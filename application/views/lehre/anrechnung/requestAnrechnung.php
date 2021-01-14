@@ -31,7 +31,7 @@ $this->load->view(
 		),
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/Anrechnung.js')
+			'public/js/lehre/anrechnung/requestAnrechnung.js')
 	)
 );
 ?>
@@ -40,149 +40,165 @@ $this->load->view(
 <div id="page-wrapper">
 	<div class="container-fluid">
         <!-- title -->
-		<div class="row">
-			<div class="col-lg-12 page-header">
-				<a class="pull-right" data-toggle="collapse" href="#collapseHelp">
-					<?php echo $this->p->t('ui', 'hilfeZuDieserSeite'); ?>
-				</a>
-				<h3>
+        <div class="row">
+            <div class="col-lg-12 page-header">
+                <h3>
 					<?php echo $this->p->t('anrechnung', 'anerkennungNachgewiesenerKenntnisse'); ?>
                     <small>| <?php echo $this->p->t('anrechnung', 'antragStellen'); ?></small>
-				</h3>
-			</div>
-		</div>
+                </h3>
+            </div>
+        </div>
+        
+		<?php echo form_open_multipart(current_url(). '/apply',
+			['id' => 'requestAnrechnung-form'],
+			['lehrveranstaltung_id' => $antragData->lv_id, 'studiensemester_kurzbz' => $antragData->studiensemester_kurzbz]
+		); ?>
         <div class="row">
-            <div class="col-xs-12">
-                <div class="panel panel-default panel-body">
-                    <!-- Antragsdaten, Dokument Upload, Notiz-->
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <!-- Antragsdaten -->
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <?php echo $this->p->t('anrechnung', 'antragsdaten'); ?>
-                                            <span class="pull-right">Status: <span id="anrechnungsStatus"><?php echo $this->p->t('anrechnung', 'neu'); ?></span></span>
-                                        </div>
-                                        <table class="panel-body table table-bordered table-condensed">
-                                            <tbody>
+            <div class="col-xs-8">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <!-- Antragsdaten, Dokument Upload, Notiz-->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <!-- Antragsdaten -->
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+												<span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
+                                                <span class="pull-right">Status: <small><b><span id="requestAnrechnung-status" class="text-uppercase"><?php echo $anrechnungData->status; ?></span></b></small></span>
+                                            </div>
+                                            <table class="panel-body table table-bordered table-condensed">
+                                                <tbody>
                                                 <tr>
                                                     <td><?php echo $this->p->t('person', 'student'); ?></td>
-                                                    <td><?php echo $anrechnungData->vorname. ' '. $anrechnungData->nachname; ?></td>
+                                                    <td><?php echo $antragData->vorname. ' '. $antragData->nachname; ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
-                                                    <td><?php echo $anrechnungData->bpk ?></td>
+                                                    <td><?php echo $antragData->bpk ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('lehre', 'studiensemester'); ?></td>
-                                                    <td><?php echo $anrechnungData->studiensemester_kurzbz ?></td>
+                                                    <td><?php echo $antragData->studiensemester_kurzbz ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('lehre', 'studiengang'); ?></td>
-                                                    <td><?php echo $anrechnungData->stg_bezeichnung ?></td>
+                                                    <td><?php echo $antragData->stg_bezeichnung ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></td>
-                                                    <td><?php echo $anrechnungData->lv_bezeichnung ?></td>
+                                                    <td><?php echo $antragData->lv_bezeichnung ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('lehre', 'ects'); ?></td>
-                                                    <td><?php echo $anrechnungData->ects ?></td>
+                                                    <td><?php echo $antragData->ects ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('lehre', 'lektor'); ?></td>
                                                     <td>
-	                                                    <?php $len = count($anrechnungData->lektoren) - 1 ?>
-                                                        <?php foreach ($anrechnungData->lektoren as $key => $lektor): ?>
-                                                        <?php echo $lektor->vorname. ' '. $lektor->nachname;
-                                                            echo $key === $len ? '' : ', ' ?>
-                                                        <?php endforeach; ?>
+														<?php $len = count($antragData->lektoren) - 1 ?>
+														<?php foreach ($antragData->lektoren as $key => $lektor): ?>
+															<?php echo $lektor->vorname. ' '. $lektor->nachname;
+															echo $key === $len ? '' : ', ' ?>
+														<?php endforeach; ?>
                                                     </td>
                                                 </tr>
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Dokument Upload-->
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <?php echo $this->p->t('anrechnung', 'dokumentZumNachweis'); ?>
-                                        </div>
-                                        <div class="form-inline panel-body">
-                                            <?php echo form_open_multipart(current_url().'/uploadFile');?>
-                                            <div class="form-group">
-                                                <input type="file" class="" id="file" name="file" size="20" >
+                                <!-- Antrag mit Checkboxen -->
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="well" style="border:solid black 2px">
+                                            <p><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></p>
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="radio" name="begruendung" value="1" required
+														<?php echo $anrechnungData->begruendung_id == '1' ? 'checked' : ''; ?>
+														<?php echo $disabled; ?>>
+													<?php echo $this->p->t('anrechnung', 'antragStellenWegenZeugnis'); ?>
+                                                </label>
                                             </div>
-                                            <button type="submit" class="btn btn-default pull-right" value="upload" />
-                                                <?php echo $this->p->t('ui', 'hochladen'); ?>
-                                            </button>
-                                            <?php echo form_close();?>
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="radio" name="begruendung" value="4" required
+														<?php echo $anrechnungData->begruendung_id == '4' ? 'checked' : ''; ?>
+														<?php echo $disabled; ?>>
+													<?php echo $this->p->t('anrechnung', 'antragStellenWegenPraxis'); ?>
+                                                </label>
+                                            </div>
                                         </div>
-                                        <ul class="list-group">
-                                            <li class="list-group-item">
-                                                <span class="pull-right"><i class="fa fa-times fa-lg" aria-hidden="true"></i></span>
-                                                <a href="#">bla.pdf</a>
-                                            </li>
-                                            <li class="list-group-item">
-                                                <span class="pull-right"><i class="fa fa-times fa-lg" aria-hidden="true"></i></span>
-                                                <a href="#">bla.pdf</a>
-                                            </li>
-                                        </ul>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Notiz -->
-                        <div class="col-lg-6">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <?php echo $this->p->t('anrechnung', 'weitereInformationen'); ?>
+                                <!-- Dokument Upload-->
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+												<?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?>
+                                            </div>
+                                            <div class="form-inline panel-body">
+                                                <div class="form-group">
+                                                    <input type="file" id="requestAnrechnung-uploadfile" name="uploadfile" accept=".pdf,.jpg" size="50" required <?php echo $disabled; ?>>
+                                                </div>
+												<?php if(!empty($anrechnungData->dms_id)): ?>
+                                                    <a class="pull-right" href="<?php echo current_url(). '/download?dms_id='. $anrechnungData->dms_id; ?>" target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
+												<?php endif; ?>
+                                            </div>
                                         </div>
-                                        <div class="panel-body">
-                                            <textarea class="form-control" rows="15"></textarea>
+                                    </div>
+                                </div>
+                                <!-- Notiz -->
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+														<?php echo $this->p->t('anrechnung', 'weitereInformationen'); ?>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <textarea class="form-control" name="anmerkung" rows="3" <?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Antrag mit Checkboxen -->
-                    <div class="row">
-                            <div class="col-lg-6">
-                                <div class="well">
-                                    <p><b><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?> </b></p>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" value="">
-                                            <b><?php echo $this->p->t('anrechnung', 'antragStellenWegenZeugnis'); ?></b>
-                                        </label>
-                                    </div>
-                                    <div class="checkbox disabled">
-                                        <label>
-                                            <input type="checkbox" value="">
-                                            <b><?php echo $this->p->t('anrechnung', 'antragStellenWegenPraxis'); ?></b>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                 </div>
+            </div>
+            <div class ="col-xs-4">
+                <div class="panel panel-default panel-heading text-center">
+                    Status: <span class="text-uppercase"><small><b><?php echo $anrechnungData->status; ?></b></small></span>
+                </div>
+                <?php if (!empty($anrechnungData->anrechnung_id)): ?>
+                <div class="panel panel-default panel-heading">
+                    <span>Antrag gestellt am <?php echo $anrechnungData->insertamum; ?></span>
+                </div>
+                <?php endif; ?>
+                <?php if ($disabled): ?>
+                <div class="alert alert-warning">
+	                <?php echo $this->p->t('global', 'bearbeitungGesperrt'); ?>
+	                <?php echo $is_expired &&  empty($antragData->anrechnung_id)? ': '. $this->p->t('anrechnung', 'deadlineUeberschritten') : ''; ?>
+<!--	                --><?php //echo !empty($anrechnungData->anrechnung_id) ? $this->p->t('anrechnung', 'anrechnungIst'). ' '. $anrechnungData->status : ''; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
         <!-- Submit button 'Anrechnung beantragen'-->
         <div class="row">
-            <div class="col-xs-12">
-                <button type="submit" role="button" class="btn btn-primary pull-right"
-                        value=""><?php echo $this->p->t('anrechnung', 'anrechnungBeantragen'); ?>
+            <div class="col-xs-8">
+                <input type="submit" id="requestAnrechnung-submit" class="btn btn-primary pull-right"
+                       value="<?php echo $this->p->t('anrechnung', 'anrechnungBeantragen'); ?>" <?php echo $disabled; ?>>
             </div>
         </div>
+		<?php echo form_close();?>
     </div>
 </div>
 </body>
