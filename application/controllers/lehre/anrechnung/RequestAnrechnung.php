@@ -18,8 +18,9 @@ class requestAnrechnung extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index' => 'admin:rw',
-				'uploadFile' => 'admin:rw',
+				'index'     => 'student/anrechnung_beantragen:rw',
+				'apply'     => 'student/anrechnung_beantragen:rw',
+				'download'  => 'student/anrechnung_beantragen:rw',
 			)
 		);
 		
