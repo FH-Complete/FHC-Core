@@ -191,6 +191,20 @@ class requestAnrechnung extends Auth_Controller
 		}
 	}
 	
+	/**
+	 * Download and open uploaded document (Nachweisdokument).
+	 */
+	public function download()
+	{
+		$dms_id = $this->input->get('dms_id');
+		
+		if (!is_numeric($dms_id))
+		{
+			show_error('Wrong parameter');
+		}
+		
+		$this->dmslib->download($dms_id);
+	}
 	
 	/**
 	 * Retrieve the UID of the logged user and checks if it is valid

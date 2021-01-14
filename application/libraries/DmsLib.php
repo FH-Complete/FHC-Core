@@ -132,6 +132,47 @@ class DmsLib
 		// return result of uploaded data
 		return success($upload_data); // data about the uploaded file
 	}
+	
+	/**
+	 * Download a document
+	 * @param $dms_id
+	 */
+	public function download($dms_id)
+	{
+		if (!is_numeric($dms_id))
+		{
+			show_error('Wrong parameter');
+		}
+		
+		$this->ci->DmsVersionModel->addSelect('filename');
+		$result = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
+		
+		if (isError($result))
+		{
+			show_error(getError($result));
+		}
+		
+		$filename = $result->retval[0]->filename;
+		$file = DMS_PATH. $filename;
+		
+		if (file_exists($file))
+		{
+			$finfo  = new finfo(FILEINFO_MIME);
+			
+			header('Content-Description: File Transfer');
+			header('Content-Type: '.$finfo->file($file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+			readfile($file);
+			exit;
+		}
+		else
+		{
+			show_error('File does not exist');
+		}
+	}
 
 	/**
 	 * Saves a Document
