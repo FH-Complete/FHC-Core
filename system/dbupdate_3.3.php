@@ -4480,6 +4480,7 @@ if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
 
 		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
 		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
+		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
 	";
 	
 	
