@@ -101,9 +101,8 @@ class AnrechnungLib
 			$anrechnung_data->dms_id = $anrechnung->dms_id;
 			$anrechnung_data->insertamum = (new DateTime($anrechnung->insertamum))->format('d.m.Y');
 			$anrechnung_data->insertvon= $anrechnung->insertvon;
-			$anrechnung_data->studiensemester_kurzbz= $anrechnung->studiensemster_kurzbz;
+			$anrechnung_data->studiensemester_kurzbz= $anrechnung->studiensemester_kurzbz;
 			$anrechnung_data->empfehlung= $anrechnung->empfehlung_anrechnung;
-			
 			// Get last status bezeichnung in the users language
 			$anrechnung_data->status = $this->getLastAnrechnungstatus($anrechnung->anrechnung_id);
 			
