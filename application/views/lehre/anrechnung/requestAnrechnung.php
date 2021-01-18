@@ -182,12 +182,11 @@ $this->load->view(
                     <span>Antrag gestellt am <?php echo $anrechnungData->insertamum; ?></span>
                 </div>
                 <?php endif; ?>
-                <?php if ($disabled): ?>
-                <div class="alert alert-warning">
-	                <?php echo $this->p->t('global', 'bearbeitungGesperrt'); ?>
-	                <?php echo $is_expired &&  empty($antragData->anrechnung_id)? ': '. $this->p->t('anrechnung', 'deadlineUeberschritten') : ''; ?>
-<!--	                --><?php //echo !empty($anrechnungData->anrechnung_id) ? $this->p->t('anrechnung', 'anrechnungIst'). ' '. $anrechnungData->status : ''; ?>
-                </div>
+                <?php if ($is_expired): ?>
+                    <div class="alert alert-warning">
+                        <?php echo $this->p->t('global', 'bearbeitungGesperrt'); ?>
+                        <?php echo $is_expired &&  empty($antragData->anrechnung_id)? ': '. $this->p->t('anrechnung', 'deadlineUeberschritten') : ''; ?>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>

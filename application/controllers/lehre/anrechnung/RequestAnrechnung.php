@@ -66,7 +66,8 @@ class requestAnrechnung extends Auth_Controller
 		}
 		
 		// Check if application deadline is expired
-		$is_expired = $this->_checkAntragDeadline($studiensemester_kurzbz);
+		// $is_expired = $this->_checkAntragDeadline($studiensemester_kurzbz);
+		$is_expired = false;    // Set to false until Deadline is defined
 		
 		// Get Anrechung data
 		$result = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id);
