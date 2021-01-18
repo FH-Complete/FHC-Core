@@ -66,12 +66,43 @@ class AnrechnungLib
 	}
 	
 	/**
+	 * Get Anrechnung data, last status and Nachweisdokument dms data.
+	 * @param $anrechnung_id
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getAnrechnungData($anrechnung_id)
+	{
+		if (!is_numeric($anrechnung_id))
+		{
+			show_error('Incorrect parameter');
+		}
+		
+		$anrechnung_data = new StdClass();
+		
+		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
+		
+		if (isError($result))
+		{
+			show_error(getError($result));
+		}
+		
+		if ($anrechnung = getData($result)[0])
+		{
+			$anrechnung_data = $this->_setAnrechnungDataObject($anrechnung);
+		}
+		
+		return success($anrechnung_data);
+		
+	}
+	
+	/**
 	 * Get Anrechnung data by Lehrveranstaltung. Also retrieves last status and Nachweisdokument dms data.
 	 * @param $lehrveranstaltung_id
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getAnrechnungData($lehrveranstaltung_id)
+	public function getAnrechnungDataByLv($lehrveranstaltung_id)
 	{
 		$anrechnung_data = new StdClass();
 		$anrechnung_data->anrechnung_id = '';
@@ -94,22 +125,7 @@ class AnrechnungLib
 		
 		if ($anrechnung = getData($result)[0])
 		{
-			// Get Anrechnung data
-			$anrechnung_data->anrechnung_id = $anrechnung->anrechnung_id;
-			$anrechnung_data->begruendung_id =  $anrechnung->begruendung_id;
-			$anrechnung_data->anmerkung = $anrechnung->anmerkung_student;
-			$anrechnung_data->dms_id = $anrechnung->dms_id;
-			$anrechnung_data->insertamum = (new DateTime($anrechnung->insertamum))->format('d.m.Y');
-			$anrechnung_data->insertvon= $anrechnung->insertvon;
-			$anrechnung_data->studiensemester_kurzbz= $anrechnung->studiensemester_kurzbz;
-			$anrechnung_data->empfehlung= $anrechnung->empfehlung_anrechnung;
-			// Get last status bezeichnung in the users language
-			$anrechnung_data->status = $this->getLastAnrechnungstatus($anrechnung->anrechnung_id);
-			
-			// Get document name
-			$this->ci->DmsVersionModel->addSelect('name');
-			$result = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $anrechnung->dms_id));
-			$anrechnung_data->dokumentname  = $result->retval[0]->name;
+			$anrechnung_data = $this->_setAnrechnungDataObject($anrechnung);
 		}
 		
 		return success($anrechnung_data);
@@ -128,6 +144,35 @@ class AnrechnungLib
 		
 		return $status;
 	}
-
 	
+	private function _setAnrechnungDataObject($anrechnung)
+	{
+		$anrechnung_data = new StdClass();
+		
+		// Get Anrechnung data
+		$anrechnung_data->anrechnung_id = $anrechnung->anrechnung_id;
+		$anrechnung_data->begruendung_id =  $anrechnung->begruendung_id;
+		$anrechnung_data->anmerkung = $anrechnung->anmerkung_student;
+		$anrechnung_data->dms_id = $anrechnung->dms_id;
+		$anrechnung_data->insertamum = (new DateTime($anrechnung->insertamum))->format('d.m.Y');
+		$anrechnung_data->insertvon= $anrechnung->insertvon;
+		$anrechnung_data->studiensemester_kurzbz= $anrechnung->studiensemester_kurzbz;
+		$anrechnung_data->empfehlung= $anrechnung->empfehlung_anrechnung;
+		
+		// Get last status bezeichnung in the users language
+		$anrechnung_data->status = $this->getLastAnrechnungstatus($anrechnung->anrechnung_id);
+		
+		// Get document name
+		$this->ci->DmsVersionModel->addSelect('name');
+		$result = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $anrechnung->dms_id));
+		
+		if (isError($result))
+		{
+			show_error(getError($result));
+		}
+		
+		$anrechnung_data->dokumentname  = $result->retval[0]->name;
+		
+		return $anrechnung_data;
+	}
 }

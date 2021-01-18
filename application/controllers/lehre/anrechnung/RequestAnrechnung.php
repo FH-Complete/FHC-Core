@@ -69,7 +69,7 @@ class requestAnrechnung extends Auth_Controller
 		$is_expired = $this->_checkAntragDeadline($studiensemester_kurzbz);
 		
 		// Get Anrechung data
-		$result = $this->anrechnunglib->getAnrechnungData($lehrveranstaltung_id);
+		$result = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id);
 		if (!$anrechnungData = getData($result))
 		{
 			show_error(getError($anrechnungData));
