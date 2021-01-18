@@ -30,8 +30,8 @@ $this->load->view(
             )
 		),
 		'customJSs' => array(
-			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/requestAnrechnung.js')
+			'public/js/bootstrapper.js'
+        )
 	)
 );
 ?>
