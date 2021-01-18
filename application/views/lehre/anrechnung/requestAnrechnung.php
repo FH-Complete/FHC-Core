@@ -66,7 +66,7 @@ $this->load->view(
                                         <div class="panel panel-default">
                                             <div class="panel-heading">
 												<span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
-                                                <span class="pull-right">Status: <small><b><span id="requestAnrechnung-status" class="text-uppercase"><?php echo $anrechnungData->status; ?></span></b></small></span>
+                                                <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span id="requestAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
                                             </div>
                                             <table class="panel-body table table-bordered table-condensed">
                                                 <tbody>
@@ -177,11 +177,6 @@ $this->load->view(
                 <div class="panel panel-default panel-heading text-center">
                     Status: <span class="text-uppercase"><small><b><?php echo $anrechnungData->status; ?></b></small></span>
                 </div>
-                <?php if (!empty($anrechnungData->anrechnung_id)): ?>
-                <div class="panel panel-default panel-heading">
-                    <span>Antrag gestellt am <?php echo $anrechnungData->insertamum; ?></span>
-                </div>
-                <?php endif; ?>
                 <?php if ($is_expired): ?>
                     <div class="alert alert-warning">
                         <?php echo $this->p->t('global', 'bearbeitungGesperrt'); ?>
