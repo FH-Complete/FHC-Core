@@ -112,7 +112,7 @@ class AnrechnungLib
 		$anrechnung_data->insertamum = '';
 		$anrechnung_data->insertvon = '';
 		$anrechnung_data->studiensemester_kurzbz = '';
-		$anrechnung_data->empfehlung = false;
+		$anrechnung_data->empfehlung = '';
 		$anrechnung_data->status = '';
 		$anrechnung_data->dokumentname = '';
 		
