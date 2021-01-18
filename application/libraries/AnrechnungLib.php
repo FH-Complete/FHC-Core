@@ -58,7 +58,8 @@ class AnrechnungLib
 		$antrag_data->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$antrag_data->vorname = $person->vorname;
 		$antrag_data->nachname = $person->nachname;
-		$antrag_data->bpk = $person->bpk;
+//		$antrag_data->bpk = $person->bpk;
+		$antrag_data->bpk = $person->matr_nr;
 		$antrag_data->stg_bezeichnung = $studiengang->bezeichnung;
 		$antrag_data->lektoren = $lv_lektoren;
 		
