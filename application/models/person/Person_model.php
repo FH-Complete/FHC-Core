@@ -191,7 +191,7 @@ class Person_model extends DB_Model
 	 */
 	public function getByUid($uid)
 	{
-		$this->addSelect('vorname, nachname, gebdatum, person_id');
+		$this->addSelect('vorname, nachname, gebdatum, person_id, bpk, matr_nr');
 		$this->addJoin('tbl_benutzer', 'person_id');
 
 		return $this->loadWhere(array('uid' => $uid));
