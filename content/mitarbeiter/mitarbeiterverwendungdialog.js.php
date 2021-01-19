@@ -70,6 +70,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		dv_art = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dv_art" ));
 		inkludierte_lehre = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#inkludierte_lehre" ));
 		zeitaufzeichnungspflichtig = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zeitaufzeichnungspflichtig" ));
+		azgrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#azgrelevant" ));
 	}
 	else
 	{
@@ -112,6 +113,14 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		{
 			zeitaufzeichnungspflichtig='Nein';
 		}
+		if (azgrelevant=='Ja')
+		{
+			azgrelevant='Ja';
+		}
+		else
+		{
+			azgrelevant='Nein';
+		}
 	}
 
 	document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value=ba1code;
@@ -138,7 +147,10 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked=true;
 	else
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked=false;
-
+	if(azgrelevant=='Ja')
+		document.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked=true;
+	else
+		document.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked=false;
 	MitarbeiterVerwendungDetailToggleHauptberuf();
 	MitarbeiterVerwendungVerwendungChange();
 }
