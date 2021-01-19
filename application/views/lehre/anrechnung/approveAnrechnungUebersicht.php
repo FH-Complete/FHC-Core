@@ -114,8 +114,8 @@ $this->load->view(
         <div class="row">
             <div class="col-xs-12">
                 <div class="pull-right">
-                    <button id="request-recommendation" class="btn btn-primary btn-w200 btn-mr50"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
-                    <button id="reject-anrechnungen" class="btn btn-primary btn-w200 btn-mr5"><?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
+                    <button id="request-recommendation" class="btn btn-default btn-w200 btn-mr50"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
+                    <button id="reject-anrechnungen" class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
                     <button id="approve-anrechnungen" class="btn btn-primary btn-w200"><?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>
                 </div>
                 </div>
