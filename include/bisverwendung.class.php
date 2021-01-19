@@ -220,13 +220,21 @@ class bisverwendung extends basis_db
 		{
 			$zeitaufzeichnungspflichtig = 'null';
 		}
+		if(is_bool($this->azgrelevant))
+		{
+			$azgrelevant = $this->db_add_param($this->azgrelevant, FHC_BOOLEAN);
+		}
+		else
+		{
+			$azgrelevant = 'null';
+		}
 
 		if($new)
 		{
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode,
 					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden,
-					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig) VALUES (".
+					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig, azgrelevant) VALUES (".
 			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
@@ -244,7 +252,8 @@ class bisverwendung extends basis_db
 			       $this->db_add_param($this->insertvon).', '.
 				   $this->db_add_param($this->dv_art).','.
 				   $this->db_add_param($this->inkludierte_lehre).','.
-				   $zeitaufzeichnungspflichtig. ');';
+				   $zeitaufzeichnungspflichtig.','.
+				   $azgrelevant. ');';
 
 		}
 		else
@@ -268,7 +277,8 @@ class bisverwendung extends basis_db
 				  " insertvon=".$this->db_add_param($this->insertvon).",".
 				  " dv_art=".$this->db_add_param($this->dv_art).",".
 				  " inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).",".
-				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.
+				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.",".
+				  " azgrelevant =". $azgrelevant.
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
 
