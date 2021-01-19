@@ -4,6 +4,7 @@
 
 class approveAnrechnungUebersicht extends Auth_Controller
 {
+	const BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN = 'lehre/anrechnung_genehmigen';
 	public function __construct()
 	{
 		// Set required permissions
@@ -50,6 +51,12 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	{
 		$studiensemester_kurzbz = $this->input->get('studiensemester');
 		
+		// Retrieve studiengaenge the user is entitled for
+		if (!$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN))
+		{
+			show_error(getError($studiengang_kz_arr));
+		}
+		
 		if (!is_string($studiensemester_kurzbz))
 		{
 			$studiensemester = $this->StudiensemesterModel->getNearest(); // TODO check
@@ -64,7 +71,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 		
 		$viewData = array(
-			'studiensemester_selected' => $studiensemester_kurzbz
+			'studiensemester_selected' => $studiensemester_kurzbz,
+			'studiengaenge_entitled' => $studiengang_kz_arr
 		);
 		
 		$this->load->view('lehre/anrechnung/approveAnrechnungUebersicht.php', $viewData);

@@ -1,5 +1,6 @@
 <?php
 $STUDIENSEMESTER = $studiensemester_selected;
+$STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '0' : '1';
 
 $query = '
@@ -40,6 +41,7 @@ $query = '
 	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+	AND studiengang_kz IN (' . $STUDIENGAENGE_ENTITLED . ')
 ';
 
 $filterWidgetArray = array(
