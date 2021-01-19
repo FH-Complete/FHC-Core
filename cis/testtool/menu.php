@@ -224,6 +224,8 @@ if (isset($_SESSION['pruefling_id']))
 					(
 						(prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
 						OR
+						(prestudent_data.semester= 2 AND tbl_ablauf.semester = 2)
+						OR
 						(prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
 					)
 				AND (   
