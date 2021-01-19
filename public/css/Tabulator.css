@@ -40,3 +40,33 @@
 {
 	background-color: #e6e6e6;
 }
+
+.btn-w200
+{
+    width: 200px;
+}
+
+.btn-mr5
+{
+    margin-right: 10px;
+}
+
+.btn-mr10
+{
+    margin-right: 10px;
+}
+
+.btn-mr20
+{
+    margin-right: 20px;
+}
+
+.btn-mr40
+{
+    margin-right: 40px;
+}
+
+.btn-mr50
+{
+    margin-right: 50px;
+}
