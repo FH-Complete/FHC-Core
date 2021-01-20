@@ -88,7 +88,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	}
 	
 	/**
-	 * Approve multiple Anrechnungen.
+	 * Approve Anrechnungen.
 	 */
 	public function approve()
 	{
@@ -102,6 +102,9 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Get statusbezeichnung for 'approved'
 		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
 		$approved = getData($this->AnrechnungstatusModel->load('approved'))[0];
+		$approved = getUserLanguage() == 'German'
+			? $approved->bezeichnung_mehrsprachig[0]
+			: $approved->bezeichnung_mehrsprachig[1];
 
 		foreach ($data as $item)
 		{
@@ -110,9 +113,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
-					'status_bezeichnung' => getUserLanguage() == 'German'
-						? $approved->bezeichnung_mehrsprachig[0]
-						: $approved->bezeichnung_mehrsprachig[1]
+					'status_bezeichnung' => $approved
 				);
 			}
 		}
@@ -128,6 +129,9 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 	}
 	
+	/**
+	 * Reject Anrechnungen.
+	 */
 	public function reject()
 	{
 		$data = $this->input->post('data');
@@ -137,7 +141,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 		
-		// Get statusbezeichnung for 'approved'
+		// Get statusbezeichnung for 'rejected'
 		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
 		$rejected = getData($this->AnrechnungstatusModel->load('rejected'))[0];
 		$rejected = getUserLanguage() == 'German'
@@ -146,7 +150,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
+			// Reject Anrechnung
 			if(getData($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'])))
 			{
 				$json[]= array(

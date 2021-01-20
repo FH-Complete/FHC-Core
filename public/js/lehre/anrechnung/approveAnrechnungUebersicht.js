@@ -41,19 +41,8 @@ function func_selectableCheck(row){
 
 // Performes after row was updated
 function func_rowUpdated(row){
-    // TODO: check better solution...
-    // status_kurzbz is not updated until page reload...therefor use the updated status_bezeichnung
-    let status_bezeichnung = row.getData().status_bezeichnung;
-
-    // Deselect and disable new selection of updated rows, but not when
-    if (status_bezeichnung == 'genehmigt' ||
-        status_bezeichnung == 'approved' ||
-        status_bezeichnung == 'abgelehnt' ||
-        status_bezeichnung == 'rejected')
-    {
         row.deselect();
         row.getElement().style["pointerEvents"] = "none";
-    }
 }
 
 // Formats null values to '-'

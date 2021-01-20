@@ -225,6 +225,11 @@ class AnrechnungLib
 		return success(true);   // approved
 	}
 	
+	/**
+	 * Reject Anrechnung.
+	 * @param $anrechnung_id
+	 * @return array
+	 */
 	public function rejectAnrechnung($anrechnung_id)
 	{
 		// Check last Anrechnungstatus
