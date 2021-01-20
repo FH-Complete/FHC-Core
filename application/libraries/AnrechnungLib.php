@@ -19,6 +19,7 @@ class AnrechnungLib
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->ci->load->model('crm/Student_model', 'StudentModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
+		$this->ci->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 	}
 	
 	/**
@@ -177,35 +178,51 @@ class AnrechnungLib
 		// Exit if already approved or rejected
 		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED) // TODO: in js: bereits genehmigte nicht clickable!
 		{
-			return success(false);  // has not been approved
+			return success(false);  // dont approve
 		}
 		
 		// Start DB transaction
 		$this->ci->db->trans_start(false);
 
+		$stgl_uid = getAuthUID();
+		
 		// Insert new status approved
-		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_APPROVED);
+		$this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_APPROVED);
 
 		// Update genehmigt von
-		$result = $this->ci->AnrechnungModel->update(
+		$this->ci->AnrechnungModel->update(
 			$anrechnung_id,
 			array(
-				'genehmigt_von' => getAuthUID(),
+				'genehmigt_von' => $stgl_uid,
 				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
-				'updatevon'     => getAuthUID()
+				'updatevon'     => $stgl_uid
 			)
 		);
 
-		// Transaction complete!
+		// Set zeugnisnote to angerechnet (= note 6)
+		$this->ci->AnrechnungModel->addSelect('lehrveranstaltung_id, student_uid, studiensemester_kurzbz');
+		$this->ci->AnrechnungModel->addJoin('public.tbl_student', 'prestudent_id');
+		$anrechnung = getData($this->ci->AnrechnungModel->load($anrechnung_id))[0];
+		$result = $this->ci->ZeugnisnoteModel->insert(array(
+				'lehrveranstaltung_id' => $anrechnung->lehrveranstaltung_id,
+				'student_uid' => $anrechnung->student_uid,
+				'studiensemester_kurzbz' => $anrechnung->studiensemester_kurzbz,
+				'note' => 6,
+				'insertvon' => $stgl_uid,
+				'bemerkung' => 'Digitale Anrechnung'
+			)
+		);
+		
+		// Transaction complete
 		$this->ci->db->trans_complete();
 
-		if ($this->ci->db->trans_status() === false || isError($result))
+		if ($this->ci->db->trans_status() === false)
 		{
 			$this->ci->db->trans_rollback();
-			show_error($result->msg, EXIT_ERROR);
+			return error($result->msg, EXIT_ERROR);
 		}
 		
-		return success(true);   // has been approved
+		return success(true);   // approved
 	}
 	
 	public function rejectAnrechnung($anrechnung_id)
