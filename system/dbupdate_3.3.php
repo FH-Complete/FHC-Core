@@ -4553,10 +4553,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"
 
 		ALTER TABLE lehre.tbl_anrechnungstatus ADD CONSTRAINT pk_anrechnungstatus PRIMARY KEY (status_kurzbz);
 
-		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressDP', '{\'bearbeitet von STG-Leitung\',\'processed by STG-Director\'}');
-		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressKF', '{\'bearbeitet von KF-Leitung\',\'processed by KF-Manager\'}');
-		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('approved', '{\'genehmigt\',\'approved\'}');
-		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('rejected', '{\'abgelehnt\',\'rejected\'}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressDP', '{\"bearbeitet von STG-Leitung\",\"processed by STG-Director\"}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressKF', '{\"bearbeitet von KF-Leitung\",\"processed by KF-Manager\"}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressLektor', '{\"bearbeitet von LektorIn\",\"processed by lector\"}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('approved', '{\"genehmigt\",\"approved\"}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('rejected', '{\"abgelehnt\",\"rejected\"}');
 	
 		GRANT SELECT ON lehre.tbl_anrechnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnungstatus TO vilesci;
