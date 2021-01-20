@@ -6,6 +6,7 @@ class AnrechnungLib
 {
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
+	const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 	
@@ -248,6 +249,40 @@ class AnrechnungLib
 		
 		// Insert new status rejected
 		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_REJECTED);
+		
+		if (isError($result))
+		{
+			show_error(getError($result));
+		}
+		
+		return success(true);   // rejected
+	}
+	
+	/**
+	 * Request recommendation.
+	 * @param $anrechnung_id
+	 * @return array
+	 */
+	public function requestRecommendation($anrechnung_id)
+	{
+		// Check last Anrechnungstatus
+		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			show_error(getError($result));
+		}
+		
+		$status_kurzbz = $result->status_kurzbz;
+		
+		// Exit if already approved or rejected or processed by lector
+		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
+			|| $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED
+			|| $status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR)
+		{
+			return success(false);  // dont ask for recommendation
+		}
+		
+		// Insert new status inProgressLektor
+		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR);
 		
 		if (isError($result))
 		{

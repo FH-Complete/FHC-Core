@@ -8,6 +8,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
+	const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 	
@@ -19,7 +20,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 				'index'     => 'lehre/anrechnung_genehmigen:rw',
 				'download'  => 'lehre/anrechnung_genehmigen:rw',
 				'approve'   => 'lehre/anrechnung_genehmigen:rw',
-				'reject'   => 'lehre/anrechnung_genehmigen:rw'
+				'reject'    => 'lehre/anrechnung_genehmigen:rw',
+				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw'
 			)
 		);
 		
@@ -168,6 +170,48 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		else
 		{
 			return $this->outputJsonError('Es wurden keine Anrechnungen genehmigt.');
+		}
+	}
+	
+	/**
+	 * Request recommendation for Anrechnungen.
+	 */
+	public function requestRecommendation()
+	{
+		$data = $this->input->post('data');
+		
+		if(isEmptyArray($data))
+		{
+			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+		}
+		
+		// Get statusbezeichnung for 'inProgressLektor'
+		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
+		$inProgressLektor = getData($this->AnrechnungstatusModel->load('inProgressLektor'))[0];
+		$inProgressLektor = getUserLanguage() == 'German'
+			? $inProgressLektor->bezeichnung_mehrsprachig[0]
+			: $inProgressLektor->bezeichnung_mehrsprachig[1];
+		
+		foreach ($data as $item)
+		{
+			// Approve Anrechnung
+			if(getData($this->anrechnunglib->requestRecommendation($item['anrechnung_id'])))
+			{
+				$json[]= array(
+					'anrechnung_id' => $item['anrechnung_id'],
+					'status_bezeichnung' => $inProgressLektor
+				);
+			}
+		}
+		
+		// Output json to ajax
+		if (isset($json) && !isEmptyArray($json))
+		{
+			return $this->outputJsonSuccess($json);
+		}
+		else
+		{
+			return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
 		}
 	}
 	

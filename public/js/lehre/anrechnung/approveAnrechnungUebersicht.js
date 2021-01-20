@@ -3,6 +3,7 @@ const APPROVE_ANRECHNUNG_DETAIL_URI = "lehre/anrechnung/ApproveAnrechnungDetail"
 
 const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
+const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
@@ -36,7 +37,11 @@ function func_tableBuilt(table) {
 function func_selectableCheck(row){
     let status_kurzbz = row.getData().status_kurzbz;
 
-    return (status_kurzbz != ANRECHNUNGSTATUS_APPROVED && status_kurzbz != ANRECHNUNGSTATUS_REJECTED);
+    return (
+        status_kurzbz != ANRECHNUNGSTATUS_APPROVED &&
+        status_kurzbz != ANRECHNUNGSTATUS_REJECTED &&
+        status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+    );
 }
 
 // Performes after row was updated
@@ -169,6 +174,58 @@ $(function(){
 
                         // Print success message
                         FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden abgelehnt.");
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+                }
+            }
+        );
+    });
+
+    // Request Recommendation for Anrechnungen
+    $("#request-recommendation").click(function(){
+        // Get selected rows data
+        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
+            .map(function(data){
+                // reduce to necessary fields
+                return {
+                    'anrechnung_id' : data.anrechnung_id,
+                }
+            });
+
+        // Alert and exit if no anrechnung is selected
+        if (selected_data.length == 0)
+        {
+            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
+            return;
+        }
+
+        // Prepare data object for ajax call
+        let data = {
+            'data': selected_data
+        };
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
+            data,
+            {
+                successCallback: function (data, textStatus, jqXHR)
+                {
+                    if (data.error && data.retval != null)
+                    {
+                        // Print error message
+                        FHC_DialogLib.alertWarning(data.retval);
+                    }
+
+                    if (!data.error && data.retval != null)
+                    {
+                        // Update status 'genehmigt'
+                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+
+                        // Print success message
+                        FHC_DialogLib.alertSuccess("Empfehlungen wurden angefordert.");
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
