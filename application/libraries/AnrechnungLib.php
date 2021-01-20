@@ -17,6 +17,7 @@ class AnrechnungLib
 		$this->ci->load->model('person/Person_model', 'PersonModel');
 		$this->ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->ci->load->model('crm/Student_model', 'StudentModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
 	}
 	
@@ -43,6 +44,12 @@ class AnrechnungLib
 			show_error('Failed loading person data.');
 		}
 		
+		// Get the internal personenkennzeichen
+		if (!$student = getData($this->ci->StudentModel->load(array('student_uid' => $uid)))[0])
+		{
+			show_error(getError($student));
+		}
+		
 		// Get studiengang bezeichnung
 		if (!$studiengang = getData($this->ci->StudiengangModel->load($lv->studiengang_kz))[0])
 		{
@@ -63,8 +70,7 @@ class AnrechnungLib
 		$antrag_data->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$antrag_data->vorname = $person->vorname;
 		$antrag_data->nachname = $person->nachname;
-//		$antrag_data->bpk = $person->bpk;
-		$antrag_data->bpk = $person->matr_nr;
+		$antrag_data->matrikelnr = $student->matrikelnr;
 		$antrag_data->stg_bezeichnung = $studiengang->bezeichnung;
 		$antrag_data->lektoren = $lv_lektoren;
 		

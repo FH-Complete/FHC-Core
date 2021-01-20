@@ -76,7 +76,7 @@ $this->load->view(
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
-                                                    <td><?php echo $antragData->bpk ?></td>
+                                                    <td><?php echo $antragData->matrikelnr ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('lehre', 'studiensemester'); ?></td>
