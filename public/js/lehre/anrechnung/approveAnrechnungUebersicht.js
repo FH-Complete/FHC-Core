@@ -55,6 +55,19 @@ var format_nullToMinus = function(cell, formatterParams){
     return (cell.getValue() == null) ? '-' : cell.getValue();
 }
 
+/*
+ * Hook to overwrite TableWigdgets select-all-button behaviour
+ * Select all (filtered) rows that are progressed by stg leiter.
+ * (Ignore rows that are approved, rejected or in request for recommendation)
+ */
+function tableWidgetHook_selectAllButton(tableWidgetDiv){
+    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+        .filter(row =>
+            row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_STGL
+        )
+        .forEach((row => row.select()));
+}
+
 
 $(function(){
     // Pruefen ob Promise unterstuetzt wird
