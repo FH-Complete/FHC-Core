@@ -63,6 +63,21 @@ var format_nullToMinus = function(cell, formatterParams){
 
 
 $(function(){
+    // Pruefen ob Promise unterstuetzt wird
+    // Tabulator funktioniert nicht mit IE
+    var canPromise = !! window.Promise;
+    if(!canPromise)
+    {
+        alert("Diese Seite kann mit ihrem Browser nicht angezeigt werden. Bitte verwenden Sie Firefox, Chrome oder Edge um die Seite anzuzeigen");
+        window.location.href='about:blank';
+        return;
+    }
+
+    // Redraw table on resize to fit tabulators height to windows height
+    window.addEventListener('resize', function(){
+        $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
+        $('#tableWidgetTabulator').tabulator('redraw', true);
+    });
 
     // Approve Anrechnungen
     $("#approve-anrechnungen").click(function(){
