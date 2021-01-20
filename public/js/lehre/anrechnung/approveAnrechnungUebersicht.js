@@ -132,4 +132,62 @@ $(function(){
         );
     });
 
+    // Reject Anrechnungen
+    $("#reject-anrechnungen").click(function(){
+        // Get selected rows data
+        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
+            .map(function(data){
+                // reduce to necessary fields
+                return {
+                    'anrechnung_id' : data.anrechnung_id,
+                }
+            });
+
+        // Alert and exit if no anrechnung is selected
+        if (selected_data.length == 0)
+        {
+            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
+            return;
+        }
+
+        // Confirm before rejecting
+        if(!confirm('Wollen Sie wirklich die gewählten Anträge ablehnen?'))
+        {
+            return;
+        }
+
+        // Prepare data object for ajax call
+        let data = {
+            'data': selected_data
+        };
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/reject",
+            data,
+            {
+                successCallback: function (data, textStatus, jqXHR)
+                {
+                    if (data.error && data.retval != null)
+                    {
+                        // Print error message
+                        FHC_DialogLib.alertWarning(data.retval);
+                    }
+
+                    if (!data.error && data.retval != null)
+                    {
+                        // Update status 'genehmigt'
+                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+
+                        // Print success message
+                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden abgelehnt.");
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+                }
+            }
+        );
+    });
+
 });

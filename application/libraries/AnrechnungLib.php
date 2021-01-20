@@ -202,6 +202,50 @@ class AnrechnungLib
 		return success(true);   // has been approved
 	}
 	
+	public function rejectAnrechnung($anrechnung_id)
+	{
+		// Check last Anrechnungstatus
+		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			show_error(getError($result));
+		}
+		
+		$status_kurzbz = $result->status_kurzbz;
+		
+		// Exit if already approved or rejected
+		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED) // TODO: in js: bereits genehmigte nicht clickable!
+		{
+			return success(false);  // dont reject
+		}
+		
+		// Start DB transaction
+		$this->ci->db->trans_start(false);
+		
+		// Insert new status approved
+		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_REJECTED);
+		
+		// Update genehmigt von
+		$result = $this->ci->AnrechnungModel->update(
+			$anrechnung_id,
+			array(
+				'genehmigt_von' => getAuthUID(),
+				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
+				'updatevon'     => getAuthUID()
+			)
+		);
+		
+		// Transaction complete!
+		$this->ci->db->trans_complete();
+		
+		if ($this->ci->db->trans_status() === false || isError($result))
+		{
+			$this->ci->db->trans_rollback();
+			show_error($result->msg, EXIT_ERROR);
+		}
+		
+		return success(true);   // rejected
+	}
+	
 	private function _setAnrechnungDataObject($anrechnung)
 	{
 		$anrechnung_data = new StdClass();
