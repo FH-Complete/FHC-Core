@@ -5,18 +5,26 @@
 class approveAnrechnungUebersicht extends Auth_Controller
 {
 	const BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN = 'lehre/anrechnung_genehmigen';
+	
+	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
+	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
+	const ANRECHNUNGSTATUS_APPROVED = 'approved';
+	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
+	
 	public function __construct()
 	{
 		// Set required permissions
 		parent::__construct(
 			array(
 				'index'     => 'lehre/anrechnung_genehmigen:rw',
-				'download'  => 'lehre/anrechnung_genehmigen:rw'
+				'download'  => 'lehre/anrechnung_genehmigen:rw',
+				'approve'   => 'lehre/anrechnung_genehmigen:rw'
 			)
 		);
 		
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
+		$this->load->model('education/Anrechnungstatus_model', 'AnrechnungstatusModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		
 		// Load libraries
@@ -76,6 +84,47 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		);
 		
 		$this->load->view('lehre/anrechnung/approveAnrechnungUebersicht.php', $viewData);
+	}
+	
+	/**
+	 * Approve multiple Anrechnungen.
+	 */
+	public function approve()
+	{
+		$data = $this->input->post('data');
+
+		if(isEmptyArray($data))
+		{
+			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+		}
+		
+		// Get statusbezeichnung for 'approved'
+		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
+		$approved = getData($this->AnrechnungstatusModel->load('approved'))[0];
+
+		foreach ($data as $item)
+		{
+			// Approve Anrechnung
+			if(getData($this->anrechnunglib->approveAnrechnung($item['anrechnung_id'])))
+			{
+				$json[]= array(
+					'anrechnung_id' => $item['anrechnung_id'],
+					'status_bezeichnung' => getUserLanguage() == 'German'
+						? $approved->bezeichnung_mehrsprachig[0]
+						: $approved->bezeichnung_mehrsprachig[1]
+				);
+			}
+		}
+		
+		// Output json to ajax
+		if (isset($json) && !isEmptyArray($json))
+		{
+			return $this->outputJsonSuccess($json);
+		}
+		else
+		{
+			return $this->outputJsonError('Es wurden keine Anrechnungen genehmigt.');
+		}
 	}
 	
 	/**

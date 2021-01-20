@@ -4,6 +4,11 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class AnrechnungLib
 {
+	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
+	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
+	const ANRECHNUNGSTATUS_APPROVED = 'approved';
+	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
+	
 	public function __construct()
 	{
 		$this->ci =& get_instance();
@@ -144,6 +149,57 @@ class AnrechnungLib
 		$status = getUserLanguage() == 'German' ? $status_mehrsprachig[0] : $status_mehrsprachig[1];
 		
 		return $status;
+	}
+	
+	/**
+	 * Approve Anrechnung.
+	 * Checks last status of Anrechnung and will only approve if last status is not approved or rejected.
+	 * @param $anrechnung_id
+	 * @return array
+	 * @throws Exception
+	 */
+	public function approveAnrechnung($anrechnung_id)
+	{
+		// Check last Anrechnungstatus
+		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			show_error(getError($result));
+		}
+		
+		$status_kurzbz = $result->status_kurzbz;
+	
+		// Exit if already approved or rejected
+		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED) // TODO: in js: bereits genehmigte nicht clickable!
+		{
+			return success(false);  // has not been approved
+		}
+		
+		// Start DB transaction
+		$this->ci->db->trans_start(false);
+
+		// Insert new status approved
+		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_APPROVED);
+
+		// Update genehmigt von
+		$result = $this->ci->AnrechnungModel->update(
+			$anrechnung_id,
+			array(
+				'genehmigt_von' => getAuthUID(),
+				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
+				'updatevon'     => getAuthUID()
+			)
+		);
+
+		// Transaction complete!
+		$this->ci->db->trans_complete();
+
+		if ($this->ci->db->trans_status() === false || isError($result))
+		{
+			$this->ci->db->trans_rollback();
+			show_error($result->msg, EXIT_ERROR);
+		}
+		
+		return success(true);   // has been approved
 	}
 	
 	private function _setAnrechnungDataObject($anrechnung)

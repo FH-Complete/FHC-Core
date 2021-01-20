@@ -79,7 +79,13 @@ $filterWidgetArray = array(
         },
         tableWidgetFooter: {
 			selectButtons: true
-		}
+		},
+		selectableCheck: function(row){
+            return func_selectableCheck(row);
+        },
+         rowUpdated:function(row){
+            func_rowUpdated(row);
+        },
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
 		anrechnung_id: {visible: false},
