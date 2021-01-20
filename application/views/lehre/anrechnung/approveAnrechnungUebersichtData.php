@@ -15,6 +15,7 @@ $query = '
 			stg.studiengang_kz,
 			stg.bezeichnung AS "stg_bezeichnung",
 			lv.bezeichnung AS "lv_bezeichnung",
+			lv.ects,
 			(person.nachname || \' \' || person.vorname) AS "student",
 			begruendung.bezeichnung AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
@@ -58,6 +59,7 @@ $filterWidgetArray = array(
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
+		'ECTS',
 		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
@@ -96,6 +98,7 @@ $filterWidgetArray = array(
 		studiengang_kz: {visible: false},
 		stg_bezeichnung: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
+		ects: {headerFilter:"input"},
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{
