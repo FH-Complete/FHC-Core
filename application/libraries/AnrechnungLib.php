@@ -208,6 +208,8 @@ class AnrechnungLib
 				'lehrveranstaltung_id' => $anrechnung->lehrveranstaltung_id,
 				'student_uid' => $anrechnung->student_uid,
 				'studiensemester_kurzbz' => $anrechnung->studiensemester_kurzbz,
+				'uebernahmedatum' => (new DateTime())->format('Y-m-d H:m:i'),
+				'benotungsdatum' => (new DateTime())->format('Y-m-d H:m:i'),
 				'note' => 6,
 				'insertvon' => $stgl_uid,
 				'bemerkung' => 'Digitale Anrechnung'
