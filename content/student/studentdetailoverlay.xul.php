@@ -300,7 +300,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="ZGV" control="student-prestudent-menulist-zgvcode"/>
 							<menulist id="student-prestudent-menulist-zgvcode" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/zgv.rdf.php?optional=true" flex="1"
-									ref="http://www.technikum-wien.at/zgv/alle" >
+									ref="http://www.technikum-wien.at/zgv/alle"
+									style="min-width: 130px">
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/zgv/rdf#code"
@@ -320,7 +321,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<hbox>
 								<menulist id="student-prestudent-menulist-zgvnation" disabled="true"
 										datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
-										ref="http://www.technikum-wien.at/nation/liste">
+										ref="http://www.technikum-wien.at/nation/liste"
+										style="min-width: 100px">
 									<template>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
@@ -335,7 +337,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="ZGV Master" control="student-prestudent-menulist-zgvmastercode"/>
 							<menulist id="student-prestudent-menulist-zgvmastercode" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/zgvmaster.rdf.php?optional=true" flex="1"
-									ref="http://www.technikum-wien.at/zgvmaster/alle" >
+									ref="http://www.technikum-wien.at/zgvmaster/alle"
+									style="min-width: 130px" >
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
@@ -354,7 +357,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<hbox>
 								<menulist id="student-prestudent-menulist-zgvmasternation" disabled="true"
 										datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
-										ref="http://www.technikum-wien.at/nation/liste" >
+										ref="http://www.technikum-wien.at/nation/liste"
+										style="min-width: 100px">
 									<template>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
