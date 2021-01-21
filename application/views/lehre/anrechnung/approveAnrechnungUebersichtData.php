@@ -70,6 +70,8 @@ $filterWidgetArray = array(
 	'datasetRepOptions' => '{
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
+		persistentLayout:true,
+		persistentSort:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
