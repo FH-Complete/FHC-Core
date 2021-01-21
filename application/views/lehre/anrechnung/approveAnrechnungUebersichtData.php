@@ -48,7 +48,7 @@ $query = '
 $filterWidgetArray = array(
 	'query' => $query,
 	'tableUniqueId' => 'approveAnrechnungUebersicht',
-	'requiredPermissions' => 'admin',
+	'requiredPermissions' => 'lehre/anrechnung_genehmigen',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
 		'anrechnung_id',
