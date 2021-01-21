@@ -115,6 +115,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
+					'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
 					'status_bezeichnung' => $approved
 				);
 			}
@@ -157,6 +158,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
+					'status_kurzbz' => self::ANRECHNUNGSTATUS_REJECTED,
 					'status_bezeichnung' => $rejected
 				);
 			}
@@ -199,6 +201,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
+					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
 					'status_bezeichnung' => $inProgressLektor
 				);
 			}
