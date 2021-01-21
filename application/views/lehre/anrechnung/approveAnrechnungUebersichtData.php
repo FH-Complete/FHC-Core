@@ -85,6 +85,9 @@ $filterWidgetArray = array(
 		selectableCheck: function(row){
             return func_selectableCheck(row);
         },
+        rowFormatter:function(row){
+            func_rowFormatter(row);
+        },
          rowUpdated:function(row){
             func_rowUpdated(row);
         },

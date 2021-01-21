@@ -7,6 +7,8 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
+const COLOR_LIGHTGREY = "#f5f5f5";
+
 // TABULATOR FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 // Returns relative height (depending on screen size)
@@ -33,6 +35,18 @@ function func_tableBuilt(table) {
     );
 }
 
+// Formats the rows
+function func_rowFormatter(row){
+    let status_kurzbz = row.getData().status_kurzbz;
+
+    row.getCells().forEach(function(cell){
+        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
+        {
+            row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+        }
+    });
+}
+
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
     let status_kurzbz = row.getData().status_kurzbz;
@@ -46,8 +60,12 @@ function func_selectableCheck(row){
 
 // Performes after row was updated
 function func_rowUpdated(row){
-        row.deselect();
-        row.getElement().style["pointerEvents"] = "none";
+    // Refresh row formatters
+    row.reformat();
+
+    // Deselect and disable new selection of updated rows
+    row.deselect();
+    row.getElement().style["pointerEvents"] = "none";
 }
 
 // Formats empfehlung_anrechnung
