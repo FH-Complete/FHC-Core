@@ -86,6 +86,57 @@ $(function(){
         $('#tableWidgetTabulator').tabulator('redraw', true);
     });
 
+    // Show only rows with empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
+    $("#show-recommended").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_STGL},
+                {field: 'empfehlung_anrechnung', type: '=', value: 'true'}
+            ]
+        );
+    });
+
+    // Show only rows with nicht empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
+    $("#show-not-recommended").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter', [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_STGL},
+                {field: 'empfehlung_anrechnung', type: '=', value: 'false'},
+            ]
+        );
+    });
+
+    // Show only rows with genehmigte anrechnungen
+    $("#show-approved").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_APPROVED}
+            ]
+        );
+    });
+
+    // Show only rows with abgelehnte anrechnungen
+    $("#show-rejected").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_REJECTED}
+            ]
+        );
+    });
+
+    /**
+     * Show all rows: clear filter and blur button
+     * Bootstrap button remains in activated style, even when clicking various times.
+     * This function "resets" button style and clear all tabulators filter.
+     * NOTE: MUST be after all other filters
+     */
+    $(".btn-clearfilter").click(function(){
+        if($(this).hasClass('active'))
+        {
+            $('#tableWidgetTabulator').tabulator('clearFilter');
+            $(this).blur();
+        }
+    })
+
     // Approve Anrechnungen
     $("#approve-anrechnungen").click(function(){
         // Get selected rows data

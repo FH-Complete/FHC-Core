@@ -110,9 +110,35 @@ $this->load->view(
 	            <?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
             </div>
         </div>
-        <!-- Action Buttons 'Genehmigen', 'Empfehlung anfordern'-->
+
         <div class="row">
-            <div class="col-xs-12">
+
+            <!-- Filter buttons -->
+            <div class="col-xs-5 col-md-4">
+                <div class="btn-toolbar" role="toolbar">
+                    <div class="btn-group" role="group">
+                        <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="<?php echo $this->p->t('ui', 'nurEmpfohleneAnzeigen'); ?>"><i class='fa fa-thumbs-o-up'></i>
+                        </button>
+                        <button id="show-not-recommended" class="btn btn-default btn-clearfilter" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="<?php echo $this->p->t('ui', 'nurNichtEmpfohleneAnzeigen'); ?>"><i class='fa fa-thumbs-o-down'></i>
+                        </button>
+                        <button id="show-approved" class="btn btn-default btn-clearfilter" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="<?php echo $this->p->t('ui', 'nurGenehmigteAnzeigen'); ?>"><i class='fa fa-check'></i>
+                        </button>
+                        <button id="show-rejected" class="btn btn-default btn-clearfilter" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="<?php echo $this->p->t('ui', 'nurAbgelehnteAnzeigen'); ?>"><i class='fa fa-times'></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons 'Genehmigen', 'Empfehlung anfordern'-->
+            <div class="col-xs-7 col-md-8">
                 <div class="pull-right">
                     <button id="request-recommendation" class="btn btn-default btn-w200 btn-mr50"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
                     <button id="reject-anrechnungen" class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
