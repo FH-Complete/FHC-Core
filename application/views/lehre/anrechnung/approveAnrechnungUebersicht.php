@@ -33,6 +33,8 @@ $this->load->view(
 				'tabelleneinstellungen',
 				'keineDatenVorhanden',
 				'spaltenEinstellen',
+                'ja',
+                'nein'
 			),
 			'person' => array(
 				'student',

@@ -106,7 +106,7 @@ $filterWidgetArray = array(
 			url:function(cell){return "'. current_url() .'/download?dms_id=" + cell.getData().dms_id},
 		    target:"_blank"
 		}},
-		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_nullToMinus},
+		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung},
 		status_kurzbz: {visible: false},
 		status_bezeichnung: {headerFilter:"input"}
 	 }', // col properties

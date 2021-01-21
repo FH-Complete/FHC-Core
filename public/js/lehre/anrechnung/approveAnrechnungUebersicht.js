@@ -50,9 +50,13 @@ function func_rowUpdated(row){
         row.getElement().style["pointerEvents"] = "none";
 }
 
-// Formats null values to '-'
-var format_nullToMinus = function(cell, formatterParams){
-    return (cell.getValue() == null) ? '-' : cell.getValue();
+// Formats empfehlung_anrechnung
+var format_empfehlung_anrechnung = function(cell, formatterParams){
+    return (cell.getValue() == null)
+        ? '-'
+        : (cell.getValue() ==  'true')
+            ? FHC_PhrasesLib.t("ui", "ja")
+            : FHC_PhrasesLib.t("ui", "nein");
 }
 
 /*
