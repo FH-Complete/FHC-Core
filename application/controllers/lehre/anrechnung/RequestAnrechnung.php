@@ -129,7 +129,7 @@ class requestAnrechnung extends Auth_Controller
 			'insertvon'         => $this->_uid
 		);
 
-		if(isError($uploaddata = $this->dmslib->upload($dms, array('jpg', 'pdf'))))
+		if(isError($uploaddata = $this->dmslib->upload($dms, array('pdf'))))
 		{
 			show_error(getError($uploaddata));
 		}

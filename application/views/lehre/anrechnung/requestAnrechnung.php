@@ -142,7 +142,7 @@ $this->load->view(
                                             </div>
                                             <div class="form-inline panel-body">
                                                 <div class="form-group">
-                                                    <input type="file" id="requestAnrechnung-uploadfile" name="uploadfile" accept=".pdf,.jpg" size="50" required <?php echo $disabled; ?>>
+                                                    <input type="file" id="requestAnrechnung-uploadfile" name="uploadfile" accept=".pdf" size="50" required <?php echo $disabled; ?>>
                                                 </div>
 												<?php if(!empty($anrechnungData->dms_id)): ?>
                                                     <a class="pull-right" href="<?php echo current_url(). '/download?dms_id='. $anrechnungData->dms_id; ?>" target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
