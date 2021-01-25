@@ -146,6 +146,7 @@ class AnrechnungLib
 	}
 	
 	/**
+	 * Get last Anrechnungstatusbezeichnung in users language.
 	 * @param $anrechnung_id
 	 * @return mixed
 	 */
@@ -244,7 +245,7 @@ class AnrechnungLib
 		$status_kurzbz = $result->status_kurzbz;
 		
 		// Exit if already approved or rejected
-		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED) // TODO: in js: bereits genehmigte nicht clickable!
+		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED)
 		{
 			return success(false);  // dont reject
 		}
@@ -292,6 +293,110 @@ class AnrechnungLib
 		}
 		
 		return success(true);   // rejected
+	}
+	
+	/**
+	 * Recommend Anrechnung.
+	 * @param $anrechnung_id
+	 * @return array
+	 * @throws Exception
+	 */
+	public function recommendAnrechnung($anrechnung_id)
+	{
+		// Check last Anrechnungstatus
+		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			show_error(getError($result));
+		}
+		
+		$status_kurzbz = $result->status_kurzbz;
+		
+		// Exit if already approved or rejected
+		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED)
+		{
+			return success(false);  // dont approve
+		}
+		
+		// Start DB transaction
+		$this->ci->db->trans_start(false);
+		
+		$lektor_uid = getAuthUID();
+		
+		// Insert new status progessed by stgl
+		$this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
+		
+		// Update empfehlung_anrechnung
+		$this->ci->AnrechnungModel->update(
+			$anrechnung_id,
+			array(
+				'empfehlung_anrechnung' => true,
+				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
+				'updatevon'     => $lektor_uid
+			)
+		);
+		
+		// Transaction complete
+		$this->ci->db->trans_complete();
+		
+		if ($this->ci->db->trans_status() === false)
+		{
+			$this->ci->db->trans_rollback();
+			return error($result->msg, EXIT_ERROR);
+		}
+		
+		return success(true);   // recommended
+	}
+	
+	/**
+	 * Do not recommend Anrechnung.
+	 * @param $anrechnung_id
+	 * @return array
+	 * @throws Exception
+	 */
+	public function dontRecommendAnrechnung($anrechnung_id)
+	{
+		// Check last Anrechnungstatus
+		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			show_error(getError($result));
+		}
+		
+		$status_kurzbz = $result->status_kurzbz;
+		
+		// Exit if already approved or rejected
+		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED)
+		{
+			return success(false);  // dont approve
+		}
+		
+		// Start DB transaction
+		$this->ci->db->trans_start(false);
+		
+		$lektor_uid = getAuthUID();
+		
+		// Insert new status progessed by stgl
+		$this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
+		
+		// Update empfehlung_anrechnung
+		$this->ci->AnrechnungModel->update(
+			$anrechnung_id,
+			array(
+				'empfehlung_anrechnung' => false,
+				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
+				'updatevon'     => $lektor_uid
+			)
+		);
+		
+		// Transaction complete
+		$this->ci->db->trans_complete();
+		
+		if ($this->ci->db->trans_status() === false)
+		{
+			$this->ci->db->trans_rollback();
+			return error($result->msg, EXIT_ERROR);
+		}
+		
+		return success(true);   // recommended
 	}
 	
 	private function _setAnrechnungDataObject($anrechnung)
