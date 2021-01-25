@@ -66,6 +66,14 @@ function func_rowUpdated(row){
     row.getElement().style["pointerEvents"] = "none";
 }
 
+// Returns tooltip
+function func_tooltips(cell) {
+    // Return tooltip if row is unselectable
+    if (!func_selectableCheck(cell.getRow())){
+        return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + 'Status';
+    }
+}
+
 // Formats empfehlung_anrechnung
 var format_empfehlung_anrechnung = function(cell, formatterParams){
     return (cell.getValue() == null)

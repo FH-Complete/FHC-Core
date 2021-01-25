@@ -93,6 +93,9 @@ $filterWidgetArray = array(
          rowUpdated:function(row){
             func_rowUpdated(row);
         },
+        tooltips: function(cell){
+            return func_tooltips(cell);
+        }
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
 		anrechnung_id: {visible: false},

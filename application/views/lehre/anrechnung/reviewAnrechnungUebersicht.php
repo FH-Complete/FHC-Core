@@ -34,7 +34,8 @@ $this->load->view(
 				'keineDatenVorhanden',
 				'spaltenEinstellen',
                 'ja',
-                'nein'
+                'nein',
+                'nichtSelektierbarAufgrundVon'
 			),
 			'person' => array(
 				'student',

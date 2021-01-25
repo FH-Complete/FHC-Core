@@ -8668,6 +8668,26 @@ Any unusual occurrences
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nichtSelektierbarAufgrundVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht selektierbar aufgrund von: ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not selectable because of: ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 
