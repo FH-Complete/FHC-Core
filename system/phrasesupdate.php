@@ -8688,6 +8688,26 @@ Any unusual occurrences
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'confirmTextAntragHatBereitsEmpfehlung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Mindestens 1 Antrag enthält bereits eine Empfehlung.\nWollen Sie wirklich für Ihre Auswahl eine Empfehlung anfordern und bereits vorhandene Empfehlungen dabei zurücksetzen?",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "At least one application was already recommended.\nDo you really want to request for recommendation for your selection?",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 

@@ -284,15 +284,36 @@ class AnrechnungLib
 			return success(false);  // dont ask for recommendation
 		}
 		
+		// Start DB transaction
+		$this->ci->db->trans_start(false);
+		
 		// Insert new status inProgressLektor
 		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR);
 		
-		if (isError($result))
+		/**
+		 * Anyway update empfehlung_anrechnung to be null
+		 * Regardless of what empfehlung_anrechnung was already set (true/false/null), it should be (reset to ) null by
+		 * requesting a (new) recommendation.
+		 * **/
+		$this->ci->AnrechnungModel->update(
+			$anrechnung_id,
+			array(
+				'empfehlung_anrechnung' => null,
+				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
+				'updatevon'     => getAuthUID()
+			)
+		);
+		
+		// Transaction complete
+		$this->ci->db->trans_complete();
+		
+		if ($this->ci->db->trans_status() === false)
 		{
-			show_error(getError($result));
+			$this->ci->db->trans_rollback();
+			return error($result->msg, EXIT_ERROR);
 		}
 		
-		return success(true);   // rejected
+		return success(true);   // recommended
 	}
 	
 	/**

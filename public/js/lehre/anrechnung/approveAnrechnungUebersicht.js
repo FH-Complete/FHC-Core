@@ -281,13 +281,24 @@ $(function(){
     // Request Recommendation for Anrechnungen
     $("#request-recommendation").click(function(){
         // Get selected rows data
-        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
-            .map(function(data){
-                // reduce to necessary fields
-                return {
-                    'anrechnung_id' : data.anrechnung_id,
-                }
-            });
+        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
+
+        // If some of selected anrechnungen has already been recommended...
+        if (selected_data.some((data) => data.empfehlung_anrechnung !== null))
+        {
+            // ...confirm before requesting recommendation
+            if(!confirm(FHC_PhrasesLib.t("anrechnung", "confirmTextAntragHatBereitsEmpfehlung")))
+            {
+                return;
+            }
+        }
+
+        selected_data.map(function(data){
+            // reduce to necessary fields
+            return {
+                'anrechnung_id' : data.anrechnung_id,
+            }
+        });
 
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)

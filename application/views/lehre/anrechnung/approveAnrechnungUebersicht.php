@@ -17,7 +17,8 @@ $this->load->view(
             ),
             'anrechnung' => array(
                 'nachweisdokumente',
-                'empfehlung'
+                'empfehlung',
+                'confirmTextAntragHatBereitsEmpfehlung'
             ),
 			'ui' => array(
 				'anzeigen',

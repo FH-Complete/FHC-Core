@@ -202,7 +202,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
-					'status_bezeichnung' => $inProgressLektor
+					'status_bezeichnung' => $inProgressLektor,
+					'empfehlung_anrechnung' => null
 				);
 			}
 		}
