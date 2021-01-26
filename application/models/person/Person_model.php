@@ -248,4 +248,19 @@ class Person_model extends DB_Model
 
 		return $this->execQuery($qry, $parametersArray);
 	}
+	
+	/**
+	 * Get full name of given uid. (Vorname Nachname)
+	 * @param $uid
+	 * @return array
+	 */
+	public function getFullName($uid)
+	{
+		if (!$result = getData($this->getByUid($uid))[0])
+		{
+			show_error('Failed loading person');
+		}
+		
+		return success($result->vorname. ' '. $result->nachname);
+	}
 }
