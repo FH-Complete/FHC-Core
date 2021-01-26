@@ -5,6 +5,7 @@
 class requestAnrechnung extends Auth_Controller
 {
 	const REQUEST_ANRECHNUNG_URI = '/lehre/anrechnung/RequestAnrechnung';
+	const APPROVE_ANRECHNUNG_URI = '/lehre/anrechnung/ApproveAnrechnungUebersicht';
 	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
@@ -142,7 +143,7 @@ class requestAnrechnung extends Auth_Controller
 			show_error('Failed retrieving prestudent');
 		}
 
-		// Save Anrechnung with Status 'inProgressSTGL'
+		// Save Anrechnung
 		$result = $this->AnrechnungModel->insert(array(
 			'prestudent_id' => $prestudent->prestudent_id,
 			'lehrveranstaltung_id' => $lehrveranstaltung_id,
@@ -151,22 +152,23 @@ class requestAnrechnung extends Auth_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'anmerkung_student' => $anmerkung
 		));
-		
+
 		if (isError($result))
 		{
 			show_error('Failed inserting Anrechnung');
 		}
-		
+
+		// Save Anrechnungstatus 'inProgressSTGL'
 		$result = $this->AnrechnungModel->saveAnrechnungstatus($result->retval, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
-		
+
 		if (isError($result))
 		{
 			show_error('Failed saving Anrechnungstatus');
 		}
-		
+
 		// Transaction complete!
 		$this->db->trans_complete();
-		
+
 		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
@@ -174,18 +176,15 @@ class requestAnrechnung extends Auth_Controller
 		}
 		
 		// Send mail to STGL
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$studiengang = $this->StudiengangModel->load($prestudent->studiengang_kz);
+		$mail_params = array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiengang_kz' => $prestudent->studiengang_kz,
+			'lehrveranstaltung_id' => $lehrveranstaltung_id
+		);
 		
-		// Send mail
-		$this->load->library('MailLib');
-		if(!$this->maillib->send(
-			"noreply@". DOMAIN,
-			$studiengang->retval[0]->email,
-			'Neuer LV-Anrechnungsantrag',
-			'Eine neuer LV Anrechnungsantrag steht zur Prüfung bereit.'))
+		if(!$this->_sendSanchoMail($mail_params))
 		{
-			show_error('Failed sending email to STGL');
+			show_error('Failed sending mail');
 		}
 		else
 		{
@@ -297,6 +296,79 @@ class requestAnrechnung extends Auth_Controller
 		{
 			$status_mehrsprachig = getData($result)[0]->bezeichnung_mehrsprachig;
 			return getUserLanguage() == 'German' ? $status_mehrsprachig[0] : $status_mehrsprachig[1];
+		}
+	}
+	
+	/**
+	 * Send mail to STGL (if not available, send to STGL assistance)
+	 * @param $mail_params
+	 */
+	private function _sendSanchoMail($mail_params)
+	{
+		// Get STGL mail address, if available, otherwise get assistance mail address
+		list ($to, $vorname) = $this->_getSTGLMailAddress($mail_params['studiengang_kz']);
+		
+		// Get full name of student
+		$this->load->model('person/Person_model', 'PersonModel');
+		if (!$student_name = getData($this->PersonModel->getFullName($this->_uid)))
+		{
+			show_error ('Failed retrieving person');
+		}
+		
+		// Get lehrveranstaltung bezeichnung
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		if (!$lehrveranstaltung = getData($this->LehrveranstaltungModel->load($mail_params['lehrveranstaltung_id']))[0])
+		{
+			show_error ('Failed retrieving person');
+		}
+		
+		// Link to Antrag genehmigen
+		$url = site_url(self::APPROVE_ANRECHNUNG_URI).'?studiensemester='. $mail_params['studiensemester_kurzbz'];
+		
+		// Prepare mail content
+		$body_fields = array(
+			'vorname'                       => $vorname,
+			'student_name'                  => $student_name,
+			'lehrveranstaltung_bezeichnung' => $lehrveranstaltung->bezeichnung,
+			'link'		                    => anchor($url, 'Anrechnungsanträge Übersicht')
+		);
+	
+		sendSanchoMail(
+			'AnrechnungAntragStellen',
+			$body_fields,
+			$to,
+			'Neuer LV-Anrechnungsantrag'
+		);
+		
+		return true;
+	}
+	
+	// Get STGL mail address, if available, otherwise get assistance mail address
+	private function _getSTGLMailAddress($stg_kz)
+	{
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$result = $this->StudiengangModel->getLeitung($stg_kz);
+		
+		// Get STGL mail address, if available
+		if (hasData($result))
+		{
+			return array(
+					$result->retval[0]->uid. '@'. DOMAIN,
+					$result->retval[0]->vorname
+				);
+		}
+		// ...otherwise get assistance mail address
+		else
+		{
+			$result = $this->StudiengangModel->load($stg_kz);
+			
+			if (hasData($result))
+			{
+				return array(
+					$result->retval[0]->email,
+					''
+				);
+			}
 		}
 	}
 }
