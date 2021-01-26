@@ -8728,6 +8728,26 @@ Any unusual occurrences
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'herkunft',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herkunft',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Origins',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 

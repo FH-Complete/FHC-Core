@@ -19,6 +19,7 @@ $query = '
 			(person.nachname || \' \' || person.vorname) AS "student",
 			begruendung.bezeichnung AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
+			anrechnung.anmerkung_student,
 			empfehlung_anrechnung,
 			(SELECT status_kurzbz
 			FROM lehre.tbl_anrechnungstatus
@@ -67,6 +68,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
+		ucfirst($this->p->t('anrechnung', 'herkunft')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
 		'Status'
@@ -118,6 +120,7 @@ $filterWidgetArray = array(
 			url:function(cell){return "'. current_url() .'/download?dms_id=" + cell.getData().dms_id},
 		    target:"_blank"
 		}},
+		anmerkung_student: {headerFilter:"input"},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung},
 		status_kurzbz: {visible: false},
 		status_bezeichnung: {headerFilter:"input"}
