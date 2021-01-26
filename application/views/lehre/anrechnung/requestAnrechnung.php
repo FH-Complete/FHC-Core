@@ -158,7 +158,7 @@ $this->load->view(
                                             <div class="col-lg-12">
                                                 <div class="panel panel-default">
                                                     <div class="panel-heading">
-														<?php echo $this->p->t('anrechnung', 'weitereInformationen'); ?>
+														<?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?>
                                                     </div>
                                                     <div class="panel-body">
                                                         <textarea class="form-control" name="anmerkung" rows="3" <?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
