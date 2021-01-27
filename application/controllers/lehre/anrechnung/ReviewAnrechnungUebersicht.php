@@ -6,6 +6,8 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 {
 	const BERECHTIGUNG_ANRECHNUNG_EMPFEHLEN = 'lehre/anrechnung_empfehlen';
 	
+	const APPROVE_ANRECHNUNG_URI = '/lehre/anrechnung/ApproveAnrechnungUebersicht';
+	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
@@ -118,6 +120,12 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		// Output json to ajax
 		if (isset($json) && !isEmptyArray($json))
 		{
+			// Send mails to STGL (if not present STGL, send to STGL assistance)
+			if (!$this->_sendSanchoMails($json, true))
+			{
+				show_error('Failed sending emails');
+			}
+
 			return $this->outputJsonSuccess($json);
 		}
 		else
@@ -162,6 +170,12 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		// Output json to ajax
 		if (isset($json) && !isEmptyArray($json))
 		{
+			// Send mails to STGL (if not present STGL, send to STGL assistance)
+			if (!$this->_sendSanchoMails($json, false))
+			{
+				show_error('Failed sending emails');
+			}
+			
 			return $this->outputJsonSuccess($json);
 		}
 		else
@@ -195,4 +209,84 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		
 		if (!$this->_uid) show_error('User authentification failed');
 	}
+	
+	private function _sendSanchoMails($mail_params, $empfehlung)
+	{
+		// Get studiengaenge
+		$studiengang_kz_arr = array();
+		
+		foreach ($mail_params as $item)
+		{
+			$this->AnrechnungModel->addSelect('studiengang_kz');
+			$this->AnrechnungModel->addJoin('public.tbl_prestudent', 'prestudent_id');
+			
+			$studiengang_kz_arr[]= $this->AnrechnungModel->load($item['anrechnung_id'])->retval[0]->studiengang_kz;
+		}
+		
+		$studiengang_kz_arr = array_unique($studiengang_kz_arr);
+		
+		// Send mail to STGL of each studiengang
+		foreach ($studiengang_kz_arr as $studiengang_kz)
+		{
+			// Get STGL mail address, if available, otherwise get assistance mail address
+			list ($to, $vorname) = $this->_getSTGLMailAddress($studiengang_kz);
+			
+			// Get full name of lector
+			$this->load->model('person/Person_model', 'PersonModel');
+			if (!$lector_name = getData($this->PersonModel->getFullName($this->_uid)))
+			{
+				show_error ('Failed retrieving person');
+			}
+			
+			// Link to Antrag genehmigen
+			$url = site_url(self::APPROVE_ANRECHNUNG_URI);
+			
+			// Prepare mail content
+			$body_fields = array(
+				'vorname'                       => $vorname,
+				'lektor_name'                   => $lector_name,
+				'empfehlung'                    => $empfehlung ? 'positive' : 'negative',
+				'link'		                    => anchor($url, 'Anrechnungsanträge Übersicht')
+			);
+			
+			sendSanchoMail(
+				'AnrechnungEmpfehlungAbgeben',
+				$body_fields,
+				$to,
+				'Neue '. ($empfehlung ? 'positive' : 'negative'). ' Empfehlungen für LV-Anrechnungsanträge'
+			);
+		}
+		
+		return true;
+	}
+	
+	// Get STGL mail address, if available, otherwise get assistance mail address
+	private function _getSTGLMailAddress($stg_kz)
+	{
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$result = $this->StudiengangModel->getLeitung($stg_kz);
+		
+		// Get STGL mail address, if available
+		if (hasData($result))
+		{
+			return array(
+				$result->retval[0]->uid. '@'. DOMAIN,
+				$result->retval[0]->vorname
+			);
+		}
+		// ...otherwise get assistance mail address
+		else
+		{
+			$result = $this->StudiengangModel->load($stg_kz);
+			
+			if (hasData($result))
+			{
+				return array(
+					$result->retval[0]->email,
+					''
+				);
+			}
+		}
+	}
+	
 }

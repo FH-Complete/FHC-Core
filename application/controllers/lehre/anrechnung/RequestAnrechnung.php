@@ -323,7 +323,7 @@ class requestAnrechnung extends Auth_Controller
 		}
 		
 		// Link to Antrag genehmigen
-		$url = site_url(self::APPROVE_ANRECHNUNG_URI).'?studiensemester='. $mail_params['studiensemester_kurzbz'];
+		$url = site_url(self::APPROVE_ANRECHNUNG_URI);
 		
 		// Prepare mail content
 		$body_fields = array(
