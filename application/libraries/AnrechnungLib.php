@@ -145,6 +145,34 @@ class AnrechnungLib
 		return success($anrechnung_data);
 	}
 	
+	public function getStudentData($anrechnung_id)
+	{
+		if (!is_numeric($anrechnung_id))
+		{
+			show_error('Incorrect parameter');
+		}
+		
+		$this->ci->AnrechnungModel->addSelect('tbl_benutzer.uid, tbl_prestudent.prestudent_id, tbl_person.person_id, tbl_anrechnung.studiensemester_kurzbz, vorname, nachname, tbl_lehrveranstaltung.bezeichnung AS "lv_bezeichnung"');
+		$this->ci->AnrechnungModel->addJoin('public.tbl_prestudent', 'prestudent_id');
+		$this->ci->AnrechnungModel->addJoin('public.tbl_person', 'person_id');
+		$this->ci->AnrechnungModel->addJoin('public.tbl_benutzer', 'person_id');
+		$this->ci->AnrechnungModel->addJoin('lehre.tbl_lehrveranstaltung', 'lehrveranstaltung_id');
+		
+		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
+		
+		if (isError($result))
+		{
+			show_error(getError($result));
+		}
+		
+		if (!hasData($result))
+		{
+			show_error('Failed retrieving students data');
+		}
+		
+		return $result;
+	}
+	
 	/**
 	 * Get last Anrechnungstatusbezeichnung in users language.
 	 * @param $anrechnung_id

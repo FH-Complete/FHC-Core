@@ -118,6 +118,11 @@ class approveAnrechnungUebersicht extends Auth_Controller
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
 					'status_bezeichnung' => $approved
 				);
+				
+				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], $approved))
+				{
+					show_error('Failed sending mail');
+				}
 			}
 		}
 		
@@ -161,6 +166,11 @@ class approveAnrechnungUebersicht extends Auth_Controller
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_REJECTED,
 					'status_bezeichnung' => $rejected
 				);
+				
+				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], $rejected))
+				{
+					show_error('Failed sending mail');
+				}
 			}
 		}
 		
@@ -243,5 +253,34 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		$this->_uid = getAuthUID();
 		
 		if (!$this->_uid) show_error('User authentification failed');
+	}
+	
+	/**
+	 * Send mail to student to inform if Anrechnung was approved or rejected
+	 * @param $mail_params
+	 */
+	private function _sendSanchoMailToStudent($anrechnung_id, $status_bezeichnung)
+	{
+		$result = getData($this->anrechnunglib->getStudentData($anrechnung_id))[0];
+		
+		// Get student name and mail address
+		$to = $result->uid. '@'. DOMAIN;
+		
+		
+		// Prepare mail content
+		$body_fields = array(
+			'vorname'                       => $result->vorname,
+			'lehrveranstaltung_bezeichnung' => $result->lv_bezeichnung,
+			'status'		                => $status_bezeichnung
+		);
+		
+		sendSanchoMail(
+			'AnrechnungGenehmigen',
+			$body_fields,
+			$to,
+			'Dein Anrechnungsantrag zur LV '. $result->lv_bezeichnung. ' wurde '. $status_bezeichnung
+		);
+		
+		return true;
 	}
 }

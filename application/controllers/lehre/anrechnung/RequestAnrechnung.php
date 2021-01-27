@@ -177,7 +177,6 @@ class requestAnrechnung extends Auth_Controller
 		
 		// Send mail to STGL
 		$mail_params = array(
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'studiengang_kz' => $prestudent->studiengang_kz,
 			'lehrveranstaltung_id' => $lehrveranstaltung_id
 		);

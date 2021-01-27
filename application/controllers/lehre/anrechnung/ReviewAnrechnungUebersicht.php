@@ -120,7 +120,10 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		// Output json to ajax
 		if (isset($json) && !isEmptyArray($json))
 		{
-			// Send mails to STGL (if not present STGL, send to STGL assistance)
+			/**
+			 * Send mails to STGL (if not present STGL, send to STGL assistance)
+			 * NOTE: mails are sent at the end to ensure sending only one mail to each STGL
+			 * */
 			if (!$this->_sendSanchoMails($json, true))
 			{
 				show_error('Failed sending emails');
