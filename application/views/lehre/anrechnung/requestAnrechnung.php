@@ -183,6 +183,8 @@ $this->load->view(
                         <?php echo $is_expired &&  empty($antragData->anrechnung_id)? ': '. $this->p->t('anrechnung', 'deadlineUeberschritten') : ''; ?>
                     </div>
                 <?php endif; ?>
+                <br>
+	            <?php $this->load->view('lehre/anrechnung/requestAnrechnungImportant'); ?>
             </div>
         </div>
         <!-- Submit button 'Anrechnung beantragen'-->
