@@ -1,6 +1,6 @@
 <?php
 
-//if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class reviewAnrechnungUebersicht extends Auth_Controller
 {
@@ -213,6 +213,12 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		if (!$this->_uid) show_error('User authentification failed');
 	}
 	
+	/**
+	 * Send mails to STGL (if not present then to STGL assistance)
+	 * @param $mail_params
+	 * @param $empfehlung
+	 * @return bool
+	 */
 	private function _sendSanchoMails($mail_params, $empfehlung)
 	{
 		// Get studiengaenge

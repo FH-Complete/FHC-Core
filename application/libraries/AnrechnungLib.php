@@ -145,6 +145,11 @@ class AnrechnungLib
 		return success($anrechnung_data);
 	}
 	
+	/**
+	 * Get students data by Anrechnung
+	 * @param $anrechnung_id
+	 * @return mixed
+	 */
 	public function getStudentData($anrechnung_id)
 	{
 		if (!is_numeric($anrechnung_id))
@@ -233,17 +238,49 @@ class AnrechnungLib
 		$this->ci->AnrechnungModel->addSelect('lehrveranstaltung_id, student_uid, studiensemester_kurzbz');
 		$this->ci->AnrechnungModel->addJoin('public.tbl_student', 'prestudent_id');
 		$anrechnung = getData($this->ci->AnrechnungModel->load($anrechnung_id))[0];
-		$result = $this->ci->ZeugnisnoteModel->insert(array(
+		
+		// Check if zeugnisnote exists
+		$result = $this->ci->ZeugnisnoteModel->loadWhere(array(
 				'lehrveranstaltung_id' => $anrechnung->lehrveranstaltung_id,
 				'student_uid' => $anrechnung->student_uid,
-				'studiensemester_kurzbz' => $anrechnung->studiensemester_kurzbz,
-				'uebernahmedatum' => (new DateTime())->format('Y-m-d H:m:i'),
-				'benotungsdatum' => (new DateTime())->format('Y-m-d H:m:i'),
-				'note' => 6,
-				'insertvon' => $stgl_uid,
-				'bemerkung' => 'Digitale Anrechnung'
+				'studiensemester_kurzbz' => $anrechnung->studiensemester_kurzbz
 			)
 		);
+		
+		// If zeugnisnote exists, update...
+		if (hasData($result))
+		{
+			$this->ci->ZeugnisnoteModel->update(
+				array(
+					'lehrveranstaltung_id' => $anrechnung->lehrveranstaltung_id,
+					'student_uid' => $anrechnung->student_uid,
+					'studiensemester_kurzbz' => $anrechnung->studiensemester_kurzbz
+				),
+				array(
+					'uebernahmedatum' => (new DateTime())->format('Y-m-d H:m:i'),
+					'benotungsdatum' => (new DateTime())->format('Y-m-d H:m:i'),
+					'note' => 6,
+					'insertvon' => $stgl_uid,
+					'bemerkung' => 'Digitale Anrechnung'
+				)
+			);
+			
+		}
+		// ...otherwise insert
+		else
+		{
+			$this->ci->ZeugnisnoteModel->insert(array(
+					'lehrveranstaltung_id' => $anrechnung->lehrveranstaltung_id,
+					'student_uid' => $anrechnung->student_uid,
+					'studiensemester_kurzbz' => $anrechnung->studiensemester_kurzbz,
+					'uebernahmedatum' => (new DateTime())->format('Y-m-d H:m:i'),
+					'benotungsdatum' => (new DateTime())->format('Y-m-d H:m:i'),
+					'note' => 6,
+					'insertvon' => $stgl_uid,
+					'bemerkung' => 'Digitale Anrechnung'
+				)
+			);
+		}
 		
 		// Transaction complete
 		$this->ci->db->trans_complete();
@@ -448,6 +485,7 @@ class AnrechnungLib
 		return success(true);   // recommended
 	}
 	
+	// Return an object with Anrechnungdata
 	private function _setAnrechnungDataObject($anrechnung)
 	{
 		$anrechnung_data = new StdClass();

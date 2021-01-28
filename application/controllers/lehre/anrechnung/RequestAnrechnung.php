@@ -1,6 +1,6 @@
 <?php
 
-//if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class requestAnrechnung extends Auth_Controller
 {
@@ -94,6 +94,9 @@ class requestAnrechnung extends Auth_Controller
 		$this->load->view('lehre/anrechnung/requestAnrechnung.php', $viewData);
 	}
 	
+	/**
+	 * Apply Anrechnungsantrag and send to STGL
+	 */
 	public function apply()
 	{
 		$anmerkung = $this->input->post('anmerkung');
