@@ -157,7 +157,7 @@ class AnrechnungLib
 			show_error('Incorrect parameter');
 		}
 		
-		$this->ci->AnrechnungModel->addSelect('tbl_benutzer.uid, tbl_prestudent.prestudent_id, tbl_person.person_id, tbl_anrechnung.studiensemester_kurzbz, vorname, nachname, tbl_lehrveranstaltung.bezeichnung AS "lv_bezeichnung"');
+		$this->ci->AnrechnungModel->addSelect('tbl_benutzer.uid, tbl_prestudent.prestudent_id, tbl_person.person_id, tbl_anrechnung.studiensemester_kurzbz, vorname, nachname, geschlecht, tbl_lehrveranstaltung.bezeichnung AS "lv_bezeichnung"');
 		$this->ci->AnrechnungModel->addJoin('public.tbl_prestudent', 'prestudent_id');
 		$this->ci->AnrechnungModel->addJoin('public.tbl_person', 'person_id');
 		$this->ci->AnrechnungModel->addJoin('public.tbl_benutzer', 'person_id');

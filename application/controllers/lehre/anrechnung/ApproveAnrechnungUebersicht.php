@@ -121,7 +121,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 					'status_bezeichnung' => $approved
 				);
 				
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], $approved))
+				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_APPROVED))
 				{
 					show_error('Failed sending mail');
 				}
@@ -169,7 +169,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 					'status_bezeichnung' => $rejected
 				);
 				
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], $rejected))
+				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_REJECTED))
 				{
 					show_error('Failed sending mail');
 				}
@@ -271,26 +271,28 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	 * Send mail to student to inform if Anrechnung was approved or rejected
 	 * @param $mail_params
 	 */
-	private function _sendSanchoMailToStudent($anrechnung_id, $status_bezeichnung)
+	private function _sendSanchoMailToStudent($anrechnung_id, $status_kurzbz)
 	{
 		$result = getData($this->anrechnunglib->getStudentData($anrechnung_id))[0];
 		
 		// Get student name and mail address
 		$to = $result->uid. '@'. DOMAIN;
 		
-		
+		$anrede = $result->geschlecht == 'w' ? 'Sehr geehrte Frau ' : 'Sehr geehrter Herr ';
 		// Prepare mail content
 		$body_fields = array(
-			'vorname'                       => $result->vorname,
-			'lehrveranstaltung_bezeichnung' => $result->lv_bezeichnung,
-			'status'		                => $status_bezeichnung
+			'anrede_name'                       => $anrede. $result->vorname. ' '. $result->nachname,
+			'lehrveranstaltung_bezeichnung'     => $result->lv_bezeichnung,
+			'stattgegeben_nichtstattgegeben'    => $status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
+				? 'stattgegeben'
+				: 'nicht stattgegeben'
 		);
 		
 		sendSanchoMail(
 			'AnrechnungGenehmigen',
 			$body_fields,
 			$to,
-			'Dein Anrechnungsantrag zur LV '. $result->lv_bezeichnung. ' wurde '. $status_bezeichnung
+			'Ihr Antrag auf Anerkennung nachgewiesener Kenntnisse wurde abgeschlossen'
 		);
 		
 		return true;
