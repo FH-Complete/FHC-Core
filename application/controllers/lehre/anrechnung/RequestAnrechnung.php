@@ -325,7 +325,10 @@ class requestAnrechnung extends Auth_Controller
 		}
 		
 		// Link to Antrag genehmigen
-		$url = site_url(self::APPROVE_ANRECHNUNG_URI);
+		$url =
+			CIS_ROOT. 'cis/index.php?menu='.
+			CIS_ROOT. 'cis/menu.php?content_id=&content='.
+			CIS_ROOT. index_page(). self::APPROVE_ANRECHNUNG_URI;
 		
 		// Prepare mail content
 		$body_fields = array(
