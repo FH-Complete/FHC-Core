@@ -161,7 +161,7 @@ $this->load->view(
 														<?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?>
                                                     </div>
                                                     <div class="panel-body">
-                                                        <textarea class="form-control" name="anmerkung" rows="3" <?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
+                                                        <textarea class="form-control" name="anmerkung" rows="2" required<?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -174,8 +174,8 @@ $this->load->view(
                 </div>
             </div>
             <div class ="col-xs-4">
-                <div class="panel panel-default panel-heading text-center">
-                    Status: <span class="text-uppercase"><small><b><?php echo $anrechnungData->status; ?></b></small></span>
+                <div class="alert alert-info text-center">
+                    Status: <b><span class="text-uppercase"><?php echo $anrechnungData->status; ?></span></b>
                 </div>
                 <?php if ($is_expired): ?>
                     <div class="alert alert-warning">
