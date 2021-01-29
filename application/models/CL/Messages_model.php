@@ -48,6 +48,9 @@ class Messages_model extends CI_Model
 		$this->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
 		// Loads model Prestudent_model
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		// Loads model Benutzer_model
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -402,7 +405,10 @@ class Messages_model extends CI_Model
 		// Looping on receivers data
 		foreach (getData($msgVarsData) as $receiver)
 		{
-			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)$receiver); // replaces array keys
+			// Merge receivers data with logged in user data
+			$msgVarsDataArray = $this->_addMsgVarsDataOfLoggedInUser($receiver);
+	
+			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)getData($msgVarsDataArray)[0]); // replaces array keys
 			$parsedSubject = parseText($subject, $msgVarsDataArray);
 			$parsedBody = parseText($body, $msgVarsDataArray);
 
@@ -466,6 +472,15 @@ class Messages_model extends CI_Model
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
 		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
+		
+		// Get the senders uid (if user is an active employee)
+		$this->BenutzerModel->addSelect('uid');
+		$this->BenutzerModel->addJoin('public.tbl_mitarbeiter ma', 'ma.mitarbeiter_uid = uid');
+		if (!$result = getData($this->BenutzerModel->getFromPersonId($sender_id)))
+		{
+			show_error('No sender_uid found');
+		}
+		$sender_uid = $result[0]->uid;
 
 		// Adds the organisation unit to each prestudent
 		if (isEmptyString($oe_kurzbz) && hasData($msgVarsData) && hasData($prestudentsData))
@@ -475,7 +490,15 @@ class Messages_model extends CI_Model
 
 		foreach (getData($msgVarsData) as $receiver)
 		{
-			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)$receiver); // replaces array keys
+			/**
+			 * Merge receivers data with senders data
+			 * NOTE: _addMsgVarsDataOfLoggedInUser usually retrieves data of the logged in user that is set in the 
+			 * templates user fields. As sendExplicitTemplateSenderId is run by a job, a sender uid is passed to be used 
+			 * instead the logged in user.
+			 */
+			$msgVarsDataArray = $this->_addMsgVarsDataOfLoggedInUser($receiver, $sender_uid);
+
+			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)getData($msgVarsDataArray)[0]); // replaces array keys
 
 			// Additional message variables
 			if (is_array($msgVars)) $msgVarsDataArray = array_merge($msgVarsDataArray, $msgVars);
@@ -606,6 +629,9 @@ class Messages_model extends CI_Model
 		$parseMessageText = error('The given person_id is not a valid number');
 
 		if (is_numeric($person_id)) $parseMessageText = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		
+		// Add message vars data of the logged in user
+		$parseMessageText = $this->_addMsgVarsDataOfLoggedInUser($parseMessageText);
 
 		if (hasData($parseMessageText))
 		{
@@ -629,7 +655,10 @@ class Messages_model extends CI_Model
 		$parseMessageText = error('The given prestudent_id is not a valid number');
 
 		if (is_numeric($prestudent_id)) $parseMessageText = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-
+		
+		// Add message vars data of the logged in user
+		$parseMessageText = $this->_addMsgVarsDataOfLoggedInUser($parseMessageText);
+		
 		if (hasData($parseMessageText))
 		{
 			$parseMessageText = success(
@@ -839,6 +868,26 @@ class Messages_model extends CI_Model
 
 			$variables[] = $tmpVar;
 		}
+		
+		// ---------------------------------------------------------------------------------------
+		// Retrieves message vars of logged in user from database view vw_msg_vars_person
+		$result = null;
+		
+		// If data contains a prestudent id
+		$result = $this->messagelib->getMessageVarsLoggedInUser();
+		
+		if (isError($result)) show_error(getError($result));
+
+		// Then builds an array that contains objects with field name and field description of logged in user data
+		$user_fields = array();
+		foreach (getData($result) as $id => $description)
+		{
+			$obj = new stdClass();
+			$obj->id = $id;
+			$obj->description = $description;
+			
+			$user_fields[] = $obj;
+		}
 
 		// ---------------------------------------------------------------------------------------
 		// Retrieves the sender id
@@ -859,6 +908,7 @@ class Messages_model extends CI_Model
 			'subject' => $replySubject,
 			'body' => $replyBody,
 			'variables' => $variables,
+			'user_fields' => $user_fields,
 			'organisationUnits' => getData($organisationUnits),
 			'senderIsAdmin' => getData($senderIsAdmin),
 			'recipientsArray' => $recipientsArray,
@@ -866,5 +916,31 @@ class Messages_model extends CI_Model
 			'relationmessage_id' => $relationmessage,
 			'type' => $type
 		);
+	}
+	
+	/**
+	 * Adds message vars data of the logged in user to the given object (that should also have message vars data)
+	 * @param object $otherMsgVarsDataObj Can be success object or simple object.
+	 * @return object Returns success object.
+	 */
+	public function _addMsgVarsDataOfLoggedInUser($otherMsgVarsDataObj, $uid = null)
+	{
+		// First check if param type is object
+		if (!is_object($otherMsgVarsDataObj)) show_error('Must pass an object to merge with data of logged in user');
+		
+		// If it is a return object, extract the simple data object
+		if (isSuccess($otherMsgVarsDataObj))
+		{
+			$otherMsgVarsDataObj = getData($otherMsgVarsDataObj)[0];
+		}
+		
+		// Retrieve message vars data of the logged in user
+		if (!$msgVarsDataLoggedInUser = getData($this->MessageModel->getMsgVarsDataByLoggedInUser($uid))[0])
+		{
+			return success($otherMsgVarsDataObj);   // If failed, return at least given object as expected success object
+		}
+		
+		return success(array((object)(array_merge((array) $otherMsgVarsDataObj, (array) $msgVarsDataLoggedInUser))));
+		
 	}
 }

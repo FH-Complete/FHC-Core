@@ -46,7 +46,12 @@ $(document).ready(function ()
 {
 	tinymce.init({
 		selector: "#bodyTextArea",
-		plugins: "autoresize"
+		plugins: "autoresize",
+		autoresize_on_init: false,
+		autoresize_min_height: 400,
+		autoresize_max_height: 400,
+		autoresize_bottom_margin: 10,
+		auto_focus: "bodyTextArea"
 	});
 
 	tinymce.init({
@@ -61,6 +66,21 @@ $(document).ready(function ()
 	if ($("#variables"))
 	{
 		$("#variables").dblclick(function ()
+		{
+			if ($("#bodyTextArea"))
+			{
+				//if editor active add at cursor position, otherwise at end
+				if (tinymce.activeEditor.id === "bodyTextArea")
+					tinymce.activeEditor.execCommand('mceInsertContent', false, $(this).children(":selected").val());
+				else
+					tinyMCE.get("bodyTextArea").setContent(tinyMCE.get("bodyTextArea").getContent() + $(this).children(":selected").val());
+			}
+		});
+	}
+
+	if ($("#user_fields"))
+	{
+		$("#user_fields").dblclick(function ()
 		{
 			if ($("#bodyTextArea"))
 			{

@@ -171,6 +171,23 @@ class Message_model extends DB_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 		}
 	}
+	
+	/**
+	 * Get message variables for logged in user
+	 */
+	public function getMsgVarsLoggedInUser()
+	{
+		$result = $this->db->query('SELECT * FROM public.vw_msg_vars_user WHERE 0 = 1');
+		
+		if ($result)
+		{
+			return success($result->list_fields());
+		}
+		else
+		{
+			return error($this->db->error(), FHC_DB_ERROR);
+		}
+	}
 
 	/**
 	 * getMsgVarsDataByPrestudentId
@@ -190,5 +207,27 @@ class Message_model extends DB_Model
 		$query = 'SELECT * FROM public.vw_msg_vars_person WHERE person_id %s ?';
 
 		return $this->execQuery(sprintf($query, is_array($person_id) ? 'IN' : '='), array($person_id));
+	}
+	
+	/**
+	 * Get message vars data for logged in user
+	 * @param string uid The UID should ONLY be passed if this method is called by a cronjob.
+	 * This is to enable jobs to use templates which use logged-in-user fields ('Eigene Felder').
+	 * @return array|null
+	 */
+	public function getMsgVarsDataByLoggedInUser($uid = null)
+	{
+		if (is_string($uid))
+		{
+			$params = array($uid);
+		}
+		else
+		{
+			$params = array(getAuthUID());
+		}
+		
+		$query = 'SELECT * FROM public.vw_msg_vars_user WHERE my_uid = ?';
+		
+		return $this->execQuery($query, $params);
 	}
 }

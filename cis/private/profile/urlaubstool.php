@@ -163,6 +163,68 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 		$wjahr=$wjahr;
 	}
 }
+
+//Bereits freigegebenen Eintrag löschen
+//Eintragung löschen
+if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POST['delete']) && isset($_POST['informSupervisor'])))
+{
+    $zeitsperre = new zeitsperre();
+    $zeitsperre->load($_GET['delete']);
+
+    $vondatum = $zeitsperre->getVonDatum();
+    $bisdatum = $zeitsperre->getBisDatum();
+
+    if(!$zeitsperre->delete($_GET['delete']))
+        echo $zeitsperre->errormsg;
+
+        //Mail an Vorgesetzten
+        $prsn = new person();
+
+        $vorgesetzter = $ma->getVorgesetzte($uid);
+        if($vorgesetzter)
+        {
+            $to='';
+            $fullName ='';
+            foreach($ma->vorgesetzte as $vg)
+            {
+                if($to!='')
+                {
+                    $to.=', '.$vg.'@'.DOMAIN;
+                    $name = $prsn->getFullNameFromBenutzer($vg);
+                    $fullName.=', '.$name;
+                }
+                else
+                {
+                    $to.=$vg.'@'.DOMAIN;
+                    $name = $prsn->getFullNameFromBenutzer($vg);
+                    $fullName.=$name;
+                }
+            }
+
+        $benutzer = new benutzer();
+        $benutzer->load($uid);
+        $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
+            $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
+        $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
+
+
+        $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
+        if($mail->send())
+        {
+            $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</span>";
+        }
+        else
+        {
+            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
+        }
+    }
+    else
+    {
+        $vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
+    }
+}
+
+
 //Eintragung löschen
 if((isset($_GET['delete']) || isset($_POST['delete'])))
 {
@@ -257,19 +319,26 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		if(!$error)
 		{
 			//Mail an Vorgesetzten
+            $prsn = new person();
+
 			$vorgesetzter = $ma->getVorgesetzte($uid);
 			if($vorgesetzter)
 			{
 				$to='';
+				$fullName ='';
 				foreach($ma->vorgesetzte as $vg)
 				{
 					if($to!='')
 					{
 						$to.=', '.$vg.'@'.DOMAIN;
+						$name = $prsn->getFullNameFromBenutzer($vg);
+						$fullName.=', '.$name;
 					}
 					else
 					{
 						$to.=$vg.'@'.DOMAIN;
+						$name = $prsn->getFullNameFromBenutzer($vg);
+						$fullName.=$name;
 					}
 				}
 
@@ -295,7 +364,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigabeansuchenUrlaub'), $message);
 				if($mail->send())
 				{
-					$vgmail="<span style='color:green;'>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."</span>";
+					$vgmail="<span style='color:green;'>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</span>";
 				}
 				else
 				{
@@ -373,10 +442,14 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 				if(date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))>=$row->vondatum
 				&& date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))<=$row->bisdatum)
 				{
-					if($row->freigabevon!='' || $row->bisdatum<date("Y-m-d",time()))
+					if($row->freigabevon!='' && $row->vondatum<=date("Y-m-d",time()))
 					{
 						$hgfarbe[$i]='#bbb';
 					}
+					elseif ($row->freigabevon!=''  && $row->vondatum>date("Y-m-d",time()))
+                    {
+						$hgfarbe[$i]='#CDDDEE';
+                    }
 					else
 					{
 						$hgfarbe[$i]='#FFFC7F';
@@ -389,7 +462,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 				}
 				else
 				{
-					if($hgfarbe[$i]!='#FFFC7F' && $hgfarbe[$i]!='#bbb')
+					if($hgfarbe[$i]!='#FFFC7F' && $hgfarbe[$i]!='#bbb' && $hgfarbe[$i]!='#CDDDEE')
 					{
 
 						$hgfarbe[$i]='#E9ECEE';
@@ -696,7 +769,7 @@ for ($i=0;$i<6;$i++)
 		}
 		if($tage[$j+7*$i]!='')
 		{
-			if($hgfarbe[$j+7*$i]=='#FFFC7F')
+			if($hgfarbe[$j+7*$i]=='#FFFC7F' )//|| $hgfarbe[$j+7*$i]=='#CDDDEE')
 			{
 				echo '<b title='.$p->t('urlaubstool/vertretung').': '.$vertretung_uid[$j+7*$i].' - '.$p->t('urlaubstool/erreichbar').': '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';;
 				$k=$j+7*$i;
@@ -724,7 +797,13 @@ for ($i=0;$i<6;$i++)
 				}
 				elseif(isset($freigabeamum[$j+7*$i]))
 				{
-					echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurchAm', array($freigabevon[$j+7*$i])).' '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>';
+                    echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurch', array($freigabevon[$j+7*$i])).': '.$freigabevon[$j+7*$i].'"><span> </span>';
+					if($hgfarbe[$j+7*$i]=='#CDDDEE')
+					{
+						$k=$j+7*$i;
+						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]&informSupervisor=True' onclick='return conf_del()'>";
+                        echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
+					}
 				}
 				else
 				{

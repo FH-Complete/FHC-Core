@@ -57,6 +57,12 @@ $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 $person_id = filter_input(INPUT_POST, 'person_id');
 $strasse = filter_input(INPUT_POST, 'strasse');
 
+$dokumenttyp = filter_input(INPUT_POST, 'dokumenttyp');
+$ausgabedatum = filter_input(INPUT_POST, 'ausgabedatum');
+$ausstellbehoerde = filter_input(INPUT_POST, 'ausstellbehoerde');
+$ausstellland = filter_input(INPUT_POST, 'ausstellland');
+$dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
+
 ?><!DOCTYPE html>
 <html>
 <head>
@@ -79,6 +85,7 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 		<li><a href="datenverbund_client.php?action=getReservations">Matrikelnummer Reservierungen anzeigen</a></li>
 		<li><a href="datenverbund_client.php?action=getKontingent">Matrikelnummer Kontingent anfordern</a></li>
 		<li><a href="datenverbund_client.php?action=setMatrikelnummer">Matrikelnummer Vergabe melden</a></li>
+		<li><a href="datenverbund_client.php?action=setMatrikelnummerErnp">ERNP-Eintragung anfordern</a></li>
 		<li><a href="datenverbund_client.php?action=assignMatrikelnummer">Gesamtprozess (Abfrage, ggf Vergabemeldung, Speichern bei Person)</a></li>
 		<li><a href="datenverbund_client.php?action=getBPK">BPK ermitteln</a></li>
 		<li><a href="datenverbund_client.php?action=pruefeBPK">BPK ermitteln manuell</a></li>
@@ -114,6 +121,50 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 		</tr>';
 	}
 
+	/**
+	 * Erstellt eine Tabllezeile mit Input-Feld
+	 * @param string $name Name des Inputs.
+	 * @param string $title Titel der Zeile.
+	 * @param string $value Value des Inputs.
+	 * @param string $hint Hinweistext zu Inputfeld.
+	 * @param int $maxlength Maximallaenge des Eingabefeldes.
+	 * @return void
+	 */
+	function printDropdownRow($name, $title, $values, $selectedValue = '', $hint = '')
+	{
+		global $db;
+
+		echo '
+		<tr>
+			<td align="right">'.$title.':</td>
+			<td>
+			    <select name="'.$name.'">';
+
+            foreach ($values as $idx => $value)
+            {
+                $selected = $selectedValue === $value ? ' selected' : '';
+                echo '<option value="'.$db->convert_html_chars($value).'"'.$selected.'>'.$idx.'</option>';
+            }
+
+            echo '</select>'.$hint.'
+			</td>
+		</tr>';
+	}
+
+	/**
+	 * Prints Stammdaten inputfields for setMatrikelnummer form
+	 */
+	function printSetMatrikelnrRows()
+    {
+        global $matrikelnr, $nachname, $vorname, $geburtsdatum, $geschlecht, $postleitzahl;
+		printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
+		printrow('nachname', 'Nachname', $nachname, '', 255);
+		printrow('vorname', 'Vorname', $vorname, '', 30);
+		printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
+		printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
+		printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
+    }
+
 	switch($action)
 	{
 		case 'getOAuth':
@@ -144,15 +195,35 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 			break;
 
 		case 'setMatrikelnummer':
-			printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
-			printrow('nachname', 'Nachname', $nachname, '', 255);
-			printrow('vorname', 'Vorname', $vorname, '', 30);
-			printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
-			printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
-			printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
+            printSetMatrikelnrRows();
 			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
 			printrow('svnr', 'SVNR', $svnr);
 			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
+			break;
+
+		case 'setMatrikelnummerErnp':
+		    echo '<b>HINWEIS: Die Eintragung ins ERnP (Ergänzungsregister für natürliche Personen) sollte nur dann durchgeführt werden, <br />wenn für die Person bei "Matrikelnummer Vergabe melden" keine BPK ermittelt werden kann.
+		     <br />Beim Punkt "BPK ermitteln" sollte dementsprechend keine BPK zurückgegeben werden.</b></br></br>';
+		    echo '
+            <tr>
+                <td colspan="2"><b>Personmeldung</b></td>
+            </tr>';
+
+			printSetMatrikelnrRows();
+			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb D für Deutschland)', 3);
+			printrow('svnr', 'SVNR/Ersatzkennzeichen', $svnr);
+			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
+
+			echo '
+            <tr>
+                <td colspan="2"><b>Ernpmeldung</b></td>
+            </tr>';
+
+			printDropdownRow('dokumenttyp', 'Dokumenttyp', array('Reisepass' => 'REISEP', 'Personalausweis' => 'PERSAUSW'), $dokumenttyp,'');
+			printrow('dokumentnr', 'Dokumentnummer', $dokumentnr, '', 60);
+			printrow('ausgabedatum', 'Ausgabedatum', $ausgabedatum, 'Format: YYYYMMDD', 10);
+			printrow('ausstellbehoerde', 'Ausstellbehörde', $ausstellbehoerde, '', 40);
+			printrow('ausstellland', 'Ausstellland', $ausstellland, '1-3 Stellen Codex (zb D für Deutschland)', 60);
 			break;
 
 		case 'assignMatrikelnummer':
@@ -337,6 +408,33 @@ if (isset($_REQUEST['submit']))
 				echo '<br><b>Fehlgeschlagen:</b>'.$result->errormsg;
 			break;
 
+		case 'setMatrikelnummerErnp':
+			$person = new stdClass();
+			$person->matrikelnummer = $matrikelnr;
+			$person->vorname = $vorname;
+			$person->nachname = $nachname;
+			$person->geburtsdatum = $geburtsdatum;
+			$person->geschlecht = $geschlecht;
+			$person->staat = $staat;
+			$person->plz = $postleitzahl;
+			$person->matura = $matura; // Optional
+			$person->svnr = $svnr; // Optional
+
+			$reisepass = new stdClass();
+            $reisepass->dokumenttyp = $dokumenttyp;
+            $reisepass->ausgabedatum = $ausgabedatum;
+            $reisepass->ausstellBehoerde = $ausstellbehoerde;
+            $reisepass->ausstellland = $ausstellland;
+            $reisepass->dokumentnr = $dokumentnr;
+
+			$result = $dvb->setMatrikelnummerErnp(DVB_BILDUNGSEINRICHTUNG_CODE, $person, $reisepass);
+
+			if (ErrorHandler::isSuccess($result))
+				echo '<br><b>Erfolgreich gemeldet</b>';
+			else
+				echo '<br><b>Fehlgeschlagen:</b>'.$result->errormsg;
+			break;
+
 		case 'assignMatrikelnummer':
 			$result = $dvb->assignMatrikelnummer($person_id);
 			if(ErrorHandler::isSuccess($result))
@@ -371,7 +469,14 @@ if (isset($_REQUEST['submit']))
 			break;
 	}
 	if (isset($_POST['debug']))
-		echo '<div style="color: gray">'.nl2br(htmlentities($dvb->debug_output)).'</div>';
+	{
+		$output = nl2br(htmlentities($dvb->debug_output));
+		$output = str_replace('&gt;&lt;','&gt;<br>&lt;',$output);
+		$output = preg_replace('/(&lt;uni:.*?&gt;)/','<span style="color: deepskyblue">$1</span>',$output);
+		$output = preg_replace('/(&lt;\/uni:.*?&gt;)/','<span style="color: deepskyblue">$1</span>',$output);
+
+		echo '<div style="color: gray">'.$output.'</div>';
+	}
 }
 
 ?>

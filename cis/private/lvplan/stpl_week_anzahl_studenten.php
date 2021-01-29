@@ -37,7 +37,7 @@
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 	
-	if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 's') || !$rechte->isBerechtigt('admin'))
+	if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 's') && !$rechte->isBerechtigt('admin'))
 		die($rechte->errormsg);
 	unset($rechte);
 

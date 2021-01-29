@@ -96,7 +96,14 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
       				<label value="Buchungstext" control="student-konto-neu-textbox-buchungstext"/>
 		      		<textbox id="student-konto-neu-textbox-buchungstext"  maxlength="256"/>
 				</row>
-				<row>
+				<?php
+					// Mahnspanne wird nur angezeigt, wenn diese im Config aktiviert wurden
+					if(!defined('FAS_KONTO_SHOW_MAHNSPANNE') || FAS_KONTO_SHOW_MAHNSPANNE===true)
+						$hidden='';
+					else
+						$hidden='hidden="true"';
+				?>
+				<row <?php echo $hidden;?>>
 					<label value="Mahnspanne" control="student-konto-neu-textbox-mahnspanne"/>
 					<hbox>
 						<textbox id="student-konto-neu-textbox-mahnspanne" value="30" maxlength="4" size="4"/>
