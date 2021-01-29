@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -31,16 +31,16 @@
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/phrasen.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
-	
+
 	$sprache = getSprache();
 	$p = new phrasen($sprache);
 	$uid=get_uid();
-	
+
 	if(isset($_GET['uid']))
 	{
 		// Administratoren duerfen die UID als Parameter uebergeben um die Zahlungen
 		// von anderen Personen anzuzeigen
-	
+
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($uid);
 		if($rechte->isBerechtigt('admin'))
@@ -58,7 +58,7 @@
 	{
 		die('Um diese Seite anzuzeigen, ist ein entsprechender Eintrag in der Konfigurationsdatei nötig.');
 	}
-	
+
 	$datum_obj = new datum();
 
 	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -127,20 +127,20 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 					type: "numeric"
 				});
 				// Parser für Studiensemester
-				$.tablesorter.addParser({ 
-					// set a unique id 
-					id: "studiensemester", 
-					is: function(s) { 
-						// return false so this parser is not auto detected 
-						return false; 
-					}, 
-					format: function(s) { 
-						// format data for normalization 
+				$.tablesorter.addParser({
+					// set a unique id
+					id: "studiensemester",
+					is: function(s) {
+						// return false so this parser is not auto detected
+						return false;
+					},
+					format: function(s) {
+						// format data for normalization
 						var result = s.substr(2) + s.substr(0, 2);
 						return result;
-					}, 
-					// set type, either numeric or text 
-					type: "text" 
+					},
+					// set type, either numeric or text
+					type: "text"
 				});
 				// For correct sorting of Umlauts
 				$.tablesorter.characterEquivalents = {
@@ -159,8 +159,8 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 					"u" : "\u00fa\u00f9\u00fb\u00fc\u016f", // úùûüů
 					"U" : "\u00da\u00d9\u00db\u00dc\u016e" // ÚÙÛÜŮ
 				  };
-				$(document).ready(function() 
-				{ 
+				$(document).ready(function()
+				{
 					$("#t1").tablesorter(
 					{
 						// Adding Function for sorting images by title
@@ -173,31 +173,31 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 						widgets: ["zebra"],
 						sortLocaleCompare : true,
 						headers: { 0: { sorter: "customDate"}, 3: { sorter: "studiensemester"}, 5: { sorter: "customCurrancy"}, 6: { sorter: false}}
-					}); 
+					});
 				});
 			</script>
 			<body>';
 
 	$studiengang = new studiengang();
 	$studiengang->getAll(null,null);
-	
+
 	$stg_arr = array();
 	foreach ($studiengang->result as $row)
 		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
-	
+
 	$benutzer = new benutzer();
 	if(!$benutzer->load($uid))
 		die('Benutzer wurde nicht gefunden');
-	
+
 	echo '<h1>'.$p->t('tools/zahlungen').' - '.$benutzer->vorname.' '.$benutzer->nachname.'</h1>';
-		
+
 	$konto = new konto();
 	$konto->getBuchungstyp();
 	$buchungstyp = array();
-	
+
 	foreach ($konto->result as $row)
 		$buchungstyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
-	
+
 	$konto = new konto();
 	$konto->getBuchungen($benutzer->person_id);
 	if(count($konto->result)>0)
@@ -211,9 +211,9 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 			<th>'.$p->t('global/studiensemester').'</th>
 			<th>'.$p->t('tools/buchungstext').'</th>
 			<th>'.$p->t('tools/betrag').'</th>
-			<th>'.$p->t('tools/zahlungsbestaetigung').'</th>';	
+			<th>'.$p->t('tools/zahlungsbestaetigung').'</th>';
 		echo '</tr></thead><tbody>';
-		
+
 		foreach ($konto->result as $row)
 		{
 			$i=0;  //Zaehler fuer Anzahl Gegenbuchungen
@@ -226,12 +226,12 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 				$is_lehrgang = $row['parent']->studiengang_kz < 0 ? true : false;
 				if ($is_lehrgang) continue;
 			}
-			
+
 			if(!isset($row['parent']))
 				continue;
 			$betrag = $row['parent']->betrag;
 			$count_studiengangszahlung ++;
-			
+
 			if(isset($row['childs']))
 			{
 				foreach ($row['childs'] as $key => $row_child)
@@ -243,57 +243,63 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 					$i = $key; //Zaehler auf letzten Gegenbuchungseintrag setzen
 				}
 			}
-			else 
+			else
 				$buchungsnummern = $row['parent']->buchungsnr;
-			
+
 			if($betrag<0)
 				$style='style="background-color: #FF8888;"';
 			elseif($betrag>0)
 				$style='style="background-color: #88DD88;"';
-			else 
+			else
 				$style='';
 
-			echo "<tr>";
-			echo '<td '.$style.'>'.date('d.m.Y',$datum_obj->mktime_fromdate(isset($row['childs'][$i])?$row['childs'][$i]->buchungsdatum:$row['parent']->buchungsdatum)).'</td>';
-			echo '<td '.$style.'>'.$buchungstyp[$row['parent']->buchungstyp_kurzbz].'</td>';
-			echo '<td '.$style.'>'.$stg_arr[$row['parent']->studiengang_kz].'</td>';
-			echo '<td '.$style.'>'.$row['parent']->studiensemester_kurzbz.'</td>';			
-			
-			echo '<td '.$style.'>'.$row['parent']->buchungstext.'</td>';
-			echo '<td align="right" '.$style.'>€ '.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).'</td>';
-			echo '<td align="center" '.$style.'>';
-			if($betrag>=0 && $row['parent']->betrag<=0)
+			$buchungsdatum = $datum_obj->mktime_fromdate(isset($row['childs'][$i])?$row['childs'][$i]->buchungsdatum:$row['parent']->buchungsdatum);
+			$aktdatum = time();
+			// Zukünftige Zahlungen werden nicht angezeigt
+			if ($buchungsdatum <= $aktdatum)
 			{
-				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$buchungsnummern.'" title="'.$p->t('tools/bestaetigungDrucken').'"><img src="../../../skin/images/pdfpic.gif" alt="'.$p->t('tools/bestaetigungDrucken').'"></a>';
+				echo "<tr>";
+				echo '<td '.$style.'>'.date('d.m.Y',$buchungsdatum).'</td>';
+				echo '<td '.$style.'>'.$buchungstyp[$row['parent']->buchungstyp_kurzbz].'</td>';
+				echo '<td '.$style.'>'.$stg_arr[$row['parent']->studiengang_kz].'</td>';
+				echo '<td '.$style.'>'.$row['parent']->studiensemester_kurzbz.'</td>';
+
+				echo '<td '.$style.'>'.$row['parent']->buchungstext.'</td>';
+				echo '<td align="right" '.$style.'>€ '.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).'</td>';
+				echo '<td align="center" '.$style.'>';
+				if($betrag>=0 && $row['parent']->betrag<=0)
+				{
+					echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$buchungsnummern.'" title="'.$p->t('tools/bestaetigungDrucken').'"><img src="../../../skin/images/pdfpic.gif" alt="'.$p->t('tools/bestaetigungDrucken').'"></a>';
+				}
+				elseif($row['parent']->betrag>0)
+				{
+					//Auszahlung
+				}
+				else
+				{
+					echo '<a onclick="window.open(';
+					echo "'zahlungen_details.php?buchungsnr=".$row['parent']->buchungsnr.$getParam."','Zahlungsdetails','height=500,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
+					echo '" href="#">'.$p->t('tools/offen').'</a>(€ '.sprintf('%.2f',$betrag*-1).')';
+
+					echo '</td>';
+				}
+				echo '</tr>';
 			}
-			elseif($row['parent']->betrag>0)
-			{
-				//Auszahlung
-			}
-			else
-			{
-				echo '<a onclick="window.open(';
-				echo "'zahlungen_details.php?buchungsnr=".$row['parent']->buchungsnr.$getParam."','Zahlungsdetails','height=500,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
-				echo '" href="#">'.$p->t('tools/offen').'</a>(€ '.sprintf('%.2f',$betrag*-1).')';
-			
-				echo '</td>';
-			}
-			echo '</tr>';
 		}
-		
+
 		// Wenn die Tabelle keine Eintraege hat, wird eine Tabellenzeile mit entsprechender Information angezeigt.
 		if ($count_studiengangszahlung == 0)
 		{
 			echo "<tr><td colspan='7' style='background-color: white;'>" .$p->t('tools/keineZahlungenVorhanden'). "</td></tr>";
 		}
-		
+
 		echo '</tbody></table>';
 	}
-	else 
+	else
 	{
 		echo $p->t('tools/keineZahlungenVorhanden');
-	}	
+	}
 	echo '</td></tr></table';
-	
-	echo '</body></html>';	   	
+
+	echo '</body></html>';
 ?>
