@@ -195,6 +195,7 @@ $berechtigungen = array(
 	array('student/noten','Notenverwaltung'),
 	array('student/stammdaten','Stammdaten der Studenten'),
 	array('student/vorrueckung','Studentenvorrückung'),
+	array('student/zahlungAdmin','Zahlungsadministration'),
 	array('system/developer','Anzeige zusätzlicher Developerinfos'),
 	array('system/loginasuser','Berechtigung zum Einloggen als anderer User'),
 	array('system/phrase','Bearbeiten von Textphrasen'),

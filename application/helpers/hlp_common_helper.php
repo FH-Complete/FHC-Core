@@ -301,3 +301,45 @@ function isLogged()
 
 	return isset($ci->authlib) && $ci->authlib->getAuthObj() != null;
 }
+
+/**
+ * Konvertiert Problematische Sonderzeichen in Strings fuer
+ * Accountnamen und EMail-Aliase
+ *
+ * @param $str
+ * @return bereinigter String
+ */
+function sanitizeProblemChars($str)
+{
+	$enc = 'UTF-8';
+
+	$acentos = array(
+		'A' => '/&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Aring;/',
+		'Ae' => '/&Auml;/',
+		'a' => '/&agrave;|&aacute;|&acirc;|&atilde;|&aring;/',
+		'ae'=> '/&auml;/',
+		'C' => '/&Ccedil;/',
+		'c' => '/&ccedil;/',
+		'E' => '/&Egrave;|&Eacute;|&Ecirc;|&Euml;/',
+		'e' => '/&egrave;|&eacute;|&ecirc;|&euml;/',
+		'I' => '/&Igrave;|&Iacute;|&Icirc;|&Iuml;/',
+		'i' => '/&igrave;|&iacute;|&icirc;|&iuml;/',
+		'N' => '/&Ntilde;/',
+		'n' => '/&ntilde;/',
+		'O' => '/&Ograve;|&Oacute;|&Ocirc;|&Otilde;/',
+		'Oe' => '/&Ouml;/',
+		'o' => '/&ograve;|&oacute;|&ocirc;|&otilde;/',
+		'oe' => '/&ouml;/',
+		'U' => '/&Ugrave;|&Uacute;|&Ucirc;/',
+		'Ue' => '/&Uuml;/',
+		'u' => '/&ugrave;|&uacute;|&ucirc;/',
+		'ue' => '/&uuml;/',
+		'Y' => '/&Yacute;/',
+		'y' => '/&yacute;|&yuml;/',
+		'a.' => '/&ordf;/',
+		'o.' => '/&ordm;/',
+		'ss' => '/&szlig;/'
+	);
+
+	return preg_replace($acentos, array_keys($acentos), htmlentities($str,ENT_NOQUOTES, $enc));
+}

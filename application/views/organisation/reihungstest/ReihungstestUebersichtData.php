@@ -106,7 +106,7 @@
 				public.tbl_reihungstest
 				LEFT JOIN public.tbl_studiengang using(studiengang_kz)
 			WHERE
-				datum>now()-'2 weeks'::interval
+				datum>now()-'5 months'::interval
 			ORDER BY datum desc
 		) data
 		",
@@ -142,7 +142,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'anmeldefrist'} = date_format(date_create($datasetRaw->{'anmeldefrist'}), 'd.m.Y');
+				$datasetRaw->{'anmeldefrist'} = date_format(date_create($datasetRaw->{'anmeldefrist'}), 'Y-m-d');
 			}
 			if ($datasetRaw->{'max_plaetze'} == null)
 			{
@@ -175,7 +175,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'datum'} = date_format(date_create($datasetRaw->{'datum'}), 'd.m.Y');
+				$datasetRaw->{'datum'} = date_format(date_create($datasetRaw->{'datum'}), 'Y-m-d');
 			}
 
 			return $datasetRaw;

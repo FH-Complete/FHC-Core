@@ -147,7 +147,7 @@ class PermissionLib
 
 								$accessType = '';
 
-								// Checks if the required access type is compliant with the HTTP method (GET => r, POST => w)
+								// Set the access type
 								if (strpos($requiredAccessType, PermissionLib::READ_RIGHT) !== false)
 								{
 									$accessType = PermissionLib::SELECT_RIGHT; // S
@@ -184,12 +184,12 @@ class PermissionLib
 			}
 			else
 			{
-				show_error('The given permission array does not contain the called method or is not correctly set');
+				show_error('The given permission array does not contain the given method or is not correctly set');
 			}
 		}
 		else
 		{
-			show_error('You must give the permissions array as parameter to the constructor of the controller');
+			show_error('The given permissions is not a valid array or it is an empty one');
 		}
 
 		return $checkPermissions;

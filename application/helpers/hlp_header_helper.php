@@ -69,6 +69,8 @@ function generateCSSsInclude($CSSs)
  */
 function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
+	$user_language = getUserLanguage();
+
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= '

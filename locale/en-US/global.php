@@ -44,6 +44,7 @@ $this->phrasen['global/alle']='All';
 $this->phrasen['global/abbrechen']='Cancel';
 $this->phrasen['global/eintragen']='Register';
 $this->phrasen['global/erstellen']='Create';
+$this->phrasen['global/durchfuehren']='Run';
 $this->phrasen['global/zurueck']='Back';
 $this->phrasen['global/abschicken']='Submit';
 $this->phrasen['global/zuruecksetzen']='Reset';
@@ -181,6 +182,7 @@ $this->phrasen['global/keineDatenGefunden']='No data found';
 $this->phrasen['global/erfolgreichAngelegt']='Created successfully';
 $this->phrasen['global/keineSuchergebnisse']='No matches found';
 $this->phrasen['global/bitteWaehlen']='Please select';
+$this->phrasen['global/zusaetzlicheInformationen']='Additional Informations';
 
 //infrastruktur
 

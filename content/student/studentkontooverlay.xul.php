@@ -195,13 +195,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</tree>
 					</vbox>
 					<vbox flex="1">
+                        <?php
+                        $is_hidden = (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN) ? 'false' : 'true';
+                        ?>
 						<hbox>
 							<button id="student-konto-button-neu" label="Neu" oncommand="StudentKontoNeu();" disabled="true"/>
 							<button id="student-konto-button-gegenbuchung" label="Gegenbuchung" oncommand="StudentKontoGegenbuchung();" disabled="true"/>
 							<box class="Datum" id="student-konto-textbox-gegenbuchungsdatum" disabled="true" tooltiptext="Optionales Datum der Gegenbuchung"/>
 							<button id="student-konto-button-loeschen" label="Loeschen" oncommand="StudentKontoDelete();" disabled="true"/>
 							<spacer flex="1"/>
-							<button id="student-konto-button-zahlungsbestaetigung" label="Zahlungsbestaetigung drucken" oncommand="StudentKontoZahlungsbestaetigung();" disabled="true"/>
+							<button id="student-konto-button-zahlungsbestaetigung" label="Zahlungsbestaetigung drucken" oncommand="StudentKontoZahlungsbestaetigung();" disabled="true" hidden="<?php echo $is_hidden?>"/>
 						</hbox>
 						<vbox hidden="true">
 							<label value="Buchungsnr" control="student-konto-textbox-buchungsnr"/>
@@ -234,7 +237,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					      				<label value="Buchungstext" control="student-konto-textbox-buchungstext"/>
 							      		<textbox id="student-konto-textbox-buchungstext" disabled="true" maxlength="256"/>
 									</row>
-									<row>
+									<?php
+										// Mahnspanne wird nur angezeigt, wenn diese im Config aktiviert wurden
+										if(!defined('FAS_KONTO_SHOW_MAHNSPANNE') || FAS_KONTO_SHOW_MAHNSPANNE===true)
+											$hidden='';
+										else
+											$hidden='hidden="true"';
+									?>
+									<row <?php echo $hidden; ?>>
 										<label value="Mahnspanne" control="student-konto-textbox-mahnspanne"/>
 										<hbox>
 											<textbox id="student-konto-textbox-mahnspanne" disabled="true" maxlength="4" size="4"/>

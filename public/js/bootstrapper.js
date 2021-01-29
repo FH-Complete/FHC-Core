@@ -9,7 +9,7 @@ $(document).ready(function() {
 var Bootstrapper = {
 	bootstraphtml: function ()
 	{
-		$("input[type=text], select").addClass("form-control");
+		$("input[type=text], select, textarea").addClass("form-control");
 		$("button, input[type=button]").addClass("btn btn-default");
 		$("table").addClass("table-condensed");
 	}

@@ -61,6 +61,20 @@ class DB_Model extends CI_Model
 	// Public methods
 
 	/**
+	 * This method provides a way to setup a database model without declaring one that extends this class
+	 */
+	public function setup($schema, $table, $primaryKey, $hasSequence = true)
+	{
+		//
+		if (!isEmptyString($schema) && !isEmptyString($table) && !isEmptyString($primaryKey) && is_bool($hasSequence))
+		{
+			$this->dbTable = $schema.'.'.$table;
+			$this->pk = $primaryKey;
+			$this->hasSequence = $hasSequence;
+		}
+	}
+
+	/**
 	 * Insert Data into DB-Table
 	 *
 	 * @param   array $data  DataArray for Insert
@@ -690,7 +704,7 @@ class DB_Model extends CI_Model
 	 */
 	public function hasUDF()
 	{
-		if($this->fieldExists(UDFLib::COLUMN_NAME))
+		if ($this->fieldExists(UDFLib::COLUMN_NAME))
 		{
 			$resultUDFsDefinitions = $this->UDFModel->getUDFsDefinitions($this->dbTable);
 			if (hasData($resultUDFsDefinitions))
@@ -727,8 +741,8 @@ class DB_Model extends CI_Model
 		$cleanedQuery = trim(preg_replace('/\t|\n|\r|;/', '', $query)); //
 
 		//
-		if (stripos($cleanedQuery, 'SELECT') == 0
-			&& (stripos($cleanedQuery, 'INSERT') > 0 || stripos($cleanedQuery, 'INSERT') == false)
+		if (
+			(stripos($cleanedQuery, 'INSERT') > 0 || stripos($cleanedQuery, 'INSERT') == false)
 			&& (stripos($cleanedQuery, 'UPDATE') > 0 || stripos($cleanedQuery, 'UPDATE') == false)
 			&& (stripos($cleanedQuery, 'CREATE') > 0 || stripos($cleanedQuery, 'CREATE') == false)
 			&& (stripos($cleanedQuery, 'DELETE') > 0 || stripos($cleanedQuery, 'DELETE') == false)

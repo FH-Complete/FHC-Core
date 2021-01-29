@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------------------------------------------------
 // Global vars
 // -----------------------------------------------------------------------------------------------------------------
+const APP_ROOT = FHC_JS_DATA_STORAGE_OBJECT.app_root;
 
 const COLOR_LIGHTGREY = "#f5f5f5";
 
@@ -18,6 +19,18 @@ const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user
 const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -6px;">';
 const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
 const ICON_LEHRAUFTRAG_CANCELLED = '<img src="../../../public/images/icons/fa-user-times.png" style="height: 30px; width: 30px; margin: -6px;">';
+
+// Fields that should not be provided in the column picker
+var tableWidgetBlacklistArray_columnUnselectable = [
+	'status',
+	'row_index',
+	'betrag',
+	'vertrag_id',
+	'vertrag_stunden',
+	'vertrag_betrag',
+	'storniert_von',				// fields from cancelledLehrauftragData
+	'letzterStatus_vorStorniert'	// fields from cancelledLehrauftragData
+];
 
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -81,10 +94,9 @@ function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
 
-// Displays text when table is empty
-function func_placeholder()
-{
-	return "<h4>Keine Daten vorhanden.</h4>";
+// Returns relative height (depending on screen size)
+function func_height(table){
+	return $(window).height() * 0.50;
 }
 
 // Formats the rows
@@ -254,65 +266,20 @@ function func_renderComplete(table){
 	);
 }
 
-// Tabulator footer element
+// TableWidget Footer element
 // -----------------------------------------------------------------------------------------------------------------
 
-// Adds a footer with buttons select all / deselect all / download
-function func_footerElement(){
-
-	var footer_html = '<div class="row">';
-	footer_html += '<div class="col-lg-12" style="padding: 5px;">';
-
-	footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
-	footer_html += '<div class="btn-group" role="group">';
-	footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-	footer_html += '</div>';
-	footer_html += '</div>';
-
-	footer_html += '<div class="btn-toolbar" role="toolbar">';
-	footer_html += '<div class="btn-group" role="group">';
-	footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
-	footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
-	footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
-	footer_html += '</div>';
-	footer_html += '</div>';
-
-	footer_html += '</div>';
-	footer_html += '</div>';
-
-	return footer_html;
-}
-
-// Performs download CSV
-function footer_downloadCSV(){
-	$('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
-}
-
 /*
- * Performs select all
+ * Hook to overwrite TableWigdgets select-all-button behaviour
  * Select all (filtered) rows and ignore rows that are bestellt and erteilt
  */
-function footer_selectAll(){
-	$('#tableWidgetTabulator').tabulator('getRows', true)
-		.filter(function(row){ return row.getData().bestellt != null &&   // bestellt
-			row.getData().erteilt != null &&            // AND erteilt
-			row.getData().akzeptiert == null &&         // AND NOT akzeptiert
-			row.getData().status != 'Geändert'
-		;})         // AND NOT geändert
-		.forEach((function(row){ return row.select();}));
-}
-
-/*
- * Performs deselect all
- * Deselect all (filtered) rows
- */
-function footer_deselectAll(){
-	$('#tableWidgetTabulator').tabulator('deselectRow');
-}
-
-// Displays number of selected rows on row selection change
-function func_rowSelectionChanged(data, rows){
-	$('#number-selected').html("Für Annehmen ausgewählt: <strong>" + rows.length + "</strong>");
+function tableWidgetHook_selectAllButton(tableWidgetDiv){
+	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+		.filter(row =>  row.getData().bestellt != null &&	// bestellt
+			row.getData().erteilt != null &&				// AND erteilt
+			row.getData().akzeptiert == null &&				// AND NOT akzeptiert
+			row.getData().status != 'Geändert')				// AND NOT geändert
+		.forEach((row => row.select()));
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -402,36 +369,35 @@ status_tooltip = function(cell){
 		letzterStatus_vorStorniert = 'angenommen';
 	}
 
-	var text = 'Lehrauftrag in Bearbeitung. ';
+	var text = FHC_PhrasesLib.t("ui", "lehrauftragInBearbeitung");
 
 	if (bestellt != null && erteilt == null && akzeptiert == null
 		&& (betrag != vertrag_betrag || stunden != vertrag_stunden))        // geaendert (when never erteilt before)
 	{
-		text += 'Wartet auf Erteilung.';
+		text += FHC_PhrasesLib.t("ui", "wartetAufErteilung");;
 		return text;
 	}
 	else if (bestellt != null && erteilt != null && akzeptiert == null
 		&& (betrag != vertrag_betrag || stunden != vertrag_stunden))        // geaendert (when has been erteilt once)
 	{
-		text += 'Wartet auf erneute Erteilung.';
+		text += FHC_PhrasesLib.t("ui", "wartetAufErneuteErteilung");
 		return text;
 	}
 	else if (bestellt != null && erteilt == null && akzeptiert == null)     // bestellt
 	{
-		return 'Letzter Status: Bestellt. Wartet auf Erteilung.';
+		return FHC_PhrasesLib.t("ui", "letzterStatusBestellt");
 	}
 	else if (bestellt != null && erteilt != null && akzeptiert == null)     // erteilt
 	{
-		return 'Letzter Status: Erteilt. Wartet auf Annahme durch Lektor.';
+		return FHC_PhrasesLib.t("ui", "letzterStatusErteilt");
 	}
 	else if (bestellt != null && erteilt != null && akzeptiert != null)     // akzeptiert
 	{
-		return 'Letzter Status: Angenommen. Vertrag wurde beidseitig abgeschlossen.';
+		return FHC_PhrasesLib.t("ui", "letzterStatusAngenommen");
 	}
-	else if (is_storniert)
+	else if (is_storniert)													// storniert
 	{
-		return 'Dieser Vertrag wurde storniert. Letzter Status vor Stornierung war: '
-			+ letzterStatus_vorStorniert;                                   // storniert
+		return FHC_PhrasesLib.t("ui", "vertragWurdeStorniert");
 	}
 }
 
@@ -439,33 +405,32 @@ status_tooltip = function(cell){
 bestellt_tooltip = function(cell){
 	if (cell.getRow().getData().bestellt_von != null)
 	{
-		return 'Bestellt von: ' + cell.getRow().getData().bestellt_von;
+		return FHC_PhrasesLib.t("ui", "bestelltVon") + cell.getRow().getData().bestellt_von;
 	}
 }
 
 // Generates erteilt tooltip
 erteilt_tooltip = function(cell){
 	if (cell.getRow().getData().erteilt_von != null) {
-		return 'Erteilt von: ' + cell.getRow().getData().erteilt_von;
+		return FHC_PhrasesLib.t("ui", "erteiltVon") + cell.getRow().getData().erteilt_von;
 	}
 }
 
 // Generates akzeptiert tooltip
 akzeptiert_tooltip = function(cell){
 	if (cell.getRow().getData().akzeptiert_von != null) {
-		return 'Angenommen von: ' + cell.getRow().getData().akzeptiert_von;
+		return FHC_PhrasesLib.t("ui", "angenommenVon") + cell.getRow().getData().akzeptiert_von;
 	}
 }
 
 // Generates storniert tooltip
 storniert_tooltip = function(cell){
 	if (cell.getRow().getData().storniert_von != null) {
-		return 'Storniert von: ' + cell.getRow().getData().storniert_von;
+		return FHC_PhrasesLib.t("ui", "storniertVon") + cell.getRow().getData().storniert_von;
 	}
 }
 
 $(function() {
-
 	// Pruefen ob Promise unterstuetzt wird
 	// Tabulator funktioniert nicht mit IE
 	var canPromise = !! window.Promise;
@@ -475,6 +440,12 @@ $(function() {
 		window.location.href='about:blank';
 		return;
 	}
+
+	// Redraw table on resize to fit tabulators height to windows height
+	window.addEventListener('resize', function(){
+		$('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
+		$('#tableWidgetTabulator').tabulator('redraw', true);
+	});
 
 	// Show all rows
 	$("#show-all").click(function(){
@@ -534,6 +505,29 @@ $(function() {
 		// De/activate and un/focus on clicked button
 		$(".btn-lehrauftrag").removeClass('focus').removeClass('active');
 		$(this).addClass('focus').addClass('active');
+	});
+
+	// Performs download PDF accepted Lehrauftraege
+	$("#ul-download-pdf").on('click', 'li', function(){
+		var uid = $("#uid").val();
+		var studiensemester = $('#studiensemester').val();
+
+		if ($(this).attr('value') != null && $(this).attr('value') != '')
+		{
+			var selected = $(this).attr('value');
+
+			if (selected == 'etw' || selected == 'lehrgang')
+			{
+				window.open(APP_ROOT + 'cis/private/pdfExport.php' +
+					'?xml=lehrauftrag_annehmen.xml.php' +
+					'&xsl=Lehrauftrag' +
+					'&xsl_oe_kurzbz=' + selected +
+					'&stg_kz=' +
+					'&uid=' + uid +
+					'&ss=' + studiensemester, '_parent'
+				);
+			}
+		}
 	});
 
 	// Redraw table stornierte lehrauftraege on button click

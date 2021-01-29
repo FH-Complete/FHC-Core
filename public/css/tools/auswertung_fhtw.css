@@ -1,0 +1,189 @@
+.info
+{
+    color: #0c5460;
+    background-color: #d1ecf1;
+    padding: .75rem 1.25rem;
+    border: 1px solid #bee5eb;;
+}
+.warning
+{
+    color: #856404;
+    background-color: #fff3cd;
+    padding: .75rem 1.25rem;
+    border: 1px solid #ffeeba;
+}
+.error
+{
+    color: #721c24;
+    background-color: #f8d7da;
+    padding: .75rem 1.25rem;
+    border: 1px solid #f5c6cb;
+}
+.loaderIcon
+{
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+    margin-right: auto;
+    margin-left: auto;
+}
+@keyframes spin
+{
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.alert > .btn
+{
+    padding: 0 6px;
+}
+/*** Bootstrap popover ***/
+#popover-target label
+{
+    margin: 0 5px;
+    display: block;
+}
+#popover-target input
+{
+    margin-right: 5px;
+}
+#popover-target .disabled
+{
+    color: #ddd;
+}
+.glyphicon-remove
+{
+    font-size: 150%;
+    margin: -5px 0;
+    top: 4px;
+}
+.ui-autocomplete-loading
+{
+    background: white url("../../../skin/images/spinner.gif") right 5px center no-repeat;
+}
+
+#paramstbl
+{
+    margin-bottom: 0;
+}
+
+#paramstbl label
+{
+    font-weight: normal;
+}
+
+#rtcheckboxesbtn
+{
+    max-width: 390px;
+}
+
+#rtwaehlen
+{
+    white-space: nowrap;
+    padding: 10px;
+}
+
+.rtchkbox
+{
+    float: left;
+}
+
+.rtlabel
+{
+    width: 100%;
+}
+
+.rtlabel:hover, .rtlabel label:hover
+{
+    color: white;
+    background-color: #337ab7;
+    cursor: pointer;
+}
+
+#rtcheckboxes
+{
+    height: 100%;
+    width: 500px;
+    left: 155px;
+    position: absolute;
+    z-index: 9999999;
+    overflow-y: auto;
+    border: 1px solid;
+    padding: 8px;
+    background-color: white;
+    display: none
+}
+
+#auswertencell
+{
+    vertical-align: middle;
+    padding: 0 5px;
+    border-right: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+#addpers,#toggleDelete,#checkAllResButton,#showUebertragenOptionsButton,#punkteUebertragenButton
+{
+    margin-left: 10px;
+}
+
+#miscfunctionscol input,#miscfunctionscol button
+{
+    /*make sure datepicker dropdown is in front*/
+    z-index: 0;
+}
+
+.loaderIcon
+{
+    display: none;
+    margin-top: 10px;
+}
+
+.hiddenEl
+{
+    display: none;
+}
+
+.textcentered
+{
+    text-align: center;
+}
+
+th.smallcol
+{
+    width: 20px;
+}
+
+th.toggletblchkboxcol
+{
+    width: 30px;
+}
+
+.rightaligned
+{
+    text-align: right;
+    padding-right: 3px;
+}
+
+.redcolor
+{
+    color: red;
+}
+
+.darkredcolor
+{
+    color: #c82333;
+}
+
+.darkyellowcolor
+{
+    color: #e0a800;
+}
+
+.zerovalcolor
+{
+    color: #C10000;
+}
