@@ -52,6 +52,7 @@ if(!$rechte->isBerechtigt('student/stammdaten',null,'suid') && !$rechte->isBerec
 $error_log='';
 $error_log1='';
 $error_log_all="";
+$error_log_io = ''; // error log fuer plausichecks von incomings/outgoings
 $stgart='';
 $fehler='';
 $maxsemester=0;
@@ -143,9 +144,9 @@ derzeit fuer alle Studierende der gleiche Standort
 ToDo: Standort sollte pro Student konfigurierbar sein.
 */
 $standortcode='22';
-if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400')))
+if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859')))
 	$standortcode='14'; // Pinkafeld
-elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271')))
+elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271','781')))
 	$standortcode='3'; // Eisenstadt
 
 $datumobj=new datum();
@@ -358,8 +359,46 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<head>
 		<title>BIS - Meldung Student - ('.$stg_kz.')</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-	</head>
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
+
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+
+echo '	</head>
+	<style>
+	#t1, #t2
+	{
+		width: auto;
+	}
+	</style>
+	<script language="JavaScript" type="text/javascript">
+	$(document).ready(function()
+	{
+		$("#t1").tablesorter(
+		{
+			sortList: [[6,1],[5,1],[4,1],[2,0],[3,0]], 
+			widgets: ["zebra", "filter", "stickyHeaders"],
+			widgetOptions : {	filter_functions:  
+								{ 
+									// Add select menu to this column 
+									4 : {
+									"Abbrecher" : function(e, n, f, i, $r, c, data) { return /Abbrecher/.test(e); }, 
+									"Absolvent" : function(e, n, f, i, $r, c, data) { return /Absolvent/.test(e); },
+									"Diplomand" : function(e, n, f, i, $r, c, data) { return /Diplomand/.test(e); },
+									"Incoming" : function(e, n, f, i, $r, c, data) { return /Incoming/.test(e); },
+									"Student" : function(e, n, f, i, $r, c, data) { return /Student/.test(e); },
+									"Unterbrecher" : function(e, n, f, i, $r, c, data) { return /Unterbrecher/.test(e); }, 
+									}
+								} 
+							} 
+		});
+		$("#t2").tablesorter(
+		{
+			sortList: [[0,0],[1,0]], 
+			widgets: ["zebra", "filter", "stickyHeaders"] 
+		});
+	});
+	</script>
 	<body>';
 if ($rechte->isBerechtigt('admin'))
 {
@@ -569,7 +608,8 @@ if(file_exists($eee))
 	echo '<a href="'.$eee.'">BIS-Melde&uuml;bersicht der BIS-Meldung Stg '.$stg_kz.'</a><br><br>';
 }
 
-echo '<table border=1>
+echo '<table id="t1" class="tablesorter">
+	<thead>
 	<tr align=center>
 		<th>UID</th>
 		<th>PersKZ</th>
@@ -579,16 +619,25 @@ echo '<table border=1>
 		<th>Semester</th>
 		<th>Orgform</th>
 	</tr>
+	</thead>
+	<tbody>
 	',$stlist,'
+	</tbody>
 	</table>';
 
 echo '<br>Bewerber&uuml;bersicht';
-echo '<table border=1>
+echo '<table id="t2" class="tablesorter">
+	<thead>
 	<tr align=center>
 		<th>Nachname</th>
 		<th>Vorname</th>
+		<th>Orgform</th>
+		<th>Geschlecht</th>
 	</tr>
+	</thead>
+	<tbody>
 	',$bwlist,'
+	</tbody>
 	</table>';
 
 echo '</body></html>';
@@ -612,6 +661,7 @@ function GenerateXMLStudentBlock($row)
 	global $stg_kz;
 	$error_log='';
 	$error_log1='';
+	$error_log_io = '';
 	$datei = '';
 	$datumobj = new datum();
 
@@ -623,6 +673,9 @@ function GenerateXMLStudentBlock($row)
 		$ausserordentlich=true;
 	else
 		$ausserordentlich=false;
+
+	// Pruefen, ob Incoming (3.Stelle in Personenkennzeichen = 0)
+	$incoming = mb_substr($row->matrikelnr,2,1) == '0' ? true : false;
 
 	$qryadr="SELECT * FROM public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id=".$db->db_add_param($row->pers_id).";";
 	$results=$db->db_query($qryadr);
@@ -637,6 +690,7 @@ function GenerateXMLStudentBlock($row)
 		$gemeinde=$rowadr->gemeinde;
 		$strasse=$rowadr->strasse;
 		$nation=$rowadr->nation;
+		$co_name = $rowadr->co_name;
 	}
 	else
 	{
@@ -644,7 +698,43 @@ function GenerateXMLStudentBlock($row)
 		$gemeinde='';
 		$strasse='';
 		$nation='';
+		$co_name = '';
 	}
+
+	// Zustelladresse & c/o Name(=abweichender Empfaenger)
+	$qryzustelladr = "
+		SELECT *
+		FROM public.tbl_adresse
+		WHERE zustelladresse IS TRUE
+		AND person_id=". $db->db_add_param($row->pers_id). ";
+	";
+	$results = $db->db_query($qryzustelladr);
+
+	if ($db->db_num_rows($results) != 1)
+	{
+		$error_log1.= "Es sind ".$db->db_num_rows($results)." Zustelladressen eingetragen\n";
+	}
+
+	$zustell_plz = '';
+	$zustell_gemeinde = '';
+	$zustell_strasse = '';
+	$zustell_nation = '';
+
+	if ($rowzustelladr = $db->db_fetch_object($results))
+	{
+		$zustell_plz = $rowzustelladr->plz;
+		$zustell_gemeinde = $rowzustelladr->gemeinde;
+		$zustell_strasse = $rowzustelladr->strasse;
+		$zustell_nation = $rowzustelladr->nation;
+	}
+
+	// FH eMail-Adresse FH aus UID@Domain
+	$email = '';
+	if ($row->student_uid != '')
+	{
+		$email = $row->student_uid. '@'. DOMAIN;
+	}
+
 	if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -709,6 +799,51 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
+	/*if($row->bpk == '' || $row->bpk == null)
+	{
+		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
+	}
+	if($row->bpk != '' && $row->bpk != null)
+	{
+		if (!preg_match('/[a-zA-Z0-9\+\/]{27}=/', $row->bpk))
+		{
+			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK-Zeichenfolge ist ung&uuml;ltig";
+		}
+
+		if (strlen($row->bpk) != 28)
+		{
+			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
+		}
+	}*/
+	if (!$ausserordentlich && !$incoming)
+	{
+		if ($zustell_plz == '' || $zustell_plz == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-PLZ fehlt";
+		}
+
+		if ($zustell_gemeinde == '' || $zustell_gemeinde == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Gemeinde fehlt";
+		}
+
+		if ($zustell_strasse == '' || $zustell_strasse == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Strasse fehlt";
+		}
+
+		if ($zustell_nation == '' || $zustell_nation == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Nation fehlt";
+		}
+
+		if ($email == '' || $email == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Studenten-eMail Adresse fehlt (keine Student-UID eingetragen).";
+		}
+
+	}
+
 	if(!$ausserordentlich)
 	{
 		if($row->zgv_code=='' || $row->zgv_code==null)
@@ -806,7 +941,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				else
 				{
-					$error_log.= "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
+					$error_log.= (!empty($error_log)?', ':''). "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
 					return '';
 				}
 				$aktstatus=$rowstatus->status_kurzbz;
@@ -861,7 +996,7 @@ function GenerateXMLStudentBlock($row)
 					}
 					else
 					{
-						$error_log.= "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
+						$error_log.= (!empty($error_log)?', ':''). "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
 						return '';
 					}
 					$aktstatus=$rowstatus->status_kurzbz;
@@ -876,7 +1011,7 @@ function GenerateXMLStudentBlock($row)
 					$aktstatus_datum='';
 					$aktstatus_stsem='';
 					$sem='';
-					$error_log.= "kein gueltiger Status vorhanden";
+					$error_log.= (!empty($error_log)?', ':''). "kein gueltiger Status vorhanden";
 
 				}
 			}
@@ -887,7 +1022,7 @@ function GenerateXMLStudentBlock($row)
 				$aktstatus_datum='';
 				$aktstatus_stsem='';
 				$sem='';
-				$error_log.= "kein gueltiger Status vorhanden";
+				$error_log.= (!empty($error_log)?', ':'').  "kein gueltiger Status vorhanden";
 
 			}
 		}
@@ -1066,44 +1201,85 @@ function GenerateXMLStudentBlock($row)
 		return '';
 	}
 	else
-	{
-		$datei.="
+		{
+		$datei .= "
 		<StudentIn>
-			<PersKz>".trim($row->matrikelnr)."</PersKz>";
+			<PersKz>" . trim($row->matrikelnr) . "</PersKz>";
 
-		$datei.="
-			<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>";
+		$datei .= "
+			<Matrikelnummer>" . $row->matr_nr . "</Matrikelnummer>";
 
-		if(!$ausserordentlich)
+		if (!$ausserordentlich)
 		{
-			$datei.="
-			<OrgFormCode>".$orgform_code_array[$storgform]."</OrgFormCode>";
+			$datei .= "
+			<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
 		}
 
-		$datei.="
-			<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-			<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
-		$datei.="
-			<Vorname>".$row->vorname."</Vorname>
-			<Familienname>".$row->nachname."</Familienname>";
+		$datei .= "
+			<GeburtsDatum>" . date("dmY", $datumobj->mktime_fromdate($row->gebdatum)) . "</GeburtsDatum>
+			<Geschlecht>" . strtoupper($row->geschlecht) . "</Geschlecht>";
 
-		if($row->svnr!='')
+		if ($row->titelpre != '')
 		{
-			$datei.="
-			<SVNR>".$row->svnr."</SVNR>";
-		}
-		if($row->ersatzkennzeichen!='')
-		{
-			$datei.="
-			<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
+			$datei .= "
+			<AkadGradeVorName>" . $row->titelpre . "</AkadGradeVorName>";
 		}
 
-		$datei.="
-			<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
-			<HeimatPLZ>".$plz."</HeimatPLZ>
-			<HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
-			<HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
-			<HeimatNation>".$nation."</HeimatNation>";
+		if ($row->titelpost != '')
+		{
+			$datei .= "
+			<AkadGradeNachName>" . $row->titelpost . "</AkadGradeNachName>";
+		}
+
+		$datei .= "
+			<Vorname>" . $row->vorname . "</Vorname>
+			<Familienname>" . $row->nachname . "</Familienname>";
+
+		if ($row->svnr != '')
+		{
+			$datei .= "
+			<SVNR>" . $row->svnr . "</SVNR>";
+		}
+		if ($row->ersatzkennzeichen != '')
+		{
+			$datei .= "
+			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
+		}
+
+		/*$datei .= "
+			<bPK>" . $row->bpk . "</bPK>
+		";*/
+
+		$datei .= "
+			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
+			<HeimatPLZ>" . $plz . "</HeimatPLZ>
+			<HeimatGemeinde>" . $gemeinde . "</HeimatGemeinde>
+			<HeimatStrasse><![CDATA[" . $strasse . "]]></HeimatStrasse>
+			<HeimatNation>" . $nation . "</HeimatNation>";
+
+		if (!$ausserordentlich && !$incoming)
+		{
+			$datei .= "
+			<ZustellPLZ>" . $zustell_plz . "</ZustellPLZ>
+			<ZustellGemeinde>" . $zustell_gemeinde . "</ZustellGemeinde>
+			<ZustellStrasse>" . $zustell_strasse . "</ZustellStrasse>
+			<ZustellNation>" . $zustell_nation . "</ZustellNation>";
+		}
+
+		if ($co_name != '')
+		{
+			$datei .= "
+			<coName>" . $co_name . "</coName>
+			";
+		}
+
+		if ($email != '')
+		{
+			$datei .= "
+			<eMailAdresse>" . $email . "</eMailAdresse>
+			";
+		}
+
 		if(!$ausserordentlich)
 		{
 			$datei.="
@@ -1206,48 +1382,151 @@ function GenerateXMLStudentBlock($row)
 				$gast=$rowio->nation_code;
 				$avon=date("dmY", $datumobj->mktime_fromdate($rowio->von));
 				$abis=date("dmY", $datumobj->mktime_fromdate($rowio->bis));
+				$adauer = (is_null($rowio->von) || is_null($rowio->bis))
+					? null
+					: $datumobj->DateDiff($rowio->von, $rowio->bis);
 
-				$datei.="
-			<IO>
-				<MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
-				<GastlandCode>".$gast."</GastlandCode>
-				<AufenthaltVon>".$avon."</AufenthaltVon>";
-				if($datumobj->mktime_fromdate($rowio->bis)<$datumobj->mktime_fromdate($bisdatum) && $datumobj->mktime_fromdate($rowio->bis)>$datumobj->mktime_fromdate($bisprevious))
-				{
-					$datei.="
-				<AufenthaltBis>".$abis."</AufenthaltBis>";
-				}
-
+				// Aufenthaltszweckcode --------------------------------------------------------------------------------
 				$bisio_zweck = new bisio();
 				$bisio_zweck->getZweck($rowio->bisio_id);
-				foreach ($bisio_zweck->result as $row_zweck)
+				$zweck_code_arr = array();
+
+				// Bei Incomings...
+				if ($aktstatus == 'Incoming')
 				{
-					$datei.="
-					<AufenthaltZweckCode>".$row_zweck->zweck_code."</AufenthaltZweckCode>";
-				}
-				if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
-				{
-					$datei.="
-					<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
-				}
-				if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
-				{
-					$datei.="
-					<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
-				}
-				if ($aktstatus != 'Incoming')
-				{
-					$bisio_foerderung = new bisio();
-					$bisio_foerderung->getFoerderungen($rowio->bisio_id);
-					foreach ($bisio_foerderung->result as $row_foerderung)
+					// ...max 1 Aufenthaltszweck
+					if (count($bisio_zweck->result) > 1)
 					{
-						$datei.="
-						<AufenthaltFoerderungCode>".$row_foerderung->aufenthaltfoerderung_code."</AufenthaltFoerderungCode>";
+						$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Es sind". count($bisio_zweck->result).
+							" Aufenthaltszwecke eingetragen (max. 1 Zweck für Incomings)";
+					}
+
+					//...nur Zweck 1, 2 oder 3 erlaubt
+					if (count($bisio_zweck->result) == 1 &&
+						empty(array_intersect(array(1, 2, 3), array_column($bisio_zweck->result, 'zweck_code'))))
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Aufenthaltszweckcode ist ".
+							$bisio_zweck->result[0]->zweck_code. " (f&uuml;r Incomings ist nur Zweck 1, 2, 3 erlaubt)";
 					}
 				}
 
-			$datei.="
-			</IO>";
+				foreach ($bisio_zweck->result as $row_zweck)
+				{
+					// Nur eindeutige Werte (bei Mehrfachangaben; trifft auf Outgoings zu)
+					if (!in_array($row_zweck->zweck_code, $zweck_code_arr))
+					{
+						// Aufenthaltszweck 1, 2, 3 nicht gemeinsam melden
+						if (in_array(1,$zweck_code_arr) && in_array(2,$zweck_code_arr) && in_array(3,$zweck_code_arr))
+						{
+							$error_log_io .= (!empty($error_log_io) ? ', ' : '').
+								"Aufenthaltzweckcode 1, 2, 3 d&uuml;rfen nicht gemeinsam gemeldet werden";
+						}
+
+						$zweck_code_arr []= $row_zweck->zweck_code;
+					}
+				}
+
+				// Aufenthaltfoerderungscode ---------------------------------------------------------------------------
+				$aufenthaltfoerderung_code_arr = array();
+
+				// Nur bei Outgoings Aufenthaltsfoerderungscode melden
+				if ($aktstatus != 'Incoming') {
+					$bisio_foerderung = new bisio();
+					$bisio_foerderung->getFoerderungen($rowio->bisio_id);
+
+					// ... mindestens 1 Aufenthaltfoerderung melden, wenn Auslandsaufenthalt >= 29 Tage
+					if ((!$bisio_foerderung->result || count($bisio_foerderung->result) == 0) && $adauer >= 29)
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
+							"Keine Aufenthaltsfoerderung angegeben (bei Outgoings >= 29 Tage Monat im Ausland muss mind. 1 gemeldet werden)";
+					}
+
+					foreach ($bisio_foerderung->result as $row_foerderung)
+					{
+						// ...wenn code = 5, nur ein Wert erlaubt (keine Mehrfachangaben)
+						if ($row_foerderung->aufenthaltfoerderung_code == 5) {
+							unset($aufenthaltfoerderung_code_arr);
+							$aufenthaltfoerderung_code_arr [] = $row_foerderung->aufenthaltfoerderung_code;
+							break;
+						}
+
+						// nur eindeutige Werte
+						if (!in_array($row_foerderung->aufenthaltfoerderung_code, $aufenthaltfoerderung_code_arr)) {
+							$aufenthaltfoerderung_code_arr [] = $row_foerderung->aufenthaltfoerderung_code;
+						}
+					}
+
+					if($datumobj->mktime_fromdate($rowio->bis) < $datumobj->mktime_fromdate($bisdatum))
+						$aufenthalt_finished = true;
+					else
+						$aufenthalt_finished = false;
+
+					if ($rowio->ects_erworben == '' && $adauer >= 29 && $aufenthalt_finished)
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
+							"Erworbene ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)";
+					}
+
+					if ($rowio->ects_angerechnet == '' && $adauer >= 29 && $aufenthalt_finished)
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
+							"Angerechnete ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)";
+					}
+				}
+
+				// Bei validen Daten errorlog ausgeben
+				if($error_log_io != '')
+				{
+					$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+					if($error_log_io != '')
+					{
+						$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fehler: ".$error_log_io. "\n";
+					}
+					$v.="\n";
+					$error_log_io = '';
+					return '';
+				}
+				// Bei validen Daten XML-Datensatz bauen
+				else
+				{
+					$datei.="
+					<IO>
+						<MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
+						<GastlandCode>".$gast."</GastlandCode>
+						<AufenthaltVon>".$avon."</AufenthaltVon>";
+						if($datumobj->mktime_fromdate($rowio->bis)<$datumobj->mktime_fromdate($bisdatum) && $datumobj->mktime_fromdate($rowio->bis)>$datumobj->mktime_fromdate($bisprevious))
+						{
+							$datei.="
+							<AufenthaltBis>".$abis."</AufenthaltBis>";
+						}
+
+						foreach ($zweck_code_arr as $zweck)
+						{
+							$datei.="
+							<AufenthaltZweckCode>". $zweck. "</AufenthaltZweckCode>";
+						}
+						if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
+						{
+							$datei.="
+							<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
+						}
+						if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
+						{
+							$datei.="
+							<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
+						}
+						foreach ($aufenthaltfoerderung_code_arr as $aufenthaltfoerderung_code)
+						{
+							$datei.="
+							<AufenthaltFoerderungCode>". $aufenthaltfoerderung_code. "</AufenthaltFoerderungCode>";
+						}
+
+					$datei.="
+					</IO>";
+				}
+
+
+
 				if($aktstatus!='Incoming')
 				{
 					if(!isset($iosem[$storgform][$sem]))

@@ -413,15 +413,23 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 				{
 					//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
-					$vorgesetzter = $ma->getVorgesetzte($uid);
+					$prsn = new person();
+
+                    $vorgesetzter = $ma->getVorgesetzte($uid);
 					if($vorgesetzter)
 					{
 						$to='';
+						$fullName='';
 						foreach($ma->vorgesetzte as $vg)
 						{
 							if (!empty($to))
+                            {
 								$to.=',';
+								$fullName.=',';
+                            }
 							$to.=trim($vg.'@'.DOMAIN);
+							$name = $prsn->getFullNameFromBenutzer($vg);
+							$fullName.=$name;
 						}
 
 						$benutzer = new benutzer();
@@ -440,11 +448,11 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
 						if($mail->send())
 						{
-							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."</b>";
+							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</b>";
 						}
 						else
 						{
-							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."</span>";
+							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."</span>";
 						}
 					}
 					else
@@ -461,8 +469,69 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		echo "<span class='error'>$error_msg</span>";
 }
 
+//loeschen eines bereits freigegebenen Urlaubs
+if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['informSupervisor'])))
+{
+    $zeitsperre = new zeitsperre();
+    $zeitsperre->load($_GET['id']);
+
+    $vondatum = $zeitsperre->getVonDatum();
+    $bisdatum = $zeitsperre->getBisDatum();
+
+    if(!$zeitsperre->delete($_GET['id']))
+        echo $zeitsperre->errormsg;
+
+    //Mail an Vorgesetzten
+    $prsn = new person();
+
+    $vorgesetzter = $ma->getVorgesetzte($uid);
+    if($vorgesetzter)
+    {
+        $to='';
+        $fullName ='';
+        foreach($ma->vorgesetzte as $vg)
+        {
+            if($to!='')
+            {
+                $to.=', '.$vg.'@'.DOMAIN;
+                $name = $prsn->getFullNameFromBenutzer($vg);
+                $fullName.=', '.$name;
+            }
+            else
+            {
+                $to.=$vg.'@'.DOMAIN;
+                $name = $prsn->getFullNameFromBenutzer($vg);
+                $fullName.=$name;
+            }
+        }
+
+        $benutzer = new benutzer();
+        $benutzer->load($uid);
+        $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
+            $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
+
+
+        $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
+
+
+        $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
+        if($mail->send())
+        {
+            echo "<br><b>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</b>";
+        }
+        else
+        {
+            echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
+        }
+    }
+    else
+    {
+        $vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
+    }
+}
+
 //loeschen einer zeitsperre
-if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
+if(isset($_GET['type']) && $_GET['type']=='delete_sperre' && !isset($_GET['informSupervisor'])   )
 {
 	$zeit = new zeitsperre();
 	$zeit->load($_GET['id']);
@@ -532,10 +601,14 @@ if(count($zeit->result)>0)
 			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
 		if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
-		else if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
+		else if($row->vondatum>=date("Y-m-d",time()) && $row->zeitsperretyp_kurzbz=='Urlaub')
 		{
-			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
+			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id&informSupervisor=True' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
+		elseif($row->zeitsperretyp_kurzbz!='Urlaub')
+        {
+            $content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
+        }
 		else
 			$content_table .= '<td>&nbsp;</td>';
 		$content_table.="</tr>";

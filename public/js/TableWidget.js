@@ -544,8 +544,11 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
-				options.persistentLayout = true;			// enables persistence (default store in localStorage if available, else in cookie)
-				options.persistenceID = data.tableUniqueId;	// TableWidget unique id to store persistence data seperately for multiple tables
+				if (options.tableWidgetHeader == 'undefined')
+				{
+					options.persistentLayout = true;			// enables persistence (default store in localStorage if available, else in cookie)
+					options.persistenceID = data.tableUniqueId;	// TableWidget unique id to store persistence data seperately for multiple tables
+				}
 				options.movableColumns = true;				// allows changing column order
 				options.tooltipsHeader = true;				// set header tooltip with column title
 				options.placeholder = _func_placeholder();	// display text when table is empty
@@ -566,12 +569,16 @@ var FHC_TableWidget = {
 		// -------------------------------------------------------------------------------------------------------------
 
 		// Render tableWidgetHeader
-		var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
-		tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
+		if (options.tableWidgetHeader == 'undefined' ||
+			(options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != false))
+		{
+			var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
+			tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
 
-		// Render the collapsable div triggered by button in tableWidgetHeader
-		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
-		tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
+			// Render the collapsable div triggered by button in tableWidgetHeader
+			var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
+			tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
+		}
 
 		/**
 		 * 	tableWidgetFooter is NOT rendered by default.

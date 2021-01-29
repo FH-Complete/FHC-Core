@@ -20,7 +20,7 @@ abstract class JQW_Controller extends JOB_Controller
 		parent::__construct();
 
 		// Changes the needed configs for LogLib
-		$this->loglib->setConfigs(
+		$this->LogLibJob->setConfigs(
 			array(
 				'dbExecuteUser' => 'Jobs queue system',
 				'requestId' => 'JQW'

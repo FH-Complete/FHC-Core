@@ -44,6 +44,7 @@ $this->phrasen['global/alle']='Alle';
 $this->phrasen['global/abbrechen']='Abbrechen';
 $this->phrasen['global/eintragen']='Eintragen';
 $this->phrasen['global/erstellen']='Erstellen';
+$this->phrasen['global/durchfuehren']='Durchf&uuml;hren';
 $this->phrasen['global/zurueck']='Zurück';
 $this->phrasen['global/abschicken']='Abschicken';
 $this->phrasen['global/zuruecksetzen']='Zurücksetzen';
@@ -183,7 +184,7 @@ $this->phrasen['global/keineDatenGefunden']='Keine Daten gefunden';
 $this->phrasen['global/erfolgreichAngelegt']='Erfolgreich angelegt';
 $this->phrasen['global/keineSuchergebnisse']='Es liegen keine Daten zu Ihrer Suchanfrage vor';
 $this->phrasen['global/bitteWaehlen']='Bitte wählen Sie';
-
+$this->phrasen['global/zusaetzlicheInformationen']='Zusätzliche Informationen';
 
 //infrastruktur
 

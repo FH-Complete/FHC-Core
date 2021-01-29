@@ -197,7 +197,7 @@ else
 										<label value="Nummer" control="betriebsmittel-textbox-nummer"/>
 										<hbox>
 											<textbox id="betriebsmittel-textbox-nummerold" hidden="true"/>
-					      					<textbox id="betriebsmittel-textbox-nummer" disabled="true" maxlength="12"/>
+					      					<textbox id="betriebsmittel-textbox-nummer" disabled="true" maxlength="32"/>
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>

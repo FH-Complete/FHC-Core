@@ -374,7 +374,7 @@ class person extends basis_db
 			$this->errormsg = 'Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein';
 			return false;
 		}
-		
+
 		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
 		if ($this->svnr != '' && $this->gebdatum != '')
 		{
@@ -1015,6 +1015,35 @@ class person extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	public function getFullNameFromBenutzer($uid)
+	{
+		$qry = "SELECT
+					vorname, nachname
+				FROM
+					public.tbl_person
+					JOIN public.tbl_benutzer USING(person_id)
+				WHERE
+					uid=".$this->db_add_param($uid, FHC_STRING);
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				return (string)$row->vorname.' '.$row->nachname;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Personendaten zu dieser UID gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden der Personendaten";
 			return false;
 		}
 	}

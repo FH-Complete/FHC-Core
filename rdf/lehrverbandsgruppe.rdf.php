@@ -105,10 +105,15 @@ if (count($berechtigt_studiengang)>0)
 		tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 	FROM
 		(public.tbl_studiengang JOIN public.tbl_lehrverband USING (studiengang_kz))
-		LEFT OUTER JOIN public.tbl_gruppe ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
+		LEFT OUTER JOIN public.tbl_gruppe ON (
+			tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz
+			AND tbl_lehrverband.semester=tbl_gruppe.semester
+			AND (tbl_lehrverband.verband='')
+			AND tbl_gruppe.lehre AND tbl_gruppe.aktiv
+			AND (tbl_gruppe.direktinskription is null or tbl_gruppe.direktinskription=false)
+			)
 	WHERE
-		(tbl_gruppe.direktinskription is null or tbl_gruppe.direktinskription=false)
-		AND tbl_lehrverband.aktiv $stg_kz_query
+		tbl_lehrverband.aktiv $stg_kz_query
 	ORDER BY
 		erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 }
