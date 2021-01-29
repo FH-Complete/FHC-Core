@@ -260,6 +260,9 @@ define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 //Wenn auf 'true' gesetzt, dann wird im FAS beim Konto das Feld fuer die CreditPoints angezeigt
 define('FAS_KONTO_SHOW_CREDIT_POINTS','false');
 
+//Wenn auf true gesetzt, dann wird im FAS beim Konto das Feld fuer die Mahnspanne angezeigt
+define('FAS_KONTO_SHOW_MAHNSPANNE', true);
+
 // Wenn definiert, wird bei der Vorrückung der Lehreinheiten nicht der Stundensatz des Vorjahres eingetragen.
 // Erlaubt sind numerische Werte oder der Wert "default".
 // Bei "default" wird der Standard-Stundensatz des Lektors (aus tbl_mitarbeiter) ermittelt, und dieser eingetragen.

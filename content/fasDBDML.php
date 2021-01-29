@@ -104,6 +104,7 @@ if(!$error)
 			$adresse->typ = $_POST['typ'];
 			$adresse->heimatadresse = ($_POST['heimatadresse']=='true'?true:false);
 			$adresse->zustelladresse = ($_POST['zustelladresse']=='true'?true:false);
+			$adresse->co_name = $_POST['co_name'];
 			$adresse->firma_id = $_POST['firma_id'];
 			$adresse->updateamum = date('Y-m-d H:i:s');
 			$adresse->updatevon = $user;

@@ -43,6 +43,7 @@ class adresse extends basis_db
 	public $typ;				//  string
 	public $heimatadresse;		//  boolean
 	public $zustelladresse;		//  boolean
+	public $coname;             //  string
 	public $firma_id;			//  integer
 	public $updateamum;			//  timestamp
 	public $updatevon;			//  string
@@ -51,6 +52,7 @@ class adresse extends basis_db
 	public $ext_id;				//  integer
 	public $rechnungsadresse=false;	//  boolean
 	public $anmerkung;			//  string
+	public $co_name;
 
 	/**
 	 * Konstruktor
@@ -99,6 +101,7 @@ class adresse extends basis_db
 			$this->person_id		= $row->person_id;
 			$this->plz				= $row->plz;
 			$this->strasse			= $row->strasse;
+			$this->co_name			= $row->co_name;
 			$this->typ				= $row->typ;
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
@@ -161,6 +164,7 @@ class adresse extends basis_db
 			$adr_obj->insertamum      = $row->insertamum;
 			$adr_obj->insertvon       = $row->insertvon;
 			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
+			$adr_obj->co_name		  = $row->co_name;
 			$adr_obj->rechnungsadresse 	= $this->db_parse_bool($row->rechnungsadresse);
 			$adr_obj->anmerkung 	  = $row->anmerkung;
 
@@ -217,6 +221,7 @@ class adresse extends basis_db
 			$adr_obj->insertamum      = $row->insertamum;
 			$adr_obj->insertvon       = $row->insertvon;
 			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
+			$adr_obj->co_name		  = $row->co_name;
 			$adr_obj->rechnungsadresse = $this->db_parse_bool($row->rechnungsadresse);
 			$adr_obj->anmerkung 	  = $row->anmerkung;
 
@@ -269,6 +274,12 @@ class adresse extends basis_db
 			return false;
 		}
 
+		if(mb_strlen($this->co_name)>64)
+		{
+			$this->errormsg = 'Gemeinde darf nicht länger als 64 Zeichen sein';
+			return false;
+		}
+
 		$this->errormsg = '';
 		return true;
 	}
@@ -289,7 +300,7 @@ class adresse extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
-				gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, rechnungsadresse, anmerkung) VALUES('.
+				gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, rechnungsadresse, anmerkung, co_name) VALUES('.
 				$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 				$this->db_add_param($this->name).', '.
 				$this->db_add_param($this->strasse).', '.
@@ -304,7 +315,8 @@ class adresse extends basis_db
 				$this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
 				$this->db_add_param($this->updatevon).','.
 				$this->db_add_param($this->rechnungsadresse, FHC_BOOLEAN, false).','.
-				$this->db_add_param($this->anmerkung).');';
+				$this->db_add_param($this->anmerkung).','.
+				$this->db_add_param($this->co_name).');';
 		}
 		else
 		{
@@ -314,6 +326,7 @@ class adresse extends basis_db
 				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein';
 				return false;
 			}
+
 			$qry='UPDATE public.tbl_adresse SET'.
 				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 				' name='.$this->db_add_param($this->name).', '.
@@ -329,7 +342,8 @@ class adresse extends basis_db
 				' heimatadresse='.$this->db_add_param($this->heimatadresse, FHC_BOOLEAN, false).', '.
 				' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).', '.
 				' rechnungsadresse='.$this->db_add_param($this->rechnungsadresse, FHC_BOOLEAN, false).','.
-				' anmerkung='.$this->db_add_param($this->anmerkung).' '.
+				' anmerkung='.$this->db_add_param($this->anmerkung).', '.
+				' co_name='.$this->db_add_param($this->co_name).' '.
 				'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
 		}
 
@@ -442,6 +456,7 @@ class adresse extends basis_db
 			$this->firma_id			= $row->firma_id;
 			$this->rechnungsadresse = $this->db_parse_bool($row->rechnungsadresse);
 			$this->anmerkung        = $row->anmerkung;
+			$this->co_name			= $row->co_name;
 		}
 		else
 		{
@@ -498,6 +513,7 @@ class adresse extends basis_db
 			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
 			$adr_obj->rechnungsadresse 	= $this->db_parse_bool($row->rechnungsadresse);
 			$adr_obj->anmerkung 	  = $row->anmerkung;
+			$adr_obj->co_name 	  = $row->co_name;
 
 			$this->result[] = $adr_obj;
 		}
