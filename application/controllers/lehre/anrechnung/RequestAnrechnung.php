@@ -54,8 +54,6 @@ class requestAnrechnung extends Auth_Controller
 		$this->_setAuthUID();
 		
 		$this->setControllerId();
-//		$this->_uid = 'wd15k002';
-		$this->_uid = 'be18b106';
 	}
 	
 	public function index()
