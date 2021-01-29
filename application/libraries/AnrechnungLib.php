@@ -127,7 +127,8 @@ class AnrechnungLib
 		$anrechnung_data->insertvon = '';
 		$anrechnung_data->studiensemester_kurzbz = '';
 		$anrechnung_data->empfehlung = '';
-		$anrechnung_data->status = '';
+		$anrechnung_data->status_kurzbz = '';
+		$anrechnung_data->status = getUserLanguage() == 'German' ? 'neu' : 'new';
 		$anrechnung_data->dokumentname = '';
 		
 		$result = $this->ci->AnrechnungModel->loadWhere(array('lehrveranstaltung_id' => $lehrveranstaltung_id));
@@ -500,8 +501,13 @@ class AnrechnungLib
 		$anrechnung_data->studiensemester_kurzbz= $anrechnung->studiensemester_kurzbz;
 		$anrechnung_data->empfehlung= $anrechnung->empfehlung_anrechnung;
 		
+		// Get last status_kurzbz
+		$result = $this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung->anrechnung_id);
+		$anrechnung_data->status_kurzbz = $result->retval[0]->status_kurzbz;
+		
 		// Get last status bezeichnung in the users language
 		$anrechnung_data->status = $this->getLastAnrechnungstatus($anrechnung->anrechnung_id);
+		
 		
 		// Get document name
 		$this->ci->DmsVersionModel->addSelect('name');

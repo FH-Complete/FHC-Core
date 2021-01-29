@@ -9,6 +9,7 @@ class requestAnrechnung extends Auth_Controller
 	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
+	const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 	
@@ -77,10 +78,13 @@ class requestAnrechnung extends Auth_Controller
 			show_error(getError($anrechnungData));
 		}
 		
-		// Overwrite progress status for student view. If no Anrechnung exists yet, set to new.
-		$anrechnungData->status = empty($anrechnungData->status) 
-			? getUserLanguage() == 'German' ? 'neu' : 'new'
-			: $this->_getLastAnrechnungstatus($anrechnungData->anrechnung_id);
+		// Dont show who is progressing the application to the student
+		if ($anrechnungData->status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL ||
+			$anrechnungData->status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR ||
+			$anrechnungData->status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_KF)
+		{
+			$anrechnungData->status = getUserLanguage() == 'German' ? 'in Bearbeitung' : 'in process';
+		}
 		
 		$viewData = array(
 			'antragData' => $this->anrechnunglib->getAntragData($this->_uid, $studiensemester_kurzbz, $lehrveranstaltung_id),
@@ -277,28 +281,6 @@ class requestAnrechnung extends Auth_Controller
 		}
 		
 		return $result;
-	}
-	
-	/**
-	 * Get last Anrechnungstatus. Modify progress status for student view.
-	 * @param $anrechnung_id
-	 * @return string
-	 */
-	private function _getLastAnrechnungstatus($anrechnung_id)
-	{
-		$result = $this->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id);
-		$status_kurzbz = getData($result)[0]->status_kurzbz;
-		
-		// Dont show who is progressing the application
-		if ($status_kurzbz == 'inProgressDP' || $status_kurzbz == 'inProgressKF')
-		{
-			return getUserLanguage() == 'German' ? 'in Bearbeitung' : 'in process';
-		}
-		else
-		{
-			$status_mehrsprachig = getData($result)[0]->bezeichnung_mehrsprachig;
-			return getUserLanguage() == 'German' ? $status_mehrsprachig[0] : $status_mehrsprachig[1];
-		}
 	}
 	
 	/**
