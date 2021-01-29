@@ -15,30 +15,32 @@ $this->load->view(
 			),
 			'ui' => array(
 				'hilfeZuDieserSeite',
-                'hochladen'
+				'hochladen'
 			),
-            'person' => array(
-                'student',
-                'personenkennzeichen'
-            ),
-            'lehre' => array(
-                'studiensemester',
-                'studiengang',
-                'lehrveranstaltung',
-                'ects',
-                'lektor',
-            )
+			'person' => array(
+				'student',
+				'personenkennzeichen'
+			),
+			'lehre' => array(
+				'studiensemester',
+				'studiengang',
+				'lehrveranstaltung',
+				'ects',
+				'lektor',
+			)
 		),
 		'customJSs' => array(
-			'public/js/bootstrapper.js'
-        )
+			'public/js/bootstrapper.js',
+			'public/js/lehre/anrechnung/requestAnrechnung.js'
+		
+		)
 	)
 );
 ?>
 
 <body>
 <div id="page-wrapper">
-	<div class="container-fluid">
+    <div class="container-fluid">
         <!-- title -->
         <div class="row">
             <div class="col-lg-12 page-header">
@@ -48,8 +50,8 @@ $this->load->view(
                 </h3>
             </div>
         </div>
-        
-		<?php echo form_open_multipart(current_url(). '/apply',
+		
+		<?php echo form_open_multipart(current_url() . '/apply',
 			['id' => 'requestAnrechnung-form'],
 			['lv_id' => $antragData->lv_id, 'studiensemester' => $antragData->studiensemester_kurzbz]
 		); ?>
@@ -65,14 +67,15 @@ $this->load->view(
                                     <div class="col-lg-12">
                                         <div class="panel panel-default">
                                             <div class="panel-heading">
-												<span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
-                                                <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span id="requestAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
+                                                <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
+                                                <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
+                                                            id="requestAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
                                             </div>
                                             <table class="panel-body table table-bordered table-condensed">
                                                 <tbody>
                                                 <tr>
                                                     <td><?php echo $this->p->t('person', 'student'); ?></td>
-                                                    <td><?php echo $antragData->vorname. ' '. $antragData->nachname; ?></td>
+                                                    <td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
@@ -99,7 +102,7 @@ $this->load->view(
                                                     <td>
 														<?php $len = count($antragData->lektoren) - 1 ?>
 														<?php foreach ($antragData->lektoren as $key => $lektor): ?>
-															<?php echo $lektor->vorname. ' '. $lektor->nachname;
+															<?php echo $lektor->vorname . ' ' . $lektor->nachname;
 															echo $key === $len ? '' : ', ' ?>
 														<?php endforeach; ?>
                                                     </td>
@@ -142,10 +145,14 @@ $this->load->view(
                                             </div>
                                             <div class="form-inline panel-body">
                                                 <div class="form-group">
-                                                    <input type="file" id="requestAnrechnung-uploadfile" name="uploadfile" accept=".pdf" size="50" required <?php echo $disabled; ?>>
+                                                    <input type="file" id="requestAnrechnung-uploadfile"
+                                                           name="uploadfile" accept=".pdf" size="50"
+                                                           required <?php echo $disabled; ?>>
                                                 </div>
-												<?php if(!empty($anrechnungData->dms_id)): ?>
-                                                    <a class="pull-right" href="<?php echo current_url(). '/download?dms_id='. $anrechnungData->dms_id; ?>" target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
+												<?php if (!empty($anrechnungData->dms_id)): ?>
+                                                    <a class="pull-right"
+                                                       href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
+                                                       target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
 												<?php endif; ?>
                                             </div>
                                         </div>
@@ -161,7 +168,8 @@ $this->load->view(
 														<?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?>
                                                     </div>
                                                     <div class="panel-body">
-                                                        <textarea class="form-control" name="anmerkung" rows="2" required<?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
+                                                        <textarea class="form-control" name="anmerkung" rows="2"
+                                                                  required<?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -173,18 +181,22 @@ $this->load->view(
                     </div>
                 </div>
             </div>
-            <div class ="col-xs-4">
-                <div class="alert alert-info text-center">
-                    Status: <b><span class="text-uppercase"><?php echo $anrechnungData->status; ?></span></b>
+            <div class="col-xs-4">
+                <div class="alert text-center">
+                    Status:
+                    <b><span class="text-uppercase" id="requestAnrechnung-status_kurzbz"
+                             data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
+                            <?php echo $anrechnungData->status; ?>
+                        </span></b>
                 </div>
-                <?php if ($is_expired): ?>
+				<?php if ($is_expired): ?>
                     <div class="alert alert-warning">
-                        <?php echo $this->p->t('global', 'bearbeitungGesperrt'); ?>
-                        <?php echo $is_expired &&  empty($antragData->anrechnung_id)? ': '. $this->p->t('anrechnung', 'deadlineUeberschritten') : ''; ?>
+						<?php echo $this->p->t('global', 'bearbeitungGesperrt'); ?>
+						<?php echo $is_expired && empty($antragData->anrechnung_id) ? ': ' . $this->p->t('anrechnung', 'deadlineUeberschritten') : ''; ?>
                     </div>
-                <?php endif; ?>
+				<?php endif; ?>
                 <br>
-	            <?php $this->load->view('lehre/anrechnung/requestAnrechnungImportant'); ?>
+				<?php $this->load->view('lehre/anrechnung/requestAnrechnungImportant'); ?>
             </div>
         </div>
         <!-- Submit button 'Anrechnung beantragen'-->
@@ -194,7 +206,7 @@ $this->load->view(
                        value="<?php echo $this->p->t('anrechnung', 'anrechnungBeantragen'); ?>" <?php echo $disabled; ?>>
             </div>
         </div>
-		<?php echo form_close();?>
+		<?php echo form_close(); ?>
     </div>
 </div>
 </body>
