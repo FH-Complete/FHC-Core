@@ -68,7 +68,7 @@ $this->load->view(
 		),
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/reviewAnrechnungUebersicht.js'
+			'public/js/lehre/anrechnung/reviewAnrechnung.js'
 		)
 	)
 );

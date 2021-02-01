@@ -1,5 +1,5 @@
 const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-const APPROVE_ANRECHNUNG_DETAIL_URI = "lehre/anrechnung/ApproveAnrechnungDetail";
+const APPROVE_ANRECHNUNG_DETAIL_URI = "lehre/anrechnung/ReviewAnrechnungDetail";
 
 const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
@@ -40,7 +40,7 @@ function func_rowFormatter(row){
     let status_kurzbz = row.getData().status_kurzbz;
 
     row.getCells().forEach(function(cell){
-        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
+        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR)
         {
             row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
         }
@@ -52,9 +52,7 @@ function func_selectableCheck(row){
     let status_kurzbz = row.getData().status_kurzbz;
 
     return (
-        status_kurzbz != ANRECHNUNGSTATUS_APPROVED &&
-        status_kurzbz != ANRECHNUNGSTATUS_REJECTED &&
-        status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+        status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
     );
 }
 
@@ -93,7 +91,7 @@ var format_empfehlung_anrechnung = function(cell, formatterParams){
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
     tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
         .filter(row =>
-            row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_STGL
+            row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
         )
         .forEach((row => row.select()));
 }
@@ -114,6 +112,18 @@ $(function(){
     window.addEventListener('resize', function(){
         $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
         $('#tableWidgetTabulator').tabulator('redraw', true);
+    });
+
+    // Set status alert color
+    reviewAnrechnung.setStatusAlertColor();
+
+    // Show only rows with anrechnungen ohne Empfehlung
+    $("#show-need-recommendation").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR}
+            ]
+        );
     });
 
     // Show only rows with empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
@@ -167,8 +177,8 @@ $(function(){
         }
     })
 
-    // Approve Anrechnungen
-    $("#approve-anrechnungen").click(function(){
+    // Recommend Anrechnungen
+    $("#recommend-anrechnungen").click(function(){
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .map(function(data){
@@ -192,7 +202,7 @@ $(function(){
         };
 
         FHC_AjaxClient.ajaxCallPost(
-            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/approve",
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/recommend",
             data,
             {
                 successCallback: function (data, textStatus, jqXHR)
@@ -209,7 +219,7 @@ $(function(){
                         $('#tableWidgetTabulator').tabulator('updateData', data.retval);
 
                         // Print success message
-                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden genehmigt.");
+                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden empfohlen.");
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -220,8 +230,8 @@ $(function(){
         );
     });
 
-    // Reject Anrechnungen
-    $("#reject-anrechnungen").click(function(){
+    // Dont recommend Anrechnungen
+    $("#dont-recommend-anrechnungen").click(function(){
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .map(function(data){
@@ -239,7 +249,7 @@ $(function(){
         }
 
         // Confirm before rejecting
-        if(!confirm('Wollen Sie wirklich die gewählten Anträge ablehnen?'))
+        if(!confirm('Wollen Sie wirklich für die gewählten Anträge keine Empfehlung abgeben?'))
         {
             return;
         }
@@ -250,7 +260,7 @@ $(function(){
         };
 
         FHC_AjaxClient.ajaxCallPost(
-            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/reject",
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/dontRecommend",
             data,
             {
                 successCallback: function (data, textStatus, jqXHR)
@@ -267,70 +277,7 @@ $(function(){
                         $('#tableWidgetTabulator').tabulator('updateData', data.retval);
 
                         // Print success message
-                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden abgelehnt.");
-                    }
-                },
-                errorCallback: function (jqXHR, textStatus, errorThrown)
-                {
-                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
-                }
-            }
-        );
-    });
-
-    // Request Recommendation for Anrechnungen
-    $("#request-recommendation").click(function(){
-        // Get selected rows data
-        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
-
-        // If some of selected anrechnungen has already been recommended...
-        if (selected_data.some((data) => data.empfehlung_anrechnung !== null))
-        {
-            // ...confirm before requesting recommendation
-            if(!confirm(FHC_PhrasesLib.t("anrechnung", "confirmTextAntragHatBereitsEmpfehlung")))
-            {
-                return;
-            }
-        }
-
-        selected_data.map(function(data){
-            // reduce to necessary fields
-            return {
-                'anrechnung_id' : data.anrechnung_id,
-            }
-        });
-
-        // Alert and exit if no anrechnung is selected
-        if (selected_data.length == 0)
-        {
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
-            return;
-        }
-
-        // Prepare data object for ajax call
-        let data = {
-            'data': selected_data
-        };
-
-        FHC_AjaxClient.ajaxCallPost(
-            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
-            data,
-            {
-                successCallback: function (data, textStatus, jqXHR)
-                {
-                    if (data.error && data.retval != null)
-                    {
-                        // Print error message
-                        FHC_DialogLib.alertWarning(data.retval);
-                    }
-
-                    if (!data.error && data.retval != null)
-                    {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
-
-                        // Print success message
-                        FHC_DialogLib.alertSuccess("Empfehlungen wurden angefordert.");
+                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden nicht empfohlen.");
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -342,3 +289,23 @@ $(function(){
     });
 
 });
+
+var reviewAnrechnung = {
+    setStatusAlertColor: function () {
+        let status_kurzbz = $('#reviewAnrechnung-status_kurzbz').data('status_kurzbz');
+
+        switch (status_kurzbz) {
+            case ANRECHNUNGSTATUS_APPROVED:
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-success');
+                break;
+            case ANRECHNUNGSTATUS_REJECTED:
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-danger');
+                break;
+            case '':
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-info');
+                break;
+            default:
+                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+        }
+    }
+}
