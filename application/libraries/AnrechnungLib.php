@@ -120,6 +120,8 @@ class AnrechnungLib
 	{
 		$anrechnung_data = new StdClass();
 		$anrechnung_data->anrechnung_id = '';
+		$anrechnung_data->prestudent_id = '';
+		$anrechnung_data->lehrveranstaltung = '';
 		$anrechnung_data->begruendung_id = '';
 		$anrechnung_data->anmerkung = '';
 		$anrechnung_data->dms_id = '';
@@ -493,6 +495,8 @@ class AnrechnungLib
 		
 		// Get Anrechnung data
 		$anrechnung_data->anrechnung_id = $anrechnung->anrechnung_id;
+		$anrechnung_data->prestudent_id = $anrechnung->prestudent_id;
+		$anrechnung_data->lehrveranstaltung_id = $anrechnung->lehrveranstaltung_id;
 		$anrechnung_data->begruendung_id =  $anrechnung->begruendung_id;
 		$anrechnung_data->anmerkung = $anrechnung->anmerkung_student;
 		$anrechnung_data->dms_id = $anrechnung->dms_id;
