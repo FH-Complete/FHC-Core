@@ -10,6 +10,9 @@ class AnrechnungLib
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 	
+	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_LEKTOR = 'AnrechnungNotizLektor';
+	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
+	
 	public function __construct()
 	{
 		$this->ci =& get_instance();
@@ -442,7 +445,7 @@ class AnrechnungLib
 	 * @return array
 	 * @throws Exception
 	 */
-	public function dontRecommendAnrechnung($anrechnung_id)
+	public function dontRecommendAnrechnung($anrechnung_id, $begruendung)
 	{
 		// Check last Anrechnungstatus
 		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
@@ -474,6 +477,15 @@ class AnrechnungLib
 				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
 				'updatevon'     => $lektor_uid
 			)
+		);
+		
+		// Add begruendung as notiz
+		$this->ci->load->model('person/Notiz_model', 'NotizModel');
+		$this->ci->NotizModel->addNotizForAnrechnung(
+			$anrechnung_id,
+			self::ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_LEKTOR,
+			$begruendung,
+			$lektor_uid
 		);
 		
 		// Transaction complete

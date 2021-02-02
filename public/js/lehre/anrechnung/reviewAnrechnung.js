@@ -230,14 +230,36 @@ $(function(){
         );
     });
 
-    // Dont recommend Anrechnungen
+    // Dont recommend Anrechnungen (Overview GUI)
     $("#dont-recommend-anrechnungen").click(function(){
-        // Get selected rows data
+
+        let begruendung_panel = $('#reviewAnrechnungUebersicht-begruendung-panel');
+        let begruendung = $('#reviewAnrechnungUebersicht-begruendung').val();
+
+
+        if (begruendung_panel.is(":hidden"))
+        {
+            // Show begruendung panel if is hidden
+            begruendung_panel.slideDown('slow');
+            return;
+        }
+        else
+        {
+            // Check if begruendung is given
+            if (!begruendung.trim()) // empty or white spaces only
+            {
+                FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
+                return;
+            }
+        }
+
+        // Get selected rows data and add begruendung
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .map(function(data){
                 // reduce to necessary fields
                 return {
                     'anrechnung_id' : data.anrechnung_id,
+                    'begruendung'   : begruendung
                 }
             });
 
@@ -258,6 +280,9 @@ $(function(){
         let data = {
             'data': selected_data
         };
+
+        // Hide begruendung panel again
+        $(begruendung_panel).slideUp('slow');
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/dontRecommend",
@@ -288,6 +313,17 @@ $(function(){
         );
     });
 
+    // Break Begruendung abgeben
+    $('#reviewAnrechnungUebersicht-begruendung-abbrechen').click(function(){
+        $('#reviewAnrechnungUebersicht-begruendung').val('');
+        $('#reviewAnrechnungUebersicht-begruendung-panel').slideUp('slow');
+
+    })
+
+    // Copy Begruendung into textarea
+    $(".btn-copyIntoTextarea").click(function(){
+        reviewAnrechnung.copyIntoTextarea(this);
+    })
 });
 
 var reviewAnrechnung = {
@@ -307,5 +343,13 @@ var reviewAnrechnung = {
             default:
                 $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
         }
+    },
+    copyIntoTextarea: function(elem){
+
+        // Find closest textarea
+        let textarea = $(elem).closest('div').find('textarea');
+
+        // Copy begruendung into textarea
+        textarea.val($.trim($(elem).parent().text()));
     }
 }
