@@ -161,7 +161,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		foreach ($data as $item)
 		{
 			// Reject Anrechnung
-			if(getData($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'])))
+			if(getData($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung'])))
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
