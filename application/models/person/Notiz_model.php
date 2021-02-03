@@ -208,14 +208,24 @@ class Notiz_model extends DB_Model
 	}
 	
 	/**
-	 * gets all Notizen for a person
-	 * @param $person_id
+	 * Get Notiz by Anrechnung and title
+	 *
+	 * @param $anrechnung_id
+	 * @return array
 	 */
-	public function getNotizByAnrechnung($anrechnung_id)
+	public function getNotizByAnrechnung($anrechnung_id, $titel = null)
 	{
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
 		
-		return $this->loadWhere(array('anrechnung' => $anrechnung_id));
+		if (is_string($titel))
+		{
+			return $this->loadWhere(array(
+				'anrechnung_id' => $anrechnung_id,
+				'titel'         => $titel
+			));
+		}
+		
+		return $this->loadWhere(array('anrechnung_id' => $anrechnung_id));
 	}
 	// ------------------------------------------------------------------------------------------------------
 
