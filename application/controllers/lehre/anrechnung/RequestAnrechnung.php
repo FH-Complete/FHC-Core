@@ -157,7 +157,8 @@ class requestAnrechnung extends Auth_Controller
 			'begruendung_id' => $begruendung_id,
 			'dms_id' => $uploaddata->retval['dms_id'],
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'anmerkung_student' => $anmerkung
+			'anmerkung_student' => $anmerkung,
+			'insertvon' => $this->_uid
 		));
 
 		if (isError($result))
