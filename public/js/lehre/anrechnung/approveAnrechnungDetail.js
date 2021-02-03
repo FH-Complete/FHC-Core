@@ -21,7 +21,7 @@ $(function(){
     approveAnrechnungDetail.setStatusAlertColor();
 
     // Approve Anrechnungen
-    $("#approve-anrechnungen").click(function(){
+    $("#approve-anrechnung").click(function(){
         let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
         let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
 
@@ -88,7 +88,7 @@ $(function(){
     });
 
     // Reject Anrechnungen
-    $("#reject-anrechnungen").click(function(){
+    $("#reject-anrechnung").click(function(){
         let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
         let begruendung = $('#approveAnrechnungUebersicht-begruendung').val();
         let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
@@ -173,36 +173,17 @@ $(function(){
 
     // Request Recommendation for Anrechnungen
     $("#request-recommendation").click(function(){
-        // Get selected rows data
-        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
 
-        // If some of selected anrechnungen has already been recommended...
-        if (selected_data.some((data) => data.empfehlung_anrechnung !== null))
-        {
-            // ...confirm before requesting recommendation
-            if(!confirm(FHC_PhrasesLib.t("anrechnung", "confirmTextAntragHatBereitsEmpfehlung")))
-            {
-                return;
-            }
-        }
+        // Get form data
+        // index 0: anrechnung_id
+        let form_data = $('form').serializeArray();
 
-        selected_data.map(function(data){
-            // reduce to necessary fields
-            return {
-                'anrechnung_id' : data.anrechnung_id,
-            }
-        });
-
-        // Alert and exit if no anrechnung is selected
-        if (selected_data.length == 0)
-        {
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
-            return;
-        }
 
         // Prepare data object for ajax call
         let data = {
-            'data': selected_data
+            'data': [{
+                'anrechnung_id' : form_data[0].value
+            }]
         };
 
         FHC_AjaxClient.ajaxCallPost(
@@ -219,11 +200,10 @@ $(function(){
 
                     if (!data.error && data.retval != null)
                     {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
-
-                        // Print success message
-                        FHC_DialogLib.alertSuccess("Empfehlungen wurden angefordert.");
+                        approveAnrechnungDetail.formatEmpfehlungIsRequested(
+                            data.retval[0].empfehlung_angefordert_am,
+                            data.retval[0].status_bezeichnung
+                        );
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -281,19 +261,30 @@ var approveAnrechnungDetail = {
         // Copy begruendung into textarea
         textarea.val($.trim($(elem).parent().text()));
     },
-    formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon){
+    formatEmpfehlungIsRequested: function(empfehlungAngefordertAm, statusBezeichnung) {
+        $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsAngefordert').removeClass('hidden');
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungAngefordertAm').text(empfehlungAngefordertAm);
+        $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
+        $('#request-recommendation').prop('disabled', true);
+        $('#approve-anrechnung').prop('disabled', true);
+        $('#reject-anrechnung').prop('disabled', true);
+    },
+    formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon, statusBezeichnung){
         $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsTrue').removeClass('hidden');
-        $('#recommend-anrechnung').prop('disabled', true);
-        $('#dont-recommend-anrechnung').prop('disabled', true);
-        $('#approveAnrechnungDetail-empfehlungAm').text(empfehlungAm);
-        $('#approveAnrechnungDetail-empfehlungVon').text(emfehlungVon);
+        $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
+        $('#request-recommendation').prop('disabled', true);
+        $('#approve-anrechnung').prop('disabled', true);
+        $('#reject-anrechnung').prop('disabled', true);
     },
-    formatEmpfehlungIsFalse: function(empfehlungAm, emfehlungVon, begruendung){
+    formatEmpfehlungIsFalse: function(empfehlungAm, emfehlungVon, statusBezeichnung, begruendung){
         $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsFalse').removeClass('hidden');
-        $('#recommend-anrechnung').prop('disabled', true);
-        $('#dont-recommend-anrechnung').prop('disabled', true);
+        $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
+        $('#request-recommendation').prop('disabled', true);
+        $('#approve-anrechnung').prop('disabled', true);
+        $('#reject-anrechnung').prop('disabled', true);
         $('#approveAnrechnungDetail-empfehlungAm').text(empfehlungAm);
         $('#approveAnrechnungDetail-empfehlungVon').text(emfehlungVon);
         $('#approveAnrechnungDetail-empfehlungDetail-begruendung').text(begruendung);

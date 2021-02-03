@@ -222,7 +222,8 @@ class approveAnrechnungDetail extends Auth_Controller
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
 					'status_bezeichnung' => $inProgressLektor,
-					'empfehlung_anrechnung' => null
+					'empfehlung_anrechnung' => null,
+					'empfehlung_angefordert_am' => (new DateTime())->format('d.m.Y')
 				);
 			}
 		}

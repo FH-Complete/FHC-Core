@@ -70,7 +70,8 @@ $(function(){
                     {
                         reviewAnrechnung.formatEmpfehlungIsTrue(
                             data.retval[0].empfehlung_am,
-                            data.retval[0].empfehlung_von
+                            data.retval[0].empfehlung_von,
+                            data.retval[0].status_bezeichnung
                         );
                     }
                 },
@@ -147,6 +148,7 @@ $(function(){
                         reviewAnrechnung.formatEmpfehlungIsFalse(
                             data.retval[0].empfehlung_am,
                             data.retval[0].empfehlung_von,
+                            data.retval[0].status_bezeichnung,
                             begruendung
                         );
                     }

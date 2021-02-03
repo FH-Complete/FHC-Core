@@ -152,9 +152,11 @@ $this->load->view(
                                                 <div class="panel panel-default panel-body <?php echo
                                                 is_null($empfehlungData->empfehlung) && $anrechnungData->status_kurzbz == 'inProgressLektor'
                                                     ? '' : 'hidden' ?>"
-                                                     id="approveAnrechnungDetail-empfehlungDetail-empfehlungIsNull">
+                                                     id="approveAnrechnungDetail-empfehlungDetail-empfehlungIsAngefordert">
                                                     <?php echo $this->p->t('anrechnung', 'empfehlungAngefordertNochKeineEmpfehlung'); ?>
-                                                    <?php echo $empfehlungData->empfehlung_angefordert_am ?>.
+                                                    <span id="approveAnrechnungDetail-empfehlungDetail-empfehlungAngefordertAm">
+                                                        <?php echo $empfehlungData->empfehlung_angefordert_am ?>
+                                                    </span>.
                                                 </div>
                                             
                                                 <div class="alert alert-success <?php echo $empfehlungData->empfehlung === true ? '' : 'hidden' ?>"
