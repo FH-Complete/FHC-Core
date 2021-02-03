@@ -203,17 +203,19 @@ var reviewAnrechnung = {
         // Copy begruendung into textarea
         textarea.val($.trim($(elem).parent().text()));
     },
-    formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon){
+    formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon, statusBezeichnung){
         $('#reviewAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
         $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungIsTrue').removeClass('hidden');
+        $('#reviewAnrechnung-status_kurzbz').text(statusBezeichnung);
         $('#recommend-anrechnung').prop('disabled', true);
         $('#dont-recommend-anrechnung').prop('disabled', true);
         $('#reviewAnrechnungDetail-empfehlungAm').text(empfehlungAm);
         $('#reviewAnrechnungDetail-empfehlungVon').text(emfehlungVon);
     },
-    formatEmpfehlungIsFalse: function(empfehlungAm, emfehlungVon, begruendung){
+    formatEmpfehlungIsFalse: function(empfehlungAm, emfehlungVon, statusBezeichnung, begruendung){
         $('#reviewAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
         $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungIsFalse').removeClass('hidden');
+        $('#reviewAnrechnung-status_kurzbz').text(statusBezeichnung);
         $('#recommend-anrechnung').prop('disabled', true);
         $('#dont-recommend-anrechnung').prop('disabled', true);
         $('#reviewAnrechnungDetail-empfehlungAm').text(empfehlungAm);
