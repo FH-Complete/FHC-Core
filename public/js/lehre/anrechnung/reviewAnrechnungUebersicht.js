@@ -28,8 +28,8 @@ function func_tableBuilt(table) {
                 label:"Details",
                 url:function(cell){
                     return  BASE_URL + "/" + APPROVE_ANRECHNUNG_DETAIL_URI + "?anrechnung_id=" + cell.getData().anrechnung_id
-                },
-                target:"_blank"
+                }
+                // target:"_blank"
             }
         }, false, "status"  // place column after status
     );
@@ -213,6 +213,9 @@ $(function(){
             'data': selected_data
         };
 
+        // Hide empfehlung panel again
+        empfehlung_panel.slideUp('slow');
+
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/recommend",
             data,
@@ -296,7 +299,7 @@ $(function(){
         };
 
         // Hide begruendung panel again
-        $(begruendung_panel).slideUp('slow');
+        begruendung_panel.slideUp('slow');
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/dontRecommend",

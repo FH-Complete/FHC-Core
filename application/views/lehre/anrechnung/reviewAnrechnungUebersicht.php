@@ -115,8 +115,7 @@ $this->load->view(
 				<?php $this->load->view('lehre/anrechnung/reviewAnrechnungUebersichtData.php'); ?>
             </div>
         </div>
-
-        <!--        Empfehlung / Nicht Empfehlung Panel -->
+        <!-- Empfehlung / Nicht Empfehlung Panel -->
         <div class="row">
             <div class="panel panel-default panel-body" style="display: none"
                  id="reviewAnrechnungUebersicht-begruendung-panel">
