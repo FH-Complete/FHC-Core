@@ -179,6 +179,18 @@ $(function(){
 
     // Recommend Anrechnungen
     $("#recommend-anrechnungen").click(function(){
+        let empfehlung_panel = $('#reviewAnrechnungUebersicht-empfehlung-panel');
+        let begruendung_panel = $('#reviewAnrechnungUebersicht-begruendung-panel');
+
+        begruendung_panel.css('display', 'none');
+
+        if (empfehlung_panel.is(":hidden"))
+        {
+            // Show begruendung panel if is hidden
+            empfehlung_panel.slideDown('slow');
+            return;
+        }
+
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .map(function(data){
@@ -235,7 +247,9 @@ $(function(){
 
         let begruendung_panel = $('#reviewAnrechnungUebersicht-begruendung-panel');
         let begruendung = $('#reviewAnrechnungUebersicht-begruendung').val();
+        let empfehlung_panel = $('#reviewAnrechnungUebersicht-empfehlung-panel');
 
+        empfehlung_panel.css('display', 'none');
 
         if (begruendung_panel.is(":hidden"))
         {
@@ -312,6 +326,12 @@ $(function(){
             }
         );
     });
+
+    // Break Empfehlung abgeben
+    $('#reviewAnrechnungUebersicht-empfehlung-abbrechen').click(function(){
+        $('#reviewAnrechnungUebersicht-empfehlung-panel').slideUp('slow');
+
+    })
 
     // Break Begruendung abgeben
     $('#reviewAnrechnungUebersicht-begruendung-abbrechen').click(function(){

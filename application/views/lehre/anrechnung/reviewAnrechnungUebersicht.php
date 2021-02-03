@@ -68,7 +68,7 @@ $this->load->view(
 		),
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/reviewAnrechnung.js'
+			'public/js/lehre/anrechnung/reviewAnrechnungUebersicht.js'
 		)
 	)
 );
@@ -116,31 +116,31 @@ $this->load->view(
             </div>
         </div>
 
-        <!--        Begruendung Panel -->
+        <!--        Empfehlung / Nicht Empfehlung Panel -->
         <div class="row">
             <div class="panel panel-default panel-body" style="display: none"
                  id="reviewAnrechnungUebersicht-begruendung-panel">
                 <div>
+                    <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'empfehlungenNegativ'); ?></b></div>
                     <h4><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></h4><br>
-                    <label><?php echo $this->p->t('anrechnung', 'moeglicheBegruendungen'); ?></label><br>
                     <ol>
                         <li><?php echo $this->p->t('anrechnung', 'empfehlungNegativPruefungNichtMoeglich'); ?>
-                            <button class="btn btn-sm btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
                                     title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </button>
+                            </a>
                         </li>
                         <li><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?>
-                            <button class="btn btn-sm btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
                                     title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </button>
+                            </a>
                         </li>
                         <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
                     </ol>
                     <br>
                     <span class="text-danger">
-                        <b><?php echo $this->p->t('anrechnung', 'begruendungWirdFuerAlleUebernommen'); ?></b>
+                        <?php echo $this->p->t('anrechnung', 'begruendungWirdFuerAlleUebernommen'); ?>
                     </span><br><br>
                     <textarea class="form-control" name="begruendung" id="reviewAnrechnungUebersicht-begruendung"
                               rows="2" required></textarea>
@@ -150,6 +150,19 @@ $this->load->view(
                 <div class="pull-right">
                     <button id="reviewAnrechnungUebersicht-begruendung-abbrechen" class="btn btn-default btn-w200">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                    </button>
+                </div>
+            </div>
+            <div class="panel panel-default panel-body" style="display: none"
+                 id="reviewAnrechnungUebersicht-empfehlung-panel">
+                <div>
+                    <div class="alert alert-success"><b><?php echo $this->p->t('anrechnung', 'empfehlungenPositiv'); ?></b></div>
+                </div>
+                <br>
+                <!-- Action Button 'Abbrechen'-->
+                <div class="pull-right">
+                    <button id="reviewAnrechnungUebersicht-empfehlung-abbrechen" class="btn btn-default btn-w200">
+				        <?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
                 </div>
             </div>
