@@ -8,7 +8,7 @@
                 </a>
             </h4>
         </div>
-        <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+        <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
             <div class="panel-body">
                 Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
                 <br><br>Wenn die Gleichwertigkeit gegeben ist, können auch außerhochschulisch erworbene Kenntnisse angerechnet werden (z.B. Sekundarschule, Weiterbildungseinrichtungen).
@@ -22,7 +22,7 @@
     <div class="panel panel-warning">
         <div class="panel-heading" role="tab" id="headingOne">
             <h4 class="panel-title">
-                <a role="button" data-toggle="collapse in" data-parent="#accordion" href="#collapseOne"
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
                    aria-expanded="true" aria-controls="collapseOne">
                     <i class="fa fa-arrow-right" aria-hidden="true"></i> Beantragung: Fristen
                 </a>
