@@ -21,13 +21,6 @@ $(function(){
     // Set status alert color
     reviewAnrechnung.setStatusAlertColor();
 
-    // Break Begruendung abgeben
-    $('#reviewAnrechnungUebersicht-begruendung-abbrechen').click(function(){
-        $('#reviewAnrechnungUebersicht-begruendung').val('');
-        $('#reviewAnrechnungUebersicht-begruendung-panel').slideUp('slow');
-
-    })
-
     // Copy Begruendung into textarea
     $(".btn-copyIntoTextarea").click(function(){
            reviewAnrechnung.copyIntoTextarea(this);

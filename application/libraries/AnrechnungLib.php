@@ -201,12 +201,23 @@ class AnrechnungLib
 		$empfehlung_data->empfehlung = null;
 		$empfehlung_data->empfehlung_von = '-';
 		$empfehlung_data->empfehlung_am = '-';
+		$empfehlung_data->empfehlung_angefordert_am = '-';
 		$empfehlung_data->notiz = '';   // Begruendung, if not recommended
 		
 		
 		if(!$anrechnung = getData($this->ci->AnrechnungModel->load($anrechnung_id))[0])
 		{
 			show_error('Failed loading Anrechnung');
+		}
+		
+		// Get date, where recommendation was last requested
+		$result = $this->ci->AnrechnungModel->getLastAnrechnungstatus(
+			$anrechnung_id,
+			self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR   //  when STLG asks for recommendation, status is set to in progress lektor
+		);
+		if ($result = getData($result)[0])
+		{
+			$empfehlung_data->empfehlung_angefordert_am = (new DateTime($result->insertamum))->format('d.m.Y');
 		}
 		
 		if (is_null($anrechnung->empfehlung_anrechnung))
