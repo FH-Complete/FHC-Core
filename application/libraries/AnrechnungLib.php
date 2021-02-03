@@ -231,7 +231,7 @@ class AnrechnungLib
 			// Get last lector and date, where recommendation was given
 			$result = $this->ci->AnrechnungModel->getLastAnrechnungstatus(
 				$anrechnung_id,
-				self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+				self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL   //  when lector sends recommendation, status is set to in progress STGL again
 			);
 			if ($result = getData($result)[0])
 			{
