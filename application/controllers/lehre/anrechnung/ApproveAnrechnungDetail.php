@@ -4,6 +4,8 @@
 
 class approveAnrechnungDetail extends Auth_Controller
 {
+	const REVIEW_ANRECHNUNG_URI = '/lehre/anrechnung/ReviewAnrechnungUebersicht';
+	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
@@ -17,10 +19,11 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_empfehlen:rw',
-				'download'  => 'lehre/anrechnung_empfehlen:rw',
-				'recommend'   => 'lehre/anrechnung_empfehlen:rw',
-				'dontRecommend'   => 'lehre/anrechnung_empfehlen:rw'
+				'index'     => 'lehre/anrechnung_genehmigen:rw',
+				'download'  => 'lehre/anrechnung_genehmigen:rw',
+				'approve'   => 'lehre/anrechnung_genehmigen:rw',
+				'reject'    => 'lehre/anrechnung_genehmigen:rw',
+				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw'
 			)
 		);
 		
