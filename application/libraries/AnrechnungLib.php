@@ -376,7 +376,7 @@ class AnrechnungLib
 	 * @param $anrechnung_id
 	 * @return array
 	 */
-	public function rejectAnrechnung($anrechnung_id)
+	public function rejectAnrechnung($anrechnung_id, $begruendung)
 	{
 		// Check last Anrechnungstatus
 		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
@@ -399,6 +399,15 @@ class AnrechnungLib
 		{
 			show_error(getError($result));
 		}
+		
+		// Add begruendung as notiz
+		$this->ci->load->model('person/Notiz_model', 'NotizModel');
+		$this->ci->NotizModel->addNotizForAnrechnung(
+			$anrechnung_id,
+			self::ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL,
+			$begruendung,
+			getAuthUID()
+		);
 		
 		return success(true);   // rejected
 	}

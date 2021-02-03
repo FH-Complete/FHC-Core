@@ -267,6 +267,7 @@ $(function(){
                 // reduce to necessary fields
                 return {
                     'anrechnung_id' : data.anrechnung_id,
+                    'begruendung'   : begruendung
                 }
             });
 
@@ -289,7 +290,7 @@ $(function(){
         };
 
         // Hide begruendung panel again
-        $(begruendung_panel).slideUp('slow');
+        begruendung_panel.slideUp('slow');
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/reject",
