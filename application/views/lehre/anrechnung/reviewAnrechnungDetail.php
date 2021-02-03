@@ -4,6 +4,7 @@ $this->load->view(
 	array(
 		'title' => $this->p->t('anrechnung', 'anrechnungenPruefen'),
 		'jquery' => true,
+		'jqueryui' => true,
 		'bootstrap' => true,
 		'fontawesome' => true,
 		'ajaxlib' => true,
@@ -29,9 +30,12 @@ $this->load->view(
 				'lektor',
 			)
 		),
+		'customCSSs' => array(
+			'public/css/Tabulator.css'
+		),
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
-			'public/js/lehre/anrechnung/reviewAnrechnung.js'
+			'public/js/lehre/anrechnung/reviewAnrechnungDetail.js'
 		
 		)
 	)
@@ -55,83 +59,172 @@ $this->load->view(
             <div class="col-xs-8">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        
+                        <!-- Antragsdaten -->
                         <div class="row">
                             <div class="col-lg-12">
-                                <!-- Antragsdaten -->
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
-                                                <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
-                                                            id="reviewAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
+                                        <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
+                                                    id="reviewAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
+                                    </div>
+                                    <table class="panel-body table table-bordered table-condensed">
+                                        <tbody>
+                                        <tr>
+                                            <td><?php echo $this->p->t('person', 'student'); ?></td>
+                                            <td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
+                                            <td><?php echo $antragData->matrikelnr ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('lehre', 'studiensemester'); ?></td>
+                                            <td><?php echo $antragData->studiensemester_kurzbz ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('lehre', 'studiengang'); ?></td>
+                                            <td><?php echo $antragData->stg_bezeichnung ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></td>
+                                            <td><?php echo $antragData->lv_bezeichnung ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('lehre', 'ects'); ?></td>
+                                            <td><?php echo $antragData->ects ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('lehre', 'lektorInnen'); ?></td>
+                                            <td>
+                                                <?php $len = count($antragData->lektoren) - 1 ?>
+                                                <?php foreach ($antragData->lektoren as $key => $lektor): ?>
+                                                    <?php echo $lektor->vorname . ' ' . $lektor->nachname;
+                                                    echo $key === $len ? '' : ', ' ?>
+                                                <?php endforeach; ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></td>
+                                            <td><?php echo $anrechnungData->anmerkung ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></td>
+                                            <td>
+                                                <a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
+                                                   target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Antrag mit Checkboxen -->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <form>
+                                    <input type="hidden" name="anrechnung_id" value="<?php echo $anrechnungData->anrechnung_id ?>">
+                                    <div class="panel panel-default" id="test">
+                                        
+                                        <div class="panel-heading">
+                                            <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></b></span>
+                                            <div class="pull-right">
+	                                            <?php echo $this->p->t('anrechnung', 'empfehlungVon'); ?>:
+                                                <span id="reviewAnrechnungDetail-empfehlungVon"><?php echo $empfehlungData->empfehlung_von ?></span>
+                                                &emsp;|&emsp;
+                                                <?php echo $this->p->t('anrechnung', 'empfehlungdatum'); ?>:
+                                                <span id="reviewAnrechnungDetail-empfehlungAm"><?php echo $empfehlungData->empfehlung_am ?></span>
+                                               
                                             </div>
-                                            <table class="panel-body table table-bordered table-condensed">
-                                                <tbody>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('person', 'student'); ?></td>
-                                                    <td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
-                                                    <td><?php echo $antragData->matrikelnr ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('lehre', 'studiensemester'); ?></td>
-                                                    <td><?php echo $antragData->studiensemester_kurzbz ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('lehre', 'studiengang'); ?></td>
-                                                    <td><?php echo $antragData->stg_bezeichnung ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></td>
-                                                    <td><?php echo $antragData->lv_bezeichnung ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('lehre', 'ects'); ?></td>
-                                                    <td><?php echo $antragData->ects ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('lehre', 'lektorInnen'); ?></td>
-                                                    <td>
-														<?php $len = count($antragData->lektoren) - 1 ?>
-														<?php foreach ($antragData->lektoren as $key => $lektor): ?>
-															<?php echo $lektor->vorname . ' ' . $lektor->nachname;
-															echo $key === $len ? '' : ', ' ?>
-														<?php endforeach; ?>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></td>
-                                                    <td><?php echo $anrechnungData->anmerkung ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></td>
-                                                    <td>
-                                                        <a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
-                                                           target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
+                                        </div>
+                                        
+                                        <div class="panel-body" id="reviewAnrechnungDetail-empfehlungDetail">
+                                         
+                                                <div class="panel panel-default panel-body <?php echo is_null($empfehlungData->empfehlung) ? '' : 'hidden' ?>"
+                                                     id="reviewAnrechnungDetail-empfehlungDetail-empfehlungIsNull">
+                                                    <?php echo $this->p->t('anrechnung', 'nochKeineEmpfehlung'); ?>
+                                                </div>
+                                            
+                                                <div class="alert alert-success <?php echo $empfehlungData->empfehlung === true ? '' : 'hidden' ?>"
+                                                     id="reviewAnrechnungDetail-empfehlungDetail-empfehlungIsTrue">
+                                                    <b><?php echo $this->p->t('anrechnung', 'empfehlungPositiv'); ?></b>
+                                                </div>
+	                                        
+                                            <div class="<?php echo $empfehlungData->empfehlung === false ? '' : 'hidden' ?>"
+                                                    id="reviewAnrechnungDetail-empfehlungDetail-empfehlungIsFalse">
+                                                <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'empfehlungNegativ'); ?></b></div>
+                                                <div class="well"><b><?php echo $this->p->t('global', 'begruendung'); ?>: </b>
+                                                    <span id="reviewAnrechnungDetail-empfehlungDetail-begruendung"><?php echo $empfehlungData->notiz ?></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="panel panel-default panel-body" style="display: none"
+                                                 id="reviewAnrechnungDetail-begruendung-panel">
+                                                <div>
+                                                    <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'empfehlungNegativ'); ?></b></div>
+                                                    <h4><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></h4><br>
+                                                    <ol>
+                                                        <li><?php echo $this->p->t('anrechnung', 'empfehlungNegativPruefungNichtMoeglich'); ?>
+                                                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                                                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?>
+                                                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                                                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
+                                                    </ol><br>
+                                                    <textarea class="form-control" name="begruendung" id="reviewAnrechnungDetail-begruendung"
+                                                              rows="2" required></textarea>
+                                                </div>
+                                                <br>
+                                                <!-- Action Button 'Abbrechen'-->
+                                                <div class="pull-right">
+                                                    <button id="reviewAnrechnungDetail-begruendung-abbrechen" class="btn btn-default btn-w200">
+				                                        <?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="panel panel-default panel-body" style="display: none"
+                                                 id="reviewAnrechnungDetail-empfehlung-panel">
+                                                <div>
+                                                    <div class="alert alert-success"><b><?php echo $this->p->t('anrechnung', 'empfehlungPositiv'); ?></b></div>
+                                                </div>
+                                                <br>
+                                                <!-- Action Button 'Abbrechen'-->
+                                                <div class="pull-right">
+                                                    <button id="reviewAnrechnungDetail-empfehlung-abbrechen" class="btn btn-default btn-w200">
+				                                        <?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <!-- Antrag mit Checkboxen -->
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="well">
-
-
-                                        </div>
-                                    </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
+                
+               <div class="pull-right">
+                    <button id="dont-recommend-anrechnung" class="btn btn-danger btn-w200"
+                        <?php echo is_null($empfehlungData->empfehlung) ? '' : 'disabled' ?>>
+                        <?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?>
+                    </button>
+                    <button id="recommend-anrechnung" class="btn btn-primary btn-w200"
+	                    <?php echo is_null($empfehlungData->empfehlung) ? '' : 'disabled' ?>>
+                        <?php echo ucfirst($this->p->t('anrechnung', 'empfehlen')); ?>
+                    </button>
+               </div>
             </div>
+            
             <div class="col-xs-4">
                 <div class="alert text-center">
                     Status:
@@ -144,7 +237,7 @@ $this->load->view(
 				<?php $this->load->view('lehre/anrechnung/reviewAnrechnungInfo'); ?>
             </div>
         </div>
-        
+
     </div>
 </div>
 </body>

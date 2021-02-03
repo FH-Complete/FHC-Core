@@ -185,6 +185,77 @@ class AnrechnungLib
 	}
 	
 	/**
+	 * Get Empfehlung data object.
+	 * @param $anrechnung_id
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getEmpfehlungData($anrechnung_id)
+	{
+		if (!is_numeric($anrechnung_id))
+		{
+			show_error('Incorrect parameter');
+		}
+		
+		$empfehlung_data = new stdClass();
+		$empfehlung_data->empfehlung = null;
+		$empfehlung_data->empfehlung_von = '-';
+		$empfehlung_data->empfehlung_am = '-';
+		$empfehlung_data->notiz = '';   // Begruendung, if not recommended
+		
+		
+		if(!$anrechnung = getData($this->ci->AnrechnungModel->load($anrechnung_id))[0])
+		{
+			show_error('Failed loading Anrechnung');
+		}
+		
+		if (is_null($anrechnung->empfehlung_anrechnung))
+		{
+			return success($empfehlung_data);
+		}
+		
+		// If Empfehlung is true or false
+		if (!is_null($anrechnung->empfehlung_anrechnung))
+		{
+			// Get last lector and date, where recommendation was given
+			$result = $this->ci->AnrechnungModel->getLastAnrechnungstatus(
+				$anrechnung_id,
+				self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+			);
+			if ($result = getData($result)[0])
+			{
+				$empfehlung_datum = (new DateTime($result->insertamum))->format('d.m.Y');
+			}
+			
+			// Get full name of lector
+			$result = $this->ci->PersonModel->getByUID($result->insertvon);
+			if ($result = getData($result)[0])
+			{
+				$empfehlung_von = $result->vorname. ' '. $result->nachname;
+			}
+			
+			$empfehlung_data->empfehlung    = $anrechnung->empfehlung_anrechnung;
+			$empfehlung_data->empfehlung_von     = $empfehlung_von;
+			$empfehlung_data->empfehlung_am    = $empfehlung_datum;
+		}
+		
+		// If Empfehlung is false, retrieve also Notiz with Begruendung
+		if (!$anrechnung->empfehlung_anrechnung)
+		{
+			// Get Ablehnungsbegruendung (only set, if Anrechnung was not recommended yet)
+			$this->ci->load->model('person/Notiz_model', 'NotizModel');
+			$result = $this->ci->NotizModel->getNotizByAnrechnung($anrechnung_id, self::ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_LEKTOR);
+			if ($notiz = getData($result)[0])
+			{
+				$empfehlung_data->notiz = $notiz->text;
+			}
+		}
+		
+		return success($empfehlung_data);
+		
+	}
+	
+	/**
 	 * Get last Anrechnungstatusbezeichnung in users language.
 	 * @param $anrechnung_id
 	 * @return mixed
