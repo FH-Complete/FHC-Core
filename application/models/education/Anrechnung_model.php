@@ -34,10 +34,26 @@ class Anrechnung_model extends DB_Model
 	 * @param $anrechnung_id
 	 * @return array|null
 	 */
-	public function getLastAnrechnungstatus($anrechnung_id)
+	public function getLastAnrechnungstatus($anrechnung_id, $status_kurzbz = null)
 	{
+		if (is_string($status_kurzbz))
+		{
+			$qry = '
+				SELECT *
+				FROM lehre.tbl_anrechnungstatus
+				JOIN lehre.tbl_anrechnung_anrechnungstatus USING (status_kurzbz)
+				WHERE anrechnung_id = ?
+				AND status_kurzbz = ?
+				ORDER BY insertamum DESC
+				LIMIT 1
+			';
+			
+			return $this->execQuery($qry, array($anrechnung_id, $status_kurzbz));
+		}
+		
+		
 		$qry = '
-			SELECT status_kurzbz, bezeichnung_mehrsprachig
+			SELECT *
 			FROM lehre.tbl_anrechnungstatus
 			JOIN lehre.tbl_anrechnung_anrechnungstatus USING (status_kurzbz)
 			WHERE anrechnung_id = ?
