@@ -115,9 +115,59 @@ $this->load->view(
 	            <?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
             </div>
         </div>
-
+        <!-- Genehmigen / Ablehnen Panel -->
         <div class="row">
-
+            <div class="panel panel-default panel-body" style="display: none"
+                 id="approveAnrechnungUebersicht-begruendung-panel">
+                <div>
+                    <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'genehmigungenNegativ'); ?></b></div>
+                    <h4><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></h4><br>
+                    <ol>
+                        <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativPruefungNichtMoeglich'); ?>
+                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertig'); ?>
+                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
+                    </ol>
+                    <br>
+                    <span class="text-danger">
+                        <?php echo $this->p->t('anrechnung', 'begruendungWirdFuerAlleUebernommen'); ?>
+                    </span><br><br>
+                    <textarea class="form-control" name="begruendung" id="approveAnrechnungUebersicht-begruendung"
+                              rows="2" required></textarea>
+                </div>
+                <br>
+                <!-- Action Button 'Abbrechen'-->
+                <div class="pull-right">
+                    <button id="approveAnrechnungUebersicht-begruendung-abbrechen" class="btn btn-default btn-w200">
+						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                    </button>
+                </div>
+            </div>
+            <div class="panel panel-default panel-body" style="display: none"
+                 id="approveAnrechnungUebersicht-empfehlung-panel">
+                <div>
+                    <div class="alert alert-success"><b><?php echo $this->p->t('anrechnung', 'genehmigungenPositiv'); ?></b></div>
+                </div>
+                <br>
+                <!-- Action Button 'Abbrechen'-->
+                <div class="pull-right">
+                    <button id="approveAnrechnungUebersicht-empfehlung-abbrechen" class="btn btn-default btn-w200">
+						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Filter buttons / Submit buttons-->
+        <div class="row">
             <!-- Filter buttons -->
             <div class="col-xs-5 col-md-4">
                 <div class="btn-toolbar" role="toolbar">
@@ -141,7 +191,6 @@ $this->load->view(
                     </div>
                 </div>
             </div>
-            
             <!-- Action Buttons 'Genehmigen', 'Empfehlung anfordern'-->
             <div class="col-xs-7 col-md-8">
                 <div class="pull-right">
@@ -149,7 +198,7 @@ $this->load->view(
                     <button id="reject-anrechnungen" class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
                     <button id="approve-anrechnungen" class="btn btn-primary btn-w200"><?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>
                 </div>
-                </div>
+            </div>
         </div>
 	</div>
 </div>

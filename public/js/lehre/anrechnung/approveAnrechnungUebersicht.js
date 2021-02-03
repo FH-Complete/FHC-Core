@@ -172,6 +172,18 @@ $(function(){
 
     // Approve Anrechnungen
     $("#approve-anrechnungen").click(function(){
+        let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
+        let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
+
+        begruendung_panel.css('display', 'none');
+
+        if (genehmigung_panel.is(":hidden"))
+        {
+            // Show begruendung panel if is hidden
+            genehmigung_panel.slideDown('slow');
+            return;
+        }
+
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .map(function(data){
@@ -188,11 +200,13 @@ $(function(){
             return;
         }
 
-
         // Prepare data object for ajax call
         let data = {
             'data': selected_data
         };
+
+        // Hide genehmigung panel again
+        genehmigung_panel.slideUp('slow');
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/approve",
@@ -225,6 +239,28 @@ $(function(){
 
     // Reject Anrechnungen
     $("#reject-anrechnungen").click(function(){
+        let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
+        let begruendung = $('#approveAnrechnungUebersicht-begruendung').val();
+        let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
+
+        genehmigung_panel.css('display', 'none');
+
+        if (begruendung_panel.is(":hidden"))
+        {
+            // Show begruendung panel if is hidden
+            begruendung_panel.slideDown('slow');
+            return;
+        }
+        else
+        {
+            // Check if begruendung is given
+            if (!begruendung.trim()) // empty or white spaces only
+            {
+                FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
+                return;
+            }
+        }
+
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .map(function(data){
@@ -251,6 +287,9 @@ $(function(){
         let data = {
             'data': selected_data
         };
+
+        // Hide begruendung panel again
+        $(begruendung_panel).slideUp('slow');
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/reject",
@@ -344,6 +383,24 @@ $(function(){
         );
     });
 
+    // Break Genehmigung abgeben
+    $('#approveAnrechnungUebersicht-empfehlung-abbrechen').click(function(){
+        $('#approveAnrechnungUebersicht-empfehlung-panel').slideUp('slow');
+
+    })
+
+    // Break Ablehnung abgeben
+    $('#approveAnrechnungUebersicht-begruendung-abbrechen').click(function(){
+        $('#approveAnrechnungUebersicht-begruendung').val('');
+        $('#approveAnrechnungUebersicht-begruendung-panel').slideUp('slow');
+
+    })
+
+    // Copy Begruendung into textarea
+    $(".btn-copyIntoTextarea").click(function(){
+        approveAnrechnung.copyIntoTextarea(this);
+    })
+
 });
 
 var approveAnrechnung = {
@@ -363,5 +420,13 @@ var approveAnrechnung = {
             default:
                 $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
         }
+    },
+    copyIntoTextarea: function(elem){
+
+        // Find closest textarea
+        let textarea = $(elem).closest('div').find('textarea');
+
+        // Copy begruendung into textarea
+        textarea.val($.trim($(elem).parent().text()));
     }
 }
