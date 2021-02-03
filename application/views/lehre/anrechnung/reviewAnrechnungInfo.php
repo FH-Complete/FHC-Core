@@ -1,25 +1,5 @@
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
     <div class="panel panel-warning">
-        <div class="panel-heading" role="tab" id="headingZero">
-            <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero"
-                   aria-expanded="true" aria-controls="collapseZero">
-                    <i class="fa fa-arrow-right" aria-hidden="true"></i> Antrag: Voraussetzungen
-                </a>
-            </h4>
-        </div>
-        <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
-            <div class="panel-body">
-                Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
-                <br><br>Wenn die Gleichwertigkeit gegeben ist, können auch außerhochschulisch erworbene Kenntnisse angerechnet werden (z.B. Sekundarschule, Weiterbildungseinrichtungen).
-                <br><br>
-                <u>Umfangmäßige Gleichwertigkeit Schule - Hochschule:</u>
-                <br>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden, ein Schulhalbjahr besteht aus ca. 20 Wochen.
-                <br>Das heißt eine Unterrichtsstunde pro Woche sind insgesamt ca. 20 Stunden.
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-warning">
         <div class="panel-heading" role="tab" id="headingOne">
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
@@ -32,9 +12,29 @@
             <div class="panel-body">
                 Die Entscheidung über den Antrag durch die Studiengangsleitung sollte
                 <ul>
-                    <li><span class="text-danger">innerhalb von zwei Wochen ab dem 15. September (Wintersemester) </span></li>
-                    <li><span class="text-danger">innerhalb von zwei Wochen ab dem 22. Februar (Sommersemester) </span> erfolgen</li>
+                    <li><u>innerhalb von zwei Wochen ab dem 15. September (Wintersemester)</u></li>
+                    <li><u>innerhalb von zwei Wochen ab dem 22. Februar (Sommersemester)</u> erfolgen</li>
                 </ul>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-warning">
+        <div class="panel-heading" role="tab" id="headingZero">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero"
+                   aria-expanded="true" aria-controls="collapseZero">
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i> Antrag: Voraussetzungen
+                </a>
+            </h4>
+        </div>
+        <div id="collapseZero" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingZero">
+            <div class="panel-body">
+                Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
+                <br><br>Wenn die Gleichwertigkeit gegeben ist, können auch außerhochschulisch erworbene Kenntnisse angerechnet werden (z.B. Sekundarschule, Weiterbildungseinrichtungen).
+                <br><br>
+                <u>Umfangmäßige Gleichwertigkeit Schule - Hochschule:</u>
+                <br>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden, ein Schulhalbjahr besteht aus ca. 20 Wochen.
+                <br>Das heißt eine Unterrichtsstunde pro Woche sind insgesamt ca. 20 Stunden.
             </div>
         </div>
     </div>
