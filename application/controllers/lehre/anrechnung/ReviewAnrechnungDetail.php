@@ -14,6 +14,8 @@ class reviewAnrechnungDetail extends Auth_Controller
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 	
+	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_LEKTOR = 'AnrechnungNotizLektor';
+	
 	public function __construct()
 	{
 		// Set required permissions
@@ -32,6 +34,8 @@ class reviewAnrechnungDetail extends Auth_Controller
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('person/Person_model', 'PersonModel');
 		
 		// Load libraries
 		$this->load->library('WidgetLib');
@@ -71,10 +75,15 @@ class reviewAnrechnungDetail extends Auth_Controller
 		}
 		
 		// Get Anrechung data
-		$result = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
-		if (!$anrechnungData = getData($result))
+		if (!$anrechnungData = getData($this->anrechnunglib->getAnrechnungData($anrechnung_id)))
 		{
-			show_error(getError($anrechnungData));
+			show_error('Missing data for Anrechnung.');
+		}
+		
+		// Get Empfehlung data
+		if(!$empfehlungData = getData($this->anrechnunglib->getEmpfehlungData($anrechnung_id)))
+		{
+			show_error('Missing data for recommendation');
 		}
 
 		$viewData = array(
@@ -83,7 +92,8 @@ class reviewAnrechnungDetail extends Auth_Controller
 				$anrechnungData->studiensemester_kurzbz,
 				$anrechnungData->lehrveranstaltung_id
 			),
-			'anrechnungData' => $anrechnungData
+			'anrechnungData' => $anrechnungData,
+			'empfehlungData' => $empfehlungData
 		);
 		
 		$this->load->view('lehre/anrechnung/reviewAnrechnungDetail.php', $viewData);
@@ -107,6 +117,11 @@ class reviewAnrechnungDetail extends Auth_Controller
 		$inProgressDP = getUserLanguage() == 'German'
 			? $inProgressDP->bezeichnung_mehrsprachig[0]
 			: $inProgressDP->bezeichnung_mehrsprachig[1];
+		
+		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
+		{
+			show_error('Failed retrieving person data');
+		}
 
 		foreach ($data as $item)
 		{
@@ -117,7 +132,9 @@ class reviewAnrechnungDetail extends Auth_Controller
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'true',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP
+					'status_bezeichnung'    => $inProgressDP,
+					'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
+					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
 				);
 			}
 		}
@@ -161,16 +178,23 @@ class reviewAnrechnungDetail extends Auth_Controller
 			? $inProgressDP->bezeichnung_mehrsprachig[0]
 			: $inProgressDP->bezeichnung_mehrsprachig[1];
 		
+		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
+		{
+			show_error('Failed retrieving person data');
+		}
+		
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'])))
+			if(getData($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung'])))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'false',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP
+					'status_bezeichnung'    => $inProgressDP,
+					'empfehlumg_am'          => (new DateTime())->format('d.m.Y'),
+					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
 				);
 			}
 		}
