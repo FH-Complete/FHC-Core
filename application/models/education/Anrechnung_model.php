@@ -63,4 +63,24 @@ class Anrechnung_model extends DB_Model
 		
 		return $this->execQuery($qry, array($anrechnung_id));
 	}
+	
+	/**
+	 * Get status approved / rejected, if present.
+	 * @param $anrechnung_id
+	 * @return array|null
+	 */
+	public function getApprovedOrRejected($anrechnung_id)
+	{
+		$qry = '
+			SELECT *
+			FROM lehre.tbl_anrechnungstatus
+			JOIN lehre.tbl_anrechnung_anrechnungstatus USING (status_kurzbz)
+			WHERE anrechnung_id = ?
+			AND (status_kurzbz = \'approved\' OR status_kurzbz = \'rejected\')
+			ORDER BY insertamum DESC
+			LIMIT 1
+		';
+		
+		return $this->execQuery($qry, array($anrechnung_id));
+	}
 }
