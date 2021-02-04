@@ -1,10 +1,10 @@
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-    <div class="panel panel-warning">
+    <div class="panel panel-info">
         <div class="panel-heading" role="tab" id="headingOne">
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
                    aria-expanded="true" aria-controls="collapseOne">
-                    <i class="fa fa-arrow-right" aria-hidden="true"></i> Beantragung: Fristen
+                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;Beantragung: Fristen
                 </a>
             </h4>
         </div>
@@ -18,12 +18,12 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-warning">
+    <div class="panel panel-info">
         <div class="panel-heading" role="tab" id="headingZero">
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero"
                    aria-expanded="true" aria-controls="collapseZero">
-                    <i class="fa fa-arrow-right" aria-hidden="true"></i> Antrag: Voraussetzungen
+                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;Antrag: Voraussetzungen
                 </a>
             </h4>
         </div>
@@ -38,12 +38,12 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-warning">
+    <div class="panel panel-info">
         <div class="panel-heading" role="tab" id="headingTwo">
             <h4 class="panel-title">
                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
                    aria-expanded="false" aria-controls="collapseTwo">
-                    <i class="fa fa-arrow-right" aria-hidden="true"></i> Nachweisdokumente: Formalprüfung
+                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;Nachweisdokumente: Formalprüfung
                 </a>
             </h4>
         </div>
@@ -66,12 +66,12 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-warning">
+    <div class="panel panel-info">
         <div class="panel-heading" role="tab" id="headingThree">
             <h4 class="panel-title">
                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree"
                    aria-expanded="false" aria-controls="collapseThree">
-                    <i class="fa fa-arrow-right" aria-hidden="true"></i> Herkunft der Kenntnisse: Formalprüfung
+                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;Herkunft der Kenntnisse: Formalprüfung
                 </a>
             </h4>
         </div>
