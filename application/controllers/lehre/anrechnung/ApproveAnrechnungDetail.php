@@ -4,6 +4,8 @@
 
 class approveAnrechnungDetail extends Auth_Controller
 {
+	const BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN = 'lehre/anrechnung_genehmigen';
+	
 	const REVIEW_ANRECHNUNG_URI = '/lehre/anrechnung/ReviewAnrechnungUebersicht';
 	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
@@ -72,6 +74,9 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			show_error('Missing correct parameter');
 		}
+		
+		// Check if user is entitled to read the Anrechnung
+		self::_checkIfEntitledToReadAnrechnung($anrechnung_id);
 		
 		// Get Anrechung data
 		if (!$anrechnungData = getData($this->anrechnunglib->getAnrechnungData($anrechnung_id)))
@@ -282,6 +287,9 @@ class approveAnrechnungDetail extends Auth_Controller
 			show_error('Wrong parameter');
 		}
 		
+		// Check if user is entitled to read dms doc
+		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		
 		$this->dmslib->download($dms_id);
 	}
 	
@@ -293,6 +301,68 @@ class approveAnrechnungDetail extends Auth_Controller
 		$this->_uid = getAuthUID();
 		
 		if (!$this->_uid) show_error('User authentification failed');
+	}
+	
+	/**
+	 * Check if user is entitled to read this Anrechnung
+	 * @param $anrechnung_id
+	 */
+	private function _checkIfEntitledToReadAnrechnung($anrechnung_id)
+	{
+		// Retrieve studiengaenge the user is entitled for
+		$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN);
+		
+		$result = $this->AnrechnungModel->load($anrechnung_id);
+		
+		if(!$result = getData($result)[0])
+		{
+			show_error('Failed retrieving Anrechnung');
+		}
+		
+		$result = $this->LehrveranstaltungModel->loadWhere(array(
+			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
+		));
+		
+		if($result = getData($result)[0])
+		{
+			if (in_array($result->studiengang_kz, $studiengang_kz_arr))
+			{
+				return;
+			}
+		}
+		
+		show_error('You are not entitled to read this Anrechnung');
+	}
+	
+	/**
+	 * Check if user is entitled to read dms doc
+	 * @param $dms_id
+	 */
+	private function _checkIfEntitledToReadDMSDoc($dms_id)
+	{
+		// Retrieve studiengaenge the user is entitled for
+		$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN);
+		
+		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
+		
+		if(!$result = getData($result)[0])
+		{
+			show_error('Failed retrieving Anrechnung');
+		}
+		
+		$result = $this->LehrveranstaltungModel->loadWhere(array(
+			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
+		));
+		
+		if($result = getData($result)[0])
+		{
+			if (in_array($result->studiengang_kz, $studiengang_kz_arr))
+			{
+				return;
+			}
+		}
+		
+		show_error('You are not entitled to read this document');
 	}
 	
 	/**

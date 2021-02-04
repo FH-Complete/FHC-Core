@@ -211,6 +211,9 @@ class requestAnrechnung extends Auth_Controller
 			show_error('Wrong parameter');
 		}
 		
+		// Check if user is entitled to read dms doc
+		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		
 		$this->dmslib->download($dms_id);
 	}
 	
@@ -263,6 +266,25 @@ class requestAnrechnung extends Auth_Controller
 		
 		// True if today > application deadline
 		return ($today > $start->add((new DateInterval(self::DEADLINE_INTERVAL_NACH_SEMESTERSTART))));
+	}
+	
+	/**
+	 * Check if user is entitled to read dms doc
+	 * @param $dms_id
+	 */
+	private function _checkIfEntitledToReadDMSDoc($dms_id)
+	{
+		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
+		
+		if($result = getData($result)[0])
+		{
+			if ($result->insertvon == $this->_uid)
+			{
+				return;
+			}
+		}
+		
+		show_error('You are not entitled to read this document');
 	}
 	
 	/**

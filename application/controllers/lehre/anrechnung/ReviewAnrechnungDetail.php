@@ -74,6 +74,9 @@ class reviewAnrechnungDetail extends Auth_Controller
 			show_error('Missing correct parameter');
 		}
 		
+		// Check if user is entitled to read this Anrechnung
+		self::_checkIfEntitledToReadAnrechnung($anrechnung_id);
+		
 		// Get Anrechung data
 		if (!$anrechnungData = getData($this->anrechnunglib->getAnrechnungData($anrechnung_id)))
 		{
@@ -228,6 +231,9 @@ class reviewAnrechnungDetail extends Auth_Controller
 			show_error('Wrong parameter');
 		}
 		
+		// Check if user is entitled to read dms doc
+		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		
 		$this->dmslib->download($dms_id);
 	}
 	
@@ -240,6 +246,64 @@ class reviewAnrechnungDetail extends Auth_Controller
 		$this->_uid = getAuthUID();
 		
 		if (!$this->_uid) show_error('User authentification failed');
+	}
+	
+	/**
+	 * Check if user is entitled to read dms doc
+	 * @param $dms_id
+	 */
+	private function _checkIfEntitledToReadAnrechnung($anrechnung_id)
+	{
+		$result = $this->AnrechnungModel->load($anrechnung_id);
+		
+		if(!$result = getData($result)[0])
+		{
+			show_error('Failed retrieving Anrechnung');
+		}
+		
+		$result = $this->LehrveranstaltungModel
+			->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+		
+		if($result = getData($result))
+		{
+			$entitled_lector_arr = array_column($result, 'uid');
+			
+			if (in_array($this->_uid, $entitled_lector_arr))
+			{
+				return;
+			}
+		}
+		
+		show_error('You are not entitled to read this document');
+	}
+	
+	/**
+	 * Check if user is entitled to read dms doc
+	 * @param $dms_id
+	 */
+	private function _checkIfEntitledToReadDMSDoc($dms_id)
+	{
+		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
+		
+		if(!$result = getData($result)[0])
+		{
+			show_error('Failed retrieving Anrechnung');
+		}
+		
+		$result = $this->LehrveranstaltungModel
+			->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+		
+		if($result = getData($result))
+		{
+			$entitled_lector_arr = array_column($result, 'uid');
+			
+			if (in_array($this->_uid, $entitled_lector_arr))
+			{
+				return;
+			}
+		}
+		
+		show_error('You are not entitled to read this document');
 	}
 	
 	/**
