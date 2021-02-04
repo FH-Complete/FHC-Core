@@ -325,7 +325,7 @@ class requestAnrechnung extends Auth_Controller
 			'AnrechnungAntragStellen',
 			$body_fields,
 			$to,
-			'Neuer LV-Anrechnungsantrag'
+			'Anerkennung nachgewiesener Kenntnisse: Neuer Antrag wurde gestellt'
 		);
 		
 		return true;

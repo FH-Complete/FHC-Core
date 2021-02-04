@@ -320,7 +320,7 @@ class approveAnrechnungDetail extends Auth_Controller
 			'AnrechnungGenehmigen',
 			$body_fields,
 			$to,
-			'Ihr Antrag auf Anerkennung nachgewiesener Kenntnisse wurde abgeschlossen'
+			'Anerkennung nachgewiesener Kenntnisse: Ihr Antrag ist abgeschlossen'
 		);
 		
 		return true;
@@ -384,7 +384,7 @@ class approveAnrechnungDetail extends Auth_Controller
 				'AnrechnungEmpfehlungAnfordern',
 				$body_fields,
 				$to,
-				'Neue LV-Anrechnungsanträge benötigen Deine Empfehlung'
+				'Anerkennung nachgewiesener Kenntnisse: Deine Empfehlung wird benötigt'
 			);
 		}
 		return true;

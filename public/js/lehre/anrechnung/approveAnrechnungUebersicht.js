@@ -29,7 +29,7 @@ function func_tableBuilt(table) {
                 url:function(cell){
                     return  BASE_URL + "/" + APPROVE_ANRECHNUNG_DETAIL_URI + "?anrechnung_id=" + cell.getData().anrechnung_id
                 },
-                target:"_blank"
+                // target:"_blank"
             }
         }, false, "status"  // place column after status
     );

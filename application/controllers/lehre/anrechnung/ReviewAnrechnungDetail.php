@@ -294,7 +294,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 				'AnrechnungEmpfehlungAbgeben',
 				$body_fields,
 				$to,
-				'Neue '. ($empfehlung ? 'positive' : 'negative'). ' Empfehlungen für LV-Anrechnungsanträge'
+				'Anerkennung nachgewiesener Kenntnisse: Empfehlung wurde abgegeben'
 			);
 		}
 		

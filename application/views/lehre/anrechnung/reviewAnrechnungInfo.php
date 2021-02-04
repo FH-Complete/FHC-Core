@@ -27,7 +27,7 @@
                 </a>
             </h4>
         </div>
-        <div id="collapseZero" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingZero">
+        <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
             <div class="panel-body">
                 Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
                 <br><br>Wenn die Gleichwertigkeit gegeben ist, können auch außerhochschulisch erworbene Kenntnisse angerechnet werden (z.B. Sekundarschule, Weiterbildungseinrichtungen).
