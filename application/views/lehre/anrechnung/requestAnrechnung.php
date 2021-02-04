@@ -169,7 +169,7 @@ $this->load->view(
                                                     </div>
                                                     <div class="panel-body">
                                                         <textarea class="form-control" name="anmerkung" rows="2"
-                                                                  required<?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
+                                                                  required <?php echo $disabled; ?>><?php echo $anrechnungData->anmerkung; ?></textarea>
                                                     </div>
                                                 </div>
                                             </div>
