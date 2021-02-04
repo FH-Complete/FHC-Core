@@ -267,6 +267,69 @@ class AnrechnungLib
 	}
 	
 	/**
+	 * Get Genehmigung data object.
+	 * @param $anrechnung_id
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getGenehmigungData($anrechnung_id)
+	{
+		if (!is_numeric($anrechnung_id))
+		{
+			show_error('Incorrect parameter');
+		}
+		
+		$genehmigung_data = new stdClass();
+		$genehmigung_data->genehmigung = null;
+		$genehmigung_data->abgeschlossen_von = '-';
+		$genehmigung_data->abgeschlossen_am = '-';
+		$genehmigung_data->notiz = '';   // Begruendung, if rejected
+		
+		
+		if(!$anrechnung = getData($this->ci->AnrechnungModel->load($anrechnung_id))[0])
+		{
+			show_error('Failed loading Anrechnung');
+		}
+		
+		// Get date of approvement or rejection
+		$result = $this->ci->AnrechnungModel->getApprovedOrRejected($anrechnung_id);
+	
+		if (!$result = getData($result)[0])
+		{
+			return success($genehmigung_data);
+		}
+		
+		
+		$genehmigung_data->genehmigung = $result->status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
+			? true
+			: false;
+		$genehmigung_data->abgeschlossen_am = (new DateTime($result->insertamum))->format('d.m.Y');
+		
+		// Get full name of lector
+		$result = $this->ci->PersonModel->getByUID($result->insertvon);
+		if ($result = getData($result)[0])
+		{
+			$genehmigung_data->abgeschlossen_von = $result->vorname. ' '. $result->nachname;
+		}
+		
+		
+		// If Anrechnung was rejected, retrieve also Notiz with Begruendung
+		if (!$genehmigung_data->genehmigung)
+		{
+			// Get Ablehnungsbegruendung (only set, if Anrechnung was not recommended yet)
+			$this->ci->load->model('person/Notiz_model', 'NotizModel');
+			$result = $this->ci->NotizModel->getNotizByAnrechnung($anrechnung_id, self::ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL);
+			if ($notiz = getData($result)[0])
+			{
+				$genehmigung_data->notiz = $notiz->text;
+			}
+		}
+		
+		return success($genehmigung_data);
+		
+	}
+	
+	/**
 	 * Get last Anrechnungstatusbezeichnung in users language.
 	 * @param $anrechnung_id
 	 * @return mixed

@@ -22,8 +22,8 @@ $(function(){
 
     // Approve Anrechnungen
     $("#approve-anrechnung").click(function(){
-        let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
-        let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
+        let genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
+        let begruendung_panel = $('#approveAnrechnungDetail-begruendung-panel');
 
         begruendung_panel.css('display', 'none');
 
@@ -34,25 +34,15 @@ $(function(){
             return;
         }
 
-        // Get selected rows data
-        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
-            .map(function(data){
-                // reduce to necessary fields
-                return {
-                    'anrechnung_id' : data.anrechnung_id,
-                }
-            });
-
-        // Alert and exit if no anrechnung is selected
-        if (selected_data.length == 0)
-        {
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
-            return;
-        }
+        // Get form data
+        // index 0: anrechnung_id
+        let form_data = $('form').serializeArray();
 
         // Prepare data object for ajax call
         let data = {
-            'data': selected_data
+            'data': [{
+                'anrechnung_id' : form_data[0].value
+            }]
         };
 
         // Hide genehmigung panel again
@@ -72,11 +62,11 @@ $(function(){
 
                     if (!data.error && data.retval != null)
                     {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
-
-                        // Print success message
-                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden genehmigt.");
+                        approveAnrechnungDetail.formatGenehmigungIsPositiv(
+                            data.retval[0].abgeschlossen_am,
+                            data.retval[0].abgeschlossen_von,
+                            data.retval[0].status_bezeichnung
+                        );
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -89,9 +79,9 @@ $(function(){
 
     // Reject Anrechnungen
     $("#reject-anrechnung").click(function(){
-        let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
-        let begruendung = $('#approveAnrechnungUebersicht-begruendung').val();
-        let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
+        let begruendung_panel = $('#approveAnrechnungDetail-begruendung-panel');
+        let begruendung = $('#approveAnrechnungDetail-begruendung').val();
+        let genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
 
         genehmigung_panel.css('display', 'none');
 
@@ -111,33 +101,23 @@ $(function(){
             }
         }
 
-        // Get selected rows data
-        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
-            .map(function(data){
-                // reduce to necessary fields
-                return {
-                    'anrechnung_id' : data.anrechnung_id,
-                    'begruendung'   : begruendung
-                }
-            });
-
-        // Alert and exit if no anrechnung is selected
-        if (selected_data.length == 0)
-        {
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
-            return;
-        }
+        // Get form data
+        // index 0: anrechnung_id
+        let form_data = $('form').serializeArray();
 
         // Confirm before rejecting
-        if(!confirm('Wollen Sie wirklich die gewählten Anträge ablehnen?'))
+        if(!confirm('Wollen Sie wirklich für die gewählten Anträge keine Empfehlung abgeben?'))
         {
             return;
         }
 
         // Prepare data object for ajax call
         let data = {
-            'data': selected_data
-        };
+            'data': [{
+                'anrechnung_id' : form_data[0].value,
+                'begruendung'   : begruendung
+            }]
+        }
 
         // Hide begruendung panel again
         begruendung_panel.slideUp('slow');
@@ -156,11 +136,12 @@ $(function(){
 
                     if (!data.error && data.retval != null)
                     {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
-
-                        // Print success message
-                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden abgelehnt.");
+                        approveAnrechnungDetail.formatGenehmigungIsNegativ(
+                            data.retval[0].abgeschlossen_am,
+                            data.retval[0].abgeschlossen_von,
+                            data.retval[0].status_bezeichnung,
+                            begruendung
+                        );
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -219,9 +200,9 @@ $(function(){
         approveAnrechnungDetail.copyIntoTextarea(this);
     })
 
-    // Break Empfehlung abgeben
-    $('#approveAnrechnungDetail-empfehlung-abbrechen').click(function(){
-        $('#approveAnrechnungDetail-empfehlung-panel').slideUp('slow');
+    // Break Genehmigung abgeben
+    $('#approveAnrechnungDetail-genehmigung-abbrechen').click(function(){
+        $('#approveAnrechnungDetail-genehmigung-panel').slideUp('slow');
 
     })
 
@@ -270,23 +251,27 @@ var approveAnrechnungDetail = {
         $('#approve-anrechnung').prop('disabled', true);
         $('#reject-anrechnung').prop('disabled', true);
     },
-    formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon, statusBezeichnung){
-        $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
-        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsTrue').removeClass('hidden');
+    formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung){
+        $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').removeClass('hidden');
         $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
+        $('#approveAnrechnung-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-success');
+        $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
+        $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
         $('#request-recommendation').prop('disabled', true);
         $('#approve-anrechnung').prop('disabled', true);
         $('#reject-anrechnung').prop('disabled', true);
     },
-    formatEmpfehlungIsFalse: function(empfehlungAm, emfehlungVon, statusBezeichnung, begruendung){
-        $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
-        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsFalse').removeClass('hidden');
+    formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung, begruendung){
+        $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').removeClass('hidden');
         $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
+        $('#approveAnrechnung-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-danger');
+        $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
+        $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
+        $('#approveAnrechnungDetail-genehmigungDetail-begruendung').text(begruendung);
         $('#request-recommendation').prop('disabled', true);
         $('#approve-anrechnung').prop('disabled', true);
         $('#reject-anrechnung').prop('disabled', true);
-        $('#approveAnrechnungDetail-empfehlungAm').text(empfehlungAm);
-        $('#approveAnrechnungDetail-empfehlungVon').text(emfehlungVon);
-        $('#approveAnrechnungDetail-empfehlungDetail-begruendung').text(begruendung);
     }
 }

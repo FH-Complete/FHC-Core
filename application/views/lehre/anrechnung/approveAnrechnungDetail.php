@@ -143,8 +143,7 @@ $this->load->view(
 
                                                 <div class="panel panel-default panel-body
                                                 <?php echo
-                                                is_null($empfehlungData->empfehlung) && $anrechnungData->status_kurzbz == 'inProgressDP'
-                                                    ? '' : 'hidden' ?>"
+                                                is_null($empfehlungData->empfehlung) ? '' : 'hidden' ?>"
                                                      id="approveAnrechnungDetail-empfehlungDetail-empfehlungIsNull">
                                                     <?php echo $this->p->t('anrechnung', 'keineEmpfehlungAngefordert'); ?>
                                                 </div>
@@ -181,9 +180,111 @@ $this->load->view(
                                     </button>
                                 </div>
                             </div>
+                        </div><br><br>
+                        <!-- Genehmigungssdaten -->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <form>
+                                    <input type="hidden" name="anrechnung_id" value="<?php echo $anrechnungData->anrechnung_id ?>">
+                                    <div class="panel panel-default" id="test">
+                                        
+                                        <div class="panel-heading">
+                                            <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'genehmigung'); ?></b></span>
+                                            <div class="pull-right">
+							                    <?php echo $this->p->t('anrechnung', 'abgeschlossenVon'); ?>:
+                                                <span id="approveAnrechnungDetail-abgeschlossenVon"><?php echo $genehmigungData->abgeschlossen_von ?></span>
+                                                &emsp;|&emsp;
+							                    <?php echo $this->p->t('anrechnung', 'abschlussdatum'); ?>:
+                                                <span id="approveAnrechnungDetail-abgeschlossenAm"><?php echo $genehmigungData->abgeschlossen_am ?></span>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-body" id="approveAnrechnungDetail-genehmigungDetail">
+
+                                            <div class="panel panel-default panel-body <?php echo is_null($genehmigungData->genehmigung) ? '' : 'hidden' ?>"
+                                                 id="approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull">
+							                    <?php echo $this->p->t('anrechnung', 'nochKeineGenehmigung'); ?>
+                                            </div>
+
+                                            <div class="alert alert-success <?php echo $genehmigungData->genehmigung === true ? '' : 'hidden' ?>"
+                                                 id="approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv">
+                                                <b><?php echo $this->p->t('anrechnung', 'genehmigungPositiv'); ?></b>
+                                            </div>
+
+                                            <div class="<?php echo $genehmigungData->genehmigung === false ? '' : 'hidden' ?>"
+                                                 id="approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ">
+                                                <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'genehmigungNegativ'); ?></b></div>
+                                                <div class="well"><b><?php echo $this->p->t('global', 'begruendung'); ?>: </b>
+                                                    <span id="approveAnrechnungDetail-genehmigungDetail-begruendung"><?php echo $genehmigungData->notiz ?></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="panel panel-default panel-body" style="display: none"
+                                                 id="approveAnrechnungDetail-begruendung-panel">
+                                                <div>
+                                                    <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'genehmigungNegativ'); ?></b></div>
+                                                    <h4><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></h4><br>
+                                                    <ol>
+                                                        <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativPruefungNichtMoeglich'); ?>
+                                                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                                                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertig'); ?>
+                                                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                                                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
+                                                    </ol><br>
+                                                    <textarea class="form-control" name="begruendung" id="approveAnrechnungDetail-begruendung"
+                                                              rows="2" required></textarea>
+                                                </div>
+                                                <br>
+                                                <!-- Action Button 'Abbrechen'-->
+                                                <div class="pull-right">
+                                                    <button id="approveAnrechnungDetail-begruendung-abbrechen" class="btn btn-default btn-w200">
+									                    <?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="panel panel-default panel-body" style="display: none"
+                                                 id="approveAnrechnungDetail-genehmigung-panel">
+                                                <div>
+                                                    <div class="alert alert-success"><b><?php echo $this->p->t('anrechnung', 'genehmigungPositiv'); ?></b></div>
+                                                </div>
+                                                <br>
+                                                <!-- Action Button 'Abbrechen'-->
+                                                <div class="pull-right">
+                                                    <button id="approveAnrechnungDetail-genehmigung-abbrechen" class="btn btn-default btn-w200">
+									                    <?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
+                        
                     </div>
                 </div>
+
+                <div class="pull-right">
+                    <button id="reject-anrechnung" class="btn btn-danger btn-w200"
+			            <?php echo $anrechnungData->status_kurzbz == 'inProgressDP' ? '' : 'disabled' ?>>
+			            <?php echo ucfirst($this->p->t('global', 'ablehnen')); ?>
+                    </button>
+                    <button id="approve-anrechnung" class="btn btn-primary btn-w200"
+			            <?php echo $anrechnungData->status_kurzbz == 'inProgressDP' ? '' : 'disabled' ?>>
+			            <?php echo ucfirst($this->p->t('global', 'genehmigen')); ?>
+                    </button>
+                </div>
+                
             </div>
             
             <div class="col-xs-4">

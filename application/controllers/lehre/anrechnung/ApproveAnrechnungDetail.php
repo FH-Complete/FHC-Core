@@ -85,6 +85,12 @@ class approveAnrechnungDetail extends Auth_Controller
 			show_error('Missing data for recommendation');
 		}
 
+		// Get Genehmigung data
+		if(!$genehmigungData = getData($this->anrechnunglib->getGenehmigungData($anrechnung_id)))
+		{
+			show_error('Missing data for recommendation');
+		}
+
 		$viewData = array(
 			'antragData' => $this->anrechnunglib->getAntragData(
 				$student_uid = $this->PrestudentModel->getUID($anrechnungData->prestudent_id),
@@ -92,7 +98,8 @@ class approveAnrechnungDetail extends Auth_Controller
 				$anrechnungData->lehrveranstaltung_id
 			),
 			'anrechnungData' => $anrechnungData,
-			'empfehlungData' => $empfehlungData
+			'empfehlungData' => $empfehlungData,
+			'genehmigungData' => $genehmigungData
 		);
 		
 		$this->load->view('lehre/anrechnung/approveAnrechnungDetail.php', $viewData);
@@ -117,6 +124,11 @@ class approveAnrechnungDetail extends Auth_Controller
 			? $approved->bezeichnung_mehrsprachig[0]
 			: $approved->bezeichnung_mehrsprachig[1];
 		
+		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
+		{
+			show_error('Failed retrieving person data');
+		}
+		
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
@@ -125,7 +137,9 @@ class approveAnrechnungDetail extends Auth_Controller
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
-					'status_bezeichnung' => $approved
+					'status_bezeichnung' => $approved,
+					'abgeschlossen_am'          => (new DateTime())->format('d.m.Y'),
+					'abgeschlossen_von'         => $person->vorname. ' '. $person->nachname
 				);
 				
 				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_APPROVED))
@@ -165,15 +179,22 @@ class approveAnrechnungDetail extends Auth_Controller
 			? $rejected->bezeichnung_mehrsprachig[0]
 			: $rejected->bezeichnung_mehrsprachig[1];
 		
+		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
+		{
+			show_error('Failed retrieving person data');
+		}
+		
 		foreach ($data as $item)
 		{
 			// Reject Anrechnung
 			if(getData($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung'])))
 			{
 				$json[]= array(
-					'anrechnung_id' => $item['anrechnung_id'],
-					'status_kurzbz' => self::ANRECHNUNGSTATUS_REJECTED,
-					'status_bezeichnung' => $rejected
+					'anrechnung_id'         => $item['anrechnung_id'],
+					'status_kurzbz'         => self::ANRECHNUNGSTATUS_REJECTED,
+					'status_bezeichnung'    => $rejected,
+					'abgeschlossen_am'      => (new DateTime())->format('d.m.Y'),
+					'abgeschlossen_von'     => $person->vorname. ' '. $person->nachname
 				);
 				
 				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_REJECTED))
