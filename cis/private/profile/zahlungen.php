@@ -195,6 +195,8 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 	$konto->getBuchungstyp();
 	$buchungstyp = array();
 
+	echo $p->t('tools/zahlungenHinweis');
+
 	foreach ($konto->result as $row)
 		$buchungstyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
 
