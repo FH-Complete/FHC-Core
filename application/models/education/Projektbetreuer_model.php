@@ -41,4 +41,23 @@ class Projektbetreuer_model extends DB_Model
             return error ('Incorrect parameter type');
         }
     }
+
+	/**
+	 * Get Projektbetreuer data by authentification token
+	 * @param $zugangstoken
+	 * @return object
+	 */
+    public function getBetreuerByToken($zugangstoken)
+	{
+		$qry = '
+			SELECT tbl_projektbetreuer.person_id, tbl_projektbetreuer.projektarbeit_id, student_uid
+			FROM lehre.tbl_projektbetreuer
+			JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
+			WHERE zugangstoken = ? AND zugangstoken_gueltigbis >= NOW()
+			ORDER BY tbl_projektbetreuer.insertamum DESC, projektarbeit_id DESC
+			LIMIT 1
+		';
+
+		return $this->execQuery($qry, array($zugangstoken));
+	}
 }
