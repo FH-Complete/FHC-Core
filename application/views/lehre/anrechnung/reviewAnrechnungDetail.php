@@ -66,6 +66,11 @@ $this->load->view(
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
+                                        </span>&emsp;
+                                        <span class="reviewAnrechnungDetail-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
+                                              title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
+                                                            <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                        </span>
                                         <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
                                                     id="reviewAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
                                     </div>

@@ -21,6 +21,9 @@ $(function(){
     // Set status alert color
     reviewAnrechnung.setStatusAlertColor();
 
+    // Init tooltips
+    reviewAnrechnung.initTooltips();
+
     // Copy Begruendung into textarea
     $(".btn-copyIntoTextarea").click(function(){
            reviewAnrechnung.copyIntoTextarea(this);
@@ -194,6 +197,14 @@ var reviewAnrechnung = {
             default:
                 $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
         }
+    },
+    initTooltips: function (){
+        $('[data-toggle="tooltip"]').tooltip({
+                delay: { "show": 200, "hide": 200 },
+                html: true
+        }
+        );
+
     },
     copyIntoTextarea: function(elem){
 

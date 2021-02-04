@@ -4,6 +4,11 @@ const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 $(function(){
     // Set status alert color
     requestAnrechnung.setStatusAlertColor();
+
+    // Init tooltips
+    requestAnrechnung.initTooltips();
+
+
 })
 
 var requestAnrechnung = {
@@ -23,5 +28,12 @@ var requestAnrechnung = {
             default:
                 $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
         }
+    },
+    initTooltips: function (){
+        $('[data-toggle="tooltip"]').tooltip({
+                delay: { "show": 200, "hide": 200 },
+                html: true
+            }
+        );
     }
 }

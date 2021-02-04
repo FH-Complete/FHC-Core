@@ -67,7 +67,11 @@ $this->load->view(
                                     <div class="col-lg-12">
                                         <div class="panel panel-default">
                                             <div class="panel-heading">
-                                                <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>
+                                                <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'antrag'); ?></b></span>&emsp;
+                                                <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
+                                                      title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
+                                                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                </span>
                                                 <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
                                                             id="requestAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
                                             </div>
@@ -115,7 +119,7 @@ $this->load->view(
                                 <!-- Antrag mit Checkboxen -->
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <div class="well" style="border:solid black 2px">
+                                        <div class="well" style="border:solid black 3px">
                                             <p><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></p>
                                             <div class="checkbox">
                                                 <label>
@@ -141,7 +145,11 @@ $this->load->view(
                                     <div class="col-lg-12">
                                         <div class="panel panel-default">
                                             <div class="panel-heading">
-												<?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?>
+                                                <b><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></b>&emsp;
+                                                <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
+                                                      title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
+                                                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                </span>
                                             </div>
                                             <div class="form-inline panel-body">
                                                 <div class="form-group">
@@ -149,6 +157,10 @@ $this->load->view(
                                                            name="uploadfile" accept=".pdf" size="50"
                                                            required <?php echo $disabled; ?>>
                                                 </div>
+                                                <span id="requestAnrechnung-uploadTooltip" data-toggle="tooltip" data-placement="right"
+                                                   title="<?php echo $this->p->t('ui', 'uploadTooltipText'); ?>">
+                                                    <i class="fa fa-lg fa-question-circle-o" aria-hidden="true"></i>
+                                                </span>
 												<?php if (!empty($anrechnungData->dms_id)): ?>
                                                     <a class="pull-right"
                                                        href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
@@ -165,7 +177,11 @@ $this->load->view(
                                             <div class="col-lg-12">
                                                 <div class="panel panel-default">
                                                     <div class="panel-heading">
-														<?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?>
+                                                        <b><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></b>&emsp;
+                                                        <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
+                                                              title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
+                                                            <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                        </span>
                                                     </div>
                                                     <div class="panel-body">
                                                         <textarea class="form-control" name="anmerkung" rows="2"
@@ -175,6 +191,11 @@ $this->load->view(
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <!-- Submit button 'Anrechnung beantragen'-->
+                                <div class="pull-right">
+                                    <input type="submit" id="requestAnrechnung-submit" class="btn btn-primary"
+                                           value="<?php echo $this->p->t('anrechnung', 'anrechnungBeantragen'); ?>" <?php echo $disabled; ?>>
                                 </div>
                             </div>
                         </div>
@@ -197,13 +218,6 @@ $this->load->view(
 				<?php endif; ?>
                 <br>
 				<?php $this->load->view('lehre/anrechnung/requestAnrechnungImportant'); ?>
-            </div>
-        </div>
-        <!-- Submit button 'Anrechnung beantragen'-->
-        <div class="row">
-            <div class="col-xs-8">
-                <input type="submit" id="requestAnrechnung-submit" class="btn btn-primary pull-right"
-                       value="<?php echo $this->p->t('anrechnung', 'anrechnungBeantragen'); ?>" <?php echo $disabled; ?>>
             </div>
         </div>
 		<?php echo form_close(); ?>

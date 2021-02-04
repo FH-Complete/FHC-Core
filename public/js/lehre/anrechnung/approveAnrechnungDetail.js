@@ -20,6 +20,9 @@ $(function(){
     // Set status alert color
     approveAnrechnungDetail.setStatusAlertColor();
 
+    // Init tooltips
+    approveAnrechnungDetail.initTooltips();
+
     // Approve Anrechnungen
     $("#approve-anrechnung").click(function(){
         let genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
@@ -233,6 +236,13 @@ var approveAnrechnungDetail = {
             default:
                 $('#approveAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
         }
+    },
+    initTooltips: function (){
+        $('[data-toggle="tooltip"]').tooltip({
+                delay: { "show": 200, "hide": 200 },
+                html: true
+        }
+        );
     },
     copyIntoTextarea: function(elem){
 
