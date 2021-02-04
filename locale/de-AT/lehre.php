@@ -41,4 +41,5 @@ $this->phrasen['lehre/studienordnung']='Studienordnung';
 $this->phrasen['lehre/studienplan']='Studienplan';
 $this->phrasen['lehre/noteneingabedeaktiviert']='Noteneingabe deaktiviert';
 $this->phrasen['lehre/anerkennungNachgewiesenerKenntnisse']='Anerkennung nachgewiesener Kenntnisse';
+$this->phrasen['lehre/anrechnung']='Anrechnung';
 ?>

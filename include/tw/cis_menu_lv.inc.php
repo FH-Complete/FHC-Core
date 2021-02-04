@@ -473,8 +473,8 @@ function checkZeilenUmbruch()
         (
             'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse',
             'position'=>'128',
-            'name'=>$p->t('lehre/anerkennungNachgewiesenerKenntnisse'),
-            'icon'=>'../../../skin/images/button_kreuzerltool.png',
+            'name'=>$p->t('lehre/anrechnung'),
+            'icon'=>'../../../skin/images/button_listen.png',
             'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid)
         );
     }
