@@ -208,7 +208,7 @@ class Notiz_model extends DB_Model
 	}
 	
 	/**
-	 * Get Notiz by Anrechnung and title
+	 * Get Notizen by Anrechnung and title ordered last first
 	 *
 	 * @param $anrechnung_id
 	 * @return array
@@ -216,6 +216,7 @@ class Notiz_model extends DB_Model
 	public function getNotizByAnrechnung($anrechnung_id, $titel = null)
 	{
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
+		$this->addOrder('insertamum', 'DESC');
 		
 		if (is_string($titel))
 		{
