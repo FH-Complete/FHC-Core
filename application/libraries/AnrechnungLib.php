@@ -379,9 +379,7 @@ class AnrechnungLib
 		$this->ci->AnrechnungModel->update(
 			$anrechnung_id,
 			array(
-				'genehmigt_von' => $stgl_uid,
-				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
-				'updatevon'     => $stgl_uid
+				'genehmigt_von' => $stgl_uid
 			)
 		);
 
@@ -523,9 +521,7 @@ class AnrechnungLib
 		$this->ci->AnrechnungModel->update(
 			$anrechnung_id,
 			array(
-				'empfehlung_anrechnung' => null,
-				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
-				'updatevon'     => getAuthUID()
+				'empfehlung_anrechnung' => null
 			)
 		);
 		
@@ -566,8 +562,6 @@ class AnrechnungLib
 		// Start DB transaction
 		$this->ci->db->trans_start(false);
 		
-		$lektor_uid = getAuthUID();
-		
 		// Insert new status progessed by stgl
 		$this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
 		
@@ -575,9 +569,7 @@ class AnrechnungLib
 		$this->ci->AnrechnungModel->update(
 			$anrechnung_id,
 			array(
-				'empfehlung_anrechnung' => true,
-				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
-				'updatevon'     => $lektor_uid
+				'empfehlung_anrechnung' => true
 			)
 		);
 		
@@ -618,8 +610,6 @@ class AnrechnungLib
 		// Start DB transaction
 		$this->ci->db->trans_start(false);
 		
-		$lektor_uid = getAuthUID();
-		
 		// Insert new status progessed by stgl
 		$this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
 		
@@ -627,11 +617,11 @@ class AnrechnungLib
 		$this->ci->AnrechnungModel->update(
 			$anrechnung_id,
 			array(
-				'empfehlung_anrechnung' => false,
-				'updateamum'    => (new DateTime())->format('Y-m-d H:m:i'),
-				'updatevon'     => $lektor_uid
+				'empfehlung_anrechnung' => false
 			)
 		);
+		
+		$lektor_uid = getAuthUID();
 		
 		// Add begruendung as notiz
 		$this->ci->load->model('person/Notiz_model', 'NotizModel');
