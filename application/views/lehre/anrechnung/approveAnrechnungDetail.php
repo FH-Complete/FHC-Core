@@ -136,11 +136,11 @@ $this->load->view(
 
                                         <div class="panel-heading">
                                             <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></b></span>&emsp;
-                                            <span class="approveAnrechnungDetail-empfehlungInfoTooltip"
-                                                  data-toggle="tooltip" data-placement="right"
-                                                  title="<?php echo $this->p->t('anrechnung', 'empfehlungInfoTooltipText'); ?>">
-                                                            <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
-                                                        </span>
+<!--                                            <span class="approveAnrechnungDetail-empfehlungInfoTooltip"-->
+<!--                                                  data-toggle="tooltip" data-placement="right"-->
+<!--                                                  title="--><?php //echo $this->p->t('anrechnung', 'empfehlungInfoTooltipText'); ?><!--">-->
+<!--                                                            <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>-->
+<!--                                                        </span>-->
                                             <div class="pull-right">
 												<?php echo $this->p->t('anrechnung', 'empfehlungVon'); ?>:
                                                 <span id="approveAnrechnungDetail-empfehlungVon"><?php echo $empfehlungData->empfehlung_von ?></span>
@@ -203,11 +203,11 @@ $this->load->view(
 
                                     <div class="panel-heading">
                                         <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'genehmigung'); ?></b></span>&emsp;
-                                        <span class="approveAnrechnungDetail-genehmigungInfoTooltip"
-                                              data-toggle="tooltip" data-placement="right"
-                                              title="<?php echo $this->p->t('anrechnung', 'genehmigungInfoTooltipText'); ?>">
-                                                            <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
-                                                        </span>
+<!--                                        <span class="approveAnrechnungDetail-genehmigungInfoTooltip"-->
+<!--                                              data-toggle="tooltip" data-placement="right"-->
+<!--                                              title="--><?php //echo $this->p->t('anrechnung', 'genehmigungInfoTooltipText'); ?><!--">-->
+<!--                                                            <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>-->
+<!--                                                        </span>-->
                                         <div class="pull-right">
 											<?php echo $this->p->t('anrechnung', 'abgeschlossenVon'); ?>:
                                             <span id="approveAnrechnungDetail-abgeschlossenVon"><?php echo $genehmigungData->abgeschlossen_von ?></span>
