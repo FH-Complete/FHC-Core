@@ -37,6 +37,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		
 		// Load libraries
 		$this->load->library('WidgetLib');
@@ -309,23 +310,28 @@ class approveAnrechnungDetail extends Auth_Controller
 	 */
 	private function _checkIfEntitledToReadAnrechnung($anrechnung_id)
 	{
-		// Retrieve studiengaenge the user is entitled for
-		$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN);
-		
 		$result = $this->AnrechnungModel->load($anrechnung_id);
 		
 		if(!$result = getData($result)[0])
 		{
-			show_error('Failed retrieving Anrechnung');
+			show_error('Failed loading Anrechnung');
 		}
 		
 		$result = $this->LehrveranstaltungModel->loadWhere(array(
 			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
 		));
 		
+		if(!$result = getData($result)[0])
+		{
+			show_error('Failed loading Lehrveranstaltung');
+		}
+		
+		// Get STGL
+		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
+
 		if($result = getData($result)[0])
 		{
-			if (in_array($result->studiengang_kz, $studiengang_kz_arr))
+			if ($result->uid == $this->_uid)
 			{
 				return;
 			}
@@ -340,9 +346,6 @@ class approveAnrechnungDetail extends Auth_Controller
 	 */
 	private function _checkIfEntitledToReadDMSDoc($dms_id)
 	{
-		// Retrieve studiengaenge the user is entitled for
-		$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN);
-		
 		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
 		
 		if(!$result = getData($result)[0])
@@ -354,9 +357,17 @@ class approveAnrechnungDetail extends Auth_Controller
 			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
 		));
 		
+		if(!$result = getData($result)[0])
+		{
+			show_error('Failed loading Lehrveranstaltung');
+		}
+		
+		// Get STGL
+		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
+		
 		if($result = getData($result)[0])
 		{
-			if (in_array($result->studiengang_kz, $studiengang_kz_arr))
+			if ($result->uid == $this->_uid)
 			{
 				return;
 			}

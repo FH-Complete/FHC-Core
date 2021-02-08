@@ -276,10 +276,6 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	 */
 	private function _checkIfEntitledToReadDMSDoc($dms_id)
 	{
-		// Retrieve studiengaenge the user is entitled for
-		$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN);
-		
-		
 		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
 		
 		if(!$result = getData($result)[0])
@@ -291,9 +287,18 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
 		));
 		
+		
+		if(!$result = getData($result)[0])
+		{
+			show_error('Failed loading Lehrveranstaltung');
+		}
+		
+		// Get STGL
+		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
+		
 		if($result = getData($result)[0])
 		{
-			if (in_array($result->studiengang_kz, $studiengang_kz_arr))
+			if ($result->uid == $this->_uid)
 			{
 				return;
 			}
