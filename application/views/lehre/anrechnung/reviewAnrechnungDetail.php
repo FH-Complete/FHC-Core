@@ -255,7 +255,7 @@ $this->load->view(
             <div class="col-xs-4">
                 <div class="alert text-center">
                     Status:
-                    <b><span class="text-uppercase" id="reviewAnrechnung-status_kurzbz"
+                    <b><span class="text-uppercase" id="reviewAnrechnungDetail-status_kurzbz"
                              data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
                             <?php echo $anrechnungData->status; ?>
                         </span></b>

@@ -180,20 +180,20 @@ $(function(){
 
 var reviewAnrechnung = {
     setStatusAlertColor: function () {
-        let status_kurzbz = $('#reviewAnrechnung-status_kurzbz').data('status_kurzbz');
+        let status_kurzbz = $('#reviewAnrechnungDetail-status_kurzbz').data('status_kurzbz');
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-success');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-success');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-danger');
                 break;
             case '':
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-info');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-info');
                 break;
             default:
-                $('#reviewAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
         }
     },
     initTooltips: function (){
@@ -215,18 +215,18 @@ var reviewAnrechnung = {
     formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon, statusBezeichnung){
         $('#reviewAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
         $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungIsTrue').removeClass('hidden');
-        $('#reviewAnrechnung-status_kurzbz').text(statusBezeichnung);
-        $('#recommend-anrechnung').prop('disabled', true);
-        $('#dont-recommend-anrechnung').prop('disabled', true);
+        $('#reviewAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+        $('#reviewAnrechnungDetail-recommend-anrechnung-ask').prop('disabled', true);
+        $('#reviewAnrechnungDetail-dont-recommend-anrechnung-ask').prop('disabled', true);
         $('#reviewAnrechnungDetail-empfehlungAm').text(empfehlungAm);
         $('#reviewAnrechnungDetail-empfehlungVon').text(emfehlungVon);
     },
     formatEmpfehlungIsFalse: function(empfehlungAm, emfehlungVon, statusBezeichnung, begruendung){
         $('#reviewAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
         $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungIsFalse').removeClass('hidden');
-        $('#reviewAnrechnung-status_kurzbz').text(statusBezeichnung);
-        $('#recommend-anrechnung').prop('disabled', true);
-        $('#dont-recommend-anrechnung').prop('disabled', true);
+        $('#reviewAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+        $('#reviewAnrechnungDetail-recommend-anrechnung-ask').prop('disabled', true);
+        $('#reviewAnrechnungDetail-dont-recommend-anrechnung-ask').prop('disabled', true);
         $('#reviewAnrechnungDetail-empfehlungAm').text(empfehlungAm);
         $('#reviewAnrechnungDetail-empfehlungVon').text(emfehlungVon);
         $('#reviewAnrechnungDetail-empfehlungDetail-begruendung').text(begruendung);

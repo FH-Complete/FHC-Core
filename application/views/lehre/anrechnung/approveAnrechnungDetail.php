@@ -187,7 +187,7 @@ $this->load->view(
                                     </div>
                                 </form>
                                 <div class="pull-right">
-                                    <button id="request-recommendation" class="btn btn-primary btn-w200"
+                                    <button id="approveAnrechnungDetail-request-recommendation" class="btn btn-primary btn-w200"
 										<?php echo is_null($empfehlungData->empfehlung) && $anrechnungData->status_kurzbz == 'inProgressDP' ? '' : 'disabled' ?>>
 										<?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?>
                                     </button>
@@ -334,7 +334,7 @@ $this->load->view(
             <div class="col-xs-4">
                 <div class="alert text-center">
                     Status:
-                    <b><span class="text-uppercase" id="approveAnrechnung-status_kurzbz"
+                    <b><span class="text-uppercase" id="approveAnrechnungDetail-status_kurzbz"
                              data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
                             <?php echo $anrechnungData->status; ?>
                         </span></b>

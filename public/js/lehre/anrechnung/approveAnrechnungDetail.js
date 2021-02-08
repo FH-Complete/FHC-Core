@@ -158,7 +158,7 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#request-recommendation").click(function(){
+    $("#approveAnrechnungDetail-request-recommendation").click(function(){
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -222,20 +222,20 @@ $(function(){
 
 var approveAnrechnungDetail = {
     setStatusAlertColor: function () {
-        let status_kurzbz = $('#approveAnrechnung-status_kurzbz').data('status_kurzbz');
+        let status_kurzbz = $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz');
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#approveAnrechnung-status_kurzbz').closest('div').addClass('alert-success');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-success');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#approveAnrechnung-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-danger');
                 break;
             case '':
-                $('#approveAnrechnung-status_kurzbz').closest('div').addClass('alert-info');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-info');
                 break;
             default:
-                $('#approveAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
         }
     },
     initTooltips: function (){
@@ -257,32 +257,32 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsAngefordert').removeClass('hidden');
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungAngefordertAm').text(empfehlungAngefordertAm);
-        $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
-        $('#request-recommendation').prop('disabled', true);
-        $('#approve-anrechnung').prop('disabled', true);
-        $('#reject-anrechnung').prop('disabled', true);
+        $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+        $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
+        $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
+        $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
     },
     formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung){
         $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').removeClass('hidden');
-        $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
-        $('#approveAnrechnung-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-success');
+        $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-success');
         $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
         $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
-        $('#request-recommendation').prop('disabled', true);
-        $('#approve-anrechnung').prop('disabled', true);
-        $('#reject-anrechnung').prop('disabled', true);
+        $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
+        $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
+        $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
     },
     formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung, begruendung){
         $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').removeClass('hidden');
-        $('#approveAnrechnung-status_kurzbz').text(statusBezeichnung);
-        $('#approveAnrechnung-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-danger');
+        $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-danger');
         $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
         $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
         $('#approveAnrechnungDetail-genehmigungDetail-begruendung').text(begruendung);
-        $('#request-recommendation').prop('disabled', true);
-        $('#approve-anrechnung').prop('disabled', true);
-        $('#reject-anrechnung').prop('disabled', true);
+        $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
+        $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
+        $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
     }
 }
