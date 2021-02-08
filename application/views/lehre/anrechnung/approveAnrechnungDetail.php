@@ -170,7 +170,7 @@ $this->load->view(
 
                                             <div class="alert alert-success <?php echo $empfehlungData->empfehlung === true ? '' : 'hidden' ?>"
                                                  id="approveAnrechnungDetail-empfehlungDetail-empfehlungIsTrue">
-                                                <b><?php echo $this->p->t('anrechnung', 'empfehlungPositiv'); ?></b>
+                                                <b><?php echo $this->p->t('anrechnung', 'empfehlungPositivConfirmed'); ?></b>
                                             </div>
 
                                             <div class="<?php echo $empfehlungData->empfehlung === false ? '' : 'hidden' ?>"
