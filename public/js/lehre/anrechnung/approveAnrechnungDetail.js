@@ -7,6 +7,10 @@ const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 
 $(function(){
+
+    const genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
+    const begruendung_panel = $('#approveAnrechnungDetail-begruendung-panel');
+
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
     var canPromise = !! window.Promise;
@@ -23,10 +27,8 @@ $(function(){
     // Init tooltips
     approveAnrechnungDetail.initTooltips();
 
-    // Approve Anrechnungen
-    $("#approve-anrechnung").click(function(){
-        let genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
-        let begruendung_panel = $('#approveAnrechnungDetail-begruendung-panel');
+    // Ask if Approve Anrechnungen
+    $("#approveAnrechnungDetail-approve-anrechnung-ask").click(function(){
 
         begruendung_panel.css('display', 'none');
 
@@ -36,9 +38,12 @@ $(function(){
             genehmigung_panel.slideDown('slow');
             return;
         }
+    });
+
+    // Approve Anrechnungen
+    $("#approveAnrechnungDetail-approve-anrechnung-confirm").click(function(){
 
         // Get form data
-        // index 0: anrechnung_id
         let form_data = $('form').serializeArray();
 
         // Prepare data object for ajax call
@@ -80,11 +85,8 @@ $(function(){
         );
     });
 
-    // Reject Anrechnungen
-    $("#reject-anrechnung").click(function(){
-        let begruendung_panel = $('#approveAnrechnungDetail-begruendung-panel');
-        let begruendung = $('#approveAnrechnungDetail-begruendung').val();
-        let genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
+    // Ask if Reject Anrechnungen
+    $("#approveAnrechnungDetail-reject-anrechnung-ask").click(function(){
 
         genehmigung_panel.css('display', 'none');
 
@@ -94,25 +96,25 @@ $(function(){
             begruendung_panel.slideDown('slow');
             return;
         }
-        else
-        {
-            // Check if begruendung is given
-            if (!begruendung.trim()) // empty or white spaces only
-            {
-                FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
-                return;
-            }
-        }
+    });
 
-        // Get form data
-        // index 0: anrechnung_id
-        let form_data = $('form').serializeArray();
+    // Reject Anrechnungen
+    $("#approveAnrechnungDetail-reject-anrechnung-confirm").click(function(){
 
-        // Confirm before rejecting
-        if(!confirm('Wollen Sie wirklich für die gewählten Anträge keine Empfehlung abgeben?'))
+        let begruendung = $('#approveAnrechnungDetail-begruendung').val();
+
+        // Check if begruendung is given
+        if (!begruendung.trim()) // empty or white spaces only
         {
+            FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
             return;
         }
+
+        // Avoid form redirecting automatically
+        event.preventDefault();
+
+        // Get form data
+        let form_data = $('form').serializeArray();
 
         // Prepare data object for ajax call
         let data = {
@@ -159,7 +161,6 @@ $(function(){
     $("#request-recommendation").click(function(){
 
         // Get form data
-        // index 0: anrechnung_id
         let form_data = $('form').serializeArray();
 
 
@@ -205,14 +206,14 @@ $(function(){
 
     // Break Genehmigung abgeben
     $('#approveAnrechnungDetail-genehmigung-abbrechen').click(function(){
-        $('#approveAnrechnungDetail-genehmigung-panel').slideUp('slow');
+        genehmigung_panel.slideUp('slow');
 
     })
 
     // Break Begruendung abgeben
     $('#approveAnrechnungDetail-begruendung-abbrechen').click(function(){
         $('#approveAnrechnungDetail-begruendung').val('');
-        $('#approveAnrechnungDetail-begruendung-panel').slideUp('slow');
+        begruendung_panel.slideUp('slow');
 
     })
 
@@ -250,7 +251,7 @@ var approveAnrechnungDetail = {
         let textarea = $(elem).closest('div').find('textarea');
 
         // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().text()));
+        textarea.val($.trim($(elem).parent().find('span:first').text()));
     },
     formatEmpfehlungIsRequested: function(empfehlungAngefordertAm, statusBezeichnung) {
         $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');

@@ -98,6 +98,10 @@ function tableWidgetHook_selectAllButton(tableWidgetDiv){
 
 
 $(function(){
+
+    const empfehlung_panel = $('#reviewAnrechnungUebersicht-empfehlung-panel');
+    const begruendung_panel = $('#reviewAnrechnungUebersicht-begruendung-panel');
+
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
     var canPromise = !! window.Promise;
@@ -177,10 +181,8 @@ $(function(){
         }
     })
 
-    // Recommend Anrechnungen
-    $("#recommend-anrechnungen").click(function(){
-        let empfehlung_panel = $('#reviewAnrechnungUebersicht-empfehlung-panel');
-        let begruendung_panel = $('#reviewAnrechnungUebersicht-begruendung-panel');
+    // Ask ifRecommend Anrechnungen
+    $("#reviewAnrechnungUebersicht-recommend-anrechnungen-ask").click(function(){
 
         begruendung_panel.css('display', 'none');
 
@@ -190,6 +192,10 @@ $(function(){
             empfehlung_panel.slideDown('slow');
             return;
         }
+    });
+
+    // Recommend Anrechnungen
+    $("#reviewAnrechnungUebersicht-recommend-anrechnungen-confirm").click(function(){
 
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
@@ -245,12 +251,8 @@ $(function(){
         );
     });
 
-    // Dont recommend Anrechnungen (Overview GUI)
-    $("#dont-recommend-anrechnungen").click(function(){
-
-        let begruendung_panel = $('#reviewAnrechnungUebersicht-begruendung-panel');
-        let begruendung = $('#reviewAnrechnungUebersicht-begruendung').val();
-        let empfehlung_panel = $('#reviewAnrechnungUebersicht-empfehlung-panel');
+    // Ask if Dont recommend Anrechnungen
+    $("#reviewAnrechnungUebersicht-dont-recommend-anrechnungen-ask").click(function(){
 
         empfehlung_panel.css('display', 'none');
 
@@ -260,14 +262,20 @@ $(function(){
             begruendung_panel.slideDown('slow');
             return;
         }
-        else
+    });
+
+    // Dont recommend Anrechnungen
+    $("#reviewAnrechnungUebersicht-dont-recommend-anrechnungen-confirm").click(function(){
+
+        let begruendung = $('#reviewAnrechnungUebersicht-begruendung').val();
+
+        empfehlung_panel.css('display', 'none');
+
+        // Check if begruendung is given
+        if (!begruendung.trim()) // empty or white spaces only
         {
-            // Check if begruendung is given
-            if (!begruendung.trim()) // empty or white spaces only
-            {
-                FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
-                return;
-            }
+            FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
+            return;
         }
 
         // Get selected rows data and add begruendung
@@ -287,11 +295,8 @@ $(function(){
             return;
         }
 
-        // Confirm before rejecting
-        if(!confirm('Wollen Sie wirklich für die gewählten Anträge keine Empfehlung abgeben?'))
-        {
-            return;
-        }
+        // Avoid form redirecting automatically
+        event.preventDefault();
 
         // Prepare data object for ajax call
         let data = {
@@ -332,14 +337,14 @@ $(function(){
 
     // Break Empfehlung abgeben
     $('#reviewAnrechnungUebersicht-empfehlung-abbrechen').click(function(){
-        $('#reviewAnrechnungUebersicht-empfehlung-panel').slideUp('slow');
+        empfehlung_panel.slideUp('slow');
 
     })
 
     // Break Begruendung abgeben
     $('#reviewAnrechnungUebersicht-begruendung-abbrechen').click(function(){
         $('#reviewAnrechnungUebersicht-begruendung').val('');
-        $('#reviewAnrechnungUebersicht-begruendung-panel').slideUp('slow');
+        begruendung_panel.slideUp('slow');
 
     })
 

@@ -12,15 +12,15 @@ $this->load->view(
 		'dialoglib' => true,
 		'tablewidget' => true,
 		'phrases' => array(
-            'global' => array(
-                'begruendung'
-            ),
-            'anrechnung' => array(
-                'nachweisdokumente',
-                'empfehlung',
-                'confirmTextAntragHatBereitsEmpfehlung',
-                'herkunft'
-            ),
+			'global' => array(
+				'begruendung'
+			),
+			'anrechnung' => array(
+				'nachweisdokumente',
+				'empfehlung',
+				'confirmTextAntragHatBereitsEmpfehlung',
+				'herkunft'
+			),
 			'ui' => array(
 				'anzeigen',
 				'alleAnzeigen',
@@ -35,15 +35,15 @@ $this->load->view(
 				'tabelleneinstellungen',
 				'keineDatenVorhanden',
 				'spaltenEinstellen',
-                'ja',
-                'nein',
-                'nichtSelektierbarAufgrundVon'
+				'ja',
+				'nein',
+				'nichtSelektierbarAufgrundVon'
 			),
 			'person' => array(
 				'student',
 				'personenkennzeichen',
-                'vorname',
-                'nachname'
+				'vorname',
+				'nachname'
 			),
 			'lehre' => array(
 				'studiensemester',
@@ -65,7 +65,7 @@ $this->load->view(
 				'zeilenAuswaehlenEinzeln',
 				'zeilenAuswaehlenBereich',
 				'zeilenAuswaehlenAlle'
-            )
+			)
 		),
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
@@ -77,16 +77,16 @@ $this->load->view(
 
 <body>
 <div id="page-wrapper">
-	<div class="container-fluid">
-		<!-- title -->
-		<div class="row">
-			<div class="col-lg-12 page-header">
-				<h3>
+    <div class="container-fluid">
+        <!-- title -->
+        <div class="row">
+            <div class="col-lg-12 page-header">
+                <h3>
 					<?php echo $this->p->t('anrechnung', 'anrechnungenGenehmigen'); ?>
-					<small>| <?php echo $this->p->t('global', 'uebersicht'); ?></small>
-				</h3>
-			</div>
-		</div>
+                    <small>| <?php echo $this->p->t('global', 'uebersicht'); ?></small>
+                </h3>
+            </div>
+        </div>
         <!-- dropdown studiensemester -->
         <div class="row">
             <div class="col-lg-12">
@@ -105,14 +105,15 @@ $this->load->view(
 						);
 						?>
                     </div>
-                    <button type="submit" class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
+                    <button type="submit"
+                            class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
                 </form>
             </div>
         </div>
         <!-- Tabelle -->
         <div class="row">
             <div class="col-xs-12">
-	            <?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
+				<?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
             </div>
         </div>
         <!-- Genehmigen / Ablehnen Panel -->
@@ -120,8 +121,8 @@ $this->load->view(
             <div class="panel panel-default panel-body" style="display: none"
                  id="approveAnrechnungUebersicht-begruendung-panel">
                 <div>
-                    <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'genehmigungenNegativ'); ?></b></div>
-                    <h4><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></h4><br>
+                    <h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'genehmigungenNegativQuestion'); ?></h4>
+                    &nbsp;<b><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></b><br><br>
                     <ol>
                         <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativPruefungNichtMoeglich'); ?>
                             <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
@@ -150,18 +151,27 @@ $this->load->view(
                     <button id="approveAnrechnungUebersicht-begruendung-abbrechen" class="btn btn-default btn-w200">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
+                    <button id="approveAnrechnungUebersicht-reject-anrechnungen-confirm"
+                            class="btn btn-primary btn-w200">
+						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
+                    </button>
                 </div>
             </div>
             <div class="panel panel-default panel-body" style="display: none"
-                 id="approveAnrechnungUebersicht-empfehlung-panel">
+                 id="approveAnrechnungUebersicht-genehmigung-panel">
                 <div>
-                    <div class="alert alert-success"><b><?php echo $this->p->t('anrechnung', 'genehmigungenPositiv'); ?></b></div>
+                    <h4 class="panel panel-body panel-success text-success"><?php echo $this->p->t('anrechnung', 'genehmigungenPositivQuestion'); ?></h4>
+                    &ensp;<?php echo $this->p->t('anrechnung', 'genehmigungenPositiv'); ?><br><br>
                 </div>
                 <br>
                 <!-- Action Button 'Abbrechen'-->
                 <div class="pull-right">
                     <button id="approveAnrechnungUebersicht-empfehlung-abbrechen" class="btn btn-default btn-w200">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                    </button>
+                    <button id="approveAnrechnungUebersicht-approve-anrechnungen-confirm"
+                            class="btn btn-primary btn-w200">
+						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>
             </div>
@@ -174,33 +184,40 @@ $this->load->view(
                     <div class="btn-group" role="group">
                         <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
-                                title="<?php echo $this->p->t('ui', 'nurEmpfohleneAnzeigen'); ?>"><i class='fa fa-thumbs-o-up'></i>
+                                title="<?php echo $this->p->t('ui', 'nurEmpfohleneAnzeigen'); ?>"><i
+                                    class='fa fa-thumbs-o-up'></i>
                         </button>
                         <button id="show-not-recommended" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
-                                title="<?php echo $this->p->t('ui', 'nurNichtEmpfohleneAnzeigen'); ?>"><i class='fa fa-thumbs-o-down'></i>
+                                title="<?php echo $this->p->t('ui', 'nurNichtEmpfohleneAnzeigen'); ?>"><i
+                                    class='fa fa-thumbs-o-down'></i>
                         </button>
                         <button id="show-approved" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
-                                title="<?php echo $this->p->t('ui', 'nurGenehmigteAnzeigen'); ?>"><i class='fa fa-check'></i>
+                                title="<?php echo $this->p->t('ui', 'nurGenehmigteAnzeigen'); ?>"><i
+                                    class='fa fa-check'></i>
                         </button>
                         <button id="show-rejected" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
-                                title="<?php echo $this->p->t('ui', 'nurAbgelehnteAnzeigen'); ?>"><i class='fa fa-times'></i>
+                                title="<?php echo $this->p->t('ui', 'nurAbgelehnteAnzeigen'); ?>"><i
+                                    class='fa fa-times'></i>
                         </button>
                     </div>
                 </div>
             </div>
-            <!-- Action Buttons 'Genehmigen', 'Empfehlung anfordern'-->
+            <!-- Action Buttons 'Genehmigen', Ablehnen, 'Empfehlung anfordern'-->
             <div class="col-xs-7 col-md-8">
                 <div class="pull-right">
-                    <button id="request-recommendation" class="btn btn-default btn-w200 btn-mr50"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
-                    <button id="reject-anrechnungen" class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
-                    <button id="approve-anrechnungen" class="btn btn-primary btn-w200"><?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>
+                    <button id="approveAnrechnungUebersicht-request-recommendation"
+                            class="btn btn-default btn-w200 btn-mr50"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
+                    <button id="approveAnrechnungUebersicht-reject-anrechnungen-ask"
+                            class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
+                    <button id="approveAnrechnungUebersicht-approve-anrechnungen-ask"
+                            class="btn btn-primary btn-w200"><?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>
                 </div>
             </div>
         </div>
-	</div>
+    </div>
 </div>
 </body>
 

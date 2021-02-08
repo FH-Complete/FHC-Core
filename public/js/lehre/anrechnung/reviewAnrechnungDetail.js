@@ -7,6 +7,10 @@ const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 
 $(function(){
+
+    const empfehlung_panel = $('#reviewAnrechnungDetail-empfehlung-panel');
+    const begruendung_panel = $('#reviewAnrechnungDetail-begruendung-panel');
+
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
     var canPromise = !! window.Promise;
@@ -29,10 +33,8 @@ $(function(){
            reviewAnrechnung.copyIntoTextarea(this);
     })
 
-    // Recommend Anrechnung (Detail GUI)
-    $("#recommend-anrechnung").click(function(){
-        let empfehlung_panel = $('#reviewAnrechnungDetail-empfehlung-panel');
-        let begruendung_panel = $('#reviewAnrechnungDetail-begruendung-panel');
+    // Ask if Recommend Anrechnung
+    $("#reviewAnrechnungDetail-recommend-anrechnung-ask").click(function(){
 
         begruendung_panel.css('display', 'none');
 
@@ -42,9 +44,12 @@ $(function(){
             empfehlung_panel.slideDown('slow');
             return;
         }
+    });
+
+    // Recommend Anrechnung
+    $("#reviewAnrechnungDetail-recommend-anrechnung-confirm").click(function(){
 
         // Get form data
-        // index 0: anrechnung_id
         let form_data = $('form').serializeArray();
 
         // Prepare data object for ajax call
@@ -55,7 +60,7 @@ $(function(){
         };
 
         // Hide begruendung panel again
-        $(empfehlung_panel).slideUp('slow');
+        empfehlung_panel.slideUp('slow');
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/recommend",
@@ -86,13 +91,8 @@ $(function(){
         );
     });
 
-    // Dont recommend Anrechnung (Detail GUI)
-    $("#dont-recommend-anrechnung").click(function(){
-
-        let begruendung_panel = $('#reviewAnrechnungDetail-begruendung-panel');
-        let begruendung = $('#reviewAnrechnungDetail-begruendung').val();
-
-        let empfehlung_panel = $('#reviewAnrechnungDetail-empfehlung-panel');
+    // Ask if Dont recommend Anrechnung
+    $("#reviewAnrechnungDetail-dont-recommend-anrechnung-ask").click(function(){
 
         empfehlung_panel.css('display', 'none');
 
@@ -102,26 +102,25 @@ $(function(){
             begruendung_panel.slideDown('slow');
             return;
         }
-        else
+    });
+
+    // Dont recommend Anrechnung
+    $("#reviewAnrechnungDetail-dont-recommend-anrechnung-confirm").click(function(){
+
+        let begruendung = $('#reviewAnrechnungDetail-begruendung').val();
+
+        // Check if begruendung is given
+        if (!begruendung.trim()) // empty or white spaces only
         {
-            // Check if begruendung is given
-            if (!begruendung.trim()) // empty or white spaces only
-            {
-                FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
-                return;
-            }
-        }
-
-
-        // Get form data
-        // index 0: anrechnung_id
-        let form_data = $('form').serializeArray();
-
-        // Confirm before rejecting
-        if(!confirm('Wollen Sie wirklich für die gewählten Anträge keine Empfehlung abgeben?'))
-        {
+            FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
             return;
         }
+
+        // Avoid form redirecting automatically
+        event.preventDefault();
+
+        // Get form data
+        let form_data = $('form').serializeArray();
 
         // Prepare data object for ajax call
         let data = {
@@ -132,7 +131,7 @@ $(function(){
         }
 
         // Hide begruendung panel again
-        $(begruendung_panel).slideUp('slow');
+        begruendung_panel.slideUp('slow');
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/dontRecommend",
@@ -166,15 +165,14 @@ $(function(){
 
     // Break Empfehlung abgeben
     $('#reviewAnrechnungDetail-empfehlung-abbrechen').click(function(){
-        $('#reviewAnrechnungDetail-empfehlung-panel').slideUp('slow');
+        empfehlung_panel.slideUp('slow');
 
     })
 
     // Break Begruendung abgeben
     $('#reviewAnrechnungDetail-begruendung-abbrechen').click(function(){
         $('#reviewAnrechnungDetail-begruendung').val('');
-        $('#reviewAnrechnungDetail-begruendung-panel').slideUp('slow');
-
+        begruendung_panel.slideUp('slow');
     })
 
 
@@ -212,7 +210,7 @@ var reviewAnrechnung = {
         let textarea = $(elem).closest('div').find('textarea');
 
         // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().text()));
+        textarea.val($.trim($(elem).parent().find('span:first').text()));
     },
     formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon, statusBezeichnung){
         $('#reviewAnrechnungDetail-empfehlungDetail').children().addClass('hidden');

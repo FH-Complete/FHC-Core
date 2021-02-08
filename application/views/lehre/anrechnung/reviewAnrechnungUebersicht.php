@@ -120,23 +120,25 @@ $this->load->view(
             <div class="panel panel-default panel-body" style="display: none"
                  id="reviewAnrechnungUebersicht-begruendung-panel">
                 <div>
-                    <div class="alert alert-danger"><b><?php echo $this->p->t('anrechnung', 'empfehlungenNegativ'); ?></b></div>
-                    <h4><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></h4><br>
-                    <ol>
-                        <li><?php echo $this->p->t('anrechnung', 'empfehlungNegativPruefungNichtMoeglich'); ?>
-                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
-                                    title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                    <h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'anrechnungenNichtEmpfehlenAsk'); ?></h4>
+                    <b>&ensp;<?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></b><br><br>
+                    <ul>
+                        <li>
+                            <span><?php echo $this->p->t('anrechnung', 'empfehlungNegativPruefungNichtMoeglich'); ?></span>
+                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="right"
+                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </a>
+                            </span>
                         </li>
-                        <li><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?>
-                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
-                                    title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                        <li>
+                            <span><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?></span>
+                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="right"
+                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </a>
+                            </span>
                         </li>
                         <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
-                    </ol>
+                    </ul>
                     <br>
                     <span class="text-danger">
                         <?php echo $this->p->t('anrechnung', 'begruendungWirdFuerAlleUebernommen'); ?>
@@ -145,23 +147,32 @@ $this->load->view(
                               rows="2" required></textarea>
                 </div>
                 <br>
-                <!-- Action Button 'Abbrechen'-->
+                <!-- Action Button Abbrechen & Bestaetigen-->
                 <div class="pull-right">
                     <button id="reviewAnrechnungUebersicht-begruendung-abbrechen" class="btn btn-default btn-w200">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                    </button>
+                    <button id="reviewAnrechnungUebersicht-dont-recommend-anrechnungen-confirm"
+                            class="btn btn-primary btn-w200">
+						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>
             </div>
             <div class="panel panel-default panel-body" style="display: none"
                  id="reviewAnrechnungUebersicht-empfehlung-panel">
                 <div>
-                    <div class="alert alert-success"><b><?php echo $this->p->t('anrechnung', 'empfehlungenPositiv'); ?></b></div>
+                    <h4 class="panel panel-body panel-success text-success"><?php echo $this->p->t('anrechnung', 'empfehlungenPositivQuestion'); ?></h4>
+                    &ensp;<?php echo $this->p->t('anrechnung', 'empfehlungenPositiv'); ?><br><br>
                 </div>
                 <br>
                 <!-- Action Button 'Abbrechen'-->
                 <div class="pull-right">
                     <button id="reviewAnrechnungUebersicht-empfehlung-abbrechen" class="btn btn-default btn-w200">
-				        <?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
+                    </button>
+                    <button id="reviewAnrechnungUebersicht-recommend-anrechnungen-confirm"
+                            class="btn btn-primary btn-w200">
+						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>
             </div>
@@ -205,9 +216,9 @@ $this->load->view(
             <!-- Action Buttons 'Empfehlen', 'Nicht empfehlen'-->
             <div class="col-xs-7 col-md-8">
                 <div class="pull-right">
-                    <button id="dont-recommend-anrechnungen"
+                    <button id="reviewAnrechnungUebersicht-dont-recommend-anrechnungen-ask"
                             class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?></button>
-                    <button id="recommend-anrechnungen"
+                    <button id="reviewAnrechnungUebersicht-recommend-anrechnungen-ask"
                             class="btn btn-primary btn-w200"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlen')); ?></button>
                 </div>
             </div>

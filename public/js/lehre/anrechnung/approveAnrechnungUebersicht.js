@@ -100,6 +100,10 @@ function tableWidgetHook_selectAllButton(tableWidgetDiv){
 
 
 $(function(){
+
+    const genehmigung_panel = $('#approveAnrechnungUebersicht-genehmigung-panel');
+    const begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
+
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
     var canPromise = !! window.Promise;
@@ -170,10 +174,8 @@ $(function(){
         }
     })
 
-    // Approve Anrechnungen
-    $("#approve-anrechnungen").click(function(){
-        let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
-        let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
+    // Ask if Approve Anrechnungen
+    $("#approveAnrechnungUebersicht-approve-anrechnungen-ask").click(function(){
 
         begruendung_panel.css('display', 'none');
 
@@ -183,6 +185,10 @@ $(function(){
             genehmigung_panel.slideDown('slow');
             return;
         }
+    });
+
+    // Approve Anrechnungen
+    $("#approveAnrechnungUebersicht-approve-anrechnungen-confirm").click(function(){
 
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
@@ -237,11 +243,8 @@ $(function(){
         );
     });
 
-    // Reject Anrechnungen
-    $("#reject-anrechnungen").click(function(){
-        let begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
-        let begruendung = $('#approveAnrechnungUebersicht-begruendung').val();
-        let genehmigung_panel = $('#approveAnrechnungUebersicht-empfehlung-panel');
+    // Ask if Reject Anrechnungen
+    $("#approveAnrechnungUebersicht-reject-anrechnungen-ask").click(function(){
 
         genehmigung_panel.css('display', 'none');
 
@@ -251,14 +254,20 @@ $(function(){
             begruendung_panel.slideDown('slow');
             return;
         }
-        else
+    });
+
+    // Reject Anrechnungen
+    $("#approveAnrechnungUebersicht-reject-anrechnungen-confirm").click(function(){
+
+        let begruendung = $('#approveAnrechnungUebersicht-begruendung').val();
+
+        genehmigung_panel.css('display', 'none');
+
+        // Check if begruendung is given
+        if (!begruendung.trim()) // empty or white spaces only
         {
-            // Check if begruendung is given
-            if (!begruendung.trim()) // empty or white spaces only
-            {
-                FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
-                return;
-            }
+            FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
+            return;
         }
 
         // Get selected rows data
@@ -278,11 +287,8 @@ $(function(){
             return;
         }
 
-        // Confirm before rejecting
-        if(!confirm('Wollen Sie wirklich die gewählten Anträge ablehnen?'))
-        {
-            return;
-        }
+        // Avoid form redirecting automatically
+        event.preventDefault();
 
         // Prepare data object for ajax call
         let data = {
@@ -322,7 +328,7 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#request-recommendation").click(function(){
+    $("#approveAnrechnungUebersicht-request-recommendation").click(function(){
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
 
@@ -386,14 +392,14 @@ $(function(){
 
     // Break Genehmigung abgeben
     $('#approveAnrechnungUebersicht-empfehlung-abbrechen').click(function(){
-        $('#approveAnrechnungUebersicht-empfehlung-panel').slideUp('slow');
+        genehmigung_panel.slideUp('slow');
 
     })
 
     // Break Ablehnung abgeben
     $('#approveAnrechnungUebersicht-begruendung-abbrechen').click(function(){
         $('#approveAnrechnungUebersicht-begruendung').val('');
-        $('#approveAnrechnungUebersicht-begruendung-panel').slideUp('slow');
+        begruendung_panel.slideUp('slow');
 
     })
 
