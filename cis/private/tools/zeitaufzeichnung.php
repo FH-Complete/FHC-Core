@@ -1145,7 +1145,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
 				<td colspan="3"><SELECT '.$oestyle.' name="oe_kurzbz_1">';
 			$oe = new organisationseinheit();
-			$oe->getFrequent($user,'180','3',true);
+			$oe->getFrequent($user,'180','3',true, array('oezuordnung', 'fachzuordnung', 'kstzuordnung'));
 			$trennlinie = true;
 
 			echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
