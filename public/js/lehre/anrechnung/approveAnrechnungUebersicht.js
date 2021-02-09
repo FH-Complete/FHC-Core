@@ -21,6 +21,7 @@ function func_tableBuilt(table) {
     table.addColumn(
         {
             title: "Details",
+            field: 'details',
             align: "center",
             width: 100,
             formatter: "link",
@@ -66,6 +67,10 @@ function func_rowUpdated(row){
     // Deselect and disable new selection of updated rows
     row.deselect();
     row.getElement().style["pointerEvents"] = "none";
+
+    // ...but leave url links selectable
+    row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
+    row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
 }
 
 // Returns tooltip
