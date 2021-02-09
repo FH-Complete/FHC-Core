@@ -176,7 +176,7 @@ $this->load->view(
                                             <div class="<?php echo $empfehlungData->empfehlung === false ? '' : 'hidden' ?>"
                                                  id="approveAnrechnungDetail-empfehlungDetail-empfehlungIsFalse">
                                                 <div class="alert alert-danger">
-                                                    <b><?php echo $this->p->t('anrechnung', 'empfehlungNegativ'); ?></b>
+                                                    <b><?php echo $this->p->t('anrechnung', 'empfehlungNegativConfirmed'); ?></b>
                                                 </div>
                                                 <div class="well"><b><?php echo $this->p->t('global', 'begruendung'); ?>
                                                         : </b>

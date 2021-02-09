@@ -120,7 +120,7 @@ $this->load->view(
             <div class="panel panel-default panel-body" style="display: none"
                  id="reviewAnrechnungUebersicht-begruendung-panel">
                 <div>
-                    <h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'anrechnungenNichtEmpfehlenAsk'); ?></h4>
+                    <h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'empfehlungenNegativQuestion'); ?></h4>
                     <b>&ensp;<?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></b><br><br>
                     <ul>
                         <li>
