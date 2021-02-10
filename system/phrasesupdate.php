@@ -8323,7 +8323,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Approve applications',
+				'text' => 'Approve Applications for Recognition of Prior Knowledge',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8343,7 +8343,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Approve application',
+				'text' => 'Approve application for Recognition of Prior Knowledge',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8623,7 +8623,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Review applications',
+				'text' => 'Review Applications for Recognition of Prior Knowledge',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8803,7 +8803,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => "Please confirm: <b>Recognition and exemption is recommended for this application based on the documents submitted.</b>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8823,7 +8823,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognition and exemption is recommended based on the documents submitted.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8843,7 +8843,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Equivalence can not be determined because the enclosures contain insufficient information as regards the teaching content.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8863,7 +8863,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Equivalence can not be determined because of the insufficient learning objectives and the length of the course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8883,7 +8883,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recommendation date',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9003,7 +9003,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognition and exemption is not recommended based on the documents submitted.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9043,7 +9043,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => "Please confirm: <b>Recognition and exemption is recommended for these applications based on the documents submitted.</b>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9063,7 +9063,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognitions and exemptions are not recommended.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9103,7 +9103,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognition and exemption is rejected based on the documents submitted.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9123,7 +9123,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Do you want to reject recognition and exemption for this application?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9143,7 +9143,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognition and exemption are rejected for these applications based on the documents submitted.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9163,7 +9163,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Do you want to reject recognition and exemption for these applications?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9183,7 +9183,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognition and exemption is rejected because the enclosures contain insufficient information as regards the teaching content.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9203,7 +9203,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognition and exemption is rejected because of the insufficient learning objectives and the length of the course.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9223,7 +9223,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => "Please confirm: <b>Recognition and exemption is approved for these applications based on the documents submitted.</b>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9243,7 +9243,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Do you want to approve recognition and exemption for these applications?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9263,7 +9263,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Recognition and exemption is approved based on the documents submitted.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9283,7 +9283,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Do you want to approve recognition and exemption for this application?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9303,7 +9303,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => "Please confirm: <b>Recognition and exemption is approved for this application based on the documents submitted.</b>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9323,7 +9323,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'You have not requested a recommendation yet.',
+				'text' => 'No recommendation has yet been requested.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9423,7 +9423,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The application is waiting for your approvement.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9463,47 +9463,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => '<p>Important: Please pay attention to the information about deadlines and conditions provided in the right infobox.<br>It is important that your documents contain the information that enables equivalence to be checked.</p>',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'anrechnung',
-		'phrase' => 'empfehlungInfoTooltipText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => '<p>Optionen für die Empfehlung werden rechts in den Infoboxen näher erläutert.</p>',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => '',
-				'description' => '<p></p>',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'anrechnung',
-		'phrase' => 'genehmigungInfoTooltipText',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => '<p>Optionen zur Genehmigung werden rechts in den Infoboxen näher erläutert.</p>',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => '',
+				'text' => '<p>Important: Please pay attention to the information about deadlines and conditions provided in the right infobox.<br>It is important that your documents contain the information that enables equivalence to be checked.</p>',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9543,7 +9503,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Confirm',
+				'text' => 'Do you want to recommend recognition and exemption for this application?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9563,7 +9523,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Confirm',
+				'text' => 'Do you want to recommend recognition and exemption for these applications?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9583,7 +9543,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Confirm',
+				'text' => 'Don\'t you want to recommend recognition and exemption for this application?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9603,7 +9563,129 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Confirm',
+				'text' => 'Don\'t you want to recommend recognition and exemption for these applications??',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
+                Bitte laden Sie das Zeugnis und weitere Nachweis-Dokumente (z.B. Syllabus, Lehrpläne,
+                Modulbeschreibung…) hoch.
+                <br><br>Die folgenden Informationen müssen enthalten sein: Name der das Zeugnis ausstellenden Institution;
+                Beschreibung der Lehrinhalte und / oder Lernergebnisse;
+                Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)
+                <br><br>
+                <h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
+                Soll die Anrechnung auf der Grundlage der beruflichen Praxis erfolgen, laden Sie bitte eine detaillierte
+                Tätigkeitsbeschreibung hoch. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
+                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
+                oder durch Bestätigungen des Arbeitgebers) erfolgen.
+                <br><br>Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden, laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
+                <br><br>Falls diese Informationen nicht enthalten sind, können wir den Antrag nicht prüfen und er wird abgelehnt.
+                ",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>Application for recognition based on a certificate</u></h5>
+               	Please upload the certificate and other supporting documents (e.g. syllabus, curricula, module description ...).
+                <br><br>The following information must be included:
+                    name of the institution issuing the certificate;
+                    description of the teaching content and / or learning outcomes;
+                    duration of the course (e.g. ECTS, contact hours per week, total number of hours taught...)
+                <br><br>
+                <h5><u>Application for recognition based on professional practice</u></h5>
+                If the exemption is to be based on professional practice, please upload a detailed job description. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).
+                <br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
+                <br><br>If this information is not included, we will not be able to check the application and it will be rejected.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundAllgemeinTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden, laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
+                <br><br>Falls diese Informationen nicht enthalten sind, können wir den Antrag nicht prüfen und er wird abgelehnt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
+                <br><br>If this information is not included, we will not be able to check the application and it will be rejected.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundZeugnisTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
+                Bitte laden Sie das Zeugnis und weitere Nachweis-Dokumente (z.B. Syllabus, Lehrpläne,
+                Modulbeschreibung…) hoch.
+                <br><br>Die folgenden Informationen müssen enthalten sein: Name der das Zeugnis ausstellenden Institution;
+                Beschreibung der Lehrinhalte und / oder Lernergebnisse;
+                Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>Application for recognition based on a certificate</u></h5>
+               	Please upload the certificate and other supporting documents (e.g. syllabus, curricula, module description ...).
+                <br><br>The following information must be included:
+                    name of the institution issuing the certificate;
+                    description of the teaching content and / or learning outcomes;
+                    duration of the course (e.g. ECTS, contact hours per week, total number of hours taught...)
+   ",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundBerufTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
+                Soll die Anrechnung auf der Grundlage der beruflichen Praxis erfolgen, laden Sie bitte eine detaillierte
+                Tätigkeitsbeschreibung hoch. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
+                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
+                oder durch Bestätigungen des Arbeitgebers) erfolgen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>Application for recognition based on professional practice</u></h5>
+                If the exemption is to be based on professional practice, please upload a detailed job description. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9617,13 +9699,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Allgemein & Fristen',
+				'text' => 'Beantragung: Fristen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'General & Deadlines',
+				'text' => 'Deadlines',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9637,12 +9719,10 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Um grundsätzlich festzustellen, ob die erworbenen Kenntnisse zu einer Anrechnung führen können, informieren Sie sich bitte vorab im CIS über die Lernergebnisse, Lehrinhalte und ECTS-Punkte der anzurechnenden Lehrveranstaltung.
-                <br><br>Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
-				<br><br>Bitte laden Sie den Antrag in deutscher oder englischer Sprache für das
+				'text' => "Bitte laden Sie den Antrag in deutscher oder englischer Sprache für das
                 <ul>
                     <li><u>Wintersemester spätestens bis 15. September</u></li>
-                    <li><u>Sommersemester spätestens bis 22. Februar</u> hoch</li>
+                    <li><u>Sommersemester spätestens bis 22. Februar</u> hoch.</li>
                 </ul>
                 <br>Die Entscheidung über den Antrag erfolgt in der Regel innerhalb von zwei Wochen ab dem 15. September
                 bzw. 22. Februar.
@@ -9652,15 +9732,13 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'To determine whether the knowledge you have acquired can lead to exemption, please inform yourself in advance in the CIS about the learning outcomes, course content and ECTS points of the course to be credited.
-                <br><br>A prerequisite for recognition is that the knowledge acquired is equivalent to the content and scope of the course.
-				<br><br>Please upload the application in German or English
+				'text' => "Please upload the application in German or English
                 <ul>
                     <li><u>by September 15th for the winter semester</u></li>
                     <li><u>by February 22nd for the summer semester</u> at the latest.</li>
                 </ul>
                 <br>The decision on the application is usually made within two weeks from September 15 (winter semester) or February 22 (summer semester).
-                <br><br>A separate application must be submitted for each course.</li>',
+                <br><br>A separate application must be submitted for each course.</li>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9680,7 +9758,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Prerequisites for: Verification Documents',
+				'text' => 'Prerequisites for Verification Documents',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9694,41 +9772,18 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
-                Bitte laden Sie das Zeugnis und weitere Nachweis-Dokumente (z.B. Syllabus, Lehrpläne,
-                Modulbeschreibung…) hoch.
-                <br><br>Die folgenden Informationen müssen enthalten sein:
-                <ol>
-                    <li>Name der das Zeugnis ausstellenden Institution</li>
-                    <li>Beschreibung der Lehrinhalte und / oder Lernergebnisse</li>
-                    <li>Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)</li>
-                </ol>
-                <br>
-                <h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
-                Soll die Anrechnung auf der Grundlage der beruflichen Praxis erfolgen, laden Sie bitte eine detaillierte
-                Tätigkeitsbeschreibung hoch. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
-                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
-                oder durch Bestätigungen des Arbeitgebers) erfolgen.
-                <br><br>Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden, laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
-                <br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, können wir den Antrag nicht prüfen und er wird abgelehnt.</span>",
+				'text' => "Bitte laden Sie mehrere Nachweis-Dokumente zusammengefasst in einem PDF-Dokument hoch.
+					<br><br>Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden,
+					laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
+					<br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, kann der Antrag auch abgelehnt werden.</span>",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '<h5><u>Application for recognition based on a certificate</u></h5>
-               	Please upload the certificate and other supporting documents (e.g. syllabus, curricula, module description ...).
-                <br><br>The following information must be included:
-                <ol>
-                    <li>name of the institution issuing the certificate</li>
-                    <li>description of the teaching content and / or learning outcomes</li>
-                    <li>duration of the course (e.g. ECTS, contact hours per week, total number of hours taught...)</li>
-                </ol>
-                <br>
-                <h5><u>Application for recognition based on professional practice</u></h5>
-                If the exemption is to be based on professional practice, please upload a detailed job description. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).
-                <br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
-                <br><br><span class="text-danger">If this information is not included, we will not be able to check the application and it will be rejected.</span>',
+				'text' => "Please combine and upload more than one verification document in one PDF document.
+				<br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
+				<br><br><span class=\"text-danger\">If this information is not included, the application might be rejected.</span>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9748,7 +9803,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Prerequisites for: Origin of previous knowledge',
+				'text' => 'Prerequisites for Origin of previous Knowledge',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9762,12 +9817,12 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
+				'text' => "<h5><u>Bei Anrechnungen von schulischen bzw. hochschulischen Zeugnissen</u></h5>
                 Bitte geben Sie an, wo Sie die Kenntnisse erworben haben: (Hoch-)Schultyp, Standort, Fachrichtung.
                 Beispiel Schule: HTL Mödling, Fahrzeugtechnik; Beispiel Hochschule: TU Wien, Bachelor
                 Wirtschaftsinformatik
                 <br>
-                <h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
+                <h5><u>Bei Anrechnungen von beruflicher Praxis</u></h5>
                 Bitte geben Sie Unternehmen, Position und Funktion sowie Dauer der Beschäftigung an.",
 				'description' => '',
 				'insertvon' => 'system'
@@ -9784,7 +9839,217 @@ array(
 			)
 		)
 	),
-	
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoFristenTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beantragung: Fristen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoFristenBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Die Entscheidung über den Antrag durch die Studiengangsleitung sollte
+                <ul>
+                    <li><u>innerhalb von zwei Wochen ab dem 15. September (Wintersemester)</u></li>
+                    <li><u>innerhalb von zwei Wochen ab dem 22. Februar (Sommersemester)</u> erfolgen.</li>
+                </ul>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "The decision on the application should be made by the study program director
+                <ul>
+                    <li><u>within two weeks from September 15 (winter semester)</u></li>
+                    <li><u>within two weeks from February 22 (summer semester)</u>.</li>
+                </ul>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoAntragVoraussetungenTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag: Voraussetzungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Application',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoAntragVoraussetungenBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
+                <br><br>Wenn die Gleichwertigkeit gegeben ist, können auch außerhochschulisch erworbene Kenntnisse angerechnet werden (z.B. Sekundarschule, Weiterbildungseinrichtungen).
+                <br><br>
+                <u>Umfangmäßige Gleichwertigkeit Schule - Hochschule:</u>
+                <br>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden, ein Schulhalbjahr besteht aus ca. 20 Wochen.
+                <br>Das heißt eine Unterrichtsstunde pro Woche sind insgesamt ca. 20 Stunden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "A prerequisite for recognition is that the knowledge acquired is equivalent to the content and scope of the course.
+				<br><br>If the equivalence is given, knowledge acquired outside the university can also be taken into account (e.g. secondary school, further education institutions).
+				<br><br>
+				<u>Equivalence School - University:</u>
+                <br>1 ECTS at the UAS Technikum Wien corresponds to a workload of 25 hours, a school semester consists of approx. 20 weeks.
+                <br>That means one lesson per week is a total of approx. 20 hours.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoNachweisdokumenteTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachweisdokumente: Voraussetzung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Verification Documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoNachweisdokumenteBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
+         		Falls für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwendet werden, sind entweder nur die für die Anrechnung relevanten Teile hochzuladen oder entsprechend zu markieren.
+                <br><br>Die folgenden Informationen müssen enthalten sein:
+                <ol>
+                    <li>Name der das Zeugnis ausstellenden Institution</li>
+                    <li>Beschreibung der Lehrinhalte und / oder Lernergebnisse</li>
+                    <li>Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)</li>
+                </ol>
+                <br>
+                <h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
+                Es wird eine detaillierte Tätigkeitsbeschreibung benötigt. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
+                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
+                oder durch Bestätigungen des Arbeitgebers) erfolgen.
+                <br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, kann der Antrag nicht geprüft werden und er wird abgelehnt.</span>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<h5><u>Application for recognition based on a certificate</u></h5>
+                To prove equivalence of curricula published in federal law gazettes (cf. HTL, HAK ...), only the parts relevant for recognition should be upload or marked accordingly.
+                <br><br>The following information must be included:
+                <ol>
+                    <li>name of the institution issuing the certificate</li>
+                    <li>description of the teaching content and / or learning outcomes</li>
+                    <li>duration of the course (e.g. ECTS, contact hours per week, total number of hours taught...)</li>
+                </ol>
+                <br>
+                <h5><u>Application for recognition based on professional practice</u></h5>
+                If the exemption is to be based on professional practice, an upload of a detailed job description is required. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).
+                <br><br><span class="text-danger">If this information is not included, we will not be able to check the application and it will be rejected.</span>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoHerkunftKenntnisseTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herkunft der Kenntnisse: Angaben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Origin of previous Knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoHerkunftKenntnisseBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Bei Anrechnungen von schulischen bzw. hochschulischen Zeugnissen</u></h5>
+ 					Angabe, wo die Kenntnisse erworben worden sind: (Hoch-)Schultyp, Standort, Fachrichtung. Beispiel Schule: HTL Mödling, Fahrzeugtechnik; Beispiel Hochschule: TU Wien, Bachelor
+                Wirtschaftsinformatik
+                <br>
+                <h5><u>Bei Anrechnungen von beruflicher Praxis</u></h5>
+                Angabe von Unternehmen, Position und Funktion sowie Dauer der Beschäftigung.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>If school or university certificates are to be recognized</u></h5>
+                Indication where the knowledge has been acquired: type of (university) school, location, subject area. Example school: HTL Mödling, vehicle technology; Example university: Vienna University of Technology, Bachelor of Business Informatics
+                <br>
+                <h5><u>If professional practice is to be recognized</u></h5>
+                Specification of company, position and function as well as length of employment.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	
 	
 
