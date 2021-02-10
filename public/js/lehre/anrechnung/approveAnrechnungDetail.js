@@ -79,7 +79,7 @@ $(function(){
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
-                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
                 }
             }
         );
@@ -106,7 +106,7 @@ $(function(){
         // Check if begruendung is given
         if (!begruendung.trim()) // empty or white spaces only
         {
-            FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
+            FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungAngeben"));
             return;
         }
 
@@ -151,7 +151,7 @@ $(function(){
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
-                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
                 }
             }
         );
@@ -193,7 +193,7 @@ $(function(){
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
-                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
                 }
             }
         );

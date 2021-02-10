@@ -120,7 +120,11 @@ $this->load->view(
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <div class="well" style="border:solid black 3px">
-                                            <p><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></p>
+                                            <span><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></span>&emsp;
+                                            <span id="requestAnrechnung-anrechnungGrundTooltip" data-toggle="tooltip" data-placement="right"
+                                                  title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundTooltipText'); ?>">
+                                                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                </span>
                                             <div class="checkbox">
                                                 <label>
                                                     <input type="radio" name="begruendung" value="1" required

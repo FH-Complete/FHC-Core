@@ -37,7 +37,14 @@ $this->load->view(
 				'spaltenEinstellen',
 				'ja',
 				'nein',
-				'nichtSelektierbarAufgrundVon'
+				'nichtSelektierbarAufgrundVon',
+				'nichtSelektierbarAufgrundVon',
+				'systemfehler',
+				'bitteMindEinenAntragWaehlen',
+				'bitteBegruendungAngeben',
+				'empfehlungWurdeAngefordert',
+				'anrechnungenWurdenGenehmigt',
+				'anrechnungenWurdenAbgelehnt'
 			),
 			'person' => array(
 				'student',
@@ -83,7 +90,7 @@ $this->load->view(
             <div class="col-lg-12 page-header">
                 <h3>
 					<?php echo $this->p->t('anrechnung', 'anrechnungenGenehmigen'); ?>
-                    <small>| <?php echo $this->p->t('global', 'uebersicht'); ?></small>
+                    <small>| <?php echo ucfirst($this->p->t('global', 'uebersicht')); ?></small>
                 </h3>
             </div>
         </div>

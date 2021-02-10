@@ -214,7 +214,7 @@ $(function(){
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)
         {
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
+            FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteMindEinenAntragWaehlen"));
             return;
         }
 
@@ -245,12 +245,12 @@ $(function(){
                         $('#tableWidgetTabulator').tabulator('updateData', data.retval);
 
                         // Print success message
-                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden empfohlen.");
+                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenEmpfohlen"));
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
-                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
                 }
             }
         );
@@ -279,7 +279,7 @@ $(function(){
         // Check if begruendung is given
         if (!begruendung.trim()) // empty or white spaces only
         {
-            FHC_DialogLib.alertInfo('Bitte tragen Sie eine Begründung ein.');
+            FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungAngeben"));
             return;
         }
 
@@ -296,7 +296,7 @@ $(function(){
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)
         {
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Antrag auf Anrechnung');
+            FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteMindEinenAntragWaehlen"));
             return;
         }
 
@@ -329,12 +329,12 @@ $(function(){
                         $('#tableWidgetTabulator').tabulator('updateData', data.retval);
 
                         // Print success message
-                        FHC_DialogLib.alertSuccess(data.retval.length + " Anrechnungsanträge wurden nicht empfohlen.");
+                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenNichtEmpfohlen"));
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
-                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
                 }
             }
         );

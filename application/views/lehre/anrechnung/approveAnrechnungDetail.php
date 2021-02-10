@@ -16,7 +16,15 @@ $this->load->view(
 			),
 			'ui' => array(
 				'hilfeZuDieserSeite',
-				'hochladen'
+				'hochladen',
+				'nichtSelektierbarAufgrundVon',
+				'nichtSelektierbarAufgrundVon',
+				'systemfehler',
+				'bitteMindEinenAntragWaehlen',
+				'bitteBegruendungAngeben',
+				'empfehlungWurdeAngefordert',
+				'anrechnungenWurdenGenehmigt',
+				'anrechnungenWurdenAbgelehnt'
 			),
 			'person' => array(
 				'student',
@@ -77,7 +85,7 @@ $this->load->view(
                                     <table class="panel-body table table-bordered table-condensed">
                                         <tbody>
                                         <tr>
-                                            <td><?php echo $this->p->t('person', 'student'); ?></td>
+                                            <td><?php echo ucfirst($this->p->t('person', 'student')); ?></td>
                                             <td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
                                         </tr>
                                         <tr>
@@ -85,11 +93,11 @@ $this->load->view(
                                             <td><?php echo $antragData->matrikelnr ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('lehre', 'studiensemester'); ?></td>
+                                            <td><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></td>
                                             <td><?php echo $antragData->studiensemester_kurzbz ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('lehre', 'studiengang'); ?></td>
+                                            <td><?php echo ucfirst($this->p->t('lehre', 'studiengang')); ?></td>
                                             <td><?php echo $antragData->stg_bezeichnung ?></td>
                                         </tr>
                                         <tr>
