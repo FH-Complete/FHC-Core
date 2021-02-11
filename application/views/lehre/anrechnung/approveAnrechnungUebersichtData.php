@@ -108,7 +108,7 @@ $filterWidgetArray = array(
 		studiengang_kz: {visible: false},
 		stg_bezeichnung: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
-		ects: {headerFilter:"input"},
+		ects: {headerFilter:"input", align:"center"},
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{

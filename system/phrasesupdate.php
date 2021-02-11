@@ -8957,13 +8957,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Andere Begründung',
+				'text' => 'Andere Begr&uuml;ndung. Bitte im Notizfeld kurz angeben.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Other reason',
+				'text' => 'Other reasons. Please briefly state the reasons in the field for comments.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

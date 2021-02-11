@@ -132,16 +132,16 @@ $this->load->view(
                     &nbsp;<b><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></b><br><br>
                     <ol>
                         <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativPruefungNichtMoeglich'); ?>
-                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
                                title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </a>
+                            </span>
                         </li>
                         <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertig'); ?>
-                            <a class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
+                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
                                title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </a>
+                            </span>
                         </li>
                         <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
                     </ol>
