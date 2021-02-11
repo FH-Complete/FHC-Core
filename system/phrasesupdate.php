@@ -8183,7 +8183,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'a certificate (see § 4 para. 4, Statute 5 of the UASTW)',
+				'text' => 'a certificate (see § 4 para. 5, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8203,7 +8203,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'professional practice (see § 4 para. 5, Statute 5 of the UASTW)',
+				'text' => 'professional practice (see § 4 para. 6, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9457,13 +9457,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<p>Wichtig: Bitte die Fristen, Voraussetzungen und Formvorgaben rechts in den Infoboxen beachten.<br>Wichtig ist, dass Ihre Unterlagen jene Informationen enthalten, die eine Prüfung der Gleichwertigkeit möglich machen.</p>',
+				'text' => 'Wichtig: Bitte die Fristen, Voraussetzungen und Formvorgaben rechts in den Infoboxen beachten.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '<p>Important: Please pay attention to the information about deadlines and conditions provided in the right infobox.<br>It is important that your documents contain the information that enables equivalence to be checked.</p>',
+				'text' => 'Important: Please pay attention to the information about deadlines and conditions provided in the right infobox.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9622,14 +9622,14 @@ Any unusual occurrences
 			array(
 				'sprache' => 'German',
 				'text' => "Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden, laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
-                <br><br>Falls diese Informationen nicht enthalten sind, können wir den Antrag nicht prüfen und er wird abgelehnt.",
+                <br><br><u>Falls diese Informationen nicht enthalten sind, können wir den Antrag nicht prüfen und er wird abgelehnt.</u>",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => "If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
-                <br><br>If this information is not included, we will not be able to check the application and it will be rejected.",
+                <br><br><u>If this information is not included, we will not be able to check the application and it will be rejected.</u>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9877,7 +9877,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "The decision on the application should be made by the study program director
+				'text' => "The decision on the application is usually made by the program director
                 <ul>
                     <li><u>within two weeks from September 15 (winter semester)</u></li>
                     <li><u>within two weeks from February 22 (summer semester)</u>.</li>
@@ -9916,7 +9916,7 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => "Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
-                <br><br>Wenn die Gleichwertigkeit gegeben ist, können auch außerhochschulisch erworbene Kenntnisse angerechnet werden (z.B. Sekundarschule, Weiterbildungseinrichtungen).
+                <br><br>Positiv absolvierte Prüfungen von allgemein- und berufsbildenden höheren Schulen sind anzurechnen, sofern sie hinsichtlich Inhalt und Umfang mit der zu erlassenden Lehrveranstaltung gleichwertig sind (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 4 Abs. 8).
                 <br><br>
                 <u>Umfangmäßige Gleichwertigkeit Schule - Hochschule:</u>
                 <br>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden, ein Schulhalbjahr besteht aus ca. 20 Wochen.
@@ -9927,11 +9927,11 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "A prerequisite for recognition is that the knowledge acquired is equivalent to the content and scope of the course.
-				<br><br>If the equivalence is given, knowledge acquired outside the university can also be taken into account (e.g. secondary school, further education institutions).
+				<br><br>Successfully completed examinations from general and vocational secondary schools are to be recognized as long as they are equivalent to the course to be exempted with regard to content and scope (cf. Statute on Studies Act Provisions / Examination Regulations, § 4 Para. 8).
 				<br><br>
-				<u>Equivalence School - University:</u>
+				<u>Equivalence school - university in terms of scope:</u>
                 <br>1 ECTS at the UAS Technikum Wien corresponds to a workload of 25 hours, a school semester consists of approx. 20 weeks.
-                <br>That means one lesson per week is a total of approx. 20 hours.",
+                <br>i.e. one teaching hour per week is a total of approx. 20 hours.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9985,7 +9985,7 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => '<h5><u>Application for recognition based on a certificate</u></h5>
-                To prove equivalence of curricula published in federal law gazettes (cf. HTL, HAK ...), only the parts relevant for recognition should be upload or marked accordingly.
+                To prove equivalence of curricula published in federal law gazettes (cf. HTL, HAK ...), only the parts relevant for recognition should be uploaded or marked accordingly.
                 <br><br>The following information must be included:
                 <ol>
                     <li>name of the institution issuing the certificate</li>
@@ -9995,7 +9995,7 @@ array(
                 <br>
                 <h5><u>Application for recognition based on professional practice</u></h5>
                 If the exemption is to be based on professional practice, an upload of a detailed job description is required. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).
-                <br><br><span class="text-danger">If this information is not included, we will not be able to check the application and it will be rejected.</span>',
+                <br><br><span class="text-danger">If this information is not included, the application can not be checked adequately and it might need to be rejected.</span>',
 				'description' => '',
 				'insertvon' => 'system'
 			)

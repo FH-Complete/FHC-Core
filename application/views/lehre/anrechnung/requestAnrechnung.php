@@ -38,6 +38,12 @@ $this->load->view(
 );
 ?>
 
+<style>
+    .tooltip-inner {
+        width:300px;
+    }
+</style>
+
 <body>
 <div id="page-wrapper">
     <div class="container-fluid">
@@ -121,16 +127,16 @@ $this->load->view(
                                     <div class="col-lg-12">
                                         <div class="well" style="border:solid black 3px">
                                             <span><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></span>&emsp;
-                                            <span id="requestAnrechnung-anrechnungGrundTooltip" data-toggle="tooltip" data-placement="right"
-                                                  title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundTooltipText'); ?>">
-                                                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
-                                                </span>
                                             <div class="checkbox">
                                                 <label>
                                                     <input type="radio" name="begruendung" value="1" required
 														<?php echo $anrechnungData->begruendung_id == '1' ? 'checked' : ''; ?>
 														<?php echo $disabled; ?>>
-													<?php echo $this->p->t('anrechnung', 'antragStellenWegenZeugnis'); ?>
+													<?php echo $this->p->t('anrechnung', 'antragStellenWegenZeugnis'); ?>&emsp;
+                                                    <span id="requestAnrechnung-anrechnungGrundZeugnisTooltip" data-toggle="tooltip" data-placement="right"
+                                                          title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>">
+                                                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                </span>
                                                 </label>
                                             </div>
                                             <div class="checkbox">
@@ -138,7 +144,11 @@ $this->load->view(
                                                     <input type="radio" name="begruendung" value="4" required
 														<?php echo $anrechnungData->begruendung_id == '4' ? 'checked' : ''; ?>
 														<?php echo $disabled; ?>>
-													<?php echo $this->p->t('anrechnung', 'antragStellenWegenPraxis'); ?>
+													<?php echo $this->p->t('anrechnung', 'antragStellenWegenPraxis'); ?>&emsp;
+                                                    <span id="requestAnrechnung-anrechnungGrundBerufTooltip" data-toggle="tooltip" data-placement="right"
+                                                          title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundBerufTooltipText'); ?>">
+                                                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                </span>
                                                 </label>
                                             </div>
                                         </div>
@@ -151,7 +161,7 @@ $this->load->view(
                                             <div class="panel-heading">
                                                 <b><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></b>&emsp;
                                                 <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
-                                                      title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
+                                                      title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundAllgemeinTooltipText'); ?>">
                                                     <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                                 </span>
                                             </div>
