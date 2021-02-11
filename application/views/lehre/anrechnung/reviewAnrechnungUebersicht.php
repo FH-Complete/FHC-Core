@@ -186,7 +186,7 @@ $this->load->view(
         <div class="row">
 
             <!-- Filter buttons -->
-            <div class="col-xs-5 col-md-4">
+            <div class="col-xs-3">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-need-recommendation" class="btn btn-default btn-clearfilter" type="button"
@@ -219,7 +219,7 @@ $this->load->view(
             </div>
 
             <!-- Action Buttons 'Empfehlen', 'Nicht empfehlen'-->
-            <div class="col-xs-7 col-md-8">
+            <div class="col-xs-9">
                 <div class="pull-right">
                     <button id="reviewAnrechnungUebersicht-dont-recommend-anrechnungen-ask"
                             class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?></button>

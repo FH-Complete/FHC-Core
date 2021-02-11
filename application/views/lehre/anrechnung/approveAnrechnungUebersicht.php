@@ -186,7 +186,7 @@ $this->load->view(
         <!-- Filter buttons / Submit buttons-->
         <div class="row">
             <!-- Filter buttons -->
-            <div class="col-xs-5 col-md-4">
+            <div class="col-xs-3">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
@@ -213,7 +213,7 @@ $this->load->view(
                 </div>
             </div>
             <!-- Action Buttons 'Genehmigen', Ablehnen, 'Empfehlung anfordern'-->
-            <div class="col-xs-7 col-md-8">
+            <div class="col-xs-9">
                 <div class="pull-right">
                     <button id="approveAnrechnungUebersicht-request-recommendation"
                             class="btn btn-default btn-w200 btn-mr50"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
