@@ -16,6 +16,25 @@ function func_height(table){
     return $(window).height() * 0.50;
 }
 
+// Filters boolean values
+function hf_filterTrueFalse(headerValue, rowValue){
+
+    if ('ja'.startsWith(headerValue) || 'yes'.startsWith(headerValue))
+    {
+        return rowValue == 'true';
+    }
+
+    if ('nein'.startsWith(headerValue) || 'no'.startsWith(headerValue))
+    {
+        return rowValue == 'false';
+    }
+
+    if (headerValue = '-')
+    {
+        return rowValue == null;
+    }
+}
+
 // Adds column details
 function func_tableBuilt(table) {
     table.addColumn(

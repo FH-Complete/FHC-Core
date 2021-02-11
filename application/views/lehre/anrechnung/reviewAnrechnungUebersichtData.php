@@ -121,7 +121,7 @@ $filterWidgetArray = array(
 		    target:"_blank"
 		}},
 		anmerkung_student: {headerFilter:"input"},
-		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung},
+		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false},
 		status_bezeichnung: {headerFilter:"input"}
 	 }', // col properties
