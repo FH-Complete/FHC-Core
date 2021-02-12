@@ -32,7 +32,7 @@ $this->load->view(
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
 			'public/js/lehre/anrechnung/requestAnrechnung.js'
-		
+
 		)
 	)
 );
@@ -56,7 +56,7 @@ $this->load->view(
                 </h3>
             </div>
         </div>
-		
+
 		<?php echo form_open_multipart(current_url() . '/apply',
 			['id' => 'requestAnrechnung-form'],
 			['lv_id' => $antragData->lv_id, 'studiensemester' => $antragData->studiensemester_kurzbz]
@@ -178,7 +178,7 @@ $this->load->view(
 												<?php if (!empty($anrechnungData->dms_id)): ?>
                                                     <a class="pull-right"
                                                        href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
-                                                       target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
+                                                       target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
 												<?php endif; ?>
                                             </div>
                                         </div>

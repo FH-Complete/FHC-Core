@@ -42,7 +42,7 @@ $this->load->view(
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
 			'public/js/lehre/anrechnung/reviewAnrechnungDetail.js'
-		
+
 		)
 	)
 );
@@ -125,7 +125,7 @@ $this->load->view(
                                             <td><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></td>
                                             <td>
                                                 <a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
-                                                   target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
+                                                   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -167,7 +167,7 @@ $this->load->view(
                                             </div>
                                             <div class="well"><b><?php echo $this->p->t('global', 'begruendung'); ?>
                                                     : </b>
-                                                <span id="reviewAnrechnungDetail-empfehlungDetail-begruendung"><?php echo $empfehlungData->notiz ?></span>
+                                                <span id="reviewAnrechnungDetail-empfehlungDetail-begruendung"><?php echo htmlentities($empfehlungData->notiz) ?></span>
                                             </div>
                                         </div>
                                     </div>

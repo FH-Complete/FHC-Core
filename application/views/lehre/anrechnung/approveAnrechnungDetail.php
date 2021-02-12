@@ -44,7 +44,7 @@ $this->load->view(
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
 			'public/js/lehre/anrechnung/approveAnrechnungDetail.js'
-		
+
 		)
 	)
 );
@@ -126,7 +126,7 @@ $this->load->view(
                                             <td><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></td>
                                             <td>
                                                 <a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
-                                                   target="_blank"><?php echo $anrechnungData->dokumentname ?></a>
+                                                   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -188,7 +188,7 @@ $this->load->view(
                                                 </div>
                                                 <div class="well"><b><?php echo $this->p->t('global', 'begruendung'); ?>
                                                         : </b>
-                                                    <span id="approveAnrechnungDetail-empfehlungDetail-begruendung"><?php echo $empfehlungData->notiz ?></span>
+                                                    <span id="approveAnrechnungDetail-empfehlungDetail-begruendung"><?php echo htmlentities($empfehlungData->notiz) ?></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -245,7 +245,7 @@ $this->load->view(
                                             </div>
                                             <div class="well"><b><?php echo $this->p->t('global', 'begruendung'); ?>
                                                     : </b>
-                                                <span id="approveAnrechnungDetail-genehmigungDetail-begruendung"><?php echo $genehmigungData->notiz ?></span>
+                                                <span id="approveAnrechnungDetail-genehmigungDetail-begruendung"><?php echo htmlentities($genehmigungData->notiz) ?></span>
                                             </div>
                                         </div>
                                     </div>
