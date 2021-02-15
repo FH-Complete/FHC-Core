@@ -388,13 +388,17 @@ class approveAnrechnungDetail extends Auth_Controller
 		$to = $result->uid. '@'. DOMAIN;
 		
 		$anrede = $result->geschlecht == 'w' ? 'Sehr geehrte Frau ' : 'Sehr geehrter Herr ';
+		
+		$text = $status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
+			? 'Ihrem Antrag auf Anerkennung nachgewiesener Kenntnisse der Lehrveranstaltung "'.
+			$result->lv_bezeichnung. '" wurde stattgegeben.'
+			: 'wir haben Ihren Antrag auf Anerkennung nachgewiesener Kenntnisse geprüft und können die Lehrveranstaltung "'.
+			$result->lv_bezeichnung. '" leider nicht anrechnen, weil die Gleichwertigkeit nicht festgestellt werden konnte.';
+		
 		// Prepare mail content
 		$body_fields = array(
-			'anrede_name'                       => $anrede. $result->vorname. ' '. $result->nachname,
-			'lehrveranstaltung_bezeichnung'     => $result->lv_bezeichnung,
-			'stattgegeben_nichtstattgegeben'    => $status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
-				? 'stattgegeben'
-				: 'nicht stattgegeben'
+			'anrede_name'   => $anrede. $result->vorname. ' '. $result->nachname,
+			'text'          => $text
 		);
 		
 		sendSanchoMail(
