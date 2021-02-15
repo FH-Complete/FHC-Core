@@ -13,27 +13,6 @@ class Prestudent_model extends DB_Model
 
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 	}
-	
-	/**
-	 * Get students UID by PrestudentID.
-	 * @param $prestudent_id
-	 * @return mixed
-	 */
-	public function getUID($prestudent_id)
-	{
-		$this->addSelect('uid');
-		$this->addJoin('public.tbl_person', 'person_id');
-		$this->addJoin('public.tbl_benutzer ', 'person_id');
-		
-		$result = $this->load($prestudent_id);
-		
-		if (!hasData($result))
-		{
-			show_error('Failed getting UID by prestudent_id');
-		}
-		
-		return $result->retval[0]->uid;
-	}
 
 	/**
 	 * getLastStatuses
