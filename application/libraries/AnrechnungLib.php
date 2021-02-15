@@ -118,7 +118,7 @@ class AnrechnungLib
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getAnrechnungDataByLv($lehrveranstaltung_id)
+	public function getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id)
 	{
 		$anrechnung_data = new StdClass();
 		$anrechnung_data->anrechnung_id = '';
@@ -135,7 +135,13 @@ class AnrechnungLib
 		$anrechnung_data->status = getUserLanguage() == 'German' ? 'neu' : 'new';
 		$anrechnung_data->dokumentname = '';
 
-		$result = $this->ci->AnrechnungModel->loadWhere(array('lehrveranstaltung_id' => $lehrveranstaltung_id));
+		$result = $this->ci->AnrechnungModel->loadWhere(
+			array(
+				'lehrveranstaltung_id' => $lehrveranstaltung_id,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'prestudent_id' => $prestudent_id
+			)
+		);
 
 		if (isError($result))
 		{
