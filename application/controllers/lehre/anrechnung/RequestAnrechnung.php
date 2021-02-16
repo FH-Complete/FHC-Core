@@ -292,11 +292,16 @@ class requestAnrechnung extends Auth_Controller
 	 */
 	private function _checkIfEntitledToReadDMSDoc($dms_id)
 	{
+		if (!$student = getData($this->StudentModel->load(array('student_uid' => $this->_uid)))[0])
+		{
+			show_error('Failed loading Student');
+		}
+		
 		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
 
 		if($result = getData($result)[0])
 		{
-			if ($result->insertvon == $this->_uid)
+			if ($result->prestudent_id == $student->prestudent_id)
 			{
 				return;
 			}
