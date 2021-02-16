@@ -48,6 +48,12 @@ $query = '
 	AND le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
 	AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'
 	AND le.lehre = TRUE
+	AND EXISTS (
+		SELECT 1
+		FROM lehre.tbl_anrechnung_anrechnungstatus
+		WHERE anrechnung_id = anrechnungen.anrechnung_id
+		AND status_kurzbz=\'inProgressLektor\'
+	)
 ';
 
 $filterWidgetArray = array(
