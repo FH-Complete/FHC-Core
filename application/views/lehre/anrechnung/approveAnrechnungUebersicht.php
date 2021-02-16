@@ -189,6 +189,11 @@ $this->load->view(
             <div class="col-xs-3">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
+                        <button id="show-inProgressDP" class="btn btn-default btn-clearfilter" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="<?php echo $this->p->t('anrechnung', 'alleInBearbeitungSTGL'); ?>">
+                                    <i class='fa fa-eye'></i>
+                        </button>
                         <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'nurEmpfohleneAnzeigen'); ?>"><i

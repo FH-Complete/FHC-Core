@@ -10210,8 +10210,26 @@ array(
 			)
 		)
 	),
-	
-	
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alleInBearbeitungSTGL',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Alle anzeigen, die durch die Studiengangsleitung bearbeitet werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Show all that are processed by the study course director.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 
