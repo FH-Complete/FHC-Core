@@ -83,4 +83,19 @@ class Anrechnung_model extends DB_Model
 		
 		return $this->execQuery($qry, array($anrechnung_id));
 	}
+	
+	/**
+	 * Delete Anrechnungstatus.
+	 *
+	 * @param $anrechnungstatus_id
+	 */
+	public function deleteAnrechnungstatus($anrechnungstatus_id){
+		
+		$qry = '
+			DELETE FROM lehre.tbl_anrechnung_anrechnungstatus
+			WHERE anrechnungstatus_id = ?
+		';
+		
+		return $this->execQuery($qry, array($anrechnungstatus_id));
+	}
 }

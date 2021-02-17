@@ -25,7 +25,8 @@ class approveAnrechnungDetail extends Auth_Controller
 				'download'  => 'lehre/anrechnung_genehmigen:rw',
 				'approve'   => 'lehre/anrechnung_genehmigen:rw',
 				'reject'    => 'lehre/anrechnung_genehmigen:rw',
-				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw'
+				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
+				'withdraw' => 'lehre/anrechnung_genehmigen:rw'
 			)
 		);
 
@@ -274,6 +275,47 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
 		}
+	}
+	
+	/**
+	 * Withdraw approved / rejected Anrechnung and reset to 'inProgressDP'.
+	 */
+	public function withdraw()
+	{
+		$anrechnung_id = $this->input->post('anrechnung_id');
+		
+		if (!is_numeric($anrechnung_id))
+		{
+			show_error('Wrong parameter.');
+		}
+		
+		// Get last Anrechnungstatus
+		if (!$result = getData($this->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			show_error('Failed loading Anrechnung');
+		}
+		
+		$last_status = $result->status_kurzbz;
+		$anrechnungstatus_id = $result->anrechnungstatus_id;
+		
+		// Return if last status is not approved / rejected
+		if ($last_status != self::ANRECHNUNGSTATUS_APPROVED && $last_status != self::ANRECHNUNGSTATUS_REJECTED)
+		{
+			return $this->outputJsonError('Nothing to withdraw. Application is still in progress.');
+		}
+		
+		// Withdraw status approved / rejected
+		$result = $this->AnrechnungModel->deleteAnrechnungstatus($anrechnungstatus_id);
+		
+		if (isError($result))
+		{
+			return $this->outputJsonError('Could not withdraw this application.');
+		}
+		
+		// Success output to AJAX
+		return $this->outputJsonSuccess(array(
+			'status_bezeichnung' => $this->anrechnunglib->getLastAnrechnungstatus($anrechnung_id))
+		);
 	}
 
 	/**

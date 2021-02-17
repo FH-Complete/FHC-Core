@@ -36,7 +36,11 @@ $this->load->view(
 				'lehrveranstaltung',
 				'ects',
 				'lektor',
-			)
+			),
+            'anrechnung' => array(
+                'genehmigungAblehnungWirklichZuruecknehmen',
+                'erfolgreichZurueckgenommen'
+            )
 		),
 		'customCSSs' => array(
 			'public/css/Tabulator.css'
@@ -327,6 +331,11 @@ $this->load->view(
                 </div>
 
                 <div class="pull-right">
+                    <button id="approveAnrechnungDetail-withdraw-anrechnung-approvement"
+                            class="btn btn-default btn-w200 <?php echo ($anrechnungData->status_kurzbz == 'approved' ||
+                                $anrechnungData->status_kurzbz == 'rejected') ? '' : 'hidden' ?>">
+	                    <?php echo ucfirst($this->p->t('global', 'zuruecknehmen')); ?>
+                    </button>
                     <button id="approveAnrechnungDetail-reject-anrechnung-ask" class="btn btn-danger btn-w200"
 						<?php echo $anrechnungData->status_kurzbz == 'inProgressDP' ? '' : 'disabled' ?>>
 						<?php echo ucfirst($this->p->t('global', 'ablehnen')); ?>

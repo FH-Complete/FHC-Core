@@ -199,6 +199,52 @@ $(function(){
         );
     });
 
+    // Request Recommendation for Anrechnungen
+    $("#approveAnrechnungDetail-withdraw-anrechnung-approvement").click(function(){
+
+        if(!confirm(FHC_PhrasesLib.t("anrechnung", "genehmigungAblehnungWirklichZuruecknehmen")))
+        {
+            return;
+        }
+
+        // Get form data
+        let form_data = $('form').serializeArray();
+
+        // Prepare data object for ajax call
+        let data = {
+            'anrechnung_id' : form_data[0].value
+        };
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/withdraw",
+            data,
+            {
+                successCallback: function (data, textStatus, jqXHR)
+                {
+                    if (data.error && data.retval != null)
+                    {
+                        // Print error message
+                        FHC_DialogLib.alertWarning(data.retval);
+                    }
+
+                    if (!data.error && data.retval != null)
+                    {
+                        approveAnrechnungDetail.formatGenehmigungIsWithdrawed(
+                            data.retval.status_bezeichnung
+                        );
+
+                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("anrechnung", "erfolgreichZurueckgenommen"));
+
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            }
+        );
+    });
+
     // Copy Begruendung into textarea
     $(".btn-copyIntoTextarea").click(function(){
         approveAnrechnungDetail.copyIntoTextarea(this);
@@ -272,6 +318,9 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
+
+        // Show button to withdraw approval
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
     },
     formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung, begruendung){
         $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
@@ -284,5 +333,25 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
+
+        // Show button to withdraw approval
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
+    },
+    formatGenehmigungIsWithdrawed: function (statusBezeichnung){
+        $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-danger').removeClass('alert-success');
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
+
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').removeClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('hidden');
+
+        $('#approveAnrechnungDetail-abgeschlossenAm').text('-');
+        $('#approveAnrechnungDetail-abgeschlossenVon').text('-');
+
+        $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', false);
+        $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
+        // Hide button to withdraw approval
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').addClass('hidden');
     }
 }
