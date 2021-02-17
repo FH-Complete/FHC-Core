@@ -147,12 +147,11 @@ $(function(){
     // Set status alert color
     approveAnrechnung.setStatusAlertColor();
 
-    // Show only rows with empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
-    $("#show-recommended").click(function(){
+    // Show only rows that are in progress by STGL
+    $("#show-inProgressDP").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter',
             [
                 {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_STGL},
-                {field: 'empfehlung_anrechnung', type: '=', value: 'true'}
             ]
         );
     });

@@ -4569,6 +4569,42 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"
 		echo ' lehre.tbl_anrechnungstatus: Tabelle hinzugefuegt<br>';
 }
 
+// GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;
+$qry = 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;';
+if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_anrechnungstatus '.$db->db_last_error().'</strong><br>';
+else
+	echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus';
+
+
+// SEQUENCE seq_anrechnungstatus_status_kurzbz
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'seq_anrechnungstatus_status_kurzbz'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+			CREATE SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz
+			START WITH 1
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+			';
+		
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created sequence: lehre.seq_anrechnungstatus_status_kurzbz';
+		
+		// GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_anrechnungstatus_status_kurzbz_seq to web;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz TO web;';
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.seq_anrechnungstatus_status_kurzbz';
+	}
+}
+
 // Add table anrechnung_anrechnungstatus
 // Für bestehende genehmigte Anrechnungsanträge wird ein Eintrag mit dem Status 'approved' angelegt
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatus LIMIT 1;"))
