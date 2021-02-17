@@ -191,7 +191,7 @@ $this->load->view(
                     <div class="btn-group" role="group">
                         <button id="show-inProgressDP" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
-                                title="<?php echo $this->p->t('anrechnung', 'alleInBearbeitungSTGL'); ?>">
+                                title="<?php echo $this->p->t('ui', 'alleInBearbeitungSTGL'); ?>">
                                     <i class='fa fa-eye'></i>
                         </button>
                         <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
@@ -234,4 +234,3 @@ $this->load->view(
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
-
