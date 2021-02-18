@@ -4541,7 +4541,7 @@ if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie_gruppe WHER
 	}
 }
 
-// Add table anrechnung_status
+// Add table anrechnungstatus
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"))
 {
 	$qry = "
@@ -4569,13 +4569,18 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"
 		echo ' lehre.tbl_anrechnungstatus: Tabelle hinzugefuegt<br>';
 }
 
-// GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;
-$qry = 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;';
-if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_anrechnungstatus '.$db->db_last_error().'</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus';
-
+// GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web; (SELECT was granted while adding table anrechnungstatus)
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_anrechnungstatus' AND table_schema='lehre' AND grantee='web' AND privilege_type='INSERT'"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = 'GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;';
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_anrechnungstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus';
+	}
+}
 
 // SEQUENCE seq_anrechnungstatus_status_kurzbz
 if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'seq_anrechnungstatus_status_kurzbz'"))
