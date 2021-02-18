@@ -221,6 +221,9 @@ $(function(){
     // Recommend Anrechnungen
     $("#reviewAnrechnungUebersicht-recommend-anrechnungen-confirm").click(function(){
 
+        // Avoid form redirecting automatically
+        event.preventDefault();
+
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .map(function(data){

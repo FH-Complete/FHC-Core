@@ -43,6 +43,9 @@ $(function(){
     // Approve Anrechnungen
     $("#approveAnrechnungDetail-approve-anrechnung-confirm").click(function(){
 
+        // Avoid form redirecting automatically
+        event.preventDefault();
+
         // Get form data
         let form_data = $('form').serializeArray();
 
@@ -160,6 +163,9 @@ $(function(){
     // Request Recommendation for Anrechnungen
     $("#approveAnrechnungDetail-request-recommendation").click(function(){
 
+        // Avoid form redirecting automatically
+        event.preventDefault();
+
         // Get form data
         let form_data = $('form').serializeArray();
 
@@ -202,6 +208,9 @@ $(function(){
     // Request Recommendation for Anrechnungen
     $("#approveAnrechnungDetail-withdraw-anrechnung-approvement").click(function(){
 
+        // Avoid form redirecting automatically
+        event.preventDefault();
+
         if(!confirm(FHC_PhrasesLib.t("anrechnung", "genehmigungAblehnungWirklichZuruecknehmen")))
         {
             return;
@@ -221,14 +230,17 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
+                    console.log(data);
                     if (data.error && data.retval != null)
                     {
+                        console.log('inside error');
                         // Print error message
                         FHC_DialogLib.alertWarning(data.retval);
                     }
 
                     if (!data.error && data.retval != null)
                     {
+                        console.log('inside success');
                         approveAnrechnungDetail.formatGenehmigungIsWithdrawed(
                             data.retval.status_bezeichnung
                         );

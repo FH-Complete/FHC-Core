@@ -49,6 +49,9 @@ $(function(){
     // Recommend Anrechnung
     $("#reviewAnrechnungDetail-recommend-anrechnung-confirm").click(function(){
 
+        // Avoid form redirecting automatically
+        event.preventDefault();
+
         // Get form data
         let form_data = $('form').serializeArray();
 
