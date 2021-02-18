@@ -358,7 +358,7 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 }
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
-$htmlstr .= "<td width=10% align=center><form action='../../../include/".EXT_FKT_PATH."/abgabe_lektor_benotung.php' title='Benotungsformular' target='_blank' method='GET'>";
+$htmlstr .= "<td width=10% align=center><form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung' title='Benotungsformular' target='_blank' method='GET'>";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 $htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form></td>";
