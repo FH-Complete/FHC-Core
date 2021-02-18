@@ -826,8 +826,7 @@ class ReihungstestJob extends JOB_Controller
 						AND tbl_studiengang.typ IN ('b', 'm')
 				)
 				SELECT * FROM prst
-				WHERE
-				prestudenstatus_datum >= (SELECT CURRENT_DATE - 1)
+				WHERE prestudenstatus_datum >= (SELECT CURRENT_DATE - 1)
 				AND (studiengang_typ = 'b' OR (studiengang_typ = 'm' AND EXISTS (SELECT 1 /* Master Studiengänge berücksichtigen wenn auch Bachelor im gleichen Semester */
 																					FROM prst prstb
 																					WHERE studiengang_typ = 'b'
