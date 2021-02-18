@@ -30,7 +30,7 @@ function getAuthPersonId()
 function getAuthUID()
 {
 	$ci =& get_instance(); // get CI instance
-return 'martinek';
+
 	return isLogged() ? ($ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME} : null;
 }
 
