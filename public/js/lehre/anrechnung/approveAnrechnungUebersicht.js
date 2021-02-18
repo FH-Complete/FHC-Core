@@ -156,6 +156,16 @@ $(function(){
         );
     });
 
+    // Show only rows with empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
+    $("#show-recommended").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_STGL},
+                {field: 'empfehlung_anrechnung', type: '=', value: 'true'}
+            ]
+        );
+    });
+
     // Show only rows with nicht empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
     $("#show-not-recommended").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter', [
