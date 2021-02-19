@@ -6,6 +6,9 @@ class DmsLib
 {
 	const FILE_CONTENT_PROPERTY = 'file_content';
 
+	const FILE_INPUT_NAME = 'uploadfile'; // name of the HTML input tag containing the uploaded file
+	private $UPLOAD_PATH = DMS_PATH; // temporary directory to store the upload file
+
 	/**
 	 * Object initialization
 	 */
@@ -91,6 +94,84 @@ class DmsLib
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Uploads a document and saves it to DMS
+	 * @param $dms DMS assoc array
+	 * @param array $allowed_types  Default: all. Param example: array(jpg, pdf)
+	 * @return array
+	 */
+	public function upload($dms, $allowed_types = array('*'))
+	{
+		// Init upload configs
+		$this->_loadUploadLibrary($allowed_types);
+
+		if (!$this->ci->upload->do_upload(DmsLib::FILE_INPUT_NAME))
+		{
+			return error($this->ci->upload->display_errors());
+		}
+
+		$upload_data = $this->ci->upload->data();  // data about the uploaded file
+		$filename = $upload_data['file_name'];
+
+		// Insert to DMS table
+		if (!$result = $this->ci->DmsModel->insert($this->ci->DmsModel->filterFields($dms)))
+		{
+			return error('Failed inserting to DMS');
+		}
+		$upload_data['dms_id'] = $result->retval;
+
+		// Insert DMS version
+		if (!$result = $this->ci->DmsVersionModel->insert(
+			$this->ci->DmsVersionModel->filterFields($dms, $result->retval, $filename)))
+		{
+			return error('Failed inserting DMS version');
+		}
+
+		// return result of uploaded data
+		return success($upload_data); // data about the uploaded file
+	}
+
+	/**
+	 * Download a document
+	 * @param $dms_id
+	 */
+	public function download($dms_id)
+	{
+		if (!is_numeric($dms_id))
+		{
+			show_error('Wrong parameter');
+		}
+
+		$this->ci->DmsVersionModel->addSelect('filename');
+		$result = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
+
+		if (isError($result))
+		{
+			show_error(getError($result));
+		}
+
+		$filename = $result->retval[0]->filename;
+		$file = DMS_PATH. $filename;
+
+		if (file_exists($file))
+		{
+			$finfo  = new finfo(FILEINFO_MIME);
+
+			header('Content-Description: File Transfer');
+			header('Content-Type: '.$finfo->file($file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+			readfile($file);
+			exit;
+		}
+		else
+		{
+			show_error('File does not exist');
+		}
 	}
 
 	/**
@@ -301,5 +382,19 @@ class DmsLib
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Loads the upload library of CI
+	 */
+	private function _loadUploadLibrary($allowed_types)
+	{
+		$config['upload_path']          = $this->UPLOAD_PATH;
+		$config['allowed_types']        = implode('|', $allowed_types);
+		$config['overwrite']            = true;
+		$config['file_name']				= uniqid().'.pdf';
+
+		$this->ci->load->library('upload', $config);
+		$this->ci->upload->initialize($config);
 	}
 }
