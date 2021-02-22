@@ -41,10 +41,13 @@ $(function(){
     });
 
     // Approve Anrechnungen
-    $("#approveAnrechnungDetail-approve-anrechnung-confirm").click(function(){
+    $("#approveAnrechnungDetail-approve-anrechnung-confirm").click(function(e){
 
         // Avoid form redirecting automatically
-        event.preventDefault();
+        e.preventDefault();
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -102,7 +105,13 @@ $(function(){
     });
 
     // Reject Anrechnungen
-    $("#approveAnrechnungDetail-reject-anrechnung-confirm").click(function(){
+    $("#approveAnrechnungDetail-reject-anrechnung-confirm").click(function(e){
+
+        // Avoid form redirecting automatically
+        e.preventDefault();
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         let begruendung = $('#approveAnrechnungDetail-begruendung').val();
 
@@ -112,9 +121,6 @@ $(function(){
             FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungAngeben"));
             return;
         }
-
-        // Avoid form redirecting automatically
-        event.preventDefault();
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -161,10 +167,10 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungDetail-request-recommendation").click(function(){
+    $("#approveAnrechnungDetail-request-recommendation").click(function(e){
 
         // Avoid form redirecting automatically
-        event.preventDefault();
+        e.preventDefault();
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -206,10 +212,10 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungDetail-withdraw-anrechnung-approvement").click(function(){
+    $("#approveAnrechnungDetail-withdraw-anrechnung-approvement").click(function(e){
 
         // Avoid form redirecting automatically
-        event.preventDefault();
+        e.preventDefault();
 
         if(!confirm(FHC_PhrasesLib.t("anrechnung", "genehmigungAblehnungWirklichZuruecknehmen")))
         {

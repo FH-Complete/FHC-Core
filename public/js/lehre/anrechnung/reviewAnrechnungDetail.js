@@ -47,10 +47,13 @@ $(function(){
     });
 
     // Recommend Anrechnung
-    $("#reviewAnrechnungDetail-recommend-anrechnung-confirm").click(function(){
+    $("#reviewAnrechnungDetail-recommend-anrechnung-confirm").click(function(e){
 
         // Avoid form redirecting automatically
-        event.preventDefault();
+        e.preventDefault();
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -108,7 +111,13 @@ $(function(){
     });
 
     // Dont recommend Anrechnung
-    $("#reviewAnrechnungDetail-dont-recommend-anrechnung-confirm").click(function(){
+    $("#reviewAnrechnungDetail-dont-recommend-anrechnung-confirm").click(function(e){
+
+        // Avoid form redirecting automatically
+        e.preventDefault();
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         let begruendung = $('#reviewAnrechnungDetail-begruendung').val();
 
@@ -118,9 +127,6 @@ $(function(){
             FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungAngeben"));
             return;
         }
-
-        // Avoid form redirecting automatically
-        event.preventDefault();
 
         // Get form data
         let form_data = $('form').serializeArray();

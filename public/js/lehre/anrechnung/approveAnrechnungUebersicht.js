@@ -221,10 +221,13 @@ $(function(){
     });
 
     // Approve Anrechnungen
-    $("#approveAnrechnungUebersicht-approve-anrechnungen-confirm").click(function(){
+    $("#approveAnrechnungUebersicht-approve-anrechnungen-confirm").click(function(e){
 
         // Avoid form redirecting automatically
-        event.preventDefault();
+        e.preventDefault();
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
@@ -293,7 +296,13 @@ $(function(){
     });
 
     // Reject Anrechnungen
-    $("#approveAnrechnungUebersicht-reject-anrechnungen-confirm").click(function(){
+    $("#approveAnrechnungUebersicht-reject-anrechnungen-confirm").click(function(e){
+
+        // Avoid form redirecting automatically
+        e.preventDefault();
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         let begruendung = $('#approveAnrechnungUebersicht-begruendung').val();
 
@@ -322,9 +331,6 @@ $(function(){
             FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteMindEinenAntragWaehlen"));
             return;
         }
-
-        // Avoid form redirecting automatically
-        event.preventDefault();
 
         // Prepare data object for ajax call
         let data = {
@@ -364,10 +370,10 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungUebersicht-request-recommendation").click(function(){
+    $("#approveAnrechnungUebersicht-request-recommendation").click(function(e){
 
         // Avoid form redirecting automatically
-        event.preventDefault();
+        e.preventDefault();
 
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
