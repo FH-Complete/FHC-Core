@@ -20,6 +20,7 @@ $query = '
 			begruendung.bezeichnung AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
+			anrechnung.insertamum::date AS "antragsdatum",
 			empfehlung_anrechnung,
 			(SELECT status_kurzbz
 			FROM lehre.tbl_anrechnungstatus
@@ -65,6 +66,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
 		ucfirst($this->p->t('anrechnung', 'herkunft')),
+		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
 		'Status'
@@ -117,6 +119,7 @@ $filterWidgetArray = array(
 		    target:"_blank"
 		}},
 		anmerkung_student: {headerFilter:"input"},
+		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false},
 		status_bezeichnung: {headerFilter:"input"}

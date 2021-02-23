@@ -9,6 +9,20 @@ const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 const COLOR_LIGHTGREY = "#f5f5f5";
 
+// -----------------------------------------------------------------------------------------------------------------
+// Mutators - setter methods to manipulate table data when entering the tabulator
+// -----------------------------------------------------------------------------------------------------------------
+
+// Converts string date postgre style to string DD.MM.YYYY.
+// This will allow correct filtering.
+var mut_formatStringDate = function(value, data, type, params, component) {
+    if (value != null)
+    {
+        var d = new Date(value);
+        return ("0" + (d.getDate())).slice(-2)  + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + d.getFullYear();
+    }
+}
+
 // TABULATOR FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 // Returns relative height (depending on screen size)
