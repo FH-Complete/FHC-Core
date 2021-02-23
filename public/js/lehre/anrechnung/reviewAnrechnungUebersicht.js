@@ -221,9 +221,6 @@ $(function(){
     // Recommend Anrechnungen
     $("#reviewAnrechnungUebersicht-recommend-anrechnungen-confirm").click(function(e){
 
-        // Avoid form redirecting automatically
-        e.preventDefault();
-
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
 
@@ -296,9 +293,6 @@ $(function(){
 
     // Dont recommend Anrechnungen
     $("#reviewAnrechnungUebersicht-dont-recommend-anrechnungen-confirm").click(function(e){
-
-        // Avoid form redirecting automatically
-        e.preventDefault();
 
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
@@ -376,7 +370,7 @@ $(function(){
 
     // Break Begruendung abgeben
     $('#reviewAnrechnungUebersicht-begruendung-abbrechen').click(function(){
-        $('#reviewAnrechnungUebersicht-begruendung').val('');
+
         begruendung_panel.slideUp('slow');
 
     })

@@ -223,9 +223,6 @@ $(function(){
     // Approve Anrechnungen
     $("#approveAnrechnungUebersicht-approve-anrechnungen-confirm").click(function(e){
 
-        // Avoid form redirecting automatically
-        e.preventDefault();
-
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
 
@@ -298,9 +295,6 @@ $(function(){
     // Reject Anrechnungen
     $("#approveAnrechnungUebersicht-reject-anrechnungen-confirm").click(function(e){
 
-        // Avoid form redirecting automatically
-        e.preventDefault();
-
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
 
@@ -370,10 +364,7 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungUebersicht-request-recommendation").click(function(e){
-
-        // Avoid form redirecting automatically
-        e.preventDefault();
+    $("#approveAnrechnungUebersicht-request-recommendation").click(function(){
 
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
@@ -444,7 +435,7 @@ $(function(){
 
     // Break Ablehnung abgeben
     $('#approveAnrechnungUebersicht-begruendung-abbrechen').click(function(){
-        $('#approveAnrechnungUebersicht-begruendung').val('');
+
         begruendung_panel.slideUp('slow');
 
     })

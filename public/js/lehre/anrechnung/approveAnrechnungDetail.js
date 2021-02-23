@@ -43,9 +43,6 @@ $(function(){
     // Approve Anrechnungen
     $("#approveAnrechnungDetail-approve-anrechnung-confirm").click(function(e){
 
-        // Avoid form redirecting automatically
-        e.preventDefault();
-
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
 
@@ -107,9 +104,6 @@ $(function(){
     // Reject Anrechnungen
     $("#approveAnrechnungDetail-reject-anrechnung-confirm").click(function(e){
 
-        // Avoid form redirecting automatically
-        e.preventDefault();
-
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
 
@@ -167,10 +161,7 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungDetail-request-recommendation").click(function(e){
-
-        // Avoid form redirecting automatically
-        e.preventDefault();
+    $("#approveAnrechnungDetail-request-recommendation").click(function(){
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -212,10 +203,7 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungDetail-withdraw-anrechnung-approvement").click(function(e){
-
-        // Avoid form redirecting automatically
-        e.preventDefault();
+    $("#approveAnrechnungDetail-withdraw-anrechnung-approvement").click(function(){
 
         if(!confirm(FHC_PhrasesLib.t("anrechnung", "genehmigungAblehnungWirklichZuruecknehmen")))
         {
@@ -276,7 +264,7 @@ $(function(){
 
     // Break Begruendung abgeben
     $('#approveAnrechnungDetail-begruendung-abbrechen').click(function(){
-        $('#approveAnrechnungDetail-begruendung').val('');
+
         begruendung_panel.slideUp('slow');
 
     })

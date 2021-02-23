@@ -209,11 +209,11 @@ $this->load->view(
                                                 <!-- Action Button Abbrechen & Bestaetigen-->
                                                 <div class="pull-right">
                                                     <button id="reviewAnrechnungDetail-begruendung-abbrechen"
-                                                            class="btn btn-default btn-w200">
+                                                            class="btn btn-default btn-w200" type="reset">
 														<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                                                     </button>
                                                     <button id="reviewAnrechnungDetail-dont-recommend-anrechnung-confirm"
-                                                            class="btn btn-primary btn-w200">
+                                                            class="btn btn-primary btn-w200" type="button">
 														<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                                                     </button>
                                                 </div>
@@ -229,11 +229,11 @@ $this->load->view(
                                                 <!-- Action Button Abbrechen & Bestaetigen-->
                                                 <div class="pull-right">
                                                     <button id="reviewAnrechnungDetail-empfehlung-abbrechen"
-                                                            class="btn btn-default btn-w200">
+                                                            class="btn btn-default btn-w200" type="reset">
 														<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                                                     </button>
                                                     <button id="reviewAnrechnungDetail-recommend-anrechnung-confirm"
-                                                            class="btn btn-primary btn-w200">
+                                                            class="btn btn-primary btn-w200" type="button">
 														<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                                                     </button>
                                                 </div>
@@ -248,10 +248,12 @@ $this->load->view(
 
                 <div class="pull-right">
                     <button id="reviewAnrechnungDetail-dont-recommend-anrechnung-ask" class="btn btn-danger btn-w200"
+                            type="button"
 						<?php echo is_null($empfehlungData->empfehlung) ? '' : 'disabled' ?>>
 						<?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?>
                     </button>
                     <button id="reviewAnrechnungDetail-recommend-anrechnung-ask" class="btn btn-primary btn-w200"
+                            type="button"
 						<?php echo is_null($empfehlungData->empfehlung) ? '' : 'disabled' ?>>
 						<?php echo ucfirst($this->p->t('anrechnung', 'empfehlen')); ?>
                     </button>

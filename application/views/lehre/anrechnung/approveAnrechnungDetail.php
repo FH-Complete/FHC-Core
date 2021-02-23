@@ -290,11 +290,11 @@ $this->load->view(
                                                 <!-- Action Button 'Abbrechen'-->
                                                 <div class="pull-right">
                                                     <button id="approveAnrechnungDetail-begruendung-abbrechen"
-                                                            class="btn btn-default btn-w200">
+                                                            class="btn btn-default btn-w200" type="reset">
 														<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                                                     </button>
                                                     <button id="approveAnrechnungDetail-reject-anrechnung-confirm"
-                                                            class="btn btn-primary btn-w200">
+                                                            class="btn btn-primary btn-w200" type="button">
 														<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                                                     </button>
                                                 </div>
@@ -311,11 +311,11 @@ $this->load->view(
                                                 <!-- Action Button 'Abbrechen'-->
                                                 <div class="pull-right">
                                                     <button id="approveAnrechnungDetail-genehmigung-abbrechen"
-                                                            class="btn btn-default btn-w200">
+                                                            class="btn btn-default btn-w200" type="reset">
 														<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                                                     </button>
                                                     <button id="approveAnrechnungDetail-approve-anrechnung-confirm"
-                                                            class="btn btn-primary btn-w200">
+                                                            class="btn btn-primary btn-w200" type="button">
 														<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                                                     </button>
                                                 </div>
@@ -333,14 +333,17 @@ $this->load->view(
                 <div class="pull-right">
                     <button id="approveAnrechnungDetail-withdraw-anrechnung-approvement"
                             class="btn btn-default btn-w200 <?php echo ($anrechnungData->status_kurzbz == 'approved' ||
-                                $anrechnungData->status_kurzbz == 'rejected') ? '' : 'hidden' ?>">
+                                $anrechnungData->status_kurzbz == 'rejected') ? '' : 'hidden' ?>"
+                            type="button">
 	                    <?php echo ucfirst($this->p->t('global', 'zuruecknehmen')); ?>
                     </button>
                     <button id="approveAnrechnungDetail-reject-anrechnung-ask" class="btn btn-danger btn-w200"
+                            type="button"
 						<?php echo $anrechnungData->status_kurzbz == 'inProgressDP' ? '' : 'disabled' ?>>
 						<?php echo ucfirst($this->p->t('global', 'ablehnen')); ?>
                     </button>
                     <button id="approveAnrechnungDetail-approve-anrechnung-ask" class="btn btn-primary btn-w200"
+                            type="button"
 						<?php echo $anrechnungData->status_kurzbz == 'inProgressDP' ? '' : 'disabled' ?>>
 						<?php echo ucfirst($this->p->t('global', 'genehmigen')); ?>
                     </button>

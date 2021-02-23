@@ -49,9 +49,6 @@ $(function(){
     // Recommend Anrechnung
     $("#reviewAnrechnungDetail-recommend-anrechnung-confirm").click(function(e){
 
-        // Avoid form redirecting automatically
-        e.preventDefault();
-
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
 
@@ -112,9 +109,6 @@ $(function(){
 
     // Dont recommend Anrechnung
     $("#reviewAnrechnungDetail-dont-recommend-anrechnung-confirm").click(function(e){
-
-        // Avoid form redirecting automatically
-        e.preventDefault();
 
         // Avoid bubbling click event to sibling break button
         e.stopImmediatePropagation();
@@ -180,7 +174,7 @@ $(function(){
 
     // Break Begruendung abgeben
     $('#reviewAnrechnungDetail-begruendung-abbrechen').click(function(){
-        $('#reviewAnrechnungDetail-begruendung').val('');
+
         begruendung_panel.slideUp('slow');
     })
 
