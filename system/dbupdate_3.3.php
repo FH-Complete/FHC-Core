@@ -212,21 +212,21 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_user LIMIT 1"))
 			JOIN public.tbl_mitarbeiter ma ON ma.mitarbeiter_uid = b.uid
 			WHERE ma.personalnummer > 0
 		);';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.vw_msg_vars_user view created';
-	
+
 	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO web;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars_user';
-	
+
 	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO vilesci;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4482,8 +4482,8 @@ if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
 		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
 		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
 	";
-	
-	
+
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_anrechnung: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4558,56 +4558,15 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"
 		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressLektor', '{\"Empfehlung angefordert\",\"recommendation requested\"}');
 		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('approved', '{\"genehmigt\",\"approved\"}');
 		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('rejected', '{\"abgelehnt\",\"rejected\"}');
-	
+
 		GRANT SELECT ON lehre.tbl_anrechnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnungstatus TO vilesci;
 	";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' lehre.tbl_anrechnungstatus: Tabelle hinzugefuegt<br>';
-}
-
-// GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web; (SELECT was granted while adding table anrechnungstatus)
-if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_anrechnungstatus' AND table_schema='lehre' AND grantee='web' AND privilege_type='INSERT'"))
-{
-	if($db->db_num_rows($result) == 0)
-	{
-		$qry = 'GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;';
-		if (!$db->db_query($qry))
-			echo '<strong>lehre.tbl_anrechnungstatus '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus';
-	}
-}
-
-// SEQUENCE seq_anrechnungstatus_status_kurzbz
-if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'seq_anrechnungstatus_status_kurzbz'"))
-{
-	if ($db->db_num_rows($result) == 0)
-	{
-		$qry = '
-			CREATE SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz
-			START WITH 1
-			INCREMENT BY 1
-			NO MAXVALUE
-			NO MINVALUE
-			CACHE 1;
-			';
-		
-		if(!$db->db_query($qry))
-			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Created sequence: lehre.seq_anrechnungstatus_status_kurzbz';
-		
-		// GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_anrechnungstatus_status_kurzbz_seq to web;
-		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz TO web;';
-		if (!$db->db_query($qry))
-			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.seq_anrechnungstatus_status_kurzbz';
-	}
 }
 
 // Add table anrechnung_anrechnungstatus
@@ -4628,7 +4587,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT pk_anrechnung_anrechnungstatus PRIMARY KEY (anrechnungstatus_id);
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT fk_anrechnung_anrechnungstatus_anrechnung FOREIGN KEY (anrechnung_id) REFERENCES lehre.tbl_anrechnung(anrechnung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT fk_anrechnung_anrechnungstatus_anrechnungstatus FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_anrechnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-		
+
 		CREATE SEQUENCE lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id
 			START WITH 1
 			INCREMENT BY 1
@@ -4636,14 +4595,15 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 			NO MINVALUE
 			CACHE 1;
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ALTER COLUMN anrechnungstatus_id SET DEFAULT nextval('lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id');
-		
+
 		INSERT INTO lehre.tbl_anrechnung_anrechnungstatus(anrechnung_id, status_kurzbz) SELECT anrechnung_id, 'approved' as status_kurzbz FROM lehre.tbl_anrechnung WHERE genehmigt_von is not null;
-		
-		GRANT SELECT ON lehre.tbl_anrechnung_anrechnungstatus TO web;
+
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO vilesci;
 		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO vilesci;
+		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO web;
 	";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_anrechnung_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4669,7 +4629,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	if($db->db_num_rows($result) == 0)
 	{
 		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/anrechnung_beantragen', 'Anrechnung beantragen');";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
@@ -4683,7 +4643,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	if($db->db_num_rows($result) == 0)
 	{
 		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/anrechnung_genehmigen', 'Anrechnung genehmigen');";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
@@ -4697,7 +4657,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	if($db->db_num_rows($result) == 0)
 	{
 		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/anrechnung_empfehlen', 'Anrechnung empfehlen');";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
