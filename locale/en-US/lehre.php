@@ -40,4 +40,7 @@ $this->phrasen['lehre/nichtzugeteilt']='Sie sind nicht zu dieser Lehrveranstaltu
 $this->phrasen['lehre/studienordnung']='Studienordnung';
 $this->phrasen['lehre/studienplan']='Studienplan';
 $this->phrasen['lehre/noteneingabedeaktiviert']='Grading disabled';
+$this->phrasen['lehre/anerkennungNachgewiesenerKenntnisse']='Crediting for proven knowledge';
+$this->phrasen['lehre/anrechnung']='Exemption';
+
 ?>

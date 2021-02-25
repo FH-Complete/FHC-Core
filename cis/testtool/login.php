@@ -219,6 +219,11 @@ if (isset($_REQUEST['prestudent']))
 				$ablauf->getAblaufGebiete($firstPrio_studiengang_kz, $firstPrio_studienplan_id);
 				$rt_sprache = '';
 
+				if (empty($ablauf->result[0]))
+				{
+                    $ablauf->getAblaufGebiete($firstPrio_studiengang_kz);
+                }
+
 				if (!empty($ablauf->result[0]))
 				{
 					$rt_sprache = $ablauf->result[0]->sprache;
@@ -441,6 +446,7 @@ if (isset($prestudent_id))
 			if (isset($row_prio->studiengang_kz))
 			{
 				$firstPrio_studiengang_kz = $row_prio->studiengang_kz;
+                $firstPrio_studienplan_id = $row_prio->studienplan_id;
 				break;
 			}
 		}
@@ -449,9 +455,16 @@ if (isset($prestudent_id))
 	// Sprachwahl zu STG mit höchster Prio ermitteln
 	$ablauf = new Ablauf();
 	$sprachwahl = false;
-	if (isset($ablauf->result[0])
-	 && $ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz)
-	 && is_bool($ablauf->result[0]->sprachwahl))
+
+    $ablauf->getAblaufGebiete($firstPrio_studiengang_kz, $firstPrio_studienplan_id);
+
+    if (empty($ablauf->result[0]))
+    {
+        $ablauf->getAblaufGebiete($firstPrio_studiengang_kz);
+    }
+
+    if (isset($ablauf->result[0])
+        && is_bool($ablauf->result[0]->sprachwahl))
 	{
 	   $sprachwahl = $ablauf->result[0]->sprachwahl;
 	}
