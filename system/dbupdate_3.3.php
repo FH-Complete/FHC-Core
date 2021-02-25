@@ -4471,8 +4471,8 @@ if(!$result = @$db->db_query("SELECT azgrelevant FROM bis.tbl_bisverwendung LIMI
 	$qry = "
 		ALTER TABLE bis.tbl_bisverwendung ADD COLUMN azgrelevant boolean;
 		UPDATE bis.tbl_bisverwendung SET azgrelevant = zeitaufzeichnungspflichtig;
-		UPDATE bis.tbl_bisverwendung SET zeitaufzeichnungspflichtig = true WHERE ba1code=103;
-  	";
+		UPDATE bis.tbl_bisverwendung SET zeitaufzeichnungspflichtig = true WHERE ba1code=103 AND beschausmasscode!=5;
+	";
 
 	if(!$db->db_query($qry))
 		echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
