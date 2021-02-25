@@ -48,6 +48,19 @@ abstract class JQW_Controller extends JOB_Controller
 	}
 
 	/**
+	 * To get the oldest added job using the given job type
+	 */
+	protected function getOldestJob($type)
+	{
+		$jobs = $this->jobsqueuelib->getOldestJob($type);
+
+		// If an error occurred then log it in database
+		if (isError($jobs)) $this->logError(getError($jobs), $type);
+
+		return $jobs;
+	}
+
+	/**
 	 * To get all the jobs specified by the given parameters
 	 */
 	protected function getJobsByTypeStatusInput($type, $status, $input)
