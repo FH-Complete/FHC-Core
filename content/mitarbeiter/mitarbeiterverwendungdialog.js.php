@@ -88,7 +88,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		var predicateNS = "http://www.technikum-wien.at/mitarbeiter/rdf";
 
 		fixangestellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fixangestellt" ));
-
+		azgrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#azgrelevant" ));
 		//neuer Datensatz wird angelegt
 		MitarbeiterVerwendungDetailNeu='true';
 
@@ -113,13 +113,13 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		{
 			zeitaufzeichnungspflichtig='Nein';
 		}
-		if (azgrelevant=='Ja')
+		if (!azgrelevant)
 		{
-			azgrelevant='Ja';
+			azgrelevant='Nein';
 		}
 		else
 		{
-			azgrelevant='Nein';
+			azgrelevant='Ja';
 		}
 	}
 
@@ -147,10 +147,10 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked=true;
 	else
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked=false;
-	if(azgrelevant=='Ja')
-		document.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked=true;
-	else
+	if(azgrelevant=='Nein')
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked=false;
+	else
+		document.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked=true;
 	MitarbeiterVerwendungDetailToggleHauptberuf();
 	MitarbeiterVerwendungVerwendungChange();
 }
