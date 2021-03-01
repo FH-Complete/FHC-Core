@@ -9292,7 +9292,26 @@ Any unusual occurrences
 			)
 		)
 	),
-
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'zurZweitbegutachterBewertung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zur Bewertung des Zweitbegutachters',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To assessment of second assessor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 

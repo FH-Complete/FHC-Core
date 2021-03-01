@@ -4503,6 +4503,20 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='projektarbei
 	}
 }
 
+// UPDATE Berechtigung für lehre.tbl_projektbetreuer für web user hinzufügen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_projektbetreuer' AND table_schema='lehre' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT UPDATE ON lehre.tbl_projektbetreuer TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Projektbetreuer Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Web User: update fuer lehre.tbl_projektbetreuer berechtigt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
