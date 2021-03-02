@@ -397,7 +397,7 @@ if($command=="update" && $error!=true)
 						echo $p->t('global/dateiNichtErfolgreichHochgeladen');
 					}
 				}
-				//E-Mail an 1.Begutachter
+				//E-Mail an 1.Begutachter und 2.Begutachter
 				if($bid!='' && $bid!=NULL)
 				{
 					$qry_betr="SELECT distinct trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
@@ -424,12 +424,47 @@ if($command=="update" && $error!=true)
 							{
 								$row_std=$db->db_fetch_object($result_std);
 
+								$mail_anrede = "Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\n";
+								$mail_abgabetext = ($row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)." hat eine Abgabe vorgenommen.\n\n";
+								$mail_zurbeurteilung = "Zur Beurteilung der Arbeit:\n";
+								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+								$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$user."\n\n";
+								$mail_abschluss = "--------------------------------------------------------------------------\n";
+								$mail_abschluss .= "Dies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\nCis->Mein CIS->Projektarbeiten->Bachelor- und Masterarbeitsabgabe\n";
+								$mail_abschluss .= "--------------------------------------------------------------------------";
+
+								$mailtext_erstbetr = $mail_anrede.$mail_abgabetext.$mail_zurbeurteilung.$mail_fulllink.$mail_abschluss;
+
+								// send Mail to 1. Begutachter
 								$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "no-reply@".DOMAIN, "Bachelor-/Masterarbeitsbetreuung",
-								"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\n".($row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)." hat eine Abgabe vorgenommen.\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\nCis->Mein CIS->Projektarbeiten->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
+									$mailtext_erstbetr);
 								$mail->setReplyTo($user."@".DOMAIN);
 								if(!$mail->send())
 								{
 									echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailBegutachter')."</font><br>&nbsp;";
+								}
+
+								// send Mail to 2. Begutachter
+								$zweitbetr = getZweitbegutachterWithToken($projektarbeit_id, $bid, $user);
+
+								if ($zweitbetr)
+								{
+									$intern = isset($zweitbetr->uid);
+									$zweitbetrmail = $intern ? $zweitbetr->uid."@".DOMAIN : $zweitbetr->kontakt;
+
+									$mail_link = $intern ? $mail_fulllink : $mail_baselink."\n\n";
+									$mail_anrede = "Sehr geehrte".($zweitbetr->anrede=="Herr"?"r":"")." ".$zweitbetr->anrede." ".$zweitbetr->first."!\n\n";
+									$mail_token = isset($zweitbetr->zugangstoken) && !$intern ? "Zugangstoken: ".$zweitbetr->zugangstoken."\n\n" : "";
+
+									$mailtext_zweitbetr = $mail_anrede.$mail_abgabetext.$mail_zurbeurteilung.$mail_link.$mail_token.$mail_abschluss;
+
+									$mail = new mail($zweitbetrmail, "no-reply@".DOMAIN, "Masterarbeitsbetreuung",
+										$mailtext_zweitbetr);
+									$mail->setReplyTo($user."@".DOMAIN);
+									if(!$mail->send())
+									{
+										echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailBegutachter')."</font><br>&nbsp;";
+									}
 								}
 							}
 						}
@@ -604,5 +639,104 @@ function isAbgabeOutOfDate($paabgabe_id)
 		}
 	}
 	return false;
+}
+
+/**
+ * Holt Zweitbegutachter einer Projektarbeit.
+ * Wenn Zweitbegutachter extern ist (kein Benutzeraccount) und noch keinen Token hat,
+ * wird der Token erstellt.
+ * @param $projektarbeit_id int
+ * @param $bid int person_id des Erstbegutachters
+ * @param $student_uid string uid des Studenten der Arbeit abgibt
+ * @return object
+ */
+function getZweitbegutachterWithToken($projektarbeit_id, $bid, $student_uid)
+{
+	global $db, $p;
+
+	$qry_betr="SELECT betr.person_id, anrede, betr.zugangstoken, betr.zugangstoken_gueltigbis, tbl_benutzer.uid, kontakt,
+       			trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first
+			FROM lehre.tbl_projektbetreuer betr
+			JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id 
+			JOIN public.tbl_person pers ON betr.person_id = pers.person_id
+			JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id
+			LEFT JOIN public.tbl_benutzer ON pers.person_id = tbl_benutzer.person_id
+			WHERE betr.betreuerart_kurzbz = 'Zweitbegutachter'
+			AND betr.projektarbeit_id = ".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
+			AND parb.student_uid = ".$db->db_add_param($student_uid)."
+			AND EXISTS (
+			    SELECT 1 FROM lehre.tbl_projektbetreuer
+			    WHERE person_id = ".$db->db_add_param($bid, FHC_INTEGER)."
+			    AND betreuerart_kurzbz = 'Erstbegutachter'
+			    AND projektarbeit_id = betr.projektarbeit_id
+			)
+			AND kontakttyp='email' AND zustellung AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)
+			ORDER BY betr.insertamum DESC
+			LIMIT 1";
+
+	if (!$betr=$db->db_query($qry_betr))
+	{
+		echo "<font color=\"#FF0000\">".$p->t('global/fehlerBeimLesenAusDatenbank')."</font><br>&nbsp;";
+		return null;
+	}
+	else
+	{
+		$row_betr = $db->db_fetch_object($betr);
+
+		if ($row_betr)
+		{
+			// if externer Betreuer and no valid token, generate
+			if (!isset($row_betr->uid) && (!isset($row_betr->zugangstoken) || $row_betr->zugangstoken_gueltigbis < date('Y-m-d')))
+			{
+				$tokenanzahl = 1;
+
+				while ($tokenanzahl > 0)
+				{
+					//generate random string
+					$rand_token = openssl_random_pseudo_bytes(16);
+					//change binary to hexadecimal
+					$token = bin2hex($rand_token);
+					//token generated
+
+					$qry_tokencheck = "
+						SELECT count(*) AS anzahl
+						FROM lehre.tbl_projektbetreuer
+						WHERE zugangstoken = ".$db->db_add_param($token)."
+					";
+
+					if ($tokencount = $db->db_query($qry_tokencheck))
+					{
+						$row_tokencount = $db->db_fetch_object($tokencount);
+
+						$tokenanzahl = (int) $row_tokencount->anzahl;
+					}
+					else
+					{
+						echo "<font color=\"#FF0000\">".$p->t('global/fehleraufgetreten')."</font><br>&nbsp;";
+						break;
+					}
+				}
+
+				$qry_upd="UPDATE lehre.tbl_projektbetreuer SET
+					zugangstoken = ".$db->db_add_param($token).",
+					zugangstoken_gueltigbis = CURRENT_DATE + interval '1 year'
+					WHERE projektarbeit_id = ".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
+					AND person_id = ".$db->db_add_param($row_betr->person_id, FHC_INTEGER)."
+					AND betreuerart_kurzbz = 'Zweitbegutachter'
+					";
+
+				if($result=$db->db_query($qry_upd))
+				{
+					$row_betr->zugangstoken = $token;
+				}
+				else
+				{
+					echo "<font color=\"#FF0000\">".$p->t('global/fehleraufgetreten')."</font><br>&nbsp;";
+				}
+			}
+
+			return $row_betr;
+		}
+	}
 }
 ?>
