@@ -456,7 +456,14 @@ if($command=="update" && $error!=true)
 								$maildata['link'] = $mail_fulllink;
 								$maildata['token'] = "";
 
-								$mailres = sendSanchoMail('ParbeitsbeurteilungEndupload', $maildata, $row_betr->mitarbeiter_uid."@".DOMAIN, "Bachelor-/Masterarbeitsbetreuung");
+								$mailres = sendSanchoMail(
+									'ParbeitsbeurteilungEndupload',
+									$maildata,
+									$row_betr->mitarbeiter_uid."@".DOMAIN,
+									"Bachelor-/Masterarbeitsbetreuung",
+									'sancho_header_min_bw.jpg',
+									'sancho_footer_min_bw.jpg',
+									$user."@".DOMAIN);
 
 								if(!$mailres)
 								{
@@ -494,7 +501,15 @@ if($command=="update" && $error!=true)
 									$zweitbetmaildata['link'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
 									$zweitbetmaildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
 
-									$mailres = sendSanchoMail('ParbeitsbeurteilungEndupload', $zweitbetmaildata, $zweitbetrmail, "Masterarbeitsbetreuung");
+									$mailres = sendSanchoMail(
+										'ParbeitsbeurteilungEndupload',
+										$zweitbetmaildata,
+										$zweitbetrmail,
+										"Masterarbeitsbetreuung",
+										'sancho_header_min_bw.jpg',
+										'sancho_footer_min_bw.jpg',
+										$user."@".DOMAIN
+									);
 
 									if(!$mailres)
 									{
