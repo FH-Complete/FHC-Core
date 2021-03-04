@@ -28,6 +28,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../config/global.config.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/phrasen.class.php');
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -38,6 +39,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 // Vertragsdetails: Anzeige wird über config Eintrag bestimmt
 $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') || FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN == true) ? 'false' : 'true';
 
+$sprache = getSprache();
+$p = new phrasen($sprache);
 ?>
 
 <overlay id="LehrveranstaltungDetailOverlay"
@@ -239,12 +242,12 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
 		</grid>
 
 		<vbox flex="1">
-			<label value=" Anmerkung" />
+			<label value="<?php echo $p->t('lehrveranstaltung/DetailAnmerkung'); ?>" />
 			<textbox id="lehrveranstaltung-detail-textbox-anmerkung" rows="5" multiline="true" disabled="true"/>
 
 			<hbox>
-				<spacer flex="1" />
 				<button id="lehrveranstaltung-detail-button-save" label="speichern" oncommand="LeDetailSave();" disabled="true"/>
+				<spacer flex="1" />
 			</hbox>
 		</vbox>
 		</hbox>
@@ -435,13 +438,15 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
 		<vbox>
 		<groupbox>
 			<caption label="LektorInnendaten" />
-			<vbox flex="1" style="padding: 10px;">
+			<hbox flex="1" style="padding: 10px;">
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id" hidden="true"/>
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid" hidden="true"/>
 			<grid align="end" flex="1"
 			      flags="dont-build-content"
 				  enableColumnDrag="true">
 				<columns>
+					<column />
+					<column flex="1"/>
 					<column />
 					<column flex="1"/>
 					<column />
@@ -472,6 +477,8 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
 				            </menupopup>
 				         </template>
 			   		 	</menulist>
+						<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" value="<?php echo $p->t('lehrveranstaltung/LehreinheitmitarbeiterAnmerkung'); ?>"/>
+						<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" disabled="true" maxlength="255" width="300" oninput="LeMitarbeiterValueChanged();"/>
 					</row>
 			    	<row>
     					<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-semesterstunden" control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
@@ -482,26 +489,22 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
 			    	<row>
 			    		<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-stundensatz" control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" value="Stundensatz: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
-    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" hidden="true" value="Faktor: "/>
+						<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" hidden="true" value="Faktor: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" hidden="true" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
+						<label control="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" value="BIS-Melden: "/>
+    					<checkbox id="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" disabled="true" flex="1" oncommand="LeMitarbeiterValueChanged();"/>
 					</row>
 					<row>
-			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" value="Anmerkung: "/>
-    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" disabled="true" maxlength="256" flex="1" oninput="LeMitarbeiterValueChanged();"/>
-    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" value="BIS-Melden: "/>
-    					<checkbox id="lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden" disabled="true" flex="1" oncommand="LeMitarbeiterValueChanged();"/>
+						<label value='Gesamtkosten:' />
+    					<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten" value='' />
+						<spacer />
+						<button label="Speichern" disabled="true" id="lehrveranstaltung-lehreinheitmitarbeiter-button-save" oncommand="LeMitarbeiterSave();"/>
+						<spacer />
+						<spacer />
 					</row>
     			</rows>
     			</grid>
-    			<hbox flex="1">
-    				<!--<spacer flex="1" />-->
-    				<hbox flex="1">
-    					<label value='Gesamtkosten:' />
-    					<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten" value='' />
-    				</hbox>
-					<button label="Speichern" disabled="true" id="lehrveranstaltung-lehreinheitmitarbeiter-button-save" oncommand="LeMitarbeiterSave();"/>
-				</hbox>
-			</vbox>
+			</hbox>
 		</groupbox>
 		</vbox>
 
@@ -509,11 +512,11 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
         <vbox>
             <groupbox id="lehrveranstaltung-lehreinheitmitarbeiter-groupbox-vertragsdetails" hidden="<?php echo $is_hidden ?>">
                 <caption label="Vertragsdetails" />
-                <grid style="overflow:auto; padding:10px;" flex="1">
+                <grid style="overflow:auto; padding:10px;" >
                 <columns>
-                    <column flex="1"/>
-                    <column flex="1"/>
-                    <column flex="1"/>
+                    <column/>
+                    <column/>
+                    <column/>
                 </columns>
                 <rows>
                     <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertrag_id" hidden="true" value=""/>
