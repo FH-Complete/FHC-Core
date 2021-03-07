@@ -62,11 +62,15 @@ TZOFFSETTO:+0100
 END:STANDARD
 END:VTIMEZONE\n";
 //echo 'URL:',APP_ROOT,'cis/public/ical_coodle.php/',$uid,"\n";
-echo "BEGIN:VEVENT";
+
 // Alle Umfragen holen an denen der User beteiligt ist
 $umfragen = new coodle();
 $umfragen->getCoodleFromUser($uid);
 $i = 0;
+if (count($umfragen->result) > 0)
+{
+	//echo "BEGIN:VEVENT";
+}
 foreach($umfragen->result as $umfrage)
 {
 	if($umfrage->coodle_status_kurzbz=='laufend')
@@ -88,10 +92,7 @@ foreach($umfragen->result as $umfrage)
 				$uhrzeit_ende = $date->format('H:i:s');
 				$dtende = $date->format('Ymd\THis');
 
-				if ($i > 0)
-				{
-					echo "\nBEGIN:VEVENT";
-				}
+				echo "\nBEGIN:VEVENT";
 				echo "\nUID:Coodle_Terminoption".$dtstart."_".$dtende."";
 				echo "\nSUMMARY:Coodle Terminoption";
 				echo "\nDTSTART;TZID=Europe/Vienna:$dtstart";

@@ -8,7 +8,7 @@ class Studiengang_widget extends DropdownWidget
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->StudiengangModel->addOrder('kurzbzlang');
 		
-		$this->addSelectToModel($this->StudiengangModel, 'studiengang_kz', '\'(\' || upper(typ||kurzbz) || \') \' || tbl_studiengang.bezeichnung');
+		$this->addSelectToModel($this->StudiengangModel, 'studiengang_kz', 'upper(typ||kurzbz) || \' - \' || tbl_studiengang.bezeichnung');
 
 		// If 'studiengang' (array of specific studiengaenge) is given, retrieve these studiengaenge only
 		if (isset($widgetData['studiengang']) && !empty($widgetData['studiengang']))

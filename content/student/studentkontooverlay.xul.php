@@ -237,7 +237,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					      				<label value="Buchungstext" control="student-konto-textbox-buchungstext"/>
 							      		<textbox id="student-konto-textbox-buchungstext" disabled="true" maxlength="256"/>
 									</row>
-									<row>
+									<?php
+										// Mahnspanne wird nur angezeigt, wenn diese im Config aktiviert wurden
+										if(!defined('FAS_KONTO_SHOW_MAHNSPANNE') || FAS_KONTO_SHOW_MAHNSPANNE===true)
+											$hidden='';
+										else
+											$hidden='hidden="true"';
+									?>
+									<row <?php echo $hidden; ?>>
 										<label value="Mahnspanne" control="student-konto-textbox-mahnspanne"/>
 										<hbox>
 											<textbox id="student-konto-textbox-mahnspanne" disabled="true" maxlength="4" size="4"/>
