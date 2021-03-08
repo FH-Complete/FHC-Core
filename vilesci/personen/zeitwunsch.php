@@ -157,7 +157,13 @@ $updatevon = 0;
 		?>
     </TR>
 	<?php
-	for ($j=1; $j<7; $j++)
+
+    $readonly = 'readonly';
+
+    if ($rechte->isBerechtigt('mitarbeiter/zeitwuensche', null, 'suid'))
+        $readonly = '';
+
+    for ($j=1; $j<7; $j++)
 	{
 		echo '<TR><TD>'.$tagbez[1][$j].'</TD>';
 	  	for ($i=0;$i<$num_rows_stunde;$i++)
@@ -166,7 +172,7 @@ $updatevon = 0;
 			if ($index=="")
 				$index=1;
 			$bgcolor=$cfgStdBgcolor[$index+3];
-			echo '<TD align="center" bgcolor="'.$bgcolor.'"><INPUT align="right" type="text" name="wunsch'.$j.'_'.$i.'" size="2" maxlength="2" value="'.$index.'"></TD>';
+			echo '<TD align="center" bgcolor="'.$bgcolor.'"><INPUT align="right" type="text"  name="wunsch'.$j.'_'.$i.'" size="2" maxlength="2"' . $readonly .' value="'.$index.'"></TD>';
 		}
 		echo '</TR>';
 	}
@@ -189,7 +195,10 @@ $updatevon = 0;
   <br/>
   <br/>
   <INPUT type="hidden" name="uid" value="<?php echo $uid; ?>">
-  <INPUT type="submit" name="save" value="Speichern">
+    <?php
+        if($rechte->isBerechtigt('mitarbeiter/zeitwuensche', null, 'suid'))
+            echo '<INPUT type="submit" name="save" value="Speichern">'
+    ?>
 </FORM>
 <br>
 <hr>
