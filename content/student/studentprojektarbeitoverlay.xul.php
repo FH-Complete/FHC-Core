@@ -529,7 +529,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
                         <column flex="1"/>
                         <column flex="1"/>
                     </columns>
-                    <rows>
+                    <rows id="student-projektbetreuer-groupbox-vertragsdetails-rows">
                         <label id="student-projektbetreuer-label-vertrag_id" hidden="true" value=""/>
                         <row>
                             <label value="Vertragsstatus:"/>

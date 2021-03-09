@@ -1122,6 +1122,11 @@ function StudentProjektbetreuerDetailDisableFields(val)
 	document.getElementById('student-projektbetreuer-button-speichern').disabled=val;
 	document.getElementById('student-projektbetreuer-button-neueperson').disabled=val;
 	document.getElementById('student-projektbetreuer-button-kontaktdaten').disabled=val;
+
+    if (document.getElementById('student-projektbetreuer-button-beurteilung'))
+    {
+        document.getElementById('student-projektbetreuer-button-beurteilung').disabled=val;
+    }
 }
 
 // ****
