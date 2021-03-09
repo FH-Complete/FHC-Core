@@ -587,34 +587,38 @@ public function getFortschritt($projektphase_id)
 		{
 			$projektphase = $this->getProjectphaseById($projektphase_id);
 			if(strtotime($projektphase->start))
-      		{
-        		$projektphase_start = date('Y-m-d', strtotime($projektphase->start));
-      		}
+			{
+				$projektphase_start = date('Y-m-d', strtotime($projektphase->start));
+			}
 			else
-      		{
-        		$projektphase_start = NULL;
-      		}
+			{
+				$projektphase_start = NULL;
+			}
 			if(strtotime($projektphase->ende))
-      		{
-        		$projektphase_ende = date('Y-m-d', strtotime($projektphase->ende));
-      		}
+			{
+				$projektphase_ende = date('Y-m-d', strtotime($projektphase->ende));
+			}
 			else
-      		{
-        		$projektphase_ende = NULL;
-      		}
+			{
+				$projektphase_ende = NULL;
+			}
 
 			$given_start = date('Y-m-d', strtotime($given_projectphase_start));
 			$given_ende = date('Y-m-d', strtotime($given_projektphase_ende));
 
-			if ((empty($projektphase_start) || $given_start >= $projektphase_start) && (empty($projektphase_ende) || $given_ende <= $projektphase_ende))
+			if ((empty($projektphase_start) || $given_start >= $projektphase_start)
+			&& (empty($projektphase_ende) || $given_ende <= $projektphase_ende))
+			{
 				return true;
+			}
 			else
+			{
 				return false;
-
+			}
 		}
 		catch (Exception $e)
 		{
-      error_log('Exception abgefangen: ',  $e->getMessage(), "\n");
+			error_log('Exception abgefangen: ',  $e->getMessage(), "\n");
 		}
 	}
 
@@ -681,120 +685,26 @@ public function getFortschritt($projektphase_id)
 	public function getProjectphaseForMitarbeiter($mitarbeiter_uid)
 	{
 		$projecphasetList = array();
-		/*$qry = "SELECT DISTINCT
-					tbl_projekt.*
-				FROM
-					fue.tbl_ressource
-					JOIN fue.tbl_projekt_ressource USING(ressource_id)
-					JOIN fue.tbl_projekt USING(projekt_kurzbz)
-				WHERE (beginn<=now() or beginn is null)
-				AND (ende + interval '1 month 1 day' >=now() OR ende is null)
-				AND
-				(
-					mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid) . " OR
-					student_uid=" . $this->db_add_param($mitarbeiter_uid) . "
-				)";*/
 
 		$qry = "
-
-                             SELECT DISTINCT
-                                        tbl_projektphase.*
-                                FROM
-                                        fue.tbl_projektphase
-                                        JOIN fue.tbl_projekt USING (projekt_kurzbz)
-                                        JOIN fue.tbl_projekt_ressource USING (projektphase_id)
-                                        JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
-                                WHERE
-                                (
-									(
-										(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-										AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
-									) OR (
-										(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-										AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
-									)
-								)
-                                AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
-
-		if($result = $this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object($result))
-			{
-					$obj = new projektphase();
-
-					$obj->projekt_kurzbz = $row->projekt_kurzbz;
-					$obj->projektphase_id = $row->projektphase_id;
-					$obj->projektphase_fk = $row->projektphase_fk;
-					$obj->bezeichnung = $row->bezeichnung;
-					$obj->typ = $row->typ;
-					$obj->beschreibung = $row->beschreibung;
-					$obj->start = $row->start;
-					$obj->ende = $row->ende;
-					$obj->personentage = $row->personentage;
-					$obj->farbe = $row->farbe;
-					$obj->budget = $row->budget;
-					$obj->ressource_id = $row->ressource_id;
-					$obj->insertamum = $row->insertamum;
-					$obj->insertvon = $row->insertvon;
-					$obj->updateamum = $row->updateamum;
-					$obj->updatevon = $row->updatevon;
-
-					$this->result[] = $obj;
-
-					array_push($projecphasetList, $obj);
-			}
-			return $projecphasetList;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
-
-	/**
-	 * Laedt die Projektphase mit der ID des mitarbeiters für das jeweilige Projekt
-	 * @param  $mitarbeiter_uid der zu ladenden Projektphase des users
-	 * @param  $prjkzbz des zu landenen Projekts
-	 * @return array wenn ok, false im Fehlerfall
-	 */
-	public function getProjectphaseForMitarbeiterByKurzBz($mitarbeiter_uid, $prjkzbz)
-	{
-		$projecphasetList = array();
-		/*$qry = "SELECT DISTINCT
-					tbl_projekt.*
-				FROM
-					fue.tbl_ressource
-					JOIN fue.tbl_projekt_ressource USING(ressource_id)
-					JOIN fue.tbl_projekt USING(projekt_kurzbz)
-				WHERE (beginn<=now() or beginn is null)
-				AND (ende + interval '1 month 1 day' >=now() OR ende is null)
-				AND
-				(
-					mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid) . " OR
-					student_uid=" . $this->db_add_param($mitarbeiter_uid) . "
-				)";*/
-
-		$qry = "
-
-                             SELECT DISTINCT
-                                        tbl_projektphase.*
-                                FROM
-                                        fue.tbl_projektphase
-                                        JOIN fue.tbl_projekt USING (projekt_kurzbz)
-                                        JOIN fue.tbl_projekt_ressource USING (projektphase_id)
-                                        JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
-                                WHERE
-                                (
-									(
-										(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-										AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
-									) OR (
-										(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-										AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
-									)
-								)
-                                AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+		SELECT
+			DISTINCT tbl_projektphase.*
+		FROM
+			fue.tbl_projektphase
+			JOIN fue.tbl_projekt USING (projekt_kurzbz)
+			JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+			JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+		WHERE
+		(
+			(
+				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+			) AND (
+				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+			)
+		)
+		AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
 
 		if($result = $this->db_query($qry))
 		{
@@ -821,10 +731,74 @@ public function getFortschritt($projektphase_id)
 
 				$this->result[] = $obj;
 
-				if($prjkzbz === $row->projekt_kurzbz )
-					array_push($projecphasetList, $obj);
+				array_push($projecphasetList, $obj);
 			}
 			return $projecphasetList;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Projektphase mit der ID des mitarbeiters für das jeweilige Projekt
+	 * @param  $mitarbeiter_uid der zu ladenden Projektphase des users
+	 * @param  $projekt_kurzbz des zu landenen Projekts
+	 * @return array wenn ok, false im Fehlerfall
+	 */
+	public function getProjectphaseForMitarbeiterByKurzBz($mitarbeiter_uid, $projekt_kurzbz)
+	{
+		$projecphasetList = array();
+
+		$qry = "
+		SELECT
+			DISTINCT tbl_projektphase.*
+		FROM
+			fue.tbl_projektphase
+			JOIN fue.tbl_projekt USING (projekt_kurzbz)
+			JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+			JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+		WHERE
+		(
+			(
+				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+			) AND (
+				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+			)
+		)
+		AND mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)."
+		AND tbl_projekt.projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz);
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new projektphase();
+
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->projektphase_fk = $row->projektphase_fk;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->personentage = $row->personentage;
+				$obj->farbe = $row->farbe;
+				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				$this->result[] = $obj;
+			}
+			return true;
 		}
 		else
 		{

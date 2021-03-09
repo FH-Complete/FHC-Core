@@ -543,7 +543,13 @@ echo '
 							var projphasenhtml = "";
 							for (var i = 0; i < json.length; i++)
 							{
-								projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>" + json[i].bezeichnung + "<\/option>";
+								projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>";
+								projphasenhtml += json[i].bezeichnung;
+								if(json[i].start != \'\' && json[i].ende !=\'\')
+								{
+									projphasenhtml += " ( "+json[i].start+" - "+json[i].ende+" )";
+								}
+								projphasenhtml += "<\/option>";
 							}
 
 							$("#projektphase").append(projphasenhtml);
@@ -1525,8 +1531,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					printTableHeadings($fieldheadings, $za_simple);
 
 
-		    $tag=null;
-		   $woche=date('W');
+			$tag=null;
+			$woche=date('W');
 
 			$tagessumme='00:00';
 			$pausesumme='00:00';
@@ -1545,8 +1551,6 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			foreach($za->result as $row)
 			{
 				$datumtag = $datum_obj->formatDatum($row->datum, 'Y-m-d');
-
-				//echo '<tr><th colspan="13">foo<th></tr>';
 
 				// Nach jedem Tag eine Summenzeile einfuegen
 				if(is_null($tag))
@@ -1979,7 +1983,10 @@ function getDataForProjectOverviewCSV($user)
 	$projects = $projects_of_user->getProjekteListForMitarbeiter($user);
 
 	$projektphase = new projektphase();
-	$projektphasen = $projektphase->getProjectphaseForMitarbeiter($user);
+	if($projektphase->getProjectphaseForMitarbeiter($user))
+		$projektphasen = $projektphase->result;
+	else
+		$projetkphasen = array();
 
 	$csvData = array();
 
@@ -1993,9 +2000,8 @@ function getDataForProjectOverviewCSV($user)
 		$ende = $project->ende;
 
 		$csvData[] = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
-
-
 	}
+
 	foreach ($projektphasen as $prjp)
 	{
 		if (true)
@@ -2007,7 +2013,7 @@ function getDataForProjectOverviewCSV($user)
 			$beginn = $prjp->start;
 			$ende = $prjp->ende;
 
-			array_push($csvData, array($projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende)  );
+			array_push($csvData, array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende)  );
 		}
 	}
 
