@@ -446,7 +446,7 @@ if($command=="update" && $error!=true)
 								}*/
 
 								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
-								$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$user;
+								$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
 								$maildata = array();
 								$maildata['geehrt'] = "geehrte".($row_betr->anrede=="Herr"?"r":"");
 								$maildata['anrede'] = $row_betr->anrede;
@@ -471,7 +471,7 @@ if($command=="update" && $error!=true)
 								}
 
 								// send Mail to 2. Begutachter
-								$zweitbetr = getZweitbegutachterWithToken($projektarbeit_id, $bid, $user);
+								$zweitbetr = getZweitbegutachterWithToken($projektarbeit_id, $bid, $row_std->uid);
 
 								if ($zweitbetr)
 								{
