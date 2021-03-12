@@ -356,12 +356,34 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 {
 	$studentenname=$row_nam->studnam;
 }
+
+$qry_sem="SELECT 1
+		FROM lehre.tbl_projektarbeit 
+    	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
+		AND tbl_studiensemester.start >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')
+		LIMIT 1";
+$result_sem=$db->db_query($qry_sem);
+$num_rows_sem = $db->db_num_rows($result_sem);
+
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
-$htmlstr .= "<td width=10% align=center><form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung' title='Benotungsformular' target='_blank' method='GET'>";
-$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
-$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-$htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form></td>";
+if ($num_rows_sem >= 1)
+{
+	$htmlstr .= "<td width=10% align=center>";
+	$htmlstr .= "<form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung' title='Benotungsformular' target='_blank' method='GET'>";
+	$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
+	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+	$htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form>";
+}
+else
+{
+	$htmlstr .= "<td width=50% align=center>";
+	$htmlstr .= "<b>".$p->t('abgabetool/aeltereParbeitBenoten')."</b>";
+}
+$htmlstr .= "</td>";
+
 if($betreuerart!="Zweitbegutachter")
 {
 	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.com/' title='ephorus' target='_blank' method='GET'>";

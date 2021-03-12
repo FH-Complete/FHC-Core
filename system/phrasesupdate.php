@@ -8900,13 +8900,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Liegt die Punkteanzahl bei den Kriterien "1 - 5" oder "6 - 10"  in Summe unter 50%, ist die Masterarbeit insgesamt als negativ zu beurteilen.',
+				'text' => 'Liegt die Punkteanzahl bei den Kriterien "1 - 5" oder "6 - 10"  in Summe unter 50%%, ist die %s insgesamt als negativ zu beurteilen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'If, within any of the criteria, the points total is under 50%, the Master’s Thesis is deemed to have failed overall.',
+				'text' => 'If, within any of the criteria, the points total is under 50%%, the %s is deemed to have failed overall.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

@@ -1,5 +1,6 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Submission tool';
+$this->phrasen['abgabetool/aeltereParbeitBenoten']='Thesis handed in for older semester, please use word form for assessment!';
 $this->phrasen['abgabetool/typ']='Type';
 $this->phrasen['abgabetool/titel']='Title';
 $this->phrasen['abgabetool/betreuerart']='Supervisor type';

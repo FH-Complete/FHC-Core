@@ -1,5 +1,6 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Abgabetool';
+$this->phrasen['abgabetool/aeltereParbeitBenoten']='Projektarbeit für älteres Semester, bitte Word-Formular zur Benotung verwenden!';
 $this->phrasen['abgabetool/typ']='Typ';
 $this->phrasen['abgabetool/titel']='Titel';
 $this->phrasen['abgabetool/betreuerart']='Betreuerart';
