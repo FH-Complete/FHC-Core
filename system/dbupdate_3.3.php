@@ -4468,8 +4468,9 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 // Add column zugangstoken to tbl_projektbetreuer
 if(!$result = @$db->db_query("SELECT zugangstoken FROM lehre.tbl_projektbetreuer LIMIT 1"))
 {
-	$qry = "ALTER table lehre.tbl_projektbetreuer ADD COLUMN zugangstoken VARCHAR(32);
-			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken IS 'Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';";
+	$qry = "ALTER TABLE lehre.tbl_projektbetreuer ADD COLUMN zugangstoken VARCHAR(32);
+			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken IS 'Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';
+			ALTER TABLE lehre.tbl_projektbetreuer ADD CONSTRAINT uk_tbl_projektbetreuer_zugangstoken UNIQUE (zugangstoken);";
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_projektbetreuer: '.$db->db_last_error().'</strong><br>';
