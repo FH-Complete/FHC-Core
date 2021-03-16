@@ -200,21 +200,8 @@ class requestAnrechnung extends Auth_Controller
 			$this->db->trans_rollback();
 			show_error($result->msg, EXIT_ERROR);
 		}
-
-		// Send mail to STGL
-		$mail_params = array(
-			'studiengang_kz' => $prestudent->studiengang_kz,
-			'lehrveranstaltung_id' => $lehrveranstaltung_id
-		);
-
-		if(!$this->_sendSanchoMail($mail_params))
-		{
-			show_error('Failed sending mail');
-		}
-		else
-		{
-			redirect(site_url(). self::REQUEST_ANRECHNUNG_URI. '?studiensemester='. $studiensemester_kurzbz. '&lv_id='. $lehrveranstaltung_id);
-		}
+		
+		redirect(site_url(). self::REQUEST_ANRECHNUNG_URI. '?studiensemester='. $studiensemester_kurzbz. '&lv_id='. $lehrveranstaltung_id);
 	}
 
 	/**
@@ -329,81 +316,5 @@ class requestAnrechnung extends Auth_Controller
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Send mail to STGL (if not available, send to STGL assistance)
-	 * @param $mail_params
-	 */
-	private function _sendSanchoMail($mail_params)
-	{
-		// Get STGL mail address, if available, otherwise get assistance mail address
-		list ($to, $vorname) = $this->_getSTGLMailAddress($mail_params['studiengang_kz']);
-
-		// Get full name of student
-		$this->load->model('person/Person_model', 'PersonModel');
-		if (!$student_name = getData($this->PersonModel->getFullName($this->_uid)))
-		{
-			show_error ('Failed retrieving person');
-		}
-
-		// Get lehrveranstaltung bezeichnung
-		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-		if (!$lehrveranstaltung = getData($this->LehrveranstaltungModel->load($mail_params['lehrveranstaltung_id']))[0])
-		{
-			show_error ('Failed retrieving person');
-		}
-
-		// Link to Antrag genehmigen
-		$url =
-			CIS_ROOT. 'cis/index.php?menu='.
-			CIS_ROOT. 'cis/menu.php?content_id=&content='.
-			CIS_ROOT. index_page(). self::APPROVE_ANRECHNUNG_URI;
-
-		// Prepare mail content
-		$body_fields = array(
-			'vorname'                       => $vorname,
-			'student_name'                  => $student_name,
-			'lehrveranstaltung_bezeichnung' => $lehrveranstaltung->bezeichnung,
-			'link'		                    => anchor($url, 'Anrechnungsanträge Übersicht')
-		);
-
-		sendSanchoMail(
-			'AnrechnungAntragStellen',
-			$body_fields,
-			$to,
-			'Anerkennung nachgewiesener Kenntnisse: Neuer Antrag wurde gestellt'
-		);
-
-		return true;
-	}
-
-	// Get STGL mail address, if available, otherwise get assistance mail address
-	private function _getSTGLMailAddress($stg_kz)
-	{
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$result = $this->StudiengangModel->getLeitung($stg_kz);
-
-		// Get STGL mail address, if available
-		if (hasData($result))
-		{
-			return array(
-					$result->retval[0]->uid. '@'. DOMAIN,
-					$result->retval[0]->vorname
-				);
-		}
-		// ...otherwise get assistance mail address
-		else
-		{
-			$result = $this->StudiengangModel->load($stg_kz);
-
-			if (hasData($result))
-			{
-				return array(
-					$result->retval[0]->email,
-					''
-				);
-			}
-		}
 	}
 }
