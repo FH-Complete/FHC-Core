@@ -14,6 +14,11 @@ $query = '
 			anrechnung.studiensemester_kurzbz,
 			stg.studiengang_kz,
 			stg.bezeichnung AS "stg_bezeichnung",
+			lv.orgform_kurzbz,
+			(SELECT ausbildungssemester
+			FROM public.tbl_prestudentstatus press
+			WHERE press.prestudent_id = anrechnung.prestudent_id
+			AND press.studiensemester_kurzbz = anrechnung.studiensemester_kurzbz),
 			lv.bezeichnung AS "lv_bezeichnung",
 			lv.ects,
 			(person.nachname || \' \' || person.vorname) AS "student",
@@ -60,6 +65,8 @@ $filterWidgetArray = array(
 		'studiensemester_kurzbz',
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),
+		ucfirst($this->p->t('lehre', 'organisationsform')),
+		'Semester',
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
 		'ECTS',
 		ucfirst($this->p->t('person', 'studentIn')),
@@ -109,6 +116,8 @@ $filterWidgetArray = array(
 		studiensemester_kurzbz: {visible: false},
 		studiengang_kz: {visible: false},
 		stg_bezeichnung: {headerFilter:"input"},
+		orgform_kurzbz: {headerFilter:"input"},
+		ausbildungssemester: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
 		ects: {headerFilter:"input", align:"center"},
 		student: {headerFilter:"input"},
