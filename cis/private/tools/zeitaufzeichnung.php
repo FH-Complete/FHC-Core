@@ -221,6 +221,7 @@ echo '
         <script type="text/javascript">
 		$(document).ready(function()
 		{
+			resetProjekt()
 		    $( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
 					 changeYear: true,
@@ -467,6 +468,7 @@ echo '
 				document.getElementById("bis_datum").focus();
 			  	return false;
 			}
+
 			return true;
 		}
 
@@ -513,6 +515,12 @@ echo '
 				}
 			}
 			return true;
+		}
+		
+		function resetProjekt()
+		{
+			$("#projekt").val("");
+			$("#projektphaseformgroup").hide();
 		}
 
 		function getProjektphasen(projekt_kurzbz)
