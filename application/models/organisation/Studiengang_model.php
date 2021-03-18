@@ -475,7 +475,7 @@ class Studiengang_model extends DB_Model
                funktion_kurzbz = \'Leitung\'
                 AND ( datum_von <= NOW() OR datum_von IS NULL )
                 AND ( datum_bis >= NOW() OR datum_bis IS NULL )
-                AND studiengang_kz = ' . $this->db->escape($studiengang_kz, FHC_INTEGER)
+                AND studiengang_kz = ' . $this->db->escape($studiengang_kz)
 			;
 		}
 		
