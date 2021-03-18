@@ -39,6 +39,7 @@ $this->load->view(
 			),
             'anrechnung' => array(
                 'genehmigungAblehnungWirklichZuruecknehmen',
+                'empfehlungsanforderungWirklichZuruecknehmen',
                 'erfolgreichZurueckgenommen'
             )
 		),
@@ -199,6 +200,12 @@ $this->load->view(
                                     </div>
                                 </form>
                                 <div class="pull-right">
+                                    <button id="approveAnrechnungDetail-withdraw-request-recommedation"
+                                            class="btn btn-default btn-w200 <?php echo (is_null($empfehlungData->empfehlung) &&
+                                                $anrechnungData->status_kurzbz == 'inProgressLektor') ? '' : 'hidden' ?>"
+                                            type="button">
+		                                <?php echo ucfirst($this->p->t('global', 'zuruecknehmen')); ?>
+                                    </button>
                                     <button id="approveAnrechnungDetail-request-recommendation" class="btn btn-primary btn-w200"
 										<?php echo is_null($empfehlungData->empfehlung) && $anrechnungData->status_kurzbz == 'inProgressDP' ? '' : 'disabled' ?>>
 										<?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?>

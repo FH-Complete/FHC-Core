@@ -10290,6 +10290,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungsanforderungWirklichZuruecknehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlungsanforderung wirklich zurücknehmen?",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Do you really want to withdraw your request for recommendation?",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 
