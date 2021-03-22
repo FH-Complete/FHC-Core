@@ -9311,6 +9311,26 @@ Any unusual occurrences
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'zweitbegutachterFehltWarnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Beurteilung des Zweitbegutachters liegt noch nicht vor.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The assessment of the second assessor is not available yet.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 
