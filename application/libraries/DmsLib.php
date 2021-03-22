@@ -132,16 +132,24 @@ class DmsLib
 		// return result of uploaded data
 		return success($upload_data); // data about the uploaded file
 	}
-
+	
 	/**
 	 * Download a document
 	 * @param $dms_id
+	 * @param null $filename If String is given, it will be used as filename on download
+	 * @param string $disposition [inline | attachment]
+	 * Inline opens doc in new tab. Attachment displays download dialog box.
 	 */
-	public function download($dms_id)
+	public function download($dms_id, $filename = null, $disposition = 'inline')
 	{
 		if (!is_numeric($dms_id))
 		{
 			show_error('Wrong parameter');
+		}
+		
+		if ($disposition != 'inline' && $disposition != 'attachment')
+		{
+			$disposition = 'inline';
 		}
 
 		$this->ci->DmsVersionModel->addSelect('filename');
@@ -151,9 +159,9 @@ class DmsLib
 		{
 			show_error(getError($result));
 		}
-
-		$filename = $result->retval[0]->filename;
-		$file = DMS_PATH. $filename;
+		
+		$filename = is_string($filename) && !isEmptyString($filename) ? $filename : $result->retval[0]->filename;
+		$file = DMS_PATH. $result->retval[0]->filename;
 
 		if (file_exists($file))
 		{
@@ -161,6 +169,7 @@ class DmsLib
 
 			header('Content-Description: File Transfer');
 			header('Content-Type: '.$finfo->file($file));
+			header('Content-Disposition: '. $disposition. '; filename="'. $filename. '"');
 			header('Expires: 0');
 			header('Cache-Control: must-revalidate');
 			header('Pragma: public');
