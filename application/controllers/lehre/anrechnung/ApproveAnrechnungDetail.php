@@ -535,6 +535,8 @@ class approveAnrechnungDetail extends Auth_Controller
 		 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
 		 * **/
 		$lector_arr = $this->_getLectors($anrechnung_arr);
+		
+		
 
 		// Send mail to lectors
 		foreach ($lector_arr as $lector)

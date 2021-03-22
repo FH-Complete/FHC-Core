@@ -61,12 +61,14 @@ class AnrechnungLib
 		}
 
 		// Get lectors of lehrveranstaltung
-		$antrag_data->lektoren = array();
-		if (!$lv_lektoren = getData($this->ci->LehrveranstaltungModel->getLecturersByLv($studiensemester_kurzbz, $lv_id)))
+		$result = $this->ci->LehrveranstaltungModel->getLecturersByLv($studiensemester_kurzbz, $lv_id);
+		if (isError($result))
 		{
 			show_error('Failed loading course lectors.');
 		}
-
+		
+		$lv_lektoren_arr =  hasData($result) ? getData($result) : array();
+		
 		// Set the given studiensemester
 		$antrag_data->lv_id = $lv_id;
 		$antrag_data->lv_bezeichnung = $lv->bezeichnung;
@@ -76,7 +78,7 @@ class AnrechnungLib
 		$antrag_data->nachname = $person->nachname;
 		$antrag_data->matrikelnr = $student->matrikelnr;
 		$antrag_data->stg_bezeichnung = $studiengang->bezeichnung;
-		$antrag_data->lektoren = $lv_lektoren;
+		$antrag_data->lektoren = $lv_lektoren_arr;
 
 		return $antrag_data;
 	}
