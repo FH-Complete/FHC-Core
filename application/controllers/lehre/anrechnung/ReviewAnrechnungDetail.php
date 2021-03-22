@@ -233,8 +233,12 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		// Check if user is entitled to read dms doc
 		self::_checkIfEntitledToReadDMSDoc($dms_id);
-
-		$this->dmslib->download($dms_id);
+		
+		// Set filename to be used on downlaod
+		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
+		
+		// Download file
+		$this->dmslib->download($dms_id, $filename);
 	}
 
 

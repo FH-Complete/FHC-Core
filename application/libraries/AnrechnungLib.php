@@ -601,6 +601,42 @@ class AnrechnungLib
 
 		return success(true);   // recommended
 	}
+	
+	/**
+	 * Set Filename that should be used on download
+	 * @param $dms_id
+	 * @return string|null
+	 */
+	public function setFilenameOnDownload($dms_id)
+	{
+		// Load Anrechnung
+		$result = $this->ci->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
+		
+		// Return null if no data found
+		if (!hasData($result))
+		{
+			return null;
+		}
+		
+		$prestudent_id = $result->retval[0]->prestudent_id;
+		$lehrveranstaltung_id = $result->retval[0]->lehrveranstaltung_id;
+		
+		// Get LV OrgForm
+		$this->ci->LehrveranstaltungModel->addSelect('stg.orgform_kurzbz');
+		$this->ci->LehrveranstaltungModel->addJoin('public.tbl_studiengang AS stg', 'studiengang_kz');
+		$result = $this->ci->LehrveranstaltungModel->load($lehrveranstaltung_id);
+		$orgform_kurzbz = hasData($result) ? '_'. $result->retval[0]->orgform_kurzbz : '';
+		
+		// Get full name of student
+		$this->ci->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->ci->PrestudentModel->addSelect('vorname, nachname');
+		$this->ci->PrestudentModel->addJoin('public.tbl_person', 'person_id');
+		$result = $this->ci->PrestudentModel->load($prestudent_id);
+		$fullname = hasData($result) ? $result->retval[0]->vorname. $result->retval[0]->nachname : '';
+		
+		// Return filename
+		return 'Anrechnungsantrag'. $orgform_kurzbz .'_LV-'. $lehrveranstaltung_id. '_'. $fullname;
+	}
 
 	// Return an object with Anrechnungdata
 	private function _setAnrechnungDataObject($anrechnung)
