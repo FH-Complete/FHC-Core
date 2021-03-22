@@ -122,14 +122,14 @@ $( document ).ready(function()
 			addon[i].init("cis/private/profile/zeitsperre_resturlaub.php", {uid:\''.$uid.'\', holiDays: holiDays});
 		}
 	}
-    console.log(holiDays)
+
 	$( ".datepicker_datum" ).datepicker({
 		 changeMonth: true,
 		 changeYear: true,
 		 dateFormat: "dd.mm.yy",
 		 beforeShowDay: setHoliDays
 		 });
-    
+
 	$( ".timepicker" ).timepicker({
 			showPeriodLabels: false,
 			hourText: "'.$p->t("global/stunde").'",
@@ -154,11 +154,16 @@ $( document ).ready(function()
 
 ?>
 <style type="text/css">
-    .ui-datepicker td.holiday a, .ui-datepicker td.holiday a:hover
-    {
-       background: none #FFEBAF;
-       border: 1px solid #BF5A0C;
-    }
+	.dd_breit
+	{
+		width:460px;
+	}
+
+	.ui-datepicker td.holiday a, .ui-datepicker td.holiday a:hover
+	{
+		background: none #FFEBAF;
+		border: 1px solid #BF5A0C;
+	}
 </style>
 <script language="Javascript">
 function conf_del()
