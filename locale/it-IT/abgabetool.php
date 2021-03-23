@@ -70,4 +70,7 @@ $this->phrasen['abgabetool/ueberschrift']='tesi bachelor / master';
 $this->phrasen['abgabetool/upload']='Upload';
 $this->phrasen['abgabetool/variablerAbgabetermin']='scadenza consegna variabile';
 $this->phrasen['abgabetool/zweitbetreuerBei']='secondo relatore presso';
+$this->phrasen['abgabetool/zweitBegutachter']='Second assessor';
+$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Send access token to second assessor';
+$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail sent to second assessor (%s)';
 ?>

@@ -35,6 +35,8 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
+require_once('../../../include/projektbetreuer.class.php');
+require_once('../../../include/sancho.inc.php');
 
 if (!$db = new basis_db())
 	$db=false;
@@ -116,6 +118,63 @@ if($projektarbeit_id==-1)
 if(!$projektarbeit_obj->load($projektarbeit_id))
 	die('Fehler beim Laden der Projektarbeit');
 $titel = $projektarbeit_obj->titel;
+$student_uid = $projektarbeit_obj->student_uid;
+
+// paarbeit sollte nur ab SS2021 online bewertet werden
+$qry_sem="SELECT 1
+		FROM lehre.tbl_projektarbeit 
+    	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
+		AND tbl_studiensemester.start >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')
+		LIMIT 1";
+$result_sem=$db->db_query($qry_sem);
+$num_rows_sem = $db->db_num_rows($result_sem);
+
+// Zweitbegutachter holen
+if($betreuerart=="Erstbegutachter")
+{
+	$projektbetreuer = new projektbetreuer();
+	$alleBegutachter = $projektbetreuer->getProjektbetreuer($projektarbeit_id);
+
+	if ($alleBegutachter)
+	{
+		$alleBegutachterResults = $projektbetreuer->result;
+
+		foreach ($alleBegutachterResults as $begutachter)
+		{
+			if ($begutachter->betreuerart_kurzbz == "Erstbegutachter")
+			{
+				$erstbetreuer_id = $begutachter->person_id;
+				$zweitbegutachter = $projektbetreuer->getZweitbegutachterWithToken($erstbetreuer_id, $projektarbeit_id, $student_uid);
+				break;
+			}
+		}
+
+		if ($zweitbegutachter && $num_rows_sem >= 1 && isset($_GET['zweitbegutachtertoken']))
+		{
+			$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
+			if(!$result_std=$db->db_query($qry_std))
+			{
+				echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
+			}
+			else
+			{
+				$row_std=@$db->db_fetch_object($result_std);
+				$mailres = sendZweitbegutachterMail($zweitbegutachter, $erstbetreuer_id, $row_std);
+
+				if ($mailres)
+				{
+					echo "<br><span style='color: green; '>".$p->t('abgabetool/zweitbegutachterMailGesendet', $zweitbegutachter->email)."</span><br>&nbsp;";
+				}
+				elseif(!$mailres)
+				{
+					echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')."</font><br>&nbsp;";
+				}
+			}
+		}
+	}
+}
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -357,16 +416,6 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 	$studentenname=$row_nam->studnam;
 }
 
-$qry_sem="SELECT 1
-		FROM lehre.tbl_projektarbeit 
-    	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-		JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
-		AND tbl_studiensemester.start >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')
-		LIMIT 1";
-$result_sem=$db->db_query($qry_sem);
-$num_rows_sem = $db->db_num_rows($result_sem);
-
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
 if ($num_rows_sem >= 1)
@@ -387,7 +436,9 @@ $htmlstr .= "</td>";
 if($betreuerart!="Zweitbegutachter")
 {
 	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.com/' title='ephorus' target='_blank' method='GET'>";
-	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td></tr>";
+	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td>";
+	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
+	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>\n";
 }
 else
 {
@@ -396,7 +447,26 @@ else
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$db->convert_html_chars($titel)."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
-$htmlstr .= "<br><b>".$p->t('abgabetool/abgabetermine').":</b>\n";
+$htmlstr .= "<table style='width: 100%'><tr>";
+$htmlstr .= "<td><br><b>".$p->t('abgabetool/abgabetermine').":</b></td>\n";
+if (isset($zweitbegutachter) && $zweitbegutachter && $num_rows_sem >= 1) // if there is a zweitbegutachter and paarbeit should be graded with online form
+{
+	$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET'>\n";
+	$htmlstr .= "<td style='text-align:right'>" . $p->t('abgabetool/zweitBegutachter') . ": <b>" . $zweitbegutachter->voller_name . "</b>";
+	if (isset($zweitbegutachter->abgabedatum) && !isset($zweitbegutachter->uid))
+	{
+		$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
+		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='" . $projektarbeit_id . "'>";
+		$htmlstr .= "<input type='hidden' name='betreuerart' value='" . $betreuerart . "'>";
+		$htmlstr .= "&nbsp;&nbsp;<input type='submit' name='zweitbegutachtertoken' value='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "' title='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'>\n";
+		$htmlstr .= "</form>";
+	}
+	$htmlstr .= "</td>\n";
+	$htmlstr .= "<td>&nbsp;&nbsp;</td>\n";
+	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;</td>\n";
+}
+$htmlstr .= "</tr>\n";
+$htmlstr .= "</table>\n";
 $htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 $htmlstr .= "<tr></tr>\n";
 $htmlstr .= "<tr>
@@ -565,4 +635,51 @@ $htmlstr .= "</form>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";
 echo $htmlstr;
+
+/**
+ * Mail zum Zweitbegutachter mit Info dass Projektarbeit zur Bewertung bereit ist, inklusive Zugangstoken wenn nötig.
+ * @param object $zweitbegutachter
+ * @param $int erstbegutachter_person_id
+ * @param object $student
+ * @return bool|projektbetreuer|void|null
+ */
+function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id, $student)
+{
+	// send Mail to 2. Begutachter
+	$projektbetreuer = new projektbetreuer();
+
+	$projektbetreuer->generateZweitbegutachterToken($zweitbegutachter->person_id, $zweitbegutachter->projektarbeit_id);
+
+	if (!$projektbetreuer)
+		return $projektbetreuer;
+
+	$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($erstbegutachter_person_id, $zweitbegutachter->projektarbeit_id, $student->uid);
+
+	if ($zweitbetr)
+	{
+		$intern = isset($zweitbetr->uid);
+		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+		$mail_fulllink = "$mail_baselink?projektarbeit_id=".$zweitbegutachter->projektarbeit_id."&uid=".$student->uid;
+		$maildata = array();
+		$maildata['geehrt'] = "geehrte".($zweitbegutachter->anrede=="Herr"?"r":"");
+		$maildata['anrede'] = $zweitbegutachter->anrede;
+		$maildata['betreuer_voller_name'] = $zweitbegutachter->voller_name;
+		$maildata['student_anrede'] = $student->anrede;
+		$maildata['student_voller_name'] = trim($student->titelpre." ".$student->vorname." ".$student->nachname." ".$student->titelpost);
+		$maildata['link'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
+		$maildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
+
+		return sendSanchoMail(
+			'ParbeitsbeurteilungEndupload',
+			$maildata,
+			$zweitbetr->email,
+			"Masterarbeitsbetreuung",
+			'sancho_header_min_bw.jpg',
+			'sancho_footer_min_bw.jpg'
+		);
+	}
+
+	return false;
+}
+
 ?>
