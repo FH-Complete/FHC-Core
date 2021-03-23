@@ -402,6 +402,14 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'zgvUeberpruefung',
+		'filter_kurzbz' => 'zgvUeberpruefung',
+		'description' => '{ZGV Übersicht}',
+		'sort' => 4,
+	),
+
+	array(
 		'app' => 'budget',
 		'dataset_name' => 'budgetoverview',
 		'filter_kurzbz' => 'BudgetUebersicht',

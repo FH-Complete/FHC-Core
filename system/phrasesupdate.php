@@ -3006,6 +3006,126 @@ $phrases = array(
 			)
 		)
 	),
+    array(
+        'app' => 'infocenter',
+        'category' => 'infocenter',
+        'phrase' => 'zgvRueckfragen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'ZGV Prüfung beantragen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'apply for a ZGV examination',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+	array(
+        'app' => 'infocenter',
+        'category' => 'infocenter',
+        'phrase' => 'zgvAkzeptieren',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Dokumente akzeptieren',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'accept documents',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+	array(
+        'app' => 'infocenter',
+        'category' => 'infocenter',
+        'phrase' => 'zgvAblehnen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Dokumente ablehnen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'reject documents',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zgvInPruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV noch in Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV still in review',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zgvAkzeptiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumente akzeptiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'accepted documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zgvAbgelehnt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumente abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'rejected documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',

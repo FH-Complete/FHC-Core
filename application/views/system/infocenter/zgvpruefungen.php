@@ -311,12 +311,34 @@
 					</form>
 					<?php if (!$infoonly): ?>
 						<div class="row">
-							<div class="col-xs-6 text-left">
+							<div class="col-xs-8 text-left">
 								<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
 								</button>
+								<button type="button" class="btn btn-default zgvRueckfragen" id="zgvRueckfragen_<?php echo $zgvpruefung->prestudent_id ?>">
+									<?php echo $this->p->t('infocenter', 'zgvRueckfragen') ?>
+								</button>
+								<span id="zgvStatusText">
+									<?php
+									if (isset($zgvpruefung->statusZGV))
+									{
+										switch ($zgvpruefung->statusZGV)
+										{
+											case 'pruefung_stg' :
+												echo $this->p->t('infocenter', 'zgvInPruefung');
+												break;
+											case 'accepted' :
+												echo $this->p->t('infocenter', 'zgvAkzeptiert');
+												break;
+											case 'rejected' :
+												echo $this->p->t('infocenter', 'zgvAbgelehnt');
+												break;
+										}
+									}
+									?>
+								</span>
 							</div>
-							<div class="col-xs-6 text-right">
+							<div class="col-xs-4 text-right">
 								<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php echo  $this->p->t('ui', 'speichern') ?>
 								</button>

@@ -6,7 +6,10 @@
 			<th><?php echo  ucfirst($this->p->t('global','typ')) ?></th>
 			<th><?php echo  ucfirst($this->p->t('global','uploaddatum')) ?></th>
 			<th><?php echo  ucfirst($this->p->t('infocenter','ausstellungsnation')) ?></th>
-			<th><?php echo  ucfirst($this->p->t('infocenter','formalGeprueft')) ?></th>
+			<?php
+				if (!isset($formalReadonly))
+					echo "<th>" . ucfirst($this->p->t('infocenter','formalGeprueft')) . "</th>"
+			?>
 		</tr>
 		</thead>
 		<tbody>
@@ -21,13 +24,17 @@
 				<td><?php echo $dokument->dokument_bezeichnung ?></td>
 				<td><?php echo date_format(date_create($dokument->erstelltam), 'd.m.Y') ?></td>
 				<td><?php echo $dokument->langtext ?></td>
-				<td>
-					<input type="checkbox" class="form-check-input prchbox"
-						   id="prchkbx_<?php echo $dokument->akte_id ?>" <?php echo $geprueft ?>>
-					<span id="formalgeprueftam_<?php echo $dokument->akte_id ?>">
-					<?php echo isset($dokument->formal_geprueft_amum) ? date_format(date_create($dokument->formal_geprueft_amum), 'd.m.Y') : ''; ?>
-					</span>
-				</td>
+				<?php
+				if (!isset($formalReadonly)) :
+				?>
+					<td>
+						<input type="checkbox" class="form-check-input prchbox"
+							   id="prchkbx_<?php echo $dokument->akte_id ?>" <?php echo $geprueft ?>>
+						<span id="formalgeprueftam_<?php echo $dokument->akte_id ?>">
+						<?php echo isset($dokument->formal_geprueft_amum) ? date_format(date_create($dokument->formal_geprueft_amum), 'd.m.Y') : ''; ?>
+						</span>
+					</td>
+				<?php endif ?>
 			</tr>
 		<?php endforeach ?>
 		</tbody>
