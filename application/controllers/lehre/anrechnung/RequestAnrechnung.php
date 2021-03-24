@@ -141,6 +141,13 @@ class requestAnrechnung extends Auth_Controller
 		{
 			show_error('Der Antrag wurde bereits gestellt');
 		}
+		
+		// Exit, if application is not for actual studysemester
+		if (!self::_applicationIsForActualSS($studiensemester_kurzbz))
+		{
+			show_error ($this->p->t('anrechnung', 'antragNurImAktSS'));
+			
+		}
 
 		// Start DB transaction
 		$this->db->trans_start(false);
@@ -316,5 +323,19 @@ class requestAnrechnung extends Auth_Controller
 		}
 
 		return $result;
+	}
+	
+	/**
+	 * Check, if applications' study semester is actual study semester
+	 * @param $studiensemester_kurzbz
+	 * @return bool
+	 */
+	private function _applicationIsForActualSS($studiensemester_kurzbz)
+	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$result = $this->StudiensemesterModel->getNearest();
+		$actual_ss = getData($result)[0]->studiensemester_kurzbz;
+		
+		return $studiensemester_kurzbz == $actual_ss;
 	}
 }
