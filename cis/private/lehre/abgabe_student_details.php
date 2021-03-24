@@ -455,7 +455,8 @@ if($command=="update" && $error!=true)
 								$maildata['betreuer_voller_name'] = $row_betr->first;
 								$maildata['student_anrede'] = $row_std->anrede;
 								$maildata['student_voller_name'] = trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost);
-								$maildata['link'] = $mail_fulllink;
+								$maildata['parbeituebersichtlink'] = "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>";
+								$maildata['bewertunglink'] = $mail_fulllink;
 								$maildata['token'] = "";
 
 								$mailres = sendSanchoMail(
@@ -514,7 +515,8 @@ if($command=="update" && $error!=true)
 									$zweitbetmaildata['betreuer_voller_name'] = $zweitbetr->voller_name;
 									$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
 									$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
-									$zweitbetmaildata['link'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
+									$zweitbetmaildata['parbeituebersichtlink'] =  $intern ? $maildata['parbeituebersichtlink'] : "";
+									$zweitbetmaildata['bewertunglink'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
 									$zweitbetmaildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
 
 									$mailres = sendSanchoMail(

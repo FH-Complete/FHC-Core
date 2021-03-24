@@ -167,9 +167,9 @@ if($betreuerart=="Erstbegutachter")
 				{
 					echo "<br><span style='color: green; '>".$p->t('abgabetool/zweitbegutachterMailGesendet', $zweitbegutachter->email)."</span><br>&nbsp;";
 				}
-				elseif(!$mailres)
+				else
 				{
-					echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')."</font><br>&nbsp;";
+					echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')." Mail: ".$zweitbegutachter->email."</font><br>&nbsp;";
 				}
 			}
 		}
@@ -666,7 +666,8 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 		$maildata['betreuer_voller_name'] = $zweitbegutachter->voller_name;
 		$maildata['student_anrede'] = $student->anrede;
 		$maildata['student_voller_name'] = trim($student->titelpre." ".$student->vorname." ".$student->nachname." ".$student->titelpost);
-		$maildata['link'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
+		$maildata['parbeituebersichtlink'] =  $intern ? "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>" : "";
+		$maildata['bewertunglink'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
 		$maildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
 
 		return sendSanchoMail(

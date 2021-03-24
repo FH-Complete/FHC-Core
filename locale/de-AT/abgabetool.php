@@ -80,7 +80,7 @@ Sollten Sie trotzdem die `Eidesstattliche Erklärung´ samt Unterschrift hochlad
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Gelesen und akzeptiert';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Erklärung nicht akzeptiert';
 $this->phrasen['abgabetool/downloadProjektarbeit']='Dokument herunterladen';
-$this->phrasen['abgabetool/zweitBegutachter']='Zweitbegutachter';
-$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Zugangstoken an Zweitbegutachter senden';
-$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail an Zweitbegutachter (%s) gesendet';
+$this->phrasen['abgabetool/zweitBegutachter']='ZweitbegutachterIn';
+$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Zugangstoken an ZweitbegutachterIn senden';
+$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail an ZweitbegutachterIn (%s) gesendet';
 ?>

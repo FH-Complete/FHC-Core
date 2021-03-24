@@ -8195,6 +8195,66 @@ Any unusual occurrences
 	array(
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'studiengang',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengang',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study Program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'organisationsform',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Organisationsform',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Organizational structure ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'arbeitBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bachelorarbeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Bachelor\'s Paper',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'beurteilung',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -8206,7 +8266,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessment',
+				'text' => 'Assessment of',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8336,6 +8396,26 @@ Any unusual occurrences
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'themaText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Thema wurde in eine im Rahmen einer Bachelorarbeit bearbeitbare Form übergeführt (Entwicklung sinnvoller Forschungsfragen bzw. Aufgabenstellungen, etc.).',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The subject was handled in a suitable manner for a bachelor thesis (well-structured, meaningful research questions or tasks, etc.)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'themaTextMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -8760,7 +8840,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Das Gutachten des/der Zweit-BegutachterIn liegt vor und ist in die Beurteilung eingeflossen.',
+				'text' => 'Das Gutachten des/der Zweit-Begutachter*in liegt vor und ist in die Beurteilung eingeflossen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -8906,7 +8986,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'If, within any of the criteria, the points total is under 50%%, the %s is deemed to have failed overall.',
+				'text' => 'If the number of points for the criteria "1 - 5" or "6 - 10" is below 50%% in total, the %s is to be assessed as negative overall.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9140,7 +9220,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Name des/der Studierenden',
+				'text' => 'Name des*der Studierenden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
