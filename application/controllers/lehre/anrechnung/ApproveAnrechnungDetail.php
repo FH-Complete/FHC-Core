@@ -241,13 +241,26 @@ class approveAnrechnungDetail extends Auth_Controller
 		$inProgressLektor = getUserLanguage() == 'German'
 			? $inProgressLektor->bezeichnung_mehrsprachig[0]
 			: $inProgressLektor->bezeichnung_mehrsprachig[1];
-
+		
+		$retval = array();
+		$counter = 0;
+		
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if(getData($this->anrechnunglib->requestRecommendation($item['anrechnung_id'])))
+			// Check if Anrechnungs-LV has lector
+			if (!$this->anrechnunglib->LVhasLector($item['anrechnung_id']))
 			{
-				$json[]= array(
+				// Count up LV with no lector
+				$counter++;
+				
+				// Break, if LV has no lector
+				break;
+			}
+			
+			// Request Recommendation
+			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
+			{
+				$retval[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
 					'status_bezeichnung' => $inProgressLektor,
@@ -256,26 +269,29 @@ class approveAnrechnungDetail extends Auth_Controller
 				);
 			}
 		}
-
+		
+		/**
+		 * Send mails to lectors
+		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
+		 * even if they are required for more recommendations
+		 * */
+		if (!isEmptyArray($retval))
+		{
+			self::_sendSanchoMailToLectors($retval);
+			
+			// Output json to ajax
+			return $this->outputJsonSuccess($retval);
+		}
+		
 		// Output json to ajax
-		if (isset($json) && !isEmptyArray($json))
+		if (isEmptyArray($retval) && $counter > 0)
 		{
-			/**
-			 * Send mails to lectors
-			 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
-			 * even if they are required for more recommendations
-			 * */
-			if (!$this->_sendSanchoMailToLectors($json))
-			{
-				show_error('Failed sending emails');
-			}
-
-			return $this->outputJsonSuccess($json);
+			return $this->outputJsonError(
+				"Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
+			);
 		}
-		else
-		{
-			return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
-		}
+		
+		return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
 	}
 	
 	/**
@@ -575,8 +591,8 @@ class approveAnrechnungDetail extends Auth_Controller
 	}
 
 	/**
-	 * Get lectors (prio for LV-Leitung, if not present to all lectors of LV.
-	 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
+	 * Get unique array of LV lectors.
+	 * Only get LV Leitung if present, otherwise all lectors of LV.
 	 * @param $anrechnung_arr
 	 * @return array
 	 */
@@ -620,7 +636,7 @@ class approveAnrechnungDetail extends Auth_Controller
 			unset($lector->lvleiter);
 		}
 
-		// Now make the lector array aka mail receivers unique
+		// Make the lector array unique
 		$lector_arr = array_unique($lector_arr, SORT_REGULAR);
 
 		return $lector_arr;

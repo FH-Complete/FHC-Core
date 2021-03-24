@@ -464,7 +464,7 @@ class AnrechnungLib
 			|| $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED
 			|| $status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR)
 		{
-			return success(false);  // dont ask for recommendation
+			return false;  // dont ask for recommendation
 		}
 
 		// Start DB transaction
@@ -494,7 +494,7 @@ class AnrechnungLib
 			return error($result->msg, EXIT_ERROR);
 		}
 
-		return success(true);   // recommended
+		return true;   // recommended
 	}
 
 	/**
@@ -638,6 +638,24 @@ class AnrechnungLib
 		
 		// Return filename
 		return 'Anrechnungsantrag'. $orgform_kurzbz .'_LV-'. $lehrveranstaltung_id. '_'. $fullname;
+	}
+	
+	public function LVhasLector($anrechnung_id)
+	{
+		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
+		if (!hasData($result))
+		{
+			showError('Anrechnung existiert nicht');
+		}
+		
+		// Get lectors of lehrveranstaltung
+		$result = $this->ci->LehrveranstaltungModel->getLecturersByLv(
+			$result->retval[0]->studiensemester_kurzbz,
+			$result->retval[0]->lehrveranstaltung_id
+		);
+		
+		// Continue, if LV has no lector (there is no one to ask for recommendation)
+		return hasData($result) ? true : false;
 	}
 
 	// Return an object with Anrechnungdata

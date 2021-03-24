@@ -43,6 +43,7 @@ $this->load->view(
 				'bitteMindEinenAntragWaehlen',
 				'bitteBegruendungAngeben',
 				'empfehlungWurdeAngefordert',
+				'empfehlungWurdeAngefordertAusnahmeWoKeineLektoren',
 				'anrechnungenWurdenGenehmigt',
 				'anrechnungenWurdenAbgelehnt'
 			),

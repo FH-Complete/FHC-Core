@@ -426,12 +426,23 @@ $(function(){
 
                     if (!data.error && data.retval != null)
                     {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
-
-                        // Print success message
-                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
+                        // Print info message, if not all selected recommendations were requested
+                        if (data.retval.length < selected_data.length){
+                            FHC_DialogLib.alertInfo(
+                                FHC_PhrasesLib.t(
+                                    "ui", "empfehlungWurdeAngefordertAusnahmeWoKeineLektoren",
+                                    [selected_data.length, data.retval.length, selected_data.length - data.retval.length])
+                            );
+                        }
+                        else
+                        {
+                            // Print success message
+                            FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
+                        }
                     }
+
+                    //Update status 'genehmigt'
+                    $('#tableWidgetTabulator').tabulator('updateData', data.retval);
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {

@@ -10213,6 +10213,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'empfehlungWurdeAngefordertAusnahmeWoKeineLektoren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlungsanfragen: {0}<br>Abgeschickt: {1}<br>Nicht abgeschickt: {2}<br>Grund: Keine Lektoren zu LV zugeteilt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Requests for recommendation: {0}<br>Sent: {1}<br>Not sent: {2}<br>Reason: No lectors assigned to the course yet.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'alleInBearbeitungSTGL',
 		'insertvon' => 'system',
 		'phrases' => array(
