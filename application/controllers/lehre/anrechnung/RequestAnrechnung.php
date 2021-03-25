@@ -86,23 +86,13 @@ class requestAnrechnung extends Auth_Controller
 			show_error(getError($anrechnungData));
 		}
 
-		// Dont show who is progressing the application to the student
-		if ($anrechnungData->status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL ||
-			$anrechnungData->status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR ||
-			$anrechnungData->status_kurzbz == self::ANRECHNUNGSTATUS_PROGRESSED_BY_KF)
-		{
-			$anrechnungData->status = getUserLanguage() == 'German' ? 'in Bearbeitung' : 'in process';
-		}
-
+		// Get Antrag data
 		$antragData = $this->anrechnunglib->getAntragData($this->_uid, $studiensemester_kurzbz, $lehrveranstaltung_id);
 
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
-			'is_expired' => $is_expired,
-			'disabled' => $is_expired && empty($anrechnungData->anrechnung_id) || !empty($anrechnungData->anrechnung_id)
-				? 'disabled'
-				: ''
+			'is_expired' => $is_expired
 		);
 
 		$this->load->view('lehre/anrechnung/requestAnrechnung.php', $viewData);
@@ -127,26 +117,28 @@ class requestAnrechnung extends Auth_Controller
 		{
 			show_error('Missing correct parameter');
 		}
-
-		$student = $this->StudentModel->load(array('student_uid' => $this->_uid));
-		if (isSuccess($student) && hasData($student))
+		
+		// Exit if user is not a student
+		$result = $this->StudentModel->load(array('student_uid' => $this->_uid));
+		
+		if (!hasData($result))
 		{
-			$prestudent_id = getData($student)[0]->prestudent_id;
-		}
-		else
-			show_error('Cant load User');
-
-		$result = $this->_getAnrechnung($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
-		if (hasData($result))
-		{
-			show_error('Der Antrag wurde bereits gestellt');
+			return $this->outputJsonError('Cant load user');
 		}
 		
-		// Exit, if application is not for actual studysemester
+		// Get Prestudent ID
+		$prestudent_id = getData($result)[0]->prestudent_id;
+		
+		// Exit if application already exists
+		if (self::_applicationExists($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id))
+		{
+			return $this->outputJsonError($this->p->t('anrechnung', 'antragBereitsGestellt'));
+		}
+		
+		// Exit if application is not for actual studysemester
 		if (!self::_applicationIsForActualSS($studiensemester_kurzbz))
 		{
-			show_error ($this->p->t('anrechnung', 'antragNurImAktSS'));
-			
+			return $this->outputJsonError($this->p->t('anrechnung', 'antragNurImAktSS'));
 		}
 
 		// Start DB transaction
@@ -208,7 +200,10 @@ class requestAnrechnung extends Auth_Controller
 			show_error($result->msg, EXIT_ERROR);
 		}
 		
-		redirect(site_url(). self::REQUEST_ANRECHNUNG_URI. '?studiensemester='. $studiensemester_kurzbz. '&lv_id='. $lehrveranstaltung_id);
+		// Output to AJAX
+		return $this->outputJsonSuccess(array(
+			'antragdatum' => (new DateTime())->format('d.m.Y')
+		));
 	}
 
 	/**
@@ -309,7 +304,7 @@ class requestAnrechnung extends Auth_Controller
 	 * @param $lehrveranstaltung_id
 	 * @return mixed
 	 */
-	private function _getAnrechnung($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id)
+	private function _applicationExists($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id)
 	{
 		$result = $this->AnrechnungModel->loadWhere(array(
 			'lehrveranstaltung_id' => $lehrveranstaltung_id,
@@ -321,8 +316,8 @@ class requestAnrechnung extends Auth_Controller
 		{
 			show_error(getError($result));
 		}
-
-		return $result;
+		
+		return hasData($result);
 	}
 	
 	/**
