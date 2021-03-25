@@ -496,7 +496,9 @@ class InfoCenter extends Auth_Controller
 	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
 	 */
 	private function sendZgvMail($mail){
-		$data = array();
+		$data = array(
+			'link' => site_url('system/infocenter/ZGVUeberpruefung')
+		);
 
 		$this->load->helper('hlp_sancho');
 
