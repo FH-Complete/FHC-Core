@@ -8406,7 +8406,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The subject was handled in a suitable manner for a bachelor thesis (well-structured, meaningful research questions or tasks, etc.)',
+				'text' => 'The subject was handled in a suitable manner for a bachelor\'s paper (well-structured, meaningful research questions or tasks, etc.)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
