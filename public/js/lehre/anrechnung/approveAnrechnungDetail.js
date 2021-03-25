@@ -351,8 +351,17 @@ var approveAnrechnungDetail = {
         // Find closest textarea
         let textarea = $(elem).closest('div').find('textarea');
 
-        // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().find('span:first').text()));
+        if (elem.id.length && elem.id == 'empfehlungstextUebernehmen')
+        {
+            // Copy Empfehlungstext into textarea
+            textarea.val($('#approveAnrechnungDetail-empfehlungDetail-begruendung').text());
+            return;
+        }
+        else
+        {
+            // Copy begruendung into textarea
+            textarea.val($.trim($(elem).parent().find('span:first').text()));
+        }
     },
     formatEmpfehlungIsRequested: function(empfehlungAngefordertAm, statusBezeichnung) {
         $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
