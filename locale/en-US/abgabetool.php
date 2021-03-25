@@ -78,4 +78,8 @@ Sollten Sie trotzdem die `Eidesstattliche Erklärung´ samt Unterschrift hochlad
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Read and accepted';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Declaration not accepted';
 $this->phrasen['abgabetool/downloadProjektarbeit']='Download File';
+
+$this->phrasen['abgabetool/projektbeurteilungDownload']='Thesis-Assessment download';
+$this->phrasen['abgabetool/projektbeurteilungErstDownload']='First-/Assessor';
+$this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Second Assessor';
 ?>
