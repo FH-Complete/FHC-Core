@@ -496,10 +496,10 @@ class InfoCenter extends Auth_Controller
 	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
 	 */
 	private function sendZgvMail($mail){
-		$data = array(
-			'DataTest' => 'getestet.'
-		);
+		$data = array();
+
 		$this->load->helper('hlp_sancho');
+
 		sendSanchoMail(
 			self::ZGVPRUEFUNG_MAIL_VORLAGE,
 			$data,
@@ -508,8 +508,6 @@ class InfoCenter extends Auth_Controller
 			'sancho_header_min_bw.jpg',
 			'sancho_footer_min_bw.jpg'
 		);
-
-		return true;
 	}
 
 	/**
@@ -624,7 +622,7 @@ class InfoCenter extends Auth_Controller
 			);
 
 			if (isSuccess($insert) && isSuccess($update))
-				$mailStatus = $this->sendZgvMail($mail);
+				$this->sendZgvMail($mail);
 			elseif (isError($insert) && isError($update))
 				return $this->outputJsonError('Fehler beim Speichern');
 
@@ -649,21 +647,19 @@ class InfoCenter extends Auth_Controller
 				);
 
 				if (isSuccess($result))
-					$mailStatus = $this->sendZgvMail($mail);
+					$this->sendZgvMail($mail);
 				elseif (isError($result))
 					return $this->outputJsonError('Fehler beim Speichern');
 			}
 		}
-		if ($mailStatus)
-		{
-			$this->outputJsonSuccess(
-				array
-				(
-					'msg' => 'Erfolgreich gespeichert',
-					'person_id' => $sg['person_id']
-				)
-			);
-		}
+
+		$this->outputJsonSuccess(
+			array
+			(
+				'msg' => 'Erfolgreich gespeichert',
+				'person_id' => $sg['person_id']
+			)
+		);
 	}
 
 	/**
