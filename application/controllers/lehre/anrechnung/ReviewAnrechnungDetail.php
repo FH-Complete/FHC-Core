@@ -78,23 +78,20 @@ class reviewAnrechnungDetail extends Auth_Controller
 		self::_checkIfEntitledToReadAnrechnung($anrechnung_id);
 
 		// Get Anrechung data
-		if (!$anrechnungData = getData($this->anrechnunglib->getAnrechnungData($anrechnung_id)))
-		{
-			show_error('Missing data for Anrechnung.');
-		}
+		$anrechnungData = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
+		
+		// Get Antrag data
+		$antragData = $this->anrechnunglib->getAntragData(
+			$student_uid = $this->StudentModel->getUID($anrechnungData->prestudent_id),
+			$anrechnungData->studiensemester_kurzbz,
+			$anrechnungData->lehrveranstaltung_id
+		);
 
 		// Get Empfehlung data
-		if(!$empfehlungData = getData($this->anrechnunglib->getEmpfehlungData($anrechnung_id)))
-		{
-			show_error('Missing data for recommendation');
-		}
+		$empfehlungData = $this->anrechnunglib->getEmpfehlungData($anrechnung_id);
 
 		$viewData = array(
-			'antragData' => $this->anrechnunglib->getAntragData(
-				$student_uid = $this->StudentModel->getUID($anrechnungData->prestudent_id),
-				$anrechnungData->studiensemester_kurzbz,
-				$anrechnungData->lehrveranstaltung_id
-			),
+			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
 			'empfehlungData' => $empfehlungData
 		);

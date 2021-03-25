@@ -23,6 +23,8 @@ class AnrechnungLib
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->ci->load->model('crm/Student_model', 'StudentModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
+		
+		$this->ci->load->library('DmsLib');
 	}
 
 	/**
@@ -109,8 +111,12 @@ class AnrechnungLib
 		{
 			$anrechnung_data = $this->_setAnrechnungDataObject($anrechnung);
 		}
+		else
+		{
+			show_error('No Anrechnung with this anrechnung_id.');
+		}
 
-		return success($anrechnung_data);
+		return $anrechnung_data;
 
 	}
 
@@ -155,7 +161,7 @@ class AnrechnungLib
 			$anrechnung_data = $this->_setAnrechnungDataObject($anrechnung);
 		}
 
-		return success($anrechnung_data);
+		return $anrechnung_data;
 	}
 
 	/**
@@ -173,8 +179,8 @@ class AnrechnungLib
 		$this->ci->AnrechnungModel->addSelect('tbl_benutzer.uid, tbl_prestudent.prestudent_id, tbl_person.person_id, tbl_anrechnung.studiensemester_kurzbz, vorname, nachname, geschlecht, tbl_lehrveranstaltung.bezeichnung AS "lv_bezeichnung"');
 		$this->ci->AnrechnungModel->addJoin('public.tbl_prestudent', 'prestudent_id');
 		$this->ci->AnrechnungModel->addJoin('public.tbl_student', 'prestudent_id');
-		$this->ci->AnrechnungModel->addJoin('public.tbl_benutzer', 'uid=student_uid');
-		$this->ci->AnrechnungModel->addJoin('public.tbl_person', 'tbl_benutzer.person_id=tbl_person.person_id');
+		$this->ci->AnrechnungModel->addJoin('public.tbl_benutzer', 'uid = student_uid');
+		$this->ci->AnrechnungModel->addJoin('public.tbl_person', 'tbl_benutzer.person_id = tbl_person.person_id');
 		$this->ci->AnrechnungModel->addJoin('lehre.tbl_lehrveranstaltung', 'lehrveranstaltung_id');
 
 		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
@@ -230,7 +236,7 @@ class AnrechnungLib
 
 		if (is_null($anrechnung->empfehlung_anrechnung))
 		{
-			return success($empfehlung_data);
+			return $empfehlung_data;
 		}
 
 		// If Empfehlung is true or false
@@ -270,7 +276,7 @@ class AnrechnungLib
 			}
 		}
 
-		return success($empfehlung_data);
+		return $empfehlung_data;
 
 	}
 
@@ -302,9 +308,10 @@ class AnrechnungLib
 		// Get date of approvement or rejection
 		$result = $this->ci->AnrechnungModel->getApprovedOrRejected($anrechnung_id);
 
+		// If no approved or rejected Anrechnung exist, return basic genehmigung data object
 		if (!$result = getData($result)[0])
 		{
-			return success($genehmigung_data);
+			return $genehmigung_data;
 		}
 
 
@@ -333,7 +340,7 @@ class AnrechnungLib
 			}
 		}
 
-		return success($genehmigung_data);
+		return $genehmigung_data;
 
 	}
 
@@ -564,7 +571,7 @@ class AnrechnungLib
 		// Exit if already approved or rejected
 		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED)
 		{
-			return success(false);  // dont approve
+			return false;  // dont approve
 		}
 
 		// Start DB transaction
@@ -601,7 +608,7 @@ class AnrechnungLib
 			return error($result->msg, EXIT_ERROR);
 		}
 
-		return success(true);   // recommended
+		return true;   // recommended
 	}
 	
 	/**
