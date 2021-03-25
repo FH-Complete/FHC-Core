@@ -62,19 +62,13 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 	
 	public function index()
 	{
+		// Get study semester
 		$studiensemester_kurzbz = $this->input->get('studiensemester');
 
-		if (!is_string($studiensemester_kurzbz))
+		if (isEmptyString($studiensemester_kurzbz))
 		{
-			$studiensemester = $this->StudiensemesterModel->getNearest();
-			if (hasData($studiensemester))
-			{
-				$studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;
-			}
-			elseif (isError($studiensemester))
-			{
-				show_error(getError($studiensemester));
-			}
+			$result = $this->StudiensemesterModel->getNearest();
+			$studiensemester_kurzbz = getData($result)[0]->studiensemester_kurzbz;
 		}
 		
 		$viewData = array(

@@ -62,25 +62,19 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	
 	public function index()
 	{
+		// Get study semester
 		$studiensemester_kurzbz = $this->input->get('studiensemester');
 		
-		// Retrieve studiengaenge the user is entitled for
+		if (isEmptyString($studiensemester_kurzbz))
+		{
+			$result = $this->StudiensemesterModel->getNearest();
+			$studiensemester_kurzbz = getData($result)[0]->studiensemester_kurzbz;
+		}
+		
+		// Get studiengaenge the user is entitled for
 		if (!$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN))
 		{
 			show_error(getError($studiengang_kz_arr));
-		}
-		
-		if (!is_string($studiensemester_kurzbz))
-		{
-			$studiensemester = $this->StudiensemesterModel->getNearest();
-			if (hasData($studiensemester))
-			{
-				$studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;
-			}
-			elseif (isError($studiensemester))
-			{
-				show_error(getError($studiensemester));
-			}
 		}
 		
 		$viewData = array(
