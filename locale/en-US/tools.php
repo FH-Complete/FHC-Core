@@ -40,7 +40,7 @@ $this->phrasen['tools/zahlungsbestaetigung']='Confirmation of payment ';
 $this->phrasen['tools/bestaetigungDrucken']='Print Confirmation';
 $this->phrasen['tools/offen']='outstanding';
 $this->phrasen['tools/keineZahlungenVorhanden']='Currently there are no payments';
-$this->phrasen['tools/zahlungenHinweis']='Please note that it can take up to 3 working days for the receipt of payment to appear here.';
+$this->phrasen['tools/zahlungenHinweis']='Please note that it can take up to 5 working days for the receipt of payment to appear here.';
 
 //Ampeln
 $this->phrasen['tools/ampelsystem']='Notification System';

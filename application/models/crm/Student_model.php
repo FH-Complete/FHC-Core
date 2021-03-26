@@ -45,4 +45,25 @@ class Student_model extends DB_Model
 		$max += 1;
 		return $matrikelnummer.sprintf("%03d", $max);
 	}
+
+	/**
+	 * Get students UID by PrestudentID.
+	 * @param $prestudent_id
+	 * @return mixed
+	 */
+	public function getUID($prestudent_id)
+	{
+		$this->addSelect('student_uid');
+
+		$result = $this->loadWhere(
+			array('prestudent_id' => $prestudent_id)
+		);
+
+		if (!hasData($result))
+		{
+			show_error('Failed getting UID by prestudent_id');
+		}
+
+		return $result->retval[0]->student_uid;
+	}
 }

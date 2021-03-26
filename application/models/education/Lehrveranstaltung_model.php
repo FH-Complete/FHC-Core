@@ -273,4 +273,24 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($query, $parametersarray);
 	}
+	
+	/**
+	 * Gets Lehrveranstaltung and its Lehreinheiten (multiple rows possible).
+	 * Returns empty array if student has no Lehrveranstaltung.
+	 * @param $uid
+	 * @param $studiensemester_kurzbz
+	 * @param $lehrveranstaltung_id
+	 * @return array|null
+	 */
+	public function getLvByStudent($uid, $studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		$query = '
+			SELECT * FROM campus.vw_student_lehrveranstaltung
+			WHERE uid = ?
+			AND studiensemester_kurzbz = ?
+			AND lehrveranstaltung_id = ?;
+		';
+		
+		return $this->execQuery($query, array($uid, $studiensemester_kurzbz, $lehrveranstaltung_id));
+	}
 }

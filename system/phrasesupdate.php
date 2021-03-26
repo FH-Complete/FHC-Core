@@ -51,6 +51,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'bearbeitungGesperrt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bearbeitung gesperrt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Locked for editing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'zeilen',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -2471,7 +2491,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lektor',
+				'text' => 'LektorIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -7988,7 +8008,2229 @@ Any unusual occurrences
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anerkennungNachgewiesenerKenntnisse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anerkennung nachgewiesener Kenntnisse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition of Prior Knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungBeantragen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung beantragen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Apply',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragStellen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag stellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Apply for Exemption',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragsdaten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antragsdaten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'nachweisdokumente',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachweisdokumente',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Verification Documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'personenkennzeichen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Personenkennzeichen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Personal identity number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'hochladen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hochladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragStellenText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich beantrage die Feststellung der Gleichwertigkeit aufgrund',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'I apply for equivalence to be established on the basis of',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragStellenWegenZeugnis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'eines Zeugnisses (vgl. § 4 Abs. 5 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'a certificate (see § 4 para. 5, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragStellenWegenPraxis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'der nachgewiesenen beruflichen Praxis ((vgl. § 4 Abs. 6 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'professional practice (see § 4 para. 6, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'weitereInformationen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weitere Informationen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Further information',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungIst',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag ist',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application is',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'deadlineUeberschritten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Deadline ist &uuml;berschritten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadline is exceeded',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antragsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungenGenehmigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen genehmigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve Applications for Recognition of Prior Knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGenehmigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung genehmigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve application for Recognition of Prior Knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungAnfordern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Empfehlung anfordern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request recommendation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'genehmigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Genehmigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ablehnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ablehnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reject',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Empfehlung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recommendation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'begruendung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begr&uuml;ndung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'studentIn',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'StudentIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'student',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nurEmpfohleneAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur empfohlene anzeigen (die noch genehmigt/abgelehnt werden müssen)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only recommended ones (that need to be approved/rejected)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nurNichtEmpfohleneAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur nicht empfohlene anzeigen (die noch genehmigt/abgelehnt werden müssen)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only not recommended ones (that need to be approved/rejected)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nurGenehmigteAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur genehmigte anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only approved ones',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nurAbgelehnteAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur abgelehnte anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only rejected ones',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nurFehlendeEmpfehlungenAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur jene anzeigen, wo eine Empfehlung noch fehlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only those ones that need your recommendation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'ja',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ja',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'yes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nein',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'nein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'no',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungenPruefen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen pr&uuml;fen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Review Applications for Recognition of Prior Knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Empfehlen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recommend',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'nichtEmpfehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht empfehlen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do not recommend',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nichtSelektierbarAufgrundVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht selektierbar aufgrund von: ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not selectable because of: ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'confirmTextAntragHatBereitsEmpfehlung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Mindestens 1 Antrag enthält bereits eine Empfehlung.\nWollen Sie wirklich für Ihre Auswahl eine Empfehlung anfordern und bereits vorhandene Empfehlungen dabei zurücksetzen?",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "At least one application was already recommended.\nDo you really want to request for recommendation for your selection?",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'herkunftDerKenntnisse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herkunft der Kenntnisse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Origin of previous knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'herkunft',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herkunft',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Origins',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'detailsicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Detailsicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lektorInnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LektorInnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lectors',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungPositivSubquestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte best&auml;tigen Sie: <b>Anrechnung wird empfohlen, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please confirm: <b>Recognition and exemption is recommended for this application based on the documents submitted.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungPositivConfirmed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Anrechnung wird empfohlen, weil die Kenntnisse inhaltlich und umfangmäßig gleichwertig sind.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition and exemption is recommended based on the documents submitted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungNegativPruefungNichtMoeglich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung wird nicht empfohlen, weil die Prüfung der Gleichwertigkeit aus formalen Gründen (z.B. mangelhafte Unterlagen) nicht möglich war.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Equivalence can not be determined because the enclosures contain insufficient information as regards the teaching content.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungNegativKenntnisseNichtGleichwertig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung wird nicht empfohlen, weil die Kenntnisse inhaltlich und umfangmäßig nicht gleichwertig sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Equivalence can not be determined because of the insufficient learning objectives and the length of the course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Empfehlungsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recommendation date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'textUebernehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Text &uuml;bernehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Use this text',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'bitteBegruendungAngeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte geben Sie eine Begründung für die Ablehnung an und best&auml;tigen danach.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please give a reason why you do not recommend to approve this applications and confirm.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'moeglicheBegruendungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mögliche Begründungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Possible reasons',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'andereBegruendung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Andere Begr&uuml;ndung. Bitte im Notizfeld kurz angeben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Other reasons. Please briefly state the reasons in the field for comments.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'begruendungWirdFuerAlleUebernommen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Begründung wird für alle gewählten Anträge übernommen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This reason will be used for all of the selected applications.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungNegativConfirmed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => ' Anrechnung wird nicht empfohlen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition and exemption is not recommended based on the documents submitted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => ' Empfehlung von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recommended by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungenPositiv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte best&auml;tigen Sie: <b>Alle ausgew&auml;hlten Anrechnungen werden empfohlen, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please confirm: <b>Recognition and exemption is recommended for these applications based on the documents submitted.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungenNegativ',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen werden nicht empfohlen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognitions and exemptions are not recommended.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'nochKeineEmpfehlung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es wurde keine Empfehlung abgegeben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No request for recommendation.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungNegativ',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag wird nicht genehmigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition and exemption is rejected based on the documents submitted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungNegativQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag nicht genehmigen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you want to reject recognition and exemption for this application?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungenNegativ',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antr&auml;ge werden nicht genehmigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition and exemption are rejected for these applications based on the documents submitted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungenNegativQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen nicht genehmigen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you want to reject recognition and exemption for these applications?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungNegativPruefungNichtMoeglich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung wird nicht genehmigt, weil die Prüfung der Gleichwertigkeit aus formalen Gründen (z.B. mangelhafte Unterlagen) nicht möglich war.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition and exemption is rejected because the enclosures contain insufficient information as regards the teaching content.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung wird nicht genehmigt, weil die Kenntnisse inhaltlich und umfangmäßig nicht gleichwertig sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition and exemption is rejected because of the insufficient learning objectives and the length of the course.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungenPositiv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte best&auml;tigen Sie: <b>Alle ausgew&auml;hlten Anrechnungen werden genehmigt, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please confirm: <b>Recognition and exemption is approved for these applications based on the documents submitted.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungenPositivQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen genehmigen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you want to approve recognition and exemption for these applications?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungPositiv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung wird genehmigt, weil die Kenntnisse inhaltlich und umfangmäßig gleichwertig sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recognition and exemption is approved based on the documents submitted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungPositivQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag genehmigen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you want to approve recognition and exemption for this application?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungPositivSubquestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte best&auml;tigen Sie: <b>Anrechnung wird genehmigt, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please confirm: <b>Recognition and exemption is approved for this application based on the documents submitted.</b>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'keineEmpfehlungAngefordert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es wurde noch keine Empfehlung angefordert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No recommendation has yet been requested.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungAngefordertNochKeineEmpfehlung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Empfehlung wurde angefordert am ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recommendation was requested on ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Genehmigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approvement',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'abgeschlossenVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abgeschlossen von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Closed by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'abschlussdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Closing date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'nochKeineGenehmigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Antrag auf Anerkennung der nachgewiesenen Kenntnisse erfordert Ihre Genehmigung / Ablehnung.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The application is waiting for your approvement.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'uploadTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<p>Max. Uploadvolumen: 2MB<br>Max. Anzahl Dokumente: 1<br>Tipp: Um mehrere Einzelseiten zu einer Datei zusammenfügen zu können, empfehlen wir Ihnen kostenlose Programme wie bspw. PDF Merge.</p>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Max. Uploadvolume: 2MB<br>Max. document amount: 1<br>Hint: To combine more than one document we recommend using free pdf merging software like e.g. PDF Merge.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungInfoTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wichtig: Bitte die Fristen, Voraussetzungen und Formvorgaben rechts in den Infoboxen beachten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Important: Please pay attention to the information about deadlines and conditions provided in the right infobox.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bestaetigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirm',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungPositivQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung empfehlen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you want to recommend recognition and exemption for this application?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungenPositivQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen empfehlen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you want to recommend recognition and exemption for these applications?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungNegativQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung nicht empfehlen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Don\'t you want to recommend recognition and exemption for this application?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungenNegativQuestion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen nicht empfehlen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Don\'t you want to recommend recognition and exemption for these applications??',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
+                Bitte laden Sie das Zeugnis und weitere Nachweis-Dokumente (z.B. Syllabus, Lehrpläne,
+                Modulbeschreibung…) hoch.
+                <br><br>Die folgenden Informationen müssen enthalten sein: Name der das Zeugnis ausstellenden Institution;
+                Beschreibung der Lehrinhalte und / oder Lernergebnisse;
+                Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)
+                <br><br>
+                <h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
+                Soll die Anrechnung auf der Grundlage der beruflichen Praxis erfolgen, laden Sie bitte eine detaillierte
+                Tätigkeitsbeschreibung hoch. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
+                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
+                oder durch Bestätigungen des Arbeitgebers) erfolgen.
+                <br><br>Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden, laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
+                <br><br>Falls diese Informationen nicht enthalten sind, können wir den Antrag nicht prüfen und er wird abgelehnt.
+                ",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>Application for recognition based on a certificate</u></h5>
+               	Please upload the certificate and other supporting documents (e.g. syllabus, curricula, module description ...).
+                <br><br>The following information must be included:
+                    name of the institution issuing the certificate;
+                    description of the teaching content and / or learning outcomes;
+                    duration of the course (e.g. ECTS, contact hours per week, total number of hours taught...)
+                <br><br>
+                <h5><u>Application for recognition based on professional practice</u></h5>
+                If the exemption is to be based on professional practice, please upload a detailed job description. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).
+                <br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
+                <br><br>If this information is not included, we will not be able to check the application and it will be rejected.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundAllgemeinTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden, laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
+                <br><br><u>Falls diese Informationen nicht enthalten sind, können wir den Antrag nicht prüfen und er wird abgelehnt.</u>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
+                <br><br><u>If this information is not included, we will not be able to check the application and it will be rejected.</u>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundZeugnisTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
+                Bitte laden Sie das Zeugnis und weitere Nachweis-Dokumente (z.B. Syllabus, Lehrpläne,
+                Modulbeschreibung…) hoch.
+                <br><br>Die folgenden Informationen müssen enthalten sein: Name der das Zeugnis ausstellenden Institution;
+                Beschreibung der Lehrinhalte und / oder Lernergebnisse;
+                Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>Application for recognition based on a certificate</u></h5>
+               	Please upload the certificate and other supporting documents (e.g. syllabus, curricula, module description ...).
+                <br><br>The following information must be included:
+                    name of the institution issuing the certificate;
+                    description of the teaching content and / or learning outcomes;
+                    duration of the course (e.g. ECTS, contact hours per week, total number of hours taught...)
+   ",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungGrundBerufTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
+                Soll die Anrechnung auf der Grundlage der beruflichen Praxis erfolgen, laden Sie bitte eine detaillierte
+                Tätigkeitsbeschreibung hoch. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
+                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
+                oder durch Bestätigungen des Arbeitgebers) erfolgen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>Application for recognition based on professional practice</u></h5>
+                If the exemption is to be based on professional practice, please upload a detailed job description. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoFristenTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beantragung: Fristen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoFristenBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte laden Sie den Antrag in deutscher oder englischer Sprache für das
+                <ul>
+                    <li><u>Wintersemester spätestens bis 15. September</u></li>
+                    <li><u>Sommersemester spätestens bis 22. Februar</u> hoch.</li>
+                </ul>
+                <br>Die Entscheidung über den Antrag erfolgt in der Regel innerhalb von zwei Wochen ab dem 15. September
+                bzw. 22. Februar.
+                <br><br>Für jede Lehrveranstaltung ist ein gesonderter Antrag beizubringen.</li>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please upload the application in German or English
+                <ul>
+                    <li><u>by September 15th for the winter semester</u></li>
+                    <li><u>by February 22nd for the summer semester</u> at the latest.</li>
+                </ul>
+                <br>The decision on the application is usually made within two weeks from September 15 (winter semester) or February 22 (summer semester).
+                <br><br>A separate application must be submitted for each course.</li>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoNachweisdokumenteTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachweisdokumente: Voraussetzung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Verification Documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoNachweisdokumenteBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte laden Sie mehrere Nachweis-Dokumente zusammengefasst in einem PDF-Dokument hoch.
+					<br><br>Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden,
+					laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
+					<br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, kann der Antrag auch abgelehnt werden.</span>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please combine and upload more than one verification document in one PDF document.
+				<br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
+				<br><br><span class=\"text-danger\">If this information is not included, the application might be rejected.</span>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoHerkunftKenntnisseTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herkunft der Kenntnisse: Angaben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Origin of previous Knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoHerkunftKenntnisseBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Bei Anrechnungen von schulischen bzw. hochschulischen Zeugnissen</u></h5>
+                Bitte geben Sie an, wo Sie die Kenntnisse erworben haben: (Hoch-)Schultyp, Standort, Fachrichtung.
+                Beispiel Schule: HTL Mödling, Fahrzeugtechnik; Beispiel Hochschule: TU Wien, Bachelor
+                Wirtschaftsinformatik
+                <br>
+                <h5><u>Bei Anrechnungen von beruflicher Praxis</u></h5>
+                Bitte geben Sie Unternehmen, Position und Funktion sowie Dauer der Beschäftigung an.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>If school or university certificates are to be recognized</u></h5>
+                Please indicate where you acquired the knowledge: type of (university) school, location, subject area. Example school: HTL Mödling, vehicle technology; Example university: Vienna University of Technology, Bachelor of Business Informatics
+                <br>
+                <h5><u>If professional practice is to be recognized</u></h5>
+                Please state company, position and function as well as length of employment.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoFristenTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beantragung: Fristen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoFristenBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Die Entscheidung über den Antrag durch die Studiengangsleitung sollte
+                <ul>
+                    <li><u>innerhalb von zwei Wochen ab dem 15. September (Wintersemester)</u></li>
+                    <li><u>innerhalb von zwei Wochen ab dem 22. Februar (Sommersemester)</u> erfolgen.</li>
+                </ul>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "The decision on the application is usually made by the program director
+                <ul>
+                    <li><u>within two weeks from September 15 (winter semester)</u></li>
+                    <li><u>within two weeks from February 22 (summer semester)</u>.</li>
+                </ul>",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoAntragVoraussetungenTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag: Voraussetzungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Application',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoAntragVoraussetungenBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Eine Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und Umfang der Lehrveranstaltung gleichwertig sind.
+                <br><br>Positiv absolvierte Prüfungen von allgemein- und berufsbildenden höheren Schulen sind anzurechnen, sofern sie hinsichtlich Inhalt und Umfang mit der zu erlassenden Lehrveranstaltung gleichwertig sind (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 4 Abs. 8).
+                <br><br>
+                <u>Umfangmäßige Gleichwertigkeit Schule - Hochschule:</u>
+                <br>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden, ein Schulhalbjahr besteht aus ca. 20 Wochen.
+                <br>Das heißt eine Unterrichtsstunde pro Woche sind insgesamt ca. 20 Stunden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "A prerequisite for recognition is that the knowledge acquired is equivalent to the content and scope of the course.
+				<br><br>Successfully completed examinations from general and vocational secondary schools are to be recognized as long as they are equivalent to the course to be exempted with regard to content and scope (cf. Statute on Studies Act Provisions / Examination Regulations, § 4 Para. 8).
+				<br><br>
+				<u>Equivalence school - university in terms of scope:</u>
+                <br>1 ECTS at the UAS Technikum Wien corresponds to a workload of 25 hours, a school semester consists of approx. 20 weeks.
+                <br>i.e. one teaching hour per week is a total of approx. 20 hours.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoNachweisdokumenteTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachweisdokumente: Voraussetzung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Verification Documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoNachweisdokumenteBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Beantragung aufgrund eines Zeugnisses</u></h5>
+         		Falls für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwendet werden, sind entweder nur die für die Anrechnung relevanten Teile hochzuladen oder entsprechend zu markieren.
+                <br><br>Die folgenden Informationen müssen enthalten sein:
+                <ol>
+                    <li>Name der das Zeugnis ausstellenden Institution</li>
+                    <li>Beschreibung der Lehrinhalte und / oder Lernergebnisse</li>
+                    <li>Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)</li>
+                </ol>
+                <br>
+                <h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
+                Es wird eine detaillierte Tätigkeitsbeschreibung benötigt. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
+                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
+                oder durch Bestätigungen des Arbeitgebers) erfolgen.
+                <br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, kann der Antrag nicht geprüft werden und er wird abgelehnt.</span>",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<h5><u>Application for recognition based on a certificate</u></h5>
+                To prove equivalence of curricula published in federal law gazettes (cf. HTL, HAK ...), only the parts relevant for recognition should be uploaded or marked accordingly.
+                <br><br>The following information must be included:
+                <ol>
+                    <li>name of the institution issuing the certificate</li>
+                    <li>description of the teaching content and / or learning outcomes</li>
+                    <li>duration of the course (e.g. ECTS, contact hours per week, total number of hours taught...)</li>
+                </ol>
+                <br>
+                <h5><u>Application for recognition based on professional practice</u></h5>
+                If the exemption is to be based on professional practice, an upload of a detailed job description is required. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).
+                <br><br><span class="text-danger">If this information is not included, the application can not be checked adequately and it might need to be rejected.</span>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoHerkunftKenntnisseTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herkunft der Kenntnisse: Angaben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prerequisites for Origin of previous Knowledge',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'reviewAnrechnungInfoHerkunftKenntnisseBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<h5><u>Bei Anrechnungen von schulischen bzw. hochschulischen Zeugnissen</u></h5>
+ 					Angabe, wo die Kenntnisse erworben worden sind: (Hoch-)Schultyp, Standort, Fachrichtung. Beispiel Schule: HTL Mödling, Fahrzeugtechnik; Beispiel Hochschule: TU Wien, Bachelor
+                Wirtschaftsinformatik
+                <br>
+                <h5><u>Bei Anrechnungen von beruflicher Praxis</u></h5>
+                Angabe von Unternehmen, Position und Funktion sowie Dauer der Beschäftigung.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<h5><u>If school or university certificates are to be recognized</u></h5>
+                Indication where the knowledge has been acquired: type of (university) school, location, subject area. Example school: HTL Mödling, vehicle technology; Example university: Vienna University of Technology, Bachelor of Business Informatics
+                <br>
+                <h5><u>If professional practice is to be recognized</u></h5>
+                Specification of company, position and function as well as length of employment.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'systemfehler',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Systemfehler<br>Bitte kontaktieren Sie den Systemadministrator.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "System Error<br>Please contact the system administrator.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bitteMindEinenAntragWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte w&auml;hlen Sie zumindest einen Antrag aus.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please select at least one application.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bitteBegruendungAngeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte geben Sie eine Begr&uml;ndung an.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please provide a reason.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'anrechnungenWurdenEmpfohlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => " Anrechnungsantr&auml;ge wurden empfohlen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => " Applications have been recommended.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'anrechnungenWurdenNichtEmpfohlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => " Anrechnungsantr&auml;ge wurden nicht empfohlen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => " Applications have not been recommended.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'anrechnungenWurdenGenehmigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => " Anrechnungsantr&auml;ge wurden genehmigt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => " Applications have been approved.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'anrechnungenWurdenAbgelehnt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => " Anrechnungsantr&auml;ge wurden abgelehnt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => " Applications have been rejected.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'empfehlungWurdeAngefordert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => " Empfehlung wurde angefordert.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => " Recommendation has been requested.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alleInBearbeitungSTGL',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Alle anzeigen, die durch die Studiengangsleitung bearbeitet werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Show all that are processed by the study course director.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 );
 
 
