@@ -40,6 +40,7 @@ $this->phrasen['tools/zahlungsbestaetigung']='Zahlungsbestätigung';
 $this->phrasen['tools/bestaetigungDrucken']='Bestaetigung drucken';
 $this->phrasen['tools/offen']='offen';
 $this->phrasen['tools/keineZahlungenVorhanden']='Derzeit sind keine Zahlungen vorhanden';
+$this->phrasen['tools/zahlungenHinweis']='Bitte beachten Sie, dass es bis zu 5 Werktage dauern kann bis der Zahlungseingang hier aufscheint.';
 
 //Ampeln
 $this->phrasen['tools/ampelsystem']='Ampelsystem';

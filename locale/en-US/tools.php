@@ -27,7 +27,7 @@ $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Error reading the grades.';
 $this->phrasen['tools/benotungsdatumDerZeugnisnote']='Date of grading';
 $this->phrasen['tools/hinweistextMarkierung']='The marking indicates those entries where the grade for the course is different from the grade on the report card.<b>The grade on the report card is the valid one.</b> <br>Should these details not be correct please contact the Administrative Assistant responsible.';
 $this->phrasen['tools/notendurchschnittDerZeugnisnote']='Average grade on the certificate*';
-$this->phrasen['tools/gewichteterNotendurchschnittDerZeugnisnote']='Weighted** grade point average on the certificate*';	
+$this->phrasen['tools/gewichteterNotendurchschnittDerZeugnisnote']='Weighted** grade point average on the certificate*';
 $this->phrasen['tools/legendeGewichteterNotendurchschnitt']='he weighted grade point average is calculated from the grade of the course multiplied by their ECTS divided by the sum of all ECTS';
 $this->phrasen['tools/legendeNotendurchschnitt']='Please note that extracurricular courses (eg electives) may distort the calculated grade point average';
 
@@ -40,6 +40,7 @@ $this->phrasen['tools/zahlungsbestaetigung']='Confirmation of payment ';
 $this->phrasen['tools/bestaetigungDrucken']='Print Confirmation';
 $this->phrasen['tools/offen']='outstanding';
 $this->phrasen['tools/keineZahlungenVorhanden']='Currently there are no payments';
+$this->phrasen['tools/zahlungenHinweis']='Please note that it can take up to 5 working days for the receipt of payment to appear here.';
 
 //Ampeln
 $this->phrasen['tools/ampelsystem']='Notification System';

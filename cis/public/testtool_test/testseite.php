@@ -76,7 +76,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
 	</noscript>
 	<div class="row well">
 		<div class="col-sm-12">
-			<h2>Fomeln</h2>
+			<h2>Formeln</h2>
 			<p>Die Formeln auf der linken Seite sollten möglichst gleich dargestellt werden, wie in dem Bild auf der rechten Seite.<br>
 			Abweichungen in Schriftgröße und -art können vorkommen.</p>
 			<p>The formula on the left side should be equal to the picture on the right side.<br>
@@ -166,5 +166,4 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
 </div>
 
 </body>
-</html> 
-
+</html>

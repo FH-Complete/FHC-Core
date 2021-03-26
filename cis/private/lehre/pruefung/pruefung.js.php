@@ -1626,8 +1626,9 @@ function loadPruefungsDetails(prfId)
 								{
 									$("#termin"+j+"sammelklausur").text("false");
 								}
-								$("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='terminLoeschen(\""+d.pruefung.pruefung_id+"\", \""+t.pruefungstermin_id+"\");'><?php echo $p->t('global/löschen'); ?></a></td>");
-								$("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='window.open(\"pruefungstermin_aendern.php?termin_id="+t.pruefungstermin_id+"\",\"edit\",\"height=600,width=500,toolbar=no,titlebar=no,status=no,menubar=no\");'><?php echo $p->t('global/editieren'); ?></a></td>");
+								//$("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='terminLoeschen(\""+d.pruefung.pruefung_id+"\", \""+t.pruefungstermin_id+"\");'><?php //echo $p->t('global/löschen'); ?></a></td>");
+                                $("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='window.open(\"pruefungstermin_loeschen.php?pruefung_id="+d.pruefung.pruefung_id+"&termin_id="+t.pruefungstermin_id+"\",\"delete\",\"height=600,width=500,toolbar=no,titlebar=no,status=no,menubar=no\");'><?php echo $p->t('global/löschen'); ?></a></td>");
+                                $("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='window.open(\"pruefungstermin_aendern.php?termin_id="+t.pruefungstermin_id+"\",\"edit\",\"height=600,width=500,toolbar=no,titlebar=no,status=no,menubar=no\");'><?php echo $p->t('global/editieren'); ?></a></td>");
 								terminHinzufuegen("span");
 							}
 						});
@@ -1969,6 +1970,36 @@ function terminLoeschen(pruefung_id, pruefungstermin_id)
 		loadPruefungsDetails(pruefung_id);
 		loadAllPruefungen();
 	});
+}
+
+/**
+ * Löscht einen Termin ohne im Anschluss die Prüfungen neu zu laden
+ * @param {int} pruefung_id ID der Prüfung
+ * @param {int} pruefungstermin_id ID des Prüfungstermines
+ * @returns {undefined}
+ */
+function terminLoeschenOhneLaden(pruefung_id, pruefungstermin_id)
+{
+    $.ajax({
+        dataType: 'json',
+        url: "./pruefungstermin.json.php",
+        type: "POST",
+        data: {
+            method: "deleteTermin",
+            pruefung_id: pruefung_id,
+            pruefungstermin_id: pruefungstermin_id
+        },
+        error: loadError
+    }).done(function(data){
+        if(data.error === "false")
+        {
+            messageBox("message", "<?php echo $p->t('pruefung/terminGeloescht'); ?>", "green", "highlight", 10000);
+        }
+        else
+        {
+            messageBox("message", data.errormsg, "red", "highlight", 10000);
+        }
+    });
 }
 
 /**

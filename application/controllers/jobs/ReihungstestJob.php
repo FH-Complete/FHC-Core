@@ -1,7 +1,7 @@
 <?php
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class ReihungstestJob extends CLI_Controller
+class ReihungstestJob extends JOB_Controller
 {
 	/**
 	 * Constructor
@@ -17,6 +17,7 @@ class ReihungstestJob extends CLI_Controller
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+		$this->load->model('crm/buchungstyp_model', 'BuchungstypModel');
 
 		// Load helpers
 		$this->load->helper('hlp_sancho_helper');
@@ -799,24 +800,39 @@ class ReihungstestJob extends CLI_Controller
 	 * @param string $bcc. Optional. BCC-Mailadress to send the Mails to
 	 * @param string $from. Optional. Sender-Mailadress shown to recipient
 	 */
-	public function prioritizationJob($bcc = null, $from = null)
+	public function prioritizationJob($studiensemester, $bcc = null, $from = null)
 	{
-		$qry = "    SELECT DISTINCT
-					get_rolle_prestudent (tbl_prestudent.prestudent_id, 'WS2020') AS laststatus, /* Todo: Studiensemester dynamisch ermitteln oder als Parameter */
-					tbl_prestudentstatus.studiensemester_kurzbz,
-					tbl_prestudent.*
+		if (!isset($studiensemester) || isEmptyString($studiensemester))
+		{
+			$this->logError("Studiensemster not passed as parameter");
+			return;
+		}
+
+		$qry = "WITH prst AS (
+					SELECT DISTINCT
+						get_rolle_prestudent (tbl_prestudent.prestudent_id, ?) AS laststatus,
+						tbl_prestudentstatus.studiensemester_kurzbz,
+						tbl_prestudentstatus.datum AS prestudenstatus_datum,
+						tbl_prestudent.*,
+						tbl_studiengang.typ AS studiengang_typ
 					FROM PUBLIC.tbl_person
-					JOIN PUBLIC.tbl_prestudent USING (person_id)
-					JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-					JOIN lehre.tbl_studienplan USING (studienplan_id)
-					JOIN lehre.tbl_studienordnung USING (studienordnung_id)
-					JOIN PUBLIC.tbl_studiengang ON (tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz)
-					WHERE tbl_prestudentstatus.datum >= (SELECT CURRENT_DATE -1)
-						AND get_rolle_prestudent (tbl_prestudent.prestudent_id, 'WS2020') IN ('Aufgenommener','Bewerber','Wartender')
-						AND studiensemester_kurzbz = 'WS2020' /* Todo: Studiensemester dynamisch ermitteln oder als Parameter */
-						AND tbl_studiengang.typ = 'b'
-						ORDER BY studiengang_kz, laststatus
-					";
+						JOIN PUBLIC.tbl_prestudent USING (person_id)
+						JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+						JOIN lehre.tbl_studienplan USING (studienplan_id)
+						JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+						JOIN PUBLIC.tbl_studiengang ON (tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz)
+					WHERE get_rolle_prestudent (tbl_prestudent.prestudent_id, ?) IN ('Aufgenommener','Bewerber','Wartender','Abgewiesener')
+						AND studiensemester_kurzbz = ? 
+						AND tbl_studiengang.typ IN ('b', 'm')
+				)
+				SELECT * FROM prst
+				WHERE prestudenstatus_datum >= (SELECT CURRENT_DATE - 1)
+				AND (studiengang_typ = 'b' OR (studiengang_typ = 'm' AND EXISTS (SELECT 1 /* Master Studiengänge berücksichtigen wenn auch Bachelor im gleichen Semester */
+																					FROM prst prstb
+																					WHERE studiengang_typ = 'b'
+																					AND laststatus != 'Abgewiesener'
+																					AND prstb.person_id = prst.person_id )))
+				ORDER BY studiengang_kz, laststatus";
 
 		// Encode Params
 		if ($bcc != '')
@@ -837,26 +853,22 @@ class ReihungstestJob extends CLI_Controller
 		}
 
 		$db = new DB_Model();
-		$result_prestudents = $db->execReadOnlyQuery($qry);
+		$result_prestudents = $db->execReadOnlyQuery($qry, array_pad(array(), 3, $studiensemester));
 		$mailArray = array();
 
 		if (hasdata($result_prestudents))
 		{
 			foreach ($result_prestudents->retval as $row_ps)
 			{
-				// Wenn der letzte Status "Aufgenommener" ist, alle niedrigeren Prios auf "Abgewiesen" setzen
-				// falls diese Bewerber oder Warteliste sind
-				// Danach Kaution einbuchen
-				if ($row_ps->laststatus == 'Aufgenommener')
-				{
-					// Alle niedrigeren Prios laden
-					$qryNiedrPrios = "
+				// Alle niedrigeren Prios laden
+				$qryNiedrPrios = "
 						SELECT DISTINCT
 							get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') AS laststatus,
 							tbl_studienplan.orgform_kurzbz,
 							tbl_person.nachname,
 							tbl_person.vorname,
-							tbl_prestudent.*
+							tbl_prestudent.*,
+							tbl_studiengang.typ AS studiengang_typ
 						FROM PUBLIC.tbl_person
 							JOIN PUBLIC.tbl_prestudent USING (person_id)
 							JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
@@ -866,18 +878,30 @@ class ReihungstestJob extends CLI_Controller
 							AND tbl_prestudent.prestudent_id != ".$row_ps->prestudent_id."
 							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender')
 							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
-							AND tbl_studiengang.typ = 'b'
+							AND tbl_studiengang.typ IN ('b', 'm')
 							AND priorisierung > ".$row_ps->priorisierung."
 						ORDER BY studiengang_kz, laststatus
 					";
 
+				// Wenn der letzte Status "Aufgenommener" ist, alle niedrigeren Prios auf "Abgewiesen" setzen
+				// falls diese Bewerber oder Warteliste sind
+				// Danach Kaution einbuchen
+				if ($row_ps->laststatus == 'Aufgenommener')
+				{
 					$resultNiedrPrios = $db->execReadOnlyQuery($qryNiedrPrios);
 
 					if (hasdata($resultNiedrPrios))
 					{
 						foreach ($resultNiedrPrios->retval as $rowNiedrPrios)
 						{
-							if ($rowNiedrPrios->laststatus == 'Bewerber')
+							// nur Info wenn aufgenommen oder master
+							if ($rowNiedrPrios->laststatus == 'Aufgenommener' || $rowNiedrPrios->studiengang_typ == 'm')
+							{
+								// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
+								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
+									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+							}
+							elseif ($rowNiedrPrios->laststatus == 'Bewerber')
 							{
 								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
 								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
@@ -929,43 +953,63 @@ class ReihungstestJob extends CLI_Controller
 										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 								}
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Aufgenommener')
-							{
-								// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
-								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
-									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
-							}
 						}
 					}
 
-					// Kaution einbuchen für $row_ps->prestudent_id
+					// Kaution einbuchen für $row_ps->prestudent_id (für aufgenommenen Bachelor)
 					// Vorher prüfen, ob schon eine Kaution gebucht ist
-					// Todo: Betrag automatisch aus tbl_buchungstyp laden
 
-					$qryKautionExists = "
+					if ($row_ps->studiengang_typ == 'b')
+					{
+						$qryKautionExists = "
 						SELECT count(*) as anzahl
 						FROM public.tbl_konto
-						WHERE person_id = ".$row_ps->person_id."
-							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
-							AND buchungstyp_kurzbz = 'Kaution'";
+						WHERE person_id = " . $row_ps->person_id . "
+							AND studiensemester_kurzbz = '" . $row_ps->studiensemester_kurzbz . "'
+							AND buchungstyp_kurzbz = 'StudiengebuehrAnzahlung'";
 
-					$resultKautionExists = $db->execReadOnlyQuery($qryKautionExists);
-					if (hasdata($resultKautionExists))
-					{
-						if ($resultKautionExists->retval[0]->anzahl == '0')
+						$resultKautionExists = $db->execReadOnlyQuery($qryKautionExists);
+						if (hasdata($resultKautionExists))
 						{
-							// Todo: Zahlungsreferenz generieren (StudiengangsOE+Buchungsnummer)
-							$this->KontoModel->insert(array(
-								"person_id" => $row_ps->person_id,
-								"studiengang_kz" => $row_ps->studiengang_kz,
-								"studiensemester_kurzbz" => $row_ps->studiensemester_kurzbz,
-								"betrag" => -150,
-								"buchungsdatum" => date('Y-m-d'),
-								"buchungstext" => 'Kaution',
-								"buchungstyp_kurzbz" => 'Kaution',
-								"insertvon" => 'prioritizationJob',
-								"insertamum" => date('Y-m-d H:i:s')
-							));
+							if ($resultKautionExists->retval[0]->anzahl == '0')
+							{
+								// Betrag automatisch aus tbl_buchungstyp laden
+								$this->BuchungstypModel->addSelect('buchungstyp_kurzbz, standardbetrag, standardtext');
+								$buchungstypRes = $this->BuchungstypModel->loadWhere(array('buchungstyp_kurzbz' => 'StudiengebuehrAnzahlung'));
+
+								if (hasData($buchungstypRes))
+								{
+									$buchungstypData = getData($buchungstypRes)[0];
+
+									$this->KontoModel->insert(array(
+										"person_id" => $row_ps->person_id,
+										"studiengang_kz" => $row_ps->studiengang_kz,
+										"studiensemester_kurzbz" => $row_ps->studiensemester_kurzbz,
+										"betrag" => $buchungstypData->standardbetrag,
+										"buchungsdatum" => date('Y-m-d'),
+										"buchungstext" => $buchungstypData->standardtext,
+										"buchungstyp_kurzbz" => $buchungstypData->buchungstyp_kurzbz,
+										"insertvon" => 'prioritizationJob',
+										"insertamum" => date('Y-m-d H:i:s')
+									));
+								}
+								else
+									$this->logError('No Buchungstyp found for Studiengebühr Anzahlung');
+							}
+						}
+					}
+				}
+				elseif ($row_ps->laststatus == 'Abgewiesener')
+				{
+					$resultNiedrPrios = $db->execReadOnlyQuery($qryNiedrPrios);
+
+					if (hasdata($resultNiedrPrios))
+					{
+						foreach ($resultNiedrPrios->retval as $rowNiedrPrios)
+						{
+							// Mail zur Info an Assistenz schicken, dass in höherer Prio abgewiesen wurde
+							$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenHoeherePrio'][]
+								= $rowNiedrPrios->nachname . ' ' . $rowNiedrPrios->vorname . ' (' . $rowNiedrPrios->prestudent_id . ')';
 						}
 					}
 				}
@@ -1010,6 +1054,19 @@ class ReihungstestJob extends CLI_Controller
 						$mailcontent .= '					<tbody>';
 						sort($value['AufnahmeHoeherePrio']);
 						foreach ($value['AufnahmeHoeherePrio'] AS $key=>$bewerber)
+						{
+							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
+						}
+						$mailcontent .= '</tbody></table>';
+					}
+					if (isset($value['AbgewiesenHoeherePrio']) && !isEmptyArray($value['AbgewiesenHoeherePrio']))
+					{
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
+									Folgende Bewerber wurden in einem höher priorisierten Studiengang abgewiesen:</p>';
+						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
+						$mailcontent .= '					<tbody>';
+						sort($value['AbgewiesenHoeherePrio']);
+						foreach ($value['AbgewiesenHoeherePrio'] AS $key=>$bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}

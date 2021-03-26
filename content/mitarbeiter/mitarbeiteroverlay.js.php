@@ -448,9 +448,32 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-checkbox-kleriker').disabled=val;
 }
 
+function MitarbeiterCount()
+{
+    var tree = document.getElementById('mitarbeiter-tree');
+
+    //Alle markierten Personen holen
+    var start = {};
+    var end = {};
+    var numRanges = tree.view.selection.getRangeCount();
+    var anzahl = 0;
+
+    for (var t = 0; t < numRanges; t++)
+    {
+        tree.view.selection.getRangeAt(t, start, end);
+        for (var v = start.value; v <= end.value; v++)
+        {
+            anzahl = anzahl + 1;
+        }
+    }
+    return anzahl;
+}
+
 function MitarbeiterAuswahl()
 {
-	if(!MitarbeiterTreeLoadDataOnSelect)
+    document.getElementById('mitarbeiter-toolbar-label-anzahl').value = 'Anzahl: ' + MitarbeiterCount();
+
+    if(!MitarbeiterTreeLoadDataOnSelect)
 	{
 		MitarbeiterTreeLoadDataOnSelect=true;
 		return true;

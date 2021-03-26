@@ -182,7 +182,7 @@ $this->phrasen['global/keineDatenGefunden']='No data found';
 $this->phrasen['global/erfolgreichAngelegt']='Created successfully';
 $this->phrasen['global/keineSuchergebnisse']='No matches found';
 $this->phrasen['global/bitteWaehlen']='Please select';
-$this->phrasen['global/zusaetzlicheInformationen']='Additional Informations';
+$this->phrasen['global/zusaetzlicheInformationen']='Additional Information';
 
 //infrastruktur
 
