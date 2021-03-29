@@ -168,7 +168,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
       			<checkbox id="mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig"/>
       		</row>
             <row>
-                <label value="Azgrelevant" control="mitarbeiter-verwendung-detail-checkbox-azgrelevant"/>
+                <label value="AZG-relevant" control="mitarbeiter-verwendung-detail-checkbox-azgrelevant"/>
                 <checkbox id="mitarbeiter-verwendung-detail-checkbox-azgrelevant"/>
             </row>
       		<row>
