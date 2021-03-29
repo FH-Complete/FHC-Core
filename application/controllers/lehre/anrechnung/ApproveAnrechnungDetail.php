@@ -213,7 +213,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Es wurden keine Anrechnungen genehmigt.');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 
@@ -285,7 +285,7 @@ class approveAnrechnungDetail extends Auth_Controller
 			);
 		}
 		
-		return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
+		return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 	}
 	
 	/**

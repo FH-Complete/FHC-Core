@@ -546,10 +546,10 @@ class AnrechnungLib
 		if ($this->ci->db->trans_status() === false)
 		{
 			$this->ci->db->trans_rollback();
-			return error($result->msg, EXIT_ERROR);
+			return false;
 		}
 
-		return success(true);   // recommended
+		return true;   // recommended
 	}
 
 	/**
@@ -605,7 +605,7 @@ class AnrechnungLib
 		if ($this->ci->db->trans_status() === false)
 		{
 			$this->ci->db->trans_rollback();
-			return error($result->msg, EXIT_ERROR);
+			return false;
 		}
 
 		return true;   // recommended

@@ -100,7 +100,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id'])))
+			if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
@@ -127,7 +127,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 	
@@ -153,8 +153,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib
-				->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung'])))
+			if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
@@ -178,7 +177,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 	

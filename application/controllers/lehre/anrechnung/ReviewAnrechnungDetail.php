@@ -120,13 +120,13 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
-			show_error('Failed retrieving person data');
+			return $this->outputJsonError('Failed retrieving person data');
 		}
 
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id'])))
+			if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
@@ -148,14 +148,14 @@ class reviewAnrechnungDetail extends Auth_Controller
 			 * */
 			if (!$this->_sendSanchoMails($json, true))
 			{
-				show_error('Failed sending emails');
+				return $this->outputJsonError('Failed sending emails');
 			}
 
 			return $this->outputJsonSuccess($json);
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 
@@ -180,13 +180,13 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
-			show_error('Failed retrieving person data');
+			return $this->outputJsonError('Failed retrieving person data');
 		}
 
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung'])))
+			if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
@@ -205,14 +205,14 @@ class reviewAnrechnungDetail extends Auth_Controller
 			// Send mails to STGL (if not present STGL, send to STGL assistance)
 			if (!$this->_sendSanchoMails($json, false))
 			{
-				show_error('Failed sending emails');
+				return $this->outputJsonError('Failed sending emails');
 			}
 
 			return $this->outputJsonSuccess($json);
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 
