@@ -403,6 +403,8 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
     },
     formatGenehmigungIsWithdrawed: function (statusBezeichnung){
+        let empfehlung = $('#approveAnrechnungDetail-empfehlung').data('empfehlung'); // null / false / true
+
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-danger').removeClass('alert-success');
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
@@ -414,7 +416,11 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-abgeschlossenAm').text('-');
         $('#approveAnrechnungDetail-abgeschlossenVon').text('-');
 
-        $('#approveAnrechnungDetail-request-recommendation').prop('disabled', false);
+        // Only enable recommendation button again if no recommendation was submitted until now
+        if (empfehlung === null)
+        {
+            $('#approveAnrechnungDetail-request-recommendation').prop('disabled', false);
+        }
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', false);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
         // Hide button to withdraw approval

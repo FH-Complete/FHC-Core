@@ -145,7 +145,8 @@ $this->load->view(
                                 <form>
                                     <input type="hidden" name="anrechnung_id"
                                            value="<?php echo $anrechnungData->anrechnung_id ?>">
-                                    <div class="panel panel-default" id="test">
+                                    <div class="panel panel-default" id="approveAnrechnungDetail-empfehlung"
+                                         data-empfehlung="<?php echo json_encode($empfehlungData->empfehlung) ?>">
 
                                         <div class="panel-heading">
                                             <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></b></span>&emsp;
