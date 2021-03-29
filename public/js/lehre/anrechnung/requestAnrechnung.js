@@ -34,7 +34,9 @@ $(function(){
                 if (!data.error && data.retval != null)
                 {
                       requestAnrechnung.formatAnrechnungIsApplied(
-                        data.retval.antragdatum
+                        data.retval.antragdatum,
+                        data.retval.dms_id,
+                        formdata.get('uploadfile').name
                     );
 
                     FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("global", "antragWurdeGestellt"));
@@ -83,10 +85,16 @@ var requestAnrechnung = {
             }
         );
     },
-    formatAnrechnungIsApplied: function (antragdatum){
+    formatAnrechnungIsApplied: function (antragdatum, dms_id, filename){
         $('#requestAnrechnung-antragdatum').text(antragdatum);
         $('#requestAnrechnung-status_kurzbz').text(FHC_PhrasesLib.t("ui", "inBearbeitung"));
         $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+
+        // Display File-Downloadlink
+        $('#requestAnrechnung-downloadDocLink')
+            .removeClass('hidden')
+            .attr('href', 'RequestAnrechnung/download?dms_id=' + dms_id)
+            .html(filename);
 
         // Disable all form elements
         $("#requestAnrechnung-form :input").prop("disabled", true);

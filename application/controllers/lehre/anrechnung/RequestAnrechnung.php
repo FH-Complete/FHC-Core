@@ -110,12 +110,13 @@ class requestAnrechnung extends Auth_Controller
 		// Validate data
 		if (empty($_FILES['uploadfile']['name']))
 		{
-			show_error('Missing upload file');
+			return $this->outputJsonError($this->p->t('ui', 'errorUploadFehlt'));
 		}
 
-		if (isEmptyString($begruendung_id) || isEmptyString($lehrveranstaltung_id) || isEmptyString($studiensemester_kurzbz))
+		if (isEmptyString($begruendung_id) || isEmptyString($anmerkung) ||
+			isEmptyString($lehrveranstaltung_id) || isEmptyString($studiensemester_kurzbz))
 		{
-			show_error('Missing correct parameter');
+			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
 		
 		// Exit if user is not a student
@@ -172,7 +173,8 @@ class requestAnrechnung extends Auth_Controller
 		
 		// Output to AJAX
 		return $this->outputJsonSuccess(array(
-			'antragdatum' => (new DateTime())->format('d.m.Y')
+			'antragdatum' => (new DateTime())->format('d.m.Y'),
+			'dms_id' => $lastInsert_dms_id
 		));
 	}
 
