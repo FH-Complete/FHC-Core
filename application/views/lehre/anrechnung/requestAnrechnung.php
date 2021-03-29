@@ -133,10 +133,10 @@ $this->load->view(
                                                 <div class="checkbox">
                                                     <label>
                                                         <input type="radio" name="begruendung" value="1" required
-                                                            <?php echo $anrechnungData->begruendung_id == '1' ? 'checked' : ''; ?>>
+                                                            <?php echo $anrechnungData->begruendung_id == '1' ? 'checked' : ''; ?> />
                                                         <?php echo $this->p->t('anrechnung', 'antragStellenWegenZeugnis'); ?>&emsp;
                                                         <span id="requestAnrechnung-anrechnungGrundZeugnisTooltip" data-toggle="tooltip" data-placement="right"
-                                                              title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>">
+                                                              title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>" />
                                                         <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                                     </span>
                                                     </label>
@@ -176,11 +176,11 @@ $this->load->view(
                                                        title="<?php echo $this->p->t('ui', 'uploadTooltipText'); ?>">
                                                         <i class="fa fa-lg fa-question-circle-o" aria-hidden="true"></i>
                                                     </span>
-                                                    <?php if (!empty($anrechnungData->dms_id)): ?>
-                                                        <a class="pull-right"
-                                                           href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
-                                                           target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
-                                                    <?php endif; ?>
+                                                    <a class="pull-right <?php echo !empty($anrechnungData->dms_id) ? '' : 'hidden' ?>"
+                                                       id="requestAnrechnung-downloadDocLink"
+                                                       href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
+                                                       target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
