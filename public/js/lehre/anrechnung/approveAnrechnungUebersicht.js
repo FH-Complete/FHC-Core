@@ -170,6 +170,16 @@ $(function(){
         );
     });
 
+    // Show only rows that are in progress by lector
+    $("#show-inProgressLektor").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR},
+                {field: 'empfehlung_anrechnung', type: '=', value: null}
+            ]
+        );
+    });
+
     // Show only rows with empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
     $("#show-recommended").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter',

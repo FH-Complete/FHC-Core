@@ -197,6 +197,11 @@ $this->load->view(
                                 title="<?php echo $this->p->t('ui', 'alleInBearbeitungSTGL'); ?>">
                                     <i class='fa fa-eye'></i>
                         </button>
+                        <button id="show-inProgressLektor" class="btn btn-default btn-clearfilter" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="<?php echo $this->p->t('ui', 'alleInBearbeitungLektor'); ?>"><i
+                                    class='fa fa-clock-o'></i>
+                        </button>
                         <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'nurEmpfohleneAnzeigen'); ?>"><i
