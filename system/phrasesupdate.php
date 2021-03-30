@@ -9571,6 +9571,26 @@ Any unusual occurrences
 	),
 	array(
 		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'zgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'anrechnung',
 		'phrase' => 'anrechnungGrundTooltipText',
 		'insertvon' => 'system',

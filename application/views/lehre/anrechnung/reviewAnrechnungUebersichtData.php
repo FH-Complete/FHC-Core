@@ -20,6 +20,15 @@ $query = '
 			begruendung.bezeichnung AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
+			(SELECT COALESCE(
+				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . ',
+				array_to_json(zgv.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . '
+				) AS zgv
+			FROM public.tbl_prestudent
+			LEFT JOIN bis.tbl_zgv zgv USING (zgv_code)
+			LEFT JOIN bis.tbl_zgvmaster zgvmaster USING (zgvmas_code)
+			WHERE prestudent_id = anrechnung.prestudent_id
+			) AS zgv,
 			anrechnung.insertamum::date AS "antragsdatum",
 			empfehlung_anrechnung,
 			(SELECT status_kurzbz
@@ -76,6 +85,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
 		ucfirst($this->p->t('anrechnung', 'herkunft')),
+		ucfirst($this->p->t('global', 'zgv')),
 		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
@@ -123,6 +133,7 @@ $filterWidgetArray = array(
 		ects: {headerFilter:"input", align:"center"},
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
+		zgv: {visible: false, headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{
 		    labelField:"dokument_bezeichnung",
 			url:function(cell){return "'. current_url() .'/download?dms_id=" + cell.getData().dms_id},

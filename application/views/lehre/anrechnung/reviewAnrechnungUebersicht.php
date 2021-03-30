@@ -13,7 +13,8 @@ $this->load->view(
 		'tablewidget' => true,
 		'phrases' => array(
 			'global' => array(
-				'begruendung'
+				'begruendung',
+				'zgv'
 			),
 			'anrechnung' => array(
 				'nachweisdokumente',
