@@ -110,14 +110,8 @@ class reviewAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-
-		// Get statusbezeichnung for 'inProgressDP'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressDP = getData($this->AnrechnungstatusModel->load('inProgressDP'))[0];
-		$inProgressDP = getUserLanguage() == 'German'
-			? $inProgressDP->bezeichnung_mehrsprachig[0]
-			: $inProgressDP->bezeichnung_mehrsprachig[1];
-
+		
+		// Get lectors person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
 			return $this->outputJsonError('Failed retrieving person data');
@@ -132,7 +126,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'true',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP,
+					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
 					'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
 					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
 				);
@@ -171,13 +165,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 
-		// Get statusbezeichnung for 'inProgressDP'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressDP = getData($this->AnrechnungstatusModel->load('inProgressDP'))[0];
-		$inProgressDP = getUserLanguage() == 'German'
-			? $inProgressDP->bezeichnung_mehrsprachig[0]
-			: $inProgressDP->bezeichnung_mehrsprachig[1];
-
+		// Get lectors person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
 			return $this->outputJsonError('Failed retrieving person data');
@@ -192,7 +180,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'false',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP,
+					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
 					'empfehlumg_am'          => (new DateTime())->format('d.m.Y'),
 					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
 				);

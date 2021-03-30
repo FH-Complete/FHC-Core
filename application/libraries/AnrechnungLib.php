@@ -343,6 +343,27 @@ class AnrechnungLib
 		return $genehmigung_data;
 
 	}
+	
+	/**
+	 * Get Anrechnungstatusbezeichnung of given status_kurzbz in users language.
+	 *
+	 * @param $status_kurzbz
+	 * @return mixed
+	 */
+	public function getStatusbezeichnung ($status_kurzbz)
+	{
+		$this->ci->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
+		$result = $this->ci->AnrechnungstatusModel->load($status_kurzbz);
+		
+		if (!hasData($result))
+		{
+			show_error('Failed retrieving Anrechnungstatusbezeichung');
+		}
+		
+		return getUserLanguage() == 'German'
+			? $result->retval[0]->bezeichnung_mehrsprachig[0]
+			: $result->retval[0]->bezeichnung_mehrsprachig[1];
+	}
 
 	/**
 	 * Get last Anrechnungstatusbezeichnung in users language.

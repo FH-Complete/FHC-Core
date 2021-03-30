@@ -96,13 +96,6 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-		
-		// Get statusbezeichnung for 'approved'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$approved = getData($this->AnrechnungstatusModel->load('approved'))[0];
-		$approved = getUserLanguage() == 'German'
-			? $approved->bezeichnung_mehrsprachig[0]
-			: $approved->bezeichnung_mehrsprachig[1];
 
 		foreach ($data as $item)
 		{
@@ -112,7 +105,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
-					'status_bezeichnung' => $approved
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_APPROVED)
 				);
 				
 				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_APPROVED))
@@ -145,13 +138,6 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 		
-		// Get statusbezeichnung for 'rejected'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$rejected = getData($this->AnrechnungstatusModel->load('rejected'))[0];
-		$rejected = getUserLanguage() == 'German'
-			? $rejected->bezeichnung_mehrsprachig[0]
-			: $rejected->bezeichnung_mehrsprachig[1];
-		
 		foreach ($data as $item)
 		{
 			// Reject Anrechnung
@@ -160,7 +146,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_REJECTED,
-					'status_bezeichnung' => $rejected
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_REJECTED)
 				);
 				
 				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_REJECTED))
@@ -193,13 +179,6 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 		
-		// Get statusbezeichnung for 'inProgressLektor'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressLektor = getData($this->AnrechnungstatusModel->load('inProgressLektor'))[0];
-		$inProgressLektor = getUserLanguage() == 'German'
-			? $inProgressLektor->bezeichnung_mehrsprachig[0]
-			: $inProgressLektor->bezeichnung_mehrsprachig[1];
-		
 		$retval = array();
 		$counter = 0;
 		
@@ -221,7 +200,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 				$retval[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
-					'status_bezeichnung' => $inProgressLektor,
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
 					'empfehlung_anrechnung' => null
 				);
 			}
