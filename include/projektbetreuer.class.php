@@ -407,7 +407,7 @@ class projektbetreuer extends basis_db
 				FROM lehre.tbl_projektbetreuer betr
 				JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id 
 				JOIN public.tbl_person pers ON betr.person_id = pers.person_id
-				JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id
+				LEFT JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id AND kontakttyp = 'email' AND zustellung = true
 				LEFT JOIN public.tbl_benutzer ON pers.person_id = tbl_benutzer.person_id
 				LEFT JOIN campus.tbl_paabgabe abg ON betr.projektarbeit_id = abg.projektarbeit_id AND abg.paabgabetyp_kurzbz = 'end'
 				WHERE betr.betreuerart_kurzbz = 'Zweitbegutachter'
@@ -419,7 +419,7 @@ class projektbetreuer extends basis_db
 					AND betreuerart_kurzbz = 'Erstbegutachter'
 					AND projektarbeit_id = betr.projektarbeit_id
 				)
-				AND kontakttyp='email' AND zustellung AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)
+				AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)
 				ORDER BY betr.insertamum DESC
 				LIMIT 1";
 
@@ -462,7 +462,6 @@ class projektbetreuer extends basis_db
 
 			if ($row_betr)
 			{
-
 				if (!isset($row_betr->uid)
 					&& (!isset($row_betr->zugangstoken) || $row_betr->zugangstoken_gueltigbis < date('Y-m-d')))
 				{

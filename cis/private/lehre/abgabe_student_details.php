@@ -479,21 +479,17 @@ if($command=="update" && $error!=true)
 
 								if ($zweitbetr)
 								{
-									if (!isset($zweitbetr->zugangstoken))
-									{
-										$tokenGenRes = $projektbetreuer->generateZweitbegutachterToken($zweitbetr->person_id, $projektarbeit_id);
+									$tokenGenRes = $projektbetreuer->generateZweitbegutachterToken($zweitbetr->person_id, $projektarbeit_id);
 
-										if (!$tokenGenRes)
-											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+									if (!$tokenGenRes)
+										echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
 
-										$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
+									$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
 
-										if (!$zweitbetr)
-											echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')."</font><br>&nbsp;";
-									}
+									if (!$zweitbetr)
+										echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')."</font><br>&nbsp;";
 
 									$intern = isset($zweitbetr->uid);
-									$zweitbetrmail = $intern ? $zweitbetr->uid."@".DOMAIN : $zweitbetr->kontakt;
 
 									/*$mail_link = $intern ? $mail_fulllink : $mail_baselink."\n\n";
 									$mail_anrede = "Sehr geehrte".($zweitbetr->anrede=="Herr"?"r":"")." ".$zweitbetr->anrede." ".$zweitbetr->first."!\n\n";
@@ -522,7 +518,7 @@ if($command=="update" && $error!=true)
 									$mailres = sendSanchoMail(
 										'ParbeitsbeurteilungEndupload',
 										$zweitbetmaildata,
-										$zweitbetrmail,
+										$zweitbetr->email,
 										"Masterarbeitsbetreuung",
 										'sancho_header_min_bw.jpg',
 										'sancho_footer_min_bw.jpg',

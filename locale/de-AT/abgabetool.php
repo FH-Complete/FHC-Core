@@ -83,4 +83,5 @@ $this->phrasen['abgabetool/downloadProjektarbeit']='Dokument herunterladen';
 $this->phrasen['abgabetool/zweitBegutachter']='ZweitbegutachterIn';
 $this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Zugangstoken an ZweitbegutachterIn senden';
 $this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail an ZweitbegutachterIn (%s) gesendet';
+$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='keine Zustellmail für Zweitbegutachter vorhanden!';
 ?>
