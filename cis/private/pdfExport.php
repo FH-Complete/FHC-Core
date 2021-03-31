@@ -194,9 +194,6 @@ if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
 	if (!isset($_GET['betreuerart_kurzbz']) || !isset($_GET['person_id']) || !isset($_GET['projektarbeit_id']))
 		die('Fehlerhafte Parameteruebergabe');
 
-	if (!$rechte->isBerechtigt('assistenz'))
-		die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
-
 	$projektarbeit = new projektarbeit();
 	$projektarbeit->load($_GET['projektarbeit_id']);
 
@@ -204,7 +201,7 @@ if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
 	$betreuer->getPersonFromBenutzer($user);
 
 	//Überprüft ob es der Betreuer oder der Student ist
-	if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user)
+	if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
 		die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
 
 	switch ($_GET['betreuerart_kurzbz'])
@@ -219,11 +216,13 @@ if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
 			$xsl = 'ProjektBeurteilungMAZweit';
 			break;
 	}
+
+	$allowed = true;
 }
 
 
 $konto = new konto();
-if (((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin'))
+if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin')) || (isset($allowed) && $allowed === true))
 {
 	$buchungstypen = array();
 	if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
