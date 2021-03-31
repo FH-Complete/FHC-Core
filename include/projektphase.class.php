@@ -48,6 +48,7 @@ class projektphase extends basis_db
 	public $insertvon;	    // bigint
 	public $updateamum;	    // timestamp
 	public $updatevon;	    // bigint
+	public $buchbar; // bool
 
 
 	/**
@@ -100,6 +101,7 @@ class projektphase extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->buchbar = $this->db_parse_bool($row->buchbar);
 				return true;
 			}
 			else 
@@ -158,6 +160,7 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->buchbar = $this->db_parse_bool($row->buchbar);
 				
 				$this->result[] = $obj;
 			}
@@ -213,7 +216,7 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				
+				$obj->buchbar = $this->db_parse_bool($row->buchbar);
 				$this->result[] = $obj;
 			}
 			//var_dump($this->result);
@@ -260,6 +263,7 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+	            $obj->buchbar = $this->db_parse_bool($row->buchbar);
 				
 				$this->result[] = $obj;
             }
@@ -321,7 +325,7 @@ class projektphase extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, typ, 
-				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
+				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage, buchbar) VALUES ('.
 			     $this->db_add_param($this->projekt_kurzbz).', '.
 			     $this->db_add_param($this->projektphase_fk).', '.
 				 $this->db_add_param($this->bezeichnung).', '.
@@ -334,7 +338,8 @@ class projektphase extends basis_db
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).', now(), '.
                  $this->db_add_param($this->farbe).', '.
-			     $this->db_add_param($this->personentage).' );';
+			     $this->db_add_param($this->personentage).', '.
+				 $this->db_add_param($this->buchbar,FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -354,6 +359,7 @@ class projektphase extends basis_db
 				'personentage='.$this->db_add_param($this->personentage).', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'buchbar='.$this->db_add_param($this->buchbar,FHC_BOOLEAN).' '.
 				'WHERE projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).';';
 		}
 		

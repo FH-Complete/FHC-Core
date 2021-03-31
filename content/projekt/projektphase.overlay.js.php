@@ -161,7 +161,16 @@ function onselectTreeProjektphase()
     var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
     var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
-    
+	var buchbar=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchbar" ));
+
+	if (!buchbar)
+	{
+		buchbar='Nein';
+	}
+	else
+	{
+		buchbar='Ja';
+	}
     //alert(typ);
     
     //Daten den Feldern zuweisen
@@ -180,6 +189,11 @@ function onselectTreeProjektphase()
     document.getElementById('textbox-projektphase-detail-personentage').value=personentage;
     document.getElementById('textbox-projektphase-detail-farbe').value=farbe;
     document.getElementById('checkbox-projektphase-detail-neu').checked=false;
+	if(buchbar=='Nein')
+		document.getElementById('checkbox-projekt-detail-buchbar').checked=false;
+	else
+		document.getElementById('checkbox-projekt-detail-buchbar').checked=true;
+
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', projektphase_fk);
 	MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', ressource_id);
     

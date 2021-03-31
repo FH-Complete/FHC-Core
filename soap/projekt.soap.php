@@ -72,10 +72,23 @@ function saveProjekt($username, $passwort, $projekt)
 	$projektNew->anzahl_ma = $projekt->anzahl_ma;
 	$projektNew->aufwand_pt = $projekt->aufwand_pt;
 
-	if($projekt->neu=='true')
-		$projektNew->new = true;
+	if($projekt->buchbar=='true')
+	{
+		$projektNew->buchbar = true;
+	}
 	else
+	{
+		$projektNew->buchbar = false;
+	}
+
+	if($projekt->neu=='true')
+	{
+		$projektNew->new = true;
+	}
+	else
+	{
 		$projektNew->new = false;
+	}
 
 	if($projektNew->save())
 		return $projektNew->projekt_kurzbz;

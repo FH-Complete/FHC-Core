@@ -143,6 +143,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   					</hbox>
 					</row>
+                    <row>
+
+                        <label value="Buchbar" control="checkbox-projektphase-detail-buchbar"/>
+                        <hbox>
+                            <checkbox id="checkbox-projektphase-detail-buchbar"/>
+                            <spacer />
+                        </hbox>
+
+                    </row>
 				</rows>
 			</grid>
 			<hbox>

@@ -63,7 +63,8 @@ if($projektphase_id != '')
     $oRdf->obj[$i]->setAttribut('farbe',$phase->farbe);
     $oRdf->obj[$i]->setAttribut('typ',$phase->typ);
     $oRdf->obj[$i]->setAttribut('ressource_id',$phase->ressource_id);
-	
+	$oRdf->obj[$i]->setAttribut('buchbar',$phase->buchbar);
+
 	if($phase->projektphase_fk!='')
 		$oRdf->addSequence($phase->projektphase_id, $phase->projektphase_fk);
 	else
@@ -94,7 +95,8 @@ if($projektphase_id != '')
 		$oRdf->obj[$idx]->setAttribut('personentage', '');	
         $oRdf->obj[$idx]->setAttribut('farbe', '');
         $oRdf->obj[$idx]->setAttribut('typ', '');
-		
+		$oRdf->obj[$idx]->setAttribut('buchbar','');
+
 		$oRdf->addSequence('opt');
 	}
 		
@@ -113,7 +115,8 @@ if($projektphase_id != '')
 		$oRdf->obj[$idx]->setAttribut('personentage', $phase->personentage);
         $oRdf->obj[$idx]->setAttribut('farbe', $phase->farbe);
         $oRdf->obj[$idx]->setAttribut('typ', $phase->typ);
-	
+		$oRdf->obj[$idx]->setAttribut('buchbar',$phase->buchbar);
+
 		$oRdf->addSequence($phase->projektphase_id);
 	}
 	
@@ -163,7 +166,8 @@ else
 			$oRdf->obj[$idx]->setAttribut('beginn','');
 			$oRdf->obj[$idx]->setAttribut('ende','');
 			$oRdf->obj[$idx]->setAttribut('typ','organisationseinheit');
-			
+			$oRdf->obj[$idx]->setAttribut('buchbar','');
+
 			$oRdf->addSequence($projekt->oe_kurzbz);
 			
 			$lastOE=$currentOE;
@@ -184,6 +188,8 @@ else
 		$oRdf->obj[$idx]->setAttribut('beginn',$datum_obj->formatDatum($projekt->beginn,'d.m.Y'));
 		$oRdf->obj[$idx]->setAttribut('ende',$datum_obj->formatDatum($projekt->ende,'d.m.Y'));
 		$oRdf->obj[$idx]->setAttribut('typ','projekt');
+		$oRdf->obj[$idx]->setAttribut('buchbar',$projekt->buchbar);
+
 		
 		$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz, $projekt->oe_kurzbz);
 				
@@ -223,6 +229,7 @@ else
 			$oRdf->obj[$idx]->setAttribut('typ',strtolower($projektphase->typ));
 			$oRdf->obj[$idx]->setAttribut('ressource_bezeichnung',$projektphase->ressource_bezeichnung);
 			$oRdf->obj[$idx]->setAttribut('ressource_id',$projektphase->ressource_id);
+			$oRdf->obj[$idx]->setAttribut('buchbar',$projektphase->buchbar);
 			if (!is_null($projektphase->projektphase_fk))
 				$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_id, $projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_fk);
 			else

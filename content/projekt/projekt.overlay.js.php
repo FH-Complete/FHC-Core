@@ -153,8 +153,18 @@ function onselectProjekt()
     var aufwand_pt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwand_pt" ));
     var anzahl_ma=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_ma" ));
     var aufwandstyp_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwandstyp_kurzbz" ));
-    
-    //Daten den Feldern zuweisen
+	var buchbar=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchbar" ));
+
+	if (!buchbar)
+	{
+		buchbar='Nein';
+	}
+	else
+	{
+		buchbar='Ja';
+	}
+
+	//Daten den Feldern zuweisen
 
     document.getElementById('textbox-projekt-detail-projekt_kurzbz').value=projekt_kurzbz;
     //document.getElementById('menulist-projekt-detail-oe_kurzbz').value=oe_kurzbz;
@@ -169,6 +179,11 @@ function onselectProjekt()
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
     document.getElementById('textbox-projekt-anzahl_ma').value=anzahl_ma;
     document.getElementById('textbox-projekt-aufwand_pt').value=aufwand_pt;
+    if(buchbar=='Nein')
+        document.getElementById('checkbox-projekt-detail-buchbar').checked=false;
+    else
+    	document.getElementById('checkbox-projekt-detail-buchbar').checked=true;
+
     MenulistSelectItemOnValue('menulist-projekt-detail-aufwandstyp', aufwandstyp_kurzbz);
     
     
@@ -197,12 +212,13 @@ function saveProjektDetail()
 	beginn = document.getElementById('textbox-projekt-detail-beginn').iso;
 	ende = document.getElementById('textbox-projekt-detail-ende').iso;
 	budget = document.getElementById('textbox-projekt-detail-budget').value;
-   farbe = document.getElementById('textbox-projekt-detail-farbe').value;
+    farbe = document.getElementById('textbox-projekt-detail-farbe').value;
 	neu = document.getElementById('checkbox-projekt-detail-neu').checked;
 	aufwandstyp_kurzbz = MenulistGetSelectedValue('menulist-projekt-detail-aufwandstyp');
 	anzahl_ma = document.getElementById('textbox-projekt-anzahl_ma').value;
 	aufwand_pt = document.getElementById('textbox-projekt-aufwand_pt').value;
-	
+	buchbar = document.getElementById('checkbox-projekt-detail-buchbar').checked;
+
 	var soapBody = new SOAPObject("saveProjekt");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
 	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
@@ -220,11 +236,25 @@ function saveProjektDetail()
     projekt.appendChild(new SOAPObject("aufwandstyp_kurzbz")).val(aufwandstyp_kurzbz);
     projekt.appendChild(new SOAPObject("anzahl_ma")).val(anzahl_ma);
     projekt.appendChild(new SOAPObject("aufwand_pt")).val(aufwand_pt);
-    
+	console.log(buchbar);
+	if(buchbar)
+	{
+		projekt.appendChild(new SOAPObject("buchbar")).val('true');
+	}
+	else
+	{
+		projekt.appendChild(new SOAPObject("buchbar")).val('false');
+	}
+
 	if(neu)
+	{
 		projekt.appendChild(new SOAPObject("neu")).val('true');
-	else	
+	}
+	else
+	{
 		projekt.appendChild(new SOAPObject("neu")).val('false');
+	}
+
 	soapBody.appendChild(projekt);
 	
 	var sr = new SOAPRequest("saveProjekt",soapBody);

@@ -125,7 +125,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   					</hbox>
 					</row>
 					<row style="background-color:#eeeeee">
-						<label value="Anzahl MA" control="textbox-projekt-anzahl_ma"/>
+						<label value="AzgrAnzahl MA" control="textbox-projekt-anzahl_ma"/>
 							<hbox>
 	   					<textbox id="textbox-projekt-anzahl_ma"  size="7" maxlength="7" disabled="true" onchange="makeProjektAnalyse()"/>
 	   					</hbox>
@@ -164,6 +164,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<spacer />
 						</hbox>
 					</row>
+                    <row>
+
+                            <label value="Buchbar" control="checkbox-projekt-detail-buchbar"/>
+                            <hbox>
+                                <checkbox id="checkbox-projekt-detail-buchbar"/>
+                                <spacer />
+                            </hbox>
+
+                    </row>
 				</rows>
 			</grid>
 			<hbox>
