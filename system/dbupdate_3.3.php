@@ -2032,6 +2032,28 @@ if (!$result = @$db->db_query("SELECT projekt_id FROM fue.tbl_projekt LIMIT 1"))
 
 }
 
+// add column buchbar to fue.tbl_project
+if (!$result = @$db->db_query("SELECT buchbar FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "ALTER TABLE fue.tbl_projekt ADD COLUMN buchbar BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte buchbar zu fue.tbl_projekt hinzugefügt';
+}
+
+// add column buchbar to fue.tbl_projectphase
+if (!$result = @$db->db_query("SELECT buchbar FROM fue.tbl_projektphase LIMIT 1"))
+{
+	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN buchbar BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte buchbar zu fue.tbl_projektphase hinzugefügt';
+}
+
 // Extension Schema
 if ($result = $db->db_query("SELECT schema_name FROM information_schema.schemata WHERE schema_name='extension'"))
 {
