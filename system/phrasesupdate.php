@@ -10550,6 +10550,46 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungsanfrageAn',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlungsanfrage an",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Request Recommend. to",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungsanfrageAm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlungsanfrage am",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Request Recommend. on",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	
 );
 

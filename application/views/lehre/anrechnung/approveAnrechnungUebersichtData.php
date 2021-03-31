@@ -1,4 +1,7 @@
 <?php
+const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
+const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
+
 $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '0' : '1';
@@ -54,7 +57,41 @@ $query = '
 	)
 	
 	SELECT anrechnungen.*,
-	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung"
+	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
+	CASE
+		WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
+		ELSE
+		(SELECT insertamum::date
+			FROM lehre.tbl_anrechnungstatus
+			JOIN lehre.tbl_anrechnung_anrechnungstatus USING (status_kurzbz)
+			WHERE anrechnung_id = anrechnungen.anrechnung_id
+			AND status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR . '\'
+			ORDER BY insertamum DESC
+			LIMIT 1)
+	END empfehlungsanfrage_am,
+	CASE
+		WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
+		ELSE
+		(SELECT COALESCE(
+				STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = TRUE),
+				STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = FALSE)
+			) empfehlungsanfrage_an
+			FROM (
+				SELECT DISTINCT ON (benutzer.uid) uid, vorname, nachname,
+				CASE WHEN lehrfunktion_kurzbz = \'LV-Leitung\' THEN TRUE ELSE FALSE END AS lvleiter
+				FROM lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+				JOIN public.tbl_benutzer benutzer ON lema.mitarbeiter_uid = benutzer.uid
+				JOIN public.tbl_person USING (person_id)
+				WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+				AND lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id
+				AND lema.mitarbeiter_uid NOT like \'_Dummy%\'
+				AND benutzer.aktiv = TRUE
+				AND tbl_person.aktiv = TRUE
+				ORDER BY benutzer.uid, lvleiter DESC, nachname, vorname
+				) as tmp_lvlektoren
+			)
+	END empfehlungsanfrage_an
 	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
@@ -86,7 +123,9 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
-		'Status'
+		'Status',
+		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')),
+		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAn'))
 	),
 	'datasetRepOptions' => '{
 		height: func_height(this),
@@ -143,7 +182,9 @@ $filterWidgetArray = array(
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false},
-		status_bezeichnung: {headerFilter:"input"}
+		status_bezeichnung: {headerFilter:"input"},
+		empfehlungsanfrage_am: {visible: false, align:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlungsanfrage_an: {visible: false, headerFilter:"input"}
 	 }', // col properties
 );
 
