@@ -236,7 +236,7 @@ function saveProjektDetail()
     projekt.appendChild(new SOAPObject("aufwandstyp_kurzbz")).val(aufwandstyp_kurzbz);
     projekt.appendChild(new SOAPObject("anzahl_ma")).val(anzahl_ma);
     projekt.appendChild(new SOAPObject("aufwand_pt")).val(aufwand_pt);
-	console.log(buchbar);
+
 	if(buchbar)
 	{
 		projekt.appendChild(new SOAPObject("buchbar")).val('true');

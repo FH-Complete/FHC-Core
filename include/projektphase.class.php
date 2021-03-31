@@ -358,7 +358,7 @@ class projektphase extends basis_db
                 'farbe='.$this->db_add_param($this->farbe).', '.
 				'personentage='.$this->db_add_param($this->personentage).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
 				'buchbar='.$this->db_add_param($this->buchbar,FHC_BOOLEAN).' '.
 				'WHERE projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).';';
 		}

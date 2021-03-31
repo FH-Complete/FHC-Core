@@ -82,10 +82,23 @@ function saveProjektphase($username, $passwort, $phase)
 	$projektphase->updatevon = $user;
 	$projektphase->updateamum = date('Y-m-d H:i:s');
 
-	if($phase->neu=='true')
-		$projektphase->new = true;
+	if($phase->buchbar=='true')
+	{
+		$projektphase->buchbar = true;
+	}
 	else
+	{
+		$projektphase->buchbar = false;
+	}
+
+	if($phase->neu=='true')
+	{
+		$projektphase->new = true;
+	}
+	else
+	{
 		$projektphase->new = false;
+	}
 
 	if($projektphase->save())
 		return $projektphase->projektphase_id;

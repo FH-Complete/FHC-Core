@@ -190,9 +190,9 @@ function onselectTreeProjektphase()
     document.getElementById('textbox-projektphase-detail-farbe').value=farbe;
     document.getElementById('checkbox-projektphase-detail-neu').checked=false;
 	if(buchbar=='Nein')
-		document.getElementById('checkbox-projekt-detail-buchbar').checked=false;
+		document.getElementById('checkbox-projektphase-detail-buchbar').checked=false;
 	else
-		document.getElementById('checkbox-projekt-detail-buchbar').checked=true;
+		document.getElementById('checkbox-projektphase-detail-buchbar').checked=true;
 
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', projektphase_fk);
 	MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', ressource_id);
@@ -247,6 +247,7 @@ function saveProjektphaseDetail()
 	var personentage = document.getElementById('textbox-projektphase-detail-personentage').value;
     var farbe = document.getElementById('textbox-projektphase-detail-farbe').value;
 	var neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
+	var buchbar = document.getElementById('checkbox-projektphase-detail-buchbar').checked;
 
 	var soapBody = new SOAPObject("saveProjektphase");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -265,10 +266,22 @@ function saveProjektphaseDetail()
 	phase.appendChild(new SOAPObject("budget")).val(budget);
 	phase.appendChild(new SOAPObject("personentage")).val(personentage);
     phase.appendChild(new SOAPObject("farbe")).val(farbe);
-	if(neu)
-		phase.appendChild(new SOAPObject("neu")).val('true');
+	if(buchbar)
+	{
+		phase.appendChild(new SOAPObject("buchbar")).val('true');
+	}
 	else
+	{
+		phase.appendChild(new SOAPObject("buchbar")).val('false');
+	}
+	if(neu)
+	{
+		phase.appendChild(new SOAPObject("neu")).val('true');
+	}
+	else
+	{
 		phase.appendChild(new SOAPObject("neu")).val('false');
+	}
 	phase.appendChild(new SOAPObject("user")).val(getUsername());
 	soapBody.appendChild(phase);
 		
