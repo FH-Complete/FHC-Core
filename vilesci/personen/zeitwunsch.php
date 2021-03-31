@@ -66,7 +66,7 @@ $updatevon = 0;
 	// Zeitwuensche speichern
 	if (isset($_POST['save']))
 	{
-		if(!$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
+		if(!$rechte->isBerechtigt('mitarbeiter/zeitwuensche', null, 'suid'))
 			die($rechte->errormsg);
 
 		for ($t=1;$t<7;$t++)
