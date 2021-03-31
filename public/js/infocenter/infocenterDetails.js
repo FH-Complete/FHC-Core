@@ -207,6 +207,22 @@ var InfocenterDetails = {
 						$("#zgvort_" + prestudentid).val(zgvort);
 						$("#zgvdatum_" + prestudentid).val(gerzgvdatum);
 						$("#zgvnation_" + prestudentid).val(zgvnation);
+
+						var zgvmas_code = prestudent.zgvmas_code !== null ? prestudent.zgvmas_code : "null";
+						var zgvmaort = prestudent.zgvmaort !== null ? prestudent.zgvmaort : "";
+						var zgvmadatum = prestudent.zgvmadatum;
+						var gerzgvmadatum = "";
+						if (zgvmadatum !== null)
+						{
+							zgvmadatum = $.datepicker.parseDate("yy-mm-dd", prestudent.zgvmadatum);
+							gerzgvmadatum = $.datepicker.formatDate("dd.mm.yy", zgvmadatum);
+						}
+						var zgvmanation = prestudent.zgvmanation !== null ? prestudent.zgvmanation : "null";
+
+						$("#zgvmas_" + prestudentid).val(zgvmas_code);
+						$("#zgvmaort_" + prestudentid).val(zgvmaort);
+						$("#zgvmadatum_" + prestudentid).val(gerzgvmadatum);
+						$("#zgvmanation_" + prestudentid).val(zgvmanation);
 					}
 					else
 					{
