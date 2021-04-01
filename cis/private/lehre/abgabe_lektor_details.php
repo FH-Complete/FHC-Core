@@ -186,8 +186,12 @@ echo '
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<style>			
 			#beurteilungheadertable td {
-				height: 35px;
+				height: 30px;
 				overflow: hidden;
+			}
+			
+			#beurteilungheadertable form {
+				margin: 0;
 			}
 			
 			/* Bild statt submit button, styling entfernen*/
