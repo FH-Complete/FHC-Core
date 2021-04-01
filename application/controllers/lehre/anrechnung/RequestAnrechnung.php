@@ -113,8 +113,10 @@ class requestAnrechnung extends Auth_Controller
 			return $this->outputJsonError($this->p->t('ui', 'errorUploadFehlt'));
 		}
 
-		if (isEmptyString($begruendung_id) || isEmptyString($anmerkung) ||
-			isEmptyString($lehrveranstaltung_id) || isEmptyString($studiensemester_kurzbz))
+		if (isEmptyString($begruendung_id) ||
+			isEmptyString($anmerkung) ||
+			isEmptyString($lehrveranstaltung_id) ||
+			isEmptyString($studiensemester_kurzbz))
 		{
 			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
@@ -143,7 +145,15 @@ class requestAnrechnung extends Auth_Controller
 		}
 		
 		// Upload document
-		$lastInsert_dms_id = self::_uploadFile();
+		$result = self::_uploadFile();
+
+		if (isError($result))
+		{
+			return $this->outputJsonError($result->retval);
+		}
+		
+		// Store just inserted DMS ID
+		$lastInsert_dms_id = $result->retval['dms_id'];
 		
 		// Start DB transaction
 		$this->db->trans_start(false);
@@ -159,7 +169,7 @@ class requestAnrechnung extends Auth_Controller
 			'insertvon' => $this->_uid
 		));
 		
-		// Save Anrechnungstatus 'inProgressSTGL'
+		// Save Anrechnungstatus
 		$this->AnrechnungModel->saveAnrechnungstatus($result->retval, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
 		
 		// Transaction complete
@@ -293,14 +303,8 @@ class requestAnrechnung extends Auth_Controller
 		return $studiensemester_kurzbz == $actual_ss;
 	}
 	
-	private function _uploadFile(){
-		
-		if (empty($_FILES['uploadfile']['name']))
-		{
-			show_error('Missing upload file');
-		}
-		
-		// Upload document
+	private function _uploadFile()
+	{
 		$dms = array(
 			'kategorie_kurzbz'  => 'anrechnung',
 			'version'           => 0,
@@ -310,11 +314,7 @@ class requestAnrechnung extends Auth_Controller
 			'insertvon'         => $this->_uid
 		);
 		
-		if (isError($uploaddata = $this->dmslib->upload($dms, array('pdf'))))
-		{
-			show_error(getError($uploaddata));
-		}
-		
-		return $uploaddata->retval['dms_id'];
+		// Upload document
+		return $this->dmslib->upload($dms, array('pdf'));
 	}
 }
