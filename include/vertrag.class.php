@@ -1245,5 +1245,82 @@ class vertrag extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Prueft ob ein Mitarbeiter einen erteilten Vertrag zu einer Lehreinheit besitzt.
+	 * @param $lehreinheit ID der Lehreinheit
+	 * @param $studiensemester_kurzbz Studiensemester das geprueft wird
+	 * @param $mitarbeiter_uid UID des Mitarbeiters
+	 */
+	public function isVertragErteiltLE($lehreinheit_id, $studiensemester_kurzbz, $mitarbeiter_uid)
+	{
+		if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
+		 && CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
+		{
+			// Liegt das Studiensemester vor dem Pruefdatum, wird die LV immer als Erteilt angezeigt
+			$qry = "
+				SELECT
+					tbl_studiensemester.start
+				FROM
+					public.tbl_studiensemester
+				WHERE
+					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND tbl_studiensemester.start < (SELECT start
+						FROM public.tbl_studiensemester stsem WHERE
+						stsem.studiensemester_kurzbz=".$this->db_add_param(CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON)."
+						)";
+
+			if ($result = $this->db_query($qry))
+			{
+				if ($this->db_num_rows($result)>0)
+				{
+					// Wenn das Studiensemester vor dem Pruefdatum liegt, gilt der Vertrag immer als erteilt.
+					return true;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden des Studiensemesters';
+				return false;
+			}
+		}
+
+		$qry = "
+			SELECT
+				1
+			FROM
+				lehre.tbl_lehreinheitmitarbeiter
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				JOIN lehre.tbl_vertrag USING(vertrag_id)
+				JOIN lehre.tbl_vertrag_vertragsstatus USING(vertrag_id)
+			WHERE
+				tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)."
+				AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+				AND tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
+				AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz='erteilt'
+				AND NOT EXISTS(
+					SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus vstatus
+					WHERE vstatus.vertrag_id = tbl_vertrag.vertrag_id
+					AND vstatus.vertragsstatus_kurzbz='storno'
+				)
+		";
+
+		if ($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
