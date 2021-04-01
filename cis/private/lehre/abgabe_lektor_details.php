@@ -199,6 +199,12 @@ echo '
 				cursor: pointer;
 				outline: inherit;
 			}
+			#tokenmailimg {
+				top: 4px;
+				height: 18px;
+				width: 18px;
+				position: relative;
+			}
 			
 		</style>
 
@@ -483,8 +489,8 @@ if (isset($zweitbegutachter) && $zweitbegutachter) // wenn es Zweitbegutachter g
 		$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='" . $projektarbeit_id . "'>";
 		$htmlstr .= "<input type='hidden' name='betreuerart' value='" . $betreuerart . "'>";
-		$htmlstr .= "&nbsp;&nbsp;<button type='submit' name='zweitbegutachtertoken' title='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'>
-						<img src='../../../skin/images/email.png' alt='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'/></button>\n";
+		$htmlstr .= "&nbsp;<button type='submit' name='zweitbegutachtertoken' title='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'>
+						<img id='tokenmailimg' src='../../../skin/images/email.png' alt='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'/></button>\n";
 		$htmlstr .= "</form>";
 	}
 	$htmlstr .= "</td>\n";
