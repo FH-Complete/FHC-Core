@@ -169,8 +169,11 @@ class requestAnrechnung extends Auth_Controller
 			'insertvon' => $this->_uid
 		));
 		
+		// Store just inserted Anrechnung ID
+		$lastInsert_anrechnung_id = $result->retval;
+		
 		// Save Anrechnungstatus
-		$this->AnrechnungModel->saveAnrechnungstatus($result->retval, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
+		$this->AnrechnungModel->saveAnrechnungstatus($lastInsert_anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
 		
 		// Transaction complete
 		$this->db->trans_complete();
@@ -303,6 +306,12 @@ class requestAnrechnung extends Auth_Controller
 		return $studiensemester_kurzbz == $actual_ss;
 	}
 	
+	/**
+	 * Upload file via DMS library.
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
 	private function _uploadFile()
 	{
 		$dms = array(
