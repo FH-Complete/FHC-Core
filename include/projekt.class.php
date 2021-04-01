@@ -47,7 +47,7 @@ class projekt extends basis_db
 	public $farbe;
 	public $anzahl_ma;		// integer
 	public $aufwand_pt;		// integer
-	public $buchbar;    //bool
+	public $zeitaufzeichnung;    //bool
 
 
 	/**
@@ -86,7 +86,7 @@ class projekt extends basis_db
 				$this->farbe = $row->farbe;
 				$this->anzahl_ma = $row->anzahl_ma;
 				$this->aufwand_pt = $row->aufwand_pt;
-				$this->buchbar = $this->db_parse_bool($row->buchbar);
+				$this->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				return true;
 			}
@@ -141,7 +141,7 @@ class projekt extends basis_db
 				$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
 				$obj->anzahl_ma = $row->anzahl_ma;
 				$obj->aufwand_pt = $row->aufwand_pt;
-				$obj->buchbar = $this->db_parse_bool($row->buchbar);
+				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				$this->result[] = $obj;
 			}
@@ -185,7 +185,7 @@ class projekt extends basis_db
 				$obj->farbe = $row->farbe;
 				$obj->anzahl_ma = $row->anzahl_ma;
 				$obj->aufwand_pt = $row->aufwand_pt;
-				$obj->buchbar = $this->db_parse_bool($row->buchbar);
+				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				$this->result[] = $obj;
 			}
@@ -229,7 +229,7 @@ class projekt extends basis_db
 				$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
 				$obj->anzahl_ma = $row->anzahl_ma;
 				$obj->aufwand_pt = $row->aufwand_pt;
-				$obj->buchbar = $this->db_parse_bool($row->buchbar);
+				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				$this->result[] = $obj;
 			}
@@ -297,7 +297,7 @@ class projekt extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry = 'INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz, aufwand_pt, anzahl_ma, aufwandstyp_kurzbz, buchbar) VALUES('.
+			$qry = 'INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz, aufwand_pt, anzahl_ma, aufwandstyp_kurzbz, zeitaufzeichnung) VALUES('.
 		     $this->db_add_param($this->projekt_kurzbz).', '.
 		     $this->db_add_param($this->nummer).', '.
 		     $this->db_add_param($this->titel).', '.
@@ -310,7 +310,7 @@ class projekt extends basis_db
 		     $this->db_add_param($this->aufwand_pt).','.
 		     $this->db_add_param($this->anzahl_ma).','.
 		     $this->db_add_param($this->aufwandstyp_kurzbz).', '.
-			 $this->db_add_param($this->buchbar,FHC_BOOLEAN).');';
+			 $this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -329,7 +329,7 @@ class projekt extends basis_db
 				'anzahl_ma='.$this->db_add_param($this->anzahl_ma).', '.
 				'aufwand_pt='.$this->db_add_param($this->aufwand_pt).', '.
 				'aufwandstyp_kurzbz='.$this->db_add_param($this->aufwandstyp_kurzbz).', '.
-				'buchbar='.$this->db_add_param($this->buchbar,FHC_BOOLEAN).' '.
+				'zeitaufzeichnung='.$this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).' '.
 				'WHERE projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).';';
 		}
 
@@ -424,7 +424,7 @@ class projekt extends basis_db
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
-				$obj->buchbar = $this->db_parse_bool($row->buchbar);
+				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				$this->result[] = $obj;
 			}
@@ -457,7 +457,7 @@ class projekt extends basis_db
 				$this->farbe = $row->farbe;
 				$this->anzahl_ma = $row->anzahl_ma;
 				$this->aufwand_pt = $row->aufwand_pt;
-				$this->buchbar = $this->db_parse_bool($row->buchbar);
+				$this->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				return true;
 			}

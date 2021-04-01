@@ -161,15 +161,15 @@ function onselectTreeProjektphase()
     var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
     var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
-	var buchbar=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchbar" ));
+	var zeitaufzeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zeitaufzeichnung" ));
 
-	if (!buchbar)
+	if (!zeitaufzeichnung)
 	{
-		buchbar='Nein';
+		zeitaufzeichnung='Nein';
 	}
 	else
 	{
-		buchbar='Ja';
+		zeitaufzeichnung='Ja';
 	}
     //alert(typ);
     
@@ -189,10 +189,10 @@ function onselectTreeProjektphase()
     document.getElementById('textbox-projektphase-detail-personentage').value=personentage;
     document.getElementById('textbox-projektphase-detail-farbe').value=farbe;
     document.getElementById('checkbox-projektphase-detail-neu').checked=false;
-	if(buchbar=='Nein')
-		document.getElementById('checkbox-projektphase-detail-buchbar').checked=false;
+	if(zeitaufzeichnung=='Nein')
+		document.getElementById('checkbox-projektphase-detail-zeitaufzeichnung').checked=false;
 	else
-		document.getElementById('checkbox-projektphase-detail-buchbar').checked=true;
+		document.getElementById('checkbox-projektphase-detail-zeitaufzeichnung').checked=true;
 
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', projektphase_fk);
 	MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', ressource_id);
@@ -247,7 +247,7 @@ function saveProjektphaseDetail()
 	var personentage = document.getElementById('textbox-projektphase-detail-personentage').value;
     var farbe = document.getElementById('textbox-projektphase-detail-farbe').value;
 	var neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
-	var buchbar = document.getElementById('checkbox-projektphase-detail-buchbar').checked;
+	var zeitaufzeichnung = document.getElementById('checkbox-projektphase-detail-zeitaufzeichnung').checked;
 
 	var soapBody = new SOAPObject("saveProjektphase");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -266,13 +266,13 @@ function saveProjektphaseDetail()
 	phase.appendChild(new SOAPObject("budget")).val(budget);
 	phase.appendChild(new SOAPObject("personentage")).val(personentage);
     phase.appendChild(new SOAPObject("farbe")).val(farbe);
-	if(buchbar)
+	if(zeitaufzeichnung)
 	{
-		phase.appendChild(new SOAPObject("buchbar")).val('true');
+		phase.appendChild(new SOAPObject("zeitaufzeichnung")).val('true');
 	}
 	else
 	{
-		phase.appendChild(new SOAPObject("buchbar")).val('false');
+		phase.appendChild(new SOAPObject("zeitaufzeichnung")).val('false');
 	}
 	if(neu)
 	{

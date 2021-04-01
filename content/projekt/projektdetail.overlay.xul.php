@@ -166,9 +166,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
                     <row>
 
-                            <label value="Buchbar" control="checkbox-projekt-detail-buchbar"/>
+                            <label value="Zeitaufzeichnung" control="checkbox-projekt-detail-zeitaufzeichnung"/>
                             <hbox>
-                                <checkbox id="checkbox-projekt-detail-buchbar"/>
+                                <checkbox id="checkbox-projekt-detail-zeitaufzeichnung"/>
                                 <spacer />
                             </hbox>
 

@@ -72,13 +72,13 @@ function saveProjekt($username, $passwort, $projekt)
 	$projektNew->anzahl_ma = $projekt->anzahl_ma;
 	$projektNew->aufwand_pt = $projekt->aufwand_pt;
 
-	if($projekt->buchbar=='true')
+	if($projekt->zeitaufzeichnung=='true')
 	{
-		$projektNew->buchbar = true;
+		$projektNew->zeitaufzeichnung = true;
 	}
 	else
 	{
-		$projektNew->buchbar = false;
+		$projektNew->zeitaufzeichnung = false;
 	}
 
 	if($projekt->neu=='true')

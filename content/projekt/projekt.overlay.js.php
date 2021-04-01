@@ -153,15 +153,15 @@ function onselectProjekt()
     var aufwand_pt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwand_pt" ));
     var anzahl_ma=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_ma" ));
     var aufwandstyp_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwandstyp_kurzbz" ));
-	var buchbar=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchbar" ));
+	var zeitaufzeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zeitaufzeichnung" ));
 
-	if (!buchbar)
+	if (!zeitaufzeichnung)
 	{
-		buchbar='Nein';
+		zeitaufzeichnung='Nein';
 	}
 	else
 	{
-		buchbar='Ja';
+		zeitaufzeichnung='Ja';
 	}
 
 	//Daten den Feldern zuweisen
@@ -179,10 +179,10 @@ function onselectProjekt()
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
     document.getElementById('textbox-projekt-anzahl_ma').value=anzahl_ma;
     document.getElementById('textbox-projekt-aufwand_pt').value=aufwand_pt;
-    if(buchbar=='Nein')
-        document.getElementById('checkbox-projekt-detail-buchbar').checked=false;
+    if(zeitaufzeichnung=='Nein')
+        document.getElementById('checkbox-projekt-detail-zeitaufzeichnung').checked=false;
     else
-    	document.getElementById('checkbox-projekt-detail-buchbar').checked=true;
+    	document.getElementById('checkbox-projekt-detail-zeitaufzeichnung').checked=true;
 
     MenulistSelectItemOnValue('menulist-projekt-detail-aufwandstyp', aufwandstyp_kurzbz);
     
@@ -217,7 +217,7 @@ function saveProjektDetail()
 	aufwandstyp_kurzbz = MenulistGetSelectedValue('menulist-projekt-detail-aufwandstyp');
 	anzahl_ma = document.getElementById('textbox-projekt-anzahl_ma').value;
 	aufwand_pt = document.getElementById('textbox-projekt-aufwand_pt').value;
-	buchbar = document.getElementById('checkbox-projekt-detail-buchbar').checked;
+	zeitaufzeichnung = document.getElementById('checkbox-projekt-detail-zeitaufzeichnung').checked;
 
 	var soapBody = new SOAPObject("saveProjekt");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -237,13 +237,13 @@ function saveProjektDetail()
     projekt.appendChild(new SOAPObject("anzahl_ma")).val(anzahl_ma);
     projekt.appendChild(new SOAPObject("aufwand_pt")).val(aufwand_pt);
 
-	if(buchbar)
+	if(zeitaufzeichnung)
 	{
-		projekt.appendChild(new SOAPObject("buchbar")).val('true');
+		projekt.appendChild(new SOAPObject("zeitaufzeichnung")).val('true');
 	}
 	else
 	{
-		projekt.appendChild(new SOAPObject("buchbar")).val('false');
+		projekt.appendChild(new SOAPObject("zeitaufzeichnung")).val('false');
 	}
 
 	if(neu)

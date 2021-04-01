@@ -82,13 +82,13 @@ function saveProjektphase($username, $passwort, $phase)
 	$projektphase->updatevon = $user;
 	$projektphase->updateamum = date('Y-m-d H:i:s');
 
-	if($phase->buchbar=='true')
+	if($phase->zeitaufzeichnung=='true')
 	{
-		$projektphase->buchbar = true;
+		$projektphase->zeitaufzeichnung = true;
 	}
 	else
 	{
-		$projektphase->buchbar = false;
+		$projektphase->zeitaufzeichnung = false;
 	}
 
 	if($phase->neu=='true')
