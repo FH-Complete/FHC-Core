@@ -184,7 +184,7 @@
 		<!ENTITY menu-dokumente.accesskey	"D">
 
 		<!ENTITY menu-dokumente-inskriptionsbestaetigung.key		"I">
-		<!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Inskriptionsbestätigung">
+		<!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Studienbestätigung">
 		<!ENTITY menu-dokumente-inskriptionsbestaetigung.accesskey	"I">
 
 		<!ENTITY menu-dokumente-bewerberakt.key		"B">
