@@ -162,21 +162,18 @@ else
 			$htmlstr .= "       <td><a href='abgabe_student_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&bid=".$row->betreuer_person_id."' target='as_detail' title='Details anzeigen'>".$p->t('abgabetool/upload')."</a></td>\n";
 		elseif (!is_null($row->babgeschickt) || !is_null($row->zweitbetreuer_abgeschickt))
 		{
-			$htmlstr .= "<td><select onChange='window.location.href = this.value'>
-							<option selected disabled>". $p->t('abgabetool/projektbeurteilungDownload') ."</option>";
+			$htmlstr .= "<td>";
 
-			if(!is_null($row->babgeschickt))
-			{
-				$path = "../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->betreuer_person_id;
-				$htmlstr .= "<option value=". $path .">". $p->t('abgabetool/projektbeurteilungErstDownload') ."</option>";
-			}
+			if (!is_null($row->babgeschickt))
+				$htmlstr .= "<a href='../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->betreuer_person_id ."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungErstDownload')."</a>";
+
+			if (!is_null($row->babgeschickt) && !is_null($row->zweitbetreuer_abgeschickt))
+				$htmlstr .= "/";
 
 			if (!is_null($row->zweitbetreuer_abgeschickt))
-			{
-				$path = "../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->zweitbetreuer_betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->zweitbetreuer_person_id;
-				$htmlstr .= "<option value=". $path .">". $p->t('abgabetool/projektbeurteilungZweitDownload') ."</option>";
-			}
-			$htmlstr .= "</select></td>";
+				$htmlstr .= "<a href='../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->zweitbetreuer_betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->zweitbetreuer_person_id."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungZweitDownload')."</a>";
+
+			$htmlstr .= "</td>";
 		} else
 		{
 			$htmlstr  .= "<td></td>";
