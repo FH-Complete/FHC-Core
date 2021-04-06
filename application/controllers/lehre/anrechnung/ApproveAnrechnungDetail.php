@@ -86,7 +86,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		
 		// Get Antrag data
 		$antragData = $this->anrechnunglib->getAntragData(
-			$student_uid = $this->StudentModel->getUID($anrechnungData->prestudent_id),
+			$anrechnungData->prestudent_id,
 			$anrechnungData->studiensemester_kurzbz,
 			$anrechnungData->lehrveranstaltung_id
 		);

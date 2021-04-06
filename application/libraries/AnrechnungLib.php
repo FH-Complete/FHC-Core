@@ -23,6 +23,7 @@ class AnrechnungLib
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->ci->load->model('crm/Student_model', 'StudentModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
+		$this->ci->load->model('crm/Prestudent_model', 'PrestudentModel');
 		
 		$this->ci->load->library('DmsLib');
 	}
@@ -34,16 +35,19 @@ class AnrechnungLib
 	 * @param $lv_id
 	 * @return StdClass
 	 */
-	public function getAntragData($uid, $studiensemester_kurzbz, $lv_id)
+	public function getAntragData($prestudent_id, $studiensemester_kurzbz, $lv_id)
 	{
 		$antrag_data = new StdClass();
-
+		
+		// Get students UID.
+		$uid = $this->ci->StudentModel->getUID($prestudent_id);
+		
 		// Get lehrveranstaltung data. Break, if course is not assigned to student.
 		if(!$lv = getData($this->ci->LehrveranstaltungModel->getLvByStudent($uid, $studiensemester_kurzbz, $lv_id))[0])
 		{
 			show_error('You are not assigned to this course yet.');
 		}
-
+		
 		// Get the students personal data
 		if (!$person = getData($this->ci->PersonModel->getByUid($uid))[0])
 		{
@@ -71,6 +75,10 @@ class AnrechnungLib
 		
 		$lv_lektoren_arr =  hasData($result) ? getData($result) : array();
 		
+		// Get latest ZGV
+		$result = $this->ci->PrestudentModel->getLatestZGVBezeichnung($prestudent_id);
+		$latest_zgv_bezeichnung = hasData($result) ? getData($result)[0]->bezeichnung : '';
+		
 		// Set the given studiensemester
 		$antrag_data->lv_id = $lv_id;
 		$antrag_data->lv_bezeichnung = $lv->bezeichnung;
@@ -81,6 +89,7 @@ class AnrechnungLib
 		$antrag_data->matrikelnr = $student->matrikelnr;
 		$antrag_data->stg_bezeichnung = $studiengang->bezeichnung;
 		$antrag_data->lektoren = $lv_lektoren_arr;
+		$antrag_data->zgv = $latest_zgv_bezeichnung;
 
 		return $antrag_data;
 	}

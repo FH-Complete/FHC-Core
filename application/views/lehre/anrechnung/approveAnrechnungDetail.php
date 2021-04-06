@@ -124,6 +124,10 @@ $this->load->view(
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td class="col-xs-4"><?php echo ucfirst($this->p->t('global', 'zgv')); ?></td>
+                                            <td><?php echo $antragData->zgv ?></td>
+                                        </tr>
+                                        <tr>
                                             <td><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></td>
                                             <td><?php echo $anrechnungData->anmerkung ?></td>
                                         </tr>
