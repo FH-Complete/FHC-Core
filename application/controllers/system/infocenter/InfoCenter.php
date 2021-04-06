@@ -374,12 +374,18 @@ class InfoCenter extends Auth_Controller
 			$zgvdatum = isEmptyString($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
 			$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
 
-			// zgvmasterdata
-			$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
-			$zgvmaort = $this->input->post('zgvmaort');
-			$zgvmadatum = $this->input->post('zgvmadatum');
-			$zgvmadatum = isEmptyString($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
-			$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
+			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id);
+			$prestudentdata = getData($prestudent);
+
+			if ($prestudentdata->studiengangtyp === 'm')
+			{
+				// zgvmasterdata
+				$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
+				$zgvmaort = $this->input->post('zgvmaort');
+				$zgvmadatum = $this->input->post('zgvmadatum');
+				$zgvmadatum = isEmptyString($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
+				$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
+			}
 
 			$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, '', self::INTERESSENTSTATUS);
 
@@ -395,19 +401,29 @@ class InfoCenter extends Auth_Controller
 				);
 			}
 
-			$prestresult = $this->PrestudentModel->update(
-				$prestudent_id,
-				array(
-					'zgv_code' => $zgv_code,
-					'zgvort' => $zgvort,
-					'zgvdatum' => $zgvdatum,
-					'zgvnation' => $zgvnation_code,
+			$updateArray = array(
+				'zgv_code' => $zgv_code,
+				'zgvort' => $zgvort,
+				'zgvdatum' => $zgvdatum,
+				'zgvnation' => $zgvnation_code,
+				'updateamum' => date('Y-m-d H:i:s')
+			);
+
+			if ($prestudentdata->studiengangtyp === 'm')
+			{
+				$updateMasterArray = array(
 					'zgvmas_code' => $zgvmas_code,
 					'zgvmaort' => $zgvmaort,
 					'zgvmadatum' => $zgvmadatum,
-					'zgvmanation' => $zgvmanation_code,
-					'updateamum' => date('Y-m-d H:i:s')
-				)
+					'zgvmanation' => $zgvmanation_code
+				);
+
+				$updateArray = array_merge($updateArray, $updateMasterArray);
+			}
+
+			$prestresult = $this->PrestudentModel->update(
+				$prestudent_id,
+				$updateArray
 			);
 
 			if (isError($prestresult))
