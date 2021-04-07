@@ -99,7 +99,11 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 			(SELECT betreuerart_kurzbz FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
 			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_betreuerart_kurzbz,
 			tbl_projektbetreuer.person_id AS betreuer_person_id,
-			tbl_projekttyp.bezeichnung AS prjbez, *
+			tbl_projekttyp.bezeichnung AS prjbez, *,
+			lehre.tbl_projektbetreuer.note as note,
+			public.tbl_benutzer.aktiv as aktiv,
+			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuer_person_id = tbl_projektbetreuer.person_id) AS babgeschickt,
+			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_abgeschickt
 		FROM lehre.tbl_projektarbeit
 		LEFT JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
 		LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
@@ -114,8 +118,6 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer'
 			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter')
 		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)."
-		AND public.tbl_benutzer.aktiv
-		AND lehre.tbl_projektarbeit.note IS NULL
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";
 
 //AND tbl_projektarbeit.student_uid='$getuid' 'ie07m102';
@@ -155,7 +157,29 @@ else
 		($row->btitelpost!=''?$htmlstr1 .= ' '.$row->btitelpost:$htmlstr1 .= '');
 		$htmlstr1 .= $zweitbetreuer;
 		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
-		$htmlstr .= "       <td><a href='abgabe_student_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&bid=".$row->betreuer_person_id."' target='as_detail' title='Details anzeigen'>".$p->t('abgabetool/upload')."</a></td>\n";
+
+		if (is_null($row->note) && $row->aktiv === 't')
+			$htmlstr .= "       <td><a href='abgabe_student_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&bid=".$row->betreuer_person_id."' target='as_detail' title='Details anzeigen'>".$p->t('abgabetool/upload')."</a></td>\n";
+		elseif (!is_null($row->babgeschickt) || !is_null($row->zweitbetreuer_abgeschickt))
+		{
+			$htmlstr .= "<td>";
+
+			if (!is_null($row->babgeschickt))
+				$htmlstr .= "<a href='../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->betreuer_person_id ."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungErstDownload')."</a>";
+
+			if (!is_null($row->babgeschickt) && !is_null($row->zweitbetreuer_abgeschickt))
+				$htmlstr .= "/";
+
+			if (!is_null($row->zweitbetreuer_abgeschickt))
+				$htmlstr .= "<a href='../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->zweitbetreuer_betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->zweitbetreuer_person_id."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungZweitDownload')."</a>";
+
+			$htmlstr .= "</td>";
+		} else
+		{
+			$htmlstr  .= "<td></td>";
+		}
+
+
 		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".strtoupper($row->typ.$row->kurzbz)."</td>\n";
 		$htmlstr .= "	   <td align= center>";
