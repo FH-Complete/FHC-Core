@@ -232,6 +232,13 @@ class approveAnrechnungDetail extends Auth_Controller
 				break;
 			}
 			
+			// Get full name of LV Leitung.
+			// If LV Leitung is not present, get full name of LV lectors.
+			$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
+			$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
+				? implode(', ', array_column($lector_arr, 'fullname'))
+				: '';
+			
 			// Request Recommendation
 			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
 			{

@@ -199,7 +199,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			{
 				// Get full name of LV Leitung.
 				// If LV Leitung is not present, get full name of LV lectors.
-				$lector_arr = self::_getLVLectors($item['anrechnung_id']);
+				$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
 				$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
 					? implode(', ', array_column($lector_arr, 'fullname'))
 					: '';
@@ -447,68 +447,6 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		foreach ($lector_arr as $lector)
 		{
 			unset($lector->lvleiter);
-		}
-		
-		// Now make the lector array aka mail receivers unique
-		$lector_arr = array_unique($lector_arr, SORT_REGULAR);
-		
-		return $lector_arr;
-		
-	}
-	
-	/**
-	 * Get LV Leitung. If not present, get all LV lectors.
-	 *
-	 * @param $anrechnung_id
-	 * @return array|bool
-	 */
-	private function _getLVLectors($anrechnung_id)
-	{
-		$this->AnrechnungModel->addSelect('lehrveranstaltung_id, studiensemester_kurzbz');
-		$result = $this->AnrechnungModel->load($anrechnung_id);
-		
-		if (!hasData($result))
-		{
-			return false;
-		}
-		
-		$lehrveranstaltung_id = getData($result)[0]->lehrveranstaltung_id;
-		$studiensemester_kurzbz = getData($result)[0]->studiensemester_kurzbz;
-		
-		// Get lectors
-		$lector_arr = array();
-		
-		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-		$result = $this->LehrveranstaltungModel->getLecturersByLv($studiensemester_kurzbz, $lehrveranstaltung_id);
-		
-		if (!$result = getData($result))
-		{
-			return false;
-		}
-		
-		// Check if lv has LV-Leitung
-		$key = array_search(true, array_column($result, 'lvleiter'));
-		
-		// If lv has LV-Leitung, keep only the one
-		if ($key !== false)
-		{
-			$lector_arr[]= $result[$key];
-		}
-		// ...otherwise keep all lectors
-		else
-		{
-			$lector_arr = array_merge($lector_arr, $result);
-		}
-		
-		/**
-		 * NOTE: This step is only done to make the array unique by uid, vorname and nachname in the following step
-		 * (e.g. if same lector is ones LV-Leitung and another time not, then array_unique would leave both.
-		 * But we wish to send only one email by to that one person)
-		 * **/
-		foreach ($lector_arr as $lector)
-		{
-			unset($lector->lvleiter);
-			$lector->fullname = $lector->vorname. ' '. $lector->nachname;
 		}
 		
 		// Now make the lector array aka mail receivers unique

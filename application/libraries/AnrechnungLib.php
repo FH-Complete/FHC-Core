@@ -694,6 +694,67 @@ class AnrechnungLib
 		// Continue, if LV has no lector (there is no one to ask for recommendation)
 		return hasData($result) ? true : false;
 	}
+	
+	/**
+	 * Get LV Leitung. If not present, get all LV lectors.
+	 *
+	 * @param $anrechnung_id
+	 * @return array|bool
+	 */
+	public function getLectors($anrechnung_id)
+	{
+		$this->ci->AnrechnungModel->addSelect('lehrveranstaltung_id, studiensemester_kurzbz');
+		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
+		
+		if (!hasData($result))
+		{
+			return false;
+		}
+		
+		$lehrveranstaltung_id = getData($result)[0]->lehrveranstaltung_id;
+		$studiensemester_kurzbz = getData($result)[0]->studiensemester_kurzbz;
+		
+		// Get lectors
+		$lector_arr = array();
+		
+		$this->ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$result = $this->ci->LehrveranstaltungModel->getLecturersByLv($studiensemester_kurzbz, $lehrveranstaltung_id);
+		
+		if (!$result = getData($result))
+		{
+			return false;
+		}
+		
+		// Check if lv has LV-Leitung
+		$key = array_search(true, array_column($result, 'lvleiter'));
+		
+		// If lv has LV-Leitung, keep only the one
+		if ($key !== false)
+		{
+			$lector_arr[]= $result[$key];
+		}
+		// ...otherwise keep all lectors
+		else
+		{
+			$lector_arr = array_merge($lector_arr, $result);
+		}
+		
+		/**
+		 * NOTE: This step is only done to make the array unique by uid, vorname and nachname in the following step
+		 * (e.g. if same lector is ones LV-Leitung and another time not, then array_unique would leave both.
+		 * But we wish to send only one email by to that one person)
+		 * **/
+		foreach ($lector_arr as $lector)
+		{
+			unset($lector->lvleiter);
+			$lector->fullname = $lector->vorname. ' '. $lector->nachname;
+		}
+		
+		// Now make the lector array aka mail receivers unique
+		$lector_arr = array_unique($lector_arr, SORT_REGULAR);
+		
+		return $lector_arr;
+	}
 
 	// Return an object with Anrechnungdata
 	private function _setAnrechnungDataObject($anrechnung)
