@@ -1,5 +1,6 @@
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
+const HERKUNFT_DER_KENNTNISSE_MAX_LENGTH = 125;
 
 $(function(){
     // Set status alert color
@@ -10,6 +11,9 @@ $(function(){
 
     // Init tooltips
     requestAnrechnung.initTooltips();
+
+    // Set chars counter for textarea 'Herkunft der Kenntnisse'
+    requestAnrechnung.setCharsCounter();
 
     $('#requestAnrechnung-apply-anrechnung').click(function(e){
 
@@ -84,6 +88,14 @@ var requestAnrechnung = {
                 html: true
             }
         );
+    },
+    setCharsCounter: function(){
+        $('#requestAnrechnung-herkunftDerKenntnisse').keyup(function() {
+
+            let length = HERKUNFT_DER_KENNTNISSE_MAX_LENGTH - $(this).val().length;
+
+            $('#requestAnrechnung-herkunftDerKenntnisse-charCounter').text(length);
+        });
     },
     formatAnrechnungIsApplied: function (antragdatum, dms_id, filename){
         $('#requestAnrechnung-antragdatum').text(antragdatum);

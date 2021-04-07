@@ -1,4 +1,6 @@
 <?php
+const HERKUNFT_DER_KENNTNISSE_MAX_LENGTH = 125;
+
 $this->load->view(
 	'templates/FHC-Header',
 	array(
@@ -20,7 +22,8 @@ $this->load->view(
 				'hilfeZuDieserSeite',
 				'hochladen',
                 'inBearbeitung',
-                'neu'
+                'neu',
+				'maxZeichen'
 			),
 			'person' => array(
 				'student',
@@ -199,8 +202,9 @@ $this->load->view(
                                                             </span>
                                                         </div>
                                                         <div class="panel-body">
-                                                            <textarea class="form-control" name="anmerkung" rows="2"
-                                                                      required><?php echo $anrechnungData->anmerkung; ?></textarea>
+                                                            <textarea class="form-control" name="anmerkung" rows="2" id="requestAnrechnung-herkunftDerKenntnisse"
+                                                                      maxlength="<?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?>" required><?php echo $anrechnungData->anmerkung; ?></textarea>
+                                                            <small><span class="text-muted pull-right">Max. Zeichen: <span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?></span></span></small>
                                                         </div>
                                                     </div>
                                                 </div>
