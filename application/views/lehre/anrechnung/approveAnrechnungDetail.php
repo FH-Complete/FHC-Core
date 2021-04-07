@@ -90,31 +90,31 @@ $this->load->view(
                                     <table class="panel-body table table-bordered table-condensed">
                                         <tbody>
                                         <tr>
-                                            <td><?php echo ucfirst($this->p->t('person', 'student')); ?></td>
+                                            <td class="col-xs-4"><?php echo ucfirst($this->p->t('person', 'student')); ?></td>
                                             <td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
+                                            <td class="col-xs-4"><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
                                             <td><?php echo $antragData->matrikelnr ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></td>
+                                            <td class="col-xs-4"><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></td>
                                             <td><?php echo $antragData->studiensemester_kurzbz ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo ucfirst($this->p->t('lehre', 'studiengang')); ?></td>
+                                            <td class="col-xs-4"><?php echo ucfirst($this->p->t('lehre', 'studiengang')); ?></td>
                                             <td><?php echo $antragData->stg_bezeichnung ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></td>
+                                            <td class="col-xs-4"><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></td>
                                             <td><?php echo $antragData->lv_bezeichnung ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('lehre', 'ects'); ?></td>
+                                            <td class="col-xs-4"><?php echo $this->p->t('lehre', 'ects'); ?></td>
                                             <td><?php echo $antragData->ects ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('lehre', 'lektorInnen'); ?></td>
+                                            <td class="col-xs-4"><?php echo $this->p->t('lehre', 'lektorInnen'); ?></td>
                                             <td>
 												<?php $len = count($antragData->lektoren) - 1 ?>
 												<?php foreach ($antragData->lektoren as $key => $lektor): ?>
@@ -128,11 +128,11 @@ $this->load->view(
                                             <td><?php echo $antragData->zgv ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></td>
+                                            <td class="col-xs-4"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></td>
                                             <td><?php echo $anrechnungData->anmerkung ?></td>
                                         </tr>
                                         <tr>
-                                            <td><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></td>
+                                            <td class="col-xs-4"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></td>
                                             <td>
                                                 <a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
                                                    target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
