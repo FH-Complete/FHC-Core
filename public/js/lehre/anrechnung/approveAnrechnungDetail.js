@@ -354,7 +354,7 @@ var approveAnrechnungDetail = {
         if (elem.id.length && elem.id == 'empfehlungstextUebernehmen')
         {
             // Copy Empfehlungstext into textarea
-            textarea.val($('#approveAnrechnungDetail-empfehlungDetail-begruendung').text());
+            textarea.val($.trim($('#approveAnrechnungDetail-empfehlungDetail-begruendung').text()));
             return;
         }
         else
