@@ -181,7 +181,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 					'empfehlung_anrechnung' => 'false',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
 					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
-					'empfehlumg_am'          => (new DateTime())->format('d.m.Y'),
+					'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
 					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
 				);
 			}

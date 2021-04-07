@@ -34,7 +34,11 @@ $this->load->view(
 				'lehrveranstaltung',
 				'ects',
 				'lektor',
-			)
+			),
+            'anrechnung' => array(
+                'empfehlungPositivConfirmed',
+                'empfehlungNegativConfirmed'
+            )
 		),
 		'customCSSs' => array(
 			'public/css/Tabulator.css'
@@ -140,7 +144,8 @@ $this->load->view(
                         <!-- Empfehlungsdaten -->
                         <div class="row">
                             <div class="col-lg-12">
-                                <div class="panel panel-default">
+                                <div class="panel panel-default" id="reviewAnrechnungDetail-empfehlung"
+                                     data-empfehlung="<?php echo json_encode($empfehlungData->empfehlung) ?>">
                                     <div class="panel-heading">
                                         <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></b></span>
                                         <div class="pull-right">
@@ -152,29 +157,46 @@ $this->load->view(
 
                                         </div>
                                     </div>
-                                    <div class="panel-body" id="reviewAnrechnungDetail-empfehlungDetail">
+                                    
+                                    <table class="panel-body table table-bordered table-condensed">
 
-                                        <div class="panel panel-default panel-body <?php echo is_null($empfehlungData->empfehlung) ? '' : 'hidden' ?>"
-                                             id="reviewAnrechnungDetail-empfehlungDetail-empfehlungIsNull">
-											<?php echo $this->p->t('anrechnung', 'nochKeineEmpfehlung'); ?>
-                                        </div>
-
-                                        <div class="alert alert-success <?php echo $empfehlungData->empfehlung === true ? '' : 'hidden' ?>"
-                                             id="reviewAnrechnungDetail-empfehlungDetail-empfehlungIsTrue">
-                                            <b><?php echo $this->p->t('anrechnung', 'empfehlungPositivConfirmed'); ?></b>
-                                        </div>
-
-                                        <div class="<?php echo $empfehlungData->empfehlung === false ? '' : 'hidden' ?>"
-                                             id="reviewAnrechnungDetail-empfehlungDetail-empfehlungIsFalse">
-                                            <div class="alert alert-danger">
-                                                <b><?php echo $this->p->t('anrechnung', 'empfehlungNegativConfirmed'); ?></b>
-                                            </div>
-                                            <div class="well"><b><?php echo $this->p->t('global', 'begruendung'); ?>
-                                                    : </b>
-                                                <span id="reviewAnrechnungDetail-empfehlungDetail-begruendung"><?php echo htmlentities($empfehlungData->notiz) ?></span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        <tbody>
+                                        <tr>
+                                            <td class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')); ?></td>
+                                            <td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm">
+			                                    <?php echo $empfehlungData->empfehlungsanfrageAm; ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlungsanfrageAn'); ?></td>
+                                            <td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn">
+			                                    <?php echo $empfehlungData->empfehlungsanfrageAn; ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungdatum')); ?></td>
+                                            <td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungAm">
+                                                <?php echo $empfehlungData->empfehlung_am ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungVon')); ?></td>
+                                            <td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungVon">
+                                                <?php echo $empfehlungData->empfehlung_von ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></td>
+                                            <td id="reviewAnrechnungDetail-empfehlungDetail-empfehlung"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></td>
+                                            <td id="reviewAnrechnungDetail-empfehlungDetail-begruendung">
+			                                    <?php echo htmlentities($empfehlungData->notiz) ?>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                     <div class="panel-body">
                                         <form>
                                             <input type="hidden" name="anrechnung_id"

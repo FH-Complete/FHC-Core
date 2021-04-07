@@ -224,8 +224,9 @@ class AnrechnungLib
 		$empfehlung_data->empfehlung = null;
 		$empfehlung_data->empfehlung_von = '-';
 		$empfehlung_data->empfehlung_am = '-';
-		$empfehlung_data->empfehlung_angefordert_am = '-';
-		$empfehlung_data->notiz = '';   // Begruendung, if not recommended
+		$empfehlung_data->empfehlungsanfrageAm = '-';
+		$empfehlung_data->empfehlungsanfrageAn = '-';
+		$empfehlung_data->notiz = '-';   // Begruendung, if not recommended
 
 
 		if(!$anrechnung = getData($this->ci->AnrechnungModel->load($anrechnung_id))[0])
@@ -238,9 +239,19 @@ class AnrechnungLib
 			$anrechnung_id,
 			self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR   //  when STLG asks for recommendation, status is set to in progress lektor
 		);
-		if ($result = getData($result)[0])
+		
+		// If request for recommendation exists
+		if (hasData($result))
 		{
-			$empfehlung_data->empfehlung_angefordert_am = (new DateTime($result->insertamum))->format('d.m.Y');
+			$empfehlung_data->empfehlungsanfrageAm = (new DateTime($result->retval[0]->insertamum))->format('d.m.Y');
+			
+			// Get lectors who received request for recommendation
+			$lector_arr = self::getLectors($anrechnung_id);
+			
+			if (!isEmptyArray($lector_arr))
+			{
+				$empfehlung_data->empfehlungsanfrageAn = implode(', ', array_column($lector_arr, 'fullname'));
+			}
 		}
 
 		if (is_null($anrechnung->empfehlung_anrechnung))

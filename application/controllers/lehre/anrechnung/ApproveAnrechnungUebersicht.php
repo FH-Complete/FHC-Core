@@ -209,8 +209,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
 					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
 					'empfehlung_anrechnung' => null,
-					'empfehlungsanfrage_am' => (new DateTime())->format('Y-m-d H:i:s'),
-					'empfehlungsanfrage_an' => $empfehlungsanfrage_an
+					'empfehlungsanfrageAm' => (new DateTime())->format('Y-m-d H:i:s'),
+					'empfehlungsanfrageAn' => $empfehlungsanfrage_an
 				);
 			}
 		}

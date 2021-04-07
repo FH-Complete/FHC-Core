@@ -68,14 +68,14 @@ $query = '
 			AND status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR . '\'
 			ORDER BY insertamum DESC
 			LIMIT 1)
-	END empfehlungsanfrage_am,
+	END "empfehlungsanfrageAm",
 	CASE
 		WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
 		ELSE
 		(SELECT COALESCE(
 				STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = TRUE),
 				STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = FALSE)
-			) empfehlungsanfrage_an
+			) empfehlungsanfrageAn
 			FROM (
 				SELECT DISTINCT ON (benutzer.uid) uid, vorname, nachname,
 				CASE WHEN lehrfunktion_kurzbz = \'LV-Leitung\' THEN TRUE ELSE FALSE END AS lvleiter
@@ -91,7 +91,7 @@ $query = '
 				ORDER BY benutzer.uid, lvleiter DESC, nachname, vorname
 				) as tmp_lvlektoren
 			)
-	END empfehlungsanfrage_an
+	END "empfehlungsanfrageAn"
 	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
@@ -183,8 +183,8 @@ $filterWidgetArray = array(
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false},
 		status_bezeichnung: {headerFilter:"input"},
-		empfehlungsanfrage_am: {visible: false, align:"center", headerFilter:"input", mutator: mut_formatStringDate},
-		empfehlungsanfrage_an: {visible: false, headerFilter:"input"}
+		empfehlungsanfrageAm: {visible: false, align:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlungsanfrageAn: {visible: false, headerFilter:"input"}
 	 }', // col properties
 );
 

@@ -25,6 +25,9 @@ $(function(){
     // Set status alert color
     reviewAnrechnung.setStatusAlertColor();
 
+    // Set Empfehlungstext
+    reviewAnrechnung.setEmpfehlungstext();
+
     // Init tooltips
     reviewAnrechnung.initTooltips();
 
@@ -199,6 +202,24 @@ var reviewAnrechnung = {
                 $('#reviewAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
         }
     },
+    setEmpfehlungstext: function () {
+        let empfehlung = $('#reviewAnrechnungDetail-empfehlung').data('empfehlung');
+
+        switch (empfehlung) {
+            case true:
+                $('#reviewAnrechnungDetail-empfehlungDetail-empfehlung')
+                    .addClass('text-success')
+                    .html(FHC_PhrasesLib.t("anrechnung", "empfehlungPositivConfirmed"));
+                break;
+            case false:
+                $('#reviewAnrechnungDetail-empfehlungDetail-empfehlung')
+                    .addClass('text-danger')
+                    .html(FHC_PhrasesLib.t("anrechnung", "empfehlungNegativConfirmed"));
+                break;
+            default:
+                $('#reviewAnrechnungDetail-empfehlungDetail-empfehlung').html('-');
+        }
+    },
     initTooltips: function (){
         $('[data-toggle="tooltip"]').tooltip({
                 delay: { "show": 200, "hide": 200 },
@@ -216,22 +237,28 @@ var reviewAnrechnung = {
         textarea.val($.trim($(elem).parent().find('span:first').text()));
     },
     formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon, statusBezeichnung){
-        $('#reviewAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
-        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungIsTrue').removeClass('hidden');
         $('#reviewAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#reviewAnrechnungDetail-recommend-anrechnung-ask').prop('disabled', true);
         $('#reviewAnrechnungDetail-dont-recommend-anrechnung-ask').prop('disabled', true);
         $('#reviewAnrechnungDetail-empfehlungAm').text(empfehlungAm);
         $('#reviewAnrechnungDetail-empfehlungVon').text(emfehlungVon);
+        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlung')
+            .addClass('text-success')
+            .html(FHC_PhrasesLib.t("anrechnung", "empfehlungPositivConfirmed"));
+        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungAm').html(empfehlungAm);
+        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungVon').html(emfehlungVon);
     },
     formatEmpfehlungIsFalse: function(empfehlungAm, emfehlungVon, statusBezeichnung, begruendung){
-        $('#reviewAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
-        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungIsFalse').removeClass('hidden');
         $('#reviewAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#reviewAnrechnungDetail-recommend-anrechnung-ask').prop('disabled', true);
         $('#reviewAnrechnungDetail-dont-recommend-anrechnung-ask').prop('disabled', true);
         $('#reviewAnrechnungDetail-empfehlungAm').text(empfehlungAm);
         $('#reviewAnrechnungDetail-empfehlungVon').text(emfehlungVon);
+        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlung')
+            .addClass('text-danger')
+            .html(FHC_PhrasesLib.t("anrechnung", "empfehlungNegativConfirmed"));
+        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungAm').html(empfehlungAm);
+        $('#reviewAnrechnungDetail-empfehlungDetail-empfehlungVon').html(emfehlungVon);
         $('#reviewAnrechnungDetail-empfehlungDetail-begruendung').text(begruendung);
     }
 }
