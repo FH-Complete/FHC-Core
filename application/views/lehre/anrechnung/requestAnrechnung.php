@@ -90,31 +90,31 @@ $this->load->view(
                                                 <table class="panel-body table table-bordered table-condensed">
                                                     <tbody>
                                                     <tr>
-                                                        <td><?php echo ucfirst($this->p->t('person', 'student')); ?></td>
+                                                        <th><?php echo ucfirst($this->p->t('person', 'studentIn')); ?></th>
                                                         <td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
+                                                        <th><?php echo $this->p->t('person', 'personenkennzeichen'); ?></th>
                                                         <td><?php echo $antragData->matrikelnr ?></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></td>
+                                                        <th><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></th>
                                                         <td><?php echo $antragData->studiensemester_kurzbz ?></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><?php echo ucfirst($this->p->t('lehre', 'studiengang')); ?></td>
+                                                        <th><?php echo ucfirst($this->p->t('lehre', 'studiengang')); ?></th>
                                                         <td><?php echo $antragData->stg_bezeichnung ?></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></td>
+                                                        <th><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></th>
                                                         <td><?php echo $antragData->lv_bezeichnung ?></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><?php echo $this->p->t('lehre', 'ects'); ?></td>
+                                                        <th><?php echo $this->p->t('lehre', 'ects'); ?></th>
                                                         <td><?php echo $antragData->ects ?></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><?php echo ucfirst($this->p->t('lehre', 'lektor')); ?></td>
+                                                        <th><?php echo ucfirst($this->p->t('lehre', 'lektorInnen')); ?></th>
                                                         <td>
                                                             <?php $len = count($antragData->lektoren) - 1 ?>
                                                             <?php foreach ($antragData->lektoren as $key => $lektor): ?>
