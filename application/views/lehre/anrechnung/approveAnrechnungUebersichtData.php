@@ -21,7 +21,8 @@ $query = '
 			(SELECT ausbildungssemester
 			FROM public.tbl_prestudentstatus press
 			WHERE press.prestudent_id = anrechnung.prestudent_id
-			AND press.studiensemester_kurzbz = anrechnung.studiensemester_kurzbz),
+			AND press.studiensemester_kurzbz = anrechnung.studiensemester_kurzbz
+			AND press.status_kurzbz = \'Student\'),
 			lv.bezeichnung AS "lv_bezeichnung",
 			lv.ects,
 			(person.nachname || \' \' || person.vorname) AS "student",
