@@ -132,7 +132,7 @@ $result_sem=$db->db_query($qry_sem);
 $num_rows_sem = $db->db_num_rows($result_sem);
 if($num_rows_sem < 0)
 {
-	echo "<font color=\"#FF0000\">Fehler bei Ermittlung der Aktualit&auml;t der Projektarbeit</font><br>&nbsp;";
+	echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
 }
 
 // Zweitbegutachter holen

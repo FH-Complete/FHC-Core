@@ -65,6 +65,7 @@ $this->phrasen['abgabetool/dateneingabeUnvollstaendig']='Die Dateneingabe ist un
 $this->phrasen['abgabetool/fehlerMailBegutachter']='Fehler beim Versenden des Mails an den Erstbegutachter!';
 $this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Fehler beim Versenden des Mails an den Zweitbegutachter!';
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Betreuer nicht gefunden. Kein Mail verschickt!';
+$this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Fehler bei Ermittlung der Aktualit&auml;t der Projektarbeit';
 $this->phrasen['abgabetool/keinPDF']='Upload ist keine pdf-Datei! Bitte wiederholen Sie den Fileupload.';
 $this->phrasen['abgabetool/dateiZuGross']='Die Datei ist zu groß! Maximale Dateigröße 15 MB';
 $this->phrasen['abgabetool/fehlerTerminVorbei']='Die Abgabefrist für diesen Termin ist bereits abgelaufen.';

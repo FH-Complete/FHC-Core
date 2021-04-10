@@ -64,6 +64,7 @@ $this->phrasen['abgabetool/dateneingabeUnvollstaendig']='Incomplete Data input';
 $this->phrasen['abgabetool/fehlerMailBegutachter']='Error sending E-Mail to first Assessor!';
 $this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Error sending E-Mail to second Assessor!';
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Assessor not found. No E-Mail sent!';
+$this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Error when checking if current thesis';
 $this->phrasen['abgabetool/keinPDF']='Upload-File ist not a PDF! Please retry the Fileupload.';
 $this->phrasen['abgabetool/dateiZuGross']='The File is too big! Maximum File size: 15 MB';
 $this->phrasen['abgabetool/fehlerTerminVorbei']='The deadline for this upload has already expired.';

@@ -34,6 +34,7 @@ $this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Errore di trasmissione 
 $this->phrasen['abgabetool/fehlerMailStudent']='errore di spedizione della mai agli studenti!';
 $this->phrasen['abgabetool/fehlerTerminEintragen']='scadenza non è stata registrata!';
 $this->phrasen['abgabetool/fehlerTerminLoeschen']='Errore in sede di cancellazione della scadenza!';
+$this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Error when checking if current thesis';
 $this->phrasen['abgabetool/fix']='fisso';
 $this->phrasen['abgabetool/fixerAbgabetermin']='scadenza consegna inderogabile';
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Letto e accettato';
