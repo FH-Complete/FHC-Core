@@ -130,6 +130,10 @@ $qry_sem="SELECT 1
 		LIMIT 1";
 $result_sem=$db->db_query($qry_sem);
 $num_rows_sem = $db->db_num_rows($result_sem);
+if($num_rows_sem < 0)
+{
+	echo "<font color=\"#FF0000\">Fehler bei Ermittlung der Aktualit&auml;t der Projektarbeit</font><br>&nbsp;";
+}
 
 // Zweitbegutachter holen
 if($betreuerart=="Erstbegutachter")
@@ -203,10 +207,16 @@ echo '
 				cursor: pointer;
 				outline: inherit;
 			}
-			#tokenmailimg {
+			#zweitbetrmailicon {
 				top: 4px;
 				height: 18px;
 				width: 18px;
+				position: relative;
+			}
+			#tokenmailicon {
+				top: 2px;
+				height: 15px;
+				width: 15px;
 				position: relative;
 			}
 			
@@ -493,10 +503,13 @@ if (isset($zweitbegutachter) && $zweitbegutachter) // wenn es Zweitbegutachter g
 		$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='" . $projektarbeit_id . "'>";
 		$htmlstr .= "<input type='hidden' name='betreuerart' value='" . $betreuerart . "'>";
+		$htmlstr .= "&nbsp;<a href='mailto:".$zweitbegutachter->email."'><img id='zweitbetrmailicon' src='../../../skin/images/email.png'
+						title='" . $p->t('abgabetool/zweitbetreuerMailSenden', $zweitbegutachter->email) . "' alt='" . $p->t('abgabetool/zweitbetreuerMailSenden', $zweitbegutachter->email) . "'/></a>\n";
 		$htmlstr .= "&nbsp;<button type='submit' name='zweitbegutachtertoken' title='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'>
-						<img id='tokenmailimg' src='../../../skin/images/email.png' alt='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'/></button>\n";
+						<img id='tokenmailicon' src='../../../skin/images/repeat.png' alt='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'/></button>\n";
 		$htmlstr .= "</form>";
 	}
+
 	$htmlstr .= "</td>\n";
 	$htmlstr .= "<td></td>\n";
 	$htmlstr .= "<td></td>\n";
@@ -703,6 +716,8 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 		$intern = isset($zweitbetr->uid);
 		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
 		$mail_fulllink = "$mail_baselink?projektarbeit_id=".$zweitbegutachter->projektarbeit_id."&uid=".$student->uid;
+		$mail_link = $intern ? $mail_fulllink : $mail_baselink;
+
 		$maildata = array();
 		$maildata['geehrt'] = "geehrte".($zweitbegutachter->anrede=="Herr"?"r":"");
 		$maildata['anrede'] = $zweitbegutachter->anrede;
@@ -710,7 +725,7 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 		$maildata['student_anrede'] = $student->anrede;
 		$maildata['student_voller_name'] = trim($student->titelpre." ".$student->vorname." ".$student->nachname." ".$student->titelpost);
 		$maildata['parbeituebersichtlink'] =  $intern ? "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>" : "";
-		$maildata['bewertunglink'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
+		$maildata['bewertunglink'] = "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>";
 		$maildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
 
 		return sendSanchoMail(

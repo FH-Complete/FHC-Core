@@ -326,7 +326,6 @@ if($command=="update" && $error!=true)
 						{
 							if($row_zd=@$db->db_fetch_object($result_zd))
 							{
-
 								$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$db->convert_html_chars($betreuer)."</b><br>".$p->t('abgabetool/titel').": <b>".$db->convert_html_chars($titel)."<b><br><br></div>\n";
 								$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 								$htmlstr .= "<tr></tr>\n";
@@ -424,6 +423,22 @@ if($command=="update" && $error!=true)
 							}
 							else
 							{
+								// paarbeit sollte nur ab SS2021 online bewertet werden
+								$qry_sem="SELECT 1
+											FROM lehre.tbl_projektarbeit 
+											JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+											JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+											WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
+											AND tbl_studiensemester.start::date >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')::date
+											LIMIT 1";
+
+								$result_sem=$db->db_query($qry_sem);
+								$num_rows_sem = $db->db_num_rows($result_sem);
+								if($num_rows_sem < 0)
+								{
+									echo "<font color=\"#FF0000\">Fehler bei Ermittlung der Aktualit&auml;t der Projektarbeit</font><br>&nbsp;";
+								}
+
 								$row_std=$db->db_fetch_object($result_std);
 
 								// 1. Begutachter mail ohne Token
@@ -436,7 +451,7 @@ if($command=="update" && $error!=true)
 								$maildata['student_anrede'] = $row_std->anrede;
 								$maildata['student_voller_name'] = trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost);
 								$maildata['parbeituebersichtlink'] = "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>";
-								$maildata['bewertunglink'] = $mail_fulllink;
+								$maildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
 								$maildata['token'] = "";
 
 								$mailres = sendSanchoMail(
@@ -472,6 +487,7 @@ if($command=="update" && $error!=true)
 											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
 
 										$intern = isset($zweitbetr->uid);
+										$mail_link = $intern ? $mail_fulllink : $mail_baselink;
 
 										$zweitbetmaildata = array();
 										$zweitbetmaildata['geehrt'] = "geehrte" . ($zweitbetr->anrede == "Herr" ? "r" : "");
@@ -480,8 +496,8 @@ if($command=="update" && $error!=true)
 										$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
 										$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
 										$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-										$zweitbetmaildata['bewertunglink'] = $mail_link = $intern ? $mail_fulllink : $mail_baselink;
-										$zweitbetmaildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $zweitbetr->zugangstoken . "</p>" : "";
+										$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+										$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $zweitbetr->zugangstoken . "</p>" : "";
 
 										$mailres = sendSanchoMail(
 											'ParbeitsbeurteilungEndupload',

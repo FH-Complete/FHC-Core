@@ -9400,7 +9400,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zur Bewertung des Zweitbegutachters',
+				'text' => 'Zur Bewertung des/der Zweitbegutachters*in',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -9420,7 +9420,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Beurteilung des Zweitbegutachters liegt noch nicht vor.',
+				'text' => 'Die Beurteilung des/der Zweitbegutachters*in liegt noch nicht vor.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
