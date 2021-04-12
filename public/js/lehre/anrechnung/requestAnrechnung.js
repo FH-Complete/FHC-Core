@@ -23,6 +23,12 @@ $(function(){
         // Get form data
         let formdata = new FormData($('#requestAnrechnung-form')[0]);
 
+        // These field MUST be activated
+        if (!formdata.has('bestaetigung'))
+        {
+            return FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "errorBestaetigungFehlt"));
+        }
+
         $.ajax({
             url : "RequestAnrechnung/apply",
             type: "POST",

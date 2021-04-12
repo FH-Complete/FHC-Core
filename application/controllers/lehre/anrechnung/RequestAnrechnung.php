@@ -106,6 +106,7 @@ class requestAnrechnung extends Auth_Controller
 		$begruendung_id = $this->input->post('begruendung');
 		$lehrveranstaltung_id = $this->input->post('lv_id');
 		$studiensemester_kurzbz = $this->input->post('studiensemester');
+		$bestaetigung = $this->input->post('bestaetigung');
 
 		// Validate data
 		if (empty($_FILES['uploadfile']['name']))
@@ -119,6 +120,11 @@ class requestAnrechnung extends Auth_Controller
 			isEmptyString($studiensemester_kurzbz))
 		{
 			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
+		}
+		
+		if (isEmptyString($bestaetigung))
+		{
+			return $this->outputJsonError($this->p->t('ui', 'errorBestaetigungFehlt'));
 		}
 		
 		// Exit if user is not a student

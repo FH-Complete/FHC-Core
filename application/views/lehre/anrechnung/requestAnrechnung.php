@@ -23,7 +23,8 @@ $this->load->view(
 				'hochladen',
                 'inBearbeitung',
                 'neu',
-				'maxZeichen'
+				'maxZeichen',
+                'errorBestaetigungFehlt'
 			),
 			'person' => array(
 				'student',
@@ -202,11 +203,23 @@ $this->load->view(
                                                             </span>
                                                         </div>
                                                         <div class="panel-body">
-                                                            <textarea class="form-control" name="anmerkung" rows="2" id="requestAnrechnung-herkunftDerKenntnisse"
+                                                            <textarea class="form-control" name="anmerkung" rows="1" id="requestAnrechnung-herkunftDerKenntnisse"
                                                                       maxlength="<?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?>" required><?php echo $anrechnungData->anmerkung; ?></textarea>
                                                             <small><span class="text-muted pull-right">Max. Zeichen: <span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?></span></span></small>
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="well" style="border:solid black 3px">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="bestaetigung" required>
+                                                        <b><?php echo $this->p->t('anrechnung', 'bestaetigungstext'); ?></b>
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
