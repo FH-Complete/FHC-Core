@@ -137,11 +137,6 @@ class approveAnrechnungDetail extends Auth_Controller
 					'abgeschlossen_am'   => (new DateTime())->format('d.m.Y'),
 					'abgeschlossen_von'  => $person->vorname. ' '. $person->nachname
 				);
-
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_APPROVED))
-				{
-					show_error('Failed sending mail');
-				}
 			}
 		}
 
@@ -186,11 +181,6 @@ class approveAnrechnungDetail extends Auth_Controller
 					'abgeschlossen_am'      => (new DateTime())->format('d.m.Y'),
 					'abgeschlossen_von'     => $person->vorname. ' '. $person->nachname
 				);
-
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_REJECTED))
-				{
-					show_error('Failed sending mail');
-				}
 			}
 		}
 
@@ -471,42 +461,7 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		show_error('You are not entitled to read this document');
 	}
-
-	/**
-	 * Send mail to student to inform if Anrechnung was approved or rejected
-	 * @param $mail_params
-	 */
-	private function _sendSanchoMailToStudent($anrechnung_id, $status_kurzbz)
-	{
-		$result = getData($this->anrechnunglib->getStudentData($anrechnung_id))[0];
-
-		// Get student name and mail address
-		$to = $result->uid. '@'. DOMAIN;
-
-		$anrede = $result->geschlecht == 'w' ? 'Sehr geehrte Frau ' : 'Sehr geehrter Herr ';
-
-		$text = $status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
-			? 'Ihrem Antrag auf Anerkennung nachgewiesener Kenntnisse der Lehrveranstaltung "'.
-			$result->lv_bezeichnung. '" wurde stattgegeben.'
-			: 'wir haben Ihren Antrag auf Anerkennung nachgewiesener Kenntnisse geprüft und können die Lehrveranstaltung "'.
-			$result->lv_bezeichnung. '" leider nicht anrechnen, weil die Gleichwertigkeit nicht festgestellt werden konnte.';
-
-		// Prepare mail content
-		$body_fields = array(
-			'anrede_name'   => $anrede. $result->vorname. ' '. $result->nachname,
-			'text'          => $text
-		);
-
-		sendSanchoMail(
-			'AnrechnungGenehmigen',
-			$body_fields,
-			$to,
-			'Anerkennung nachgewiesener Kenntnisse: Ihr Antrag ist abgeschlossen'
-		);
-
-		return true;
-	}
-
+	
 	/**
 	 * Send mail to lectors asking for recommendation. (first to LV-Leitung, if not present to all lectors of lv)
 	 * @param $mail_params

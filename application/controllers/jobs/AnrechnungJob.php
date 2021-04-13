@@ -16,6 +16,10 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 class AnrechnungJob extends JOB_Controller
 {
 	const APPROVE_ANRECHNUNG_URI = '/lehre/anrechnung/ApproveAnrechnungUebersicht';
+	
+	const ANRECHNUNGSTATUS_APPROVED = 'approved';
+	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
+	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
 
 	/**
 	 * Constructor
@@ -153,6 +157,120 @@ class AnrechnungJob extends JOB_Controller
 		}
 		
 		$this->logInfo('SUCCEDED: Sending emails to STGL about yesterdays new Anrechnungen succeded.');
+	}
+	
+	/**
+	 * Send Sancho mail to students, whose Anrechnungen were approved 24 hours ago.
+	 */
+	public function sendMailApproved(){
+		
+		$this->logInfo('Start AnrechnungJob to send emails to students, whose Anrechnungen were approved.');
+		
+		// Get all yesterdays approvements
+		$this->AnrechnungModel->addSelect('student.student_uid, vorname, nachname, geschlecht, lv.bezeichnung');
+		$this->AnrechnungModel->addJoin('lehre.tbl_anrechnung_anrechnungstatus status', 'anrechnung_id');
+		$this->AnrechnungModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
+		$this->AnrechnungModel->addJoin('public.tbl_student student', 'prestudent_id');
+		$this->AnrechnungModel->addJoin('public.tbl_benutzer benutzer', 'ON (benutzer.uid = student.student_uid)');
+		$this->AnrechnungModel->addJoin('public.tbl_person person', 'person_id');
+		
+		$result = $this->AnrechnungModel->loadWhere(
+			'(status.insertamum)::date = (NOW() - INTERVAL \'24 HOURS\')::DATE AND
+			status.status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_APPROVED)
+		);
+		
+		// Exit if there are no approved Anrechnungen
+		if (!hasData($result))
+		{
+			$this->logInfo('ABORTED sending emails to students, whose Anrechnungen were approved. No new approvements found.');
+			exit;
+		}
+		
+		// Loop through students
+		foreach ($result->retval as $student)
+		{
+			$to = $student->student_uid. '@'. DOMAIN;
+			
+			$anrede = $student->geschlecht == 'w' ? 'Sehr geehrte Frau ' : 'Sehr geehrter Herr ';
+			
+			$text = 'Ihrem Antrag auf Anerkennung nachgewiesener Kenntnisse der Lehrveranstaltung "'.
+				$student->bezeichnung. '" wurde stattgegeben.';
+			
+			// Prepare mail content
+			$body_fields = array(
+				'anrede_name'   => $anrede. $student->vorname. ' '. $student->nachname,
+				'text'          => $text
+			);
+			
+			// Send mail
+			sendSanchoMail(
+				'AnrechnungGenehmigen',
+				$body_fields,
+				$to,
+				'Anerkennung nachgewiesener Kenntnisse: Ihr Antrag ist abgeschlossen'
+			);
+		}
+	}
+	
+	/**
+	 * Send Sancho mail to students, whose Anrechnungen were rejected 24 hours ago.
+	 */
+	public function sendMailRejected(){
+		
+		$this->logInfo('Start AnrechnungJob to send emails to students, whose Anrechnungen were rejected.');
+		
+		// Get all yesterdays rejections
+		$this->AnrechnungModel->addSelect('student.student_uid, vorname, nachname, geschlecht, lv.bezeichnung, notiz.text');
+		$this->AnrechnungModel->addJoin('lehre.tbl_anrechnung_anrechnungstatus status', 'anrechnung_id');
+		$this->AnrechnungModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
+		$this->AnrechnungModel->addJoin('public.tbl_student student', 'prestudent_id');
+		$this->AnrechnungModel->addJoin('public.tbl_benutzer benutzer', 'ON (benutzer.uid = student.student_uid)');
+		$this->AnrechnungModel->addJoin('public.tbl_person person', 'person_id');
+		$this->AnrechnungModel->addJoin('public.tbl_notizzuordnung', 'anrechnung_id');
+		$this->AnrechnungModel->addJoin('public.tbl_notiz notiz', 'notiz_id');
+		
+		
+		$result = $this->AnrechnungModel->loadWhere(
+			'(status.insertamum)::date = (NOW() - INTERVAL \'24 HOURS\')::DATE AND
+			status.status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_REJECTED). ' AND
+			notiz.titel = '. $this->db->escape(self::ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL)
+		);
+		
+		// Exit if there are no rejected Anrechnungen
+		if (!hasData($result))
+		{
+			$this->logInfo('ABORTED sending emails to students, whose Anrechnungen were rejected. No new rejectments found.');
+			exit;
+		}
+		
+		// Loop through students
+		foreach ($result->retval as $student)
+		{
+			$to = $student->student_uid. '@'. DOMAIN;
+			
+			$anrede = $student->geschlecht == 'w' ? 'Sehr geehrte Frau ' : 'Sehr geehrter Herr ';
+			
+			$text = <<<html
+				wir haben Ihren Antrag auf Anerkennung nachgewiesener Kenntnisse geprüft und können die Lehrveranstaltung
+				"$student->bezeichnung" leider nicht anrechnen, weil die Gleichwertigkeit nicht festgestellt werden konnte.<br><br>
+				Begründung: $student->text
+html;
+			
+			// Prepare mail content
+			$body_fields = array(
+				'anrede_name'   => $anrede. $student->vorname. ' '. $student->nachname,
+				'text'          => $text
+			);
+			
+			// Send mail
+			sendSanchoMail(
+				'AnrechnungGenehmigen',
+				$body_fields,
+				$to,
+				'Anerkennung nachgewiesener Kenntnisse: Ihr Antrag ist abgeschlossen'
+			);
+		}
+	
 	}
 	
 	// Get STGL mail address
