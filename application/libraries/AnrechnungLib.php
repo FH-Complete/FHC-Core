@@ -420,7 +420,7 @@ class AnrechnungLib
 		// Exit if already approved or rejected
 		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED)
 		{
-			return success(false);  // dont approve
+			return false;  // dont approve
 		}
 
 		// Start DB transaction
@@ -445,10 +445,10 @@ class AnrechnungLib
 		if ($this->ci->db->trans_status() === false)
 		{
 			$this->ci->db->trans_rollback();
-			return error($result->msg, EXIT_ERROR);
+			return false;
 		}
 
-		return success(true);   // approved
+		return true;   // approved
 	}
 
 	/**
@@ -469,16 +469,14 @@ class AnrechnungLib
 		// Exit if already approved or rejected
 		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED)
 		{
-			return success(false);  // dont reject
+			return false;  // dont reject
 		}
+		
+		// Start DB transaction
+		$this->ci->db->trans_start(false);
 
 		// Insert new status rejected
-		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_REJECTED);
-
-		if (isError($result))
-		{
-			show_error(getError($result));
-		}
+		$this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_REJECTED);
 
 		// Add begruendung as notiz
 		$this->ci->load->model('person/Notiz_model', 'NotizModel');
@@ -488,8 +486,17 @@ class AnrechnungLib
 			$begruendung,
 			getAuthUID()
 		);
+		
+		// Transaction complete
+		$this->ci->db->trans_complete();
+		
+		if ($this->ci->db->trans_status() === false)
+		{
+			$this->ci->db->trans_rollback();
+			return false;
+		}
 
-		return success(true);   // rejected
+		return true;   // rejected
 	}
 
 	/**

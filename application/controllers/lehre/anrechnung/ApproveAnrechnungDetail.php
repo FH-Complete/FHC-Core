@@ -114,7 +114,8 @@ class approveAnrechnungDetail extends Auth_Controller
 	{
 		$data = $this->input->post('data');
 
-		if(isEmptyArray($data))
+		// Validate data
+		if (isEmptyArray($data))
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
@@ -124,11 +125,11 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			show_error('Failed retrieving person data');
 		}
-
+		
+		// Approve Anrechnung
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if(getData($this->anrechnunglib->approveAnrechnung($item['anrechnung_id'])))
+			if ($this->anrechnunglib->approveAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
@@ -158,7 +159,8 @@ class approveAnrechnungDetail extends Auth_Controller
 	{
 		$data = $this->input->post('data');
 
-		if(isEmptyArray($data))
+		// Validate data
+		if (isEmptyArray($data))
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
@@ -168,11 +170,11 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			show_error('Failed retrieving person data');
 		}
-
+		
+		// Reject Anrechnung
 		foreach ($data as $item)
 		{
-			// Reject Anrechnung
-			if(getData($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung'])))
+			if ($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
