@@ -205,7 +205,7 @@ $this->load->view(
                                                         <div class="panel-body">
                                                             <textarea class="form-control" name="anmerkung" rows="1" id="requestAnrechnung-herkunftDerKenntnisse"
                                                                       maxlength="<?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?>" required><?php echo $anrechnungData->anmerkung; ?></textarea>
-                                                            <small><span class="text-muted pull-right">Max. Zeichen: <span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?></span></span></small>
+                                                            <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?></span></span></small>
                                                         </div>
                                                     </div>
                                                 </div>
