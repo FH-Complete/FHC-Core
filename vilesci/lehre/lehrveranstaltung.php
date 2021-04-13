@@ -25,7 +25,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/fachbereich.class.php');
-require_once('../../include/organisationseinheit.class.php'); //manu
+require_once('../../include/organisationseinheit.class.php');
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
@@ -65,7 +65,7 @@ if(!is_numeric($semester))
 	$semester = -1;
 
 
-//manu kann auskommentiert werden
+
 $oe_fachbereich='';
 if(isset($_REQUEST['fachbereich_kurzbz']))
 {
@@ -86,7 +86,6 @@ else
 if (isset($_REQUEST['oe_kurzbz']))
 {
 	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
-		//manu: erweiterung Objektaufruf
 		if($oe_kurzbz!='')
 		{
 			$oe_obj = new organisationseinheit();
@@ -488,49 +487,24 @@ else
 	$aktiv='';
 }
 
-//manu: das wird zukünftig wohl leerbleiben..
-// if($fb_kurzbz !='')
-// 	$sql_query="
-// 	SELECT
-// 		distinct tbl_lehrveranstaltung.*
-// 	FROM
-// 		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
-// 	WHERE
-// 		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
-// 		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
-// 		AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz
-// 		AND	tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
-
-//manu: Verknüpfung mit Table public.tbl_organisationseinheit für schöne Anzeige OE in Übersichtsliste
-if($oe_kurzbz !='')
-	$sql_query="
+$sql_query="
 	SELECT
-		distinct tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung
+	tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung
 	FROM
-		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_organisationseinheit
-	WHERE
-		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
-		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
-		AND lehrfach.oe_kurzbz=tbl_organisationseinheit.oe_kurzbz
-		AND lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
-
-else
-	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE true";
-	// $sql_query="
-	// SELECT
-	// 	distinct tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung
-	// FROM
-	// 	lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_organisationseinheit
-	// WHERE
-	// 	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
-	// 	AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
-	// 	AND lehrfach.oe_kurzbz=tbl_organisationseinheit.oe_kurzbz";
+		lehre.tbl_lehrveranstaltung
+		FULL JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
+		FULL JOIN lehre.tbl_lehrveranstaltung  as lehrfach on (lehre.tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id)
+		FULL JOIN public.tbl_organisationseinheit ON (public.tbl_organisationseinheit.oe_kurzbz = lehre.tbl_lehrveranstaltung.oe_kurzbz)
+	where
+		lehre.tbl_lehrveranstaltung.bezeichnung != 'NULL'
+";
 
 if($stg_kz!='')
 	$sql_query.= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
-//manu warum wars auskommentiert?
+
 if($oe_kurzbz!='')
 	$sql_query.= " AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
+
 if($semester != -1)
 	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 
@@ -548,6 +522,9 @@ if($lehrveranstaltung_name != '')
 	$sql_query.= " AND (UPPER(tbl_lehrveranstaltung.bezeichnung) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")";
 	$sql_query.= " OR UPPER(tbl_lehrveranstaltung.bezeichnung_english) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")) ";
 }
+
+$sql_query.=" GROUP BY tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung";
+
 
 $sql_query.=" $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
@@ -607,7 +584,7 @@ foreach ($orgform->result as $of)
 $outp.='</SELECT>';
 
 //Institut DropDown
-//deleted by manu: user story #12646
+//auskommentiert: user story #12646
 // $outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
 // $fachb = new fachbereich();
 // $fachb->getAll();
@@ -653,8 +630,6 @@ $outp.='</SELECT>';
 		$outp.= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
 	}
 	$outp.= '</select>';
-
-	// manu: hier Detailseite dazubasteln analog zu Berechtigungen
 
 	//Lehrveranstaltung ID Input
 	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
@@ -1118,23 +1093,8 @@ if ($result_lv!=0)
 		echo ($row->orgform_kurzbz!=''?$db->convert_html_chars($row->orgform_kurzbz):'&nbsp;');
 		echo '</td>';
 
-		//Organisationseinheit manu
-		echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->oe_kurzbz):'-').'</td>';
-		//oe.organisationseinheittyp_kurzbz as organisationseinheitstyp, oe.bezeichnung as oebezeichnung
-		//echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->bezeichnung):'-').'</td>';
-		//echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
-		// if ($oe_kurzbz !='')
-		// {
-		// 	echo '<td>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung).'</td>';
-		// }
-		// else if ($oe_kurzbz =='' && ($row->oe_kurzbz!='')
-		// {
-		// 	echo '<td>'.$db->convert_html_chars($row->oe_kurzbz).'</td>';
-		// }
-		// else {
-		// 	echo '-';
-		// }
-		//echo '<td>'.(($row->oe_kurzbz!='' && $oe_kurzbz !='') ? $db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
+		//Organisationseinheit
+		echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
 
 		//Semesterstunden
 		echo '<td>'.($row->semesterstunden!=''?$db->convert_html_chars($row->semesterstunden):'-').'</td>';
