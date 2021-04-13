@@ -25,11 +25,11 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/fachbereich.class.php');
+require_once('../../include/organisationseinheit.class.php'); //manu
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/addon.class.php');
-
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
@@ -64,6 +64,8 @@ if(!is_numeric($stg_kz) && $stg_kz!='')
 if(!is_numeric($semester))
 	$semester = -1;
 
+
+//manu kann auskommentiert werden
 $oe_fachbereich='';
 if(isset($_REQUEST['fachbereich_kurzbz']))
 {
@@ -79,9 +81,19 @@ if(isset($_REQUEST['fachbereich_kurzbz']))
 else
 	$fachbereich_kurzbz = '';
 
+
+
 if (isset($_REQUEST['oe_kurzbz']))
 {
 	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
+		//manu: erweiterung Objektaufruf
+		if($oe_kurzbz!='')
+		{
+			$oe_obj = new organisationseinheit();
+			if(!$oe_obj->load($oe_kurzbz))
+				die('Organisationseinheit konnte nicht geladen werden');
+			$oe_kurzbz = $oe_obj->oe_kurzbz;
+		}
 }
 else
 	$oe_kurzbz='';
@@ -476,24 +488,49 @@ else
 	$aktiv='';
 }
 
-if($fb_kurzbz !='')
+//manu: das wird zukünftig wohl leerbleiben..
+// if($fb_kurzbz !='')
+// 	$sql_query="
+// 	SELECT
+// 		distinct tbl_lehrveranstaltung.*
+// 	FROM
+// 		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
+// 	WHERE
+// 		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
+// 		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
+// 		AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz
+// 		AND	tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
+
+//manu: Verknüpfung mit Table public.tbl_organisationseinheit für schöne Anzeige OE in Übersichtsliste
+if($oe_kurzbz !='')
 	$sql_query="
 	SELECT
-		distinct tbl_lehrveranstaltung.*
+		distinct tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung
 	FROM
-		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
+		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_organisationseinheit
 	WHERE
 		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
 		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
-		AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz
-		AND	tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
+		AND lehrfach.oe_kurzbz=tbl_organisationseinheit.oe_kurzbz
+		AND lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
+
 else
 	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE true";
+	// $sql_query="
+	// SELECT
+	// 	distinct tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung
+	// FROM
+	// 	lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_organisationseinheit
+	// WHERE
+	// 	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
+	// 	AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
+	// 	AND lehrfach.oe_kurzbz=tbl_organisationseinheit.oe_kurzbz";
 
 if($stg_kz!='')
 	$sql_query.= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
-//if($oe_kurzbz!='')
-//	$sql_query.= " AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
+//manu warum wars auskommentiert?
+if($oe_kurzbz!='')
+	$sql_query.= " AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
 if($semester != -1)
 	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 
@@ -502,7 +539,7 @@ if($orgform_kurzbz != -1)
 		$sql_query.=" AND (tbl_lehrveranstaltung.orgform_kurzbz IS NULL OR tbl_lehrveranstaltung.orgform_kurzbz='')";
 	else
 		$sql_query.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz, FHC_STRING);
-	
+
 if($lehrveranstaltung_id != '')
 	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 
@@ -570,23 +607,24 @@ foreach ($orgform->result as $of)
 $outp.='</SELECT>';
 
 //Institut DropDown
-$outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
-$fachb = new fachbereich();
-$fachb->getAll();
-$outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
-$fachbereich_berechtigt = $rechte->getFbKz('lehre/lehrveranstaltung:begrenzt');
-foreach ($fachb->result as $fb)
-{
-	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
-		$selected = 'selected';
-	else
-		$selected = '';
-
-	if(in_array($fb->fachbereich_kurzbz, $fachbereich_berechtigt))
-		$outp.= '<OPTION value="'.$db->convert_html_chars($fb->fachbereich_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($fb->fachbereich_kurzbz).'</OPTION>';
-}
-
-$outp.= '</SELECT>';
+//deleted by manu: user story #12646
+// $outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
+// $fachb = new fachbereich();
+// $fachb->getAll();
+// $outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
+// $fachbereich_berechtigt = $rechte->getFbKz('lehre/lehrveranstaltung:begrenzt');
+// foreach ($fachb->result as $fb)
+// {
+// 	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
+// 		$selected = 'selected';
+// 	else
+// 		$selected = '';
+//
+// 	if(in_array($fb->fachbereich_kurzbz, $fachbereich_berechtigt))
+// 		$outp.= '<OPTION value="'.$db->convert_html_chars($fb->fachbereich_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($fb->fachbereich_kurzbz).'</OPTION>';
+// }
+//
+// $outp.= '</SELECT>';
 
 //if($write_admin) Von kindlm am 12.04.2013 auskommentiert, da Assistentinnen auch bei inaktiven LV's die Lehrform aendern koennen sollen
 //{
@@ -615,12 +653,14 @@ $outp.= '</SELECT>';
 		$outp.= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
 	}
 	$outp.= '</select>';
-	
+
+	// manu: hier Detailseite dazubasteln analog zu Berechtigungen
+
 	//Lehrveranstaltung ID Input
 	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
-	
+
 	//Lehrveranstaltung Suche Bezeichnung
-	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 400px" id="lehrveranstaltung_name" 
+	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 400px" id="lehrveranstaltung_name"
 					value="'.$lehrveranstaltung_name.'" placeholder="Mind. 3 Zeichen. Deutsche oder Englische Bezeichnung"
 					title="Platzhalter _ (EIN beliebiges Zeichen) und % (beliebig viele Zeichen) möglich">';
 
@@ -675,29 +715,29 @@ echo '
 					widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
 					headers: {	4: {sorter: false, filter: false},
 								5: {sorter: false, filter: false},
-								11: {sorter: false, filter: false},
-								13: {sorter: false, filter: false},
+								12: {sorter: false, filter: false},
 								14: {sorter: false, filter: false},
-								17: {sorter: false, filter: false},
+								15: {sorter: false, filter: false},
 								18: {sorter: false, filter: false},
 								19: {sorter: false, filter: false},
 								20: {sorter: false, filter: false},
-								21: {sorter: false, filter: false}},
+								21: {sorter: false, filter: false},
+								22: {sorter: false, filter: false}},
 					widgetOptions : {filter_functions : {
 										// Add select menu to this column
-										10 : {
+										11 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										},
-										12 : {
-										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
-										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
-										},
-										15 : {
+										13 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										},
 										16 : {
+										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+										},
+										17 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										}
@@ -929,7 +969,7 @@ echo '
 		{
 			padding: 0 4px;
 		}
-		table.tablesorter tbody td 
+		table.tablesorter tbody td
 		{
 			padding: 0 4px;
 		}
@@ -993,6 +1033,7 @@ if ($result_lv!=0)
 		  <th>Lehrtyp</th>
 		  <th>Stg</th>\n
 		  <th>Orgform</th>
+		  <th>Organisationseinheit</th>
 		  <th title='Semesterstunden'>SS</th>
 		  <th>ECTS</th>
 		  <th>Lehre</th>
@@ -1034,7 +1075,7 @@ if ($result_lv!=0)
 		else
 			echo $db->convert_html_chars($row->bezeichnung);
 		echo '</td>';
-		
+
 		//Bezeichnung Englisch
 		echo '<td>';
 		echo $db->convert_html_chars($row->bezeichnung_english);
@@ -1076,6 +1117,25 @@ if ($result_lv!=0)
 		echo '<td style="white-space:nowrap;">';
 		echo ($row->orgform_kurzbz!=''?$db->convert_html_chars($row->orgform_kurzbz):'&nbsp;');
 		echo '</td>';
+
+		//Organisationseinheit manu
+		echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->oe_kurzbz):'-').'</td>';
+		//oe.organisationseinheittyp_kurzbz as organisationseinheitstyp, oe.bezeichnung as oebezeichnung
+		//echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->bezeichnung):'-').'</td>';
+		//echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
+		// if ($oe_kurzbz !='')
+		// {
+		// 	echo '<td>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung).'</td>';
+		// }
+		// else if ($oe_kurzbz =='' && ($row->oe_kurzbz!='')
+		// {
+		// 	echo '<td>'.$db->convert_html_chars($row->oe_kurzbz).'</td>';
+		// }
+		// else {
+		// 	echo '-';
+		// }
+		//echo '<td>'.(($row->oe_kurzbz!='' && $oe_kurzbz !='') ? $db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
+
 		//Semesterstunden
 		echo '<td>'.($row->semesterstunden!=''?$db->convert_html_chars($row->semesterstunden):'-').'</td>';
 		//ECTS
