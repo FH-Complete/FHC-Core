@@ -160,12 +160,12 @@ $filterWidgetArray = array(
         }
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
-		anrechnung_id: {visible: false},
-		lehrveranstaltung_id: {visible: false},
-		begruendung_id: {visible: false},
-		dms_id: {visible: false},
-		studiensemester_kurzbz: {visible: false},
-		studiengang_kz: {visible: false},
+		anrechnung_id: {visible: false, headerFilter:"input"},
+		lehrveranstaltung_id: {visible: false, headerFilter:"input"},
+		begruendung_id: {visible: false, headerFilter:"input"},
+		dms_id: {visible: false, headerFilter:"input"},
+		studiensemester_kurzbz: {visible: false, headerFilter:"input"},
+		studiengang_kz: {visible: false, headerFilter:"input"},
 		stg_bezeichnung: {headerFilter:"input"},
 		orgform_kurzbz: {headerFilter:"input"},
 		ausbildungssemester: {headerFilter:"input"},
@@ -182,7 +182,7 @@ $filterWidgetArray = array(
 		anmerkung_student: {headerFilter:"input"},
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
-		status_kurzbz: {visible: false},
+		status_kurzbz: {visible: false, headerFilter:"input"},
 		status_bezeichnung: {headerFilter:"input"},
 		empfehlungsanfrageAm: {visible: false, align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlungsanfrageAn: {visible: false, headerFilter:"input"}
