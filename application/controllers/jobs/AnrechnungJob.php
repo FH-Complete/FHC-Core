@@ -109,7 +109,7 @@ class AnrechnungJob extends JOB_Controller
 		$this->AnrechnungModel->addOrder('lv.studiengang_kz, lv.bezeichnung');
 		
 		$result = $this->AnrechnungModel->loadWhere(
-			'(lehre.tbl_anrechnung.insertamum)::date = (NOW() - INTERVAL \'1 DAY\')::DATE'
+			'(lehre.tbl_anrechnung.insertamum)::date = (NOW() - INTERVAL \'24 HOURS\')::DATE'
 		);
 		
 		// Exit if there are no Anrechnungen
