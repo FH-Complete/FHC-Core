@@ -86,13 +86,13 @@ else
 if (isset($_REQUEST['oe_kurzbz']))
 {
 	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
-		if($oe_kurzbz!='')
-		{
-			$oe_obj = new organisationseinheit();
-			if(!$oe_obj->load($oe_kurzbz))
-				die('Organisationseinheit konnte nicht geladen werden');
-			$oe_kurzbz = $oe_obj->oe_kurzbz;
-		}
+	if($oe_kurzbz != '')
+	{
+		$oe_obj = new organisationseinheit();
+		if(!$oe_obj->load($oe_kurzbz))
+			die('Organisationseinheit konnte nicht geladen werden');
+		$oe_kurzbz = $oe_obj->oe_kurzbz;
+	}
 }
 else
 	$oe_kurzbz='';
@@ -618,23 +618,21 @@ $outp.='</SELECT>';
 }*/
 
 
-$outp.= '</hr><details id="detailTag" style="margin-top: 10px;">
-<summary>Erweiterte Suchoptionen:</summary><hr></hr>
-	';
+$outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary>Erweiterte Suchoptionen:</summary><hr></hr>';
 
 	//Organisationseinheit Dropdown
-	$outp.= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
-	$oe=new organisationseinheit();
+	$outp .= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
+	$oe = new organisationseinheit();
 	$oe->getAll();
 	foreach($oe->result as $row)
 	{
-		if($oe_kurzbz==$row->oe_kurzbz)
-			$selected='selected';
-		else
-			$selected='';
-		$outp.= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
+	if($oe_kurzbz == $row->oe_kurzbz)
+		$selected = 'selected';
+	else
+		$selected = '';
+	$outp .= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
 	}
-	$outp.= '</select>';
+	$outp .= '</select>';
 
 	//Lehrveranstaltung ID Input
 	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
@@ -1113,7 +1111,7 @@ if ($result_lv!=0)
 		echo '</td>';
 
 		//Organisationseinheit
-		echo '<td>'.($row->oe_kurzbz!=''?$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
+		echo '<td>'.($row->oe_kurzbz != ''?$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
 
 		//Semesterstunden
 		echo '<td>'.($row->semesterstunden!=''?$db->convert_html_chars($row->semesterstunden):'-').'</td>';
