@@ -617,8 +617,13 @@ $outp.='</SELECT>';
 	$isaktiv='aktiv';
 }*/
 
+
+$outp.= '</hr><details id="detailTag" style="margin-top: 10px;">
+<summary>Erweiterte Suchoptionen:</summary><hr></hr>
+	';
+
 	//Organisationseinheit Dropdown
-	$outp.= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 200px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
+	$outp.= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
 	$oe=new organisationseinheit();
 	$oe->getAll();
 	foreach($oe->result as $row)
@@ -635,12 +640,15 @@ $outp.='</SELECT>';
 	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
 
 	//Lehrveranstaltung Suche Bezeichnung
-	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 400px" id="lehrveranstaltung_name"
+	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 450px" id="lehrveranstaltung_name"
 					value="'.$lehrveranstaltung_name.'" placeholder="Mind. 3 Zeichen. Deutsche oder Englische Bezeichnung"
 					title="Platzhalter _ (EIN beliebiges Zeichen) und % (beliebig viele Zeichen) möglich">';
 
-	$outp.= ' <input type="submit" value="Anzeigen">';
+
+	$outp.= '<hr></hr></details>';
+	$outp.= ' <input type="submit" style="float:right" value="Anzeigen">';
 	$outp.= '</form>';
+
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -684,6 +692,7 @@ echo '
 	<script type="text/javascript">
 		$(document).ready(function()
 			{
+				openDetailTag();
 				$("#t1").tablesorter(
 				{
 					sortList: [[2,0]],
@@ -745,7 +754,6 @@ echo '
 				}
 				else
 					return true;
-
 			}
 			function changelehrevz(lvid, lehrevz)
 			{
@@ -937,8 +945,19 @@ echo '
 			{
 				return confirm("Diese Lehrveranstaltung wirklich löschen?");
 			}
-
+			function openDetailTag()
+			{
+				var details = document.getElementById("detailTag");
+				if(document.getElementById("lehrveranstaltung_name").value!=""
+								|| document.getElementById("select_oe_kurzbz").value!=""
+								|| document.getElementById("lehrveranstaltung_id").value!="")
+				{
+					details.open = true;
+					return false;
+				}
+			}
 		</script>
+
 		<style>
 		.tablesorter-default input.tablesorter-filter
 		{
