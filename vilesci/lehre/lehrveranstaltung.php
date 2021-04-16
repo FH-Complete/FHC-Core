@@ -82,7 +82,7 @@ else
 	$fachbereich_kurzbz = '';
 
 
-
+$oe_organisationseinheit='';
 if (isset($_REQUEST['oe_kurzbz']))
 {
 	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
@@ -91,7 +91,7 @@ if (isset($_REQUEST['oe_kurzbz']))
 		$oe_obj = new organisationseinheit();
 		if(!$oe_obj->load($oe_kurzbz))
 			die('Organisationseinheit konnte nicht geladen werden');
-		$oe_kurzbz = $oe_obj->oe_kurzbz;
+		$oe_organisationseinheit = $oe_obj->oe_kurzbz;
 	}
 }
 else
@@ -219,6 +219,45 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
+
+		//Lehrform Speichern
+		//userstory #12645: only $write_admin
+		if(isset($_POST['lf']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrform_kurzbz=$_POST['lf'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
+
+		//Lehrtyp Speichern
+		//userstory #12645: only $write_admin
+		if(isset($_POST['lt']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrtyp_kurzbz=$_POST['lt'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
+
 	}
 
 	if($write_low || $write_admin)
@@ -312,42 +351,6 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			if($lv_obj->load($_POST['lvid']))
 			{
 				$lv_obj->koordinator=$_POST['fbk'];
-				$lv_obj->updateamum = date('Y-m-d H:i:s');
-				$lv_obj->updatevon = $user;
-				if($lv_obj->save(false))
-					exit('true');
-				else
-					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
-			}
-			else
-				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
-		}
-
-		//Lehrform Speichern
-		if(isset($_POST['lf']))
-		{
-			$lv_obj = new lehrveranstaltung();
-			if($lv_obj->load($_POST['lvid']))
-			{
-				$lv_obj->lehrform_kurzbz=$_POST['lf'];
-				$lv_obj->updateamum = date('Y-m-d H:i:s');
-				$lv_obj->updatevon = $user;
-				if($lv_obj->save(false))
-					exit('true');
-				else
-					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
-			}
-			else
-				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
-		}
-
-		//Lehrtyp Speichern
-		if(isset($_POST['lt']))
-		{
-			$lv_obj = new lehrveranstaltung();
-			if($lv_obj->load($_POST['lvid']))
-			{
-				$lv_obj->lehrtyp_kurzbz=$_POST['lt'];
 				$lv_obj->updateamum = date('Y-m-d H:i:s');
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
@@ -611,6 +614,8 @@ $outp.='</SELECT>';
 	$outp.= "<OPTION value='true '".($isaktiv=='true'?'selected':'').">-- Aktiv --</OPTION>";
 	$outp.= "<OPTION value='false '".($isaktiv=='false'?'selected':'').">-- Nicht aktiv --</OPTION>";
 	$outp.= '</SELECT>';
+
+	$outp.= '<input type="submit" style="margin-left:20px;" value="Anzeigen">';
 //}
 /*else
 {
@@ -618,7 +623,7 @@ $outp.='</SELECT>';
 }*/
 
 
-$outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary>Erweiterte Suchoptionen:</summary><hr></hr>';
+$outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary style="float:right">Erweiterte Suchoptionen</summary><hr></hr>';
 
 	//Organisationseinheit Dropdown
 	$outp .= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
@@ -642,9 +647,8 @@ $outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary>Erweit
 					value="'.$lehrveranstaltung_name.'" placeholder="Mind. 3 Zeichen. Deutsche oder Englische Bezeichnung"
 					title="Platzhalter _ (EIN beliebiges Zeichen) und % (beliebig viele Zeichen) möglich">';
 
-
+	$outp.= ' <input type="submit" style="margin-left:20px" value="Anzeigen">';
 	$outp.= '<hr></hr></details>';
-	$outp.= ' <input type="submit" style="float:right" value="Anzeigen">';
 	$outp.= '</form>';
 
 
