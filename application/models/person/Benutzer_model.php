@@ -13,6 +13,11 @@ class Benutzer_model extends DB_Model
 		$this->hasSequence = false;
 	}
 
+	/**
+	 * Gets active Benutzer from person_id
+	 * @param $person_id
+	 * @return object
+	 */
 	public function getFromPersonId($person_id)
 	{
 		return $this->loadWhere(array('person_id' => $person_id, 'aktiv' => true));
