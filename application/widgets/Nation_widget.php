@@ -6,7 +6,7 @@ class Nation_widget extends DropdownWidget
 	{
 		// Nation
 		$this->load->model('codex/Nation_model', 'NationModel');
-		$this->NationModel->addOrder('nation_code');
+		$this->NationModel->addOrder('kurztext');
 
 		$this->addSelectToModel($this->NationModel, 'nation_code', 'kurztext');
 
