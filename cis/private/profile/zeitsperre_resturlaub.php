@@ -277,13 +277,17 @@ function setBisDatum()
 function showHideStudeDropDown()
 {
 	var dd = document.zeitsperre_form.zeitsperretyp_kurzbz;
-	console.log(dd.options[dd.selectedIndex].value == 'ZA')
-	if (dd.options[dd.selectedIndex].value == 'ZA' || dd.options[dd.selectedIndex].value == 'Urlaub')
-    {
+
+	if (dd.options[dd.selectedIndex].value == 'ZA'
+	|| dd.options[dd.selectedIndex].value == 'Urlaub'
+	|| dd.options[dd.selectedIndex].value == 'Krank'
+	|| dd.options[dd.selectedIndex].value == 'DienstF'
+	|| dd.options[dd.selectedIndex].value == 'DienstV')
+	{
 		document.getElementById('vonStd').style.visibility = 'hidden';
 		document.getElementById('bisStd').style.visibility = 'hidden';
-    }
-    else
+	}
+	else
 	{
 		document.getElementById('vonStd').style.visibility = 'visible';
 		document.getElementById('bisStd').style.visibility = 'visible';
