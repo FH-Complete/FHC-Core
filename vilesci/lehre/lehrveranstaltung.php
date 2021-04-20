@@ -174,7 +174,7 @@ if(isset($_GET['delete_lvid']))
 		}
 	}
 	else
-		echo "Keine Berechtigung, um Lehrveranstaltung zu löschen!\n";
+		echo " Keine Berechtigung, um Lehrveranstaltung zu löschen!\n";
 }
 
 // Speichern der Daten
@@ -227,7 +227,7 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			$lv_obj = new lehrveranstaltung();
 			if($lv_obj->load($_POST['lvid']))
 			{
-				$lv_obj->lehrform_kurzbz=$_POST['lf'];
+				$lv_obj->lehrform_kurzbz = $_POST['lf'];
 				$lv_obj->updateamum = date('Y-m-d H:i:s');
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
@@ -246,7 +246,7 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			$lv_obj = new lehrveranstaltung();
 			if($lv_obj->load($_POST['lvid']))
 			{
-				$lv_obj->lehrtyp_kurzbz=$_POST['lt'];
+				$lv_obj->lehrtyp_kurzbz = $_POST['lt'];
 				$lv_obj->updateamum = date('Y-m-d H:i:s');
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
@@ -257,7 +257,10 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-
+	}
+	else
+	{
+		exit('Keine Berechtigung, um Lehrveranstaltungen zu bearbeiten!');
 	}
 
 	if($write_low || $write_admin)
@@ -472,32 +475,15 @@ if($result = $db->db_query($qry))
 
 //Lehrveranstaltungen holen
 
-//Wenn nicht admin, werden erst nur die aktiven angezeigt, es koennen aber auch die inaktiven eingeblendet werden
-
-$aktiv='';
-$isaktiv=trim($isaktiv);
-
-if($isaktiv=='true')
-{
-	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
-}
-elseif($isaktiv=='false')
-{
-	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=false';
-}
-else
-{
-	$aktiv='';
-}
-
-$sql_query="
+$sql_query = "
 	SELECT
-	tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung
+	tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz,
+	tbl_organisationseinheit.bezeichnung as oe_bezeichnung
 	FROM
 		lehre.tbl_lehrveranstaltung
-		FULL JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
-		FULL JOIN lehre.tbl_lehrveranstaltung  as lehrfach on (lehre.tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id)
-		FULL JOIN public.tbl_organisationseinheit ON (public.tbl_organisationseinheit.oe_kurzbz = lehre.tbl_lehrveranstaltung.oe_kurzbz)
+		LEFT JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
+		LEFT JOIN lehre.tbl_lehrveranstaltung  as lehrfach on (lehre.tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id)
+		LEFT JOIN public.tbl_organisationseinheit ON (public.tbl_organisationseinheit.oe_kurzbz = lehre.tbl_lehrveranstaltung.oe_kurzbz)
 	where
 		lehre.tbl_lehrveranstaltung.bezeichnung != 'NULL'
 ";
@@ -526,10 +512,27 @@ if($lehrveranstaltung_name != '')
 	$sql_query.= " OR UPPER(tbl_lehrveranstaltung.bezeichnung_english) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")) ";
 }
 
-$sql_query.=" GROUP BY tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung";
+//Wenn nicht admin, werden erst nur die aktiven angezeigt, es koennen aber auch die inaktiven eingeblendet werden
 
+$aktiv = '';
+$isaktiv = trim($isaktiv);
 
-$sql_query.=" $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
+if($isaktiv == 'true')
+{
+	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
+}
+elseif($isaktiv=='false')
+{
+	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=false';
+}
+else
+{
+	$aktiv='';
+}
+
+$sql_query .= " GROUP BY tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung";
+
+$sql_query .= " ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
 if($fb_kurzbz=='' && $stg_kz=='' && $semester=='0' && $oe_kurzbz=='')
 	$result_lv='';
@@ -540,11 +543,11 @@ else
 }
 
 //Studiengang DropDown
-$outp='';
-$s=array();
-$outp.="<form action='".$_SERVER['PHP_SELF']."' method='GET' onsubmit='return checksubmit();'>";
-$outp.=" Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
-$outp.="<OPTION value='' ".($stg_kz==''?'selected':'').">-- Alle --</OPTION>";
+$outp = '';
+$s = array();
+$outp .= "<form action='".$_SERVER['PHP_SELF']."' method='GET' onsubmit='return checksubmit();'>";
+$outp .= " Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
+$outp .= "<OPTION value='' ".($stg_kz == ''?'selected':'').">-- Alle --</OPTION>";
 $stg_berechtigt = $rechte->getStgKz('lehre/lehrveranstaltung:begrenzt');
 
 foreach ($studiengang as $stg)
