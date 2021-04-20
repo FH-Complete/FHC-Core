@@ -104,8 +104,8 @@ class bisverwendung extends basis_db
 				$this->verwendung_code = $row->verwendung_code;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
-				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-				$this->habilitation = $this->db_parse_bool($row->habilitation);
+                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+                $this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
 				$this->updatevon = $row->updatevon;
@@ -254,49 +254,49 @@ class bisverwendung extends basis_db
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode,
 					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden,
 					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig) VALUES (".
-				$this->db_add_param($this->ba1code, FHC_INTEGER).', '.
-				$this->db_add_param($this->ba2code, FHC_INTEGER).', '.
-				$this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
-				$this->db_add_param($this->verwendung_code, FHC_INTEGER).', '.
-				$this->db_add_param($this->mitarbeiter_uid).', '.
-				$this->db_add_param($this->hauptberufcode, FHC_INTEGER).', '.
-				$hauptberuflich.', '.
-				$this->db_add_param($this->habilitation, FHC_BOOLEAN).', '.
-				$this->db_add_param($this->beginn).', '.
-				$this->db_add_param($this->ende).', '.
-				$this->db_add_param($this->vertragsstunden).', '.
-				$this->db_add_param($this->updateamum).', '.
-				$this->db_add_param($this->updatevon).', '.
-				$this->db_add_param($this->insertamum).', '.
-				$this->db_add_param($this->insertvon).', '.
-				$this->db_add_param($this->dv_art).','.
-				$this->db_add_param($this->inkludierte_lehre).','.
-				$zeitaufzeichnungspflichtig. ');';
+			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
+			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
+			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
+			       $this->db_add_param($this->verwendung_code, FHC_INTEGER).', '.
+			       $this->db_add_param($this->mitarbeiter_uid).', '.
+			       $this->db_add_param($this->hauptberufcode, FHC_INTEGER).', '.
+			       $hauptberuflich.', '.
+			       $this->db_add_param($this->habilitation, FHC_BOOLEAN).', '.
+			       $this->db_add_param($this->beginn).', '.
+			       $this->db_add_param($this->ende).', '.
+			       $this->db_add_param($this->vertragsstunden).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).', '.
+				   $this->db_add_param($this->dv_art).','.
+				   $this->db_add_param($this->inkludierte_lehre).','.
+				   $zeitaufzeichnungspflichtig. ');';
 
 		}
 		else
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE bis.tbl_bisverwendung SET".
-				" ba1code=".$this->db_add_param($this->ba1code, FHC_INTEGER).",".
-				" ba2code=".$this->db_add_param($this->ba2code, FHC_INTEGER).",".
-				" beschausmasscode=".$this->db_add_param($this->beschausmasscode, FHC_INTEGER).",".
-				" verwendung_code=".$this->db_add_param($this->verwendung_code, FHC_INTEGER).",".
-				" mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid).",".
-				" hauptberufcode=".$this->db_add_param($this->hauptberufcode, FHC_INTEGER).",".
-				" hauptberuflich=".$hauptberuflich.",".
-				" habilitation=".$this->db_add_param($this->habilitation, FHC_BOOLEAN).",".
-				" beginn=".$this->db_add_param($this->beginn).",".
-				" ende=".$this->db_add_param($this->ende).",".
-				" vertragsstunden=".$this->db_add_param($this->vertragsstunden).",".
-				" updateamum=".$this->db_add_param($this->updateamum).",".
-				" updatevon=".$this->db_add_param($this->updatevon).",".
-				" insertamum=".$this->db_add_param($this->insertamum).",".
-				" insertvon=".$this->db_add_param($this->insertvon).",".
-				" dv_art=".$this->db_add_param($this->dv_art).",".
-				" inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).",".
-				" zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.
-				" WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
+				  " ba1code=".$this->db_add_param($this->ba1code, FHC_INTEGER).",".
+				  " ba2code=".$this->db_add_param($this->ba2code, FHC_INTEGER).",".
+				  " beschausmasscode=".$this->db_add_param($this->beschausmasscode, FHC_INTEGER).",".
+				  " verwendung_code=".$this->db_add_param($this->verwendung_code, FHC_INTEGER).",".
+				  " mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid).",".
+				  " hauptberufcode=".$this->db_add_param($this->hauptberufcode, FHC_INTEGER).",".
+				  " hauptberuflich=".$hauptberuflich.",".
+				  " habilitation=".$this->db_add_param($this->habilitation, FHC_BOOLEAN).",".
+				  " beginn=".$this->db_add_param($this->beginn).",".
+				  " ende=".$this->db_add_param($this->ende).",".
+				  " vertragsstunden=".$this->db_add_param($this->vertragsstunden).",".
+				  " updateamum=".$this->db_add_param($this->updateamum).",".
+				  " updatevon=".$this->db_add_param($this->updatevon).",".
+				  " insertamum=".$this->db_add_param($this->insertamum).",".
+				  " insertvon=".$this->db_add_param($this->insertvon).",".
+				  " dv_art=".$this->db_add_param($this->dv_art).",".
+				  " inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).",".
+				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.
+				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
 
 		if($this->db_query($qry))
@@ -370,8 +370,8 @@ class bisverwendung extends basis_db
 				$obj->verwendung_code = $row->verwendung_code;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->hauptberufcode = $row->hauptberufcode;
-				$obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-				$obj->habilitation = $this->db_parse_bool($row->habilitation);
+                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+                $obj->habilitation = $this->db_parse_bool($row->habilitation);
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->updatevon = $row->updatevon;
@@ -799,4 +799,3 @@ class bisverwendung extends basis_db
 	}
 }
 ?>
-
