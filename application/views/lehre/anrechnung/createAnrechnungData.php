@@ -31,6 +31,7 @@ $query = '
 	WHERE pststatus.studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
 	AND pst.studiengang_kz IN (' . $STUDIENGAENGE_ENTITLED . ')
 	AND benutzer.aktiv = true
+	AND pststatus.status_kurzbz = \'Student\'
 	ORDER BY "stg_bezeichnung", ausbildungssemester, nachname
 ';
 
