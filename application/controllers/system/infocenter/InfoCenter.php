@@ -15,10 +15,13 @@ class InfoCenter extends Auth_Controller
 	const ZGVPRUEFUNG_MAIL_VORLAGE = 'InfocenterMailZgvUeberpruefung';
 
 	const INFOCENTER_URI = 'system/infocenter/InfoCenter'; // URL prefix for this controller
+	const ZGV_UEBERPRUEFUNG_URI = 'system/infocenter/ZGVUeberpruefung';
 	const INDEX_PAGE = 'index';
 	const FREIGEGEBEN_PAGE = 'freigegeben';
 	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
 	const SHOW_DETAILS_PAGE = 'showDetails';
+	const SHOW_ZGV_DETAILS_PAGE = 'showZGVDetails';
+	const ZGV_UBERPRUEFUNG_PAGE = 'ZGVUeberpruefung';
 
 	const NAVIGATION_PAGE = 'navigation_page';
 	const ORIGIN_PAGE = 'origin_page';
@@ -64,6 +67,18 @@ class InfoCenter extends Auth_Controller
 			'name' => 'Note updated',
 			'message' => 'Note with title %s was updated',
 			'success' => null
+		),
+		'updatezgv' => array(
+			'logtype' => 'Action',
+			'name' => 'ZGV pruefung updated',
+			'message' => 'ZGV with the ID %s was updated to %s',
+			'success' => null
+		),
+		'newzgv' => array(
+			'logtype' => 'Action',
+			'name' => 'ZGV pruefung added',
+			'message' => 'ZGV with the ID %s was added',
+			'success' => null
 		)
 	);
 
@@ -86,7 +101,7 @@ class InfoCenter extends Auth_Controller
 				'freigegeben' => 'infocenter:r',
 				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
-				'showZGVDetails' => 'infocenter:r',
+				'showZGVDetails' => 'lehre/zgvpruefung:r',
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'getPrestudentData' => 'infocenter:r',
@@ -95,7 +110,7 @@ class InfoCenter extends Auth_Controller
 				'saveBewPriorisierung' => 'infocenter:rw',
 				'saveZgvPruefung' => 'infocenter:rw',
 				'zgvRueckfragen' => 'infocenter:rw',
-				'zgvStatusUpdate' => 'infocenter:rw',
+				'zgvStatusUpdate' => 'lehre/zgvpruefung:rw',
 				'saveAbsage' => 'infocenter:rw',
 				'saveFreigabe' => 'infocenter:rw',
 				'getNotiz' => 'infocenter:r',
@@ -190,6 +205,8 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function showZGVDetails()
 	{
+		$this->_setNavigationMenuShowDetails(self::SHOW_ZGV_DETAILS_PAGE);
+
 		$prestudent_id = $this->input->get('prestudent_id');
 
 		if (!is_numeric($prestudent_id))
@@ -203,37 +220,25 @@ class InfoCenter extends Auth_Controller
 		if (!hasData($prestudentexists))
 			show_error('Prestudent does not exist!');
 
-		$zgvExist = $this->ZGVPruefungModel->loadWhere(array('prestudent_id' => $prestudent_id));
+		$zgv = $this->ZGVPruefungStatusModel->getZgvStatusByPrestudent($prestudent_id);
 
-		if (isError($zgvExist))
-			show_error(getError($zgvExist));
+		if (isError($zgv))
+			show_error(getError($zgv));
 
-		if (!hasData($zgvExist))
-			show_error('ZGV does not exist!');
-
-		$this->ZGVPruefungStatusModel->addOrder('datum', 'DESC');
-		$this->ZGVPruefungStatusModel->addLimit(1);
-
-		$statusZGV = $this->ZGVPruefungStatusModel->loadWhere(array('zgvpruefung_id' => $zgvExist->retval[0]->zgvpruefung_id));
-
-		if (isError($statusZGV))
-			show_error(getError($statusZGV));
-
-		if (!hasData($statusZGV))
+		if (!hasData($zgv))
 			show_error('ZGV has no status.');
 
-		$statusZGV = array('status' => $statusZGV->retval[0]->status);
-		$origin_page = $this->input->get(self::ORIGIN_PAGE);
-
-
-		$persondata = $this->_loadPersonData($prestudentexists->retval[0]->person_id);
-
+		$persondata = $this->_loadPersonData(getData($prestudentexists)[0]->person_id);
 		$prestudent_id = array('prestudent_id' => $prestudent_id);
+		$status = array('status' => getData($zgv)[0]->status);
+
 		$data = array_merge(
 			$persondata,
 			$prestudent_id,
-			$statusZGV
+			$status
 		);
+
+		$origin_page = $this->input->get(self::ORIGIN_PAGE);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
 		$data[self::ORIGIN_PAGE] = $origin_page;
@@ -521,30 +526,27 @@ class InfoCenter extends Auth_Controller
 		$person_id = $this->input->post('person_id');
 		$status = $this->input->post('status');
 
-		if (isEmptyString($prestudent_id) && isEmptyString($person_id) && isEmptyString($status))
-			return $this->outputJsonError('Some data is missing');
+		if (isEmptyString($prestudent_id) || isEmptyString($person_id) || isEmptyString($status))
+			$this->terminateWithJsonError('Some data is missing');
 
-		$zgv = $this->ZGVPruefungModel->loadWhere(array('prestudent_id' => $prestudent_id));
+		$personInfos = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id);
+
+		if (!hasData($personInfos))
+			$this->terminateWithJsonError('Person id nicht gefunden');
+
+		$personInfos = getData($personInfos);
+
+		$zgv = $this->ZGVPruefungStatusModel->getZgvStatusByPrestudent($prestudent_id);
 
 		if (!hasData($zgv))
-			return $this->outputJsonError('ZGV nicht gefunden');
+			$this->terminateWithJsonError('ZGV-Status nicht gefunden');
 
 		$zgv = getData($zgv);
 
-		$this->ZGVPruefungStatusModel->addOrder('datum', 'DESC');
-		$this->ZGVPruefungStatusModel->addLimit(1);
-		$statusZGV = $this->ZGVPruefungStatusModel->loadWhere(array('zgvpruefung_id' => $zgv[0]->zgvpruefung_id));
-
-		if (!hasData($statusZGV))
-			return $this->outputJsonError('ZGV-Status nicht gefunden');
-
-		$statusZGV = getData($statusZGV);
-
-		if ($statusZGV[0]->status === 'rejected' && $status === 'rejected')
-			return $this->outputJsonError('Bereits abgelehnt worden');
-		elseif ($statusZGV[0]->status === 'accepted' && $status === 'accepted')
-			return $this->outputJsonError('Bereits akzeptiert worden');
-
+		if ($zgv[0]->status === 'rejected' && $status === 'rejected')
+			$this->terminateWithJsonError('Bereits abgelehnt worden');
+		elseif ($zgv[0]->status === 'accepted' && $status === 'accepted')
+			$this->terminateWithJsonError('Bereits akzeptiert worden');
 
 		$insert = $this->ZGVPruefungStatusModel->insert(
 			array(
@@ -561,16 +563,23 @@ class InfoCenter extends Auth_Controller
 			)
 		);
 
-		if (isError($insert) && isError($update))
-			return $this->outputJsonError('Fehler beim Speichern');
+		if (isError($insert) || isError($update))
+			$this->terminateWithJsonError('Fehler beim Speichern');
 
-		$personInfos = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+		$allZgvs = $this->ZGVPruefungStatusModel->getOpenZgvByPerson($personInfos->person_id, array('pruefung_stg'));
+		$openZgv = false;
+
+		if (hasData($allZgvs))
+			$openZgv = true;
+
+		$this->_log($person_id, 'updatezgv', array($zgv[0]->zgvpruefung_id, $status));
 
 		$this->outputJsonSuccess(
 			array
 			(
 				'msg' => 'Erfolgreich gespeichert',
-				'person_id' => $personInfos['person_id']
+				'person_id' => $personInfos->person_id,
+				'openZgv' => $openZgv
 			)
 		);
 
@@ -585,28 +594,19 @@ class InfoCenter extends Auth_Controller
 		$prestudent_id = $this->input->post('prestudent_id');
 		$person_id = $this->input->post('person_id');
 
-		if (isEmptyString($prestudent_id) && isEmptyString($person_id))
-			return $this->outputJsonError('Prestudentid OR/AND Personid missing');
+		if (isEmptyString($prestudent_id) || isEmptyString($person_id))
+			$this->terminateWithJsonError('Prestudentid OR/AND Personid missing');
 
-		$zgv = $this->ZGVPruefungModel->loadWhere(array('prestudent_id' => $prestudent_id));
-		$sg = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
-		$mail = $sg['studiengang_mail'];
+		$zgv = $this->ZGVPruefungStatusModel->getZgvStatusByPrestudent($prestudent_id);
 
+		$data = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+		$mail = $data['studiengang_mail'];
 		if (hasData($zgv))
 		{
 			$zgv = getData($zgv);
 
-			$this->ZGVPruefungStatusModel->addOrder('datum', 'DESC');
-			$this->ZGVPruefungStatusModel->addLimit(1);
-			$statusZGV = $this->ZGVPruefungStatusModel->loadWhere(array('zgvpruefung_id' => $zgv[0]->zgvpruefung_id));
-
-			if (!hasData($statusZGV))
-				return $this->outputJsonError('ZGV-Status nicht gefunden');
-
-			$statusZGV = getData($statusZGV);
-
-			if ($statusZGV[0]->status === 'pruefung_stg')
-				return $this->outputJsonError('Bereits in Prüfung');
+			if ($zgv[0]->status === 'pruefung_stg')
+				$this->terminateWithJsonError('Bereits in Prüfung');
 
 			$insert = $this->ZGVPruefungStatusModel->insert(
 				array(
@@ -615,7 +615,7 @@ class InfoCenter extends Auth_Controller
 				)
 			);
 
-			$update = $this->ZGVPruefungModel->update(
+			$this->ZGVPruefungModel->update(
 				$zgv[0]->zgvpruefung_id,
 				array(
 					'updateamum' => date('Y-m-d H:i:s'),
@@ -623,11 +623,12 @@ class InfoCenter extends Auth_Controller
 				)
 			);
 
-			if (isSuccess($insert) && isSuccess($update))
-				$this->sendZgvMail($mail);
-			elseif (isError($insert) && isError($update))
-				return $this->outputJsonError('Fehler beim Speichern');
+			$this->_log($person_id, 'updatezgv', array($zgv[0]->zgvpruefung_id, 'pruefung_stg'));
 
+			if (isSuccess($insert))
+				$this->sendZgvMail($mail);
+			elseif (isError($insert))
+				$this->terminateWithJsonError('Fehler beim Speichern');
 		}else
 		{
 			$insert = $this->ZGVPruefungModel->insert(
@@ -648,18 +649,25 @@ class InfoCenter extends Auth_Controller
 					)
 				);
 
+				$this->_log($person_id, 'newzgv', array($zgvpruefung_id));
+
 				if (isSuccess($result))
 					$this->sendZgvMail($mail);
 				elseif (isError($result))
-					return $this->outputJsonError('Fehler beim Speichern');
+					$this->terminateWithJsonError('Fehler beim Speichern');
 			}
 		}
+
+		$hold = false;
+		if ($this->personloglib->getOnHoldDate($person_id) !== null)
+			$hold = true;
 
 		$this->outputJsonSuccess(
 			array
 			(
 				'msg' => 'Erfolgreich gespeichert',
-				'person_id' => $sg['person_id']
+				'person_id' => $data['person_id'],
+				'hold' => $hold
 			)
 		);
 	}
@@ -1293,9 +1301,9 @@ class InfoCenter extends Auth_Controller
 	/**
 	 *  Define the navigation menu for the showDetails page
 	 */
-	private function _setNavigationMenuShowDetails()
+	private function _setNavigationMenuShowDetails($page = self::SHOW_DETAILS_PAGE)
 	{
-		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.self::SHOW_DETAILS_PAGE));
+		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.$page));
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
 
@@ -1308,6 +1316,8 @@ class InfoCenter extends Auth_Controller
 		{
 			$link = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		}
+		if ($origin_page === self::ZGV_UBERPRUEFUNG_PAGE)
+			$link = site_url(self::ZGV_UEBERPRUEFUNG_URI);
 
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
@@ -1457,7 +1467,7 @@ class InfoCenter extends Auth_Controller
 	 * @param $person_id
 	 * @return array
 	 */
-	private function _loadPersonData($person_id)
+	public function _loadPersonData($person_id)
 	{
 		$locked = $this->PersonLockModel->checkIfLocked($person_id, self::APP);
 

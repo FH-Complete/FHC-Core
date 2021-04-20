@@ -25,7 +25,8 @@
 				'public/js/bootstrapper.js',
 				'public/js/tablesort/tablesort.js',
 				'public/js/infocenter/messageList.js',
-				'public/js/infocenter/infocenterDetails.js'
+				'public/js/infocenter/infocenterDetails.js',
+				'public/js/infocenter/zgvUeberpruefung.js'
 			),
 			'phrases' => array(
 				'infocenter' => array(
@@ -43,7 +44,11 @@
 					'nichtsZumEntfernen',
 					'fehlerBeimEntfernen',
 					'rueckstelldatumUeberschritten',
-					'parkenZurueckstellenInfo'
+					'parkenZurueckstellenInfo',
+					'zgvInPruefung',
+					'zgvErfuellt',
+					'zgvNichtErfuellt',
+					'zgvErfuelltPruefung'
 				),
 				'ui' => array(
 					'gespeichert',

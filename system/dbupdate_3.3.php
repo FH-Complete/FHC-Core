@@ -4715,6 +4715,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus LIMIT 1
 		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('pruefung_stg', 'Wird vom Studiengang geprüft');
 		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('rejected', 'Vom Studiengang abgelehnt');
 		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('accepted', 'Vom Studiengang akzeptiert');
+		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('accepted_pruefung', 'Vom Studiengang akzeptiert mit Prüfung');
 
 		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_zgvpruefungstatus TO vilesci;
 		GRANT SELECT ON public.tbl_zgvpruefungstatus TO web;

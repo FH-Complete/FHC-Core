@@ -311,31 +311,14 @@
 					</form>
 					<?php if (!$infoonly): ?>
 						<div class="row">
-							<div class="col-xs-8 text-left">
+							<div class="col-xs-8 text-left zgvBearbeitungButtons" id="zgvBearbeitungButtons_<?php echo $zgvpruefung->prestudent_id ?>">
 								<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
 								</button>
-								<button type="button" class="btn btn-default zgvRueckfragen" id="zgvRueckfragen_<?php echo $zgvpruefung->prestudent_id ?>">
+								<button class="btn btn-default zgvRueckfragen" id="zgvRueckfragen_<?php echo $zgvpruefung->prestudent_id ?>" <?php (!(isset($zgvpruefung->statusZGV))) ?: print_r('disabled')?>>
 									<?php echo $this->p->t('infocenter', 'zgvRueckfragen') ?>
 								</button>
-								<span id="zgvStatusText">
-									<?php
-									if (isset($zgvpruefung->statusZGV))
-									{
-										switch ($zgvpruefung->statusZGV)
-										{
-											case 'pruefung_stg' :
-												echo $this->p->t('infocenter', 'zgvInPruefung');
-												break;
-											case 'accepted' :
-												echo $this->p->t('infocenter', 'zgvAkzeptiert');
-												break;
-											case 'rejected' :
-												echo $this->p->t('infocenter', 'zgvAbgelehnt');
-												break;
-										}
-									}
-									?>
+								<span class="zgvStatusText" id="zgvStatusText_<?php echo $zgvpruefung->prestudent_id ?>">
 								</span>
 							</div>
 							<div class="col-xs-4 text-right">
