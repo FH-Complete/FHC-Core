@@ -158,40 +158,26 @@ class requestAnrechnung extends Auth_Controller
 			return $this->outputJsonError($result->retval);
 		}
 		
-		// Store just inserted DMS ID
+		// Hold just inserted DMS ID
 		$lastInsert_dms_id = $result->retval['dms_id'];
 		
-		// Start DB transaction
-		$this->db->trans_start(false);
+		// Save Anrechnung and Anrechnungstatus
+		$result = $this->AnrechnungModel->createAnrechnungsantrag(
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$lehrveranstaltung_id,
+			$begruendung_id,
+			$lastInsert_dms_id,
+			$anmerkung
+		);
 		
-		// Save Anrechnung
-		$result = $this->AnrechnungModel->insert(array(
-			'prestudent_id' => $prestudent_id,
-			'lehrveranstaltung_id' => $lehrveranstaltung_id,
-			'begruendung_id' => $begruendung_id,
-			'dms_id' => $lastInsert_dms_id,
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'anmerkung_student' => $anmerkung,
-			'insertvon' => $this->_uid
-		));
-		
-		// Store just inserted Anrechnung ID
-		$lastInsert_anrechnung_id = $result->retval;
-		
-		// Save Anrechnungstatus
-		$this->AnrechnungModel->saveAnrechnungstatus($lastInsert_anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
-		
-		// Transaction complete
-		$this->db->trans_complete();
-
-		if ($this->db->trans_status() === false)
+		if (isError($result))
 		{
-			$this->db->trans_rollback();
-			show_error('Failed inserting Anrechnung', EXIT_ERROR);
+			$this->terminateWithJsonError(getError($result));
 		}
 		
 		// Output to AJAX
-		return $this->outputJsonSuccess(array(
+		$this->outputJsonSuccess(array(
 			'antragdatum' => (new DateTime())->format('d.m.Y'),
 			'dms_id' => $lastInsert_dms_id
 		));
