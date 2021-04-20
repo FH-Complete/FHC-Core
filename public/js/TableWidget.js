@@ -552,9 +552,12 @@ var FHC_TableWidget = {
 				options.movableColumns = true;				// allows changing column order
 				options.tooltipsHeader = true;				// set header tooltip with column title
 				options.placeholder = _func_placeholder();	// display text when table is empty
-				options.rowSelectionChanged = function(data, rows){
-					_func_rowSelectionChanged(data, rows);
-				};
+				if (options.rowSelectionChanged == 'undefined')
+				{
+					options.rowSelectionChanged = function(data, rows){
+						_func_rowSelectionChanged(data, rows);
+					};
+				}
 				options.columnVisibilityChanged = function(column, visible) {
 					_func_columnVisibilityChanged(column, visible);
 				};
