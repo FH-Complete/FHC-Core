@@ -167,7 +167,7 @@ class LDAPLib
 		}
 
 		// LDAP connection
-		$ldapConnection = @ldap_connect($ldapConfigs[self::SERVER], $ldapConfigs[self::PORT]);
+		$ldapConnection = @ldap_connect($ldapConfigs[self::SERVER].':'.$ldapConfigs[self::PORT]);
 		if ($ldapConnection) // if success
 		{
 			// Sets the LDAP protocol version
