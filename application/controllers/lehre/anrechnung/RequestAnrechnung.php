@@ -316,6 +316,6 @@ class requestAnrechnung extends Auth_Controller
 		);
 		
 		// Upload document
-		return $this->dmslib->upload($dms, array('pdf'));
+		return $this->dmslib->upload($dms, 'uploadfile', array('pdf'));
 	}
 }

@@ -5,8 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class DmsLib extends FHC_Controller
 {
 	const FILE_CONTENT_PROPERTY = 'file_content';
-
-	const FILE_INPUT_NAME = 'uploadfile'; // name of the HTML input tag containing the uploaded file
+	
 	private $UPLOAD_PATH = DMS_PATH; // temporary directory to store the upload file
 
 	/**
@@ -123,19 +122,20 @@ class DmsLib extends FHC_Controller
 
 		return $result;
 	}
-
+	
 	/**
 	 * Uploads a document and saves it to DMS
 	 * @param $dms DMS assoc array
-	 * @param array $allowed_types  Default: all. Param example: array(jpg, pdf)
+	 * @param $field_name  Name of the HTML uploadfile input name attribute
+	 * @param array $allowed_types Default: all. Param example: array(jpg, pdf)
 	 * @return array
 	 */
-	public function upload($dms, $allowed_types = array('*'))
+	public function upload($dms, $field_name, $allowed_types = array('*'))
 	{
 		// Init upload configs
 		$this->_loadUploadLibrary($allowed_types);
 
-		if (!$this->ci->upload->do_upload(DmsLib::FILE_INPUT_NAME))
+		if (!$this->ci->upload->do_upload($field_name))
 		{
 			return error($this->ci->upload->display_errors());
 		}
