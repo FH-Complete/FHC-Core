@@ -9,6 +9,9 @@ $(function(){
     // Disable Form fields if Anrechnung was already applied
     requestAnrechnung.disableFormFieldsIfAntragIsApplied();
 
+    // Check Bestaetigung checkbox if Anrechnung was already applied
+    requestAnrechnung.markAsBestaetigtIfAntragIsApplied();
+
     // Init tooltips
     requestAnrechnung.initTooltips();
 
@@ -86,6 +89,14 @@ var requestAnrechnung = {
         {
             // Disable all form elements
             $("#requestAnrechnung-form :input").prop("disabled", true);
+        }
+    },
+    markAsBestaetigtIfAntragIsApplied: function(){
+        let status_kurzbz = $('#requestAnrechnung-status_kurzbz').data('status_kurzbz');
+
+        if (status_kurzbz != '')
+        {
+            $("#requestAnrechnung-form :input[name='bestaetigung']").prop('checked', true);
         }
     },
     initTooltips: function (){
