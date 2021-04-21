@@ -226,10 +226,14 @@ $this->load->view(
                                     class='fa fa-times'></i>
                         </button>
                     </div>
-                </div>
+					<span style="padding:20px;">
+						<a href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_self'>
+							<i class='fa fa-plus' aria-hidden='true'></i> <?php echo $this->p->t('global', 'antragAnlegen'); ?>
+						</a></span>
+				</div>
             </div>
             <!-- Action Buttons 'Genehmigen', Ablehnen, 'Empfehlung anfordern'-->
-            <div class="col-xs-9">
+            <div class="col-xs-8">
                 <div class="pull-right">
                     <button id="approveAnrechnungUebersicht-request-recommendation"
                             class="btn btn-default btn-w200 btn-mr50" type="button">
