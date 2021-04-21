@@ -22,7 +22,7 @@ class Zeugnisnote_model extends DB_Model
 	public function getByPerson($person_id, $studiensemester_kurzbz)
 	{
 		$qry = '
-		SELECT note.*, pers.matr_nr, lv.ects, stg.studiengang_kz, prst.prestudent_id,
+		SELECT note.*, pers.matr_nr, lv.ects, stg.studiengang_kz, prst.prestudent_id, stg.erhalter_kz,
        			UPPER(stg.typ||stg.kurzbz) AS studiengang, stg.bezeichnung AS studiengang_bezeichnung
 		FROM public.tbl_person pers
 		JOIN public.tbl_prestudent prst USING (person_id)
