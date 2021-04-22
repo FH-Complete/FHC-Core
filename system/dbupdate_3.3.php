@@ -4700,6 +4700,45 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Add Table lehre.tbl_lehrmodus
+if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrmodus LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE lehre.tbl_lehrmodus
+		(
+			lehrmodus_kurzbz varchar(32) NOT NULL,
+			bezeichnung_mehrsprachig varchar(255)[],
+			aktiv boolean DEFAULT true
+		);
+
+		ALTER TABLE lehre.tbl_lehrmodus ADD CONSTRAINT pk_lehrmodus PRIMARY KEY (lehrmodus_kurzbz);
+
+		INSERT INTO lehre.tbl_lehrmodus(lehrmodus_kurzbz, bezeichnung_mehrsprachig) VALUES('regulaer', '{\"regulaer\",\"regular\"}');
+		INSERT INTO lehre.tbl_lehrmodus(lehrmodus_kurzbz, bezeichnung_mehrsprachig) VALUES('standardisiert', '{\"standardisiert\",\"standardized\"}');
+	
+		GRANT SELECT ON lehre.tbl_lehrmodus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_lehrmodus TO vilesci;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrmodus: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_lehrmodus: Tabelle hinzugefuegt<br>';
+}
+
+//Add Column lehrmodus_kurzbz to lehre.tbl_lehrveranstaltung
+if(!@$db->db_query("SELECT lehrmodus_kurzbz FROM lehre.tbl_lehrveranstaltung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lehrmodus_kurzbz varchar(32);
+			ALTER TABLE lehre.tbl_lehrveranstaltung ADD CONSTRAINT fk_lehrveranstaltung_lehrmodus FOREIGN KEY (lehrmodus_kurzbz) REFERENCES lehre.tbl_lehrmodus(lehrmodus_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte lehrmodus_kurzbz in lehre.tbl_lehrveranstaltung hinzugefügt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
