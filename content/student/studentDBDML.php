@@ -617,10 +617,19 @@ if(!$error)
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
+				// zgv_erfuellt ergaenzt 
+				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt']; 									   
 				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
+				// zgvmas_erfuellt ergaenzt 
+				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];
+				// zgvdoktor 										  
+				$prestudent->zgvdoktor_code = $_POST['zgvdoktor_code'];
+				$prestudent->zgvdoktorort = $_POST['zgvdoktorort'];
+				$prestudent->zgvdoktordatum = $_POST['zgvdoktordatum'];
+				$prestudent->zgvdoktornation = $_POST['zgvdoktornation'];											  
 				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
 				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
@@ -2296,12 +2305,8 @@ if(!$error)
 		{
 			$dokumente = explode(';',$_POST['dokumente']);
 			$errormsg = '';
-			$sonst = 0;
 			foreach ($dokumente as $dokument_kurzbz)
 			{
-				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
-					continue;
-
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2312,8 +2317,6 @@ if(!$error)
 					$dok->insertamum = date('Y-m-d H:i:s');
 					$dok->insertvon = $user;
 					$dok->new = true;
-					if ($dokument_kurzbz === 'Sonst')
-						$sonst++;
 
 					if(!$dok->save())
 					{
@@ -2507,13 +2510,8 @@ if(!$error)
 		{
 			$dokumente = explode(';',$_POST['dokumente']);
 			$errormsg = '';
-			$sonst = 0;
-
 			foreach ($dokumente as $dokument_kurzbz)
 			{
-				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
-					continue;
-
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2524,11 +2522,6 @@ if(!$error)
 							if(!$dok->delete($dokument_kurzbz, $_POST['prestudent_id']))
 							{
 								$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
-							}
-							else
-							{
-								if ($dokument_kurzbz === 'Sonst')
-									$sonst++;
 							}
 						}
 						else
