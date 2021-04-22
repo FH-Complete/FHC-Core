@@ -46,7 +46,7 @@ $sprache_obj = new sprache();
 $sprache_obj->load($sprache);
 $sprache_index = $sprache_obj->index;
 
-$uid = 'oesi';//get_uid();
+$uid = get_uid();
 
 //Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
 //des uebergebenen Users anzeigen
@@ -57,7 +57,7 @@ if (isset($_GET['uid']))
 
 	if ($rechte->isBerechtigt('admin'))
 	{
-		$uid = "oesi";//$_GET['uid'];
+		$uid = $_GET['uid'];
 	}
 	else
 	{
