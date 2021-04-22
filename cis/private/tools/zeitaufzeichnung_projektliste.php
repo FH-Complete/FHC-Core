@@ -46,7 +46,7 @@ $sprache_obj = new sprache();
 $sprache_obj->load($sprache);
 $sprache_index = $sprache_obj->index;
 
-$uid = get_uid();
+$uid = 'oesi';//get_uid();
 
 //Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
 //des uebergebenen Users anzeigen
@@ -57,7 +57,7 @@ if (isset($_GET['uid']))
 
 	if ($rechte->isBerechtigt('admin'))
 	{
-		$uid = $_GET['uid'];
+		$uid = "oesi";//$_GET['uid'];
 	}
 	else
 	{
@@ -90,6 +90,7 @@ $ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$d
 $projektlines = array();
 $dayStart = $dayEnd = '';
 $projektnames = $projektphasenames = $tosubtract = $allpauseranges = array();
+$projektTiteles = array();
 $activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde'];//aktivitaetstypen which should be subtracted fromworktime
 $ztaufdata = $ztauf->result;
 $totalmonthsum = 0.00;
@@ -281,7 +282,12 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 
 			//add new projekt to array with unique projekt names
 			if (!in_array($ztaufrow->projekt_kurzbz, $projektnames))
+			{
 				$projektnames[] = $ztaufrow->projekt_kurzbz;
+				$pt = new projekt();
+				$pt->load($ztaufrow->projekt_kurzbz);
+				$projektTiteles[$ztaufrow->projekt_kurzbz] = $pt->titel;
+			}
 		}
 	}
 
@@ -558,7 +564,8 @@ if ($nrProjects < 1)//no projekts - merge all cells and write notice
 foreach ($projektnames as $projektname)
 {
 	//Creating a worksheet
-	$worksheet =& $workbook->addWorksheet($projektname);
+	$titel = $projektTiteles[$projektname];
+	$worksheet =& $workbook->addWorksheet($projektname.' ('.$titel.')');
 	$worksheet->setInputEncoding('utf-8');
 
 	//general options
