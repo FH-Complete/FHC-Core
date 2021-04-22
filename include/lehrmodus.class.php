@@ -19,18 +19,29 @@
  */
 
 require_once(dirname(__FILE__) . '/basis_db.class.php');
-require_once(dirname(__FILE__) . '/functions.inc.php');
 require_once(dirname(__FILE__).'/sprache.class.php');
 
 class lehrmodus extends basis_db {
 
-	public $result = array();
+	public $new;
+	//Objekt Lehrmodus
+	public $lehrmodus = array();
+
+	//Tabellenspalten
 	public $lehrmodus_kurzbz;
 	public $bezeichnung_mehrsprachig;
+	public $aktiv;
 
+	/**
+	 * Konstruktor - Laedt optional einen Lehrmodus
+	 * @param $lehrmodus_kurbz Lehrmodus der geladen werden soll
+	 */
 	public function __construct()
 	{
 		parent::__construct();
+
+		if(!is_null($lehrmodus_kurzbz))
+			$this->load($lehrmodus_kurzbz);
 
 	}
 
@@ -41,65 +52,90 @@ class lehrmodus extends basis_db {
 	 */
 	public function load($lehrmodus_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrmodus WHERE lehrmodus_kurzbz = ".$this->db_add_param($lehrmodus_kurzbz).";";
+		$sprache = new sprache();
+		$qry = "SELECT *,".$sprache->getSprachQuery('bezeichnung_mehrsprachig')." FROM lehre.tbl_lehrmodus WHERE lehrmodus_kurzbz=".$this->db_add_param($lehrmodus_kurzbz).";";
 
 		if(!$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Lesen vom Lehrmodus';
 			return false;
 		}
 
 		if($row = $this->db_fetch_object())
 		{
 			$this->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
-			$this->bezeichnung_mehrsprachig = $row->bezeichnung_mehrsprachig;
+			$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrprachig',$row);
 		}
 		else
 		{
-			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
+			$this->errormsg = 'Es ist kein Lehrmodus mit dieser ID vorhanden';
 			return false;
 		}
 		return true;
 	}
 
 	/**
-	* Laedt alle Lehrmodi aus der table tbl_lehrmodus
+	* Liefert alle Lehrmodi aus der table tbl_lehrmodus
 	* @return true wenn ok, false im Fehlerfall
 	*/
 	public function getAll(){
-		$qry = "SELECT * FROM lehre.tbl_lehrmodus;";
+		$sprache = new sprache();
+		$qry = "SELECT *,".$sprache->getSprachQuery('bezeichnung_mehrsprachig')." FROM lehre.tbl_lehrmodus ORDER BY lehrmodus_kurzbz;";
+
 		if (!$this->db_query($qry)) {
-			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			$this->errormsg = 'Fehler beim Lesen Lehrmodus';
 			return false;
 		}
 
-		while ($row = $this->db_fetch_object()) {
-			$lehrmodus = new lehrmodus();
-			$lehrmodus->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
-			$lehrmodus->bezeichnung_mehrsprachig = $row->bezeichnung_mehrsprachig;
-			$this->result[] = $lehrmodus;
+		while ($row = $this->db_fetch_object())
+		{
+			$lm = new lehrmodus();
+
+			$lm->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
+			$lm->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
+			$this->lehrmodus[] = $lm;
 		}
 		return true;
 	}
 
 	/**
-	 * Baut die Datenstruktur für senden als JSON Objekt auf
+	 * Speichert den Lehrmodus in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function cleanResult()
-	{
-		$data = array();
-		if(count($this->result)>0)
-		{
-			foreach ($this->result as $lt)
-			{
-				$obj = new stdClass();
-				$obj->lehrtyp_kurzbz = $lt->lehrtyp_kurzbz;
-				$obj->bezeichnung = $lt->bezeichnung;
-				$data[] = $obj;
-			}
-		}
-		return $data;
-	}
+	// public function save()
+	// {
+	// 	//Variablen auf Gueltigkeit pruefen
+	// 	// if(!$this->validate())
+	// 	// 	return false;
+	//
+	// 	if($this->new)
+	// 	{
+	// 		$qry = "INSERT INTO lehre.tbl_lehrmodus (lehrmodus_kurzbz, bezeichnung, verplanen)
+	// 		        VALUES(".$this->db_add_param($this->lehrform_kurzbz).",".
+	// 				$this->db_add_param($this->bezeichnung).','.
+	// 				$this->db_add_param($this->verplanen, FHC_BOOLEAN).');';
+	// 	}
+	// 	else
+	// 	{
+	// 		$qry = 'UPDATE lehre.tbl_lehrform SET'.
+	// 		       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+	// 		       ' verplanen='.$this->db_add_param($this->verplanen, FHC_BOOLEAN).
+	// 		       " WHERE lehrform_kurzbz=".$this->db_add_param($this->lehrform_kurzbz).';';
+	// 	}
+	//
+	// 	if($this->db_query($qry))
+	// 	{
+	// 		//Log schreiben
+	// 		return true;
+	// 	}
+	// 	else
+	// 	{
+	// 		$this->errormsg = 'Fehler beim Speichern der Lehrform:'.$qry;
+	// 		return false;
+	// 	}
+	// }
 }
 
 ?>
