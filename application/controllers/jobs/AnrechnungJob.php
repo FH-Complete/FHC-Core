@@ -100,7 +100,9 @@ class AnrechnungJob extends JOB_Controller
 	{
 		$this->logInfo('Start AnrechnungJob to send emails to STGL about yesterdays new Anrechnungen.');
 		
-		// Get all yesterdays Anrechnungen
+		// Get all yesterdays Anrechnungen, that did not process further than first status
+		// (If Anrechnung is new, but STGL already started the process yesterday,
+		// he does not need to be informed about this new Anrechnung anymore)
 		$this->AnrechnungModel->addSelect('anrechnung_id, studiensemester_kurzbz, lv.studiengang_kz, lv.bezeichnung, vorname, nachname');
 		$this->AnrechnungModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
 		$this->AnrechnungModel->addJoin('public.tbl_student student', 'prestudent_id');
@@ -109,7 +111,8 @@ class AnrechnungJob extends JOB_Controller
 		$this->AnrechnungModel->addOrder('lv.studiengang_kz, lv.bezeichnung');
 		
 		$result = $this->AnrechnungModel->loadWhere(
-			'(lehre.tbl_anrechnung.insertamum)::date = (NOW() - INTERVAL \'24 HOURS\')::DATE'
+			'(lehre.tbl_anrechnung.insertamum)::date = (NOW() - INTERVAL \'24 HOURS\')::DATE
+			AND 1 = (SELECT COUNT(*) FROM lehre.tbl_anrechnung_anrechnungstatus status WHERE status.anrechnung_id = tbl_anrechnung.anrechnung_id)'
 		);
 		
 		// Exit if there are no Anrechnungen
