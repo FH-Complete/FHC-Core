@@ -219,48 +219,6 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-
-		//Lehrform Speichern
-		//userstory #12645: only $write_admin
-		if(isset($_POST['lf']))
-		{
-			$lv_obj = new lehrveranstaltung();
-			if($lv_obj->load($_POST['lvid']))
-			{
-				$lv_obj->lehrform_kurzbz = $_POST['lf'];
-				$lv_obj->updateamum = date('Y-m-d H:i:s');
-				$lv_obj->updatevon = $user;
-				if($lv_obj->save(false))
-					exit('true');
-				else
-					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
-			}
-			else
-				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
-		}
-
-		//Lehrtyp Speichern
-		//userstory #12645: only $write_admin
-		if(isset($_POST['lt']))
-		{
-			$lv_obj = new lehrveranstaltung();
-			if($lv_obj->load($_POST['lvid']))
-			{
-				$lv_obj->lehrtyp_kurzbz = $_POST['lt'];
-				$lv_obj->updateamum = date('Y-m-d H:i:s');
-				$lv_obj->updatevon = $user;
-				if($lv_obj->save(false))
-					exit('true');
-				else
-					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
-			}
-			else
-				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
-		}
-	}
-	else
-	{
-		exit('Keine Berechtigung, um Lehrveranstaltungen zu bearbeiten!');
 	}
 
 	if($write_low || $write_admin)
@@ -354,6 +312,42 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			if($lv_obj->load($_POST['lvid']))
 			{
 				$lv_obj->koordinator=$_POST['fbk'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
+
+		//Lehrform Speichern
+		if(isset($_POST['lf']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrform_kurzbz = $_POST['lf'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
+
+		//Lehrtyp Speichern
+		if(isset($_POST['lt']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrtyp_kurzbz = $_POST['lt'];
 				$lv_obj->updateamum = date('Y-m-d H:i:s');
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
@@ -473,8 +467,7 @@ if($result = $db->db_query($qry))
 	}
 }
 
-//Lehrveranstaltungen holen
-
+//Lehrveranstaltungen mit OEs holen
 $sql_query = "
 	SELECT
 	tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz,
@@ -485,7 +478,7 @@ $sql_query = "
 		LEFT JOIN lehre.tbl_lehrveranstaltung  as lehrfach on (lehre.tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id)
 		LEFT JOIN public.tbl_organisationseinheit ON (public.tbl_organisationseinheit.oe_kurzbz = lehre.tbl_lehrveranstaltung.oe_kurzbz)
 	where
-		lehre.tbl_lehrveranstaltung.bezeichnung != 'NULL'
+		true
 ";
 
 if($stg_kz!='')
@@ -1081,37 +1074,64 @@ if ($result_lv!=0)
 		echo '</td>';
 
 		//Lehrform
-		echo '<td style="white-space:nowrap;">';
-		echo '<SELECT style="width:80px;" id="lf'.$row->lehrveranstaltung_id.'">';
-		echo '<option value="">--</option>';
-		foreach ($lf as $lehrform=>$lf_kz)
+		if($write_admin)
 		{
-			if($lehrform==$row->lehrform_kurzbz)
-				$selected='selected';
-			else
-				$selected='';
-			echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
+			echo '<td style="white-space:nowrap;">';
+			echo '<SELECT style="width:80px;" id="lf'.$row->lehrveranstaltung_id.'">';
+			echo '<option value="">--</option>';
+			foreach ($lf as $lehrform=>$lf_kz)
+			{
+				if($lehrform == $row->lehrform_kurzbz)
+					$selected='selected';
+				else
+					$selected='';
+				echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
+			}
+			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
+			echo '</td>';
 		}
-		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
-		echo '</td>';
+		else
+		{
+			echo '<td>';
+			foreach ($lf as $lehrform=>$lf_kz)
+			{
+				if($lehrform == $row->lehrform_kurzbz)
+					echo $db->convert_html_chars($lf_kz['lehrform_kurzbz']). ' '. $db->convert_html_chars($lf_kz['bezeichnung']);
+			}
+			echo '</td>';
+		}
 
 		//Lehrtyp
-		echo '<td style="white-space:nowrap;">';
-		echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
-		echo '<option value="">--</option>';
-		foreach ($lt as $lehrtyp=>$lt_kz)
+		if($write_admin)
 		{
-			if($lehrtyp==$row->lehrtyp_kurzbz)
-				$selected='selected';
-			else
-				$selected='';
-			echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
+			echo '<td style="white-space:nowrap;">';
+			echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
+			echo '<option value="">--</option>';
+			foreach ($lt as $lehrtyp=>$lt_kz)
+			{
+				if($lehrtyp == $row->lehrtyp_kurzbz)
+					$selected='selected';
+				else
+					$selected='';
+				echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
+			}
+			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrtyp(\''.$row->lehrveranstaltung_id.'\',$(\'#lt'.$row->lehrveranstaltung_id.'\').val())">';
+			echo '</td>';
 		}
-		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrtyp(\''.$row->lehrveranstaltung_id.'\',$(\'#lt'.$row->lehrveranstaltung_id.'\').val())">';
-		echo '</td>';
+		else
+		{
+			echo '<td>';
+			foreach ($lt as $lehrtyp=>$lt_kz)
+			{
+				if($lehrtyp == $row->lehrtyp_kurzbz)
+					echo $db->convert_html_chars($lt_kz['bezeichnung']);
+			}
+			echo '</td>';
+		}
 
 		//Studiengang
 		echo '<td>'.$db->convert_html_chars($s[$row->studiengang_kz]->kurzbz).'</td>';
+
 		//Organisationsform
 		echo '<td style="white-space:nowrap;">';
 		echo ($row->orgform_kurzbz!=''?$db->convert_html_chars($row->orgform_kurzbz):'&nbsp;');
