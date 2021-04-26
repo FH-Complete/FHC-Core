@@ -82,7 +82,7 @@ else
 	$fachbereich_kurzbz = '';
 
 
-$oe_organisationseinheit='';
+$oe_organisationseinheit = '';
 if (isset($_REQUEST['oe_kurzbz']))
 {
 	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
@@ -95,7 +95,7 @@ if (isset($_REQUEST['oe_kurzbz']))
 	}
 }
 else
-	$oe_kurzbz='';
+	$oe_kurzbz = '';
 
 if (isset($_REQUEST['orgform']))
 {
@@ -419,6 +419,7 @@ if($result = $db->db_query($qry))
 	}
 }
 
+
 //Fachbereichskoordinatoren holen
 $fb_kurzbz='';
 if($stg_kz!='')
@@ -621,22 +622,23 @@ $outp.='</SELECT>';
 
 $outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary style="float:right">Erweiterte Suchoptionen</summary><hr></hr>';
 
-	//Organisationseinheit Dropdown
-	$outp .= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
-	$oe = new organisationseinheit();
-	$oe->getAll();
-	foreach($oe->result as $row)
-	{
+//Organisationseinheit Dropdown
+$outp .= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
+$oe = new organisationseinheit();
+$oe->getAll();
+foreach($oe->result as $row)
+{
 	if($oe_kurzbz == $row->oe_kurzbz)
 		$selected = 'selected';
 	else
 		$selected = '';
-	$outp .= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
-	}
-	$outp .= '</select>';
+		$outp .= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'
+		.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
+}
+$outp .= '</select>';
 
 	//Lehrveranstaltung ID Input
-	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
+	$outp .= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
 
 	//Lehrveranstaltung Suche Bezeichnung
 	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 450px" id="lehrveranstaltung_name"
@@ -1079,13 +1081,15 @@ if ($result_lv!=0)
 			echo '<td style="white-space:nowrap;">';
 			echo '<SELECT style="width:80px;" id="lf'.$row->lehrveranstaltung_id.'">';
 			echo '<option value="">--</option>';
-			foreach ($lf as $lehrform=>$lf_kz)
+			foreach ($lf as $lehrform => $lf_kz)
 			{
 				if($lehrform == $row->lehrform_kurzbz)
-					$selected='selected';
+					$selected = 'selected';
 				else
-					$selected='';
-				echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
+					$selected = '';
+				echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'
+				.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '
+				.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
 			}
 			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
 			echo '</td>';
@@ -1093,7 +1097,7 @@ if ($result_lv!=0)
 		else
 		{
 			echo '<td>';
-			foreach ($lf as $lehrform=>$lf_kz)
+			foreach ($lf as $lehrform => $lf_kz)
 			{
 				if($lehrform == $row->lehrform_kurzbz)
 					echo $db->convert_html_chars($lf_kz['lehrform_kurzbz']). ' '. $db->convert_html_chars($lf_kz['bezeichnung']);
@@ -1107,13 +1111,14 @@ if ($result_lv!=0)
 			echo '<td style="white-space:nowrap;">';
 			echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
 			echo '<option value="">--</option>';
-			foreach ($lt as $lehrtyp=>$lt_kz)
+			foreach ($lt as $lehrtyp => $lt_kz)
 			{
 				if($lehrtyp == $row->lehrtyp_kurzbz)
-					$selected='selected';
+					$selected = 'selected';
 				else
-					$selected='';
-				echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
+					$selected = '';
+				echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'
+				.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
 			}
 			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrtyp(\''.$row->lehrveranstaltung_id.'\',$(\'#lt'.$row->lehrveranstaltung_id.'\').val())">';
 			echo '</td>';
@@ -1121,7 +1126,7 @@ if ($result_lv!=0)
 		else
 		{
 			echo '<td>';
-			foreach ($lt as $lehrtyp=>$lt_kz)
+			foreach ($lt as $lehrtyp => $lt_kz)
 			{
 				if($lehrtyp == $row->lehrtyp_kurzbz)
 					echo $db->convert_html_chars($lt_kz['bezeichnung']);
