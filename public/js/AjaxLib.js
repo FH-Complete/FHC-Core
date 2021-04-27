@@ -380,6 +380,70 @@ var FHC_AjaxClient = {
 	},
 
 	/**
+	 * Check if controllerParameters is a FormData object.
+	 * FormData objects can contain uploaded files.
+	 *
+	 * @param controllerParameters
+	 * 			Example: new FormData(selector)[0]
+	 * @returns {boolean}
+	 * @private
+	 */
+	_isFormDataObject(controllerParameters){
+		return controllerParameters instanceof FormData;
+	},
+
+	/**
+	 * Check if controllerParameters has a FileList of uploaded file(s).
+	 *
+	 * @param controllerParameters
+	 * 			Example: {
+	 * 			    name1: value,
+	 * 			    name2: value,
+	 * 			    files: $(selector)[0].files --> this is the FileList
+	 * 			}
+	 * @returns {boolean}
+	 * @private
+	 */
+	_hasFileList(controllerParameters){
+		return Object.values(controllerParameters)
+			.some((value) => value instanceof FileList === true);
+	},
+
+	/**
+	 * Returns a FormData object. Useful for passing uploaded files via AJAX.
+	 *
+	 * @param controllerParameters
+	 * @returns {FormData}
+	 * @private
+	 */
+	_convertToFormDataObject: function(controllerParameters)
+	{
+		// The new FormData instance
+		const formData = new FormData();
+
+		// Loop through controllerParameters
+		for (const [key, value] of Object.entries(controllerParameters)) {
+
+			// When FileList is found ( parameter with uploaded file(s))
+			if (value instanceof FileList)
+			{
+				// Loop through uploaded files
+				for (let file of value)
+				{
+					// Append file to FormData object (if more than 1 file, append as array)
+					formData.append(value.length == 1 ? key : key + '[]', file);
+				}
+			}
+			else
+			{
+				// For any other then FileList, just append to FormData object
+				formData.append(key, value);
+			}
+		}
+		return formData;
+	},
+
+	/**
 	 * Checks call parameters, if they are present and are valid
 	 * It generates and returns all the parameters needed to perform an ajax remote call
 	 * NOTE: console.error is used here because those are not messages for the final user,
@@ -419,8 +483,23 @@ var FHC_AjaxClient = {
 	    // controllerParameters must be an object
 	    if (typeof controllerParameters == "object")
 	    {
-			// Copy the properties of controllerParameters into a new object
-			var data = FHC_AjaxClient._cpObjProps(controllerParameters);
+			// If controllerParameters is a FormData object.
+			if (FHC_AjaxClient._isFormDataObject(controllerParameters))
+			{
+				var data = controllerParameters;	// data is a FormData object now
+			}
+			// If controllerParameters contains uploaded file(s) as FileList
+			else if (FHC_AjaxClient._hasFileList(controllerParameters))
+			{
+				// Convert controllerParameters to FormData object to easily pass uploaded files via AJAX
+				var data = FHC_AjaxClient._convertToFormDataObject(controllerParameters);	// data is a FormData object now
+			}
+			// Anything else
+			else
+			{
+				// Copy the properties of controllerParameters into a new object
+				var data = FHC_AjaxClient._cpObjProps(controllerParameters);
+			}
 
 			// fhc_controller_id is given if present
 			data[FHC_CONTROLLER_ID] = FHC_AjaxClient.getUrlParameter(FHC_CONTROLLER_ID);
@@ -430,6 +509,14 @@ var FHC_AjaxClient = {
 			//		so the variable data is saved also in _data and it will be used later
 			ajaxParameters.data = data;
 			ajaxParameters._data = data;
+
+			// Finally, if data is a FormData object...
+			if (data instanceof FormData)
+			{
+				//...add options to tell jQuery not to process data or worry about content-type
+				ajaxParameters.processData = false;
+				ajaxParameters.contentType = false;
+			}
 	    }
 		else
 		{
