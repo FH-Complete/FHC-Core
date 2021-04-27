@@ -157,7 +157,7 @@ $this->load->view(
 <!-- Submit Button -->
 <div class="row">
 	<div class="col-lg-10">
-		<button class="btn btn-primary btn-w200 pull-right" id="createAnrechnung-submit" type="button" value="submit">
+		<button class="btn btn-primary btn-w200 pull-right" id="createAnrechnung-submit" type="submit" value="submit">
 			<?php echo $this->p->t('global', 'antragAnlegen'); ?>
 		</button>
 	</div>

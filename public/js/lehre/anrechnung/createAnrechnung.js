@@ -4,38 +4,33 @@ $(function () {
     createAnrechnung.disableFormFields();
 
     // Create Anrechnung on form submit
-    $('#createAnrechnung-submit').click(function(e){
+    $('#createAnrechnung-form').submit(function(e){
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/create",
+            new FormData(this),
+            {
+                successCallback: function (data, textStatus, jqXHR)
+                {
+                    if (FHC_AjaxClient.isError(data))
+                    {
+                        FHC_DialogLib.alertWarning(FHC_AjaxClient.getError(data));
+                    }
+
+                    if (FHC_AjaxClient.hasData(data))
+                    {
+                        FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data));
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            }
+        );
 
         // Avoid form redirecting automatically
-        e.preventDefault();
-
-        // Get form data
-        let formData = new FormData($('#createAnrechnung-form')[0]);
-
-        $.ajax({
-            url : "CreateAnrechnung/create",
-            type: "POST",
-            data : formData,
-            processData: false, // needed to pass uploaded file with FormData
-            contentType: false, // needed to pass uploaded file with FormData
-            success:function(data, textStatus, jqXHR){
-
-                if (FHC_AjaxClient.isError(data))
-                {
-                    FHC_DialogLib.alertWarning(FHC_AjaxClient.getError(data));
-                }
-
-                if (FHC_AjaxClient.hasData(data))
-                {
-                   FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data));
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown){
-
-                FHC_DialogLib.alertWarning(FHC_PhrasesLib.t("ui", "systemfehler"));
-
-            }
-        });
+        return false;
     });
 
 })

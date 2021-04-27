@@ -32,33 +32,32 @@ $(function(){
             return FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "errorBestaetigungFehlt"));
         }
 
-        $.ajax({
-            url : "RequestAnrechnung/apply",
-            type: "POST",
-            data : formdata,
-            processData: false, // needed to pass uploaded file with FormData
-            contentType: false, // needed to pass uploaded file with FormData
-            success:function(data, textStatus, jqXHR){
-                if (data.error && data.retval != null)
-                {
-                    FHC_DialogLib.alertWarning(data.retval);
-                }
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/apply",
+            formdata,
+            {
+                successCallback:function(data, textStatus, jqXHR){
+                    if (FHC_AjaxClient.isError(data))
+                    {
+                        FHC_DialogLib.alertWarning(FHC_AjaxClient.getError(data));
+                    }
 
-                if (!data.error && data.retval != null)
-                {
-                      requestAnrechnung.formatAnrechnungIsApplied(
-                        data.retval.antragdatum,
-                        data.retval.dms_id,
-                        formdata.get('uploadfile').name
-                    );
+                    if (FHC_AjaxClient.hasData(data))
+                    {
+                        requestAnrechnung.formatAnrechnungIsApplied(
+                            data.retval.antragdatum,
+                            data.retval.dms_id,
+                            formdata.get('uploadfile').name
+                        );
 
-                    FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("global", "antragWurdeGestellt"));
+                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("global", "antragWurdeGestellt"));
+                    }
+                },
+                errorCallback: function(jqXHR, textStatus, errorThrown){
+                    FHC_DialogLib.alertWarning(FHC_PhrasesLib.t("ui", "systemfehler"));
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown){
-                FHC_DialogLib.alertWarning(FHC_PhrasesLib.t("ui", "systemfehler"));
             }
-        });
+        );
     });
 })
 
