@@ -217,7 +217,7 @@ if ($num_rows > 0)
 		 && CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
 		{
 			$vertrag = new vertrag();
-			if (!$vertrag->isVertragErteiltLV($row->lehrveranstaltung_id, $stdsem, $user))
+			if (!$vertrag->isVertragErteiltLE($row->lehreinheit_id, $stdsem, $user))
 			{
 				continue;
 			}

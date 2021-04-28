@@ -220,7 +220,7 @@ class Pruefungsprotokoll extends Auth_Controller
 		$nullfields = array('uhrzeit', 'endezeit', 'abschlussbeurteilung_kurzbz', 'protokoll');
 		foreach ($data as $idx => $item)
 		{
-			if (in_array($idx, $nullfields) & $item === '')
+			if (in_array($idx, $nullfields) && $item === '')
 				$data[$idx] = null;
 		}
 

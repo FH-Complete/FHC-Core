@@ -30,6 +30,7 @@ require_once('../../../include/student.class.php');
 require_once('../../../include/akte.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/webservicelog.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -84,6 +85,19 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 				header("Content-type: $akte->mimetype");
 				header('Content-Disposition: attachment; filename="'.$akte->titel.'"');
 				echo base64_decode($akte->inhalt);
+
+				//Log bei einem Download vom Becheid
+				if ((isset($akte->dokument_kurzbz) && !empty($akte->dokument_kurzbz)) && ($akte->dokument_kurzbz === 'Bescheid' || $akte->dokument_kurzbz === 'BescheidEng'))
+				{
+					$log = new Webservicelog();
+					$log->webservicetyp_kurzbz = 'content';
+					$log->request_id = (isset($akte->akte_id) && !empty($akte->akte_id)) ? $akte->akte_id : NULL;
+					$log->beschreibung = 'Bescheidbestaetigungsdownload';
+					$log->request_data = $_SERVER['QUERY_STRING'];
+					$log->execute_user = get_uid();
+					$log->save(true);
+				}
+
 				exit;
 			}
 			else
