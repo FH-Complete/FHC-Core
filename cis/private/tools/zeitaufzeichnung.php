@@ -1145,7 +1145,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
 				<td colspan="3"><SELECT '.$oestyle.' name="oe_kurzbz_1">';
 			$oe = new organisationseinheit();
-			$oe->getFrequent($user,'180','3',true);
+			$oe->getFrequent($user,'180','3',true, array('oezuordnung', 'fachzuordnung', 'kstzuordnung'));
 			$trennlinie = true;
 
 			echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
@@ -1532,7 +1532,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 							$langindex = 1;
 						else
 							$langindex = 2;
-						echo '<b>'.$tagbez[$langindex][$datum->formatDatum($tag,'N')].' '.$datum->formatDatum($tag,'d.m.Y').'</b> <span id="tag_'.$datum->formatDatum($tag,'d_m_Y').'">'.$zeitsperre_text.'</span>'.$pausefehlt_str;
+						echo '<span style="display: inline-block; width: 130px;"><b>'.$tagbez[$langindex][$datum->formatDatum($tag,'N')].' '.$datum->formatDatum($tag,'d.m.Y').'</b></span><span id="tag_'.$datum->formatDatum($tag,'d_m_Y').'">'.$zeitsperre_text.'</span>'.$pausefehlt_str;
 						if ($ersumme != '00:00')
 							$erstr = ' (+ '.$ersumme.' ER)';
 						else
