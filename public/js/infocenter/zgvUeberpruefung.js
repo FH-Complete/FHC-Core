@@ -61,9 +61,6 @@ $(document).ready(function ()
 var zgvUeberpruefung = {
 	checkStatus: function(prestudent_id)
 	{
-		if (prestudent_id === undefined)
-			prestudent_id = zgvUeberpruefung.getPrestudentId();
-
 		FHC_AjaxClient.ajaxCallGet(
 			"system/infocenter/ZGVUeberpruefung/getZgvStatusByPrestudent",
 			{
