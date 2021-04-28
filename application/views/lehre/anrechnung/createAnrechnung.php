@@ -129,7 +129,6 @@ $this->load->view(
 				<th class="col-xs-5 col-lg-2"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></th>
 				<td>
 					<?php echo form_textarea(array(
-						'id' => 'textarea-herkunftKenntnisse',
 						'name' => 'herkunftKenntnisse',
 						'rows' => 1
 					)); ?>
@@ -140,11 +139,11 @@ $this->load->view(
 				<th class="col-xs-5 col-lg-2"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?> *</th>
 				<td>
 					<div><?php echo form_upload(array(
-							'id' => 'upload-nachweisdokumente',
 							'name' => 'uploadfile',
 							'accept' => '.pdf',
 							'size' => '50',
-							'required' => 'required'
+							'required' => 'required',
+							'enctype' => "multipart/form-data"
 							)); ?>
 					</div>
 					<a class="pull-right" id="download-nachweisdokumente"></a>

@@ -6,9 +6,18 @@ $(function () {
     // Create Anrechnung on form submit
     $('#createAnrechnung-form').submit(function(e){
 
+        e.preventDefault();
+
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/create",
-            new FormData(this),
+            {
+                prestudent_id: this.prestudent_id.value,
+                studiensemester_kurzbz: this.studiensemester_kurzbz.value,
+                lehrveranstaltung_id: this.lehrveranstaltung_id.value,
+                begruendung_id: this.begruendung_id.value,
+                herkunftKenntnisse: this.herkunftKenntnisse.value,
+                uploadfile: this.uploadfile.files
+            },
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
@@ -28,11 +37,7 @@ $(function () {
                 }
             }
         );
-
-        // Avoid form redirecting automatically
-        return false;
     });
-
 })
 
 // TABULATOR FUNCTIONS

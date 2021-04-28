@@ -179,7 +179,8 @@ class requestAnrechnung extends Auth_Controller
 		// Output to AJAX
 		$this->outputJsonSuccess(array(
 			'antragdatum' => (new DateTime())->format('d.m.Y'),
-			'dms_id' => $lastInsert_dms_id
+			'dms_id' => $lastInsert_dms_id,
+			'filename' => $_FILES['uploadfile']['name']
 		));
 	}
 

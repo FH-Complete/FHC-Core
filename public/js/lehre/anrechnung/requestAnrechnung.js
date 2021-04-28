@@ -18,23 +18,21 @@ $(function(){
     // Set chars counter for textarea 'Herkunft der Kenntnisse'
     requestAnrechnung.setCharsCounter();
 
-    $('#requestAnrechnung-apply-anrechnung').click(function(e){
+    $('#requestAnrechnung-form').submit(function(e){
 
         // Avoid form redirecting automatically
         e.preventDefault();
 
-        // Get form data
-        let formdata = new FormData($('#requestAnrechnung-form')[0]);
-
-        // These field MUST be activated
-        if (!formdata.has('bestaetigung'))
-        {
-            return FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "errorBestaetigungFehlt"));
-        }
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/apply",
-            formdata,
+            {
+                anmerkung: this.anmerkung.value,
+                begruendung: this.begruendung.value,
+                lv_id: this.lv_id.value,
+                studiensemester: this.studiensemester.value,
+                bestaetigung: this.bestaetigung.value,
+                uploadfile: this.uploadfile.files
+            },
             {
                 successCallback:function(data, textStatus, jqXHR){
                     if (FHC_AjaxClient.isError(data))
@@ -47,7 +45,7 @@ $(function(){
                         requestAnrechnung.formatAnrechnungIsApplied(
                             data.retval.antragdatum,
                             data.retval.dms_id,
-                            formdata.get('uploadfile').name
+                            data.retval.filename
                         );
 
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("global", "antragWurdeGestellt"));

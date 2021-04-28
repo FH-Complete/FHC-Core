@@ -380,19 +380,6 @@ var FHC_AjaxClient = {
 	},
 
 	/**
-	 * Check if controllerParameters is a FormData object.
-	 * FormData objects can contain uploaded files.
-	 *
-	 * @param controllerParameters
-	 * 			Example: new FormData(selector)[0]
-	 * @returns {boolean}
-	 * @private
-	 */
-	_isFormDataObject(controllerParameters){
-		return controllerParameters instanceof FormData;
-	},
-
-	/**
 	 * Check if controllerParameters has a FileList of uploaded file(s).
 	 *
 	 * @param controllerParameters
@@ -483,16 +470,15 @@ var FHC_AjaxClient = {
 	    // controllerParameters must be an object
 	    if (typeof controllerParameters == "object")
 	    {
-			// If controllerParameters is a FormData object.
-			if (FHC_AjaxClient._isFormDataObject(controllerParameters))
-			{
-				var data = controllerParameters;	// data is a FormData object now
-			}
 			// If controllerParameters contains uploaded file(s) as FileList
-			else if (FHC_AjaxClient._hasFileList(controllerParameters))
+			if (FHC_AjaxClient._hasFileList(controllerParameters))
 			{
 				// Convert controllerParameters to FormData object to easily pass uploaded files via AJAX
 				var data = FHC_AjaxClient._convertToFormDataObject(controllerParameters);	// data is a FormData object now
+
+				// Add options to tell jQuery not to process data or worry about content-type
+				ajaxParameters.processData = false;
+				ajaxParameters.contentType = false;
 			}
 			// Anything else
 			else
@@ -509,14 +495,6 @@ var FHC_AjaxClient = {
 			//		so the variable data is saved also in _data and it will be used later
 			ajaxParameters.data = data;
 			ajaxParameters._data = data;
-
-			// Finally, if data is a FormData object...
-			if (data instanceof FormData)
-			{
-				//...add options to tell jQuery not to process data or worry about content-type
-				ajaxParameters.processData = false;
-				ajaxParameters.contentType = false;
-			}
 	    }
 		else
 		{

@@ -24,7 +24,8 @@ $this->load->view(
                 'inBearbeitung',
                 'neu',
 				'maxZeichen',
-                'errorBestaetigungFehlt'
+                'errorBestaetigungFehlt',
+				'systemfehler'
 			),
 			'person' => array(
 				'student',
