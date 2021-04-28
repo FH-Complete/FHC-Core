@@ -128,7 +128,7 @@
 								<button type="button" class="btn btn-default zgvAkzeptierenPruefung" id="zgvAkzeptierenPruefung_<?php echo $prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'zgvErfuelltPruefung') ?>
 								</button>
-								<span class="zgvStatusText_" id="zgvStatusText_<?php echo $prestudent_id ?>">
+								<span class="zgvStatusText" id="zgvStatusText_<?php echo $prestudent_id ?>" data-info="need">
 								</span>
 							</div>
 						</div> <!-- ./panel -->

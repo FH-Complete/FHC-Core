@@ -893,6 +893,8 @@ var InfocenterDetails = {
 				}
 			}
 		);
+
+		zgvUeberpruefung.checkAfterReload();
 	},
 	_refreshMessages: function()
 	{

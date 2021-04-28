@@ -2,17 +2,7 @@ $(document).ready(function ()
 {
 	var personid = $("#hiddenpersonid").val();
 
-	if ($('#zgvpruefungen').length)
-	{
-		$('#zgvpruefungen .zgvRueckfragen').each(function() {
-			if($(this).is(':disabled')) {
-				zgvUeberpruefung.checkStatus(InfocenterDetails._getPrestudentIdFromElementId($(this).attr('id')));
-			}
-		});
-	} else
-	{
-		zgvUeberpruefung.checkStatus();
-	}
+	zgvUeberpruefung.checkAfterReload();
 
 	$('.zgvRueckfragen').click(function ()
 	{
@@ -86,6 +76,7 @@ var zgvUeberpruefung = {
 						$('#zgvBearbeitungButtons_' + prestudent_id +' button').each(function() {
 							$(this).attr('disabled', false);
 						});
+
 						var status = FHC_AjaxClient.getData(data);
 
 						switch (status)
@@ -141,6 +132,7 @@ var zgvUeberpruefung = {
 							InfocenterDetails.setPersonOnHold(response.person_id, formatedDate);
 						}
 
+						InfocenterDetails._refreshLog();
 						FHC_DialogLib.alertSuccess(response.msg);
 					} else if(FHC_AjaxClient.isError(data))
 						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
@@ -155,6 +147,7 @@ var zgvUeberpruefung = {
 
 	zgvStatusUpdate: function(data)
 	{
+		var prestudent_id = data.prestudent_id;
 		FHC_AjaxClient.ajaxCallPost(
 			CALLED_PATH + '/zgvStatusUpdate',
 			data,
@@ -163,7 +156,7 @@ var zgvUeberpruefung = {
 				{
 					if (FHC_AjaxClient.hasData(data))
 					{
-						zgvUeberpruefung.checkStatus();
+						zgvUeberpruefung.checkStatus(prestudent_id);
 						var response = FHC_AjaxClient.getData(data)
 
 						if (response.openZgv === false)
@@ -181,9 +174,12 @@ var zgvUeberpruefung = {
 		);
 	},
 
-	getPrestudentId: function()
+	checkAfterReload: function()
 	{
-		var id = $('.zgvBearbeitungButtons .zgvAkzeptierenPruefung').attr('id');
-		return InfocenterDetails._getPrestudentIdFromElementId(id);
+		$('.zgvStatusText').each(function() {
+			if($(this).data('info')) {
+				zgvUeberpruefung.checkStatus(InfocenterDetails._getPrestudentIdFromElementId($(this).attr('id')));
+			}
+		});
 	}
 }
