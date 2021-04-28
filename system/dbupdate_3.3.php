@@ -4739,6 +4739,22 @@ if(!@$db->db_query("SELECT lehrmodus_kurzbz FROM lehre.tbl_lehrveranstaltung LIM
 			echo '<br>Spalte lehrmodus_kurzbz in lehre.tbl_lehrveranstaltung hinzugefügt';
 }
 
+
+//Add Column lehrmodus_kurzbz to addon.tbl_lvevaluierung_frage
+if(!@$db->db_query("SELECT lehrmodus_kurzbz FROM addon.tbl_lvevaluierung_frage LIMIT 1"))
+{
+	$qry = "ALTER TABLE addon.tbl_lvevaluierung_frage ADD COLUMN lehrmodus_kurzbz varchar(32);
+			ALTER TABLE addon.tbl_lvevaluierung_frage ADD CONSTRAINT fk_lvevaluierung_lehrmodus 
+			FOREIGN KEY (lehrmodus_kurzbz) REFERENCES lehre.tbl_lehrmodus(lehrmodus_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>addon.tbl_lvevaluierung_frage '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte lehrmodus_kurzbz in addon.tbl_lvevaluierung_frage hinzugefügt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
