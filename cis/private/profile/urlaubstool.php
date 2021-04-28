@@ -464,7 +464,6 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 				{
 					if($hgfarbe[$i]!='#FFFC7F' && $hgfarbe[$i]!='#bbb' && $hgfarbe[$i]!='#CDDDEE')
 					{
-
 						$hgfarbe[$i]='#E9ECEE';
 						$datensatz[$i]=0;
 						$freigabevon[$i]=$row->freigabevon;
@@ -761,11 +760,25 @@ for ($i=0;$i<6;$i++)
 		echo "\n";
 		if(strlen(stristr($tage[$j+7*$i],"."))>0)
 		{
-			echo '<td align="center" valign="center" style="font-size:16px; color:grey; background-color: '.$hgfarbe[$j+7*$i].'">';
+			if($j%6==0 || $j==7)
+			{
+				echo '<td align="center" valign="center" style="font-size:16px; color:grey; background-color:#A5AFB6">';
+			}
+			else
+			{
+				echo '<td align="center" valign="center" style="font-size:16px; color:grey; background-color: ' . $hgfarbe[$j + 7 * $i] . '">';
+			}
 		}
 		else
 		{
-			echo '<td align="center" valign="center" style="background-color: '.$hgfarbe[$j+7*$i].'">';
+			if($j%6==0 || $j==7)
+			{
+				echo '<td align="center" valign="center" style="font-size:; color:; background-color:#A5AFB6">';
+			}
+			else
+			{
+				echo '<td align="center" valign="center" style="background-color: ' . $hgfarbe[$j + 7 * $i] . '">';
+			}
 		}
 		if($tage[$j+7*$i]!='')
 		{
@@ -781,11 +794,11 @@ for ($i=0;$i<6;$i++)
 				echo '<b>'.$tage[$j+7*$i].'</b><br>';
 				if(strlen(stristr($tage[$j+7*$i],"."))>0)
 				{
-					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'"></td>';
+					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'" id="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'" ></td>';
 				}
 				else
 				{
-					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
+					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'" id="'.date("d.m.Y",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
 				}
 			}
 			else

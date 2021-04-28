@@ -391,5 +391,130 @@ class projektbetreuer extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Holt Zweitbegutachter einer Projektarbeit mit Mail.
+	 * @param $erstbegutachter_person_id int person_id des Erstbegutachters
+	 * @param $projektarbeit_id int
+	 * @param $student_uid string uid des Studenten der Arbeit abgibt
+	 * @return object | bool
+	 */
+	public function getZweitbegutachterWithToken($erstbegutachter_person_id, $projektarbeit_id, $student_uid)
+	{
+		$qry_betr="SELECT betr.person_id, betr.projektarbeit_id, pers.anrede, betr.zugangstoken, betr.zugangstoken_gueltigbis, tbl_benutzer.uid, kontakt,
+       			trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
+       			CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email, abg.abgabedatum
+				FROM lehre.tbl_projektbetreuer betr
+				JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id 
+				JOIN public.tbl_person pers ON betr.person_id = pers.person_id
+				LEFT JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id AND kontakttyp = 'email' AND zustellung = true
+				LEFT JOIN public.tbl_benutzer ON pers.person_id = tbl_benutzer.person_id
+				LEFT JOIN campus.tbl_paabgabe abg ON betr.projektarbeit_id = abg.projektarbeit_id AND abg.paabgabetyp_kurzbz = 'end'
+				WHERE betr.betreuerart_kurzbz = 'Zweitbegutachter'
+				AND betr.projektarbeit_id = ".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
+				AND parb.student_uid = ".$this->db_add_param($student_uid)."
+				AND EXISTS (
+					SELECT 1 FROM lehre.tbl_projektbetreuer
+					WHERE person_id = ".$this->db_add_param($erstbegutachter_person_id, FHC_INTEGER)."
+					AND betreuerart_kurzbz = 'Erstbegutachter'
+					AND projektarbeit_id = betr.projektarbeit_id
+				)
+				AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)
+				ORDER BY betr.insertamum DESC
+				LIMIT 1";
+
+		if ($betr=$this->db_query($qry_betr))
+		{
+			$row_betr = $this->db_fetch_object($betr);
+
+			if ($row_betr)
+				return $row_betr;
+			else
+				return false;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Generiert Token für externen Zweitbetreuer wenn noch kein Token vorhanden ist.
+	 * @param int $zweitbegutachter_person_id
+	 * @param int $projektarbeit_id
+	 * @return bool true wenn erfolgreich (generiert oder bereits vorhanden), false wenn fehlgeschlagen
+	 */
+	public function generateZweitbegutachterToken($zweitbegutachter_person_id, $projektarbeit_id)
+	{
+		// if externer Betreuer and no valid token, generate
+		$betreuerUidQry = "SELECT uid, zugangstoken, zugangstoken_gueltigbis, tbl_projektbetreuer.person_id
+							FROM lehre.tbl_projektbetreuer
+							JOIN public.tbl_person USING(person_id)
+							LEFT JOIN public.tbl_benutzer USING(person_id)
+							WHERE projektarbeit_id = ".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
+							AND tbl_projektbetreuer.person_id = ".$this->db_add_param($zweitbegutachter_person_id, FHC_INTEGER)."
+							AND betreuerart_kurzbz = 'Zweitbegutachter'
+							LIMIT 1";
+
+		if ($betreueruidres = $this->db_query($betreuerUidQry))
+		{
+			$row_betr = $this->db_fetch_object($betreueruidres);
+
+			if ($row_betr)
+			{
+				if (!isset($row_betr->uid)
+					&& (!isset($row_betr->zugangstoken) || $row_betr->zugangstoken_gueltigbis < date('Y-m-d')))
+				{
+					$tokenanzahl = 1;
+
+					while ($tokenanzahl > 0)
+					{
+						//generate random string
+						$token = generateUniqueToken(16);
+
+						if (!$token)
+							return false;
+
+						$qry_tokencheck = "SELECT count(*) AS anzahl
+							FROM lehre.tbl_projektbetreuer
+							WHERE zugangstoken = " . $this->db_add_param($token);
+
+						if ($tokencount = $this->db_query($qry_tokencheck))
+						{
+							$row_tokencount = $this->db_fetch_object($tokencount);
+
+							$tokenanzahl = (int)$row_tokencount->anzahl;
+						}
+						else
+						{
+							return false;
+						}
+					}
+
+					$qry_upd = "UPDATE lehre.tbl_projektbetreuer SET
+						zugangstoken = " . $this->db_add_param($token) . ",
+						zugangstoken_gueltigbis = CURRENT_DATE + interval '1 year'
+						WHERE projektarbeit_id = " . $this->db_add_param($projektarbeit_id, FHC_INTEGER) . "
+						AND person_id = " . $this->db_add_param($row_betr->person_id, FHC_INTEGER) . "
+						AND betreuerart_kurzbz = 'Zweitbegutachter'";
+
+					if ($this->db_query($qry_upd))
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				else
+					return true; // not generated because intern or already exists
+			}
+			else
+				return false;// not found
+		}
+		else
+			return false; // query error
+	}
 }
 ?>

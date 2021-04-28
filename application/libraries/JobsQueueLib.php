@@ -57,6 +57,19 @@ class JobsQueueLib
 	}
 
 	/**
+	 * To get the oldest added jobs using the given job type
+	 */
+	public function getOldestJob($type)
+	{
+		$this->_ci->JobsQueueModel->resetQuery();
+
+		$this->_ci->JobsQueueModel->addOrder('creationtime', 'ASC');
+		$this->_ci->JobsQueueModel->addLimit('1');
+
+		return $this->_ci->JobsQueueModel->loadWhere(array('status' => self::STATUS_NEW, 'type' => $type));
+	}
+
+	/**
 	 * To get all the jobs specified by the given parameters
 	 */
 	public function getJobsByTypeStatusInput($type, $status, $input)

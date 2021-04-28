@@ -39,6 +39,7 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/dokument_export.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/webservicelog.class.php');
+require_once('../../include/projektarbeit.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -120,7 +121,7 @@ $params = 'xmlformat=xml';
 
 //Admins duerfen Dokumente anderer Personen drucken
 if ($rechte->isBerechtigt('admin'))
-	$user = $_GET['uid'];
+	$user = isset($_GET['uid']) ? $_GET['uid'] : $user;
 
 $params .= '&uid='.$user;
 if (isset($_GET['person_id']))
@@ -139,6 +140,11 @@ if (isset($_GET['all']))
 	$params .= '&all=1';
 if (isset($_GET['xsl_oe_kurzbz']))
 	$params .= '&xsl_oe_kurzbz='. $_GET['xsl_oe_kurzbz'];
+if (isset($_GET['projektarbeit_id']))
+	$params .= '&projektarbeit_id='. $_GET['projektarbeit_id'];
+if (isset($_GET['betreuerart_kurzbz']))
+	$params .= '&betreuerart_kurzbz='. $_GET['betreuerart_kurzbz'];
+
 
 // Logeintrag bei Download von Zahlungsbestaetigungen
 if (isset($_GET['xsl']) && $_GET['xsl'] == 'Zahlung')
@@ -150,7 +156,7 @@ if (isset($_GET['xsl']) && $_GET['xsl'] == 'Zahlung')
 	$log->request_id = isset($_GET['buchungsnummern']) && !empty($_GET['buchungsnummern']) ? $_GET['buchungsnummern'] : NULL;
 	$log->beschreibung = 'Zahlungsbestaetigungsdownload';
 	$log->request_data = $requestdata;
-	$log->execute_user = $user;
+	$log->execute_user = get_uid();
 	
 	$log->save(true);
 }
@@ -183,9 +189,40 @@ if (isset($_GET['output']) && $_GET['output'] != 'pdf')
 else
 	$output = 'pdf';
 
+if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
+{
+	if (!isset($_GET['betreuerart_kurzbz']) || !isset($_GET['person_id']) || !isset($_GET['projektarbeit_id']))
+		die('Fehlerhafte Parameteruebergabe');
+
+	$projektarbeit = new projektarbeit();
+	$projektarbeit->load($_GET['projektarbeit_id']);
+
+	$betreuer = new person();
+	$betreuer->getPersonFromBenutzer($user);
+
+	//Überprüft ob es der Betreuer oder der Student ist
+	if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
+		die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
+
+	switch ($_GET['betreuerart_kurzbz'])
+	{
+		case 'Begutachter' :
+			$xsl = 'ProjektBeurteilungBA';
+			break;
+		case 'Erstbegutachter' :
+			$xsl = 'ProjektBeurteilungMAErst';
+			break;
+		case 'Zweitbegutachter' :
+			$xsl = 'ProjektBeurteilungMAZweit';
+			break;
+	}
+
+	$allowed = true;
+}
+
 
 $konto = new konto();
-if (((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin'))
+if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin')) || (isset($allowed) && $allowed === true))
 {
 	$buchungstypen = array();
 	if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))

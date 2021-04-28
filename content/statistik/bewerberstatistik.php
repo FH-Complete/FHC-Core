@@ -1733,6 +1733,7 @@ else
 			$content .= "</tr>";
 
 			$content .= '</tfoot></table>';
+			$content .= "\n";
 		}
 
 		//Aufsplittungen für Mischformen holen
@@ -1744,28 +1745,32 @@ else
 		{
 			if ($db->db_num_rows($result) > 0)
 			{
-				$content .= "<br><br><h2>Aufsplittung Mischformen</h2><br>";
-				$content .= "\n<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
-						<thead>
-							<tr>
-								<th class='table-sortable:default'>Studiengang</th>";
+				$content .= "<br><br>";
+				$content .= "<h2>Aufsplittung Mischformen</h2><br>";
+				$content .= "\n<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>";
+				$content .= "\n<thead>";
+				$content .= "\n<tr>";
+				$content .= "\n<th class='table-sortable:default'>Studiengang</th>";
 				foreach ($studenttypes as $heading)
 				{
-					$content .= "<th colspan=".$noOrgformen.">$heading</th>";
+					$content .= "\n<th colspan=".$noOrgformen.">$heading</th>";
 				}
-				$content .= "</tr><tr><th>&nbsp</th>";
+				$content .= "\n</tr>";
+				$content .= "\n<tr>\n<th></th>";
 
 				//orgformheadings (VZ, BB,...) ausgeben
 				for ($i = 0; $i < $noStudenttypes; $i++)
 				{
 					foreach ($orgform_arr as $row_orgform)
 					{
-						$content .= "<th align='center' class='table-sortable:numeric'>";
+						$content .= "\n<th align='center' class='table-sortable:numeric' nowrap>";
 						$content .= $row_orgform;
 						$content .= "</th>";
 					}
 				}
-				$content .= "</tr></thead><tbody>";
+				$content .= "\n</tr>";
+				$content .= "\n</thead>";
+				$content .= "\n<tbody>";
 
 				$sumarr = array();
 
@@ -1773,13 +1778,13 @@ else
 				{
 					$content .= "\n";
 					$content .= '<tr>';
-					$content .= "<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+					$content .= "\n<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 					foreach ($studenttypes as $key => $value)
 					{
 						foreach ($orgform_arr as $row_orgform)
 						{
 							$fullAlias = $key."_".mb_strtolower($row_orgform);
-							$content .= "<td align='center'>";
+							$content .= "\n<td align='center' nowrap>";
 							$content .= $row->{$fullAlias};
 							$content .= "</td>";
 							//Summe berechnen
@@ -1794,14 +1799,15 @@ else
 						}
 					}
 				}
-				$content .= "</tr>";
+				$content .= "\n</tr>";
 
 				$content .= "\n";
-				$content .= '</tbody><tfoot style="font-weight: bold;"><tr>';
-				$content .= "<td>Summe</td>";
+				$content .= "</tbody>";
+				$content .= '<tfoot style="font-weight: bold;"><tr>';
+				$content .= "\n<td>Summe</td>";
 				foreach ($sumarr as $sum)
 				{
-					$content .= "<td align='center'>".$sum."</td>";
+					$content .= "\n<td align='center'>".$sum."</td>";
 				}
 				$content .= "</tfoot></tr>";
 				$content .= '</table>';

@@ -964,8 +964,8 @@ function _generateXML($person_arr)
 			$xml .= '<VerwendungsCode><![CDATA['. $verwendung->verwendung_code. ']]></VerwendungsCode>';
 			$xml .= '<BeschaeftigungsArt1><![CDATA['. $verwendung->ba1code. ']]></BeschaeftigungsArt1>';
 			$xml .= '<BeschaeftigungsArt2><![CDATA['. $verwendung->ba2code. ']]></BeschaeftigungsArt2>';
-			$xml .= '<BeschaeftigungsAusmassVZAE><![CDATA['. $verwendung->vzae. ']]></BeschaeftigungsAusmassVZAE>';
-			$xml .= '<BeschaeftigungsAusmassJVZAE><![CDATA['. $verwendung->jvzae. ']]></BeschaeftigungsAusmassJVZAE>';
+			$xml .= '<BeschaeftigungsAusmassVZAE><![CDATA['. number_format($verwendung->vzae,2,'.',''). ']]></BeschaeftigungsAusmassVZAE>';
+			$xml .= '<BeschaeftigungsAusmassJVZAE><![CDATA['. number_format($verwendung->jvzae,2,'.',''). ']]></BeschaeftigungsAusmassJVZAE>';
 			$xml .= '</Verwendung>';
 		}
 

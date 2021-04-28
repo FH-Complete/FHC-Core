@@ -35,6 +35,8 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
+require_once('../../../include/projektbetreuer.class.php');
+require_once('../../../include/sancho.inc.php');
 
 if (!$db = new basis_db())
 	$db=false;
@@ -116,6 +118,68 @@ if($projektarbeit_id==-1)
 if(!$projektarbeit_obj->load($projektarbeit_id))
 	die('Fehler beim Laden der Projektarbeit');
 $titel = $projektarbeit_obj->titel;
+$student_uid = $projektarbeit_obj->student_uid;
+
+// paarbeit sollte nur ab SS2021 online bewertet werden
+$qry_sem="SELECT 1
+		FROM lehre.tbl_projektarbeit 
+    	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
+		AND tbl_studiensemester.start::date >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')::date
+		LIMIT 1";
+$result_sem=$db->db_query($qry_sem);
+$num_rows_sem = $db->db_num_rows($result_sem);
+if($num_rows_sem < 0)
+{
+	echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
+}
+
+// Zweitbegutachter holen
+if($betreuerart=="Erstbegutachter")
+{
+	$projektbetreuer = new projektbetreuer();
+	$alleBegutachter = $projektbetreuer->getProjektbetreuer($projektarbeit_id);
+
+	if ($alleBegutachter)
+	{
+		$alleBegutachterResults = $projektbetreuer->result;
+
+		foreach ($alleBegutachterResults as $begutachter)
+		{
+			if ($begutachter->betreuerart_kurzbz == "Erstbegutachter")
+			{
+				$erstbetreuer_id = $begutachter->person_id;
+				$zweitbegutachter = $projektbetreuer->getZweitbegutachterWithToken($erstbetreuer_id, $projektarbeit_id, $student_uid);
+				break;
+			}
+		}
+
+		// Mail mit Token an Zweitbegutachter senden
+		if ($zweitbegutachter && $num_rows_sem >= 1 && isset($_GET['zweitbegutachtertoken']))
+		{
+			$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
+			if(!$result_std=$db->db_query($qry_std))
+			{
+				echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
+			}
+			else
+			{
+				$row_std=@$db->db_fetch_object($result_std);
+				$mailres = sendZweitbegutachterMail($zweitbegutachter, $erstbetreuer_id, $row_std);
+
+				if ($mailres)
+				{
+					echo "<br><span style='color: green; '>".$p->t('abgabetool/zweitbegutachterMailGesendet', $zweitbegutachter->email)."</span><br>&nbsp;";
+				}
+				else
+				{
+					echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailZweitBegutachter')." Mail: ".$zweitbegutachter->email."</font><br>&nbsp;";
+				}
+			}
+		}
+	}
+}
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -124,6 +188,39 @@ echo '
 		<title>'.$p->t('abgabetool/abgabetool').'</title>
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<style>			
+			#beurteilungheadertable td {
+				height: 30px;
+				overflow: hidden;
+			}
+			
+			#beurteilungheadertable form {
+				margin: 0;
+			}
+			
+			/* Bild statt submit button, styling entfernen*/
+			button[name="zweitbegutachtertoken"] {
+				background: none;
+				color: inherit;
+				border: none;
+				font: inherit;
+				cursor: pointer;
+				outline: inherit;
+			}
+			#zweitbetrmailicon {
+				top: 4px;
+				height: 18px;
+				width: 18px;
+				position: relative;
+			}
+			#tokenmailicon {
+				top: 2px;
+				height: 15px;
+				width: 15px;
+				position: relative;
+			}
+			
+		</style>
 
 		<script language="Javascript">
 			function confdel()
@@ -356,25 +453,73 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 {
 	$studentenname=$row_nam->studnam;
 }
-$htmlstr .= "<table width=100%>\n";
+
+$htmlstr .= "<table id='beurteilungheadertable' width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
-$htmlstr .= "<td width=10% align=center><form action='../../../include/".EXT_FKT_PATH."/abgabe_lektor_benotung.php' title='Benotungsformular' target='_blank' method='GET'>";
-$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
-$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-$htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form></td>";
+$htmlstr .= "<td width=10% align=center>";
+if ($num_rows_sem >= 1)
+{
+	$htmlstr .= "<form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung' title='Benotungsformular' target='_blank' method='GET'>";
+	$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
+	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+	$htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form>";
+}
+else
+{
+	$htmlstr .= "<form action='javascript:void(0);'>";
+	$htmlstr .= "<input type='submit' value='".$p->t('abgabetool/benoten')."' title='".$p->t('abgabetool/aeltereParbeitBenoten')."'
+					alt='".$p->t('abgabetool/aeltereParbeitBenoten')."' disabled>";
+	$htmlstr .= "</form>";
+}
+$htmlstr .= "</td>";
+
 if($betreuerart!="Zweitbegutachter")
 {
 	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.com/' title='ephorus' target='_blank' method='GET'>";
-	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td></tr>";
+	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td>";
+	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
+	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>\n";
 }
 else
 {
 	$htmlstr .= "<td>&nbsp;</td></tr>";
 }
-$htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$db->convert_html_chars($titel)."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
+$htmlstr .= "<tr><td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
+$htmlstr .= "</tr>\n";
+if (isset($zweitbegutachter) && $zweitbegutachter) // wenn es Zweitbegutachter gibt
+{
+	// Zweitbegutachter anzeigen
+	$htmlstr .= "<tr>\n";
+	$htmlstr .= "<td style='font-size:16px'>" . $p->t('abgabetool/zweitBegutachter') . ": <b>" . $zweitbegutachter->voller_name . "</b>";
+
+	// keine Mail -> Fehler anzeigen
+	if (!isset($zweitbegutachter->email))
+		$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
+
+	// Token senden button wenn Projektarbeit abgegeben und Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
+	if (isset($zweitbegutachter->abgabedatum) && isset($zweitbegutachter->email) && !isset($zweitbegutachter->uid) && $num_rows_sem >= 1)
+	{
+		$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
+		$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
+		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='" . $projektarbeit_id . "'>";
+		$htmlstr .= "<input type='hidden' name='betreuerart' value='" . $betreuerart . "'>";
+		$htmlstr .= "&nbsp;<a href='mailto:".$zweitbegutachter->email."'><img id='zweitbetrmailicon' src='../../../skin/images/email.png'
+						title='" . $p->t('abgabetool/zweitbetreuerMailSenden', $zweitbegutachter->email) . "' alt='" . $p->t('abgabetool/zweitbetreuerMailSenden', $zweitbegutachter->email) . "'/></a>\n";
+		$htmlstr .= "&nbsp;<button type='submit' name='zweitbegutachtertoken' title='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'>
+						<img id='tokenmailicon' src='../../../skin/images/repeat.png' alt='" . $p->t('abgabetool/zweitbetreuerTokenMailSenden') . "'/></button>\n";
+		$htmlstr .= "</form>";
+	}
+
+	$htmlstr .= "</td>\n";
+	$htmlstr .= "<td></td>\n";
+	$htmlstr .= "<td></td>\n";
+	$htmlstr .= "</tr>\n";
+}
+$htmlstr .= "</table>\n";
+$htmlstr .= "<table style='width: 100%'><tr>";
+$htmlstr .= "<td><br><b>".$p->t('abgabetool/abgabetermine').":</b></td>\n";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
-$htmlstr .= "<br><b>".$p->t('abgabetool/abgabetermine').":</b>\n";
 $htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 $htmlstr .= "<tr></tr>\n";
 $htmlstr .= "<tr>
@@ -543,4 +688,57 @@ $htmlstr .= "</form>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";
 echo $htmlstr;
+
+/**
+ * Mail zum Zweitbegutachter mit Info dass Projektarbeit zur Bewertung bereit ist, inklusive Zugangstoken wenn nötig.
+ * @param object $zweitbegutachter
+ * @param $int erstbegutachter_person_id
+ * @param object $student
+ * @return bool|projektbetreuer|void|null
+ */
+function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id, $student)
+{
+	if (!isset($zweitbegutachter->email) || $zweitbegutachter->email == '')
+		return false;
+
+	// send Mail to 2. Begutachter
+	$projektbetreuer = new projektbetreuer();
+
+	$projektbetreuer->generateZweitbegutachterToken($zweitbegutachter->person_id, $zweitbegutachter->projektarbeit_id);
+
+	if (!$projektbetreuer)
+		return $projektbetreuer;
+
+	$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($erstbegutachter_person_id, $zweitbegutachter->projektarbeit_id, $student->uid);
+
+	if ($zweitbetr)
+	{
+		$intern = isset($zweitbetr->uid);
+		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+		$mail_fulllink = "$mail_baselink?projektarbeit_id=".$zweitbegutachter->projektarbeit_id."&uid=".$student->uid;
+		$mail_link = $intern ? $mail_fulllink : $mail_baselink;
+
+		$maildata = array();
+		$maildata['geehrt'] = "geehrte".($zweitbegutachter->anrede=="Herr"?"r":"");
+		$maildata['anrede'] = $zweitbegutachter->anrede;
+		$maildata['betreuer_voller_name'] = $zweitbegutachter->voller_name;
+		$maildata['student_anrede'] = $student->anrede;
+		$maildata['student_voller_name'] = trim($student->titelpre." ".$student->vorname." ".$student->nachname." ".$student->titelpost);
+		$maildata['parbeituebersichtlink'] =  $intern ? "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>" : "";
+		$maildata['bewertunglink'] = "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>";
+		$maildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
+
+		return sendSanchoMail(
+			'ParbeitsbeurteilungEndupload',
+			$maildata,
+			$zweitbetr->email,
+			"Masterarbeitsbetreuung",
+			'sancho_header_min_bw.jpg',
+			'sancho_footer_min_bw.jpg'
+		);
+	}
+
+	return false;
+}
+
 ?>
