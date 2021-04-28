@@ -1,5 +1,6 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Submission tool';
+$this->phrasen['abgabetool/aeltereParbeitBenoten']='Thesis handed in for older semester, please use word form for assessment!';
 $this->phrasen['abgabetool/typ']='Type';
 $this->phrasen['abgabetool/titel']='Title';
 $this->phrasen['abgabetool/betreuerart']='Supervisor type';
@@ -60,8 +61,10 @@ $this->phrasen['abgabetool/fehlerTerminEintragen']='The deadline could not be en
 $this->phrasen['abgabetool/fehlerTerminLoeschen']='Error deleting the deadline!';
 $this->phrasen['abgabetool/keineBerechtigungStudentenansicht']='You are not allowed to view this Page';
 $this->phrasen['abgabetool/dateneingabeUnvollstaendig']='Incomplete Data input';
-$this->phrasen['abgabetool/fehlerMailBegutachter']='Error sending E-Mail to Assessor!';
+$this->phrasen['abgabetool/fehlerMailBegutachter']='Error sending E-Mail to first Assessor!';
+$this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Error sending E-Mail to second Assessor!';
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Assessor not found. No E-Mail sent!';
+$this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Error when checking if current thesis';
 $this->phrasen['abgabetool/keinPDF']='Upload-File ist not a PDF! Please retry the Fileupload.';
 $this->phrasen['abgabetool/dateiZuGross']='The File is too big! Maximum File size: 15 MB';
 $this->phrasen['abgabetool/fehlerTerminVorbei']='The deadline for this upload has already expired.';
@@ -78,4 +81,12 @@ Sollten Sie trotzdem die `Eidesstattliche Erklärung´ samt Unterschrift hochlad
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Read and accepted';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Declaration not accepted';
 $this->phrasen['abgabetool/downloadProjektarbeit']='Download File';
+$this->phrasen['abgabetool/zweitBegutachter']='Second assessor';
+$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Resend access token to second assessor';
+$this->phrasen['abgabetool/zweitbetreuerMailSenden']='Send mail to second assessor (%s)';
+$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail sent to second assessor (%s)';
+$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='Second assessor has no delivery mail adress!';
+$this->phrasen['abgabetool/projektbeurteilungDownload']='Thesis-Assessment download';
+$this->phrasen['abgabetool/projektbeurteilungErstDownload']='First-/Assessor';
+$this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Second Assessor';
 ?>
