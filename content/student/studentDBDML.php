@@ -2296,8 +2296,12 @@ if(!$error)
 		{
 			$dokumente = explode(';',$_POST['dokumente']);
 			$errormsg = '';
+			$sonst = 0;
 			foreach ($dokumente as $dokument_kurzbz)
 			{
+				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
+					continue;
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2308,6 +2312,8 @@ if(!$error)
 					$dok->insertamum = date('Y-m-d H:i:s');
 					$dok->insertvon = $user;
 					$dok->new = true;
+					if ($dokument_kurzbz === 'Sonst')
+						$sonst++;
 
 					if(!$dok->save())
 					{
@@ -2501,8 +2507,13 @@ if(!$error)
 		{
 			$dokumente = explode(';',$_POST['dokumente']);
 			$errormsg = '';
+			$sonst = 0;
+
 			foreach ($dokumente as $dokument_kurzbz)
 			{
+				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
+					continue;
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2513,6 +2524,11 @@ if(!$error)
 							if(!$dok->delete($dokument_kurzbz, $_POST['prestudent_id']))
 							{
 								$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
+							}
+							else
+							{
+								if ($dokument_kurzbz === 'Sonst')
+									$sonst++;
 							}
 						}
 						else

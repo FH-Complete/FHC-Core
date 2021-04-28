@@ -4465,6 +4465,59 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// Add column zugangstoken to tbl_projektbetreuer
+if(!$result = @$db->db_query("SELECT zugangstoken FROM lehre.tbl_projektbetreuer LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_projektbetreuer ADD COLUMN zugangstoken VARCHAR(32);
+			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken IS 'Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';
+			ALTER TABLE lehre.tbl_projektbetreuer ADD CONSTRAINT uk_tbl_projektbetreuer_zugangstoken UNIQUE (zugangstoken);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektbetreuer: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_projektbetreuer: Spalte zugangstoken hinzugefuegt';
+}
+
+// Add column zugangstoken_gueltigbis to tbl_projektbetreuer
+if(!$result = @$db->db_query("SELECT zugangstoken_gueltigbis FROM lehre.tbl_projektbetreuer LIMIT 1"))
+{
+	$qry = "ALTER table lehre.tbl_projektbetreuer ADD COLUMN zugangstoken_gueltigbis date;
+			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken_gueltigbis IS 'Gueligkeitsdatum fuer Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektbetreuer: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_projektbetreuer: Spalte zugangstoken_gueltigbis hinzugefuegt';
+}
+
+// App 'projektarbeitsbeurteilung' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='projektarbeitsbeurteilung'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('projektarbeitsbeurteilung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App projektarbeitsbeurteilung in system.tbl_app hinzugefügt';
+	}
+}
+
+// UPDATE Berechtigung für lehre.tbl_projektbetreuer für web user hinzufügen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_projektbetreuer' AND table_schema='lehre' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT UPDATE ON lehre.tbl_projektbetreuer TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Projektbetreuer Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Web User: update fuer lehre.tbl_projektbetreuer berechtigt';
+	}
+}
+
 // Add column dms_id, studiensemester_kurzbz, anmerkung_student und empfehlung_anrechnung
 // Change genehmigt_von and begruendung_id to be NULLABLE
 if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
@@ -4809,7 +4862,7 @@ $tabellen=array(
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
-	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
+	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id", "zugangstoken", "zugangstoken_gueltigbis"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung","aktiv"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss","sort"),
