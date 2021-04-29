@@ -415,7 +415,7 @@
 									$disabledTxt = $disabledStgTxt = $this->p->t('infocenter', 'bewerbungMussAbgeschickt');
 								}
 
-								/*if ($studiengangtyp !== 'b')
+								if ($studiengangtyp !== 'b')
 								{
 									$disabled = 'disabled';
 									$disabledTxt = $this->p->t('infocenter', 'nurBachelorFreigeben');
@@ -426,7 +426,7 @@
 										$disabledStg = 'disabled';
 										$disabledStgTxt = $this->p->t('infocenter', 'nurBachelorFreigeben');
 									}
-								}*/
+								}
 								?>
 							<div class="col-lg-8 text-right">
 								<div class="form-inline">
