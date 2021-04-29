@@ -743,9 +743,15 @@ class ressource extends basis_db
 			return false;
 		}
 
-		$qry="DELETE FROM fue.tbl_projekt_ressource WHERE ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false)."
+		/*$qry="DELETE FROM fue.tbl_projekt_ressource WHERE ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false)."
                 AND projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER, false).';';
-
+		*/
+		$qry="
+				DELETE FROM fue.tbl_projekt_ressource pr
+				USING fue.tbl_ressource r
+				WHERE r.ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false). "
+				AND pr.projekt_ressource_id=".$this->db_add_param($project_ressource_id, FHC_INTEGER, false). "
+				AND pr.projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER, false).';';
 		if($this->db_query($qry))
 			return true;
 		else
