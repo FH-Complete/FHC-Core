@@ -85,7 +85,8 @@ $this->load->view(
                                         <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
                                                     id="reviewAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
                                     </div>
-                                    <table class="panel-body table table-bordered table-condensed">
+									<div class="panel-body">
+                                    <table class="table table-bordered table-condensed">
                                         <tbody>
                                         <tr>
                                             <th class="col-xs-4"><?php echo ucfirst($this->p->t('person', 'studentIn')); ?></th>
@@ -138,6 +139,7 @@ $this->load->view(
                                         </tr>
                                         </tbody>
                                     </table>
+									</div>
                                 </div>
                             </div>
                         </div>
@@ -157,8 +159,8 @@ $this->load->view(
 
                                         </div>
                                     </div>
-                                    
-                                    <table class="panel-body table table-bordered table-condensed">
+                                    <div class="panel-body">
+                                    <table class="table table-bordered table-condensed">
 
                                         <tbody>
                                         <tr>
@@ -192,11 +194,12 @@ $this->load->view(
                                         <tr>
                                             <th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
                                             <td id="reviewAnrechnungDetail-empfehlungDetail-begruendung">
-			                                    <?php echo htmlentities($empfehlungData->notiz) ?>
+			                                    <?php echo htmlentities($empfehlungData->begruendung) ?>
                                             </td>
                                         </tr>
                                         </tbody>
                                     </table>
+									</div>
                                     <div class="panel-body">
                                         <form>
                                             <input type="hidden" name="anrechnung_id"

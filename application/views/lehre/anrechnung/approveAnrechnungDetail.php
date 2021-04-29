@@ -75,7 +75,6 @@ $this->load->view(
             <div class="col-xs-8">
                 <div class="panel panel-default">
                     <div class="panel-body">
-
                         <!-- Antragsdaten -->
                         <div class="row">
                             <div class="col-lg-12">
@@ -90,7 +89,10 @@ $this->load->view(
                                         <span class="pull-right"><?php echo $this->p->t('anrechnung', 'antragdatum'); ?>: <span
                                                     id="approveAnrechnung-status"><?php echo !empty($anrechnungData->anrechnung_id) ? $anrechnungData->insertamum : '-' ?></span></span>
                                     </div>
-                                    <table class="panel-body table table-bordered table-condensed">
+									<div class="panel-body">
+										<div class="row">
+											<div class="col-lg-12">
+                                    			<table class="table table-bordered table-condensed">
                                         <tbody>
                                         <tr>
                                             <th class="col-xs-4"><?php echo ucfirst($this->p->t('person', 'studentIn')); ?></th>
@@ -143,16 +145,16 @@ $this->load->view(
                                         </tr>
                                         </tbody>
                                     </table>
+											</div>
+										</div>
+									</div>
                                 </div>
                             </div>
                         </div>
                         <!-- Empfehlungsdaten -->
                         <div class="row">
                             <div class="col-lg-12">
-                                <form>
-                                    <input type="hidden" name="anrechnung_id"
-                                           value="<?php echo $anrechnungData->anrechnung_id ?>">
-                                    <div class="panel panel-default" id="approveAnrechnungDetail-empfehlung"
+								<div class="panel panel-default" id="approveAnrechnungDetail-empfehlung"
                                          data-empfehlung="<?php echo json_encode($empfehlungData->empfehlung) ?>">
                                         <div class="panel-heading">
                                             <span class="text-uppercase"><b><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></b></span>&emsp;
@@ -164,42 +166,67 @@ $this->load->view(
                                                 <span id="approveAnrechnungDetail-empfehlungAm"><?php echo $empfehlungData->empfehlung_am ?></span>
                                             </div>
                                         </div>
-                                        <table class="panel-body table table-bordered table-condensed">
-                                            <tbody>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')); ?></th>
-                                                <td id="approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm">
-                                                    <?php echo $empfehlungData->empfehlungsanfrageAm; ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlungsanfrageAn'); ?></th>
-                                                <td id="approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn">
-                                                    <?php echo $empfehlungData->empfehlungsanfrageAn; ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAm')); ?></th>
-                                                <td><?php echo $empfehlungData->empfehlung_am ?></td>
-                                            </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungVon')); ?></th>
-                                                <td><?php echo $empfehlungData->empfehlung_von ?></td>
-                                            </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></th>
-                                                <td id="approveAnrechnungDetail-empfehlungDetail-empfehlung"></td>
-                                            </tr>
-                                            <tr>
-                                                <th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
-                                                <td id="approveAnrechnungDetail-empfehlungDetail-begruendung">
-                                                    <?php echo htmlentities($empfehlungData->notiz) ?>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+										<div class="panel-body">
+											<div class="row">
+												<div class="col-lg-7">
+													<form id="form-empfehlung">
+														<input type="hidden" name="anrechnung_id"
+															   value="<?php echo $anrechnungData->anrechnung_id ?>">
+                                       			 		<table class="table table-bordered table-condensed">
+															<tbody>
+															<tr>
+																<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')); ?></th>
+																<td id="approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm">
+																	<?php echo $empfehlungData->empfehlungsanfrageAm; ?>
+																</td>
+															</tr>
+															<tr>
+																<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlungsanfrageAn'); ?></th>
+																<td id="approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn">
+																	<?php echo $empfehlungData->empfehlungsanfrageAn; ?>
+																</td>
+															</tr>
+															<tr>
+																<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAm')); ?></th>
+																<td><?php echo $empfehlungData->empfehlung_am ?></td>
+															</tr>
+															<tr>
+																<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungVon')); ?></th>
+																<td><?php echo $empfehlungData->empfehlung_von ?></td>
+															</tr>
+															<tr>
+																<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></th>
+																<td id="approveAnrechnungDetail-empfehlungDetail-empfehlung"></td>
+															</tr>
+															<tr>
+																<th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
+																<td id="approveAnrechnungDetail-empfehlungDetail-begruendung">
+																	<?php echo htmlentities($empfehlungData->begruendung) ?>
+																</td>
+															</tr>
+															</tbody>
+														</table>
+													</form>
+												</div>
+												<div class="col-lg-5">
+													<form id="form-empfehlungNotiz">
+														<input type="hidden" name="anrechnung_id"
+															   value="<?php echo $anrechnungData->anrechnung_id ?>">
+														<input type="hidden" name="notiz_id"
+															   value="<?php echo $empfehlungData->notiz_id ?>">
+														<div class="form-group">
+															<label class="text-center">
+																<?php echo ucfirst($this->p->t('global', 'notiz')); ?>
+															</label>
+															<textarea name="empfehlungText" rows="4"><?php echo htmlentities($empfehlungData->notiz) ?></textarea>
+														</div>
+														<input type="submit" class="btn btn-default pull-right" value="<?php echo ucfirst($this->p->t('ui', 'speichern')); ?>">
+													</form>
+												</div>
+											</div>
+										</div>
                                     </div>
-                                </form>
+                               
                                 <div class="pull-right">
                                     <button id="approveAnrechnungDetail-withdraw-request-recommedation"
                                             class="btn btn-default btn-w200 <?php echo (is_null($empfehlungData->empfehlung) &&
@@ -342,10 +369,8 @@ $this->load->view(
 
                             </div>
                         </div>
-
                     </div>
                 </div>
-
                 <div class="pull-right">
                     <button id="approveAnrechnungDetail-withdraw-anrechnung-approvement"
                             class="btn btn-default btn-w200 <?php echo ($anrechnungData->status_kurzbz == 'approved' ||
@@ -364,7 +389,6 @@ $this->load->view(
 						<?php echo ucfirst($this->p->t('global', 'genehmigen')); ?>
                     </button>
                 </div>
-
             </div>
 
             <div class="col-xs-4">
@@ -378,7 +402,7 @@ $this->load->view(
                 <br>
 				<?php $this->load->view('lehre/anrechnung/reviewAnrechnungInfo'); ?>
             </div>
-        </div>
+        </div><!--end row-->
 
     </div>
 </div>

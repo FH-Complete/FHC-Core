@@ -12,6 +12,7 @@ class AnrechnungLib
 
 	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_LEKTOR = 'AnrechnungNotizLektor';
 	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
+	const ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL = 'AnrechnungEmpfehlungsnotizSTGL';
 
 	public function __construct()
 	{
@@ -24,6 +25,7 @@ class AnrechnungLib
 		$this->ci->load->model('crm/Student_model', 'StudentModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->ci->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->ci->load->model('person/Notiz_model', 'NotizModel');
 		
 		$this->ci->load->library('DmsLib');
 	}
@@ -226,12 +228,26 @@ class AnrechnungLib
 		$empfehlung_data->empfehlung_am = '-';
 		$empfehlung_data->empfehlungsanfrageAm = '-';
 		$empfehlung_data->empfehlungsanfrageAn = '-';
-		$empfehlung_data->notiz = '-';   // Begruendung, if not recommended
-
+		$empfehlung_data->begruendung = '-';   // Begruendung, if not recommended
+		$empfehlung_data->notiz_id = '';  // Empfehlungsnotiz from STGL
+		$empfehlung_data->notiz = '';  // Empfehlungsnotiz from STGL
+		
 
 		if(!$anrechnung = getData($this->ci->AnrechnungModel->load($anrechnung_id))[0])
 		{
 			show_error('Failed loading Anrechnung');
+		}
+		
+		// Get Empfehlungsnotiz
+		$result = $this->ci->NotizModel->getNotizByAnrechnung(
+			$anrechnung_id,
+			self::ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL
+		);
+		
+		if ($notiz = getData($result)[0])
+		{
+			$empfehlung_data->notiz_id = $notiz->notiz_id;
+			$empfehlung_data->notiz = $notiz->text;
 		}
 
 		// Get date, where recommendation was last requested
@@ -288,11 +304,10 @@ class AnrechnungLib
 		if (!$anrechnung->empfehlung_anrechnung)
 		{
 			// Get Ablehnungsbegruendung (only set, if Anrechnung was not recommended yet)
-			$this->ci->load->model('person/Notiz_model', 'NotizModel');
 			$result = $this->ci->NotizModel->getNotizByAnrechnung($anrechnung_id, self::ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_LEKTOR);
 			if ($notiz = getData($result)[0])
 			{
-				$empfehlung_data->notiz = $notiz->text;
+				$empfehlung_data->begruendung = $notiz->text;
 			}
 		}
 

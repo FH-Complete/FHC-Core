@@ -12001,7 +12001,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Empfehlung angefragt an",
+				'text' => "Anfrage an",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -12021,7 +12021,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Empfehlung angefragt am",
+				'text' => "Anfrage am",
 				'description' => '',
 				'insertvon' => 'system'
 			),

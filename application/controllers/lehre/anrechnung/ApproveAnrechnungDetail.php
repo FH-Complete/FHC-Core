@@ -15,6 +15,7 @@ class approveAnrechnungDetail extends Auth_Controller
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
+	const ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL = 'AnrechnungEmpfehlungsnotizSTGL';
 
 	public function __construct()
 	{
@@ -27,7 +28,8 @@ class approveAnrechnungDetail extends Auth_Controller
 				'reject'    => 'lehre/anrechnung_genehmigen:rw',
 				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
 				'withdraw' => 'lehre/anrechnung_genehmigen:rw',
-				'withdrawRequestRecommendation' => 'lehre/anrechnung_genehmigen:rw'
+				'withdrawRequestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
+				'saveEmpfehlungsNotiz' => 'lehre/anrechnung_genehmigen:rw'
 			)
 		);
 
@@ -359,6 +361,30 @@ class approveAnrechnungDetail extends Auth_Controller
 				'status_bezeichnung' => $this->anrechnunglib->getLastAnrechnungstatus($anrechnung_id))
 		);
 	}
+	
+	public function saveEmpfehlungsNotiz()
+	{
+		$anrechnung_id = $this->input->post('anrechnung_id');
+		$notiz_id = $this->input->post('notiz_id');
+		$empfehlungstext = $this->input->post('empfehlung_text');
+		
+		// Validate data
+		if (isEmptyString($anrechnung_id))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'systemFehler'));
+		}
+		
+		// Save Empfehlungstext
+		$result = self::_saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id);
+		
+		if (isError($result))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+		}
+		
+		// Output success message
+		$this->outputJsonSuccess($this->p->t('ui', 'gespeichert'));
+	}
 
 	/**
 	 * Download and open uploaded document (Nachweisdokument).
@@ -581,6 +607,32 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		return $lector_arr;
 
+	}
+	
+	private function _saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id)
+	{
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		
+		if (!isEmptyString($notiz_id))
+		{
+			return $this->NotizModel->update(
+				$notiz_id,
+				array(
+					'text' => $empfehlungstext,
+					'updateamum' => (new DateTime())->format('Y-m-d H:i:s'),
+					'updatevon' => $this->_uid
+				)
+			);
+		}
+		
+		return $this->NotizModel->addNotizForAnrechnung(
+			$anrechnung_id,
+			self::ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL,
+			trim($empfehlungstext),
+			$this->_uid
+		);
+		
+		
 	}
 
 }

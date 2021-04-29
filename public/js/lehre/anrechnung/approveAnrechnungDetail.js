@@ -164,10 +164,12 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungDetail-request-recommendation").click(function(){
+    $("#approveAnrechnungDetail-request-recommendation").click(function(e){
+
+        e.preventDefault();
 
         // Get form data
-        let form_data = $('form').serializeArray();
+        let form_data = $('#form-empfehlung').serializeArray();
 
 
         // Prepare data object for ajax call
@@ -256,7 +258,9 @@ $(function(){
     });
 
     // Withdraw request for recommendation
-    $("#approveAnrechnungDetail-withdraw-request-recommedation").click(function(){
+    $("#approveAnrechnungDetail-withdraw-request-recommedation").click(function(e){
+
+        e.preventDefault();
 
         if(!confirm(FHC_PhrasesLib.t("anrechnung", "empfehlungsanforderungWirklichZuruecknehmen")))
         {
@@ -264,7 +268,7 @@ $(function(){
         }
 
         // Get form data
-        let form_data = $('form').serializeArray();
+        let form_data = $('#form-empfehlung').serializeArray();
 
         // Prepare data object for ajax call
         let data = {
@@ -303,6 +307,39 @@ $(function(){
             }
         );
     });
+
+    $('#form-empfehlungNotiz').submit(function(e){
+
+        e.preventDefault();
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/saveEmpfehlungsNotiz",
+            {
+                anrechnung_id: this.anrechnung_id.value,
+                notiz_id: this.notiz_id.value,
+                empfehlung_text: this.empfehlungText.value
+            },
+            {
+                successCallback: function (data){
+
+                    if (FHC_AjaxClient.isError(data)){
+
+                        // Print error message
+                        FHC_DialogLib.alertWarning(FHC_AjaxClient.getError(data));
+                    }
+
+                    if (FHC_AjaxClient.hasData(data)){
+
+                        // Print success message
+                        FHC_DialogLib.alertSuccess((FHC_AjaxClient.getData(data)))
+                    }
+                },
+                errorCallback(){
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            }
+        )
+    })
 
     // Copy Begruendung into textarea
     $(".btn-copyIntoTextarea").click(function(){
