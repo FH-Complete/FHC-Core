@@ -113,8 +113,10 @@ function deleteProjektRessource($username, $passwort, $projektRessource)
     }
     else
     {
+
         // von Projekt löschen
-        if($ressource->deleteFromProjekt($projektRessource->ressource_id, $projektRessource->projekt_kurzbz))
+        //if($ressource->deleteFromProjekt($projektRessource->ressource_id, $projektRessource->projekt_kurzbz))
+	    if($ressource->deleteFromProjektWithProjektRessourceId($projektRessource->ressource_id, $projektRessource->projekt_kurzbz, $projektRessource->projekt_ressource_id))
             return "Erfolg";
         else
             return "Fehler beim Löschen";
