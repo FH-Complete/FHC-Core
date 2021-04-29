@@ -286,7 +286,10 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 				$projektnames[] = $ztaufrow->projekt_kurzbz;
 				$pt = new projekt();
 				$pt->load($ztaufrow->projekt_kurzbz);
-				$projektTiteles[$ztaufrow->projekt_kurzbz] = $pt->titel;
+				if(!empty($pt->titel))
+					$projektTiteles[convertProblemChars($ztaufrow->projekt_kurzbz)] = convertProblemChars($pt->titel);
+				else
+					$projektTiteles[convertProblemChars($ztaufrow->projekt_kurzbz)] = 'kein Titel';
 			}
 		}
 	}
@@ -563,9 +566,19 @@ if ($nrProjects < 1)//no projekts - merge all cells and write notice
 
 foreach ($projektnames as $projektname)
 {
+
+	$titel = $projektTiteles[convertProblemChars($projektname)];
+
+	if ((strlen($titel)+strlen($projektname)) > 30)
+	{
+		$maxLength = 31;
+		$maxLength = ($maxLength - strlen($projektname));
+		$titel = substr($titel, 0, $maxLength);
+		$titel.='...';
+	}
 	//Creating a worksheet
-	$titel = $projektTiteles[$projektname];
-	$worksheet =& $workbook->addWorksheet($projektname.' ('.$titel.')');
+
+	$worksheet =& $workbook->addWorksheet(convertProblemChars($projektname).' ('.$titel.')');
 	$worksheet->setInputEncoding('utf-8');
 
 	//general options
