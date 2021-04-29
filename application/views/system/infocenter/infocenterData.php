@@ -1,16 +1,17 @@
 <?php
 
+	$this->config->load('infocenter');
 	$APP = '\'infocenter\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$INTERESSENT_STATUS = '\'Interessent\'';
-	$STUDIENGANG_TYP = '\'b\'';
+	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\', \'Interessent rejected\'';
 	$LOGDATA_NAME_PARKED = '\'Parked\'';
 	$LOGDATA_NAME_ONHOLD = '\'Onhold\'';
 	$LOGTYPE_KURZBZ = '\'Processstate\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
-	$ADDITIONAL_STG = '10021,10027';
+	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
@@ -142,10 +143,7 @@
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				 -- AND pss.bestaetigtam IS NULL
 				   AND ps.person_id = p.person_id
-				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
-					   OR
-					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
-					   )
+			
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 					   SELECT 1

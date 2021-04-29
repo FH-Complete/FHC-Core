@@ -1,12 +1,13 @@
 <?php
 
+	$this->config->load('infocenter');
 	$APP = '\'infocenter\'';
 	$INTERESSENT_STATUS = '\'Interessent\'';
-	$STUDIENGANG_TYP = '\'b\'';
+	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
-	$ADDITIONAL_STG = '10021,10027,10002';
+	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
@@ -109,10 +110,6 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
-				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
-					    OR
-					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
-					   )
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				 LIMIT 1
 			) AS "StgAbgeschickt",

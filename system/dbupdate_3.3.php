@@ -3232,6 +3232,7 @@ if(!@$db->db_query("SELECT 0 FROM public.tbl_variablenname WHERE 0 = 1"))
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'kontofilterstg\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'kollision_student\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'infocenter_studiensemester\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'infocenter_studiensgangtyp\', \'b\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_zeitsperre\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_reservierung\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_kollision\', \'false\');

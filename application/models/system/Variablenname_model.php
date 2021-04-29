@@ -11,7 +11,8 @@ class Variablenname_model extends DB_Model
 										   ORDER BY studienjahr_kurzbz, start
                                    		) sem
 										WHERE start > now()
-										LIMIT 1;'
+										LIMIT 1;',
+        'infocenter_studiensgangtyp' => 'SELECT infocenter_studiensgangtyp FROM public.tbl_variablename LIMIT 1'
 	);
 
 	/**
