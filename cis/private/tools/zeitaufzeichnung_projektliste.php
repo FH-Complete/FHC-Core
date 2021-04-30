@@ -569,10 +569,10 @@ foreach ($projektnames as $projektname)
 
 	$titel = $projektTiteles[convertProblemChars($projektname)];
 
-	if ((strlen($titel)+strlen($projektname)) > 30)
+	if ((strlen($titel)+strlen($projektname)) > 31)
 	{
 		$maxLength = 31;
-		$maxLength = ($maxLength - strlen($projektname));
+		$maxLength = ($maxLength - 3 - strlen($projektname));
 		$titel = substr($titel, 0, $maxLength);
 		$titel.='...';
 	}
@@ -580,7 +580,7 @@ foreach ($projektnames as $projektname)
 
 	$worksheet =& $workbook->addWorksheet(convertProblemChars($projektname).' ('.$titel.')');
 	$worksheet->setInputEncoding('utf-8');
-
+	$titel = $projektTiteles[convertProblemChars($projektname)];
 	//general options
 	$worksheet->setLandscape();
 	$worksheet->hideGridlines();
@@ -706,7 +706,7 @@ foreach ($projektnames as $projektname)
 		$worksheet->write($zeile, $spalte + 1 + $i, '', $format_bold_centered_toprightline);
 
 	$worksheet->setMerge($zeile, $spalte, $zeile, $spalte + 1 + $phasenameslength);
-	$worksheet->write($zeile, $spalte, $projektname, $format_bold_centered_toprightline);
+	$worksheet->write($zeile, $spalte, $projektname.' ('.$titel.')', $format_bold_centered_toprightline);
 
 	for ($i = 0; $i < $phasenameslength; $i++)
 		$worksheet->write($zeile + 1, $spalte + 1 + $i, $phasenames[$i], $format_bold_centered_bottomline);
