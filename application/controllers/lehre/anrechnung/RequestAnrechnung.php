@@ -13,8 +13,6 @@ class requestAnrechnung extends Auth_Controller
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 	
-	const DEADLINE_INTERVAL_NACH_SEMESTERSTART = 'P1M'; // Deadline for application
-	
 	public function __construct()
 	{
 		// Set required permissions
@@ -239,7 +237,7 @@ class requestAnrechnung extends Auth_Controller
 		$today = new DateTime('today midnight');
 		
 		// True if today > application deadline
-		return ($today > $start->add((new DateInterval(self::DEADLINE_INTERVAL_NACH_SEMESTERSTART))));
+		return ($today > $start->add((new DateInterval($this->config->item('interval_blocking_application')))));
 	}
 	
 	/**
