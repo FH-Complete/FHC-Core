@@ -16,7 +16,8 @@ $this->load->view(
 				'anerkennungNachgewiesenerKenntnisse',
 				'antragStellen',
                 'antragWurdeGestellt',
-                'antragBereitsGestellt'
+                'antragBereitsGestellt',
+				'bearbeitungGesperrt'
 			),
 			'ui' => array(
 				'hilfeZuDieserSeite',
@@ -26,6 +27,10 @@ $this->load->view(
 				'maxZeichen',
                 'errorBestaetigungFehlt',
 				'systemfehler'
+			),
+			'anrechnung' => array(
+				'deadlineUeberschritten',
+				'benotungDerLV'
 			),
 			'person' => array(
 				'student',
@@ -237,16 +242,18 @@ $this->load->view(
 				<br><br><br><br>
             </div>
             <div class="col-xs-4">
-                <div class="alert text-center">Status: <b><span class="text-uppercase" id="requestAnrechnung-status_kurzbz"
+				 <!-- Status panel -->
+                <div class="alert text-center" id="requestAnrechnung-status">Status: <b><span class="text-uppercase" id="requestAnrechnung-status_kurzbz"
                              data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
                             <?php echo $anrechnungData->status; ?>
-                        </span></b></div>
-				<?php if ($is_expired): ?>
-                    <div class="alert alert-warning">
-						<?php echo $this->p->t('global', 'bearbeitungGesperrt'); ?>
-						<?php echo $is_expired && empty($antragData->anrechnung_id) ? ': ' . $this->p->t('anrechnung', 'deadlineUeberschritten') : ''; ?>
-                    </div>
-				<?php endif; ?>
+                        </span></b>
+				</div>
+				<!-- Sperregrund panel (hidden by default) -->
+				<div class="alert alert-danger text-center hidden" id="requestAnrechnung-sperre"
+					 data-anrechnung_id="<?php echo empty($antragData->anrechnung_id) ? '' : $antragData->anrechnung_id; ?>"
+					 data-expired="<?php echo json_encode($is_expired); ?>"
+					 data-blocked="<?php echo json_encode($is_blocked) ?>">
+				</div>
                 <br>
 				<?php $this->load->view('lehre/anrechnung/requestAnrechnungImportant'); ?>
             </div>

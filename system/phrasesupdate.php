@@ -1474,7 +1474,26 @@ $phrases = array(
 			)
 		)
 	),
-
+	array(
+	'app' => 'core',
+	'category' => 'anrechnung',
+	'phrase' => 'benotungDerLV',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Benotung der Lehrveranstaltung',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Grading of the course',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
 
 	//***************************	CORE/filter
 	array(

@@ -18,6 +18,9 @@ $(function(){
     // Set chars counter for textarea 'Herkunft der Kenntnisse'
     requestAnrechnung.setCharsCounter();
 
+    // If Sperregrund exists: display Sperre panel, hide Status panel and disable all form elements
+    requestAnrechnung.displaySperreIfHasSperregrund();
+
     $('#requestAnrechnung-form').submit(function(e){
 
         // Avoid form redirecting automatically
@@ -85,7 +88,7 @@ var requestAnrechnung = {
         if (status_kurzbz != '')
         {
             // Disable all form elements
-            $("#requestAnrechnung-form :input").prop("disabled", true);
+           requestAnrechnung.disableFormFields();
         }
     },
     markAsBestaetigtIfAntragIsApplied: function(){
@@ -94,6 +97,40 @@ var requestAnrechnung = {
         if (status_kurzbz != '')
         {
             $("#requestAnrechnung-form :input[name='bestaetigung']").prop('checked', true);
+        }
+    },
+    disableFormFields(){
+        // Disable all form elements
+        $("#requestAnrechnung-form :input").prop("disabled", true);
+    },
+    displaySperreIfHasSperregrund: function(){
+        const anrechnung_id = $('#requestAnrechnung-sperre').data('anrechnung_id');
+        const is_expired = $('#requestAnrechnung-sperre').data('expired');
+        const is_blocked = $('#requestAnrechnung-sperre').data('blocked');
+
+        // If Deadline is expired or is blocked by grades of LV, AND not already angerechnet
+        if ((is_expired || is_blocked) && anrechnung_id == '')
+        {
+            // Hide status panel
+            $('#requestAnrechnung-status').hide();
+
+            // Show sperre panel
+            $('#requestAnrechnung-sperre')
+                .removeClass('hidden')
+                .html(function(){
+                    let sperregrund = FHC_PhrasesLib.t('global', 'bearbeitungGesperrt') + ': ';
+
+                    if (is_expired) {
+                        sperregrund += FHC_PhrasesLib.t('anrechnung', 'deadlineUeberschritten');
+                    }
+                    else if (is_blocked){
+                        sperregrund += FHC_PhrasesLib.t('anrechnung', 'benotungDerLV');
+                    }
+                    return "<b>"+ sperregrund + "</b>";
+                })
+
+            // Disable all form elements
+            requestAnrechnung.disableFormFields();
         }
     },
     initTooltips: function (){

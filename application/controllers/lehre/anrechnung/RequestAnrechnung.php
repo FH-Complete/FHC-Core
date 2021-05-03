@@ -41,6 +41,9 @@ class requestAnrechnung extends Auth_Controller
 		$this->load->helper('url');
 		$this->load->helper('hlp_sancho_helper');
 		
+		// Load configs
+		$this->load->config('anrechnung');
+		
 		// Load language phrases
 		$this->loadPhrases(
 			array(
@@ -82,6 +85,9 @@ class requestAnrechnung extends Auth_Controller
 		// $is_expired = self::_checkAntragDeadline($studiensemester_kurzbz);
 		$is_expired = false;
 		
+		// Check if Lehrveranstaltung was already graded with application blocking grades
+		$is_blocked = self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id);
+		
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
 
@@ -91,7 +97,8 @@ class requestAnrechnung extends Auth_Controller
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
-			'is_expired' => $is_expired
+			'is_expired' => $is_expired,
+			'is_blocked' => $is_blocked
 		);
 		
 		$this->load->view('lehre/anrechnung/requestAnrechnung.php', $viewData);
@@ -297,6 +304,31 @@ class requestAnrechnung extends Auth_Controller
 		$actual_ss = getData($result)[0]->studiensemester_kurzbz;
 		
 		return $studiensemester_kurzbz == $actual_ss;
+	}
+	
+	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		// Get Note of Lehrveranstaltung
+		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
+		$result = $this->LvgesamtnoteModel->load(array(
+				'student_uid' => $this->_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'lehrveranstaltung_id' => $lehrveranstaltung_id
+			)
+		);
+		
+		// If Lehrveranstaltung has Note
+		if (hasData($result))
+		{
+			$note = getData($result)[0]->note;
+			
+			// Check if Note is a blocking grade
+			if (in_array($note, $this->config->item('grades_blocking_application')))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
