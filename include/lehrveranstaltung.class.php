@@ -58,7 +58,7 @@ class lehrveranstaltung extends basis_db
 	public $bezeichnung_english; // varchar(256)
 	public $orgform_kurzbz;	// varchar(3)
 	public $lehrtyp_kurzbz;	// varchar(32)
-	public $lehrmodus_kurbz; //varchar(32)
+	public $lehrmodus_kurzbz;	//varchar(32)
 	public $oe_kurzbz;	// varchar(32)
 	public $raumtyp_kurzbz;	// varchar(16)
 	public $anzahlsemester;	// smallint
@@ -262,6 +262,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $sort smallint Sortierung
 	 * @param $oe_kurzbz string Organisationseinheit
 	 * @param $lehrtyp string lehrtyp_kurzbz
+	 * @param $lehrmodus string lehrmodus_kurzbz
 	 * @param $orgform string Organisationsform
 	 * @param $lehrmodus string lehrmodus_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
@@ -506,6 +507,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+			$lv_obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
 			$lv_obj->oe_kurzbz = $row->oe_kurzbz;
 			$lv_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
 			$lv_obj->anzahlsemester = $row->anzahlsemester;
@@ -516,7 +518,6 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
-			$lv_obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -588,6 +589,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+			$lv_obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
 			$lv_obj->oe_kurzbz = $row->oe_kurzbz;
 			$lv_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
 			$lv_obj->anzahlsemester = $row->anzahlsemester;
@@ -598,7 +600,6 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
-			$lv_obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -750,8 +751,9 @@ class lehrveranstaltung extends basis_db
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, insertamum,
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
-				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, lehrmodus_kurzbz, oe_kurzbz,
-				raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe,sws,lvs,alvs,lvps,las,benotung,lvinfo, lehrauftrag) VALUES ('.
+				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz,
+				raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe,sws,lvs,alvs,lvps,las,benotung,lvinfo,
+				lehrauftrag, lehrmodus_kurzbz) VALUES ('.
 					$this->db_add_param($this->studiengang_kz). ', '.
 					$this->db_add_param($this->bezeichnung). ', '.
 					$this->db_add_param($this->kurzbz). ', '.
@@ -780,7 +782,6 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->orgform_kurzbz). ','.
 					$this->db_add_param($this->incoming).','.
 					$this->db_add_param($this->lehrtyp_kurzbz).','.
-					$this->db_add_param($this->lehrmodus_kurzbz).','.
 					$this->db_add_param($this->oe_kurzbz). ','.
 					$this->db_add_param($this->raumtyp_kurzbz). ','.
 					$this->db_add_param($this->anzahlsemester). ','.
@@ -795,7 +796,8 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->las).','.
 					$this->db_add_param($this->benotung, FHC_BOOLEAN).','.
 					$this->db_add_param($this->lvinfo, FHC_BOOLEAN).','.
-					$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN)
+					$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).','.
+					$this->db_add_param($this->lehrmodus_kurzbz)
 					.');';
 		}
 		else
@@ -1043,7 +1045,7 @@ class lehrveranstaltung extends basis_db
 				$l->bezeichnung_english = $row->bezeichnung_english;
 				$l->orgform_kurzbz = $row->orgform_kurzbz;
 				$l->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
-				$l->lehrmodus_kurzbz = $row->lehrtyp_kurzbz;
+				$l->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
 				$l->oe_kurzbz = $row->oe_kurzbz;
 				$l->raumtyp_kurzbz = $row->raumtyp_kurzbz;
 				$l->anzahlsemester = $row->anzahlsemester;
@@ -1771,6 +1773,9 @@ class lehrveranstaltung extends basis_db
 		if(!is_null($lehrtyp))
 			$qry .= " AND lehrtyp_kurzbz=".$this->db_add_param($lehrtyp);
 
+		if(!is_null($lehrmodus))
+			$qry .= " AND lehrmodus_kurzbz=".$this->db_add_param($lehrmodus);
+
 		if(!is_null($semester))
 			$qry .= " AND semester=".$this->db_add_param ($semester);
 
@@ -2294,6 +2299,11 @@ class lehrveranstaltung extends basis_db
 		if (!is_null($lehrtyp_kurzbz))
 		{
 			$qry.=" AND tbl_lehrveranstaltung.lehrtyp_kurzbz=" . $this->db_add_param($lehrtyp_kurzbz, FHC_STRING);
+		}
+
+		if (!is_null($lehrmodus_kurzbz))
+		{
+			$qry.=" AND tbl_lehrveranstaltung.lehrmodus_kurzbz=" . $this->db_add_param($lehrmodus_kurzbz, FHC_STRING);
 		}
 
 		if (!is_null($semester))
