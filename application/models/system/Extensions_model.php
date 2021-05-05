@@ -31,7 +31,7 @@ class Extensions_model extends DB_Model
 	 */
 	public function getInstalledExtensions()
 	{
-		$query = 'SELECT extension_id, e1.name, e1.version, description, license, url, core_version, dependencies, enabled
+		$query = 'SELECT extension_id, e1.name, e1.version, description, license, url, core_version, dependencies, enabled, e1.server_kurzbz
 					FROM system.tbl_extensions e1
 			  INNER JOIN (
 				  SELECT name, MAX(version) AS version

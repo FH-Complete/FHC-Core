@@ -64,7 +64,7 @@ class ExtensionsLib
 	 * @param $extensionName string Name of Extension (optional)
 	 * @param $filename Path to tgz Extension File (optional)
 	 */
-	public function installExtension($extensionName = null, $filename = null)
+	public function installExtension($extensionName = null, $filename = null, $perform_sql = true)
 	{
 		$extensionDB = null; // contains data from DB about an extension
 		$extensionJson = null; // contains the extension.json data
@@ -114,7 +114,7 @@ class ExtensionsLib
 
 				$this->_installExtension($extensionJson); // records extension data in DB
 
-				if (!$this->_errorOccurred) // if no error occurred
+				if (!$this->_errorOccurred && $perform_sql === true) // if no error occurred
 				{
 					// Loads and executes neede SQL scripts
 					$this->_loadSQLs(
@@ -173,6 +173,9 @@ class ExtensionsLib
 		$result = $this->_ci->ExtensionsModel->load($extensionId);
 		if (hasData($result)) // if something was found
 		{
+			$extensionServer = $result->retval[0]->server_kurzbz;
+			if ($extensionServer !== SERVER_NAME)
+				return false;
 			$extensionName = $result->retval[0]->name; // extension name
 			$this->_delSoftLinks($extensionName); // not to be checked, could fail if the extension is disabled
 			// remove the extension from the extensions installation directory
@@ -180,10 +183,9 @@ class ExtensionsLib
 
 			// Select all the version of this extension
 			$this->_ci->ExtensionsModel->addSelect('extension_id');
-			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
+			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
 			if (hasData($result)) // if something was found
 			{
-				$extsArray = array();
 				foreach ($result->retval as $key => $extension) // loops on them
 				{
 					// Remove them all
@@ -328,7 +330,7 @@ class ExtensionsLib
 		// Loads the last version of the previous installation of this extension
 		$this->_ci->ExtensionsModel->addOrder('version', 'DESC');
 		$this->_ci->ExtensionsModel->addLimit(1);
-		$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
+		$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
 		if (isError($result))
 		{
 			$this->_errorOccurred = true;
@@ -550,7 +552,8 @@ class ExtensionsLib
 				'license' => isset($extensionJson->license) ? $extensionJson->license : null,
 				'url' => isset($extensionJson->url) ? $extensionJson->url : null,
 				'core_version' => $extensionJson->core_version,
-				'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null
+				'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
+				'server_kurzbz' => SERVER_NAME,
 			)
 		);
 		if (isSuccess($result))
@@ -738,11 +741,18 @@ class ExtensionsLib
 						mkdir($extensionPath.$targetDirectory);
 					}
 
-					// Create the symlink
-					$_addSoftLinks = symlink(
-						$extensionPath.$targetDirectory,
-						$rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName
-					);
+					if (!file_exists($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
+					{
+						// Create the symlink
+						$_addSoftLinks = symlink(
+							$extensionPath.$targetDirectory,
+							$rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName
+						);
+					}else
+					{
+						$_addSoftLinks = true;
+					}
+
 					if (!$_addSoftLinks)
 					{
 						log_message('error', 'Failed to create Symlink to '.$extensionPath.$targetDirectory);

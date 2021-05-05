@@ -28,9 +28,10 @@ class CLI_Manager extends CLI_Controller
 	 * die Commandline ohne Upload durchzufuehren.
 	 * @param $extensioName string Name der Extension
 	 * @param $filename Url Encoded Pfad zum tgz File der Extension
+	 * @param $perform_sql boolean ob die SQL Befehle ausgeführt werden
 	 */
-	public function uploadExtension($extensionName = null, $filename = null)
+	public function uploadExtension($extensionName = null, $filename = null, $perform_sql = true)
 	{
-		$this->extensionslib->installExtension($extensionName, urldecode($filename));
+		$this->extensionslib->installExtension($extensionName, urldecode($filename), $perform_sql);
 	}
 }

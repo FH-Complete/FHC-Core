@@ -108,6 +108,7 @@
 							<th>URL</th>
 							<th>Minimum required Core version</th>
 							<th>Dependes on (extensions)</th>
+							<th>Server</th>
 							<th>Enabled</th>
 							<th>&nbsp;</th>
 						</tr>
@@ -117,6 +118,7 @@
 						<?php
 							$tableRow = '
 							<tr>
+								<td>%s</td>
 								<td>%s</td>
 								<td>%s</td>
 								<td>%s</td>
@@ -143,6 +145,7 @@
 									$extension->url,
 									$extension->core_version,
 									count($extension->dependencies) == 0 ? 'None' : json_encode($extension->dependencies),
+									$extension->server_kurzbz,
 									$extension->extension_id,
 									$extension->enabled === true ? 'checked' : '',
 									$extension->extension_id
@@ -160,7 +163,9 @@
 
 		<?php echo form_open_multipart(current_url().'/uploadExtension'); ?>
 			<input type="file" name="extension" />
-			<input type="submit" value="Install/Update extension" />
+			<input type="submit" value="Install/Update extension" /> <br/>
+			<input type="checkbox" class="checkbox" id="databasechange" name="databasechange"/>
+			<label for="databasechange">Don´t perform SQL</label>
 		</form>
 
 	</body>

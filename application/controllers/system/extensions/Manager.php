@@ -87,9 +87,13 @@ class Manager extends Auth_Controller
 	 * die Commandline ohne Upload durchzufuehren.
 	 * @param $extensioName string Name der Extension
 	 * @param $filename Url Encoded Pfad zum tgz File der Extension
+	 * @param $perform_sql boolean ob die SQL Befehle ausgeführt werden
 	 */
-	public function uploadExtension($extensionName = null, $filename = null)
+	public function uploadExtension($extensionName = null, $filename = null, $perform_sql = true)
 	{
-		$this->extensionslib->installExtension($extensionName, urldecode($filename));
+		$perform_sql = $this->input->post('databasechange');
+		$perform_sql = isset($perform_sql) ? false : true;
+
+		$this->extensionslib->installExtension($extensionName, urldecode($filename), $perform_sql);
 	}
 }
