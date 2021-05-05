@@ -101,55 +101,59 @@ if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
     <title>set gemeinde skript</title>
   </head>
   <body>
-		<hr><b>Filesyntax:</b> (Standard xlsx-File von https://www.bis.ac.at/BISSuite, gespeichert als csv! erste Zeile ist Header (alles was oberhalb ist kann entfernt werden) -> dann Daten)
-		<br><br>
-		<table border="1" style="border-collapse: collapse;">
-		<tbody><tr style="height:28.5pt" height="38">
-			<td style="height:28.5pt;width:57pt" width="76" height="38">Gemeindekennziffer</td>
-			<td style="width:191pt" width="254">Gemeindename</td>
-			<td style="width:58pt" width="77">Ortschaftskennziffer</td>
-			<td style="width:229pt" width="305">Ortschaftsname</td>
-			<td style="width:194pt" width="258">PLZ</td>
-			<td style="width:66pt" width="88">BULA_Code</td>
-			<td style="width:66pt" width="88">BULA_Bez</td>
-			<td style="width:66pt" width="88">Gültig</td>
-		</tr>
-		<tr style="height:15.0pt" height="20">
-			<td style="height:15.0pt" height="20">10101</td>
-			<td>Eisenstadt</td>
-			<td>1</td>
-			<td>Eisenstadt</td>
-			<td>7000</td>
-			<td>1</td>
-			<td>BGLD</td>
-			<td>Ja</td>
-		</tr>
-		<tr style="height:15.0pt" height="20">
-			<td style="height:15.0pt" height="20">10101</td>
-			<td>Eisenstadt</td>
-			<td>2</td>
-			<td>Kleinhöflein im Burgenland</td>
-			<td>7000 7001 7002</td>
-			<td>1</td>
-			<td>BGLD</td>
-			<td>Ja</td>
-		</tr>
-		<tr style="height:15.0pt" height="20">
-			<td>...</td>
-			<td>...</td>
-			<td>...</td>
-			<td>...</td>
-			<td>...</td>
-			<td>...</td>
-			<td>...</td>
-			<td>...</td>
-		</tr>
-		</tbody></table>
+		<hr>
+		<b>Filesyntax:</b>(Standard xlsx-File von https://www.bis.ac.at/BISSuite, gespeichert als csv! erste Zeile ist Header (alles was oberhalb ist kann entfernt werden) -> dann Daten)
+		<br/><br/>
+		<table border="1">
+			<tbody>
+				<tr>
+					<td>Gemeindekennziffer</td>
+					<td>Gemeindename</td>
+					<td>Ortschaftskennziffer</td>
+					<td>Ortschaftsname</td>
+					<td>PLZ</td>
+					<td>BULA_Code</td>
+					<td>BULA_Bez</td>
+					<td>Gültig</td>
+				</tr>
+				<tr>
+					<td>10101</td>
+					<td>Eisenstadt</td>
+					<td>1</td>
+					<td>Eisenstadt</td>
+					<td>7000</td>
+					<td>1</td>
+					<td>BGLD</td>
+					<td>Ja</td>
+				</tr>
+				<tr>
+					<td>10101</td>
+					<td>Eisenstadt</td>
+					<td>2</td>
+					<td>Kleinhöflein im Burgenland</td>
+					<td>7000 7001 7002</td>
+					<td>1</td>
+					<td>BGLD</td>
+					<td>Ja</td>
+				</tr>
+				<tr>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</tbody>
+		</table>
 		<hr>
 		<form enctype="multipart/form-data" method="post">
 			<br>PLZ Kodextabelle <input name="parsefile" type="file" />
 			<input type="submit" value="hochladen" />
 		</form>
+		<hr>
 		<div>
 			<pre>
 				<?php 
