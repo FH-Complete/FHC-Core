@@ -4465,6 +4465,20 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// Add new funktion type kstzuordnung for cost center assignment in public.tbl_funktion
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_funktion WHERE funktion_kurzbz = 'kstzuordnung';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('kstzuordnung','Standardkostenstelle Zuordnung',true,false,false);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_funktion '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_funktion: Added funktion kstzuordnung<br>';
+	}
+}
+
 // Add column zugangstoken to tbl_projektbetreuer
 if(!$result = @$db->db_query("SELECT zugangstoken FROM lehre.tbl_projektbetreuer LIMIT 1"))
 {
