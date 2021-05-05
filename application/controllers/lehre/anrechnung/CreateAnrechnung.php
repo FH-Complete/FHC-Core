@@ -167,7 +167,7 @@ class CreateAnrechnung extends Auth_Controller
 		}
 		
 		// Success response to AJAX
-		$this->outputJsonSuccess($this->p->t('global', 'antragWurdeGestellt'));
+		$this->outputJsonSuccess($this->p->t('global', 'antragWurdeAngelegt'));
 	}
 	
 	

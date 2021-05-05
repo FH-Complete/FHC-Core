@@ -192,7 +192,7 @@ $this->load->view(
         <!-- Filter buttons / Submit buttons-->
         <div class="row">
             <!-- Filter buttons -->
-            <div class="col-xs-3">
+            <div class="col-xs-4">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-inProgressDP" class="btn btn-default btn-clearfilter" type="button"
@@ -226,10 +226,9 @@ $this->load->view(
                                     class='fa fa-times'></i>
                         </button>
                     </div>
-					<span style="padding:20px;">
-						<a href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_self'>
+						<a type="button" class="btn btn-default" style="margin-left: 20px;" href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_self'>
 							<i class='fa fa-plus' aria-hidden='true'></i> <?php echo $this->p->t('global', 'antragAnlegen'); ?>
-						</a></span>
+						</a>
 				</div>
             </div>
             <!-- Action Buttons 'Genehmigen', Ablehnen, 'Empfehlung anfordern'-->

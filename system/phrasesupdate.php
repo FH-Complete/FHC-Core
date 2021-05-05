@@ -11053,6 +11053,26 @@ Any unusual occurrences
 	),
 	array(
 		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'antragWurdeAngelegt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag wurde angelegt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application was created',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'anrechnung',
 		'phrase' => 'anrechnungGrundTooltipText',
 		'insertvon' => 'system',
