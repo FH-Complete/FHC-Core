@@ -59,7 +59,7 @@ class Anrechnung_model extends DB_Model
 			return error('Failed inserting Anrechnung', EXIT_ERROR);
 		}
 		
-		return success();
+		return success($lastInsert_anrechnung_id);
 	}
 	
 	/**

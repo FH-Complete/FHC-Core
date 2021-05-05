@@ -28,7 +28,10 @@ $(function () {
 
                     if (FHC_AjaxClient.hasData(data))
                     {
-                        FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data));
+                        FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data).msg);
+
+                        // Display button to open Anrechnung in new tab
+                        createAnrechnung.displayButtonToOpenAnrechnung(FHC_AjaxClient.getData(data).anrechnung_id);
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -97,6 +100,9 @@ var createAnrechnung = {
 
         // Empty form fields (except hidden ones)
         $('#createAnrechnung-form :input:not([type=hidden])').val('');
+
+        // Hide eventually displayed button to open Anrechnung
+        $('#createAnrechnung-openAnrechnung').addClass('hidden');
     },
     disableFormFields: function(){
         let prestudent_id = $('#prestudent_id').data('prestudent_id');
@@ -142,5 +148,12 @@ var createAnrechnung = {
                 }
             }
         );
+    },
+    displayButtonToOpenAnrechnung: function(anrechnung_id){
+        // Display button to open Anrechnung in new tab
+        $('#createAnrechnung-openAnrechnung')
+            .removeClass('hidden')
+            .attr('href', 'ApproveAnrechnungDetail/?anrechnung_id=' + anrechnung_id)
+            .html('<i class="fa fa-external-link" aria-hidden="true"></i> ' + FHC_PhrasesLib.t("global", "antragBearbeiten"));
     }
 }

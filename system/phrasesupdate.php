@@ -12212,7 +12212,26 @@ array(
 			)
 		)
 	),
-	
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'antragBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Antrag bearbeiten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Go to application",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

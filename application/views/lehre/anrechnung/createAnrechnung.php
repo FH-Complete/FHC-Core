@@ -15,7 +15,8 @@ $this->load->view(
 			'global' => array(
 				'anerkennungNachgewiesenerKenntnisse',
 				'antragWurdeGestellt',
-				'antragBereitsGestellt'
+				'antragBereitsGestellt',
+				'antragBearbeiten'
 			),
 			'ui' => array(
 				'hochladen'
@@ -153,12 +154,14 @@ $this->load->view(
 	</div>
 </div>
 
-<!-- Submit Button -->
 <div class="row">
 	<div class="col-lg-10">
+		<!-- Submit Button -->
 		<button class="btn btn-primary btn-w200 pull-right" id="createAnrechnung-submit" type="submit" value="submit">
 			<?php echo $this->p->t('global', 'antragAnlegen'); ?>
 		</button>
+		<!-- Open new Anrechnung Button (hidden by default) -->
+		<a type="button" class="btn btn-default btn-mr10 pull-right hidden" id="createAnrechnung-openAnrechnung" target="_blank"></a>
 	</div>
 </div>
 

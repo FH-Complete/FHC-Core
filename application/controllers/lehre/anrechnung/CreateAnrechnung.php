@@ -166,8 +166,13 @@ class CreateAnrechnung extends Auth_Controller
 			$this->terminateWithJsonError(getError($result));
 		}
 		
+		$lastInsert_anrechnung_id = getData($result);
+		
 		// Success response to AJAX
-		$this->outputJsonSuccess($this->p->t('global', 'antragWurdeAngelegt'));
+		$this->outputJsonSuccess(array(
+			'anrechnung_id' => $lastInsert_anrechnung_id,
+			'msg' => $this->p->t('global', 'antragWurdeAngelegt')
+		));
 	}
 	
 	
