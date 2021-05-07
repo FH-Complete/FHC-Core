@@ -496,7 +496,7 @@ if (isset($zweitbegutachter) && $zweitbegutachter) // wenn es Zweitbegutachter g
 	if (!isset($zweitbegutachter->email))
 		$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
 
-	// Token senden button wenn Projektarbeit abgegeben und Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
+	// Token senden button wenn Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
 	if (isset($zweitbegutachter->email) && !isset($zweitbegutachter->uid) && $num_rows_sem >= 1)
 	{
 		$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
@@ -724,7 +724,7 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 		$maildata['betreuer_voller_name'] = $zweitbegutachter->voller_name;
 		$maildata['student_anrede'] = $student->anrede;
 		$maildata['student_voller_name'] = trim($student->titelpre." ".$student->vorname." ".$student->nachname." ".$student->titelpost);
-		$maildata['abgabetyp'] = 'Endabgabe';
+		$maildata['abgabetyp'] = isset($zweitbetr->abgabedatum) ? 'Endabgabe' : 'Abgabe';
 		$maildata['parbeituebersichtlink'] =  $intern ? "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>" : "";
 		$maildata['bewertunglink'] = "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>";
 		$maildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
