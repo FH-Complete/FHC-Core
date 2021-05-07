@@ -122,7 +122,7 @@ $student_uid = $projektarbeit_obj->student_uid;
 
 // paarbeit sollte nur ab SS2021 online bewertet werden
 $qry_sem="SELECT 1
-		FROM lehre.tbl_projektarbeit 
+		FROM lehre.tbl_projektarbeit
     	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
@@ -188,16 +188,16 @@ echo '
 		<title>'.$p->t('abgabetool/abgabetool').'</title>
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<style>			
+		<style>
 			#beurteilungheadertable td {
 				height: 30px;
 				overflow: hidden;
 			}
-			
+
 			#beurteilungheadertable form {
 				margin: 0;
 			}
-			
+
 			/* Bild statt submit button, styling entfernen*/
 			button[name="zweitbegutachtertoken"] {
 				background: none;
@@ -219,7 +219,7 @@ echo '
 				width: 15px;
 				position: relative;
 			}
-			
+
 		</style>
 
 		<script language="Javascript">
@@ -497,7 +497,7 @@ if (isset($zweitbegutachter) && $zweitbegutachter) // wenn es Zweitbegutachter g
 		$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
 
 	// Token senden button wenn Projektarbeit abgegeben und Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
-	if (isset($zweitbegutachter->abgabedatum) && isset($zweitbegutachter->email) && !isset($zweitbegutachter->uid) && $num_rows_sem >= 1)
+	if (isset($zweitbegutachter->email) && !isset($zweitbegutachter->uid) && $num_rows_sem >= 1)
 	{
 		$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
