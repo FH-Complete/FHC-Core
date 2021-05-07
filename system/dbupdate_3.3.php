@@ -3232,7 +3232,6 @@ if(!@$db->db_query("SELECT 0 FROM public.tbl_variablenname WHERE 0 = 1"))
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'kontofilterstg\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'kollision_student\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'infocenter_studiensemester\', null);
-		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'infocenter_studiensgangtyp\', \'b\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_zeitsperre\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_reservierung\', \'false\');
 		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_kollision\', \'false\');
@@ -3264,6 +3263,20 @@ if(!@$db->db_query("SELECT 0 FROM public.tbl_variablenname WHERE 0 = 1"))
 		echo '<strong>public.tbl_variablenname ' . $db->db_last_error() . '</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.tbl_variablenname';
+}
+
+// Add new name type in public.tbl_variablenname
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name = 'infocenter_studiensgangtyp';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_variablenname(name, defaultwert) VALUES('infocenter_studiensgangtyp', 'b');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_variablenname '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_variablenname: Added name "infocenter_studiensgangtyp"<br>';
+	}
 }
 
 // Add column projektphase_id to tbl_zeitaufzeichnung
