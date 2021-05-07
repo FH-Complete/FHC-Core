@@ -724,6 +724,7 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 		$maildata['betreuer_voller_name'] = $zweitbegutachter->voller_name;
 		$maildata['student_anrede'] = $student->anrede;
 		$maildata['student_voller_name'] = trim($student->titelpre." ".$student->vorname." ".$student->nachname." ".$student->titelpost);
+		$maildata['abgabetyp'] = 'Endabgabe';
 		$maildata['parbeituebersichtlink'] =  $intern ? "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>" : "";
 		$maildata['bewertunglink'] = "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>";
 		$maildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";
