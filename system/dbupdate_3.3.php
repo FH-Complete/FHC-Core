@@ -4782,11 +4782,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrmodus LIMIT 1;"))
 
 		INSERT INTO lehre.tbl_lehrmodus(lehrmodus_kurzbz, bezeichnung_mehrsprachig) VALUES('regulaer', '{\"regulaer\",\"regular\"}');
 		INSERT INTO lehre.tbl_lehrmodus(lehrmodus_kurzbz, bezeichnung_mehrsprachig) VALUES('standardisiert', '{\"standardisiert\",\"standardized\"}');
-	
+
 		GRANT SELECT ON lehre.tbl_lehrmodus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_lehrmodus TO vilesci;
 	";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrmodus: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4804,22 +4804,6 @@ if(!@$db->db_query("SELECT lehrmodus_kurzbz FROM lehre.tbl_lehrveranstaltung LIM
 		echo '<strong>lehre.tbl_lehrveranstaltung '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Spalte lehrmodus_kurzbz in lehre.tbl_lehrveranstaltung hinzugefügt';
-}
-
-
-//Add Column lehrmodus_kurzbz to addon.tbl_lvevaluierung_frage
-if(!@$db->db_query("SELECT lehrmodus_kurzbz FROM addon.tbl_lvevaluierung_frage LIMIT 1"))
-{
-	$qry = "ALTER TABLE addon.tbl_lvevaluierung_frage ADD COLUMN lehrmodus_kurzbz varchar(32);
-			ALTER TABLE addon.tbl_lvevaluierung_frage ADD CONSTRAINT fk_lvevaluierung_lehrmodus 
-			FOREIGN KEY (lehrmodus_kurzbz) REFERENCES lehre.tbl_lehrmodus(lehrmodus_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-			";
-
-	if(!$db->db_query($qry))
-		echo '<strong>addon.tbl_lvevaluierung_frage '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Spalte lehrmodus_kurzbz in addon.tbl_lvevaluierung_frage hinzugefügt';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -4941,8 +4925,9 @@ $tabellen=array(
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen","bezeichnung_kurz","bezeichnung_lang"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
+	"lehre.tbl_lehrmodus" => array("lehrmodus_kurzbz","bezeichnung_mehrsprachig","aktiv"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
