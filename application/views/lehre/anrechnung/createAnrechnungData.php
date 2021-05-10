@@ -38,7 +38,7 @@ $query = '
 $filterWidgetArray = array(
 	'query' => $query,
 	'tableUniqueId' => 'createAnrechnung',
-	'requiredPermissions' => 'lehre/anrechnung_genehmigen',
+	'requiredPermissions' => 'lehre/anrechnung_anlegen',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
 		'prestudent_id',
