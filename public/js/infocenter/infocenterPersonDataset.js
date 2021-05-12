@@ -304,7 +304,6 @@ var InfocenterPersonDataset = {
 					}
 				},
 				errorCallback: function(jqXHR, textStatus, errorThrown) {
-					console.log(FHC_AjaxClient.getError(jqXHR));
 					FHC_DialogLib.alertError(textStatus);
 				}
 			}
