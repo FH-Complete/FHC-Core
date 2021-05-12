@@ -31,6 +31,20 @@ var InfocenterPersonDataset = {
 		var formHtml = '<form id="sendMsgsForm" method="post" action="'+ url +'" target="_blank"></form>';
 		$("#datasetActionsTop").before(formHtml);
 
+		var auswahlAbsageToggle =
+			'<a class="absageToggle">Erweiterte Einstellungen</a>';
+
+		var auswahlAbsage =
+			'<select class="form-control absgstatusgrund" style="width:auto; float:left;">' +
+			'<option value="null" selected="selected"> Absagegrund </option>' +
+			'</select>' +
+			'<select class="form-control auswahlAbsageStg" style="width:auto; float:left;">' +
+			'<option value="null" selected="selected"> Studiengang </option>' +
+			'</select>' +
+			'<button class="btn btn-default auswahlAbsageBtn" style="float:left"> Absage </button>';
+
+		InfocenterPersonDataset.getAbsageData();
+
 		var studienSemesterHtml = '<button class="btn btn-default btn-xs decStudiensemester">' +
 			'<i class="fa fa-chevron-left"></i>' +
 			'</button>&nbsp;' +
@@ -60,6 +74,14 @@ var InfocenterPersonDataset = {
 			"<div class='col-xs-12 text-center'>"+studienSemesterHtml+"</div>"+
 			"</div><div class='h-divider'></div><hr class='studiensemesterline'>");
 
+		$("#datasetActionsBottom").append(
+			"<div class='row'>"+
+				"<div class='col-xs-12'>"+auswahlAbsageToggle+"</div>"+
+				"<div class='col-xs-12' id='absagePunkte' style='display:none'>"+auswahlAbsage+"</div>"+
+			"</div>" +
+			"<div class='h-divider'></div>" +
+			"<hr class='studiensemesterline'>"
+		)
 		$("button.incStudiensemester").click(function() {
 			InfocenterPersonDataset.changeStudiensemesterUservar(1);
 		});
@@ -67,6 +89,16 @@ var InfocenterPersonDataset = {
 		$("button.decStudiensemester").click(function() {
 			InfocenterPersonDataset.changeStudiensemesterUservar(-1);
 		});
+
+		$('button.auswahlAbsageBtn').click(function()
+		{
+			InfocenterPersonDataset.saveAbsageForAll();
+		});
+
+		$('a.absageToggle').click(function()
+		{
+			$('#absagePunkte').toggle();
+		})
 
 		var personcount = 0;
 
@@ -203,6 +235,81 @@ var InfocenterPersonDataset = {
 		);
 	},
 
+	saveAbsageForAll: function()
+	{
+		var idsel = $("#filterTableDataset input:checked[name=PersonId\\[\\]]");
+
+		if(idsel.length <= 0)
+			return FHC_DialogLib.alertInfo("Bitte wählen Sie die Personen aus.");
+
+		var statusgrund = $('.absgstatusgrund').val();
+		var studiengang = $('.auswahlAbsageStg').val();
+
+		if(statusgrund === 'null' || studiengang === 'null')
+			return FHC_DialogLib.alertInfo("Bitte den Absagegrund und Studiengang auswählen.");
+
+		var personen = [];
+
+		for (var i = 0; i < idsel.length; i++)
+		{
+			personen.push($(idsel[i]).val());
+		}
+
+		FHC_AjaxClient.ajaxCallPost(
+			'system/infocenter/InfoCenter/saveAbsageForAll',
+			{
+				'statusgrund': statusgrund,
+				'studiengang': studiengang,
+				'personen' : personen
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data))
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+
+					if (FHC_AjaxClient.hasData(data))
+						FHC_FilterWidget.reloadDataset();
+
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
+
+	getAbsageData: function()
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			'system/infocenter/InfoCenter/getAbsageData',
+			{},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						data = FHC_AjaxClient.getData(data);
+						$.each(data.statusgruende, function(key, value){
+							$('.absgstatusgrund').append($("<option/>", {
+									value: value.statusgrund_id,
+									text: value.bezeichnung_mehrsprachig[0]
+							}))
+						})
+						$.each(data.studiengaenge, function(key, value){
+							$('.auswahlAbsageStg').append($("<option/>", {
+									value: value.studiengang,
+									text: value.studiengang
+							}))
+						})
+
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					console.log(FHC_AjaxClient.getError(jqXHR));
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
 	/**
 	 * initializes call to get the Studiensemester user variable
 	 */

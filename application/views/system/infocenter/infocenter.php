@@ -13,6 +13,7 @@
 			'ajaxlib' => true,
 			'filterwidget' => true,
 			'navigationwidget' => true,
+			'dialoglib' => true,
 			'phrases' => array(
 				'person' => array('vorname', 'nachname'),
 				'global' => array('mailAnXversandt'),

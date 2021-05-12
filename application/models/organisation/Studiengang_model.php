@@ -481,4 +481,17 @@ class Studiengang_model extends DB_Model
 		
 		return $this->loadWhere($condition);
 	}
+
+	public function getStudiengaengeWithOrgForm($typ)
+	{
+		$query = "SELECT DISTINCT (UPPER(sg.typ || sg.kurzbz || ':' || sp.orgform_kurzbz)) AS Studiengang
+					FROM public.tbl_prestudentstatus pss
+					JOIN public.tbl_prestudent ps USING(prestudent_id)
+					JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+					WHERE sg.typ IN ?
+					ORDER BY Studiengang;";
+
+		return $this->execQuery($query, array($typ));
+	}
 }

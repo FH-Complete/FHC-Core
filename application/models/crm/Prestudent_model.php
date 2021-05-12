@@ -581,4 +581,17 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery($query, array($person_id));
 	}
+
+	public function getPrestudentByStudiengangAndPerson($studiengang, $person)
+	{
+		$query = "SELECT ps.prestudent_id
+					FROM public.tbl_prestudentstatus pss
+					JOIN public.tbl_prestudent ps USING(prestudent_id)
+					JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+					WHERE ps.person_id = ?
+					AND UPPER((sg.typ || sg.kurzbz) || ':' || sp.orgform_kurzbz) = ?";
+
+		return $this->execQuery($query, array($person, $studiengang));
+	}
 }
