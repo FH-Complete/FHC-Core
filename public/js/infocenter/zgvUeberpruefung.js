@@ -30,12 +30,14 @@ $(document).ready(function ()
 		var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 		$('#inputStatus_' + prestudentid).val('rejected');
 		$('#notizModal_' + prestudentid).modal('show');
+		$('#notizModal_' + prestudentid + ' #inputNotizTitelModal').val('ZGV wurde nicht erfüllt')
 	});
 
 	$('.zgvAkzeptierenPruefung').click(function (){
 		var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 		$('#inputStatus_' + prestudentid).val('accepted_pruefung');
 		$('#notizModal_' + prestudentid).modal('show');
+		$('#notizModal_' + prestudentid + ' #inputNotizTitelModal').val('ZGV erfüllt mit Prüfung')
 	});
 
 	$('.saveZgvNotiz').click(function (){
