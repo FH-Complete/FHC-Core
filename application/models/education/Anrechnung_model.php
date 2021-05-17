@@ -3,6 +3,9 @@ class Anrechnung_model extends DB_Model
 {
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	
+	const ANRECHNUNGSTATUS_APPROVED = 'approved';
+	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
+	
 	/**
 	 * Constructor
 	 */
@@ -147,5 +150,54 @@ class Anrechnung_model extends DB_Model
 		';
 		
 		return $this->execQuery($qry, array($anrechnungstatus_id));
+	}
+	
+	/**
+	 * Delete last status approved / rejected.
+	 * If last status is 'approved', Genehmigung is resetted.
+	 *
+	 * @param $anrechnung_id
+	 * @return array
+	 */
+	public function withdrawApprovement($anrechnung_id)
+	{
+		// Get last Anrechnungstatus
+		if (!$result = getData($this->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			return error('Failed loading Anrechnung');
+		}
+		
+		$last_status = $result->status_kurzbz;
+		$anrechnungstatus_id = $result->anrechnungstatus_id;
+		
+		// Exit, if last status is not approved / rejected
+		if ($last_status != self::ANRECHNUNGSTATUS_APPROVED && $last_status != self::ANRECHNUNGSTATUS_REJECTED)
+		{
+			return error('Nothing to withdraw. Application is still in progress');
+		}
+		
+		// Start DB transaction
+		$this->db->trans_start(false);
+		
+		// If Anrechnung was approved
+		if ($last_status == self::ANRECHNUNGSTATUS_APPROVED)
+		{
+			// Reset Genehmigung
+			$this->AnrechnungModel->update($anrechnung_id, array('genehmigt_von' => NULL));
+		}
+		
+		// Delete last status approved / rejected
+		$this->AnrechnungModel->deleteAnrechnungstatus($anrechnungstatus_id);
+		
+		// Transaction complete
+		$this->db->trans_complete();
+		
+		if ($this->db->trans_status() === false)
+		{
+			$this->db->trans_rollback();
+			return error('Failed withdrawing Genehmigung', EXIT_ERROR);
+		}
+		return success();
+		
 	}
 }

@@ -280,34 +280,20 @@ class approveAnrechnungDetail extends Auth_Controller
 		
 		if (!is_numeric($anrechnung_id))
 		{
-			show_error('Wrong parameter.');
+			$this->terminateWithJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
 		
-		// Get last Anrechnungstatus
-		if (!$result = getData($this->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
-		{
-			show_error('Failed loading Anrechnung');
-		}
-		
-		$last_status = $result->status_kurzbz;
-		$anrechnungstatus_id = $result->anrechnungstatus_id;
-		
-		// Return if last status is not approved / rejected
-		if ($last_status != self::ANRECHNUNGSTATUS_APPROVED && $last_status != self::ANRECHNUNGSTATUS_REJECTED)
-		{
-			return $this->outputJsonError('Nothing to withdraw. Application is still in progress.');
-		}
-		
-		// Withdraw status approved / rejected
-		$result = $this->AnrechnungModel->deleteAnrechnungstatus($anrechnungstatus_id);
-		
+		// Delete last status approved / rejected.
+		// If last status is 'approved', Genehmigung is resetted.
+		$result = $this->AnrechnungModel->withdrawApprovement($anrechnung_id);
+
 		if (isError($result))
 		{
-			return $this->outputJsonError('Could not withdraw this application.');
+			$this->terminateWithJsonError(getError($result));
 		}
 		
 		// Success output to AJAX
-		return $this->outputJsonSuccess(array(
+		$this->outputJsonSuccess(array(
 			'status_bezeichnung' => $this->anrechnunglib->getLastAnrechnungstatus($anrechnung_id))
 		);
 	}
