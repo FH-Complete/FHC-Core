@@ -95,6 +95,64 @@ class AnrechnungJob extends JOB_Controller
 		$this->logInfo('End Anrechnung Grades Job', array('Number of Grades added'=>$cnt));
 	}
 	
+	/**
+	 * Deletes Zeugnisnoten 'angerechnet', when Anrechnung is rejected afterwards.
+	 * E.g., when STGL first accepts, then withdraws and finally rejects the approvement.
+	 */
+	public function deleteAnrechnungGrades()
+	{
+		$this->logInfo('Start AnrechnungJob to delete Grades');
+		
+		// Get all Zeungisnoten,
+		// WHERE note is angerechnet
+		// AND Anrechnung was rejected AFTER the Zeugnisnote was created
+		$qry = '
+			SELECT DISTINCT ON (status.anrechnung_id) anrechnung_id,
+				status.status_kurzbz AS "last_anrechnungstatus",
+				status.insertamum AS "last_anrechnungstatus_insertamum",
+				zeugnisnote.insertamum AS "zeugnisdatum_insertamum",
+				student.student_uid,
+				zeugnisnote.lehrveranstaltung_id,
+				zeugnisnote.studiensemester_kurzbz,
+				note
+			FROM lehre.tbl_zeugnisnote zeugnisnote
+			JOIN public.tbl_student student USING (student_uid)
+			JOIN lehre.tbl_anrechnung anrechnung
+				ON (zeugnisnote.lehrveranstaltung_id = anrechnung.lehrveranstaltung_id)
+					AND (student.prestudent_id = anrechnung.prestudent_id)
+					AND (zeugnisnote.studiensemester_kurzbz = anrechnung.studiensemester_kurzbz)
+			JOIN lehre.tbl_anrechnung_anrechnungstatus status USING (anrechnung_id)
+			WHERE note = 6
+			AND status.insertamum > zeugnisnote.insertamum
+			AND status.status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_REJECTED). '
+			ORDER BY status.anrechnung_id, status.insertamum DESC
+		';
+		
+		$db = new DB_Model();
+		$result = $db->execReadOnlyQuery($qry);
+		$cnt = 0;
+		
+		if (hasData($result))
+		{
+			$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+			
+			foreach (getData($result) as $row)
+			{
+				// Delete Zeugnisnote
+				$this->ZeugnisnoteModel->delete(array(
+					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
+					'student_uid' => $row->student_uid,
+					'studiensemester_kurzbz' => $row->studiensemester_kurzbz
+				));
+				
+				// Count up
+				$cnt++;
+			}
+		}
+		
+		$this->logInfo('End AnrechnungJob to delete Grades', array('Number of Grades deleted: ' => $cnt));
+	}
+	
 	// Send Sancho mail to STGL with yesterdays new Anrechnungen
 	public function sendMailToSTGL()
 	{
