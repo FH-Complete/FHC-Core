@@ -148,16 +148,36 @@ class datum
 	}
 
 	/**
-	 * Prueft ob das Datum im Format dd.mm.YYYY oder YYYY-mm-dd ist
-	 * @return true wenn ok, false wenn falsches Format
+	 * Prueft ob das Datum im Format dd.mm.YYYY oder YYYY-mm-dd ist UND ob es sich um ein gültiges Datum handelt
+	 * @return true wenn ok, false wenn falsches Format und/oder nicht gültig
 	 */
 	public function checkDatum($datum)
 	{
-		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})$",$datum) || mb_ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})$",$datum))
-			return true;
+		//Format dd.mm.yyyy
+		if(mb_ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})$", $datum))
+		{
+
+			$year = substr($datum, 6, 4);
+			$month = substr($datum, 3, 2);
+			$day = substr($datum, 0, 2);
+		}
+
+		//Format yyyy-mm-dd
+		elseif(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})$", $datum))
+		{
+			$year = substr($datum, 0, 4);
+			$month = substr($datum, 5, 2);
+			$day = substr($datum, 8, 2);
+		}
 		else
+		{
 			return false;
+		}
+
+		return	checkdate($month, $day, $year);
 	}
+
+
 
 	/**
 	 * Zieht ein Datum von einem anderen ab, und gibt die differenz in Tagen zurueck (mit Vorzeichen)
