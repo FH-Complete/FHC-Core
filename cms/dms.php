@@ -85,7 +85,7 @@ if($doc->isLocked($id))
 			$dokumente_arr[] .= 'ZgvBaPre';
 			$dokumente_arr[] .= 'ZgvMaPre';
 			$dokumente_arr[] .= 'InvitLet';
-			$dokumente_arr[] .= 'bst_zeit';
+			$dokumente_arr[] .= 'ZeitBest';
 		}
 		if ($person_id!=$akte_person || !in_array($akte_dokument_kurzbz, $dokumente_arr))
 			die('Sie haben keinen Zugriff auf dieses Dokument');
