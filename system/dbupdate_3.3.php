@@ -4767,6 +4767,64 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Creates table bis.tbl_oehbeitrag if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_oehbeitrag LIMIT 1'))
+{
+	$qry = 'CREATE TABLE bis.tbl_oehbeitrag (
+			    oehbeitrag_id integer NOT NULL,
+				studierendenbeitrag numeric(5,2) NOT NULL,
+				versicherung numeric(5,2) NOT NULL,
+				von_studiensemester_kurzbz varchar(16) NOT NULL,
+				bis_studiensemester_kurzbz varchar(16),
+				insertamum timestamp DEFAULT NOW(),
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
+			);
+
+			COMMENT ON TABLE bis.tbl_oehbeitrag IS \'Table to save amount of Oehbeitrag and Versicherung.\';
+			COMMENT ON COLUMN bis.tbl_oehbeitrag.studierendenbeitrag IS \'Amount of Studierendenbeitrag, Oehbeitrag without Versicherung.\';
+			COMMENT ON COLUMN bis.tbl_oehbeitrag.versicherung IS \'Amount of Versicherung as part of the Oehbeitrag\';
+			COMMENT ON COLUMN bis.tbl_oehbeitrag.von_studiensemester_kurzbz IS \'Semester from which amounts are valid\';
+			COMMENT ON COLUMN bis.tbl_oehbeitrag.bis_studiensemester_kurzbz IS \'Semester until which amounts are valid\';
+
+			CREATE SEQUENCE bis.seq_oehbeitrag_oehbeitrag_id
+			    START WITH 1
+			    INCREMENT BY 1
+			    NO MINVALUE
+			    NO MAXVALUE
+			    CACHE 1;
+
+			ALTER TABLE bis.tbl_oehbeitrag ALTER COLUMN oehbeitrag_id SET DEFAULT nextval(\'bis.seq_oehbeitrag_oehbeitrag_id\'::regclass);
+
+			GRANT SELECT, UPDATE ON SEQUENCE bis.seq_oehbeitrag_oehbeitrag_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE bis.seq_oehbeitrag_oehbeitrag_id TO fhcomplete;
+
+			ALTER TABLE bis.tbl_oehbeitrag ADD CONSTRAINT pk_oehbeitrag PRIMARY KEY (oehbeitrag_id);
+
+			ALTER TABLE bis.tbl_oehbeitrag ADD CONSTRAINT fk_oehbeitrag_von_studiensemester_kurzbz FOREIGN KEY (von_studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE bis.tbl_oehbeitrag ADD CONSTRAINT fk_oehbeitrag_bis_studiensemester_kurzbz FOREIGN KEY (bis_studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			ALTER TABLE bis.tbl_oehbeitrag ADD CONSTRAINT uk_oehbeitrag_von_studiensemester_kurzbz UNIQUE (von_studiensemester_kurzbz);';
+
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_oehbeitrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_oehbeitrag table created';
+
+	$qry = 'GRANT SELECT ON TABLE bis.tbl_oehbeitrag TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_oehbeitrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on bis.tbl_oehbeitrag';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_oehbeitrag TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_oehbeitrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on bis.tbl_oehbeitrag';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4798,6 +4856,7 @@ $tabellen=array(
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre","nationengruppe_kurzbz", "iso3166_1_a2","iso3166_1_a3"),
 	"bis.tbl_nationengruppe"  => array("nationengruppe_kurzbz","nationengruppe_bezeichnung","aktiv"),
+	"bis.tbl_oehbeitrag"  => array("oehbeitrag_id","studierendenbeitrag","versicherung","von_studiensemester_kurzbz","bis_studiensemester_kurzbz","bezeichnung_mehrsprachig", "insertamum", "insertvon", "updateamum", "updatevon"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz","bezeichnung_mehrsprachig"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
 	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
