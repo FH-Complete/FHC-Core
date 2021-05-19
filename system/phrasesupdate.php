@@ -12232,6 +12232,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragBenotungBlockiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Antrag kann aufgrund der vorhandenen Benotung nicht erstellt werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Application can not be created due to existing grade.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

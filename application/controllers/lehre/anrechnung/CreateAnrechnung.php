@@ -47,6 +47,9 @@ class CreateAnrechnung extends Auth_Controller
 			)
 		);
 		
+		// Load configs
+		$this->load->config('anrechnung');
+		
 		$this->_setAuthUID();
 		
 		$this->setControllerId();
@@ -140,6 +143,12 @@ class CreateAnrechnung extends Auth_Controller
 			$this->terminateWithJsonError($this->p->t('global', 'antragBereitsGestellt'));
 		}
 		
+		// Exit if Lehrveranstaltung was already graded with application blocking grades
+		if (self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id, $prestudent_id))
+		{
+			$this->terminateWithJsonError($this->p->t('anrechnung', 'antragBenotungBlockiert'));
+		}
+	
 		// Upload document
 		$result = self::_uploadFile();
 		
@@ -229,6 +238,34 @@ class CreateAnrechnung extends Auth_Controller
 		
 		// Upload document
 		return $this->dmslib->upload($dms, 'uploadfile', array('pdf'));
+	}
+	
+	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id, $prestudent_id)
+	{
+		// Get Student UID
+		$student_uid = $this->StudentModel->getUID($prestudent_id);
+		
+		// Get Note of Lehrveranstaltung
+		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
+		$result = $this->LvgesamtnoteModel->load(array(
+				'student_uid' => $student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'lehrveranstaltung_id' => $lehrveranstaltung_id
+			)
+		);
+
+		// If Lehrveranstaltung has Note
+		if (hasData($result))
+		{
+			$note = getData($result)[0]->note;
+			
+			// Check if Note is a blocking grade
+			if (in_array($note, $this->config->item('grades_blocking_application')))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }
