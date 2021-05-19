@@ -131,6 +131,7 @@ $bis_datum = (isset($_REQUEST['bis_datum'])?$_REQUEST['bis_datum']:date('d.m.Y')
 $bis_uhrzeit = (isset($_POST['bis_uhrzeit'])?$_POST['bis_uhrzeit']:date('H:i',mktime(date('H'), date('i')+10)));
 $bis = $bis_datum.' '.$bis_uhrzeit;
 
+$homeoffice = (isset($_POST['homeoffice'])?true:false);
 $pause_von = (isset($_POST['pause_von'])?$_POST['pause_von']:date('H:i'));
 $pause_bis = (isset($_POST['pause_bis'])?$_POST['pause_bis']:date('H:i'));
 $von_pause = $von_datum.' '.$pause_von;
@@ -908,6 +909,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit->updatevon = $user;
 		$zeit->projekt_kurzbz = $projekt_kurzbz;
 		$zeit->projektphase_id = $projektphase_id;
+		$zeit->homeoffice = $homeoffice;
 		$zeit->service_id = $service_id;
 		$zeit->kunde_uid = $kunde_uid;
 		$saveerror = 0;
@@ -1072,6 +1074,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 			$oe_kurzbz_2 = $zeit->oe_kurzbz_2;
 			$projekt_kurzbz = $zeit->projekt_kurzbz;
 			$projektphase_id = $zeit->projektphase_id;
+			$homeoffice = $zeit->homeoffice;
 			$service_id = $zeit->service_id;
 			$kunde_uid = $zeit->kunde_uid;
 
@@ -1449,8 +1452,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		<tr>
 			<td>&nbsp;</td>
 			<td colspan="1">
-				<span id="pausenblock">
-					<input type="checkbox" name="Homeoffice" id="homeoffice" >Homeoffice</input>
+				<span id="homeofficeBlock">
+					<input type="checkbox" name="homeoffice" id="homeoffice" >Homeoffice</input>
 				</span>
 			</td>
 		</tr>
