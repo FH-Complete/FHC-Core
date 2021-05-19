@@ -267,7 +267,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $lehrmodus string lehrmodus_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva($studiengang_kz=null, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null, $orgform=null)
+	public function load_lva($studiengang_kz=null, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null, $lehrmodus=null, $orgform=null)
 	{
 		//Variablen pruefen
 		if($semester == "null")
