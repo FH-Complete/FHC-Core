@@ -807,6 +807,21 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 										$zeit->projektphase_id = $data[7];
 									if (isset($data[8]))
 										$zeit->service_id = $data[8];
+									if (isset($data[9]))
+									{
+										if(strtolower($data[9]=='true'))
+										{
+											$zeit->homeoffice = true;
+										}
+										else
+										{
+											$zeit->homeoffice = false;
+										}
+									}
+									else
+									{
+										$zeit->homeoffice = false;
+									}
 									$tag = $datum->formatDatum($data[2], $format='Y-m-d');
 
 									if(!in_array($tag, $importtage_array))
