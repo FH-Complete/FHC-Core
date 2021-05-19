@@ -226,7 +226,7 @@ $this->load->view(
                                     class='fa fa-times'></i>
                         </button>
                     </div>
-						<a type="button" class="btn btn-default" style="margin-left: 20px;" href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_self'>
+						<a type="button" class="btn btn-default" style="margin-left: 20px;" href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_blank'>
 							<i class='fa fa-plus' aria-hidden='true'></i> <?php echo $this->p->t('global', 'antragAnlegen'); ?>
 						</a>
 				</div>
