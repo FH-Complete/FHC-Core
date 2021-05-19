@@ -4700,6 +4700,19 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// ADD COLUMN homeoffice in campus.tbl_zeitaufzeichnung
+if(!$result = @$db->db_query("SELECT homeoffice FROM campus.tbl_zeitaufzeichnung 1"))
+{
+	$qry = "
+		ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN homeoffice boolean NOT NULL DEFAULT false ;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_zeitaufzeichnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_zeitaufzeichnung Spalte homeoffice hinzugefügt.';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
