@@ -1444,6 +1444,17 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			</td>
 		</tr>
 		';
+		//Homeoffice Checkbox
+		echo '
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="1">
+				<span id="pausenblock">
+					<input type="checkbox" name="Homeoffice" id="homeoffice" >Homeoffice</input>
+				</span>
+			</td>
+		</tr>
+		';
 		//Beschreibung
 		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea style="font-size: 13px" name="beschreibung" cols="60" maxlength="256">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
 		echo '<tr><td></td><td></td><td></td><td align="right">';
