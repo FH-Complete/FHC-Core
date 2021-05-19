@@ -554,15 +554,15 @@ class ExtensionsLib
 	{
 		$this->_printStart('Adding new entry in the DB');
 
-		$sqlArr =
-		array('name' => $extensionJson->name,
-			'description' => isset($extensionJson->description) ? $extensionJson->description : null,
-			'version' => $extensionJson->version,
-			'license' => isset($extensionJson->license) ? $extensionJson->license : null,
-			'url' => isset($extensionJson->url) ? $extensionJson->url : null,
-			'core_version' => $extensionJson->core_version,
-			'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
-			'server_kurzbz' => SERVER_NAME);
+		$sqlArr = array('name' => $extensionJson->name,
+						'description' => isset($extensionJson->description) ? $extensionJson->description : null,
+						'version' => $extensionJson->version,
+						'license' => isset($extensionJson->license) ? $extensionJson->license : null,
+						'url' => isset($extensionJson->url) ? $extensionJson->url : null,
+						'core_version' => $extensionJson->core_version,
+						'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
+						'server_kurzbz' => SERVER_NAME);
+
 		if (is_null($extensionDBNull))
 			$result = $this->_ci->ExtensionsModel->insert($sqlArr);
 		else
