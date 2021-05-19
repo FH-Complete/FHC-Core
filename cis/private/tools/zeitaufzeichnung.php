@@ -845,6 +845,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 											$pause->start = $ende_vorher;
 											$pause->ende = $zeit->start;
 											$pause->beschreibung = '';
+											$pause->homeoffice = $homeoffice;
 											if(!$pause->save())
 											{
 												echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span><br>';
@@ -985,6 +986,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 				$pause->insertvon = $user;
 				$pause->uid = $user;
 				$pause->aktivitaet_kurzbz = 'Pause';
+				$pause->homeoffice = $homeoffice;
 				$pause->start = $datum->formatDatum($von_pause, $format='Y-m-d H:i:s');
 				$pause->ende = $datum->formatDatum($bis_pause, $format='Y-m-d H:i:s');
 				$pause->beschreibung = '';
