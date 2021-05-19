@@ -90,60 +90,68 @@ $this->load->view(
 							</div>
 							<div class="panel-body">
 								<div class="row">
-									<div class="col-lg-12">
+									<div class="col-lg-6">
 										<table class="table table-bordered table-condensed">
-								<tbody>
-								<tr>
-									<th class="col-xs-4"><?php echo ucfirst($this->p->t('person', 'studentIn')); ?></th>
-									<td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('person', 'personenkennzeichen'); ?></th>
-									<td><?php echo $antragData->matrikelnr ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></th>
-									<td><?php echo $antragData->studiensemester_kurzbz ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo ucfirst($this->p->t('lehre', 'studiengang')); ?></th>
-									<td><?php echo $antragData->stg_bezeichnung ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></th>
-									<td><?php echo $antragData->lv_bezeichnung ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('lehre', 'ects'); ?></th>
-									<td><?php echo $antragData->ects ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lektorInnen'); ?></th>
-									<td>
-										<?php $len = count($antragData->lektoren) - 1 ?>
-										<?php foreach ($antragData->lektoren as $key => $lektor): ?>
-											<?php echo $lektor->vorname . ' ' . $lektor->nachname;
-											echo $key === $len ? '' : ', ' ?>
-										<?php endforeach; ?>
-									</td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo ucfirst($this->p->t('global', 'zgv')); ?></th>
-									<td><?php echo $antragData->zgv ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></th>
-									<td><?php echo $anrechnungData->anmerkung ?></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></th>
-									<td>
-										<a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
-										   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
-									</td>
-								</tr>
-								</tbody>
-							</table>
+											<tbody>
+											<tr>
+												<th class="col-xs-4"><?php echo ucfirst($this->p->t('person', 'studentIn')); ?></th>
+												<td><?php echo $antragData->vorname . ' ' . $antragData->nachname; ?></td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo $this->p->t('person', 'personenkennzeichen'); ?></th>
+												<td><?php echo $antragData->matrikelnr ?></td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></th>
+												<td><?php echo $antragData->studiensemester_kurzbz ?></td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo ucfirst($this->p->t('lehre', 'studiengang')); ?></th>
+												<td><?php echo $antragData->stg_bezeichnung ?></td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></th>
+												<td><?php echo $antragData->lv_bezeichnung ?></td>
+											</tr>
+											
+											</tbody>
+										</table>
+									</div>
+									<div class="col-lg-6">
+										<table class="table table-bordered table-condensed">
+											<tbody>
+											
+											<tr>
+												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'ects'); ?></th>
+												<td><?php echo $antragData->ects ?></td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lektorInnen'); ?></th>
+												<td>
+													<?php $len = count($antragData->lektoren) - 1 ?>
+													<?php foreach ($antragData->lektoren as $key => $lektor): ?>
+														<?php echo $lektor->vorname . ' ' . $lektor->nachname;
+														echo $key === $len ? '' : ', ' ?>
+													<?php endforeach; ?>
+												</td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo ucfirst($this->p->t('global', 'zgv')); ?></th>
+												<td><?php echo $antragData->zgv ?></td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></th>
+												<td><?php echo $anrechnungData->anmerkung ?></td>
+											</tr>
+											<tr>
+												<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></th>
+												<td>
+													<a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
+													   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
+												</td>
+											</tr>
+											</tbody>
+										</table>
 									</div>
 								</div>
 							</div>
@@ -167,7 +175,7 @@ $this->load->view(
 								</div>
 								<div class="panel-body">
 									<div class="row">
-										<div class="col-lg-7">
+										<div class="col-lg-6">
 											<form id="form-empfehlung">
 												<input type="hidden" name="anrechnung_id"
 													   value="<?php echo $anrechnungData->anrechnung_id ?>">
@@ -207,7 +215,7 @@ $this->load->view(
 												</table>
 											</form>
 										</div>
-										<div class="col-lg-5">
+										<div class="col-lg-6">
 											<form id="form-empfehlungNotiz">
 												<input type="hidden" name="anrechnung_id"
 													   value="<?php echo $anrechnungData->anrechnung_id ?>">
