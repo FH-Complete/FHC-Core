@@ -1534,7 +1534,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<a href="?normal" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
 		else
 			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
-		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
+		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array(fehlt!)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
 
 		$za = new zeitaufzeichnung();
 	    if(isset($_GET['filter']))
@@ -1649,6 +1649,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 							$pausefehlt_str = '<span style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
 						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000)
 							$pausefehlt_str = '<span style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
+
 
 						$tagessaldo = date('H:i', ($tagessaldo));
 						$colspan = ($za_simple)?6:8;
@@ -1799,6 +1800,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					$style = 'style="border-top: 3px solid #8DBDD8; border-bottom: 3px solid #8DBDD8"';
 				if ($row->aktivitaet_kurzbz=='Pause' || $row->aktivitaet_kurzbz=='LehreExtern'|| $row->aktivitaet_kurzbz=='Ersatzruhe')
 					$style .= ' style="color: grey;"';
+				if($db->convert_html_chars($row->homeoffice)=='t')
+				{
+					$homeoffice = " - Homeoffice";
+				}else
+					$homeoffice="";
 				$summe = $row->summe;
 				$service = new service();
 				$service->load($row->service_id);
@@ -1814,7 +1820,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				{
 					echo '<td '.$style.' > '.$db->convert_html_chars($row->oe_kurzbz_2).'</td>';
 				}
-			    echo '<td '.$style.'>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>';
+			    echo '<td '.$style.'>'.$db->convert_html_chars($row->aktivitaet_kurzbz).($homeoffice).'</td>';
 				if(!$za_simple)
 				{
 					echo '<td '.$style.' title = "'.$service->bezeichnung.'" > '.StringCut($db->convert_html_chars($service->bezeichnung),20,null,'...').' </td>';
