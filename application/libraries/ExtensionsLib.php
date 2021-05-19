@@ -89,8 +89,14 @@ class ExtensionsLib
 
 			if (!$this->_errorOccurred) // if no error occurred
 			{
+				// Retives data about any previous installation of this extension on this server
+				$extensionDB = $this->_loadPreviousInstallation($uploadData->extensionName, true);
+			}
+
+			if (!$this->_errorOccurred) // if no error occurred
+			{
 				// Retives data about any previous installation of this extension
-				$extensionDB = $this->_loadPreviousInstallation($uploadData->extensionName);
+				$extensionDBNull = $this->_loadPreviousInstallation($uploadData->extensionName, false);
 			}
 
 			if (!$this->_errorOccurred) // if no error occurred
@@ -112,7 +118,7 @@ class ExtensionsLib
 
 				$this->_cleanPreviousInstallation($extensionJson); // cleans any previous installation
 
-				$this->_installExtension($extensionJson); // records extension data in DB
+				$this->_installExtension($extensionJson, $extensionDBNull); // records extension data in DB
 
 				if (!$this->_errorOccurred && $perform_sql === true) // if no error occurred
 				{
@@ -321,7 +327,7 @@ class ExtensionsLib
 	/**
 	 * Loads any previous installations of the given extension from DB
 	 */
-	private function _loadPreviousInstallation($extensionName)
+	private function _loadPreviousInstallation($extensionName, $onServer)
 	{
 		$extensionDB = null;
 
@@ -330,7 +336,11 @@ class ExtensionsLib
 		// Loads the last version of the previous installation of this extension
 		$this->_ci->ExtensionsModel->addOrder('version', 'DESC');
 		$this->_ci->ExtensionsModel->addLimit(1);
-		$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
+		if ($onServer)
+			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
+		else
+			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => NULL));
+
 		if (isError($result))
 		{
 			$this->_errorOccurred = true;
@@ -540,22 +550,24 @@ class ExtensionsLib
 	/**
 	 * Insert extension's data into the DB
 	 */
-	private function _installExtension($extensionJson)
+	private function _installExtension($extensionJson, $extensionDBNull)
 	{
 		$this->_printStart('Adding new entry in the DB');
 
-		$result = $this->_ci->ExtensionsModel->insert(
-			array(
-				'name' => $extensionJson->name,
-				'description' => isset($extensionJson->description) ? $extensionJson->description : null,
-				'version' => $extensionJson->version,
-				'license' => isset($extensionJson->license) ? $extensionJson->license : null,
-				'url' => isset($extensionJson->url) ? $extensionJson->url : null,
-				'core_version' => $extensionJson->core_version,
-				'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
-				'server_kurzbz' => SERVER_NAME,
-			)
-		);
+		$sqlArr =
+		array('name' => $extensionJson->name,
+			'description' => isset($extensionJson->description) ? $extensionJson->description : null,
+			'version' => $extensionJson->version,
+			'license' => isset($extensionJson->license) ? $extensionJson->license : null,
+			'url' => isset($extensionJson->url) ? $extensionJson->url : null,
+			'core_version' => $extensionJson->core_version,
+			'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
+			'server_kurzbz' => SERVER_NAME);
+		if (is_null($extensionDBNull))
+			$result = $this->_ci->ExtensionsModel->insert($sqlArr);
+		else
+			$result = $this->_ci->ExtensionsModel->update($extensionDBNull->extension_id, $sqlArr);
+
 		if (isSuccess($result))
 		{
 			$this->_printSuccess(true);
@@ -633,14 +645,17 @@ class ExtensionsLib
 		$this->_printMessage('Current extension directory: '.$this->UPLOAD_PATH.$extensionName);
 		$this->_printMessage('Directory where it will be moved: '.$this->EXTENSIONS_PATH.$extensionName);
 
-		if (rename($this->UPLOAD_PATH.$extensionName.'/', $this->EXTENSIONS_PATH.$extensionName))
+		if (!file_exists($this->EXTENSIONS_PATH.$extensionName))
 		{
-			$this->_printSuccess(true);
-		}
-		else
-		{
-			$this->_errorOccurred = true;
-			$this->_printFailure('error while moving');
+			if (rename($this->UPLOAD_PATH.$extensionName.'/', $this->EXTENSIONS_PATH.$extensionName))
+			{
+				$this->_printSuccess(true);
+			}
+			else
+			{
+				$this->_errorOccurred = true;
+				$this->_printFailure('error while moving');
+			}
 		}
 
 		$this->_printEnd();
@@ -758,6 +773,9 @@ class ExtensionsLib
 						log_message('error', 'Failed to create Symlink to '.$extensionPath.$targetDirectory);
 						break;
 					}
+				}else
+				{
+					$_addSoftLinks = true;
 				}
 			}
 		}
@@ -826,6 +844,10 @@ class ExtensionsLib
 		$result = $this->_ci->ExtensionsModel->load($extensionId);
 		if (hasData($result))
 		{
+			$extensionServer = $result->retval[0]->server_kurzbz;
+			if ($extensionServer !== SERVER_NAME)
+				return false;
+
 			$extensionName = $result->retval[0]->name; // extension name
 
 			// If to be enabled
