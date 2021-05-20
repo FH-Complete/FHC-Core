@@ -41,6 +41,7 @@
 				</div>
 				<div>
 					<?php $this->load->view('system/infocenter/infocenterData.php'); ?>
+					<?php $this->load->view('system/infocenter/absageModal.php'); ?>
 				</div>
 			</div>
 		</div>
