@@ -818,12 +818,7 @@ class AnrechnungLib
 		$this->ci->DmsVersionModel->addSelect('name');
 		$result = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $anrechnung->dms_id));
 
-		if (isError($result))
-		{
-			show_error(getError($result));
-		}
-
-		$anrechnung_data->dokumentname  = $result->retval[0]->name;
+		$anrechnung_data->dokumentname  = hasData($result) ? getData($result)[0]->name : '';
 
 		return $anrechnung_data;
 	}
