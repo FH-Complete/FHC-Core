@@ -884,4 +884,179 @@ class dokument extends basis_db
 		}
 
 	}
+
+	/**
+ * Akzeptiert ein bestimmtes Dokument
+ * Optional kann auch eine studiengang_kz uebergeben werden, ob speziell dort das Dokument akzeptiert wurde
+ * @param $dokument_kurzbz
+ * @param $person_id
+ * @param $studiengang_kz integer oder array aus mehreren studiengang_kz
+ * @return boolean true wenn akzeptiert, false wenn noch nicht akzeptiert
+ */
+function akzeptiereDokument($dokument_kurzbz, $person_id)
+{
+	$db = new basis_db();
+	$arrayDoksZuAkzeptieren = array();
+
+	//get Prestudent_ids
+	$qry = "SELECT 
+				prestudent_id
+			FROM 
+				tbl_prestudent ps, tbl_studiengang sg
+			WHERE 
+				ps.studiengang_kz = sg.studiengang_kz
+			AND sg.typ = 'm'
+			AND person_id = ".$this->db_add_param($person_id)."
+			AND not exists(
+				SELECT *
+				from tbl_dokumentprestudent dok
+				where dok.prestudent_id = ps.prestudent_id
+				and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz).")";
+
+
+	//echo var_dump($qry);
+	//for all prestudents 
+
+
+	//gibt ein Array von zu akzeptierenden Dokumenten zurück
+	if($db->db_query($qry))
+	{
+		$num_rows = $db->db_num_rows();
+		// Wenn kein ergebnis return 0 sonst ID
+		if ($num_rows>0)
+		{
+			while($row = $db->db_fetch_object())
+			{
+				//echo var_dump($row->prestudent_id);	
+				$arrayDoksZuAkzeptieren[] = $row->prestudent_id;
+			}
+			//print_r($arrayDoksZuAkzeptieren);
+
+			//und jetzt für alle prestudent_ids das Dokument akzeptieren
+
+			$qry = "INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id) VALUES";
+			//echo $qry;
+
+			foreach ($arrayDoksZuAkzeptieren AS $prestudent_id){
+				$qry.= "(".$this->db_add_param($dokument_kurzbz). ",". $prestudent_id . ")";
+
+				if (next($arrayDoksZuAkzeptieren)==true){
+					$qry.=  ",";
+				}
+			}
+			$qry.=  ";";
+
+			echo $qry;
+
+			if($this->db_query($qry))
+			{
+				echo " Jawoll: query ausgeführt";
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Akzeptieren';
+				return false;
+			}
+
+
+		}
+		else
+		{
+			echo "keine zu akzeptierenden Doks vorhanden";
+		}
+
+		return true;
+	}
+
+	else
+		return false;
+}
+
+	/**
+ * entakzeptiert ein bestimmtes Dokument
+ * Optional kann auch eine studiengang_kz uebergeben werden, ob speziell dort das Dokument entakzeptiert wurde
+ * @param $dokument_kurzbz
+ * @param $person_id
+ * @param $studiengang_kz integer oder array aus mehreren studiengang_kz
+ * @return boolean true wenn entakzeptiert, false wenn noch nicht entakzeptiert
+ */
+function entakzeptiereDokument($dokument_kurzbz, $person_id)
+{
+	$db = new basis_db();
+	$arrayDoksZuEntakzeptieren = array();
+
+	//get Prestudent_ids
+
+	$qry = "SELECT 
+				prestudent_id
+			from 
+				tbl_dokumentprestudent
+			join 
+				tbl_prestudent using (prestudent_id)
+			where 
+				person_id = ".$this->db_add_param($person_id)."
+			and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz);
+	
+		//	echo var_dump($qry);
+	//for all prestudents 
+
+
+	//gibt ein Array von zu Entakzeptierenden Dokumenten zurück
+	if($db->db_query($qry))
+	{
+		$num_rows = $db->db_num_rows();
+		// Wenn kein ergebnis return 0 sonst ID
+		if ($num_rows>0)
+		{
+			while($row = $db->db_fetch_object())
+			{
+				//echo var_dump($row->prestudent_id);	
+				$arrayDoksZuEntakzeptieren[] = $row->prestudent_id;
+			}
+			print_r($arrayDoksZuEntakzeptieren);
+
+			//und jetzt für alle prestudent_ids das Dokument Entakzeptieren
+
+			$qry = "DELETE FROM public.tbl_dokumentprestudent WHERE prestudent_id in (";
+			//echo $qry;
+
+			foreach ($arrayDoksZuEntakzeptieren AS $prestudent_id){
+				$qry.= $prestudent_id;
+
+				if (next($arrayDoksZuEntakzeptieren)==true){
+					$qry.=  ",";
+				}
+			}
+			$qry.=  ");";
+
+			echo $qry;
+
+			if($this->db_query($qry))
+			{
+				echo " Jawoll: query ausgeführt";
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Entakzeptieren';
+				return false;
+			}
+
+
+		}
+		else
+		{
+			echo "keine Entzuakzeptierenden Doks vorhanden";
+		}
+
+		return true;
+	}
+
+	else
+		return false;
+}
+
+
+
 }
