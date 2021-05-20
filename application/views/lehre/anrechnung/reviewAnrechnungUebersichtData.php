@@ -43,7 +43,7 @@ $query = '
 		JOIN public.tbl_person AS person USING (person_id)
 		JOIN public.tbl_studiengang AS stg USING (studiengang_kz)
 		JOIN lehre.tbl_lehrveranstaltung AS lv USING (lehrveranstaltung_id)
-		JOIN campus.tbl_dms_version AS dmsversion USING (dms_id)
+		LEFT JOIN campus.tbl_dms_version AS dmsversion USING (dms_id)
 		JOIN lehre.tbl_anrechnung_anrechnungstatus USING (anrechnung_id)
 		JOIN lehre.tbl_anrechnung_begruendung AS begruendung USING (begruendung_id)
 	)
