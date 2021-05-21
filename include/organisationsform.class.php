@@ -81,7 +81,9 @@ class organisationsform extends basis_db
 			$this->errormsg ="Fehler bei der Abfrage aufgetreten";
 			return false;
 		}
-	}
+
+        return true;
+    }
 
 	/**
 	 *

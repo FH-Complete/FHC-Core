@@ -212,21 +212,21 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_user LIMIT 1"))
 			JOIN public.tbl_mitarbeiter ma ON ma.mitarbeiter_uid = b.uid
 			WHERE ma.personalnummer > 0
 		);';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.vw_msg_vars_user view created';
-	
+
 	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO web;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars_user';
-	
+
 	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO vilesci;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4465,6 +4465,73 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// Add new funktion type kstzuordnung for cost center assignment in public.tbl_funktion
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_funktion WHERE funktion_kurzbz = 'kstzuordnung';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('kstzuordnung','Standardkostenstelle Zuordnung',true,false,false);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_funktion '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_funktion: Added funktion kstzuordnung<br>';
+	}
+}
+
+// Add column zugangstoken to tbl_projektbetreuer
+if(!$result = @$db->db_query("SELECT zugangstoken FROM lehre.tbl_projektbetreuer LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_projektbetreuer ADD COLUMN zugangstoken VARCHAR(32);
+			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken IS 'Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';
+			ALTER TABLE lehre.tbl_projektbetreuer ADD CONSTRAINT uk_tbl_projektbetreuer_zugangstoken UNIQUE (zugangstoken);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektbetreuer: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_projektbetreuer: Spalte zugangstoken hinzugefuegt';
+}
+
+// Add column zugangstoken_gueltigbis to tbl_projektbetreuer
+if(!$result = @$db->db_query("SELECT zugangstoken_gueltigbis FROM lehre.tbl_projektbetreuer LIMIT 1"))
+{
+	$qry = "ALTER table lehre.tbl_projektbetreuer ADD COLUMN zugangstoken_gueltigbis date;
+			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken_gueltigbis IS 'Gueligkeitsdatum fuer Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektbetreuer: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_projektbetreuer: Spalte zugangstoken_gueltigbis hinzugefuegt';
+}
+
+// App 'projektarbeitsbeurteilung' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='projektarbeitsbeurteilung'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('projektarbeitsbeurteilung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App projektarbeitsbeurteilung in system.tbl_app hinzugefügt';
+	}
+}
+
+// UPDATE Berechtigung für lehre.tbl_projektbetreuer für web user hinzufügen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_projektbetreuer' AND table_schema='lehre' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT UPDATE ON lehre.tbl_projektbetreuer TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Projektbetreuer Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Web User: update fuer lehre.tbl_projektbetreuer berechtigt';
+	}
+}
+
 // Add column dms_id, studiensemester_kurzbz, anmerkung_student und empfehlung_anrechnung
 // Change genehmigt_von and begruendung_id to be NULLABLE
 if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
@@ -4482,8 +4549,8 @@ if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
 		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
 		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
 	";
-	
-	
+
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_anrechnung: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4558,11 +4625,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"
 		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressLektor', '{\"Empfehlung angefordert\",\"recommendation requested\"}');
 		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('approved', '{\"genehmigt\",\"approved\"}');
 		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('rejected', '{\"abgelehnt\",\"rejected\"}');
-	
+
 		GRANT SELECT ON lehre.tbl_anrechnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnungstatus TO vilesci;
 	";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4590,12 +4657,12 @@ if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'seq_anrechn
 			NO MINVALUE
 			CACHE 1;
 			';
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Created sequence: lehre.seq_anrechnungstatus_status_kurzbz';
-		
+
 		// GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_anrechnungstatus_status_kurzbz_seq to web;
 		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz TO web;';
 		if (!$db->db_query($qry))
@@ -4623,7 +4690,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT pk_anrechnung_anrechnungstatus PRIMARY KEY (anrechnungstatus_id);
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT fk_anrechnung_anrechnungstatus_anrechnung FOREIGN KEY (anrechnung_id) REFERENCES lehre.tbl_anrechnung(anrechnung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT fk_anrechnung_anrechnungstatus_anrechnungstatus FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_anrechnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-		
+
 		CREATE SEQUENCE lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id
 			START WITH 1
 			INCREMENT BY 1
@@ -4631,14 +4698,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 			NO MINVALUE
 			CACHE 1;
 		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ALTER COLUMN anrechnungstatus_id SET DEFAULT nextval('lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id');
-		
+
 		INSERT INTO lehre.tbl_anrechnung_anrechnungstatus(anrechnung_id, status_kurzbz) SELECT anrechnung_id, 'approved' as status_kurzbz FROM lehre.tbl_anrechnung WHERE genehmigt_von is not null;
-		
+
 		GRANT SELECT ON lehre.tbl_anrechnung_anrechnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO vilesci;
 		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO vilesci;
 	";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_anrechnung_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
 	else
@@ -4664,7 +4731,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	if($db->db_num_rows($result) == 0)
 	{
 		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/anrechnung_beantragen', 'Anrechnung beantragen');";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
@@ -4678,7 +4745,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	if($db->db_num_rows($result) == 0)
 	{
 		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/anrechnung_genehmigen', 'Anrechnung genehmigen');";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
@@ -4692,7 +4759,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	if($db->db_num_rows($result) == 0)
 	{
 		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/anrechnung_empfehlen', 'Anrechnung empfehlen');";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
@@ -4830,7 +4897,7 @@ $tabellen=array(
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
-	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
+	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id", "zugangstoken", "zugangstoken_gueltigbis"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung","aktiv"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss","sort"),

@@ -1121,4 +1121,57 @@ function setLeadingZero($number, $length = 2)
 		return str_pad($number, $length, "0", STR_PAD_LEFT);
 	}
 }
+
+/**
+ * Generates a new token for diffent use cases. Default token length is 64
+ * - Reading messages
+ * - Forgotten password
+ * - etc
+ * Returns null on failure
+ */
+function generateUniqueToken($length = 64)
+{
+	$token = null;
+	$firstGeneratedToken = null;
+
+	// For PHP 7 you can use random_bytes()
+	if (function_exists('random_bytes'))
+	{
+		try
+		{
+			$firstGeneratedToken = random_bytes($length); // try to generates cryptographically secure pseudo-random bytes...
+		}
+		catch (Exception $e) { $firstGeneratedToken = null; } // if fails $firstGeneratedToken is set to null
+	}
+	// For PHP >= 5.3 and < 7 and openssl is available
+	elseif (function_exists('openssl_random_pseudo_bytes'))
+	{
+		$firstGeneratedToken = openssl_random_pseudo_bytes($length, $strong);
+		// If the token generation ended with errors OR the generated token is NOT strong enough
+		if ($firstGeneratedToken == false || $strong == false) $firstGeneratedToken = null; // $firstGeneratedToken is set to null
+	}
+
+	if ($firstGeneratedToken != null) // If everything was fine
+	{
+		// base64 is about 33% longer, so we need to truncate the result
+		$token = strtr(substr(base64_encode($firstGeneratedToken), 0, $length), '+/=', '-_,');
+	}
+
+	// Fallback to mt_rand if:
+	// php < 5.3
+	// OR no openssl is available
+	// OR openssl_random_pseudo_bytes used an algorithm that is cryptographically NOT strong
+	// OR one of the previous methods failed
+	if ($token == null)
+	{
+		$token = ''; // set $token as an empty string
+		$characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/+';
+		$charactersLength = strlen($characters) - 1;
+
+		// Select some random characters
+		for ($i = 0; $i < $length; $i++) $token .= $characters[mt_rand(0, $charactersLength)];
+	}
+
+	return $token;
+}
 ?>

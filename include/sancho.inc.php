@@ -23,6 +23,7 @@ require_once(dirname(__FILE__).'/mail.class.php');
 require_once(dirname(__FILE__).'/vorlage.class.php');
 
 const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
+const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
 
 /**
  * Send single Mail with Sancho Design and Layout.
@@ -31,14 +32,15 @@ const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
  *  to be replaced in the content template.
  * @param string $to Email-adress.
  * @param string $subject Subject of mail.
- * @param string $headerImg	Filename of the specific Sancho header image.
- * @return boolean True, if succeeded. 
+ * @param string $headerImg Filename of the specific Sancho header image.
+ * @param string $replyTo default Email-adress for reply.
+ * @return boolean True, if succeeded.
  */
-function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG)
+function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG, $footerImg = DEFAULT_SANCHO_FOOTER_IMG, $replyTo = '')
 {	
 	$from = 'sancho@'. DOMAIN;
 	$sanchoHeader_img = dirname(__FILE__). '/../skin/images/sancho/'. $headerImg;
-	$sanchoFooter_img = dirname(__FILE__). '/../skin/images/sancho/sancho_footer.jpg';
+	$sanchoFooter_img = dirname(__FILE__). '/../skin/images/sancho/'. $footerImg;
 
 	// Set unique content id for embedding header and footer image
 	$cid_header = uniqid();
@@ -63,7 +65,11 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 	// * embed the images
 	$mail->addEmbeddedImage($sanchoHeader_img, 'image/jpg', '', $cid_header);
 	$mail->addEmbeddedImage($sanchoFooter_img, 'image/jpg', '', $cid_footer);
-	
+
+	// * Set reply-to
+	if (isset($replyTo) && $replyTo != '')
+		$mail->setReplyTo($replyTo);
+
 	// * embed the html content
 	$mail->setHTMLContent($body);
 	

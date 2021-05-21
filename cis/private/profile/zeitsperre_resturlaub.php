@@ -112,13 +112,14 @@ foreach($addon_obj->result as $addon)
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
 <script>
+let holiDays =[];
 $( document ).ready(function()
 {
 	if(typeof addon  !== \'undefined\')
 	{
 		for(i in addon)
 		{
-			addon[i].init("cis/private/profile/urlaubstool.php", {uid:\''.$uid.'\'});
+			addon[i].init("cis/private/profile/zeitsperre_resturlaub.php", {uid:\''.$uid.'\', holiDays: holiDays});
 		}
 	}
 
@@ -126,6 +127,7 @@ $( document ).ready(function()
 		 changeMonth: true,
 		 changeYear: true,
 		 dateFormat: "dd.mm.yy",
+		 beforeShowDay: setHoliDays
 		 });
 
 	$( ".timepicker" ).timepicker({
@@ -137,13 +139,31 @@ $( document ).ready(function()
 			});
 
 });
-</script>';
-?>
-<style>
-.dd_breit
-{
-	width:460px;
+// set holidays function which is configured in beforeShowDay
+ function setHoliDays(date) {
+   for (i = 0; i < holiDays.length; i++) {
+     if (date.getFullYear() == holiDays[i][0]
+    	  && date.getMonth() == holiDays[i][1] - 1
+          && date.getDate() == holiDays[i][2]) {
+        return [true, "holiday", ""];
+     }
+   }
+  return [true, ""];
 }
+</script>';
+
+?>
+<style type="text/css">
+	.dd_breit
+	{
+		width:460px;
+	}
+
+	.ui-datepicker td.holiday a, .ui-datepicker td.holiday a:hover
+	{
+		background: none #FFEBAF;
+		border: 1px solid #BF5A0C;
+	}
 </style>
 <script language="Javascript">
 function conf_del()
