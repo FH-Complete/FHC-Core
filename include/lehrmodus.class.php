@@ -81,32 +81,35 @@ class lehrmodus extends basis_db
 	 * @param lehrmodus_kurzbz ID des Datensatzes der zu laden ist
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	// public function load($lehrmodus_kurzbz)
-	// {
-	// 	$sprache = new sprache();
-	// 	$qry = "SELECT *,".$sprache->getSprachQuery('bezeichnung_mehrsprachig')."
-	// 	FROM lehre.tbl_lehrmodus
-	// 	WHERE lehrmodus_kurzbz=".$this->db_add_param($lehrmodus_kurzbz).";";
-	//
-	// 	if(!$this->db_query($qry))
-	// 	{
-	// 		$this->errormsg = 'Fehler beim Lesen vom Lehrmodus';
-	// 		return false;
-	// 	}
-	//
-	// 	if($row = $this->db_fetch_object())
-	// 	{
-	// 		$this->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
-	// 		$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrprachig',$row);
-	// 		$this->aktiv = $this->db_parse_bool($row->aktiv);
-	// 	}
-	// 	else
-	// 	{
-	// 		$this->errormsg = 'Es ist kein Lehrmodus mit dieser ID vorhanden';
-	// 		return false;
-	// 	}
-	// 	return true;
-	// }
+	public function load($lehrmodus_kurzbz)
+	{
+		$sprache = new sprache();
+		$qry = "SELECT
+					*,".$sprache->getSprachQuery('bezeichnung_mehrsprachig')."
+				FROM
+					lehre.tbl_lehrmodus
+				WHERE
+					lehrmodus_kurzbz=".$this->db_add_param($lehrmodus_kurzbz).";";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Lesen vom Lehrmodus';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$this->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
+			$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
+		}
+		else
+		{
+			$this->errormsg = 'Es ist kein Lehrmodus mit dieser ID vorhanden';
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Baut die Datenstruktur für senden als JSON Objekt auf
