@@ -30,8 +30,34 @@ require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/addon.class.php');
+require_once ('../../include/sprache.class.php');
+require_once ('../../include/lehrmodus.class.php');
+
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+//Sprache
+
+// $spracheGet = filter_input(INPUT_GET, 'sprache');
+//
+// if(isset($spracheGet))
+// {
+// 	$spracheGet = new sprache();
+// 	if($spracheGet->load($_GET['sprache']))
+// 	{
+// 		setSprache($_GET['sprache']);
+// 	}
+// 	else
+// 	{
+// 		setSprache(DEFAULT_LANGUAGE);
+// 	}
+// }
+// $sprache = DEFAULT_LANGUAGE;
+// $sprache = getSprache();
+// $sprachindex = new sprache();
+// $spracheIndex = $sprachindex->getIndexFromSprache($sprache);
+//echo $spracheGet;
+
 
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
@@ -438,6 +464,8 @@ if($result = $db->db_query($qry))
 }
 
 //Lehrmodus holen
+$sprache = getSprache();
+
 $qry = "
 SELECT
 	lehrmodus_kurzbz,
@@ -445,12 +473,14 @@ SELECT
 FROM
 	lehre.tbl_lehrmodus ORDER BY lehrmodus_kurzbz";
 
-$lm = array();
 if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		$lm[$row->lehrmodus_kurzbz]['lehrmodus_kurzbz']=$row->lehrmodus_kurzbz;
+	//	$lm[$row->lehrmodus_kurzbz]['lehrmodus_kurzbz']=$row->lehrmodus_kurzbz;
+		$lm_beschr = new lehrmodus();
+		$lm_beschr ->load($row->lehrmodus_kurzbz);
+		$lm[$row->lehrmodus_kurzbz]['bezeichnung_mehrsprachig']=$lm_beschr->bezeichnung_mehrsprachig[$sprache];
 	}
 }
 
@@ -1198,7 +1228,8 @@ if ($result_lv!=0)
 				$selected='selected';
 			else
 				$selected='';
-			echo '<option value="'.$db->convert_html_chars($lehrmodus).'" '.$selected.'>'.$db->convert_html_chars($lm_kz['lehrmodus_kurzbz']).'</option>';
+
+			echo '<option value="'.$db->convert_html_chars($lehrmodus).'" '.$selected.'>'.$db->convert_html_chars($lm_kz['lehrmodus_kurzbz']. $lm_kz['bezeichnung_mehrsprachig']).'</option>';
 		}
 		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrmodus(\''.$row->lehrveranstaltung_id.'\',$(\'#lm'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';

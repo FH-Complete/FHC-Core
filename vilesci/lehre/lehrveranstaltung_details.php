@@ -174,14 +174,6 @@
 		}
 	}
 
-	$qry = "SELECT * FROM lehre.tbl_lehrmodus ORDER BY lehrmodus_kurzbz";
-	if($result = $db->db_query($qry))
-	{
-		while($row = $db->db_fetch_object($result))
-		{
-			$lehrmodus_arr[] = $row->lehrmodus_kurzbz;
-		}
-	}
 
 	if (isset($_REQUEST['lv_id']) || isset($_REQUEST['neu']))
 	{
@@ -304,13 +296,14 @@
 
 		$lehrmodus_arr = new lehrmodus();
 		$lehrmodus_arr->getAll();
+		$sprache = getSprache();
 		foreach ($lehrmodus_arr->result as $lehrmodus)
 		{
 			if ($lehrmodus->lehrmodus_kurzbz == $lv->lehrmodus_kurzbz)
 				$sel = ' selected';
 			else
 				$sel = '';
-			$htmlstr .= '<option value="'.$lehrmodus->lehrmodus_kurzbz.'" '.$sel.'>'.$lehrmodus->lehrmodus_kurzbz.'</option>';
+			$htmlstr .= '<option value="'.$lehrmodus->lehrmodus_kurzbz.'" '.$sel.'>'.$lehrmodus->bezeichnung_mehrsprachig[$sprache].'</option>';
 		}
 
 		$htmlstr .= '<tr>
