@@ -250,7 +250,7 @@ $this->load->view(
 				</div>
 				<!-- Sperregrund panel (hidden by default) -->
 				<div class="alert alert-danger text-center hidden" id="requestAnrechnung-sperre"
-					 data-anrechnung_id="<?php echo empty($antragData->anrechnung_id) ? '' : $antragData->anrechnung_id; ?>"
+					 data-anrechnung_id="<?php echo empty($anrechnungData->anrechnung_id) ? '' : $anrechnungData->anrechnung_id; ?>"
 					 data-expired="<?php echo json_encode($is_expired); ?>"
 					 data-blocked="<?php echo json_encode($is_blocked) ?>">
 				</div>
