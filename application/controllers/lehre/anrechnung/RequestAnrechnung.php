@@ -80,8 +80,11 @@ class requestAnrechnung extends Auth_Controller
 		$prestudent_id = getData($result)[0]->prestudent_id;
 		
 		// Check if application deadline is expired
-		// $is_expired = self::_checkAntragDeadline($studiensemester_kurzbz);
-		$is_expired = false;
+		$is_expired = self::_checkAntragDeadline(
+			$this->config->item('submit_application_start'),
+			$this->config->item('submit_application_end'),
+			$studiensemester_kurzbz
+		);
 		
 		// Check if Lehrveranstaltung was already graded with application blocking grades
 		$is_blocked = self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id);
@@ -216,28 +219,42 @@ class requestAnrechnung extends Auth_Controller
 		
 		if (!$this->_uid) show_error('User authentification failed');
 	}
-
+	
 	/**
 	 * Check if application deadline is expired.
 	 *
+	 * @param $start Start date for application submission.
+	 * @param $ende End date for application submission.
 	 * @param $studiensemester_kurzbz
-	 * @return bool True if semester start is more then 1 week ago
+	 * @return bool True if today is not during the start- and ending deadlines (= if is expired)
 	 * @throws Exception
 	 */
-	private function _checkAntragDeadline($studiensemester_kurzbz)
+	private function _checkAntragDeadline($start, $ende, $studiensemester_kurzbz)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$this->StudiensemesterModel->addSelect('start');
-		if (!$start = getData($this->StudiensemesterModel->load($studiensemester_kurzbz)))
-		{
-			show_error(getError($start));
-		}
-
-		$start = new DateTime($start[0]->start);
-		$today = new DateTime('today midnight');
 		
-		// True if today > application deadline
-		return ($today > $start->add((new DateInterval($this->config->item('interval_blocking_application')))));
+		// If start is not given, set to Semesterstart.
+		if (!isset($start) || isEmptyString($start))
+		{
+			$this->StudiensemesterModel->addSelect('start');
+			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
+			$start = getData($result)[0]->start;
+		}
+		
+		// If ende is not given, set to Semesterende.
+		if (!isset($ende) || isEmptyString($ende))
+		{
+			$this->StudiensemesterModel->addSelect('ende');
+			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
+			$ende = getData($result)[0]->ende;
+		}
+		
+		$today = new DateTime('today midnight');
+		$start = new DateTime($start);
+		$ende = new DateTime($ende);
+		
+		// True if today is not during the start- and ending deadlines (= if is expired)
+		return ($today <= $start || $today >= $ende);
 	}
 	
 	/**
