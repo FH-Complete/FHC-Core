@@ -416,5 +416,21 @@ class datum
 		return intval(substr($timestring, 0, 2)) + intval(substr($timestring, 3, 2)) / 60;
 	}
 
+	/**
+	 * Prueft das Datum
+	 * @param $date = string
+	 * @return true wenn ok, sonst false
+	 */
+	static public function verifyDate($date, $strict = true)
+	{
+		$dateTime = DateTime::createFromFormat('Y-m-d', $date);
+		if ($strict) {
+			$errors = DateTime::getLastErrors();
+			if (!empty($errors['warning_count'])) {
+				return false;
+			}
+		}
+		return $dateTime !== false;
+	}
 }
 ?>

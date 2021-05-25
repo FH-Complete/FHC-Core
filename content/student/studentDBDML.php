@@ -365,7 +365,6 @@ if(!$error)
 			$error = true;
 			$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 		}
-
 		//Studentendaten speichern
 		if(!$error)
 		{
@@ -377,7 +376,14 @@ if(!$error)
 				$errormsg = 'Fehler beim Laden:'.$student->errormsg;
 				$error = true;
 			}
-
+			$datum = new datum();
+			$geb = $_POST['geburtsdatum'];
+			if(!$datum->verifyDate($geb))
+			{
+				$return = false;
+				$errormsg = 'Datum ist nicht korrekt: '.$geb;
+				$error = true;
+			}
 			if(!$error)
 			{
 				$student->uid = $_POST['uid'];
