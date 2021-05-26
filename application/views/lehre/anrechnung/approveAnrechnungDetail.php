@@ -91,7 +91,7 @@ $this->load->view(
 							<div class="panel-body">
 								<div class="row">
 									<div class="col-lg-6">
-										<table class="table table-bordered table-condensed">
+										<table class="table table-bordered table-condensed table-fixed">
 											<tbody>
 											<tr>
 												<th class="col-xs-4"><?php echo ucfirst($this->p->t('person', 'studentIn')); ?></th>
@@ -118,7 +118,7 @@ $this->load->view(
 										</table>
 									</div>
 									<div class="col-lg-6">
-										<table class="table table-bordered table-condensed">
+										<table class="table table-bordered table-condensed table-fixed">
 											<tbody>
 											
 											<tr>
@@ -179,7 +179,7 @@ $this->load->view(
 											<form id="form-empfehlung">
 												<input type="hidden" name="anrechnung_id"
 													   value="<?php echo $anrechnungData->anrechnung_id ?>">
-												<table class="table table-bordered table-condensed">
+												<table class="table table-bordered table-condensed table-fixed">
 													<tbody>
 													<tr>
 														<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')); ?></th>

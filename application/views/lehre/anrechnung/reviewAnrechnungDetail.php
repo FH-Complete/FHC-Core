@@ -85,7 +85,7 @@ $this->load->view(
 							<div class="panel-body">
 								<div class="row">
 									<div class="col-lg-6">
-										<table class="table table-bordered table-condensed">
+										<table class="table table-bordered table-condensed table-fixed">
 											<tbody>
 											<tr>
 												<th class="col-xs-4"><?php echo ucfirst($this->p->t('person', 'studentIn')); ?></th>
@@ -111,7 +111,7 @@ $this->load->view(
 										</table>
 									</div>
 									<div class="col-lg-6">
-										<table class="table table-bordered table-condensed">
+										<table class="table table-bordered table-condensed table-fixed">
 											<tbody>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'ects'); ?></th>
@@ -167,7 +167,7 @@ $this->load->view(
 								</div>
 							</div>
 							<div class="panel-body">
-								<table class="table table-bordered table-condensed">
+								<table class="table table-bordered table-condensed table-fixed">
 
 								<tbody>
 								<tr>
