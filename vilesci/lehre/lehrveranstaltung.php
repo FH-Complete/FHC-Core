@@ -30,34 +30,14 @@ require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/addon.class.php');
-require_once ('../../include/sprache.class.php');
-require_once ('../../include/lehrmodus.class.php');
+require_once('../../include/sprache.class.php');
+require_once('../../include/lehrmodus.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 //Sprache
-
-// $spracheGet = filter_input(INPUT_GET, 'sprache');
-//
-// if(isset($spracheGet))
-// {
-// 	$spracheGet = new sprache();
-// 	if($spracheGet->load($_GET['sprache']))
-// 	{
-// 		setSprache($_GET['sprache']);
-// 	}
-// 	else
-// 	{
-// 		setSprache(DEFAULT_LANGUAGE);
-// 	}
-// }
-// $sprache = DEFAULT_LANGUAGE;
-// $sprache = getSprache();
-// $sprachindex = new sprache();
-// $spracheIndex = $sprachindex->getIndexFromSprache($sprache);
-//echo $spracheGet;
-
+$sprache = getSprache();
 
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
@@ -464,8 +444,6 @@ if($result = $db->db_query($qry))
 }
 
 //Lehrmodus holen
-$sprache = getSprache();
-
 $qry = "
 SELECT
 	lehrmodus_kurzbz,
@@ -480,7 +458,7 @@ if($result = $db->db_query($qry))
 	//	$lm[$row->lehrmodus_kurzbz]['lehrmodus_kurzbz']=$row->lehrmodus_kurzbz;
 		$lm_beschr = new lehrmodus();
 		$lm_beschr ->load($row->lehrmodus_kurzbz);
-		$lm[$row->lehrmodus_kurzbz]['bezeichnung_mehrsprachig']=$lm_beschr->bezeichnung_mehrsprachig[$sprache];
+		$lm[$row->lehrmodus_kurzbz]['bezeichnung_mehrsprachig'] = $lm_beschr->bezeichnung_mehrsprachig[$sprache];
 	}
 }
 
@@ -647,26 +625,6 @@ foreach ($orgform->result as $of)
 		$outp.= '<OPTION value="'.$db->convert_html_chars($of->orgform_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($of->orgform_kurzbz).' - '.$db->convert_html_chars($of->bezeichnung).'</OPTION>';
 }
 $outp.='</SELECT>';
-
-//Institut DropDown
-//auskommentiert: user story #12646
-// $outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
-// $fachb = new fachbereich();
-// $fachb->getAll();
-// $outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
-// $fachbereich_berechtigt = $rechte->getFbKz('lehre/lehrveranstaltung:begrenzt');
-// foreach ($fachb->result as $fb)
-// {
-// 	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
-// 		$selected = 'selected';
-// 	else
-// 		$selected = '';
-//
-// 	if(in_array($fb->fachbereich_kurzbz, $fachbereich_berechtigt))
-// 		$outp.= '<OPTION value="'.$db->convert_html_chars($fb->fachbereich_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($fb->fachbereich_kurzbz).'</OPTION>';
-// }
-//
-// $outp.= '</SELECT>';
 
 //if($write_admin) Von kindlm am 12.04.2013 auskommentiert, da Assistentinnen auch bei inaktiven LV's die Lehrform aendern koennen sollen
 //{
@@ -1222,14 +1180,15 @@ if ($result_lv!=0)
 		echo '<td style="white-space:nowrap;">';
 		echo '<SELECT id="lm'.$row->lehrveranstaltung_id.'">';
 		echo '<option value="">--</option>';
-		foreach ($lm as $lehrmodus=>$lm_kz)
+		foreach ($lm as $lehrmodus => $lm_kz)
 		{
 			if($lehrmodus == $row->lehrmodus_kurzbz)
-				$selected='selected';
+				$selected = 'selected';
 			else
-				$selected='';
+				$selected = '';
 
-			echo '<option value="'.$db->convert_html_chars($lehrmodus).'" '.$selected.'>'.$db->convert_html_chars($lm_kz['lehrmodus_kurzbz']. $lm_kz['bezeichnung_mehrsprachig']).'</option>';
+			echo '<option value="'.$db->convert_html_chars($lehrmodus).'" '.$selected.'>'
+			.$db->convert_html_chars($lm_kz['lehrmodus_kurzbz']. $lm_kz['bezeichnung_mehrsprachig']).'</option>';
 		}
 		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrmodus(\''.$row->lehrveranstaltung_id.'\',$(\'#lm'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';
