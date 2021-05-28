@@ -32,4 +32,57 @@ class Oehbeitrag_model extends DB_Model
 
 		return $this->execQuery($qry, array($studiensemester_kurzbz));
 	}
+
+	/**
+	 * Gets all Studiensemester for which no Oehbeitrag value assignment.
+	 * @param string $start_studiensemester_kurzbz semester before the given semester are ignored
+	 * @return object
+	 */
+	public function getUnassignedStudiensemester($start_studiensemester_kurzbz)
+	{
+		$qry = "SELECT * FROM public.tbl_studiensemester sem
+				WHERE sem.start >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = ?)
+				AND NOT EXISTS (SELECT 1 FROM bis.tbl_oehbeitrag oeh
+                    JOIN public.tbl_studiensemester oeh_von ON oeh.von_studiensemester_kurzbz = oeh_von.studiensemester_kurzbz
+                    LEFT JOIN public.tbl_studiensemester oeh_bis ON oeh.bis_studiensemester_kurzbz = oeh_bis.studiensemester_kurzbz
+                    WHERE sem.start::date >= oeh_von.start::date AND (sem.start::date <= oeh_bis.start::date OR oeh_bis.studiensemester_kurzbz IS NULL))
+                ORDER BY sem.start";
+
+		return $this->execQuery($qry, array($start_studiensemester_kurzbz));
+	}
+
+	/**
+	 * Checks if a Öhbeitrag can be assigned for a Studiensemester range.
+	 * @param string $von_studiensemester_kurzbz
+	 * @param string $bis_studiensemester_kurzbz
+	 * @return object
+	 */
+	public function checkIfStudiensemesterAssignable($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz = null)
+	{
+		$params = array($von_studiensemester_kurzbz);
+
+		$allStdSemSpanQry = "SELECT count(studiensemester_kurzbz) as number_assigned FROM public.tbl_studiensemester sem
+			WHERE start >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = ?)";
+
+		if ($bis_studiensemester_kurzbz != null)
+		{
+			$allStdSemSpanQry .= " AND (start <= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = ?))";
+			$params[] = $bis_studiensemester_kurzbz;
+		}
+
+		$allStdSemSpanQry .= " AND EXISTS (SELECT 1 FROM bis.tbl_oehbeitrag
+            JOIN public.tbl_studiensemester sem_von ON tbl_oehbeitrag.von_studiensemester_kurzbz = sem_von.studiensemester_kurzbz
+            LEFT JOIN public.tbl_studiensemester sem_bis ON tbl_oehbeitrag.bis_studiensemester_kurzbz = sem_bis.studiensemester_kurzbz
+            WHERE sem.start >= sem_von.start AND (sem.start <= sem_bis.start OR sem_bis.studiensemester_kurzbz IS NULL))";
+
+		$nrAssigned = $this->execQuery($allStdSemSpanQry, $params);
+
+		if (isError($nrAssigned))
+			return $nrAssigned;
+
+		if (!hasData($nrAssigned))
+			return error("Fehler bei Überprüfung der Möglichkeit der Semesterzuweisung");
+
+		return success(array(getData($nrAssigned)[0]->number_assigned == 0));
+	}
 }
