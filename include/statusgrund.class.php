@@ -179,5 +179,19 @@ class statusgrund extends basis_db
 
 		return true;
 	}
+
+	public function getByBezeichnung($beschreibung)
+	{
+		$qry = "
+			SELECT
+				*
+			FROM
+				public.tbl_status_grund
+			WHERE beschreibung[1] = '" . $beschreibung . "'
+			
+			";
+		$this->db_query($qry);
+		return $this->db_fetch_object();
+	}
 }
 ?>
