@@ -13,6 +13,7 @@ class Oehbeitrag extends Auth_Controller
 				'index' => 'admin:r',// TODO which Berechtigung?
 				'getValidStudiensemester' => 'admin:r',
 				'addOehbeitrag' => 'admin:rw',
+				'updateOehbeitrag' => 'admin:rw',
 				'deleteOehbeitrag' => 'admin:rw'
 			)
 		);
@@ -38,14 +39,16 @@ class Oehbeitrag extends Auth_Controller
 
 	public function getValidStudiensemester()
 	{
+		$oehbeitrag_id = $this->input->get('oehbeitrag_id');
+		$oehbeitrag_id_arr = isset($oehbeitrag_id) ? array($oehbeitrag_id) : null;
+
 		$studiensemester = array();
 
-		$studiensemesterres = $this->OehbeitragModel->getUnassignedStudiensemester(self::STUDIENSEMESTER_START);
-
+		$studiensemesterres = $this->OehbeitragModel->getUnassignedStudiensemester(self::STUDIENSEMESTER_START, $oehbeitrag_id_arr);
 		if (isError($studiensemesterres))
 		{
 			$this->outputJsonError(getError($studiensemesterres));
-			die();
+			return;
 		}
 
 		if (hasData($studiensemesterres))
@@ -63,9 +66,9 @@ class Oehbeitrag extends Auth_Controller
 		if ($bis_studiensemester_kurzbz == 'null')
 			$bis_studiensemester_kurzbz = null;
 
-		if (!is_numeric($studierendenbeitrag))
+		if (!$this->_checkAmount($studierendenbeitrag))
 			$this->outputJsonError('Ungültiger Studierendenbeitrag');
-		elseif (!is_numeric($versicherung))
+		elseif (!$this->_checkAmount($versicherung))
 			$this->outputJsonError('Ungültige Versicherung');
 		else
 		{
@@ -82,11 +85,63 @@ class Oehbeitrag extends Auth_Controller
 					'bis_studiensemester_kurzbz' => $bis_studiensemester_kurzbz
 				);
 
-				$insertRes = $this->OehbeitragModel->insert($data);
-
-				$this->outputJson($insertRes);
+				$this->outputJson($this->OehbeitragModel->insert($data));
 			}
 		}
+	}
+
+	public function updateOehbeitrag()
+	{
+		$oehbeitrag_id = $this->input->post("oehbeitrag_id");
+		$data = $this->input->post("data");
+
+		if (!is_numeric($oehbeitrag_id) || isEmptyArray($data))
+		{
+			$this->outputJsonError("Ungültige Parameter");
+			return;
+		}
+
+		foreach ($data as $idx => $value)
+		{
+			if ($idx == 'studierendenbeitrag' || $idx == 'versicherung')
+			{
+				if (!$this->_checkAmount($value))
+				{
+					$this->outputJsonError("Ungültiger $idx");
+					return;
+				}
+			}
+			elseif ($idx == 'von_studiensemester_kurzbz' || $idx == 'bis_studiensemester_kurzbz')
+			{
+				$this->OehbeitragModel->addSelect('von_studiensemester_kurzbz, bis_studiensemester_kurzbz');
+				$vonBisStudiensemesterRes = $this->OehbeitragModel->load($oehbeitrag_id);
+
+				if (!hasData($vonBisStudiensemesterRes))
+				{
+					$this->outputJsonError("Fehler beim Holen des Öhbeitrags");
+					return;
+				}
+
+				$vonBisStudiensemester = getData($vonBisStudiensemesterRes);
+
+				$von_studiensemester_kurzbz = $idx == 'von_studiensemester_kurzbz' ? $value : $vonBisStudiensemester[0]->von_studiensemester_kurzbz;
+
+				if ($idx == 'bis_studiensemester_kurzbz')
+					$bis_studiensemester_kurzbz = $data[$idx] = $value == 'null' ? null : $value;
+				else
+					$bis_studiensemester_kurzbz = $vonBisStudiensemester[0]->bis_studiensemester_kurzbz;
+
+				$checkStudiensemester = $this->_checkVonBisStudiensemester($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz, $oehbeitrag_id);
+
+				if (isError($checkStudiensemester))
+				{
+					$this->outputJsonError(getError($checkStudiensemester));
+					return;
+				}
+			}
+		}
+
+		$this->outputJson($this->OehbeitragModel->update($oehbeitrag_id, $data));
 	}
 
 	public function deleteOehbeitrag()
@@ -98,12 +153,19 @@ class Oehbeitrag extends Auth_Controller
 
 	private function _loadOehbeitraege()
 	{
-		$this->OehbeitragModel->addJoin('public.tbl_studiensemester', 'tbl_oehbeitrag.von_studiensemester_kurzbz = tbl_studiensemester.studiensemester_kurzbz');
-		$this->OehbeitragModel->addOrder('public.tbl_studiensemester.start', 'DESC');
+		$this->OehbeitragModel->addSelect('oehbeitrag_id, von_studiensemester_kurzbz, bis_studiensemester_kurzbz, studierendenbeitrag, versicherung, sem_von.start as von_datum, sem_bis.ende as bis_datum');
+		$this->OehbeitragModel->addJoin('public.tbl_studiensemester sem_von', 'tbl_oehbeitrag.von_studiensemester_kurzbz = sem_von.studiensemester_kurzbz');
+		$this->OehbeitragModel->addJoin('public.tbl_studiensemester sem_bis', 'tbl_oehbeitrag.bis_studiensemester_kurzbz = sem_bis.studiensemester_kurzbz', 'LEFT');
+		$this->OehbeitragModel->addOrder('sem_von.start', 'DESC');
 		return $this->OehbeitragModel->load();
 	}
 
-	private function _checkVonBisStudiensemester($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz)
+	private function _checkAmount($amount)
+	{
+		return is_numeric($amount) && $amount <= 99999.99;
+	}
+
+	private function _checkVonBisStudiensemester($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz, $oehbeitrag_id = null)
 	{
 		$regex = "/^(WS|SS)\d{4}$/";
 		if (!preg_match($regex, $von_studiensemester_kurzbz))
@@ -130,7 +192,13 @@ class Oehbeitrag extends Auth_Controller
 		if ($bis_studiensemester_kurzbz != null && new DateTime($vonStudiensemester) > new DateTime($bisStudiensemester))
 			return error("Von-Studiensemester größer als Bis-Studiensemester");
 
-		$assignableRes = $this->OehbeitragModel->checkIfStudiensemesterAssignable($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz);
+		$oehbeitrag_id_arr = isset($oehbeitrag_id) ? array($oehbeitrag_id) : null;
+
+		$assignableRes = $this->OehbeitragModel->checkIfStudiensemesterAssignable(
+			$von_studiensemester_kurzbz,
+			$bis_studiensemester_kurzbz,
+			$oehbeitrag_id_arr
+		);
 
 		if (isError($assignableRes))
 			return $assignableRes;

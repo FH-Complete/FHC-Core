@@ -34,30 +34,40 @@ class Oehbeitrag_model extends DB_Model
 	}
 
 	/**
-	 * Gets all Studiensemester for which no Oehbeitrag value assignment.
+	 * Gets all Studiensemester for which no Oehbeitrag value assignment exists.
 	 * @param string $start_studiensemester_kurzbz semester before the given semester are ignored
 	 * @return object
 	 */
-	public function getUnassignedStudiensemester($start_studiensemester_kurzbz)
+	public function getUnassignedStudiensemester($start_studiensemester_kurzbz, $excluded_oehbeitrag_id = array())
 	{
+		$params =  array($start_studiensemester_kurzbz);
+
 		$qry = "SELECT * FROM public.tbl_studiensemester sem
 				WHERE sem.start >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = ?)
 				AND NOT EXISTS (SELECT 1 FROM bis.tbl_oehbeitrag oeh
                     JOIN public.tbl_studiensemester oeh_von ON oeh.von_studiensemester_kurzbz = oeh_von.studiensemester_kurzbz
                     LEFT JOIN public.tbl_studiensemester oeh_bis ON oeh.bis_studiensemester_kurzbz = oeh_bis.studiensemester_kurzbz
-                    WHERE sem.start::date >= oeh_von.start::date AND (sem.start::date <= oeh_bis.start::date OR oeh_bis.studiensemester_kurzbz IS NULL))
-                ORDER BY sem.start";
+                    WHERE sem.start::date >= oeh_von.start::date AND (sem.start::date <= oeh_bis.start::date OR oeh_bis.studiensemester_kurzbz IS NULL)";
 
-		return $this->execQuery($qry, array($start_studiensemester_kurzbz));
+		if (!isEmptyArray($excluded_oehbeitrag_id))
+		{
+			$qry .= " AND oehbeitrag_id NOT IN ?";
+			$params[] = $excluded_oehbeitrag_id;
+		}
+
+		$qry .= ") ORDER BY sem.start";
+
+		return $this->execQuery($qry, $params);
 	}
 
 	/**
 	 * Checks if a Öhbeitrag can be assigned for a Studiensemester range.
 	 * @param string $von_studiensemester_kurzbz
 	 * @param string $bis_studiensemester_kurzbz
-	 * @return object
+	 * @param array $excluded_oehbeitrag_id
+	 * @return object array with true if assignable, with false if not
 	 */
-	public function checkIfStudiensemesterAssignable($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz = null)
+	public function checkIfStudiensemesterAssignable($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz = null, $excluded_oehbeitrag_id = array())
 	{
 		$params = array($von_studiensemester_kurzbz);
 
@@ -73,7 +83,15 @@ class Oehbeitrag_model extends DB_Model
 		$allStdSemSpanQry .= " AND EXISTS (SELECT 1 FROM bis.tbl_oehbeitrag
             JOIN public.tbl_studiensemester sem_von ON tbl_oehbeitrag.von_studiensemester_kurzbz = sem_von.studiensemester_kurzbz
             LEFT JOIN public.tbl_studiensemester sem_bis ON tbl_oehbeitrag.bis_studiensemester_kurzbz = sem_bis.studiensemester_kurzbz
-            WHERE sem.start >= sem_von.start AND (sem.start <= sem_bis.start OR sem_bis.studiensemester_kurzbz IS NULL))";
+            WHERE sem.start >= sem_von.start AND (sem.start <= sem_bis.start OR sem_bis.studiensemester_kurzbz IS NULL)";
+
+		if (!isEmptyArray($excluded_oehbeitrag_id))
+		{
+			$allStdSemSpanQry .= " AND oehbeitrag_id NOT IN ?";
+			$params[] = $excluded_oehbeitrag_id;
+		}
+		
+		$allStdSemSpanQry .= ")";
 
 		$nrAssigned = $this->execQuery($allStdSemSpanQry, $params);
 

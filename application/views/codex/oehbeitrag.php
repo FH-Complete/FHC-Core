@@ -12,7 +12,7 @@ $this->load->view(
 		'dialoglib' => true,
 		'ajaxlib' => true,
 		'navigationwidget' => true,
-		'customCSSs' => array('public/css/sbadmin2/tablesort_bootstrap.css'/*, 'public/css/codex/oehbeitrag.css'*/),
+		'customCSSs' => array('public/css/sbadmin2/tablesort_bootstrap.css', 'public/css/codex/oehbeitrag.css'),
 		'customJSs' => array('public/js/tablesort/tablesort.js', 'public/js/codex/oehbeitrag.js')
 	)
 );
@@ -41,7 +41,7 @@ $this->load->view(
 						<thead>
 							<tr>
 								<th>G&uuml;ltig von</th>
-								<th>G&uuml;ltig bis (inkl.)</th>
+								<th>G&uuml;ltig bis</th>
 								<th>Studierendenbetrag</th>
 								<th>Versicherungsbetrag</th>
 								<th id="actionHeading">Aktion</th>
@@ -50,10 +50,18 @@ $this->load->view(
 						<tbody>
 							<?php foreach ($oehbeitraege as $oehbeitrag): ?>
 							<tr>
-								<td><?php echo $oehbeitrag->von_studiensemester_kurzbz ?></td>
-								<td><?php echo $oehbeitrag->bis_studiensemester_kurzbz == null ? 'unbeschr&aumlnkt' : $oehbeitrag->bis_studiensemester_kurzbz ?></td>
-								<td><?php echo number_format($oehbeitrag->studierendenbeitrag, 2, ',', '.') ?></td>
-								<td><?php echo number_format($oehbeitrag->versicherung, 2, ',', '.') ?></td>
+								<td><?php echo date_format(date_create($oehbeitrag->von_datum), 'd.m.Y') . '/' . $oehbeitrag->von_studiensemester_kurzbz ?>
+									<i class="fa fa-edit editVonStudiensemester" id="edit_von_studiensemester_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
+								</td>
+								<td><?php echo $oehbeitrag->bis_studiensemester_kurzbz == null ? 'unbeschr&aumlnkt' : (date_format(date_create($oehbeitrag->bis_datum), 'd.m.Y') . '/' .  $oehbeitrag->bis_studiensemester_kurzbz) ?>
+									<i class="fa fa-edit editBisStudiensemester" id="edit_bis_studiensemester_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
+								</td>
+								<td><?php echo number_format($oehbeitrag->studierendenbeitrag, 2, ',', '.') ?>
+									<i class="fa fa-edit editStudierendenbeitrag" id="edit_studierendenbeitrag_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
+								</td>
+								<td><?php echo number_format($oehbeitrag->versicherung, 2, ',', '.') ?>
+									<i class="fa fa-edit editVersicherung" id="edit_versicherung_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
+								</td>
 								<td><button class="btn btn-default deleteBtn" id="delete_<?php echo $oehbeitrag->oehbeitrag_id ?>">L&ouml;schen</button></td>
 							</tr>
 							<?php endforeach; ?>
