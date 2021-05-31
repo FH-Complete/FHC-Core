@@ -3094,7 +3094,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ZGV erfüllt mit Prüfung',
+				'text' => 'ZGV mit Prüfungen erfüllt',
 				'description' => '',
 				'insertvon' => 'system'
 			),

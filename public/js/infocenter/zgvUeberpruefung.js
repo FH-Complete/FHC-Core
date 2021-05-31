@@ -37,7 +37,7 @@ $(document).ready(function ()
 		var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 		$('#inputStatus_' + prestudentid).val('accepted_pruefung');
 		$('#notizModal_' + prestudentid).modal('show');
-		$('#notizModal_' + prestudentid + ' #inputNotizTitelModal').val('ZGV erfüllt mit Prüfung')
+		$('#notizModal_' + prestudentid + ' #inputNotizTitelModal').val('ZGV mit Prüfungen erfüllt')
 	});
 
 	$('.saveZgvNotiz').click(function (){
