@@ -208,10 +208,10 @@
 				 LIMIT 1
 			) AS "StgAktiv",
 			(
-				SELECT ps.zgvnation
+				SELECT CONCAT(COALESCE(ps.zgvnation, \'-\'), \' / \' , COALESCE(ps.zgvmanation, \'-\'))
 				FROM public.tbl_prestudent ps
 				 WHERE ps.person_id = p.person_id
-			  ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
+			  ORDER BY ps.zgvnation, ps.zgvmanation DESC NULLS LAST, ps.prestudent_id DESC
 				 LIMIT 1
 			) AS "ZGVNation"
 		  FROM public.tbl_person p
