@@ -154,6 +154,9 @@ var Oehbeitrag = {
 								Oehbeitrag.deleteOehbeitrag(oehbeitrag_id);
 							}
 						)
+
+						// refresh tablesorter
+						Oehbeitrag._addTablesorter();
 					}
 					else
 					{
@@ -200,6 +203,8 @@ var Oehbeitrag = {
 								Oehbeitrag._setUpdateEvent($(this).prop("id"), fieldname, inputtype);
 							}
 						);
+
+						Oehbeitrag._addTablesorter();
 					}
 					else
 					{
@@ -359,8 +364,25 @@ var Oehbeitrag = {
 	},
 	_addTablesorter: function()
 	{
-		let headers = {headers: { 0: { sorter: false}, 1: { sorter: false}, 4: { sorter: false}}};
-		Tablesort.addTablesorter("oehbeitraegeTbl", [[0,0],[1,0]], ["zebra"], 8, headers);
+		// add parser through the tablesorter addParser method
+		$.tablesorter.addParser({
+			// set a unique id
+			id: 'germandatesort',
+			is: function(s, table, cell, $cell) {
+				// return false so this parser is not auto detected
+				return false;
+			},
+			format: function(s, table, cell, cellIndex) {
+				// format data, should sort by leading german date
+				return s.substring(0, 10).split(".").reverse().join("");
+			},
+			// set type, either numeric or text
+			type: 'numeric'
+		});
+
+		let headers = {headers: { 0: {sorter: "germandatesort"}, 1: {sorter: "germandatesort"}, 4: {sorter: false}}};
+
+		Tablesort.addTablesorter("oehbeitraegeTbl", [[0,1]], ["zebra"], 8, headers);
 	},
 	/**
 	 * Formats a numeric value as a float with two decimals

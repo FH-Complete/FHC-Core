@@ -3,7 +3,12 @@
     display: inline;
 }
 
-.fa-edit, .fa-check {
+.fa-edit {
     cursor: pointer;
     font-size: 1.2em;
+}
+
+.fa-check {
+    cursor: pointer;
+    font-size: 1.4em;
 }

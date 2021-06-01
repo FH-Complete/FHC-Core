@@ -36,6 +36,7 @@ class Oehbeitrag_model extends DB_Model
 	/**
 	 * Gets all Studiensemester for which no Oehbeitrag value assignment exists.
 	 * @param string $start_studiensemester_kurzbz semester before the given semester are ignored
+	 * @param array $excluded_oehbeitrag_id oehbeitraege to be ignored, i.e. which are assigned
 	 * @return object
 	 */
 	public function getUnassignedStudiensemester($start_studiensemester_kurzbz, $excluded_oehbeitrag_id = array())
@@ -64,7 +65,7 @@ class Oehbeitrag_model extends DB_Model
 	 * Checks if a Öhbeitrag can be assigned for a Studiensemester range.
 	 * @param string $von_studiensemester_kurzbz
 	 * @param string $bis_studiensemester_kurzbz
-	 * @param array $excluded_oehbeitrag_id
+	 * @param array $excluded_oehbeitrag_id oehbeitraege to ignore, i.e. which are assignable
 	 * @return object array with true if assignable, with false if not
 	 */
 	public function checkIfStudiensemesterAssignable($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz = null, $excluded_oehbeitrag_id = array())
