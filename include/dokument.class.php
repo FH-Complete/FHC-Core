@@ -890,7 +890,7 @@ class dokument extends basis_db
 	 * @param int $person_id Personenkennzeichen.
 	 * @return boolean true wenn akzeptiert, false wenn noch nicht akzeptiert
 	 */
-	protected function akzeptiereDokument($dokument_kurzbz, $person_id)
+	public function akzeptiereDokument($dokument_kurzbz, $person_id)
 	{
 		$db = new basis_db();
 		$arrayDoksZuAkzeptieren = array();
@@ -975,7 +975,7 @@ class dokument extends basis_db
 	 * @param int $person_id Personenkennzeichen.
 	 * @return boolean true wenn entakzeptiert, false wenn noch nicht entakzeptiert
 	 */
-	protected function entakzeptiereDokument($dokument_kurzbz, $person_id)
+	public function entakzeptiereDokument($dokument_kurzbz, $person_id)
 	{
 		$db = new basis_db();
 		$arrayDoksZuEntakzeptieren = array();
