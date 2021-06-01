@@ -1713,13 +1713,14 @@ class InfoCenter extends Auth_Controller
 		$statusgrund = $this->input->post('statusgrund');
 		$studiengang = $this->input->post('studiengang');
 		$personen = $this->input->post('personen');
+		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
 
 		if ($statusgrund === 'null' || $studiengang === 'null' || empty($personen))
 			$this->terminateWithJsonError("Bitte Statusgrund, Studiengang und Personen auswählen.");
 
 		foreach($personen as $person)
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person);
+			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester);
 
 			if(!hasData($prestudent))
 				continue;
