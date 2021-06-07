@@ -2215,9 +2215,9 @@ class prestudent extends person
 				WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
 				AND priorisierung <= ".$this->db_add_param($priorisierungAbsolut, FHC_INTEGER);
 
-		if($result = $this->db_query($qry))
+		if ($result = $this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object($result))
+			if ($row = $this->db_fetch_object($result))
 			{
 				return $row->prio_relativ;
 			}
@@ -2328,7 +2328,7 @@ class prestudent extends person
 					//echo var_dump($row->prestudent_id);
 					$arrayleereManations[] = $row->prestudent_id;
 				}
-				print_r($arrayleereManations);
+				//print_r($arrayleereManations);
 
 				$qry = "UPDATE
 					public.tbl_prestudent
@@ -2352,7 +2352,7 @@ class prestudent extends person
 
 				if ($this->db_query($qry))
 				{
-					echo " ZGV-Master Nation A eingetragen!";
+					//echo " ZGV-Master Nation A eingetragen!";
 					return true;
 				}
 				else
@@ -2362,7 +2362,7 @@ class prestudent extends person
 				}
 			}
 			else
-				echo " Keine leere ZGVManation gefunden";
+				//echo " Keine leere ZGVManation gefunden";
 				return true;
 		}
 	}
@@ -2447,9 +2447,6 @@ class prestudent extends person
 				//prestudentIds auf Interessentenstatus prüfen
 				foreach ($prestudentsOfMaster as $prestudent_id)
 				{
-					//echo $prestudent_id;
-					//echo "last status = " . $this->getLastPrestudentStatus($prestudent_id);
-					//echo "<br>";
 					if ($this->getLastPrestudentStatus($prestudent_id) == "Interessent")
 					{
 						return true;
@@ -2460,5 +2457,4 @@ class prestudent extends person
 		else
 			return false;
 	}
-
 }

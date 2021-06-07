@@ -888,7 +888,7 @@ class dokument extends basis_db
 	 * Akzeptiert ein bestimmtes Dokument
 	 * @param char $dokument_kurzbz Bezeichner Dokument.
 	 * @param int $person_id Personenkennzeichen.
-	 * @return boolean true wenn akzeptiert, false wenn noch nicht akzeptiert
+	 * @return boolean true wenn akzeptiert bzw geprüft ohne Akzeptieren, false wenn Fehler
 	 */
 	public function akzeptiereDokument($dokument_kurzbz, $person_id)
 	{
@@ -910,10 +910,7 @@ class dokument extends basis_db
 					where dok.prestudent_id = ps.prestudent_id
 					and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz).")";
 
-
 		//echo var_dump($qry);
-		//for all prestudents
-
 
 		//gibt ein Array von zu akzeptierenden Dokumenten zurück
 		if ($db->db_query($qry))
@@ -929,10 +926,8 @@ class dokument extends basis_db
 				}
 				//print_r($arrayDoksZuAkzeptieren);
 
-				//und jetzt für alle prestudent_ids das Dokument akzeptieren
-
+				//für alle prestudent_ids das Dokument akzeptieren
 				$qry = "INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id) VALUES";
-				//echo $qry;
 
 				foreach ($arrayDoksZuAkzeptieren as $prestudent_id)
 				{
@@ -945,11 +940,8 @@ class dokument extends basis_db
 				}
 				$qry .=  ";";
 
-				echo $qry;
-
 				if ($this->db_query($qry))
 				{
-					echo " Jawoll: query ausgeführt";
 					return true;
 				}
 				else
@@ -957,10 +949,6 @@ class dokument extends basis_db
 					$this->errormsg = 'Fehler beim Akzeptieren';
 					return false;
 				}
-			}
-			else
-			{
-				echo " Keine zu akzeptierenden Doks vorhanden";
 			}
 			return true;
 		}
@@ -973,7 +961,7 @@ class dokument extends basis_db
 	 * entakzeptiert ein bestimmtes Dokument
 	 * @param char $dokument_kurzbz Kurzbezeichnung des zu entakzeptierenden Dokuments.
 	 * @param int $person_id Personenkennzeichen.
-	 * @return boolean true wenn entakzeptiert, false wenn noch nicht entakzeptiert
+	 * @return boolean true wenn entakzeptiert bzw geprüft ohne Entakzeptieren, false wenn Fehler
 	 */
 	public function entakzeptiereDokument($dokument_kurzbz, $person_id)
 	{
@@ -981,7 +969,6 @@ class dokument extends basis_db
 		$arrayDoksZuEntakzeptieren = array();
 
 		//get Prestudent_ids
-
 		$qry = "SELECT
 					prestudent_id
 				from
@@ -1003,15 +990,12 @@ class dokument extends basis_db
 			{
 				while ($row = $db->db_fetch_object())
 				{
-					//echo var_dump($row->prestudent_id);
 					$arrayDoksZuEntakzeptieren[] = $row->prestudent_id;
 				}
-				print_r($arrayDoksZuEntakzeptieren);
+				//print_r($arrayDoksZuEntakzeptieren);
 
-				//und jetzt für alle prestudent_ids das Dokument Entakzeptieren
-
+				//für alle prestudent_ids das Dokument Entakzeptieren
 				$qry = "DELETE FROM public.tbl_dokumentprestudent WHERE prestudent_id in (";
-				//echo $qry;
 
 				foreach ($arrayDoksZuEntakzeptieren as $prestudent_id)
 				{
@@ -1024,8 +1008,6 @@ class dokument extends basis_db
 				}
 				$qry .=  ") AND dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz).";";
 
-				echo $qry;
-
 				if ($this->db_query($qry))
 				{
 					return true;
@@ -1035,10 +1017,6 @@ class dokument extends basis_db
 					$this->errormsg = 'Fehler beim Entakzeptieren';
 					return false;
 				}
-			}
-			else
-			{
-				echo " Keine Entzuakzeptierenden Doks vorhanden";
 			}
 			return true;
 		}
