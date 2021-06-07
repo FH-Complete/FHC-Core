@@ -133,6 +133,7 @@ class InfoCenter extends Auth_Controller
 
 		// Loads models
 		$this->load->model('crm/Akte_model', 'AkteModel');
+		$this->load->model('crm/Dokument_model', 'DokumentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
@@ -232,10 +233,13 @@ class InfoCenter extends Auth_Controller
 		$prestudent_id = array('prestudent_id' => $prestudent_id);
 		$status = array('status' => getData($zgv)[0]->status);
 
+		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
+
 		$data = array_merge(
 			$persondata,
 			$prestudent_id,
-			$status
+			$status,
+			$dokumentdata
 		);
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);

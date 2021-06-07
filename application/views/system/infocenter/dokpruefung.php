@@ -21,7 +21,14 @@
 				<td>
 					<a href="outputAkteContent/<?php echo $dokument->akte_id ?>"><?php echo isEmptyString($dokument->titel) ? $dokument->bezeichnung : $dokument->titel ?></a>
 				</td>
-				<td><?php echo $dokument->dokument_bezeichnung ?></td>
+				<td>
+					<select class="aktenid" id="aktenid_<?php echo $dokument->akte_id?>" <?php echo (isset($formalReadonly) ? 'disabled' : '') ?>>
+						<?php
+						foreach($dokumententypen as $dokumenttyp)
+							echo "<option " . ($dokumenttyp->bezeichnung === $dokument->dokument_bezeichnung ? 'selected' : '') . " value = " . $dokumenttyp->dokument_kurzbz . ">" . $dokumenttyp->bezeichnung . "</option>"
+						?>
+					</select>
+				</td>
 				<td><?php echo date_format(date_create($dokument->erstelltam), 'd.m.Y') ?></td>
 				<td><?php echo $dokument->langtext ?></td>
 				<?php
