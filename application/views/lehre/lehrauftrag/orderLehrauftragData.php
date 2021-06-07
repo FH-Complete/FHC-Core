@@ -405,6 +405,9 @@ $filterWidgetArray = array(
         dataLoaded: function(data){
             func_dataLoaded(data, this);
         },
+        tableWidgetHeader: {
+			headerButtons: true
+		},
 		tableWidgetFooter: {
 			selectButtons: true
 		}

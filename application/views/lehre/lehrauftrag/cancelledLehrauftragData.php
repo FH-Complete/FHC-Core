@@ -76,6 +76,9 @@ $tableWidgetArray = array(
         tableBuilt: function(){
             func_tableBuilt(this);
         },
+        tableWidgetHeader: {
+			headerButtons: true
+		}
     }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
         vertrag_id: {visible: false},

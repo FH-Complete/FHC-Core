@@ -544,17 +544,28 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
-				if (options.tableWidgetHeader == 'undefined')
-				{
-					options.persistentLayout = true;			// enables persistence (default store in localStorage if available, else in cookie)
-					options.persistenceID = data.tableUniqueId;	// TableWidget unique id to store persistence data seperately for multiple tables
-				}
-				options.movableColumns = true;				// allows changing column order
 				options.tooltipsHeader = true;				// set header tooltip with column title
 				options.placeholder = _func_placeholder();	// display text when table is empty
+				options.persistenceID = data.tableUniqueId;	// unique id to store persistence data separately for multiple tables
+
+				// Columns can be moved per default
+				if (options.movableColumns == undefined)
+				{
+					options.movableColumns = true;			// allows changing column order
+				}
+
+				// Column layout is stored by default
+				if (typeof(options.persistentLayout) === 'undefined')
+				{
+					options.persistentLayout = true;		// enables column layout persistence
+				}
+
+				// Sum up rows selected
 				options.rowSelectionChanged = function(data, rows){
 					_func_rowSelectionChanged(data, rows);
 				};
+				
+				// Redraw table when hiding / showing columns
 				options.columnVisibilityChanged = function(column, visible) {
 					_func_columnVisibilityChanged(column, visible);
 				};
@@ -569,15 +580,19 @@ var FHC_TableWidget = {
 		// -------------------------------------------------------------------------------------------------------------
 
 		// Render tableWidgetHeader
-		if (options.tableWidgetHeader == 'undefined' ||
-			(options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != false))
+		if (options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != null)
 		{
-			var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
-			tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
+			// If property headerButtons is true, render them! (CSV-, Help-, Settingbuttons)
+			if (options.tableWidgetHeader.headerButtons != 'undefined' && options.tableWidgetHeader.headerButtons === true)
+			{
+				// Render the buttons
+				var tabulatorHeaderButtonsHTML = _renderTabulatorHeaderButtonsHTML(tableWidgetDiv);
+				tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderButtonsHTML);
 
-			// Render the collapsable div triggered by button in tableWidgetHeader
-			var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
-			tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
+				// Render the collapsable div triggered by clicking the headerButtons
+				var tabulatorHeaderButtonsCollapseHTML = _renderTabulatorHeaderButtonsCollapseHTML(tableWidgetDiv);
+				tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderButtonsCollapseHTML);
+			}
 		}
 
 		/**
@@ -759,7 +774,7 @@ function _func_placeholder(){
 }
 
 // Returns TableWidget Header HTML (download-, setting button...)
-function _renderTabulatorHeaderHTML(tableWidgetDiv){
+function _renderTabulatorHeaderButtonsHTML(tableWidgetDiv){
 
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 
@@ -785,13 +800,13 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 		'</button>';
 	tabulatorHeaderHTML += '</div>';
 	tabulatorHeaderHTML += '</div>';
-	tabulatorHeaderHTML += '<br><br><br>';
+	tabulatorHeaderHTML += '<br><br>';
 
 	return tabulatorHeaderHTML;
 }
 
 // Returns collapsable HTML element for TableWidget header buttons
-function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
+function _renderTabulatorHeaderButtonsCollapseHTML(tableWidgetDiv){
 
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 

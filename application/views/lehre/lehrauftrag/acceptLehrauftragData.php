@@ -353,6 +353,9 @@ $filterWidgetArray = array(
          renderStarted:function(){
             func_renderStarted(this);
         },
+        tableWidgetHeader: {
+			headerButtons: true
+		},
 		tableWidgetFooter: {
 			selectButtons: true
 		}

@@ -370,6 +370,9 @@ $filterWidgetArray = array(
         tableBuilt: function(){
             func_tableBuilt(this);
         },
+        tableWidgetHeader: {
+			headerButtons: true
+		},
 		tableWidgetFooter: {
 			selectButtons: true
 		}
