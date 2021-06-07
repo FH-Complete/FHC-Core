@@ -2366,4 +2366,99 @@ class prestudent extends person
 				return true;
 		}
 	}
+
+	/**
+	 * liefert den letztgültigen Status des Prestudenten
+	 * @param int $prestudent_id ID der zu überprüfenden Person.
+	 * @return string $result wenn vorhanden
+	 *		 false und errormsg wenn Fehler aufgetreten ist
+	 */
+	public function getLastPrestudentStatus($prestudent_id)
+	{
+		if (!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+		//get all prestudents
+		$qry = "SELECT pss.status_kurzbz
+		FROM public.tbl_prestudentstatus pss
+		JOIN public.tbl_prestudent ps using (prestudent_id)
+		where ps.prestudent_id = ".$this->db_add_param($prestudent_id)."
+		group by prestudent_id, pss.status_kurzbz, pss.insertamum
+		order by pss.insertamum DESC limit 1";
+
+		if ($db->db_query($qry))
+		{
+			$row = $db->db_fetch_object();
+			$result = $row->status_kurzbz;
+			return $result;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Prueft, ob eine Person einen aktuellen PreStudentstatus-Eintrag Interessent für einen Masterstudiengang besitzt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn vorhanden
+	 *		 false wenn nicht vorhanden
+	 *		 false und errormsg wenn Fehler aufgetreten ist
+	 */
+	public function existsStatusInteressentMaster($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+		$prestudentsOfMaster = array();
+		//get all prestudents
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps, tbl_studiengang sg
+				WHERE
+					ps.studiengang_kz = sg.studiengang_kz
+				AND
+					sg.typ in ('m','d')
+				AND person_id = ".$this->db_add_param($person_id).";";
+
+
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+			// Wenn kein ergebnis return 0 sonst ID
+			if ($num_rows > 0)
+			{
+				while ($row = $db->db_fetch_object())
+				{
+					//echo var_dump($row->prestudent_id);
+					$prestudentsOfMaster[] = $row->prestudent_id;
+				}
+
+				//prestudentIds auf Interessentenstatus prüfen
+				foreach ($prestudentsOfMaster as $prestudent_id)
+				{
+					//echo $prestudent_id;
+					//echo "last status = " . $this->getLastPrestudentStatus($prestudent_id);
+					//echo "<br>";
+					if ($this->getLastPrestudentStatus($prestudent_id) == "Interessent")
+					{
+						return true;
+					}
+				}
+			}
+		}
+		else
+			return false;
+	}
+
 }
