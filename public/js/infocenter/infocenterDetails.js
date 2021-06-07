@@ -4,6 +4,7 @@ const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
 const CONTROLLER_URL = BASE_URL + "/"+CALLED_PATH;
 const RTFREIGABE_MESSAGE_VORLAGE = "InfocenterRTfreigegeben";
 const RTFREIGABE_MESSAGE_VORLAGE_MASTER = "InfocenterRTfreigegebenM";
+const RTFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH = "InfocenterRTfreigegebenMEnglisch";
 const RTFREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
 const RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ = "InfocenterRTfreigegQuerKurz";
 const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
@@ -662,10 +663,12 @@ var InfocenterDetails = {
 					else
 					{
 						//send normal RTfreigabe message
-						if (receiverPrestudent.studiengangtyp === 'm')
-						{
-							vorlage = RTFREIGABE_MESSAGE_VORLAGE_MASTER
-						}else
+						if (receiverPrestudent.studiengangtyp === 'm') {
+							if (receiverPrestudentstatus.sprache === 'English')
+								vorlage = RTFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH
+							else
+								vorlage = RTFREIGABE_MESSAGE_VORLAGE_MASTER
+						} else
 						{
 							vorlage = RTFREIGABE_MESSAGE_VORLAGE
 						}
@@ -681,6 +684,12 @@ var InfocenterDetails = {
 				{
 					if (receiverPrestudent.studiengangtyp === 'm' && (freigabedata.statusgrundbezeichnung === 'Ergänzungsprüfungen' || freigabedata.statusgrundbezeichnung === 'Supplementary exams'))
 					{
+						msgvars = {
+							'studiengangbezeichnung': studiengangbezeichnung,
+							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
+							'orgform_deutsch': orgform_deutsch,
+							'orgform_englisch': orgform_englisch
+						}
 						InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE_MASTER, msgvars);
 					}else
 					{
