@@ -107,7 +107,7 @@ class Oehbeitrag extends Auth_Controller
 			{
 				if (!$this->_checkAmount($value))
 				{
-					$this->outputJsonError("Ungültiger $idx");
+					$this->outputJsonError("Ungültige(r) $idx");
 					return;
 				}
 			}
@@ -162,7 +162,7 @@ class Oehbeitrag extends Auth_Controller
 
 	private function _checkAmount($amount)
 	{
-		return is_numeric($amount) && $amount <= 99999.99;
+		return is_numeric($amount) && (float) $amount <= 99999.99;
 	}
 
 	private function _checkVonBisStudiensemester($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz, $oehbeitrag_id = null)

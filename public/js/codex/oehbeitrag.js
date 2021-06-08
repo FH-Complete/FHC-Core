@@ -127,10 +127,10 @@ var Oehbeitrag = {
 						let bis_studiensemester_kurzbz = oehbeitrag.bis_studiensemester_kurzbz == 'null' ? 'unbeschränkt' : studiensemester_von_bis.bis_semester_with_date;
 
 						$("#input_studierendenbeitrag_"+nextOehbeitragId).parent('td').html(
-							Oehbeitrag._formatDecimalGerman(oehbeitrag.studierendenbeitrag)+" <i class='fa fa-edit editStudierendenbeitrag' id='edit_studierendenbeitrag_"+inserted_id+"'></i>"
+							Oehbeitrag._formatDecimal(oehbeitrag.studierendenbeitrag)+" <i class='fa fa-edit editStudierendenbeitrag' id='edit_studierendenbeitrag_"+inserted_id+"'></i>"
 						);
 						$("#input_versicherung_"+nextOehbeitragId).parent('td').html(
-							Oehbeitrag._formatDecimalGerman(oehbeitrag.versicherung)+" <i class='fa fa-edit editVersicherung' id='edit_versicherung_"+inserted_id+"'></i>"
+							Oehbeitrag._formatDecimal(oehbeitrag.versicherung)+" <i class='fa fa-edit editVersicherung' id='edit_versicherung_"+inserted_id+"'></i>"
 						);
 						$("#input_von_studiensemester_kurzbz_"+nextOehbeitragId).parent('td').html(
 							studiensemester_von_bis.von_semester_with_date+" <i class='fa fa-edit editVonStudiensemester' id='edit_von_studiensemester_kurzbz_"+inserted_id+"'></i>"
@@ -174,6 +174,10 @@ var Oehbeitrag = {
 	{
 		let oehbeitragdata = {};
 		let fieldvalue = fieldelement.val();
+
+		if (inputtype != 'semester') // formal number as decimal with point separator
+			fieldvalue = Oehbeitrag._formatDecimal(fieldvalue, ".");
+
 		oehbeitragdata[fieldname] = fieldvalue;
 
 		FHC_AjaxClient.ajaxCallPost(
@@ -193,7 +197,7 @@ var Oehbeitrag = {
 						if (inputtype == 'semester')
 							fieldvalue = $(fieldelement).find("option:selected").text();
 						else
-							fieldvalue = Oehbeitrag._formatDecimalGerman(fieldvalue);
+							fieldvalue = Oehbeitrag._formatDecimal(fieldvalue);
 						$("#confirm_"+fieldname+"_"+oehbeitrag_id).parent('td').html(
 							fieldvalue+" <i class='fa fa-edit' id='edit_"+fieldname+"_"+oehbeitrag_id+"'></i>"
 						);
@@ -245,15 +249,6 @@ var Oehbeitrag = {
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// (private) methods
-	_renderOehbeitragTable(oehbeitraege)
-	{
-		for (let oehbeitragidx in oehbeitraege)
-		{
-			let oehbeitrag = oehbeitraege[oehbeitragidx];
-
-
-		}
-	},
 	_setUpdateEvents()
 	{
 		$(".editStudierendenbeitrag").off('click').click(
@@ -386,32 +381,31 @@ var Oehbeitrag = {
 	},
 	/**
 	 * Formats a numeric value as a float with two decimals
-	 * @param sum
-	 * @returns {string}
+	 * @param value
+	 * @param decSeparator the new decimal separator
+	 * @returns {string} formatted value
 	 */
-	_formatDecimalGerman: function(sum)
+	_formatDecimal: function(value, decSeparator)
 	{
-		var dec = null;
+		let dec = null;
+		let prevSeparator = ".";
 
-		if(sum === null)
-			dec = parseFloat(0).toFixed(2).replace(".", ",");
-		else if(sum === '')
-		{
-			dec = ''
-		}
+		if (decSeparator === ".")
+			prevSeparator = ",";
 		else
-		{
-			dec = parseFloat(sum).toFixed(2);
+			decSeparator = ",";
 
-			dec = dec.split('.');
-			var dec1 = dec[0];
-			var dec2 = ',' + dec[1];
-			var rgx = /(\d+)(\d{3})/;
-			while (rgx.test(dec1)) {
-				dec1 = dec1.replace(rgx, '$1' + '.' + '$2');
-			}
-			dec = dec1 + dec2;
+		dec = value.split(prevSeparator);
+		if (dec.length === 2)
+		{
+			dec = parseFloat(dec[0] + '.' + dec[1]).toFixed(2);
+			dec = dec.replace(prevSeparator, decSeparator);
 		}
+		else if (Math.floor(value) == value) // if integer, add zeros
+			dec = value + decSeparator + '00';
+		else
+			dec = value;
+
 		return dec;
 	},
 	_formatDateToGerman: function(date)
