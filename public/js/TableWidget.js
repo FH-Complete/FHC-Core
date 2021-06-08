@@ -548,8 +548,14 @@ var FHC_TableWidget = {
 				options.placeholder = _func_placeholder();	// display text when table is empty
 				options.persistenceID = data.tableUniqueId;	// unique id to store persistence data separately for multiple tables
 
-				// Columns can be moved per default
-				if (options.movableColumns == undefined)
+				// Headerfilter should be empty by default
+				if (typeof(options.headerFilterPlaceholder) === 'undefined')
+				{
+					options.headerFilterPlaceholder = '';
+				}
+
+				// Columns can be moved by default
+				if (typeof(options.movableColumns) === 'undefined')
 				{
 					options.movableColumns = true;			// allows changing column order
 				}

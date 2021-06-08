@@ -330,7 +330,6 @@ $filterWidgetArray = array(
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
         index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
