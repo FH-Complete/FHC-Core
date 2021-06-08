@@ -58,7 +58,7 @@ $query = '
 
 $filterWidgetArray = array(
 	'query' => $query,
-	'tableUniqueId' => 'approveAnrechnungUebersicht',
+	'tableUniqueId' => 'reviewAnrechnungUebersicht',
 	'requiredPermissions' => 'lehre/anrechnung_empfehlen',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
