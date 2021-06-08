@@ -580,10 +580,10 @@ var FHC_TableWidget = {
 		// -------------------------------------------------------------------------------------------------------------
 
 		// Render tableWidgetHeader
-		if (options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != null)
+		if (typeof(options.tableWidgetHeader) !== 'undefined' && options.tableWidgetHeader != null)
 		{
 			// If property headerButtons is true, render them! (CSV-, Help-, Settingbuttons)
-			if (options.tableWidgetHeader.headerButtons != 'undefined' && options.tableWidgetHeader.headerButtons === true)
+			if (typeof(options.tableWidgetHeader.headerButtons) !== 'undefined' && options.tableWidgetHeader.headerButtons === true)
 			{
 				// Render the buttons
 				var tabulatorHeaderButtonsHTML = _renderTabulatorHeaderButtonsHTML(tableWidgetDiv);
@@ -603,7 +603,7 @@ var FHC_TableWidget = {
 		 *  	selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
 		 *  }
  		 */
-		if (options.tableWidgetFooter != 'undefined' && options.tableWidgetFooter != null)
+		if (typeof(options.tableWidgetFooter) !== 'undefined' && options.tableWidgetFooter != null)
 		{
 			var tabulatorFooterHTML = _renderTabulatorFooterHTML(options.tableWidgetFooter);
 			tableWidgetDiv.find('#tableWidgetFooter').append(tabulatorFooterHTML);
