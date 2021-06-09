@@ -2348,7 +2348,7 @@ class prestudent extends person
 				}
 				$qry .=  ");";
 
-				echo $qry;
+				//echo $qry;
 
 				if ($this->db_query($qry))
 				{
