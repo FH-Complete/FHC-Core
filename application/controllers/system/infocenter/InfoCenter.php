@@ -233,6 +233,7 @@ class InfoCenter extends Auth_Controller
 		$prestudent_id = array('prestudent_id' => $prestudent_id);
 		$status = array('status' => getData($zgv)[0]->status);
 
+		$this->DokumentModel->addOrder('bezeichnung');
 		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
 
 		$data = array_merge(
