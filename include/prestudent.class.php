@@ -2303,19 +2303,23 @@ class prestudent extends person
 		$db = new basis_db();
 		$arrayleereManations = array();
 
-		//all prestudent_ids mit leerer ZGV_Nation
+		//all prestudent_ids mit leerer ZGV_Nation und Status Interessent
 		$qry = "SELECT
 					*
 				FROM
 					public.tbl_prestudent
 				JOIN
 					public.tbl_studiengang USING (studiengang_kz)
+				JOIN
+					public.tbl_prestudentstatus USING (prestudent_id)
 				WHERE
 					person_id = ".$this->db_add_param($person_id)."
 				AND
 					zgvmanation is NULL
 				AND
-					typ in ('m','d')";
+					typ in ('m','d')
+				AND
+					status_kurzbz = 'Interessent'";
 
 		if ($db->db_query($qry))
 		{
