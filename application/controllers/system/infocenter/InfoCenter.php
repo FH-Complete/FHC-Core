@@ -219,6 +219,7 @@ class InfoCenter extends Auth_Controller
 		$persondata = $this->_loadPersonData($person_id);
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
+		$this->DokumentModel->addOrder('bezeichnung');
 		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
 
 		$data = array_merge(
