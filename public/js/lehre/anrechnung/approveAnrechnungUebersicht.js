@@ -50,6 +50,7 @@ function hf_filterTrueFalse(headerValue, rowValue){
 }
 
 // Adds column details
+// Sets focus on filterbutton, if table starts with stored filter.
 function func_tableBuilt(table) {
     table.addColumn(
         {
@@ -67,6 +68,12 @@ function func_tableBuilt(table) {
             }
         }, false, "status"  // place column after status
     );
+
+    // Set focus on filterbutton
+    let filters = table.getFilters();
+    if (filters.length > 0){
+        approveAnrechnung.focusFilterbuttonIfTableStartsWithStoredFilter(filters);
+    }
 }
 
 // Formats the rows
@@ -507,5 +514,40 @@ var approveAnrechnung = {
 
         // Copy begruendung into textarea
         textarea.val($.trim($(elem).parent().text()));
+    },
+    focusFilterbuttonIfTableStartsWithStoredFilter(filters){
+        switch (filters[0].value) {
+            case ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR:
+                $("#show-inProgressLektor").addClass('active');
+                break;
+            case ANRECHNUNGSTATUS_APPROVED:
+                $("#show-approved").addClass('active');
+                break;
+            case ANRECHNUNGSTATUS_REJECTED:
+                $("#show-rejected").addClass('active');
+                break;
+            case ANRECHNUNGSTATUS_PROGRESSED_BY_STGL:
+                if (filters.length > 1)
+                {
+                    if (filters[1].field == 'empfehlung_anrechnung')
+                    {
+                        if (filters[1].value === 'true')
+                        {
+                            $("#show-recommended").addClass('active');
+                        }
+                        else
+                        {
+                            $("#show-not-recommended").addClass('active');
+                        }
+                    }
+                }
+                else
+                {
+                    $("#show-inProgressDP").addClass('active');
+                }
+
+                break;
+
+        }
     }
 }
