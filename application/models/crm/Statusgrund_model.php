@@ -14,6 +14,7 @@ class Statusgrund_model extends DB_Model
 
 	public function getStatus($status_kurzbz = null, $aktiv = null)
 	{
+		$this->addOrder('bezeichnung_mehrsprachig');
 		$where = array();
 		if (!is_null($status_kurzbz))
 			$where['status_kurzbz'] = $status_kurzbz;
