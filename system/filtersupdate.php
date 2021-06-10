@@ -38,6 +38,7 @@ $filters = array(
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [
@@ -71,6 +72,7 @@ $filters = array(
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [
@@ -108,6 +110,7 @@ $filters = array(
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
@@ -142,6 +145,7 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
@@ -184,6 +188,7 @@ $filters = array(
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [
@@ -220,6 +225,7 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
@@ -266,6 +272,7 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "Statusgrund"}
 				],
@@ -302,6 +309,7 @@ $filters = array(
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "Statusgrund"},
 					{"name": "Studiensemester"},
@@ -383,6 +391,7 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [

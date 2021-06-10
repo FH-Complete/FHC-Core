@@ -207,7 +207,24 @@
 				 WHERE ps.person_id = p.person_id
 			  ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
 				 LIMIT 1
-			) AS "ZGVNation"
+			) AS "ZGVNation",
+			(
+				SELECT tbl_organisationseinheit.bezeichnung
+				FROM public.tbl_benutzerfunktion 
+				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
+				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				AND tbl_benutzerfunktion.uid = (
+					SELECT l.insertvon
+					FROM system.tbl_log l
+					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
+					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.person_id = p.person_id
+					ORDER BY l.zeitpunkt DESC
+					LIMIT 1
+				)
+				LIMIT 1 
+			) AS "InfoCenterMitarbeiter"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -275,7 +292,8 @@
 			'Reihungstest angetreten',
 			'Reihungstest angemeldet',
 			'Reihungstest date',
-			'ZGV Nation'
+			'ZGV Nation',
+			'InfoCenter Mitarbeiter'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -368,6 +386,16 @@
 			{
 				$datasetRaw->{'ZGVNation'} = '-';
 			}
+
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'InfoCenter')
+			{
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+			}
+			else
+			{
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
+			}
+
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {
