@@ -38,6 +38,7 @@ $(function(){
         if (genehmigung_panel.is(":hidden"))
         {
             // Show genehmigung panel if is hidden
+            genehmigung_panel.css('display', 'block');
             genehmigung_panel.slideDown(400, function() {
                 $('html, body').animate({
                     scrollTop: genehmigung_panel.offset().top // Move genehmigung panel bottom up to be visible within window screen
@@ -104,6 +105,7 @@ $(function(){
         if (begruendung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
+            begruendung_panel.css('display', 'block');
             begruendung_panel.slideDown(400, function() {
                 $('html, body').animate({
                     scrollTop: begruendung_panel.offset().top // Move begruendung panel bottom up to be visible within window screen
@@ -442,7 +444,8 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-withdraw-request-recommedation').removeClass('hidden');
     },
     formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung){
-        $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').removeClass('hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-success');
@@ -456,7 +459,8 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
     },
     formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung, begruendung){
-        $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').removeClass('hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-danger');
