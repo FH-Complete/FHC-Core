@@ -136,6 +136,7 @@ $pause_von = (isset($_POST['pause_von'])?$_POST['pause_von']:date('H:i'));
 $pause_bis = (isset($_POST['pause_bis'])?$_POST['pause_bis']:date('H:i'));
 $von_pause = $von_datum.' '.$pause_von;
 $bis_pause = $bis_datum.' '.$pause_bis;
+$homeofficeChecked = '';
 
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
 $service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
@@ -517,7 +518,7 @@ echo '
 			}
 			return true;
 		}
-		
+
 		function resetProjekt()
 		{
 			$("#projekt").val("");
@@ -809,7 +810,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 										$zeit->service_id = $data[8];
 									if (isset($data[9]))
 									{
-										if(strtolower($data[9]=='true'))
+										if (strtolower($data[9] == 'true'))
 										{
 											$zeit->homeoffice = true;
 										}
@@ -1074,13 +1075,13 @@ else
 	echo '<b>&nbsp;</b>';
 
 //Laden der Daten zum aendern
-if(isset($_GET['type']) && $_GET['type']=='edit')
+if (isset($_GET['type']) && $_GET['type']=='edit')
 {
 	$zeit = new zeitaufzeichnung();
 
-	if($zeit->load($zeitaufzeichnung_id))
+	if ($zeit->load($zeitaufzeichnung_id))
 	{
-		if($zeit->uid==$user)
+		if ($zeit->uid == $user)
 		{
 			$uid = $zeit->uid;
 			$aktivitaet_kurzbz = $zeit->aktivitaet_kurzbz;
@@ -1092,8 +1093,10 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 			$projekt_kurzbz = $zeit->projekt_kurzbz;
 			$projektphase_id = $zeit->projektphase_id;
 			$homeoffice = $zeit->homeoffice;
+			$homeoffice[0] == 't' ? $homeofficeChecked = 'checked' : $homeofficeChecked = '';
 			$service_id = $zeit->service_id;
 			$kunde_uid = $zeit->kunde_uid;
+
 
 			$projektphase = new projektphase();
 
@@ -1470,7 +1473,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			<td>&nbsp;</td>
 			<td colspan="1">
 				<span id="homeofficeBlock">
-					<input type="checkbox" name="homeoffice" id="homeoffice" >Homeoffice</input>
+					<input type="checkbox" name="homeoffice" id="homeoffice" '. $homeofficeChecked . '>Homeoffice</input>
 				</span>
 			</td>
 		</tr>
