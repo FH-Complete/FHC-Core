@@ -335,7 +335,7 @@ class projektbetreuer extends basis_db
 	}
 
 	/**
-	 * Retrieves all projektarbeiten by person (only with stundensatz > 0)
+	 * Retrieves all projektarbeiten by person
 	 * @param $person_id
 	 * @return boolean If succeeded true and result-array with objects of each projektarbeit of the person.
 	 */
@@ -349,8 +349,6 @@ class projektbetreuer extends basis_db
 				FROM
 					lehre.tbl_projektbetreuer
 				WHERE
-					(stundensatz IS NOT NULL) AND (stundensatz > 0)
-				AND 
 					person_id =' . $this->db_add_param($person_id, FHC_INTEGER);
 
 			if ($this->db_query($qry))

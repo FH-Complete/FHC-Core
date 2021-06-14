@@ -122,7 +122,7 @@ $student_uid = $projektarbeit_obj->student_uid;
 
 // paarbeit sollte nur ab SS2021 online bewertet werden
 $qry_sem="SELECT 1
-		FROM lehre.tbl_projektarbeit 
+		FROM lehre.tbl_projektarbeit
     	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
@@ -188,16 +188,16 @@ echo '
 		<title>'.$p->t('abgabetool/abgabetool').'</title>
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<style>			
+		<style>
 			#beurteilungheadertable td {
 				height: 30px;
 				overflow: hidden;
 			}
-			
+
 			#beurteilungheadertable form {
 				margin: 0;
 			}
-			
+
 			/* Bild statt submit button, styling entfernen*/
 			button[name="zweitbegutachtertoken"] {
 				background: none;
@@ -219,7 +219,7 @@ echo '
 				width: 15px;
 				position: relative;
 			}
-			
+
 		</style>
 
 		<script language="Javascript">
@@ -475,7 +475,7 @@ $htmlstr .= "</td>";
 
 if($betreuerart!="Zweitbegutachter")
 {
-	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.com/' title='ephorus' target='_blank' method='GET'>";
+	$htmlstr .= "<td width=10% align=center><form action='https://technikum-wien.turnitin.com/sso/sp/redwood/saml/5IyfmBr2OcSIaWQTKlFCGj/start' title='plagiatsprüfung' target='_blank' method='GET'>";
 	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td>";
 	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
 	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>\n";
@@ -496,8 +496,8 @@ if (isset($zweitbegutachter) && $zweitbegutachter) // wenn es Zweitbegutachter g
 	if (!isset($zweitbegutachter->email))
 		$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
 
-	// Token senden button wenn Projektarbeit abgegeben und Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
-	if (isset($zweitbegutachter->abgabedatum) && isset($zweitbegutachter->email) && !isset($zweitbegutachter->uid) && $num_rows_sem >= 1)
+	// Token senden button wenn Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
+	if (isset($zweitbegutachter->email) && !isset($zweitbegutachter->uid) && $num_rows_sem >= 1)
 	{
 		$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
@@ -724,6 +724,7 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 		$maildata['betreuer_voller_name'] = $zweitbegutachter->voller_name;
 		$maildata['student_anrede'] = $student->anrede;
 		$maildata['student_voller_name'] = trim($student->titelpre." ".$student->vorname." ".$student->nachname." ".$student->titelpost);
+		$maildata['abgabetyp'] = isset($zweitbetr->abgabedatum) ? 'Endabgabe' : 'Abgabe';
 		$maildata['parbeituebersichtlink'] =  $intern ? "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>" : "";
 		$maildata['bewertunglink'] = "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>";
 		$maildata['token'] = isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: ".$zweitbetr->zugangstoken."</p>" : "";

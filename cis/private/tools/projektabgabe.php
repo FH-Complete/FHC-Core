@@ -35,9 +35,6 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/phrasen.class.php');
 
-include('../../../include/meta/jquery.php');
-include('../../../include/meta/jquery-tablesorter.php');
-
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
@@ -96,8 +93,10 @@ if($aktion!='zip')
 		<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 		<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-
+		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>';
+	include('../../../include/meta/jquery.php');
+	include('../../../include/meta/jquery-tablesorter.php');
+	echo '
 		<script language="JavaScript" type="text/javascript">
 		$(document).ready(function()
 		{
