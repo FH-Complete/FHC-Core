@@ -270,7 +270,6 @@ class Lehrauftrag extends Auth_Controller
     private function _sendMail($lehrvertrag_data_arr)
     {
         // Cluster data of new lehrvertraege as needed to send mail
-        $lehrvertrag_data_arr = $this->_cluster_newVertragData($lehrvertrag_data_arr);
 
         foreach ($lehrvertrag_data_arr as $lehrvertrag_data)
         {

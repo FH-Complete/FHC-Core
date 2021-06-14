@@ -139,7 +139,7 @@ class gemeinde extends basis_db
 		if($this->db_query($qry))
 		{
 			//naechste ID aus der Sequence holen
-			$qry="SELECT currval('tbl_gemeinde_gemeinde_id_seq') as id;";
+			$qry="SELECT currval('bis.tbl_gemeinde_gemeinde_id_seq') as id;";
 			if($this->db_query($qry))
 			{
 				if($row = $this->db_fetch_object())

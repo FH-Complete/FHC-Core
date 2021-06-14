@@ -1,5 +1,6 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Abgabetool';
+$this->phrasen['abgabetool/aeltereParbeitBenoten']='Projektarbeit für älteres Semester, bitte Word-Formular zur Benotung verwenden!';
 $this->phrasen['abgabetool/typ']='Typ';
 $this->phrasen['abgabetool/titel']='Titel';
 $this->phrasen['abgabetool/betreuerart']='Betreuerart';
@@ -61,8 +62,10 @@ $this->phrasen['abgabetool/fehlerTerminEintragen']='Die Termin konnte nicht eing
 $this->phrasen['abgabetool/fehlerTerminLoeschen']='Fehler beim Löschen des Termins!';
 $this->phrasen['abgabetool/keineBerechtigungStudentenansicht']='Sie haben keine Berechtigung zum Anzeigen der Studentenansicht';
 $this->phrasen['abgabetool/dateneingabeUnvollstaendig']='Die Dateneingabe ist unvollständig';
-$this->phrasen['abgabetool/fehlerMailBegutachter']='Fehler beim Versenden des Mails an den (Erst-)Begutachter!';
+$this->phrasen['abgabetool/fehlerMailBegutachter']='Fehler beim Versenden des Mails an den Erstbegutachter!';
+$this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Fehler beim Versenden des Mails an den Zweitbegutachter!';
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Betreuer nicht gefunden. Kein Mail verschickt!';
+$this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Fehler bei Ermittlung der Aktualit&auml;t der Projektarbeit';
 $this->phrasen['abgabetool/keinPDF']='Upload ist keine pdf-Datei! Bitte wiederholen Sie den Fileupload.';
 $this->phrasen['abgabetool/dateiZuGross']='Die Datei ist zu groß! Maximale Dateigröße 15 MB';
 $this->phrasen['abgabetool/fehlerTerminVorbei']='Die Abgabefrist für diesen Termin ist bereits abgelaufen.';
@@ -78,4 +81,12 @@ Sollten Sie trotzdem die `Eidesstattliche Erklärung´ samt Unterschrift hochlad
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Gelesen und akzeptiert';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Erklärung nicht akzeptiert';
 $this->phrasen['abgabetool/downloadProjektarbeit']='Dokument herunterladen';
+$this->phrasen['abgabetool/zweitBegutachter']='ZweitbegutachterIn';
+$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Zugangstoken an ZweitbegutachterIn noch einmal senden';
+$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail an ZweitbegutachterIn (%s) gesendet';
+$this->phrasen['abgabetool/zweitbetreuerMailSenden']='Mail an ZweitbegutachterIn (%s) senden';
+$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='keine Zustellmail für Zweitbegutachter vorhanden!';
+$this->phrasen['abgabetool/projektbeurteilungDownload']='Projektbeurteilung herunterladen';
+$this->phrasen['abgabetool/projektbeurteilungErstDownload']='Erst-/Begutachter';
+$this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Zweitbegutachter';
 ?>

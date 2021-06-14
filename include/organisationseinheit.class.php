@@ -691,10 +691,11 @@ class organisationseinheit extends basis_db
 	 *
 	 * @param string $user uid
 	 * @param integer $zeitraum Anzahl Tage in die Vergangenheit, die fuer das Auftreten der OE beruecksichtigt werden sollen
-	 * @param integer $anzahl_ereignisse default: 3 Wie oft soll diese OE mindestens in $zeitraum vorkommen, um beruecksichtigt zu werden
+	 * @param string $anzahl_ereignisse default: 3 Wie oft soll diese OE mindestens in $zeitraum vorkommen, um beruecksichtigt zu werden
 	 * @param boolean $aktiv
+	 * @param array $funktion_zuordnungen Einschränkung nach zugeordneten Funktionen (Gültigkeitszeitraum heute - 1 Monat 1 Tag nach Gültigkeitsende)
 	 */
-	public function getFrequent($user, $zeitraum=null, $anzahl_ereignisse='3', $aktiv=null)
+	public function getFrequent($user, $zeitraum=null, $anzahl_ereignisse='3', $aktiv=null, $funktion_zuordnungen=array())
 	{
 		if(!is_numeric($anzahl_ereignisse))
 		{
@@ -707,36 +708,51 @@ class organisationseinheit extends basis_db
 		else
 			$zeit = "";
 
-		$qry = "SELECT
-				oe_kurzbz,
-				oe_parent_kurzbz,
-				bezeichnung,
-				organisationseinheittyp_kurzbz,
-				aktiv,
-				lehre,
-				count(tbl_zeitaufzeichnung.zeitaufzeichnung_id)
-				FROM campus.tbl_zeitaufzeichnung
-				JOIN public.tbl_organisationseinheit ON(oe_kurzbz IN (oe_kurzbz_1,oe_kurzbz_2))
-				WHERE tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)."
-				$zeit
-				GROUP BY tbl_organisationseinheit.oe_kurzbz HAVING COUNT(*) > $anzahl_ereignisse
-
-				UNION
-
-				SELECT
-				oe_kurzbz,
-				oe_parent_kurzbz,
-				bezeichnung,
-				organisationseinheittyp_kurzbz,
-				aktiv,
-				lehre,
-				'0'
-				FROM public.tbl_organisationseinheit";
+		$qry = "SELECT * FROM (
+					SELECT
+					oe_kurzbz,
+					oe_parent_kurzbz,
+					bezeichnung,
+					organisationseinheittyp_kurzbz,
+					aktiv,
+					lehre,
+					count(tbl_zeitaufzeichnung.zeitaufzeichnung_id)
+					FROM campus.tbl_zeitaufzeichnung
+					JOIN public.tbl_organisationseinheit ON(oe_kurzbz IN (oe_kurzbz_1,oe_kurzbz_2))
+					WHERE tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)."
+					$zeit
+					GROUP BY tbl_organisationseinheit.oe_kurzbz HAVING COUNT(*) > $anzahl_ereignisse
+	
+					UNION
+	
+					SELECT
+					oe_kurzbz,
+					oe_parent_kurzbz,
+					bezeichnung,
+					organisationseinheittyp_kurzbz,
+					aktiv,
+					lehre,
+					'0'
+					FROM public.tbl_organisationseinheit";
 
 		if(!is_null($aktiv))
 			$qry.=" WHERE aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
 
-		$qry .=" ORDER BY count DESC,bezeichnung,oe_kurzbz";
+		$qry .=") oes";
+
+		if (isset($funktion_zuordnungen) && is_array($funktion_zuordnungen) && count($funktion_zuordnungen) > 0)
+		{
+			$qry .= " WHERE EXISTS (
+    					SELECT 1 FROM public.tbl_benutzerfunktion
+    					WHERE uid = ".$this->db_add_param($user)."
+    					AND funktion_kurzbz IN (".$this->db_implode4SQL($funktion_zuordnungen).")
+    					AND oe_kurzbz = oes.oe_kurzbz
+    					AND (datum_von <= now() OR datum_von IS NULL)
+    					AND (datum_bis + interval '1 month 1 day' >= now() OR datum_bis IS NULL)
+					)";
+		}
+
+		$qry .= " ORDER BY count DESC,bezeichnung,oe_kurzbz";
 
 		if($this->db_query($qry))
 		{

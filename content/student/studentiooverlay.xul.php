@@ -151,7 +151,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/mobilitaetsprogramm/rdf#mobilitaetsprogramm_code"
-													          label="rdf:http://www.technikum-wien.at/mobilitaetsprogramm/rdf#kurzbz"
+													          label="rdf:http://www.technikum-wien.at/mobilitaetsprogramm/rdf#kurzbz - rdf:http://www.technikum-wien.at/mobilitaetsprogramm/rdf#beschreibung"
 													          uri="rdf:*"/>
 													</menupopup>
 											</template>
