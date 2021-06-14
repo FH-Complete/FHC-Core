@@ -95,7 +95,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-prefs-stpltable-stundenplan:command" oncommand="stpltableChange('stundenplan');"/>
   <command id="menu-prefs-stpltable-stundenplandev:command" oncommand="stpltableChange('stundenplandev');"/>
   <command id="menu-prefs-kontofilterstg:command" oncommand="EinstellungenKontoFilterStgChange();"/>
-  <command id="menu-prefs-number_displayed_past_studiensemester:command" oncommand="variableChangeValue('number_displayed_past_studiensemester');"/>
+  <command id="menu-prefs-number_displayed_past_studiensemester:command" oncommand="variableChangeValueIfNumber('number_displayed_past_studiensemester');"/>
   <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
   <command id="menu-statistic-lvplanungexcel:command" oncommand="StatistikPrintLVPlanungExcel();"/>
