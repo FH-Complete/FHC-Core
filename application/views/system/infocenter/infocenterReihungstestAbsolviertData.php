@@ -232,8 +232,8 @@
 			'Reihungstest angetreten',
 			'Reihungstest angemeldet',
 			'Reihungstest Datum',
-			'ZGV Nation',
-			'ZGV Master Nation'
+			'ZGV Nation BA',
+			'ZGV Nation MA'
 		),
 		'formatRow' => function($datasetRaw) {
 

@@ -305,8 +305,8 @@
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'gesendet').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'nichtGesendet').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
-			'ZGV Nation',
-			'ZGV Master Nation'
+			'ZGV Nation BA',
+			'ZGV Nation MA'
 		),
 		'formatRow' => function($datasetRaw) {
 
