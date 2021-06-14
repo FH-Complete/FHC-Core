@@ -213,7 +213,7 @@ if($result = $db->db_query($qry))
 			if($row->bisio_id!='' && $row->status!='Incoming' && ($row->bis > $stsemdatumvon || $row->bis=='') && $row->von < $stsemdatumbis) //Outgoing
 				$zusatz.='(o)(ab '.$datum->formatDatum($row->von,'d.m.Y').')';
 
-			if($row->note==6) //angerechnet
+			if($row->note==6 || $row->note == 19) //angerechnet oder intern angerechnet
 				$zusatz.='(ar)';
 
 			if($row->mitarbeiter_uid!='') //mitarbeiter
