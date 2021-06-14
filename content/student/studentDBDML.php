@@ -377,11 +377,12 @@ if(!$error)
 				$error = true;
 			}
 			$datum = new datum();
-			$geb = $_POST['geburtsdatum'];
-			if(!$datum->verifyDate($geb))
+
+			$gebdatum = $_POST['geburtsdatum'];
+			if($gebdatum!='' && !$datum->checkDatum($gebdatum))
 			{
 				$return = false;
-				$errormsg = 'Datum ist nicht korrekt: '.$geb;
+				$errormsg = 'Geburtsdatum ist nicht korrekt.';
 				$error = true;
 			}
 			if(!$error)
