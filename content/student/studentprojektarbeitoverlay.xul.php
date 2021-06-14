@@ -520,7 +520,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 			</groupbox>
 
         <!-- Vertragsdetails: Anzeige wird ueber config Eintrag bestimmt -->
-        <vbox>
+        <vbox id="student-projektbetreuer-vbox">
             <groupbox id="student-projektbetreuer-groupbox-vertragsdetails" hidden="<?php echo $is_hidden ?>">
                 <caption label="Vertragsdetails" />
                 <grid style="overflow:auto; padding:10px;" flex="1">
@@ -529,7 +529,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
                         <column flex="1"/>
                         <column flex="1"/>
                     </columns>
-                    <rows>
+                    <rows >
                         <label id="student-projektbetreuer-label-vertrag_id" hidden="true" value=""/>
                         <row>
                             <label value="Vertragsstatus:"/>

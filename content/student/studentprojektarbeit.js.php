@@ -892,7 +892,13 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;
 
     var gesamtkosten = StudentProjektbetreuerGesamtkosten();
-    
+
+
+	if (document.getElementById('student-projektbetreuer-button-beurteilung'))
+	{
+		checkBeurteilung();
+	}
+
     // Wenn Vertragsdetails angezeigt werden
     if (projektarbeit_vertragsdetails_anzeigen) {
          //Reset attributes
@@ -1122,6 +1128,12 @@ function StudentProjektbetreuerDetailDisableFields(val)
 	document.getElementById('student-projektbetreuer-button-speichern').disabled=val;
 	document.getElementById('student-projektbetreuer-button-neueperson').disabled=val;
 	document.getElementById('student-projektbetreuer-button-kontaktdaten').disabled=val;
+
+    if (document.getElementById('student-projektbetreuer-button-beurteilung') && val === true)
+    {
+        document.getElementById('student-projektbetreuer-button-beurteilung').disabled=val;
+		document.getElementById('student-projektbetreuer-span-beurteilung').setAttribute("value", '');
+	}
 }
 
 // ****

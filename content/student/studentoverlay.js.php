@@ -952,6 +952,27 @@ function StudentImageInfomail()
 	}
 }
 
+function StudentCount()
+{
+	var tree = document.getElementById('student-tree');
+
+	//Alle markierten Personen holen
+	var start = {};
+	var end = {};
+	var numRanges = tree.view.selection.getRangeCount();
+	var anzahl = 0;
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t, start, end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			anzahl = anzahl + 1;
+		}
+	}
+	return anzahl;
+}
+
 // ****
 // * Auswahl eines Studenten
 // * bei Auswahl eines Studenten wird dieser geladen
@@ -959,6 +980,8 @@ function StudentImageInfomail()
 // ****
 function StudentAuswahl()
 {
+	document.getElementById('student-toolbar-label-anzahl').value = 'Anzahl: ' + StudentCount();
+
 	if(!StudentTreeLoadDataOnSelect)
 	{
 		StudentTreeLoadDataOnSelect=true;

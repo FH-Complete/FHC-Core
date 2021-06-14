@@ -322,66 +322,77 @@ if(!$error)
 					else
 						$alte_stunden_eingerechnet=true;
 
-					//Stundenreduzierung immer moeglich
-					if(($lem->semesterstunden>$semesterstunden_alt) || $neue_stunden_eingerechnet)
+					if ($semesterstunden_alt != '' && $lem->semesterstunden != '')
 					{
-						$oe_obj = new organisationseinheit();
-						$oe_arr = $oe_obj->getChilds($stunden_oe_kurzbz);
-						$qry = "SELECT ";
-						if($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)-($semesterstunden_alt)+($lem->semesterstunden)) as summe";
-						elseif($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)-($semesterstunden_alt)) as summe";
-						elseif(!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)+($lem->semesterstunden)) as summe";
-						elseif(!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)) as summe";
-						$qry.="	FROM
-									lehre.tbl_lehreinheitmitarbeiter
-									JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-									JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-									JOIN public.tbl_studiengang USING(studiengang_kz)
-								WHERE
-									mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
-									studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
-									bismelden";
 
-						if(count($oe_arr)>0)
-							$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
-
-						if(defined('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE')
-						&& is_array(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)
-						&& count(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)>0)
+						//Stundenreduzierung immer moeglich
+						if(($lem->semesterstunden>$semesterstunden_alt) || $neue_stunden_eingerechnet)
 						{
-							$qry.=" AND tbl_studiengang.oe_kurzbz not in(".$db->db_implode4SQL(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE).")";
-						}
+							$oe_obj = new organisationseinheit();
+							$oe_arr = $oe_obj->getChilds($stunden_oe_kurzbz);
+							$qry = "SELECT ";
+							if($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
+								$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)-($semesterstunden_alt)+($lem->semesterstunden)) as summe";
+							elseif($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
+								$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)-($semesterstunden_alt)) as summe";
+							elseif(!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
+								$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)+($lem->semesterstunden)) as summe";
+							elseif(!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
+								$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)) as summe";
+							$qry.="	FROM
+										lehre.tbl_lehreinheitmitarbeiter
+										JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+										JOIN public.tbl_studiengang USING(studiengang_kz)
+									WHERE
+										mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
+										studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
+										bismelden";
 
-						if($db->db_query($qry))
-						{
-							if($row = $db->db_fetch_object())
+							if(count($oe_arr)>0)
+								$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
+
+							if(defined('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE')
+							&& is_array(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)
+							&& count(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)>0)
 							{
-								if($row->summe>$max_stunden)
-								{
-									if(!$fixangestellt)
-									{
-										if(!LehrauftragAufFirma($lem->mitarbeiter_uid))
-										{
-											//Warnung wenn die Stundenzahl ueberschritten wurde
-											$return = false;
-											$error = true;
-											$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
-										}
-									}
-									else
-									{
-										$return = true;
-										$error = false;
-										$warnung = true;
-										$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
-									}
+								$qry.=" AND tbl_studiengang.oe_kurzbz not in(".$db->db_implode4SQL(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE).")";
+							}
 
-									$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz, $oe_arr);
+							if($db->db_query($qry))
+							{
+								if($row = $db->db_fetch_object())
+								{
+									if($row->summe>$max_stunden)
+									{
+										if(!$fixangestellt)
+										{
+											if(!LehrauftragAufFirma($lem->mitarbeiter_uid))
+											{
+												//Warnung wenn die Stundenzahl ueberschritten wurde
+												$return = false;
+												$error = true;
+												$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
+											}
+										}
+										else
+										{
+											$return = true;
+											$error = false;
+											$warnung = true;
+											$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
+										}
+
+										$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz, $oe_arr);
+									}
 								}
+								else
+								{
+									$return = false;
+									$error=true;
+									$errormsg='Fehler beim Ermitteln der Gesamtstunden';
+								}
+
 							}
 							else
 							{
@@ -389,13 +400,6 @@ if(!$error)
 								$error=true;
 								$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 							}
-
-						}
-						else
-						{
-							$return = false;
-							$error=true;
-							$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 						}
 					}
 				}

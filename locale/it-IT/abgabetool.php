@@ -1,5 +1,6 @@
 <?php
 $this->phrasen['abgabetool/abgabeLektorenbereich']='Consegna portale lettori';
+$this->phrasen['abgabetool/aeltereParbeitBenoten']='Thesis handed in for older semester, please use word form for assessment!';
 $this->phrasen['abgabetool/abgabeStudentenbereich']='consegna portale studente';
 $this->phrasen['abgabetool/abgabetermine']='scadenze consegna';
 $this->phrasen['abgabetool/abgabetool']='Strumenti di consegna';
@@ -28,10 +29,12 @@ $this->phrasen['abgabetool/englischeSchlagwoerter']='parole chiave inglesi';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='dichiarazione non accettata';
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Impossibile trovare il relatore. Nessuna email spedita';
 $this->phrasen['abgabetool/fehlerMail']='errore di spedizione della email!';
-$this->phrasen['abgabetool/fehlerMailBegutachter']='Errore di trasmissione della mail al (primo) esaminatore';
+$this->phrasen['abgabetool/fehlerMailBegutachter']='Errore di trasmissione della mail al primo esaminatore';
+$this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Errore di trasmissione della mail al secondo esaminatore';
 $this->phrasen['abgabetool/fehlerMailStudent']='errore di spedizione della mai agli studenti!';
 $this->phrasen['abgabetool/fehlerTerminEintragen']='scadenza non è stata registrata!';
 $this->phrasen['abgabetool/fehlerTerminLoeschen']='Errore in sede di cancellazione della scadenza!';
+$this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Error when checking if current thesis';
 $this->phrasen['abgabetool/fix']='fisso';
 $this->phrasen['abgabetool/fixerAbgabetermin']='scadenza consegna inderogabile';
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Letto e accettato';
@@ -68,4 +71,9 @@ $this->phrasen['abgabetool/ueberschrift']='tesi bachelor / master';
 $this->phrasen['abgabetool/upload']='Upload';
 $this->phrasen['abgabetool/variablerAbgabetermin']='scadenza consegna variabile';
 $this->phrasen['abgabetool/zweitbetreuerBei']='secondo relatore presso';
+$this->phrasen['abgabetool/zweitBegutachter']='Second assessor';
+$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Resend access token to second assessor';
+$this->phrasen['abgabetool/zweitbetreuerMailSenden']='Send mail to second assessor (%s)';
+$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail sent to second assessor (%s)';
+$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='Second assessor has no delivery mail adress!';
 ?>
