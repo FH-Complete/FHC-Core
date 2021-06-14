@@ -4767,7 +4767,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
-//Spalte matr_aktiv in tbl_person zum Markieren von noch nicht scharfgeschaltenen Matrikelnummern vom Datenverbund
+// Spalte matr_aktiv in tbl_person zum Markieren von noch nicht scharfgeschaltenen Matrikelnummern vom Datenverbund
 if(!$result = @$db->db_query("SELECT matr_aktiv FROM public.tbl_person LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_person ADD COLUMN matr_aktiv boolean NOT NULL DEFAULT false;
@@ -4842,6 +4842,17 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_oehbeitrag LIMIT 1'))
 		echo '<strong>bis.tbl_oehbeitrag: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on bis.tbl_oehbeitrag';
+}
+
+// Add column melderelevant to public.tbl_studiengang
+if(!$result = @$db->db_query("SELECT melderelevant FROM public.tbl_studiengang"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melderelevant boolean NOT NULL DEFAULT FALSE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_studiengang: Neue Spalte melderelevant hinzugefuegt.';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -5075,7 +5086,7 @@ $tabellen=array(
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
