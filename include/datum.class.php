@@ -415,6 +415,5 @@ class datum
 	{
 		return intval(substr($timestring, 0, 2)) + intval(substr($timestring, 3, 2)) / 60;
 	}
-
 }
 ?>
