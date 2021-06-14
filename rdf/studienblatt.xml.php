@@ -157,7 +157,7 @@ foreach($uid_arr as $uid)
 
 			echo "\t\t<aktuellesJahr><![CDATA[".date('Y')."]]></aktuellesJahr>";
 			$status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,null,null))?$prestudent->status_kurzbz:'';
-			$abbrecher = 'false';
+			$abbrecher = false;
 
 			switch($status_aktuell)
 			{
@@ -176,12 +176,12 @@ foreach($uid_arr as $uid)
 				case 'Abbrecher':
 					$studierendenstatus_aktuell = 'AbbrecherIn';
 					$enddatum = date('d.m.Y',strtotime($prestudent->bestaetigtam));
-					$abbrecher = "true";
+					$abbrecher = true;
 					break;
 				default:
 					$studierendenstatus_aktuell ='';
 			}
-		echo "\t\t<abbrecher><![CDATA[".$abbrecher."]]></abbrecher>";
+		echo "\t\t<abbrecher><![CDATA[".($abbrecher?'true':'false')."]]></abbrecher>";
 
 		echo "\t\t<ausbildungssemester_aktuell><![CDATA[".$prestudent->ausbildungssemester."]]></ausbildungssemester_aktuell>";
 
@@ -207,7 +207,10 @@ foreach($uid_arr as $uid)
 
 		$prestudent->getLastStatus($student->prestudent_id,$studiensemester);
 		$studiensemester_abschluss = new studiensemester();
-		$abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
+		if($abbrecher)
+			$abschluss = $prestudent->studiensemester_kurzbz;
+		else
+			$abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
 		$studiensemester_abschluss->load($abschluss);
 		echo "\t\t<voraussichtlichLetztesStudiensemester><![CDATA[".$studiensemester_abschluss->bezeichnung."]]></voraussichtlichLetztesStudiensemester>";
 
@@ -220,7 +223,10 @@ foreach($uid_arr as $uid)
 
 		echo "\t\t<studiensemester_endedatum><![CDATA[".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."]]></studiensemester_endedatum>";
 
-		echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".$enddatum."]]></voraussichtlichLetztesStudiensemester_datum>";
+		if($abbrecher)
+			echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".date('d.m.Y',strtotime($prestudent->datum))."]]></voraussichtlichLetztesStudiensemester_datum>";
+		else
+			echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".$enddatum."]]></voraussichtlichLetztesStudiensemester_datum>";
 
 		echo "\t\t<studierendenstatus_aktuell><![CDATA[".$studierendenstatus_aktuell."]]></studierendenstatus_aktuell>\n";
 		echo "\t\t<datum_reifepruefung><![CDATA[".$prestudent->zgvdatum."]]></datum_reifepruefung>\n";
