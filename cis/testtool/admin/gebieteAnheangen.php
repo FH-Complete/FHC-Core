@@ -220,6 +220,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit')
 		$studiengang = new studiengang($stg_kz);
 
 		echo '<table><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=editsave" method="POST">
+				<input type="hidden" name="ablauf_id" value="'.$_POST['ablauf_id'].'" />
 				<tr><td>Studiengang_kz: </td><td><input type="text" name="stg_kz" value="'.strtoupper($studiengang->typ.$studiengang->kurzbz).' ('.$studiengang->bezeichnung.')'.'" style="width:98.5%" disabled /></td></tr>
 				<tr><td>Gebiet: </td><td><input type="text" value="'.$gebiet->kurzbz.' ('.$gebiet->bezeichnung.')" style="width:98.5%" disabled /><input type="hidden" name="gebiet_id" value="'.$ablauf->result[0]->gebiet_id.'"/></td></tr>
 				<tr><td>Reihung: </td><td><input type="text" name="reihung" value="'.$ablauf->result[0]->reihung.'" style="width:98.5%" /></td></tr>
@@ -254,10 +255,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'editsave')
 {
 	if (isset($_POST['reihung']) && $_POST['reihung'] != '' && isset($_POST['gewicht']) && $_POST['gewicht'] != '' && isset($_POST['semester']) && $_POST['semester'] != '')
 	{
-		$ablauf = new ablauf();
-		$ablauf->getAblaufId($stg_kz, $_POST['gebiet_id']);
-		$ablauf_id = $ablauf->result[0];
-		$ablauf = new ablauf($ablauf_id);
+		$ablauf = new ablauf($_POST['ablauf_id']);
 		$ablauf = $ablauf->result[0];
 		$ablauf->reihung = $_POST['reihung'];
 		$ablauf->gewicht = $_POST['gewicht'];

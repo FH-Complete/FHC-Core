@@ -90,6 +90,7 @@ $ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$d
 $projektlines = array();
 $dayStart = $dayEnd = '';
 $projektnames = $projektphasenames = $tosubtract = $allpauseranges = array();
+$projektTiteles = array();
 $activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde'];//aktivitaetstypen which should be subtracted fromworktime
 $ztaufdata = $ztauf->result;
 $totalmonthsum = 0.00;
@@ -281,7 +282,15 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 
 			//add new projekt to array with unique projekt names
 			if (!in_array($ztaufrow->projekt_kurzbz, $projektnames))
+			{
 				$projektnames[] = $ztaufrow->projekt_kurzbz;
+				$pt = new projekt();
+				$pt->load($ztaufrow->projekt_kurzbz);
+				if(!empty($pt->titel))
+					$projektTiteles[convertProblemChars($ztaufrow->projekt_kurzbz)] = convertProblemChars($pt->titel);
+				else
+					$projektTiteles[convertProblemChars($ztaufrow->projekt_kurzbz)] = 'kein Titel';
+			}
 		}
 	}
 
@@ -557,10 +566,21 @@ if ($nrProjects < 1)//no projekts - merge all cells and write notice
 
 foreach ($projektnames as $projektname)
 {
-	//Creating a worksheet
-	$worksheet =& $workbook->addWorksheet($projektname);
-	$worksheet->setInputEncoding('utf-8');
 
+	$titel = $projektTiteles[convertProblemChars($projektname)];
+
+	if ((strlen($titel)+strlen($projektname)) > 31)
+	{
+		$maxLength = 31;
+		$maxLength = ($maxLength - 3 - strlen($projektname));
+		$titel = substr($titel, 0, $maxLength);
+		$titel.='...';
+	}
+	//Creating a worksheet
+
+	$worksheet =& $workbook->addWorksheet(convertProblemChars($projektname).' ('.$titel.')');
+	$worksheet->setInputEncoding('utf-8');
+	$titel = $projektTiteles[convertProblemChars($projektname)];
 	//general options
 	$worksheet->setLandscape();
 	$worksheet->hideGridlines();
@@ -686,7 +706,7 @@ foreach ($projektnames as $projektname)
 		$worksheet->write($zeile, $spalte + 1 + $i, '', $format_bold_centered_toprightline);
 
 	$worksheet->setMerge($zeile, $spalte, $zeile, $spalte + 1 + $phasenameslength);
-	$worksheet->write($zeile, $spalte, $projektname, $format_bold_centered_toprightline);
+	$worksheet->write($zeile, $spalte, $projektname.' ('.$titel.')', $format_bold_centered_toprightline);
 
 	for ($i = 0; $i < $phasenameslength; $i++)
 		$worksheet->write($zeile + 1, $spalte + 1 + $i, $phasenames[$i], $format_bold_centered_bottomline);

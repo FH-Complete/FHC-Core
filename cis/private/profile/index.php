@@ -56,6 +56,12 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
+$is_employee = false;
+if (check_lektor($uid))
+{
+	$is_employee = true;
+}
+
 $datum_obj = new datum();
 
 // Wenn ein anderer User sich das Profil ansieht (Bei Personensuche) sollen bestimmte persönliche Daten nicht angezeigt werden
@@ -346,7 +352,7 @@ if ($type == 'mitarbeiter')
 	$kontakt->load_pers($user->person_id);
 	foreach($kontakt->result as $k)
 	{
-		if ($k->kontakttyp == 'firmenhandy')
+		if ($k->kontakttyp == 'firmenhandy' && $is_employee)
 			echo 'Firmenhandy: '.$k->kontakt.'<br>';
 	}
 

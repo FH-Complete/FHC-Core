@@ -26,6 +26,7 @@ define('CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
+define('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN', true);
 
 // Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
 define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);
@@ -259,6 +260,9 @@ define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 
 //Wenn auf 'true' gesetzt, dann wird im FAS beim Konto das Feld fuer die CreditPoints angezeigt
 define('FAS_KONTO_SHOW_CREDIT_POINTS','false');
+
+//Wenn auf true gesetzt, dann wird im FAS beim Konto das Feld fuer die Mahnspanne angezeigt
+define('FAS_KONTO_SHOW_MAHNSPANNE', true);
 
 // Wenn definiert, wird bei der Vorrückung der Lehreinheiten nicht der Stundensatz des Vorjahres eingetragen.
 // Erlaubt sind numerische Werte oder der Wert "default".

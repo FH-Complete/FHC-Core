@@ -144,9 +144,9 @@ derzeit fuer alle Studierende der gleiche Standort
 ToDo: Standort sollte pro Student konfigurierbar sein.
 */
 $standortcode='22';
-if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400')))
+if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859')))
 	$standortcode='14'; // Pinkafeld
-elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271')))
+elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271','781')))
 	$standortcode='3'; // Eisenstadt
 
 $datumobj=new datum();
@@ -359,8 +359,46 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<head>
 		<title>BIS - Meldung Student - ('.$stg_kz.')</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-	</head>
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
+
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+
+echo '	</head>
+	<style>
+	#t1, #t2
+	{
+		width: auto;
+	}
+	</style>
+	<script language="JavaScript" type="text/javascript">
+	$(document).ready(function()
+	{
+		$("#t1").tablesorter(
+		{
+			sortList: [[6,1],[5,1],[4,1],[2,0],[3,0]], 
+			widgets: ["zebra", "filter", "stickyHeaders"],
+			widgetOptions : {	filter_functions:  
+								{ 
+									// Add select menu to this column 
+									4 : {
+									"Abbrecher" : function(e, n, f, i, $r, c, data) { return /Abbrecher/.test(e); }, 
+									"Absolvent" : function(e, n, f, i, $r, c, data) { return /Absolvent/.test(e); },
+									"Diplomand" : function(e, n, f, i, $r, c, data) { return /Diplomand/.test(e); },
+									"Incoming" : function(e, n, f, i, $r, c, data) { return /Incoming/.test(e); },
+									"Student" : function(e, n, f, i, $r, c, data) { return /Student/.test(e); },
+									"Unterbrecher" : function(e, n, f, i, $r, c, data) { return /Unterbrecher/.test(e); }, 
+									}
+								} 
+							} 
+		});
+		$("#t2").tablesorter(
+		{
+			sortList: [[0,0],[1,0]], 
+			widgets: ["zebra", "filter", "stickyHeaders"] 
+		});
+	});
+	</script>
 	<body>';
 if ($rechte->isBerechtigt('admin'))
 {
@@ -570,7 +608,8 @@ if(file_exists($eee))
 	echo '<a href="'.$eee.'">BIS-Melde&uuml;bersicht der BIS-Meldung Stg '.$stg_kz.'</a><br><br>';
 }
 
-echo '<table border=1>
+echo '<table id="t1" class="tablesorter">
+	<thead>
 	<tr align=center>
 		<th>UID</th>
 		<th>PersKZ</th>
@@ -580,16 +619,25 @@ echo '<table border=1>
 		<th>Semester</th>
 		<th>Orgform</th>
 	</tr>
+	</thead>
+	<tbody>
 	',$stlist,'
+	</tbody>
 	</table>';
 
 echo '<br>Bewerber&uuml;bersicht';
-echo '<table border=1>
+echo '<table id="t2" class="tablesorter">
+	<thead>
 	<tr align=center>
 		<th>Nachname</th>
 		<th>Vorname</th>
+		<th>Orgform</th>
+		<th>Geschlecht</th>
 	</tr>
+	</thead>
+	<tbody>
 	',$bwlist,'
+	</tbody>
 	</table>';
 
 echo '</body></html>';
@@ -751,7 +799,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
-	if($row->bpk == '' || $row->bpk == null)
+	/*if($row->bpk == '' || $row->bpk == null)
 	{
 		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 	}
@@ -766,7 +814,7 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 		}
-	}
+	}*/
 	if (!$ausserordentlich && !$incoming)
 	{
 		if ($zustell_plz == '' || $zustell_plz == null)
@@ -1198,9 +1246,9 @@ function GenerateXMLStudentBlock($row)
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
 		}
 
-		$datei .= "
+		/*$datei .= "
 			<bPK>" . $row->bpk . "</bPK>
-		";
+		";*/
 
 		$datei .= "
 			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
@@ -1368,7 +1416,7 @@ function GenerateXMLStudentBlock($row)
 					if (!in_array($row_zweck->zweck_code, $zweck_code_arr))
 					{
 						// Aufenthaltszweck 1, 2, 3 nicht gemeinsam melden
-						if (!empty(array_intersect(array(1, 2, 3), $zweck_code_arr)))
+						if (in_array(1,$zweck_code_arr) && in_array(2,$zweck_code_arr) && in_array(3,$zweck_code_arr))
 						{
 							$error_log_io .= (!empty($error_log_io) ? ', ' : '').
 								"Aufenthaltzweckcode 1, 2, 3 d&uuml;rfen nicht gemeinsam gemeldet werden";

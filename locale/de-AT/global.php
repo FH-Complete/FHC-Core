@@ -184,6 +184,7 @@ $this->phrasen['global/keineDatenGefunden']='Keine Daten gefunden';
 $this->phrasen['global/erfolgreichAngelegt']='Erfolgreich angelegt';
 $this->phrasen['global/keineSuchergebnisse']='Es liegen keine Daten zu Ihrer Suchanfrage vor';
 $this->phrasen['global/bitteWaehlen']='Bitte wählen Sie';
+$this->phrasen['global/zusaetzlicheInformationen']='Zus&auml;tzliche Informationen';
 
 
 //infrastruktur
