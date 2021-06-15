@@ -4844,10 +4844,12 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_oehbeitrag LIMIT 1'))
 		echo '<br>Granted privileges to <strong>vilesci</strong> on bis.tbl_oehbeitrag';
 }
 
-// Add column melderelevant to public.tbl_studiengang
+// Add column melderelevant to public.tbl_studiengang and prefill values
 if(!$result = @$db->db_query("SELECT melderelevant FROM public.tbl_studiengang"))
 {
-	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melderelevant boolean NOT NULL DEFAULT FALSE;";
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melderelevant boolean NOT NULL DEFAULT FALSE;
+			UPDATE public.tbl_studiengang SET melderelevant = TRUE WHERE tbl_studiengang.studiengang_kz < 10000 AND tbl_studiengang.studiengang_kz <> 0;
+			COMMENT ON COLUMN public.tbl_studiengang.melderelevant IS 'Zeigt an, ob Studenten aus Studiengang an Ministerien gemeldet werden müssen'";
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
