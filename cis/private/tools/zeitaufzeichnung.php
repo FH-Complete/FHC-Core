@@ -223,7 +223,7 @@ echo '
         <script type="text/javascript">
 		$(document).ready(function()
 		{
-			resetProjekt()
+			//resetProjekt()
 		    $( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
 					 changeYear: true,
@@ -519,11 +519,11 @@ echo '
 			return true;
 		}
 
-		function resetProjekt()
-		{
-			$("#projekt").val("");
-			$("#projektphaseformgroup").hide();
-		}
+		// function resetProjekt()
+		// {
+		// 	$("#projekt").val("");
+		// 	$("#projektphaseformgroup").hide();
+		// }
 
 		function getProjektphasen(projekt_kurzbz)
 		{
