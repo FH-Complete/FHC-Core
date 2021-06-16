@@ -171,7 +171,7 @@ function draw_ressource($ressource)
 		else
 			die('Fehler beim Laden der Mitarbeiter-daten');
 
-		$mitarbeiter.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
+		$mitarbeiter.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id.'/'.$ressource->projekt_ressource_id."\" />";
 		$typ ='Mitarbeiter';
 	}
 	// Ressource ist ein Student
@@ -229,7 +229,7 @@ function draw_ressource($ressource)
 	}
 
 	echo '
-	<RDF:Description about="'.$rdf_url.$ressource->ressource_id.'" >
+	<RDF:Description about="'.$rdf_url.$ressource->ressource_id.'/'.$ressource->projekt_ressource_id.'" >
     	<RESSOURCE:ressource_id><![CDATA['.$ressource->ressource_id.']]></RESSOURCE:ressource_id>
 		<RESSOURCE:bezeichnung><![CDATA['.$ressource->bezeichnung.']]></RESSOURCE:bezeichnung>
 		<RESSOURCE:typ><![CDATA['.$typ.']]></RESSOURCE:typ>
