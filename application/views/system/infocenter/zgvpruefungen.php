@@ -424,16 +424,16 @@
 									$disabledTxt = $disabledStgTxt = $this->p->t('infocenter', 'bewerbungMussAbgeschickt');
 								}
 
-								if ($studiengangtyp !== 'b')
+								if ($studiengangtyp !== 'b' && $studiengangtyp !== 'm')
 								{
 									$disabled = 'disabled';
-									$disabledTxt = $this->p->t('infocenter', 'nurBachelorFreigeben');
+									$disabledTxt = $this->p->t('infocenter', 'nurBachelorMasterFreigeben');
 
 									// FIT-Lehrgänge: exceptions, can be freigegeben in Infocenter
 									if (!in_array($studiengang_kz, $fit_programme_studiengaenge))
 									{
 										$disabledStg = 'disabled';
-										$disabledStgTxt = $this->p->t('infocenter', 'nurBachelorFreigeben');
+										$disabledStgTxt = $this->p->t('infocenter', 'nurBachelorMasterFreigeben');
 									}
 								}
 								?>

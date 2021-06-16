@@ -3669,18 +3669,18 @@ $phrases = array(
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
-		'phrase' => 'nurBachelorFreigeben',
+		'phrase' => 'nurBachelorMasterFreigeben',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Nur Bachelorstudiengänge können freigegeben werden.',
+				'text' => 'Nur Bachelorstudiengänge/Masterstudiengänge können freigegeben werden.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Only bachelor programmes can be approved.',
+				'text' => 'Only bachelor/master programmes can be approved.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
