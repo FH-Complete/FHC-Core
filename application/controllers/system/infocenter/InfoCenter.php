@@ -13,6 +13,7 @@ class InfoCenter extends Auth_Controller
 	const TAETIGKEIT = 'bewerbung';
 	const FREIGABE_MAIL_VORLAGE = 'InfocenterMailFreigabeAssistenz';
 	const ZGVPRUEFUNG_MAIL_VORLAGE = 'InfocenterMailZgvUeberpruefung';
+	const ZGVPRUEFUNG_MAIL_VORLAGE_MASTER = 'InfocenterMailZgvUeberpruefungM';
 
 	const INFOCENTER_URI = 'system/infocenter/InfoCenter'; // URL prefix for this controller
 	const ZGV_UEBERPRUEFUNG_URI = 'system/infocenter/ZGVUeberpruefung';
@@ -521,7 +522,7 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
 	 */
-	private function sendZgvMail($mail){
+	private function sendZgvMail($mail, $typ){
 		$data = array(
 			'link' => site_url('system/infocenter/ZGVUeberpruefung')
 		);
@@ -529,7 +530,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->helper('hlp_sancho');
 
 		sendSanchoMail(
-			self::ZGVPRUEFUNG_MAIL_VORLAGE,
+			($typ === 'm' ? self::ZGVPRUEFUNG_MAIL_VORLAGE_MASTER : self::ZGVPRUEFUNG_MAIL_VORLAGE),
 			$data,
 			$mail,
 			'ZGV Ueberpruefung',
@@ -622,6 +623,8 @@ class InfoCenter extends Auth_Controller
 
 		$data = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 		$mail = $data['studiengang_mail'];
+		$typ = $data['studiengang_typ'];
+
 		if (hasData($zgv))
 		{
 			$zgv = getData($zgv);
@@ -647,7 +650,7 @@ class InfoCenter extends Auth_Controller
 			$this->_log($person_id, 'updatezgv', array($zgv[0]->zgvpruefung_id, 'pruefung_stg'));
 
 			if (isSuccess($insert))
-				$this->sendZgvMail($mail);
+				$this->sendZgvMail($mail, $typ);
 			elseif (isError($insert))
 				$this->terminateWithJsonError('Fehler beim Speichern');
 		}else
@@ -673,7 +676,7 @@ class InfoCenter extends Auth_Controller
 				$this->_log($person_id, 'newzgv', array($zgvpruefung_id));
 
 				if (isSuccess($result))
-					$this->sendZgvMail($mail);
+					$this->sendZgvMail($mail, $typ);
 				elseif (isError($result))
 					$this->terminateWithJsonError('Fehler beim Speichern');
 			}
@@ -1824,8 +1827,9 @@ class InfoCenter extends Auth_Controller
 		$studiengang_kurzbz = $prestudentdata->studiengang;
 		$studiengang_bezeichnung = $prestudentdata->studiengangbezeichnung;
 		$studiengang_mail = $prestudentdata->studiengangmail;
+		$studiengang_typ = $prestudentdata->studiengangtyp;
 
-		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung, 'studiengang_mail' => $studiengang_mail);
+		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung, 'studiengang_mail' => $studiengang_mail, 'studiengang_typ' => $studiengang_typ);
 	}
 
 	/**
