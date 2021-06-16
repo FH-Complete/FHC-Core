@@ -215,6 +215,9 @@ if($result = $db->db_query($qry))
 
 			if($row->note==6 || $row->note == 19) //angerechnet oder intern angerechnet
 				$zusatz.='(ar)';
+			
+			if($row->note == 20) // nicht zugelassen
+				$zusatz.='(nz)';
 
 			if($row->mitarbeiter_uid!='') //mitarbeiter
 				$zusatz.='(ma)';
