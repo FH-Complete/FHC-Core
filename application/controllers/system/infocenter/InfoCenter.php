@@ -12,12 +12,17 @@ class InfoCenter extends Auth_Controller
 	const APP = 'infocenter';
 	const TAETIGKEIT = 'bewerbung';
 	const FREIGABE_MAIL_VORLAGE = 'InfocenterMailFreigabeAssistenz';
+	const ZGVPRUEFUNG_MAIL_VORLAGE = 'InfocenterMailZgvUeberpruefung';
+	const ZGVPRUEFUNG_MAIL_VORLAGE_MASTER = 'InfocenterMailZgvUeberpruefungM';
 
 	const INFOCENTER_URI = 'system/infocenter/InfoCenter'; // URL prefix for this controller
+	const ZGV_UEBERPRUEFUNG_URI = 'system/infocenter/ZGVUeberpruefung';
 	const INDEX_PAGE = 'index';
 	const FREIGEGEBEN_PAGE = 'freigegeben';
 	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
 	const SHOW_DETAILS_PAGE = 'showDetails';
+	const SHOW_ZGV_DETAILS_PAGE = 'showZGVDetails';
+	const ZGV_UBERPRUEFUNG_PAGE = 'ZGVUeberpruefung';
 
 	const NAVIGATION_PAGE = 'navigation_page';
 	const ORIGIN_PAGE = 'origin_page';
@@ -64,6 +69,18 @@ class InfoCenter extends Auth_Controller
 			'message' => 'Note with title %s was updated',
 			'success' => null
 		),
+		'updatezgv' => array(
+			'logtype' => 'Action',
+			'name' => 'ZGV pruefung updated',
+			'message' => 'ZGV with the ID %s was updated to %s',
+			'success' => null
+		),
+		'newzgv' => array(
+			'logtype' => 'Action',
+			'name' => 'ZGV pruefung added',
+			'message' => 'ZGV with the ID %s was added',
+			'success' => null
+		),
 		'updatedoctyp' => array(
 			'logtype' => 'Action',
 			'name' => 'Document type updated',
@@ -91,6 +108,7 @@ class InfoCenter extends Auth_Controller
 				'freigegeben' => 'infocenter:r',
 				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
+				'showZGVDetails' => 'lehre/zgvpruefung:r',
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'saveDocTyp' => 'infocenter:rw',
@@ -99,6 +117,8 @@ class InfoCenter extends Auth_Controller
 				'getZgvInfoForPrestudent' => 'infocenter:r',
 				'saveBewPriorisierung' => 'infocenter:rw',
 				'saveZgvPruefung' => 'infocenter:rw',
+				'zgvRueckfragen' => 'infocenter:rw',
+				'zgvStatusUpdate' => 'lehre/zgvpruefung:rw',
 				'saveAbsage' => 'infocenter:rw',
 				'saveFreigabe' => 'infocenter:rw',
 				'getNotiz' => 'infocenter:r',
@@ -125,6 +145,8 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+		$this->load->model('crm/ZGVPruefung_model', 'ZGVPruefungModel');
+		$this->load->model('crm/ZGVPruefungStatus_model', 'ZGVPruefungStatusModel');
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('system/Message_model', 'MessageModel');
@@ -186,6 +208,57 @@ class InfoCenter extends Auth_Controller
 		$this->load->view('system/infocenter/infocenterReihungstestAbsolviert.php');
 	}
 
+	/**
+	 * Prestudenten/ZGV übersicht
+	 * Holt sich die Informationen zu den ZGV vom Prestudenten und zeigt die dann an
+	 */
+	public function showZGVDetails()
+	{
+		$this->_setNavigationMenuShowDetails(self::SHOW_ZGV_DETAILS_PAGE);
+
+		$prestudent_id = $this->input->get('prestudent_id');
+
+		if (!is_numeric($prestudent_id))
+			show_error('prestudent id is not numeric!');
+
+		$prestudentexists = $this->PrestudentModel->load($prestudent_id);
+
+		if (isError($prestudentexists))
+			show_error(getError($prestudentexists));
+
+		if (!hasData($prestudentexists))
+			show_error('Prestudent does not exist!');
+
+		$zgv = $this->ZGVPruefungStatusModel->getZgvStatusByPrestudent($prestudent_id);
+
+		if (isError($zgv))
+			show_error(getError($zgv));
+
+		if (!hasData($zgv))
+			show_error('ZGV has no status.');
+
+		$persondata = $this->_loadPersonData(getData($prestudentexists)[0]->person_id);
+		$prestudent_id = array('prestudent_id' => $prestudent_id);
+		$status = array('status' => getData($zgv)[0]->status);
+
+		$this->DokumentModel->addOrder('bezeichnung');
+		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
+
+		$data = array_merge(
+			$persondata,
+			$prestudent_id,
+			$status,
+			$dokumentdata
+		);
+
+		$origin_page = $this->input->get(self::ORIGIN_PAGE);
+
+		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
+		$data[self::ORIGIN_PAGE] = $origin_page;
+		$data[self::PREV_FILTER_ID] = $this->input->get(self::PREV_FILTER_ID);
+
+		$this->load->view('system/infocenter/infocenterZgvDetails.php', $data);
+	}
 	/**
 	 * Personal details page of the InfoCenter tool
 	 * Initialization function, gets person and prestudent data and loads the view with the data
@@ -386,12 +459,18 @@ class InfoCenter extends Auth_Controller
 			$zgvdatum = isEmptyString($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
 			$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
 
-			// zgvmasterdata
-			$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
-			$zgvmaort = $this->input->post('zgvmaort');
-			$zgvmadatum = $this->input->post('zgvmadatum');
-			$zgvmadatum = isEmptyString($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
-			$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
+			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id);
+			$prestudentdata = getData($prestudent);
+
+			if ($prestudentdata->studiengangtyp === 'm')
+			{
+				// zgvmasterdata
+				$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
+				$zgvmaort = $this->input->post('zgvmaort');
+				$zgvmadatum = $this->input->post('zgvmadatum');
+				$zgvmadatum = isEmptyString($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
+				$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
+			}
 
 			$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, '', self::INTERESSENTSTATUS);
 
@@ -407,19 +486,29 @@ class InfoCenter extends Auth_Controller
 				);
 			}
 
-			$prestresult = $this->PrestudentModel->update(
-				$prestudent_id,
-				array(
-					'zgv_code' => $zgv_code,
-					'zgvort' => $zgvort,
-					'zgvdatum' => $zgvdatum,
-					'zgvnation' => $zgvnation_code,
+			$updateArray = array(
+				'zgv_code' => $zgv_code,
+				'zgvort' => $zgvort,
+				'zgvdatum' => $zgvdatum,
+				'zgvnation' => $zgvnation_code,
+				'updateamum' => date('Y-m-d H:i:s')
+			);
+
+			if ($prestudentdata->studiengangtyp === 'm')
+			{
+				$updateMasterArray = array(
 					'zgvmas_code' => $zgvmas_code,
 					'zgvmaort' => $zgvmaort,
 					'zgvmadatum' => $zgvmadatum,
-					'zgvmanation' => $zgvmanation_code,
-					'updateamum' => date('Y-m-d H:i:s')
-				)
+					'zgvmanation' => $zgvmanation_code
+				);
+
+				$updateArray = array_merge($updateArray, $updateMasterArray);
+			}
+
+			$prestresult = $this->PrestudentModel->update(
+				$prestudent_id,
+				$updateArray
 			);
 
 			if (isError($prestresult))
@@ -439,6 +528,183 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->outputJson($json);
+	}
+
+	/**
+	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
+	 */
+	private function sendZgvMail($mail, $typ){
+		$data = array(
+			'link' => site_url('system/infocenter/ZGVUeberpruefung')
+		);
+
+		$this->load->helper('hlp_sancho');
+
+		sendSanchoMail(
+			($typ === 'm' ? self::ZGVPRUEFUNG_MAIL_VORLAGE_MASTER : self::ZGVPRUEFUNG_MAIL_VORLAGE),
+			$data,
+			$mail,
+			'ZGV Ueberpruefung',
+			'sancho_header_min_bw.jpg',
+			'sancho_footer_min_bw.jpg'
+		);
+	}
+
+	/**
+	 * Der Status von den ZGV wird geupdated
+	 */
+	public function zgvStatusUpdate()
+	{
+		$prestudent_id = $this->input->post('prestudent_id');
+		$person_id = $this->input->post('person_id');
+		$status = $this->input->post('status');
+
+		if (isEmptyString($prestudent_id) || isEmptyString($person_id) || isEmptyString($status))
+			$this->terminateWithJsonError('Some data is missing');
+
+		$personInfos = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id);
+
+		if (!hasData($personInfos))
+			$this->terminateWithJsonError('Person id nicht gefunden');
+
+		$personInfos = getData($personInfos);
+
+		$zgv = $this->ZGVPruefungStatusModel->getZgvStatusByPrestudent($prestudent_id);
+
+		if (!hasData($zgv))
+			$this->terminateWithJsonError('ZGV-Status nicht gefunden');
+
+		$zgv = getData($zgv);
+
+		if ($zgv[0]->status === 'rejected' && $status === 'rejected')
+			$this->terminateWithJsonError('Bereits abgelehnt worden');
+		elseif ($zgv[0]->status === 'accepted' && $status === 'accepted')
+			$this->terminateWithJsonError('Bereits akzeptiert worden');
+
+		$insert = $this->ZGVPruefungStatusModel->insert(
+			array(
+				'zgvpruefung_id' => $zgv[0]->zgvpruefung_id,
+				'status' => $status
+			)
+		);
+
+		$update = $this->ZGVPruefungModel->update(
+			$zgv[0]->zgvpruefung_id,
+			array(
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $this->_uid
+			)
+		);
+
+		if (isError($insert) || isError($update))
+			$this->terminateWithJsonError('Fehler beim Speichern');
+
+		$allZgvs = $this->ZGVPruefungStatusModel->getOpenZgvByPerson($personInfos->person_id, array('pruefung_stg'));
+		$openZgv = false;
+
+		if (hasData($allZgvs))
+			$openZgv = true;
+
+		$this->_log($person_id, 'updatezgv', array($zgv[0]->zgvpruefung_id, $status));
+
+		$this->outputJsonSuccess(
+			array
+			(
+				'msg' => 'Erfolgreich gespeichert',
+				'person_id' => $personInfos->person_id,
+				'openZgv' => $openZgv
+			)
+		);
+
+	}
+
+	/**
+	 * Fügt einen neuen ZGV Status hinzu oder updated einen bestehenden
+	 * Falls es erfolgreich war, sendet er die Mail raus
+	 */
+	public function zgvRueckfragen()
+	{
+		$prestudent_id = $this->input->post('prestudent_id');
+		$person_id = $this->input->post('person_id');
+
+		if (isEmptyString($prestudent_id) || isEmptyString($person_id))
+			$this->terminateWithJsonError('Prestudentid OR/AND Personid missing');
+
+		$zgv = $this->ZGVPruefungStatusModel->getZgvStatusByPrestudent($prestudent_id);
+
+		$data = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+		$mail = $data['studiengang_mail'];
+		$typ = $data['studiengang_typ'];
+
+		if (hasData($zgv))
+		{
+			$zgv = getData($zgv);
+
+			if ($zgv[0]->status === 'pruefung_stg')
+				$this->terminateWithJsonError('Bereits in Prüfung');
+
+			$insert = $this->ZGVPruefungStatusModel->insert(
+				array(
+					'zgvpruefung_id' => $zgv[0]->zgvpruefung_id,
+					'status' => 'pruefung_stg'
+				)
+			);
+
+			$this->ZGVPruefungModel->update(
+				$zgv[0]->zgvpruefung_id,
+				array(
+					'updateamum' => date('Y-m-d H:i:s'),
+					'updatevon' => $this->_uid
+				)
+			);
+
+			$this->_log($person_id, 'updatezgv', array($zgv[0]->zgvpruefung_id, 'pruefung_stg'));
+
+			if (isSuccess($insert))
+				$this->sendZgvMail($mail, $typ);
+			elseif (isError($insert))
+				$this->terminateWithJsonError('Fehler beim Speichern');
+		}else
+		{
+			$insert = $this->ZGVPruefungModel->insert(
+				array(
+					'prestudent_id' => $prestudent_id,
+					'insertamum' => date('Y-m-d H:i:s'),
+					'insertvon' => $this->_uid
+				)
+			);
+
+			if (isSuccess($insert))
+			{
+				$zgvpruefung_id = $this->ZGVPruefungModel->db->insert_id();
+				$result = $this->ZGVPruefungStatusModel->insert(
+					array(
+						'zgvpruefung_id' => $zgvpruefung_id,
+						'status' => 'pruefung_stg'
+					)
+				);
+
+				$this->_log($person_id, 'newzgv', array($zgvpruefung_id));
+
+				if (isSuccess($result))
+					$this->sendZgvMail($mail, $typ);
+				elseif (isError($result))
+					$this->terminateWithJsonError('Fehler beim Speichern');
+			}
+		}
+
+		$hold = false;
+		if ($this->personloglib->getOnHoldDate($person_id) !== null)
+			$hold = true;
+
+		$this->outputJsonSuccess(
+			array
+			(
+				'msg' => 'Erfolgreich gespeichert',
+				'person_id' => $data['person_id'],
+				'hold' => $hold
+			)
+		);
 	}
 
 	/**
@@ -1105,9 +1371,9 @@ class InfoCenter extends Auth_Controller
 	/**
 	 *  Define the navigation menu for the showDetails page
 	 */
-	private function _setNavigationMenuShowDetails()
+	private function _setNavigationMenuShowDetails($page = self::SHOW_DETAILS_PAGE)
 	{
-		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.self::SHOW_DETAILS_PAGE));
+		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.$page));
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
 
@@ -1120,6 +1386,8 @@ class InfoCenter extends Auth_Controller
 		{
 			$link = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		}
+		if ($origin_page === self::ZGV_UBERPRUEFUNG_PAGE)
+			$link = site_url(self::ZGV_UEBERPRUEFUNG_URI);
 
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
@@ -1468,8 +1736,20 @@ class InfoCenter extends Auth_Controller
                     $zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
                 }
             }
+			$zgvExist = $this->ZGVPruefungModel->loadWhere(array('prestudent_id' => $zgvpruefung->prestudent_id));
 
-            $zgvpruefungen[] = $zgvpruefung;
+            if (isSuccess($zgvExist) && hasData($zgvExist))
+			{
+				$this->ZGVPruefungStatusModel->addOrder('datum', 'DESC');
+				$this->ZGVPruefungStatusModel->addLimit(1);
+
+				$statusZGV = $this->ZGVPruefungStatusModel->loadWhere(array('zgvpruefung_id' => $zgvExist->retval[0]->zgvpruefung_id));
+
+				if (isSuccess($statusZGV) && hasData($statusZGV))
+					$zgvpruefung->statusZGV = $statusZGV->retval[0]->status;
+			}
+
+			$zgvpruefungen[] = $zgvpruefung;
 		}
 
 		$this->_sortPrestudents($zgvpruefungen);
@@ -1592,8 +1872,10 @@ class InfoCenter extends Auth_Controller
 		$person_id = $prestudentdata->person_id;
 		$studiengang_kurzbz = $prestudentdata->studiengang;
 		$studiengang_bezeichnung = $prestudentdata->studiengangbezeichnung;
+		$studiengang_mail = $prestudentdata->studiengangmail;
+		$studiengang_typ = $prestudentdata->studiengangtyp;
 
-		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung);
+		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung, 'studiengang_mail' => $studiengang_mail, 'studiengang_typ' => $studiengang_typ);
 	}
 
 	/**

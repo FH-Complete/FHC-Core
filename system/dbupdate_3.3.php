@@ -3265,6 +3265,20 @@ if(!@$db->db_query("SELECT 0 FROM public.tbl_variablenname WHERE 0 = 1"))
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.tbl_variablenname';
 }
 
+// Add new name type in public.tbl_variablenname
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name = 'infocenter_studiensgangtyp';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_variablenname(name, defaultwert) VALUES('infocenter_studiensgangtyp', 'b');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_variablenname '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_variablenname: Added name "infocenter_studiensgangtyp"<br>';
+	}
+}
+
 // Add column projektphase_id to tbl_zeitaufzeichnung
 if(!$result = @$db->db_query("SELECT projektphase_id FROM campus.tbl_zeitaufzeichnung LIMIT 1"))
 {
@@ -4767,6 +4781,103 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+
+// Add table zgvpruefungstatus
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_zgvpruefungstatus
+		(
+			status_kurzbz character varying(32),
+			bezeichnung character varying(256)
+		);
+
+		ALTER TABLE public.tbl_zgvpruefungstatus ADD CONSTRAINT status_kurzbz PRIMARY KEY (status_kurzbz);
+		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('pruefung_stg', 'Wird vom Studiengang geprüft');
+		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('rejected', 'Vom Studiengang abgelehnt');
+		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('accepted', 'Vom Studiengang akzeptiert');
+		INSERT INTO public.tbl_zgvpruefungstatus(status_kurzbz, bezeichnung) VALUES('accepted_pruefung', 'Vom Studiengang akzeptiert mit Prüfung');
+
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_zgvpruefungstatus TO vilesci;
+		GRANT SELECT ON public.tbl_zgvpruefungstatus TO web;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_zgvpruefungstatus: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_zgvpruefungstatus: Tabelle hinzugefuegt<br>';
+}
+
+// Add table zgvpruefung
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefung LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_zgvpruefung
+		(
+			zgvpruefung_id integer NOT NULL,
+			prestudent_id integer NOT NULL,
+			insertamum timestamp without time zone,
+			insertvon character varying(32),
+			updateamum timestamp without time zone,
+			updatevon character varying(32)
+		);
+
+		CREATE SEQUENCE public.tbl_zgvpruefung_id_seq 
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+		ALTER TABLE public.tbl_zgvpruefung ADD CONSTRAINT pk_tbl_zgvpruefung PRIMARY KEY (zgvpruefung_id);
+		ALTER TABLE public.tbl_zgvpruefung ALTER COLUMN zgvpruefung_id SET DEFAULT nextval('public.tbl_zgvpruefung_id_seq');
+		ALTER TABLE public.tbl_zgvpruefung ADD CONSTRAINT fk_tbl_zgvpruefung_student FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT, UPDATE ON public.tbl_zgvpruefung_id_seq  TO vilesci;
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_zgvpruefung TO vilesci;
+		GRANT SELECT ON public.tbl_zgvpruefung TO web;
+		
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_zgvpruefung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_zgvpruefung: Tabelle hinzugefuegt<br>';
+}
+
+// Add table zgvpruefungstatus_status
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_zgvpruefungstatus_status
+		(
+			zgv_pruefung_status_id integer NOT NULL,
+			zgvpruefung_id integer NOT NULL,
+			status character varying(32),
+			datum timestamp without time zone DEFAULT now()
+		);
+
+		CREATE SEQUENCE public.tbl_zgvpruefungstatus_status_id_seq 
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+
+		ALTER TABLE public.tbl_zgvpruefungstatus_status ADD CONSTRAINT pk_tbl_zgvpruefungstatus_status PRIMARY KEY (zgv_pruefung_status_id);
+		ALTER TABLE public.tbl_zgvpruefungstatus_status ALTER COLUMN zgv_pruefung_status_id SET DEFAULT nextval('tbl_zgvpruefungstatus_status_id_seq');
+		ALTER TABLE public.tbl_zgvpruefungstatus_status ADD CONSTRAINT fk_tbl_zgvpruefung_zgvpruefung FOREIGN KEY (zgvpruefung_id) REFERENCES public.tbl_zgvpruefung (zgvpruefung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE public.tbl_zgvpruefungstatus_status ADD CONSTRAINT fk_tbl_zgvpruefung_status FOREIGN KEY (status) REFERENCES public.tbl_zgvpruefungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT, UPDATE ON public.tbl_zgvpruefungstatus_status_id_seq  TO vilesci;
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_zgvpruefungstatus_status TO vilesci;
+		GRANT SELECT ON public.tbl_zgvpruefungstatus_status TO web;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_zgvpruefungstatus_status: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_zgvpruefungstatus_status: Tabelle hinzugefuegt<br>';
+}
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -5007,6 +5118,9 @@ $tabellen=array(
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype","attribute","archivierbar","signierbar","stud_selfservice","dokument_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_vorlagedokument"  => array("vorlagedokument_id","sort","vorlagestudiengang_id","dokument_kurzbz"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv","sprache","subject","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_zgvpruefungstatus" => array("status_kurzbz","bezeichnung"),
+	"public.tbl_zgvpruefung" => array("zgvpruefung_id","prestudent_id","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_zgvpruefungstatus_status" => array("zgv_pruefung_status_id","zgvpruefung_id","status","datum"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id","studienplan_id"),
 	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),

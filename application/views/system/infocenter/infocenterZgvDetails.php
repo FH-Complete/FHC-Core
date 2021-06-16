@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'InfocenterDetails',
+			'title' => 'InfocenterZgvDetails',
 			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
@@ -32,19 +32,8 @@
 				'infocenter' => array(
 					'notizHinzufuegen',
 					'notizAendern',
-					'bewerberParken',
-					'bewerberAusparken',
-					'nichtsZumAusparken',
-					'fehlerBeimAusparken',
-					'fehlerBeimParken',
-					'bewerberGeparktBis',
-					'bewerberOnHold',
-					'bewerberOnHoldEntfernen',
-					'bewerberOnHoldBis',
 					'nichtsZumEntfernen',
 					'fehlerBeimEntfernen',
-					'rueckstelldatumUeberschritten',
-					'parkenZurueckstellenInfo',
 					'zgvInPruefung',
 					'zgvErfuellt',
 					'zgvNichtErfuellt',
@@ -107,7 +96,8 @@
 								<h4><?php echo ucfirst($this->p->t('global', 'stammdaten')) ?></h4>
 							</div>
 							<div class="panel-body">
-								<?php $this->load->view('system/infocenter/stammdaten.php'); ?>
+								<?php
+								$this->load->view('system/infocenter/stammdaten.php'); ?>
 								<?php $this->load->view('system/infocenter/anmerkungenZurBewerbung.php'); ?>
 							</div> <!-- ./panel-body -->
 						</div> <!-- ./panel -->
@@ -125,28 +115,68 @@
 								</h4>
 							</div>
 							<div class="panel-body">
-								<?php $this->load->view('system/infocenter/dokpruefung.php'); ?>
+								<?php $this->load->view('system/infocenter/dokpruefung.php', array('formalReadonly' => true)); ?>
 							</div> <!-- ./panel-body -->
+
+							<div class="panel-body zgvBearbeitungButtons" id="zgvBearbeitungButtons_<?php echo $prestudent_id ?>">
+								<button type="button" class="btn btn-default zgvAkzeptieren" id="zgvAkzeptieren_<?php echo $prestudent_id ?>">
+									<?php echo $this->p->t('infocenter', 'zgvErfuellt') ?>
+								</button>
+								<button type="button" class="btn btn-default zgvAblehnen" id="zgvAblehnen_<?php echo $prestudent_id ?>">
+									<?php echo $this->p->t('infocenter', 'zgvNichtErfuellt') ?>
+								</button>
+								<button type="button" class="btn btn-default zgvAkzeptierenPruefung" id="zgvAkzeptierenPruefung_<?php echo $prestudent_id ?>">
+									<?php echo $this->p->t('infocenter', 'zgvErfuelltPruefung') ?>
+								</button>
+								<span class="zgvStatusText" id="zgvStatusText_<?php echo $prestudent_id ?>" data-info="need">
+								</span>
+							</div>
 						</div> <!-- ./panel -->
 					</div> <!-- ./column -->
 				</div> <!-- ./row -->
 			</section>
 			<section>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="panel panel-primary">
-							<div class="panel-heading text-center">
-								<a name="ZgvPruef"></a>
-								<h4>
-									<?php echo $this->p->t('infocenter', 'zgv').' - '.ucfirst($this->p->t('lehre', 'pruefung'))?>
+				<div class="modal fade notizModal" id="notizModal_<?php echo $prestudent_id ?>" tabindex="-1"
+					 role="dialog"
+					 aria-labelledby="notizModalLabel"
+					 aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close"
+										data-dismiss="modal"
+										aria-hidden="true">&times;
+								</button>
+								<h4 class="modal-title"
+									id="notizModalLabel">
+									<?php echo $this->p->t('infocenter', 'notizHinzufuegen') ?>
+									<span id="notizModalStgr_<?php echo $prestudent_id ?>"></span>
 								</h4>
 							</div>
-							<div class="panel-body" id="zgvpruefungen">
-								<?php $this->load->view('system/infocenter/zgvpruefungen.php'); ?><!-- /.panel-group -->
-							</div><!-- /.main panel body -->
-						</div> <!-- /.main panel-->
-					</div> <!-- /.column freigabe-->
-				</div> <!-- /.row freigabe-->
+							<div class="modal-body">
+								<input type="hidden" id="inputStatus_<?php echo $prestudent_id ?>">
+								<div class="form-group">
+									<label for="inputNotizTitelModal"><?php echo  ucfirst($this->p->t('global', 'titel')) . ':' ?></label>
+									<input id="inputNotizTitelModal" required type="text" class="form-control"/>
+								</div>
+								<div class="form-group">
+									<label for="inputNotizTextModal"><?php echo  ucfirst($this->p->t('global', 'text')) . ':' ?></label>
+									<textarea id="inputNotizTextModal" required class="form-control" rows="3" cols="32"></textarea>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button"
+										class="btn btn-default"
+										data-dismiss="modal"><?php echo  $this->p->t('ui', 'abbrechen') ?>
+								</button>
+								<button type="button"
+										class="btn btn-default saveZgvNotiz" id="saveZgvNotiz_<?php echo $prestudent_id ?>">
+									<?php echo $this->p->t('ui', 'speichern') ?>
+								</button>
+							</div>
+						</div><!-- /.modal-content -->
+					</div><!-- /.modal-dialog -->
+				</div><!-- /.modal-fade -->
 			</section>
 			<section>
 				<div class="row">
@@ -176,12 +206,12 @@
 							<div class="panel-heading text-center">
 								<a name="NotizAkt"></a>
 								<h4 class="text-center">
-									<?php echo ucfirst($this->p->t('global', 'notizen')).' & '.ucfirst($this->p->t('global', 'aktivitaeten')) ?>
+									<?php echo ucfirst($this->p->t('global', 'notizen'))?>
 								</h4>
 							</div>
 							<div class="panel-body">
 								<div class="row">
-									<div class="col-lg-6">
+									<div class="col-lg-12">
 										<div id="addnotiz">
 											<?php $this->load->view('system/infocenter/addNotiz.php'); ?>
 										</div>
@@ -189,12 +219,7 @@
 											<?php $this->load->view('system/infocenter/notizen.php'); ?>
 										</div>
 									</div>
-									<div class="col-lg-6">
-										<div id="postponing"></div>
-										<div id="logs">
-										<?php $this->load->view('system/infocenter/logs.php'); ?>
-										</div>
-									</div> <!-- ./column -->
+
 								</div> <!-- ./row -->
 							</div> <!-- ./panel-body -->
 						</div> <!-- ./panel -->

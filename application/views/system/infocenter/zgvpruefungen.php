@@ -259,7 +259,7 @@
 											echo $this->widgetlib->widget(
 												'Zgvmaster_widget',
 												array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvmas_code),
-												array('name' => 'zgvmas', 'id' => 'zgvmas')
+												array('name' => 'zgvmas', 'id' => 'zgvmas_'.$zgvpruefung->prestudent_id)
 											); ?>
 									</div>
 								</div>
@@ -272,7 +272,8 @@
 											?>
 											<input type="text" class="form-control"
 												   value="<?php echo $zgvpruefung->zgvmaort ?>"
-												   name="zgvmaort">
+												   name="zgvmaort"
+												   id="zgvmaort_<?php echo $zgvpruefung->prestudent_id ?>">
 										<?php endif; ?>
 									</div>
 								</div>
@@ -288,7 +289,8 @@
 											<input type="text"
 												   class="dateinput form-control"
 												   value="<?php echo $zgvmadatum ?>"
-												   name="zgvmadatum">
+												   name="zgvmadatum"
+												   id="zgvmadatum_<?php echo $zgvpruefung->prestudent_id ?>">
 										<?php endif; ?>
 									</div>
 								</div>
@@ -301,22 +303,31 @@
 											echo $this->widgetlib->widget(
 												'Nation_widget',
 												array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvmanation_code),
-												array('name' => 'zgvmanation', 'id' => 'zgvmanation')
+												array('name' => 'zgvmanation', 'id' => 'zgvmanation_'.$zgvpruefung->prestudent_id)
 											); ?>
 									</div>
 								</div>
 							</div>
 							<!-- show only master zgv if master studiengang - end -->
 						<?php endif; ?>
+					<?php if ($infoonly) : ?>
+						<span class="zgvStatusText" id="zgvStatusText_<?php echo $zgvpruefung->prestudent_id ?>" <?php (!(isset($zgvpruefung->statusZGV))) ?: print_r('data-info="need"')?>>
+						</span>
+					<?php endif; ?>
 					</form>
 					<?php if (!$infoonly): ?>
 						<div class="row">
-							<div class="col-xs-6 text-left">
+							<div class="col-xs-8 text-left zgvBearbeitungButtons" id="zgvBearbeitungButtons_<?php echo $zgvpruefung->prestudent_id ?>">
 								<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
 								</button>
+								<button class="btn btn-default zgvRueckfragen" id="zgvRueckfragen_<?php echo $zgvpruefung->prestudent_id ?>">
+									<?php echo $this->p->t('infocenter', 'zgvRueckfragen') ?>
+								</button>
+								<span class="zgvStatusText" id="zgvStatusText_<?php echo $zgvpruefung->prestudent_id ?>" <?php (!(isset($zgvpruefung->statusZGV))) ?: print_r('data-info="need"')?>>
+								</span>
 							</div>
-							<div class="col-xs-6 text-right">
+							<div class="col-xs-4 text-right">
 								<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php echo  $this->p->t('ui', 'speichern') ?>
 								</button>
