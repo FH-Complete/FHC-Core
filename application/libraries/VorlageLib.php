@@ -114,7 +114,7 @@ class VorlageLib
 		if (!hasData($vorlage))
 		{
 			// Builds where clause
-			$where = $this->_where($vorlage_kurzbz, $orgform_kurzbz, $sprache);
+			$where = $this->_where($vorlage_kurzbz);
 
 			$vorlage = $this->ci->organisationseinheitlib->treeSearch(
 				'public',
@@ -134,19 +134,10 @@ class VorlageLib
 	/**
 	 * _where
 	 */
-	private function _where($vorlage_kurzbz, $orgform_kurzbz, $sprache)
+	private function _where($vorlage_kurzbz)
 	{
 		// Builds where clause
 		$where = "vorlage_kurzbz = ".$this->ci->VorlageModel->escape($vorlage_kurzbz);
-
-		if (is_null($sprache))
-		{
-			$where .= " AND sprache IS NULL";
-		}
-		else
-		{
-			$where .= " AND sprache = ".$this->ci->VorlageModel->escape($sprache);
-		}
 
 		$where .= " AND aktiv = true";
 
