@@ -126,6 +126,10 @@ else
 										echo '
 										<menu id="'.$id.'" label="'.$label.'">
 											<menupopup>';
+
+										if ($id == 'student-toolbar-student')
+											echo '<menuitem label="Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Status ändern auf Student"/>';
+
 										foreach($gruende[$status_kurzbz] as $row)
 										{
 											$commandWithID = str_replace('STATUSGRUNDID',$row['statusgrund_id'],$command);
