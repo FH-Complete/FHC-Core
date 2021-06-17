@@ -761,7 +761,15 @@ var InfocenterDetails = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					InfocenterDetails._refreshLog();
+					if (FHC_AjaxClient.isSuccess(data))
+					{
+						FHC_DialogLib.alertSuccess("Done!");
+						InfocenterDetails._refreshLog();
+					}
+					else
+					{
+						FHC_DialogLib.alertError("Fehler beim Speichern des Dokumententypes!");
+					}
 				},
 				errorCallback: function() {
 					FHC_DialogLib.alertWarning("Document type could not be updated");
