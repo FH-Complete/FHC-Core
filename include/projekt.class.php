@@ -28,21 +28,21 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class projekt extends basis_db
 {
-	public $new;       		// boolean
-	public $result = array(); 	// projekt Objekt
+	public $new;            // boolean
+	public $result = array();    // projekt Objekt
 
 	//Tabellenspalten
-	public $projekt_kurzbz;	// string
-	public $nummer;			// string
-	public $titel;			// string
-	public $beschreibung;	// string
-	public $beginn;			// date
-	public $ende;			// date
-	public $oe_kurzbz;		// string
-	public $insertamum;		// timestamp
-	public $insertvon;		// string
-	public $updateamum;		// timestamp
-	public $updatevon;		// string
+	public $projekt_kurzbz;    // string
+	public $nummer;            // string
+	public $titel;            // string
+	public $beschreibung;    // string
+	public $beginn;            // date
+	public $ende;            // date
+	public $oe_kurzbz;        // string
+	public $insertamum;        // timestamp
+	public $insertvon;        // string
+	public $updateamum;        // timestamp
+	public $updatevon;        // string
 	public $budget;
 	public $farbe;
 	public $anzahl_ma;		// integer
@@ -58,18 +58,18 @@ class projekt extends basis_db
 	{
 		parent::__construct();
 
-		if($projekt_kurzbz != null)
+		if ($projekt_kurzbz != null)
 			$this->load($projekt_kurzbz);
 	}
 
 	/**
 	 * Laedt die Projek mit der Kurzbezeichnung $projekt_kurzbz
-	 * @param  string $projekt_kurzbz Kurzbz des Projekts.
+	 * @param string $projekt_kurzbz Kurzbz des Projekts.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($projekt_kurzbz)
 	{
-		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
+		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz=" . $this->db_add_param($projekt_kurzbz);
 
 		if ($this->db_query($qry))
 		{
@@ -103,27 +103,27 @@ class projekt extends basis_db
 		}
 	}
 
-    /**
-     * Laedt alle aktuellen Projekte
-     * @param bool $filter_kommende Lädt auch alle zukünftigen.
+	/**
+	 * Laedt alle aktuellen Projekte
+	 * @param bool $filter_kommende Lädt auch alle zukünftigen.
 	 * @param string $oe Organisationseinheit.
-     * @return bool
-     */
-    public function getProjekteAktuell($filter_kommende = false, $oe = null)
-    {
-        $qry = 'SELECT * FROM fue.tbl_projekt WHERE ';
+	 * @return bool
+	 */
+	public function getProjekteAktuell($filter_kommende = false, $oe = null)
+	{
+		$qry = 'SELECT * FROM fue.tbl_projekt WHERE ';
 
-        if($filter_kommende)
-            $qry .= " ((beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP) OR beginn > CURRENT_TIMESTAMP)";
-        else
-            $qry .= " (beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP)";
+		if ($filter_kommende)
+			$qry .= " ((beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP) OR beginn > CURRENT_TIMESTAMP)";
+		else
+			$qry .= " (beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP)";
 
 
-        if (!is_null($oe))
-            $qry .= ' AND oe_kurzbz='.$this->db_add_param($oe);
+		if (!is_null($oe))
+			$qry .= ' AND oe_kurzbz=' . $this->db_add_param($oe);
 
-        $qry .= ' ORDER BY oe_kurzbz;';
-        if ($this->db_query($qry))
+		$qry .= ' ORDER BY oe_kurzbz;';
+		if ($this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object())
 			{
@@ -152,22 +152,22 @@ class projekt extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-    }
+	}
 
-    /**
-     * Laedt alle Projekte die zwischen beginn und ende liegen
-     * @param date $beginn Anfang.
-     * @param date $ende Ende.
-     * @param string $oe Organisationseinheit.
-     * @return bool
-     */
-    public function getProjekteInZeitraum($beginn, $ende, $oe = null)
-    {
-		$qry = 'select * from fue.tbl_projekt where beginn <= '.$this->db_add_param($ende).' and ende >= '.$this->db_add_param($beginn);
+	/**
+	 * Laedt alle Projekte die zwischen beginn und ende liegen
+	 * @param date $beginn Anfang.
+	 * @param date $ende Ende.
+	 * @param string $oe Organisationseinheit.
+	 * @return bool
+	 */
+	public function getProjekteInZeitraum($beginn, $ende, $oe = null)
+	{
+		$qry = 'select * from fue.tbl_projekt where beginn <= ' . $this->db_add_param($ende) . ' and ende >= ' . $this->db_add_param($beginn);
 		if (!is_null($oe))
-			$qry .= " AND oe_kurzbz=".$this->db_add_param($oe);
+			$qry .= " AND oe_kurzbz=" . $this->db_add_param($oe);
 		$qry .= ' ORDER BY oe_kurzbz;';
-		//echo $qry;
+
 		if ($this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object())
@@ -196,8 +196,7 @@ class projekt extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-    }
-
+	}
 
 	/**
 	 * Laedt die Projeke einer Organisationseinheit
@@ -208,9 +207,9 @@ class projekt extends basis_db
 	{
 		$qry = 'SELECT * FROM fue.tbl_projekt';
 		if (!is_null($oe))
-			$qry .= " WHERE oe_kurzbz=".$this->db_add_param($oe);
+			$qry .= " WHERE oe_kurzbz=" . $this->db_add_param($oe);
 		$qry .= ' ORDER BY oe_kurzbz;';
-		//echo $qry;
+
 		if ($this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object())
@@ -287,7 +286,7 @@ class projekt extends basis_db
 	public function save($new = null)
 	{
 		//Variablen pruefen
-		if(!$this->validate())
+		if (!$this->validate())
 			return false;
 
 		if ($new == null)
@@ -298,19 +297,19 @@ class projekt extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry = 'INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz, aufwand_pt, anzahl_ma, aufwandstyp_kurzbz, zeitaufzeichnung) VALUES('.
-		     $this->db_add_param($this->projekt_kurzbz).', '.
-		     $this->db_add_param($this->nummer).', '.
-		     $this->db_add_param($this->titel).', '.
-		     $this->db_add_param($this->beschreibung).', '.
-		     $this->db_add_param($this->beginn).', '.
-		     $this->db_add_param($this->ende).', '.
-		     $this->db_add_param($this->budget).', '.
-	 	     $this->db_add_param($this->farbe).', '.
-		     $this->db_add_param($this->oe_kurzbz).','.
-		     $this->db_add_param($this->aufwand_pt).','.
-		     $this->db_add_param($this->anzahl_ma).','.
-		     $this->db_add_param($this->aufwandstyp_kurzbz).', '.
-			 $this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).');';
+			$this->db_add_param($this->projekt_kurzbz).', '.
+			$this->db_add_param($this->nummer).', '.
+			$this->db_add_param($this->titel).', '.
+			$this->db_add_param($this->beschreibung).', '.
+			$this->db_add_param($this->beginn).', '.
+			$this->db_add_param($this->ende).', '.
+			$this->db_add_param($this->budget).', '.
+			$this->db_add_param($this->farbe).', '.
+			$this->db_add_param($this->oe_kurzbz).','.
+			$this->db_add_param($this->aufwand_pt).','.
+			$this->db_add_param($this->anzahl_ma).','.
+			$this->db_add_param($this->aufwandstyp_kurzbz).', '.
+			$this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -353,7 +352,7 @@ class projekt extends basis_db
 	 */
 	public function delete($projekt_kurzbz)
 	{
-		$qry = "DELETE FROM lehre.tbl_projek WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
+		$qry = "DELETE FROM lehre.tbl_projek WHERE projekt_kurzbz=" . $this->db_add_param($projekt_kurzbz);
 
 		if ($this->db_query($qry))
 		{
@@ -375,7 +374,7 @@ class projekt extends basis_db
 	 */
 	function getProjekteMitarbeiter($mitarbeiter_uid, $projektphasen = false)
 	{
-                $qry = "SELECT DISTINCT
+		$qry = "SELECT DISTINCT
 					tbl_projekt.*
 				FROM
 					fue.tbl_ressource
@@ -385,31 +384,33 @@ class projekt extends basis_db
 				AND (ende + interval '1 month 1 day' >=now() OR ende is null)
 				AND
 				(
-					mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." OR
-					student_uid=".$this->db_add_param($mitarbeiter_uid)."
+					mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid) . " OR
+					student_uid=" . $this->db_add_param($mitarbeiter_uid) . "
 				)";
 
-                if ($projektphasen == true)
-                    $qry .=  "UNION
+		if ($projektphasen == true)
+		{
+			$qry .= "UNION
 
-                             SELECT DISTINCT
-                                        tbl_projekt.*
-                                FROM
-                                        fue.tbl_projektphase
-                                        JOIN fue.tbl_projekt USING (projekt_kurzbz)
-                                        JOIN fue.tbl_projekt_ressource USING (projektphase_id)
-                                        JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
-                                WHERE
-                                (
-									(
-										(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-										AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
-									) OR (
-										(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-										AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
-									)
-								)
-                                AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
+					SELECT DISTINCT
+						tbl_projekt.*
+					FROM
+						fue.tbl_projektphase
+						JOIN fue.tbl_projekt USING (projekt_kurzbz)
+						JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+						JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+					WHERE
+					(
+						(
+							(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+							AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+						) OR (
+							(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+							AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+						)
+					)
+					AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+		}
 
 		if ($result = $this->db_query($qry))
 		{
@@ -436,11 +437,84 @@ class projekt extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert Ein Array mit Projekten von allen Projekten des Mitarbeiters mit UID.
+	 * Optional auch mit den Zuteilungen zu Projektphasen.
+	 * @param string $mitarbeiter_uid MitarbeiterUID.
+	 * @param bool $projektphasen Default false. Wenn true, werden auch Zuteilungen zu Projektphasen geliefert.
+	 * @return array wenn ok, false im Fehlerfall
+	 */
+	function getProjekteListForMitarbeiter($mitarbeiter_uid, $projektphasen = false)
+	{
+		$projectList = array();
+		$qry = "SELECT DISTINCT
+					tbl_projekt.*
+				FROM
+					fue.tbl_ressource
+					JOIN fue.tbl_projekt_ressource USING(ressource_id)
+					JOIN fue.tbl_projekt USING(projekt_kurzbz)
+				WHERE (beginn<=now() or beginn is null)
+				AND (ende + interval '1 month 1 day' >=now() OR ende is null)
+				AND
+				(
+					mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid) . " OR
+					student_uid=" . $this->db_add_param($mitarbeiter_uid) . "
+				)";
+
+		if ($projektphasen == true)
+			$qry .= "UNION
+					SELECT DISTINCT
+						tbl_projekt.*
+					FROM
+						fue.tbl_projektphase
+						JOIN fue.tbl_projekt USING (projekt_kurzbz)
+						JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+						JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+					WHERE
+					(
+						(
+							(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+							AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+						) OR (
+							(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+							AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+						)
+					)
+					AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+
+		if ($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object($result))
+			{
+				$obj = new projekt();
+
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->nummer = $row->nummer;
+				$obj->titel = $row->titel;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+
+				$this->result[] = $obj;
+
+				array_push($projectList, $obj);
+			}
+			return $projectList;
+		}
+		else
+		{
+			$this->erromsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
 	public function getProjektFromBestellung($bestellung_id)
 	{
 		$qry = "select * from fue.tbl_projekt
 				join wawi.tbl_projekt_bestellung USING (projekt_kurzbz)
-				where bestellung_id= ".$this->db_add_param($bestellung_id);
+				where bestellung_id= " . $this->db_add_param($bestellung_id);
 
 		if ($this->db_query($qry))
 		{
@@ -473,5 +547,69 @@ class projekt extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert True zurück wenn die angegebenen Start und Endzeitpunkt der Arbeitsdauer in die Projektdauer fallen
+	 * @param string $mitarbeiter_uid MitarbeiterUID.
+	 * @param bool $projektphasen Default false. Wenn true, werden auch Zuteilungen zu Projektphasen geliefert.
+	 * @return array wenn ok, false im Fehlerfall
+	 */
+	public function checkProjectInCorrectTime($projekt_kurzbz, $give_project_start, $give_projekt_ende)
+	{
+		if(empty($projekt_kurzbz))
+			return true;
+		try
+		{
+			$projekt = $this->getProjectByKurzbz($projekt_kurzbz);
+			if(strtotime($projekt->beginn))
+				$projekt_start = date('Y-m-d', strtotime($projekt->beginn));
+			else
+				$projekt_start = NULL;
+			if(strtotime($projekt->ende))
+				$projekt_ende = date('Y-m-d', strtotime($projekt->ende));
+			else
+				$projekt_ende = NULL;
+
+			$given_start = date('Y-m-d', strtotime($give_project_start));
+			$given_ende = date('Y-m-d', strtotime($give_projekt_ende));
+
+			if ((empty($projekt_start) || $given_start >= $projekt_start) && (empty($projekt_ende) || $given_ende <= $projekt_ende))
+				return true;
+			else
+				return false;
+
+		}
+		catch (Exception $e)
+		{
+			error_log('Exception abgefangen: ',  $e->getMessage(), "\n");
+		}
+	}
+
+	public function getProjectByKurzbz($projekt_kurzbz)
+	{
+		$qry = "SELECT * FROM fue.tbl_projekt
+				WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
+		if ($result = $this->db_query($qry))
+		{
+			$row = $this->db_fetch_object($result);
+			$obj = new projekt();
+
+			$obj->projekt_kurzbz = $row->projekt_kurzbz;
+			$obj->nummer = $row->nummer;
+			$obj->titel = $row->titel;
+			$obj->beschreibung = $row->beschreibung;
+			$obj->beginn = $row->beginn;
+			$obj->ende = $row->ende;
+			$obj->oe_kurzbz = $row->oe_kurzbz;
+
+			return $obj;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
+
 ?>

@@ -177,6 +177,24 @@ class bisverwendung extends basis_db
 		}
 	}
 
+
+	/**
+	 * Prueft das Datum
+	 * @param $date = string
+	 * @return true wenn ok, sonst false
+	 */
+	static public function verifyDate($date, $strict = true)
+	{
+		$dateTime = DateTime::createFromFormat('Y-m-d', $date);
+		if ($strict) {
+			$errors = DateTime::getLastErrors();
+			if (!empty($errors['warning_count'])) {
+				return false;
+			}
+		}
+		return $dateTime !== false;
+	}
+
 	/**
 	 * Prueft die Daten vor dem Speichern
 	 *
@@ -189,6 +207,17 @@ class bisverwendung extends basis_db
 			$this->errormsg = 'Vertragsstunden sind ungueltig';
 			return false;
 		}
+		elseif(!$this->verifyDate($this->beginn) && !empty($this->beginn))
+		{
+			$this->errormsg = 'Start Datum ist kein Valides Datum: '.$this->beginn;
+			return false;
+		}
+		elseif(!$this->verifyDate($this->ende) && !empty($this->ende))
+		{
+			$this->errormsg = 'End Datum ist kein Valides Datum: '.$this->ende;
+			return false;
+		}
+
 		return true;
 	}
 

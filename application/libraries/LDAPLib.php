@@ -167,7 +167,7 @@ class LDAPLib
 		}
 
 		// LDAP connection
-		$ldapConnection = @ldap_connect($ldapConfigs[self::SERVER], $ldapConfigs[self::PORT]);
+		$ldapConnection = @ldap_connect($ldapConfigs[self::SERVER].':'.$ldapConfigs[self::PORT]);
 		if ($ldapConnection) // if success
 		{
 			// Sets the LDAP protocol version
@@ -220,7 +220,9 @@ class LDAPLib
 		}
 		else // Connection error
 		{
-			return error(ldap_error($ldapConnection));
+			return error(
+				'An error occurred while connecting to the LDAP server: '.$ldapConfigs[self::SERVER].':'.$ldapConfigs[self::PORT]
+			);
 		}
 	}
 }

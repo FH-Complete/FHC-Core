@@ -37,7 +37,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
     <wsdl:message name="DeleteProjektRessourceRequest">
 		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
 		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
-		<wsdl:part name="projektRessource" type="tns:projektRessource"></wsdl:part>
+		<wsdl:part name="projektRessource" type="xsd:projektRessource"></wsdl:part>
     </wsdl:message>
     
     <wsdl:message name="DeleteProjektRessourceResponse">

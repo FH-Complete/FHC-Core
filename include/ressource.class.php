@@ -688,5 +688,77 @@ class ressource extends basis_db
             return false;
         }
     }
+
+	/**
+	 * Löscht eine Ressource zu Projekt Zuordnung
+	 * @param type $ressource_id
+	 * @param type $projekt_kurzbz
+	 * @return boolean
+	 */
+	public function deleteFromProjektWithProjektRessourceId($ressource_id, $projekt_kurzbz, $project_ressource_id)
+	{
+		if($ressource_id == '' || !is_numeric($ressource_id))
+		{
+			$this->errormsg = 'Ressource Id ist keine gültige Zahl';
+			return false;
+		}
+		/*$qry="DELETE FROM fue.tbl_projekt_ressource WHERE ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false)."
+                AND projekt_kurzbz=".$this->db_add_param($projekt_kurzbz, FHC_STRING, false).';';
+		*/
+		$qry="
+				DELETE FROM fue.tbl_projekt_ressource pr
+				USING fue.tbl_ressource r
+				WHERE r.ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false). "
+				AND pr.projekt_ressource_id=".$this->db_add_param($project_ressource_id, FHC_INTEGER, false). "
+				AND pr.projekt_kurzbz=".$this->db_add_param($projekt_kurzbz, FHC_STRING, false).';';
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Löscht eine Ressource zu Phase Zuordnung
+	 * @param type $ressource_id
+	 * @param type $projekt_kurzbz
+	 * @return boolean
+	 */
+	public function deleteFromPhaseWithProjektRessourceId($ressource_id, $projektphase_id, $project_ressource_id)
+	{
+		if($ressource_id == '' || !is_numeric($ressource_id))
+		{
+			$this->errormsg = 'Ressource Id ist keine gültige Zahl';
+			return false;
+		}
+
+		if($projektphase_id == '' || !is_numeric($projektphase_id))
+		{
+			$this->errormsg = 'Ressource Id ist keine gültige Zahl';
+			return false;
+		}
+
+		/*$qry="DELETE FROM fue.tbl_projekt_ressource WHERE ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false)."
+                AND projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER, false).';';
+		*/
+		$qry="
+				DELETE FROM fue.tbl_projekt_ressource pr
+				USING fue.tbl_ressource r
+				WHERE r.ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false). "
+				AND pr.projekt_ressource_id=".$this->db_add_param($project_ressource_id, FHC_INTEGER, false). "
+				AND pr.projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER, false).';';
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
 }
 ?>

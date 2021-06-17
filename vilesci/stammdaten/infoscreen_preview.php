@@ -56,7 +56,7 @@ $datum_obj = new datum();
 		echo '
 		<div style="float: left">
 			<h2><center>',$row->bezeichnung,'</center></h2>
-			<iframe style="width:500px; height:400px" src="../../cis/infoterminal/infoscreen.php?ipadresse=',$row->ipadresse,'"></iframe>
+			<iframe style="width:500px; height:400px" src="../../cis/infoterminal/informationsbildschirm.php?ipadresse=',$row->ipadresse,'"></iframe>
 		</div>';
 	}
 ?>
