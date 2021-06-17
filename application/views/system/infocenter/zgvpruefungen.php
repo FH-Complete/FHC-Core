@@ -508,6 +508,63 @@
 								</label>
 							</div>
 						</div><!-- /.row -->
+						<div class="row">
+							<div class="col-lg-4 text-left">
+								<div class="input-group" id="absgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
+									<select name="absgstatusgrund"
+											class="d-inline float-right"
+											required>
+										<option value="null"
+												selected="selected"><?php echo ucfirst($this->p->t('infocenter', 'absagegrund')) . '...' ?>
+										</option>
+										<?php foreach ($abwstatusgruende as $statusgrund): ?>
+											<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
+										<?php endforeach ?>
+									</select>
+									<span class="input-group-btn">
+											<button type="button"
+													class="btn btn-default absageBtn" id="absagebtn_<?php echo $zgvpruefung->prestudent_id ?>">
+												<?php echo  $this->p->t('ui', 'absagen') ?>
+											</button>
+										</span>
+								</div>
+								<div class="modal fade absageModal" id="absageModal_<?php echo $zgvpruefung->prestudent_id ?>"
+									 tabindex="-1"
+									 role="dialog"
+									 aria-labelledby="absageModalLabel"
+									 aria-hidden="true">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<button type="button"
+														class="close"
+														data-dismiss="modal"
+														aria-hidden="true">
+													&times;
+												</button>
+												<h4 class="modal-title"
+													id="absageModalLabel"><?php echo  $this->p->t('infocenter', 'absageBestaetigen') ?></h4>
+											</div>
+											<div class="modal-body">
+												<?php echo  $this->p->t('infocenter', 'absageBestaetigenTxt') ?>
+											</div>
+											<div class="modal-footer">
+												<button type="button"
+														class="btn btn-default"
+														data-dismiss="modal">
+													<?php echo  $this->p->t('ui', 'abbrechen') ?>
+												</button>
+												<button class="btn btn-primary saveAbsage" id="saveAbsage_<?php echo $zgvpruefung->prestudent_id ?>">
+													<?php echo  $this->p->t('infocenter', 'interessentAbweisen') ?>
+												</button>
+											</div>
+										</div>
+										<!-- /.modal-content -->
+									</div>
+									<!-- /.modal-dialog -->
+								</div>
+							</div>
+						</div>
 					</div><!-- /.panel-footer -->
 				<?php endif; //end if infoonly
 				?>

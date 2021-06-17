@@ -451,8 +451,8 @@ class InfoCenter extends Auth_Controller
 
 		if (hasData($lastStatus) && hasData($statusgrresult))
 		{
-			//check if still Interessent and not freigegeben yet
-			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS && !isset($lastStatus->retval[0]->bestaetigtam))
+			//check if still Interessent
+			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS)
 			{
 				$result = $this->PrestudentstatusModel->insert(
 					array(
@@ -1362,6 +1362,8 @@ class InfoCenter extends Auth_Controller
 			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus)
 				|| isset($zgvpruefung->prestudentstatus->bestaetigtam)
 				|| $zgvpruefung->prestudentstatus->status_kurzbz != self::INTERESSENTSTATUS;
+
+			$zgvpruefung->abgewiesener = $zgvpruefung->prestudentstatus->status_kurzbz === self::ABGEWIESENERSTATUS;
 
 			//wether prestudent was freigegeben for RT/Stg
 			$zgvpruefung->isRtFreigegeben = false;
