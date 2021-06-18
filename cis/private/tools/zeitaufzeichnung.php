@@ -276,7 +276,9 @@ echo '
 			$("#projekt").change(
 				function()
 				{
-					getProjektphasen($(this).val());
+					//var uidpass = "ma0068";
+					var uid = $("#uidpass").val();
+					getProjektphasen($(this).val(),uid);
 				}
 			)
 
@@ -519,13 +521,13 @@ echo '
 			return true;
 		}
 
-		// function resetProjekt()
-		// {
-		// 	$("#projekt").val("");
-		// 	$("#projektphaseformgroup").hide();
-		// }
+		function resetProjekt()
+		{
+			$("#projekt").val("");
+			$("#projektphaseformgroup").hide();
+		}
 
-		function getProjektphasen(projekt_kurzbz)
+		function getProjektphasen(projekt_kurzbz, uid)
 		{
 			$.ajax
 			(
@@ -535,7 +537,9 @@ echo '
 					dataType: "json",
 					data:
 					{
+						"uid":uid,
 						"projekt_kurzbz":projekt_kurzbz
+
 					},
 					success: function(json)
 					{
@@ -1351,6 +1355,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">-->';
 
 			//Projektphase
+
 			$showprojphases = isset($projektphasen) && is_array($projektphasen) && count($projektphasen) > 0 && $projektfound;
 			$hiddentext = $showprojphases ? "" : " style='display:none'";
 
@@ -1372,6 +1377,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).'</option>';
 				}
 				echo '</SELECT></span>';
+
+
 			}
 			echo '</td></tr>';
 		}

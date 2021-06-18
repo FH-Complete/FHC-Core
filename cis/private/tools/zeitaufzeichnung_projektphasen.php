@@ -8,7 +8,29 @@ require_once('../../../include/datum.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-$user = get_uid();
+
+
+//$user = get_uid();
+
+$user = $_GET['uid'];
+
+// //Wenn User Administrator ist und UID uebergeben wurde, dann die Phasen
+// //des uebergebenen Users anzeigen
+// if (isset($_GET['uid']))
+// {
+// 	$rechte = new benutzerberechtigung();
+// 	$rechte->getBerechtigungen($user);
+//
+// 	if ($rechte->isBerechtigt('admin'))
+// 	{
+// 		$user = $_GET['uid'];
+// 	}
+// 	else
+// 	{
+// 		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
+// 	}
+// }
+
 
 $datum_obj = new datum();
 
