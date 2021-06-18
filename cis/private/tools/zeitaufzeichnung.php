@@ -276,7 +276,6 @@ echo '
 			$("#projekt").change(
 				function()
 				{
-					//var uidpass = "ma0068";
 					var uid = $("#uidpass").val();
 					getProjektphasen($(this).val(),uid);
 				}
@@ -1382,6 +1381,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			}
 			echo '</td></tr>';
 		}
+
+		echo "<input type ='hidden' value='$user'id=uidpass>";
 
 		if ($za_simple == 0)
 		{
