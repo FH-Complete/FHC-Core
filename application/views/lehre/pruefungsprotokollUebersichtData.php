@@ -20,8 +20,8 @@ WHERE
 	vorsitz='".$UID."'
 	AND (
 		'". $PERIOD. "' = 'today' AND datum = NOW()::date OR
-		'". $PERIOD. "' = 'lastWeek' AND datum = (NOW() - interval '1 week')::date OR
-                '". $PERIOD. "' = 'upcoming' AND datum > NOW()::date OR    
+		'". $PERIOD. "' = 'lastWeek' AND datum >= (NOW() - interval '1 week')::date AND datum < NOW()::date OR
+		'". $PERIOD. "' = 'upcoming' AND datum > NOW()::date OR
 		'". $PERIOD. "' = 'all' AND datum >= '2020-05-27'
 	)
 ORDER BY datum, nachname, vorname
