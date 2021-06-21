@@ -2100,6 +2100,26 @@ function variableChangeValue(variable)
 }
 
 // ****
+// *  Aendert eines Variablenwert nach Überprüfung der Eingabe auf gültigen Wert (kleiner 100)
+// ****
+function variableChangeValueIfNumber(variable)
+{
+	var variablevalue = getvariable(variable);
+
+	if(variablevalue = prompt('Bitte geben Sie den neuen Wert fuer '+variable+' ein', variablevalue))
+	{
+		if ((typeof(parseInt(variablevalue)) === 'number' && variablevalue < 100 ))
+		{
+			variableChange(variable, '', variablevalue);
+		}
+		else
+		{
+			alert(variablevalue + ' ist keine gültige Eingabe! Bitte eine Zahl eingeben!');
+		}
+	}
+}
+
+// ****
 // * Sendet einen Request zum Aendern einer Variable
 // ****
 function variableChange(variable, id, wert)
