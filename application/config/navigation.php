@@ -23,6 +23,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 10,
 					'requiredPermissions' => 'basis/vilesci:r'
+				),
+				'oehbeitragsverwaltung' => array(
+					'link' => site_url('codex/Oehbeitrag'),
+					'icon' => '',
+					'description' => 'Öhbeitragsverwaltung',
+					'expand' => true,
+					'sort' => 20,
+					'requiredPermissions' => 'admin:w'
 				)
 			)
 		),
