@@ -21,7 +21,7 @@ $this->load->view(
 <body>
 <div id="wrapper">
 
-	<?php /*echo $this->widgetlib->widget('NavigationWidget');*/ ?>
+	<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
 
 	<div id="page-wrapper">
 		<div class="container-fluid">

@@ -20,6 +20,8 @@ class Oehbeitrag extends Auth_Controller
 
         $this->load->model('codex/Oehbeitrag_model', 'OehbeitragModel');
         $this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->load->library('WidgetLib');
     }
 
 	public function index()
