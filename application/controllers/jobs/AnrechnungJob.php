@@ -290,6 +290,9 @@ class AnrechnungJob extends JOB_Controller
 		$this->AnrechnungModel->addJoin('public.tbl_notizzuordnung', 'anrechnung_id');
 		$this->AnrechnungModel->addJoin('public.tbl_notiz notiz', 'notiz_id');
 		
+		$this->AnrechnungModel->addOrder('notiz.insertamum', 'DESC');
+		$this->AnrechnungModel->addLimit(1);
+		
 		
 		$result = $this->AnrechnungModel->loadWhere(
 			'(status.insertamum)::date = (NOW() - INTERVAL \'24 HOURS\')::DATE AND
