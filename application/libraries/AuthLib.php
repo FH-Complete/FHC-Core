@@ -385,7 +385,7 @@ class AuthLib
 		// Invalid credentials
 		// NOTE: this is a corner case because of the HTTP basic authentication
 		if (getCode($hta) == AUTH_NOT_AUTHENTICATED || getCode($hta) == AUTH_INVALID_CREDENTIALS
-			|| getCode($hta) == LDAP_NO_USER_DN || getCode($hta) == LDAP_TOO_MANY_USER_DN)
+			|| getCode($hta) == AuthLDAPLib::LDAP_NO_USER_DN || getCode($hta) == AuthLDAPLib::LDAP_TOO_MANY_USER_DN)
 		{
 			$this->_showInvalidAuthentication(); // this also stop the execution
 		}
@@ -404,37 +404,12 @@ class AuthLib
 	{
 		$ldap = error('Not authenticated', AUTH_NOT_AUTHENTICATED); // by default is NOT authenticated
 
-		$this->_ci->load->library('LDAPLib'); // Loads the LDAP library
+		$this->_ci->load->library('AuthLDAPLib'); // Loads the LDAP library
 
-		$ldapConnection = $this->_ci->ldaplib->anonymousConnect(); // connect anonymously!
-		if (isSuccess($ldapConnection)) // connected!!
+		// If it is possible to authenticate on LDAP with the given username and password
+		if ($this->_ci->authldaplib->checkUsernamePassword($username, $password) === true)
 		{
-			// Get the user DN from LDAP
-			$userDN = $this->_ci->ldaplib->getUserDN($username);
-			if (isSuccess($userDN)) // got it!
-			{
-				$this->_ci->ldaplib->close(); // close the previous LDAP anonymous connection
-
-				// Connects to LDAP using the last working configuration + the retrieved user DN + the provided password
-				$ldapConnection = $this->_ci->ldaplib->connectUsernamePassword(getData($userDN), $password);
-				if (isSuccess($ldapConnection)) // connected!
-				{
-					$this->_ci->ldaplib->close(); // close the previous connection
-					$ldap = success('Authenticated', AUTH_SUCCESS); // authenticated!
-				}
-				else // blocking error
-				{
-					$ldap = $ldapConnection;
-				}
-			}
-			else // blocking error
-			{
-				$ldap = $userDN;
-			}
-		}
-		else // blocking error
-		{
-			$ldap = $ldapConnection;
+			$ldap = success('Authenticated', AUTH_SUCCESS); // authenticated!
 		}
 
 		return $ldap;
