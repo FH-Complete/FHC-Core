@@ -192,7 +192,7 @@ $this->load->view(
         <!-- Filter buttons / Submit buttons-->
         <div class="row">
             <!-- Filter buttons -->
-            <div class="col-xs-4">
+            <div class="col-xs-4 col-md-5">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-inProgressDP" class="btn btn-default btn-clearfilter" type="button"
@@ -232,7 +232,7 @@ $this->load->view(
 				</div>
             </div>
             <!-- Action Buttons 'Genehmigen', Ablehnen, 'Empfehlung anfordern'-->
-            <div class="col-xs-8">
+            <div class="col-xs-8 col-md-7">
                 <div class="pull-right">
                     <button id="approveAnrechnungUebersicht-request-recommendation"
                             class="btn btn-default btn-w200 btn-mr50" type="button">
