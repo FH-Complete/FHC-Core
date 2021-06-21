@@ -471,7 +471,7 @@ var FHC_AjaxClient = {
 	    if (typeof controllerParameters == "object")
 	    {
 			// If controllerParameters contains uploaded file(s) as FileList
-			if (FHC_AjaxClient._hasFileList(controllerParameters))
+			if (controllerParameters !==  null && FHC_AjaxClient._hasFileList(controllerParameters))
 			{
 				// Convert controllerParameters to FormData object to easily pass uploaded files via AJAX
 				var data = FHC_AjaxClient._convertToFormDataObject(controllerParameters);	// data is a FormData object now
