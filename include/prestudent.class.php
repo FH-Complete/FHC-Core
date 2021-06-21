@@ -2287,12 +2287,13 @@ class prestudent extends person
 	}
 
 	/**
-	 * Befüllt MasterZGV Nation mit Österreich
+	 * Befüllt MasterZGV Nation mit Österreich,
+	 * MasterZGV-code mit FH-Bachelor(I) und MasterZGV-Ort mit Wien(FHTW)
 	 * @param int $person_id Personenkennzeichen.
 	 * @return true wenn erfolgreich durchgeführt
 	 *		 false und errormsg wenn ein Fehler aufgetreten ist
 	 */
-	public function setManationZGV($person_id)
+	public function setZGVMasterFields($person_id)
 	{
 		if (!is_numeric($person_id))
 		{
@@ -2337,7 +2338,7 @@ class prestudent extends person
 				$qry = "UPDATE
 					public.tbl_prestudent
 				SET
-					zgvmanation = 'A'
+					(zgvmanation, zgvmaort, zgvmas_code) = ('A','Wien (FHTW)',1)
 				WHERE
 					prestudent_id in (";
 
@@ -2356,12 +2357,12 @@ class prestudent extends person
 
 				if ($this->db_query($qry))
 				{
-					//echo " ZGV-Master Nation A eingetragen!";
+					//echo " ZGV-Master Eintragungen vorgenommen!";
 					return true;
 				}
 				else
 				{
-					$this->errormsg = 'Fehler beim Eintragen zgvMasternation';
+					$this->errormsg = 'Fehler beim Eintragen zgvMasterFields';
 					return false;
 				}
 			}
