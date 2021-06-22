@@ -167,45 +167,56 @@ $this->load->view(
 								</div>
 							</div>
 							<div class="panel-body">
-								<table class="table table-bordered table-condensed table-fixed">
-
-								<tbody>
-								<tr>
-									<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')); ?></th>
-									<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm">
-										<?php echo $empfehlungData->empfehlungsanfrageAm; ?>
-									</td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlungsanfrageAn'); ?></th>
-									<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn">
-										<?php echo $empfehlungData->empfehlungsanfrageAn; ?>
-									</td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAm')); ?></th>
-									<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungAm">
-										<?php echo $empfehlungData->empfehlung_am ?>
-									</td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungVon')); ?></th>
-									<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungVon">
-										<?php echo $empfehlungData->empfehlung_von ?>
-									</td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></th>
-									<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlung"></td>
-								</tr>
-								<tr>
-									<th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
-									<td id="reviewAnrechnungDetail-empfehlungDetail-begruendung">
-										<?php echo htmlentities($empfehlungData->begruendung) ?>
-									</td>
-								</tr>
-								</tbody>
-							</table>
+								<div class="row">
+									<div class="col-lg-6">
+										<table class="table table-bordered table-condensed table-fixed">
+												<tbody>
+												<tr>
+													<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')); ?></th>
+													<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm">
+														<?php echo $empfehlungData->empfehlungsanfrageAm; ?>
+													</td>
+												</tr>
+												<tr>
+													<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlungsanfrageAn'); ?></th>
+													<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn">
+														<?php echo $empfehlungData->empfehlungsanfrageAn; ?>
+													</td>
+												</tr>
+												<tr>
+													<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAm')); ?></th>
+													<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungAm">
+														<?php echo $empfehlungData->empfehlung_am ?>
+													</td>
+												</tr>
+												<tr>
+													<th class="col-xs-4"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungVon')); ?></th>
+													<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlungVon">
+														<?php echo $empfehlungData->empfehlung_von ?>
+													</td>
+												</tr>
+												<tr>
+													<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'empfehlung'); ?></th>
+													<td id="reviewAnrechnungDetail-empfehlungDetail-empfehlung"></td>
+												</tr>
+												<tr>
+													<th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
+													<td id="reviewAnrechnungDetail-empfehlungDetail-begruendung">
+														<?php echo htmlentities($empfehlungData->begruendung) ?>
+													</td>
+												</tr>
+												</tbody>
+											</table>
+									</div>
+									<div class="col-lg-6">
+										<div>
+											<label class="text-center">
+												<?php echo ucfirst($this->p->t('global', 'notizDerSTGL')); ?>
+											</label>
+											<textarea rows="4" readonly><?php echo htmlentities($empfehlungData->notiz) ?></textarea>
+										</div>
+									</div>
+								</div>
 							</div>
 							<form>
 								<input type="hidden" name="anrechnung_id"
