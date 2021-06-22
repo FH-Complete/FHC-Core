@@ -5,36 +5,35 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/projektphase.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
+$user = get_uid();
 
-//$user = get_uid();
+//Wenn User Administrator ist und UID uebergeben wurde, dann die Phasen
+//des uebergebenen Users anzeigen
+if (isset($_GET['uid']) && $user != $_GET['uid'])
+{
+ 	$rechte = new benutzerberechtigung();
+ 	$rechte->getBerechtigungen($user);
 
-$user = $_GET['uid'];
-
-// //Wenn User Administrator ist und UID uebergeben wurde, dann die Phasen
-// //des uebergebenen Users anzeigen
-// if (isset($_GET['uid']))
-// {
-// 	$rechte = new benutzerberechtigung();
-// 	$rechte->getBerechtigungen($user);
-//
-// 	if ($rechte->isBerechtigt('admin'))
-// 	{
-// 		$user = $_GET['uid'];
-// 	}
-// 	else
-// 	{
-// 		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
-// 	}
-// }
-
+ 	if ($rechte->isBerechtigt('admin'))
+ 	{
+ 		$user = $_GET['uid'];
+ 	}
+	else
+	{
+		$p = new phrasen();
+		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
+	}
+}
 
 $datum_obj = new datum();
 
-if(isset($_GET['projekt_kurzbz'])) // TODO maybe check that phasen only shown if projekt is projekt of logged in user
+if(isset($_GET['projekt_kurzbz']))
 {
 	$projekt_kurzbz = $_GET['projekt_kurzbz'];
 	$projektphase = new projektphase();
