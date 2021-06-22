@@ -114,6 +114,12 @@
 					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+				   AND NOT EXISTS (
+					   SELECT 1
+						 FROM tbl_prestudentstatus spss
+						WHERE spss.prestudent_id = ps.prestudent_id
+						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+					)
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
