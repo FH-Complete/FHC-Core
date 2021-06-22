@@ -4845,16 +4845,85 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_oehbeitrag LIMIT 1'))
 }
 
 // Add column melderelevant to public.tbl_studiengang and prefill values
-if(!$result = @$db->db_query("SELECT melderelevant FROM public.tbl_studiengang"))
+if (!$result = @$db->db_query("SELECT melderelevant FROM public.tbl_studiengang LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melderelevant boolean NOT NULL DEFAULT FALSE;
 			UPDATE public.tbl_studiengang SET melderelevant = TRUE WHERE tbl_studiengang.studiengang_kz < 10000 AND tbl_studiengang.studiengang_kz <> 0;
-			COMMENT ON COLUMN public.tbl_studiengang.melderelevant IS 'Zeigt an, ob Studenten aus Studiengang an Ministerien gemeldet werden müssen'";
+			COMMENT ON COLUMN public.tbl_studiengang.melderelevant IS 'Zeigt an, ob Studierende aus Studiengang an Ministerien gemeldet werden müssen'";
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.tbl_studiengang: Neue Spalte melderelevant hinzugefuegt.';
+}
+
+// TABLE bis.tbl_bisstandort
+if (!@$db->db_query("SELECT 1 FROM bis.tbl_bisstandort LIMIT 1"))
+{
+	$qry = "
+		CREATE TABLE bis.tbl_bisstandort (
+			standort_code integer,
+			bezeichnung character varying(256),
+			aktiv boolean NOT NULL DEFAULT TRUE,
+			insertamum timestamp DEFAULT NOW(),
+			insertvon varchar(32),
+			updateamum timestamp,
+			updatevon varchar(32)
+		);
+		ALTER TABLE bis.tbl_bisstandort ADD CONSTRAINT pk_bisstandort PRIMARY KEY (standort_code);
+		COMMENT ON TABLE bis.tbl_bisstandort IS 'Key-Table of Locations';
+		INSERT INTO bis.tbl_bisstandort(standort_code, bezeichnung, insertvon) VALUES (22, 'Wien', 'dbcheck');
+		INSERT INTO bis.tbl_bisstandort(standort_code, bezeichnung, insertvon) VALUES (14, 'Pinkafeld', 'dbcheck');
+		INSERT INTO bis.tbl_bisstandort(standort_code, bezeichnung, insertvon) VALUES (3, 'Eisenstadt', 'dbcheck');";
+
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisstandort '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Created table bis.tbl_bisstandort';
+
+	// GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;
+	$qry = 'GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisstandort '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on bis.tbl_bisstandort';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisstandort TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisstandort TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisstandort '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on bis.tbl_bisstandort';
+}
+
+// Add columns foerderrelevant and standort to public.tbl_studiengang
+if (!$result = @$db->db_query("SELECT foerderrelevant, standort_code FROM public.tbl_studiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN foerderrelevant boolean NOT NULL DEFAULT TRUE;
+			ALTER TABLE public.tbl_studiengang ADD COLUMN standort_code integer;
+			ALTER TABLE public.tbl_studiengang ADD CONSTRAINT fk_studiengang_standort_code FOREIGN KEY (standort_code) REFERENCES bis.tbl_bisstandort(standort_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+			COMMENT ON COLUMN public.tbl_studiengang.foerderrelevant IS 'Zeigt an, ob Studierende aus Studiengang bei Meldung für Förderungen relevant sind';
+			COMMENT ON COLUMN public.tbl_studiengang.standort_code IS 'Zu meldender Standortcode der Studierenden des Studiengangs'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_studiengang: Neue Spalten foerderrelevant, standort_code hinzugefuegt.';
+}
+
+// Add columns foerderrelevant and standort to public.tbl_prestudent
+if (!$result = @$db->db_query("SELECT foerderrelevant, standort_code FROM public.tbl_prestudent LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN foerderrelevant boolean;
+			ALTER TABLE public.tbl_prestudent ADD COLUMN standort_code integer;
+			ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_standort_code FOREIGN KEY (standort_code) REFERENCES bis.tbl_bisstandort(standort_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+			COMMENT ON COLUMN public.tbl_prestudent.foerderrelevant IS 'Zeigt an, ob Studierende bei Meldung für Förderungen relevant sind. Überschreibt förderrelevant auf Studienganglevel.';
+			COMMENT ON COLUMN public.tbl_prestudent.standort_code IS 'Zu meldender Standortcode des Studierenden. Überschreibt standort auf Studienganglevel.';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_prestudent: Neue Spalten foerderrelevant, standort_code hinzugefuegt.';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -4874,6 +4943,7 @@ $tabellen=array(
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id","ects_erworben","ects_angerechnet"),
 	"bis.tbl_bisio_zweck"  => array("bisio_id","zweck_code"),
+	"bis.tbl_bisstandort"  => array("standort_code","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
 	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -5059,7 +5129,7 @@ $tabellen=array(
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre","standort","warn_semesterstunden_frei","warn_semesterstunden_fix","standort_id"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
-	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre","matr_nr","zugangscode_timestamp","udf_values","bpk"),
+	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre","matr_nr","zugangscode_timestamp","udf_values","bpk","matr_aktiv"),
 	"public.tbl_person_fotostatus"  => array("person_fotostatus_id","person_id","fotostatus_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
 	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area","deutschkurs3","ext_id"),
@@ -5071,7 +5141,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz","aufnahmegruppe_kurzbz","udf_values","priorisierung"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz","aufnahmegruppe_kurzbz","udf_values","priorisierung","foerderrelevant","standort_code"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum","rt_stufe","statusgrund_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist"),
@@ -5088,7 +5158,7 @@ $tabellen=array(
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant","foerderrelevant","standort_code"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
