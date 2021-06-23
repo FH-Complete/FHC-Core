@@ -4860,21 +4860,17 @@ if (!$result = @$db->db_query("SELECT melderelevant FROM public.tbl_studiengang 
 // TABLE bis.tbl_bisstandort
 if (!@$db->db_query("SELECT 1 FROM bis.tbl_bisstandort LIMIT 1"))
 {
-	$qry = "
-		CREATE TABLE bis.tbl_bisstandort (
-			standort_code integer,
-			bezeichnung character varying(256),
-			aktiv boolean NOT NULL DEFAULT TRUE,
-			insertamum timestamp DEFAULT NOW(),
-			insertvon varchar(32),
-			updateamum timestamp,
-			updatevon varchar(32)
-		);
-		ALTER TABLE bis.tbl_bisstandort ADD CONSTRAINT pk_bisstandort PRIMARY KEY (standort_code);
-		COMMENT ON TABLE bis.tbl_bisstandort IS 'Key-Table of Locations';
-		INSERT INTO bis.tbl_bisstandort(standort_code, bezeichnung, insertvon) VALUES (22, 'Wien', 'dbcheck');
-		INSERT INTO bis.tbl_bisstandort(standort_code, bezeichnung, insertvon) VALUES (14, 'Pinkafeld', 'dbcheck');
-		INSERT INTO bis.tbl_bisstandort(standort_code, bezeichnung, insertvon) VALUES (3, 'Eisenstadt', 'dbcheck');";
+	$qry = "CREATE TABLE bis.tbl_bisstandort (
+				standort_code integer,
+				bezeichnung character varying(256),
+				aktiv boolean NOT NULL DEFAULT TRUE,
+				insertamum timestamp DEFAULT NOW(),
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
+			);
+			ALTER TABLE bis.tbl_bisstandort ADD CONSTRAINT pk_bisstandort PRIMARY KEY (standort_code);
+			COMMENT ON TABLE bis.tbl_bisstandort IS 'Key-Table of Locations';";
 
 	if (!$db->db_query($qry))
 		echo '<strong>bis.tbl_bisstandort '.$db->db_last_error().'</strong><br>';
