@@ -4917,6 +4917,16 @@ if (!$result = @$db->db_query("SELECT foerderrelevant, standort_code FROM public
 	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN foerderrelevant boolean;
 			ALTER TABLE public.tbl_prestudent ADD COLUMN standort_code integer;
 			ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_standort_code FOREIGN KEY (standort_code) REFERENCES bis.tbl_bisstandort(standort_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+			UPDATE public.tbl_prestudent ps -- set foerderrelevant false for incoming, ausserordentlich, gsextern
+			SET foerderrelevant = FALSE
+			WHERE EXISTS (SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id = ps.prestudent_id AND status_kurzbz = 'Incoming') -- incoming
+			   OR EXISTS (SELECT 1 FROM public.tbl_prestudent
+											JOIN public.tbl_person USING (person_id)
+											LEFT JOIN public.tbl_student USING (prestudent_id)
+											LEFT JOIN bis.tbl_gsstudientyp USING (gsstudientyp_kurzbz)
+						  WHERE prestudent_id = ps.prestudent_id
+							AND (SUBSTRING(matrikelnr, 4, 1) = '9' -- ausserordentlich
+							  		OR studientyp_code = 'E')); -- extern
 			COMMENT ON COLUMN public.tbl_prestudent.foerderrelevant IS 'Zeigt an, ob Studierende bei Meldung für Förderungen relevant sind. Überschreibt förderrelevant auf Studienganglevel.';
 			COMMENT ON COLUMN public.tbl_prestudent.standort_code IS 'Zu meldender Standortcode des Studierenden. Überschreibt standort auf Studienganglevel.';";
 
