@@ -2318,9 +2318,9 @@ class prestudent extends person
 				AND
 					zgvmanation is NULL
 				AND
-					typ in ('m','d')
-				AND
-					status_kurzbz = 'Interessent'";
+					typ in ('m','d')";";
+				-- AND
+				-- 	status_kurzbz = Interessent";
 
 		if ($db->db_query($qry))
 		{
@@ -2330,44 +2330,54 @@ class prestudent extends person
 			{
 				while ($row = $db->db_fetch_object())
 				{
-					//echo var_dump($row->prestudent_id);
-					$arrayleereManations[] = $row->prestudent_id;
+				//	echo ($row->prestudent_id . " = id " . $row->status_kurzbz . " = status " . $row->studiengang_kz . " = stg <br>");
+					echo ($this->getLastPrestudentStatus($row->prestudent_id));
+						if ($this->getLastPrestudentStatus($row->prestudent_id) == "Interessent")
+						{
+							$arrayleereManations[] = $row->prestudent_id;
+						}
+
 				}
-				//print_r($arrayleereManations);
+				print_r($arrayleereManations);
 
-				$qry = "UPDATE
-					public.tbl_prestudent
-				SET
-					(zgvmanation, zgvmaort, zgvmas_code) = ('A','Wien (FHTW)',1)
-				WHERE
-					prestudent_id in (";
 
-				foreach ($arrayleereManations as $prestudent_id)
+				if($arrayleereManations)
 				{
-					$qry .= $prestudent_id;
+					$qry = "UPDATE
+						public.tbl_prestudent
+					SET
+						(zgvmanation, zgvmaort, zgvmas_code) = ('A','Wien (FHTW)',1)
+					WHERE
+						prestudent_id in (";
 
-					if (next($arrayleereManations) == true)
+					foreach ($arrayleereManations as $prestudent_id)
 					{
-						$qry .=  ",";
+						$qry .= $prestudent_id;
+
+						if (next($arrayleereManations) == true)
+						{
+							$qry .=  ",";
+						}
 					}
-				}
-				$qry .=  ");";
+					$qry .=  ");";
 
-				//echo $qry;
+					echo $qry;
 
-				if ($this->db_query($qry))
-				{
-					//echo " ZGV-Master Eintragungen vorgenommen!";
-					return true;
-				}
-				else
-				{
-					$this->errormsg = 'Fehler beim Eintragen zgvMasterFields';
-					return false;
+					if ($this->db_query($qry))
+					{
+						echo " ZGV-Master Eintragungen vorgenommen!";
+						return true;
+					}
+					else
+					{
+						$this->errormsg = 'Fehler beim Eintragen zgvMasterFields';
+						return false;
+					}
+					
 				}
 			}
 			else
-				//echo " Keine leere ZGVManation gefunden";
+				echo " Keine prestudentId Master gefunden";
 				return true;
 		}
 	}
@@ -2445,7 +2455,6 @@ class prestudent extends person
 			{
 				while ($row = $db->db_fetch_object())
 				{
-					//echo var_dump($row->prestudent_id);
 					$prestudentsOfMaster[] = $row->prestudent_id;
 				}
 
