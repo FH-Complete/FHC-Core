@@ -1188,7 +1188,7 @@ if ($result_lv!=0)
 				$selected = '';
 
 			echo '<option value="'.$db->convert_html_chars($lehrmodus).'" '.$selected.'>'
-			.$db->convert_html_chars($lm_kz['lehrmodus_kurzbz']. $lm_kz['bezeichnung_mehrsprachig']).'</option>';
+			.$db->convert_html_chars($lm_kz['bezeichnung_mehrsprachig']).'</option>';
 		}
 		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrmodus(\''.$row->lehrveranstaltung_id.'\',$(\'#lm'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';
