@@ -22,6 +22,7 @@
  *          Manfred Kindl <kindlm@technikum.wien.at>
  *          Gerald Raab <raab@technikum-wien.at>
  * 			Alexei Karpenko <karpenko@technikum-wien.at>
+ *			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -1100,11 +1101,10 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 			$service_id = $zeit->service_id;
 			$kunde_uid = $zeit->kunde_uid;
 
-
 			$projektphase = new projektphase();
-
 			$projektphasen = array();
-			if($projektphase->getProjektphasen($projekt_kurzbz))
+
+			if ($projektphase->getProjectphaseForMitarbeiterByKurzBz($uid, $projekt_kurzbz))
 			{
 				foreach ($projektphase->result as $row)
 				{
@@ -1115,7 +1115,7 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 		else
 		{
 			echo "<b>".$p->t("global/keineBerechtigungZumAendernDesDatensatzes")."</b>";
-			$zeitaufzeichnung_id='';
+			$zeitaufzeichnung_id = '';
 		}
 	}
 }
