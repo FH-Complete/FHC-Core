@@ -4920,7 +4920,7 @@ if (!$result = @$db->db_query("SELECT foerderrelevant, standort_code FROM public
 											JOIN public.tbl_person USING (person_id)
 											LEFT JOIN public.tbl_student USING (prestudent_id)
 											LEFT JOIN bis.tbl_gsstudientyp USING (gsstudientyp_kurzbz)
-						  WHERE prestudent_id = ps.prestudent_id
+							WHERE prestudent_id = ps.prestudent_id
 							AND (SUBSTRING(matrikelnr, 4, 1) = '9' -- ausserordentlich
 							  		OR studientyp_code = 'E')); -- extern
 			COMMENT ON COLUMN public.tbl_prestudent.foerderrelevant IS 'Zeigt an, ob Studierende bei Meldung für Förderungen relevant sind. Überschreibt förderrelevant auf Studienganglevel.';
