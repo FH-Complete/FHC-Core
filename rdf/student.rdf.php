@@ -157,6 +157,18 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 			}
 		}
 	}
+	elseif ( $filter2=='wiederholer' )
+	{
+	    // Alle Personen mit Statusgrund "PreWiederholer" in tbl_prestudentstatus
+	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus WHERE
+				    studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
+				    person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
+				    status_kurzbz='Student' AND statusgrund_id = 14";
+	    if ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) )
+	    {
+		return false;
+	    }
+	}
 	return true;
 }
 
