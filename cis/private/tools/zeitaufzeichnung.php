@@ -138,6 +138,7 @@ $pause_bis = (isset($_POST['pause_bis'])?$_POST['pause_bis']:date('H:i'));
 $von_pause = $von_datum.' '.$pause_von;
 $bis_pause = $bis_datum.' '.$pause_bis;
 $homeofficeChecked = '';
+//$reload = false;
 
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
 $service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
@@ -281,6 +282,18 @@ echo '
 					getProjektphasen($(this).val(),uid);
 				}
 			)
+
+			function isVisible()
+			{
+				resetPhasen()
+			}
+
+			$("#triggerPhasenReset").bind("isVisible", isVisible);
+
+			$("#triggerPhasenReset").show("slow", function()
+			{
+				$(this).trigger("isVisible");
+			});
 
 		});
 
@@ -527,6 +540,12 @@ echo '
 			$("#projektphaseformgroup").hide();
 		}
 
+		function resetPhasen()
+		{
+			var uid = $("#uidpass").val();
+			getProjektphasen($("#projekt").val(),uid);
+		}
+
 		function getProjektphasen(projekt_kurzbz, uid)
 		{
 			$.ajax
@@ -552,6 +571,48 @@ echo '
 							}
 						);
 						//append Projektphasen if any
+						if (json.length > 0)
+						{
+							var projphasenhtml = "";
+							for (var i = 0; i < json.length; i++)
+							{
+								projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>";
+								projphasenhtml += json[i].bezeichnung;
+								if(json[i].start != \'\' && json[i].ende !=\'\')
+								{
+									projphasenhtml += " ( "+json[i].start+" - "+json[i].ende+" )";
+								}
+								projphasenhtml += "<\/option>";
+							}
+
+							$("#projektphase").append(projphasenhtml);
+							$("#projektphaseformgroup").show();
+						}
+						else
+						{
+							$("#projektphaseformgroup").hide();
+						}
+					}
+				}
+			);
+		}
+
+		function appendProjektphasenzeiten(projektphase_id)
+		{
+			$.ajax
+			(
+				{
+					type: "GET",
+					url: "zeitaufzeichnung_projektphasenzeiten.php",
+					dataType: "json",
+					data:
+					{
+						"projektphase_id":projektphase_id
+
+					},
+					success: function(json)
+					{
+						//append Projektphasenzeiten if any
 						if (json.length > 0)
 						{
 							var projphasenhtml = "";
@@ -947,8 +1008,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		}
 		elseif (!$projectphase->checkProjectphaseInCorrectTime($projektphase_id, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
-			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt.</b></span><br>';
+			echo '<p id="triggerPhasenReset"><span style="color:red" ><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").':
+			Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt.</b></span></p><br>';
 			$saveerror = 1;
+
 		}
 		elseif (abs($von-$bis)>0 && $aktivitaet_kurzbz!="DienstreiseMT")
 		{
