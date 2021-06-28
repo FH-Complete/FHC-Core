@@ -70,6 +70,7 @@ class prestudent extends person
 	public $gsstudientyp_kurzbz='Intern';
 	public $aufnahmegruppe_kurzbz;
 	public $priorisierung = null;
+	public $foerderrelevant = null;
 
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -163,6 +164,7 @@ class prestudent extends person
 				$this->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
 				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$this->priorisierung = $row->priorisierung;
+				$this->foerderrelevant = $row->foerderrelevant;
 
 				if(!person::load($row->person_id))
 					return false;
@@ -249,7 +251,7 @@ class prestudent extends person
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte,
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon,
 					updateamum, updatevon, anmerkung, dual, ausstellungsstaat, mentor,
-					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung) VALUES('.
+					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, foerderrelevant) VALUES('.
 					$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
 					$this->db_add_param($this->person_id).",".
 					$this->db_add_param($this->studiengang_kz).",".
@@ -283,7 +285,8 @@ class prestudent extends person
 					$this->db_add_param($this->mentor).",".
 					$this->db_add_param($this->gsstudientyp_kurzbz).",".
 					$this->db_add_param($this->aufnahmegruppe_kurzbz).",".
-					$this->db_add_param($this->priorisierung).");";
+					$this->db_add_param($this->priorisierung).",".
+					$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).");";
 		}
 		else
 		{
@@ -319,7 +322,8 @@ class prestudent extends person
 					' dual='.$this->db_add_param($this->dual, FHC_BOOLEAN).",".
 					' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).",".
 					' aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).",".
-					' priorisierung='.$this->db_add_param($this->priorisierung).' '.
+					' priorisierung='.$this->db_add_param($this->priorisierung).",".
+					' foerderrelevant='.$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).' '.
 					" WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
 		}
 

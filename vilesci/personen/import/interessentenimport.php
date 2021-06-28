@@ -720,6 +720,9 @@ if (isset($_POST['save']))
 		$prestudent->reihungstestangetreten = false;
 		$prestudent->bismelden = true;
 
+		if ($incoming === true)// incomings sind bei Meldung nicht förderrelevant
+			$prestudent->foerderrelevant = false;
+
 		//Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
 		$qry_zgv = "
 			SELECT
