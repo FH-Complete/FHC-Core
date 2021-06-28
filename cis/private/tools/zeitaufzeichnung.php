@@ -1079,10 +1079,9 @@ else
 	echo '<b>&nbsp;</b>';
 
 //Laden der Daten zum aendern
-if (isset($_GET['type']) && $_GET['type']=='edit')
+if (isset($_GET['type']) && $_GET['type'] == 'edit')
 {
 	$zeit = new zeitaufzeichnung();
-
 	if ($zeit->load($zeitaufzeichnung_id))
 	{
 		if ($zeit->uid == $user)
@@ -1120,10 +1119,11 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 	}
 }
 
+
 //Projekte holen zu denen der Benutzer zugeteilt ist
 $projekt = new projekt();
 
-if($projekt->getProjekteMitarbeiter($user, true))
+if ($projekt->getProjekteMitarbeiter($user, true))
 {
 	//if(count($projekt->result)>0)
 	//{
@@ -1350,41 +1350,48 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					$selected = '';
 
 				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
-			}
-			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">-->';
-
-			//Projektphase
-
-			$showprojphases = isset($projektphasen) && is_array($projektphasen) && count($projektphasen) > 0 && $projektfound;
-			$hiddentext = $showprojphases ? "" : " style='display:none'";
-
-			echo
-				'<span id="projektphaseformgroup"'.$hiddentext.'>&nbsp;&nbsp;&nbsp;&nbsp;'.
-				$p->t("zeitaufzeichnung/projektphase").'
-					<SELECT name="projektphase" id="projektphase">
-						<OPTION value="" id="projektphasekeineausw">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
-
-			if ($showprojphases)
-			{
-				foreach ($projektphasen as $projektphase)
-				{
-					if ($projektphase_id == $projektphase->projektphase_id/* || $filter == $row_projekt->projekt_kurzbz*/)
-						$selected = 'selected';
-					else
-						$selected = '';
-
-					echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).'</option>';
-				}
-				echo '</SELECT></span>';
-
-
-			}
-			echo '</td></tr>';
 		}
+		echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">-->';
 
-		echo "<input type ='hidden' value='$user'id=uidpass>";
+		//Projektphase
+		$showprojphases = isset($projektphasen) && is_array($projektphasen) && count($projektphasen) > 0 && $projektfound;
+		$hiddentext = $showprojphases ? "" : " style='display:none'";
 
-		if ($za_simple == 0)
+		echo
+			'<span id="projektphaseformgroup"'.$hiddentext.'>&nbsp;&nbsp;&nbsp;&nbsp;'.
+			$p->t("zeitaufzeichnung/projektphase").'
+				<SELECT name="projektphase" id="projektphase">
+					<OPTION value="" id="projektphasekeineausw">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+
+		if ($showprojphases)
+		{
+			foreach ($projektphasen as $projektphase)
+			{
+				if (($projektphase->start != "" ) && ($projektphase->ende != " "))
+				{
+					$phasentext = " (". $datum->formatDatum($projektphase->start, 'd.m.Y'). " - ".
+					$datum->formatDatum($projektphase->ende, 'd.m.Y'). ")";
+				}
+				else
+				{
+					$phasentext = '';
+				}
+
+				if ($projektphase_id == $projektphase->projektphase_id/* || $filter == $row_projekt->projekt_kurzbz*/)
+					$selected = 'selected';
+				else
+					$selected = '';
+
+				echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung). $phasentext.'</option>';
+			}
+			echo '</SELECT></span>';
+		}
+		echo '</td></tr>';
+	}
+
+	echo "<input type ='hidden' value='$user'id=uidpass>";
+
+	if ($za_simple == 0)
 		{
 			// Service
 			echo '<tr>
