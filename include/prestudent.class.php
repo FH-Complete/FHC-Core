@@ -71,6 +71,7 @@ class prestudent extends person
 	public $aufnahmegruppe_kurzbz;
 	public $priorisierung = null;
 	public $foerderrelevant = null;
+	public $standort_code = null;
 
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -165,6 +166,7 @@ class prestudent extends person
 				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$this->priorisierung = $row->priorisierung;
 				$this->foerderrelevant = $row->foerderrelevant;
+				$this->standort_code = $row->standort_code;
 
 				if(!person::load($row->person_id))
 					return false;
@@ -251,7 +253,7 @@ class prestudent extends person
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte,
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon,
 					updateamum, updatevon, anmerkung, dual, ausstellungsstaat, mentor,
-					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, foerderrelevant) VALUES('.
+					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, foerderrelevant, standort_code) VALUES('.
 					$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
 					$this->db_add_param($this->person_id).",".
 					$this->db_add_param($this->studiengang_kz).",".
@@ -286,7 +288,8 @@ class prestudent extends person
 					$this->db_add_param($this->gsstudientyp_kurzbz).",".
 					$this->db_add_param($this->aufnahmegruppe_kurzbz).",".
 					$this->db_add_param($this->priorisierung).",".
-					$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).");";
+					$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).",".
+					$this->db_add_param($this->standort_code).");";
 		}
 		else
 		{
@@ -323,7 +326,8 @@ class prestudent extends person
 					' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).",".
 					' aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).",".
 					' priorisierung='.$this->db_add_param($this->priorisierung).",".
-					' foerderrelevant='.$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).' '.
+					' foerderrelevant='.$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).",".
+					' standort_code='.$this->db_add_param($this->standort_code)." ".
 					" WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
 		}
 
@@ -919,6 +923,8 @@ class prestudent extends person
 				$ps->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
 				$ps->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$ps->priorisierung = $row->priorisierung;
+				$ps->foerderrelevant = $row->foerderrelevant;
+				$ps->standort_code = $row->standort_code;
 
 				$ps->status_kurzbz = $row->status_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -1081,23 +1087,23 @@ class prestudent extends person
 					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon,
 					updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, anmerkung,
 					bewerbung_abgeschicktamum, studienplan_id, rt_stufe, statusgrund_id) VALUES('.
-				   $this->db_add_param($this->prestudent_id).",".
-				   $this->db_add_param($this->status_kurzbz).",".
-				   $this->db_add_param($this->studiensemester_kurzbz).",".
-				   $this->db_add_param($this->ausbildungssemester).",".
-				   $this->db_add_param($this->datum).",".
-				   $this->db_add_param($this->insertamum).",".
-				   $this->db_add_param($this->insertvon).",".
-				   $this->db_add_param($this->updateamum).",".
-				   $this->db_add_param($this->updatevon).",".
-				   $this->db_add_param($this->ext_id_prestudent).",".
-				   $this->db_add_param($this->orgform_kurzbz).",".
-				   $this->db_add_param($this->bestaetigtam).",".
-				   $this->db_add_param($this->bestaetigtvon).",".
-				   $this->db_add_param($this->anmerkung_status).",".
-				   $this->db_add_param($this->bewerbung_abgeschicktamum).",".
-				   $this->db_add_param($this->studienplan_id,FHC_INTEGER).",".
-				   $this->db_add_param($this->rt_stufe,FHC_INTEGER).",".
+					$this->db_add_param($this->prestudent_id).",".
+					$this->db_add_param($this->status_kurzbz).",".
+					$this->db_add_param($this->studiensemester_kurzbz).",".
+					$this->db_add_param($this->ausbildungssemester).",".
+					$this->db_add_param($this->datum).",".
+					$this->db_add_param($this->insertamum).",".
+					$this->db_add_param($this->insertvon).",".
+					$this->db_add_param($this->updateamum).",".
+					$this->db_add_param($this->updatevon).",".
+					$this->db_add_param($this->ext_id_prestudent).",".
+					$this->db_add_param($this->orgform_kurzbz).",".
+					$this->db_add_param($this->bestaetigtam).",".
+					$this->db_add_param($this->bestaetigtvon).",".
+					$this->db_add_param($this->anmerkung_status).",".
+					$this->db_add_param($this->bewerbung_abgeschicktamum).",".
+					$this->db_add_param($this->studienplan_id,FHC_INTEGER).",".
+					$this->db_add_param($this->rt_stufe,FHC_INTEGER).",".
 					$this->db_add_param($this->statusgrund_id, FHC_INTEGER).");";
 		}
 		else

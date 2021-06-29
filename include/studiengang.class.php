@@ -53,6 +53,8 @@ class studiengang extends basis_db
 	public $studienplaetze;		// smallint
 	public $oe_kurzbz;			// varchar(32)
 	public $onlinebewerbung;	// boolean
+	public $foerderrelevant;	// boolean
+	public $standort_code;		// integer
 
 	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
 	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
@@ -128,6 +130,8 @@ class studiengang extends basis_db
 				$this->moodle = $this->db_parse_bool($row->moodle);
 				$this->mischform = $this->db_parse_bool($row->mischform);
 				$this->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+				$this->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
+				$this->standort_code = $row->standort_code;
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
 				$this->bezeichnung_arr['English'] = $this->english;
@@ -201,6 +205,8 @@ class studiengang extends basis_db
 			$stg_obj->moodle = $this->db_parse_bool($row->moodle);
 			$stg_obj->mischform = $this->db_parse_bool($row->mischform);
 			$stg_obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+			$stg_obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
+			$stg_obj->standort_code = $row->standort_code;
 
 			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English'] = $row->english;
@@ -419,6 +425,8 @@ class studiengang extends basis_db
 			$stg_obj->moodle = $this->db_parse_bool($row->moodle);
 			$stg_obj->mischform = $this->db_parse_bool($row->mischform);
 			$stg_obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+			$stg_obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
+			$stg_obj->standort_code = $row->standort_code;
 
 			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English'] = $row->english;
@@ -519,7 +527,9 @@ class studiengang extends basis_db
 				$this->db_add_param($this->studienplaetze).', '.
 				$this->db_add_param($this->lgartcode).', '.
 				$this->db_add_param($this->mischform, FHC_BOOLEAN).','.
-				$this->db_add_param($this->projektarbeit_note_anzeige, FHC_BOOLEAN).');';
+				$this->db_add_param($this->projektarbeit_note_anzeige, FHC_BOOLEAN).','.
+				$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).','.
+				$this->db_add_param($this->standort_code).');';
 		}
 		else
 		{
@@ -556,7 +566,9 @@ class studiengang extends basis_db
 				'testtool_sprachwahl='.$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).', '.
 				'studienplaetze='.$this->db_add_param($this->studienplaetze).', '.
 				'lgartcode='.$this->db_add_param($this->lgartcode).', '.
-				'mischform='.$this->db_add_param($this->mischform, FHC_BOOLEAN).' '.
+				'mischform='.$this->db_add_param($this->mischform, FHC_BOOLEAN).', '.
+				'foerderrelevant='.$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).', '.
+				'standort_code='.$this->db_add_param($this->standort_code).' '.
 				'WHERE studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER, false).';';
 		}
 
@@ -679,6 +691,8 @@ class studiengang extends basis_db
 				$this->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				$this->moodle = $this->db_parse_bool($row->moodle);
 				$this->mischform = $this->db_parse_bool($row->mischform);
+				$this->foerderrelevant = $this->db_parse_bool($row->mischform);
+				$this->standort_code = $row->standort_code;
 				$this->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
@@ -819,6 +833,8 @@ class studiengang extends basis_db
 				$obj->moodle = $this->db_parse_bool($row->moodle);
 				$obj->mischform = $this->db_parse_bool($row->mischform);
 				$obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
+				$obj->standort_code = $row->standort_code;
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 				$this->result[] = $obj;
@@ -891,6 +907,8 @@ class studiengang extends basis_db
 				$obj->moodle = $this->db_parse_bool($row->moodle);
 				$obj->mischform = $this->db_parse_bool($row->mischform);
 				$obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
+				$obj->standort_code = $row->standort_code;
 
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;
@@ -993,6 +1011,8 @@ class studiengang extends basis_db
 				$obj->moodle = $this->db_parse_bool($row->moodle);
 				$obj->mischform = $this->db_parse_bool($row->mischform);
 				$obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
+				$obj->standort_code = $row->standort_code;
 
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;
@@ -1127,6 +1147,8 @@ class studiengang extends basis_db
 				$obj->moodle = $this->db_parse_bool($row->moodle);
 				$obj->mischform = $this->db_parse_bool($row->mischform);
 				$obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
+				$obj->standort_code = $row->standort_code;
 				
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;
