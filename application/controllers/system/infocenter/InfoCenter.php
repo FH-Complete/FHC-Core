@@ -112,6 +112,7 @@ class InfoCenter extends Auth_Controller
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'saveDocTyp' => 'infocenter:rw',
+				'saveNachreichung' => 'infocenter:rw',
 				'getPrestudentData' => 'infocenter:r',
 				'getLastPrestudentWithZgvJson' => 'infocenter:r',
 				'getZgvInfoForPrestudent' => 'infocenter:r',
@@ -1211,6 +1212,64 @@ class InfoCenter extends Auth_Controller
 		$this->outputJsonSuccess('success');
 	}
 
+	public function saveNachreichung($person_id)
+	{
+		$nachreichungAm = $this->input->post('nachreichungAm');
+		$nachreichungAnmerkung = empty($this->input->post('nachreichungAnmerkung')) ? NULL : $this->input->post('nachreichungAnmerkung');
+		$typ = $this->input->post('typ');
+
+		$allowedTypes = [
+			'VorlSpB2' => 'SprachB2',
+			'ZgvBaPre' => 'zgv_bakk',
+			'ZgvMaPre' => 'zgv_mast'
+		];
+
+		if (!in_array($typ, array_keys($allowedTypes)))
+			$this->terminateWithJsonError('Bei dem Dokument ist keine Nachreichung möglich');
+
+		if (empty($nachreichungAm))
+			$this->terminateWithJsonError('Ein Datum muss im folgenden Format angegeben werden: tt.mm.jjjj');
+
+		if (!preg_match('/^\d{2}\.\d{2}\.(\d{2}|\d{4})$/ ', $nachreichungAm))
+			$this->terminateWithJsonError('Bitte das Datum im folgenden Format angeben: tt.mm.jjjj');
+
+		$akte = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'dokument_kurzbz' => $allowedTypes[$typ]));
+
+		if (hasData($akte)) {
+			$akte = getData($akte)[0];
+			$this->AkteModel->update(
+				$akte->akte_id,
+				array(
+					'anmerkung' => $nachreichungAnmerkung,
+					'updateamum' => date('Y-m-d H:i:s'),
+					'updatevon' => get_uid(),
+					'nachgereicht' => true,
+					'nachgereicht_am' => date_format(date_create($nachreichungAm), 'Y-m-d')
+				)
+			);
+		}
+		else
+		{
+			$this->AkteModel->insert(
+				array(
+					'dokument_kurzbz' => $allowedTypes[$typ],
+					'person_id' => $person_id,
+					'erstelltam' => NULL,
+					'gedruckt' => false,
+					'anmerkung' => $nachreichungAnmerkung,
+					'updateamum' => date('Y-m-d H:i:s'),
+					'updatevon' => get_uid(),
+					'insertamum' => date('Y-m-d H:i:s'),
+					'insertvon' => get_uid(),
+					'uid' => NULL,
+					'nachgereicht' => true,
+					'nachgereicht_am' => date_format(date_create($nachreichungAm), 'Y-m-d')
+				)
+			);
+		}
+
+		$this->outputJsonSuccess("Done!");
+	}
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 

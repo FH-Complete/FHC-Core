@@ -119,11 +119,6 @@ $(document).ready(function ()
 		}
 	);
 
-	$('.aktenid').change(function(){
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
-		var typ = $(this).val();
-		InfocenterDetails.saveDocTyp(personid, akteid, typ);
-	});
 });
 
 var InfocenterDetails = {
@@ -746,33 +741,6 @@ var InfocenterDetails = {
 				},
 				errorCallback: function() {
 					FHC_DialogLib.alertWarning("Freigabe message could not be sent");
-				}
-			}
-		);
-	},
-
-	saveDocTyp: function(personid, akteid, typ)
-	{
-		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + "/saveDocTyp/"+encodeURIComponent(personid),
-			{
-				"akte_id": akteid,
-				"typ" : typ
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.isSuccess(data))
-					{
-						FHC_DialogLib.alertSuccess("Done!");
-						InfocenterDetails._refreshLog();
-					}
-					else
-					{
-						FHC_DialogLib.alertError("Fehler beim Speichern des Dokumententypes!");
-					}
-				},
-				errorCallback: function() {
-					FHC_DialogLib.alertWarning("Document type could not be updated");
 				}
 			}
 		);

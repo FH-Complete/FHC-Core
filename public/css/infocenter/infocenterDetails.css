@@ -76,6 +76,17 @@
     font-weight: normal;
 }
 
+.nachreichungInfos
+{
+    float: right;
+    margin: 5px 15px 0 0;
+}
+
+.nachreichungInputs .row
+{
+    margin-top: 5px;
+}
+
 @media screen and (max-width: 1510px)
 {
     #postponing{
