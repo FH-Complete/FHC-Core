@@ -68,7 +68,7 @@ var DocUeberpruefung = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError(data);
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
 					}
 				},
 				errorCallback: function() {
@@ -96,7 +96,7 @@ var DocUeberpruefung = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError(data);
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
 					}
 				},
 				errorCallback: function() {
