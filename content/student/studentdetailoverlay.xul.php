@@ -461,6 +461,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
+                            <label value="Standort" control="student-prestudent-menulist-bisstandort"/>
+                            <menulist id="student-prestudent-menulist-bisstandort" disabled="true"
+                                      datasources="<?php echo APP_ROOT ?>rdf/bisstandort.rdf.php?optional=true" flex="1"
+                                      ref="http://www.technikum-wien.at/bisstandort/alle" >
+                                <template>
+                                    <menupopup>
+                                        <menuitem value="rdf:http://www.technikum-wien.at/bisstandort/rdf#standort_code"
+                                                  label="rdf:http://www.technikum-wien.at/bisstandort/rdf#bezeichnung"
+                                                  uri="rdf:*"/>
+                                    </menupopup>
+                                </template>
+                            </menulist>
 							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf" hidden="true"/>
 							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true" hidden="true"/>
 						</row>
@@ -481,6 +493,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
 								<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
 							</hbox>
+                            <hbox>
+                                <label value="Förderrelevant" control="student-prestudent-checkbox-foerderrelevant"/>
+                                <checkbox id="student-prestudent-checkbox-foerderrelevant" checked="false" disabled="true"/>
+                            </hbox>
 							<hbox>
 								<label value="Dual" control="student-prestudent-checkbox-dual"/>
 								<checkbox id="student-prestudent-checkbox-dual" checked="false" disabled="true"/>

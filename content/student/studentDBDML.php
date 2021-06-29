@@ -624,11 +624,13 @@ if(!$error)
 				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
 				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
+				$prestudent->foerderrelevant = ($_POST['foerderrelevant']=='true'?true:false);
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
 				$prestudent->mentor = $_POST['mentor'];
 				$prestudent->gsstudientyp_kurzbz = $_POST['gsstudientyp_kurzbz'];
 				$prestudent->priorisierung = $_POST['priorisierung'];
+				$prestudent->standort_code = $_POST['standort_code'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;
 				$prestudent->updateamum = date('Y-m-d H:i:s');

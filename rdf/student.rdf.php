@@ -366,6 +366,7 @@ function draw_prestudent($row)
 			<STUDENT:reihungstestangetreten><![CDATA['.($row->reihungstestangetreten?'true':'false').']]></STUDENT:reihungstestangetreten>
 			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
 			<STUDENT:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></STUDENT:bismelden>
+			<STUDENT:foerderrelevant><![CDATA['.($row->foerderrelevant?'true':'false').']]></STUDENT:foerderrelevant>
 			<STUDENT:dual><![CDATA['.($row->dual?'true':'false').']]></STUDENT:dual>
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
@@ -374,6 +375,7 @@ function draw_prestudent($row)
 			<STUDENT:aufnahmegruppe_kurzbz><![CDATA['.$row->aufnahmegruppe_kurzbz.']]></STUDENT:aufnahmegruppe_kurzbz>
 			<STUDENT:priorisierung><![CDATA['.$row->priorisierung.']]></STUDENT:priorisierung>
 			<STUDENT:priorisierung_realtiv><![CDATA['.$prioRelativ.' ('.$row->priorisierung.')'.']]></STUDENT:priorisierung_realtiv>
+			<STUDENT:standort_code><![CDATA['.$row->standort_code.']]></STUDENT:standort_code>
 		</RDF:Description>
 	</RDF:li>';
 	}
