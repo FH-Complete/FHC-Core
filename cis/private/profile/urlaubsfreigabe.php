@@ -18,6 +18,7 @@
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -28,6 +29,13 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/addon.class.php');
+require_once('../../../include/mail.class.php');
+require_once('../../../include/phrasen.class.php');
+require_once('../../../include/globals.inc.php');
+require_once('../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -53,6 +61,7 @@ if(isset($_GET['uid']))
 	$uid=$_GET['uid'];
 else
 	$uid='';
+
 
 $datum_obj = new datum();
 
@@ -141,7 +150,34 @@ if(isset($_GET['action']) && $_GET['action']=='freigabe')
 			$zeitsperre->freigabeamum = date('Y-m-d H:i:s');
 			$zeitsperre->freigabevon = $user;
 			if(!$zeitsperre->save(false))
+			{
 				echo "<b>Fehler bei der Freigabe: $zeitsperre->errormsg</b>";
+			}
+
+
+			//Bestätigungsmail an Mitarbeiter*in
+			$to = $uid . '@'.DOMAIN;
+			$benutzer = new benutzer();
+			$benutzer->load($uid);
+			$person = new person();
+			$fullName = $person->getFullNameFromBenutzer($uid);
+			$from = 'noreply@'.DOMAIN;
+			$subject = $p->t('urlaubstool/urlaubsfreigabe') . date("d.m.Y", strtotime($zeitsperre->vondatum)). " " . $p->t('urlaubstool/bis'). " ". date("d.m.Y", strtotime($zeitsperre->bisdatum));
+			$text = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n";
+			$text .= $p->t('urlaubstool/urlaubVon')." ".date("d.m.Y", strtotime($zeitsperre->vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($zeitsperre->bisdatum));
+			$text .= $p->t('urlaubstool/urlaubBis',array($fullName));
+			$text .= "\n". "\n".  $p->t('urlaubstool/sieKoennenDiesenUnterFolgenderAdresseEinsehen');
+			$text .= "\n". APP_ROOT . 'cis/private/profile/urlaubstool.php?uid='.$uid;
+
+
+			$mail = new mail($to, $from, $subject, $text);
+
+			if($mail->send())
+			{
+				echo "<span style='color:green;'>".$p->t('urlaubstool/bestaetigungsmailWurdeVersandt',array($fullName))."</span>";
+
+			}
+
 		}
 		else
 		{
