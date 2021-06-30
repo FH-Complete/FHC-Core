@@ -9,6 +9,7 @@ const RTFREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
 const RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ = "InfocenterRTfreigegQuerKurz";
 const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 const STGFREIGABE_MESSAGE_VORLAGE_MASTER = "InfocenterSTGfreigegebenM";
+const STGFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH = "InfocenterSTGfreigegebenMEng";
 
 //Statusgründe for which no Studiengang Freigabe Message should be sent
 const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
@@ -588,6 +589,7 @@ var InfocenterDetails = {
 			var ausbildungssemester = receiverPrestudentstatus.ausbildungssemester;
 			var studiengangbezeichnung = receiverPrestudentstatus.studiengangbezeichnung;
 			var studiengangbezeichnung_englisch = receiverPrestudentstatus.studiengangbezeichnung_englisch;
+			var vorlage = null;
 
 			var orgform_deutsch, orgform_englisch;
 			orgform_deutsch = orgform_englisch = "";
@@ -625,7 +627,6 @@ var InfocenterDetails = {
 				}
 				else //not already for RT freigegeben - send RTfreigabe message
 				{
-					var vorlage = null;
 					//send Quereinstiegsmessage if later Ausbildungssemester
 					if (ausbildungssemester > 1)
 					{
@@ -651,22 +652,25 @@ var InfocenterDetails = {
 			}
 			else
 			{
-				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent and allowed to send
-				if (!stgFreigegeben && receiverPrestudent.sendStgFreigabeMsg === true)
+				if (receiverPrestudent.studiengangtyp === 'm' && (freigabedata.statusgrundbezeichnung === 'Ergänzungsprüfungen' || freigabedata.statusgrundbezeichnung === 'Supplementary exams'))
 				{
-					if (receiverPrestudent.studiengangtyp === 'm' && (freigabedata.statusgrundbezeichnung === 'Ergänzungsprüfungen' || freigabedata.statusgrundbezeichnung === 'Supplementary exams'))
-					{
-						msgvars = {
-							'studiengangbezeichnung': studiengangbezeichnung,
-							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
-							'orgform_deutsch': orgform_deutsch,
-							'orgform_englisch': orgform_englisch
-						}
-						InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE_MASTER, msgvars);
-					}else
-					{
-						InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE, msgvars);
+					msgvars = {
+						'studiengangbezeichnung': studiengangbezeichnung,
+						'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
+						'orgform_deutsch': orgform_deutsch,
+						'orgform_englisch': orgform_englisch
 					}
+					if (receiverPrestudentstatus.sprache === 'English')
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH
+					else
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE_MASTER
+
+					InfocenterDetails.sendFreigabeMessage(prestudent_id, vorlage, msgvars);
+				}
+				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent and allowed to send
+				else if (!stgFreigegeben && receiverPrestudent.sendStgFreigabeMsg === true)
+				{
+					InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE, msgvars);
 				}
 			}
 		};
