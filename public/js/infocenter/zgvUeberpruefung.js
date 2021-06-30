@@ -2,6 +2,8 @@ $(document).ready(function ()
 {
 	var personid = $("#hiddenpersonid").val();
 
+	var studiengang = $('#studiengangtyp').val();
+
 	zgvUeberpruefung.checkAfterReload();
 
 	$('.zgvRueckfragen').click(function ()
@@ -18,12 +20,22 @@ $(document).ready(function ()
 	$('.zgvAkzeptieren').click(function (){
 		var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 
-		var data = {
-			'person_id' : personid,
-			'prestudent_id' : prestudentid,
-			'status' : 'accepted'
+		if (studiengang === 'b')
+		{
+			$('#inputStatus_' + prestudentid).val('accepted');
+			$('#notizModal_' + prestudentid).modal('show');
+			$('#notizModal_' + prestudentid + ' #inputNotizTitelModal').val('ZGV wurde erfüllt')
 		}
-		zgvUeberpruefung.zgvStatusUpdate(data);
+		else
+		{
+			var data = {
+				'person_id' : personid,
+				'prestudent_id' : prestudentid,
+				'status' : 'accepted'
+			}
+			zgvUeberpruefung.zgvStatusUpdate(data);
+		}
+
 	});
 
 	$('.zgvAblehnen').click(function (){
@@ -176,7 +188,7 @@ var zgvUeberpruefung = {
 	checkAfterReload: function()
 	{
 		$('.zgvStatusText').each(function() {
-			if($(this).data('info')) {
+			if ($(this).data('info')) {
 				zgvUeberpruefung.checkStatus(InfocenterDetails._getPrestudentIdFromElementId($(this).attr('id')));
 			}
 		});

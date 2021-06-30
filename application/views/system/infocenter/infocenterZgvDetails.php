@@ -59,6 +59,7 @@
 	<div id="page-wrapper">
 		<div class="container-fluid">
 			<input type="hidden" id="hiddenpersonid" value="<?php echo $stammdaten->person_id ?>">
+			<input type="hidden" id="studiengangtyp" value="<?php echo $studiengang_typ ?>">
 			<div class="row<?php if ($lockedbyother) echo ' alert-danger' ?>">
 				<div class="col-lg-8">
 					<h3 class="page-header">
@@ -128,9 +129,15 @@
 								<button type="button" class="btn btn-default zgvAblehnen" id="zgvAblehnen_<?php echo $prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'zgvNichtErfuellt') ?>
 								</button>
-								<button type="button" class="btn btn-default zgvAkzeptierenPruefung" id="zgvAkzeptierenPruefung_<?php echo $prestudent_id ?>">
-									<?php echo $this->p->t('infocenter', 'zgvErfuelltPruefung') ?>
-								</button>
+								<?php
+								if ($studiengang_typ === 'm') :
+								?>
+									<button type="button" class="btn btn-default zgvAkzeptierenPruefung" id="zgvAkzeptierenPruefung_<?php echo $prestudent_id ?>">
+										<?php echo $this->p->t('infocenter', 'zgvErfuelltPruefung') ?>
+									</button>
+								<?php
+								endif;
+								?>
 								<span class="zgvStatusText" id="zgvStatusText_<?php echo $prestudent_id ?>" data-info="need">
 								</span>
 							</div>

@@ -242,6 +242,7 @@ class InfoCenter extends Auth_Controller
 		$persondata = $this->_loadPersonData(getData($prestudentexists)[0]->person_id);
 		$prestudent_id = array('prestudent_id' => $prestudent_id);
 		$status = array('status' => getData($zgv)[0]->status);
+		$prestudent_data = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 
 		$this->DokumentModel->addOrder('bezeichnung');
 		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
@@ -250,7 +251,8 @@ class InfoCenter extends Auth_Controller
 			$persondata,
 			$prestudent_id,
 			$status,
-			$dokumentdata
+			$dokumentdata,
+			$prestudent_data
 		);
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
