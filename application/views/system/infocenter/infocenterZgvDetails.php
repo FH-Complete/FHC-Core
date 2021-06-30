@@ -116,6 +116,9 @@
 							</div>
 							<div class="panel-body">
 								<?php $this->load->view('system/infocenter/dokpruefung.php', array('formalReadonly' => true)); ?>
+								<div id="nachzureichendeDoks">
+									<?php $this->load->view('system/infocenter/dokNachzureichend.php'); ?>
+								</div>
 							</div> <!-- ./panel-body -->
 
 							<div class="panel-body zgvBearbeitungButtons" id="zgvBearbeitungButtons_<?php echo $prestudent_id ?>">

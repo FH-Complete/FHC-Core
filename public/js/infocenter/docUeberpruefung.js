@@ -1,8 +1,20 @@
+const ALLOWED_DOC_TYPES = ['VorlSpB2', 'ZgvBaPre', 'ZgvMaPre'];
+
 $(document).ready(function ()
 {
+	DocUeberpruefung._formatDocTable();
+	DocUeberpruefung.checkNachreichungButtons();
+
 	var personid = $("#hiddenpersonid").val();
 
-	DocUeberpruefung.checkNachreichungButtons();
+	//add click events to "formal geprüft" checkboxes
+	$(".prchbox").click(function ()
+	{
+		var boxid = this.id;
+		var akteid = InfocenterDetails._getPrestudentIdFromElementId(boxid);
+		var checked = this.checked;
+		DocUeberpruefung.saveFormalGeprueft(personid, akteid, checked)
+	});
 
 	$('select.aktenid').change(function()
 	{
@@ -33,14 +45,15 @@ $(document).ready(function ()
 
 		if(nachreichungAm === '')
 		{
-			FHC_DialogLib.alertError('Ein Datum muss im folgenden Format angegeben werden: tt.mm.jjjj');
+			FHC_DialogLib.alertError(FHC_PhrasesLib.t('infocenter', 'datumUngueltig'));
 			return false;
 		}
 
 		var regEx = /^\d{2}\.\d{2}\.(\d{2}|\d{4})$/;
+
 		if(nachreichungAm.match(regEx) === null)
 		{
-			FHC_DialogLib.alertError('Bitte das Datum im folgenden Format angeben: tt.mm.jjjj')
+			FHC_DialogLib.alertError(FHC_PhrasesLib.t('infocenter', 'datumUngueltig'))
 			return false;
 		}
 
@@ -50,10 +63,48 @@ $(document).ready(function ()
 
 var DocUeberpruefung = {
 
+	saveFormalGeprueft: function(personid, akteid, checked)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + '/saveFormalGeprueft/' + encodeURIComponent(personid),
+			{
+				akte_id: akteid,
+				formal_geprueft: checked
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						var timestamp = data.retval[0];
+						if (timestamp === "")
+						{
+							$("#formalgeprueftam_" + akteid).text("");
+						}
+						else
+						{
+							var fgdatum = $.datepicker.parseDate("yy-mm-dd", timestamp);
+							var gerfgdatum = $.datepicker.formatDate("dd.mm.yy", fgdatum);
+							$("#formalgeprueftam_" + akteid).text(gerfgdatum);
+						}
+						//refresh doctable tablesorter, formal geprueft changed!
+						$("#doctable").trigger("update");
+						InfocenterDetails._refreshLog();
+					}
+					else
+					{
+						InfocenterDetails._genericSaveError();
+					}
+				},
+				errorCallback: InfocenterDetails._genericSaveError,
+				veilTimeout: 0
+			}
+		);
+	},
+
 	saveDocTyp: function(personid, akteid, typ)
 	{
 		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + "/saveDocTyp/"+encodeURIComponent(personid),
+			CALLED_PATH + "/saveDocTyp/" + encodeURIComponent(personid),
 			{
 				"akte_id": akteid,
 				"typ" : typ
@@ -81,7 +132,7 @@ var DocUeberpruefung = {
 	saveNachreichung: function (personid, nachreichungAm, nachreichungAnmerkung, typ)
 	{
 		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + "/saveNachreichung/"+encodeURIComponent(personid),
+			CALLED_PATH + "/saveNachreichung/" + encodeURIComponent(personid),
 			{
 				"nachreichungAm": nachreichungAm,
 				"nachreichungAnmerkung" : nachreichungAnmerkung,
@@ -91,8 +142,9 @@ var DocUeberpruefung = {
 				successCallback: function(data, textStatus, jqXHR) {
 					if (FHC_AjaxClient.isSuccess(data))
 					{
-						FHC_DialogLib.alertSuccess("Done!");
+						DocUeberpruefung._refreshNachzureichendeDoks();
 						InfocenterDetails._refreshLog();
+						FHC_DialogLib.alertSuccess("Done!");
 					}
 					else
 					{
@@ -132,14 +184,35 @@ var DocUeberpruefung = {
 
 	checkNachreichungButton: function(akteid)
 	{
-		var allowedTyps = ['VorlSpB2', 'ZgvBaPre', 'ZgvMaPre'];
 		var typ = $('#aktenid_' + akteid).val();
 		var infos = $('#nachreichungInfos_' + akteid);
 
-		if ($.inArray(typ, allowedTyps) === -1)
+		if ($.inArray(typ, ALLOWED_DOC_TYPES) === -1)
+		{
 			infos.addClass('hidden');
+		}
 		else
+		{
 			infos.removeClass('hidden');
-	}
+		}
+	},
+
+	_refreshNachzureichendeDoks: function()
+	{
+		var personid = $("#hiddenpersonid").val();
+
+		$("#nachzureichendeDoks").load(
+			CONTROLLER_URL + '/reloadDoks/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
+			function () {
+				DocUeberpruefung._formatDocTable();
+			}
+		);
+	},
+
+	_formatDocTable: function()
+	{
+		Tablesort.addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
+		Tablesort.addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
+	},
 
 }

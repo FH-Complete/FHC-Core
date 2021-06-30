@@ -3507,6 +3507,66 @@ $phrases = array(
 		)
 	),
 	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'datumUngueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Datumsformat ist ungültig oder liegt außerhalb des gültigen Bereichs. Bitte geben Sie ein gültiges Datum im Format tt.mm.jjjj ein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date is invalid or out of range. Please enter a valid date in the format dd.mm.yyyy.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'dokUngueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bei dem Dokument ist keine Nachreichung möglich.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date is invalid or out of range. Please enter a valid date in the format dd.mm.yyyy.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'nachreichDatumNichtVergangenheit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Datum der Nachreichung darf nicht in der Vergangenheit liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The date of submission may not be in the past.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'parkdatum',

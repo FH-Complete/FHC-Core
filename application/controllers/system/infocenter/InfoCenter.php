@@ -127,6 +127,7 @@ class InfoCenter extends Auth_Controller
 				'updateNotiz' => 'infocenter:rw',
 				'reloadZgvPruefungen' => 'infocenter:r',
 				'reloadMessages' => 'infocenter:r',
+				'reloadDoks' => 'infocenter:r',
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => 'infocenter:r',
@@ -1023,6 +1024,13 @@ class InfoCenter extends Auth_Controller
 		$this->load->view('system/infocenter/logs.php', array('logs' => $logs));
 	}
 
+	public function reloadDoks($person_id)
+	{
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+
+		$this->load->view('system/infocenter/dokNachzureichend.php', array('dokumente_nachgereicht' => $dokumente_nachgereicht->retval));
+	}
+
 	/**
 	 * Outputs content of an Akte, sends appropriate headers (so the document can be downloaded)
 	 * @param $akte_id
@@ -1225,13 +1233,31 @@ class InfoCenter extends Auth_Controller
 		];
 
 		if (!in_array($typ, array_keys($allowedTypes)))
-			$this->terminateWithJsonError('Bei dem Dokument ist keine Nachreichung möglich');
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 
 		if (empty($nachreichungAm))
-			$this->terminateWithJsonError('Ein Datum muss im folgenden Format angegeben werden: tt.mm.jjjj');
+			$this->terminateWithJsonError($this->p->t('infocenter', 'datumUngueltig'));
 
 		if (!preg_match('/^\d{2}\.\d{2}\.(\d{2}|\d{4})$/ ', $nachreichungAm))
-			$this->terminateWithJsonError('Bitte das Datum im folgenden Format angeben: tt.mm.jjjj');
+		{
+			$this->terminateWithJsonError($this->p->t('infocenter', 'datumUngueltig'));
+		}
+		else
+		{
+			$ds = explode('.', $nachreichungAm);
+			if (! checkdate($ds[1], $ds[0], $ds[2]))
+			{
+				$this->terminateWithJsonError($this->p->t('infocenter', 'datumUngueltig'));
+			}
+		}
+
+		$nachreichungAm = (date_format(date_create($nachreichungAm), 'Y-m-d'));
+
+		$today = date('Y-m-d H:i:s');
+
+		if($nachreichungAm < $today)
+			$this->terminateWithJsonError($this->p->t('infocenter', 'nachreichDatumNichtVergangenheit'));
+
 
 		$akte = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'dokument_kurzbz' => $allowedTypes[$typ]));
 
@@ -1241,10 +1267,10 @@ class InfoCenter extends Auth_Controller
 				$akte->akte_id,
 				array(
 					'anmerkung' => $nachreichungAnmerkung,
-					'updateamum' => date('Y-m-d H:i:s'),
+					'updateamum' => $today,
 					'updatevon' => get_uid(),
 					'nachgereicht' => true,
-					'nachgereicht_am' => date_format(date_create($nachreichungAm), 'Y-m-d')
+					'nachgereicht_am' => $nachreichungAm
 				)
 			);
 		}
@@ -1257,13 +1283,13 @@ class InfoCenter extends Auth_Controller
 					'erstelltam' => NULL,
 					'gedruckt' => false,
 					'anmerkung' => $nachreichungAnmerkung,
-					'updateamum' => date('Y-m-d H:i:s'),
+					'updateamum' => $today,
 					'updatevon' => get_uid(),
-					'insertamum' => date('Y-m-d H:i:s'),
+					'insertamum' => $today,
 					'insertvon' => get_uid(),
 					'uid' => NULL,
 					'nachgereicht' => true,
-					'nachgereicht_am' => date_format(date_create($nachreichungAm), 'Y-m-d')
+					'nachgereicht_am' => $nachreichungAm
 				)
 			);
 		}

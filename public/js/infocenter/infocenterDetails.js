@@ -21,9 +21,6 @@ const ONHOLDNAME = 'onhold';
  */
 $(document).ready(function ()
 {
-	//initialise table sorter
-	Tablesort.addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
-	Tablesort.addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
 
 	InfocenterDetails._formatMessageTable();
 	InfocenterDetails._formatNotizTable();
@@ -35,15 +32,6 @@ $(document).ready(function ()
 	$("#sendmsglink").click(function ()
 	{
 		$("#sendmsgform").submit();
-	});
-
-	//add click events to "formal geprüft" checkboxes
-	$(".prchbox").click(function ()
-	{
-		var boxid = this.id;
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(boxid);
-		var checked = this.checked;
-		InfocenterDetails.saveFormalGeprueft(personid, akteid, checked)
 	});
 
 	//add click events to zgv Prüfung section
@@ -133,43 +121,6 @@ var InfocenterDetails = {
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// ajax calls
-	saveFormalGeprueft: function(personid, akteid, checked)
-	{
-		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + '/saveFormalGeprueft/' + encodeURIComponent(personid),
-			{
-				akte_id: akteid,
-				formal_geprueft: checked
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-					{
-						var timestamp = data.retval[0];
-						if (timestamp === "")
-						{
-							$("#formalgeprueftam_" + akteid).text("");
-						}
-						else
-						{
-							var fgdatum = $.datepicker.parseDate("yy-mm-dd", timestamp);
-							var gerfgdatum = $.datepicker.formatDate("dd.mm.yy", fgdatum);
-							$("#formalgeprueftam_" + akteid).text(gerfgdatum);
-						}
-						//refresh doctable tablesorter, formal geprueft changed!
-						$("#doctable").trigger("update");
-						InfocenterDetails._refreshLog();
-					}
-					else
-					{
-						InfocenterDetails._genericSaveError();
-					}
-				},
-				errorCallback: InfocenterDetails._genericSaveError,
-				veilTimeout: 0
-			}
-		);
-	},
 	saveBewPriorisierung: function(data)
 	{
 		FHC_AjaxClient.ajaxCallPost(
