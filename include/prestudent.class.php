@@ -165,7 +165,7 @@ class prestudent extends person
 				$this->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
 				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$this->priorisierung = $row->priorisierung;
-				$this->foerderrelevant = $row->foerderrelevant;
+				$this->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$this->standort_code = $row->standort_code;
 
 				if(!person::load($row->person_id))
