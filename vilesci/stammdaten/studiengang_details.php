@@ -89,6 +89,7 @@ $testtool_sprachwahl = false;
 $studienplaetze = '';
 $orgform_kurzbz = '';
 $lgartcode='';
+$melderelevant = false;
 $foerderrelevant = false;
 $standort_code='';
 $schick = filter_input(INPUT_POST, 'schick');
@@ -151,6 +152,7 @@ if($schick)
 	$aktiv = filter_input(INPUT_POST, 'aktiv', FILTER_VALIDATE_BOOLEAN);
 	$onlinebewerbung = filter_input(INPUT_POST, 'onlinebewerbung', FILTER_VALIDATE_BOOLEAN);
 	$mischform = filter_input(INPUT_POST, 'mischform', FILTER_VALIDATE_BOOLEAN);
+	$melderelevant = filter_input(INPUT_POST, 'melderelevant', FILTER_VALIDATE_BOOLEAN);
 	$foerderrelevant = filter_input(INPUT_POST, 'foerderrelevant', FILTER_VALIDATE_BOOLEAN);
 	$standort_code = filter_input(INPUT_POST, 'standort_code');
 
@@ -218,6 +220,7 @@ if($schick)
 		$sg_update->studienplaetze = $studienplaetze;
 		$sg_update->orgform_kurzbz = $orgform_kurzbz;
 		$sg_update->lgartcode = $lgartcode;
+		$sg_update->melderelevant = $melderelevant;
 		$sg_update->foerderrelevant = $foerderrelevant;
 		$sg_update->standort_code = $standort_code;
 
@@ -286,6 +289,7 @@ if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_RE
 	$studienplaetze = $sg->studienplaetze;
 	$orgform_kurzbz = $sg->orgform_kurzbz;
 	$lgartcode = $sg->lgartcode;
+	$melderelevant = $sg->melderelevant;
 	$foerderrelevant = $sg->foerderrelevant;
 	$standort_code = $sg->standort_code;
 }
@@ -438,13 +442,6 @@ if (!$erh->getAll('kurzbz'))
 									<input type="checkbox" name="mischform" <?php echo $mischform ? 'checked' : '' ?> onchange="submitable()">
 								</td>
 							</tr>
-							<tr>
-								<td valign="top">F&ouml;rderrelevant</td>
-								<td>
-									<input type="hidden" name="foerderrelevant" value="0">
-									<input type="checkbox" name="foerderrelevant" <?php echo $foerderrelevant ? 'checked' : '' ?> onchange="submitable()">
-								</td>
-							</tr>
 						</table>
 					</td>
 					<td valign="top">
@@ -594,6 +591,20 @@ if (!$erh->getAll('kurzbz'))
 											<?php endwhile; ?>
 										<?php endif; ?>
 									</select>
+								</td>
+							</tr>
+							<tr>
+								<td valign="top">Melderelevant</td>
+								<td>
+									<input type="hidden" name="melderelevant" value="0">
+									<input type="checkbox" name="melderelevant" <?php echo $melderelevant ? 'checked' : '' ?> onchange="submitable()">
+								</td>
+							</tr>
+							<tr>
+								<td valign="top">F&ouml;rderrelevant</td>
+								<td>
+									<input type="hidden" name="foerderrelevant" value="0">
+									<input type="checkbox" name="foerderrelevant" <?php echo $foerderrelevant ? 'checked' : '' ?> onchange="submitable()">
 								</td>
 							</tr>
 						</table>
