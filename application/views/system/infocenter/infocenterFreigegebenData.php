@@ -2,7 +2,7 @@
 
 	$APP = '\'infocenter\'';
 	$INTERESSENT_STATUS = '\'Interessent\'';
-	$STUDIENGANG_TYP = '\'b\'';
+	$STUDIENGANG_TYP = '\'m\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
@@ -114,6 +114,12 @@
 					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+				   AND NOT EXISTS (
+					   SELECT 1
+						 FROM tbl_prestudentstatus spss
+						WHERE spss.prestudent_id = ps.prestudent_id
+						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+					)
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(

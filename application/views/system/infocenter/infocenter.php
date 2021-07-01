@@ -13,6 +13,7 @@
 			'ajaxlib' => true,
 			'filterwidget' => true,
 			'navigationwidget' => true,
+			'dialoglib' => true,
 			'phrases' => array(
 				'person' => array('vorname', 'nachname'),
 				'global' => array('mailAnXversandt'),
@@ -40,6 +41,7 @@
 				</div>
 				<div>
 					<?php $this->load->view('system/infocenter/infocenterData.php'); ?>
+					<?php $this->load->view('system/infocenter/absageModal.php'); ?>
 				</div>
 			</div>
 		</div>
