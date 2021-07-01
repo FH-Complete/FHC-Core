@@ -228,7 +228,7 @@ function draw_monat($monat)
 			if ($vertretung->uid != '')
 				echo ' (Vertretung: '.$vertretung->nachname.')';
 			if($row->freigabeamum=='')
-				echo " <a href='".$_SERVER['PHP_SELF']."?action=freigabe&id=$row->zeitsperre_id&year=$year&uid=$uid class='Item'>Freigabe</a>";
+				echo " <a href='".$_SERVER['PHP_SELF']."?action=freigabe&id=$row->zeitsperre_id&year=$year&uid=$row->mitarbeiter_uid' class='Item'>Freigabe</a>";
 			echo "</span>";
 			echo '<br>';
 		}
