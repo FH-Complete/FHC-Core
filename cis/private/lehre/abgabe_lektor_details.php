@@ -475,7 +475,7 @@ $htmlstr .= "</td>";
 
 if($betreuerart!="Zweitbegutachter")
 {
-	$htmlstr .= "<td width=10% align=center><form action='https://technikum-wien.turnitin.com' title='plagiatsprüfung' target='_blank' method='GET'>";
+	$htmlstr .= "<td width=10% align=center><form action='https://technikum-wien.turnitin.com/sso/sp/redwood/saml/5IyfmBr2OcSIaWQTKlFCGj/start' title='plagiatsprüfung' target='_blank' method='GET'>";
 	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td>";
 	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
 	$htmlstr .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>\n";
