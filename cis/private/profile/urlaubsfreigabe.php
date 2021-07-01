@@ -40,7 +40,8 @@ $p = new phrasen($sprache);
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
-$user = get_uid();
+//$user = get_uid();
+$user = 'ma0080';
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -61,6 +62,7 @@ if(isset($_GET['uid']))
 	$uid=$_GET['uid'];
 else
 	$uid='';
+echo "uid: " . $uid;
 
 
 $datum_obj = new datum();
@@ -157,15 +159,14 @@ if(isset($_GET['action']) && $_GET['action']=='freigabe')
 
 			//Bestätigungsmail an Mitarbeiter*in
 			$to = $uid . '@'.DOMAIN;
-			$benutzer = new benutzer();
-			$benutzer->load($uid);
 			$person = new person();
-			$fullName = $person->getFullNameFromBenutzer($uid);
+			$fullNameVG = $person->getFullNameFromBenutzer($user);
+			$fullNameMA = $person->getFullNameFromBenutzer($uid);
 			$from = 'noreply@'.DOMAIN;
 			$subject = $p->t('urlaubstool/urlaubsfreigabe') . date("d.m.Y", strtotime($zeitsperre->vondatum)). " " . $p->t('urlaubstool/bis'). " ". date("d.m.Y", strtotime($zeitsperre->bisdatum));
 			$text = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n";
 			$text .= $p->t('urlaubstool/urlaubVon')." ".date("d.m.Y", strtotime($zeitsperre->vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($zeitsperre->bisdatum));
-			$text .= $p->t('urlaubstool/urlaubBis',array($fullName));
+			$text .= $p->t('urlaubstool/urlaubBis',array($fullNameVG));
 			$text .= "\n". "\n".  $p->t('urlaubstool/sieKoennenDiesenUnterFolgenderAdresseEinsehen');
 			$text .= "\n". APP_ROOT . 'cis/private/profile/urlaubstool.php?uid='.$uid;
 
@@ -174,7 +175,7 @@ if(isset($_GET['action']) && $_GET['action']=='freigabe')
 
 			if($mail->send())
 			{
-				echo "<span style='color:green;'>".$p->t('urlaubstool/bestaetigungsmailWurdeVersandt',array($fullName))."</span>";
+				echo "<span style='color:green;'>".$p->t('urlaubstool/bestaetigungsmailWurdeVersandt',array($fullNameMA))."</span>";
 
 			}
 
