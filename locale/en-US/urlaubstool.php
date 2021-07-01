@@ -38,7 +38,8 @@ $this->phrasen['urlaubstool/freigabeansuchenUrlaub']='Freigabeansuchen Urlaub'; 
 $this->phrasen['urlaubstool/freigabeFehlt']='Vacation has not been approved yet';
 $this->phrasen['urlaubstool/urlaubsfreigabe']='Vacation approval: ';
 $this->phrasen['urlaubstool/bestaetigungsmailWurdeVersandt']='Confirmation mail to %s sent';
-$this->phrasen['urlaubstool/urlaubVon']='The requested vacation from';
-$this->phrasen['urlaubstool/urlaubBis']=' was approved by %s.';
-$this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseEinsehen']='Review your vacation here:';
+$this->phrasen['urlaubstool/urlaubVon']='Ihr angefragter Urlaub von'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/urlaubBis']=' wurde von %s freigegeben.'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseEinsehen']='Sie können diesen unter folgender Adresse einsehen:'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+
 ?>
