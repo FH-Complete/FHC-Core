@@ -2,7 +2,7 @@
 
 	$APP = '\'infocenter\'';
 	$INTERESSENT_STATUS = '\'Interessent\'';
-	$STUDIENGANG_TYP = '\'m\'';
+	$STUDIENGANG_TYP = '\'b\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';

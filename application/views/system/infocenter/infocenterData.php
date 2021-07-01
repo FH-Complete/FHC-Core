@@ -3,7 +3,7 @@
 	$APP = '\'infocenter\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$INTERESSENT_STATUS = '\'Interessent\'';
-	$STUDIENGANG_TYP = '\'m\'';
+	$STUDIENGANG_TYP = '\'b\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\', \'Interessent rejected\'';
 	$LOGDATA_NAME_PARKED = '\'Parked\'';
