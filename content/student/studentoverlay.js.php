@@ -1144,12 +1144,12 @@ function StudentAuswahl()
 	aufnahmeschluessel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmeschluessel" ));
 	facheinschlberuf = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#facheinschlberuf" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
-	foerderrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#foerderrelevant" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungpre" ));
 	mentor = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mentor" ));
 	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
 	gsstudientyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gsstudientyp_kurzbz" ));
 	priorisierung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#priorisierung" ));
+	foerderrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#foerderrelevant" ));
 	standort_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#standort_code" ));
 
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
@@ -1174,11 +1174,6 @@ function StudentAuswahl()
 	else
 		document.getElementById('student-prestudent-checkbox-bismelden').checked=false;
 
-	if(foerderrelevant=='true')
-		document.getElementById('student-prestudent-checkbox-foerderrelevant').checked=true;
-	else
-		document.getElementById('student-prestudent-checkbox-foerderrelevant').checked=false;
-
 	if(dual=='true')
 		document.getElementById('student-prestudent-checkbox-dual').checked=true;
 	else
@@ -1193,6 +1188,7 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-priorisierung').value=priorisierung;
 	document.getElementById('student-prestudent-textbox-mentor').value=mentor;
 	document.getElementById('student-detail-menulist-gsstudientyp').value=gsstudientyp_kurzbz;
+	document.getElementById('student-prestudent-menulist-foerderrelevant').value=foerderrelevant;
 	document.getElementById('student-prestudent-menulist-bisstandort').value=standort_code;
 
 	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
@@ -1709,7 +1705,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
-	document.getElementById('student-prestudent-checkbox-foerderrelevant').disabled=val;
+	document.getElementById('student-prestudent-menulist-foerderrelevant').disabled=val;
 	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
 	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
@@ -1780,7 +1776,6 @@ function StudentPrestudentSave()
 	aufnahmeschluessel = document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value;
 	facheinschlberuf = document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked;
 	bismelden = document.getElementById('student-prestudent-checkbox-bismelden').checked;
-	foerderrelevant = document.getElementById('student-prestudent-checkbox-foerderrelevant').checked;
 	dual = document.getElementById('student-prestudent-checkbox-dual').checked;
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value;
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
@@ -1790,6 +1785,7 @@ function StudentPrestudentSave()
 	priorisierung = document.getElementById('student-prestudent-textbox-priorisierung').value;
 	mentor = document.getElementById('student-prestudent-textbox-mentor').value;
 	gsstudientyp = document.getElementById('student-detail-menulist-gsstudientyp').value;
+	foerderrelevant = document.getElementById('student-prestudent-menulist-foerderrelevant').value;
 	standort_code = document.getElementById('student-prestudent-menulist-bisstandort').value;
 
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
@@ -1828,7 +1824,6 @@ function StudentPrestudentSave()
 	req.add('aufnahmeschluessel', aufnahmeschluessel);
 	req.add('facheinschlberuf', facheinschlberuf);
 	req.add('bismelden', bismelden);
-	req.add('foerderrelevant', foerderrelevant);
 	req.add('dual', dual);
 	req.add('person_id', person_id);
 	req.add('prestudent_id', prestudent_id);
@@ -1837,6 +1832,7 @@ function StudentPrestudentSave()
 	req.add('priorisierung', priorisierung);
 	req.add('mentor', mentor);
 	req.add('gsstudientyp_kurzbz', gsstudientyp);
+	req.add('foerderrelevant', foerderrelevant);
 	req.add('standort_code', standort_code);
 
 	var response = req.executePOST();

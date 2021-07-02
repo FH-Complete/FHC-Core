@@ -624,7 +624,12 @@ if(!$error)
 				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
 				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
-				$prestudent->foerderrelevant = ($_POST['foerderrelevant']=='true'?true:false);
+				$foerderrelevant = null;
+				if ($_POST['foerderrelevant'] === 'true')
+					$foerderrelevant = true;
+				elseif ($_POST['foerderrelevant'] === 'false')
+					$foerderrelevant = false;
+				$prestudent->foerderrelevant = $foerderrelevant;
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
 				$prestudent->mentor = $_POST['mentor'];

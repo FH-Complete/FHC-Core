@@ -481,37 +481,44 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<grid style="margin:4px;" flex="1">
 					<columns>
 						<column flex="1"/>
-						<column flex="12"/>
+						<column flex="19"/>
 						<column flex="3"/>
 						<column flex="3"/>
+						<column flex="5"/>
 					</columns>
 					<rows>
 						<row>
-							<label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
-							<textbox id="student-prestudent-textbox-anmerkung" disabled="true"/>
+                            <label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
+                            <textbox id="student-prestudent-textbox-anmerkung" disabled="true"/>
+                            <hbox>
+                                <label value="Priorität" control="student-prestudent-textbox-priorisierung"/>
+								<?php
+								$readonly = 'readonly="true"';
+								$rechte = new benutzerberechtigung();
+								$rechte->getBerechtigungen($user);
+								if($rechte->isBerechtigt('basis/prestudent'))
+									$readonly = '';
+								?>
+                                <textbox id="student-prestudent-textbox-priorisierung" disabled="true" <?php echo $readonly ?>/>
+                            </hbox>
 							<hbox>
 								<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
 								<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
 							</hbox>
-                            <hbox>
-                                <label value="Förderrelevant" control="student-prestudent-checkbox-foerderrelevant"/>
-                                <checkbox id="student-prestudent-checkbox-foerderrelevant" checked="false" disabled="true"/>
-                            </hbox>
 							<hbox>
 								<label value="Dual" control="student-prestudent-checkbox-dual"/>
 								<checkbox id="student-prestudent-checkbox-dual" checked="false" disabled="true"/>
 							</hbox>
-							<hbox>
-								<label value="Priorität" control="student-prestudent-textbox-priorisierung"/>
-								<?php
-									$readonly = 'readonly="true"';
-									$rechte = new benutzerberechtigung();
-									$rechte->getBerechtigungen($user);
-									if($rechte->isBerechtigt('basis/prestudent'))
-										$readonly = '';
-								?>
-								<textbox id="student-prestudent-textbox-priorisierung" disabled="true" <?php echo $readonly ?>/>
-							</hbox>
+                            <hbox>
+                                <label value="Förderrelevant" control="student-prestudent-menulist-foerderrelevant"/>
+                                <menulist id="student-prestudent-menulist-foerderrelevant" disabled="true">
+                                    <menupopup>
+                                        <menuitem value="" label="Wie Studiengang"/>
+                                        <menuitem value="true" label="Ja"/>
+                                        <menuitem value="false" label="Nein"/>
+                                    </menupopup>
+                                </menulist>
+                           </hbox>
 						</row>
 						<row id="student-prestudent-row-mentor">
 						<label value="MentorIn" control="student-prestudent-textbox-mentor"/>
