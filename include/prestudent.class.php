@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 fhcomplete.org
+/* Copyright (C) 2021 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *		  Manuela Thamer <manuela.thamer@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
@@ -2407,5 +2408,49 @@ class prestudent extends person
 		}
 		else
 			return false;
+	}
+
+
+	/**
+	 * Liefert den wahrscheinlichen Studiengang der MasterZGV einer Person
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return string studiengangkurzbzlang
+	 */
+	public function getZGVMasterStg($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT kurzbzlang
+				FROM public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				JOIN public.tbl_studiengang USING (studiengang_kz)
+				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
+				AND typ in ('b','m','d')
+				ORDER BY status_kurzbz ASC
+				LIMIT 1;";
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				$stg = $row->kurzbzlang;
+				return $stg;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }

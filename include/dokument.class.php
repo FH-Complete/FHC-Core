@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 fhcomplete.org
+/* Copyright (C) 2021 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -910,21 +910,17 @@ class dokument extends basis_db
 					where dok.prestudent_id = ps.prestudent_id
 					and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz).")";
 
-		//echo var_dump($qry);
-
 		//gibt ein Array von zu akzeptierenden Dokumenten zurück
 		if ($db->db_query($qry))
 		{
 			$num_rows = $db->db_num_rows();
-			// Wenn kein ergebnis return 0 sonst ID
+
 			if ($num_rows > 0)
 			{
 				while ($row = $db->db_fetch_object())
 				{
-					//echo var_dump($row->prestudent_id);
 					$arrayDoksZuAkzeptieren[] = $row->prestudent_id;
 				}
-				//print_r($arrayDoksZuAkzeptieren);
 
 				//für alle prestudent_ids das Dokument akzeptieren
 				$qry = "INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id) VALUES";
@@ -979,20 +975,17 @@ class dokument extends basis_db
 					person_id = ".$this->db_add_param($person_id)."
 				and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz);
 
-			//	echo var_dump($qry);
-
 		//gibt ein Array von zu Entakzeptierenden Dokumenten zurück
 		if ($db->db_query($qry))
 		{
 			$num_rows = $db->db_num_rows();
-			// Wenn kein ergebnis return 0 sonst ID
+
 			if ($num_rows > 0)
 			{
 				while ($row = $db->db_fetch_object())
 				{
 					$arrayDoksZuEntakzeptieren[] = $row->prestudent_id;
 				}
-				//print_r($arrayDoksZuEntakzeptieren);
 
 				//für alle prestudent_ids das Dokument Entakzeptieren
 				$qry = "DELETE FROM public.tbl_dokumentprestudent WHERE prestudent_id in (";
