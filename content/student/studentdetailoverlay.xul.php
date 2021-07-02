@@ -448,7 +448,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
-
 							<label value="Studientyp" control="student-detail-menulist-gsstudientyp"/>
 							<menulist id="student-detail-menulist-gsstudientyp" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/gsstudientyp.rdf.php" flex="1"
@@ -461,7 +460,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
-                            <label value="Standort" control="student-prestudent-menulist-bisstandort"/>
+                            <label value="Bisstandort" control="student-prestudent-menulist-bisstandort"/>
                             <menulist id="student-prestudent-menulist-bisstandort" disabled="true"
                                       datasources="<?php echo APP_ROOT ?>rdf/bisstandort.rdf.php?optional=true" flex="1"
                                       ref="http://www.technikum-wien.at/bisstandort/alle" >
@@ -481,44 +480,43 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<grid style="margin:4px;" flex="1">
 					<columns>
 						<column flex="1"/>
-						<column flex="19"/>
-						<column flex="3"/>
-						<column flex="3"/>
-						<column flex="5"/>
+						<column flex="12"/>
+						<column flex="1"/>
+						<column flex="1"/>
+						<column flex="1"/>
+						<column flex="1"/>
+						<column flex="1"/>
+						<column flex="1"/>
 					</columns>
 					<rows>
 						<row>
                             <label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
                             <textbox id="student-prestudent-textbox-anmerkung" disabled="true"/>
+                            <label value="Förderrelevant" control="student-prestudent-menulist-foerderrelevant"/>
+                            <menulist id="student-prestudent-menulist-foerderrelevant" disabled="true">
+                                <menupopup>
+                                    <menuitem value="" label="Wie Studiengang"/>
+                                    <menuitem value="true" label="Ja"/>
+                                    <menuitem value="false" label="Nein"/>
+                                </menupopup>
+                            </menulist>
                             <hbox>
-                                <label value="Priorität" control="student-prestudent-textbox-priorisierung"/>
-								<?php
-								$readonly = 'readonly="true"';
-								$rechte = new benutzerberechtigung();
-								$rechte->getBerechtigungen($user);
-								if($rechte->isBerechtigt('basis/prestudent'))
-									$readonly = '';
-								?>
-                                <textbox id="student-prestudent-textbox-priorisierung" disabled="true" <?php echo $readonly ?>/>
+                                <label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
+                                <checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
                             </hbox>
-							<hbox>
-								<label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
-								<checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
-							</hbox>
 							<hbox>
 								<label value="Dual" control="student-prestudent-checkbox-dual"/>
 								<checkbox id="student-prestudent-checkbox-dual" checked="false" disabled="true"/>
 							</hbox>
-                            <hbox>
-                                <label value="Förderrelevant" control="student-prestudent-menulist-foerderrelevant"/>
-                                <menulist id="student-prestudent-menulist-foerderrelevant" disabled="true">
-                                    <menupopup>
-                                        <menuitem value="" label="Wie Studiengang"/>
-                                        <menuitem value="true" label="Ja"/>
-                                        <menuitem value="false" label="Nein"/>
-                                    </menupopup>
-                                </menulist>
-                           </hbox>
+                            <label value="Priorität" control="student-prestudent-textbox-priorisierung"/>
+							<?php
+							$readonly = 'readonly="true"';
+							$rechte = new benutzerberechtigung();
+							$rechte->getBerechtigungen($user);
+							if($rechte->isBerechtigt('basis/prestudent'))
+								$readonly = '';
+							?>
+                            <textbox id="student-prestudent-textbox-priorisierung" disabled="true" <?php echo $readonly ?>/>
 						</row>
 						<row id="student-prestudent-row-mentor">
 						<label value="MentorIn" control="student-prestudent-textbox-mentor"/>
