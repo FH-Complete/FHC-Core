@@ -189,7 +189,7 @@ $this->load->view(
 
 			<div class="col-xs-4 col-md-offset-0 col-md-4">
 				<div class="input-group">
-					<input id="username" type="hidden" autocomplete="username" value=""><!-- this is to prevent Chrome autofilling a random input field with the username-->
+					<input id="username" autocomplete="username" style="position: absolute; opacity: 0;"><!-- this is to prevent Chrome autofilling a random input field with the username-->
 					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-<?php echo ucfirst($this->p->t('password', 'password')); ?>">
 						<span class="input-group-btn">
 							<button id="accept-lehrauftraege" class="btn btn-primary pull-right"><?php echo ucfirst($this->p->t('global', 'lehrauftraegeAnnehmen')); ?></button>
