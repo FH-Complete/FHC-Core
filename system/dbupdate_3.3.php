@@ -4781,6 +4781,19 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruef
 	}
 }
 
+// Added Buchungstyp "ZuschussIO"
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_buchungstyp WHERE buchungstyp_kurzbz = 'ZuschussIO';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_buchungstyp (buchungstyp_kurzbz, beschreibung, standardtext) VALUES ('ZuschussIO', 'Zuschuss IO', 'Zuschuss Incoming Outgoing');";
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_buchungstyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' public.tbl_buchungstyp: Added buchungstyp "ZuschussIO" <br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
