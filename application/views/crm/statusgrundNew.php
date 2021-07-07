@@ -52,6 +52,16 @@
 							</td>
 						</tr>
 						<tr>
+							<td>
+								StatusGrund:
+							</td>
+						<tr>
+						</tr>
+							<td>
+								<input type="text" name="statusgrund_kurzbz" value="" /><br/>
+							</td>
+						</tr>
+						<tr>
 							<td colspan="2" align="center">
 								<button type="submit">Save</button>
 							</td>
