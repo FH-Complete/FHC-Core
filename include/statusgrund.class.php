@@ -184,5 +184,28 @@ class statusgrund extends basis_db
 
 		return true;
 	}
+
+	/**
+	 * Laedt das Klassenobjekt anhand der kurzbz
+	 *
+	 * @param string $statusgrund_kurzbz Statusgrund zu dem das Objekt geladen werden soll.
+	 * @return object classobject
+	 */
+	public function getByStatusgrundKurzbz($statusgrund_kurzbz)
+	{
+		$qry = "
+			SELECT
+				 *
+			FROM
+				 public.tbl_status_grund
+			WHERE
+				statusgrund_kurzbz ='". $statusgrund_kurzbz. "'
+		";
+
+		$this->db_query($qry);
+
+		return
+			$this->db_fetch_object();
+	}
 }
 ?>
