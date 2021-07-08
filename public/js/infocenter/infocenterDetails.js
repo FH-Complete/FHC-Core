@@ -571,7 +571,8 @@ var InfocenterDetails = {
 				{
 					var fitstg = $.inArray(parseInt(prestudent.studiengang_kz), FIT_PROGRAMM_STUDIENGAENGE) >= 0;
 
-					if (receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz
+					if ((receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz)
+						&& (receiverPrestudent.studiengangtyp === prestudent.studiengangtyp)
 						&& (prestudent.studiengangtyp === "b" || prestudent.studiengangtyp === "m" || fitstg))
 					{
 						if (prestudent.isRtFreigegeben)
@@ -596,7 +597,7 @@ var InfocenterDetails = {
 
 			if (typeof receiverPrestudentstatus.bezeichnung_orgform_german === 'string')
 			{
-				orgform_deutsch = receiverPrestudentstatus.bezeichnung_orgform_german.toLowerCase();
+				orgform_deutsch = receiverPrestudentstatus.bezeichnung_orgform_german;
 			}
 
 			if (typeof receiverPrestudentstatus.bezeichnung_orgform_english === 'string')
