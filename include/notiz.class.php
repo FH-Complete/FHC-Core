@@ -411,7 +411,7 @@ class notiz extends basis_db
 			$qry .= " AND prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		}
 
-		$qry .= " ORDER BY notiz_id";
+		$qry .= " ORDER BY notiz_id DESC";
 
 		if($result = $this->db_query($qry))
 		{
