@@ -25,7 +25,7 @@ require_once('../../config/vilesci.config.inc.php');
 
 var TaskSelectID=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
 var filterErledigt; //Tasks filtern
-var currentProjektPhaseID; 
+var currentProjektPhaseID;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -81,13 +81,13 @@ function LoadTasks(projekt_phase_id, filter)
 		{
 			// wenn phase übergeben wurde -> setzte globale variable
 			if(projekt_phase_id != null && projekt_phase_id != '' && typeof optional && "undefined")
-				currentProjektPhaseID = projekt_phase_id; 
-			
+				currentProjektPhaseID = projekt_phase_id;
+
 			// wenn filter übergeben wurde -> setze globale variable
 			if(filter != null && filter != '' && typeof filter != "undefined")
 				filterErledigt = filter;
-				
-			url = "<?php echo APP_ROOT; ?>rdf/projekttask.rdf.php?projektphase_id="+currentProjektPhaseID+"&"+gettimestamp();	
+
+			url = "<?php echo APP_ROOT; ?>rdf/projekttask.rdf.php?projektphase_id="+currentProjektPhaseID+"&"+gettimestamp();
 
 			// überprüfe ob filter gesetzt ist
 			if(filterErledigt != null)
@@ -100,7 +100,7 @@ function LoadTasks(projekt_phase_id, filter)
 			{
 			    treeTask.database.RemoveDataSource(oldDatasources.getNext());
 			}
-	
+
 			try
 			{
 			    datasourceTreeTask.removeXMLSinkObserver(TaskTreeSinkObserver);
@@ -108,7 +108,7 @@ function LoadTasks(projekt_phase_id, filter)
 			}
 			catch(e)
 			{}
-			
+
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 			datasourceTreeTask = rdfService.GetDataSource(url);
 			datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -116,7 +116,7 @@ function LoadTasks(projekt_phase_id, filter)
 			treeTask.database.AddDataSource(datasourceTreeTask);
 			datasourceTreeTask.addXMLSinkObserver(TaskTreeSinkObserver);
 			treeTask.builder.addListener(TaskTreeListener);
-			
+
 		}
 		catch(e)
 		{
@@ -153,7 +153,7 @@ function RessourceTaskLoad(menulist, id)
 	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	menulist.database.AddDataSource(datasource);
 	menulist.builder.rebuild();
-	
+
 }
 
 
@@ -167,7 +167,7 @@ function TaskTreeRefresh()
 	//markierte Lehreinheit global speichern damit diese LE nach dem
 	//refresh wieder markiert werden kann.
 	var tree = document.getElementById('projekttask-tree');
-		
+
 	try
 	{
 		TaskSelectID = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
@@ -187,7 +187,7 @@ function TaskNeu()
 	var tasktree=document.getElementById('projekttask-tree');
 	tasktree.view.selection.clearSelection();
 	tree = document.getElementById('tree-projektmenue');
-	
+
 	//Projektphase_id holen
 	var projektphase_id = getTreeCellText(tree, "treecol-projektmenue-projekt_phase_id", tree.currentIndex);
 
@@ -199,12 +199,12 @@ function TaskNeu()
 	//Details zuruecksetzen
 	TaskDetailReset();
 	TaskDisableFields(false);
-			
+
 	document.getElementById('textbox-projekttaskdetail-projektphase_id').value=projektphase_id;
 	document.getElementById('caption-projekttask-detail').label='Neuer Task';
-	
+
 	//Detail Tab auswaehlen
-	document.getElementById('projekttask-tabs').selectedItem=document.getElementById('projekttask-tab-detail');	
+	document.getElementById('projekttask-tabs').selectedItem=document.getElementById('projekttask-tab-detail');
 }
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
@@ -222,7 +222,7 @@ function TaskTreeSelectTask()
 	   	{
 	   		//id der row holen
 	   		id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", i);
-			
+
 			//wenn dies die zu selektierende Zeile
 			if(TaskSelectID==id)
 			{
@@ -264,7 +264,7 @@ function TaskDelete()
 		var soapBody = new SOAPObject("deleteProjekttask");
 		soapBody.appendChild(new SOAPObject("projekttask_id")).val(id);
 		var sr = new SOAPRequest("deleteProjekttask",soapBody);
-	
+
 		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
 		SOAPClient.SendRequest(sr, clb_deleteProjekttask);
 	}
@@ -285,7 +285,7 @@ function clb_deleteProjekttask(respObj)
 		return;
 	}
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-			
+
 	TaskSelectID='';
 	datasourceTreeTask.Refresh(false); //non blocking
 	SetStatusBarText('Eintrag wurde entfernt');
@@ -332,7 +332,7 @@ function showProjekttaskParsedown()
 
 	//Werte holen
 	projekttask_id = document.getElementById('textbox-projekttaskdetail-projekttask_id').value;
-	
+
 	if(!isNaN(projekttask_id) && projekttask_id != '')
 	{
 		window.open("projekt/parsedown.php?projekttask_id="+projekttask_id,"Projekttask"+projekttask_id);
@@ -355,15 +355,15 @@ function saveProjekttaskDetail()
 	aufwand = document.getElementById('textbox-projekttask-detail-aufwand').value;
 	mantis_id = document.getElementById('textbox-projekttask-detail-mantis_id').value;
 	scrumsprint_id = document.getElementById('textbox-projekttask-detail-scrumsprint_id').value;
-	ressource_id = MenulistGetSelectedValue('textbox-projekttask-detail-ressource'); 	
+	ressource_id = MenulistGetSelectedValue('textbox-projekttask-detail-ressource');
 	ende = document.getElementById('textbox-projekttask-detail-ende').iso;
-	
+
 	if(!isNaN(projektphase_id) && projektphase_id != '')
 	{
 		var soapBody = new SOAPObject("saveProjekttask");
 		//soapBody.appendChild(new SOAPObject("username")).val('joe');
 		//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
-					
+
 		var task = new SOAPObject("task");
 		task.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
 		task.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
@@ -376,9 +376,9 @@ function saveProjekttaskDetail()
 		task.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
 		task.appendChild(new SOAPObject("ende")).val(ende);
 		soapBody.appendChild(task);
-								
+
 		var sr = new SOAPRequest("saveProjekttask",soapBody);
-	
+
 		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
 		SOAPClient.SendRequest(sr, clb_saveProjekttask);
 	}else
@@ -402,7 +402,7 @@ function clb_saveProjekttask(respObj)
 	}
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('textbox-projekttaskdetail-projekttask_id').value=id;
-		
+
 	TaskSelectID=id;
 	datasourceTreeTask.Refresh(false); //non blocking
 	SetStatusBarText('Daten wurden gespeichert');
@@ -415,7 +415,7 @@ function clb_saveProjekttask(respObj)
 // ****
 function onselectProjekttask()
 {
-	
+
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('projekttask-tree');
@@ -445,12 +445,12 @@ function onselectProjekttask()
 		alert(e);
 		return false;
 	}
-	
+
 	var req = new phpRequest('../rdf/projekttask.rdf.php','','');
 	req.add('projekttask_id',id);
 
 	var response = req.execute();
-	
+
 	// Datasource holen
 	var dsource=parseRDFString(response, 'http://www.technikum-wien.at/projekttask/alle-projekttasks');
 
@@ -472,7 +472,7 @@ function onselectProjekttask()
 	var scrumsprint_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#scrumsprint_id" ));
 	var ressource_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ressource_id" ));
 	var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
-	
+
 	//Daten den Feldern zuweisen
 	var menulist = document.getElementById('textbox-projekttask-detail-ressource');
 	RessourceTaskLoad(menulist, projektphase_id);
@@ -486,17 +486,17 @@ function onselectProjekttask()
 	document.getElementById('textbox-projekttask-detail-scrumsprint_id').value=scrumsprint_id;
 	MenulistSelectItemOnValue('textbox-projekttask-detail-ressource', ressource_id);
 	//document.getElementById('textbox-projekttask-detail-ressource').value=ressource_id;
-	
+
 	 //Notizen zu eines Tasks Laden
 	notiz = document.getElementById('box-projekttask-notizen');
 	notiz.LoadNotizTree('','',projekttask_id,'','','','', '','');
-	
+
 	//Mantis Tab reset
 	document.getElementById('textbox-projekttask-mantis-issue_summary').value=bezeichnung;
 	document.getElementById('textbox-projekttask-mantis-issue_description').value=beschreibung;
 	//document.getElementById('textbox-projekttask-mantis-issue_project_id').value='1';
     //document.getElementById('textbox-projekttask-mantis-issue_category').value='General';
-	
+
 	document.getElementById('textbox-projekttask-mantis-mantis_id').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_view_state_id').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_view_state_name').value='';
@@ -525,9 +525,9 @@ function onselectProjekttask()
     document.getElementById('textbox-projekttask-mantis-issue_due_date').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_steps_to_reproduce').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_additional_information').value='';
-        
+
     //Mantis
-	if (mantis_id!='')
+	if (false && mantis_id!='')
     {
     	var req = new phpRequest('../rdf/mantis.rdf.php','','');
         req.add('issue_id',mantis_id);
@@ -539,7 +539,7 @@ function onselectProjekttask()
 		           getService(Components.interfaces.nsIRDFService);
         subject = rdfService.GetResource("http://www.technikum-wien.at/mantis/" + mantis_id);
         predicateNS = "http://www.technikum-wien.at/mantis/rdf";
-    
+
         //Daten holen
         var issue_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_id" ));
         var issue_summary=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_summary" ));
@@ -571,12 +571,12 @@ function onselectProjekttask()
 		var issue_tags_name=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_tags_name" ));
 		var issue_resolution_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_resolution_id" ));
 		var issue_resolution_name=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_resolution_name" ));
-		var issue_due_date=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_due_date" ));			 		 
+		var issue_due_date=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_due_date" ));
 		var issue_steps_to_reproduce=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_steps_to_reproduce" ));
 		var issue_additional_information=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_additional_information" ));
 
 		ProjekttaskLoadCategories(issue_project_id);
-		
+
 		//Daten den Feldern zuweisen
 		document.getElementById('textbox-projekttask-mantis-mantis_id').value=mantis_id;
 		document.getElementById('textbox-projekttask-mantis-issue_summary').value=issue_summary;
@@ -610,18 +610,18 @@ function onselectProjekttask()
 		document.getElementById('textbox-projekttask-mantis-issue_due_date').value=issue_due_date;
 		document.getElementById('textbox-projekttask-mantis-issue_steps_to_reproduce').value=issue_steps_to_reproduce;
 		document.getElementById('textbox-projekttask-mantis-issue_additional_information').value=issue_additional_information;
-		document.getElementById('textbox-projekttask-mantis-issue_tags').value=issue_tags_name; 
+		document.getElementById('textbox-projekttask-mantis-issue_tags').value=issue_tags_name;
 	}
 }
 
 // ****
-// * Beim Aendern des Mantis Projekts werden die zugehoerigen 
+// * Beim Aendern des Mantis Projekts werden die zugehoerigen
 // * Kategorien geladen
 // ****
 function ProjekttaskMantisProjektChange()
 {
 	project_id=document.getElementById('menulist-projekttask-mantis-issue_project_id').value;
-	
+
 	if(project_id!='')
 		ProjekttaskLoadCategories(project_id);
 }
@@ -645,10 +645,10 @@ function ProjekttaskLoadCategories(project_id)
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		menulist.builder.rebuild();
-	
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);	
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		var datasource = rdfService.GetDataSourceBlocking(url);
-	
+
 		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		menulist.database.AddDataSource(datasource);
@@ -696,7 +696,7 @@ function saveProjekttaskMantis()
 	var issue_steps_to_reproduce=document.getElementById('textbox-projekttask-mantis-issue_steps_to_reproduce').value;
 	var issue_additional_information=document.getElementById('textbox-projekttask-mantis-issue_additional_information').value;
 	var issue_tags = document.getElementById('textbox-projekttask-mantis-issue_tags').value;
-	
+
 	var soapBody = new SOAPObject("saveMantis");
 	soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
 	soapBody.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
@@ -731,25 +731,25 @@ function saveProjekttaskMantis()
 	soapBody.appendChild(new SOAPObject("issue_due_date")).val(issue_due_date);
 	soapBody.appendChild(new SOAPObject("issue_steps_to_reproduce")).val(issue_steps_to_reproduce);
 	soapBody.appendChild(new SOAPObject("issue_additional_information")).val(issue_additional_information);
-		
+
 	var sr = new SOAPRequest("saveMantis",soapBody);
 
 	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
 	SOAPClient.SendRequest(sr, clb_saveProjekttaskMantis);
-	
+
 	// Tags speichern
 	if(mantis_id != '')
 	{
 		var soapBody = new SOAPObject("saveTagsForIssue");
 		soapBody.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
-		soapBody.appendChild(new SOAPObject("issue_tags")).val(issue_tags);	
+		soapBody.appendChild(new SOAPObject("issue_tags")).val(issue_tags);
 
 		var sr = new SOAPRequest("saveTagsForIssue",soapBody);
 
 		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
 		SOAPClient.SendRequest(sr, clb_saveProjekttaskMantis);
 	}
-	
+
 }
 
 // ****
@@ -779,7 +779,7 @@ function ProjekttaskUpdateErledigt(event)
     var col = new Object();
     var childElt = new Object();
     //Tree holen
-    var tree = event.currentTarget; 
+    var tree = event.currentTarget;
     //Treecol ermitteln in die geklickt wurde
     tree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, childElt);
     //abbrechen wenn auf Header oder Scrollbar geklickt wurde
@@ -798,7 +798,7 @@ function ProjekttaskUpdateErledigt(event)
 			newval='false';
 		else
 			newval='true';
-		
+
 		var soapBody = new SOAPObject("setErledigt");
 		//soapBody.appendChild(new SOAPObject("username")).val('joe');
 		//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
@@ -807,8 +807,8 @@ function ProjekttaskUpdateErledigt(event)
 
 	    var sr = new SOAPRequest("setErledigt",soapBody);
 	    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
-    				    
-    	SOAPClient.SendRequest(sr,function (respObj) 
+
+    	SOAPClient.SendRequest(sr,function (respObj)
     	{
 	    	try
 			{

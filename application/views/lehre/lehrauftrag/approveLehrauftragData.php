@@ -34,7 +34,7 @@ SELECT
     erteilt,
     akzeptiert,
       (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -50,7 +50,7 @@ SELECT
          )
     )                    AS "bestellt_von",
     (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -66,7 +66,7 @@ SELECT
          )
     )                    AS "erteilt_von",
     (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -128,7 +128,7 @@ FROM
         (
             SELECT
                 /* lehrauftraege also planned with dummies, therefore personalnummer is needed */
-                ma.personalnummer,
+                (ma.personalnummer::text),
                 lema.lehreinheit_id,
                 lv.lehrveranstaltung_id,
                 lv.bezeichnung                                      AS "lv_bezeichnung",
@@ -240,7 +240,7 @@ FROM
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
                     lv.bezeichnung                                                                      AS "lv_bezeichnung",
-                    pa.projektarbeit_id                                                                 AS "projektarbeit_id",
+                    (pa.projektarbeit_id::text)                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
@@ -249,7 +249,7 @@ FROM
                     \'Betreuung\'                                                                       AS "typ",
                     (betreuerart_kurzbz || \' \' ||
                      (SELECT
-                          vorname || \' \' || nachname
+                          nachname || \' \' || vorname
                       FROM
                           PUBLIC.tbl_person
                               JOIN PUBLIC.tbl_benutzer USING (person_id)
@@ -268,7 +268,7 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    (nachname || \' \' || vorname)                                                        AS "lektor",
+                    (vorname || \' \' || nachname)                                                        AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
                     vertrag_id,
