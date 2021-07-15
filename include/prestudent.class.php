@@ -2316,6 +2316,8 @@ class prestudent extends person
 					person_id = ".$this->db_add_param($person_id)."
 				AND
 					typ ='m'
+				AND
+					zgvmadatum IS NULL
 				And
 					get_rolle_prestudent(prestudent_id, null) = 'Interessent';";
 
