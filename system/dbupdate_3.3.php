@@ -4641,7 +4641,7 @@ $qry = 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus
 if (!$db->db_query($qry))
 	echo '<strong>lehre.tbl_anrechnungstatus '.$db->db_last_error().'</strong><br>';
 else
-	echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus';
+	echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus<br>';
 
 
 // SEQUENCE seq_anrechnungstatus_status_kurzbz
@@ -4779,6 +4779,69 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruef
 		else
 			echo 'Index fuer lehre.pruefung.student_uid hinzugefuegt<br>';
 	}
+}
+
+// Add table issues
+if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issues LIMIT 1;"))
+{
+	$qry = "CREATE TABLE system.tbl_issues (
+                                      id integer NOT NULL,
+                                      app character varying(32),
+                                      inhalt text,
+                                      datum timestamp without time zone NOT NULL,
+                                      verarbeitetvon character varying(32),
+                                      verarbeitetamum timestamp without time zone,
+                                      fehlercode character varying(64) NOT NULL,
+                                      person_id integer,
+                                      oe_kurzbz character varying(32),
+                                      status character varying(32) NOT NULL,
+                                      schweregrad character varying(32) NOT NULL,
+                                      insertvon character varying(32),
+                                      insertamum timestamp without time zone DEFAULT now(),
+                                      updatevon character varying(32),
+                                      updateamum timestamp without time zone
+			);
+			
+			COMMENT ON TABLE system.tbl_issues IS 'Tabelle zur Verfolgung von Problemen/Fehlern von verschiedenen Systemen';
+						COMMENT ON COLUMN system.tbl_issues.id IS 'Primärschlüssel';
+						COMMENT ON COLUMN system.tbl_issues.app IS 'Ursprungsapp des Problems';
+						COMMENT ON COLUMN system.tbl_issues.inhalt IS 'Beschreibungstext, Fehlertext';
+						COMMENT ON COLUMN system.tbl_issues.datum IS 'Tag und Zeit des Auftritts des Problems';
+						COMMENT ON COLUMN system.tbl_issues.verarbeitetvon IS 'uid des Nutzers, der das Problem verarbeitet hat';
+						COMMENT ON COLUMN system.tbl_issues.verarbeitetamum IS 'Tag und Zeit der Problemverarbeitung';
+						COMMENT ON COLUMN system.tbl_issues.fehlercode IS 'Identifikationscode  des Problems/Fehlers, kann von anderem System kommen oder eigens definiert sein';
+						COMMENT ON COLUMN system.tbl_issues.person_id IS 'Id der betreffenden Person';
+						COMMENT ON COLUMN system.tbl_issues.oe_kurzbz IS 'Betroffene Organisationseinheit';
+						COMMENT ON COLUMN system.tbl_issues.status IS 'Verarbeitsungsstatus';
+			
+			CREATE SEQUENCE system.seq_issues_id
+				START WITH 1
+				INCREMENT BY 1
+				NO MINVALUE
+				NO MAXVALUE
+				CACHE 1;
+			
+			ALTER TABLE ONLY system.tbl_issues ALTER COLUMN id SET DEFAULT nextval('system.seq_jobsqueue_jobid'::regclass);
+			
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issues_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issues_id TO fhcomplete;
+			
+			ALTER TABLE system.tbl_issues ADD CONSTRAINT pk_issues PRIMARY KEY (id);
+			
+			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_app FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_verarbeitetvon FOREIGN KEY (verarbeitetvon) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			
+			ALTER TABLE system.tbl_issues ADD CONSTRAINT chk_issues_person_id_oe_kurzbz CHECK (person_id IS NOT NULL OR oe_kurzbz IS NOT NULL);
+
+			CREATE INDEX idx_tbl_issues_person_id ON system.tbl_issues USING btree (person_id);
+			CREATE INDEX idx_tbl_issues_oe_kurzbz ON system.tbl_issues USING btree (oe_kurzbz);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_issues: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' system.tbl_issues: Tabelle hinzugefuegt<br>';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -5039,6 +5102,7 @@ $tabellen=array(
 	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon","kostenstelle_id","anmerkung"),
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
+	"system.tbl_issues" => array("id","app","inhalt","datum","verarbeitetvon","verarbeitetamum","fehlercode","person_id","oe_kurzbz","status","insertvon","insertamum","updatevon","updateamum"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz","statistik_kurzbz"),
