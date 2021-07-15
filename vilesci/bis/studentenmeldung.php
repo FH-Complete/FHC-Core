@@ -100,6 +100,7 @@ $bwlist='';
 $storgfor='';
 $verwendete_orgformen=array();
 $student_data=array();
+$nur_bewerber=false;
 
 $datum_obj = new datum();
 
@@ -137,6 +138,9 @@ else
 {
 	die('<H2>Es wurde kein Studiengang ausgew&auml;hlt!</H2>');
 }
+
+//Parameter wenn nur Bewerbermeldung durchgeführt werden soll
+$nur_bewerber=filter_input(INPUT_GET, 'nur_bewerber', FILTER_VALIDATE_BOOLEAN);
 
 /*
  standortcode 22=Wien
@@ -269,58 +273,58 @@ if($result_in = $db->db_query($qry_in))
 	}
 }
 
-//Hauptselect
-// An der FHTW können nur die Incomings ausgelesen werden, wenn die stg_kz 10006 übergeben wird
-if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
+if ($nur_bewerber !== true)
 {
-	$qry="
-	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
-	FROM
-		public.tbl_student
-		JOIN public.tbl_benutzer ON(student_uid=uid)
-		JOIN public.tbl_person USING (person_id)
-		JOIN public.tbl_prestudent USING (prestudent_id)
-		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
-	WHERE
-		bismelden=TRUE
-		AND (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
-				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
-		))
-	ORDER BY student_uid, nachname, vorname
-	";
-}
-else
-{
-	$qry="
-	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
-	FROM
-		public.tbl_student
-		JOIN public.tbl_benutzer ON(student_uid=uid)
-		JOIN public.tbl_person USING (person_id)
-		JOIN public.tbl_prestudent USING (prestudent_id)
-		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
-	WHERE
-		bismelden=TRUE
-		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
-		AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
-			AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
-			OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
-			OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
-			OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
-			OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
-			OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
-				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
-		)))
-	ORDER BY student_uid, nachname, vorname
-	";
+	//Hauptselect
+	// An der FHTW können nur die Incomings ausgelesen werden, wenn die stg_kz 10006 übergeben wird
+	if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
+	{
+		$qry="
+		SELECT
+			DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		FROM
+			public.tbl_student
+			JOIN public.tbl_benutzer ON(student_uid=uid)
+			JOIN public.tbl_person USING (person_id)
+			JOIN public.tbl_prestudent USING (prestudent_id)
+			JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		WHERE
+			bismelden=TRUE
+			AND (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+					OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
+			))
+		ORDER BY student_uid, nachname, vorname
+		";
+	}
+	else
+	{
+		$qry="
+		SELECT
+			DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		FROM
+			public.tbl_student
+			JOIN public.tbl_benutzer ON(student_uid=uid)
+			JOIN public.tbl_person USING (person_id)
+			JOIN public.tbl_prestudent USING (prestudent_id)
+			JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		WHERE
+			bismelden=TRUE
+			AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
+			AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
+				AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
+				OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
+				OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
+				OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
+				OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
+				OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+					OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
+			)))
+		ORDER BY student_uid, nachname, vorname
+		";
+	}
 }
 
-if($result = $db->db_query($qry))
-{
-
-	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
   <ErhKz>".$erhalter."</ErhKz>
   <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
@@ -328,26 +332,28 @@ if($result = $db->db_query($qry))
     <Studiengang>
       <StgKz>".$stg_kz."</StgKz>";
 
+if($nur_bewerber !== true && $result = $db->db_query($qry))
+{
 	while($row = $db->db_fetch_object($result))
 	{
 		$datei.= GenerateXMLStudentBlock($row);
 	}
+}
 
-	//Bewerberblock bei Ausserordentlichen nicht anzeigen
-	if($stg_kz!=('9'.$erhalter))
+//Bewerberblock bei Ausserordentlichen nicht anzeigen
+if($stg_kz!=('9'.$erhalter))
+{
+	$stg_obj = new studiengang();
+
+	if($orgform_code==3 || $stg_obj->isMischform($stg_kz,$ssem) || $stg_obj->isMischform($stg_kz,$psem))
 	{
-		$stg_obj = new studiengang();
-
-		if($orgform_code==3 || $stg_obj->isMischform($stg_kz,$ssem) || $stg_obj->isMischform($stg_kz,$psem))
-		{
-			$orgcodes = array_unique($orgform_code_array);
-			//Mischform
-			foreach($orgcodes as $code)
-				$datei.= GenerateXMLBewerberBlock($code);
-		}
-		else
-			$datei.= GenerateXMLBewerberBlock();
+		$orgcodes = array_unique($orgform_code_array);
+		//Mischform
+		foreach($orgcodes as $code)
+			$datei.= GenerateXMLBewerberBlock($code);
 	}
+	else
+		$datei.= GenerateXMLBewerberBlock();
 }
 
 $datei.="
