@@ -11315,17 +11315,17 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => "Bitte laden Sie mehrere Nachweis-Dokumente zusammengefasst in einem PDF-Dokument hoch.
-					<br><br>Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden,
-					laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
-					<br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, kann der Antrag auch abgelehnt werden.</span>",
+					<br><br>Falls für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwendet werden,
+					sind die für die Anrechnung relevanten Teile entsprechend zu <b>markieren</b>.
+					<br><br><span class=\"text-danger\">Falls das nicht gemacht wird, wird der Antrag aus formalen Gründen <b>abgelehnt</b>.</span>",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => "Please combine and upload more than one verification document in one PDF document.
-				<br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
-				<br><br><span class=\"text-danger\">If this information is not included, the application might be rejected.</span>",
+				<br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please <b>mark</b> the parts relevant for recognition accordingly.
+				<br><br><span class=\"text-danger\">If this information is not included, the application must be <b>rejected</b>.</span>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
