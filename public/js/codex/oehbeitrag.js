@@ -7,10 +7,10 @@ const CONTROLLER_URL = BASE_URL + "/"+CALLED_PATH;
  */
 $(document).ready(function ()
 {
-	//initialise table sorter
-	Oehbeitrag._addTablesorter();
+	// get Öhbeiträge and show them in table
+	Oehbeitrag.getOehBeitraege();
 
-	// set trigger for adding new Oehhbeitrag
+	// set event for adding new Oehhbeitrag
 	$("#addNewOeh").click(
 		function()
 		{
@@ -21,6 +21,7 @@ $(document).ready(function ()
 					let studiensemester = FHC_AjaxClient.getData(data);
 					let nextOehbeitragId = Oehbeitrag.newBeitragId;
 
+					// add new table row
 					let newRowHtml = "<tr>"+
 										"<td>";
 					newRowHtml += Oehbeitrag._getStudiensemesterDropdown(Oehbeitrag.newBeitragId, 'von_studiensemester_kurzbz', studiensemester);
@@ -33,7 +34,6 @@ $(document).ready(function ()
 						"						<button class='btn btn-default' id='delete_"+nextOehbeitragId+"'>Entfernen</button></td>"+
 									"</tr>";
 
-/*					$("#saveHeading, .saveCell").show();*/
 					$("#oehbeitraegeTbl tbody").prepend(newRowHtml);
 					$("#addOeh_"+Oehbeitrag.newBeitragId).click(
 						function()
@@ -55,6 +55,7 @@ $(document).ready(function ()
 						}
 					);
 
+					// remove html row if delete button clicked
 					$("#delete_"+nextOehbeitragId).click(
 						function()
 						{
@@ -62,7 +63,7 @@ $(document).ready(function ()
 						}
 					);
 
-					// increase counter for newly added rows
+					// increase counter for newly added rows id
 					Oehbeitrag.newBeitragId++;
 				}
 				else
@@ -72,26 +73,72 @@ $(document).ready(function ()
 			Oehbeitrag.getValidStudiensemester(callback);
 		}
 	)
-
-	// set trigger for deleting Oehhbeitrag
-	$(".deleteBtn").click(
-		function()
-		{
-			let oehbeitrag_id_prefixed = $(this).prop("id");
-			let oehbeitrag_id = oehbeitrag_id_prefixed.substr(oehbeitrag_id_prefixed.lastIndexOf('_')+1);
-
-			Oehbeitrag.deleteOehbeitrag(oehbeitrag_id);
-		}
-	);
-
-	// set trigger for updating Oehhbeitrag
-	Oehbeitrag._setUpdateEvents();
 });
 
 var Oehbeitrag = {
 	newBeitragId: 0,
 	// -----------------------------------------------------------------------------------------------------------------
 	// ajax calls
+	getOehBeitraege: function()
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			CALLED_PATH + "/getOehbeitraege",
+			null,
+			{
+				successCallback: function(data, textStatus, jqXHR)
+				{
+					if (FHC_AjaxClient.isError(data))
+					{
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+					}
+					else if (FHC_AjaxClient.hasData(data))
+					{
+						let oehbeitraege = FHC_AjaxClient.getData(data);
+
+						let oehbeitrStr = '';
+						for (let idx in oehbeitraege)
+						{
+							let oehbeitrag = oehbeitraege[idx];
+
+							// add Öhbeitrag row
+							oehbeitrStr += '<tr>' +
+								'<td id="cell_von_studiensemester_kurzbz_' + oehbeitrag.oehbeitrag_id + '">' +
+									Oehbeitrag._formatDateToGerman(oehbeitrag.von_datum) + '/' + oehbeitrag.von_studiensemester_kurzbz +
+									'&nbsp;<i class="fa fa-edit editVonStudiensemester" id="edit_von_studiensemester_' + oehbeitrag.oehbeitrag_id + '"></i>'+
+								'</td>' +
+								'<td id="cell_bis_studiensemester_kurzbz_' + oehbeitrag.oehbeitrag_id + '">' + (oehbeitrag.bis_studiensemester_kurzbz == null ? 'unbeschr&aumlnkt' :
+									Oehbeitrag._formatDateToGerman(oehbeitrag.bis_datum) + '/' + oehbeitrag.bis_studiensemester_kurzbz) +
+									'&nbsp;<i class="fa fa-edit editBisStudiensemester" id="edit_bis_studiensemester_' + oehbeitrag.oehbeitrag_id + '"></i>'+
+								'</td>' +
+								'<td id="cell_studierendenbeitrag_' + oehbeitrag.oehbeitrag_id + '">' +  Oehbeitrag._formatDecimal(oehbeitrag.studierendenbeitrag) +
+									'&nbsp;<i class="fa fa-edit editStudierendenbeitrag" id="edit_studierendenbeitrag_' + oehbeitrag.oehbeitrag_id + '"></i>'+
+								'</td>' +
+								'<td id="cell_versicherung_' + oehbeitrag.oehbeitrag_id + '">' + Oehbeitrag._formatDecimal(oehbeitrag.versicherung) +
+									'&nbsp;<i class="fa fa-edit editVersicherung" id="edit_versicherung_' + oehbeitrag.oehbeitrag_id + '"></i>'+
+								'</td>' +
+								'<td>' +
+									'<button class="btn btn-default editBtn" id="edit_'+oehbeitrag.oehbeitrag_id+'">Bearbeiten</button>' +
+									'&nbsp;<button class="btn btn-default deleteBtn" id="delete_'+oehbeitrag.oehbeitrag_id+'">L&ouml;schen</button>' +
+								'</td>' +
+							'</tr>';
+						}
+						$("#oehbeitraegeTbl tbody").html(oehbeitrStr);
+
+						// set events for editing, deleting etc.
+						Oehbeitrag._setUpdateEvents();
+
+						//initialise table sorter
+						Oehbeitrag._addTablesorter();
+					}
+				},
+				errorCallback: function()
+				{
+					FHC_DialogLib.alertError('Fehler beim Holen der Öhbeiträge');
+				}
+			}
+		);
+	},
+	// get all Studiensemester which are valid for assignment (where no Öhbeitrag is assigned)
 	getValidStudiensemester: function(callback, oehbeitrag_id)
 	{
 		let params = oehbeitrag_id ? {"oehbeitrag_id": oehbeitrag_id} : null;
@@ -121,42 +168,8 @@ var Oehbeitrag = {
 					}
 					else if (FHC_AjaxClient.hasData(data))
 					{
-						let inserted_id = FHC_AjaxClient.getData(data);
-
-						// refresh table row in GUI
-						let bis_studiensemester_kurzbz = oehbeitrag.bis_studiensemester_kurzbz == 'null' ? 'unbeschränkt' : studiensemester_von_bis.bis_semester_with_date;
-
-						$("#input_studierendenbeitrag_"+nextOehbeitragId).parent('td').html(
-							Oehbeitrag._formatDecimal(oehbeitrag.studierendenbeitrag)+" <i class='fa fa-edit editStudierendenbeitrag' id='edit_studierendenbeitrag_"+inserted_id+"'></i>"
-						);
-						$("#input_versicherung_"+nextOehbeitragId).parent('td').html(
-							Oehbeitrag._formatDecimal(oehbeitrag.versicherung)+" <i class='fa fa-edit editVersicherung' id='edit_versicherung_"+inserted_id+"'></i>"
-						);
-						$("#input_von_studiensemester_kurzbz_"+nextOehbeitragId).parent('td').html(
-							studiensemester_von_bis.von_semester_with_date+" <i class='fa fa-edit editVonStudiensemester' id='edit_von_studiensemester_kurzbz_"+inserted_id+"'></i>"
-						);
-						$("#input_bis_studiensemester_kurzbz_"+nextOehbeitragId).parent('td').html(
-							bis_studiensemester_kurzbz+" <i class='fa fa-edit editBisStudiensemester' id='edit_bis_studiensemester_kurzbz_"+inserted_id+"'></i>"
-						);
-
-						// add delete button instead of save btn
-						$("#addOeh_"+nextOehbeitragId).parent('td').html("<button class='btn btn-default deleteBtn' id='delete_"+inserted_id+"'>L&ouml;schen</button>");
-
-						// add update and delete events
-						Oehbeitrag._setUpdateEvents();
-
-						$("#delete_"+inserted_id).click(
-							function()
-							{
-								let oehbeitrag_id_prefixed = $(this).prop("id");
-								let oehbeitrag_id = oehbeitrag_id_prefixed.substr(oehbeitrag_id_prefixed.indexOf('_')+1);
-
-								Oehbeitrag.deleteOehbeitrag(oehbeitrag_id);
-							}
-						)
-
-						// refresh tablesorter
-						Oehbeitrag._addTablesorter();
+						// refresh Öhbeitragstable
+						Oehbeitrag.getOehBeitraege();
 					}
 					else
 					{
@@ -170,7 +183,40 @@ var Oehbeitrag = {
 			}
 		);
 	},
-	updateOehbeitrag(oehbeitrag_id, fieldname, fieldelement, inputtype)
+	// update whole Öhbeitrag
+	updateOehbeitrag: function(oehbeitrag_id, oehbeitragData)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + '/updateOehbeitrag',
+			{
+				"oehbeitrag_id": oehbeitrag_id,
+				"data": oehbeitragData
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data))
+					{
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+					}
+					else if (FHC_AjaxClient.hasData(data))
+					{
+						// refresh Öhbeitragstable
+						Oehbeitrag.getOehBeitraege();
+					}
+					else
+					{
+						FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
+					}
+				},
+				errorCallback: function()
+				{
+					FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
+				}
+			}
+		);
+	},
+	// update one field of Öhbeitrag (e.g. only semester or only Betrag)
+	updateOehbeitragField: function(oehbeitrag_id, fieldname, fieldelement, inputtype)
 	{
 		let oehbeitragdata = {};
 		let fieldvalue = fieldelement.val();
@@ -194,6 +240,7 @@ var Oehbeitrag = {
 					}
 					else if (FHC_AjaxClient.hasData(data))
 					{
+						// refresh table cell with correct value and set edit event and tablesorter
 						if (inputtype == 'semester')
 							fieldvalue = $(fieldelement).find("option:selected").text();
 						else
@@ -204,7 +251,7 @@ var Oehbeitrag = {
 						$("#edit_"+fieldname+"_"+oehbeitrag_id).click(
 							function()
 							{
-								Oehbeitrag._setUpdateEvent($(this).prop("id"), fieldname, inputtype);
+								Oehbeitrag._makeFieldEditable($(this).prop("id"), fieldname, inputtype, true);
 							}
 						);
 
@@ -212,12 +259,12 @@ var Oehbeitrag = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError('Fehler beim Hinzufügen des Öhbeitrags');
+						FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
 					}
 				},
 				errorCallback: function()
 				{
-					FHC_DialogLib.alertError('Fehler beim Hinzufügen des Öhbeitrags');
+					FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
 				}
 			}
 		);
@@ -248,43 +295,92 @@ var Oehbeitrag = {
 	},
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// (private) methods
-	_setUpdateEvents()
+	/**
+	 * Sets click events for updating, deleting Oehbeitrag
+	 */
+	_setUpdateEvents: function()
 	{
+		// set edit event for whole row
+		$(".editBtn").click(
+			function()
+			{
+				let id = $(this).prop("id");
+				let oehbeitrag_id = id.substr(id.lastIndexOf('_')+1);
+				Oehbeitrag._makeFieldEditable(id, 'von_studiensemester_kurzbz', 'semester');
+				Oehbeitrag._makeFieldEditable(id, 'bis_studiensemester_kurzbz', 'semester');
+				Oehbeitrag._makeFieldEditable(id, 'studierendenbeitrag');
+				Oehbeitrag._makeFieldEditable(id, 'versicherung');
+				$(this).after("&nbsp;<button class='btn btn-default saveBtn' id='save_"+oehbeitrag_id+"'>Speichern</button>");
+				$(this).remove();
+				$("#delete_" + oehbeitrag_id).remove();
+
+				$("#save_"+oehbeitrag_id).click(
+					function()
+					{
+						let von_studiensemester_kurzbz = $("#input_von_studiensemester_kurzbz_"+oehbeitrag_id+" option:selected").val();
+						let bis_studiensemester_kurzbz = $("#input_bis_studiensemester_kurzbz_"+oehbeitrag_id+" option:selected").val();
+						let studierendenbeitrag = Oehbeitrag._formatDecimal($("#input_studierendenbeitrag_"+oehbeitrag_id).val(), '.');
+						let versicherung = Oehbeitrag._formatDecimal($("#input_versicherung_"+oehbeitrag_id).val(), '.');
+
+						let oehbeitragData = {
+							"von_studiensemester_kurzbz": von_studiensemester_kurzbz,
+							"bis_studiensemester_kurzbz": bis_studiensemester_kurzbz,
+							"studierendenbeitrag": studierendenbeitrag,
+							"versicherung": versicherung
+						}
+
+						Oehbeitrag.updateOehbeitrag(oehbeitrag_id, oehbeitragData);
+					}
+				)
+			}
+		);
+
+		// set delete event for all rows
+		$(".deleteBtn").click(
+			function()
+			{
+				let oehbeitrag_id_prefixed = $(this).prop("id");
+				let oehbeitrag_id = oehbeitrag_id_prefixed.substr(oehbeitrag_id_prefixed.lastIndexOf('_')+1);
+
+				Oehbeitrag.deleteOehbeitrag(oehbeitrag_id);
+			}
+		)
+
+		// set edit events for single cells
 		$(".editStudierendenbeitrag").off('click').click(
 			function()
 			{
-				Oehbeitrag._setUpdateEvent($(this).prop("id"), 'studierendenbeitrag');
+				Oehbeitrag._makeFieldEditable($(this).prop("id"), 'studierendenbeitrag', null, true);
 			}
 		);
 
 		$(".editVersicherung").off('click').click(
 			function()
 			{
-				Oehbeitrag._setUpdateEvent($(this).prop("id"), 'versicherung');
+				Oehbeitrag._makeFieldEditable($(this).prop("id"), 'versicherung', null, true);
 			}
 		);
 
 		$(".editBisStudiensemester").off('click').click(
 			function()
 			{
-				Oehbeitrag._setUpdateEvent($(this).prop("id"), 'bis_studiensemester_kurzbz', 'semester');
+				Oehbeitrag._makeFieldEditable($(this).prop("id"), 'bis_studiensemester_kurzbz', 'semester', true);
 			}
 		);
 
 		$(".editVonStudiensemester").off('click').click(
 			function()
 			{
-				Oehbeitrag._setUpdateEvent($(this).prop("id"), 'von_studiensemester_kurzbz', 'semester');
+				Oehbeitrag._makeFieldEditable($(this).prop("id"), 'von_studiensemester_kurzbz', 'semester', true);
 			}
 		);
-
 	},
-	_setUpdateEvent(oehbeitrag_id_prefixed, fieldname, inputtype)
+	// make Öhbeitrag field editable, i.e. show input field instead of text
+	_makeFieldEditable: function(oehbeitrag_id_prefixed, fieldname, inputtype, singleUpdate)
 	{
-		let initElement = $("#"+oehbeitrag_id_prefixed); // clicked element triggering event
 		let oehbeitrag_id = oehbeitrag_id_prefixed.substr(oehbeitrag_id_prefixed.lastIndexOf('_')+1);
-		let currFieldvalue = initElement.parent('td').text().trim();
+		let initElement = $("#cell_"+fieldname+"_"+oehbeitrag_id); // clicked element triggering event
+		let currFieldvalue = initElement.text().trim();
 
 		let callback = function(validSemesterData)
 		{
@@ -306,19 +402,24 @@ var Oehbeitrag = {
 					" value='"+currFieldvalue+"' placeholder='0,00'>";
 			}
 
-			inputHtml += " <i class='fa fa-check text-success' id='confirm_"+fieldname+"_"+oehbeitrag_id+"' ></i>";
+			if (singleUpdate === true)
+				inputHtml += " <i class='fa fa-check text-success' id='confirm_"+fieldname+"_"+oehbeitrag_id+"' ></i>";
 
-			initElement.parent('td').html(inputHtml);
+			initElement.html(inputHtml);
 
-			// set the update event
-			$("#confirm_"+fieldname+"_"+oehbeitrag_id).click(
-				function()
-				{
-					Oehbeitrag.updateOehbeitrag(oehbeitrag_id, fieldname, $("#input_" + fieldname + "_" + oehbeitrag_id), inputtype);
-				}
-			);
+			if (singleUpdate === true)
+			{
+				// set the update event if single field update
+				$("#confirm_" + fieldname + "_" + oehbeitrag_id).click(
+					function()
+					{
+						Oehbeitrag.updateOehbeitragField(oehbeitrag_id, fieldname, $("#input_" + fieldname + "_" + oehbeitrag_id), inputtype);
+					}
+				);
+			}
 		}
 
+		// get valid Studiensemester with no Öhbeitrag assigned
 		if (inputtype == 'semester')
 		{
 			Oehbeitrag.getValidStudiensemester(callback, oehbeitrag_id);
@@ -379,12 +480,7 @@ var Oehbeitrag = {
 
 		Tablesort.addTablesorter("oehbeitraegeTbl", [[0,1]], ["zebra"], 8, headers);
 	},
-	/**
-	 * Formats a numeric value as a float with two decimals
-	 * @param value
-	 * @param decSeparator the new decimal separator
-	 * @returns {string} formatted value
-	 */
+	// Formats a numeric value as a float with two decimals
 	_formatDecimal: function(value, decSeparator)
 	{
 		let dec = null;
@@ -408,6 +504,7 @@ var Oehbeitrag = {
 
 		return dec;
 	},
+	// formats english date to as german
 	_formatDateToGerman: function(date)
 	{
 		return date.substring(8, 10) + "." + date.substring(5, 7) + "." + date.substring(0, 4);

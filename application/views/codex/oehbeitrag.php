@@ -48,23 +48,6 @@ $this->load->view(
 							</tr>
 						</thead>
 						<tbody>
-							<?php foreach ($oehbeitraege as $oehbeitrag): ?>
-							<tr>
-								<td><?php echo date_format(date_create($oehbeitrag->von_datum), 'd.m.Y') . '/' . $oehbeitrag->von_studiensemester_kurzbz ?>
-									<i class="fa fa-edit editVonStudiensemester" id="edit_von_studiensemester_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
-								</td>
-								<td><?php echo $oehbeitrag->bis_studiensemester_kurzbz == null ? 'unbeschr&aumlnkt' : (date_format(date_create($oehbeitrag->bis_datum), 'd.m.Y') . '/' .  $oehbeitrag->bis_studiensemester_kurzbz) ?>
-									<i class="fa fa-edit editBisStudiensemester" id="edit_bis_studiensemester_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
-								</td>
-								<td><?php echo number_format($oehbeitrag->studierendenbeitrag, 2, ',', '.') ?>
-									<i class="fa fa-edit editStudierendenbeitrag" id="edit_studierendenbeitrag_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
-								</td>
-								<td><?php echo number_format($oehbeitrag->versicherung, 2, ',', '.') ?>
-									<i class="fa fa-edit editVersicherung" id="edit_versicherung_<?php echo $oehbeitrag->oehbeitrag_id ?>"></i>
-								</td>
-								<td><button class="btn btn-default deleteBtn" id="delete_<?php echo $oehbeitrag->oehbeitrag_id ?>">L&ouml;schen</button></td>
-							</tr>
-							<?php endforeach; ?>
 						</tbody>
 					</table>
 				</div>

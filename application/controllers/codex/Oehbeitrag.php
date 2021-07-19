@@ -11,6 +11,7 @@ class Oehbeitrag extends Auth_Controller
         parent::__construct(
 			array(
 				'index' => 'admin:r',// TODO which Berechtigung?
+				'getOehbeitraege' => 'admin:r',
 				'getValidStudiensemester' => 'admin:r',
 				'addOehbeitrag' => 'admin:rw',
 				'updateOehbeitrag' => 'admin:rw',
@@ -39,6 +40,9 @@ class Oehbeitrag extends Auth_Controller
 		$this->load->view("codex/oehbeitrag.php", array('oehbeitraege' => $oehbeitraege));
 	}
 
+	/**
+	 * Gets all valid, i.e. unassigned, Studiensemester.
+	 */
 	public function getValidStudiensemester()
 	{
 		$oehbeitrag_id = $this->input->get('oehbeitrag_id');
@@ -59,6 +63,17 @@ class Oehbeitrag extends Auth_Controller
 		$this->outputJsonSuccess($studiensemester);
 	}
 
+	/**
+	 * Gets all Öhbeiträge. Wrapper function for output as JSON.
+	 */
+	public function getOehbeitraege()
+	{
+		$this->outputJson($this->_loadOehbeitraege());
+	}
+
+	/**
+	 * Adds an Öhbeitrag. Checks for errors beforehand.
+	 */
 	public function addOehbeitrag()
 	{
 		$studierendenbeitrag = $this->input->post('studierendenbeitrag');
@@ -92,6 +107,9 @@ class Oehbeitrag extends Auth_Controller
 		}
 	}
 
+	/**
+	 * Updates an Öhbeitrag. Checks for errors beforehand.
+	 */
 	public function updateOehbeitrag()
 	{
 		$oehbeitrag_id = $this->input->post("oehbeitrag_id");
@@ -126,10 +144,14 @@ class Oehbeitrag extends Auth_Controller
 
 				$vonBisStudiensemester = getData($vonBisStudiensemesterRes);
 
-				$von_studiensemester_kurzbz = $idx == 'von_studiensemester_kurzbz' ? $value : $vonBisStudiensemester[0]->von_studiensemester_kurzbz;
+				$von_studiensemester_kurzbz = isset($data['von_studiensemester_kurzbz'])
+												? $data['von_studiensemester_kurzbz']
+												: $vonBisStudiensemester[0]->von_studiensemester_kurzbz;
 
-				if ($idx == 'bis_studiensemester_kurzbz')
-					$bis_studiensemester_kurzbz = $data[$idx] = $value == 'null' ? null : $value;
+				if (isset($data['bis_studiensemester_kurzbz']))
+				{
+					$bis_studiensemester_kurzbz = $data['bis_studiensemester_kurzbz'] = $data['bis_studiensemester_kurzbz'] == 'null' ? null : $data['bis_studiensemester_kurzbz'];
+				}
 				else
 					$bis_studiensemester_kurzbz = $vonBisStudiensemester[0]->bis_studiensemester_kurzbz;
 
@@ -146,6 +168,9 @@ class Oehbeitrag extends Auth_Controller
 		$this->outputJson($this->OehbeitragModel->update($oehbeitrag_id, $data));
 	}
 
+	/**
+	 * Deletes an Öhbeitrag.
+	 */
 	public function deleteOehbeitrag()
 	{
 		$oehbeitrag_id = $this->input->post("oehbeitrag_id");
@@ -153,6 +178,10 @@ class Oehbeitrag extends Auth_Controller
 		$this->outputJson($this->OehbeitragModel->delete($oehbeitrag_id));
 	}
 
+	/**
+	 * Loads all Öhbeiträge sorted by date descending.
+	 * @return object
+	 */
 	private function _loadOehbeitraege()
 	{
 		$this->OehbeitragModel->addSelect('oehbeitrag_id, von_studiensemester_kurzbz, bis_studiensemester_kurzbz, studierendenbeitrag, versicherung, sem_von.start as von_datum, sem_bis.ende as bis_datum');
@@ -162,11 +191,25 @@ class Oehbeitrag extends Auth_Controller
 		return $this->OehbeitragModel->load();
 	}
 
+	/**
+	 * Checks if an amount is numeric and not too big.
+	 * @param $amount
+	 * @return bool true if valid amount, false otherwise
+	 */
 	private function _checkAmount($amount)
 	{
 		return is_numeric($amount) && (float) $amount <= 99999.99;
 	}
 
+	/**
+	 * Checks if a certain Von-Studiensemester is valid together with a Bis-Studiensemester.
+	 * Checks for correct format, Von-Studiensemester cannot be after the Bis-Studiensemester,
+	 * checks that semester are not overlapping with semester for existent Öhbeiträge.
+	 * @param string $von_studiensemester_kurzbz
+	 * @param string $bis_studiensemester_kurzbz
+	 * @param int $oehbeitrag_id öhbeitrag to ignore, i.e. which is assignable (id of Öhbeitrag of the passed semesters)
+	 * @return object array with true if assignable, with false if not
+	 */
 	private function _checkVonBisStudiensemester($von_studiensemester_kurzbz, $bis_studiensemester_kurzbz, $oehbeitrag_id = null)
 	{
 		$regex = "/^(WS|SS)\d{4}$/";
