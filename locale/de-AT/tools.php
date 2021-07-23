@@ -5,7 +5,7 @@ $this->phrasen['tools/dokumente']='Dokumente';
 $this->phrasen['tools/dokument']='Dokument';
 $this->phrasen['tools/erstelldatum']='Erstelldatum';
 $this->phrasen['tools/bestaetigungenZeugnisse']='Bestätigungen/Zeugnisse';
-$this->phrasen['tools/inskriptionsbestaetigung']='Inskriptionsbestätigung';
+$this->phrasen['tools/inskriptionsbestaetigung']='Studienbestätigung';
 $this->phrasen['tools/studienbeitragFuerSSBezahlt']='Studienbeitrag für das %1$s bezahlt';
 $this->phrasen['tools/studienbeitragFuerSSNochNichtBezahlt']='Studienbeitrag für das %1$s noch nicht bezahlt';
 $this->phrasen['tools/studienerfolgsbestaetigung']='Studienerfolgsbestätigung';
@@ -40,7 +40,7 @@ $this->phrasen['tools/zahlungsbestaetigung']='Zahlungsbestätigung';
 $this->phrasen['tools/bestaetigungDrucken']='Bestaetigung drucken';
 $this->phrasen['tools/offen']='offen';
 $this->phrasen['tools/keineZahlungenVorhanden']='Derzeit sind keine Zahlungen vorhanden';
-$this->phrasen['tools/zahlungenHinweis']='Bitte beachten Sie, dass es bis zu 3 Werktage dauern kann bis der Zahlungseingang hier aufscheint.';
+$this->phrasen['tools/zahlungenHinweis']='Bitte beachten Sie, dass es bis zu 5 Werktage dauern kann bis der Zahlungseingang hier aufscheint.';
 
 //Ampeln
 $this->phrasen['tools/ampelsystem']='Ampelsystem';

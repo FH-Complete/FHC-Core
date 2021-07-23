@@ -389,6 +389,7 @@ foreach($prestudent_arr as $prest_id)
 					$studienplan->loadStudienplan($prestudent_orgform->studienplan_id);
 
 					echo "\t\t<studienplan_sprache>".$studienplan->sprache."</studienplan_sprache>\n";
+					echo "\t\t<studienplan_regelstudiendauer>".$studienplan->regelstudiendauer."</studienplan_regelstudiendauer>\n";
 
 					// check ob Quereinsteiger
 					$ausbildungssemester = ($prestudent_orgform->ausbildungssemester!='')?$prestudent_orgform->ausbildungssemester:'1';

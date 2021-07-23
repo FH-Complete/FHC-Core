@@ -426,7 +426,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Aktuelles Studiensemester</text:p>
+                        <xsl:choose>
+                            <xsl:when test = "abbrecher='true'">
+                                <text:p text:style-name="P4">Abgemeldet im Studiensemester</text:p>
+                            </xsl:when>
+
+                            <xsl:otherwise>
+                                <text:p text:style-name="P4">Aktuelles Studiensemester</text:p>
+                            </xsl:otherwise>
+
+                        </xsl:choose>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -435,7 +444,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Aktuelles Ausbildungssemester</text:p>
+                        <xsl:choose>
+                            <xsl:when test = "abbrecher='true'">
+                                <text:p text:style-name="P4">Abgemeldet im Ausbildungssemester</text:p>
+                            </xsl:when>
+
+                            <xsl:otherwise>
+                                <text:p text:style-name="P4">Aktuelles Ausbildungssemester</text:p>
+                            </xsl:otherwise>
+
+                        </xsl:choose>
+
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -451,6 +470,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                             <text:span text:style-name="T4"><xsl:value-of select="studierendenstatus_aktuell"/></text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
+
+            <xsl:if test="abbrecher='false'">
+
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P4">Voraussichtlich letztes Studiensemester</text:p>
@@ -460,9 +482,20 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                             <text:span text:style-name="T4"><xsl:value-of select="voraussichtlichLetztesStudiensemester"/></text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
+            </xsl:if>
+
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Voraussichtliches Abschlussdatum</text:p>
+                        <xsl:choose>
+                            <xsl:when test="abbrecher='true'">
+                                <text:p text:style-name="P4">Abgemeldet am</text:p>
+                            </xsl:when>
+
+                            <xsl:otherwise>
+                                <text:p text:style-name="P4">Voraussichtliches Abschlussdatum</text:p>
+                            </xsl:otherwise>
+
+                        </xsl:choose>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P15"><xsl:value-of select="voraussichtlichLetztesStudiensemester_datum"/></text:p>
