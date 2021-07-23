@@ -12,10 +12,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *
+ * Authors:
+ * Christian Paminger <christian.paminger@technikum-wien.at>,
  * Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  * Rudolf Hangl < rudolf.hangl@technikum-wien.at >
  * Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at >
+ * Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once ('../../../../config/cis.config.inc.php');
 require_once ('../../../../config/global.config.inc.php');
@@ -306,6 +309,8 @@ foreach ($noten_obj->result as $row)
 	{
 		if(typeof(typ)=='undefined')
 			typ = 'Termin2';
+			var nn = document.getElementById(uid+"_nn").innerHTML;
+			var vn = document.getElementById(uid+"_vn").innerHTML;
 			var str = " <form name='nachpruefung_form'>	<table style='width: 95%'>";
 			str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 
@@ -314,7 +319,7 @@ foreach ($noten_obj->result as $row)
 			anlegendiv.style.top = y+"px";
 			var x =	getOffset('x'); x = x+300;
 			anlegendiv.style.left = x+"px";
-			str += "<tr><td colspan='2'><b><?php echo $p->t('benotungstool/pruefungAnlegenFuer');?> "+uid+":</b></td></tr>";
+			str += "<tr><td colspan='2'><b><?php echo $p->t('benotungstool/pruefungAnlegenFuer');?> "+nn+" "+vn+":</b></td></tr>";
 			str += "<tr><td><?php echo $p->t('global/datum');?>:</td>";
 			str += "<td><input type='hidden' name='uid' value='"+uid+"'>";
 			str += "<input type='hidden' name='le_id' value='"+lehreinheit_id+"'>";
@@ -1166,8 +1171,8 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		$htmlstring .= '<tr class="liste' . ($i % 2) . '">
 			<td><a href="mailto:' . $uid . '@' . DOMAIN . '"><img src="../../../../skin/images/button_mail.gif"></a></td>
 			<td>' . $db->convert_html_chars($uid) . '</td>
-			<td>' . $db->convert_html_chars($data['nachname']) . '</td>
-			<td>' . $db->convert_html_chars($data['vorname']) . '</td>';
+			<td id= '. $uid. "_nn". '>' . $db->convert_html_chars($data['nachname']) . '</td>
+			<td id= '. $uid. "_vn". '>' . $db->convert_html_chars($data['vorname']) . '</td>';
 
 		// Bereits eingetragene Note ermitteln
 		if ($lvgesamtnote = new lvgesamtnote($lvid, $uid, $stsem))
