@@ -524,12 +524,13 @@ class bisverwendung extends basis_db
 	{
 		//laden des Datensatzes
 		$qry = "SELECT
-					*
+					*, tbl_hauptberuf.bezeichnung as hauptberuf
 				FROM
 					bis.tbl_bisverwendung
+					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode)
 				WHERE
 					mitarbeiter_uid=".$this->db_add_param($uid)."
-				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
+				ORDER BY ende DESC NULLS FIRST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
@@ -543,6 +544,7 @@ class bisverwendung extends basis_db
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
 				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$this->hauptberuf = $row->hauptberuf;
 				$this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
@@ -582,7 +584,7 @@ class bisverwendung extends basis_db
 					(beginn<=now() OR beginn IS NULL)
 				AND
 					(ende>=now() OR ende IS NULL)
-				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
+				ORDER BY ende DESC NULLS FIRST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
