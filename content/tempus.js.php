@@ -473,7 +473,7 @@ function SyncLVPlan()
 // ****
 function OpenManualTempus()
 {
-	window.open('https://wiki.fhcomplete.org/doku.php?id=tempus:allgemeines','Manual');
+	window.open('https://wiki.fhcomplete.info/doku.php?id=tempus:allgemeines','Manual');
 }
 
 // ****

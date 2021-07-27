@@ -171,6 +171,7 @@ $berechtigungen = array(
 	array('mitarbeiter/stammdaten','Stammdaten der Mitarbeiter'),
 	array('mitarbeiter/urlaube','Mit diesem Recht werden im CIS die Urlaube von allen Mitarbeiter sichtbar'),
 	array('mitarbeiter/zeitsperre','Zeitsperren- und Urlaubsverwaltung'),
+	array('mitarbeiter/zeitwuensche','Berechtigung um Zeitwünsche zu editieren'),
 	array('news','News eintragen'),
 	array('planner','Planner Verwaltung'),
 	array('preinteressent','Verwaltung der Preinteressenten'),
