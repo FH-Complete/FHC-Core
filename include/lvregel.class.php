@@ -596,9 +596,16 @@ class lvregel extends basis_db
 				
 					// Ausbildungssemester aus dem Status holen
 					$prestudent = new prestudent();
+					$studiensemester = new studiensemester();
+					$prev_studiensemester_kurzbz = $studiensemester->getPrevious();
+
 					if($prestudent->getLastStatus($student->prestudent_id, $studiensemester_kurzbz))
 					{
 						$this->cache[$uid][$studiensemester_kurzbz]=$prestudent->ausbildungssemester;
+					}
+					else if($prestudent->getLastStatus($student->prestudent_id, $prev_studiensemester_kurzbz))
+					{
+						$this->cache[$uid][$studiensemester_kurzbz]=$prestudent->ausbildungssemester + 1;
 					}
 				}
 				$ausbildungssemester = $this->cache[$uid][$studiensemester_kurzbz];

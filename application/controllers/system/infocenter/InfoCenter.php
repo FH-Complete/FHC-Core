@@ -70,6 +70,7 @@ class InfoCenter extends Auth_Controller
 	const INTERESSENTSTATUS = 'Interessent';
 	const ABGEWIESENERSTATUS = 'Abgewiesener';
 	const BEWERBERSTATUS = 'Bewerber';
+	const WARTENDER = 'Wartender';
 
 	// Statusgruende for which no Studiengangsfreigabemessage should be sent
 	private $_statusgruendeNoStgFreigabeMessage = array('FIT Programm', 'FIT program', 'FIT programme');
@@ -108,7 +109,9 @@ class InfoCenter extends Auth_Controller
 				'setOnHold' => 'infocenter:rw',
 				'removeOnHold' => 'infocenter:rw',
 				'getStudienjahrEnd' => 'infocenter:r',
-				'setNavigationMenuArrayJson' => 'infocenter:r'
+				'setNavigationMenuArrayJson' => 'infocenter:r',
+				'getAbsageData' => 'infocenter:r',
+				'saveAbsageForAll' => 'infocenter:rw'
 			)
 		);
 
@@ -433,11 +436,14 @@ class InfoCenter extends Auth_Controller
 	 * Saves Absage for Prestudent including the reason for the Absage (statusgrund).
 	 * inserts Studiensemester and Ausbildungssemester for the new Absage of (chronologically) last status.
 	 */
-	public function saveAbsage()
+	public function saveAbsage($prestudent_id = null, $statusgrund = null)
 	{
 		$json = null;
-		$prestudent_id = $this->input->post('prestudent_id');
-		$statusgrund = $this->input->post('statusgrund');
+		if (is_null($prestudent_id))
+			$prestudent_id = $this->input->post('prestudent_id');
+
+		if (is_null($statusgrund))
+			$statusgrund = $this->input->post('statusgrund');
 
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
@@ -446,8 +452,10 @@ class InfoCenter extends Auth_Controller
 
 		if (hasData($lastStatus) && hasData($statusgrresult))
 		{
-			//check if still Interessent and not freigegeben yet
-			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS && !isset($lastStatus->retval[0]->bestaetigtam))
+			//check if still Interessent
+			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS
+				|| $lastStatus->retval[0]->status_kurzbz === self::BEWERBERSTATUS
+				|| $lastStatus->retval[0]->status_kurzbz === self::WARTENDER)
 			{
 				$result = $this->PrestudentstatusModel->insert(
 					array(
@@ -1358,6 +1366,8 @@ class InfoCenter extends Auth_Controller
 				|| isset($zgvpruefung->prestudentstatus->bestaetigtam)
 				|| $zgvpruefung->prestudentstatus->status_kurzbz != self::INTERESSENTSTATUS;
 
+			$zgvpruefung->abgewiesener = $zgvpruefung->prestudentstatus->status_kurzbz === self::ABGEWIESENERSTATUS;
+
 			//wether prestudent was freigegeben for RT/Stg
 			$zgvpruefung->isRtFreigegeben = false;
 			$zgvpruefung->isStgFreigegeben = false;
@@ -1427,8 +1437,8 @@ class InfoCenter extends Auth_Controller
 
 		$this->_sortPrestudents($zgvpruefungen);
 
-		$abwstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => self::ABGEWIESENERSTATUS))->retval;
-		$intstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => self::INTERESSENTSTATUS))->retval;
+		$abwstatusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
+		$intstatusgruende = $this->StatusgrundModel->getStatus(self::INTERESSENTSTATUS)->retval;
 
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
@@ -1686,5 +1696,46 @@ class InfoCenter extends Auth_Controller
 		{
 			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
 		}
+	}
+
+	public function getAbsageData()
+	{
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
+		$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
+		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+		$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(['b', 'm'], $studienSemester);
+
+		$data = array (
+			'statusgruende' => $statusgruende,
+			'studiengaenge' => $studiengaenge->retval
+		);
+
+		$this->outputJsonSuccess($data);
+	}
+
+	public function saveAbsageForAll()
+	{
+		$statusgrund = $this->input->post('statusgrund');
+		$studiengang = $this->input->post('studiengang');
+		$personen = $this->input->post('personen');
+		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+
+		if ($statusgrund === 'null' || $studiengang === 'null' || empty($personen))
+			$this->terminateWithJsonError("Bitte Statusgrund, Studiengang und Personen auswählen.");
+
+		foreach($personen as $person)
+		{
+			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester);
+
+			if(!hasData($prestudent))
+				continue;
+
+			$prestudentData = getData($prestudent);
+
+			$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+		}
+
+		$this->outputJsonSuccess("Success");
 	}
 }

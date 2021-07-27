@@ -34,7 +34,12 @@ $datum = date('Y-m-d',$timestamp);
 $endetimestamp = jump_week($timestamp,$showweeks);
 $endedatum = date('Y-m-d',$endetimestamp);
 
-if(isset($_GET['projekt_kurzbz']) && $_GET['projekt_kurzbz']!='')
+if(isset($_GET['empty']))
+{
+	echo '<br><br><br>';
+	exit;
+}
+elseif(isset($_GET['projekt_kurzbz']) && $_GET['projekt_kurzbz']!='')
 {
 	$projekt_kurzbz=$_GET['projekt_kurzbz'];
 }
@@ -60,9 +65,10 @@ else
 	$anzahl_warnung = 6;
 }
 
-
 foreach($ressource->result as $row)
+{
 	$ressource_arr[]=$row->bezeichnung;
+}
 
 $ressource_arr = array_unique($ressource_arr);
 
@@ -117,7 +123,7 @@ foreach($ressource_arr as $bezeichnung)
 			$beistrich=false;
 			$start = $datum_obj->mktime_fromdate($row->start);
 			$ende = $datum_obj->mktime_fromdate($row->ende);
-			if($row->bezeichnung == $bezeichnung 
+			if($row->bezeichnung == $bezeichnung
 				&& ($row->start=='' || $start<=$timestamp_kw)
 				&& ($row->ende=='' || $ende>=$timestamp_kw)
 				)
@@ -156,10 +162,10 @@ foreach($ressource_arr as $bezeichnung)
 				if($beistrich)
 					$title.=', ';
 			}
-			
+
 		}
 		$title = mb_substr($title,0,-1);
-		
+
 		$htmlrow.='<td title="'.$title.'" align="center">';
 		if($anzahl>=$anzahl_warnung)
 			$htmlrow.='<span class="warning">'.$anzahl.($typ!='projekt'?'/'.$aufwandssumme:'').'</span>';
@@ -173,6 +179,7 @@ foreach($ressource_arr as $bezeichnung)
 	ob_flush();
 }
 
+echo ' </table>';
 echo '
 	</body>
 </html>';

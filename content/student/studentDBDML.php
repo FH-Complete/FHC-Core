@@ -365,7 +365,6 @@ if(!$error)
 			$error = true;
 			$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 		}
-
 		//Studentendaten speichern
 		if(!$error)
 		{
@@ -377,7 +376,15 @@ if(!$error)
 				$errormsg = 'Fehler beim Laden:'.$student->errormsg;
 				$error = true;
 			}
+			$datum = new datum();
 
+			$gebdatum = $_POST['geburtsdatum'];
+			if($gebdatum!='' && !$datum->checkDatum($gebdatum))
+			{
+				$return = false;
+				$errormsg = 'Geburtsdatum ist nicht korrekt.';
+				$error = true;
+			}
 			if(!$error)
 			{
 				$student->uid = $_POST['uid'];
@@ -2296,8 +2303,12 @@ if(!$error)
 		{
 			$dokumente = explode(';',$_POST['dokumente']);
 			$errormsg = '';
+			$sonst = 0;
 			foreach ($dokumente as $dokument_kurzbz)
 			{
+				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
+					continue;
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2308,6 +2319,8 @@ if(!$error)
 					$dok->insertamum = date('Y-m-d H:i:s');
 					$dok->insertvon = $user;
 					$dok->new = true;
+					if ($dokument_kurzbz === 'Sonst')
+						$sonst++;
 
 					if(!$dok->save())
 					{
@@ -2501,8 +2514,13 @@ if(!$error)
 		{
 			$dokumente = explode(';',$_POST['dokumente']);
 			$errormsg = '';
+			$sonst = 0;
+
 			foreach ($dokumente as $dokument_kurzbz)
 			{
+				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
+					continue;
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2513,6 +2531,11 @@ if(!$error)
 							if(!$dok->delete($dokument_kurzbz, $_POST['prestudent_id']))
 							{
 								$errormsg .= "Fehler bei $dokument_kurzbz: $dok->errormsg\n";
+							}
+							else
+							{
+								if ($dokument_kurzbz === 'Sonst')
+									$sonst++;
 							}
 						}
 						else
