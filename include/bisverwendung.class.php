@@ -817,16 +817,22 @@ class bisverwendung extends basis_db
 		}
 	}
 
-	public function inZeitaufzeichnungspflichtigPeriod($date)
+	public function inZeitaufzeichnungspflichtigPeriod($PeriodStartDate, $PeriodEndDate)
 	{
-		$dateToCheck = date('Y-m-d', strtotime($date));
+		$PeriodStartDateISO = date('Y-m-d', strtotime($PeriodStartDate));
+		$PeriodEndDateISO = date('Y-m-d', strtotime($PeriodEndDate));
+
 		$beginn = date('Y-m-d', strtotime($this->beginn));
 		$end = date('Y-m-d', strtotime($this->ende));
 		$zp = $this->zeitaufzeichnungspflichtig;
 
 		if ($zp)
 		{
-			if (($dateToCheck >= $beginn) && (($dateToCheck <= $end) OR is_null($this->ende)))
+			if (
+				(($PeriodStartDateISO >= $beginn) && (($PeriodStartDateISO <= $end) || is_null($this->ende)))
+				||
+				(($PeriodEndDateISO >= $beginn) && (($PeriodEndDateISO <= $end) || is_null($this->ende)))
+			)
 			{
 				return true;
 			}
