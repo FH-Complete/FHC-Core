@@ -259,16 +259,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			]]>
 			</body>
 		</method>
-            <method name="DeleteRessource">
+        <method name="DeleteRessource">
             <parameter name="ressource_id"/>
-			<body>
+		    <body>
 			<![CDATA[
 				//debug('Refresh Notiz');
                 netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
                 try
                 {
+                    var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-ressource-projekt_ressource_id'));
+                    var projekt_ressource_id =  tree.view.getCellText(tree.currentIndex, col);
                     var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
                     var projektphase_id = this.getAttribute('projektphase_id');
+                    //var projekt_ressource_id = this.getAttribute('projekt_ressource_id');
 
                     var soapBody = new SOAPObject("deleteProjektRessource");
                     //soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -286,6 +289,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
                         projektRessource.appendChild(new SOAPObject("projekt_kurzbz")).val('');
                     }
                     projektRessource.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
+                    projektRessource.appendChild(new SOAPObject("projekt_ressource_id")).val(projekt_ressource_id);
                     soapBody.appendChild(projektRessource);
 
                     var sr = new SOAPRequest("deleteProjektRessource",soapBody);

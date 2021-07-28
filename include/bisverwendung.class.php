@@ -179,6 +179,24 @@ class bisverwendung extends basis_db
 		}
 	}
 
+
+	/**
+	 * Prueft das Datum
+	 * @param $date = string
+	 * @return true wenn ok, sonst false
+	 */
+	static public function verifyDate($date, $strict = true)
+	{
+		$dateTime = DateTime::createFromFormat('Y-m-d', $date);
+		if ($strict) {
+			$errors = DateTime::getLastErrors();
+			if (!empty($errors['warning_count'])) {
+				return false;
+			}
+		}
+		return $dateTime !== false;
+	}
+
 	/**
 	 * Prueft die Daten vor dem Speichern
 	 *
@@ -191,6 +209,17 @@ class bisverwendung extends basis_db
 			$this->errormsg = 'Vertragsstunden sind ungueltig';
 			return false;
 		}
+		elseif(!$this->verifyDate($this->beginn) && !empty($this->beginn))
+		{
+			$this->errormsg = 'Start Datum ist kein Valides Datum: '.$this->beginn;
+			return false;
+		}
+		elseif(!$this->verifyDate($this->ende) && !empty($this->ende))
+		{
+			$this->errormsg = 'End Datum ist kein Valides Datum: '.$this->ende;
+			return false;
+		}
+
 		return true;
 	}
 
@@ -509,12 +538,13 @@ class bisverwendung extends basis_db
 	{
 		//laden des Datensatzes
 		$qry = "SELECT
-					*
+					*, tbl_hauptberuf.bezeichnung as hauptberuf
 				FROM
 					bis.tbl_bisverwendung
+					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode)
 				WHERE
 					mitarbeiter_uid=".$this->db_add_param($uid)."
-				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
+				ORDER BY ende DESC NULLS FIRST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
@@ -528,6 +558,7 @@ class bisverwendung extends basis_db
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
 				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$this->hauptberuf = $row->hauptberuf;
 				$this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
@@ -568,7 +599,7 @@ class bisverwendung extends basis_db
 					(beginn<=now() OR beginn IS NULL)
 				AND
 					(ende>=now() OR ende IS NULL)
-				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
+				ORDER BY ende DESC NULLS FIRST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
