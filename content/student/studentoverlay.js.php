@@ -1034,13 +1034,11 @@ function StudentAuswahl()
 	StudentGesamtNotenTreeloaded=false;
 
 	stsem = getStudiensemester();
-	//var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
+	
 	var url = buildStudentRDFURI({
 	  'prestudent_id': prestudent_id,
 	  'studiensemester_kurzbz': stsem
 	});
-	
-	console.log(url);
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 			getService(Components.interfaces.nsIRDFService);
@@ -2576,7 +2574,6 @@ function StudentKontoFilter()
 function buildStudentRDFURI(queryparams, tree) 
 {
   var baseurl = "<?php echo APP_ROOT; ?>rdf/student.rdf.php";
-  console.log(JSON.stringify(tree));
   if ( typeof tree !== "undefined" ) 
   {
     var col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
@@ -2714,7 +2711,7 @@ function StudentKontoFilterBuchungstyp()
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	//url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=buchungstyp;"+filter+"&"+gettimestamp();
+
 	var url = buildStudentRDFURI({
 	  'studiengang_kz': stg_kz,
 	  'semester': sem,
@@ -2725,8 +2722,6 @@ function StudentKontoFilterBuchungstyp()
 	  'typ': typ,
 	  'filter2': 'buchungstyp;' + filter
 	}, tree);
-	
-	console.log(url);
 	
 	var treeStudent=document.getElementById('student-tree');
 
@@ -5508,12 +5503,9 @@ function StudentSuche()
 		document.getElementById('tree-verband').view.selection.clearSelection();
 
 		//Datasource setzten und Felder deaktivieren
-		//url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
 		var url = buildStudentRDFURI({
 		  'filter': filter
 		});
-
-		console.log(url);
 	
 		var treeStudent=document.getElementById('student-tree');
 
