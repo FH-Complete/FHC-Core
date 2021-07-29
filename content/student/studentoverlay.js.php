@@ -1034,7 +1034,13 @@ function StudentAuswahl()
 	StudentGesamtNotenTreeloaded=false;
 
 	stsem = getStudiensemester();
-	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
+	//var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
+	var url = buildStudentRDFURI({
+	  'prestudent_id': prestudent_id,
+	  'studiensemester_kurzbz': stsem
+	});
+	
+	console.log(url);
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 			getService(Components.interfaces.nsIRDFService);
@@ -2565,10 +2571,48 @@ function StudentKontoFilter()
 }
 
 // ****
+// * Generiert eine student.rdf URI
+// ****
+function buildStudentRDFURI(queryparams, tree) 
+{
+  var baseurl = "<?php echo APP_ROOT; ?>rdf/student.rdf.php";
+  console.log(JSON.stringify(tree));
+  if ( typeof tree !== "undefined" ) 
+  {
+    var col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
+    queryparams.orgform = tree.view.getCellText(tree.currentIndex,col);
+  }
+  return _buildURI(baseurl, queryparams);
+}
+
+// ****
+// * Generiert aus einer BasisURL und einem Dictionary von Parametern eine URI
+// ****
+function _buildURI(baseurl, queryparams) 
+{
+    var str = [];
+    var url = baseurl;
+    for (var p in queryparams) 
+    {
+      if ( queryparams.hasOwnProperty(p) && queryparams[p].length > 0 ) 
+      {
+	str.push(encodeURIComponent(p) + "=" + encodeURIComponent(queryparams[p]));
+      }
+    }
+    var querystring = str.join("&");
+    if ( querystring.length > 0 ) 
+    {
+      url = url + '?' + querystring + '&' + gettimestamp();
+    }
+    return url;
+}
+
+// ****
 // * Setzt im Studententree einen vordefinierten Filter
 // ****
 function StudentKontoFilterStudenten(filter)
 {
+	//alert(filter);
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-verband');
 
@@ -2591,12 +2635,26 @@ function StudentKontoFilterStudenten(filter)
 	var gruppe = getTreeCellText(tree, 'gruppe', tree.currentIndex);
 	var typ = getTreeCellText(tree, 'typ', tree.currentIndex);
 	var stsem = getTreeCellText(tree, 'stsem', tree.currentIndex);
-
+	
 	if(stsem=='')
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&buchungstyp="+buchungstyp+"&"+gettimestamp();
+	      
+	var url = buildStudentRDFURI({
+	  'studiengang_kz': stg_kz,
+	  'semester': sem,
+	  'verband': ver,
+	  'gruppe': grp,
+	  'gruppe_kurzbz': gruppe,
+	  'studiensemester_kurzbz': stsem,
+	  'typ': typ,
+	  'filter2': filter,
+	  'buchungstyp': buchungstyp
+	}, tree);
+	
+	console.log(url);
+	
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -2614,6 +2672,7 @@ function StudentKontoFilterStudenten(filter)
 		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
 	}
 
+	//alert(url);
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentTreeDatasource = rdfService.GetDataSource(url);
 	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -2655,7 +2714,20 @@ function StudentKontoFilterBuchungstyp()
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=buchungstyp;"+filter+"&"+gettimestamp();
+	//url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=buchungstyp;"+filter+"&"+gettimestamp();
+	var url = buildStudentRDFURI({
+	  'studiengang_kz': stg_kz,
+	  'semester': sem,
+	  'verband': ver,
+	  'gruppe': grp,
+	  'gruppe_kurzbz': gruppe,
+	  'studiensemester_kurzbz': stsem,
+	  'typ': typ,
+	  'filter2': 'buchungstyp;' + filter
+	}, tree);
+	
+	console.log(url);
+	
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -5436,8 +5508,13 @@ function StudentSuche()
 		document.getElementById('tree-verband').view.selection.clearSelection();
 
 		//Datasource setzten und Felder deaktivieren
-		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
+		//url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
+		var url = buildStudentRDFURI({
+		  'filter': filter
+		});
 
+		console.log(url);
+	
 		var treeStudent=document.getElementById('student-tree');
 
 		try
