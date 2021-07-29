@@ -4465,6 +4465,21 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// ADD COLUMN azgrelevant in bis.tbl_bisverwendung
+if(!$result = @$db->db_query("SELECT azgrelevant FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE bis.tbl_bisverwendung ADD COLUMN azgrelevant boolean;
+		UPDATE bis.tbl_bisverwendung SET azgrelevant = zeitaufzeichnungspflichtig;
+		UPDATE bis.tbl_bisverwendung SET zeitaufzeichnungspflichtig = true WHERE ba1code=103 AND beschausmasscode!=5;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_bisverwendung Spalte azgrelevant hinzugefügt.';
+}
+
 // Add new funktion type kstzuordnung for cost center assignment in public.tbl_funktion
 if ($result = @$db->db_query("SELECT 1 FROM public.tbl_funktion WHERE funktion_kurzbz = 'kstzuordnung';"))
 {
@@ -4798,7 +4813,7 @@ $tabellen=array(
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id","ects_erworben","ects_angerechnet"),
 	"bis.tbl_bisio_zweck"  => array("bisio_id","zweck_code"),
-	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig"),
+	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
@@ -4887,10 +4902,8 @@ $tabellen=array(
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
-	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id", "dms_id", "studiensemester_kurzbz", "anmerkung_student", "empfehlung_anrechnung"),
-	"lehre.tbl_anrechnung_anrechnungstatus"  => array("anrechnungstatus_id", "anrechnung_id","status_kurzbz","datum", "insertamum","insertvon"),
+	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
-	"lehre.tbl_anrechnungstatus"  => array("status_kurzbz","bezeichnung_mehrsprachig"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
 	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old","gewicht"),
