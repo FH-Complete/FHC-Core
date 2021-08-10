@@ -4796,6 +4796,17 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruef
 	}
 }
 
+// Add column homeoffice to bis.tbl_bisverwendung
+if (!$result = @$db->db_query("SELECT homeoffice FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN homeoffice boolean NOT NULL DEFAULT FALSE";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_bisverwendung: Spalte homeoffice hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4813,7 +4824,7 @@ $tabellen=array(
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id","ects_erworben","ects_angerechnet"),
 	"bis.tbl_bisio_zweck"  => array("bisio_id","zweck_code"),
-	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant"),
+	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant", "homeoffice"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
