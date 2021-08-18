@@ -14,7 +14,7 @@ $query = '
            datum AS "storniert",
            (
                SELECT
-                    vorname || \' \' || nachname
+                    nachname || \' \' || vorname
                 FROM
                     public.tbl_person
                 JOIN public.tbl_benutzer benutzer USING (person_id)
