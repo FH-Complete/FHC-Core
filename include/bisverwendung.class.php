@@ -47,6 +47,7 @@ class bisverwendung extends basis_db
 	public $dv_art;
 	public $inkludierte_lehre;
 	public $zeitaufzeichnungspflichtig;
+	public $homeoffice;
 
 	public $ba1bez;
 	public $ba2bez;
@@ -122,6 +123,7 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$this->homeoffice = $this->db_parse_bool($row->homeoffice);
 				return true;
 			}
 			else
@@ -359,6 +361,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->homeoffice = $this->db_parse_bool($row->homeoffice);
 
 				$this->result[] = $obj;
 			}
@@ -416,6 +419,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->homeoffice = $this->db_parse_bool($row->homeoffice);
 
 				$this->result[] = $obj;
 			}
@@ -474,6 +478,8 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->homeoffice = $this->db_parse_bool($row->homeoffice);
+
 
 				$this->result[] = $obj;
 			}
@@ -493,7 +499,7 @@ class bisverwendung extends basis_db
 	 */
 	public function getLastVerwendung($uid)
 	{
-		//laden des Datensatzes
+		//laden des Datensatzes18.08.2021
 		$qry = "SELECT
 					*
 				FROM
@@ -577,6 +583,7 @@ class bisverwendung extends basis_db
 				$this->vertragsstunden = $row->vertragsstunden;
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
+				$this->homeoffice = $this->db_parse_bool($row->homeoffice);
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 			}
 			return true;

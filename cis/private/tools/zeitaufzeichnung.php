@@ -1545,17 +1545,38 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			</td>
 		</tr>
 		';
+
 		//Homeoffice Checkbox
-		echo '
-		<tr>
-			<td>&nbsp;</td>
-			<td colspan="1">
-				<span id="homeofficeBlock">
-					<input type="checkbox" name="homeoffice" id="homeoffice" '. $homeofficeChecked . '>Homeoffice</input>
-				</span>
-			</td>
-		</tr>
-		';
+		$verwendung = new bisverwendung();
+		$verwendung->getLastAktVerwendung($user);
+		$bvId = $verwendung->bisverwendung_id;
+
+		if ($verwendung->homeoffice)
+			{
+			$bvHo = "erlaubt";
+			echo '
+			<tr>
+				<td>&nbsp;</td>
+				<td colspan="1">
+					<span id="homeofficeBlock">
+						<input type="checkbox" name="homeoffice" id="homeoffice" '. $homeofficeChecked . '>Homeoffice</input>
+					</span>
+				</td>
+				<td>Homeoffice: ' . $bvHo . '</td>
+				<td>bisId: ' . $bvId . '</td>
+
+			</tr>
+			';
+			}
+
+		else
+		{
+			echo "<h2 class='text-warning'>Homeoffice nicht erlaubt</h2>";
+			echo "<td>BisId:  $bvId </td>";
+		}
+
+
+
 		//Beschreibung
 		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea style="font-size: 13px" name="beschreibung" cols="60" maxlength="256">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
 		echo '<tr><td></td><td></td><td></td><td align="right">';
