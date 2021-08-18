@@ -4797,6 +4797,20 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 }
 
 
+// INSERT,DELETE,UPDATE Berechtigung für tbl_dokumentprestudent hinzufügen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_dokumentprestudent' AND table_schema='public' AND grantee='web' AND privilege_type in ('INSERT','DELETE','UPDATE')"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT INSERT, DELETE, UPDATE ON public.tbl_dokumentprestudent TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>dokumentprestudent Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to public.tbl_dokumentprestudent';
+	}
+}
+
 // Add table zgvpruefungstatus
 if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus LIMIT 1;"))
 {
