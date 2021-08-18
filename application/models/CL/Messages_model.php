@@ -612,9 +612,9 @@ class Messages_model extends CI_Model
 		if (!isEmptyString($vorlage_kurzbz))
 		{
 			$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
-			$this->VorlagestudiengangModel->addOrder('version','DESC');
+			$this->VorlagestudiengangModel->addOrder('version', 'DESC');
 
-			$getVorlage = $this->VorlagestudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
+			$getVorlage = $this->VorlagestudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz, 'aktiv' => true));
 		}
 
 		return $getVorlage;

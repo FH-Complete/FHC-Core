@@ -19,7 +19,7 @@
  */
 /**
  * Dieses File enthaelt Hilfsklassen zur Anzeige des CMS-Menues
- * 
+ *
  * mit drawSubmenu($id) wird das enstprechende Menue gezeichnet.
  */
 require_once(dirname(__FILE__).'/../include/functions.inc.php');
@@ -30,13 +30,14 @@ $params = array();
 foreach($_REQUEST as $key=>$value)
 	$params[$key]=$value;
 
+$user = null;
 //Parameter fuer Include Addons
 $includeparams = array();
 $contentobjects=array();
 $chldsobject = array();
 /**
  * Zeichnet einen Menueeintrag aus dem CMS System
- * 
+ *
  * @param $content_id
  */
 function drawSubmenu($content_id)
@@ -47,16 +48,16 @@ function drawSubmenu($content_id)
 	global $contentobjects;
 	$content = new content();
 	$sprache = getSprache();
-	
+
 	// Daten Laden
-	
+
 	// Alle Kindelemente des Contents holen
 	$ids = $content->getAllChilds($content_id);
 
-	// Alle vorkommenden Contenteintraege laden 
+	// Alle vorkommenden Contenteintraege laden
 	$content->loadArray($ids, $sprache, true);
 	$contentobjects = $content->result;
-	
+
 	// Baumstruktur laden
 	$childsobject = $content->getChildArray($content_id);
 
@@ -91,7 +92,7 @@ function drawSubmenu1($content_id)
 				drawEntry($contentobj);
 			}
 		}
-		
+
 
 	}
 }
@@ -101,12 +102,13 @@ function drawSubmenu1($content_id)
  */
 function drawEntry($item)
 {
-	global $childsobject;
+	global $childsobject, $user;
 
 	//pruefen ob der Content eine Berechtigung erfordert
 	if($item->locked)
 	{
-		$user = get_uid();
+		if(is_null($user))
+			$user = get_uid();
 		$content = new content();
 		//wenn der User nicht berechtigt ist, dann wird der Eintrag nicht angezeigt
 		if(!$content->berechtigt($item->content_id, $user))
@@ -139,7 +141,7 @@ function drawEntry($item)
 			Redirect($item);
 		else
 			DrawLink(APP_ROOT.'cms/content.php?content_id='.$item->content_id,'content',$item->titel);
-			
+
 		echo "</li>";
 	}
 }
@@ -155,7 +157,7 @@ function DrawLink($link, $target, $name, $content_id=null, $open=null)
 {
 	if($target=='')
 		$target='content';
-	
+
 	if($open)
 		$class='class="selected"';
 	else
@@ -167,7 +169,7 @@ function DrawLink($link, $target, $name, $content_id=null, $open=null)
  * Redirects sind Links Seiten ausserhalb des CMS
  * die URL kann Variablen enthalten. Diese werden hier ersetzt.
  * Danach wird der Link angezeigt.
- * 
+ *
  * @param $content_id ContentID des Redirects
  * @param $name Anzeigename des Links
  * @param $content_id_Submenu ID des Submenues das geoeffnet werden soll (optional)
@@ -175,42 +177,42 @@ function DrawLink($link, $target, $name, $content_id=null, $open=null)
 function Redirect($content, $content_id_Submenu=null)
 {
 	global $sprache, $params;
-		
+
 	$xml = new DOMDocument();
 	if($content->content!='')
 	{
 		$xml->loadXML($content->content);
 	}
-	
+
 	if($xml->getElementsByTagName('url')->item(0))
 		$url = $xml->getElementsByTagName('url')->item(0)->nodeValue;
 	else
 		$url='';
-		
+
 	//Variablen Ersetzen
 	foreach($params as $key=>$value)
 	{
 		$url = str_replace('$'.$key,addslashes($value),$url);
 	}
-	
+
 	if($xml->getElementsByTagName('target')->item(0))
 		$target = $xml->getElementsByTagName('target')->item(0)->nodeValue;
 	else
 		$target='';
-		
+
 	DrawLink($url, $target, $content->titel, $content_id_Submenu, $content->menu_open);
 }
 
 /**
- * Bei Content mit Include Templates wird 
+ * Bei Content mit Include Templates wird
  * das entsprechende Menu-Addon geladen und inkludiert
- * 
+ *
  * @param $content_id
  */
 function IncludeMenuAddon($content)
 {
 	global $sprache, $includeparams;
-	
+
 	$xml = new DOMDocument();
 	if($content->content!='')
 	{
@@ -223,6 +225,6 @@ function IncludeMenuAddon($content)
 	if($url!='')
 	{
 		$includeparams['content']=$content;
-		include(dirname(__FILE__).'/menu/'.$url);		
+		include(dirname(__FILE__).'/menu/'.$url);
 	}
 }

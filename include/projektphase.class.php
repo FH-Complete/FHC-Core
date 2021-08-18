@@ -37,10 +37,10 @@ class projektphase extends basis_db
 	public $bezeichnung;	    //string
 	public $typ='Projektphase';	    	//string
 	public $beschreibung;	    //string
-	public $start;		    //date 	
-	public $ende;		    //date 	
+	public $start;		    //date
+	public $ende;		    //date
 	public $personentage;	    //integer
-    public $farbe; 
+    public $farbe;
 	public $budget;	    	// numeric
 	public $ressource_id;	    // bigint
 	public $ressource_bezeichnung;	    // string
@@ -58,7 +58,7 @@ class projektphase extends basis_db
 	{
 		parent::__construct();
 
-		if($projektphase_id != null) 	
+		if($projektphase_id != null)
 			$this->load($projektphase_id);
 	}
 
@@ -74,11 +74,11 @@ class projektphase extends basis_db
 			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
-		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichnung 
+
+		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichnung
 				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
 				WHERE projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -102,20 +102,20 @@ class projektphase extends basis_db
 				$this->updatevon = $row->updatevon;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
 
-	
+
 	/**
 	 * Laedt die Projektphasen mit zu einem Projekt
 	 * @param  $projekt_kurzbz Projekt der zu ladenden Projektphasen
@@ -125,23 +125,23 @@ class projektphase extends basis_db
 	{
 		$this->result=array();
 		$qry = "Select * from fue.tbl_projektphase where projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz)." and projektphase_id not in (
-		WITH RECURSIVE tasks(projektphase_fk) as 
+		WITH RECURSIVE tasks(projektphase_fk) as
 		(
 			SELECT projektphase_id FROM fue.tbl_projektphase
 			WHERE projektphase_fk=".$this->db_add_param($projektphase_id, FHC_INTEGER)."
 			UNION ALL
-			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks 
+			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks
 			WHERE p.projektphase_fk=tasks.projektphase_fk
 		) SELECT *
 		FROM tasks) and projektphase_id not in (".$this->db_add_param($projektphase_id, FHC_INTEGER).")";
 		//echo "\n".$qry."\n";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new projektphase();
-				
+
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
 				$obj->projektphase_fk = $row->projektphase_fk;
@@ -158,25 +158,25 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				
+
 				$this->result[] = $obj;
 			}
 			//var_dump($this->result);
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Projektphasen zu einem Projekt
 	 * @param  $projekt_kurzbz Projekt der zu ladenden Projektphasen
 	 * @param  $foreignkey wenn ! gib nur die Erste Ebene der Projektphasen zurück
 	 * @return true wenn ok, false im Fehlerfall
-	 */ 
+	 */
 	public function getProjektphasen($projekt_kurzbz, $foreignkey = null)
 	{
 		$this->result=array();
@@ -184,18 +184,18 @@ class projektphase extends basis_db
 				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
 				WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 		//echo "\n".$qry."\n";
-		
+
 		if(!is_null($foreignkey))
 			$qry .= " and projektphase_fk is NULL";
-			
-		$qry .= " ORDER BY start, projektphase_fk DESC;";	
-		
+
+		$qry .= " ORDER BY start, projektphase_fk DESC;";
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new projektphase();
-				
+
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
 				$obj->projektphase_fk = $row->projektphase_fk;
@@ -213,36 +213,36 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				
+
 				$this->result[] = $obj;
 			}
 			//var_dump($this->result);
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-    
+
     /**
      * Lädt alle Unterphasen zu einem Projekt
      * @param type $phase_id
-     * @return boolean 
+     * @return boolean
      */
     public function getAllUnterphasen($phase_id)
     {
         $qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichung
 				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
-				WHERE projektphase_fk =".$this->db_add_param($phase_id, FHC_INTEGER); 
-        
+				WHERE projektphase_fk =".$this->db_add_param($phase_id, FHC_INTEGER);
+
         if($result = $this->db_query($qry))
         {
             while($row = $this->db_fetch_object())
             {
-                $obj = new projektphase(); 
-                
+                $obj = new projektphase();
+
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
 				$obj->projektphase_fk = $row->projektphase_fk;
@@ -260,15 +260,15 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				
+
 				$this->result[] = $obj;
             }
-            return true; 
+            return true;
         }
         else
         {
-            $this->errormsg = "Fehler beim laden der Daten"; 
-            return false; 
+            $this->errormsg = "Fehler beim laden der Daten";
+            return false;
         }
     }
 
@@ -296,11 +296,11 @@ class projektphase extends basis_db
 			$this->errormsg.='Projekt Kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		
+
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -315,12 +315,12 @@ class projektphase extends basis_db
 
 		if($new==null)
 			$new = $this->new;
-			
+
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, typ, 
+			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, typ,
 				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
 			     $this->db_add_param($this->projekt_kurzbz).', '.
 			     $this->db_add_param($this->projektphase_fk).', '.
@@ -356,7 +356,7 @@ class projektphase extends basis_db
 				'updatevon='.$this->db_add_param($this->updatevon).' '.
 				'WHERE projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).';';
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($new)
@@ -371,21 +371,21 @@ class projektphase extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
-					
+
 			return true;
 		}
 		else
@@ -394,7 +394,7 @@ class projektphase extends basis_db
 			return false;
 		}
 	}
- 
+
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $projekt_kurzbz ID die geloescht werden soll
@@ -407,77 +407,81 @@ class projektphase extends basis_db
 			$this->errormsg = 'Projektphase_ID ist ungueltig';
 			return true;
 		}
-		
+
 		// an projektphase hängt noch eine phase
 		if($this->existPhaseFk($projektphase_id))
 		{
 			$this->errormsg ="Phase kann nicht gelöscht werden, da noch eine andere Phase daran hängt. Bitte zuerst Phase abhängen. ";
-			return false; 
+			return false;
 		}
-		
+
 		// Beginne Transaktion und lösche alle Tasks der Phase
-		$qry1 ="Begin; DELETE FROM fue.tbl_projekttask 
+		$qry1 ="Begin; DELETE FROM fue.tbl_projekttask
 		WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry1))
 		{
 			// Lösche alle zugewiesenen Ressourcen
-			$qry2 = "DELETE FROM fue.tbl_projekt_ressource 
+			$qry2 = "DELETE FROM fue.tbl_projekt_ressource
 			WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
-			
+
 			if($this->db_query($qry2))
 			{
 				// Lösche den Phaseneintrag
-				$qry3 = "DELETE FROM fue.tbl_projektphase 
+				$qry3 = "DELETE FROM fue.tbl_projektphase
 				WHERE projektphase_id = ".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
-				
+
 				if($this->db_query($qry3))
 				{
 					$this->db_query('COMMIT');
-					return true; 
-				}else 
+					return true;
+				}
+				else
 				{
 					$this->errormsg ="Fehler beim löschen der Projektphase aufgetreten";
 					$this->db_query('ROLLBACK');
-					return false; 
+					return false;
 				}
-			}else
+			}
+			else
 			{
 				$this->errormsg ="Fehler beim löschen der Ressourcen aufgetreten";
 				$this->db_query('ROLLBACK');
-				return false; 
+				return false;
 			}
-		}else
+		}
+		else
 		{
 			$this->errormsg ="Fehler beim löschen der Tasks aufgetreten";
-			$this->db_query('ROLLBACK'); 
-			return false; 
+			$this->db_query('ROLLBACK');
+			return false;
 		}
 
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Überprüft ob an übergebenr Phase noch eine andere Phase hängt. true wenn noch eine daran hängt
 	 * @param $projektphase_id
 	 */
 	public function existPhaseFk($projektphase_id)
 	{
 		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_fk =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
-				return true; 
-		}else 
+				return true;
+		}
+		else
 		{
 			$this->errormsg ="Fehler bei der Abfrage aufgetreten";
-			return false; 
+			return false;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Löscht Ressourcen einer Phase
 	 * @param $projektphase_id
 	 * @param $ressource_id -> wenn != null wird nur die eine ressource gelöscht
@@ -492,58 +496,60 @@ class projektphase extends basis_db
 				$this->errormsg = "Keine gültige ID übergeben";
 				return false;
 			}
-			$qry ="DELETE from fue.tbl_projekt_ressource 
-					WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER)." and 
+			$qry ="DELETE from fue.tbl_projekt_ressource
+					WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER)." and
 					ressource_id=".$this->db_add_param($ressource_id, FHC_INTEGER).";";
-		}else
+		}
+		else
 		{
 			// gesamte Ressourcen von Phase werden gelöscht
 			if(!is_numeric($projektphase_id))
 			{
 				$this->errormsg ="Keine gültige ID übergeben";
 			}
-			$qry ="DELETE from fue.tbl_projekt_ressource 
+			$qry ="DELETE from fue.tbl_projekt_ressource
 					WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 		}
 
 		if($this->db_query($qry))
 		{
-			return true; 
-		}else
+			return true;
+		}
+		else
 		{
 			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
-			return false; 
+			return false;
 		}
-		
+
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * gibt den Fortschritt der Phase in Prozent zurück --> Phasen die auf die übergebene Phase zeigen werden berücksichtigt
 	 * @param $projektphase_id
 	 */
-	public function getFortschritt($projektphase_id)
+public function getFortschritt($projektphase_id)
 	{
-		$qry = "Select * from fue.tbl_projektphase phase 
-		join fue.tbl_projekttask task using(projektphase_id) 
+		$qry = "Select * from fue.tbl_projektphase phase
+		join fue.tbl_projekttask task using(projektphase_id)
 		where task.projektphase_id = ".$this->db_add_param($projektphase_id, FHC_INTEGER)."
 		OR task.projektphase_id IN (
-		
-		WITH RECURSIVE tasks(projektphase_fk) as 
+
+		WITH RECURSIVE tasks(projektphase_fk) as
 		(
 			SELECT projektphase_id FROM fue.tbl_projektphase
 			WHERE projektphase_fk=".$this->db_add_param($projektphase_id, FHC_INTEGER)."
 			UNION ALL
-			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks 
+			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks
 			WHERE p.projektphase_fk=tasks.projektphase_fk
 		)SELECT *
 		FROM tasks)";
-		
-		$taskAnzahl = 0; 
+
+		$taskAnzahl = 0;
 		// erledige tasks
-		$i = 0; 
-		$ergebnis = 0; 
-		
+		$i = 0;
+		$ergebnis = 0;
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -553,25 +559,252 @@ class projektphase extends basis_db
 					$i++;
 			}
 		}
-		$taskAnzahl = ($taskAnzahl == 0)? 1 : $taskAnzahl;	
-		$ergebnis = ($i*100)/$taskAnzahl; 
-		
-		return sprintf("%01.2f", $ergebnis); 
+		$taskAnzahl = ($taskAnzahl == 0)? 1 : $taskAnzahl;
+		$ergebnis = ($i*100)/$taskAnzahl;
+
+		return sprintf("%01.2f", $ergebnis);
 	}
-	
+
 	/**
 	 * Überprüft ob alle Tasks einer Phase erledigt sind
 	 */
 	public function isPhaseErledigt($phase_id)
 	{
-		$task = new projekttask(); 
-		
-		$task->getProjekttasks($phase_id,null,'offen'); 
+		$task = new projekttask();
+
+		$task->getProjekttasks($phase_id,null,'offen');
 		if(count($task->result)==0)
-			return true; 
+			return true;
 		else
-			return false; 
+			return false;
 	}
-	
+
+	public function checkProjectphaseInCorrectTime($projektphase_id, $given_projectphase_start, $given_projektphase_ende)
+	{
+		if(empty($projektphase_id))
+			return true;
+		try
+		{
+			$projektphase = $this->getProjectphaseById($projektphase_id);
+			if(strtotime($projektphase->start))
+			{
+				$projektphase_start = date('Y-m-d', strtotime($projektphase->start));
+			}
+			else
+			{
+				$projektphase_start = NULL;
+			}
+			if(strtotime($projektphase->ende))
+			{
+				$projektphase_ende = date('Y-m-d', strtotime($projektphase->ende));
+			}
+			else
+			{
+				$projektphase_ende = NULL;
+			}
+
+			$given_start = date('Y-m-d', strtotime($given_projectphase_start));
+			$given_ende = date('Y-m-d', strtotime($given_projektphase_ende));
+
+			if ((empty($projektphase_start) || $given_start >= $projektphase_start)
+			&& (empty($projektphase_ende) || $given_ende <= $projektphase_ende))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (Exception $e)
+		{
+			error_log('Exception abgefangen: ',  $e->getMessage(), "\n");
+		}
+	}
+
+	/**
+	 * Laedt die Projektphase mit der ID $projektphase_id
+	 * @param  $projektphase_id ID der zu ladenden Projektphase
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getProjectphaseById($projektphase_id)
+	{
+		if(!is_numeric($projektphase_id))
+		{
+			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichnung
+				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
+				WHERE projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$obj = new projektphase();
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->projektphase_fk = $row->projektphase_fk;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->personentage = $row->personentage;
+				$obj->farbe = $row->farbe;
+				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
+				$obj->ressource_bezeichnung = $row->ressource_bezeichnung;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				return $obj;
+			}
+			else
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Projektphase mit der ID des mitarbeiters
+	 * @param  $mitarbeiter_uid der zu ladenden Projektphase des users
+	 * @return array wenn ok, false im Fehlerfall
+	 */
+	public function getProjectphaseForMitarbeiter($mitarbeiter_uid)
+	{
+		$projecphasetList = array();
+
+		$qry = "
+		SELECT
+			DISTINCT tbl_projektphase.*
+		FROM
+			fue.tbl_projektphase
+			JOIN fue.tbl_projekt USING (projekt_kurzbz)
+			JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+			JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+		WHERE
+		(
+			(
+				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+			) AND (
+				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+			)
+		)
+		AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new projektphase();
+
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->projektphase_fk = $row->projektphase_fk;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->personentage = $row->personentage;
+				$obj->farbe = $row->farbe;
+				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				$this->result[] = $obj;
+
+				array_push($projecphasetList, $obj);
+			}
+			return $projecphasetList;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Projektphase mit der ID des mitarbeiters für das jeweilige Projekt
+	 * @param  $mitarbeiter_uid der zu ladenden Projektphase des users
+	 * @param  $projekt_kurzbz des zu landenen Projekts
+	 * @return array wenn ok, false im Fehlerfall
+	 */
+	public function getProjectphaseForMitarbeiterByKurzBz($mitarbeiter_uid, $projekt_kurzbz)
+	{
+		$projecphasetList = array();
+
+		$qry = "
+		SELECT
+			DISTINCT tbl_projektphase.*
+		FROM
+			fue.tbl_projektphase
+			JOIN fue.tbl_projekt USING (projekt_kurzbz)
+			JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+			JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+		WHERE
+		(
+			(
+				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+			) AND (
+				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+			)
+		)
+		AND mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)."
+		AND tbl_projekt.projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz);
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new projektphase();
+
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->projektphase_fk = $row->projektphase_fk;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->personentage = $row->personentage;
+				$obj->farbe = $row->farbe;
+				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

@@ -156,42 +156,8 @@ foreach($uid_arr as $uid)
 			echo "\t\t<ects_pro_semester><![CDATA[".($studienplan->regelstudiendauer!=0?$studienordnung->ects/$studienplan->regelstudiendauer:0)."]]></ects_pro_semester>";
 
 			echo "\t\t<aktuellesJahr><![CDATA[".date('Y')."]]></aktuellesJahr>";
-
-			echo "\t\t<ausbildungssemester_aktuell><![CDATA[".$prestudent->ausbildungssemester."]]></ausbildungssemester_aktuell>";
-
-			$studiensemester_aktuell = new studiensemester();
-			$studiensemester_aktuell->load($studiensemester);
-
-			echo "\t\t<studiensemester_aktuell><![CDATA[".$studiensemester_aktuell->bezeichnung."]]></studiensemester_aktuell>";
-
-			// check ob Oeh-Beitrag bezahlt wurde
-			$oehbeitrag = $konto->getOehBeitragGesamt($uid, $studiensemester_aktuell->studiensemester_kurzbz);
-			echo "\t\t<oehbeitrag><![CDATA[".str_replace('.', ',', $oehbeitrag)."]]></oehbeitrag>";
-
-			// check ob Quereinsteiger
-			$ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'';
-			echo "\t\t<semesterStudent><![CDATA[".$ausbildungssemester."]]></semesterStudent>";
-
-			$studiensemester_beginn = new studiensemester();
-			$studienbeginn = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
-			$studiensemester_beginn->load($studienbeginn);
-
-			echo "\t\t<studiensemester_beginn><![CDATA[".$studiensemester_beginn->bezeichnung."]]></studiensemester_beginn>";
-			echo "\t\t<studiensemester_beginndatum><![CDATA[".date('d.m.Y',strtotime($studiensemester_beginn->start))."]]></studiensemester_beginndatum>";
-
-			$prestudent->getLastStatus($student->prestudent_id,$studiensemester);
-			$studiensemester_abschluss = new studiensemester();
-			$abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
-			$studiensemester_abschluss->load($abschluss);
-			echo "\t\t<voraussichtlichLetztesStudiensemester><![CDATA[".$studiensemester_abschluss->bezeichnung."]]></voraussichtlichLetztesStudiensemester>";
-			echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".date('d.m.Y',strtotime($studiensemester_abschluss->ende))."]]></voraussichtlichLetztesStudiensemester_datum>";
-
-			$studiensemester_endedatum = new studiensemester();
-			$studiensemester_endedatum->load($studiensemester_endedatum->getaktorNext(1));
-
-			echo "\t\t<studiensemester_endedatum><![CDATA[".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."]]></studiensemester_endedatum>";
-
 			$status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,null,null))?$prestudent->status_kurzbz:'';
+			$abbrecher = false;
 
 			switch($status_aktuell)
 			{
@@ -209,12 +175,60 @@ foreach($uid_arr as $uid)
 					break;
 				case 'Abbrecher':
 					$studierendenstatus_aktuell = 'AbbrecherIn';
+					$enddatum = date('d.m.Y',strtotime($prestudent->bestaetigtam));
+					$abbrecher = true;
 					break;
 				default:
 					$studierendenstatus_aktuell ='';
 			}
+		echo "\t\t<abbrecher><![CDATA[".($abbrecher?'true':'false')."]]></abbrecher>";
 
-			echo "\t\t<studierendenstatus_aktuell><![CDATA[".$studierendenstatus_aktuell."]]></studierendenstatus_aktuell>\n";
+		echo "\t\t<ausbildungssemester_aktuell><![CDATA[".$prestudent->ausbildungssemester."]]></ausbildungssemester_aktuell>";
+
+		$studiensemester_aktuell = new studiensemester();
+		$studiensemester_aktuell->load($studiensemester);
+
+		echo "\t\t<studiensemester_aktuell><![CDATA[".$studiensemester_aktuell->bezeichnung."]]></studiensemester_aktuell>";
+
+		// check ob Oeh-Beitrag bezahlt wurde
+		$oehbeitrag = $konto->getOehBeitragGesamt($uid, $studiensemester_aktuell->studiensemester_kurzbz);
+		echo "\t\t<oehbeitrag><![CDATA[".str_replace('.', ',', $oehbeitrag)."]]></oehbeitrag>";
+
+		// check ob Quereinsteiger
+		$ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'';
+		echo "\t\t<semesterStudent><![CDATA[".$ausbildungssemester."]]></semesterStudent>";
+
+		$studiensemester_beginn = new studiensemester();
+		$studienbeginn = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
+		$studiensemester_beginn->load($studienbeginn);
+
+		echo "\t\t<studiensemester_beginn><![CDATA[".$studiensemester_beginn->bezeichnung."]]></studiensemester_beginn>";
+		echo "\t\t<studiensemester_beginndatum><![CDATA[".date('d.m.Y',strtotime($studiensemester_beginn->start))."]]></studiensemester_beginndatum>";
+
+		$prestudent->getLastStatus($student->prestudent_id,$studiensemester);
+		$studiensemester_abschluss = new studiensemester();
+		if($abbrecher)
+			$abschluss = $prestudent->studiensemester_kurzbz;
+		else
+			$abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
+		$studiensemester_abschluss->load($abschluss);
+		echo "\t\t<voraussichtlichLetztesStudiensemester><![CDATA[".$studiensemester_abschluss->bezeichnung."]]></voraussichtlichLetztesStudiensemester>";
+
+		$studiensemester_endedatum = new studiensemester();
+		$studiensemester_endedatum->load($studiensemester_endedatum->getaktorNext(1));
+
+		$status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,null,null))?$prestudent->status_kurzbz:'';
+
+		$enddatum = date('d.m.Y',strtotime($studiensemester_abschluss->ende));
+
+		echo "\t\t<studiensemester_endedatum><![CDATA[".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."]]></studiensemester_endedatum>";
+
+		if($abbrecher)
+			echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".date('d.m.Y',strtotime($prestudent->datum))."]]></voraussichtlichLetztesStudiensemester_datum>";
+		else
+			echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".$enddatum."]]></voraussichtlichLetztesStudiensemester_datum>";
+
+		echo "\t\t<studierendenstatus_aktuell><![CDATA[".$studierendenstatus_aktuell."]]></studierendenstatus_aktuell>\n";
 		echo "\t\t<datum_reifepruefung><![CDATA[".$prestudent->zgvdatum."]]></datum_reifepruefung>\n";
 		$zgv = new zgv($prestudent->zgv_code);
 		echo "\t\t<schulform_zgv><![CDATA[".$zgv->zgv_kurzbz."]]></schulform_zgv>\n";

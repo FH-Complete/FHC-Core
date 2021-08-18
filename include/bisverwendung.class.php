@@ -47,6 +47,7 @@ class bisverwendung extends basis_db
 	public $dv_art;
 	public $inkludierte_lehre;
 	public $zeitaufzeichnungspflichtig;
+	public $azgrelevant;
 
 	public $ba1bez;
 	public $ba2bez;
@@ -122,6 +123,7 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 				return true;
 			}
 			else
@@ -247,13 +249,21 @@ class bisverwendung extends basis_db
 		{
 			$zeitaufzeichnungspflichtig = 'null';
 		}
+		if(is_bool($this->azgrelevant))
+		{
+			$azgrelevant = $this->db_add_param($this->azgrelevant, FHC_BOOLEAN);
+		}
+		else
+		{
+			$azgrelevant = 'null';
+		}
 
 		if($new)
 		{
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode,
 					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden,
-					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig) VALUES (".
+					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig, azgrelevant) VALUES (".
 			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
@@ -271,7 +281,8 @@ class bisverwendung extends basis_db
 			       $this->db_add_param($this->insertvon).', '.
 				   $this->db_add_param($this->dv_art).','.
 				   $this->db_add_param($this->inkludierte_lehre).','.
-				   $zeitaufzeichnungspflichtig. ');';
+				   $zeitaufzeichnungspflichtig.','.
+				   $azgrelevant. ');';
 
 		}
 		else
@@ -295,7 +306,8 @@ class bisverwendung extends basis_db
 				  " insertvon=".$this->db_add_param($this->insertvon).",".
 				  " dv_art=".$this->db_add_param($this->dv_art).",".
 				  " inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).",".
-				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.
+				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.",".
+				  " azgrelevant =". $azgrelevant.
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
 
@@ -388,7 +400,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
-
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 				$this->result[] = $obj;
 			}
 			return true;
@@ -445,6 +457,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 
 				$this->result[] = $obj;
 			}
@@ -503,6 +516,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 
 				$this->result[] = $obj;
 			}
@@ -524,12 +538,13 @@ class bisverwendung extends basis_db
 	{
 		//laden des Datensatzes
 		$qry = "SELECT
-					*
+					*, tbl_hauptberuf.bezeichnung as hauptberuf
 				FROM
 					bis.tbl_bisverwendung
+					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode)
 				WHERE
 					mitarbeiter_uid=".$this->db_add_param($uid)."
-				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
+				ORDER BY ende DESC NULLS FIRST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
@@ -543,6 +558,7 @@ class bisverwendung extends basis_db
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
 				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$this->hauptberuf = $row->hauptberuf;
 				$this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
@@ -554,6 +570,7 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 			}
 			return true;
 		}
@@ -582,7 +599,7 @@ class bisverwendung extends basis_db
 					(beginn<=now() OR beginn IS NULL)
 				AND
 					(ende>=now() OR ende IS NULL)
-				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
+				ORDER BY ende DESC NULLS FIRST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
@@ -607,6 +624,7 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 			}
 			return true;
 		}
@@ -669,6 +687,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 
 				$this->result[] = $obj;
 			}
@@ -794,6 +813,36 @@ class bisverwendung extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	public function inZeitaufzeichnungspflichtigPeriod($PeriodStartDate, $PeriodEndDate)
+	{
+		$PeriodStartDateISO = date('Y-m-d', strtotime($PeriodStartDate));
+		$PeriodEndDateISO = date('Y-m-d', strtotime($PeriodEndDate));
+
+		$beginn = date('Y-m-d', strtotime($this->beginn));
+		$end = date('Y-m-d', strtotime($this->ende));
+		$zp = $this->zeitaufzeichnungspflichtig;
+
+		if ($zp)
+		{
+			if (
+				(($PeriodStartDateISO >= $beginn) && (($PeriodStartDateISO <= $end) || is_null($this->ende)))
+				||
+				(($PeriodEndDateISO >= $beginn) && (($PeriodEndDateISO <= $end) || is_null($this->ende)))
+			)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
 			return false;
 		}
 	}
