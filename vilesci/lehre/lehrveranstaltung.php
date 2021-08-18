@@ -30,8 +30,14 @@ require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/addon.class.php');
+require_once('../../include/sprache.class.php');
+require_once('../../include/lehrmodus.class.php');
+
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+//Sprache
+$sprache = getSprache();
 
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
@@ -82,7 +88,7 @@ else
 	$fachbereich_kurzbz = '';
 
 
-$oe_organisationseinheit = '';
+$oe_organisationseinheit='';
 if (isset($_REQUEST['oe_kurzbz']))
 {
 	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
@@ -95,7 +101,7 @@ if (isset($_REQUEST['oe_kurzbz']))
 	}
 }
 else
-	$oe_kurzbz = '';
+	$oe_kurzbz='';
 
 if (isset($_REQUEST['orgform']))
 {
@@ -359,6 +365,24 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
 
+		//Lehrmodus Speichern
+		if(isset($_POST['lm']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrmodus_kurzbz = $_POST['lm'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
+
 		//Projektarbeit Feld setzen
 		if(isset($_POST['projektarbeit']))
 		{
@@ -416,6 +440,25 @@ if($result = $db->db_query($qry))
 	{
 		$lt[$row->lehrtyp_kurzbz]['lehrtyp_kurzbz']=$row->lehrtyp_kurzbz;
 		$lt[$row->lehrtyp_kurzbz]['bezeichnung']=$row->bezeichnung;
+	}
+}
+
+//Lehrmodus holen
+$qry = "
+SELECT
+	lehrmodus_kurzbz,
+	bezeichnung_mehrsprachig
+FROM
+	lehre.tbl_lehrmodus ORDER BY lehrmodus_kurzbz";
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+	//	$lm[$row->lehrmodus_kurzbz]['lehrmodus_kurzbz']=$row->lehrmodus_kurzbz;
+		$lm_beschr = new lehrmodus();
+		$lm_beschr ->load($row->lehrmodus_kurzbz);
+		$lm[$row->lehrmodus_kurzbz]['bezeichnung_mehrsprachig'] = $lm_beschr->bezeichnung_mehrsprachig[$sprache];
 	}
 }
 
@@ -583,26 +626,6 @@ foreach ($orgform->result as $of)
 }
 $outp.='</SELECT>';
 
-//Institut DropDown
-//auskommentiert: user story #12646
-// $outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
-// $fachb = new fachbereich();
-// $fachb->getAll();
-// $outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
-// $fachbereich_berechtigt = $rechte->getFbKz('lehre/lehrveranstaltung:begrenzt');
-// foreach ($fachb->result as $fb)
-// {
-// 	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
-// 		$selected = 'selected';
-// 	else
-// 		$selected = '';
-//
-// 	if(in_array($fb->fachbereich_kurzbz, $fachbereich_berechtigt))
-// 		$outp.= '<OPTION value="'.$db->convert_html_chars($fb->fachbereich_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($fb->fachbereich_kurzbz).'</OPTION>';
-// }
-//
-// $outp.= '</SELECT>';
-
 //if($write_admin) Von kindlm am 12.04.2013 auskommentiert, da Assistentinnen auch bei inaktiven LV's die Lehrform aendern koennen sollen
 //{
 	//Aktiv DropDown
@@ -622,23 +645,22 @@ $outp.='</SELECT>';
 
 $outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary style="float:right">Erweiterte Suchoptionen</summary><hr></hr>';
 
-//Organisationseinheit Dropdown
-$outp .= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
-$oe = new organisationseinheit();
-$oe->getAll();
-foreach($oe->result as $row)
-{
+	//Organisationseinheit Dropdown
+	$outp .= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
+	$oe = new organisationseinheit();
+	$oe->getAll();
+	foreach($oe->result as $row)
+	{
 	if($oe_kurzbz == $row->oe_kurzbz)
 		$selected = 'selected';
 	else
 		$selected = '';
-		$outp .= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'
-		.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
-}
-$outp .= '</select>';
+	$outp .= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
+	}
+	$outp .= '</select>';
 
 	//Lehrveranstaltung ID Input
-	$outp .= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
+	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
 
 	//Lehrveranstaltung Suche Bezeichnung
 	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 450px" id="lehrveranstaltung_name"
@@ -699,29 +721,30 @@ echo '
 					widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
 					headers: {	4: {sorter: false, filter: false},
 								5: {sorter: false, filter: false},
-								12: {sorter: false, filter: false},
-								14: {sorter: false, filter: false},
+								6: {sorter: false, filter: false},
+								13: {sorter: false, filter: false},
 								15: {sorter: false, filter: false},
-								18: {sorter: false, filter: false},
+								16: {sorter: false, filter: false},
 								19: {sorter: false, filter: false},
 								20: {sorter: false, filter: false},
 								21: {sorter: false, filter: false},
-								22: {sorter: false, filter: false}},
+								22: {sorter: false, filter: false},
+								23: {sorter: false, filter: false}},
 					widgetOptions : {filter_functions : {
 										// Add select menu to this column
-										11 : {
+										12 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										},
-										13 : {
-										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
-										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
-										},
-										16 : {
+										14 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										},
 										17 : {
+										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+										},
+										18 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										}
@@ -878,6 +901,27 @@ echo '
 				});
 			}
 
+			function changelehrmodus(lvid, lm)
+			{
+				$.ajax({
+					type:"POST",
+					url:"lehrveranstaltung.php",
+					data:{ "lvid": lvid, "lm": lm },
+					success: function(data)
+					{
+						if(data!="true")
+							alert("ERROR:"+data)
+						else
+						{
+							$("#lm"+lvid).css("background-color", "lightgreen");
+							window.setTimeout(function(){$("#lm"+lvid).css("background-color", "");}, 500);
+						}
+
+					},
+					error: function() { alert("error"); }
+				});
+			}
+
 			function copylvinfo(lvid, source_id)
 			{
 				$.ajax({
@@ -1025,6 +1069,7 @@ if ($result_lv!=0)
 		  <th>Bezeichnung English</th>
 		  <th>Lehrform</th>
 		  <th>Lehrtyp</th>
+		  <th>Lehrmodus</th>
 		  <th>Stg</th>\n
 		  <th>Orgform</th>
 		  <th>Organisationseinheit</th>
@@ -1081,15 +1126,13 @@ if ($result_lv!=0)
 			echo '<td style="white-space:nowrap;">';
 			echo '<SELECT style="width:80px;" id="lf'.$row->lehrveranstaltung_id.'">';
 			echo '<option value="">--</option>';
-			foreach ($lf as $lehrform => $lf_kz)
+			foreach ($lf as $lehrform=>$lf_kz)
 			{
 				if($lehrform == $row->lehrform_kurzbz)
-					$selected = 'selected';
+					$selected='selected';
 				else
-					$selected = '';
-				echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'
-				.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '
-				.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
+					$selected='';
+				echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
 			}
 			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
 			echo '</td>';
@@ -1097,7 +1140,7 @@ if ($result_lv!=0)
 		else
 		{
 			echo '<td>';
-			foreach ($lf as $lehrform => $lf_kz)
+			foreach ($lf as $lehrform=>$lf_kz)
 			{
 				if($lehrform == $row->lehrform_kurzbz)
 					echo $db->convert_html_chars($lf_kz['lehrform_kurzbz']). ' '. $db->convert_html_chars($lf_kz['bezeichnung']);
@@ -1111,14 +1154,13 @@ if ($result_lv!=0)
 			echo '<td style="white-space:nowrap;">';
 			echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
 			echo '<option value="">--</option>';
-			foreach ($lt as $lehrtyp => $lt_kz)
+			foreach ($lt as $lehrtyp=>$lt_kz)
 			{
 				if($lehrtyp == $row->lehrtyp_kurzbz)
-					$selected = 'selected';
+					$selected='selected';
 				else
-					$selected = '';
-				echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'
-				.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
+					$selected='';
+				echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
 			}
 			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrtyp(\''.$row->lehrveranstaltung_id.'\',$(\'#lt'.$row->lehrveranstaltung_id.'\').val())">';
 			echo '</td>';
@@ -1126,13 +1168,30 @@ if ($result_lv!=0)
 		else
 		{
 			echo '<td>';
-			foreach ($lt as $lehrtyp => $lt_kz)
+			foreach ($lt as $lehrtyp=>$lt_kz)
 			{
 				if($lehrtyp == $row->lehrtyp_kurzbz)
 					echo $db->convert_html_chars($lt_kz['bezeichnung']);
 			}
 			echo '</td>';
 		}
+
+		//lehrmodus
+		echo '<td style="white-space:nowrap;">';
+		echo '<SELECT id="lm'.$row->lehrveranstaltung_id.'">';
+		echo '<option value="">--</option>';
+		foreach ($lm as $lehrmodus => $lm_kz)
+		{
+			if($lehrmodus == $row->lehrmodus_kurzbz)
+				$selected = 'selected';
+			else
+				$selected = '';
+
+			echo '<option value="'.$db->convert_html_chars($lehrmodus).'" '.$selected.'>'
+			.$db->convert_html_chars($lm_kz['bezeichnung_mehrsprachig']).'</option>';
+		}
+		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrmodus(\''.$row->lehrveranstaltung_id.'\',$(\'#lm'.$row->lehrveranstaltung_id.'\').val())">';
+		echo '</td>';
 
 		//Studiengang
 		echo '<td>'.$db->convert_html_chars($s[$row->studiengang_kz]->kurzbz).'</td>';
