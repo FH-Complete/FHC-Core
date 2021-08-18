@@ -92,18 +92,18 @@ class Zeugnisnote_model extends DB_Model
 	{
 		$params = array($person_id, $studiensemester_kurzbz);
 
-		$qry = '
-		SELECT zgnisnote.*, pers.matr_nr, lv.ects, stg.studiengang_kz, prst.prestudent_id, stg.erhalter_kz,
-       			UPPER(stg.typ||stg.kurzbz) AS studiengang, stg.bezeichnung AS studiengang_bezeichnung
-		FROM public.tbl_person pers
-		JOIN public.tbl_prestudent prst USING (person_id)
-		JOIN public.tbl_student USING (prestudent_id)
-		JOIN lehre.tbl_zeugnisnote zgnisnote USING (student_uid)
-		JOIN lehre.tbl_note note ON zgnisnote.note = note.note
-		JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
-		JOIN public.tbl_studiengang stg ON prst.studiengang_kz = stg.studiengang_kz 
-		WHERE pers.person_id = ?
-		AND zgnisnote.studiensemester_kurzbz = ?';
+		$qry = "SELECT zgnisnote.*, pers.matr_nr, lv.ects, stg.studiengang_kz, prst.prestudent_id, stg.erhalter_kz,
+       			UPPER(stg.typ||stg.kurzbz) AS studiengang, stg.bezeichnung AS studiengang_bezeichnung, note.note,
+       			note.bezeichnung AS note_bezeichnung
+				FROM public.tbl_person pers
+				JOIN public.tbl_prestudent prst USING (person_id)
+				JOIN public.tbl_student USING (prestudent_id)
+				JOIN lehre.tbl_zeugnisnote zgnisnote USING (student_uid)
+				JOIN lehre.tbl_note note ON zgnisnote.note = note.note
+				JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
+				JOIN public.tbl_studiengang stg ON prst.studiengang_kz = stg.studiengang_kz 
+				WHERE pers.person_id = ?
+				AND zgnisnote.studiensemester_kurzbz = ?";
 
 		if (isset($aktiv))
 		{
