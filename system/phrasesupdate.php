@@ -8152,6 +8152,26 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'zukuenftige',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zukünftige',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'upcoming',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),    
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'gestern',
 		'insertvon' => 'system',
 		'phrases' => array(
