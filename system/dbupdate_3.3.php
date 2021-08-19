@@ -532,6 +532,46 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue'
 	}
 }
 
+// Note "intern angerechnet" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'iar' AND (bezeichnung = 'intern angerechnet' OR bezeichnung = 'Intern angerechnet');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			INSERT INTO
+				lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre, offiziell, bezeichnung_mehrsprachig, lkt_ueberschreibbar)
+			VALUES(
+				(SELECT max(note)+1 FROM lehre.tbl_note),'intern angerechnet', 'iar', NULL, TRUE, NULL, TRUE, FALSE, FALSE, '{\"intern angerechnet\",\"internally credited\"}', FALSE
+			);
+		";
+		
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Note intern angerechnet hinzugefuegt!<br>';
+	}
+}
+
+// Note "nicht zugelassen" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'nz' AND (bezeichnung = 'nicht zugelassen' OR bezeichnung = 'Nicht zugelassen');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			INSERT INTO
+				lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre, offiziell, bezeichnung_mehrsprachig, lkt_ueberschreibbar)
+			VALUES(
+				(SELECT max(note)+1 FROM lehre.tbl_note), 'nicht zugelassen', 'nz', NULL, TRUE, NULL, TRUE, FALSE, FALSE, '{\"nicht zugelassen\",\"not admitted\"}', FALSE
+			);
+		";
+		
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Note nicht zugelassen hinzugefuegt!<br>';
+	}
+}
+
 // Spalte offiziell in lehre.tbl_note
 if(!$result = @$db->db_query("SELECT offiziell FROM lehre.tbl_note LIMIT 1;"))
 {
