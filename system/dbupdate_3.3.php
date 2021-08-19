@@ -4961,6 +4961,19 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruef
 	}
 }
 
+//Add Column statusgrund_kurzbz to public.tbl_status_grund
+if(!@$db->db_query("SELECT statusgrund_kurzbz FROM public.tbl_status_grund LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_status_grund ADD COLUMN statusgrund_kurzbz varchar(32);
+			ALTER TABLE public.tbl_status_grund ADD CONSTRAINT uk_tbl_statusgrund_kurzbz UNIQUE (statusgrund_kurzbz);
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_status_grund '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue Spalte statusgrund_kurzbz zu Tabelle public.tbl_status_grund hinzugefügt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -5180,7 +5193,7 @@ $tabellen=array(
 	"public.tbl_rt_person" => array("rt_person_id","person_id","rt_id","studienplan_id","anmeldedatum","teilgenommen","ort_kurzbz","punkte","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_rt_studienplan" => array("reihungstest_id","studienplan_id"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
-	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung"),
+	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung","statusgrund_kurzbz"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id","design_uid","betrieb_uid","operativ_uid","servicekategorie_kurzbz"),
 	"public.tbl_servicekategorie" => array("servicekategorie_kurzbz", "bezeichnung","sort"),

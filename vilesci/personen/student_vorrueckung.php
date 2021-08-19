@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *			Manuela Thamer < manuela.thamer@technikum-wien.at >
  */
 /**
  * Vorrückung aller AKTIVEN Studenten.
@@ -302,13 +303,14 @@ if (isset($_POST['vorr']))
 					}
 				}
 
+				//auf statusgrund_kurzbz abfragen
 				$statusgrundObj = new statusgrund($row_status->statusgrund_id);
-				$newStatusgrund = null;
-				if ($statusgrundObj->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE] === "Pre-Wiederholer" && $row_status->ausbildungssemester > 1)
+				$statusgrundId = null;
+				if ($statusgrundObj->statusgrund_kurzbz === "prewiederholer" && $row_status->ausbildungssemester > 1)
 				{
 					$s = $row->semester_stlv - 1;
 					$ausbildungssemester = $row_status->ausbildungssemester - 1;
-					$newStatusgrund = $statusgrundObj->getByBezeichnung('Wiederholer')->statusgrund_id;
+					$statusgrundId = $statusgrundObj->getByStatusgrundKurzbz('wiederholer')->statusgrund_id;
 				}
 
 				$lvb = new lehrverband();
@@ -382,7 +384,7 @@ if (isset($_POST['vorr']))
 								$db->db_add_param($user).",	NULL, NULL, NULL, ".
 								$db->db_add_param($row_status->orgform_kurzbz).", ".
 								$db->db_add_param($studienplan_id).", ".
-								$db->db_add_param($newStatusgrund).");";
+								$db->db_add_param($statusgrundId).");";
 				}
 				if ($sql != '')
 				{
@@ -618,11 +620,12 @@ if ($result_std != 0)
 		$row = $db->db_fetch_object($result_std, $i);
 		$qry_status = "
 			SELECT
-				status_kurzbz, ausbildungssemester, tbl_studienplan.studienplan_id, tbl_studienplan.bezeichnung
+				tbl_prestudentstatus.status_kurzbz, statusgrund_kurzbz, ausbildungssemester, tbl_studienplan.studienplan_id, tbl_studienplan.bezeichnung
 			FROM
 				public.tbl_prestudentstatus
 				JOIN public.tbl_prestudent USING(prestudent_id)
 				LEFT JOIN lehre.tbl_studienplan USING(studienplan_id)
+				LEFT JOIN public.tbl_status_grund USING (statusgrund_id)
 			WHERE
 				person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)."
 				AND studiengang_kz=".$db->db_add_param($row->studiengang_kz, FHC_INTEGER)."
@@ -639,6 +642,7 @@ if ($result_std != 0)
 			if ($row_status = $db->db_fetch_object($result_status))
 			{
 				$status_kurzbz = $row_status->status_kurzbz;
+				$statusgrund_kurzbz = $row_status->statusgrund_kurzbz;
 				$ausbildungssemester = $row_status->ausbildungssemester;
 				$studienplan_id = $row_status->studienplan_id;
 				$studienplan_bezeichnung = $row_status->bezeichnung;

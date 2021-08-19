@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ 			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once('basis_db.class.php');
 
@@ -30,6 +31,7 @@ class statusgrund extends basis_db
 	public $aktiv = true;   // boolean
 	public $bezeichnung_mehrsprachig; // varchar(255)[]
 	public $bezeichnung;    // text[]
+	public $statusgrund_kurzbz; //varchar(32)
 
 	/**
 	 * Konstruktor - Laedt optional einen Statusgrund
@@ -71,6 +73,7 @@ class statusgrund extends basis_db
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$this->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
+				$this->statusgrund_kurzbz = $row->statusgrund_kurzbz;
 			}
 			else
 			{
@@ -120,6 +123,7 @@ class statusgrund extends basis_db
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$obj->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
+				$obj->statusgrund_kurzbz = $row->statusgrund_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -166,6 +170,7 @@ class statusgrund extends basis_db
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$obj->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
+				$obj->statusgrund_kurzbz = $row->statusgrund_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -180,18 +185,27 @@ class statusgrund extends basis_db
 		return true;
 	}
 
-	public function getByBezeichnung($beschreibung)
+	/**
+	 * Laedt das Klassenobjekt anhand der kurzbz
+	 *
+	 * @param string $statusgrund_kurzbz Statusgrund zu dem das Objekt geladen werden soll.
+	 * @return object classobject
+	 */
+	public function getByStatusgrundKurzbz($statusgrund_kurzbz)
 	{
 		$qry = "
 			SELECT
-				*
+				 *
 			FROM
-				public.tbl_status_grund
-			WHERE beschreibung[1] = '" . $beschreibung . "'
-			
-			";
+				 public.tbl_status_grund
+			WHERE
+				statusgrund_kurzbz ='". $statusgrund_kurzbz. "'
+		";
+
 		$this->db_query($qry);
-		return $this->db_fetch_object();
+
+		return
+			$this->db_fetch_object();
 	}
 }
 ?>
