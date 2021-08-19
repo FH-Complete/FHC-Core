@@ -208,6 +208,21 @@ else
 									<menuitem id="student-toolbar-filter-offenebuchungen" label="offene Buchungen" oncommand="StudentKontoFilterStudenten('konto')" disabled="false" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
 									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit Studienbebuehr belastet wurden" />
 									<menuitem id="student-toolbar-filter-zgvohnedatum" label="ZGV eingetragen ohne Datum" oncommand="StudentKontoFilterStudenten('zgvohnedatum')" disabled="false" tooltiptext="Liste aller Studenten die ZGV eingetragen haben bei denen aber kein ZGV Datum gesetzt ist" />
+									<menu label="nach Statusgrund">
+									    <menupopup id="student-filter-statusgrund-menu-popup">
+										<?php
+										$statusgrund = new statusgrund();
+										$statusgrund->getAll(true);
+										
+										foreach($statusgrund->result as $row)
+										{
+										?>
+										<menuitem id="student-toolbar-filter-statusgrund-<?php echo $row->statusgrund_id;?>" label="<?php echo $row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];?>" oncommand="StudentKontoFilterStudenten('stud-statusgrund-<?php echo $row->statusgrund_id; ?>')" disabled="false" tooltiptext="Liste aller Studenten mit Statusgrund <?php echo $row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];?>" />
+										<?php
+										}
+										?>
+									    </menupopup>
+									</menu>
 								</menupopup>
 							</toolbarbutton>
 						<?php
