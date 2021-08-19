@@ -118,7 +118,11 @@ function StudentRolleLoadStatusgrund(status_kurzbz, statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var menulistgrund = document.getElementById('student-rolle-menulist-statusgrund');
-	url='<?php echo APP_ROOT;?>rdf/statusgrund.rdf.php?status_kurzbz='+status_kurzbz+'&include_id='+statusgrund_id+'&ts'+gettimestamp();
+
+	if (typeof statusgrund_id !== 'undefined')
+		url='<?php echo APP_ROOT;?>rdf/statusgrund.rdf.php?status_kurzbz='+status_kurzbz+'&include_id='+statusgrund_id+'&ts'+gettimestamp();
+	else
+		url='<?php echo APP_ROOT;?>rdf/statusgrund.rdf.php?status_kurzbz='+status_kurzbz+'&ts'+gettimestamp();
 
 	try
 	{
