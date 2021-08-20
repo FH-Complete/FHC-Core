@@ -1137,10 +1137,18 @@ function StudentAuswahl()
 	zgvort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvort" ));
 	zgvnation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvnation" ));
 	zgvdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdatum" ));
+	zgv_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgv_erfuellt" ));											   
 	zgvmaster_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_code" ));
 	zgvmasterort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmaort" ));
 	zgvmasternation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmanation" ));
-	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" ));
+	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" )); 
+	zgvmas_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_erfuellt" ));
+	zgvdoktor_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktor_code" ));
+	zgvdoktorort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktorort" ));
+	zgvdoktornation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktornation" ));
+	zgvdoktordatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktordatum" ));
+	zgvdoktor_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktor_erfuellt" ));
+									  
 	aufnahmeschluessel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmeschluessel" ));
 	facheinschlberuf = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#facheinschlberuf" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
@@ -1157,10 +1165,26 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-zgvort').value=zgvort;
     MenulistSelectItemOnValue('student-prestudent-menulist-zgvnation', zgvnation);
 	document.getElementById('student-prestudent-textbox-zgvdatum').value=zgvdatum;
+	if(zgv_erfuellt=='t')
+		document.getElementById('student-prestudent-checkbox-zgverfuellt').checked=true;
+	else
+		document.getElementById('student-prestudent-checkbox-zgverfuellt').checked=false;									  
 	document.getElementById('student-prestudent-menulist-zgvmastercode').value=zgvmaster_code;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').value=zgvmasterort;
     MenulistSelectItemOnValue('student-prestudent-menulist-zgvmasternation', zgvmasternation);
 	document.getElementById('student-prestudent-textbox-zgvmasterdatum').value=zgvmasterdatum;
+	if(zgvmas_erfuellt=='t')
+		document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked=true;
+	else
+	document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked=false; 
+	document.getElementById('student-prestudent-menulist-zgvdoktorcode').value=zgvdoktor_code;
+	document.getElementById('student-prestudent-textbox-zgvdoktorort').value=zgvdoktorort;
+    MenulistSelectItemOnValue('student-prestudent-menulist-zgvdoktornation', zgvdoktornation);
+	document.getElementById('student-prestudent-textbox-zgvdoktordatum').value=zgvdoktordatum;
+	if(zgvdoktor_erfuellt=='t')
+		document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').checked=true;
+	else
+	document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').checked=false;
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value=aufnahmeschluessel;
 	if(facheinschlberuf=='true')
 		document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked=true;
@@ -1694,10 +1718,18 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-textbox-zgvort').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvnation').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvdatum').disabled=val;
+	document.getElementById('student-prestudent-checkbox-zgverfuellt').disabled=val;											   
 	document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvmasternation').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvmasterdatum').disabled=val;
+	document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').disabled=val;
+	document.getElementById('student-prestudent-menulist-zgvdoktorcode').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvdoktorort').disabled=val;
+	document.getElementById('student-prestudent-menulist-zgvdoktornation').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvdoktordatum').disabled=val;
+	document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').disabled=val;
+			   
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
@@ -1763,10 +1795,18 @@ function StudentPrestudentSave()
 	zgvort = document.getElementById('student-prestudent-textbox-zgvort').value;
 	zgvnation = document.getElementById('student-prestudent-menulist-zgvnation').value;
 	zgvdatum = document.getElementById('student-prestudent-textbox-zgvdatum').value;
+	zgv_erfuellt = document.getElementById('student-prestudent-checkbox-zgverfuellt').checked;											   
 	zgvmaster_code = document.getElementById('student-prestudent-menulist-zgvmastercode').value;
 	zgvmasterort = document.getElementById('student-prestudent-textbox-zgvmasterort').value;
 	zgvmasternation = document.getElementById('student-prestudent-menulist-zgvmasternation').value;
 	zgvmasterdatum = document.getElementById('student-prestudent-textbox-zgvmasterdatum').value;
+	zgvmas_erfuellt = document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked;
+	zgvdoktor_code = document.getElementById('student-prestudent-menulist-zgvdoktorcode').value;
+	zgvdoktorort = document.getElementById('student-prestudent-textbox-zgvdoktorort').value;
+	zgvdoktornation = document.getElementById('student-prestudent-menulist-zgvdoktornation').value;
+	zgvdoktordatum = document.getElementById('student-prestudent-textbox-zgvdoktordatum').value;
+	zgvdoktor_erfuellt = document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').checked;
+							  
 	aufnahmeschluessel = document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value;
 	facheinschlberuf = document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked;
 	bismelden = document.getElementById('student-prestudent-checkbox-bismelden').checked;
@@ -1790,7 +1830,11 @@ function StudentPrestudentSave()
 		alert('ZGVMaster Datum ist ungueltig');
 		return false;
 	}
-
+	if(zgvdoktordatum!='' && !CheckDatum(zgvdoktordatum))
+	{
+		alert('ZGVDoktor Datum ist ungueltig');
+		return false;
+	}
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -1809,10 +1853,18 @@ function StudentPrestudentSave()
 	req.add('zgvort', zgvort);
 	req.add('zgvnation', zgvnation);
 	req.add('zgvdatum', ConvertDateToISO(zgvdatum));
+	req.add('zgv_erfuellt', zgv_erfuellt);											   
 	req.add('zgvmas_code', zgvmaster_code);
 	req.add('zgvmaort', zgvmasterort);
 	req.add('zgvmanation', zgvmasternation);
 	req.add('zgvmadatum', ConvertDateToISO(zgvmasterdatum));
+	req.add('zgvmas_erfuellt', zgvmas_erfuellt);
+	req.add('zgvdoktor_code', zgvdoktor_code);
+	req.add('zgvdoktorort', zgvdoktorort);
+	req.add('zgvdoktornation', zgvdoktornation);
+	req.add('zgvdoktordatum', ConvertDateToISO(zgvdoktordatum));
+	req.add('zgvdoktor_erfuellt', zgvdoktor_erfuellt);
+							  
 	req.add('aufnahmeschluessel', aufnahmeschluessel);
 	req.add('facheinschlberuf', facheinschlberuf);
 	req.add('bismelden', bismelden);
