@@ -126,14 +126,16 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif($filter2=='zgvohnedatum')
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
-		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum
+		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum,zgvdoktor_code, zgvdoktordatum
 			FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id);
 		if($db->db_query($qry))
 		{
 			if($row_filter = $db->db_fetch_object())
 			{
 				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='')
-				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
+				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum=='')
+				|| ($row_filter->zgvdoktor_code!='' && $row_filter->zgvdoktordatum=='')
+				)
 					return true;
 				else
 					return false;
@@ -352,11 +354,18 @@ function draw_prestudent($row)
 			<STUDENT:zgvdatum><![CDATA['.$datum_obj->convertISODate($row->zgvdatum).']]></STUDENT:zgvdatum>
 			<STUDENT:zgvdatum_iso><![CDATA['.$row->zgvdatum.']]></STUDENT:zgvdatum_iso>
 			<STUDENT:zgvnation><![CDATA['.$row->zgvnation.']]></STUDENT:zgvnation>
+			<STUDENT:zgv_erfuellt><![CDATA['.$row->zgv_erfuellt.']]></STUDENT:zgv_erfuellt>														  
 			<STUDENT:zgvmas_code><![CDATA['.$row->zgvmas_code.']]></STUDENT:zgvmas_code>
 			<STUDENT:zgvmaort><![CDATA['.$row->zgvmaort.']]></STUDENT:zgvmaort>
 			<STUDENT:zgvmadatum><![CDATA['.$datum_obj->convertISODate($row->zgvmadatum).']]></STUDENT:zgvmadatum>
 			<STUDENT:zgvmadatum_iso><![CDATA['.$row->zgvmadatum.']]></STUDENT:zgvmadatum_iso>
 			<STUDENT:zgvmanation><![CDATA['.$row->zgvmanation.']]></STUDENT:zgvmanation>
+			<STUDENT:zgvmas_erfuellt><![CDATA['.$row->zgvmas_erfuellt.']]></STUDENT:zgvmas_erfuellt>
+			<STUDENT:zgvdoktor_code><![CDATA['.$row->zgvdoktor_code.']]></STUDENT:zgvdoktor_code>
+			<STUDENT:zgvdoktorort><![CDATA['.$row->zgvdoktorort.']]></STUDENT:zgvdoktorort>
+			<STUDENT:zgvdoktordatum><![CDATA['.$datum_obj->convertISODate($row->zgvdoktordatum).']]></STUDENT:zgvdoktordatum>
+			<STUDENT:zgvdoktordatum_iso><![CDATA['.$row->zgvdoktordatum.']]></STUDENT:zgvdoktordatum_iso>
+			<STUDENT:zgvdoktornation><![CDATA['.$row->zgvdoktornation.']]></STUDENT:zgvdoktornation>																																			<STUDENT:zgvdoktor_erfuellt><![CDATA['.$row->zgvdoktor_erfuellt.']]></STUDENT:zgvdoktor_erfuellt>							 
 			<STUDENT:ausstellungsstaat><![CDATA['.$row->ausstellungsstaat.']]></STUDENT:ausstellungsstaat>
 			<STUDENT:aufnahmeschluessel><![CDATA['.$row->aufnahmeschluessel.']]></STUDENT:aufnahmeschluessel>
 			<STUDENT:facheinschlberuf><![CDATA['.($row->facheinschlberuf?'true':'false').']]></STUDENT:facheinschlberuf>
