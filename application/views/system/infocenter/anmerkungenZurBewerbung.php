@@ -15,6 +15,7 @@
 							<?php echo date_format(date_create($notiz->insertamum), 'd.m.Y H:i:s') ?>
 						</td>
 						<td>
+							<?php (!isset($notiz->kurzbzlang)) ?: print_r('(' . nl2br($notiz->kurzbzlang) . ') - ') ?>
 							<?php echo nl2br($notiz->text) ?>
 						</td>
 					</tr>

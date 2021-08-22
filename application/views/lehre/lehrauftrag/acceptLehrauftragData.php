@@ -32,7 +32,7 @@ SELECT
     erteilt,
     akzeptiert,
       (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -48,7 +48,7 @@ SELECT
          )
     )                    AS "bestellt_von",
     (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -64,7 +64,7 @@ SELECT
          )
     )                    AS "erteilt_von",
     (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -241,7 +241,7 @@ FROM
                     \'Betreuung\'                                                                       AS "typ",
                     (betreuerart_kurzbz || \' \' ||
                      (SELECT
-                          vorname || \' \' || nachname
+                          nachname || \' \' || vorname
                       FROM
                           PUBLIC.tbl_person
                               JOIN PUBLIC.tbl_benutzer USING (person_id)
