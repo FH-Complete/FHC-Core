@@ -1539,7 +1539,7 @@ function OpenAboutDialog()
 // ****
 function OpenManual()
 {
-	window.open('https://wiki.fhcomplete.org/doku.php?','_blank');
+	window.open('https://wiki.fhcomplete.info/','_blank');
 }
 
 // ****
@@ -2096,6 +2096,26 @@ function variableChangeValue(variable)
 	if(variablevalue = prompt('Bitte geben Sie den neuen Wert fuer '+variable+' ein', variablevalue))
 	{
 		variableChange(variable, '', variablevalue);
+	}
+}
+
+// ****
+// *  Aendert eines Variablenwert nach Überprüfung der Eingabe auf gültigen Wert (kleiner 100)
+// ****
+function variableChangeValueIfNumber(variable)
+{
+	var variablevalue = getvariable(variable);
+
+	if(variablevalue = prompt('Bitte geben Sie den neuen Wert fuer '+variable+' ein', variablevalue))
+	{
+		if ((typeof(parseInt(variablevalue)) === 'number' && variablevalue < 100 ))
+		{
+			variableChange(variable, '', variablevalue);
+		}
+		else
+		{
+			alert(variablevalue + ' ist keine gültige Eingabe! Bitte eine Zahl eingeben!');
+		}
 	}
 }
 

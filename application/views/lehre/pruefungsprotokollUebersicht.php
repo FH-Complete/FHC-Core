@@ -48,6 +48,8 @@
                                 name="period" value="today"><?php echo $this->p->t('ui','heute'); ?></button>
                         <button type="submit" class="btn btn-default <?php echo $period == 'lastWeek' ? 'active' : ''?>"
                                 name="period" value="lastWeek"><?php echo $this->p->t('ui','letzteWoche'); ?></button>
+                        <button type="submit" class="btn btn-default <?php echo $period == 'upcoming' ? 'active' : ''?>"
+                                name="period" value="upcoming"><?php echo $this->p->t('ui','zukuenftige'); ?></button>
                         <button type="submit" class="btn btn-default <?php echo $period == 'all' ? 'active' : ''?>"
                                 name="period" value="all"><?php echo $this->p->t('ui','alle'); ?></button>
                     </div>

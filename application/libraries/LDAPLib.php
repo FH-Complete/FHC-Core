@@ -220,7 +220,9 @@ class LDAPLib
 		}
 		else // Connection error
 		{
-			return error(ldap_error($ldapConnection));
+			return error(
+				'An error occurred while connecting to the LDAP server: '.$ldapConfigs[self::SERVER].':'.$ldapConfigs[self::PORT]
+			);
 		}
 	}
 }

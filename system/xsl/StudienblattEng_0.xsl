@@ -463,7 +463,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Current Semester of Study</text:p>
+                        <xsl:choose>
+                            <xsl:when test = "abbrecher='true'">
+                                <text:p text:style-name="P4">Semester resigned from Study</text:p>
+                            </xsl:when>
+
+                            <xsl:otherwise>
+                                <text:p text:style-name="P4">Current Semester of Study</text:p>
+                            </xsl:otherwise>
+
+                        </xsl:choose>
+
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -482,7 +492,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Current Semester in Degree Program</text:p>
+                        <xsl:choose>
+                            <xsl:when test = "abbrecher='true'">
+                                <text:p text:style-name="P4">Resignation Semester in Degree Program</text:p>
+                            </xsl:when>
+
+                            <xsl:otherwise>
+                                <text:p text:style-name="P4">Current Semester in Degree Program</text:p>
+                            </xsl:otherwise>
+
+                        </xsl:choose>
+
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -516,6 +536,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                            </text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
+                <xsl:if test="abbrecher='false'">
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P4">Expected Final Semester of Study</text:p>
@@ -535,9 +556,20 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                             </text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
+                </xsl:if>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Expected Date of Graduation</text:p>
+                        <xsl:choose>
+                            <xsl:when test="abbrecher='true'">
+                                <text:p text:style-name="P4">Resignation Date</text:p>
+                            </xsl:when>
+
+                            <xsl:otherwise>
+                                <text:p text:style-name="P4">Expected Date of Graduation</text:p>
+                            </xsl:otherwise>
+
+                        </xsl:choose>
+
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P15"><xsl:value-of select="voraussichtlichLetztesStudiensemester_datum"/></text:p>

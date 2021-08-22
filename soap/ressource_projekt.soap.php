@@ -105,7 +105,7 @@ function deleteProjektRessource($username, $passwort, $projektRessource)
     if($projektRessource->projektphase_id != '')
     {
         // von Projektphase löschen
-        if($ressource->deleteFromPhase($projektRessource->ressource_id, $projektRessource->projektphase_id))
+        if($ressource->deleteFromPhaseWithProjektRessourceId($projektRessource->ressource_id, $projektRessource->projektphase_id, $projektRessource->projekt_ressource_id))
             return "Erfolg";
         else
             return "Fehler beim Löschen";
@@ -113,8 +113,10 @@ function deleteProjektRessource($username, $passwort, $projektRessource)
     }
     else
     {
+
         // von Projekt löschen
-        if($ressource->deleteFromProjekt($projektRessource->ressource_id, $projektRessource->projekt_kurzbz))
+        //if($ressource->deleteFromProjekt($projektRessource->ressource_id, $projektRessource->projekt_kurzbz))
+	    if($ressource->deleteFromProjektWithProjektRessourceId($projektRessource->ressource_id, $projektRessource->projekt_kurzbz, $projektRessource->projekt_ressource_id))
             return "Erfolg";
         else
             return "Fehler beim Löschen";

@@ -107,9 +107,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 <vbox id="vbox-main">
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs id="tabs-planner-main" orient="horizontal">
-			<tab id="tab-projekte" label="Projekte" />
+			<tab id="tab-projekte" label="Projekte" selected="true" />
 			<tab id="tab-projektphase" label="Phasen" />
-			<tab id="tab-projekttask" label="Tasks" selected="true" />
+			<tab id="tab-projekttask" label="Tasks"/>
 			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-ressourceauslastung" label="Ressourcen" />
 			<tab id="tab-bestellung" label="Bestellungen" />
@@ -176,7 +176,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 	      <treechildren>
 	       <treeitem uri="rdf:*">
 	         <treerow>
-	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung"/>	         
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#rdf_description"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#typ"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"/>

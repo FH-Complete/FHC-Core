@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 fhcomplete.org
+/* Copyright (C) 2021 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -339,11 +339,11 @@ class dokument extends basis_db
 		}
 
 		$qry = "SELECT tbl_dokumentprestudent.* , tbl_dokument.*
-				FROM public.tbl_dokumentprestudent 
+				FROM public.tbl_dokumentprestudent
 				JOIN public.tbl_dokument USING(dokument_kurzbz)
 				LEFT JOIN public.tbl_vorlage ON (tbl_dokumentprestudent.dokument_kurzbz = tbl_vorlage.vorlage_kurzbz)
 				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
-		
+
 		if(!$archivdokumente)
 		{
 			$qry.="	AND (tbl_vorlage.archivierbar = FALSE OR tbl_vorlage.archivierbar IS NULL)";
@@ -401,7 +401,7 @@ class dokument extends basis_db
 		}
 
 		$qry = "SELECT tbl_dokument.* , tbl_dokumentstudiengang.*
-				FROM public.tbl_dokument 
+				FROM public.tbl_dokument
 				JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz)
 				LEFT JOIN public.tbl_vorlage ON (tbl_dokument.dokument_kurzbz = tbl_vorlage.vorlage_kurzbz)
 				WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
@@ -836,11 +836,11 @@ class dokument extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die Studiengänge bei denen das übergebene Dokument benötigt wird
 	 * @param string $dokument_kurzbz Kurzbz des Dokuments
-	 * @param integer $person_id Optional. Die Dokumente werden zusätzlich auf die Studiengänge eingeschränkt für die sich eine Person beworben hat. 
+	 * @param integer $person_id Optional. Die Dokumente werden zusätzlich auf die Studiengänge eingeschränkt für die sich eine Person beworben hat.
 	 * @return object Objekt mit den Studiengängen oder false.
 	 */
 	public function getStudiengaengeDokument($dokument_kurzbz, $person_id = null)
@@ -854,7 +854,7 @@ class dokument extends basis_db
 					AND person_id =".$this->db_add_param($person_id, FHC_INTEGER)."
 					AND tbl_prestudentstatus.status_kurzbz = 'Interessent'
 					AND get_rolle_prestudent (prestudent_id, NULL) NOT IN ('Abgewiesener','Abbrecher')
-	
+
 					ORDER BY kuerzel";
 
 		if($result = $this->db_query($qry))
@@ -869,12 +869,12 @@ class dokument extends basis_db
 					$stg_obj->studiengang_kz = $row->studiengang_kz;
 					$stg_obj->english = $row->english;
 					$stg_obj->stufe = $row->stufe;
-	
+
 					$this->result[] = $stg_obj;
 				}
 				return $stg_obj;
 			}
-			else 
+			else
 				return false;
 		}
 		else
@@ -882,6 +882,138 @@ class dokument extends basis_db
 			$this->errormsg="Fehler bei der Abfrage aufgetreten";
 			return false;
 		}
+	}
 
+	/**
+	 * Akzeptiert ein bestimmtes Dokument
+	 * @param char $dokument_kurzbz Bezeichner Dokument.
+	 * @param int $person_id Personenkennzeichen.
+	 * @return boolean true wenn akzeptiert bzw geprüft ohne Akzeptieren, false wenn Fehler
+	 */
+	public function akzeptiereDokument($dokument_kurzbz, $person_id)
+	{
+		$db = new basis_db();
+		$arrayDoksZuAkzeptieren = array();
+
+		//get Prestudent_ids
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps, tbl_studiengang sg
+				WHERE
+					ps.studiengang_kz = sg.studiengang_kz
+				AND sg.typ = 'm'
+				AND person_id = ".$this->db_add_param($person_id)."
+				AND not exists(
+					SELECT *
+					from tbl_dokumentprestudent dok
+					where dok.prestudent_id = ps.prestudent_id
+					and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz).")";
+
+		//gibt ein Array von zu akzeptierenden Dokumenten zurück
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+
+			if ($num_rows > 0)
+			{
+				while ($row = $db->db_fetch_object())
+				{
+					$arrayDoksZuAkzeptieren[] = $row->prestudent_id;
+				}
+
+				//für alle prestudent_ids das Dokument akzeptieren
+				$qry = "INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id) VALUES";
+
+				foreach ($arrayDoksZuAkzeptieren as $prestudent_id)
+				{
+					$qry .= "(".$this->db_add_param($dokument_kurzbz). ",". $prestudent_id. ")";
+
+					if (next($arrayDoksZuAkzeptieren) == true)
+					{
+						$qry .=  ",";
+					}
+				}
+				$qry .=  ";";
+
+				if ($this->db_query($qry))
+				{
+					return true;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Akzeptieren';
+					return false;
+				}
+			}
+			return true;
+		}
+
+		else
+			return false;
+	}
+
+	/**
+	 * entakzeptiert ein bestimmtes Dokument
+	 * @param char $dokument_kurzbz Kurzbezeichnung des zu entakzeptierenden Dokuments.
+	 * @param int $person_id Personenkennzeichen.
+	 * @return boolean true wenn entakzeptiert bzw geprüft ohne Entakzeptieren, false wenn Fehler
+	 */
+	public function entakzeptiereDokument($dokument_kurzbz, $person_id)
+	{
+		$db = new basis_db();
+		$arrayDoksZuEntakzeptieren = array();
+
+		//get Prestudent_ids
+		$qry = "SELECT
+					prestudent_id
+				from
+					tbl_dokumentprestudent
+				join
+					tbl_prestudent using (prestudent_id)
+				where
+					person_id = ".$this->db_add_param($person_id)."
+				and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz);
+
+		//gibt ein Array von zu Entakzeptierenden Dokumenten zurück
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+
+			if ($num_rows > 0)
+			{
+				while ($row = $db->db_fetch_object())
+				{
+					$arrayDoksZuEntakzeptieren[] = $row->prestudent_id;
+				}
+
+				//für alle prestudent_ids das Dokument Entakzeptieren
+				$qry = "DELETE FROM public.tbl_dokumentprestudent WHERE prestudent_id in (";
+
+				foreach ($arrayDoksZuEntakzeptieren as $prestudent_id)
+				{
+					$qry .= $prestudent_id;
+
+					if (next($arrayDoksZuEntakzeptieren) == true)
+					{
+						$qry .=  ",";
+					}
+				}
+				$qry .=  ") AND dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz).";";
+
+				if ($this->db_query($qry))
+				{
+					return true;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Entakzeptieren';
+					return false;
+				}
+			}
+			return true;
+		}
+		else
+			return false;
 	}
 }

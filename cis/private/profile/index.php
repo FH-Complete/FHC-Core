@@ -44,6 +44,7 @@ require_once('../../../include/addon.class.php');
 require_once('../../../include/gruppe.class.php');
 require_once('../../../include/adresse.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/bisverwendung.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -269,6 +270,22 @@ if (!$ansicht)
 	echo '	'.$p->t('global/geburtsdatum').': '.$datum_obj->formatDatum($user->gebdatum,'d.m.Y')."<br>
 	".$p->t('global/geburtsort').": $user->gebort<br><br>";
 
+}
+
+if (!$ansicht)
+{
+	if ($is_employee)
+	{
+		$verwendung = new bisverwendung();
+		if($verwendung->getLastVerwendung($uid))
+		{
+			if (!$verwendung->hauptberuflich)
+			{
+				echo 'Hauptberuf: '. $verwendung->hauptberuf;
+			}
+		}
+		echo "<br><br>";
+	}
 }
 
 if (!$ansicht)

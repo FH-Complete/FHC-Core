@@ -398,7 +398,7 @@ if($command=="update" && $error!=true)
 						echo $p->t('global/dateiNichtErfolgreichHochgeladen');
 					}
 				}
-				//E-Mail an 1.Begutachter und 2.Begutachter
+				//E-Mail an 1.Begutachter und 2.Begutachter senden
 				if($bid!='' && $bid!=NULL)
 				{
 					$qry_betr="SELECT distinct trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
@@ -444,14 +444,17 @@ if($command=="update" && $error!=true)
 								// 1. Begutachter mail ohne Token
 								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
 								$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
+								$abgabetyp = $paabgabetyp_kurzbz == 'end' ? 'Endabgabe' : 'Zwischenabgabe';
+
 								$maildata = array();
 								$maildata['geehrt'] = "geehrte".($row_betr->anrede=="Herr"?"r":"");
 								$maildata['anrede'] = $row_betr->anrede;
 								$maildata['betreuer_voller_name'] = $row_betr->first;
 								$maildata['student_anrede'] = $row_std->anrede;
 								$maildata['student_voller_name'] = trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost);
+								$maildata['abgabetyp'] = $abgabetyp;
 								$maildata['parbeituebersichtlink'] = "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>";
-								$maildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
+								$maildata['bewertunglink'] = $num_rows_sem >= 1 && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
 								$maildata['token'] = "";
 
 								$mailres = sendSanchoMail(
@@ -495,6 +498,7 @@ if($command=="update" && $error!=true)
 										$zweitbetmaildata['betreuer_voller_name'] = $zweitbetr->voller_name;
 										$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
 										$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
+										$zweitbetmaildata['abgabetyp'] = $abgabetyp;
 										$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
 										$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
 										$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $zweitbetr->zugangstoken . "</p>" : "";

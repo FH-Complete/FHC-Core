@@ -154,9 +154,11 @@ class Notiz_model extends DB_Model
 	{
 		// Join with the table public.tbl_notizzuordnung using notiz_id
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
-		$this->addOrder('insertamum', 'DESC');
+		$this->addJoin('public.tbl_prestudent', 'prestudent_id', 'LEFT');
+		$this->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
+		$this->addOrder('public.tbl_notiz.insertamum', 'DESC');
 
-		return $this->loadWhere(array('person_id' => $person_id, 'titel LIKE' => $titel));
+		return $this->loadWhere(array('public.tbl_notizzuordnung.person_id' => $person_id, 'titel LIKE' => $titel));
 	}
 	
 	/**

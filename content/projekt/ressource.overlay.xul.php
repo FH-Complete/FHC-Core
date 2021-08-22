@@ -64,7 +64,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<toolbarbutton id="toolbarbutton-ressource-projekt-drucken" label="Drucken" oncommand="foo = window.open('<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=projekt');foo.print();" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
 						</toolbar>
 					</toolbox>
-					<iframe id="iframe-ressource-projekt" flex="5" src="<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=projekt" />
+					<iframe id="iframe-ressource-projekt" flex="5" src="<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?empty" />
 				</vbox>
 				<vbox>
 					<toolbox>
