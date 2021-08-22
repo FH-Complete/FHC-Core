@@ -395,9 +395,10 @@ class notiz extends basis_db
 	 * Laedt die Notizen vom Bewerbungstool
 	 * @param integer $person_id
 	 * @param integer $prestudent_id
+	 * @param string $order Sorting order. Default: "notiz_id"
 	 * @return boolean
 	 */
-	public function getBewerbungstoolNotizen($person_id, $prestudent_id = null)
+	public function getBewerbungstoolNotizen($person_id, $prestudent_id = null, $order = 'notiz_id')
 	{
 		$qry = "SELECT
 					*
@@ -411,7 +412,7 @@ class notiz extends basis_db
 			$qry .= " AND prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		}
 
-		$qry .= " ORDER BY notiz_id";
+		$qry .= " ORDER BY ".$order;
 
 		if($result = $this->db_query($qry))
 		{
