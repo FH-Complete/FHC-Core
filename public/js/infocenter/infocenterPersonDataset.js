@@ -20,22 +20,44 @@ if (FHC_JS_DATA_STORAGE_OBJECT.called_method == 'index')
  */
 var InfocenterPersonDataset = {
 	infocenter_studiensemester_variablename: 'infocenter_studiensemester',
+	infocenter_studienganstyp_variablename: 'infocenter_studiensgangtyp',
 
 	/**
 	 * adds person table additional actions html (above and beneath it)
 	 */
-	appendTableActionsHtml: function(infocenter_studiensemester)
+	appendTableActionsHtml: function(infocenter_studiensemester, infocenter_studiengangstyp)
 	{
 		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/system/messages/Messages/writeTemplate";
 
 		var formHtml = '<form id="sendMsgsForm" method="post" action="'+ url +'" target="_blank"></form>';
 		$("#datasetActionsTop").before(formHtml);
 
+		var auswahlStudienart =
+			'<select class="form-control auswahlStudienArt" style="width:auto;">' +
+				'<option data-id="all"> Alle </option>' +
+				'<option data-id="master"> Master </option>' +
+				'<option data-id="bachelor"> Bachelor </option>' +
+			'</select>';
+
+		var auswahlAbsageToggle =
+			'<a class="absageToggle">Erweiterte Einstellungen</a>';
+
+		var auswahlAbsage =
+			'<select class="form-control absgstatusgrund" style="width:auto; float:left;">' +
+			'<option value="null" selected="selected"> Absagegrund </option>' +
+			'</select>' +
+			'<select class="form-control auswahlAbsageStg" style="width:auto; float:left;">' +
+			'<option value="null" selected="selected"> Studiengang </option>' +
+			'</select>' +
+			'<button class="btn btn-default auswahlAbsageBtn" style="float:left"> Absage </button>';
+
+		InfocenterPersonDataset.getAbsageData();
+
 		var studienSemesterHtml = '<button class="btn btn-default btn-xs decStudiensemester">' +
 			'<i class="fa fa-chevron-left"></i>' +
 			'</button>&nbsp;' +
 			infocenter_studiensemester +
-			'&nbsp;<button class="btn btn-default btn-xs incStudiensemester">' +
+			'&nbsp;<button class="btn btn-default btn-sm incStudiensemester">' +
 			'<i class="fa fa-chevron-right"></i>' +
 			'</button>';
 
@@ -56,10 +78,28 @@ var InfocenterPersonDataset = {
 		// userdefined Semestervariable shown independently of personcount,
 		// it is possible to change the semester
 		$("#datasetActionsTop, #datasetActionsBottom").append(
-			"<div class='row'>"+
-			"<div class='col-xs-12 text-center'>"+studienSemesterHtml+"</div>"+
-			"</div><div class='h-divider'></div><hr class='studiensemesterline'>");
+			"<div class='row'>" +
+				"<div class='col-xs-5 text-right'>" + auswahlStudienart + "</div>" +
+				"<div class='col-xs-7 text-left'>" + studienSemesterHtml + "</div>" +
+			"</div>" +
+			"<div class='h-divider'></div><hr class='studiensemesterline'>"
+		);
 
+		InfocenterPersonDataset.selectStudiengangTyp(infocenter_studiengangstyp)
+
+		$('.auswahlStudienArt').change(function()
+		{
+			InfocenterPersonDataset.changeStudengangsTyp($(this).find('option:selected').attr('data-id'));
+		});
+
+		$("#datasetActionsBottom").append(
+			"<div class='row'>"+
+				"<div class='col-xs-12'>"+auswahlAbsageToggle+"</div>"+
+				"<div class='col-xs-12' id='absagePunkte' style='display:none'>"+auswahlAbsage+"</div>"+
+			"</div>" +
+			"<div class='h-divider'></div>" +
+			"<hr class='studiensemesterline'>"
+		)
 		$("button.incStudiensemester").click(function() {
 			InfocenterPersonDataset.changeStudiensemesterUservar(1);
 		});
@@ -67,6 +107,29 @@ var InfocenterPersonDataset = {
 		$("button.decStudiensemester").click(function() {
 			InfocenterPersonDataset.changeStudiensemesterUservar(-1);
 		});
+
+		$('button.auswahlAbsageBtn').click(function()
+		{
+			var idsel = $("#filterTableDataset input:checked[name=PersonId\\[\\]]");
+
+			if(idsel.length <= 0)
+				return FHC_DialogLib.alertInfo("Bitte wählen Sie die Personen aus.");
+
+			if($('.absgstatusgrund').val()  === 'null' || $('.auswahlAbsageStg').val() === 'null')
+				return FHC_DialogLib.alertInfo("Bitte den Absagegrund und Studiengang auswählen.");
+
+			$(".absageModalForAll").modal("show");
+		});
+
+		$('#saveAbsageForAll').click(function()
+		{
+			InfocenterPersonDataset.saveAbsageForAll();
+		});
+
+		$('a.absageToggle').click(function()
+		{
+			$('#absagePunkte').toggle();
+		})
 
 		var personcount = 0;
 
@@ -113,6 +176,22 @@ var InfocenterPersonDataset = {
 				}
 			}
 		);
+	},
+
+	selectStudiengangTyp: function(typ)
+	{
+		switch (typ)
+		{
+			case 'b, m' :
+				$('.auswahlStudienArt [data-id="all"]').attr('selected', 'selected');
+				break;
+			case 'b' :
+				$('.auswahlStudienArt [data-id="bachelor"]').attr('selected', 'selected');
+				break;
+			case 'm' :
+				$('.auswahlStudienArt [data-id="master"]').attr('selected', 'selected');
+				break;
+		}
 	},
 
 	/**
@@ -173,6 +252,45 @@ var InfocenterPersonDataset = {
 		});
 	},
 
+	changeStudengangsTyp: function($typ)
+	{
+		switch ($typ)
+		{
+			case 'all' :
+				var change = 'b\', \'m';
+				break;
+			case 'bachelor' :
+				var change = 'b';
+				break;
+			case 'master' :
+				var change = 'm';
+				break;
+		}
+
+		FHC_AjaxClient.showVeil();
+
+		FHC_AjaxClient.ajaxCallPost(
+			'system/Variables/changeStudengangsTypVar',
+			{
+				'name': InfocenterPersonDataset.infocenter_studienganstyp_variablename,
+				'change': change,
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						// refresh filterwidget with page reload
+						FHC_FilterWidget.reloadDataset();
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_AjaxClient.hideVeil();
+					alert(textStatus);
+				}
+			}
+		);
+	},
+
 	/**
 	 * initializes change of the uservariable infocenter_studiensemesster, either
 	 * to next semester (change > 0) or previous semester (change < 0)
@@ -203,6 +321,75 @@ var InfocenterPersonDataset = {
 		);
 	},
 
+	saveAbsageForAll: function()
+	{
+		var idsel = $("#filterTableDataset input:checked[name=PersonId\\[\\]]");
+
+		var statusgrund = $('.absgstatusgrund').val();
+		var studiengang = $('.auswahlAbsageStg').val();
+
+		var personen = [];
+
+		for (var i = 0; i < idsel.length; i++)
+		{
+			personen.push($(idsel[i]).val());
+		}
+
+		FHC_AjaxClient.ajaxCallPost(
+			'system/infocenter/InfoCenter/saveAbsageForAll',
+			{
+				'statusgrund': statusgrund,
+				'studiengang': studiengang,
+				'personen' : personen
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data))
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+
+					if (FHC_AjaxClient.hasData(data))
+						FHC_DialogLib.alertSuccess("Erfolgreich gespeichert.")
+
+					$(".absageModalForAll").modal("hide");
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
+
+	getAbsageData: function()
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			'system/infocenter/InfoCenter/getAbsageData',
+			{},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						data = FHC_AjaxClient.getData(data);
+						$.each(data.statusgruende, function(key, value){
+							$('.absgstatusgrund').append($("<option/>", {
+									value: value.statusgrund_id,
+									text: value.bezeichnung_mehrsprachig[0]
+							}))
+						})
+						$.each(data.studiengaenge, function(key, value){
+							$('.auswahlAbsageStg').append($("<option/>", {
+									value: value.studiengang,
+									text: value.studiengang
+							}))
+						})
+
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
 	/**
 	 * initializes call to get the Studiensemester user variable
 	 */
@@ -211,7 +398,8 @@ var InfocenterPersonDataset = {
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Variables/getVar',
 			{
-				'name': InfocenterPersonDataset.infocenter_studiensemester_variablename
+				'name' : InfocenterPersonDataset.infocenter_studiensemester_variablename,
+				'typ' : InfocenterPersonDataset.infocenter_studienganstyp_variablename
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -220,7 +408,7 @@ var InfocenterPersonDataset = {
 						if (typeof callback === "function")
 						{
 							var infocenter_studiensemester = FHC_AjaxClient.getData(data);
-							callback(infocenter_studiensemester[InfocenterPersonDataset.infocenter_studiensemester_variablename]);
+							callback(infocenter_studiensemester[InfocenterPersonDataset.infocenter_studiensemester_variablename], infocenter_studiensemester[InfocenterPersonDataset.infocenter_studienganstyp_variablename]);
 						}
 					}
 				},
