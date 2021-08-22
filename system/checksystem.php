@@ -162,6 +162,7 @@ $berechtigungen = array(
 	array('lehre/studienordnungInaktiv','Studienordnung Inaktiv'),
 	array('lehre/studienplan','Studienplan'),
 	array('lehre/vorrueckung','Lehreinheitenvorrückung'),
+	array('lehre/zgvpruefung','Berechtigung um ZGV Überprüfungen vorzunehmen'),
 	array('lv-plan','Stundenplan'),
 	array('lv-plan/gruppenentfernen','Erlaut das Entfernen von Gruppen aus LVPlan vom FAS aus'),
 	array('lv-plan/lektorentfernen','Erlaut das Entfernen von Lektoren aus LVPlan vom FAS aus'),

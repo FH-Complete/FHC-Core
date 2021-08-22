@@ -1,11 +1,12 @@
 <?php
 
+	$this->config->load('infocenter');
 	$APP = '\'infocenter\'';
 	$INTERESSENT_STATUS = '\'Interessent\'';
-	$STUDIENGANG_TYP = '\'b\'';
+	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
-	$ADDITIONAL_STG = '10021,10027';
+	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
 	$query = '
@@ -167,7 +168,31 @@
 				 WHERE ps.person_id = p.person_id
 			  ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
 				 LIMIT 1
-			) AS "ZGVNation"
+			) AS "ZGVNation",
+			(
+				SELECT ps.zgvmanation
+				FROM public.tbl_prestudent ps
+				 WHERE ps.person_id = p.person_id
+			  ORDER BY ps.zgvmanation DESC NULLS LAST, ps.prestudent_id DESC
+				 LIMIT 1
+			) AS "ZGVMNation",
+			(
+				SELECT tbl_organisationseinheit.bezeichnung
+				FROM public.tbl_benutzerfunktion 
+				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
+				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				AND tbl_benutzerfunktion.uid = (
+					SELECT l.insertvon
+					FROM system.tbl_log l
+					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
+					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.person_id = p.person_id
+					ORDER BY l.zeitpunkt DESC
+					LIMIT 1
+				)
+				LIMIT 1 
+			) AS "InfoCenterMitarbeiter"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -226,7 +251,9 @@
 			'Reihungstest angetreten',
 			'Reihungstest angemeldet',
 			'Reihungstest Datum',
-			'ZGV Nation'
+			'ZGV Nation BA',
+			'ZGV Nation MA',
+			'InfoCenter Mitarbeiter'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -314,6 +341,21 @@
 			{
 				$datasetRaw->{'ZGVNation'} = '-';
 			}
+
+			if ($datasetRaw->{'ZGVMNation'} == null)
+			{
+				$datasetRaw->{'ZGVMNation'} = '-';
+			}
+
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'InfoCenter')
+			{
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+			}
+			else
+			{
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
+			}
+
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {
