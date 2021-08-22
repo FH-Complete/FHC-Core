@@ -1097,7 +1097,7 @@ class mitarbeiter extends benutzer
 	 * beschäftigten Untergebenen der Kind-OEs des Leiters zurückgegeben.
 	 * @return boolean
 	 */
-	public function getUntergebene($uid=null, $include_OE_childs = false)
+	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
@@ -1192,6 +1192,9 @@ class mitarbeiter extends benutzer
 			JOIN
 				public.tbl_benutzer
 			USING (uid)
+			JOIN
+			  public.tbl_mitarbeiter
+			ON (uid = mitarbeiter_uid)
 			WHERE ((funktion_kurzbz='oezuordnung' AND (false ";
 
 		if($oe!='')
@@ -1205,7 +1208,10 @@ class mitarbeiter extends benutzer
 			AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 			AND
-				tbl_benutzer.aktiv = 'true';";
+				tbl_benutzer.aktiv = 'true'";
+			if ($fixangestellte_only)
+				$qry .= " AND tbl_mitarbeiter.fixangestellt";
+			$qry .= ";";
 
 		if($this->db_query($qry))
 		{
@@ -1537,6 +1543,57 @@ class mitarbeiter extends benutzer
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Gibt alle Mitarbeiter zurück, die im BIS Meldungszeitraum bisgemeldet sind
+	 * @param String $stichtag BIS Meldung Stichtag
+	 * @return boolean
+	 */
+	public function getMitarbeiterBISMeldung($stichtag)
+	{
+		$datetime = new DateTime($stichtag);
+		$bismeldung_jahr = $datetime->format('Y');
+
+		$qry = '
+			SELECT DISTINCT ON (UID) *,
+			transform_geschlecht(tbl_person.geschlecht, tbl_person.gebdatum) as geschlecht_imputiert
+			FROM
+				public.tbl_mitarbeiter
+				JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+				JOIN public.tbl_person USING(person_id)
+				JOIN bis.tbl_bisverwendung USING(mitarbeiter_uid)
+				JOIN bis.tbl_beschaeftigungsausmass USING(beschausmasscode)
+			WHERE
+				bismelden
+				AND personalnummer > 0
+				AND (beginn <= make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 12, 31) OR beginn is null)
+				AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende >= make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 1, 1))
+			ORDER BY uid, nachname, vorname
+		';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->vornamen = $row->vornamen;
+				$obj->nachname = $row->nachname;
+				$obj->gebdatum = $row->gebdatum;
+				$obj->geschlecht = $row->geschlecht;
+				$obj->geschlechtX = $row->geschlecht_imputiert;
+				$obj->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$obj->personalnummer = $row->personalnummer;
+				$obj->ausbildungcode = $row->ausbildungcode;
+
+				$this->result []= $obj;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

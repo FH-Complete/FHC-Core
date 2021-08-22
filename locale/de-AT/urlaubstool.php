@@ -35,4 +35,15 @@ $this->phrasen['urlaubstool/handbuchUrlaubserfassung']='Handbuch Urlaubserfassun
 $this->phrasen['urlaubstool/meineZeitsperren']='Meine Zeitsperren';
 $this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseFreigeben']='Sie können diesen unter folgender Adresse freigeben';
 $this->phrasen['urlaubstool/freigabeansuchenUrlaub']='Freigabeansuchen Urlaub';
+$this->phrasen['urlaubstool/freigabeFehlt']='Urlaub wurde noch nicht freigegeben';
+$this->phrasen['urlaubstool/freigegebenerUrlaubGeloescht']='Bereits Freigegebener Urlaub wurde gelöscht';
+$this->phrasen['urlaubstool/VorgesetzteInformiert']='Email wurde an %s versandt';
+$this->phrasen['urlaubstool/konnteKeinInformationsemailVersendetWerden']='Es konnte kein Email versendet werden, da kein Vorgesetzter eingetragen ist!';
+$this->phrasen['urlaubstool/xHatUrlaubGeloescht']='%s %s hat bereits freigegebenen Urlaub gelöscht';
+$this->phrasen['urlaubstool/urlaubsfreigabe']='Freigabe Urlaub: ';
+$this->phrasen['urlaubstool/bestaetigungsmailWurdeVersandt']='Bestätigungsmail an %s versandt';
+$this->phrasen['urlaubstool/urlaubVon']='Ihr angefragter Urlaub von';
+$this->phrasen['urlaubstool/urlaubBis']=' wurde von %s freigegeben.';
+$this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseEinsehen']='Sie können diesen unter folgender Adresse einsehen:';
+
 ?>

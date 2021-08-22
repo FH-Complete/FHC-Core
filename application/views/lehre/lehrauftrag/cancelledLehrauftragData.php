@@ -14,7 +14,7 @@ $query = '
            datum AS "storniert",
            (
                SELECT
-                    vorname || \' \' || nachname
+                    nachname || \' \' || vorname
                 FROM
                     public.tbl_person
                 JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -53,20 +53,17 @@ $tableWidgetArray = array(
 	'tableUniqueId' => 'cancelledLehrauftrag',
 	'requiredPermissions' => 'lehre/lehrauftrag_akzeptieren',
 	'datasetRepresentation' => 'tabulator',
-	'columnsAliases' => array(  // TODO: use phrasen
+	'columnsAliases' => array(
 		'Status',
-		'Studiensemester',
-		'Typ',
-		'LV- / Projektbezeichnung',
-		'Stunden',
-		'Betrag',
-		'Storniert am'
+		ucfirst($this->p->t('lehre', 'studiensemester')),
+		ucfirst($this->p->t('global', 'typ')),
+		ucfirst($this->p->t('lehre', 'lehrveranstaltung')). '- / '. ucfirst($this->p->t('ui', 'projekt')). lcfirst($this->p->t('ui', 'bezeichnung')),
+		ucfirst($this->p->t('ui', 'stunden')),
+		ucfirst($this->p->t('ui', 'betrag')),
+		ucfirst($this->p->t('ui', 'storniertAm')),
+		ucfirst($this->p->t('ui', 'storniertVon'))
 	),
 	'datasetRepOptions' => '{
-        layout: "fitColumns",           // fit columns to width of table
-	    responsiveLayout: "hide",       // hide columns that dont fit on the table
-	    movableColumns: true,           // allows changing column
-	    placeholder: func_placeholder(),
         rowFormatter:function(row){
             func_rowFormatter(row);
         },
@@ -78,22 +75,24 @@ $tableWidgetArray = array(
         },
         tableBuilt: function(){
             func_tableBuilt(this);
-        }
+        },
     }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
         vertrag_id: {visible: false},
-        vertragsstunden_studiensemester_kurzbz: {visible: false},
-        vertragstyp_kurzbz: {widthGrow: 2},
-        bezeichnung: {widthGrow: 2},
+        vertragsstunden_studiensemester_kurzbz: {visible: false, widthShrink:1},
+        vertragstyp_kurzbz: {minWidth: 200},
+        bezeichnung: {minWidth: 200},
         vertragsstunden: {
             align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
-            bottomCalc:"sum", bottomCalcParams:{precision:1}
+            bottomCalc:"sum", bottomCalcParams:{precision:1},
+            minWidth: 200
         },
         betrag: {
             align:"right", formatter: form_formatNulltoStringNumber,
-            bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}
+            bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"},
+            minWidth: 200
         },
-        storniert: {align:"center", mutator: mut_formatStringDate, tooltip: storniert_tooltip},
+        storniert: {align:"center", mutator: mut_formatStringDate, tooltip: storniert_tooltip, minWidth: 200},
         storniert_von: {visible: false},
         letzterStatus_vorStorniert: {visible: false}
     }', // col properties

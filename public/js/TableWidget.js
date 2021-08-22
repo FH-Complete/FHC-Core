@@ -182,10 +182,96 @@ var FHC_TableWidget = {
 	 */
 	_turnOnEvents: function(tableWidgetDiv) {
 
+		var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
+
 		// If the choosen dataset representation is tablesorter
 		if (FHC_TableWidget._datasetRepresentation == DATASET_REP_TABLESORTER)
 		{
 			FHC_TableWidget._enableTableSorter(tableWidgetDiv); // enable the tablesorter
+		}
+
+		// If the choosen dataset representation is tabulator
+		if (FHC_TableWidget._datasetRepresentation == DATASET_REP_TABULATOR)
+		{
+			// ---------------------------------------------------------------------------------------------------------
+			// Add events to the elements
+			// ---------------------------------------------------------------------------------------------------------
+
+			// Click-Event to download csv
+			tableWidgetDiv.find('#download-csv').on('click', function()
+			{
+				// BOM for correct UTF-8 char output
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("download", "csv", "data.csv", {bom:true});
+			})
+
+			// Click-Event to toggle the collapsable help panel
+			tableWidgetDiv.find('#help').on('click', function()
+			{
+				// Hide the collapsable settings panel, if it actually shown
+				$('#tabulatorSettings-' + tableUniqueId).collapse('hide');
+
+				// Toggle the collapsable help panel
+				$('#tabulatorHelp-' + tableUniqueId).collapse('toggle');
+			})
+
+			// Click-Event to toggle the collapsable settings panel
+			tableWidgetDiv.find('#settings').on('click', function()
+			{
+				// Hide the collapsable help panel, if it actually shown
+				$('#tabulatorHelp-' + tableUniqueId).collapse('hide');
+
+				// Toggle the collapsable settings panel
+				$('#tabulatorSettings-' + tableUniqueId).collapse('toggle');
+			})
+
+			/* Beautify button group behaviour
+			 * Let buttons stay active even until they are clicked again to close the collapsable help- oder setting panels
+			 * Also remove the disturbing button focus behaviour
+			 */
+			$(".btn-group > .btn").click(function(){
+				if ($(this).hasClass("active"))
+				{
+					$(this).removeClass('active').css('outline', 'none');
+				}
+				else
+				{
+					$(this).addClass("active").css('outline', 'none').siblings().removeClass("active");
+				}
+			});
+
+			/**
+			 * Click-Event to select all rows
+			 * Default is ALL rows. This can be modified via hook tableWidgetHook_selectAllButton.
+ 			 */
+			if (typeof tableWidgetHook_selectAllButton == 'function')
+			{
+				tableWidgetDiv.find('#select-all').on('click', function() {
+					tableWidgetHook_selectAllButton(tableWidgetDiv);
+				});
+			}
+			else
+			{
+				tableWidgetDiv.find('#select-all').on('click', function() {
+					tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', true);
+				});
+			}
+
+			// Click-Event to deselect all rows
+			tableWidgetDiv.find('#deselect-all').on('click', function()
+			{
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('deselectRow');
+			})
+
+			// Click-Event to toggle column-picker columns
+			tableWidgetDiv.find('.btn-select-col').on('click', function()
+			{
+				var selected = this.value;
+
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('toggleColumn', selected);
+
+				// toggle class to color button as selected / deselected
+				$(this).toggleClass('btn-select-col-selected').blur();	// blur removes automatic focus
+			})
 		}
 	},
 
@@ -250,47 +336,62 @@ var FHC_TableWidget = {
 					if (typeof tableWidgetDiv.find("#tableWidgetTableDataset").checkboxes === 'function')
 						tableWidgetDiv.find("#tableWidgetTableDataset").checkboxes("range", true);
 				}
-
-				for (var i = 0; i < data.dataset.length; i++)
+				if (data.dataset.length == 0)
 				{
-					var record = data.dataset[i];
-
-					if ($.isEmptyObject(record))
+					// Display placeholder if Table is empty
+					var numColumns = arrayFieldsToDisplay.length;
+					if (data.hasOwnProperty("additionalColumns") && $.isArray(data.additionalColumns))
 					{
-						continue;
+						numColumns += data.additionalColumns.length;
 					}
-
-					var strHtml = "<tr class='" + record.MARK_ROW_CLASS + "'>";
-
-					if (data.checkboxes != null && data.checkboxes != "")
+					var strHtml = '<tr><td align="center" colspan="'+numColumns+'">';
+					strHtml += FHC_PhrasesLib.t('ui', 'keineDatenVorhanden');
+					strHtml += '</td></tr>';
+					tableWidgetDiv.find("#tableWidgetTableDataset > tbody").append(strHtml);
+				}
+				else
+				{
+					for (var i = 0; i < data.dataset.length; i++)
 					{
-						strHtml += "<td>";
-						strHtml += "<input type='checkbox' name='" + data.checkboxes + "[]' value='" + record[data.checkboxes] + "'>";
-						strHtml += "</td>";
-					}
+						var record = data.dataset[i];
 
-					$.each(arrayFieldsToDisplay, function(i, fieldToDisplay) {
-
-						if (record.hasOwnProperty(data.fields[i]))
+						if ($.isEmptyObject(record))
 						{
-							strHtml += "<td>" + record[data.fields[i]] + "</td>";
+							continue;
 						}
-					});
 
-					if (data.additionalColumns != null && $.isArray(data.additionalColumns))
-					{
-						$.each(data.additionalColumns, function(i, additionalColumn) {
+						var strHtml = "<tr class='" + record.MARK_ROW_CLASS + "'>";
 
-							if (record.hasOwnProperty(additionalColumn))
+						if (data.checkboxes != null && data.checkboxes != "")
+						{
+							strHtml += "<td>";
+							strHtml += "<input type='checkbox' name='" + data.checkboxes + "[]' value='" + record[data.checkboxes] + "'>";
+							strHtml += "</td>";
+						}
+
+						$.each(arrayFieldsToDisplay, function(i, fieldToDisplay) {
+
+							if (record.hasOwnProperty(data.fields[i]))
 							{
-								strHtml += "<td>" + record[additionalColumn] + "</td>";
+								strHtml += "<td>" + record[data.fields[i]] + "</td>";
 							}
 						});
+
+						if (data.additionalColumns != null && $.isArray(data.additionalColumns))
+						{
+							$.each(data.additionalColumns, function(i, additionalColumn) {
+
+								if (record.hasOwnProperty(additionalColumn))
+								{
+									strHtml += "<td>" + record[additionalColumn] + "</td>";
+								}
+							});
+						}
+
+						strHtml += "</tr>";
+
+						tableWidgetDiv.find("#tableWidgetTableDataset > tbody").append(strHtml);
 					}
-
-					strHtml += "</tr>";
-
-					tableWidgetDiv.find("#tableWidgetTableDataset > tbody").append(strHtml);
 				}
 			}
 		}
@@ -443,10 +544,54 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
+				if (options.tableWidgetHeader == 'undefined')
+				{
+					options.persistentLayout = true;			// enables persistence (default store in localStorage if available, else in cookie)
+					options.persistenceID = data.tableUniqueId;	// TableWidget unique id to store persistence data seperately for multiple tables
+				}
+				options.movableColumns = true;				// allows changing column order
+				options.tooltipsHeader = true;				// set header tooltip with column title
+				options.placeholder = _func_placeholder();	// display text when table is empty
+				options.rowSelectionChanged = function(data, rows){
+					_func_rowSelectionChanged(data, rows);
+				};
+				options.columnVisibilityChanged = function(column, visible) {
+					_func_columnVisibilityChanged(column, visible);
+				};
 
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
 			}
+		}
+
+		// -------------------------------------------------------------------------------------------------------------
+		// Render TableWidget Header and -Footer
+		// -------------------------------------------------------------------------------------------------------------
+
+		// Render tableWidgetHeader
+		if (options.tableWidgetHeader == 'undefined' ||
+			(options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != false))
+		{
+			var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
+			tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
+
+			// Render the collapsable div triggered by button in tableWidgetHeader
+			var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
+			tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
+		}
+
+		/**
+		 * 	tableWidgetFooter is NOT rendered by default.
+		 * 	tableWidgetFooter is rendered, if tableWidgetFooter is set in tabulators datasetRepOptions.
+		 *	Setup options like this:
+		 *  tableWidgetFooter: {
+		 *  	selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
+		 *  }
+ 		 */
+		if (options.tableWidgetFooter != 'undefined' && options.tableWidgetFooter != null)
+		{
+			var tabulatorFooterHTML = _renderTabulatorFooterHTML(options.tableWidgetFooter);
+			tableWidgetDiv.find('#tableWidgetFooter').append(tabulatorFooterHTML);
 		}
 	},
 
@@ -583,6 +728,161 @@ var FHC_TableWidget = {
 		return tableWidgetUniqueIdArray;
 	}
 };
+
+//**********************************************************************************************************************
+// Render functions
+//**********************************************************************************************************************
+/*
+ * Processed when row selection changed.
+ * Displays number of selected rows on row selection change.
+ */
+function _func_rowSelectionChanged (data, rows){
+
+	$('#number-selected').html("Ausgewählte Zeilen: <strong>" + rows.length + "</strong>");
+}
+
+/* Processed when columns visibility changed (e.g. using the column picker).
+ * Redraws the table to expand columns to table width.
+ */
+function _func_columnVisibilityChanged(column, visible){
+
+	var table = column.getTable();
+
+	table.redraw();
+}
+
+/*
+ * Displays text when table is empty
+ */
+function _func_placeholder(){
+	return '<h4>' + FHC_PhrasesLib.t('ui', 'keineDatenVorhanden') + '</h4>';
+}
+
+// Returns TableWidget Header HTML (download-, setting button...)
+function _renderTabulatorHeaderHTML(tableWidgetDiv){
+
+	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
+
+	var tabulatorHeaderHTML = '';
+	tabulatorHeaderHTML += '<div class="btn-toolbar pull-right" role="toolbar">';
+	tabulatorHeaderHTML += '<div class="btn-group" role="group">';
+	tabulatorHeaderHTML += '' +
+		'<button id="download-csv" class="btn btn-default" type="button" ' +
+		'data-toggle="tooltip" data-placement="left" title="Download CSV">' +
+		'<small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i>' +
+		'</button>';
+	tabulatorHeaderHTML += '' +
+		'<button id="help" class="btn btn-default" type="button" ' +
+		'data-toggle="collapse tooltip" data-target="tabulatorHelp-'+ tableUniqueId + '" data-placement="left" ' +
+		'title="' + FHC_PhrasesLib.t("ui", "hilfe") + '"><i class="fa fa-question"></i>' +
+		'</button>';
+	tabulatorHeaderHTML += '' +
+		'<button id="settings" class="btn btn-default" type="button" ' +
+		'data-toggle="collapse tooltip" data-target="tabulatorSettings-'+ tableUniqueId + '" data-placement="left" ' +
+		'title="' + FHC_PhrasesLib.t("ui", "tabelleneinstellungen") + '" ' +
+		'aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '">' +
+		'<i class="fa fa-cog"></i>' +
+		'</button>';
+	tabulatorHeaderHTML += '</div>';
+	tabulatorHeaderHTML += '</div>';
+	tabulatorHeaderHTML += '<br><br><br>';
+
+	return tabulatorHeaderHTML;
+}
+
+// Returns collapsable HTML element for TableWidget header buttons
+function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
+
+	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
+
+	var tabulatorHeaderCollapseHTML = '';
+
+	// CollapseHTML 'Settings'
+	tabulatorHeaderCollapseHTML += '<div class="row">';
+	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
+	tabulatorHeaderCollapseHTML += '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
+
+	tabulatorHeaderCollapseHTML += '<div class="panel panel-default">';
+	tabulatorHeaderCollapseHTML += '<div class="panel-heading" role="tab" id="headingOne">';
+	tabulatorHeaderCollapseHTML += '<h5 class="panel-title">';
+	tabulatorHeaderCollapseHTML += '' +
+		'<a role="button" data-toggle="collapse" data-parent="#accordion" ' +
+		'href="#selectColumns-' + tableUniqueId + '" ' +
+		'aria-expanded="false" aria-controls="selectColumns">' +
+		FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
+		'</a>';
+	tabulatorHeaderCollapseHTML += '</h5>';
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-heading
+	tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="panel-collapse collapse" ' +
+		'role="tabpanel" aria-labelledby="headingOne">';
+	tabulatorHeaderCollapseHTML += '<div class="panel-body">';
+	tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
+
+	// Create column picker (Spalten einstellen)
+	tableWidgetDiv.find('#tableWidgetTabulator').tabulator('getColumns').forEach(function(column)
+	{
+		var field = column.getField();
+		var title = column.getDefinition().title;
+		var btn_select_col_selected = column.getVisibility() ? 'btn-select-col-selected' : '';
+
+		// If certain columns should be excluded from the column picker (define them in a blacklist array)
+		if (typeof tableWidgetBlacklistArray_columnUnselectable != 'undefined' &&
+			Array.isArray(tableWidgetBlacklistArray_columnUnselectable) &&
+			tableWidgetBlacklistArray_columnUnselectable.length)
+		{
+			if ($.inArray(field, tableWidgetBlacklistArray_columnUnselectable) < 0)
+			{
+				tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+			}
+		}
+		// Else provide all tabulator fields as pickable columns
+		else
+		{
+			tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+		}
+	});
+
+	tabulatorHeaderCollapseHTML += '</div>'; // end btn-group
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-body
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-collapse
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel
+
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-group
+	tabulatorHeaderCollapseHTML += ' </div>'; // end col
+	tabulatorHeaderCollapseHTML += ' </div>'; // end row
+
+	return tabulatorHeaderCollapseHTML;
+}
+
+// Returns TableWidget Footer HTML (de-/select buttons,...)
+function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
+
+	var tabulatorFooterHTML = '';
+
+	// If property selectButtons is true, render 'Alle auswaehlen / Alle abwaehlen' buttons
+	if (tableWidgetFooterOptions.selectButtons != 'undefined' && tableWidgetFooterOptions.selectButtons == true)
+	{
+		tabulatorFooterHTML += '<div class="btn-toolbar" role="toolbar">';
+		tabulatorFooterHTML += '<div class="btn-group" role="group">';
+		tabulatorFooterHTML += '' +
+			'<button id="select-all" class="btn btn-default pull-left" type="button">'
+			+ FHC_PhrasesLib.t("ui", "alleAuswaehlen") + '' +
+			'</button>';
+		tabulatorFooterHTML += '' +
+			'<button id="deselect-all" class="btn btn-default pull-left" type="button">'
+			+ FHC_PhrasesLib.t("ui", "alleAbwaehlen") + '' +
+			'</button>';
+		tabulatorFooterHTML += '' +
+			'<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal">'
+			+ FHC_PhrasesLib.t("ui", "ausgewaehlteZeilen") + ': <strong>0</strong>' +
+			'</span>';
+		tabulatorFooterHTML += '</div>';
+		tabulatorFooterHTML += '</div>';
+		tabulatorFooterHTML += '</br></br>';
+	}
+
+	return tabulatorFooterHTML;
+}
 
 /**
  * When JQuery is up

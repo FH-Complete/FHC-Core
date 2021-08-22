@@ -35,6 +35,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
+require_once('../../include/statusgrund.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/udf.class.php');
@@ -156,6 +157,8 @@ $maxlength[$i] = 16;
 
 $worksheet->write($zeile, ++$i, "STATUS", $format_bold);
 $maxlength[$i] = 6;
+$worksheet->write($zeile, ++$i, "STATUSGRUND", $format_bold);
+$maxlength[$i] = 6;
 $worksheet->write($zeile, ++$i, "STATUS IN ANDEREN STUDIENGÄNGEN", $format_bold);
 $maxlength[$i] = 8;
 $worksheet->write($zeile, ++$i, "EMail Intern", $format_bold);
@@ -258,6 +261,8 @@ function draw_content($row)
 
 	$prestudent = new prestudent();
 	$prestudent->getLastStatus($row->prestudent_id);
+	$statusgrundObj = new statusgrund($prestudent->statusgrund_id);
+	$statusgrund = $statusgrundObj->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
 	$prio_relativ  = new prestudent();
@@ -521,6 +526,12 @@ function draw_content($row)
 	if (mb_strlen($status) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($status);
 	$worksheet->write($zeile, $i, $status);
+	$i++;
+
+	//Statusgrund
+	if (mb_strlen($statusgrund) > $maxlength[$i])
+		$maxlength[$i] = mb_strlen($statusgrund);
+	$worksheet->write($zeile, $i, $statusgrund);
 	$i++;
 
 	//Stati in anderen Studiengaengen

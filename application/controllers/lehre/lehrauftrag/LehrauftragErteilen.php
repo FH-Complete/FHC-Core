@@ -50,7 +50,8 @@ class LehrauftragErteilen extends Auth_Controller
             array(
                 'global',
                 'ui',
-				'lehre'
+				'lehre',
+	            'table'
             )
         );
 

@@ -228,7 +228,8 @@ if(isset($_POST["schick"]) && $error=='')
 					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
 					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
 					WHERE projektarbeit_id=".$db->db_add_param($termine[$j])." AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)
-					AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer' OR tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter')";
+					AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer' OR tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter')
+					ORDER BY mitarbeiter_uid NULLS LAST";
 			if(!$betr=$db->db_query($qry_betr))
 			{
 				echo "<font color=\"#FF0000\">Fehler beim Laden des Begutachters (Diplomand: $row->nachname)!</font><br>&nbsp;";

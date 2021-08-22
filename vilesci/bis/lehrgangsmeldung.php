@@ -44,8 +44,16 @@ $fehler='';
 $maxsemester=0;
 $v='';
 $studiensemester=new studiensemester();
-$ssem=$studiensemester->getaktorNext();
-$psem=$studiensemester->getPrevious();
+if (isset($_GET['studiensemester']))
+{
+	$ssem = $_GET['studiensemester'];
+	$psem = $studiensemester->getPreviousFrom($ssem);
+}
+else
+{
+	$ssem=$studiensemester->getaktorNext();
+	$psem=$studiensemester->getPrevious();
+}
 $datei='';
 $zaehl=0;
 $lehrgangsname = '';
@@ -93,6 +101,18 @@ if(isset($_GET['plausi']))
 {
 	$plausi=$_GET['plausi'];
 }
+
+// Standortcode
+if (defined('BIS_STANDORTCODE_LEHRGAENGE') && BIS_STANDORTCODE_LEHRGAENGE != '0')
+{
+	$standortcode = BIS_STANDORTCODE_LEHRGAENGE;
+}
+else
+{
+	echo "<H2>Standortcode f&uuml;r Lehrg&auml;nge fehlt.</H2>";
+	exit;
+}
+
 $datumobj=new datum();
 
 //Lehrgangsdaten auslesen
@@ -185,6 +205,7 @@ if($result = $db->db_query($qry))
 			$gemeinde=$rowadr->gemeinde;
 			$strasse=$rowadr->strasse;
 			$nation=$rowadr->nation;
+			$co_name = $rowadr->co_name;
 		}
 		else
 		{
@@ -192,7 +213,58 @@ if($result = $db->db_query($qry))
 			$gemeinde='';
 			$strasse='';
 			$nation='';
+			$co_name = '';
 		}
+		
+		// Zustelladresse & c/o Name(=abweichender Empfaenger)
+		$qryzustelladr = "
+			SELECT *
+			FROM public.tbl_adresse
+			WHERE zustelladresse IS TRUE
+			AND person_id=". $db->db_add_param($row->pers_id). ";
+		";
+		$results = $db->db_query($qryzustelladr);
+		
+		if ($db->db_num_rows($results) != 1)
+		{
+			$error_log1.= "Es sind ".$db->db_num_rows($results)." Zustelladressen eingetragen\n";
+		}
+		
+		$zustell_plz = '';
+		$zustell_gemeinde = '';
+		$zustell_strasse = '';
+		$zustell_nation = '';
+		
+		if ($rowzustelladr = $db->db_fetch_object($results))
+		{
+			$zustell_plz = $rowzustelladr->plz;
+			$zustell_gemeinde = $rowzustelladr->gemeinde;
+			$zustell_strasse = $rowzustelladr->strasse;
+			$zustell_nation = $rowzustelladr->nation;
+		}
+		
+		// eMail-Adresse
+		$qry_mail = "
+			SELECT kontakt
+			FROM public.tbl_kontakt
+			WHERE kontakttyp = 'email'
+			AND zustellung = TRUE
+			AND person_id = ". $db->db_add_param($row->pers_id). "
+			ORDER BY insertamum DESC LIMIT 1;
+		";
+		
+		$email = '';
+		if ($result_email = $db->db_query($qry_mail))
+		{
+			if($db->db_num_rows($result_email) == 1)
+			{
+				if($row_mail = $db->db_fetch_object($result_email))
+				{
+					$email = $row_mail->kontakt;
+				}
+			}
+		}
+		
 		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -237,6 +309,7 @@ if($result = $db->db_query($qry))
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
+		// Wenn SVNR fehlt, darf Ersatzkennzeichen nicht fehlen (und umgekehrt)
 		if(($row->svnr=='' || $row->svnr==null)&&($row->ersatzkennzeichen=='' || $row->ersatzkennzeichen==null))
 		{
 			$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') bzw. ErsKz ('".$row->ersatzkennzeichen."') fehlt";
@@ -306,6 +379,49 @@ if($result = $db->db_query($qry))
 				}
 			}
 		}
+		/*if($row->bpk == '' || $row->bpk == null)
+		{
+			$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
+		}
+		
+		if($row->bpk != '' && $row->bpk != null)
+		{
+			if (!preg_match('/[a-zA-Z0-9\+\/]{27}=/', $row->bpk))
+			{
+				$error_log.=(!empty($error_log) ? ', ' : ''). "bPK-Zeichenfolge ist ung&uuml;ltig";
+			}
+			
+			if (strlen($row->bpk) != 28)
+			{
+				$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
+			}
+		}*/
+		
+		if ($zustell_plz == '' || $zustell_plz == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-PLZ fehlt";
+		}
+		
+		if ($zustell_gemeinde == '' || $zustell_gemeinde == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Gemeinde fehlt";
+		}
+		
+		if ($zustell_strasse == '' || $zustell_strasse == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Strasse fehlt";
+		}
+		
+		if ($zustell_nation == '' || $zustell_nation == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Nation fehlt";
+		}
+		
+		if ($email == '' || $email == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."eMail Adresse fehlt oder eMail-Zustellung auf 'Nein' gesetzt.";
+		}
+		
 		//Bestimmen der aktuellen Prestudentrolle (Status) und des akt. Ausbildungssemesters des Studenten
 		$qrystatus="SELECT * FROM public.tbl_prestudentstatus
 		WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND studiensemester_kurzbz=".$db->db_add_param($ssem)."
@@ -481,7 +597,21 @@ if($result = $db->db_query($qry))
 				<PersKz>".trim($row->matrikelnr)."</PersKz>
 				<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>
 				<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-				<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>
+				<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
+			
+				if ($row->titelpre != '')
+				{
+					$datei .= "
+				<AkadGradeVorName>" . $row->titelpre . "</AkadGradeVorName>";
+				}
+				
+				if ($row->titelpost != '')
+				{
+					$datei .= "
+				<AkadGradeNachName>" . $row->titelpost . "</AkadGradeNachName>";
+				}
+				
+			$datei .= "
 				<Vorname>".$row->vorname."</Vorname>
 				<Familienname>".$row->nachname."</Familienname>";
 
@@ -495,6 +625,10 @@ if($result = $db->db_query($qry))
 					$datei.="
 				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 				}
+			
+				/*$datei.="
+				<bPK>".$row->bpk."</bPK>
+				";*/
 
 				$datei.="
 				<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
@@ -502,6 +636,19 @@ if($result = $db->db_query($qry))
 				<HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
 				<HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
 				<HeimatNation>".$nation."</HeimatNation>
+				<ZustellPLZ>". $zustell_plz. "</ZustellPLZ>
+				<ZustellGemeinde>". $zustell_gemeinde. "</ZustellGemeinde>
+				<ZustellStrasse>". $zustell_strasse. "</ZustellStrasse>
+				<ZustellNation>". $zustell_nation. "</ZustellNation>";
+				
+				if ($co_name != '')
+				{
+					$datei .= "
+					<coName>". $co_name. "</coName>";
+				}
+			
+				$datei.="
+				<eMailAdresse>". $email. "</eMailAdresse>
 				<ZugangCode>".$row->zgv_code."</ZugangCode>
 				<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
 
@@ -545,6 +692,7 @@ if($result = $db->db_query($qry))
 				}
 				$datei.="
 				<StudStatusCode>".$status."</StudStatusCode>
+				<StandortCode>" .$standortcode. "</StandortCode>
 			</StudentIn>";
 		}
 	}

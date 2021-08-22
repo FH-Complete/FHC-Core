@@ -9,20 +9,20 @@ SELECT
     /* provide extra row index for tabulator, because no other column has unique ids */
     ROW_NUMBER() OVER () AS "row_index",
     personalnummer,
+	auftrag,
+	stg_typ_kurzbz,
+	gruppe,
+	typ,
     lehreinheit_id,
     lehrveranstaltung_id,
     lv_bezeichnung,
     projektarbeit_id,
     studiensemester_kurzbz,
     studiengang_kz,
-    stg_typ_kurzbz,
     semester,
     orgform_kurzbz,
     person_id,
-    typ,
-    auftrag,
     lv_oe_kurzbz,
-    gruppe,
     lektor,
     stunden,
     betrag,
@@ -34,7 +34,7 @@ SELECT
     erteilt,
     akzeptiert,
       (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -50,7 +50,7 @@ SELECT
          )
     )                    AS "bestellt_von",
     (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -66,7 +66,7 @@ SELECT
          )
     )                    AS "erteilt_von",
     (SELECT
-         vorname || \' \' || nachname
+         nachname || \' \' || vorname
      FROM
          public.tbl_person
              JOIN public.tbl_benutzer benutzer USING (person_id)
@@ -128,7 +128,7 @@ FROM
         (
             SELECT
                 /* lehrauftraege also planned with dummies, therefore personalnummer is needed */
-                ma.personalnummer,
+                (ma.personalnummer::text),
                 lema.lehreinheit_id,
                 lv.lehrveranstaltung_id,
                 lv.bezeichnung                                      AS "lv_bezeichnung",
@@ -240,7 +240,7 @@ FROM
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
                     lv.bezeichnung                                                                      AS "lv_bezeichnung",
-                    pa.projektarbeit_id                                                                 AS "projektarbeit_id",
+                    (pa.projektarbeit_id::text)                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
@@ -249,7 +249,7 @@ FROM
                     \'Betreuung\'                                                                       AS "typ",
                     (betreuerart_kurzbz || \' \' ||
                      (SELECT
-                          vorname || \' \' || nachname
+                          nachname || \' \' || vorname
                       FROM
                           PUBLIC.tbl_person
                               JOIN PUBLIC.tbl_benutzer USING (person_id)
@@ -268,7 +268,7 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    (nachname || \' \' || vorname)                                                        AS "lektor",
+                    (vorname || \' \' || nachname)                                                        AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
                     vertrag_id,
@@ -305,46 +305,46 @@ $filterWidgetArray = array(
     'tableUniqueId' => 'approveLehrauftrag',
     'requiredPermissions' => 'lehre/lehrauftrag_erteilen',
     'datasetRepresentation' => 'tabulator',
-    'columnsAliases' => array(  // TODO: use phrasen
+    'columnsAliases' => array(
         'Status', // alias for row_index, because row_index is formatted to display the status icons
-        'Personalnummer',
-        'LV-Teil',
-        'LV-ID',
-        'LV',
-        'PA-ID',
-        'Studiensemester',
-        'Studiengang-KZ',
-        'Studiengang',
-        'Semester',
-        'OrgForm',
-        'Person-ID',
-        'Typ',
-        'LV- / Projektbezeichnung',
-        'Organisationseinheit',
-        'Gruppe',
-        'Lektor',
-        'Stunden',
-        'Betrag',
-        'Vertrag-ID',
-        'Vertrag-Stunden',
-        'Vertrag-Betrag',
-        'UID',
-        'Bestellt',
-        'Erteilt',
-        'Angenommen',
-        'Bestellt von',
-        'Erteilt von',
-        'Angenommen von'
+	    ucfirst($this->p->t('global', 'personalnummer')),
+	    ucfirst($this->p->t('lehre', 'lehrveranstaltung')). '- / '.
+	        ucfirst($this->p->t('ui', 'projekt')). lcfirst($this->p->t('ui', 'bezeichnung')),
+	    ucfirst($this->p->t('lehre', 'studiengang')),
+	    ucfirst($this->p->t('lehre', 'gruppe')),
+	    ucfirst($this->p->t('global', 'typ')),
+	    ucfirst($this->p->t('lehre', 'lehreinheit')),
+	    ucfirst($this->p->t('lehre', 'lehrveranstaltung')). '-ID',
+	    ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
+	    ucfirst($this->p->t('ui', 'projektarbeit')). '-ID',
+	    ucfirst($this->p->t('lehre', 'studiensemester')),
+	    ucfirst($this->p->t('lehre', 'studiengang')). '-'. ucfirst($this->p->t('ui', 'kz')),
+	    'Semester',
+	    ucfirst($this->p->t('lehre', 'organisationsform')),
+	    'Person-ID',
+	    ucfirst($this->p->t('lehre', 'organisationseinheit')),
+	    ucfirst($this->p->t('lehre', 'lektor')),
+	    ucfirst($this->p->t('ui', 'stunden')),
+	    ucfirst($this->p->t('ui', 'betrag')),
+	    ucfirst($this->p->t('ui', 'vertrag')). '-ID',
+	    ucfirst($this->p->t('ui', 'vertrag')). '-'. ucfirst($this->p->t('ui', 'stunden')),
+	    ucfirst($this->p->t('ui', 'vertrag')). '-'. ucfirst($this->p->t('ui', 'betrag')),
+	    'UID',
+	    ucfirst($this->p->t('ui', 'bestellt')),
+	    ucfirst($this->p->t('ui', 'erteilt')),
+	    ucfirst($this->p->t('ui', 'angenommen')),
+	    ucfirst($this->p->t('ui', 'bestelltVon')),
+	    ucfirst($this->p->t('ui', 'erteiltVon')),
+	    ucfirst($this->p->t('ui', 'angenommenVon'))
     ),
     'datasetRepOptions' => '{
-        height: 700,
-        layout: "fitColumns",           // fit columns to width of table
-	    responsiveLayout: "hide",       // hide columns that dont fit on the table
-	    movableColumns: true,           // allows changing column
-        placeholder: func_placeholder(),
+		height: func_height(this),
+		layout: "fitColumns",			// fit columns to width of table
+		layoutColumnsOnNewData: true,	// ajust column widths to the data each time TableWidget is loaded
+		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",
 	    groupBy:"lehrveranstaltung_id",
-	    groupToggleElement:"header",    //toggle group on click anywhere in the group header
+	    groupToggleElement:"header",	//toggle group on click anywhere in the group header
 	    groupHeader: function(value, count, data, group){
 	       return func_groupHeader(data);
 	    },
@@ -357,12 +357,8 @@ $filterWidgetArray = array(
             return func_selectableCheck(row);
         },
         initialFilter: func_initialFilter(),
-        footerElement: func_footerElement(),
         rowUpdated:function(row){
              func_rowUpdated(row);
-        },
-        rowSelectionChanged:function(data, rows){
-             func_rowSelectionChanged(data, rows);
         },
         rowFormatter:function(row)
         {
@@ -373,44 +369,49 @@ $filterWidgetArray = array(
         },
         tableBuilt: function(){
             func_tableBuilt(this);
-        }
+        },
+		tableWidgetFooter: {
+			selectButtons: true
+		}
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         // column status is built dynamically in funcTableBuilt(),
         row_index: {visible:false},     // necessary for row indexing
-        personalnummer: {visible: false},
-        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", width: "7%",
-            bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();},},
-        lehrveranstaltung_id: {headerFilter:"input"},
-        lv_bezeichnung: {visible: false},
-        projektarbeit_id: {visible: false},
-        studiensemester_kurzbz: {headerFilter:"input"},
-        studiengang_kz: {visible: false},
-        stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
+        personalnummer: {visible: false, headerFilter:"input"},
+		auftrag: {
+			headerFilter:"input", widthGrow: 2,
+			bottomCalc:"count", bottomCalcFormatter:function(cell){return "'. ucfirst($this->p->t('global', 'anzahl')). ': " + cell.getValue();}
+		},
+		stg_typ_kurzbz: {headerFilter:"input"},
+		gruppe: {headerFilter:"input"},
+		typ: {headerFilter:"input"},
+        lehreinheit_id: {visible: false, headerFilter:"input"},
+        lehrveranstaltung_id: {visible: false, headerFilter:"input"},
+        lv_bezeichnung: {visible: false, headerFilter:"input"},
+        projektarbeit_id: {visible: false, headerFilter:"input"},
+        studiensemester_kurzbz: {visible: false, headerFilter:"input"},
+        studiengang_kz: {visible: false, headerFilter:"input"},
         semester: {headerFilter:"input"},
-        orgform_kurzbz: {headerFilter:"input"},
-        person_id: {visible: false},
-        typ: {headerFilter:"input"},
-        auftrag: {headerFilter:"input", width:"20%"},
-        lv_oe_kurzbz: {headerFilter:"input"},
-        gruppe: {headerFilter:"input"},
-        lektor: {headerFilter:"input", widthGrow: 3},
+        orgform_kurzbz: {visible: false, headerFilter:"input"},
+        person_id: {visible: false, headerFilter:"input"},
+        lv_oe_kurzbz: {visible: false, headerFilter:"input"},
+        lektor: {headerFilter:"input", widthGrow: 2},
         stunden: {align:"right",  formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}},
-        betrag: {align:"right", width: "8%", formatter: form_formatNulltoStringNumber,
+        betrag: {align:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
         vertrag_id: {visible: false},
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
-        mitarbeiter_uid: {visible: false},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip, width: "8%"},
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip, width: "8%"},
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip, width: "8%"},
-        bestellt_von: {visible: false},
-        erteilt_von: {visible: false},
-        akzeptiert_von: {visible: false},
+        mitarbeiter_uid: {visible: false, headerFilter:"input"},
+        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
+        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
+        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
+        bestellt_von: {visible: false, headerFilter:"input"},
+        erteilt_von: {visible: false, headerFilter:"input"},
+        akzeptiert_von: {visible: false, headerFilter:"input"},
     }', // col properties
 );
 

@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * This controller operates between (interface) the JS (GUI) and the FilterWidgetLib (back-end)
- * Provides data to the ajax get calls about the filter
+ * Provides data to the ajax get calls about the filter widget
  * Accepts ajax post calls to change the filter data
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
  * NOTE: extends the FHC_Controller instead of the Auth_Controller because the FilterWidget has its
@@ -12,7 +12,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class Filters extends FHC_Controller
 {
-	const FILTER_UNIQUE_ID = 'filterUniqueId';
+	const FILTER_UNIQUE_ID = 'filterUniqueId'; // Name of the filter widget unique id
 
 	/**
 	 * Calls the parent's constructor and loads the FilterWidgetLib

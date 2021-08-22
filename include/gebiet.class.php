@@ -677,13 +677,13 @@ class gebiet extends basis_db
 
 		$qry = "
 			WITH fragen AS (
-				 SELECT tbl_frage.frage_id, tbl_frage.gebiet_id, tbl_frage.level, punkte
-				 FROM testtool.tbl_frage
-						  JOIN testtool.tbl_vorschlag USING (frage_id)
-				 WHERE tbl_vorschlag.aktiv
-				   AND tbl_vorschlag.punkte < 0
-				   AND tbl_frage.demo = false
-				   AND tbl_frage.aktiv
+				SELECT tbl_frage.frage_id, tbl_frage.gebiet_id, tbl_frage.level, tbl_frage.nummer, punkte
+				FROM testtool.tbl_frage
+						 JOIN testtool.tbl_vorschlag USING (frage_id)
+				WHERE tbl_vorschlag.aktiv
+				  AND tbl_vorschlag.punkte < 0
+				  AND tbl_frage.demo = false
+				  AND tbl_frage.aktiv
 			),
 			fragenanzahl AS (
 				SELECT gebiet_id, level, levelgleichverteilung,
@@ -712,57 +712,83 @@ class gebiet extends basis_db
 				tbl_gebiet.level_start,
 				(
 					CASE WHEN tbl_gebiet.levelgleichverteilung  THEN
-								 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
-										   (SELECT sum(frprolevel) FROM
-											   (
-												   SELECT fragen.level, (min(punkte)
-															  * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) AS frprolevel
-												   FROM fragen
-												   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
-												   GROUP BY fragen.gebiet_id, level
-											   ) pkteprolevel)
-									   ELSE
-										   (SELECT sum(frprolevel) FROM
-											   (
-												   SELECT fragen.level, (sum(punkte)
-													   * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) AS frprolevel
-												   FROM fragen
-												   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
-													 AND frage_id = (SELECT min(frage_id) FROM fragen fr WHERE fr.gebiet_id = fragen.gebiet_id AND fr.level = fragen.level)
-												   GROUP BY fragen.gebiet_id, level
-											   ) pkteprolevel)
-									 END)
+							 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+									   (SELECT sum(frprolevel) FROM
+										   (
+											   SELECT fragen.level, (SELECT sum(punkte) FROM (SELECT min(punkte) AS punkte FROM fragen lvlfr WHERE lvlfr.gebiet_id = fragen.gebiet_id and lvlfr.level = fragen.level
+																							  GROUP BY lvlfr.frage_id, lvlfr.nummer
+																							  ORDER BY lvlfr.nummer
+																							  LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) fr)
+												   AS frprolevel
+											   FROM fragen
+											   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+											   GROUP BY fragen.gebiet_id, level
+										   ) pkteprolevel)
+								   ELSE
+									   (SELECT sum(frprolevel) FROM
+										   (
+											   SELECT fragen.level,
+													  (SELECT sum(punkte) FROM (SELECT sum(punkte) AS punkte FROM fragen lvlfr WHERE lvlfr.gebiet_id = fragen.gebiet_id and lvlfr.level = fragen.level
+																				GROUP by lvlfr.frage_id, lvlfr.nummer
+																				ORDER BY lvlfr.nummer
+																				LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) fr)
+														  AS frprolevel
+											   FROM fragen
+											   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+											   GROUP BY fragen.gebiet_id, level
+										   ) pkteprolevel)
+								 END)
 					WHEN tbl_gebiet.level_start IS NOT NULL THEN
-								 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
-											   (
-												   SELECT min(punkte)
-												   FROM fragen
-												   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+							 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+									   (SELECT sum(pkte)
+										FROM (
+												 SELECT min(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
 												   AND fragen.level = tbl_gebiet.level_start
-											   ) * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
-									   ELSE
-											   (SELECT sum(punkte)
-												FROM fragen
-												WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
-												  AND frage_id = (SELECT min(frage_id) FROM fragen WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id)
-												  AND fragen.level = tbl_gebiet.level_start
-											   )* (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
-									 END)
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+											 ) minpkte
+									   )
+								   ELSE
+									   (
+										   SELECT sum(pkte)
+										   FROM (SELECT sum(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												   AND fragen.level = tbl_gebiet.level_start
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+												) sumpkte
+									   )
+								 END)
 					ELSE
-						(CASE WHEN tbl_gebiet.multipleresponse=false THEN
-								 (
-									SELECT min(punkte)
-									 FROM fragen
-									 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
-								 ) * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
-							 ELSE
-								 (SELECT sum(punkte)
-								  FROM fragen
-								  WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
-								  AND frage_id = (SELECT min(frage_id) FROM fragen WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id)
-								 )* (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
-							END)
-
+							 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+									   (
+										   SELECT sum(pkte)
+										   FROM (SELECT min(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+												) minpkte
+									   )
+								   ELSE
+									   (
+										   SELECT sum(pkte)
+										   FROM (SELECT sum(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+												) sumpkte
+									   )
+								 END)
+			
 					END) * (-1) AS offsetpunkte
 			FROM
 				testtool.tbl_gebiet
@@ -770,7 +796,7 @@ class gebiet extends basis_db
 				EXISTS(
 						SELECT 1 FROM fragen WHERE fragen.gebiet_id=tbl_gebiet.gebiet_id
 					)
-				AND gebiet_id = ".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+			AND gebiet_id = ".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 		";
 
 		if($this->db_query($qry))

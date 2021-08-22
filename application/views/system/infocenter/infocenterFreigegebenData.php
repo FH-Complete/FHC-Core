@@ -1,12 +1,13 @@
 <?php
 
+	$this->config->load('infocenter');
 	$APP = '\'infocenter\'';
 	$INTERESSENT_STATUS = '\'Interessent\'';
-	$STUDIENGANG_TYP = '\'b\'';
+	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
-	$ADDITIONAL_STG = '10021,10027,10002';
+	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
@@ -114,6 +115,12 @@
 					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+				   AND NOT EXISTS (
+					   SELECT 1
+						 FROM tbl_prestudentstatus spss
+						WHERE spss.prestudent_id = ps.prestudent_id
+						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+					)
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
@@ -186,12 +193,55 @@
 				 LIMIT 1
 			) AS "ReihungstestApplied",
 			(
+				SELECT rtp.datum
+				  FROM public.tbl_prestudentstatus pss
+				  JOIN public.tbl_prestudent ps USING(prestudent_id)
+		  	 LEFT JOIN (
+					SELECT rtp.person_id,
+						   rt.studiensemester_kurzbz,
+						   rtp.teilgenommen,
+						   rt.datum
+					  FROM public.tbl_rt_person rtp
+		   			  JOIN tbl_reihungstest rt ON(rtp.rt_id = rt.reihungstest_id)
+					 WHERE rt.stufe = 1
+				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
+				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+				   AND ps.person_id = p.person_id
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+				 LIMIT 1
+			) AS "ReihungstestDate",
+			(
 				SELECT ps.zgvnation
 				FROM public.tbl_prestudent ps
 				 WHERE ps.person_id = p.person_id
 			  ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
 				 LIMIT 1
-			) AS "ZGVNation"
+			) AS "ZGVNation",
+			(
+				SELECT ps.zgvmanation
+				FROM public.tbl_prestudent ps
+				 WHERE ps.person_id = p.person_id
+			  ORDER BY ps.zgvmanation DESC NULLS LAST, ps.prestudent_id DESC
+				 LIMIT 1
+			) AS "ZGVMNation",
+			(
+				SELECT tbl_organisationseinheit.bezeichnung
+				FROM public.tbl_benutzerfunktion 
+				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
+				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				AND tbl_benutzerfunktion.uid = (
+					SELECT l.insertvon
+					FROM system.tbl_log l
+					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
+					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.person_id = p.person_id
+					ORDER BY l.zeitpunkt DESC
+					LIMIT 1
+				)
+				LIMIT 1 
+			) AS "InfoCenterMitarbeiter"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -258,7 +308,10 @@
 			'Statusgrund',
 			'Reihungstest angetreten',
 			'Reihungstest angemeldet',
-			'ZGV Nation'
+			'Reihungstest date',
+			'ZGV Nation BA',
+			'ZGV Nation MA',
+			'InfoCenter Mitarbeiter'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -337,10 +390,35 @@
 			{
 				$datasetRaw->{'ReihungstestApplied'} = 'Nein';
 			}
+
+			if ($datasetRaw->{'ReihungstestDate'} == null)
+			{
+				$datasetRaw->{'ReihungstestDate'} = '-';
+			}
+			else
+			{
+				$datasetRaw->{'ReihungstestDate'} = date_format(date_create($datasetRaw->{'ReihungstestDate'}),'Y-m-d');
+			}
+
 			if ($datasetRaw->{'ZGVNation'} == null)
 			{
 				$datasetRaw->{'ZGVNation'} = '-';
 			}
+
+			if ($datasetRaw->{'ZGVMNation'} == null)
+			{
+				$datasetRaw->{'ZGVMNation'} = '-';
+			}
+
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'InfoCenter')
+			{
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+			}
+			else
+			{
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
+			}
+
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {

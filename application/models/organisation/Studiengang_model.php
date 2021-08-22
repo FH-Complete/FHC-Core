@@ -448,4 +448,51 @@ class Studiengang_model extends DB_Model
 
 		return $this->execQuery($query, array($typ));
 	}
+	
+	/**
+	 * Get Studiengangsleitung
+	 * @param null $studiengang_kz
+	 * @return array
+	 */
+	public function getLeitung($studiengang_kz = null)
+	{
+		$this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email');
+		$this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
+		$this->addJoin('public.tbl_benutzer', 'uid');
+		$this->addJoin('public.tbl_person', 'person_id');
+		
+		if (is_null($studiengang_kz))
+		{
+			$condition = '
+                funktion_kurzbz = \'Leitung\'
+                AND ( datum_von <= NOW() OR datum_von IS NULL )
+                AND ( datum_bis >= NOW() OR datum_bis IS NULL )
+            ';
+		}
+		elseif (is_numeric($studiengang_kz))
+		{
+			$condition =  '
+               funktion_kurzbz = \'Leitung\'
+                AND ( datum_von <= NOW() OR datum_von IS NULL )
+                AND ( datum_bis >= NOW() OR datum_bis IS NULL )
+                AND studiengang_kz = ' . $this->db->escape($studiengang_kz, FHC_INTEGER)
+			;
+		}
+		
+		return $this->loadWhere($condition);
+	}
+
+	public function getStudiengaengeWithOrgForm($typ, $semester)
+	{
+		$query = "SELECT DISTINCT (UPPER(sg.typ || sg.kurzbz || ':' || sp.orgform_kurzbz)) AS Studiengang
+					FROM public.tbl_studiengang sg
+					JOIN lehre.tbl_studienordnung USING (studiengang_kz)
+					JOIN lehre.tbl_studienplan sp USING (studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester spsem USING (studienplan_id)
+					WHERE sp.aktiv = TRUE AND sg.aktiv = TRUE AND sg.typ IN ?
+					AND spsem.studiensemester_kurzbz = ?
+					ORDER BY Studiengang";
+
+		return $this->execQuery($query, array($typ, $semester));
+	}
 }

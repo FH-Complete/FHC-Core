@@ -25,7 +25,7 @@
 		),
 		'formatRow' => function($datasetRaw) {
 
-			$datasetRaw->ExecutionTime = date_format(date_create($datasetRaw->ExecutionTime), 'd.m.Y H:i:s');
+			$datasetRaw->ExecutionTime = date_format(date_create($datasetRaw->ExecutionTime), 'd.m.Y H:i:s:u');
 
 			return $datasetRaw;
 		},
@@ -33,22 +33,22 @@
 
 			$mark = '';
 
-			if ($datasetRaw->RequestId == 'Cronjob error')
+			if (strpos($datasetRaw->RequestId, 'error') != false)
 			{
 				$mark = 'text-red';
 			}
 
-			if ($datasetRaw->RequestId == 'Cronjob info')
+			if (strpos($datasetRaw->RequestId, 'info') != false)
 			{
 				$mark = 'text-green';
 			}
 
-			if ($datasetRaw->RequestId == 'Cronjob warning')
+			if (strpos($datasetRaw->RequestId, 'warning') != false)
 			{
 				$mark = 'text-orange';
 			}
 
-			if ($datasetRaw->RequestId == 'Cronjob debug')
+			if (strpos($datasetRaw->RequestId, 'debug') != false)
 			{
 				$mark = 'text-info';
 			}
@@ -63,3 +63,4 @@
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 ?>
+

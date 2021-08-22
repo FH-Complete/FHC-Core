@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 fhcomplete.org
+/* Copyright (C) 2021 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *		  Manuela Thamer <manuela.thamer@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
@@ -207,6 +208,16 @@ class prestudent extends person
 		if($this->rt_punkte3>9999.9999)
 		{
 			$this->errormsg = 'Reihungstestpunkte3 darf nicht groesser als 9999.9999 sein';
+			return false;
+		}
+		if(mb_strlen($this->zgvort)>64)
+		{
+			$this->errormsg = 'ZGV Ort darf nicht länger als 64 Zeichen sein.';
+			return false;
+		}
+		if(mb_strlen($this->zgvmaort)>64)
+		{
+			$this->errormsg = 'ZGV Master Ort darf nicht länger als 64 Zeichen sein.';
 			return false;
 		}
 
@@ -435,14 +446,14 @@ class prestudent extends person
 						tbl_reihungstest.*,
 						ps.studiengang_kz as studiengang_kz,
 						tbl_studiengang.typ
-					FROM 
+					FROM
 						public.tbl_prestudent ps
 						JOIN public.tbl_person pers USING (person_id)
 						JOIN public.tbl_rt_person USING (person_id)
 						JOIN public.tbl_reihungstest ON (tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
 						JOIN public.tbl_studiengang ON (ps.studiengang_kz=tbl_studiengang.studiengang_kz)
-						JOIN public.tbl_prestudentstatus ON (tbl_prestudentstatus.prestudent_id=ps.prestudent_id 
-																AND status_kurzbz=\'Interessent\' 
+						JOIN public.tbl_prestudentstatus ON (tbl_prestudentstatus.prestudent_id=ps.prestudent_id
+																AND status_kurzbz=\'Interessent\'
 																AND tbl_prestudentstatus.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz)
 					WHERE
 						tbl_reihungstest.datum='.$this->db_add_param($datum).'
@@ -450,8 +461,8 @@ class prestudent extends person
 						AND tbl_prestudentstatus.studienplan_id IN (SELECT studienplan_id FROM public.tbl_rt_studienplan WHERE reihungstest_id=tbl_rt_person.rt_id)
 						AND EXISTS(SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 							WHERE prestudent_id=ps.prestudent_id AND tbl_studiensemester.ende > '.$this->db_add_param($datum).')
-						AND priorisierung = (SELECT priorisierung FROM public.tbl_prestudent 
-									WHERE person_id = pers.person_id 
+						AND priorisierung = (SELECT priorisierung FROM public.tbl_prestudent
+									WHERE person_id = pers.person_id
 									AND get_rolle_prestudent (ps.prestudent_id,NULL) IN (\'Interessent\',\'Bewerber\',\'Wartender\',\'Aufgenommener\')
 									--AND tbl_prestudent.studiengang_kz=ps.studiengang_kz
 									ORDER BY priorisierung ASC LIMIT 1)
@@ -496,9 +507,9 @@ class prestudent extends person
 		if (is_numeric($prestudent_id))
 		{
 			$qry = "
-			SELECT DISTINCT ON (priorisierung, prestudent_id) 
+			SELECT DISTINCT ON (priorisierung, prestudent_id)
 				priorisierung,
-				prestudent_id, 
+				prestudent_id,
 				tbl_prestudentstatus.studienplan_id,
 				studiengang_kz,
 				typ,
@@ -517,7 +528,7 @@ class prestudent extends person
 				lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
 			JOIN
 				bis.tbl_orgform ON (tbl_studienplan.orgform_kurzbz = tbl_orgform.orgform_kurzbz)
-			WHERE 
+			WHERE
 				tbl_prestudent.person_id = (
 				SELECT
 						person_id
@@ -526,19 +537,19 @@ class prestudent extends person
 					WHERE
 						prestudent_id = ". $this->db_add_param($prestudent_id). "
 				)
-					
+
 			/* Filter only future studiensemester (incl. actual one) */
 			AND
 				studiensemester_kurzbz IN (
-			SELECT 
+			SELECT
 						studiensemester_kurzbz
 					FROM
-						public.tbl_studiensemester 
-					WHERE 
+						public.tbl_studiensemester
+					WHERE
 						ende > now()
 				)
-		
-			AND 
+
+			AND
 				status_kurzbz = 'Interessent'";
 
 			if (!is_null($typ) && is_string($typ))
@@ -556,10 +567,10 @@ class prestudent extends person
 			$qry .= "
 			  -- Order to get the very last status and highest prio on top
 			 ORDER BY
-				priorisierung NULLS LAST,   
+				priorisierung NULLS LAST,
 				prestudent_id,
 				datum DESC,
-				tbl_prestudentstatus.insertamum DESC, 
+				tbl_prestudentstatus.insertamum DESC,
 				tbl_prestudentstatus.ext_id DESC
 			" ;
 
@@ -634,7 +645,7 @@ class prestudent extends person
 		if($this->db_query($qry))
 		{
 			$this->num_rows=0;
-			
+
 			while($row = $this->db_fetch_object())
 			{
 				$rolle = new prestudent();
@@ -1008,13 +1019,13 @@ class prestudent extends person
 				JOIN public.tbl_prestudentstatus USING (prestudent_id)
 				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 				AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
-		
+
 		if ($studiensemester_kurzbz != '')
 			$qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		
+
 		if ($status_kurzbz != '')
 			$qry .= " AND status_kurzbz=".$this->db_add_param($status_kurzbz);
-		
+
 		if ($studienplan_id != '')
 			$qry .= " AND studienplan_id=".$this->db_add_param($studienplan_id);
 
@@ -1045,7 +1056,7 @@ class prestudent extends person
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Speichert den Prestudentstatus
 	 * @return true wenn ok, false im Fehlerfall
@@ -1384,12 +1395,12 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT 
-					* 
-				FROM 
-					public.tbl_prestudent 
-				WHERE 
-					person_id=".$this->db_add_param($person_id, FHC_INTEGER)." 
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_prestudent
+				WHERE
+					person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 				ORDER BY prestudent_id";
 
 		if($this->db_query($qry))
@@ -2122,7 +2133,7 @@ class prestudent extends person
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die Priorität des PreStudenten einer Person in einem Studiensemester
 	 * Per Default wird die Höchste Priorisierung (ORDER BY DESC NULLS LAST) zurueckgegeben.
@@ -2142,9 +2153,9 @@ class prestudent extends person
 					tbl_prestudent.person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 					AND tbl_prestudentstatus.status_kurzbz='Interessent'
 					AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
-				ORDER BY ".$order." 
+				ORDER BY ".$order."
 				LIMIT 1";
-					
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -2164,9 +2175,9 @@ class prestudent extends person
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-					
+
 	}
-	
+
 	/**
 	 * Liefert die relative Priorität (zB 1, 2, 3) eines PreStudenten Anhand seiner absoluten Priorität (zB 9, 10, 11)
 
@@ -2204,10 +2215,10 @@ class prestudent extends person
 					) prest
 				WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
 				AND priorisierung <= ".$this->db_add_param($priorisierungAbsolut, FHC_INTEGER);
-		
-		if($result = $this->db_query($qry))
+
+		if ($result = $this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object($result))
+			if ($row = $this->db_fetch_object($result))
 			{
 				return $row->prio_relativ;
 			}
@@ -2222,6 +2233,222 @@ class prestudent extends person
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-		
+	}
+
+	/**
+	 * Prueft, ob eine Person einen aktuellen PreStudentstatus-Eintrag besitzt, der die ZGV Master ersetzt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn vorhanden
+	 *		 false wenn nicht vorhanden
+	 *		 false und errormsg wenn Fehler aufgetreten ist
+	 */
+	public function existsZGVIntern($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				JOIN public.tbl_studiengang USING (studiengang_kz)
+				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
+				AND typ in ('b','m','d')";
+
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				if ($row->anzahl > 0)
+				{
+					$this->errormsg = '';
+					return true;
+				}
+				else
+				{
+					$this->errormsg = '';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Befüllt MasterZGV-Felder: Nation mit Österreich und MasterZGV-code mit FH-Bachelor(I)
+	 * @param int $person_id Personenkennzeichen.
+	 * @param varchar $ort Ort.
+	 * @return true wenn erfolgreich durchgeführt
+	 *		 false und errormsg wenn ein Fehler aufgetreten ist
+	 */
+	public function setZGVMasterFields($person_id, $ort)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+		$arrayleereManations = array();
+
+		//all prestudent_ids mit Status Interessent
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_prestudent
+				JOIN
+					public.tbl_studiengang USING (studiengang_kz)
+				WHERE
+					person_id = ".$this->db_add_param($person_id)."
+				AND
+					typ ='m'
+				And
+					get_rolle_prestudent(prestudent_id, null) = 'Interessent';";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+
+			if ($num_rows > 0)
+			{
+				while ($row = $db->db_fetch_object())
+				{
+					$arrayleereManations[] = $row->prestudent_id;
+				}
+
+				if ($arrayleereManations)
+				{
+					$qry = "UPDATE
+						public.tbl_prestudent
+					SET
+						(zgvmanation, zgvmaort, zgvmas_code) = ('A',".$this->db_add_param($ort).",1)
+					WHERE
+						prestudent_id in (";
+
+					foreach ($arrayleereManations as $prestudent_id)
+					{
+						$qry .= $prestudent_id;
+
+						if (next($arrayleereManations) == true)
+						{
+							$qry .=  ",";
+						}
+					}
+					$qry .=  ");";
+
+					if ($this->db_query($qry))
+					{
+						return true;
+					}
+					else
+					{
+						$this->errormsg = 'Fehler beim Eintragen zgvMasterFields';
+						return false;
+					}
+				}
+			}
+			else
+				return true;
+		}
+	}
+
+
+	/**
+	 * Prueft, ob eine Person einen aktuellen PreStudentstatus-Eintrag Interessent für einen Masterstudiengang besitzt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn vorhanden, false wenn nicht vorhanden
+	 */
+	public function existsStatusInteressentMaster($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+		$prestudentsOfMaster = array();
+
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps, tbl_studiengang sg
+				WHERE
+					ps.studiengang_kz = sg.studiengang_kz
+				AND
+					sg.typ in ('m')
+				AND
+					person_id = ".$this->db_add_param($person_id)."
+				And
+					get_rolle_prestudent(prestudent_id, null) = 'Interessent';";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+			if ($num_rows > 0)
+			{
+				return true;
+			}
+		}
+		else
+			return false;
+	}
+
+
+	/**
+	 * Liefert den wahrscheinlichen Studiengang der MasterZGV einer Person
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return string studiengangkurzbzlang
+	 */
+	public function getZGVMasterStg($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT kurzbzlang
+				FROM public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				JOIN public.tbl_studiengang USING (studiengang_kz)
+				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
+				AND typ in ('b','m','d')
+				ORDER BY status_kurzbz ASC
+				LIMIT 1;";
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				$stg = $row->kurzbzlang;
+				return $stg;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }

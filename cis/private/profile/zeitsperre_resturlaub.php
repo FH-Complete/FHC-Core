@@ -112,13 +112,14 @@ foreach($addon_obj->result as $addon)
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
 <script>
+let holiDays =[];
 $( document ).ready(function()
 {
 	if(typeof addon  !== \'undefined\')
 	{
 		for(i in addon)
 		{
-			addon[i].init("cis/private/profile/urlaubstool.php", {uid:\''.$uid.'\'});
+			addon[i].init("cis/private/profile/zeitsperre_resturlaub.php", {uid:\''.$uid.'\', holiDays: holiDays});
 		}
 	}
 
@@ -126,6 +127,7 @@ $( document ).ready(function()
 		 changeMonth: true,
 		 changeYear: true,
 		 dateFormat: "dd.mm.yy",
+		 beforeShowDay: setHoliDays
 		 });
 
 	$( ".timepicker" ).timepicker({
@@ -137,13 +139,31 @@ $( document ).ready(function()
 			});
 
 });
-</script>';
-?>
-<style>
-.dd_breit
-{
-	width:460px;
+// set holidays function which is configured in beforeShowDay
+ function setHoliDays(date) {
+   for (i = 0; i < holiDays.length; i++) {
+     if (date.getFullYear() == holiDays[i][0]
+    	  && date.getMonth() == holiDays[i][1] - 1
+          && date.getDate() == holiDays[i][2]) {
+        return [true, "holiday", ""];
+     }
+   }
+  return [true, ""];
 }
+</script>';
+
+?>
+<style type="text/css">
+	.dd_breit
+	{
+		width:460px;
+	}
+
+	.ui-datepicker td.holiday a, .ui-datepicker td.holiday a:hover
+	{
+		background: none #FFEBAF;
+		border: 1px solid #BF5A0C;
+	}
 </style>
 <script language="Javascript">
 function conf_del()
@@ -180,7 +200,7 @@ function checkdatum()
 		return false;
 	}
 
-      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum;
+      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum, diff;
 
 	  Datum=document.getElementById('vondatum').value;
       Tag=Datum.substring(0,2);
@@ -210,11 +230,22 @@ function checkdatum()
 
 	  bisDatum=Jahr+''+Monat+''+Tag;
 
+	  diff=bisDatum-vonDatum;
+
 	  if (vonDatum>bisDatum)
 	  {
 		alert('<?php echo $p->t('zeitsperre/vonDatum');?> '+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istGroesserAlsBisDatum');?> '+document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
 	  	return false;
+	  }
+      else if (diff>14)
+      {
+      	Check = confirm('<?php echo $p->t('zeitaufzeichnung/zeitraumAuffallendHoch');?>');
+		document.getElementById('bisdatum').focus();
+	      if (Check == false)
+		      return false;
+	      else
+		      return true;
 	  }
 
 	return true;
@@ -254,11 +285,33 @@ function showHideBezeichnungDropDown()
 		document.getElementById('resturlaub').style.visibility = 'visible';
 	else
 		document.getElementById('resturlaub').style.visibility = 'hidden';
+
+	showHideStudeDropDown()
 }
 
 function setBisDatum()
 {
 	document.zeitsperre_form.bisdatum.value = document.zeitsperre_form.vondatum.value;
+}
+
+function showHideStudeDropDown()
+{
+	var dd = document.zeitsperre_form.zeitsperretyp_kurzbz;
+
+	if (dd.options[dd.selectedIndex].value == 'ZA'
+	|| dd.options[dd.selectedIndex].value == 'Urlaub'
+	|| dd.options[dd.selectedIndex].value == 'Krank'
+	|| dd.options[dd.selectedIndex].value == 'DienstF'
+	|| dd.options[dd.selectedIndex].value == 'DienstV')
+	{
+		document.getElementById('vonStd').style.visibility = 'hidden';
+		document.getElementById('bisStd').style.visibility = 'hidden';
+	}
+	else
+	{
+		document.getElementById('vonStd').style.visibility = 'visible';
+		document.getElementById('bisStd').style.visibility = 'visible';
+	}
 }
 
 </script>
@@ -413,15 +466,23 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 				{
 					//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
-					$vorgesetzter = $ma->getVorgesetzte($uid);
+					$prsn = new person();
+
+                    $vorgesetzter = $ma->getVorgesetzte($uid);
 					if($vorgesetzter)
 					{
 						$to='';
+						$fullName='';
 						foreach($ma->vorgesetzte as $vg)
 						{
 							if (!empty($to))
+                            {
 								$to.=',';
+								$fullName.=',';
+                            }
 							$to.=trim($vg.'@'.DOMAIN);
+							$name = $prsn->getFullNameFromBenutzer($vg);
+							$fullName.=$name;
 						}
 
 						$benutzer = new benutzer();
@@ -440,11 +501,11 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
 						if($mail->send())
 						{
-							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."</b>";
+							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</b>";
 						}
 						else
 						{
-							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."</span>";
+							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."</span>";
 						}
 					}
 					else
@@ -461,8 +522,69 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		echo "<span class='error'>$error_msg</span>";
 }
 
+//loeschen eines bereits freigegebenen Urlaubs
+if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['informSupervisor'])))
+{
+    $zeitsperre = new zeitsperre();
+    $zeitsperre->load($_GET['id']);
+
+    $vondatum = $zeitsperre->getVonDatum();
+    $bisdatum = $zeitsperre->getBisDatum();
+
+    if(!$zeitsperre->delete($_GET['id']))
+        echo $zeitsperre->errormsg;
+
+    //Mail an Vorgesetzten
+    $prsn = new person();
+
+    $vorgesetzter = $ma->getVorgesetzte($uid);
+    if($vorgesetzter)
+    {
+        $to='';
+        $fullName ='';
+        foreach($ma->vorgesetzte as $vg)
+        {
+            if($to!='')
+            {
+                $to.=', '.$vg.'@'.DOMAIN;
+                $name = $prsn->getFullNameFromBenutzer($vg);
+                $fullName.=', '.$name;
+            }
+            else
+            {
+                $to.=$vg.'@'.DOMAIN;
+                $name = $prsn->getFullNameFromBenutzer($vg);
+                $fullName.=$name;
+            }
+        }
+
+        $benutzer = new benutzer();
+        $benutzer->load($uid);
+        $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
+            $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
+
+
+        $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
+
+
+        $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
+        if($mail->send())
+        {
+            echo "<br><b>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</b>";
+        }
+        else
+        {
+            echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
+        }
+    }
+    else
+    {
+        $vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
+    }
+}
+
 //loeschen einer zeitsperre
-if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
+if(isset($_GET['type']) && $_GET['type']=='delete_sperre' && !isset($_GET['informSupervisor'])   )
 {
 	$zeit = new zeitsperre();
 	$zeit->load($_GET['id']);
@@ -518,7 +640,7 @@ if(count($zeit->result)>0)
 		$row_vertretung = $db->db_fetch_object($result_vertretung);
 		$content_table.= "<tr class='liste".($i%2)."'>
 							<td>$row->bezeichnung</td>
-							<td>$row->zeitsperretyp_kurzbz</td>
+							<td>$row->zeitsperretyp_beschreibung</td>
 							<td nowrap>".$datum_obj->convertISODate($row->vondatum)." ".($row->vonstunde!=''?'('.$row->vonstunde.')':'')."</td>
 							<td nowrap>".$datum_obj->convertISODate($row->bisdatum)." ".($row->bisstunde!=''?'('.$row->bisstunde.')':'')."</td>
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
@@ -532,10 +654,14 @@ if(count($zeit->result)>0)
 			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
 		if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
-		else if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
+		else if($row->vondatum>=date("Y-m-d",time()) && $row->zeitsperretyp_kurzbz=='Urlaub')
 		{
-			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
+			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id&informSupervisor=True' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
+		elseif($row->zeitsperretyp_kurzbz!='Urlaub')
+        {
+            $content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
+        }
 		else
 			$content_table .= '<td>&nbsp;</td>';
 		$content_table.="</tr>";
@@ -587,20 +713,20 @@ $content_form.= '<form method="POST" name="zeitsperre_form" action="'.$action.'"
 $content_form.= "<table>\n";
 $content_form.= '<tr><td style="width:150px">'.$p->t('zeitsperre/grund').'</td><td colspan="2" style="width:450px"><SELECT name="zeitsperretyp_kurzbz"'.$style.' onchange="showHideBezeichnungDropDown()" class="dd_breit">';
 //dropdown fuer zeitsperretyp
-$qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
+$qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY beschreibung";
 if($result = $db->db_query($qry))
 {
 	while($row=$db->db_fetch_object($result))
 	{
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->beschreibung</OPTION>";
 		else
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled>$row->beschreibung</OPTION>";
 	}
 }
 $content_form.= '</SELECT></td></tr>';
 $content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td colspan="2"><span id="dienstv_span"><input'.$style.' type="text" size="32" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"'.$readonly.'></span></td></tr>';
-$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> <a href="javascript:void(0);" onClick="setBisDatum()">&dArr;</a></td><td  style="text-align:right;"> ';
+$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> <a href="javascript:void(0);" onClick="setBisDatum()">&dArr;</a></td><td id="vonStd"  style="text-align:right;"> ';
 //dropdown fuer vonstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 
@@ -622,7 +748,7 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td  style="text-align:right;"> ';
+$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td id="bisStd"  style="text-align:right;"> ';
 //dropdown fuer bisstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 $content_form.= " <SELECT name='bisstunde'$style>\n";
@@ -676,12 +802,13 @@ $content_form.= '<td style="text-align:right;">';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/speichern')."'>";
+
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/hinzufuegen')."'>";
 $content_form.= '</td></tr>';
 
 $content_form .= '<tr><td colspan="3">&nbsp;</td></tr>';
-$content_form.= "<tr><td colspan='3' style='color:red'>".$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td></tr>";
+$content_form.= "<tr><td colspan='3' style='color:#ff0000'>" .$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td></tr>";
 $content_form.= '</table></form>';
 
 echo '<table width="100%">';
@@ -701,3 +828,4 @@ echo '</table>';
 </div>
 <body>
 </html>
+<?php echo '<script>showHideStudeDropDown();</script>'; ?>

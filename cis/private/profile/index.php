@@ -44,6 +44,7 @@ require_once('../../../include/addon.class.php');
 require_once('../../../include/gruppe.class.php');
 require_once('../../../include/adresse.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/bisverwendung.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -55,6 +56,12 @@ $uid = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
+
+$is_employee = false;
+if (check_lektor($uid))
+{
+	$is_employee = true;
+}
 
 $datum_obj = new datum();
 
@@ -267,6 +274,22 @@ if (!$ansicht)
 
 if (!$ansicht)
 {
+	if ($is_employee)
+	{
+		$verwendung = new bisverwendung();
+		if($verwendung->getLastVerwendung($uid))
+		{
+			if (!$verwendung->hauptberuflich)
+			{
+				echo 'Hauptberuf: '. $verwendung->hauptberuf;
+			}
+		}
+		echo "<br><br>";
+	}
+}
+
+if (!$ansicht)
+{
 	$adresse = new adresse();
 	$adresse->load_pers($user->person_id);
 
@@ -341,16 +364,16 @@ if ($type == 'mitarbeiter')
 		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
 		//echo $p->t('profil/faxTw').": $vorwahl - 99 $user->telefonklappe<BR>";
 	}
-	else {
-		$kontakt = new kontakt();
-		$kontakt->load_pers($user->person_id);
-		foreach($kontakt->result as $k)
-		{
-			if ($k->kontakttyp == 'firmenhandy')
-				echo $p->t('profil/telefonTw').': '.$k->kontakt.'<br>';
-		}
 
+	$kontakt = new kontakt();
+	$kontakt->load_pers($user->person_id);
+	foreach($kontakt->result as $k)
+	{
+		if ($k->kontakttyp == 'firmenhandy' && $is_employee)
+			echo 'Firmenhandy: '.$k->kontakt.'<br>';
 	}
+
+
 	if ($user->ort_kurzbz != '')
 		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
 }
@@ -427,6 +450,7 @@ if (!$ansicht)
 	usort($kontakt->result, "sortKontakt");
 	echo '<table>';
 
+	$has_notfallkontakt = false;
 	foreach($kontakt->result as $k)
 	{
 		if ($k->kontakttyp != 'firmenhandy' && $k->kontakttyp != 'hidden')
@@ -441,6 +465,8 @@ if (!$ansicht)
 			echo '<td>'.$k->anmerkung.'</td>';
 			echo '<td>'.$zustellung.'</td>';
 			echo '</tr>';
+			if ($k->kontakttyp == 'notfallkontakt')
+				$has_notfallkontakt = true;
 		}
 		/*
 		if ($k->zustellung === TRUE)
@@ -462,6 +488,9 @@ if (!$ansicht)
 		}
 		*/
 	}
+	if (!$has_notfallkontakt && $type == 'mitarbeiter')
+		echo '<tr><td>'.$p->t('profil/notfallkontakt').'</td><td colspan="3">'.$p->t('profil/notfallkontaktBekanntgeben').'</td></tr>';
+
 	echo '</table>';
 }
 

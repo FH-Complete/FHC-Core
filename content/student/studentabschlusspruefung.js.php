@@ -163,6 +163,7 @@ function StudentAbschlusspruefungDetailDisableFields(val)
 	document.getElementById('student-abschlusspruefung-menulist-pruefer2').disabled=val;
 	document.getElementById('student-abschlusspruefung-menulist-pruefer3').disabled=val;
 	document.getElementById('student-abschlusspruefung-menulist-abschlussbeurteilung').disabled=val;
+	document.getElementById('student-abschlusspruefung-menulist-pruefungsantritt').disabled=val;
 	document.getElementById('student-abschlusspruefung-menulist-notekommpruef').disabled=val;
 	document.getElementById('student-abschlusspruefung-menulist-akadgrad').disabled=val;
 	document.getElementById('student-abschlusspruefung-menulist-typ').disabled=val;
@@ -186,6 +187,7 @@ function StudentAbschlusspruefungResetFields()
 	document.getElementById('student-abschlusspruefung-menulist-pruefer2').value='';
 	document.getElementById('student-abschlusspruefung-menulist-pruefer3').value='';
 	document.getElementById('student-abschlusspruefung-menulist-abschlussbeurteilung').value='';
+	document.getElementById('student-abschlusspruefung-menulist-pruefungsantritt').value='';
 	document.getElementById('student-abschlusspruefung-menulist-notekommpruef').value='';
 	//document.getElementById('student-abschlusspruefung-menulist-akadgrad').value='';
 	//document.getElementById('student-abschlusspruefung-menulist-typ').value='Bachelor';
@@ -342,6 +344,7 @@ function StudentAbschlusspruefungAuswahl()
 	pruefer3 = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefer3" ));
 	pruefer3_nachname = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefer3_nachname" ));
 	abschlussbeurteilung_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#abschlussbeurteilung_kurzbz" ));
+	pruefungsantritt_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungsantritt_kurzbz" ));
 	notekommpruef = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#notekommpruef" ));
 	akadgrad_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#akadgrad_id" ));
 	datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
@@ -349,6 +352,7 @@ function StudentAbschlusspruefungAuswahl()
 	sponsion = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sponsion" ));
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
+	protokoll = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#protokoll" ));
 
 	stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
@@ -395,6 +399,7 @@ function StudentAbschlusspruefungAuswahl()
 	MenulistSelectItemOnValue('student-abschlusspruefung-menulist-pruefer2', pruefer2);
 	MenulistSelectItemOnValue('student-abschlusspruefung-menulist-pruefer3', pruefer3);
 	document.getElementById('student-abschlusspruefung-menulist-abschlussbeurteilung').value=abschlussbeurteilung_kurzbz;
+	document.getElementById('student-abschlusspruefung-menulist-pruefungsantritt').value=pruefungsantritt_kurzbz;
 	document.getElementById('student-abschlusspruefung-menulist-notekommpruef').value=notekommpruef;
 	document.getElementById('student-abschlusspruefung-menulist-akadgrad').value=akadgrad_id;
 	document.getElementById('student-abschlusspruefung-datum-datum').value=datum;
@@ -406,6 +411,7 @@ function StudentAbschlusspruefungAuswahl()
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value=abschlusspruefung_id;
 	document.getElementById('student-abschlusspruefung-checkbox-neu').checked=false;
+	document.getElementById('student-abschlusspruefung-textbox-protokoll').value=protokoll;
 
 	StudentAbschlusspruefungTypChange();
 }
@@ -424,6 +430,7 @@ function StudentAbschlusspruefungSpeichern()
 	var pruefer2 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer2');
 	var pruefer3 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer3');
 	var abschlussbeurteilung_kurzbz = document.getElementById('student-abschlusspruefung-menulist-abschlussbeurteilung').value;
+	var pruefungsantritt_kurzbz = document.getElementById('student-abschlusspruefung-menulist-pruefungsantritt').value;
 	var notekommpruef = document.getElementById('student-abschlusspruefung-menulist-notekommpruef').value;
 	var akadgrad_id = document.getElementById('student-abschlusspruefung-menulist-akadgrad').value;
 	var datum = document.getElementById('student-abschlusspruefung-datum-datum').value;
@@ -482,6 +489,7 @@ function StudentAbschlusspruefungSpeichern()
 	req.add('pruefer2', pruefer2);
 	req.add('pruefer3', pruefer3);
 	req.add('abschlussbeurteilung_kurzbz', abschlussbeurteilung_kurzbz);
+	req.add('pruefungsantritt_kurzbz', pruefungsantritt_kurzbz);
 	req.add('notekommpruef', notekommpruef);
 	req.add('akadgrad_id', akadgrad_id);
 	req.add('datum', ConvertDateToISO(datum));

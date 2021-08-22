@@ -30,6 +30,7 @@ require_once('../../../include/student.class.php');
 require_once('../../../include/akte.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/webservicelog.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -76,7 +77,6 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 		$akte = new akte();
 		$akte->load($id);
 		if ($akte->person_id == $student_studiengang->person_id
-			&& $akte->signiert
 			&& $akte->stud_selfservice)
 		{
 			if($akte->inhalt!='')
@@ -85,16 +85,29 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 				header("Content-type: $akte->mimetype");
 				header('Content-Disposition: attachment; filename="'.$akte->titel.'"');
 				echo base64_decode($akte->inhalt);
+
+				//Log bei einem Download vom Becheid
+				if ((isset($akte->dokument_kurzbz) && !empty($akte->dokument_kurzbz)) && ($akte->dokument_kurzbz === 'Bescheid' || $akte->dokument_kurzbz === 'BescheidEng'))
+				{
+					$log = new Webservicelog();
+					$log->webservicetyp_kurzbz = 'content';
+					$log->request_id = (isset($akte->akte_id) && !empty($akte->akte_id)) ? $akte->akte_id : NULL;
+					$log->beschreibung = 'Bescheidbestaetigungsdownload';
+					$log->request_data = $_SERVER['QUERY_STRING'];
+					$log->execute_user = get_uid();
+					$log->save(true);
+				}
+
 				exit;
 			}
 			else
 			{
-				die('Id ist ungueltig');
+				die('Akte hat keinen Inhalt.');
 			}
 		}
 		else
 		{
-			die('Id ist ungueltig');
+			die('Nicht zum selbständigen Download bestimmt oder falsche PersonID.');
 		}
 	}
 	else
@@ -123,7 +136,6 @@ echo '
 		});
 		$(".tablesorter2").tablesorter(
 		{
-			sortList: [[1,1]],
 			headers: { 0: { sorter: false }},
 			widgets: ["zebra"]
 		});

@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Martin Tatzber <tatzberm@technikum-wien.at>, 
+ * Authors: Martin Tatzber <tatzberm@technikum-wien.at>,
  */
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/bankverbindung.class.php');
@@ -28,7 +29,7 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/prestudent.class.php');
-	
+
 $uid = get_uid();
 
 if(isset($_GET['uid']))
@@ -48,7 +49,7 @@ if(isset($_GET['uid']))
 }
 else
 	$getParam='';
-	
+
 $benutzer = new benutzer();
 if(!$benutzer->load($uid))
 	die('Benutzer nicht gefunden');
@@ -88,7 +89,7 @@ $oe=new organisationseinheit();
 $oe->load($studiengang->oe_kurzbz);
 
 $konto->getBuchungstyp();
-$buchungstyp = array();	
+$buchungstyp = array();
 foreach ($konto->result as $row)
 	$buchungstyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
 
@@ -153,7 +154,13 @@ if($bic!='')
 				<td>'.$bic.'</td>
 			</tr>';
 }
-if($konto->zahlungsreferenz!='')
+if ($konto->zahlungsreferenz != ''
+ 	&&
+	(
+	 !defined('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN')
+	 || ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN == true
+	)
+)
 {
 	echo '
 			<tr>
@@ -189,7 +196,7 @@ foreach($addon->result as $a)
 		</tbody>
 	</table>';
 	}
-	
+
 }
 
 echo '</body></html>';

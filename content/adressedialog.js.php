@@ -60,6 +60,7 @@ function AdresseInit(adresse_id, person_id)
 		typ = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#typ" ));
 		heimatadresse = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#heimatadresse" ));
 		zustelladresse = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zustelladresse" ));
+        co_name = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#co_name" ));
 		firma_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#firma_id" ));
 		rechnungsadresse = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#rechnungsadresse" ));
 		anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
@@ -78,6 +79,7 @@ function AdresseInit(adresse_id, person_id)
 		typ='h';
 		heimatadresse='Ja';
 		zustelladresse='Ja';
+        co_name = '';
 		firma_id='';
 		rechnungsadresse='Nein';
 		anmerkung='';
@@ -104,6 +106,7 @@ function AdresseInit(adresse_id, person_id)
 		document.getElementById('adresse-checkbox-zustelladresse').checked=true;
 	else
 		document.getElementById('adresse-checkbox-zustelladresse').checked=false;
+    document.getElementById('adresse-textbox-co_name').value = co_name;
 	document.getElementById('adresse-menulist-firma').value=firma_id;
 	document.getElementById('adresse-textbox-anmerkung').value=anmerkung;
 	if(rechnungsadresse=='Ja')

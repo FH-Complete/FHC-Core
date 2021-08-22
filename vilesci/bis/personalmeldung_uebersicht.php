@@ -43,10 +43,6 @@ echo '<!doctype html>
 		Diverse Prüfungen auf inkonsistente Daten<br><br>
 	</li>
 	<li>
-		<a href="checkfunktion.php">Funktionen generieren</a><br>
-		Funktionen zu den Verwendungen generieren (SWS pro Studiengang)<br><br>
-	</li>
-	<li>
 		<a href="personalmeldung.php">Meldung generieren</a><br>
 		Abschließende Plausibilitätsprüfungen durchführen und Meldung generieren<br><br>
 	</li>

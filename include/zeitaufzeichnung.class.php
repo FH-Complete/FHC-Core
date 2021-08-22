@@ -174,7 +174,7 @@ class zeitaufzeichnung extends basis_db
 		}
 		if ($this->aktivitaet_kurzbz != 'Ersatzruhe' && $this->aktivitaet_kurzbz != 'DienstreiseMT')
 		{
-			$check_qry = "SELECT count(*) from campus.tbl_zeitaufzeichnung where uid=".$this->db_add_param($this->uid)." and aktivitaet_kurzbz != 'DienstreiseMT' and (start < ".$this->db_add_param($this->ende)." and ende > ".$this->db_add_param($this->start).")";
+			$check_qry = "SELECT count(*) from campus.tbl_zeitaufzeichnung where uid=".$this->db_add_param($this->uid)." and (aktivitaet_kurzbz != 'DienstreiseMT' or aktivitaet_kurzbz IS NULL ) and (start < ".$this->db_add_param($this->ende)." and ende > ".$this->db_add_param($this->start).")";
 			if($this->db_query($check_qry))
 			{
 				if($row = $this->db_fetch_object())
@@ -460,7 +460,7 @@ class zeitaufzeichnung extends basis_db
 			$where.= " AND start>(now() - INTERVAL '".$days." days')";
 
 	   $qry = "SELECT
-	    			*, 
+	    			*,
 	    			CASE WHEN (ende IS NOT NULL AND ende > start)
 	    			THEN to_char ((ende-start),'HH24:MI')
 	    			ELSE '0'
@@ -734,7 +734,7 @@ or not exists
 				$where AND
 				$where_sem AND
 				l.lehreinheit_id = m.lehreinheit_id AND
-				m.stundensatz * m.semesterstunden > 0 AND
+				m.semesterstunden > 0 AND
 				s.typ not in ('l') AND
 				lv.studiengang_kz > 0
 			UNION
@@ -754,7 +754,7 @@ or not exists
 				pb.projektarbeit_id = pa.projektarbeit_id AND
 				pb.person_id = b.person_id AND
 				b.uid = ".$this->db_add_param($user)." AND
-				pb.stunden * pb.stundensatz > 0 AND
+				pb.stunden > 0 AND
 				s.typ not in ('l') AND
 				lv.studiengang_kz > 0 AND
 				$where_sem
