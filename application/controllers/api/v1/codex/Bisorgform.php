@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bisorgform extends APIv1_Controller
+class Bisorgform extends API_Controller
 {
 	/**
 	 * Bisorgform API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Mobilitaetsprogramm extends APIv1_Controller
+class Mobilitaetsprogramm extends API_Controller
 {
 	/**
 	 * Mobilitaetsprogramm API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lvinfo extends APIv1_Controller
+class Lvinfo extends API_Controller
 {
 	/**
 	 * Lvinfo API constructor.

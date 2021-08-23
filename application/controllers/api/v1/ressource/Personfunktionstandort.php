@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Personfunktionstandort extends APIv1_Controller
+class Personfunktionstandort extends API_Controller
 {
 	/**
 	 * Personfunktionstandort API constructor.

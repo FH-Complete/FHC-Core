@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zeitsperre extends APIv1_Controller
+class Zeitsperre extends API_Controller
 {
 	/**
 	 * Zeitsperre API constructor.

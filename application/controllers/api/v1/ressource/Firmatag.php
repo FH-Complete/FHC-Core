@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Firmatag extends APIv1_Controller
+class Firmatag extends API_Controller
 {
 	/**
 	 * Firmatag API constructor.

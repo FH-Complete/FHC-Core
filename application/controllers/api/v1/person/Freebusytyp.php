@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Freebusytyp extends APIv1_Controller
+class Freebusytyp extends API_Controller
 {
 	/**
 	 * Freebusytyp API constructor.

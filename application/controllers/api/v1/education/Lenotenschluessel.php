@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lenotenschluessel extends APIv1_Controller
+class Lenotenschluessel extends API_Controller
 {
 	/**
 	 * LeNotenschluessel API constructor.

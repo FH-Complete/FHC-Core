@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Benutzerrolle extends APIv1_Controller
+class Benutzerrolle extends API_Controller
 {
 	/**
 	 * Benutzerrolle API constructor.

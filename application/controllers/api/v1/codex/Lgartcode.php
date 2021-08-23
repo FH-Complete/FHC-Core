@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lgartcode extends APIv1_Controller
+class Lgartcode extends API_Controller
 {
 	/**
 	 * Lgartcode API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zahlungstyp extends APIv1_Controller
+class Zahlungstyp extends API_Controller
 {
 	/**
 	 * Zahlungstyp API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class Ort extends APIv1_Controller
+class Ort extends API_Controller
 {
 	/**
 	 * Ort API constructor.

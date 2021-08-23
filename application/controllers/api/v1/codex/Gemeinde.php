@@ -14,7 +14,7 @@
 
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class Gemeinde extends APIv1_Controller
+class Gemeinde extends API_Controller
 {
 	/**
 	 * Gemeinde API constructor.
