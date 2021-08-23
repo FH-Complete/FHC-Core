@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Frage extends APIv1_Controller
+class Frage extends API_Controller
 {
 	/**
 	 * Frage API constructor.

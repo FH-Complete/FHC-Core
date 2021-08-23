@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zeugnis extends APIv1_Controller
+class Zeugnis extends API_Controller
 {
 	/**
 	 * Zeugnis API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Sprache2 extends APIv1_Controller
+class Sprache2 extends API_Controller
 {
 	/**
 	 * Sprache API constructor.

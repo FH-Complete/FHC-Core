@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Kriterien extends APIv1_Controller
+class Kriterien extends API_Controller
 {
 	/**
 	 * Kriterien API constructor.

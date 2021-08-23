@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vorlagestudiengang extends APIv1_Controller
+class Vorlagestudiengang extends API_Controller
 {
 	/**
 	 * Vorlagestudiengang API constructor.

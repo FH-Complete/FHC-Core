@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 fhcomplete.org
+/* Copyright (C) 2021 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *		  Manuela Thamer <manuela.thamer@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
@@ -2225,9 +2226,9 @@ class prestudent extends person
 				WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
 				AND priorisierung <= ".$this->db_add_param($priorisierungAbsolut, FHC_INTEGER);
 
-		if($result = $this->db_query($qry))
+		if ($result = $this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object($result))
+			if ($row = $this->db_fetch_object($result))
 			{
 				return $row->prio_relativ;
 			}
@@ -2242,6 +2243,222 @@ class prestudent extends person
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
 
+	/**
+	 * Prueft, ob eine Person einen aktuellen PreStudentstatus-Eintrag besitzt, der die ZGV Master ersetzt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn vorhanden
+	 *		 false wenn nicht vorhanden
+	 *		 false und errormsg wenn Fehler aufgetreten ist
+	 */
+	public function existsZGVIntern($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				JOIN public.tbl_studiengang USING (studiengang_kz)
+				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
+				AND typ in ('b','m','d')";
+
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				if ($row->anzahl > 0)
+				{
+					$this->errormsg = '';
+					return true;
+				}
+				else
+				{
+					$this->errormsg = '';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Befüllt MasterZGV-Felder: Nation mit Österreich und MasterZGV-code mit FH-Bachelor(I)
+	 * @param int $person_id Personenkennzeichen.
+	 * @param varchar $ort Ort.
+	 * @return true wenn erfolgreich durchgeführt
+	 *		 false und errormsg wenn ein Fehler aufgetreten ist
+	 */
+	public function setZGVMasterFields($person_id, $ort)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+		$arrayleereManations = array();
+
+		//all prestudent_ids mit Status Interessent
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_prestudent
+				JOIN
+					public.tbl_studiengang USING (studiengang_kz)
+				WHERE
+					person_id = ".$this->db_add_param($person_id)."
+				AND
+					typ ='m'
+				And
+					get_rolle_prestudent(prestudent_id, null) = 'Interessent';";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+
+			if ($num_rows > 0)
+			{
+				while ($row = $db->db_fetch_object())
+				{
+					$arrayleereManations[] = $row->prestudent_id;
+				}
+
+				if ($arrayleereManations)
+				{
+					$qry = "UPDATE
+						public.tbl_prestudent
+					SET
+						(zgvmanation, zgvmaort, zgvmas_code) = ('A',".$this->db_add_param($ort).",1)
+					WHERE
+						prestudent_id in (";
+
+					foreach ($arrayleereManations as $prestudent_id)
+					{
+						$qry .= $prestudent_id;
+
+						if (next($arrayleereManations) == true)
+						{
+							$qry .=  ",";
+						}
+					}
+					$qry .=  ");";
+
+					if ($this->db_query($qry))
+					{
+						return true;
+					}
+					else
+					{
+						$this->errormsg = 'Fehler beim Eintragen zgvMasterFields';
+						return false;
+					}
+				}
+			}
+			else
+				return true;
+		}
+	}
+
+
+	/**
+	 * Prueft, ob eine Person einen aktuellen PreStudentstatus-Eintrag Interessent für einen Masterstudiengang besitzt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn vorhanden, false wenn nicht vorhanden
+	 */
+	public function existsStatusInteressentMaster($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+		$prestudentsOfMaster = array();
+
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps, tbl_studiengang sg
+				WHERE
+					ps.studiengang_kz = sg.studiengang_kz
+				AND
+					sg.typ in ('m')
+				AND
+					person_id = ".$this->db_add_param($person_id)."
+				And
+					get_rolle_prestudent(prestudent_id, null) = 'Interessent';";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+			if ($num_rows > 0)
+			{
+				return true;
+			}
+		}
+		else
+			return false;
+	}
+
+
+	/**
+	 * Liefert den wahrscheinlichen Studiengang der MasterZGV einer Person
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return string studiengangkurzbzlang
+	 */
+	public function getZGVMasterStg($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT kurzbzlang
+				FROM public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				JOIN public.tbl_studiengang USING (studiengang_kz)
+				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
+				AND typ in ('b','m','d')
+				ORDER BY status_kurzbz ASC
+				LIMIT 1;";
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				$stg = $row->kurzbzlang;
+				return $stg;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }

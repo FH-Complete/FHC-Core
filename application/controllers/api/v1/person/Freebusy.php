@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Freebusy extends APIv1_Controller
+class Freebusy extends API_Controller
 {
 	/**
 	 * Freebusy API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Besqual extends APIv1_Controller
+class Besqual extends API_Controller
 {
 	/**
 	 * Besqual API constructor.

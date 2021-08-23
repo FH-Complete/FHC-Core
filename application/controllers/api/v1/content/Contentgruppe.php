@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Contentgruppe extends APIv1_Controller
+class Contentgruppe extends API_Controller
 {
 	/**
 	 * Contentgruppe API constructor.

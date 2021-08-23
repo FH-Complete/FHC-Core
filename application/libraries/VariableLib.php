@@ -100,6 +100,18 @@ class VariableLib
 		return $result;
 	}
 
+	public function changeStudengangsTypVar($uid, $name, $change)
+	{
+		$result = error('error when setting variable!');
+
+		if (isEmptyString($uid) || isEmptyString($name) || isEmptyString($change))
+            return $result;
+
+		$result = $this->_ci->VariableModel->setVariable($uid, $name, $change);
+        $this->_setVariable($uid, $name);
+        return $result;
+	}
+
 	/**
 	 * "Refreshes" variable value with given name by retrieving current value from db and saving it.
 	 * @param $uid

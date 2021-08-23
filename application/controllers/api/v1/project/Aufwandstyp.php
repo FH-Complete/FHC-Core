@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aufwandstyp extends APIv1_Controller
+class Aufwandstyp extends API_Controller
 {
 	/**
 	 * Aufwandstyp API constructor.

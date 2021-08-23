@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Firma extends APIv1_Controller
+class Firma extends API_Controller
 {
 	/**
 	 * Firma API constructor.

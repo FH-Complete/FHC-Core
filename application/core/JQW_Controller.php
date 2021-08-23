@@ -49,10 +49,20 @@ abstract class JQW_Controller extends JOB_Controller
 
 	/**
 	 * To get the oldest added job using the given job type
+	 * NOTE: just a wrapper
 	 */
 	protected function getOldestJob($type)
 	{
-		$jobs = $this->jobsqueuelib->getOldestJob($type);
+		return $this->getOldestJobs($type, 1);
+	}
+
+	/**
+	 * To get the oldest added jobs using the given job type
+	 * It is eventually specify the maximum amount of jobs to be retrieved
+	 */
+	protected function getOldestJobs($type, $maxAmount)
+	{
+		$jobs = $this->jobsqueuelib->getOldestJobs($type, $maxAmount);
 
 		// If an error occurred then log it in database
 		if (isError($jobs)) $this->logError(getError($jobs), $type);
@@ -144,12 +154,7 @@ abstract class JQW_Controller extends JOB_Controller
 	 */
 	protected function generateJobs($status, $input)
 	{
-		$job = new stdClass();
-
-		$job->{JobsQueueLib::PROPERTY_STATUS} = $status;
-		$job->{JobsQueueLib::PROPERTY_INPUT} = $input;
-		
-		return array($job);
+		return JobsQueueLib::generateJobs($status, $input);
 	}
 }
 

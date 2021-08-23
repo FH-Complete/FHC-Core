@@ -12,7 +12,7 @@ class CheckUserAuth extends RESTFul_Controller
 		parent::__construct();
 
 		// Loads helper message to manage returning messages
-		// NOTE: loaded here because it does not extend the APIv1_Controller
+		// NOTE: loaded here because it does not extend the API_Controller
 		$this->load->helper('hlp_return_object');
 	}
 

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Notenschluesselzuordnung extends APIv1_Controller
+class Notenschluesselzuordnung extends API_Controller
 {
 	/**
 	 * Notenschluesselzuordnung API constructor.

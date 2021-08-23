@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bisio extends APIv1_Controller
+class Bisio extends API_Controller
 {
 	/**
 	 * Bisio API constructor.
