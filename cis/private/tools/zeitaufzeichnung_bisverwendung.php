@@ -36,37 +36,24 @@ require_once('../../../include/projekt.class.php');
 require_once('../../../include/bisverwendung.class.php');
 
 
-// if (isset($_GET['day']))
-// {
-// 	$day = $_GET['day'];
-// 	echo " es ist ein schöner Tag: " . $day;
-// 	echo "<br> bisid: ";
-//
-//
-// }
-
-// if (isset($_GET['uid'])){
-// 	$uid = $_GET['uid'];
-// 	$verwendung = new bisverwendung();
-// 	$verwendung->getLastAktVerwendung($uid);
-// 	echo $bvId = $verwendung->bisverwendung_id;
-// }
-
 if ((isset($_GET['uid'])) && (isset($_GET['day']))) {
 
 	$uid = $_GET['uid'];
-	//$day = $_GET['day'];
-
-	//$day = '2021-08-15';
-	$day = "2021-08-15";
-
+	$day = $_GET['day'];
 
 	$verwendung = new bisverwendung();
-	$verwendung->getLastAktVerwendung($uid); //haut hin
-	//$verwendung->getVerwendungDatum($uid, $day); //hier kommt nix
-	//$verwendung ->getVerwendungDatumMonat($uid, $day);
-	//
-	echo $bvId = $verwendung->bisverwendung_id;
-	echo "check " . $uid . " on day " . $day;
+
+	$verwendung->getVerwendungDatum($uid, $day);
+	$verwendungArr = array();
+
+	foreach ($verwendung->result as $v)
+		if ($v->homeoffice)
+			if (!in_array($v->bisverwendung_id, $verwendungArr))
+			{
+				$bvId = $v->bisverwendung_id;
+				$verwendungArr[] = $v->bisverwendung_id;
+			}
+
+echo json_encode($verwendungArr);
 
 }

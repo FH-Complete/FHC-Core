@@ -284,18 +284,19 @@ echo '
 				}
 			)
 
-			$("#von_datum").change(
-				function()
-				{
-					var uid = $("#uidpass").val();
-					var Datum = $(this).val();
-					Tag=Datum.substring(0,2);
-					Monat=Datum.substring(3,5);
-					Jahr=Datum.substring(6,10);
-					var day = Jahr + "-" + Monat + "-" + Tag;
-					checkBisverwendung(day,uid);
+			useCheckedDate();
 
-				}
+			$("#von_datum").change(
+			function()
+			{
+				var uid = $("#uidpass").val();
+				var Datum = $(this).val();
+				Tag=Datum.substring(0,2);
+				Monat=Datum.substring(3,5);
+				Jahr=Datum.substring(6,10);
+				var day = Jahr + "-" + Monat + "-" + Tag;
+				checkBisverwendung(day,uid);
+			}
 			)
 
 			function isVisible()
@@ -734,6 +735,16 @@ echo '
 			$("#pause_bis").val("");
 		}
 
+		function useCheckedDate(){
+			var uid = $("#uidpass").val();
+			var Datum = $("#von_datum").val();
+			Tag=Datum.substring(0,2);
+			Monat=Datum.substring(3,5);
+			Jahr=Datum.substring(6,10);
+			var checkedDay = Jahr + "-" + Monat + "-" + Tag;
+			checkBisverwendung(checkedDay, uid);
+		}
+
 		function checkBisverwendung(day, uid)
 		{
 			$.ajax({
@@ -742,12 +753,21 @@ echo '
   			  day: day,
 			  uid: uid
   			},
-  			success: function (daten) {
-  			  $("#outputTest").html(daten);
+  			success: function (json)
+			{
+			  if (json.length > 3)
+			  {
+				$("#outputTest").html(json);
+				$("#homeofficeBlock").show();
+			  }
+			  else
+			  {
+				  $("#outputTest").html(json);
+				  $("#homeofficeBlock").hide();
+
+			  }
   			}
   		  });
-
-
 		}
 
 		</script>
@@ -1536,7 +1556,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		$bis_ts = $datum->mktime_fromtimestamp($datum->formatDatum($bis, $format='Y-m-d H:i:s'));
 		$diff = $bis_ts - $von_ts;
 
-		//outputTest Manu
 		echo '
 		<tr>
 			<td>'.$p->t("global/von").' - '.$p->t("global/bis").'</td>
@@ -1580,32 +1599,28 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		</tr>
 		';
 
-		//Homeoffice Checkbox
-		$verwendung = new bisverwendung();
+		//Homeoffice Checkbox manu
+		//$homeofficeErlaubt = false;
 
-		//Ok: passt
-		//$verwendung->getLastAktVerwendung($user);
-
-		//geht nicht...liefert keine bisverwendung_id, Format?
-		//sql-statement mit '2021-08-20' funktioniert einwandfrei..
-		echo $vonForm = $datum->formatDatum($von, $format='Y-m-d');
-		//echo $vonForm = '2021-08-20';
-		echo $user;
-		// echo $von_ts;
-		$verwendung->getVerwendungDatum($user, $vonForm);
-
-		//gleiches Problem: liefert keine bisverwendung_id
-		// $now = new DateTime('today');
-		// var_dump($now);
-		// echo $now->format('Y-m-d');
+		// $verwendung = new bisverwendung();
+		//
+		// // $now = document.getElementById("von_datum");
+		// // echo $now;
+		// //$now = new DateTime('today');
+		// $now = new DateTime('checkedDay');
 		// $verwendung->getVerwendungDatum($user, $now->format('Y-m-d'));
-
-		echo $bvId = $verwendung->bisverwendung_id;
-
-
-		if ($verwendung->homeoffice)
-			{
-			$bvHo = "erlaubt";
+		// $verwendungArr = array();
+		//
+		// foreach ($verwendung->result as $v)
+		// 	if ($v->homeoffice)
+		// 		if (!in_array($v->bisverwendung_id, $verwendungArr))
+		// 		{
+		// 			$homeofficeErlaubt = true;
+		// 			$verwendungArr[] = $v->bisverwendung_id;
+		// 		}
+		//
+		//  if ($homeofficeErlaubt)
+		//  	{
 			echo '
 			<tr>
 				<td>&nbsp;</td>
@@ -1614,24 +1629,16 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						<input type="checkbox" name="homeoffice" id="homeoffice" '. $homeofficeChecked . '>Homeoffice</input>
 					</span>
 				</td>
-				<td>Homeoffice: ' . $bvHo . '</td>
-				<td>bisId: ' . $bvId . '</td>
-
 			</tr>
 
 			';
-			}
+// }
 
-		else
-		{
-			echo "<h2 class='text-warning'>Homeoffice nicht erlaubt</h2>";
-			echo "<td>BisId:  $bvId </td>";
-			// echo "<td>Datum:  $vonForm </td>";
-		}
 
-		echo '<tr>
-			<td id="outputTest">Manu</td>
-		</tr>';
+		// echo '<tr>
+		// 	<td id="outputTest">Testausgaben</td>
+		// 	<td>bisId: ' . $verwendungArr[0] . '</td>
+		// </tr>';
 
 
 		//Beschreibung
