@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Variable extends APIv1_Controller
+class Variable extends API_Controller
 {
 	/**
 	 * Variable API constructor.

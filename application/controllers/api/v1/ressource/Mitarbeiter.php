@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Mitarbeiter extends APIv1_Controller
+class Mitarbeiter extends API_Controller
 {
 	/**
 	 * Mitarbeiter API constructor.

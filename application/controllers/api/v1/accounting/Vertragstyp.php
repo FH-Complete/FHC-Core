@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vertragstyp extends APIv1_Controller
+class Vertragstyp extends API_Controller
 {
 	/**
 	 * Vertragstyp API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Beschaeftigungsausmass extends APIv1_Controller
+class Beschaeftigungsausmass extends API_Controller
 {
 	/**
 	 * Beschaeftigungsausmass API constructor.

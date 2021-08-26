@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Legesamtnote extends APIv1_Controller
+class Legesamtnote extends API_Controller
 {
 	/**
 	 * Legesamtnote API constructor.

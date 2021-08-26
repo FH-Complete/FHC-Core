@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zgvmaster extends APIv1_Controller
+class Zgvmaster extends API_Controller
 {
 	/**
 	 * Zgvmaster API constructor.

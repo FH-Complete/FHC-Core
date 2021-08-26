@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Contentsprache extends APIv1_Controller
+class Contentsprache extends API_Controller
 {
 	/**
 	 * Contentsprache API constructor.

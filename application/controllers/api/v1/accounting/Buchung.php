@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Buchung extends APIv1_Controller
+class Buchung extends API_Controller
 {
 	/**
 	 * Buchung API constructor.

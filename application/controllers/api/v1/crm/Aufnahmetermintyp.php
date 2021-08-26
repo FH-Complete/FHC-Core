@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aufnahmetermintyp extends APIv1_Controller
+class Aufnahmetermintyp extends API_Controller
 {
 	/**
 	 * Aufnahmetermintyp API constructor.

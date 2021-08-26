@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Webservicerecht extends APIv1_Controller
+class Webservicerecht extends API_Controller
 {
 	/**
 	 * Webservicerecht API constructor.

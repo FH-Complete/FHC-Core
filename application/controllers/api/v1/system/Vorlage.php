@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vorlage extends APIv1_Controller
+class Vorlage extends API_Controller
 {
 	/**
 	 * Vorlage API constructor.

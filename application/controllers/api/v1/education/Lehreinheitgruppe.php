@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lehreinheitgruppe extends APIv1_Controller
+class Lehreinheitgruppe extends API_Controller
 {
 	/**
 	 * Lehreinheitgruppe API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Standort extends APIv1_Controller
+class Standort extends API_Controller
 {
 	/**
 	 * Standort API constructor.

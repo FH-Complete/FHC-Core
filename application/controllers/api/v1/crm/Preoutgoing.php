@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Preoutgoing extends APIv1_Controller
+class Preoutgoing extends API_Controller
 {
 	/**
 	 * Preoutgoing API constructor.

@@ -20,7 +20,8 @@ class Variables extends Auth_Controller
 			array(
 				'setVar' => 'basis/variable:rw',
 				'getVar' => 'basis/variable:rw',
-				'changeStudiensemesterVar' => 'basis/variable:rw'
+				'changeStudiensemesterVar' => 'basis/variable:rw',
+				'changeStudengangsTypVar' => 'basis/variable:rw'
 			)
 		);
 
@@ -50,7 +51,9 @@ class Variables extends Auth_Controller
 	public function getVar()
 	{
 		$name = $this->input->get('name');
-		$this->outputJson($this->VariableModel->getVariables($this->_uid, array($name)));
+		$typ = $this->input->get('typ');
+
+		$this->outputJson($this->VariableModel->getVariables($this->_uid, array($name, $typ)));
 	}
 
 	/**
@@ -63,6 +66,15 @@ class Variables extends Auth_Controller
 
 		$result = $this->variablelib->changeStudiensemesterVar($this->_uid, $name, $change);
 
+		$this->outputJson($result);
+	}
+
+	public function changeStudengangsTypVar()
+	{
+		$name = $this->input->post('name');
+        $change = $this->input->post('change');
+
+        $result = $this->variablelib->changeStudengangsTypVar($this->_uid, $name, $change);
 		$this->outputJson($result);
 	}
 

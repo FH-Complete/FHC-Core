@@ -275,29 +275,29 @@ function drawLehrauftrag($uid)
 		FROM
 			campus.vw_lehreinheit
 			JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id, mitarbeiter_uid)
-            JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
+			JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
 		WHERE
 			mitarbeiter_uid=".$db->db_add_param($uid)."
 			AND studiensemester_kurzbz=".$db->db_add_param($ss). "
-            AND lema.vertrag_id IS NOT NULL
-            AND vertragsstatus_kurzbz = 'akzeptiert'";
+			AND lema.vertrag_id IS NOT NULL
+			AND vertragsstatus_kurzbz = 'akzeptiert'";
 
 	if ($studiengang_kz != '') //$studiengang_kz!='0' &&
-    {
-        $qry .= " AND lv_studiengang_kz=".$db->db_add_param($studiengang_kz);
-    }
+	{
+		$qry .= " AND lv_studiengang_kz=".$db->db_add_param($studiengang_kz);
+	}
 	elseif (!empty($xsl_oe_kurzbz))
-    {
-        if ($xsl_oe_kurzbz == 'etw')
-        {
-            $qry .= " AND lv_studiengang_kz > 0";
-        }
+	{
+		if ($xsl_oe_kurzbz == 'etw')
+		{
+			$qry .= " AND lv_studiengang_kz > 0";
+		}
 
-        if ($xsl_oe_kurzbz == 'lehrgang')
-        {
-            $qry .= " AND lv_studiengang_kz <= 0";
-        }
-    }
+		if ($xsl_oe_kurzbz == 'lehrgang')
+		{
+			$qry .= " AND lv_studiengang_kz <= 0";
+		}
+	}
 
 	$qry .= " ORDER BY lv_orgform_kurzbz, lv_bezeichnung, lehreinheit_id";
 	$lv = array();
@@ -390,8 +390,8 @@ function drawLehrauftrag($uid)
 				$gesamtstunden = $gesamtstunden + $stunden;
 		}
 	}
-	$qry = 'SELECT 
-	            pa.projektarbeit_id,
+	$qry = 'SELECT
+				pa.projektarbeit_id,
 				pb.faktor,
 				pb.stunden,
 				pb.stundensatz,
@@ -401,37 +401,37 @@ function drawLehrauftrag($uid)
 				student.studiengang_kz,
 				projekttyp_kurzbz,
 				lv.oe_kurzbz,
-                vertragsstatus_kurzbz
+				vertragsstatus_kurzbz
 			FROM lehre.tbl_projektbetreuer pb
-                JOIN lehre.tbl_projektarbeit pa USING (projektarbeit_id)
-		        JOIN lehre.tbl_lehreinheit le USING (lehreinheit_id)
-		        JOIN lehre.tbl_lehrveranstaltung           lv USING (lehrveranstaltung_id)
-                JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
-                JOIN public.tbl_benutzer benutzer ON pb.person_id = benutzer.person_id			
-                JOIN campus.vw_student student ON pa.student_uid = student.uid
-                LEFT JOIN lehre.tbl_vertrag                vertrag USING (vertrag_id)
-                LEFT JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
+				JOIN lehre.tbl_projektarbeit pa USING (projektarbeit_id)
+				JOIN lehre.tbl_lehreinheit le USING (lehreinheit_id)
+				JOIN lehre.tbl_lehrveranstaltung           lv USING (lehrveranstaltung_id)
+				JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
+				JOIN public.tbl_benutzer benutzer ON pb.person_id = benutzer.person_id
+				JOIN campus.vw_student student ON pa.student_uid = student.uid
+				LEFT JOIN lehre.tbl_vertrag                vertrag USING (vertrag_id)
+				LEFT JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
 			WHERE pb.vertrag_id IS NOT NULL
-                AND vvst.vertragsstatus_kurzbz = \'akzeptiert\'
-                AND benutzer.uid = '.$db->db_add_param($uid).'
-                AND le.studiensemester_kurzbz = '.$db->db_add_param($ss);
+				AND vvst.vertragsstatus_kurzbz = \'akzeptiert\'
+				AND benutzer.uid = '.$db->db_add_param($uid).'
+				AND le.studiensemester_kurzbz = '.$db->db_add_param($ss);
 
 	if ($studiengang_kz != '')
-    {
-        $qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
-    }
-    elseif (!empty($xsl_oe_kurzbz))
-    {
-        if ($xsl_oe_kurzbz == 'etw')
-        {
-            $qry .= " AND lv.studiengang_kz > 0";
-        }
+	{
+		$qry .= " AND lv.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+	}
+	elseif (!empty($xsl_oe_kurzbz))
+	{
+		if ($xsl_oe_kurzbz == 'etw')
+		{
+			$qry .= " AND lv.studiengang_kz > 0";
+		}
 
-        if ($xsl_oe_kurzbz == 'lehrgang')
-        {
-            $qry .= " AND lv.studiengang_kz <= 0";
-        }
-    }
+		if ($xsl_oe_kurzbz == 'lehrgang')
+		{
+			$qry .= " AND lv.studiengang_kz <= 0";
+		}
+	}
 
 	if ($result = $db->db_query($qry))
 	{
@@ -470,8 +470,6 @@ function drawLehrauftrag($uid)
 			}
 		}
 	}
-
-
 
 	foreach ($lv as $lv_row)
 	{

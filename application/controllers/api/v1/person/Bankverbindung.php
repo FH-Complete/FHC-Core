@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bankverbindung extends APIv1_Controller
+class Bankverbindung extends API_Controller
 {
 	/**
 	 * Bankverbindung API constructor.

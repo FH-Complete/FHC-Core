@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Hauptberuf extends APIv1_Controller
+class Hauptberuf extends API_Controller
 {
 	/**
 	 * Hauptberuf API constructor.
