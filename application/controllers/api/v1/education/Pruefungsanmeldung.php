@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Pruefungsanmeldung extends APIv1_Controller
+class Pruefungsanmeldung extends API_Controller
 {
 	/**
 	 * Pruefungsanmeldung API constructor.

@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studiengang2 extends APIv1_Controller
+class Studiengang2 extends API_Controller
 {
 	/**
 	 *

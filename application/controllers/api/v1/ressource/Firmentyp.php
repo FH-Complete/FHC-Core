@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Firmentyp extends APIv1_Controller
+class Firmentyp extends API_Controller
 {
 	/**
 	 * Firmentyp API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Anwesenheit extends APIv1_Controller
+class Anwesenheit extends API_Controller
 {
 	/**
 	 * Anwesenheit API constructor.

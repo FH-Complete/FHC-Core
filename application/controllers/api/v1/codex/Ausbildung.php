@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ausbildung extends APIv1_Controller
+class Ausbildung extends API_Controller
 {
 	/**
 	 * Ausbildung API constructor.

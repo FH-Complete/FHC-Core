@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Tag extends APIv1_Controller
+class Tag extends API_Controller
 {
 	/**
 	 * Tag API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Pruefungsfenster extends APIv1_Controller
+class Pruefungsfenster extends API_Controller
 {
 	/**
 	 * Pruefungsfenster API constructor.

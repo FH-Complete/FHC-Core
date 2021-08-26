@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Scrumsprint extends APIv1_Controller
+class Scrumsprint extends API_Controller
 {
 	/**
 	 * Scrumsprint API constructor.

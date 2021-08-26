@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Entwicklungsteam extends APIv1_Controller
+class Entwicklungsteam extends API_Controller
 {
 	/**
 	 * Entwicklungsteam API constructor.

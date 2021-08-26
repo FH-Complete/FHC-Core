@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Reservierung extends APIv1_Controller
+class Reservierung extends API_Controller
 {
 	/**
 	 * Reservierung API constructor.

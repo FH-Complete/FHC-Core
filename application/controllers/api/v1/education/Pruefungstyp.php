@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Pruefungstyp extends APIv1_Controller
+class Pruefungstyp extends API_Controller
 {
 	/**
 	 * Pruefungstyp API constructor.

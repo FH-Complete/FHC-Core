@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lvgesamtnote extends APIv1_Controller
+class Lvgesamtnote extends API_Controller
 {
 	/**
 	 * Lvgesamtnote API constructor.

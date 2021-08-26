@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Filter extends APIv1_Controller
+class Filter extends API_Controller
 {
 	/**
 	 * Filter API constructor.

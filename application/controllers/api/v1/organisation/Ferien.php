@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ferien extends APIv1_Controller
+class Ferien extends API_Controller
 {
 	/**
 	 * Ferien API constructor.

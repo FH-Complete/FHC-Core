@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Statistik extends APIv1_Controller
+class Statistik extends API_Controller
 {
 	/**
 	 * Statistik API constructor.

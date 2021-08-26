@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vorschlag extends APIv1_Controller
+class Vorschlag extends API_Controller
 {
 	/**
 	 * Vorschlag API constructor.

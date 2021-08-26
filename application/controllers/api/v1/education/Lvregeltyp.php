@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lvregeltyp extends APIv1_Controller
+class Lvregeltyp extends API_Controller
 {
 	/**
 	 * Lvregeltyp API constructor.
