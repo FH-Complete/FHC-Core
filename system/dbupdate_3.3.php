@@ -4945,7 +4945,7 @@ if(!$result = @$db->db_query("SELECT matr_aktiv FROM public.tbl_person LIMIT 1")
 	else
 		echo '<br>public.tbl_person: Spalte matr_aktiv hinzugefuegt';
 
-	$qry = "UPDATE public.tbl_person SET matr_aktiv = true;";
+	$qry = "UPDATE public.tbl_person SET matr_aktiv = TRUE WHERE matr_nr IS NOT NULL;";
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
