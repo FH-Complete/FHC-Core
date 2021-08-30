@@ -246,7 +246,12 @@ $(function(){
         if (genehmigung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
-            genehmigung_panel.slideDown('slow');
+            genehmigung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: genehmigung_panel.offset().top // Move genehmigung panel bottom up to be visible within window screen
+                }, 400);
+            });
+
             return;
         }
     });
@@ -318,7 +323,12 @@ $(function(){
         if (begruendung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
-            begruendung_panel.slideDown('slow');
+            begruendung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: begruendung_panel.offset().top // Move begruendung panel bottom up to be visible within window screen
+                }, 400);
+            });
+
             return;
         }
     });
