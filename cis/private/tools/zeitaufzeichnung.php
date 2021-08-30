@@ -757,12 +757,10 @@ echo '
 			{
 			  if (json.length > 3)
 			  {
-				$("#outputTest").html(json);
 				$("#homeofficeBlock").show();
 			  }
 			  else
 			  {
-				  $("#outputTest").html(json);
 				  $("#homeofficeBlock").hide();
 
 			  }
@@ -1599,28 +1597,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		</tr>
 		';
 
-		//Homeoffice Checkbox manu
-		//$homeofficeErlaubt = false;
-
-		// $verwendung = new bisverwendung();
-		//
-		// // $now = document.getElementById("von_datum");
-		// // echo $now;
-		// //$now = new DateTime('today');
-		// $now = new DateTime('checkedDay');
-		// $verwendung->getVerwendungDatum($user, $now->format('Y-m-d'));
-		// $verwendungArr = array();
-		//
-		// foreach ($verwendung->result as $v)
-		// 	if ($v->homeoffice)
-		// 		if (!in_array($v->bisverwendung_id, $verwendungArr))
-		// 		{
-		// 			$homeofficeErlaubt = true;
-		// 			$verwendungArr[] = $v->bisverwendung_id;
-		// 		}
-		//
-		//  if ($homeofficeErlaubt)
-		//  	{
+		//Homeoffice Checkbox
 			echo '
 			<tr>
 				<td>&nbsp;</td>
@@ -1632,14 +1609,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			</tr>
 
 			';
-// }
-
-
-		// echo '<tr>
-		// 	<td id="outputTest">Testausgaben</td>
-		// 	<td>bisId: ' . $verwendungArr[0] . '</td>
-		// </tr>';
-
 
 		//Beschreibung
 		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea style="font-size: 13px" name="beschreibung" cols="60" maxlength="256">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
