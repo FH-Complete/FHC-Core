@@ -1539,7 +1539,7 @@ function OpenAboutDialog()
 // ****
 function OpenManual()
 {
-	window.open('https://wiki.fhcomplete.org/doku.php?','_blank');
+	window.open('https://wiki.fhcomplete.info/','_blank');
 }
 
 // ****

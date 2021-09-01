@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bestellungtag extends APIv1_Controller
+class Bestellungtag extends API_Controller
 {
 	/**
 	 * Bestellungtag API constructor.

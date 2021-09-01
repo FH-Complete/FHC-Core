@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ressource extends APIv1_Controller
+class Ressource extends API_Controller
 {
 	/**
 	 * Ressource API constructor.

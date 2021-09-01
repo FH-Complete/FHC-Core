@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lehrform extends APIv1_Controller
+class Lehrform extends API_Controller
 {
 	/**
 	 * Lehrform API constructor.

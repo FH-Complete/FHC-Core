@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studienplatz extends APIv1_Controller
+class Studienplatz extends API_Controller
 {
 	/**
 	 * Studienplatz API constructor.

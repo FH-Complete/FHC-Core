@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Konto extends APIv1_Controller
+class Konto extends API_Controller
 {
 	/**
 	 * Konto API constructor.

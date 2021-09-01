@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studienordnungstatus extends APIv1_Controller
+class Studienordnungstatus extends API_Controller
 {
 	/**
 	 * Studienordnungstatus API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zeitfenster extends APIv1_Controller
+class Zeitfenster extends API_Controller
 {
 	/**
 	 * Zeitfenster API constructor.

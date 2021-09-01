@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Kostenstelle extends APIv1_Controller
+class Kostenstelle extends API_Controller
 {
 	/**
 	 * Kostenstelle API constructor.

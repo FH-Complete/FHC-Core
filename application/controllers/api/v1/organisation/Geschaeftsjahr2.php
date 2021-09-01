@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Geschaeftsjahr2 extends APIv1_Controller
+class Geschaeftsjahr2 extends API_Controller
 {
 	/**
 	 * Geschaeftsjahr API constructor.

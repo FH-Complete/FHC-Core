@@ -106,7 +106,8 @@ if(!isset($_GET['searchstr']))
 
 			$email=$row->uid.'@'.DOMAIN;
 			echo "<td nowrap><a href='mailto:$email'>$email</a></td>";
-			echo "<td nowrap class='button'><a href='personen_details.php?uid=".$row->uid."'>Edit</a></td>";
+            if($rechte->isBerechtigt('student/stammdaten', null, 's') || $rechte->isBerechtigt('mitarbeiter/stammdaten', null, 's'))
+                echo "<td nowrap class='button'><a href='personen_details.php?uid=".$row->uid."'>Edit</a></td>";
 			echo "<td nowrap class='button'>";
 			if ($row->lektor)
 			{

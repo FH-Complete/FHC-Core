@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nation extends APIv1_Controller
+class Nation extends API_Controller
 {
 	/**
 	 * Course API constructor.

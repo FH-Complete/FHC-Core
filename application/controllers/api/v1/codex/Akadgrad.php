@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Akadgrad extends APIv1_Controller
+class Akadgrad extends API_Controller
 {
 	/**
 	 * Akadgrad API constructor.

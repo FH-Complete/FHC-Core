@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zeugnisnote extends APIv1_Controller
+class Zeugnisnote extends API_Controller
 {
 	/**
 	 * Zeugnisnote API constructor.

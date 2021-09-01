@@ -85,6 +85,7 @@ if($doc->isLocked($id))
 			$dokumente_arr[] .= 'ZgvBaPre';
 			$dokumente_arr[] .= 'ZgvMaPre';
 			$dokumente_arr[] .= 'InvitLet';
+			$dokumente_arr[] .= 'VorlSpB2';
 			$dokumente_arr[] .= 'ZeitBest';
 		}
 		if ($person_id!=$akte_person || !in_array($akte_dokument_kurzbz, $dokumente_arr))

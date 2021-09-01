@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Feedback extends APIv1_Controller
+class Feedback extends API_Controller
 {
 	/**
 	 * Feedback API constructor.

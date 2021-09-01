@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Log extends APIv1_Controller
+class Log extends API_Controller
 {
 	/**
 	 * Log API constructor.

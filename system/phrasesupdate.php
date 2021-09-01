@@ -91,6 +91,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'text',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Text',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'text',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'titel',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -3048,6 +3068,106 @@ $phrases = array(
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
+		'phrase' => 'zgvRueckfragen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Prüfung beantragen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'apply for a ZGV examination',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zgvErfuellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zgvNichtErfuellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV nicht erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV unfulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zgvErfuelltPruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV mit Prüfungen erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV fulfilled with exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zgvInPruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV noch in Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV still in review',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
 		'phrase' => 'absagegrund',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -3406,6 +3526,86 @@ $phrases = array(
 		)
 	),
 	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'dokumentWirdNachgereicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument wird nachgereicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document will be submitted later',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'datumUngueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Datumsformat ist ungültig oder liegt außerhalb des gültigen Bereichs. Bitte geben Sie ein gültiges Datum im Format tt.mm.jjjj ein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date is invalid or out of range. Please enter a valid date in the format dd.mm.yyyy.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'dokUngueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bei dem Dokument ist keine Nachreichung möglich.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date is invalid or out of range. Please enter a valid date in the format dd.mm.yyyy.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'nachreichDatumNichtVergangenheit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Datum der Nachreichung darf nicht in der Vergangenheit liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The date of submission may not be in the past.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'parkdatum',
@@ -3588,18 +3788,18 @@ $phrases = array(
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
-		'phrase' => 'nurBachelorFreigeben',
+		'phrase' => 'nurBachelorMasterFreigeben',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Nur Bachelorstudiengänge können freigegeben werden.',
+				'text' => 'Nur Bachelorstudiengänge/Masterstudiengänge können freigegeben werden.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Only bachelor programmes can be approved.',
+				'text' => 'Only bachelor/master programmes can be approved.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

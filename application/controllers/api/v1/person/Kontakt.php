@@ -15,7 +15,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Kontakt extends APIv1_Controller
+class Kontakt extends API_Controller
 {
     /**
      * Person API constructor.
