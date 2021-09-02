@@ -4808,7 +4808,7 @@ if (!$result = @$db->db_query("SELECT homeoffice FROM bis.tbl_bisverwendung LIMI
 }
 
 // ADD COLUMN homeoffice to campus.tbl_zeitaufzeichnung
-if(!$result = @$db->db_query("SELECT homeoffice FROM campus.tbl_zeitaufzeichnung 1"))
+if(!$result = @$db->db_query("SELECT homeoffice FROM campus.tbl_zeitaufzeichnung LIMIT 1"))
 {
 	$qry = "
 		ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN homeoffice boolean NOT NULL DEFAULT false ;
