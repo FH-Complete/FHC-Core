@@ -174,7 +174,20 @@ if(!$error)
 			elseif($_POST['zeitaufzeichnungspflichtig']=='false')
 				$verwendung->zeitaufzeichnungspflichtig = false;
 			else
-				$verwendung->zeitaufzeichnungspflichtig = '';
+				$verwendung->azgrelevant = '';
+			if($_POST['azgrelevant']=='true')
+				$verwendung->azgrelevant = true;
+			elseif($_POST['azgrelevant']=='false')
+				$verwendung->azgrelevant = false;
+			else
+				$verwendung->azgrelevant = '';
+			
+			if($_POST['homeoffice']=='true')
+				$verwendung->homeoffice = true;
+			elseif($_POST['homeoffice']=='false')
+				$verwendung->homeoffice = false;
+			else
+				$verwendung->homeoffice = '';
 
 			if($verwendung->save())
 			{

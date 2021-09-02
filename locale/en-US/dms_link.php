@@ -27,8 +27,8 @@ $this->phrasen['dms_link/profilhilfe']=''; //Hilfe-Link aus dem Profil
 $this->phrasen['dms_link/anleitungMailverteiler']='7578'; //Anleitung für die Benutzung der Mailverteiler und der Berechtigungsschlüssel
 
 //Links auf externe Seiten
-$this->phrasen['dms_link/dokuwikiGesamtnote']='https://wiki.fhcomplete.org/doku.php?id=cis:gesamtnote'; //Link ins Dokuwiki zur Anleitung Gesamtnote
-$this->phrasen['dms_link/abgabetoolLektorHandbuch']='https://wiki.fhcomplete.org/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer LektorInnen
-$this->phrasen['dms_link/abgabetoolStudentHandbuch']='https://wiki.fhcomplete.org/doku.php?id=cis:abgabetool_fuer_studierende'; //Abgabetool Handbuch fuer Studierende
-$this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='https://wiki.fhcomplete.org/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer Assistenz
+$this->phrasen['dms_link/dokuwikiGesamtnote']='https://wiki.fhcomplete.info/doku.php?id=cis:gesamtnote'; //Link ins Dokuwiki zur Anleitung Gesamtnote
+$this->phrasen['dms_link/abgabetoolLektorHandbuch']='https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer LektorInnen
+$this->phrasen['dms_link/abgabetoolStudentHandbuch']='https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende'; //Abgabetool Handbuch fuer Studierende
+$this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer Assistenz
 ?>

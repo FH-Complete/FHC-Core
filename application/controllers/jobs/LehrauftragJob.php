@@ -383,8 +383,8 @@ class LehrauftragJob extends JOB_Controller
 						} // Else if UID exists
 						else
 						{
-							// Search if studiensemester exists
-							$ss_index = array_search($data['studiensemester_kurzbz'], array_column($mail_data_arr, 'studiensemester_kurzbz'));
+							// Search if studiensemester exists inside the existing UID array
+							$ss_index = array_search($data['studiensemester_kurzbz'], array_column($mail_data_arr[$uid_index], 'studiensemester_kurzbz'));
 
 							// If studiensemester is new, add studiensemester to existing UID
 							if ($ss_index === false)
@@ -394,13 +394,6 @@ class LehrauftragJob extends JOB_Controller
 									$data[$i]
 								);
 							}
-							// Else if studiensemester exists
-							else
-							{
-								// Add corresponding data to existing studiensemester of UID
-								$mail_data_arr[$uid_index]['studiensemester_kurbz'][] = $data[$i];
-							}
-
 						}
 					}
 				}

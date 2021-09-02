@@ -1233,6 +1233,8 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	dv_art = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-dv_art').value;
 	inkludierte_lehre = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-inkludierte_lehre').value;
 	zeitaufzeichnungspflichtig = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked;
+	azgrelevant = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked;
+	homeoffice = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-homeoffice').checked;
 
 	if(verwendung_code=='1')
 	{
@@ -1291,6 +1293,8 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	req.add('dv_art', dv_art);
 	req.add('inkludierte_lehre', inkludierte_lehre);
 	req.add('zeitaufzeichnungspflichtig', zeitaufzeichnungspflichtig);
+	req.add('azgrelevant', azgrelevant);
+	req.add('homeoffice', homeoffice);
 
 	var response = req.executePOST();
 

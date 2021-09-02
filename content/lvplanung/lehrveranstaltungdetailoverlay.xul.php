@@ -481,9 +481,9 @@ $p = new phrasen($sprache);
 						<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" disabled="true" maxlength="255" width="300" oninput="LeMitarbeiterValueChanged();"/>
 					</row>
 			    	<row>
-    					<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-semesterstunden" control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
+    					<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-semesterstunden" control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Lehrauftragsstunden (LAS): "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten(); if(parseInt(this.value)) document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value= parseInt(this.value)"/>
-    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" value="Planstunden: "/>
+    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" tooltiptext="LVPLS" value="LV-Plan Stunden: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
     				</row>
 			    	<row>
