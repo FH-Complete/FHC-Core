@@ -276,7 +276,7 @@ class person extends basis_db
 				$erg += $gewichtung[$i] * $this->svnr{$i};
 			}
 
-			if ($this->svnr{3} != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
+			if ($this->svnr[3] != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
 			{
 				$this->errormsg = 'SVNR ist ungueltig';
 				return false;
