@@ -8207,7 +8207,7 @@ Any unusual occurrences
 				'insertvon' => 'system'
 			)
 		)
-	),    
+	),
 	array(
 		'app' => 'core',
 		'category' => 'ui',
@@ -9959,7 +9959,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Deadline ist &uuml;berschritten',
+				'text' => 'Außerhalb der Einreichfrist',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -11466,7 +11466,7 @@ Any unusual occurrences
                     <li><u>Wintersemester spätestens bis 22. September</u></li>
                     <li><u>Sommersemester spätestens bis 22. Februar</u> hoch.</li>
                 </ul>
-                <br>Die Entscheidung über den Antrag erfolgt in der Regel innerhalb von zwei Wochen ab dem 15. September
+                <br>Die Entscheidung über den Antrag erfolgt in der Regel innerhalb von zwei Wochen ab dem 22. September
                 bzw. 22. Februar.
                 <br><br>Für jede Lehrveranstaltung ist ein gesonderter Antrag beizubringen.</li>",
 				'description' => '',
@@ -11479,7 +11479,7 @@ Any unusual occurrences
                     <li><u>by September 22nd for the winter semester</u></li>
                     <li><u>by February 22nd for the summer semester</u> at the latest.</li>
                 </ul>
-                <br>The decision on the application is usually made within two weeks from September 15 (winter semester) or February 22 (summer semester).
+                <br>The decision on the application is usually made within two weeks from September 22 (winter semester) or February 22 (summer semester).
                 <br><br>A separate application must be submitted for each course.</li>",
 				'description' => '',
 				'insertvon' => 'system'
@@ -12287,26 +12287,6 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "Requested to",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'anrechnung',
-		'phrase' => 'empfehlungsanfrageAm',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Anfrage am",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Requested on",
 				'description' => '',
 				'insertvon' => 'system'
 			)
