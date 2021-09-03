@@ -20,6 +20,16 @@ $query = '
 			begruendung.bezeichnung AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
+			(SELECT COALESCE(
+				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . ',
+				array_to_json(zgv.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . '
+				) AS zgv
+			FROM public.tbl_prestudent
+			LEFT JOIN bis.tbl_zgv zgv USING (zgv_code)
+			LEFT JOIN bis.tbl_zgvmaster zgvmaster USING (zgvmas_code)
+			WHERE prestudent_id = anrechnung.prestudent_id
+			) AS zgv,
+			anrechnung.insertamum::date AS "antragsdatum",
 			empfehlung_anrechnung,
 			(SELECT status_kurzbz
 			FROM lehre.tbl_anrechnungstatus
@@ -33,7 +43,7 @@ $query = '
 		JOIN public.tbl_person AS person USING (person_id)
 		JOIN public.tbl_studiengang AS stg USING (studiengang_kz)
 		JOIN lehre.tbl_lehrveranstaltung AS lv USING (lehrveranstaltung_id)
-		JOIN campus.tbl_dms_version AS dmsversion USING (dms_id)
+		LEFT JOIN campus.tbl_dms_version AS dmsversion USING (dms_id)
 		JOIN lehre.tbl_anrechnung_anrechnungstatus USING (anrechnung_id)
 		JOIN lehre.tbl_anrechnung_begruendung AS begruendung USING (begruendung_id)
 	)
@@ -75,6 +85,8 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
 		ucfirst($this->p->t('anrechnung', 'herkunft')),
+		ucfirst($this->p->t('global', 'zgv')),
+		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
 		'Status'
@@ -110,25 +122,27 @@ $filterWidgetArray = array(
         }
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
-		anrechnung_id: {visible: false},
-		lehrveranstaltung_id: {visible: false},
-		begruendung_id: {visible: false},
-		dms_id: {visible: false},
-		studiensemester_kurzbz: {visible: false},
-		studiengang_kz: {visible: false},
+		anrechnung_id: {visible: false, headerFilter:"input"},
+		lehrveranstaltung_id: {visible: false, headerFilter:"input"},
+		begruendung_id: {visible: false, headerFilter:"input"},
+		dms_id: {visible: false, headerFilter:"input"},
+		studiensemester_kurzbz: {visible: false, headerFilter:"input"},
+		studiengang_kz: {visible: false, headerFilter:"input"},
 		stg_bezeichnung: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
 		ects: {headerFilter:"input", align:"center"},
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
+		zgv: {visible: false, headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{
 		    labelField:"dokument_bezeichnung",
 			url:function(cell){return "'. current_url() .'/download?dms_id=" + cell.getData().dms_id},
 		    target:"_blank"
 		}},
 		anmerkung_student: {headerFilter:"input"},
+		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
-		status_kurzbz: {visible: false},
+		status_kurzbz: {visible: false, headerFilter:"input"},
 		status_bezeichnung: {headerFilter:"input"}
 	 }', // col properties
 );

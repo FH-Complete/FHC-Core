@@ -243,7 +243,8 @@ class anrechnung extends basis_db
 	 */
 	public function delete($anrechnung_id)
 	{
-		$qry = "DELETE FROM lehre.tbl_anrechnung WHERE anrechnung_id = " . $this->db_add_param($anrechnung_id);
+		$qry = "DELETE FROM lehre.tbl_anrechnung_anrechnungstatus WHERE anrechnung_id = " . $this->db_add_param($anrechnung_id). "; ";
+		$qry.= "DELETE FROM lehre.tbl_anrechnung WHERE anrechnung_id = " . $this->db_add_param($anrechnung_id);
 
 		if ($this->db_query($qry))
 		{
@@ -359,6 +360,45 @@ class anrechnung extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	public function getLastAnrechnungstatus($anrechnung_id)
+	{
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		
+		$qry = '
+			SELECT *, '. $bezeichnung_mehrsprachig. '
+			FROM lehre.tbl_anrechnungstatus
+			JOIN lehre.tbl_anrechnung_anrechnungstatus USING (status_kurzbz)
+			WHERE anrechnung_id = ' . $this->db_add_param($anrechnung_id). '
+			ORDER BY insertamum DESC
+			LIMIT 1
+		';
+		
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+				$obj->anrechnungstatus_id = $row->anrechnungstatus_id;
+				$obj->status_kurzbz = $row->status_kurzbz;
+				$obj->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
+
+				$this->result[]= $obj;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Daten konnten nicht geladen werden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Daten konnten nicht geladen werden';
 			return false;
 		}
 	}

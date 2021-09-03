@@ -43,6 +43,12 @@ foreach($ampel->result as $a)
 			$uid = $row->uid;
 			
 			$mail = new mail($uid.'@'.DOMAIN, 'cis@'.DOMAIN, $subject, $message);
+			
+			// If message has HTML content
+			if($message != strip_tags($message)) {
+				$mail->setHTMLContent(sprintf('%s', $message));
+			}
+			
 			if($mail->send())
 				echo "Email an $uid versandt\n";
 			 else
