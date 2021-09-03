@@ -160,6 +160,17 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 		beschreibungstext = beschreibungstext.replace(/Ze1l3numxbr/g, "\r\n");
 		document.getElementById("beschreibung-textarea").value = beschreibungstext;
 	}
+	function updateSchlagworte(schlagworte)
+	{
+		document.getElementById("schlagworte-textarea").value = schlagworte;
+	}
+	function updateCisSuche(cisSuche)
+	{
+		if (cisSuche == true)
+			document.getElementById("cis_suche_checkbox").checked = true;
+		else
+			document.getElementById("cis_suche_checkbox").checked = false;
+	}
 
 	var __js_page_array = new Array();
 	function js_toggle_container(conid)
@@ -1003,7 +1014,7 @@ else
 				</tr>
 				<tr>
 					<td>CIS-Suche</td>
-					<td><input type="checkbox" name="cis_suche"></td>
+					<td><input type="checkbox" id="cis_suche_checkbox" name="cis_suche"></td>
 				</tr>
 				<tr>
 					<td></td>
@@ -1348,7 +1359,10 @@ function drawFilesList($rows)
 			$beschreibungstext = str_replace('"', "D4n7ührung", $beschreibungstext);
 			$beschreibungstext = str_replace("\\", "6Sl4sh", $beschreibungstext);
 			$beschreibungstext = str_replace("\r\n", "Ze1l3numxbr", $beschreibungstext);
-			echo $beschreibungstext.'\'); return upload(\''.$row->dms_id.'\',\''.$row->name.'\');" style="font-size:small">Neue Version hochladen</a></li>';
+			echo $beschreibungstext.'\'); 
+			updateSchlagworte(\''.$row->schlagworte.'\');
+			updateCisSuche(\''.$row->cis_suche.'\');
+			return upload(\''.$row->dms_id.'\',\''.$row->name.'\');" style="font-size:small">Neue Version hochladen</a></li>';
 		}
 		if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
 		{
