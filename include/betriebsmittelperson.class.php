@@ -509,10 +509,11 @@ class betriebsmittelperson extends basis_db
 
 	/**
 	 * Sucht welche Person die uebergebene Kartennummer hat
-	 * @param  $nummer Kartennummer
+	 * @param $nummer Kartennummer
+	 * @param boolean $checkRetour Optional. Default true. Checkt, ob die Karte bereits retourniert wurde. Wenn false werden auch bereits retournierte Karten zurückgegeben
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getKartenzuordnung($nummer)
+	public function getKartenzuordnung($nummer, $checkRetour=true)
 	{
 		// fuehrende Nullen bei Kartennummern auch checken
 		$qry='
@@ -536,8 +537,12 @@ class betriebsmittelperson extends basis_db
 			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('00000'.$nummer).'
 			)
 			AND tbl_betriebsmittel.betriebsmitteltyp=\'Zutrittskarte\'
-			AND (ausgegebenam<=now() OR ausgegebenam is NULL)
-			AND (retouram>=now() OR retouram is NULL)';
+			AND (ausgegebenam<=now() OR ausgegebenam is NULL)';
+
+		if ($checkRetour == true)
+		{
+			$qry .= ' AND (retouram>=now() OR retouram is NULL)';
+		}
 
 		if($this->db_query($qry))
 		{
