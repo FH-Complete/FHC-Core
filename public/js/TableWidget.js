@@ -544,7 +544,7 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
-				if (options.tableWidgetHeader == 'undefined')
+				if (typeof options.tableWidgetHeader == 'undefined')
 				{
 					options.persistentLayout = true;			// enables persistence (default store in localStorage if available, else in cookie)
 					options.persistenceID = data.tableUniqueId;	// TableWidget unique id to store persistence data seperately for multiple tables
@@ -552,9 +552,13 @@ var FHC_TableWidget = {
 				options.movableColumns = true;				// allows changing column order
 				options.tooltipsHeader = true;				// set header tooltip with column title
 				options.placeholder = _func_placeholder();	// display text when table is empty
-				options.rowSelectionChanged = function(data, rows){
-					_func_rowSelectionChanged(data, rows);
-				};
+
+				if (typeof options.rowSelectionChanged == 'undefined')
+				{
+					options.rowSelectionChanged = function(data, rows){
+						_func_rowSelectionChanged(data, rows);
+					};
+				}
 				options.columnVisibilityChanged = function(column, visible) {
 					_func_columnVisibilityChanged(column, visible);
 				};
@@ -569,8 +573,8 @@ var FHC_TableWidget = {
 		// -------------------------------------------------------------------------------------------------------------
 
 		// Render tableWidgetHeader
-		if (options.tableWidgetHeader == 'undefined' ||
-			(options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != false))
+		if (typeof options.tableWidgetHeader == 'undefined' ||
+			(typeof options.tableWidgetHeader != 'undefined' && options.tableWidgetHeader != false))
 		{
 			var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
 			tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
@@ -588,7 +592,7 @@ var FHC_TableWidget = {
 		 *  	selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
 		 *  }
  		 */
-		if (options.tableWidgetFooter != 'undefined' && options.tableWidgetFooter != null)
+		if (typeof options.tableWidgetFooter != 'undefined' && options.tableWidgetFooter != null)
 		{
 			var tabulatorFooterHTML = _renderTabulatorFooterHTML(options.tableWidgetFooter);
 			tableWidgetDiv.find('#tableWidgetFooter').append(tabulatorFooterHTML);
@@ -860,7 +864,7 @@ function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
 	var tabulatorFooterHTML = '';
 
 	// If property selectButtons is true, render 'Alle auswaehlen / Alle abwaehlen' buttons
-	if (tableWidgetFooterOptions.selectButtons != 'undefined' && tableWidgetFooterOptions.selectButtons == true)
+	if (typeof tableWidgetFooterOptions.selectButtons != 'undefined' && tableWidgetFooterOptions.selectButtons == true)
 	{
 		tabulatorFooterHTML += '<div class="btn-toolbar" role="toolbar">';
 		tabulatorFooterHTML += '<div class="btn-group" role="group">';
