@@ -391,9 +391,21 @@ var FHC_AjaxClient = {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_hasFileList(controllerParameters){
+	_hasFileList: function(controllerParameters)
+	{
+		// Loop through controllerParameters
+		for (key in controllerParameters)
+		{
+			// When FileList is found ( parameter with uploaded file(s))
+			if (controllerParameters[key] instanceof FileList)
+			{
+				return true;
+			}
+		}
+		/*
 		return Object.values(controllerParameters)
 			.some((value) => value instanceof FileList === true);
+		*/
 	},
 
 	/**
@@ -409,14 +421,18 @@ var FHC_AjaxClient = {
 		const formData = new FormData();
 
 		// Loop through controllerParameters
-		for (const [key, value] of Object.entries(controllerParameters)) {
-
+		for (key in controllerParameters)
+		{
+			var value = controllerParameters[key];
 			// When FileList is found ( parameter with uploaded file(s))
 			if (value instanceof FileList)
 			{
 				// Loop through uploaded files
-				for (let file of value)
+				//for (let file of value)
+				//for (var file of value)
+				for (var filekey in value)
 				{
+					var file = value[filekey];
 					// Append file to FormData object (if more than 1 file, append as array)
 					formData.append(value.length == 1 ? key : key + '[]', file);
 				}
