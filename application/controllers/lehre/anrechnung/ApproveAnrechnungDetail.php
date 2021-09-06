@@ -1,6 +1,6 @@
 <?php
 
-//if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class approveAnrechnungDetail extends Auth_Controller
 {
@@ -15,6 +15,7 @@ class approveAnrechnungDetail extends Auth_Controller
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
+	const ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL = 'AnrechnungEmpfehlungsnotizSTGL';
 
 	public function __construct()
 	{
@@ -25,7 +26,10 @@ class approveAnrechnungDetail extends Auth_Controller
 				'download'  => 'lehre/anrechnung_genehmigen:rw',
 				'approve'   => 'lehre/anrechnung_genehmigen:rw',
 				'reject'    => 'lehre/anrechnung_genehmigen:rw',
-				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw'
+				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
+				'withdraw' => 'lehre/anrechnung_genehmigen:rw',
+				'withdrawRequestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
+				'saveEmpfehlungsNotiz' => 'lehre/anrechnung_genehmigen:rw'
 			)
 		);
 
@@ -80,29 +84,23 @@ class approveAnrechnungDetail extends Auth_Controller
 		self::_checkIfEntitledToReadAnrechnung($anrechnung_id);
 
 		// Get Anrechung data
-		if (!$anrechnungData = getData($this->anrechnunglib->getAnrechnungData($anrechnung_id)))
-		{
-			show_error('Missing data for Anrechnung.');
-		}
+		$anrechnungData = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
+		
+		// Get Antrag data
+		$antragData = $this->anrechnunglib->getAntragData(
+			$anrechnungData->prestudent_id,
+			$anrechnungData->studiensemester_kurzbz,
+			$anrechnungData->lehrveranstaltung_id
+		);
 
 		// Get Empfehlung data
-		if(!$empfehlungData = getData($this->anrechnunglib->getEmpfehlungData($anrechnung_id)))
-		{
-			show_error('Missing data for recommendation');
-		}
+		$empfehlungData = $this->anrechnunglib->getEmpfehlungData($anrechnung_id);
 
 		// Get Genehmigung data
-		if(!$genehmigungData = getData($this->anrechnunglib->getGenehmigungData($anrechnung_id)))
-		{
-			show_error('Missing data for recommendation');
-		}
-
+		$genehmigungData = $this->anrechnunglib->getGenehmigungData($anrechnung_id);
+		
 		$viewData = array(
-			'antragData' => $this->anrechnunglib->getAntragData(
-				$student_uid = $this->StudentModel->getUID($anrechnungData->prestudent_id),
-				$anrechnungData->studiensemester_kurzbz,
-				$anrechnungData->lehrveranstaltung_id
-			),
+			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
 			'empfehlungData' => $empfehlungData,
 			'genehmigungData' => $genehmigungData
@@ -118,40 +116,30 @@ class approveAnrechnungDetail extends Auth_Controller
 	{
 		$data = $this->input->post('data');
 
-		if(isEmptyArray($data))
+		// Validate data
+		if (isEmptyArray($data))
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-
-		// Get statusbezeichnung for 'approved'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$approved = getData($this->AnrechnungstatusModel->load('approved'))[0];
-		$approved = getUserLanguage() == 'German'
-			? $approved->bezeichnung_mehrsprachig[0]
-			: $approved->bezeichnung_mehrsprachig[1];
-
+		
+		// Get STGLs person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
 			show_error('Failed retrieving person data');
 		}
-
+		
+		// Approve Anrechnung
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if(getData($this->anrechnunglib->approveAnrechnung($item['anrechnung_id'])))
+			if ($this->anrechnunglib->approveAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
-					'status_bezeichnung' => $approved,
-					'abgeschlossen_am'          => (new DateTime())->format('d.m.Y'),
-					'abgeschlossen_von'         => $person->vorname. ' '. $person->nachname
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_APPROVED),
+					'abgeschlossen_am'   => (new DateTime())->format('d.m.Y'),
+					'abgeschlossen_von'  => $person->vorname. ' '. $person->nachname
 				);
-
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_APPROVED))
-				{
-					show_error('Failed sending mail');
-				}
 			}
 		}
 
@@ -173,40 +161,30 @@ class approveAnrechnungDetail extends Auth_Controller
 	{
 		$data = $this->input->post('data');
 
-		if(isEmptyArray($data))
+		// Validate data
+		if (isEmptyArray($data))
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-
-		// Get statusbezeichnung for 'rejected'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$rejected = getData($this->AnrechnungstatusModel->load('rejected'))[0];
-		$rejected = getUserLanguage() == 'German'
-			? $rejected->bezeichnung_mehrsprachig[0]
-			: $rejected->bezeichnung_mehrsprachig[1];
-
+		
+		// Get STGLs person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
 			show_error('Failed retrieving person data');
 		}
-
+		
+		// Reject Anrechnung
 		foreach ($data as $item)
 		{
-			// Reject Anrechnung
-			if(getData($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung'])))
+			if ($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_REJECTED,
-					'status_bezeichnung'    => $rejected,
+					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_REJECTED),
 					'abgeschlossen_am'      => (new DateTime())->format('d.m.Y'),
 					'abgeschlossen_von'     => $person->vorname. ' '. $person->nachname
 				);
-
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_REJECTED))
-				{
-					show_error('Failed sending mail');
-				}
 			}
 		}
 
@@ -217,7 +195,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Es wurden keine Anrechnungen genehmigt.');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 
@@ -232,48 +210,166 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-
-		// Get statusbezeichnung for 'inProgressLektor'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressLektor = getData($this->AnrechnungstatusModel->load('inProgressLektor'))[0];
-		$inProgressLektor = getUserLanguage() == 'German'
-			? $inProgressLektor->bezeichnung_mehrsprachig[0]
-			: $inProgressLektor->bezeichnung_mehrsprachig[1];
-
+		
+		$retval = array();
+		$counter = 0;
+		
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if(getData($this->anrechnunglib->requestRecommendation($item['anrechnung_id'])))
+			// Check if Anrechnungs-LV has lector
+			if (!$this->anrechnunglib->LVhasLector($item['anrechnung_id']))
 			{
-				$json[]= array(
+				// Count up LV with no lector
+				$counter++;
+				
+				// Break, if LV has no lector
+				break;
+			}
+			
+			// Get full name of LV Leitung.
+			// If LV Leitung is not present, get full name of LV lectors.
+			$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
+			$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
+				? implode(', ', array_column($lector_arr, 'fullname'))
+				: '';
+			
+			// Request Recommendation
+			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
+			{
+				$retval[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
-					'status_bezeichnung' => $inProgressLektor,
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
 					'empfehlung_anrechnung' => null,
-					'empfehlung_angefordert_am' => (new DateTime())->format('d.m.Y')
+					'empfehlungsanfrageAm' => (new DateTime())->format('d.m.Y'),
+					'empfehlungsanfrageAn' => $empfehlungsanfrage_an
 				);
 			}
 		}
-
+		
+		/**
+		 * Send mails to lectors
+		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
+		 * even if they are required for more recommendations
+		 * */
+		if (!isEmptyArray($retval))
+		{
+			self::_sendSanchoMailToLectors($retval);
+			
+			// Output json to ajax
+			return $this->outputJsonSuccess($retval);
+		}
+		
 		// Output json to ajax
-		if (isset($json) && !isEmptyArray($json))
+		if (isEmptyArray($retval) && $counter > 0)
 		{
-			/**
-			 * Send mails to lectors
-			 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
-			 * even if they are required for more recommendations
-			 * */
-			if (!$this->_sendSanchoMailToLectors($json))
-			{
-				show_error('Failed sending emails');
-			}
+			return $this->outputJsonError(
+				"Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
+			);
+		}
+		
+		return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
+	}
+	
+	/**
+	 * Withdraw approved / rejected Anrechnung and reset to 'inProgressDP'.
+	 */
+	public function withdraw()
+	{
+		$anrechnung_id = $this->input->post('anrechnung_id');
+		
+		if (!is_numeric($anrechnung_id))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'errorFelderFehlen'));
+		}
+		
+		// Delete last status approved / rejected.
+		// If last status is 'approved', Genehmigung is resetted.
+		$result = $this->AnrechnungModel->withdrawApprovement($anrechnung_id);
 
-			return $this->outputJsonSuccess($json);
-		}
-		else
+		if (isError($result))
 		{
-			return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
+			$this->terminateWithJsonError(getError($result));
 		}
+		
+		// Success output to AJAX
+		$this->outputJsonSuccess(array(
+			'status_bezeichnung' => $this->anrechnunglib->getLastAnrechnungstatus($anrechnung_id))
+		);
+	}
+	
+	/**
+	 * Withdraw request for reommendation and reset to 'inProgressDP'.
+	 * This is only possible if the lector has not provided a recommendation yet.
+	 */
+	public function withdrawRequestRecommendation()
+	{
+		$anrechnung_id = $this->input->post('anrechnung_id');
+		
+		if (!is_numeric($anrechnung_id))
+		{
+			show_error('Wrong parameter.');
+		}
+		
+		// Get boolean empfehlung of given Anrechnung
+		if (!$result = getData($this->AnrechnungModel->load($anrechnung_id))[0])
+		{
+			show_error('Failed loading Anrechnung');
+		}
+		
+		$empfehlung = $result->empfehlung_anrechnung;
+		
+		// Get last Anrechnungstatus
+		if (!$result = getData($this->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
+		{
+			show_error('Failed loading last Anrechnungstatus');
+		}
+		
+		$last_status = $result->status_kurzbz;
+		$anrechnungstatus_id = $result->anrechnungstatus_id;
+		
+		// Return if Anrechnung was not waiting for recommendation or if Anrechnung has already been recommended
+		if ($last_status != self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR && !is_null($empfehlung))
+		{
+			return $this->outputJsonError('No recommendation to withdraw.');
+		}
+		
+		// Reset status to 'inProgressDP'
+		$result = $this->AnrechnungModel->deleteAnrechnungstatus($anrechnungstatus_id);
+		
+		if (isError($result))
+		{
+			return $this->outputJsonError('Could not withdraw this application.');
+		}
+		
+		// Success output to AJAX
+		return $this->outputJsonSuccess(array(
+				'status_bezeichnung' => $this->anrechnunglib->getLastAnrechnungstatus($anrechnung_id))
+		);
+	}
+	
+	public function saveEmpfehlungsNotiz()
+	{
+		$anrechnung_id = $this->input->post('anrechnung_id');
+		$notiz_id = $this->input->post('notiz_id');
+		$empfehlungstext = $this->input->post('empfehlung_text');
+		
+		// Validate data
+		if (isEmptyString($anrechnung_id))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'systemFehler'));
+		}
+		
+		// Save Empfehlungstext
+		$result = self::_saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id);
+		
+		if (isError($result))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+		}
+		
+		// Output success message
+		$this->outputJsonSuccess($this->p->t('ui', 'gespeichert'));
 	}
 
 	/**
@@ -290,8 +386,12 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		// Check if user is entitled to read dms doc
 		self::_checkIfEntitledToReadDMSDoc($dms_id);
-
-		$this->dmslib->download($dms_id);
+		
+		// Set filename to be used on downlaod
+		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
+		
+		// Download file
+		$this->dmslib->download($dms_id, $filename);
 	}
 
 	/**
@@ -375,42 +475,7 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		show_error('You are not entitled to read this document');
 	}
-
-	/**
-	 * Send mail to student to inform if Anrechnung was approved or rejected
-	 * @param $mail_params
-	 */
-	private function _sendSanchoMailToStudent($anrechnung_id, $status_kurzbz)
-	{
-		$result = getData($this->anrechnunglib->getStudentData($anrechnung_id))[0];
-
-		// Get student name and mail address
-		$to = $result->uid. '@'. DOMAIN;
-
-		$anrede = $result->geschlecht == 'w' ? 'Sehr geehrte Frau ' : 'Sehr geehrter Herr ';
-
-		$text = $status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
-			? 'Ihrem Antrag auf Anerkennung nachgewiesener Kenntnisse der Lehrveranstaltung "'.
-			$result->lv_bezeichnung. '" wurde stattgegeben.'
-			: 'wir haben Ihren Antrag auf Anerkennung nachgewiesener Kenntnisse geprüft und können die Lehrveranstaltung "'.
-			$result->lv_bezeichnung. '" leider nicht anrechnen, weil die Gleichwertigkeit nicht festgestellt werden konnte.';
-
-		// Prepare mail content
-		$body_fields = array(
-			'anrede_name'   => $anrede. $result->vorname. ' '. $result->nachname,
-			'text'          => $text
-		);
-
-		sendSanchoMail(
-			'AnrechnungGenehmigen',
-			$body_fields,
-			$to,
-			'Anerkennung nachgewiesener Kenntnisse: Ihr Antrag ist abgeschlossen'
-		);
-
-		return true;
-	}
-
+	
 	/**
 	 * Send mail to lectors asking for recommendation. (first to LV-Leitung, if not present to all lectors of lv)
 	 * @param $mail_params
@@ -438,6 +503,8 @@ class approveAnrechnungDetail extends Auth_Controller
 		 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
 		 * **/
 		$lector_arr = $this->_getLectors($anrechnung_arr);
+		
+		
 
 		// Send mail to lectors
 		foreach ($lector_arr as $lector)
@@ -476,8 +543,8 @@ class approveAnrechnungDetail extends Auth_Controller
 	}
 
 	/**
-	 * Get lectors (prio for LV-Leitung, if not present to all lectors of LV.
-	 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
+	 * Get unique array of LV lectors.
+	 * Only get LV Leitung if present, otherwise all lectors of LV.
 	 * @param $anrechnung_arr
 	 * @return array
 	 */
@@ -521,11 +588,37 @@ class approveAnrechnungDetail extends Auth_Controller
 			unset($lector->lvleiter);
 		}
 
-		// Now make the lector array aka mail receivers unique
+		// Make the lector array unique
 		$lector_arr = array_unique($lector_arr, SORT_REGULAR);
 
 		return $lector_arr;
 
+	}
+	
+	private function _saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id)
+	{
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		
+		if (!isEmptyString($notiz_id))
+		{
+			return $this->NotizModel->update(
+				$notiz_id,
+				array(
+					'text' => $empfehlungstext,
+					'updateamum' => (new DateTime())->format('Y-m-d H:i:s'),
+					'updatevon' => $this->_uid
+				)
+			);
+		}
+		
+		return $this->NotizModel->addNotizForAnrechnung(
+			$anrechnung_id,
+			self::ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL,
+			trim($empfehlungstext),
+			$this->_uid
+		);
+		
+		
 	}
 
 }
