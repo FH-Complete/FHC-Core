@@ -80,7 +80,7 @@ class requestAnrechnung extends Auth_Controller
 		$prestudent_id = getData($result)[0]->prestudent_id;
 		
 		// Check if application deadline is expired
-		$is_expired = self::_checkAntragDeadline(
+		$is_expired = self::_isExpired(
 			$this->config->item('submit_application_start'),
 			$this->config->item('submit_application_end'),
 			$studiensemester_kurzbz
@@ -226,10 +226,10 @@ class requestAnrechnung extends Auth_Controller
 	 * @param $start Start date for application submission.
 	 * @param $ende End date for application submission.
 	 * @param $studiensemester_kurzbz
-	 * @return bool True if today is not during the start- and ending deadlines (= if is expired)
+	 * @return bool True if deadline is expired
 	 * @throws Exception
 	 */
-	private function _checkAntragDeadline($start, $ende, $studiensemester_kurzbz)
+	private function _isExpired($start, $ende, $studiensemester_kurzbz)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		
@@ -253,8 +253,8 @@ class requestAnrechnung extends Auth_Controller
 		$start = new DateTime($start);
 		$ende = new DateTime($ende);
 		
-		// True if today is not during the start- and ending deadlines (= if is expired)
-		return ($today <= $start || $today >= $ende);
+		// True if expired
+		return ($today < $start || $today > $ende);
 	}
 	
 	/**
