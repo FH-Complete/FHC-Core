@@ -341,7 +341,6 @@
 						echo $this->udflib->UDFWidget(
 							array(
 								UDFLib::UDF_UNIQUE_ID => 'infocenterPrestudentUDFs_'.$zgvpruefung->prestudent_id,
-								UDFLib::REQUIRED_PERMISSIONS_PARAMETER => 'infocenter',
 								UDFLib::SCHEMA_ARG_NAME => 'public',
 								UDFLib::TABLE_ARG_NAME => 'tbl_prestudent',
 								UDFLib::PRIMARY_KEY_NAME => 'prestudent_id',
@@ -553,3 +552,4 @@
 		endforeach; // end foreach zgvpruefungen
 	?>
 </div><!-- /.panel-group -->
+

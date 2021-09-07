@@ -30,12 +30,13 @@ class UDFLib
 	// ...to specify permissions that are needed to use this TableWidget
 	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
 
+	const PERMISSION_TABLE_METHOD = 'UDFWidget'; // Name for fake method to be checked by the PermissionLib
+	const PERMISSION_TYPE_READ = 'r';
+	const PERMISSION_TYPE_WRITE = 'w';
+
 	// ...to specify the primary key name and value
 	const PRIMARY_KEY_NAME = 'primaryKeyName';
 	const PRIMARY_KEY_VALUE = 'primaryKeyValue';
-
-	const PERMISSION_TABLE_METHOD = 'UDFWidget'; // Name for fake method to be checked by the PermissionLib
-	const PERMISSION_TYPE = 'rw';
 
 	// HTML components
 	const LABEL = 'title';
@@ -76,10 +77,10 @@ class UDFLib
 	// Public methods
 
 	/**
-     * UDFWidget
-     */
-    public function UDFWidget($args, $htmlArgs = array())
-    {
+	 * UDFWidget
+	 */
+	public function UDFWidget($args, $htmlArgs = array())
+	{
 		if ((isset($args[self::SCHEMA_ARG_NAME]) && !isEmptyString($args[self::SCHEMA_ARG_NAME]))
 			&& (isset($args[self::TABLE_ARG_NAME]) && !isEmptyString($args[self::TABLE_ARG_NAME])))
 		{
@@ -112,16 +113,17 @@ class UDFLib
 				show_error(self::TABLE_ARG_NAME.' parameter is missing!');
 			}
 		}
-    }
+	}
 
-    /**
+	/**
 	 * It renders the HTML of the UDF
 	 *
 	 * NOTE: When this method is called $widgetData contains different data from
 	 * parameter $args in the constructor
 	 */
-    public function displayUDFWidget(&$widgetData)
+	public function displayUDFWidget(&$widgetData)
 	{
+		$field = null;
 		$schema = $widgetData[self::SCHEMA_ARG_NAME]; // schema attribute
 		$table = $widgetData[self::TABLE_ARG_NAME]; // table attribute
 
@@ -155,7 +157,7 @@ class UDFLib
 					$found = false; // used to check if the field is found or not in the json schema
 
 					$this->_sortJsonSchemas($jsonSchemasArray); // Sort the list of UDF by sort property
-
+					
 					// Loops through json schemas
 					foreach ($jsonSchemasArray as $jsonSchema)
 					{
@@ -169,21 +171,37 @@ class UDFLib
 						{
 							show_error(sprintf('%s.%s: Attribute "name" not present in the json schema', $schema, $table));
 						}
+						// If the requiredPermissions property is not present then show an error
+						if (!isset($jsonSchema->{self::REQUIRED_PERMISSIONS_PARAMETER}))
+						{
+							show_error(sprintf('%s.%s: Attribute "requiredPermissions" not present in the json schema', $schema, $table));
+						}
+
+						// Set the required permissions for this UDF
+						$this->_setRequiredPermissions($jsonSchema->{self::NAME}, $jsonSchema->{self::REQUIRED_PERMISSIONS_PARAMETER});
 
 						// If a UDF is specified and is present in the json schemas list or no UDF is specified
 						if ((isset($field) && $field == $jsonSchema->{self::NAME}) || !isset($field))
 						{
-							// Set attributes using phrases
-							$this->_setAttributesWithPhrases($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
+							// If the user has the permissions to read this field
+							if ($this->_readAllowed($jsonSchema->{self::REQUIRED_PERMISSIONS_PARAMETER}))
+							{
+								// Set attributes using phrases
+								$this->_setAttributesWithPhrases($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
 
-							// Set validation attributes
-							$this->_setValidationAttributes($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
+								// Set validation attributes
+								$this->_setValidationAttributes($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
 
-							// Set name and id attributes
-							$this->_setNameAndId($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
+								// Set name and id attributes
+								$this->_setNameAndId($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
 
-							// Render the HTML for this UDF
-							$this->_render($jsonSchema, $widgetData);
+								// Set if the field is in read only mode
+								$this->_setReadOnly($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
+
+								// Render the HTML for this UDF
+								$this->_render($jsonSchema, $widgetData);
+							}
+							// otherwise the UDF is not displayed
 
 							// If a UDf is specified and it was found then stop looking through this list
 							if (isset($field) && $field == $jsonSchema->{self::NAME})
@@ -213,7 +231,7 @@ class UDFLib
 				show_error(sprintf('%s.%s: Does not contain "jsons" field', $schema, $table));
 			}
 		}
-    }
+	}
 
 	/**
 	 * Manage UDFs
@@ -248,6 +266,22 @@ class UDFLib
 			for ($i = 0; $i < count($decodedUDFDefinitions); $i++)
 			{
 				$decodedUDFDefinition = $decodedUDFDefinitions[$i]; // Definition of a single UDF
+
+				// Checks if the requiredPermissions is available and it is a valid array or a valid string
+				if (isset($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})
+					&& (!isEmptyArray($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})
+					|| !isEmptyString($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER})))
+				{
+					// Then check if the user has the permissions to write such UDF
+					if (!$this->_writeAllowed($decodedUDFDefinition->{self::REQUIRED_PERMISSIONS_PARAMETER}))
+					{
+						$notValidUDFsArray[] = error('Writing not allowed for UDF: '.$decodedUDFDefinition->{self::NAME});
+					}
+				}
+				else
+				{
+					$notValidUDFsArray[] = error('Writing permissions not defined for UDF: '.$decodedUDFDefinition->{self::NAME});
+				}
 
 				// Loops through the UDFs values that should be stored
 				foreach ($udfsParameters as $key => $val)
@@ -468,11 +502,31 @@ class UDFLib
 	 */
 	public function saveUDFs($udfUniqueId, $udfs)
 	{
+		$udfToBewritten = array(); // UDFs to be written into database
+
 		// Read the all session for this udf widget
 		$session = $this->getSession();
 
 		// If session is empty then return an error
 		if ($session == null) return error('No UDFWidget loaded');
+
+		// Get the required permission from the session
+		$requiredPermissions = $session[self::REQUIRED_PERMISSIONS_PARAMETER];
+
+		// For each UDF that is trying to save
+		foreach ($udfs as $udfName => $udfValue)
+		{
+			// If the UDFs exists in the requiredPermissions array
+			if (array_key_exists($udfName, $requiredPermissions))
+			{
+				// Then check if the user has the permissions to write such UDF
+				if ($this->_writeAllowed($requiredPermissions[$udfName]))
+				{
+					// If allowed then save the UDF name and value to be stored later into the database
+					$udfToBewritten[$udfName] = $udfValue;
+				}
+			}
+		}
 
 		// Workaround to load CI
 		$this->_ci->load->model('system/UDF_model', 'UDFModel');
@@ -490,30 +544,56 @@ class UDFLib
 		// Returns the result of the database update operation to save UDFs
 		return $dbModel->update(
 			array($session[self::PRIMARY_KEY_NAME] => $session[self::PRIMARY_KEY_VALUE]),
-			(array)$udfs
+			$udfToBewritten
 		);
-	}
-
-	/**
-	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
-	 * to the authenticated user, if confirmed then is allowed to use this UDFWidget.
-	 * If the parameter requiredPermissions is NOT given or is not present in the session,
-	 * then NO one is allow to use this UDFWidget
-	 * Wrapper method to permissionlib->hasAtLeastOne
-	 */
-	public function isAllowed($requiredPermissions = null)
-	{
-		$this->_ci->load->library('PermissionLib'); // Load permission library
-
-		// Gets the required permissions from the session if they are not provided as parameter
-		$rq = $requiredPermissions;
-		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS_PARAMETER);
-
-		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_TABLE_METHOD, self::PERMISSION_TYPE);
 	}
 
 	// -------------------------------------------------------------------------------------------------
 	// Private methods
+	//
+
+	/**
+	 * Checks if at least one of the permissions given as parameter belongs to the authenticated user in read mode
+	 * Wrapper method to permissionlib->hasAtLeastOne
+	 */
+	private function _readAllowed($requiredPermissions)
+	{
+		$this->_ci->load->library('PermissionLib'); // Load permission library
+
+		return $this->_ci->permissionlib->hasAtLeastOne($requiredPermissions, self::PERMISSION_TABLE_METHOD, self::PERMISSION_TYPE_READ);
+	}
+
+	/**
+	 * Checks if at least one of the permissions given as parameter belongs to the authenticated user in write mode
+	 * Wrapper method to permissionlib->hasAtLeastOne
+	 */
+	private function _writeAllowed($requiredPermissions)
+	{
+		$this->_ci->load->library('PermissionLib'); // Load permission library
+
+		return $this->_ci->permissionlib->hasAtLeastOne($requiredPermissions, self::PERMISSION_TABLE_METHOD, self::PERMISSION_TYPE_WRITE);
+	}
+
+	/**
+	 * Set an array of required permissions for a UDF into the session
+	 */
+	private function _setRequiredPermissions($udfName, $permissions)
+	{
+		// Get the session for this UDFWidget
+		$session = $this->getSession();
+
+		// If does _not_ exist yet in the session
+		if (!isset($session[self::REQUIRED_PERMISSIONS_PARAMETER]))
+		{
+			$session[self::REQUIRED_PERMISSIONS_PARAMETER] = array();
+		}
+
+		// Set the required permission in the session for this UDFWidget
+		$session[self::REQUIRED_PERMISSIONS_PARAMETER][$udfName] = $permissions;
+
+		// Write into the session
+		$this->setSession($session);
+	}
 
 	/**
 	 * Print the block for UDFs
@@ -654,20 +734,36 @@ class UDFLib
 		return $returnArrayValidation;
 	}
 
-    /**
-     * Set the name and id attribute of the HTML element
-     */
-    private function _setNameAndId($jsonSchema, &$htmlParameters)
-    {
+	/**
+	 * Disable the HTML element if in read only mode
+	 */
+	private function _setReadOnly($jsonSchema, &$htmlParameters)
+	{
+		// If write permissions _not_ exist then set the field as disabled
+		if (!$this->_writeAllowed($jsonSchema->{self::REQUIRED_PERMISSIONS_PARAMETER}))
+		{
+			$htmlParameters[HTMLWidget::DISABLED] = HTMLWidget::DISABLED; // any values is fine
+		}
+		else // otherwise restore to default
+		{
+			if (isset($htmlParameters[HTMLWidget::DISABLED])) unset($htmlParameters[HTMLWidget::DISABLED]);
+		}
+	}
+
+	/**
+	 * Set the name and id attribute of the HTML element
+	 */
+	private function _setNameAndId($jsonSchema, &$htmlParameters)
+	{
 		$htmlParameters[HTMLWidget::HTML_ID] = $jsonSchema->{self::NAME};
 		$htmlParameters[HTMLWidget::HTML_NAME] = $jsonSchema->{self::NAME};
-    }
-
-    /**
-     * Sort the list of UDF by sort property
-     */
-    private function _sortJsonSchemas(&$jsonSchemasArray)
-    {
+	}
+	
+	/**
+	 * Sort the list of UDF by sort property
+	 */
+	private function _sortJsonSchemas(&$jsonSchemasArray)
+	{
 		usort($jsonSchemasArray, function ($a, $b) {
 			if (!isset($a->{self::SORT}))
 			{
@@ -684,13 +780,13 @@ class UDFLib
 
 			return ($a->{self::SORT} < $b->{self::SORT}) ? -1 : 1;
 		});
-    }
-
-    /**
-     * Loads the UDF description by the given schema and table
-     */
-    private function _loadUDF($schema, $table)
-    {
+	}
+	
+	/**
+	 * Loads the UDF description by the given schema and table
+	 */
+	private function _loadUDF($schema, $table)
+	{
 		// Loads UDF model
 		$this->_ci->load->model('system/UDF_model', 'UDFModel');
 
@@ -722,13 +818,13 @@ class UDFLib
 		}
 
 		return $udfResults;
-    }
+	}
 
-    /**
-     * Render the HTML for the UDF
-     */
-    private function _render($jsonSchema, &$widgetData)
-    {
+	/**
+	 * Render the HTML for the UDF
+	 */
+	private function _render($jsonSchema, &$widgetData)
+	{
 		// Checkbox
 		if ($jsonSchema->{self::TYPE} == 'checkbox')
 		{
@@ -759,11 +855,11 @@ class UDFLib
 		{
 			$this->_renderDropdown($jsonSchema, $widgetData, true);
 		}
-    }
+	}
 
-    /**
-     * Renders a dropdown element
-     */
+	/**
+	 * Renders a dropdown element
+	 */
 	private function _renderDropdown($jsonSchema, &$widgetData, $multiple = false)
 	{
 		// Selected element/s
@@ -805,8 +901,8 @@ class UDFLib
 	}
 
 	/**
-     * Renders a textarea element
-     */
+	 * Renders a textarea element
+	 */
 	private function _renderTextarea($jsonSchema, &$widgetData)
 	{
 		$text = null; // text value
@@ -823,8 +919,8 @@ class UDFLib
 	}
 
 	/**
-     * Renders an input text element
-     */
+	 * Renders an input text element
+	 */
 	private function _renderTextfield($jsonSchema, &$widgetData)
 	{
 		$text = null; // text value
@@ -841,8 +937,8 @@ class UDFLib
 	}
 
 	/**
-     * Renders a checkbox element
-     */
+	 * Renders a checkbox element
+	 */
 	private function _renderCheckbox($jsonSchema, &$widgetData)
 	{
 		// Set checkbox value if present in the DB
@@ -861,11 +957,11 @@ class UDFLib
 		$checkboxWidgetUDF->render();
 	}
 
-    /**
-     * Sets the attributes of the HTML element using the phrases system
-     */
-    private function _setAttributesWithPhrases($jsonSchema, &$htmlParameters)
-    {
+	/**
+	 * Sets the attributes of the HTML element using the phrases system
+	 */
+	private function _setAttributesWithPhrases($jsonSchema, &$htmlParameters)
+	{
 		// By default set to null all the attributes
 		$htmlParameters[HTMLWidget::LABEL] = null;
 		$htmlParameters[HTMLWidget::TITLE] = null;
@@ -933,13 +1029,13 @@ class UDFLib
 				}
 			}
 		}
-    }
+	}
 
-    /**
-     * Sets the validation attributes of the HTML element using the configuration inside the json schema
-     */
-    private function _setValidationAttributes($jsonSchema, &$htmlParameters)
-    {
+	/**
+	 * Sets the validation attributes of the HTML element using the configuration inside the json schema
+	 */
+	private function _setValidationAttributes($jsonSchema, &$htmlParameters)
+	{
 		// Validation attributes set by default to null
 		$htmlParameters[HTMLWidget::REGEX] = null;
 		$htmlParameters[HTMLWidget::REQUIRED] = null;
@@ -998,3 +1094,4 @@ class UDFLib
 		}
 	}
 }
+
