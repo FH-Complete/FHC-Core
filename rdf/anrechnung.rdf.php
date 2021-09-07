@@ -28,24 +28,27 @@ $anrechnung = new anrechnung();
 if(is_numeric($anrechnung_id))
 {
 	$anrechnung->getAnrechnung($anrechnung_id);
-	
+
 	// Add last Anrechnungstatus
 	$anrechnungstatus = new Anrechnung();
 	$anrechnungstatus->getLastAnrechnungstatus($anrechnung_id);
-	
+
 	$anrechnung->result[0]->status = $anrechnungstatus->result[0]->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
 }
 elseif(is_numeric($prestudent_id))
 {
 	$anrechnung->getAnrechnungPrestudent($prestudent_id);
-	
+
 	// Add last Anrechnungstatus to each Anrechnung of Prestudent
-	foreach ($anrechnung->result as $row)
-    {
-        $anrechnungstatus = new Anrechnung();
-        $status = 	$anrechnungstatus->getLastAnrechnungstatus($row->anrechnung_id);
-        $row->status = $anrechnungstatus->result[0]->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
-    }
+	if(is_array($anrechnung->result))
+	{
+		foreach ($anrechnung->result as $row)
+	    {
+	        $anrechnungstatus = new Anrechnung();
+	        $status = 	$anrechnungstatus->getLastAnrechnungstatus($row->anrechnung_id);
+	        $row->status = $anrechnungstatus->result[0]->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+	    }
+	}
 }
 else
 {
