@@ -5318,6 +5318,7 @@ function StudentAnrechnungAuswahl()
 	lehrveranstaltung_id_kompatibel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id_kompatibel" ));
 	genehmigt_von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#genehmigt_von" ));
 	anzahl_notizen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_notizen" ));
+	status = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#status" ));
 
 	// Studiengang ermitteln
 	var tree = document.getElementById('student-tree');

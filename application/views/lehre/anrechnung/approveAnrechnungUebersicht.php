@@ -13,11 +13,14 @@ $this->load->view(
 		'tablewidget' => true,
 		'phrases' => array(
 			'global' => array(
-				'begruendung'
+				'begruendung',
+                'zgv'
 			),
 			'anrechnung' => array(
 				'nachweisdokumente',
 				'empfehlung',
+				'empfehlungsanfrageAn',
+				'empfehlungsanfrageAm',
 				'confirmTextAntragHatBereitsEmpfehlung',
 				'herkunft'
 			),
@@ -43,6 +46,7 @@ $this->load->view(
 				'bitteMindEinenAntragWaehlen',
 				'bitteBegruendungAngeben',
 				'empfehlungWurdeAngefordert',
+				'empfehlungWurdeAngefordertAusnahmeWoKeineLektoren',
 				'anrechnungenWurdenGenehmigt',
 				'anrechnungenWurdenAbgelehnt'
 			),
@@ -155,11 +159,12 @@ $this->load->view(
                 <br>
                 <!-- Action Button 'Abbrechen'-->
                 <div class="pull-right">
-                    <button id="approveAnrechnungUebersicht-begruendung-abbrechen" class="btn btn-default btn-w200">
+                    <button id="approveAnrechnungUebersicht-begruendung-abbrechen"
+                            class="btn btn-default btn-w200" type="reset">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
                     <button id="approveAnrechnungUebersicht-reject-anrechnungen-confirm"
-                            class="btn btn-primary btn-w200">
+                            class="btn btn-primary btn-w200" type="button">
 						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>
@@ -173,11 +178,12 @@ $this->load->view(
                 <br>
                 <!-- Action Button 'Abbrechen'-->
                 <div class="pull-right">
-                    <button id="approveAnrechnungUebersicht-empfehlung-abbrechen" class="btn btn-default btn-w200">
+                    <button id="approveAnrechnungUebersicht-empfehlung-abbrechen"
+                            class="btn btn-default btn-w200" type="reset">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
                     <button id="approveAnrechnungUebersicht-approve-anrechnungen-confirm"
-                            class="btn btn-primary btn-w200">
+                            class="btn btn-primary btn-w200" type="button">
 						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>
@@ -186,13 +192,18 @@ $this->load->view(
         <!-- Filter buttons / Submit buttons-->
         <div class="row">
             <!-- Filter buttons -->
-            <div class="col-xs-3">
+            <div class="col-xs-4 col-md-5">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-inProgressDP" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
                                 title="<?php echo $this->p->t('ui', 'alleInBearbeitungSTGL'); ?>">
                                     <i class='fa fa-eye'></i>
+                        </button>
+                        <button id="show-inProgressLektor" class="btn btn-default btn-clearfilter" type="button"
+                                data-toggle="tooltip" data-placement="left"
+                                title="<?php echo $this->p->t('ui', 'alleInBearbeitungLektor'); ?>"><i
+                                    class='fa fa-clock-o'></i>
                         </button>
                         <button id="show-recommended" class="btn btn-default btn-clearfilter" type="button"
                                 data-toggle="tooltip" data-placement="left"
@@ -215,17 +226,23 @@ $this->load->view(
                                     class='fa fa-times'></i>
                         </button>
                     </div>
-                </div>
+						<a type="button" class="btn btn-default" style="margin-left: 20px;" href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_blank'>
+							<i class='fa fa-plus' aria-hidden='true'></i> <?php echo $this->p->t('global', 'antragAnlegen'); ?>
+						</a>
+				</div>
             </div>
             <!-- Action Buttons 'Genehmigen', Ablehnen, 'Empfehlung anfordern'-->
-            <div class="col-xs-9">
+            <div class="col-xs-8 col-md-7">
                 <div class="pull-right">
                     <button id="approveAnrechnungUebersicht-request-recommendation"
-                            class="btn btn-default btn-w200 btn-mr50"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
+                            class="btn btn-default btn-w200 btn-mr50" type="button">
+                        <?php echo ucfirst($this->p->t('anrechnung', 'empfehlungAnfordern')); ?></button>
                     <button id="approveAnrechnungUebersicht-reject-anrechnungen-ask"
-                            class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
+                            class="btn btn-danger btn-w200" type="button">
+                        <?php echo ucfirst($this->p->t('global', 'ablehnen')); ?></button>
                     <button id="approveAnrechnungUebersicht-approve-anrechnungen-ask"
-                            class="btn btn-primary btn-w200"><?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>
+                            class="btn btn-primary btn-w200" type="button">
+                        <?php echo ucfirst($this->p->t('global', 'genehmigen')); ?></button>
                 </div>
             </div>
         </div>

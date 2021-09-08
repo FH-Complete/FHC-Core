@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Stundenplandev extends APIv1_Controller
+class Stundenplandev extends API_Controller
 {
 	/**
 	 * Stundenplandev API constructor.

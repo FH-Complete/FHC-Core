@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bestellstatus extends APIv1_Controller
+class Bestellstatus extends API_Controller
 {
 	/**
 	 * Bestellstatus API constructor.

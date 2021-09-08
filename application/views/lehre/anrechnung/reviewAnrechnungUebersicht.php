@@ -13,7 +13,8 @@ $this->load->view(
 		'tablewidget' => true,
 		'phrases' => array(
 			'global' => array(
-				'begruendung'
+				'begruendung',
+				'zgv'
 			),
 			'anrechnung' => array(
 				'nachweisdokumente',
@@ -154,11 +155,12 @@ $this->load->view(
                 <br>
                 <!-- Action Button Abbrechen & Bestaetigen-->
                 <div class="pull-right">
-                    <button id="reviewAnrechnungUebersicht-begruendung-abbrechen" class="btn btn-default btn-w200">
+                    <button id="reviewAnrechnungUebersicht-begruendung-abbrechen"
+                            class="btn btn-default btn-w200" type="reset">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
                     <button id="reviewAnrechnungUebersicht-dont-recommend-anrechnungen-confirm"
-                            class="btn btn-primary btn-w200">
+                            class="btn btn-primary btn-w200" type="button">
 						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>
@@ -172,11 +174,12 @@ $this->load->view(
                 <br>
                 <!-- Action Button 'Abbrechen'-->
                 <div class="pull-right">
-                    <button id="reviewAnrechnungUebersicht-empfehlung-abbrechen" class="btn btn-default btn-w200">
+                    <button id="reviewAnrechnungUebersicht-empfehlung-abbrechen"
+                            class="btn btn-default btn-w200" type="reset">
 						<?php echo ucfirst($this->p->t('ui', 'abbrechen')); ?>
                     </button>
                     <button id="reviewAnrechnungUebersicht-recommend-anrechnungen-confirm"
-                            class="btn btn-primary btn-w200">
+                            class="btn btn-primary btn-w200" type="button">
 						<?php echo ucfirst($this->p->t('ui', 'bestaetigen')); ?>
                     </button>
                 </div>
@@ -222,9 +225,11 @@ $this->load->view(
             <div class="col-xs-9">
                 <div class="pull-right">
                     <button id="reviewAnrechnungUebersicht-dont-recommend-anrechnungen-ask"
-                            class="btn btn-danger btn-w200"><?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?></button>
+                            class="btn btn-danger btn-w200" type="button">
+                        <?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?></button>
                     <button id="reviewAnrechnungUebersicht-recommend-anrechnungen-ask"
-                            class="btn btn-primary btn-w200"><?php echo ucfirst($this->p->t('anrechnung', 'empfehlen')); ?></button>
+                            class="btn btn-primary btn-w200" type="button">
+                        <?php echo ucfirst($this->p->t('anrechnung', 'empfehlen')); ?></button>
                 </div>
             </div>
         </div>

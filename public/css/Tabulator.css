@@ -70,3 +70,9 @@
 {
     margin-right: 50px;
 }
+
+.table-fixed
+{
+	table-layout: fixed;
+	word-wrap: break-word;
+}

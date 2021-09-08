@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lehrveranstaltung extends APIv1_Controller
+class Lehrveranstaltung extends API_Controller
 {
 	/**
 	 * Lehrveranstaltung API constructor.

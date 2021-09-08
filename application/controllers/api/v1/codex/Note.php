@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Note extends APIv1_Controller
+class Note extends API_Controller
 {
 	/**
 	 * Note API constructor.

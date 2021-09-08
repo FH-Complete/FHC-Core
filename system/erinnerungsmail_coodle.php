@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2013 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,14 +18,16 @@
  *
  * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
  */
+
 /**
  * Cronjob zur Versendung von Infomails wenn Coodle Umfragen Beendet sind 
  */
-require_once('../config/vilesci.config.inc.php');
-require_once('../include/coodle.class.php');
-require_once('../include/phrasen.class.php');
-require_once('../include/benutzer.class.php');
-require_once('../include/mail.class.php');
+
+require_once(dirname(__FILE__).'/../config/vilesci.config.inc.php');
+require_once(dirname(__FILE__).'/../include/coodle.class.php');
+require_once(dirname(__FILE__).'/../include/phrasen.class.php');
+require_once(dirname(__FILE__).'/../include/benutzer.class.php');
+require_once(dirname(__FILE__).'/../include/mail.class.php');
 
 $coodle = new coodle();
 $coodle->getCoodleBeendet();
@@ -33,10 +36,10 @@ $p = new phrasen();
 foreach($coodle->result as $row)
 {
 	$benutzer = new benutzer($row->ersteller_uid);
-	$subject='Ablauf der Coodle Umfrage';
-	
-	$mailtext='';
-	$mailtexthtml='';
+	$subject = 'Ablauf der Coodle Umfrage';
+	$mailtext = '';
+	$mailtexthtml = '';
+
 	switch($benutzer->geschlecht)
 	{
 		case 'm':
@@ -53,19 +56,23 @@ foreach($coodle->result as $row)
 			break;
 	}
 	
-	$mailtext.="Ihre Terminumfrage zum Thema \"".$row->titel."\" ist beendet.\n";
-	$mailtext.="Bitte folgen sie dem Link um die Terminumfrage abzuschließen: ".CIS_ROOT."cis/public/coodle.php?coodle_id=".$row->coodle_id."\n\n";
-	$mailtext.= $p->t('mail/signatur');
+	$mailtext .= "Ihre Terminumfrage zum Thema \"".$row->titel."\" ist beendet.\n";
+	$mailtext .= "Bitte folgen sie dem Link um die Terminumfrage abzuschließen: ".CIS_ROOT."cis/public/coodle.php?coodle_id=".$row->coodle_id."\n\n";
+	$mailtext .= $p->t('mail/signatur');
 	
-	$mailtexthtml.="Ihre Terminumfrage zum Thema \"".$row->titel."\" ist beendet.<br>";
-	$mailtexthtml.="Bitte folgen sie dem Link um die Terminumfrage abzuschließen: <a href=\"".CIS_ROOT."cis/public/coodle.php?coodle_id=".$row->coodle_id."\">Link zur Umfrage</a><br><br>";
-	$mailtexthtml.= nl2br($p->t('mail/signatur'));
+	$mailtexthtml .= "Ihre Terminumfrage zum Thema \"".$row->titel."\" ist beendet.<br>";
+	$mailtexthtml .= "Bitte folgen sie dem Link um die Terminumfrage abzuschließen: <a href=\"".CIS_ROOT."cis/public/coodle.php?coodle_id=".
+		$row->coodle_id."\">Link zur Umfrage</a><br><br>";
+	$mailtexthtml .= nl2br($p->t('mail/signatur'));
 	
 	$mail = new mail($row->ersteller_uid.'@'.DOMAIN, 'no-reply@'.DOMAIN, $subject, $mailtext);
 	$mail->setHTMLContent($mailtexthtml);
+
 	if($mail->send())
-		echo "Mail versandt an $row->ersteller_uid CoodleID $row->coodle_id<br>\n";
+		echo "Mail versandt an $row->ersteller_uid CoodleID $row->coodle_id\n";
 	else
-		echo "Fehler beim Mailversand an $row->ersteller_uid CoodleID $row->coodle_id<br>\n";
+		echo "Fehler beim Mailversand an $row->ersteller_uid CoodleID $row->coodle_id\n";
 }
+
 ?>
+

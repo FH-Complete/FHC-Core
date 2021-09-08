@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ablauf extends APIv1_Controller
+class Ablauf extends API_Controller
 {
 	/**
 	 * Ablauf API constructor.

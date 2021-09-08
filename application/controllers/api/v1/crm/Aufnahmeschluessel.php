@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aufnahmeschluessel extends APIv1_Controller
+class Aufnahmeschluessel extends API_Controller
 {
 	/**
 	 * Aufnahmeschluessel API constructor.

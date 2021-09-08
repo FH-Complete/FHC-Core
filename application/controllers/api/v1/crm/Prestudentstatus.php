@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Prestudentstatus extends APIv1_Controller
+class Prestudentstatus extends API_Controller
 {
 	/**
 	 * Prestudentstatus API constructor.

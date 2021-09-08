@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Erreichbarkeit extends APIv1_Controller
+class Erreichbarkeit extends API_Controller
 {
 	/**
 	 * Erreichbarkeit API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Stunde extends APIv1_Controller
+class Stunde extends API_Controller
 {
 	/**
 	 * Stunde API constructor.

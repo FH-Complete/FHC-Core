@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Pruefling extends APIv1_Controller
+class Pruefling extends API_Controller
 {
 	/**
 	 * Pruefling API constructor.

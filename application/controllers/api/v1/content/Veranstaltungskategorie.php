@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Veranstaltungskategorie extends APIv1_Controller
+class Veranstaltungskategorie extends API_Controller
 {
 	/**
 	 * Veranstaltungskategorie API constructor.

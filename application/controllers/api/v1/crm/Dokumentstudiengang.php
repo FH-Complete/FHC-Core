@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Dokumentstudiengang extends APIv1_Controller
+class Dokumentstudiengang extends API_Controller
 {
 	/**
 	 * Dokumentstudiengang API constructor.

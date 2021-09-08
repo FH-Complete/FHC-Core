@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Dokumentprestudent extends APIv1_Controller
+class Dokumentprestudent extends API_Controller
 {
 	/**
 	 * Dokumentprestudent API constructor.

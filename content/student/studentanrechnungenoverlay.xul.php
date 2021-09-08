@@ -79,6 +79,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							   class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/anrechnung/rdf#lehrveranstaltung_bez_kompatibel"/>
 							<splitter class="tree-splitter"/>
+                            <treecol id="student-anrechnungen-tree-status" label="Status" flex="2" hidden="false"
+                                     class="sortDirectionIndicator"
+                                     sort="rdf:http://www.technikum-wien.at/anrechnung/rdf#status" />
+                            <splitter class="tree-splitter"/>
 							<treecol id="student-anrechnungen-tree-genehmigt_von" label="genehmigt von" flex="2" hidden="false"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/anrechnung/rdf#genehmigt_von" />
@@ -99,6 +103,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<treecell label="rdf:http://www.technikum-wien.at/anrechnung/rdf#begruendung"/>
 										<treecell label="rdf:http://www.technikum-wien.at/anrechnung/rdf#lehrveranstaltung_id_kompatibel"/>
 										<treecell label="rdf:http://www.technikum-wien.at/anrechnung/rdf#lehrveranstaltung_bez_kompatibel"/>
+										<treecell label="rdf:http://www.technikum-wien.at/anrechnung/rdf#status"/>
 										<treecell label="rdf:http://www.technikum-wien.at/anrechnung/rdf#genehmigt_von"/>
 										<treecell label="rdf:http://www.technikum-wien.at/anrechnung/rdf#insertamum"/>
 									</treerow>

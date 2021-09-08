@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Betriebsmittelperson2 extends APIv1_Controller
+class Betriebsmittelperson2 extends API_Controller
 {
 	/**
 	 * Betriebsmittelperson API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Status extends APIv1_Controller
+class Status extends API_Controller
 {
 	/**
 	 * Status API constructor.

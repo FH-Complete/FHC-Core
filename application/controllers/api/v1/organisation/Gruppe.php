@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Gruppe extends APIv1_Controller
+class Gruppe extends API_Controller
 {
 	/**
 	 * Gruppe API constructor.

@@ -581,6 +581,35 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery($query, array($person_id));
 	}
+	
+	/**
+	 * Get latest ZGV Bezeichnung of Prestudent.
+	 *
+	 * @param $prestudent_id
+	 */
+	public function getLatestZGVBezeichnung($prestudent_id)
+	{
+		if (!is_numeric($prestudent_id))
+		{
+			show_error('Prestudent_id is not numeric.');
+		}
+		
+		$language_index = getUserLanguage() == 'German' ? 0 : 1;
+	
+		$this->addSelect('
+			COALESCE(
+				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $language_index . ',
+				array_to_json(zgv.bezeichnung::varchar[])->>' . $language_index . '
+			) AS bezeichnung'
+		);
+		
+		$this->addJoin('bis.tbl_zgv zgv', 'zgv_code', 'LEFT');
+		$this->addJoin('bis.tbl_zgvmaster zgvmaster', 'zgvmas_code', 'LEFT');
+		
+		return $this->loadWhere(array(
+			'prestudent_id' => $prestudent_id
+		));
+	}
 
 	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester)
 	{

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zgvgruppe extends APIv1_Controller
+class Zgvgruppe extends API_Controller
 {
 	/**
 	 * Zgvgruppe API constructor.

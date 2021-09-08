@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Rolle extends APIv1_Controller
+class Rolle extends API_Controller
 {
 	/**
 	 * Rolle API constructor.

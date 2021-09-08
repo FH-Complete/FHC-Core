@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Preinteressent extends APIv1_Controller
+class Preinteressent extends API_Controller
 {
 	/**
 	 * Person API constructor.

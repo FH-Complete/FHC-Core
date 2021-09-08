@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Infoscreen extends APIv1_Controller
+class Infoscreen extends API_Controller
 {
 	/**
 	 * Infoscreen API constructor.

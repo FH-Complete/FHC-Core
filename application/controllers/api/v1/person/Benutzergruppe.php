@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Benutzergruppe extends APIv1_Controller
+class Benutzergruppe extends API_Controller
 {
 	/**
 	 * Benutzergruppe API constructor.

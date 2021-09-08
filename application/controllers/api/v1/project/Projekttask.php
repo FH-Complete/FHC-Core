@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Projekttask extends APIv1_Controller
+class Projekttask extends API_Controller
 {
 	/**
 	 * Projekttask API constructor.
