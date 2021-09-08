@@ -1,5 +1,5 @@
 <?php
-/* kCopyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,6 +22,7 @@
  *          Manfred Kindl <kindlm@technikum.wien.at>
  *          Gerald Raab <raab@technikum-wien.at>
  * 			Alexei Karpenko <karpenko@technikum-wien.at>
+ *			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -55,26 +56,64 @@ if (!$db = new basis_db())
 
 $user = get_uid();
 
+
 $passuid = false;
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
+$mas = new mitarbeiter();
+$mas->getUntergebene($user, true);
+$untergebenen_arr = array();
+$untergebenen_arr = $mas->untergebene;
+
+//Wenn User Administrator ist und UID uebergeben wurde (bzw. Vorgesetzter ist und die übergebene UID von einem MA) dann die Zeitaufzeichnung
 //des uebergebenen Users anzeigen
 if(isset($_GET['uid']))
 {
-	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
+	if($rechte->isBerechtigt('admin') || (in_array($_GET['uid'], $untergebenen_arr)) )
 	{
 		$user = $_GET['uid'];
+		//$username = $_GET['uid'];
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user);
 		$passuid = true;
+		// echo "Adminview";
+		//
+		// if(in_array($user, $untergebenen_arr))
+		// {
+		// 	echo "<br>" . $user . " ist ein/e Mitarbeiterin";
+		// }
+		// echo "<br>";
 	}
+	// if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
+	// {
+	// 	$user = $_GET['uid'];
+	// 	$rechte = new benutzerberechtigung();
+	// 	$rechte->getBerechtigungen($user);
+	// 	$passuid = true;
+	// 	echo "Adminview";
+	//
+	// 	// if(in_array($_GET['uid'], $untergebenen_arr))
+	// 	// {
+	// 	// 	echo "<br>" . $_GET['uid'] . " ist ein/e Mitarbeiterin";
+	// 	// }
+	// 	// echo "<br>";
+	// }
+	// elseif(($rechte->isBerechtigt('mitarbeiter')) && in_array($_GET['uid'], $untergebenen_arr))
+	// {
+	// 	echo "Vorgesetztenview";
+	// 	$user = $_GET['uid'];
+	// 	$rechte = new benutzerberechtigung();
+	// 	$rechte->getBerechtigungen($user);
+	// 	$passuid = true;
+	// }
 	else
 	{
 		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
 	}
 }
+
+
 if($rechte->isBerechtigt('addon/casetimeGenerateXLS'))
 	$export_xls = 'true';
 else {
@@ -516,7 +555,7 @@ echo '
 			}
 			return true;
 		}
-		
+
 		function resetProjekt()
 		{
 			$("#projekt").val("");
@@ -1130,8 +1169,27 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		}
 		echo '<p><a href="../profile/zeitsperre_resturlaub.php">'.$p->t("urlaubstool/meineZeitsperren").'</a></p>';
 		echo $p->t("zeitaufzeichnung/supportAnfragen");
-		echo '</td>
-		      	</tr>
+
+		//Dropdown timesheets Mitarbeiter
+		if ($untergebenen_arr)
+		{
+			$ben = new benutzer();
+			echo "
+			<hr><br>
+
+			<select name='mas' id='mas' onchange='location = this.options[this.selectedIndex].value;''>
+				<option>-- Timesheets Mitarbeiter*Innen --</option>";
+				foreach($untergebenen_arr as $k=>$v)
+				{
+					if ($ben->load($v))
+					{
+						echo "<option value='zeitaufzeichnung.php?uid=$v'>$ben->vorname $ben->nachname</option>";
+					}
+				}
+				echo "<option value='zeitaufzeichnung.php'> --zurück zur Übersicht--</option>";
+			echo "</select>";
+		}
+		echo '</td></tr>
 		      </table>';
 			echo '<table>
 			<tr>
@@ -1499,6 +1557,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		echo '</td></tr>';
 		echo '</table>';
 		echo '</form>';
+
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)
@@ -1524,6 +1583,9 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		$dr_arr = $dr->result;
 
 		//var_dump($dr->result);
+
+
+
 
 		if(count($za->result)>0)
 		{
@@ -1668,8 +1730,6 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					//{
 					//	echo '<tr><td style="background-color:#DCE4EF; font-size: 8pt;" colspan="13"><b>'.$datum->formatDatum($row->datum,'D d.m.Y').'</b></b> <span id="tag_'.$datum->formatDatum($row->datum,'d_m_Y').'"></span></td></tr>';
 					//}
-
-
 
 				}
 				// Nach jeder Woche eine Summenzeile einfuegen und eine neue Tabelle beginnen
