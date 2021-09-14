@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Notiz extends APIv1_Controller
+class Notiz extends API_Controller
 {
 	/**
 	 * Notiz API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studiensemester extends APIv1_Controller
+class Studiensemester extends API_Controller
 {
 	/**
 	 * Studiensemester API constructor.

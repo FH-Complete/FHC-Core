@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bisverwendung extends APIv1_Controller
+class Bisverwendung extends API_Controller
 {
 	/**
 	 * Bisverwendung API constructor.

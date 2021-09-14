@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Cronjob extends APIv1_Controller
+class Cronjob extends API_Controller
 {
 	/**
 	 * Cronjob API constructor.

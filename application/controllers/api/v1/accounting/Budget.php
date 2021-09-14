@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Budget extends APIv1_Controller
+class Budget extends API_Controller
 {
 	/**
 	 * Budget API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Kontaktmedium extends APIv1_Controller
+class Kontaktmedium extends API_Controller
 {
 	/**
 	 * Kontaktmedium API constructor.

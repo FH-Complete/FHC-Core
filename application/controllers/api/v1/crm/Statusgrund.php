@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Statusgrund extends APIv1_Controller
+class Statusgrund extends API_Controller
 {
 	/**
 	 * Status API constructor.

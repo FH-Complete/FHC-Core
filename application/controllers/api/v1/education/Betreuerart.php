@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Betreuerart extends APIv1_Controller
+class Betreuerart extends API_Controller
 {
 	/**
 	 * Betreuerart API constructor.

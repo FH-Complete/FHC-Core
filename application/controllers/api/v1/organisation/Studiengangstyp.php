@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studiengangstyp extends APIv1_Controller
+class Studiengangstyp extends API_Controller
 {
 	/**
 	 * Studiengangstyp API constructor.

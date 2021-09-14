@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Pruefungstermin extends APIv1_Controller
+class Pruefungstermin extends API_Controller
 {
 	/**
 	 * Pruefungstermin API constructor.

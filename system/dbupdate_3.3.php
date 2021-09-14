@@ -4663,7 +4663,7 @@ if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie_gruppe WHER
 	}
 }
 
-// Add table anrechnung_status
+// Add table anrechnungstatus
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"))
 {
 	$qry = "
@@ -4689,42 +4689,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"
 		echo '<strong>lehre.tbl_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' lehre.tbl_anrechnungstatus: Tabelle hinzugefuegt<br>';
-}
-
-// GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;
-$qry = 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;';
-if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_anrechnungstatus '.$db->db_last_error().'</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus';
-
-
-// SEQUENCE seq_anrechnungstatus_status_kurzbz
-if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'seq_anrechnungstatus_status_kurzbz'"))
-{
-	if ($db->db_num_rows($result) == 0)
-	{
-		$qry = '
-			CREATE SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz
-			START WITH 1
-			INCREMENT BY 1
-			NO MAXVALUE
-			NO MINVALUE
-			CACHE 1;
-			';
-
-		if(!$db->db_query($qry))
-			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Created sequence: lehre.seq_anrechnungstatus_status_kurzbz';
-
-		// GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_anrechnungstatus_status_kurzbz_seq to web;
-		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz TO web;';
-		if (!$db->db_query($qry))
-			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.seq_anrechnungstatus_status_kurzbz';
-	}
 }
 
 // Add table anrechnung_anrechnungstatus
@@ -4756,9 +4720,10 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 
 		INSERT INTO lehre.tbl_anrechnung_anrechnungstatus(anrechnung_id, status_kurzbz) SELECT anrechnung_id, 'approved' as status_kurzbz FROM lehre.tbl_anrechnung WHERE genehmigt_von is not null;
 
-		GRANT SELECT ON lehre.tbl_anrechnung_anrechnungstatus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO vilesci;
 		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO vilesci;
+		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO web;
 	";
 
 	if(!$db->db_query($qry))
@@ -4822,6 +4787,19 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Add permission to create Anrechnung
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/anrechnung_anlegen';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/anrechnung_anlegen', 'Anrechnung anlegen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/anrechnung_anlegen<br>';
+	}
+}
 
 // INSERT,DELETE,UPDATE Berechtigung für tbl_dokumentprestudent hinzufügen
 if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_dokumentprestudent' AND table_schema='public' AND grantee='web' AND privilege_type in ('INSERT','DELETE','UPDATE')"))
@@ -4877,7 +4855,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefung LIMIT 1;"))
 			updatevon character varying(32)
 		);
 
-		CREATE SEQUENCE public.tbl_zgvpruefung_id_seq 
+		CREATE SEQUENCE public.tbl_zgvpruefung_id_seq
 			INCREMENT BY 1
 			NO MAXVALUE
 			NO MINVALUE
@@ -4889,7 +4867,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefung LIMIT 1;"))
 		GRANT SELECT, UPDATE ON public.tbl_zgvpruefung_id_seq  TO vilesci;
 		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_zgvpruefung TO vilesci;
 		GRANT SELECT ON public.tbl_zgvpruefung TO web;
-		
+
 	";
 
 	if(!$db->db_query($qry))
@@ -4910,7 +4888,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status 
 			datum timestamp without time zone DEFAULT now()
 		);
 
-		CREATE SEQUENCE public.tbl_zgvpruefungstatus_status_id_seq 
+		CREATE SEQUENCE public.tbl_zgvpruefungstatus_status_id_seq
 			INCREMENT BY 1
 			NO MAXVALUE
 			NO MINVALUE
@@ -4931,7 +4909,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status 
 	else
 		echo ' public.tbl_zgvpruefungstatus_status: Tabelle hinzugefuegt<br>';
 }
-
 
 // Add index to system.tbl_log
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruefung_student_uid'"))

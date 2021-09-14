@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Archiv extends APIv1_Controller
+class Archiv extends API_Controller
 {
 	/**
 	 * Archiv API constructor.
