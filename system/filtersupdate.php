@@ -122,10 +122,10 @@ $filters = array(
 				],
 				"filters": [
 					{
-						"name": "SendDate",
+						"name": "AnzahlStgNichtAbgeschickt",
 						"option": "",
-						"condition": "",
-						"operation": "nset"
+						"condition": "0",
+						"operation": "gt"
 					}
 				]
 			}
