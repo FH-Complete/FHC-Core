@@ -26,35 +26,37 @@ Die Tabelle bis.tbl_gemeinde löschen. -> delete from bis.tbl_gemeinde;
 Skript aufrufen, csv auswählen und hochladen.
 Datei wird eingelesen und in die DB gespeichert.
 */
-
 require_once('../../config/system.config.inc.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/benutzerberechtigung.class.php');
 require_once(dirname(__FILE__).'/../../include/gemeinde.class.php');
 require_once(dirname(__FILE__).'/../../include/benutzerberechtigung.class.php');
 
-
 $user = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('basis/gemeinde')) {
+if (!$rechte->isBerechtigt('basis/gemeinde'))
+{
 	die('Sie haben keine Berechtigung fuer diese Seite');
 }
 
 $tmp_gemeinde_ar = array();
 
-if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
+if (isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0)
+{
 
-	$rows   = array_map('str_getcsv', file( $_FILES['parsefile']['tmp_name'] ));
+	$rows = array_map('str_getcsv', file( $_FILES['parsefile']['tmp_name'] ));
 	$header = array_shift($rows);
-	$data    = array();
-	foreach($rows as $row) {
+	$data = array();
+	foreach ($rows as $row)
+	{
 		$data[] = array_combine($header, $row);
 	}
 
-	foreach ($data as $gemeinde_details) {
+	foreach ($data as $gemeinde_details)
+	{
 
 		//Wenn nicht gültig dann überspringen
 		if ($gemeinde_details['Gültig'] == 'Nein')  continue;
@@ -62,7 +64,8 @@ if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
 		//es können mehrere plz in einer zeile stehen
 		$plzs = explode(' ', trim($gemeinde_details['PLZ']));
 
-		foreach ($plzs as $plz) {
+		foreach ($plzs as $plz)
+		{
 			$tmp_obj_gemeinde = null;
 			$tmp_obj_gemeinde = new gemeinde();
 			$tmp_obj_gemeinde->plz = $plz;
@@ -73,35 +76,22 @@ if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
 			$tmp_obj_gemeinde->bulabez = $gemeinde_details['BULA_Bez'];
 			$tmp_obj_gemeinde->kennziffer = $gemeinde_details['Gemeindekennziffer'];
 
-			//print_r($tmp_obj_gemeinde);
 			$tmp_obj_gemeinde->save();
 			$tmp_gemeinde_ar[] = $tmp_obj_gemeinde;
-			// if ($tmp_obj_gemeinde->save()) {
-			// 	echo "<br/>";
-			// 	echo "gemeinde save true";
-			// 	echo "<br/>";
-			// 	print_r($tmp_obj_gemeinde);
-			// 	echo "<br/>";
-			// } else {
-			// 	echo "<br/>";
-			// 	echo "gemeinde save false";
-			// 	echo "<br/>";
-			// 	print_r($tmp_obj_gemeinde);
-			// 	echo "<br/>";
-			// }
 		}
 	}
 }
 ?>
-
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>set gemeinde skript</title>
+    <title>Set Gemeinde</title>
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
   </head>
   <body>
-		<hr>
+	  	<h2>Gemeinden aktualisieren</h2>
+		Diese Seite dient dazu die Gemeinde Kodex Tabelle zu aktualisieren.<br /><br />
 		<b>Filesyntax:</b>(Standard xlsx-File von https://www.bis.ac.at/BISSuite, gespeichert als csv! erste Zeile ist Header (alles was oberhalb ist kann entfernt werden) -> dann Daten)
 		<br/><br/>
 		<table border="1">
@@ -157,7 +147,8 @@ if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
 		<div>
 			<pre>
 				<?php
-					if ($tmp_gemeinde_ar) {
+					if ($tmp_gemeinde_ar)
+					{
 						print_r($tmp_gemeinde_ar);
 					}
 				?>
