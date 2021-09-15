@@ -37,6 +37,7 @@ class ExtensionsLib
 	{
 		$this->UPLOAD_PATH = APPPATH.'tmp/';
 		$this->EXTENSIONS_PATH = APPPATH.'extensions/';
+
 		// Get code igniter instance
 		$this->_ci =& get_instance();
 
@@ -52,6 +53,13 @@ class ExtensionsLib
 		// Set default values fot class properties
 		$this->_errorOccurred = false;
 		$this->_currentInstalledExtensionVersion = 0;
+
+		// If SERVER_NAME is _not_ declared or it is an empty string
+		if (!defined('SERVER_NAME') || (defined('SERVER_NAME') && isEmptyString(SERVER_NAME)))
+		{
+			$this->_printError('Global constant SERVER_NAME is not declared or it is not valid');
+			exit();
+		}
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -89,14 +97,8 @@ class ExtensionsLib
 
 			if (!$this->_errorOccurred) // if no error occurred
 			{
-				// Retives data about any previous installation of this extension on this server
-				$extensionDB = $this->_loadPreviousInstallation($uploadData->extensionName, true);
-			}
-
-			if (!$this->_errorOccurred) // if no error occurred
-			{
-				// Retives data about any previous installation of this extension
-				$extensionDBNull = $this->_loadPreviousInstallation($uploadData->extensionName, false);
+				// Retrieves data about any previous installation of this extension on this server
+				$extensionDB = $this->_loadPreviousInstallation($uploadData->extensionName);
 			}
 
 			if (!$this->_errorOccurred) // if no error occurred
@@ -116,9 +118,10 @@ class ExtensionsLib
 				$this->_printStart('Proceding with the installation of the extension: '.$extensionJson->name);
 				$this->_printEnd();
 
-				$this->_cleanPreviousInstallation($extensionJson); // cleans any previous installation
+				// Remove any previous installation from file system and database
+				$this->_cleanPreviousInstallation($extensionJson);
 
-				$this->_installExtension($extensionJson, $extensionDBNull); // records extension data in DB
+				$this->_installExtension($extensionJson); // records extension data in DB
 
 				if (!$this->_errorOccurred && $perform_sql === true) // if no error occurred
 				{
@@ -179,10 +182,10 @@ class ExtensionsLib
 		$result = $this->_ci->ExtensionsModel->load($extensionId);
 		if (hasData($result)) // if something was found
 		{
-			$extensionServer = $result->retval[0]->server_kurzbz;
-			if ($extensionServer !== SERVER_NAME)
-				return false;
-			$extensionName = $result->retval[0]->name; // extension name
+			// If this server is _not_ the same where the extension was installed then exit with a failure
+			if (getData($result)[0]->server_kurzbz != SERVER_NAME) return false;
+
+			$extensionName = getData($result)[0]->name; // extension name
 			$this->_delSoftLinks($extensionName); // not to be checked, could fail if the extension is disabled
 			// remove the extension from the extensions installation directory
 			$delExtension = $this->_rrm($this->EXTENSIONS_PATH.$extensionName);
@@ -192,7 +195,7 @@ class ExtensionsLib
 			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
 			if (hasData($result)) // if something was found
 			{
-				foreach ($result->retval as $key => $extension) // loops on them
+				foreach (getData($result) as $key => $extension) // loops on them
 				{
 					// Remove them all
 					$result = $this->_ci->ExtensionsModel->delete($extension->extension_id);
@@ -212,7 +215,11 @@ class ExtensionsLib
 	 */
 	public function getInstalledExtensions()
 	{
-		return $this->_ci->ExtensionsModel->getInstalledExtensions();
+		$this->_ci->ExtensionsModel->addOrder('name', 'ASC');
+		$this->_ci->ExtensionsModel->addOrder('server_kurzbz', 'ASC');
+		$this->_ci->ExtensionsModel->addOrder('version', 'ASC');
+
+		return $this->_ci->ExtensionsModel->load();
 	}
 
 	/**
@@ -327,7 +334,7 @@ class ExtensionsLib
 	/**
 	 * Loads any previous installations of the given extension from DB
 	 */
-	private function _loadPreviousInstallation($extensionName, $onServer)
+	private function _loadPreviousInstallation($extensionName)
 	{
 		$extensionDB = null;
 
@@ -336,21 +343,26 @@ class ExtensionsLib
 		// Loads the last version of the previous installation of this extension
 		$this->_ci->ExtensionsModel->addOrder('version', 'DESC');
 		$this->_ci->ExtensionsModel->addLimit(1);
-		if ($onServer)
-			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
-		else
-			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => NULL));
 
+		// Loads extensions installed on this server
+		$result = $this->_ci->ExtensionsModel->loadWhere(
+			array(
+				'name' => $extensionName,
+				'server_kurzbz' => SERVER_NAME
+			)
+		);
+
+		// In an error occurred
 		if (isError($result))
 		{
 			$this->_errorOccurred = true;
-			$this->_printFailure('data base error: '.$result->retval);
+			$this->_printFailure('data base error: '.getData($result));
 		}
-		else
+		else // otherwise
 		{
 			if (hasData($result)) // if found
 			{
-				$extensionDB = $result->retval[0]; // return it!
+				$extensionDB = getData($result)[0]; // return it!
 			}
 			else
 			{
@@ -412,36 +424,41 @@ class ExtensionsLib
 			if (isset($extensionJson->version))
 			{
 				$extensionJson->currentInstalledVersion = 0; // default current installed version of this extension
-
-				if ($extensionDB != null) // if no previous installation was found in DB
+				
+				// If a previous installation was found in DB
+				if ($extensionDB != null)
 				{
+					// Then get the data from database
 					$extensionJson->extension_id = $extensionDB->extension_id; // get the extension_id from DB
 					$extensionJson->currentInstalledVersion = $extensionDB->version; // get the current installed version from DB
 
+					// Prompt a summary
 					$this->_printMessage('Extension already installed!');
 					$this->_printMessage('Current version: '.$extensionDB->version);
 					$this->_printMessage('Version of the uploaded extension: '.$extensionJson->version);
 
+					// Check if the version of the uploaded extension is the same
+					// as the one from the dataabase
 					if ($extensionJson->version == $extensionDB->version)
 					{
 						$this->_printMessage('Updating the same version!');
 					}
-					elseif ($extensionJson->version > $extensionDB->version)
+					elseif ($extensionJson->version > $extensionDB->version) // or it is higher
 					{
 						$this->_printMessage('Updating to a new version!');
 					}
-					else // downgrade is not possible
+					else // otherwise is lower, then the downgrade is not possible
 					{
 						$extensionJson = null;
 						$this->_printFailure('downgrade must be performed manually');
 					}
 				}
-				else
+				else // otherwise if it is not installed on this server
 				{
 					$this->_printMessage('Version of the uploaded extension: '.$extensionJson->version);
 				}
 
-				// If no errors occurred
+				// If no errors occurred then check the JSON file content within the uploaded extension
 				if ($extensionJson != null)
 				{
 					require_once('version.php'); // get the core version
@@ -459,7 +476,7 @@ class ExtensionsLib
 							// Gets the required dependencies
 							$result = $this->_ci->ExtensionsModel->getDependencies($extensionJson->dependencies);
 							// If they are matcheds
-							if (hasData($result) && count($result->retval) == count($extensionJson->dependencies))
+							if (hasData($result) && count(getData($result)) == count($extensionJson->dependencies))
 							{
 								if (isset($extensionJson->dependencies))
 								{
@@ -550,24 +567,23 @@ class ExtensionsLib
 	/**
 	 * Insert extension's data into the DB
 	 */
-	private function _installExtension($extensionJson, $extensionDBNull)
+	private function _installExtension($extensionJson)
 	{
 		$this->_printStart('Adding new entry in the DB');
 
-		$sqlArr = array('name' => $extensionJson->name,
-						'description' => isset($extensionJson->description) ? $extensionJson->description : null,
-						'version' => $extensionJson->version,
-						'license' => isset($extensionJson->license) ? $extensionJson->license : null,
-						'url' => isset($extensionJson->url) ? $extensionJson->url : null,
-						'core_version' => $extensionJson->core_version,
-						'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
-						'server_kurzbz' => SERVER_NAME);
-
-		if (is_null($extensionDBNull))
-			$result = $this->_ci->ExtensionsModel->insert($sqlArr);
-		else
-			$result = $this->_ci->ExtensionsModel->update($extensionDBNull->extension_id, $sqlArr);
-
+		// Insert into database the extension information
+		$result = $this->_ci->ExtensionsModel->insert(
+			array(
+				'name' => $extensionJson->name,
+				'description' => isset($extensionJson->description) ? $extensionJson->description : null,
+				'version' => $extensionJson->version,
+				'license' => isset($extensionJson->license) ? $extensionJson->license : null,
+				'url' => isset($extensionJson->url) ? $extensionJson->url : null,
+				'core_version' => $extensionJson->core_version,
+				'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null,
+				'server_kurzbz' => SERVER_NAME
+			)
+		);
 		if (isSuccess($result))
 		{
 			$this->_printSuccess(true);
@@ -603,11 +619,11 @@ class ExtensionsLib
 		{
 			// If a directory with the same value of the version is present in the sql scripts directory
 			if (($files = glob($pkgSQLsPath.'/'.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION)) != false)
-	        {
+	        	{
 				// Loads every sql files
-	            foreach ($files as $file)
-	            {
-	                $sql = file_get_contents($file); // gets the entire content of the file
+				foreach ($files as $file)
+				{
+	        		        $sql = file_get_contents($file); // gets the entire content of the file
 
 					$this->_printMessage('Executing query:');
 					$this->_printMessage($sql);
@@ -623,11 +639,11 @@ class ExtensionsLib
 					else
 					{
 						$this->_printMessage('Query result:');
-						var_dump($result->retval); // KEEP IT!!!
+						var_dump(getData($result)); // KEEP IT!!!
 						$this->_ci->eprintflib->printEOL();
 					}
-	            }
-	        }
+				}
+	        	}
 		}
 
 		$this->_printSuccess(!$this->_errorOccurred);
@@ -816,7 +832,7 @@ class ExtensionsLib
 			{
 				// Remove them all from file system and DB
 				$this->_printMessage('Removing entries in the DB related to this extension and from extensions directory');
-				$this->delExtension($result->retval[0]->extension_id);
+				$this->delExtension(getData($result)[0]->extension_id);
 			}
 		}
 		else // otherwise
@@ -844,11 +860,10 @@ class ExtensionsLib
 		$result = $this->_ci->ExtensionsModel->load($extensionId);
 		if (hasData($result))
 		{
-			$extensionServer = $result->retval[0]->server_kurzbz;
-			if ($extensionServer !== SERVER_NAME)
-				return false;
+			// If this server is _not_ the same where the extension was installed then exit with a failure
+			if (getData($result)[0]->server_kurzbz != SERVER_NAME) return false; 
 
-			$extensionName = $result->retval[0]->name; // extension name
+			$extensionName = getData($result)[0]->name; // extension name
 
 			// If to be enabled
 			if ($enabled === true)
@@ -940,3 +955,4 @@ class ExtensionsLib
 		$this->_printInfo('------------------------------------------------------------------------------------------');
 	}
 }
+

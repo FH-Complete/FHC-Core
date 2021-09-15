@@ -103,12 +103,12 @@
 						<tr>
 							<th>Name</th>
 							<th>Description</th>
+							<th>Server</th>
 							<th>Version</th>
 							<th>Licence</th>
 							<th>URL</th>
 							<th>Minimum required Core version</th>
 							<th>Dependes on (extensions)</th>
-							<th>Server</th>
 							<th>Enabled</th>
 							<th>&nbsp;</th>
 						</tr>
@@ -140,12 +140,12 @@
 									$tableRow,
 									$extension->name,
 									$extension->description,
+									$extension->server_kurzbz,
 									$extension->version,
 									$extension->license,
 									$extension->url,
 									$extension->core_version,
 									count($extension->dependencies) == 0 ? 'None' : json_encode($extension->dependencies),
-									$extension->server_kurzbz,
 									$extension->extension_id,
 									$extension->enabled === true ? 'checked' : '',
 									$extension->extension_id
@@ -171,3 +171,4 @@
 	</body>
 
 <?php $this->load->view('templates/footer'); ?>
+
