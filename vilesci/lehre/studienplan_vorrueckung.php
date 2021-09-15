@@ -67,6 +67,13 @@ echo '<!DOCTYPE HTML>
 		});
 
 		$("#t1").checkboxes("range", true);
+		
+		$("#select_studiensemester_kurzbz_from").change(function()
+		{
+			var index = $(this).prop("selectedIndex");
+			index = index+3;
+			$("#select_studiensemester_kurzbz_to :nth-child("+index+")").prop("selected", true);
+		});
 	});
 	</script>
 	<title>Studienplan Semester Vorrückung</title>
@@ -96,10 +103,10 @@ if($studiensemester_kurzbz_to == '')
 
 echo '<form action="studienplan_vorrueckung.php" method="POST">';
 
-echo ' Quelle: <select name="studiensemester_kurzbz_from" />';
+echo ' Quelle: <select id="select_studiensemester_kurzbz_from" name="studiensemester_kurzbz_from" />';
 
 $stsem = new studiensemester();
-$stsem->getAll();
+$stsem->getPlusMinus(null,10,'ende ASC');
 
 foreach($stsem->studiensemester as $row)
 {
@@ -113,10 +120,7 @@ foreach($stsem->studiensemester as $row)
 }
 echo '</select>';
 
-echo ' Ziel:<select name="studiensemester_kurzbz_to" />';
-
-$stsem = new studiensemester();
-$stsem->getAll();
+echo ' Ziel:<select id="select_studiensemester_kurzbz_to" name="studiensemester_kurzbz_to" />';
 
 foreach($stsem->studiensemester as $row)
 {
@@ -168,7 +172,7 @@ if(isset($_POST['show']) && $studiensemester_kurzbz_from != '' && $studiensemest
 					studienplan.sprache
 				FROM lehre.tbl_studienplan studienplan
 				JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
-				JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+				JOIN lehre.tbl_studienordnung sto USING (studienordnung_id)
 				JOIN PUBLIC.tbl_studiengang USING (studiengang_kz)
 				WHERE tbl_studienplan_semester.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz_from, FHC_STRING)."
 					AND NOT EXISTS (
@@ -179,60 +183,78 @@ if(isset($_POST['show']) && $studiensemester_kurzbz_from != '' && $studiensemest
 							AND orgform_kurzbz = studienplan.orgform_kurzbz
 							AND studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz_to, FHC_STRING)."
 						)
+					AND NOT EXISTS (
+						SELECT 1
+						FROM lehre.tbl_studienplan_semester
+						JOIN lehre.tbl_studienplan USING (studienplan_id)
+						JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+						WHERE orgform_kurzbz = studienplan.orgform_kurzbz
+							AND studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz_to, FHC_STRING)."
+							AND studiengang_kz = sto.studiengang_kz
+						)
 					AND tbl_studiengang.typ IN ('b', 'm', 'l')
-					AND studienplan.onlinebewerbung_studienplan = true
-					AND tbl_studienplan_semester.semester = 1
-				ORDER BY studiengang";
+					AND studienplan.onlinebewerbung_studienplan = true";
+	if (substr($studiensemester_kurzbz_from,0,2) == 'SS')
+	{
+		$qry .= "   AND tbl_studienplan_semester.semester = 2";
+	}
+	else
+	{
+		$qry .= "   AND tbl_studienplan_semester.semester = 1";
+	}
+	$qry .= "   ORDER BY studiengang";
 	
 	if($result = $db->db_query($qry))
 	{
 		echo '<br>Anzahl: '.$db->db_num_rows($result);
-		//$pruefling = new pruefling();
-		
-		echo '<form action="studienplan_vorrueckung.php" method="POST">';
-		echo '<input type="hidden" name="show">';
-		echo '<input type="hidden" value="'.$studiensemester_kurzbz_from.'" name="studiensemester_kurzbz_from">';
-		echo '<input type="hidden" value="'.$studiensemester_kurzbz_to.'" name="studiensemester_kurzbz_to">';
-		echo '<table id="t1" class="tablesorter" style="width: unset">
-					<thead>
-					<tr>
-						<th style="text-align: center">
-						<nobr>
-							<a href="#" id="toggle_t1" data-toggle="checkboxes" data-action="toggle" ><img src="../../skin/images/checkbox_toggle.png" name="toggle"></a>
-							<a href="#" id="uncheck_t1" data-toggle="checkboxes" data-action="uncheck" ><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
-						</nobr>
-						</th>
-						<th>Studiengang</th>
-						<th>Organisationsform</th>
-						<th>Bezeichnung</th>
-						<th>Sprache</th>
-						<th>Studienplan ID</th>
-					</tr>
-					</thead>
-					<tbody>';
-		while($row = $db->db_fetch_object($result))
+
+		if ($db->db_num_rows($result) > 0)
 		{
-			echo '
-					<tr>
-						<td><input type="checkbox" class="chkbox" name="studienplaene[]" value="'.$row->studienplan_id.'" checked="checked"></td>
-						<td>'.$row->studiengang.'</td>
-						<td>'.$row->orgform_kurzbz.'</td>
-						<td>'.$row->bezeichnung.'</td>
-						<td>'.$row->sprache.'</td>
-						<td>'.$row->studienplan_id.'</td>
-						</tr>';
+			echo '<form action="studienplan_vorrueckung.php" method="POST">';
+			echo '<input type="hidden" name="show">';
+			echo '<input type="hidden" value="'.$studiensemester_kurzbz_from.'" name="studiensemester_kurzbz_from">';
+			echo '<input type="hidden" value="'.$studiensemester_kurzbz_to.'" name="studiensemester_kurzbz_to">';
+			echo '<table id="t1" class="tablesorter" style="width: unset">
+						<thead>
+						<tr>
+							<th style="text-align: center">
+							<nobr>
+								<a href="#" id="toggle_t1" data-toggle="checkboxes" data-action="toggle" ><img src="../../skin/images/checkbox_toggle.png" name="toggle"></a>
+								<a href="#" id="uncheck_t1" data-toggle="checkboxes" data-action="uncheck" ><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
+							</nobr>
+							</th>
+							<th>Studiengang</th>
+							<th>Organisationsform</th>
+							<th>Bezeichnung</th>
+							<th>Sprache</th>
+							<th>Studienplan ID</th>
+						</tr>
+						</thead>
+						<tbody>';
+			while ($row = $db->db_fetch_object($result))
+			{
+				echo '
+						<tr>
+							<td><input type="checkbox" class="chkbox" name="studienplaene[]" value="'.$row->studienplan_id.'" checked="checked"></td>
+							<td>'.$row->studiengang.'</td>
+							<td>'.$row->orgform_kurzbz.'</td>
+							<td>'.$row->bezeichnung.'</td>
+							<td>'.$row->sprache.'</td>
+							<td>'.$row->studienplan_id.'</td>
+							</tr>';
+			}
+			echo "</tbody></table>";
+			if ($rechte->isBerechtigt('lehre/studienordnung', null, 'suid'))
+			{
+				echo '<button type="submit" name="vorruecken">Ausgewählte Studienpläne vorrücken</button>';
+			}
+			else
+			{
+				echo '<button name="vorruecken" disabled>Ausgewählte Studienpläne vorrücken</button> Keine Berechtigung zum Vorrücken von Studienplänen';
+			}
+
+			echo '</form>';
 		}
-		echo "</tbody></table>";
-		if($rechte->isBerechtigt('lehre/studienordnung', null, 'suid'))
-		{
-			echo '<button type="submit" name="vorruecken">Ausgewählte Studienpläne vorrücken</button>';
-		}
-		else
-		{
-			echo '<button name="vorruecken" disabled>Ausgewählte Studienpläne vorrücken</button> Keine Berechtigung zum Vorrücken von Studienplänen';
-		}
-		
-		echo '</form>';
 	}
 }
 

@@ -3,9 +3,14 @@ const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJEC
 const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
 const CONTROLLER_URL = BASE_URL + "/"+CALLED_PATH;
 const RTFREIGABE_MESSAGE_VORLAGE = "InfocenterRTfreigegeben";
+const RTFREIGABE_MESSAGE_VORLAGE_MASTER = "InfocenterRTfreigegebenM";
+const RTFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH = "InfocenterRTfreigegebenMEnglisch";
 const RTFREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
 const RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ = "InfocenterRTfreigegQuerKurz";
 const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
+const STGFREIGABE_MESSAGE_VORLAGE_MASTER = "InfocenterSTGfreigegebenM";
+const STGFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH = "InfocenterSTGfreigegebenMEng";
+const STGFREIGABE_MESSAGE_VORLAGE_ANDERES_SEMESTER = "InfocenterSTGfreigegebenSemester";
 
 //Statusgründe for which no Studiengang Freigabe Message should be sent
 const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
@@ -18,9 +23,6 @@ const ONHOLDNAME = 'onhold';
  */
 $(document).ready(function ()
 {
-	//initialise table sorter
-	Tablesort.addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
-	Tablesort.addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
 
 	InfocenterDetails._formatMessageTable();
 	InfocenterDetails._formatNotizTable();
@@ -32,15 +34,6 @@ $(document).ready(function ()
 	$("#sendmsglink").click(function ()
 	{
 		$("#sendmsgform").submit();
-	});
-
-	//add click events to "formal geprüft" checkboxes
-	$(".prchbox").click(function ()
-	{
-		var boxid = this.id;
-		var akteid = InfocenterDetails._getPrestudentIdFromElementId(boxid);
-		var checked = this.checked;
-		InfocenterDetails.saveFormalGeprueft(personid, akteid, checked)
 	});
 
 	//add click events to zgv Prüfung section
@@ -114,7 +107,8 @@ $(document).ready(function ()
 		{
 			$('html,body').animate({scrollTop:0},250,'linear');
 		}
-	)
+	);
+
 });
 
 var InfocenterDetails = {
@@ -129,43 +123,6 @@ var InfocenterDetails = {
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// ajax calls
-	saveFormalGeprueft: function(personid, akteid, checked)
-	{
-		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + '/saveFormalGeprueft/' + encodeURIComponent(personid),
-			{
-				akte_id: akteid,
-				formal_geprueft: checked
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-					{
-						var timestamp = data.retval[0];
-						if (timestamp === "")
-						{
-							$("#formalgeprueftam_" + akteid).text("");
-						}
-						else
-						{
-							var fgdatum = $.datepicker.parseDate("yy-mm-dd", timestamp);
-							var gerfgdatum = $.datepicker.formatDate("dd.mm.yy", fgdatum);
-							$("#formalgeprueftam_" + akteid).text(gerfgdatum);
-						}
-						//refresh doctable tablesorter, formal geprueft changed!
-						$("#doctable").trigger("update");
-						InfocenterDetails._refreshLog();
-					}
-					else
-					{
-						InfocenterDetails._genericSaveError();
-					}
-				},
-				errorCallback: InfocenterDetails._genericSaveError,
-				veilTimeout: 0
-			}
-		);
-	},
 	saveBewPriorisierung: function(data)
 	{
 		FHC_AjaxClient.ajaxCallPost(
@@ -207,6 +164,22 @@ var InfocenterDetails = {
 						$("#zgvort_" + prestudentid).val(zgvort);
 						$("#zgvdatum_" + prestudentid).val(gerzgvdatum);
 						$("#zgvnation_" + prestudentid).val(zgvnation);
+
+						var zgvmas_code = prestudent.zgvmas_code !== null ? prestudent.zgvmas_code : "null";
+						var zgvmaort = prestudent.zgvmaort !== null ? prestudent.zgvmaort : "";
+						var zgvmadatum = prestudent.zgvmadatum;
+						var gerzgvmadatum = "";
+						if (zgvmadatum !== null)
+						{
+							zgvmadatum = $.datepicker.parseDate("yy-mm-dd", prestudent.zgvmadatum);
+							gerzgvmadatum = $.datepicker.formatDate("dd.mm.yy", zgvmadatum);
+						}
+						var zgvmanation = prestudent.zgvmanation !== null ? prestudent.zgvmanation : "null";
+
+						$("#zgvmas_" + prestudentid).val(zgvmas_code);
+						$("#zgvmaort_" + prestudentid).val(zgvmaort);
+						$("#zgvmadatum_" + prestudentid).val(gerzgvmadatum);
+						$("#zgvmanation_" + prestudentid).val(zgvmanation);
 					}
 					else
 					{
@@ -221,6 +194,7 @@ var InfocenterDetails = {
 			}
 		);
 	},
+
 	saveZgv: function(data)
 	{
 		var zgvError = function(){
@@ -340,8 +314,9 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	saveNotiz: function(personid, data)
+	saveNotiz: function(personid, data, callback)
 	{
+		var callbackValue = data;
 		FHC_AjaxClient.ajaxCallPost(
 			CALLED_PATH + '/saveNotiz/' + encodeURIComponent(personid),
 			data,
@@ -351,6 +326,8 @@ var InfocenterDetails = {
 					{
 						InfocenterDetails._refreshNotizen();
 						InfocenterDetails._refreshLog();
+						if ($.isFunction(callback))
+							callback(callbackValue);
 					}
 					else
 					{
@@ -595,8 +572,9 @@ var InfocenterDetails = {
 				{
 					var fitstg = $.inArray(parseInt(prestudent.studiengang_kz), FIT_PROGRAMM_STUDIENGAENGE) >= 0;
 
-					if (receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz
-						&& (prestudent.studiengangtyp === "b" || fitstg))
+					if ((receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz)
+						&& (receiverPrestudent.studiengangtyp === prestudent.studiengangtyp)
+						&& (prestudent.studiengangtyp === "b" || prestudent.studiengangtyp === "m" || fitstg))
 					{
 						if (prestudent.isRtFreigegeben)
 						{
@@ -613,13 +591,14 @@ var InfocenterDetails = {
 			var ausbildungssemester = receiverPrestudentstatus.ausbildungssemester;
 			var studiengangbezeichnung = receiverPrestudentstatus.studiengangbezeichnung;
 			var studiengangbezeichnung_englisch = receiverPrestudentstatus.studiengangbezeichnung_englisch;
+			var vorlage = null;
 
 			var orgform_deutsch, orgform_englisch;
 			orgform_deutsch = orgform_englisch = "";
 
 			if (typeof receiverPrestudentstatus.bezeichnung_orgform_german === 'string')
 			{
-				orgform_deutsch = receiverPrestudentstatus.bezeichnung_orgform_german.toLowerCase();
+				orgform_deutsch = receiverPrestudentstatus.bezeichnung_orgform_german;
 			}
 
 			if (typeof receiverPrestudentstatus.bezeichnung_orgform_english === 'string')
@@ -650,7 +629,6 @@ var InfocenterDetails = {
 				}
 				else //not already for RT freigegeben - send RTfreigabe message
 				{
-					var vorlage = null;
 					//send Quereinstiegsmessage if later Ausbildungssemester
 					if (ausbildungssemester > 1)
 					{
@@ -660,7 +638,15 @@ var InfocenterDetails = {
 					else
 					{
 						//send normal RTfreigabe message
-						vorlage = RTFREIGABE_MESSAGE_VORLAGE
+						if (receiverPrestudent.studiengangtyp === 'm') {
+							if (receiverPrestudentstatus.sprache === 'English')
+								vorlage = RTFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH
+							else
+								vorlage = RTFREIGABE_MESSAGE_VORLAGE_MASTER
+						} else
+						{
+							vorlage = RTFREIGABE_MESSAGE_VORLAGE
+						}
 					}
 
 					InfocenterDetails.sendFreigabeMessage(prestudent_id, vorlage, msgvars);
@@ -668,10 +654,29 @@ var InfocenterDetails = {
 			}
 			else
 			{
-				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent and allowed to send
-				if (!stgFreigegeben && receiverPrestudent.sendStgFreigabeMsg === true)
+				if (receiverPrestudent.studiengangtyp === 'm' && freigabedata.statuskurzbz === 'ergPruefung')
 				{
-					InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE, msgvars);
+					msgvars = {
+						'studiengangbezeichnung': studiengangbezeichnung,
+						'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
+						'orgform_deutsch': orgform_deutsch,
+						'orgform_englisch': orgform_englisch
+					}
+					if (receiverPrestudentstatus.sprache === 'English')
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH
+					else
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE_MASTER
+
+					InfocenterDetails.sendFreigabeMessage(prestudent_id, vorlage, msgvars);
+				}
+				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent and allowed to send
+				else if (!stgFreigegeben && receiverPrestudent.sendStgFreigabeMsg === true)
+				{
+					if (receiverPrestudent.studiengangtyp === 'b' && freigabedata.statuskurzbz === 'anderesSemester')
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE_ANDERES_SEMESTER
+					else
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE
+					InfocenterDetails.sendFreigabeMessage(prestudent_id, vorlage, msgvars);
 				}
 			}
 		};
@@ -744,6 +749,10 @@ var InfocenterDetails = {
 			var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 			$('#zgvUebernehmenNotice').remove();
 			InfocenterDetails.zgvUebernehmen(personid, prestudentid, btn);
+		});
+
+		$('.notizModal').on('hidden.bs.modal', function () {
+			$(':input', this).val('');
 		});
 
 		//zgv speichern
@@ -843,7 +852,8 @@ var InfocenterDetails = {
 				var statusgrundel = $("#frgstatusgrselect_" + prestudent_id + " select[name=frgstatusgrund]");
 				var statusgrund_id = statusgrundel.val();
 				var statusgrundbezeichnung = statusgrundel.find("option[value="+statusgrund_id+"]").text();
-				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id, "statusgrundbezeichnung": statusgrundbezeichnung};
+				var statuskurzbz = statusgrundel.find(':selected').data('kurzbz');
+				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id, "statusgrundbezeichnung": statusgrundbezeichnung, "statuskurzbz" : statuskurzbz};
 				InfocenterDetails.saveFreigabe(data);//Studiengangfreigabe
 			}
 		);
@@ -885,6 +895,8 @@ var InfocenterDetails = {
 				}
 			}
 		);
+
+		zgvUeberpruefung.checkAfterReload();
 	},
 	_refreshMessages: function()
 	{

@@ -20,8 +20,8 @@ class Geschaeftsjahr_model extends DB_Model
 	{
 		$query = 'SELECT *
 					FROM public.tbl_geschaeftsjahr
-					WHERE start <= now()
-					AND ende >= now()
+					WHERE start <= CURRENT_DATE
+					AND ende >= CURRENT_DATE
 					ORDER BY start DESC
 					LIMIT 1';
 

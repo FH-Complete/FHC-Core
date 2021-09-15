@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *			Manuela Thamer < manuela.thamer@technikum-wien.at >
  */
 /**
  * Vorrückung aller AKTIVEN Studenten.
@@ -32,6 +33,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/lehrverband.class.php');
 require_once('../../include/studienordnung.class.php');
 require_once('../../include/studienplan.class.php');
+require_once('../../include/statusgrund.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -301,6 +303,16 @@ if (isset($_POST['vorr']))
 					}
 				}
 
+				//auf statusgrund_kurzbz abfragen
+				$statusgrundObj = new statusgrund($row_status->statusgrund_id);
+				$statusgrundId = null;
+				if ($statusgrundObj->statusgrund_kurzbz === "prewiederholer" && $row_status->ausbildungssemester > 1)
+				{
+					$s = $row->semester_stlv - 1;
+					$ausbildungssemester = $row_status->ausbildungssemester - 1;
+					$statusgrundId = $statusgrundObj->getByStatusgrundKurzbz('wiederholer')->statusgrund_id;
+				}
+
 				$lvb = new lehrverband();
 
 				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
@@ -364,14 +376,15 @@ if (isset($_POST['vorr']))
 					//Eintragen des neuen Status
 					$sql .= "INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz,
 								studiensemester_kurzbz, ausbildungssemester, datum, insertamum,
-								insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id)
+								insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id, statusgrund_id)
 							VALUES (".$db->db_add_param($row->prestudent_id).", ".
 								$db->db_add_param($row_status->status_kurzbz).", ".
 								$db->db_add_param($next_ss).", ".
 								$db->db_add_param($ausbildungssemester).", now(), now(), ".
 								$db->db_add_param($user).",	NULL, NULL, NULL, ".
 								$db->db_add_param($row_status->orgform_kurzbz).", ".
-								$db->db_add_param($studienplan_id).");";
+								$db->db_add_param($studienplan_id).", ".
+								$db->db_add_param($statusgrundId).");";
 				}
 				if ($sql != '')
 				{
@@ -408,7 +421,7 @@ $outp .= '
 <tr>
 	<td>Studiengang:</td>
 	<td>
-		<SELECT name="stg_kz">';
+		<SELECT name="stg_kz" onchange="document.location.href=this.value">';
 
 //Auswahl Studiengang
 foreach ($studiengang as $stg)
@@ -420,7 +433,7 @@ foreach ($studiengang as $stg)
 	$url .= "&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt";
 	$url .= "&studiensemester_kurzbz_zk=$studiensemester_kurzbz_zk";
 
-	$outp .= "<OPTION onclick=\"window.location.href='".$url."'\" ".($stg->studiengang_kz == $stg_kz?'selected':'').">";
+	$outp .= "<OPTION value='" . $url . "' " . ($stg->studiengang_kz == $stg_kz ? 'selected' : '') . ">";
 	$outp .= "$stg->kurzbzlang ($stg->kuerzel) - $stg->bezeichnung</OPTION>";
 	if (!isset($s[$stg->studiengang_kz]))
 		$s[$stg->studiengang_kz] = new stdClass();
@@ -435,17 +448,12 @@ $outp .= '</SELECT>
 $outp .= "
 <tr>
 	<td>Angezeigtes Studiensemester:</td>
-	<td><select name='studiensemester_kurzbz'>\n";
+	<td><select name='studiensemester_kurzbz' onchange='document.location.href=this.value'>\n";
 
 if (isset($ss_arr) && is_array($ss_arr))
 {
 	foreach ($ss_arr as $sts)
 	{
-		if ($studiensemester_kurzbz == $sts)
-			$sel = " selected ";
-		else
-			$sel = '';
-
 		$url = $_SERVER['PHP_SELF']."?stg_kz=$stg_kz";
 		$url .= "&semester=$semester";
 		$url .= "&semesterv=$semesterv";
@@ -453,7 +461,7 @@ if (isset($ss_arr) && is_array($ss_arr))
 		$url .= "&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt";
 		$url .= "&studiensemester_kurzbz_zk=$studiensemester_kurzbz_zk";
 
-		$outp .= "<option value='".$sts."' ".$sel."onclick=\"window.location.href = '".$url."'\">".$sts."</option>";
+		$outp .= "<option value='" .$url ."' " . ($studiensemester_kurzbz == $sts ? 'selected' : '') . ">".$sts."</option>";
 	}
 }
 $outp .= "		</select>
@@ -493,17 +501,12 @@ $outp .= '
 </tr>
 <tr>
 	<td>Ausgangs-Studiensemester:</td>
-	<td><select name="studiensemester_kurzbz_akt">';
+	<td><select name="studiensemester_kurzbz_akt" onchange="document.location.href=this.value">';
 
 if (isset($ss_arr) && is_array($ss_arr))
 {
 	foreach ($ss_arr as $sts2)
 	{
-		if ($studiensemester_kurzbz_akt == $sts2)
-			$sel2 = " selected ";
-		else
-			$sel2 = '';
-
 		$url = $_SERVER['PHP_SELF']."?stg_kz=$stg_kz";
 		$url .= "&semester=$semester";
 		$url .= "&semesterv=$semesterv";
@@ -511,7 +514,7 @@ if (isset($ss_arr) && is_array($ss_arr))
 		$url .= "&studiensemester_kurzbz_akt=$sts2";
 		$url .= "&studiensemester_kurzb_zk=$studiensemester_kurzbz_zk";
 
-		$outp .= "<option value='".$sts2."' ".$sel2."onclick=\"window.location.href = '".$url."'\">".$sts2."</option>";
+		$outp .= "<option value='".$url ."' " . ($studiensemester_kurzbz_akt == $sts2 ? 'selected' : '') . ">".$sts2."</option>";
 	}
 }
 $outp .= "		</select>
@@ -547,7 +550,7 @@ $outp .=  '<A href="'.$url.'">alle</A> --
 $outp .= "
 <tr>
 	<td>Ziel-Studiensemester:</td>
-	<td><select name='studiensemester_kurzbz_zk'>\n";
+	<td><select name='studiensemester_kurzbz_zk' onchange='document.location.href=this.value'>\n";
 
 if (isset($ss_arr) && is_array($ss_arr))
 {
@@ -565,7 +568,7 @@ if (isset($ss_arr) && is_array($ss_arr))
 		$url .= "&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt";
 		$url .= "&studiensemester_kurzbz_zk=$sts3";
 
-		$outp .= "<option value='".$sts3."' ".$sel3."onclick=\"window.location.href = '".$url."'\">".$sts3."</option>";
+		$outp .= "<option value='" .$url ."' " . ($studiensemester_kurzbz_zk == $sts3 ? 'selected' : '') . ">".$sts3."</option>";
 	}
 }
 $outp .= "		</select>\n
@@ -617,11 +620,12 @@ if ($result_std != 0)
 		$row = $db->db_fetch_object($result_std, $i);
 		$qry_status = "
 			SELECT
-				status_kurzbz, ausbildungssemester, tbl_studienplan.studienplan_id, tbl_studienplan.bezeichnung
+				tbl_prestudentstatus.status_kurzbz, statusgrund_kurzbz, ausbildungssemester, tbl_studienplan.studienplan_id, tbl_studienplan.bezeichnung
 			FROM
 				public.tbl_prestudentstatus
 				JOIN public.tbl_prestudent USING(prestudent_id)
 				LEFT JOIN lehre.tbl_studienplan USING(studienplan_id)
+				LEFT JOIN public.tbl_status_grund USING (statusgrund_id)
 			WHERE
 				person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)."
 				AND studiengang_kz=".$db->db_add_param($row->studiengang_kz, FHC_INTEGER)."
@@ -638,6 +642,7 @@ if ($result_std != 0)
 			if ($row_status = $db->db_fetch_object($result_status))
 			{
 				$status_kurzbz = $row_status->status_kurzbz;
+				$statusgrund_kurzbz = $row_status->statusgrund_kurzbz;
 				$ausbildungssemester = $row_status->ausbildungssemester;
 				$studienplan_id = $row_status->studienplan_id;
 				$studienplan_bezeichnung = $row_status->bezeichnung;

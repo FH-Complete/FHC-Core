@@ -25,7 +25,7 @@
                 </a>
             </h4>
         </div>
-        <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
+        <div id="collapseZero" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingZero">
             <div class="panel-body">
 	            <?php echo $this->p->t('anrechnung', 'reviewAnrechnungInfoAntragVoraussetungenBody'); ?>
             </div>

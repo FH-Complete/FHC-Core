@@ -62,6 +62,15 @@ $config['navigation_header'] = array(
 						'lehre/lehrauftrag_bestellen:r',
 						'lehre/lehrauftrag_erteilen:r'
 					)
+				),
+				'zgvueberpruefung' => array(
+					'link' => site_url('system/infocenter/ZGVUeberpruefung'),
+					'description' => 'ZGV Überprüfung',
+					'expand' => true,
+					'sort' => 50,
+					'requiredPermissions' => array(
+						'lehre/zgvpruefung:r'
+					)
 				)
 			)
 		),

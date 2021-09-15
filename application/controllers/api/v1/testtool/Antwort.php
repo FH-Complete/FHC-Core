@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Antwort extends APIv1_Controller
+class Antwort extends API_Controller
 {
 	/**
 	 * Antwort API constructor.

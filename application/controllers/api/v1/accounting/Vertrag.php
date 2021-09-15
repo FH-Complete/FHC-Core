@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vertrag extends APIv1_Controller
+class Vertrag extends API_Controller
 {
 	/**
 	 * Vertrag API constructor.

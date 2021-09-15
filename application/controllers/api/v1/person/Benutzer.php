@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Benutzer extends APIv1_Controller
+class Benutzer extends API_Controller
 {
 	/**
 	 * Benutzer API constructor.

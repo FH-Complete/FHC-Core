@@ -33,11 +33,13 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "ZGVNation"},
+					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [
@@ -66,11 +68,13 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "ZGVNation"},
+					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [
@@ -105,9 +109,11 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "ZGVNation"},
+					{"name": "ZGVMNation"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
@@ -140,8 +146,10 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "ZGVNation"},
+					{"name": "ZGVMNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
@@ -180,10 +188,12 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "ZGVNation"},
+					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [
@@ -218,8 +228,10 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "ZGVNation"},
+					{"name": "ZGVMNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
@@ -266,6 +278,7 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "Statusgrund"}
 				],
@@ -302,6 +315,7 @@ $filters = array(
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
 					{"name": "Statusgrund"},
 					{"name": "Studiensemester"},
@@ -383,6 +397,7 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
+					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"}
 				],
 				"filters": [
@@ -395,6 +410,61 @@ $filters = array(
 					{
 						"name": "ReihungstestAngetreten",
 						"operation": "true"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'zgvUeberpruefung',
+		'filter_kurzbz' => 'zgvOffen',
+		'description' => '{ZGV Überprüfung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Zgv Überprüfung",
+				"columns": [
+					{"name": "PreStudentID"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"}
+				],
+				"filters": [
+					{
+						"name": "Status",
+						"condition": "stg",
+						"operation": "contains"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'zgvUeberpruefung',
+		'filter_kurzbz' => 'zgvRest',
+		'description' => '{ZGV abgeschlossen}',
+		'sort' => 2,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Zgv abgeschlossen",
+				"columns": [
+					{"name": "PreStudentID"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"},
+					{"name": "Status"}
+				],
+				"filters": [
+					{
+						"name": "Status",
+						"condition": "stg",
+						"operation": "ncontains"
 					}
 				]
 			}

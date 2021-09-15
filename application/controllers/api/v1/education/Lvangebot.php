@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lvangebot extends APIv1_Controller
+class Lvangebot extends API_Controller
 {
 	/**
 	 * Lvangebot API constructor.

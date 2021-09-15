@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class UDF extends APIv1_Controller
+class UDF extends API_Controller
 {
 	/**
 	 * UDF API constructor.

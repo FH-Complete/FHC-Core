@@ -164,7 +164,7 @@ class konto extends basis_db
 			return false;
 		}
 
-		if(!is_numeric($this->mahnspanne))
+		if($this->mahnspanne!='' && !is_numeric($this->mahnspanne))
 		{
 			$this->errormsg = "Die Mahnspanne muss eine gueltige Zahl sein";
 			return false;

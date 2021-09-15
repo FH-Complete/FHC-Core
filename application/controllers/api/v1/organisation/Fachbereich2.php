@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Fachbereich2 extends APIv1_Controller
+class Fachbereich2 extends API_Controller
 {
 	/**
 	 * Fachbereich API constructor.

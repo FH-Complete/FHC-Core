@@ -17,7 +17,8 @@ if (defined('LDAP_SERVER')) // 1st LDAP server
 		'basedn'	=> LDAP_BASE_DN,
 		'username'	=> LDAP_BIND_USER,
 		'password'	=> LDAP_BIND_PASSWORD,
-		'usf'		=> LDAP_USER_SEARCH_FILTER
+		'usf'		=> LDAP_USER_SEARCH_FILTER,
+		'timeout'	=> 1
 	);
 }
 
@@ -30,7 +31,8 @@ if (defined('LDAP2_SERVER')) // 2nd LDAP server
 		'basedn'	=> LDAP2_BASE_DN,
 		'username'	=> LDAP2_BIND_USER,
 		'password'	=> LDAP2_BIND_PASSWORD,
-		'usf'		=> LDAP2_USER_SEARCH_FILTER
+		'usf'		=> LDAP2_USER_SEARCH_FILTER,
+		'timeout'	=> 1
 	);
 }
 
@@ -45,7 +47,8 @@ if (defined('LDAP_SERVER')) // 1st LDAP server
 		'basedn'	=> LDAP_BASE_DN,
 		'username'	=> LDAP_BIND_USER,
 		'password'	=> LDAP_BIND_PASSWORD,
-		'usf'		=> LDAP_USER_SEARCH_FILTER
+		'usf'		=> LDAP_USER_SEARCH_FILTER,
+		'timeout'	=> 1
 	);
 }
 
@@ -58,6 +61,8 @@ if (defined('LDAP2_SERVER')) // 2nd LDAP server
 		'basedn'	=> LDAP2_BASE_DN,
 		'username'	=> LDAP2_BIND_USER,
 		'password'	=> LDAP2_BIND_PASSWORD,
-		'usf'		=> LDAP2_USER_SEARCH_FILTER
+		'usf'		=> LDAP2_USER_SEARCH_FILTER,
+		'timeout'	=> 1
 	);
 }
+

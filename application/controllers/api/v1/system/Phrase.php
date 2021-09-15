@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Phrase extends APIv1_Controller
+class Phrase extends API_Controller
 {
 	/**
 	 * Phrase API constructor.

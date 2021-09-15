@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studentlehrverband extends APIv1_Controller
+class Studentlehrverband extends API_Controller
 {
 	/**
 	 * Studentlehrverband API constructor.
