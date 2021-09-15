@@ -28,10 +28,10 @@ Datei wird eingelesen und in die DB gespeichert.
 */
 
 require_once('../../config/system.config.inc.php');
-require_once(DOC_ROOT.'include/functions.inc.php');
-require_once(DOC_ROOT.'include/benutzerberechtigung.class.php');
-require_once(DOC_ROOT.'include/gemeinde.class.php');
-require_once(DOC_ROOT.'include/benutzerberechtigung.class.php');
+require_once(dirname(__FILE__).'/../../include/functions.inc.php');
+require_once(dirname(__FILE__).'/../../include/benutzerberechtigung.class.php');
+require_once(dirname(__FILE__).'/../../include/gemeinde.class.php');
+require_once(dirname(__FILE__).'/../../include/benutzerberechtigung.class.php');
 
 
 $user = get_uid();
@@ -55,13 +55,13 @@ if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
 	}
 
 	foreach ($data as $gemeinde_details) {
-		
+
 		//Wenn nicht gültig dann überspringen
 		if ($gemeinde_details['Gültig'] == 'Nein')  continue;
-		
+
 		//es können mehrere plz in einer zeile stehen
 		$plzs = explode(' ', trim($gemeinde_details['PLZ']));
-   
+
 		foreach ($plzs as $plz) {
 			$tmp_obj_gemeinde = null;
 			$tmp_obj_gemeinde = new gemeinde();
@@ -72,7 +72,7 @@ if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
 			$tmp_obj_gemeinde->bulacode = $gemeinde_details['BULA_Code'];
 			$tmp_obj_gemeinde->bulabez = $gemeinde_details['BULA_Bez'];
 			$tmp_obj_gemeinde->kennziffer = $gemeinde_details['Gemeindekennziffer'];
-			
+
 			//print_r($tmp_obj_gemeinde);
 			$tmp_obj_gemeinde->save();
 			$tmp_gemeinde_ar[] = $tmp_obj_gemeinde;
@@ -156,9 +156,9 @@ if(isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0) {
 		<hr>
 		<div>
 			<pre>
-				<?php 
+				<?php
 					if ($tmp_gemeinde_ar) {
-						print_r($tmp_gemeinde_ar); 
+						print_r($tmp_gemeinde_ar);
 					}
 				?>
 			</pre>
