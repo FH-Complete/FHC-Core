@@ -9,6 +9,20 @@ const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 const COLOR_LIGHTGREY = "#f5f5f5";
 
+// -----------------------------------------------------------------------------------------------------------------
+// Mutators - setter methods to manipulate table data when entering the tabulator
+// -----------------------------------------------------------------------------------------------------------------
+
+// Converts string date postgre style to string DD.MM.YYYY.
+// This will allow correct filtering.
+var mut_formatStringDate = function(value, data, type, params, component) {
+    if (value != null)
+    {
+        var d = new Date(value);
+        return ("0" + (d.getDate())).slice(-2)  + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + d.getFullYear();
+    }
+}
+
 // TABULATOR FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 // Returns relative height (depending on screen size)
@@ -36,6 +50,7 @@ function hf_filterTrueFalse(headerValue, rowValue){
 }
 
 // Adds column details
+// Sets focus on filterbutton, if table starts with stored filter.
 function func_tableBuilt(table) {
     table.addColumn(
         {
@@ -49,10 +64,16 @@ function func_tableBuilt(table) {
                 url:function(cell){
                     return  BASE_URL + "/" + APPROVE_ANRECHNUNG_DETAIL_URI + "?anrechnung_id=" + cell.getData().anrechnung_id
                 },
-                // target:"_blank"
+                target:"_blank"
             }
         }, false, "status"  // place column after status
     );
+
+    // Set focus on filterbutton
+    let filters = table.getFilters();
+    if (filters.length > 0){
+        approveAnrechnung.focusFilterbuttonIfTableStartsWithStoredFilter(filters);
+    }
 }
 
 // Formats the rows
@@ -156,6 +177,26 @@ $(function(){
         );
     });
 
+    // Show only rows that are in progress by lector
+    $("#show-inProgressLektor").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR},
+                {field: 'empfehlung_anrechnung', type: '=', value: null}
+            ]
+        );
+    });
+
+    // Show only rows with empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
+    $("#show-recommended").click(function(){
+        $('#tableWidgetTabulator').tabulator('setFilter',
+            [
+                {field: 'status_kurzbz', type: '=', value: ANRECHNUNGSTATUS_PROGRESSED_BY_STGL},
+                {field: 'empfehlung_anrechnung', type: '=', value: 'true'}
+            ]
+        );
+    });
+
     // Show only rows with nicht empfohlene + noch nicht genehmigte/abgelehnte anrechnungen
     $("#show-not-recommended").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter', [
@@ -205,13 +246,21 @@ $(function(){
         if (genehmigung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
-            genehmigung_panel.slideDown('slow');
+            genehmigung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: genehmigung_panel.offset().top // Move genehmigung panel bottom up to be visible within window screen
+                }, 400);
+            });
+
             return;
         }
     });
 
     // Approve Anrechnungen
-    $("#approveAnrechnungUebersicht-approve-anrechnungen-confirm").click(function(){
+    $("#approveAnrechnungUebersicht-approve-anrechnungen-confirm").click(function(e){
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
@@ -274,13 +323,21 @@ $(function(){
         if (begruendung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
-            begruendung_panel.slideDown('slow');
+            begruendung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: begruendung_panel.offset().top // Move begruendung panel bottom up to be visible within window screen
+                }, 400);
+            });
+
             return;
         }
     });
 
     // Reject Anrechnungen
-    $("#approveAnrechnungUebersicht-reject-anrechnungen-confirm").click(function(){
+    $("#approveAnrechnungUebersicht-reject-anrechnungen-confirm").click(function(e){
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         let begruendung = $('#approveAnrechnungUebersicht-begruendung').val();
 
@@ -309,9 +366,6 @@ $(function(){
             FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteMindEinenAntragWaehlen"));
             return;
         }
-
-        // Avoid form redirecting automatically
-        event.preventDefault();
 
         // Prepare data object for ajax call
         let data = {
@@ -352,6 +406,7 @@ $(function(){
 
     // Request Recommendation for Anrechnungen
     $("#approveAnrechnungUebersicht-request-recommendation").click(function(){
+
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
 
@@ -398,12 +453,23 @@ $(function(){
 
                     if (!data.error && data.retval != null)
                     {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
-
-                        // Print success message
-                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
+                        // Print info message, if not all selected recommendations were requested
+                        if (data.retval.length < selected_data.length){
+                            FHC_DialogLib.alertInfo(
+                                FHC_PhrasesLib.t(
+                                    "ui", "empfehlungWurdeAngefordertAusnahmeWoKeineLektoren",
+                                    [selected_data.length, data.retval.length, selected_data.length - data.retval.length])
+                            );
+                        }
+                        else
+                        {
+                            // Print success message
+                            FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
+                        }
                     }
+
+                    //Update status 'genehmigt'
+                    $('#tableWidgetTabulator').tabulator('updateData', data.retval);
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
@@ -421,7 +487,7 @@ $(function(){
 
     // Break Ablehnung abgeben
     $('#approveAnrechnungUebersicht-begruendung-abbrechen').click(function(){
-        $('#approveAnrechnungUebersicht-begruendung').val('');
+
         begruendung_panel.slideUp('slow');
 
     })
@@ -458,5 +524,40 @@ var approveAnrechnung = {
 
         // Copy begruendung into textarea
         textarea.val($.trim($(elem).parent().text()));
+    },
+    focusFilterbuttonIfTableStartsWithStoredFilter(filters){
+        switch (filters[0].value) {
+            case ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR:
+                $("#show-inProgressLektor").addClass('active');
+                break;
+            case ANRECHNUNGSTATUS_APPROVED:
+                $("#show-approved").addClass('active');
+                break;
+            case ANRECHNUNGSTATUS_REJECTED:
+                $("#show-rejected").addClass('active');
+                break;
+            case ANRECHNUNGSTATUS_PROGRESSED_BY_STGL:
+                if (filters.length > 1)
+                {
+                    if (filters[1].field == 'empfehlung_anrechnung')
+                    {
+                        if (filters[1].value === 'true')
+                        {
+                            $("#show-recommended").addClass('active');
+                        }
+                        else
+                        {
+                            $("#show-not-recommended").addClass('active');
+                        }
+                    }
+                }
+                else
+                {
+                    $("#show-inProgressDP").addClass('active');
+                }
+
+                break;
+
+        }
     }
 }

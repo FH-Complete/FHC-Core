@@ -532,6 +532,46 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue'
 	}
 }
 
+// Note "intern angerechnet" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'iar' AND (bezeichnung = 'intern angerechnet' OR bezeichnung = 'Intern angerechnet');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			INSERT INTO
+				lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre, offiziell, bezeichnung_mehrsprachig, lkt_ueberschreibbar)
+			VALUES(
+				(SELECT max(note)+1 FROM lehre.tbl_note),'intern angerechnet', 'iar', NULL, TRUE, NULL, TRUE, FALSE, FALSE, '{\"intern angerechnet\",\"internally credited\"}', FALSE
+			);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Note intern angerechnet hinzugefuegt!<br>';
+	}
+}
+
+// Note "nicht zugelassen" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'nz' AND (bezeichnung = 'nicht zugelassen' OR bezeichnung = 'Nicht zugelassen');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			INSERT INTO
+				lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre, offiziell, bezeichnung_mehrsprachig, lkt_ueberschreibbar)
+			VALUES(
+				(SELECT max(note)+1 FROM lehre.tbl_note), 'nicht zugelassen', 'nz', NULL, TRUE, NULL, TRUE, FALSE, FALSE, '{\"nicht zugelassen\",\"not admitted\"}', FALSE
+			);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Note nicht zugelassen hinzugefuegt!<br>';
+	}
+}
+
 // Spalte offiziell in lehre.tbl_note
 if(!$result = @$db->db_query("SELECT offiziell FROM lehre.tbl_note LIMIT 1;"))
 {
@@ -4637,7 +4677,7 @@ if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie_gruppe WHER
 	}
 }
 
-// Add table anrechnung_status
+// Add table anrechnungstatus
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"))
 {
 	$qry = "
@@ -4663,42 +4703,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"
 		echo '<strong>lehre.tbl_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' lehre.tbl_anrechnungstatus: Tabelle hinzugefuegt<br>';
-}
-
-// GRANT INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;
-$qry = 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE lehre.tbl_anrechnungstatus TO web;';
-if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_anrechnungstatus '.$db->db_last_error().'</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_anrechnungstatus';
-
-
-// SEQUENCE seq_anrechnungstatus_status_kurzbz
-if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'seq_anrechnungstatus_status_kurzbz'"))
-{
-	if ($db->db_num_rows($result) == 0)
-	{
-		$qry = '
-			CREATE SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz
-			START WITH 1
-			INCREMENT BY 1
-			NO MAXVALUE
-			NO MINVALUE
-			CACHE 1;
-			';
-
-		if(!$db->db_query($qry))
-			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Created sequence: lehre.seq_anrechnungstatus_status_kurzbz';
-
-		// GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_anrechnungstatus_status_kurzbz_seq to web;
-		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE lehre.seq_anrechnungstatus_status_kurzbz TO web;';
-		if (!$db->db_query($qry))
-			echo '<strong>lehre.seq_anrechnungstatus_status_kurzbz '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.seq_anrechnungstatus_status_kurzbz';
-	}
 }
 
 // Add table anrechnung_anrechnungstatus
@@ -4730,9 +4734,10 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 
 		INSERT INTO lehre.tbl_anrechnung_anrechnungstatus(anrechnung_id, status_kurzbz) SELECT anrechnung_id, 'approved' as status_kurzbz FROM lehre.tbl_anrechnung WHERE genehmigt_von is not null;
 
-		GRANT SELECT ON lehre.tbl_anrechnung_anrechnungstatus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO vilesci;
 		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO vilesci;
+		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO web;
 	";
 
 	if(!$db->db_query($qry))
@@ -4796,6 +4801,19 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Add permission to create Anrechnung
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/anrechnung_anlegen';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/anrechnung_anlegen', 'Anrechnung anlegen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/anrechnung_anlegen<br>';
+	}
+}
 
 // INSERT,DELETE,UPDATE Berechtigung für tbl_dokumentprestudent hinzufügen
 if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_dokumentprestudent' AND table_schema='public' AND grantee='web' AND privilege_type in ('INSERT','DELETE','UPDATE')"))
@@ -4851,7 +4869,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefung LIMIT 1;"))
 			updatevon character varying(32)
 		);
 
-		CREATE SEQUENCE public.tbl_zgvpruefung_id_seq 
+		CREATE SEQUENCE public.tbl_zgvpruefung_id_seq
 			INCREMENT BY 1
 			NO MAXVALUE
 			NO MINVALUE
@@ -4863,7 +4881,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefung LIMIT 1;"))
 		GRANT SELECT, UPDATE ON public.tbl_zgvpruefung_id_seq  TO vilesci;
 		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_zgvpruefung TO vilesci;
 		GRANT SELECT ON public.tbl_zgvpruefung TO web;
-		
+
 	";
 
 	if(!$db->db_query($qry))
@@ -4884,7 +4902,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status 
 			datum timestamp without time zone DEFAULT now()
 		);
 
-		CREATE SEQUENCE public.tbl_zgvpruefungstatus_status_id_seq 
+		CREATE SEQUENCE public.tbl_zgvpruefungstatus_status_id_seq
 			INCREMENT BY 1
 			NO MAXVALUE
 			NO MINVALUE
@@ -4906,7 +4924,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status 
 		echo ' public.tbl_zgvpruefungstatus_status: Tabelle hinzugefuegt<br>';
 }
 
-
 // Add index to system.tbl_log
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruefung_student_uid'"))
 {
@@ -4920,7 +4937,6 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruef
 			echo 'Index fuer lehre.pruefung.student_uid hinzugefuegt<br>';
 	}
 }
-
 // Added Buchungstyp "ZuschussIO"
 if ($result = @$db->db_query("SELECT 1 FROM public.tbl_buchungstyp WHERE buchungstyp_kurzbz = 'ZuschussIO';"))
 {
@@ -4932,6 +4948,18 @@ if ($result = @$db->db_query("SELECT 1 FROM public.tbl_buchungstyp WHERE buchung
 		else
 			echo ' public.tbl_buchungstyp: Added buchungstyp "ZuschussIO" <br>';
 	}
+}
+//Add Column statusgrund_kurzbz to public.tbl_status_grund
+if(!@$db->db_query("SELECT statusgrund_kurzbz FROM public.tbl_status_grund LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_status_grund ADD COLUMN statusgrund_kurzbz varchar(32);
+			ALTER TABLE public.tbl_status_grund ADD CONSTRAINT uk_tbl_statusgrund_kurzbz UNIQUE (statusgrund_kurzbz);
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_status_grund '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte statusgrund_kurzbz zu Tabelle public.tbl_status_grund hinzugefügt';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -5153,7 +5181,7 @@ $tabellen=array(
 	"public.tbl_rt_person" => array("rt_person_id","person_id","rt_id","studienplan_id","anmeldedatum","teilgenommen","ort_kurzbz","punkte","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_rt_studienplan" => array("reihungstest_id","studienplan_id"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
-	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung"),
+	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung","statusgrund_kurzbz"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id","design_uid","betrieb_uid","operativ_uid","servicekategorie_kurzbz"),
 	"public.tbl_servicekategorie" => array("servicekategorie_kurzbz", "bezeichnung","sort"),

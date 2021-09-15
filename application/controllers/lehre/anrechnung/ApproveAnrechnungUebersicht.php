@@ -62,25 +62,19 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	
 	public function index()
 	{
+		// Get study semester
 		$studiensemester_kurzbz = $this->input->get('studiensemester');
 		
-		// Retrieve studiengaenge the user is entitled for
+		if (isEmptyString($studiensemester_kurzbz))
+		{
+			$result = $this->StudiensemesterModel->getNearest();
+			$studiensemester_kurzbz = getData($result)[0]->studiensemester_kurzbz;
+		}
+		
+		// Get studiengaenge the user is entitled for
 		if (!$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN))
 		{
 			show_error(getError($studiengang_kz_arr));
-		}
-		
-		if (!is_string($studiensemester_kurzbz))
-		{
-			$studiensemester = $this->StudiensemesterModel->getNearest();
-			if (hasData($studiensemester))
-			{
-				$studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;
-			}
-			elseif (isError($studiensemester))
-			{
-				show_error(getError($studiensemester));
-			}
 		}
 		
 		$viewData = array(
@@ -98,33 +92,22 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	{
 		$data = $this->input->post('data');
 
-		if(isEmptyArray($data))
+		// Validate data
+		if (isEmptyArray($data))
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 		
-		// Get statusbezeichnung for 'approved'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$approved = getData($this->AnrechnungstatusModel->load('approved'))[0];
-		$approved = getUserLanguage() == 'German'
-			? $approved->bezeichnung_mehrsprachig[0]
-			: $approved->bezeichnung_mehrsprachig[1];
-
+		// Approve Anrechnung
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if(getData($this->anrechnunglib->approveAnrechnung($item['anrechnung_id'])))
+			if ($this->anrechnunglib->approveAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
-					'status_bezeichnung' => $approved
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_APPROVED)
 				);
-				
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_APPROVED))
-				{
-					show_error('Failed sending mail');
-				}
 			}
 		}
 		
@@ -146,33 +129,22 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	{
 		$data = $this->input->post('data');
 		
-		if(isEmptyArray($data))
+		// Validate data
+		if (isEmptyArray($data))
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 		
-		// Get statusbezeichnung for 'rejected'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$rejected = getData($this->AnrechnungstatusModel->load('rejected'))[0];
-		$rejected = getUserLanguage() == 'German'
-			? $rejected->bezeichnung_mehrsprachig[0]
-			: $rejected->bezeichnung_mehrsprachig[1];
-		
+		// Reject Anrechnung
 		foreach ($data as $item)
 		{
-			// Reject Anrechnung
-			if(getData($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung'])))
+			if ($this->anrechnunglib->rejectAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_REJECTED,
-					'status_bezeichnung' => $rejected
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_REJECTED)
 				);
-				
-				if(!$this->_sendSanchoMailToStudent($item['anrechnung_id'], self::ANRECHNUNGSTATUS_REJECTED))
-				{
-					show_error('Failed sending mail');
-				}
 			}
 		}
 		
@@ -199,46 +171,59 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 		
-		// Get statusbezeichnung for 'inProgressLektor'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressLektor = getData($this->AnrechnungstatusModel->load('inProgressLektor'))[0];
-		$inProgressLektor = getUserLanguage() == 'German'
-			? $inProgressLektor->bezeichnung_mehrsprachig[0]
-			: $inProgressLektor->bezeichnung_mehrsprachig[1];
+		$retval = array();
+		$counter = 0;
 		
 		foreach ($data as $item)
 		{
-			// Approve Anrechnung
-			if(getData($this->anrechnunglib->requestRecommendation($item['anrechnung_id'])))
+			// Check if Anrechnungs-LV has lector
+			if (!$this->anrechnunglib->LVhasLector($item['anrechnung_id']))
 			{
-				$json[]= array(
+				// Count up LV with no lector
+				$counter++;
+				
+				// Continue loop, if LV has no lector
+				continue;
+			}
+
+			// Request Recommendation
+			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
+			{
+				// Get full name of LV Leitung.
+				// If LV Leitung is not present, get full name of LV lectors.
+				$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
+				$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
+					? implode(', ', array_column($lector_arr, 'fullname'))
+					: '';
+				
+				$retval[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
-					'status_bezeichnung' => $inProgressLektor,
-					'empfehlung_anrechnung' => null
+					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
+					'empfehlung_anrechnung' => null,
+					'empfehlungsanfrageAm' => (new DateTime())->format('Y-m-d H:i:s'),
+					'empfehlungsanfrageAn' => $empfehlungsanfrage_an
 				);
 			}
 		}
 		
-		// Output json to ajax
-		if (isset($json) && !isEmptyArray($json))
+		/**
+		 * Send mails to lectors
+		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
+		 * even if they are required for more recommendations
+		 * */
+		if (!isEmptyArray($retval))
 		{
-			/**
-			 * Send mails to lectors
-			 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
-			 * even if they are required for more recommendations
-			 * */
-			if (!$this->_sendSanchoMailToLectors($json))
-			{
-				show_error('Failed sending emails');
-			}
-			
-			return $this->outputJsonSuccess($json);
+			self::_sendSanchoMailToLectors($retval);
 		}
-		else
+		
+		// Output json to ajax
+		if (isEmptyArray($retval) && $counter == 0)
 		{
 			return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
 		}
+		
+		return $this->outputJsonSuccess($retval);
 	}
 	
 	/**
@@ -256,7 +241,11 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Check if user is entitled to read dms doc
 		self::_checkIfEntitledToReadDMSDoc($dms_id);
 		
-		$this->dmslib->download($dms_id);
+		// Set filename to be used on downlaod
+		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
+		
+		// Download file
+		$this->dmslib->download($dms_id, $filename);
 	}
 	
 	
@@ -305,41 +294,6 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 		
 		show_error('You are not entitled to read this document');
-	}
-	
-	/**
-	 * Send mail to student to inform if Anrechnung was approved or rejected
-	 * @param $mail_params
-	 */
-	private function _sendSanchoMailToStudent($anrechnung_id, $status_kurzbz)
-	{
-		$result = getData($this->anrechnunglib->getStudentData($anrechnung_id))[0];
-		
-		// Get student name and mail address
-		$to = $result->uid. '@'. DOMAIN;
-		
-		$anrede = $result->geschlecht == 'w' ? 'Sehr geehrte Frau ' : 'Sehr geehrter Herr ';
-		
-		$text = $status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED
-			? 'Ihrem Antrag auf Anerkennung nachgewiesener Kenntnisse der Lehrveranstaltung "'.
-			$result->lv_bezeichnung. '" wurde stattgegeben.'
-			: 'wir haben Ihren Antrag auf Anerkennung nachgewiesener Kenntnisse geprüft und können die Lehrveranstaltung "'.
-			$result->lv_bezeichnung. '" leider nicht anrechnen, weil die Gleichwertigkeit nicht festgestellt werden konnte.';
-		
-		// Prepare mail content
-		$body_fields = array(
-			'anrede_name'   => $anrede. $result->vorname. ' '. $result->nachname,
-			'text'          => $text
-		);
-		
-		sendSanchoMail(
-			'AnrechnungGenehmigen',
-			$body_fields,
-			$to,
-			'Anerkennung nachgewiesener Kenntnisse: Ihr Antrag ist abgeschlossen'
-		);
-		
-		return true;
 	}
 	
 	/**
@@ -456,6 +410,5 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		$lector_arr = array_unique($lector_arr, SORT_REGULAR);
 		
 		return $lector_arr;
-		
 	}
 }
