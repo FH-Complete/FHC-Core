@@ -289,7 +289,8 @@ else
 			</grid>
 			<hbox>
 			<spacer flex="1" />
-			<button id="funktion-button-speichern" oncommand="FunktionDetailSpeichern()" label="Speichern" disabled="true"/>
+			<button id="funktion-button-kopiespeichern" oncommand="FunktionDetailSpeichern(true)" label="Als Kopie speichern" disabled="true"/>
+			<button id="funktion-button-speichern" oncommand="FunktionDetailSpeichern(false)" label="Speichern" disabled="true"/>
 		</hbox>
 		</groupbox>
 		<spacer/>

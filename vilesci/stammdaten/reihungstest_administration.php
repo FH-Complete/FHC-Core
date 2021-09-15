@@ -330,7 +330,7 @@ if($result = $db->db_query($qry))
 	}
 	echo '</SELECT>';
 }
-
+echo '&nbsp;&nbsp;<input type="checkbox" name="deletePruefling">&nbsp;Auch Prüfling löschen&nbsp;&nbsp;';
 echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value="Dieses Teilgebiet l&ouml;schen" name="deleteteilgebiet" onclick="return confirm(\'Antworten dieses Gebietes wirklich löschen?\')">&nbsp;&nbsp;&nbsp;&nbsp;';
 if(isset($_POST['deleteteilgebiet']))
 {
@@ -525,6 +525,57 @@ if(isset($_POST['delete_all']))
 		{
 			$db->errormsg = 'Fehler beim Loeschen der Daten';
 			$db->db_query('ROLLBACK');
+		}
+
+		// Wenn Option angeklickt ist, auch den Prüfling löschen
+		if (isset($_POST['deletePruefling']) && $_POST['deletePruefling'] == 'on')
+		{
+			$qry = "SELECT * FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param($_POST['prestudent']).";
+				";
+
+			if($db->db_query($qry))
+			{
+				while($row = $db->db_fetch_object())
+				{
+					$undo=" INSERT INTO testtool.tbl_pruefling(pruefling_id, studiengang_kz, idnachweis, registriert, prestudent_id, semester) VALUES (".
+						$db->db_add_param($row->pruefling_id, FHC_INTEGER).', '.
+						$db->db_add_param($row->studiengang_kz, FHC_INTEGER).', '.
+						$db->db_add_param($row->idnachweis).', '.
+						$db->db_add_param($row->registriert).', '.
+						$db->db_add_param($row->prestudent_id, FHC_INTEGER).', '.
+						$db->db_add_param($row->semester, FHC_INTEGER).');';
+				}
+			}
+			else
+			{
+				$db->errormsg = 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_pruefling';
+				$db->db_query('ROLLBACK');
+				return false;
+			}
+			$qry = "DELETE FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param($_POST['prestudent']).";";
+
+			if($result = $db->db_query($qry))
+			{
+				//Log schreiben
+				$log = new log();
+
+				$log->new = true;
+				$log->sql = $qry;
+				$log->sqlundo = $undo;
+				$log->executetime = date('Y-m-d H:i:s');
+				$log->mitarbeiter_uid = $user;
+				$log->beschreibung = "Prüfling von Prestudent ".$_POST['prestudent']." geloescht";
+
+				if(!$log->save())
+				{
+					$db->errormsg = 'Fehler beim Schreiben des Log-Eintrages';
+					$db->db_query('ROLLBACK');
+					return false;
+				}
+
+				$db->db_query('COMMIT;');
+				echo '<br/><b> Prüfling wurde gelöscht</b>';
+			}
 		}
 	}
 	else

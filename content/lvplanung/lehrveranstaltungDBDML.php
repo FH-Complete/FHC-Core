@@ -402,6 +402,20 @@ if(!$error)
 							}
 						}
 					}
+
+					//Pruefen, ob Benutzer inaktiv ist. Wenn ja, eine Warnung ausgeben
+					$benutzerAktiv = false;
+					if(!$error)
+					{
+						$benutzer = new benutzer($lem->mitarbeiter_uid);
+						$benutzerAktiv = $benutzer->bnaktiv;
+						if (!$benutzerAktiv)
+						{
+							$return = true;
+							$warnung = true;
+							$errormsg = "Achtung: Der/Die Benutzer*in ist inaktiv!\nBitte informieren Sie die Personalbteilung.\n\nDaten wurden gespeichert.\n\n";
+						}
+					}
 				}
 
 				if(!$error)
