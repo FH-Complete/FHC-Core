@@ -942,7 +942,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 											}
 											else
 											{
-												echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$p->t("zeitaufzeichnung/homeofficeNichtErlaubt", ($vonCSV)) .'</b></span><br>';
+												echo '<span style="color:orange"><b>'.$p->t("zeitaufzeichnung/homeofficeNichtErlaubt", ($vonCSV)) .'</b></span><br>';
 
 												$zeit->homeoffice = false;
 											}
