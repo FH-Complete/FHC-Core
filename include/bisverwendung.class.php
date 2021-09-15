@@ -273,7 +273,8 @@ class bisverwendung extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode,
 					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden,
-					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig, azgrelevant) VALUES (".
+					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig,
+					azgrelevant, homeoffice) VALUES (".
 			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
