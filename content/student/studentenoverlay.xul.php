@@ -129,7 +129,9 @@ else
 
 										if ($id == 'student-toolbar-student')
 											echo '<menuitem label="Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Status ändern auf Student"/>';
-
+										if ($id == 'interessent-toolbar-zustudent')
+											echo '<menuitem label="Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Status ändern auf Student"/>';
+										
 										foreach($gruende[$status_kurzbz] as $row)
 										{
 											$commandWithID = str_replace('STATUSGRUNDID',$row['statusgrund_id'],$command);
@@ -213,7 +215,7 @@ else
 										<?php
 										$statusgrund = new statusgrund();
 										$statusgrund->getAll(true);
-										
+
 										foreach($statusgrund->result as $row)
 										{
 										?>
