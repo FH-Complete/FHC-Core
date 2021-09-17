@@ -142,7 +142,7 @@ class statistik extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
-				$obj->udpatevon = $row->updatevon;
+				$obj->updatevon = $row->updatevon;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$obj->preferences = $row->preferences;
 
