@@ -1355,7 +1355,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_verarbeitungstaetigkeit"
 }
 
 // system.tbl_log.taetigkeit_kurzbz
-if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
+if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log LIMIT 1"))
 {
 	$qry = "
 	ALTER TABLE system.tbl_log ADD COLUMN taetigkeit_kurzbz varchar(32);
@@ -4960,6 +4960,20 @@ if(!@$db->db_query("SELECT statusgrund_kurzbz FROM public.tbl_status_grund LIMIT
 		echo '<strong>public.tbl_status_grund '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Neue Spalte statusgrund_kurzbz zu Tabelle public.tbl_status_grund hinzugefügt';
+}
+
+
+// INDEX idx_anrechnung_anrechnung_status_anrechnung_id
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'idx_anrechnung_anrechnung_status_anrechnung_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE INDEX idx_anrechnung_anrechnung_status_anrechnung_id ON lehre.tbl_anrechnung_anrechnungstatus USING btree (anrechnung_id)';
+		if (!$db->db_query($qry))
+			echo '<strong>idx_anrechnung_anrechnung_status_anrechnung_id '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created Index idx_anrechnung_anrechnung_status_anrechnung_id';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
