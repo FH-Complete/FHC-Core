@@ -211,7 +211,7 @@ class Filters extends FHC_Controller
 	public function setNavigationMenu()
 	{
 		// Generates the filters structure array
-		$filterMenu = $this->filterwidgetlib->generateFilterMenu($this->input->get(FilterWidgetLib::NAVIGATION_PAGE));
+		$this->filterwidgetlib->generateFilterMenu($this->input->get(FilterWidgetLib::NAVIGATION_PAGE));
 
 		$this->outputJsonSuccess('Success');
 	}
@@ -271,3 +271,4 @@ class Filters extends FHC_Controller
 		}
 	}
 }
+
