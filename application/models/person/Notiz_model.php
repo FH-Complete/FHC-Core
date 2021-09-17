@@ -152,6 +152,7 @@ class Notiz_model extends DB_Model
 	 */
 	public function getNotizByTitel($person_id, $titel)
 	{
+		$this->addSelect('public.tbl_notiz.insertamum as insertnotiz, *');
 		// Join with the table public.tbl_notizzuordnung using notiz_id
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
 		$this->addJoin('public.tbl_prestudent', 'prestudent_id', 'LEFT');
