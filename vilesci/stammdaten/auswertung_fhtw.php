@@ -3002,6 +3002,7 @@ else
 				if ($erg->letzter_status == 'Abgewiesener')
 				{
 					$inaktiv = 'text-muted';
+					$erg->prioritaet = 0;
 				}
 				echo "<tr id='row_".$erg->prestudent_id."'>
 						<td class='textcentered ".$inaktiv."'>

@@ -266,6 +266,7 @@ class FilterWidgetLib
 					$whereParameters = array(
 						'app' => $app,
 						'dataset_name' => $datasetName,
+						'person_id' => null,
 						'default_filter' => true
 					);
 
@@ -738,8 +739,10 @@ class FilterWidgetLib
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
 
 			// Loads all the filters related to this page (same dataset_name and same app name)
-			$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetName(
-				$session[self::APP], $session[self::DATASET_NAME]
+			$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetNamePersonId(
+				$session[self::APP],
+				$session[self::DATASET_NAME],
+				getAuthPersonId()
 			);
 
 			// If filters were loaded
@@ -813,9 +816,6 @@ class FilterWidgetLib
 		}
 	}
 
-	//------------------------------------------------------------------------------------------------------------------
-	// Private methods
-
 	/**
 	 * Return an unique string that identify this filter widget
 	 * NOTE: The default value is the URI where the FilterWidget is called
@@ -856,6 +856,9 @@ class FilterWidgetLib
 
 		$this->_filterUniqueId = $filterUniqueId;
 	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
 
 	/**
 	 * Generates a condition for a SQL where clause using the given applied filter definition.
@@ -972,3 +975,4 @@ class FilterWidgetLib
 		return $pos;
 	}
 }
+

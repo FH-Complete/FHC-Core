@@ -178,7 +178,7 @@ if ($action == 'kartenabfrage' || $action == 'kartenruecknahme')
 										}
 										elseif ($mitarbeiter->load($bmp->uid))
 										{
-											echo '<br>Letzter Status: '.($benutzer->bnaktiv ? '<span style="color: green;">Mitarbeiter*in aktiv</span>' : '<span style="color: red; font-weight: bold">Mitarbeiter*in inaktiv</span>').'<br>';
+											echo '<br>Letzter Status: '.($benutzer->bnaktiv ? '<span style="color: green;">Mitarbeiter*in aktiv</span>' : '<span style="color: red; font-weight: bold">Mitarbeiter*in inaktiv seit '.$datum_obj->formatDatum($benutzer->updateaktivam,'d.m.Y').'</span>').'<br>';
 										}
 										else
 										{
@@ -197,7 +197,7 @@ if ($action == 'kartenabfrage' || $action == 'kartenruecknahme')
 								</form><br>';
 						}
 
-						if(!$rechte->isBerechtigt('basis/fhausweis', 'suid'))
+						if($rechte->isBerechtigt('basis/fhausweis', 'suid'))
 						{
 							echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
 									<input type="hidden" name="action" value="karte_loeschen" />

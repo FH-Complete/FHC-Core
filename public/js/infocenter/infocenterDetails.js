@@ -10,6 +10,7 @@ const RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ = "InfocenterRTfreigegQuerKurz";
 const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 const STGFREIGABE_MESSAGE_VORLAGE_MASTER = "InfocenterSTGfreigegebenM";
 const STGFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH = "InfocenterSTGfreigegebenMEng";
+const STGFREIGABE_MESSAGE_VORLAGE_ANDERES_SEMESTER = "InfocenterSTGfreigegebenSemester";
 
 //Statusgründe for which no Studiengang Freigabe Message should be sent
 const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
@@ -653,7 +654,7 @@ var InfocenterDetails = {
 			}
 			else
 			{
-				if (receiverPrestudent.studiengangtyp === 'm' && (freigabedata.statusgrundbezeichnung === 'Ergänzungsprüfungen' || freigabedata.statusgrundbezeichnung === 'Supplementary exams'))
+				if (receiverPrestudent.studiengangtyp === 'm' && freigabedata.statuskurzbz === 'ergPruefung')
 				{
 					msgvars = {
 						'studiengangbezeichnung': studiengangbezeichnung,
@@ -671,7 +672,11 @@ var InfocenterDetails = {
 				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent and allowed to send
 				else if (!stgFreigegeben && receiverPrestudent.sendStgFreigabeMsg === true)
 				{
-					InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE, msgvars);
+					if (receiverPrestudent.studiengangtyp === 'b' && freigabedata.statuskurzbz === 'anderesSemester')
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE_ANDERES_SEMESTER
+					else
+						vorlage = STGFREIGABE_MESSAGE_VORLAGE
+					InfocenterDetails.sendFreigabeMessage(prestudent_id, vorlage, msgvars);
 				}
 			}
 		};
@@ -847,7 +852,8 @@ var InfocenterDetails = {
 				var statusgrundel = $("#frgstatusgrselect_" + prestudent_id + " select[name=frgstatusgrund]");
 				var statusgrund_id = statusgrundel.val();
 				var statusgrundbezeichnung = statusgrundel.find("option[value="+statusgrund_id+"]").text();
-				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id, "statusgrundbezeichnung": statusgrundbezeichnung};
+				var statuskurzbz = statusgrundel.find(':selected').data('kurzbz');
+				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id, "statusgrundbezeichnung": statusgrundbezeichnung, "statuskurzbz" : statuskurzbz};
 				InfocenterDetails.saveFreigabe(data);//Studiengangfreigabe
 			}
 		);

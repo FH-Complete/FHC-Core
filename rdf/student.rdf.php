@@ -61,8 +61,9 @@ function convdate($date)
 
 function checkfilter($row, $filter2, $buchungstyp = null)
 {
-	global $studiensemester_kurzbz, $kontofilterstg;
+	global $studiensemester_kurzbz, $kontofilterstg, $studiengang_kz;
 	$db = new basis_db();
+	$studstatusgrund = array();
 
 	if($filter2=='dokumente')
 	{
@@ -156,6 +157,21 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 					return false;
 			}
 		}
+	}
+	elseif ( preg_match('/^stud-statusgrund-([0-9]+)$/', $filter2, $studstatusgrund) )
+	{
+	    // Alle Studenten mit Statusgrund in tbl_prestudentstatus
+	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus ps JOIN 
+				    public.tbl_prestudent p ON p.prestudent_id = ps.prestudent_id AND 
+				    ps. studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
+				    p. person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
+				    p.studiengang_kz=" . $db->db_add_param($studiengang_kz, FHC_INTEGER) . " AND 
+				    ps.statusgrund_id = " . $db->db_add_param($studstatusgrund[1], FHC_INTEGER);
+	    //echo $qry . "\n";
+	    $filtered = ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) ) 
+		      ? true 
+		      : false;
+	    return $filtered;
 	}
 	return true;
 }

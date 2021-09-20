@@ -2432,13 +2432,15 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT kurzbzlang
-				FROM public.tbl_prestudent
-				JOIN public.tbl_prestudentstatus USING (prestudent_id)
-				JOIN public.tbl_studiengang USING (studiengang_kz)
+		$qry = "SELECT
+					UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as kuerzel
+				FROM
+					public.tbl_prestudent
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_studiengang USING (studiengang_kz)
 				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
-				AND typ in ('b','m','d')
+					AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
+					AND typ in ('b','m','d')
 				ORDER BY status_kurzbz ASC
 				LIMIT 1;";
 
@@ -2446,7 +2448,7 @@ class prestudent extends person
 		{
 			if ($row = $this->db_fetch_object())
 			{
-				$stg = $row->kurzbzlang;
+				$stg = $row->kuerzel;
 				return $stg;
 			}
 			else

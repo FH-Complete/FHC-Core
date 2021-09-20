@@ -65,16 +65,14 @@ echo '<html>
 	<head>
 		<title>Zeitsperren (Urlaube) der MitarbeiterInnen</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" href="../../vendor/mottie/tablesorter/dist/css/theme.default.min.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
-		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-		<script type="text/javascript" src="../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
-		<script type="text/javascript" src="../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"></script>
+		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">';
+
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+
+echo '	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script language="Javascript">
 		function confdel(val)
 		{
@@ -103,7 +101,8 @@ echo '<html>
 			$("#t1").tablesorter(
 			{
 				sortList: [[3,1]],
-				widgets: [\'zebra\', \'filter\']
+				widgets: [\'zebra\', \'filter\'],
+				headers : { 3 : { sorter: "shortDate", dateFormat: "ddmmyyyy" },4 : { sorter: "shortDate", dateFormat: "ddmmyyyy" } }
 			});
 			$( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
@@ -144,6 +143,30 @@ if($action=='delete')
 			$message='Zeitsperre wurde geloescht';
 		else
 			$errormsg='Fehler beim Loeschen der Zeitsperre';
+	}
+	else
+		$errormsg='Zeitsperre_id ist ungueltig';
+}
+
+//Kopieren einer Zeitsperre
+if($action=='copy')
+{
+	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+		die('Sie haben keine Berechtigung für diese Aktion');
+
+	if($zeitsperre_id!='' && is_numeric($zeitsperre_id))
+	{
+		$zeitsperre = new zeitsperre($zeitsperre_id);
+		$zeitsperre->new = true;
+
+		if($zeitsperre->save())
+		{
+			$message = 'Eintrag wurde erfolgreich kopiert';
+		}
+		else
+		{
+			$errormsg = "Fehler beim Kopieren der Zeitsperre: $zeitsperre->errormsg";
+		}
 	}
 	else
 		$errormsg='Zeitsperre_id ist ungueltig';
@@ -230,8 +253,9 @@ if($uid!='')
 			<th>Freigegeben von, am</th>
 			<th>Aktualisiert am</th>
 			<th>Aktualisiert von</th>
-			<th>edit</th>
-			<th>delete</th>
+			<th>Edit</th>
+			<th>Copy</th>
+			<th>Delete</th>
 		</tr>
 	</thead>
 	<tbody>';
@@ -241,13 +265,14 @@ if($uid!='')
 		echo "<td>$row->zeitsperre_id</td>";
 		echo "<td>$row->zeitsperretyp_kurzbz</td>";
 		echo "<td>$row->bezeichnung</td>";
-		echo "<td>".$datum->formatDatum($row->vondatum,'d.m.Y')." ".($row->vonstunde!=''?'(Stunde '.$row->vonstunde.')':'')."</td>";
-		echo "<td>".$datum->formatDatum($row->bisdatum,'d.m.Y')." ".($row->bisstunde!=''?'(Stunde '.$row->bisstunde.')':'')."</td>";
+		echo "<td data-sorter='shortDate' data-date-format='dd.mm.yyyy'>".$datum->formatDatum($row->vondatum,'d.m.Y')." ".($row->vonstunde!=''?'(Stunde '.$row->vonstunde.')':'')."</td>";
+		echo "<td data-sorter='shortDate' data-date-format='dd.mm.yyyy'>".$datum->formatDatum($row->bisdatum,'d.m.Y')." ".($row->bisstunde!=''?'(Stunde '.$row->bisstunde.')':'')."</td>";
 		echo "<td>$row->vertretung_uid</td>";
 		echo "<td>$row->freigabevon ".$datum->formatDatum($row->freigabeamum,'d.m.Y')."</td>";
 		echo "<td>".$datum->formatDatum($row->updateamum,'d.m.Y H:i:s')."</td>";
 		echo "<td>$row->updatevon</td>";
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=edit&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=copy&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/copy.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=delete&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'' onclick='return confdel(\"$row->zeitsperretyp_kurzbz von ".$datum->formatDatum($row->vondatum,'d.m.Y')." bis ".$datum->formatDatum($row->bisdatum,'d.m.Y')."\")'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		echo '</tr>';
 	}

@@ -129,7 +129,19 @@ function draw_content_xml($row)
 	if($person->load($row->pruefer3))
 		$pruefer3 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
 
-	$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='rek'";
+	$qry = "SELECT *
+			FROM PUBLIC.tbl_benutzerfunktion
+			JOIN campus.vw_mitarbeiter USING (uid)
+			WHERE funktion_kurzbz = 'rek'
+				AND (
+					tbl_benutzerfunktion.datum_von <= now()
+					OR tbl_benutzerfunktion.datum_von IS NULL
+					)
+				AND (
+					tbl_benutzerfunktion.datum_bis >= now()
+					OR tbl_benutzerfunktion.datum_bis IS NULL
+					)
+			ORDER BY tbl_benutzerfunktion.insertamum DESC LIMIT 1";
 	$rektor = '';
 	$db = new basis_db();
 	$db2 = new basis_db();

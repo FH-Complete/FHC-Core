@@ -532,6 +532,46 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue'
 	}
 }
 
+// Note "intern angerechnet" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'iar' AND (bezeichnung = 'intern angerechnet' OR bezeichnung = 'Intern angerechnet');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			INSERT INTO
+				lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre, offiziell, bezeichnung_mehrsprachig, lkt_ueberschreibbar)
+			VALUES(
+				(SELECT max(note)+1 FROM lehre.tbl_note),'intern angerechnet', 'iar', NULL, TRUE, NULL, TRUE, FALSE, FALSE, '{\"intern angerechnet\",\"internally credited\"}', FALSE
+			);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Note intern angerechnet hinzugefuegt!<br>';
+	}
+}
+
+// Note "nicht zugelassen" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'nz' AND (bezeichnung = 'nicht zugelassen' OR bezeichnung = 'Nicht zugelassen');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			INSERT INTO
+				lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre, offiziell, bezeichnung_mehrsprachig, lkt_ueberschreibbar)
+			VALUES(
+				(SELECT max(note)+1 FROM lehre.tbl_note), 'nicht zugelassen', 'nz', NULL, TRUE, NULL, TRUE, FALSE, FALSE, '{\"nicht zugelassen\",\"not admitted\"}', FALSE
+			);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Note nicht zugelassen hinzugefuegt!<br>';
+	}
+}
+
 // Spalte offiziell in lehre.tbl_note
 if(!$result = @$db->db_query("SELECT offiziell FROM lehre.tbl_note LIMIT 1;"))
 {
@@ -1315,7 +1355,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_verarbeitungstaetigkeit"
 }
 
 // system.tbl_log.taetigkeit_kurzbz
-if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
+if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log LIMIT 1"))
 {
 	$qry = "
 	ALTER TABLE system.tbl_log ADD COLUMN taetigkeit_kurzbz varchar(32);
@@ -4897,7 +4937,6 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruef
 			echo 'Index fuer lehre.pruefung.student_uid hinzugefuegt<br>';
 	}
 }
-
 // Added Buchungstyp "ZuschussIO"
 if ($result = @$db->db_query("SELECT 1 FROM public.tbl_buchungstyp WHERE buchungstyp_kurzbz = 'ZuschussIO';"))
 {
@@ -4908,6 +4947,32 @@ if ($result = @$db->db_query("SELECT 1 FROM public.tbl_buchungstyp WHERE buchung
 			echo '<strong>public.tbl_buchungstyp '.$db->db_last_error().'</strong><br>';
 		else
 			echo ' public.tbl_buchungstyp: Added buchungstyp "ZuschussIO" <br>';
+	}
+}
+//Add Column statusgrund_kurzbz to public.tbl_status_grund
+if(!@$db->db_query("SELECT statusgrund_kurzbz FROM public.tbl_status_grund LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_status_grund ADD COLUMN statusgrund_kurzbz varchar(32);
+			ALTER TABLE public.tbl_status_grund ADD CONSTRAINT uk_tbl_statusgrund_kurzbz UNIQUE (statusgrund_kurzbz);
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_status_grund '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte statusgrund_kurzbz zu Tabelle public.tbl_status_grund hinzugefügt';
+}
+
+
+// INDEX idx_anrechnung_anrechnung_status_anrechnung_id
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'idx_anrechnung_anrechnung_status_anrechnung_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE INDEX idx_anrechnung_anrechnung_status_anrechnung_id ON lehre.tbl_anrechnung_anrechnungstatus USING btree (anrechnung_id)';
+		if (!$db->db_query($qry))
+			echo '<strong>idx_anrechnung_anrechnung_status_anrechnung_id '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created Index idx_anrechnung_anrechnung_status_anrechnung_id';
 	}
 }
 
@@ -5584,7 +5649,7 @@ $tabellen=array(
 	"public.tbl_rt_person" => array("rt_person_id","person_id","rt_id","studienplan_id","anmeldedatum","teilgenommen","ort_kurzbz","punkte","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_rt_studienplan" => array("reihungstest_id","studienplan_id"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
-	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung"),
+	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung","statusgrund_kurzbz"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id","design_uid","betrieb_uid","operativ_uid","servicekategorie_kurzbz"),
 	"public.tbl_servicekategorie" => array("servicekategorie_kurzbz", "bezeichnung","sort"),
