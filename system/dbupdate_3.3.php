@@ -5076,67 +5076,291 @@ if (!$result = @$db->db_query("SELECT foerderrelevant, standort_code FROM public
 		echo '<br>public.tbl_prestudent: Neue Spalten foerderrelevant, standort_code hinzugefuegt.';
 }
 
-// Add table issues
-if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issues LIMIT 1;"))
+// App 'dvuh' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='dvuh'"))
 {
-	$qry = "CREATE TABLE system.tbl_issues (
-                                      id integer NOT NULL,
-                                      app character varying(32),
-                                      inhalt text,
-                                      datum timestamp without time zone NOT NULL,
-                                      verarbeitetvon character varying(32),
-                                      verarbeitetamum timestamp without time zone,
-                                      fehlercode character varying(64) NOT NULL,
-                                      person_id integer,
-                                      oe_kurzbz character varying(32),
-                                      status character varying(32) NOT NULL,
-                                      schweregrad character varying(32) NOT NULL,
-                                      insertvon character varying(32),
-                                      insertamum timestamp without time zone DEFAULT now(),
-                                      updatevon character varying(32),
-                                      updateamum timestamp without time zone
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('dvuh');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' Neue App dvuh in system.tbl_app hinzugefügt<br>';
+	}
+}
+
+// Add table issue_status
+if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue_status LIMIT 1;"))
+{
+	$qry = "CREATE TABLE system.tbl_issue_status (
+				  status_kurzbz character varying(32),
+				  bezeichnung_mehrsprachig varchar(32)[]
+			);
+
+			COMMENT ON TABLE system.tbl_issue_status IS 'Tabelle zur Pflege von Bearbeitungsstatus von issues.';
+			
+			ALTER TABLE system.tbl_issue_status ADD CONSTRAINT pk_tbl_issue_status PRIMARY KEY (status_kurzbz);
+			
+			INSERT INTO system.tbl_issue_status (status_kurzbz, bezeichnung_mehrsprachig) VALUES('new', '{\"neu\",\"new\"}');
+			INSERT INTO system.tbl_issue_status (status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgress', '{\"in Bearbeitung\",\"in progress\"}');
+			INSERT INTO system.tbl_issue_status (status_kurzbz, bezeichnung_mehrsprachig) VALUES('resolved', '{\"behoben\",\"resolved\"}');";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_issue_status: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_issue_status: Tabelle hinzugefuegt';
+
+	// GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;
+	$qry = 'GRANT SELECT ON TABLE system.tbl_issue_status TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_issue_status '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_issue_status';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue_status TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue_status TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_issue_status '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_issue_status';
+}
+
+// Add table fehlertyp
+if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehlertyp LIMIT 1;"))
+{
+	$qry = "CREATE TABLE system.tbl_fehlertyp (
+				  fehlertyp_kurzbz character varying(32),
+				  bezeichnung_mehrsprachig varchar(32)[]
 			);
 			
-			COMMENT ON TABLE system.tbl_issues IS 'Tabelle zur Verfolgung von Problemen/Fehlern von verschiedenen Systemen';
-						COMMENT ON COLUMN system.tbl_issues.id IS 'Primärschlüssel';
-						COMMENT ON COLUMN system.tbl_issues.app IS 'Ursprungsapp des Problems';
-						COMMENT ON COLUMN system.tbl_issues.inhalt IS 'Beschreibungstext, Fehlertext';
-						COMMENT ON COLUMN system.tbl_issues.datum IS 'Tag und Zeit des Auftritts des Problems';
-						COMMENT ON COLUMN system.tbl_issues.verarbeitetvon IS 'uid des Nutzers, der das Problem verarbeitet hat';
-						COMMENT ON COLUMN system.tbl_issues.verarbeitetamum IS 'Tag und Zeit der Problemverarbeitung';
-						COMMENT ON COLUMN system.tbl_issues.fehlercode IS 'Identifikationscode  des Problems/Fehlers, kann von anderem System kommen oder eigens definiert sein';
-						COMMENT ON COLUMN system.tbl_issues.person_id IS 'Id der betreffenden Person';
-						COMMENT ON COLUMN system.tbl_issues.oe_kurzbz IS 'Betroffene Organisationseinheit';
-						COMMENT ON COLUMN system.tbl_issues.status IS 'Verarbeitsungsstatus';
+			COMMENT ON TABLE system.tbl_fehlertyp IS 'Tabelle mit fehlertyp für tbl_fehler';
+
+			ALTER TABLE system.tbl_fehlertyp ADD CONSTRAINT pk_tbl_fehlertyp PRIMARY KEY (fehlertyp_kurzbz);
 			
-			CREATE SEQUENCE system.seq_issues_id
+			INSERT INTO system.tbl_fehlertyp (fehlertyp_kurzbz, bezeichnung_mehrsprachig) VALUES('warning', '{\"warnung\",\"warning\"}');
+			INSERT INTO system.tbl_fehlertyp (fehlertyp_kurzbz, bezeichnung_mehrsprachig) VALUES('error', '{\"fehler\",\"error\"}');
+			INSERT INTO system.tbl_fehlertyp (fehlertyp_kurzbz, bezeichnung_mehrsprachig) VALUES('info', '{\"info\",\"info\"}');";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_fehlertyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_fehlertyp: Tabelle hinzugefuegt';
+
+	// GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;
+	$qry = 'GRANT SELECT ON TABLE system.tbl_fehlertyp TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_fehlertyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehlertyp';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisstandort TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehlertyp TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_fehlertyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_fehlertyp';
+}
+
+// Add table fehler
+if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler LIMIT 1;"))
+{
+	$qry = "CREATE TABLE system.tbl_fehler (
+				  fehlercode character varying(64),
+				  fehler_kurzbz character varying(64) UNIQUE,
+				  fehlercode_extern character varying(64),
+				  fehlertext text,
+				  fehlertyp_kurzbz character varying(32) NOT NULL,
+				  app character varying(32) NOT NULL
+			);
+			
+			COMMENT ON TABLE system.tbl_fehler IS 'Tabelle zur Pflege von Fehlerfällen';
+			COMMENT ON COLUMN system.tbl_fehler.fehlercode IS 'Eindeutiger interner Fehlercode';
+			COMMENT ON COLUMN system.tbl_fehler.fehler_kurzbz IS 'Eindeutige Kurzbezeichnung für den Fehler';
+			COMMENT ON COLUMN system.tbl_fehler.fehlercode_extern IS 'Code für von vordefinierte, von externen Systemen produzierte Fehler';
+			COMMENT ON COLUMN system.tbl_fehler.fehlertext IS 'Interner, eigens definierter Fehlertext mit Platzhaltern für Parameter';
+			COMMENT ON COLUMN system.tbl_fehler.fehlertyp_kurzbz IS 'Typ bzw Schweregrad (z.B. warnung, fehler)';
+			COMMENT ON COLUMN system.tbl_fehler.app IS 'Ursprungsapp des Fehlers';
+			
+			ALTER TABLE system.tbl_fehler ADD CONSTRAINT pk_tbl_fehler PRIMARY KEY (fehlercode);	
+			ALTER TABLE system.tbl_fehler ADD CONSTRAINT fk_tbl_fehler_fehlertyp_kurzbz FOREIGN KEY (fehlertyp_kurzbz) REFERENCES system.tbl_fehlertyp(fehlertyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_fehler ADD CONSTRAINT fk_tbl_fehler_app FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_fehler ADD CONSTRAINT uk_tbl_fehler_fehlercode_fehler_kurzbz UNIQUE (fehlercode, fehler_kurzbz); -- for upsert ON CONFLICT
+			ALTER TABLE system.tbl_fehler ADD CONSTRAINT uk_tbl_fehler_fehlercode_extern_app UNIQUE (fehlercode_extern, app); -- for recognizing external errors
+			
+			INSERT INTO system.tbl_fehler (fehlercode, fehlertext, fehlertyp_kurzbz, app) VALUES ('UNKNOWN_ERROR', 'Fehler ist aufgetreten', 'error', 'core');
+			";
+
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_fehler: Tabelle hinzugefuegt';
+
+	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	$qry = 'GRANT SELECT, UPDATE ON TABLE system.tbl_fehler TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehler';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_fehler';
+}
+
+// Add table fehler_zustaendigkeiten
+if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler_zustaendigkeiten LIMIT 1;"))
+{
+	$qry = "CREATE TABLE system.tbl_fehler_zustaendigkeiten (
+				  fehlerzustaendigkeiten_id character varying(64) NOT NULL,
+				  fehlercode character varying(64),
+				  person_id integer,
+				  oe_kurzbz character varying(32),
+				  funktion_kurzbz character varying(16)
+			);
+			
+			COMMENT ON TABLE system.tbl_fehler_zustaendigkeiten IS 'Tabelle zum Hinzufügen für Zuständigkeiten für einzelne Fehler';
+			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.fehlercode IS 'Eindeutiger interner Fehlercode';
+			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.person_id IS 'person_id der zuständigen Person';
+			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.oe_kurzbz IS 'Zuständigkeit für einen fehlercode für eine ganze OE';
+			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.funktion_kurzbz IS 'Zusätzliche Einschränkung der OE Zuständigkeit nach funktion';
+			
+				
+			CREATE SEQUENCE system.seq_fehlerzustaendigkeiten_id
 				START WITH 1
 				INCREMENT BY 1
 				NO MINVALUE
 				NO MAXVALUE
 				CACHE 1;
 			
-			ALTER TABLE ONLY system.tbl_issues ALTER COLUMN id SET DEFAULT nextval('system.seq_jobsqueue_jobid'::regclass);
+			ALTER TABLE ONLY system.tbl_fehler_zustaendigkeiten ALTER COLUMN fehlerzustaendigkeiten_id SET DEFAULT nextval('system.seq_fehlerzustaendigkeiten_id'::regclass);
 			
-			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issues_id TO vilesci;
-			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issues_id TO fhcomplete;
-			
-			ALTER TABLE system.tbl_issues ADD CONSTRAINT pk_issues PRIMARY KEY (id);
-			
-			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_app FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_verarbeitetvon FOREIGN KEY (verarbeitetvon) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE system.tbl_issues ADD CONSTRAINT fk_issues_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-			
-			ALTER TABLE system.tbl_issues ADD CONSTRAINT chk_issues_person_id_oe_kurzbz CHECK (person_id IS NOT NULL OR oe_kurzbz IS NOT NULL);
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_fehlerzustaendigkeiten_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_fehlerzustaendigkeiten_id TO fhcomplete;
 
-			CREATE INDEX idx_tbl_issues_person_id ON system.tbl_issues USING btree (person_id);
-			CREATE INDEX idx_tbl_issues_oe_kurzbz ON system.tbl_issues USING btree (oe_kurzbz);";
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT pk_tbl_fehler_zustaendigkeiten PRIMARY KEY (fehlerzustaendigkeiten_id);	
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_fehlercode FOREIGN KEY (fehlercode) REFERENCES system.tbl_fehler(fehlercode) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_funktion_kurzbz FOREIGN KEY (funktion_kurzbz) REFERENCES public.tbl_funktion(funktion_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT uk_tbl_fehler_zustaendigkeiten_fehlercode_person_id UNIQUE (fehlercode, person_id);
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT uk_tbl_fehler_zustaendigkeiten_fehlercode_oe_kurzbz_funktion_kurzbz UNIQUE (fehlercode, oe_kurzbz, funktion_kurzbz);";
 
 	if(!$db->db_query($qry))
-		echo '<strong>system.tbl_issues: '.$db->db_last_error().'</strong><br>';
+		echo '<strong>system.tbl_fehler_zustaendigkeiten: '.$db->db_last_error().'</strong><br>';
 	else
-		echo ' system.tbl_issues: Tabelle hinzugefuegt<br>';
+		echo '<br>system.tbl_fehler_zustaendigkeiten: Tabelle hinzugefuegt';
+
+	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	$qry = 'GRANT SELECT ON TABLE system.tbl_fehler_zustaendigkeiten TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehler_zustaendigkeiten';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler_zustaendigkeiten TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_fehler_zustaendigkeiten';
+}
+
+// Add table issue
+if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue LIMIT 1;"))
+{
+	$qry = "CREATE TABLE system.tbl_issue (
+				  issue_id integer,
+				  fehlercode character varying(64) NOT NULL,
+				  inhalt text,
+				  fehlercode_extern character varying(64),
+				  inhalt_extern text,
+				  person_id integer,
+				  oe_kurzbz character varying(32),
+				  datum timestamp without time zone NOT NULL,
+				  verarbeitetvon character varying(32),
+				  verarbeitetamum timestamp without time zone,
+				  status_kurzbz character varying(32) NOT NULL,
+				  insertvon character varying(32),
+				  insertamum timestamp without time zone DEFAULT now(),
+				  updatevon character varying(32),
+				  updateamum timestamp without time zone
+			);
+			
+			COMMENT ON TABLE system.tbl_issue IS 'Tabelle zur Verfolgung von Problemen/Fehlern von verschiedenen Systemen';
+			COMMENT ON COLUMN system.tbl_issue.issue_id IS 'Primärschlüssel';
+			COMMENT ON COLUMN system.tbl_issue.fehlercode IS 'Identifikationscode  des Problems/Fehlers, kann von anderem System kommen oder eigens definiert sein';
+			COMMENT ON COLUMN system.tbl_issue.inhalt IS 'Fehlertext';
+			COMMENT ON COLUMN system.tbl_issue.fehlercode_extern IS 'Externer, von App geschriebener Fehlercode. Zum Auseinanderhalten der externen Fehler, die nicht in tbl_fehler definiert sind.';
+			COMMENT ON COLUMN system.tbl_issue.inhalt_extern IS 'von externem System kommender Fehlermeldungstext';
+			COMMENT ON COLUMN system.tbl_issue.datum IS 'Tag und Zeit des Auftritts des Problems';
+			COMMENT ON COLUMN system.tbl_issue.verarbeitetvon IS 'uid des Nutzers, der das Problem verarbeitet hat';
+			COMMENT ON COLUMN system.tbl_issue.verarbeitetamum IS 'Tag und Zeit der Problemverarbeitung';
+			COMMENT ON COLUMN system.tbl_issue.person_id IS 'Id der Person, für welche das issue besteht';
+			COMMENT ON COLUMN system.tbl_issue.oe_kurzbz IS 'Betroffene Organisationseinheit';
+			COMMENT ON COLUMN system.tbl_issue.status_kurzbz IS 'Verarbeitsungsstatus';
+			
+			CREATE SEQUENCE system.seq_issue_id
+				START WITH 1
+				INCREMENT BY 1
+				NO MINVALUE
+				NO MAXVALUE
+				CACHE 1;
+			
+			ALTER TABLE ONLY system.tbl_issue ALTER COLUMN issue_id SET DEFAULT nextval('system.seq_issue_id'::regclass);
+			
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issue_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issue_id TO fhcomplete;
+			
+			ALTER TABLE system.tbl_issue ADD CONSTRAINT pk_tbl_issue PRIMARY KEY (issue_id);
+			
+			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_fehlercode FOREIGN KEY (fehlercode) REFERENCES system.tbl_fehler(fehlercode) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_verarbeitetvon FOREIGN KEY (verarbeitetvon) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			
+			ALTER TABLE system.tbl_issue ADD CONSTRAINT chk_tbl_issue_person_id_oe_kurzbz CHECK (person_id IS NOT NULL OR oe_kurzbz IS NOT NULL);
+
+			CREATE INDEX idx_tbl_issue_person_id ON system.tbl_issue USING btree (person_id);
+			CREATE INDEX idx_tbl_issue_oe_kurzbz ON system.tbl_issue USING btree (oe_kurzbz);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_issue: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_issue: Tabelle hinzugefuegt';
+
+	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	$qry = 'GRANT SELECT, UPDATE ON TABLE system.tbl_issue TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_issue '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_issue';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_issue '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_issue';
+}
+
+// Add permission to manage issues
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'system/issues_verwalten';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('system/issues_verwalten', 'Issues verwalten');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_berechtigung: Added permission for system/issues_verwalten';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -5400,7 +5624,11 @@ $tabellen=array(
 	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon","kostenstelle_id","anmerkung"),
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
-	"system.tbl_issues" => array("id","app","inhalt","datum","verarbeitetvon","verarbeitetamum","fehlercode","person_id","oe_kurzbz","status","insertvon","insertamum","updatevon","updateamum"),
+	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app"),
+	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
+	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz"),
+	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","insertvon","insertamum","updatevon","updateamum"),
+	"system.tbl_issue_status" => array("status_kurzbz","bezeichnung_mehrsprachig"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz","statistik_kurzbz"),

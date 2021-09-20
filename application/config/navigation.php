@@ -133,6 +133,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'system/developer:r'
+				),
+				'errormonitoring' => array(
+					'link' => site_url('system/issues/Issues'),
+					'description' => 'Fehler Monitoring',
+					'expand' => true,
+					'sort' => 20,
+					'requiredPermissions' => 'system/issues_verwalten:r'
 				)
 			)
 		)

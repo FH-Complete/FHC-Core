@@ -856,7 +856,42 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
-	)
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'last7Days',
+		'description' => '{Fehler letzte 7 Tage}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler ",
+				"columns": [
+					{"name": "Fehlercode"},
+					{"name": "Fehlercode extern"},
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Inhalt extern"},
+					{"name": "PersonId"},
+					{"name": "OE"},
+					{"name": "Fehlertyp"},
+					{"name": "Fehlerstatus"},
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
+				],
+				"filters": [
+					{
+						"name": "Datum",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
 );
 
 // Loop through the filters array
