@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Gebiet extends APIv1_Controller
+class Gebiet extends API_Controller
 {
 	/**
 	 * Gebiet API constructor.

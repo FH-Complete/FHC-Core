@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vertragsstatus extends APIv1_Controller
+class Vertragsstatus extends API_Controller
 {
 	/**
 	 * Vertragsstatus API constructor.

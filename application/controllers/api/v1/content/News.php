@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class News extends APIv1_Controller
+class News extends API_Controller
 {
 	/**
 	 * News API constructor.

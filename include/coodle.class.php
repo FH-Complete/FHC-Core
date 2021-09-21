@@ -373,7 +373,7 @@ class coodle extends basis_db
                 WHERE 
 					(uid =".$this->db_add_param($uid, FHC_STRING, false)." 
                     OR ersteller_uid =".$this->db_add_param($uid, FHC_STRING, false).")
-                    AND endedatum >= CURRENT_DATE - interval '20 days';"; 
+                    AND endedatum >= CURRENT_DATE - interval '90 days';";
         
         if(!$this->db_query($qry))
         {

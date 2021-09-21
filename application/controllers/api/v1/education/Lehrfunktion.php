@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lehrfunktion extends APIv1_Controller
+class Lehrfunktion extends API_Controller
 {
 	/**
 	 * Lehrfunktion API constructor.

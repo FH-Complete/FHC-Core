@@ -14,7 +14,7 @@
 
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class RtPerson extends APIv1_Controller
+class RtPerson extends API_Controller
 {
 	/**
 	 * Status API constructor.

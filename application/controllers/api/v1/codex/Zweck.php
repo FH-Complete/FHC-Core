@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zweck extends APIv1_Controller
+class Zweck extends API_Controller
 {
 	/**
 	 * Zweck API constructor.

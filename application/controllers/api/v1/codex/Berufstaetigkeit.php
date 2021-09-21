@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Berufstaetigkeit extends APIv1_Controller
+class Berufstaetigkeit extends API_Controller
 {
 	/**
 	 * Berufstaetigkeit API constructor.

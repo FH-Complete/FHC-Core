@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Notenschluessel extends APIv1_Controller
+class Notenschluessel extends API_Controller
 {
 	/**
 	 * Notenschluessel API constructor.

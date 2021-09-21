@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Projekttyp extends APIv1_Controller
+class Projekttyp extends API_Controller
 {
 	/**
 	 * Projekttyp API constructor.

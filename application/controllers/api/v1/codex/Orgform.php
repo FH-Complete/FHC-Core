@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Orgform extends APIv1_Controller
+class Orgform extends API_Controller
 {
 	/**
 	 * Orgform API constructor.

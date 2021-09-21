@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Reihungstest extends APIv1_Controller
+class Reihungstest extends API_Controller
 {
 	/**
 	 * Reihungstest API constructor.

@@ -61,6 +61,11 @@ if(isset($_GET['uid']))
 else
 	$uid = '';
 
+if(isset($_GET['orgform_kurzbz']))
+	$orgform_kurzbz = $_GET['orgform_kurzbz'];
+else
+	$orgform_kurzbz = '';
+
 $db = new basis_db();
 
 $rechte = new benutzerberechtigung();
@@ -122,6 +127,7 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 	tbl_lehrveranstaltung.semesterstunden AS sws,
 	tbl_lehrveranstaltung.lehrform_kurzbz,
 	tbl_lehrveranstaltung.lehrveranstaltung_id,
+	tbl_lehrveranstaltung.orgform_kurzbz,
 	(
 		SELECT nachname
 		FROM PUBLIC.tbl_person
@@ -166,6 +172,9 @@ if($semester!='')
 
 if($uid!='')
 	$qry.=" AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($uid);
+
+if($orgform_kurzbz!='')
+	$qry.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz);
 
 $qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung";
 
@@ -239,6 +248,9 @@ $maxlength[$spalte]=9;
 
 $worksheet->write($zeile,++$spalte,"LV-Typ", $format_bold);
 $maxlength[$spalte]=9;
+
+$worksheet->write($zeile,++$spalte,"Organisationsform", $format_bold);
+$maxlength[$spalte]=15;
 
 if($result = $db->db_query($qry))
 {
@@ -370,6 +382,10 @@ if($result = $db->db_query($qry))
 		if($maxlength[$spalte]<mb_strlen($row->lv_type))
 			$maxlength[$spalte]=mb_strlen($row->lv_type);
 
+		//Organisationsform
+		$worksheet->write($zeile,++$spalte,$row->orgform_kurzbz);
+		if($maxlength[$spalte]<mb_strlen($row->orgform_kurzbz))
+			$maxlength[$spalte]=mb_strlen($row->orgform_kurzbz);
 	}
 
 	//Betreuungen
@@ -382,7 +398,8 @@ if($result = $db->db_query($qry))
 				student_uid,
 				stunden,
 				tbl_projektbetreuer.stundensatz,
-				tbl_projektbetreuer.person_id
+				tbl_projektbetreuer.person_id,
+				tbl_lehrveranstaltung.orgform_kurzbz
 			FROM lehre.tbl_projektarbeit,
 				lehre.tbl_lehreinheit,
 				lehre.tbl_lehrveranstaltung,
@@ -408,6 +425,9 @@ if($result = $db->db_query($qry))
 
 	if($semester!='')
 		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
+
+	if($orgform_kurzbz!='')
+		$qry.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz);
 
 	if($result = $db->db_query($qry))
 	{
@@ -501,7 +521,10 @@ if($result = $db->db_query($qry))
 			$worksheet->write($zeile,++$spalte,$row->stunden*$row->stundensatz);
 			if($maxlength[$spalte]<mb_strlen($row->stunden*$row->stundensatz))
 				$maxlength[$spalte]=mb_strlen($row->stunden*$row->stundensatz);
-
+			//Organisationsform
+			$worksheet->write($zeile,++$spalte,$row->orgform_kurzbz);
+			if($maxlength[$spalte]<mb_strlen($row->orgform_kurzbz))
+				$maxlength[$spalte]=mb_strlen($row->orgform_kurzbz);
 		}
 	}
 

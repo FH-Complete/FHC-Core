@@ -12,7 +12,7 @@
 				<?php foreach ($notizenbewerbung as $notiz): ?>
 					<tr>
 						<td class="text-center">
-							<?php echo date_format(date_create($notiz->insertamum), 'd.m.Y H:i:s') ?>
+							<?php echo date_format(date_create($notiz->insertnotiz), 'd.m.Y H:i:s') ?>
 						</td>
 						<td>
 							<?php (!isset($notiz->kurzbzlang)) ?: print_r('(' . nl2br($notiz->kurzbzlang) . ') - ') ?>

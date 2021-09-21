@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Anrechnung extends APIv1_Controller
+class Anrechnung extends API_Controller
 {
 	/**
 	 * Anrechnung API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aufmerksamdurch extends APIv1_Controller
+class Aufmerksamdurch extends API_Controller
 {
 	/**
 	 * Aufmerksamdurch API constructor.

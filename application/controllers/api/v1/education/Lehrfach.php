@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lehrfach extends APIv1_Controller
+class Lehrfach extends API_Controller
 {
 	/**
 	 * Lehrfach API constructor.

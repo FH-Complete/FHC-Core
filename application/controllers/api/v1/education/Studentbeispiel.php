@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studentbeispiel extends APIv1_Controller
+class Studentbeispiel extends API_Controller
 {
 	/**
 	 * Studentbeispiel API constructor.

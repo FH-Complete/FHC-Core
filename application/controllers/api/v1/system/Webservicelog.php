@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Webservicelog extends APIv1_Controller
+class Webservicelog extends API_Controller
 {
 	/**
 	 * Webservicelog API constructor.
