@@ -504,22 +504,6 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefung
 	}
 }
 
-// change Datatype of lehre.tbl_note.bezeichnung from varchar(32) to varchar(64)
-if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='lehre' AND TABLE_NAME='tbl_note' AND COLUMN_NAME = 'bezeichnung' AND character_maximum_length < 64"))
-{
-	if($db->db_num_rows($result)>0)
-	{
-		$qry = "
-		ALTER TABLE lehre.tbl_note ALTER COLUMN bezeichnung TYPE varchar(64);
-		";
-
-		if(!$db->db_query($qry))
-			echo '<strong>lehre.tbl_note '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Spalte bezeichnung in lehre.tbl_note von kleiner varchar(64) auf varchar(64) geändert<br>';
-	}
-}
-
 // Note "entschuldigt" hinzufügen
 if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en' AND (bezeichnung = 'entschuldigt' OR bezeichnung = 'Entschuldigt');"))
 {
