@@ -414,7 +414,7 @@
 													selected="selected"><?php echo ucfirst($this->p->t('ui', 'freigabeart')) . '...' ?>
 											</option>
 											<?php foreach ($intstatusgruende as $statusgrund): ?>
-												<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
+												<option value="<?php echo $statusgrund->statusgrund_id ?>" data-kurzbz="<?php echo $statusgrund->statusgrund_kurzbz ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
 											<?php endforeach ?>
 										</select>
 										<span class="input-group-btn">
