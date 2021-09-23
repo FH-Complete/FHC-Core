@@ -285,11 +285,14 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Get STGL
 		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
 		
-		if($result = getData($result)[0])
+		if (hasData($result))
 		{
-			if ($result->uid == $this->_uid)
+			foreach (getData($result) as $stgl)
 			{
-				return;
+				if ($stgl->uid == $this->_uid)
+				{
+					return;
+				}
 			}
 		}
 		
