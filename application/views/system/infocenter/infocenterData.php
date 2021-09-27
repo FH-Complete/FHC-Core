@@ -185,6 +185,32 @@
 				 LIMIT 1
 			) AS "StgNichtAbgeschickt",
 			(
+				SELECT COUNT(*)
+				  FROM public.tbl_prestudentstatus pss
+				  JOIN public.tbl_prestudent ps USING(prestudent_id)
+				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+				   AND pss.bewerbung_abgeschicktamum IS NULL
+				   AND pss.bestaetigtam IS NULL
+				   AND ps.person_id = p.person_id
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+
+				   AND NOT EXISTS (
+					  SELECT 1
+						FROM tbl_prestudentstatus spss
+					   WHERE spss.prestudent_id = pss.prestudent_id
+						 AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+						 AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >
+						 (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
+					)
+				 LIMIT 1
+			) AS "AnzahlStgNichtAbgeschickt",
+			(
 				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
@@ -322,6 +348,7 @@
 			ucfirst($this->p->t('global', 'abgeschickt')).' ('.$this->p->t('global', 'anzahl').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'gesendet').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'nichtGesendet').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'anzahlNichtGesendet').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
 			'ZGV Nation BA',
 			'ZGV Nation MA',

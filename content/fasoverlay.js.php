@@ -907,8 +907,10 @@ function StatistikPrintLVPlanungExcel()
 		col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 		var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
 		col = tree.columns ? tree.columns["sem"] : "sem";
-		var semester=tree.view.getCellText(tree.currentIndex,col);
-		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&studiensemester_kurzbz='+studiensemester;
+		var semester = tree.view.getCellText(tree.currentIndex,col);
+		col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
+		var orgform = tree.view.getCellText(tree.currentIndex,col);
+		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&studiensemester_kurzbz='+studiensemester+'&orgform_kurzbz='+orgform;
 	}
 	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-organisationseinheit'))
 	{
