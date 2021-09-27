@@ -94,6 +94,11 @@ function draw_row($row)
 		$azgrelevant = $row->azgrelevant?'Ja':'Nein';
 	else
 		$azgrelevant = '';
+	
+	if(is_bool($row->homeoffice))
+		$homeoffice = $row->homeoffice?'Ja':'Nein';
+	else
+		$homeoffice = '';
 
 	echo '
       <RDF:li>
@@ -125,6 +130,7 @@ function draw_row($row)
 			<VERWENDUNG:inkludierte_lehre><![CDATA['.$row->inkludierte_lehre.']]></VERWENDUNG:inkludierte_lehre>
 			<VERWENDUNG:zeitaufzeichnungspflichtig><![CDATA['.$zeitaufzeichnungspflichtig.']]></VERWENDUNG:zeitaufzeichnungspflichtig>
 			<VERWENDUNG:azgrelevant><![CDATA['.$azgrelevant.']]></VERWENDUNG:azgrelevant>
+			<VERWENDUNG:homeoffice><![CDATA['.$homeoffice.']]></VERWENDUNG:homeoffice>
          </RDF:Description>
       </RDF:li>
       ';

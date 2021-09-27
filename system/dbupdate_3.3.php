@@ -4955,6 +4955,30 @@ if(!@$db->db_query("SELECT statusgrund_kurzbz FROM public.tbl_status_grund LIMIT
 		echo '<br>Neue Spalte statusgrund_kurzbz zu Tabelle public.tbl_status_grund hinzugefügt';
 }
 
+// Add column homeoffice to bis.tbl_bisverwendung
+if (!$result = @$db->db_query("SELECT homeoffice FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN homeoffice boolean NOT NULL DEFAULT FALSE";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_bisverwendung: Spalte homeoffice hinzugefuegt';
+}
+
+// ADD COLUMN homeoffice to campus.tbl_zeitaufzeichnung
+if(!$result = @$db->db_query("SELECT homeoffice FROM campus.tbl_zeitaufzeichnung LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN homeoffice boolean NOT NULL DEFAULT false ;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_zeitaufzeichnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_zeitaufzeichnung Spalte homeoffice hinzugefügt.';
+}
+
 // INDEX idx_anrechnung_anrechnung_status_anrechnung_id
 if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'idx_anrechnung_anrechnung_status_anrechnung_id'"))
 {
@@ -5000,8 +5024,8 @@ if(!@$db->db_query("SELECT lehrmodus_kurzbz FROM lehre.tbl_lehrveranstaltung LIM
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrveranstaltung '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Spalte lehrmodus_kurzbz in lehre.tbl_lehrveranstaltung hinzugefügt';
+	else
+		echo '<br>Spalte lehrmodus_kurzbz in lehre.tbl_lehrveranstaltung hinzugefügt';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -5021,7 +5045,7 @@ $tabellen=array(
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id","ects_erworben","ects_angerechnet"),
 	"bis.tbl_bisio_zweck"  => array("bisio_id","zweck_code"),
-	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant"),
+	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant", "homeoffice"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
@@ -5090,7 +5114,7 @@ $tabellen=array(
 	"campus.tbl_uebung"  => array("uebung_id","gewicht","punkte","angabedatei","freigabevon","freigabebis","abgabe","beispiele","statistik","bezeichnung","positiv","defaultbemerkung","lehreinheit_id","maxstd","maxbsp","liste_id","prozent","nummer","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltung"  => array("veranstaltung_id","titel","beschreibung","veranstaltungskategorie_kurzbz","inhalt","start","ende","freigabevon","freigabeamum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltungskategorie"  => array("veranstaltungskategorie_kurzbz","bezeichnung","bild","farbe"),
-	"campus.tbl_zeitaufzeichnung"  => array("zeitaufzeichnung_id","uid","aktivitaet_kurzbz","projekt_kurzbz","start","ende","beschreibung","oe_kurzbz_1","oe_kurzbz_2","insertamum","insertvon","updateamum","updatevon","ext_id","service_id","kunde_uid","projektphase_id"),
+	"campus.tbl_zeitaufzeichnung"  => array("zeitaufzeichnung_id","uid","aktivitaet_kurzbz","projekt_kurzbz","start","ende","beschreibung","oe_kurzbz_1","oe_kurzbz_2","insertamum","insertvon","updateamum","updatevon","ext_id","service_id","kunde_uid","projektphase_id","homeoffice"),
 	"campus.tbl_zeitaufzeichnung_gd"  => array("zeitaufzeichnung_gd_id","uid","studiensemester_kurzbz","selbstverwaltete_pause","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz","freigabeamum","freigabevon"),
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
