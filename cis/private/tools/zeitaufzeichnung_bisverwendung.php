@@ -21,8 +21,6 @@
  * Checks, if there is the possibility for homeoffice for the given bisverwendung of
  * a certain date.
  */
-
-
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/phrasen.class.php');
@@ -35,25 +33,43 @@ require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/projekt.class.php');
 require_once('../../../include/bisverwendung.class.php');
 
+if ((isset($_GET['uid'])) && (isset($_GET['day'])))
+{
+	$uid = get_uid();
 
-if ((isset($_GET['uid'])) && (isset($_GET['day']))) {
+	//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
+	//des uebergebenen Users anzeigen
+	if (isset($_GET['uid']) && $_GET['uid'] != $uid)
+	{
+		$p = new phrasen();
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($uid);
 
-	$uid = $_GET['uid'];
+		if ($rechte->isBerechtigt('admin'))
+		{
+			$uid = $_GET['uid'];
+		}
+		else
+		{
+			die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
+		}
+	}
+
 	$day = $_GET['day'];
 
 	$verwendung = new bisverwendung();
 
 	$verwendung->getVerwendungDatum($uid, $day);
-	$verwendungArr = array();
+	$homeoffice = false;
 
 	foreach ($verwendung->result as $v)
+	{
 		if ($v->homeoffice)
-			if (!in_array($v->bisverwendung_id, $verwendungArr))
-			{
-				$bvId = $v->bisverwendung_id;
-				$verwendungArr[] = $v->bisverwendung_id;
-			}
+		{
+			$homeoffice = true;
+		}
+	}
 
-echo json_encode($verwendungArr);
+	echo json_encode($homeoffice);
 
 }

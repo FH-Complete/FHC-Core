@@ -287,16 +287,16 @@ echo '
 			useCheckedDate();
 
 			$("#von_datum").change(
-			function()
-			{
-				var uid = $("#uidpass").val();
-				var Datum = $(this).val();
-				Tag=Datum.substring(0,2);
-				Monat=Datum.substring(3,5);
-				Jahr=Datum.substring(6,10);
-				var day = Jahr + "-" + Monat + "-" + Tag;
-				checkBisverwendung(day,uid);
-			}
+				function()
+				{
+					var uid = $("#uidpass").val();
+					var Datum = $(this).val();
+					Tag=Datum.substring(0,2);
+					Monat=Datum.substring(3,5);
+					Jahr=Datum.substring(6,10);
+					var day = Jahr + "-" + Monat + "-" + Tag;
+					checkBisverwendung(day,uid);
+				}
 			)
 
 			function isVisible()
@@ -753,9 +753,9 @@ echo '
   			  day: day,
 			  uid: uid
   			},
-  			success: function (json)
+  			success: function (result)
 			{
-			  if (json.length > 3)
+			  if (result==\'true\')
 			  {
 				$("#homeofficeBlock").show();
 			  }
