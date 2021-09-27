@@ -25,7 +25,6 @@
 //flag for at least one new phrase
 $new = false;
 
-
 $phrases = array(
 	//*******************	CORE/global
 	array(
@@ -12472,6 +12471,106 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'extensions',
+		'phrase' => 'title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Extensions manager',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Extensions manager',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'extensions',
+		'phrase' => 'uploadExtension',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Upload extension',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload extension',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'extensions',
+		'phrase' => 'performSql',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Do not perform SQL',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do not perform SQL',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'extensions',
+		'phrase' => 'changeSuccess',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'The extension have been correctly changed',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The extension have been correctly changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'extensions',
+		'phrase' => 'changeError',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'An error occurred while changing the extension',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An error occurred while changing the extension',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
@@ -12594,5 +12693,5 @@ foreach ($phrases as $phrase)
 	}
 }
 
-if(!$new)
-	echo '<b>Keine neuen Phrasen</b><br>';
+if (!$new) echo '<b>Keine neuen Phrasen</b><br>';
+

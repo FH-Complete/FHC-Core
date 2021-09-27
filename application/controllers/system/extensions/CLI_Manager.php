@@ -11,8 +11,8 @@ class CLI_Manager extends CLI_Controller
 	 *
 	 */
 	public function __construct()
-    {
-        parent::__construct();
+	{
+		parent::__construct();
 
 		// Load helpers to upload files
 		$this->load->helper('form');
@@ -30,8 +30,9 @@ class CLI_Manager extends CLI_Controller
 	 * @param $filename Url Encoded Pfad zum tgz File der Extension
 	 * @param $perform_sql boolean ob die SQL Befehle ausgeführt werden
 	 */
-	public function uploadExtension($extensionName = null, $filename = null, $perform_sql = true)
+	public function installExtension($extensionName, $filename, $perform_sql = true)
 	{
 		$this->extensionslib->installExtension($extensionName, urldecode($filename), $perform_sql);
 	}
 }
+

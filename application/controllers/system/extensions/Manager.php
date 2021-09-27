@@ -11,8 +11,8 @@ class Manager extends Auth_Controller
 	 *
 	 */
 	public function __construct()
-    {
-        parent::__construct(
+	{
+		parent::__construct(
 			array(
 				'index' => 'system/extensions:r',
 				'toggleExtension' => 'system/extensions:rw',
@@ -21,11 +21,20 @@ class Manager extends Auth_Controller
 			)
 		);
 
-		// Load helpers to upload files
+		// Loads the form helper
 		$this->load->helper('form');
+
+		// Loads WidgetLib
+		$this->load->library('WidgetLib');
 
 		// Loads the extensions library
 		$this->load->library('ExtensionsLib');
+
+		$this->loadPhrases(
+                        array(
+                                'extensions'
+                        )
+                );
 	}
 
 	/**
@@ -50,7 +59,7 @@ class Manager extends Auth_Controller
 		$extension_id = $this->input->post('extension_id');
 		$enabled = $this->input->post('enabled');
 
-		if ($enabled === 'true')
+		if ($enabled === true)
 		{
 			$toggleExtension = $this->extensionslib->enableExtension($extension_id);
 		}
@@ -59,9 +68,7 @@ class Manager extends Auth_Controller
 			$toggleExtension = $this->extensionslib->disableExtension($extension_id);
 		}
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($toggleExtension));
+		$this->outputJsonSuccess($toggleExtension);
 	}
 
 	/**
@@ -69,15 +76,11 @@ class Manager extends Auth_Controller
 	 */
 	public function delExtension()
 	{
-		$delExtension = false;
-
 		$extension_id = $this->input->post('extension_id');
 
 		$delExtension = $this->extensionslib->delExtension($extension_id);
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($delExtension));
+		$this->outputJsonSuccess($delExtension);
 	}
 
 	/**
@@ -89,11 +92,11 @@ class Manager extends Auth_Controller
 	 * @param $filename Url Encoded Pfad zum tgz File der Extension
 	 * @param $perform_sql boolean ob die SQL Befehle ausgeführt werden
 	 */
-	public function uploadExtension($extensionName = null, $filename = null, $perform_sql = true)
+	public function uploadExtension()
 	{
-		$perform_sql = $this->input->post('databasechange');
-		$perform_sql = isset($perform_sql) ? false : true;
+		$performSql = $this->input->post('performSql');
 
-		$this->extensionslib->installExtension($extensionName, urldecode($filename), $perform_sql);
+		$this->extensionslib->installExtension(null, null, $performSql);
 	}
 }
+

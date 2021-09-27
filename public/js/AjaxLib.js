@@ -96,16 +96,17 @@ var FHC_AjaxClient = {
 	hasData: function(response) {
 		var hasData = false;
 
-	    if (FHC_AjaxClient.isSuccess(response))
-	    {
+		if (FHC_AjaxClient.isSuccess(response))
+		{
 			if ((jQuery.type(response.retval) == "object" && !jQuery.isEmptyObject(response.retval))
 				|| (jQuery.isArray(response.retval) && response.retval.length > 0)
 				|| (jQuery.type(response.retval) == "string" && response.retval.trim() != "")
-				|| jQuery.type(response.retval) == "number")
+				|| jQuery.type(response.retval) == "number"
+				|| jQuery.type(response.retval) == "boolean")
 			{
 				hasData = true;
 			}
-	    }
+		}
 
 		return hasData;
 	},

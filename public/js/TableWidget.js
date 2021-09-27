@@ -896,3 +896,4 @@ $(document).ready(function() {
 	FHC_TableWidget.display();
 
 });
+

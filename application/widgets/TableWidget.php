@@ -381,6 +381,19 @@ class TableWidget extends Widget
 			{
 				$rawDatasetRow->{$columnName} = ($columnValue === true ? 'true' : 'false');
 			}
+			// if it is an array
+			elseif (is_array($columnValue))
+			{
+				// Default is an empty string
+				$rawDatasetRow->{$columnName} = '';
+
+				// For each element of the array
+				foreach ($columnValue as $value)
+				{
+					$rawDatasetRow->{$columnName} .= $value."\n"; // concatenate each element of the array
+				}
+			}
+			// if it is a date/timestamp
 			elseif (DateTime::createFromFormat('Y-m-d H:i:s', $columnValue) !== false)
 			{
 				$rawDatasetRow->{$columnName} = date(self::DEFAULT_DATE_FORMAT, strtotime($columnValue));
