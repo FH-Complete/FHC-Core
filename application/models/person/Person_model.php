@@ -159,28 +159,29 @@ class Person_model extends DB_Model
 
 		$person = $this->load($person_id);
 
-		if($person->error) return $person;
+		if (isError($person)) return $person;
 
 		//return null if not found
-		if(count($person->retval) < 1)
+		if (!hasData($person))
 			return success(null);
 
-		$this->KontaktModel->addDistinct();
 		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
 		$this->KontaktModel->addOrder('kontakttyp');
+		$this->KontaktModel->addOrder('insertamum', 'DESC');
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);
 		$kontakte = $this->KontaktModel->loadWhere($where);
-		if($kontakte->error) return $kontakte;
+		if (isError($kontakte)) return $kontakte;
 
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
 		$this->AdresseModel->addSelect('public.tbl_adresse.*, bis.tbl_nation.kurztext AS nationkurztext');
 		$this->AdresseModel->addJoin('bis.tbl_nation', 'tbl_adresse.nation = tbl_nation.nation_code', 'LEFT');
+		$this->AdresseModel->addOrder('insertamum', 'DESC');
 		$adressen = $this->AdresseModel->loadWhere($where);
-		if($adressen->error) return $adressen;
+		if (isError($adressen)) return $adressen;
 
-		$stammdaten = $person->retval[0];
-		$stammdaten->kontakte = $kontakte->retval;
-		$stammdaten->adressen = $adressen->retval;
+		$stammdaten = getData($person)[0];
+		$stammdaten->kontakte = hasData($kontakte) ? getData($kontakte) : array();
+		$stammdaten->adressen = hasData($adressen) ? getData($adressen) : array();
 
 		return success($stammdaten);
 	}
