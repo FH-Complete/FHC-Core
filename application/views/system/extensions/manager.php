@@ -39,16 +39,24 @@
 			</div>
 
 			<?php echo form_open_multipart(current_url().'/uploadExtension'); ?>
-				<div>
-					<input type="file" name="extension" />
-					<input type="button" id="uploadExtension" value="<?php echo $this->p->t('extensions', 'uploadExtension'); ?>" />
+				<div class="row">
+					<div class="col-xs-2">
+						<input type="file" name="extension" />
+					</div>
+					<div>
+						<input type="button" id="uploadExtension" value="<?php echo $this->p->t('extensions', 'uploadExtension'); ?>" />
+					</div>
 				</div>
 
 				<br/>
 
-				<div>
-					<label for="performSql"><?php echo $this->p->t('extensions', 'performSql'); ?></label>
-					<input type="checkbox" class="checkbox" id="performSql" name="performSql"/>
+				<div class="row">
+					<div class="col-xs-2">
+						<label for="performSql"><?php echo $this->p->t('extensions', 'performSql'); ?></label>
+					</div>
+					<div>
+						<input type="checkbox" class="checkbox" id="performSql" name="performSql"/>
+					</div>
 				</div>
 			</form>
 		</div>
