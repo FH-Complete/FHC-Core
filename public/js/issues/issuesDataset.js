@@ -17,7 +17,7 @@ var IssuesDataset = {
 			'<option value="new"> Neu </option>' +
 			'</select>' +
 			'<span class="input-group-btn">' +
-			'<button class="btn btn-default setStatus">Status für Ausgew&auml;lte setzen</button>' +
+			'<button class="btn btn-default setStatus">Status für Ausgew&auml;hlte setzen</button>' +
 			'</span>' +
 			'</div>';
 

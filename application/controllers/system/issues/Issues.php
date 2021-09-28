@@ -14,7 +14,7 @@ class Issues extends Auth_Controller
 		parent::__construct(
 			array(
 				'index' => array(self::BERECHTIGUNG_KURZBZ.':r'),
-				'changeIssueStatus' => array(self::BERECHTIGUNG_KURZBZ.':r')
+				'changeIssueStatus' => array(self::BERECHTIGUNG_KURZBZ.':rw')
 			)
 		);
 
@@ -33,6 +33,7 @@ class Issues extends Auth_Controller
 
 		// Load models
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 
 		$this->_setAuthUID(); // sets property uid
 	}
@@ -101,8 +102,28 @@ class Issues extends Auth_Controller
 			foreach (getData($benutzerfunktionRes) as $benutzerfunktion)
 			{
 				$all_oe_kurzbz_with_funktionen[$benutzerfunktion->oe_kurzbz][] = $benutzerfunktion->funktion_kurzbz;
-				if ($benutzerfunktion->funktion_kurzbz == self::FUNKTION_KURZBZ) // separate oes for the funktion needed for displaying issues
+
+				// separate oes for the funktion needed for displaying issues
+				if ($benutzerfunktion->funktion_kurzbz == self::FUNKTION_KURZBZ)
+				{
 					$oe_kurzbz_for_funktion[] = $benutzerfunktion->oe_kurzbz;
+
+					$childOesFunktionRes = $this->OrganisationseinheitModel->getChilds($benutzerfunktion->oe_kurzbz);
+
+					if (isError($childOesFunktionRes))
+						show_error(getError($childOesFunktionRes));
+
+					if (hasData($childOesFunktionRes))
+					{
+						$childOesFunktion = getData($childOesFunktionRes);
+
+						foreach ($childOesFunktion as $childOeFunktion)
+						{
+							if (!in_array($childOeFunktion->oe_kurzbz, $oe_kurzbz_for_funktion))
+								$oe_kurzbz_for_funktion[] = $childOeFunktion->oe_kurzbz;
+						}
+					}
+				}
 			}
 		}
 

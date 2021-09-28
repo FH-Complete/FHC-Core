@@ -860,25 +860,49 @@ $filters = array(
 	array(
 		'app' => 'core',
 		'dataset_name' => 'issues',
-		'filter_kurzbz' => 'last7Days',
-		'description' => '{Fehler letzte 7 Tage}',
+		'filter_kurzbz' => 'offeneFehler',
+		'description' => '{Alle offenen}',
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler ",
+				"name": "Alle offenen Fehler",
 				"columns": [
-					{"name": "Fehlercode"},
-					{"name": "Fehlercode extern"},
 					{"name": "Datum"},
 					{"name": "Inhalt"},
-					{"name": "Inhalt extern"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
 					{"name": "PersonId"},
-					{"name": "OE"},
-					{"name": "Fehlertyp"},
-					{"name": "Fehlerstatus"},
-					{"name": "Verarbeitet von"},
-					{"name": "Verarbeitet am"}
+					{"name": "Fehlerstatus"}
+				],
+				"filters": [
+					{
+						"name": "Fehlerstatus",
+						"operation": "ncontains",
+						"condition": "behoben"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetze7Tage',
+		'description' => '{Letzten 7 Tage}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"}
 				],
 				"filters": [
 					{
@@ -892,6 +916,42 @@ $filters = array(
 		',
 		'oe_kurzbz' => null,
 	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetzte7TageBearbeitet',
+		'description' => '{Letzten 7 Tage bearbeitet}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"},
+					{"name": "Verarbeitet von"}
+				],
+				"filters": [
+					{
+						"name": "Verarbeitet am",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					},
+					{
+						"name": "Fehlerstatus",
+						"operation": "contains",
+						"condition": "behoben"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	)
 );
 
 // Loop through the filters array

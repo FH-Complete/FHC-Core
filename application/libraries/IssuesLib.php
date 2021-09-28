@@ -72,7 +72,7 @@ class IssuesLib
 			return $this->_addIssue($fehlercode, $person_id, $oe_kurzbz, $fehlertext_params);
 		}
 		else
-			return error("Fehler nicht gefunden");
+			return error("Fehler $fehler_kurzbz nicht gefunden");
 	}
 
 	/**
@@ -81,26 +81,39 @@ class IssuesLib
 	 * @param string $inhalt_extern error text in external system
 	 * @param int $person_id
 	 * @param int $oe_kurzbz
-	 * @param array $fehlertext_params params for sprint replace of error text in system.tbl_fehler
+	 * @param array $fehlertext_params params for replacement of parts of error text
+	 * @param bool $force_predefined if true, only predefined external issues are added
 	 * @return object success or error
 	 */
-	public function addExternalIssue($fehlercode_extern, $inhalt_extern, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null)
+	public function addExternalIssue($fehlercode_extern, $inhalt_extern, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $force_predefined = false)
 	{
 		if (isEmptyString($fehlercode_extern))
 			return error("fehlercode_extern fehlt");
 
 		// get external fehlercode (unique for each app)
 		$this->_ci->FehlerModel->addSelect('fehlercode');
-		$fehlerRes = $this->_ci->FehlerModel->loadWhere(array('fehlercode_extern' => $fehlercode_extern, 'app' => $this->_app));
+		$fehlerRes = $this->_ci->FehlerModel->loadWhere(
+			array(
+				'fehlercode_extern' => $fehlercode_extern,
+				'app' => $this->_app
+			)
+		);
 
 		if (isError($fehlerRes))
 			return $fehlerRes;
+
+		$fehlerData = getData($fehlerRes)[0];
 
 		// check if there is a predefined custom error for the external issue
 		if (hasData($fehlerRes))
 		{
 			// if found, use the code
-			$fehlercode = getData($fehlerRes)[0]->fehlercode;
+			$fehlercode = $fehlerData->fehlercode;
+		}
+		elseif ($force_predefined === true)
+		{
+			// only added if predefined
+			return success("No definition found - not added");
 		}
 		else
 		{
@@ -180,7 +193,7 @@ class IssuesLib
 	 * @param array $fehlertext_params
 	 * @param string $fehlercode_extern
 	 * @param string $inhalt_extern
-	 * @return array|stdClass
+	 * @return object success or error
 	 */
 	private function _addIssue($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $fehlercode_extern = null, $inhalt_extern = null)
 	{
@@ -226,6 +239,6 @@ class IssuesLib
 				return error("Anzahl offener Issues konnte nicht ermittelt werden.");
 		}
 		else
-			return error("Fehler nicht gefunden");
+			return error("Fehler $fehlercode nicht gefunden");
 	}
 }
