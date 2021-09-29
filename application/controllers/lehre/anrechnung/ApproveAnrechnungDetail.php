@@ -85,7 +85,7 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
-		
+
 		// Get Antrag data
 		$antragData = $this->anrechnunglib->getAntragData(
 			$anrechnungData->prestudent_id,
@@ -98,7 +98,7 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		// Get Genehmigung data
 		$genehmigungData = $this->anrechnunglib->getGenehmigungData($anrechnung_id);
-		
+
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
@@ -121,13 +121,13 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-		
+
 		// Get STGLs person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
 			show_error('Failed retrieving person data');
 		}
-		
+
 		// Approve Anrechnung
 		foreach ($data as $item)
 		{
@@ -166,13 +166,13 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-		
+
 		// Get STGLs person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
 			show_error('Failed retrieving person data');
 		}
-		
+
 		// Reject Anrechnung
 		foreach ($data as $item)
 		{
@@ -210,10 +210,10 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-		
+
 		$retval = array();
 		$counter = 0;
-		
+
 		foreach ($data as $item)
 		{
 			// Check if Anrechnungs-LV has lector
@@ -221,18 +221,18 @@ class approveAnrechnungDetail extends Auth_Controller
 			{
 				// Count up LV with no lector
 				$counter++;
-				
+
 				// Break, if LV has no lector
 				break;
 			}
-			
+
 			// Get full name of LV Leitung.
 			// If LV Leitung is not present, get full name of LV lectors.
 			$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
 			$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
 				? implode(', ', array_column($lector_arr, 'fullname'))
 				: '';
-			
+
 			// Request Recommendation
 			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
 			{
@@ -246,7 +246,7 @@ class approveAnrechnungDetail extends Auth_Controller
 				);
 			}
 		}
-		
+
 		/**
 		 * Send mails to lectors
 		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
@@ -255,11 +255,11 @@ class approveAnrechnungDetail extends Auth_Controller
 		if (!isEmptyArray($retval))
 		{
 			self::_sendSanchoMailToLectors($retval);
-			
+
 			// Output json to ajax
 			return $this->outputJsonSuccess($retval);
 		}
-		
+
 		// Output json to ajax
 		if (isEmptyArray($retval) && $counter > 0)
 		{
@@ -267,22 +267,22 @@ class approveAnrechnungDetail extends Auth_Controller
 				"Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
 			);
 		}
-		
+
 		return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 	}
-	
+
 	/**
 	 * Withdraw approved / rejected Anrechnung and reset to 'inProgressDP'.
 	 */
 	public function withdraw()
 	{
 		$anrechnung_id = $this->input->post('anrechnung_id');
-		
+
 		if (!is_numeric($anrechnung_id))
 		{
 			$this->terminateWithJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
-		
+
 		// Delete last status approved / rejected.
 		// If last status is 'approved', Genehmigung is resetted.
 		$result = $this->AnrechnungModel->withdrawApprovement($anrechnung_id);
@@ -291,13 +291,13 @@ class approveAnrechnungDetail extends Auth_Controller
 		{
 			$this->terminateWithJsonError(getError($result));
 		}
-		
+
 		// Success output to AJAX
 		$this->outputJsonSuccess(array(
 			'status_bezeichnung' => $this->anrechnunglib->getLastAnrechnungstatus($anrechnung_id))
 		);
 	}
-	
+
 	/**
 	 * Withdraw request for reommendation and reset to 'inProgressDP'.
 	 * This is only possible if the lector has not provided a recommendation yet.
@@ -305,69 +305,69 @@ class approveAnrechnungDetail extends Auth_Controller
 	public function withdrawRequestRecommendation()
 	{
 		$anrechnung_id = $this->input->post('anrechnung_id');
-		
+
 		if (!is_numeric($anrechnung_id))
 		{
 			show_error('Wrong parameter.');
 		}
-		
+
 		// Get boolean empfehlung of given Anrechnung
 		if (!$result = getData($this->AnrechnungModel->load($anrechnung_id))[0])
 		{
 			show_error('Failed loading Anrechnung');
 		}
-		
+
 		$empfehlung = $result->empfehlung_anrechnung;
-		
+
 		// Get last Anrechnungstatus
 		if (!$result = getData($this->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
 		{
 			show_error('Failed loading last Anrechnungstatus');
 		}
-		
+
 		$last_status = $result->status_kurzbz;
 		$anrechnungstatus_id = $result->anrechnungstatus_id;
-		
+
 		// Return if Anrechnung was not waiting for recommendation or if Anrechnung has already been recommended
-		if ($last_status != self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR && !is_null($empfehlung))
+		if ($last_status != self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || !is_null($empfehlung))
 		{
 			return $this->outputJsonError('No recommendation to withdraw.');
 		}
-		
+
 		// Reset status to 'inProgressDP'
 		$result = $this->AnrechnungModel->deleteAnrechnungstatus($anrechnungstatus_id);
-		
+
 		if (isError($result))
 		{
 			return $this->outputJsonError('Could not withdraw this application.');
 		}
-		
+
 		// Success output to AJAX
 		return $this->outputJsonSuccess(array(
 				'status_bezeichnung' => $this->anrechnunglib->getLastAnrechnungstatus($anrechnung_id))
 		);
 	}
-	
+
 	public function saveEmpfehlungsNotiz()
 	{
 		$anrechnung_id = $this->input->post('anrechnung_id');
 		$notiz_id = $this->input->post('notiz_id');
 		$empfehlungstext = $this->input->post('empfehlung_text');
-		
+
 		// Validate data
 		if (isEmptyString($anrechnung_id))
 		{
 			$this->terminateWithJsonError($this->p->t('ui', 'systemFehler'));
 		}
-		
+
 		// Save Empfehlungstext
 		$result = self::_saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id);
-		
+
 		if (isError($result))
 		{
 			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 		}
-		
+
 		// Output success message
 		$this->outputJsonSuccess($this->p->t('ui', 'gespeichert'));
 	}
@@ -386,10 +386,10 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		// Check if user is entitled to read dms doc
 		self::_checkIfEntitledToReadDMSDoc($dms_id);
-		
+
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
-		
+
 		// Download file
 		$this->dmslib->download($dms_id, $filename);
 	}
@@ -475,7 +475,7 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		show_error('You are not entitled to read this document');
 	}
-	
+
 	/**
 	 * Send mail to lectors asking for recommendation. (first to LV-Leitung, if not present to all lectors of lv)
 	 * @param $mail_params
@@ -503,8 +503,8 @@ class approveAnrechnungDetail extends Auth_Controller
 		 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
 		 * **/
 		$lector_arr = $this->_getLectors($anrechnung_arr);
-		
-		
+
+
 
 		// Send mail to lectors
 		foreach ($lector_arr as $lector)
@@ -594,11 +594,11 @@ class approveAnrechnungDetail extends Auth_Controller
 		return $lector_arr;
 
 	}
-	
+
 	private function _saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id)
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
-		
+
 		if (!isEmptyString($notiz_id))
 		{
 			return $this->NotizModel->update(
@@ -610,15 +610,15 @@ class approveAnrechnungDetail extends Auth_Controller
 				)
 			);
 		}
-		
+
 		return $this->NotizModel->addNotizForAnrechnung(
 			$anrechnung_id,
 			self::ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL,
 			trim($empfehlungstext),
 			$this->_uid
 		);
-		
-		
+
+
 	}
 
 }
