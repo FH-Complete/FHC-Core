@@ -5282,7 +5282,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler_zustaendigkeiten L
 {
 	$qry = "CREATE TABLE system.tbl_fehler_zustaendigkeiten (
 				  fehlerzustaendigkeiten_id character varying(64) NOT NULL,
-				  fehlercode character varying(64),
+				  fehlercode character varying(64) NOT NULL,
 				  person_id integer,
 				  oe_kurzbz character varying(32),
 				  funktion_kurzbz character varying(16)
@@ -5293,7 +5293,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler_zustaendigkeiten L
 			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.person_id IS 'person_id der zuständigen Person';
 			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.oe_kurzbz IS 'Zuständigkeit für einen fehlercode für eine ganze OE';
 			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.funktion_kurzbz IS 'Zusätzliche Einschränkung der OE Zuständigkeit nach funktion';
-			
 				
 			CREATE SEQUENCE system.seq_fehlerzustaendigkeiten_id
 				START WITH 1
