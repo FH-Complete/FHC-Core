@@ -389,7 +389,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					echo "<bis>".$datum->convertISODate($row1->bis)."</bis>";
 					echo "<zweck>$row1->zweck</zweck>";
 					echo "<ort>$row1->ort</ort>";
-					echo "<universitaet>$row1->universitaet</universitaet>";
+					echo "<universitaet><![CDATA[$row1->universitaet]]></universitaet>";
 					echo "</auslandssemesters>";
 				}
 				echo "</auslandssemester>";

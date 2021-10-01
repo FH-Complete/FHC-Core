@@ -104,9 +104,11 @@ if(isset($_GET['show']))
 			SELECT 
 				distinct on(tbl_frage.frage_id) *, tbl_gebiet.kurzbz as gebiet
 			FROM 
-				testtool.tbl_frage 
-				JOIN testtool.tbl_ablauf USING(gebiet_id)
-				JOIN testtool.tbl_frage_sprache USING(frage_id)
+				testtool.tbl_frage ";
+	if($stg_kz!='')
+		$qry.="	JOIN testtool.tbl_ablauf USING(gebiet_id) ";
+
+		$qry.="	JOIN testtool.tbl_frage_sprache USING(frage_id)
 				JOIN testtool.tbl_gebiet USING(gebiet_id)
 			WHERE 
 				demo=false";

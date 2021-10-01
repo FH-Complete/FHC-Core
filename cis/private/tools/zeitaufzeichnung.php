@@ -2204,7 +2204,7 @@ function getDataForProjectOverviewCSV($user)
 	{
 		if (true)
 		{
-			$titel = $prjp->projekt_kurzbz;
+			$titel = $prjp->projekttitel;
 			$projekt_kurzbz = $prjp->projekt_kurzbz;
 			$projekt_phase = $prjp->bezeichnung;
 			$projekt_phase_id = $prjp->projektphase_id;
