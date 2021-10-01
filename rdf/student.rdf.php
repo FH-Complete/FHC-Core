@@ -395,6 +395,94 @@ function draw_prestudent($row)
 	}
 }
 
+function draw_empty_content()
+{
+	echo '<RDF:li>
+		<RDF:Description  id=""  about="" >
+			<STUDENT:person_id><![CDATA[]]></STUDENT:person_id>
+			<STUDENT:titelpre><![CDATA[]]></STUDENT:titelpre>
+			<STUDENT:titelpost><![CDATA[]]></STUDENT:titelpost>
+			<STUDENT:vornamen><![CDATA[]]></STUDENT:vornamen>
+			<STUDENT:vorname><![CDATA[]]></STUDENT:vorname>
+			<STUDENT:nachname><![CDATA[KEINE RESULTATE]]></STUDENT:nachname>
+			<STUDENT:geburtsdatum><![CDATA[]]></STUDENT:geburtsdatum>
+			<STUDENT:geburtsdatum_iso><![CDATA[]]></STUDENT:geburtsdatum_iso>
+			<STUDENT:homepage><![CDATA[]]></STUDENT:homepage>
+			<STUDENT:gebort><![CDATA[]]></STUDENT:gebort>
+			<STUDENT:gebzeit><![CDATA[]]></STUDENT:gebzeit>
+			<STUDENT:anmerkungen><![CDATA[]]></STUDENT:anmerkungen>
+			<STUDENT:anrede><![CDATA[]]></STUDENT:anrede>
+			<STUDENT:svnr><![CDATA[]]></STUDENT:svnr>
+			<STUDENT:ersatzkennzeichen><![CDATA[]]></STUDENT:ersatzkennzeichen>
+			<STUDENT:familienstand><![CDATA[]]></STUDENT:familienstand>
+			<STUDENT:geschlecht><![CDATA[]]></STUDENT:geschlecht>
+			<STUDENT:anzahlkinder><![CDATA[]]></STUDENT:anzahlkinder>
+			<STUDENT:staatsbuergerschaft><![CDATA[]]></STUDENT:staatsbuergerschaft>
+			<STUDENT:geburtsnation><![CDATA[]]></STUDENT:geburtsnation>
+			<STUDENT:sprache><![CDATA[]]></STUDENT:sprache>
+			<STUDENT:status><![CDATA[]]></STUDENT:status>
+			<STUDENT:status_datum><![CDATA[]]></STUDENT:status_datum>
+			<STUDENT:status_datum_iso><![CDATA[]]></STUDENT:status_datum_iso>
+			<STUDENT:status_bestaetigung><![CDATA[]]></STUDENT:status_bestaetigung>
+			<STUDENT:status_bestaetigung_iso><![CDATA[]]></STUDENT:status_bestaetigung_iso>
+			<STUDENT:orgform><![CDATA[]]></STUDENT:orgform>
+			<STUDENT:studienplan_bezeichnung><![CDATA[]]></STUDENT:studienplan_bezeichnung>
+			<STUDENT:studienplan_id><![CDATA[]]></STUDENT:studienplan_id>
+			<STUDENT:mail_privat><![CDATA[]]></STUDENT:mail_privat>
+			<STUDENT:mail_intern><![CDATA[]]></STUDENT:mail_intern>
+			<STUDENT:zugangscode><![CDATA[]]></STUDENT:zugangscode>
+			<STUDENT:link_bewerbungstool><![CDATA[]]></STUDENT:link_bewerbungstool>
+
+			<STUDENT:aktiv><![CDATA[]]></STUDENT:aktiv>
+			<STUDENT:uid><![CDATA[]]></STUDENT:uid>
+			<STUDENT:matrikelnummer><![CDATA[]]></STUDENT:matrikelnummer>
+			<STUDENT:alias><![CDATA[]]></STUDENT:alias>
+			<STUDENT:semester><![CDATA[]]></STUDENT:semester>
+			<STUDENT:verband><![CDATA[]]></STUDENT:verband>
+			<STUDENT:gruppe><![CDATA[]]></STUDENT:gruppe>
+			<STUDENT:studiengang_kz_student><![CDATA[]]></STUDENT:studiengang_kz_student>
+			<STUDENT:matr_nr><![CDATA[]]></STUDENT:matr_nr>
+			<STUDENT:studiengang_studiengangsleitung><![CDATA[]]></STUDENT:studiengang_studiengangsleitung>
+			<STUDENT:anzahl_notizen><![CDATA[]]></STUDENT:anzahl_notizen>
+			
+			<STUDENT:prestudent_id><![CDATA[]]></STUDENT:prestudent_id>
+			<STUDENT:studiengang_kz_prestudent><![CDATA[]]></STUDENT:studiengang_kz_prestudent>
+			<STUDENT:studiengang_kz><![CDATA[]]></STUDENT:studiengang_kz>
+			<STUDENT:aufmerksamdurch_kurzbz><![CDATA[]]></STUDENT:aufmerksamdurch_kurzbz>
+			<STUDENT:studiengang><![CDATA[]]></STUDENT:studiengang>
+			<STUDENT:berufstaetigkeit_code><![CDATA[]]></STUDENT:berufstaetigkeit_code>
+			<STUDENT:ausbildungcode><![CDATA[]]></STUDENT:ausbildungcode>
+			<STUDENT:zgv_code><![CDATA[]]></STUDENT:zgv_code>
+			<STUDENT:zgvort><![CDATA[]]></STUDENT:zgvort>
+			<STUDENT:zgvdatum><![CDATA[]]></STUDENT:zgvdatum>
+			<STUDENT:zgvdatum_iso><![CDATA[]]></STUDENT:zgvdatum_iso>
+			<STUDENT:zgvnation><![CDATA[]]></STUDENT:zgvnation>
+			<STUDENT:zgvmas_code><![CDATA[]]></STUDENT:zgvmas_code>
+			<STUDENT:zgvmaort><![CDATA[]]></STUDENT:zgvmaort>
+			<STUDENT:zgvmadatum><![CDATA[]]></STUDENT:zgvmadatum>
+			<STUDENT:zgvmadatum_iso><![CDATA[]]></STUDENT:zgvmadatum_iso>
+			<STUDENT:zgvmanation><![CDATA[]]></STUDENT:zgvmanation>
+			<STUDENT:ausstellungsstaat><![CDATA[]]></STUDENT:ausstellungsstaat>
+			<STUDENT:aufnahmeschluessel><![CDATA[]]></STUDENT:aufnahmeschluessel>
+			<STUDENT:facheinschlberuf><![CDATA[]]></STUDENT:facheinschlberuf>
+			<STUDENT:reihungstest_id><![CDATA[]]></STUDENT:reihungstest_id>
+			<STUDENT:anmeldungreihungstest><![CDATA[]]></STUDENT:anmeldungreihungstest>
+			<STUDENT:anmeldungreihungstest_iso><![CDATA[]]></STUDENT:anmeldungreihungstest_iso>
+			<STUDENT:reihungstestangetreten><![CDATA[]]></STUDENT:reihungstestangetreten>
+			<STUDENT:punkte><![CDATA[]]></STUDENT:punkte>
+			<STUDENT:bismelden><![CDATA[]]></STUDENT:bismelden>
+			<STUDENT:dual><![CDATA[]]></STUDENT:dual>
+			<STUDENT:dual_bezeichnung><![CDATA[]]></STUDENT:dual_bezeichnung>
+			<STUDENT:anmerkungpre><![CDATA[]]></STUDENT:anmerkungpre>
+			<STUDENT:mentor><![CDATA[]]></STUDENT:mentor>
+			<STUDENT:gsstudientyp_kurzbz><![CDATA[]]></STUDENT:gsstudientyp_kurzbz>
+			<STUDENT:aufnahmegruppe_kurzbz><![CDATA[]]></STUDENT:aufnahmegruppe_kurzbz>
+			<STUDENT:priorisierung><![CDATA[]]></STUDENT:priorisierung>
+			<STUDENT:priorisierung_realtiv><![CDATA[]]></STUDENT:priorisierung_realtiv>
+		</RDF:Description>
+	</RDF:li>';
+}
+
 // ******* Init **************************
 
 
@@ -766,19 +854,22 @@ if($xmlformat=='rdf')
 
 				if($db->db_query($qry))
 				{
-					while($row = $db->db_fetch_object())
+					while ($row = $db->db_fetch_object())
 					{
-						$student=new student();
-						if($uid = $student->getUid($row->prestudent_id))
+						$student = new student();
+						if ($uid = $student->getUid($row->prestudent_id))
 						{
 							//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
 							//nochmal laden aber ohne studiensemester
-							if(!$student->load($uid, $studiensemester_kurzbz))
+							if (!$student->load($uid, $studiensemester_kurzbz))
+							{
 								$student->load($uid);
+							}
 						}
 						$prestd = new prestudent();
 						$prestd->load($row->prestudent_id);
-						if($uid!='')
+
+						if ($uid != '')
 						{
 							draw_content($student);
 							draw_prestudent($prestd);
@@ -823,29 +914,38 @@ if($xmlformat=='rdf')
 									matr_nr = ".$db->db_add_param($searchItems_string_orig)." OR
 									svnr = ".$db->db_add_param($searchItems_string_orig).";";
 				}
-				if($db->db_query($qry))
+				if($result = $db->db_query($qry))
 				{
-					while($row = $db->db_fetch_object())
+					if ($db->db_num_rows($result) == 0)
 					{
-						$student=new student();
-						if($uid = $student->getUid($row->prestudent_id))
+						draw_empty_content();
+					}
+					else
+					{
+						while ($row = $db->db_fetch_object())
 						{
-							//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
-							//nochmal laden aber ohne studiensemester
-							if(!$student->load($uid, $studiensemester_kurzbz))
-								$student->load($uid);
-						}
-						$prestd = new prestudent();
-						$prestd->load($row->prestudent_id);
-						if($uid!='')
-						{
-							draw_content($student);
-							draw_prestudent($prestd);
-						}
-						else
-						{
-							draw_content($prestd);
-							draw_prestudent($prestd);
+							$student = new student();
+							if ($uid = $student->getUid($row->prestudent_id))
+							{
+								//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+								//nochmal laden aber ohne studiensemester
+								if (!$student->load($uid, $studiensemester_kurzbz))
+								{
+									$student->load($uid);
+								}
+							}
+							$prestd = new prestudent();
+							$prestd->load($row->prestudent_id);
+							if ($uid != '')
+							{
+								draw_content($student);
+								draw_prestudent($prestd);
+							}
+							else
+							{
+								draw_content($prestd);
+								draw_prestudent($prestd);
+							}
 						}
 					}
 				}
@@ -917,7 +1017,19 @@ else
 				default:	$typ = 'FH-Studiengang';
 			}
 
-			$qry = "SELECT * FROM campus.vw_benutzer JOIN public.tbl_benutzerfunktion USING(uid) WHERE funktion_kurzbz='rek'";
+			$qry = "SELECT *
+					FROM PUBLIC.tbl_benutzerfunktion
+					JOIN campus.vw_mitarbeiter USING (uid)
+					WHERE funktion_kurzbz = 'rek'
+						AND (
+							tbl_benutzerfunktion.datum_von <= now()
+							OR tbl_benutzerfunktion.datum_von IS NULL
+							)
+						AND (
+							tbl_benutzerfunktion.datum_bis >= now()
+							OR tbl_benutzerfunktion.datum_bis IS NULL
+							)
+					ORDER BY tbl_benutzerfunktion.insertamum DESC LIMIT 1";
 			$rektor = '';
 			if($db->db_query($qry))
 			{
