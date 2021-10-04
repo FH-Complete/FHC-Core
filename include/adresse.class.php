@@ -526,7 +526,7 @@ class adresse extends basis_db
 
 	public function getAdressentyp()
 	{
-		$qry = "SELECT * FROM public.tbl_adressentyp ORDER BY sort;";
+		$qry = "SELECT * FROM public.tbl_adressentyp ORDER BY sort";
 
 		if($this->db_query($qry))
 		{
