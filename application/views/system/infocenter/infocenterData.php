@@ -6,7 +6,7 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\', \'Interessent rejected\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\'';
 	$LOGDATA_NAME_PARKED = '\'Parked\'';
 	$LOGDATA_NAME_ONHOLD = '\'Onhold\'';
 	$LOGTYPE_KURZBZ = '\'Processstate\'';
@@ -14,6 +14,7 @@
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
+	$ORG_NAME = '\'InfoCenter\'';
 
 	$query = '
 		SELECT
@@ -33,7 +34,7 @@
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "LastAction",
 			(
@@ -42,7 +43,7 @@
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "LastActionType",
 			(
@@ -59,7 +60,7 @@
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "User/Operator",
 			(
@@ -254,13 +255,14 @@
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
 				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				AND tbl_organisationseinheit.bezeichnung = '.$ORG_NAME.'
 				AND tbl_benutzerfunktion.uid = (
 					SELECT l.insertvon
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 					AND l.person_id = p.person_id
-					ORDER BY l.zeitpunkt DESC
+					ORDER BY l.log_id DESC
 					LIMIT 1
 				)
 				LIMIT 1 
@@ -439,13 +441,13 @@
 				$datasetRaw->{'ZGVMNation'} = '-';
 			}
 
-			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'InfoCenter')
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)
 			{
-				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
 			}
 			else
 			{
-				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
 			}
 
 			return $datasetRaw;
