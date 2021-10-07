@@ -86,7 +86,7 @@ class DB_Model extends CI_Model
 		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
-		if (isError($validate = $this->_manageUDFs($data, $this->dbTable))) return $validate;
+		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable))) return $validate;
 
 		// DB-INSERT
 		$insert = $this->db->insert($this->dbTable, $data);
@@ -137,7 +137,7 @@ class DB_Model extends CI_Model
 		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
-		if (isError($validate = $this->_manageUDFs($data, $this->dbTable, $id))) return $validate;
+		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable, $id))) return $validate;
 
 		$tmpId = $id;
 
@@ -844,25 +844,25 @@ class DB_Model extends CI_Model
 	}
 
 	/**
-	 * Wrapper method for UDFLib->manageUDFs
+	 * Wrapper method for UDFLib->prepareUDFsWrite
 	 */
-	private function _manageUDFs(&$data, $schemaAndTable, $id = null)
+	private function _prepareUDFsWrite(&$data, $schemaAndTable, $id = null)
 	{
-		$manageUDFs = success();
+		$prepareUDFsWrite = success();
 
 		if ($this->hasUDF())
 		{
 			if ($id != null)
 			{
-				$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable, $this->getUDFs($id));
+				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable, $this->getUDFs($id));
 			}
 			else
 			{
-				$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable);
+				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable);
 			}
 		}
 
-		return $manageUDFs;
+		return $prepareUDFsWrite;
 	}
 
 	/**
@@ -874,9 +874,10 @@ class DB_Model extends CI_Model
 	 */
 	private function _toPhp($result)
 	{
+		$udfs = false; // if UDFs are inside the given result set
 		$toPhp = $result; // if there is nothing to convert then return the result from DB
 
-		// If it's an object its fields will be parsed to find booleans and arrays types
+		// If it's an object its fields will be parsed to find booleans, arrays and UDFs types
 		if (is_object($result))
 		{
 			$toBeConverterdArray = array(); // Fields to be converted
@@ -884,40 +885,48 @@ class DB_Model extends CI_Model
 			$this->executedQueryMetaData = $result->field_data(); // Fields information
 			$this->executedQueryListFields = $result->list_fields(); // List of the retrieved fields
 
-			for ($i = 0; $i < count($this->executedQueryMetaData); $i++) // Looking for booleans and arrays
+			// Looking for booleans, arrays and UDFs
+			foreach ($this->executedQueryMetaData as $eqmd)
 			{
 				// If array type, boolean type OR a UDF
-				if (strpos($this->executedQueryMetaData[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
-					|| $this->executedQueryMetaData[$i]->type == DB_Model::PGSQL_BOOLEAN_TYPE
-					|| $this->udflib->isUDFColumn($this->executedQueryMetaData[$i]->name, $this->executedQueryMetaData[$i]->type))
+				if (strpos($eqmd->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
+					|| $eqmd->type == DB_Model::PGSQL_BOOLEAN_TYPE
+					|| $this->udflib->isUDFColumn($eqmd->name, $eqmd->type))
 				{
-					// Name and type of the field to be converted
-					$toBeConverted = new stdClass();
-					// Set the type of the field to be converted
-					$toBeConverted->type = $this->executedQueryMetaData[$i]->type;
-					// Set the name of the field to be converted
-					$toBeConverted->name = $this->executedQueryMetaData[$i]->name;
-					// Add the field to be converted to $toBeConverterdArray
-					array_push($toBeConverterdArray, $toBeConverted);
+					// If UDFs are inside this result set
+					if ($this->udflib->isUDFColumn($eqmd->name, $eqmd->type))
+					{
+						$udfs = true;
+					}
+					else // all the other cases
+					{
+						// Name and type of the field to be converted
+						$toBeConverted = new stdClass();
+						// Set the type of the field to be converted
+						$toBeConverted->type = $eqmd->type;
+						// Set the name of the field to be converted
+						$toBeConverted->name = $eqmd->name;
+						// Add the field to be converted to $toBeConverterdArray
+						array_push($toBeConverterdArray, $toBeConverted);
+					}
 				}
 			}
 
-			// If there is something to convert, otherwhise don't lose time
-			if (count($toBeConverterdArray) > 0)
-			{
-				// Returns the array of objects, each of them represents a DB record
-				$resultsArray = $result->result();
-				// Looping on results
-				for ($i = 0; $i < count($resultsArray); $i++)
-				{
-					// Single element
-					$resultElement = $resultsArray[$i];
-					// Looping on fields to be converted
-					for ($j = 0; $j < count($toBeConverterdArray); $j++)
-					{
-						// Single element
-						$toBeConverted = $toBeConverterdArray[$j];
+			// Returns the array of objects, each of them represents a DB record
+			$resultsArray = $result->result();
 
+			// If in this result set there are UDFs then prepare them
+			if ($udfs) $this->udflib->prepareUDFsRead($resultsArray, $this->dbTable);
+
+			// If there is something to convert, otherwhise don't waste time
+			if (!isEmptyArray($toBeConverterdArray))
+			{
+				// Looping on results
+				foreach ($resultsArray as $resultElement)
+				{
+					// Looping on fields to be converted
+					foreach ($toBeConverterdArray as $toBeConverted)
+					{
 						// Array type
 						if (strpos($toBeConverted->type, DB_Model::PGSQL_ARRAY_TYPE) !== false)
 						{
@@ -931,30 +940,12 @@ class DB_Model extends CI_Model
 						{
 							$resultElement->{$toBeConverted->name} = $this->pgBoolPhp($resultElement->{$toBeConverted->name});
 						}
-						// UDF
-						elseif ($this->udflib->isUDFColumn($toBeConverted->name, $toBeConverted->type))
-						{
-							$jsonValues = json_decode($resultElement->{$toBeConverted->name}); // decode UDFs values
-							if ($jsonValues != null) // if decode is ok
-							{
-								// For every UDF
-								foreach ($jsonValues as $key => $value)
-								{
-									$resultElement->{$key} = $value; // create a new element called like the UDF
-								}
-							}
-							unset($resultElement->{UDFLib::COLUMN_NAME}); // remove udf_values from the response
-						}
 					}
 				}
-				// Returns DB data as an array
-				$toPhp = $resultsArray;
 			}
-			// And returns DB data as an array
-			else
-			{
-				$toPhp = $result->result();
-			}
+
+			// Returns DB data as an array
+			$toPhp = $resultsArray;
 		}
 
 		return $toPhp;
