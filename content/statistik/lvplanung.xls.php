@@ -29,6 +29,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/organisationseinheit.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/studiensemester.class.php');
 
 $user = get_uid();
 
@@ -114,6 +115,9 @@ $oe_arr[''] = '';
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
+$stsem = new studiensemester();
+
+$previousStsem = $stsem->getPreviousFrom($stsem->getPreviousFrom($studiensemester_kurzbz));
 $qry = "
 SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 	tbl_lehrveranstaltung.studiengang_kz,
@@ -124,18 +128,21 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 	tbl_lehreinheitmitarbeiter.stundensatz,
 	tbl_lehreinheitmitarbeiter.semesterstunden lemss,
 	tbl_lehreinheitmitarbeiter.planstunden,
+	tbl_lehreinheitmitarbeiter.anmerkung as mitarbeiter_anmerkung,
 	tbl_lehreinheit.stundenblockung,
 	tbl_lehreinheit.wochenrythmus,
 	tbl_lehreinheit.raumtyp,
 	tbl_lehreinheit.raumtypalternativ,
-	tbl_lehreinheit.anmerkung,
+	tbl_lehreinheit.anmerkung as lehreinheit_anmerkung,
 	tbl_lehreinheit.studiensemester_kurzbz,
+	tbl_lehreinheit.start_kw,
 	tbl_lehrveranstaltung.ects,
 	tbl_lehrveranstaltung.semesterstunden,
 	tbl_lehrveranstaltung.semesterstunden AS sws,
 	tbl_lehrveranstaltung.lehrform_kurzbz,
 	tbl_lehrveranstaltung.lehrveranstaltung_id,
 	tbl_lehrveranstaltung.orgform_kurzbz,
+	tbl_lehrveranstaltung.sprache,
 	(
 		SELECT nachname
 		FROM PUBLIC.tbl_person
@@ -163,6 +170,16 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 		FROM lehre.tbl_lehrform
 		WHERE lehre.tbl_lehrform.lehrform_kurzbz = tbl_lehrveranstaltung.lehrform_kurzbz LIMIT 1
 		) AS lv_type,
+	(
+			SELECT STRING_AGG(DISTINCT (person.nachname || ' ' || person.vorname), ', ')
+			FROM lehre.tbl_lehrveranstaltung slv
+			JOIN lehre.tbl_lehreinheit sle USING (lehrveranstaltung_id)
+			JOIN lehre.tbl_lehreinheitmitarbeiter slema USING (lehreinheit_id)
+			JOIN PUBLIC.tbl_benutzer benutzer ON benutzer.uid = slema.mitarbeiter_uid
+			JOIN PUBLIC.tbl_person person USING (person_id)
+			WHERE lehre.tbl_lehreinheit.lehrveranstaltung_id = sle.lehrveranstaltung_id
+			AND sle.studiensemester_kurzbz = " . $db->db_add_param($previousStsem) . "
+		) AS vorjahr_lektor,
 	tbl_lehrveranstaltung.lehrform_kurzbz
 FROM lehre.tbl_lehrveranstaltung
 JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
@@ -217,6 +234,10 @@ $worksheet->write($zeile,++$spalte,"LektorIn", $format_bold);
 $maxlength[$spalte]=6;
 $worksheet->write($zeile,++$spalte,"Fixangestellt", $format_bold);
 $maxlength[$spalte]=10;
+$worksheet->write($zeile,++$spalte,"Vorjahrslektor", $format_bold);
+$maxlength[$spalte]=12;
+$worksheet->write($zeile,++$spalte,"Wunschlektor", $format_bold);
+$maxlength[$spalte]=12;
 $worksheet->write($zeile,++$spalte,"Bezeichnung", $format_bold);
 $maxlength[$spalte]=25;
 $worksheet->write($zeile,++$spalte,"Semester", $format_bold);
@@ -239,8 +260,12 @@ $worksheet->write($zeile,++$spalte,"Raum", $format_bold);
 $maxlength[$spalte]=4;
 $worksheet->write($zeile,++$spalte,"Raum alternativ", $format_bold);
 $maxlength[$spalte]=15;
-$worksheet->write($zeile,++$spalte,"Anmerkung", $format_bold);
-$maxlength[$spalte]=9;
+
+$worksheet->write($zeile,++$spalte,"Anmerkung für LV Planung", $format_bold);
+$maxlength[$spalte]=25;
+
+$worksheet->write($zeile,++$spalte,"Anmerkung für Dpt/KF", $format_bold);
+$maxlength[$spalte]=25;
 
 $worksheet->write($zeile,++$spalte,"LV-Leitung", $format_bold);
 $maxlength[$spalte]=9;
@@ -259,6 +284,16 @@ $maxlength[$spalte]=9;
 
 $worksheet->write($zeile,++$spalte,"Organisationsform", $format_bold);
 $maxlength[$spalte]=15;
+
+$worksheet->write($zeile,++$spalte,"Sprache (LV)", $format_bold);
+$maxlength[$spalte]=10;
+
+$worksheet->write($zeile,++$spalte,"Software", $format_bold);
+$maxlength[$spalte]=10;
+
+$worksheet->write($zeile,++$spalte,"Start in KW", $format_bold);
+$maxlength[$spalte]=10;
+
 
 if($result = $db->db_query($qry))
 {
@@ -289,6 +324,10 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,($mitarbeiter->fixangestellt ? 'Ja' : 'Nein'));
 		if($maxlength[$spalte]<mb_strlen($mitarbeiter->fixangestellt ? 'Ja' : 'Nein'))
 			$maxlength[$spalte]=mb_strlen($mitarbeiter->fixangestellt ? 'Ja' : 'Nein');
+
+		$worksheet->write($zeile,++$spalte, $row->vorjahr_lektor);
+
+		$worksheet->write($zeile,++$spalte, '');
 
 		//Lehrfach
 		$worksheet->write($zeile,++$spalte,$row->lf_bezeichnung);
@@ -354,10 +393,13 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$row->raumtypalternativ);
 		if($maxlength[$spalte]<mb_strlen($row->raumtypalternativ))
 			$maxlength[$spalte]=mb_strlen($row->raumtypalternativ);
-		//Anmerkung
-		$worksheet->write($zeile,++$spalte,$row->anmerkung);
-		//if($maxlength[$spalte]<mb_strlen($row->anmerkung))
-			//$maxlength[$spalte]=mb_strlen($row->anmerkung);
+
+		//Anmerkung für LV Planung
+		$worksheet->write($zeile,++$spalte,$row->lehreinheit_anmerkung
+);
+
+		//Anmerkung für Dpt/KF
+		$worksheet->write($zeile,++$spalte,$row->mitarbeiter_anmerkung);
 
 		//LV-Leitung
 		$worksheet->write($zeile,++$spalte,$row->lv_leitung.' '.$row->lv_leitung_vorname);
@@ -394,6 +436,15 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$row->orgform_kurzbz);
 		if($maxlength[$spalte]<mb_strlen($row->orgform_kurzbz))
 			$maxlength[$spalte]=mb_strlen($row->orgform_kurzbz);
+
+		//Sprache (LV)
+		$worksheet->write($zeile,++$spalte,$row->sprache);
+
+		//Software
+		$worksheet->write($zeile,++$spalte,'');
+
+		//Software
+		$worksheet->write($zeile,++$spalte,$row->start_kw);
 	}
 
 	//Betreuungen
