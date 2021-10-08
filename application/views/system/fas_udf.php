@@ -45,7 +45,6 @@
 							echo $this->udflib->UDFWidget(
 								array(
 									UDFLib::UDF_UNIQUE_ID => 'fasPersonUDFs',
-									UDFLib::REQUIRED_PERMISSIONS_PARAMETER => 'basis/person',
 									UDFLib::SCHEMA_ARG_NAME => 'public',
 									UDFLib::TABLE_ARG_NAME => 'tbl_person',
 									UDFLib::PRIMARY_KEY_NAME => 'person_id',
@@ -70,7 +69,6 @@
 							echo $this->udflib->UDFWidget(
 								array(
 									UDFLib::UDF_UNIQUE_ID => 'fasPrestudentUDFs',
-									UDFLib::REQUIRED_PERMISSIONS_PARAMETER => 'basis/person',
 									UDFLib::SCHEMA_ARG_NAME => 'public',
 									UDFLib::TABLE_ARG_NAME => 'tbl_prestudent',
 									UDFLib::PRIMARY_KEY_NAME => 'prestudent_id',
@@ -109,3 +107,4 @@
 	</body>
 
 <?php $this->load->view("templates/footer"); ?>
+

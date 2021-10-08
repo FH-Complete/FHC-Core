@@ -26,9 +26,6 @@ class UDF extends FHC_Controller
 
 		// Loads the UDFLib with HTTP GET/POST parameters
 		$this->_loadUDFLib();
-
-		// Checks if the caller is allow to use this UDF widget
-		$this->_isAllowed();
     }
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -64,17 +61,6 @@ class UDF extends FHC_Controller
 	// Private methods
 
 	/**
-	 * Checks if the user is allowed to use this UDFWidget
-	 */
-	private function _isAllowed()
-	{
-		if (!$this->udflib->isAllowed())
-		{
-			$this->terminateWithJsonError('You are not allowed to access to this content');
-		}
-	}
-
-	/**
 	 * Loads the UDFLib with the UDF_UNIQUE_ID parameter
 	 * If the parameter UDF_UNIQUE_ID is not given then the execution of the controller is terminated and
 	 * an error message is printed
@@ -105,3 +91,4 @@ class UDF extends FHC_Controller
 		}
 	}
 }
+
