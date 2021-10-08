@@ -2010,3 +2010,16 @@ function MitarbeiterUDFIFrameLoad()
 	}
 	catch(e) {}
 }
+
+// ****
+// * Validierung Alias auf Sonderzeichen (analog zu checkWunschUid, außerdem . und _ erlaubt)
+// ****
+function checkAlias()
+{
+	var alias = document.getElementById('mitarbeiter-detail-textbox-alias').value;
+
+	if (/^[a-z0-9 . _]*$/i.test(alias) === false)
+	{
+		alert('Der Alias darf keine Sonderzeichen enthalten');
+	}
+}
