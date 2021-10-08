@@ -12575,23 +12575,23 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'eucovidqr',
-		'phrase' => 'ZertifikatAlsPdfHochladen',
+		'phrase' => 'ValidierungsergebnisAktuellesGueltigkeitsdatum',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Zertifikat als PDF hochladen",
+				'text' => "Validierungsergebnis / aktuelles Gültigkeitsdatum",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "upload certificate pdf",
+				'text' => "validation result / current valid date",
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
-	),	
+	),        
 	array(
 		'app' => 'core',
 		'category' => 'eucovidqr',
