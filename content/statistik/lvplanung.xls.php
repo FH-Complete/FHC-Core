@@ -178,6 +178,7 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 			JOIN PUBLIC.tbl_benutzer benutzer ON benutzer.uid = slema.mitarbeiter_uid
 			JOIN PUBLIC.tbl_person person USING (person_id)
 			WHERE lehre.tbl_lehreinheit.lehrveranstaltung_id = sle.lehrveranstaltung_id
+			AND tbl_lehrveranstaltung.lehrform_kurzbz = slv.lehrform_kurzbz
 			AND sle.studiensemester_kurzbz = " . $db->db_add_param($previousStsem) . "
 		) AS vorjahr_lektor,
 	tbl_lehrveranstaltung.lehrform_kurzbz
@@ -395,8 +396,7 @@ if($result = $db->db_query($qry))
 			$maxlength[$spalte]=mb_strlen($row->raumtypalternativ);
 
 		//Anmerkung für LV Planung
-		$worksheet->write($zeile,++$spalte,$row->lehreinheit_anmerkung
-);
+		$worksheet->write($zeile,++$spalte,$row->lehreinheit_anmerkung);
 
 		//Anmerkung für Dpt/KF
 		$worksheet->write($zeile,++$spalte,$row->mitarbeiter_anmerkung);
@@ -443,7 +443,7 @@ if($result = $db->db_query($qry))
 		//Software
 		$worksheet->write($zeile,++$spalte,'');
 
-		//Software
+		//Start in KW
 		$worksheet->write($zeile,++$spalte,$row->start_kw);
 	}
 
