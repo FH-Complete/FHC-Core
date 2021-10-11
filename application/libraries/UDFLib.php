@@ -371,7 +371,7 @@ class UDFLib
 				// Loops through the UDFs values that should be stored
 				foreach ($udfsParameters as $key => $val)
 				{
-					$tmpValidate = success(true); // temporary variable used to store the returned value from _validateUDFs
+					$tmpValidateArray = array(); // temporary variable used to store the returned value from _validateUDFs
 
 					// If this is the definition of this UDF
 					if ($decodedUDFDefinition->{self::NAME} == $key)
@@ -433,7 +433,7 @@ class UDFLib
 
 								if ($toBeValidated === true) // Checks if validation should be performed
 								{
-									$tmpValidate = $this->_validateUDFs(
+									$tmpValidateArray = $this->_validateUDFs(
 										$decodedUDFDefinition->{self::VALIDATION},
 										$decodedUDFDefinition->{self::NAME},
 										$val
@@ -443,13 +443,13 @@ class UDFLib
 						}
 
 						// If validation is ok copy the value that is to be stored into $toBeStoredUDFsArray
-						if (isSuccess($tmpValidate))
+						if (isEmptyArray($tmpValidateArray))
 						{
 							$toBeStoredUDFsArray[$key] = $val;
 						}
-						else // otherwise store the validation error in $notValidUDFsArray
+						else // otherwise store the validation errors in $notValidUDFsArray
 						{
-							$notValidUDFsArray[] = $tmpValidate;
+							$notValidUDFsArray = array_merge($notValidUDFsArray, $tmpValidateArray);
 						}
 					}
 				}
@@ -585,33 +585,13 @@ class UDFLib
 	/**
 	 * Save UDFs
 	 */
-	public function saveUDFs($udfUniqueId, $udfs)
+	public function saveUDFs($udfs)
 	{
-		$udfToBewritten = array(); // UDFs to be written into database
-
 		// Read the all session for this udf widget
 		$session = $this->getSession();
 
 		// If session is empty then return an error
 		if ($session == null) return error('No UDFWidget loaded');
-
-		// Get the required permission from the session
-		$requiredPermissions = $session[self::REQUIRED_PERMISSIONS_PARAMETER];
-
-		// For each UDF that is trying to save
-		foreach ($udfs as $udfName => $udfValue)
-		{
-			// If the UDFs exists in the requiredPermissions array
-			if (array_key_exists($udfName, $requiredPermissions))
-			{
-				// Then check if the user has the permissions to write such UDF
-				if ($this->_writeAllowed($requiredPermissions[$udfName]))
-				{
-					// If allowed then save the UDF name and value to be stored later into the database
-					$udfToBewritten[$udfName] = $udfValue;
-				}
-			}
-		}
 
 		// Workaround to load CI
 		$this->_ci->load->model('system/UDF_model', 'UDFModel');
@@ -629,7 +609,7 @@ class UDFLib
 		// Returns the result of the database update operation to save UDFs
 		return $dbModel->update(
 			array($session[self::PRIMARY_KEY_NAME] => $session[self::PRIMARY_KEY_VALUE]),
-			$udfToBewritten
+			get_object_vars($udfs)
 		);
 	}
 
@@ -833,9 +813,6 @@ class UDFLib
 				$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_NOT_VALID_VAL);
 			}
 		}
-
-		// If no UDF validation errors were raised, it's a success!!
-		if (isEmptyArray($returnArrayValidation)) $returnArrayValidation = success(true);
 
 		return $returnArrayValidation;
 	}

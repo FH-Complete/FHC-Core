@@ -55,17 +55,27 @@ var FHC_UDFWidget = {
 
 							if (FHC_AjaxClient.hasData(data))
 							{
-								FHC_DialogLib.alertSuccess('Done!');
+								FHC_DialogLib.alertSuccess("Successfully saved");
 							}
 							else
 							{
-								console.log(FHC_AjaxClient.getError(data));
+								var msgError = "An error occurred while saving these fields:<br>";
+								var errors = FHC_AjaxClient.getError(data);
+
+								for (var i = 0; i < errors.length; i++)
+								{
+									var error = errors[i];
+
+									msgError += FHC_AjaxClient.getError(error)+ "<br>";
+								}
+
+								FHC_DialogLib.alertError(msgError);
 							}
 						}
 					},
 					{
 						errorCallback: function(data, textStatus, jqXHR) {
-							console.log('Contact the administrator');
+							FHC_DialogLib.alertError("A generic error occurred, please contact the support");
 						}
 					}
 				);
@@ -98,3 +108,4 @@ $(document).ready(function() {
 	FHC_UDFWidget.display();
 
 });
+
