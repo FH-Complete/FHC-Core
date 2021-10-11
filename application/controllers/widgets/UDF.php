@@ -36,7 +36,6 @@ class UDF extends FHC_Controller
 	 */
 	public function saveUDFs()
 	{
-		$udfUniqueId = $this->input->post(self::UDF_UNIQUE_ID);
 		$udfs = $this->input->post(UDFLib::UDFS_ARG_NAME);
 
 		if (!isEmptyString($udfs))
@@ -44,7 +43,7 @@ class UDF extends FHC_Controller
 			$jsonDecodedUDF = json_decode($udfs);
 			if ($jsonDecodedUDF != null)
 			{
-				$this->outputJson($this->udflib->saveUDFs($udfUniqueId, $jsonDecodedUDF));
+				$this->outputJson($this->udflib->saveUDFs($jsonDecodedUDF));
 			}
 			else
 			{

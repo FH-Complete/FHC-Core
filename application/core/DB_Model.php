@@ -670,6 +670,7 @@ class DB_Model extends CI_Model
 	/**
 	 * Returns all the UDF contained in this table ($dbTable)
 	 * If no UDF are present, an empty array will be returned
+	 * NOTE: only the UDFs that the logged user is allowed to read are loaded by this method
 	 */
 	public function getUDFs($id, $udfName = null)
 	{
@@ -700,9 +701,9 @@ class DB_Model extends CI_Model
 	}
 
 	/**
-	 * Checks if this table has the field udf_values
+	 * Checks if this table has the field udf_values and if there is a UDF definition for this table
 	 */
-	public function hasUDF()
+	public function udfsExistAndDefined()
 	{
 		if ($this->fieldExists(UDFLib::COLUMN_NAME))
 		{
@@ -850,11 +851,11 @@ class DB_Model extends CI_Model
 	{
 		$prepareUDFsWrite = success();
 
-		if ($this->hasUDF())
+		if ($this->udfsExistAndDefined())
 		{
 			if ($id != null)
 			{
-				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable, $this->getUDFs($id));
+				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable, $this->_getUDFsNoPerms($id));
 			}
 			else
 			{
@@ -989,4 +990,48 @@ class DB_Model extends CI_Model
 	{
 		if ($this->debugMode) $this->loglib->logDebug($this->db->last_query());
 	}
+
+	/**
+	 * Returns all the UDF contained in this table ($dbTable)
+	 * If no UDF are present, an empty array will be returned
+	 * NOTE: it returns all the UDFs, does _not_ check the permissions
+	 */
+	private function _getUDFsNoPerms($id)
+	{
+		$udfs = array();
+
+		$this->db->select(UDFLib::COLUMN_NAME, true); // get only the UDF column
+
+		// Primary key management
+		$tmpId = $id;
+
+		// Check for composite Primary Key
+		if (is_array($id))
+		{
+			if (isset($id[0]))
+			{
+				$tmpId = $this->_arrayCombine($this->pk, $id);
+			}
+		}
+		elseif ($id != null)
+		{
+			$tmpId = array($this->pk => $id);
+		}
+
+		// Read the record from the table
+		$result = $this->db->get_where($this->dbTable, $tmpId);
+
+		// If was a success and there are data
+		if ($result && count($result->result()) == 1)
+		{
+			// Get the UDF column and decode it from JSON
+			$jsonValues = json_decode($result->result()[0]->{UDFLib::COLUMN_NAME});
+
+			// If the JSON convertion was fine convert the object to an array
+			if ($jsonValues != null) $udfs = get_object_vars($jsonValues);
+		}
+
+		return $udfs;
+	}
 }
+
