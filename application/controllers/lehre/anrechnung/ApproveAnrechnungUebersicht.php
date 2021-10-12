@@ -379,23 +379,24 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 			$result = $this->LehrveranstaltungModel->getLecturersByLv($anrechnung['studiensemester_kurzbz'], $anrechnung['lehrveranstaltung_id']);
 			
-			if (!$result = getData($result))
+			if (!hasData($result))
 			{
 				show_error('Failed retrieving lectors of Lehrveranstaltung');
 			}
 			
+			$lecturersByLv = getData($result);
+
 			// Check if lv has LV-Leitung
-			$key = array_search(true, array_column($result, 'lvleiter'));
-			
+			$key = array_search(true, array_column($lecturersByLv, 'lvleiter'));
 			// If lv has LV-Leitung, keep only the one
 			if ($key !== false)
 			{
-				$lector_arr[]= $result[$key];
+				$lector_arr[]= $lecturersByLv[$key];
 			}
 			// ...otherwise keep all lectors
 			else
 			{
-				$lector_arr = array_merge($lector_arr, $result);
+				$lector_arr = array_merge($lector_arr, $lecturersByLv);
 			}
 		}
 		
