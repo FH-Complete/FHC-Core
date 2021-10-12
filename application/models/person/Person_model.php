@@ -263,4 +263,19 @@ class Person_model extends DB_Model
 		
 		return success($result->vorname. ' '. $result->nachname);
 	}
+
+	public function checkDuplicate($person_id)
+	{
+		$qry = "SELECT sp.person_id
+		FROM public.tbl_person p 
+		LEFT JOIN public.tbl_person sp ON p.vorname = sp.vorname
+			AND p.nachname = sp.nachname 
+			AND p.gebdatum = sp.gebdatum 
+		JOIN public.tbl_prestudent ps ON sp.person_id = ps.person_id
+		JOIN public.tbl_prestudentstatus pss ON ps.prestudent_id = pss.prestudent_id
+		WHERE p.person_id = ? AND sp.person_id != ? AND pss.status_kurzbz = ?";
+
+
+		return $this->execQuery($qry, array($person_id, $person_id, 'Abbrecher'));
+	}
 }

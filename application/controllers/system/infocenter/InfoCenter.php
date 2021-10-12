@@ -297,6 +297,13 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$persondata = $this->_loadPersonData($person_id);
+
+		$checkPerson = $this->PersonModel->checkDuplicate($person_id);
+
+		if (isError($checkPerson)) show_error(getError($checkPerson));
+
+		$duplicate = array('duplicated' => getData($checkPerson));
+
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
 		$this->DokumentModel->addOrder('bezeichnung');
@@ -305,7 +312,8 @@ class InfoCenter extends Auth_Controller
 		$data = array_merge(
 			$persondata,
 			$prestudentdata,
-			$dokumentdata
+			$dokumentdata,
+			$duplicate
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
