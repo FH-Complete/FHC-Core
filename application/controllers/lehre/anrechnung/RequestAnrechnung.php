@@ -324,8 +324,8 @@ class requestAnrechnung extends Auth_Controller
 	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
 		// Get Note of Lehrveranstaltung
-		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
-		$result = $this->LvgesamtnoteModel->load(array(
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+		$result = $this->ZeugnisnoteModel->load(array(
 				'student_uid' => $this->_uid,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'lehrveranstaltung_id' => $lehrveranstaltung_id
