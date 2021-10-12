@@ -22,7 +22,7 @@
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/benutzer.class.php');
 require_once(dirname(__FILE__).'/functions.inc.php');
-require_once(dirname(__FILE__).'/udf.class.php');
+require_once(dirname(__FILE__).'/udf.class.php'); // required only to check if UDFs are defined
 
 class mitarbeiter extends benutzer
 {

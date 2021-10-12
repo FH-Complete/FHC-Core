@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2009 Technikum-Wien
+/* Copyright (C) 2009-2021 fhcomplete.net
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Bison Paolo <bison@technikum-wien.at>
  */
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/../config/global.config.inc.php');
+require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
 
 /**
  * Used to export UDF in MS Excel format
@@ -286,14 +286,21 @@ class UDF extends basis_db
 		});
     }
 
-    /**
-     * Returns an array of associative arrays that contains the couple name and title related to an UDF
-     * These data are retrived from the UDF definitions given as parameter
-     */
-    private function _getUDFDefinition($jsons)
-    {
+	/**
+	 * Returns an array of associative arrays that contains the couple name and title related to an UDF
+	 * These data are retrived from the UDF definitions given as parameter
+	 */
+	private function _getUDFDefinition($jsons)
+	{
 		$names = array();
+		$uid = get_uid(); // get the UID of the logged person
 
+		if ($uid == null) return names(); // if no logged then it is not possible to loads UDFs
+
+		// Gets the permissions for the logged user
+		$berechtigung = new benutzerberechtigung();
+		$berechtigung->getBerechtigungen($uid);
+ 
 		if ($jsons != null && ($jsonsDecoded = json_decode($jsons)) != null)
 		{
 			if (is_object($jsonsDecoded) || is_array($jsonsDecoded))
@@ -305,27 +312,51 @@ class UDF extends basis_db
 
 				$this->_sortJsonSchemas($jsonsDecoded);
 
-				foreach($jsonsDecoded as $udfJsonShema)
+				foreach ($jsonsDecoded as $udfJsonShema)
 				{
-					if (isset($udfJsonShema->name) && isset($udfJsonShema->title))
+					// Checks if the requiredPermissions property exists
+					if (isset($udfJsonShema->requiredPermissions))
 					{
-						$tmpArray = array('name' => $udfJsonShema->name, 'title' => $udfJsonShema->title);
+						$isAllowed = false;
 
-						if (isset($udfJsonShema->type)
-							&& ($udfJsonShema->type == 'dropdown' || $udfJsonShema->type == 'multipledropdown')
-							&& isset($udfJsonShema->listValues) && isset($udfJsonShema->listValues->enum))
+						// If requiredPermissions is an array check if at least one of the permissions belongs to the logged user
+						if (is_array($udfJsonShema->requiredPermissions))
 						{
-							$tmpArray['enum'] = $udfJsonShema->listValues->enum;
+							foreach ($udfJsonShema->requiredPermissions as $permission)
+							{
+								$isAllowed = $berechtigung->isBerechtigt($permission);
+								if ($isAllowed === true) break;
+							}
+						}
+						else // otherwise check it directly
+						{
+							$isAllowed = $berechtigung->isBerechtigt($udfJsonShema->requiredPermissions);
 						}
 
-						$names[] = $tmpArray;
-					}
+						// If the logged user has at least one of the required permissions
+						if ($isAllowed === true)
+						{
+							if (isset($udfJsonShema->name) && isset($udfJsonShema->title))
+							{
+								$tmpArray = array('name' => $udfJsonShema->name, 'title' => $udfJsonShema->title);
+
+								if (isset($udfJsonShema->type)
+									&& ($udfJsonShema->type == 'dropdown' || $udfJsonShema->type == 'multipledropdown')
+									&& isset($udfJsonShema->listValues) && isset($udfJsonShema->listValues->enum))
+								{
+									$tmpArray['enum'] = $udfJsonShema->listValues->enum;
+								}
+
+								$names[] = $tmpArray;
+							}
+						} // otherwise this UDF is discarted because the requiredPermissions is mandatory
+					} // otherwise this UDF is discarted because the requiredPermissions is mandatory
 				}
 			}
 		}
 
 		return $names;
-    }
+	}
 
     /**
      * Loads UDf titles from phrases
@@ -374,3 +405,4 @@ class UDF extends basis_db
 		return $titles;
 	}
 }
+
