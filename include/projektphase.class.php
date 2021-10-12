@@ -688,7 +688,7 @@ public function getFortschritt($projektphase_id)
 
 		$qry = "
 		SELECT
-			DISTINCT tbl_projektphase.*
+			DISTINCT tbl_projektphase.*,tbl_projekt.titel
 		FROM
 			fue.tbl_projektphase
 			JOIN fue.tbl_projekt USING (projekt_kurzbz)
@@ -718,6 +718,7 @@ public function getFortschritt($projektphase_id)
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->typ = $row->typ;
 				$obj->beschreibung = $row->beschreibung;
+				$obj->projekttitel = $row->titel;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				$obj->personentage = $row->personentage;

@@ -71,6 +71,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		inkludierte_lehre = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#inkludierte_lehre" ));
 		zeitaufzeichnungspflichtig = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zeitaufzeichnungspflichtig" ));
 		azgrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#azgrelevant" ));
+		homeoffice = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#homeoffice" ));
 	}
 	else
 	{
@@ -89,6 +90,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 
 		fixangestellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fixangestellt" ));
 		azgrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#azgrelevant" ));
+        homeoffice = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#homeoffice" ));
 		//neuer Datensatz wird angelegt
 		MitarbeiterVerwendungDetailNeu='true';
 
@@ -121,6 +123,15 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		{
 			azgrelevant='Ja';
 		}
+		
+		if (!homeoffice)
+		{
+            homeoffice='Nein';
+		}
+		else
+		{
+            homeoffice='Ja';
+		}
 	}
 
 	document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value=ba1code;
@@ -151,6 +162,11 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked=false;
 	else
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked=true;
+	
+    if(homeoffice=='Nein')
+        document.getElementById('mitarbeiter-verwendung-detail-checkbox-homeoffice').checked=false;
+    else
+        document.getElementById('mitarbeiter-verwendung-detail-checkbox-homeoffice').checked=true;
 	MitarbeiterVerwendungDetailToggleHauptberuf();
 	MitarbeiterVerwendungVerwendungChange();
 }
