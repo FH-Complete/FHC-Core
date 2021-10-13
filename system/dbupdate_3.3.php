@@ -5203,7 +5203,7 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='dvuh'"))
 		if(!$db->db_query($qry))
 			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' Neue App dvuh in system.tbl_app hinzugefügt<br>';
+			echo '<br>Neue App dvuh in system.tbl_app hinzugefügt';
 	}
 }
 
