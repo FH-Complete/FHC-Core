@@ -73,8 +73,16 @@ $rechte->getBerechtigungen($user);
 
 if($studiengang_kz != '')
 {
-	if(!$rechte->isBerechtigt('assistenz', $studiengang_kz, 's'))
-		die($rechte->errormsg);
+	$studiengang_kz_arr = explode(',',$studiengang_kz);
+	foreach ($studiengang_kz_arr AS $kennzahl)
+	{
+		if (!is_numeric($kennzahl))
+		{
+			die($kennzahl.' is not an iteger value');
+		}
+		if(!$rechte->isBerechtigt('assistenz', $kennzahl, 's'))
+			die($rechte->errormsg);
+	}
 }
 elseif($oe_kurzbz!='')
 {
@@ -162,7 +170,7 @@ JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
 WHERE tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
 if($studiengang_kz!='')
-	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz IN (".$studiengang_kz.")";
 
 if($oe_kurzbz!='')
 	$qry.=" AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
@@ -421,7 +429,7 @@ if($result = $db->db_query($qry))
 		$qry.=" AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
 
 	if($studiengang_kz!='')
-		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz IN(".$studiengang_kz.")";
 
 	if($semester!='')
 		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);

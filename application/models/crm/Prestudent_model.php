@@ -290,7 +290,8 @@ class Prestudent_model extends DB_Model
 
 			$prestudentdata->prestudentstatus = $lastStatusData;
 
-			if ($this->hasUDF())
+
+			if ($this->udfsExistAndDefined())
 			{
 				$prestudentdata->prestudentUdfs = $this->getUDFs($prestudent_id);
 			}
