@@ -12500,13 +12500,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "3G Nachweis",
+				'text' => "Zertifikat hochladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "3G evidence",
+				'text' => "upload certificate",
 				'description' => '',
 				'insertvon' => 'system'
 			)
