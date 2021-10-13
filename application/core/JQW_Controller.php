@@ -73,6 +73,19 @@ abstract class JQW_Controller extends JOB_Controller
 	/**
 	 * To get all the jobs specified by the given parameters
 	 */
+	protected function getJobsByTypeStatus($type, $status)
+	{
+		$jobs = $this->jobsqueuelib->getJobsByTypeStatus($type, $status);
+
+		// If an error occurred then log it in database
+		if (isError($jobs)) $this->logError(getError($jobs), array($type, $status));
+
+		return $jobs;
+	}
+
+	/**
+	 * To get all the jobs specified by the given parameters
+	 */
 	protected function getJobsByTypeStatusInput($type, $status, $input)
 	{
 		$jobs = $this->jobsqueuelib->getJobsByTypeStatusInput($type, $status, $input);
