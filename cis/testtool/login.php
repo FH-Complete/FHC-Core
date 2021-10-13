@@ -132,7 +132,7 @@ if (isset($_REQUEST['prestudent']))
 		}
 		else
 		{
-			if ($rt->getReihungstestPersonDatum($ps->prestudent_id, date('Y-m-d')))
+			if ($rt->getReihungstestPersonDatum($ps->prestudent_id, $ps->studiengang_kz, date('Y-m-d')))
 			{
 				// TODO Was ist wenn da mehrere Zurueckkommen?!
 				if (isset($rt->result[0]))
@@ -149,6 +149,7 @@ if (isset($_REQUEST['prestudent']))
 		}
 		if ($reihungstest_id != '' && $rt->load($reihungstest_id))
 		{
+
 			if ($rt->freigeschaltet)
 			{
 				// regenerate Session ID after Login
@@ -699,7 +700,7 @@ else // LOGIN Site (vor Login)
 			else
 				$selected='';
 			echo '
-					<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
+					<OPTION value="'.$prestd->prestudent_id.'" data-stg="' . $prestd->studiengang_kz .'"'.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
 		}
 		// An der FHTW gibt es 3 Testuser für den Camus International
 		if (CAMPUS_NAME == 'FH Technikum Wien')
