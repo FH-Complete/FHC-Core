@@ -90,7 +90,7 @@ class Issues extends Auth_Controller
 	private function _getOesForIssues()
 	{
 		// get oes of uid for which there is a current funktion
-		$all_oe_kurzbz_with_funktionen = array();
+		$all_funktionen_oe_kurzbz = array();
 		$oe_kurzbz_for_funktion = array();
 		$benutzerfunktionRes = $this->BenutzerfunktionModel->getBenutzerFunktionByUid($this->_uid, null, date('Y-m-d'), date('Y-m-d'));
 
@@ -101,13 +101,14 @@ class Issues extends Auth_Controller
 		{
 			foreach (getData($benutzerfunktionRes) as $benutzerfunktion)
 			{
-				$all_oe_kurzbz_with_funktionen[$benutzerfunktion->oe_kurzbz][] = $benutzerfunktion->funktion_kurzbz;
+				$all_funktionen_oe_kurzbz[$benutzerfunktion->oe_kurzbz][] = $benutzerfunktion->funktion_kurzbz;
 
 				// separate oes for the funktion needed for displaying issues
 				if ($benutzerfunktion->funktion_kurzbz == self::FUNKTION_KURZBZ)
 				{
 					$oe_kurzbz_for_funktion[] = $benutzerfunktion->oe_kurzbz;
 
+					// permission also for all oes under the oe for which funktion is assigend
 					$childOesFunktionRes = $this->OrganisationseinheitModel->getChilds($benutzerfunktion->oe_kurzbz);
 
 					if (isError($childOesFunktionRes))
@@ -127,14 +128,14 @@ class Issues extends Auth_Controller
 			}
 		}
 
-		// add oes for which there is the issues_verwalten Berechtigung
+		// add oes for which there is the "manage issues" Berechtigung
 		if (!$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ))
 			show_error('Keine Berechtigung oder Fehler bei Berechtigungsprüfung');
 
 		$all_oe_kurzbz_berechtigt = array_unique(array_merge($oe_kurzbz_for_funktion, $oe_kurzbz_berechtigt));
 
 		return array(
-			'all_oe_kurzbz_with_funktionen' => $all_oe_kurzbz_with_funktionen,
+			'all_funktionen_oe_kurzbz' => $all_funktionen_oe_kurzbz,
 			'all_oe_kurzbz_berechtigt' => $all_oe_kurzbz_berechtigt
 		);
 	}

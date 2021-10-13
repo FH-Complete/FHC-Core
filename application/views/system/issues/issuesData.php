@@ -1,7 +1,7 @@
 <?php
 
 $PERSON_ID = getAuthPersonId();
-$ALL_OE_KURZBZ = "('" . implode("','", array_keys($all_oe_kurzbz_with_funktionen)) . "')";
+$ALL_FUNKTIONEN_OE_KURZBZ = "('" . implode("','", array_keys($all_funktionen_oe_kurzbz)) . "')";
 $ALL_OE_KURZBZ_BERECHTIGT = "('" . implode("','", $all_oe_kurzbz_berechtigt) . "')";
 $RELEVANT_PRESTUDENT_STATUS = "('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')";
 
@@ -23,12 +23,12 @@ $query = "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern A
 				    AND (
 				        	person_id = ".$PERSON_ID." /* person_id in fehler_zustaendigkeit for individual persons */";
 
-if (!isEmptyArray($all_oe_kurzbz_with_funktionen))
+if (!isEmptyArray($all_funktionen_oe_kurzbz))
 {
-	$query .= " OR (zst.oe_kurzbz IN $ALL_OE_KURZBZ AND zst.funktion_kurzbz IS NULL)  /* if oe is specified in fehler_zustaendigkeiten */";
+	$query .= " OR (zst.oe_kurzbz IN $ALL_FUNKTIONEN_OE_KURZBZ AND zst.funktion_kurzbz IS NULL)  /* if oe is specified in fehler_zustaendigkeiten */";
 
 	// check for each oe for each function if zustaendig
-	foreach ($all_oe_kurzbz_with_funktionen as $oe_kurzbz => $funktionen_kurzbz)
+	foreach ($all_funktionen_oe_kurzbz as $oe_kurzbz => $funktionen_kurzbz)
 	{
 		foreach ($funktionen_kurzbz as $funktion_kurzbz)
 		{
@@ -39,25 +39,25 @@ if (!isEmptyArray($all_oe_kurzbz_with_funktionen))
 
 $query .= "))"; // close AND of exists, and exists
 
-// show issue if it is assigend to oe of uid or to student of oe of uid
+// show issue if it is assigend to oe of logged in user or to student of oe of logged in user
 if (!isEmptyArray($all_oe_kurzbz_berechtigt))
 {
-	$query .= " OR iss.oe_kurzbz IN $ALL_OE_KURZBZ_BERECHTIGT /* if error is for studiengang oe */";
+	$query .= " OR iss.oe_kurzbz IN $ALL_OE_KURZBZ_BERECHTIGT /* if issue is for oe */";
 
-	$query .= " OR (iss.oe_kurzbz IS NULL AND EXISTS ( /* if person_id of error is a student of studiengang oe */
+	$query .= " OR (iss.oe_kurzbz IS NULL AND EXISTS ( /* if person_id of issue is a student of studiengang oe */
 						SELECT 1 FROM public.tbl_prestudent ps
 						JOIN public.tbl_prestudentstatus pss USING (prestudent_id)
 						JOIN public.tbl_studiengang stg USING (studiengang_kz)
 						WHERE person_id = iss.person_id
 						AND stg.oe_kurzbz IN $ALL_OE_KURZBZ_BERECHTIGT
 						AND pss.status_kurzbz IN $RELEVANT_PRESTUDENT_STATUS
-						AND NOT EXISTS (SELECT 1 
+						AND NOT EXISTS (SELECT 1 /* irrelevant if already finished studies and studied a while ago */
 										FROM public.tbl_prestudentstatus ps_finished
 										JOIN public.tbl_studiensemester sem_finished USING (studiensemester_kurzbz)
-										WHERE prestudent_id = ps.prestudent_id /* irrelevant if already finished studies and studied a while ago */
+										WHERE prestudent_id = ps.prestudent_id 
 										AND status_kurzbz IN ('Absolvent','Abbrecher','Abgewiesener')
 										AND datum::date + interval '2 months' < NOW()
-										AND EXISTS (SELECT 1 FROM public.tbl_prestudent /* if more recent prestudent exists, their oe should get the issue */
+										AND EXISTS (SELECT 1 FROM public.tbl_prestudent /* if more recent prestudent exists, still display the issue */
 													JOIN public.tbl_prestudentstatus USING (prestudent_id)
 													JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
 													WHERE tbl_prestudentstatus.status_kurzbz IN $RELEVANT_PRESTUDENT_STATUS 
