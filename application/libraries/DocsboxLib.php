@@ -39,8 +39,9 @@ class DocsboxLib
 	/**
 	 * Static method used to convert a document using a Docsbox installation (local/remote) over the network
 	 * It return 0 on success and any other integer on error
+	 * NOTE: currently format is not supported
 	 */
-	public static function convert($inputFileName, $outputFileName)
+	public static function convert($inputFileName, $outputFileName, $format = 'pdf')
 	{
 		// Posts the file to docsbox
 		$queueId = self::_postFile($inputFileName); 
