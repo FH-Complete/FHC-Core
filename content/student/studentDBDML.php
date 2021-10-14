@@ -148,7 +148,6 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	if($art=='2' || $art=='4')
 		$jahr = $jahr-1;
 	
-	
 	//FH-Burgenland - weil leider die AO Studiengänge aufgeteilt sind (AO sind normal 9+erhalter Nummer, matrikelnr/personenkz wird auch im DVUH Extension berücksichtigt)
 	if ($studiengang_kz >= 90010 && $studiengang_kz <= 90019) {
 		$matrikelnummer = sprintf("%02d",$jahr).$art.substr($studiengang_kz, 0, 4);
@@ -156,7 +155,6 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 		$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
 	}
 	
-	$qry = null;
 	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
 
 	if($result = $db->db_query($qry))
