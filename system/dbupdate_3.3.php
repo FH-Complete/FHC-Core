@@ -4941,6 +4941,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_adressentyp LIMIT 1;"))
 		UPDATE public.tbl_adresse SET typ = 'h' WHERE person_id IS NOT NULL AND typ IS NULL;
 
 		ALTER TABLE public.tbl_adresse ADD CONSTRAINT fk_tbl_adresse_adressentyp FOREIGN KEY (typ) REFERENCES public.tbl_adressentyp (adressentyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_adresse ALTER COLUMN typ TYPE varchar(32);
 
 		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_adressentyp TO vilesci;
 		GRANT SELECT ON public.tbl_adressentyp TO web;
