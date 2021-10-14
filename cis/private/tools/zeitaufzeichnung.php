@@ -861,10 +861,11 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 							}
 							else
 							{
-								$vonCSV = $datum->formatDatum($data[2], $format='Y-m-d');
-								$bisCSV = $datum->formatDatum($data[3], $format='Y-m-d');
+								$vonCSV = $datum->formatDatum($data[2], $format = 'Y-m-d');
+								$bisCSV = $datum->formatDatum($data[3], $format = 'Y-m-d');
 								$dateVonCSV = new DateTime($vonCSV);
 								$dateBisCSV = new DateTime($bisCSV);
+								$extractHourBis = $datum->formatDatum($data[3], $format = 'H:i:s');
 
 								if (!isset($data[5]))
 									$data[5] = NULL;
@@ -881,6 +882,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 								elseif ($dateVonCSV!=$dateBisCSV && $data[1]!="DienstreiseMT")
 								{
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da keine Zeitaufzeichnung über mehrere Tage erlaubt ist (ausgenommen Dienstreisen).</b></span><br>';
+								}
+								elseif ($extractHourBis == '00:00:00')
+								{
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Bitte Arbeitszeiten gemäß Arbeitsaufzeichnung Leitfaden tagesgenau abgrenzen: Nur Eingaben von 00:00 bis 23:59 erlaubt!</b></span><br>';
 								}
 								elseif (empty($data[7]) && !empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
@@ -932,18 +937,13 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 											$verwendung->getVerwendungDatum($data[0],$vonCSV);
 
 											foreach ($verwendung->result as $v)
-											// echo "homeoffice für Tag " . $vonCSV . " ".  $v->homeoffice . " " . $v->bisverwendung_id . "<br>";
-
 											if ($v->homeoffice)
 											{
-
-												// echo "homeoffice erlaubt <br>";
 												$zeit->homeoffice = true;
 											}
 											else
 											{
 												echo '<span style="color:orange"><b>'.$p->t("zeitaufzeichnung/homeofficeNichtErlaubt", ($vonCSV)) .'</b></span><br>';
-
 												$zeit->homeoffice = false;
 											}
 										}
@@ -1050,8 +1050,8 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 
 		$zeit->uid = $user;
 		$zeit->aktivitaet_kurzbz = $aktivitaet_kurzbz;
-		$zeit->start = $datum->formatDatum($von, $format='Y-m-d H:i:s');
-		$zeit->ende = $datum->formatDatum($bis, $format='Y-m-d H:i:s');
+		$zeit->start = $datum->formatDatum($von, $format = 'Y-m-d H:i:s');
+		$zeit->ende = $datum->formatDatum($bis, $format = 'Y-m-d H:i:s');
 		$zeit->beschreibung = $beschreibung;
 		$zeit->oe_kurzbz_1 = $oe_kurzbz_1;
 		$zeit->oe_kurzbz_2 = $oe_kurzbz_2;
@@ -1063,6 +1063,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit->service_id = $service_id;
 		$zeit->kunde_uid = $kunde_uid;
 		$saveerror = 0;
+		$extractTimeBis = $datum->formatDatum($bis, $format = 'H:i:s');
 
 		if (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
@@ -1081,9 +1082,14 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			$saveerror = 1;
 
 		}
-		elseif (abs($von-$bis)>0 && $aktivitaet_kurzbz!="DienstreiseMT")
+		elseif (abs($von-$bis)>0 && $aktivitaet_kurzbz!="DienstreiseMT" && $extractTimeBis != '00:00:00')
 		{
 			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da keine Zeitaufzeichnung über mehrere Tage erlaubt ist (ausgenommen Dienstreisen).</b></span><br>';
+			$saveerror = 1;
+		}
+		elseif ($extractTimeBis == '00:00:00')
+		{
+			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Bitte Arbeitszeiten gemäß Arbeitsaufzeichnung Leitfaden tagesgenau abgrenzen: Nur Eingaben von 00:00 bis 23:59 erlaubt!</b></span><br>';
 			$saveerror = 1;
 		}
 		elseif (isset($_POST['genPause']) && (isset($_POST['save']) || isset($_POST['edit'])))
@@ -1765,7 +1771,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						}
 						else
 							$zeitsperre_text = '';
-						//var_dump($zs->result);
 						if (isset($_GET["von_datum"]) && $datum->formatDatum($tag, 'd.m.Y') == $_GET["von_datum"])
 							$style = 'style="border-top: 3px solid #8DBDD8; border-bottom: 3px solid #8DBDD8"';
 
