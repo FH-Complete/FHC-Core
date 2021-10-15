@@ -500,7 +500,8 @@ class studiengang extends basis_db
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
 				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, onlinebewerbung, orgform_kurzbz, zusatzinfo_html,
-				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige) VALUES ('.
+				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige,
+				melderelevant, foerderrelevant, standort_code) VALUES ('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->kurzbz).', '.
 				$this->db_add_param($this->kurzbzlang).', '.
@@ -1103,7 +1104,7 @@ class studiengang extends basis_db
 				return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Studiengänge die vom übergeben Typ sind
 	 * @param string $typ
@@ -1118,13 +1119,13 @@ class studiengang extends basis_db
 					tbl_studiengang.typ=".$this->db_add_param($typ)."
 				ORDER BY
 					kurzbz";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new studiengang();
-				
+
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->kurzbzlang = $row->kurzbzlang;
@@ -1160,10 +1161,10 @@ class studiengang extends basis_db
 				$obj->melderelevant = $this->db_parse_bool($row->melderelevant);
 				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$obj->standort_code = $row->standort_code;
-				
+
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
