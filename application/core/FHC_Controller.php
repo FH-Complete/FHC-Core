@@ -132,6 +132,32 @@ abstract class FHC_Controller extends CI_Controller
 	{
 		$this->output->set_content_type('application/json')->set_output(json_encode($mixed));
 	}
+	
+	protected function outputFile($fileObj)
+	{
+		if (file_exists($fileObj->file))
+		{
+			$finfo  = new finfo(FILEINFO_MIME);
+			
+			header('Content-Description: File Transfer');
+			header('Content-Type: '. $finfo->file($fileObj->file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($fileObj->file));
+			
+			if (isset($fileObj->disposition) && ($fileObj->disposition == 'inline' || $fileObj->disposition == 'attachment'))
+			{
+				header('Content-Disposition: '. $fileObj->disposition. '; filename="'. $fileObj->name. '"');
+			}
+			
+			readfile($fileObj->file);
+			
+			exit;
+		}
+		
+		return false;
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods

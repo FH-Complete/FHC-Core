@@ -1,6 +1,6 @@
 <?php
 
-//if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class reviewAnrechnungDetail extends Auth_Controller
 {
@@ -78,23 +78,20 @@ class reviewAnrechnungDetail extends Auth_Controller
 		self::_checkIfEntitledToReadAnrechnung($anrechnung_id);
 
 		// Get Anrechung data
-		if (!$anrechnungData = getData($this->anrechnunglib->getAnrechnungData($anrechnung_id)))
-		{
-			show_error('Missing data for Anrechnung.');
-		}
+		$anrechnungData = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
+		
+		// Get Antrag data
+		$antragData = $this->anrechnunglib->getAntragData(
+			$anrechnungData->prestudent_id,
+			$anrechnungData->studiensemester_kurzbz,
+			$anrechnungData->lehrveranstaltung_id
+		);
 
 		// Get Empfehlung data
-		if(!$empfehlungData = getData($this->anrechnunglib->getEmpfehlungData($anrechnung_id)))
-		{
-			show_error('Missing data for recommendation');
-		}
+		$empfehlungData = $this->anrechnunglib->getEmpfehlungData($anrechnung_id);
 
 		$viewData = array(
-			'antragData' => $this->anrechnunglib->getAntragData(
-				$student_uid = $this->StudentModel->getUID($anrechnungData->prestudent_id),
-				$anrechnungData->studiensemester_kurzbz,
-				$anrechnungData->lehrveranstaltung_id
-			),
+			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
 			'empfehlungData' => $empfehlungData
 		);
@@ -113,29 +110,23 @@ class reviewAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-
-		// Get statusbezeichnung for 'inProgressDP'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressDP = getData($this->AnrechnungstatusModel->load('inProgressDP'))[0];
-		$inProgressDP = getUserLanguage() == 'German'
-			? $inProgressDP->bezeichnung_mehrsprachig[0]
-			: $inProgressDP->bezeichnung_mehrsprachig[1];
-
+		
+		// Get lectors person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
-			show_error('Failed retrieving person data');
+			return $this->outputJsonError('Failed retrieving person data');
 		}
 
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id'])))
+			if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'true',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP,
+					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
 					'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
 					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
 				);
@@ -151,14 +142,14 @@ class reviewAnrechnungDetail extends Auth_Controller
 			 * */
 			if (!$this->_sendSanchoMails($json, true))
 			{
-				show_error('Failed sending emails');
+				return $this->outputJsonError('Failed sending emails');
 			}
 
 			return $this->outputJsonSuccess($json);
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 
@@ -174,29 +165,23 @@ class reviewAnrechnungDetail extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 
-		// Get statusbezeichnung for 'inProgressDP'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressDP = getData($this->AnrechnungstatusModel->load('inProgressDP'))[0];
-		$inProgressDP = getUserLanguage() == 'German'
-			? $inProgressDP->bezeichnung_mehrsprachig[0]
-			: $inProgressDP->bezeichnung_mehrsprachig[1];
-
+		// Get lectors person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
-			show_error('Failed retrieving person data');
+			return $this->outputJsonError('Failed retrieving person data');
 		}
 
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung'])))
+			if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'false',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP,
-					'empfehlumg_am'          => (new DateTime())->format('d.m.Y'),
+					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL),
+					'empfehlung_am'          => (new DateTime())->format('d.m.Y'),
 					'empfehlung_von'         => $person->vorname. ' '. $person->nachname
 				);
 			}
@@ -208,14 +193,14 @@ class reviewAnrechnungDetail extends Auth_Controller
 			// Send mails to STGL (if not present STGL, send to STGL assistance)
 			if (!$this->_sendSanchoMails($json, false))
 			{
-				show_error('Failed sending emails');
+				return $this->outputJsonError('Failed sending emails');
 			}
 
 			return $this->outputJsonSuccess($json);
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 
@@ -233,8 +218,12 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		// Check if user is entitled to read dms doc
 		self::_checkIfEntitledToReadDMSDoc($dms_id);
-
-		$this->dmslib->download($dms_id);
+		
+		// Set filename to be used on downlaod
+		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
+		
+		// Download file
+		$this->dmslib->download($dms_id, $filename);
 	}
 
 

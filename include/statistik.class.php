@@ -142,7 +142,7 @@ class statistik extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
-				$obj->udpatevon = $row->updatevon;
+				$obj->updatevon = $row->updatevon;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$obj->preferences = $row->preferences;
 
@@ -510,6 +510,7 @@ class statistik extends basis_db
 		$this->html='';
 		$this->csv='';
 		$this->json=array();
+		set_time_limit(60);
 
 		if($this->sql!='')
 		{

@@ -465,7 +465,7 @@ function checkZeilenUmbruch()
 		}
 	}
 
-    // Anerkennung nachgewiesener Kenntnisse (Anrechnung)
+    // Anerkennung nachgewiesener Kenntnisse (Anrechnung) - Anzeige fuer Studenten
     if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
         && $rechte->isBerechtigt('student/anrechnung_beantragen'))
     {
@@ -478,6 +478,20 @@ function checkZeilenUmbruch()
             'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid)
         );
     }
+
+// Anerkennung nachgewiesener Kenntnisse (Anrechnung) - Anzeige fuer LektorInnen
+if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN)
+	&& $rechte->isBerechtigt('lehre/anrechnung_empfehlen'))
+{
+	$menu[]=array
+	(
+		'id'=>'core_menu_anerkennungNachgewiesenerKenntnisse_empfehlen',
+		'position'=>'128',
+		'name'=>$p->t('lehre/anrechnungen'),
+		'icon'=>'../../../skin/images/button_listen.png',
+		'link' => APP_ROOT. 'index.ci.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem)
+	);
+}
 
 
 //************* Menuepunkte anzeigen ****************

@@ -291,7 +291,7 @@ class Prestudent_model extends DB_Model
 			$prestudentdata->prestudentstatus = $lastStatusData;
 
 
-			if ($this->hasUDF())
+			if ($this->udfsExistAndDefined())
 			{
 				$prestudentdata->prestudentUdfs = $this->getUDFs($prestudent_id);
 			}
@@ -581,6 +581,35 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery($query, array($person_id));
 	}
+	
+	/**
+	 * Get latest ZGV Bezeichnung of Prestudent.
+	 *
+	 * @param $prestudent_id
+	 */
+	public function getLatestZGVBezeichnung($prestudent_id)
+	{
+		if (!is_numeric($prestudent_id))
+		{
+			show_error('Prestudent_id is not numeric.');
+		}
+		
+		$language_index = getUserLanguage() == 'German' ? 0 : 1;
+	
+		$this->addSelect('
+			COALESCE(
+				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $language_index . ',
+				array_to_json(zgv.bezeichnung::varchar[])->>' . $language_index . '
+			) AS bezeichnung'
+		);
+		
+		$this->addJoin('bis.tbl_zgv zgv', 'zgv_code', 'LEFT');
+		$this->addJoin('bis.tbl_zgvmaster zgvmaster', 'zgvmas_code', 'LEFT');
+		
+		return $this->loadWhere(array(
+			'prestudent_id' => $prestudent_id
+		));
+	}
 
 	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester)
 	{
@@ -595,5 +624,35 @@ class Prestudent_model extends DB_Model
 					";
 
 		return $this->execQuery($query, array($person, $studiengang, $studienSemester));
+	}
+
+	/**
+	 * Gets förderrelevant flag for a prestudent, from prestudent, or, if not set on prestudent level, from studiengang
+	 * @param int $prestudent_id
+	 * @return object
+	 */
+	public function getFoerderrelevant($prestudent_id)
+	{
+		$query = 'SELECT COALESCE (ps.foerderrelevant, stg.foerderrelevant) AS foerderrelevant
+					FROM public.tbl_prestudent ps
+					LEFT JOIN public.tbl_studiengang stg USING (studiengang_kz)
+					WHERE prestudent_id = ?';
+
+		return $this->execQuery($query, array($prestudent_id));
+	}
+
+	/**
+	 * Gets bis standort_code for a prestudent, from prestudent, or, if not set on prestudent level, from studiengang
+	 * @param int $prestudent_id
+	 * @return object
+	 */
+	public function getStandortCode($prestudent_id)
+	{
+		$query = 'SELECT COALESCE (ps.standort_code, stg.standort_code) AS standort_code
+					FROM public.tbl_prestudent ps
+					LEFT JOIN public.tbl_studiengang stg USING (studiengang_kz)
+					WHERE prestudent_id = ?';
+
+		return $this->execQuery($query, array($prestudent_id));
 	}
 }

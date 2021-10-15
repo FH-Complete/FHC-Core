@@ -9,6 +9,20 @@ const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 const COLOR_LIGHTGREY = "#f5f5f5";
 
+// -----------------------------------------------------------------------------------------------------------------
+// Mutators - setter methods to manipulate table data when entering the tabulator
+// -----------------------------------------------------------------------------------------------------------------
+
+// Converts string date postgre style to string DD.MM.YYYY.
+// This will allow correct filtering.
+var mut_formatStringDate = function(value, data, type, params, component) {
+    if (value != null)
+    {
+        var d = new Date(value);
+        return ("0" + (d.getDate())).slice(-2)  + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + d.getFullYear();
+    }
+}
+
 // TABULATOR FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 // Returns relative height (depending on screen size)
@@ -48,8 +62,8 @@ function func_tableBuilt(table) {
                 label:"Details",
                 url:function(cell){
                     return  BASE_URL + "/" + APPROVE_ANRECHNUNG_DETAIL_URI + "?anrechnung_id=" + cell.getData().anrechnung_id
-                }
-                // target:"_blank"
+                },
+                target:"_blank"
             }
         }, false, "status"  // place column after status
     );
@@ -213,13 +227,20 @@ $(function(){
         if (empfehlung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
-            empfehlung_panel.slideDown('slow');
+            empfehlung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: empfehlung_panel.offset().top // Move empfehlung panel bottom up to be visible within window screen
+                }, 400);
+            });
             return;
         }
     });
 
     // Recommend Anrechnungen
-    $("#reviewAnrechnungUebersicht-recommend-anrechnungen-confirm").click(function(){
+    $("#reviewAnrechnungUebersicht-recommend-anrechnungen-confirm").click(function(e){
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         // Get selected rows data
         let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
@@ -283,13 +304,20 @@ $(function(){
         if (begruendung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
-            begruendung_panel.slideDown('slow');
+            begruendung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: begruendung_panel.offset().top // Move genehmigung panel bottom up to be visible within window screen
+                }, 400);
+            });
             return;
         }
     });
 
     // Dont recommend Anrechnungen
-    $("#reviewAnrechnungUebersicht-dont-recommend-anrechnungen-confirm").click(function(){
+    $("#reviewAnrechnungUebersicht-dont-recommend-anrechnungen-confirm").click(function(e){
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         let begruendung = $('#reviewAnrechnungUebersicht-begruendung').val();
 
@@ -318,9 +346,6 @@ $(function(){
             FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteMindEinenAntragWaehlen"));
             return;
         }
-
-        // Avoid form redirecting automatically
-        event.preventDefault();
 
         // Prepare data object for ajax call
         let data = {
@@ -367,7 +392,7 @@ $(function(){
 
     // Break Begruendung abgeben
     $('#reviewAnrechnungUebersicht-begruendung-abbrechen').click(function(){
-        $('#reviewAnrechnungUebersicht-begruendung').val('');
+
         begruendung_panel.slideUp('slow');
 
     })

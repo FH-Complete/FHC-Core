@@ -365,7 +365,7 @@ if(!$error)
 								{
 									if($row->summe>$max_stunden)
 									{
-										if(!$fixangestellt)
+										if(!$fixangestellt && !$rechte->isBerechtigt('admin'))
 										{
 											if(!LehrauftragAufFirma($lem->mitarbeiter_uid))
 											{
@@ -400,6 +400,20 @@ if(!$error)
 								$error=true;
 								$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 							}
+						}
+					}
+
+					//Pruefen, ob Benutzer inaktiv ist. Wenn ja, eine Warnung ausgeben
+					$benutzerAktiv = false;
+					if(!$error)
+					{
+						$benutzer = new benutzer($lem->mitarbeiter_uid);
+						$benutzerAktiv = $benutzer->bnaktiv;
+						if (!$benutzerAktiv)
+						{
+							$return = true;
+							$warnung = true;
+							$errormsg = "Achtung: Der/Die Benutzer*in ist inaktiv!\nBitte informieren Sie die Personalbteilung.\n\nDaten wurden gespeichert.\n\n";
 						}
 					}
 				}
@@ -610,7 +624,7 @@ if(!$error)
 						if($row_std = $db->db_fetch_object($result_std))
 						{
 							//Grenze ueberschritten
-							if($row_std->summe>=$max_stunden)
+							if($row_std->summe>=$max_stunden && !$rechte->isBerechtigt('admin'))
 							{
 								$return = false;
 								$error = true;

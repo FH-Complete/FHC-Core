@@ -270,7 +270,7 @@ function FunktionDelete()
 // ****
 // * Speichert die Daten
 // ****
-function FunktionDetailSpeichern()
+function FunktionDetailSpeichern(kopie)
 {
 	var funktion_kurzbz = document.getElementById('funktion-menulist-funktion').value;
 	var oe_kurzbz = document.getElementById('funktion-menulist-oe_kurzbz').value;
@@ -282,6 +282,9 @@ function FunktionDetailSpeichern()
 	var datum_bis = document.getElementById('funktion-box-datum_bis').value;
 	var bezeichnung = document.getElementById('funktion-textbox-bezeichnung').value;
 	var wochenstunden = document.getElementById('funktion-textbox-wochenstunden').value;
+
+	if(kopie == true)
+		var neu = true;
 
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
@@ -412,6 +415,7 @@ function FunktionDetailDisableFields(val)
 	document.getElementById('funktion-menulist-semester').disabled=val;
 	document.getElementById('funktion-menulist-funktion').disabled=val;
 	document.getElementById('funktion-button-speichern').disabled=val;
+	document.getElementById('funktion-button-kopiespeichern').disabled=val;
 	document.getElementById('funktion-box-datum_von').disabled=val;
 	document.getElementById('funktion-box-datum_bis').disabled=val;
 	document.getElementById('funktion-textbox-bezeichnung').disabled=val;

@@ -57,19 +57,34 @@ class Filters_model extends DB_Model
 	/**
 	 * Loads all filters by their app and dataset_name
 	 */
-	public function getFiltersByAppDatasetName($app, $dataset_name)
+	public function getFiltersByAppDatasetNamePersonId($app, $dataset_name, $person_id)
 	{
-		$this->resetQuery(); // reset any previous built query
+		$query = '
+		(
+			-- Global filters
+			SELECT gs.filter_id,
+				gs.person_id,
+				gs.description
+			  FROM system.tbl_filters gs
+			 WHERE gs.app = ?
+			   AND gs.dataset_name = ?
+			   AND gs.person_id IS NULL
+		      ORDER BY gs.person_id DESC, gs.sort ASC
+		)
+		UNION ALL
+		(
+			-- Personal filters
+			SELECT ps.filter_id,
+				ps.person_id,
+				ps.description
+			  FROM system.tbl_filters ps
+			 WHERE ps.app = ?
+			   AND ps.dataset_name = ?
+			   AND ps.person_id = ?
+		      ORDER BY ps.person_id DESC, ps.sort ASC
+		)';
 
-		$this->addSelect('filter_id, person_id, description');
-		$this->addOrder('person_id', 'DESC'); // sort descending on column person_id
-		$this->addOrder('sort', 'ASC'); // sort on column sort
-
-		$filterParametersArray = array(
-			'app' => $app,
-			'dataset_name' => $dataset_name
-		);
-
-		return $this->loadWhere($filterParametersArray);
+		return $this->execQuery($query, array($app, $dataset_name, $app, $dataset_name, $person_id));
 	}
 }
+
