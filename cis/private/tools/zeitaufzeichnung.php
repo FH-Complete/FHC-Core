@@ -1089,7 +1089,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		}
 		elseif ($extractTimeBis == '00:00:00')
 		{
-			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Bitte Arbeitszeiten gemäß Arbeitsaufzeichnung Leitfaden tagesgenau abgrenzen: Nur Eingaben von 00:00 bis 23:59 erlaubt!</b></span><br>';
+			echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Bitte Arbeitszeiten gemäß Arbeitsaufzeichnung Leitfaden tagesgenau abgrenzen: Nur Eingaben von 00:00 bis 23:59 erlaubt!</b></span><br>';
 			$saveerror = 1;
 		}
 		elseif (isset($_POST['genPause']) && (isset($_POST['save']) || isset($_POST['edit'])))
