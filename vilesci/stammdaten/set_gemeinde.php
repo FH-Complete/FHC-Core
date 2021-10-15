@@ -92,6 +92,7 @@ if (isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0)
   <body>
 	  	<h2>Gemeinden aktualisieren</h2>
 		Diese Seite dient dazu die Gemeinde Kodex Tabelle zu aktualisieren.<br /><br />
+		Die Gemeinde Tabelle muss zuvor manuell geleert werden<br />
 		<b>Filesyntax:</b>(Standard xlsx-File von https://www.bis.ac.at/BISSuite, gespeichert als csv! erste Zeile ist Header (alles was oberhalb ist kann entfernt werden) -> dann Daten)
 		<br/><br/>
 		<table border="1">
