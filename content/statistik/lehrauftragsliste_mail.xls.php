@@ -30,6 +30,8 @@ require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/mail.class.php');
+require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/organisationseinheit.class.php');
 
 $stsem = new studiensemester();
 
@@ -124,6 +126,10 @@ $workbook->setCustomColor(10, 255, 186, 179);
 $format_colored =& $workbook->addFormat();
 $format_colored->setFgColor(10);
 
+$workbook->setCustomColor(10, 238, 238, 0);
+$oe_colored =& $workbook->addFormat();
+$oe_colored->setFgColor(10);
+
 $format_number_colored =& $workbook->addFormat();
 $format_number_colored->setNumFormat('0,0.00');
 //$format_number_colored->setNumFormat('0.00');
@@ -209,7 +215,7 @@ if ($result_stg = $db->db_query($qry_stg))
 						SELECT tbl_organisationseinheit.organisationseinheittyp_kurzbz || ' ' || tbl_organisationseinheit.bezeichnung
 						FROM PUBLIC.tbl_benutzerfunktion
 						JOIN PUBLIC.tbl_organisationseinheit USING (oe_kurzbz)
-						WHERE funktion_kurzbz = 'oezuordnung'
+						WHERE funktion_kurzbz = (CASE WHEN fixangestellt = true THEN 'kstzuordnung' ELSE 'oezuordnung' END)
 							AND (
 								datum_von IS NULL
 								OR datum_von <= now()
@@ -229,7 +235,7 @@ if ($result_stg = $db->db_query($qry_stg))
 								WHERE oe_kurzbz IN (
 										SELECT oe_kurzbz
 										FROM PUBLIC.tbl_benutzerfunktion
-										WHERE funktion_kurzbz = 'oezuordnung'
+										WHERE funktion_kurzbz = (CASE WHEN fixangestellt = true THEN 'kstzuordnung' ELSE 'oezuordnung' END)
 											AND (
 												datum_von IS NULL
 												OR datum_von <= now()
@@ -356,8 +362,20 @@ if ($result_stg = $db->db_query($qry_stg))
 				$liste[$row->mitarbeiter_uid]['vorname'] = $row->vorname;
 				$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
 				$liste[$row->mitarbeiter_uid]['fixangestellt'] = $row->fixangestellt;
-				$liste[$row->mitarbeiter_uid]['oezuordnung'] = $row->oezuordnung;
-				$liste[$row->mitarbeiter_uid]['department'] = $row->department;
+
+				if (is_null($row->oezuordnung))
+				{
+					$oeInfos = getOe($row->mitarbeiter_uid, $row->fixangestellt);
+					$liste[$row->mitarbeiter_uid]['oezuordnung'] = $oeInfos['oezuordnung'];
+					$liste[$row->mitarbeiter_uid]['department'] = $oeInfos['department'];
+					$liste[$row->mitarbeiter_uid]['organisationgeaendert'] = $oeInfos['organisationgeaendert'];
+				}
+				else
+				{
+					$liste[$row->mitarbeiter_uid]['oezuordnung'] = $row->oezuordnung;
+					$liste[$row->mitarbeiter_uid]['department'] = $row->department;
+				}
+
 				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden'] = 0;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten'] = 0;
 				if ($row->geaendert == 't')
@@ -375,7 +393,7 @@ if ($result_stg = $db->db_query($qry_stg))
 							public.tbl_benutzerfunktion
 							JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
 						WHERE
-							funktion_kurzbz='oezuordnung'
+							funktion_kurzbz = (CASE WHEN fixangestellt = true THEN 'kstzuordnung' ELSE 'oezuordnung' END)
 							AND (datum_von IS NULL OR datum_von <= now())
 							AND (datum_bis IS NULL OR datum_bis >= now())
 							AND tbl_benutzerfunktion.uid = tbl_benutzer.uid
@@ -390,7 +408,7 @@ if ($result_stg = $db->db_query($qry_stg))
 								WHERE oe_kurzbz IN (
 										SELECT oe_kurzbz
 										FROM PUBLIC.tbl_benutzerfunktion
-										WHERE funktion_kurzbz = 'oezuordnung'
+										WHERE funktion_kurzbz = (CASE WHEN fixangestellt = true THEN 'kstzuordnung' ELSE 'oezuordnung' END)
 											AND (
 												datum_von IS NULL
 												OR datum_von <= now()
@@ -461,8 +479,20 @@ if ($result_stg = $db->db_query($qry_stg))
 						$liste[$row->uid]['vorname'] = $row->vorname;
 						$liste[$row->uid]['nachname'] = $row->nachname;
 						$liste[$row->uid]['fixangestellt'] = $row->fixangestellt;
-						$liste[$row->uid]['oezuordnung'] = $row->oezuordnung;
-						$liste[$row->uid]['department'] = $row->department;
+
+						if (is_null($row->oezuordnung))
+						{
+							$oeInfos = getOe($row->uid, $row->fixangestellt);
+							$liste[$row->uid]['oezuordnung'] = $oeInfos['oezuordnung'];
+							$liste[$row->uid]['department'] = $oeInfos['department'];
+							$liste[$row->uid]['organisationgeaendert'] = $oeInfos['organisationgeaendert'];
+						}
+						else
+						{
+							$liste[$row->uid]['oezuordnung'] = $row->oezuordnung;
+							$liste[$row->uid]['department'] = $row->department;
+						}
+
 						$liste[$row->uid]['geaendert'] = false;
 						$liste[$row->uid]['gesamtstunden'] = 0;
 						$liste[$row->uid]['gesamtkosten'] = 0;
@@ -559,6 +589,11 @@ if ($result_stg = $db->db_query($qry_stg))
 				{
 					$format = $format_colored;
 					$formatnb = $format_number_colored;
+				}
+				else if(isset($row['organisationgeaendert']) && $row['organisationgeaendert'] === true)
+				{
+					$format = $oe_colored;
+					$formatnb = $format_number;
 				}
 				else
 				{
@@ -744,4 +779,37 @@ if ($result_stg = $db->db_query($qry_stg))
 		echo 'Email mit Lehrauftragslisten wurde an '.$empfaenger.' versandt!';
 	else
 		echo "Fehler beim Versenden der Lehrauftragsliste";
+}
+
+function getOe($mitarbeiter_uid, $fixangestellt)
+{
+	$benutzerfunktion = new Benutzerfunktion();
+	$oe = new Organisationseinheit();
+
+	$benutzerfunktion->getBenutzerFunktionByUid($mitarbeiter_uid, $fixangestellt === 'Ja' ? 'kstzuordnung' : 'oezuordnung', date('Y-m-d'));
+
+	if (isset($benutzerfunktion->result[0]))
+	{
+		array_multisort(array_column($benutzerfunktion->result, 'datum_von'), SORT_ASC, $benutzerfunktion->result);
+	}
+	else
+	{
+		$benutzerfunktion->getBenutzerFunktionByUid($mitarbeiter_uid, $fixangestellt === 'Ja' ? 'kstzuordnung' : 'oezuordnung', null, date('Y-m-d'));
+		array_multisort(array_column($benutzerfunktion->result, 'datum_bis'), SORT_DESC, $benutzerfunktion->result);
+	}
+
+	if (!isset($benutzerfunktion->result[0]))
+		return array('oezuordnung' => '', 'department' => '', 'organisationgeaendert' => false);
+
+	$oe->load($benutzerfunktion->result[0]->oe_kurzbz);
+	$oezuordnung = $oe->organisationseinheittyp_kurzbz . ' ' . $oe->bezeichnung;
+
+	$oe_parents = $oe->getParents_withOEType($oe->oe_kurzbz);
+
+	if (is_array($oe_parents))
+		 $department = ($oe_parents[array_search('Department', array_column($oe_parents, 'oe_typ_bezeichnung'))]->oe_bezeichnung);
+	else
+		$department = '';
+
+	return array('oezuordnung' => $oezuordnung, 'department' => $department, 'organisationgeaendert' => true);
 }
