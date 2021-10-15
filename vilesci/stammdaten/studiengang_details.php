@@ -89,6 +89,9 @@ $testtool_sprachwahl = false;
 $studienplaetze = '';
 $orgform_kurzbz = '';
 $lgartcode='';
+$melderelevant = false;
+$foerderrelevant = false;
+$standort_code='';
 $schick = filter_input(INPUT_POST, 'schick');
 $onlinebewerbung = false;
 
@@ -149,6 +152,9 @@ if($schick)
 	$aktiv = filter_input(INPUT_POST, 'aktiv', FILTER_VALIDATE_BOOLEAN);
 	$onlinebewerbung = filter_input(INPUT_POST, 'onlinebewerbung', FILTER_VALIDATE_BOOLEAN);
 	$mischform = filter_input(INPUT_POST, 'mischform', FILTER_VALIDATE_BOOLEAN);
+	$melderelevant = filter_input(INPUT_POST, 'melderelevant', FILTER_VALIDATE_BOOLEAN);
+	$foerderrelevant = filter_input(INPUT_POST, 'foerderrelevant', FILTER_VALIDATE_BOOLEAN);
+	$standort_code = filter_input(INPUT_POST, 'standort_code');
 
 	$ext_id = filter_input(INPUT_POST, 'ext_id');
 
@@ -214,6 +220,9 @@ if($schick)
 		$sg_update->studienplaetze = $studienplaetze;
 		$sg_update->orgform_kurzbz = $orgform_kurzbz;
 		$sg_update->lgartcode = $lgartcode;
+		$sg_update->melderelevant = $melderelevant;
+		$sg_update->foerderrelevant = $foerderrelevant;
+		$sg_update->standort_code = $standort_code;
 
 		$sg_update->bescheidvom=$date->formatDatum($sg_update->bescheidvom,'Y-m-d');
 		$sg_update->titelbescheidvom=$date->formatDatum($sg_update->titelbescheidvom,'Y-m-d');
@@ -280,6 +289,9 @@ if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_RE
 	$studienplaetze = $sg->studienplaetze;
 	$orgform_kurzbz = $sg->orgform_kurzbz;
 	$lgartcode = $sg->lgartcode;
+	$melderelevant = $sg->melderelevant;
+	$foerderrelevant = $sg->foerderrelevant;
+	$standort_code = $sg->standort_code;
 }
 
 $erh = new erhalter();
@@ -553,6 +565,46 @@ if (!$erh->getAll('kurzbz'))
 											<?php endwhile; ?>
 										<?php endif; ?>
 									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>Standort</td>
+								<td>
+									<select name="standort_code" onchange="submitable()">
+										<option value="">-- keine Auswahl --</option>
+										<?php
+										$qry = 'SELECT standort_code, bezeichnung '
+											. 'FROM bis.tbl_bisstandort '
+											. 'WHERE aktiv '
+											. 'ORDER BY bezeichnung';
+
+										if($result = $db->db_query($qry)):
+											while($row = $db->db_fetch_object($result)):
+												if($row->standort_code == $standort_code)
+													$selected = 'selected';
+												else
+													$selected = ''; ?>
+
+												<option value="<?php echo $row->standort_code ?>" <?php echo $selected ?>>
+													<?php echo $row->bezeichnung ?> - <?php echo $row->standort_code ?>
+												</option>
+											<?php endwhile; ?>
+										<?php endif; ?>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td valign="top">Melderelevant</td>
+								<td>
+									<input type="hidden" name="melderelevant" value="0">
+									<input type="checkbox" name="melderelevant" <?php echo $melderelevant ? 'checked' : '' ?> onchange="submitable()">
+								</td>
+							</tr>
+							<tr>
+								<td valign="top">F&ouml;rderrelevant</td>
+								<td>
+									<input type="hidden" name="foerderrelevant" value="0">
+									<input type="checkbox" name="foerderrelevant" <?php echo $foerderrelevant ? 'checked' : '' ?> onchange="submitable()">
 								</td>
 							</tr>
 						</table>

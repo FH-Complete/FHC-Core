@@ -171,6 +171,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
                 <label value="AZG-relevant" control="mitarbeiter-verwendung-detail-checkbox-azgrelevant"/>
                 <checkbox id="mitarbeiter-verwendung-detail-checkbox-azgrelevant"/>
             </row>
+            <row>
+                <label value="Homeoffice" control="mitarbeiter-verwendung-detail-checkbox-homeoffice"/>
+                <checkbox id="mitarbeiter-verwendung-detail-checkbox-homeoffice"/>
+            </row>
       		<row>
       			<spacer />
       			<hbox>

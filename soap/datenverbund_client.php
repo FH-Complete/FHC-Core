@@ -26,6 +26,8 @@ require_once('../include/basis_db.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/dvb.class.php');
 require_once('../include/errorhandler.class.php');
+require_once('../include/person.class.php');
+require_once('../include/adresse.class.php');
 
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
@@ -63,12 +65,80 @@ $ausstellbehoerde = filter_input(INPUT_POST, 'ausstellbehoerde');
 $ausstellland = filter_input(INPUT_POST, 'ausstellland');
 $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
 
+$getPersonData = filter_input(INPUT_POST, 'getPersonData', FILTER_VALIDATE_BOOLEAN);
+$data_person_id = filter_input(INPUT_POST, 'data_person_id');
+if ($getPersonData)
+{
+	$person = new person($data_person_id);
+	$adresse = new adresse();
+	$adresse->loadZustellAdresse($person->person_id);
+	$svnr = $person->svnr;
+	if ($svnr == '' && $person->ersatzkennzeichen != '')
+	{
+		$svnr = $person->ersatzkennzeichen;
+	}
+
+	echo json_encode(array(
+		'status'=>'ok',
+		'matrikelnummer'=>$person->matr_nr,
+		'nachname'=>$person->nachname,
+		'vorname'=>$person->vorname,
+		'geburtsdatum'=>str_replace('-','',$person->gebdatum),
+		'geschlecht'=>strtoupper($person->geschlecht),
+		'postleitzahl'=>$adresse->plz,
+		'staat'=>$adresse->nation,
+		'sozialversicherungsnummer'=>$svnr
+	));
+
+	exit();
+}
+
 ?><!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8"/>
 	<title>Datenverbund-Client</title>
+	<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 </head>
+<script type="text/javascript">
+	$(function () {
+		$('#getPersonDataButton').on('click', function ()
+		{
+			data = {
+				data_person_id: $('#getPersonDataInput').val(),
+				getPersonData: true
+			};
+
+			$.ajax({
+				url: 'datenverbund_client.php',
+				data: data,
+				type: 'POST',
+				dataType: "json",
+				success: function (data) {
+					if (data.status != 'ok') {
+						alert(JSON.stringify(data));
+						console.log(JSON.stringify(data));
+					}
+					else
+					{
+						$('input[name="matrikelnummer"]').val(data.matrikelnummer);
+						$('input[name="nachname"]').val(data.nachname);
+						$('input[name="vorname"]').val(data.vorname);
+						$('input[name="geburtsdatum"]').val(data.geburtsdatum);
+						$('input[name="geschlecht"]').val(data.geschlecht);
+						$('input[name="postleitzahl"]').val(data.postleitzahl);
+						$('input[name="staat"]').val(data.staat);
+						$('input[name="svnr"]').val(data.sozialversicherungsnummer);
+					}
+				},
+				error: function (data) {
+					alert(JSON.stringify(data));
+					console.log(JSON.stringify(data));
+				}
+			});
+		});
+	});
+</script>
 <body>
 	<h1>Testclient für Datenverbund-Webservice</h1>
 	<ul>
@@ -195,6 +265,7 @@ $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
 			break;
 
 		case 'setMatrikelnummer':
+			echo '<p><input id="getPersonDataInput" type="text" maxlength="10" size="10" placeholder="person_id"><button type="button" id="getPersonDataButton">Personendaten laden</button></p>';
             printSetMatrikelnrRows();
 			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
 			printrow('svnr', 'SVNR', $svnr);

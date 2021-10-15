@@ -1,0 +1,14 @@
+.inline-inputfield {
+    width: auto;
+    display: inline;
+}
+
+.fa-edit {
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+.fa-check {
+    cursor: pointer;
+    font-size: 1.4em;
+}
