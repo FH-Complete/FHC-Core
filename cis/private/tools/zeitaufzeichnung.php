@@ -2184,7 +2184,7 @@ function getDataForProjectOverviewCSV($user)
 	if($projektphase->getProjectphaseForMitarbeiter($user))
 		$projektphasen = $projektphase->result;
 	else
-		$projetkphasen = array();
+		$projektphasen = array();
 
 	$csvData = array();
 
@@ -2196,8 +2196,9 @@ function getDataForProjectOverviewCSV($user)
 		$projekt_phase_id = '';
 		$beginn = $project->beginn;
 		$ende = $project->ende;
+		$sap_projekt_id = $project->sap_project_id;
 
-		$csvData[] = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
+		$csvData[] = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende, $sap_projekt_id);
 	}
 
 	foreach ($projektphasen as $prjp)
@@ -2210,14 +2211,15 @@ function getDataForProjectOverviewCSV($user)
 			$projekt_phase_id = $prjp->projektphase_id;
 			$beginn = $prjp->start;
 			$ende = $prjp->ende;
+			$sap_project_id = $project->sap_project_id;
 
-			array_push($csvData, array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende)  );
+			array_push($csvData, array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende, $sap_project_id)  );
 		}
 	}
 
 	sort($csvData);
 	//headers schreiben
-	array_unshift($csvData, array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE'));
+	array_unshift($csvData, array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE', 'SAP PROJEKTNUMMER'));
 	return $csvData;
 }
 ?>

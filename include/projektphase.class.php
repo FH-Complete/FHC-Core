@@ -48,6 +48,7 @@ class projektphase extends basis_db
 	public $insertvon;	    // bigint
 	public $updateamum;	    // timestamp
 	public $updatevon;	    // bigint
+	public $sap_project_id;
 
 
 	/**
@@ -688,10 +689,11 @@ public function getFortschritt($projektphase_id)
 
 		$qry = "
 		SELECT
-			DISTINCT tbl_projektphase.*,tbl_projekt.titel
+			DISTINCT tbl_projektphase.*,tbl_projekt.titel, tbl_projects_timesheets_project.projects_timesheet_id
 		FROM
 			fue.tbl_projektphase
 			JOIN fue.tbl_projekt USING (projekt_kurzbz)
+			LEFT JOIN sync.tbl_projects_timesheets_project USING(projektphase_id)
 			JOIN fue.tbl_projekt_ressource USING (projektphase_id)
 			JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
 		WHERE
@@ -729,6 +731,7 @@ public function getFortschritt($projektphase_id)
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->sap_project_id = $row->projects_timesheet_id;
 
 				$this->result[] = $obj;
 
