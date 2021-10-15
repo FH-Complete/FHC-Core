@@ -510,6 +510,7 @@ class statistik extends basis_db
 		$this->html='';
 		$this->csv='';
 		$this->json=array();
+		set_time_limit(60);
 
 		if($this->sql!='')
 		{
