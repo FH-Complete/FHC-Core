@@ -61,16 +61,24 @@ $passuid = false;
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
+$mas = new mitarbeiter();
+$mas->getUntergebene($user, true);
+$untergebenen_arr = array();
+$untergebenen_arr = $mas->untergebene;
+$adminView = false;
+
 //Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
 //des uebergebenen Users anzeigen
 if(isset($_GET['uid']))
 {
-	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
+	if ($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid') ||
+	(in_array($_GET['uid'], $untergebenen_arr)))
 	{
 		$user = $_GET['uid'];
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user);
 		$passuid = true;
+		$adminView = true;
 	}
 	else
 	{
@@ -1287,13 +1295,33 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		}
 		echo '<p><a href="../profile/zeitsperre_resturlaub.php">'.$p->t("urlaubstool/meineZeitsperren").'</a></p>';
 		echo $p->t("zeitaufzeichnung/supportAnfragen");
-		echo '</td>
-		      	</tr>
-		      </table>';
+
+		//Dropdown timesheets Mitarbeiter
+		if ($untergebenen_arr)
+		{
+			$ben = new benutzer();
+			echo "
+			<hr><br>
+
+			<select name='mas' id='mas' onchange='location = this.options[this.selectedIndex].value;''>
+				<option>-- Timesheets Mitarbeiter*Innen --</option>";
+			foreach($untergebenen_arr as $k=>$v)
+			{
+				if ($ben->load($v))
+				{
+					echo "<option value='zeitaufzeichnung.php?uid=$v'>$ben->vorname $ben->nachname</option>";
+				}
+			}
+			echo "<option value='zeitaufzeichnung.php'> --zurück zur Übersicht--</option>";
+			echo "</select>";
+		}
+		echo '</td></tr>
+			  </table>';
 			echo '<table>
 			<tr>
 				<td rowspan="2">';
 		echo '<table>';
+
 		if (isset($_GET['projektexport']))
 		{
 			$projektexpurl = dirname($_SERVER["PHP_SELF"]) .'/zeitaufzeichnung_projektliste.php';
@@ -1628,23 +1656,30 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 			';
 
-		//Beschreibung
-		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea style="font-size: 13px" name="beschreibung" cols="60" maxlength="256">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
-		echo '<tr><td></td><td></td><td></td><td align="right">';
-		//SpeichernButton
-		if($zeitaufzeichnung_id=='')
-			echo '<input type="submit" value="'.$p->t("global/speichern").'" name="save"></td></tr>';
-		else
-		{
-			echo '<input type="hidden" value="" name="'.($alle===true?'alle':'').'">';
-			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
-			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
-		}
-		echo '</table>';
+			if (!$adminView)
+				{
+					//Beschreibung
+					echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea style="font-size: 13px" name="beschreibung" cols="60" maxlength="256">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
+					echo '<tr><td></td><td></td><td></td><td align="right">';
+					//SpeichernButton
+					if($zeitaufzeichnung_id == '')
+						echo '<input type="submit" value="'.$p->t("global/speichern").'" name="save"></td></tr>';
+					else
+					{
+						echo '<input type="hidden" value="" name="'.($alle===true?'alle':'').'">';
+						echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
+						echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
+					}
+				}
+					echo '</table>';
+					echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br>';
 
-		echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br><div id="monatsliste"></span></td></tr>';
-
-		echo '<tr><td style="float:right;">';
+				if (!$adminView)
+				{
+					echo '<div id="monatsliste">';
+				}
+				echo '</span></td></tr>';
+				echo '<tr><td style="float:right;">';
 
 		// Summen Lehre anzeigen
 		$bv = new bisverwendung();
@@ -1985,14 +2020,22 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			        <td '.$style.' align="right">'.$db->convert_html_chars($row->diff).'</td>
 			        <td '.$style.' title="'.$db->convert_html_chars(mb_eregi_replace("\r\n",' ',$row->beschreibung)).'">'.StringCut($db->convert_html_chars($row->beschreibung),20,null,'...').'</td>
 			        <td '.$style.'>';
-		        if(!isset($_GET['filter']) && ($row->uid==$user && $row->datum > $sperrdatum))
-		        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item">'.$p->t("global/bearbeiten").'</a>';
-		        echo "</td>\n";
-		        echo "       <td ".$style.">";
-		        if(!isset($_GET['filter']) && ($row->uid==$user && $row->start > $sperrdatum))
-		        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=delete&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item"  onclick="return confdel()">'.$p->t("global/loeschen").'</a>';
-		        echo "</td>\n";
-		        echo "   </tr>\n";
+
+					if (!$adminView)
+					{
+						if(!isset($_GET['filter']) && ($row->uid==$user && $row->datum > $sperrdatum))
+				        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item">'.$p->t("global/bearbeiten").'</a>';
+					}
+			        echo "</td>\n";
+			        echo "       <td ".$style.">";
+
+					if (!$adminView)
+					{
+						if(!isset($_GET['filter']) && ($row->uid==$user && $row->start > $sperrdatum))
+							echo '<a href="'.$_SERVER['PHP_SELF'].'?type=delete&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item"  onclick="return confdel()">'.$p->t("global/loeschen").'</a>';
+					}
+			        echo "</td>\n";
+			        echo "   </tr>\n";
 
 		        if (($tagesbeginn=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
 					$tagesbeginn = $row->start;
