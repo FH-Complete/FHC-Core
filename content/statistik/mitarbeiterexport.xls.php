@@ -61,7 +61,7 @@ foreach ($mitarbeiterDAO->result as $key => $foo)
 array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result);
 
 $spalte = array('anrede','titelpre', 'vorname', 'vornamen', 'nachname', 'titelpost','gebdatum','svnr','ersatzkennzeichen',
-	'aktiv','personalnummer', 'kurzbz','fixangestellt','lektor');
+	'aktiv','personalnummer', 'kurzbz','fixangestellt','lektor','uid');
 $anzSpalten = count($spalte);
 
 // Creating a workbook

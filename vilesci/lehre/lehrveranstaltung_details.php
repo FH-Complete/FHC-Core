@@ -27,6 +27,7 @@
 	require_once('../../include/lehrveranstaltung.class.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/lehrtyp.class.php');
+	require_once('../../include/lehrmodus.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
 
 	if (!$db = new basis_db())
@@ -104,6 +105,7 @@
 		$lv->projektarbeit = isset($_POST['projektarbeit']);
 		$lv->orgform_kurzbz = $_POST['orgform_kurzbz'];
 		$lv->lehrtyp_kurzbz = $_POST['lehrtyp_kurzbz'];
+		$lv->lehrmodus_kurzbz = $_POST['lehrmodus_kurzbz'];
 		$lv->oe_kurzbz = $_POST['oe_kurzbz'];
 		$lv->raumtyp_kurzbz = $_POST['raumtyp_kurzbz'];
 		$lv->anzahlsemester = $_POST['anzahlsemester'];
@@ -171,6 +173,7 @@
 			$lehrtyp_arr[] = $row->lehrtyp_kurzbz;
 		}
 	}
+
 
 	if (isset($_REQUEST['lv_id']) || isset($_REQUEST['neu']))
 	{
@@ -282,6 +285,26 @@
 		}
 		$htmlstr .= '</select></td>
 		</tr>';
+
+		$htmlstr .= '
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td>Lehrmodus*</td>
+			<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
+
+		$lehrmodus_arr = new lehrmodus();
+		$lehrmodus_arr->getAll();
+		$sprache = getSprache();
+		foreach ($lehrmodus_arr->result as $lehrmodus)
+		{
+			if ($lehrmodus->lehrmodus_kurzbz == $lv->lehrmodus_kurzbz)
+				$sel = ' selected';
+			else
+				$sel = '';
+			$htmlstr .= '<option value="'.$lehrmodus->lehrmodus_kurzbz.'" '.$sel.'>'.$lehrmodus->bezeichnung_mehrsprachig[$sprache].'</option>';
+		}
 
 		$htmlstr .= '<tr>
 			<td>Sort</td>
@@ -600,6 +623,16 @@
 					{
 					    error = true;
 					    $('select[name="lehrtyp_kurzbz"]').addClass("missingFormData");
+					}
+					if($('select[name="lehrmodus_kurzbz"]').val() === "")
+					{
+						error = true;
+						$('select[name="lehrmodus_kurzbz"]').addClass("missingFormData");
+					}
+					if($('input[name="lehreverzeichnis"]').val() === "")
+					{
+						error = true;
+						$('input[name="lehreverzeichnis"]').addClass("missingFormData");
 					}
 					if($('input[name="lehreverzeichnis"]').val() === "")
 					{

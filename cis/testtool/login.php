@@ -438,6 +438,8 @@ if (isset($prestudent_id))
 
 	//  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
 	//  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
+	$firstPrio_studienplan_id = '';
+	$firstPrio_studiengang_kz = '';
 	if ($typ->typ == 'b')
 	{
 		$ps->getActualInteressenten($prestudent_id, true, 'b');

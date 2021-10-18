@@ -31,7 +31,7 @@ class FAS_UDF extends Auth_Controller
 
 		if (isset($person_id) && is_numeric($person_id))
 		{
-			if ($this->PersonModel->hasUDF())
+			if ($this->PersonModel->udfsExistAndDefined())
 			{
 				$personUdfs = $this->PersonModel->getUDFs($person_id);
 				$data['person_id'] = $person_id;
@@ -41,7 +41,7 @@ class FAS_UDF extends Auth_Controller
 
 		if (isset($prestudent_id) && is_numeric($prestudent_id))
 		{
-			if ($this->PrestudentModel->hasUDF())
+			if ($this->PrestudentModel->udfsExistAndDefined())
 			{
 				$prestudentUdfs = $this->PrestudentModel->getUDFs($prestudent_id);
 				$data['prestudent_id'] = $prestudent_id;
