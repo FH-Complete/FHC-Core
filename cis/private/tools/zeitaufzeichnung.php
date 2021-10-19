@@ -2153,9 +2153,6 @@ function getZeitaufzeichnung($user, $von, $bis)
  * Exportiert Zeitaufzeichnungsdaten als CSV
  * @param $data Zeitaufzeichnungsdaten
  * @param string $delimiter CSV-Trennzeichen
- * @param $fieldheadings Namen der Spaltenüberschriften
- * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple)
- * @param $uid Id des Users für CSV-Filenamen "zeitaufzeichnung_uid"
  */
 function exportProjectOverviewAsCSV($user, $delimiter = ',')
 {
