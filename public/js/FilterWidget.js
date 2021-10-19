@@ -46,11 +46,12 @@ function sideMenuHook()
 					filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 				},
 				{
+					reloadPage: true,
 					successCallback: function(data, textStatus, jqXHR) {
 
 						if (FHC_AjaxClient.isError(data))
 						{
-							console.log(FHC_AjaxClient.getError(data));
+							console.error(FHC_AjaxClient.getError(data));
 						}
 						else
 						{
@@ -141,7 +142,7 @@ var FHC_FilterWidget = {
 
 		if (FHC_AjaxClient.isError(data))
 		{
-			console.log(FHC_AjaxClient.getError(data));
+			console.error(FHC_AjaxClient.getError(data));
 		}
 		else
 		{
@@ -157,7 +158,7 @@ var FHC_FilterWidget = {
 
 		if (FHC_AjaxClient.isError(data))
 		{
-			console.log(FHC_AjaxClient.getError(data));
+			console.error(FHC_AjaxClient.getError(data));
 		}
 		else
 		{
@@ -174,6 +175,7 @@ var FHC_FilterWidget = {
 		$("#addField").html("<option value=''>" + FHC_PhrasesLib.t("ui", "bitteEintragWaehlen") + "</option>");
 		$("#appliedFilters").html("");
 		$("#addFilter").html("<option value=''>" + FHC_PhrasesLib.t("ui", "bitteEintragWaehlen") + "</option>");
+		FHC_FilterWidget._toggleApplySaveButtons(false);
 
 		// If the choosen dataset representation is tablesorter
 		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_TABLESORTER)
@@ -218,7 +220,7 @@ var FHC_FilterWidget = {
 					}
 					else
 					{
-						console.log(FHC_AjaxClient.getError(data));
+						console.error(FHC_AjaxClient.getError(data));
 					}
 				}
 			}
@@ -290,6 +292,8 @@ var FHC_FilterWidget = {
 		$(".remove-selected-field").off("click");
 		$("#addField").off("change");
 		$(".applied-filter-operation").off("change");
+		$(".applied-filter-condition").off("keyup");
+		$(".applied-filter-option").off("change");
 		$(".remove-applied-filter").off("click");
 		$("#addFilter").off("change");
 		$("#applyFilter").off("click");
@@ -314,6 +318,8 @@ var FHC_FilterWidget = {
 		$(".remove-selected-field").click(FHC_FilterWidget._revomeSelectedFieldsEvent); // Click event on the "X" link
 		$("#addField").change(FHC_FilterWidget._addFieldEvent); // Change event on the fields drop-down to add new fields
 		$(".applied-filter-operation").change(FHC_FilterWidget._appliedFiltersOperationsEvent); // Change event on the operation drop-down
+		$(".applied-filter-condition").keyup(FHC_FilterWidget._appliedFiltersConditionsEvent); // Change event on the conditions fields
+		$(".applied-filter-option").change(FHC_FilterWidget._appliedFiltersOptionsEvent); // Change event on the operation drop-down
 		$(".remove-applied-filter").click(FHC_FilterWidget._removeAppliedFiltersEvent); // Click event to the "X" button to remove an applied filter
 		$("#addFilter").change(FHC_FilterWidget._addFilterEvent); // Click event on the applied filters drop-down to add a new filter to the dataset
 		$("#applyFilter").click(FHC_FilterWidget._applyFilterEvent); // Click event on the applied filters drop-down to apply filters to the dataset
@@ -456,6 +462,22 @@ var FHC_FilterWidget = {
 			$(this).parent().parent().find(".applied-filter-condition").prop("disabled", false);
 			$(this).parent().parent().find(".applied-filter-option").prop("disabled", false);
 		}
+
+		FHC_FilterWidget._toggleApplySaveButtons(true);
+	},
+
+	/**
+	 * Event function used by the applied filter conditions
+	 */
+	_appliedFiltersConditionsEvent: function(event) {
+		FHC_FilterWidget._toggleApplySaveButtons(true);
+	},
+
+	/**
+	 * Event function used by the applied filter options
+	 */
+	_appliedFiltersOptionsEvent: function(event) {
+		FHC_FilterWidget._toggleApplySaveButtons(true);
 	},
 
 	/**
@@ -481,7 +503,7 @@ var FHC_FilterWidget = {
 	 * Event function used by the apply filter button
 	 * The given parameter is used to decide if the page is going to be reloaded
 	 */
-	_applyFilterEvent: function(reload = true) {
+	_applyFilterEvent: function() {
 
 		var appliedFilters = [];
 		var appliedFiltersOperations = [];
@@ -506,15 +528,7 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-
-					if (reload === true)
-					{
-						FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
-					}
-					else
-					{
-						console.log(FHC_AjaxClient.getError(data));
-					}
+					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
 				}
 			}
 		);
@@ -586,9 +600,6 @@ var FHC_FilterWidget = {
 
  		if ($("#customFilterDescription").val() != "")
  		{
-			// Apply the filter before saving it, without reloading the page
-			FHC_FilterWidget._applyFilterEvent(false);
-
  			FHC_AjaxClient.ajaxCallPost(
  				"widgets/Filters/saveCustomFilter",
  				{
@@ -597,7 +608,12 @@ var FHC_FilterWidget = {
  				},
  				{
  					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._failOrReload(data);
+
+						// If an error occurred then log it
+						if (FHC_AjaxClient.isError(data)) console.error(data);
+
+						// In any case tries to apply the filter
+						FHC_FilterWidget._applyFilterEvent();
 					}
  				}
  			);
@@ -1265,6 +1281,14 @@ var FHC_FilterWidget = {
 		{
 			FHC_FilterWidget._hideOptions = data.hideOptions;
 		}
+	},
+
+	/**
+	 * Enable/disable the apply and save buttons
+	 */
+	_toggleApplySaveButtons(addedNewFilterOption) {
+		$("#applyFilter").prop("disabled", addedNewFilterOption != true);
+		$("#saveCustomFilterButton").prop("disabled", addedNewFilterOption === true);
 	}
 };
 
@@ -1276,3 +1300,4 @@ $(document).ready(function() {
 	FHC_FilterWidget.display();
 
 });
+

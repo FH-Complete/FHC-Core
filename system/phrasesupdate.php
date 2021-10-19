@@ -1580,6 +1580,27 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'filter',
+		'phrase' => 'filterApply',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filtern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Apply',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'core',
+		'category' => 'filter',
 		'phrase' => 'filterHinzufuegen',
 		'insertvon' => 'system',
 		'phrases' => array(
