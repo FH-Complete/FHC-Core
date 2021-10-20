@@ -505,33 +505,51 @@ var FHC_FilterWidget = {
 	 */
 	_applyFilterEvent: function() {
 
+		var isValid = true;
 		var appliedFilters = [];
 		var appliedFiltersOperations = [];
 		var appliedFiltersConditions = [];
 		var appliedFiltersOptions = [];
 
+		// Get all the data from the filter form and fill the arrays
 		$("#appliedFilters > div").each(function(i, e) {
+
 			appliedFilters.push($(this).find(".hidden-field-name").val());
 			appliedFiltersOperations.push($(this).find(".applied-filter-operation").val());
-			appliedFiltersConditions.push($(this).find(".applied-filter-condition:enabled").val());
+
+			// Checks if the conditions are filled by the user
+			if ($(this).find(".applied-filter-condition:enabled").length > 0
+				&& $(this).find(".applied-filter-condition:enabled").val().trim() != '')
+			{
+				appliedFiltersConditions.push($(this).find(".applied-filter-condition:enabled").val());
+			}
+			else // otherwise mark the empty conditions in red
+			{
+				$(this).find(".applied-filter-condition:enabled").css("border", "1px solid red");
+				isValid = false;
+			}
+
 			appliedFiltersOptions.push($(this).find(".applied-filter-option:enabled").val());
 		});
 
-		FHC_AjaxClient.ajaxCallPost(
-			"widgets/Filters/applyFilters",
-			{
-				appliedFilters: appliedFilters,
-				appliedFiltersOperations: appliedFiltersOperations,
-				appliedFiltersConditions: appliedFiltersConditions,
-				appliedFiltersOptions: appliedFiltersOptions,
-				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
+		if (isValid)
+		{
+			FHC_AjaxClient.ajaxCallPost(
+				"widgets/Filters/applyFilters",
+				{
+					appliedFilters: appliedFilters,
+					appliedFiltersOperations: appliedFiltersOperations,
+					appliedFiltersConditions: appliedFiltersConditions,
+					appliedFiltersOptions: appliedFiltersOptions,
+					filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
+				},
+				{
+					successCallback: function(data, textStatus, jqXHR) {
+						FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
+					}
 				}
-			}
-		);
+			);
+		}
 	},
 
 	/**
@@ -770,6 +788,8 @@ var FHC_FilterWidget = {
 
 		var html = "";
 
+		console.log(metaData.type.toLowerCase());
+
 		if (metaData.type.toLowerCase().indexOf("int") >= 0)
 		{
 			if (appliedFilter.condition == null) appliedFilter.condition = 0;
@@ -786,7 +806,9 @@ var FHC_FilterWidget = {
 			html += "	<input type='numbe' value='" + appliedFilter.condition + "' class='form-control applied-filter-condition'>";
 			html += "</span>";
 		}
-		if (metaData.type.toLowerCase().indexOf("varchar") >= 0 || metaData.type.toLowerCase() == "text")
+		if (metaData.type.toLowerCase().indexOf("varchar") >= 0
+			|| metaData.type.toLowerCase().indexOf("text") >= 0
+			|| metaData.type.toLowerCase().indexOf("bpchar") >= 0)
 		{
 			if (appliedFilter.condition == null) appliedFilter.condition = "";
 
