@@ -788,8 +788,7 @@ var FHC_FilterWidget = {
 
 		var html = "";
 
-		console.log(metaData.type.toLowerCase());
-
+		// If integer type
 		if (metaData.type.toLowerCase().indexOf("int") >= 0)
 		{
 			if (appliedFilter.condition == null) appliedFilter.condition = 0;
@@ -806,6 +805,8 @@ var FHC_FilterWidget = {
 			html += "	<input type='numbe' value='" + appliedFilter.condition + "' class='form-control applied-filter-condition'>";
 			html += "</span>";
 		}
+
+		// If text, varchar or char type
 		if (metaData.type.toLowerCase().indexOf("varchar") >= 0
 			|| metaData.type.toLowerCase().indexOf("text") >= 0
 			|| metaData.type.toLowerCase().indexOf("bpchar") >= 0)
@@ -822,6 +823,8 @@ var FHC_FilterWidget = {
 			html += "	<input type='text' value='" + appliedFilter.condition + "' class='form-control applied-filter-condition'>";
 			html += "</span>";
 		}
+
+		// If boolean type
 		if (metaData.type.toLowerCase().indexOf("bool") >= 0)
 		{
 			html = "<span>";
@@ -834,6 +837,8 @@ var FHC_FilterWidget = {
 			html += "	<input type='hidden' value='" + appliedFilter.condition + "' class='form-control applied-filter-condition'>";
 			html += "</span>";
 		}
+
+		// If timestamp or date type
 		if (metaData.type.toLowerCase().indexOf("timestamp") >= 0 || metaData.type.toLowerCase().indexOf("date") >= 0)
 		{
 			var classOperation = "form-control applied-filter-condition";
@@ -881,6 +886,9 @@ var FHC_FilterWidget = {
 		return html;
 	},
 
+	/**
+	 * It renders the dataset with a tablesorter, puvotUI or a tabulator
+	 */
 	_renderDataset: function(data) {
 
 		// If the choosen dataset representation is tablesorter then...
