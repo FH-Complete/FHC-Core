@@ -237,7 +237,7 @@ $worksheet->write($zeile,++$spalte,"Fixangestellt", $format_bold);
 $maxlength[$spalte]=10;
 $worksheet->write($zeile,++$spalte,"Vorjahrslektor", $format_bold);
 $maxlength[$spalte]=12;
-$worksheet->write($zeile,++$spalte,"Wunschlektor", $format_bold);
+$worksheet->write($zeile,++$spalte,"Lektor*in bestätigt", $format_bold);
 $maxlength[$spalte]=12;
 $worksheet->write($zeile,++$spalte,"Bezeichnung", $format_bold);
 $maxlength[$spalte]=25;
