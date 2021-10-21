@@ -30,8 +30,8 @@ $(document).ready(function ()
 					newRowHtml += 		"</td>";
 					newRowHtml += 		"<td><input type='text' name='studierendenbeitrag' id='input_studierendenbeitrag_"+nextOehbeitragId+"' class='form-control' placeholder='0,00'></td>"+
 										"<td><input type='text' name='versicherung' id='input_versicherung_"+nextOehbeitragId+"' class='form-control' placeholder='0,00'></td>"+
-										"<td><button class='btn btn-default' id='addOeh_"+nextOehbeitragId+"'>Speichern</button>&nbsp;" +
-						"						<button class='btn btn-default' id='delete_"+nextOehbeitragId+"'>Entfernen</button></td>"+
+										"<td><button class='btn btn-default' id='addOeh_"+nextOehbeitragId+"'>"+FHC_PhrasesLib.t('ui', 'speichern')+"</button>&nbsp;" +
+						"						<button class='btn btn-default' id='delete_"+nextOehbeitragId+"'>"+FHC_PhrasesLib.t('ui', 'entfernen')+"</button></td>"+
 									"</tr>";
 
 					$("#oehbeitraegeTbl tbody").prepend(newRowHtml);
@@ -67,7 +67,7 @@ $(document).ready(function ()
 					Oehbeitrag.newBeitragId++;
 				}
 				else
-					FHC_DialogLib.alertInfo("ÖH-Beiträge für alle Studiensemester festgelegt");
+					FHC_DialogLib.alertInfo(FHC_PhrasesLib.t('oehbeitrag', 'oehbeitraegeFestgelegt'));
 			}
 
 			Oehbeitrag.getValidStudiensemester(callback);
@@ -106,7 +106,7 @@ var Oehbeitrag = {
 									Oehbeitrag._formatDateToGerman(oehbeitrag.von_datum) + '/' + oehbeitrag.von_studiensemester_kurzbz +
 									'&nbsp;<i class="fa fa-edit editVonStudiensemester" id="edit_von_studiensemester_' + oehbeitrag.oehbeitrag_id + '"></i>'+
 								'</td>' +
-								'<td id="cell_bis_studiensemester_kurzbz_' + oehbeitrag.oehbeitrag_id + '">' + (oehbeitrag.bis_studiensemester_kurzbz == null ? 'unbeschr&aumlnkt' :
+								'<td id="cell_bis_studiensemester_kurzbz_' + oehbeitrag.oehbeitrag_id + '">' + (oehbeitrag.bis_studiensemester_kurzbz == null ? FHC_PhrasesLib.t('global', 'unbeschraenkt') :
 									Oehbeitrag._formatDateToGerman(oehbeitrag.bis_datum) + '/' + oehbeitrag.bis_studiensemester_kurzbz) +
 									'&nbsp;<i class="fa fa-edit editBisStudiensemester" id="edit_bis_studiensemester_' + oehbeitrag.oehbeitrag_id + '"></i>'+
 								'</td>' +
@@ -117,8 +117,8 @@ var Oehbeitrag = {
 									'&nbsp;<i class="fa fa-edit editVersicherung" id="edit_versicherung_' + oehbeitrag.oehbeitrag_id + '"></i>'+
 								'</td>' +
 								'<td>' +
-									'<button class="btn btn-default editBtn" id="edit_'+oehbeitrag.oehbeitrag_id+'">Bearbeiten</button>' +
-									'&nbsp;<button class="btn btn-default deleteBtn" id="delete_'+oehbeitrag.oehbeitrag_id+'">L&ouml;schen</button>' +
+									'<button class="btn btn-default editBtn" id="edit_'+oehbeitrag.oehbeitrag_id+'">'+FHC_PhrasesLib.t('ui', 'bearbeiten')+'</button>' +
+									'&nbsp;<button class="btn btn-default deleteBtn" id="delete_'+oehbeitrag.oehbeitrag_id+'">'+FHC_PhrasesLib.t('ui', 'loeschen')+'</button>' +
 								'</td>' +
 							'</tr>';
 						}
@@ -133,7 +133,7 @@ var Oehbeitrag = {
 				},
 				errorCallback: function()
 				{
-					FHC_DialogLib.alertError('Fehler beim Holen der Öhbeiträge');
+					FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerHolenOehbeitraege'));
 				}
 			}
 		);
@@ -150,7 +150,7 @@ var Oehbeitrag = {
 				successCallback: callback,
 				errorCallback: function()
 				{
-					FHC_DialogLib.alertError('Fehler beim Holen der Semester');
+					FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerHolenSemester'));
 				}
 			}
 		);
@@ -173,12 +173,12 @@ var Oehbeitrag = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError('Fehler beim Hinzufügen des Öhbeitrags');
+						FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerHinzufuegenOehbeitrag'));
 					}
 				},
 				errorCallback: function()
 				{
-					FHC_DialogLib.alertError('Fehler beim Hinzufügen des Öhbeitrags');
+					FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerHinzufuegenOehbeitrag'));
 				}
 			}
 		);
@@ -205,12 +205,12 @@ var Oehbeitrag = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
+						FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerAktualisierenOehbeitrag'));
 					}
 				},
 				errorCallback: function()
 				{
-					FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
+					FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerAktualisierenOehbeitrag'));
 				}
 			}
 		);
@@ -259,12 +259,12 @@ var Oehbeitrag = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
+						FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerAktualisierenOehbeitrag'));
 					}
 				},
 				errorCallback: function()
 				{
-					FHC_DialogLib.alertError('Fehler beim Aktualisieren des Öhbeitrags');
+					FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerAktualisierenOehbeitrag'));
 				}
 			}
 		);
@@ -283,12 +283,12 @@ var Oehbeitrag = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError('Fehler beim Löschen des Öhbeitrags');
+						FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerLoeschenOehbeitrag'));
 					}
 				},
 				errorCallback: function()
 				{
-					FHC_DialogLib.alertError('Fehler beim Löschen des Öhbeitrags');
+					FHC_DialogLib.alertError(FHC_PhrasesLib.t('oehbeitrag', 'fehlerLoeschenOehbeitrag'));
 				}
 			}
 		);
@@ -310,7 +310,7 @@ var Oehbeitrag = {
 				Oehbeitrag._makeFieldEditable(id, 'bis_studiensemester_kurzbz', 'semester');
 				Oehbeitrag._makeFieldEditable(id, 'studierendenbeitrag');
 				Oehbeitrag._makeFieldEditable(id, 'versicherung');
-				$(this).after("&nbsp;<button class='btn btn-default saveBtn' id='save_"+oehbeitrag_id+"'>Speichern</button>");
+				$(this).after("&nbsp;<button class='btn btn-default saveBtn' id='save_"+oehbeitrag_id+"'>"+FHC_PhrasesLib.t('ui', 'speichern')+"</button>");
 				$(this).remove();
 				$("#delete_" + oehbeitrag_id).remove();
 
