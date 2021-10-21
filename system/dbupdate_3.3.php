@@ -4955,6 +4955,20 @@ if(!@$db->db_query("SELECT statusgrund_kurzbz FROM public.tbl_status_grund LIMIT
 		echo '<br>Neue Spalte statusgrund_kurzbz zu Tabelle public.tbl_status_grund hinzugefügt';
 }
 
+// Add permission to set gemeinde
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'basis/gemeinde';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('basis/gemeinde', 'Gemeindedaten pflegen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for basis/gemeinde<br>';
+	}
+}
+
 // Add column homeoffice to bis.tbl_bisverwendung
 if (!$result = @$db->db_query("SELECT homeoffice FROM bis.tbl_bisverwendung LIMIT 1"))
 {
@@ -5216,9 +5230,9 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue_status LIMIT 1;"))
 			);
 
 			COMMENT ON TABLE system.tbl_issue_status IS 'Tabelle zur Pflege von Bearbeitungsstatus von issues.';
-			
+
 			ALTER TABLE system.tbl_issue_status ADD CONSTRAINT pk_tbl_issue_status PRIMARY KEY (status_kurzbz);
-			
+
 			INSERT INTO system.tbl_issue_status (status_kurzbz, bezeichnung_mehrsprachig) VALUES('new', '{\"neu\",\"new\"}');
 			INSERT INTO system.tbl_issue_status (status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgress', '{\"in Bearbeitung\",\"in progress\"}');
 			INSERT INTO system.tbl_issue_status (status_kurzbz, bezeichnung_mehrsprachig) VALUES('resolved', '{\"behoben\",\"resolved\"}');";
@@ -5250,11 +5264,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehlertyp LIMIT 1;"))
 				  fehlertyp_kurzbz character varying(32),
 				  bezeichnung_mehrsprachig varchar(32)[]
 			);
-			
+
 			COMMENT ON TABLE system.tbl_fehlertyp IS 'Tabelle mit fehlertyp für tbl_fehler';
 
 			ALTER TABLE system.tbl_fehlertyp ADD CONSTRAINT pk_tbl_fehlertyp PRIMARY KEY (fehlertyp_kurzbz);
-			
+
 			INSERT INTO system.tbl_fehlertyp (fehlertyp_kurzbz, bezeichnung_mehrsprachig) VALUES('warning', '{\"warnung\",\"warning\"}');
 			INSERT INTO system.tbl_fehlertyp (fehlertyp_kurzbz, bezeichnung_mehrsprachig) VALUES('error', '{\"fehler\",\"error\"}');
 			INSERT INTO system.tbl_fehlertyp (fehlertyp_kurzbz, bezeichnung_mehrsprachig) VALUES('info', '{\"info\",\"info\"}');";
@@ -5290,7 +5304,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler LIMIT 1;"))
 				  fehlertyp_kurzbz character varying(32) NOT NULL,
 				  app character varying(32) NOT NULL
 			);
-			
+
 			COMMENT ON TABLE system.tbl_fehler IS 'Tabelle zur Pflege von Fehlerfällen';
 			COMMENT ON COLUMN system.tbl_fehler.fehlercode IS 'Eindeutiger interner Fehlercode';
 			COMMENT ON COLUMN system.tbl_fehler.fehler_kurzbz IS 'Eindeutige Kurzbezeichnung für den Fehler';
@@ -5298,13 +5312,13 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler LIMIT 1;"))
 			COMMENT ON COLUMN system.tbl_fehler.fehlertext IS 'Interner, eigens definierter Fehlertext mit Platzhaltern für Parameter';
 			COMMENT ON COLUMN system.tbl_fehler.fehlertyp_kurzbz IS 'Typ bzw Schweregrad (z.B. warnung, fehler)';
 			COMMENT ON COLUMN system.tbl_fehler.app IS 'Ursprungsapp des Fehlers';
-			
-			ALTER TABLE system.tbl_fehler ADD CONSTRAINT pk_tbl_fehler PRIMARY KEY (fehlercode);	
+
+			ALTER TABLE system.tbl_fehler ADD CONSTRAINT pk_tbl_fehler PRIMARY KEY (fehlercode);
 			ALTER TABLE system.tbl_fehler ADD CONSTRAINT fk_tbl_fehler_fehlertyp_kurzbz FOREIGN KEY (fehlertyp_kurzbz) REFERENCES system.tbl_fehlertyp(fehlertyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_fehler ADD CONSTRAINT fk_tbl_fehler_app FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_fehler ADD CONSTRAINT uk_tbl_fehler_fehlercode_fehler_kurzbz UNIQUE (fehlercode, fehler_kurzbz); -- for upsert ON CONFLICT
 			ALTER TABLE system.tbl_fehler ADD CONSTRAINT uk_tbl_fehler_fehlercode_extern_app UNIQUE (fehlercode_extern, app); -- for recognizing external errors
-			
+
 			INSERT INTO system.tbl_fehler (fehlercode, fehlertext, fehlertyp_kurzbz, app) VALUES ('UNKNOWN_ERROR', 'Fehler ist aufgetreten', 'error', 'core');
 			";
 
@@ -5339,31 +5353,31 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler_zustaendigkeiten L
 				  oe_kurzbz character varying(32),
 				  funktion_kurzbz character varying(16)
 			);
-			
+
 			COMMENT ON TABLE system.tbl_fehler_zustaendigkeiten IS 'Tabelle zum Hinzufügen für Zuständigkeiten für einzelne Fehler';
 			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.fehlercode IS 'Eindeutiger interner Fehlercode';
 			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.person_id IS 'person_id der zuständigen Person';
 			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.oe_kurzbz IS 'Zuständigkeit für einen fehlercode für eine ganze OE';
 			COMMENT ON COLUMN system.tbl_fehler_zustaendigkeiten.funktion_kurzbz IS 'Zusätzliche Einschränkung der OE Zuständigkeit nach funktion';
-				
+
 			CREATE SEQUENCE system.seq_fehlerzustaendigkeiten_id
 				START WITH 1
 				INCREMENT BY 1
 				NO MINVALUE
 				NO MAXVALUE
 				CACHE 1;
-			
+
 			ALTER TABLE ONLY system.tbl_fehler_zustaendigkeiten ALTER COLUMN fehlerzustaendigkeiten_id SET DEFAULT nextval('system.seq_fehlerzustaendigkeiten_id'::regclass);
-			
+
 			GRANT SELECT, UPDATE ON SEQUENCE system.seq_fehlerzustaendigkeiten_id TO vilesci;
 			GRANT SELECT, UPDATE ON SEQUENCE system.seq_fehlerzustaendigkeiten_id TO fhcomplete;
 
-			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT pk_tbl_fehler_zustaendigkeiten PRIMARY KEY (fehlerzustaendigkeiten_id);	
+			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT pk_tbl_fehler_zustaendigkeiten PRIMARY KEY (fehlerzustaendigkeiten_id);
 			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_fehlercode FOREIGN KEY (fehlercode) REFERENCES system.tbl_fehler(fehlercode) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT fk_tbl_fehler_zustaendigkeiten_funktion_kurzbz FOREIGN KEY (funktion_kurzbz) REFERENCES public.tbl_funktion(funktion_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-			
+
 			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT uk_tbl_fehler_zustaendigkeiten_fehlercode_person_id UNIQUE (fehlercode, person_id);
 			ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD CONSTRAINT uk_tbl_fehler_zustaendigkeiten_fehlercode_oe_kurzbz_funktion_kurzbz UNIQUE (fehlercode, oe_kurzbz, funktion_kurzbz);";
 
@@ -5407,7 +5421,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue LIMIT 1;"))
 				  updatevon character varying(32),
 				  updateamum timestamp without time zone
 			);
-			
+
 			COMMENT ON TABLE system.tbl_issue IS 'Tabelle zur Verfolgung von Problemen/Fehlern von verschiedenen Systemen';
 			COMMENT ON COLUMN system.tbl_issue.issue_id IS 'Primärschlüssel';
 			COMMENT ON COLUMN system.tbl_issue.fehlercode IS 'Identifikationscode  des Problems/Fehlers, kann von anderem System kommen oder eigens definiert sein';
@@ -5420,26 +5434,26 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue LIMIT 1;"))
 			COMMENT ON COLUMN system.tbl_issue.person_id IS 'Id der Person, für welche das issue besteht';
 			COMMENT ON COLUMN system.tbl_issue.oe_kurzbz IS 'Betroffene Organisationseinheit';
 			COMMENT ON COLUMN system.tbl_issue.status_kurzbz IS 'Verarbeitsungsstatus';
-			
+
 			CREATE SEQUENCE system.seq_issue_id
 				START WITH 1
 				INCREMENT BY 1
 				NO MINVALUE
 				NO MAXVALUE
 				CACHE 1;
-			
+
 			ALTER TABLE ONLY system.tbl_issue ALTER COLUMN issue_id SET DEFAULT nextval('system.seq_issue_id'::regclass);
-			
+
 			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issue_id TO vilesci;
 			GRANT SELECT, UPDATE ON SEQUENCE system.seq_issue_id TO fhcomplete;
-			
+
 			ALTER TABLE system.tbl_issue ADD CONSTRAINT pk_tbl_issue PRIMARY KEY (issue_id);
-			
+
 			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_fehlercode FOREIGN KEY (fehlercode) REFERENCES system.tbl_fehler(fehlercode) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_verarbeitetvon FOREIGN KEY (verarbeitetvon) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE system.tbl_issue ADD CONSTRAINT fk_tbl_issue_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-			
+
 			ALTER TABLE system.tbl_issue ADD CONSTRAINT chk_tbl_issue_person_id_oe_kurzbz CHECK (person_id IS NOT NULL OR oe_kurzbz IS NOT NULL);
 
 			CREATE INDEX idx_tbl_issue_person_id ON system.tbl_issue USING btree (person_id);

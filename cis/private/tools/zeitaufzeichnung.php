@@ -770,7 +770,6 @@ echo '
 			  else
 			  {
 				  $("#homeofficeBlock").hide();
-
 			  }
   			}
   		  });
@@ -1840,10 +1839,29 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						$tagessaldo = $tagessaldo-$pausesumme;
 						// fehlende Pausen berechnen
 						$pausefehlt_str = '';
-						if ($tagessaldo > 19800 && $pausesumme < 1800)
-							$pausefehlt_str = '<span style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
-						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000)
-							$pausefehlt_str = '<span style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
+
+						//Prüfung auf azgrelevant
+						$azgrelevant = false;
+						$verwendung = new bisverwendung();
+
+						$verwendung->getVerwendungDatum($user, $datum->formatDatum($tag, 'Y-m-d'));
+						$azgrelevant = true;
+						foreach ($verwendung->result as $v)
+						{
+							if ($v->azgrelevant)
+							{
+								$azgrelevant = false;
+							}
+						}
+
+						if ($tagessaldo > 19800 && $pausesumme < 1800 && !$azgrelevant)
+							$pausefehlt_str = '<span class="pauseFehlt" style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
+						elseif ($tagessaldo > 19800 && $pausesumme < 1800 && $azgrelevant)
+								$pausefehlt_str = '<span class="pauseFehlt" style="color:grey; font-weight:bold;">-- Hinweis: Pause fehlt --</span>';
+						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000 && !$azgrelevant)
+							$pausefehlt_str = '<span class="pauseFehlt" style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
+						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000 && $azgrelevant)
+							$pausefehlt_str = '<span class="pauseFehlt" style="color:grey; font-weight:bold;">-- Hinweis: Pause fehlt --</span>';
 
 
 						$tagessaldo = date('H:i', ($tagessaldo));
