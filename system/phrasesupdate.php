@@ -12560,13 +12560,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Zertifikat als PDF hochladen",
+				'text' => "Zertifikat als PDF hochladen (nur mit QR-Code, kein gescanntes Zertifikat)",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "upload certificate pdf",
+				'text' => "upload certificate pdf (only with qrcode, no scanned certificate)",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12580,13 +12580,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Validierungsergebnis / aktuelles Gültigkeitsdatum",
+				'text' => "Validierungsergebnis / gespeichertes Gültigkeitsdatum",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "validation result / current valid date",
+				'text' => "validation result / stored valid date",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12767,6 +12767,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "person data from certificate does not match the logged in user",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'UploadSuccessful',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Das Gültigkeitsdatum wurde erfolgreich gespeichert.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "validity date has been successfully stored.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'UploadFailed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es wurde kein Gültigkeitsdatum gespeichert.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "validity date has not been stored.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
