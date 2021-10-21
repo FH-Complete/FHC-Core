@@ -60,7 +60,8 @@ if (!$filter->loadAll())
 				$("#t1").tablesorter(
 				{
 					sortList: [[2,0]],
-					widgets: ["zebra"]
+					widgets: ["zebra", "filter", "stickyHeaders"],
+					headers: {8: {sorter: false, filter: false}}
 				});
 			});
 

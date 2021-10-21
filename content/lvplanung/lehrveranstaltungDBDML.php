@@ -365,7 +365,7 @@ if(!$error)
 								{
 									if($row->summe>$max_stunden)
 									{
-										if(!$fixangestellt)
+										if(!$fixangestellt && !$rechte->isBerechtigt('admin'))
 										{
 											if(!LehrauftragAufFirma($lem->mitarbeiter_uid))
 											{
@@ -624,7 +624,7 @@ if(!$error)
 						if($row_std = $db->db_fetch_object($result_std))
 						{
 							//Grenze ueberschritten
-							if($row_std->summe>=$max_stunden)
+							if($row_std->summe>=$max_stunden && !$rechte->isBerechtigt('admin'))
 							{
 								$return = false;
 								$error = true;

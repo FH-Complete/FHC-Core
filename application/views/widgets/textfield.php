@@ -31,6 +31,7 @@
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MAX_LENGTH); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REGEX); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::TITLE); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::DISABLED, false); ?>
 					value="<?php echo ${TextfieldWidget::VALUE}; ?>"
 				>
 			</div>
@@ -38,3 +39,4 @@
 	</div>
 
 <?php HTMLWidget::printEndBlock(${HTMLWidget::HTML_ARG_NAME}); ?>
+
