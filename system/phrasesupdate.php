@@ -12680,13 +12680,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Das Zertifikat konnte nicht verifiziert werden.",
+				'text' => "Das Zertifikat konnte nicht verifiziert werden. Stellen Sie bitte sicher, dass ein QR-Code enthalten ist.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "certificate could not be verified.",
+				'text' => "certificate could not be verified. Please make sure it contains a qr-code.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12807,6 +12807,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "validity date has not been stored.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'uploadbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hier kann ein Zertifikat mit QR-Code selbst erfasst werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "a certificate with qr-code can be self registered here.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'manualbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Falls das Zertifikat keinen QR-Code enthält oder die Selbst-Erfassung fehlschlägt, kann das Zertifkat beim Empfang manuell erfasst werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "if the certificate does not contain a qr-code or self registration fails, the certificate can be manually registered at the front desk.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
