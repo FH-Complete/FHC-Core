@@ -1846,6 +1846,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 						$verwendung->getVerwendungDatum($user, $datum->formatDatum($tag, 'Y-m-d'));
 						$azgrelevant = true;
+						$linkExclamation =  APP_ROOT. 'skin/images/exclamation.png';
+						$linkInformation =  APP_ROOT. 'skin/images/information.png';
 						foreach ($verwendung->result as $v)
 						{
 							if ($v->azgrelevant)
@@ -1855,14 +1857,13 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						}
 
 						if ($tagessaldo > 19800 && $pausesumme < 1800 && !$azgrelevant)
-							$pausefehlt_str = '<span class="pauseFehlt" style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
+							$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz --</span>';
 						elseif ($tagessaldo > 19800 && $pausesumme < 1800 && $azgrelevant)
-								$pausefehlt_str = '<span class="pauseFehlt" style="color:grey; font-weight:bold;">-- Hinweis: Pause fehlt --</span>';
+								$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
 						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000 && !$azgrelevant)
-							$pausefehlt_str = '<span class="pauseFehlt" style="color:red; font-weight:bold;">-- Pause fehlt oder zu kurz --</span>';
+							$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz --</span>';
 						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000 && $azgrelevant)
-							$pausefehlt_str = '<span class="pauseFehlt" style="color:grey; font-weight:bold;">-- Hinweis: Pause fehlt --</span>';
-
+							$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
 
 						$tagessaldo = date('H:i', ($tagessaldo));
 						$colspan = ($za_simple)?6:8;
