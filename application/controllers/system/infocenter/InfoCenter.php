@@ -742,7 +742,7 @@ class InfoCenter extends Auth_Controller
 
 		if (hasData($lastStatus) && hasData($statusgrresult))
 		{
-			//check if still Interessent
+			//check if still Interessent, Bewerber or Wartender
 			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS
 				|| $lastStatus->retval[0]->status_kurzbz === self::BEWERBERSTATUS
 				|| $lastStatus->retval[0]->status_kurzbz === self::WARTENDER)
@@ -2142,17 +2142,18 @@ class InfoCenter extends Auth_Controller
 	{
 		$statusgrund = $this->input->post('statusgrund');
 		$studiengang = $this->input->post('studiengang');
+		$abgeschickt = $this->input->post('abgeschickt');
 		$personen = $this->input->post('personen');
 		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
 
-		if ($statusgrund === 'null' || $studiengang === 'null' || empty($personen))
-			$this->terminateWithJsonError("Bitte Statusgrund, Studiengang und Personen auswählen.");
+		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
+			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
 
 		foreach($personen as $person)
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester);
+			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
 
-			if(!hasData($prestudent))
+			if (!hasData($prestudent))
 				continue;
 
 			$prestudentData = getData($prestudent);
