@@ -1,20 +1,17 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "d9941245360c86434d18413999bdc812",
-    "content-hash": "fbeb5d4ef943f6d1d55220cb844d11f1",
+    "content-hash": "6c4ea7986cab0bf16928c0eb9858f3f6",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
             "version": "3.3.7.1",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip"
             },
             "type": "library"
         },
@@ -47,16 +44,14 @@
             ],
             "description": "Defacto way to enable use of HTML5 sectioning elements in legacy Internet Explorer.",
             "homepage": "http://paulirish.com/2011/the-history-of-the-html5-shiv/",
-            "time": "2015-07-20 20:04:00"
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "alvaro-prieto/colResizable",
             "version": "1.6",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip"
             },
             "type": "library"
         },
@@ -65,9 +60,7 @@
             "version": "2.0.4",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/borgar/textile-js/archive/v2.0.4.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/borgar/textile-js/archive/v2.0.4.zip"
             },
             "type": "library"
         },
@@ -108,7 +101,7 @@
             ],
             "description": "REST Server for the CodeIgniter framework",
             "homepage": "https://github.com/chriskacerguis/codeigniter-restserver",
-            "time": "2017-09-23 16:44:55"
+            "time": "2017-09-23T16:44:55+00:00"
         },
         {
             "name": "christianbach/tablesorter",
@@ -126,7 +119,7 @@
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2016-09-02 11:31:54"
+            "time": "2016-09-02T11:31:54+00:00"
         },
         {
             "name": "codeigniter/framework",
@@ -159,7 +152,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2019-09-19 12:08:45"
+            "time": "2019-09-19T12:08:45+00:00"
         },
         {
             "name": "components/angular.js",
@@ -463,7 +456,7 @@
             ],
             "description": "Shim repository for Angular.js",
             "homepage": "http://angularjs.org",
-            "time": "2015-06-07 20:10:38"
+            "time": "2015-06-07T20:10:38+00:00"
         },
         {
             "name": "components/font-awesome",
@@ -498,7 +491,7 @@
                 "OFL-1.1"
             ],
             "description": "The iconic font designed for use with Twitter Bootstrap.",
-            "time": "2016-10-25 10:56:23"
+            "time": "2016-10-25T10:56:23+00:00"
         },
         {
             "name": "components/jquery",
@@ -540,7 +533,7 @@
             ],
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
-            "time": "2019-10-23 05:15:13"
+            "time": "2019-10-23T05:15:13+00:00"
         },
         {
             "name": "components/jqueryui",
@@ -625,7 +618,7 @@
                 }
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
-            "time": "2016-09-16 05:47:55"
+            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "dapphp/securimage",
@@ -674,7 +667,8 @@
                 "captcha",
                 "security"
             ],
-            "time": "2018-03-09 06:07:41"
+            "abandoned": true,
+            "time": "2018-03-09T06:07:41+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -736,7 +730,7 @@
                 "rdfa",
                 "sparql"
             ],
-            "time": "2015-02-27 09:45:49"
+            "time": "2015-02-27T09:45:49+00:00"
         },
         {
             "name": "fgelinas/timepicker",
@@ -797,16 +791,14 @@
                 "fixtures"
             ],
             "abandoned": true,
-            "time": "2019-12-12 13:22:17"
+            "time": "2019-12-12T13:22:17+00:00"
         },
         {
             "name": "joeldbirch/superfish",
             "version": "1.7.9",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip"
             },
             "type": "library"
         },
@@ -825,9 +817,7 @@
             "version": "1.12.4",
             "dist": {
                 "type": "file",
-                "url": "https://code.jquery.com/jquery-1.12.4.min.js",
-                "reference": null,
-                "shasum": null
+                "url": "https://code.jquery.com/jquery-1.12.4.min.js"
             },
             "type": "library"
         },
@@ -836,9 +826,7 @@
             "version": "2.2.4",
             "dist": {
                 "type": "file",
-                "url": "https://code.jquery.com/jquery-2.2.4.min.js",
-                "reference": null,
-                "shasum": null
+                "url": "https://code.jquery.com/jquery-2.2.4.min.js"
             },
             "type": "library"
         },
@@ -847,9 +835,7 @@
             "version": "1.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/jquery/sizzle/archive/1.0.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/jquery/sizzle/archive/1.0.0.zip"
             },
             "type": "library"
         },
@@ -858,9 +844,7 @@
             "version": "1.4.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip"
             },
             "type": "library"
         },
@@ -869,9 +853,7 @@
             "version": "5.5.6",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip"
             },
             "type": "library"
         },
@@ -939,7 +921,7 @@
                 "json",
                 "schema"
             ],
-            "time": "2014-08-25 02:48:14"
+            "time": "2014-08-25T02:48:14+00:00"
         },
         {
             "name": "kingsquare/json-schema-form",
@@ -973,16 +955,14 @@
                 }
             ],
             "description": "A framework-agnostic PHP Implementation for generating simple forms based on json-schema",
-            "time": "2014-07-10 12:27:19"
+            "time": "2014-07-10T12:27:19+00:00"
         },
         {
             "name": "ludo/jquery-treetable",
             "version": "3.2.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip"
             },
             "type": "library"
         },
@@ -1035,7 +1015,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2015-03-01 12:03:08"
+            "time": "2015-03-01T12:03:08+00:00"
         },
         {
             "name": "ml/iri",
@@ -1082,7 +1062,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2014-01-21 13:43:39"
+            "time": "2014-01-21T13:43:39+00:00"
         },
         {
             "name": "ml/json-ld",
@@ -1131,16 +1111,14 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2018-11-18 20:26:18"
+            "time": "2018-11-18T20:26:18+00:00"
         },
         {
             "name": "moment/momentjs",
             "version": "2.24.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/moment/moment/archive/2.24.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/moment/moment/archive/2.24.0.zip"
             },
             "type": "library"
         },
@@ -1193,7 +1171,7 @@
                 "sorting",
                 "table"
             ],
-            "time": "2019-12-01 13:49:52"
+            "time": "2019-12-01T13:49:52+00:00"
         },
         {
             "name": "nategood/httpful",
@@ -1243,7 +1221,7 @@
                 "rest",
                 "restful"
             ],
-            "time": "2015-10-26 16:11:30"
+            "time": "2015-10-26T16:11:30+00:00"
         },
         {
             "name": "netcarver/textile",
@@ -1296,16 +1274,14 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2020-01-08 21:13:37"
+            "time": "2020-01-08T21:13:37+00:00"
         },
         {
             "name": "nicolaskruchten/pivottable",
             "version": "2.23.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/nicolaskruchten/pivottable/archive/v2.23.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/nicolaskruchten/pivottable/archive/v2.23.0.zip"
             },
             "type": "library"
         },
@@ -1314,9 +1290,7 @@
             "version": "4.2.7",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip"
             },
             "type": "library"
         },
@@ -1409,16 +1383,28 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2021-04-06 13:56:45"
+            "funding": [
+                {
+                    "url": "https://github.com/terrafrost",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpseclib",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2021-04-06T13:56:45+00:00"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
             "version": "1.0.7",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip"
             },
             "type": "library"
         },
@@ -1427,9 +1413,7 @@
             "version": "1.4.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip"
             },
             "type": "library"
         },
@@ -1489,31 +1473,29 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2019-11-27 13:56:44"
+            "time": "2019-11-27T13:56:44+00:00"
         },
         {
             "name": "tapmodo/Jcrop",
             "version": "2.0.4",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip"
             },
             "type": "library"
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.9.8",
+            "version": "5.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "912df2bc85015c758e32d1262219f1653bbf9783"
+                "reference": "7a479e525582d09f315c2cf2a99075d6a798b535"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/912df2bc85015c758e32d1262219f1653bbf9783",
-                "reference": "912df2bc85015c758e32d1262219f1653bbf9783",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/7a479e525582d09f315c2cf2a99075d6a798b535",
+                "reference": "7a479e525582d09f315c2cf2a99075d6a798b535",
                 "shasum": ""
             },
             "type": "component",
@@ -1522,13 +1504,15 @@
                     "scripts": [
                         "tinymce.js",
                         "plugins/*/plugin.js",
-                        "themes/*/theme.js"
+                        "themes/*/theme.js",
+                        "themes/*/icons.js"
                     ],
                     "files": [
                         "tinymce.min.js",
                         "plugins/*/plugin.min.js",
                         "themes/*/theme.min.js",
-                        "skins/**"
+                        "skins/**",
+                        "icons/*/icons.min.js"
                     ]
                 }
             },
@@ -1537,16 +1521,22 @@
                 "LGPL-2.1-only"
             ],
             "description": "Web based JavaScript HTML WYSIWYG editor control.",
-            "homepage": "http://www.tinymce.com",
+            "homepage": "https://www.tiny.cloud/",
             "keywords": [
-                "editor",
+                "contenteditable",
+                "editing",
                 "html",
                 "javascript",
+                "rich editor",
+                "rich text",
+                "rich text editor",
                 "richtext",
+                "rte",
+                "text",
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2020-01-28 05:03:01"
+            "time": "2021-08-26T05:43:13+00:00"
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -1607,7 +1597,7 @@
                 "responsive",
                 "web"
             ],
-            "time": "2019-02-13 15:55:38"
+            "time": "2019-02-13T15:55:38+00:00"
         },
         {
             "name": "twig/twig",
@@ -1673,7 +1663,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2019-11-11 16:49:32"
+            "time": "2019-11-11T16:49:32+00:00"
         },
         {
             "name": "zetacomponents/base",
@@ -1737,7 +1727,7 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-11-28 11:30:00"
+            "time": "2017-11-28T11:30:00+00:00"
         },
         {
             "name": "zetacomponents/database",
@@ -1814,7 +1804,7 @@
             ],
             "description": "A lightweight database layer on top of PHP's PDO that allows you to utilize a database without having to take care of differences in SQL dialects.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-11-28 10:55:26"
+            "time": "2017-11-28T10:55:26+00:00"
         },
         {
             "name": "zetacomponents/document",
@@ -1865,7 +1855,7 @@
             ],
             "description": "The Document components provides a general conversion framework for different semantic document markup languages like XHTML, Docbook, RST and similar.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2013-12-19 11:40:00"
+            "time": "2013-12-19T11:40:00+00:00"
         },
         {
             "name": "zetacomponents/workflow",
@@ -1931,7 +1921,7 @@
             ],
             "description": "The purpose of the Workflow component is to provide the core functionality of an activity-based workflow system including the definition and execution of workflow specifications.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-database-tiein",
@@ -1998,7 +1988,7 @@
             ],
             "description": "Contains the database backend for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-event-log-tiein",
@@ -2058,7 +2048,7 @@
             ],
             "description": "Contains the EventLog listener for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2007-12-17 09:04:44"
+            "time": "2007-12-17T09:04:44+00:00"
         }
     ],
     "packages-dev": [],
@@ -2070,5 +2060,6 @@
     "platform": {
         "php": ">=5.6.40"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

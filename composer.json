@@ -271,7 +271,7 @@
 
 		"phpseclib/phpseclib": "2.0.*",
 
-		"tinymce/tinymce": "4.9.*",
+		"tinymce/tinymce": "5.9.*",
 
 		"twbs/bootstrap": "3.4.*",
 
