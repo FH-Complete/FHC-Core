@@ -182,7 +182,7 @@ if(isset($_POST['export']))
 }
 
 //CSV export für Übersicht zugeteilter Projekte - Konflikt mit normalen HTML headern deshalb weiter vorne
-if(isset($_POST['projektübersichtexport']))
+if(isset($_GET['projektübersichtexport']))
 {
 	exportProjectOverviewAsCSV($user, ',');
 }
@@ -1275,13 +1275,19 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		echo "<table width='100%'>
 				<tr>
 					<td>
-						<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
+						<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>";
 
-						<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
+		if (!$adminView)
+		{
+			echo
+			"
+			<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
 
-		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
+			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
+			";
+		}
 
-						<a href='".$_SERVER['PHP_SELF']."?projektübersichtexport=1' style='font-size: larger;'>Projektübersichtexport</a>";
+		echo "	<a href='".$_SERVER['PHP_SELF']."?projektübersichtexport=1".($passuid ? '&uid='.$user : '')."' style='font-size: larger;'>Projektübersichtexport</a>";
 		      			if($anzprojekte > 0)
 		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1".($passuid ? '&uid='.$user : '')."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
 				echo "</td>
@@ -1389,13 +1395,11 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 		if (isset($_GET['projektübersichtexport']))
 		{
-
 			echo '<tr><td colspan="4"><hr></td></tr>';
 			echo '<tr><td>CSV-Export</td>';
 			echo '<td align="right"><input type="submit" value="Projektübersichtexport" name="projektübersichtexport"></td></tr>';
 			echo '<tr><td></td><td colspan="3"></td></tr>';
 			echo '<tr><td colspan="4"><hr></td></tr>';
-
 		}
 
 		//Aktivitaet
@@ -1960,7 +1964,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					$ersumme_woche = '00:00';
 				}
 
-				// Diestreisen NEU
+				// Dienstreisen NEU
 				if (array_key_exists($datumtag, $dr_arr))
 				{
 					$colspan=($za_simple)?6:8;
