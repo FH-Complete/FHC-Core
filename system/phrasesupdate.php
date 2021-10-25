@@ -12872,6 +12872,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'supportbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bei technischen Problemen kontaktieren Sie bitte: ",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "in case of technical issues please contact: ",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
