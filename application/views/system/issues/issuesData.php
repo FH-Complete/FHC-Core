@@ -4,11 +4,12 @@ $PERSON_ID = getAuthPersonId();
 $ALL_FUNKTIONEN_OE_KURZBZ = "('" . implode("','", array_keys($all_funktionen_oe_kurzbz)) . "')";
 $ALL_OE_KURZBZ_BERECHTIGT = "('" . implode("','", $all_oe_kurzbz_berechtigt) . "')";
 $RELEVANT_PRESTUDENT_STATUS = "('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')";
+$LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
 // get issues for the oes of the uid or for the persons (students, oe-zuordnung) of the oes
 $query = "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
        		inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\", 
-       		ftyp.bezeichnung_mehrsprachig[1] AS \"Fehlertyp\", stat.bezeichnung_mehrsprachig[1] AS \"Fehlerstatus\",
+       		ftyp.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlertyp\", stat.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlerstatus\",
        		verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\", fr.app AS \"Applikation\",
        		fr.fehlertyp_kurzbz as \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
        		pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\"
@@ -17,7 +18,7 @@ $query = "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern A
 				JOIN system.tbl_fehlertyp ftyp USING (fehlertyp_kurzbz)
 				JOIN system.tbl_issue_status stat USING (status_kurzbz)
 				LEFT JOIN public.tbl_person pers ON iss.person_id = pers.person_id
-		 		WHERE  EXISTS (
+		 		WHERE EXISTS (
 				    SELECT 1 FROM system.tbl_fehler_zustaendigkeiten zst
 				    WHERE fehlercode = iss.fehlercode
 				    AND (
@@ -92,22 +93,22 @@ $filterWidgetArray = array(
 	'checkboxes' => 'issue_id',
     'columnsAliases' => array(
     	'ID',
-    	'Fehlercode',
-    	'Fehlercode extern',
-		'Datum',
-		'Inhalt',
-		'Inhalt extern',
+		ucfirst($this->p->t('fehlermonitoring', 'fehlercode')),
+		ucfirst($this->p->t('fehlermonitoring', 'fehlercodeExtern')),
+		ucfirst($this->p->t('global', 'datum')),
+		ucfirst($this->p->t('fehlermonitoring', 'inhalt')),
+		ucfirst($this->p->t('fehlermonitoring', 'inhaltExtern')),
 		'PersonId',
-		'OE',
-		'Fehlertyp',
-		'Fehlerstatus',
-		'Verarbeitet von',
-		'Verarbeitet am',
-		'Applikation',
-		'Fehlertypcode',
-		'Statuscode',
-		'Vorname',
-		'Nachname'
+		ucfirst($this->p->t('lehre', 'organisationseinheit')),
+		ucfirst($this->p->t('fehlermonitoring', 'fehlertyp')),
+		ucfirst($this->p->t('fehlermonitoring', 'fehlerstatus')),
+		ucfirst($this->p->t('fehlermonitoring', 'verarbeitetVon')),
+		ucfirst($this->p->t('fehlermonitoring', 'verarbeitetAm')),
+		ucfirst($this->p->t('global', 'applikation')),
+		ucfirst($this->p->t('fehlermonitoring', 'fehlertypcode')),
+		ucfirst($this->p->t('fehlermonitoring', 'statuscode')),
+		ucfirst($this->p->t('person', 'vorname')),
+		ucfirst($this->p->t('person', 'nachname'))
     ),
 	'formatRow' => function($datasetRaw) {
 
