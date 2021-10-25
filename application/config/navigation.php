@@ -102,6 +102,13 @@ $config['navigation_header'] = array(
 					'description' => 'BPK Wartung',
 					'sort' => 20,
 					'requiredPermissions' => 'admin:r'
+				),
+				'errormonitoring' => array(
+					'link' => site_url('system/issues/Issues'),
+					'description' => 'Fehler Monitoring',
+					'expand' => true,
+					'sort' => 30,
+					'requiredPermissions' => 'system/issues_verwalten:r'
 				)
 			)
 		),
@@ -133,13 +140,6 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'system/developer:r'
-				),
-				'errormonitoring' => array(
-					'link' => site_url('system/issues/Issues'),
-					'description' => 'Fehler Monitoring',
-					'expand' => true,
-					'sort' => 20,
-					'requiredPermissions' => 'system/issues_verwalten:r'
 				)
 			)
 		)
