@@ -312,10 +312,10 @@ class UDFLib
 			{
 				$resultElement->{$columnName} = $columnValue;
 			}
-		}
 
-		// And finally remove the UDFs column
-		unset($resultElement->{self::COLUMN_NAME});
+			// And finally remove the UDFs column
+			unset($resultElement->{self::COLUMN_NAME});
+		}
 	}
 
 	/**
