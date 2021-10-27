@@ -1098,6 +1098,8 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit->kunde_uid = $kunde_uid;
 		$saveerror = 0;
 		$extractTimeBis = $datum->formatDatum($bis, $format = 'H:i:s');
+		$extractVon = $datum->formatDatum($von, $format = 'Y-m-d');
+		$extractBis = $datum->formatDatum($bis, $format = 'Y-m-d');
 
 		if (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
@@ -1114,9 +1116,8 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			echo '<p id="triggerPhasenReset"><span style="color:red" ><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").':
 			Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt.</b></span></p><br>';
 			$saveerror = 1;
-
 		}
-		elseif (abs($von-$bis)>0 && $aktivitaet_kurzbz!="DienstreiseMT" && $extractTimeBis != '00:00:00')
+		elseif ((abs($von - $bis) > 0 || $extractVon != $extractBis) && $aktivitaet_kurzbz!="DienstreiseMT" && $extractTimeBis != '00:00:00')
 		{
 			echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da keine Zeitaufzeichnung über mehrere Tage erlaubt ist (ausgenommen Dienstreisen).</b></span><br>';
 			$saveerror = 1;
