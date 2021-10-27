@@ -304,6 +304,7 @@ echo '
 					Jahr=Datum.substring(6,10);
 					var day = Jahr + "-" + Monat + "-" + Tag;
 					checkBisverwendung(day,uid);
+					checkZeitsperre(day,uid);
 				}
 			)
 
