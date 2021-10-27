@@ -751,6 +751,7 @@ echo '
 			Jahr=Datum.substring(6,10);
 			var checkedDay = Jahr + "-" + Monat + "-" + Tag;
 			checkBisverwendung(checkedDay, uid);
+			checkZeitsperre(checkedDay, uid);
 		}
 
 		function checkBisverwendung(day, uid)
@@ -773,6 +774,31 @@ echo '
 			  }
   			}
   		  });
+		}
+
+		function checkZeitsperre(day, uid)
+		{
+			$.ajax
+			({
+				url: "zeitaufzeichnung_zeitsperren.php",
+				data:
+				{
+					day: day,
+					uid: uid
+				},
+				success: function (json)
+				{
+					if (json.length > 1)
+					{
+						$("#buttonSave").hide();
+					}
+					else
+					{
+						$("#buttonSave").show();
+					}
+					$("#outputZs").html(json);
+				}
+			});
 		}
 
 		</script>
@@ -1652,6 +1678,9 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		</tr>
 		';
 
+		//Zeitsperren
+		echo '<p id="outputZs"></p>';
+
 		//Homeoffice Checkbox
 			echo '
 			<tr>
@@ -1672,7 +1701,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					echo '<tr><td></td><td></td><td></td><td align="right">';
 					//SpeichernButton
 					if($zeitaufzeichnung_id == '')
-						echo '<input type="submit" value="'.$p->t("global/speichern").'" name="save"></td></tr>';
+						echo '<input id="buttonSave" type="submit" value="'.$p->t("global/speichern").'" name="save"></td></tr>';
 					else
 					{
 						echo '<input type="hidden" value="" name="'.($alle===true?'alle':'').'">';
