@@ -24,6 +24,7 @@
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::HTML_NAME); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REQUIRED); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::TITLE); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::DISABLED, false); ?>
 					<?php
 						$checked = '';
 						if (${CheckboxWidget::VALUE_FIELD} === true)
@@ -39,3 +40,4 @@
 	</div>
 
 <?php HTMLWidget::printEndBlock(${HTMLWidget::HTML_ARG_NAME}); ?>
+

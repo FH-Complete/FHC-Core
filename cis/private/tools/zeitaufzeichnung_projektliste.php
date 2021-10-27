@@ -559,9 +559,11 @@ $totalworktimewidth = 13;
 $worktimewidth = 14;
 $timecolumnswidth = 2 * $daywidth + $totalworktimewidth + $worktimewidth;
 
-if ($nrProjects < 1)//no projekts - merge all cells and write notice
+if ($nrProjects < 1) //no projekts - write notice
 {
-	$projektnames[] = "Keine Projekte vorhanden";
+	$worksheet =& $workbook->addWorksheet('Tabelle');
+	$worksheet->setInputEncoding('utf-8');
+	$worksheet->write(0,0,'Für diesen Zeitraum sind keine Projekte zugeordnet');
 }
 
 foreach ($projektnames as $projektname)

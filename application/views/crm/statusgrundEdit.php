@@ -82,6 +82,21 @@
 							</td>
 						</tr>
 						<tr>
+							<td>
+								StatusGrund:
+							</td>
+						<tr>
+						</tr>
+							<td>
+								<input type="text" name="statusgrund_kurzbz" value="<?php echo $sg->statusgrund_kurzbz; ?>" /><br/>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
 							<td colspan="2" align="center">
 								<button type="submit">Save</button>
 							</td>

@@ -6,18 +6,18 @@
 class HTMLWidget extends Widget
 {
 	// The name of the array present in the data array given to the view that will render this widget
-    const HTML_ARG_NAME = 'HTML';
+	const HTML_ARG_NAME = 'HTML';
 	const HTML_DEFAULT_VALUE = ''; // Default value of the html element
-    const HTML_NAME = 'name'; // HTML name attribute
-    const HTML_ID = 'id'; // HTML id attribute
-
-    // External block definition
-    const EXTERNAL_BLOCK = 'externalBlock'; // External block name
-    const EXTERNAL_START_BLOCK_HTML_TAG = '<div>'; // External block start tag
-    const EXTERNAL_END_BLOCK_HTML_TAG = '</div>'; // External block end tag
-
-    // HTML attributes
-    const LABEL = 'title';
+	const HTML_NAME = 'name'; // HTML name attribute
+	const HTML_ID = 'id'; // HTML id attribute
+	
+	// External block definition
+	const EXTERNAL_BLOCK = 'externalBlock'; // External block name
+	const EXTERNAL_START_BLOCK_HTML_TAG = '<div>'; // External block start tag
+	const EXTERNAL_END_BLOCK_HTML_TAG = '</div>'; // External block end tag
+	
+	// HTML attributes
+	const LABEL = 'title';
 	const REGEX = 'regex';
 	const TITLE = 'description';
 	const REQUIRED = 'required-field';
@@ -26,11 +26,12 @@ class HTMLWidget extends Widget
 	const MAX_LENGTH = 'max-length';
 	const MIN_LENGTH = 'min-length';
 	const PLACEHOLDER = 'placeholder';
+	const DISABLED = 'disabled';
 
-    /**
-     * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
-     */
-    public function __construct($name, $args = array(), $htmlArgs = array())
+	/**
+	 * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
+	 */
+	public function __construct($name, $args = array(), $htmlArgs = array())
 	{
 		parent::__construct($name, $args);
 
@@ -38,11 +39,11 @@ class HTMLWidget extends Widget
 		$this->_setHtmlProperties($htmlArgs);
 	}
 
-    /**
-     * Initialising html properties, such as the id and name attributes of the HTML element
-     */
-    private function _setHtmlProperties($htmlArgs)
-    {
+	/**
+	 * Initialising html properties, such as the id and name attributes of the HTML element
+	 */
+	private function _setHtmlProperties($htmlArgs)
+	{
 		// If $htmlArgs wasn't already stored in $this->_args
 		if (!isset($this->_args[HTMLWidget::HTML_ARG_NAME]))
 		{
@@ -58,9 +59,9 @@ class HTMLWidget extends Widget
 				$this->_args[HTMLWidget::HTML_ARG_NAME][$argName] = $argValue;
 			}
 		}
-    }
+	}
 
-    /**
+	/**
 	 * Prints an attribute name and eventually also the value extracted from $htmlArgs
 	 * Set $isValuePresent to false the value should not be displayed
 	 */
@@ -113,3 +114,4 @@ class HTMLWidget extends Widget
 		}
 	}
 }
+

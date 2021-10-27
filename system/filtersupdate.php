@@ -122,10 +122,10 @@ $filters = array(
 				],
 				"filters": [
 					{
-						"name": "SendDate",
+						"name": "AnzahlStgNichtAbgeschickt",
 						"option": "",
-						"condition": "",
-						"operation": "nset"
+						"condition": "0",
+						"operation": "gt"
 					}
 				]
 			}
@@ -851,6 +851,101 @@ $filters = array(
 						"operation": "lt",
 						"condition": "1",
 						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'offeneFehler',
+		'description' => '{Alle offenen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle offenen Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"}
+				],
+				"filters": [
+					{
+						"name": "Fehlerstatus",
+						"operation": "ncontains",
+						"condition": "behoben"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetze7Tage',
+		'description' => '{Letzten 7 Tage}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"}
+				],
+				"filters": [
+					{
+						"name": "Datum",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetzte7TageBearbeitet',
+		'description' => '{Letzten 7 Tage bearbeitet}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"},
+					{"name": "Verarbeitet von"}
+				],
+				"filters": [
+					{
+						"name": "Verarbeitet am",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					},
+					{
+						"name": "Fehlerstatus",
+						"operation": "contains",
+						"condition": "behoben"
 					}
 				]
 			}

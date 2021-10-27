@@ -341,7 +341,6 @@
 						echo $this->udflib->UDFWidget(
 							array(
 								UDFLib::UDF_UNIQUE_ID => 'infocenterPrestudentUDFs_'.$zgvpruefung->prestudent_id,
-								UDFLib::REQUIRED_PERMISSIONS_PARAMETER => 'infocenter',
 								UDFLib::SCHEMA_ARG_NAME => 'public',
 								UDFLib::TABLE_ARG_NAME => 'tbl_prestudent',
 								UDFLib::PRIMARY_KEY_NAME => 'prestudent_id',
@@ -414,7 +413,7 @@
 													selected="selected"><?php echo ucfirst($this->p->t('ui', 'freigabeart')) . '...' ?>
 											</option>
 											<?php foreach ($intstatusgruende as $statusgrund): ?>
-												<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
+												<option value="<?php echo $statusgrund->statusgrund_id ?>" data-kurzbz="<?php echo $statusgrund->statusgrund_kurzbz ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
 											<?php endforeach ?>
 										</select>
 										<span class="input-group-btn">
@@ -553,3 +552,4 @@
 		endforeach; // end foreach zgvpruefungen
 	?>
 </div><!-- /.panel-group -->
+

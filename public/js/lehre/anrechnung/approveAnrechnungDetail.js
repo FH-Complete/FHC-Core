@@ -24,6 +24,9 @@ $(function(){
     // Set status alert color
     approveAnrechnungDetail.setStatusAlertColor();
 
+    // Set Empfehlungstext
+    approveAnrechnungDetail.setEmpfehlungstext();
+
     // Init tooltips
     approveAnrechnungDetail.initTooltips();
 
@@ -34,14 +37,23 @@ $(function(){
 
         if (genehmigung_panel.is(":hidden"))
         {
-            // Show begruendung panel if is hidden
-            genehmigung_panel.slideDown('slow');
+            // Show genehmigung panel if is hidden
+            genehmigung_panel.css('display', 'block');
+            genehmigung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: genehmigung_panel.offset().top // Move genehmigung panel bottom up to be visible within window screen
+                }, 400);
+            });
+
             return;
         }
     });
 
     // Approve Anrechnungen
-    $("#approveAnrechnungDetail-approve-anrechnung-confirm").click(function(){
+    $("#approveAnrechnungDetail-approve-anrechnung-confirm").click(function(e){
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -93,13 +105,22 @@ $(function(){
         if (begruendung_panel.is(":hidden"))
         {
             // Show begruendung panel if is hidden
-            begruendung_panel.slideDown('slow');
+            begruendung_panel.css('display', 'block');
+            begruendung_panel.slideDown(400, function() {
+                $('html, body').animate({
+                    scrollTop: begruendung_panel.offset().top // Move begruendung panel bottom up to be visible within window screen
+                }, 400);
+            });
+
             return;
         }
     });
 
     // Reject Anrechnungen
-    $("#approveAnrechnungDetail-reject-anrechnung-confirm").click(function(){
+    $("#approveAnrechnungDetail-reject-anrechnung-confirm").click(function(e){
+
+        // Avoid bubbling click event to sibling break button
+        e.stopImmediatePropagation();
 
         let begruendung = $('#approveAnrechnungDetail-begruendung').val();
 
@@ -109,9 +130,6 @@ $(function(){
             FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungAngeben"));
             return;
         }
-
-        // Avoid form redirecting automatically
-        event.preventDefault();
 
         // Get form data
         let form_data = $('form').serializeArray();
@@ -158,10 +176,12 @@ $(function(){
     });
 
     // Request Recommendation for Anrechnungen
-    $("#approveAnrechnungDetail-request-recommendation").click(function(){
+    $("#approveAnrechnungDetail-request-recommendation").click(function(e){
+
+        e.preventDefault();
 
         // Get form data
-        let form_data = $('form').serializeArray();
+        let form_data = $('#form-empfehlung').serializeArray();
 
 
         // Prepare data object for ajax call
@@ -186,8 +206,9 @@ $(function(){
                     if (!data.error && data.retval != null)
                     {
                         approveAnrechnungDetail.formatEmpfehlungIsRequested(
-                            data.retval[0].empfehlung_angefordert_am,
-                            data.retval[0].status_bezeichnung
+                            data.retval[0].status_bezeichnung,
+                            data.retval[0].empfehlungsanfrageAm,
+                            data.retval[0].empfehlungsanfrageAn
                         );
                     }
                 },
@@ -198,6 +219,139 @@ $(function(){
             }
         );
     });
+
+    // Withdraw approvement or rejection
+    $("#approveAnrechnungDetail-withdraw-anrechnung-approvement").click(function(){
+
+        if(!confirm(FHC_PhrasesLib.t("anrechnung", "genehmigungAblehnungWirklichZuruecknehmen")))
+        {
+            return;
+        }
+
+        // Get form data
+        let form_data = $('form').serializeArray();
+
+        // Prepare data object for ajax call
+        let data = {
+            'anrechnung_id' : form_data[0].value
+        };
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/withdraw",
+            data,
+            {
+                successCallback: function (data, textStatus, jqXHR)
+                {
+                    console.log(data);
+                    if (data.error && data.retval != null)
+                    {
+                        console.log('inside error');
+                        // Print error message
+                        FHC_DialogLib.alertWarning(data.retval);
+                    }
+
+                    if (!data.error && data.retval != null)
+                    {
+                        console.log('inside success');
+                        approveAnrechnungDetail.formatGenehmigungIsWithdrawed(
+                            data.retval.status_bezeichnung
+                        );
+
+                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("anrechnung", "erfolgreichZurueckgenommen"));
+
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            }
+        );
+    });
+
+    // Withdraw request for recommendation
+    $("#approveAnrechnungDetail-withdraw-request-recommedation").click(function(e){
+
+        e.preventDefault();
+
+        if(!confirm(FHC_PhrasesLib.t("anrechnung", "empfehlungsanforderungWirklichZuruecknehmen")))
+        {
+            return;
+        }
+
+        // Get form data
+        let form_data = $('#form-empfehlung').serializeArray();
+
+        // Prepare data object for ajax call
+        let data = {
+            'anrechnung_id' : form_data[0].value
+        };
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/withdrawRequestRecommendation",
+            data,
+            {
+                successCallback: function (data, textStatus, jqXHR)
+                {
+                    console.log(data);
+                    if (data.error && data.retval != null)
+                    {
+                        // Print error message
+                        FHC_DialogLib.alertWarning(data.retval);
+                    }
+
+                    if (!data.error && data.retval != null)
+                    {
+                        approveAnrechnungDetail.formatEmpfehlungIsWithdrawed(
+                            data.retval.status_bezeichnung
+                        );
+
+                        FHC_DialogLib.alertSuccess(
+                            FHC_PhrasesLib.t("anrechnung", "erfolgreichZurueckgenommen")
+                        );
+
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            }
+        );
+    });
+
+    $('#form-empfehlungNotiz').submit(function(e){
+
+        e.preventDefault();
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/saveEmpfehlungsNotiz",
+            {
+                anrechnung_id: this.anrechnung_id.value,
+                notiz_id: this.notiz_id.value,
+                empfehlung_text: this.empfehlungText.value
+            },
+            {
+                successCallback: function (data){
+
+                    if (FHC_AjaxClient.isError(data)){
+
+                        // Print error message
+                        FHC_DialogLib.alertWarning(FHC_AjaxClient.getError(data));
+                    }
+
+                    if (FHC_AjaxClient.hasData(data)){
+
+                        // Print success message
+                        FHC_DialogLib.alertSuccess((FHC_AjaxClient.getData(data)))
+                    }
+                },
+                errorCallback(){
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            }
+        )
+    })
 
     // Copy Begruendung into textarea
     $(".btn-copyIntoTextarea").click(function(){
@@ -212,7 +366,7 @@ $(function(){
 
     // Break Begruendung abgeben
     $('#approveAnrechnungDetail-begruendung-abbrechen').click(function(){
-        $('#approveAnrechnungDetail-begruendung').val('');
+
         begruendung_panel.slideUp('slow');
 
     })
@@ -238,6 +392,24 @@ var approveAnrechnungDetail = {
                 $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
         }
     },
+    setEmpfehlungstext: function () {
+        let empfehlung = $('#approveAnrechnungDetail-empfehlung').data('empfehlung');
+
+        switch (empfehlung) {
+            case true:
+                $('#approveAnrechnungDetail-empfehlungDetail-empfehlung')
+                    .addClass('text-success')
+                    .html(FHC_PhrasesLib.t("anrechnung", "empfehlungPositivConfirmed"));
+                break;
+            case false:
+                $('#approveAnrechnungDetail-empfehlungDetail-empfehlung')
+                    .addClass('text-danger')
+                    .html(FHC_PhrasesLib.t("anrechnung", "empfehlungNegativConfirmed"));
+                break;
+            default:
+                $('#approveAnrechnungDetail-empfehlungDetail-empfehlung').html('-');
+        }
+    },
     initTooltips: function (){
         $('[data-toggle="tooltip"]').tooltip({
                 delay: { "show": 200, "hide": 200 },
@@ -250,20 +422,30 @@ var approveAnrechnungDetail = {
         // Find closest textarea
         let textarea = $(elem).closest('div').find('textarea');
 
-        // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().find('span:first').text()));
+        if (elem.id.length && elem.id == 'empfehlungstextUebernehmen')
+        {
+            // Copy Empfehlungstext into textarea
+            textarea.val($.trim($('#approveAnrechnungDetail-empfehlungDetail-begruendung').text()));
+            return;
+        }
+        else
+        {
+            // Copy begruendung into textarea
+            textarea.val($.trim($(elem).parent().find('span:first').text()));
+        }
     },
-    formatEmpfehlungIsRequested: function(empfehlungAngefordertAm, statusBezeichnung) {
-        $('#approveAnrechnungDetail-empfehlungDetail').children().addClass('hidden');
-        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsAngefordert').removeClass('hidden');
-        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungAngefordertAm').text(empfehlungAngefordertAm);
+    formatEmpfehlungIsRequested: function(statusBezeichnung, empfehlungsanfrageAm, empfehlungsanfrageAn) {
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm').html(empfehlungsanfrageAm);
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn').html(empfehlungsanfrageAn);
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
+        $('#approveAnrechnungDetail-withdraw-request-recommedation').removeClass('hidden');
     },
     formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung){
-        $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').removeClass('hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-success');
@@ -272,9 +454,13 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
+
+        // Show button to withdraw approval
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
     },
     formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung, begruendung){
-        $('#approveAnrechnungDetail-genehmigungDetail').children().addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').removeClass('hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-danger');
@@ -284,5 +470,45 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
         $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', true);
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
+
+        // Show button to withdraw approval
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
+    },
+    formatGenehmigungIsWithdrawed: function (statusBezeichnung){
+        let empfehlung = $('#approveAnrechnungDetail-empfehlung').data('empfehlung'); // null / false / true
+
+        $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-danger').removeClass('alert-success');
+        $('#approveAnrechnungDetail-status_kurzbz').closest('div').addClass('alert-warning');
+
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').removeClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('hidden');
+        $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('hidden');
+
+        $('#approveAnrechnungDetail-abgeschlossenAm').text('-');
+        $('#approveAnrechnungDetail-abgeschlossenVon').text('-');
+
+        // Only enable recommendation button again if no recommendation was submitted until now
+        if (empfehlung === null)
+        {
+            $('#approveAnrechnungDetail-request-recommendation').prop('disabled', false);
+        }
+        $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', false);
+        $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
+        // Hide button to withdraw approval
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').addClass('hidden');
+    },
+    formatEmpfehlungIsWithdrawed: function (statusBezeichnung){
+        $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
+
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungIsNull').removeClass('hidden');
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm').html('-');
+        $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAn').html('-');
+
+        $('#approveAnrechnungDetail-request-recommendation').prop('disabled', false);
+        $('#approveAnrechnungDetail-approve-anrechnung-ask').prop('disabled', false);
+        $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
+        // Hide button to withdraw approval
+        $('#approveAnrechnungDetail-withdraw-request-recommedation').addClass('hidden');
     }
 }
