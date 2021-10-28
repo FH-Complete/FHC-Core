@@ -2177,6 +2177,7 @@ function exportProjectOverviewAsCSV($user, $delimiter = ',')
 
 function getDataForProjectOverviewCSV($user)
 {
+	$db = new basis_db();
 	$projects_of_user = new projekt();
 	$projects = $projects_of_user->getProjekteListForMitarbeiter($user);
 
@@ -2188,6 +2189,8 @@ function getDataForProjectOverviewCSV($user)
 
 	$csvData = array();
 
+	$exists = @$db->db_query('SELECT 1 FROM sync.tbl_projects_timesheets_project LIMIT 1;');
+
 	foreach ($projects as $project)
 	{
 		$titel = $project->titel;
@@ -2196,9 +2199,16 @@ function getDataForProjectOverviewCSV($user)
 		$projekt_phase_id = '';
 		$beginn = $project->beginn;
 		$ende = $project->ende;
-		$sap_projekt_id = $project->sap_project_id;
 
-		$csvData[] = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende, $sap_projekt_id);
+		$inhalt = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
+
+		if ($exists)
+		{
+			$sap_projekt_id = $project->sap_project_id;
+			$inhalt[] = $sap_projekt_id;
+		}
+
+		$csvData[] = $inhalt;
 	}
 
 	foreach ($projektphasen as $prjp)
@@ -2211,15 +2221,26 @@ function getDataForProjectOverviewCSV($user)
 			$projekt_phase_id = $prjp->projektphase_id;
 			$beginn = $prjp->start;
 			$ende = $prjp->ende;
-			$sap_project_id = $project->sap_project_id;
+			$inhalt = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
 
-			array_push($csvData, array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende, $sap_project_id)  );
+			if ($exists)
+			{
+				$project_task_id = $prjp->project_task_id;
+				$inhalt[] = $project_task_id;
+			}
+
+			array_push($csvData, $inhalt);
 		}
 	}
 
 	sort($csvData);
 	//headers schreiben
-	array_unshift($csvData, array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE', 'SAP PROJEKTNUMMER'));
+	$header = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE');
+
+	if ($exists)
+		$header[] = 'SAP PROJEKTNUMMER';
+
+	array_unshift($csvData, $header);
 	return $csvData;
 }
 ?>

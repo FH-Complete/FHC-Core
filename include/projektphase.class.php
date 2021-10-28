@@ -48,7 +48,7 @@ class projektphase extends basis_db
 	public $insertvon;	    // bigint
 	public $updateamum;	    // timestamp
 	public $updatevon;	    // bigint
-	public $sap_project_id;
+	public $project_task_id;
 
 
 	/**
@@ -686,27 +686,42 @@ public function getFortschritt($projektphase_id)
 	public function getProjectphaseForMitarbeiter($mitarbeiter_uid)
 	{
 		$projecphasetList = array();
+		$exists = @$this->db_query('SELECT 1 FROM sync.tbl_projects_timesheets_project LIMIT 1;');
 
-		$qry = "
-		SELECT
-			DISTINCT tbl_projektphase.*,tbl_projekt.titel, tbl_projects_timesheets_project.projects_timesheet_id
-		FROM
-			fue.tbl_projektphase
-			JOIN fue.tbl_projekt USING (projekt_kurzbz)
-			LEFT JOIN sync.tbl_projects_timesheets_project USING(projektphase_id)
-			JOIN fue.tbl_projekt_ressource USING (projektphase_id)
-			JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
-		WHERE
-		(
-			(
-				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
-			) AND (
-				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
-			)
-		)
-		AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+		$qry = "SELECT DISTINCT tbl_projektphase.*,
+				tbl_projekt.titel
+				";
+
+		if ($exists)
+		{
+			$qry .= ", tbl_sap_projects_timesheets.project_task_id
+					";
+		}
+
+		$qry .= "FROM fue.tbl_projektphase
+				JOIN fue.tbl_projekt USING (projekt_kurzbz)
+				JOIN fue.tbl_projekt_ressource USING(projektphase_id)
+				JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+				";
+
+		if ($exists)
+		{
+			$qry .= "LEFT JOIN sync.tbl_projects_timesheets_project ON tbl_projects_timesheets_project.projektphase_id = tbl_projekt_ressource.projektphase_id
+					LEFT JOIN sync.tbl_sap_projects_timesheets USING(projects_timesheet_id)
+					";
+		}
+
+		$qry .= "WHERE
+				(
+					(
+						(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+						AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+					) AND (
+						(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+						AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+					)
+				)
+				AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
 
 		if($result = $this->db_query($qry))
 		{
@@ -731,7 +746,8 @@ public function getFortschritt($projektphase_id)
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				$obj->sap_project_id = $row->projects_timesheet_id;
+				if ($exists)
+					$obj->project_task_id = $row->project_task_id;
 
 				$this->result[] = $obj;
 
