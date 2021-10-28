@@ -866,7 +866,7 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Alle offenen Fehler",
+				"name": "Alle offenen Fehler, hauptzuständig",
 				"columns": [
 					{"name": "Datum"},
 					{"name": "Inhalt"},
@@ -880,6 +880,11 @@ $filters = array(
 						"name": "Fehlerstatus",
 						"operation": "ncontains",
 						"condition": "behoben"
+					},
+					{
+						"name": "Hauptzuständig",
+						"operation": "contains",
+						"condition": "Ja"
 					}
 				]
 			}

@@ -6,39 +6,56 @@ $ALL_OE_KURZBZ_BERECHTIGT = "('" . implode("','", $all_oe_kurzbz_berechtigt) . "
 $RELEVANT_PRESTUDENT_STATUS = "('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')";
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
-// get issues for the oes of the uid or for the persons (students, oe-zuordnung) of the oes
-$query = "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
+// get issues for the oes of the logged user or for the persons (students, oe-zuordnung) of the oes
+$query = "WITH zustaendigkeiten AS (
+			SELECT fehlercode,
+				CASE
+					WHEN zst.person_id = ".$PERSON_ID;
+
+		if (!isEmptyArray($all_funktionen_oe_kurzbz))
+		{
+			$query .= " OR (zst.oe_kurzbz IN $ALL_FUNKTIONEN_OE_KURZBZ AND zst.funktion_kurzbz IS NULL)  /* if oe is specified in fehler_zustaendigkeiten */";
+
+			// check for each oe for each function if zustaendig
+			foreach ($all_funktionen_oe_kurzbz as $oe_kurzbz => $funktionen_kurzbz)
+			{
+				foreach ($funktionen_kurzbz as $funktion_kurzbz)
+				{
+					$query .= " OR (zst.oe_kurzbz = '$oe_kurzbz' AND zst.funktion_kurzbz = '$funktion_kurzbz')";
+				}
+			}
+		}
+
+		$query .= " THEN TRUE
+					ELSE FALSE
+				END AS \"zustaendig\"
+			FROM system.tbl_fehler_zustaendigkeiten zst 
+		)";
+
+$query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
        		inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\", 
        		ftyp.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlertyp\", stat.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlerstatus\",
        		verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\", fr.app AS \"Applikation\",
-       		fr.fehlertyp_kurzbz as \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
-       		pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\"
+       		fr.fehlertyp_kurzbz AS \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
+       		pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\", 
+                         CASE
+                             WHEN
+                                 EXISTS(SELECT 1
+                                        FROM zustaendigkeiten
+                                        WHERE fehlercode = iss.fehlercode
+                                          AND zustaendig = FALSE) /* If Zuständigkeit is defined for different oe/person, not zustaendig. */
+                                 THEN 'Nein'
+                             ELSE 'Ja' /* If no Zuständigkeit defined or defined for oe/person of user, zustaendig. */
+                             END AS \"Hauptzuständig\"
        			FROM system.tbl_issue iss
 				JOIN system.tbl_fehler fr USING (fehlercode)
 				JOIN system.tbl_fehlertyp ftyp USING (fehlertyp_kurzbz)
 				JOIN system.tbl_issue_status stat USING (status_kurzbz)
 				LEFT JOIN public.tbl_person pers ON iss.person_id = pers.person_id
-		 		WHERE EXISTS (
-				    SELECT 1 FROM system.tbl_fehler_zustaendigkeiten zst
+		 		WHERE EXISTS ( /* if oe or person is specified in fehler_zustaendigkeiten */
+				    SELECT 1 FROM zustaendigkeiten
 				    WHERE fehlercode = iss.fehlercode
-				    AND (
-				        	person_id = ".$PERSON_ID." /* person_id in fehler_zustaendigkeit for individual persons */";
-
-if (!isEmptyArray($all_funktionen_oe_kurzbz))
-{
-	$query .= " OR (zst.oe_kurzbz IN $ALL_FUNKTIONEN_OE_KURZBZ AND zst.funktion_kurzbz IS NULL)  /* if oe is specified in fehler_zustaendigkeiten */";
-
-	// check for each oe for each function if zustaendig
-	foreach ($all_funktionen_oe_kurzbz as $oe_kurzbz => $funktionen_kurzbz)
-	{
-		foreach ($funktionen_kurzbz as $funktion_kurzbz)
-		{
-			$query .= " OR (zst.oe_kurzbz = '$oe_kurzbz' AND zst.funktion_kurzbz = '$funktion_kurzbz')";
-		}
-	}
-}
-
-$query .= "))"; // close AND of exists, and exists
+				    AND zustaendig = TRUE)";
 
 // show issue if it is assigend to oe of logged in user or to student of oe of logged in user
 if (!isEmptyArray($all_oe_kurzbz_berechtigt))
@@ -108,7 +125,8 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('fehlermonitoring', 'fehlertypcode')),
 		ucfirst($this->p->t('fehlermonitoring', 'statuscode')),
 		ucfirst($this->p->t('person', 'vorname')),
-		ucfirst($this->p->t('person', 'nachname'))
+		ucfirst($this->p->t('person', 'nachname')),
+		ucfirst($this->p->t('fehlermonitoring', 'hauptzustaendig'))
     ),
 	'formatRow' => function($datasetRaw) {
 

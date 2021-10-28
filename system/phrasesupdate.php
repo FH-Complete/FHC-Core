@@ -13417,6 +13417,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'fehlermonitoring',
+		'phrase' => 'hauptzustaendig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hauptzuständig",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Main responsibility",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
 		'phrase' => 'bitteStatusWaehlen',
 		'insertvon' => 'system',
 		'phrases' => array(
