@@ -12840,13 +12840,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Hier kann ein Zertifikat mit QR-Code selbst erfasst werden.",
+				'text' => "Hier kann ein Digitales COVID-Zertifikat der EU mit QR-Code selbst erfasst werden.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "a certificate with qr-code can be self registered here.",
+				'text' => "an EU Digital COVID Certificate with QR code can be self registered here.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12866,7 +12866,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "if the certificate does not contain a qr-code or self registration fails, the certificate can be manually registered at the front desk.",
+				'text' => "if the certificate does not contain a QR code or self registration fails, the certificate can be manually registered at the front desk.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
