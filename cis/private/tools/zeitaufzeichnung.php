@@ -710,6 +710,10 @@ echo '
 			else
 			{
 				var pausenstart = Math.floor((spanne/2-15)+(von_stunden*60+parseInt(von_minuten)));
+				if (pausenstart%15 !== 0)
+				{
+					pausenstart = Math.round(pausenstart/10)*10;
+				}
 				var pausenstart_stunde = Math.floor(pausenstart/60);
 				var pausenstart_minute = pausenstart - pausenstart_stunde*60;
 				pausenstart_stunde = (pausenstart_stunde < 10 ? "0"+pausenstart_stunde : pausenstart_stunde);
