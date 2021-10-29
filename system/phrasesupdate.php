@@ -12772,7 +12772,7 @@ array(
 			)
 		)
 	),
-	//*******************	Öhbeitragsverwaltung
+	//*******************	ÖH-Beitragsverwaltung
 	array(
 		'app' => 'core',
 		'category' => 'oehbeitrag',
@@ -12781,7 +12781,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "ÖHbeitragsverwaltung",
+				'text' => "ÖH-Beitragsverwaltung",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -12801,7 +12801,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Neuen ÖHbeitrag hinzufügen",
+				'text' => "Neuen ÖH-Beitrag hinzufügen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -13021,7 +13021,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Fehler beim Hinzufügen des Öhbeitrags",
+				'text' => "Fehler beim Hinzufügen des ÖH-Beitrags",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -13041,7 +13041,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Fehler beim Aktualisieren des Öhbeitrags",
+				'text' => "Fehler beim Aktualisieren des ÖH-Beitrags",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -13061,7 +13061,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Fehler beim Löschen des Öhbeitrags",
+				'text' => "Fehler beim Löschen des ÖH-Beitrags",
 				'description' => '',
 				'insertvon' => 'system'
 			),
