@@ -2177,6 +2177,7 @@ function exportProjectOverviewAsCSV($user, $delimiter = ',')
 
 function getDataForProjectOverviewCSV($user)
 {
+	$db = new basis_db();
 	$projects_of_user = new projekt();
 	$projects = $projects_of_user->getProjekteListForMitarbeiter($user);
 
@@ -2184,9 +2185,11 @@ function getDataForProjectOverviewCSV($user)
 	if($projektphase->getProjectphaseForMitarbeiter($user))
 		$projektphasen = $projektphase->result;
 	else
-		$projetkphasen = array();
+		$projektphasen = array();
 
 	$csvData = array();
+
+	$exists = @$db->db_query('SELECT 1 FROM sync.tbl_projects_timesheets_project LIMIT 1;');
 
 	foreach ($projects as $project)
 	{
@@ -2197,7 +2200,15 @@ function getDataForProjectOverviewCSV($user)
 		$beginn = $project->beginn;
 		$ende = $project->ende;
 
-		$csvData[] = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
+		$inhalt = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
+
+		if ($exists)
+		{
+			$sap_projekt_id = $project->sap_project_id;
+			$inhalt[] = $sap_projekt_id;
+		}
+
+		$csvData[] = $inhalt;
 	}
 
 	foreach ($projektphasen as $prjp)
@@ -2210,14 +2221,26 @@ function getDataForProjectOverviewCSV($user)
 			$projekt_phase_id = $prjp->projektphase_id;
 			$beginn = $prjp->start;
 			$ende = $prjp->ende;
+			$inhalt = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
 
-			array_push($csvData, array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende)  );
+			if ($exists)
+			{
+				$project_task_id = $prjp->project_task_id;
+				$inhalt[] = $project_task_id;
+			}
+
+			array_push($csvData, $inhalt);
 		}
 	}
 
 	sort($csvData);
 	//headers schreiben
-	array_unshift($csvData, array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE'));
+	$header = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE');
+
+	if ($exists)
+		$header[] = 'SAP PROJEKTNUMMER';
+
+	array_unshift($csvData, $header);
 	return $csvData;
 }
 ?>
