@@ -166,9 +166,10 @@ $qry = 'SELECT
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
-			tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang
+			tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang, tbl_mobilitaet.mobilitaetstyp_kurzbz
 		FROM
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+			campus.vw_student_lehrveranstaltung
+			JOIN public.tbl_benutzer USING(uid)
 			JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student ON(uid=student_uid)
 			LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
@@ -176,9 +177,11 @@ $qry = 'SELECT
 			LEFT JOIN lehre.tbl_note USING (note)
 			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 			LEFT JOIN public.tbl_studiengang ON(tbl_student.studiengang_kz=tbl_studiengang.studiengang_kz)
+			LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
 		WHERE
-			vw_student_lehrveranstaltung.lehrveranstaltung_id='.$db->db_add_param($lvid, FHC_INTEGER).' AND
-			vw_student_lehrveranstaltung.studiensemester_kurzbz='.$db->db_add_param($studiensemester);
+			vw_student_lehrveranstaltung.lehrveranstaltung_id='.$db->db_add_param($lvid, FHC_INTEGER).'	AND
+			vw_student_lehrveranstaltung.studiensemester_kurzbz='.$db->db_add_param($studiensemester);';';
+
 
 if($lehreinheit!='')
 	$qry.=' AND vw_student_lehrveranstaltung.lehreinheit_id='.$db->db_add_param($lehreinheit, FHC_INTEGER);
@@ -223,6 +226,11 @@ if($result = $db->db_query($qry))
 			if($row->stg_kz_student==$a_o_kz) //Außerordentliche Studierende
 				$zusatz.='(a.o.)';
 
+			if($row->mobilitaetstyp_kurzbz !='') //Double Degree Student
+				$zusatz.='(d.d.)';
+
+			//$zusatz.='test';
+
 			$data[]=array('student'=>array(
 							'vorname'=>$row->vorname,
 							'nachname'=>$row->nachname,
@@ -232,7 +240,8 @@ if($result = $db->db_query($qry))
 							'verband'=>trim($row->verband),
 							'gruppe'=>trim($row->gruppe),
 							'zusatz'=>$zusatz,
-							'studiengang_kurzbz'=>$row->kurzbzlang
+							'studiengang_kurzbz'=>$row->kurzbzlang,
+							'mobilitaetstyp_kurzbz'=>$row->mobilitaetstyp_kurzbz
 							));
 		}
 	}
