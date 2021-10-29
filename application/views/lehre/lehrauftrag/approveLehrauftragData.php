@@ -2,7 +2,7 @@
 
 $STUDIENSEMESTER = $studiensemester_selected;
 $ORGANISATIONSEINHEIT = (isset($organisationseinheit_selected) && !is_null($organisationseinheit_selected)) ? array($organisationseinheit_selected) : $organisationseinheit;
-$AUSBILDUNGSSEMESTER = (isset($ausbildungssemester_selected) && !is_null($ausbildungssemester_selected)) ? $ausbildungssemester_selected : '1,2,3,4,5,6,7,8';
+$AUSBILDUNGSSEMESTER = (isset($ausbildungssemester_selected) && !is_null($ausbildungssemester_selected)) ? $ausbildungssemester_selected : '1,2,3,4,5,6,7,8,9,10';
 
 $query = '
 SELECT

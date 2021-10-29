@@ -750,7 +750,7 @@ foreach ($projektnames as $projektname)
 				}
 
 				$worksheet->setColumn($spalte, $spalte, $phasewidth);
-				$worksheet->write($zeile, $spalte++, $projekt->beschreibung, $format_cell_leftrightline);
+				$worksheet->writeString($zeile, $spalte++, $projekt->beschreibung, $format_cell_leftrightline);
 			}
 		}
 		else
