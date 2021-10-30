@@ -40,13 +40,19 @@ $query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern 
        		pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\", 
                          CASE
                              WHEN
+                             	EXISTS(SELECT 1
+                                        FROM zustaendigkeiten
+                                        WHERE fehlercode = iss.fehlercode
+                                          AND zustaendig = TRUE) /* If Zuständigkeit is defined for the oe/person, zustaendig. */
+                                 THEN 'Ja'
+							 WHEN
                                  EXISTS(SELECT 1
                                         FROM zustaendigkeiten
                                         WHERE fehlercode = iss.fehlercode
                                           AND zustaendig = FALSE) /* If Zuständigkeit is defined for different oe/person, not zustaendig. */
                                  THEN 'Nein'
-                             ELSE 'Ja' /* If no Zuständigkeit defined or defined for oe/person of user, zustaendig. */
-                             END AS \"Hauptzuständig\"
+                             ELSE 'Ja' /* If no Zuständigkeit defined, zustaendig by default. */
+                         END AS \"Hauptzuständig\"
        			FROM system.tbl_issue iss
 				JOIN system.tbl_fehler fr USING (fehlercode)
 				JOIN system.tbl_fehlertyp ftyp USING (fehlertyp_kurzbz)
