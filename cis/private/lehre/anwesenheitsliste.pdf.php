@@ -66,7 +66,7 @@ isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
 isset($_GET['lehreinheit_id']) ? $lehreinheit = $_GET['lehreinheit_id'] : $lehreinheit = NULL;
 
 $stg = new studiengang();
-$stg->load($this->lv->studiengang_kz);
+$stg->load($lv->studiengang_kz);
 
 $doc = new dokument_export('Anwesenheitslist');
 
