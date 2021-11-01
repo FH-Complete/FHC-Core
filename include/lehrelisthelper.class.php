@@ -40,6 +40,7 @@ class LehreListHelper
 	protected $lvid;
 	protected $lv;
 	protected $lehreinheit;
+	protected $stg;
 	
 	protected $arr_lehrende;
 	protected $studentuids;
@@ -50,13 +51,14 @@ class LehreListHelper
 	protected $raum_string;
 
 	public function __construct(basis_db $db, $studiensemester, $lvid, 
-		lehrveranstaltung $lv, $lehreinheit='')
+		lehrveranstaltung $lv, studiengang $stg, $lehreinheit='')
 	{
 		$this->db = $db;
 		$this->studiensemester = $studiensemester;
 		$this->lvid = $lvid;
 		$this->lv = $lv;
 		$this->lehreinheit = $lehreinheit;
+		$this->stg = $stg;
 
 		$this->arr_lehrende = array();
 		$this->studentuids = array();
@@ -153,12 +155,9 @@ class LehreListHelper
 	
 	protected function initData()
 	{
-		$stg = new studiengang();
-		$stg->load($this->lv->studiengang_kz);
+		$studiengang_bezeichnung=$this->stg->bezeichnung;
 
-		$studiengang_bezeichnung=$stg->bezeichnung;
-
-		$stg->getAllTypes();
+		$this->stg->getAllTypes();
 
 		$this->data = array(
 			'gruppen'=>$this->gruppen_string,
@@ -166,7 +165,7 @@ class LehreListHelper
 			'lehrveranstaltung_id'=>$this->lv->lehrveranstaltung_id,
 			'studiengang'=>$studiengang_bezeichnung,
 			'studiengang_kz'=>$this->lv->studiengang_kz,
-			'typ'=>$stg->studiengang_typ_arr[$stg->typ],
+			'typ'=>$this->stg->studiengang_typ_arr[$this->stg->typ],
 			'ects'=>$this->lv->ects,
 			'sprache'=>$this->lv->sprache,
 			'studiensemester'=>$this->studiensemester,
