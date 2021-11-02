@@ -212,7 +212,7 @@ $covidhelper = new CovidHelper();
 			if($covid_content!='')
 				$covid_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/covidstatuslisten')."</h3></td></tr>".$covid_content."</table>";
 		  	else
-		  		$covid_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
+		  		$covid_content = ($covidhelper->isUdfDefined()) ? $p->t('anwesenheitsliste/keineStudentenVorhanden') : '';
 			
 		  	if($aw_content!='')
 				$aw_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/anwesenheitslisten')."</h3></td></tr>".$aw_content."</table>";
