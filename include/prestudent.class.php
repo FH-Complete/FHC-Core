@@ -2463,4 +2463,43 @@ class prestudent extends person
 			return false;
 		}
 	}
+
+	/**
+	 * Ermittelt den Prestudenten mithilfe der UID, des Studiengangs und des Semesters
+	 * @param string $uid UID des Benutzers (zum Beispiel se15m007).
+	 * @param int $stg_kz Kennzeichen Studiengang (zum Beispiel 299).
+	 * @param string $stsem Semesterkurzbezeichnung (zum Beispiel WS2021).
+	 * @return int prestudent_id
+	 */
+	public function getPrestudentFromBenutzer($uid, $stg_kz, $stsem)
+	{
+		$qry = "SELECT
+			prestudent_id
+		FROM public.tbl_benutzer
+		JOIN public.tbl_prestudent USING (person_id)
+		JOIN public.tbl_prestudentstatus USING (prestudent_id)
+		WHERE uid = ".$this->db_add_param($uid)."
+		AND studiengang_kz = ".$this->db_add_param($stg_kz, FHC_INTEGER)."
+		AND studiensemester_kurzbz = ".$this->db_add_param($stsem)."
+		AND status_kurzbz = 'Student';";
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				$prestudent_id = $row->prestudent_id;
+				return $prestudent_id;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
