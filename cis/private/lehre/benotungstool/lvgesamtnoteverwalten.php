@@ -46,7 +46,7 @@ require_once ('../../../../include/notenschluessel.class.php');
 require_once ('../../../../include/studienplan.class.php');
 require_once ('../../../../include/addon.class.php');
 require_once ('../../../../include/mobilitaet.class.php');
-require_once ('../../../../include/prestudent.class.php');
+require_once ('../../../../include/student.class.php');
 
 $summe_stud = 0;
 $summe_t2 = 0;
@@ -1133,8 +1133,8 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			$grades[$row_stud->uid]['vorname'] = $row_stud->vorname;
 			$grades[$row_stud->uid]['nachname'] = $row_stud->nachname;
 
-			$ps = new prestudent();
-			$prestudent_id = $ps->getPrestudentFromBenutzer($row_stud->uid, $stg_obj->studiengang_kz, $stsem);
+			$ps = new student();
+			$prestudent_id = $ps->getPrestudentIdFromBenutzerId($row_stud->uid, $stg_obj->studiengang_kz);
 			$mobility = new mobilitaet();
 			$mobility->loadPrestudent($prestudent_id);
 			$output = $mobility->result;
