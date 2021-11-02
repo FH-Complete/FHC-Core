@@ -34,6 +34,7 @@
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../../../include/phrasen.class.php');
 	require_once('../../../include/vertrag.class.php');
+	require_once '../../../include/covid/covidhelper.class.php';
 
 	$sprache = getSprache();
 	$p=new phrasen($sprache);
@@ -61,7 +62,8 @@
     	$stsem = $_GET['stsem'];
     else
     	die($p->t('anwesenheitsliste/studiensemesterIstUngueltig'));
-
+	
+$covidhelper = new CovidHelper();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -69,6 +71,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+<link href="../../../vendor/components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+	.covidstatus {
+		float: right;
+		padding-left: 2.5em;
+	}
+	.covidstatus i {
+		margin-right: .5em;
+	}
+</style>
 </head>
 
 <body>
@@ -98,7 +110,8 @@
 
 	  	$lv = new lehrveranstaltung($lvid);
 
-	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
+		$covid_content = ($covidhelper->isUdfDefined()) ? '<a class="covidstatus" href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&stsem='.$stsem.'"><i class="fa fa-qrcode" aria-hidden="true"></i>Covid-Status</a>' : '';
+	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a>" . $covid_content . "</td></tr>";
 	  	$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 	  	$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 
@@ -151,7 +164,8 @@
 			  					}
 			  				}
 
-			  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+							$covid_content = ($covidhelper->isUdfDefined()) ? '<a class="covidstatus" href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&lehreinheit_id='.$lastlehreinheit.'&stsem='.$stsem.'"><i class="fa fa-qrcode" aria-hidden="true"></i>Covid-Status</a>' : '';
+			  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a>" . $covid_content . "</td></tr>";
 			  				$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 			  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 
@@ -186,7 +200,8 @@
 					}
 				}
 
-				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
+				$covid_content = ($covidhelper->isUdfDefined()) ? '<a class="covidstatus" href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&lehreinheit_id='.$lastlehreinheit.'&stsem='.$stsem.'"><i class="fa fa-qrcode" aria-hidden="true"></i>Covid-Status</a>' : '';
+				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a>" . $covid_content . "</td></tr>";
 				$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 	  		}
