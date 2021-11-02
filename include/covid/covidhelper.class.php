@@ -52,11 +52,13 @@ class CovidHelper extends basis_db
 		$this->checkIfUdfValuesAreDefined();
 	}
 
-	public function isUdfDefined() {
+	public function isUdfDefined() 
+	{
 		return $this->isUdfDefined;
 	}
 	
-	public function fetchCovidStatus(array $uids) {
+	public function fetchCovidStatus(array $uids) 
+	{
 		$this->uids = $uids;
 		$this->covidstatus = array();
 		$this->fetchCovidValidStatus();

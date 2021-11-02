@@ -96,6 +96,7 @@ $covidhelper = new CovidHelper();
 	  	<?php
 	if($error==0)
 	{
+		$covid_content = '';
 	  	$aw_content='';
 	  	$awbild_content='';
 	  	$nt_content='';
@@ -110,8 +111,8 @@ $covidhelper = new CovidHelper();
 
 	  	$lv = new lehrveranstaltung($lvid);
 
-		$covid_content = ($covidhelper->isUdfDefined()) ? '<a class="covidstatus" href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&stsem='.$stsem.'"><i class="fa fa-qrcode" aria-hidden="true"></i>Covid-Status</a>' : '';
-	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a>" . $covid_content . "</td></tr>";
+		$covid_content .= ($covidhelper->isUdfDefined()) ? '<tr><td><a href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&stsem='.$stsem.'">' . $p->t('anwesenheitsliste/gesamtliste') . ' ' . $lv->bezeichnung . '</a></td></tr>' : '';
+	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 	  	$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 	  	$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 
@@ -164,8 +165,8 @@ $covidhelper = new CovidHelper();
 			  					}
 			  				}
 
-							$covid_content = ($covidhelper->isUdfDefined()) ? '<a class="covidstatus" href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&lehreinheit_id='.$lastlehreinheit.'&stsem='.$stsem.'"><i class="fa fa-qrcode" aria-hidden="true"></i>Covid-Status</a>' : '';
-			  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a>" . $covid_content . "</td></tr>";
+							$covid_content .= ($covidhelper->isUdfDefined()) ? '<tr><td><a href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&lehreinheit_id='.$lastlehreinheit.'&stsem='.$stsem.'">&nbsp;&nbsp;&nbsp;<img src="../../../skin/images/haken.gif" />' . $kurzbz . ' - ' . $lehrform . ' - ' . $gruppen . ' (' . $lektoren . ')</a></td></tr>' : '';
+			  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 			  				$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 			  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 
@@ -200,8 +201,8 @@ $covidhelper = new CovidHelper();
 					}
 				}
 
-				$covid_content = ($covidhelper->isUdfDefined()) ? '<a class="covidstatus" href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&lehreinheit_id='.$lastlehreinheit.'&stsem='.$stsem.'"><i class="fa fa-qrcode" aria-hidden="true"></i>Covid-Status</a>' : '';
-				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a>" . $covid_content . "</td></tr>";
+				$covid_content .= ($covidhelper->isUdfDefined()) ? '<tr><td><a href="covidstatusliste.php?stg='.$stg_kz.'.&sem='.$sem.'&lvid='.$lvid.'&lehreinheit_id='.$lastlehreinheit.'&stsem='.$stsem.'">&nbsp;&nbsp;&nbsp;<img src="../../../skin/images/haken.gif" />' . $kurzbz . ' - ' . $lehrform . ' - ' . $gruppen . ' (' . $lektoren . ')</a></td></tr>' : '';
+				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 				$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 	  		}
@@ -213,6 +214,11 @@ $covidhelper = new CovidHelper();
 	  	}
 	  	else
 	  	{
+			if($covid_content!='')
+				$covid_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/covidstatuslisten')."</h3></td></tr>".$covid_content."</table>";
+		  	else
+		  		$covid_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
+			
 		  	if($aw_content!='')
 				$aw_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/anwesenheitslisten')."</h3></td></tr>".$aw_content."</table>";
 		  	else
@@ -236,17 +242,20 @@ $covidhelper = new CovidHelper();
 				$aw_content='';
 			if(defined('CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_BILD_ANZEIGEN') && !CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_BILD_ANZEIGEN)
 				$awbild_content='';
-
+			
 		  	echo "<table cellpadding='0' cellspacing='0'>
-
+				
 		  		<tr>
 		  		   <td>$aw_content</td>
+				   <td>$covid_content</td>
 		  		</tr>
 		  		<tr>
 		  			<td>$awbild_content</td>
+					<td></td>
 		  		</tr>
 				<tr>
 		  		   <td>$nt_content</td>
+				   <td></td>
 		  		</tr>
 
 		  		</table>";

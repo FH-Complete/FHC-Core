@@ -85,7 +85,8 @@ class LehreListHelper
 		return $this->studentuids;
 	}
 	
-	public function getArr_Lehrende() {
+	public function getArr_Lehrende() 
+	{
 		return $this->arr_lehrende;
 	}
 	
@@ -175,7 +176,8 @@ class LehreListHelper
 		);
 	}
 	
-	protected function loadLehrende() {
+	protected function loadLehrende() 
+	{
 		//Lehrende der LV laden und in ein Array schreiben
 		$lehrende = new lehreinheitmitarbeiter();
 		$lehrende->getMitarbeiterLV($this->lvid, $this->studiensemester, $this->lehreinheit);
@@ -193,7 +195,8 @@ class LehreListHelper
 		}
 	}
 	
-	protected function loadStudierende() {
+	protected function loadStudierende() 
+	{
 		//Studierende der LV laden und in ein Array schreiben
 
 		$qry = 'SELECT

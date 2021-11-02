@@ -113,8 +113,10 @@ header('Content-Type: text/html; charset=utf-8');
 <?php
 $len = strlen($data['anzahl_studierende']);
 $lfdnr = 1;
-foreach ($data as $value) {
-	if( !(is_array($value) && isset($value['student'])) ) {
+foreach ($data as $value) 
+{
+	if( !(is_array($value) && isset($value['student'])) ) 
+	{
 		continue;
 	}
 	$tmpstudent =& $value['student']; 
@@ -137,7 +139,8 @@ foreach ($data as $value) {
 	</div>
 
 <?php
-if( $debug ) {
+if( $debug ) 
+{
 ?>
 	<div class="row">
 		<div class="col-lg-6">
