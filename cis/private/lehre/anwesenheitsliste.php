@@ -71,14 +71,9 @@ $covidhelper = new CovidHelper();
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<link href="../../../vendor/components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
 <style type="text/css">
 	.covidstatus {
-		float: right;
-		padding-left: 2.5em;
-	}
-	.covidstatus i {
-		margin-right: .5em;
+		padding-left: 4em;
 	}
 </style>
 </head>
@@ -247,7 +242,7 @@ $covidhelper = new CovidHelper();
 				
 		  		<tr>
 		  		   <td>$aw_content</td>
-				   <td>$covid_content</td>
+				   <td class=\"covidstatus\">$covid_content</td>
 		  		</tr>
 		  		<tr>
 		  			<td>$awbild_content</td>
