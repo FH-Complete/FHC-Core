@@ -1133,19 +1133,20 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			$grades[$row_stud->uid]['vorname'] = $row_stud->vorname;
 			$grades[$row_stud->uid]['nachname'] = $row_stud->nachname;
 
-			$ps = new student();
-			$prestudent_id = $ps->getPrestudentIdFromBenutzerId($row_stud->uid, $stg_obj->studiengang_kz);
+			$student = new student();
+			$student->load($row_stud->uid);
+			$student->result[]= $student;
+			$prestudent_id = $student->prestudent_id;
+
 			$mobility = new mobilitaet();
 			$mobility->loadPrestudent($prestudent_id);
 			$output = $mobility->result;
 			$eintrag = '';
-
 			foreach ($output as $k)
 			{
 				if($k->mobilitaetstyp_kurzbz == 'GS')
-				$eintrag = ' (d.d.)';
+			 	$eintrag = ' (d.d.)';
 			}
-
 			$grades[$row_stud->uid]['mobility'] = $eintrag;
 
 			// Noten aus Uebungstool
