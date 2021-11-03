@@ -101,6 +101,22 @@
 					</div>
 				</div>
 			</div>
+			<?php if (!is_null($duplicated)): ?>
+				<div class="row alert-warning">
+					<h3 class="header col-lg-12">
+						<?php echo $this->p->t('global', 'bewerberVorhanden') . ':'; ?>
+					</h3>
+					<div class="text-left col-lg-12">
+						<?php
+						foreach ($duplicated as $duplicate)
+						{
+							echo  'Person ID: ' . $duplicate->person_id . '<br />';
+						}
+						?>
+					</div>
+
+				</div>
+			<?php endif; ?>
 			<br/>
 			<section>
 				<div class="row">

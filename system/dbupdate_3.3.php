@@ -1725,6 +1725,20 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// UPDATE Berechtigungen fuer vilesci User erteilen fuer tbl_person_lock
+if ($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_person_lock' AND table_schema='system' AND grantee='vilesci' AND privilege_type='UPDATE'"))
+{
+	if ($db->db_num_rows($result) === 0)
+	{
+		$qry = "GRANT UPDATE ON system.tbl_person_lock TO vilesci;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_person_lock Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'UPDATE Recht fuer system.tbl_person_lock fuer vilesci user gesetzt ';
+	}
+}
+
 
 /**
  * Kommentare fuer Datenbanktabellen

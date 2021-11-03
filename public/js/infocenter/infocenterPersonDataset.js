@@ -49,6 +49,11 @@ var InfocenterPersonDataset = {
 			'<select class="form-control auswahlAbsageStg" style="width:auto; float:left;">' +
 			'<option value="null" selected="selected"> Studiengang </option>' +
 			'</select>' +
+			'<select class="form-control auswahlAbsageAbgeschickt" style="width:auto; float:left;">' +
+			'<option value="null" selected="selected"> Bewerbung abgeschickt? </option>' +
+			'<option value="true"> Ja </option>' +
+			'<option value="false"> Nein </option>' +
+			'</select>' +
 			'<button class="btn btn-default auswahlAbsageBtn" style="float:left"> Absage </button>';
 
 		InfocenterPersonDataset.getAbsageData();
@@ -327,6 +332,7 @@ var InfocenterPersonDataset = {
 
 		var statusgrund = $('.absgstatusgrund').val();
 		var studiengang = $('.auswahlAbsageStg').val();
+		var abgeschickt = $('.auswahlAbsageAbgeschickt').val();
 
 		var personen = [];
 
@@ -340,7 +346,8 @@ var InfocenterPersonDataset = {
 			{
 				'statusgrund': statusgrund,
 				'studiengang': studiengang,
-				'personen' : personen
+				'personen' : personen,
+				'abgeschickt' : abgeschickt
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {

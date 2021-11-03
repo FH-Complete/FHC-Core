@@ -758,6 +758,29 @@ function GenerateXMLStudentBlock($row)
 		$email = $row->student_uid. '@'. DOMAIN;
 	}
 
+	// private eMail-Adresse
+	$email_privat = '';
+	$qry_privmail = "
+		SELECT kontakt
+		FROM public.tbl_kontakt
+		WHERE zustellung = TRUE
+	  	AND kontakttyp = 'email'
+		AND person_id=". $db->db_add_param($row->pers_id). "
+		ORDER BY insertamum DESC
+		LIMIT 1;
+	";
+
+	if ($privmail_result = $db->db_query($qry_privmail))
+	{
+		if($db->db_num_rows($privmail_result) == 1)
+		{
+			if ($row_privmail = $db->db_fetch_object($privmail_result))
+			{
+				$email_privat = $row_privmail->kontakt;
+			}
+		}
+	}
+
 	if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -1263,7 +1286,9 @@ function GenerateXMLStudentBlock($row)
 			$datei .= "
 			<SVNR>" . $row->svnr . "</SVNR>";
 		}
-		if ($row->ersatzkennzeichen != '')
+
+		// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
+		if ($row->ersatzkennzeichen != '' && $row->svnr == null)
 		{
 			$datei .= "
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
@@ -1296,11 +1321,16 @@ function GenerateXMLStudentBlock($row)
 			";
 		}
 
+		if ($email_privat != '')
+		{
+			$datei .= "
+			<eMailAdresse>" . $email_privat . "</eMailAdresse>";
+		}
+
 		if ($email != '')
 		{
 			$datei .= "
-			<eMailAdresse>" . $email . "</eMailAdresse>
-			";
+			<eMailAdresseBE>" . $email . "</eMailAdresseBE>";
 		}
 
 		if(!$ausserordentlich)
@@ -1531,12 +1561,12 @@ function GenerateXMLStudentBlock($row)
 						if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
 						{
 							$datei.="
-							<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
+							<ECTSerworben>".round($rowio->ects_erworben)."</ECTSerworben>";
 						}
 						if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
 						{
 							$datei.="
-							<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
+							<ECTSangerechnet>".round($rowio->ects_angerechnet)."</ECTSangerechnet>";
 						}
 						foreach ($aufenthaltfoerderung_code_arr as $aufenthaltfoerderung_code)
 						{
