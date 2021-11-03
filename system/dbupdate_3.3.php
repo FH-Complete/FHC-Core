@@ -5517,9 +5517,9 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitwunsch_gueltigkeit LI
 			mitarbeiter_uid CHARACTER VARYING(32) NOT NULL,
 			von DATE,
 			bis DATE,
-			insertamum TIMESTAMP WITHOUT TIME ZONE,
+			insertamum TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
 			insertvon CHARACTER VARYING(32),
-			updateamum TIMESTAMP WITHOUT TIME ZONE,
+			updateamum TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
 			updatevon CHARACTER VARYING(32)
 		);
 
@@ -5535,6 +5535,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitwunsch_gueltigkeit LI
 
 		-- Add Permissions
 		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO vilesci;
+		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO web;
 
 		GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_zeitwunsch_gueltigkeit TO vilesci;
 		GRANT SELECT, INSERT, UPDATE ON campus.tbl_zeitwunsch_gueltigkeit TO web;
@@ -5657,6 +5658,7 @@ if (!$result = @$db->db_query("SELECT zeitwunsch_id FROM campus.tbl_zeitwunsch L
 
 		-- Set permissions
 		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO vilesci;
+		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO web;
 	";
 
 	if(!$db->db_query($qry))
