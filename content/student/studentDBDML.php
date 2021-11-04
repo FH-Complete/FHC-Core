@@ -428,7 +428,8 @@ if(!$error)
 				$student->geburtsnation = $_POST['geburtsnation'];
 				$student->sprache = $_POST['sprache'];
 				$student->matrikelnr = $_POST['matrikelnummer'];
-				$student->bpk = $_POST['bpk'];
+				if (isset($_POST['bpk']))
+					$student->bpk = $_POST['bpk'];
 				$student->updateamum = date('Y-m-d H:i:s');
 				$student->updatevon = $user;
 
@@ -578,7 +579,8 @@ if(!$error)
 				$person->geburtsnation = $_POST['geburtsnation'];
 				$person->sprache = $_POST['sprache'];
 				$person->matr_nr = $_POST['matr_nr'];
-				$person->bpk = $_POST['bpk'];
+				if (isset($_POST['bpk']))
+					$person->bpk = $_POST['bpk'];
 				$person->updateamum = date('Y-m-d H:i:s');
 				$person->updatevon = $user;
 
