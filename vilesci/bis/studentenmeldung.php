@@ -145,7 +145,7 @@ derzeit fuer alle Studierende der gleiche Standort
 ToDo: Standort sollte pro Student konfigurierbar sein.
 */
 $standortcode='22';
-if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859')))
+if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859','871')))
 	$standortcode='14'; // Pinkafeld
 elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271','781')))
 	$standortcode='3'; // Eisenstadt
@@ -845,7 +845,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
-	/*if($row->bpk == '' || $row->bpk == null)
+	if($row->bpk == '' || $row->bpk == null)
 	{
 		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 	}
@@ -860,7 +860,7 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 		}
-	}*/
+	}
 	if (!$ausserordentlich && !$incoming)
 	{
 		if ($zustell_plz == '' || $zustell_plz == null)
@@ -1294,9 +1294,9 @@ function GenerateXMLStudentBlock($row)
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
 		}
 
-		/*$datei .= "
+		$datei .= "
 			<bPK>" . $row->bpk . "</bPK>
-		";*/
+		";
 
 		$datei .= "
 			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
