@@ -5278,14 +5278,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue_status LIMIT 1;"))
 	else
 		echo '<br>system.tbl_issue_status: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;
+	// GRANT SELECT ON TABLE system.tbl_issue_status TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_issue_status TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue_status '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_issue_status';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue_status TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue_status TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue_status TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue_status '.$db->db_last_error().'</strong><br>';
@@ -5314,14 +5314,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehlertyp LIMIT 1;"))
 	else
 		echo '<br>system.tbl_fehlertyp: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;
+	// GRANT SELECT ON TABLE system.tbl_fehlertyp TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_fehlertyp TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehlertyp '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehlertyp';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisstandort TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehlertyp TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehlertyp TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehlertyp '.$db->db_last_error().'</strong><br>';
@@ -5364,14 +5364,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler LIMIT 1;"))
 	else
 		echo '<br>system.tbl_fehler: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	// GRANT SELECT ON TABLE system.tbl_fehler TO web;
 	$qry = 'GRANT SELECT, UPDATE ON TABLE system.tbl_fehler TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehler';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler '.$db->db_last_error().'</strong><br>';
@@ -5422,14 +5422,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler_zustaendigkeiten L
 	else
 		echo '<br>system.tbl_fehler_zustaendigkeiten: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	// GRANT SELECT ON TABLE system.tbl_fehler_zustaendigkeiten TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_fehler_zustaendigkeiten TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehler_zustaendigkeiten';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler_zustaendigkeiten TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler_zustaendigkeiten TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
@@ -5500,14 +5500,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue LIMIT 1;"))
 	else
 		echo '<br>system.tbl_issue: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	// GRANT SELECT ON TABLE system.tbl_issue TO web;
 	$qry = 'GRANT SELECT, UPDATE ON TABLE system.tbl_issue TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_issue';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue '.$db->db_last_error().'</strong><br>';
