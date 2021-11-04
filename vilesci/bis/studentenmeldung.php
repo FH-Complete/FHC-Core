@@ -428,6 +428,10 @@ if ($rechte->isBerechtigt('admin'))
 	$typ = '';
 	foreach ($studiengang->result AS $row)
 	{
+		if ($row->typ != 'b' && $row->typ != 'm' && $row->typ != 'd' && $row->typ != 'e')
+		{
+			continue;
+		}
 		if ($row->studiengang_kz == $stg_kz)
 		{
 			$selected = 'selected';
