@@ -859,7 +859,7 @@ function MitarbeiterSave()
 
 	if(!checkAlias(alias))
 	{
-		alert('Der Alias darf keine Sonderzeichen enthalten');
+		alert('Der Alias darf keine Sonderzeichen außer ._-& ; enthalten');
 		return false;
 	}
 
@@ -2015,18 +2015,4 @@ function MitarbeiterUDFIFrameLoad()
 		document.getElementById('mitarbeiter-udf').setAttribute('src', url);
 	}
 	catch(e) {}
-}
-
-// ****
-// * Validierung Alias auf Sonderzeichen (analog zu checkWunschUid, außerdem . und _ erlaubt)
-// ****
-function checkAlias(alias)
-{
-
-	if (/^[a-z0-9 . _]*$/i.test(alias) === false)
-	{
-		return false;
-	}
-	else
-		return true;
 }

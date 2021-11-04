@@ -421,12 +421,12 @@ function setVariable(variable, wert)
 }
 
 // ****
-// * Validierung Alias auf Sonderzeichen (analog zu checkWunschUid, außerdem . und _ erlaubt)
+// * Validierung Alias auf Sonderzeichen (analog zu checkWunschUid erlaubt)
 // ****
 function checkAlias(alias)
 {
 
-	if (/^[a-z0-9 . _]*$/i.test(alias) === false)
+	if (/^[a-z0-9 . _ - & ;]*$/i.test(alias) === false)
 	{
 		return false;
 	}
