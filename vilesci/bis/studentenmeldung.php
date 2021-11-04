@@ -50,6 +50,7 @@ if(!$rechte->isBerechtigt('student/stammdaten',null,'suid') && !$rechte->isBerec
 	die('Sie haben keine Berechtigung für diese Seite');
 
 $error_log='';
+$error_log_hinweis='';
 $error_log1='';
 $error_log_all="";
 $error_log_io = ''; // error log fuer plausichecks von incomings/outgoings
@@ -683,6 +684,7 @@ function GenerateXMLStudentBlock($row)
 	global $kodex_studientyp_array, $kodex_studstatuscode_array;
 	global $stg_kz;
 	$error_log='';
+	$error_log_hinweis='';
 	$error_log1='';
 	$error_log_io = '';
 	$datei = '';
@@ -815,7 +817,7 @@ function GenerateXMLStudentBlock($row)
 	}
 	if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 	{
-		$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
+		$error_log_hinweis.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
 	}
 	if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 	{
@@ -845,7 +847,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
-	/*if($row->bpk == '' || $row->bpk == null)
+	if($row->bpk == '' || $row->bpk == null)
 	{
 		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 	}
@@ -860,7 +862,7 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 		}
-	}*/
+	}
 	if (!$ausserordentlich && !$incoming)
 	{
 		if ($zustell_plz == '' || $zustell_plz == null)
@@ -1240,6 +1242,11 @@ function GenerateXMLStudentBlock($row)
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 		}
+		if($error_log_hinweis != '')
+		{
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+			$error_log_hinweis = '';
+		}
 		$anzahl_fehler++;
 		$v.="\n";
 		$error_log='';
@@ -1247,7 +1254,14 @@ function GenerateXMLStudentBlock($row)
 		return '';
 	}
 	else
+	{
+		if($error_log_hinweis != '')
 		{
+			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+			$error_log_hinweis = '';
+		}
+
 		$datei .= "
 		<StudentIn>
 			<PersKz>" . trim($row->matrikelnr) . "</PersKz>";
@@ -1294,9 +1308,9 @@ function GenerateXMLStudentBlock($row)
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
 		}
 
-		/*$datei .= "
+		$datei .= "
 			<bPK>" . $row->bpk . "</bPK>
-		";*/
+		";
 
 		$datei .= "
 			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
