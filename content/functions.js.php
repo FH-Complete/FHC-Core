@@ -419,3 +419,17 @@ function setVariable(variable, wert)
 		return true;
 	}
 }
+
+// ****
+// * Validierung Alias auf Sonderzeichen (analog zu checkWunschUid, außerdem . und _ erlaubt)
+// ****
+function checkAlias(alias)
+{
+
+	if (/^[a-z0-9 . _]*$/i.test(alias) === false)
+	{
+		return false;
+	}
+	else
+		return true;
+}

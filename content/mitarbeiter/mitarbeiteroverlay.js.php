@@ -857,6 +857,12 @@ function MitarbeiterSave()
 		return false;
 	}
 
+	if(!checkAlias(alias))
+	{
+		alert('Der Alias darf keine Sonderzeichen enthalten');
+		return false;
+	}
+
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -2014,12 +2020,13 @@ function MitarbeiterUDFIFrameLoad()
 // ****
 // * Validierung Alias auf Sonderzeichen (analog zu checkWunschUid, außerdem . und _ erlaubt)
 // ****
-function checkAlias()
+function checkAlias(alias)
 {
-	var alias = document.getElementById('mitarbeiter-detail-textbox-alias').value;
 
 	if (/^[a-z0-9 . _]*$/i.test(alias) === false)
 	{
-		alert('Der Alias darf keine Sonderzeichen enthalten');
+		return false;
 	}
+	else
+		return true;
 }
