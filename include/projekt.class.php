@@ -48,6 +48,7 @@ class projekt extends basis_db
 	public $anzahl_ma;		// integer
 	public $aufwand_pt;		// integer
 	public $zeitaufzeichnung;    //bool
+	public $sap_project_id;
 
 
 	/**
@@ -448,30 +449,73 @@ class projekt extends basis_db
 	function getProjekteListForMitarbeiter($mitarbeiter_uid, $projektphasen = false)
 	{
 		$projectList = array();
+		$exists = @$this->db_query('SELECT 1 FROM sync.tbl_projects_timesheets_project LIMIT 1;');
+
 		$qry = "SELECT DISTINCT
 					tbl_projekt.*
-				FROM
-					fue.tbl_ressource
-					JOIN fue.tbl_projekt_ressource USING(ressource_id)
-					JOIN fue.tbl_projekt USING(projekt_kurzbz)
-				WHERE (beginn<=now() or beginn is null)
+				";
+
+		if ($exists)
+		{
+			$qry .= ", tbl_sap_projects_timesheets.project_id
+					";
+		}
+
+		$qry .= "FROM
+				fue.tbl_ressource
+				JOIN fue.tbl_projekt_ressource USING(ressource_id)
+				JOIN fue.tbl_projekt USING(projekt_kurzbz)
+				";
+
+		if ($exists)
+		{
+			$qry .= "LEFT JOIN sync.tbl_projects_timesheets_project USING(projekt_id)
+					LEFT JOIN sync.tbl_sap_projects_timesheets USING(projects_timesheet_id)
+					";
+		}
+
+		$qry .= "WHERE (beginn<=now() or beginn is null)
 				AND (ende + interval '1 month 1 day' >=now() OR ende is null)
 				AND
 				(
 					mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid) . " OR
 					student_uid=" . $this->db_add_param($mitarbeiter_uid) . "
-				)";
+				)
+				";
+
+		if ($exists)
+		{
+			$qry .= "AND tbl_projects_timesheets_project.projektphase_id IS NULL
+					";
+		}
 
 		if ($projektphasen == true)
+		{
 			$qry .= "UNION
-					SELECT DISTINCT
-						tbl_projekt.*
-					FROM
-						fue.tbl_projektphase
-						JOIN fue.tbl_projekt USING (projekt_kurzbz)
-						JOIN fue.tbl_projekt_ressource USING (projektphase_id)
-						JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
-					WHERE
+						SELECT DISTINCT
+							tbl_projekt.*
+						";
+
+			if ($exists)
+			{
+				$qry .= ", tbl_sap_projects_timesheets.project_task_id
+						";
+			}
+
+			$qry .= "FROM fue.tbl_projektphase
+					JOIN fue.tbl_projekt USING (projekt_kurzbz)
+					JOIN fue.tbl_projekt_ressource USING(projektphase_id)
+					JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+					";
+
+			if ($exists)
+			{
+				$qry .= "LEFT JOIN sync.tbl_projects_timesheets_project ON tbl_projects_timesheets_project.projektphase_id = tbl_projekt_ressource.projektphase_id
+						LEFT JOIN sync.tbl_sap_projects_timesheets USING(projects_timesheet_id)
+						";
+			}
+
+			$qry .= "WHERE
 					(
 						(
 							(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
@@ -481,7 +525,10 @@ class projekt extends basis_db
 							AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
 						)
 					)
-					AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+					";
+		};
+
+		$qry .= "AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
 
 		if ($result = $this->db_query($qry))
 		{
@@ -496,6 +543,8 @@ class projekt extends basis_db
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
+				if ($exists)
+					$obj->sap_project_id = $row->project_id;
 
 				$this->result[] = $obj;
 

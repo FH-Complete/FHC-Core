@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bewerbungstermine extends APIv1_Controller
+class Bewerbungstermine extends API_Controller
 {
 	/**
 	 * Bewerbungstermine API constructor.

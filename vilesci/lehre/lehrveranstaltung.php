@@ -25,13 +25,19 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/fachbereich.class.php');
+require_once('../../include/organisationseinheit.class.php');
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/addon.class.php');
+require_once('../../include/sprache.class.php');
+require_once('../../include/lehrmodus.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+//Sprache
+$sprache = getSprache();
 
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
@@ -64,6 +70,8 @@ if(!is_numeric($stg_kz) && $stg_kz!='')
 if(!is_numeric($semester))
 	$semester = -1;
 
+
+
 $oe_fachbereich='';
 if(isset($_REQUEST['fachbereich_kurzbz']))
 {
@@ -79,9 +87,18 @@ if(isset($_REQUEST['fachbereich_kurzbz']))
 else
 	$fachbereich_kurzbz = '';
 
+
+$oe_organisationseinheit='';
 if (isset($_REQUEST['oe_kurzbz']))
 {
 	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
+	if($oe_kurzbz != '')
+	{
+		$oe_obj = new organisationseinheit();
+		if(!$oe_obj->load($oe_kurzbz))
+			die('Organisationseinheit konnte nicht geladen werden');
+		$oe_organisationseinheit = $oe_obj->oe_kurzbz;
+	}
 }
 else
 	$oe_kurzbz='';
@@ -163,7 +180,7 @@ if(isset($_GET['delete_lvid']))
 		}
 	}
 	else
-		echo "Keine Berechtigung, um Lehrveranstaltung zu löschen!\n";
+		echo " Keine Berechtigung, um Lehrveranstaltung zu löschen!\n";
 }
 
 // Speichern der Daten
@@ -318,7 +335,7 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			$lv_obj = new lehrveranstaltung();
 			if($lv_obj->load($_POST['lvid']))
 			{
-				$lv_obj->lehrform_kurzbz=$_POST['lf'];
+				$lv_obj->lehrform_kurzbz = $_POST['lf'];
 				$lv_obj->updateamum = date('Y-m-d H:i:s');
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
@@ -336,7 +353,25 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			$lv_obj = new lehrveranstaltung();
 			if($lv_obj->load($_POST['lvid']))
 			{
-				$lv_obj->lehrtyp_kurzbz=$_POST['lt'];
+				$lv_obj->lehrtyp_kurzbz = $_POST['lt'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
+
+		//Lehrmodus Speichern
+		if(isset($_POST['lm']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrmodus_kurzbz = $_POST['lm'];
 				$lv_obj->updateamum = date('Y-m-d H:i:s');
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
@@ -408,6 +443,26 @@ if($result = $db->db_query($qry))
 	}
 }
 
+//Lehrmodus holen
+$qry = "
+SELECT
+	lehrmodus_kurzbz,
+	bezeichnung_mehrsprachig
+FROM
+	lehre.tbl_lehrmodus ORDER BY lehrmodus_kurzbz";
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+	//	$lm[$row->lehrmodus_kurzbz]['lehrmodus_kurzbz']=$row->lehrmodus_kurzbz;
+		$lm_beschr = new lehrmodus();
+		$lm_beschr ->load($row->lehrmodus_kurzbz);
+		$lm[$row->lehrmodus_kurzbz]['bezeichnung_mehrsprachig'] = $lm_beschr->bezeichnung_mehrsprachig[$sprache];
+	}
+}
+
+
 //Fachbereichskoordinatoren holen
 $fb_kurzbz='';
 if($stg_kz!='')
@@ -456,14 +511,50 @@ if($result = $db->db_query($qry))
 	}
 }
 
-//Lehrveranstaltungen holen
+//Lehrveranstaltungen mit OEs holen
+$sql_query = "
+	SELECT
+	tbl_lehrveranstaltung.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz,
+	tbl_organisationseinheit.bezeichnung as oe_bezeichnung
+	FROM
+		lehre.tbl_lehrveranstaltung
+		LEFT JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
+		LEFT JOIN lehre.tbl_lehrveranstaltung  as lehrfach on (lehre.tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id)
+		LEFT JOIN public.tbl_organisationseinheit ON (public.tbl_organisationseinheit.oe_kurzbz = lehre.tbl_lehrveranstaltung.oe_kurzbz)
+	where
+		true
+";
+
+if($stg_kz!='')
+	$sql_query.= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
+
+if($oe_kurzbz!='')
+	$sql_query.= " AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
+
+if($semester != -1)
+	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
+
+if($orgform_kurzbz != -1)
+	if($orgform_kurzbz == 'none')
+		$sql_query.=" AND (tbl_lehrveranstaltung.orgform_kurzbz IS NULL OR tbl_lehrveranstaltung.orgform_kurzbz='')";
+	else
+		$sql_query.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz, FHC_STRING);
+
+if($lehrveranstaltung_id != '')
+	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
+
+if($lehrveranstaltung_name != '')
+{
+	$sql_query.= " AND (UPPER(tbl_lehrveranstaltung.bezeichnung) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")";
+	$sql_query.= " OR UPPER(tbl_lehrveranstaltung.bezeichnung_english) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")) ";
+}
 
 //Wenn nicht admin, werden erst nur die aktiven angezeigt, es koennen aber auch die inaktiven eingeblendet werden
 
-$aktiv='';
-$isaktiv=trim($isaktiv);
+$aktiv = '';
+$isaktiv = trim($isaktiv);
 
-if($isaktiv=='true')
+if($isaktiv == 'true')
 {
 	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
 }
@@ -476,43 +567,9 @@ else
 	$aktiv='';
 }
 
-if($fb_kurzbz !='')
-	$sql_query="
-	SELECT
-		distinct tbl_lehrveranstaltung.*
-	FROM
-		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
-	WHERE
-		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
-		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
-		AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz
-		AND	tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
-else
-	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE true";
+$sql_query .= " GROUP BY tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung";
 
-if($stg_kz!='')
-	$sql_query.= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
-//if($oe_kurzbz!='')
-//	$sql_query.= " AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
-if($semester != -1)
-	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
-
-if($orgform_kurzbz != -1)
-	if($orgform_kurzbz == 'none')
-		$sql_query.=" AND (tbl_lehrveranstaltung.orgform_kurzbz IS NULL OR tbl_lehrveranstaltung.orgform_kurzbz='')";
-	else
-		$sql_query.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz, FHC_STRING);
-	
-if($lehrveranstaltung_id != '')
-	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
-
-if($lehrveranstaltung_name != '')
-{
-	$sql_query.= " AND (UPPER(tbl_lehrveranstaltung.bezeichnung) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")";
-	$sql_query.= " OR UPPER(tbl_lehrveranstaltung.bezeichnung_english) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")) ";
-}
-
-$sql_query.=" $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
+$sql_query .= " ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
 if($fb_kurzbz=='' && $stg_kz=='' && $semester=='0' && $oe_kurzbz=='')
 	$result_lv='';
@@ -523,11 +580,11 @@ else
 }
 
 //Studiengang DropDown
-$outp='';
-$s=array();
-$outp.="<form action='".$_SERVER['PHP_SELF']."' method='GET' onsubmit='return checksubmit();'>";
-$outp.=" Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
-$outp.="<OPTION value='' ".($stg_kz==''?'selected':'').">-- Alle --</OPTION>";
+$outp = '';
+$s = array();
+$outp .= "<form action='".$_SERVER['PHP_SELF']."' method='GET' onsubmit='return checksubmit();'>";
+$outp .= " Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
+$outp .= "<OPTION value='' ".($stg_kz == ''?'selected':'').">-- Alle --</OPTION>";
 $stg_berechtigt = $rechte->getStgKz('lehre/lehrveranstaltung:begrenzt');
 
 foreach ($studiengang as $stg)
@@ -569,25 +626,6 @@ foreach ($orgform->result as $of)
 }
 $outp.='</SELECT>';
 
-//Institut DropDown
-$outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
-$fachb = new fachbereich();
-$fachb->getAll();
-$outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
-$fachbereich_berechtigt = $rechte->getFbKz('lehre/lehrveranstaltung:begrenzt');
-foreach ($fachb->result as $fb)
-{
-	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
-		$selected = 'selected';
-	else
-		$selected = '';
-
-	if(in_array($fb->fachbereich_kurzbz, $fachbereich_berechtigt))
-		$outp.= '<OPTION value="'.$db->convert_html_chars($fb->fachbereich_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($fb->fachbereich_kurzbz).'</OPTION>';
-}
-
-$outp.= '</SELECT>';
-
 //if($write_admin) Von kindlm am 12.04.2013 auskommentiert, da Assistentinnen auch bei inaktiven LV's die Lehrform aendern koennen sollen
 //{
 	//Aktiv DropDown
@@ -596,36 +634,43 @@ $outp.= '</SELECT>';
 	$outp.= "<OPTION value='true '".($isaktiv=='true'?'selected':'').">-- Aktiv --</OPTION>";
 	$outp.= "<OPTION value='false '".($isaktiv=='false'?'selected':'').">-- Nicht aktiv --</OPTION>";
 	$outp.= '</SELECT>';
+
+	$outp.= '<input type="submit" style="margin-left:20px;" value="Anzeigen">';
 //}
 /*else
 {
 	$isaktiv='aktiv';
 }*/
 
+
+$outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary style="float:right">Erweiterte Suchoptionen</summary><hr></hr>';
+
 	//Organisationseinheit Dropdown
-	$outp.= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 200px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
-	$oe=new organisationseinheit();
+	$outp .= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 450px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
+	$oe = new organisationseinheit();
 	$oe->getAll();
 	foreach($oe->result as $row)
 	{
-		if($oe_kurzbz==$row->oe_kurzbz)
-			$selected='selected';
-		else
-			$selected='';
-		$outp.= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
+	if($oe_kurzbz == $row->oe_kurzbz)
+		$selected = 'selected';
+	else
+		$selected = '';
+	$outp .= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
 	}
-	$outp.= '</select>';
-	
+	$outp .= '</select>';
+
 	//Lehrveranstaltung ID Input
 	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
-	
+
 	//Lehrveranstaltung Suche Bezeichnung
-	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 400px" id="lehrveranstaltung_name" 
+	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 450px" id="lehrveranstaltung_name"
 					value="'.$lehrveranstaltung_name.'" placeholder="Mind. 3 Zeichen. Deutsche oder Englische Bezeichnung"
 					title="Platzhalter _ (EIN beliebiges Zeichen) und % (beliebig viele Zeichen) möglich">';
 
-	$outp.= ' <input type="submit" value="Anzeigen">';
+	$outp.= ' <input type="submit" style="margin-left:20px" value="Anzeigen">';
+	$outp.= '<hr></hr></details>';
 	$outp.= '</form>';
+
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -669,35 +714,37 @@ echo '
 	<script type="text/javascript">
 		$(document).ready(function()
 			{
+				openDetailTag();
 				$("#t1").tablesorter(
 				{
 					sortList: [[2,0]],
 					widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
 					headers: {	4: {sorter: false, filter: false},
 								5: {sorter: false, filter: false},
-								11: {sorter: false, filter: false},
+								6: {sorter: false, filter: false},
 								13: {sorter: false, filter: false},
-								14: {sorter: false, filter: false},
-								17: {sorter: false, filter: false},
-								18: {sorter: false, filter: false},
+								15: {sorter: false, filter: false},
+								16: {sorter: false, filter: false},
 								19: {sorter: false, filter: false},
 								20: {sorter: false, filter: false},
-								21: {sorter: false, filter: false}},
+								21: {sorter: false, filter: false},
+								22: {sorter: false, filter: false},
+								23: {sorter: false, filter: false}},
 					widgetOptions : {filter_functions : {
 										// Add select menu to this column
-										10 : {
-										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
-										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
-										},
 										12 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										},
-										15 : {
+										14 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										},
-										16 : {
+										17 : {
+										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+										},
+										18 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										}
@@ -730,7 +777,6 @@ echo '
 				}
 				else
 					return true;
-
 			}
 			function changelehrevz(lvid, lehrevz)
 			{
@@ -855,6 +901,27 @@ echo '
 				});
 			}
 
+			function changelehrmodus(lvid, lm)
+			{
+				$.ajax({
+					type:"POST",
+					url:"lehrveranstaltung.php",
+					data:{ "lvid": lvid, "lm": lm },
+					success: function(data)
+					{
+						if(data!="true")
+							alert("ERROR:"+data)
+						else
+						{
+							$("#lm"+lvid).css("background-color", "lightgreen");
+							window.setTimeout(function(){$("#lm"+lvid).css("background-color", "");}, 500);
+						}
+
+					},
+					error: function() { alert("error"); }
+				});
+			}
+
 			function copylvinfo(lvid, source_id)
 			{
 				$.ajax({
@@ -922,14 +989,25 @@ echo '
 			{
 				return confirm("Diese Lehrveranstaltung wirklich löschen?");
 			}
-
+			function openDetailTag()
+			{
+				var details = document.getElementById("detailTag");
+				if(document.getElementById("lehrveranstaltung_name").value!=""
+								|| document.getElementById("select_oe_kurzbz").value!=""
+								|| document.getElementById("lehrveranstaltung_id").value!="")
+				{
+					details.open = true;
+					return false;
+				}
+			}
 		</script>
+
 		<style>
 		.tablesorter-default input.tablesorter-filter
 		{
 			padding: 0 4px;
 		}
-		table.tablesorter tbody td 
+		table.tablesorter tbody td
 		{
 			padding: 0 4px;
 		}
@@ -991,8 +1069,10 @@ if ($result_lv!=0)
 		  <th>Bezeichnung English</th>
 		  <th>Lehrform</th>
 		  <th>Lehrtyp</th>
+		  <th>Lehrmodus</th>
 		  <th>Stg</th>\n
 		  <th>Orgform</th>
+		  <th>Organisationseinheit</th>
 		  <th title='Semesterstunden'>SS</th>
 		  <th>ECTS</th>
 		  <th>Lehre</th>
@@ -1034,48 +1114,96 @@ if ($result_lv!=0)
 		else
 			echo $db->convert_html_chars($row->bezeichnung);
 		echo '</td>';
-		
+
 		//Bezeichnung Englisch
 		echo '<td>';
 		echo $db->convert_html_chars($row->bezeichnung_english);
 		echo '</td>';
 
 		//Lehrform
-		echo '<td style="white-space:nowrap;">';
-		echo '<SELECT style="width:80px;" id="lf'.$row->lehrveranstaltung_id.'">';
-		echo '<option value="">--</option>';
-		foreach ($lf as $lehrform=>$lf_kz)
+		if($write_admin)
 		{
-			if($lehrform==$row->lehrform_kurzbz)
-				$selected='selected';
-			else
-				$selected='';
-			echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
+			echo '<td style="white-space:nowrap;">';
+			echo '<SELECT style="width:80px;" id="lf'.$row->lehrveranstaltung_id.'">';
+			echo '<option value="">--</option>';
+			foreach ($lf as $lehrform=>$lf_kz)
+			{
+				if($lehrform == $row->lehrform_kurzbz)
+					$selected='selected';
+				else
+					$selected='';
+				echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
+			}
+			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
+			echo '</td>';
 		}
-		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
-		echo '</td>';
+		else
+		{
+			echo '<td>';
+			foreach ($lf as $lehrform=>$lf_kz)
+			{
+				if($lehrform == $row->lehrform_kurzbz)
+					echo $db->convert_html_chars($lf_kz['lehrform_kurzbz']). ' '. $db->convert_html_chars($lf_kz['bezeichnung']);
+			}
+			echo '</td>';
+		}
 
 		//Lehrtyp
-		echo '<td style="white-space:nowrap;">';
-		echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
-		echo '<option value="">--</option>';
-		foreach ($lt as $lehrtyp=>$lt_kz)
+		if($write_admin)
 		{
-			if($lehrtyp==$row->lehrtyp_kurzbz)
-				$selected='selected';
-			else
-				$selected='';
-			echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
+			echo '<td style="white-space:nowrap;">';
+			echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
+			echo '<option value="">--</option>';
+			foreach ($lt as $lehrtyp=>$lt_kz)
+			{
+				if($lehrtyp == $row->lehrtyp_kurzbz)
+					$selected='selected';
+				else
+					$selected='';
+				echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
+			}
+			echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrtyp(\''.$row->lehrveranstaltung_id.'\',$(\'#lt'.$row->lehrveranstaltung_id.'\').val())">';
+			echo '</td>';
 		}
-		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrtyp(\''.$row->lehrveranstaltung_id.'\',$(\'#lt'.$row->lehrveranstaltung_id.'\').val())">';
+		else
+		{
+			echo '<td>';
+			foreach ($lt as $lehrtyp=>$lt_kz)
+			{
+				if($lehrtyp == $row->lehrtyp_kurzbz)
+					echo $db->convert_html_chars($lt_kz['bezeichnung']);
+			}
+			echo '</td>';
+		}
+
+		//lehrmodus
+		echo '<td style="white-space:nowrap;">';
+		echo '<SELECT id="lm'.$row->lehrveranstaltung_id.'">';
+		echo '<option value="">--</option>';
+		foreach ($lm as $lehrmodus => $lm_kz)
+		{
+			if($lehrmodus == $row->lehrmodus_kurzbz)
+				$selected = 'selected';
+			else
+				$selected = '';
+
+			echo '<option value="'.$db->convert_html_chars($lehrmodus).'" '.$selected.'>'
+			.$db->convert_html_chars($lm_kz['bezeichnung_mehrsprachig']).'</option>';
+		}
+		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrmodus(\''.$row->lehrveranstaltung_id.'\',$(\'#lm'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';
 
 		//Studiengang
 		echo '<td>'.$db->convert_html_chars($s[$row->studiengang_kz]->kurzbz).'</td>';
+
 		//Organisationsform
 		echo '<td style="white-space:nowrap;">';
 		echo ($row->orgform_kurzbz!=''?$db->convert_html_chars($row->orgform_kurzbz):'&nbsp;');
 		echo '</td>';
+
+		//Organisationseinheit
+		echo '<td>'.($row->oe_kurzbz != ''?$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->oe_bezeichnung):'-').'</td>';
+
 		//Semesterstunden
 		echo '<td>'.($row->semesterstunden!=''?$db->convert_html_chars($row->semesterstunden):'-').'</td>';
 		//ECTS

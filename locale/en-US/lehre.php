@@ -3,6 +3,7 @@ $this->phrasen['lehre/keineLektorenZugeordnet']='Currently there are no lecturer
 
 $this->phrasen['lehre/lehrveranstaltungsinformation']='Course Information';
 $this->phrasen['lehre/lehrbeauftragter']='Lecturer(s)';
+$this->phrasen['lehre/lvleitung']='Head of Course';
 $this->phrasen['lehre/lvInfoBearbeiten']='Edit';
 
 $this->phrasen['lehre/semesterplan']='Semesterplan';
@@ -42,5 +43,6 @@ $this->phrasen['lehre/studienplan']='Studienplan';
 $this->phrasen['lehre/noteneingabedeaktiviert']='Grading disabled';
 $this->phrasen['lehre/anerkennungNachgewiesenerKenntnisse']='Crediting for proven knowledge';
 $this->phrasen['lehre/anrechnung']='Exemption';
+$this->phrasen['lehre/anrechnungen']='Exemptions';
 
 ?>

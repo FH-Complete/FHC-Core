@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Coodle extends APIv1_Controller
+class Coodle extends API_Controller
 {
 	/**
 	 * Coodle API constructor.

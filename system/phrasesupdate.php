@@ -571,6 +571,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'anzahlNichtGesendet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anzahl (nicht gesendet)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'amount (not sent)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'kontakt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -791,6 +811,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'notizDerSTGL',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz der STGL',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note of the study course director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'aktivitaet',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -843,6 +883,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'edited by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'bewerberVorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn bereits vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Applicant already available',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1494,7 +1554,26 @@ $phrases = array(
 			)
 		)
 	),
-
+	array(
+	'app' => 'core',
+	'category' => 'anrechnung',
+	'phrase' => 'benotungDerLV',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Benotung der Lehrveranstaltung',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Grading of the course',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
 
 	//***************************	CORE/filter
 	array(
@@ -8168,7 +8247,7 @@ Any unusual occurrences
 				'insertvon' => 'system'
 			)
 		)
-	),    
+	),
 	array(
 		'app' => 'core',
 		'category' => 'ui',
@@ -9920,7 +9999,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Deadline ist &uuml;berschritten',
+				'text' => 'Außerhalb der Einreichfrist',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -10675,6 +10754,26 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
+		'phrase' => 'empfehlungAm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => ' Empfehlung am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recommended on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
 		'phrase' => 'empfehlungenPositiv',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -11214,6 +11313,46 @@ Any unusual occurrences
 	),
 	array(
 		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'zgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'antragWurdeAngelegt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antrag wurde angelegt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application was created',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'anrechnung',
 		'phrase' => 'anrechnungGrundTooltipText',
 		'insertvon' => 'system',
@@ -11364,10 +11503,10 @@ Any unusual occurrences
 				'sprache' => 'German',
 				'text' => "Bitte laden Sie den Antrag in deutscher oder englischer Sprache für das
                 <ul>
-                    <li><u>Wintersemester spätestens bis 15. September</u></li>
+                    <li><u>Wintersemester spätestens bis 22. September</u></li>
                     <li><u>Sommersemester spätestens bis 22. Februar</u> hoch.</li>
                 </ul>
-                <br>Die Entscheidung über den Antrag erfolgt in der Regel innerhalb von zwei Wochen ab dem 15. September
+                <br>Die Entscheidung über den Antrag erfolgt in der Regel innerhalb von zwei Wochen ab dem 22. September
                 bzw. 22. Februar.
                 <br><br>Für jede Lehrveranstaltung ist ein gesonderter Antrag beizubringen.</li>",
 				'description' => '',
@@ -11377,10 +11516,10 @@ Any unusual occurrences
 				'sprache' => 'English',
 				'text' => "Please upload the application in German or English
                 <ul>
-                    <li><u>by September 15th for the winter semester</u></li>
+                    <li><u>by September 22nd for the winter semester</u></li>
                     <li><u>by February 22nd for the summer semester</u> at the latest.</li>
                 </ul>
-                <br>The decision on the application is usually made within two weeks from September 15 (winter semester) or February 22 (summer semester).
+                <br>The decision on the application is usually made within two weeks from September 22 (winter semester) or February 22 (summer semester).
                 <br><br>A separate application must be submitted for each course.</li>",
 				'description' => '',
 				'insertvon' => 'system'
@@ -11416,17 +11555,17 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => "Bitte laden Sie mehrere Nachweis-Dokumente zusammengefasst in einem PDF-Dokument hoch.
-					<br><br>Falls Sie für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwenden,
-					laden Sie bitte nur die für die Anrechnung relevanten Teile hoch oder markieren Sie diese entsprechend.
-					<br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, kann der Antrag auch abgelehnt werden.</span>",
+					<br><br>Falls für den Nachweis der Gleichwertigkeit in Bundesgesetzblättern veröffentlichte Lehrpläne (vgl. HTL, HAK…) verwendet werden,
+					sind die für die Anrechnung relevanten Teile entsprechend zu <b>markieren</b>.
+					<br><br><span class=\"text-danger\">Falls das nicht gemacht wird, wird der Antrag aus formalen Gründen <b>abgelehnt</b>.</span>",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => "Please combine and upload more than one verification document in one PDF document.
-				<br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please upload only the parts relevant for recognition or mark them accordingly.
-				<br><br><span class=\"text-danger\">If this information is not included, the application might be rejected.</span>",
+				<br><br>If you use curricula published in federal law gazettes (cf. HTL, HAK ...) to prove equivalence, please <b>mark</b> the parts relevant for recognition accordingly.
+				<br><br><span class=\"text-danger\">If this information is not included, the application must be <b>rejected</b>.</span>",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -11512,7 +11651,7 @@ array(
 				'sprache' => 'German',
 				'text' => "Die Entscheidung über den Antrag durch die Studiengangsleitung sollte
                 <ul>
-                    <li><u>innerhalb von zwei Wochen ab dem 15. September (Wintersemester)</u></li>
+                    <li><u>innerhalb von zwei Wochen ab dem 22. September (Wintersemester)</u></li>
                     <li><u>innerhalb von zwei Wochen ab dem 22. Februar (Sommersemester)</u> erfolgen.</li>
                 </ul>",
 				'description' => '',
@@ -11522,7 +11661,7 @@ array(
 				'sprache' => 'English',
 				'text' => "The decision on the application is usually made by the program director
                 <ul>
-                    <li><u>within two weeks from September 15 (winter semester)</u></li>
+                    <li><u>within two weeks from September 22 (winter semester)</u></li>
                     <li><u>within two weeks from February 22 (summer semester)</u>.</li>
                 </ul>",
 				'description' => '',
@@ -11856,6 +11995,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'empfehlungWurdeAngefordertAusnahmeWoKeineLektoren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlungsanfragen: {0}<br>Abgeschickt: {1}<br>Nicht abgeschickt: {2}<br>Grund: Keine Lektoren zu LV zugeteilt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Requests for recommendation: {0}<br>Sent: {1}<br>Not sent: {2}<br>Reason: No lectors assigned to the course yet.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'alleInBearbeitungSTGL',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -11873,7 +12032,866 @@ array(
 			)
 		)
 	),
-
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alleInBearbeitungLektor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Alle anzeigen, die auf Empfehlung von LektorIn warten.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Show all that are waiting for recommendation.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'zuruecknehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zur&uuml;cknehmen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Withdraw",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungAblehnungWirklichZuruecknehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Ihre Genehmigung / Ablehnung wirklich zurücknehmen?",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Do you really want to withdraw your approval / rejection?",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'erfolgreichZurueckgenommen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Erfolgreich zurückgenommen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Successfully withdrawn.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungsanforderungWirklichZuruecknehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlungsanforderung wirklich zurücknehmen?",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Do you really want to withdraw your request for recommendation?",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragNurImAktSS',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Der Antrag kann nur für das aktuelle Semester gestellt werden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "You only can apply for the actual study semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'neu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Neu",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "New",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'inBearbeitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "in Bearbeitung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "in process",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'antragWurdeGestellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Antrag wurde gestellt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Application was submitted successfully.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'antragBereitsGestellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Der Antrag wurde bereits gestellt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Application has already been submitted.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigungNegativEmpfehlungstextUebernehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlungstext des Lektors als Begr&uuml;ndung &uuml;bernehmen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Copy the lectors recommendation text as reason for the rejection.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorFelderFehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Daten fehlen.<br>Bitte f&uuml;llen Sie alle Formularfelder aus",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Missing data.<br>Please fill in all form fields",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorUploadFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dokument fehlt.<br>Bitte laden Sie noch die entsprechenden Dokumente hoch.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Missing document.<br>Please upload the required documents.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorNichtAusgefuehrt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Ihre Anfrage konnte nicht ausgefuehrt werden.<br>Bitte wenden Sie sich an den IT-Support.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Your request could not be processed.<br>Please contact the IT Support team.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungsanfrageAn',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Anfrage an",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Requested to",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'empfehlungsanfrageAm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Empfehlung angefragt am",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Requested on",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'maxZeichen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Max. Zeichen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Max. Characters",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'bestaetigungstext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hiermit bestätige ich, dass ich die relevanten <a href='https://moodle.technikum-wien.at/course/view.php?id=15449' target='_blank'>Prozess-Informationen</a> gelesen habe und bestätige hiermit auch die Vollständigkeit und Richtigkeit meiner Angaben.<br>Ich nehme zur Kenntnis, dass der Antrag nur einmal hochgeladen werden kann und dass Unterlagen nicht nachgereicht werden können.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "I hereby confirm that I have read the relevant <a href='https://moodle.technikum-wien.at/course/view.php?id=15449' target='_blank'>process information</a> and hereby also confirm the accuracy and completeness of the information I have provided above.<br>I acknowledge that the application can only be uploaded once and that documents cannot be submitted later.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorBestaetigungFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Ihre Bestaetigung fehlt.<br>Bitte aktivieren Sie das entsprechende Feld.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Your confirmation is missing.<br>Please confirm the corresponding field.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'neueAnrechnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Neue Anrechnung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "New Exemption",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'antragAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Antrag anlegen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Create Application",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'keineLVzugeteilt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dem Studierenden sind keine Lehrveranstaltungen zugeteilt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No courses assigned to this student yet.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'antragBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Antrag bearbeiten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Go to application",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragBenotungBlockiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Antrag kann aufgrund der vorhandenen Benotung nicht erstellt werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Application can not be created due to existing grade.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => '3gNachweis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zertifikat hochladen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "upload certificate",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'QrViaWebcam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "QR-Code via Webcam scannen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "scan qr code via webcam",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'oder',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "oder",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "or",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'ZertifikatAlsPdfHochladen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zertifikat als PDF hochladen (nur mit QR-Code, kein gescanntes Zertifikat)",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "upload certificate pdf (only with qrcode, no scanned certificate)",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'ValidierungsergebnisAktuellesGueltigkeitsdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Validierungsergebnis / gespeichertes Gültigkeitsdatum",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "validation result / stored valid date",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),        
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'DateiZiehenUndAblegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Datei hier hinziehen und ablegen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "drag & drop file here",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'KeinZugriffWebcam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zugriff auf die Webcam nicht möglich!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "webcam access denied",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),	
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'gueltigBis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "gültig bis",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "valid to",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'ZertifikatUngueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zertifikat ungültig",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "certificate invalid",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),		
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'ZertifikatKonnteNichtGeprueftWerden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Das Zertifikat konnte nicht verifiziert werden. Stellen Sie bitte sicher, dass ein QR-Code enthalten ist.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "certificate could not be verified. Please make sure it contains a qr-code.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'Laedt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Lädt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "loading",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => '3G',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Covid19 Gültigkeitsdatum",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "covid19 valid date",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'FehlerBeimSpeichernDesGueltigkeitsdatums',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fehler beim Speichern des Gültigkeitsdatum",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "error saving valid date",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'PersondatenInFH-CompleteStimmenNichtMitDemZertifikatUeberein',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Personendaten aus dem Zertifikat stimmen nicht dem angemeldeten Benutzer überein",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "person data from certificate does not match the logged in user",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'UploadSuccessful',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Das Gültigkeitsdatum wurde erfolgreich gespeichert.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "validity date has been successfully stored.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'UploadFailed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es wurde kein Gültigkeitsdatum gespeichert.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "validity date has not been stored.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'uploadbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hier kann ein Digitales COVID-Zertifikat der EU mit QR-Code selbst erfasst werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "an EU Digital COVID Certificate with QR code can be self registered here.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'manualbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Falls das Zertifikat keinen QR-Code enthält oder die Selbst-Erfassung fehlschlägt, kann das Zertifkat beim Empfang manuell erfasst werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "if the certificate does not contain a QR code or self registration fails, the certificate can be manually registered at the front desk.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'supportbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bei technischen Problemen kontaktieren Sie bitte: ",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "in case of technical issues please contact: ",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

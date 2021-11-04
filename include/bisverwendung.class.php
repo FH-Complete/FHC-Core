@@ -48,6 +48,7 @@ class bisverwendung extends basis_db
 	public $inkludierte_lehre;
 	public $zeitaufzeichnungspflichtig;
 	public $azgrelevant;
+	public $homeoffice;
 
 	public $ba1bez;
 	public $ba2bez;
@@ -124,6 +125,7 @@ class bisverwendung extends basis_db
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
+				$this->homeoffice = $this->db_parse_bool($row->homeoffice);
 				return true;
 			}
 			else
@@ -257,13 +259,22 @@ class bisverwendung extends basis_db
 		{
 			$azgrelevant = 'null';
 		}
+		if(is_bool($this->homeoffice))
+		{
+			$homeoffice = $this->db_add_param($this->homeoffice, FHC_BOOLEAN);
+		}
+		else
+		{
+			$homeoffice = 'null';
+		}
 
 		if($new)
 		{
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode,
 					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden,
-					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig, azgrelevant) VALUES (".
+					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig,
+					azgrelevant, homeoffice) VALUES (".
 			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
@@ -282,7 +293,8 @@ class bisverwendung extends basis_db
 				   $this->db_add_param($this->dv_art).','.
 				   $this->db_add_param($this->inkludierte_lehre).','.
 				   $zeitaufzeichnungspflichtig.','.
-				   $azgrelevant. ');';
+				   $azgrelevant.','.
+				   $homeoffice. ');';
 
 		}
 		else
@@ -307,7 +319,8 @@ class bisverwendung extends basis_db
 				  " dv_art=".$this->db_add_param($this->dv_art).",".
 				  " inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).",".
 				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.",".
-				  " azgrelevant =". $azgrelevant.
+				  " azgrelevant =". $azgrelevant.",".
+				  " homeoffice =". $homeoffice.
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
 
@@ -401,6 +414,7 @@ class bisverwendung extends basis_db
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
+				$obj->homeoffice = $this->db_parse_bool($row->homeoffice);
 				$this->result[] = $obj;
 			}
 			return true;
@@ -458,6 +472,7 @@ class bisverwendung extends basis_db
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
+				$obj->homeoffice = $this->db_parse_bool($row->homeoffice);
 
 				$this->result[] = $obj;
 			}
@@ -517,6 +532,7 @@ class bisverwendung extends basis_db
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
+				$obj->homeoffice = $this->db_parse_bool($row->homeoffice);
 
 				$this->result[] = $obj;
 			}
@@ -571,6 +587,7 @@ class bisverwendung extends basis_db
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
+				$this->homeoffice = $this->db_parse_bool($row->homeoffice);
 			}
 			return true;
 		}
@@ -625,6 +642,7 @@ class bisverwendung extends basis_db
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
+				$this->homeoffice = $this->db_parse_bool($row->homeoffice);
 			}
 			return true;
 		}
@@ -688,6 +706,7 @@ class bisverwendung extends basis_db
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
+				$obj->homeoffice = $this->db_parse_bool($row->homeoffice);
 
 				$this->result[] = $obj;
 			}

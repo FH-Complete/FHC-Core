@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zgvdoktor extends APIv1_Controller
+class Zgvdoktor extends API_Controller
 {
 	/**
 	 * Zgvdoktor API constructor.

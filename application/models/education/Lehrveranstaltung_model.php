@@ -169,18 +169,34 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLecturersByLv($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
-		$query = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid,
-	    			CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter
-	    		FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person
-	    		WHERE
-	    			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-					tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
-					tbl_person.person_id=tbl_benutzer.person_id AND
-					lehrveranstaltung_id=? AND
-					tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND
-					tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND
-					studiensemester_kurzbz=?) AS a
-					ORDER BY lvleiter DESC, nachname, vorname";
+		$query = "SELECT
+					*
+				FROM
+					(SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid,
+						CASE WHEN
+						EXISTS(
+							SELECT
+								1
+							FROM
+								lehre.tbl_lehreinheitmitarbeiter lvllem
+								JOIN lehre.tbl_lehreinheit lvlle USING(lehreinheit_id)
+							WHERE
+						 		lehrfunktion_kurzbz='LV-Leitung'
+								AND lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
+								AND studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz
+								AND mitarbeiter_uid=tbl_benutzer.uid
+						) THEN true ELSE false END as lvleiter
+		    		FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person
+		    		WHERE
+		    			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+						tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
+						tbl_person.person_id=tbl_benutzer.person_id AND
+						lehrveranstaltung_id=? AND
+						tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND
+						tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND
+						studiensemester_kurzbz=?
+					) AS a
+				ORDER BY lvleiter DESC, nachname, vorname";
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
 	}
@@ -273,7 +289,7 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($query, $parametersarray);
 	}
-	
+
 	/**
 	 * Gets Lehrveranstaltung and its Lehreinheiten (multiple rows possible).
 	 * Returns empty array if student has no Lehrveranstaltung.
@@ -290,7 +306,7 @@ class Lehrveranstaltung_model extends DB_Model
 			AND studiensemester_kurzbz = ?
 			AND lehrveranstaltung_id = ?;
 		';
-		
+
 		return $this->execQuery($query, array($uid, $studiensemester_kurzbz, $lehrveranstaltung_id));
 	}
 }

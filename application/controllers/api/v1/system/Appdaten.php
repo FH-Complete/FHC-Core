@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Appdaten extends APIv1_Controller
+class Appdaten extends API_Controller
 {
 	/**
 	 * Appdaten API constructor.

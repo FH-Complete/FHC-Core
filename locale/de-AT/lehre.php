@@ -2,7 +2,8 @@
 $this->phrasen['lehre/keineLektorenZugeordnet']='Derzeit sind keine Lektoren für dieses Fach zugeteilt';
 
 $this->phrasen['lehre/lehrveranstaltungsinformation']='Lehrveranstaltungsinformation';
-$this->phrasen['lehre/lehrbeauftragter']='Lehrbeauftragte(r)';
+$this->phrasen['lehre/lehrbeauftragter']='Lehrbeauftragte*r';
+$this->phrasen['lehre/lvleitung']='LV-Leiter*in';
 $this->phrasen['lehre/lvInfoBearbeiten']='Bearbeiten';
 
 $this->phrasen['lehre/semesterplan']='Semesterplan';
@@ -42,4 +43,5 @@ $this->phrasen['lehre/studienplan']='Studienplan';
 $this->phrasen['lehre/noteneingabedeaktiviert']='Noteneingabe deaktiviert';
 $this->phrasen['lehre/anerkennungNachgewiesenerKenntnisse']='Anerkennung nachgewiesener Kenntnisse';
 $this->phrasen['lehre/anrechnung']='Anrechnung';
+$this->phrasen['lehre/anrechnungen']='Anrechnungen';
 ?>

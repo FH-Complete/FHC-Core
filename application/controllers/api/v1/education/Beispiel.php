@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Beispiel extends APIv1_Controller
+class Beispiel extends API_Controller
 {
 	/**
 	 * Beispiel API constructor.

@@ -6,7 +6,7 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\', \'Interessent rejected\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\'';
 	$LOGDATA_NAME_PARKED = '\'Parked\'';
 	$LOGDATA_NAME_ONHOLD = '\'Onhold\'';
 	$LOGTYPE_KURZBZ = '\'Processstate\'';
@@ -14,6 +14,7 @@
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
+	$ORG_NAME = '\'InfoCenter\'';
 
 	$query = '
 		SELECT
@@ -33,7 +34,7 @@
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "LastAction",
 			(
@@ -42,7 +43,7 @@
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "LastActionType",
 			(
@@ -59,7 +60,7 @@
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "User/Operator",
 			(
@@ -185,6 +186,32 @@
 				 LIMIT 1
 			) AS "StgNichtAbgeschickt",
 			(
+				SELECT COUNT(*)
+				  FROM public.tbl_prestudentstatus pss
+				  JOIN public.tbl_prestudent ps USING(prestudent_id)
+				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+				   AND pss.bewerbung_abgeschicktamum IS NULL
+				   AND pss.bestaetigtam IS NULL
+				   AND ps.person_id = p.person_id
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+
+				   AND NOT EXISTS (
+					  SELECT 1
+						FROM tbl_prestudentstatus spss
+					   WHERE spss.prestudent_id = pss.prestudent_id
+						 AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+						 AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >
+						 (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
+					)
+				 LIMIT 1
+			) AS "AnzahlStgNichtAbgeschickt",
+			(
 				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
@@ -228,13 +255,14 @@
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
 				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				AND tbl_organisationseinheit.bezeichnung = '.$ORG_NAME.'
 				AND tbl_benutzerfunktion.uid = (
 					SELECT l.insertvon
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 					AND l.person_id = p.person_id
-					ORDER BY l.zeitpunkt DESC
+					ORDER BY l.log_id DESC
 					LIMIT 1
 				)
 				LIMIT 1 
@@ -322,6 +350,7 @@
 			ucfirst($this->p->t('global', 'abgeschickt')).' ('.$this->p->t('global', 'anzahl').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'gesendet').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'nichtGesendet').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'anzahlNichtGesendet').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
@@ -412,13 +441,13 @@
 				$datasetRaw->{'ZGVMNation'} = '-';
 			}
 
-			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'InfoCenter')
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)
 			{
-				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
 			}
 			else
 			{
-				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
 			}
 
 			return $datasetRaw;

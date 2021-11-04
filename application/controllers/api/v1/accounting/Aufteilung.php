@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Aufteilung extends APIv1_Controller
+class Aufteilung extends API_Controller
 {
 	/**
 	 * Aufteilung API constructor.

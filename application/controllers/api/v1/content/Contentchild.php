@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Contentchild extends APIv1_Controller
+class Contentchild extends API_Controller
 {
 	/**
 	 * Contentchild API constructor.

@@ -2,11 +2,10 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class DmsLib
+class DmsLib extends FHC_Controller
 {
 	const FILE_CONTENT_PROPERTY = 'file_content';
-
-	const FILE_INPUT_NAME = 'uploadfile'; // name of the HTML input tag containing the uploaded file
+	
 	private $UPLOAD_PATH = DMS_PATH; // temporary directory to store the upload file
 
 	/**
@@ -20,6 +19,34 @@ class DmsLib
 		$this->ci->load->model('content/Dms_model', 'DmsModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->ci->load->model('content/DmsFS_model', 'DmsFSModel');
+	}
+	
+	/**
+	 * Load a DMS Document.
+	 * If no version is particularly given, the latest version is loaded.
+	 *
+	 * @param $dms_id
+	 * @param integer $version
+	 * @return array
+	 */
+	public function load($dms_id, $version = null)
+	{
+		if (is_numeric($dms_id))
+		{
+			$this->ci->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
+			$this->ci->DmsModel->addOrder('version', 'DESC');
+			$this->ci->DmsModel->addLimit(1);
+			
+			if (!is_numeric($version))
+			{
+				return $this->ci->DmsModel->load($dms_id);
+			}
+			else
+			{
+				return $this->ci->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
+			}
+		}
+		return error('The parameter DMS ID must be a number');
 	}
 
 	/**
@@ -95,19 +122,20 @@ class DmsLib
 
 		return $result;
 	}
-
+	
 	/**
 	 * Uploads a document and saves it to DMS
 	 * @param $dms DMS assoc array
-	 * @param array $allowed_types  Default: all. Param example: array(jpg, pdf)
+	 * @param $field_name  Name of the HTML uploadfile input name attribute
+	 * @param array $allowed_types Default: all. Param example: array(jpg, pdf)
 	 * @return array
 	 */
-	public function upload($dms, $allowed_types = array('*'))
+	public function upload($dms, $field_name, $allowed_types = array('*'))
 	{
 		// Init upload configs
 		$this->_loadUploadLibrary($allowed_types);
 
-		if (!$this->ci->upload->do_upload(DmsLib::FILE_INPUT_NAME))
+		if (!$this->ci->upload->do_upload($field_name))
 		{
 			return error($this->ci->upload->display_errors());
 		}
@@ -132,46 +160,80 @@ class DmsLib
 		// return result of uploaded data
 		return success($upload_data); // data about the uploaded file
 	}
-
+	
 	/**
-	 * Download a document
+	 * Download a document.
+	 *
 	 * @param $dms_id
+	 * @param string $filename $filename If String is given, it will be used as filename on download
+	 * @param string $disposition [inline | attachment]
+	 *        Inline opens doc in new tab. Attachment displays download dialog box.
 	 */
-	public function download($dms_id)
+	public function download($dms_id, $filename = null, $disposition = 'inline')
 	{
-		if (!is_numeric($dms_id))
-		{
-			show_error('Wrong parameter');
-		}
-
-		$this->ci->DmsVersionModel->addSelect('filename');
-		$result = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
-
+		$result = $this->getFileInfo($dms_id);
+		
 		if (isError($result))
 		{
-			show_error(getError($result));
+			return error(getError($result));
 		}
 
-		$filename = $result->retval[0]->filename;
-		$file = DMS_PATH. $filename;
-
-		if (file_exists($file))
+		$fileObj = getData($result);
+		
+		// Change filename, if filename is provided
+		if (is_string($filename))
 		{
-			$finfo  = new finfo(FILEINFO_MIME);
-
-			header('Content-Description: File Transfer');
-			header('Content-Type: '.$finfo->file($file));
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
-			header('Content-Length: ' . filesize($file));
-			readfile($file);
-			exit;
+			$fileObj->name = $filename;
+		}
+		
+		// Add file disposition
+		if ($disposition == 'attachment')
+		{
+			$fileObj->disposition = 'attachment';
 		}
 		else
 		{
-			show_error('File does not exist');
+			$fileObj->disposition = 'inline';
 		}
+	
+		// Output file
+		if(!$this->outputFile($fileObj))
+		{
+			return error('Error on file output');
+		}
+	}
+	
+	/**
+	 * Get file information.
+	 *
+	 * @param $dms_id
+	 * @param integer $version
+	 * @return array with File Object.
+	 */
+	public function getFileInfo($dms_id, $version = null)
+	{
+		if (!is_numeric($dms_id))
+		{
+			return error('Wrong parameter');
+		}
+		
+		// Load file
+		$result = $this->load($dms_id, $version);
+
+		if (isError($result))
+		{
+			return error(getError($result));
+		}
+
+		// Store file information in fileObj
+		$fileObj = new StdClass();
+		$fileObj->filename = getData($result)[0]->filename;
+		$fileObj->file = DMS_PATH. getData($result)[0]->filename;
+		$fileObj->name = DMS_PATH. getData($result)[0]->name;   // original users filename
+		$fileObj->mimetype = DMS_PATH. getData($result)[0]->mimetype;
+		
+		return success($fileObj);
+
 	}
 
 	/**

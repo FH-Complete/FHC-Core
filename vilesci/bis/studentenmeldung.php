@@ -76,6 +76,7 @@ $stgart='';
 $orgform_code='';
 $status='';
 $datei='';
+$dateiNurBewerber='';
 $aktstatus='';
 $aktstatus_datum='';
 $mob='';
@@ -319,14 +320,17 @@ else
 
 if($result = $db->db_query($qry))
 {
-
-	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+	$header ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
   <ErhKz>".$erhalter."</ErhKz>
   <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
   <StudierendenBewerberMeldung>
     <Studiengang>
       <StgKz>".$stg_kz."</StgKz>";
+
+
+	$datei .= $header;
+	$dateiNurBewerber .= $header;
 
 	while($row = $db->db_fetch_object($result))
 	{
@@ -343,17 +347,29 @@ if($result = $db->db_query($qry))
 			$orgcodes = array_unique($orgform_code_array);
 			//Mischform
 			foreach($orgcodes as $code)
-				$datei.= GenerateXMLBewerberBlock($code);
+			{
+				$bewerberBlock=GenerateXMLBewerberBlock($code);
+				$datei.=$bewerberBlock;
+				$dateiNurBewerber.=$bewerberBlock;
+			}
 		}
 		else
-			$datei.= GenerateXMLBewerberBlock();
+		{
+			$bewerberBlock=GenerateXMLBewerberBlock();
+			$datei.=$bewerberBlock;
+			$dateiNurBewerber.=$bewerberBlock;
+		}
 	}
 }
 
-$datei.="
+$footer="
     </Studiengang>
   </StudierendenBewerberMeldung>
 </Erhalter>";
+
+$datei.=$footer;
+$dateiNurBewerber.=$footer;
+
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 	<head>
@@ -592,6 +608,12 @@ $dateiausgabe=fopen($ddd,'w');
 fwrite($dateiausgabe,$datei);
 fclose($dateiausgabe);
 
+$dddNurBew='bisdaten/bismeldung_bewerber_'.$ssem.'_Stg'.$stg_kz.'.xml';
+
+$dateiausgabe=fopen($dddNurBew,'w');
+fwrite($dateiausgabe,$dateiNurBewerber);
+fclose($dateiausgabe);
+
 $eee='bisdaten/tabelle_'.$ssem.'_Stg'.$stg_kz.'.html';
 
 $dateiausgabe=fopen($eee,'w');
@@ -602,6 +624,7 @@ if(file_exists($ddd))
 {
 	echo '<a href="archiv.php?meldung='.$ddd.'&html='.$eee.'&stg='.$stg_kz.'&sem='.$ssem.'&typ=studenten&action=archivieren">BIS-Meldung Stg '.$stg_kz.' archivieren</a><br>';
 	echo '<a href="'.$ddd.'" target="_blank" download>XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.'</a><br>';
+	echo '<a href="'.$dddNurBew.'" target="_blank" download>XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.' - nur Bewerberdaten</a><br>';
 }
 if(file_exists($eee))
 {
@@ -733,6 +756,29 @@ function GenerateXMLStudentBlock($row)
 	if ($row->student_uid != '')
 	{
 		$email = $row->student_uid. '@'. DOMAIN;
+	}
+
+	// private eMail-Adresse
+	$email_privat = '';
+	$qry_privmail = "
+		SELECT kontakt
+		FROM public.tbl_kontakt
+		WHERE zustellung = TRUE
+	  	AND kontakttyp = 'email'
+		AND person_id=". $db->db_add_param($row->pers_id). "
+		ORDER BY insertamum DESC
+		LIMIT 1;
+	";
+
+	if ($privmail_result = $db->db_query($qry_privmail))
+	{
+		if($db->db_num_rows($privmail_result) == 1)
+		{
+			if ($row_privmail = $db->db_fetch_object($privmail_result))
+			{
+				$email_privat = $row_privmail->kontakt;
+			}
+		}
 	}
 
 	if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
@@ -1240,7 +1286,9 @@ function GenerateXMLStudentBlock($row)
 			$datei .= "
 			<SVNR>" . $row->svnr . "</SVNR>";
 		}
-		if ($row->ersatzkennzeichen != '')
+
+		// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
+		if ($row->ersatzkennzeichen != '' && $row->svnr == null)
 		{
 			$datei .= "
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
@@ -1273,11 +1321,16 @@ function GenerateXMLStudentBlock($row)
 			";
 		}
 
+		if ($email_privat != '')
+		{
+			$datei .= "
+			<eMailAdresse>" . $email_privat . "</eMailAdresse>";
+		}
+
 		if ($email != '')
 		{
 			$datei .= "
-			<eMailAdresse>" . $email . "</eMailAdresse>
-			";
+			<eMailAdresseBE>" . $email . "</eMailAdresseBE>";
 		}
 
 		if(!$ausserordentlich)
@@ -1508,12 +1561,12 @@ function GenerateXMLStudentBlock($row)
 						if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
 						{
 							$datei.="
-							<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
+							<ECTSerworben>".round($rowio->ects_erworben)."</ECTSerworben>";
 						}
 						if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
 						{
 							$datei.="
-							<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
+							<ECTSangerechnet>".round($rowio->ects_angerechnet)."</ECTSangerechnet>";
 						}
 						foreach ($aufenthaltfoerderung_code_arr as $aufenthaltfoerderung_code)
 						{

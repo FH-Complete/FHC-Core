@@ -124,20 +124,20 @@ class InfoCenter extends Auth_Controller
 				'saveAbsage' => 'infocenter:rw',
 				'saveFreigabe' => 'infocenter:rw',
 				'getNotiz' => 'infocenter:r',
-				'saveNotiz' => 'infocenter:rw',
+				'saveNotiz' => array('infocenter:rw', 'lehre/zgvpruefung:rw'),
 				'updateNotiz' => 'infocenter:rw',
 				'reloadZgvPruefungen' => 'infocenter:r',
 				'reloadMessages' => 'infocenter:r',
 				'reloadDoks' => 'infocenter:r',
-				'reloadNotizen' => 'infocenter:r',
+				'reloadNotizen' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'reloadLogs' => 'infocenter:r',
-				'outputAkteContent' => 'infocenter:r',
-				'getPostponeDate' => 'infocenter:r',
+				'outputAkteContent' => array('infocenter:r', 'lehre/zgvpruefung:r'),
+				'getPostponeDate' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'park' => 'infocenter:rw',
 				'unpark' => 'infocenter:rw',
 				'setOnHold' => 'infocenter:rw',
-				'removeOnHold' => 'infocenter:rw',
-				'getStudienjahrEnd' => 'infocenter:r',
+				'removeOnHold' => array('infocenter:rw', 'lehre/zgvpruefung:rw'),
+				'getStudienjahrEnd' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'setNavigationMenuArrayJson' => 'infocenter:r',
 				'getAbsageData' => 'infocenter:r',
 				'saveAbsageForAll' => 'infocenter:rw'
@@ -297,6 +297,13 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$persondata = $this->_loadPersonData($person_id);
+
+		$checkPerson = $this->PersonModel->checkDuplicate($person_id);
+
+		if (isError($checkPerson)) show_error(getError($checkPerson));
+
+		$duplicate = array('duplicated' => getData($checkPerson));
+
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
 		$this->DokumentModel->addOrder('bezeichnung');
@@ -305,7 +312,8 @@ class InfoCenter extends Auth_Controller
 		$data = array_merge(
 			$persondata,
 			$prestudentdata,
-			$dokumentdata
+			$dokumentdata,
+			$duplicate
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
@@ -734,7 +742,7 @@ class InfoCenter extends Auth_Controller
 
 		if (hasData($lastStatus) && hasData($statusgrresult))
 		{
-			//check if still Interessent
+			//check if still Interessent, Bewerber or Wartender
 			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS
 				|| $lastStatus->retval[0]->status_kurzbz === self::BEWERBERSTATUS
 				|| $lastStatus->retval[0]->status_kurzbz === self::WARTENDER)
@@ -2134,17 +2142,18 @@ class InfoCenter extends Auth_Controller
 	{
 		$statusgrund = $this->input->post('statusgrund');
 		$studiengang = $this->input->post('studiengang');
+		$abgeschickt = $this->input->post('abgeschickt');
 		$personen = $this->input->post('personen');
 		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
 
-		if ($statusgrund === 'null' || $studiengang === 'null' || empty($personen))
-			$this->terminateWithJsonError("Bitte Statusgrund, Studiengang und Personen auswählen.");
+		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
+			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
 
 		foreach($personen as $person)
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester);
+			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
 
-			if(!hasData($prestudent))
+			if (!hasData($prestudent))
 				continue;
 
 			$prestudentData = getData($prestudent);

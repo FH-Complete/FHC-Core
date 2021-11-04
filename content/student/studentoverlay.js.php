@@ -1034,7 +1034,11 @@ function StudentAuswahl()
 	StudentGesamtNotenTreeloaded=false;
 
 	stsem = getStudiensemester();
-	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
+	
+	var url = buildStudentRDFURI({
+	  'prestudent_id': prestudent_id,
+	  'studiensemester_kurzbz': stsem
+	});
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 			getService(Components.interfaces.nsIRDFService);
@@ -1149,6 +1153,8 @@ function StudentAuswahl()
 	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
 	gsstudientyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gsstudientyp_kurzbz" ));
 	priorisierung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#priorisierung" ));
+	foerderrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#foerderrelevant" ));
+	standort_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#standort_code" ));
 
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
@@ -1186,6 +1192,8 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-priorisierung').value=priorisierung;
 	document.getElementById('student-prestudent-textbox-mentor').value=mentor;
 	document.getElementById('student-detail-menulist-gsstudientyp').value=gsstudientyp_kurzbz;
+	document.getElementById('student-prestudent-menulist-foerderrelevant').value=foerderrelevant;
+	document.getElementById('student-prestudent-menulist-bisstandort').value=standort_code;
 
 	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1701,12 +1709,14 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+	document.getElementById('student-prestudent-menulist-foerderrelevant').disabled=val;
 	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
 	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
 	document.getElementById('student-prestudent-textbox-priorisierung').disabled=val;
 	document.getElementById('student-prestudent-textbox-mentor').disabled=val;
 	document.getElementById('student-detail-menulist-gsstudientyp').disabled=val;
+	document.getElementById('student-prestudent-menulist-bisstandort').disabled=val;
 
 	// Studiengang des angeklickten Prestudenten ermitteln
 	var tree = document.getElementById('student-tree');
@@ -1779,6 +1789,8 @@ function StudentPrestudentSave()
 	priorisierung = document.getElementById('student-prestudent-textbox-priorisierung').value;
 	mentor = document.getElementById('student-prestudent-textbox-mentor').value;
 	gsstudientyp = document.getElementById('student-detail-menulist-gsstudientyp').value;
+	foerderrelevant = document.getElementById('student-prestudent-menulist-foerderrelevant').value;
+	standort_code = document.getElementById('student-prestudent-menulist-bisstandort').value;
 
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
@@ -1824,6 +1836,8 @@ function StudentPrestudentSave()
 	req.add('priorisierung', priorisierung);
 	req.add('mentor', mentor);
 	req.add('gsstudientyp_kurzbz', gsstudientyp);
+	req.add('foerderrelevant', foerderrelevant);
+	req.add('standort_code', standort_code);
 
 	var response = req.executePOST();
 
@@ -2565,10 +2579,47 @@ function StudentKontoFilter()
 }
 
 // ****
+// * Generiert eine student.rdf URI
+// ****
+function buildStudentRDFURI(queryparams, tree) 
+{
+  var baseurl = "<?php echo APP_ROOT; ?>rdf/student.rdf.php";
+  if ( typeof tree !== "undefined" ) 
+  {
+    var col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
+    queryparams.orgform = tree.view.getCellText(tree.currentIndex,col);
+  }
+  return _buildURI(baseurl, queryparams);
+}
+
+// ****
+// * Generiert aus einer BasisURL und einem Dictionary von Parametern eine URI
+// ****
+function _buildURI(baseurl, queryparams) 
+{
+    var str = [];
+    var url = baseurl;
+    for (var p in queryparams) 
+    {
+      if ( queryparams.hasOwnProperty(p) && queryparams[p].length > 0 ) 
+      {
+	str.push(encodeURIComponent(p) + "=" + encodeURIComponent(queryparams[p]));
+      }
+    }
+    var querystring = str.join("&");
+    if ( querystring.length > 0 ) 
+    {
+      url = url + '?' + querystring + '&' + gettimestamp();
+    }
+    return url;
+}
+
+// ****
 // * Setzt im Studententree einen vordefinierten Filter
 // ****
 function StudentKontoFilterStudenten(filter)
 {
+	//alert(filter);
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-verband');
 
@@ -2591,12 +2642,26 @@ function StudentKontoFilterStudenten(filter)
 	var gruppe = getTreeCellText(tree, 'gruppe', tree.currentIndex);
 	var typ = getTreeCellText(tree, 'typ', tree.currentIndex);
 	var stsem = getTreeCellText(tree, 'stsem', tree.currentIndex);
-
+	
 	if(stsem=='')
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&buchungstyp="+buchungstyp+"&"+gettimestamp();
+	      
+	var url = buildStudentRDFURI({
+	  'studiengang_kz': stg_kz,
+	  'semester': sem,
+	  'verband': ver,
+	  'gruppe': grp,
+	  'gruppe_kurzbz': gruppe,
+	  'studiensemester_kurzbz': stsem,
+	  'typ': typ,
+	  'filter2': filter,
+	  'buchungstyp': buchungstyp
+	}, tree);
+	
+	console.log(url);
+	
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -2614,6 +2679,7 @@ function StudentKontoFilterStudenten(filter)
 		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
 	}
 
+	//alert(url);
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentTreeDatasource = rdfService.GetDataSource(url);
 	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -2655,7 +2721,18 @@ function StudentKontoFilterBuchungstyp()
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=buchungstyp;"+filter+"&"+gettimestamp();
+
+	var url = buildStudentRDFURI({
+	  'studiengang_kz': stg_kz,
+	  'semester': sem,
+	  'verband': ver,
+	  'gruppe': grp,
+	  'gruppe_kurzbz': gruppe,
+	  'studiensemester_kurzbz': stsem,
+	  'typ': typ,
+	  'filter2': 'buchungstyp;' + filter
+	}, tree);
+	
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -5318,6 +5395,7 @@ function StudentAnrechnungAuswahl()
 	lehrveranstaltung_id_kompatibel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id_kompatibel" ));
 	genehmigt_von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#genehmigt_von" ));
 	anzahl_notizen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_notizen" ));
+	status = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#status" ));
 
 	// Studiengang ermitteln
 	var tree = document.getElementById('student-tree');
@@ -5436,8 +5514,10 @@ function StudentSuche()
 		document.getElementById('tree-verband').view.selection.clearSelection();
 
 		//Datasource setzten und Felder deaktivieren
-		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
-
+		var url = buildStudentRDFURI({
+		  'filter': filter
+		});
+	
 		var treeStudent=document.getElementById('student-tree');
 
 		try

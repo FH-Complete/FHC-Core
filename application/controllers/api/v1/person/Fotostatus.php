@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Fotostatus extends APIv1_Controller
+class Fotostatus extends API_Controller
 {
 	/**
 	 * Fotostatus API constructor.

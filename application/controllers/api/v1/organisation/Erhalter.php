@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Erhalter extends APIv1_Controller
+class Erhalter extends API_Controller
 {
 	/**
 	 * Erhalter API constructor.

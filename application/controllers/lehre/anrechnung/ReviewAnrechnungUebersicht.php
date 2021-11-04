@@ -62,19 +62,13 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 	
 	public function index()
 	{
+		// Get study semester
 		$studiensemester_kurzbz = $this->input->get('studiensemester');
 
-		if (!is_string($studiensemester_kurzbz))
+		if (isEmptyString($studiensemester_kurzbz))
 		{
-			$studiensemester = $this->StudiensemesterModel->getNearest();
-			if (hasData($studiensemester))
-			{
-				$studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;
-			}
-			elseif (isError($studiensemester))
-			{
-				show_error(getError($studiensemester));
-			}
+			$result = $this->StudiensemesterModel->getNearest();
+			$studiensemester_kurzbz = getData($result)[0]->studiensemester_kurzbz;
 		}
 		
 		$viewData = array(
@@ -95,24 +89,17 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-		
-		// Get statusbezeichnung for 'inProgressDP'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressDP = getData($this->AnrechnungstatusModel->load('inProgressDP'))[0];
-		$inProgressDP = getUserLanguage() == 'German'
-			? $inProgressDP->bezeichnung_mehrsprachig[0]
-			: $inProgressDP->bezeichnung_mehrsprachig[1];
 
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id'])))
+			if($this->anrechnunglib->recommendAnrechnung($item['anrechnung_id']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'true',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP
+					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
 				);
 			}
 		}
@@ -133,7 +120,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 	
@@ -149,24 +136,16 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 		
-		// Get statusbezeichnung for 'inProgressDP'
-		$this->AnrechnungstatusModel->addSelect('bezeichnung_mehrsprachig');
-		$inProgressDP = getData($this->AnrechnungstatusModel->load('inProgressDP'))[0];
-		$inProgressDP = getUserLanguage() == 'German'
-			? $inProgressDP->bezeichnung_mehrsprachig[0]
-			: $inProgressDP->bezeichnung_mehrsprachig[1];
-		
 		foreach ($data as $item)
 		{
 			// Approve Anrechnung
-			if(getData($this->anrechnunglib
-				->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung'])))
+			if($this->anrechnunglib->dontRecommendAnrechnung($item['anrechnung_id'], $item['begruendung']))
 			{
 				$json[]= array(
 					'anrechnung_id'         => $item['anrechnung_id'],
 					'empfehlung_anrechnung' => 'false',
 					'status_kurzbz'         => self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL,
-					'status_bezeichnung'    => $inProgressDP
+					'status_bezeichnung'    => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
 				);
 			}
 		}
@@ -184,7 +163,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Empfehlungen wurden nicht durchgeführt');
+			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 	
@@ -203,7 +182,11 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		// Check if user is entitled to read dms doc
 		self::_checkIfEntitledToReadDMSDoc($dms_id);
 		
-		$this->dmslib->download($dms_id);
+		// Set filename to be used on downlaod
+		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
+		
+		// Download file
+		$this->dmslib->download($dms_id, $filename);
 	}
 	
 	

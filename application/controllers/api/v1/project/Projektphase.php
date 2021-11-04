@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Projektphase extends APIv1_Controller
+class Projektphase extends API_Controller
 {
 	/**
 	 * Projektphase API constructor.

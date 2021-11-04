@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Paabgabe extends APIv1_Controller
+class Paabgabe extends API_Controller
 {
 	/**
 	 * Paabgabe API constructor.

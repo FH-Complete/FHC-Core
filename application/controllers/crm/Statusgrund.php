@@ -129,6 +129,7 @@ class Statusgrund extends Auth_Controller
 		$aktiv = $this->input->post("aktiv") != null && $this->input->post("aktiv") == "on" ? true : false;
 		$bezeichnung_mehrsprachig = $this->input->post("bezeichnung_mehrsprachig");
 		$beschreibung = $this->input->post("beschreibung");
+		$statusgrund_kurzbz = $this->input->post("statusgrund_kurzbz");
 
 		for ($i = 0; $i < count($bezeichnung_mehrsprachig); $i++)
 		{
@@ -177,7 +178,8 @@ class Statusgrund extends Auth_Controller
 		$data = array(
 			"aktiv" => $aktiv,
 			"bezeichnung_mehrsprachig" => $bezeichnung_mehrsprachig,
-			"beschreibung" => $beschreibung
+			"beschreibung" => $beschreibung,
+			"statusgrund_kurzbz" => $statusgrund_kurzbz
 		);
 
 		$statusgrund = $this->StatusgrundModel->update($statusgrund_id, $data);
@@ -196,6 +198,7 @@ class Statusgrund extends Auth_Controller
 		$bezeichnung_mehrsprachig = $this->input->post("bezeichnung_mehrsprachig");
 		$beschreibung = $this->input->post("beschreibung");
 		$status_kurzbz = $this->input->post("status_kurzbz");
+		$statusgrund_kurzbz = $this->input->post("statusgrund_kurzbz");
 
 		for ($i = 0; $i < count($bezeichnung_mehrsprachig); $i++)
 		{
@@ -245,7 +248,8 @@ class Statusgrund extends Auth_Controller
 			"status_kurzbz" => $status_kurzbz,
 			"aktiv" => $aktiv,
 			"bezeichnung_mehrsprachig" => $bezeichnung_mehrsprachig,
-			"beschreibung" => $beschreibung
+			"beschreibung" => $beschreibung,
+			"statusgrund_kurzbz" => $statusgrund_kurzbz
 		);
 
 		$statusgrund = $this->StatusgrundModel->insert($data);

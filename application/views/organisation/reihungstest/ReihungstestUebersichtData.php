@@ -106,7 +106,7 @@
 				public.tbl_reihungstest
 				LEFT JOIN public.tbl_studiengang using(studiengang_kz)
 			WHERE
-				datum>now()-'5 months'::interval
+				datum>now()-'12 months'::interval
 			ORDER BY datum desc
 		) data
 		",

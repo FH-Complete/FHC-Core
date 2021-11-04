@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zeitwunsch extends APIv1_Controller
+class Zeitwunsch extends API_Controller
 {
 	/**
 	 * Zeitwunsch API constructor.

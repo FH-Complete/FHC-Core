@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ortraumtyp extends APIv1_Controller
+class Ortraumtyp extends API_Controller
 {
 	/**
 	 * Ortraumtyp API constructor.

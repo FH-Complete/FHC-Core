@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Semesterwochen extends APIv1_Controller
+class Semesterwochen extends API_Controller
 {
 	/**
 	 * Semesterwochen API constructor.

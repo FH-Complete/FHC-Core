@@ -58,15 +58,30 @@ class JobsQueueLib
 
 	/**
 	 * To get the oldest added jobs using the given job type
+	 * It is eventually specify the maximum amount of jobs to be retrieved
 	 */
-	public function getOldestJob($type)
+	public function getOldestJobs($type, $maxAmount = null)
 	{
 		$this->_ci->JobsQueueModel->resetQuery();
 
 		$this->_ci->JobsQueueModel->addOrder('creationtime', 'ASC');
-		$this->_ci->JobsQueueModel->addLimit('1');
+
+		// If the maximum amount of jobs to retrieve have been specified
+		if (is_numeric($maxAmount)) $this->_ci->JobsQueueModel->addLimit($maxAmount);
 
 		return $this->_ci->JobsQueueModel->loadWhere(array('status' => self::STATUS_NEW, 'type' => $type));
+	}
+
+	/**
+	 * To get all the jobs specified by the given parameters
+	 */
+	public function getJobsByTypeStatus($type, $status)
+	{
+		$this->_ci->JobsQueueModel->resetQuery();
+
+		$this->_ci->JobsQueueModel->addOrder('creationtime', 'DESC');
+
+		return $this->_ci->JobsQueueModel->loadWhere(array('status' => $status, 'type' => $type));
 	}
 
 	/**
@@ -219,6 +234,23 @@ class JobsQueueLib
 		if ($errorOccurred) return error($results);
 
 		return success($results); // otherwise return results in a success object
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Public static methods
+
+	/**
+	 * Utility method to generate a job with the given parameters and return it inside an array
+	 * ready to be used by addNewJobsToQueue and updateJobsQueue
+	 */
+	public static function generateJobs($status, $input)
+	{
+		$job = new stdClass();
+
+		$job->{self::PROPERTY_STATUS} = $status;
+		$job->{self::PROPERTY_INPUT} = $input;
+
+		return array($job);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

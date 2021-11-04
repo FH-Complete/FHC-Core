@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Bisfunktion extends APIv1_Controller
+class Bisfunktion extends API_Controller
 {
 	/**
 	 * Bisfunktion API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Contentlog extends APIv1_Controller
+class Contentlog extends API_Controller
 {
 	/**
 	 * Contentlog API constructor.
