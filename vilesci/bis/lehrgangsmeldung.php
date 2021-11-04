@@ -242,29 +242,37 @@ if($result = $db->db_query($qry))
 			$zustell_strasse = $rowzustelladr->strasse;
 			$zustell_nation = $rowzustelladr->nation;
 		}
-		
-		// eMail-Adresse
-		$qry_mail = "
+
+		// FH eMail-Adresse FH aus UID@Domain
+		$email = '';
+		if ($row->student_uid != '')
+		{
+			$email = $row->student_uid. '@'. DOMAIN;
+		}
+
+		// private eMail-Adresse
+		$email_privat = '';
+		$qry_privmail = "
 			SELECT kontakt
 			FROM public.tbl_kontakt
-			WHERE kontakttyp = 'email'
-			AND zustellung = TRUE
-			AND person_id = ". $db->db_add_param($row->pers_id). "
-			ORDER BY insertamum DESC LIMIT 1;
+			WHERE zustellung = TRUE
+			AND kontakttyp = 'email'
+			AND person_id=". $db->db_add_param($row->pers_id). "
+			ORDER BY insertamum DESC
+			LIMIT 1;
 		";
-		
-		$email = '';
-		if ($result_email = $db->db_query($qry_mail))
+
+		if ($privmail_result = $db->db_query($qry_privmail))
 		{
-			if($db->db_num_rows($result_email) == 1)
+			if($db->db_num_rows($privmail_result) == 1)
 			{
-				if($row_mail = $db->db_fetch_object($result_email))
+				if ($row_privmail = $db->db_fetch_object($privmail_result))
 				{
-					$email = $row_mail->kontakt;
+					$email_privat = $row_privmail->kontakt;
 				}
 			}
 		}
-		
+
 		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -620,7 +628,8 @@ if($result = $db->db_query($qry))
 					$datei.="
 				<SVNR>".$row->svnr."</SVNR>";
 				}
-				if($row->ersatzkennzeichen!='')
+				// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
+				if($row->ersatzkennzeichen!='' && $row->svnr == null)
 				{
 					$datei.="
 				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
@@ -648,7 +657,8 @@ if($result = $db->db_query($qry))
 				}
 			
 				$datei.="
-				<eMailAdresse>". $email. "</eMailAdresse>
+				<eMailAdresse>". $email_privat. "</eMailAdresse>
+				<eMailAdresseBE>". $email. "</eMailAdresseBE>
 				<ZugangCode>".$row->zgv_code."</ZugangCode>
 				<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
 

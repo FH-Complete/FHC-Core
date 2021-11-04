@@ -891,6 +891,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'bewerberVorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn bereits vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Applicant already available',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'nichtAbgeschickt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -12560,13 +12580,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Zertifikat als PDF hochladen",
+				'text' => "Zertifikat als PDF hochladen (nur mit QR-Code, kein gescanntes Zertifikat)",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "upload certificate pdf",
+				'text' => "upload certificate pdf (only with qrcode, no scanned certificate)",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12580,13 +12600,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Validierungsergebnis / aktuelles Gültigkeitsdatum",
+				'text' => "Validierungsergebnis / gespeichertes Gültigkeitsdatum",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "validation result / current valid date",
+				'text' => "validation result / stored valid date",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12680,13 +12700,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Das Zertifikat konnte nicht verifiziert werden.",
+				'text' => "Das Zertifikat konnte nicht verifiziert werden. Stellen Sie bitte sicher, dass ein QR-Code enthalten ist.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "certificate could not be verified.",
+				'text' => "certificate could not be verified. Please make sure it contains a qr-code.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12767,6 +12787,106 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "person data from certificate does not match the logged in user",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'UploadSuccessful',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Das Gültigkeitsdatum wurde erfolgreich gespeichert.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "validity date has been successfully stored.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'UploadFailed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es wurde kein Gültigkeitsdatum gespeichert.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "validity date has not been stored.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'uploadbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hier kann ein Digitales COVID-Zertifikat der EU mit QR-Code selbst erfasst werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "an EU Digital COVID Certificate with QR code can be self registered here.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'manualbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Falls das Zertifikat keinen QR-Code enthält oder die Selbst-Erfassung fehlschlägt, kann das Zertifkat beim Empfang manuell erfasst werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "if the certificate does not contain a QR code or self registration fails, the certificate can be manually registered at the front desk.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
+		'phrase' => 'supportbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bei technischen Problemen kontaktieren Sie bitte: ",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "in case of technical issues please contact: ",
 				'description' => '',
 				'insertvon' => 'system'
 			)
