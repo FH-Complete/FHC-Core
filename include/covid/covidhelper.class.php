@@ -137,7 +137,7 @@ class CovidHelper extends basis_db
 	
 	protected function fetchCovidValidStatus() 
 	{
-		if( !($this->isUdfDefined && is_array($this->uids)) ) 
+		if( !($this->isUdfDefined && is_array($this->uids) && (count($this->uids) > 0)) ) 
 		{
 			return;
 		}
