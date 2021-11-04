@@ -2181,6 +2181,26 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'matrikelnummer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Matrikelnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Matriculation number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 	//****************	CORE/lehre
 	array(
@@ -12632,7 +12652,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),        
+	),
 	array(
 		'app' => 'core',
 		'category' => 'eucovidqr',
@@ -12672,7 +12692,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),	
+	),
 	array(
 		'app' => 'core',
 		'category' => 'eucovidqr',
@@ -12712,7 +12732,7 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),		
+	),
 	array(
 		'app' => 'core',
 		'category' => 'eucovidqr',
