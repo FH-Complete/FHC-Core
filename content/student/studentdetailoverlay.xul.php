@@ -76,7 +76,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
 							<?php $hideBpk = $rechte->isBerechtigt('student/bpk') ? '':' hidden="true"'; ?>
                             <label value="BPK" control="student-detail-textbox-bpk"<?php echo $hideBpk; ?>/>
-                            <hbox><textbox id="student-detail-textbox-bpk" disabled="true" maxlength="255"<?php echo $hideBpk; ?>/></hbox>
+                            <hbox><textbox id="student-detail-textbox-bpk" disabled="true" maxlength="28" size="30"<?php echo $hideBpk; ?>/></hbox>
 						</row>
 						<row>
 							<label value="Anrede" control="student-detail-textbox-anrede"/>
