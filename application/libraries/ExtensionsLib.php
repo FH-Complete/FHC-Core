@@ -91,6 +91,13 @@ class ExtensionsLib
 			$uploadData = $this->_uploadExtension(); // perform the upload of the file and returns info about it
 		}
 
+		// If the given filename is the upper directory or the current one
+		if (trim($uploadData->fullPath) == '..' || trim($uploadData->fullPath) == '.')
+		{
+			$this->_printFailure('wrong file name: / has to be escaped with %2F');
+			$uploadData = null; // then it is a wrong one!
+		}
+
 		if ($uploadData != null) // if no error occurred
 		{
 			$this->_extractExtension($uploadData->fullPath); // extract the archive of the uploaded extension
@@ -321,6 +328,16 @@ class ExtensionsLib
 			$this->_printFailure('provided an invalid archive');
 		}
 		catch (PharException $pe)
+		{
+			$this->_errorOccurred = true;
+			$this->_printFailure('phar error occurred');
+		}
+		catch (InvalidArgumentException $iae)
+		{
+			$this->_errorOccurred = true;
+			$this->_printFailure('wrong file name');
+		}
+		catch (Exception $e)
 		{
 			$this->_errorOccurred = true;
 			$this->_printFailure('generic error occurred, check logs');
