@@ -859,7 +859,7 @@ function MitarbeiterSave()
 
 	if(!checkAlias(alias))
 	{
-		alert('Der Alias darf keine Sonderzeichen außer ._-& ; enthalten');
+		alert('Der Alias darf keine Sonderzeichen außer ._- enthalten.');
 		return false;
 	}
 

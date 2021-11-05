@@ -426,7 +426,7 @@ function setVariable(variable, wert)
 function checkAlias(alias)
 {
 
-	if (/^[a-z0-9 . _ - & ;]*$/i.test(alias) === false)
+	if (/^[a-z0-9 . _ -]*$/i.test(alias) === false)
 	{
 		return false;
 	}
