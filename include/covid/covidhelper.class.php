@@ -74,11 +74,14 @@ class CovidHelper extends basis_db
 				$html = '<i title="' . $this->getTitle($uid) . '" class="fa fa-check-circle" aria-hidden="true" style="color: green; margin-right: .5em;"></i>';
 				break;
 			case self::STATUS_NOTOK:
+			case self::STATUS_UNKNOWN:
 				$html = '<i title="' . $this->getTitle($uid) . '" class="fa fa-times-circle" aria-hidden="true" style="color: red; margin-right: .5em;"></i>';
 				break;
+/*
 			case self::STATUS_UNKNOWN:
 				$html = '<i title="' . $this->getTitle($uid) . '" class="fa fa-question-circle" aria-hidden="true" style="color: grey; margin-right: .5em;"></i>';
 				break;
+ */
 			default:
 				$html = '';
 				break;
@@ -96,11 +99,14 @@ class CovidHelper extends basis_db
 				$class = 'success';
 				break;
 			case self::STATUS_NOTOK:
+			case self::STATUS_UNKNOWN:
 				$class = 'danger';
 				break;
+/*
 			case self::STATUS_UNKNOWN:
 				$class = 'warning';
 				break;
+ */
 			default:
 				$class = '';
 				break;
@@ -118,11 +124,14 @@ class CovidHelper extends basis_db
 				$title = self::TITLE_OK;
 				break;
 			case self::STATUS_NOTOK:
+			case self::STATUS_UNKNOWN:
 				$title = self::TITLE_NOTOK;
 				break;
+/*
 			case self::STATUS_UNKNOWN:
 				$title = self::TITLE_UNKNOWN;
 				break;
+ */
 			default:
 				$title = '';
 				break;
