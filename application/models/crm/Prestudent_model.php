@@ -560,7 +560,7 @@ class Prestudent_model extends DB_Model
 						o.bezeichnung,
 						(CASE
 							WHEN sg.typ = \'b\' THEN ps.prestudent_id
-							WHEN sg.typ = \'m\' THEN p.prestudent_id
+							WHEN sg.typ = \'m\' THEN ps.prestudent_id
             				ELSE NULL
        					END) AS prestudent_id
 					FROM public.tbl_prestudent p
@@ -581,7 +581,7 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery($query, array($person_id));
 	}
-	
+
 	/**
 	 * Get latest ZGV Bezeichnung of Prestudent.
 	 *
@@ -593,19 +593,19 @@ class Prestudent_model extends DB_Model
 		{
 			show_error('Prestudent_id is not numeric.');
 		}
-		
+
 		$language_index = getUserLanguage() == 'German' ? 0 : 1;
-	
+
 		$this->addSelect('
 			COALESCE(
 				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $language_index . ',
 				array_to_json(zgv.bezeichnung::varchar[])->>' . $language_index . '
 			) AS bezeichnung'
 		);
-		
+
 		$this->addJoin('bis.tbl_zgv zgv', 'zgv_code', 'LEFT');
 		$this->addJoin('bis.tbl_zgvmaster zgvmaster', 'zgvmas_code', 'LEFT');
-		
+
 		return $this->loadWhere(array(
 			'prestudent_id' => $prestudent_id
 		));
@@ -629,7 +629,7 @@ class Prestudent_model extends DB_Model
 			$query .= " NOT EXISTS";
 
 		$query .= " (SELECT 1 FROM public.tbl_prestudentstatus spss
-					JOIN public.tbl_prestudent sps USING(prestudent_id) 
+					JOIN public.tbl_prestudent sps USING(prestudent_id)
 					WHERE sps.prestudent_id = ps.prestudent_id
 					AND spss.bewerbung_abgeschicktamum IS NOT NULL)";
 
