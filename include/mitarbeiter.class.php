@@ -1128,7 +1128,8 @@ class mitarbeiter extends benutzer
 				}
 				else
 				{
-					return $this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+                                        $this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+                                        $return = false;
 				}
 			}
 		}
