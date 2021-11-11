@@ -62,7 +62,7 @@ var InfocenterPersonDataset = {
 			'<i class="fa fa-chevron-left"></i>' +
 			'</button>&nbsp;' +
 			infocenter_studiensemester +
-			'&nbsp;<button class="btn btn-default btn-sm incStudiensemester">' +
+			'&nbsp;<button class="btn btn-default btn-xs incStudiensemester">' +
 			'<i class="fa fa-chevron-right"></i>' +
 			'</button>';
 
