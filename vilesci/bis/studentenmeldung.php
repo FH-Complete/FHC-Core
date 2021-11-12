@@ -990,6 +990,16 @@ function GenerateXMLStudentBlock($row)
 				else if($rowstatus->status_kurzbz=="Abbrecher" )
 				{
 					$status=4;
+					// Checken, ob der Student Abbrecher vor der Meldung war und noch nie gemeldet wurde
+					$qryAbbrecher = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id = ".$db->db_add_param($row->prestudent_id)." AND status_kurzbz='Student' AND datum <=".$db->db_add_param($bisprevious);
+					if($resultAbbrecher = $db->db_query($qryAbbrecher))
+					{
+						if ($db->db_num_rows($resultAbbrecher) == 0)
+						{
+							$error_log .= (!empty($error_log) ? ', ' : '')."Der Student ist Abbrecher vor der ersten BIS-Meldung. Bitte im FAS das Hakerl bei \"Bismelden\" im Reiter \"Prestudent\" entfernen";
+
+						}
+					}
 				}
 				else
 				{
@@ -1262,7 +1272,7 @@ function GenerateXMLStudentBlock($row)
 		if($error_log_hinweis != '')
 		{
 			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
-			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n\n";
 			$error_log_hinweis = '';
 		}
 
