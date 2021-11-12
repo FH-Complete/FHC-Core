@@ -68,4 +68,27 @@ class Konto_model extends DB_Model
 			return error('Failed to load Payment');
 		}
 	}
+
+	public function getLastStudienbeitrag($uid, $buchungstypen)
+	{
+		$query = 'SELECT konto.studiensemester_kurzbz
+					FROM public.tbl_konto konto,
+						public.tbl_benutzer,
+						public.tbl_student
+					WHERE tbl_benutzer.uid = \'' . $uid . '\'
+					AND tbl_benutzer.uid = tbl_student.student_uid
+					AND tbl_benutzer.person_id = konto.person_id
+					AND konto.studiengang_kz = tbl_student.studiengang_kz
+					AND konto.buchungstyp_kurzbz IN (\'' . $buchungstypen . '\')
+					AND 0 = (
+						SELECT sum(betrag)
+						FROM public.tbl_konto skonto
+						WHERE skonto.buchungsnr = konto.buchungsnr_verweis
+						OR skonto.buchungsnr_verweis = konto.buchungsnr_verweis
+						)
+					ORDER BY buchungsnr DESC LIMIT 1;
+					';
+
+		return $this->execQuery($query);
+	}
 }

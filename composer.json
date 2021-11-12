@@ -309,7 +309,9 @@
 		"scottjehl/Respond": "1.4.2",
 
 		"tapmodo/Jcrop": "2.0.4",
-		"tomazdragar/SimpleCropper": "1.0"
+		"tomazdragar/SimpleCropper": "1.0",
+
+		"chillerlan/php-qrcode": "2.0.*"
 	},
 	"config": {
 		"bin-dir": "vendor/bin"
