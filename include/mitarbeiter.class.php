@@ -1091,6 +1091,55 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
+	 * Gibt UID des letzten Vorgesetzten zurück
+	 * @param string $uid Mitarbeiter.
+	 * @return uid letzter Vorgesetzter
+	 */
+	public function getLastVorgesetzter($uid = null)
+	{
+		$return = false;
+		if (is_null($uid))
+			$uid = $this->uid;
+
+		$qry = "SELECT
+					uid  as vorgesetzter
+				FROM
+					public.tbl_benutzerfunktion
+				WHERE
+					funktion_kurzbz='Leitung' AND
+					(datum_von is null OR datum_von<=now()) AND
+					(datum_bis is null OR datum_bis>=now()) AND
+					oe_kurzbz in (SELECT oe_kurzbz
+								  FROM public.tbl_benutzerfunktion
+								  WHERE
+									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)."
+				ORDER BY datum_von DESC
+				LIMIT 1
+								  );
+				";
+
+		if ($this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object())
+			{
+				if ($row->vorgesetzter != '')
+				{
+					$return = $this->vorgesetzter = $row->vorgesetzter;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+					$return = false;
+				}
+			}
+		}
+
+		return $return;
+	}
+
+
+
+	/**
 	 * Gibt ein Array mit den UIDs der aktiv beschäftigten Untergebenen zurueck
 	 * @param string $uid	UID.
 	 * @param boolean $include_OE_childs	Wenn true, dann werden auch alle aktiv
