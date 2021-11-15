@@ -1740,6 +1740,20 @@ if ($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants
 }
 
 
+// SELECT Berechtigung fuer web User erteilen fuer tbl_mobilitaet
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_mobilitaet' AND table_schema='bis' AND grantee='web' AND privilege_type='SELECT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT SELECT ON bis.tbl_mobilitaet TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>bis.tbl_mobilitaet Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'SELECT Recht fuer bis.tbl_mobilitaet fuer web user gesetzt ';
+	}
+}
+
 /**
  * Kommentare fuer Datenbanktabellen
  */
