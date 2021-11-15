@@ -80,7 +80,7 @@ header('Content-Type: text/html; charset=utf-8');
 <!<!doctype html>
 <html>
 <head>
-	<title>FHC - Covidliste</title>
+	<title>FHC - Nachweisliste</title>
 	<link rel="stylesheet" type="text/css" href="../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
 	<link href="../../../vendor/components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>	
 </head>
@@ -90,7 +90,7 @@ header('Content-Type: text/html; charset=utf-8');
 	<div class="row">
 		<div class="col-lg-6">
 			
-			<h1>Covid-Status-Liste "<?php echo $data['bezeichnung']; ?>"</h1>
+			<h1>Nachweisliste "<?php echo $data['bezeichnung']; ?>"</h1>
 			<ul>
 				<li><strong>Gruppen</strong>: <?php echo $data['gruppen']; ?></li>
 				<li><strong>Studiensemester</strong>: <?php echo $data['studiensemester']; ?></li>
@@ -106,7 +106,7 @@ header('Content-Type: text/html; charset=utf-8');
 						<th>Name</th>
 						<th>Kennzeichen</th>
 						<th>Gruppe</th>
-						<th>Covid-Status</th>
+						<th>Nachweis</th>
 					</tr>
 				</thead>
 				<tbody>

@@ -30,9 +30,9 @@ class CovidHelper extends basis_db
 	const STATUS_UNKNOWN	= -1;
 	const STATUS_NOTSET		= -2;
 	
-	const TITLE_OK		= 'Covid Status gültig';
-	const TITLE_NOTOK	= 'Covid Status ungültig';
-	const TITLE_UNKNOWN = 'Covid Status unbekannt';
+	const TITLE_OK		= 'Nachweis gültig';
+	const TITLE_NOTOK	= 'Nachweis ungültig';
+	const TITLE_UNKNOWN = 'Nachweis unbekannt';
 	
 	const DB_SCHEMA		= 'public';
 	const DB_TABLE		= 'tbl_person';
