@@ -125,7 +125,7 @@ $config['navigation_header'] = array(
 					'description' => 'Extensions Manager',
 					'expand' => true,
 					'sort' => 10,
-					'requiredPermissions' => 'admin:r'
+					'requiredPermissions' => 'system/extensions:r'
 				),
 				'logsviewer' => array(
 					'link' => site_url('system/LogsViewer'),
@@ -138,7 +138,14 @@ $config['navigation_header'] = array(
 					'link' => site_url('system/jq/JobsQueueViewer'),
 					'description' => 'Jobs Queue Viewer',
 					'expand' => true,
-					'sort' => 20,
+					'sort' => 30,
+					'requiredPermissions' => 'system/developer:r'
+				),
+				'phrasesviewer' => array(
+					'link' => site_url('system/phrases/PhrasesViewer'),
+					'description' => 'Phrases viewer',
+					'expand' => true,
+					'sort' => 40,
 					'requiredPermissions' => 'system/developer:r'
 				)
 			)

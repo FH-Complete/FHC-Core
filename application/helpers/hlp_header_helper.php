@@ -98,7 +98,7 @@ function generateJSPhrasesStorageObject($phrases)
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= "\n";
-	$toPrint .= '	var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->getJSON().';';
+	$toPrint .= '	var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->toJSON().';';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
 	$toPrint .= "\n\n";

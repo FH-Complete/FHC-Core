@@ -410,7 +410,6 @@ class FilterWidget extends Widget
 
 		// Read the all session for this filter widget
 		$session = $this->filterwidgetlib->getSession();
-
 		// If session is NOT empty -> a filter was already loaded
 		if ($session != null)
 		{
@@ -509,6 +508,10 @@ class FilterWidget extends Widget
 						)
 					);
 				}
+			}
+			else
+			{
+				show_error('The JSON contained within the database filter definition is not valid');
 			}
 		}
 

@@ -956,6 +956,29 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'phrases',
+		'filter_kurzbz' => 'all',
+		'description' => '{"All phrases", "All phrases", "All phrases", "All phrases"}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "All phrases",
+				"columns": [
+					{"name": "PhraseId"},
+					{"name": "Application"},
+					{"name": "Category"},
+					{"name": "PhraseName"},
+					{"name": "Language"},
+					{"name": "Phrase"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
 	)
 );
 

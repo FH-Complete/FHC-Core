@@ -4,95 +4,73 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class PhrasesLib
 {
+	// Directory name where all the category files are
+	const CORE_PHRASES_DIRECTORY = 'phrases/';
+
+	// Who adds phrases into the database
+	const INSERT_BY = 'PhrasesManager';
+
+	// Array elements names
+	const APP = 'app';
+	const CATEGORY = 'category';
+	const PHRASE = 'phrase';
+	const SPRACHE = 'sprache';
+	const TEXT = 'text';
+	const DESCRIPTION = 'description';
+
 	private $_ci; // Code igniter instance
 	private $_phrases; // Contains the retrieved phrases
 
 	/**
 	 * Loads parser library
 	 */
-    public function __construct()
-    {
+	public function __construct()
+	{
 		$this->_ci =& get_instance();
 
 		$this->_phrases = null; // set the property _phrases as null by default
 
 		// CI parser
 		$this->_ci->load->library('parser');
+		// Loads EPrintfLib
+		$this->_ci->load->library('EPrintfLib');
 
+		// Loads the PhraseModel
 		$this->_ci->load->model('system/Phrase_model', 'PhraseModel');
+		// Loads the PhrasentextModel
 		$this->_ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 
 		// Workaround to use more parameters in the construct since PHP doesn't support many constructors
 		$this->_extend_construct(func_get_args());
-    }
+	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Public methods
 
-   	/**
-     * getPhrase() - loads a specific Phrase
-     */
-    public function getPhrase($phrase_id)
-    {
-        if (isEmptyString($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
-
-        return $this->_ci->PhraseModel->load($phrase_id);
-    }
-
-    /**
-     * getSubMessages() - will return all Messages subordinated from a specified message.
-     */
-    public function getPhraseByApp($app = null)
-    {
-	    return $this->_ci->PhraseModel->loadWhere(array('app' => $app));
-    }
-
-    /**
-     * getPhraseInhalt
-     */
-	public function getPhraseInhalt($phrase_id)
-    {
-        if (isEmptyString($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
-
-        return $this->_ci->PhrasentextModel->loadWhere(array('phrase_id' => $phrase_id));
-    }
-
-    /**
-     * delPhrasentext
-     */
-    public function delPhrasentext($phrasentext_id)
-    {
-        if (isEmptyString($phrasentext_id)) return error(MSG_ERR_INVALID_MSG_ID);
-
-        return $this->_ci->PhrasentextModel->delete(array('phrasentext_id' => $phrasentext_id));
-    }
-
 	/**
-     * savePhrase() - will save a spezific Phrase.
-     */
-    public function savePhrase($phrase_id, $data)
-    {
-        if (isEmptyString($data)) return error(MSG_ERR_INVALID_MSG_ID);
-
-        return $this->_ci->PhraseModel->update($phrase_id, $data);
-    }
-
-	/**
-     * getVorlagetextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
-     */
-    public function getPhrasentextById($phrasentext_id)
+	 * Return the phrases in JSON format
+	 */
+	public function toJSON()
 	{
-        if (isEmptyString($phrasentext_id)) return error('Not a valid phrasentext_id');
-
-        return $this->_ci->PhrasentextModel->load($phrasentext_id);
-    }
+		return json_encode($this->_phrases);
+	}
 
 	/**
-     * getPhrases() - Retrieves phrases from the DB
+	 * getPhrase() - loads a specific Phrase
+	 */
+	public function getPhrase($phrase_id)
+	{
+		if (isEmptyString($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
+
+		return $this->_ci->PhraseModel->load($phrase_id);
+	}
+
+	/**
+	 * getPhrases() - Retrieves phrases from the DB
 	 * The given parameter are the same needed to read from the table system.tb_phrase
-     */
-    public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null, $blockTags = null)
-    {
+	 */
+	public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null, $blockTags = null)
+	{
 		if (isset($app) && isset($sprache))
 		{
 			$result = $this->_ci->PhraseModel->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz);
@@ -138,31 +116,7 @@ class PhrasesLib
 		}
 
 		return $result;
-    }
-
-	/**
-     * insertPhraseinhalt() - will load tbl_vorlagestudiengang for a spezific Template.
-     */
-    public function insertPhraseinhalt($data)
-	{
-        return $this->_ci->PhrasentextModel->insert($data);
-    }
-
-	/**
-     * getVorlagetextById() - will load tbl_vorlagestudiengang for a spezific Template.
-     */
-    public function getVorlagetextById($vorlagestudiengang_id)
-	{
-        return $this->_ci->VorlageStudiengangModel->load($vorlagestudiengang_id);
-    }
-
-	/**
-     * saveVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
-     */
-    public function updatePhraseInhalt($phrasentext_id, $data)
-	{
-        return $this->_ci->PhrasentextModel->update($phrasentext_id, $data);
-    }
+	}
 
 	/**
 	 * Retrieves a phrases from the the property _phrases with the given parameters
@@ -175,7 +129,7 @@ class PhrasesLib
 	public function t($category, $phrase, $parameters = array(), $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
 	{
 		// If the property _phrases is populated
-		if (is_array($this->_phrases))
+		if (!isEmptyArray($this->_phrases))
 		{
 			// Loops through the _phrases property
 			for ($i = 0; $i < count($this->_phrases); $i++)
@@ -200,6 +154,22 @@ class PhrasesLib
 		return '<< PHRASE '.$phrase.' >>';
 	}
 
+	/**
+	 * Install phrases from the core
+	 */
+	public function installFromCore()
+	{
+		$this->_installPhrases(APPPATH.self::CORE_PHRASES_DIRECTORY);
+	}
+
+	/**
+	 * Install phrases from the given path
+	 */
+	public function installFrom($phrasesDirectory)
+	{
+		$this->_installPhrases($phrasesDirectory);
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -215,19 +185,17 @@ class PhrasesLib
 	private function _extend_construct($params)
 	{
 		// Checks if the $params is an array with at least one element
-		if (is_array($params) && count($params) > 0)
+		if (!isEmptyArray($params))
 		{
 			$parameters = $params[0];	// temporary variable
 			$isIndexArray = false;		//flag for indexed array
 
 			// If there are parameters
-			if (is_array($parameters) && count($parameters) > 0)
+			if (!isEmptyArray($parameters))
 			{
 				$categories = $parameters[0]; // categories is always the first parameter
-				if (!is_array($categories)) // if it is not an array, then convert into one
-				{
-					$categories = array($categories);
-				}
+				// If it is not an array, then convert into one
+				if (!is_array($categories)) $categories = array($categories);
 
 				// Retrieves the language of the logged user
 				$language = getUserLanguage(count($parameters) == 2 ? $parameters[1] : null);
@@ -267,7 +235,7 @@ class PhrasesLib
 		// If language is not default language and phrasentext is null -> fallback to default language
 		if ($language != DEFAULT_LANGUAGE)
 		{
-			// get array with phrasentexte in the default language
+			// Get array with phrasentexte in the default language
 			$defaultPhrases = null;
 			if ($isIndexArray)
 			{
@@ -278,19 +246,19 @@ class PhrasesLib
 				$defaultPhrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndPhrasesAndLanguage($categories, DEFAULT_LANGUAGE);
 			}
 
-			// combine array with phrasentexte in users language and in default language
+			// Combine array with phrasentexte in users language and in default language
 			// (default used if phrasentext in users language is null or not set)
 			if (hasData($phrases) && hasData($defaultPhrases))
 			{
-				// loop through phrases in default language
+				// Loop through phrases in default language
 				foreach ($defaultPhrases->retval as $defaultPhrase)
 				{
 					$found = false;	// flag for found phrase
 
-					// loop through phrases in users language
+					// Loop through phrases in users language
 					foreach ($phrases->retval as $phrase)
 					{
-						// if same phrase and category found and text is not null
+						// If same phrase and category found and text is not null
 						// use phrase in users language
 						if ($phrase->phrase == $defaultPhrase->phrase
 							&& $phrase->category == $defaultPhrase->category
@@ -301,13 +269,11 @@ class PhrasesLib
 						}
 					}
 
-					// otherwise use phrase in default language
-					if (!$found)
-					{
-						array_push($phrases->retval, $defaultPhrase);
-					}
+					// Otherwise use phrase in default language
+					if (!$found) array_push($phrases->retval, $defaultPhrase);
 				}
 			}
+			// Otherwise if only defaultPhrases have data
 			elseif (hasData($defaultPhrases))
 			{
 				$phrases = $defaultPhrases;
@@ -315,18 +281,226 @@ class PhrasesLib
 		}
 
 		// If there are phrases loaded then store them in the property _phrases
-		if (hasData($phrases))
-		{
-			$this->_phrases = $phrases->retval;
-		}
+		if (hasData($phrases)) $this->_phrases = $phrases->retval;
 	}
 
 	/**
-	 * Returns the property _phrases JSON encoded
-	 * @return json encoded property _phrases
+	 * Install phrases from the given directory
 	 */
-	public function getJSON()
+	private function _installPhrases($phrasesDirectory)
 	{
-		return json_encode($this->_phrases);
+		$this->_ci->eprintflib->printInfo('------------------------------------------------------------------------------------------');
+		$this->_ci->eprintflib->printInfo('Phrases installation started from: '.$phrasesDirectory);
+
+		// If the given directory name does not exist
+		if (!is_dir($phrasesDirectory))
+		{
+			$this->_ci->eprintflib->printError('The directory '.$phrasesDirectory.' does not exist');
+		}
+		else // otherwise install the phrases from the given directory
+		{
+			// Get the list of category files from the given directory
+			$phrasesCategoryFiles = scandir($phrasesDirectory);
+
+			if ($phrasesCategoryFiles == false)
+			{
+				$this->_ci->eprintflib->printError('An error occurred while trying to access to the given directory: '.$phrasesDirectory);
+			}
+			else
+			{
+				// If no files are inside the given directory
+				if (count($phrasesCategoryFiles) == 2)
+				{
+					$this->_ci->eprintflib->printInfo('No phrases files are inside the given directory: '.$phrasesDirectory);
+				}
+
+				// For each file in this directory that represents a phrases category
+				foreach ($phrasesCategoryFiles as $phrasesCategoryFile)
+				{
+					// Gets the infos about the file
+					$pathInfo = pathinfo($phrasesDirectory.$phrasesCategoryFile);
+
+					// Skip the upper directory, the same directory and files that are not a php file
+					if ($phrasesCategoryFile != '.'
+						&& $phrasesCategoryFile != '..'
+						&& $pathInfo['extension'] == 'php')
+					{
+						// Include the php file that contains phrases for that category
+						require_once($phrasesDirectory.$phrasesCategoryFile);
+
+						// If this file contains an array called phrases
+						if (isset($phrases) && is_array($phrases))
+						{
+							$addPhrases = $this->_addPhrases($phrases); // add them to the database
+
+							// If a blocking error occurred then print an error and stop the execution
+							if (isError($addPhrases))
+							{
+								$this->_ci->eprintflib->printError(getError($addPhrases));
+								break;
+							}
+						}
+						else // otherwise print an error and continue with the next file
+						{
+							$this->_ci->eprintflib->printInfo(
+								'The file '.$phrasesDirectory.$phrasesCategoryFile.' does not contain an array called "phrases"'
+							);
+						}
+
+						// Clean for the next file
+						unset($phrases);
+					}
+				}
+			}
+		}
+
+		$this->_ci->eprintflib->printInfo('Phrases installation ended');
+		$this->_ci->eprintflib->printInfo('------------------------------------------------------------------------------------------');
+	}
+
+	/**
+	 * Add new phrases to the database
+	 */
+	private function _addPhrases($phrases)
+	{
+		// For eache given phrase
+		foreach ($phrases as $phrase)
+		{
+			$phrase_id = null; // The id of the new/existing phrase
+
+			// Checks the mandatory fields, if one of them is not valid continue with the next phrase
+			if (!$this->_isValidElement($phrase, self::APP)) continue;
+			if (!$this->_isValidElement($phrase, self::CATEGORY)) continue;
+			if (!$this->_isValidElement($phrase, self::PHRASE)) continue;
+
+			// Checks if the phrase already exists in the database
+			$phraseResult = $this->_ci->PhraseModel->loadWhere(
+				array(
+					'app' => $phrase[self::APP],
+					'category' => $phrase[self::CATEGORY],
+					'phrase' => $phrase[self::PHRASE]
+				)
+			);
+
+			// If an error occurred then return the error itself
+			if (isError($phraseResult)) return $phraseResult;
+
+			// If no phrase has been found
+			if (!hasData($phraseResult))
+			{
+				// Then add the phrase to the database
+				$phraseInsertResult = $this->_ci->PhraseModel->insert(
+					array(
+						'app' => $phrase[self::APP],
+						'category' => $phrase[self::CATEGORY],
+						'phrase' => $phrase[self::PHRASE],
+						'insertamum' => 'NOW()',
+						'insertvon' => self::INSERT_BY
+					)
+				);
+
+				// If an error occurred then return the error itself
+				if (isError($phraseInsertResult)) return $phraseInsertResult;
+
+				$phrase_id = getData($phraseInsertResult); // the phrase_id of the new added phrase
+
+				// Prints info about the new added phrase
+				$this->_ci->eprintflib->printMessage(
+					sprintf(
+						'A new phrase has been added into the database: '.
+						'phrase_id => %s | app => %s | category => %s | phrase => %s',
+						$phrase_id,
+						$phrase[self::APP],
+						$phrase[self::CATEGORY],
+						$phrase[self::PHRASE]
+					)
+				);
+
+			}
+			else // otherwise if the phrase already exists in the database
+			{
+				$phrase_id = getData($phraseResult)[0]->phrase_id; // gets the phrase_id
+			}
+
+			// If not a valid phrase_id
+			if ($phrase_id == null) return error('Not a valid phrase id');
+
+			// For each phrase text, one text for each language
+			foreach ($phrase['phrases'] as $phraseText)
+			{
+				// Checks the mandatory fields, if one of them is not valid continue with the next phrase text
+				if (!$this->_isValidElement($phraseText, self::SPRACHE)) continue;
+				if (!$this->_isValidElement($phraseText, self::TEXT)) continue;
+
+				// Set the not optional fields if they have not been set
+				if (!isset($phraseText[self::DESCRIPTION])) $phraseText[self::DESCRIPTION] = null;
+
+				// Checks if the phrase already exists in the database
+				$phraseTextResult = $this->_ci->PhrasentextModel->loadWhere(
+					array(
+						'phrase_id' => $phrase_id,
+						'sprache' => $phraseText[self::SPRACHE]
+					)
+				);
+
+				// If an error occurred then return the error itself
+				if (isError($phraseTextResult)) return $phraseTextResult;
+
+				// If no text for the phrase was found
+				if (!hasData($phraseTextResult))
+				{
+					// Then add the text phrase to the database
+					$phraseTextInsertResult = $this->_ci->PhrasentextModel->insert(
+						array(
+							'phrase_id' => $phrase_id,
+							'sprache' => $phraseText[self::SPRACHE],
+							'text' => $phraseText[self::TEXT],
+							'description' => $phraseText[self::DESCRIPTION],
+							'insertvon' => self::INSERT_BY,
+							'insertamum' => 'NOW()',
+							'orgeinheit_kurzbz' => null,
+							'orgform_kurzbz' => null
+						)
+					);
+
+					// If an error occurred then return the error itself
+					if (isError($phraseTextInsertResult)) return $phraseTextInsertResult;
+
+					// Prints info about the new added text phrase
+					$this->_ci->eprintflib->printMessage(
+						sprintf(
+							'A new text has been added into the database: '.
+							'phrase_id => %s | sprache => %s | text => %s | description => %s',
+							$phrase_id,
+							$phraseText[self::SPRACHE],
+							substr($phraseText[self::TEXT], 0, 42).'...',
+							substr($phraseText[self::DESCRIPTION], 0, 42).'...'
+						)
+					);
+				}
+			}
+		}
+
+		// If here then no blocking errors occurred
+		return success();
+	}
+
+	/**
+	 * Checks if the given array element exists in the given array and if it is a valid string and then returns true
+	 * Otherwise prints an info and then returns false
+	 */
+	private function _isValidElement($array, $elementName)
+	{
+		// If a not valid text is set
+		if ((isset($array[$elementName]) && isEmptyString($array[$elementName])) || !isset($array[$elementName]))
+		{
+			$this->_ci->eprintflib->printInfo('Not a valid element "'.$elementName.'":');
+			var_dump($array); // KEEP IT!!!
+			$this->_ci->eprintflib->printEOL();
+			return false;
+		}
+
+		return true;
 	}
 }
+
