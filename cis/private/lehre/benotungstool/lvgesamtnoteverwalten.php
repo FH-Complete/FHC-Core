@@ -905,7 +905,7 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 		if ($neuenoten > 0)
 		{
 			$lv = new lehrveranstaltung($lvid);
-			echo $sg = new studiengang($lv->studiengang_kz);
+			$sg = new studiengang($lv->studiengang_kz);
 			$lektor_adresse = $user . "@" . DOMAIN;
 			$adressen = $sg->email . ", " . $user . "@" . DOMAIN;
 
