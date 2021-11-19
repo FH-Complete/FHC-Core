@@ -1472,6 +1472,11 @@ function GenerateXMLStudentBlock($row)
 				$bisio_zweck->getZweck($rowio->bisio_id);
 				$zweck_code_arr = array();
 
+				// Es muss immer mindestens 1 Aufenthaltszweck geben
+				if (count($bisio_zweck->result) == 0)
+				{
+					$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Es muss mindestens ein Aufenthaltszweck eingetragen sein";
+				}
 				// Bei Incomings...
 				if ($aktstatus == 'Incoming')
 				{
