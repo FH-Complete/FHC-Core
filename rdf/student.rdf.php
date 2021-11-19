@@ -767,8 +767,16 @@ if($xmlformat=='rdf')
 	}
 	else
 	{
-		// String aufsplitten und Sonderzeichen entfernen
-		$searchItems = explode(' ',TRIM(str_replace(',', '', $filter),' 	!.?'));
+		// Sonderzeichen entfernen und String aufsplitten
+		// Replace commas with whitespace
+		$filter = str_replace(',', ' ', $filter);
+		// Replace multiple whitespaces with just one
+		$filter = preg_replace('/\s/', ' ', $filter);
+		// Trim whitespaces and special characters from the string
+		$filter = trim($filter,' 		!.?');
+		// Explode string
+		$searchItems = explode(' ',$filter);
+
 		$kriterienliste = array("#email","#name","#pid","#preid","#tel", "#ref");
 		$suchkriterium = '';
 
