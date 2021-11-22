@@ -96,12 +96,12 @@ $fieldheadings = array(
 if ($rechte->isBerechtigt('basis/servicezeitaufzeichnung'))
 {
 	$za_simple = 0;
-	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'FuE', 'Lehre', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'FuE','FuEallg', 'Lehre', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe', 'Weiterbildung', 'LVEntwicklung');
 }
 else
 {
 	$za_simple = 1;
-	$activities = array('Admin', 'FuE','Lehre', 'Pause', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
+	$activities = array('Admin', 'FuE','FuEallg','Lehre', 'Pause', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe', 'Weiterbildung', 'LVEntwicklung');
 }
 
 $activities_str = "'".implode("','", $activities)."'";
@@ -1379,8 +1379,10 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		if($result = $db->db_query($qry))
 		{
 			echo '<SELECT name="aktivitaet" id="aktivitaet" onChange="checkPausenblock()">';
+			/*
 			if ($za_simple == 0)
 				echo '<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+			*/
 			//else
 			//	echo '<OPTION value="Arbeit">Arbeit</OPTION>';
 			while($row = $db->db_fetch_object($result))
@@ -2157,9 +2159,6 @@ function getZeitaufzeichnung($user, $von, $bis)
  * Exportiert Zeitaufzeichnungsdaten als CSV
  * @param $data Zeitaufzeichnungsdaten
  * @param string $delimiter CSV-Trennzeichen
- * @param $fieldheadings Namen der Spaltenüberschriften
- * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple)
- * @param $uid Id des Users für CSV-Filenamen "zeitaufzeichnung_uid"
  */
 function exportProjectOverviewAsCSV($user, $delimiter = ',')
 {
