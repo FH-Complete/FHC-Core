@@ -37,6 +37,8 @@ class zeitwunsch extends basis_db
 	public $insertvon;
 	public $updateamum;
 	public $updatevon;
+	public $zeitwunsch_id;
+	public $zeitwunsch_gueltigkeit_id;
 
 	/**
 	 * Konstruktor
@@ -121,7 +123,7 @@ class zeitwunsch extends basis_db
 		if($this->new)
 		{
 			$qry = 'INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, tag, stunde, gewicht, 
-					insertamum, insertvon, updateamum, updatevon) VALUES('.
+					insertamum, insertvon, updateamum, updatevon, zeitwunsch_gueltigkeit_id) VALUES('.
 					$this->db_add_param($this->mitarbeiter_uid).','.
 					$this->db_add_param($this->tag, FHC_INTEGER).','.
 					$this->db_add_param($this->stunde, FHC_INTEGER).','.
@@ -129,7 +131,8 @@ class zeitwunsch extends basis_db
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
-					$this->db_add_param($this->updatevon).');';
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->zeitwunsch_gueltigkeit_id).');';
 		}
 		else
 		{
@@ -140,7 +143,8 @@ class zeitwunsch extends basis_db
 			       " WHERE 
 			       		mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid, FHC_STRING, false)." 
 			       		AND tag=".$this->db_add_param($this->tag, FHC_INTEGER)." 
-			       		AND stunde=".$this->db_add_param($this->stunde, FHC_INTEGER);
+			       		AND stunde=".$this->db_add_param($this->stunde, FHC_INTEGER). "
+			       		AND zeitwunsch_gueltigkeit_id=".$this->db_add_param($this->zeitwunsch_gueltigkeit_id, FHC_INTEGER);
 		}
 
 		if($this->db_query($qry))
@@ -154,8 +158,46 @@ class zeitwunsch extends basis_db
 		}
 	}
 
-	/**
-	 * Zeitwunsch einer Person laden
+    /**
+     * Zeitwunsch einer Person zu bestimmter Zeitwunschgueltigkeit laden
+     * @param $uid
+     * @param $zeitwunsch_gueltigkeit_id
+     * @return boolean
+     */
+    public function loadByZWG($uid, $zeitwunsch_gueltigkeit_id)
+    {
+        $qry = '
+            SELECT * 
+            FROM campus.tbl_zeitwunsch
+            JOIN campus.tbl_zeitwunsch_gueltigkeit zwg USING (zeitwunsch_gueltigkeit_id)
+            WHERE zwg.mitarbeiter_uid = ' . $this->db_add_param($uid) . '
+            AND zeitwunsch_gueltigkeit_id = ' . $this->db_add_param($zeitwunsch_gueltigkeit_id) . '
+            ORDER BY tag, stunde
+        ';
+
+        if ($this->db_query($qry))
+        {
+            while ($row = $this->db_fetch_object())
+            {
+                $this->zeitwunsch[$row->tag][$row->stunde] = $row->gewicht;
+                $this->insertamum = $row->insertamum;
+                $this->insertvon = $row->insertvon;
+                $this->updateamum = $row->updateamum;
+                $this->updatevon = $row->updatevon;
+                $this->zeitwunsch_id = $row->zeitwunsch_id;
+                $this->zeitwunsch_gueltigkeit_id = $row->zeitwunsch_gueltigkeit_id;
+            }
+            return true;
+        }
+        else
+        {
+            $this->errormsg = $this->db_last_error();
+            return false;
+        }
+    }
+
+    /**
+	 * Alle Zeitwuensche einer Person laden
 	 * @param uid
 	 * @param datum
 	 * @return boolean Ergebnis steht in Array $zeitwunsch wenn true
@@ -177,9 +219,11 @@ class zeitwunsch extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+                $this->zeitwunsch_id = $row->zeitwunsch_id;
+                $this->zeitwunsch_gueltigkeit_id = $row->zeitwunsch_gueltigkeit_id;
 			}
 		}
-		
+
 		if (!is_null($datum))
 		{
 			$beginn=montag($datum);
@@ -196,7 +240,7 @@ class zeitwunsch extends basis_db
 					mitarbeiter_uid=".$this->db_add_param($uid)."
 					AND vondatum<=".$this->db_add_param($ende)." 
 					AND bisdatum>=".$this->db_add_param($start);
-			
+
 			if(!$this->db_query($sql))
 			{
 				$this->errormsg=$this->db_last_error();
@@ -245,11 +289,10 @@ class zeitwunsch extends basis_db
 		return true;
 	}
 
-
 	/**
 	 * Zeitwunsch der Personen in Lehreinheiten laden
 	 * @param $le_id LehreinheitID Array
-	 * @param $datum 
+	 * @param $datum
 	 * @return true oder false
 	 */
 	public function loadZwLE($le_id,$datum=null)
@@ -296,7 +339,7 @@ class zeitwunsch extends basis_db
 					mitarbeiter_uid IN ($sql_query_le) 
 					AND vondatum<=".$this->db_add_param($ende)." 
 					AND bisdatum>=".$this->db_add_param($start);
-			
+
 			if(!$this->db_query($sql))
 			{
 				$this->errormsg = $this->db_last_error();
@@ -341,34 +384,37 @@ class zeitwunsch extends basis_db
 		}
 		return true;
 	}
-	
-	/**
-	 * Prueft ob bereits ein Zeitwunsch eingetragen ist
-	 *
-	 * @param $uid
-	 * @param $stunde
-	 * @param $tag
-	 * @return true wenn vorhanden sonst false
-	 */
-	function exists($uid, $stunde, $tag)
+
+    /**
+     * Prueft ob bereits ein Zeitwunsch eingetragen ist
+     *
+     * @param $uid
+     * @param $zwg_id
+     * @param $stunde
+     * @param $tag
+     * @return true wenn vorhanden sonst false
+     */
+	function exists($uid, $zwg_id, $stunde, $tag)
 	{
 		$qry = "SELECT 1 FROM campus.tbl_zeitwunsch 
 				WHERE 
 					mitarbeiter_uid=".$this->db_add_param($uid)." 
 					AND stunde=".$this->db_add_param($stunde, FHC_INTEGER)." 
-					AND tag=".$this->db_add_param($tag, FHC_INTEGER);
+					AND tag=".$this->db_add_param($tag, FHC_INTEGER). "
+                    AND zeitwunsch_gueltigkeit_id = ".$this->db_add_param($zwg_id, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
 				return true;
-			else 
+			else
 				return false;
 		}
-		else 
+		else
 		{
 			$this->errormsg='Fehler beim Abfragen des Zeitwunsches';
 			return false;
 		}
 	}
 }
+
 ?>
