@@ -121,19 +121,19 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'prestudent
 				lower(nachname || ' ' || vorname) like '%" . $db->db_escape(mb_strtolower($search)) . "%' OR
 				lower(vorname || ' ' || nachname) like '%" . $db->db_escape(mb_strtolower($search)) . "%' OR
 				prestudent_id::text like '%" . $db->db_escape(mb_strtolower($search)) . "%')";
-				$first = true;
-				if (is_array($studiensemester_kurzbz))
-					$qry .= " AND (";
-				foreach ($studiensemester_kurzbz as $stsem) {
-					$stsem = trim($stsem);
-					if (!$first)
-						$qry .= 'OR ';
-					$qry .= "get_rolle_prestudent(prestudent_id, " . $db->db_add_param($stsem) . ") IN ('Interessent')";
-				}
-				if (is_array($studiensemester_kurzbz))
-					$qry .= ")";
-				$qry .=
-				" ORDER BY nachname,vorname,stg
+	$first = true;
+	if (is_array($studiensemester_kurzbz))
+		$qry .= " AND (";
+	foreach ($studiensemester_kurzbz as $stsem) {
+		$stsem = trim($stsem);
+		if (!$first)
+			$qry .= 'OR ';
+		$qry .= "get_rolle_prestudent(prestudent_id, " . $db->db_add_param($stsem) . ") IN ('Interessent')";
+	}
+	if (is_array($studiensemester_kurzbz))
+		$qry .= ")";
+	$qry .=
+		" ORDER BY nachname,vorname,stg
 				LIMIT 10";
 
 	if ($result = $db->db_query($qry))
@@ -162,7 +162,7 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'prestudent
 			$item['student_uid'] = '';
 			$result_obj[] = $item;
 		}
-			echo json_encode($result_obj);
+		echo json_encode($result_obj);
 	}
 	exit;
 }
@@ -478,6 +478,43 @@ if ($rtFreischalten)
 	}
 }
 
+// Ajax-Request um einen Reihungstest freizuschalten
+$clearList = filter_input(INPUT_POST, 'clearList', FILTER_VALIDATE_BOOLEAN);
+if ($clearList)
+{
+	if (!$rechte->isBerechtigt('infocenter', null, 'suid'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	$qry = "DELETE FROM testtool.tbl_pruefling pf
+			WHERE 
+			(
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_pruefling_frage WHERE pruefling_id=pf.pruefling_id) AND
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_antwort WHERE pruefling_id=pf.pruefling_id)
+			)";
+
+	if ($result = $db->db_query($qry))
+	{
+		echo json_encode(array(
+			'status' => 'ok',
+			'msg' => $db->db_affected_rows($result).' leere Prüflinge wurden gelöscht'));
+		exit();
+	}
+	else
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => 'Fehler beim Löschen der leeren Prüflinge'
+		));
+		exit();
+	}
+}
+
 // Informiert die Studiengangsassistenz über das Ende des Tests
 $testende = filter_input(INPUT_POST, 'testende', FILTER_VALIDATE_BOOLEAN);
 if ($testende)
@@ -648,23 +685,23 @@ if ($testende)
 			}
 		}
 	}
-    if ($sendError)
-    {
-        echo json_encode(array(
-            'status' => 'fehler',
-            'msg' => '<p>Fehler beim Senden einer Nachricht</p>'
-        ));
-        exit();
-    }
-    else
-    {
-        $empfaengerArray = array_unique($empfaengerArray);
-        echo json_encode(array(
-            'status' => 'ok',
-            'msg' => 'Nachricht erfolgreich verschickt an: '.implode(',', $empfaengerArray)
-        ));
-        exit();
-    }
+	if ($sendError)
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => '<p>Fehler beim Senden einer Nachricht</p>'
+		));
+		exit();
+	}
+	else
+	{
+		$empfaengerArray = array_unique($empfaengerArray);
+		echo json_encode(array(
+			'status' => 'ok',
+			'msg' => 'Nachricht erfolgreich verschickt an: '.implode(',', $empfaengerArray)
+		));
+		exit();
+	}
 }
 
 // Fügt einen Teilnehmer zum Reihungstest hinzu
@@ -769,223 +806,223 @@ if (isset($_POST['method']) && $_POST['method'] == 'addPerson')
 $punkteUebertragen = filter_input(INPUT_POST, 'punkteUebertragen', FILTER_VALIDATE_BOOLEAN);
 if ($punkteUebertragen)
 {
-/*	if (isset($_POST['reihungstest_id']) &&	is_numeric($_POST['reihungstest_id']))
-	{*/
-		//$reihungstest = new reihungstest(/*$_POST['reihungstest_id']*/);
-		$msg_warning = '';
-		$msg_error = '';
-		$count_success_punkte = 0;
-		$count_success_gesamtpunkte = 0;
-		$count_success_bewerber = 0;
+	/*	if (isset($_POST['reihungstest_id']) &&	is_numeric($_POST['reihungstest_id']))
+		{*/
+	//$reihungstest = new reihungstest(/*$_POST['reihungstest_id']*/);
+	$msg_warning = '';
+	$msg_error = '';
+	$count_success_punkte = 0;
+	$count_success_gesamtpunkte = 0;
+	$count_success_bewerber = 0;
 
-		if (isset($_POST['prestudentPunkteArr']))
+	if (isset($_POST['prestudentPunkteArr']))
+	{
+		foreach ($_POST['prestudentPunkteArr'] AS $key => $array)
 		{
-			foreach ($_POST['prestudentPunkteArr'] AS $key => $array)
+			$reihungstest = new reihungstest($array['reihungstest_id']);
+			$rtpunkte = number_format(floatval(str_replace(',', '.', $array['ergebnis'])), 4);
+			$prestudentrolle = new prestudent($array['prestudent_id']);
+			$prestudentrolle->getLastStatus($array['prestudent_id'], null, 'Interessent');
+
+			if (!$rechte->isBerechtigt('lehre/reihungstest', $prestudentrolle->studiengang_kz, 'sui'))
 			{
-				$reihungstest = new reihungstest($array['reihungstest_id']);
-				$rtpunkte = number_format(floatval(str_replace(',', '.', $array['ergebnis'])), 4);
-				$prestudentrolle = new prestudent($array['prestudent_id']);
-				$prestudentrolle->getLastStatus($array['prestudent_id'], null, 'Interessent');
+				$msg_error .= '<br>Sie haben keine Rechte, um für diesen Studiengang Ergebnisse ins FAS zu übertragen';
+				continue;
+			}
 
-				if (!$rechte->isBerechtigt('lehre/reihungstest', $prestudentrolle->studiengang_kz, 'sui'))
+			// Checken, ob Person-Reihungstest-Studienplan zuteilung existiert
+			if ($reihungstest->checkPersonRtStudienplanExists($prestudentrolle->person_id, $array['reihungstest_id'], $prestudentrolle->studienplan_id))
+			{
+				$setRTPunkte = new reihungstest();
+				$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $array['reihungstest_id'], $prestudentrolle->studienplan_id);
+
+				// Check, ob Punkte schon befüllt sind
+				if ($setRTPunkte->punkte == '')
 				{
-					$msg_error .= '<br>Sie haben keine Rechte, um für diesen Studiengang Ergebnisse ins FAS zu übertragen';
-					continue;
-				}
+					$setRTPunkte->new = false;
+					$setRTPunkte->punkte = $rtpunkte;
+					$setRTPunkte->updateamum = date('Y-m-d H:i:s');
+					$setRTPunkte->updatevon = $user;
 
-				// Checken, ob Person-Reihungstest-Studienplan zuteilung existiert
-				if ($reihungstest->checkPersonRtStudienplanExists($prestudentrolle->person_id, $array['reihungstest_id'], $prestudentrolle->studienplan_id))
-				{
-					$setRTPunkte = new reihungstest();
-					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $array['reihungstest_id'], $prestudentrolle->studienplan_id);
-
-					// Check, ob Punkte schon befüllt sind
-					if ($setRTPunkte->punkte == '')
+					if (!$setRTPunkte->savePersonReihungstest())
 					{
-						$setRTPunkte->new = false;
-						$setRTPunkte->punkte = $rtpunkte;
-						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
-						$setRTPunkte->updatevon = $user;
-
-						if (!$setRTPunkte->savePersonReihungstest())
-						{
-							$msg_error .= '<br>Fehler beim speichern der Reihungstestpunkte für Prestudent '.$array['prestudent_id'].': ' . $setRTPunkte->errormsg;
-						}
-						else
-						{
-							$count_success_punkte ++;
-						}
+						$msg_error .= '<br>Fehler beim speichern der Reihungstestpunkte für Prestudent '.$array['prestudent_id'].': ' . $setRTPunkte->errormsg;
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
+						$count_success_punkte ++;
 					}
 				}
 				else
 				{
-					$setRTPunkte = new reihungstest();
-					$ort_kurzbz = '';
-					// Checken, ob schon irgendeine Raumzuteilung existiert (Check ohne Studienplan) und diese ggf. übernehmen
-					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $array['reihungstest_id']);
-					if ($setRTPunkte->ort_kurzbz != '')
-					{
-						$ort_kurzbz = $setRTPunkte->ort_kurzbz;
-					}
-					$setRTPunkte = new reihungstest();
-					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $array['reihungstest_id'], $prestudentrolle->studienplan_id);
+					$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
+				}
+			}
+			else
+			{
+				$setRTPunkte = new reihungstest();
+				$ort_kurzbz = '';
+				// Checken, ob schon irgendeine Raumzuteilung existiert (Check ohne Studienplan) und diese ggf. übernehmen
+				$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $array['reihungstest_id']);
+				if ($setRTPunkte->ort_kurzbz != '')
+				{
+					$ort_kurzbz = $setRTPunkte->ort_kurzbz;
+				}
+				$setRTPunkte = new reihungstest();
+				$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $array['reihungstest_id'], $prestudentrolle->studienplan_id);
 
-					// Check, ob Punkte schon befüllt sind
-					if ($setRTPunkte->punkte == '')
-					{
-						$setRTPunkte->new = true;
-						$setRTPunkte->person_id = $prestudentrolle->person_id;
-						$setRTPunkte->reihungstest_id = $array['reihungstest_id'];
-						$setRTPunkte->anmeldedatum = '';
-						$setRTPunkte->teilgenommen = true;
-						$setRTPunkte->ort_kurzbz = $ort_kurzbz;
-						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
-						$setRTPunkte->punkte = $rtpunkte;
-						$setRTPunkte->insertamum = date('Y-m-d H:i:s');
-						$setRTPunkte->insertvon = $user;
+				// Check, ob Punkte schon befüllt sind
+				if ($setRTPunkte->punkte == '')
+				{
+					$setRTPunkte->new = true;
+					$setRTPunkte->person_id = $prestudentrolle->person_id;
+					$setRTPunkte->reihungstest_id = $array['reihungstest_id'];
+					$setRTPunkte->anmeldedatum = '';
+					$setRTPunkte->teilgenommen = true;
+					$setRTPunkte->ort_kurzbz = $ort_kurzbz;
+					$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
+					$setRTPunkte->punkte = $rtpunkte;
+					$setRTPunkte->insertamum = date('Y-m-d H:i:s');
+					$setRTPunkte->insertvon = $user;
 
-						if (!$setRTPunkte->savePersonReihungstest())
-						{
-							$msg_error .= '<br>Fehler beim speichern der Reihungstestpunkte für Prestudent ' . $array['prestudent_id'] . ': ' . $setRTPunkte->errormsg;
-						}
-						else
-						{
-							$count_success_punkte ++;
-						}
+					if (!$setRTPunkte->savePersonReihungstest())
+					{
+						$msg_error .= '<br>Fehler beim speichern der Reihungstestpunkte für Prestudent ' . $array['prestudent_id'] . ': ' . $setRTPunkte->errormsg;
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
+						$count_success_punkte ++;
 					}
 				}
-
-				$gesamtpunkteSetzen = filter_input(INPUT_POST, 'gesamtpunkteSetzen', FILTER_VALIDATE_BOOLEAN);
-				// Wenn gesamtpunkteSetzen true ist, auch die Gesamtpunkte für den Prestudenten setzen
-				if ($gesamtpunkteSetzen)
+				else
 				{
-					$prestudent = new prestudent($array['prestudent_id']);
+					$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
+				}
+			}
 
-					// Check, ob Punkte schon befüllt sind
-					if ($prestudent->punkte == '')
+			$gesamtpunkteSetzen = filter_input(INPUT_POST, 'gesamtpunkteSetzen', FILTER_VALIDATE_BOOLEAN);
+			// Wenn gesamtpunkteSetzen true ist, auch die Gesamtpunkte für den Prestudenten setzen
+			if ($gesamtpunkteSetzen)
+			{
+				$prestudent = new prestudent($array['prestudent_id']);
+
+				// Check, ob Punkte schon befüllt sind
+				if ($prestudent->punkte == '')
+				{
+					$prestudent->new = false;
+					$prestudent->punkte = $rtpunkte;
+					$prestudent->reihungstestangetreten = true;
+					$setRTPunkte->updateamum = date('Y-m-d H:i:s');
+					$setRTPunkte->updatevon = $user;
+
+					if (!$prestudent->save())
 					{
-						$prestudent->new = false;
-						$prestudent->punkte = $rtpunkte;
-						$prestudent->reihungstestangetreten = true;
-						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
-						$setRTPunkte->updatevon = $user;
-
-						if (!$prestudent->save())
-						{
-							$msg_error .= '<br>Fehler beim setzen der Gesamtpunkte für Prestudent '.$array['prestudent_id'].': ' . $prestudent->errormsg;
-						}
-						else
-						{
-							$count_success_gesamtpunkte++;
-						}
+						$msg_error .= '<br>Fehler beim setzen der Gesamtpunkte für Prestudent '.$array['prestudent_id'].': ' . $prestudent->errormsg;
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Gesamtpunkte eingetragen.';
+						$count_success_gesamtpunkte++;
 					}
 				}
-
-				$zuBewerberMachen = filter_input(INPUT_POST, 'zuBewerberMachen', FILTER_VALIDATE_BOOLEAN);
-				// Wenn zuBewerberMachen true ist, wird der Prestudent auch zum Bewerber gemacht
-				if ($zuBewerberMachen)
+				else
 				{
-					$prestudent = new prestudent($array['prestudent_id']);
+					$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Gesamtpunkte eingetragen.';
+				}
+			}
 
-					// Checken, ob schon Bewerberstatus vorhanden ist
-					if (!$prestudent->load_rolle($array['prestudent_id'], 'Bewerber', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
+			$zuBewerberMachen = filter_input(INPUT_POST, 'zuBewerberMachen', FILTER_VALIDATE_BOOLEAN);
+			// Wenn zuBewerberMachen true ist, wird der Prestudent auch zum Bewerber gemacht
+			if ($zuBewerberMachen)
+			{
+				$prestudent = new prestudent($array['prestudent_id']);
+
+				// Checken, ob schon Bewerberstatus vorhanden ist
+				if (!$prestudent->load_rolle($array['prestudent_id'], 'Bewerber', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
+				{
+					// Checken, ob Abgewiesener-Status vorhanden ist
+					if (!$prestudent->load_rolle($array['prestudent_id'], 'Abgewiesener', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
 					{
-						// Checken, ob Abgewiesener-Status vorhanden ist
-						if (!$prestudent->load_rolle($array['prestudent_id'], 'Abgewiesener', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
+						// Um einen Bewerberstatus zu setzen, muss "reihungstestangetreten" true sein
+						if ($prestudent->reihungstestangetreten == true)
 						{
-							// Um einen Bewerberstatus zu setzen, muss "reihungstestangetreten" true sein
-							if ($prestudent->reihungstestangetreten == true)
+							// Um einen Bewerberstatus zu setzen, muss die ZGV ausgefüllt sein
+							if ($prestudent->zgv_code != '')
 							{
-								// Um einen Bewerberstatus zu setzen, muss die ZGV ausgefüllt sein
-								if ($prestudent->zgv_code != '')
+								$studiengang = new studiengang($prestudent->studiengang_kz);
+								// Bei Mastern muss auch die ZGV-Master ausgefüllt sein
+								if ($studiengang->typ == 'm' && $prestudent->zgvmas_code == '')
 								{
-									$studiengang = new studiengang($prestudent->studiengang_kz);
-									// Bei Mastern muss auch die ZGV-Master ausgefüllt sein
-									if ($studiengang->typ == 'm' && $prestudent->zgvmas_code == '')
-									{
-										$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine Master-ZGV eingetragen sein.';
-									}
-									else
-									{
-										$prestudent->new = true;
-										$prestudent->prestudent_id = $array['prestudent_id'];
-										$prestudent->status_kurzbz = 'Bewerber';
-										$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
-										$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
-										$prestudent->datum = date('Y-m-d');
-										$prestudent->insertamum = date('Y-m-d H:i:s');
-										$prestudent->insertvon = $user;
-										$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
-										$prestudent->bestaetigtam = '';
-										$prestudent->bestaetigtvon = '';
-										$prestudent->bewerbung_abgeschicktamum = '';
-										$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
-
-										if (!$prestudent->save_rolle())
-										{
-											$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': '.$prestudent->errormsg;
-										}
-										else
-										{
-											$count_success_bewerber++;
-										}
-									}
+									$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine Master-ZGV eingetragen sein.';
 								}
 								else
 								{
-									$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine ZGV eingetragen sein.';
+									$prestudent->new = true;
+									$prestudent->prestudent_id = $array['prestudent_id'];
+									$prestudent->status_kurzbz = 'Bewerber';
+									$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
+									$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
+									$prestudent->datum = date('Y-m-d');
+									$prestudent->insertamum = date('Y-m-d H:i:s');
+									$prestudent->insertvon = $user;
+									$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
+									$prestudent->bestaetigtam = '';
+									$prestudent->bestaetigtvon = '';
+									$prestudent->bewerbung_abgeschicktamum = '';
+									$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
+
+									if (!$prestudent->save_rolle())
+									{
+										$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': '.$prestudent->errormsg;
+									}
+									else
+									{
+										$count_success_bewerber++;
+									}
 								}
 							}
 							else
 							{
-								$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Zuerst muss "Reihungstestverfahren absolviert" gesetzt sein.';
+								$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine ZGV eingetragen sein.';
 							}
 						}
 						else
 						{
-							$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es ist bereits ein Abgewiesener-Status vorhanden';
+							$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Zuerst muss "Reihungstestverfahren absolviert" gesetzt sein.';
 						}
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits einen Bewerberstatus';
+						$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es ist bereits ein Abgewiesener-Status vorhanden';
 					}
+				}
+				else
+				{
+					$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits einen Bewerberstatus';
 				}
 			}
 		}
+	}
 
-		$msg_success = '';
-		if ($count_success_punkte > 0)
-		{
-			$msg_success .= $count_success_punkte.' Punkte erfolgreich ins FAS übertragen';
-		}
-		if ($count_success_gesamtpunkte > 0)
-		{
-			$msg_success .= '<br>'.$count_success_gesamtpunkte.' Gesamtpunkte erfolgreich gesetzt';
-		}
-		if ($count_success_bewerber > 0)
-		{
-			$msg_success .= '<br>'.$count_success_bewerber.' Prestudenten zu Bewerber gemacht';
-		}
+	$msg_success = '';
+	if ($count_success_punkte > 0)
+	{
+		$msg_success .= $count_success_punkte.' Punkte erfolgreich ins FAS übertragen';
+	}
+	if ($count_success_gesamtpunkte > 0)
+	{
+		$msg_success .= '<br>'.$count_success_gesamtpunkte.' Gesamtpunkte erfolgreich gesetzt';
+	}
+	if ($count_success_bewerber > 0)
+	{
+		$msg_success .= '<br>'.$count_success_bewerber.' Prestudenten zu Bewerber gemacht';
+	}
 
-		echo json_encode(array(
-				'status' => 'ok',
-				'msg_success' => $msg_success,
-				'msg_warning' => $msg_warning,
-				'msg_error' => $msg_error));
-			exit();
+	echo json_encode(array(
+		'status' => 'ok',
+		'msg_success' => $msg_success,
+		'msg_warning' => $msg_warning,
+		'msg_error' => $msg_error));
+	exit();
 }
 
 function sortByField($multArray, $sortField, $desc = true)
@@ -1423,6 +1460,23 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		LEFT JOIN testtool.tbl_gebiet USING (gebiet_id)
 		WHERE 1 = 1
 			--AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) NOT IN ('Abgewiesener') /*Wenn einkommentiert, kommen zB bei alten Bewerbungen keine Ergebnisse*/ 
+			AND CASE WHEN
+			(
+				get_rolle_prestudent (prestudent_id, rt.studiensemester_kurzbz) IN ('Abgewiesener') 
+				AND
+				rt.datum > (
+					SELECT MAX(insertamum) 
+					FROM PUBLIC.tbl_prestudentstatus spss
+					WHERE spss.prestudent_id = ps.prestudent_id
+					AND status_kurzbz = 'Abgewiesener'
+					LIMIT 1
+				)
+			)
+			THEN
+				false
+			ELSE
+				true
+			END
 			AND tbl_prestudentstatus.studiensemester_kurzbz IN (
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
@@ -1897,7 +1951,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 					$worksheet->write($zeile, ++$spalte, '');
 				}
 			}
-			$worksheet->writeNumber($zeile, ++$spalte, $erg->gesamtpunkte, $format_punkte);
+			$worksheet->writeNumber($zeile, ++$spalte, 4, $format_punkte);
 			$worksheet->writeNumber($zeile, ++$spalte, $erg->gesamtoffsetpunkte, $format_punkte);
 			$worksheet->writeNumber($zeile, ++$spalte, $erg->gesamt / 100, $format_prozent);
 		}
@@ -2489,6 +2543,38 @@ else
 		});
 		window.location.href = "mailto:?bcc="+adresseArray.join(";");
 	}
+	
+	function clearList()
+	{
+		$.ajax({
+			url: "auswertung_fhtw.php",
+			data: {clearList: true},
+			type: "POST",
+			dataType: "json",
+			success: function(data)
+			{
+				if(data.status !== "ok")
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+				else
+				{
+					$("#freischaltenWarning").show();
+					$("#freischaltenInfo").hide();
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+				}
+			},
+			error: function(data)
+			{
+				$("#msgbox").attr("class","alert alert-danger");
+				$("#msgbox").show();
+				$("#msgbox").html(data["msg"]);
+			}
+		});
+	}
 	function checkAllWithResult()
 	{
 		// Schleife ueber die einzelnen Elemente
@@ -2866,12 +2952,16 @@ else
 		}
 		else
 		{
-			echo '&nbsp;&nbsp;<a href="'.APP_ROOT.'/addons/reports/cis/vorschau.php?statistik_kurzbz=TesttoolFortschritt&debug=true&ReihungstestID='.$_GET['reihungstest'].'" class="btn btn-default btn-xs" role="button" target="_blank">Testfortschritt ansehen</a>';
+			echo '&nbsp;&nbsp;<a href="'.APP_ROOT.'/addons/reports/cis/vorschau.php?statistik_kurzbz=TesttoolFortschritt&debug=true&ReihungstestID='.$_GET['reihungstest'][0].'" class="btn btn-default btn-xs" role="button" target="_blank">Testfortschritt ansehen</a>';
 		}
 	}
 	else
 	{
 		echo '&nbsp;&nbsp;<a href="#" class="btn btn-default btn-xs" disabled="" role="button" title="Aktiv nur bei Einzelterminauswahl">Testfortschritt ansehen</a>';
+	}
+	if ($rechte->isBerechtigt('infocenter', null, 'suid'))
+	{
+		echo '&nbsp;&nbsp;<button type="button" class="btn btn-default btn-xs" onclick="clearList()" id="mailSendButton">Liste aufräumen</button>';
 	}
 	echo '</div></div></form>';
 	echo '	<form class="form" role="form">
@@ -3002,7 +3092,6 @@ else
 				if ($erg->letzter_status == 'Abgewiesener')
 				{
 					$inaktiv = 'text-muted';
-					$erg->prioritaet = 0;
 				}
 				echo "<tr id='row_".$erg->prestudent_id."'>
 						<td class='textcentered ".$inaktiv."'>

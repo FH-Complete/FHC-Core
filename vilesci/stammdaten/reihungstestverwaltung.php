@@ -2624,6 +2624,23 @@ if($reihungstest_id!='')
 	JOIN PUBLIC.tbl_prestudent ON (tbl_rt_person.person_id = tbl_prestudent.person_id)
 	JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
 	WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
+		AND CASE WHEN
+		(
+			get_rolle_prestudent (tbl_prestudent.prestudent_id, null) IN ('Abgewiesener') 
+			AND
+			rt.datum > (
+				SELECT MAX(insertamum) 
+				FROM PUBLIC.tbl_prestudentstatus
+				WHERE prestudent_id = tbl_prestudent.prestudent_id
+				AND status_kurzbz = 'Abgewiesener'
+				LIMIT 1
+			)
+		)
+		THEN
+			false
+		ELSE
+			true
+		END
 		AND tbl_rt_person.studienplan_id IN (
 			SELECT studienplan_id
 			FROM PUBLIC.tbl_prestudentstatus
