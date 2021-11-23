@@ -9,6 +9,7 @@ $this->phrasen['zeitwunsch/von']='from';
 $this->phrasen['zeitwunsch/formularZumEintragenDerZeitsperren']='The form for entering times when you are unavailable to teach can be found %s here';
 $this->phrasen['zeitwunsch/erklärung']='Explanation';
 $this->phrasen['zeitwunsch/kontrollierenSieIhreZeitwuensche']='Please check/change your preferred teaching times and click "Save"';
+$this->phrasen['zeitwunsch/erstellenSieIhreZeitwuensche']='Please enter / change your preferred teaching times and click "Save"';
 $this->phrasen['zeitwunsch/wert']='Value';
 $this->phrasen['zeitwunsch/bedeutung']='Meaning';
 $this->phrasen['zeitwunsch/hierMoechteIchUnterrichten']='I would like to teach at this time';
