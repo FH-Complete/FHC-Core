@@ -627,13 +627,13 @@ function updateZWG($uid, $zwg_id, $bis)
                         </TH>
                     </TR>
                     <TR>
-                        <TD>
+                        <TD style="background-color: <?php echo $cfgStdBgcolor[5]; ?>">
                             <DIV align="right">2</DIV>
                         </TD>
                         <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/hierMoechteIchUnterrichten');?></TD>
                     </TR>
                     <TR>
-                        <TD>
+                        <TD style="background-color: <?php echo $cfgStdBgcolor[6]; ?>">
                             <DIV align="right">1</DIV>
                         </TD>
                         <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/hierKannIchUnterrichten');?></TD>
@@ -645,13 +645,13 @@ function updateZWG($uid, $zwg_id, $bis)
                       <TD>keine Bedeutung</TD>
                     </TR>-->
                     <TR>
-                        <TD>
+                        <TD style="background-color: <?php echo $cfgStdBgcolor[2]; ?>">
                             <DIV align="right">-1</DIV>
                         </TD>
                         <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/nurInNotfaellen');?></TD>
                     </TR>
                     <TR>
-                        <TD>
+                        <TD style="background-color: <?php echo $cfgStdBgcolor[1]; ?>">
                             <DIV align="right">-2</DIV>
                         </TD>
                         <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/hierAufGarKeinenFall');?></TD>
