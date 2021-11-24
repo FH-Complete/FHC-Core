@@ -35,6 +35,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/zeitaufzeichnung_gd.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 
@@ -79,6 +80,9 @@ if(!$person->load($uid))
 
 $ma = new mitarbeiter($uid);
 $fixangestellt = $ma->fixangestellt;
+
+// Check, ob Lektor bereits zugewiesene LVs hat
+$isAssignedToLv = checkIsAssigendToLV($uid, $selected_ss); // boolean
 
 // Erklärung zu Pausen bei geteilten Arbeitszeiten speichern
 if (isset($_GET['selbstverwaltete-pause-akt']) && !empty($_GET['submit-akt']))
@@ -261,6 +265,10 @@ if (isset($_GET['type']) && $_GET['type'] == 'save')
             }
         }
     }
+
+    // Wenn speichern möglich ist, dann hat der Lektor entweder keine LVs zugeteilt oder hat aktiv die Bearbeitungssperre
+    // deaktiviert. Bearbeitungssperre wird gesetzt, wenn isAssignedToLv true ist. Deshalb hier mit false überschreiben.
+    $isAssignedToLv = false;
 }
 
 /**
@@ -328,6 +336,23 @@ function updateZWG($uid, $zwg_id, $bis)
     return;
 }
 
+/**
+ * Check, ob Lektor bereits zugewiesene LVs hat
+ * @param $uid
+ * @param $studiensemester_kurzbz
+ * @return bool|void
+ */
+function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
+{
+    $lv = new Lehrveranstaltung();
+    if (!$lv->getLVByMitarbeiter($uid, $studiensemester_kurzbz))
+    {
+        die($lv->errormsg);
+    }
+
+    return empty($lv->lehrveranstaltungen) ? false : true;
+}
+
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -365,6 +390,22 @@ function updateZWG($uid, $zwg_id, $bis)
 		}
 
         $(function() {
+            // Bearbeitung deaktivieren, wenn Lektor zugewiesene LV im Studiensemester hat
+            const isAssignedToLv = $('input[name=isAssigendToLv]').val();
+            if (isAssignedToLv == 'true')
+            {
+                $('input[name=radioZWG]').attr("disabled", true);
+                $('input[name=submit]').attr("disabled", true);
+            }
+
+            // Bearbeitung aktivieren, wenn Lektor Aktivierungslink klickt
+            $('#bearbeitung-aktivieren').click(function(){
+                $('input[name=radioZWG]').attr("disabled", false);
+                $('input[name=submit]').attr("disabled", false);
+
+                $('#divChangeZWG').removeClass('hidden');
+                $('#divIsAssignedToLv').addClass('hidden');
+            });
 
             // Bei Wechsel von Studiensemester die Seite mit GET params neu laden
            $('#stsem').change(function(){
@@ -488,6 +529,7 @@ function updateZWG($uid, $zwg_id, $bis)
         // FORM Begin
         echo '<form name="zeitwunsch" method="post" action="zeitwunsch.php?stsem='. $selected_ss. '&type=save" onsubmit="return checkvalues()">';
         echo '<input type="hidden" name="uid" value="'. $uid. '">';
+        echo '<input type="hidden" name="isAssigendToLv" value="'. json_encode($isAssignedToLv). '">';
 
         // Mein Zeitwunsch-Semesterplan Dropdown, Default = naechstes Studiensemester
         $next_ss_selected = $next_ss->studiensemester_kurzbz == $selected_ss ? 'selected' : '';
@@ -537,7 +579,8 @@ function updateZWG($uid, $zwg_id, $bis)
         echo '<div class="row">';
             echo '<div class="col-xs-12">';
             echo '<span>Sie können Ihren Zeitwunsch direkt in der Tabelle bearbeiten oder einen Zeitwunsch eines vergangenen Studiensemester kopieren.<br>
-                        Solange Sie keine Änderungen vornehmen, wird Ihr Zeitwunsch immer ins nächste Studiensemester übernommen.</span><br><br>';
+                        Solange Sie keine Änderungen vornehmen, wird Ihr Zeitwunsch immer ins nächste Studiensemester übernommen.</span><br>';
+            echo '<hr>';
 
                 // Radiobuttons aendern / kopieren
                 $radioChangeChecked = is_null($selected_past_ss) ? 'checked' : '';
@@ -549,8 +592,12 @@ function updateZWG($uid, $zwg_id, $bis)
                 echo '<b><input type="radio" name="radioZWG" id="radioChangeZWG" value="change" '. $radioChangeChecked. '> ändern</b>';
                 echo '</label>';
                 echo '<label class="radio-inline">';
-                echo '<b><input type="radio" name="radioZWG" id="radioCopyZWG" value="copy" '. $radioCopyChecked. '> kopieren von früherem Studiensemester</b>';
+                echo '<b><input type="radio" name="radioZWG" id="radioCopyZWG" value="copy" '. $radioCopyChecked. '> kopieren von früherem Studiensemester&emsp;</b>';
                 echo '</label>';
+                if ($isAssignedToLv)
+                {
+                    echo '<span class="label label-danger valign-top">LV bereits zugeteilt</span>';
+                }
                 echo '</div>';
 
             echo '</div>'; // end col-xs-12
@@ -558,10 +605,11 @@ function updateZWG($uid, $zwg_id, $bis)
 
         echo '<div class="row">';
 
-            $divChangeHidden = !is_null($selected_past_ss) ? 'hidden' : '';
-            $divCopyHidden = is_null($selected_past_ss) ? 'hidden' : '';
+            $divChangeHidden = !is_null($selected_past_ss) || $isAssignedToLv ? 'hidden' : '';
+            $divCopyHidden = is_null($selected_past_ss) || $isAssignedToLv ? 'hidden' : '';
+            $divIsAssignedToLVHidden = $isAssignedToLv ? '' : 'hidden';
 
-            echo '<div id="divChangeZWG"class="'. $divChangeHidden . '">';
+            echo '<div id="divChangeZWG" class="'. $divChangeHidden . '">';
                 echo '<div class="col-xs-8 col-lg-7">';
                     echo '<span>' . $p->t('zeitwunsch/tragenSieInDiesesNormwochenraster') .' Klicken Sie danach auf \'Speichern\'</span>';
                 echo '</div>'; // end col
@@ -571,10 +619,10 @@ function updateZWG($uid, $zwg_id, $bis)
             echo '</div>'; // end divChangeZWG
 
             echo '<div id="divCopyZWG" class="'. $divCopyHidden . '">';
-                echo '<div class="col-xs-6">';
-                echo '<span>Wählen Sie das gewünschte Studiensemester aus dem <u>rechten</u> Dropdown aus.
+                echo '<div class="col-xs-7">';
+                echo '<span>Wählen Sie rechts das gewünschte Studiensemester aus.
                                 Der Zeitwunsch wird dann <u>automatisch</u> in die Tabelle übernommen.<br>
-                                Nehmen Sie gegebenenfalls Änderungen vor und klicken Sie dann auf \'Speichern\'.</span>';
+                                Nehmen Sie gegebenenfalls Änderungen vor und klicken danach auf \'Speichern\'.</span>';
                 echo '</div>'; // end col
 
                 $studiensemester = new Studiensemester();
@@ -584,7 +632,7 @@ function updateZWG($uid, $zwg_id, $bis)
                 $zwg = new Zeitwunsch_gueltigkeit();
                 $zwg->getByUID($uid, 4, true, $studiensemester->ende);
                 $past_zwg_arr = $zwg->result;
-                echo '<div class="col-xs-3">';
+                echo '<div class="col-xs-2">';
                     echo '<select name="pastStsem" id="pastStsem" class="form form-control">';
                     echo '<OPTION value="">-- '. $p->t("global/bitteWaehlen").' --</OPTION>';
                     foreach($past_zwg_arr as $row)
@@ -595,6 +643,21 @@ function updateZWG($uid, $zwg_id, $bis)
                     echo '</select>';
                 echo '</div>';  // end col
             echo '</div>'; // end divCopyZWG
+
+            echo '<div id="divIsAssignedToLv" class="'. $divIsAssignedToLVHidden . '">';
+                echo '<div class="col-xs-9">';
+                echo '<div class="panel panel-danger">';
+                    echo '<div class="panel-body">';
+                    echo '<span class="text-danger"><b>Bearbeitung deaktiviert: </b></span>';
+                    echo '<span>Ihnen wurden im '. $selected_ss. ' bereits Lehrveranstaltung(en) zugeteilt.</span><br>
+                            Bitte stimmen Sie sich vor einer Änderung mit der <a href="mailto:<?php echo MAIL_LVPLAN;?>">'. $p->t('lvplan/lvKoordinationsstelle'). '</a> ab.<br>
+                            Möchten Sie mit der Bearbeitung fortsetzen? <a id="bearbeitung-aktivieren" style="cursor:pointer;">Hier Bearbeitung aktivieren</a>
+                        </span>';
+
+                    echo '</div>'; // end panel heading
+                echo '</div>'; // end panel
+                echo '</div>'; // end col
+            echo '</div>'; // end divIsAssignedToLV
 
             // Speichern - Button
             echo '<div class="col-xs-3">';
