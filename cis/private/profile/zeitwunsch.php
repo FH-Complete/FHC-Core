@@ -406,46 +406,78 @@ function updateZWG($uid, $zwg_id, $bis)
 		<!--Erklärung zu Pausen bei geteilten Arbeitszeiten-->
 		<tr>
 			<td>
-				<h1>Zustimmung zur Verplanung in geteilter Arbeitszeit</h1>
+				<h3>Zustimmung zur Verplanung in geteilter Arbeitszeit</h3>
 
 			<form action="">
 				<p>
 					<?php
 					echo $p->t('zeitwunsch/geteilteArbeitszeit');
+                    echo '<br><br>';
 					$gd = new zeitaufzeichnung_gd();
 					$gd->load($uid, $akt_ss->studiensemester_kurzbz);
 					if ( ! $gd->uid )
 					{
-						echo '<br><br><h3>Zustimmung für '.$akt_ss->studiensemester_kurzbz.': ';
-						echo '<input type="radio" name="selbstverwaltete-pause-akt" value="yes">ja';
-						echo '<input type="radio" name="selbstverwaltete-pause-akt" value="no">nein';
-						echo '</h3><br><br><input type="submit" name="submit-akt" value="'.$p->t('global/speichern').'" style="float: right"><br>';
+                        echo '<div class="row">';
+                        echo '<div class="col-lg-3 col-md-4 col-xs-4">';
+                            echo '<div class="radio">';
+                            echo '<b>Zustimmung für '.$akt_ss->studiensemester_kurzbz.': ';
+                            echo '<label class="radio-inline">';
+                            echo '<input type="radio" name="selbstverwaltete-pause-akt" value="yes">ja';
+                            echo '</label>';
+                            echo '<label class="radio-inline">';
+                            echo '<input type="radio" name="selbstverwaltete-pause-akt" value="no">nein';
+                            echo '</label>';
+                            echo '</div>';
+                        echo '</div>';
+
+                        echo '<div class="col-lg-2 col-md-3 col-xs-4">';
+						    echo '</b><input type="submit" class="btn btn-default btn-block" name="submit-akt" value="'.$p->t('global/speichern').'" style="float: right"><br>';
+                        echo '</div>';
+
+                        echo '<div class="col-lg-7 col-md-5 col-xs-4">';
+                        echo '</div>';
+                        echo '</div>';
 					}
 					else
 					{
 						$zustimmung = ($gd->selbstverwaltete_pause) ? ' erteilt' : 'abgelehnt';
-						echo '<br><br><h3>Zustimmung für '.$akt_ss->studiensemester_kurzbz.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</h3>';
+						echo '<br><br><b>Zustimmung für '.$akt_ss->studiensemester_kurzbz.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</b>';
 					}
 					$gd = new zeitaufzeichnung_gd();
 					$gd->load($uid, $next_ss->studiensemester_kurzbz);
 					if ( ! $gd->uid )
 					{
-						echo '<h3>Zustimmung für '.$next_ss->studiensemester_kurzbz.': ';
-						echo '<input type="radio" name="selbstverwaltete-pause" value="yes">ja';
-						echo '<input type="radio" name="selbstverwaltete-pause" value="no">nein';
-						echo '</h3><br><br><input type="submit" name="submit" value="'.$p->t('global/speichern').'" style="float: right"><br>';
+                        echo '<div class="row">';
+                        echo '<div class="col-lg-3 col-md-4 col-xs-4">';
+                            echo '<div class="radio">';
+                            echo '<b>Zustimmung für '.$next_ss->studiensemester_kurzbz.': ';
+                            echo '<label class="radio-inline">';
+                            echo '<input type="radio" name="selbstverwaltete-pause" value="yes">ja';
+                            echo '</label>';
+                            echo '<label class="radio-inline">';
+                            echo '<input type="radio" name="selbstverwaltete-pause" value="no">nein';
+                            echo '</label>';
+                            echo '</div>';
+                        echo '</div>';
+
+                        echo '<div class="col-lg-2 col-md-3 col-xs-4">';
+						    echo '</b><input type="submit" class="btn btn-default btn-block" name="submit" value="'.$p->t('global/speichern').'" style="float: right">';
+                        echo '</div>';
+
+                        echo '<div class="col-lg-7 col-md-5 col-xs-4">';
+                        echo '</div>';
+                        echo '</div>';
 					}
 					else
 					{
 						$zustimmung = ($gd->selbstverwaltete_pause) ? ' erteilt' : 'abgelehnt';
-						echo '<h3>Zustimmung für '.$next_ss->studiensemester_kurzbz.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</h3>';
+						echo '<b>Zustimmung für '.$next_ss->studiensemester_kurzbz.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</b>';
 					}
 					//var_dump($gd);
 					?>
 
 				</p>
 			</form>
-		<br><hr>
 		</td>
 	</tr>
 <?php endif; ?>
