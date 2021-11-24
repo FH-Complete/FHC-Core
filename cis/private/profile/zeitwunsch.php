@@ -72,171 +72,6 @@ if(! $result_stunde=$db->db_query('SELECT * FROM lehre.tbl_stunde ORDER BY stund
 	die($db->db_last_error());
 $num_rows_stunde=$db->db_num_rows($result_stunde);
 
-// Zeitwuensche speichern
-if (isset($_GET['type']) && $_GET['type'] == 'save')
-{
-    // Letzte Zeitwunschgueltigkeit (ZWG) holen
-    $zwg = new Zeitwunsch_gueltigkeit();
-    $zwg->getByUID($uid, 1);
-    $lastZwg = !empty($zwg->result) ? $zwg->result[0] : null;
-
-    // Check, ob letzte ZWG im nächsten Studiensemester startet. D.h. es existiert ein neuer Zeitwunsch in der Zukunft
-    $lastZwgStartsNextSemester = (!is_null($lastZwg) && $lastZwg->von >= $next_ss->start) ? true : false;
-    $zw_zwg_id = null;  // ZWG ID, die zum Speichern / Updaten des Zeitwunsches uebergeben wird
-
-    //  Wenn allererster Zeitwunsch, also noch keine ZWG vorhanden
-    if (is_null($lastZwg))
-    {
-        // Wenn ZW fuer naechstes Studiensemester ist
-        if ($selected_ss == $next_ss->studiensemester_kurzbz)
-        {
-            // Neue ZWG setzen: von = Start nächstes Studiensemester, bis offen lassen
-            $zw_zwg_id = insertZWG($uid, $next_ss->start, null);
-        }
-
-        // Wenn Zeitwunsch fuer aktuelles Studiensemester ist
-        if ($selected_ss == $akt_ss->studiensemester_kurzbz)
-        {
-            // Neue ZWG setzen: von = now(), bis offen lassen
-            $zw_zwg_id = insertZWG($uid, (new DateTime())->format('Y-m-d H:i:s'), null);
-        }
-    }
-
-    // Wenn mindestens eine ZWG vorhanden
-     if (!is_null($lastZwg))
-     {
-         // Wenn Zeitwunsch fuer naechstes Studiensemester ist
-         if ($selected_ss == $next_ss->studiensemester_kurzbz)
-         {
-             // Wenn naechstes Studiensemester schon eine eigene ZWG hat
-            if ($lastZwgStartsNextSemester)
-            {
-               // Nur Zeitwunsch dieser ZWG updaten
-                $zw_zwg_id = $lastZwg->zeitwunsch_gueltigkeit_id;
-            }
-
-             // Wenn naechstes Studiensemester keine eigene ZWG hat
-            if (!$lastZwgStartsNextSemester)
-            {
-                // Fuer bisher letzte ZWG ein Endedatum setzen: bis = Ende aktuelles Studiensemester
-                updateZWG($uid, $lastZwg->zeitwunsch_gueltigkeit_id, $akt_ss->ende);
-
-                // Neue ZWG setzen: von = Start nächstes Studiensemester, bis offen lassen
-                $zw_zwg_id = insertZWG($uid, $next_ss->start, null);
-            }
-         }
-
-         // Wenn Zeitwunsch fuer aktuelles Studiensemester ist
-         if ($selected_ss == $akt_ss->studiensemester_kurzbz)
-         {
-             /**
-              * Check, ob aktuelles Studiensemester eine ZWG hat.
-              * Wenn die allererste ZWG fuer das naechste Studiensemester erstellt wurde, dann hat das
-              * aktuelle Studiensemester noch keine ZWG.
-              * */
-             $zwg = new Zeitwunsch_gueltigkeit();
-             $zwg->getByStudiensemester($uid, $akt_ss->studiensemester_kurzbz);
-             $akt_ss_zwg = !empty($zwg->result) ? $zwg->result[0] : null;
-
-             // Keine ZWG fuer aktuelles Studiensemester vorhanden.
-             // Da eine ZWG ID aber schon vorhanden: USER HAT ERSTMALIG MIT NAECHSTEM STUDIENSEMESTER EINTRAG BEGONNEN
-             if (is_null($akt_ss_zwg))
-             {
-                 // Neue ZWG setzen: von = now(), ende = Ende aktuelles Studiensemester
-                 $zw_zwg_id = insertZWG($uid, (new DateTime())->format('Y-m-d H:i:s'), $akt_ss->ende);
-             }
-
-             // ZWG für aktuelles Studiensemester ist vorhanden --> SPLIT AKTUELLE STUDIENSEMESTER
-             if ((!is_null($akt_ss_zwg)))
-             {
-                 // Wenn am selben Tag schon neue ZWG gespeichert wurde, keine neue ZWG anlegen, sondern diese nur updaten
-                 // Verhindert mehrfache Eintraege, wenn oefters zwischengespeichert wird.
-                 if ((new DateTime($akt_ss_zwg->insertamum))->format('Y-m-d') == (new Datetime())->format('Y-m-d'))
-                 {
-                     updateZWG($uid, $akt_ss_zwg->zeitwunsch_gueltigkeit_id, $akt_ss_zwg->bis);
-
-                     $zw_zwg_id = $akt_ss_zwg->zeitwunsch_gueltigkeit_id;
-                 }
-                 else
-                 {
-                     // Neue ZWG setzen: von = now(), bis = Bis von ZWG des aktuellen Studiensemesters uebernehmen:
-                     // -> bis ist entweder Ende aktuelles Studiensemester (wenn ZWG für nächstes Studiensemester vorhanden ist)
-                     // -> sonst ist bis null
-                     $zw_zwg_id = insertZWG($uid, (new DateTime())->format('Y-m-d H:i:s'), $akt_ss_zwg->bis);
-
-                     // Fuer bisher letzte ZWG das Endedatum auf heute setzen: bis = now()
-                     // NOTE: MUSS nach dem insert sein
-                     updateZWG($uid, $akt_ss_zwg->zeitwunsch_gueltigkeit_id, (new DateTime())->format('Y-m-d H:i:s'));
-                 }
-             }
-         }
-     }
-
-    // Insert Zeitwunsch mit Zeitwunsch ZWG ID
-    if (is_numeric($zw_zwg_id))
-    {
-        $zw = new zeitwunsch();
-
-        for ($t=1;$t<7;$t++)
-        {
-            for ($i=0;$i<$num_rows_stunde;$i++)
-            {
-                $var='wunsch'.$t.'_'.$i;
-                if(!isset($_POST[$var]))
-                    continue;
-                $gewicht=$_POST[$var];
-                $stunde=$i+1;
-
-                $zw->mitarbeiter_uid = $uid;
-                $zw->stunde = $stunde;
-                $zw->tag = $t;
-                $zw->gewicht = $gewicht;
-                $zw->updateamum = date('Y-m-d H:i:s');
-                $zw->updatevon = $uid;
-    			$zw->zeitwunsch_gueltigkeit_id = $zw_zwg_id;
-
-                if (!$zw->exists($uid, $zw_zwg_id, $stunde, $t))
-                {
-                    $zw->new = true;
-                    $zw->insertamum = date('Y-m-d H:i:s');
-                    $zw->insertvon = $uid;
-                }
-                else
-                {
-                    $zw->new = false;
-                }
-
-                if(!$zw->save())
-                    echo $zw->errormsg;
-            }
-        }
-    }
-}
-
-/**
- * Zeitwunschgueltigkeit fuer Tabelle holen.
- * Der Zeitwunsch wird anhand der Zeitwunschgueltigkeit (ZWG) des gewaehlten Studiensemesters ermittelt.
- * Das Studiensemester wird, je nach Vorhandensein, in dieser Reihenfolge herangezogen:
- * 1. Wenn in Dropdown ausgewaehlt: Vergangenes Studiensemester (zum Kopieren von Zeitwunsch)
- * 2. Wenn in Dropdown ausgewaehlt: Aktuelles Studiensemester
- * 3: Default: Nächstes Studiensemesters
- */
-$zwg = new zeitwunsch_gueltigkeit();
-$tmp_ss = is_null($selected_past_ss) ? $selected_ss : $selected_past_ss;
-$zwg->getByStudiensemester($uid, $tmp_ss);
-$zwg_id = !empty($zwg->result[0]) ? $zwg->result[0]->zeitwunsch_gueltigkeit_id : null;  //null, wenn noch kein ZW
-
-/**
- * Zeitwunsch fuer Tabelle holen
- * Wenn noch kein Zeitwunsch vorhanden, bleibt die Zeitwunsch Instanz leer
- * */
-$zw = new zeitwunsch();
-if (!$zw->loadByZWG($uid, $zwg_id))
-{
-    die($zw->errormsg);
-}
-$wunsch = $zw->zeitwunsch;
-
 // Personendaten
 $person = new benutzer();
 if(!$person->load($uid))
@@ -286,6 +121,171 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
     }
 
 }
+
+// Zeitwuensche speichern
+if (isset($_GET['type']) && $_GET['type'] == 'save')
+{
+    // Letzte Zeitwunschgueltigkeit (ZWG) holen
+    $zwg = new Zeitwunsch_gueltigkeit();
+    $zwg->getByUID($uid, 1);
+    $lastZwg = !empty($zwg->result) ? $zwg->result[0] : null;
+
+    // Check, ob letzte ZWG im nächsten Studiensemester startet. D.h. es existiert ein neuer Zeitwunsch in der Zukunft
+    $lastZwgStartsNextSemester = (!is_null($lastZwg) && $lastZwg->von >= $next_ss->start) ? true : false;
+    $zw_zwg_id = null;  // ZWG ID, die zum Speichern / Updaten des Zeitwunsches uebergeben wird
+
+    //  Wenn allererster Zeitwunsch, also noch keine ZWG vorhanden
+    if (is_null($lastZwg))
+    {
+        // Wenn ZW fuer naechstes Studiensemester ist
+        if ($selected_ss == $next_ss->studiensemester_kurzbz)
+        {
+            // Neue ZWG setzen: von = Start nächstes Studiensemester, bis offen lassen
+            $zw_zwg_id = insertZWG($uid, $next_ss->start, null);
+        }
+
+        // Wenn Zeitwunsch fuer aktuelles Studiensemester ist
+        if ($selected_ss == $akt_ss->studiensemester_kurzbz)
+        {
+            // Neue ZWG setzen: von = now(), bis offen lassen
+            $zw_zwg_id = insertZWG($uid, (new DateTime())->format('Y-m-d H:i:s'), null);
+        }
+    }
+
+    // Wenn mindestens eine ZWG vorhanden
+    if (!is_null($lastZwg))
+    {
+        // Wenn Zeitwunsch fuer naechstes Studiensemester ist
+        if ($selected_ss == $next_ss->studiensemester_kurzbz)
+        {
+            // Wenn naechstes Studiensemester schon eine eigene ZWG hat
+            if ($lastZwgStartsNextSemester)
+            {
+                // Nur Zeitwunsch dieser ZWG updaten
+                $zw_zwg_id = $lastZwg->zeitwunsch_gueltigkeit_id;
+            }
+
+            // Wenn naechstes Studiensemester keine eigene ZWG hat
+            if (!$lastZwgStartsNextSemester)
+            {
+                // Fuer bisher letzte ZWG ein Endedatum setzen: bis = Ende aktuelles Studiensemester
+                updateZWG($uid, $lastZwg->zeitwunsch_gueltigkeit_id, $akt_ss->ende);
+
+                // Neue ZWG setzen: von = Start nächstes Studiensemester, bis offen lassen
+                $zw_zwg_id = insertZWG($uid, $next_ss->start, null);
+            }
+        }
+
+        // Wenn Zeitwunsch fuer aktuelles Studiensemester ist
+        if ($selected_ss == $akt_ss->studiensemester_kurzbz)
+        {
+            /**
+             * Check, ob aktuelles Studiensemester eine ZWG hat.
+             * Wenn die allererste ZWG fuer das naechste Studiensemester erstellt wurde, dann hat das
+             * aktuelle Studiensemester noch keine ZWG.
+             * */
+            $zwg = new Zeitwunsch_gueltigkeit();
+            $zwg->getByStudiensemester($uid, $akt_ss->studiensemester_kurzbz);
+            $akt_ss_zwg = !empty($zwg->result) ? $zwg->result[0] : null;
+
+            // Keine ZWG fuer aktuelles Studiensemester vorhanden.
+            // Da eine ZWG ID aber schon vorhanden: USER HAT ERSTMALIG MIT NAECHSTEM STUDIENSEMESTER EINTRAG BEGONNEN
+            if (is_null($akt_ss_zwg))
+            {
+                // Neue ZWG setzen: von = now(), ende = Ende aktuelles Studiensemester
+                $zw_zwg_id = insertZWG($uid, (new DateTime())->format('Y-m-d H:i:s'), $akt_ss->ende);
+            }
+
+            // ZWG für aktuelles Studiensemester ist vorhanden --> SPLIT AKTUELLE STUDIENSEMESTER
+            if ((!is_null($akt_ss_zwg)))
+            {
+                // Wenn am selben Tag schon neue ZWG gespeichert wurde, keine neue ZWG anlegen, sondern diese nur updaten
+                // Verhindert mehrfache Eintraege, wenn oefters zwischengespeichert wird.
+                if ((new DateTime($akt_ss_zwg->insertamum))->format('Y-m-d') == (new Datetime())->format('Y-m-d'))
+                {
+                    updateZWG($uid, $akt_ss_zwg->zeitwunsch_gueltigkeit_id, $akt_ss_zwg->bis);
+
+                    $zw_zwg_id = $akt_ss_zwg->zeitwunsch_gueltigkeit_id;
+                }
+                else
+                {
+                    // Neue ZWG setzen: von = now(), bis = Bis von ZWG des aktuellen Studiensemesters uebernehmen:
+                    // -> bis ist entweder Ende aktuelles Studiensemester (wenn ZWG für nächstes Studiensemester vorhanden ist)
+                    // -> sonst ist bis null
+                    $zw_zwg_id = insertZWG($uid, (new DateTime())->format('Y-m-d H:i:s'), $akt_ss_zwg->bis);
+
+                    // Fuer bisher letzte ZWG das Endedatum auf heute setzen: bis = now()
+                    // NOTE: MUSS nach dem insert sein
+                    updateZWG($uid, $akt_ss_zwg->zeitwunsch_gueltigkeit_id, (new DateTime())->format('Y-m-d H:i:s'));
+                }
+            }
+        }
+    }
+
+    // Insert Zeitwunsch mit Zeitwunsch ZWG ID
+    if (is_numeric($zw_zwg_id))
+    {
+        $zw = new zeitwunsch();
+
+        for ($t=1;$t<7;$t++)
+        {
+            for ($i=0;$i<$num_rows_stunde;$i++)
+            {
+                $var='wunsch'.$t.'_'.$i;
+                if(!isset($_POST[$var]))
+                    continue;
+                $gewicht=$_POST[$var];
+                $stunde=$i+1;
+
+                $zw->mitarbeiter_uid = $uid;
+                $zw->stunde = $stunde;
+                $zw->tag = $t;
+                $zw->gewicht = $gewicht;
+                $zw->updateamum = date('Y-m-d H:i:s');
+                $zw->updatevon = $uid;
+                $zw->zeitwunsch_gueltigkeit_id = $zw_zwg_id;
+
+                if (!$zw->exists($uid, $zw_zwg_id, $stunde, $t))
+                {
+                    $zw->new = true;
+                    $zw->insertamum = date('Y-m-d H:i:s');
+                    $zw->insertvon = $uid;
+                }
+                else
+                {
+                    $zw->new = false;
+                }
+
+                if(!$zw->save())
+                    echo $zw->errormsg;
+            }
+        }
+    }
+}
+
+/**
+ * Zeitwunschgueltigkeit fuer Tabelle holen.
+ * Der Zeitwunsch wird anhand der Zeitwunschgueltigkeit (ZWG) des gewaehlten Studiensemesters ermittelt.
+ * Das Studiensemester wird, je nach Vorhandensein, in dieser Reihenfolge herangezogen:
+ * 1. Wenn in Dropdown ausgewaehlt: Vergangenes Studiensemester (zum Kopieren von Zeitwunsch)
+ * 2. Wenn in Dropdown ausgewaehlt: Aktuelles Studiensemester
+ * 3: Default: Nächstes Studiensemesters
+ */
+$zwg = new zeitwunsch_gueltigkeit();
+$tmp_ss = is_null($selected_past_ss) ? $selected_ss : $selected_past_ss;
+$zwg->getByStudiensemester($uid, $tmp_ss);
+$zwg_id = !empty($zwg->result[0]) ? $zwg->result[0]->zeitwunsch_gueltigkeit_id : null;  //null, wenn noch kein ZW
+
+/**
+ * Zeitwunsch fuer Tabelle holen
+ * Wenn noch kein Zeitwunsch vorhanden, bleibt die Zeitwunsch Instanz leer
+ * */
+$zw = new zeitwunsch();
+if (!$zw->loadByZWG($uid, $zwg_id))
+{
+    die($zw->errormsg);
+}
+$wunsch = $zw->zeitwunsch;
 
 /**
  * Init ZWG Objekt zum Erstellen einer neuen ZWG

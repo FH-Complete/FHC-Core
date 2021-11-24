@@ -5519,7 +5519,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitwunsch_gueltigkeit LI
 			bis DATE,
 			insertamum TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
 			insertvon CHARACTER VARYING(32),
-			updateamum TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+			updateamum TIMESTAMP WITHOUT TIME ZONE,
 			updatevon CHARACTER VARYING(32)
 		);
 
