@@ -435,6 +435,21 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
 
                 window.location = '?stsem='+ stsem + '&pastStsem=' + pastStsem;
             });
+
+            // Alle Werte ind Zeitwunschtabelle auf 1 setzen
+            $('#empty-table').click(function(){
+                $('#table-zeitwunsch tr td input').each(function() {
+                    $(this)
+                        .val(1)
+                        .parent().css('background-color', '#CCFFCC');
+                });
+            })
+
+            // Aenderungen in Zeitwunschtabelle zurücknehmen -> Seite neu laden
+            $('#reload-table').click(function(){
+                let studiensemester = $('option:selected', '#stsem').val();
+                window.location = '?stsem=' + studiensemester;
+            })
         });
 		</script>
 	</head>
@@ -543,7 +558,7 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
         echo '</h3><br>';
 
         // Tabelle Zeitwunsch-Semesterplan
-        echo '<table class="table table-default table-condensed table-bordered">';
+        echo '<table id="table-zeitwunsch" class="table table-default table-condensed table-bordered">';
             // Tabelle Kopfzeile
             echo '<tr>';
                 echo '<th>'.$p->t('global/stunde').'<br>'.$p->t('global/beginn').'<br>'.$p->t('global/ende').'</th>';
@@ -581,7 +596,12 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
             echo '<span>Sie können Ihren Zeitwunsch direkt in der Tabelle bearbeiten oder einen Zeitwunsch eines vergangenen Studiensemester kopieren.<br>
                         Solange Sie keine Änderungen vornehmen, wird Ihr Zeitwunsch immer ins nächste Studiensemester übernommen.</span><br>';
             echo '<hr>';
+            echo '</div>'; // end col-xs-12
+        echo '</div>'; // end row
 
+        echo '<div class="row">';
+
+            echo '<div class="col-xs-9">';
                 // Radiobuttons aendern / kopieren
                 $radioChangeChecked = is_null($selected_past_ss) ? 'checked' : '';
                 $radioCopyChecked = !is_null($selected_past_ss) ? 'checked' : '';
@@ -599,11 +619,12 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
                     echo '<span class="label label-danger valign-top">LV bereits zugeteilt</span>';
                 }
                 echo '</div>';
+            echo '</div>'; // end col-xs-9
 
-            echo '</div>'; // end col-xs-12
-        echo '</div>'; // end row
-
-        echo '<div class="row">';
+            echo '<div class="col-xs-3"  class="pull-left">';
+                echo '<span><small><a id="empty-table" style="cursor: pointer">Alle Werte auf 1 setzen</a></small></span><br>';
+                echo '<span><small><a id="reload-table" style="cursor: pointer">Änderungen zurücknehmen</a></small></span><br><br>';
+            echo '</div>'; // end col-xs-3
 
             $divChangeHidden = !is_null($selected_past_ss) || $isAssignedToLv ? 'hidden' : '';
             $divCopyHidden = is_null($selected_past_ss) || $isAssignedToLv ? 'hidden' : '';
