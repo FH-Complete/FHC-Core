@@ -36,6 +36,7 @@ require_once('../../../include/zeitaufzeichnung_gd.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
+require_once('../../../include/lehrstunde.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 
@@ -82,7 +83,7 @@ $ma = new mitarbeiter($uid);
 $fixangestellt = $ma->fixangestellt;
 
 // Check, ob Lektor bereits zugewiesene LVs hat
-$isAssignedToLv = checkIsAssigendToLV($uid, $selected_ss); // boolean
+$isVerplant = checkIsVerplant($uid, $selected_ss); // boolean
 
 // Erklärung zu Pausen bei geteilten Arbeitszeiten speichern
 if (isset($_GET['selbstverwaltete-pause-akt']) && !empty($_GET['submit-akt']))
@@ -267,8 +268,8 @@ if (isset($_GET['type']) && $_GET['type'] == 'save')
     }
 
     // Wenn speichern möglich ist, dann hat der Lektor entweder keine LVs zugeteilt oder hat aktiv die Bearbeitungssperre
-    // deaktiviert. Bearbeitungssperre wird gesetzt, wenn isAssignedToLv true ist. Deshalb hier mit false überschreiben.
-    $isAssignedToLv = false;
+    // deaktiviert. Bearbeitungssperre wird gesetzt, wenn isVerplant true ist. Deshalb hier mit false überschreiben.
+    $isVerplant = false;
 }
 
 /**
@@ -342,15 +343,15 @@ function updateZWG($uid, $zwg_id, $bis)
  * @param $studiensemester_kurzbz
  * @return bool|void
  */
-function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
+function checkIsVerplant($uid, $studiensemester_kurzbz)
 {
-    $lv = new Lehrveranstaltung();
-    if (!$lv->getLVByMitarbeiter($uid, $studiensemester_kurzbz))
+    $lstd = new Lehrstunde();
+    if (!$lstd->getStundenplanData('stundenplandev', null, $studiensemester_kurzbz, null, $uid))
     {
-        die($lv->errormsg);
+        die($lstd->errormsg);
     }
 
-    return empty($lv->lehrveranstaltungen) ? false : true;
+    return empty($lstd->result) ? false : true;
 }
 
 
@@ -391,8 +392,8 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
 
         $(function() {
             // Bearbeitung deaktivieren, wenn Lektor zugewiesene LV im Studiensemester hat
-            const isAssignedToLv = $('input[name=isAssigendToLv]').val();
-            if (isAssignedToLv == 'true')
+            const isVerplant = $('input[name=isVerplant]').val();
+            if (isVerplant == 'true')
             {
                 $('input[name=radioZWG]').attr("disabled", true);
                 $('input[name=submit]').attr("disabled", true);
@@ -404,7 +405,7 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
                 $('input[name=submit]').attr("disabled", false);
 
                 $('#divChangeZWG').removeClass('hidden');
-                $('#divIsAssignedToLv').addClass('hidden');
+                $('#divIsVerplant').addClass('hidden');
             });
 
             // Bei Wechsel von Studiensemester die Seite mit GET params neu laden
@@ -544,7 +545,7 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
         // FORM Begin
         echo '<form name="zeitwunsch" method="post" action="zeitwunsch.php?stsem='. $selected_ss. '&type=save" onsubmit="return checkvalues()">';
         echo '<input type="hidden" name="uid" value="'. $uid. '">';
-        echo '<input type="hidden" name="isAssigendToLv" value="'. json_encode($isAssignedToLv). '">';
+        echo '<input type="hidden" name="isVerplant" value="'. json_encode($isVerplant). '">';
 
         // Mein Zeitwunsch-Semesterplan Dropdown, Default = naechstes Studiensemester
         $next_ss_selected = $next_ss->studiensemester_kurzbz == $selected_ss ? 'selected' : '';
@@ -614,7 +615,7 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
                 echo '<label class="radio-inline">';
                 echo '<b><input type="radio" name="radioZWG" id="radioCopyZWG" value="copy" '. $radioCopyChecked. '> kopieren von früherem Studiensemester&emsp;</b>';
                 echo '</label>';
-                if ($isAssignedToLv)
+                if ($isVerplant)
                 {
                     echo '<span class="label label-danger valign-top">LV bereits zugeteilt</span>';
                 }
@@ -626,9 +627,9 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
                 echo '<span><small><a id="reload-table" style="cursor: pointer">Änderungen zurücknehmen</a></small></span><br><br>';
             echo '</div>'; // end col-xs-3
 
-            $divChangeHidden = !is_null($selected_past_ss) || $isAssignedToLv ? 'hidden' : '';
-            $divCopyHidden = is_null($selected_past_ss) || $isAssignedToLv ? 'hidden' : '';
-            $divIsAssignedToLVHidden = $isAssignedToLv ? '' : 'hidden';
+            $divChangeHidden = !is_null($selected_past_ss) || $isVerplant ? 'hidden' : '';
+            $divCopyHidden = is_null($selected_past_ss) || $isVerplant ? 'hidden' : '';
+            $divIsVerplantHidden = $isVerplant ? '' : 'hidden';
 
             echo '<div id="divChangeZWG" class="'. $divChangeHidden . '">';
                 echo '<div class="col-xs-8 col-lg-7">';
@@ -665,7 +666,7 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
                 echo '</div>';  // end col
             echo '</div>'; // end divCopyZWG
 
-            echo '<div id="divIsAssignedToLv" class="'. $divIsAssignedToLVHidden . '">';
+            echo '<div id="divIsVerplant" class="'. $divIsVerplantHidden . '">';
                 echo '<div class="col-xs-9">';
                 echo '<div class="panel panel-danger">';
                     echo '<div class="panel-body">';
@@ -678,7 +679,7 @@ function checkIsAssigendToLV($uid, $studiensemester_kurzbz)
                     echo '</div>'; // end panel heading
                 echo '</div>'; // end panel
                 echo '</div>'; // end col
-            echo '</div>'; // end divIsAssignedToLV
+            echo '</div>'; // end divIsVerplant
 
             // Speichern - Button
             echo '<div class="col-xs-3">';
