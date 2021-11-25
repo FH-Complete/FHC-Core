@@ -34,6 +34,8 @@ require_once(dirname(__FILE__).'/variable.class.php');
 
 class lehrstunde extends basis_db
 {
+	public $result = array();
+
 	public $stundenplan_id;	/// @brief ID in der Datenbank
 	public $lehreinheit_id;	/// @brief id der Lehreinheit in der DB
 	public $unr;			// @brief Unterrichtsnummer
@@ -1136,7 +1138,10 @@ class lehrstunde extends basis_db
 			return true;
 		}
 		else
+		{
+			$this->errormsg = 'Fehler beim Einholen der Stundenplandaten';
 			return false;
+		}
 	}
 }
 
