@@ -674,6 +674,19 @@ if(isset($_POST['save']))
 		$vorname_clean = mb_strtolower(convertProblemChars($vorname));
 		$nachname_clean = str_replace(' ','_', $nachname_clean);
 		$vorname_clean = str_replace(' ','_', $vorname_clean);
+		var_dump($vorname_clean);
+		var_dump($nachname_clean);
+
+		if (!preg_match('/^[a-z0-9-]{3,32}$/i', $vorname_clean))
+		{
+			$error = true;
+			$errormsg = 'Im Vornamen dürfen keine Sonderzeichen außer - enthalten sein!';
+		}
+		if (!preg_match('/^[a-z0-9-]{4,32}$/i', $nachname_clean))
+		{
+			$error = true;
+			$errormsg = 'Im Nachnamen dürfen keine Sonderzeichen außer - enthalten sein!';
+		}
 
 		$bn = new benutzer();
 
