@@ -156,7 +156,7 @@ class zeitwunsch_gueltigkeit extends basis_db
 
         // Nach Gueltigkeits-Startdatum sortieren, zuerst die zuletzt gueltigen
         $qry.= '
-                ORDER BY zeitwunsch_gueltigkeit_id DESC, start DESC 
+                ORDER BY start DESC 
             ';
 
         // Wenn nur aktive Zeitwunschgueltigkeiten angezeigt werden sollen
