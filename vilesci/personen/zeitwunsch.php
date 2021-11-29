@@ -32,6 +32,8 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/globals.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/zeitwunsch.class.php');
+require_once('../../include/zeitwunsch_gueltigkeit.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -48,6 +50,20 @@ if (!isset($uid))
 {
 	die( "uid nicht gesetzt");
 }
+
+// Zeitwunschgueltigkeit ID ueber Dropdown ausgewaehlt
+if (isset($_GET['zwg_id']) && is_string($_GET['zwg_id']))
+{
+    $zwg_id =  $_GET['zwg_id'];
+}
+else
+{
+    // Default: Letzte Zeitwunschgueltigkeit (ZWG) holen
+    $zwg = new Zeitwunsch_gueltigkeit();
+    $zwg->getByUID($uid, 1);
+    $zwg_id = !empty($zwg->result) ? $zwg->result[0]->zeitwunsch_gueltigkeit_id : null; // NULL, wenn Lektor noch gar keinen ZW hinterlegt hat
+}
+
 $uid_benutzer = get_uid();
 
 $rechte = new benutzerberechtigung();
@@ -97,7 +113,12 @@ $updatevon = 0;
 			}
 	}
 
-	if(!($erg=$db->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid=".$db->db_add_param($uid))))
+	if(!($erg=$db->db_query("
+        SELECT * 
+        FROM campus.tbl_zeitwunsch 
+        WHERE mitarbeiter_uid = ". $db->db_add_param($uid). "
+        AND zeitwunsch_gueltigkeit_id = ". $db->db_add_param(($zwg_id))
+    )))
 		die($db->db_last_error());
 	$num_rows=$db->db_num_rows($erg);
 	for ($i=0;$i<$num_rows;$i++)
@@ -135,10 +156,42 @@ $updatevon = 0;
 <title>Profil</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        // Bei Wechsel von Studiensemester die Seite mit GET params neu laden
+        $('#stsem').change(function(){
+            let uid = $('input[name="uid"]').val();
+            let zeitwunsch_gueltigkeit_id = $('option:selected', this).val();
+
+            window.location = '?uid=' + uid + '&zwg_id=' + zeitwunsch_gueltigkeit_id;
+        });
+});
+</script>
 </head>
 
 <body>
 <h2>Zeitw&uuml;nsche von <?php echo $person->titelpre.' '.$person->vornamen.' '.$person->nachname. ' '.$person->titelpost; ?></h2>
+<span>Zeitwunschgueltigkeit:</span>
+<?php
+$zwg = new Zeitwunsch_gueltigkeit();
+$zwg->getByUID($uid, null, false);
+$zwg_arr = $zwg->result;
+
+echo '<select name="stsem" id="stsem" class="form form-control">';
+foreach($zwg_arr as $row)
+{
+    $von = (new DateTime($row->von))->format('d.m.Y');
+    $bis = !is_null($row->bis) ? (new DateTime($row->bis))->format('d.m.Y') : "offen";
+
+    $selected = !is_null($zwg_id) && $row->zeitwunsch_gueltigkeit_id == $zwg_id ? ' selected ' : '';
+    echo '<option value="'. $row->zeitwunsch_gueltigkeit_id. '"'. $selected. '>'.
+        $row->studiensemester_kurzbz. '&emsp;[ '. $von. ' &ensp;-&ensp;' . $bis. ' ]
+        </option>';
+}
+echo '</select>';
+?>
+<br><br>
 
 <FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save">
   <TABLE width="100%" border="1" cellspacing="0" cellpadding="0">
