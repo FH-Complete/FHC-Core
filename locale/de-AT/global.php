@@ -66,6 +66,7 @@ $this->phrasen['global/pdfExport']='PDF Export';
 $this->phrasen['global/und']='und';
 $this->phrasen['global/oder']='oder';
 $this->phrasen['global/faelligAm']='Fällig am';
+$this->phrasen['global/aenderungenZuruecksetzen']= "&Auml;nderungen zur&uuml;cksetzen";
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='Vorname';

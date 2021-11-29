@@ -551,7 +551,7 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
         $next_ss_selected = $next_ss->studiensemester_kurzbz == $selected_ss ? 'selected' : '';
         $akt_ss_selected = $akt_ss->studiensemester_kurzbz == $selected_ss ? 'selected' : '';
 
-        echo '<h3>Mein Zeitwunsch gültig im: ';
+        echo '<h3>'. $p->t('zeitwunsch/gueltigIm');
         echo '<SELECT name="stsem" id="stsem">';
         echo '<OPTION value="'.$next_ss->studiensemester_kurzbz.'"'. $next_ss_selected. '>'. $next_ss->studiensemester_kurzbz.'</OPTION>';
         echo '<OPTION value="'.$akt_ss->studiensemester_kurzbz.'"'. $akt_ss_selected. '>'. $akt_ss->studiensemester_kurzbz.'</OPTION>';
@@ -594,8 +594,7 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
         // Zeitwunsch aendern / kopieren
         echo '<div class="row">';
             echo '<div class="col-xs-12">';
-            echo '<span>Sie können Ihren Zeitwunsch direkt in der Tabelle bearbeiten oder einen Zeitwunsch eines vergangenen Studiensemester kopieren.<br>
-                        Solange Sie keine Änderungen vornehmen, wird Ihr Zeitwunsch immer ins nächste Studiensemester übernommen.</span><br>';
+            echo '<span>'. $p->t('zeitwunsch/erklaerungstext'). '</span><br>';
             echo '<hr>';
             echo '</div>'; // end col-xs-12
         echo '</div>'; // end row
@@ -608,23 +607,23 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
                 $radioCopyChecked = !is_null($selected_past_ss) ? 'checked' : '';
 
                 echo '<div class="radio">';
-                echo '<span class="text-uppercase"><b>Zeitwunsch für '. $selected_ss. '&emsp;</b></span>';
+                echo '<span class="text-uppercase"><b>'.$p->t('zeitwunsch/fuer', array($selected_ss)). '</b></span>';
                 echo '<label class="radio-inline">';
-                echo '<b><input type="radio" name="radioZWG" id="radioChangeZWG" value="change" '. $radioChangeChecked. '> ändern</b>';
+                echo '<b><input type="radio" name="radioZWG" id="radioChangeZWG" value="change" '. $radioChangeChecked. '> '. $p->t('zeitwunsch/kopieren'). '</b>';
                 echo '</label>';
                 echo '<label class="radio-inline">';
-                echo '<b><input type="radio" name="radioZWG" id="radioCopyZWG" value="copy" '. $radioCopyChecked. '> kopieren von früherem Studiensemester&emsp;</b>';
+                echo '<b><input type="radio" name="radioZWG" id="radioCopyZWG" value="copy" '. $radioCopyChecked. '> '. $p->t('zeitwunsch/aendern'). '</b>';
                 echo '</label>';
                 if ($isVerplant)
                 {
-                    echo '<span class="label label-danger valign-top">LV bereits zugeteilt</span>';
+                    echo '<span class="label label-danger valign-top">'.$p->t('zeitwunsch/stundenBereitsVerplant', array($selected_ss)). '</span>';
                 }
                 echo '</div>';
             echo '</div>'; // end col-xs-9
 
             echo '<div class="col-xs-3"  class="pull-left">';
-                echo '<span><small><a id="empty-table" style="cursor: pointer">Alle Werte auf 1 setzen</a></small></span><br>';
-                echo '<span><small><a id="reload-table" style="cursor: pointer">Änderungen zurücknehmen</a></small></span><br><br>';
+                echo '<span><small><a id="empty-table" style="cursor: pointer">'. $p->t('zeitwunsch/werteAuf1setzen'). '</a></small></span><br>';
+                echo '<span><small><a id="reload-table" style="cursor: pointer">'. $p->t('global/aenderungenZuruecksetzen'). '</a></small></span><br><br>';
             echo '</div>'; // end col-xs-3
 
             $divChangeHidden = !is_null($selected_past_ss) || $isVerplant ? 'hidden' : '';
@@ -633,7 +632,7 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
 
             echo '<div id="divChangeZWG" class="'. $divChangeHidden . '">';
                 echo '<div class="col-xs-8 col-lg-7">';
-                    echo '<span>' . $p->t('zeitwunsch/tragenSieInDiesesNormwochenraster') .' Klicken Sie danach auf \'Speichern\'</span>';
+                    echo '<span>' . $p->t('zeitwunsch/tragenSieInDiesesNormwochenraster') .'</span>';
                 echo '</div>'; // end col
                 echo '<div class="col-xs-1 col-lg-2">';
                     // BLANK
@@ -642,9 +641,7 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
 
             echo '<div id="divCopyZWG" class="'. $divCopyHidden . '">';
                 echo '<div class="col-xs-7">';
-                echo '<span>Wählen Sie rechts das gewünschte Studiensemester aus.
-                                Der Zeitwunsch wird dann <u>automatisch</u> in die Tabelle übernommen.<br>
-                                Nehmen Sie gegebenenfalls Änderungen vor und klicken danach auf \'Speichern\'.</span>';
+                echo '<span>' . $p->t('zeitwunsch/kopierenText') .'</span>';
                 echo '</div>'; // end col
 
                 $studiensemester = new Studiensemester();
@@ -670,12 +667,10 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
                 echo '<div class="col-xs-9">';
                 echo '<div class="panel panel-danger">';
                     echo '<div class="panel-body">';
-                    echo '<span class="text-danger"><b>Bearbeitung deaktiviert: </b></span>';
-                    echo '<span>Ihnen wurden im '. $selected_ss. ' bereits Lehrveranstaltung(en) zugeteilt.</span><br>
-                            Bitte stimmen Sie sich vor einer Änderung mit der <a href="mailto:<?php echo MAIL_LVPLAN;?>">'. $p->t('lvplan/lvKoordinationsstelle'). '</a> ab.<br>
-                            Möchten Sie mit der Bearbeitung fortsetzen? <a id="bearbeitung-aktivieren" style="cursor:pointer;">Hier Bearbeitung aktivieren</a>
+                    echo '<span class="text-danger"><b>'. $p->t("zeitwunsch/bearbeitungDeaktiviert"). ': </b></span>';
+                    echo '<span>'. $p->t("zeitwunsch/bearbeitungDeaktiviertText", array($selected_ss, MAIL_LVPLAN, $p->t('lvplan/lvPlanung'))). ' 
+                        <a id="bearbeitung-aktivieren" style="cursor:pointer;">'. $p->t("zeitwunsch/bearbeitungAktivieren"). '</a>
                         </span>';
-
                     echo '</div>'; // end panel heading
                 echo '</div>'; // end panel
                 echo '</div>'; // end col
@@ -700,7 +695,7 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
                         <LI><?php echo $p->t('zeitwunsch/sperrenSieNurTermine');?></LI>
                         <LI><?php echo $p->t('zeitwunsch/esSolltenFuerJedeStunde');?></LI>
                     </UL><br>
-                    <P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P><br>
+                    <P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('lvplan/lvPlanung');?></A>.</P><br>
             </div>
             <div class="col-xs-3">
                 <br>

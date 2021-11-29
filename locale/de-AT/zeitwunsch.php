@@ -3,7 +3,7 @@ $this->phrasen['zeitwunsch/falscheWerteEingetragen']='Es duerfen nur die Werte -
 $this->phrasen['zeitwunsch/zeitwunsch']='Zeitwunsch';
 $this->phrasen['zeitwunsch/help']='HELP';
 $this->phrasen['zeitwunsch/zeitwunschVon']='Zeitwünsche von';
-$this->phrasen['zeitwunsch/tragenSieInDiesesNormwochenraster']='Tragen Sie in dieses Normwochenraster Ihre Verfügbarkeit in einer durchschnittlichen Arbeitswoche ein.';
+$this->phrasen['zeitwunsch/tragenSieInDiesesNormwochenraster']="Tragen Sie in dieses Normwochenraster Ihre Verfügbarkeit in einer durchschnittlichen Arbeitswoche ein. Klicken Sie danach auf 'Speichern'";
 $this->phrasen['zeitwunsch/letzteAenderung']='Letzte Änderung';
 $this->phrasen['zeitwunsch/von']='von';
 $this->phrasen['zeitwunsch/formularZumEintragenDerZeitsperren']='Das Formular zum Eintragen der Zeitsperren finden Sie %s hier';
@@ -24,4 +24,20 @@ $this->phrasen['zeitwunsch/erklaerung']='Erklärung';
 $this->phrasen['zeitwunsch/beiProblemenWendenSieSichAn']='Bei Problemen wenden Sie sich bitte an die';
 $this->phrasen['zeitwunsch/profil']='Profil';
 $this->phrasen['zeitwunsch/geteilteArbeitszeit']='Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken am Tagesrand einverstanden.';
+$this->phrasen['zeitwunsch/gueltigIm']="Mein Zeitwunsch g&uuml;ltig im: ";
+$this->phrasen['zeitwunsch/erklaerungstext']="Sie k&ouml;nnen Ihren Zeitwunsch direkt in der Tabelle bearbeiten oder einen Zeitwunsch eines vergangenen Studiensemester kopieren.<br>
+                        Solange Sie keine &Auml;nderungen vornehmen, wird Ihr Zeitwunsch immer ins n&auml;chste Studiensemester &uuml;bernommen.";
+$this->phrasen['zeitwunsch/werteAuf1setzen']="Alle Werte auf 1 setzen";
+$this->phrasen['zeitwunsch/kopierenText']="W&auml;hlen Sie rechts das gew&uuml;nschte Studiensemester aus.
+                                Der Zeitwunsch wird dann <u>automatisch</u> in die Tabelle &uuml;bernommen.<br>
+                                Nehmen Sie gegebenenfalls &Auml;nderungen vor und klicken danach auf 'Speichern'.";
+$this->phrasen['zeitwunsch/kopieren']= "&auml;ndern";
+$this->phrasen['zeitwunsch/aendern']= "kopieren von fr&uuml;herem Studiensemester&emsp;";
+$this->phrasen['zeitwunsch/stundenBereitsVerplant']='Stunden für %s bereits verplant';
+$this->phrasen['zeitwunsch/fuer']='Zeitwunsch f&uuml;r %s &ensp;';
+$this->phrasen['zeitwunsch/bearbeitungDeaktiviert']='Bearbeitung deaktiviert';
+$this->phrasen['zeitwunsch/bearbeitungDeaktiviertText']='Ihnen wurden im %s bereits Lehrveranstaltung(en) zugeteilt.</span><br>
+                            Bitte stimmen Sie sich vor einer &Auml;nderung mit der <a href="mailto:%s">%s</a> ab.<br>
+                            M&ouml;chten Sie mit der Bearbeitung fortsetzen?';
+$this->phrasen['zeitwunsch/bearbeitungAktivieren']='Bearbeitung aktivieren';
 ?>
