@@ -219,9 +219,9 @@ if (isset($_GET['type']) && $_GET['type'] == 'save')
                     // -> sonst ist bis null
                     $zw_zwg_id = insertZWG($uid, (new DateTime())->format('Y-m-d H:i:s'), $akt_ss_zwg->bis);
 
-                    // Fuer bisher letzte ZWG das Endedatum auf heute setzen: bis = now()
+                    // Fuer bisher letzte ZWG das Endedatum auf gestern setzen: bis = gestern
                     // NOTE: MUSS nach dem insert sein
-                    updateZWG($uid, $akt_ss_zwg->zeitwunsch_gueltigkeit_id, (new DateTime())->format('Y-m-d H:i:s'));
+                    updateZWG($uid, $akt_ss_zwg->zeitwunsch_gueltigkeit_id, (new DateTime('yesterday'))->format('Y-m-d H:i:s'));
                 }
             }
         }
