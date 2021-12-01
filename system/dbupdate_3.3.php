@@ -4198,60 +4198,60 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_st
 }
 
 // Add type "p" to Studiengangstyp
-	if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'p';"))
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'p';"))
+{
+	if ($db->db_num_rows($result) == 0)
 	{
-		if ($db->db_num_rows($result) == 0)
-		{
-			$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('p', 'PhD',NULL,'{PhD,PhD}');";
-	
-			if (!$db->db_query($qry))
-				echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
-			else
-				echo '<br> public.tbl_studiengangstyp: Added type "p"<br>';
-		}
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('p', 'PhD',NULL,'{PhD,PhD}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "p"<br>';
 	}
-	
+}
+
 // Add type "l" to Studiengangstyp
-	if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'l';"))
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'l';"))
+{
+	if ($db->db_num_rows($result) == 0)
 	{
-		if ($db->db_num_rows($result) == 0)
-		{
-			$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('l', 'Lehrgang',NULL,'{Lehrgang,Course}');";
-	
-			if (!$db->db_query($qry))
-				echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
-			else
-				echo '<br> public.tbl_studiengangstyp: Added type "l"<br>';
-		}
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('l', 'Lehrgang',NULL,'{Lehrgang,Course}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "l"<br>';
 	}
-	
+}
+
 // Add type "d" to Studiengangstyp
-	if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'd';"))
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'd';"))
+{
+	if ($db->db_num_rows($result) == 0)
 	{
-		if ($db->db_num_rows($result) == 0)
-		{
-			$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('d', 'Diplom',NULL,'{Diplom,Diploma}');";
-	
-			if (!$db->db_query($qry))
-				echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
-			else
-				echo '<br> public.tbl_studiengangstyp: Added type "d"<br>';
-		}
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('d', 'Diplom',NULL,'{Diplom,Diploma}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "d"<br>';
 	}
+}
 
 // Add type "w" to Studiengangstyp
-	if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'w';"))
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'w';"))
+{
+	if ($db->db_num_rows($result) == 0)
 	{
-		if ($db->db_num_rows($result) == 0)
-		{
-			$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('w', 'Weiterbildung',NULL,'{Weiterbildung,Further education}');";
-	
-			if (!$db->db_query($qry))
-				echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
-			else
-				echo '<br> public.tbl_studiengangstyp: Added type "w"<br>';
-		}
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('w', 'Weiterbildung',NULL,'{Weiterbildung,Further education}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "w"<br>';
 	}
+}
 
 /**
  * Anpassungen fuer BIS Personalmeldung 6.8
