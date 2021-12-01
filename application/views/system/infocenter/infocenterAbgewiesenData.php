@@ -76,6 +76,7 @@ $query = '
 				$datasetRaw->{'Nachricht'} = 'Ja';
 			}
 
+			$datasetRaw->{'AbgewiesenAm'} = date_format(date_create($datasetRaw->{'AbgewiesenAm'}),'Y-m-d H:i');
 			return $datasetRaw;
 		}
 	);

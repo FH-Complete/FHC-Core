@@ -1486,7 +1486,7 @@ class InfoCenter extends Auth_Controller
 					20   				// sort
 				),
 				'abgewiesen' => $this->navigationlib->oneLevel(
-					'Abgewiesene Studenten',		// description
+					'Abgewiesene',		// description
 					$abgewiesenLink,				// link
 					null,				// children
 					'close',					// icon
@@ -1624,7 +1624,7 @@ class InfoCenter extends Auth_Controller
 			$this->navigationlib->setSessionElementMenu(
 				'abgewiesen',
 				$this->navigationlib->oneLevel(
-					'Abgewiesene Studenten',		// description
+					'Abgewiesene',		// description
 					$abgewiesenLink,	// link
 					null,				// children
 					'close',			// icon

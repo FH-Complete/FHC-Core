@@ -35,7 +35,7 @@
 				<div class="row">
 					<div class="col-lg-12">
 						<h3 class="page-header">
-							Abgewiesene Studenten
+							Abgewiesene
 						</h3>
 					</div>
 				</div>
