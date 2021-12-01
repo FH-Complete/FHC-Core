@@ -4,7 +4,7 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 
 class Oehbeitrag extends Auth_Controller
 {
-	const STUDIENSEMESTER_START = 'WS2020';
+	const STUDIENSEMESTER_START = 'WS2020'; // Öhbeitrage can be assigned beginning with this Studiensemester
 
 	public function __construct()
     {
@@ -23,6 +23,14 @@ class Oehbeitrag extends Auth_Controller
         $this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$this->load->library('WidgetLib');
+
+		$this->loadPhrases(
+			array(
+				'global',
+				'ui',
+				'oehbeitrag'
+			)
+		);
     }
 
 	public function index()
