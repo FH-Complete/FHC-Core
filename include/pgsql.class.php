@@ -32,12 +32,12 @@ class basis_db extends db
 		//Connection Herstellen
 		if (DB_CONNECT_PERSISTENT)
 		{
-			if(!basis_db::$db_conn = pg_pconnect($conn_str))
+			if(!basis_db::$db_conn = @pg_pconnect($conn_str))
 				die('Fehler beim Oeffnen der Datenbankverbindung');
 		}
 		else
 		{
-			if(!basis_db::$db_conn = pg_connect($conn_str))
+			if(!basis_db::$db_conn = @pg_connect($conn_str))
 				die('Fehler beim Oeffnen der Datenbankverbindung');
 		}
 	}

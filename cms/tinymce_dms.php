@@ -332,6 +332,7 @@ if (isset($_POST['fileupload']))
 	$dms_id = $_POST['dms_id'];
 	$beschreibung = $_POST['beschreibung'];
 	$schlagworte = $_POST['schlagworte'];
+	$mimetype = isset($_POST['mimetype']) ? $_POST['mimetype'] : '';
 	$cis_suche = isset($_POST['cis_suche']) ? true : false;
 	$ext = pathinfo($_FILES['userfile']['name'], PATHINFO_EXTENSION);
 	$filename = uniqid();
@@ -363,7 +364,14 @@ if (isset($_POST['fileupload']))
 
 		$dms->insertamum = date('Y-m-d H:i:s');
 		$dms->insertvon = $user;
-		$dms->mimetype = finfo_file($finfo, $uploadfile); // Davor deprecated: $_FILES['userfile']['type'];
+		if ($mimetype != '')
+		{
+			$dms->mimetype = $mimetype;
+		}
+		else
+		{
+			$dms->mimetype = finfo_file($finfo, $uploadfile);
+		}
 		$dms->filename = $filename;
 		$dms->name = $_FILES['userfile']['name'];
 		$dms->beschreibung = $beschreibung;
@@ -404,6 +412,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'rename')
 	$version = $_POST['version'];
 	$beschreibung = $_POST['beschreibung'];
 	$schlagworte = $_POST['schlagworte'];
+	$mimetype = isset($_POST['mimetype']) ? $_POST['mimetype'] : '';
 	$cis_suche = isset($_POST['cis_suche']) ? true : false;
 
 	$dms = new dms();
@@ -413,6 +422,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'rename')
 		$dms->beschreibung = $beschreibung;
 		$dms->schlagworte = $schlagworte;
 		$dms->cis_suche = $cis_suche;
+		if ($mimetype != '')
+		{
+			$dms->mimetype = $mimetype;
+		}
+		else
+		{
+			$dms->mimetype = finfo_file($finfo, $uploadfile);
+		}
 		$dms->updateamum = date('Y-m-d H:i:s');
 		$dms->updatevon = $user;
 
@@ -1013,6 +1030,10 @@ else
 					<td><textarea name="schlagworte" id="schlagworte-textarea" rows="2" cols="80" style="font-size: small;"></textarea></td>
 				</tr>
 				<tr>
+					<td>Mimetype</td>
+					<td><input type="text" name="mimetype" id="mimetype-input" size="50" maxlength="256" style="font-size: small;" /></td>
+				</tr>
+				<tr>
 					<td>CIS-Suche</td>
 					<td><input type="checkbox" id="cis_suche_checkbox" name="cis_suche"></td>
 				</tr>
@@ -1088,6 +1109,7 @@ function drawAllVersions($id)
 				<th>CIS-Suche</th>
 				<th>Kategorie</th>
 				<th>Filename intern</th>
+				<th>Mimetype</th>
 				<th>Datum</th>
 				<th>User</th>
 			</tr>
@@ -1102,6 +1124,7 @@ function drawAllVersions($id)
 				<td style="padding: 1px; vertical-align:middle">'.($dms_help->cis_suche == 'true'?'Ja':'Nein').'</td>
 				<td style="padding: 1px; vertical-align:middle" align="center">'.$dms_help->kategorie_kurzbz.'</td>
 				<td style="padding: 1px; vertical-align:middle" align="center">'.$dms_help->filename.'</td>
+				<td style="padding: 1px; vertical-align:middle" align="center">'.$dms_help->mimetype.'</td>
 				<td style="padding: 1px; vertical-align:middle">'.$dms_help->insertamum.'</td>
 				<td style="padding: 1px; vertical-align:middle;">'.$dms_help->insertvon.'</td>
 				<td style="padding: 1px; vertical-align:middle;">
@@ -1567,6 +1590,10 @@ function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching
 		<tr>
 			<td>Schlagworte<br/>(Semikolon getrennt):</td>
 			<td><textarea name="schlagworte" rows="2" cols="80" style="font-size: small;">'.$dms->convert_html_chars($dms->schlagworte).'</textarea></td>
+		</tr>
+		<tr>
+			<td>Mimetype</td>
+			<td><input type="text" name="mimetype" size="80" maxlength="256" style="font-size: small;" value="'.$dms->convert_html_chars($dms->mimetype).'"/></td>
 		</tr>
 		<tr>
 			<td>CIS-Suche:</td>

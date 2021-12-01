@@ -110,10 +110,18 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 {
 	$db = new basis_db();
 
+	$studiengang_details = new studiengang();
+	$studiengang_details->load($studiengang_kz);
+
+	if (!isset($studiengang_details->studiengang_kz))
+	{
+		return false;
+	}
+
 	$jahr = substr($studiensemester_kurzbz, 4);
 	$art = substr($studiensemester_kurzbz, 0, 2);
 
-	if($studiengang_kz<0)
+	if (($studiengang_kz < 0) || (isset($studiengang_details->typ) && ($studiengang_details->typ == 'l')))
 	{
 		$studiengang_kz=abs($studiengang_kz);
 		//Lehrgang
@@ -136,7 +144,17 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	}
 	if($art=='2' || $art=='4')
 		$jahr = $jahr-1;
-	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
+
+	//FH-Burgenland - weil leider die AO Studiengänge aufgeteilt sind
+	//(AO sind normal 9+erhalter Nummer, matrikelnr/personenkz wird auch im DVUH Extension berücksichtigt)
+	if ($studiengang_kz >= 90010 && $studiengang_kz <= 90019)
+	{
+		$matrikelnummer = sprintf("%02d",$jahr).$art.substr($studiengang_kz, 0, 4);
+	}
+	else
+	{
+		$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
+	}
 
 	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
 
@@ -410,6 +428,8 @@ if(!$error)
 				$student->geburtsnation = $_POST['geburtsnation'];
 				$student->sprache = $_POST['sprache'];
 				$student->matrikelnr = $_POST['matrikelnummer'];
+				if (isset($_POST['bpk']))
+					$student->bpk = $_POST['bpk'];
 				$student->updateamum = date('Y-m-d H:i:s');
 				$student->updatevon = $user;
 
@@ -559,6 +579,8 @@ if(!$error)
 				$person->geburtsnation = $_POST['geburtsnation'];
 				$person->sprache = $_POST['sprache'];
 				$person->matr_nr = $_POST['matr_nr'];
+				if (isset($_POST['bpk']))
+					$person->bpk = $_POST['bpk'];
 				$person->updateamum = date('Y-m-d H:i:s');
 				$person->updatevon = $user;
 
@@ -631,11 +653,18 @@ if(!$error)
 				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
 				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
+				$foerderrelevant = null;
+				if ($_POST['foerderrelevant'] === 'true')
+					$foerderrelevant = true;
+				elseif ($_POST['foerderrelevant'] === 'false')
+					$foerderrelevant = false;
+				$prestudent->foerderrelevant = $foerderrelevant;
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
 				$prestudent->mentor = $_POST['mentor'];
 				$prestudent->gsstudientyp_kurzbz = $_POST['gsstudientyp_kurzbz'];
 				$prestudent->priorisierung = $_POST['priorisierung'];
+				$prestudent->standort_code = $_POST['standort_code'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;
 				$prestudent->updateamum = date('Y-m-d H:i:s');
