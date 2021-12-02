@@ -26,9 +26,6 @@ class UDF extends FHC_Controller
 
 		// Loads the UDFLib with HTTP GET/POST parameters
 		$this->_loadUDFLib();
-
-		// Checks if the caller is allow to use this UDF widget
-		$this->_isAllowed();
     }
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -39,7 +36,6 @@ class UDF extends FHC_Controller
 	 */
 	public function saveUDFs()
 	{
-		$udfUniqueId = $this->input->post(self::UDF_UNIQUE_ID);
 		$udfs = $this->input->post(UDFLib::UDFS_ARG_NAME);
 
 		if (!isEmptyString($udfs))
@@ -47,7 +43,7 @@ class UDF extends FHC_Controller
 			$jsonDecodedUDF = json_decode($udfs);
 			if ($jsonDecodedUDF != null)
 			{
-				$this->outputJson($this->udflib->saveUDFs($udfUniqueId, $jsonDecodedUDF));
+				$this->outputJson($this->udflib->saveUDFs($jsonDecodedUDF));
 			}
 			else
 			{
@@ -62,17 +58,6 @@ class UDF extends FHC_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
-
-	/**
-	 * Checks if the user is allowed to use this UDFWidget
-	 */
-	private function _isAllowed()
-	{
-		if (!$this->udflib->isAllowed())
-		{
-			$this->terminateWithJsonError('You are not allowed to access to this content');
-		}
-	}
 
 	/**
 	 * Loads the UDFLib with the UDF_UNIQUE_ID parameter
@@ -105,3 +90,4 @@ class UDF extends FHC_Controller
 		}
 	}
 }
+

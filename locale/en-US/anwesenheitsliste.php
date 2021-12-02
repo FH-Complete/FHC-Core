@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='No valid semester'; 
 $this->phrasen['anwesenheitsliste/anwesenheitslisten']='Attendance lists';
+$this->phrasen['anwesenheitsliste/covidstatuslisten']='verification lists';
 $this->phrasen['anwesenheitsliste/notenlisten']='Grade lists';
 $this->phrasen['anwesenheitsliste/notenliste']='Grade list';
 $this->phrasen['anwesenheitsliste/anwesenheitslistenMitBildern']='Picture lists';

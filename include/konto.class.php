@@ -713,7 +713,7 @@ class konto extends basis_db
 		$qry = "select sum(betrag) as betrag from public.tbl_konto
 				join public.tbl_benutzer benutzer using(person_id)
 				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)."
-				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0";
+				and buchungstyp_kurzbz in('Studiengebuehr','StudiengebuehrAnzahlung','StudiengebuehrRestzahlung') and betrag > 0";
 		if($studiengang_kz!= null)
 		$qry.=" and studiengang_kz = ".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 

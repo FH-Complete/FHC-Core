@@ -236,7 +236,9 @@ if (! $funktion->load ( $kurzbz )) {
 <link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 
 <script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<?php
+	include("../../include/meta/jquery-tablesorter.php");
+	?>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -265,8 +267,8 @@ if (! $funktion->load ( $kurzbz )) {
 		});
 		$("#t1").tablesorter({
 			sortList: [[0,0]],
-			widgets: ["zebra"],
-			headers: {9:{sorter:false},10:{sorter:false}}
+			widgets: ["zebra", "filter", "stickyHeaders"],
+			headers: {9:{sorter:false, filter: false},10:{sorter:false, filter: false}}
 		});
 		$('#t1').checkboxes('range', true);
 		$( ".datepicker_datumvon" ).datepicker({
