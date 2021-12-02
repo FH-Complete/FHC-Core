@@ -51,7 +51,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
-if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars LIMIT 1"))
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1"))
 {
 	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
 	$qry = '
@@ -2760,7 +2760,7 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 }
 
 // Spalte Zugangscode zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -3827,7 +3827,7 @@ if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindu
 }
 
 // iban, bic und weitere Variablen zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -4356,7 +4356,7 @@ if (!$result = @$db->db_query("SELECT ba1code_bis FROM bis.tbl_beschaeftigungsar
 }
 
 // Orgform DE und Orform EN zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "Orgform DE", "Orgform EN" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "Orgform DE", "Orgform EN" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
