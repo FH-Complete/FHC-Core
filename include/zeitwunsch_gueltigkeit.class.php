@@ -18,9 +18,9 @@ class zeitwunsch_gueltigkeit extends basis_db
     public $updatevon;                  // varchar 32
 
 
-    public function __construct()
+    public function __construct($zeitwunsch_gueltigkeit_id = null)
     {
-        parent::__construct($zeitwunsch_gueltigkeit_id = null);
+        parent::__construct();
 
         if (!is_null($zeitwunsch_gueltigkeit_id))
         {
