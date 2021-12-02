@@ -17,6 +17,9 @@ class zeitwunsch_gueltigkeit extends basis_db
     public $updateamum;                 // timestamp
     public $updatevon;                  // varchar 32
 
+    public $studiensemester_kurzbz;
+    public $start;
+    public $ende;
 
     public function __construct($zeitwunsch_gueltigkeit_id = null)
     {
@@ -45,6 +48,7 @@ class zeitwunsch_gueltigkeit extends basis_db
             SELECT *
             FROM campus.tbl_zeitwunsch_gueltigkeit
             WHERE zeitwunsch_gueltigkeit_id = '.$this->db_add_param($zeitwunsch_gueltigkeit_id). '
+            AND (von < ende AND COALESCE(bis, '. $this->db_add_param($studiensemester->ende).'::date ) > start)
             ORDER BY von DESC
         ';
 
@@ -130,13 +134,14 @@ class zeitwunsch_gueltigkeit extends basis_db
      */
     public function getByUID($uid, $limit = null, $activeOnly = true, $bis = null)
     {
-        $studiensemester = new Studiensemester();
-        $studiensemester->getNextStudiensemester();
-
         $qry = '
-            SELECT zwg.*, studiensemester_kurzbz, start, ende
-            FROM campus.tbl_zeitwunsch_gueltigkeit zwg, public.tbl_studiensemester
-            WHERE zwg.mitarbeiter_uid = '.$this->db_add_param($uid);
+            SELECT zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, bis, 
+                   insertamum, insertvon, updateamum, updatevon, 
+                   studiensemester_kurzbz, start, ende
+            FROM (
+                SELECT DISTINCT ON (bis) bis, zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, insertamum, insertvon, updateamum, updatevon, studiensemester_kurzbz, start, ende
+                FROM campus.tbl_zeitwunsch_gueltigkeit zwg, public.tbl_studiensemester
+                WHERE zwg.mitarbeiter_uid =  '.$this->db_add_param($uid);
 
         // Wenn Bis-Datum angegeben
         if (!is_null($bis))
@@ -150,13 +155,18 @@ class zeitwunsch_gueltigkeit extends basis_db
         {
             // Alle Zeitwuensche
             $qry.= '
-                AND (von < ende AND COALESCE(bis, '. $this->db_add_param($studiensemester->ende).'::date ) > start)
+                AND (von < ende AND COALESCE(bis, \'2999-12-31\'::date ) > start)
             ';
         }
 
+        $qry.= '
+                ORDER BY bis, von DESC, bis DESC, start ASC
+                ) temp
+            ';
+
         // Nach Gueltigkeits-Startdatum sortieren, zuerst die zuletzt gueltigen
         $qry.= '
-                ORDER BY start DESC 
+                ORDER BY von DESC, bis DESC 
             ';
 
         // Wenn nur aktive Zeitwunschgueltigkeiten angezeigt werden sollen
@@ -164,11 +174,11 @@ class zeitwunsch_gueltigkeit extends basis_db
         {
             // ...mit distinct die zuletzt erstellten pro Studiensemester filtern
             $qry = '
-                SELECT DISTINCT ON (start, studiensemester_kurzbz) start, studiensemester_kurzbz, 
-                    ende, zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, bis, 
+                SELECT DISTINCT ON (studiensemester_kurzbz) studiensemester_kurzbz, 
+                    start, ende, zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, bis, 
                     insertamum, insertvon, updateamum, updatevon 
                 FROM ('. $qry. ') temp
-                ORDER BY start DESC, studiensemester_kurzbz 
+                ORDER BY studiensemester_kurzbz, von DESC, bis DESC 
             ';
         }
 
@@ -229,7 +239,7 @@ class zeitwunsch_gueltigkeit extends basis_db
             FROM campus.tbl_zeitwunsch_gueltigkeit zwg, studiensemester ss
             WHERE zwg.mitarbeiter_uid = '.$this->db_add_param($uid). '
             AND (zwg.von < ss.ende AND COALESCE(zwg.bis, ss.ende) >= ss.start)
-            ORDER BY von DESC
+            ORDER BY von DESC, bis DESC
         ';
 
         // Wenn Limit angegeben
