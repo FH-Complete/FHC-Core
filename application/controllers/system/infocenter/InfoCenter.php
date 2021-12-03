@@ -933,7 +933,8 @@ class InfoCenter extends Auth_Controller
 
 					$this->_log($person_id, 'freigegeben', $logparams);
 
-					$this->_sendFreigabeMail($prestudent_id);
+					if (is_numeric($statusgrund_id) || $logdata['studiengang_typ'] === 'm')
+						$this->_sendFreigabeMail($prestudent_id);
 				}
 			}
 		}
