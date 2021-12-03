@@ -38,6 +38,7 @@ if(!$rechte->isBerechtigt('student/stammdaten', null, 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 $error_log='';
+$error_log_hinweis='';
 $error_log1='';
 $error_log_all="";
 $fehler='';
@@ -242,29 +243,37 @@ if($result = $db->db_query($qry))
 			$zustell_strasse = $rowzustelladr->strasse;
 			$zustell_nation = $rowzustelladr->nation;
 		}
-		
-		// eMail-Adresse
-		$qry_mail = "
+
+		// FH eMail-Adresse FH aus UID@Domain
+		$email = '';
+		if ($row->student_uid != '')
+		{
+			$email = $row->student_uid. '@'. DOMAIN;
+		}
+
+		// private eMail-Adresse
+		$email_privat = '';
+		$qry_privmail = "
 			SELECT kontakt
 			FROM public.tbl_kontakt
-			WHERE kontakttyp = 'email'
-			AND zustellung = TRUE
-			AND person_id = ". $db->db_add_param($row->pers_id). "
-			ORDER BY insertamum DESC LIMIT 1;
+			WHERE zustellung = TRUE
+			AND kontakttyp = 'email'
+			AND person_id=". $db->db_add_param($row->pers_id). "
+			ORDER BY insertamum DESC
+			LIMIT 1;
 		";
-		
-		$email = '';
-		if ($result_email = $db->db_query($qry_mail))
+
+		if ($privmail_result = $db->db_query($qry_privmail))
 		{
-			if($db->db_num_rows($result_email) == 1)
+			if($db->db_num_rows($privmail_result) == 1)
 			{
-				if($row_mail = $db->db_fetch_object($result_email))
+				if ($row_privmail = $db->db_fetch_object($privmail_result))
 				{
-					$email = $row_mail->kontakt;
+					$email_privat = $row_privmail->kontakt;
 				}
 			}
 		}
-		
+
 		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -302,7 +311,7 @@ if($result = $db->db_query($qry))
 		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - ausser bei 01.01. und 01.07.
 		if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 		{
-			$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
+			$error_log_hinweis.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		//Vergleich der letzten 6 Stellen des Ersatzkennzeichen mit Geburtsdatum
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
@@ -379,7 +388,7 @@ if($result = $db->db_query($qry))
 				}
 			}
 		}
-		/*if($row->bpk == '' || $row->bpk == null)
+		if($row->bpk == '' || $row->bpk == null)
 		{
 			$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 		}
@@ -395,7 +404,7 @@ if($result = $db->db_query($qry))
 			{
 				$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 			}
-		}*/
+		}
 		
 		if ($zustell_plz == '' || $zustell_plz == null)
 		{
@@ -474,6 +483,7 @@ if($result = $db->db_query($qry))
 					{
 						$error_log='';
 						$error_log1='';
+						$error_log_hinweis='';
 						continue;
 					}
 					$aktstatus=$rowstatus->status_kurzbz;
@@ -520,6 +530,7 @@ if($result = $db->db_query($qry))
 						{
 							$error_log='';
 							$error_log1='';
+							$error_log_hinweis='';
 							continue;
 						}
 						$aktstatus=$rowstatus->status_kurzbz;
@@ -580,6 +591,11 @@ if($result = $db->db_query($qry))
 			{
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 			}
+			if($error_log_hinweis != '')
+			{
+				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+				$error_log_hinweis = '';
+			}
 			$zaehl++;
 			$v.="\n";
 			$error_log='';
@@ -588,6 +604,13 @@ if($result = $db->db_query($qry))
 		}
 		else
 		{
+			if($error_log_hinweis != '')
+			{
+				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+				$error_log_hinweis = '';
+			}
+
 			$anzahl_gemeldet++;
 			$tabelle.='<tr><td>'.$row->student_uid.'</td><td>'.$row->nachname.'</td><td>'.$row->vorname.'</td><td>'.$row->matrikelnr.'</td></tr>';
 
@@ -620,15 +643,16 @@ if($result = $db->db_query($qry))
 					$datei.="
 				<SVNR>".$row->svnr."</SVNR>";
 				}
-				if($row->ersatzkennzeichen!='')
+				// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
+				if($row->ersatzkennzeichen!='' && $row->svnr == null)
 				{
 					$datei.="
 				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 				}
 			
-				/*$datei.="
+				$datei.="
 				<bPK>".$row->bpk."</bPK>
-				";*/
+				";
 
 				$datei.="
 				<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
@@ -648,7 +672,8 @@ if($result = $db->db_query($qry))
 				}
 			
 				$datei.="
-				<eMailAdresse>". $email. "</eMailAdresse>
+				<eMailAdresse>". $email_privat. "</eMailAdresse>
+				<eMailAdresseBE>". $email. "</eMailAdresseBE>
 				<ZugangCode>".$row->zgv_code."</ZugangCode>
 				<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
 
