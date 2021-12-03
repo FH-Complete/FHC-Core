@@ -298,16 +298,16 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 				if ($udfToKeep != $udfToDelete)
 				{
-					foreach ($udfToDelete as $key => $udf)
+					foreach ($udfToDelete as $key => $udfValue)
 					{
 						if (!array_key_exists($key, $udfToKeep))
 						{
-							$udfToKeep[$key] = $udf;
+							$udfToKeep[$key] = $udfValue;
 						}
-						elseif ($udfToKeep[$key] !== $udf && !is_null($udf))
+						elseif ($udfToKeep[$key] !== $udfValue && !is_null($udfValue))
 						{
 							if (is_null($udfToKeep[$key]))
-								$udfToKeep[$key] = $udf;
+								$udfToKeep[$key] = $udfValue;
 							else
 							{
 								$msg_error[] = 'Beide Personen haben unterschiedliche Werte in den UDFs und können nicht zusammengelegt werden.<br>
@@ -850,16 +850,16 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 											if ($udfToKeep != $udfToDelete)
 											{
-												foreach ($udfToDelete as $udfKey => $udf)
+												foreach ($udfToDelete as $udfKey => $udfValue)
 												{
 													if (!array_key_exists($udfKey, $udfToKeep))
 													{
-														$udfToKeep[$udfKey] = $udf;
+														$udfToKeep[$udfKey] = $udfValue;
 													}
-													elseif ($udfToKeep[$udfKey] !== $udf && !is_null($udf))
+													elseif ($udfToKeep[$udfKey] !== $udfValue && !is_null($udfValue))
 													{
 														if (is_null($udfToKeep[$udfKey]))
-															$udfToKeep[$udfKey] = $udf;
+															$udfToKeep[$udfKey] = $udfValue;
 														else
 														{
 
