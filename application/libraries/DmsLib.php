@@ -2,24 +2,35 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class DmsLib extends FHC_Controller
+class DmsLib
 {
 	const FILE_CONTENT_PROPERTY = 'file_content';
-	
-	private $UPLOAD_PATH = DMS_PATH; // temporary directory to store the upload file
+
+	private $_ci; // code igniter instance
 
 	/**
 	 * Object initialization
 	 */
 	public function __construct()
 	{
-		$this->ci =& get_instance();
+		$this->_ci =& get_instance();
 
-		$this->ci->load->model('crm/Akte_model', 'AkteModel');
-		$this->ci->load->model('content/Dms_model', 'DmsModel');
-		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
-		$this->ci->load->model('content/DmsFS_model', 'DmsFSModel');
+		$this->_ci->load->model('crm/Akte_model', 'AkteModel'); // deprecated, should not be used here!
+		$this->_ci->load->model('content/Dms_model', 'DmsModel');
+		$this->_ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
+		$this->_ci->load->model('content/DmsFS_model', 'DmsFSModel');
 	}
+
+	// -----------------------------------------------------------------------------------------------------------
+	// Public methods
+
+
+	// -----------------------------------------------------------------------------------------------------------
+	// Private methods
+
+
+	// -----------------------------------------------------------------------------------------------------------
+	// Deprecated methods, not to be used
 	
 	/**
 	 * Load a DMS Document.
@@ -33,19 +44,20 @@ class DmsLib extends FHC_Controller
 	{
 		if (is_numeric($dms_id))
 		{
-			$this->ci->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
-			$this->ci->DmsModel->addOrder('version', 'DESC');
-			$this->ci->DmsModel->addLimit(1);
+			$this->_ci->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
+			$this->_ci->DmsModel->addOrder('version', 'DESC');
+			$this->_ci->DmsModel->addLimit(1);
 			
 			if (!is_numeric($version))
 			{
-				return $this->ci->DmsModel->load($dms_id);
+				return $this->_ci->DmsModel->load($dms_id);
 			}
 			else
 			{
-				return $this->ci->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
+				return $this->_ci->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
 			}
 		}
+
 		return error('The parameter DMS ID must be a number');
 	}
 
@@ -57,34 +69,30 @@ class DmsLib extends FHC_Controller
 	 */
 	public function read($dms_id, $version = null)
 	{
-		$result = null;
+		$result = error('Wrong dms_id parameter');
 
 		if (isset($dms_id))
 		{
-			$this->ci->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
-			$this->ci->DmsModel->addOrder('version', 'DESC');
-			$this->ci->DmsModel->addLimit(1);
+			$this->_ci->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
+			$this->_ci->DmsModel->addOrder('version', 'DESC');
+			$this->_ci->DmsModel->addLimit(1);
 
 			if (!isset($version))
 			{
-				$result = $this->ci->DmsModel->load($dms_id);
+				$result = $this->_ci->DmsModel->load($dms_id);
 			}
 			else
 			{
-				$result = $this->ci->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
+				$result = $this->_ci->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
 			}
-		}
 
-		if (hasData($result))
-		{
-			$resultFS = $this->ci->DmsFSModel->read($result->retval[0]->filename);
-			if (isSuccess($resultFS))
+			// If a dms has been found
+			if (hasData($result))
 			{
-				$result->retval[0]->{DmsLib::FILE_CONTENT_PROPERTY} = $resultFS->retval;
-			}
-			else
-			{
-				$result = $resultFS;
+				$resultFS = $this->_ci->DmsFSModel->readBase64(getData($result)[0]->filename);
+				if (isError($resultFS)) return $resultFS; // if an error occurred return it
+
+				$result->retval[0]->{self::FILE_CONTENT_PROPERTY} = getData($resultFS);
 			}
 		}
 
@@ -101,22 +109,16 @@ class DmsLib extends FHC_Controller
 	 */
 	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null, $no_file = null)
 	{
-		$result = $this->ci->AkteModel->getAktenAcceptedDms($person_id, $dokument_kurzbz);
+		$result = $this->_ci->AkteModel->getAktenAcceptedDms($person_id, $dokument_kurzbz);
 
 		if (hasData($result) && $no_file == null)
 		{
-			$cnt = count($result->retval);
-			for ($i = 0; $i < $cnt; $i++)
+			for ($i = 0; $i < count(getData($result)); $i++)
 			{
-				$resultFS = $this->ci->DmsFSModel->read($result->retval[$i]->filename);
-				if (isSuccess($resultFS))
-				{
-					$result->retval[$i]->{DmsLib::FILE_CONTENT_PROPERTY} = $resultFS->retval;
-				}
-				else
-				{
-					$result = $resultFS;
-				}
+				$resultFS = $this->_ci->DmsFSModel->readBase64(getData($result)[$i]->filename);
+				if (isError($resultFS)) return $resultFS; // if an error occurred return it
+
+				$result->retval[$i]->{self::FILE_CONTENT_PROPERTY} = getData($resultFS);
 			}
 		}
 
@@ -135,24 +137,24 @@ class DmsLib extends FHC_Controller
 		// Init upload configs
 		$this->_loadUploadLibrary($allowed_types);
 
-		if (!$this->ci->upload->do_upload($field_name))
+		if (!$this->_ci->upload->do_upload($field_name))
 		{
-			return error($this->ci->upload->display_errors());
+			return error($this->_ci->upload->display_errors());
 		}
 
-		$upload_data = $this->ci->upload->data();  // data about the uploaded file
+		$upload_data = $this->_ci->upload->data();  // data about the uploaded file
 		$filename = $upload_data['file_name'];
 
 		// Insert to DMS table
-		if (!$result = $this->ci->DmsModel->insert($this->ci->DmsModel->filterFields($dms)))
+		if (!$result = $this->_ci->DmsModel->insert($this->_ci->DmsModel->filterFields($dms)))
 		{
 			return error('Failed inserting to DMS');
 		}
-		$upload_data['dms_id'] = $result->retval;
+		$upload_data['dms_id'] = getData($result);
 
 		// Insert DMS version
-		if (!$result = $this->ci->DmsVersionModel->insert(
-			$this->ci->DmsVersionModel->filterFields($dms, $result->retval, $filename)))
+		if (!$result = $this->_ci->DmsVersionModel->insert(
+			$this->_ci->DmsVersionModel->filterFields($dms, getData($result), $filename)))
 		{
 			return error('Failed inserting DMS version');
 		}
@@ -171,36 +173,29 @@ class DmsLib extends FHC_Controller
 	 */
 	public function download($dms_id, $filename = null, $disposition = 'inline')
 	{
-		$result = $this->getFileInfo($dms_id);
-		
-		if (isError($result))
+		// Retrieves info about the given dms
+		$fileInfoResult = $this->getFileInfo($dms_id);
+		if (isError($fileInfoResult)) return error(getError($fileInfoResult));
+
+		// If data have been found
+		if (hasData($fileInfoResult))
 		{
-			return error(getError($result));
+			$fileObj = getData($fileInfoResult);
+		
+			// Change filename, if filename is provided
+			if (!isEmptyString($filename)) $fileObj->name = $filename;
+
+			// Add file disposition if disposition has a valid value
+			if ($disposition == 'attachment' || $disposition == 'inline')
+			{
+				$fileObj->disposition = $disposition;
+			}
+
+			return success($fileObj);
 		}
 
-		$fileObj = getData($result);
-		
-		// Change filename, if filename is provided
-		if (is_string($filename))
-		{
-			$fileObj->name = $filename;
-		}
-		
-		// Add file disposition
-		if ($disposition == 'attachment')
-		{
-			$fileObj->disposition = 'attachment';
-		}
-		else
-		{
-			$fileObj->disposition = 'inline';
-		}
-	
-		// Output file
-		if(!$this->outputFile($fileObj))
-		{
-			return error('Error on file output');
-		}
+		// If no data have been found then return an empty success
+		return success();
 	}
 	
 	/**
@@ -212,28 +207,28 @@ class DmsLib extends FHC_Controller
 	 */
 	public function getFileInfo($dms_id, $version = null)
 	{
-		if (!is_numeric($dms_id))
-		{
-			return error('Wrong parameter');
-		}
+		// Checks the dms_id parameter
+		if (!is_numeric($dms_id)) return error('Wrong parameter');
 		
-		// Load file
+		// Load DMS from database
 		$result = $this->load($dms_id, $version);
+		if (isError($result)) return error(getError($result));
 
-		if (isError($result))
+		// If data have been found
+		if (hasData($result))
 		{
-			return error(getError($result));
+			// Store file information in fileObj
+			$fileObj = new StdClass();
+			$fileObj->filename = getData($result)[0]->filename;
+			$fileObj->file = DMS_PATH.getData($result)[0]->filename;
+			$fileObj->name = DMS_PATH.getData($result)[0]->name;   // original user filename
+			$fileObj->mimetype = getData($result)[0]->mimetype;
+
+			return success($fileObj);
 		}
 
-		// Store file information in fileObj
-		$fileObj = new StdClass();
-		$fileObj->filename = getData($result)[0]->filename;
-		$fileObj->file = DMS_PATH. getData($result)[0]->filename;
-		$fileObj->name = DMS_PATH. getData($result)[0]->name;   // original users filename
-		$fileObj->mimetype = DMS_PATH. getData($result)[0]->mimetype;
-		
-		return success($fileObj);
-
+		// If no data have been found return an empty success
+		return success();
 	}
 
 	/**
@@ -253,20 +248,20 @@ class DmsLib extends FHC_Controller
 			$result = $this->_saveFileOnInsert($dms);
 			if (isSuccess($result))
 			{
-				$filename = $result->retval;
+				$filename = getData($result);
 				if (isset($dms['dms_id']) && $dms['dms_id'] != '')
 				{
-					$result = $this->ci->DmsVersionModel->insert(
-						$this->ci->DmsVersionModel->filterFields($dms, $dms['dms_id'], $filename)
+					$result = $this->_ci->DmsVersionModel->insert(
+						$this->_ci->DmsVersionModel->filterFields($dms, $dms['dms_id'], $filename)
 					);
 				}
 				else
 				{
-					$result = $this->ci->DmsModel->insert($this->ci->DmsModel->filterFields($dms));
+					$result = $this->_ci->DmsModel->insert($this->_ci->DmsModel->filterFields($dms));
 					if (isSuccess($result))
 					{
-						$result = $this->ci->DmsVersionModel->insert(
-							$this->ci->DmsVersionModel->filterFields($dms, $result->retval, $filename)
+						$result = $this->_ci->DmsVersionModel->insert(
+							$this->_ci->DmsVersionModel->filterFields($dms, getData($result), $filename)
 						);
 					}
 				}
@@ -277,15 +272,15 @@ class DmsLib extends FHC_Controller
 			$result = $this->_saveFileOnUpdate($dms);
 			if (isSuccess($result))
 			{
-				$result = $this->ci->DmsModel->update($dms['dms_id'], $this->ci->DmsModel->filterFields($dms));
+				$result = $this->_ci->DmsModel->update($dms['dms_id'], $this->_ci->DmsModel->filterFields($dms));
 				if (isSuccess($result))
 				{
-					$result = $this->ci->DmsVersionModel->update(
+					$result = $this->_ci->DmsVersionModel->update(
 						array(
 							$dms['dms_id'],
 							$dms['version']
 						),
-						$this->ci->DmsVersionModel->filterFields($dms)
+						$this->_ci->DmsVersionModel->filterFields($dms)
 					);
 				}
 			}
@@ -308,56 +303,54 @@ class DmsLib extends FHC_Controller
 		if (is_numeric($person_id) && is_numeric($dms_id))
 		{
 			// Start DB transaction
-			$this->ci->db->trans_start(false);
+			$this->_ci->db->trans_start(false);
 
 			// Get akte_id from table tbl_akte
-			$result = $this->ci->AkteModel->loadWhere(array('person_id' => $person_id, 'dms_id' => $dms_id));
+			$result = $this->_ci->AkteModel->loadWhere(array('person_id' => $person_id, 'dms_id' => $dms_id));
 			if (isSuccess($result))
 			{
 				// Delete all entries in tbl_akte
-				$cnt = count($result->retval);
-				for ($i = 0; $i < $cnt; $i++)
+				for ($i = 0; $i < count(getData($result)); $i++)
 				{
-					$this->ci->AkteModel->delete($result->retval[$i]->akte_id);
+					$this->_ci->AkteModel->delete(getData($result)[$i]->akte_id);
 				}
 
 				// Get all filenames related to this dms
-				$resultFileNames = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
+				$resultFileNames = $this->_ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
 				if (isSuccess($resultFileNames))
 				{
 					// Delete from tbl_dms_version
-					$result = $this->ci->DmsVersionModel->delete(array('dms_id' => $dms_id));
+					$result = $this->_ci->DmsVersionModel->delete(array('dms_id' => $dms_id));
 					if (isSuccess($result))
 					{
 						// Delete from tbl_dms
-						$result = $this->ci->DmsModel->delete($dms_id);
+						$result = $this->_ci->DmsModel->delete($dms_id);
 					}
 				}
 			}
 
 			// Transaction complete!
-			$this->ci->db->trans_complete();
+			$this->_ci->db->trans_complete();
 
 			// Check if everything went ok during the transaction
-			if ($this->ci->db->trans_status() === false || isError($result))
+			if ($this->_ci->db->trans_status() === false || isError($result))
 			{
-				$this->ci->db->trans_rollback();
+				$this->_ci->db->trans_rollback();
 				$result = error('An error occurred while performing a delete operation', EXIT_ERROR);
 			}
 			else
 			{
-				$this->ci->db->trans_commit();
+				$this->_ci->db->trans_commit();
 				$result = success('Dms successfully removed from DB');
 			}
 
 			// If everything is ok
 			if (isSuccess($result))
 			{
-				$cnt = count($resultFileNames->retval);
 				// Remove all files related to this person and dms
-				for ($i = 0; $i < $cnt; $i++)
+				for ($i = 0; $i < count(getData($resultFileNames)); $i++)
 				{
-					$this->ci->DmsFSModel->remove($resultFileNames->retval[$i]->filename);
+					$this->_ci->DmsFSModel->removeBase64(getData($resultFileNames)[$i]->filename);
 				}
 			}
 		}
@@ -376,19 +369,19 @@ class DmsLib extends FHC_Controller
 	 */
 	public function getAkteContent($akte_id)
 	{
-		$akte = $this->ci->AkteModel->load($akte_id);
+		$akte = $this->_ci->AkteModel->load($akte_id);
 		if (hasData($akte))
 		{
-			if ($akte->retval[0]->inhalt != '')
+			if (getData($akte)[0]->inhalt != '')
 			{
-				return success(base64_decode($akte->retval[0]->inhalt));
+				return success(base64_decode(getData($akte)[0]->inhalt));
 			}
-			elseif ($akte->retval[0]->dms_id != '')
+			elseif (getData($akte)[0]->dms_id != '')
 			{
-				$dmscontent = $this->read($akte->retval[0]->dms_id);
+				$dmscontent = $this->read(getData($akte)[0]->dms_id);
 				if (isSuccess($dmscontent))
 				{
-					return success(base64_decode($dmscontent->retval[0]->file_content));
+					return success(base64_decode(getData($dmscontent)[0]->file_content));
 				}
 				else
 				{
@@ -415,10 +408,10 @@ class DmsLib extends FHC_Controller
 	{
 		$filename = uniqid().'.'.pathinfo($dms['name'], PATHINFO_EXTENSION);
 
-		$result = $this->ci->DmsFSModel->write($filename, $dms['file_content']);
+		$result = $this->_ci->DmsFSModel->writeBase64($filename, $dms['file_content']);
 		if (isSuccess($result))
 		{
-			$result->retval = $filename;
+			$result = success($filename);
 		}
 
 		return $result;
@@ -439,7 +432,7 @@ class DmsLib extends FHC_Controller
 
 			if (hasData($result))
 			{
-				$result = $this->ci->DmsFSModel->write($result->retval[0]->filename, $dms['file_content']);
+				$result = $this->_ci->DmsFSModel->writeBase64(getData($result)[0]->filename, $dms['file_content']);
 			}
 		}
 
@@ -451,12 +444,13 @@ class DmsLib extends FHC_Controller
 	 */
 	private function _loadUploadLibrary($allowed_types)
 	{
-		$config['upload_path']          = $this->UPLOAD_PATH;
+		$config['upload_path']          = DMS_PATH;
 		$config['allowed_types']        = implode('|', $allowed_types);
 		$config['overwrite']            = true;
 		$config['file_name']				= uniqid().'.pdf';
 
-		$this->ci->load->library('upload', $config);
-		$this->ci->upload->initialize($config);
+		$this->_ci->load->library('upload', $config);
+		$this->_ci->upload->initialize($config);
 	}
 }
+

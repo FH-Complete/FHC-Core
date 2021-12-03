@@ -225,7 +225,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		
 		return $this->outputJsonSuccess($retval);
 	}
-	
+
 	/**
 	 * Download and open uploaded document (Nachweisdokument).
 	 */
@@ -239,16 +239,19 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 
 		// Check if user is entitled to read dms doc
-		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 		
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
-		
+
+		// Get file to be downloaded from DMS
+		$download = $this->dmslib->download($dms_id, $filename);
+		if (isError($download)) return $download;
+
 		// Download file
-		$this->dmslib->download($dms_id, $filename);
+		$this->outputFile(getData($download));
 	}
-	
-	
+
 	/**
 	 * Retrieve the UID of the logged user and checks if it is valid
 	 */
@@ -266,25 +269,24 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	private function _checkIfEntitledToReadDMSDoc($dms_id)
 	{
 		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
-		
+
 		if(!$result = getData($result)[0])
 		{
 			show_error('Failed retrieving Anrechnung');
 		}
-		
+
 		$result = $this->LehrveranstaltungModel->loadWhere(array(
 			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
 		));
-		
-		
+
 		if(!$result = getData($result)[0])
 		{
 			show_error('Failed loading Lehrveranstaltung');
 		}
-		
+
 		// Get STGL
 		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
-		
+
 		if($result = getData($result)[0])
 		{
 			if ($result->uid == $this->_uid)
@@ -292,7 +294,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 				return;
 			}
 		}
-		
+
 		show_error('You are not entitled to read this document');
 	}
 	
