@@ -197,15 +197,32 @@ class zeitwunsch extends basis_db
     }
 
     /**
-	 * Alle Zeitwuensche einer Person laden
+	 * Alle Zeitwuensche einer Person laden.
+     * Um auf einen Zeitwunsch einer bestimmten Zeit, also innerhalb einer bestimmten Zeitwunschgueltigkeit
+     * zu beschraenken, kann ein Datum mitgegeben werden.
 	 * @param uid
-	 * @param datum
+	 * @param datum UNIX timestamp, um Zeitwunsch mit richtiger Zeitwunschgueltigkeit zu ermitteln
 	 * @return boolean Ergebnis steht in Array $zeitwunsch wenn true
 	 */
 	public function loadPerson($uid,$datum=null)
 	{
+        // Default datum: jetzt
+        if (is_null($datum))
+        {
+            $datum = time();
+        }
+
+        $qry = "
+            SELECT * 
+            FROM campus.tbl_zeitwunsch
+            JOIN campus.tbl_zeitwunsch_gueltigkeit zwg USING (zeitwunsch_gueltigkeit_id)
+            WHERE zwg.mitarbeiter_uid=". $this->db_add_param($uid). "
+            AND ". $this->db_add_param(date('Y-m-d', $datum)). " BETWEEN von AND bis;
+        ";
+
+
 		// Zeitwuensche abfragen
-		if(!$this->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid=".$this->db_add_param($uid)))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = $this->db_last_error();
 			return false;
@@ -292,12 +309,16 @@ class zeitwunsch extends basis_db
 	/**
 	 * Zeitwunsch der Personen in Lehreinheiten laden
 	 * @param $le_id LehreinheitID Array
-	 * @param $datum
+	 * @param $datum UNIX timestamp Datum, um Zeitwunsch mit richtiger Zeitwunschgueltigkeit zu ermitteln
 	 * @return true oder false
 	 */
-	public function loadZwLE($le_id,$datum=null)
+	public function loadZwLE($le_id, $datum = null)
 	{
-		//$this->init();
+        // Default datum: jetzt
+        if (is_null($datum))
+        {
+            $datum = time();
+        }
 		// SUB-Select fuer LVAs
 		$sql_query_leid='';
 		$sql_query_le='SELECT DISTINCT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE ';
@@ -308,7 +329,11 @@ class zeitwunsch extends basis_db
 
 		// Schlechteste Zeitwuensche holen
 		$sql_query='SELECT tag,stunde,min(gewicht) AS gewicht
-				FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid IN ('.$sql_query_le.') GROUP BY tag,stunde';
+				FROM campus.tbl_zeitwunsch
+                JOIN campus.tbl_zeitwunsch_gueltigkeit zwg USING (zeitwunsch_gueltigkeit_id)
+                WHERE zwg.mitarbeiter_uid IN ('.$sql_query_le.') 
+                AND '. $this->db_add_param(date('Y-m-d', $datum)). ' BETWEEN von AND bis
+                GROUP BY tag,stunde;';
 
 		// Zeitwuensche abfragen
 		if(!$this->db_query($sql_query))
