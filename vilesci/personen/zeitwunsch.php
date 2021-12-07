@@ -337,9 +337,9 @@ $selected_zwg_id = !is_null($selected_zwg) ? $selected_zwg->zeitwunsch_gueltigke
     $(function(){
         // Bei Wechsel von Zeitwunschgueltigkeit die Seite mit GET params neu laden
         $('#zwg').change(function(){
-            let uid = $('input[name="uid"]').val();
-            let zeitwunsch_gueltigkeit_id = $('option:selected', this).val();
-            let studiensemester = $('option:selected', this).data('stsem');
+            var uid = $('input[name="uid"]').val();
+            var zeitwunsch_gueltigkeit_id = $('option:selected', this).val();
+            var studiensemester = $('option:selected', this).data('stsem');
 
             window.location = '?uid=' + uid + '&zwg_id=' + zeitwunsch_gueltigkeit_id + '&stsem=' + studiensemester;
         });
@@ -359,7 +359,7 @@ $zwg_arr = $zwg->result;
 // Dropdown
 echo '<select name="zwg" id="zwg" class="form form-control">';
 
-// Wenn nächstes Studiensemester hat keine Zeitwunschgueltigkeit hat...
+// Wenn nächstes Studiensemester keine Zeitwunschgueltigkeit hat...
 if (!empty($zwg_arr) && $zwg_arr[0]->von < $next_ss->start)
 {
     // ...naechstes Studiensemester 'neu anlegen' als Option anzeigen
@@ -379,7 +379,7 @@ foreach($zwg_arr as $row)
         $row->studiensemester_kurzbz. '&emsp;[ '. $von. ' &ensp;-&ensp;' . $bis. ' ]
         </option>';
 }
-// Wenn aktuelles Studiensemester hat keine Zeitwunschgueltigkeit hat, das naechste aber schon
+// Wenn aktuelles Studiensemester keine Zeitwunschgueltigkeit hat, das naechste aber schon
 if (count($zwg_arr) == 1 && ($zwg_arr[0]->von >= $next_ss->start))
 {
     // ...aktuelles Studiensemester 'neu anlegen' als Option anzeigen
@@ -524,6 +524,48 @@ echo '</select>';
 </OL>
 <P>&nbsp;</P>
 </body>
+<script type="text/javascript">
+    $(function(){
+        // Bei Wechsel von Zeitwunschgueltigkeit die Seite mit GET params neu laden
+        //$('#zwg').change(function(){
+        //    let uid = $('input[name="uid"]').val();
+        //    let zeitwunsch_gueltigkeit_id = $('option:selected', this).val();
+        //    let studiensemester = $('option:selected', this).data('stsem');
+        //
+        //    // window.location = '?uid=' + uid + '&zwg_id=' + zeitwunsch_gueltigkeit_id + '&stsem=' + studiensemester;
+        //    window.open = <?php //echo $_SERVER['PHP_SELF']  ?>// + '?uid=' + uid + '&zwg_id=' + zeitwunsch_gueltigkeit_id + '&stsem=' + studiensemester;
+        //});
+    });
+    function submitZwg(obj){
+        // console.log(obj);
+        // console.log(obj.options[obj. selectedIndex].getAttribute('data-stsem'));
+        // var selectedValue = document.getElementById("zwg").value;
+        // console.log(selectedValue);
+        // console.log(document.getElementById("zwg"));
+        // console.log(document.getElementById("zwg").getAttribute('data'));
+        // console.log($(selectElem).val());
+        // console.log($(selectElem).selected);
+        // console.log($('option:selected', this));
+        // console.log($('option:selected', this).val());
+        //     let uid = $('input[name="uid"]').val();
+        //     let zeitwunsch_gueltigkeit_id = $('option:selected', obj).val();
+        //     let studiensemester = $('option:selected', obj).data('stsem');
+
+
+        let uid = document.getElementById("uid").value;
+        let zeitwunsch_gueltigkeit_id = document.getElementById("zwg").value;
+        let studiensemester = obj.options[obj.selectedIndex].getAttribute('data-stsem');
+        console.log(uid);
+        console.log(zeitwunsch_gueltigkeit_id);
+        console.log(studiensemester);
+        // window.location = '?uid=' + uid + '&zwg_id=' + zeitwunsch_gueltigkeit_id + '&stsem=' + studiensemester;
+
+        //window.open('<?php //echo APP_ROOT ?>//vilesci/personen/zeitwunsch.php?uid=' + uid + '&zwg_id=' + zeitwunsch_gueltigkeit_id + '&stsem=' + studiensemester,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+        window.open('<?php echo $_SERVER['PHP_SELF'] ?>?uid=' + uid + '&zwg_id=' + zeitwunsch_gueltigkeit_id + '&stsem=' + studiensemester);
+
+    }
+
+</script>
 </html>
 
 <?php
@@ -551,3 +593,6 @@ function getDisabledString($uid, $selected_zwg, $akt_ss, $next_ss){
         : 'disabled';
 
 }
+
+
+
