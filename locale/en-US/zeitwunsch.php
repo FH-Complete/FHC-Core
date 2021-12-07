@@ -26,7 +26,7 @@ $this->phrasen['zeitwunsch/profil']='Profile';
 $this->phrasen['zeitwunsch/geteilteArbeitszeit']='Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken am Tagesrand einverstanden.';
 $this->phrasen['zeitwunsch/gueltigIm']="My preferred times valid in: ";
 $this->phrasen['zeitwunsch/erklaerungstext']="You can edit your preferred times directly in the table or copy a your preferred times from a previous semester.<br>
-        As long as you do not make any changes, your preferred times will be carried over to the next study semester.";
+        <b>As long as you do not make any changes, your preferred times will be carried over to the next study semester.</b>";
 $this->phrasen['zeitwunsch/werteAuf1setzen']="Set all values to 1";
 $this->phrasen['zeitwunsch/kopierenText']="Select the desired semester on the right.
                                 Your preferred time of that semester is then <u> automatically </u> transferred to the table.<br>
@@ -37,7 +37,8 @@ $this->phrasen['zeitwunsch/stundenBereitsVerplant']='Hours already scheduled for
 $this->phrasen['zeitwunsch/fuer']='Preferred time for %s &ensp;';
 $this->phrasen['zeitwunsch/bearbeitungDeaktiviert']='Editing disabled';
 $this->phrasen['zeitwunsch/bearbeitungDeaktiviertText']='You have already been assigned to course(s) in %s.</span><br>
-                            Please agree with <a href="mailto:%s">%s</a> before making a change.<br>
-                            Do you want to proceed editing?';
+                            Please agree with %s</a> before making a change.<br>
+                            Would you still like to continue without agreement or after having agreed?';
 $this->phrasen['zeitwunsch/bearbeitungAktivieren']='Enable editing';
+$this->phrasen['zeitwunsch/kompetenzfeldWirdInformiert']= 'INFO: The field of competence will be informed of your changes by email';
 ?>

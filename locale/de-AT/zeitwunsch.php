@@ -26,7 +26,7 @@ $this->phrasen['zeitwunsch/profil']='Profil';
 $this->phrasen['zeitwunsch/geteilteArbeitszeit']='Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken am Tagesrand einverstanden.';
 $this->phrasen['zeitwunsch/gueltigIm']="Mein Zeitwunsch g&uuml;ltig im: ";
 $this->phrasen['zeitwunsch/erklaerungstext']="Sie k&ouml;nnen Ihren Zeitwunsch direkt in der Tabelle bearbeiten oder einen Zeitwunsch eines vergangenen Studiensemester kopieren.<br>
-                        Solange Sie keine &Auml;nderungen vornehmen, wird Ihr Zeitwunsch immer ins n&auml;chste Studiensemester &uuml;bernommen.";
+                        <br><b>Solange Sie keine &Auml;nderungen vornehmen, <u>wird Ihr Zeitwunsch immer ins n&auml;chste Studiensemester &uuml;bernommen.</u></b>";
 $this->phrasen['zeitwunsch/werteAuf1setzen']="Alle Werte auf 1 setzen";
 $this->phrasen['zeitwunsch/kopierenText']="W&auml;hlen Sie rechts das gew&uuml;nschte Studiensemester aus.
                                 Der Zeitwunsch wird dann <u>automatisch</u> in die Tabelle &uuml;bernommen.<br>
@@ -36,8 +36,9 @@ $this->phrasen['zeitwunsch/aendern']= "kopieren von fr&uuml;herem Studiensemeste
 $this->phrasen['zeitwunsch/stundenBereitsVerplant']='Stunden für %s bereits verplant';
 $this->phrasen['zeitwunsch/fuer']='Zeitwunsch f&uuml;r %s &ensp;';
 $this->phrasen['zeitwunsch/bearbeitungDeaktiviert']='Bearbeitung deaktiviert';
-$this->phrasen['zeitwunsch/bearbeitungDeaktiviertText']='Ihnen wurden im %s bereits Lehrveranstaltung(en) zugeteilt.</span><br>
-                            Bitte stimmen Sie sich vor einer &Auml;nderung mit der <a href="mailto:%s">%s</a> ab.<br>
-                            M&ouml;chten Sie mit der Bearbeitung fortsetzen?';
+$this->phrasen['zeitwunsch/bearbeitungDeaktiviertText']='Ihnen wurden im %s bereits Lehrveranstaltung(en) zugeteilt.<br>
+                            Bitte stimmen Sie sich vor einer &Auml;nderung mit dem %s ab.<br>
+                            M&ouml;chten Sie trotzdem ohne Abstimmung bzw. nach bereits erfolgter Abstimmung fortsetzen?';
 $this->phrasen['zeitwunsch/bearbeitungAktivieren']='Bearbeitung aktivieren';
+$this->phrasen['zeitwunsch/kompetenzfeldWirdInformiert']= 'INFO: Kompetenzfeld wird &uuml;ber die &Auml;nderung per Mail informiert';
 ?>

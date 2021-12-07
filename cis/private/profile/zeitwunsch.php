@@ -668,8 +668,9 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
                 echo '<div class="panel panel-danger">';
                     echo '<div class="panel-body">';
                     echo '<span class="text-danger"><b>'. $p->t("zeitwunsch/bearbeitungDeaktiviert"). ': </b></span>';
-                    echo '<span>'. $p->t("zeitwunsch/bearbeitungDeaktiviertText", array($selected_ss, MAIL_LVPLAN, $p->t('lvplan/lvPlanung'))). ' 
-                        <a id="bearbeitung-aktivieren" style="cursor:pointer;">'. $p->t("zeitwunsch/bearbeitungAktivieren"). '</a>
+                    echo $p->t("zeitwunsch/bearbeitungDeaktiviertText", array($selected_ss, $p->t('global/studiengangsmanagement'))). ' 
+                        <a id="bearbeitung-aktivieren" style="cursor:pointer;">'. $p->t("zeitwunsch/bearbeitungAktivieren"). '</a><br>
+                        <span><b>'. $p->t("zeitwunsch/kompetenzfeldWirdInformiert") . '</b></span>
                         </span>';
                     echo '</div>'; // end panel heading
                 echo '</div>'; // end panel
@@ -695,7 +696,6 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
                         <LI><?php echo $p->t('zeitwunsch/sperrenSieNurTermine');?></LI>
                         <LI><?php echo $p->t('zeitwunsch/esSolltenFuerJedeStunde');?></LI>
                     </UL><br>
-                    <P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('lvplan/lvPlanung');?></A>.</P><br>
             </div>
             <div class="col-xs-3">
                 <br>
