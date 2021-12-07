@@ -472,6 +472,29 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'abgewiesen',
+		'filter_kurzbz' => 'InfoCenterAbgewiesenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Abgewiesen - Alle",
+				"columns": [
+					{"name": "PersonID"},
+					{"name": "PreStudentID"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "AbgewiesenAm"},
+					{"name": "Nachricht"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
 		'app' => 'budget',
 		'dataset_name' => 'budgetoverview',
 		'filter_kurzbz' => 'BudgetUebersicht',
@@ -866,7 +889,7 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Alle offenen Fehler",
+				"name": "Alle offenen Fehler, hauptzuständig",
 				"columns": [
 					{"name": "Datum"},
 					{"name": "Inhalt"},
@@ -880,6 +903,11 @@ $filters = array(
 						"name": "Fehlerstatus",
 						"operation": "ncontains",
 						"condition": "behoben"
+					},
+					{
+						"name": "Hauptzuständig",
+						"operation": "contains",
+						"condition": "Ja"
 					}
 				]
 			}
