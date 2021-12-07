@@ -51,7 +51,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
-if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars LIMIT 1"))
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1"))
 {
 	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
 	$qry = '
@@ -1735,7 +1735,7 @@ if ($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_person_lock Berechtigungen: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'UPDATE Recht fuer system.tbl_person_lock fuer vilesci user gesetzt ';
+			echo '<br> UPDATE Recht fuer system.tbl_person_lock fuer vilesci user gesetzt <br>';
 	}
 }
 
@@ -1750,7 +1750,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 		if(!$db->db_query($qry))
 			echo '<strong>bis.tbl_mobilitaet Berechtigungen: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'SELECT Recht fuer bis.tbl_mobilitaet fuer web user gesetzt ';
+			echo '<br>SELECT Recht fuer bis.tbl_mobilitaet fuer web user gesetzt <br>';
 	}
 }
 
@@ -2760,7 +2760,7 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 }
 
 // Spalte Zugangscode zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -3827,7 +3827,7 @@ if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindu
 }
 
 // iban, bic und weitere Variablen zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -4193,7 +4193,63 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_st
 		if(!$db->db_query($qry))
 			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'bis.tbl_studiengangstyp: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+			echo '<br> bis.tbl_studiengangstyp: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+	}
+}
+
+// Add type "p" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'p';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('p', 'PhD',NULL,'{PhD,PhD}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "p"<br>';
+	}
+}
+
+// Add type "l" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'l';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('l', 'Lehrgang',NULL,'{Lehrgang,Course}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "l"<br>';
+	}
+}
+
+// Add type "d" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'd';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('d', 'Diplom',NULL,'{Diplom,Diploma}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "d"<br>';
+	}
+}
+
+// Add type "w" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'w';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('w', 'Weiterbildung',NULL,'{Weiterbildung,Further education}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "w"<br>';
 	}
 }
 
@@ -4300,7 +4356,7 @@ if (!$result = @$db->db_query("SELECT ba1code_bis FROM bis.tbl_beschaeftigungsar
 }
 
 // Orgform DE und Orform EN zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "Orgform DE", "Orgform EN" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "Orgform DE", "Orgform EN" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -5554,6 +5610,20 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>system.tbl_berechtigung: Added permission for student/bpk';
+	}
+}
+
+// Add index to campus.tbl_zeitaufzeichnung.uid
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_zeitaufzeichnung_uid'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_tbl_zeitaufzeichnung_uid ON campus.tbl_zeitaufzeichnung USING btree (uid)";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer campus.tbl_zeitaufzeichnung.uid hinzugefuegt<br>';
 	}
 }
 

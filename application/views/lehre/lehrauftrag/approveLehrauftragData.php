@@ -187,7 +187,7 @@ FROM
             (SELECT
                  uid
              FROM
-                 public.tbl_benutzer JOIN public.tbl_mitarbeiter ma 
+                 public.tbl_benutzer JOIN public.tbl_mitarbeiter ma
                     ON tbl_benutzer.uid = ma.mitarbeiter_uid
              WHERE
                  person_id = tmp_projektbetreuung.person_id
@@ -268,7 +268,7 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    (vorname || \' \' || nachname)                                                        AS "lektor",
+                    (nachname || \' \' || vorname)                                                        AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
                     vertrag_id,
