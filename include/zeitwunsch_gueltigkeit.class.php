@@ -1,7 +1,6 @@
 <?php
 
 require_once(dirname(__FILE__). '/basis_db.class.php');
-require_once(dirname(__FILE__). '/studiensemester.class.php');
 
 class zeitwunsch_gueltigkeit extends basis_db
 {
@@ -45,11 +44,12 @@ class zeitwunsch_gueltigkeit extends basis_db
         }
 
         $qry = '
-            SELECT *
-            FROM campus.tbl_zeitwunsch_gueltigkeit
+            SELECT *, studiensemester_kurzbz, start, ende
+            FROM campus.tbl_zeitwunsch_gueltigkeit, public.tbl_studiensemester
             WHERE zeitwunsch_gueltigkeit_id = '.$this->db_add_param($zeitwunsch_gueltigkeit_id). '
-            AND (von < ende AND COALESCE(bis, '. $this->db_add_param($studiensemester->ende).'::date ) > start)
-            ORDER BY von DESC
+            AND (von < ende AND COALESCE(bis, \'2999-12-31\'::date ) > start)
+            ORDER BY start ASC
+            LIMIT 1
         ';
 
         if ($result = $this->db_query($qry))
@@ -63,6 +63,9 @@ class zeitwunsch_gueltigkeit extends basis_db
                 $this->insertvon = $row->insertvon;
                 $this->updateamum = $row->updateamum;
                 $this->updatevon = $row->updatevon;
+                $this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+                $this->start = $row->start;
+                $this->ende = $row->ende;
             }
             return true;
         }
