@@ -11,21 +11,21 @@ var IssuesDataset = {
 	{
 		let auswahlStatus =
 			'<div class="input-group">' +
-			'<select class="form-control d-inline auswahlStatus">' +
-			'<option value="resolved"> Behoben </option>' +
-			'<option value="inProgress"> in Bearbeitung </option>' +
-			'<option value="new"> Neu </option>' +
-			'</select>' +
-			'<span class="input-group-btn">' +
-			'<button class="btn btn-default setStatus">Status für Ausgew&auml;hlte setzen</button>' +
-			'</span>' +
+				'<select class="form-control d-inline auswahlStatus">' +
+					'<option value="resolved">'+FHC_PhrasesLib.t("fehlermonitoring", "behoben")+'</option>' +
+					'<option value="inProgress">'+FHC_PhrasesLib.t("fehlermonitoring", "inBearbeitung")+'</option>' +
+					'<option value="new">'+FHC_PhrasesLib.t("ui", "neu")+'</option>' +
+				'</select>' +
+				'<span class="input-group-btn">' +
+					'<button class="btn btn-default setStatus">'+FHC_PhrasesLib.t("fehlermonitoring", "statusFuerAusgewaehlteSetzen")+'</button>' +
+				'</span>' +
 			'</div>';
 
 		let selectAllHtml =
 			'<a href="javascript:void(0)" class="selectAll">' +
-			'<i class="fa fa-check"></i>&nbsp;Alle</a>&nbsp;&nbsp;' +
+			'<i class="fa fa-check"></i>&nbsp;'+FHC_PhrasesLib.t("ui", "alle")+'</a>&nbsp;&nbsp;' +
 			'<a href="javascript:void(0)" class="unselectAll">' +
-			'<i class="fa fa-times"></i>&nbsp;Keinen</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+			'<i class="fa fa-times"></i>&nbsp;'+FHC_PhrasesLib.t("ui", "keinen")+'</a>&nbsp;&nbsp;&nbsp;&nbsp;';
 
 		let issuescount = 0;
 
@@ -42,7 +42,7 @@ var IssuesDataset = {
 
 						if (issuescount > 0)
 						{
-							var countHtml = issuescount + " Fehler";
+							var countHtml = issuescount + " "+FHC_PhrasesLib.t("fehlermonitoring", "meldungen");
 
 							// Count Records after Filtering
 							$("#filterTableDataset").bind("filterEnd", function() {
@@ -86,10 +86,10 @@ var IssuesDataset = {
 				let issue_ids_sel = $("#filterTableDataset input:checked[name=issue_id\\[\\]]");
 
 				if(status_kurzbz.length <= 0)
-					return FHC_DialogLib.alertInfo("Bitte wählen Sie den Status aus.");
+					return FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("fehlermonitoring", "bitteStatusWaehlen"));
 
 				if(issue_ids_sel.length <= 0)
-					return FHC_DialogLib.alertInfo("Bitte wählen Sie die Fehler aus.");
+					return FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("fehlermonitoring", "bitteFehlerWaehlen"));
 
 				let issue_ids = [];
 
@@ -107,17 +107,20 @@ var IssuesDataset = {
 					{
 						successCallback: function(data, textStatus, jqXHR) {
 							if (FHC_AjaxClient.isError(data))
-								FHC_DialogLib.alertError("Fehler beim Status &Auml;ndern: " + FHC_AjaxClient.getError(data));
+								FHC_DialogLib.alertError(
+									FHC_PhrasesLib.t("fehlermonitoring", "statusAendernFehler") + ": "
+									+ FHC_AjaxClient.getError(data)
+								);
 							else if (FHC_AjaxClient.hasData(data))
 							{
 								FHC_FilterWidget.reloadDataset();
 								FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data));
 							}
 							else
-								FHC_DialogLib.alertError("Unbekannter Fehler beim Status &Auml;ndern");
+								FHC_DialogLib.alertError(FHC_PhrasesLib.t("fehlermonitoring", "statusAendernUnbekannterFehler"));
 						},
 						errorCallback: function(jqXHR, textStatus, errorThrown) {
-							FHC_DialogLib.alertError("Fehler beim Status &Auml;ndern: " + textStatus);
+							FHC_DialogLib.alertError(FHC_PhrasesLib.t("fehlermonitoring", "statusAendernFehler") + ": " + textStatus);
 						}
 					}
 				);

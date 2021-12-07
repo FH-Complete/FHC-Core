@@ -23,17 +23,20 @@ class Issues extends Auth_Controller
 		$this->load->library('PermissionLib');
 		$this->load->library('WidgetLib');
 
+		// Load models
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+
 		$this->loadPhrases(
 			array(
 				'global',
 				'ui',
-				'filter'
+				'filter',
+				'lehre',
+				'person',
+				'fehlermonitoring'
 			)
 		);
-
-		// Load models
-		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
-		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 
 		$this->_setAuthUID(); // sets property uid
 	}

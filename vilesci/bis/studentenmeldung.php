@@ -50,6 +50,7 @@ if(!$rechte->isBerechtigt('student/stammdaten',null,'suid') && !$rechte->isBerec
 	die('Sie haben keine Berechtigung für diese Seite');
 
 $error_log='';
+$error_log_hinweis='';
 $error_log1='';
 $error_log_all="";
 $error_log_io = ''; // error log fuer plausichecks von incomings/outgoings
@@ -145,7 +146,7 @@ derzeit fuer alle Studierende der gleiche Standort
 ToDo: Standort sollte pro Student konfigurierbar sein.
 */
 $standortcode='22';
-if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859')))
+if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859','871')))
 	$standortcode='14'; // Pinkafeld
 elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271','781')))
 	$standortcode='3'; // Eisenstadt
@@ -427,6 +428,10 @@ if ($rechte->isBerechtigt('admin'))
 	$typ = '';
 	foreach ($studiengang->result AS $row)
 	{
+		if ($row->typ != 'b' && $row->typ != 'm' && $row->typ != 'd' && $row->typ != 'e')
+		{
+			continue;
+		}
 		if ($row->studiengang_kz == $stg_kz)
 		{
 			$selected = 'selected';
@@ -683,6 +688,7 @@ function GenerateXMLStudentBlock($row)
 	global $kodex_studientyp_array, $kodex_studstatuscode_array;
 	global $stg_kz;
 	$error_log='';
+	$error_log_hinweis='';
 	$error_log1='';
 	$error_log_io = '';
 	$datei = '';
@@ -815,7 +821,7 @@ function GenerateXMLStudentBlock($row)
 	}
 	if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 	{
-		$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
+		$error_log_hinweis.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
 	}
 	if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 	{
@@ -845,7 +851,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
-	/*if($row->bpk == '' || $row->bpk == null)
+	if($row->bpk == '' || $row->bpk == null)
 	{
 		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 	}
@@ -860,7 +866,7 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 		}
-	}*/
+	}
 	if (!$ausserordentlich && !$incoming)
 	{
 		if ($zustell_plz == '' || $zustell_plz == null)
@@ -984,6 +990,16 @@ function GenerateXMLStudentBlock($row)
 				else if($rowstatus->status_kurzbz=="Abbrecher" )
 				{
 					$status=4;
+					// Checken, ob der Student Abbrecher vor der Meldung war und noch nie gemeldet wurde
+					$qryAbbrecher = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id = ".$db->db_add_param($row->prestudent_id)." AND status_kurzbz='Student' AND datum <=".$db->db_add_param($bisprevious);
+					if($resultAbbrecher = $db->db_query($qryAbbrecher))
+					{
+						if ($db->db_num_rows($resultAbbrecher) == 0)
+						{
+							$error_log .= (!empty($error_log) ? ', ' : '')."Der Student ist Abbrecher vor der ersten BIS-Meldung. Bitte im FAS das Hakerl bei \"Bismelden\" im Reiter \"Prestudent\" entfernen";
+
+						}
+					}
 				}
 				else
 				{
@@ -1240,6 +1256,11 @@ function GenerateXMLStudentBlock($row)
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 		}
+		if($error_log_hinweis != '')
+		{
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+			$error_log_hinweis = '';
+		}
 		$anzahl_fehler++;
 		$v.="\n";
 		$error_log='';
@@ -1247,7 +1268,14 @@ function GenerateXMLStudentBlock($row)
 		return '';
 	}
 	else
+	{
+		if($error_log_hinweis != '')
 		{
+			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n\n";
+			$error_log_hinweis = '';
+		}
+
 		$datei .= "
 		<StudentIn>
 			<PersKz>" . trim($row->matrikelnr) . "</PersKz>";
@@ -1294,9 +1322,9 @@ function GenerateXMLStudentBlock($row)
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
 		}
 
-		/*$datei .= "
+		$datei .= "
 			<bPK>" . $row->bpk . "</bPK>
-		";*/
+		";
 
 		$datei .= "
 			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
@@ -1444,6 +1472,11 @@ function GenerateXMLStudentBlock($row)
 				$bisio_zweck->getZweck($rowio->bisio_id);
 				$zweck_code_arr = array();
 
+				// Es muss immer mindestens 1 Aufenthaltszweck geben
+				if (count($bisio_zweck->result) == 0)
+				{
+					$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Es muss mindestens ein Aufenthaltszweck eingetragen sein";
+				}
 				// Bei Incomings...
 				if ($aktstatus == 'Incoming')
 				{
