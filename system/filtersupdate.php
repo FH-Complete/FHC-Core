@@ -486,6 +486,7 @@ $filters = array(
 					{"name": "PreStudentID"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
+					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
 					{"name": "Nachricht"}
 				],
