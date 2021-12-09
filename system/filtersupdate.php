@@ -347,7 +347,8 @@ $filters = array(
 					{"name": "vorname"},
 					{"name": "nachname"},
 					{"name": "svnr"},
-					{"name": "ersatzkennzeichen"}
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
 				],
 				"filters": []
 			}
