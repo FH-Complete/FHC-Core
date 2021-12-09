@@ -277,7 +277,7 @@ elseif ($stg_kz == 'alleBaMa')
 {
 	$qry="
 	SELECT
-		DISTINCT ON(tbl_studiengang.typ, tbl_student.studiengang_kz, matrikelnummer, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -297,7 +297,7 @@ elseif ($stg_kz == 'alleBaMa')
 			OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
 				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
 		)))
-	ORDER BY tbl_studiengang.typ, tbl_student.studiengang_kz, matrikelnummer, nachname, vorname
+	ORDER BY tbl_student.studiengang_kz, matrikelnr, nachname, vorname
 	";
 }
 else
@@ -448,26 +448,26 @@ echo '	</head>
 	{
 		$("#t1").tablesorter(
 		{
-			sortList: [[6,1],[5,1],[4,1],[2,0],[3,0]], 
+			sortList: [[6,1],[5,1],[4,1],[2,0],[3,0]],
 			widgets: ["zebra", "filter", "stickyHeaders"],
-			widgetOptions : {	filter_functions:  
-								{ 
-									// Add select menu to this column 
+			widgetOptions : {	filter_functions:
+								{
+									// Add select menu to this column
 									4 : {
-									"Abbrecher" : function(e, n, f, i, $r, c, data) { return /Abbrecher/.test(e); }, 
+									"Abbrecher" : function(e, n, f, i, $r, c, data) { return /Abbrecher/.test(e); },
 									"Absolvent" : function(e, n, f, i, $r, c, data) { return /Absolvent/.test(e); },
 									"Diplomand" : function(e, n, f, i, $r, c, data) { return /Diplomand/.test(e); },
 									"Incoming" : function(e, n, f, i, $r, c, data) { return /Incoming/.test(e); },
 									"Student" : function(e, n, f, i, $r, c, data) { return /Student/.test(e); },
-									"Unterbrecher" : function(e, n, f, i, $r, c, data) { return /Unterbrecher/.test(e); }, 
+									"Unterbrecher" : function(e, n, f, i, $r, c, data) { return /Unterbrecher/.test(e); },
 									}
-								} 
-							} 
+								}
+							}
 		});
 		$("#t2").tablesorter(
 		{
-			sortList: [[0,0],[1,0]], 
-			widgets: ["zebra", "filter", "stickyHeaders"] 
+			sortList: [[0,0],[1,0]],
+			widgets: ["zebra", "filter", "stickyHeaders"]
 		});
 	});
 	</script>
