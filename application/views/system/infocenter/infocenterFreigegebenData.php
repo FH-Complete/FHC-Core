@@ -41,8 +41,10 @@ $query = '
 				 LIMIT 1
 			) AS "LastActionType",
 			(
-				SELECT l.insertvon
+				SELECT CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END
 				  FROM system.tbl_log l
+				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
+				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
@@ -248,8 +250,10 @@ $query = '
 	 LEFT JOIN (
 			SELECT tpl.person_id,
 				   tpl.zeitpunkt,
-				   tpl.uid AS lockuser
+				   sp.nachname AS lockuser
 			  FROM system.tbl_person_lock tpl
+			  JOIN public.tbl_benutzer sb USING (uid)
+			  JOIN public.tbl_person sp ON sb.person_id = sp.person_id
 			 WHERE tpl.app = '.$APP.'
 		 ) pl USING(person_id)
 		 WHERE
