@@ -346,7 +346,7 @@ function updateZWG($uid, $zwg_id, $bis)
 function checkIsVerplant($uid, $studiensemester_kurzbz)
 {
     $lstd = new Lehrstunde();
-    if (!$lstd->getStundenplanData('stundenplandev', null, $studiensemester_kurzbz, null, $uid))
+    if (!$lstd->getStundenplanData('stundenplandev', null, $studiensemester_kurzbz, null, $uid, null, true))
     {
         die($lstd->errormsg);
     }
