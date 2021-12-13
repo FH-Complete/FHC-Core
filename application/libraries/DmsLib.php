@@ -7,6 +7,7 @@ class DmsLib
 	const FILE_CONTENT_PROPERTY = 'file_content';
 
 	private $_ci; // code igniter instance
+	private $_uid;
 
 	/**
 	 * Object initialization
@@ -14,6 +15,7 @@ class DmsLib
 	public function __construct()
 	{
 		$this->_ci =& get_instance();
+		$this->_uid = getAuthUID();
 
 		$this->_ci->load->model('crm/Akte_model', 'AkteModel'); // deprecated, should not be used here!
 		$this->_ci->load->model('content/Dms_model', 'DmsModel');
@@ -24,10 +26,429 @@ class DmsLib
 	// -----------------------------------------------------------------------------------------------------------
 	// Public methods
 
+	public function add($name, $kategorie_kurzbz, $mimetype, $fileHandle, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
+	{
+			$writeFileResult = $this->_writeNewFile($name, $fileHandle);
+
+			if (isError($writeFileResult)) return $writeFileResult;
+
+			if (hasData($writeFileResult))
+			{
+				$writeFileData = getData($writeFileResult);
+				$filename = $writeFileData->filename;
+
+				// if file written successful, insert dms
+				$dmsResult = $this->_ci->DmsModel->insert(
+					array(
+						'kategorie_kurzbz' => $kategorie_kurzbz,
+						'dokument_kurzbz' => $dokument_kurzbz
+					)
+				);
+
+				if (isError($dmsResult)) return $dmsResult;
+
+				if (hasData($dmsResult))
+				{
+					$dms_id = getData($dmsResult);
+					$version = 0;
+
+					// insert dms version
+					$dmsVersion = array(
+						'dms_id' => $dms_id,
+						'version' => $version,
+						'filename' => $filename,
+						'mimetype' => $mimetype,
+						'name' => $name,
+						'beschreibung' => $beschreibung,
+						'cis_suche' => $cis_suche,
+						'schlagworte' => $schlagworte,
+						'insertvon' => $this->_uid,
+						'insertamum' => date('Y-m-d H:i:s')
+					);
+
+					$dmsVersionResult = $this->_ci->DmsVersionModel->insert($dmsVersion);
+
+					if (isError($dmsVersionResult)) return $dmsVersionResult;
+
+					$resObj = new stdClass();
+					$resObj->dms_id = $dms_id;
+					$resObj->version = $version;
+					$resObj->filename = $filename;
+
+					return success($resObj);
+				}
+				else
+					return error("error when inserting DMS");
+			}
+			else
+				return error("file could not be written");
+	}
+
+	public function addNewVersion($dms_id, $fileHandle, $name = null, $mimetype = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
+	{
+		// get the latest version
+		$lastVersionResult = $this->getLastVersion($dms_id);
+
+		if (isError($lastVersionResult)) return $lastVersionResult;
+
+		if (hasData($lastVersionResult))
+		{
+			$lastVersion = getData($lastVersionResult);
+
+			$originalName = isset($name) ? $name : $lastVersion->name;
+
+			// write new file
+			$writeFileResult = $this->_writeNewFile($originalName, $fileHandle);
+
+			if (isError($writeFileResult)) return $writeFileResult;
+
+			if (hasData($writeFileResult))
+			{
+				$writeFileData = getData($writeFileResult);
+				$filename = $writeFileData->filename;
+
+				// insert new version
+				$newVersionNumber = $lastVersion->version + 1;
+
+				// if new parameters given, use them, otherwise use parameters from last version
+				$newVersion = array(
+					'dms_id' => $dms_id,
+					'name' => $originalName,
+					'filename' => $filename,
+					'version' => $newVersionNumber,
+					'mimetype' => isset($mimetype) ? $mimetype : $lastVersion->mimetype,
+					'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
+					'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
+					'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
+					'insertvon' => $this->_uid,
+					'insertamum' => date('Y-m-d H:i:s')
+				);
+
+				$addVersionResult = $this->_ci->DmsVersionModel->insert($newVersion);
+
+				if (isError($addVersionResult))
+					return $addVersionResult;
+
+				$resObj = new stdClass();
+				$resObj->version = $newVersionNumber;
+				$resObj->filename = $filename;
+
+				return success($resObj);
+			}
+			else
+				return error("file could not be written");
+		}
+		else
+			return error("last version not found");
+	}
+
+	public function updateLastVersion($dms_id, $fileHandle, $name = null, $mimetype = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
+	{
+		// get the latest version
+		$lastVersionResult = $this->getLastVersion($dms_id);
+
+		if (isError($lastVersionResult)) return $lastVersionResult;
+
+		if (hasData($lastVersionResult))
+		{
+			$lastVersion = getData($lastVersionResult);
+
+			// update file in filesystem
+			$writeFileResult = $this->_writeFile($lastVersion->filename, $fileHandle);
+
+			if (isError($writeFileResult)) return $writeFileResult;
+
+			if (hasData($writeFileResult))
+			{
+				$writeFileData = getData($writeFileResult);
+				$filename = $writeFileData->filename;
+
+				// if new parameters given, use them, otherwise use parameters from last version
+				$newVersion = array(
+					'name' => isset($name) ? $name : $lastVersion->name,
+					'filename' => $filename,
+					'mimetype' => isset($mimetype) ? $mimetype : $lastVersion->mimetype,
+					'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
+					'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
+					'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
+				);
+
+				// update last dms version
+				$addVersionResult = $this->_ci->DmsVersionModel->update(
+					array($dms_id, $lastVersion->version),
+					$newVersion
+				);
+
+				if (isError($addVersionResult))
+					return $addVersionResult;
+
+				$resObj = new stdClass();
+				$resObj->version = $lastVersion->version;
+				$resObj->filename = $filename;
+
+				return success($resObj);
+			}
+			else
+				return error("file could not be written");
+		}
+		else
+			return error("last version not found");
+	}
+
+	public function getLastVersion($dms_id)
+	{
+		$this->_ci->DmsVersionModel->addSelect('version');
+		$this->_ci->DmsVersionModel->addOrder('version', 'DESC');
+		$this->_ci->DmsVersionModel->addOrder('insertamum', 'DESC');
+		$this->_ci->DmsVersionModel->addLimit(1);
+		$lastDmsVersionResult = $this->_ci->DmsVersionModel->loadWhere(
+			array('dms_id' => $dms_id)
+		);
+
+		if (isError($lastDmsVersionResult)) return $lastDmsVersionResult;
+
+		if (hasData($lastDmsVersionResult))
+		{
+			$lastDmsVersionData = getData($lastDmsVersionResult)[0];
+			$lastDmsVersion = $lastDmsVersionData->version;
+
+			return $this->getVersion($dms_id, $lastDmsVersion);
+		}
+		else
+			return error("Dms last version not found");
+	}
+
+	public function getVersion($dms_id, $version)
+	{
+		$this->_ci->DmsVersionModel->addSelect('dms_id, version, filename, mimetype, name, beschreibung, cis_suche, schlagworte');
+		$dmsVersionResult = $this->_ci->DmsVersionModel->loadWhere(
+			array(
+				'dms_id' => $dms_id,
+				'version' => $version
+			)
+		);
+
+		if (isError($dmsVersionResult)) return $dmsVersionResult;
+
+		if (hasData($dmsVersionResult))
+		{
+			$dmsVersion = getData($dmsVersionResult)[0];
+
+			// file content as file pointer
+			$fileHandleResult = $this->_ci->DmsFSModel->openRead($dmsVersion->filename);
+
+			if (isError($fileHandleResult)) return $fileHandleResult;
+
+			if (hasData($fileHandleResult))
+			{
+				$fileHandle = getData($fileHandleResult);
+				$dmsVersion->{self::FILE_CONTENT_PROPERTY} = $fileHandle;
+
+				$closeResult = $this->_ci->DmsFSModel->close($fileHandle);
+
+				if (isError($closeResult)) return $closeResult;
+
+				return success($dmsVersion);
+			}
+			else
+				return error("File could not be opened");
+		}
+		else
+			return error("Dms version not found");
+	}
+
+	public function removeAll($dms_id)
+	{
+		$versions_removed = array();
+
+		$this->_ci->DmsVersionModel->addSelect('version, filename');
+		$allVersionsResult = $this->_ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
+
+		if (hasData($allVersionsResult))
+		{
+			$allVersionsData = getData($allVersionsResult);
+
+			$error = null;
+
+			// Start DB transaction
+			$this->_ci->db->trans_begin();
+
+			// remove all versions
+			foreach ($allVersionsData as $version)
+			{
+				$removeVersionResult = $this->removeVersion($dms_id, $version->version);
+
+				if (isError($removeVersionResult))
+				{
+					$error = $removeVersionResult;
+					break;
+				}
+				else
+					$versions_removed[] = $version;
+			}
+
+			// Transaction complete!
+			$this->_ci->db->trans_complete();
+
+			// Check if everything went ok during the transaction
+			if ($this->_ci->db->trans_status() === false || isset($error))
+			{
+				$this->_ci->db->trans_rollback();
+
+				if (isset($error))
+					return $error;
+				else
+					return error("Error occured when deleting, rolled back");
+			}
+			else
+			{
+				$this->_ci->db->trans_commit();
+			}
+		}
+
+		return success($versions_removed);
+	}
+
+	public function removeLastVersion($dms_id)
+	{
+		$lastVersionNumber = 0;
+		// get the latest version
+		$lastVersionResult = $this->getLastVersion($dms_id);
+
+		if (isError($lastVersionResult)) return $lastVersionResult;
+
+		if (hasData($lastVersionResult))
+		{
+			$lastVersion = getData($lastVersionResult);
+			$lastVersionNumber = $lastVersion->version;
+		}
+
+		return $this->removeVersion($dms_id, $lastVersionNumber);
+	}
+
+	public function removeVersion($dms_id, $version)
+	{
+		$removeVersionResultObj = new stdClass();
+		$removeVersionResultObj->dms_id = null;
+		$removeVersionResultObj->version = null;
+		$removeVersionResultObj->filename = null;
+
+		// load version and check how many versions there are
+		$db = new DB_Model();
+
+		$checkDeleteResult = $db->execReadOnlyQuery(
+			"SELECT filename,
+					(SELECT count(version)
+						FROM campus.tbl_dms_version dv_anzahl
+						WHERE dv_anzahl.dms_id = dv.dms_id) AS anzahl_versionen
+					FROM campus.tbl_dms_version dv
+					WHERE dms_id=?
+					AND version=?",
+			array($dms_id, $version)
+		);
+
+		if (isError($checkDeleteResult)) return $checkDeleteResult;
+
+		if (hasData($checkDeleteResult))
+		{
+			$checkDeleteData = getData($checkDeleteResult)[0];
+
+			$deleteVersionResult = $this->_ci->DmsVersionModel->delete(array($dms_id, $version));
+
+			if (isError($deleteVersionResult)) return $deleteVersionResult;
+
+			$removeVersionResultObj->version = $version;
+			$removeVersionResultObj->filename = $checkDeleteData->filename;
+
+			// delete dms too if no versions left
+			if ($checkDeleteData->anzahl_versionen <= 1)
+			{
+				$deleteDmsResult = $this->_ci->DmsModel->delete($dms_id);
+
+				if (isError($deleteDmsResult)) return $deleteDmsResult;
+
+				$removeVersionResultObj->dms_id = $dms_id;
+			}
+
+			// delete file from file system
+			$removeResult = $this->_ci->DmsFSModel->remove($checkDeleteData->filename);
+
+			if (isError($removeResult))
+				return $removeResult;
+		}
+
+		return success($removeVersionResultObj);
+	}
 
 	// -----------------------------------------------------------------------------------------------------------
 	// Private methods
+	private function _writeNewFile($originalName, $fileHandle)
+	{
+		// create unique filename
+		$filename = $this->_getUniqueFilename($originalName);
 
+		return $this->_writeFile($filename, $fileHandle);
+	}
+
+	private function _writeFile($filename, $fileHandle)
+	{
+		// copy file content provided by fileHandle
+		$fileContent = '';
+
+		$readBlockResult = success();
+
+		// While the end of the file is not reached and the read does not fail
+		while (!feof($fileHandle) && isSuccess($readBlockResult = $this->_ci->DmsFSModel->readBlock($fileHandle)))
+		{
+			// Concatenate the content of the file
+			$fileContent .= getData($readBlockResult);
+		}
+
+		// If an error occurred while reading then return it
+		if (isError($readBlockResult)) return $readBlockResult;
+
+		// open file for writing
+		$openFileResult = $this->_ci->DmsFSModel->openReadWrite($filename);
+
+		if (isError($openFileResult)) return $openFileResult;
+
+		if (!hasData($openFileResult)) return error("File could not be opened");
+
+		$newFileHandle = getData($openFileResult);
+
+		// write file
+		$writeFileResult = $this->_ci->DmsFSModel->write($newFileHandle, $fileContent);
+
+		if (isError($writeFileResult)) return $writeFileResult;
+
+		$resObj = new stdClass();
+		$resObj->bytesWritten = 0;
+		$resObj->filename = '';
+
+		if (hasData($writeFileResult))
+		{
+			$resObj->bytesWritten = getData($writeFileResult);
+			$resObj->filename = $filename;
+		}
+
+		// close handle
+		$closeResult = $this->_ci->DmsFSModel->close($newFileHandle, $fileContent);
+
+		if (isError($closeResult)) return $closeResult;
+
+		return success($resObj);
+	}
+
+	private function _getUniqueFilename($dokname)
+	{
+		$uniqueFilename = uniqid();
+		$fileExtension = pathinfo($dokname, PATHINFO_EXTENSION);
+
+		if (!isEmptyString($fileExtension))
+			$uniqueFilename .= '.'.$fileExtension;
+
+		return $uniqueFilename;
+	}
 
 	// -----------------------------------------------------------------------------------------------------------
 	// Deprecated methods, not to be used

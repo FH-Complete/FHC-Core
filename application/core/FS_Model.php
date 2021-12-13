@@ -114,6 +114,25 @@ class FS_Model extends CI_Model
 		return success($writeResult);
 	}
 
+	public function remove($filename)
+	{
+		// Check if the property _path represents a valid directory
+		$checkResult = $this->_checkPath();
+		if (isError($checkResult)) return $checkResult; // If not then return the error
+
+		// Check filename
+		if (isEmptyString($filename)) return error('The given filename is not valid');
+
+		if (unlink($this->_path.DIRECTORY_SEPARATOR.$filename) === true)
+		{
+			return success();
+		}
+		else
+		{
+			return error('An error occurred while removing a file');
+		}
+	}
+
 	// ------------------------------------------------------------------------------------------------------------------
 	// Old public methods that work with the base64 encoding, not to be used!
 
