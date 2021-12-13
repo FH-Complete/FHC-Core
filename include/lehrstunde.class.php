@@ -1062,7 +1062,19 @@ class lehrstunde extends basis_db
 		return $result;
 	}
 
-	public function getStundenplanData($db_stpl_table, $lehrveranstaltung_id=null, $studiensemester_kurzbz=null, $lehreinheit_id=null, $mitarbeiter_uid=null, $student_uid=null)
+	/**
+	 * Holt Studenplandaten.
+	 *
+	 * @param $db_stpl_table
+	 * @param null $lehrveranstaltung_id
+	 * @param null $studiensemester_kurzbz
+	 * @param null $lehreinheit_id
+	 * @param null $mitarbeiter_uid
+	 * @param null $student_uid
+	 * @param false $nurBevorstehende Wenn true, dann werden nur bevorstehende LVs abgefragt.
+	 * @return bool
+	 */
+	public function getStundenplanData($db_stpl_table, $lehrveranstaltung_id=null, $studiensemester_kurzbz=null, $lehreinheit_id=null, $mitarbeiter_uid=null, $student_uid=null, $nurBevorstehende = false)
 	{
 
 		$qry = "SELECT
@@ -1113,6 +1125,11 @@ class lehrstunde extends basis_db
 		}
 		else
 			return false;
+
+		if($nurBevorstehende)
+		{
+			$qry.= " AND datum >= NOW()::date ";
+		}
 
 		$qry.="GROUP BY stpl.datum, stpl.unr, stpl.lehreinheit_id, lehrfach.bezeichnung
 					ORDER BY stpl.datum,  min(stpl.stunde), stpl.unr, stpl.lehreinheit_id";
