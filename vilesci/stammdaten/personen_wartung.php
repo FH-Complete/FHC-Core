@@ -42,6 +42,7 @@ require_once ('../../include/kontakt.class.php');
 require_once ('../../include/dokument.class.php');
 require_once ('../../include/reihungstest.class.php');
 require_once ('../../include/pruefling.class.php');
+require_once ('../../include/udf.class.php');
 
 
 if (! $db = new basis_db())
@@ -54,6 +55,7 @@ $rechte->getBerechtigungen($uid);
 if (! $rechte->isBerechtigt('basis/person', null, 'suid'))
 	die($rechte->errormsg);
 
+$udf = new UDF();
 $msg_info = array();
 $msg_error = array();
 $msg_warning = array();
@@ -283,6 +285,40 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 			if ($doppelteReihungstestzuordnung === false)
 				$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 
+
+			$personUDF = $udf->personHasUDF();
+
+			if ($personUDF)
+			{
+				$udfToKeep = json_decode($personToKeep_obj->udf_values, true);
+				$udfToDelete = json_decode($personToDelete_obj->udf_values, true);
+
+				$udfToKeep = is_null($udfToKeep) ? array() : $udfToKeep;
+				$udfToDelete = is_null($udfToDelete) ? array() : $udfToDelete;
+
+				if ($udfToKeep != $udfToDelete)
+				{
+					foreach ($udfToDelete as $key => $udfValue)
+					{
+						if (!array_key_exists($key, $udfToKeep))
+						{
+							$udfToKeep[$key] = $udfValue;
+						}
+						elseif ($udfToKeep[$key] !== $udfValue && !is_null($udfValue))
+						{
+							if (is_null($udfToKeep[$key]))
+								$udfToKeep[$key] = $udfValue;
+							else
+							{
+								$msg_error[] = 'Beide Personen haben unterschiedliche Werte in den UDFs und können nicht zusammengelegt werden.<br>
+												Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+								$error = true;
+								break;
+							}
+						}
+					}
+				}
+			}
 			if ($error == false)
 			{
 				// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
@@ -437,6 +473,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				$sql_query_upd1 .= "UPDATE system.tbl_filters SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_log SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_person_lock SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+				$sql_query_upd1 .= "UPDATE system.tbl_issue SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE wawi.tbl_betriebsmittelperson SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE wawi.tbl_konto SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= $alma_query_upd;
@@ -455,6 +492,9 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 				// BPK erst setzen, wenn nur mehr eine Person vorhanden ist
 				$sql_query_upd1 .= "UPDATE public.tbl_person SET bpk=" . $db->db_add_param($bpk, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
+
+				if ($personUDF)
+					$sql_query_upd1 .= "UPDATE public.tbl_person SET udf_values=" . $db->db_add_param(json_encode($udfToKeep)) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 
 				if ($db->db_query($sql_query_upd1))
 				{
@@ -730,9 +770,10 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 					usort($prestudenten->result, "sortPrestudents");
 
+					$prestudentUDF = $udf->prestudentHasUDF();
 					$prestudentenArray = array();
 					$kontaktLoeschArray = array();
-					foreach ($prestudenten->result AS $row)
+					foreach ($prestudenten->result AS $key => $row)
 					{
 						$prestudentenArray[] = array(
 							'prestudent_id' => $row->prestudent_id,
@@ -753,6 +794,8 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							'zgvmanation' => $row->zgvmanation,
 							'studiengang_typ' => $row->studiengang_typ
 						);
+						if ($prestudentUDF)
+							$prestudentenArray[$key] = array_merge($prestudentenArray[$key], array('udf_values' => $row->udf_values));
 					}
 
 					/*
@@ -792,6 +835,48 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 											$warningList['statusUnklar'][$i][2] = $value['prestudent_id'];
 											$i++;
 											continue;
+										}
+
+										//Wenn die UDF values nicht zusammengeführt werden können, wird mit dem nächsten weitergemacht und eine Warnung ausgegeben
+										if ($prestudentUDF)
+										{
+											$udfError = false;
+
+											$udfToKeep =  json_decode($prestudentenArray[$previousKey]['udf_values'], true);;
+											$udfToKeep =  is_null($udfToKeep) ? array() : $udfToKeep;
+
+											$udfToDelete = json_decode($value['udf_values'], true);
+											$udfToDelete = is_null($udfToDelete) ? array() : $udfToDelete;
+
+											if ($udfToKeep != $udfToDelete)
+											{
+												foreach ($udfToDelete as $udfKey => $udfValue)
+												{
+													if (!array_key_exists($udfKey, $udfToKeep))
+													{
+														$udfToKeep[$udfKey] = $udfValue;
+													}
+													elseif ($udfToKeep[$udfKey] !== $udfValue && !is_null($udfValue))
+													{
+														if (is_null($udfToKeep[$udfKey]))
+															$udfToKeep[$udfKey] = $udfValue;
+														else
+														{
+
+															$warningList['udfUnklar'][$i][1] = $prestudentId;
+															$warningList['udfUnklar'][$i][2] = $value['prestudent_id'];
+															$i++;
+															$udfError = true;
+															break;
+														}
+													}
+												}
+											}
+
+											$prestudentenArray[$previousKey]['udf_values'] = json_encode($udfToKeep);
+											if ($udfError)
+												continue;
+
 										}
 										// Wenn der Status gleich ist, wird auf bestätigt-datum geprüft
 										if ($status_kurzbz == $value['status_kurzbz'])
@@ -894,6 +979,11 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						$zgvmadatum = $value['zgvmadatum'];
 						$zgvmanation = $value['zgvmanation'];
 						$previousKey = $key;
+						if ($prestudentUDF)
+						{
+							$udfToKeep =  json_decode($value['udf_values'], true);
+							$udfToKeep =  is_null($udfToKeep) ? array() : $udfToKeep;
+						}
 					}
 
 					// Messages in $msg_warning schreiben
@@ -927,6 +1017,22 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							$messageOutput .= '<div>Bei folgenden PreStudenten ist der Status widersprüchlich oder unklar:<br>';
 
 							foreach ($value as $key => $presstudentid)
+							{
+								$messageOutput .= '&nbsp;&nbsp;&nbsp;&nbsp;'.$presstudentid.'<br>';
+							}
+							$messageOutput .= '</div>';
+						}
+					}
+
+					$msg_warning[] = $messageOutput;
+					$messageOutput = '';
+					if(isset($warningList['udfUnklar']))
+					{
+						foreach ($warningList['udfUnklar'] as $key => $value) {
+
+							$messageOutput .= '<div>Bei folgenden PreStudenten sind die UDFs widersprüchlich oder unklar:<br>';
+
+							foreach ($value as $presstudentid)
 							{
 								$messageOutput .= '&nbsp;&nbsp;&nbsp;&nbsp;'.$presstudentid.'<br>';
 							}

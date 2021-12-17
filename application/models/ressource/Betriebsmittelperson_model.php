@@ -18,7 +18,7 @@ class Betriebsmittelperson_model extends DB_Model
 	 * @param bool $isRetourniert   False to retrieve only active Betriebsmittel.
 	 * @return array|bool
 	 */
-	public function getBetriebsmittel($person_id, $betriebsmitteltyp = null, $isRetourniert = null)
+	public function getBetriebsmittel($person_id, $betriebsmitteltyp = null, $isRetourniert = null, $onlyAktiveBenutzer=false)
 	{
 		if (!is_numeric($person_id))
 		{
@@ -28,8 +28,12 @@ class Betriebsmittelperson_model extends DB_Model
 		
 		$this->addJoin('wawi.tbl_betriebsmittel', 'betriebsmittel_id');
 		
+		if( $onlyAktiveBenutzer ) {
+			$this->addJoin('public.tbl_benutzer b', 'b.uid = wawi.tbl_betriebsmittelperson.uid AND b.aktiv = \'t\'');
+		}
+
 		$condition = '
-			person_id = '. $this->escape($person_id). '
+			wawi.tbl_betriebsmittelperson.person_id = '. $this->escape($person_id). '
 		';
 		
 		if (is_string($betriebsmitteltyp)) {

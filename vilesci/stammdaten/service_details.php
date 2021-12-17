@@ -149,7 +149,7 @@ $datum_obj = new datum();
 			{
 				echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 				echo "<script type='text/javascript'>\n";
-				echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
+				//echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
 				echo "</script>\n";
 				$action='update';
 				$service_id = $service->service_id;

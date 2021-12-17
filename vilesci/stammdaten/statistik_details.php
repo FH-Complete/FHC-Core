@@ -223,7 +223,7 @@ EOT;
 					</tr>
 					<tr valign="top">
 						<td rowspan="3">SQL</td>
-						<td rowspan="3"><textarea name="sql" cols="60" rows="5"><?php echo $statistik->sql ?></textarea></td>
+						<td rowspan="3"><textarea name="sql" cols="60" rows="5" style="width: 45vw; height: 100vh"><?php echo $statistik->sql ?></textarea></td>
 						<td></td>
 					<tr valign="top">
 						<td></td>
@@ -234,7 +234,7 @@ EOT;
 					<tr valign="top">
 						<td></td>
 						<td>Preferences</td>
-						<td><textarea name="preferences" cols="60" rows="5"><?php echo $statistik->preferences ?></textarea></td>
+						<td><textarea name="preferences" cols="60" rows="5" style="width: 40vw; height: 100vh"><?php echo $statistik->preferences ?></textarea></td>
 						<td></td>
 						<td></td>
 						<td></td>

@@ -214,6 +214,7 @@ function draw_content_liste($row)
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
 			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
+			<STUDENT:bpk><![CDATA['.$row->bpk.']]></STUDENT:bpk>
 
 			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 			<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
@@ -330,6 +331,7 @@ function draw_content($row)
 			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
 			<STUDENT:link_bewerbungstool><![CDATA['.CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.$row->zugangscode.'&emailAdresse='.$mail_privat.']]></STUDENT:link_bewerbungstool>
+			<STUDENT:bpk><![CDATA['.$row->bpk.']]></STUDENT:bpk>
 
 			<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
@@ -441,6 +443,7 @@ function draw_empty_content()
 			<STUDENT:mail_intern><![CDATA[]]></STUDENT:mail_intern>
 			<STUDENT:zugangscode><![CDATA[]]></STUDENT:zugangscode>
 			<STUDENT:link_bewerbungstool><![CDATA[]]></STUDENT:link_bewerbungstool>
+			<STUDENT:bpk><![CDATA[]]></STUDENT:bpk>
 
 			<STUDENT:aktiv><![CDATA[]]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA[]]></STUDENT:uid>
@@ -608,7 +611,7 @@ if($xmlformat=='rdf')
 			AS email_privat,
 			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
 			 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr,
-			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode
+			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode, p.bpk
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON (student_uid=uid)
@@ -764,8 +767,16 @@ if($xmlformat=='rdf')
 	}
 	else
 	{
-		// String aufsplitten und Sonderzeichen entfernen
-		$searchItems = explode(' ',TRIM(str_replace(',', '', $filter),' 	!.?'));
+		// Sonderzeichen entfernen und String aufsplitten
+		// Replace commas with whitespace
+		$filter = str_replace(',', ' ', $filter);
+		// Replace multiple whitespaces with just one
+		$filter = preg_replace('/\s/', ' ', $filter);
+		// Trim whitespaces and special characters from the string
+		$filter = trim($filter,' 		!.?');
+		// Explode string
+		$searchItems = explode(' ',$filter);
+
 		$kriterienliste = array("#email","#name","#pid","#preid","#tel", "#ref");
 		$suchkriterium = '';
 

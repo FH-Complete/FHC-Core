@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='Studiensemester ist ungueltig'; 
 $this->phrasen['anwesenheitsliste/anwesenheitslisten']='Anwesenheitslisten';
+$this->phrasen['anwesenheitsliste/covidstatuslisten']='Nachweislisten';
 $this->phrasen['anwesenheitsliste/notenlisten']='Notenlisten';
 $this->phrasen['anwesenheitsliste/notenliste']='Notenliste';
 $this->phrasen['anwesenheitsliste/anwesenheitslistenMitBildern']='Fotolisten';

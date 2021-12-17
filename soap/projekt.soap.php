@@ -72,10 +72,23 @@ function saveProjekt($username, $passwort, $projekt)
 	$projektNew->anzahl_ma = $projekt->anzahl_ma;
 	$projektNew->aufwand_pt = $projekt->aufwand_pt;
 
-	if($projekt->neu=='true')
-		$projektNew->new = true;
+	if($projekt->zeitaufzeichnung=='true')
+	{
+		$projektNew->zeitaufzeichnung = true;
+	}
 	else
+	{
+		$projektNew->zeitaufzeichnung = false;
+	}
+
+	if($projekt->neu=='true')
+	{
+		$projektNew->new = true;
+	}
+	else
+	{
 		$projektNew->new = false;
+	}
 
 	if($projektNew->save())
 		return $projektNew->projekt_kurzbz;

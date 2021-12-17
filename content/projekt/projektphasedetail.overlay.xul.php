@@ -143,6 +143,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   					</hbox>
 					</row>
+                    <row>
+
+                        <label value="Zeitaufzeichnung" control="checkbox-projektphase-detail-zeitaufzeichnung"/>
+                        <hbox>
+                            <checkbox id="checkbox-projektphase-detail-zeitaufzeichnung"/>
+                            <spacer />
+                        </hbox>
+
+                    </row>
 				</rows>
 			</grid>
 			<hbox>

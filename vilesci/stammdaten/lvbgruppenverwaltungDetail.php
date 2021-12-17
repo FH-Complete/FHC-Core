@@ -396,6 +396,13 @@ if ($type == 'save')
 		$gruppe = new gruppe();
 		if ($gruppe->load($gruppe_kurzbz))
 		{
+			if(!preg_match('/^[A-Z0-9a-z\-\_]*$/', $_POST['kurzBzNeu']) ||
+				!preg_match('/^[A-Z0-9a-z\-\_]*$/', $_POST['bezeichnung']))
+			{
+				echo "<span class='error'>Bitte verwenden Sie für die Kurzbezeichnung/Bezeichnung keine Sonderzeichen oder Umlaute</span>";
+				return;
+			}
+
 			$gruppe->bezeichnung = $_POST['bezeichnung'];
 			if ($admin)
 			{
@@ -432,6 +439,12 @@ if ($type == 'save')
 		$lvb = new lehrverband();
 		if ($lvb->load($studiengang_kz, $semester, $verband, $gruppe))
 		{
+			if(!preg_match('/^[A-Z0-9a-z\-\_]*$/', $_POST['bezeichnung']))
+			{
+				echo "<span class='error'>Bitte verwenden Sie für die Bezeichnung keine Sonderzeichen oder Umlaute</span>";
+				return;
+			}
+
 			$lvb->bezeichnung = $_POST['bezeichnung'];
 
 			if ($admin)
