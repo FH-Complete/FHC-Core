@@ -114,15 +114,20 @@ class FS_Model extends CI_Model
 		return success($writeResult);
 	}
 
+	/**
+	 * Removes a given file
+	 */
 	public function remove($filename)
 	{
 		// Check if the property _path represents a valid directory
 		$checkResult = $this->_checkPath();
+
 		if (isError($checkResult)) return $checkResult; // If not then return the error
 
 		// Check filename
 		if (isEmptyString($filename)) return error('The given filename is not valid');
 
+		// remove file
 		if (unlink($this->_path.DIRECTORY_SEPARATOR.$filename) === true)
 		{
 			return success();

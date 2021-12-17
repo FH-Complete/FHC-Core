@@ -4,10 +4,11 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class AkteLib
 {
-	const AKTE_KATEGORIE_KURZBZ = 'Akte';
+	const AKTE_KATEGORIE_KURZBZ = 'Akte'; // kategorie_kurzbz of dms when inserting for akte
+	const DEFAULT_USER = 'Akte'; // fallback string for insertvon if no logged user
 
 	private $_ci; // Code igniter instance
-	private $_uid;
+	private $_uid; // uid of logged user
 
 	/**
 	 * Object initialization
@@ -23,17 +24,23 @@ class AkteLib
 		$this->_ci->load->library('DmsLib');
 	}
 
-	public function add($person_id, $dokument_kurzbz, $titel, $mimetype, $fileHandle, $bezeichnung = null, $uid = null)
+	/**
+	 * Writes a new file, adds a new dms entry with given akte data,
+	 * adds a new dms version 0 for the written file, and adds Akte if dms add was successfull
+	 * Returns success with inserted akte id or error
+	 */
+	public function add($person_id, $dokument_kurzbz, $titel, $mimetype, $fileHandle, $bezeichnung = null, $archiv = false, $signiert = false, $stud_selfservice = false)
 	{
-		$dmsAddResult = $this->_ci->dmslib->add($titel, self::AKTE_KATEGORIE_KURZBZ, $mimetype, $fileHandle, $dokument_kurzbz, $bezeichnung);
+		// add new dms entry and new dms version for the Akte, using Akte data (title, mimetype, file content as handle)
+		$dmsAddResult = $this->_ci->dmslib->add($titel, $mimetype, $fileHandle, self::AKTE_KATEGORIE_KURZBZ, $dokument_kurzbz, $bezeichnung);
 
 		if (isError($dmsAddResult)) return $dmsAddResult;
 
-		if (!hasData($dmsAddResult))
-			return error("Dms document could not be added");
+		if (!hasData($dmsAddResult)) return error("Dms document could not be added");
 
 		$dmsAddData = getData($dmsAddResult);
 
+		// insert the Akte
 		return $this->_ci->AkteModel->insert(
 			array(
 				'person_id' => $person_id,
@@ -42,36 +49,42 @@ class AkteLib
 				'mimetype' => $mimetype,
 				'bezeichnung' => $bezeichnung,
 				'erstelltam' => date('Y-m-d'),
-				'uid' => $uid,
 				'dms_id' => $dmsAddData->dms_id,
+				'archiv' => $archiv,
+				'signiert' => $signiert,
+				'stud_selfservice' => $stud_selfservice,
 				'insertamum' => date('Y-m-d H:i:s'),
-				'insertvon' => $this->_uid
+				'insertvon' => isEmptyString($this->_uid) ? self::DEFAULT_USER : $this->_uid
 			)
 		);
 	}
 
-	public function update($akte_id, $titel, $mimetype, $fileHandle, $bezeichnung = null)
+	/**
+	 * Writes a new file, adds a new dms version 0 for the written file, and updates Akte if dms version add was successfull
+	 * Returns success with updated akte id or error
+	 */
+	public function update($akte_id, $titel, $mimetype, $fileHandle, $bezeichnung = null, $archiv = false, $signiert = false, $stud_selfservice = false)
 	{
+		// check if Akte with dms exists
 		$this->_ci->AkteModel->addSelect('dms_id');
 		$akteResult = $this->_ci->AkteModel->load($akte_id);
 
 		if (isError($akteResult)) return $akteResult;
 
-		if (!hasData($akteResult))
-			return error("Akte not found");
+		if (!hasData($akteResult)) return error("Akte not found");
 
 		$dms_id = getData($akteResult)[0]->dms_id;
 
-		if (isEmptyString($dms_id))
-			return error("Akte has no dms document");
+		if (isEmptyString($dms_id)) return error("Akte has no dms document");
 
+		// if Akte with dms found, update the last dms version
 		$dmsUpdateResult = $this->_ci->dmslib->updateLastVersion($dms_id, $fileHandle, $titel, $mimetype, $bezeichnung);
 
 		if (isError($dmsUpdateResult)) return $dmsUpdateResult;
 
-		if (!hasData($dmsUpdateResult))
-			return error("Dms document could not be updated");
+		if (!hasData($dmsUpdateResult)) return error("Dms document could not be updated");
 
+		// update the Akte
 		return $this->_ci->AkteModel->update(
 			$akte_id,
 			array(
@@ -80,12 +93,19 @@ class AkteLib
 				'bezeichnung' => $bezeichnung,
 				'erstelltam' => date('Y-m-d'),
 				'dms_id' => $dms_id,
+				'archiv' => $archiv,
+				'signiert' => $signiert,
+				'stud_selfservice' => $stud_selfservice,
 				'updateamum' => date('Y-m-d H:i:s'),
 				'updatevon' => $this->_uid
 			)
 		);
 	}
 
+	/**
+	 * Gets akte data and associated dms data by akte Id
+	 * Returns success with akte and dms data or error
+	 */
 	public function get($akte_id)
 	{
 		// get Akte data
@@ -98,19 +118,22 @@ class AkteLib
 
 		if (isError($akteResult)) return $akteResult;
 
-		if (!hasData($akteResult))
-			return error("Akte not found");
+		if (!hasData($akteResult)) return error("Akte not found");
 
 		$resultObject = getData($akteResult)[0];
 
+		// set properties with same name in Akte and Dms table
 		$resultObject->akte_mimetype = $resultObject->mimetype;
 
 		// get dms data
 		$dmsResult = $this->_ci->dmslib->getLastVersion($resultObject->dms_id);
-		$dmsProperties = array('version', 'filename', 'mimetype', 'name', 'beschreibung', 'cis_suche', 'schlagworte', DmsLib::FILE_CONTENT_PROPERTY);
 
 		if (isError($dmsResult)) return $dmsResult;
 
+		// properties to retrieve from dms
+		$dmsProperties = array('version', 'filename', 'mimetype', 'name', 'beschreibung', 'cis_suche', 'schlagworte', DmsLib::FILE_CONTENT_PROPERTY);
+
+		// set dms properties
 		if (hasData($dmsResult))
 		{
 			$dmsData = getData($dmsResult);
@@ -122,17 +145,24 @@ class AkteLib
 		}
 		else
 		{
+			// set null if no dms result found
 			foreach ($dmsProperties as $dmsProperty)
 			{
 				$resultObject->{$dmsProperty} = null;
 			}
 		}
 
+		// return the object containing akte and dms data
 		return success($resultObject);
 	}
 
+	/**
+	 * Gets Akte data and associated dms data by person Id and dokument_kurzbz
+	 * Returns success with result array with akte and dms data or error
+	 */
 	public function getByPersonIdAndDocumentType($person_id, $dokument_kurzbz)
 	{
+		// load all Akte entries for given person and dokument_kurzbz
 		$this->_ci->AkteModel->addSelect('akte_id');
 		$akteResult = $this->_ci->AkteModel->loadWhere(
 			array(
@@ -141,40 +171,45 @@ class AkteLib
 			)
 		);
 
-		if (!hasData($akteResult))
-			return error("Akte not found");
+		if (!hasData($akteResult)) return error("Akte not found");
 
 		$akteData = getData($akteResult);
 
 		$resultArr = array();
 
+		// for each found akte entry
 		foreach ($akteData as $akte)
 		{
+			// get dms and akte data from akte Id
 			$getAkteDmsResult = $this->get($akte->akte_id);
 
-			if (isError($getAkteDmsResult))
-				return $getAkteDmsResult;
+			if (isError($getAkteDmsResult)) return $getAkteDmsResult;
 
 			$resultArr[] = getData($getAkteDmsResult);
 		}
 
+		// return all found entries
 		return success($resultArr);
 	}
 
+	/**
+	 * Removes Akte by akte Id, removes all associated dms entries and versions, and deletes all associated files
+	 * Returns success with removed version numbers or error
+	 */
 	public function remove($akte_id)
 	{
+		// get dms_id for akte
 		$this->_ci->AkteModel->addSelect('dms_id');
 		$akteResult = $this->_ci->AkteModel->load($akte_id);
 
 		if (isError($akteResult)) return $akteResult;
 
-		if (!hasData($akteResult))
-			return error("Akte not found");
+		if (!hasData($akteResult)) return error("Akte not found");
 
 		$dms_id = getData($akteResult)[0]->dms_id;
 		$error = null;
 
-		// Start DB transaction
+		// Start DB transaction to avoid deleting only part of the data
 		$this->_ci->db->trans_begin();
 
 		// delete Akte
@@ -186,6 +221,7 @@ class AkteLib
 		}
 		else
 		{
+			// remove all dms entry for dms of the akte
 			$removeAllResult = $this->_ci->dmslib->removeAll($dms_id);
 
 			if (isError($removeAllResult))
@@ -200,6 +236,7 @@ class AkteLib
 		{
 			$this->_ci->db->trans_rollback();
 
+			// return occured error
 			if (isset($error))
 				return $error;
 			else
@@ -208,6 +245,8 @@ class AkteLib
 		else
 		{
 			$this->_ci->db->trans_commit();
+
+			// return removed dms entry data
 			return $removeAllResult;
 		}
 	}

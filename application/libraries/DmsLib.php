@@ -4,10 +4,11 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class DmsLib
 {
-	const FILE_CONTENT_PROPERTY = 'file_content';
+	const FILE_CONTENT_PROPERTY = 'file_content'; // property name for file content
+	const DEFAULT_USER = 'DMS'; // fallback string for insertvon if no logged user
 
 	private $_ci; // code igniter instance
-	private $_uid;
+	private $_uid; // uid of logged user
 
 	/**
 	 * Object initialization
@@ -26,8 +27,13 @@ class DmsLib
 	// -----------------------------------------------------------------------------------------------------------
 	// Public methods
 
-	public function add($name, $kategorie_kurzbz, $mimetype, $fileHandle, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
+	/**
+	 * Writes a new file, adds a new dms entry and a new dms version 0 for the written file
+	 * Returns success info of added dms entry (dms_id, version, filename) or error
+	 */
+	public function add($name, $mimetype, $fileHandle, $kategorie_kurzbz = null, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
 	{
+			// write file with content of fileHandle
 			$writeFileResult = $this->_writeNewFile($name, $fileHandle);
 
 			if (isError($writeFileResult)) return $writeFileResult;
@@ -62,7 +68,7 @@ class DmsLib
 						'beschreibung' => $beschreibung,
 						'cis_suche' => $cis_suche,
 						'schlagworte' => $schlagworte,
-						'insertvon' => $this->_uid,
+						'insertvon' => isEmptyString($this->_uid) ? self::DEFAULT_USER : $this->_uid,
 						'insertamum' => date('Y-m-d H:i:s')
 					);
 
@@ -70,6 +76,7 @@ class DmsLib
 
 					if (isError($dmsVersionResult)) return $dmsVersionResult;
 
+					// return dms info
 					$resObj = new stdClass();
 					$resObj->dms_id = $dms_id;
 					$resObj->version = $version;
@@ -84,6 +91,10 @@ class DmsLib
 				return error("file could not be written");
 	}
 
+	/**
+	 * Writes a new file with content of fileHandle, adds a new dms version (max version number + 1) for the written file
+	 * Returns success with info of added dms version (version, filename) or error
+	 */
 	public function addNewVersion($dms_id, $fileHandle, $name = null, $mimetype = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
 	{
 		// get the latest version
@@ -97,7 +108,7 @@ class DmsLib
 
 			$originalName = isset($name) ? $name : $lastVersion->name;
 
-			// write new file
+			// write new file with content of fileHandle
 			$writeFileResult = $this->_writeNewFile($originalName, $fileHandle);
 
 			if (isError($writeFileResult)) return $writeFileResult;
@@ -120,15 +131,15 @@ class DmsLib
 					'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
 					'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
 					'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
-					'insertvon' => $this->_uid,
+					'insertvon' => isEmptyString($this->_uid) ? self::DEFAULT_USER : $this->_uid,
 					'insertamum' => date('Y-m-d H:i:s')
 				);
 
 				$addVersionResult = $this->_ci->DmsVersionModel->insert($newVersion);
 
-				if (isError($addVersionResult))
-					return $addVersionResult;
+				if (isError($addVersionResult)) return $addVersionResult;
 
+				// return dms info
 				$resObj = new stdClass();
 				$resObj->version = $newVersionNumber;
 				$resObj->filename = $filename;
@@ -142,6 +153,11 @@ class DmsLib
 			return error("last version not found");
 	}
 
+	/**
+	 * Updates the last version (max version number) of a dms entry
+	 * Overwrites the file associated with this version with content read from fileHandle
+	 * Returns success with info of added dms version (version, filename) or error
+	 */
 	public function updateLastVersion($dms_id, $fileHandle, $name = null, $mimetype = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
 	{
 		// get the latest version
@@ -179,9 +195,9 @@ class DmsLib
 					$newVersion
 				);
 
-				if (isError($addVersionResult))
-					return $addVersionResult;
+				if (isError($addVersionResult)) return $addVersionResult;
 
+				// return dms info
 				$resObj = new stdClass();
 				$resObj->version = $lastVersion->version;
 				$resObj->filename = $filename;
@@ -195,8 +211,13 @@ class DmsLib
 			return error("last version not found");
 	}
 
+	/**
+	 * Gets dms version with highest number
+	 * Returns success with dms data and fileHandle with file content or error
+	 */
 	public function getLastVersion($dms_id)
 	{
+		// get the latest version number
 		$this->_ci->DmsVersionModel->addSelect('version');
 		$this->_ci->DmsVersionModel->addOrder('version', 'DESC');
 		$this->_ci->DmsVersionModel->addOrder('insertamum', 'DESC');
@@ -212,12 +233,17 @@ class DmsLib
 			$lastDmsVersionData = getData($lastDmsVersionResult)[0];
 			$lastDmsVersion = $lastDmsVersionData->version;
 
+			// call get Version with last version number
 			return $this->getVersion($dms_id, $lastDmsVersion);
 		}
 		else
 			return error("Dms last version not found");
 	}
 
+	/**
+	 * Gets specified dms version
+	 * Returns success with dms data and fileHandle with file content or error
+	 */
 	public function getVersion($dms_id, $version)
 	{
 		$this->_ci->DmsVersionModel->addSelect('dms_id, version, filename, mimetype, name, beschreibung, cis_suche, schlagworte');
@@ -234,7 +260,7 @@ class DmsLib
 		{
 			$dmsVersion = getData($dmsVersionResult)[0];
 
-			// file content as file pointer
+			// get file content as file pointer
 			$fileHandleResult = $this->_ci->DmsFSModel->openRead($dmsVersion->filename);
 
 			if (isError($fileHandleResult)) return $fileHandleResult;
@@ -244,6 +270,7 @@ class DmsLib
 				$fileHandle = getData($fileHandleResult);
 				$dmsVersion->{self::FILE_CONTENT_PROPERTY} = $fileHandle;
 
+				// close file pointer
 				$closeResult = $this->_ci->DmsFSModel->close($fileHandle);
 
 				if (isError($closeResult)) return $closeResult;
@@ -257,9 +284,13 @@ class DmsLib
 			return error("Dms version not found");
 	}
 
+	/**
+	 * Removes dms entry and all its versions, deletes all associated files
+	 * Returns success with removed version numbers or error
+	 */
 	public function removeAll($dms_id)
 	{
-		$versions_removed = array();
+		$versionsRemoved = array();
 
 		$this->_ci->DmsVersionModel->addSelect('version, filename');
 		$allVersionsResult = $this->_ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
@@ -270,10 +301,10 @@ class DmsLib
 
 			$error = null;
 
-			// Start DB transaction
+			// Start DB transaction to avoid deleting only part of the data
 			$this->_ci->db->trans_begin();
 
-			// remove all versions
+			// remove all versions of the dms Id
 			foreach ($allVersionsData as $version)
 			{
 				$removeVersionResult = $this->removeVersion($dms_id, $version->version);
@@ -284,7 +315,7 @@ class DmsLib
 					break;
 				}
 				else
-					$versions_removed[] = $version;
+					$versionsRemoved[] = $version; // return removed versions
 			}
 
 			// Transaction complete!
@@ -306,9 +337,13 @@ class DmsLib
 			}
 		}
 
-		return success($versions_removed);
+		return success($versionsRemoved);
 	}
 
+	/**
+	 * Removes latest version and its associated file
+	 * Returns success with removed dms version data (dms_id, version, filename) or error
+	 */
 	public function removeLastVersion($dms_id)
 	{
 		$lastVersionNumber = 0;
@@ -323,9 +358,14 @@ class DmsLib
 			$lastVersionNumber = $lastVersion->version;
 		}
 
+		// call remove method for latest version
 		return $this->removeVersion($dms_id, $lastVersionNumber);
 	}
 
+	/**
+	 * Removes latest version and its associated file
+	 * Returns success with removed dms version data (dms_id, version, filename) or error
+	 */
 	public function removeVersion($dms_id, $version)
 	{
 		$removeVersionResultObj = new stdClass();
@@ -333,7 +373,7 @@ class DmsLib
 		$removeVersionResultObj->version = null;
 		$removeVersionResultObj->filename = null;
 
-		// load version and check how many versions there are
+		// load dms version and check how many versions there are
 		$db = new DB_Model();
 
 		$checkDeleteResult = $db->execReadOnlyQuery(
@@ -353,6 +393,7 @@ class DmsLib
 		{
 			$checkDeleteData = getData($checkDeleteResult)[0];
 
+			// delete version
 			$deleteVersionResult = $this->_ci->DmsVersionModel->delete(array($dms_id, $version));
 
 			if (isError($deleteVersionResult)) return $deleteVersionResult;
@@ -373,8 +414,7 @@ class DmsLib
 			// delete file from file system
 			$removeResult = $this->_ci->DmsFSModel->remove($checkDeleteData->filename);
 
-			if (isError($removeResult))
-				return $removeResult;
+			if (isError($removeResult)) return $removeResult;
 		}
 
 		return success($removeVersionResultObj);
@@ -382,17 +422,26 @@ class DmsLib
 
 	// -----------------------------------------------------------------------------------------------------------
 	// Private methods
+
+	/**
+	 * Writes file with content of fileHandle using original document name for file extension
+	 */
 	private function _writeNewFile($originalName, $fileHandle)
 	{
-		// create unique filename
+		// create unique filename, using original document name to detect file extension
 		$filename = $this->_getUniqueFilename($originalName);
 
+		// write the file
 		return $this->_writeFile($filename, $fileHandle);
 	}
 
+	/**
+	 * Writes file with content of fileHandle
+	 * Returns number of bytes written and filename
+	 */
 	private function _writeFile($filename, $fileHandle)
 	{
-		// copy file content provided by fileHandle
+		// file content provided by fileHandle
 		$fileContent = '';
 
 		$readBlockResult = success();
@@ -421,6 +470,7 @@ class DmsLib
 
 		if (isError($writeFileResult)) return $writeFileResult;
 
+		// return number of bytes written and filename
 		$resObj = new stdClass();
 		$resObj->bytesWritten = 0;
 		$resObj->filename = '';
@@ -439,11 +489,19 @@ class DmsLib
 		return success($resObj);
 	}
 
+	/**
+	 * Generates unique filename, appends file extension from document name
+	 * Returns the filename string
+	 */
 	private function _getUniqueFilename($dokname)
 	{
+		// create unique id
 		$uniqueFilename = uniqid();
+
+		// getting extension of file from document name
 		$fileExtension = pathinfo($dokname, PATHINFO_EXTENSION);
 
+		// if file extension found, append it
 		if (!isEmptyString($fileExtension))
 			$uniqueFilename .= '.'.$fileExtension;
 
