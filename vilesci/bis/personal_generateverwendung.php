@@ -31,7 +31,7 @@ require_once('../../include/bisverwendung.class.php');
 require_once('../../include/benutzer.class.php');
 
 if (!$db = new basis_db())
-	die ('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $uid = get_uid();
 $datum_obj = new datum();
@@ -50,18 +50,23 @@ $studiensemester->getAll();
 
 $stsem_arr = array();
 
-foreach($studiensemester->studiensemester as $row_stsem)
+foreach ($studiensemester->studiensemester as $row_stsem)
 {
-	$stsem_arr[$row_stsem->studiensemester_kurzbz]['start']=$row_stsem->start;
-	$stsem_arr[$row_stsem->studiensemester_kurzbz]['ende']=$row_stsem->ende;
+	$stsem_arr[$row_stsem->studiensemester_kurzbz]['start'] = $row_stsem->start;
+	$stsem_arr[$row_stsem->studiensemester_kurzbz]['ende'] = $row_stsem->ende;
 }
 
 if (!$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'suid'))
-	die ('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung für diese Seite');
 
-function buildSQL($maUid=null)
+/**
+ * baut die Query
+ * @param string $maUid UID des Mitarbeiters.
+ * @return string $qry
+ */
+function buildSQL($maUid = null)
 {
-	$condition = ($maUid !== null) ? " AND ma.uid = '" . $maUid . "' " : '';
+	$condition = ($maUid !== null) ? " AND ma.uid = '". $maUid. "' " : '';
 	$qry = "SELECT ma.* FROM
 			(
 			SELECT
@@ -146,6 +151,12 @@ function buildSQL($maUid=null)
 	return $qry;
 }
 
+/**
+ * verlängert die Benutzerfunktion für den betreffenden MA
+ * @param string $maUid UID des Mitarbeiters.
+ * @param string $stsem_arr Array der Studiensemester.
+ * @return String $outputOeFunktion
+ */
 function verlaengereOeFunktion($maUid, $stsem_arr)
 {
 	$uid = get_uid();
@@ -154,7 +165,7 @@ function verlaengereOeFunktion($maUid, $stsem_arr)
 	$qry = buildSQL($maUid);
 
 	if (!$db = new basis_db())
-		die ('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	if ($result = $db->db_query($qry))
 	{
@@ -162,16 +173,13 @@ function verlaengereOeFunktion($maUid, $stsem_arr)
 		{
 			$lastLA = $row->letzter_lehrauftrag;
 		}
-
 	}
 
 	//bisverwendung
 	$bisverwendung = new bisverwendung();
 	$bisverwendung->getLastVerwendung($maUid);
 
-
-
-	if(isset($stsem_arr[$lastLA]) && $stsem_arr[$lastLA]['start'] > $bisverwendung->ende)
+	if (isset($stsem_arr[$lastLA]) && $stsem_arr[$lastLA]['start'] > $bisverwendung->ende)
 	{
 		$dt_verwendungsendeplus10 = new DateTime($bisverwendung->ende);
 		$dt_now = new DateTime();
@@ -182,72 +190,78 @@ function verlaengereOeFunktion($maUid, $stsem_arr)
 		$lastFkt->getLastBenutzerFunktionByUid($maUid, 'oezuordnung');
 
 
-		foreach($lastFkt->result as $row2)
-			{
-				$vonBf = $row2->datum_von;
-				$bisBf = $row2->datum_bis;
-				$bisBF10 = new DateTime($bisBf);
-				$bisBF10-> add(new DateInterval('P10M'));
-				$bfId = $row2->benutzerfunktion_id;
-				$bfOe_kurzbz = $row2->oe_kurzbz;
-				$bfFachbereich_kurzbz = $row2->fachbereich_kurzbz;
-				$bfKurzbz = $row2->funktion_kurzbz;
-				$bfInsertamum = $row2->insertamum;
-				$bfInsertvon = $row2->insertvon;
-				$bfUpdateamum = $row2->updateamum;
-				$bfBezeichnung = $row2->bezeichnung;
-				$bfSem = $row2->semester;
-				$bfWochenstunden = $row2->wochenstunden;
-			}
+		foreach ($lastFkt->result as $row2)
+		{
+			$vonBf = $row2->datum_von;
+			$bisBf = $row2->datum_bis;
+			$bisBF10 = new DateTime($bisBf);
+			$bisBF10->add(new DateInterval('P10M'));
+			$bfId = $row2->benutzerfunktion_id;
+			$bfOe_kurzbz = $row2->oe_kurzbz;
+			$bfFachbereich_kurzbz = $row2->fachbereich_kurzbz;
+			$bfKurzbz = $row2->funktion_kurzbz;
+			$bfInsertamum = $row2->insertamum;
+			$bfInsertvon = $row2->insertvon;
+			$bfUpdateamum = $row2->updateamum;
+			$bfBezeichnung = $row2->bezeichnung;
+			$bfSem = $row2->semester;
+			$bfWochenstunden = $row2->wochenstunden;
+		}
 
-			if ($bisBf != null)
-			{
-				$lastFkt->datum_bis = $stsem_arr[$lastLA]['ende'];
-				$lastFkt->updateamum = date('Y-m-d H:i:s');
-				$lastFkt->updatevon = $uid;
-				$lastFkt->benutzerfunktion_id = $bfId;
-				$lastFkt->fachbereich_kurzbz = $bfFachbereich_kurzbz;
-				$lastFkt->funktion_kurzbz = $bfKurzbz;
-				$lastFkt->uid = $row2->uid;
-				$lastFkt->oe_kurzbz = $bfOe_kurzbz;
-				$lastFkt->insertamum = $bfInsertamum;
-				$lastFkt->insertvon = $bfInsertvon;
-				$lastFkt->datum_von = $vonBf;
-				$lastFkt->bezeichnung = $bfBezeichnung;
-				$lastFkt->semester = $bfSem;
-				$lastFkt->wochenstunden = $bfWochenstunden;
+		if ($bisBf != null)
+		{
+			$lastFkt->datum_bis = $stsem_arr[$lastLA]['ende'];
+			$lastFkt->updateamum = date('Y-m-d H:i:s');
+			$lastFkt->updatevon = $uid;
+			$lastFkt->benutzerfunktion_id = $bfId;
+			$lastFkt->fachbereich_kurzbz = $bfFachbereich_kurzbz;
+			$lastFkt->funktion_kurzbz = $bfKurzbz;
+			$lastFkt->uid = $row2->uid;
+			$lastFkt->oe_kurzbz = $bfOe_kurzbz;
+			$lastFkt->insertamum = $bfInsertamum;
+			$lastFkt->insertvon = $bfInsertvon;
+			$lastFkt->datum_von = $vonBf;
+			$lastFkt->bezeichnung = $bfBezeichnung;
+			$lastFkt->semester = $bfSem;
+			$lastFkt->wochenstunden = $bfWochenstunden;
 
-				if ($bisBF10 > $dt_now)
+			if ($bisBF10 > $dt_now)
+			{
+				if ($lastFkt->save(false))
 				{
-					if ($lastFkt->save(false))
-					{
-						$outputOeFunktion ='Benutzerfunktion verlängert';
-					}
-					else
-					{
-						$outputOeFunktion = $lastFkt->errormsg;
-					}
+					$outputOeFunktion = 'Benutzerfunktion verlängert';
 				}
 				else
 				{
-					$lastFkt->datum_von = $stsem_arr[$lastLA]['start'];
-					$lastFkt->insertamum = date('Y-m-d H:i:s');
-					$lastFkt->insertvon = $uid;
-					if ($lastFkt->save(true))
-					{
-						$outputOeFunktion = 'Benutzerfunktion neu angelegt';
-					}
-					else
-					{
-						$outputOeFunktion = $lastFkt->errormsg;
-					}
+					$outputOeFunktion = $lastFkt->errormsg;
 				}
 			}
+			else
+			{
+				$lastFkt->datum_von = $stsem_arr[$lastLA]['start'];
+				$lastFkt->insertamum = date('Y-m-d H:i:s');
+				$lastFkt->insertvon = $uid;
+				if ($lastFkt->save(true))
+				{
+					$outputOeFunktion = 'Benutzerfunktion neu angelegt';
+				}
+				else
+				{
+					$outputOeFunktion = $lastFkt->errormsg;
+				}
+			}
+		}
 	}
 
 	return $outputOeFunktion;
 }
 
+/**
+ * verlängert die Bisverwendung bzw. legt eine neue Bisverwendung an
+ * @param string $maUid UID des Mitarbeiters.
+ * @param string $stsem_arr Array der Studiensemester.
+ * @return String Returnstring
+ */
 function verlaengereBis($maUid, $stsem_arr)
 {
 	$uid = get_uid();
@@ -255,7 +269,7 @@ function verlaengereBis($maUid, $stsem_arr)
 	$qry = buildSQL($maUid);
 
 	if (!$db = new basis_db())
-		die ('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	if ($result = $db->db_query($qry))
 	{
@@ -263,74 +277,67 @@ function verlaengereBis($maUid, $stsem_arr)
 		{
 			$lastLA = $row->letzter_lehrauftrag;
 		}
-
 	}
 
 	$bisverwendung = new bisverwendung();
 	$bisverwendung->getLastVerwendung($maUid);
 
-		if(isset($stsem_arr[ $lastLA])
-			&& $stsem_arr[$lastLA]['start'] > $bisverwendung->ende)
+	if (isset($stsem_arr[$lastLA]) && $stsem_arr[$lastLA]['start'] > $bisverwendung->ende)
+	{
+		// wenn das Stsem des letzten Lehrauftrags größer ist als die Verwendung
+			// Wenn die letzte Verwendung weniger als 10 Monate alt ist, wird die bestehende
+			// Verwendung aktualisiert auf das neue Datum
+			// Ansonsten wird eine neue Verwendung erstellt
+		$dt_verwendungsendeplus10 = new DateTime($bisverwendung->ende);
+		$dt_now = new DateTime();
+		$dt_verwendungsendeplus10->add(new DateInterval('P10M'));
+
+		if ($dt_verwendungsendeplus10 > $dt_now)
 		{
+			$bisverwendung->ende = $stsem_arr[$lastLA]['ende'];
+			$bisverwendung->updateamum = date('Y-m-d H:i:s');
+			$bisverwendung->updatevon = $uid;
 
-			// wenn das Stsem des letzten Lehrauftrags größer ist als die Verwendung
-				// Wenn die letzte Verwendung weniger als 10 Monate alt ist, wird die bestehende
-				// Verwendung aktualisiert auf das neue Datum
-				// Ansonsten wird eine neue Verwendung erstellt
-				$dt_verwendungsendeplus10 = new DateTime($bisverwendung->ende);
-				$dt_now = new DateTime();
-				$dt_verwendungsendeplus10->add(new DateInterval('P10M'));
+			$retOe = verlaengereOeFunktion($maUid, $stsem_arr);
 
-				if ($dt_verwendungsendeplus10 > $dt_now)
-				{
-					$bisverwendung->ende = $stsem_arr[$lastLA]['ende'];
-					$bisverwendung->updateamum = date('Y-m-d H:i:s');
-					$bisverwendung->updatevon = $uid;
-
-					$retOe = verlaengereOeFunktion($maUid, $stsem_arr);
-
-					if ($bisverwendung->save(false))
-					{
-						return "bis verlaengert " . $retOe;
-					}
-					else
-					{
-						return ('Fehler beim Verlängern Bisverwendung:'.$bisverwendung->errormsg);
-					}
-				}
-				else
-				{
-					$bisverwendung->beginn = $stsem_arr[$lastLA]['start'];
-					$bisverwendung->ende = $stsem_arr[$lastLA]['ende'];
-					$bisverwendung->updateamum = date('Y-m-d H:i:s');
-					$bisverwendung->updatevon = $uid;
-					$bisverwendung->insertamum = date('Y-m-d H:i:s');
-					$bisverwendung->insertvon = $uid;
-
-					$retOe = verlaengereOeFunktion($maUid, $stsem_arr);
-
-					if ($bisverwendung->save(true))
-					{
-						return "bis erstellt " . $retOe;
-					}
-					else
-					{
-						return ('Fehler beim Erstellen Bisverwendung:'.$bisverwendung->errormsg);
-					}
-				}
+			if ($bisverwendung->save(false))
+			{
+				return "bis verlaengert ". $retOe;
+			}
+			else
+			{
+				return ('Fehler beim Verlängern Bisverwendung:'.$bisverwendung->errormsg);
+			}
 		}
+		else
+		{
+			$bisverwendung->beginn = $stsem_arr[$lastLA]['start'];
+			$bisverwendung->ende = $stsem_arr[$lastLA]['ende'];
+			$bisverwendung->updateamum = date('Y-m-d H:i:s');
+			$bisverwendung->updatevon = $uid;
+			$bisverwendung->insertamum = date('Y-m-d H:i:s');
+			$bisverwendung->insertvon = $uid;
+
+			$retOe = verlaengereOeFunktion($maUid, $stsem_arr);
+
+			if ($bisverwendung->save(true))
+			{
+				return "bis erstellt ". $retOe;
+			}
+			else
+			{
+				return ('Fehler beim Erstellen Bisverwendung:'.$bisverwendung->errormsg);
+			}
+		}
+	}
 }
 
 
 
-if (isset($_POST['action']) && $_POST['action']=='bisverlaengern')
+if (isset($_POST['action']) && $_POST['action'] == 'bisverlaengern')
 {
-	// $retstr = deactivateBenutzer($maUid,$datumEndeAktiv);
-	// exit($retstr);
-
 	$retstr = verlaengereBis($_POST['uid'], $stsem_arr);
-	exit ($retstr);
-
+	exit($retstr);
 }
 
 echo '<!doctype html>
@@ -463,7 +470,7 @@ if ($result = $db->db_query($qry))
 			<td>'.$db->convert_html_chars($row->uid).'</td>
 			<td>'.($db->db_parse_bool($row->aktiv)?'Ja':'<span style="color:red; font-weight:bold">Nein</span>').'</td>
 			<td>'.$db->convert_html_chars($row->personalnummer).'</td>
-			<td>'.$db->convert_html_chars($datum_obj->formatDatum($row->insertamum,'d.m.Y')).'</td>
+			<td>'.$db->convert_html_chars($datum_obj->formatDatum($row->insertamum, 'd.m.Y')).'</td>
 			<td>'.$db->convert_html_chars($row->letzter_lehrauftrag).'</td>
 			<td>
 				<table>';
@@ -480,90 +487,82 @@ if ($result = $db->db_query($qry))
 		echo '</table></td>';
 		$bisverwendung = new bisverwendung();
 		$bisverwendung->getLastVerwendung($row->uid);
-		echo '<td>'.($bisverwendung->beginn != ''?$datum_obj->formatDatum($bisverwendung->beginn,'d.m.Y'):' unbekannt ');
-		echo ' - '.($bisverwendung->ende != ''?$datum_obj->formatDatum($bisverwendung->ende,'d.m.Y'):' jetzt ').'</td>';
+		echo '<td>'.($bisverwendung->beginn != ''?$datum_obj->formatDatum($bisverwendung->beginn, 'd.m.Y'):' unbekannt ');
+		echo ' - '.($bisverwendung->ende != ''?$datum_obj->formatDatum($bisverwendung->ende, 'd.m.Y'):' jetzt ').'</td>';
 		echo '<td>'.($row->anmerkung != ''?'<img src="../../skin/images/sticky.png" title="'.$db->convert_html_chars($row->anmerkung).'" />':'').'</td>';
 
 
-		if(isset($stsem_arr[$row->letzter_lehrauftrag])
-			&& $stsem_arr[$row->letzter_lehrauftrag]['start'] > $bisverwendung->ende)
+		if (isset($stsem_arr[$row->letzter_lehrauftrag])
+		&& $stsem_arr[$row->letzter_lehrauftrag]['start'] > $bisverwendung->ende)
 		{
 			// wenn das Stsem des letzten Lehrauftrags größer ist als die Verwendung
+			// Wenn die letzte Verwendung weniger als 10 Monate alt ist, wird die bestehende
+			// Verwendung aktualisiert auf das neue Datum
+			// Ansonsten wird eine neue Verwendung erstellt
+			$dt_verwendungsendeplus10 = new DateTime($bisverwendung->ende);
+			$dt_now = new DateTime();
+			$dt_verwendungsendeplus10->add(new DateInterval('P10M'));
 
+			if ($dt_verwendungsendeplus10 > $dt_now)
+			{
+				$bisverwendung->ende = $stsem_arr[$row->letzter_lehrauftrag]['ende'];
+				$bisverwendung->updateamum = date('Y-m-d H:i:s');
+				$bisverwendung->updatevon = $uid;
+				$retOe = verlaengereOeFunktion($row->uid, $stsem_arr);
 
-				// Wenn die letzte Verwendung weniger als 10 Monate alt ist, wird die bestehende
-				// Verwendung aktualisiert auf das neue Datum
-				// Ansonsten wird eine neue Verwendung erstellt
-				$dt_verwendungsendeplus10 = new DateTime($bisverwendung->ende);
-				$dt_now = new DateTime();
-				$dt_verwendungsendeplus10->add(new DateInterval('P10M'));
-
-				if ($dt_verwendungsendeplus10 > $dt_now)
+				if (isset($_POST['action']) && $_POST['action'] == 'generateall')
 				{
-					$bisverwendung->ende = $stsem_arr[$row->letzter_lehrauftrag]['ende'];
-					$bisverwendung->updateamum = date('Y-m-d H:i:s');
-					$bisverwendung->updatevon = $uid;
-					$retOe = verlaengereOeFunktion($row->uid, $stsem_arr);
-
-					if(isset($_POST['action']) && $_POST['action']=='generateall')
+					if ($bisverwendung->save(false))
 					{
-						if ($bisverwendung->save(false))
-						{
-							echo '<td>Verwendung verlängert ' . $retOe . '</td>';
-						}
-						else
-						{
-							echo '<td>Failed:'.$bisverwendung->errormsg.'</td>';
-						}
+						echo '<td>Verwendung verlängert '. $retOe. '</td>';
 					}
 					else
-						echo '<td>Verlängerung bis '.$bisverwendung->ende.'<br>
-						<span id="verlaengerungslink_'.$row->uid.'">
-						<a href="#bisverlaengern" onclick="verlaengereBis(\''.$row->uid.'\');return false;">verlängern</a>
-						</span>
-						<span id="infobox_'.$row->uid.'"></span>
-								<span id="outputTest_'.$row->uid.'"></span>
-						</td>';
+					{
+						echo '<td>Failed:'.$bisverwendung->errormsg.'</td>';
+					}
 				}
 				else
+					echo '<td>Verlängerung bis '.$bisverwendung->ende.'<br>
+					<span id="verlaengerungslink_'.$row->uid.'">
+					<a href="#bisverlaengern" onclick="verlaengereBis(\''.$row->uid.'\');return false;">verlängern</a>
+					</span>
+					<span id="infobox_'.$row->uid.'"></span>
+							<span id="outputTest_'.$row->uid.'"></span>
+					</td>';
+			}
+			else
+			{
+				$bisverwendung->beginn = $stsem_arr[$row->letzter_lehrauftrag]['start'];
+				$bisverwendung->ende = $stsem_arr[$row->letzter_lehrauftrag]['ende'];
+				$bisverwendung->updateamum = date('Y-m-d H:i:s');
+				$bisverwendung->updatevon = $uid;
+				$bisverwendung->insertamum = date('Y-m-d H:i:s');
+				$bisverwendung->insertvon = $uid;
+				$retOe = verlaengereOeFunktion($row->uid, $stsem_arr);
+
+				if (isset($_POST['action']) && $_POST['action'] == 'generateall')
 				{
-					$bisverwendung->beginn = $stsem_arr[$row->letzter_lehrauftrag]['start'];
-					$bisverwendung->ende = $stsem_arr[$row->letzter_lehrauftrag]['ende'];
-					$bisverwendung->updateamum = date('Y-m-d H:i:s');
-					$bisverwendung->updatevon = $uid;
-					$bisverwendung->insertamum = date('Y-m-d H:i:s');
-					$bisverwendung->insertvon = $uid;
-					$retOe = verlaengereOeFunktion($row->uid, $stsem_arr);
-
-					if(isset($_POST['action']) && $_POST['action']=='generateall')
+					if ($bisverwendung->save(true))
 					{
-						if ($bisverwendung->save(true))
-						{
-							echo '<td>Neue Verwendung erstellt ' . $retOe . '</td>';
-
-
-						}
-						else
-						{
-							echo '<td>Failed:'.$bisverwendung->errormsg.'</td>';
-						}
-					//	echo '<td>Neue Verwendung wird erstellt '.$bisverwendung->beginn.' bis '.$bisverwendung->ende.'<br>
-
-						//		</td>';
-
+						echo '<td>Neue Verwendung erstellt '. $retOe. '</td>';
 					}
 					else
-						echo '<td>Neue Verwendung wird erstellt '.$bisverwendung->beginn.' bis '.$bisverwendung->ende.'<br>';
-
-
-						echo '
-						<span id="verlaengerungslink_'.$row->uid.'">
-						<a href="#bisverlaengern" onclick="verlaengereBis(\''.$row->uid.'\');return false;">verlängern</a>
-						</span>
-						<span id="infobox_'.$row->uid.'"></span>
-							<span id="outputTest_'.$row->uid.'"></span>
-							</td>';
+					{
+						echo '<td>Failed:'.$bisverwendung->errormsg.'</td>';
+					}
 				}
+				else
+					echo '<td>Neue Verwendung wird erstellt '.$bisverwendung->beginn.' bis '.$bisverwendung->ende.'<br>';
+
+
+					echo '
+					<span id="verlaengerungslink_'.$row->uid.'">
+					<a href="#bisverlaengern" onclick="verlaengereBis(\''.$row->uid.'\');return false;">verlängern</a>
+					</span>
+					<span id="infobox_'.$row->uid.'"></span>
+						<span id="outputTest_'.$row->uid.'"></span>
+						</td>';
+			}
 		}
 		else
 		{
