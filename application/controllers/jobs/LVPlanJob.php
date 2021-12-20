@@ -19,7 +19,7 @@
  */
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class LVPlanJob extends CLI_Controller
+class LVPlanJob extends JOB_Controller
 {
 	/**
 	 * Initialize LVPlanJob Class
@@ -149,4 +149,351 @@ class LVPlanJob extends CLI_Controller
 			echo "Failed ".$fail."\n";
 		}
 	}
+
+    /**
+     * Send Mail to STGL, Kompetenzfeld and LV Planung about todays updated Zeitwuensche.
+     * STGL gets list only of lectors who updated future assigend courses concerning their STG.
+     * Kompetenzleitung gets list only of lectors who updated future assigend courses concerning their KF.
+     * LVPlanung gets list of lectors who updated future assigend courses.
+     */
+    public function mailUpdatedZeitwuensche()
+    {
+        // Load models
+        $this->load->model('ressource/Stundenplandev_model', 'StundenplandevModel');
+        $this->load->model('organisation/Studiensemester_model', 'StundiensemesterModel');
+        $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+        $this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+        $this->load->model('person/Person_model', 'PersonModel');
+
+        // Load libs
+        $this->load->library('MailLib');
+
+        // Load helpers
+        $this->load->helper('hlp_sancho_helper');
+
+        // Start Log Message
+        $this->logInfo('Mail updated Zeitwuensche started.');
+
+        // Get all lectors, who updated their Zeitwunsch today
+        $db = new DB_Model();
+        $result = $db->execReadOnlyQuery('
+            SELECT  mitarbeiter_uid, von, bis
+            FROM    campus.tbl_zeitwunsch_gueltigkeit
+            WHERE   updateamum::date = NOW()::date
+            -- dont get updated, if they were also inserted today
+            AND     insertamum::date != NOW()::date
+        ');
+
+        if (!hasData($result))
+        {
+            return; // No updated Zeitwuensche today
+        }
+
+        $uidByStg_arr = array(); // Mail data for Studiengang
+        $uidByOe_arr = array();  // Mail data for Kompetenzfeld
+
+        // Loop through lectors, who updated their Zeitwunsch today
+        $zwg_arr = getData($result);
+        foreach ($zwg_arr as $zwg)
+        {
+            $next = $this->StudiensemesterModel->getNext();
+
+            // Get Studiensemester concerend by Zeitwunschgueltigkeit
+            // If Zeitwunschgueltigkeit Ende is null, get only till next Studiensemester, as LVs will be only
+            // assigned for actual or next Studiensemester
+            $result = $this->StudiensemesterModel->getByDate(
+                $zwg->von,
+                is_null($zwg->bis) ? $next->retval[0]->ende : $zwg->bis
+            );
+            $studiensemester_arr = getData($result);
+
+            // Get Stundenplan entries of lector of Studiensemester concerned by Zeitwunschgueltigkeit
+            $result = $this->StundenplandevModel
+                ->getStundenplanData(
+                    null,
+                    implode(array_column($studiensemester_arr, 'studiensemester_kurzbz'), ', '),
+                    null,
+                    $zwg->mitarbeiter_uid,
+                    null,
+                    true    //...but only from now on
+                );
+
+            if (!hasData($result))
+            {
+                continue;   // Continue if lector has no Stundenplan entries
+            }
+
+            // Loop through Stundenplan entries
+            $stundenplanData_arr = getData($result);
+            foreach ($stundenplanData_arr as $stundenplanData)
+            {
+                // Get LE of Stundenplan entry
+                $result = $this->LehreinheitModel->load($stundenplanData->lehreinheit_id);
+
+                if (!hasData($result))
+                {
+                    // Return log error msg if no LE found and continue
+                    $this->logError('
+                        LVPlanJob / mailUpdatedZeitwuensche did not find Lehreinheit for '. $zwg->mitarbeiter_uid
+                    );
+                    continue;
+                }
+
+                $le = getData($result)[0];
+
+                // GET LV by LE of Stundenplan entry
+                $result = $this->LehrveranstaltungModel->load($le->lehrveranstaltung_id);
+
+                if (!hasData($result))
+                {
+                    // Return log error msg if no LV found and continue
+                    $this->logError('
+                        LVPlanJob / mailUpdatedZeitwuensche did not find Lehrveranstaltung for '. $zwg->mitarbeiter_uid
+                    );
+                    continue;
+                }
+
+                $lv = getData($result)[0];
+
+                // Build unique Studiengang array
+                if (!array_key_exists($lv->studiengang_kz, $uidByStg_arr))
+                {
+                    $uidByStg_arr[$lv->studiengang_kz] = array($zwg->mitarbeiter_uid);
+
+                }
+                else
+                {
+                    // Add unique lector array to Studiengang array
+                    if (!in_array($zwg->mitarbeiter_uid, $uidByStg_arr[$lv->studiengang_kz]))
+                    {
+                        $uidByStg_arr[$lv->studiengang_kz][]= $zwg->mitarbeiter_uid;
+                    }
+                }
+
+                // Build unique Kompetenzfeld array
+                if (!array_key_exists($lv->oe_kurzbz, $uidByOe_arr))
+                {
+                    $uidByOe_arr[$lv->oe_kurzbz] = array($zwg->mitarbeiter_uid);
+
+                }
+                else
+                {
+                    // Add unique lector array to Kompetenzfeld array
+                    if (!in_array($zwg->mitarbeiter_uid, $uidByOe_arr[$lv->oe_kurzbz]))
+                    {
+                        $uidByOe_arr[$lv->oe_kurzbz][]= $zwg->mitarbeiter_uid;
+                    }
+                }
+            }
+        }
+
+        // Send mail to STG Assistenz
+        $result = $this->_sendMailToStg($uidByStg_arr);
+        if (isError($result))
+        {
+            $this->logError(getError($result));
+        }
+
+        // Send mail to Kompetenzfeld Leitung
+        $result = $this->_sendMailToKF($uidByOe_arr);
+        if (isError($result))
+        {
+            $this->logError(getError($result));
+        }
+
+        // Send mail to LV Planung
+        $result = $this->_sendMailToLvPlanung($zwg_arr);
+        if (isError($result))
+        {
+            $this->logError(getError($result));
+        }
+
+        // End Log Message
+        $this->logInfo('Mail updated Zeitwuensche ended.');
+    }
+
+    /**
+     * Send Mail to STGL Assistance about lectors, who teach LV assigend to the STG, and who updated Zeitwuensche.
+     *
+     * @param $data_arr
+     * @param $stg_bezeichnung
+     */
+    private function _sendMailToStg($data_arr)
+    {
+        foreach ($data_arr as $stg_kurzbz => $uid_arr)
+        {
+            // Get STG eMail
+            $this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+            $result = $this->StudiengangModel->load($stg_kurzbz);
+            $stgMail = $result->retval[0]->email;
+
+            $lektorenTabelle = '
+            <table><thead>
+                <tr>
+                    <th style="text-align:left">Name</th> 
+                    <th style="text-align:left">UID</th>
+                </tr>
+            </thead><tbody>
+        ';
+
+            foreach($uid_arr as $uid)
+            {
+                $person = $this->PersonModel->getByUid($uid);
+                $lektorenTabelle.= '
+                <tr>
+                    <td style="text-align:left">'. getData($person)[0]->vorname. ' '. getData($person)[0]->nachname. '</td>
+                    <td style="text-align:left">['. $uid. ']</td>
+                </tr>
+            ';
+            }
+
+            $lektorenTabelle.= '</tbody></table>';
+
+            $contentData_arr = array(
+                'datentabelle' => $lektorenTabelle
+            );
+
+            // Send mail
+            if (!sendSanchoMail(
+                'ZeitwunschUpdateMail',
+                $contentData_arr,
+                $stgMail,
+                'Änderung von Zeitwünschen',
+                'sancho_header_min_bw.jpg',
+                'sancho_footer_min_bw.jpg'
+            ))
+            {
+                $errorReceiverUid_arr[]= $stgMail;
+            }
+        }
+        
+        if (isset($errorReceiverUid_arr))
+        {
+            return error('Mail updated Zeitwuensche could not be sent to :'. implode($errorReceiverUid_arr, ','));
+        }
+
+        return success();
+    }
+
+    /**
+     * Send Mail to Kompetenzfeld about lectors, who teach LV assigend to the Kompetenzfeld, and who updated Zeitwuensche.
+     *
+     * @param $data_arr
+     * @param $stg_bezeichnung
+     */
+    private function _sendMailToKF($data_arr)
+    {
+        // Send mail to Komepetenzfeld Leitung
+        foreach ($data_arr as $oe_kurzbz => $uid_arr)
+        {
+            // Get KF Leitung eMail
+            $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+            $result = $this->BenutzerfunktionModel->loadWhere(array(
+                'funktion_kurzbz' => 'Leitung',
+                'oe_kurzbz' => $oe_kurzbz
+            ));
+            $kfMail = $result->retval[0]->uid. '@'. DOMAIN;
+
+            $lektorenTabelle = '
+                <table><thead>
+                    <tr>
+                        <th style="text-align:left">Name</th> 
+                        <th style="text-align:left">UID</th>
+                    </tr>
+                </thead><tbody>
+            ';
+
+            foreach($uid_arr as $uid)
+            {
+                $person = $this->PersonModel->getByUid($uid);
+                $lektorenTabelle.= '
+                    <tr>
+                        <td style="text-align:left">'. getData($person)[0]->vorname. ' '. getData($person)[0]->nachname. '</td>
+                        <td style="text-align:left">['. $uid. ']</td>
+                    </tr>
+                ';
+            }
+
+            $lektorenTabelle.= '</tbody></table>';
+
+            $contentData_arr = array(
+                'datentabelle' => $lektorenTabelle
+            );
+
+            // Send mail
+            if (!sendSanchoMail(
+                'ZeitwunschUpdateMail',
+                $contentData_arr,
+                $kfMail,
+                'Änderung von Zeitwünschen',
+                'sancho_header_min_bw.jpg',
+                'sancho_footer_min_bw.jpg'
+            ))
+            {
+                $errorReceiverUid_arr[]= $kfMail;
+            }
+        }
+
+        if (isset($errorReceiverUid_arr))
+        {
+            return error('Mail updated Zeitwuensche could not be sent to :'. implode($errorReceiverUid_arr, ','));
+        }
+
+        return success();
+    }
+
+    /**
+     * Send Mail to LV Planung about all lectors who updated Zeitwuensche.
+     *
+     * @param $data_arr
+     * @param $stg_bezeichnung
+     */
+    private function _sendMailToLvPlanung($data_arr)
+    {
+        $lektorenTabelle = '
+                <table><thead>
+                    <tr>
+                        <th style="text-align:left">Name</th> 
+                        <th style="text-align:left">UID</th>
+                    </tr>
+                </thead><tbody>
+            ';
+
+        foreach($data_arr as $lector)
+        {
+            $person = $this->PersonModel->getByUid($lector->mitarbeiter_uid);
+            $lektorenTabelle.= '
+                    <tr>
+                        <td style="text-align:left">'. getData($person)[0]->vorname. ' '. getData($person)[0]->nachname. '</td>
+                        <td style="text-align:left">['. $lector->mitarbeiter_uid. ']</td>
+                    </tr>
+                ';
+        }
+
+        $lektorenTabelle.= '</tbody></table>';
+
+        $contentData_arr = array(
+            'datentabelle' => $lektorenTabelle
+        );
+
+        // Send mail
+        if (!sendSanchoMail(
+            'ZeitwunschUpdateMail',
+            $contentData_arr,
+            MAIL_LVPLAN,
+            'Änderung von Zeitwünschen',
+            'sancho_header_min_bw.jpg',
+            'sancho_footer_min_bw.jpg'
+        ))
+        {
+            $errorReceiver = MAIL_LVPLAN;
+        }
+
+        if (isset($errorReceiver))
+        {
+            return error('Mail updated Zeitwuensche could not be sent to :'. $errorReceiver);
+        }
+
+        return success();
+    }
 }
