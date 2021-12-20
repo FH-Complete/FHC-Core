@@ -167,15 +167,13 @@ class Studiensemester_model extends DB_Model
 		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
 			return success(array());
 
-		$query = "SELECT *
-							FROM public.tbl_studiensemester
-							WHERE
-							  (ende > ?::date AND start < ?::date)
-							  OR start = ?::date
-							  OR ende = ?::date
-							ORDER BY start DESC";
+		$query = "
+            SELECT  *
+            FROM    public.tbl_studiensemester
+            WHERE   ( ?::date < ende AND ?::date > start )
+            ORDER BY start DESC";
 
-		return $this->execQuery($query, array($from, $to, $from, $to));
+		return $this->execQuery($query, array($from, $to));
 	}
 
 	/**
