@@ -14,6 +14,7 @@ $query = '
 			ps.prestudent_id AS "PreStudentID",
 			p.vorname AS "Vorname",
 			p.nachname AS "Nachname",
+			sg.kurzbzlang as "Studiengang",
 			pss.insertamum AS "AbgewiesenAm",
 			(
 				SELECT l.zeitpunkt
@@ -62,6 +63,7 @@ $query = '
 			'PreStudentID',
 			'Vorname',
 			'Nachname',
+			'Studiengang',
 			'Abgewiesen am',
 			'Nachricht'
 		),

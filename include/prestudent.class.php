@@ -26,6 +26,7 @@ require_once(dirname(__FILE__).'/log.class.php');
 require_once(dirname(__FILE__).'/phrasen.class.php');
 require_once(dirname(__FILE__).'/globals.inc.php');
 require_once(dirname(__FILE__).'/sprache.class.php');
+require_once(dirname(__FILE__).'/udf.class.php');
 
 $sprache = getSprache();
 $lang = new sprache();
@@ -73,6 +74,7 @@ class prestudent extends person
 	public $priorisierung = null;
 	public $foerderrelevant = null;
 	public $standort_code = null;
+	public $udf_values = null;
 
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -1413,6 +1415,9 @@ class prestudent extends person
 					person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 				ORDER BY prestudent_id";
 
+		$udf = new UDF();
+		$hasUDF = $udf->prestudentHasUDF();
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -1455,6 +1460,10 @@ class prestudent extends person
 				$obj->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
 				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$obj->priorisierung = $row->priorisierung;
+				if ($hasUDF)
+				{
+					$obj->udf_values = $row->udf_values;
+				}
 
 				$this->result[] = $obj;
 			}

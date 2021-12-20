@@ -347,7 +347,8 @@ $filters = array(
 					{"name": "vorname"},
 					{"name": "nachname"},
 					{"name": "svnr"},
-					{"name": "ersatzkennzeichen"}
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
 				],
 				"filters": []
 			}
@@ -486,6 +487,7 @@ $filters = array(
 					{"name": "PreStudentID"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
+					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
 					{"name": "Nachricht"}
 				],
