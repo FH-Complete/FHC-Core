@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ 			Manuela Thamer <manuela.thamer@technikum-wien.at>.
  */
 /**
  * Klasse benutzerfunktion (FAS-Online)
@@ -111,7 +112,7 @@ class benutzerfunktion extends basis_db
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion
 				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($benutzerfunktion);
-		
+
 		if ($gueltig = TRUE)
 			$qry .= ' AND (datum_von IS NULL OR datum_von <= now()) AND (datum_bis IS NULL OR datum_bis >= now()) ';
 
@@ -137,13 +138,13 @@ class benutzerfunktion extends basis_db
 	 */
 	public function getBenutzerFunktion($uid, $funktion_kurzbz, $oe_kurzbz)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					bfunk.*, stg.studiengang_kz
-				FROM 
+				FROM
 					public.tbl_benutzerfunktion AS bfunk
 					INNER JOIN public.tbl_studiengang AS stg ON(stg.oe_kurzbz = bfunk.oe_kurzbz)
-				WHERE 
-					bfunk.uid=".$this->db_add_param($uid)." 
+				WHERE
+					bfunk.uid=".$this->db_add_param($uid)."
 					AND bfunk.funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)."
 					AND bfunk.oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 
@@ -534,6 +535,53 @@ class benutzerfunktion extends basis_db
 		}
 	}
 
-	
+	/**
+	 * Lädt die letzte Benutzerfunktion zu einer UID
+	 * @param type $uid UID des Mitarbeiters.
+	 * @param type $funktion_kurzbz OPTIONAL Kurzbezeichnung der Funktion.
+	 * @return bool true wenn ok, sonst false
+	 */
+	public function getLastBenutzerFunktionByUid($uid, $funktion_kurzbz = null)
+	{
+	    $qry = "SELECT * FROM public.tbl_benutzerfunktion
+			    WHERE uid=".$this->db_add_param($uid);
+	    if (!is_null($funktion_kurzbz))
+	    {
+			$qry .= " AND funktion_kurzbz=".$this->db_add_param($funktion_kurzbz);
+	    }
+		$qry .= "ORDER BY datum_von DESC NULLS LAST LIMIT 1";
+	    $qry .= ";";
+
+	    if ($result = $this->db_query($qry))
+	    {
+			while ($row = $this->db_fetch_object($result))
+			{
+				$obj = new benutzerfunktion();
+
+				$obj->benutzerfunktion_id = $row->benutzerfunktion_id;
+				$obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+				$obj->uid = $row->uid;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->funktion_kurzbz = $row->funktion_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->semester = $row->semester;
+				$obj->datum_von = $row->datum_von;
+				$obj->datum_bis = $row->datum_bis;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->wochenstunden = $row->wochenstunden;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Benutzerfunktion';
+			return false;
+		}
+	}
 }
 ?>

@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ * 			Manuela Thamer < manuela.thamer@technikum-wien.at >
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -30,7 +31,7 @@ require_once('../../include/bisverwendung.class.php');
 require_once('../../include/benutzer.class.php');
 
 if (!$db = new basis_db())
-	die ('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $uid = get_uid();
 $datum_obj = new datum();
@@ -45,12 +46,19 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 if (!$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'suid'))
-	die ('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung für diese Seite');
 
-if (isset($_POST['action']) && $_POST['action'] == 'deaktivieren')
+/**
+ * Setzt die Benutzerfunktion zu einer UID zu einem bestimmten Datum inaktiv
+ * @param string $maUid UID des Mitarbeiters.
+ * @param Datum $datumEndeAktiv Deaktivierungsdatum.
+ * @return 'true', 'OK, Bisverwendung angepasst' oder error
+ */
+function deactivateBenutzer($maUid, $datumEndeAktiv)
 {
 	$benutzer = new benutzer();
-	if ($benutzer->load($_POST['uid']))
+	$uid = get_uid();
+	if ($benutzer->load($maUid))
 	{
 		$benutzer->bnaktiv = false;
 		$benutzer->updateamum = date('Y-m-d H:i:s');
@@ -58,30 +66,48 @@ if (isset($_POST['action']) && $_POST['action'] == 'deaktivieren')
 		if ($benutzer->save(false, false))
 		{
 			$bisverwendung = new bisverwendung();
-			if ($bisverwendung->getLastVerwendung($_POST['uid']))
+			if ($bisverwendung->getLastVerwendung($maUid))
 			{
 				if ($bisverwendung->ende == '')
 				{
-					$bisverwendung->ende = $_POST['datum'];
+					$bisverwendung->ende = $datumEndeAktiv;
 					$bisverwendung->updateamum = date('Y-m-d H:i:s');
 					$bisverwendung->updatevon = $uid;
 
 					if ($bisverwendung->save(false))
-						exit ('true');
+						return ('OK, Bisverwendung angepasst');
 				}
 				else
 				{
-					exit ('true');
+					return ('true');
 				}
 			}
 			else
-				exit ('Fehler beim Laden der Verwendung:'.$bisverwendung->errormsg);
+				return ('Fehler beim Laden der Verwendung: '.$bisverwendung->errormsg);
 		}
 		else
-			exit ('Fehler beim Deaktivieren:'.$benutzer->errormsg);
+			return ('Fehler beim Deaktivieren: '.$benutzer->errormsg);
 	}
 	else
-		exit ('Fehler beim Laden des Benutzers');
+		$output1 = 'Fehler beim Laden des Benutzers';
+		return ('Fehler beim Laden des Benutzers');
+}
+
+/**
+ * Setzt die Benutzerfunktion zu einer UID zu einem bestimmten Datum inaktiv, Einzeldeaktivierung mittels Link
+ * @param string $maUid UID des Mitarbeiters.
+ * @param Datum $datumEndeAktiv Deaktivierungsdatum.
+ * @return exit string $retstr 'true', 'OK, Bisverwendung angepasst' oder error
+ */
+function deactivateBenutzerAJAX($maUid, $datumEndeAktiv)
+{
+	$retstr = deactivateBenutzer($maUid, $datumEndeAktiv);
+	exit($retstr);
+}
+
+if (isset($_POST['action']) && $_POST['action'] == 'deaktivieren')
+{
+	deactivateBenutzerAJAX($_POST['uid'], $_POST['datum']);
 }
 
 echo '<!doctype html>
@@ -101,7 +127,7 @@ echo '
 			{
 				$( ".datepicker_datum" ).datepicker({
 					changeMonth: true,
-					hangeYear: true,
+					changeYear: true,
 					dateFormat: "yy-mm-dd",
 				});
 			});
@@ -122,6 +148,7 @@ die Verwendung zum angegebenen Datum zu beenden.
 				widgets: ["zebra"]
 			});
 		});
+
 	function deaktiviere(uid)
 	{
 		var datum = $("#deaktivierungsdatum").val();
@@ -137,6 +164,11 @@ die Verwendung zum angegebenen Datum zu beenden.
 					$("#deaktivierungslink_"+uid).hide();
 					$("#infobox_"+uid).text("OK");
 				}
+				else if(data="OK, Bisverwendung angepasst")
+				{
+					$("#deaktivierungslink_"+uid).hide();
+					$("#infobox_"+uid).text("OK, Bisverwendung angepasst");
+				}
 				else
 				{
 					$("#infobox_"+uid).text("ERROR:"+data);
@@ -145,6 +177,7 @@ die Verwendung zum angegebenen Datum zu beenden.
 			error: function() { alert("error"); }
 		});
 	}
+
 </script>';
 $qry = "SELECT
 			vorname, nachname, uid, personalnummer, insertamum,anmerkung,
@@ -218,9 +251,20 @@ if ($result = $db->db_query($qry))
 {
 	echo '<br><br>Anzahl:'.$db->db_num_rows($result);
 	echo '
+	<form method="POST" action="personal_lektorenohnelehrauftrag.php">
 	<div style="float:right" >Beendingungsdatum der Verwendung:
-	<input class="datepicker_datum" type="text" size="10" value="'.(date('Y')-2).'-12-31" id="deaktivierungsdatum"/>
+	<input class="datepicker_datum" type="text" size="10" value="'.(date('Y') - 2).'-12-31" id="deaktivierungsdatum"
+	name="datumEndeAktiv"/>
+	</div><br><br>
+
+	<div style="float:right">
+
+			<input type="hidden" name="action" value="deactivateAll" />
+			<input type="submit" value="Alle deaktivieren" />
+
 	</div>
+	</form>
+
 	<br><br>
 	<table class="tablesorter" id="t1">
 		<thead>
@@ -239,6 +283,8 @@ if ($result = $db->db_query($qry))
 		</thead>
 		<tbody>
 	';
+
+	$countMa = 0;
 	while ($row = $db->db_fetch_object($result))
 	{
 		echo '
@@ -247,7 +293,7 @@ if ($result = $db->db_query($qry))
 			<td>'.$db->convert_html_chars($row->vorname).'</td>
 			<td>'.$db->convert_html_chars($row->uid).'</td>
 			<td>'.$db->convert_html_chars($row->personalnummer).'</td>
-			<td>'.$db->convert_html_chars($datum_obj->formatDatum($row->insertamum,'d.m.Y')).'</td>
+			<td>'.$db->convert_html_chars($datum_obj->formatDatum($row->insertamum, 'd.m.Y')).'</td>
 			<td>'.$db->convert_html_chars($row->letzter_lehrauftrag).'</td>
 			<td>
 				<table>';
@@ -264,18 +310,37 @@ if ($result = $db->db_query($qry))
 		echo '</table></td>';
 		$bisverwendung = new bisverwendung();
 		$bisverwendung->getLastVerwendung($row->uid);
-		echo '<td>'.($bisverwendung->beginn != ''?$datum_obj->formatDatum($bisverwendung->beginn,'d.m.Y'):' jetzt ');
-		echo ' - '.($bisverwendung->ende != ''?$datum_obj->formatDatum($bisverwendung->ende,'d.m.Y'):' jetzt ').'</td>';
+
+		echo '<td>'.($bisverwendung->beginn != ''?$datum_obj->formatDatum($bisverwendung->beginn, 'd.m.Y'):' jetzt ');
+		echo ' - '.($bisverwendung->ende != ''?$datum_obj->formatDatum($bisverwendung->ende, 'd.m.Y'):' jetzt ').'</td>';
 		echo '<td>'.($row->anmerkung != ''?'<img src="../../skin/images/sticky.png" title="'.$db->convert_html_chars($row->anmerkung).'" />':'').'</td>';
-		echo '
-			<td>
-			<span id="deaktivierungslink_'.$row->uid.'">
-			<a href="#deaktivieren" onclick="deaktiviere(\''.$row->uid.'\');return false;">deaktivieren</a>
-			</span>
-			<span id="infobox_'.$row->uid.'"></span>
-			</td>
-		</tr>';
+
+		$countMa++;
+		if (isset($_POST['action']) && $_POST['action'] == 'deactivateAll')
+		{
+			$retstr = (($retstr = deactivateBenutzer($row->uid, $_POST['datumEndeAktiv'])) === 'true')
+					? 'OK'
+					: $retstr;
+			echo '
+				<td>
+				<span>'. $retstr. '</span>
+				<span id="infobox_'.$row->uid.'"></span>
+				</td>';
+		}
+		else
+		{
+			echo '
+				<td>
+				<span id="deaktivierungslink_'.$row->uid.'">
+				<a href="#deaktivieren" onclick="deaktiviere(\''.$row->uid.'\');return false;">deaktivieren</a>
+				</span>
+				<span id="infobox_'.$row->uid.'"></span>
+
+				</td>';
+		}
+		echo '	</tr>';
 	}
+
 	echo '</tbody></table>';
 }
 
