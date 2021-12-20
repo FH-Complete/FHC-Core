@@ -37,7 +37,7 @@ $this->phrasen['zeitwunsch/stundenBereitsVerplant']='Hours already scheduled for
 $this->phrasen['zeitwunsch/fuer']='Preferred time for %s &ensp;';
 $this->phrasen['zeitwunsch/bearbeitungDeaktiviert']='Editing disabled';
 $this->phrasen['zeitwunsch/bearbeitungDeaktiviertText']='You have already been assigned to course(s) in %s.</span><br>
-                            Please agree with %s</a> before making a change.<br>
+                            Please agree <a href="mailto:%s">per Mail</a> with the degree programs concerned, before making a change.<br>
                             Would you still like to continue without agreement or after having agreed?';
 $this->phrasen['zeitwunsch/bearbeitungAktivieren']='Enable editing';
 $this->phrasen['zeitwunsch/kompetenzfeldWirdInformiert']= 'INFO: The field of competence will be informed of your changes by email';

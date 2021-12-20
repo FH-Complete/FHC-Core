@@ -37,7 +37,7 @@ $this->phrasen['zeitwunsch/stundenBereitsVerplant']='Stunden für %s bereits ver
 $this->phrasen['zeitwunsch/fuer']='Zeitwunsch f&uuml;r %s &ensp;';
 $this->phrasen['zeitwunsch/bearbeitungDeaktiviert']='Bearbeitung deaktiviert';
 $this->phrasen['zeitwunsch/bearbeitungDeaktiviertText']='Ihnen wurden im %s bereits Lehrveranstaltung(en) zugeteilt.<br>
-                            Bitte stimmen Sie sich vor einer &Auml;nderung mit dem %s ab.<br>
+                            Bitte stimmen Sie sich vor einer &Auml;nderung <a href="mailto:%s">per Mail</a> mit den betroffenen Studieng&auml;ngen ab.<br>
                             M&ouml;chten Sie trotzdem ohne Abstimmung bzw. nach bereits erfolgter Abstimmung fortsetzen?';
 $this->phrasen['zeitwunsch/bearbeitungAktivieren']='Bearbeitung aktivieren';
 $this->phrasen['zeitwunsch/kompetenzfeldWirdInformiert']= 'INFO: Kompetenzfeld wird &uuml;ber die &Auml;nderung per Mail informiert';

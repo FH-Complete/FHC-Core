@@ -32,10 +32,12 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/zeitwunsch.class.php');
 require_once('../../../include/zeitwunsch_gueltigkeit.class.php');
 require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/studiengang.class.php');
 require_once('../../../include/zeitaufzeichnung_gd.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
+require_once('../../../include/lehreinheit.class.php');
 require_once('../../../include/lehrstunde.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
@@ -354,6 +356,64 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
     return empty($lstd->result) ? false : true;
 }
 
+/**
+ * Get Studiengaenge of STG assigend to LVs, to which lector is alredy assigend in
+ * the given Studiensemester.
+ *
+ * @param $uid
+ * @param $studiensemester_kurzbz
+ * @return array|void
+ */
+function getStgOfVerplant($uid, $studiensemester_kurzbz)
+{
+    $stg_arr = array(); // Mail data for Studiengang
+
+    // Get Stundenplan entries of lector of Studiensemester concerned by Zeitwunschgueltigkeit
+    $lstd = new Lehrstunde();
+    if (!$lstd->getStundenplanData(
+            'stundenplandev',
+            null,
+            $studiensemester_kurzbz,
+            null,
+            $uid,
+            null,
+            true)) //...but only from now on
+    {
+        die($lstd->errormsg);
+    }
+
+    // Loop through Stundenplan entries
+    foreach ($lstd->result as $row)
+    {
+        // Get LE of Stundenplan entry
+        $le = new Lehreinheit($row->lehreinheit_id);
+
+        // GET LV by LE of Stundenplan entry
+        $lv = new Lehrveranstaltung($le->lehrveranstaltung_id);
+
+        // Build Studiengang array
+        $stg_arr[] = $lv->studiengang_kz;
+    }
+
+    // Make Studiengang array unique
+    return array_unique($stg_arr);
+}
+
+/**
+ * Get Studiengang eMail Addresses.
+ * @param $stgKz_arr    // Studiengang Kennzeichen Array
+ * @return array
+ */
+function getStgMail($stgKz_arr)
+{
+    $stgMail_arr = array();
+    foreach($stgKz_arr as $stgKz)
+    {
+        $stg = new Studiengang($stgKz);
+        $stgMail_arr[]= $stg->email;
+    }
+    return $stgMail_arr;
+}
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -664,11 +724,16 @@ function checkIsVerplant($uid, $studiensemester_kurzbz)
             echo '</div>'; // end divCopyZWG
 
             echo '<div id="divIsVerplant" class="'. $divIsVerplantHidden . '">';
+
+                // Mail Adressen der Studiengaenge, wo Lektor ueber eine LV bereits verplant ist
+                $stgKzOfVerplant_arr = getStgOfVerplant($uid, $selected_ss);
+                $stgMail_arr = getStgMail($stgKzOfVerplant_arr);
+
                 echo '<div class="col-xs-9">';
                 echo '<div class="panel panel-danger">';
                     echo '<div class="panel-body">';
                     echo '<span class="text-danger"><b>'. $p->t("zeitwunsch/bearbeitungDeaktiviert"). ': </b></span>';
-                    echo $p->t("zeitwunsch/bearbeitungDeaktiviertText", array($selected_ss, $p->t('global/studiengangsmanagement'))). ' 
+                    echo $p->t("zeitwunsch/bearbeitungDeaktiviertText", array($selected_ss, implode($stgMail_arr, '; '))). ' 
                         <a id="bearbeitung-aktivieren" style="cursor:pointer;">'. $p->t("zeitwunsch/bearbeitungAktivieren"). '</a><br>
                         <span><b>'. $p->t("zeitwunsch/kompetenzfeldWirdInformiert") . '</b></span>
                         </span>';
