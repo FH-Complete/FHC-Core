@@ -208,7 +208,7 @@ function verlaengereOeFunktion($maUid, $stsem_arr)
 			$bfWochenstunden = $row2->wochenstunden;
 		}
 
-		if ($bisBf != null)
+		if ($bisBf != null && $bisBf > $dt_now)
 		{
 			$lastFkt->datum_bis = $stsem_arr[$lastLA]['ende'];
 			$lastFkt->updateamum = date('Y-m-d H:i:s');
@@ -373,12 +373,16 @@ echo '
 						{
 							$("#verlaengerungslink_"+uid).hide();
 							$("#infobox_"+uid).text("OK");
-							$("#outputTest_"+uid).text("OK ich verlängere dich");
 						}
-						else if(data=="bis verlaengert")
+						else if(data=="bis verlaengert true")
 						{
 							$("#verlaengerungslink_"+uid).hide();
 							$("#infobox_"+uid).text("OK, Bisverwendung verlängert");
+						}
+						else if(data=="bis erstellt true")
+						{
+							$("#verlaengerungslink_"+uid).hide();
+							$("#infobox_"+uid).text("OK, Bisverwendung erstellt");
 						}
 						else if(data=="bis verlaengert Benutzerfunktion verlängert")
 						{
@@ -514,7 +518,8 @@ if ($result = $db->db_query($qry))
 				{
 					if ($bisverwendung->save(false))
 					{
-						echo '<td>Verwendung verlängert '. $retOe. '</td>';
+						$retOe == 'true' ? $retOe = '': $retOe;
+						echo '<td>Bisverwendung verlängert '. $retOe. '</td>';
 					}
 					else
 					{
@@ -544,7 +549,8 @@ if ($result = $db->db_query($qry))
 				{
 					if ($bisverwendung->save(true))
 					{
-						echo '<td>Neue Verwendung erstellt '. $retOe. '</td>';
+						$retOe == 'true' ? $retOe = '': $retOe;
+						echo '<td>Neue Bisverwendung erstellt '. $retOe. '</td>';
 					}
 					else
 					{
