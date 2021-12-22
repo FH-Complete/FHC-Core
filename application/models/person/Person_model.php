@@ -268,16 +268,35 @@ class Person_model extends DB_Model
 
 	public function checkDuplicate($person_id)
 	{
-		$qry = "SELECT sp.person_id
-		FROM public.tbl_person p 
-		LEFT JOIN public.tbl_person sp ON p.vorname = sp.vorname
-			AND p.nachname = sp.nachname 
-			AND p.gebdatum = sp.gebdatum 
-		JOIN public.tbl_prestudent ps ON sp.person_id = ps.person_id
-		JOIN public.tbl_prestudentstatus pss ON ps.prestudent_id = pss.prestudent_id
-		WHERE p.person_id = ? AND sp.person_id != ? AND pss.status_kurzbz = ?";
+		$qry = "SELECT p.person_id
+				FROM public.tbl_person p
+				JOIN  public.tbl_prestudent USING (person_id)
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				WHERE status_kurzbz = 'Abbrecher'
+				AND person_id IN (SELECT p2.person_id
+								FROM public.tbl_person p
+								JOIN public.tbl_person p2
+								ON p.vorname = p2.vorname
+								AND p.nachname = p2.nachname
+								AND p.gebdatum = p2.gebdatum
+								WHERE p.person_id = ?
+				)";
 
+		$person = $this->execQuery($qry, array($person_id));
 
-		return $this->execQuery($qry, array($person_id, $person_id, 'Abbrecher'));
+		if (hasData($person))
+		{
+			$qry = "SELECT p2.person_id
+					FROM public.tbl_person p
+					JOIN public.tbl_person p2
+					ON p.vorname = p2.vorname
+					AND p.nachname = p2.nachname
+					AND p.gebdatum = p2.gebdatum
+					WHERE p.person_id = ?";
+
+			return $this->execQuery($qry, array($person_id));
+		}
+
+		return $person;
 	}
 }
