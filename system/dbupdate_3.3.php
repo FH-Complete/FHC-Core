@@ -5022,6 +5022,43 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status 
 		echo ' public.tbl_zgvpruefungstatus_status: Tabelle hinzugefuegt<br>';
 }
 
+// Add table adressentyp
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_adressentyp LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_adressentyp
+		(
+			adressentyp_kurzbz varchar(32),
+			bezeichnung varchar(256),
+			bezeichnung_mehrsprachig varchar(256)[],
+			sort smallint
+		);
+
+		COMMENT ON TABLE public.tbl_adressentyp IS 'Types of Addresses';
+		ALTER TABLE public.tbl_adressentyp ADD CONSTRAINT pk_tbl_adressentyp PRIMARY KEY (adressentyp_kurzbz);
+
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('h', 'Hauptwohnsitz', '{\"Hauptwohnsitz\", \"Principal residence\"}', 1);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('n', 'Nebenwohnsitz', '{\"Nebenwohnsitz\", \"Secondary residence\"}', 2);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('ho', 'Homeoffice', '{\"Homeoffice\", \"Homeoffice\"}', 3);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('r', 'Rechnungsadresse', '{\"Rechnungsadresse\", \"Billing address\"}', 4);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('f', 'Firma', '{\"Firma\", \"Company\"}', 5);
+
+		UPDATE public.tbl_adresse SET typ = 'f' WHERE person_id IS NULL AND (typ IS NULL OR typ = '');
+		UPDATE public.tbl_adresse SET typ = 'h' WHERE person_id IS NOT NULL AND typ IS NULL;
+
+		ALTER TABLE public.tbl_adresse ADD CONSTRAINT fk_tbl_adresse_adressentyp FOREIGN KEY (typ) REFERENCES public.tbl_adressentyp (adressentyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_adresse ALTER COLUMN typ TYPE varchar(32);
+
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_adressentyp TO vilesci;
+		GRANT SELECT ON public.tbl_adressentyp TO web;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_adressentyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_adressentyp: Tabelle hinzugefuegt<br>';
+}
+
 // Add index to lehre.tbl_pruefung
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruefung_student_uid'"))
 {
@@ -5782,6 +5819,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
+	"public.tbl_adressentyp"  => array("adressentyp_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "sort"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice","akzeptiertamum"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
