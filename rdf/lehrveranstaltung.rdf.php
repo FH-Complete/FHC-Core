@@ -73,7 +73,11 @@ else
 $lehrveranstaltung=new lehrveranstaltung();
 
 if($student_uid!='')
+{
 	$lehrveranstaltung->load_lva_student($student_uid);
+	if ($stg_kz !== '')
+		$lehrveranstaltung->load_lva($stg_kz);
+}
 elseif($lehrveranstaltung_kompatibel_id!='')
 {
 	// Laedt die Lehrveranstaltung und alle die dazu kompatibel sind
