@@ -107,9 +107,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
 									<menupopup>
+										<?php
+											$styleNationSperre = 'rdf:http://www.technikum-wien.at/nation/rdf#styleNationSperre';
+											$nationSperre= 'rdf:http://www.technikum-wien.at/nation/rdf#sperre';
+										?>
 										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
 												label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-												uri="rdf:*"/>
+												uri="rdf:*"
+												style="<?php echo $styleNationSperre?>"
+												disabled="<?php echo $nationSperre?>"
+												/>
 										</menupopup>
 								</template>
 							</menulist>
@@ -130,12 +137,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
 									<menupopup>
+										<?php
+											$styleNationSperre = 'rdf:http://www.technikum-wien.at/nation/rdf#styleNationSperre';
+											$nationSperre= 'rdf:http://www.technikum-wien.at/nation/rdf#sperre';
+										?>
 										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
 												label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-												uri="rdf:*"/>
+												uri="rdf:*"
+												style="<?php echo $styleNationSperre?>"
+												disabled="<?php echo $nationSperre?>"
+												 />
 										</menupopup>
 								</template>
 							</menulist>
+
+
 							<label value="Matrikelnummer" control="student-detail-textbox-matr_nr"/>
 							<hbox><textbox id="student-detail-textbox-matr_nr" disabled="true" maxlength="32" size="15"/></hbox>
 							<label value="Sprache" control="student-detail-menulist-sprache" />
@@ -329,9 +345,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										style="min-width: 100px">
 									<template>
 										<menupopup>
+											<?php
+												$styleNationSperre = 'rdf:http://www.technikum-wien.at/nation/rdf#styleNationSperre';
+												$nationSperre= 'rdf:http://www.technikum-wien.at/nation/rdf#sperre';
+											?>
 											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
 													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-													uri="rdf:*"/>
+													uri="rdf:*"
+													style="<?php echo $styleNationSperre?>"
+													disabled="<?php echo $nationSperre?>"
+													/>
 										</menupopup>
 									</template>
 								</menulist>
@@ -347,7 +370,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
 												label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
-												uri="rdf:*"/>
+												uri="rdf:*"
+												/>
 										</menupopup>
 								</template>
 							</menulist>
@@ -365,9 +389,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										style="min-width: 100px">
 									<template>
 										<menupopup>
+											<?php
+												$styleNationSperre = 'rdf:http://www.technikum-wien.at/nation/rdf#styleNationSperre';
+												$nationSperre= 'rdf:http://www.technikum-wien.at/nation/rdf#sperre';
+											?>
 											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
 													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-													uri="rdf:*"/>
+													uri="rdf:*"
+													style="<?php echo $styleNationSperre?>"
+													disabled="<?php echo $nationSperre?>"
+													/>
 										</menupopup>
 									</template>
 								</menulist>
