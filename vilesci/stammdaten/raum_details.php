@@ -115,9 +115,15 @@
 		$sg_update->gebteil = $gebteil;
 		$sg_update->oe_kurzbz = $oe_kurzbz;
 		$sg_update->arbeitsplaetze = $arbeitsplaetze;
+		$sg_update->updateamum = date('Y-m-d H:i:s');
+		$sg_update->updatevon = $user;
 
 		if ($_POST["neu"] == "true")
+		{
+			$sg_update->insertamum = date('Y-m-d H:i:s');
+			$sg_update->insertvon = $user;
 			$sg_update->new = 1;
+		}
 
 		if(!$sg_update->save())
 		{
