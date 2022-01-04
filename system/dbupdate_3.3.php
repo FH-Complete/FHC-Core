@@ -5790,6 +5790,20 @@ if (!$result = @$db->db_query("SELECT zeitwunsch_id FROM campus.tbl_zeitwunsch L
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
+// Insert postive Zeitsperre 'Zeitverfuegbarkeit' to tbl_zeitsperretyp
+if($result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitsperretyp WHERE zeitsperretyp_kurzbz = 'ZVerfueg';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_zeitsperretyp(zeitsperretyp_kurzbz, beschreibung) VALUES('ZVerfueg', 'Zeitverfügbarkeit');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitsperretyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'campus.tbl_zeitsperretyp: Added value \'ZVerfueg\'<br>';
+	}
+}
+
 $tabellen=array(
 	"bis.tbl_bisorgform" => array("bisorgform_kurzbz","code","bezeichnung"),
 	"bis.tbl_archiv"  => array("archiv_id","studiensemester_kurzbz","meldung","html","studiengang_kz","insertamum","insertvon","typ"),
