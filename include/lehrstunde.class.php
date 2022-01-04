@@ -878,8 +878,12 @@ class lehrstunde extends basis_db
 		if ($anz_zs!=0)
 		{
 			$row = $this->db_fetch_object($erg_zs);
-			$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
-			return true;
+
+			if ($row->zeitsperretyp_kurzbz != 'ZVerfueg')
+			{
+				$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
+				return true;
+			}
 		}
 		return false;
 	}
