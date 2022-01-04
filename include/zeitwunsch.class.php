@@ -250,7 +250,7 @@ class zeitwunsch extends basis_db
 			// Zeitsperren abfragen
 			$sql="
 				SELECT 
-					vondatum,vonstunde,bisdatum,bisstunde
+					zeitsperretyp_kurzbz, vondatum,vonstunde,bisdatum,bisstunde
 				FROM 
 					campus.tbl_zeitsperre
 				WHERE 
@@ -265,6 +265,8 @@ class zeitwunsch extends basis_db
 			}
 			else
 			{
+                // Zeitsperren negativ (-3) gewichten.
+                // Ausnahme: positive Zeitsperren: diese positiv (4) gewichten.
 				while($row = $this->db_fetch_object())
 				{
 					$beginn=montag($datum);
@@ -274,20 +276,21 @@ class zeitwunsch extends basis_db
 						//echo "\n".$date_iso."\n".$row->vondatum."\n";
 						if ($date_iso>$row->vondatum && $date_iso<$row->bisdatum)
 							for ($j=$this->min_stunde;$j<=$this->max_stunde;$j++)
-								$this->zeitwunsch[$i][$j]=-3;
+								$this->zeitwunsch[$i][$j] = $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
+
 						if ($date_iso==$row->vondatum && $date_iso<$row->bisdatum)
 						{
 							if (is_null($row->vonstunde))
 								$row->vonstunde=$this->min_stunde;
 							for ($j=$row->vonstunde;$j<=$this->max_stunde;$j++)
-								$this->zeitwunsch[$i][$j]=-3;
+								$this->zeitwunsch[$i][$j] = $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
 						}
 						if ($date_iso>$row->vondatum && $date_iso==$row->bisdatum)
 						{
 							if (is_null($row->bisstunde))
 								$row->bisstunde=$this->max_stunde;
 							for ($j=$this->min_stunde;$j<=$row->bisstunde;$j++)
-								$this->zeitwunsch[$i][$j]=-3;
+								$this->zeitwunsch[$i][$j] = $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
 						}
 						if ($date_iso==$row->vondatum && $date_iso==$row->bisdatum)
 						{
@@ -296,7 +299,7 @@ class zeitwunsch extends basis_db
 							if (is_null($row->bisstunde))
 								$row->bisstunde=$this->max_stunde;
 							for ($j=$row->vonstunde;$j<=$row->bisstunde;$j++)
-								$this->zeitwunsch[$i][$j]=-3;
+								$this->zeitwunsch[$i][$j] = $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
 						}
 						$beginn=jump_day($beginn,1);
 					}
@@ -357,7 +360,7 @@ class zeitwunsch extends basis_db
 			// Zeitsperren abfragen
 			$sql="
 				SELECT 
-					vondatum,vonstunde,bisdatum,bisstunde
+					zeitsperretyp_kurzbz, vondatum,vonstunde,bisdatum,bisstunde
 				FROM 
 					campus.tbl_zeitsperre
 				WHERE 
@@ -379,20 +382,20 @@ class zeitwunsch extends basis_db
 					//echo "\n".$date_iso."\n".$row->vondatum."\n";
 					if ($date_iso>$row->vondatum && $date_iso<$row->bisdatum)
 						for ($j=$this->min_stunde;$j<=$this->max_stunde;$j++)
-							$this->zeitwunsch[$i][$j]=-3;
+							$this->zeitwunsch[$i][$j]= $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
 					if ($date_iso==$row->vondatum && $date_iso<$row->bisdatum)
 					{
 						if (is_null($row->vonstunde))
 							$row->vonstunde=$this->min_stunde;
 						for ($j=$row->vonstunde;$j<=$this->max_stunde;$j++)
-							$this->zeitwunsch[$i][$j]=-3;
+							$this->zeitwunsch[$i][$j]= $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
 					}
 					if ($date_iso>$row->vondatum && $date_iso==$row->bisdatum)
 					{
 						if (is_null($row->bisstunde))
 							$row->bisstunde=$this->max_stunde;
 						for ($j=$this->min_stunde;$j<=$row->bisstunde;$j++)
-							$this->zeitwunsch[$i][$j]=-3;
+							$this->zeitwunsch[$i][$j]= $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
 					}
 					if ($date_iso==$row->vondatum && $date_iso==$row->bisdatum)
 					{
@@ -401,7 +404,7 @@ class zeitwunsch extends basis_db
 						if (is_null($row->bisstunde))
 							$row->bisstunde=$this->max_stunde;
 						for ($j=$row->vonstunde;$j<=$row->bisstunde;$j++)
-							$this->zeitwunsch[$i][$j]=-3;
+							$this->zeitwunsch[$i][$j]= $row->zeitsperretyp_kurzbz == 'ZVerfueg' ? 4 : -3;
 					}
 					$beginn=jump_day($beginn,1);
 				}
