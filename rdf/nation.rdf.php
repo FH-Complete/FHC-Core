@@ -83,7 +83,6 @@ foreach ($nation->nation as $row)
             <NATION:langtext><![CDATA[<?php echo $row->langtext ?>]]></NATION:langtext>
             <NATION:engltext><![CDATA[<?php echo $row->engltext ?>]]></NATION:engltext>
             <NATION:sperre><![CDATA[<?php echo ($row->sperre?'true':'false') ?>]]></NATION:sperre>
-            <NATION:styleNationSperre><![CDATA[<?php echo ($row->sperre?'text-decoration: line-through':'') ?>]]></NATION:styleNationSperre>
          </RDF:Description>
       </RDF:li>
 <?php
