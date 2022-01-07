@@ -3,6 +3,7 @@ $this->phrasen['lehre/keineLektorenZugeordnet']='Currently there are no lecturer
 
 $this->phrasen['lehre/lehrveranstaltungsinformation']='Course Information';
 $this->phrasen['lehre/lehrbeauftragter']='Lecturer(s)';
+$this->phrasen['lehre/lvleitung']='Head of Course';
 $this->phrasen['lehre/lvInfoBearbeiten']='Edit';
 
 $this->phrasen['lehre/semesterplan']='Semesterplan';

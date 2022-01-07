@@ -31,7 +31,9 @@ require_once('../../include/variable.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-$user=get_uid();
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
 
 $variable = new variable();
 if(!$variable->loadVariables($user))
@@ -72,7 +74,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Zugangscode" control="student-detail-zugangscode"/>
 							<label id="label-student-detail-link_bewerbungstool" hidden="true" value=""></label>
 							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
-
+							<?php $hideBpk = $rechte->isBerechtigt('student/bpk') ? '':' hidden="true"'; ?>
+                            <label value="BPK" control="student-detail-textbox-bpk"<?php echo $hideBpk; ?>/>
+                            <hbox><textbox id="student-detail-textbox-bpk" disabled="true" maxlength="28" size="50"<?php echo $hideBpk; ?>/></hbox>
 						</row>
 						<row>
 							<label value="Anrede" control="student-detail-textbox-anrede"/>
@@ -100,13 +104,26 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Geburtsnation" control="student-detail-menulist-geburtsnation"/>
 							<menulist id="student-detail-menulist-geburtsnation" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+									 xmlns:NATION="http://www.technikum-wien.at/nation/rdf#"
 									ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-												label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-												uri="rdf:*"/>
+									<rule NATION:sperre='false'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+													uri="rdf:*"
+													/>
 										</menupopup>
+									</rule>
+									<rule>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+													uri="rdf:*" style="text-decoration:line-through;"
+													/>
+										</menupopup>
+									</rule>
+
 								</template>
 							</menulist>
 
@@ -123,15 +140,29 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Staatsbuergerschaft" control="student-detail-menulist-staatsbuergerschaft"/>
 							<menulist id="student-detail-menulist-staatsbuergerschaft" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+									xmlns:NATION="http://www.technikum-wien.at/nation/rdf#"
 									ref="http://www.technikum-wien.at/nation/liste" >
 								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-												label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-												uri="rdf:*"/>
+									<rule NATION:sperre='false'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+													uri="rdf:*"
+													 />
 										</menupopup>
+									</rule>
+									<rule>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+													uri="rdf:*" style="text-decoration:line-through;"
+													 />
+										</menupopup>
+									</rule>
 								</template>
 							</menulist>
+
+
 							<label value="Matrikelnummer" control="student-detail-textbox-matr_nr"/>
 							<hbox><textbox id="student-detail-textbox-matr_nr" disabled="true" maxlength="32" size="15"/></hbox>
 							<label value="Sprache" control="student-detail-menulist-sprache" />
@@ -324,13 +355,25 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<menulist id="student-prestudent-menulist-zgvnation" disabled="true"
 										datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
 										ref="http://www.technikum-wien.at/nation/liste"
+										xmlns:NATION="http://www.technikum-wien.at/nation/rdf#"
 										style="min-width: 100px">
 									<template>
-										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-													uri="rdf:*"/>
-										</menupopup>
+										<rule NATION:sperre='false'>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+														label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+														uri="rdf:*"
+														/>
+											</menupopup>
+										</rule>
+										<rule>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+														label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+														uri="rdf:*" style="text-decoration:line-through;"
+														/>
+											</menupopup>
+										</rule>
 									</template>
 								</menulist>
 							</hbox>
@@ -353,7 +396,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
 												label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
-												uri="rdf:*"/>
+												uri="rdf:*"
+												/>
 										</menupopup>
 								</template>
 							</menulist>
@@ -368,13 +412,25 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<menulist id="student-prestudent-menulist-zgvmasternation" disabled="true"
 										datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
 										ref="http://www.technikum-wien.at/nation/liste"
+										xmlns:NATION="http://www.technikum-wien.at/nation/rdf#"
 										style="min-width: 100px">
 									<template>
-										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-													uri="rdf:*"/>
-										</menupopup>
+										<rule NATION:sperre='false'>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+														label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+														uri="rdf:*"
+														/>
+											</menupopup>
+										</rule>
+										<rule>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+														label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+														uri="rdf:*" style="text-decoration:line-through;"
+														/>
+											</menupopup>
+										</rule>
 									</template>
 								</menulist>
 							</hbox>													

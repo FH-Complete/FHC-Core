@@ -51,7 +51,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
-if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars LIMIT 1"))
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1"))
 {
 	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
 	$qry = '
@@ -1741,6 +1741,34 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// UPDATE Berechtigungen fuer vilesci User erteilen fuer tbl_person_lock
+if ($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_person_lock' AND table_schema='system' AND grantee='vilesci' AND privilege_type='UPDATE'"))
+{
+	if ($db->db_num_rows($result) === 0)
+	{
+		$qry = "GRANT UPDATE ON system.tbl_person_lock TO vilesci;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_person_lock Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> UPDATE Recht fuer system.tbl_person_lock fuer vilesci user gesetzt <br>';
+	}
+}
+
+
+// SELECT Berechtigung fuer web User erteilen fuer tbl_mobilitaet
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_mobilitaet' AND table_schema='bis' AND grantee='web' AND privilege_type='SELECT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT SELECT ON bis.tbl_mobilitaet TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>bis.tbl_mobilitaet Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>SELECT Recht fuer bis.tbl_mobilitaet fuer web user gesetzt <br>';
+	}
+}
 
 /**
  * Kommentare fuer Datenbanktabellen
@@ -2086,6 +2114,28 @@ if (!$result = @$db->db_query("SELECT projekt_id FROM fue.tbl_projekt LIMIT 1"))
 	else
 		echo '<br>Neue Spalte projekt_id für fue.tbl_projekt hinzugefügt';
 
+}
+
+// add column zeitaufzeichnung to fue.tbl_project
+if (!$result = @$db->db_query("SELECT zeitaufzeichnung FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "ALTER TABLE fue.tbl_projekt ADD COLUMN zeitaufzeichnung BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte zeitaufzeichnung zu fue.tbl_projekt hinzugefügt';
+}
+
+// add column zeitaufzeichnung to fue.tbl_projectphase
+if (!$result = @$db->db_query("SELECT zeitaufzeichnung FROM fue.tbl_projektphase LIMIT 1"))
+{
+	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN zeitaufzeichnung BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte zeitaufzeichnung zu fue.tbl_projektphase hinzugefügt';
 }
 
 // Extension Schema
@@ -2759,7 +2809,7 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 }
 
 // Spalte Zugangscode zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -3826,7 +3876,7 @@ if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindu
 }
 
 // iban, bic und weitere Variablen zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -4192,7 +4242,63 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_st
 		if(!$db->db_query($qry))
 			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'bis.tbl_studiengangstyp: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+			echo '<br> bis.tbl_studiengangstyp: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+	}
+}
+
+// Add type "p" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'p';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('p', 'PhD',NULL,'{PhD,PhD}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "p"<br>';
+	}
+}
+
+// Add type "l" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'l';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('l', 'Lehrgang',NULL,'{Lehrgang,Course}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "l"<br>';
+	}
+}
+
+// Add type "d" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'd';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('d', 'Diplom',NULL,'{Diplom,Diploma}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "d"<br>';
+	}
+}
+
+// Add type "w" to Studiengangstyp
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp WHERE typ = 'w';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_studiengangstyp(typ,bezeichnung,beschreibung,bezeichnung_mehrsprachig) VALUES('w', 'Weiterbildung',NULL,'{Weiterbildung,Further education}');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br> public.tbl_studiengangstyp: Added type "w"<br>';
 	}
 }
 
@@ -4299,7 +4405,7 @@ if (!$result = @$db->db_query("SELECT ba1code_bis FROM bis.tbl_beschaeftigungsar
 }
 
 // Orgform DE und Orform EN zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "Orgform DE", "Orgform EN" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "Orgform DE", "Orgform EN" FROM public.vw_msg_vars WHERE person_id=-1 LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -4965,6 +5071,43 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status 
 		echo ' public.tbl_zgvpruefungstatus_status: Tabelle hinzugefuegt<br>';
 }
 
+// Add table adressentyp
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_adressentyp LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_adressentyp
+		(
+			adressentyp_kurzbz varchar(32),
+			bezeichnung varchar(256),
+			bezeichnung_mehrsprachig varchar(256)[],
+			sort smallint
+		);
+
+		COMMENT ON TABLE public.tbl_adressentyp IS 'Types of Addresses';
+		ALTER TABLE public.tbl_adressentyp ADD CONSTRAINT pk_tbl_adressentyp PRIMARY KEY (adressentyp_kurzbz);
+
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('h', 'Hauptwohnsitz', '{\"Hauptwohnsitz\", \"Principal residence\"}', 1);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('n', 'Nebenwohnsitz', '{\"Nebenwohnsitz\", \"Secondary residence\"}', 2);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('ho', 'Homeoffice', '{\"Homeoffice\", \"Homeoffice\"}', 3);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('r', 'Rechnungsadresse', '{\"Rechnungsadresse\", \"Billing address\"}', 4);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('f', 'Firma', '{\"Firma\", \"Company\"}', 5);
+
+		UPDATE public.tbl_adresse SET typ = 'f' WHERE person_id IS NULL AND (typ IS NULL OR typ = '');
+		UPDATE public.tbl_adresse SET typ = 'h' WHERE person_id IS NOT NULL AND typ IS NULL;
+
+		ALTER TABLE public.tbl_adresse ADD CONSTRAINT fk_tbl_adresse_adressentyp FOREIGN KEY (typ) REFERENCES public.tbl_adressentyp (adressentyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_adresse ALTER COLUMN typ TYPE varchar(32);
+
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_adressentyp TO vilesci;
+		GRANT SELECT ON public.tbl_adressentyp TO web;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_adressentyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_adressentyp: Tabelle hinzugefuegt<br>';
+}
+
 // Add index to lehre.tbl_pruefung
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_pruefung_student_uid'"))
 {
@@ -5291,14 +5434,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue_status LIMIT 1;"))
 	else
 		echo '<br>system.tbl_issue_status: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;
+	// GRANT SELECT ON TABLE system.tbl_issue_status TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_issue_status TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue_status '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_issue_status';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue_status TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue_status TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue_status TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue_status '.$db->db_last_error().'</strong><br>';
@@ -5327,14 +5470,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehlertyp LIMIT 1;"))
 	else
 		echo '<br>system.tbl_fehlertyp: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_bisstandort TO web;
+	// GRANT SELECT ON TABLE system.tbl_fehlertyp TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_fehlertyp TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehlertyp '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehlertyp';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisstandort TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehlertyp TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehlertyp TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehlertyp '.$db->db_last_error().'</strong><br>';
@@ -5377,14 +5520,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler LIMIT 1;"))
 	else
 		echo '<br>system.tbl_fehler: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	// GRANT SELECT ON TABLE system.tbl_fehler TO web;
 	$qry = 'GRANT SELECT, UPDATE ON TABLE system.tbl_fehler TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehler';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler '.$db->db_last_error().'</strong><br>';
@@ -5435,14 +5578,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_fehler_zustaendigkeiten L
 	else
 		echo '<br>system.tbl_fehler_zustaendigkeiten: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	// GRANT SELECT ON TABLE system.tbl_fehler_zustaendigkeiten TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_fehler_zustaendigkeiten TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_fehler_zustaendigkeiten';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler_zustaendigkeiten TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_fehler_zustaendigkeiten TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
@@ -5513,14 +5656,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue LIMIT 1;"))
 	else
 		echo '<br>system.tbl_issue: Tabelle hinzugefuegt';
 
-	// GRANT SELECT ON TABLE bis.tbl_issue TO web;
+	// GRANT SELECT ON TABLE system.tbl_issue TO web;
 	$qry = 'GRANT SELECT, UPDATE ON TABLE system.tbl_issue TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_issue';
 
-	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_issue TO vilesci;
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue TO vilesci;
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_issue TO vilesci;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_issue '.$db->db_last_error().'</strong><br>';
@@ -5539,6 +5682,34 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>system.tbl_berechtigung: Added permission for system/issues_verwalten';
+	}
+}
+
+// Add permission to manage bpk in FAS
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/bpk';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/bpk', 'BPK verwalten');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_berechtigung: Added permission for student/bpk';
+	}
+}
+
+// Add index to campus.tbl_zeitaufzeichnung.uid
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_zeitaufzeichnung_uid'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_tbl_zeitaufzeichnung_uid ON campus.tbl_zeitaufzeichnung USING btree (uid)";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer campus.tbl_zeitaufzeichnung.uid hinzugefuegt<br>';
 	}
 }
 
@@ -5637,8 +5808,8 @@ $tabellen=array(
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id","projekttyp_kurzbz"),
-	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","typ","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe","ressource_id"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id","projekttyp_kurzbz","zeitaufzeichnung"),
+	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","typ","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe","ressource_id","zeitaufzeichnung"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id","scrumsprint_id"),
 	"fue.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
@@ -5697,6 +5868,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
+	"public.tbl_adressentyp"  => array("adressentyp_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "sort"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice","akzeptiertamum"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),

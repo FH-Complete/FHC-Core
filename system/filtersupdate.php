@@ -347,7 +347,8 @@ $filters = array(
 					{"name": "vorname"},
 					{"name": "nachname"},
 					{"name": "svnr"},
-					{"name": "ersatzkennzeichen"}
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
 				],
 				"filters": []
 			}
@@ -467,6 +468,30 @@ $filters = array(
 						"operation": "ncontains"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'abgewiesen',
+		'filter_kurzbz' => 'InfoCenterAbgewiesenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Abgewiesen - Alle",
+				"columns": [
+					{"name": "PersonID"},
+					{"name": "PreStudentID"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"},
+					{"name": "AbgewiesenAm"},
+					{"name": "Nachricht"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,
@@ -866,7 +891,7 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Alle offenen Fehler",
+				"name": "Alle offenen Fehler, hauptzuständig",
 				"columns": [
 					{"name": "Datum"},
 					{"name": "Inhalt"},
@@ -880,6 +905,11 @@ $filters = array(
 						"name": "Fehlerstatus",
 						"operation": "ncontains",
 						"condition": "behoben"
+					},
+					{
+						"name": "Hauptzuständig",
+						"operation": "contains",
+						"condition": "Ja"
 					}
 				]
 			}

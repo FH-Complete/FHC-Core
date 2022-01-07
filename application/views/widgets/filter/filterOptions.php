@@ -21,8 +21,6 @@
 							<?php FilterWidget::loadViewSelectFilters(); ?>
 						</div>
 
-						<br>
-
 						<!-- Filter save options -->
 						<div>
 							<?php FilterWidget::loadViewSaveFilter(); ?>

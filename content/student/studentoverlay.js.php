@@ -704,6 +704,7 @@ function StudentDetailReset()
 	document.getElementById('student-detail-menulist-sprache').value='German';
 	document.getElementById('student-detail-textbox-matrikelnummer').value='';
 	document.getElementById('student-detail-textbox-matr_nr').value='';
+	document.getElementById('student-detail-textbox-bpk').value='';
 	document.getElementById('student-detail-image').src='';
 }
 
@@ -742,6 +743,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-alias').disabled=val;
 	document.getElementById('student-detail-button-save').disabled=val;
 	document.getElementById('student-detail-textbox-matr_nr').disabled=val;
+	document.getElementById('student-detail-textbox-bpk').disabled=val;
 }
 
 // ****
@@ -779,6 +781,7 @@ function StudentDetailSave()
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
 	alias = document.getElementById('student-detail-textbox-alias').value;
 	matr_nr = document.getElementById('student-detail-textbox-matr_nr').value;
+	bpk = document.getElementById('student-detail-textbox-bpk').value;
 
 	//Wenn es noch kein Student ist, dann wird die Studiengang_kz vom Prestudent genommen
 	if(studiengang_kz=='')
@@ -836,6 +839,7 @@ function StudentDetailSave()
 	req.add('gruppe', gruppe);
 	req.add('alias', alias);
 	req.add('matr_nr',matr_nr);
+	req.add('bpk',bpk);
 
 	var response = req.executePOST();
 
@@ -1084,6 +1088,7 @@ function StudentAuswahl()
 	matr_nr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#matr_nr" ));
 	zugangscode=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zugangscode" ));
 	link_bewerbungstool=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#link_bewerbungstool" ));
+	bpk=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bpk" ));
 
 	//Bei Incoming wird das Menue zur Statusaenderung deaktiviert
 	if(status=='Incoming')
@@ -1130,6 +1135,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-matr_nr').value=matr_nr;
 	document.getElementById('label-student-detail-zugangscode').value=zugangscode;
 	document.getElementById('label-student-detail-link_bewerbungstool').value=link_bewerbungstool;
+	document.getElementById('student-detail-textbox-bpk').value=bpk;
 
 	//PreStudent Daten holen
 
