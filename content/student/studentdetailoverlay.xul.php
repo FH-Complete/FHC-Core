@@ -326,7 +326,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<column flex="1"/>
 						<column flex="5"/>
 						<column flex="1"/>
-						<column flex="1"/>							 
+						<column flex="1"/>
 					</columns>
 					<rows>
 						<row>
@@ -380,11 +380,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<!-- ZGV erfuellt -->
 							<?php
 							$is_hidden = (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN) ? 'false' : 'true';
-							?>							
+							?>
 							<label value="ZGV erfüllt" control="student-prestudent-checkbox-zgverfuellt" hidden="<?php echo $is_hidden?>"/>
 							<hbox>
 								<checkbox id="student-prestudent-checkbox-zgverfuellt" checked="true" disabled="true" hidden="<?php echo $is_hidden?>"/>
-							</hbox>						  
+							</hbox>
 						</row>
 						<row>
 							<label value="ZGV Master" control="student-prestudent-menulist-zgvmastercode"/>
@@ -433,17 +433,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</rule>
 									</template>
 								</menulist>
-							</hbox>													
+							</hbox>
 		   							<!-- ZGV Master erfuellt -->
 							<?php
 							$is_hidden = (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN) ? 'false' : 'true';
-							?>			
+							?>
 							<label value="ZGV Master erfüllt" control="student-prestudent-checkbox-zgvmaserfuellt" hidden="<?php echo $is_hidden?>"/>
 							<hbox>
 								<checkbox id="student-prestudent-checkbox-zgvmaserfuellt" checked="true" disabled="true" hidden="<?php echo $is_hidden?>"/>
 							</hbox>
 						</row>
-						<!-- ZGV Doktor --> 
+						<!-- ZGV Doktor -->
 						<?php
 							$is_hidden = (defined('ZGV_DOKTOR_ANZEIGEN') && ZGV_DOKTOR_ANZEIGEN) ? 'false' : 'true';
 							?>
@@ -470,20 +470,32 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<hbox>
 								<menulist id="student-prestudent-menulist-zgvdoktornation" disabled="true"
 										datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+										xmlns:NATION="http://www.technikum-wien.at/nation/rdf#"
 										ref="http://www.technikum-wien.at/nation/liste" >
 									<template>
-										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-													label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-													uri="rdf:*"/>
-										</menupopup>
+										<rule NATION:sperre='false'>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+														label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+														uri="rdf:*"
+														/>
+											</menupopup>
+										</rule>
+										<rule>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+														label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+														uri="rdf:*" style="text-decoration:line-through;"
+														/>
+											</menupopup>
+										</rule>
 									</template>
 								</menulist>
 							</hbox>
 									<!-- ZGV Doktor erfuellt -->
 							<?php
 							$is_hidden = (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN) ? 'false' : 'true';
-							?>			
+							?>
 							<label value="ZGV Doktor erfüllt" control="student-prestudent-checkbox-zgvdoktorerfuellt" hidden="<?php echo $is_hidden?>"/>
 							<hbox>
 								<checkbox id="student-prestudent-checkbox-zgvdoktorerfuellt" checked="true" disabled="true" hidden="<?php echo $is_hidden?>"/>
