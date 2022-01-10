@@ -127,14 +127,16 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif($filter2=='zgvohnedatum')
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
-		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum
+		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum,zgvdoktor_code, zgvdoktordatum
 			FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id);
 		if($db->db_query($qry))
 		{
 			if($row_filter = $db->db_fetch_object())
 			{
 				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='')
-				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
+				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum=='')
+				|| ($row_filter->zgvdoktor_code!='' && $row_filter->zgvdoktordatum=='')
+				)
 					return true;
 				else
 					return false;
@@ -161,15 +163,15 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif ( preg_match('/^stud-statusgrund-([0-9]+)$/', $filter2, $studstatusgrund) )
 	{
 	    // Alle Studenten mit Statusgrund in tbl_prestudentstatus
-	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus ps JOIN 
-				    public.tbl_prestudent p ON p.prestudent_id = ps.prestudent_id AND 
+	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus ps JOIN
+				    public.tbl_prestudent p ON p.prestudent_id = ps.prestudent_id AND
 				    ps. studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				    p. person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
-				    p.studiengang_kz=" . $db->db_add_param($studiengang_kz, FHC_INTEGER) . " AND 
+				    p.studiengang_kz=" . $db->db_add_param($studiengang_kz, FHC_INTEGER) . " AND
 				    ps.statusgrund_id = " . $db->db_add_param($studstatusgrund[1], FHC_INTEGER);
 	    //echo $qry . "\n";
-	    $filtered = ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) ) 
-		      ? true 
+	    $filtered = ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) )
+		      ? true
 		      : false;
 	    return $filtered;
 	}
@@ -377,11 +379,19 @@ function draw_prestudent($row)
 				<STUDENT:zgvdatum><![CDATA['.$datum_obj->convertISODate($row->zgvdatum).']]></STUDENT:zgvdatum>
 				<STUDENT:zgvdatum_iso><![CDATA['.$row->zgvdatum.']]></STUDENT:zgvdatum_iso>
 				<STUDENT:zgvnation><![CDATA['.$row->zgvnation.']]></STUDENT:zgvnation>
+				<STUDENT:zgv_erfuellt><![CDATA['.$row->zgv_erfuellt.']]></STUDENT:zgv_erfuellt>
 				<STUDENT:zgvmas_code><![CDATA['.$row->zgvmas_code.']]></STUDENT:zgvmas_code>
 				<STUDENT:zgvmaort><![CDATA['.$row->zgvmaort.']]></STUDENT:zgvmaort>
 				<STUDENT:zgvmadatum><![CDATA['.$datum_obj->convertISODate($row->zgvmadatum).']]></STUDENT:zgvmadatum>
 				<STUDENT:zgvmadatum_iso><![CDATA['.$row->zgvmadatum.']]></STUDENT:zgvmadatum_iso>
 				<STUDENT:zgvmanation><![CDATA['.$row->zgvmanation.']]></STUDENT:zgvmanation>
+				<STUDENT:zgvmas_erfuellt><![CDATA['.$row->zgvmas_erfuellt.']]></STUDENT:zgvmas_erfuellt>
+				<STUDENT:zgvdoktor_code><![CDATA['.$row->zgvdoktor_code.']]></STUDENT:zgvdoktor_code>
+				<STUDENT:zgvdoktorort><![CDATA['.$row->zgvdoktorort.']]></STUDENT:zgvdoktorort>
+				<STUDENT:zgvdoktordatum><![CDATA['.$datum_obj->convertISODate($row->zgvdoktordatum).']]></STUDENT:zgvdoktordatum>
+				<STUDENT:zgvdoktordatum_iso><![CDATA['.$row->zgvdoktordatum.']]></STUDENT:zgvdoktordatum_iso>
+				<STUDENT:zgvdoktornation><![CDATA['.$row->zgvdoktornation.']]></STUDENT:zgvdoktornation>
+				<STUDENT:zgvdoktor_erfuellt><![CDATA['.$row->zgvdoktor_erfuellt.']]></STUDENT:zgvdoktor_erfuellt>
 				<STUDENT:ausstellungsstaat><![CDATA['.$row->ausstellungsstaat.']]></STUDENT:ausstellungsstaat>
 				<STUDENT:aufnahmeschluessel><![CDATA['.$row->aufnahmeschluessel.']]></STUDENT:aufnahmeschluessel>
 				<STUDENT:facheinschlberuf><![CDATA['.($row->facheinschlberuf?'true':'false').']]></STUDENT:facheinschlberuf>
@@ -456,7 +466,7 @@ function draw_empty_content()
 			<STUDENT:matr_nr><![CDATA[]]></STUDENT:matr_nr>
 			<STUDENT:studiengang_studiengangsleitung><![CDATA[]]></STUDENT:studiengang_studiengangsleitung>
 			<STUDENT:anzahl_notizen><![CDATA[]]></STUDENT:anzahl_notizen>
-			
+
 			<STUDENT:prestudent_id><![CDATA[]]></STUDENT:prestudent_id>
 			<STUDENT:studiengang_kz_prestudent><![CDATA[]]></STUDENT:studiengang_kz_prestudent>
 			<STUDENT:studiengang_kz><![CDATA[]]></STUDENT:studiengang_kz>
