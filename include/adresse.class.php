@@ -53,6 +53,9 @@ class adresse extends basis_db
 	public $rechnungsadresse=false;	//  boolean
 	public $anmerkung;			//  string
 	public $co_name;
+	public $adressentyp;
+	public $bezeichnung;
+	public $bezeichnung_mehrsprachig;
 
 	/**
 	 * Konstruktor
@@ -133,10 +136,10 @@ class adresse extends basis_db
 			$this->errormsg = 'person_id muss eine gültige Zahl sein';
 			return false;
 		}
-
+		$sprache = new sprache();
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=".$this->db_add_param($pers_id, FHC_INTEGER, false);
-		$qry.=" ORDER BY zustelladresse DESC";
+		$qry = "SELECT *, ". $sprache->getSprachQuery('bezeichnung_mehrsprachig') ." FROM public.tbl_adresse JOIN public.tbl_adressentyp ON typ = adressentyp_kurzbz WHERE person_id=".$this->db_add_param($pers_id, FHC_INTEGER, false);
+		$qry.=" ORDER BY zustelladresse DESC, sort";
 
 		if(!$this->db_query($qry))
 		{
@@ -167,6 +170,7 @@ class adresse extends basis_db
 			$adr_obj->co_name		  = $row->co_name;
 			$adr_obj->rechnungsadresse 	= $this->db_parse_bool($row->rechnungsadresse);
 			$adr_obj->anmerkung 	  = $row->anmerkung;
+			$adr_obj->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
 
 			$this->result[] = $adr_obj;
 		}
@@ -518,6 +522,30 @@ class adresse extends basis_db
 			$this->result[] = $adr_obj;
 		}
 		return true;
+	}
+
+	public function getAdressentyp()
+	{
+		$qry = "SELECT * FROM public.tbl_adressentyp ORDER BY sort";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new adresse();
+
+				$obj->adressentyp = $row->adressentyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }
 ?>
