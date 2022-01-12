@@ -306,6 +306,7 @@ else
 	$worksheet->write(++$lines,0,'(i)  ... Incoming');
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
 	$worksheet->write(++$lines,0,'(ar) ... '.$p->t('anwesenheitsliste/angerechnet'));
+	$worksheet->write(++$lines,0,'(iar) ... '.$p->t('anwesenheitsliste/internangerechnet'));
 	$worksheet->write(++$lines,0,'(dd) ... Double Degree Program');
 
 	$worksheet->setColumn(0, 0, 5);
