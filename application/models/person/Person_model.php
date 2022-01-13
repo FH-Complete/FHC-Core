@@ -268,35 +268,61 @@ class Person_model extends DB_Model
 
 	public function checkDuplicate($person_id)
 	{
-		$qry = "SELECT p.person_id
-				FROM public.tbl_person p
-				JOIN  public.tbl_prestudent USING (person_id)
-				JOIN public.tbl_prestudentstatus USING (prestudent_id)
-				WHERE status_kurzbz = 'Abbrecher'
-				AND person_id IN (SELECT p2.person_id
+		$qry = "SELECT person_id
+				FROM public.tbl_prestudent p
+				JOIN 
+				(
+					SELECT DISTINCT ON(prestudent_id) *
+					FROM public.tbl_prestudentstatus
+					WHERE prestudent_id IN 
+						(
+							SELECT prestudent_id 
+							FROM public.tbl_prestudent 
+							WHERE person_id IN 
+							(
+								SELECT p2.person_id
 								FROM public.tbl_person p
 								JOIN public.tbl_person p2
 								ON p.vorname = p2.vorname
 								AND p.nachname = p2.nachname
 								AND p.gebdatum = p2.gebdatum
-								WHERE p.person_id = ?
-				)";
+								AND p.person_id = ?
+							)
+						)
+					ORDER BY prestudent_id, datum DESC, insertamum DESC
+				) ps USING(prestudent_id)
+				JOIN public.tbl_status USING(status_kurzbz)
+				WHERE status_kurzbz = 'Interessent' 
+				AND studiengang_kz IN 
+				(
+					SELECT studiengang_kz
+					FROM public.tbl_prestudent p
+					JOIN
+					(
+						SELECT DISTINCT ON(prestudent_id) *
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id IN
+						(
+							SELECT prestudent_id
+							FROM public.tbl_prestudent
+							WHERE person_id IN
+							(
+								SELECT p2.person_id
+								FROM public.tbl_person p
+								JOIN public.tbl_person p2
+								ON p.vorname = p2.vorname
+								AND p.nachname = p2.nachname
+								AND p.gebdatum = p2.gebdatum
+								AND p.person_id = ?
+							)
+						)
+						ORDER BY prestudent_id, datum DESC, insertamum DESC
+					) ps USING(prestudent_id)
+					JOIN public.tbl_status USING(status_kurzbz)
+					WHERE status_kurzbz = 'Abbrecher'
+				)
+				";
 
-		$person = $this->execQuery($qry, array($person_id));
-
-		if (hasData($person))
-		{
-			$qry = "SELECT p2.person_id
-					FROM public.tbl_person p
-					JOIN public.tbl_person p2
-					ON p.vorname = p2.vorname
-					AND p.nachname = p2.nachname
-					AND p.gebdatum = p2.gebdatum
-					WHERE p.person_id = ?";
-
-			return $this->execQuery($qry, array($person_id));
-		}
-
-		return $person;
+		return $this->execQuery($qry, array($person_id, $person_id));
 	}
 }

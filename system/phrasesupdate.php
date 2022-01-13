@@ -896,13 +896,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn bereits vorhanden',
+				'text' => 'BewerberIn möglicherweise vorhanden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Applicant already available',
+				'text' => 'Applicant maybe available',
 				'description' => '',
 				'insertvon' => 'system'
 			)
