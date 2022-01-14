@@ -1186,7 +1186,6 @@ class betriebsmittel extends basis_db
 		//Kartennummern die im Hex-Format sind werden umgewandelt
 		if (!is_numeric($kartennummer))
 		{
-			//$kartennummer=substr($kartennummer,strlen($kartennummer)-2,2).substr($kartennummer,strlen($kartennummer)-4,2). substr($kartennummer,strlen($kartennummer)-6,2).substr($kartennummer,0,2);
 			$tmp_kn_str = null;
 			for ($i=0; strlen($kartennummer) > $i; $i+=2) { 
 
