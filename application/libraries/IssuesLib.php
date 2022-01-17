@@ -124,6 +124,12 @@ class IssuesLib
 		return $this->_addIssue($fehlercode, $person_id, $oe_kurzbz, $fehlertext_params, null, $fehlercode_extern, $inhalt_extern);
 	}
 
+	/**
+	 * Set issue to resolved.
+	 * @param int $issue_id
+	 * @param string $user uid of issue resolver
+	 * @return object success or error
+	 */
 	public function setBehoben($issue_id, $user)
 	{
 		$data = array(
@@ -135,6 +141,12 @@ class IssuesLib
 		return $this->_changeIssueStatus($issue_id, $data, $user);
 	}
 
+	/**
+	 * Set issue to in progress.
+	 * @param int $issue_id
+	 * @param string $user uid of issue resovler
+	 * @return object success or error
+	 */
 	public function setInBearbeitung($issue_id, $user)
 	{
 		$data = array(
@@ -145,6 +157,12 @@ class IssuesLib
 		return $this->_changeIssueStatus($issue_id, $data, $user);
 	}
 
+	/**
+	 * Set issue to new.
+	 * @param int $issue_id
+	 * @param string $user uid of issue resolver
+	 * @return object success or error
+	 */
 	public function setNeu($issue_id, $user)
 	{
 		$data = array(
@@ -225,8 +243,6 @@ class IssuesLib
 
 				if ($openIssueCount == 0)
 				{
-					var_dump($resolution_params);
-
 					if (isset($resolution_params))
 					{
 						if (is_array($resolution_params))

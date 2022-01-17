@@ -83,8 +83,6 @@ class Issues extends Auth_Controller
 				$errors[] = error("Invalid issue status given");
 			else
 			{
-/*				var_dump($changeIssueMethod);
-				var_dump($issue_id);*/
 				$issueRes = $this->issueslib->{$changeIssueMethod}($issue_id, $user);
 
 				if (isError($issueRes))
