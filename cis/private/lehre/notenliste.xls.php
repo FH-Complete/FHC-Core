@@ -254,7 +254,7 @@ else
 
 					if ($elem->mobilitaetstyp_kurzbz !='' && $elem->doubledegree == 1) //dd-Program
 					{
-						$inc.=' (dd)';
+						$inc.=' (d.d.)';
 					}
 
 					$worksheet->write($lines,1,$elem->uid);
@@ -308,7 +308,7 @@ else
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
 	$worksheet->write(++$lines,0,'(ar) ... '.$p->t('anwesenheitsliste/angerechnet'));
 	$worksheet->write(++$lines,0,'(iar) ... '.$p->t('anwesenheitsliste/internangerechnet'));
-	$worksheet->write(++$lines,0,'(dd) ... Double Degree Program');
+	$worksheet->write(++$lines,0,'(d.d.) ... Double Degree Program');
 
 	$worksheet->setColumn(0, 0, 5);
 	$worksheet->setColumn(0, 1, 16);
