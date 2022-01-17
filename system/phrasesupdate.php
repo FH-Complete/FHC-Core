@@ -1562,13 +1562,13 @@ $phrases = array(
 	'phrases' => array(
 		array(
 			'sprache' => 'German',
-			'text' => 'Benotung der Lehrveranstaltung',
+			'text' => '	Lehrveranstaltung bereits benotet',
 			'description' => '',
 			'insertvon' => 'system'
 		),
 		array(
 			'sprache' => 'English',
-			'text' => 'Grading of the course',
+			'text' => 'Course already graded',
 			'description' => '',
 			'insertvon' => 'system'
 		)
