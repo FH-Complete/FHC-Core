@@ -1,5 +1,5 @@
 <?php
-$this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='No valid semester'; 
+$this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='No valid semester';
 $this->phrasen['anwesenheitsliste/anwesenheitslisten']='Attendance lists';
 $this->phrasen['anwesenheitsliste/covidstatuslisten']='verification lists';
 $this->phrasen['anwesenheitsliste/notenlisten']='Grade lists';
@@ -19,4 +19,5 @@ $this->phrasen['anwesenheitsliste/keineStundenvorhanden']='Currently no lessons 
 $this->phrasen['anwesenheitsliste/keineEintraegeGefunden']='No entries have been found';
 $this->phrasen['anwesenheitsliste/anleitungImportFunktion']='Copy these cells to the clipboard to fill the subject grade import of the final grade form';
 $this->phrasen['anwesenheitsliste/angerechnet']='Accredited';
+$this->phrasen['anwesenheitsliste/internangerechnet']='Internally accredited';
 ?>
