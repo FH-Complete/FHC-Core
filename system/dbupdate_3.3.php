@@ -5713,6 +5713,16 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_zeita
 	}
 }
 
+// Add column parameterFuerBehebung to system.tbl_issue
+if(!$result = @$db->db_query("SELECT behebung_parameter FROM system.tbl_issue LIMIT 1"))
+{
+	$qry = 'ALTER TABLE system.tbl_issue ADD COLUMN behebung_parameter JSONB;';
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_issue: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column behebung_parameter to table system.tbl_issue';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

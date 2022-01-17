@@ -58,21 +58,44 @@ class Issues extends Auth_Controller
 	{
 		$issue_ids = $this->input->post('issue_ids');
 		$status_kurzbz = $this->input->post('status_kurzbz');
-		$verarbeitetvon = $this->_uid;
+		$user = $this->_uid;
 
 		$errors = array();
 		foreach ($issue_ids as $issue_id)
 		{
-			$issueRes = $this->issueslib->changeIssueStatus($issue_id, $status_kurzbz, $verarbeitetvon);
+			switch ($status_kurzbz)
+			{
+				case IssuesLib::STATUS_NEU:
+					$changeIssueMethod = 'setNeu';
+					break;
+				case IssuesLib::STATUS_IN_BEARBEITUNG:
+					$changeIssueMethod = 'setInBearbeitung';
+					break;
+				case IssuesLib::STATUS_BEHOBEN:
+					$changeIssueMethod = 'setBehoben';
+					break;
+				default:
+					$changeIssueMethod = null;
+					break;
+			}
 
-			if (isError($issueRes))
-				$errors[] = getError($issueRes);
+			if (isEmptyString($changeIssueMethod))
+				$errors[] = error("Invalid issue status given");
+			else
+			{
+/*				var_dump($changeIssueMethod);
+				var_dump($issue_id);*/
+				$issueRes = $this->issueslib->{$changeIssueMethod}($issue_id, $user);
+
+				if (isError($issueRes))
+					$errors[] = getError($issueRes);
+			}
 		}
 
 		if (!isEmptyArray($errors))
 			$this->outputJsonError(implode(", ", $errors));
 		else
-			$this->outputJsonSuccess("Status erfolgreich aktualisiert");
+			$this->outputJsonSuccess("Status successfully refreshed");
 	}
 
 	/**
@@ -133,7 +156,7 @@ class Issues extends Auth_Controller
 
 		// add oes for which there is the "manage issues" Berechtigung
 		if (!$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ))
-			show_error('Keine Berechtigung oder Fehler bei Berechtigungsprüfung');
+			show_error('No permission or error when checking permissions');
 
 		$all_oe_kurzbz_berechtigt = array_unique(array_merge($oe_kurzbz_for_funktion, $oe_kurzbz_berechtigt));
 
