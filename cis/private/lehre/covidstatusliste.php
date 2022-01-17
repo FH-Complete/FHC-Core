@@ -18,7 +18,6 @@
  * Authors: Manfred Kindl <manfred.kindl@technikum-wien.at>
  */
 require_once('../../../config/cis.config.inc.php');
-require_once('../../../include/dokument_export.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/lehreinheitgruppe.class.php');
 require_once('../../../include/lehreinheit.class.php');
@@ -29,6 +28,9 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/erhalter.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/lehrelisthelper.class.php');
+require_once('../../../include/covid/covidhelper.class.php');
+
+$debug = false;
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -57,35 +59,108 @@ if(	!$berechtigung->isBerechtigt('admin')
 	&& !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
 	die('Sie muessen LektorIn der LV sein oder das Recht "ADMIN", "ASSISTENZ" oder "LEHRE" haben, um diese Seite aufrufen zu koennen');
 
-$output='pdf';
-
-if(isset($_GET['output']) && ($output='odt' || $output='doc'))
-	$output=$_GET['output'];
-
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
 isset($_GET['lehreinheit_id']) ? $lehreinheit = $_GET['lehreinheit_id'] : $lehreinheit = NULL;
 
 $stg = new studiengang();
 $stg->load($lv->studiengang_kz);
 
-$doc = new dokument_export('Anwesenheitslist');
-
 $lehrelisthelper = new LehreListHelper($db, $studiensemester, $lvid, $lv, $stg, $lehreinheit);
 $arr_lehrende = $lehrelisthelper->getArr_Lehrende();
 $data = $lehrelisthelper->getData();
 $studentuids = $lehrelisthelper->getStudentUids();
 
-$doc->addDataArray($data,'anwesenheitsliste');
-if($lehreinheit!='')
-{
-	$lehrende = '_'.implode('_',array_unique($arr_lehrende));
-}
-else
-	$lehrende = '';
+$covidhelper = new CovidHelper();
+$covidhelper->fetchCovidStatus($studentuids);
+$covidstatus = $covidhelper->getCovidStatus();
 
-$doc->setFilename('Anwesenheitsliste_'.$studiensemester.'_'.$stg->kuerzel.'_'.$lv->semester.'_'.$lv->kurzbz.$lehrende);
-if(!$doc->create($output))
-	die($doc->errormsg);
-$doc->output();
-$doc->close();
+$now = new DateTime('now', new DateTimeZone('Europe/Vienna'));
+header('Content-Type: text/html; charset=utf-8');
 ?>
+<!<!doctype html>
+<html>
+<head>
+	<title>FHC - Nachweisliste</title>
+	<link rel="stylesheet" type="text/css" href="../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+	<link href="../../../vendor/components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>	
+</head>
+<body>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-6">
+			
+			<h1>Nachweisliste "<?php echo $data['bezeichnung']; ?>"</h1>
+			<ul>
+				<li><strong>Gruppen</strong>: <?php echo $data['gruppen']; ?></li>
+				<li><strong>Studiensemester</strong>: <?php echo $data['studiensemester']; ?></li>
+				<li><strong>Lehrende</strong>: <?php echo $lehrelisthelper->getLehrende_String(); ?></li>
+				<li><strong>generiert</strong>: <?php echo $now->format('d.m.Y H:i'); ?></li>
+				<li><strong>Anzahl der Studierenden</strong>: <?php echo $data['anzahl_studierende']; ?></li>
+			</ul>
+			
+			<table class="table table-striped table-hover table-condensed">
+				<thead>
+					<tr>
+						<th>lfd.Nr.</th>
+						<th>Name</th>
+						<th>Kennzeichen</th>
+						<th>Gruppe</th>
+						<th>Nachweis</th>
+					</tr>
+				</thead>
+				<tbody>
+<?php
+$len = strlen($data['anzahl_studierende']);
+$lfdnr = 1;
+foreach ($data as $value) 
+{
+	if( !(is_array($value) && isset($value['student'])) ) 
+	{
+		continue;
+	}
+	$tmpstudent =& $value['student']; 
+?>
+					<tr class="<?php echo $covidhelper->getBootstrapClass($tmpstudent['uid'])?>" title="<?php echo $covidhelper->getTitle($tmpstudent['uid'])?>">
+						<td><?php echo sprintf('%0' . $len . 'd', $lfdnr); ?></td>
+						<td><?php echo $tmpstudent['nachname'] . ' ' . $tmpstudent['vorname'] . ' ' . $tmpstudent['zusatz']; ?></td>
+						<td><?php echo $tmpstudent['personenkennzeichen']; ?></td>
+						<td><?php echo $tmpstudent['semester'] . $tmpstudent['verband'] . $tmpstudent['gruppe']; ?></td>
+						<td><?php echo $covidhelper->getIconHtml($tmpstudent['uid']); ?></td>
+					</tr>
+<?php
+	$lfdnr++;
+}
+?>
+				</tbody>
+			</table>
+	
+		</div>
+	</div>
+
+<?php
+if( $debug ) 
+{
+?>
+	<div class="row">
+		<div class="col-lg-6">
+			
+			<div class="debug">
+				<pre>
+<?php
+print_r($data);
+print_r($covidstatus);
+?>
+				</pre>
+			</div>
+			
+		</div>
+	</div>
+<?php
+}
+?>
+
+</div>
+
+</body>
+</html>

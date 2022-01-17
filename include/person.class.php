@@ -24,6 +24,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/udf.class.php');
 
 class person extends basis_db
 {
@@ -64,6 +65,7 @@ class person extends basis_db
 	public $foto_sperre = false;	// boolean
 	public $matr_nr;			//varchar(32)
 	public $bpk; 				//varchar(255)
+	public $udf_values;				//json
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional eine Person
@@ -84,6 +86,8 @@ class person extends basis_db
 	 **/
 	public function load($personId)
 	{
+		$udf = new UDF();
+
 		//person_id auf gueltigkeit pruefen
 		if (is_numeric($personId) && $personId != '')
 		{
@@ -91,8 +95,11 @@ class person extends basis_db
 							gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 							familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
 							geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre,
-							matr_nr, bpk
-					  FROM public.tbl_person
+							matr_nr, bpk";
+			if ($hasUDF = $udf->personHasUDF())
+				$qry .= ", udf_values ";
+
+			$qry .= "FROM public.tbl_person
 					 WHERE person_id = " . $this->db_add_param($personId, FHC_INTEGER);
 
 			if (!$this->db_query($qry))
@@ -135,6 +142,10 @@ class person extends basis_db
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$this->matr_nr = $row->matr_nr;
 				$this->bpk = $row->bpk;
+				if ($hasUDF)
+				{
+					$this->udf_values = $row->udf_values;
+				}
 			}
 			else
 			{

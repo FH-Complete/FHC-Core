@@ -455,42 +455,50 @@ function intersect($str1, $str2)
  * Konvertiert Problematische Sonderzeichen in Strings fuer
  * Accountnamen und EMail-Aliase
  *
- * @param $str
- * @return bereinigter String
+ * @param string $str Inputparameter.
+ * @return string bereinigter String.
  */
 function convertProblemChars($str)
 {
 	$enc = 'UTF-8';
 
 	$acentos = array(
-   'A' => '/&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Aring;/',
-   'Ae' => '/&Auml;/',
-   'a' => '/&agrave;|&aacute;|&acirc;|&atilde;|&aring;/',
-   'ae'=> '/&auml;/',
-   'C' => '/&Ccedil;/',
-   'c' => '/&ccedil;/',
-   'E' => '/&Egrave;|&Eacute;|&Ecirc;|&Euml;/',
-   'e' => '/&egrave;|&eacute;|&ecirc;|&euml;/',
-   'I' => '/&Igrave;|&Iacute;|&Icirc;|&Iuml;/',
-   'i' => '/&igrave;|&iacute;|&icirc;|&iuml;/',
-   'N' => '/&Ntilde;/',
-   'n' => '/&ntilde;/',
-   'O' => '/&Ograve;|&Oacute;|&Ocirc;|&Otilde;/',
-   'Oe' => '/&Ouml;/',
-   'o' => '/&ograve;|&oacute;|&ocirc;|&otilde;/',
-   'oe' => '/&ouml;/',
-   'U' => '/&Ugrave;|&Uacute;|&Ucirc;/',
-   'Ue' => '/&Uuml;/',
-   'u' => '/&ugrave;|&uacute;|&ucirc;/',
-   'ue' => '/&uuml;/',
-   'Y' => '/&Yacute;/',
-   'y' => '/&yacute;|&yuml;/',
-   'a.' => '/&ordf;/',
-   'o.' => '/&ordm;/',
-   'ss' => '/&szlig;/'
+    'A' => '/&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Aring;|&Abreve;|Ǎ/',
+    'Ae' => '/&Auml;/',
+    'a' => '/&agrave;|&aacute;|&acirc;|&atilde;|&aring;|&abreve;|ǎ/',
+    'ae' => '/&auml;/',
+    'C' => '/&Ccedil;|&Ccaron;/',
+    'c' => '/&ccedil;|&ccaron;/',
+    'E' => '/&Egrave;|&Eacute;|&Ecirc;|&Euml;/',
+    'e' => '/&egrave;|&eacute;|&ecirc;|&euml;/',
+    'I' => '/&Igrave;|&Iacute;|&Icirc;|&Iuml;|Ǐ/',
+    'i' => '/&igrave;|&iacute;|&icirc;|&iuml;|ǐ/',
+    'N' => '/&Ntilde;|&Ncaron;|&ncaron;/',
+    'n' => '/&ntilde;/',
+    'O' => '/&Ograve;|&Oacute;|&Ocirc;|&Otilde;|Ǒ/',
+    'Oe' => '/&Ouml;/',
+    'o' => '/&ograve;|&oacute;|&ocirc;|&otilde;|ǒ/',
+    'oe' => '/&ouml;/',
+    'R' => '/&Rcaron;/',
+    'r' => '/&rcaron;/',
+    'S' => '/&Scaron;/',
+    's' => '/&scaron;/',
+    'T' => '/&Tcaron;/',
+    't' => '/&tcaron;/',
+    'U' => '/&Ugrave;|&Uacute;|&Ucirc;|&Ubreve;|Ǔ/',
+    'Ue' => '/&Uuml;/',
+    'u' => '/&ugrave;|&uacute;|&ucirc;|&ubreve;|ǔ/',
+    'ue' => '/&uuml;/',
+    'Y' => '/&Yacute;/',
+    'y' => '/&yacute;|&yuml;/',
+    'Z' => '/&Zcaron;/',
+    'z' => '/&zcaron;/',
+    'a.' => '/&ordf;/',
+    'o.' => '/&ordm;/',
+    'ss' => '/&szlig;/'
 	);
 
-	return preg_replace($acentos, array_keys($acentos), htmlentities($str,ENT_NOQUOTES, $enc));
+	return preg_replace($acentos, array_keys($acentos), htmlentities($str, ENT_NOQUOTES | ENT_HTML5, $enc));
 }
 
 //Ersetzt alle Problemzeichen in einem String bevor dieser als xml oder rdf ausgegeben wird
