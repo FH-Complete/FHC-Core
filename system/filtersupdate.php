@@ -902,9 +902,9 @@ $filters = array(
 				],
 				"filters": [
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "ncontains",
-						"condition": "behoben"
+						"condition": "resolved"
 					},
 					{
 						"name": "Hauptzuständig",
@@ -973,9 +973,9 @@ $filters = array(
 						"option": "days"
 					},
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "contains",
-						"condition": "behoben"
+						"condition": "resolved"
 					}
 				]
 			}
