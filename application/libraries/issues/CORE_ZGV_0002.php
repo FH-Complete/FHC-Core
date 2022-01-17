@@ -10,7 +10,7 @@ class CORE_ZGV_0002 implements IIssueResolvedChecker
 	public function checkIfIssueIsResolved($params)
 	{
 		if (!isset($params['prestudent_id']) || !is_numeric($params['prestudent_id']))
-			return error('Prestudent Id missing');
+			return error('Prestudent Id missing, issue_id: '.$params['issue_id']);
 
 		$this->_ci =& get_instance(); // get code igniter instance
 

@@ -51,7 +51,7 @@ abstract class IssueResolver_Controller extends JOB_Controller
 				// add person id and oe kurzbz automatically as params, merge it with additional params
 				// decode bewerbung_parameter into assoc array
 				$params = array_merge(
-					array('issue_person_id' => $issue->person_id, 'issue_oe_kurzbz' => $issue->oe_kurzbz),
+					array('issue_id' => $issue->issue_id, 'issue_person_id' => $issue->person_id, 'issue_oe_kurzbz' => $issue->oe_kurzbz),
 					isset($issue->behebung_parameter) ? json_decode($issue->behebung_parameter, true) : array()
 				);
 

@@ -85,7 +85,7 @@ class IssuesLib
 	 * @param bool $force_predefined if true, only predefined (with entry in fehler table) external issues are added
 	 * @return object success or error
 	 */
-	public function addExternalIssue($fehlercode_extern, $inhalt_extern, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null/* $resolve_params = null*//*, $force_predefined = false*/)
+	public function addExternalIssue($fehlercode_extern, $inhalt_extern, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null)
 	{
 		if (isEmptyString($fehlercode_extern))
 			return error("fehlercode_extern missing");
@@ -109,11 +109,6 @@ class IssuesLib
 			// if found, use the code
 			$fehlercode = $fehlerData->fehlercode;
 		}
-		/*elseif ($force_predefined === true)
-		{
-			// only added if predefined
-			return success("Keine Definition gefunden - Issue nicht hinzugefügt");
-		}*/
 		else
 		{
 			// if predefined error is not found, insert with fallback code

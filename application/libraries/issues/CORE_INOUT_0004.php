@@ -10,7 +10,7 @@ class CORE_INOUT_0004 implements IIssueResolvedChecker
 	public function checkIfIssueIsResolved($params)
 	{
 		if (!isset($params['bisio_id']) || !is_numeric($params['bisio_id']))
-			return error('Bisio Id missing');
+			return error('Bisio Id missing, issue_id: '.$params['issue_id']);
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
