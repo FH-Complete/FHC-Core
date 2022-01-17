@@ -23,6 +23,8 @@ abstract class IssueResolver_Controller extends JOB_Controller
 	 */
 	public function run()
 	{
+		$this->logInfo("Issue resolve job started");
+
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(array_keys($this->_codeLibMappings));
 
@@ -87,5 +89,7 @@ abstract class IssueResolver_Controller extends JOB_Controller
 				}
 			}
 		}
+
+		$this->logInfo("Issue resolve job ended");
 	}
 }
