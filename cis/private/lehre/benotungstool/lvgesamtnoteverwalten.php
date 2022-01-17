@@ -736,6 +736,7 @@ else
 	die($p->t('global/fehleraufgetreten'));
 
 // Kopfzeile
+
 echo '
 <table width="100%">
 	<tr>
@@ -1144,7 +1145,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			$eintrag = '';
 			foreach ($output as $k)
 			{
-				if($k->mobilitaetstyp_kurzbz == 'GS')
+				if(($k->mobilitaetstyp_kurzbz == 'GS') && ($k->studiensemester_kurzbz == $stsem))
 			 	$eintrag = ' (d.d.)';
 			}
 			$grades[$row_stud->uid]['mobility'] = $eintrag;
