@@ -233,6 +233,7 @@ else
 		$lines++;
 		while($elem = $db->db_fetch_object($result))
 		{
+			$note='';
 			if(!preg_match('*dummy*',$elem->uid) && $elem->semester!=10)
 	   		{
 	   			if($elem->status!='Abbrecher' && $elem->status!='Unterbrecher')
@@ -250,12 +251,12 @@ else
 						$inc.=' (ar)';
 						$note='ar';
 					}
+
 					if ($elem->mobilitaetstyp_kurzbz !='' && $elem->doubledegree == 1) //dd-Program
 					{
 						$inc.=' (dd)';
 					}
-					else
-						$note='';
+
 					$worksheet->write($lines,1,$elem->uid);
 					$worksheet->write($lines,2,$elem->nachname.$inc);
 					$worksheet->write($lines,3,$elem->vorname);
