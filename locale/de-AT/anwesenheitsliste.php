@@ -1,5 +1,5 @@
 <?php
-$this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='Studiensemester ist ungueltig'; 
+$this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='Studiensemester ist ungueltig';
 $this->phrasen['anwesenheitsliste/anwesenheitslisten']='Anwesenheitslisten';
 $this->phrasen['anwesenheitsliste/covidstatuslisten']='Nachweislisten';
 $this->phrasen['anwesenheitsliste/notenlisten']='Notenlisten';
@@ -19,4 +19,5 @@ $this->phrasen['anwesenheitsliste/keineStundenvorhanden']='Derzeit sind keine St
 $this->phrasen['anwesenheitsliste/keineEintraegeGefunden']='Es wurden keine Einträge gefunden';
 $this->phrasen['anwesenheitsliste/anleitungImportFunktion']='Kopieren Sie diese Zellen in die Zwischenablage, um damit die Import-Spalte des Gesamtnotenformulars zu befüllen';
 $this->phrasen['anwesenheitsliste/angerechnet']='Angerechnet';
+$this->phrasen['anwesenheitsliste/internangerechnet']='Intern angerechnet';
 ?>

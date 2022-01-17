@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 /*
  * Erstellt Notenliste im Excel Format
@@ -207,9 +208,9 @@ else
 	WHERE prestudent_id=tbl_student.prestudent_id
 	ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 	tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
-	tbl_zeugnisnote.note,tbl_mobilitaet.mobilitaetstyp_kurzbz
-	FROM
-	campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+	tbl_zeugnisnote.note,tbl_mobilitaet.mobilitaetstyp_kurzbz,
+	(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN '1' ELSE '' END) as doubledegree
+	FROM campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
 	JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
 	LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 	LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
@@ -224,7 +225,7 @@ else
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 
-	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
+	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
 
 	if($result = $db->db_query($qry))
 	{
@@ -249,7 +250,7 @@ else
 						$inc.=' (ar)';
 						$note='ar';
 					}
-					if($elem->mobilitaetstyp_kurzbz !='') //dd-Program
+					if ($elem->mobilitaetstyp_kurzbz !='' && $elem->doubledegree == 1) //dd-Program
 					{
 						$inc.=' (dd)';
 					}
@@ -305,6 +306,7 @@ else
 	$worksheet->write(++$lines,0,'(i)  ... Incoming');
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
 	$worksheet->write(++$lines,0,'(ar) ... '.$p->t('anwesenheitsliste/angerechnet'));
+	$worksheet->write(++$lines,0,'(iar) ... '.$p->t('anwesenheitsliste/internangerechnet'));
 	$worksheet->write(++$lines,0,'(dd) ... Double Degree Program');
 
 	$worksheet->setColumn(0, 0, 5);
