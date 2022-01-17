@@ -20,6 +20,7 @@ class InfoCenter extends Auth_Controller
 	const INDEX_PAGE = 'index';
 	const FREIGEGEBEN_PAGE = 'freigegeben';
 	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
+	const ABGEWIESEN_PAGE = 'abgewiesen';
 	const SHOW_DETAILS_PAGE = 'showDetails';
 	const SHOW_ZGV_DETAILS_PAGE = 'showZGVDetails';
 	const ZGV_UBERPRUEFUNG_PAGE = 'ZGVUeberpruefung';
@@ -107,6 +108,7 @@ class InfoCenter extends Auth_Controller
 			array(
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
+				'abgewiesen' => 'infocenter:r',
 				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
 				'showZGVDetails' => 'lehre/zgvpruefung:r',
@@ -204,6 +206,16 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
+	 * Abgewiesen page of the InfoCenter tool
+	 */
+	public function abgewiesen()
+	{
+		$this->_setNavigationMenu(self::ABGEWIESEN_PAGE); // define the navigation menu for this page
+
+		$this->load->view('system/infocenter/infocenterAbgewiesen.php');
+	}
+
+	/**
 	 *
 	 */
 	public function reihungstestAbsolviert()
@@ -297,6 +309,13 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$persondata = $this->_loadPersonData($person_id);
+
+		$checkPerson = $this->PersonModel->checkDuplicate($person_id);
+
+		if (isError($checkPerson)) show_error(getError($checkPerson));
+
+		$duplicate = array('duplicated' => getData($checkPerson));
+
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
 		$this->DokumentModel->addOrder('bezeichnung');
@@ -305,7 +324,8 @@ class InfoCenter extends Auth_Controller
 		$data = array_merge(
 			$persondata,
 			$prestudentdata,
-			$dokumentdata
+			$dokumentdata,
+			$duplicate
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
@@ -734,7 +754,7 @@ class InfoCenter extends Auth_Controller
 
 		if (hasData($lastStatus) && hasData($statusgrresult))
 		{
-			//check if still Interessent
+			//check if still Interessent, Bewerber or Wartender
 			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS
 				|| $lastStatus->retval[0]->status_kurzbz === self::BEWERBERSTATUS
 				|| $lastStatus->retval[0]->status_kurzbz === self::WARTENDER)
@@ -913,7 +933,8 @@ class InfoCenter extends Auth_Controller
 
 					$this->_log($person_id, 'freigegeben', $logparams);
 
-					$this->_sendFreigabeMail($prestudent_id);
+					if (is_numeric($statusgrund_id) || $logdata['studiengang_typ'] === 'm')
+						$this->_sendFreigabeMail($prestudent_id);
 				}
 			}
 		}
@@ -1191,6 +1212,10 @@ class InfoCenter extends Auth_Controller
 		{
 			$this->_setNavigationMenu(self::REIHUNGSTESTABSOLVIERT_PAGE);
 		}
+		elseif (strpos($navigation_page, self::ABGEWIESEN_PAGE) !== false)
+		{
+			$this->_setNavigationMenu(self::ABGEWIESEN_PAGE);
+		}
 
 		$this->outputJsonSuccess('success');
 	}
@@ -1414,12 +1439,14 @@ class InfoCenter extends Auth_Controller
 
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
+		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
 		{
 			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$abgewiesenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1458,6 +1485,18 @@ class InfoCenter extends Auth_Controller
 					null, 				// subscriptLinkValue
 					'', 				// target
 					20   				// sort
+				),
+				'abgewiesen' => $this->navigationlib->oneLevel(
+					'Abgewiesene',		// description
+					$abgewiesenLink,				// link
+					null,				// children
+					'close',					// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					30   				// sort
 				)
 			)
 		);
@@ -1483,6 +1522,8 @@ class InfoCenter extends Auth_Controller
 		}
 		if ($origin_page === self::ZGV_UBERPRUEFUNG_PAGE)
 			$link = site_url(self::ZGV_UEBERPRUEFUNG_URI);
+		if ($origin_page === self::ABGEWIESEN_PAGE)
+			$link = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
 
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
@@ -1520,6 +1561,7 @@ class InfoCenter extends Auth_Controller
 		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
+		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
@@ -1575,6 +1617,24 @@ class InfoCenter extends Auth_Controller
 					null, 				// subscriptLinkValue
 					'', 				// target
 					30   				// sort
+				)
+			);
+		}
+		if($page == self::ABGEWIESEN_PAGE)
+		{
+			$this->navigationlib->setSessionElementMenu(
+				'abgewiesen',
+				$this->navigationlib->oneLevel(
+					'Abgewiesene',		// description
+					$abgewiesenLink,	// link
+					null,				// children
+					'close',			// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					40   				// sort
 				)
 			);
 		}
@@ -2134,17 +2194,18 @@ class InfoCenter extends Auth_Controller
 	{
 		$statusgrund = $this->input->post('statusgrund');
 		$studiengang = $this->input->post('studiengang');
+		$abgeschickt = $this->input->post('abgeschickt');
 		$personen = $this->input->post('personen');
 		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
 
-		if ($statusgrund === 'null' || $studiengang === 'null' || empty($personen))
-			$this->terminateWithJsonError("Bitte Statusgrund, Studiengang und Personen auswählen.");
+		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
+			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
 
 		foreach($personen as $person)
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester);
+			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
 
-			if(!hasData($prestudent))
+			if (!hasData($prestudent))
 				continue;
 
 			$prestudentData = getData($prestudent);

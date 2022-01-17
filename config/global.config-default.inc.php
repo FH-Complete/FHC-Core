@@ -194,6 +194,9 @@ define('REIHUNGSTEST_CHECK', true);
 // Bei Statuswechsel auf Bewerber bzw. Student -> soll ZGV brücksichtigt werden
 define('ZGV_CHECK', true);
 
+define ('ZGV_DOKTOR_ANZEIGEN', false);
+define ('ZGV_ERFUELLT_ANZEIGEN', false);
+
 // Bei Statuswechsel auf Bewerber -> bei true wird email (INFOMAIL_BEWERBER) an den Bewerber geschickt
 define('SEND_BEWERBER_INFOMAIL', false);
 

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 fhcomplete.org
+/* Copyright (C) 2021 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
- * 			Stefan Puraner	<puraner@technikum-wien.at>
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ * 			Stefan Puraner	<puraner@technikum-wien.at> and
+ *			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once(dirname(__FILE__) . '/basis_db.class.php');
 require_once(dirname(__FILE__) . '/functions.inc.php');
@@ -2438,6 +2439,44 @@ class lehrveranstaltung extends basis_db
 					tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."
 					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 				ORDER BY sort LIMIT 1";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->mitarbeiter_uid;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Eintrag gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt den LV-Leiter einer Lehrveranstaltung
+	 * ist keiner der Lektoren als LV-Leitung eingetragen, wird Null zurückgegeben
+	 * @param int $lehrveranstaltung_id ID der Lehrveranstaltung.
+	 * @param char $studiensemester_kurzbz Studiensemester.
+	 * @return char $mitarbeiter_uid UID des Mitarbeiters oder NULL, wenn keine LV-Leitung vorhanden
+	 */
+	public function getEingetrageneLVLeitung($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					mitarbeiter_uid
+				FROM
+					lehre.tbl_lehreinheit
+					JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+				WHERE
+					tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."
+					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND lehrfunktion_kurzbz='LV-Leitung';";
 
 		if($result = $this->db_query($qry))
 		{

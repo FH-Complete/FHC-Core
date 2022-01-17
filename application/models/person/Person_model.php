@@ -152,34 +152,36 @@ class Person_model extends DB_Model
 	 */
 	public function getPersonStammdaten($person_id, $zustellung_only = false)
 	{
-		$this->addSelect('public.tbl_person.*, s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addSelect('public.tbl_person.*, tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code, tbl_person.geburtsnation AS geburtsnation_code, 
+		s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
 		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
 		$this->addJoin('bis.tbl_nation g', 'public.tbl_person.geburtsnation = g.nation_code', 'LEFT');
 
 		$person = $this->load($person_id);
 
-		if($person->error) return $person;
+		if (isError($person)) return $person;
 
 		//return null if not found
-		if(count($person->retval) < 1)
+		if (!hasData($person))
 			return success(null);
 
-		$this->KontaktModel->addDistinct();
 		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
 		$this->KontaktModel->addOrder('kontakttyp');
+		$this->KontaktModel->addOrder('insertamum', 'DESC');
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);
 		$kontakte = $this->KontaktModel->loadWhere($where);
-		if($kontakte->error) return $kontakte;
+		if (isError($kontakte)) return $kontakte;
 
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
 		$this->AdresseModel->addSelect('public.tbl_adresse.*, bis.tbl_nation.kurztext AS nationkurztext');
 		$this->AdresseModel->addJoin('bis.tbl_nation', 'tbl_adresse.nation = tbl_nation.nation_code', 'LEFT');
+		$this->AdresseModel->addOrder('insertamum', 'DESC');
 		$adressen = $this->AdresseModel->loadWhere($where);
-		if($adressen->error) return $adressen;
+		if (isError($adressen)) return $adressen;
 
-		$stammdaten = $person->retval[0];
-		$stammdaten->kontakte = $kontakte->retval;
-		$stammdaten->adressen = $adressen->retval;
+		$stammdaten = getData($person)[0];
+		$stammdaten->kontakte = hasData($kontakte) ? getData($kontakte) : array();
+		$stammdaten->adressen = hasData($adressen) ? getData($adressen) : array();
 
 		return success($stammdaten);
 	}
@@ -262,5 +264,20 @@ class Person_model extends DB_Model
 		}
 		
 		return success($result->vorname. ' '. $result->nachname);
+	}
+
+	public function checkDuplicate($person_id)
+	{
+		$qry = "SELECT sp.person_id
+		FROM public.tbl_person p 
+		LEFT JOIN public.tbl_person sp ON p.vorname = sp.vorname
+			AND p.nachname = sp.nachname 
+			AND p.gebdatum = sp.gebdatum 
+		JOIN public.tbl_prestudent ps ON sp.person_id = ps.person_id
+		JOIN public.tbl_prestudentstatus pss ON ps.prestudent_id = pss.prestudent_id
+		WHERE p.person_id = ? AND sp.person_id != ? AND pss.status_kurzbz = ?";
+
+
+		return $this->execQuery($qry, array($person_id, $person_id, 'Abbrecher'));
 	}
 }
