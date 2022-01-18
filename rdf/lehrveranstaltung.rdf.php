@@ -75,7 +75,7 @@ $lehrveranstaltung=new lehrveranstaltung();
 if($student_uid!='')
 {
 	$lehrveranstaltung->load_lva_student($student_uid);
-	if ($stg_kz !== '')
+	if (!is_null($stg_kz) && $stg_kz !== '')
 		$lehrveranstaltung->load_lva($stg_kz);
 }
 elseif($lehrveranstaltung_kompatibel_id!='')
