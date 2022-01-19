@@ -981,6 +981,31 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'dataset_name' => 'projektuebersicht',
+		'filter_kurzbz' => 'alleProjekte',
+		'description' => '{Projektübersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Projektübersicht",
+				"columns": [
+					{"name": "ProjectWorkID"},
+					{"name": "ErstNachname"},
+					{"name": "ErstAbgeschickt"},
+					{"name": "ZweitNachname"},
+					{"name": "ZweitAbgeschickt"},
+					{"name": "StudentNachname"},
+					{"name": "Note"},
+					{"name": "Abgabedatum"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 
