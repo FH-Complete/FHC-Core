@@ -412,28 +412,31 @@ class approveAnrechnungDetail extends Auth_Controller
 	{
 		$result = $this->AnrechnungModel->load($anrechnung_id);
 
-		if(!$result = getData($result)[0])
+		if(!hasData($result))
 		{
 			show_error('Failed loading Anrechnung');
 		}
-
+		
 		$result = $this->LehrveranstaltungModel->loadWhere(array(
-			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
+			'lehrveranstaltung_id' => getData($result)[0]->lehrveranstaltung_id
 		));
 
-		if(!$result = getData($result)[0])
+		if(!hasData($result))
 		{
 			show_error('Failed loading Lehrveranstaltung');
 		}
 
 		// Get STGL
-		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
-
-		if($result = getData($result)[0])
+		$result = $this->StudiengangModel->getLeitung(getData($result)[0]->studiengang_kz);
+		
+		if (hasData($result))
 		{
-			if ($result->uid == $this->_uid)
+			foreach (getData($result) as $stgl)
 			{
-				return;
+				if ($stgl->uid == $this->_uid)
+				{
+					return;
+				}
 			}
 		}
 
