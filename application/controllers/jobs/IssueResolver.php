@@ -10,6 +10,7 @@ class IssueResolver extends IssueResolver_Controller
 		parent::__construct();
 
 		// set fehler codes which can be resolved by the job
+		// structure: fehlercode => class (library) name for resolving
 		$this->_codeLibMappings = array(
 			'CORE_ZGV_0001' => 'CORE_ZGV_0001',
 			'CORE_ZGV_0002' => 'CORE_ZGV_0002',
