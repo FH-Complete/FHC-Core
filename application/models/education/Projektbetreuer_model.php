@@ -43,6 +43,31 @@ class Projektbetreuer_model extends DB_Model
     }
 
 	/**
+	 * Checks if a Projektarbeit has a Betreuer of a certain type
+	 * @param int $projektarbeit_id
+	 * @param string $betreuerart_kurzbz
+	 * @return array success with number of Betreuer or error
+	 */
+	public function getBetreuerOfProjektarbeit($projektarbeit_id, $betreuerart_kurzbz)
+	{
+		$this->addSelect('pers.person_id, betreuerart_kurzbz, vorname, nachname, 
+							anrede, titelpre, titelpost, gebdatum, geschlecht,
+							ben.uid, ben.aktiv as benutzer_aktiv, ben.alias, student_uid');
+		$this->addJoin('lehre.tbl_projektarbeit', 'projektarbeit_id');
+		$this->addJoin('public.tbl_person pers', 'person_id');
+		$this->addJoin('public.tbl_benutzer ben', 'person_id', 'LEFT');
+		$this->addOrder('pers.person_id');
+
+		return $this->loadWhere(
+			array(
+				'projektarbeit_id' => $projektarbeit_id,
+				'betreuerart_kurzbz' => $betreuerart_kurzbz,
+				'ben.aktiv' => true
+			)
+		);
+	}
+
+	/**
 	 * Get Projektbetreuer data by authentification token
 	 * @param $zugangstoken
 	 * @return object
@@ -99,7 +124,7 @@ class Projektbetreuer_model extends DB_Model
 	 * Generiert neuen Token für externen Zweitbetreuer.
 	 * @param int $zweitbegutachter_person_id
 	 * @param int $projektarbeit_id
-	 * @return object | bool
+	 * @return array
 	 */
 	public function generateZweitbegutachterToken($zweitbegutachter_person_id, $projektarbeit_id)
 	{
@@ -136,5 +161,7 @@ class Projektbetreuer_model extends DB_Model
 
 			return $result;
 		}
+		else
+			return success("Account vorhanden, kein Token benötigt");
 	}
 }

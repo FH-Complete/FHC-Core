@@ -9873,6 +9873,83 @@ Any unusual occurrences
 		)
 	),
 	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'kommissionellePruefungHinweis',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dies ist eine zur kommissionellen Wiederholungsprüfung vorgelegte Bachelorarbeit. Die Note sollte daher erst nach Abstimmung mit allen Kommissionsmitgliedern abgesendet werden.',
+				'description' => '',
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This bachelor thesis is submitted for the Bachelor Examination before a Committee. It should be graded after consultation with all committee members.',
+				'description' => '',
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'kommissionMailSenden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Infomail an Kommissionsmitglieder senden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sent info mail to commission members',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'kommissionMailGesendet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mail an Kommissionsmitglieder gesendet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sent mail to commission members',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'kommissionMailFehler',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Senden der Mail an Kommission',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when sending mail to commission members',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
 		'phrase' => 'anerkennungNachgewiesenerKenntnisse',
