@@ -72,20 +72,21 @@ abstract class IssueResolver_Controller extends JOB_Controller
 				if (isError($issueResolvedRes))
 				{
 					$this->logError(getError($issueResolvedRes));
-					return;
 				}
-
-				$issueResolvedData = getData($issueResolvedRes);
-
-				if ($issueResolvedData === true)
+				else
 				{
-					// set issue to resolved if needed
-					$behobenRes = $this->issueslib->setBehoben($issue->issue_id, null);
+					$issueResolvedData = getData($issueResolvedRes);
 
-					if (isError($behobenRes))
-						$this->logError(getError($behobenRes));
-					else
-						$this->logInfo("Issue ".$issue->issue_id." successfully resolved");
+					if ($issueResolvedData === true)
+					{
+						// set issue to resolved if needed
+						$behobenRes = $this->issueslib->setBehoben($issue->issue_id, null);
+
+						if (isError($behobenRes))
+							$this->logError(getError($behobenRes));
+						else
+							$this->logInfo("Issue " . $issue->issue_id . " successfully resolved");
+					}
 				}
 			}
 		}
