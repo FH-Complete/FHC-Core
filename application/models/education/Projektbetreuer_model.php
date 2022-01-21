@@ -43,28 +43,29 @@ class Projektbetreuer_model extends DB_Model
     }
 
 	/**
-	 * Checks if a Projektarbeit has a Betreuer of a certain type
+	 * Gets Betreuer of a certain Type of a Projektarbeit.
 	 * @param int $projektarbeit_id
 	 * @param string $betreuerart_kurzbz
 	 * @return array success with number of Betreuer or error
 	 */
 	public function getBetreuerOfProjektarbeit($projektarbeit_id, $betreuerart_kurzbz)
 	{
-		$this->addSelect('pers.person_id, betreuerart_kurzbz, vorname, nachname, 
-							anrede, titelpre, titelpost, gebdatum, geschlecht,
-							ben.uid, ben.aktiv as benutzer_aktiv, ben.alias, student_uid');
-		$this->addJoin('lehre.tbl_projektarbeit', 'projektarbeit_id');
-		$this->addJoin('public.tbl_person pers', 'person_id');
-		$this->addJoin('public.tbl_benutzer ben', 'person_id', 'LEFT');
-		$this->addOrder('pers.person_id');
+		$qry = "SELECT pers.person_id, betreuerart_kurzbz, vorname, nachname,
+				anrede, titelpre, titelpost, gebdatum, geschlecht,
+				ben.uid, ben.alias, ma.personalnummer, mitarbeiter_uid, student_uid
+			FROM lehre.tbl_projektarbeit
+			JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
+			JOIN public.tbl_person pers USING (person_id)
+			LEFT JOIN public.tbl_benutzer ben USING (person_id)
+			LEFT JOIN public.tbl_mitarbeiter ma ON ben.uid =  ma.mitarbeiter_uid
+			WHERE ben.aktiv
+			AND projektarbeit_id = ?
+			AND betreuerart_kurzbz = ?
+			ORDER BY CASE WHEN ma.mitarbeiter_uid IS NULL THEN 1 ELSE 0 END, /*Mitarbeiter first*/
+					CASE WHEN ben.uid IS NULL THEN 1 ELSE 0 END,
+         			ben.insertamum";
 
-		return $this->loadWhere(
-			array(
-				'projektarbeit_id' => $projektarbeit_id,
-				'betreuerart_kurzbz' => $betreuerart_kurzbz,
-				'ben.aktiv' => true
-			)
-		);
+		return $this->execQuery($qry, array($projektarbeit_id, $betreuerart_kurzbz));
 	}
 
 	/**
