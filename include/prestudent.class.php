@@ -2489,10 +2489,14 @@ class prestudent extends person
 		$qry = "SELECT
 					UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as kuerzel
 				FROM
-					public.tbl_prestudent
+					public.tbl_prestudent pt
 					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					JOIN public.tbl_studiengang USING (studiengang_kz)
 				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND NOT EXISTS
+						(SELECT * FROM public.tbl_prestudentstatus ps
+						WHERE ps.prestudent_id = pt.prestudent_id
+						AND status_kurzbz = 'Abbrecher' )
 					AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
 					AND typ in ('b','m','d')
 				ORDER BY status_kurzbz ASC
