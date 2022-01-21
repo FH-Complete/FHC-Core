@@ -5716,6 +5716,21 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_zeita
 	}
 }
 
+// Betreuerart 'Kommission' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_betreuerart WHERE betreuerart_kurzbz='Kommission'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO lehre.tbl_betreuerart(betreuerart_kurzbz,beschreibung,aktiv) VALUES('Kommission','Mitglied der Kommission',TRUE);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Betreuerart: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue Betreuerart Kommission in lehre.tbl_betreuerart hinzugefügt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
