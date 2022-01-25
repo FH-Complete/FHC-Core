@@ -51,9 +51,10 @@ class Projektbetreuer_model extends DB_Model
 	public function getBetreuerOfProjektarbeit($projektarbeit_id, $betreuerart_kurzbz)
 	{
 		$qry = "SELECT pers.person_id, betreuerart_kurzbz, vorname, nachname,
-				anrede, titelpre, titelpost, gebdatum, geschlecht,
+				trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
+				anrede, titelpre, titelpost, gebdatum, geschlecht, pa.projekttyp_kurzbz,
 				ben.uid, ben.alias, ma.personalnummer, mitarbeiter_uid, student_uid
-			FROM lehre.tbl_projektarbeit
+			FROM lehre.tbl_projektarbeit pa
 			JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
 			JOIN public.tbl_person pers USING (person_id)
 			LEFT JOIN public.tbl_benutzer ben USING (person_id)
