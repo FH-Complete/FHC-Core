@@ -44,13 +44,14 @@ class Projektbetreuer_model extends DB_Model
 
 	/**
 	 * Gets Betreuer of a certain Type of a Projektarbeit.
+	 * Returns one row for each person.
 	 * @param int $projektarbeit_id
 	 * @param string $betreuerart_kurzbz
 	 * @return array success with number of Betreuer or error
 	 */
 	public function getBetreuerOfProjektarbeit($projektarbeit_id, $betreuerart_kurzbz)
 	{
-		$qry = "SELECT pers.person_id, betreuerart_kurzbz, vorname, nachname,
+		$qry = "SELECT DISTINCT ON (pers.person_id) pers.person_id, betreuerart_kurzbz, vorname, nachname,
 				trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
 				anrede, titelpre, titelpost, gebdatum, geschlecht, pa.projekttyp_kurzbz,
 				ben.uid, ben.alias, ma.personalnummer, mitarbeiter_uid, student_uid
@@ -62,8 +63,8 @@ class Projektbetreuer_model extends DB_Model
 			WHERE ben.aktiv
 			AND projektarbeit_id = ?
 			AND betreuerart_kurzbz = ?
-			ORDER BY CASE WHEN ma.mitarbeiter_uid IS NULL THEN 1 ELSE 0 END, /*Mitarbeiter first*/
-					CASE WHEN ben.uid IS NULL THEN 1 ELSE 0 END,
+			ORDER BY pers.person_id, CASE WHEN ma.mitarbeiter_uid IS NULL THEN 1 ELSE 0 END, /*Mitarbeiter account first*/
+					CASE WHEN ben.uid IS NULL THEN 1 ELSE 0 END, /*user with account first*/
          			ben.insertamum";
 
 		return $this->execQuery($qry, array($projektarbeit_id, $betreuerart_kurzbz));
