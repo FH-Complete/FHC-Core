@@ -46,7 +46,7 @@ $sprache_obj = new sprache();
 $sprache_obj->load($sprache);
 $sprache_index = $sprache_obj->index;
 
-echo $uid = get_uid();
+$uid = get_uid();
 
 $mitarbeiter = new mitarbeiter();
 $mitarbeiter->getUntergebene($uid, true);
