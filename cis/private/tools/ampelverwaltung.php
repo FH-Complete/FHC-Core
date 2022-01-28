@@ -219,7 +219,8 @@ function getUserAmpelData($user)
 							'verfallszeit' => $row->verfallszeit,
 							'beschreibung' => $row->beschreibung,
 							'abgelaufen' => $abgelaufen,
-							'active' => $active);
+							'active' => $active,
+							'buttontext' => $row->buttontext);
 	}
 
 	return array($user_ampel_arr, $cnt_ueberfaellig);
@@ -491,7 +492,12 @@ function typeWrite(span){
 				<p><br></p>
 				<form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?ampel_id='. urlencode($user_ampel['ampel_id']) . '&type=bestaetigen'; ?>">
 					<button type="type" type="submit" class="btn btn-default pull-right"
-						<?php if ($user_ampel['abgelaufen'] || $user_ampel['bestaetigt']) echo 'disabled data-toggle="tooltip" data-placement="top" title="' . $p->t('tools/ampelBestaetigtAbgelaufen'). '"'?>><?php echo $p->t('global/bestaetigen') ?>
+						<?php if ($user_ampel['abgelaufen'] || $user_ampel['bestaetigt']) echo 'disabled data-toggle="tooltip" data-placement="top" title="' . $p->t('tools/ampelBestaetigtAbgelaufen'). '"'?>>
+						<?php
+							if ($user_ampel['buttontext'][$sprache] != '')
+								echo $user_ampel['buttontext'][$sprache];
+							else
+								echo $p->t('global/bestaetigen') ?>
 					</button>
 				</form>
 			</div>

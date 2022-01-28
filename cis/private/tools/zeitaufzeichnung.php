@@ -660,7 +660,7 @@ echo '
 		function checkPausenblock()
 		{
 			var sel = $("#aktivitaet").val();
-			var activities = ["Admin", "Lehre", "FuE", "Operativ", "Betrieb", "Design"];
+			var activities = ["Admin", "Lehre", "FuE", "Operativ", "Betrieb", "Design", "LVEntwicklung", "Weiterbildung", "FuEallg"];
 			if (activities.includes(sel))
 				showPausenblock();
 			else
