@@ -81,7 +81,7 @@ $monthtext = $monatsname[$sprache_index][$month - 1];
 $username = $benutzer->vorname." ".$benutzer->nachname;
 $mitarbeiter->load($uid);
 $persnr = $mitarbeiter->personalnummer;
-$persnr;
+
 $daysinmonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
 $date = new datum();
