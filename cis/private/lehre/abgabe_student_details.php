@@ -423,13 +423,13 @@ if($command=="update" && $error!=true)
 							}
 							else
 							{
-								// paarbeit sollte nur ab SS2021 online bewertet werden
+								// paarbeit sollte nur ab SS2022 online bewertet werden
 								$qry_sem="SELECT 1
 											FROM lehre.tbl_projektarbeit 
 											JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 											JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 											WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
-											AND tbl_studiensemester.start::date >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')::date
+											AND tbl_studiensemester.start::date >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2022')::date
 											LIMIT 1";
 
 								$result_sem=$db->db_query($qry_sem);
