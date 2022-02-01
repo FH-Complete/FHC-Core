@@ -8675,12 +8675,12 @@ Any unusual occurrences
 	array(
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'plagiatscheckUnauffaellig',
+		'phrase' => 'plagiatscheckBeschreibung',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Der Plagiatscheck ist unauffällig.',
+				'text' => 'Der Plagiatscheck wurde durchgeführt und bestätigt, dass der zentrale Inhalt der Arbeit im erforderlichen Ausmaß eigenständig verfasst wurde (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 18 Abs. 2 und 3).',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -8820,7 +8820,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Der Lösungsansatz ist dem Stand der Technik entsprechend argumentiert und zeigt ein adäquates Problemverständnis.',
+				'text' => 'Der Lösungsansatz ist für das Thema geeignet und entspricht dem Stand der Technik.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -8860,7 +8860,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die methodische Vorgangsweise ist in Bezug auf die Ausrichtung der Arbeit (technisch-ingenieurwissenschaftlich, sozial-wirtschaftswissenschaftlich…) angemessen, gut begründet und wird korrekt umgesetzt.',
+				'text' => 'Das Vorgehen ist in Bezug auf die fachspezifische Ausrichtung der Arbeit angemessen, anhand der Fachliteratur begründet und korrekt umgesetzt.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -8900,7 +8900,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Frage- bzw. Aufgabenstellungen wurden zielführend beantwortet; die Ergebnisse werden diskutiert.',
+				'text' => 'Die Ergebnisse werden im Lichte der Fragestellung interpretiert und kritisch diskutiert im Hinblick auf ihren Mehrwert für Forschung und/oder Berufspraxis. Visualisierungen unterstützen die Argumentation.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -9000,7 +9000,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Arbeit ist schlüssig aufgebaut und gut strukturiert.',
+				'text' => 'Die Arbeit ist schlüssig strukturiert.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -9040,7 +9040,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Der Stil entspricht einer wissenschaftlichen Arbeit. Die Arbeit ist flüssig lesbar und weist eine klare, eindeutige und gendergerechte Sprache auf.',
+				'text' => 'Rechtschreibung und Grammatik sind korrekt. Die Verwendung von Fachsprache ist angemessen. Die Anforderungen an gendergerechte Sprache sind nach den geltenden Richtlinien umgesetzt.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -9120,7 +9120,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die verwendeten Quellen sind passend, aktuell und werden ausreichend variiert.',
+				'text' => 'Quellen und Literatur sind für die wissenschaftliche Auseinandersetzung mit dem Thema der Arbeit relevant, geben den aktuellen Stand der Forschung wieder und decken das Thema ab.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -9340,13 +9340,33 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Liegt die Punkteanzahl bei den Kriterien "1 - 5" oder "6 - 10"  in Summe unter 50%%, ist die %s insgesamt als negativ zu beurteilen.',
+				'text' => 'Liegt die Punkteanzahl bei den Kriterien "1 - 5" oder "6 - 10"  in Summe unter 50%, ist die {0} insgesamt als negativ zu beurteilen.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'If the number of points for the criteria "1 - 5" or "6 - 10" is below 50%% in total, the %s is to be assessed as negative overall.',
+				'text' => 'If the number of points for the criteria "1 - 5" or "6 - 10" is below 50% in total, the {0} is to be assessed as negative overall.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'notenschluesselHinweisNullPunkteEinKriterium',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls ein Kriterium mit 0 Punkten bewertet wird, ist die {0} insgesamt als negativ zu beurteilen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If the number of points for one criteria is 0, the {0} is to be assessed as negative overall.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9540,7 +9560,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ist die Arbeit gut strukturiert?',
+				'text' => 'Ist die Arbeit schlüssig strukturiert?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -10064,6 +10084,86 @@ Any unusual occurrences
 			array(
 				'sprache' => 'English',
 				'text' => 'Commitee members',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'plagiatscheckNichtGesetzt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Plagiatscheck auffällig, negative Beurteilung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plagiarism check not passed, negative assessment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'titelBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Titel bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'titelGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Titel gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Title saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'plagiatscheckHinweisNegativeBeurteilung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '(Bei Plagiat wird die Arbeit negativ bewertet.)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '(Plagiarism leads to a negative grade.)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
