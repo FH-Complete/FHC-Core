@@ -1000,7 +1000,8 @@ $filters = array(
 					{"name": "ZweitAbgeschickt"},
 					{"name": "StudentNachname"},
 					{"name": "Note"},
-					{"name": "Abgabedatum"}
+					{"name": "Abgabedatum"},
+					{"name": "Studiengang"}
 				],
 				"filters": []
 			}
