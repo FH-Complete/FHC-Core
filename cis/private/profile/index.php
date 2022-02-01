@@ -274,7 +274,7 @@ if (!$ansicht)
 
 if (!$ansicht)
 {
-	if ($is_employee)
+	if ($type === 'mitarbeiter')
 	{
 		$verwendung = new bisverwendung();
 		if($verwendung->getLastVerwendung($uid))
