@@ -121,7 +121,7 @@ abstract class FHC_Controller extends CI_Controller
 	protected function terminateWithJsonError($message)
 	{
 		header('Content-Type: application/json');
-		echo json_encode(error($message));
+		echo json_encode(error($message)); // KEEP IT!!!
 		exit;
 	}
 
