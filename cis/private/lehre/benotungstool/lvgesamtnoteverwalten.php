@@ -1304,7 +1304,8 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			$hide = "style='display:none;visibility:hidden;'";
 		else
 			$hide = "style='display:block;visibility:visible;'";
-
+		
+		$ueberschreibbar = false;
 		if (! defined('CIS_GESAMTNOTE_UEBERSCHREIBEN') || CIS_GESAMTNOTE_UEBERSCHREIBEN || (! CIS_GESAMTNOTE_UEBERSCHREIBEN && is_null($znote)))
 		{
 			$htmlstring .= "<td valign='bottom' nowrap>
