@@ -52,6 +52,7 @@ $summe_stud = 0;
 $summe_t2 = 0;
 $summe_komm = 0;
 $summe_ng = 0;
+$ueberschreibbar = false;
 $grades = array();
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -1305,7 +1306,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		else
 			$hide = "style='display:block;visibility:visible;'";
 		
-		$ueberschreibbar = false;
+		
 		if (! defined('CIS_GESAMTNOTE_UEBERSCHREIBEN') || CIS_GESAMTNOTE_UEBERSCHREIBEN || (! CIS_GESAMTNOTE_UEBERSCHREIBEN && is_null($znote)))
 		{
 			$htmlstring .= "<td valign='bottom' nowrap>
