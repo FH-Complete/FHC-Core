@@ -230,7 +230,6 @@ require_once(dirname(__FILE__).'/../statistik.class.php');
 $statistik = new statistik();
 $statistik = $statistik->getMenueArray(1);
 $menu['Auswertung']=array_merge($menu['Auswertung'],$statistik);
-//var_dump($menu['Auswertung']);
 
 require_once(dirname(__FILE__).'/../addon.class.php');
 $addon_obj = new addon();
