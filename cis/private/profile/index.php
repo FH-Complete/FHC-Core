@@ -274,7 +274,7 @@ if (!$ansicht)
 
 if (!$ansicht)
 {
-	if ($is_employee)
+	if ($type === 'mitarbeiter')
 	{
 		$verwendung = new bisverwendung();
 		if($verwendung->getLastVerwendung($uid))
@@ -293,9 +293,35 @@ if (!$ansicht)
 	$adresse = new adresse();
 	$adresse->load_pers($user->person_id);
 
-	foreach($adresse->result as $a)
+	if ($type === 'mitarbeiter')
 	{
-		echo $a->strasse . "<b> (" . $a->bezeichnung_mehrsprachig[$sprache] .") </b>" . "<br>".$a->plz." ".$a->ort."<br><br>";
+		foreach ($adresse->result as $a)
+		{
+			echo $a->strasse . "<b> (" . $a->bezeichnung_mehrsprachig[$sprache] . ") </b>" . "<br>" . $a->plz . " " . $a->ort . "<br><br>";
+		}
+	}
+	else
+	{
+		function sortAdresse($a , $b)
+		{
+			if ($a->typ === $b->typ)
+				return 0;
+
+			return ($a->typ < $b->typ) ? -1 : 1;
+		}
+		usort($adresse->result, "sortAdresse");
+
+		foreach($adresse->result as $a)
+		{
+			if ($a->zustelladresse)
+			{
+				if ($a->bezeichnung_mehrsprachig[$sprache] !== NULL)
+				{
+					echo "<b>".$a->bezeichnung_mehrsprachig[$sprache].": </b><br>";
+					echo $a->strasse."<br>".$a->plz." ".$a->ort."<br><br>";
+				}
+			}
+		}
 	}
 }
 
