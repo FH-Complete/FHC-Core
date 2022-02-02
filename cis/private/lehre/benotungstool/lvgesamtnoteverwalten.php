@@ -52,7 +52,6 @@ $summe_stud = 0;
 $summe_t2 = 0;
 $summe_komm = 0;
 $summe_ng = 0;
-$ueberschreibbar = false;
 $grades = array();
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -1193,6 +1192,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 	foreach ($grades as $uid => $data)
 	//Ausgabe Array
 	{
+
 		$htmlstring .= '<tr class="liste' . ($i % 2) . '">
 			<td><a href="mailto:' . $uid . '@' . DOMAIN . '"><img src="../../../../skin/images/button_mail.gif"></a></td>
 			<td>' . $db->convert_html_chars($uid) . '</td>
@@ -1220,6 +1220,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		$negativeteilnote = false;
 		$note_zusatztext = '';
 		$note_zusatztext_tooltip = '';
+		$ueberschreibbar = false; //Damit keine Notice Fehler kommt muss Variable bei jeden Schleifendurchgang neue gesetzt und berechnet werden.
 
 		if (isset($data['grades']))
 		{
@@ -1305,8 +1306,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			$hide = "style='display:none;visibility:hidden;'";
 		else
 			$hide = "style='display:block;visibility:visible;'";
-		
-		
+
 		if (! defined('CIS_GESAMTNOTE_UEBERSCHREIBEN') || CIS_GESAMTNOTE_UEBERSCHREIBEN || (! CIS_GESAMTNOTE_UEBERSCHREIBEN && is_null($znote)))
 		{
 			$htmlstring .= "<td valign='bottom' nowrap>
