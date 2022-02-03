@@ -209,6 +209,7 @@ class lehrstunde extends basis_db
 		$sql_query='DELETE FROM '.$stpl_table;
 		$sql_query.=" WHERE $stpl_id=".$this->db_add_param($id);
 
+		$this->lastqry = $sql_query;
 		//Datenbankrequest
 		if (!$this->db_query($sql_query))
 		{

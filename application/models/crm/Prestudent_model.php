@@ -611,7 +611,7 @@ class Prestudent_model extends DB_Model
 		));
 	}
 
-	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester)
+	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt)
 	{
 		$query = "SELECT ps.prestudent_id
 					FROM public.tbl_prestudentstatus pss
@@ -621,8 +621,49 @@ class Prestudent_model extends DB_Model
 					WHERE ps.person_id = ?
 					AND UPPER((sg.typ || sg.kurzbz) || ':' || sp.orgform_kurzbz) = ?
 					AND pss.studiensemester_kurzbz = ?
-					";
+					AND";
+
+		if ($abgeschickt === 'true')
+			$query .= " EXISTS";
+		else
+			$query .= " NOT EXISTS";
+
+		$query .= " (SELECT 1 FROM public.tbl_prestudentstatus spss
+					JOIN public.tbl_prestudent sps USING(prestudent_id) 
+					WHERE sps.prestudent_id = ps.prestudent_id
+					AND spss.bewerbung_abgeschicktamum IS NOT NULL)";
 
 		return $this->execQuery($query, array($person, $studiengang, $studienSemester));
 	}
+
+	/**
+	 * Gets förderrelevant flag for a prestudent, from prestudent, or, if not set on prestudent level, from studiengang
+	 * @param int $prestudent_id
+	 * @return object
+	 */
+	public function getFoerderrelevant($prestudent_id)
+	{
+		$query = 'SELECT COALESCE (ps.foerderrelevant, stg.foerderrelevant) AS foerderrelevant
+					FROM public.tbl_prestudent ps
+					LEFT JOIN public.tbl_studiengang stg USING (studiengang_kz)
+					WHERE prestudent_id = ?';
+
+		return $this->execQuery($query, array($prestudent_id));
+	}
+
+	/**
+	 * Gets bis standort_code for a prestudent, from prestudent, or, if not set on prestudent level, from studiengang
+	 * @param int $prestudent_id
+	 * @return object
+	 */
+	public function getStandortCode($prestudent_id)
+	{
+		$query = 'SELECT COALESCE (ps.standort_code, stg.standort_code) AS standort_code
+					FROM public.tbl_prestudent ps
+					LEFT JOIN public.tbl_studiengang stg USING (studiengang_kz)
+					WHERE prestudent_id = ?';
+
+		return $this->execQuery($query, array($prestudent_id));
+	}
+
 }

@@ -347,7 +347,8 @@ $filters = array(
 					{"name": "vorname"},
 					{"name": "nachname"},
 					{"name": "svnr"},
-					{"name": "ersatzkennzeichen"}
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
 				],
 				"filters": []
 			}
@@ -467,6 +468,30 @@ $filters = array(
 						"operation": "ncontains"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'abgewiesen',
+		'filter_kurzbz' => 'InfoCenterAbgewiesenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Abgewiesen - Alle",
+				"columns": [
+					{"name": "PersonID"},
+					{"name": "PreStudentID"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"},
+					{"name": "AbgewiesenAm"},
+					{"name": "Nachricht"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,
@@ -851,6 +876,106 @@ $filters = array(
 						"operation": "lt",
 						"condition": "1",
 						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'offeneFehler',
+		'description' => '{Alle offenen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle offenen Fehler, hauptzuständig",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"}
+				],
+				"filters": [
+					{
+						"name": "Fehlerstatus",
+						"operation": "ncontains",
+						"condition": "behoben"
+					},
+					{
+						"name": "Hauptzuständig",
+						"operation": "contains",
+						"condition": "Ja"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetze7Tage',
+		'description' => '{Letzten 7 Tage}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"}
+				],
+				"filters": [
+					{
+						"name": "Datum",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetzte7TageBearbeitet',
+		'description' => '{Letzten 7 Tage bearbeitet}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"},
+					{"name": "Verarbeitet von"}
+				],
+				"filters": [
+					{
+						"name": "Verarbeitet am",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					},
+					{
+						"name": "Fehlerstatus",
+						"operation": "contains",
+						"condition": "behoben"
 					}
 				]
 			}

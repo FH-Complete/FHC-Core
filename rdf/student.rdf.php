@@ -127,14 +127,16 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif($filter2=='zgvohnedatum')
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
-		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum
+		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum,zgvdoktor_code, zgvdoktordatum
 			FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id);
 		if($db->db_query($qry))
 		{
 			if($row_filter = $db->db_fetch_object())
 			{
 				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='')
-				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
+				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum=='')
+				|| ($row_filter->zgvdoktor_code!='' && $row_filter->zgvdoktordatum=='')
+				)
 					return true;
 				else
 					return false;
@@ -161,15 +163,15 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif ( preg_match('/^stud-statusgrund-([0-9]+)$/', $filter2, $studstatusgrund) )
 	{
 	    // Alle Studenten mit Statusgrund in tbl_prestudentstatus
-	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus ps JOIN 
-				    public.tbl_prestudent p ON p.prestudent_id = ps.prestudent_id AND 
+	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus ps JOIN
+				    public.tbl_prestudent p ON p.prestudent_id = ps.prestudent_id AND
 				    ps. studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				    p. person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
-				    p.studiengang_kz=" . $db->db_add_param($studiengang_kz, FHC_INTEGER) . " AND 
+				    p.studiengang_kz=" . $db->db_add_param($studiengang_kz, FHC_INTEGER) . " AND
 				    ps.statusgrund_id = " . $db->db_add_param($studstatusgrund[1], FHC_INTEGER);
 	    //echo $qry . "\n";
-	    $filtered = ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) ) 
-		      ? true 
+	    $filtered = ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) )
+		      ? true
 		      : false;
 	    return $filtered;
 	}
@@ -214,6 +216,7 @@ function draw_content_liste($row)
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
 			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
+			<STUDENT:bpk><![CDATA['.$row->bpk.']]></STUDENT:bpk>
 
 			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 			<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
@@ -330,6 +333,7 @@ function draw_content($row)
 			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
 			<STUDENT:link_bewerbungstool><![CDATA['.CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.$row->zugangscode.'&emailAdresse='.$mail_privat.']]></STUDENT:link_bewerbungstool>
+			<STUDENT:bpk><![CDATA['.$row->bpk.']]></STUDENT:bpk>
 
 			<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
@@ -355,43 +359,60 @@ function draw_prestudent($row)
 	$prioRelativ = $prioRelativ->getRelativePriorisierungFromAbsolut($row->prestudent_id, $row->priorisierung);
 	if($row->prestudent_id!='')
 	{
-	echo '
-			<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
-			<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
-			<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
-			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
-			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
-			<STUDENT:berufstaetigkeit_code><![CDATA['.$row->berufstaetigkeit_code.']]></STUDENT:berufstaetigkeit_code>
-			<STUDENT:ausbildungcode><![CDATA['.$row->ausbildungcode.']]></STUDENT:ausbildungcode>
-			<STUDENT:zgv_code><![CDATA['.$row->zgv_code.']]></STUDENT:zgv_code>
-			<STUDENT:zgvort><![CDATA['.$row->zgvort.']]></STUDENT:zgvort>
-			<STUDENT:zgvdatum><![CDATA['.$datum_obj->convertISODate($row->zgvdatum).']]></STUDENT:zgvdatum>
-			<STUDENT:zgvdatum_iso><![CDATA['.$row->zgvdatum.']]></STUDENT:zgvdatum_iso>
-			<STUDENT:zgvnation><![CDATA['.$row->zgvnation.']]></STUDENT:zgvnation>
-			<STUDENT:zgvmas_code><![CDATA['.$row->zgvmas_code.']]></STUDENT:zgvmas_code>
-			<STUDENT:zgvmaort><![CDATA['.$row->zgvmaort.']]></STUDENT:zgvmaort>
-			<STUDENT:zgvmadatum><![CDATA['.$datum_obj->convertISODate($row->zgvmadatum).']]></STUDENT:zgvmadatum>
-			<STUDENT:zgvmadatum_iso><![CDATA['.$row->zgvmadatum.']]></STUDENT:zgvmadatum_iso>
-			<STUDENT:zgvmanation><![CDATA['.$row->zgvmanation.']]></STUDENT:zgvmanation>
-			<STUDENT:ausstellungsstaat><![CDATA['.$row->ausstellungsstaat.']]></STUDENT:ausstellungsstaat>
-			<STUDENT:aufnahmeschluessel><![CDATA['.$row->aufnahmeschluessel.']]></STUDENT:aufnahmeschluessel>
-			<STUDENT:facheinschlberuf><![CDATA['.($row->facheinschlberuf?'true':'false').']]></STUDENT:facheinschlberuf>
-			<STUDENT:reihungstest_id><![CDATA['.$row->reihungstest_id.']]></STUDENT:reihungstest_id>
-			<STUDENT:anmeldungreihungstest><![CDATA['.$datum_obj->convertISODate($row->anmeldungreihungstest).']]></STUDENT:anmeldungreihungstest>
-			<STUDENT:anmeldungreihungstest_iso><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:anmeldungreihungstest_iso>
-			<STUDENT:reihungstestangetreten><![CDATA['.($row->reihungstestangetreten?'true':'false').']]></STUDENT:reihungstestangetreten>
-			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
-			<STUDENT:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></STUDENT:bismelden>
-			<STUDENT:dual><![CDATA['.($row->dual?'true':'false').']]></STUDENT:dual>
-			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
-			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
-			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
-			<STUDENT:gsstudientyp_kurzbz><![CDATA['.$row->gsstudientyp_kurzbz.']]></STUDENT:gsstudientyp_kurzbz>
-			<STUDENT:aufnahmegruppe_kurzbz><![CDATA['.$row->aufnahmegruppe_kurzbz.']]></STUDENT:aufnahmegruppe_kurzbz>
-			<STUDENT:priorisierung><![CDATA['.$row->priorisierung.']]></STUDENT:priorisierung>
-			<STUDENT:priorisierung_realtiv><![CDATA['.$prioRelativ.' ('.$row->priorisierung.')'.']]></STUDENT:priorisierung_realtiv>
-		</RDF:Description>
-	</RDF:li>';
+		$foerderrelevant = '';
+
+		if ($row->foerderrelevant === true)
+			$foerderrelevant = 'true';
+		elseif ($row->foerderrelevant === false)
+			$foerderrelevant = 'false';
+
+		echo '
+				<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
+				<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
+				<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
+				<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
+				<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
+				<STUDENT:berufstaetigkeit_code><![CDATA['.$row->berufstaetigkeit_code.']]></STUDENT:berufstaetigkeit_code>
+				<STUDENT:ausbildungcode><![CDATA['.$row->ausbildungcode.']]></STUDENT:ausbildungcode>
+				<STUDENT:zgv_code><![CDATA['.$row->zgv_code.']]></STUDENT:zgv_code>
+				<STUDENT:zgvort><![CDATA['.$row->zgvort.']]></STUDENT:zgvort>
+				<STUDENT:zgvdatum><![CDATA['.$datum_obj->convertISODate($row->zgvdatum).']]></STUDENT:zgvdatum>
+				<STUDENT:zgvdatum_iso><![CDATA['.$row->zgvdatum.']]></STUDENT:zgvdatum_iso>
+				<STUDENT:zgvnation><![CDATA['.$row->zgvnation.']]></STUDENT:zgvnation>
+				<STUDENT:zgv_erfuellt><![CDATA['.$row->zgv_erfuellt.']]></STUDENT:zgv_erfuellt>
+				<STUDENT:zgvmas_code><![CDATA['.$row->zgvmas_code.']]></STUDENT:zgvmas_code>
+				<STUDENT:zgvmaort><![CDATA['.$row->zgvmaort.']]></STUDENT:zgvmaort>
+				<STUDENT:zgvmadatum><![CDATA['.$datum_obj->convertISODate($row->zgvmadatum).']]></STUDENT:zgvmadatum>
+				<STUDENT:zgvmadatum_iso><![CDATA['.$row->zgvmadatum.']]></STUDENT:zgvmadatum_iso>
+				<STUDENT:zgvmanation><![CDATA['.$row->zgvmanation.']]></STUDENT:zgvmanation>
+				<STUDENT:zgvmas_erfuellt><![CDATA['.$row->zgvmas_erfuellt.']]></STUDENT:zgvmas_erfuellt>
+				<STUDENT:zgvdoktor_code><![CDATA['.$row->zgvdoktor_code.']]></STUDENT:zgvdoktor_code>
+				<STUDENT:zgvdoktorort><![CDATA['.$row->zgvdoktorort.']]></STUDENT:zgvdoktorort>
+				<STUDENT:zgvdoktordatum><![CDATA['.$datum_obj->convertISODate($row->zgvdoktordatum).']]></STUDENT:zgvdoktordatum>
+				<STUDENT:zgvdoktordatum_iso><![CDATA['.$row->zgvdoktordatum.']]></STUDENT:zgvdoktordatum_iso>
+				<STUDENT:zgvdoktornation><![CDATA['.$row->zgvdoktornation.']]></STUDENT:zgvdoktornation>
+				<STUDENT:zgvdoktor_erfuellt><![CDATA['.$row->zgvdoktor_erfuellt.']]></STUDENT:zgvdoktor_erfuellt>
+				<STUDENT:ausstellungsstaat><![CDATA['.$row->ausstellungsstaat.']]></STUDENT:ausstellungsstaat>
+				<STUDENT:aufnahmeschluessel><![CDATA['.$row->aufnahmeschluessel.']]></STUDENT:aufnahmeschluessel>
+				<STUDENT:facheinschlberuf><![CDATA['.($row->facheinschlberuf?'true':'false').']]></STUDENT:facheinschlberuf>
+				<STUDENT:reihungstest_id><![CDATA['.$row->reihungstest_id.']]></STUDENT:reihungstest_id>
+				<STUDENT:anmeldungreihungstest><![CDATA['.$datum_obj->convertISODate($row->anmeldungreihungstest).']]></STUDENT:anmeldungreihungstest>
+				<STUDENT:anmeldungreihungstest_iso><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:anmeldungreihungstest_iso>
+				<STUDENT:reihungstestangetreten><![CDATA['.($row->reihungstestangetreten?'true':'false').']]></STUDENT:reihungstestangetreten>
+				<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
+				<STUDENT:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></STUDENT:bismelden>
+				<STUDENT:foerderrelevant><![CDATA['.($foerderrelevant).']]></STUDENT:foerderrelevant>
+				<STUDENT:dual><![CDATA['.($row->dual?'true':'false').']]></STUDENT:dual>
+				<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
+				<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
+				<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
+				<STUDENT:gsstudientyp_kurzbz><![CDATA['.$row->gsstudientyp_kurzbz.']]></STUDENT:gsstudientyp_kurzbz>
+				<STUDENT:aufnahmegruppe_kurzbz><![CDATA['.$row->aufnahmegruppe_kurzbz.']]></STUDENT:aufnahmegruppe_kurzbz>
+				<STUDENT:priorisierung><![CDATA['.$row->priorisierung.']]></STUDENT:priorisierung>
+				<STUDENT:priorisierung_realtiv><![CDATA['.$prioRelativ.' ('.$row->priorisierung.')'.']]></STUDENT:priorisierung_realtiv>
+				<STUDENT:standort_code><![CDATA['.$row->standort_code.']]></STUDENT:standort_code>
+			</RDF:Description>
+		</RDF:li>';
 	}
 }
 
@@ -432,6 +453,7 @@ function draw_empty_content()
 			<STUDENT:mail_intern><![CDATA[]]></STUDENT:mail_intern>
 			<STUDENT:zugangscode><![CDATA[]]></STUDENT:zugangscode>
 			<STUDENT:link_bewerbungstool><![CDATA[]]></STUDENT:link_bewerbungstool>
+			<STUDENT:bpk><![CDATA[]]></STUDENT:bpk>
 
 			<STUDENT:aktiv><![CDATA[]]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA[]]></STUDENT:uid>
@@ -444,7 +466,7 @@ function draw_empty_content()
 			<STUDENT:matr_nr><![CDATA[]]></STUDENT:matr_nr>
 			<STUDENT:studiengang_studiengangsleitung><![CDATA[]]></STUDENT:studiengang_studiengangsleitung>
 			<STUDENT:anzahl_notizen><![CDATA[]]></STUDENT:anzahl_notizen>
-			
+
 			<STUDENT:prestudent_id><![CDATA[]]></STUDENT:prestudent_id>
 			<STUDENT:studiengang_kz_prestudent><![CDATA[]]></STUDENT:studiengang_kz_prestudent>
 			<STUDENT:studiengang_kz><![CDATA[]]></STUDENT:studiengang_kz>
@@ -599,7 +621,7 @@ if($xmlformat=='rdf')
 			AS email_privat,
 			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
 			 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr,
-			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode
+			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode, p.bpk
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON (student_uid=uid)
@@ -755,8 +777,16 @@ if($xmlformat=='rdf')
 	}
 	else
 	{
-		// String aufsplitten und Sonderzeichen entfernen
-		$searchItems = explode(' ',TRIM(str_replace(',', '', $filter),' 	!.?'));
+		// Sonderzeichen entfernen und String aufsplitten
+		// Replace commas with whitespace
+		$filter = str_replace(',', ' ', $filter);
+		// Replace multiple whitespaces with just one
+		$filter = preg_replace('/\s/', ' ', $filter);
+		// Trim whitespaces and special characters from the string
+		$filter = trim($filter,' 		!.?');
+		// Explode string
+		$searchItems = explode(' ',$filter);
+
 		$kriterienliste = array("#email","#name","#pid","#preid","#tel", "#ref");
 		$suchkriterium = '';
 
