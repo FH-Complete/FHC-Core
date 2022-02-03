@@ -368,10 +368,10 @@ class zeitsperre extends basis_db
 	 *
 	 * @param $user
 	 * @param $datum
-	 * @param $stunde
+	 * @param $stunde optional, wird nur abgefragt, wenn != null
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getSperreByDate($user, $datum, $stunde)
+	public function getSperreByDate($user, $datum, $stunde=null)
 	{
 		$qry = "
 			SELECT
@@ -380,16 +380,19 @@ class zeitsperre extends basis_db
 				campus.tbl_zeitsperre
 			WHERE
 				vondatum<=".$this->db_add_param($datum)."
-				AND bisdatum>=".$this->db_add_param($datum)." AND
-				((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND
-				((bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") OR bisstunde is null OR bisdatum<>".$this->db_add_param($datum).") AND
-				mitarbeiter_uid=".$this->db_add_param($user);
+				AND bisdatum>=".$this->db_add_param($datum);
+
+			if(!is_null($stunde))
+				$qry.=" AND
+					((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND
+					((bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") OR bisstunde is null OR bisdatum<>".$this->db_add_param($datum).")";
+
+				$qry .= "AND mitarbeiter_uid=".$this->db_add_param($user);
 
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
-
 				$obj = new zeitsperre();
 
 				$obj->zeitsperre_id = $row->zeitsperre_id;

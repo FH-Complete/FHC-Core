@@ -651,7 +651,6 @@ echo '
 								}
 								projphasenhtml += "<\/option>";
 							}
-
 							$("#projektphase").append(projphasenhtml);
 							$("#projektphaseformgroup").show();
 						}
@@ -785,7 +784,9 @@ echo '
 		{
 			$.ajax
 			({
+				type: "GET",
 				url: "zeitaufzeichnung_zeitsperren.php",
+				dataType: "json",
 				data:
 				{
 					day: day,
@@ -793,15 +794,25 @@ echo '
 				},
 				success: function (json)
 				{
-					if (json.length > 1)
+				if (json.length > 0)
+				{
+					var output = "";
+					for (var i = 0; i < json.length; i++)
 					{
-						$("#buttonSave").hide();
+						output = "Für den Tag " + json[i].day + " ist bereits eine Zeitsperre vom Typ " +  json[i].typ + " eingetragen!";
+						alert("'.$p->t("zeitaufzeichnung/zeitsperreVorhanden1").'");
+						$("#buttonSave").attr("disabled","disabled");
+						$("#triggerPhasenReset").hide();
 					}
-					else
-					{
-						$("#buttonSave").show();
-					}
-					$("#outputZs").html(json);
+				}
+				else
+				{
+					$("#buttonSave").prop("disabled",false);
+					output = "";					 
+				}
+				$("#outputZeitsperren").html(output);
+
+
 				}
 			});
 		}
@@ -811,8 +822,17 @@ echo '
 <body>
 ';
 
+
 echo '<h1>'.$p->t("zeitaufzeichnung/zeitaufzeichnungVon").' '.$db->convert_html_chars($bn->vorname).' '.$db->convert_html_chars($bn->nachname).'</h1>';
 
+echo '
+<tr>
+	<td colspan="1">
+		<p id="outputZeitsperren" style="color:red; font-weight:bold;" >
+		</p>
+	</td>
+</tr>
+';
 // Wenn Kartennummer übergeben wurde dann hole uid von Karteninhaber
 if($kartennummer != '')
 {
@@ -1772,6 +1792,54 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
 		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array(fehlt!)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
 
+		// $test = '2022-02-01';
+		// echo "hello " . $test . "<br>";
+		//
+		// $zs = new zeitsperre();
+		// $sperreVorhanden = false;
+		// $stunde = '09';
+		// $zs->getSperreByDate($user, $test, $stunde);
+
+		//var_dump($zs->result);
+
+		// foreach ($zs->result as $z)
+		// {
+		// 	if ($z->zeitsperretyp_kurzbz)
+		// 	{
+		// 		$sperreVorhanden = true;
+		// 		echo "zeitsperre vorhanden: ". $z->zeitsperretyp_kurzbz . " am: " . $test;
+		// 	}
+		// 	else {
+		// 		echo "zeitsperre nicht vorhanden";
+		// 	}
+		// }
+		//Testausgaben
+			// echo '
+			// <tr>
+			// 	<td>&nbsp;</td>
+			// 	<td colspan="1">
+			// 		<span id="testausgaben">
+			// 			TESTAUSGABEN
+			// 		</span>
+			// 	</td>
+			// </tr>
+			//
+			// ';
+			//
+			// echo '
+			// <tr>
+			// 	<td>&nbsp;</td>
+			// 	<td colspan="1">
+			// 		<span id="outputTest" style="color:red" >
+			// 			TESTAUSGABEN
+			// 		</span>
+			// 	</td>
+			// </tr>
+			// ';
+
+
+
+
 		$za = new zeitaufzeichnung();
 	    if(isset($_GET['filter']))
 	    	$za->getListeProjekt($_GET['filter']);
@@ -1787,8 +1855,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		$dr = new zeitaufzeichnung();
 		$dr->getDienstreisenUser($user, 180);
 		$dr_arr = $dr->result;
-
-		//var_dump($dr->result);
 
 		if(count($za->result)>0)
 		{

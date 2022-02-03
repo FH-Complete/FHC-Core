@@ -26,14 +26,16 @@
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/phrasen.class.php');
-require_once('../../../include/datum.class.php');
-require_once('../../../include/Excel/excel.php');
-require_once('../../../include/benutzer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-require_once('../../../include/mitarbeiter.class.php');
-require_once('../../../include/zeitaufzeichnung.class.php');
-require_once('../../../include/projekt.class.php');
 require_once('../../../include/zeitsperre.class.php');
+//require_once('../../../include/datum.class.php');
+// require_once('../../../include/Excel/excel.php');
+//require_once('../../../include/benutzer.class.php');
+
+// require_once('../../../include/mitarbeiter.class.php');
+//require_once('../../../include/zeitaufzeichnung.class.php');
+// require_once('../../../include/projekt.class.php');
+
 
 
 $sprache = getSprache();
@@ -44,16 +46,42 @@ if ((isset($_GET['uid'])) && (isset($_GET['day'])))
 	$uid = $_GET['uid'];
 	$day = $_GET['day'];
 
-	$zs = new zeitsperre();
-	$zs->getZeitsperrenForZeitaufzeichnung($uid, '180');
-	$zeitsperren = $zs->result;
+	//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
+	//des uebergebenen Users anzeigen
+	if (isset($_GET['uid']) && $_GET['uid'] != $uid)
+	{
+		$p = new phrasen();
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($uid);
 
-	if (array_key_exists($day, $zeitsperren))
-	{
-		echo '<span style="color:red"><b>'.$p->t('zeitaufzeichnung/zeitsperreVorhanden', [$day, $zeitsperren[$day]]).'</b></span><br>';
+		if ($rechte->isBerechtigt('admin'))
+		{
+			$uid = $_GET['uid'];
+		}
+		else
+		{
+			die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
+		}
 	}
-	else
+
+	$zs = new zeitsperre();
+	$sperreVorhanden = false;
+	$typ = '';
+	$zs->getSperreByDate($uid, $day, null);
+	$result_obj = array();
+	$now = new DateTime($day);
+	$now = $now->format('d.m.Y');
+
+	foreach ($zs->result as $z)
 	{
-		echo "";
+		if ($z->zeitsperretyp_kurzbz)
+		{
+			$item['typ'] = $z->zeitsperretyp_kurzbz;
+			$item['day'] = $now;
+			$item['sperreVorhanden'] = true;
+			$result_obj[] = $item;
+		}
 	}
+	//var_dump($result_obj);
+	echo json_encode($result_obj);
 }
