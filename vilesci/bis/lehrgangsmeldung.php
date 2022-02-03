@@ -311,7 +311,7 @@ if($result = $db->db_query($qry))
 		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - ausser bei 01.01. und 01.07.
 		if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 		{
-			$error_log_hinweis.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
+			$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		//Vergleich der letzten 6 Stellen des Ersatzkennzeichen mit Geburtsdatum
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
@@ -390,7 +390,7 @@ if($result = $db->db_query($qry))
 		}
 		if($row->bpk == '' || $row->bpk == null)
 		{
-			$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
+			$error_log_hinweis .= (!empty($error_log_hinweis) ? ', ' : '') . "bPK fehlt";
 		}
 		
 		if($row->bpk != '' && $row->bpk != null)
@@ -606,7 +606,7 @@ if($result = $db->db_query($qry))
 		{
 			if($error_log_hinweis != '')
 			{
-				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
 				$error_log_hinweis = '';
 			}
@@ -649,10 +649,13 @@ if($result = $db->db_query($qry))
 					$datei.="
 				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 				}
-			
-				$datei.="
-				<bPK>".$row->bpk."</bPK>
-				";
+
+				if($row->bpk != '' && $row->bpk != null)
+				{
+					$datei.="
+					<bPK>".$row->bpk."</bPK>
+					";
+				}
 
 				$datei.="
 				<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>

@@ -665,4 +665,5 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery($query, array($prestudent_id));
 	}
+
 }

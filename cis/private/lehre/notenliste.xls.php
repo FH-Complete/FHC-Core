@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 /*
  * Erstellt Notenliste im Excel Format
@@ -200,25 +201,31 @@ else
 	$stsemdatumbis = $stsem_obj->ende;
 
 	$qry = "SELECT
-			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
-			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
-			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
-			tbl_zeugnisnote.note
-		FROM
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
-			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
-			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		WHERE
-			vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
-			vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);
+		distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
+	tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+	(SELECT status_kurzbz
+	FROM public.tbl_prestudentstatus
+	WHERE prestudent_id=tbl_student.prestudent_id
+	ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+	tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
+	tbl_zeugnisnote.note,tbl_mobilitaet.mobilitaetstyp_kurzbz,
+	(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN '1' ELSE '' END) as doubledegree
+	FROM campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+	JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
+	LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
+	LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+	AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
+	AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
+	LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
+	LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+	WHERE
+	vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+	vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);";";
 
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 
-	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
+	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
 
 	if($result = $db->db_query($qry))
 	{
@@ -226,6 +233,7 @@ else
 		$lines++;
 		while($elem = $db->db_fetch_object($result))
 		{
+			$note='';
 			if(!preg_match('*dummy*',$elem->uid) && $elem->semester!=10)
 	   		{
 	   			if($elem->status!='Abbrecher' && $elem->status!='Unterbrecher')
@@ -243,8 +251,12 @@ else
 						$inc.=' (ar)';
 						$note='ar';
 					}
-					else
-						$note='';
+
+					if ($elem->mobilitaetstyp_kurzbz !='' && $elem->doubledegree == 1) //dd-Program
+					{
+						$inc.=' (d.d.)';
+					}
+
 					$worksheet->write($lines,1,$elem->uid);
 					$worksheet->write($lines,2,$elem->nachname.$inc);
 					$worksheet->write($lines,3,$elem->vorname);
@@ -295,6 +307,8 @@ else
 	$worksheet->write(++$lines,0,'(i)  ... Incoming');
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
 	$worksheet->write(++$lines,0,'(ar) ... '.$p->t('anwesenheitsliste/angerechnet'));
+	$worksheet->write(++$lines,0,'(iar) ... '.$p->t('anwesenheitsliste/internangerechnet'));
+	$worksheet->write(++$lines,0,'(d.d.) ... Double Degree Program');
 
 	$worksheet->setColumn(0, 0, 5);
 	$worksheet->setColumn(0, 1, 16);

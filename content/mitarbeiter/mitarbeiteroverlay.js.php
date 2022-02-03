@@ -857,6 +857,12 @@ function MitarbeiterSave()
 		return false;
 	}
 
+	if(!checkAlias(alias))
+	{
+		alert('Der Alias darf keine Sonderzeichen außer ._- enthalten.');
+		return false;
+	}
+
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
 

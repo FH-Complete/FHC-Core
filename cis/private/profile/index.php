@@ -274,7 +274,7 @@ if (!$ansicht)
 
 if (!$ansicht)
 {
-	if ($is_employee)
+	if ($type === 'mitarbeiter')
 	{
 		$verwendung = new bisverwendung();
 		if($verwendung->getLastVerwendung($uid))
@@ -293,34 +293,33 @@ if (!$ansicht)
 	$adresse = new adresse();
 	$adresse->load_pers($user->person_id);
 
-	function sortAdresse($a , $b)
+	if ($type === 'mitarbeiter')
 	{
-		if ($a->typ === $b->typ)
-			return 0;
-
-		return ($a->typ < $b->typ) ? -1 : 1;
-	}
-	usort($adresse->result, "sortAdresse");
-	foreach($adresse->result as $a)
-	{
-		if ($a->zustelladresse)
+		foreach ($adresse->result as $a)
 		{
-			switch ($a->typ)
+			echo $a->strasse . "<b> (" . $a->bezeichnung_mehrsprachig[$sprache] . ") </b>" . "<br>" . $a->plz . " " . $a->ort . "<br><br>";
+		}
+	}
+	else
+	{
+		function sortAdresse($a , $b)
+		{
+			if ($a->typ === $b->typ)
+				return 0;
+
+			return ($a->typ < $b->typ) ? -1 : 1;
+		}
+		usort($adresse->result, "sortAdresse");
+
+		foreach($adresse->result as $a)
+		{
+			if ($a->zustelladresse)
 			{
-				case "h":
-					$typ = $p->t("global/hauptwohnsitz");
-					break;
-				case "n":
-					$typ = $p->t("global/nebenwohnsitz");
-					break;
-				default:
-					$typ = NULL;
-					break;
-			}
-			if ($typ !== NULL)
-			{
-				echo "<b>".$typ.": </b><br>";
-				echo $a->strasse."<br>".$a->plz." ".$a->ort."<br><br>";
+				if ($a->bezeichnung_mehrsprachig[$sprache] !== NULL)
+				{
+					echo "<b>".$a->bezeichnung_mehrsprachig[$sprache].": </b><br>";
+					echo $a->strasse."<br>".$a->plz." ".$a->ort."<br><br>";
+				}
 			}
 		}
 	}

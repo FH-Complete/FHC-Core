@@ -183,7 +183,7 @@ function StudentProjektarbeitTreeLoad(uid)
 	tree.builder.addListener(StudentProjektarbeitTreeListener);
 
 	StudentProjektarbeitDisableFields(false);
-	
+
     // Wenn Vertragsdetails angezeigt werden
     if (projektarbeit_vertragsdetails_anzeigen) {
         //Reset attributes
@@ -398,7 +398,7 @@ function StudentProjektarbeitAuswahl()
 
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&projektarbeit=true&withlv="+lehrveranstaltung_id+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid='+student_uid+"&projektarbeit=true&withlv="+lehrveranstaltung_id+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LvDropDown.database.GetDataSources();
@@ -653,10 +653,11 @@ function StudentProjektarbeitNeu()
 	StudentProjektarbeitDetailDisableFields(false);
 	StudentProjektbetreuerDisableFields(true);
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+	var student_uid = document.getElementById('student-detail-textbox-uid').value;
 
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&projektarbeit=true&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid='+student_uid+'&stg_kz='+stg_kz+"&projektarbeit=true&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LvDropDown.database.GetDataSources();
