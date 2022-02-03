@@ -504,6 +504,22 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefung
 	}
 }
 
+// change Datatype of lehre.tbl_note.bezeichnung from varchar(32) to varchar(64)
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='lehre' AND TABLE_NAME='tbl_note' AND COLUMN_NAME = 'bezeichnung' AND character_maximum_length < 64"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = "
+		ALTER TABLE lehre.tbl_note ALTER COLUMN bezeichnung TYPE varchar(64);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte bezeichnung in lehre.tbl_note von kleiner varchar(64) auf varchar(64) geändert<br>';
+	}
+}
+
 // Note "entschuldigt" hinzufügen
 if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en' AND (bezeichnung = 'entschuldigt' OR bezeichnung = 'Entschuldigt');"))
 {
@@ -2657,7 +2673,6 @@ if(!@$db->db_query("SELECT zeitaufzeichnungspflichtig FROM bis.tbl_bisverwendung
 				. "<br>Fix angestellte Mitarbeiter auf true gesetzt, alle anderen auf false";
 }
 
-
 // Spalte Priorisierung für tbl_prestudent
 if(!$result = @$db->db_query("SELECT priorisierung FROM public.tbl_prestudent LIMIT 1"))
 {
@@ -2668,6 +2683,40 @@ if(!$result = @$db->db_query("SELECT priorisierung FROM public.tbl_prestudent LI
 		else
 			echo '<br>public.tbl_prestudent: Spalte priorisierung hinzugefuegt';
 }
+
+// Spalte zgv_erfuellt für tbl_prestudent
+if(!$result = @$db->db_query("SELECT zgv_erfuellt FROM public.tbl_prestudent LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN zgv_erfuellt boolean default false;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_prestudent: Spalte zgv_erfuellt hinzugefuegt';
+}
+
+// Spalte zgvmas_erfuellt für tbl_prestudent
+if(!$result = @$db->db_query("SELECT zgvmas_erfuellt FROM public.tbl_prestudent LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN zgvmas_erfuellt boolean default false;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_prestudent: Spalte zgvmas_erfuellt hinzugefuegt';
+}
+
+// Spalte zgvdoktor_erfuellt für tbl_prestudent
+if(!$result = @$db->db_query("SELECT zgvdoktor_erfuellt FROM public.tbl_prestudent LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktor_erfuellt boolean default false;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_prestudent: Spalte zgvdoktor_erfuellt hinzugefuegt';
+}
+
 
 // Spalte lieferant in tbl_firma
 if(!$result = @$db->db_query("SELECT lieferant FROM public.tbl_firma LIMIT 1"))
@@ -4709,21 +4758,24 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 
 // Add column dms_id, studiensemester_kurzbz, anmerkung_student und empfehlung_anrechnung
 // Change genehmigt_von and begruendung_id to be NULLABLE
-if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
+if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung LIMIT 1"))
 {
-	$qry = "
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN dms_id bigint;
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN studiensemester_kurzbz varchar(6);
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN anmerkung_student text;
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN empfehlung_anrechnung boolean;
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN dms_id bigint;
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN studiensemester_kurzbz varchar(6);
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN anmerkung_student text;
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN empfehlung_anrechnung boolean;
 
-		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
-	";
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
+		";
+	}
 
 
 	if(!$db->db_query($qry))
@@ -5020,6 +5072,43 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_zgvpruefungstatus_status 
 		echo '<strong>public.tbl_zgvpruefungstatus_status: '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' public.tbl_zgvpruefungstatus_status: Tabelle hinzugefuegt<br>';
+}
+
+// Add table adressentyp
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_adressentyp LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_adressentyp
+		(
+			adressentyp_kurzbz varchar(32),
+			bezeichnung varchar(256),
+			bezeichnung_mehrsprachig varchar(256)[],
+			sort smallint
+		);
+
+		COMMENT ON TABLE public.tbl_adressentyp IS 'Types of Addresses';
+		ALTER TABLE public.tbl_adressentyp ADD CONSTRAINT pk_tbl_adressentyp PRIMARY KEY (adressentyp_kurzbz);
+
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('h', 'Hauptwohnsitz', '{\"Hauptwohnsitz\", \"Principal residence\"}', 1);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('n', 'Nebenwohnsitz', '{\"Nebenwohnsitz\", \"Secondary residence\"}', 2);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('ho', 'Homeoffice', '{\"Homeoffice\", \"Homeoffice\"}', 3);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('r', 'Rechnungsadresse', '{\"Rechnungsadresse\", \"Billing address\"}', 4);
+		INSERT INTO public.tbl_adressentyp(adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES ('f', 'Firma', '{\"Firma\", \"Company\"}', 5);
+
+		UPDATE public.tbl_adresse SET typ = 'f' WHERE person_id IS NULL AND (typ IS NULL OR typ = '');
+		UPDATE public.tbl_adresse SET typ = 'h' WHERE person_id IS NOT NULL AND typ IS NULL;
+
+		ALTER TABLE public.tbl_adresse ADD CONSTRAINT fk_tbl_adresse_adressentyp FOREIGN KEY (typ) REFERENCES public.tbl_adressentyp (adressentyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_adresse ALTER COLUMN typ TYPE varchar(32);
+
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_adressentyp TO vilesci;
+		GRANT SELECT ON public.tbl_adressentyp TO web;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_adressentyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_adressentyp: Tabelle hinzugefuegt<br>';
 }
 
 // Add index to lehre.tbl_pruefung
@@ -5735,7 +5824,9 @@ $tabellen=array(
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
-	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id", "dms_id", "studiensemester_kurzbz", "anmerkung_student", "empfehlung_anrechnung"),
+	"lehre.tbl_anrechnungstatus"  => array("status_kurzbz", "bezeichnung_mehrsprachig"),
+	"lehre.tbl_anrechnung_anrechnungstatus"  => array("anrechnungstatus_id", "anrechnung_id", "status_kurzbz", "datum", "insertamum", "insertvon"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
@@ -5782,6 +5873,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
+	"public.tbl_adressentyp"  => array("adressentyp_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig", "sort"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice","akzeptiertamum"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
@@ -5841,7 +5933,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz","aufnahmegruppe_kurzbz","udf_values","priorisierung","foerderrelevant","standort_code"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz","aufnahmegruppe_kurzbz","udf_values","priorisierung","foerderrelevant","standort_code","zgv_erfuellt","zgvmas_erfuellt","zgvdoktor_erfuellt"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum","rt_stufe","statusgrund_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist"),

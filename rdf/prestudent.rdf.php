@@ -68,11 +68,19 @@ if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 				<PRESTD:zgvdatum_iso><![CDATA[<?php echo $prestd->zgvdatum;  ?>]]></PRESTD:zgvdatum_iso>
                 <PRESTD:zgvdatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvdatum);  ?>]]></PRESTD:zgvdatum>
                 <PRESTD:zgvnation><![CDATA[<?php echo $prestd->zgvnation;  ?>]]></PRESTD:zgvnation>
+				<PRESTD:zgv_erfuellt><![CDATA[<?php echo $prestd->zgv_erfuellt;  ?>]]></PRESTD:zgv_erfuellt>
                 <PRESTD:zgvmas_code><![CDATA[<?php echo $prestd->zgvmas_code;  ?>]]></PRESTD:zgvmas_code>
 				<PRESTD:zgvmaort><![CDATA[<?php echo $prestd->zgvmaort;  ?>]]></PRESTD:zgvmaort>
 				<PRESTD:zgvmadatum_iso><![CDATA[<?php echo $prestd->zgvmadatum;  ?>]]></PRESTD:zgvmadatum_iso>
                 <PRESTD:zgvmadatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvmadatum);  ?>]]></PRESTD:zgvmadatum>
                 <PRESTD:zgvmanation><![CDATA[<?php echo $prestd->zgvmanation;  ?>]]></PRESTD:zgvmanation>
+				<PRESTD:zgvmas_erfuellt><![CDATA[<?php echo $prestd->zgvmas_erfuellt;  ?>]]></PRESTD:zgvmas_erfuellt>
+				<PRESTD:zgvdoktor_code><![CDATA[<?php echo $prestd->zgvdoktor_code;  ?>]]></PRESTD:zgvdoktor_code>
+				<PRESTD:zgvdoktorort><![CDATA[<?php echo $prestd->zgvdoktorort;  ?>]]></PRESTD:zgvdoktorort>
+				<PRESTD:zgvdoktordatum_iso><![CDATA[<?php echo $prestd->zgvdoktordatum;  ?>]]></PRESTD:zgvdoktordatum_iso>
+                <PRESTD:zgvdoktordatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvdoktordatum);  ?>]]></PRESTD:zgvdoktordatum>
+                <PRESTD:zgvdoktornation><![CDATA[<?php echo $prestd->zgvdoktornation;  ?>]]></PRESTD:zgvdoktornation>
+				<PRESTD:zgvdoktor_erfuellt><![CDATA[<?php echo $prestd->zgvdoktor_erfuellt;  ?>]]></PRESTD:zgvdoktor_erfuellt>
                 <PRESTD:aufnahmeschluessel><![CDATA[<?php echo $prestd->aufnahmeschluessel;  ?>]]></PRESTD:aufnahmeschluessel>
 				<PRESTD:facheinschlberuf><![CDATA[<?php echo ($prestd->facheinschlberuf?'true':'false');  ?>]]></PRESTD:facheinschlberuf>
 				<PRESTD:reihungstest_id><![CDATA[<?php echo $prestd->reihungstest_id;  ?>]]></PRESTD:reihungstest_id>
