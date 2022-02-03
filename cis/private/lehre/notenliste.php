@@ -197,8 +197,10 @@ else
 	{
 		$prestudent->getFirstStatus($prestudent_id, 'Student');
 		$firstStudiensemester = $prestudent->studiensemester_kurzbz;
-		$prestudent->getLastStatus($prestudent_id, null, 'Student');
-		$lastStudiensemester = $prestudent->studiensemester_kurzbz;
+		if ($prestudent->getLastStatus($prestudent_id, null, 'Diplomand'))
+			$lastStudiensemester = $prestudent->studiensemester_kurzbz;
+		elseif ($prestudent->getLastStatus($prestudent_id, null, 'Student'))
+			$lastStudiensemester = $prestudent->studiensemester_kurzbz;
 	}
 
 	$stsem_obj->getStudiensemesterBetween($firstStudiensemester, $lastStudiensemester);
@@ -241,7 +243,7 @@ else
 	$qry = "SELECT
 			tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_zeugnisnote.punkte,
 			tbl_lvgesamtnote.note as lvnote, tbl_lvgesamtnote.punkte as lvpunkte,
-			tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum,
+			tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, tbl_zeugnisnote.uebernahmedatum,
 			tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum,
 			tbl_zeugnisnote.studiensemester_kurzbz AS studiensemester_zeugnis, tbl_lvgesamtnote.studiensemester_kurzbz  AS studiensemester_lvnote,
 			tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.ects
@@ -354,6 +356,7 @@ else
 
 			if (count($pruefung->result) > 0)
 			{
+				$freigabedatum = $row->uebernahmedatum;
 				$tblBody .= '<td>';
 				foreach ($pruefung->result as $row)
 				{
@@ -367,7 +370,8 @@ else
 					else
 						$punkte = '';
 
-					$tblBody .= $row->pruefungstyp_beschreibung . ' ' . $datum_obj->formatDatum($row->datum, 'd.m.Y') . ' ' . $note . $punkte . '<br>';
+					if ($datum_obj->formatDatum($freigabedatum, "Y-m-d") >= $row->datum)
+						$tblBody .= $row->pruefungstyp_beschreibung . ' ' . $datum_obj->formatDatum($row->datum, 'd.m.Y') . ' ' . $note . $punkte . '<br>';
 				}
 				$tblBody .= '</td>';
 			}
