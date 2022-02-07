@@ -28,14 +28,6 @@ require_once('../../../include/globals.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/zeitsperre.class.php');
-//require_once('../../../include/datum.class.php');
-// require_once('../../../include/Excel/excel.php');
-//require_once('../../../include/benutzer.class.php');
-
-// require_once('../../../include/mitarbeiter.class.php');
-//require_once('../../../include/zeitaufzeichnung.class.php');
-// require_once('../../../include/projekt.class.php');
-
 
 
 $sprache = getSprache();
@@ -82,6 +74,5 @@ if ((isset($_GET['uid'])) && (isset($_GET['day'])))
 			$result_obj[] = $item;
 		}
 	}
-	//var_dump($result_obj);
 	echo json_encode($result_obj);
 }

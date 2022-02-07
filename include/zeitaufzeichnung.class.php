@@ -812,15 +812,63 @@ or not exists
 
 			$qry = "select max(datum) from addon.tbl_casetime_timesheet where ".$where." and abgeschicktamum is not null";
 
-		    if($result = $this->db_query($qry))
-		    {
+			if ($result = $this->db_query($qry))
+			{
 				$datum = $this->db_fetch_object($result);
 				return $datum->max;
-		    }
-		    else
-		    {
-		    	return false;
-		    }
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Prüft, ob es für einen bestimmten User für einen bestimmten Tag eine Zeitaufzeichnung  gibt
+	 * @param string $user Uid des zu prüfenden Users.
+	 * @param date $vonDay Startdatum des zu prüfenden Zeitraumes im Format d.m.Y.
+	 * @param date $bisDay Enddatum des zu prüfenden Zeitraumes im Format d.m.Y.
+	 * @return boolean true, wenn vorhanden, sonst false
+	 */
+	public function existsZeitaufzeichnung($user, $vonDay, $bisDay)
+	{
+		$datum = date($vonDay);
+		$year = substr($datum, 6, 4);
+		$month = substr($datum, 3, 2);
+		$day = substr($datum, 0, 2);
+
+		$datumbisDay = date($bisDay);
+		$yearbisDay = substr($datumbisDay, 6, 4);
+		$monthbisDay = substr($datumbisDay, 3, 2);
+		$daybisDay = substr($datumbisDay, 0, 2);
+
+		$bisDay = date("Y-m-d", (mktime(0, 0, 0, $monthbisDay, $daybisDay + 1, $yearbisDay)));
+		$datum = date("Y-m-d", (mktime(0, 0, 0, $month, $day, $year)));
+
+		$qry = "
+			SELECT *
+			FROM campus.tbl_zeitaufzeichnung
+			WHERE uid = ". $this->db_add_param($user). "
+			AND start >= ". $this->db_add_param($datum). "
+			AND ende < ". $this->db_add_param($bisDay). ";
+		";
+
+		if ($this->db_query($qry))
+		{
+			$num_rows = $this->db_num_rows();
+			if ($num_rows >= 1)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{

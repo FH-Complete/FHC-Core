@@ -44,4 +44,7 @@ $this->phrasen['zeitsperre/legendeDurchwahl']='(123)...Durchwahl';
 $this->phrasen['zeitsperre/vertretungNichtKorrekt']='Die angegebene Vertretung kann nicht gefunden werden. Bitte prüfen Sie die Vertretung und versuchen Sie es erneut.';
 $this->phrasen['zeitsperre/vorSperrdatum']='Datum liegt vor dem Sperrdatum der Zeitliste';
 $this->phrasen['zeitsperre/abwesend']='Abwesend';
+$this->phrasen['zeitsperre/zeitaufzeichnungVorhanden']='Es existiert mindestens eine Zeitaufzeichnung im angegebenen Zeitraum.';
+$this->phrasen['zeitsperre/zeitsperreEingetragen']='Für den <strong>%s</strong> existiert bereits eine Zeitsperre vom Typ <strong>%s</strong>.
+				Bitte löschen Sie diese bevor Sie eine neue für diesen Tag eintragen!';
 ?>

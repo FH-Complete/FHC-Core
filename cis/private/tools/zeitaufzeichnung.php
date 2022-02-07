@@ -299,6 +299,7 @@ echo '
 				{
 					var uid = $("#uidpass").val();
 					var Datum = $(this).val();
+					$("#triggerPhasenReset").text("");
 					Tag=Datum.substring(0,2);
 					Monat=Datum.substring(3,5);
 					Jahr=Datum.substring(6,10);
@@ -802,17 +803,14 @@ echo '
 						output = "Für den Tag " + json[i].day + " ist bereits eine Zeitsperre vom Typ " +  json[i].typ + " eingetragen!";
 						alert("'.$p->t("zeitaufzeichnung/zeitsperreVorhanden1").'");
 						$("#buttonSave").attr("disabled","disabled");
-						$("#triggerPhasenReset").hide();
 					}
 				}
 				else
 				{
 					$("#buttonSave").prop("disabled",false);
-					output = "";					 
+					output = "";
 				}
 				$("#outputZeitsperren").html(output);
-
-
 				}
 			});
 		}
@@ -1494,7 +1492,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
 				<td colspan="3"><SELECT '.$oestyle.' name="oe_kurzbz_1">';
 			$oe = new organisationseinheit();
-			$oe->getFrequent($user,'180','3',true, array('oezuordnung', 'fachzuordnung', 'kstzuordnung'));
+			$oe->getFrequent($user,'180','3',true, array('oezuordnung', 'fachzuordnung', 'kstzuordnung', 'Leitung'));
 			$trennlinie = true;
 
 			echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
@@ -1790,53 +1788,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			echo '<a href="?normal" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
 		else
 			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
-		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array(fehlt!)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
-
-		// $test = '2022-02-01';
-		// echo "hello " . $test . "<br>";
-		//
-		// $zs = new zeitsperre();
-		// $sperreVorhanden = false;
-		// $stunde = '09';
-		// $zs->getSperreByDate($user, $test, $stunde);
-
-		//var_dump($zs->result);
-
-		// foreach ($zs->result as $z)
-		// {
-		// 	if ($z->zeitsperretyp_kurzbz)
-		// 	{
-		// 		$sperreVorhanden = true;
-		// 		echo "zeitsperre vorhanden: ". $z->zeitsperretyp_kurzbz . " am: " . $test;
-		// 	}
-		// 	else {
-		// 		echo "zeitsperre nicht vorhanden";
-		// 	}
-		// }
-		//Testausgaben
-			// echo '
-			// <tr>
-			// 	<td>&nbsp;</td>
-			// 	<td colspan="1">
-			// 		<span id="testausgaben">
-			// 			TESTAUSGABEN
-			// 		</span>
-			// 	</td>
-			// </tr>
-			//
-			// ';
-			//
-			// echo '
-			// <tr>
-			// 	<td>&nbsp;</td>
-			// 	<td colspan="1">
-			// 		<span id="outputTest" style="color:red" >
-			// 			TESTAUSGABEN
-			// 		</span>
-			// 	</td>
-			// </tr>
-			// ';
-
 
 
 
