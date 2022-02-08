@@ -6,6 +6,7 @@
 abstract class IssueResolver_Controller extends JOB_Controller
 {
 	const ISSUES_FOLDER = 'issues';
+	const CHECK_ISSUE_RESOLVED_METHOD_NAME = 'checkIfIssueIsResolved';
 
 	protected $_codeLibMappings;
 
@@ -57,17 +58,36 @@ abstract class IssueResolver_Controller extends JOB_Controller
 					isset($issue->behebung_parameter) ? json_decode($issue->behebung_parameter, true) : array()
 				);
 
-				// if called from extension (extension name set), path includes extension names, otherwiese it is the core library folder
-				$libPath = isset($this->_extensionName) ? 'extensions/'.$this->_extensionName.'/'.self::ISSUES_FOLDER.'/' : self::ISSUES_FOLDER.'/';
+				// if called from extension (extension name set), path includes extension names, otherwise it is the core library folder
+				$libRootPath = isset($this->_extensionName) ? 'extensions/'.$this->_extensionName.'/' : '';
+				$issuesLibPath = $libRootPath.self::ISSUES_FOLDER.'/';
+				$issuesLibFilePath = DOC_ROOT.'application/' . $libRootPath.'libraries/'.self::ISSUES_FOLDER.'/'.$libName.'.php';
+
+				// check if library file exists
+				if (!file_exists($issuesLibFilePath))
+				{
+					// log error and continue with next issue if not
+					$this->logError("Issue library file ".$issuesLibFilePath." does not exist");
+					continue;
+				}
+
 				// load library connected to fehlercode
 				$this->load->library(
-					$libPath.$libName
+					$issuesLibPath.$libName
 				);
 
 				$lowercaseLibName = mb_strtolower($libName);
 
-				// call the function for checking if issue is resolved
-				$issueResolvedRes = $this->{$lowercaseLibName}->checkIfIssueIsResolved($params);
+				// check if method is defined in libary class
+				if (!is_callable(array($this->{$lowercaseLibName}, self::CHECK_ISSUE_RESOLVED_METHOD_NAME)))
+				{
+					// log error and continue with next issue if not
+					$this->logError("Method " . self::CHECK_ISSUE_RESOLVED_METHOD_NAME . " is not defined in library $lowercaseLibName");
+					continue;
+				}
+
+				// call the function for checking for issue resolution
+				$issueResolvedRes = $this->{$lowercaseLibName}->{self::CHECK_ISSUE_RESOLVED_METHOD_NAME}($params);
 
 				if (isError($issueResolvedRes))
 				{
