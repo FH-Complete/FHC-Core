@@ -658,7 +658,7 @@ if(count($zeit->result)>0)
 		{
 			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id&informSupervisor=True' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
-		elseif($row->zeitsperretyp_kurzbz!='Urlaub')
+		elseif($row->zeitsperretyp_kurzbz!='Urlaub' && $row->zeitsperretyp_kurzbz != 'ZVerfueg')
         {
             $content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
         }
@@ -718,6 +718,11 @@ if($result = $db->db_query($qry))
 {
 	while($row=$db->db_fetch_object($result))
 	{
+        if ($row->zeitsperretyp_kurzbz === 'ZVerfueg')
+        {
+            continue;
+        }
+
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
 			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->beschreibung</OPTION>";
 		else
