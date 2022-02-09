@@ -646,7 +646,7 @@ if(count($zeit->result)>0)
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
 							<td>".(isset($erreichbarkeit_arr[$row->erreichbarkeit])?$erreichbarkeit_arr[$row->erreichbarkeit]:'')."</td>
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
-		if ($row->zeitsperretyp_kurzbz == 'DienstV')
+		if ($row->zeitsperretyp_kurzbz == 'DienstV' || $row->zeitsperretyp_kurzbz == 'ZVerfueg')
 			$content_table .= '<td>&nbsp;</td>';
 		else if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
