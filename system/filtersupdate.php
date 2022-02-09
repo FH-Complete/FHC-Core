@@ -1001,7 +1001,8 @@ $filters = array(
 					{"name": "StudentNachname"},
 					{"name": "Note"},
 					{"name": "Abgabedatum"},
-					{"name": "Studiengang"}
+					{"name": "Studiengang"},
+					{"name": "Kommissionsmitglieder"}
 				],
 				"filters": []
 			}
