@@ -38,9 +38,6 @@
 	<rule ref="Generic.Commenting.Todo"/>
 	<rule ref="Squiz.Commenting.DocCommentAlignment"/>
 
-	<!-- We allow EOL after closing braces -->
-	<rule ref="FHComplete.ControlStructures.ControlSignature"/>
-
 	<rule ref="Generic.Files.LineEndings"/>
 
 	<rule ref="Generic.Formatting.NoSpaceAfterCast"/>
