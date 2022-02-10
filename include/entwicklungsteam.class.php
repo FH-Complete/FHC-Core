@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ *          Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -256,7 +257,7 @@ class entwicklungsteam extends basis_db
 	}
 
 	/**
-	 * Preuft ob der Eintrag schon existiert
+	 * Prueft ob der Eintrag schon existiert
 	 *
 	 * @param $mitarbeiter_uid
 	 * @param $studiengang_kz
@@ -285,6 +286,45 @@ class entwicklungsteam extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Liefert alle Entwicklungsteameinträge
+	 * @param $studiengang_kz Studiengangkennzeichen
+	 * @return alle Entwicklungsteameinträge
+	 */
+	public function getAll($stg_kz=null)
+	{
+		$qry = "SELECT * FROM bis.tbl_entwicklungsteam";
+		if($stg_kz!=null)
+			$qry.=" WHERE studiengang_kz=".$this->db_add_param($stg_kz);
+		$qry.=";";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new entwicklungsteam();
+
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->besqualcode = $row->besqualcode;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Entwicklungsteameinträge.';
 			return false;
 		}
 	}
