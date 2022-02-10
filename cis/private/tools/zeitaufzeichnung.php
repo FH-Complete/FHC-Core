@@ -801,8 +801,11 @@ echo '
 					for (var i = 0; i < json.length; i++)
 					{
 						output = "Für den Tag " + json[i].day + " ist bereits eine Zeitsperre vom Typ " +  json[i].typ + " eingetragen!";
-						alert("'.$p->t("zeitaufzeichnung/zeitsperreVorhanden1").'");
-						$("#buttonSave").attr("disabled","disabled");
+
+						var phrase = "' . $p->t("zeitaufzeichnung/zeitsperreVorhanden", ['{day}', '{typ}']) . '";
+						phrase = phrase.replace(\'{day}\', json[i].day);
+						phrase = phrase.replace(\'{typ}\', json[i].typ);
+						alert (phrase);
 					}
 				}
 				else

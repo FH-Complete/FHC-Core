@@ -65,5 +65,5 @@ $this->phrasen['zeitaufzeichnung/pauseEinfuegen']='Pause automatisch einfügen';
 $this->phrasen['zeitaufzeichnung/zeitraumZuKurz']='Zeitraum zu kurz für automatische Pause';
 $this->phrasen['zeitaufzeichnung/supportAnfragen']='<p><hr>Supportanfragen unter<br><a href="mailto:zeiterfassung@technikum-wien.at">zeiterfassung@technikum-wien.at</a></p>';
 $this->phrasen['zeitaufzeichnung/homeofficeNichtErlaubt']='Homeoffice für den Tag %s nicht erlaubt';
-$this->phrasen['zeitaufzeichnung/zeitsperreVorhanden']='<p>Achtung: Für den Tag %s existiert eine ganztägige Zeitsperre vom Typ %s!</p>';
+$this->phrasen['zeitaufzeichnung/zeitsperreVorhanden']='Achtung: Für den Tag %s existiert eine ganztägige Zeitsperre vom Typ %s!';
 $this->phrasen['zeitaufzeichnung/zeitsperreVorhanden1']='Für diesen Tag ist bereits eine ganztägige Zeitsperre eingetragen!';

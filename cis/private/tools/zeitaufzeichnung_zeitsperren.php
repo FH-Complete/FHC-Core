@@ -29,32 +29,15 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/zeitsperre.class.php');
 
-
+header('Content-Type: application/json; charset=utf-8');
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
-if ((isset($_GET['uid'])) && (isset($_GET['day'])))
+if ( isset($_GET['day']) )
 {
-	$uid = $_GET['uid'];
+	$auth = new authentication();
+	$uid = $auth->getUser();
 	$day = $_GET['day'];
-
-	//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
-	//des uebergebenen Users anzeigen
-	if (isset($_GET['uid']) && $_GET['uid'] != $uid)
-	{
-		$p = new phrasen();
-		$rechte = new benutzerberechtigung();
-		$rechte->getBerechtigungen($uid);
-
-		if ($rechte->isBerechtigt('admin'))
-		{
-			$uid = $_GET['uid'];
-		}
-		else
-		{
-			die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
-		}
-	}
 
 	$zs = new zeitsperre();
 	$sperreVorhanden = false;
@@ -75,4 +58,11 @@ if ((isset($_GET['uid'])) && (isset($_GET['day'])))
 		}
 	}
 	echo json_encode($result_obj);
+} else {
+	http_response_code(500);
+	echo json_encode(array(
+		array(
+			"error" => 'missing parameter day'
+		)
+	));
 }
