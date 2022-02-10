@@ -1335,7 +1335,7 @@ function LeMitarbeiterAuswahl()
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
 
 	var gesamtkosten = LeMitarbeiterGesamtkosten();
-	
+
     // Wenn Vertragsdetails angezeigt werden
     if (lehrveranstaltung_vertragsdetails_anzeigen) {
 
@@ -2261,6 +2261,8 @@ function LehrveranstaltungNotenAuswahl()
     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
     getService(Components.interfaces.nsIRDFService);
 
+	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
+
     var dsource = rdfService.GetDataSourceBlocking(url);
 
     var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
@@ -2271,9 +2273,6 @@ function LehrveranstaltungNotenAuswahl()
 
     note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
     punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
-
-	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
 
 	if(note=='')
 		note='9';
