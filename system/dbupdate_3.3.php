@@ -4758,21 +4758,24 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 
 // Add column dms_id, studiensemester_kurzbz, anmerkung_student und empfehlung_anrechnung
 // Change genehmigt_von and begruendung_id to be NULLABLE
-if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
+if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung LIMIT 1"))
 {
-	$qry = "
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN dms_id bigint;
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN studiensemester_kurzbz varchar(6);
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN anmerkung_student text;
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN empfehlung_anrechnung boolean;
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN dms_id bigint;
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN studiensemester_kurzbz varchar(6);
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN anmerkung_student text;
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN empfehlung_anrechnung boolean;
 
-		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
-	";
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
+		";
+	}
 
 
 	if(!$db->db_query($qry))
@@ -5996,7 +5999,9 @@ $tabellen=array(
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
-	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id", "dms_id", "studiensemester_kurzbz", "anmerkung_student", "empfehlung_anrechnung"),
+	"lehre.tbl_anrechnungstatus"  => array("status_kurzbz", "bezeichnung_mehrsprachig"),
+	"lehre.tbl_anrechnung_anrechnungstatus"  => array("anrechnungstatus_id", "anrechnung_id", "status_kurzbz", "datum", "insertamum", "insertvon"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),

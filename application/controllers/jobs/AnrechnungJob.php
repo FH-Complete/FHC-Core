@@ -188,7 +188,7 @@ class AnrechnungJob extends JOB_Controller
 			$studiengang_bezeichnung = $this->StudiengangModel->load($studiengang_kz)->retval[0]->stg_bezeichnung;
 
 			// Get STGL mail address
-			list ($to, $vorname) = self::_getSTGLMailAddress($studiengang_kz);
+			$stglMailReceiver_arr = self::_getSTGLMailAddress($studiengang_kz);
 
 			// Get HTML table with new Anrechnungen of that STG plus amount of them
 			list ($anrechnungen_amount, $anrechnungen_table) = self::_getSTGLMailDataTable($studiengang_kz, $anrechnungen);
@@ -199,22 +199,25 @@ class AnrechnungJob extends JOB_Controller
 				CIS_ROOT. 'cis/menu.php?content_id=&content='.
 				CIS_ROOT. index_page(). self::APPROVE_ANRECHNUNG_URI;
 
+			foreach ($stglMailReceiver_arr as $stgl)
+			{
 			// Prepare mail content
-			$body_fields = array(
-				'vorname'       => $vorname,
-				'studiengang'   => $studiengang_bezeichnung,
-				'anzahl'        => $anrechnungen_amount,
-				'datentabelle'  => $anrechnungen_table,
-				'link'          => anchor($url, 'Anrechnungsanträge Übersicht')
-			);
-
-			// Send mail
-			sendSanchoMail(
-				'AnrechnungAntragStellen',
-				$body_fields,
-				$to,
-				'Anerkennung nachgewiesener Kenntnisse: Neuer Antrag wurde gestellt'
-			);
+				$body_fields = array(
+					'vorname'       => $stgl['vorname'],
+					'studiengang'   => $studiengang_bezeichnung,
+					'anzahl'        => $anrechnungen_amount,
+					'datentabelle'  => $anrechnungen_table,
+					'link'          => anchor($url, 'Anrechnungsanträge Übersicht')
+				);
+	
+				// Send mail
+				sendSanchoMail(
+					'AnrechnungAntragStellen',
+					$body_fields,
+					$stgl['to'],
+					'Anerkennung nachgewiesener Kenntnisse: Neuer Antrag wurde gestellt'
+				);
+			}
 		}
 
 		$this->logInfo('SUCCEDED: Sending emails to STGL about yesterdays new Anrechnungen succeded.');
@@ -342,15 +345,21 @@ html;
 	// Get STGL mail address
 	private function _getSTGLMailAddress($studiengang_kz)
 	{
+		$stglMailAdress_arr = array();
 		$result = $this->StudiengangModel->getLeitung($studiengang_kz);
 
 		// Get STGL mail address
 		if (hasData($result))
 		{
-			return array(
-				$result->retval[0]->uid. '@'. DOMAIN,
-				$result->retval[0]->vorname
-			);
+			foreach (getData($result) as $stgl)
+			{
+				$stglMailAdress_arr[]= array(
+					'to' => $stgl->uid. '@'. DOMAIN,
+					'vorname' => $stgl->vorname
+				);
+			}
+			
+			return $stglMailAdress_arr;
 		}
 		// If not available, get assistance mail address
 		else

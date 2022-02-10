@@ -1186,7 +1186,22 @@ class betriebsmittel extends basis_db
 		//Kartennummern die im Hex-Format sind werden umgewandelt
 		if (!is_numeric($kartennummer))
 		{
-			$kartennummer=substr($kartennummer,strlen($kartennummer)-2,2).substr($kartennummer,strlen($kartennummer)-4,2). substr($kartennummer,strlen($kartennummer)-6,2).substr($kartennummer,0,2);
+			$tmp_kn_str = null;
+			for ($i=0; strlen($kartennummer) > $i; $i+=2) { 
+
+				#wenn die strlen($kartennummer) gerade ist (TW hat 8 Stellen, FHB 14 Stellen)
+				$tmp_kn_str .= substr($kartennummer,strlen($kartennummer)-($i+2),2);
+				
+				//#wenn ich ungerade und der letzte Durchgang ist dann nur mehr die eine Nummer nach vorne
+				//if ((strlen($kartennummer)%2 != 0) && ($i+2 > strlen($kartennummer))) {
+				//	$tmp_kn_str .= substr($kartennummer,strlen($kartennummer)-($i+1),1);
+				//#sonst normal immer 2 stellen nach vorne ruecken
+				//} else {
+				//	$tmp_kn_str .= substr($kartennummer,strlen($kartennummer)-($i+2),2);
+				//}
+			}
+			$kartennummer = $tmp_kn_str;
+			
 			$kartennummer=hexdec( $kartennummer);
 		}
 
