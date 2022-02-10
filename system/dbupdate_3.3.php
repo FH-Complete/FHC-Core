@@ -3500,6 +3500,48 @@ if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurz
 	}
 }
 
+// Spalte stud_selfservice in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: Zertifikat
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'Zertifikat' AND stud_selfservice;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET stud_selfservice = TRUE WHERE vorlage_kurzbz = 'Zertifikat';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalte stud_selfservice auf TRUE gesetzt bei Vorlage: Zertifikat<br>';
+	}
+}
+
+// Spalte stud_selfservice in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: LVZeugnis
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'LVZeugnis' AND stud_selfservice;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET stud_selfservice = TRUE WHERE vorlage_kurzbz = 'LVZeugnis';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalte stud_selfservice auf TRUE gesetzt bei Vorlage: LVZeugnis<br>';
+	}
+}
+
+// Spalte stud_selfservice in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: LVZeugnisEng
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'LVZeugnisEng' AND stud_selfservice;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET stud_selfservice = TRUE WHERE vorlage_kurzbz = 'LVZeugnisEng';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalte stud_selfservice auf TRUE gesetzt bei Vorlage: LVZeugnisEng<br>';
+	}
+}
+
 // dokument_kurzbz in public.tbl_dokument auf 32 Zeichen verlängert
 if($result = @$db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_dokument' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
 {

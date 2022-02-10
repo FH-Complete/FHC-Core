@@ -462,7 +462,7 @@ function StudentTreeKeyPress(event)
 // ****
 // * Erstellt das Zertifikat fuer die Freifaecher
 // ****
-function StudentFFZertifikatPrint(event, signirieren)
+function StudentFFZertifikatPrint(event, signieren)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -488,7 +488,7 @@ function StudentFFZertifikatPrint(event, signirieren)
 
 	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
-	if (signirieren)
+	if (signieren)
 	{
 		var req = new phpRequest(url,'','');
 		req.add('output', 'pdf');
@@ -515,7 +515,7 @@ function StudentFFZertifikatPrint(event, signirieren)
 //****
 //* Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 //****
-function StudentLVZeugnisPrint(event, sprache, signirieren)
+function StudentLVZeugnisPrint(event, sprache, signieren)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -545,7 +545,7 @@ function StudentLVZeugnisPrint(event, sprache, signirieren)
 
 	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid='+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
-	if (signirieren)
+	if (signieren)
 	{
 		var req = new phpRequest(url,'','');
 		req.add('output', 'pdf');

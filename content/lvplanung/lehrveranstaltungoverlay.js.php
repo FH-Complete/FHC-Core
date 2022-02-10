@@ -2403,7 +2403,7 @@ function LehrveranstaltungNotenPunkteChange()
 // ****
 // * Erstellt das Zertifikat fuer die Freifaecher
 // ****
-function LehrveranstaltungFFZertifikatPrint(event)
+function LehrveranstaltungFFZertifikatPrint(event, signieren)
 {
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 	//Alle markierten Noten holen
@@ -2439,6 +2439,11 @@ function LehrveranstaltungFFZertifikatPrint(event)
 		var output='pdf';
 
 	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+
+	if (signieren)
+	{
+		url = url + '&sign=1'
+	}
 	window.location.href = url;
 	//prompt('test:',url);
 }
@@ -2446,7 +2451,7 @@ function LehrveranstaltungFFZertifikatPrint(event)
 // ****
 // * Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 // ****
-function LehrveranstaltungLVZeugnisPrint(event, sprache)
+function LehrveranstaltungLVZeugnisPrint(event, sprache, signieren)
 {
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 	//Alle markierten Noten holen
@@ -2487,6 +2492,11 @@ function LehrveranstaltungLVZeugnisPrint(event, sprache)
 		xsl = 'LVZeugnisEng';
 
 	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+
+	if (signieren)
+	{
+		url = url + '&sign=1'
+	}
 	window.location.href = url;
 }
 
