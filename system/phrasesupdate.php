@@ -12876,6 +12876,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'eucovidqr',
+		'phrase' => 'maxtagebeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "ACHTUNG seit Februar 2022 werden Zutrittskarten für maximal 60 Tage freigeschalten.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "ATTENTION since February 2022 a maximum of 60 days validity is granted for accesscards",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
 		'phrase' => 'uploadbeschreibung',
 		'insertvon' => 'system',
 		'phrases' => array(
