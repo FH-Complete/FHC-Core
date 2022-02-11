@@ -2,11 +2,13 @@
 <ruleset name="FHComplete">
 	<description>FHComplete's coding standard</description>
 
-	<!-- Ignored directories if phpcs is running from command line -->
+	<!-- Ignored directories -->
 	<exclude-pattern>\.git</exclude-pattern>
 	<exclude-pattern>vendor</exclude-pattern>
 	<exclude-pattern>tests</exclude-pattern>
 	<exclude-pattern>application/controllers/api/v1</exclude-pattern>
+	<exclude-pattern>application/extensions</exclude-pattern>
+	<exclude-pattern>addons</exclude-pattern>
 
 	<rule ref="PSR2">
 		<exclude name="PSR1.Classes.ClassDeclaration" />
