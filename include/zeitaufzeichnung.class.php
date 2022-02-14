@@ -827,5 +827,78 @@ or not exists
 			return false;
 		}
 	}
+
+	/** Check, if there is a blocking PausenError
+	 *
+	 * @param string $uid User uid.
+	 * @param string $datumday Day to be check in the format "Y-m-d".
+	 * @return boolean True if there is a Pausen error.
+	 */
+	public function checkPausenErrors($uid, $datumday)
+	{
+		$tagesbeginn = '';
+		$tagesende = '';
+		$pausesumme = '00:00';
+		$tagessaldo = '';
+		$elsumme = '00:00';
+		$pflichtpause = false;
+		$blockingError = false;
+		$datum = new datum();
+
+		$this->getListeUserFromTo($uid, $datumday, $datumday, null);
+
+		foreach ($this->result as $row)
+		{
+			$datumtag = $datum->formatDatum($row->datum, 'Y-m-d');
+
+			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+			$tagesbeginn = $datum->formatDatum($row->start, 'H:i');
+
+			if (($tagesende == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+				$tagesende = $datum->formatDatum($row->ende, 'H:i');
+
+			if ($row->aktivitaet_kurzbz == "Pause")
+				$pausesumme = $row->diff;
+		}
+
+		$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) - $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) - 3600;
+
+		list($h1, $m1) = explode(':', $pausesumme);
+		$pausesumme = $h1 * 3600 + $m1 * 60;
+
+		list($h2, $m2) = explode(':', $elsumme);
+		$elsumme = $h2 * 3600 + $m2 * 60;
+
+
+		if ($datum->formatDatum($datumday, 'Y-m-d') >= '2019-11-06')
+		{
+			$pausesumme = $pausesumme;
+		}
+		elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pflichtpause == false && $elsumme == 0)
+		{
+			$pausesumme = $tagessaldo - 18000;
+		}
+		elseif ($tagessaldo > 18000 && $pflichtpause == false && $elsumme == 0)
+		{
+			$pausesumme = $pausesumme + 1800;
+		}
+
+		if ($elsumme > 0)
+		{
+			$pausesumme = $pausesumme + $elsumme;
+			$pflichtpause = true;
+		}
+
+		$tagessaldo = $tagessaldo - $pausesumme;
+
+		//check if blocking error
+		if (($tagessaldo > 19800 && $pausesumme < 1800) || ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000))
+		{
+			$blockingError = true;
+		}
+
+		return $blockingError;
+	}
+
 }
 ?>
