@@ -3326,6 +3326,7 @@ function StudentZeugnisDokumentArchivieren()
 			break;
 
 		case 'DiplSupplement':
+		case 'SZeugnis':
 			xml = 'diplomasupplement.xml.php';
 			break;
 
