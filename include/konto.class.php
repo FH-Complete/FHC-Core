@@ -957,6 +957,30 @@ class konto extends basis_db
 			return false;
 		}
 	}
+
+	public function checkDoppelteBuchung($person_ids, $stsem, $typ)
+	{
+		$qry = "SELECT betrag
+				FROM public.tbl_konto
+				JOIN public.tbl_benutzer benutzer USING(person_id)
+				WHERE person_id IN (".$this->implode4SQL(array_filter($person_ids)).")
+				AND studiensemester_kurzbz = ".$this->db_add_param($stsem)."
+				AND buchungstyp_kurzbz = ".$this->db_add_param($typ)." 
+				GROUP BY buchungsnr";
+
+		if ($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) > 0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
+			return false;
+		}
+	}
 }
 
 ?>
