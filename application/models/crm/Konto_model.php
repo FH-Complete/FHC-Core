@@ -18,45 +18,50 @@ class Konto_model extends DB_Model
 	public function setPaid($buchungsnr)
 	{
 		// get payment
-		$buchungResult =  $this->loadWhere(array('buchungsnr' => $buchungsnr));
+		$buchungResult = $this->loadWhere(array('buchungsnr' => $buchungsnr));
 
-		if(isSuccess($buchungResult) && hasData($buchungResult))
+		if (isSuccess($buchungResult) && hasData($buchungResult))
 		{
+			$buchung = getData($buchungResult)[0];
+
 			// get already paid amount
 			$this->addSelect('sum(betrag) as bezahlt');
 			$this->addGroupBy('buchungsnr_verweis');
-			$buchungVerweisResult =  $this->loadWhere(array('buchungsnr_verweis' => $buchungsnr));
+			$buchungVerweisResult = $this->loadWhere(array('buchungsnr_verweis' => $buchungsnr));
 
-			if(isSuccess($buchungVerweisResult))
+			if (isSuccess($buchungVerweisResult))
 			{
-				if(hasData($buchungVerweisResult))
-				{
-					$betragBezahltResult = getData($buchungVerweisResult);
-					$betragBezahlt = $betragBezahltResult->bezahlt;
-				}
-				else
-					$betragBezahlt = 0;
+				$betragBezahlt = 0;
 
-				$buchung = getData($buchungResult);
-				$buchung = $buchung[0];
+				if (hasData($buchungVerweisResult))
+				{
+					$betragBezahlt = getData($buchungVerweisResult)[0]->bezahlt;
+				}
 
 				// calculate open amount
-				$betragOffen = $betragBezahlt - $buchung->betrag*(-1);
+				$betragOffen = $betragBezahlt - $buchung->betrag * (-1);
 
-				$data = array(
-					'person_id' => $buchung->person_id,
-					'studiengang_kz' => $buchung->studiengang_kz,
-					'studiensemester_kurzbz' => $buchung->studiensemester_kurzbz,
-					'buchungsnr_verweis' => $buchungsnr,
-					'betrag' => str_replace(',','.',$betragOffen*(-1)),
-					'buchungsdatum' => date('Y-m-d'),
-					'buchungstext' => $buchung->buchungstext,
-					'insertamum' => date('Y-m-d H:i:s'),
-					'insertvon' => '',
-					'buchungstyp_kurzbz' => $buchung->buchungstyp_kurzbz,
-				);
+				if ($betragOffen != 0)
+				{
+					$data = array(
+						'person_id' => $buchung->person_id,
+						'studiengang_kz' => $buchung->studiengang_kz,
+						'studiensemester_kurzbz' => $buchung->studiensemester_kurzbz,
+						'buchungsnr_verweis' => $buchungsnr,
+						'betrag' => str_replace(',', '.', $betragOffen * (-1)),
+						'buchungsdatum' => date('Y-m-d'),
+						'buchungstext' => $buchung->buchungstext,
+						'insertamum' => date('Y-m-d H:i:s'),
+						'insertvon' => '',
+						'buchungstyp_kurzbz' => $buchung->buchungstyp_kurzbz,
+					);
 
-				return $this->insert($data);
+					return $this->insert($data);
+				}
+				else
+				{
+					return success();
+				}
 			}
 			else
 			{
