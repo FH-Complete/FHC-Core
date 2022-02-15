@@ -5941,6 +5941,20 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_zeita
 	}
 }
 
+// Change size of wawi.tbl_kostenstelle.kostenstelle_nr from character varying(4) to character varying(6)
+if ($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='wawi' AND TABLE_NAME='tbl_kostenstelle' AND COLUMN_NAME = 'kostenstelle_nr' AND character_maximum_length < 6"))
+{
+	if ($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE wawi.tbl_kostenstelle ALTER COLUMN kostenstelle_nr TYPE varchar(6);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>wawi.tbl_kostenstelle '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte bezeichnung in wawi.tbl_kostenstelle.kostenstelle_nr von kleiner varchar(4) auf varchar(6) geändert<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
