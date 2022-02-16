@@ -5951,7 +5951,7 @@ if ($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABL
 		if(!$db->db_query($qry))
 			echo '<strong>wawi.tbl_kostenstelle '.$db->db_last_error().'</strong><br>';
 		else
-			echo '<br>Spalte bezeichnung in wawi.tbl_kostenstelle.kostenstelle_nr von kleiner varchar(4) auf varchar(6) geändert<br>';
+			echo '<br>Spalte kostenstelle_nr in wawi.tbl_kostenstelle von varchar(4) auf varchar(6) geändert<br>';
 	}
 }
 
