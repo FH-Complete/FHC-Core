@@ -1358,6 +1358,7 @@ class mitarbeiter extends benutzer
 		WHERE
 			bismelden
 			AND personalnummer>0
+			AND tbl_bisverwendung.beginn<='.$this->db_add_param($meldungEnde).'
 			AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>'.$this->db_add_param($meldungBeginn).')
 		ORDER BY uid, nachname,vorname
 		';
