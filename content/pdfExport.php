@@ -520,6 +520,11 @@ else
 						{
 							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
 						}
+						elseif ($xsl == 'SZeugnis')
+						{
+							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+							$titel = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+						}
 						else
 						{
 							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss, 0, 64);
