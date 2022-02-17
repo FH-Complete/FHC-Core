@@ -133,7 +133,9 @@ $this->load->view(
                         <button type="submit" id="btn-save" class="btn btn-primary btn-w200 pull-right">
                             <?php echo ucfirst($this->p->t('ui', 'speichern')); ?>
                         </button>
-                        <button type="button" id="btn-delete" class="btn btn-danger btn-w200 btn-mr5 pull-right" disabled>
+                        <button type="button" id="btn-delete" class="btn btn-danger btn-w200 btn-mr5 pull-right" disabled
+                                data-toggle="tooltip" data-placement="right"
+                                title="Zum Löschen LektorIn aus Tabelle wählen">
                             <?php echo ucfirst($this->p->t('ui', 'loeschen')); ?>
                         </button>
                         <button type="reset" id="btn-break" class="btn btn-default btn-w200 btn-mr5 pull-right">

@@ -139,11 +139,11 @@ var Zverfueg = {
             .find('textarea[name=bezeichnung]').val('');
     },
     disableFormElements: function (){
-        $('#btn-delete').prop('disabled', true);
+        $('#btn-delete').prop('disabled', true).tooltip('enable');
         $('#mitarbeiter_uid').prop('disabled', false);
     },
     enableFormElements: function (){
-        $('#btn-delete').prop('disabled', false);
+        $('#btn-delete').prop('disabled', false).tooltip('disable');
         $('#mitarbeiter_uid').prop('disabled', true);
     }
 }
