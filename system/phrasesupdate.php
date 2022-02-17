@@ -1554,6 +1554,26 @@ $phrases = array(
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'geloescht',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Gel&ouml;scht',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Deleted',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 	'app' => 'core',
 	'category' => 'anrechnung',
