@@ -46,7 +46,7 @@ class zeitwunsch extends basis_db
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		$this->init();
 	}
 
@@ -107,7 +107,7 @@ class zeitwunsch extends basis_db
 
 		return true;
 	}
-	
+
 	/**
 	 * Speichert einen Zeitwunsch in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -122,7 +122,7 @@ class zeitwunsch extends basis_db
 
 		if($this->new)
 		{
-			$qry = 'INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, tag, stunde, gewicht, 
+			$qry = 'INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, tag, stunde, gewicht,
 					insertamum, insertvon, updateamum, updatevon, zeitwunsch_gueltigkeit_id) VALUES('.
 					$this->db_add_param($this->mitarbeiter_uid).','.
 					$this->db_add_param($this->tag, FHC_INTEGER).','.
@@ -140,9 +140,9 @@ class zeitwunsch extends basis_db
 			       ' gewicht='.$this->db_add_param($this->gewicht, FHC_INTEGER).', '.
 			       ' updateamum='.$this->db_add_param($this->updateamum).', '.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE 
-			       		mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid, FHC_STRING, false)." 
-			       		AND tag=".$this->db_add_param($this->tag, FHC_INTEGER)." 
+			       " WHERE
+			       		mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid, FHC_STRING, false)."
+			       		AND tag=".$this->db_add_param($this->tag, FHC_INTEGER)."
 			       		AND stunde=".$this->db_add_param($this->stunde, FHC_INTEGER). "
 			       		AND zeitwunsch_gueltigkeit_id=".$this->db_add_param($this->zeitwunsch_gueltigkeit_id, FHC_INTEGER);
 		}
@@ -167,7 +167,7 @@ class zeitwunsch extends basis_db
     public function loadByZWG($uid, $zeitwunsch_gueltigkeit_id)
     {
         $qry = '
-            SELECT * 
+            SELECT *
             FROM campus.tbl_zeitwunsch
             JOIN campus.tbl_zeitwunsch_gueltigkeit zwg USING (zeitwunsch_gueltigkeit_id)
             WHERE zwg.mitarbeiter_uid = ' . $this->db_add_param($uid) . '
@@ -213,11 +213,11 @@ class zeitwunsch extends basis_db
         }
 
         $qry = "
-            SELECT * 
+            SELECT *
             FROM campus.tbl_zeitwunsch
             JOIN campus.tbl_zeitwunsch_gueltigkeit zwg USING (zeitwunsch_gueltigkeit_id)
             WHERE zwg.mitarbeiter_uid=". $this->db_add_param($uid). "
-            AND ". $this->db_add_param(date('Y-m-d', $datum)). " BETWEEN von AND bis;
+            AND ". $this->db_add_param(date('Y-m-d', $datum)). " BETWEEN von AND COALESCE(bis,'2999-01-01');
         ";
 
 
@@ -249,13 +249,13 @@ class zeitwunsch extends basis_db
 
 			// Zeitsperren abfragen
 			$sql="
-				SELECT 
+				SELECT
 					zeitsperretyp_kurzbz, vondatum,vonstunde,bisdatum,bisstunde
-				FROM 
+				FROM
 					campus.tbl_zeitsperre
-				WHERE 
+				WHERE
 					mitarbeiter_uid=".$this->db_add_param($uid)."
-					AND vondatum<=".$this->db_add_param($ende)." 
+					AND vondatum<=".$this->db_add_param($ende)."
 					AND bisdatum>=".$this->db_add_param($start);
 
 			if(!$this->db_query($sql))
@@ -334,8 +334,8 @@ class zeitwunsch extends basis_db
 		$sql_query='SELECT tag,stunde,min(gewicht) AS gewicht
 				FROM campus.tbl_zeitwunsch
                 JOIN campus.tbl_zeitwunsch_gueltigkeit zwg USING (zeitwunsch_gueltigkeit_id)
-                WHERE zwg.mitarbeiter_uid IN ('.$sql_query_le.') 
-                AND '. $this->db_add_param(date('Y-m-d', $datum)). ' BETWEEN von AND bis
+                WHERE zwg.mitarbeiter_uid IN ('.$sql_query_le.')
+                AND '. $this->db_add_param(date('Y-m-d', $datum)). ' BETWEEN von AND COALESCE(bis,\'2999-01-01\')
                 GROUP BY tag,stunde;';
 
 		// Zeitwuensche abfragen
@@ -359,13 +359,13 @@ class zeitwunsch extends basis_db
 
 			// Zeitsperren abfragen
 			$sql="
-				SELECT 
+				SELECT
 					zeitsperretyp_kurzbz, vondatum,vonstunde,bisdatum,bisstunde
-				FROM 
+				FROM
 					campus.tbl_zeitsperre
-				WHERE 
-					mitarbeiter_uid IN ($sql_query_le) 
-					AND vondatum<=".$this->db_add_param($ende)." 
+				WHERE
+					mitarbeiter_uid IN ($sql_query_le)
+					AND vondatum<=".$this->db_add_param($ende)."
 					AND bisdatum>=".$this->db_add_param($start);
 
 			if(!$this->db_query($sql))
@@ -424,10 +424,10 @@ class zeitwunsch extends basis_db
      */
 	function exists($uid, $zwg_id, $stunde, $tag)
 	{
-		$qry = "SELECT 1 FROM campus.tbl_zeitwunsch 
-				WHERE 
-					mitarbeiter_uid=".$this->db_add_param($uid)." 
-					AND stunde=".$this->db_add_param($stunde, FHC_INTEGER)." 
+		$qry = "SELECT 1 FROM campus.tbl_zeitwunsch
+				WHERE
+					mitarbeiter_uid=".$this->db_add_param($uid)."
+					AND stunde=".$this->db_add_param($stunde, FHC_INTEGER)."
 					AND tag=".$this->db_add_param($tag, FHC_INTEGER). "
                     AND zeitwunsch_gueltigkeit_id = ".$this->db_add_param($zwg_id, FHC_INTEGER);
 		if($this->db_query($qry))
