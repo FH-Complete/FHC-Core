@@ -1,0 +1,196 @@
+$(function(){
+    var studiensemesterStart = $("#studsemStart").val();
+
+    Zverfueg.initDatepicker(studiensemesterStart);
+
+    $('#form-zeitverfuegbarkeit').submit(function(e){
+
+        e.preventDefault();
+
+        let zeitsperre_id = this.zeitsperre_id.value;
+        let mitarbeiter_uid = this.mitarbeiter_uid.value;
+        let lektor = this.mitarbeiter_uid.options[this.mitarbeiter_uid.selectedIndex].text;
+        let bezeichnung = this.bezeichnung.value;
+        let vondatum = this.vondatum.value;
+        let vonstunde = this.vonstunde.value;
+        let bisdatum = this.bisdatum.value;
+        let bisstunde = this.bisstunde.value;
+
+
+        if (!Zverfueg.hasValidDate(vondatum, bisdatum))
+        {
+            return FHC_DialogLib.alertInfo('Enddatum darf nicht NACH Startdatum liegen.');
+        }
+
+        if (!Zverfueg.hasValidStunden(vondatum, bisdatum, vonstunde, bisstunde))
+        {
+            return FHC_DialogLib.alertInfo('Am gleichen Tag muss die Endstunde NACH der Anfangsstunde liegen.');
+        }
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/saveZeitverfuegbarkeit",
+            {
+                zeitsperre_id: zeitsperre_id,
+                mitarbeiter_uid: mitarbeiter_uid,
+                bezeichnung: bezeichnung,
+                zeitsperretyp_kurzbz: 'ZVerfueg',
+                vondatum: vondatum,
+                vonstunde: vonstunde,
+                bisdatum: bisdatum,
+                bisstunde: bisstunde
+            },
+            {
+                successCallback: function (data, textStatus, jqXHR)
+                {
+                    if (FHC_AjaxClient.isError(data))
+                    {
+                        FHC_DialogLib.alertWarning(FHC_AjaxClient.getError(data));
+                    }
+
+                    if (FHC_AjaxClient.hasData(data))
+                    {
+                        if (zeitsperre_id == '')
+                        {
+                            // Add row
+                            $('#tableWidgetTabulator').tabulator('addRow', {
+                                zeitsperre_id: FHC_AjaxClient.getData(data).zeitsperre_id,
+                                mitarbeiter_uid: mitarbeiter_uid,
+                                lektor: lektor,
+                                vondatum: vondatum,
+                                vonstunde: $.isNumeric(vonstunde) ? vonstunde : '',
+                                bisdatum: bisdatum,
+                                bisstunde: $.isNumeric(bisstunde) ? bisstunde : '',
+                                bezeichnung: bezeichnung
+                            }, true); // true adds new row on top
+                        }
+                        else {
+                            $('#tableWidgetTabulator').tabulator('updateData', [{
+                                zeitsperre_id: zeitsperre_id,
+                                vondatum: vondatum,
+                                vonstunde: $.isNumeric(vonstunde) ? vonstunde : '',
+                                bisdatum: bisdatum,
+                                bisstunde: $.isNumeric(bisstunde) ? bisstunde : '',
+                                bezeichnung: bezeichnung
+                            }]);
+                        }
+
+                        // Reset form
+                        Zverfueg.resetFormFields();
+
+                        // Disable break and delete button
+                        Zverfueg.disableFormElements();
+
+                        // Display success message
+                        FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data).msg);
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            }
+        );
+    })
+
+    $('#btn-delete').click(function() {
+        let zeitsperre_id = $('#zeitsperre_id').val();
+
+        FHC_AjaxClient.ajaxCallPost(
+            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/deleteZeitverfuegbarkeit",
+            {
+                zeitsperre_id: zeitsperre_id,
+            },
+            {
+                successCallback: function (data, textStatus, jqXHR) {
+                    if (FHC_AjaxClient.isError(data)) {
+                        FHC_DialogLib.alertWarning(FHC_AjaxClient.getError(data));
+                    }
+
+                    if (FHC_AjaxClient.hasData(data)) {
+
+                        // Delete row
+                        let row = $('#tableWidgetTabulator').tabulator('getRow', zeitsperre_id);
+                        row.delete(zeitsperre_id);
+
+                        // Reset form
+                        Zverfueg.resetFormFields();
+
+                        // Display delete message
+                        FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data).msg);
+                    }
+                },
+                errorCallback: function (jqXHR, textStatus, errorThrown)
+                {
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("ui", "systemfehler"));
+                }
+            });
+    });
+
+    $('#btn-break').click(function () {
+        Zverfueg.disableFormElements();
+    })
+
+})
+
+var Zverfueg = {
+    initDatepicker: function (studiensemesterStart) {
+        $.datepicker.setDefaults($.datepicker.regional['de']);
+        $( ".zverfueg-datepicker" ).datepicker({
+            "dateFormat": "yy-mm-dd",
+            "minDate": $.datepicker.formatDate('yy-mm-dd', new Date(studiensemesterStart))
+        });
+    },
+    resetFormFields: function(){
+        $('#form-zeitverfuegbarkeit')
+            .trigger('reset')
+            .find('input:hidden[name=zeitsperre_id]').val('')
+            .find('textarea[name=bezeichnung]').val('');
+    },
+    disableFormElements: function (){
+        $('#btn-delete').prop('disabled', true);
+        $('#mitarbeiter_uid').prop('disabled', false);
+    },
+    enableFormElements: function (){
+        $('#btn-delete').prop('disabled', false);
+        $('#mitarbeiter_uid').prop('disabled', true);
+    },
+    hasValidDate: function(vonDatum, bisDatum){
+      if (bisDatum < vonDatum)
+      {
+          return false;
+      }
+
+      return true;
+    },
+    hasValidStunden: function (vonDatum, bisDatum, vonStunde, bisStunde){
+        if (vonDatum == bisDatum)
+        {
+            if ($.isNumeric(vonStunde) && $.isNumeric(bisStunde) && (bisStunde < vonStunde))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+// TABULATOR FUNCTIONS
+// ---------------------------------------------------------------------------------------------------------------------
+function func_rowSelected(row){
+    Zverfueg.enableFormElements();
+
+    // Set form fields
+    $('#zeitsperre_id').val(row.getData().zeitsperre_id);
+    $('#mitarbeiter_uid').val(row.getData().mitarbeiter_uid);
+    $('#bezeichnung').val(row.getData().bezeichnung);
+    $('#vondatum').datepicker('setDate', row.getData().vondatum);
+    $('#bisdatum').datepicker('setDate', row.getData().bisdatum);
+    $('#vonstunde').val(row.getData().vonstunde);
+    $('#bisstunde').val(row.getData().bisstunde);
+}
+
+function func_rowDeselected(row){
+    Zverfueg.resetFormFields();
+    Zverfueg.disableFormElements();
+    Zverfueg.resetFormFields();
+}
