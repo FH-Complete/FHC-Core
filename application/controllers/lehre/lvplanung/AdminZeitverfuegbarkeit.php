@@ -94,7 +94,8 @@ class AdminZeitverfuegbarkeit extends Auth_Controller
         $bisDatum = $this->input->post('bisdatum');
         $bisStunde = isEmptyString($this->input->post('bisstunde')) ? null : $this->input->post('bisstunde');
 
-        if ($this->_validate()) // TODO
+        $result = $this->_validate($this->input->post());
+        if (isSuccess($result))
         {
             if (is_numeric($zeitsperre_id))
             {
@@ -144,7 +145,7 @@ class AdminZeitverfuegbarkeit extends Auth_Controller
     {
         $zeitsperre_id = $this->input->post('zeitsperre_id');
 
-        if (!isset($zeitsperre_id) || !is_numeric($zeitsperre_id))
+        if (!is_numeric($zeitsperre_id))
         {
             $this->terminateWithJsonError('Wählen Sie einen Lehrenden aus der Zeitverfügbarkeit-Tabelle aus.');
         }
@@ -213,9 +214,56 @@ class AdminZeitverfuegbarkeit extends Auth_Controller
         return $this->StundeModel->load();
     }
 
-    private function _validate()
+    /**
+     * Validaton checks performed on post data.
+     *
+     * @param $post
+     * @return array|stdClass
+     * @throws Exception
+     */
+    private function _validate($post)
     {
-        return true;
+        if (isEmptyString($post['mitarbeiter_uid']))
+        {
+            return (error('LektorIn fehlt'));
+        }
+        
+        if (isEmptyString($post['vondatum']))
+        {
+            return error('Startdatum fehlt');
+        }
+
+        if (isEmptyString($post['bisdatum']))
+        {
+            return error('Endedatum fehlt');
+        }
+
+        if (new DateTime($post['bisdatum']) < new DateTime($post['vondatum']))
+        {
+            return error('Endedatum darf nicht VOR dem Startdatum liegen');
+        }
+
+        // Check bisstunde not after vonstunde within same day
+        if (new DateTime($post['bisdatum']) == new DateTime($post['vondatum']))
+        {
+            if (is_numeric($post['vonstunde']) && is_numeric($post['bisstunde'])
+                && $post['bisstunde'] < $post['vonstunde'])
+            {
+                return error('Am gleichen Tag darf Endstunde nicht VOR der Startstunde liegen');
+            }
+        }
+
+        // Check dates are > then start of actual Studiensemester
+        $result = $this->StudiensemesterModel->getAkt();
+        $studsemStart = hasData($result) ? getData($result)[0]->start : '';
+
+        if (new DateTime($post['vondatum']) < new DateTime($studsemStart) ||
+            new DateTime($post['bisdatum']) < new DateTime($studsemStart))
+        {
+            return error('Start- und Endedatum können nur für das aktuelle oder künftige Studiensemester geplant werden');
+        }
+
+        return success();
     }
 
 }

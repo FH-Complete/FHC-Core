@@ -16,17 +16,6 @@ $(function(){
         let bisdatum = this.bisdatum.value;
         let bisstunde = this.bisstunde.value;
 
-
-        if (!Zverfueg.hasValidDate(vondatum, bisdatum))
-        {
-            return FHC_DialogLib.alertInfo('Enddatum darf nicht NACH Startdatum liegen.');
-        }
-
-        if (!Zverfueg.hasValidStunden(vondatum, bisdatum, vonstunde, bisstunde))
-        {
-            return FHC_DialogLib.alertInfo('Am gleichen Tag muss die Endstunde NACH der Anfangsstunde liegen.');
-        }
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/saveZeitverfuegbarkeit",
             {
@@ -153,24 +142,6 @@ var Zverfueg = {
     enableFormElements: function (){
         $('#btn-delete').prop('disabled', false);
         $('#mitarbeiter_uid').prop('disabled', true);
-    },
-    hasValidDate: function(vonDatum, bisDatum){
-      if (bisDatum < vonDatum)
-      {
-          return false;
-      }
-
-      return true;
-    },
-    hasValidStunden: function (vonDatum, bisDatum, vonStunde, bisStunde){
-        if (vonDatum == bisDatum)
-        {
-            if ($.isNumeric(vonStunde) && $.isNumeric(bisStunde) && (bisStunde < vonStunde))
-            {
-                return false;
-            }
-        }
-        return true;
     }
 }
 
