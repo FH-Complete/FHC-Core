@@ -4,7 +4,7 @@ $STUDIENGANG_KZ_ARR = $studiengang_kz_arr; // stg the user is entitled to admini
 
 $qry = '
     SELECT * FROM (
-        SELECT DISTINCT ON (zsp.mitarbeiter_uid, zeitsperre_id) zsp.mitarbeiter_uid, zeitsperre_id, 
+        SELECT DISTINCT ON (zeitsperre_id, zsp.mitarbeiter_uid) zeitsperre_id, zsp.mitarbeiter_uid, 
             concat_ws(\' \', nachname, vorname) AS "lektor", 
             vondatum, vonstunde, bisdatum, bisstunde, zsp.bezeichnung
         FROM public.tbl_person
@@ -20,7 +20,7 @@ $qry = '
         AND ma.personalnummer > 0
         AND NOW() <= ss.ende
         AND zeitsperretyp_kurzbz = \'ZVerfueg\'
-        ORDER BY zsp.mitarbeiter_uid, zeitsperre_id
+        ORDER BY zeitsperre_id, zsp.mitarbeiter_uid
     ) as tmp
     ORDER BY vondatum DESC
 ';
