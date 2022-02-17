@@ -13,6 +13,20 @@ class Studiensemester_model extends DB_Model
 		$this->hasSequence = false;
 	}
 
+    /**
+     * Get actual Studiensemester.
+     *
+     * @return array
+     */
+    public function getAkt()
+    {
+        return $this->loadWhere(array(
+                'start <= ' => 'NOW()',
+                'ende >= '  => 'NOW()'
+            )
+        );
+    }
+
 	// Get next study semester
 	public function getNext()
     {
