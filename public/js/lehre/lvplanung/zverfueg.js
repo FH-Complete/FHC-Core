@@ -66,7 +66,7 @@ $(function(){
                         // Reset form
                         Zverfueg.resetFormFields();
 
-                        // Disable break and delete button
+                        // Disable form elements
                         Zverfueg.disableFormElements();
 
                         // Display success message
@@ -103,6 +103,9 @@ $(function(){
 
                         // Reset form
                         Zverfueg.resetFormFields();
+
+                        // Disable form elements
+                        Zverfueg.disableFormElements();
 
                         // Display delete message
                         FHC_DialogLib.alertSuccess(FHC_AjaxClient.getData(data).msg);
