@@ -2272,6 +2272,21 @@ if(!$error)
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='checkbuchung')
+	{
+		$person_ids = explode(';',$_POST['person_ids']);
+		$exists = false;
+		if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK') && (in_array($_POST['buchungstyp_kurzbz'], unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK))))
+		{
+			$konto = new konto();
+			$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $_POST['buchungstyp_kurzbz']);
+		}
+
+		if($exists)
+			$return = true;
+		else
+			$return = false;
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='neuebuchung')
 	{
 		//Speichert eine neue Buchung
@@ -2288,47 +2303,33 @@ if(!$error)
 		}
 		else
 		{
-			$exists = false;
-			if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK') && (in_array($_POST['buchungstyp_kurzbz'], unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK))))
+			foreach ($person_ids as $person_id)
 			{
-				$konto = new konto();
-				$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $_POST['buchungstyp_kurzbz']);
-			}
-
-			if ($exists)
-			{
-				$errormsg = 'Buchung bereits vorhanden.';
-			}
-			else
-			{
-				foreach ($person_ids as $person_id)
+				if($person_id!='')
 				{
-					if($person_id!='')
-					{
-						$buchung = new konto();
-						$buchung->person_id = $person_id;
-						$buchung->studiengang_kz = $_POST['studiengang_kz'];
-						$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-						$buchung->buchungsnr_verweis='';
-						$buchung->betrag = $_POST['betrag'];
-						$buchung->buchungsdatum = $_POST['buchungsdatum'];
-						$buchung->buchungstext = $_POST['buchungstext'];
-						$buchung->mahnspanne = $_POST['mahnspanne'];
-						$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
-						$buchung->credit_points = $_POST["credit_points"];
-						$buchung->insertamum = date('Y-m-d H:i:s');
-						$buchung->insertvon = $user;
-						$buchung->anmerkung = $_POST['anmerkung'];
-						$buchung->new = true;
+					$buchung = new konto();
+					$buchung->person_id = $person_id;
+					$buchung->studiengang_kz = $_POST['studiengang_kz'];
+					$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+					$buchung->buchungsnr_verweis='';
+					$buchung->betrag = $_POST['betrag'];
+					$buchung->buchungsdatum = $_POST['buchungsdatum'];
+					$buchung->buchungstext = $_POST['buchungstext'];
+					$buchung->mahnspanne = $_POST['mahnspanne'];
+					$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+					$buchung->credit_points = $_POST["credit_points"];
+					$buchung->insertamum = date('Y-m-d H:i:s');
+					$buchung->insertvon = $user;
+					$buchung->anmerkung = $_POST['anmerkung'];
+					$buchung->new = true;
 
-						if($buchung->save())
-						{
-							$data = $buchung->buchungsnr;
-						}
-						else
-						{
-							$errormsg .= "Fehler beim Speichern: $buchung->errormsg\n";
-						}
+					if($buchung->save())
+					{
+						$data = $buchung->buchungsnr;
+					}
+					else
+					{
+						$errormsg .= "Fehler beim Speichern: $buchung->errormsg\n";
 					}
 				}
 			}

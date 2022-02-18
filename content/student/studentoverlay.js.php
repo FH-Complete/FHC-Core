@@ -3044,6 +3044,20 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 		return false;
 	}
 
+	var tocheck = <?php echo (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK') && FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK) ? 'true' : 'false' ?>;
+
+	var exists = false;
+
+	if (tocheck)
+	{
+		exists = StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kurzbz, studiengang_kz);
+	}
+	if (exists)
+	{
+		if(!confirm('Die Buchung ist bereits vorhanden. Trotzdem fortfahren?'))
+			return false;
+	}
+	
 	req.add('type', 'neuebuchung');
 
 	req.add('person_ids', person_ids);
@@ -3074,6 +3088,28 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 		StudentKontoTreeDatasource.Refresh(false);
 		return true;
 	}
+}
+//  ****
+// * Prüft ob die Buchung bereits vorhanden ist
+// ****
+function StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kurzbz, studiengang_kz)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+	req.add('type', 'checkbuchung');
+
+	req.add('person_ids', person_ids);
+	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
+	req.add('studiengang_kz', studiengang_kz);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response);
+	
+	return(val.dbdml_return);
 }
 
 // *****
