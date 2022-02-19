@@ -3458,6 +3458,231 @@ if(!@$db->db_query("SELECT insertamum FROM public.tbl_vorlage LIMIT 1"))
 		echo '<br>Neue Spalten insertamum,insertvon,updateamum und updatevon in public.tbl_vorlage hinzugefügt';
 }
 
+// Spalte archivierbar und signierbar in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: Zertifikat
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'Zertifikat' AND archivierbar AND signierbar;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET archivierbar = TRUE, signierbar = TRUE WHERE vorlage_kurzbz = 'Zertifikat';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalten archivierbar und signierbar auf TRUE gesetzt bei Vorlage: Zertifikat<br>';
+	}
+}
+
+// Spalte archivierbar und signierbar in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: LVZeugnis
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'LVZeugnis' AND archivierbar AND signierbar;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET archivierbar = TRUE, signierbar = TRUE WHERE vorlage_kurzbz = 'LVZeugnis';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalten archivierbar und signierbar auf TRUE gesetzt bei Vorlage: LVZeugnis<br>';
+	}
+}
+
+// Spalte archivierbar und signierbar in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: LVZeugnisEng
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'LVZeugnisEng' AND archivierbar AND signierbar;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET archivierbar = TRUE, signierbar = TRUE WHERE vorlage_kurzbz = 'LVZeugnisEng';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalten archivierbar und signierbar auf TRUE gesetzt bei Vorlage: LVZeugnisEng<br>';
+	}
+}
+
+// Spalte stud_selfservice in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: Zertifikat
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'Zertifikat' AND stud_selfservice;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET stud_selfservice = TRUE WHERE vorlage_kurzbz = 'Zertifikat';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalte stud_selfservice auf TRUE gesetzt bei Vorlage: Zertifikat<br>';
+	}
+}
+
+// Spalte stud_selfservice in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: LVZeugnis
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'LVZeugnis' AND stud_selfservice;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET stud_selfservice = TRUE WHERE vorlage_kurzbz = 'LVZeugnis';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalte stud_selfservice auf TRUE gesetzt bei Vorlage: LVZeugnis<br>';
+	}
+}
+
+// Spalte stud_selfservice in public.tbl_vorlage auf TRUE gesetzt bei Vorlage: LVZeugnisEng
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'LVZeugnisEng' AND stud_selfservice;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "UPDATE public.tbl_vorlage SET stud_selfservice = TRUE WHERE vorlage_kurzbz = 'LVZeugnisEng';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_vorlage: Spalte stud_selfservice auf TRUE gesetzt bei Vorlage: LVZeugnisEng<br>';
+	}
+}
+
+// dokument_kurzbz in public.tbl_dokument auf 32 Zeichen verlängert
+if($result = @$db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_dokument' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = " ALTER TABLE public.tbl_dokument ALTER COLUMN dokument_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokument_kurzbz in public.tbl_dokument auf varchar(32) geändert<br>';
+	}
+}
+
+// dokument_kurzbz in public.tbl_akte auf 32 Zeichen verlängert
+if($result = @$db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_akte' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = " ALTER TABLE public.tbl_akte ALTER COLUMN dokument_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokument_kurzbz in public.tbl_akte auf varchar(32) geändert<br>';
+	}
+}
+
+
+// dokument_kurzbz in campus.tbl_dms auf 32 Zeichen verlängert
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='campus' AND TABLE_NAME='tbl_dms' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE campus.tbl_dms ALTER COLUMN dokument_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_dms '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokument_kurzbz in campus.tbl_dms auf varchar(32) geändert<br>';
+	}
+}
+
+// dokument_kurzbz in public.tbl_dokumentprestudent auf 32 Zeichen verlängert
+if($result = @$db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_dokumentprestudent' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = " ALTER TABLE public.tbl_dokumentprestudent ALTER COLUMN dokument_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokumentprestudent '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokument_kurzbz in public.tbl_dokumentprestudent auf varchar(32) geändert<br>';
+	}
+}
+
+// dokument_kurzbz in public.tbl_dokumentstudiengang auf 32 Zeichen verlängert
+if($result = @$db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_dokumentstudiengang' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = " ALTER TABLE public.tbl_dokumentstudiengang ALTER COLUMN dokument_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokumentstudiengang '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokument_kurzbz in public.tbl_dokumentstudiengang auf varchar(32) geändert<br>';
+	}
+}
+
+// dokument_kurzbz in public.tbl_vorlage auf 32 Zeichen verlängert
+if($result = @$db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_vorlage' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = " ALTER TABLE public.tbl_vorlage ALTER COLUMN dokument_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokument_kurzbz in public.tbl_vorlage auf varchar(32) geändert<br>';
+	}
+}
+
+// dokument_kurzbz in public.tbl_vorlagedokument auf 32 Zeichen verlängert
+if($result = @$db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_vorlagedokument' AND COLUMN_NAME = 'dokument_kurzbz' AND character_maximum_length = 32"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = " ALTER TABLE public.tbl_vorlagedokument ALTER COLUMN dokument_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_vorlage '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokument_kurzbz in public.tbl_vorlagedokument auf varchar(32) geändert<br>';
+	}
+}
+
+// Neues Dokument hinzugefuegt LVZeugnisEng
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_dokument WHERE dokument_kurzbz = 'LVZeugnisEng'"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_dokument (dokument_kurzbz, bezeichnung, bezeichnung_mehrsprachig) VALUES ('LVZeugnisEng', 'Lehrveranstaltungszeugnis Englisch', '{\"Lehrveranstaltungszeugnis\",\"Course Certificate\"}')";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_dokument: LVZeugnisEng hinzugefügt<br>';
+	}
+}
+
+// Neues Dokument hinzugefuegt LVZeugnis
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_dokument WHERE dokument_kurzbz = 'LVZeugnis'"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_dokument (dokument_kurzbz, bezeichnung, bezeichnung_mehrsprachig) VALUES ('LVZeugnis', 'Lehrveranstaltungszeugnis', '{\"Lehrveranstaltungszeugnis\",\"Course Certificate\"}')";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_dokument: LVZeugnis hinzugefügt<br>';
+	}
+}
+
+// Neues Dokument hinzugefuegt Zertifikat
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_dokument WHERE dokument_kurzbz = 'Zertifikat'"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_dokument (dokument_kurzbz, bezeichnung, bezeichnung_mehrsprachig) VALUES ('Zertifikat', 'Zertifikat', '{\"Zertifikat\",\"Certificate\"}')";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_dokument: Zertifikat hinzugefügt<br>';
+	}
+}
+
 // insert und update fuer public.tbl_vorlagestudiengang
 if(!@$db->db_query("SELECT insertamum FROM public.tbl_vorlagestudiengang LIMIT 1"))
 {
@@ -4758,21 +4983,24 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 
 // Add column dms_id, studiensemester_kurzbz, anmerkung_student und empfehlung_anrechnung
 // Change genehmigt_von and begruendung_id to be NULLABLE
-if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
+if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung LIMIT 1"))
 {
-	$qry = "
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN dms_id bigint;
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN studiensemester_kurzbz varchar(6);
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN anmerkung_student text;
-		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN empfehlung_anrechnung boolean;
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN dms_id bigint;
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN studiensemester_kurzbz varchar(6);
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN anmerkung_student text;
+			ALTER TABLE lehre.tbl_anrechnung ADD COLUMN empfehlung_anrechnung boolean;
 
-		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
-		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
-	";
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
+			ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN insertamum SET DEFAULT NOW();
+		";
+	}
 
 
 	if(!$db->db_query($qry))
@@ -5713,6 +5941,20 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_zeita
 	}
 }
 
+// Change size of wawi.tbl_kostenstelle.kostenstelle_nr from character varying(4) to character varying(6)
+if ($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='wawi' AND TABLE_NAME='tbl_kostenstelle' AND COLUMN_NAME = 'kostenstelle_nr' AND character_maximum_length < 6"))
+{
+	if ($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE wawi.tbl_kostenstelle ALTER COLUMN kostenstelle_nr TYPE varchar(6);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>wawi.tbl_kostenstelle '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte kostenstelle_nr in wawi.tbl_kostenstelle von varchar(4) auf varchar(6) geändert<br>';
+	}
+}
+
 // Add column parameterFuerBehebung to system.tbl_issue
 if(!$result = @$db->db_query("SELECT behebung_parameter FROM system.tbl_issue LIMIT 1"))
 {
@@ -5831,7 +6073,9 @@ $tabellen=array(
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
-	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id", "dms_id", "studiensemester_kurzbz", "anmerkung_student", "empfehlung_anrechnung"),
+	"lehre.tbl_anrechnungstatus"  => array("status_kurzbz", "bezeichnung_mehrsprachig"),
+	"lehre.tbl_anrechnung_anrechnungstatus"  => array("anrechnungstatus_id", "anrechnung_id", "status_kurzbz", "datum", "insertamum", "insertvon"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
@@ -5989,7 +6233,7 @@ $tabellen=array(
 	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app"),
 	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
 	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz"),
-	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","insertvon","insertamum","updatevon","updateamum"),
+	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","behebung_parameter","insertvon","insertamum","updatevon","updateamum"),
 	"system.tbl_issue_status" => array("status_kurzbz","bezeichnung_mehrsprachig"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),

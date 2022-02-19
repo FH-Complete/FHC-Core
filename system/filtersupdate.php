@@ -963,7 +963,8 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
-					{"name": "Verarbeitet von"}
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
 				],
 				"filters": [
 					{

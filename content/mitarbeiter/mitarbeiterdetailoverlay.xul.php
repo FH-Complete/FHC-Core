@@ -269,7 +269,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		    		<label value="Anmerkung" control="mitarbeiter-detail-textbox-mitarbeiteranmerkung"/>
       				<textbox id="mitarbeiter-detail-textbox-mitarbeiteranmerkung" disabled="true" multiline="true" oninput="MitarbeiterDetailValueChange()"/>
       				<vbox>
-      					<label value="Alias" control="mitarbeiter-detail-textbox-alias"/>
+      					<label value="Alias" control="mitarbeiter-detail-textbox-alias" oninput="MitarbeiterDetailValueChange()"/>
       				</vbox>
       				<vbox>
       					<textbox id="mitarbeiter-detail-textbox-alias" disabled="true" oninput="MitarbeiterDetailValueChange()"/>

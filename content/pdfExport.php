@@ -47,6 +47,7 @@ require_once('../include/studienordnung.class.php');
 require_once('../include/dokument_export.class.php');
 require_once('../include/dokument.class.php');
 require_once('../include/pdf.class.php');
+require_once('../include/lehrveranstaltung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -519,6 +520,13 @@ else
 						if ($xsl == 'Ausbildungsver' || $xsl == 'AusbVerEng')
 						{
 							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+						}
+						elseif ($xsl === 'LVZeugnisEng' || $xsl === 'LVZeugnis' || $xsl === 'Zertifikat')
+						{
+							$lehrveranstaltung = new lehrveranstaltung($_GET['lvid']);
+							$vorlage->dokument_kurzbz = $xsl;
+							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss . ' '. $lehrveranstaltung->bezeichnung, 0, 64);
+							$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss. '_' . str_replace(' ', '_', $lehrveranstaltung->bezeichnung), 0, 60);
 						}
 						else
 						{
