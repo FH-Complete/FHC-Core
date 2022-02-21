@@ -58,7 +58,7 @@ $this->load->view(
                     <div class="form-group">
                         <label for="mitarbeiter_uid" class="col-sm-1 control-label">LektorIn: </label>
                         <div class="col-sm-3">
-                            <select id="mitarbeiter_uid" name="mitarbeiter_uid" class="form-control select-w500">
+                            <select id="mitarbeiter_uid" name="mitarbeiter_uid" class="form-control select-w500" required>
                                 <option value="" >
                                     <?php echo $this->p->t('ui', 'bitteWaehlen'); ?>
                                 </option>
@@ -88,7 +88,7 @@ $this->load->view(
                     <div class="form-group">
                         <label for="vondatum" class="col-sm-1 control-label">Von: </label>
                         <div class="col-sm-3">
-                            <input type="date" id="vondatum" name="vondatum" class="form-control zverfueg-datepicker">
+                            <input type="date" id="vondatum" name="vondatum" class="form-control zverfueg-datepicker" required>
                         </div>
                         <label for="vonstunde" class="col-sm-1 control-label">Stunde (inkl.): </label>
                         <div class="col-sm-3">
@@ -110,7 +110,7 @@ $this->load->view(
                     <div class="form-group">
                         <label for="bisdatum" class="col-sm-1 control-label">Bis: </label>
                         <div class="col-sm-3">
-                            <input type="date" id="bisdatum" name="bisdatum" class="form-control zverfueg-datepicker">
+                            <input type="date" id="bisdatum" name="bisdatum" class="form-control zverfueg-datepicker" required>
                         </div>
                         <label for="bisstunde" class="col-sm-1 control-label">Stunde (inkl.): </label>
                         <div class="col-sm-3">
