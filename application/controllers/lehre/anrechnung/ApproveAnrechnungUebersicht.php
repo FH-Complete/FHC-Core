@@ -19,8 +19,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_genehmigen:rw',
-				'download'  => 'lehre/anrechnung_genehmigen:rw',
+				'index'     => 'lehre/anrechnung_genehmigen:r',
+				'download'  => 'lehre/anrechnung_genehmigen:r',
 				'approve'   => 'lehre/anrechnung_genehmigen:rw',
 				'reject'    => 'lehre/anrechnung_genehmigen:rw',
 				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw'

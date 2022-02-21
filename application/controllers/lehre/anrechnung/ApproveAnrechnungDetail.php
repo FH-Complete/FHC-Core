@@ -22,8 +22,8 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_genehmigen:rw',
-				'download'  => 'lehre/anrechnung_genehmigen:rw',
+				'index'     => 'lehre/anrechnung_genehmigen:r',
+				'download'  => 'lehre/anrechnung_genehmigen:r',
 				'approve'   => 'lehre/anrechnung_genehmigen:rw',
 				'reject'    => 'lehre/anrechnung_genehmigen:rw',
 				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
@@ -421,13 +421,10 @@ class approveAnrechnungDetail extends Auth_Controller
 			'lehrveranstaltung_id' => getData($result)[0]->lehrveranstaltung_id
 		));
 
-		if(!hasData($result))
-		{
-			show_error('Failed loading Lehrveranstaltung');
-		}
+	    $studiengang_kz = getData($result)[0]->studiengang_kz;
 
-		// Get STGL
-		$result = $this->StudiengangModel->getLeitung(getData($result)[0]->studiengang_kz);
+		// Check if user is STGL
+		$result = $this->StudiengangModel->getLeitung($studiengang_kz);
 		
 		if (hasData($result))
 		{
@@ -439,6 +436,20 @@ class approveAnrechnungDetail extends Auth_Controller
 				}
 			}
 		}
+
+        // Check if user is Assistance
+        $result = $this->StudiengangModel->getAssistance($studiengang_kz);
+
+        if (hasData($result))
+        {
+            foreach (getData($result) as $assistance)
+            {
+                if ($assistance->uid == $this->_uid)
+                {
+                    return;
+                }
+            }
+        }
 
 		show_error('You are not entitled to read this Anrechnung');
 	}
