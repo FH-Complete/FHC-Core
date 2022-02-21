@@ -450,8 +450,9 @@ class Studiengang_model extends DB_Model
 	}
 	
 	/**
-	 * Get Studiengangsleitung
-	 * @param null $studiengang_kz
+	 * Get Studiengangsleitung/en of Studiengang/Studiengaenge.
+     * 
+	 * @param null $studiengang_kz Numeric or Array
 	 * @return array
 	 */
 	public function getLeitung($studiengang_kz = null)
@@ -469,13 +470,17 @@ class Studiengang_model extends DB_Model
                 AND ( datum_bis >= NOW() OR datum_bis IS NULL )
             ';
 		}
-		elseif (is_numeric($studiengang_kz))
+		elseif (is_numeric($studiengang_kz) || is_array($studiengang_kz))
 		{
+            if (is_array($studiengang_kz))
+            {
+                $studiengang_kz = implode(', ', $studiengang_kz);
+            }
 			$condition =  '
                funktion_kurzbz = \'Leitung\'
                 AND ( datum_von <= NOW() OR datum_von IS NULL )
                 AND ( datum_bis >= NOW() OR datum_bis IS NULL )
-                AND studiengang_kz = ' . $this->db->escape($studiengang_kz)
+                AND studiengang_kz IN (' . $this->db->escape($studiengang_kz). ')';
 			;
 		}
 		
