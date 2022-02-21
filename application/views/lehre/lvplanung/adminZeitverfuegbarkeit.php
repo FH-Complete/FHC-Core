@@ -20,7 +20,12 @@ $this->load->view(
             ),
             'ui' => array(
                 'systemfehler',
-                'von'
+                'keineDatenVorhanden',
+                'von',
+                'bitteWaehlen',
+                'speichern',
+                'loeschen',
+                'abbrechen'
             ),
             'lehre' => array(
                 'lektor'
