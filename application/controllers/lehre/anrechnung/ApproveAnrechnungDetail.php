@@ -471,21 +471,35 @@ class approveAnrechnungDetail extends Auth_Controller
 			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
 		));
 
-		if(!$result = getData($result)[0])
-		{
-			show_error('Failed loading Lehrveranstaltung');
-		}
+		$studiengang_kz = getData($result)[0]->studiengang_kz;
 
 		// Get STGL
-		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
+		$result = $this->StudiengangModel->getLeitung($studiengang_kz);
 
-		if($result = getData($result)[0])
-		{
-			if ($result->uid == $this->_uid)
-			{
-				return;
-			}
-		}
+        if (hasData($result))
+        {
+            foreach (getData($result) as $stgl)
+            {
+                if ($stgl->uid == $this->_uid)
+                {
+                    return;
+                }
+            }
+        }
+
+        // Check if user is Assistance
+        $result = $this->StudiengangModel->getAssistance($studiengang_kz);
+
+        if (hasData($result))
+        {
+            foreach (getData($result) as $assistance)
+            {
+                if ($assistance->uid == $this->_uid)
+                {
+                    return;
+                }
+            }
+        }
 
 		show_error('You are not entitled to read this document');
 	}
