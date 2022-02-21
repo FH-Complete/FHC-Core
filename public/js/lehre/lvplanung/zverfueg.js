@@ -126,6 +126,12 @@ $(function(){
 
 var Zverfueg = {
     initDatepicker: function (studiensemesterStart) {
+
+        // Prevent opening HTMl date picker
+        $('input[type=date]').on('click', function(event) {
+            event.preventDefault();
+        });
+
         $.datepicker.setDefaults($.datepicker.regional['de']);
         $( ".zverfueg-datepicker" ).datepicker({
             "dateFormat": "yy-mm-dd",
