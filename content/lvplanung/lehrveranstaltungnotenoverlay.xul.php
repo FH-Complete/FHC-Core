@@ -49,8 +49,11 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<menupopup id="lehrveranstaltung-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="LehrveranstaltungNotenDelete();" id="lehrveranstaltung-noten-tree-popup-delete" hidden="false"/>
 		<menuitem label="Zertifikat erstellen" oncommand="LehrveranstaltungFFZertifikatPrint(event);" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
+		<menuitem label="Zertifikat erstellen mit Signatur" oncommand="LehrveranstaltungFFZertifikatPrint(event, true);" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
 		<menuitem label="Lehrveranstaltungszeugnis Deutsch erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'German');" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis Deutsch erstellen mit Signatur" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'German', true);" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
 		<menuitem label="Lehrveranstaltungszeugnis Englisch erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'English');" id="lehrveranstaltung-noten-tree-popup-lvzeugnis-englisch" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis Englisch erstellen mit Signatur" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'English', true);" id="lehrveranstaltung-noten-tree-popup-lvzeugnis-englisch" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">
