@@ -5,7 +5,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class approveAnrechnungUebersicht extends Auth_Controller
 {
 	const BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN = 'lehre/anrechnung_genehmigen';
-	
+	const BERECHTIGUNG_ANRECHNUNG_ANLEGEN = 'lehre/anrechnung_anlegen';
+
 	const REVIEW_ANRECHNUNG_URI = '/lehre/anrechnung/ReviewAnrechnungUebersicht';
 	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
@@ -76,10 +77,19 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		{
 			show_error(getError($studiengang_kz_arr));
 		}
-		
+
+        $hasReadOnlyAccess =
+            $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's')
+            && !$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid');
+
+        // This permission is checked here to disable create Anrechnung button, if permission is not given
+        $hasCreateAnrechnungAccess = $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN, 's');
+
 		$viewData = array(
 			'studiensemester_selected' => $studiensemester_kurzbz,
-			'studiengaenge_entitled' => $studiengang_kz_arr
+			'studiengaenge_entitled' => $studiengang_kz_arr,
+            'hasReadOnlyAccess' => $hasReadOnlyAccess,
+            'hasCreateAnrechnungAccess' => $hasCreateAnrechnungAccess
 		);
 		
 		$this->load->view('lehre/anrechnung/approveAnrechnungUebersicht.php', $viewData);

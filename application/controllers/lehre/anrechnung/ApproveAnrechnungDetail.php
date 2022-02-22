@@ -99,11 +99,16 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Get Genehmigung data
 		$genehmigungData = $this->anrechnunglib->getGenehmigungData($anrechnung_id);
 
+        $hasReadOnlyAccess =
+            $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $antragData->studiengang_kz)
+            && !$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $antragData->studiengang_kz);
+
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
 			'empfehlungData' => $empfehlungData,
-			'genehmigungData' => $genehmigungData
+			'genehmigungData' => $genehmigungData,
+            'hasReadOnlyAccess' => $hasReadOnlyAccess
 		);
 
 		$this->load->view('lehre/anrechnung/approveAnrechnungDetail.php', $viewData);
