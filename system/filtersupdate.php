@@ -40,7 +40,8 @@ $filters = array(
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
-					{"name": "LockUser"}
+					{"name": "LockUser"},
+					{"name": "OnholdDate"}
 				],
 				"filters": [
 					{
@@ -320,7 +321,8 @@ $filters = array(
 					{"name": "Statusgrund"},
 					{"name": "Studiensemester"},
 					{"name": "ReihungstestApplied"},
-					{"name": "ReihungstestDate"}
+					{"name": "ReihungstestDate"},
+					{"name": "AktenId"}
 				],
 				"filters": [
 					{
