@@ -249,7 +249,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 
 		// Check if user is entitled to read dms doc
-		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 		
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
@@ -294,35 +294,11 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
         $studiengang_kz = $result->studiengang_kz;
 		
-		// Check if user is STGL
-		$result = $this->StudiengangModel->getLeitung($studiengang_kz);
-		
-		if (hasData($result))
-		{
-			foreach (getData($result) as $stgl)
-			{
-				if ($stgl->uid == $this->_uid)
-				{
-					return;
-				}
-			}
-		}
-
-        // Check if user is Assistance
-        $result = $this->StudiengangModel->getAssistance($studiengang_kz);
-
-        if (hasData($result))
+		// Check if user is entitled
+		if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $studiengang_kz))
         {
-            foreach (getData($result) as $assistance)
-            {
-                if ($assistance->uid == $this->_uid)
-                {
-                    return;
-                }
-            }
+            show_error('You are not entitled to read this document');
         }
-		
-		show_error('You are not entitled to read this document');
 	}
 	
 	/**
