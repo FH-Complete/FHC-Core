@@ -26,6 +26,12 @@ $(function(){
         // Avoid form redirecting automatically
         e.preventDefault();
 
+        var fileInput = $('#requestAnrechnung-uploadfile');
+        if (!requestAnrechnung.fileSizeOk(fileInput, 8000000)) // 8MB in byte
+        {
+            return FHC_DialogLib.alertWarning(FHC_PhrasesLib.t("ui", "errorDokumentZuGross"));
+        }
+
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/apply",
             {
@@ -161,5 +167,19 @@ var requestAnrechnung = {
 
         // Disable all form elements
         $("#requestAnrechnung-form :input").prop("disabled", true);
+    },
+    fileSizeOk: function(fileInput, maxSize){
+
+        if (fileInput.get(0).files.length){
+
+            var fileSize = fileInput.get(0).files[0].size; // in bytes
+
+            if (fileSize > maxSize)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

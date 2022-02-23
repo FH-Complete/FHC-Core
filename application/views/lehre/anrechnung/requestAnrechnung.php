@@ -26,7 +26,8 @@ $this->load->view(
                 'neu',
 				'maxZeichen',
                 'errorBestaetigungFehlt',
-				'systemfehler'
+				'systemfehler',
+                'errorDokumentZuGross'
 			),
 			'anrechnung' => array(
 				'deadlineUeberschritten',
