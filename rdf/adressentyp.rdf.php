@@ -30,9 +30,9 @@ header("Content-type: application/xhtml+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../config/vilesci.config.inc.php');
-require_once('../include/adresse.class.php');
+require_once('../include/adressentyp.class.php');
 
-$adresse = new adresse();
+$adresse = new adressentyp();
 
 $rdf_url='http://www.technikum-wien.at/adressentyp';
 echo '
@@ -44,7 +44,7 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-if ($adresse->getAdressentyp())
+if ($adresse->getAll())
 {
 	foreach ($adresse->result as $row)
 	{
