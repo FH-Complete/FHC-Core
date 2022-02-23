@@ -35,7 +35,6 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
-					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
@@ -312,6 +311,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
+					{"name": "AktenId"},
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
@@ -321,8 +321,7 @@ $filters = array(
 					{"name": "Statusgrund"},
 					{"name": "Studiensemester"},
 					{"name": "ReihungstestApplied"},
-					{"name": "ReihungstestDate"},
-					{"name": "AktenId"}
+					{"name": "ReihungstestDate"}
 				],
 				"filters": [
 					{
