@@ -1335,7 +1335,7 @@ function LeMitarbeiterAuswahl()
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
 
 	var gesamtkosten = LeMitarbeiterGesamtkosten();
-	
+
     // Wenn Vertragsdetails angezeigt werden
     if (lehrveranstaltung_vertragsdetails_anzeigen) {
 
@@ -2261,6 +2261,8 @@ function LehrveranstaltungNotenAuswahl()
     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
     getService(Components.interfaces.nsIRDFService);
 
+	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
+
     var dsource = rdfService.GetDataSourceBlocking(url);
 
     var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
@@ -2271,9 +2273,6 @@ function LehrveranstaltungNotenAuswahl()
 
     note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
     punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
-
-	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
 
 	if(note=='')
 		note='9';
@@ -2403,7 +2402,7 @@ function LehrveranstaltungNotenPunkteChange()
 // ****
 // * Erstellt das Zertifikat fuer die Freifaecher
 // ****
-function LehrveranstaltungFFZertifikatPrint(event)
+function LehrveranstaltungFFZertifikatPrint(event, signieren)
 {
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 	//Alle markierten Noten holen
@@ -2414,39 +2413,93 @@ function LehrveranstaltungFFZertifikatPrint(event)
 	var anzahl=0;
 	var lvid='';
 
-	for (var t = 0; t < numRanges; t++)
-	{
-  		tree.view.selection.getRangeAt(t,start,end);
-		for (var v = start.value; v <= end.value; v++)
-		{
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-			uid = tree.view.getCellText(v,col);
-			paramList += ';'+uid;
-			anzahl = anzahl+1;
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
-			lvid = tree.view.getCellText(v,col);
-		}
-	}
 	var ss = getStudiensemester();
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz_lv"] : "lehrveranstaltung-noten-tree-studiengang_kz_lv";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
-	if (event.shiftKey)
-	    var output='odt';
-	else if (event.ctrlKey)
-		var output='doc';
-	else
-		var output='pdf';
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&ss='+ss+'&'+gettimestamp();
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
-	window.location.href = url;
-	//prompt('test:',url);
+	if (signieren)
+	{
+		// Wenn die Dokumente signiert werden, dann einzeln erstellen
+
+		var errors='';
+		var anz_erfolgreich=0;
+
+		for (var t = 0; t < numRanges; t++)
+		{
+			tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+				uid = tree.view.getCellText(v,col);
+
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+				lvid = tree.view.getCellText(v,col);
+
+				// Dokument fuer alle markierten Personen einzeln erstellen und signieren/archivieren
+
+				var req = new phpRequest(url,'','');
+				req.add('output', 'pdf');
+				req.add('sign', '1');
+				req.add('archive', '1');
+				req.add('uid', uid);
+				req.add('lvid', lvid);
+
+				var response = req.execute();
+
+				if (response != '')
+					errors = errors + response;
+				else
+				{
+					anz_erfolgreich = anz_erfolgreich + 1;
+				}
+			}
+		}
+
+		if (errors != '')
+		{
+			alert(anz_erfolgreich + ' Dokumente wurden erfolgreich erstellt und signiert. Folgende Fehler sind aufgetreten:' + errors);
+		}
+		else
+		{
+			alert(anz_erfolgreich + ' Dokumente wurden erfolgreich erstellt und signiert');
+		}
+	}
+	else
+	{
+		// wenn die Dokumente unsigniert erstellt werden, dann alle in ein Dokument generieren
+
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+				uid = tree.view.getCellText(v,col);
+				paramList += ';'+uid;
+				anzahl = anzahl+1;
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+				lvid = tree.view.getCellText(v,col);
+			}
+		}
+
+		if (event.shiftKey)
+		    var output='odt';
+		else if (event.ctrlKey)
+			var output='doc';
+		else
+			var output='pdf';
+
+		url = url +'&uid='+paramList+'&lvid='+lvid+'&output='+output;
+		window.location.href = url;
+	}
 }
 
 // ****
 // * Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 // ****
-function LehrveranstaltungLVZeugnisPrint(event, sprache)
+function LehrveranstaltungLVZeugnisPrint(event, sprache, signieren)
 {
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 	//Alle markierten Noten holen
@@ -2457,37 +2510,92 @@ function LehrveranstaltungLVZeugnisPrint(event, sprache)
 	var anzahl=0;
 	var lvid='';
 
-	for (var t = 0; t < numRanges; t++)
-	{
-  		tree.view.selection.getRangeAt(t,start,end);
-		for (var v = start.value; v <= end.value; v++)
-		{
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-			uid = tree.view.getCellText(v,col);
-			paramList += ';'+uid;
-			anzahl = anzahl+1;
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
-			lvid = tree.view.getCellText(v,col);
-		}
-	}
 	var ss = getStudiensemester();
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
-
-	if (event.shiftKey)
-	    var output='odt';
-	else if (event.ctrlKey)
-		var output='doc';
-	else
-		var output='pdf';
 
 	var xsl = 'LVZeugnis';
 
 	if (sprache == 'English')
 		xsl = 'LVZeugnisEng';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
-	window.location.href = url;
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&ss='+ss+'&'+gettimestamp();
+
+	if(signieren)
+	{
+		// Wenn die Dokumente signiert werden, dann einzeln erstellen
+
+		var errors='';
+		var anz_erfolgreich=0;
+
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+				uid = tree.view.getCellText(v,col);
+
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+				lvid = tree.view.getCellText(v,col);
+
+				// Dokument fuer alle markierten Personen einzeln erstellen und signieren/archivieren
+
+				var req = new phpRequest(url,'','');
+				req.add('output', 'pdf');
+				req.add('sign', '1');
+				req.add('archive', '1');
+				req.add('uid', uid);
+				req.add('lvid', lvid);
+
+				var response = req.execute();
+
+				if (response != '')
+					errors = errors + response;
+				else
+				{
+					anz_erfolgreich = anz_erfolgreich + 1;
+				}
+			}
+		}
+		if (errors != '')
+		{
+			alert(anz_erfolgreich + ' Dokumente wurden erfolgreich erstellt und signiert. Folgende Fehler sind aufgetreten:' + errors);
+		}
+		else
+		{
+			alert(anz_erfolgreich + ' Dokumente wurden erfolgreich erstellt und signiert');
+		}
+	}
+	else
+	{
+		// wenn die Dokumente unsigniert erstellt werden, dann alle in ein Dokument generieren
+
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+				uid = tree.view.getCellText(v,col);
+				paramList += ';'+uid;
+				anzahl = anzahl+1;
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+				lvid = tree.view.getCellText(v,col);
+			}
+		}
+
+		if (event.shiftKey)
+		    var output='odt';
+		else if (event.ctrlKey)
+			var output='doc';
+		else
+			var output='pdf';
+
+
+		url = url+'&lvid='+lvid+'&uid='+paramList+'&output='+output;
+		window.location.href = url;
+	}
 }
 
 // ****
