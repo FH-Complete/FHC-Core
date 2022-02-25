@@ -448,10 +448,10 @@ class Studiengang_model extends DB_Model
 
 		return $this->execQuery($query, array($typ));
 	}
-	
+
 	/**
 	 * Get Studiengangsleitung/en of Studiengang/Studiengaenge.
-     * 
+     *
 	 * @param null $studiengang_kz Numeric or Array
 	 * @return array
 	 */
@@ -461,7 +461,12 @@ class Studiengang_model extends DB_Model
 		$this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
 		$this->addJoin('public.tbl_benutzer', 'uid');
 		$this->addJoin('public.tbl_person', 'person_id');
-		
+
+		if (!is_numeric($studiengang_kz) && !is_array($studiengang_kz))
+		{
+			return error('Studiengangskennzahl ungültig');
+		}
+
 		if (is_null($studiengang_kz))
 		{
 			$condition = '
@@ -474,6 +479,7 @@ class Studiengang_model extends DB_Model
 		{
             if (is_array($studiengang_kz))
             {
+				$studiengang_kz = array_map(array($this,'escape'), $studiengang_kz);
                 $studiengang_kz = implode(', ', $studiengang_kz);
             }
 			$condition =  '
@@ -483,48 +489,9 @@ class Studiengang_model extends DB_Model
                 AND studiengang_kz IN (' . $studiengang_kz. ')';
 			;
 		}
-		
+
 		return $this->loadWhere($condition);
 	}
-
-    /**
-     * Get Assistance/s of Studiengang/Studiengaenge.
-     *
-     * @param null $studiengang_kz String or Array
-     * @return array
-     */
-    public function getAssistance($studiengang_kz = null)
-    {
-        $this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email');
-        $this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
-        $this->addJoin('public.tbl_benutzer', 'uid');
-        $this->addJoin('public.tbl_person', 'person_id');
-
-        if (is_null($studiengang_kz))
-        {
-            $condition = '
-                funktion_kurzbz = \'Leitung\'
-                AND ( datum_von <= NOW() OR datum_von IS NULL )
-                AND ( datum_bis >= NOW() OR datum_bis IS NULL )
-            ';
-        }
-        elseif (is_numeric($studiengang_kz) || is_array($studiengang_kz))
-        {
-            if (is_array($studiengang_kz))
-            {
-                $studiengang_kz = implode(', ', $studiengang_kz);
-            }
-
-            $condition =  '
-               funktion_kurzbz = \'ass\'
-                AND ( datum_von <= NOW() OR datum_von IS NULL )
-                AND ( datum_bis >= NOW() OR datum_bis IS NULL )
-                AND studiengang_kz IN (' . $studiengang_kz. ')'
-            ;
-        }
-
-        return $this->loadWhere($condition);
-    }
 
 	public function getStudiengaengeWithOrgForm($typ, $semester)
 	{
