@@ -1901,30 +1901,27 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						// fehlende Pausen berechnen
 						$pausefehlt_str = '';
 
-						//Prüfung auf azgrelevant
-						$azgrelevant = false;
-						$verwendung = new bisverwendung();
-
-						$verwendung->getVerwendungDatum($user, $datum->formatDatum($tag, 'Y-m-d'));
-						$azgrelevant = true;
+						//Prüfung auf azgrelevant und blockierende Pausenfehler
 						$linkExclamation =  APP_ROOT. 'skin/images/exclamation.png';
 						$linkInformation =  APP_ROOT. 'skin/images/information.png';
-						foreach ($verwendung->result as $v)
+
+						$za = new zeitaufzeichnung();
+						$verwendung = new bisverwendung();
+						if ($za->checkPausenErrors($user, $tag))
 						{
-							if ($v->azgrelevant)
+							$verwendung->getVerwendungDatum($user, $tag);
+							foreach ($verwendung->result as $v)
 							{
-								$azgrelevant = false;
+								if ($v->azgrelevant)
+								{
+									$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz -- </span>';
+								}
+								else
+								{
+									$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
+								}
 							}
 						}
-
-						if ($tagessaldo > 19800 && $pausesumme < 1800 && !$azgrelevant)
-							$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz --</span>';
-						elseif ($tagessaldo > 19800 && $pausesumme < 1800 && $azgrelevant)
-								$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
-						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000 && !$azgrelevant)
-							$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz --</span>';
-						elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000 && $azgrelevant)
-							$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
 
 						$tagessaldo = date('H:i', ($tagessaldo));
 						$colspan = ($za_simple)?6:8;
