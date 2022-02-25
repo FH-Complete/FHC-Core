@@ -13694,7 +13694,27 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'nurLeseberechtigung',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Nur Leseberechtigung",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Read-Only Access",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    )
 );
 
 
