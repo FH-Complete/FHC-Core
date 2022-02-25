@@ -86,9 +86,22 @@ $(document).ready(function()
 		$("#t3").tablesorter(
 		{
 			sortList: [[1,0],[2,0],[3,0]],
-			widgets: ["zebra"],
+			widgets: ["zebra", "filter", "stickyHeaders"],
 			headers: {8:{sorter:false}},
-			emptyTo: "emptyMax"
+			emptyTo: "emptyMax",
+			widgetOptions : {	filter_functions:  
+								{ 
+									// Add select menu to this column 
+									6 : { 
+									"Ja" : function(e, n, f, i, $r, c, data) { return /Ja/.test(e); }, 
+									"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
+									}, 
+									7 : { 
+									"Aktiv" : function(e, n, f, i, $r, c, data) { return $r.find("div").hasClass( "buttonGreen" ); }, 
+									"Inaktiv" : function(e, n, f, i, $r, c, data) { return $r.find("div").hasClass( "buttonRed" ) || $r.find("div").hasClass( "buttonYellow" ); } 
+									} 
+								} 
+							} 
 		});
 		$("#t4").tablesorter(
 		{
@@ -528,8 +541,22 @@ if($rolle_kurzbz != '')
 
 	if(isset($rollen->result) && count($rollen->result) != 0)
 	{
+		// Anzahl uniquer UIDs ermitteln
+		$berechtigungen_array_uids = sizeof(array_column($rollen->result, null, 'uid'));
+
+		$htmlstr .= "<h3>".$berechtigung_kurzbz."</h3>\n";
+		$htmlstr .= "<div style='font-size: 9pt'>".count($rollen->result)." Einträge</div>";
+		$htmlstr .= "<div style='font-size: 9pt'>".$berechtigungen_array_uids." UIDs</div>";
 		$htmlstr .= "<table id='t3' class='tablesorter'><thead><tr>\n";
-		$htmlstr .= "<th>Rolle</th><th>Funktion</th><th>Nachname</th><th>Vorname</th><th>UID</th><th>Art</th><th>Benutzer Aktiv</th><th>Status</th><th>Aktion</th>";
+		$htmlstr .= "	<th>Rolle</th>
+						<th>Funktion</th>
+						<th>Nachname</th>
+						<th>Vorname</th>
+						<th>UID</th>
+						<th>Art</th>
+						<th>Benutzer Aktiv</th>
+						<th>Status</th>
+						<th>Aktion</th>";
 		$htmlstr .= "</tr></thead><tbody>\n";
 
 		foreach($rollen->result as $row)
@@ -541,35 +568,16 @@ if($rolle_kurzbz != '')
 
 			if ($row->ende!='' && strtotime($row->ende) < $heute)
 			{
-				$color1 = '#f79c9c';
-				$color2 = '#cc0202';
+				$status = '<div class="buttonRed"></div>';
 			}
 			elseif ($row->start!='' && strtotime($row->start) > $heute)
 			{
-				$color1 = '#faf7b9';
-				$color2 = '#cfde00';
+				$status = '<div class="buttonYellow"></div>';
 			}
 			else
 			{
-				$color1 = '#d1fab9';
-				$color2 = '#00de00';
+				$status = '<div class="buttonGreen"></div>';
 			}
-			$status='<div style="
-						width: 10px;
-						height: 10px;
-						background: '.$color1.';
-						background-image: -webkit-linear-gradient(top, '.$color1.', '.$color2.');
-						background-image: -moz-linear-gradient(top, '.$color1.', '.$color2.');
-						background-image: -ms-linear-gradient(top, '.$color1.', '.$color2.');
-						background-image: -o-linear-gradient(top, '.$color1.', '.$color2.');
-						background-image: linear-gradient(to bottom, '.$color1.', '.$color2.');
-						-webkit-border-radius: 10;
-						-moz-border-radius: 10;
-						border-radius: 10px;
-
-						border: solid #999 1px;
-						text-decoration: none;
-						"></div>';
 
 			$htmlstr .= '	<tr>';
 			$htmlstr .= '		<td>'.$row->rolle_kurzbz.'</td>';
