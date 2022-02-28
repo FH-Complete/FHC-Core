@@ -165,7 +165,7 @@ class Person_model extends DB_Model
 		if (!hasData($person))
 			return success(null);
 
-		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
+		$this->KontaktModel->addSelect('kontakt_id, kontakttyp, anmerkung, kontakt, zustellung');
 		$this->KontaktModel->addOrder('kontakttyp');
 		$this->KontaktModel->addOrder('insertamum', 'DESC');
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);

@@ -903,9 +903,9 @@ $filters = array(
 				],
 				"filters": [
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "ncontains",
-						"condition": "behoben"
+						"condition": "resolved"
 					},
 					{
 						"name": "Hauptzuständig",
@@ -964,7 +964,8 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
-					{"name": "Verarbeitet von"}
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
 				],
 				"filters": [
 					{
@@ -974,11 +975,33 @@ $filters = array(
 						"option": "days"
 					},
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "contains",
-						"condition": "behoben"
+						"condition": "resolved"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'DVUHStorno',
+		'description' => '{DVUH Storno Übersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "DVUHStorno",
+				"columns": [
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "matrikelnummer"},
+					{"name": "studiengang"},
+					{"name": "studiensemester"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,
