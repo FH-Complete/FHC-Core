@@ -11,5 +11,5 @@ interface IIssueResolvedChecker
 	 * @param array $params parameters needed for issue resolution
 	 * @return object with success(true) if issue resolved, success(false) otherwise
 	 */
-	function checkIfIssueIsResolved($params);
+	public function checkIfIssueIsResolved($params);
 }
