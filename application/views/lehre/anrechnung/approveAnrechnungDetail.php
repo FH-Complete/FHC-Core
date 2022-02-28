@@ -25,7 +25,8 @@ $this->load->view(
 				'bitteBegruendungAngeben',
 				'empfehlungWurdeAngefordert',
 				'anrechnungenWurdenGenehmigt',
-				'anrechnungenWurdenAbgelehnt'
+				'anrechnungenWurdenAbgelehnt',
+                'nurLeseberechtigung'
 			),
 			'person' => array(
 				'student',
@@ -72,7 +73,7 @@ $this->load->view(
         </div>
 		<!--end header -->
 		
-        <div class="row">
+        <div class="row" id="approveAnrechnungDetail-generell" data-readonly="<?php echo json_encode($hasReadOnlyAccess)?>">
             <div class="col-xs-8">
 				<!-- Antragsdaten -->
 				<div class="row">

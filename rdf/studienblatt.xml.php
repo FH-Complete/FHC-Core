@@ -158,7 +158,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<ects_pro_semester_studienplan><![CDATA[".($studienplan->regelstudiendauer!=0?$studienplan->ects_stpl/$studienplan->regelstudiendauer:0)."]]></ects_pro_semester_studienplan>";
 
 			echo "\t\t<aktuellesJahr><![CDATA[".date('Y')."]]></aktuellesJahr>";
-			$status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,null,null))?$prestudent->status_kurzbz:'';
+			$status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,$studiensemester,null))?$prestudent->status_kurzbz:'';
 			$abbrecher = false;
 			$absolvent = false;
 
