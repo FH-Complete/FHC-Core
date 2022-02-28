@@ -45,6 +45,37 @@ require_once('../../../include/bisverwendung.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 
+function checkZeitsperren($p, $uid, $day) 
+{
+	$zs = new zeitsperre();
+	$sperreVorhanden = false;
+	
+	if( !$zs->getSperreByDate($uid, $day, null, 
+		zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN) )
+	{
+		return array(
+			"status" => false,
+			"msg" => 'Fehler beim Überprüfen der Zeitsperren'
+		);
+	}
+
+	if( count($zs->result) === 0 ) 
+	{
+		return array(
+			"status" => true,
+			"msg" => ''
+		);
+	} else {
+		$zsdate = new DateTime($day);
+		$zsdate = $zsdate->format('d.m.Y');
+		$msg = $p->t("zeitaufzeichnung/zeitsperreVorhanden", 
+			[$zsdate, $zs->result[0]->zeitsperretyp_kurzbz]);
+		return array(
+			"status" => false,
+			"msg" => $msg
+		);
+	}
+}
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
@@ -336,7 +367,7 @@ echo '
 
 			ret_uhrzeit = foo(now.getHours());
 			ret_uhrzeit = ret_uhrzeit + ":" + foo(now.getMinutes());
-
+			
 			document.getElementById("bis_datum").value=ret_datum;
 			document.getElementById("bis_uhrzeit").value=ret_uhrzeit;
 		}
@@ -354,9 +385,10 @@ echo '
 
 			ret_uhrzeit = foo(now.getHours());
 			ret_uhrzeit = ret_uhrzeit + ":" + foo(now.getMinutes());
-
+		
 			document.getElementById("von_datum").value=ret_datum;
 			document.getElementById("von_uhrzeit").value=ret_uhrzeit;
+			$("#von_datum").trigger("change");
 		}
 
 		function foo(val)
@@ -464,6 +496,7 @@ echo '
 		{
 			document.getElementById("von_datum").value=document.getElementById("bis_datum").value;
 			document.getElementById("von_uhrzeit").value=document.getElementById("bis_uhrzeit").value;
+			$("#von_datum").trigger("change");
 		}
 
 		function checkdatum()
@@ -795,25 +828,22 @@ echo '
 				},
 				success: function (json)
 				{
-				if (json.length > 0)
-				{
 					var output = "";
-					for (var i = 0; i < json.length; i++)
+					if (json.length > 0)
 					{
-						output = "Für den Tag " + json[i].day + " ist bereits eine Zeitsperre vom Typ " +  json[i].typ + " eingetragen!";
-
-						var phrase = "' . $p->t("zeitaufzeichnung/zeitsperreVorhanden", ['{day}', '{typ}']) . '";
-						phrase = phrase.replace(\'{day}\', json[i].day);
-						phrase = phrase.replace(\'{typ}\', json[i].typ);
-						alert (phrase);
+						output = "' . $p->t("zeitaufzeichnung/zeitsperreVorhanden", ['{day}', '{typ}']) . '";
+						output = output.replace(\'{day}\', json[0].day);
+						output = output.replace(\'{typ}\', json[0].typ);
+						$("#errZeitsperren").show();
+						$("#buttonSave").prop("disabled",true);
 					}
-				}
-				else
-				{
-					$("#buttonSave").prop("disabled",false);
-					output = "";
-				}
-				$("#outputZeitsperren").html(output);
+					else
+					{
+						$("#errZeitsperren").hide();
+						$("#buttonSave").prop("disabled",false);
+						output = "";
+					}
+					$("#outputZeitsperren").html(output);
 				}
 			});
 		}
@@ -826,14 +856,6 @@ echo '
 
 echo '<h1>'.$p->t("zeitaufzeichnung/zeitaufzeichnungVon").' '.$db->convert_html_chars($bn->vorname).' '.$db->convert_html_chars($bn->nachname).'</h1>';
 
-echo '
-<tr>
-	<td colspan="1">
-		<p id="outputZeitsperren" style="color:red; font-weight:bold;" >
-		</p>
-	</td>
-</tr>
-';
 // Wenn Kartennummer übergeben wurde dann hole uid von Karteninhaber
 if($kartennummer != '')
 {
@@ -934,7 +956,12 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									$data[7] = NULL;
 								if (!isset($data[8]))
 									$data[8] = NULL;
-								if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
+								
+								$zscheck = checkZeitsperren($p, $user, $vonCSV);
+								if( $zscheck['status'] === false ) {
+									echo '<span id="triggerPhasenReset" style="color:red"><b>' . $p->t("global/fehlerBeimSpeichernDerDaten") . ': ' . $zscheck['msg'] . '</b></span><br>';
+								}
+								elseif ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
 									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
 								elseif ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') > $limitdatum)
 									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da ('.$data[2].') zu weit in der Zukunft liegt.</b></span><br>';
@@ -1125,8 +1152,13 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$extractTimeBis = $datum->formatDatum($bis, $format = 'H:i:s');
 		$extractVon = $datum->formatDatum($von, $format = 'Y-m-d');
 		$extractBis = $datum->formatDatum($bis, $format = 'Y-m-d');
-
-		if (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
+		
+		$zscheck = checkZeitsperren($p, $user, $datum->formatDatum($von, $format='Y-m-d'));
+		if( $zscheck['status'] === false ) {
+			echo '<span id="triggerPhasenReset" style="color:red"><b>' . $p->t("global/fehlerBeimSpeichernDerDaten") . ': ' . $zscheck['msg'] . '</b></span><br>';
+			$saveerror = 1;
+		}
+		elseif (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
 			echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
 			$saveerror = 1;
@@ -1222,7 +1254,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 				$saveerror = 1;
 			}
 		}
-
+		
 		if ($saveerror == 0)
 		{
 			echo '<span style="color:green"><b>'.$p->t("global/datenWurdenGespeichert").'</b></span>';
@@ -1658,16 +1690,22 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			</tr>';
 			echo '<tr><td colspan="4">&nbsp;</td></tr>';
 		}
-
+		
 		//Start/Ende
 		$von_ts = $datum->mktime_fromtimestamp($datum->formatDatum($von, $format='Y-m-d H:i:s'));
 		$bis_ts = $datum->mktime_fromtimestamp($datum->formatDatum($bis, $format='Y-m-d H:i:s'));
 		$diff = $bis_ts - $von_ts;
 
 		echo '
+		<tr id="errZeitsperren">
+		  <td>&nbsp;</td>
+		  <td colspan="3">
+		    <p id="outputZeitsperren" style="color:red; font-weight:bold;" ></p>
+		  </td>
+		</tr>
 		<tr>
 			<td>'.$p->t("global/von").' - '.$p->t("global/bis").'</td>
-			<td>
+			<td>				
 				<input type="text" class="datepicker_datum" id="von_datum" name="von_datum" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='d.m.Y')).'" size="9">
 				<input onchange="checkZeiten()" type="text" class="timepicker" id="von_uhrzeit" name="von_uhrzeit" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='H:i')).'" size="4">
 			</td>';

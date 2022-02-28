@@ -23,6 +23,9 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class zeitsperre extends basis_db
 {
+	const NUR_BLOCKIERENDE_ZEITSPERREN = true;
+	const BLOCKIERENDE_ZEITSPERREN = "'Krank','Urlaub','ZA','DienstV','PflegeU','DienstF','CovidSB','CovidKS'";
+	
 	public $new;     			// boolean
 	public $result = array(); 	// news Objekt
 
@@ -369,10 +372,12 @@ class zeitsperre extends basis_db
 	 * @param $user
 	 * @param $datum
 	 * @param $stunde optional, wird nur abgefragt, wenn != null
+	 * @param $nurblockierend boolean default false
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getSperreByDate($user, $datum, $stunde=null)
+	public function getSperreByDate($user, $datum, $stunde=null, $nurblockierend=false)
 	{
+		$this->result = array();
 		$qry = "
 			SELECT
 				*
@@ -382,6 +387,10 @@ class zeitsperre extends basis_db
 				vondatum<=".$this->db_add_param($datum)."
 				AND bisdatum>=".$this->db_add_param($datum);
 
+			if( $nurblockierend ) {
+				$qry .= " AND zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
+			}
+		
 			if(!is_null($stunde))
 				$qry.=" AND
 					((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND
@@ -485,7 +494,7 @@ class zeitsperre extends basis_db
 
 		$qry = "select datum::date, freigabevon, zeitsperretyp_kurzbz
 					from  (SELECT generate_series(vondatum::timestamp, bisdatum::timestamp, '1 day') as datum, freigabevon, mitarbeiter_uid, zeitsperretyp_kurzbz FROM campus.tbl_zeitsperre where vonstunde is null and bisstunde is null) a
-					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '".$anz_tage." Days') and zeitsperretyp_kurzbz in ('Krank','Urlaub', 'ZA', 'DienstV','PflegeU', 'DienstF','CovidSB','CovidKS')";
+					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '".$anz_tage." Days') and zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
 
 
 

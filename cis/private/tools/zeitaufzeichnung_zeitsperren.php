@@ -42,7 +42,7 @@ if ( isset($_GET['day']) )
 	$zs = new zeitsperre();
 	$sperreVorhanden = false;
 	$typ = '';
-	$zs->getSperreByDate($uid, $day, null);
+	$zs->getSperreByDate($uid, $day, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN);
 	$result_obj = array();
 	$now = new DateTime($day);
 	$now = $now->format('d.m.Y');
