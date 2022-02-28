@@ -982,6 +982,28 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'DVUHStorno',
+		'description' => '{DVUH Storno Übersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "DVUHStorno",
+				"columns": [
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "matrikelnummer"},
+					{"name": "studiengang"},
+					{"name": "studiensemester"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 
