@@ -1708,9 +1708,15 @@ class InfoCenter extends Auth_Controller
 
 		if (isset($locked->retval[0]->uid))
 		{
-			$lockedby = $locked->retval[0]->uid;
-			if ($lockedby !== $this->_uid)
+			if (!$lockedby = getData($this->PersonModel->getFullName($locked->retval[0]->uid)))
+			{
+				show_error('Failed retrieving person');
+			}
+
+			if ($locked->retval[0]->uid !== $this->_uid)
+			{
 				$lockedbyother = true;
+			}
 		}
 
 		$stammdaten = $this->PersonModel->getPersonStammdaten($person_id, true);
