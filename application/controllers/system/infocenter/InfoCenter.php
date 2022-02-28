@@ -560,8 +560,10 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
 	 */
-	private function sendZgvMail($mail, $typ){
+	private function sendZgvMail($mail, $typ, $person){
 		$data = array(
+			'vorname' => $person->vorname,
+			'nachname' => $person->nachname,
 			'link' => site_url('system/infocenter/ZGVUeberpruefung')
 		);
 
@@ -657,6 +659,16 @@ class InfoCenter extends Auth_Controller
 		if (isEmptyString($prestudent_id) || isEmptyString($person_id))
 			$this->terminateWithJsonError('Prestudentid OR/AND Personid missing');
 
+		$person = $this->PersonModel->load($person_id);
+
+		if (isError($person))
+			$this->terminateWithJsonError(getError($person));
+
+		if (!hasData($person))
+			$this->terminateWithJsonError('Person existiert nicht.');
+
+		$person = getData($person)[0];
+
 		$zgv = $this->ZGVPruefungStatusModel->getZgvStatusByPrestudent($prestudent_id);
 
 		$data = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
@@ -688,7 +700,7 @@ class InfoCenter extends Auth_Controller
 			$this->_log($person_id, 'updatezgv', array($zgv[0]->zgvpruefung_id, 'pruefung_stg'));
 
 			if (isSuccess($insert))
-				$this->sendZgvMail($mail, $typ);
+				$this->sendZgvMail($mail, $typ, $person);
 			elseif (isError($insert))
 				$this->terminateWithJsonError('Fehler beim Speichern');
 		}else
@@ -714,7 +726,7 @@ class InfoCenter extends Auth_Controller
 				$this->_log($person_id, 'newzgv', array($zgvpruefung_id));
 
 				if (isSuccess($result))
-					$this->sendZgvMail($mail, $typ);
+					$this->sendZgvMail($mail, $typ, $person);
 				elseif (isError($result))
 					$this->terminateWithJsonError('Fehler beim Speichern');
 			}
