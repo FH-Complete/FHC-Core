@@ -520,7 +520,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lehrauftr&auml;ge bestellen',
+				'text' => 'Lehraufträge bestellen',
 				'description' => '',
 			),
 			array(
@@ -537,8 +537,8 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Sobald im FAS ein Lehrauftrag/eine Projektbetreuung angelegt wurde, k&ouml;nnen Sie diese
-	hier bestellen.<br>Bestellte Lehrauftr&auml;ge sind zur Erteilung freigegeben.',
+				'text' => 'Sobald im FAS ein Lehrauftrag/eine Projektbetreuung angelegt wurde, können Sie diese
+	hier bestellen.<br>Bestellte Lehraufträge sind zur Erteilung freigegeben.',
 				'description' => '',
 			),
 			array(
@@ -556,7 +556,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lehrauftr&auml;ge erteilen',
+				'text' => 'Lehraufträge erteilen',
 				'description' => '',
 			),
 			array(
@@ -573,8 +573,8 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Sobald Lehrauftr&auml;ge bestellt wurden, k&ouml;nnen Sie diese hier erteilen.<br>
-	Erteilte Lehrauftr&auml;ge k&ouml;nnen von den Lehrenden angenommen werden.<br>',
+				'text' => 'Sobald Lehraufträge bestellt wurden, können Sie diese hier erteilen.<br>
+	Erteilte Lehraufträge können von den Lehrenden angenommen werden.<br>',
 				'description' => '',
 			),
 			array(
@@ -592,7 +592,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Klicken Sie unten auf das Status-Icon \'Nur neue anzeigen\', \'Nur ge&auml;nderte anzeigen\'
+				'text' => 'Klicken Sie unten auf das Status-Icon \'Nur neue anzeigen\', \'Nur geänderte anzeigen\'
 	oder \'Alle anzeigen\'',
 				'description' => '',
 			),
@@ -627,8 +627,8 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'W&auml;hlen Sie die zu bestellenden Lehrauftr&auml;ge selbst oder &uuml;ber den
-	Button \'Alle ausw&auml;hlen\'.
+				'text' => 'Wählen Sie die zu bestellenden Lehraufträge selbst oder über den
+	Button \'Alle auswählen\'.
 ',
 				'description' => '',
 			),
@@ -646,8 +646,8 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'W&auml;hlen Sie die zu erteilenden Lehrauftr&auml;ge selbst oder &uuml;ber den
-	Button \'Alle ausw&auml;hlen\'.
+				'text' => 'Wählen Sie die zu erteilenden Lehraufträge selbst oder über den
+	Button \'Alle auswählen\'.
 ',
 				'description' => '',
 			),
@@ -716,7 +716,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ge&auml;nderte Lehrauftr&auml;ge',
+				'text' => 'Geänderte Lehraufträge',
 				'description' => '',
 			),
 			array(
@@ -733,10 +733,10 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Im FAS k&ouml;nnen &Auml;nderungen an Stunden/Stundensatz eines Lehrauftrags
-	durchgef&uuml;hrt werden, solange dieser nicht vom Lehrenden angenommen wurde.<br>
-	Diese m&uuml;ssen dann erneut bestellt werden.<br><br>
-	Sie k&ouml;nnen sich die vorgenommenen &Auml;nderungen anzeigen lassen, indem Sie mit der Maus &uuml;ber
+				'text' => 'Im FAS können Änderungen an Stunden/Stundensatz eines Lehrauftrags
+	durchgeführt werden, solange dieser nicht vom Lehrenden angenommen wurde.<br>
+	Diese müssen dann erneut bestellt werden.<br><br>
+	Sie können sich die vorgenommenen Änderungen anzeigen lassen, indem Sie mit der Maus über
 	dem Status-Icon am Beginn der Zeile fahren.<br>',
 				'description' => '',
 			),
@@ -758,10 +758,10 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Im FAS k&ouml;nnen &Auml;nderungen an Stunden/Stundensatz eines Lehrauftrags
-	durchgef&uuml;hrt werden, solange dieser nicht vom Lehrenden angenommen wurde.<br>
-	Diese m&uuml;ssen dann von der Studiengangsleitung erneut bestellt werden.<br><br>
-	Waren diese Lehrauftr&auml;ge zuvor bereits erteilt, wird deren Status auf \'neu\' zur&uuml;ckgesetzt<br>.
+				'text' => 'Im FAS können Änderungen an Stunden/Stundensatz eines Lehrauftrags
+	durchgeführt werden, solange dieser nicht vom Lehrenden angenommen wurde.<br>
+	Diese müssen dann von der Studiengangsleitung erneut bestellt werden.<br><br>
+	Waren diese Lehraufträge zuvor bereits erteilt, wird deren Status auf \'neu\' zurückgesetzt<br>.
 ',
 				'description' => '',
 			),
@@ -781,7 +781,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Warum kann ich manche Lehrauftr&auml;ge nicht ausw&auml;hlen?',
+				'text' => 'Warum kann ich manche Lehraufträge nicht auswählen?',
 				'description' => '',
 			),
 			array(
@@ -798,9 +798,9 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Nur Lehrauftr&auml;ge mit dem Status \'neu\' und \'ge&auml;ndert\' k&ouml;nnen bestellt werden.<br>
-	Erteilte oder akzeptierte Lehrauftr&auml;ge werden nur zu Ihrer Information angezeigt und sind daher
-	NICHT w&auml;hlbar.',
+				'text' => 'Nur Lehraufträge mit dem Status \'neu\' und \'geändert\' können bestellt werden.<br>
+	Erteilte oder akzeptierte Lehraufträge werden nur zu Ihrer Information angezeigt und sind daher
+	NICHT wählbar.',
 				'description' => '',
 			),
 			array(
@@ -819,9 +819,9 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Nur Lehrauftr&auml;ge mit dem Status \'bestellt\' k&ouml;nnen erteilt werden.<br>
-	Neue, angenommene und ge&auml;nderte Lehrauftr&auml;ge werden nur zu Ihrer Information
-	angezeigt und sind daher NICHT w&auml;hlbar.',
+				'text' => 'Nur Lehraufträge mit dem Status \'bestellt\' können erteilt werden.<br>
+	Neue, angenommene und geänderte Lehraufträge werden nur zu Ihrer Information
+	angezeigt und sind daher NICHT wählbar.',
 				'description' => '',
 			),
 			array(
@@ -840,9 +840,9 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Nur Lehrauftr&auml;ge mit dem Status \'erteilt\' k&ouml;nnen angenommen werden.<br>
-	Bereits angenommene oder Lehrauftr&auml;ge in Bearbeitung werden nur zu Ihrer Information
-	angezeigt und sind daher NICHT w&auml;hlbar.',
+				'text' => 'Nur Lehraufträge mit dem Status \'erteilt\' können angenommen werden.<br>
+	Bereits angenommene oder Lehraufträge in Bearbeitung werden nur zu Ihrer Information
+	angezeigt und sind daher NICHT wählbar.',
 				'description' => '',
 			),
 			array(
@@ -861,7 +861,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Alle</b><br>Alle Lehrauftr&auml;ge mit jedem Status, auch ge&auml;nderte und Dummy-Auftr&auml;ge',
+				'text' => '<b>Alle</b><br>Alle Lehraufträge mit jedem Status, auch geänderte und Dummy-Aufträge',
 				'description' => '',
 			),
 			array(
@@ -878,7 +878,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Alle</b><br>Alle Lehrauftr&auml;ge mit jedem Status',
+				'text' => '<b>Alle</b><br>Alle Lehraufträge mit jedem Status',
 				'description' => '',
 			),
 			array(
@@ -895,7 +895,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Neu</b><br>Nur Lehrauftr&auml;ge, die im FAS &uuml;ber die Zuteilung eines Lehrenden zu einer
+				'text' => '<b>Neu</b><br>Nur Lehraufträge, die im FAS über die Zuteilung eines Lehrenden zu einer
 	Lehreinheit/einem Projekt angelegt und noch nicht bestellt worden sind',
 				'description' => '',
 			),
@@ -913,7 +913,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Bestellt</b><br>Nur bestellte Lehrauftr&auml;ge (auch bestellte, die nachtr&auml;glich ge&auml;ndert wurden)',
+				'text' => '<b>Bestellt</b><br>Nur bestellte Lehraufträge (auch bestellte, die nachträglich geändert wurden)',
 				'description' => '',
 			),
 			array(
@@ -930,7 +930,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Erteilt</b><br>Nur erteilte Lehrauftr&auml;ge (auch erteilte, die nachtr&auml;glich ge&auml;ndert wurden)',
+				'text' => '<b>Erteilt</b><br>Nur erteilte Lehraufträge (auch erteilte, die nachträglich geändert wurden)',
 				'description' => '',
 			),
 			array(
@@ -947,7 +947,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Erteilt</b><br>Nur erteilte UND ge&auml;nderte Lehrauftr&auml;ge, die in Bearbeitung sind',
+				'text' => '<b>Erteilt</b><br>Nur erteilte UND geänderte Lehraufträge, die in Bearbeitung sind',
 				'description' => '',
 			),
 			array(
@@ -964,7 +964,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Angenommen</b><br>Nur angenommene Lehrauftr&auml;ge</td>',
+				'text' => '<b>Angenommen</b><br>Nur angenommene Lehraufträge</td>',
 				'description' => '',
 			),
 			array(
@@ -981,7 +981,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Ge&auml;ndert</b><br>Nur Lehrauftr&auml;ge, die ge&auml;ndert wurden, nachdem sie bereits
+				'text' => '<b>Geändert</b><br>Nur Lehraufträge, die geändert wurden, nachdem sie bereits
 	bestellt oder erteilt worden sind',
 				'description' => '',
 			),
@@ -1000,7 +1000,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<b>Dummies</b><br>Nur Lehrauftr&auml;ge, die mit einem Dummylektor angelegt sind',
+				'text' => '<b>Dummies</b><br>Nur Lehraufträge, die mit einem Dummylektor angelegt sind',
 				'description' => '',
 			),
 			array(
@@ -1034,7 +1034,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Sobald Ihnen ein oder mehrere Lehrauftr&auml;ge erteilt wurden, können Sie diese annehmen.',
+				'text' => 'Sobald Ihnen ein oder mehrere Lehraufträge erteilt wurden, können Sie diese annehmen.',
 				'description' => '',
 			),
 			array(

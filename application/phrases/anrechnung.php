@@ -314,7 +314,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Anrechnungen pr&uuml;fen',
+				'text' => 'Anrechnungen prüfen',
 				'description' => '',
 			),
 			array(
@@ -416,7 +416,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Bitte best&auml;tigen Sie: <b>Anrechnung wird empfohlen, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'text' => "Bitte bestätigen Sie: <b>Anrechnung wird empfohlen, weil die Kenntnisse inhaltlich und umfangmäßig gleichwertig sind.</b>",
 				'description' => '',
 			),
 			array(
@@ -501,7 +501,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Text &uuml;bernehmen',
+				'text' => 'Text übernehmen',
 				'description' => '',
 			),
 			array(
@@ -518,7 +518,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bitte geben Sie eine Begründung für die Ablehnung an und best&auml;tigen danach.',
+				'text' => 'Bitte geben Sie eine Begründung für die Ablehnung an und bestätigen danach.',
 				'description' => '',
 			),
 			array(
@@ -552,7 +552,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Andere Begr&uuml;ndung. Bitte im Notizfeld kurz angeben.',
+				'text' => 'Andere Begründung. Bitte im Notizfeld kurz angeben.',
 				'description' => '',
 			),
 			array(
@@ -637,7 +637,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Bitte best&auml;tigen Sie: <b>Alle ausgew&auml;hlten Anrechnungen werden empfohlen, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'text' => "Bitte bestätigen Sie: <b>Alle ausgewählten Anrechnungen werden empfohlen, weil die Kenntnisse inhaltlich und umfangmäßig gleichwertig sind.</b>",
 				'description' => '',
 			),
 			array(
@@ -722,7 +722,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antr&auml;ge werden nicht genehmigt.',
+				'text' => 'Anträge werden nicht genehmigt.',
 				'description' => '',
 			),
 			array(
@@ -790,7 +790,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Bitte best&auml;tigen Sie: <b>Alle ausgew&auml;hlten Anrechnungen werden genehmigt, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'text' => "Bitte bestätigen Sie: <b>Alle ausgewählten Anrechnungen werden genehmigt, weil die Kenntnisse inhaltlich und umfangmäßig gleichwertig sind.</b>",
 				'description' => '',
 			),
 			array(
@@ -858,7 +858,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Bitte best&auml;tigen Sie: <b>Anrechnung wird genehmigt, weil die Kenntnisse inhaltlich und umfangm&auml;ßig gleichwertig sind.</b>",
+				'text' => "Bitte bestätigen Sie: <b>Anrechnung wird genehmigt, weil die Kenntnisse inhaltlich und umfangmäßig gleichwertig sind.</b>",
 				'description' => '',
 			),
 			array(
@@ -1557,7 +1557,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Empfehlungstext des Lektors als Begr&uuml;ndung &uuml;bernehmen.",
+				'text' => "Empfehlungstext des Lektors als Begründung übernehmen.",
 				'description' => '',
 			),
 			array(

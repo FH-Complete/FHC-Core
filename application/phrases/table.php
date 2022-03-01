@@ -43,7 +43,7 @@ $phrases = array(
 			array(
 				'sprache' => 'German',
 				'text' => '
-	Mit einem Klick auf <button><i class="fa fa-cog"></i></button> werden die Einstellungen ge&ouml;ffnet.
+	Mit einem Klick auf <button><i class="fa fa-cog"></i></button> werden die Einstellungen geöffnet.
 ',
 				'description' => '',
 			),
@@ -135,10 +135,10 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Um die Spaltenbreite zu ver&auml;ndern, fährt man im Spaltenkopf langsam  mit dem Mauszeiger auf den
+				'text' => 'Um die Spaltenbreite zu verändern, fährt man im Spaltenkopf langsam  mit dem Mauszeiger auf den
 	rechten Rand der entprechenden Spalte. <br>
 	Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und mit
-	gedr&uuml;ckter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.',
+	gedrückter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.',
 				'description' => '',
 			),
 			array(
@@ -159,7 +159,7 @@ $phrases = array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Alle individuellen Tabelleneinstellungen werden in  Ihrem Browser Cache gespeichert. Wenn Sie Ihren
-	Browser Cache l&ouml;schen, werden Ihre Einstellungen zurückgesetzt und  müssen gegebenenfalls neu
+	Browser Cache löschen, werden Ihre Einstellungen zurückgesetzt und  müssen gegebenenfalls neu
 	eingestellt werden.',
 				'description' => '',
 			),
@@ -195,7 +195,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Einzeln ausw&auml;hlen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)',
+				'text' => 'Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)',
 				'description' => '',
 			),
 			array(
@@ -212,7 +212,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bereich ausw&auml;hlen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile',
+				'text' => 'Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile',
 				'description' => '',
 			),
 			array(
@@ -229,7 +229,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Alle ausw&auml;hlen: Button \'Alle ausw&auml;hlen\'',
+				'text' => 'Alle auswählen: Button \'Alle auswählen\'',
 				'description' => '',
 			),
 			array(

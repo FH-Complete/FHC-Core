@@ -1079,7 +1079,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lehrauftr&auml;ge bestellen',
+				'text' => 'Lehraufträge bestellen',
 				'description' => '',
 			),
 			array(
@@ -1249,7 +1249,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'PDF Lehrauftr&auml;ge FH',
+				'text' => 'PDF Lehraufträge FH',
 				'description' => '',
 			),
 			array(
@@ -1266,7 +1266,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'PDF Lehrauftr&auml;ge Lehrg&auml;nge',
+				'text' => 'PDF Lehraufträge Lehrgänge',
 				'description' => '',
 			),
 			array(
@@ -1334,7 +1334,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Begr&uuml;ndung',
+				'text' => 'Begründung',
 				'description' => '',
 			),
 			array(
@@ -1402,7 +1402,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Zur&uuml;cknehmen",
+				'text' => "Zurücknehmen",
 				'description' => '',
 			),
 			array(

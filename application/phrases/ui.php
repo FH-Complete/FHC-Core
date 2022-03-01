@@ -637,7 +637,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Alle ausw&auml;hlen',
+				'text' => 'Alle auswählen',
 				'description' => '',
 			),
 			array(
@@ -654,7 +654,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Alle abw&auml;hlen',
+				'text' => 'Alle abwählen',
 				'description' => '',
 			),
 			array(
@@ -671,7 +671,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausgew&auml;hlte Zeilen',
+				'text' => 'Ausgewählte Zeilen',
 				'description' => '',
 			),
 			array(
@@ -1249,7 +1249,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Stunden / Stundensatz ge&auml;ndert.',
+				'text' => 'Stunden / Stundensatz geändert.',
 				'description' => '',
 			),
 			array(
@@ -1283,7 +1283,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Wartet auf Bestellung. Danach Erteilen m&ouml;glich.',
+				'text' => 'Wartet auf Bestellung. Danach Erteilen möglich.',
 				'description' => '',
 			),
 			array(
@@ -1300,7 +1300,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Wartet auf erneute Bestellung. Danach erneut Erteilen m&ouml;glich.',
+				'text' => 'Wartet auf erneute Bestellung. Danach erneut Erteilen möglich.',
 				'description' => '',
 			),
 			array(
@@ -1761,7 +1761,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Bitte w&auml;hlen Sie zumindest einen Antrag aus.",
+				'text' => "Bitte wählen Sie zumindest einen Antrag aus.",
 				'description' => '',
 			),
 			array(
@@ -1778,7 +1778,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Bitte geben Sie eine Begr&uml;ndung an.",
+				'text' => "Bitte geben Sie eine Begründung an.",
 				'description' => '',
 			),
 			array(
@@ -1795,7 +1795,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => " Anrechnungsantr&auml;ge wurden empfohlen.",
+				'text' => " Anrechnungsanträge wurden empfohlen.",
 				'description' => '',
 			),
 			array(
@@ -1812,7 +1812,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => " Anrechnungsantr&auml;ge wurden nicht empfohlen.",
+				'text' => " Anrechnungsanträge wurden nicht empfohlen.",
 				'description' => '',
 			),
 			array(
@@ -1829,7 +1829,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => " Anrechnungsantr&auml;ge wurden genehmigt.",
+				'text' => " Anrechnungsanträge wurden genehmigt.",
 				'description' => '',
 			),
 			array(
@@ -1846,7 +1846,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => " Anrechnungsantr&auml;ge wurden abgelehnt.",
+				'text' => " Anrechnungsanträge wurden abgelehnt.",
 				'description' => '',
 			),
 			array(
@@ -1965,7 +1965,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Daten fehlen.<br>Bitte f&uuml;llen Sie alle Formularfelder aus",
+				'text' => "Daten fehlen.<br>Bitte füllen Sie alle Formularfelder aus",
 				'description' => '',
 			),
 			array(

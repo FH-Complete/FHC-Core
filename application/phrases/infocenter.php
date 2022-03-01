@@ -586,7 +586,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'an Ausgew&auml;hlte',
+				'text' => 'an Ausgewählte',
 				'description' => '',
 			),
 			array(
