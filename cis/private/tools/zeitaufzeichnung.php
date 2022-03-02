@@ -44,6 +44,7 @@ require_once('../../../include/globals.inc.php');
 require_once('../../../include/bisverwendung.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/zeitaufzeichnung_csv_import.class.php');
 
 function checkZeitsperren($p, $uid, $day) 
 {
@@ -867,28 +868,6 @@ if($kartennummer != '')
 }
 //Speichern der Daten
 
-function checkVals ($oe_val, $project_val, $phase_val, $service_val)
-{
-	$error = 0;
-	if ($service_val && ( filter_var($service_val, FILTER_VALIDATE_INT) === false ))
-		$error = 1;
-	if ($phase_val && ( filter_var($phase_val, FILTER_VALIDATE_INT) === false ))
-		$error = 1;
-	if ($oe_val)
-	{
-		$oecheck = new organisationseinheit($oe_val);
-		if ($oecheck->errormsg)
-			$error = 1;
-	}
-	if ($project_val)
-	{
-		$procheck = new projekt($project_val);
-		if ($procheck->errormsg)
-			$error = 1;
-	}
-	return $error;
-}
-
 if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 {
 	$zeit = new zeitaufzeichnung();
@@ -914,206 +893,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 
 	if ($_FILES['csv']['error'] == 0 && isset($_POST['import']))
 	{
-		$name = $_FILES['csv']['name'];
-    	$tmpName = $_FILES['csv']['tmp_name'];
-    	$mimeType = mime_content_type($_FILES['csv']['tmp_name']);
-		//echo($mimeType);
-		if($mimeType=='text/plain')
-		{
-			if(($handle = fopen($tmpName, 'r')) !== FALSE)
-			{
-				if 	(mb_detect_encoding(fgets($handle), 'UTF-8', true))
-				{
-					set_time_limit(0);
-					$anzahl = 0;
-					$importtage_array = array();
-					$ende_vorher = date('Y-m-d H:i:s');
-
-					while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE)
-					{
-						if($data[0] == $user){
-							if(!empty($data[6]) && !in_array($data[6], $project_kurzbz_array) && empty($data[7]))
-							{
-								echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgendem Projekt entweder nicht zugewiesen sind oder das Projekt schon abgeschlossen wurde: ('.$data[6].')</b></span><br>';
-							}
-							elseif(!empty($data[7]) && !in_array($data[7], $projectphasen_kurzbz_array))
-							{
-								echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgender Projektphase entweder nicht zugewiesen sind oder die Projektphase schon abgeschlossen wurde: ('.$data[7].')</b></span><br>';
-							}
-							else
-							{
-								$vonCSV = $datum->formatDatum($data[2], $format = 'Y-m-d');
-								$bisCSV = $datum->formatDatum($data[3], $format = 'Y-m-d');
-								$dateVonCSV = new DateTime($vonCSV);
-								$dateBisCSV = new DateTime($bisCSV);
-								$extractHourBis = $datum->formatDatum($data[3], $format = 'H:i:s');
-
-								if (!isset($data[5]))
-									$data[5] = NULL;
-								if (!isset($data[6]))
-									$data[6] = NULL;
-								if (!isset($data[7]))
-									$data[7] = NULL;
-								if (!isset($data[8]))
-									$data[8] = NULL;
-								
-								$zscheck = checkZeitsperren($p, $user, $vonCSV);
-								if( $zscheck['status'] === false ) {
-									echo '<span id="triggerPhasenReset" style="color:red"><b>' . $p->t("global/fehlerBeimSpeichernDerDaten") . ': ' . $zscheck['msg'] . '</b></span><br>';
-								}
-								elseif ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
-									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
-								elseif ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') > $limitdatum)
-									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da ('.$data[2].') zu weit in der Zukunft liegt.</b></span><br>';
-								elseif ($dateVonCSV!=$dateBisCSV && $data[1]!="DienstreiseMT")
-								{
-									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da keine Zeitaufzeichnung über mehrere Tage erlaubt ist (ausgenommen Dienstreisen).</b></span><br>';
-								}
-								elseif ($extractHourBis == '00:00:00')
-								{
-									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Bitte Arbeitszeiten gemäß Arbeitsaufzeichnung Leitfaden tagesgenau abgrenzen: Nur Eingaben von 00:00 bis 23:59 erlaubt!</b></span><br>';
-								}
-								elseif (empty($data[7]) && !empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
-								{
-									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt: ('.$data[2].') ('.$data[3].')</b></span><br>';
-								}
-								elseif (!empty($data[7]) && !$projektph_of_user ->checkProjectphaseInCorrectTime($data[7], $data[2], $data[3]))
-								{
-									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt: ('.$data[2].') ('.$data[3].')</b></span><br>';
-								}
-								elseif (checkVals($data[5],$data[6],$data[7],$data[8]))
-								{
-									echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Fehlerhafte Werte  ('.$data[2].')</b></span><br>';
-								}
-								else
-								{
-									if ($data[1] == 'LehreIntern')
-										$data[1] = 'Lehre';
-									$zeit->new = true;
-									$zeit->beschreibung = NULL;
-									$zeit->oe_kurzbz_1 = NULL;
-									$zeit->projekt_kurzbz = NULL;
-									$zeit->projektphase_id = NULL;
-									$zeit->service_id = NULL;
-
-									$zeit->insertamum = date('Y-m-d H:i:s');
-									$zeit->updateamum = date('Y-m-d H:i:s');
-									$zeit->updatevon = $user;
-									$zeit->insertvon = $user;
-									$zeit->uid = $data[0];
-									$zeit->aktivitaet_kurzbz = $data[1];
-									$zeit->start = $datum->formatDatum($data[2], $format='Y-m-d H:i:s');
-									$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
-									if (isset($data[4]))
-										$zeit->beschreibung = $data[4];
-									if (isset($data[5]))
-										$zeit->oe_kurzbz_1 = $data[5];
-									if (isset($data[6]))
-										$zeit->projekt_kurzbz = $data[6];
-									if (isset($data[7]))
-										$zeit->projektphase_id = $data[7];
-									if (isset($data[8]))
-										$zeit->service_id = $data[8];
-									if (isset($data[9]))
-									{
-										if (strtolower($data[9] == 'true'))
-										{
-											// check, ob homeoffice gemäß Bisverwendung
-											$verwendung = new bisverwendung();
-											$verwendung->getVerwendungDatum($data[0],$vonCSV);
-
-											foreach ($verwendung->result as $v)
-											if ($v->homeoffice)
-											{
-												$zeit->homeoffice = true;
-											}
-											else
-											{
-												echo '<span style="color:orange"><b>'.$p->t("zeitaufzeichnung/homeofficeNichtErlaubt", ($vonCSV)) .'</b></span><br>';
-												$zeit->homeoffice = false;
-											}
-										}
-										else
-										{
-											$zeit->homeoffice = false;
-										}
-									}
-									else
-									{
-										$zeit->homeoffice = false;
-									}
-									$tag = $datum->formatDatum($data[2], $format='Y-m-d');
-
-									if(!in_array($tag, $importtage_array))
-									{
-										$importtage_array[] = $tag;
-										$zeit->deleteEntriesForUser($user, $tag);
-										$tag_aktuell = $tag;
-									}
-									else
-									{
-										if ($ende_vorher < $zeit->start)
-										{
-											$pause = new zeitaufzeichnung();
-											$pause->new = true;
-											$pause->insertamum = date('Y-m-d H:i:s');
-											$pause->updateamum = date('Y-m-d H:i:s');
-											$pause->updatevon = $user;
-											$pause->insertvon = $user;
-											$pause->uid = $user;
-											$pause->aktivitaet_kurzbz = 'Pause';
-											$pause->start = $ende_vorher;
-											$pause->ende = $zeit->start;
-											$pause->beschreibung = '';
-											$pause->homeoffice = $homeoffice;
-											if(!$pause->save())
-											{
-												echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span><br>';
-											}
-										}
-									}
-
-									$ende_vorher = $zeit->ende;
-									if($data[2] != $data[3])
-									{
-										/*
-										if ($data[1] == 'LehreExtern')
-										{
-											$zeit->start = date('Y-m-d H:i:s', strtotime('+2 seconds', strtotime($data[2])));
-											$zeit->ende = date('Y-m-d H:i:s', strtotime('-2 seconds', strtotime($data[3])));
-										}
-										*/
-										if(!$zeit->save())
-										{
-											echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span><br>';
-										}
-										else
-											$anzahl++;
-									}
-									else
-										$anzahl++;
-
-								}
-						}
-						}
-						else if (strpos($data[0],'#') === false)
-						{
-							echo '<span id="triggerPhasenReset" style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Falsche UID nicht importiert </b>('.$data[0].')</span><br>';
-						}
-					}
-					if($anzahl>0)
-					{
-						echo '<span style="color:green"><b>'.$p->t("global/datenWurdenGespeichert").' ('.$anzahl.')</b></span>';
-						foreach ($importtage_array as $ptag)
-						{
-							$zeit->cleanPausenForUser($user, $ptag);
-						}
-					}
-				}
-				else
-					echo '<span style="color:red"><b>Datei konnte nicht importiert werden. Encoding ist nicht UTF-8!</b></span>';
-			}
-		}
+		$zeit_csv_import = new zeitaufzeichnung_csv_import($p, $zeit, $project_kurzbz_array, $projectphasen_kurzbz_array, $sperrdatum, $limitdatum, $projects_of_user, $projektph_of_user, $datum, $user);
+		$zeit_csv_import->parseCSV();
+		echo $zeit_csv_import->InfosToHTML();
+		echo $zeit_csv_import->ErrorsToHTML();
 	}
 	else if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
 		echo '<span id="triggerPhasenReset" style="color:#ff0000"><b>' .$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
