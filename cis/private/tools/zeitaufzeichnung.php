@@ -44,9 +44,10 @@ require_once('../../../include/globals.inc.php');
 require_once('../../../include/bisverwendung.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-require_once('../../../include/zeitaufzeichnung_csv_import.class.php');
+require_once('../../../include/zeitaufzeichnung_import_csv.class.php');
+require_once('../../../include/zeitaufzeichnung_import_post.class.php');
 
-function checkZeitsperren($p, $uid, $day) 
+/*function checkZeitsperren($p, $uid, $day) 
 {
 	$zs = new zeitsperre();
 	$sperreVorhanden = false;
@@ -76,7 +77,7 @@ function checkZeitsperren($p, $uid, $day)
 			"msg" => $msg
 		);
 	}
-}
+}*/
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
@@ -156,8 +157,8 @@ else
 	$gesperrt_bis = '2015-08-31';
 
 $sperrdatum = date('c', strtotime($gesperrt_bis));
-$datumjetzt = strtotime("+5 weeks");
-$limitdatum = date('c', $datumjetzt);
+/*$datumjetzt = strtotime("+5 weeks");
+$limitdatum = date('c', $datumjetzt);*/
 
 // Uses urlencode to avoid XSS issues
 $zeitaufzeichnung_id = urlencode(isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
@@ -870,40 +871,80 @@ if($kartennummer != '')
 
 if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 {
-	$zeit = new zeitaufzeichnung();
+	#$zeit = new zeitaufzeichnung(); // TODO(chris): make lokal
 
-	$projects_of_user = new projekt();
+	// TODO(chris): make lokal
+	/*$projects_of_user = new projekt();
 	$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
-	$project_kurzbz_array = array();
+	$project_kurzbz_array = array();*/
 
+	// TODO(chris): make lokal?
 	$projektph_of_user = new projektphase();
-	$projektphasen = $projektph_of_user->getProjectphaseForMitarbeiter($user);
-	$projectphasen_kurzbz_array = array();
+	$projektphasen = $projektph_of_user->getProjectphaseForMitarbeiter($user); // TODO(chris): this seems to be used below
+	/*$projectphasen_kurzbz_array = array();*/
 
-	foreach($projects as $prjct)
+	// TODO(chris): make lokal
+	/*foreach($projects as $prjct)
 	{
 		array_push($project_kurzbz_array, (string) $prjct->projekt_kurzbz);
-	}
-	foreach ($projektphasen as $pp)
+	}*/
+	// TODO(chris): make lokal
+	/*foreach ($projektphasen as $pp)
 	{
 		array_push($projectphasen_kurzbz_array, (string) $pp->projektphase_id);
-	}
+	}*/
 
-	$projectphase = new projektphase();
+	// NOTE(chris): this is the same as projektph_of_user
+	/*$projectphase = new projektphase();*/
 
+	// NOTE(chris): CSV Import
 	if ($_FILES['csv']['error'] == 0 && isset($_POST['import']))
 	{
-		$zeit_csv_import = new zeitaufzeichnung_csv_import($p, $zeit, $project_kurzbz_array, $projectphasen_kurzbz_array, $sperrdatum, $limitdatum, $projects_of_user, $projektph_of_user, $datum, $user);
-		$zeit_csv_import->parseCSV();
-		echo $zeit_csv_import->InfosToHTML();
-		echo $zeit_csv_import->WarningsToHTML();
-		echo $zeit_csv_import->ErrorsToHTML();
+		$zeit_csv_import = new zeitaufzeichnung_import_csv($p, $user, $sperrdatum, $_FILES['csv']['tmp_name']);
+		$zeit_csv_import->import();
+		echo $zeit_csv_import->OutputToHTML();
 	}
 	else if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
 		echo '<span id="triggerPhasenReset" style="color:#ff0000"><b>' .$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
+	// NOTE(chris): Save
 	else if (isset($_POST['save']) || isset($_POST['edit']))
 	{
+		$zeit_post_import = new zeitaufzeichnung_import_post($p, $user, isset($_POST['edit']), [
+			'aktivitaet_kurzbz' => $aktivitaet_kurzbz, 
+			'beschreibung' => $beschreibung, 
+			'bis' => $bis, 
+			'bis_pause' => $bis_pause,
+			'homeoffice' => $homeoffice, 
+			'kunde_uid' => $kunde_uid,
+			'oe_kurzbz_1' => $oe_kurzbz_1, 
+			'oe_kurzbz_2' => $oe_kurzbz_2, 
+			'projekt_kurzbz' => $projekt_kurzbz, 
+			'projektphase_id' => $projektphase_id, 
+			'service_id' => $service_id, 
+			'von' => $von, 
+			'von_pause' => $von_pause, 
+			'zeitaufzeichnung_id' => $zeitaufzeichnung_id,
+		]);
+		$zeit_post_import->import();
+		echo $zeit_post_import->OutputToHTML();
+		if (!$zeit_post_import->hasErrors() && !$zeit_post_import->hasWarnings()) {
+			// Nach dem Speichern in den neu Modus springen und als Von Zeit
+			// das Ende des letzten Eintrages eintragen
+			$zeitaufzeichnung_id = '';
+			$uid = $user;
+			$aktivitaet_kurzbz = '';
+			$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($datum->formatDatum($bis, $format = 'Y-m-d H:i:s')));
+			$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($datum->formatDatum($bis, $format = 'Y-m-d H:i:s'))+3600);
+			$beschreibung = '';
+			$oe_kurzbz_1 = '';
+			$oe_kurzbz_2 = '';
+			$projekt_kurzbz = '';
+			$projektphase_id = '';
+			$service_id = '';
+			$kunde_uid = '';
+		}
 
+	/*
 		if(isset($_POST['edit']))
 		{
 			if(!$zeit->load($zeitaufzeichnung_id))
@@ -1048,8 +1089,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			$zeitaufzeichnung_id = '';
 			$uid = $zeit->uid;
 			$aktivitaet_kurzbz = '';
-			$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende));
-			$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende)+3600);
+			#$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende));
+			#$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende)+3600);
+			$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($datum->formatDatum($bis, $format = 'Y-m-d H:i:s')));
+			$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($datum->formatDatum($bis, $format = 'Y-m-d H:i:s'))+3600);
 			$beschreibung = '';
 			$oe_kurzbz_1 = '';
 			$oe_kurzbz_2 = '';
@@ -1058,6 +1101,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			$service_id = '';
 			$kunde_uid = '';
 		}
+	*/
 	}
 }
 
@@ -1235,7 +1279,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		//Formular
 		echo '<br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST" onsubmit="return checkdatum()" enctype="multipart/form-data">';
 
-/*		echo '<table>
+		/*echo '<table>
 			<tr>
 				<td rowspan="2">';
 		echo '<table>';*/
@@ -1859,8 +1903,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					echo '</td>';
 					echo '<td colspan="2"></td>';
 					echo '<td>';
-//					if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
-//						echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$dr_arr[$datumtag]['id'].'" class="Item">'.$p->t("global/bearbeiten").'</a>';
+					//if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
+					//	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$dr_arr[$datumtag]['id'].'" class="Item">'.$p->t("global/bearbeiten").'</a>';
 					echo "</td>\n";
 					echo "<td>";
 					if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
