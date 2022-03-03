@@ -20,6 +20,7 @@ class zeitaufzeichnung_csv_import {
 	protected $fh;
 
 	protected $errors;
+	protected $warnings;
 	protected $infos;
 	
 	protected $anzahl;
@@ -67,6 +68,7 @@ class zeitaufzeichnung_csv_import {
 		
 		$this->user     = $user;
 		$this->errors   = array();
+		$this->warnings = array();
 		$this->infos    = array();
 	}
 	
@@ -87,6 +89,10 @@ class zeitaufzeichnung_csv_import {
 		return !empty($this->errors);
 	}
 
+	public function hasWarnings() {
+		return !empty($this->warnings);
+	}
+
 	public function hasInfos() {
 		return !empty($this->infos);
 	}
@@ -95,6 +101,14 @@ class zeitaufzeichnung_csv_import {
 		$html = '';
 		foreach ($this->errors as $msg) {
 			$html .= '<span style="color:red;"><b>' . $msg . '</b></span><br>' . "\n";
+		}
+		return $html;
+	}
+
+	public function WarningsToHTML() {
+		$html = '';
+		foreach ($this->errors as $msg) {
+			$html .= '<span style="color:orange;"><b>' . $msg . '</b></span><br>' . "\n";
 		}
 		return $html;
 	}
@@ -112,6 +126,13 @@ class zeitaufzeichnung_csv_import {
 			$msg = 'Zeile ' . $this->current_line . ' - ' . $msg;
 		}
 		$this->errors[] = $msg;
+	}
+	
+	protected function addWarning($msg, $prepend_current_line=false) {
+		if( $prepend_current_line ) {
+			$msg = 'Zeile ' . $this->current_line . ' - ' . $msg;
+		}
+		$this->warnings[] = $msg;
 	}
 	
 	protected function addInfo($msg) {
@@ -219,6 +240,7 @@ class zeitaufzeichnung_csv_import {
 	}
 	
 	protected function checkZeitsperren() {
+		// NOTE(chris): checkZeitsperren() is defined in private/tools/zeitaufzeichnung.php
 		$zscheck = checkZeitsperren($this->p, $this->user, $this->datum->formatDatum($this->data[self::STARTDT], $format = 'Y-m-d'));
 		if ($zscheck['status'] === false) {
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ": " . $zscheck['msg']);
@@ -360,7 +382,7 @@ class zeitaufzeichnung_csv_import {
 					if ($v->homeoffice) {
 						$this->zeit->homeoffice = true;
 					} else {
-						$this->addError($this->p->t("zeitaufzeichnung/homeofficeNichtErlaubt", ($vonCSV)));
+						$this->addWarning($this->p->t("zeitaufzeichnung/homeofficeNichtErlaubt", ($vonCSV)));
 						$this->zeit->homeoffice = false;
 					}
 				}

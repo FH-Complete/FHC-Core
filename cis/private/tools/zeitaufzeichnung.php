@@ -896,6 +896,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit_csv_import = new zeitaufzeichnung_csv_import($p, $zeit, $project_kurzbz_array, $projectphasen_kurzbz_array, $sperrdatum, $limitdatum, $projects_of_user, $projektph_of_user, $datum, $user);
 		$zeit_csv_import->parseCSV();
 		echo $zeit_csv_import->InfosToHTML();
+		echo $zeit_csv_import->WarningsToHTML();
 		echo $zeit_csv_import->ErrorsToHTML();
 	}
 	else if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
