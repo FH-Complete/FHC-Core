@@ -120,7 +120,8 @@ class DocumentLib
 
 		finfo_close($finfo);
 
-		exec($cmd, null, $ret);
+		$out = null;
+		exec($cmd, $out, $ret);
 		if ($ret != 0)
 		{
 			return error('PDF-zusammenfuegung ist derzeit nicht möglich. Bitte informieren Sie den Administrator');
@@ -155,7 +156,8 @@ class DocumentLib
 				$command = 'unoconv -f %s --output %s %s 2>&1';
 			$command = sprintf($command, $format, $outFile, $inFile);
 
-			exec($command, null, $ret);
+			$out = null;
+			exec($command, $out, $ret);
 		}
 
 		if ($ret != 0)
@@ -218,7 +220,8 @@ class DocumentLib
 		$cmd .= '/countspaces {  [ exch { dup 32 ne { pop } if  } forall ] length } bind def  >> ';
 		$cmd .= 'setpagedevice viewJPEG"';
 
-		exec($cmd, null, $ret);
+		$out = null;
+		exec($cmd, $out, $ret);
 		if ($ret != 0)
 		{
 			$this->errormsg = 'jpegToPdf ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
