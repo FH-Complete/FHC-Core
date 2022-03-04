@@ -414,6 +414,10 @@
 			{
 				$datasetRaw->{'OnholdDate'} = '-';
 			}
+			else
+			{
+				$datasetRaw->{'OnholdDate'} = date_format(date_create($datasetRaw->{'OnholdDate'}), 'Y-m-d H:i');
+			}
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
 			{
