@@ -14,6 +14,7 @@ class DocumentLib
 		// Gets CI instance
 		$this->ci =& get_instance();
 
+		// Which document converter has to be used
 		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
 		{
 			// Use docsbox!!
@@ -119,7 +120,7 @@ class DocumentLib
 
 		finfo_close($finfo);
 
-		exec($cmd, $out, $ret);
+		exec($cmd, null, $ret);
 		if ($ret != 0)
 		{
 			return error('PDF-zusammenfuegung ist derzeit nicht möglich. Bitte informieren Sie den Administrator');
@@ -154,7 +155,7 @@ class DocumentLib
 				$command = 'unoconv -f %s --output %s %s 2>&1';
 			$command = sprintf($command, $format, $outFile, $inFile);
 
-			exec($command, $out, $ret);
+			exec($command, null, $ret);
 		}
 
 		if ($ret != 0)
@@ -217,7 +218,7 @@ class DocumentLib
 		$cmd .= '/countspaces {  [ exch { dup 32 ne { pop } if  } forall ] length } bind def  >> ';
 		$cmd .= 'setpagedevice viewJPEG"';
 
-		exec($cmd, $out, $ret);
+		exec($cmd, null, $ret);
 		if ($ret != 0)
 		{
 			$this->errormsg = 'jpegToPdf ist derzeit nicht möglich. Bitte informieren Sie den Administrator';

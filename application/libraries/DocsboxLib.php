@@ -1,11 +1,11 @@
 <?php
-/* Copyright (C) 2021 fhcomplete.net
+/* Copyright (C) 2022 fhcomplete.net
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the 
+ * published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
- *              
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,18 +20,22 @@
 require_once(dirname(__FILE__).'/../config/docsbox.php');
 require_once(dirname(__FILE__).'/../../vendor/nategood/httpful/bootstrap.php');
 
+use \ZipArchive as ZipArchive;
+
 /**
  * Simple client to convert documents using Docsbox
  */
 class DocsboxLib
 {
-	const ERROR = 1;
-	const SUCCESS = 0;
+	const ERROR = EXIT_ERROR;
+	const SUCCESS = EXIT_SUCCESS;
 	const STATUS_FINISHED = 'finished'; // Docsbox status when a document conversion ended
 	const STATUS_QUEUED = 'queued'; // Docsbox status when a file has been queued for the conversion
 	const STATUS_STARTED = 'started'; // Docsbox status when a file has started being worked
 	const STATUS_WORKING = 'working'; // Docsbox status when a file is being converted
 	const OUTPUT_FILENAME = 'out.zip.pdf'; // File name used by docsbox to save a converted document
+
+	const DEFAULT_FORMAT = 'pdf'; // Default supported format
 
 	// -------------------------------------------------------------------------------------------------
 	// Public static methods
@@ -41,10 +45,13 @@ class DocsboxLib
 	 * It return 0 on success and any other integer on error
 	 * NOTE: currently format is not supported
 	 */
-	public static function convert($inputFileName, $outputFileName, $format = 'pdf')
+	public static function convert($inputFileName, $outputFileName, $format)
 	{
+		// If a format has not been given
+		if (isEmptyString($format)) $format = self::DEFAULT_FORMAT;
+
 		// Posts the file to docsbox
-		$queueId = self::_postFile($inputFileName); 
+		$queueId = self::_postFile($inputFileName);
 		// If an error occurred
 		if ($queueId == null) return self::ERROR;
 
@@ -229,7 +236,7 @@ class DocsboxLib
 				&& $getFileResponse->body != '')
 			{
 				// Output directory where to unzip the downloaded zip file
-				$outputDirectory = dirname($outputFileName); 
+				$outputDirectory = dirname($outputFileName);
 				// The path and name of the downloaded zip file
 				$temporaryDownloadedZip = sys_get_temp_dir().'/'.basename($resultUrl);
 
