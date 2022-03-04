@@ -19,7 +19,8 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 	const PHASE         = 7;
 	const SERVICE       = 8;
 	const HOMEOFFICE    = 9;
-	
+	const ANZAHL_PFLICHTFELDER = 4;
+
 	protected $tmpname;
 	protected $fh;
 
@@ -33,12 +34,12 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 	protected $projectphasen_kurzbz_array;
 
 	protected $sperrdatum;
-	
+
 	protected $current_line;
 
 	protected $homeoffice;
 
-	
+
 	/**
 	 * @param phrasen $p The Translator object
 	 * @param string $user The user ID
@@ -51,19 +52,19 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 		$this->user     = $user;
 		$this->tmpname = $filename;
 		$this->sperrdatum = $sperrdatum;
-		
+
 		$this->project_kurzbz_array         = [];
 		$projects = $this->project->getProjekteListForMitarbeiter($user);
 		foreach ($projects as $pp)
 			$this->project_kurzbz_array[] = (string) $pp->projekt_kurzbz;
-		
+
 		$this->projectphasen_kurzbz_array   = [];
 		$projektphasen = $this->phase->getProjectphaseForMitarbeiter($user);
 		foreach ($projektphasen as $pp)
 			$this->projectphasen_kurzbz_array[] = (string) $pp->projektphase_id;
 	}
 
-	
+
 	/**
 	 * @param string $msg
 	 * @param boolean $prepend_current_line
@@ -91,11 +92,11 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			$this->addError($ex->getMessage());
 		}
 	}
-	
+
 
 	/**
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkMimeType() {
@@ -107,19 +108,19 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 
 	/**
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function openFileForReading() {
-		if (false === ($this->fh = fopen($this->tmpname, 'r')) ) 
+		if (false === ($this->fh = fopen($this->tmpname, 'r')) )
 		{
 			throw new Exception('CSV - Datei konnte nicht zum lesen geöffnet werden.');
 		}
 	}
-	
+
 	/**
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkEncoding() {
@@ -142,7 +143,8 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 		$data = null;
 		$this->current_line = 0;
 		while (($data = fgetcsv($this->fh, 1000, ';', '"')) !== FALSE) {
-			if (false !== strpos($data[self::USER], '#') ) {
+			if ((false !== strpos($data[self::USER], '#'))
+				|| count($data) <  self::ANZAHL_PFLICHTFELDER) {
 				// ignore lines starting with #
 				continue;
 			}
@@ -158,9 +160,10 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 	protected function processData($data) {
 		try {
 			$this->checkUser($data[self::USER]);
+			$this->initData($data);
 			$this->checkProject($data[self::PROJEKT], $data[self::PHASE]);
 			$this->checkPhase($data[self::PHASE]);
-			$this->initData($data);
+
 			$this->checkZeitsperren($this->user, $this->datum->formatDatum($data[self::STARTDT], 'Y-m-d'));
 			$this->checkSperrdatum($data[self::STARTDT]);
 			$this->checkLimitdatum($data[self::STARTDT]);
@@ -182,11 +185,11 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 	/**
 	 * @param string $user The User ID
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkUser($user) {
-		if ($user !== $this->user && (strpos($user, '#') !== false) ) 
+		if ($user !== $this->user || (strpos($user, '#') !== false))
 		{
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten").': Falsche UID nicht importiert (' . $user . ')');
 		}
@@ -196,7 +199,7 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 	 * @param string $project The Project ID or empty string
 	 * @param string $phase The Phase ID or empty string
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkProject($project, $phase) {
@@ -204,13 +207,13 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 		{
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgendem Projekt entweder nicht zugewiesen sind oder das Projekt schon abgeschlossen wurde: (' . $project . ')');
 		}
-		
+
 	}
 
 	/**
 	 * @param string $phase The Phase ID or empty string
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkPhase($phase) {
@@ -228,28 +231,31 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 		foreach ([self::OE, self::PROJEKT, self::PHASE, self::SERVICE] as $key)
 			if (!isset($data[$key]))
 				$data[$key] = NULL;
+
+		if (!isset($data[self::HOMEOFFICE]))
+			$data[$key] = false;
 	}
-	
+
 	/**
 	 * @param string $start datetimestring
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkSperrdatum($start) {
 		if ($this->datum->formatDatum($start, 'Y-m-d H:i:s') < $this->sperrdatum) {
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Eingabe nicht möglich da vor dem Sperrdatum (' . $start . ')');
 		}
-		
+
 	}
-	
+
 	/**
 	 * @param string $oe_val
 	 * @param string $project_val
 	 * @param string $phase_val
 	 * @param string $service_val
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkVals($oe_val, $project_val, $phase_val, $service_val) {
@@ -355,11 +361,11 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param string $start datestring
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkImporttage($start) {
@@ -371,10 +377,10 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 		} else if ($this->ende_vorher < $this->zeit->start) {
 			$this->savePause();
 		}
-		
+
 		$this->ende_vorher = $this->zeit->ende;
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -413,7 +419,7 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			$this->anzahl++;
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -425,5 +431,5 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			}
 		}
 	}
-	
+
 }

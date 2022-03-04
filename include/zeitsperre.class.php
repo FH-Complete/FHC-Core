@@ -25,7 +25,7 @@ class zeitsperre extends basis_db
 {
 	const NUR_BLOCKIERENDE_ZEITSPERREN = true;
 	const BLOCKIERENDE_ZEITSPERREN = "'Krank','Urlaub','ZA','DienstV','PflegeU','DienstF','CovidSB','CovidKS'";
-	
+
 	public $new;     			// boolean
 	public $result = array(); 	// news Objekt
 
@@ -58,6 +58,11 @@ class zeitsperre extends basis_db
 
 		if($zeitsperre_id != null)
 			$this->load($zeitsperre_id);
+	}
+
+	public static function getBlockierendeZeitsperren()
+	{
+		return explode("','",trim(self::BLOCKIERENDE_ZEITSPERREN, '\''));
 	}
 
 	/**
@@ -390,7 +395,7 @@ class zeitsperre extends basis_db
 			if( $nurblockierend ) {
 				$qry .= " AND zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
 			}
-		
+
 			if(!is_null($stunde))
 				$qry.=" AND
 					((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND

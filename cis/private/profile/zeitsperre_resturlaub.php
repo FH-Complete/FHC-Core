@@ -361,30 +361,35 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	}
 
 	//Prüfen auf vorhandene Zeitaufzeichnung
-	if (isset($_POST['bisdatum']) && isset($_POST['vondatum']) && $zaufzeichnung->existsZeitaufzeichnung($uid, $_POST['vondatum'], $_POST['bisdatum']))
+	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
+	  && $zaufzeichnung->existsZeitaufzeichnung($uid, $_POST['vondatum'], $_POST['bisdatum'])
+	  // Nur Zeitaufzeichnungsrelevante Typen sollen das speichern blockieren
+	  && in_array($_POST['zeitsperretyp_kurzbz'], zeitsperre::getBlockierendeZeitsperren()))
 	{
 		$error = true;
 		$error_msg .= $p->t('zeitsperre/zeitaufzeichnungVorhanden');
 	}
 
 	//Prüfen auf vorhandene Zeitsperre
-	if (isset($_POST['bisdatum']) && isset($_POST['vondatum']))
+	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
+	&& in_array($_POST['zeitsperretyp_kurzbz'], zeitsperre::getBlockierendeZeitsperren()))
 	{
 		$von = $_POST['vondatum'];
 		$von2 = new DateTime($von);
 		$von2 = $von2->format('Y-m-d');
 		$zeitsperre = new zeitsperre();
 
-		if ($zeitsperre->getSperreByDate($uid, $von2, null))
+		if ($zeitsperre->getSperreByDate($uid, $von2, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN))
 		{
 			foreach ($zeitsperre->result as $z)
 			{
-				if ($z->zeitsperretyp_kurzbz)
-				{
-					$typ = $z->zeitsperretyp_kurzbz;
-				}
-					$error = true;
-					$error_msg .= $p->t('zeitsperre/zeitsperreEingetragen', [$von, $typ]);
+				// Beim editieren nicht mit dem eigenen Eintrag kollidieren
+				if($_GET['type'] == 'edit_sperre' && $z->zeitsperre_id == $_GET['id'])
+					continue;
+
+				$typ = $z->zeitsperretyp_kurzbz;
+				$error = true;
+				$error_msg .= $p->t('zeitsperre/zeitsperreEingetragen', [$von, $typ]);
 			}
 		}
 	}
