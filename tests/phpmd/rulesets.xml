@@ -17,8 +17,11 @@
 	<exclude-pattern>application/extensions</exclude-pattern>
 	<exclude-pattern>addons</exclude-pattern>
 
-	<!-- Import the entire clean code rule set -->
-	<rule ref="rulesets/cleancode.xml" />
+	<!-- Import the clean code rule set -->
+	<rule ref="rulesets/cleancode.xml">
+		<!-- Exclude the ElseExpression rule -->
+		<exclude name="ElseExpression" />
+	</rule>
 	<!-- Import the entire unused code rule set -->
 	<rule ref="rulesets/unusedcode.xml" />
 	<!-- Import the DevelopmentCodeFragment rule from the design rule set -->
