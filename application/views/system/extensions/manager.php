@@ -52,10 +52,10 @@
 
 				<div class="row">
 					<div class="col-xs-2">
-						<label for="performSql"><?php echo $this->p->t('extensions', 'performSql'); ?></label>
+						<label for="notPerformSql"><?php echo $this->p->t('extensions', 'performSql'); ?></label>
 					</div>
 					<div>
-						<input type="checkbox" class="checkbox" id="performSql" name="performSql"/>
+						<input type="checkbox" class="checkbox" id="notPerformSql" name="notPerformSql"/>
 					</div>
 				</div>
 			</form>

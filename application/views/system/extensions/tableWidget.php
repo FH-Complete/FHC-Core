@@ -32,7 +32,7 @@
 			'Dependencies',
 			'Enabled'
 		),
-		'formatRow' => function($datasetRaw) {
+		'formatRow' => function ($datasetRaw) {
 
 			if ($datasetRaw->{'description'} == null)
 			{
@@ -91,5 +91,4 @@
 	);
 
 	echo $this->widgetlib->widget('TableWidget', $tableWidgetArray);
-?>
 

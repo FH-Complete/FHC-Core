@@ -31,10 +31,10 @@ class Manager extends Auth_Controller
 		$this->load->library('ExtensionsLib');
 
 		$this->loadPhrases(
-                        array(
-                                'extensions'
-                        )
-                );
+			array(
+				'extensions'
+			)
+		);
 	}
 
 	/**
@@ -54,21 +54,16 @@ class Manager extends Auth_Controller
 	 */
 	public function toggleExtension()
 	{
-		$toggleExtension = false;
-
 		$extension_id = $this->input->post('extension_id');
 		$enabled = $this->input->post('enabled');
 
-		if ($enabled === true)
-		{
-			$toggleExtension = $this->extensionslib->enableExtension($extension_id);
-		}
-		else
-		{
-			$toggleExtension = $this->extensionslib->disableExtension($extension_id);
-		}
+		// Clean the parameter
+		if ($enabled !== true) $enable = false;
 
-		$this->outputJsonSuccess($toggleExtension);
+		// Output the enable/disable of the extension
+		$this->outputJsonSuccess(
+			$this->extensionslib->toggleExtension($extension_id, $enable)
+		);
 	}
 
 	/**
@@ -94,9 +89,13 @@ class Manager extends Auth_Controller
 	 */
 	public function uploadExtension()
 	{
-		$performSql = $this->input->post('performSql');
+		$notPerformSql = $this->input->post('notPerformSql');
 
-		$this->extensionslib->installExtension(null, null, $performSql);
+		// It converts the notPerformSql parameter from the checkbox value to a boolean one
+		if ($notPerformSql == 'on') $notPerformSql = true;
+		if ($notPerformSql !== true) $notPerformSql = false;
+
+		$this->extensionslib->installExtension(null, null, !$notPerformSql);
 	}
 }
 
