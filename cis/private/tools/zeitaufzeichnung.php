@@ -904,7 +904,10 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 			if($zeit->uid==$user)
 			{
 				if($zeit->delete($zeitaufzeichnung_id))
+				{
+					$zeitaufzeichnung_id = '';
 					echo '<span style="color:orange"><b>'.$p->t("global/eintragWurdeGeloescht").'</b></span>';
+				}
 				else
 					echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimLoeschenDesEintrags").'</b></span>';
 			}
