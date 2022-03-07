@@ -39,6 +39,7 @@
 			<property name="lineLimit" value="9999"/>
 			<property name="absoluteLineLimit" value="150"/>
 		</properties>
+		<exclude-pattern>application/phrases/</exclude-pattern>
 	</rule>
 
 	<!-- No white spaces are allowed in array declaration between brackets -->
