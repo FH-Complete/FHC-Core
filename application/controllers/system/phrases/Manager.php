@@ -20,7 +20,7 @@ class Manager extends Auth_Controller
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public function installFromCore()
 	{

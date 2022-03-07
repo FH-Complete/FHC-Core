@@ -2,6 +2,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \Netcarver\Textile\Parser as NTParser;
+
 class PhrasesLib
 {
 	// Directory name where all the category files are
@@ -41,7 +43,7 @@ class PhrasesLib
 		$this->_ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 
 		// Workaround to use more parameters in the construct since PHP doesn't support many constructors
-		$this->_extend_construct(func_get_args());
+		$this->_extendConstruct(func_get_args());
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -78,7 +80,7 @@ class PhrasesLib
 			if (hasData($result))
 			{
 				// Textile parser
-				$textileParser = new \Netcarver\Textile\Parser();
+				$textileParser = new NTParser();
 
 				for ($i = 0; $i < count($result->retval); $i++)
 				{
@@ -182,13 +184,12 @@ class PhrasesLib
 	 *		- could be an array of categories, and for each category there is an array of phrases
 	 * language: optional parameter must be a string. It's used to load phrases
 	 */
-	private function _extend_construct($params)
+	private function _extendConstruct($params)
 	{
 		// Checks if the $params is an array with at least one element
 		if (!isEmptyArray($params))
 		{
 			$parameters = $params[0];	// temporary variable
-			$isIndexArray = false;		//flag for indexed array
 
 			// If there are parameters
 			if (!isEmptyArray($parameters))
@@ -325,6 +326,8 @@ class PhrasesLib
 						&& $phrasesCategoryFile != '..'
 						&& $pathInfo['extension'] == 'php')
 					{
+						$phrases = null; // define the variable
+
 						// Include the php file that contains phrases for that category
 						require_once($phrasesDirectory.$phrasesCategoryFile);
 
@@ -415,7 +418,6 @@ class PhrasesLib
 						$phrase[self::PHRASE]
 					)
 				);
-
 			}
 			else // otherwise if the phrase already exists in the database
 			{

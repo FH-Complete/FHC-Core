@@ -28,7 +28,7 @@
 			'Organisation unit',
 			'Organizational form'
 		),
-		'formatRow' => function($datasetRaw) {
+		'formatRow' => function ($datasetRaw) {
 
 			if (isEmptyString($datasetRaw->Description)) $datasetRaw->Description = 'NA';
 			if (isEmptyString($datasetRaw->OrganisationUnit)) $datasetRaw->OrganisationUnit = 'NA';
@@ -43,5 +43,4 @@
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
-?>
 

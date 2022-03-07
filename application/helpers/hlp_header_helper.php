@@ -5,16 +5,8 @@
  *
  * @package		FHC-Helper
  * @author		FHC-Team
- * @copyright	Copyright (c) 2016 fhcomplete.org
+ * @copyright		Copyright (c) 2022 fhcomplete.org
  * @license		GPLv3
- * @since		Version 1.0.0
- */
-
-/**
- * FHC Helper
- *
- * @subpackage	Helpers
- * @category	Helpers
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
@@ -69,8 +61,6 @@ function generateCSSsInclude($CSSs)
  */
 function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
-	$user_language = getUserLanguage();
-
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= '
@@ -143,8 +133,11 @@ function generateAddonsJSsInclude($calledFrom)
 		$hookfile = DOC_ROOT.'addons/'.$addon.'/hooks.config.inc.php';
 		if (file_exists($hookfile))
 		{
-			include($hookfile);
-			if (key_exists($calledFrom, $js_hooks))
+			$js_hooks = null; // declare variable
+
+			include($hookfile); // include the hook file
+
+			if (array_key_exists($calledFrom, $js_hooks))
 			{
 				foreach ($js_hooks[$calledFrom] as $js_file)
 					generateJSsInclude('addons/'.$addon.'/'.$js_file);
@@ -162,3 +155,4 @@ function generateBackwardCompatibleJSMsIe($js)
 	echo '	<script type="text/javascript" src="'.$js.'"></script>'."\n";
 	echo "<![endif]-->\n";
 }
+

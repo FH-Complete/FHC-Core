@@ -2,6 +2,9 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \stdClass as stdClass;
+use \PharData as PharData;
+
 /**
  * Library to manage core extensions
  */
@@ -194,8 +197,7 @@ class ExtensionsLib
 			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
 			if (hasData($result)) // if something was found
 			{
-				$extsArray = array();
-				foreach ($result->retval as $key => $extension) // loops on them
+				foreach ($result->retval as $extension) // loops on them
 				{
 					// Remove them all
 					$result = $this->_ci->ExtensionsModel->delete($extension->extension_id);
@@ -397,6 +399,7 @@ class ExtensionsLib
 	 */
 	private function _chkExtensionJson($extensionName, $extensionDB)
 	{
+		$fhcomplete_version = 0;
 		$this->_printStart('Parsing and checking extension.json');
 
 		// Decodes extension.json
@@ -597,19 +600,23 @@ class ExtensionsLib
 		// Loops through the versions
 		for ($sqlDir = $startVersion; $sqlDir <= $extensionJson->version; $sqlDir++)
 		{
-			// If a directory with the same value of the version is present in the sql scripts directory
-			if (($files = glob($pkgSQLsPath.'/'.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION)) != false)
-	        {
+			// Search for a directory with the same value of the version in the sql scripts directory
+			$files = glob($pkgSQLsPath.'/'.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION);
+
+			// If found
+			if ($files != false)
+			{
 				// Loads every sql files
-	            foreach ($files as $file)
-	            {
-	                $sql = file_get_contents($file); // gets the entire content of the file
+				foreach ($files as $file)
+				{
+					$sql = file_get_contents($file); // gets the entire content of the file
 
 					$this->_printMessage('Executing query:');
 					$this->_printMessage($sql);
 
 					// Try to execute that
-					if (!isSuccess($result = @$this->_ci->ExtensionsModel->executeQuery($sql)))
+					$result = @$this->_ci->ExtensionsModel->executeQuery($sql);
+					if (!isSuccess($result))
 					{
 						$this->_errorOccurred = true;
 						$this->_printFailure(' error occurred while executing the query');
@@ -622,8 +629,8 @@ class ExtensionsLib
 						var_dump($result->retval); // KEEP IT!!!
 						$this->_ci->eprintflib->printEOL();
 					}
-	            }
-	        }
+				}
+			}
 		}
 
 		$this->_printSuccess(!$this->_errorOccurred);
@@ -684,7 +691,7 @@ class ExtensionsLib
 
 		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $rootPath => $targetDirectories)
 		{
-			foreach ($targetDirectories as $key => $targetDirectory)
+			foreach ($targetDirectories as $targetDirectory)
 			{
 				if (file_exists($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
 				{
@@ -738,7 +745,7 @@ class ExtensionsLib
 		// For every target directory
 		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $rootPath => $targetDirectories)
 		{
-			foreach ($targetDirectories as $key => $targetDirectory)
+			foreach ($targetDirectories as $targetDirectory)
 			{
 				// If destination of the symlink does not exist
 				if (!file_exists($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))

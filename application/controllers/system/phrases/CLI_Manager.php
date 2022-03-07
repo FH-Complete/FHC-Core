@@ -16,7 +16,7 @@ class CLI_Manager extends CLI_Controller
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public function installFrom($phrasesDirectoryPath)
 	{
