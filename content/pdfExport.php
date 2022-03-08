@@ -459,7 +459,7 @@ else
 			}
 
 			$dokument->setFilename($filename);
-			
+
 			if ($sign === true)
 			{
 				$dokument->sign($user);
@@ -528,6 +528,11 @@ else
 							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss . ' '. $lehrveranstaltung->bezeichnung, 0, 64);
 							$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss. '_' . str_replace(' ', '_', $lehrveranstaltung->bezeichnung), 0, 60);
 						}
+						elseif ($xsl == 'SZeugnis')
+						{
+							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+							$titel = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+						}
 						else
 						{
 							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss, 0, 64);
@@ -574,7 +579,7 @@ else
 			$dokument->setFilename($filename);
 
 			$error = false;
-			
+
 			// XML-tag archivierbar ergaenzen
 			$dokument->setXMLTag_archivierbar();
 
@@ -586,7 +591,7 @@ else
 			{
 				$dokument->sign($user);
 			}
-			
+
 			if ($dokument->create($output))
 				$doc = $dokument->output(false);
 			else
