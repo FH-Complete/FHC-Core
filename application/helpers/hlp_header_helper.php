@@ -44,13 +44,16 @@ function printPageTitle($title)
  */
 function printRefreshMeta($refresh)
 {
-	if (is_numeric($refresh) && $refresh > 0)
+	if ($refresh != null)
 	{
-		echo '<meta http-equiv="refresh" content="'.$refresh.'">';
-	}
-	else
-	{
-		show_error('The provided refresh parameter has to be a number greater then 0');
+		if (is_numeric($refresh) && $refresh > 0)
+		{
+			echo '<meta http-equiv="refresh" content="'.$refresh.'">';
+		}
+		else
+		{
+			show_error('The provided refresh parameter has to be a number greater then 0');
+		}
 	}
 }
 
