@@ -5735,8 +5735,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_betreuerart WHERE betreuerar
 {
 	if($db->db_num_rows($result)==0)
 	{
-
-		$qry = "INSERT INTO lehre.tbl_betreuerart(betreuerart_kurzbz,beschreibung,aktiv) VALUES('Kommission','Mitglied der Kommission',TRUE);";
+		$qry = "INSERT INTO lehre.tbl_betreuerart(betreuerart_kurzbz,beschreibung,aktiv) VALUES('Kommission','Mitglied des Prüfungssenats',TRUE);";
 
 		if(!$db->db_query($qry))
 			echo '<strong>Betreuerart: '.$db->db_last_error().'</strong><br>';

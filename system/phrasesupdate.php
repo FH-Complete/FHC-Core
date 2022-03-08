@@ -8675,6 +8675,26 @@ Any unusual occurrences
 	array(
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'titelDerArbeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Titel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Title of ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'plagiatscheckBeschreibung',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -8686,7 +8706,27 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The plagiarism check reveals nothing of note.',
+				'text' => 'The plagiarism check has been carried out and confirms that the central content of the paper has been written independently to the required extent (cf. part of the Statutes on Studies Act Provisions / Examination Regulations, § 18 Para. 2 and 3).',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'plagiatscheckBeschreibungMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Plagiatscheck wurde durchgeführt und bestätigt, dass der zentrale Inhalt der Arbeit im erforderlichen Ausmaß eigenständig verfasst wurde (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 18 Abs. 2 und 3).',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The plagiarism check has been carried out and confirms that the central content of the thesis has been written independently to the required extent (cf. part of the Statutes on Studies Act Provisions / Examination Regulations, § 18 Para. 2 and 3).',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8786,7 +8826,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The subject was handled in a suitable manner for a master thesis (well-structured, meaningful research questions or tasks, etc.)',
+				'text' => 'The subject was handled in a suitable manner for a Master\'s thesis (well-structured, meaningful research questions or tasks, etc.)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8826,7 +8866,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The approach to the solution is argued according to the state of the art and shows an adequate understanding of the problem.',
+				'text' => 'The approach to the solution is suitable for the topic and corresponds to the state of the art.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8866,7 +8906,27 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The methodological approach is appropriate, well-founded and correctly implemented in relation to the orientation of the work (technical-engineering, socio-economic…).',
+				'text' => 'The procedure is appropriate in relation to the subject-specific orientation of the paper, justified on the basis of the specialist literature and correctly implemented.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'methodeTextMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Vorgehen ist in Bezug auf die fachspezifische Ausrichtung der Arbeit angemessen, anhand der Fachliteratur begründet und korrekt umgesetzt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The procedure is appropriate in relation to the subject-specific orientation of the thesis, justified on the basis of the specialist literature and correctly implemented.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8906,27 +8966,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The research questions or the tasks were answered in a manner appropriate with the objectives; the results are discussed.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'projektarbeitsbeurteilung',
-		'category' => 'projektarbeitsbeurteilung',
-		'phrase' => 'ereignisseDiskussionTextMaster',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Die Forschungsfrage(n) wurde(n) zielführend beantwortet; die Ergebnisse werden kritisch diskutiert und liefern einen Mehrwert für Forschung und/oder Berufspraxis.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The research question(s) was (were) answered in a manner appropriate with the objectives; the results are examined critically and provide added value for research and / or professional practice.',
+				'text' => 'The results are interpreted in the light of the research question and critically discussed with regard to their added value for research and/or professional practice. Visualisations support the argumentation.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8956,6 +8996,26 @@ Any unusual occurrences
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'eigenstaendigkeitText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Arbeit wurde in selbständiger Arbeitsweise (z.B. eigenständige Lösung der Fragestellungen und aufgetretener Probleme) verfasst.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The paper was written in an independent way (e.g. independent solutions to the questions and problems that occurred)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'eigenstaendigkeitTextMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -9006,7 +9066,27 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The thesis is coherently arranged and well structured.',
+				'text' => 'The paper is structured coherently.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'strukturTextMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Arbeit ist schlüssig strukturiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The thesis is structured coherently.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9046,7 +9126,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The style is suitable for a piece of scientific work. The thesis is easy to read and has a clear, unambiguous and gender-appropriate language.',
+				'text' => 'Spelling and grammar are correct. The use of technical language is appropriate. The requirements for gender-appropriate language are implemented according to the applicable guidelines.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9126,7 +9206,27 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The sources used are appropriate, current and sufficiently varied.',
+				'text' => 'Sources and literature are relevant for the scientific discussion of the topic of the paper, reflect the current state of the art and cover the topic.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'literaturTextMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Quellen und Literatur sind für die wissenschaftliche Auseinandersetzung mit dem Thema der Arbeit relevant, geben den aktuellen Stand der Forschung wieder und decken das Thema ab.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sources and literature are relevant for the scientific discussion of the topic of the thesis, reflect the current state of the art and cover the topic.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9366,7 +9466,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'If the number of points for one criteria is 0, the {0} is to be assessed as negative overall.',
+				'text' => 'If a criterion is assessed with 0 points, the {0} is to be assessed as negative overall.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9566,7 +9666,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Is the thesis well structured?',
+				'text' => 'Is the thesis structured coherently?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9586,7 +9686,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 's the structure understandable in terms of content and is it coherent in relation to the topic ("red thread")?',
+				'text' => 'Is the structure understandable in terms of content and is it coherent in relation to the topic ("red thread")?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9899,12 +9999,12 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Dies ist eine zur kommissionellen Wiederholungsprüfung vorgelegte Bachelorarbeit. Die Note sollte daher erst nach Abstimmung mit allen Kommissionsmitgliedern abgesendet werden.',
+				'text' => 'Dies ist eine im Rahmen einer kommissionellen Wiederholungsprüfung vorgelegte Bachelorarbeit. Die Beurteilung erfolgt erst im Anschluss an eine Abstimmung der Mitglieder des Prüfungssenats.',
 				'description' => '',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'This bachelor thesis is submitted for the Bachelor Examination before a Committee. It should be graded after consultation with all committee members.',
+				'text' => 'This is a Bachelor\'s thesis submitted within the frame of a committee re-sit examination. The assessment only takes place after a vote of the members of the examination commission.',
 				'description' => '',
 			)
 		)
@@ -9917,13 +10017,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Infomail an Kommissionsmitglieder senden',
+				'text' => 'Infomail an Mitglieder des Prüfungssenats senden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send info mail to commission members',
+				'text' => 'Send infomail to members of the examination committee',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9937,13 +10037,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Mail an Kommissionsmitglieder gesendet',
+				'text' => 'Mail an Mitglieder des Prüfungssenats gesendet',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Sent mail to committee members',
+				'text' => 'Sent mail to members of the examination committee',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -9957,7 +10057,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Fehler beim Senden der Mail an Kommission',
+				'text' => 'Fehler beim Senden der Mail an Prüfungssenat',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -10077,13 +10177,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kommissionsmitglieder',
+				'text' => 'Mitglieder Prüfungssenat',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Commitee members',
+				'text' => 'Members of the examination commission',
 				'description' => '',
 				'insertvon' => 'system'
 			)
