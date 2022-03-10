@@ -985,8 +985,8 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
-		'app' => 'core',
-		'dataset_name' => 'overview',
+		'app' => 'dvuh',
+		'dataset_name' => 'storno',
 		'filter_kurzbz' => 'DVUHStorno',
 		'description' => '{DVUH Storno Übersicht}',
 		'sort' => 1,
@@ -1000,6 +1000,29 @@ $filters = array(
 					{"name": "matrikelnummer"},
 					{"name": "studiengang"},
 					{"name": "studiensemester"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'dvuh',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'BPKWartungDVUH',
+		'description' => '{bPK Uebersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehlende bPK",
+				"columns": [
+					{"name": "person_id"},
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "svnr"},
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
 				],
 				"filters": []
 			}
