@@ -2705,6 +2705,26 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'studiengangskennzahlLehre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengangskennzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study program number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//**********************	INFOCENTER/infocenter
 	array(
 		'app' => 'infocenter',
