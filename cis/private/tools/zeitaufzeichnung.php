@@ -1008,18 +1008,17 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		//Dropdown timesheets Mitarbeiter
 		if ($untergebenen_arr)
 		{
-			$ben = new benutzer();
+			$mitarbeiter = new mitarbeiter();
+			$mitarbeiter->getMitarbeiterArray($untergebenen_arr);
+
 			echo "
 			<hr><br>
 
 			<select name='mas' id='mas' onchange='location = this.options[this.selectedIndex].value;''>
 				<option>-- Timesheets Mitarbeiter*Innen --</option>";
-			foreach($untergebenen_arr as $k=>$v)
+			foreach($mitarbeiter->result as $row)
 			{
-				if ($ben->load($v))
-				{
-					echo "<option value='zeitaufzeichnung.php?uid=$v'>$ben->vorname $ben->nachname</option>";
-				}
+				echo "<option value='zeitaufzeichnung.php?uid=$row->uid'>$row->nachname $row->vorname</option>";
 			}
 			echo "<option value='zeitaufzeichnung.php'> --zurück zur Übersicht--</option>";
 			echo "</select>";
