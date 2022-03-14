@@ -27,11 +27,17 @@ require_once('../../../include/projektphase.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/mitarbeiter.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $user = get_uid();
+
+$mitarbeiter = new mitarbeiter();
+$mitarbeiter->getUntergebene($user, true);
+$untergebenen_arr = array();
+$untergebenen_arr = $mitarbeiter->untergebene;
 
 //Wenn User Administrator ist und UID uebergeben wurde, dann die Phasen
 //des uebergebenen Users anzeigen
@@ -40,7 +46,7 @@ if (isset($_GET['uid']) && $user != $_GET['uid'])
  	$rechte = new benutzerberechtigung();
  	$rechte->getBerechtigungen($user);
 
- 	if ($rechte->isBerechtigt('admin'))
+ 	if ($rechte->isBerechtigt('admin') || (in_array($_GET['uid'], $untergebenen_arr)))
  	{
  		$user = $_GET['uid'];
  	}

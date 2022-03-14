@@ -1468,22 +1468,25 @@ class mitarbeiter extends benutzer
 		$hasUDF = false;
 		$udf = new UDF();
 
-		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) *,
-									tbl_benutzer.aktiv as aktiv,
-									tbl_mitarbeiter.insertamum,
-									tbl_mitarbeiter.insertvon,
-									tbl_mitarbeiter.updateamum,
-									tbl_mitarbeiter.updatevon";
+		$qry = "SELECT
+					*,
+					tbl_benutzer.aktiv as aktiv,
+					tbl_mitarbeiter.insertamum,
+					tbl_mitarbeiter.insertvon,
+					tbl_mitarbeiter.updateamum,
+					tbl_mitarbeiter.updatevon";
 
 		if ($hasUDF = $udf->personHasUDF())
 		{
 			$qry .= ", public.tbl_person.udf_values AS p_udf_values";
 		}
 
-		$qry .= " FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
-					JOIN public.tbl_person USING(person_id))
-					LEFT JOIN public.tbl_benutzerfunktion USING(uid)
-				WHERE uid in(".$this->db_implode4SQL($uid_arr).")";;
+		$qry .= " FROM
+					public.tbl_mitarbeiter
+					JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+					JOIN public.tbl_person USING(person_id)
+				WHERE uid in(".$this->db_implode4SQL($uid_arr).")";
+		$qry .= " ORDER BY nachname, vorname";
 
 		if($this->db_query($qry))
 		{
