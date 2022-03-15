@@ -29,6 +29,8 @@ class entwicklungsteam extends basis_db
 
 	//Tabellenspalten
 	public $mitarbeiter_uid;
+	public $nachname;
+	public $vorname;
 	public $studiengang_kz;
 	public $besqualcode;
 	public $beginn;
@@ -70,7 +72,9 @@ class entwicklungsteam extends basis_db
 
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode)
-				WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
+				WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
+				$qry.=";";
 
 		if($this->db_query($qry))
 		{
@@ -149,7 +153,12 @@ class entwicklungsteam extends basis_db
 		}
 		if($this->besqualcode=='')
 		{
-			$this->errormsg = 'BesondereQualifikation muss eingetragen werden';
+			$this->errormsg = 'Besondere Qualifikation muss eingetragen werden';
+			return false;
+		}
+		if($this->beginn > $this->ende)
+		{
+			$this->errormsg = 'Endedatum darf nicht vor Anfangsdatum liegen';
 			return false;
 		}
 		return true;
@@ -292,23 +301,35 @@ class entwicklungsteam extends basis_db
 
 	/**
 	 * Liefert alle Entwicklungsteameinträge
-	 * @param $studiengang_kz Studiengangkennzeichen
+	 * @param int $studiengang_kz Studiengangkennzeichen.
+	 * @param char $sort Parameter, nach dem sortiert werden soll.
 	 * @return alle Entwicklungsteameinträge
 	 */
-	public function getAll($stg_kz=null)
+	public function getAll($studiengang_kz = null, $sort = null)
 	{
-		$qry = "SELECT * FROM bis.tbl_entwicklungsteam";
-		if($stg_kz!=null)
-			$qry.=" WHERE studiengang_kz=".$this->db_add_param($stg_kz);
-		$qry.=";";
+		$qry = "SELECT e.*, p.nachname, p.vorname FROM bis.tbl_entwicklungsteam e
+		        JOIN public.tbl_benutzer b ON e.mitarbeiter_uid = b.uid
+						JOIN public.tbl_person p ON b.person_id = p.person_id
+		       ";
+		if ($studiengang_kz != null)
+			$qry .= " WHERE e.studiengang_kz = ".$this->db_add_param($studiengang_kz);
 
-		if($this->db_query($qry))
+		if ($sort != null)
 		{
-			while($row = $this->db_fetch_object())
+				$qry .= " ORDER BY ".$sort;
+		}
+
+		$qry .= ";";
+
+		if ($this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object())
 			{
 				$obj = new entwicklungsteam();
 
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->nachname = $row->nachname;
+				$obj->vorname = $row->vorname;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->besqualcode = $row->besqualcode;
 				$obj->beginn = $row->beginn;
