@@ -903,7 +903,7 @@ foreach($addon_obj->result as $addon)
 				echo '<tree id="tree-verband" />';
 				//echo '<vbox id="vbox-fachbereich" />';
 				echo '<vbox id="vbox-organisationseinheit" />';
-				echo '<tree id="tree-lektor" />';
+				echo '<vbox id="vbox-lektor" />';
 			}
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{

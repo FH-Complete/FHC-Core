@@ -849,6 +849,8 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
+				$obj->aktiv =$this->db_parse_bool($row->aktiv);
+				$obj->fixangestellt = $this->db_parse_bool($row->fixangestellt);
 
 				$this->result[] = $obj;
 			}
