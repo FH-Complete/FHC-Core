@@ -28,6 +28,7 @@ class entwicklungsteam extends basis_db
 	public $result = array();
 
 	//Tabellenspalten
+	public $entwicklungsteam_id;
 	public $mitarbeiter_uid;
 	public $nachname;
 	public $vorname;
@@ -46,33 +47,32 @@ class entwicklungsteam extends basis_db
 
 	/**
 	 * Konstruktor
-	 * @param mitarbeiter_uid ID des zu ladenden Datensatzes
+	 * @param entwicklungsteam_id ID des zu ladenden Datensatzes
 	 *        studiengang_kz
 	 */
-	public function __construct($mitarbeiter_uid=null, $studiengang_kz=null)
+	public function __construct($entwicklungsteam_id = null)
 	{
 		parent::__construct();
 
-		if(!is_null($mitarbeiter_uid) && !is_null($studiengang_kz))
-			$this->load($mitarbeiter_uid, $studiengang_kz);
+		if(!is_null($entwicklungsteam_id))
+			$this->load($entwicklungsteam_id);
 	}
 
 	/**
 	 * Laedt einen Datensatz
-	 * @param mitarbeiter_uid ID des zu ladenden Datensatzes
-	 *        studiengang_kz
+	 * @param entwicklungsteam_id ID des zu ladenden Datensatzes
 	 */
-	public function load($mitarbeiter_uid, $studiengang_kz)
+	public function load($entwicklungsteam_id)
 	{
-		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
+		if(!is_numeric($entwicklungsteam_id))
 		{
-			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
+			$this->errormsg = 'entwicklungsteam_id muss eine gueltige Zahl sein';
 			return false;
 		}
 
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode)
-				WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+				WHERE entwicklungsteam_id=".$this->db_add_param($entwicklungsteam_id);
 
 				$qry.=";";
 
@@ -80,6 +80,7 @@ class entwicklungsteam extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
+				$this->entwicklungsteam_id = $row->entwicklungsteam_id;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->besqualcode = $row->besqualcode;
@@ -108,19 +109,19 @@ class entwicklungsteam extends basis_db
 
 	/**
 	 * Loescht einen Datensatz
-	 * @param bisverwendung_id ID des zu loeschenden Datensatzes
+	 * @param entwicklungsteam_id ID des zu loeschenden Datensatzes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function delete($mitarbeiter_uid, $studiengang_kz)
+	public function delete($entwicklungsteam_id)
 	{
-		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
+		if(!is_numeric($entwicklungsteam_id))
 		{
-			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
+			$this->errormsg = 'entwicklungsteam_id muss eine gueltige Zahl sein';
 			return false;
 		}
 
 		$qry = "DELETE FROM bis.tbl_entwicklungsteam
-				WHERE mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
+				WHERE entwicklungsteam_id = ".$this->db_add_param($entwicklungsteam_id).";";
 
 		if($this->db_query($qry))
 		{
@@ -206,7 +207,7 @@ class entwicklungsteam extends basis_db
 				  " ende=".$this->db_add_param($this->ende).",".
 				  " updateamum=".$this->db_add_param($this->updateamum).",".
 				  " updatevon=".$this->db_add_param($this->updatevon).
-				  " WHERE mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($this->studiengang_kz_old, FHC_INTEGER).";";
+				  " WHERE entwicklungsteam_id=".$this->db_add_param($this->entwicklungsteam_id).";";
 		}
 
 		if($this->db_query($qry))
@@ -268,14 +269,13 @@ class entwicklungsteam extends basis_db
 	/**
 	 * Prueft ob der Eintrag schon existiert
 	 *
-	 * @param $mitarbeiter_uid
-	 * @param $studiengang_kz
+	 * @param entwicklungsteam_id
 	 * @return true wenn vorhanden, false wenn nicht
 	 */
-	public function exists($mitarbeiter_uid,$studiengang_kz)
+	public function exists($entwicklungsteam_id)
 	{
 		$qry = "SELECT count(*) as anzahl FROM bis.tbl_entwicklungsteam
-				WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
+				WHERE entwicklungsteam_id=".$this->db_add_param($entwicklungsteam_id).";";
 
 		if($this->db_query($qry))
 		{
@@ -327,6 +327,7 @@ class entwicklungsteam extends basis_db
 			{
 				$obj = new entwicklungsteam();
 
+				$obj->entwicklungsteam_id = $row->entwicklungsteam_id;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->nachname = $row->nachname;
 				$obj->vorname = $row->vorname;
@@ -338,6 +339,7 @@ class entwicklungsteam extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+
 
 				$this->result[] = $obj;
 			}
