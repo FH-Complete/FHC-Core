@@ -10252,6 +10252,26 @@ Any unusual occurrences
 	array(
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'titelSpeichernFehler',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Speichern des Titels',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when saving title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'plagiatscheckHinweisNegativeBeurteilung',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -10264,6 +10284,46 @@ Any unusual occurrences
 			array(
 				'sprache' => 'English',
 				'text' => '(Plagiarism leads to a negative grade.)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'plagiatscheck',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Plagiatscheck',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plagiarism check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'betreuernote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betreuernote',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assessor grade',
 				'description' => '',
 				'insertvon' => 'system'
 			)
