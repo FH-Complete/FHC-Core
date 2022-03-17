@@ -13714,7 +13714,528 @@ array(
                 'insertvon' => 'system'
             )
         )
-    )
+    ),
+    //*******************	KVP
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Neuer Eintrag",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "New entry",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.info',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Im Rahmen des <b>KVP</b> <i>(Kontinuierlicher Verbesserungsprozess)</i> können Sie hier wichtige Fehler und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im KVP geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Im Rahmen des <b>KVP</b> <i>(Kontinuierlicher Verbesserungsprozess)</i> können Sie hier wichtige Fehler und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im KVP geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.info',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte füllen Sie pro Verbesserungspotential einen eigenen Eintrag aus!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Bitte füllen Sie pro Verbesserungspotential einen eigenen Eintrag aus!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.workpackages',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Vorhandene Einmeldungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Vorhandene Einmeldungen",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.success',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Die Einmeldung würde erfolgreich versandt.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Die Einmeldung würde erfolgreich versandt.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.required',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Pflichtfeld",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Required field",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.error.required',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Sie müssen hier einen Wert eintragen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "You must supply a value here.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.kurs_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte geben Sie Ihre Kurs ID (i.e. 5 Zahlen in der URL im Browser oben) an.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Bitte geben Sie Ihre Kurs ID (i.e. 5 Zahlen in der URL im Browser oben) an.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.kurs_id.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Kurs Url",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Kurs Url",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.kurs_kurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte geben Sie die Kurzbezeichnug Ihres Kurses an (zb. TEZEI).",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Bitte geben Sie die Kurzbezeichnug Ihres Kurses an (zb. TEZEI).",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.kurs_kurzbz.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Kurskrzl",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Kurskrzl",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.name',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Einreichende*r; Vor. und Nachname",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Einreichende*r; Vor. und Nachname",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.name.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Einreichende*r",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Einreichende*r",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.type',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Art der Einmeldung:",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Art der Einmeldung:",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.type.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Art der Einmeldung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Art der Einmeldung",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte geben Sie einen aussagekräftigen Titel der Einmeldung an",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Bitte geben Sie einen aussagekräftigen Titel der Einmeldung an",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.title.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Titel der Einmeldung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Titel der Einmeldung",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.priority',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte geben Sie an, wie hoch Sie den Aufwand für die Umsetzung einschätzen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Bitte geben Sie an, wie hoch Sie den Aufwand für die Umsetzung einschätzen",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.priority.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Aufwand der Umsetzung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Aufwand der Umsetzung",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.description',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => " Beschreiben Sie das Verbesserungspotential:<br><br>Geben Sie so konkret wie möglich an, auf welche Stelle im Kurs Sie sich beziehen (z.B. Eigenstudium C Test).",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => " Beschreiben Sie das Verbesserungspotential:<br><br>Geben Sie so konkret wie möglich an, auf welche Stelle im Kurs Sie sich beziehen (z.B. Eigenstudium C Test).",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.description.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Beschreiben Sie das Verbesserungspotenzial.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Beschreiben Sie das Verbesserungspotenzial.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.items',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte spezifizieren Sie, welche Items (Aufgaben, Materialien...) von dem Verbesserungspotential betroffen sind.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Bitte spezifizieren Sie, welche Items (Aufgaben, Materialien...) von dem Verbesserungspotential betroffen sind.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.items.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "betroffene items",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "betroffene items",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.implemented',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Wurde das Verbesserungspotential im Quellkurs bereits umgesetzt?",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Wurde das Verbesserungspotential im Quellkurs bereits umgesetzt?",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.implemented.label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "bereits umgesetzt?",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "bereits umgesetzt?",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.form.submit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Speichern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Save",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
