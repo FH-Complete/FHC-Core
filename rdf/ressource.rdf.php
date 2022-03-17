@@ -188,7 +188,7 @@ function draw_ressource($ressource)
 		else
 			die('Fehler beim Laden der Studenten-daten');
 
-		$student.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id.'/'."\" />";
+		$student.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id.'/'.$ressource->projekt_ressource_id."\" />";
 		$typ ='Student';
 	}
 
@@ -206,7 +206,7 @@ function draw_ressource($ressource)
 		else
 			die('Fehler beim Laden der Betriebsmittel-daten');
 
-		$betriebsmittel.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id.'/'."\" />";
+		$betriebsmittel.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id.'/'.$ressource->projekt_ressource_id."\" />";
 		$typ = 'Betriebsmittel';
 	}
 
@@ -224,7 +224,7 @@ function draw_ressource($ressource)
 		else
 			die('Fehler beim Laden der Firmen-daten');
 
-		$firma.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id.'/'."\" />";
+		$firma.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id.'/'.$ressource->projekt_ressource_id."\" />";
 		$typ = 'Firma';
 	}
 
