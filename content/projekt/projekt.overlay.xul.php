@@ -109,6 +109,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 				<treecol id="treecol-projekt-endeiso" label="EndeISO" flex="2" hidden="true" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projekt/rdf#ende_iso" />
+				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projekt-aufwand_pt" label="Aufwand PT" flex="2" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekt/rdf#aufwandpt" />
+				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projekt-anzahl_ma" label="Anzahl MA" flex="2" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekt/rdf#anzahl_ma" />
 			</treecols>
 
 			<template>
@@ -126,6 +134,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#budget"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#beginn_iso"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#ende_iso"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#aufwand_pt"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#anzahl_ma"/>
 							</treerow>
 						</treeitem>
 					</treechildren>
