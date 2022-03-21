@@ -112,6 +112,12 @@ else
 	$format_highlight->setBorder(1);
 	$format_highlight->setBorderColor('white');
 
+	$format_highlightright=& $workbook->addFormat();
+	$format_highlightright->setFgColor(15);
+	$format_highlightright->setBorder(1);
+	$format_highlightright->setBorderColor('white');
+	$format_highlightright->setAlign('right');
+
 	$format_border_bottom =& $workbook->addFormat();
 	$format_border_bottom ->setBottom(2);
 	$format_border_bottom->setBold();
@@ -174,7 +180,7 @@ else
 	$qry.=' ORDER BY nachname, vorname';
 
 	if($result = $db->db_query($qry))
-	{
+	{center
 		while($row=$db->db_fetch_object($result))
 		{
 			$worksheet->write($lines,1,"$row->vorname $row->nachname");
@@ -246,15 +252,22 @@ else
 					if($elem->bisio_id!='' && $elem->status!='Incoming' && ($elem->bis > $stsemdatumvon || $elem->bis=='') && $elem->von < $stsemdatumbis) //Outgoing
 						$inc.=' (o)';
 
+					$note = $elem->note;
 					if($elem->note==6) //angerechnet
 					{
 						$inc.=' (ar)';
 						$note='ar';
 					}
 
+					if ($elem->note == 19) // intern angerechnet
+					{
+						$inc .= ' (iar)';
+						$note = 'iar';
+					}
+
 					if ($elem->mobilitaetstyp_kurzbz !='' && $elem->doubledegree == 1) //dd-Program
 					{
-						$inc.=' (d.d.)';
+						$inc .=' (d.d.)';
 					}
 
 					$worksheet->write($lines,1,$elem->uid);
@@ -262,7 +275,7 @@ else
 					$worksheet->write($lines,3,$elem->vorname);
 					$worksheet->write($lines,4,'="'.$elem->semester.$elem->verband.$elem->gruppe.'"');
 					$worksheet->write($lines,5,'="'.trim($elem->matrikelnr).'"',$format_highlight);
-					$worksheet->write($lines,6,$note,$format_highlight);
+					$worksheet->write($lines,6, $note, $format_highlightright);
 					$i++;
 					$lines++;
 	   			}
