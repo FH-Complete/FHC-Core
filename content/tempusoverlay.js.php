@@ -284,6 +284,10 @@ function onLektorSelect(event)
 
 	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
 	var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+	//Wenn der Filter angewendet wurde, gibt es keinen Parent. Daher wird hier der stg_idx auf 0 gesetzt.
+	if(stg_idx == -1 && uid != '')
+		stg_idx = 0;
+
 	if (stg_idx != -1)
 		var stg_kz=tree.view.getCellText(stg_idx,col);
 	else

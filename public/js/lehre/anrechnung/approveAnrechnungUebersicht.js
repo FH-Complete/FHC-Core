@@ -148,6 +148,8 @@ $(function(){
 
     const genehmigung_panel = $('#approveAnrechnungUebersicht-genehmigung-panel');
     const begruendung_panel = $('#approveAnrechnungUebersicht-begruendung-panel');
+    const hasReadOnlyAccess = $('#formApproveAnrechnungUebersicht').data('readonly');
+    const hasCreateAnrechnungAccess = $('#formApproveAnrechnungUebersicht').data('createaccess');
 
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
@@ -164,6 +166,16 @@ $(function(){
         $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
         $('#tableWidgetTabulator').tabulator('redraw', true);
     });
+
+    if (hasReadOnlyAccess)
+    {
+        approveAnrechnung.disableEditElements();
+    }
+
+    if (!hasCreateAnrechnungAccess)
+    {
+        approveAnrechnung.disableCreateAnrechnungButton();
+    }
 
     // Set status alert color
     approveAnrechnung.setStatusAlertColor();
@@ -516,6 +528,30 @@ var approveAnrechnung = {
             default:
                 $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
         }
+    },
+    disableEditElements: function()
+    {
+        // Disable:
+        // ...button Empfehlung anfordern
+        $('#approveAnrechnungUebersicht-request-recommendation')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Ablehnen
+        $('#approveAnrechnungUebersicht-reject-anrechnungen-ask')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Genehmigen
+        $('#approveAnrechnungUebersicht-approve-anrechnungen-ask')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+
+    },
+    disableCreateAnrechnungButton: function()
+    {
+        // Disable button Antrag anlegen
+        $('#approveAnrechnungUebersicht-create-anrechnung')
+            .removeAttr('href')
+            .css({'color': 'grey', 'pointer-events': 'none'}); // property disabled does not work for <a> link
     },
     copyIntoTextarea: function(elem){
 

@@ -675,6 +675,17 @@ if(isset($_POST['save']))
 		$nachname_clean = str_replace(' ','_', $nachname_clean);
 		$vorname_clean = str_replace(' ','_', $vorname_clean);
 
+		if (!preg_match('/^[a-z0-9-_]{2,32}$/i', $vorname_clean))
+		{
+			$error = true;
+			$errormsg = 'Im Vornamen dürfen keine Trennzeichen außer - enthalten sein!';
+		}
+		if (!preg_match('/^[a-z0-9-_]{2,32}$/i', $nachname_clean))
+		{
+			$error = true;
+			$errormsg = 'Im Nachnamen dürfen keine Trennzeichen außer - enthalten sein!';
+		}
+
 		$bn = new benutzer();
 
 		if(!$bn->alias_exists($vorname_clean.'.'.$nachname_clean))

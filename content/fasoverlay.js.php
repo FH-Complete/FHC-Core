@@ -741,6 +741,10 @@ function onLektorSelect(event)
 	var uid=tree.view.getCellText(tree.currentIndex,col);
 
 	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
+	//Wenn der Filter angewendet wurde, gibt es keinen Parent. Daher wird hier der stg_idx auf 0 gesetzt.
+	if(stg_idx == -1 && uid != '')
+		stg_idx = 0;
+
 	//wenn direkt ein studiengang markiert wurde dann abbrechen
 	if(stg_idx==-1)
 		return;
@@ -786,6 +790,58 @@ function onLektorSelect(event)
 	catch(e)
 	{
 		debug(e);
+	}
+}
+
+// Lektorenliste aktualisieren
+function onLektorRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var treeLektorenTree=document.getElementById('tree-lektor');
+	// Input-Feld leeren
+	document.getElementById('fas-lektor-filter').value = '';
+	var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?user=true&'+gettimestamp();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	var oldDatasources = treeLektorenTree.database.GetDataSources();
+
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+
+	treeLektorenTree.database.RemoveDataSource(oldDatasources.getNext());
+	treeLektorenTree.database.AddDataSource(datasource);
+	treeLektorenTree.builder.rebuild();
+}
+
+// Lektorenliste filtern
+function onLektorFilter()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var filter=document.getElementById('fas-lektor-filter').value;
+
+	var treeLektorenTree=document.getElementById('tree-lektor');
+
+	if(filter.length>2)
+	{
+		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+encodeURIComponent(filter)+'&'+gettimestamp();
+		var oldDatasources = treeLektorenTree.database.GetDataSources();
+
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		treeLektorenTree.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter)=='undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLektorenTree.database.RemoveDataSource(oldDatasources.getNext());
+		treeLektorenTree.database.AddDataSource(datasource);
+		if(typeof(filter)!='undefined')
+			treeLektorenTree.builder.rebuild();
+		treeLektorenTree.builder.addListener(LektorTreeListener);
 	}
 }
 

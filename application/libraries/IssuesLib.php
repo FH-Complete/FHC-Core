@@ -62,17 +62,17 @@ class IssuesLib
 	 * @param array $fehlertext_params params for sprint replace of error text in system.tbl_fehler
 	 * @return object success or error
 	 */
-	public function addFhcIssue($fehler_kurzbz, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null)
+	public function addFhcIssue($fehler_kurzbz, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $resolution_params = null)
 	{
 		$fehlerRes = $this->_ci->FehlerModel->loadWhere(array('fehler_kurzbz' => $fehler_kurzbz));
 
 		if (hasData($fehlerRes))
 		{
 			$fehlercode = getData($fehlerRes)[0]->fehlercode;
-			return $this->_addIssue($fehlercode, $person_id, $oe_kurzbz, $fehlertext_params);
+			return $this->_addIssue($fehlercode, $person_id, $oe_kurzbz, $fehlertext_params, $resolution_params);
 		}
 		else
-			return error("Fehler $fehler_kurzbz nicht gefunden");
+			return error("Error $fehler_kurzbz not found");
 	}
 
 	/**
@@ -82,13 +82,13 @@ class IssuesLib
 	 * @param int $person_id
 	 * @param int $oe_kurzbz
 	 * @param array $fehlertext_params params for replacement of parts of error text
-	 * @param bool $force_predefined if true, only predefined external issues are added
+	 * @param bool $force_predefined if true, only predefined (with entry in fehler table) external issues are added
 	 * @return object success or error
 	 */
-	public function addExternalIssue($fehlercode_extern, $inhalt_extern, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $force_predefined = false)
+	public function addExternalIssue($fehlercode_extern, $inhalt_extern, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null)
 	{
 		if (isEmptyString($fehlercode_extern))
-			return error("fehlercode_extern fehlt");
+			return error("fehlercode_extern missing");
 
 		// get external fehlercode (unique for each app)
 		$this->_ci->FehlerModel->addSelect('fehlercode');
@@ -102,18 +102,12 @@ class IssuesLib
 		if (isError($fehlerRes))
 			return $fehlerRes;
 
-		$fehlerData = getData($fehlerRes)[0];
-
 		// check if there is a predefined custom error for the external issue
 		if (hasData($fehlerRes))
 		{
+			$fehlerData = getData($fehlerRes)[0];
 			// if found, use the code
 			$fehlercode = $fehlerData->fehlercode;
-		}
-		elseif ($force_predefined === true)
-		{
-			// only added if predefined
-			return success("No definition found - not added");
 		}
 		else
 		{
@@ -122,20 +116,70 @@ class IssuesLib
 		}
 
 		// add external issue
-		return $this->_addIssue($fehlercode, $person_id, $oe_kurzbz, $fehlertext_params, $fehlercode_extern, $inhalt_extern);
+		return $this->_addIssue($fehlercode, $person_id, $oe_kurzbz, $fehlertext_params, null, $fehlercode_extern, $inhalt_extern);
+	}
+
+	/**
+	 * Set issue to resolved.
+	 * @param int $issue_id
+	 * @param string $user uid of issue resolver
+	 * @return object success or error
+	 */
+	public function setBehoben($issue_id, $user)
+	{
+		$data = array(
+			'status_kurzbz' => self::STATUS_BEHOBEN,
+			'verarbeitetvon' => $user,
+			'verarbeitetamum' => date('Y-m-d H:i:s')
+		);
+
+		return $this->_changeIssueStatus($issue_id, $data, $user);
+	}
+
+	/**
+	 * Set issue to in progress.
+	 * @param int $issue_id
+	 * @param string $user uid of issue resovler
+	 * @return object success or error
+	 */
+	public function setInBearbeitung($issue_id, $user)
+	{
+		$data = array(
+			'status_kurzbz' => self::STATUS_IN_BEARBEITUNG,
+			'verarbeitetvon' => $user
+		);
+
+		return $this->_changeIssueStatus($issue_id, $data, $user);
+	}
+
+	/**
+	 * Set issue to new.
+	 * @param int $issue_id
+	 * @param string $user uid of issue resolver
+	 * @return object success or error
+	 */
+	public function setNeu($issue_id, $user)
+	{
+		$data = array(
+			'status_kurzbz' => self::STATUS_NEU,
+			'verarbeitetvon' => null,
+			'verarbeitetamum' => null
+		);
+
+		return $this->_changeIssueStatus($issue_id, $data, $user);
 	}
 
 	/**
 	 * Changes status of an issue.
 	 * @param int $issue_id
-	 * @param string $status_kurzbz the new status
-	 * @param string $verarbeitetvon uid of person changing the status (needed for in Bearbeitung and behoben)
+	 * @param array $sdata the data to save, including status
+	 * @param string $user uid of person changing the status (needed for in Bearbeitung and behoben)
 	 * @return success or error
 	 */
-	public function changeIssueStatus($issue_id, $status_kurzbz, $verarbeitetvon = null)
+	private function _changeIssueStatus($issue_id, $data, $user)
 	{
 		if (!isset($issue_id) || !is_numeric($issue_id))
-			return error("Issue Id muss korrekt gesetzt sein.");
+			return error("Issue Id must be set correctly.");
 
 		// check if given status is same as existing
 		$this->_ci->IssueModel->addSelect('status_kurzbz');
@@ -143,39 +187,14 @@ class IssuesLib
 
 		if (hasData($currStatus))
 		{
-			if (getData($currStatus)[0]->status_kurzbz == $status_kurzbz)
-				return success("Gleicher Status bereits gesetzt");
+			if (getData($currStatus)[0]->status_kurzbz == $data['status_kurzbz'])
+				return success("Same status already set");
 		}
 		else
-			return error("Fehler beim Holen des Status");
+			return error("Error when getting status");
 
-		$data = array(
-			'status_kurzbz' => $status_kurzbz,
-			'updatevon' => $verarbeitetvon,
-			'updateamum' => date('Y-m-d H:i:s')
-		);
-
-		if ($status_kurzbz == self::STATUS_NEU)
-		{
-
-			$data['verarbeitetvon'] = null;
-		}
-
-		if ($status_kurzbz == self::STATUS_NEU || $status_kurzbz == self::STATUS_IN_BEARBEITUNG)
-		{
-			$data['verarbeitetamum'] = null;
-		}
-
-		if ($status_kurzbz == self::STATUS_IN_BEARBEITUNG || $status_kurzbz == self::STATUS_BEHOBEN)
-		{
-			if (isset($verarbeitetvon))
-				$data['verarbeitetvon'] = $verarbeitetvon;
-			else
-				return error("Verarbeitetvon nicht gesetzt");
-		}
-
-		if ($status_kurzbz == self::STATUS_BEHOBEN)
-			$data['verarbeitetamum'] = date('Y-m-d H:i:s');
+		$data['updatevon'] = $user;
+		$data['updateamum'] = date('Y-m-d H:i:s');
 
 		return $this->_ci->IssueModel->update(
 			array(
@@ -191,14 +210,15 @@ class IssuesLib
 	 * @param int $person_id
 	 * @param string $oe_kurzbz
 	 * @param array $fehlertext_params
+	 * @param string $resolution_params
 	 * @param string $fehlercode_extern
 	 * @param string $inhalt_extern
 	 * @return object success or error
 	 */
-	private function _addIssue($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $fehlercode_extern = null, $inhalt_extern = null)
+	private function _addIssue($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $resolution_params = null, $fehlercode_extern = null, $inhalt_extern = null)
 	{
 		if (isEmptyString($person_id) && isEmptyString($oe_kurzbz))
-			return error("Person_id oder oe_kurzbz muss gesetzt sein.");
+			return error("Person_id or oe_kurzbz must be set.");
 
 		// get fehlertextVorlage and replace it with params
 		$fehlerRes = $this->_ci->FehlerModel->load($fehlercode);
@@ -218,6 +238,20 @@ class IssuesLib
 
 				if ($openIssueCount == 0)
 				{
+					if (isset($resolution_params))
+					{
+						if (is_array($resolution_params))
+						{
+							foreach ($resolution_params as $resolution_key => $resolution_param)
+							{
+								if (!is_string($resolution_key))
+									return error("Invalid parameter for resolution, must be an associative array");
+							}
+						}
+						else
+							return error("Invalid parameters for resolution");
+					}
+
 					return $this->_ci->IssueModel->insert(
 						array(
 							'fehlercode' => $fehlercode,
@@ -228,6 +262,7 @@ class IssuesLib
 							'oe_kurzbz' => $oe_kurzbz,
 							'datum' => date('Y-m-d H:i:s'),
 							'status_kurzbz' => self::STATUS_NEU,
+							'behebung_parameter' => isset($resolution_params) ? json_encode($resolution_params) : null,
 							'insertvon' => $this->_insertvon
 						)
 					);
@@ -236,9 +271,9 @@ class IssuesLib
 					return success($openIssueCount);
 			}
 			else
-				return error("Anzahl offener Issues konnte nicht ermittelt werden.");
+				return error("Number of open issues could not be determined");
 		}
 		else
-			return error("Fehler $fehlercode nicht gefunden");
+			return error("Error $fehlercode could not be found");
 	}
 }

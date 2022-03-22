@@ -107,10 +107,12 @@ var IssuesDataset = {
 					{
 						successCallback: function(data, textStatus, jqXHR) {
 							if (FHC_AjaxClient.isError(data))
+							{
 								FHC_DialogLib.alertError(
 									FHC_PhrasesLib.t("fehlermonitoring", "statusAendernFehler") + ": "
 									+ FHC_AjaxClient.getError(data)
 								);
+							}
 							else if (FHC_AjaxClient.hasData(data))
 							{
 								FHC_FilterWidget.reloadDataset();

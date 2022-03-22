@@ -87,8 +87,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<menulist id="textbox-projektphase-detail-typ" disabled="true">
 										<menupopup>
 											<menuitem value="Arbeitspaket" label="Arbeitspaket"/>
-											<menuitem value="Projektphase" label="Projektphase"/>
 											<menuitem value="Milestone" label="Milestone"/>
+											<menuitem value="Projektphase" label="Projektphase"/>
+											<menuitem value="Service" label="Service"/>
 										</menupopup>
 								</menulist>
 

@@ -79,7 +79,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
-		
+
 		// Get Antrag data
 		$antragData = $this->anrechnunglib->getAntragData(
 			$anrechnungData->prestudent_id,
@@ -110,7 +110,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-		
+
 		// Get lectors person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
@@ -218,10 +218,10 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		// Check if user is entitled to read dms doc
 		self::_checkIfEntitledToReadDMSDoc($dms_id);
-		
+
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
-		
+
 		// Download file
 		$this->dmslib->download($dms_id, $filename);
 	}
@@ -320,7 +320,12 @@ class reviewAnrechnungDetail extends Auth_Controller
 		foreach ($studiengang_kz_arr as $studiengang_kz)
 		{
 			// Get STGL mail address, if available, otherwise get assistance mail address
-			list ($to, $vorname) = $this->_getSTGLMailAddress($studiengang_kz);
+			$stgmail = $this->_getSTGLMailAddress($studiengang_kz);
+
+			if(isSuccess($stgmail) && hasData($stgmail))
+				list ($to, $vorname) = getData($stgmail)[0];
+			else
+				show_error ('Failed retrieving DegreeProgram Mail');
 
 			// Get full name of lector
 			$this->load->model('person/Person_model', 'PersonModel');
@@ -361,24 +366,28 @@ class reviewAnrechnungDetail extends Auth_Controller
 		$result = $this->StudiengangModel->getLeitung($stg_kz);
 
 		// Get STGL mail address, if available
-		if (hasData($result))
+		if (isSuccess($result) && hasData($result))
 		{
-			return array(
+			return success(array(
 				$result->retval[0]->uid. '@'. DOMAIN,
 				$result->retval[0]->vorname
-			);
+			));
 		}
 		// ...otherwise get assistance mail address
 		else
 		{
 			$result = $this->StudiengangModel->load($stg_kz);
 
-			if (hasData($result))
+			if (isSuccess($result) && hasData($result))
 			{
-				return array(
+				return success(array(
 					$result->retval[0]->email,
 					''
-				);
+				));
+			}
+			else
+			{
+				return error('Keine E-Mail für diesen Stg gefunden');
 			}
 		}
 	}
