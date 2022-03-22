@@ -89,6 +89,7 @@ class AnrechnungLib
 		$antrag_data->vorname = $person->vorname;
 		$antrag_data->nachname = $person->nachname;
 		$antrag_data->matrikelnr = $student->matrikelnr;
+        $antrag_data->studiengang_kz = $studiengang->studiengang_kz;
 		$antrag_data->stg_bezeichnung = $studiengang->bezeichnung;
 		$antrag_data->lektoren = $lv_lektoren_arr;
 		$antrag_data->zgv = $latest_zgv_bezeichnung;
