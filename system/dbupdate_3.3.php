@@ -6011,28 +6011,16 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitwunsch_gueltigkeit LI
 		)
 		SELECT * FROM 
 	  	(
-	  	    -- Unique Mitarbeiter from Zeitwunsch Tabelle, Start and End of actual Studiensemester
+	  	    -- Unique Mitarbeiter from Zeitwunsch Tabelle, Start of actual Studiensemester and open end
 			SELECT DISTINCT mitarbeiter_uid,
 			(SELECT start FROM public.tbl_studiensemester WHERE start <= NOW() AND ende >= NOW()),
-			(SELECT ende FROM public.tbl_studiensemester WHERE start <= NOW() AND ende >= NOW()),
-			NOW(),
-			'system',
-			NOW(),
-			'system'
-			FROM campus.tbl_zeitwunsch
-			
-			UNION
-			
-			-- Unique Mitarbeiter from Zeitwunsch Tabelle, Start of next Studiensemester and open end
-			SELECT DISTINCT mitarbeiter_uid,
-			(SELECT start FROM public.tbl_studiensemester WHERE ende > NOW() LIMIT 1),
 			NULL::DATE AS \"ende\",
 			NOW(),
 			'system',
 			NOW(),
 			'system'
 			FROM campus.tbl_zeitwunsch
-			ORDER BY start, mitarbeiter_uid
+	  	    ORDER BY mitarbeiter_uid
 		) AS init_data
 	";
 
@@ -6074,41 +6062,7 @@ if (!$result = @$db->db_query("SELECT zeitwunsch_id FROM campus.tbl_zeitwunsch L
 			SELECT zeitwunsch_gueltigkeit_id
 			FROM campus.tbl_zeitwunsch_gueltigkeit zwg
 			WHERE tbl_zeitwunsch.mitarbeiter_uid = zwg.mitarbeiter_uid
-			AND (zwg.von <= NOW() AND zwg.bis >= NOW())
 		);
-
-		-- Duplicate existing data and set initial zeitwunsch_gueltigkeit_id values to Gueltigkeitszeitraum of next Studiensemester
-		INSERT INTO campus.tbl_zeitwunsch
-		(
-			stunde,
-			mitarbeiter_uid,
-			tag,
-			gewicht,
-			updateamum,
-			updatevon,
-			insertamum,
-			insertvon,
-			zeitwunsch_gueltigkeit_id
-		)
-		SELECT * FROM 
-		(
-		    SELECT 
-				stunde,
-				mitarbeiter_uid,
-				tag,
-				gewicht,
-				NOW(),
-				'system',
-				NOW(),
-				'system',
-				(
-				    SELECT zeitwunsch_gueltigkeit_id 
-					FROM campus.tbl_zeitwunsch_gueltigkeit zwg
-					WHERE campus.tbl_zeitwunsch.mitarbeiter_uid = zwg.mitarbeiter_uid
-					AND bis IS NULL
-				) AS \"zeitwunsch_gueltigkeit_id\"
-			FROM campus.tbl_zeitwunsch
-		) AS basic_zeitwunsch_data;
 		
 		-- Set primary key and foreign key NOT NULL
 		ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_id SET NOT NULL;
