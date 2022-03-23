@@ -84,8 +84,10 @@ if(!$person->load($uid))
 $ma = new mitarbeiter($uid);
 $fixangestellt = $ma->fixangestellt;
 
-// Check, ob Lektor bereits zugewiesene LVs hat
-$isVerplant = checkIsVerplant($uid, $selected_ss); // boolean
+// Check, ob Bearbeitung des ZW gesperrt ist.
+// Gesperrt, wenn Lektor bereits zugewiesene LVs hat.
+// Sperre in jeden Fall aufgehoben, wenn ein ZW kopiert wird. (denn ist eine eventuelle Sperre bereits manuell aufgehoben worden)
+$isGesperrt = checkIsVerplant($uid, $selected_ss) && is_null($selected_past_ss); // boolean
 
 // Erklärung zu Pausen bei geteilten Arbeitszeiten speichern
 if (isset($_GET['selbstverwaltete-pause-akt']) && !empty($_GET['submit-akt']))
@@ -270,8 +272,8 @@ if (isset($_GET['type']) && $_GET['type'] == 'save')
     }
 
     // Wenn speichern möglich ist, dann hat der Lektor entweder keine LVs zugeteilt oder hat aktiv die Bearbeitungssperre
-    // deaktiviert. Bearbeitungssperre wird gesetzt, wenn isVerplant true ist. Deshalb hier mit false überschreiben.
-    $isVerplant = false;
+    // deaktiviert. Bearbeitungssperre wird gesetzt, wenn isGesperrt true ist. Deshalb hier mit false überschreiben.
+    $isGesperrt = false;
 }
 
 /**
@@ -452,8 +454,8 @@ function getStgMail($stgKz_arr)
 
         $(function() {
             // Bearbeitung deaktivieren, wenn Lektor zugewiesene LV im Studiensemester hat
-            const isVerplant = $('input[name=isVerplant]').val();
-            if (isVerplant == 'true')
+            const isGesperrt = $('input[name=isGesperrt]').val();
+            if (isGesperrt == 'true')
             {
                 $('input[name=radioZWG]').attr("disabled", true);
                 $('input[name=submit]').attr("disabled", true);
@@ -465,7 +467,7 @@ function getStgMail($stgKz_arr)
                 $('input[name=submit]').attr("disabled", false);
 
                 $('#divChangeZWG').removeClass('hidden');
-                $('#divIsVerplant').addClass('hidden');
+                $('#divisGesperrt').addClass('hidden');
             });
 
             // Bei Wechsel von Studiensemester die Seite mit GET params neu laden
@@ -605,7 +607,7 @@ function getStgMail($stgKz_arr)
         // FORM Begin
         echo '<form name="zeitwunsch" method="post" action="zeitwunsch.php?stsem='. $selected_ss. '&type=save" onsubmit="return checkvalues()">';
         echo '<input type="hidden" name="uid" value="'. $uid. '">';
-        echo '<input type="hidden" name="isVerplant" value="'. json_encode($isVerplant). '">';
+        echo '<input type="hidden" name="isGesperrt" value="'. json_encode($isGesperrt). '">';
 
         // Mein Zeitwunsch-Semesterplan Dropdown, Default = naechstes Studiensemester
         $next_ss_selected = $next_ss->studiensemester_kurzbz == $selected_ss ? 'selected' : '';
@@ -674,7 +676,7 @@ function getStgMail($stgKz_arr)
                 echo '<label class="radio-inline">';
                 echo '<b><input type="radio" name="radioZWG" id="radioCopyZWG" value="copy" '. $radioCopyChecked. '> '. $p->t('zeitwunsch/aendern'). '</b>';
                 echo '</label>';
-                if ($isVerplant)
+                if ($isGesperrt)
                 {
                     echo '<span class="label label-danger valign-top">'.$p->t('zeitwunsch/stundenBereitsVerplant', array($selected_ss)). '</span>';
                 }
@@ -686,9 +688,9 @@ function getStgMail($stgKz_arr)
                 echo '<span><small><a id="reload-table" style="cursor: pointer">'. $p->t('global/aenderungenZuruecksetzen'). '</a></small></span><br><br>';
             echo '</div>'; // end col-xs-3
 
-            $divChangeHidden = !is_null($selected_past_ss) || $isVerplant ? 'hidden' : '';
-            $divCopyHidden = is_null($selected_past_ss) || $isVerplant ? 'hidden' : '';
-            $divIsVerplantHidden = $isVerplant ? '' : 'hidden';
+            $divChangeHidden = !is_null($selected_past_ss) || $isGesperrt ? 'hidden' : '';
+            $divCopyHidden = is_null($selected_past_ss) || $isGesperrt ? 'hidden' : '';
+            $divisGesperrtHidden = $isGesperrt ? '' : 'hidden';
 
             echo '<div id="divChangeZWG" class="'. $divChangeHidden . '">';
                 echo '<div class="col-xs-8 col-lg-7">';
@@ -723,7 +725,7 @@ function getStgMail($stgKz_arr)
                 echo '</div>';  // end col
             echo '</div>'; // end divCopyZWG
 
-            echo '<div id="divIsVerplant" class="'. $divIsVerplantHidden . '">';
+            echo '<div id="divisGesperrt" class="'. $divisGesperrtHidden . '">';
 
                 // Mail Adressen der Studiengaenge, wo Lektor ueber eine LV bereits verplant ist
                 $stgKzOfVerplant_arr = getStgOfVerplant($uid, $selected_ss);
@@ -740,7 +742,7 @@ function getStgMail($stgKz_arr)
                     echo '</div>'; // end panel heading
                 echo '</div>'; // end panel
                 echo '</div>'; // end col
-            echo '</div>'; // end divIsVerplant
+            echo '</div>'; // end divisGesperrt
 
             // Speichern - Button
             echo '<div class="col-xs-3">';
