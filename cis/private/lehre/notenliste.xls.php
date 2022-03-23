@@ -180,7 +180,7 @@ else
 	$qry.=' ORDER BY nachname, vorname';
 
 	if($result = $db->db_query($qry))
-	{center
+	{
 		while($row=$db->db_fetch_object($result))
 		{
 			$worksheet->write($lines,1,"$row->vorname $row->nachname");
