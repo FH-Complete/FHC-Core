@@ -10,6 +10,7 @@ $(function(){
 
     const genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
     const begruendung_panel = $('#approveAnrechnungDetail-begruendung-panel');
+    const hasReadOnlyAccess = $('#approveAnrechnungDetail-generell').data('readonly');
 
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
@@ -19,6 +20,11 @@ $(function(){
         alert("Diese Seite kann mit ihrem Browser nicht angezeigt werden. Bitte verwenden Sie Firefox, Chrome oder Edge um die Seite anzuzeigen");
         window.location.href='about:blank';
         return;
+    }
+
+    if (hasReadOnlyAccess)
+    {
+        approveAnrechnungDetail.disableEditElements();
     }
 
     // Set status alert color
@@ -416,6 +422,34 @@ var approveAnrechnungDetail = {
                 html: true
         }
         );
+    },
+    disableEditElements: function()
+    {
+        // Disable:
+        // ...button Empfehlung anfordern
+        $('#approveAnrechnungDetail-request-recommendation')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Empfehlung zuruecknehmen
+        $('#approveAnrechnungDetail-withdraw-request-recommedation')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Genehmigen
+        $('#approveAnrechnungDetail-approve-anrechnung-ask')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Ablehnen
+        $('#approveAnrechnungDetail-reject-anrechnung-ask')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Genehmigung zurücknehmen
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ... form Empfehlungsnotiz
+        $('#form-empfehlungNotiz :input')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
     },
     copyIntoTextarea: function(elem){
 

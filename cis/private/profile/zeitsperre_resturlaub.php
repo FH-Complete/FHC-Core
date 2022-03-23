@@ -45,7 +45,7 @@ $uid = get_uid();
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
-$typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV");
+$typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV", "CovidSB", "CovidKS");
 
 if(isset($_GET['type']))
 	$type=$_GET['type'];
@@ -69,8 +69,8 @@ $datum_obj = new datum();
 $ma= new mitarbeiter();
 
 // definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
-$zasperre = new zeitaufzeichnung();
-if ($sperrdat = $zasperre->getEintragungGesperrtBisForUser($uid))
+$zaufzeichnung = new zeitaufzeichnung();
+if ($sperrdat = $zaufzeichnung->getEintragungGesperrtBisForUser($uid))
 	$gesperrt_bis = $sperrdat;
 else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
 	$gesperrt_bis = CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS;
@@ -138,7 +138,15 @@ $( document ).ready(function()
 			rows: 4,
 			});
 
+	$("#vondatum").change(
+		function()
+		{
+			$(".error").text("");
+		}
+	)
+
 });
+
 // set holidays function which is configured in beforeShowDay
  function setHoliDays(date) {
    for (i = 0; i < holiDays.length; i++) {
@@ -302,7 +310,9 @@ function showHideStudeDropDown()
 	|| dd.options[dd.selectedIndex].value == 'Urlaub'
 	|| dd.options[dd.selectedIndex].value == 'Krank'
 	|| dd.options[dd.selectedIndex].value == 'DienstF'
-	|| dd.options[dd.selectedIndex].value == 'DienstV')
+	|| dd.options[dd.selectedIndex].value == 'DienstV'
+	|| dd.options[dd.selectedIndex].value == 'CovidSB'
+	|| dd.options[dd.selectedIndex].value == 'CovidKS')
 	{
 		document.getElementById('vonStd').style.visibility = 'hidden';
 		document.getElementById('bisStd').style.visibility = 'hidden';
@@ -348,6 +358,40 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	{
 		$error=true;
 		$error_msg .= $p->t('zeitsperre/bisDatumUngueltig').' ';
+	}
+
+	//Prüfen auf vorhandene Zeitaufzeichnung
+	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
+	  && $zaufzeichnung->existsZeitaufzeichnung($uid, $_POST['vondatum'], $_POST['bisdatum'])
+	  // Nur Zeitaufzeichnungsrelevante Typen sollen das speichern blockieren
+	  && in_array($_POST['zeitsperretyp_kurzbz'], zeitsperre::getBlockierendeZeitsperren()))
+	{
+		$error = true;
+		$error_msg .= $p->t('zeitsperre/zeitaufzeichnungVorhanden');
+	}
+
+	//Prüfen auf vorhandene Zeitsperre
+	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
+	&& in_array($_POST['zeitsperretyp_kurzbz'], zeitsperre::getBlockierendeZeitsperren()))
+	{
+		$von = $_POST['vondatum'];
+		$von2 = new DateTime($von);
+		$von2 = $von2->format('Y-m-d');
+		$zeitsperre = new zeitsperre();
+
+		if ($zeitsperre->getSperreByDate($uid, $von2, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN))
+		{
+			foreach ($zeitsperre->result as $z)
+			{
+				// Beim editieren nicht mit dem eigenen Eintrag kollidieren
+				if($_GET['type'] == 'edit_sperre' && $z->zeitsperre_id == $_GET['id'])
+					continue;
+
+				$typ = $z->zeitsperretyp_kurzbz;
+				$error = true;
+				$error_msg .= $p->t('zeitsperre/zeitsperreEingetragen', [$von, $typ]);
+			}
+		}
 	}
 
 	//von - bis-datum pruefen von darf nicht groesser als bis sein

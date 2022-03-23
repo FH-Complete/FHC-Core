@@ -462,7 +462,7 @@ function StudentTreeKeyPress(event)
 // ****
 // * Erstellt das Zertifikat fuer die Freifaecher
 // ****
-function StudentFFZertifikatPrint(event)
+function StudentFFZertifikatPrint(event, signieren)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -486,16 +486,36 @@ function StudentFFZertifikatPrint(event)
 	else
 		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
-//	alert('url: '+url);
-	window.location.href = url;
+	if (signieren)
+	{
+		var req = new phpRequest(url,'','');
+		req.add('output', 'pdf');
+		req.add('sign', '1');
+		req.add('archive', '1');
+
+		var response = req.execute();
+
+		if (response != '')
+			alert(response)
+		else
+		{
+			alert('Erfolgreich archiviert und signiert');
+			StudentTreeRefresh();
+		}
+	}
+		else
+	{
+		url = url+'&output='+output;
+		window.location.href = url;
+	}
 }
 
 //****
 //* Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 //****
-function StudentLVZeugnisPrint(event, sprache)
+function StudentLVZeugnisPrint(event, sprache, signieren)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -523,9 +543,30 @@ function StudentLVZeugnisPrint(event, sprache)
 	if (sprache == 'English')
 		xsl = 'LVZeugnisEng';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid='+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
-	window.location.href = url;
+	if (signieren)
+	{
+		var req = new phpRequest(url,'','');
+		req.add('output', 'pdf');
+		req.add('sign', '1');
+		req.add('archive', '1');
+
+		var response = req.execute();
+
+		if (response != '')
+			alert(response)
+		else
+		{
+			alert('Erfolgreich archiviert und signiert');
+			StudentTreeRefresh();
+		}
+	}
+	else
+	{
+		url = url+'&output='+output;
+		window.location.href = url;
+	}
 }
 
 // ****
@@ -3326,6 +3367,7 @@ function StudentZeugnisDokumentArchivieren()
 			break;
 
 		case 'DiplSupplement':
+		case 'SZeugnis':
 			xml = 'diplomasupplement.xml.php';
 			break;
 

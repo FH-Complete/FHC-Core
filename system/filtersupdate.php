@@ -35,12 +35,12 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
-					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
-					{"name": "LockUser"}
+					{"name": "LockUser"},
+					{"name": "OnholdDate"}
 				],
 				"filters": [
 					{
@@ -311,6 +311,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
+					{"name": "AktenId"},
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
@@ -902,9 +903,9 @@ $filters = array(
 				],
 				"filters": [
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "ncontains",
-						"condition": "behoben"
+						"condition": "resolved"
 					},
 					{
 						"name": "Hauptzuständig",
@@ -963,7 +964,8 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
-					{"name": "Verarbeitet von"}
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
 				],
 				"filters": [
 					{
@@ -973,11 +975,56 @@ $filters = array(
 						"option": "days"
 					},
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "contains",
-						"condition": "behoben"
+						"condition": "resolved"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'dvuh',
+		'dataset_name' => 'storno',
+		'filter_kurzbz' => 'DVUHStorno',
+		'description' => '{DVUH Storno Übersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "DVUHStorno",
+				"columns": [
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "matrikelnummer"},
+					{"name": "studiengang"},
+					{"name": "studiensemester"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'dvuh',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'BPKWartungDVUH',
+		'description' => '{bPK Uebersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehlende bPK",
+				"columns": [
+					{"name": "person_id"},
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "svnr"},
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,
