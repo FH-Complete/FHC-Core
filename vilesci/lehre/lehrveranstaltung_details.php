@@ -121,6 +121,7 @@
 		$lv->benotung = isset($_POST['benotung']);
 		$lv->lvinfo = isset($_POST['lvinfo']);
 		$lv->lehrauftrag = isset($_POST['lehrauftrag']);
+		$lv->lehrveranstaltung_template_id = $lv->lehrtyp_kurzbz == 'tpl' ? '' : $_POST['lehrveranstaltung_template_id'];
 
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -436,6 +437,14 @@
 			<td>Lehrauftrag</td>
 			<td><input type="checkbox" name="lehrauftrag" '.($lv->lehrauftrag?'checked':'').'></td>
 		</tr>
+		<tr id="lehrveranstaltung_template_id">
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td>Template</td>
+			<td><input type="text" name="lehrveranstaltung_template_id" value="'.$lv->lehrveranstaltung_template_id.'"></td>
+		</tr>
 		<tr>
 			<td></td>
 			<td></td>
@@ -527,6 +536,7 @@
 	<title>Lehrveranstaltung - Details</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/colorpicker.css" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<script type="text/javascript" src="../../include/js/mailcheck.js"></script>
 	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
 
@@ -665,6 +675,110 @@
 			{
 				$(this).ColorPickerSetColor(this.value);
 			});
+
+			$('input[name="lehrveranstaltung_template_id"]').each(function() {
+				var input = $(this),
+					selItem = null,
+					lastContent = [],
+					dname = "";
+				function searchIdInLastContent(value) {
+					for (var i=0; i<lastContent.length; i++) {
+						if (value == lastContent[i].value) {
+							input.val(lastContent[i].id);
+							dname = lastContent[i].value;
+							lastContent = [];
+							break;
+						}
+					}
+				}
+				function initAutocomplete() {
+					$('<input/>').attr({
+						type: "text",
+						value: dname
+					}).blur(function(e) {
+						var self = $(this),
+							val = self.val();
+						if (!val) {
+							dname = "";
+							input.val("");
+							return;
+						}
+						if (val == dname) return;
+						searchIdInLastContent(val);
+						$.ajax({
+							dataType: "json",
+							url: "../../soap/fhcomplete.php",
+							data: {
+								typ: "json",
+								class: "lehrveranstaltung",
+								method: "loadTemplateByName",
+								parameter_0: val
+							}
+						}).then(data => {
+							if (!self.is(':focus') && val === self.val()) {
+								if (data.return && data.return.label && data.return.id) {
+									dname = data.return.label;
+									input.val(data.return.id);
+								}
+								self.val(dname);
+							}
+						});
+
+					}).blur().insertAfter(input.attr('type', 'hidden')).autocomplete({
+						source: function(request, response) {
+							$.ajax({
+								dataType: "json",
+								url: "../../soap/fhcomplete.php",
+								data: {
+									typ: "json",
+									class: "lehrveranstaltung",
+									method: "loadTemplates",
+									parameter_0: request.term
+								}
+							}).then(data => {
+								response(data.return);
+							});
+						},
+						response: function(e, ui) {
+							lastContent = ui.content;
+						},
+						select: function(e, ui) {
+							lastContent = [ui.item];
+						},
+						close: function(e, ui) {
+							searchIdInLastContent($(this).val());
+						}
+					});
+				}
+				if (input.val()) {
+					$.ajax({
+						dataType: "json",
+						url: "../../soap/fhcomplete.php",
+						data: {
+							typ: "json",
+							class: "lehrveranstaltung",
+							method: "load",
+							parameter_0: input.val()
+						}
+					}).then(data => {
+						if (data.error == "false") {
+							var tpl = data.result[0];
+							dname = tpl.bezeichnung + " [" + tpl.kurzbz + "]";
+							initAutocomplete();
+						}
+					});
+				} else {
+					initAutocomplete();
+				}
+			});
+
+			$('select[name="lehrtyp_kurzbz"]').change(function(e) {
+				if ($(this).val() == 'tpl') {
+					$('#lehrveranstaltung_template_id').hide();
+				} else {
+					$('#lehrveranstaltung_template_id').show();
+				}
+			}).change();
 	    });
 	</script>
 	<style type="text/css">

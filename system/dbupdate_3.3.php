@@ -5965,6 +5965,61 @@ if(!$result = @$db->db_query("SELECT behebung_parameter FROM system.tbl_issue LI
 		echo '<br>Added column behebung_parameter to table system.tbl_issue';
 }
 
+// NOTE(chris): Add "Template" to "Lehrtyp"
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrtyp WHERE bezeichnung = 'Template';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_lehrtyp(lehrtyp_kurzbz, bezeichnung) VALUES('tpl', 'Template');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_lehrtyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_lehrtyp: Added "Template"';
+	}
+}
+
+// NOTE(chris): Add Column "lehrveranstaltung_template_id" in tbl_lehrveranstaltung
+if(!$result = @$db->db_query("SELECT lehrveranstaltung_template_id FROM lehre.tbl_lehrveranstaltung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lehrveranstaltung_template_id integer;
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD CONSTRAINT fk_lehrveranstaltung_template FOREIGN KEY (lehrveranstaltung_template_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_lehrveranstaltung: Spalte lehrveranstaltung_template_id hinzugefuegt';
+}
+
+// NOTE(chris): Add Webservice Rights for lehrveranstaltung::loadTemplates
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicerecht WHERE berechtigung_kurzbz='soap/studienordnung' AND methode = 'loadTemplates' AND klasse = 'lehrveranstaltung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, insertamum, insertvon, klasse) VALUES('soap/studienordnung', 'loadTemplates', now(), 'checksystem', 'lehrveranstaltung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicerecht '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_webservicerecht: soap/studienordnung/loadTemplates->lehrveranstaltung hinzugefügt';
+	}
+}
+
+// NOTE(chris): Add Webservice Rights for lehrveranstaltung::loadTemplateByName
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicerecht WHERE berechtigung_kurzbz='soap/studienordnung' AND methode = 'loadTemplateByName' AND klasse = 'lehrveranstaltung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, insertamum, insertvon, klasse) VALUES('soap/studienordnung', 'loadTemplateByName', now(), 'checksystem', 'lehrveranstaltung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicerecht '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_webservicerecht: soap/studienordnung/loadTemplateByName->lehrveranstaltung hinzugefügt';
+	}
+}
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

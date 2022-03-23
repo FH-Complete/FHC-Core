@@ -309,4 +309,49 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($query, array($uid, $studiensemester_kurzbz, $lehrveranstaltung_id));
 	}
+
+	/**
+	 * Sucht nach LV Templates und gibt Id und Label ("bezeichnung [kurzbz]") aus
+	 * Diese funktion ist für autocomplete gedacht
+	 * 
+	 * @param string $filter Suchfilter
+	 * @return \stdClass A return object
+	 */
+	public function loadTemplates($filter)
+	{
+		$qry = "SELECT
+					tbl_lehrveranstaltung.lehrveranstaltung_id as id, CONCAT(tbl_lehrveranstaltung.bezeichnung, ' [', tbl_lehrveranstaltung.kurzbz, ']') as label
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					tbl_lehrveranstaltung.lehrtyp_kurzbz = 'tpl' AND (
+						CAST(tbl_lehrveranstaltung.lehrveranstaltung_id AS TEXT) LIKE '%".$this->db_escape($filter)."%' OR 
+						tbl_lehrveranstaltung.bezeichnung LIKE '%".$this->db_escape($filter).	"%' OR 
+						tbl_lehrveranstaltung.kurzbz LIKE '%".$this->db_escape($filter).	"%'
+					)
+			";
+		return $this->execQuery($qry);
+	}
+
+	/**
+	 * Lädt Template und gibt Id und Label ("bezeichnung [kurzbz]") zurück
+	 * Diese funktion ist für autocomplete gedacht
+	 * 
+	 * @param string $name
+	 * @return \stdClass A return object
+	 */
+	public function loadTemplateByName($name)
+	{
+		$qry = "SELECT
+					tbl_lehrveranstaltung.lehrveranstaltung_id as id, CONCAT(tbl_lehrveranstaltung.bezeichnung, ' [', tbl_lehrveranstaltung.kurzbz, ']') as label
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					tbl_lehrveranstaltung.lehrtyp_kurzbz = 'tpl' AND (
+						CAST(tbl_lehrveranstaltung.lehrveranstaltung_id AS TEXT) = '".($name ? $this->db_escape($name) : 0)."' OR tbl_lehrveranstaltung.bezeichnung = '".$this->db_escape($name).	"' OR tbl_lehrveranstaltung.kurzbz = '".$this->db_escape($name).	"'
+					)
+			";
+		return $this->execQuery($qry);
+	}
+
 }
