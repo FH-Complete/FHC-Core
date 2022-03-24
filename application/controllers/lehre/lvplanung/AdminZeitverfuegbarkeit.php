@@ -227,6 +227,11 @@ class AdminZeitverfuegbarkeit extends Auth_Controller
         {
             return (error('LektorIn fehlt'));
         }
+
+        if (isEmptyString($post['bezeichnung']))
+        {
+            return (error('Notiz fehlt'));
+        }
         
         if (isEmptyString($post['vondatum']))
         {

@@ -86,7 +86,7 @@ $this->load->view(
                     <div class="form-group">
                         <label for="bezeichnung" class="col-sm-1 control-label">Notiz: </label>
                         <div class="col-sm-3">
-                            <textarea type="" id="bezeichnung" name="bezeichnung" value=""></textarea>
+                            <textarea type="" id="bezeichnung" name="bezeichnung" value="" required></textarea>
                         </div>
                     </div>
 
