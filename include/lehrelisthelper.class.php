@@ -254,8 +254,10 @@ class LehreListHelper
 					else
 						$zusatz='';
 
-					if($row->bisio_id!='' && $row->status!='Incoming' && ($row->bis > $stsemdatumvon || $row->bis=='') && $row->von < $stsemdatumbis) //Outgoing
-						$zusatz.='(o)(ab '.$datum->formatDatum($row->von,'d.m.Y').')';
+					//Outgoing
+					if($row->bisio_id != '' && $row->status != 'Incoming' && ($row->bis > $stsemdatumvon || $row->bis == '')
+					&& $row->von < $stsemdatumbis && (anzahlTage($row->von, $row->bis) >= 30))
+						$zusatz .= '(o)(ab '.$datum->formatDatum($row->von, 'd.m.Y').')';
 
 					if($row->lkt_ueberschreibbar == 'f') // angerechnet / intern angerechnet / nicht zugelassen
 						$zusatz.= '('. $row->anmerkung. ')';
