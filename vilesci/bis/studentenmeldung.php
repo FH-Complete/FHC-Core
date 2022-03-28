@@ -194,7 +194,10 @@ if ($stg_kz != 'alleBaMa')
 {
 	$qry_akt = "
 		SELECT
-			DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
+			DISTINCT ON(student_uid, nachname, vorname) *,
+			public.tbl_person.person_id AS pers_id,
+			public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+			public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -231,7 +234,10 @@ if ($stg_kz != 'alleBaMa')
 //Incoming ohne I/O Datensatz anzeigen
 	$qry_in = "
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -261,7 +267,10 @@ if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
 {
 	$qry="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -282,7 +291,10 @@ elseif ($stg_kz == 'alleBaMa')
 {
 	$qry="
 	SELECT
-		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -309,7 +321,10 @@ else
 {
 	$qry="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -335,16 +350,22 @@ else
 
 if($result = $db->db_query($qry))
 {
+
 	$stg_kz_index = '';
 
 	while($row = $db->db_fetch_object($result))
 	{
+		$row->pre_foerderrelevant = $db->db_parse_bool($row->pre_foerderrelevant);
+		$row->stg_foerderrelevant = $db->db_parse_bool($row->stg_foerderrelevant);
+
 		if ($row->studiengang_kz != $stg_kz_index)
 		{
 			//Studiengangsdaten auslesen
 			$stg_obj = new studiengang();
 			if($stg_obj->load($row->studiengang_kz))
 			{
+				
+
 				$maxsemester = $stg_obj->max_semester;
 				if($maxsemester == 0)
 				{
@@ -1509,14 +1530,25 @@ function GenerateXMLStudentBlock($row)
 		 *
 		 * ToDo: sollte pro Studierenden konfigurierbar sein
 		 */
-		if($aktstatus=='Incoming' || $ausserordentlich
-			|| ($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
-			$bmwf='N';
-		else
+		//if($aktstatus=='Incoming' || $ausserordentlich
+		//	|| ($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
+		//	$bmwf='N';
+		//else
+		//	$bmwf='J';
+
+		if ($row->pre_foerderrelevant === true) {
 			$bmwf='J';
+		} else if ($row->pre_foerderrelevant === false) {
+			$bmwf='N';
+		} else if ($row->stg_foerderrelevant === true) {
+			$bmwf='J';
+		} else {
+			$bmwf='N';
+		}
 
 		$datei.="
 			<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
+
 
 		// **** IO Container ****/
 		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
