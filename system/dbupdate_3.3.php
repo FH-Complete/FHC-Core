@@ -5968,7 +5968,7 @@ if(!$result = @$db->db_query("SELECT behebung_parameter FROM system.tbl_issue LI
 // Add table campus.tbl_zeitwunsch_gueltigkeit and migrate initial data
 if($result = $db->db_query("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema LIKE 'campus' AND table_name = 'tbl_zeitwunsch_gueltigkeit');"))
 {
-	if ($result == false)
+	if ($db->db_fetch_object($result) == false)
 	{
 		$qry = "
 			CREATE TABLE campus.tbl_zeitwunsch_gueltigkeit 
@@ -6082,6 +6082,20 @@ if ($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE tabl
 			echo '<strong>campus.tbl_zeitwunsch: ' . $db->db_last_error() . '</strong><br>';
 		else
 			echo '<br>campus.tbl_zeitwunsch: Neue Spalte zeitwunsch_id hinzugefuegt.';
+	}
+}
+
+// Add index beschreibung to system.tbl_webservicelog
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservicelog_beschreibung'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_webservicelog_beschreibung ON system.tbl_webservicelog USING btree (beschreibung)";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer system.tbl_webservicelog hinzugefuegt';
 	}
 }
 
