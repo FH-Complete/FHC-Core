@@ -206,7 +206,7 @@ class projektphase extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
-				//$obj->personentage = $row->personentage;
+				$obj->personentage = $row->personentage;
 				$obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
 				$obj->ressource_id = $row->ressource_id;

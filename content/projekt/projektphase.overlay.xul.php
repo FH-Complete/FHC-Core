@@ -91,6 +91,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#ende_iso" />
 				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projektphase-personentage" label="Personentage" flex="2" hidden="false" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#personentage" />
+				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projektphase-budget" label="Budget" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#budget" />
@@ -129,6 +133,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beschreibung"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#ende"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#personentage"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#budget"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#typ"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz"/>
