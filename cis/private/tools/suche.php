@@ -39,6 +39,7 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/bisverwendung.class.php');
+require_once('../../../include/webservicelog.class.php');
 
 $uid = get_uid();
 $db = new basis_db();
@@ -89,6 +90,20 @@ while ($array_key = array_search("", $searchItems))
 // Wenn nach dem TRIM keine Zeichen uebrig bleiben, dann abbrechen
 if(implode(',', $searchItems) == '')
 	exit;
+
+// Legt einen Logeintrag für die Suchstatistik an
+if (defined('LOG_CONTENT') && LOG_CONTENT==true)
+{
+	$log = new webservicelog();
+
+	$log->webservicetyp_kurzbz = 'content';
+	$log->request_id = '';
+	$log->beschreibung = 'suche';
+	$log->request_data = implode(';',$searchItems);
+	$log->execute_user = $uid;
+
+	$log->save(true);
+}
 
 //Easter Egg
 $easteregg = array ('antwort','leben','universum','rest','answer','universe','life','everything');

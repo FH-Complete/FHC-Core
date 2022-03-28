@@ -3,7 +3,8 @@
 		'query' => '
 		SELECT
 			person_id, vorname, nachname, geschlecht, svnr, ersatzkennzeichen, matr_nr,
-			staatsbuergerschaft, gebdatum, false AS mitarbeiter
+			staatsbuergerschaft, gebdatum, false AS mitarbeiter,
+		    (SELECT count(*) FROM public.tbl_akte WHERE person_id=tbl_person.person_id) AS anzahl_dokumente
 		FROM
 			public.tbl_person
 		WHERE
@@ -14,7 +15,8 @@
 		UNION
 		SELECT
 			person_id, vorname, nachname, geschlecht, svnr, ersatzkennzeichen, matr_nr,
-			staatsbuergerschaft, gebdatum, true AS mitarbeiter
+			staatsbuergerschaft, gebdatum, true AS mitarbeiter,
+		    (SELECT count(*) FROM public.tbl_akte WHERE person_id=tbl_person.person_id) AS anzahl_dokumente
 		FROM
 			public.tbl_person
             JOIN public.tbl_benutzer USING(person_id)
@@ -36,7 +38,8 @@
 			ucfirst($this->p->t('person', 'matrikelnummer')),
 			ucfirst($this->p->t('person', 'staatsbuergerschaft')),
 			ucfirst($this->p->t('person', 'geburtsdatum')),
-			'Mitarbeiter'
+			'Mitarbeiter',
+			'Anzahl Dokumente'
 		),
 		'formatRow' => function($datasetRaw) {
 

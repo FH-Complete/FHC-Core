@@ -160,15 +160,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				<xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-ressource-aufwand" label="Aufwand" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/notiz/rdf#aufwand" />
+					sort="rdf:http://www.technikum-wien.at/ressource/rdf#aufwand" />
 					<xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-ressource-funktion_kurzbz" label="Funktion" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/notiz/rdf#funktion_kurzbz" />
+					sort="rdf:http://www.technikum-wien.at/ressource/rdf#funktion_kurzbz" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-ressource-typ" label="Typ" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/notiz/rdf#typ" />
+					sort="rdf:http://www.technikum-wien.at/ressource/rdf#typ" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-ressource-ressource_id" label="ID" flex="2" hidden="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"

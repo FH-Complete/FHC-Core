@@ -886,7 +886,7 @@ or not exists
 	{
 		$tagesbeginn = '';
 		$tagesende = '';
-		$pausesumme = '00:00';
+		$pausesumme = 0;
 		$tagessaldo = '';
 		$elsumme = '00:00';
 		$pflichtpause = false;
@@ -906,13 +906,13 @@ or not exists
 				$tagesende = $datum->formatDatum($row->ende, 'H:i');
 
 			if ($row->aktivitaet_kurzbz == "Pause")
-				$pausesumme = $row->diff;
+			{
+				list($h1, $m1) = explode(':', $row->diff);
+				$pausesumme += ($h1 * 3600 + $m1 * 60);
+			}
 		}
 
 		$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) - $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) - 3600;
-
-		list($h1, $m1) = explode(':', $pausesumme);
-		$pausesumme = $h1 * 3600 + $m1 * 60;
 
 		list($h2, $m2) = explode(':', $elsumme);
 		$elsumme = $h2 * 3600 + $m2 * 60;

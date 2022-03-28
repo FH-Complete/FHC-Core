@@ -31,18 +31,18 @@ function treeProjektmenueSelect()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-projektmenue');
-	
+
 	// Wenn auf die Ueberschrift geklickt wird, soll nix passieren
 	if(tree.currentIndex==-1)
 		return;
-	
+
 	var bezeichnung = getTreeCellText(tree, "treecol-projektmenue-bezeichnung", tree.currentIndex);
 	var oe=getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex);
 	var projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
 	var projekt_phase=getTreeCellText(tree, "treecol-projektmenue-projekt_phase", tree.currentIndex);
 	var projekt_phase_id=getTreeCellText(tree, "treecol-projektmenue-projekt_phase_id", tree.currentIndex);
-	  
-    
+
+
 	//Neu und Delete Button fuer Projekte und Phasen aktivieren/deaktivieren
 	if (projekt_kurzbz=='')
 	{
@@ -54,7 +54,7 @@ function treeProjektmenueSelect()
 		document.getElementById('toolbarbutton-projekt-neu').disabled=true;
 		document.getElementById('toolbarbutton-projektphase-neu').disabled=false;
 	}
-        
+
     //Projekte neu laden
 	try
 	{
@@ -75,8 +75,8 @@ function treeProjektmenueSelect()
 					reloadRessourcePhasen();
 				}
 			}
-			else 
-			{		
+			else
+			{
 				// Wenn der Tab Phase oder Tasks ausgewaehlt ist auf die Projekte wechseln
 				if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projektphase')
 				|| document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projekttask'))
@@ -102,7 +102,7 @@ function treeProjektmenueSelect()
 		}
         catch(e)
         {}
-			 
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		datasourceTreeProjekt = rdfService.GetDataSource(datasource);
 		datasourceTreeProjekt.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -115,12 +115,12 @@ function treeProjektmenueSelect()
     {
 		debug("whoops Projekt load failed with exception: "+e);
 	}
-        
+
     // Projektphasen neu laden
 	if(projekt_kurzbz!='')
 	{
 		// Wenn ein Projekt angeklickt wird, ggf Karteireiter wechseln
-		
+
 		// Wenn der Ressourceauslastung Tab geoeffnet ist
 		if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-ressourceauslastung'))
 		{
@@ -135,7 +135,7 @@ function treeProjektmenueSelect()
 				reloadRessourcePhasen();
 			}
 		}
-		else 
+		else
 		{
 			// Wenn der Tab Projekte oder Tasks ausgewaehlt ist auf die Phasen wechseln
 			if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projekte')
@@ -144,10 +144,11 @@ function treeProjektmenueSelect()
 				document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projektphase');
 			}
 		}
-			
+
 	    try
 		{
 			var datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?"+gettimestamp();
+			datasources = datasources + "&filterprj=" + encodeURIComponent(projekt_kurzbz);
 			var ref="http://www.technikum-wien.at/projektphase/"+oe+"/"+projekt_kurzbz;
 			var treePhase=document.getElementById('tree-projektphase');
 
@@ -165,7 +166,7 @@ function treeProjektmenueSelect()
 			}
 			catch(e)
 			{}
-			
+
 			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 			datasourceTreeProjektphase = rdfService.GetDataSource(datasources);
 			datasourceTreeProjektphase.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -180,7 +181,7 @@ function treeProjektmenueSelect()
 			debug("whoops Projektphase load failed with exception: "+e);
 		}
 	}
-        
+
 	// Projekttasks neu laden
 	if(projekt_phase_id!='')
 	{
@@ -190,12 +191,12 @@ function treeProjektmenueSelect()
 		{
 			document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projekttask');
 		}
-	    LoadTasks(projekt_phase_id); 
+	    LoadTasks(projekt_phase_id);
 	}
-	
+
 	document.getElementById('projekttask-toolbar-del').disabled=true;
-	
-	
+
+
 	// Dokumente laden
 	if(projekt_phase_id!='' || projekt_kurzbz!='')
 	{
@@ -203,21 +204,21 @@ function treeProjektmenueSelect()
 		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=false;
 		try
 		{
-		
+
 			if(projekt_phase_id!='')
 				url = "<?php echo APP_ROOT; ?>rdf/dms.rdf.php?projektphase_id="+projekt_phase_id+"&"+gettimestamp();
 	        else if(projekt_kurzbz!='')
 	        	url = "<?php echo APP_ROOT; ?>rdf/dms.rdf.php?projekt_kurzbz="+projekt_kurzbz+"&"+gettimestamp();
-	        
+
 	        var treeDokument=document.getElementById('tree-projektdokument');
-	
+
 	        //Alte DS entfernen
 			var oldDatasources = treeDokument.database.GetDataSources();
 			while(oldDatasources.hasMoreElements())
 	        {
 	        	treeDokument.database.RemoveDataSource(oldDatasources.getNext());
 			}
-	
+
 			try
 			{
 				datasourceTreeDokument.removeXMLSinkObserver(DokumentTreeSinkObserver);
@@ -226,7 +227,7 @@ function treeProjektmenueSelect()
 	        catch(e)
 	        {}
 	        treeDokument.builder.rebuild();
-	        
+
 	        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	        datasourceTreeDokument = rdfService.GetDataSource(url);
 	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -245,13 +246,13 @@ function treeProjektmenueSelect()
 	else
 	{
 		document.getElementById('toolbarbutton-projektdokument-neu').disabled=true;
-		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=true;	
+		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=true;
 		drawGantt();
 	}
-	
-	
-	
-	
+
+
+
+
 	// Bestellung laden
 	if(projekt_phase_id=='' && projekt_kurzbz!='')
 	{
@@ -259,14 +260,14 @@ function treeProjektmenueSelect()
 		{
 	        url = "<?php echo APP_ROOT; ?>rdf/bestellung.rdf.php?projektKurzbz="+projekt_kurzbz+"&"+gettimestamp();
 	        var treeBestellung=document.getElementById('tree-bestellung');
-	
+
 	        //Alte DS entfernen
 			var oldDatasources = treeBestellung.database.GetDataSources();
 			while(oldDatasources.hasMoreElements())
 	        {
 	        	treeBestellung.database.RemoveDataSource(oldDatasources.getNext());
 			}
-	
+
 			try
 			{
 				datasourceTreeBestellung.removeXMLSinkObserver(BestellungTreeSinkObserver);
@@ -274,7 +275,7 @@ function treeProjektmenueSelect()
 			}
 	        catch(e)
 	        {}
-	                
+
 	        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	        datasourceTreeBestellung = rdfService.GetDataSource(url);
 	        datasourceTreeBestellung.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -323,7 +324,7 @@ function ProjektmenueRefresh(filter)
 		global_filter='alle';
 	if(filter==undefined)
 		filter=global_filter;
-	
+
 	global_filter=filter;
 	try
 	{
@@ -332,7 +333,7 @@ function ProjektmenueRefresh(filter)
 			url = "<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?"+gettimestamp();
 		else
 			url = "<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?filter="+global_filter+"&"+gettimestamp();
-                
+
 		var treeProjektmenue=document.getElementById('tree-projektmenue');
 
 		//Alte DS entfernen
@@ -342,7 +343,7 @@ function ProjektmenueRefresh(filter)
 			treeProjektmenue.database.RemoveDataSource(oldDatasources.getNext());
 		}
 		treeProjektmenue.builder.rebuild();
-		
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
 		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -372,11 +373,11 @@ function loadURL(event)
 function parseRDFString(str, url)
 {
 
-	try 
+	try
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	} 
-	catch(e) 
+	}
+	catch(e)
 	{
 		alert(e);
 		return;
@@ -423,34 +424,34 @@ var projektTaskDDObserver=
 	    {
 	    	debug('treeDragDrop: e');
 	    }
-	    
+
 	    var ds = dragservice_ds;
 
 		var tree = document.getElementById('tree-projektmenue')
 	    var row = { }
 	    var col = { }
 	    var child = { }
-	   
+
 	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
-	    
+
 	    	col = tree.columns ? tree.columns["treecol-projektmenue-projekt_phase_id"] : "treecol-projektmenue-projekt_phase_id";
 			projektphaseID=tree.view.getCellText(row.value,col);
-		
+
 		if(projektphaseID == '')
 		{
 			alert('keine phase ausgewählt!');
-			return false; 
+			return false;
 		}
-		var projekttask_id = dropdata.data; 
-		
+		var projekttask_id = dropdata.data;
+
 		var soapBody = new SOAPObject("changeProjektPhase");
 		//soapBody.appendChild(new SOAPObject("username")).val('joe');
 		//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
 		soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
 		soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphaseID);
-								
+
 		var sr = new SOAPRequest("changeProjektPhase",soapBody);
-	
+
 		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
 		SOAPClient.SendRequest(sr, clb_changePhaseTask);
   	}
@@ -473,7 +474,7 @@ function clb_changePhaseTask(respObj)
 	}
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	document.getElementById('textbox-projekttaskdetail-projekttask_id').value=id;
-		
+
 	TaskSelectID=id;
 	datasourceTreeTask.Refresh(false); //non blocking
 	TaskTreeRefresh()
