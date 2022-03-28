@@ -328,6 +328,8 @@ function FunktionDetailSpeichern(kopie)
 	}
 	else
 	{
+		if(val.dbdml_errormsg!='' && val.dbdml_errormsg!='unknown')
+			alert(val.dbdml_errormsg);
 		FunktionBezeichnungChanged=false;
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		FunktionenSelectID=val.dbdml_data;

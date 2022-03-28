@@ -378,6 +378,11 @@ var InfocenterDetails = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						var engdate = $.datepicker.parseDate("yy-mm-dd", FHC_AjaxClient.getData(data)[0]);
+
+						if (engdate.getDate() === 31)
+							engdate.setDate(engdate.getDate() - 1);
+						engdate.setMonth(engdate.getMonth() + 3);
+
 						var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
 						$("#postponedate").val(gerdate);
 					}

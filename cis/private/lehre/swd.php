@@ -1,5 +1,5 @@
 <?php
-$url = "https://xgnd.bsz-bw.de/";
+$url = "https://ognd.bsz-bw.de/";
 $zielfeld = "kontrollschlagwoerter";
 $url = $url."?zielfeld=".$zielfeld;
 header('Content-Type: text/html; charset=utf-8');

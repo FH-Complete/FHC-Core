@@ -896,13 +896,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn bereits vorhanden',
+				'text' => 'BewerberIn möglicherweise vorhanden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Applicant already available',
+				'text' => 'Applicant maybe available',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1562,13 +1562,13 @@ $phrases = array(
 	'phrases' => array(
 		array(
 			'sprache' => 'German',
-			'text' => 'Benotung der Lehrveranstaltung',
+			'text' => '	Lehrveranstaltung bereits benotet',
 			'description' => '',
 			'insertvon' => 'system'
 		),
 		array(
 			'sprache' => 'English',
-			'text' => 'Grading of the course',
+			'text' => 'Course already graded',
 			'description' => '',
 			'insertvon' => 'system'
 		)
@@ -2700,6 +2700,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Course Type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'studiengangskennzahlLehre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengangskennzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study program number',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12876,6 +12896,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'eucovidqr',
+		'phrase' => 'maxtagebeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "ACHTUNG seit Februar 2022 werden Zutrittskarten für maximal 60 Tage freigeschalten.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "ATTENTION since February 2022 a maximum of 60 days validity is granted for accesscards",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'eucovidqr',
 		'phrase' => 'uploadbeschreibung',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -13674,7 +13714,27 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'nurLeseberechtigung',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Nur Leseberechtigung",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Read-Only Access",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    )
 );
 
 

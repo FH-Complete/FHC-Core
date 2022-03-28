@@ -566,6 +566,7 @@ class vorlage extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->vorlagestudiengang_id = $row->vorlagestudiengang_id;
 
 				return true;
 			}

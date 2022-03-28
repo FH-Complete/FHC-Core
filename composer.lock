@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "698d18072d5bdca35f006abb48135f97",
-    "content-hash": "5d7d0ed8a6755422fedde68f26823701",
+    "hash": "40072f80c7fd5e407eaba6591fb2d6ec",
+    "content-hash": "e55258d0e91f60adde23afe67816258a",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -229,24 +229,24 @@
         },
         {
             "name": "codeigniter/framework",
-            "version": "3.1.11",
+            "version": "3.1.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bcit-ci/CodeIgniter.git",
-                "reference": "b73eb19aed66190c10c9cad476da7c36c271d6dc"
+                "reference": "bcb17eb8ba53a85de154439d0ab8ff1bed047bc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/b73eb19aed66190c10c9cad476da7c36c271d6dc",
-                "reference": "b73eb19aed66190c10c9cad476da7c36c271d6dc",
+                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/bcb17eb8ba53a85de154439d0ab8ff1bed047bc9",
+                "reference": "bcb17eb8ba53a85de154439d0ab8ff1bed047bc9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.7"
             },
             "require-dev": {
-                "mikey179/vfsstream": "1.1.*",
-                "phpunit/phpunit": "4.* || 5.*"
+                "mikey179/vfsstream": "1.6.*",
+                "phpunit/phpunit": "4.* || 5.* || 9.*"
             },
             "suggest": {
                 "paragonie/random_compat": "Provides better randomness in PHP 5.x"
@@ -258,7 +258,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2019-09-19 12:08:45"
+            "time": "2022-03-03 13:21:49"
         },
         {
             "name": "components/angular.js",
@@ -1422,16 +1422,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.34",
+            "version": "2.0.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "98a6fe587f3481aea319eef7e656d02cfe1675ec"
+                "reference": "a97547126396548c224703a267a30af1592be146"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/98a6fe587f3481aea319eef7e656d02cfe1675ec",
-                "reference": "98a6fe587f3481aea319eef7e656d02cfe1675ec",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/a97547126396548c224703a267a30af1592be146",
+                "reference": "a97547126396548c224703a267a30af1592be146",
                 "shasum": ""
             },
             "require": {
@@ -1509,7 +1509,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2021-10-27 02:46:30"
+            "time": "2022-01-30 08:48:36"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
@@ -1564,12 +1564,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Ctype\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1843,23 +1843,23 @@
         },
         {
             "name": "zetacomponents/database",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Database.git",
-                "reference": "1750d34bf64b62f064c5b1aeb5374fbd06400904"
+                "reference": "85a2fd2af4e49f64d5c7616b6fb82c1b88de53b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Database/zipball/1750d34bf64b62f064c5b1aeb5374fbd06400904",
-                "reference": "1750d34bf64b62f064c5b1aeb5374fbd06400904",
+                "url": "https://api.github.com/repos/zetacomponents/Database/zipball/85a2fd2af4e49f64d5c7616b6fb82c1b88de53b4",
+                "reference": "85a2fd2af4e49f64d5c7616b6fb82c1b88de53b4",
                 "shasum": ""
             },
             "require": {
                 "zetacomponents/base": "~1.8"
             },
             "require-dev": {
-                "phpunit/phpunit": "~5.7",
+                "phpunit/phpunit": "~8.0",
                 "zetacomponents/database-schema": "~1.5",
                 "zetacomponents/unit-test": "*"
             },
@@ -1916,27 +1916,28 @@
             ],
             "description": "A lightweight database layer on top of PHP's PDO that allows you to utilize a database without having to take care of differences in SQL dialects.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-11-28 10:55:26"
+            "time": "2022-02-11 17:18:33"
         },
         {
             "name": "zetacomponents/document",
-            "version": "1.3.1",
+            "version": "1.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Document.git",
-                "reference": "688abfde573cf3fe0730f82538fbd7aa9fc95bc8"
+                "reference": "196884f00871ea7dcbca9ab8bc85716f626e9cc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Document/zipball/688abfde573cf3fe0730f82538fbd7aa9fc95bc8",
-                "reference": "688abfde573cf3fe0730f82538fbd7aa9fc95bc8",
+                "url": "https://api.github.com/repos/zetacomponents/Document/zipball/196884f00871ea7dcbca9ab8bc85716f626e9cc3",
+                "reference": "196884f00871ea7dcbca9ab8bc85716f626e9cc3",
                 "shasum": ""
             },
             "require": {
-                "zetacomponents/base": "*"
+                "zetacomponents/base": "~1.8"
             },
             "require-dev": {
-                "zetacomponents/unit-test": "dev-master"
+                "phpunit/phpunit": "~8.0",
+                "zetacomponents/unit-test": "*"
             },
             "type": "library",
             "autoload": {
@@ -1967,7 +1968,7 @@
             ],
             "description": "The Document components provides a general conversion framework for different semantic document markup languages like XHTML, Docbook, RST and similar.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2013-12-19 11:40:00"
+            "time": "2022-02-11 17:26:31"
         },
         {
             "name": "zetacomponents/workflow",

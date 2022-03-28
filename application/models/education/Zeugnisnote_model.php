@@ -86,9 +86,10 @@ class Zeugnisnote_model extends DB_Model
 	 * @param bool $lehre
 	 * @param bool $offiziell
 	 * @param bool $positiv
+	 * @param bool $zeugnis
 	 * @return object
 	 */
-	public function getByPerson($person_id, $studiensemester_kurzbz, $aktiv = true, $lehre = null, $offiziell = null, $positiv = null)
+	public function getByPerson($person_id, $studiensemester_kurzbz, $aktiv = true, $lehre = null, $offiziell = null, $positiv = null, $zeugnis = null)
 	{
 		$params = array($person_id, $studiensemester_kurzbz);
 
@@ -127,6 +128,12 @@ class Zeugnisnote_model extends DB_Model
 		{
 			$qry .= ' AND note.positiv = ?';
 			$params[] = $positiv;
+		}
+
+		if (isset($zeugnis))
+		{
+			$qry .= ' AND lv.zeugnis = ?';
+			$params[] = $zeugnis;
 		}
 
 		$qry .= ' ORDER BY zgnisnote.benotungsdatum';

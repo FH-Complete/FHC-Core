@@ -204,7 +204,7 @@ else
 									<row id="betriebsmittel-row-nummer2">
 										<label value="Nummer 2" control="betriebsmittel-textbox-nummer2"/>
 										<hbox>
-					      					<textbox id="betriebsmittel-textbox-nummer2" disabled="true" maxlength="12"/>
+					      					<textbox id="betriebsmittel-textbox-nummer2" disabled="true" maxlength="32"/>
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>

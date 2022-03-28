@@ -25,6 +25,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/coodle.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
 $sprache = getSprache();
@@ -35,6 +36,22 @@ $message='';
 
 if(!check_lektor($user))
 	die($p->t('global/keineBerechtigung'));
+
+// Administratoren duerfen die UID als Parameter uebergeben um die Umfragen von anderen Personen anzuzeigen
+if(isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if($rechte->isBerechtigt('admin'))
+	{
+		$user = $_GET['uid'];
+		$getParam = '&uid='.$user;
+	}
+	else
+		$getParam = '';
+}
+else
+	$getParam = '';
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
