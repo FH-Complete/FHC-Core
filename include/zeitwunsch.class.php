@@ -256,7 +256,13 @@ class zeitwunsch extends basis_db
 				WHERE
 					mitarbeiter_uid=".$this->db_add_param($uid)."
 					AND vondatum<=".$this->db_add_param($ende)."
-					AND bisdatum>=".$this->db_add_param($start);
+					AND bisdatum>=".$this->db_add_param($start). "
+					-- Negative Zeitsperren sollen im Plan eine positive Zeitsperre 'ZVerfueg' overrulen
+					ORDER BY
+					  CASE 
+					  WHEN zeitsperretyp_kurzbz = 'ZVerfueg' THEN 1
+					  ELSE 2
+					  END;";
 
 			if(!$this->db_query($sql))
 			{
