@@ -1379,7 +1379,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					}
 				}
 					echo '</table>';
-					echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br>';
+					echo '</td><td valign="top"><span id="zeitsaldo"></span><br>';
+					echo '<span id="saldoAllin"></span><br><br>';
 
 				if (!$adminView)
 				{
