@@ -6139,9 +6139,6 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservic
 	}
 }
 
-// *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
-echo '<H2>Pruefe Tabellen und Attribute!</H2>';
-
 // Insert postive Zeitsperre 'Zeitverfuegbarkeit' to tbl_zeitsperretyp
 if($result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitsperretyp WHERE zeitsperretyp_kurzbz = 'ZVerfueg';"))
 {
@@ -6169,6 +6166,9 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo ' system.tbl_berechtigung: Added permission for lehre/zeitverfuegbarkeit<br>';
 	}
 }
+
+// *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
+echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
 $tabellen=array(
 	"bis.tbl_bisorgform" => array("bisorgform_kurzbz","code","bezeichnung"),
