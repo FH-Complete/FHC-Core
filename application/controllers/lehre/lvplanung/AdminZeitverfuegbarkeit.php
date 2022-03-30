@@ -150,6 +150,10 @@ class AdminZeitverfuegbarkeit extends Auth_Controller
             $this->terminateWithJsonError('Wählen Sie einen Lehrenden aus der Zeitverfügbarkeit-Tabelle aus.');
         }
 
+        // Load Zeitsperre
+        $result = $this->ZeitsperreModel->load($zeitsperre_id);
+        $delZsp = getData($result)[0];
+
         // Delete
         $result = $this->ZeitsperreModel->delete($zeitsperre_id);
 
@@ -157,6 +161,12 @@ class AdminZeitverfuegbarkeit extends Auth_Controller
         {
             $this->terminateWithJsonError(getError($result));
         }
+
+        // Store Deletion query
+        $delQry = $this->db->last_query();
+        
+        // Log deletion
+        $this->_logDeletion($delZsp, $delQry);
 
         $this->outputJsonSuccess(array('msg' => $this->p->t('ui', 'geloescht')));
     }
@@ -271,4 +281,30 @@ class AdminZeitverfuegbarkeit extends Auth_Controller
         return success();
     }
 
+    /**
+     * Log information of deleted Zeitsperre into log table.
+     *
+     * @param $delZsp   object of deleted Zeitsperre
+     * @param $delQry   string of performed delete query
+     * @return mixed
+     * @throws Exception
+     */
+    private function _logDeletion($delZsp, $delQry)
+    {
+        $beschreibung = 'Zeitverfügbarkeitlöschung '
+            . $delZsp->mitarbeiter_uid. ' '
+            . (new DateTime($delZsp->vondatum))->format('d.m.Y')
+            . (is_null($delZsp->vonstunde) ? '(*)' : '('. $delZsp->vonstunde. ')')
+            . '-'
+            . (new DateTime($delZsp->bisdatum))->format('d.m.Y')
+            . (is_null($delZsp->bisstunde) ? '(*)' : '('. $delZsp->bisstunde. ')')
+            . '';
+
+        $this->load->model('system/Log_model', 'LogModel');
+        return $this->LogModel->insert(array(
+            'mitarbeiter_uid' => $this->_uid,
+            'beschreibung' => substr($beschreibung, 0, 64),
+            'sql' => $delQry
+        ));
+    }
 }
