@@ -140,14 +140,6 @@ $this->load->view(
 								</tr>
 								<tr>
 									<td>
-										<b><?php echo ucfirst($this->p->t('fehlermonitoring', 'fehlertyp')) ?></b>
-									</td>
-									<td>
-										<span id="fehlertypInfo"></span>
-									</td>
-								</tr>
-								<tr>
-									<td>
 										<b><?php echo ucfirst($this->p->t('fehlermonitoring', 'fehlercodeExtern')) ?></b>
 									</td>
 									<td>
