@@ -1603,7 +1603,7 @@ function MitarbeiterEntwicklungsteamTreeSelect()
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
 	//In der globalen Variable ist der zu selektierende Entwicklungsteameintrag gespeichert
-	if (MitarbeiterEntwicklungsteamSelectEntwicklungsteamID!=null)
+	if (MitarbeiterEntwicklungsteamSelectStudiengangID!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
@@ -1703,7 +1703,6 @@ function MitarbeiterEntwicklungsteamSelect()
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').value=besqualcode;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked=false;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value=studiengang_kz;
-	<!-- document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-besqual').value=besqual; -->
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value=beginn;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value=ende;
 	MitarbeiterEntwicklungsteamDetailDisableFields(false);

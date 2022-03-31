@@ -76,7 +76,8 @@ foreach ($entwicklungsteam->result as $row)
 {
 	echo '
       <RDF:li>
-				 <RDF:Description  id="'.$row->entwicklungsteam_id.'"  about="'.$rdf_url.'/'.$row->entwicklungsteam_id.'" >
+				 <RDF:Description  id="'.$row->mitarbeiter_uid.'/'.$row->studiengang_kz.'/'.$row->entwicklungsteam_id.'"
+				 about="'.$rdf_url.'/'.$row->mitarbeiter_uid.'/'.$row->studiengang_kz.'/'.$row->entwicklungsteam_id.'" >
 				 	  <ENTWICKLUNGSTEAM:entwicklungsteam_id><![CDATA['.$row->entwicklungsteam_id.']]></ENTWICKLUNGSTEAM:entwicklungsteam_id>
 						<ENTWICKLUNGSTEAM:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></ENTWICKLUNGSTEAM:mitarbeiter_uid>
             <ENTWICKLUNGSTEAM:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></ENTWICKLUNGSTEAM:studiengang_kz>
