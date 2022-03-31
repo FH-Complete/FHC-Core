@@ -39,6 +39,7 @@ var MitarbeiterFunktionTreeDatasource=null; // Datasource des Verwendungstrees
 var MitarbeiterFunktionSelectVerwendungID=null; // ID der Verwendung der Funktion die nach dem rebuild markiert werden soll
 var MitarbeiterFunktionSelectStudiengangID=null; // ID des Studiengangs der Funktion die nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamTreeDatasource=null; // Datasource des Entwicklungsteamtrees
+var MitarbeiterEntwicklungsteamSelectEntwicklungsteamID=null; //ID Entwicklungsteameintrag
 var MitarbeiterEntwicklungsteamSelectMitarbeiterUID=null; // UID des Mitarbeiters des Entwicklugnsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamSelectStudiengangID=null; // ID des Stg des Entwicklungsteams das nach dem rebuild markiert werden soll
 var MitarbeiterEntwicklungsteamDoubleRefresh=false; // Wenn auf einen Tree der eine leere Datasource enthaelt eine neue Datasource angehaengt wird, dann muss doppelt refresht werden
@@ -683,6 +684,7 @@ function MitarbeiterAuswahl()
 
 	// **** ENTWICKLUNGSTEAM ****
 	entwicklungsteamtree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
+
 	url='<?php echo APP_ROOT;?>rdf/entwicklungsteam.rdf.php?mitarbeiter_uid='+uid+"&"+gettimestamp();
 
 	try
@@ -1600,24 +1602,27 @@ function MitarbeiterEntwicklungsteamTreeSelect()
 	var tree=document.getElementById('mitarbeiter-tree-entwicklungsteam');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
-	//In der globalen Variable ist der zu selektierende Verwendung gespeichert
-	if(MitarbeiterEntwicklungsteamSelectStudiengangID!=null)
+	//In der globalen Variable ist der zu selektierende Entwicklungsteameintrag gespeichert
+	if (MitarbeiterEntwicklungsteamSelectEntwicklungsteamID!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
+			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id"] : "mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id";
+			entwicklungsteam_id=tree.view.getCellText(i,col);
 			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
-			mitarbeiter_uid=tree.view.getCellText(i,col);
+ 			mitarbeiter_uid=tree.view.getCellText(i,col);
 			col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
 			studiengang_kz=tree.view.getCellText(i,col);
 
-			if(mitarbeiter_uid == MitarbeiterEntwicklungsteamSelectMitarbeiterUID && studiengang_kz==MitarbeiterEntwicklungsteamSelectStudiengangID)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				return true;
-			}
+
+				if(entwicklungsteam_id == MitarbeiterEntwicklungsteamSelectEntwicklungsteamID && mitarbeiter_uid == MitarbeiterEntwicklungsteamSelectMitarbeiterUID && studiengang_kz==MitarbeiterEntwicklungsteamSelectStudiengangID)
+				{
+					//Zeile markieren
+					tree.view.selection.select(i);
+					//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+					tree.treeBoxObject.ensureRowIsVisible(i);
+					return true;
+				}
 	   	}
 	}
 }
@@ -1670,20 +1675,21 @@ function MitarbeiterEntwicklungsteamSelect()
 	if (tree.currentIndex==-1)
 		return false;
 
+	var col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id"] : "mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id";
+	entwicklungsteam_id=tree.view.getCellText(tree.currentIndex,col);
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
 	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
 
-	var url = '<?php echo APP_ROOT ?>rdf/entwicklungsteam.rdf.php?studiengang_kz='+studiengang_kz+'&mitarbeiter_uid='+mitarbeiter_uid+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT ?>rdf/entwicklungsteam.rdf.php?studiengang_kz='+studiengang_kz+'&mitarbeiter_uid='+mitarbeiter_uid+'&entwicklungsteam_id='+entwicklungsteam_id+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
 
-    var dsource = rdfService.GetDataSourceBlocking(url);
+  var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/entwicklungsteam/" + mitarbeiter_uid+'/'+studiengang_kz);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/entwicklungsteam/" + mitarbeiter_uid+'/'+studiengang_kz+'/'+entwicklungsteam_id);
 
 	var predicateNS = "http://www.technikum-wien.at/entwicklungsteam/rdf";
 
@@ -1697,6 +1703,7 @@ function MitarbeiterEntwicklungsteamSelect()
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').value=besqualcode;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked=false;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value=studiengang_kz;
+	<!-- document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-besqual').value=besqual; -->
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value=beginn;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value=ende;
 	MitarbeiterEntwicklungsteamDetailDisableFields(false);
@@ -1740,6 +1747,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	req.add('type', 'entwicklungsteamsave');
 
 	req.add('neu', neu);
+	req.add('entwicklungsteam_id', entwicklungsteam_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('studiengang_kz_old', studiengang_kz_old);
 	req.add('besqualcode', besqualcode);
@@ -1762,6 +1770,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		MitarbeiterEntwicklungsteamSelectEntwicklungsteamID = entwicklungsteam_id;
 		MitarbeiterEntwicklungsteamSelectMitarbeiterUID = mitarbeiter_uid;
 		MitarbeiterEntwicklungsteamSelectStudiengangID = studiengang_kz;
 		MitarbeiterEntwicklungsteamDoubleRefresh=true;
@@ -1785,11 +1794,8 @@ function MitarbeiterEntwicklungsteamLoeschen()
 		return false;
 	}
 
-	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
-	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-
-	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
-	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id"] : "mitarbeiter-entwicklungsteam-treecol-entwicklungsteam_id";
+	entwicklungsteam_id=tree.view.getCellText(tree.currentIndex,col);
 
 	if(confirm("Wollen Sie diesen Eintrag wirklich loeschen?"))
 	{
@@ -1797,9 +1803,7 @@ function MitarbeiterEntwicklungsteamLoeschen()
 		var req = new phpRequest(url,'','');
 
 		req.add('type', 'entwicklungsteamdelete');
-
-		req.add('studiengang_kz', studiengang_kz);
-		req.add('mitarbeiter_uid', mitarbeiter_uid);
+		req.add('entwicklungsteam_id', entwicklungsteam_id);
 
 		var response = req.executePOST();
 

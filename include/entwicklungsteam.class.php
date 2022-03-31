@@ -243,6 +243,7 @@ class entwicklungsteam extends basis_db
 			{
 				$obj = new entwicklungsteam();
 
+				$obj->entwicklungsteam_id = $row->entwicklungsteam_id;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->besqualcode = $row->besqualcode;
