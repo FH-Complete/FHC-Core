@@ -72,7 +72,7 @@ class studienplatz extends basis_db
 		parent::__construct();
 
 		if(!is_null($studienplatz_id))
-			$this->load($studienplatz_id);
+			$this->loadStudienplatz($studienplatz_id);
 	}
 
 	public function __set($name,$value)
