@@ -6,7 +6,7 @@ class Issues extends Auth_Controller
 {
 	private $_uid;
 
-	const FUNKTION_KURZBZ = 'ass'; // // user having this funktion can see issues for oes assigned with this funktion
+	const FUNKTION_KURZBZ = 'ass'; // user having this funktion can see issues for oes assigned with this funktion
 	const BERECHTIGUNG_KURZBZ = 'system/issues_verwalten'; // user having this permission can see issues for oes assigned with this permission
 
 	public function __construct()
