@@ -6057,11 +6057,11 @@ if ($result = @$db->db_query("SELECT column_default FROM INFORMATION_SCHEMA.COLU
 }
 
 //DELETE PRIMARY KEY pk_tbl_entwicklungsteam (mitarbeiter_uid, studiengang_kz) entfernen
-if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_tbl_entwicklungsteam'"))
+if ($result = @$db->db_query("SELECT * FROM pg_class WHERE relname='pk_tbl_entwicklungsteam'"))
 {
 	if($db->db_num_rows($result)==1)
 	{
-		$qry = "ALTER TABLE bis.tbl_entwicklungsteam DROP CONSTRAINT pk_tbl_entwicklungsteam;";
+		$qry = "DROP INDEX bis.pk_tbl_entwicklungsteam;";
 
 		if (!$db->db_query($qry))
 			echo '<strong>bis.tbl_entwicklungsteam: '.$db->db_last_error().'</strong><br>';
