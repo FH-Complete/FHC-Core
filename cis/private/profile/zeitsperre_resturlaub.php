@@ -45,7 +45,7 @@ $uid = get_uid();
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
-$typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV", "CovidSB", "CovidKS");
+$typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV", "CovidSB", "CovidKS","Mutter");
 
 if(isset($_GET['type']))
 	$type=$_GET['type'];
@@ -312,7 +312,8 @@ function showHideStudeDropDown()
 	|| dd.options[dd.selectedIndex].value == 'DienstF'
 	|| dd.options[dd.selectedIndex].value == 'DienstV'
 	|| dd.options[dd.selectedIndex].value == 'CovidSB'
-	|| dd.options[dd.selectedIndex].value == 'CovidKS')
+	|| dd.options[dd.selectedIndex].value == 'CovidKS'
+	|| dd.options[dd.selectedIndex].value == 'Mutter')
 	{
 		document.getElementById('vonStd').style.visibility = 'hidden';
 		document.getElementById('bisStd').style.visibility = 'hidden';
