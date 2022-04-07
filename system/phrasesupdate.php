@@ -13829,9 +13829,9 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "assign",
+				'text' => "Assign Responsibility",
 				'description' => '',
-				'insertvon' => 'Assign Responsibility'
+				'insertvon' => 'system'
 			)
 		)
 	),
