@@ -5940,167 +5940,6 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_zeita
 			echo 'Index fuer campus.tbl_zeitaufzeichnung.uid hinzugefuegt<br>';
 	}
 }
-
-// Add table campus.tbl_zeitwunsch_gueltigkeit and migrate initial data
-if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitwunsch_gueltigkeit LIMIT 1;"))
-{
-	$qry = "
-		CREATE TABLE campus.tbl_zeitwunsch_gueltigkeit 
-		(
-			zeitwunsch_gueltigkeit_id INTEGER NOT NULL,
-			mitarbeiter_uid CHARACTER VARYING(32) NOT NULL,
-			von DATE,
-			bis DATE,
-			insertamum TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
-			insertvon CHARACTER VARYING(32),
-			updateamum TIMESTAMP WITHOUT TIME ZONE,
-			updatevon CHARACTER VARYING(32)
-		);
-
-		CREATE SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id
-			INCREMENT BY 1
-			NO MAXVALUE
-			NO MINVALUE
-			CACHE 1;
-
-		-- Add Primary Key
-		ALTER TABLE campus.tbl_zeitwunsch_gueltigkeit ADD CONSTRAINT pk_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id PRIMARY KEY (zeitwunsch_gueltigkeit_id);
-		ALTER TABLE campus.tbl_zeitwunsch_gueltigkeit ALTER COLUMN zeitwunsch_gueltigkeit_id SET DEFAULT nextval('campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id');
-
-		-- Add Permissions
-		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO vilesci;
-		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO web;
-
-		GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_zeitwunsch_gueltigkeit TO vilesci;
-		GRANT SELECT, INSERT, UPDATE ON campus.tbl_zeitwunsch_gueltigkeit TO web;
-	
-		-- Initial data migration
-		INSERT INTO campus.tbl_zeitwunsch_gueltigkeit
-		(
-			mitarbeiter_uid,
-			von,
-			bis,
-			insertamum,
-			insertvon,
-			updateamum,
-			updatevon
-		)
-		SELECT * FROM 
-	  	(
-	  	    -- Unique Mitarbeiter from Zeitwunsch Tabelle, Start and End of actual Studiensemester
-			SELECT DISTINCT mitarbeiter_uid,
-			(SELECT start FROM public.tbl_studiensemester WHERE start <= NOW() AND ende >= NOW()),
-			(SELECT ende FROM public.tbl_studiensemester WHERE start <= NOW() AND ende >= NOW()),
-			NOW(),
-			'system',
-			NOW(),
-			'system'
-			FROM campus.tbl_zeitwunsch
-			
-			UNION
-			
-			-- Unique Mitarbeiter from Zeitwunsch Tabelle, Start of next Studiensemester and open end
-			SELECT DISTINCT mitarbeiter_uid,
-			(SELECT start FROM public.tbl_studiensemester WHERE ende > NOW() LIMIT 1),
-			NULL::DATE AS \"ende\",
-			NOW(),
-			'system',
-			NOW(),
-			'system'
-			FROM campus.tbl_zeitwunsch
-			ORDER BY start, mitarbeiter_uid
-		) AS init_data
-	";
-
-	if(!$db->db_query($qry))
-		echo '<strong>campus.tbl_zeitwunsch_gueltigkeit: '.$db->db_last_error().'</strong><br>';
-	else
-		echo 'campus.tbl_zeitwunsch_gueltigkeit: Tabelle hinzugefuegt<br>';
-}
-
-// Add column zeitwunsch_id (as new primary key) and zeitwunsch_gueltigkeit_id to campus.tbl_zeitwunsch
-if (!$result = @$db->db_query("SELECT zeitwunsch_id FROM campus.tbl_zeitwunsch LIMIT 1"))
-{
-	$qry = " 
-		ALTER TABLE campus.tbl_zeitwunsch DROP CONSTRAINT IF EXISTS pk_tbl_zeitwunsch; -- Drop combined pk stunde/mitarbeiter_uid/tag
-
-		-- Add primary key and foreign key
-		ALTER TABLE campus.tbl_zeitwunsch ADD COLUMN zeitwunsch_id INTEGER;
-		ALTER TABLE campus.tbl_zeitwunsch ADD COLUMN zeitwunsch_gueltigkeit_id INTEGER;
-
-		-- Add comments
-		COMMENT ON COLUMN campus.tbl_zeitwunsch.zeitwunsch_gueltigkeit_id IS 'Ordnet die Zeitwuensche einer Gueltigkeitsdauer von-bis zu';
-		COMMENT ON COLUMN campus.tbl_zeitwunsch.mitarbeiter_uid IS 'DEPRECATED';
-
-		CREATE SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id
-			INCREMENT BY 1
-			NO MAXVALUE
-			NO MINVALUE
-			CACHE 1;
-
-		ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_id SET DEFAULT nextval('campus.seq_zeitwunsch_zeitwunsch_id'); 
-		UPDATE campus.tbl_zeitwunsch SET zeitwunsch_id = nextval('campus.seq_zeitwunsch_zeitwunsch_id');
-
-		ALTER TABLE campus.tbl_zeitwunsch ADD CONSTRAINT pk_zeitwunsch_zeitwunsch_id PRIMARY KEY (zeitwunsch_id);
-		ALTER TABLE campus.tbl_zeitwunsch ADD CONSTRAINT fk_zeitwunsch_zeitwunsch_gueltigkeit_id FOREIGN KEY (zeitwunsch_gueltigkeit_id) REFERENCES campus.tbl_zeitwunsch_gueltigkeit(zeitwunsch_gueltigkeit_id) ON DELETE RESTRICT ON UPDATE CASCADE;
- 
-		-- Set initial zeitwunsch_gueltigkeit_id values to Gueltigkeitszeitraum of actual Studiensemester
-		UPDATE campus.tbl_zeitwunsch
-		SET zeitwunsch_gueltigkeit_id = (
-			SELECT zeitwunsch_gueltigkeit_id
-			FROM campus.tbl_zeitwunsch_gueltigkeit zwg
-			WHERE tbl_zeitwunsch.mitarbeiter_uid = zwg.mitarbeiter_uid
-			AND (zwg.von <= NOW() AND zwg.bis >= NOW())
-		);
-
-		-- Duplicate existing data and set initial zeitwunsch_gueltigkeit_id values to Gueltigkeitszeitraum of next Studiensemester
-		INSERT INTO campus.tbl_zeitwunsch
-		(
-			stunde,
-			mitarbeiter_uid,
-			tag,
-			gewicht,
-			updateamum,
-			updatevon,
-			insertamum,
-			insertvon,
-			zeitwunsch_gueltigkeit_id
-		)
-		SELECT * FROM 
-		(
-		    SELECT 
-				stunde,
-				mitarbeiter_uid,
-				tag,
-				gewicht,
-				NOW(),
-				'system',
-				NOW(),
-				'system',
-				(
-				    SELECT zeitwunsch_gueltigkeit_id 
-					FROM campus.tbl_zeitwunsch_gueltigkeit zwg
-					WHERE campus.tbl_zeitwunsch.mitarbeiter_uid = zwg.mitarbeiter_uid
-					AND bis IS NULL
-				) AS \"zeitwunsch_gueltigkeit_id\"
-			FROM campus.tbl_zeitwunsch
-		) AS basic_zeitwunsch_data;
-		
-		-- Set primary key and foreign key NOT NULL
-		ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_id SET NOT NULL;
-		ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_gueltigkeit_id SET NOT NULL;
-
-		-- Set permissions
-		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO vilesci;
-		GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO web;
-	";
-
-	if(!$db->db_query($qry))
-		echo '<strong>campus.tbl_zeitwunsch: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>campus.tbl_zeitwunsch: Neue Spalte zeitwunsch_id hinzugefuegt.';
-}
-
 // Change size of wawi.tbl_kostenstelle.kostenstelle_nr from character varying(4) to character varying(6)
 if ($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='wawi' AND TABLE_NAME='tbl_kostenstelle' AND COLUMN_NAME = 'kostenstelle_nr' AND character_maximum_length < 6"))
 {
@@ -6123,6 +5962,126 @@ if(!$result = @$db->db_query("SELECT behebung_parameter FROM system.tbl_issue LI
 		echo '<strong>system.tbl_issue: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added column behebung_parameter to table system.tbl_issue';
+}
+
+// Add table campus.tbl_zeitwunsch_gueltigkeit and migrate initial data
+if($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table_schema LIKE 'campus' AND table_name = 'tbl_zeitwunsch_gueltigkeit'"))
+{
+	if ($db->db_fetch_object($result) == false)
+	{
+		$qry = "
+			CREATE TABLE campus.tbl_zeitwunsch_gueltigkeit
+			(
+				zeitwunsch_gueltigkeit_id INTEGER NOT NULL,
+				mitarbeiter_uid CHARACTER VARYING(32) NOT NULL,
+				von DATE,
+				bis DATE,
+				insertamum TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+				insertvon CHARACTER VARYING(32),
+				updateamum TIMESTAMP WITHOUT TIME ZONE,
+				updatevon CHARACTER VARYING(32)
+			);
+
+			CREATE SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id
+				INCREMENT BY 1
+				NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+
+			-- Add Primary Key
+			ALTER TABLE campus.tbl_zeitwunsch_gueltigkeit ADD CONSTRAINT pk_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id PRIMARY KEY (zeitwunsch_gueltigkeit_id);
+			ALTER TABLE campus.tbl_zeitwunsch_gueltigkeit ALTER COLUMN zeitwunsch_gueltigkeit_id SET DEFAULT nextval('campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id');
+
+			-- Add Permissions
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO web;
+
+			GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_zeitwunsch_gueltigkeit TO vilesci;
+			GRANT SELECT, INSERT, UPDATE ON campus.tbl_zeitwunsch_gueltigkeit TO web;
+
+			-- Initial data migration
+			INSERT INTO campus.tbl_zeitwunsch_gueltigkeit
+			(
+				mitarbeiter_uid,
+				von,
+				bis,
+				insertamum,
+				insertvon,
+				updateamum,
+				updatevon
+			)
+			SELECT * FROM
+			(
+				-- Unique Mitarbeiter from Zeitwunsch Tabelle, Start of actual Studiensemester and open end
+				SELECT DISTINCT mitarbeiter_uid,
+				(SELECT start FROM public.tbl_studiensemester WHERE start <= NOW() AND ende >= NOW()),
+				NULL::DATE AS \"ende\",
+				NOW(),
+				'system',
+				NOW(),
+				'system'
+				FROM campus.tbl_zeitwunsch
+				ORDER BY mitarbeiter_uid
+			) AS init_data
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitwunsch_gueltigkeit: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'campus.tbl_zeitwunsch_gueltigkeit: Tabelle hinzugefuegt<br>';
+	}
+}
+
+// Add column zeitwunsch_id (as new primary key) and zeitwunsch_gueltigkeit_id to campus.tbl_zeitwunsch
+if ($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_zeitwunsch' AND column_name IN ('zeitwunsch_id', 'zeitwunsch_gueltigkeit_id')"))
+{
+	if ($db->db_num_rows($result) <> 2)
+	{
+		$qry = "
+			ALTER TABLE campus.tbl_zeitwunsch DROP CONSTRAINT IF EXISTS pk_tbl_zeitwunsch; -- Drop combined pk stunde/mitarbeiter_uid/tag
+
+			-- Add primary key and foreign key
+			ALTER TABLE campus.tbl_zeitwunsch ADD COLUMN IF NOT EXISTS zeitwunsch_id INTEGER;
+			ALTER TABLE campus.tbl_zeitwunsch ADD COLUMN IF NOT EXISTS zeitwunsch_gueltigkeit_id INTEGER;
+
+			-- Add comments
+			COMMENT ON COLUMN campus.tbl_zeitwunsch.zeitwunsch_gueltigkeit_id IS 'Ordnet die Zeitwuensche einer Gueltigkeitsdauer von-bis zu';
+			COMMENT ON COLUMN campus.tbl_zeitwunsch.mitarbeiter_uid IS 'DEPRECATED';
+
+			CREATE SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id
+				INCREMENT BY 1
+				NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+
+			ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_id SET DEFAULT nextval('campus.seq_zeitwunsch_zeitwunsch_id');
+			UPDATE campus.tbl_zeitwunsch SET zeitwunsch_id = nextval('campus.seq_zeitwunsch_zeitwunsch_id');
+
+			ALTER TABLE campus.tbl_zeitwunsch ADD CONSTRAINT pk_zeitwunsch_zeitwunsch_id PRIMARY KEY (zeitwunsch_id);
+			ALTER TABLE campus.tbl_zeitwunsch ADD CONSTRAINT fk_zeitwunsch_zeitwunsch_gueltigkeit_id FOREIGN KEY (zeitwunsch_gueltigkeit_id) REFERENCES campus.tbl_zeitwunsch_gueltigkeit(zeitwunsch_gueltigkeit_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			-- Set initial zeitwunsch_gueltigkeit_id values to Gueltigkeitszeitraum of actual Studiensemester
+			UPDATE campus.tbl_zeitwunsch
+			SET zeitwunsch_gueltigkeit_id = (
+				SELECT zeitwunsch_gueltigkeit_id
+				FROM campus.tbl_zeitwunsch_gueltigkeit zwg
+				WHERE tbl_zeitwunsch.mitarbeiter_uid = zwg.mitarbeiter_uid
+			);
+
+			-- Set primary key and foreign key NOT NULL
+			ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_id SET NOT NULL;
+			ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_gueltigkeit_id SET NOT NULL;
+
+			-- Set permissions
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO web;
+		";
+
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitwunsch: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo '<br>campus.tbl_zeitwunsch: Neue Spalte zeitwunsch_id hinzugefuegt.';
+	}
 }
 
 // Add index beschreibung to system.tbl_webservicelog

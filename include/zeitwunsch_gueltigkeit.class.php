@@ -138,58 +138,45 @@ class zeitwunsch_gueltigkeit extends basis_db
     public function getByUID($uid, $limit = null, $activeOnly = true, $bis = null)
     {
         $qry = '
-            SELECT zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, bis, 
-                   insertamum, insertvon, updateamum, updatevon, 
-                   studiensemester_kurzbz, start, ende
-            FROM (
-                SELECT DISTINCT ON (bis) bis, zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, insertamum, insertvon, updateamum, updatevon, studiensemester_kurzbz, start, ende
-                FROM campus.tbl_zeitwunsch_gueltigkeit zwg, public.tbl_studiensemester
-                WHERE zwg.mitarbeiter_uid =  '.$this->db_add_param($uid);
+            WITH basic_select AS (
+                SELECT *,
+                    row_number() over (PARTITION BY studiensemester_kurzbz ORDER BY von DESC) r 
+                FROM campus.tbl_zeitwunsch_gueltigkeit, public.tbl_studiensemester
+                WHERE mitarbeiter_uid = ' . $this->db_add_param($uid);
 
         // Wenn Bis-Datum angegeben
         if (!is_null($bis))
         {
             // Zeitwuensche nur bis zum angegebenen Bis-Datum
             $qry.= '
-                AND (von < ende AND '. $this->db_add_param($bis). '::date > start)
+                AND (von < ende AND '. $this->db_add_param($bis). '::date > start))
             ';
         }
+        // Wenn kein Bis-Datum angegeben ist
         else
         {
-            // Alle Zeitwuensche
-            $qry.= '
-                AND (von < ende AND COALESCE(bis, \'2999-12-31\'::date ) > start)
-            ';
+            // Zeitwuensche bis zum Semesterende des chronologisch letzten Zeitwunsches (also der ZWG, wo bis NULL ist)
+            $qry.= ' 
+                AND (von < ende AND COALESCE(bis, (SELECT ende FROM public.tbl_studiensemester WHERE von BETWEEN start AND ende)) > start))';
         }
 
         $qry.= '
-                ORDER BY bis, von DESC, bis DESC, start ASC
-                ) temp
-            ';
-
-        // Nach Gueltigkeits-Startdatum sortieren, zuerst die zuletzt gueltigen
-        $qry.= '
-                ORDER BY von DESC, bis DESC 
-            ';
+            SELECT *
+            FROM basic_select
+        ';
 
         // Wenn nur aktive Zeitwunschgueltigkeiten angezeigt werden sollen
         if ($activeOnly)
         {
-            // ...mit distinct die zuletzt erstellten pro Studiensemester filtern
-            $qry = '
-                SELECT DISTINCT ON (studiensemester_kurzbz) studiensemester_kurzbz, 
-                    start, ende, zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, bis, 
-                    insertamum, insertvon, updateamum, updatevon 
-                FROM ('. $qry. ') temp
-                ORDER BY studiensemester_kurzbz, von DESC, bis DESC 
-            ';
+            $qry.= ' WHERE r = 1';
         }
+
+        $qry.= ' ORDER BY von DESC, start DESC';
 
         // Wenn Limit angegeben
         if (!is_null($limit))
         {
-            // Ausgabe limitieren
-            $qry.= 'LIMIT '.$this->db_add_param($limit);
+            $qry.= ' LIMIT '.$this->db_add_param($limit);
         }
 
         if ($result = $this->db_query($qry))
