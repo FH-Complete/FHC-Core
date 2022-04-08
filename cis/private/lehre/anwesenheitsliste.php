@@ -237,6 +237,10 @@ $covidhelper = new CovidHelper();
 				$aw_content='';
 			if(defined('CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_BILD_ANZEIGEN') && !CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_BILD_ANZEIGEN)
 				$awbild_content='';
+			if( defined('CIS_SHOW_COVID_STATUS') && !CIS_SHOW_COVID_STATUS )
+			{
+				$covid_content = '';
+			}
 			
 		  	echo "<table cellpadding='0' cellspacing='0'>
 				

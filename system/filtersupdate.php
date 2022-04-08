@@ -357,6 +357,33 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
+		'app' => 'core',
+		'dataset_name' => 'leistungsstipendium',
+		'filter_kurzbz' => 'LeistungsstipendiumAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Leistungsstipendium - Alle",
+				"columns": [
+					{"name" : "Vorname"},
+					{"name" : "Nachname"},
+					{"name" : "Buchungsdatum"},
+					{"name" : "Betrag"},
+					{"name" : "Buchungstyp"},
+					{"name" : "VorgangsId"},
+					{"name" : "FoerderfallId"},
+					{"name" : "LeistungsdatenId"},
+					{"name" : "startjahr"},
+					{"name" : "endjahr"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
 		'app' => 'reihungstest',
 		'dataset_name' => 'overview',
 		'filter_kurzbz' => 'Reihungstest',
@@ -999,7 +1026,9 @@ $filters = array(
 					{"name": "nachname"},
 					{"name": "matrikelnummer"},
 					{"name": "studiengang"},
-					{"name": "studiensemester"}
+					{"name": "studiensemester"},
+					{"name": "last_status"},
+					{"name": "bismelden"}
 				],
 				"filters": []
 			}

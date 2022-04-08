@@ -254,4 +254,6 @@ define('JAHRESPLAN_TICKET_LINK','https://bug.technikum-wien.at/otrs/index.pl?Act
 //Gibt an ob der Block zu Verplanung in geteilter Arbeitszeit bei den Zeitwünschen angezeigt wird. Default: false
 define('CIS_ZEITWUNSCH_GD', false);
 
+// Covid-Status anzeigen
+define('CIS_SHOW_COVID_STATUS', false);
 ?>
