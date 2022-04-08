@@ -210,7 +210,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'save')
             {
                 // Wenn am selben Tag schon neue ZWG gespeichert wurde, keine neue ZWG anlegen, sondern diese nur updaten
                 // Verhindert mehrfache Eintraege, wenn oefters zwischengespeichert wird.
-                if ((new DateTime($akt_ss_zwg->insertamum))->format('Y-m-d') == (new Datetime())->format('Y-m-d'))
+                if ((new DateTime($akt_ss_zwg->von))->format('Y-m-d') == (new Datetime())->format('Y-m-d'))
                 {
                     updateZWG($uid, $akt_ss_zwg->zeitwunsch_gueltigkeit_id, $akt_ss_zwg->bis);
 
@@ -590,9 +590,8 @@ function getStgMail($stgKz_arr)
 					else
 					{
 						$zustimmung = ($gd->selbstverwaltete_pause) ? ' erteilt' : 'abgelehnt';
-						echo '<b>Zustimmung für '.$next_ss->studiensemester_kurzbz.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</b>';
+						echo '<br><b>Zustimmung für '.$next_ss->studiensemester_kurzbz.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</b>';
 					}
-					//var_dump($gd);
 					?>
 
 				</p>
@@ -735,7 +734,7 @@ function getStgMail($stgKz_arr)
                 echo '<div class="panel panel-danger">';
                     echo '<div class="panel-body">';
                     echo '<span class="text-danger"><b>'. $p->t("zeitwunsch/bearbeitungDeaktiviert"). ': </b></span>';
-                    echo $p->t("zeitwunsch/bearbeitungDeaktiviertText", array($selected_ss, implode($stgMail_arr, '; '))). ' 
+                    echo $p->t("zeitwunsch/bearbeitungDeaktiviertText", array($selected_ss, implode($stgMail_arr, '; '))). '
                         <a id="bearbeitung-aktivieren" style="cursor:pointer;">'. $p->t("zeitwunsch/bearbeitungAktivieren"). '</a><br>
                         <span><b>'. $p->t("zeitwunsch/kompetenzfeldWirdInformiert") . '</b></span>
                         </span>';
