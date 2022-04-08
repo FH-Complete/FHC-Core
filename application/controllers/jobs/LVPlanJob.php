@@ -177,11 +177,23 @@ class LVPlanJob extends JOB_Controller
         // Get all lectors, who updated their Zeitwunsch today
         $db = new DB_Model();
         $result = $db->execReadOnlyQuery('
-            SELECT  mitarbeiter_uid, von, bis
-            FROM    campus.tbl_zeitwunsch_gueltigkeit
-            WHERE   updateamum::date = NOW()::date
-            -- dont get updated, if they were also inserted today
-            AND     insertamum::date != NOW()::date
+		    SELECT
+				zwg.mitarbeiter_uid, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.oe_kurzbz
+            FROM
+				campus.tbl_zeitwunsch_gueltigkeit zwg
+				JOIN lehre.tbl_stundenplandev stpl
+					ON(
+						stpl.mitarbeiter_uid=zwg.mitarbeiter_uid
+						AND stpl.datum BETWEEN zwg.von AND COALESCE(zwg.bis, \'2999-12-31\')
+						AND (zwg.insertamum::date = (NOW()-\'1 days\'::interval)::date
+							OR
+							zwg.updateamum::date = (NOW()-\'1 days\'::interval)::date)
+						AND stpl.datum > now()
+					)
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+            GROUP BY
+				zwg.mitarbeiter_uid, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.oe_kurzbz
         ');
 
         if (!hasData($result))
@@ -191,99 +203,39 @@ class LVPlanJob extends JOB_Controller
 
         $uidByStg_arr = array(); // Mail data for Studiengang
         $uidByOe_arr = array();  // Mail data for Kompetenzfeld
+		$uid_arr = array();  // Mail data for Kompetenzfeld
 
         // Loop through lectors, who updated their Zeitwunsch today
-        $zwg_arr = getData($result);
-        foreach ($zwg_arr as $zwg)
+        $changed_arr = getData($result);
+        foreach ($changed_arr as $row)
         {
-            $next = $this->StudiensemesterModel->getNext();
 
-            // Get Studiensemester concerend by Zeitwunschgueltigkeit
-            // If Zeitwunschgueltigkeit Ende is null, get only till next Studiensemester, as LVs will be only
-            // assigned for actual or next Studiensemester
-            $result = $this->StudiensemesterModel->getByDate(
-                $zwg->von,
-                is_null($zwg->bis) ? $next->retval[0]->ende : $zwg->bis
-            );
-            $studiensemester_arr = getData($result);
+			// Add unique lector array
+			if (!in_array($row->mitarbeiter_uid, $uid_arr))
+			{
+				$uid_arr[]= $row->mitarbeiter_uid;
+			}
 
-            // Get Stundenplan entries of lector of Studiensemester concerned by Zeitwunschgueltigkeit
-            $result = $this->StundenplandevModel
-                ->getStundenplanData(
-                    null,
-                    implode(array_column($studiensemester_arr, 'studiensemester_kurzbz'), ', '),
-                    null,
-                    $zwg->mitarbeiter_uid,
-                    null,
-                    true    //...but only from now on
-                );
-
-            if (!hasData($result))
+            // Build unique Studiengang array
+            if (!array_key_exists($row->studiengang_kz, $uidByStg_arr))
             {
-                continue;   // Continue if lector has no Stundenplan entries
+                $uidByStg_arr[$row->studiengang_kz] = array($row->mitarbeiter_uid);
+
+            }
+            elseif (!in_array($row->mitarbeiter_uid, $uidByStg_arr[$row->studiengang_kz]))
+            {
+                $uidByStg_arr[$row->studiengang_kz][]= $row->mitarbeiter_uid;
             }
 
-            // Loop through Stundenplan entries
-            $stundenplanData_arr = getData($result);
-            foreach ($stundenplanData_arr as $stundenplanData)
+            // Build unique Kompetenzfeld array
+            if (!array_key_exists($row->oe_kurzbz, $uidByOe_arr))
             {
-                // Get LE of Stundenplan entry
-                $result = $this->LehreinheitModel->load($stundenplanData->lehreinheit_id);
+                $uidByOe_arr[$row->oe_kurzbz] = array($row->mitarbeiter_uid);
 
-                if (!hasData($result))
-                {
-                    // Return log error msg if no LE found and continue
-                    $this->logError('
-                        LVPlanJob / mailUpdatedZeitwuensche did not find Lehreinheit for '. $zwg->mitarbeiter_uid
-                    );
-                    continue;
-                }
-
-                $le = getData($result)[0];
-
-                // GET LV by LE of Stundenplan entry
-                $result = $this->LehrveranstaltungModel->load($le->lehrveranstaltung_id);
-
-                if (!hasData($result))
-                {
-                    // Return log error msg if no LV found and continue
-                    $this->logError('
-                        LVPlanJob / mailUpdatedZeitwuensche did not find Lehrveranstaltung for '. $zwg->mitarbeiter_uid
-                    );
-                    continue;
-                }
-
-                $lv = getData($result)[0];
-
-                // Build unique Studiengang array
-                if (!array_key_exists($lv->studiengang_kz, $uidByStg_arr))
-                {
-                    $uidByStg_arr[$lv->studiengang_kz] = array($zwg->mitarbeiter_uid);
-
-                }
-                else
-                {
-                    // Add unique lector array to Studiengang array
-                    if (!in_array($zwg->mitarbeiter_uid, $uidByStg_arr[$lv->studiengang_kz]))
-                    {
-                        $uidByStg_arr[$lv->studiengang_kz][]= $zwg->mitarbeiter_uid;
-                    }
-                }
-
-                // Build unique Kompetenzfeld array
-                if (!array_key_exists($lv->oe_kurzbz, $uidByOe_arr))
-                {
-                    $uidByOe_arr[$lv->oe_kurzbz] = array($zwg->mitarbeiter_uid);
-
-                }
-                else
-                {
-                    // Add unique lector array to Kompetenzfeld array
-                    if (!in_array($zwg->mitarbeiter_uid, $uidByOe_arr[$lv->oe_kurzbz]))
-                    {
-                        $uidByOe_arr[$lv->oe_kurzbz][]= $zwg->mitarbeiter_uid;
-                    }
-                }
+            }
+            elseif (!in_array($row->mitarbeiter_uid, $uidByOe_arr[$row->oe_kurzbz]))
+            {
+                $uidByOe_arr[$row->oe_kurzbz][]= $row->mitarbeiter_uid;
             }
         }
 
@@ -302,7 +254,7 @@ class LVPlanJob extends JOB_Controller
         }
 
         // Send mail to LV Planung
-        $result = $this->_sendMailToLvPlanung($zwg_arr);
+        $result = $this->_sendMailToLvPlanung($uid_arr);
         if (isError($result))
         {
             $this->logError(getError($result));
@@ -330,7 +282,7 @@ class LVPlanJob extends JOB_Controller
             $lektorenTabelle = '
             <table><thead>
                 <tr>
-                    <th style="text-align:left">Name</th> 
+                    <th style="text-align:left">Name</th>
                     <th style="text-align:left">UID</th>
                 </tr>
             </thead><tbody>
@@ -366,7 +318,7 @@ class LVPlanJob extends JOB_Controller
                 $errorReceiverUid_arr[]= $stgMail;
             }
         }
-        
+
         if (isset($errorReceiverUid_arr))
         {
             return error('Mail updated Zeitwuensche could not be sent to :'. implode($errorReceiverUid_arr, ','));
@@ -388,50 +340,60 @@ class LVPlanJob extends JOB_Controller
         {
             // Get KF Leitung eMail
             $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
-            $result = $this->BenutzerfunktionModel->loadWhere(array(
-                'funktion_kurzbz' => 'Leitung',
-                'oe_kurzbz' => $oe_kurzbz
-            ));
-            $kfMail = $result->retval[0]->uid. '@'. DOMAIN;
+			$result = $this->BenutzerfunktionModel->getBenutzerFunktionen(
+				'Leitung',
+				$oe_kurzbz,
+				$activeoeonly = true,
+				$activebenonly = true
+			);
 
-            $lektorenTabelle = '
-                <table><thead>
-                    <tr>
-                        <th style="text-align:left">Name</th> 
-                        <th style="text-align:left">UID</th>
-                    </tr>
-                </thead><tbody>
-            ';
+			if(isSuccess($result) && hasData($result))
+			{
+				$empfaenger = array();
 
-            foreach($uid_arr as $uid)
-            {
-                $person = $this->PersonModel->getByUid($uid);
-                $lektorenTabelle.= '
-                    <tr>
-                        <td style="text-align:left">'. getData($person)[0]->vorname. ' '. getData($person)[0]->nachname. '</td>
-                        <td style="text-align:left">['. $uid. ']</td>
-                    </tr>
-                ';
-            }
+				foreach(getData($result) as $row)
+            		$empfaenger[] = $row->uid. '@'. DOMAIN;
+				$kfMail = implode(',',$empfaenger);
 
-            $lektorenTabelle.= '</tbody></table>';
+	            $lektorenTabelle = '
+	                <table><thead>
+	                    <tr>
+	                        <th style="text-align:left">Name</th>
+	                        <th style="text-align:left">UID</th>
+	                    </tr>
+	                </thead><tbody>
+	            ';
 
-            $contentData_arr = array(
-                'datentabelle' => $lektorenTabelle
-            );
+	            foreach($uid_arr as $uid)
+	            {
+	                $person = $this->PersonModel->getByUid($uid);
+	                $lektorenTabelle.= '
+	                    <tr>
+	                        <td style="text-align:left">'. getData($person)[0]->vorname. ' '. getData($person)[0]->nachname. '</td>
+	                        <td style="text-align:left">['. $uid. ']</td>
+	                    </tr>
+	                ';
+	            }
 
-            // Send mail
-            if (!sendSanchoMail(
-                'ZeitwunschUpdateMail',
-                $contentData_arr,
-                $kfMail,
-                'Änderung von Zeitwünschen',
-                'sancho_header_min_bw.jpg',
-                'sancho_footer_min_bw.jpg'
-            ))
-            {
-                $errorReceiverUid_arr[]= $kfMail;
-            }
+	            $lektorenTabelle.= '</tbody></table>';
+
+	            $contentData_arr = array(
+	                'datentabelle' => $lektorenTabelle
+	            );
+
+	            // Send mail
+	            if (!sendSanchoMail(
+	                'ZeitwunschUpdateMail',
+	                $contentData_arr,
+	                $kfMail,
+	                'Änderung von Zeitwünschen',
+	                'sancho_header_min_bw.jpg',
+	                'sancho_footer_min_bw.jpg'
+	            ))
+	            {
+	                $errorReceiverUid_arr[]= $kfMail;
+	            }
+			}
         }
 
         if (isset($errorReceiverUid_arr))
@@ -453,7 +415,7 @@ class LVPlanJob extends JOB_Controller
         $lektorenTabelle = '
                 <table><thead>
                     <tr>
-                        <th style="text-align:left">Name</th> 
+                        <th style="text-align:left">Name</th>
                         <th style="text-align:left">UID</th>
                     </tr>
                 </thead><tbody>
@@ -461,11 +423,11 @@ class LVPlanJob extends JOB_Controller
 
         foreach($data_arr as $lector)
         {
-            $person = $this->PersonModel->getByUid($lector->mitarbeiter_uid);
+            $person = $this->PersonModel->getByUid($lector);
             $lektorenTabelle.= '
                     <tr>
                         <td style="text-align:left">'. getData($person)[0]->vorname. ' '. getData($person)[0]->nachname. '</td>
-                        <td style="text-align:left">['. $lector->mitarbeiter_uid. ']</td>
+                        <td style="text-align:left">['. $lector. ']</td>
                     </tr>
                 ';
         }

@@ -94,11 +94,11 @@ class Stundenplandev_model extends DB_Model
 
         if ($lehrveranstaltung_id != '')
         {
-            $qry.=" 
+            $qry.="
                 lehreinheit_id IN (
                     SELECT  lehreinheit_id FROM lehre.tbl_lehreinheit
                     WHERE   lehrveranstaltung_id = ?
-                    AND     studiensemester_kurzbz = ? 
+                    AND     studiensemester_kurzbz = ?
                 )";
 
             $params[]= $lehrveranstaltung_id;
@@ -113,13 +113,13 @@ class Stundenplandev_model extends DB_Model
         }
         elseif ($mitarbeiter_uid != '')
         {
-            $qry.= " 
-                mitarbeiter_uid = ? 
+            $qry.= "
+                mitarbeiter_uid = ?
                 AND lehreinheit_id IN (
 				    SELECT  lehreinheit_id
 				    FROM    lehre.tbl_lehreinheitmitarbeiter
 					JOIN    lehre.tbl_lehreinheit USING (lehreinheit_id)
-				    WHERE   mitarbeiter_uid = ? 
+				    WHERE   mitarbeiter_uid = ?
 				    AND     studiensemester_kurzbz IN ( ? )
                 )";
             $params[] = $mitarbeiter_uid;
@@ -128,11 +128,11 @@ class Stundenplandev_model extends DB_Model
         }
         elseif ($student_uid != '')
         {
-            $qry.=" 
+            $qry.="
                 lehreinheit_id IN (
                     SELECT  lehreinheit_id
                     FROM    campus.vw_student_lehrveranstaltung
-                    WHERE   uid = ? 
+                    WHERE   uid = ?
                     AND     studiensemester_kurzbz = ?
                 )";
 
@@ -144,7 +144,7 @@ class Stundenplandev_model extends DB_Model
 
         if($nurBevorstehende)
         {
-            $qry.= " AND datum >= NOW()::date ";
+            $qry.= " AND stpl.datum >= NOW()::date ";
         }
 
         $qry.= "
