@@ -108,7 +108,7 @@ class IssuesZustaendigkeiten extends Auth_Controller
 
 		$result = array(
 			'mitarbeiter' => getData($mitarbeiterRes),
-			'oe_kurzbz' => getData($oeRes),
+			'oe' => getData($oeRes),
 			'funktion' => getData($funktionRes),
 		);
 

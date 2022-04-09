@@ -19,7 +19,7 @@ $filterWidgetArray = array(
     'tableUniqueId' => 'issuesZustaendigkeiten',
     'requiredPermissions' => 'admin',
     'datasetRepresentation' => 'tablesorter',
-	'additionalColumns' => array(ucfirst($this->p->t('ui', 'loeschen'))),
+	'additionalColumns' => array('Delete'),
     'columnsAliases' => array(
     	'ID',
 		ucfirst($this->p->t('fehlermonitoring', 'fehlercode')),
@@ -38,7 +38,7 @@ $filterWidgetArray = array(
     ),
 	'formatRow' => function($datasetRaw) {
 
-		$datasetRaw->{ucfirst($this->p->t('ui', 'loeschen'))} =
+		$datasetRaw->{'Delete'} =
 			"<button id='".$datasetRaw->{'fehlerzustaendigkeiten_id'}."' class='btn btn-default deleteBtn'>"
 			.ucfirst($this->p->t('ui', 'loeschen'))."</button>";
 

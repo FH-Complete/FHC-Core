@@ -1,18 +1,17 @@
 /**
- * Javascript file for issues Zuständigkeiten page
+ * Javascript file for Issues Zuständigkeiten assignment page
  */
 
 const FEHLERAPP_DROPDOWN_ID = "fehlerappSelect";
 const FEHLERCODE_DROPDOWN_ID = "fehlercodeSelect";
 const MITARBEITER_AUTOCOMPLETE_ID = "mitarbeiterSelect";
-const MITARBEITER_HIDENFIELD_ID = "mitarbeiter_person_id";
+const MITARBEITER_HIDDENFIELD_ID = "mitarbeiter_person_id";
 const ORGANISATIONSEINHEIT_DROPDOWN_ID = "oeSelect";
 const FUNKTION_DROPDOWN_ID = "funktionSelect";
 
 var IssuesZustaendigkeiten = {
 
-	mitarbeiterArr: [],
-	fehlercodesArr: [],
+	fehlercodesArr: [], // for saving received fehlercodes
 
 	getApps: function()
 	{
@@ -62,7 +61,6 @@ var IssuesZustaendigkeiten = {
 						// save fehlercodes data for displaying info later
 						IssuesZustaendigkeiten.fehlercodesArr = fehlerCodesData;
 
-
 						// display fehlercodes in dropdown
 						let fehlerCodes = [];
 
@@ -109,36 +107,74 @@ var IssuesZustaendigkeiten = {
 						// save loaded data
 						let zustaendigkeitenData = FHC_AjaxClient.getData(data);
 
-						// fill dropdowns with data
+						let zustaendigkeiten = [];
+
+						for (let i = 0; i < zustaendigkeitenData.oe.length; i++)
+						{
+							let zustaendigkeit = zustaendigkeitenData.oe[i];
+
+							zustaendigkeiten.push(
+								{
+									oe_kurzbz: zustaendigkeit.oe_kurzbz,
+									fullOeBezeichnung: zustaendigkeit.organisationseinheittyp_kurzbz + ' ' + zustaendigkeit.bezeichnung
+								}
+							);
+						}
+
+						// fill oe dropdown with data
 						IssuesZustaendigkeiten._fillDropdown(
 							"oeSelect",
 							"oe_kurzbz",
-							zustaendigkeitenData.oe_kurzbz,
-							"bezeichnung",
+							zustaendigkeiten,
+							"fullOeBezeichnung",
 							true
 						);
-						IssuesZustaendigkeiten._fillDropdown("funktionSelect", "funktion_kurzbz", zustaendigkeitenData.funktion, "beschreibung", true);
 
-						// save Mitarbeiter in array
-						IssuesZustaendigkeiten.mitarbeiterArr = [];
+						// fill funktion dropdown with data
+						IssuesZustaendigkeiten._fillDropdown(
+							"funktionSelect",
+							"funktion_kurzbz",
+							zustaendigkeitenData.funktion,
+							"beschreibung",
+							true
+						);
+
+						// save Mitarbeiter data for autocomplete field in array
+						let autocompleteMitarbeiterArr = [];
 
 						for (let i = 0; i < zustaendigkeitenData.mitarbeiter.length; i++)
 						{
 							let ma = zustaendigkeitenData.mitarbeiter[i];
 
-							IssuesZustaendigkeiten.mitarbeiterArr.push(
+							autocompleteMitarbeiterArr.push(
 								{
+									vorname: ma.vorname,
+									nachname: ma.nachname,
+									uid: ma.uid,
 									label: ma.nachname + " " + ma.vorname + " (" + ma.uid + ")",
 									id: ma.person_id
 								}
 							);
 						}
 
+						// callback for searching source mitarbeiter array correctly
+						let sourceCallback = function(request, response)
+						{
+							// case insensitive matcher
+							var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+
+							// match vorname nachname OR nachname vorname OR uid
+							response($.grep(autocompleteMitarbeiterArr, function (value) {
+								return matcher.test(value.nachname + ' '+value.vorname + ' ' + value.nachname)
+									|| matcher.test(value.uid);
+							}));
+						}
+
 						// fill autocomplete field with mitarbeiter data
 						IssuesZustaendigkeiten._fillAutocomplete(
 							MITARBEITER_AUTOCOMPLETE_ID,
-							MITARBEITER_HIDENFIELD_ID,
-							IssuesZustaendigkeiten.mitarbeiterArr
+							MITARBEITER_HIDDENFIELD_ID,
+							sourceCallback
 						);
 
 						// set events to delete buttons
@@ -229,7 +265,8 @@ var IssuesZustaendigkeiten = {
 		for (let i = 0; i < data.length; i++)
 		{
 			let val = data[i];
-			// value selected by default
+
+			// the value selected by default
 			let selected = val === defaultValue ? " selected" : "";
 
 			// append option
@@ -241,9 +278,11 @@ var IssuesZustaendigkeiten = {
 		// jQuery ui autocomplete for employees
 		$("#"+autocompleteId).autocomplete(
 			{
+				// custom matcher
 				source: source,
 				autoFocus: true,
-				select: function( event, ui ) {
+				select: function(event, ui)
+				{
 					// when autocmplete entry selected, display label text in autocomplete, fill hidden value field
 					$("#"+autocompleteId).val(ui.item.label);
 					$("#"+idFieldId).val(ui.item.id);
@@ -290,7 +329,7 @@ var IssuesZustaendigkeiten = {
 	{
 		// clear all input fields
 		$("#"+MITARBEITER_AUTOCOMPLETE_ID).val('');
-		$("#"+MITARBEITER_HIDENFIELD_ID).val('');
+		$("#"+MITARBEITER_HIDDENFIELD_ID).val('');
 		$("#"+ORGANISATIONSEINHEIT_DROPDOWN_ID).val('');
 		$("#"+FUNKTION_DROPDOWN_ID).val('');
 	}
@@ -324,7 +363,7 @@ $(document).ready(function() {
 				fehlercode: $("#"+FEHLERCODE_DROPDOWN_ID).val()
 			}
 
-			let mitarbeiter_person_id = $("#"+MITARBEITER_HIDENFIELD_ID).val();
+			let mitarbeiter_person_id = $("#"+MITARBEITER_HIDDENFIELD_ID).val();
 			let oe_kurzbz = $("#"+ORGANISATIONSEINHEIT_DROPDOWN_ID).val();
 
 			// if person id set, send it, otherwise oe_kurzbz
