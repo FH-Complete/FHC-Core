@@ -5979,6 +5979,37 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservic
 	}
 }
 
+//ALTER Sequence tbl_mitarbeiter_personalnummer_seq
+if ($result = @$db->db_query("SELECT last_value FROM tbl_mitarbeiter_personalnummer_seq"))
+{
+	$json = $db->db_getResultJSON($result);
+	$last = json_decode($json);
+	$last = $last[0]->{'last_value'};
+
+	if ($last <= 10000)
+	{
+		$count = @$db->db_query("
+		SELECT personalnummer FROM public.tbl_mitarbeiter
+		order by personalnummer DESC
+		Limit 1
+		");
+
+		$count = $db->db_getResultJSON($count);
+		$count = json_decode($count);
+		$count =  $count[0]->{'personalnummer'} + 1;
+		$qry = 'ALTER SEQUENCE tbl_mitarbeiter_personalnummer_seq restart with ';
+		$qry .= $count;
+		if (!$db->db_query($qry))
+		{
+			echo '<strong> tbl_mitarbeiter_personalnummer_seq '.$db->db_last_error().'</strong><br>';
+		}
+		else
+		{
+			echo '<br>tbl_mitarbeiter_personalnummer_seq auf neuen Startwert '. $count . ' geändert.';
+		}
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

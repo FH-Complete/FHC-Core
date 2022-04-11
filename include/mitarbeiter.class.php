@@ -1655,5 +1655,39 @@ class mitarbeiter extends benutzer
 		return false;
 	}
 
+
+	/**
+	 * Generiert mitarbeiter_uid anhand sequence tbl_mitarbeiter_personalnummer_seq
+	 * @return string $mitarbeiter_uid im Formate maXXXX (zum Bsp. ma0207)
+	 */
+	public function getMitarbeiterMaNr()
+	{
+		$qry = "SELECT last_value FROM tbl_mitarbeiter_personalnummer_seq";
+
+		if ($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object())
+			{
+				if ($row->last_value != '')
+				{
+					$maNr = $row->last_value;
+					$maNr = $maNr - 9999;
+					$maNr =  'ma'. $maNr;
+					return $maNr;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+					$return = false;
+				}
+			}
+		}
+		else
+		{
+				$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+				return false;
+		}
+	}
+
 }
 ?>
