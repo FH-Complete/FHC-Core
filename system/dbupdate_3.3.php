@@ -5955,6 +5955,30 @@ if ($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABL
 	}
 }
 
+// Add column parameterFuerBehebung to system.tbl_issue
+if(!$result = @$db->db_query("SELECT behebung_parameter FROM system.tbl_issue LIMIT 1"))
+{
+	$qry = 'ALTER TABLE system.tbl_issue ADD COLUMN behebung_parameter JSONB;';
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_issue: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column behebung_parameter to table system.tbl_issue';
+}
+
+// Add index beschreibung to system.tbl_webservicelog
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservicelog_beschreibung'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_webservicelog_beschreibung ON system.tbl_webservicelog USING btree (beschreibung)";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer system.tbl_webservicelog hinzugefuegt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -6223,7 +6247,7 @@ $tabellen=array(
 	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app"),
 	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
 	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz"),
-	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","insertvon","insertamum","updatevon","updateamum"),
+	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","behebung_parameter","insertvon","insertamum","updatevon","updateamum"),
 	"system.tbl_issue_status" => array("status_kurzbz","bezeichnung_mehrsprachig"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),

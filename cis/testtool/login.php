@@ -55,7 +55,7 @@ if (isset($_GET['logout']) && $_GET['logout'] == true)
 
 	echo '
 		<script language="Javascript">
-			location = location.pathname;       // clean the login.php-url from querystring
+			location = "logout.html";       // clean the login.php-url from querystring
 			parent.menu.location = parent.menu.location.pathname;   // clean the menu.php-url from querystring
 			parent.topbar.location = parent.topbar.location.pathname;   // clean the topbar.php-url from querystring
 		</script>
