@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d9941245360c86434d18413999bdc812",
-    "content-hash": "fbeb5d4ef943f6d1d55220cb844d11f1",
+    "hash": "ab181b377c4128ccde03cc50571b7ab6",
+    "content-hash": "e19ca762a6a929e69ae3b0e649fa4f6d",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -130,24 +130,24 @@
         },
         {
             "name": "codeigniter/framework",
-            "version": "3.1.11",
+            "version": "3.1.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bcit-ci/CodeIgniter.git",
-                "reference": "b73eb19aed66190c10c9cad476da7c36c271d6dc"
+                "reference": "bcb17eb8ba53a85de154439d0ab8ff1bed047bc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/b73eb19aed66190c10c9cad476da7c36c271d6dc",
-                "reference": "b73eb19aed66190c10c9cad476da7c36c271d6dc",
+                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/bcb17eb8ba53a85de154439d0ab8ff1bed047bc9",
+                "reference": "bcb17eb8ba53a85de154439d0ab8ff1bed047bc9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.7"
             },
             "require-dev": {
-                "mikey179/vfsstream": "1.1.*",
-                "phpunit/phpunit": "4.* || 5.*"
+                "mikey179/vfsstream": "1.6.*",
+                "phpunit/phpunit": "4.* || 5.* || 9.*"
             },
             "suggest": {
                 "paragonie/random_compat": "Provides better randomness in PHP 5.x"
@@ -159,7 +159,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2019-09-19 12:08:45"
+            "time": "2022-03-03 13:21:49"
         },
         {
             "name": "components/angular.js",
@@ -502,16 +502,16 @@
         },
         {
             "name": "components/jquery",
-            "version": "3.4.1",
+            "version": "3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/components/jquery.git",
-                "reference": "901828b7968b18319e377dc23d466f28426ee083"
+                "reference": "6cf38ee1fd04b6adf8e7dda161283aa35be818c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/jquery/zipball/901828b7968b18319e377dc23d466f28426ee083",
-                "reference": "901828b7968b18319e377dc23d466f28426ee083",
+                "url": "https://api.github.com/repos/components/jquery/zipball/6cf38ee1fd04b6adf8e7dda161283aa35be818c3",
+                "reference": "6cf38ee1fd04b6adf8e7dda161283aa35be818c3",
                 "shasum": ""
             },
             "type": "component",
@@ -540,7 +540,7 @@
             ],
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
-            "time": "2019-10-23 05:15:13"
+            "time": "2021-03-20 19:13:42"
         },
         {
             "name": "components/jqueryui",
@@ -674,6 +674,7 @@
                 "captcha",
                 "security"
             ],
+            "abandoned": true,
             "time": "2018-03-09 06:07:41"
         },
         {
@@ -750,16 +751,16 @@
         },
         {
             "name": "fzaninotto/faker",
-            "version": "v1.9.1",
+            "version": "v1.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "fc10d778e4b84d5bd315dad194661e091d307c6f"
+                "reference": "848d8125239d7dbf8ab25cb7f054f1a630e68c2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/fc10d778e4b84d5bd315dad194661e091d307c6f",
-                "reference": "fc10d778e4b84d5bd315dad194661e091d307c6f",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/848d8125239d7dbf8ab25cb7f054f1a630e68c2e",
+                "reference": "848d8125239d7dbf8ab25cb7f054f1a630e68c2e",
                 "shasum": ""
             },
             "require": {
@@ -797,7 +798,7 @@
                 "fixtures"
             ],
             "abandoned": true,
-            "time": "2019-12-12 13:22:17"
+            "time": "2020-12-11 09:56:16"
         },
         {
             "name": "joeldbirch/superfish",
@@ -1086,16 +1087,16 @@
         },
         {
             "name": "ml/json-ld",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lanthaler/JsonLD.git",
-                "reference": "b5f82820c255cb64067b1c7adbb819cad4afa70a"
+                "reference": "c74a1aed5979ed1cfb1be35a55a305fd30e30b93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/b5f82820c255cb64067b1c7adbb819cad4afa70a",
-                "reference": "b5f82820c255cb64067b1c7adbb819cad4afa70a",
+                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/c74a1aed5979ed1cfb1be35a55a305fd30e30b93",
+                "reference": "c74a1aed5979ed1cfb1be35a55a305fd30e30b93",
                 "shasum": ""
             },
             "require": {
@@ -1131,7 +1132,7 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2018-11-18 20:26:18"
+            "time": "2020-06-16 17:45:06"
         },
         {
             "name": "moment/momentjs",
@@ -1146,16 +1147,16 @@
         },
         {
             "name": "mottie/tablesorter",
-            "version": "v2.31.2",
+            "version": "v2.31.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mottie/tablesorter.git",
-                "reference": "6a32e5acc294be5b6c420c83d70d66e096533d8f"
+                "reference": "7202d5faf8105a5ecd1a2b7a653777618713ffe5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/6a32e5acc294be5b6c420c83d70d66e096533d8f",
-                "reference": "6a32e5acc294be5b6c420c83d70d66e096533d8f",
+                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/7202d5faf8105a5ecd1a2b7a653777618713ffe5",
+                "reference": "7202d5faf8105a5ecd1a2b7a653777618713ffe5",
                 "shasum": ""
             },
             "require": {
@@ -1193,7 +1194,7 @@
                 "sorting",
                 "table"
             ],
-            "time": "2019-12-01 13:49:52"
+            "time": "2020-03-03 13:46:03"
         },
         {
             "name": "nategood/httpful",
@@ -1322,16 +1323,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.31",
+            "version": "2.0.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "233a920cb38636a43b18d428f9a8db1f0a1a08f4"
+                "reference": "a97547126396548c224703a267a30af1592be146"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/233a920cb38636a43b18d428f9a8db1f0a1a08f4",
-                "reference": "233a920cb38636a43b18d428f9a8db1f0a1a08f4",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/a97547126396548c224703a267a30af1592be146",
+                "reference": "a97547126396548c224703a267a30af1592be146",
                 "shasum": ""
             },
             "require": {
@@ -1409,7 +1410,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2021-04-06 13:56:45"
+            "time": "2022-01-30 08:48:36"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
@@ -1435,16 +1436,16 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.13.1",
+            "version": "v1.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "f8f0b461be3385e56d6de3dbb5a0df24c0c275e3"
+                "reference": "aed596913b70fae57be53d86faa2e9ef85a2297b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/f8f0b461be3385e56d6de3dbb5a0df24c0c275e3",
-                "reference": "f8f0b461be3385e56d6de3dbb5a0df24c0c275e3",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/aed596913b70fae57be53d86faa2e9ef85a2297b",
+                "reference": "aed596913b70fae57be53d86faa2e9ef85a2297b",
                 "shasum": ""
             },
             "require": {
@@ -1456,16 +1457,20 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.13-dev"
+                    "dev-main": "1.19-dev"
+                },
+                "thanks": {
+                    "name": "symfony/polyfill",
+                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Ctype\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1489,7 +1494,7 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2019-11-27 13:56:44"
+            "time": "2020-10-23 09:01:57"
         },
         {
             "name": "tapmodo/Jcrop",
@@ -1504,16 +1509,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.9.8",
+            "version": "4.9.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "912df2bc85015c758e32d1262219f1653bbf9783"
+                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/912df2bc85015c758e32d1262219f1653bbf9783",
-                "reference": "912df2bc85015c758e32d1262219f1653bbf9783",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3a68b67d1120ab89c6760afeb787291703c9a7d5",
+                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5",
                 "shasum": ""
             },
             "type": "component",
@@ -1546,7 +1551,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2020-01-28 05:03:01"
+            "time": "2020-07-13 05:29:19"
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -1611,16 +1616,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.42.4",
+            "version": "v1.42.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "e587180584c3d2d6cb864a0454e777bb6dcb6152"
+                "reference": "87b2ea9d8f6fd014d0621ca089bb1b3769ea3f8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/e587180584c3d2d6cb864a0454e777bb6dcb6152",
-                "reference": "e587180584c3d2d6cb864a0454e777bb6dcb6152",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/87b2ea9d8f6fd014d0621ca089bb1b3769ea3f8e",
+                "reference": "87b2ea9d8f6fd014d0621ca089bb1b3769ea3f8e",
                 "shasum": ""
             },
             "require": {
@@ -1629,8 +1634,7 @@
             },
             "require-dev": {
                 "psr/container": "^1.0",
-                "symfony/debug": "^3.4|^4.2",
-                "symfony/phpunit-bridge": "^4.4@dev|^5.0"
+                "symfony/phpunit-bridge": "^4.4|^5.0"
             },
             "type": "library",
             "extra": {
@@ -1659,7 +1663,6 @@
                 },
                 {
                     "name": "Twig Team",
-                    "homepage": "https://twig.symfony.com/contributors",
                     "role": "Contributors"
                 },
                 {
@@ -1673,24 +1676,24 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2019-11-11 16:49:32"
+            "time": "2020-02-11 05:59:23"
         },
         {
             "name": "zetacomponents/base",
-            "version": "1.9.1",
+            "version": "1.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Base.git",
-                "reference": "489e20235989ddc97fdd793af31ac803972454f1"
+                "reference": "2f432f4117a5aa2164d4fb1784f84db91dbdd3b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/489e20235989ddc97fdd793af31ac803972454f1",
-                "reference": "489e20235989ddc97fdd793af31ac803972454f1",
+                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/2f432f4117a5aa2164d4fb1784f84db91dbdd3b8",
+                "reference": "2f432f4117a5aa2164d4fb1784f84db91dbdd3b8",
                 "shasum": ""
             },
             "require-dev": {
-                "phpunit/phpunit": "~5.7",
+                "phpunit/phpunit": "~8.0",
                 "zetacomponents/unit-test": "*"
             },
             "type": "library",
@@ -1737,27 +1740,27 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-11-28 11:30:00"
+            "time": "2021-07-25 15:46:08"
         },
         {
             "name": "zetacomponents/database",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Database.git",
-                "reference": "1750d34bf64b62f064c5b1aeb5374fbd06400904"
+                "reference": "85a2fd2af4e49f64d5c7616b6fb82c1b88de53b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Database/zipball/1750d34bf64b62f064c5b1aeb5374fbd06400904",
-                "reference": "1750d34bf64b62f064c5b1aeb5374fbd06400904",
+                "url": "https://api.github.com/repos/zetacomponents/Database/zipball/85a2fd2af4e49f64d5c7616b6fb82c1b88de53b4",
+                "reference": "85a2fd2af4e49f64d5c7616b6fb82c1b88de53b4",
                 "shasum": ""
             },
             "require": {
                 "zetacomponents/base": "~1.8"
             },
             "require-dev": {
-                "phpunit/phpunit": "~5.7",
+                "phpunit/phpunit": "~8.0",
                 "zetacomponents/database-schema": "~1.5",
                 "zetacomponents/unit-test": "*"
             },
@@ -1814,27 +1817,28 @@
             ],
             "description": "A lightweight database layer on top of PHP's PDO that allows you to utilize a database without having to take care of differences in SQL dialects.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-11-28 10:55:26"
+            "time": "2022-02-11 17:18:33"
         },
         {
             "name": "zetacomponents/document",
-            "version": "1.3.1",
+            "version": "1.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Document.git",
-                "reference": "688abfde573cf3fe0730f82538fbd7aa9fc95bc8"
+                "reference": "196884f00871ea7dcbca9ab8bc85716f626e9cc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Document/zipball/688abfde573cf3fe0730f82538fbd7aa9fc95bc8",
-                "reference": "688abfde573cf3fe0730f82538fbd7aa9fc95bc8",
+                "url": "https://api.github.com/repos/zetacomponents/Document/zipball/196884f00871ea7dcbca9ab8bc85716f626e9cc3",
+                "reference": "196884f00871ea7dcbca9ab8bc85716f626e9cc3",
                 "shasum": ""
             },
             "require": {
-                "zetacomponents/base": "*"
+                "zetacomponents/base": "~1.8"
             },
             "require-dev": {
-                "zetacomponents/unit-test": "dev-master"
+                "phpunit/phpunit": "~8.0",
+                "zetacomponents/unit-test": "*"
             },
             "type": "library",
             "autoload": {
@@ -1865,7 +1869,7 @@
             ],
             "description": "The Document components provides a general conversion framework for different semantic document markup languages like XHTML, Docbook, RST and similar.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2013-12-19 11:40:00"
+            "time": "2022-02-11 17:26:31"
         },
         {
             "name": "zetacomponents/workflow",

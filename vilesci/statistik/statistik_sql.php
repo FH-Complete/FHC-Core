@@ -23,6 +23,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/statistik.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/webservicelog.class.php');
 
 $statistik_kurzbz = filter_input(INPUT_GET, 'statistik_kurzbz');
 $outputformat = filter_input(INPUT_GET, 'outputformat');
@@ -92,6 +93,16 @@ foreach($_REQUEST as $name=>$value)
 	else
 		$param .= '&'.$name.'='.urlencode($value);
 }
+
+// Log schreiben
+$log = new webservicelog();
+$log->request_data = $param;
+$log->webservicetyp_kurzbz = 'reports';
+$log->request_id = $statistik_kurzbz;
+$log->beschreibung = 'statistik';
+$log->execute_user = (isset($uid) ? $uid : 'unknown');
+$log->save(true);
+
 ?>
 <!DOCTYPE html>
 <html>

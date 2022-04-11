@@ -48,7 +48,7 @@ class bisverwendung extends basis_db
 	public $inkludierte_lehre;
 	public $zeitaufzeichnungspflichtig;
 	public $azgrelevant;
-	public $homeoffice;
+	public $homeoffice=false;
 
 	public $ba1bez;
 	public $ba2bez;

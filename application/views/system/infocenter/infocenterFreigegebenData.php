@@ -11,6 +11,7 @@
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
+	$IDENTITY = '\'identity\'';
 
 $query = '
 		SELECT
@@ -245,7 +246,15 @@ $query = '
 					LIMIT 1
 				)
 				LIMIT 1 
-			) AS "InfoCenterMitarbeiter"
+			) AS "InfoCenterMitarbeiter",
+			(
+				SELECT akte.akte_id
+				FROM public.tbl_akte akte
+				JOIN public.tbl_dokument USING (dokument_kurzbz)
+				WHERE akte.person_id = p.person_id
+				AND dokument_kurzbz = '. $IDENTITY .'
+				LIMIT 1
+			) AS "AktenId"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -317,7 +326,8 @@ $query = '
 			'Reihungstest date',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
-			'InfoCenter Mitarbeiter'
+			'InfoCenter Mitarbeiter',
+			'Identitätsnachweis'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -424,6 +434,19 @@ $query = '
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
 			}
+
+			if ($datasetRaw->{'AktenId'} !== null)
+			{
+				$datasetRaw->{'AktenId'} = sprintf(
+					'<a href="outputAkteContent/%s">Identitätsnachweis</a>',
+					$datasetRaw->{'AktenId'}
+				);
+			}
+			else
+			{
+				$datasetRaw->{'AktenId'} = '-';
+			}
+
 
 			return $datasetRaw;
 		},
