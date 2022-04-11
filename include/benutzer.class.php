@@ -309,6 +309,10 @@ class benutzer extends person
 	 */
 	public function search($searchItems, $limit=null, $aktiv=true, $positivePersonalnr=false)
 	{
+		// SearchItems imploden und trimmen, um preg_split(Zeichenweise trennung) durchfuehren zu koennen
+		$searchItems_string_orig = implode(' ', $searchItems);
+		$searchItems_string = generateSpecialCharacterString($searchItems_string_orig);
+
 		$qry = "SELECT * FROM (
 					SELECT
 						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, personalnummer, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv, anrede,
@@ -350,8 +354,8 @@ class benutzer extends person
 				if($positivePersonalnr === true)
 					$qry.=" (personalnummer >= 0 OR personalnummer IS NULL) AND";
 
-		$qry.=" (lower(vorname || ' ' || nachname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
-		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
+		$qry.=" (lower(vorname || ' ' || nachname) ~* lower(".$this->db_add_param($searchItems_string).")";
+		$qry.=" OR lower(nachname || ' ' || vorname) ~* lower(".$this->db_add_param($searchItems_string).")";
 		$qry.=" OR lower(uid) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(telefonklappe) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 

@@ -23,6 +23,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 10,
 					'requiredPermissions' => 'basis/vilesci:r'
+				),
+				'oehbeitragsverwaltung' => array(
+					'link' => site_url('codex/Oehbeitrag'),
+					'icon' => '',
+					'description' => 'ÖH-Beitragsverwaltung',
+					'expand' => true,
+					'sort' => 20,
+					'requiredPermissions' => 'admin:w'
 				)
 			)
 		),
@@ -94,6 +102,13 @@ $config['navigation_header'] = array(
 					'description' => 'BPK Wartung',
 					'sort' => 20,
 					'requiredPermissions' => 'admin:r'
+				),
+				'errormonitoring' => array(
+					'link' => site_url('system/issues/Issues'),
+					'description' => 'Fehler Monitoring',
+					'expand' => true,
+					'sort' => 30,
+					'requiredPermissions' => 'system/issues_verwalten:r'
 				)
 			)
 		),

@@ -159,7 +159,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#gruppen"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="lehrveranstaltung-treecol-lektoren" label="Lektoren" flex="5" hidden="false" persist="hidden, width, ordinal"
+				<treecol id="lehrveranstaltung-treecol-lektoren" label="Lehrende" flex="5" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lektoren"/>
 				<splitter class="tree-splitter"/>

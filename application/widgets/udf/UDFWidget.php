@@ -6,8 +6,6 @@
  */
 class UDFWidget extends HTMLWidget
 {
-	private $_requiredPermissions; // The required permissions to use this UDF widget
-
 	private $_schema; // Schema name
 	private $_table; // Table name
 	private $_primaryKeyName; // Primary key name
@@ -26,26 +24,16 @@ class UDFWidget extends HTMLWidget
 
 		$this->_initUDFWidget($args); // checks parameters and initialize properties
 
-		// Let's start if it's allowed
-		// NOTE: If it is NOT allowed then no data are loaded
-		if ($this->udflib->isAllowed($this->_requiredPermissions))
-		{
-			$this->_startUDFWidget($args[UDFLib::UDF_UNIQUE_ID]);
-		}
+		$this->_startUDFWidget($args[UDFLib::UDF_UNIQUE_ID]);
 	}
 
 	/**
 	 * Called by the WidgetLib, it renders the HTML of the UDF
 	 */
-    public function display($widgetData)
+	public function display($widgetData)
 	{
-		// Let's start if it's allowed
-		// NOTE: If it is NOT allowed then no data are loaded
-		if ($this->_ci->udflib->isAllowed($this->_requiredPermissions))
-		{
-			$this->_ci->udflib->displayUDFWidget($widgetData);
-		}
-    }
+		$this->_ci->udflib->displayUDFWidget($widgetData);
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
@@ -60,17 +48,10 @@ class UDFWidget extends HTMLWidget
 		// If here then everything is ok
 
 		// Initialize class properties
-		$this->_requiredPermissions = null;
 		$this->_schema = null;
 		$this->_table = null;
 		$this->_primaryKeyName = null;
 		$this->_primaryKeyValue = null;
-
-		// Retrieved the required permissions parameter if present
-		if (isset($args[UDFLib::REQUIRED_PERMISSIONS_PARAMETER]))
-		{
-			$this->_requiredPermissions = $args[UDFLib::REQUIRED_PERMISSIONS_PARAMETER];
-		}
 
 		// Retrieved the
 		if (isset($args[UDFLib::SCHEMA_ARG_NAME]))
@@ -113,11 +94,6 @@ class UDFWidget extends HTMLWidget
 				show_error('The parameter "'.UDFLib::UDF_UNIQUE_ID.'" must be specified');
 			}
 
-			if (!isset($args[UDFLib::REQUIRED_PERMISSIONS_PARAMETER]))
-			{
-				show_error('The parameter "'.UDFLib::REQUIRED_PERMISSIONS_PARAMETER.'" must be specified');
-			}
-
 			if (!isset($args[UDFLib::SCHEMA_ARG_NAME]))
 			{
 				show_error('The parameter "'.UDFLib::SCHEMA_ARG_NAME.'" must be specified');
@@ -149,7 +125,6 @@ class UDFWidget extends HTMLWidget
 		$this->udflib->setSession(
 			array(
 				UDFLib::UDF_UNIQUE_ID => $udfUniqueId, // table unique id
-				UDFLib::REQUIRED_PERMISSIONS_PARAMETER => $this->_requiredPermissions, //
 				UDFLib::SCHEMA_ARG_NAME => $this->_schema, //
 				UDFLib::TABLE_ARG_NAME => $this->_table, //
 				UDFLib::PRIMARY_KEY_NAME => $this->_primaryKeyName, //
@@ -158,3 +133,4 @@ class UDFWidget extends HTMLWidget
 		);
 	}
 }
+

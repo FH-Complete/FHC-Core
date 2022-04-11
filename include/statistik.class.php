@@ -510,6 +510,7 @@ class statistik extends basis_db
 		$this->html='';
 		$this->csv='';
 		$this->json=array();
+		set_time_limit(120);
 
 		if($this->sql!='')
 		{
@@ -552,6 +553,12 @@ class statistik extends basis_db
 					{
 						$name = $this->db_field_name($this->data,$spalte);
 						$this->html.= '<td>'.$this->convert_html_chars($row->$name).'</td>';
+						// Umwandeln von Punkt in Komma bei Float-Werten
+						if (is_numeric($row->$name))
+						{
+							if (strpos($row->$name,'.') != false)
+								$row->$name = number_format($row->$name,2,",","");
+						}
 						$this->csv.= '"'.$row->$name.'",';
 					}
 

@@ -35,12 +35,12 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
-					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
-					{"name": "LockUser"}
+					{"name": "LockUser"},
+					{"name": "OnholdDate"}
 				],
 				"filters": [
 					{
@@ -311,6 +311,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
+					{"name": "AktenId"},
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
@@ -347,7 +348,35 @@ $filters = array(
 					{"name": "vorname"},
 					{"name": "nachname"},
 					{"name": "svnr"},
-					{"name": "ersatzkennzeichen"}
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'leistungsstipendium',
+		'filter_kurzbz' => 'LeistungsstipendiumAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Leistungsstipendium - Alle",
+				"columns": [
+					{"name" : "Vorname"},
+					{"name" : "Nachname"},
+					{"name" : "Buchungsdatum"},
+					{"name" : "Betrag"},
+					{"name" : "Buchungstyp"},
+					{"name" : "VorgangsId"},
+					{"name" : "FoerderfallId"},
+					{"name" : "LeistungsdatenId"},
+					{"name" : "startjahr"},
+					{"name" : "endjahr"}
 				],
 				"filters": []
 			}
@@ -467,6 +496,30 @@ $filters = array(
 						"operation": "ncontains"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'abgewiesen',
+		'filter_kurzbz' => 'InfoCenterAbgewiesenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Abgewiesen - Alle",
+				"columns": [
+					{"name": "PersonID"},
+					{"name": "PreStudentID"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"},
+					{"name": "AbgewiesenAm"},
+					{"name": "Nachricht"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,
@@ -853,6 +906,154 @@ $filters = array(
 						"option": "hours"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'offeneFehler',
+		'description' => '{Alle offenen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle offenen Fehler, hauptzuständig",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"}
+				],
+				"filters": [
+					{
+						"name": "Statuscode",
+						"operation": "ncontains",
+						"condition": "resolved"
+					},
+					{
+						"name": "Hauptzuständig",
+						"operation": "contains",
+						"condition": "Ja"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetze7Tage',
+		'description' => '{Letzten 7 Tage}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"}
+				],
+				"filters": [
+					{
+						"name": "Datum",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'issues',
+		'filter_kurzbz' => 'FehlerLetzte7TageBearbeitet',
+		'description' => '{Letzten 7 Tage bearbeitet}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Fehlerstatus"},
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
+				],
+				"filters": [
+					{
+						"name": "Verarbeitet am",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					},
+					{
+						"name": "Statuscode",
+						"operation": "contains",
+						"condition": "resolved"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'dvuh',
+		'dataset_name' => 'storno',
+		'filter_kurzbz' => 'DVUHStorno',
+		'description' => '{DVUH Storno Übersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "DVUHStorno",
+				"columns": [
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "matrikelnummer"},
+					{"name": "studiengang"},
+					{"name": "studiensemester"},
+					{"name": "last_status"},
+					{"name": "bismelden"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'dvuh',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'BPKWartungDVUH',
+		'description' => '{bPK Uebersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehlende bPK",
+				"columns": [
+					{"name": "person_id"},
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "svnr"},
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,

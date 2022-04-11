@@ -83,6 +83,16 @@ echo '<div>';
 	require_once('filtersupdate.php');
 echo '</div>';
 
+// ******** fehlerupdate ************/
+echo '<H2>Issues time!</H2>';
+
+echo '<div>';
+echo 'fehlerupdate.php wird aufgerufen...';
+echo '</div>';
+echo '<div>';
+require_once('fehlerupdate.php');
+echo '</div>';
+
 
 // ******** Berechtigungen Prüfen ************/
 echo '<h2>Berechtigungen pruefen</h2>';

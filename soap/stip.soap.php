@@ -117,11 +117,11 @@ function GetStipendienbezieherStip($parameters)
 
 			if(!$prestudentID = $StipBezieher->searchPersonKz($BezieherStip->PersKz))
 			{
-				if(!$prestudentID = $StipBezieher->searchMatrikelnummerStg($BezieherStip->Matrikelnummer, $BezieherStip->StgKz))
+				if(!$prestudentID = $StipBezieher->searchMatrikelnummerStg($BezieherStip->Matrikelnummer, $BezieherStip->StgKz, $studSemester))
 				{
-					if(!$prestudentID = $StipBezieher->searchSvnr($BezieherStip->SVNR))
+					if(!$prestudentID = $StipBezieher->searchSvnr($BezieherStip->SVNR, $BezieherStip->StgKz, $studSemester))
 					{
-						$prestudentID = $StipBezieher->searchVorNachname($BezieherStip->Vorname, $BezieherStip->Familienname);
+						$prestudentID = $StipBezieher->searchVorNachname($BezieherStip->Vorname, $BezieherStip->Familienname, $BezieherStip->StgKz, $studSemester);
 					}
 				}
 			}

@@ -152,34 +152,36 @@ class Person_model extends DB_Model
 	 */
 	public function getPersonStammdaten($person_id, $zustellung_only = false)
 	{
-		$this->addSelect('public.tbl_person.*, s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addSelect('public.tbl_person.*, tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code, tbl_person.geburtsnation AS geburtsnation_code, 
+		s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
 		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
 		$this->addJoin('bis.tbl_nation g', 'public.tbl_person.geburtsnation = g.nation_code', 'LEFT');
 
 		$person = $this->load($person_id);
 
-		if($person->error) return $person;
+		if (isError($person)) return $person;
 
 		//return null if not found
-		if(count($person->retval) < 1)
+		if (!hasData($person))
 			return success(null);
 
-		$this->KontaktModel->addDistinct();
-		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
+		$this->KontaktModel->addSelect('kontakt_id, kontakttyp, anmerkung, kontakt, zustellung');
 		$this->KontaktModel->addOrder('kontakttyp');
+		$this->KontaktModel->addOrder('insertamum', 'DESC');
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);
 		$kontakte = $this->KontaktModel->loadWhere($where);
-		if($kontakte->error) return $kontakte;
+		if (isError($kontakte)) return $kontakte;
 
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
 		$this->AdresseModel->addSelect('public.tbl_adresse.*, bis.tbl_nation.kurztext AS nationkurztext');
 		$this->AdresseModel->addJoin('bis.tbl_nation', 'tbl_adresse.nation = tbl_nation.nation_code', 'LEFT');
+		$this->AdresseModel->addOrder('insertamum', 'DESC');
 		$adressen = $this->AdresseModel->loadWhere($where);
-		if($adressen->error) return $adressen;
+		if (isError($adressen)) return $adressen;
 
-		$stammdaten = $person->retval[0];
-		$stammdaten->kontakte = $kontakte->retval;
-		$stammdaten->adressen = $adressen->retval;
+		$stammdaten = getData($person)[0];
+		$stammdaten->kontakte = hasData($kontakte) ? getData($kontakte) : array();
+		$stammdaten->adressen = hasData($adressen) ? getData($adressen) : array();
 
 		return success($stammdaten);
 	}
@@ -262,5 +264,65 @@ class Person_model extends DB_Model
 		}
 		
 		return success($result->vorname. ' '. $result->nachname);
+	}
+
+	public function checkDuplicate($person_id)
+	{
+		$qry = "SELECT person_id
+				FROM public.tbl_prestudent p
+				JOIN 
+				(
+					SELECT DISTINCT ON(prestudent_id) *
+					FROM public.tbl_prestudentstatus
+					WHERE prestudent_id IN 
+						(
+							SELECT prestudent_id 
+							FROM public.tbl_prestudent 
+							WHERE person_id IN 
+							(
+								SELECT p2.person_id
+								FROM public.tbl_person p
+								JOIN public.tbl_person p2
+								ON p.vorname = p2.vorname
+								AND p.nachname = p2.nachname
+								AND p.gebdatum = p2.gebdatum
+								AND p.person_id = ?
+							)
+						)
+					ORDER BY prestudent_id, datum DESC, insertamum DESC
+				) ps USING(prestudent_id)
+				JOIN public.tbl_status USING(status_kurzbz)
+				WHERE status_kurzbz = 'Interessent' 
+				AND studiengang_kz IN 
+				(
+					SELECT studiengang_kz
+					FROM public.tbl_prestudent p
+					JOIN
+					(
+						SELECT DISTINCT ON(prestudent_id) *
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id IN
+						(
+							SELECT prestudent_id
+							FROM public.tbl_prestudent
+							WHERE person_id IN
+							(
+								SELECT p2.person_id
+								FROM public.tbl_person p
+								JOIN public.tbl_person p2
+								ON p.vorname = p2.vorname
+								AND p.nachname = p2.nachname
+								AND p.gebdatum = p2.gebdatum
+								AND p.person_id = ?
+							)
+						)
+						ORDER BY prestudent_id, datum DESC, insertamum DESC
+					) ps USING(prestudent_id)
+					JOIN public.tbl_status USING(status_kurzbz)
+					WHERE status_kurzbz = 'Abbrecher'
+				)
+				";
+
+		return $this->execQuery($qry, array($person_id, $person_id));
 	}
 }
