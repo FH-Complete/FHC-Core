@@ -849,6 +849,8 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
+				$obj->aktiv =$this->db_parse_bool($row->aktiv);
+				$obj->fixangestellt = $this->db_parse_bool($row->fixangestellt);
 
 				$this->result[] = $obj;
 			}
@@ -916,6 +918,10 @@ class mitarbeiter extends benutzer
 	 */
 	public function searchPersonal($filter)
 	{
+		// Filter imploden und trimmen, um preg_split(Zeichenweise trennung) durchfuehren zu koennen
+		//$searchItems_string_orig = implode(' ', $filter);
+		$searchItems_string = generateSpecialCharacterString($filter);
+
 		$qry = "SELECT
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
 					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_person.svnr
@@ -923,8 +929,8 @@ class mitarbeiter extends benutzer
 					public.tbl_mitarbeiter
 					JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
 					JOIN public.tbl_person USING(person_id)
-				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($filter).") OR
-				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($filter).") OR
+				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
+				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
 				      uid ~* ".$this->db_add_param($filter)." ";
 		if(is_numeric($filter))
 			$qry.="OR personalnummer = ".$this->db_add_param($filter)." OR svnr = ".$this->db_add_param($filter).";";
@@ -1468,22 +1474,25 @@ class mitarbeiter extends benutzer
 		$hasUDF = false;
 		$udf = new UDF();
 
-		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) *,
-									tbl_benutzer.aktiv as aktiv,
-									tbl_mitarbeiter.insertamum,
-									tbl_mitarbeiter.insertvon,
-									tbl_mitarbeiter.updateamum,
-									tbl_mitarbeiter.updatevon";
+		$qry = "SELECT
+					*,
+					tbl_benutzer.aktiv as aktiv,
+					tbl_mitarbeiter.insertamum,
+					tbl_mitarbeiter.insertvon,
+					tbl_mitarbeiter.updateamum,
+					tbl_mitarbeiter.updatevon";
 
 		if ($hasUDF = $udf->personHasUDF())
 		{
 			$qry .= ", public.tbl_person.udf_values AS p_udf_values";
 		}
 
-		$qry .= " FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
-					JOIN public.tbl_person USING(person_id))
-					LEFT JOIN public.tbl_benutzerfunktion USING(uid)
-				WHERE uid in(".$this->db_implode4SQL($uid_arr).")";;
+		$qry .= " FROM
+					public.tbl_mitarbeiter
+					JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+					JOIN public.tbl_person USING(person_id)
+				WHERE uid in(".$this->db_implode4SQL($uid_arr).")";
+		$qry .= " ORDER BY nachname, vorname";
 
 		if($this->db_query($qry))
 		{

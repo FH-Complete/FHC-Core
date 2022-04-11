@@ -707,6 +707,7 @@ function LeDetailSave()
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
+		LeDetailDisableFields(true);
 		//LvTreeRefresh();
 		LvSelectLehreinheit_id=val.dbdml_data;
 		LvOpenLehrveranstaltung_id=lehrveranstaltung;

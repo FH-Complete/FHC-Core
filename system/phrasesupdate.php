@@ -896,13 +896,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn bereits vorhanden',
+				'text' => 'BewerberIn möglicherweise vorhanden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Applicant already available',
+				'text' => 'Applicant maybe available',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2700,6 +2700,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Course Type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'studiengangskennzahlLehre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengangskennzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study program number',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -13734,7 +13754,27 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'nurLeseberechtigung',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Nur Leseberechtigung",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Read-Only Access",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    )
 );
 
 

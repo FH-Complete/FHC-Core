@@ -48,7 +48,8 @@ $this->load->view(
 				'empfehlungWurdeAngefordert',
 				'empfehlungWurdeAngefordertAusnahmeWoKeineLektoren',
 				'anrechnungenWurdenGenehmigt',
-				'anrechnungenWurdenAbgelehnt'
+				'anrechnungenWurdenAbgelehnt',
+                'nurLeseberechtigung'
 			),
 			'person' => array(
 				'student',
@@ -101,7 +102,7 @@ $this->load->view(
         <!-- dropdown studiensemester -->
         <div class="row">
             <div class="col-lg-12">
-                <form id="formApproveAnrechnungUebersicht" class="form-inline" action="" method="get">
+                <form id="formApproveAnrechnungUebersicht" class="form-inline" action="" method="get" data-readonly="<?php echo json_encode($hasReadOnlyAccess)?>" data-createaccess="<?php echo json_encode($hasCreateAnrechnungAccess)?>">
                     <div class="form-group">
 						<?php
 						echo $this->widgetlib->widget(
@@ -226,7 +227,7 @@ $this->load->view(
                                     class='fa fa-times'></i>
                         </button>
                     </div>
-						<a type="button" class="btn btn-default" style="margin-left: 20px;" href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_blank'>
+						<a type="button" id="approveAnrechnungUebersicht-create-anrechnung" class="btn btn-default" style="margin-left: 20px;" href='<?php echo site_url('lehre/anrechnung/createAnrechnung') ?>' target='_blank'>
 							<i class='fa fa-plus' aria-hidden='true'></i> <?php echo $this->p->t('global', 'antragAnlegen'); ?>
 						</a>
 				</div>
