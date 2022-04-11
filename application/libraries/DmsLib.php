@@ -31,7 +31,10 @@ class DmsLib
 	 * Writes a new file, adds a new dms entry and a new dms version 0 for the written file
 	 * Returns success info of added dms entry (dms_id, version, filename) or error
 	 */
-	public function add($name, $mimetype, $fileHandle, $kategorie_kurzbz = null, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
+	public function add(
+		$name, $mimetype, $fileHandle, // Required parameters
+		$kategorie_kurzbz = null, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null
+	)
 	{
 			// write file with content of fileHandle
 			$writeFileResult = $this->_writeNewFile($name, $fileHandle);
@@ -633,7 +636,8 @@ class DmsLib
 
 		// Insert DMS version
 		if (!$result = $this->_ci->DmsVersionModel->insert(
-			$this->_ci->DmsVersionModel->filterFields($dms, getData($result), $filename)))
+			$this->_ci->DmsVersionModel->filterFields($dms, getData($result), $filename))
+		)
 		{
 			return error('Failed inserting DMS version');
 		}

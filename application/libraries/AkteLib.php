@@ -29,7 +29,10 @@ class AkteLib
 	 * adds a new dms version 0 for the written file, and adds Akte if dms add was successfull
 	 * Returns success with inserted akte id or error
 	 */
-	public function add($person_id, $dokument_kurzbz, $titel, $mimetype, $fileHandle, $bezeichnung = null, $archiv = false, $signiert = false, $stud_selfservice = false)
+	public function add(
+		$person_id, $dokument_kurzbz, $titel, $mimetype, $fileHandle, // Required parameters
+		$bezeichnung = null, $archiv = false, $signiert = false, $stud_selfservice = false
+	)
 	{
 		// add new dms entry and new dms version for the Akte, using Akte data (title, mimetype, file content as handle)
 		$dmsAddResult = $this->_ci->dmslib->add($titel, $mimetype, $fileHandle, self::AKTE_KATEGORIE_KURZBZ, $dokument_kurzbz, $bezeichnung);
