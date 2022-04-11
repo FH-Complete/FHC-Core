@@ -27,6 +27,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/adresse.class.php');
+require_once('../../include/adressentyp.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/firma.class.php');
 require_once('../../include/standort.class.php');
@@ -260,8 +261,6 @@ if(isset($_POST['saveadresse']))
 		$adresse_obj->updateamum = date('Y-m-d H:i:s');
 		$adresse_obj->updatvon = $user;
 
-		//var_dump($adresse_obj);
-
 		if(!$adresse_obj->save())
 		{
 			$errormsg = 'Fehler beim Speichern der Adresse:'.$adresse_obj->errormsg;
@@ -342,8 +341,6 @@ $firma->getAll();
 foreach($firma->result as $row)
 	$firma_arr[$row->firma_id]=$row->name;
 
-$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
-
 //Kontakttypen laden
 $kontakttyp_arr = array();
 $kontakt_obj = new kontakt();
@@ -369,7 +366,7 @@ foreach ($adresse_obj->result as $row)
 	echo "<td>$row->ort</td>";
 	echo "<td>$row->gemeinde</td>";
 	echo "<td>".(isset($nation_arr[$row->nation])?$nation_arr[$row->nation]:'')."</td>";
-	echo "<td>".(isset($adresstyp_arr[$row->typ])?$adresstyp_arr[$row->typ]:'')."</td>";
+	echo "<td>".(isset($row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE])?$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE]:'')."</td>";
 	echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
 	echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
 	echo "<td>".($row->firma_id!=''?$firma_arr[$row->firma_id]:'')."</td>";
@@ -426,15 +423,19 @@ else
 	}
 
 	echo "</SELECT></td>";
+
+	$adressetyp = new adressentyp();
+	$adressetyp->getAll();
+
 	echo "<td><SELECT name='adresstyp'>";
-	foreach($adresstyp_arr as $code=>$kurzbz)
+	foreach($adressetyp->result as $row)
 	{
-		if($code==$typ)
+		if($row->adressentyp==$typ)
 			$selected='selected';
 		else
 			$selected='';
 
-		echo "<OPTION value='$code' $selected>$kurzbz</OPTION>";
+		echo "<OPTION value='". $row->adressentyp ."' $selected>$row->bezeichnung</OPTION>";
 	}
 	echo "</SELECT></td>";
 	echo "<td><input type='checkbox' name='heimatadresse' ".($heimatadresse?'checked':'')." /></td>";
