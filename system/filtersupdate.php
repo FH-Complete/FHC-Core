@@ -1058,7 +1058,7 @@ $filters = array(
 		',
 		'oe_kurzbz' => null,
 	),
-    array(
+	array(
 		'app' => 'core',
 		'dataset_name' => 'phrases',
 		'filter_kurzbz' => 'all',

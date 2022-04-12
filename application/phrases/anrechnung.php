@@ -1651,6 +1651,26 @@ $phrases = array(
 				'description' => '',
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'benotungDerLV',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '     Lehrveranstaltung bereits benotet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course already graded',    
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 

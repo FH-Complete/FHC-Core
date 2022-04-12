@@ -2093,6 +2093,23 @@ $phrases = array(
 				'description' => '',
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'nurLeseberechtigung',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nur Leseberechtigung",
+				'description' => ''
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Read-Only Access",
+				'description' => ''
+			)
+		)
 	)
 );
 
