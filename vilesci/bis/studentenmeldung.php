@@ -150,15 +150,17 @@ else
 }
 
 /*
+Obsolete - Standort wird nun aus DB geholt
  standortcode 22=Wien
 derzeit fuer alle Studierende der gleiche Standort
 ToDo: Standort sollte pro Student konfigurierbar sein.
-*/
+
 $standortcode='22';
 if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859','871')))
 	$standortcode='14'; // Pinkafeld
 elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271','781')))
 	$standortcode='3'; // Eisenstadt
+*/
 
 $datumobj=new datum();
 
@@ -192,13 +194,17 @@ if ($stg_kz != 'alleBaMa')
 {
 	$qry_akt = "
 		SELECT
-			DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
+			DISTINCT ON(student_uid, nachname, vorname) *,
+			public.tbl_person.person_id AS pers_id,
+			public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+			public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON(student_uid=uid)
 			JOIN public.tbl_person USING (person_id)
 			JOIN public.tbl_prestudent USING (prestudent_id)
 			JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+			JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 		WHERE
 			bismelden=FALSE
 			AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
@@ -228,13 +234,17 @@ if ($stg_kz != 'alleBaMa')
 //Incoming ohne I/O Datensatz anzeigen
 	$qry_in = "
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
@@ -257,13 +267,17 @@ if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
 {
 	$qry="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
 		AND (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
@@ -277,7 +291,10 @@ elseif ($stg_kz == 'alleBaMa')
 {
 	$qry="
 	SELECT
-		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -304,13 +321,17 @@ else
 {
 	$qry="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
@@ -329,16 +350,22 @@ else
 
 if($result = $db->db_query($qry))
 {
+
 	$stg_kz_index = '';
 
 	while($row = $db->db_fetch_object($result))
 	{
+		$row->pre_foerderrelevant = $db->db_parse_bool($row->pre_foerderrelevant);
+		$row->stg_foerderrelevant = $db->db_parse_bool($row->stg_foerderrelevant);
+
 		if ($row->studiengang_kz != $stg_kz_index)
 		{
 			//Studiengangsdaten auslesen
 			$stg_obj = new studiengang();
 			if($stg_obj->load($row->studiengang_kz))
 			{
+				
+
 				$maxsemester = $stg_obj->max_semester;
 				if($maxsemester == 0)
 				{
@@ -747,7 +774,8 @@ function GenerateXMLStudentBlock($row)
 	global $v;
 	global $stgart, $maxsemester, $orgform_kurzbz, $bisprevious,$anzahl_fehler;
 	global $iosem, $stsem, $usem, $asem, $absem, $stlist, $gssem;
-	global $verwendete_orgformen, $datum_obj,$orgform_code_array,$standortcode;
+	//global $verwendete_orgformen, $datum_obj,$orgform_code_array,$standortcode;
+	global $verwendete_orgformen, $datum_obj,$orgform_code_array;
 	global $kodex_studientyp_array, $kodex_studstatuscode_array;
 	global $stg_kz;
 	$error_log='';
@@ -1491,7 +1519,7 @@ function GenerateXMLStudentBlock($row)
 		if(!$ausserordentlich)
 		{
 			$datei.="
-			<StandortCode>".$standortcode."</StandortCode>";
+			<StandortCode>".$row->standort_code."</StandortCode>";
 		}
 		/*
 		 * BMWFFoerderrung derzeit fuer alle Studierende auf Ja gesetzt
@@ -1502,14 +1530,25 @@ function GenerateXMLStudentBlock($row)
 		 *
 		 * ToDo: sollte pro Studierenden konfigurierbar sein
 		 */
-		if($aktstatus=='Incoming' || $ausserordentlich
-			|| ($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
-			$bmwf='N';
-		else
+		//if($aktstatus=='Incoming' || $ausserordentlich
+		//	|| ($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
+		//	$bmwf='N';
+		//else
+		//	$bmwf='J';
+
+		if ($row->pre_foerderrelevant === true) {
 			$bmwf='J';
+		} else if ($row->pre_foerderrelevant === false) {
+			$bmwf='N';
+		} else if ($row->stg_foerderrelevant === true) {
+			$bmwf='J';
+		} else {
+			$bmwf='N';
+		}
 
 		$datei.="
 			<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
+
 
 		// **** IO Container ****/
 		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."

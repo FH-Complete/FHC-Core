@@ -448,10 +448,11 @@ class Studiengang_model extends DB_Model
 
 		return $this->execQuery($query, array($typ));
 	}
-	
+
 	/**
-	 * Get Studiengangsleitung
-	 * @param null $studiengang_kz
+	 * Get Studiengangsleitung/en of Studiengang/Studiengaenge.
+     *
+	 * @param null $studiengang_kz Numeric or Array
 	 * @return array
 	 */
 	public function getLeitung($studiengang_kz = null)
@@ -460,7 +461,12 @@ class Studiengang_model extends DB_Model
 		$this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
 		$this->addJoin('public.tbl_benutzer', 'uid');
 		$this->addJoin('public.tbl_person', 'person_id');
-		
+
+		if (!is_numeric($studiengang_kz) && !is_array($studiengang_kz))
+		{
+			return error('Studiengangskennzahl ungültig');
+		}
+
 		if (is_null($studiengang_kz))
 		{
 			$condition = '
@@ -469,16 +475,21 @@ class Studiengang_model extends DB_Model
                 AND ( datum_bis >= NOW() OR datum_bis IS NULL )
             ';
 		}
-		elseif (is_numeric($studiengang_kz))
+		elseif (is_numeric($studiengang_kz) || is_array($studiengang_kz))
 		{
+            if (is_array($studiengang_kz))
+            {
+				$studiengang_kz = array_map(array($this,'escape'), $studiengang_kz);
+                $studiengang_kz = implode(', ', $studiengang_kz);
+            }
 			$condition =  '
                funktion_kurzbz = \'Leitung\'
                 AND ( datum_von <= NOW() OR datum_von IS NULL )
                 AND ( datum_bis >= NOW() OR datum_bis IS NULL )
-                AND studiengang_kz = ' . $this->db->escape($studiengang_kz)
+                AND studiengang_kz IN (' . $studiengang_kz. ')';
 			;
 		}
-		
+
 		return $this->loadWhere($condition);
 	}
 
