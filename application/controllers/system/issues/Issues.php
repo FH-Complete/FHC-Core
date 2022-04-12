@@ -153,7 +153,9 @@ class Issues extends Auth_Controller
 		}
 
 		// add oes for which there is the "manage issues" Berechtigung
-		if (!$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ))
+		$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ);
+
+		if (!$oe_kurzbz_berechtigt)
 			show_error('No permission or error when checking permissions');
 
 		$all_oe_kurzbz_berechtigt = array_unique(array_merge($oe_kurzbz_for_funktion, $oe_kurzbz_berechtigt));
