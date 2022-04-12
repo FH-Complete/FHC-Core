@@ -33,6 +33,7 @@ require_once('../../../include/mail.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/sprache.class.php');
+require_once('../../../include/zeitaufzeichnung.class.php');
 
 $sprache = getSprache();
 $lang = new sprache();
@@ -281,6 +282,22 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 			{
 				$vgmail.='<br><span class="error">'.$p->t('zeitsperre/urlaubBereitsEingetragen').'</span>';
 				$error=true;
+				break;
+			}
+		}
+
+		//Prüfen, ob eine Zeitaufzeichnung vorhanden ist und ggf Abbrechen
+		for ($i = 0; $i < count($akette); $i++)
+		{
+			$za = new zeitaufzeichnung();
+			$vonDatum = new DateTime($akette[$i]);
+			$bisDatum = new DateTime($ekette[$i]);
+
+			if ($za->existsZeitaufzeichnung($uid, $vonDatum->format('d.m.Y'), $bisDatum->format('d.m.Y')))
+			{
+				$error = true;
+				$vgmail .= '<br><span class="error">'.$p->t('zeitsperre/zeitaufzeichnungVorhanden'). ' '.
+										$vonDatum->format('d.m.Y'). ' - '. $bisDatum->format('d.m.Y'). '</span>';
 				break;
 			}
 		}
@@ -794,13 +811,13 @@ for ($i=0;$i<6;$i++)
 				echo '<b>'.$tage[$j+7*$i].'</b><br>';
 				if(strlen(stristr($tage[$j+7*$i],"."))>0)
 				{
-					echo '<input type="checkbox" name="wtag[]" 
-					value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'" 
+					echo '<input type="checkbox" name="wtag[]"
+					value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'"
 					id="'.date("d.m.Y",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'"></td>';
 				}
 				else
 				{
-					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'" 
+					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"
                     id="'.date("d.m.Y",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
 				}
 			}
