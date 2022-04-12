@@ -32,6 +32,24 @@ function printPageTitle($title)
 }
 
 /**
+ * Print the meta tag http-equiv refresh having as content the value of the given parameter
+ */
+function printRefreshMeta($refresh)
+{
+	if ($refresh != null)
+	{
+		if (is_numeric($refresh) && $refresh > 0)
+		{
+			echo '<meta http-equiv="refresh" content="'.$refresh.'">';
+		}
+		else
+		{
+			show_error('The provided refresh parameter has to be a number greater then 0');
+		}
+	}
+}
+
+/**
  * Generates tags for the style sheets you want to include, the parameter could by a string or an array of strings
  */
 function generateCSSsInclude($CSSs)

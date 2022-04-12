@@ -413,6 +413,12 @@ if(!$error)
 			}
 			if(!$error)
 			{
+				//Check, ob OE aktiv ist, sonst Hinweis ausgeben
+				$oe = new organisationseinheit($_POST['oe_kurzbz']);
+				if ($oe->aktiv === false)
+				{
+					$errormsg = 'ACHTUNG: Die Organisationseinheit ist inaktiv. Änderungen wurden gespeichert.';
+				}
 				$benutzerfunktion->oe_kurzbz = $_POST['oe_kurzbz'];
 				$benutzerfunktion->semester = $_POST['semester'];
 				$benutzerfunktion->fachbereich_kurzbz = $_POST['fachbereich_kurzbz'];

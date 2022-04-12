@@ -5,7 +5,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class approveAnrechnungUebersicht extends Auth_Controller
 {
 	const BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN = 'lehre/anrechnung_genehmigen';
-	
+	const BERECHTIGUNG_ANRECHNUNG_ANLEGEN = 'lehre/anrechnung_anlegen';
+
 	const REVIEW_ANRECHNUNG_URI = '/lehre/anrechnung/ReviewAnrechnungUebersicht';
 	
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
@@ -19,8 +20,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_genehmigen:rw',
-				'download'  => 'lehre/anrechnung_genehmigen:rw',
+				'index'     => 'lehre/anrechnung_genehmigen:r',
+				'download'  => 'lehre/anrechnung_genehmigen:r',
 				'approve'   => 'lehre/anrechnung_genehmigen:rw',
 				'reject'    => 'lehre/anrechnung_genehmigen:rw',
 				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw'
@@ -76,10 +77,19 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		{
 			show_error(getError($studiengang_kz_arr));
 		}
-		
+
+        $hasReadOnlyAccess =
+            $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's')
+            && !$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid');
+
+        // This permission is checked here to disable create Anrechnung button, if permission is not given
+        $hasCreateAnrechnungAccess = $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN, 's');
+
 		$viewData = array(
 			'studiensemester_selected' => $studiensemester_kurzbz,
-			'studiengaenge_entitled' => $studiengang_kz_arr
+			'studiengaenge_entitled' => $studiengang_kz_arr,
+            'hasReadOnlyAccess' => $hasReadOnlyAccess,
+            'hasCreateAnrechnungAccess' => $hasCreateAnrechnungAccess
 		);
 		
 		$this->load->view('lehre/anrechnung/approveAnrechnungUebersicht.php', $viewData);
@@ -239,7 +249,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 
 		// Check if user is entitled to read dms doc
-		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 		
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
@@ -281,19 +291,14 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		{
 			show_error('Failed loading Lehrveranstaltung');
 		}
+
+        $studiengang_kz = $result->studiengang_kz;
 		
-		// Get STGL
-		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
-		
-		if($result = getData($result)[0])
-		{
-			if ($result->uid == $this->_uid)
-			{
-				return;
-			}
-		}
-		
-		show_error('You are not entitled to read this document');
+		// Check if user is entitled
+		if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $studiengang_kz))
+        {
+            show_error('You are not entitled to read this document');
+        }
 	}
 	
 	/**
@@ -376,23 +381,24 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 			$result = $this->LehrveranstaltungModel->getLecturersByLv($anrechnung['studiensemester_kurzbz'], $anrechnung['lehrveranstaltung_id']);
 			
-			if (!$result = getData($result))
+			if (!hasData($result))
 			{
 				show_error('Failed retrieving lectors of Lehrveranstaltung');
 			}
 			
+			$lecturersByLv = getData($result);
+
 			// Check if lv has LV-Leitung
-			$key = array_search(true, array_column($result, 'lvleiter'));
-			
+			$key = array_search(true, array_column($lecturersByLv, 'lvleiter'));
 			// If lv has LV-Leitung, keep only the one
 			if ($key !== false)
 			{
-				$lector_arr[]= $result[$key];
+				$lector_arr[]= $lecturersByLv[$key];
 			}
 			// ...otherwise keep all lectors
 			else
 			{
-				$lector_arr = array_merge($lector_arr, $result);
+				$lector_arr = array_merge($lector_arr, $lecturersByLv);
 			}
 		}
 		
