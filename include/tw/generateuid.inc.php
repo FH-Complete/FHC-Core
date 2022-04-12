@@ -23,7 +23,6 @@
  * Funktionen zum Generieren der UIDs
  */
 require_once(dirname(__FILE__).'/../addon.class.php');
-require_once(dirname(__FILE__).'/../mitarbeiter.class.php');
 
 // die aktiven Addons werden durchsucht, ob eines davon eine eigene UID Generierung vorsieht
 // falls ja, wird die Version des Addons genommen, ansonsten die Default Generierung
@@ -74,7 +73,7 @@ if(!$generateuid_addon_found)
 	// ****
 	// * Gerneriert die Mitarbeiter UID
 	// ****
-	function generateMitarbeiterUID($vorname, $nachname, $lektor, $fixangestellt=true)
+	function generateMitarbeiterUID($vorname, $nachname, $lektor, $fixangestellt=true, $personalnummer=null)
 	{
 		$bn = new benutzer();
 		$reserviert = array();
@@ -110,18 +109,6 @@ if(!$generateuid_addon_found)
 					return $uid;
 		}
 	}
-
-	/**
-	 * Neue Logik Generierung Mitarbeiter UID
-	 * fortlaufende ma_number a la ma0200;
-	 * @return string $maNr maNr im Format maXXXX
-	 **/
-	function generateMaNumberUID()
-	{
-		$mitarbeiter = new mitarbeiter();
-		$maNr = $mitarbeiter->getMitarbeiterMaNr();
-
-		return $maNr;
-	}
 }
+
 ?>

@@ -1657,23 +1657,21 @@ class mitarbeiter extends benutzer
 
 
 	/**
-	 * Generiert mitarbeiter_uid anhand sequence tbl_mitarbeiter_personalnummer_seq
-	 * @return string $mitarbeiter_uid im Formate maXXXX (zum Bsp. ma0207)
+	 * Generiert nächste freie Personalnummer anhand der sequence tbl_mitarbeiter_personalnummer_seq
+	 * @return string $personalnummer
 	 */
-	public function getMitarbeiterMaNr()
+	public function getNextPersonalnummer()
 	{
-		$qry = "SELECT last_value FROM tbl_mitarbeiter_personalnummer_seq";
+		$qry = "SELECT nextval('tbl_mitarbeiter_personalnummer_seq') ";
 
 		if ($result = $this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object())
 			{
-				if ($row->last_value != '')
+				if ($row->nextval != '')
 				{
-					$maNr = $row->last_value;
-					$maNr = $maNr - 9999;
-					$maNr =  'ma'. $maNr;
-					return $maNr;
+					$personalnummer = $row->nextval;
+					return $personalnummer;
 				}
 				else
 				{

@@ -621,8 +621,16 @@ if(isset($_POST['save']))
 		$nachname_clean = mb_strtolower(convertProblemChars($nachname));
 		$vorname_clean = mb_strtolower(convertProblemChars($vorname));
 		$uid='';
+		$mitarbeiter = new mitarbeiter();
 
-		$uid = generateMaNumberUID();
+		if ($_POST['personalnummer'])
+		{
+			$personalnummer = $_POST['personalnummer'];
+		}
+		else
+			$personalnummer = $mitarbeiter->getNextPersonalnummer();
+
+		$uid = generateMitarbeiterUID($vorname_clean, $nachname_clean, $lektor, $fixangestellt, $personalnummer);
 
 		if ($wunschUid != '')
 		{
