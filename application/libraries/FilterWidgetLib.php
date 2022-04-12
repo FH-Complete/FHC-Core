@@ -203,7 +203,7 @@ class FilterWidgetLib
 			// Loops in the session for all the filter widgets
 			foreach ($filterWidgetsSession as $filterWidget => $filterWidgetData)
 			{
-				// If this filter widget is not the currrent used filter widget and the it is expired...
+				// If this filter widget is not the current used filter widget and the it is expired...
 				if ($this->_filterUniqueId != $filterWidget && $filterWidgetData[self::SESSION_TIMEOUT] <= time())
 				{
 					cleanSessionElement(self::SESSION_NAME, $filterWidget); // ...remove it
@@ -232,7 +232,7 @@ class FilterWidgetLib
 		if ($filterId != null && is_numeric($filterId) && $filterId > 0)
 		{
 			$whereParameters = array(
-				'filter_id' => $filterId
+				self::FILTER_ID => $filterId
 			);
 		}
 		else
@@ -266,6 +266,7 @@ class FilterWidgetLib
 					$whereParameters = array(
 						'app' => $app,
 						'dataset_name' => $datasetName,
+						'person_id' => null,
 						'default_filter' => true
 					);
 
@@ -278,6 +279,18 @@ class FilterWidgetLib
 		if ($definition == null && $whereParameters != null)
 		{
 			$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
+
+			// Last chance!!!
+			if (!hasData($definition)) // If no data have been found until now the tries the most desperate query
+			{
+				$this->_ci->FiltersModel->addOrder('filter_id', 'ASC'); // sort on column filter_id to get the oldest
+				$whereParameters = array(
+					'app' => $app,
+					'dataset_name' => $datasetName
+				);
+
+				$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
+			}
 		}
 
 		return $definition;
@@ -711,8 +724,11 @@ class FilterWidgetLib
 		{
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel'); // to remove the filter definitions from DB
 
-			// delete it!
-			$this->_ci->FiltersModel->delete(array('filter_id' => $filterId));
+			// Delete it from database
+			$this->_ci->FiltersModel->delete(array(self::FILTER_ID => $filterId));
+
+			// Delete it from session
+			$this->_dropFromSessionFilterWidgetById($filterId);
 
 			$removeCustomFilter = true;
 		}
@@ -734,12 +750,14 @@ class FilterWidgetLib
 		$session = $this->getSession(); // The filter currently stored in session (the one that is currently used)
 		if ($session != null)
 		{
-			// Loads the Fitlers model
+			// Loads the Filters model
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
 
 			// Loads all the filters related to this page (same dataset_name and same app name)
-			$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetName(
-				$session[self::APP], $session[self::DATASET_NAME]
+			$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetNamePersonId(
+				$session[self::APP],
+				$session[self::DATASET_NAME],
+				getAuthPersonId()
 			);
 
 			// If filters were loaded
@@ -758,7 +776,7 @@ class FilterWidgetLib
 							'%s?%s=%s',
 							site_url($navigationPage),
 							self::FILTER_ID,
-							$filter->filter_id
+							$filter->{self::FILTER_ID}
 						) // link
 					);
 
@@ -771,7 +789,7 @@ class FilterWidgetLib
 					{
 						$menuEntry['subscriptDescription'] = 'Remove';
 						$menuEntry['subscriptLinkClass'] = 'remove-custom-filter';
-						$menuEntry['subscriptLinkValue'] = $filter->filter_id;
+						$menuEntry['subscriptLinkValue'] = $filter->{self::FILTER_ID};
 						$childrenPersonalArray[] = $menuEntry; // adds to personal filters menu array
 					}
 				}
@@ -813,9 +831,6 @@ class FilterWidgetLib
 		}
 	}
 
-	//------------------------------------------------------------------------------------------------------------------
-	// Private methods
-
 	/**
 	 * Return an unique string that identify this filter widget
 	 * NOTE: The default value is the URI where the FilterWidget is called
@@ -856,6 +871,9 @@ class FilterWidgetLib
 
 		$this->_filterUniqueId = $filterUniqueId;
 	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
 
 	/**
 	 * Generates a condition for a SQL where clause using the given applied filter definition.
@@ -971,4 +989,29 @@ class FilterWidgetLib
 
 		return $pos;
 	}
+
+	/**
+	 * Remove from the session the given filter widget
+	 */
+	private function _dropFromSessionFilterWidgetById($filterId)
+	{
+		// Loads the session for all the filter widgets
+		$filterWidgetsSession = getSession(self::SESSION_NAME);
+
+		// If something is present in session
+		if ($filterWidgetsSession != null)
+		{
+			// Loops in the session for all the filter widgets
+			foreach ($filterWidgetsSession as $filterWidget => $filterWidgetData)
+			{
+				// If this filter widget is not the one that we are looking for
+				if ($filterWidgetData[self::FILTER_ID] == $filterId)
+				{
+					cleanSessionElement(self::SESSION_NAME, $filterWidget); // ...remove it
+					break; // stop to search
+				}
+			}
+		}
+	}
 }
+

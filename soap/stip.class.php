@@ -173,7 +173,7 @@ class stip extends basis_db
 	 * Suche Studenten anhand PersonKz
 	 * @param $PersonKz
 	 */
-	function searchMatrikelnummerStg($Matrikelnummer, $StgKz)
+	function searchMatrikelnummerStg($Matrikelnummer, $StgKz, $studSemester)
 	{
 		$qry = "SELECT
 			 prestudent_id, vorname, nachname, svnr, matrikelnr, student.studiengang_kz, person.matr_nr
@@ -183,20 +183,35 @@ class stip extends basis_db
 				JOIN public.tbl_person person using(person_id)
 			WHERE
 				person.matr_nr = ".$this->db_add_param($Matrikelnummer)."
-				AND student.studiengang_kz=".$this->db_add_param(ltrim($StgKz,0)).";";
+				AND student.studiengang_kz=".$this->db_add_param(ltrim($StgKz,0))."
+				AND EXISTS(
+					SELECT 1 FROM public.tbl_prestudentstatus
+					WHERE
+						prestudent_id=student.prestudent_id
+						AND studiensemester_kurzbz=".$this->db_add_param($studSemester)."
+					);";
 
 		if($this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
+			// wenn mehr als 1 Datensatz gefunden wird --> Fehler
+			if($this->db_num_rows() == 1 )
 			{
-				$this->Vorname_Antwort = $row->vorname;
-				$this->Familienname_Antwort = $row->nachname;
-				$this->SVNR_Antwort = $row->svnr;
-				$this->PersKz_Antwort = trim($row->matrikelnr);
-				$this->StgKz_Antwort = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
-				$this->Matrikelnummer_Antwort = $row->matr_nr;
-				$this->AntwortStatusCode = 1;
-				return $row->prestudent_id;
+				if($row = $this->db_fetch_object())
+				{
+					$this->Vorname_Antwort = $row->vorname;
+					$this->Familienname_Antwort = $row->nachname;
+					$this->SVNR_Antwort = $row->svnr;
+					$this->PersKz_Antwort = trim($row->matrikelnr);
+					$this->StgKz_Antwort = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
+					$this->Matrikelnummer_Antwort = $row->matr_nr;
+					$this->AntwortStatusCode = 1;
+					return $row->prestudent_id;
+				}
+				else
+				{
+					$this->AntwortStatusCode = 2;
+					return false;
+				}
 			}
 			else
 			{
@@ -215,7 +230,7 @@ class stip extends basis_db
 	 * Suche Studenten anhand Sozialversicherungsnummer
 	 * @param $Svnr
 	 */
-	function searchSvnr($Svnr)
+	function searchSvnr($Svnr, $StgKz, $studSemester)
 	{
 		$qry = "SELECT
 					prestudent_id, vorname, nachname, svnr, matrikelnr, student.studiengang_kz, person.matr_nr
@@ -223,7 +238,18 @@ class stip extends basis_db
 					public.tbl_student student
 					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
 					JOIN public.tbl_person person using(person_id)
-				WHERE person.svnr = ".$this->db_add_param($Svnr).";";
+				WHERE person.svnr = ".$this->db_add_param($Svnr);
+
+		if ($StgKz != '')
+			$qry.=" AND student.studiengang_kz=".$this->db_add_param($StgKz);
+
+		if ($studSemester != '')
+				$qry.=" AND EXISTS(
+					SELECT 1 FROM public.tbl_prestudentstatus
+					WHERE
+						prestudent_id=student.prestudent_id
+						AND studiensemester_kurzbz=".$this->db_add_param($studSemester)."
+					)";
 
 		if($this->db_query($qry))
 		{
@@ -266,7 +292,7 @@ class stip extends basis_db
 	 * Suche Studenten anhand Vor- und Nachname
 	 * @param $Svnr
 	 */
-	function searchVorNachname($Vorname, $Nachname)
+	function searchVorNachname($Vorname, $Nachname, $StgKz, $studSemester)
 	{
 		$qry = "SELECT
 					prestudent_id, vorname, nachname, svnr, matrikelnr, student.studiengang_kz, person.matr_nr
@@ -276,7 +302,18 @@ class stip extends basis_db
 					JOIN public.tbl_person person using(person_id)
 				WHERE
 					person.vorname = ".$this->db_add_param($Vorname)."
-					AND person.nachname = ".$this->db_add_param($Nachname).";";
+					AND person.nachname = ".$this->db_add_param($Nachname);
+
+		if ($StgKz != '')
+			$qry.=" AND student.studiengang_kz=".$this->db_add_param($StgKz);
+
+		if ($studSemester != '')
+			$qry.=" AND EXISTS(
+				SELECT 1 FROM public.tbl_prestudentstatus
+				WHERE
+					prestudent_id=student.prestudent_id
+					AND studiensemester_kurzbz=".$this->db_add_param($studSemester)."
+				)";
 
 		if($this->db_query($qry))
 		{

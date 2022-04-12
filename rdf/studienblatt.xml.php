@@ -154,10 +154,13 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengangSpracheEnglisch><![CDATA[".$studienplan_sprache_englisch."]]></studiengangSpracheEnglisch>";
 			echo "\t\t<ects_gesamt><![CDATA[".$studienordnung->ects."]]></ects_gesamt>";
 			echo "\t\t<ects_pro_semester><![CDATA[".($studienplan->regelstudiendauer!=0?$studienordnung->ects/$studienplan->regelstudiendauer:0)."]]></ects_pro_semester>";
+			echo "\t\t<ects_gesamt_studienplan><![CDATA[".$studienplan->ects_stpl."]]></ects_gesamt_studienplan>";
+			echo "\t\t<ects_pro_semester_studienplan><![CDATA[".($studienplan->regelstudiendauer!=0?$studienplan->ects_stpl/$studienplan->regelstudiendauer:0)."]]></ects_pro_semester_studienplan>";
 
 			echo "\t\t<aktuellesJahr><![CDATA[".date('Y')."]]></aktuellesJahr>";
-			$status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,null,null))?$prestudent->status_kurzbz:'';
+			$status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,$studiensemester,null))?$prestudent->status_kurzbz:'';
 			$abbrecher = false;
+			$absolvent = false;
 
 			switch($status_aktuell)
 			{
@@ -169,19 +172,20 @@ foreach($uid_arr as $uid)
 					break;
 				case 'Absolvent':
 					$studierendenstatus_aktuell = 'AbsolventIn';
+					$absolvent = true;
 					break;
 				case 'Diplomand':
 					$studierendenstatus_aktuell = 'DiplomandIn';
 					break;
 				case 'Abbrecher':
 					$studierendenstatus_aktuell = 'AbbrecherIn';
-					$enddatum = date('d.m.Y',strtotime($prestudent->bestaetigtam));
 					$abbrecher = true;
 					break;
 				default:
 					$studierendenstatus_aktuell ='';
 			}
 		echo "\t\t<abbrecher><![CDATA[".($abbrecher?'true':'false')."]]></abbrecher>";
+		echo "\t\t<absolvent><![CDATA[".($absolvent?'true':'false')."]]></absolvent>";
 
 		echo "\t\t<ausbildungssemester_aktuell><![CDATA[".$prestudent->ausbildungssemester."]]></ausbildungssemester_aktuell>";
 
@@ -207,7 +211,7 @@ foreach($uid_arr as $uid)
 
 		$prestudent->getLastStatus($student->prestudent_id,$studiensemester);
 		$studiensemester_abschluss = new studiensemester();
-		if($abbrecher)
+		if($abbrecher || $absolvent)
 			$abschluss = $prestudent->studiensemester_kurzbz;
 		else
 			$abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
@@ -223,7 +227,7 @@ foreach($uid_arr as $uid)
 
 		echo "\t\t<studiensemester_endedatum><![CDATA[".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."]]></studiensemester_endedatum>";
 
-		if($abbrecher)
+		if($abbrecher || $absolvent)
 			echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".date('d.m.Y',strtotime($prestudent->datum))."]]></voraussichtlichLetztesStudiensemester_datum>";
 		else
 			echo "\t\t<voraussichtlichLetztesStudiensemester_datum><![CDATA[".$enddatum."]]></voraussichtlichLetztesStudiensemester_datum>";

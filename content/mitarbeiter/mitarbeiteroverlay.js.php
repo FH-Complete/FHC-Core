@@ -857,6 +857,12 @@ function MitarbeiterSave()
 		return false;
 	}
 
+	if(!checkAlias(alias))
+	{
+		alert('Der Alias darf keine Sonderzeichen außer ._- enthalten.');
+		return false;
+	}
+
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -1234,6 +1240,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	inkludierte_lehre = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-inkludierte_lehre').value;
 	zeitaufzeichnungspflichtig = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked;
 	azgrelevant = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-azgrelevant').checked;
+	homeoffice = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-homeoffice').checked;
 
 	if(verwendung_code=='1')
 	{
@@ -1293,6 +1300,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	req.add('inkludierte_lehre', inkludierte_lehre);
 	req.add('zeitaufzeichnungspflichtig', zeitaufzeichnungspflichtig);
 	req.add('azgrelevant', azgrelevant);
+	req.add('homeoffice', homeoffice);
 
 	var response = req.executePOST();
 

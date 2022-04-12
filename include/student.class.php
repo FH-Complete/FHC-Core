@@ -571,7 +571,7 @@ class student extends benutzer
 	{
 		$qry = "SELECT tbl_student.* FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid)
 				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
-				
+
 		if($studiengang_kz != '')
 		{
 			$qry .= " AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);

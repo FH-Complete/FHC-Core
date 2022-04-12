@@ -160,7 +160,7 @@ $this->load->view(
                             'Ausbildungssemester_widget',
                             array(
                                 DropdownWidget::SELECTED_ELEMENT => $ausbildungssemester_selected,
-                                'number_semester' => 6
+                                'number_semester' => 10
                             ),
                             array(
                                 'name' => 'ausbildungssemester',

@@ -49,6 +49,7 @@ class zeitaufzeichnung extends basis_db
 	public $ext_id;					// bigint
 	public $service_id;				// integer
 	public $kunde_uid;				// varchar(32)
+	public $homeoffice;				// bool
 
 	/**
 	 * Konstruktor
@@ -104,6 +105,7 @@ class zeitaufzeichnung extends basis_db
 			$this->ext_id = $row->ext_id;
 			$this->service_id = $row->service_id;
 			$this->kunde_uid = $row->kunde_uid;
+			$this->homeoffice = $row->homeoffice;
 		}
 		else
 		{
@@ -203,7 +205,7 @@ class zeitaufzeichnung extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO campus.tbl_zeitaufzeichnung (uid, aktivitaet_kurzbz, start, ende, beschreibung,
-			      oe_kurzbz_1, oe_kurzbz_2, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz, projektphase_id, service_id, kunde_uid) VALUES('.
+			      oe_kurzbz_1, oe_kurzbz_2, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz, projektphase_id, service_id, homeoffice, kunde_uid) VALUES('.
 			      $this->db_add_param($this->uid).', '.
 			      $this->db_add_param($this->aktivitaet_kurzbz).', '.
 			      $this->db_add_param($this->start).', '.
@@ -218,6 +220,7 @@ class zeitaufzeichnung extends basis_db
 			      $this->db_add_param($this->projekt_kurzbz).', '.
 			      $this->db_add_param($this->projektphase_id, FHC_INTEGER).', '.
 			      $this->db_add_param($this->service_id).', '.
+				  $this->db_add_param($this->homeoffice, FHC_BOOLEAN).', '.
 			      $this->db_add_param($this->kunde_uid).');';
 		}
 		else
@@ -244,6 +247,7 @@ class zeitaufzeichnung extends basis_db
 		      	' projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
 		      	' projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).', '.
 				' service_id='.$this->db_add_param($this->service_id).', '.
+				' homeoffice ='.$this->db_add_param($this->homeoffice, FHC_BOOLEAN).', '.
 				' kunde_uid='.$this->db_add_param($this->kunde_uid).' '.
 		      	'WHERE zeitaufzeichnung_id='.$this->db_add_param($this->zeitaufzeichnung_id, FHC_INTEGER, false);
 		}
@@ -349,6 +353,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
+			    $obj->homeoffice = $row->homeoffice;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -430,6 +435,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
+				$obj->homeoffice = $row->homeoffice;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -491,6 +497,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
+			    $obj->homeoffice = $row->homeoffice;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -556,6 +563,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
+			    $obj->homeoffice = $row->homeoffice;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -804,20 +812,141 @@ or not exists
 
 			$qry = "select max(datum) from addon.tbl_casetime_timesheet where ".$where." and abgeschicktamum is not null";
 
-		    if($result = $this->db_query($qry))
-		    {
+			if ($result = $this->db_query($qry))
+			{
 				$datum = $this->db_fetch_object($result);
 				return $datum->max;
-		    }
-		    else
-		    {
-		    	return false;
-		    }
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
 			return false;
 		}
 	}
+
+	/**
+	 * Prüft, ob es für einen bestimmten User für einen bestimmten Tag eine Zeitaufzeichnung  gibt
+	 * @param string $user Uid des zu prüfenden Users.
+	 * @param date $vonDay Startdatum des zu prüfenden Zeitraumes im Format d.m.Y.
+	 * @param date $bisDay Enddatum des zu prüfenden Zeitraumes im Format d.m.Y.
+	 * @return boolean true, wenn vorhanden, sonst false
+	 */
+	public function existsZeitaufzeichnung($user, $vonDay, $bisDay)
+	{
+		$datum = date($vonDay);
+		$year = substr($datum, 6, 4);
+		$month = substr($datum, 3, 2);
+		$day = substr($datum, 0, 2);
+
+		$datumbisDay = date($bisDay);
+		$yearbisDay = substr($datumbisDay, 6, 4);
+		$monthbisDay = substr($datumbisDay, 3, 2);
+		$daybisDay = substr($datumbisDay, 0, 2);
+
+		$bisDay = date("Y-m-d", (mktime(0, 0, 0, $monthbisDay, $daybisDay + 1, $yearbisDay)));
+		$datum = date("Y-m-d", (mktime(0, 0, 0, $month, $day, $year)));
+
+		$qry = "
+			SELECT *
+			FROM campus.tbl_zeitaufzeichnung
+			WHERE uid = ". $this->db_add_param($user). "
+			AND start >= ". $this->db_add_param($datum). "
+			AND ende < ". $this->db_add_param($bisDay). ";
+		";
+
+		if ($this->db_query($qry))
+		{
+			$num_rows = $this->db_num_rows();
+			if ($num_rows >= 1)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/** Check, if there is a blocking PausenError
+	 *
+	 * @param string $uid User uid.
+	 * @param string $datumday Day to be check in the format "Y-m-d".
+	 * @return boolean True if there is a Pausen error.
+	 */
+	public function checkPausenErrors($uid, $datumday)
+	{
+		$tagesbeginn = '';
+		$tagesende = '';
+		$pausesumme = 0;
+		$tagessaldo = '';
+		$elsumme = '00:00';
+		$pflichtpause = false;
+		$blockingError = false;
+		$datum = new datum();
+
+		$this->getListeUserFromTo($uid, $datumday, $datumday, null);
+
+		foreach ($this->result as $row)
+		{
+			$datumtag = $datum->formatDatum($row->datum, 'Y-m-d');
+
+			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+			$tagesbeginn = $datum->formatDatum($row->start, 'H:i');
+
+			if (($tagesende == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+				$tagesende = $datum->formatDatum($row->ende, 'H:i');
+
+			if ($row->aktivitaet_kurzbz == "Pause")
+			{
+				list($h1, $m1) = explode(':', $row->diff);
+				$pausesumme += ($h1 * 3600 + $m1 * 60);
+			}
+		}
+
+		$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) - $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) - 3600;
+
+		list($h2, $m2) = explode(':', $elsumme);
+		$elsumme = $h2 * 3600 + $m2 * 60;
+
+
+		if ($datum->formatDatum($datumday, 'Y-m-d') >= '2019-11-06')
+		{
+			$pausesumme = $pausesumme;
+		}
+		elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pflichtpause == false && $elsumme == 0)
+		{
+			$pausesumme = $tagessaldo - 18000;
+		}
+		elseif ($tagessaldo > 18000 && $pflichtpause == false && $elsumme == 0)
+		{
+			$pausesumme = $pausesumme + 1800;
+		}
+
+		if ($elsumme > 0)
+		{
+			$pausesumme = $pausesumme + $elsumme;
+			$pflichtpause = true;
+		}
+
+		$tagessaldo = $tagessaldo - $pausesumme;
+
+		//check if blocking error
+		if (($tagessaldo > 19800 && $pausesumme < 1800) || ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000))
+		{
+			$blockingError = true;
+		}
+
+		return $blockingError;
+	}
+
 }
 ?>

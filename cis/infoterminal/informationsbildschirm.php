@@ -37,6 +37,11 @@ else
 		$ip = $_SERVER["REMOTE_ADDR"];
 }
 
+if(isset($_GET['norefresh']))
+	$norefresh = true;
+else
+	$norefresh = false;
+
 $infoscreen = new infoscreen();
 $i=-1;
 $refreshzeit = 40; // Default Refreshzeit
@@ -90,9 +95,12 @@ if(isset($infoscreen_content) && isset($infoscreen_content[$aktuellerContentIdx]
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="refresh" content="',$refreshzeit,'">
-	<link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+	if (!$norefresh)
+	{
+		echo '<meta http-equiv="refresh" content="',$refreshzeit,'">';
+	}
+echo '	<link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
 ';
 
 //Skript fuer den automatischen bildlauf

@@ -19,7 +19,7 @@
  * 			Karl Burkhart <burkhart@technikum-wien.at>
  */
 /**
- * Klasse projekttask
+ * Klasse projektphase
  * @create 2011-05-23
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -48,6 +48,8 @@ class projektphase extends basis_db
 	public $insertvon;	    // bigint
 	public $updateamum;	    // timestamp
 	public $updatevon;	    // bigint
+	public $zeitaufzeichnung; // bool
+	public $project_task_id;
 
 
 	/**
@@ -92,7 +94,7 @@ class projektphase extends basis_db
 				$this->start = $row->start;
 				$this->ende = $row->ende;
 				$this->personentage = $row->personentage;
-                $this->farbe = $row->farbe;
+				$this->farbe = $row->farbe;
 				$this->budget = $row->budget;
 				$this->ressource_id = $row->ressource_id;
 				$this->ressource_bezeichnung = $row->ressource_bezeichnung;
@@ -100,6 +102,7 @@ class projektphase extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 				return true;
 			}
 			else
@@ -134,7 +137,6 @@ class projektphase extends basis_db
 			WHERE p.projektphase_fk=tasks.projektphase_fk
 		) SELECT *
 		FROM tasks) and projektphase_id not in (".$this->db_add_param($projektphase_id, FHC_INTEGER).")";
-		//echo "\n".$qry."\n";
 
 		if($this->db_query($qry))
 		{
@@ -151,17 +153,18 @@ class projektphase extends basis_db
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				//$obj->personentage = $row->personentage;
-                $obj->farbe = $row->farbe;
+				$obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
 				$obj->ressource_id = $row->ressource_id;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				$this->result[] = $obj;
 			}
-			//var_dump($this->result);
+
 			return true;
 		}
 		else
@@ -183,7 +186,6 @@ class projektphase extends basis_db
 		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichnung
 				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
 				WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
-		//echo "\n".$qry."\n";
 
 		if(!is_null($foreignkey))
 			$qry .= " and projektphase_fk is NULL";
@@ -204,8 +206,8 @@ class projektphase extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
-				//$obj->personentage = $row->personentage;
-                $obj->farbe = $row->farbe;
+				$obj->personentage = $row->personentage;
+				$obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
 				$obj->ressource_id = $row->ressource_id;
 				$obj->ressource_bezeichnung = $row->ressource_bezeichnung;
@@ -213,10 +215,10 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				$this->result[] = $obj;
 			}
-			//var_dump($this->result);
 			return true;
 		}
 		else
@@ -226,22 +228,22 @@ class projektphase extends basis_db
 		}
 	}
 
-    /**
-     * Lädt alle Unterphasen zu einem Projekt
-     * @param type $phase_id
-     * @return boolean
-     */
-    public function getAllUnterphasen($phase_id)
-    {
-        $qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichung
+	/**
+	 * Lädt alle Unterphasen zu einem Projekt
+	 * @param type $phase_id
+	 * @return boolean
+	 */
+	public function getAllUnterphasen($phase_id)
+	{
+		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichung
 				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
 				WHERE projektphase_fk =".$this->db_add_param($phase_id, FHC_INTEGER);
 
-        if($result = $this->db_query($qry))
-        {
-            while($row = $this->db_fetch_object())
-            {
-                $obj = new projektphase();
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new projektphase();
 
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
 				$obj->projektphase_id = $row->projektphase_id;
@@ -252,7 +254,7 @@ class projektphase extends basis_db
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				//$obj->personentage = $row->personentage;
-                $obj->farbe = $row->farbe;
+				$obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
 				$obj->ressource_id = $row->ressource_id;
 				$obj->ressource_bezeichnung = $row->ressource_bezeichnung;
@@ -260,17 +262,18 @@ class projektphase extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->zeitaufzeichnung = $this->db_parse_bool($row->zeitaufzeichnung);
 
 				$this->result[] = $obj;
-            }
-            return true;
-        }
-        else
-        {
-            $this->errormsg = "Fehler beim laden der Daten";
-            return false;
-        }
-    }
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden der Daten";
+			return false;
+		}
+	}
 
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
@@ -319,22 +322,22 @@ class projektphase extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
-
 			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, typ,
-				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
-			     $this->db_add_param($this->projekt_kurzbz).', '.
-			     $this->db_add_param($this->projektphase_fk).', '.
-				 $this->db_add_param($this->bezeichnung).', '.
-			     $this->db_add_param($this->typ).', '.
-			     $this->db_add_param($this->beschreibung).', '.
-			     $this->db_add_param($this->start).', '.
-			     $this->db_add_param($this->ende).', '.
-			     $this->db_add_param($this->budget).', '.
-			     $this->db_add_param($this->ressource_id).', '.
-			     $this->db_add_param($this->insertvon).', now(), '.
-			     $this->db_add_param($this->updatevon).', now(), '.
-                 $this->db_add_param($this->farbe).', '.
-			     $this->db_add_param($this->personentage).' );';
+				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage, zeitaufzeichnung) VALUES ('.
+				$this->db_add_param($this->projekt_kurzbz).', '.
+				$this->db_add_param($this->projektphase_fk).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->typ).', '.
+				$this->db_add_param($this->beschreibung).', '.
+				$this->db_add_param($this->start).', '.
+				$this->db_add_param($this->ende).', '.
+				$this->db_add_param($this->budget).', '.
+				$this->db_add_param($this->ressource_id).', '.
+				$this->db_add_param($this->insertvon).', now(), '.
+				$this->db_add_param($this->updatevon).', now(), '.
+				$this->db_add_param($this->farbe).', '.
+				$this->db_add_param($this->personentage).', '.
+				$this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -349,11 +352,12 @@ class projektphase extends basis_db
 				'start='.$this->db_add_param($this->start).', '.
 				'ende='.$this->db_add_param($this->ende).', '.
 				'budget='.$this->db_add_param($this->budget).', '.
-                'ressource_id='.$this->db_add_param($this->ressource_id).', '.
-                'farbe='.$this->db_add_param($this->farbe).', '.
+				'ressource_id='.$this->db_add_param($this->ressource_id).', '.
+				'farbe='.$this->db_add_param($this->farbe).', '.
 				'personentage='.$this->db_add_param($this->personentage).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'zeitaufzeichnung='.$this->db_add_param($this->zeitaufzeichnung,FHC_BOOLEAN).' '.
 				'WHERE projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).';';
 		}
 
@@ -528,7 +532,7 @@ class projektphase extends basis_db
 	 * gibt den Fortschritt der Phase in Prozent zurück --> Phasen die auf die übergebene Phase zeigen werden berücksichtigt
 	 * @param $projektphase_id
 	 */
-public function getFortschritt($projektphase_id)
+	 public function getFortschritt($projektphase_id)
 	{
 		$qry = "Select * from fue.tbl_projektphase phase
 		join fue.tbl_projekttask task using(projektphase_id)
@@ -685,26 +689,42 @@ public function getFortschritt($projektphase_id)
 	public function getProjectphaseForMitarbeiter($mitarbeiter_uid)
 	{
 		$projecphasetList = array();
+		$exists = @$this->db_query('SELECT 1 FROM sync.tbl_projects_timesheets_project LIMIT 1;');
 
-		$qry = "
-		SELECT
-			DISTINCT tbl_projektphase.*
-		FROM
-			fue.tbl_projektphase
-			JOIN fue.tbl_projekt USING (projekt_kurzbz)
-			JOIN fue.tbl_projekt_ressource USING (projektphase_id)
-			JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
-		WHERE
-		(
-			(
-				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
-			) AND (
-				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
-			)
-		)
-		AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+		$qry = "SELECT DISTINCT tbl_projektphase.*,
+				tbl_projekt.titel
+				";
+
+		if ($exists)
+		{
+			$qry .= ", tbl_sap_projects_timesheets.project_task_id
+					";
+		}
+
+		$qry .= "FROM fue.tbl_projektphase
+				JOIN fue.tbl_projekt USING (projekt_kurzbz)
+				JOIN fue.tbl_projekt_ressource USING(projektphase_id)
+				JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+				";
+
+		if ($exists)
+		{
+			$qry .= "LEFT JOIN sync.tbl_projects_timesheets_project ON tbl_projects_timesheets_project.projektphase_id = tbl_projekt_ressource.projektphase_id
+					LEFT JOIN sync.tbl_sap_projects_timesheets USING(projects_timesheet_id)
+					";
+		}
+
+		$qry .= "WHERE
+				(
+					(
+						(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+						AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+					) AND (
+						(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+						AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+					)
+				)
+				AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
 
 		if($result = $this->db_query($qry))
 		{
@@ -718,6 +738,7 @@ public function getFortschritt($projektphase_id)
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->typ = $row->typ;
 				$obj->beschreibung = $row->beschreibung;
+				$obj->projekttitel = $row->titel;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				$obj->personentage = $row->personentage;
@@ -728,6 +749,8 @@ public function getFortschritt($projektphase_id)
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				if ($exists)
+					$obj->project_task_id = $row->project_task_id;
 
 				$this->result[] = $obj;
 

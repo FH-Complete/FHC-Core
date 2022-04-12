@@ -5,7 +5,7 @@
  * @author
  * @copyright   Copyright (c) 2016 fhcomplete.org
  * @license GPLv3
- * @link    https://fhcomplete.org
+ * @link	https://fhcomplete.org
  * @since	Version 1.0.0
  */
 
@@ -54,7 +54,7 @@ var FHC_AjaxClient = {
 	 * ajaxCallParameters is an object
 	 */
 	ajaxCallGet: function(remoteController, controllerParameters, ajaxCallParameters) {
-	    FHC_AjaxClient._ajaxCall(remoteController, controllerParameters, HTTP_GET_METHOD, ajaxCallParameters);
+		FHC_AjaxClient._ajaxCall(remoteController, controllerParameters, HTTP_GET_METHOD, ajaxCallParameters);
 	},
 
 	/**
@@ -63,7 +63,7 @@ var FHC_AjaxClient = {
 	 * ajaxCallParameters is an object
 	 */
 	ajaxCallPost: function(remoteController, controllerParameters, ajaxCallParameters) {
-	    FHC_AjaxClient._ajaxCall(remoteController, controllerParameters, HTTP_POST_METHOD, ajaxCallParameters);
+		FHC_AjaxClient._ajaxCall(remoteController, controllerParameters, HTTP_POST_METHOD, ajaxCallParameters);
 	},
 
 	/**
@@ -72,13 +72,13 @@ var FHC_AjaxClient = {
 	isSuccess: function(response) {
 		var isSuccess = false;
 
-	    if (jQuery.type(response) == "object" && response.hasOwnProperty(CODE) && response.hasOwnProperty(RESPONSE))
-	    {
-	        if (response.error == SUCCESS)
-	        {
-	            isSuccess = true;
-	        }
-	    }
+		if (jQuery.type(response) == "object" && response.hasOwnProperty(CODE) && response.hasOwnProperty(RESPONSE))
+		{
+			if (response.error == SUCCESS)
+			{
+				isSuccess = true;
+			}
+		}
 
 		return isSuccess;
 	},
@@ -117,10 +117,10 @@ var FHC_AjaxClient = {
 	getData: function(response) {
 		var data = null;
 
-	    if (FHC_AjaxClient.hasData(response))
-	    {
+		if (FHC_AjaxClient.hasData(response))
+		{
 			data = response.retval;
-	    }
+		}
 
 		return data;
 	},
@@ -131,10 +131,10 @@ var FHC_AjaxClient = {
 	getError: function(response) {
 		var error = "Generic error";
 
-	    if (jQuery.type(response) == "object" && !jQuery.isEmptyObject(response) && response.hasOwnProperty(RESPONSE))
-	    {
+		if (jQuery.type(response) == "object" && !jQuery.isEmptyObject(response) && response.hasOwnProperty(RESPONSE))
+		{
 			error = response.retval;
-	    }
+		}
 
 		return error;
 	},
@@ -146,9 +146,9 @@ var FHC_AjaxClient = {
 		var code = 1; // Generic error
 
 		if (jQuery.type(response) == "object" && response.hasOwnProperty(CODE))
-	    {
-	        code = response.error;
-	    }
+		{
+			code = response.error;
+		}
 
 		return code;
 	},
@@ -179,20 +179,20 @@ var FHC_AjaxClient = {
 	 * Retrives parameters from URL query string (HTTP GET parameters)
 	 */
 	getUrlParameter: function(sParam) {
-	    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-	        sURLVariables = sPageURL.split("&"),
-	        sParameterName,
-	        i;
+		var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+			sURLVariables = sPageURL.split("&"),
+			sParameterName,
+			i;
 
-	    for (var i = 0; i < sURLVariables.length; i++)
+		for (var i = 0; i < sURLVariables.length; i++)
 		{
-	        sParameterName = sURLVariables[i].split("=");
+			sParameterName = sURLVariables[i].split("=");
 
-	        if (sParameterName[0] === sParam)
+			if (sParameterName[0] === sParam)
 			{
-	            return sParameterName[1];
-	        }
-	    }
+				return sParameterName[1];
+			}
+		}
 	},
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -260,7 +260,7 @@ var FHC_AjaxClient = {
 
 		// Call the error callback saved in _errorCallback property
 		// NOTE: this is not referred to FHC_AjaxClient but to the ajax object
-	    this._errorCallback(jqXHR, textStatus, errorThrown);
+		this._errorCallback(jqXHR, textStatus, errorThrown);
 	},
 
 	/**
@@ -280,6 +280,14 @@ var FHC_AjaxClient = {
 		}
 
 		FHC_AjaxClient._hideVeil(); // finally hide the veil
+
+		// If was required a page reload then do it!
+		if (this._reloadPage === true)
+		{
+			// NOTE: to avoid any conflict with other ajaxs calls
+			// Otherwise some browsers (eg. firefox) can prompt an error
+			$(document).ajaxStop(function() { location.reload(); });
+		}
 	},
 
 	/**
@@ -337,14 +345,14 @@ var FHC_AjaxClient = {
 	 * Instantiate a new object and copy in it the properties from the parameter
 	 */
 	_cpObjProps: function(obj) {
-	    var returnObj = {};
+		var returnObj = {};
 
-	    for (var prop in obj)
-	    {
-	        returnObj[prop] = obj[prop];
-	    }
+		for (var prop in obj)
+		{
+			returnObj[prop] = obj[prop];
+		}
 
-	    return returnObj;
+		return returnObj;
 	},
 
 	/**
@@ -385,9 +393,9 @@ var FHC_AjaxClient = {
 	 *
 	 * @param controllerParameters
 	 * 			Example: {
-	 * 			    name1: value,
-	 * 			    name2: value,
-	 * 			    files: $(selector)[0].files --> this is the FileList
+	 * 				name1: value,
+	 * 				name2: value,
+	 * 				files: $(selector)[0].files --> this is the FileList
 	 * 			}
 	 * @returns {boolean}
 	 * @private
@@ -403,10 +411,6 @@ var FHC_AjaxClient = {
 				return true;
 			}
 		}
-		/*
-		return Object.values(controllerParameters)
-			.some((value) => value instanceof FileList === true);
-		*/
 	},
 
 	/**
@@ -455,7 +459,7 @@ var FHC_AjaxClient = {
 	 */
 	_checkAndGenerateAjaxParams: function(remoteController, controllerParameters, type, ajaxCallParameters) {
 
-	    var valid = true; // by default they are ok (we want to trust you, please do not betray it)
+		var valid = true; // by default they are ok (we want to trust you, please do not betray it)
 
 		// Returned parameters
 		var ajaxParameters = {
@@ -465,28 +469,28 @@ var FHC_AjaxClient = {
 		};
 
 		// remoteController must be a NON-empty string
-	    if (typeof remoteController == "string" && remoteController.trim() != "")
-	    {
-			// Is it possible to generate the URL
-			if ((url = FHC_AjaxClient._generateRouterURI(remoteController)) != null)
-			{
-				ajaxParameters.url = url;
-			}
-			else // but it could fail
-			{
-				console.error("FHC_JS_DATA_STORAGE_OBJECT is not present");
-				valid = false;
-			}
-	    }
+		if (typeof remoteController == "string" && remoteController.trim() != "")
+		{
+				// Is it possible to generate the URL
+				if ((url = FHC_AjaxClient._generateRouterURI(remoteController)) != null)
+				{
+					ajaxParameters.url = url;
+				}
+				else // but it could fail
+				{
+					console.error("FHC_JS_DATA_STORAGE_OBJECT is not present");
+					valid = false;
+				}
+		}
 		else // otherwise is NOT possible to generate the URL
 		{
 			console.error("Invalid remoteController parameter");
-	        valid = false;
+			valid = false;
 		}
 
-	    // controllerParameters must be an object
-	    if (typeof controllerParameters == "object")
-	    {
+		// controllerParameters must be an object
+		if (typeof controllerParameters == "object")
+		{
 			// If controllerParameters contains uploaded file(s) as FileList
 			if (controllerParameters !==  null && FHC_AjaxClient._hasFileList(controllerParameters))
 			{
@@ -512,19 +516,18 @@ var FHC_AjaxClient = {
 			//		so the variable data is saved also in _data and it will be used later
 			ajaxParameters.data = data;
 			ajaxParameters._data = data;
-	    }
+		}
 		else
 		{
 			console.error("Invalid controller parameters, must be an object");
 			valid = false;
 		}
 
-
 		// Checks if ajaxCallParameters is an object
-	    if (typeof ajaxCallParameters == "object")
-	    {
+		if (typeof ajaxCallParameters == "object")
+		{
 			// If present, errorCallback must be a function
-		    if (ajaxCallParameters.hasOwnProperty("errorCallback"))
+			if (ajaxCallParameters.hasOwnProperty("errorCallback"))
 			{
 				if (typeof ajaxCallParameters.errorCallback == "function")
 				{
@@ -536,7 +539,7 @@ var FHC_AjaxClient = {
 					console.error("Invalid errorCallback, it must be a function");
 					valid = false;
 				}
-		    }
+			}
 			else // if is not given then call the default errorCallback
 			{
 				ajaxParameters._errorCallback = FHC_AjaxClient._defaultErrorCallback; // save as property the callback error
@@ -544,8 +547,8 @@ var FHC_AjaxClient = {
 			}
 
 			// If present, successCallback must be a function
-		    if (ajaxCallParameters.hasOwnProperty("successCallback"))
-		    {
+			if (ajaxCallParameters.hasOwnProperty("successCallback"))
+			{
 				if (typeof ajaxCallParameters.successCallback == "function")
 				{
 					ajaxParameters._successCallback = ajaxCallParameters.successCallback; // save as property the callback success
@@ -556,11 +559,11 @@ var FHC_AjaxClient = {
 					console.error("Invalid successCallback, it must be a function");
 					valid = false;
 				}
-		    }
+			}
 
 			// If present, completeCallback must be a function
-		    if (ajaxCallParameters.hasOwnProperty("completeCallback"))
-		    {
+			if (ajaxCallParameters.hasOwnProperty("completeCallback"))
+			{
 				if (typeof ajaxCallParameters.completeCallback == "function")
 				{
 					ajaxParameters._completeCallback = ajaxCallParameters.completeCallback; // save as property the callback complete
@@ -570,7 +573,7 @@ var FHC_AjaxClient = {
 					console.error("Invalid completeCallback, it must be a function");
 					valid = false;
 				}
-		    }
+			}
 
 			// If present, veilTimeout must be a number and cannot be less then 0 or greater then 60000
 			if (ajaxCallParameters.hasOwnProperty("veilTimeout") && typeof ajaxCallParameters.veilTimeout == "number")
@@ -596,6 +599,24 @@ var FHC_AjaxClient = {
 				ajaxParameters.beforeSend = FHC_AjaxClient._showVeil;
 			}
 
+			// If present reloadPage has to be a boolean
+			if (ajaxCallParameters.hasOwnProperty("reloadPage"))
+			{
+				if (typeof ajaxCallParameters.reloadPage != "boolean")
+				{
+					console.error("Invalid reloadPage parameter, must be a boolean");
+					valid = false;
+				}
+				else
+				{
+					ajaxParameters._reloadPage = ajaxCallParameters.reloadPage;
+				}
+			}
+			else // not present
+			{
+				ajaxParameters._reloadPage = false;
+			}
+
 			// Function to call after the ajax call is ended, is it here because it must be always called
 			ajaxParameters.complete = FHC_AjaxClient._onComplete;
 		}
@@ -605,7 +626,7 @@ var FHC_AjaxClient = {
 			ajaxParameters = null;
 		}
 
-	    return ajaxParameters;
+		return ajaxParameters;
 	},
 
 	/**
@@ -623,9 +644,10 @@ var FHC_AjaxClient = {
 		var ajaxParameters = FHC_AjaxClient._checkAndGenerateAjaxParams(remoteController, controllerParameters, type, ajaxCallParameters);
 
 		// Checks the given parameters if they are present and are valid
-	    if (ajaxParameters != null)
-	    {
-	        $.ajax(ajaxParameters); // ajax call
-	    }
+		if (ajaxParameters != null)
+		{
+			$.ajax(ajaxParameters); // ajax call
+		}
 	}
 };
+

@@ -142,7 +142,7 @@ class statistik extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
-				$obj->udpatevon = $row->updatevon;
+				$obj->updatevon = $row->updatevon;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$obj->preferences = $row->preferences;
 
@@ -510,6 +510,7 @@ class statistik extends basis_db
 		$this->html='';
 		$this->csv='';
 		$this->json=array();
+		set_time_limit(120);
 
 		if($this->sql!='')
 		{
@@ -552,6 +553,12 @@ class statistik extends basis_db
 					{
 						$name = $this->db_field_name($this->data,$spalte);
 						$this->html.= '<td>'.$this->convert_html_chars($row->$name).'</td>';
+						// Umwandeln von Punkt in Komma bei Float-Werten
+						if (is_numeric($row->$name))
+						{
+							if (strpos($row->$name,'.') != false)
+								$row->$name = number_format($row->$name,2,",","");
+						}
 						$this->csv.= '"'.$row->$name.'",';
 					}
 

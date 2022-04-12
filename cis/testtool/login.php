@@ -55,7 +55,7 @@ if (isset($_GET['logout']) && $_GET['logout'] == true)
 
 	echo '
 		<script language="Javascript">
-			location = location.pathname;       // clean the login.php-url from querystring
+			location = "logout.html";       // clean the login.php-url from querystring
 			parent.menu.location = parent.menu.location.pathname;   // clean the menu.php-url from querystring
 			parent.topbar.location = parent.topbar.location.pathname;   // clean the topbar.php-url from querystring
 		</script>
@@ -438,6 +438,8 @@ if (isset($prestudent_id))
 
 	//  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
 	//  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
+	$firstPrio_studienplan_id = '';
+	$firstPrio_studiengang_kz = '';
 	if ($typ->typ == 'b')
 	{
 		$ps->getActualInteressenten($prestudent_id, true, 'b');

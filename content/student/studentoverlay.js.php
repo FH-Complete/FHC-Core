@@ -462,7 +462,7 @@ function StudentTreeKeyPress(event)
 // ****
 // * Erstellt das Zertifikat fuer die Freifaecher
 // ****
-function StudentFFZertifikatPrint(event)
+function StudentFFZertifikatPrint(event, signieren)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -486,16 +486,36 @@ function StudentFFZertifikatPrint(event)
 	else
 		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
-//	alert('url: '+url);
-	window.location.href = url;
+	if (signieren)
+	{
+		var req = new phpRequest(url,'','');
+		req.add('output', 'pdf');
+		req.add('sign', '1');
+		req.add('archive', '1');
+
+		var response = req.execute();
+
+		if (response != '')
+			alert(response)
+		else
+		{
+			alert('Erfolgreich archiviert und signiert');
+			StudentTreeRefresh();
+		}
+	}
+		else
+	{
+		url = url+'&output='+output;
+		window.location.href = url;
+	}
 }
 
 //****
 //* Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 //****
-function StudentLVZeugnisPrint(event, sprache)
+function StudentLVZeugnisPrint(event, sprache, signieren)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -523,9 +543,30 @@ function StudentLVZeugnisPrint(event, sprache)
 	if (sprache == 'English')
 		xsl = 'LVZeugnisEng';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid='+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
-	window.location.href = url;
+	if (signieren)
+	{
+		var req = new phpRequest(url,'','');
+		req.add('output', 'pdf');
+		req.add('sign', '1');
+		req.add('archive', '1');
+
+		var response = req.execute();
+
+		if (response != '')
+			alert(response)
+		else
+		{
+			alert('Erfolgreich archiviert und signiert');
+			StudentTreeRefresh();
+		}
+	}
+	else
+	{
+		url = url+'&output='+output;
+		window.location.href = url;
+	}
 }
 
 // ****
@@ -704,6 +745,7 @@ function StudentDetailReset()
 	document.getElementById('student-detail-menulist-sprache').value='German';
 	document.getElementById('student-detail-textbox-matrikelnummer').value='';
 	document.getElementById('student-detail-textbox-matr_nr').value='';
+	document.getElementById('student-detail-textbox-bpk').value='';
 	document.getElementById('student-detail-image').src='';
 }
 
@@ -742,6 +784,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-alias').disabled=val;
 	document.getElementById('student-detail-button-save').disabled=val;
 	document.getElementById('student-detail-textbox-matr_nr').disabled=val;
+	document.getElementById('student-detail-textbox-bpk').disabled=val;
 }
 
 // ****
@@ -779,6 +822,7 @@ function StudentDetailSave()
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
 	alias = document.getElementById('student-detail-textbox-alias').value;
 	matr_nr = document.getElementById('student-detail-textbox-matr_nr').value;
+	bpk = document.getElementById('student-detail-textbox-bpk').value;
 
 	//Wenn es noch kein Student ist, dann wird die Studiengang_kz vom Prestudent genommen
 	if(studiengang_kz=='')
@@ -836,6 +880,7 @@ function StudentDetailSave()
 	req.add('gruppe', gruppe);
 	req.add('alias', alias);
 	req.add('matr_nr',matr_nr);
+	req.add('bpk',bpk);
 
 	var response = req.executePOST();
 
@@ -1034,7 +1079,11 @@ function StudentAuswahl()
 	StudentGesamtNotenTreeloaded=false;
 
 	stsem = getStudiensemester();
-	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
+	
+	var url = buildStudentRDFURI({
+	  'prestudent_id': prestudent_id,
+	  'studiensemester_kurzbz': stsem
+	});
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 			getService(Components.interfaces.nsIRDFService);
@@ -1080,6 +1129,7 @@ function StudentAuswahl()
 	matr_nr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#matr_nr" ));
 	zugangscode=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zugangscode" ));
 	link_bewerbungstool=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#link_bewerbungstool" ));
+	bpk=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bpk" ));
 
 	//Bei Incoming wird das Menue zur Statusaenderung deaktiviert
 	if(status=='Incoming')
@@ -1126,6 +1176,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-matr_nr').value=matr_nr;
 	document.getElementById('label-student-detail-zugangscode').value=zugangscode;
 	document.getElementById('label-student-detail-link_bewerbungstool').value=link_bewerbungstool;
+	document.getElementById('student-detail-textbox-bpk').value=bpk;
 
 	//PreStudent Daten holen
 
@@ -1137,10 +1188,18 @@ function StudentAuswahl()
 	zgvort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvort" ));
 	zgvnation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvnation" ));
 	zgvdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdatum" ));
+	zgv_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgv_erfuellt" ));											   
 	zgvmaster_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_code" ));
 	zgvmasterort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmaort" ));
 	zgvmasternation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmanation" ));
-	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" ));
+	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" )); 
+	zgvmas_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_erfuellt" ));
+	zgvdoktor_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktor_code" ));
+	zgvdoktorort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktorort" ));
+	zgvdoktornation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktornation" ));
+	zgvdoktordatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktordatum" ));
+	zgvdoktor_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktor_erfuellt" ));
+									  
 	aufnahmeschluessel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmeschluessel" ));
 	facheinschlberuf = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#facheinschlberuf" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
@@ -1149,6 +1208,8 @@ function StudentAuswahl()
 	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
 	gsstudientyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gsstudientyp_kurzbz" ));
 	priorisierung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#priorisierung" ));
+	foerderrelevant = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#foerderrelevant" ));
+	standort_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#standort_code" ));
 
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
@@ -1157,10 +1218,26 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-zgvort').value=zgvort;
     MenulistSelectItemOnValue('student-prestudent-menulist-zgvnation', zgvnation);
 	document.getElementById('student-prestudent-textbox-zgvdatum').value=zgvdatum;
+	if(zgv_erfuellt=='t')
+		document.getElementById('student-prestudent-checkbox-zgverfuellt').checked=true;
+	else
+		document.getElementById('student-prestudent-checkbox-zgverfuellt').checked=false;									  
 	document.getElementById('student-prestudent-menulist-zgvmastercode').value=zgvmaster_code;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').value=zgvmasterort;
     MenulistSelectItemOnValue('student-prestudent-menulist-zgvmasternation', zgvmasternation);
 	document.getElementById('student-prestudent-textbox-zgvmasterdatum').value=zgvmasterdatum;
+	if(zgvmas_erfuellt=='t')
+		document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked=true;
+	else
+	document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked=false; 
+	document.getElementById('student-prestudent-menulist-zgvdoktorcode').value=zgvdoktor_code;
+	document.getElementById('student-prestudent-textbox-zgvdoktorort').value=zgvdoktorort;
+    MenulistSelectItemOnValue('student-prestudent-menulist-zgvdoktornation', zgvdoktornation);
+	document.getElementById('student-prestudent-textbox-zgvdoktordatum').value=zgvdoktordatum;
+	if(zgvdoktor_erfuellt=='t')
+		document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').checked=true;
+	else
+	document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').checked=false;
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value=aufnahmeschluessel;
 	if(facheinschlberuf=='true')
 		document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked=true;
@@ -1186,6 +1263,8 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-priorisierung').value=priorisierung;
 	document.getElementById('student-prestudent-textbox-mentor').value=mentor;
 	document.getElementById('student-detail-menulist-gsstudientyp').value=gsstudientyp_kurzbz;
+	document.getElementById('student-prestudent-menulist-foerderrelevant').value=foerderrelevant;
+	document.getElementById('student-prestudent-menulist-bisstandort').value=standort_code;
 
 	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1694,19 +1773,29 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-textbox-zgvort').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvnation').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvdatum').disabled=val;
+	document.getElementById('student-prestudent-checkbox-zgverfuellt').disabled=val;											   
 	document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvmasternation').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvmasterdatum').disabled=val;
+	document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').disabled=val;
+	document.getElementById('student-prestudent-menulist-zgvdoktorcode').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvdoktorort').disabled=val;
+	document.getElementById('student-prestudent-menulist-zgvdoktornation').disabled=val;
+	document.getElementById('student-prestudent-textbox-zgvdoktordatum').disabled=val;
+	document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').disabled=val;
+			   
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+	document.getElementById('student-prestudent-menulist-foerderrelevant').disabled=val;
 	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
 	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
 	document.getElementById('student-prestudent-textbox-priorisierung').disabled=val;
 	document.getElementById('student-prestudent-textbox-mentor').disabled=val;
 	document.getElementById('student-detail-menulist-gsstudientyp').disabled=val;
+	document.getElementById('student-prestudent-menulist-bisstandort').disabled=val;
 
 	// Studiengang des angeklickten Prestudenten ermitteln
 	var tree = document.getElementById('student-tree');
@@ -1763,10 +1852,18 @@ function StudentPrestudentSave()
 	zgvort = document.getElementById('student-prestudent-textbox-zgvort').value;
 	zgvnation = document.getElementById('student-prestudent-menulist-zgvnation').value;
 	zgvdatum = document.getElementById('student-prestudent-textbox-zgvdatum').value;
+	zgv_erfuellt = document.getElementById('student-prestudent-checkbox-zgverfuellt').checked;											   
 	zgvmaster_code = document.getElementById('student-prestudent-menulist-zgvmastercode').value;
 	zgvmasterort = document.getElementById('student-prestudent-textbox-zgvmasterort').value;
 	zgvmasternation = document.getElementById('student-prestudent-menulist-zgvmasternation').value;
 	zgvmasterdatum = document.getElementById('student-prestudent-textbox-zgvmasterdatum').value;
+	zgvmas_erfuellt = document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked;
+	zgvdoktor_code = document.getElementById('student-prestudent-menulist-zgvdoktorcode').value;
+	zgvdoktorort = document.getElementById('student-prestudent-textbox-zgvdoktorort').value;
+	zgvdoktornation = document.getElementById('student-prestudent-menulist-zgvdoktornation').value;
+	zgvdoktordatum = document.getElementById('student-prestudent-textbox-zgvdoktordatum').value;
+	zgvdoktor_erfuellt = document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').checked;
+							  
 	aufnahmeschluessel = document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value;
 	facheinschlberuf = document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked;
 	bismelden = document.getElementById('student-prestudent-checkbox-bismelden').checked;
@@ -1779,6 +1876,8 @@ function StudentPrestudentSave()
 	priorisierung = document.getElementById('student-prestudent-textbox-priorisierung').value;
 	mentor = document.getElementById('student-prestudent-textbox-mentor').value;
 	gsstudientyp = document.getElementById('student-detail-menulist-gsstudientyp').value;
+	foerderrelevant = document.getElementById('student-prestudent-menulist-foerderrelevant').value;
+	standort_code = document.getElementById('student-prestudent-menulist-bisstandort').value;
 
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
@@ -1790,7 +1889,11 @@ function StudentPrestudentSave()
 		alert('ZGVMaster Datum ist ungueltig');
 		return false;
 	}
-
+	if(zgvdoktordatum!='' && !CheckDatum(zgvdoktordatum))
+	{
+		alert('ZGVDoktor Datum ist ungueltig');
+		return false;
+	}
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -1809,10 +1912,18 @@ function StudentPrestudentSave()
 	req.add('zgvort', zgvort);
 	req.add('zgvnation', zgvnation);
 	req.add('zgvdatum', ConvertDateToISO(zgvdatum));
+	req.add('zgv_erfuellt', zgv_erfuellt);											   
 	req.add('zgvmas_code', zgvmaster_code);
 	req.add('zgvmaort', zgvmasterort);
 	req.add('zgvmanation', zgvmasternation);
 	req.add('zgvmadatum', ConvertDateToISO(zgvmasterdatum));
+	req.add('zgvmas_erfuellt', zgvmas_erfuellt);
+	req.add('zgvdoktor_code', zgvdoktor_code);
+	req.add('zgvdoktorort', zgvdoktorort);
+	req.add('zgvdoktornation', zgvdoktornation);
+	req.add('zgvdoktordatum', ConvertDateToISO(zgvdoktordatum));
+	req.add('zgvdoktor_erfuellt', zgvdoktor_erfuellt);
+							  
 	req.add('aufnahmeschluessel', aufnahmeschluessel);
 	req.add('facheinschlberuf', facheinschlberuf);
 	req.add('bismelden', bismelden);
@@ -1824,6 +1935,8 @@ function StudentPrestudentSave()
 	req.add('priorisierung', priorisierung);
 	req.add('mentor', mentor);
 	req.add('gsstudientyp_kurzbz', gsstudientyp);
+	req.add('foerderrelevant', foerderrelevant);
+	req.add('standort_code', standort_code);
 
 	var response = req.executePOST();
 
@@ -2565,10 +2678,47 @@ function StudentKontoFilter()
 }
 
 // ****
+// * Generiert eine student.rdf URI
+// ****
+function buildStudentRDFURI(queryparams, tree) 
+{
+  var baseurl = "<?php echo APP_ROOT; ?>rdf/student.rdf.php";
+  if ( typeof tree !== "undefined" ) 
+  {
+    var col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
+    queryparams.orgform = tree.view.getCellText(tree.currentIndex,col);
+  }
+  return _buildURI(baseurl, queryparams);
+}
+
+// ****
+// * Generiert aus einer BasisURL und einem Dictionary von Parametern eine URI
+// ****
+function _buildURI(baseurl, queryparams) 
+{
+    var str = [];
+    var url = baseurl;
+    for (var p in queryparams) 
+    {
+      if ( queryparams.hasOwnProperty(p) && queryparams[p].length > 0 ) 
+      {
+	str.push(encodeURIComponent(p) + "=" + encodeURIComponent(queryparams[p]));
+      }
+    }
+    var querystring = str.join("&");
+    if ( querystring.length > 0 ) 
+    {
+      url = url + '?' + querystring + '&' + gettimestamp();
+    }
+    return url;
+}
+
+// ****
 // * Setzt im Studententree einen vordefinierten Filter
 // ****
 function StudentKontoFilterStudenten(filter)
 {
+	//alert(filter);
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-verband');
 
@@ -2591,12 +2741,26 @@ function StudentKontoFilterStudenten(filter)
 	var gruppe = getTreeCellText(tree, 'gruppe', tree.currentIndex);
 	var typ = getTreeCellText(tree, 'typ', tree.currentIndex);
 	var stsem = getTreeCellText(tree, 'stsem', tree.currentIndex);
-
+	
 	if(stsem=='')
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&buchungstyp="+buchungstyp+"&"+gettimestamp();
+	      
+	var url = buildStudentRDFURI({
+	  'studiengang_kz': stg_kz,
+	  'semester': sem,
+	  'verband': ver,
+	  'gruppe': grp,
+	  'gruppe_kurzbz': gruppe,
+	  'studiensemester_kurzbz': stsem,
+	  'typ': typ,
+	  'filter2': filter,
+	  'buchungstyp': buchungstyp
+	}, tree);
+	
+	console.log(url);
+	
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -2614,6 +2778,7 @@ function StudentKontoFilterStudenten(filter)
 		treeStudent.database.RemoveDataSource(oldDatasources.getNext());
 	}
 
+	//alert(url);
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	StudentTreeDatasource = rdfService.GetDataSource(url);
 	StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -2655,7 +2820,18 @@ function StudentKontoFilterBuchungstyp()
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2=buchungstyp;"+filter+"&"+gettimestamp();
+
+	var url = buildStudentRDFURI({
+	  'studiengang_kz': stg_kz,
+	  'semester': sem,
+	  'verband': ver,
+	  'gruppe': grp,
+	  'gruppe_kurzbz': gruppe,
+	  'studiensemester_kurzbz': stsem,
+	  'typ': typ,
+	  'filter2': 'buchungstyp;' + filter
+	}, tree);
+	
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -3191,6 +3367,7 @@ function StudentZeugnisDokumentArchivieren()
 			break;
 
 		case 'DiplSupplement':
+		case 'SZeugnis':
 			xml = 'diplomasupplement.xml.php';
 			break;
 
@@ -5437,8 +5614,10 @@ function StudentSuche()
 		document.getElementById('tree-verband').view.selection.clearSelection();
 
 		//Datasource setzten und Felder deaktivieren
-		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
-
+		var url = buildStudentRDFURI({
+		  'filter': filter
+		});
+	
 		var treeStudent=document.getElementById('student-tree');
 
 		try

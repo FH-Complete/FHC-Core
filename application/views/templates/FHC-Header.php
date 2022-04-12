@@ -10,6 +10,7 @@
 
 	// By default set the parameters to null
 	$title = isset($title) ? $title : null;
+	$refresh = isset($refresh) ? $refresh : null;
 	$customCSSs = isset($customCSSs) ? $customCSSs : null;
 	$customJSs = isset($customJSs) ? $customJSs : null;
 	$phrases = isset($phrases) ? $phrases : null;
@@ -44,7 +45,11 @@
 	<head>
 		<title><?php printPageTitle($title); ?></title>
 
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
 		<meta charset="UTF-8">
+
+		<?php printRefreshMeta($refresh); ?>
 
 		<?php
 			// --------------------------------------------------------------------------------------------------------

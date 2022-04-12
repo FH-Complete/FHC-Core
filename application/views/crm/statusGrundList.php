@@ -15,6 +15,7 @@
 							<th>Aktiv</th>
 							<th>Bezeichnung mehrsprachig</th>
 							<th>Beschreibung</th>
+							<th>Statusgrund</th>
 							<th></th>
 						</tr>
 					</thead>
@@ -25,6 +26,7 @@
 								<td><?php echo json_encode($s->aktiv); ?></td>
 								<td><?php echo json_encode($s->bezeichnung_mehrsprachig); ?></td>
 								<td><?php echo json_encode($s->beschreibung); ?></td>
+								<td><?php echo json_encode($s->statusgrund_kurzbz); ?></td>
 								<td><a href="../editGrund/<?php echo $s->statusgrund_id; ?>" target="StatusgrundBottom">Edit</a></td>
 							</tr>
 						<?php endforeach ?>
