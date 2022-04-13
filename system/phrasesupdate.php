@@ -12353,6 +12353,46 @@ array(
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'errorDokumentZuGross',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Dokument zu groß",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Document maximum size exceeded",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'errorUploadFehltOderZuGross',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Dokument fehlt oder zu groß",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Document missing or maximum size exceeded",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'ui',
