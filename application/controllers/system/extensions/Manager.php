@@ -58,11 +58,11 @@ class Manager extends Auth_Controller
 		$enabled = $this->input->post('enabled');
 
 		// Clean the parameter
-		if ($enabled !== true) $enable = false;
+		$enabled = $enabled == 'true' ? true : false;
 
 		// Output the enable/disable of the extension
 		$this->outputJsonSuccess(
-			$this->extensionslib->toggleExtension($extension_id, $enable)
+			$this->extensionslib->toggleExtension($extension_id, $enabled)
 		);
 	}
 
