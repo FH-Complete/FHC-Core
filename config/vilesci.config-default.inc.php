@@ -254,4 +254,10 @@ define('BIS_STANDORTCODE_LEHRGAENGE', '0');
 
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
+
+// Bei folgenden Buchungstypen wird ein Anlegen geprüft ob bereits ein Eintrag für diesen Typ vorhanden ist im selben
+// Semester und ggf ein Hinweis ausgegeben
+define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
+        array('StudiengebuehrAnzahlung', 'Studiengebuehr', 'StudiengebuehrRestzahlung', 'OEH')
+));
 ?>
