@@ -2110,6 +2110,40 @@ $phrases = array(
 				'description' => ''
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorDokumentZuGross',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dokument zu groß",
+				'description' => ''
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Document maximum size exceeded",
+				'description' => ''
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorUploadFehltOderZuGross',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dokument fehlt oder zu groß",
+				'description' => ''
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Document missing or maximum size exceeded",
+				'description' => ''
+			)
+		)
 	)
 );
 
