@@ -21,7 +21,9 @@
 			'tabulator' => true,
 			'tablewidget' => true,
 			'phrases' => array(
-				'extensions'
+				'extensions',
+				'table',
+				'ui'
 			),
 			'customJSs' => array('public/js/ExtensionsManager.js')
 		)
@@ -29,7 +31,7 @@
 ?>
 
 	<body>
-		<div>
+		<div class="container-fluid">
 			<h3 class="page-header">
 				<?php echo $this->p->t('extensions', 'title'); ?>
 			</h3>
@@ -63,4 +65,3 @@
 	</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
-

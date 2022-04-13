@@ -32,7 +32,9 @@ class Manager extends Auth_Controller
 
 		$this->loadPhrases(
 			array(
-				'extensions'
+				'extensions',
+				'table',
+				'ui'
 			)
 		);
 	}
@@ -98,4 +100,3 @@ class Manager extends Auth_Controller
 		$this->extensionslib->installExtension(null, null, !$notPerformSql);
 	}
 }
-
