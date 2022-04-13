@@ -266,14 +266,14 @@ function showHideBezeichnungDropDown()
 	if (dd.options[dd.selectedIndex].value == 'DienstV')
 	{
 		var str = '<select name="bezeichnung" class="dd_breit">';
-		str += '<option value="Eheschließung">a) Eigene Eheschließung</option>';
-		str += '<option value="Geburt eigenes Kind">b) Geburt eines Kindes der Ehefrau/Lebensgefährtin</option>';
-		str += '<option value="Heirat Kind/Geschwister">c) Eheschließung eines Kindes/eigener Geschwister</option>';
-		str += '<option value="Eigene Sponsion/Promotion">d) Teilnahme an eigener Sponsion/Promotion</option>';
-		str += '<option value="Lebensbedr. Erkrankung P/K/E">e) Lebensbedrohliche Erkrankung Partner/Kinder/Eltern</option>';
-		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil</option>';
-		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern</option>';
-		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt</option>';
+		str += '<option value="Eheschließung">a) Eigene Eheschließung (3 Tage)</option>';
+		str += '<option value="Geburt eigenes Kind">b) Geburt eines Kindes der Ehefrau/Lebensgefährtin (2 Tage)</option>';
+		str += '<option value="Heirat Kind/Geschwister">c) Eheschließung eines Kindes/eigener Geschwister (1 Tag)</option>';
+		str += '<option value="Eigene Sponsion/Promotion">d) Teilnahme an eigener Sponsion/Promotion (1 Tag)</option>';
+		str += '<option value="Lebensbedr. Erkrankung P/K/E">e) Lebensbedrohliche Erkrankung Partner/Kinder/Eltern (3 Tage)</option>';
+		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil (3 Tage)</option>';
+		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern (1 Tag)</option>';
+		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt (2 Tage)</option>';
 		str += '<option value="Bundesheer">i) Einberufung Bundesheer</option>';
 		str += '</select>';
 

@@ -256,7 +256,7 @@ class zeugnisnote extends basis_db
 	 *        $studiensemester_kurzbz
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getZeugnisnoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	public function getZeugnisnoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz, $nichtAnzeigen = null)
 	{
 		$where='';
 		if($lehrveranstaltung_id!=null)
@@ -265,6 +265,8 @@ class zeugnisnote extends basis_db
 			$where.=" AND uid=".$this->db_add_param($student_uid);
 		if($studiensemester_kurzbz!=null)
 			$where.=" AND vw_student_lehrveranstaltung.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		if ($nichtAnzeigen != null)
+			$where.=" AND tbl_note.anmerkung NOT IN (".$this->db_implode4SQL($nichtAnzeigen).")";
 		$where2='';
 		if($lehrveranstaltung_id!=null)
 			$where2.=" AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
@@ -272,6 +274,8 @@ class zeugnisnote extends basis_db
 			$where2.=" AND student_uid=".$this->db_add_param($student_uid);
 		if($studiensemester_kurzbz!=null)
 			$where2.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		if ($nichtAnzeigen != null)
+			$where2.=" AND tbl_note.anmerkung NOT IN (".$this->db_implode4SQL($nichtAnzeigen).")";
 
 		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
 					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
