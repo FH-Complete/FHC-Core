@@ -260,4 +260,7 @@ define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
 define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
         array('StudiengebuehrAnzahlung', 'Studiengebuehr', 'StudiengebuehrRestzahlung', 'OEH')
 ));
+
+// Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
+define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
 ?>
