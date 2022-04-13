@@ -1182,4 +1182,18 @@ function generateUniqueToken($length = 64)
 
 	return $token;
 }
+
+/**
+ * Berechnet die Anzahl von ganzen Tagen zwischen zwei Daten
+ * @param string $date1 Datum im Format '2022-02-22'.
+ * @param string $date2 Datum im Format '2022-04-22'.
+ * @return Anzahl der Tage
+ */
+function anzahlTage($date1, $date2)
+{
+	$date1_ts = strtotime($date1);
+	$date2_ts = strtotime($date2);
+	$diff = $date2_ts - $date1_ts;
+	return round($diff / 86400);
+}
 ?>
