@@ -39,6 +39,7 @@ class IssuesZustaendigkeiten extends Auth_Controller
 		);
 
 		$this->_setAuthUID(); // sets property uid
+		$this->setControllerId(); // sets the controller id
 	}
 
 	public function index()

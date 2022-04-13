@@ -242,6 +242,7 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'description' => 'Fehler Zuständigkeiten',
 		'icon' => 'cogs',
 		'sort' => 100,
+		'target' => '_blank',
 		'requiredPermissions' => array('admin:rw')
 	)
 );

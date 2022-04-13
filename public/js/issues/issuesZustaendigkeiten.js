@@ -71,7 +71,7 @@ var IssuesZustaendigkeiten = {
 							fehlerCodes.push(
 								{
 									fehlercode: code.fehlercode,
-									fullFehlerBezeichnung: code.fehlercode + ' - ' + code.fehler_kurzbz
+									fullFehlerBezeichnung: code.fehlercode + (!code.fehler_kurzbz ? '' : ' - ' + code.fehler_kurzbz)
 								}
 							);
 						}

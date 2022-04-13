@@ -39,6 +39,7 @@ class Issues extends Auth_Controller
 		);
 
 		$this->_setAuthUID(); // sets property uid
+		$this->setControllerId(); // sets the controller id
 	}
 
 	public function index()
@@ -127,7 +128,7 @@ class Issues extends Auth_Controller
 			{
 				$all_funktionen_oe_kurzbz[$benutzerfunktion->oe_kurzbz][] = $benutzerfunktion->funktion_kurzbz;
 
-				// separate oes for the funktion needed for displaying issues
+				// separate oes for the additional funktion which enables displaying issues
 				if ($benutzerfunktion->funktion_kurzbz == self::FUNKTION_KURZBZ)
 				{
 					$oe_kurzbz_for_funktion[] = $benutzerfunktion->oe_kurzbz;
