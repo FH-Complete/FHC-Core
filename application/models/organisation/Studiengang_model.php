@@ -495,11 +495,12 @@ class Studiengang_model extends DB_Model
 
 	public function getStudiengaengeWithOrgForm($typ, $semester)
 	{
-		$query = "SELECT DISTINCT (UPPER(sg.typ || sg.kurzbz || ':' || sp.orgform_kurzbz)) AS Studiengang
+		$query = "SELECT DISTINCT (UPPER(so.studiengangkurzbzlang || ':' || sp.orgform_kurzbz)) AS Studiengang
 					FROM public.tbl_studiengang sg
 					JOIN lehre.tbl_studienordnung USING (studiengang_kz)
 					JOIN lehre.tbl_studienplan sp USING (studienordnung_id)
 					JOIN lehre.tbl_studienplan_semester spsem USING (studienplan_id)
+					JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 					WHERE sp.aktiv = TRUE AND sg.aktiv = TRUE AND sg.typ IN ?
 					AND spsem.studiensemester_kurzbz = ?
 					ORDER BY Studiengang";

@@ -618,8 +618,9 @@ class Prestudent_model extends DB_Model
 					JOIN public.tbl_prestudent ps USING(prestudent_id)
 					JOIN public.tbl_studiengang sg USING(studiengang_kz)
 					JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+					JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 					WHERE ps.person_id = ?
-					AND UPPER((sg.typ || sg.kurzbz) || ':' || sp.orgform_kurzbz) = ?
+					AND UPPER(so.studiengangkurzbzlang || ':' || sp.orgform_kurzbz) = ?
 					AND pss.studiensemester_kurzbz = ?
 					AND";
 
