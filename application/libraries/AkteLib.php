@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * FH-Complete
+ *
+ * @package             FHC-Helper
+ * @author              FHC-Team
+ * @copyright           Copyright (c) 2022 fhcomplete.net
+ * @license             GPLv3
+ */
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class AkteLib
@@ -8,15 +17,19 @@ class AkteLib
 	const DEFAULT_USER = 'Akte'; // fallback string for insertvon if no logged user
 
 	private $_ci; // Code igniter instance
-	private $_uid; // uid of logged user
+	private $_who; // who added this document
 
 	/**
 	 * Object initialization
 	 */
-	public function __construct()
+	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance();
-		$this->_uid = getAuthUID();
+
+		// Set the the _who property
+		$this->_who = 'Akte system'; // default
+		// It is possible to set it using the who parameter
+		if (!isEmptyArray($params) && isset($params['who']) && !isEmptyString($params['who'])) $this->_who = $params['who'];
 
 		$this->_ci->load->model('crm/Akte_model', 'AkteModel');
 		$this->_ci->load->model('content/DmsFS_model', 'DmsFSModel');
@@ -57,7 +70,7 @@ class AkteLib
 				'signiert' => $signiert,
 				'stud_selfservice' => $stud_selfservice,
 				'insertamum' => date('Y-m-d H:i:s'),
-				'insertvon' => isEmptyString($this->_uid) ? self::DEFAULT_USER : $this->_uid
+				'insertvon' => $this->_who
 			)
 		);
 	}
@@ -100,7 +113,7 @@ class AkteLib
 				'signiert' => $signiert,
 				'stud_selfservice' => $stud_selfservice,
 				'updateamum' => date('Y-m-d H:i:s'),
-				'updatevon' => $this->_uid
+				'updatevon' => $this->_who
 			)
 		);
 	}

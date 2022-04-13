@@ -1,22 +1,36 @@
 <?php
 
+/**
+ * FH-Complete
+ *
+ * @package		FHC-Helper
+ * @author		FHC-Team
+ * @copyright		Copyright (c) 2022 fhcomplete.net
+ * @license		GPLv3
+ */
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+use \stdClass as stdClass;
 
 class DmsLib
 {
 	const FILE_CONTENT_PROPERTY = 'file_content'; // property name for file content
-	const DEFAULT_USER = 'DMS'; // fallback string for insertvon if no logged user
 
 	private $_ci; // code igniter instance
-	private $_uid; // uid of logged user
+	private $_who; // who added this document
 
 	/**
 	 * Object initialization
 	 */
-	public function __construct()
+	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance();
-		$this->_uid = getAuthUID();
+
+		// Set the the _who property
+		$this->_who = 'DMS system'; // default
+		// It is possible to set it using the who parameter
+		if (!isEmptyArray($params) && isset($params['who']) && !isEmptyString($params['who'])) $this->_who = $params['who'];
 
 		$this->_ci->load->model('crm/Akte_model', 'AkteModel'); // deprecated, should not be used here!
 		$this->_ci->load->model('content/Dms_model', 'DmsModel');
@@ -71,7 +85,7 @@ class DmsLib
 						'beschreibung' => $beschreibung,
 						'cis_suche' => $cis_suche,
 						'schlagworte' => $schlagworte,
-						'insertvon' => isEmptyString($this->_uid) ? self::DEFAULT_USER : $this->_uid,
+						'insertvon' => $this->_who,
 						'insertamum' => date('Y-m-d H:i:s')
 					);
 
@@ -134,7 +148,7 @@ class DmsLib
 					'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
 					'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
 					'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
-					'insertvon' => isEmptyString($this->_uid) ? self::DEFAULT_USER : $this->_uid,
+					'insertvon' => $this->_who,
 					'insertamum' => date('Y-m-d H:i:s')
 				);
 
@@ -625,25 +639,25 @@ class DmsLib
 		}
 
 		$upload_data = $this->_ci->upload->data();  // data about the uploaded file
-		$filename = $upload_data['file_name'];
 
 		// Insert to DMS table
-		if (!$result = $this->_ci->DmsModel->insert($this->_ci->DmsModel->filterFields($dms)))
-		{
-			return error('Failed inserting to DMS');
-		}
-		$upload_data['dms_id'] = getData($result);
+		$insDmsResult = $this->_ci->DmsModel->insert($this->_ci->DmsModel->filterFields($dms));
+		if (isError($insDmsResult)) return $insDmsResult;
+
+		$upload_data['dms_id'] = getData($insDmsResult);
 
 		// Insert DMS version
-		if (!$result = $this->_ci->DmsVersionModel->insert(
-			$this->_ci->DmsVersionModel->filterFields($dms, getData($result), $filename))
-		)
-		{
-			return error('Failed inserting DMS version');
-		}
+		$insVersionResult = $this->_ci->DmsVersionModel->insert(
+			$this->_ci->DmsVersionModel->filterFields(
+				$dms,
+				$upload_data['dms_id'],
+				$upload_data['file_name']
+			)
+		);
+		if (isError($insVersionResult)) return $insVersionResult;
 
-		// return result of uploaded data
-		return success($upload_data); // data about the uploaded file
+		// Return result of uploaded data
+		return success($upload_data);
 	}
 	
 	/**
@@ -701,7 +715,7 @@ class DmsLib
 		if (hasData($result))
 		{
 			// Store file information in fileObj
-			$fileObj = new StdClass();
+			$fileObj = new stdClass();
 			$fileObj->filename = getData($result)[0]->filename;
 			$fileObj->file = DMS_PATH.getData($result)[0]->filename;
 			$fileObj->name = DMS_PATH.getData($result)[0]->name;   // original user filename
@@ -927,10 +941,11 @@ class DmsLib
 	 */
 	private function _loadUploadLibrary($allowed_types)
 	{
-		$config['upload_path']          = DMS_PATH;
-		$config['allowed_types']        = implode('|', $allowed_types);
-		$config['overwrite']            = true;
-		$config['file_name']				= uniqid().'.pdf';
+		$config = array();
+		$config['upload_path'] = DMS_PATH;
+		$config['allowed_types'] = implode('|', $allowed_types);
+		$config['overwrite'] = true;
+		$config['file_name'] = uniqid().'.pdf';
 
 		$this->_ci->load->library('upload', $config);
 		$this->_ci->upload->initialize($config);
