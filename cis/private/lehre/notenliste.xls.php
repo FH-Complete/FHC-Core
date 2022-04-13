@@ -38,6 +38,8 @@ require_once('../../../include/phrasen.class.php');
 
 $uid = get_uid();
 
+
+
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
@@ -243,8 +245,10 @@ else
 						$inc=' (i)';
 					else
 						$inc='';
-					if($elem->bisio_id!='' && $elem->status!='Incoming' && ($elem->bis > $stsemdatumvon || $elem->bis=='') && $elem->von < $stsemdatumbis) //Outgoing
-						$inc.=' (o)';
+
+					if($elem->bisio_id != '' && $elem->status != 'Incoming' && ($elem->bis > $stsemdatumvon || $elem->bis == '')
+						&& $elem->von < $stsemdatumbis &&	(anzahlTage($elem->von, $elem->bis) >= 30))
+							$inc.=' (o)';
 
 					if($elem->note==6) //angerechnet
 					{
