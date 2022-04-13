@@ -114,6 +114,12 @@ else
 	$format_highlight->setBorder(1);
 	$format_highlight->setBorderColor('white');
 
+	$format_highlightright=& $workbook->addFormat();
+	$format_highlightright->setFgColor(15);
+	$format_highlightright->setBorder(1);
+	$format_highlightright->setBorderColor('white');
+	$format_highlightright->setAlign('right');
+
 	$format_border_bottom =& $workbook->addFormat();
 	$format_border_bottom ->setBottom(2);
 	$format_border_bottom->setBold();
@@ -202,27 +208,32 @@ else
 	$stsemdatumvon = $stsem_obj->start;
 	$stsemdatumbis = $stsem_obj->ende;
 
-	$qry = "SELECT
-		distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
-	tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-	(SELECT status_kurzbz
-	FROM public.tbl_prestudentstatus
-	WHERE prestudent_id=tbl_student.prestudent_id
-	ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
-	tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
-	tbl_zeugnisnote.note,tbl_mobilitaet.mobilitaetstyp_kurzbz,
-	(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN '1' ELSE '' END) as doubledegree
-	FROM campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
-	JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
-	LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
-	LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
-	AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
-	AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-	LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-	LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+	$qry = "
+	SELECT
+		distinct on(nachname, vorname, person_id)
+		vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
+		tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+		(SELECT status_kurzbz
+			FROM public.tbl_prestudentstatus
+			WHERE prestudent_id=tbl_student.prestudent_id
+			ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+		tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
+		tbl_zeugnisnote.note,tbl_mobilitaet.mobilitaetstyp_kurzbz,
+		(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN '1' ELSE '' END) as doubledegree,
+		tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung
+	FROM
+		campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+		JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
+		LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
+		LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+			AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
+				AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
+		LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
+		LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+		LEFT JOIN lehre.tbl_note USING(note)
 	WHERE
-	vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
-	vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);";";
+		vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
+		AND	vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);";";
 
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
@@ -250,15 +261,17 @@ else
 						&& $elem->von < $stsemdatumbis &&	(anzahlTage($elem->von, $elem->bis) >= 30))
 							$inc.=' (o)';
 
-					if($elem->note==6) //angerechnet
+					$note = $elem->note;
+
+					if($elem->lkt_ueberschreibbar == 'f') // angerechnet / intern angerechnet / nicht zugelassen
 					{
-						$inc.=' (ar)';
-						$note='ar';
+						$inc.= '('. $elem->anmerkung. ')';
+						$note = $elem->anmerkung;
 					}
 
 					if ($elem->mobilitaetstyp_kurzbz !='' && $elem->doubledegree == 1) //dd-Program
 					{
-						$inc.=' (d.d.)';
+						$inc .=' (d.d.)';
 					}
 
 					$worksheet->write($lines,1,$elem->uid);
@@ -266,7 +279,7 @@ else
 					$worksheet->write($lines,3,$elem->vorname);
 					$worksheet->write($lines,4,'="'.$elem->semester.$elem->verband.$elem->gruppe.'"');
 					$worksheet->write($lines,5,'="'.trim($elem->matrikelnr).'"',$format_highlight);
-					$worksheet->write($lines,6,$note,$format_highlight);
+					$worksheet->write($lines,6, $note, $format_highlightright);
 					$i++;
 					$lines++;
 	   			}
