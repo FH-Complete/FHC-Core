@@ -2990,6 +2990,19 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+
+// Spalte gesperrt in testtool.tbl_pruefling
+if(!$result = @$db->db_query("SELECT gesperrt FROM testtool.tbl_pruefling LIMIT 1;"))
+{
+	$qry = "ALTER TABLE testtool.tbl_pruefling ADD COLUMN gesperrt boolean NOT NULL DEFAULT false;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_pruefling: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>testtool.tbl_pruefling: Spalte gesperrt hinzugefuegt!<br>';
+}
+
+
 // Kategorisierung von Services
 if(!$result = @$db->db_query("SELECT * FROM public.tbl_servicekategorie LIMIT 1"))
 {
@@ -6233,7 +6246,7 @@ $tabellen=array(
 	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile","bezeichnung_mehrsprachig", "offsetpunkte"),
 	"testtool.tbl_kategorie"  => array("kategorie_kurzbz","gebiet_id"),
 	"testtool.tbl_kriterien"  => array("gebiet_id","kategorie_kurzbz","punkte","typ"),
-	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester"),
+	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester", "gesperrt"),
 	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","punkte","insertamum","insertvon","updateamum","updatevon","aktiv"),
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
