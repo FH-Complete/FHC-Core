@@ -319,15 +319,16 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function loadTemplates($filter)
 	{
+		$filter = strtolower($filter);
 		$qry = "SELECT
-					tbl_lehrveranstaltung.lehrveranstaltung_id as id, CONCAT(tbl_lehrveranstaltung.bezeichnung, ' [', tbl_lehrveranstaltung.kurzbz, ']') as label
+					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz
 				FROM
 					lehre.tbl_lehrveranstaltung
 				WHERE
 					tbl_lehrveranstaltung.lehrtyp_kurzbz = 'tpl' AND (
 						CAST(tbl_lehrveranstaltung.lehrveranstaltung_id AS TEXT) LIKE '%".$this->db_escape($filter)."%' OR 
-						tbl_lehrveranstaltung.bezeichnung LIKE '%".$this->db_escape($filter).	"%' OR 
-						tbl_lehrveranstaltung.kurzbz LIKE '%".$this->db_escape($filter).	"%'
+						LOWER(tbl_lehrveranstaltung.bezeichnung) LIKE '%".$this->db_escape($filter).	"%' OR 
+						LOWER(tbl_lehrveranstaltung.kurzbz) LIKE '%".$this->db_escape($filter).	"%'
 					)
 			";
 		return $this->execQuery($qry);

@@ -438,12 +438,11 @@
 			<td><input type="checkbox" name="lehrauftrag" '.($lv->lehrauftrag?'checked':'').'></td>
 		</tr>
 		<tr id="lehrveranstaltung_template_id">
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
 			<td>Template</td>
-			<td><input type="text" name="lehrveranstaltung_template_id" value="'.$lv->lehrveranstaltung_template_id.'"></td>
+			<td colspan="2"><input type="text" name="lehrveranstaltung_template_id" value="'.$lv->lehrveranstaltung_template_id.'" size="6"> <span class="text-template_name"></span></td>
+			<td></td>
+			<td></td>
+			<td></td>
 		</tr>
 		<tr>
 			<td></td>
@@ -676,101 +675,82 @@
 				$(this).ColorPickerSetColor(this.value);
 			});
 
-			$('input[name="lehrveranstaltung_template_id"]').each(function() {
-				var input = $(this),
-					selItem = null,
-					lastContent = [],
-					dname = "";
-				function searchIdInLastContent(value) {
-					for (var i=0; i<lastContent.length; i++) {
-						if (value == lastContent[i].value) {
-							input.val(lastContent[i].id);
-							dname = lastContent[i].value;
-							lastContent = [];
-							break;
-						}
-					}
-				}
-				function initAutocomplete() {
-					$('<input/>').attr({
-						type: "text",
-						value: dname
-					}).blur(function(e) {
-						var self = $(this),
-							val = self.val();
-						if (!val) {
-							dname = "";
-							input.val("");
-							return;
-						}
-						if (val == dname) return;
-						searchIdInLastContent(val);
-						$.ajax({
-							dataType: "json",
-							url: "../../soap/fhcomplete.php",
-							data: {
-								typ: "json",
-								class: "lehrveranstaltung",
-								method: "loadTemplateByName",
-								parameter_0: val
-							}
-						}).then(data => {
-							if (!self.is(':focus') && val === self.val()) {
-								if (data.return && data.return.label && data.return.id) {
-									dname = data.return.label;
-									input.val(data.return.id);
-								}
-								self.val(dname);
-							}
-						});
-
-					}).blur().insertAfter(input.attr('type', 'hidden')).autocomplete({
-						source: function(request, response) {
-							$.ajax({
-								dataType: "json",
-								url: "../../soap/fhcomplete.php",
-								data: {
-									typ: "json",
-									class: "lehrveranstaltung",
-									method: "loadTemplates",
-									parameter_0: request.term
-								}
-							}).then(data => {
-								response(data.return);
-							});
-						},
-						response: function(e, ui) {
-							lastContent = ui.content;
-						},
-						select: function(e, ui) {
-							lastContent = [ui.item];
-						},
-						close: function(e, ui) {
-							searchIdInLastContent($(this).val());
-						}
-					});
-				}
-				if (input.val()) {
+			$('input[name="lehrveranstaltung_template_id"]').autocomplete({
+				minLength: 2,
+				source: function(request, response) {
 					$.ajax({
 						dataType: "json",
 						url: "../../soap/fhcomplete.php",
 						data: {
 							typ: "json",
 							class: "lehrveranstaltung",
-							method: "load",
-							parameter_0: input.val()
+							method: "loadTemplates",
+							parameter_0: request.term
 						}
 					}).then(data => {
-						if (data.error == "false") {
-							var tpl = data.result[0];
-							dname = tpl.bezeichnung + " [" + tpl.kurzbz + "]";
-							initAutocomplete();
+						for (var k in data.return) {
+							data.return[k].value = data.return[k].lehrveranstaltung_id;
+							data.return[k].name = data.return[k].bezeichnung + " [" + data.return[k].kurzbz + "]";
+							data.return[k].label = data.return[k].name + " (" + data.return[k].lehrveranstaltung_id + ")";
+						}
+						response(data.return);
+					});
+				},
+				close: function(e, ui) {
+					$(this).trigger('check.ac-template');
+				},
+				focus: function(e, ui) {
+					$(this).removeClass('input_ok input_error').val(ui.item.value).parent().parent().find('.text-template_name').text(ui.item.name);
+					return false;
+				},
+				select: function(e, ui) {
+					$(this).addClass('input_ok').val(ui.item.value).parent().parent().find('.text-template_name').text(ui.item.name);
+					return false;
+				}
+			}).focus(function(e) {
+				$(this).removeClass('input_ok input_error');
+			}).blur(function(e) {
+				$(this).trigger('check.ac-template');
+			}).on('check.ac-template', function(e) {
+				var self = $(this),
+					val = self.val();
+				if (!val) {
+					self.removeClass('input_ok input_error').parent().parent().find('.text-template_name').text('');
+				} else {
+					$.ajax({
+						dataType: "json",
+						url: "../../soap/fhcomplete.php",
+						data: {
+							typ: "json",
+							class: "lehrveranstaltung",
+							method: "loadTemplates",
+							parameter_0: val
+						},
+						success: function(data) {
+							if (self.val() == val) {
+								var label = '',
+									state = '',
+									item = null;
+
+								for (var k in data.return) {
+									if (data.return[k].lehrveranstaltung_id == val) {
+										item = data.return[k];
+										break;
+									}
+								}
+
+								if (item) {
+									state = 'input_ok';
+									label = item.bezeichnung + " [" + item.kurzbz + "]";
+								} else if (val) {
+									state = 'input_error';
+								}
+								self.removeClass('input_ok input_error').addClass(state).parent().parent().find('.text-template_name').text(label);
+							}
 						}
 					});
-				} else {
-					initAutocomplete();
 				}
-			});
+			}).trigger('check.ac-template');
 
 			$('select[name="lehrtyp_kurzbz"]').change(function(e) {
 				if ($(this).val() == 'tpl') {
