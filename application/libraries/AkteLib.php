@@ -14,7 +14,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class AkteLib
 {
 	const AKTE_KATEGORIE_KURZBZ = 'Akte'; // kategorie_kurzbz of dms when inserting for akte
-	const DEFAULT_USER = 'Akte'; // fallback string for insertvon if no logged user
 
 	private $_ci; // Code igniter instance
 	private $_who; // who added this document
