@@ -1388,6 +1388,118 @@ if(!$error)
 					}
 				}
 			}
+			else if ($_POST['do']=='copy')
+			{
+				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'sui')
+					&& !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'sui')
+					&& !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'sui'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Keine Berechtigung';
+				}
+
+				if(!$leDAO->load($_POST['lehreinheit_id']))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim Laden des LV-Teils';
+				}
+
+				if(!$error)
+				{
+					// Neue Lehreinheit anlegen
+					$leDAO->new = true;
+					$leDAO->unr = '';
+					$leDAO->updateamum = date('Y-m-d H:i:s');
+					$leDAO->updatevon = $user;
+					$leDAO->insertamum = date('Y-m-d H:i:s');
+					$leDAO->insertvon = $user;
+
+					if ($leDAO->save())
+					{
+						// Wenn Art "alle" oder "gruppen" ist, werden auch alle Lehreinheitgruppe kopiert
+						if(isset($_POST['art']) && ($_POST['art'] == 'alle' || $_POST['art'] == 'gruppen'))
+						{
+							$legruppe = new lehreinheitgruppe();
+							$legruppe->getLehreinheitgruppe($_POST['lehreinheit_id']);
+
+							if (count($legruppe->lehreinheitgruppe) > 0)
+							{
+								foreach ($legruppe->lehreinheitgruppe as $row)
+								{
+									$legruppe_new = new lehreinheitgruppe();
+									$legruppe_new->lehreinheit_id = $leDAO->lehreinheit_id;
+									$legruppe_new->studiengang_kz = $row->studiengang_kz;
+									$legruppe_new->semester = $row->semester;
+									$legruppe_new->verband = $row->verband;
+									$legruppe_new->gruppe = $row->gruppe;
+									$legruppe_new->gruppe_kurzbz = $row->gruppe_kurzbz;
+									$legruppe_new->updateamum =  date('Y-m-d H:i:s');
+									$legruppe_new->updatevon = $user;
+									$legruppe_new->insertamum =  date('Y-m-d H:i:s');
+									$legruppe_new->insertvon = $user;
+
+									if (!$legruppe_new->save(true))
+									{
+										$errormsg = 'Fehler beim Kopieren der Gruppe: '.$legruppe_new->errormsg;
+										$return = false;
+									}
+									else
+									{
+										$return = true;
+									}
+								}
+							}
+						}
+						// Wenn Art "alle" oder "lektoren" ist, werden auch alle Lehreinheitmitarbeiter kopiert
+						if(isset($_POST['art']) && ($_POST['art'] == 'alle' || $_POST['art'] == 'lektoren'))
+						{
+							$lema = new lehreinheitmitarbeiter();
+							$lema->getLehreinheitmitarbeiter($_POST['lehreinheit_id']);
+
+							if (count($lema->lehreinheitmitarbeiter) > 0)
+							{
+								foreach ($lema->lehreinheitmitarbeiter as $row)
+								{
+									$lema_new = new lehreinheitmitarbeiter();
+									$lema_new->lehreinheit_id = $leDAO->lehreinheit_id;
+									$lema_new->mitarbeiter_uid = $row->mitarbeiter_uid;
+									$lema_new->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
+									$lema_new->semesterstunden = $row->semesterstunden;
+									$lema_new->planstunden = $row->planstunden;
+									$lema_new->stundensatz = $row->stundensatz;
+									$lema_new->faktor = $row->faktor;
+									$lema_new->anmerkung = $row->anmerkung;
+									$lema_new->bismelden = $row->bismelden;
+									$lema_new->updateamum = date('Y-m-d H:i:s');
+									$lema_new->updatevon = $user;
+									$lema_new->insertamum = date('Y-m-d H:i:s');
+									$lema_new->insertvon = $user;
+									$lema_new->ext_id = $row->ext_id;
+									$lema_new->vertrag_id = $row->vertrag_id;
+
+									if (!$lema_new->save(true))
+									{
+										$errormsg = 'Fehler beim Kopieren der MitarbeiterInnen: '.$lema_new->errormsg;
+										$return = false;
+									}
+									else
+									{
+										$return = true;
+									}
+								}
+							}
+						}
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $leDAO->errormsg;
+					}
+				}
+			}
 			else if ($_POST['do']=='delete') //Lehreinheit loeschen
 			{
 				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
