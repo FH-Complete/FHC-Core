@@ -330,11 +330,11 @@ var IssuesZustaendigkeiten = {
 		}
 		else
 		{
-			// otherwise enable oe and funktion input if Mitarbeiter input empty
+			// otherwise enable oe input if Mitarbeiter input empty
 			oeDropdownEl.prop('disabled', false);
 		}
 
-		// if oe or funktion is entered
+		// if oe is entered
 		if (oeDropdownEl.val().length > 0)
 		{
 			// disable Mitarbeiter input
