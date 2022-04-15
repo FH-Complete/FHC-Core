@@ -12,6 +12,7 @@ const FUNKTION_DROPDOWN_ID = "funktionSelect";
 var IssuesZustaendigkeiten = {
 
 	fehlercodesArr: [], // for saving received fehlercodes
+	oefunktionen: [], // for saving assigned oes and their funktionen
 
 	getApps: function()
 	{
@@ -106,12 +107,14 @@ var IssuesZustaendigkeiten = {
 					{
 						// save loaded data
 						let zustaendigkeitenData = FHC_AjaxClient.getData(data);
+						// save in object to display correct funktionen when oe is changed
+						IssuesZustaendigkeiten.oe_funktionen = zustaendigkeitenData.oe_funktionen;
 
 						let zustaendigkeiten = [];
 
-						for (let i = 0; i < zustaendigkeitenData.oe.length; i++)
+						for (let i = 0; i < zustaendigkeitenData.oe_funktionen.length; i++)
 						{
-							let zustaendigkeit = zustaendigkeitenData.oe[i];
+							let zustaendigkeit = zustaendigkeitenData.oe_funktionen[i];
 
 							zustaendigkeiten.push(
 								{
@@ -131,13 +134,7 @@ var IssuesZustaendigkeiten = {
 						);
 
 						// fill funktion dropdown with data
-						IssuesZustaendigkeiten._fillDropdown(
-							"funktionSelect",
-							"funktion_kurzbz",
-							zustaendigkeitenData.funktion,
-							"beschreibung",
-							true
-						);
+						IssuesZustaendigkeiten._fillFunktionDropdown();
 
 						// save Mitarbeiter data for autocomplete field in array
 						let autocompleteMitarbeiterArr = [];
@@ -177,7 +174,7 @@ var IssuesZustaendigkeiten = {
 							sourceCallback
 						);
 
-						// set events to delete buttons
+						// set events on delete buttons
 						$(".deleteBtn").click(
 							function()
 							{
@@ -248,6 +245,31 @@ var IssuesZustaendigkeiten = {
 			}
 		);
 	},
+	_fillFunktionDropdown: function()
+	{
+		let funktionen = [];
+		let oe_kurzbz = $("#"+ORGANISATIONSEINHEIT_DROPDOWN_ID).val();
+
+		// get funktionen for selected oe (saved in js object)
+		for (let i = 0; i < IssuesZustaendigkeiten.oe_funktionen.length; i++)
+		{
+			let oe_funktion = IssuesZustaendigkeiten.oe_funktionen[i];
+
+			if (oe_funktion.oe_kurzbz === oe_kurzbz)
+			{
+				funktionen = oe_funktion.funktionen
+				break;
+			}
+		}
+
+		IssuesZustaendigkeiten._fillDropdown(
+			"funktionSelect",
+			"funktion_kurzbz",
+			funktionen,
+			"beschreibung",
+			true
+		);
+	},
 	_fillDropdown: function(dropdownId, valueName, data, textName, includeNoSelectionOption, defaultValue)
 	{
 		// by default, displayed text in dropdown is the value
@@ -296,6 +318,7 @@ var IssuesZustaendigkeiten = {
 		let oeDropdownEl = $("#"+ORGANISATIONSEINHEIT_DROPDOWN_ID);
 		let funktionDropdownEl = $("#"+FUNKTION_DROPDOWN_ID);
 		let maAutocompleteEl = $("#"+MITARBEITER_AUTOCOMPLETE_ID);
+		let maHiddenEl = $("#"+MITARBEITER_HIDDENFIELD_ID);
 
 		// if Mitarbeiter is entered
 		if (maAutocompleteEl.val().length > 0)
@@ -307,22 +330,29 @@ var IssuesZustaendigkeiten = {
 		}
 		else
 		{
-			// enable oe and funktion input if Mitarbeiter input empty
+			// otherwise enable oe and funktion input if Mitarbeiter input empty
 			oeDropdownEl.prop('disabled', false);
-			funktionDropdownEl.prop('disabled', false);
 		}
 
 		// if oe or funktion is entered
-		if (oeDropdownEl.val().length > 0 || funktionDropdownEl.val().length > 0)
+		if (oeDropdownEl.val().length > 0)
 		{
 			// disable Mitarbeiter input
 			maAutocompleteEl.prop('disabled', true);
 			maAutocompleteEl.val('');
+			maHiddenEl.val('');
+
+			// enable funktion input
+			funktionDropdownEl.prop('disabled', false);
+			IssuesZustaendigkeiten._fillFunktionDropdown();
 		}
 		else
 		{
-			// enable mitarbeiter input
+			// otherwise enable mitarbeiter input
 			maAutocompleteEl.prop('disabled', false);
+
+			// disable funktion input
+			funktionDropdownEl.prop('disabled', true);
 		}
 	},
 	_emptyInputFields: function()
@@ -347,13 +377,21 @@ $(document).ready(function() {
 	$("#"+FEHLERAPP_DROPDOWN_ID).change(
 		function()
 		{
-			IssuesZustaendigkeiten.getFehlercodes($("#"+FEHLERAPP_DROPDOWN_ID).val());
+			IssuesZustaendigkeiten.getFehlercodes($(this).val());
+		}
+	);
+
+	// get new zustaendigkeiten every time Fehlercode is changed
+	$("#"+FEHLERCODE_DROPDOWN_ID).change(
+		function()
+		{
+			IssuesZustaendigkeiten.getNonAssignedZustaendigkeiten($(this).val());
 		}
 	);
 
 	// set events for disabling input fields
 	$("#"+MITARBEITER_AUTOCOMPLETE_ID).keyup(IssuesZustaendigkeiten._toggleFieldDisability);
-	$("#"+ORGANISATIONSEINHEIT_DROPDOWN_ID+", #"+FUNKTION_DROPDOWN_ID).change(IssuesZustaendigkeiten._toggleFieldDisability);
+	$("#"+ORGANISATIONSEINHEIT_DROPDOWN_ID).change(IssuesZustaendigkeiten._toggleFieldDisability);
 
 	// set event for adding a new Zuständigkeit
 	$("#assignZustaendigkeit").click(

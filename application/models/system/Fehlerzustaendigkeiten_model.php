@@ -35,31 +35,12 @@ class Fehlerzustaendigkeiten_model extends DB_Model
 	}
 
 	/**
-	 * Gets Organisationseinheiten not assigned to a Fehler.
+	 * Gets Funktionen not assigned to a Fehler (over an organisational unit).
 	 * @param $fehlercode
+	 * @param $oe_kurzbz
 	 * @return object
 	 */
-	public function getNonAssignedOes($fehlercode)
-	{
-		$query = "SELECT oe_kurzbz, bezeichnung, organisationseinheittyp_kurzbz
-					FROM public.tbl_organisationseinheit oe
-					WHERE aktiv
-					AND NOT EXISTS (
-					    SELECT 1 FROM system.tbl_fehler_zustaendigkeiten
-					    WHERE oe_kurzbz = oe.oe_kurzbz
-					    AND fehlercode = ?
-					)
-					ORDER BY organisationseinheittyp_kurzbz, bezeichnung";
-
-		return $this->execReadOnlyQuery($query, array($fehlercode));
-	}
-
-	/**
-	 * Gets Funktionen not assigned to a Fehler.
-	 * @param $fehlercode
-	 * @return object
-	 */
-	public function getNonAssignedFunktionen($fehlercode)
+	public function getNonAssignedFunktionen($fehlercode, $oe_kurzbz)
 	{
 		$query = "SELECT funktion_kurzbz, beschreibung
 					FROM public.tbl_funktion funk
@@ -68,9 +49,10 @@ class Fehlerzustaendigkeiten_model extends DB_Model
 					    SELECT 1 FROM system.tbl_fehler_zustaendigkeiten
 					    WHERE funktion_kurzbz = funk.funktion_kurzbz
 					    AND fehlercode = ?
+					    AND oe_kurzbz = ?
 					)
 					ORDER BY beschreibung";
 
-		return $this->execReadOnlyQuery($query, array($fehlercode));
+		return $this->execReadOnlyQuery($query, array($fehlercode, $oe_kurzbz));
 	}
 }
