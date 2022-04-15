@@ -80,6 +80,7 @@ else
 {
 	echo "Ung&uuml;ltiges Semester!";
 }
+
 //ausgewählter Lehrgang
 if(isset($_GET['stg_kz']))
 {
@@ -90,17 +91,71 @@ if(isset($_GET['stg_kz']))
 	else
 	{
 		echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
+		$stg_kz = '';
 	}
 }
 else
 {
 	echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
+	$stg_kz = '';
 	exit;
 }
 //plausicheck
 if(isset($_GET['plausi']))
 {
 	$plausi=$_GET['plausi'];
+}
+
+// Select für Lehrgänge
+if ($rechte->isBerechtigt('admin'))
+{
+	echo '<form name="frm_lehrgaenge" action='.$_SERVER['PHP_SELF'].' method="GET">';
+	echo 'Studiengang: <SELECT name="stg_kz"  onchange="document.frm_lehrgaenge.submit()">';
+	echo '<OPTION value="">Bitte auswählen</OPTION>';
+	$studiengang = new studiengang();
+	$studiengang->getAll('typ, kurzbz', true);
+	$types = new studiengang();
+	$types->getAllTypes();
+	$typ = '';
+	foreach ($studiengang->result AS $row)
+	{
+		if ($row->typ != 'l' && $row->typ != 'k')
+		{
+			continue;
+		}
+		if ($row->studiengang_kz >= 0)
+		{
+			continue;
+		}
+		if ($row->studiengang_kz == $stg_kz)
+		{
+			$selected = 'selected';
+		}
+		else
+		{
+			$selected = '';
+		}
+
+		if ($typ != $row->typ || $typ == '')
+		{
+			if ($typ != '')
+			{
+				echo '</optgroup>';
+			}
+			echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+		}
+
+		echo '<OPTION value="'.$row->studiengang_kz.'"'.$selected.'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
+
+		$typ = $row->typ;
+	}
+	echo '</select>';
+	echo '</form>';
+}
+
+if ($stg_kz == '')
+{
+	exit();
 }
 
 // Standortcode
