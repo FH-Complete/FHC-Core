@@ -24,6 +24,8 @@ class IssuesZustaendigkeiten extends Auth_Controller
 		$this->load->library('WidgetLib');
 
 		// Load models
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->load->model('system/Fehler_model', 'FehlerModel');
 		$this->load->model('system/Fehler_model', 'FehlerModel');
 		$this->load->model('system/Fehlerzustaendigkeiten_model', 'FehlerzustaendigkeitenModel');
 
@@ -91,7 +93,9 @@ class IssuesZustaendigkeiten extends Auth_Controller
 			return;
 		}
 
-		$oeRes = $this->FehlerzustaendigkeitenModel->getNonAssignedOes($fehlercode);
+		$this->OrganisationseinheitModel->addSelect('oe_kurzbz, bezeichnung, organisationseinheittyp_kurzbz');
+		$this->OrganisationseinheitModel->addOrder('organisationseinheittyp_kurzbz, bezeichnung');
+		$oeRes = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true));
 
 		if (isError($oeRes))
 		{
@@ -99,7 +103,28 @@ class IssuesZustaendigkeiten extends Auth_Controller
 			return;
 		}
 
-		$funktionRes = $this->FehlerzustaendigkeitenModel->getNonAssignedFunktionen($fehlercode);
+		$oe_funktionen = array();
+
+		if (hasData($oeRes))
+		{
+			$oes = getData($oeRes);
+
+			foreach ($oes as $oe)
+			{
+				$oe->funktionen = array();
+				$funktionRes = $this->FehlerzustaendigkeitenModel->getNonAssignedFunktionen($fehlercode, $oe->oe_kurzbz);
+
+				if (isError($funktionRes))
+				{
+					$this->outputJsonError(getError($oeRes));
+					return;
+				}
+
+				$funktionData = getData($funktionRes);
+				$oe->funktionen = $funktionData;
+				$oe_funktionen[] = $oe;
+			}
+		}
 
 		if (isError($funktionRes))
 		{
@@ -109,8 +134,7 @@ class IssuesZustaendigkeiten extends Auth_Controller
 
 		$result = array(
 			'mitarbeiter' => getData($mitarbeiterRes),
-			'oe' => getData($oeRes),
-			'funktion' => getData($funktionRes),
+			'oe_funktionen' => $oe_funktionen
 		);
 
 		$this->outputJsonSuccess($result);
