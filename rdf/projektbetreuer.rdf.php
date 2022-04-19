@@ -80,7 +80,7 @@ function draw_content($row)
             <PROJEKTBETREUER:faktor><![CDATA['.$row->faktor.']]></PROJEKTBETREUER:faktor>
             <PROJEKTBETREUER:name><![CDATA['.$row->name.']]></PROJEKTBETREUER:name>
             <PROJEKTBETREUER:punkte><![CDATA['.$row->punkte.']]></PROJEKTBETREUER:punkte>
-            <PROJEKTBETREUER:stunden><![CDATA['.number_format($row->stunden,1).']]></PROJEKTBETREUER:stunden>
+            <PROJEKTBETREUER:stunden><![CDATA['.(float)$row->stunden.']]></PROJEKTBETREUER:stunden>
             <PROJEKTBETREUER:stundensatz><![CDATA['.$row->stundensatz.']]></PROJEKTBETREUER:stundensatz>
             <PROJEKTBETREUER:betreuerart_kurzbz><![CDATA['.$row->betreuerart_kurzbz.']]></PROJEKTBETREUER:betreuerart_kurzbz>
             <PROJEKTBETREUER:vertrag_id><![CDATA['.$row->vertrag_id.']]></PROJEKTBETREUER:vertrag_id>
