@@ -1026,7 +1026,9 @@ $filters = array(
 					{"name": "nachname"},
 					{"name": "matrikelnummer"},
 					{"name": "studiengang"},
-					{"name": "studiensemester"}
+					{"name": "studiensemester"},
+					{"name": "last_status"},
+					{"name": "bismelden"}
 				],
 				"filters": []
 			}

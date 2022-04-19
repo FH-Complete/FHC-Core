@@ -137,11 +137,12 @@
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				 -- AND pss.bestaetigtam IS NULL
@@ -162,11 +163,12 @@
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NULL
 				   AND pss.bestaetigtam IS NULL
@@ -214,11 +216,12 @@
 				 LIMIT 1
 			) AS "AnzahlStgNichtAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz IN ('.$STATUS_KURZBZ.')
 				   AND pss.bewerbung_abgeschicktamum IS NULL
 				   AND ps.person_id = p.person_id

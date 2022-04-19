@@ -649,7 +649,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			WHERE
 				student_uid = ".$db->db_add_param($uid_arr[$i])."
 				AND zeugnis = true
-				AND studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).")
+				AND studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).")";
+
+			if (defined('ZEUGNISNOTE_NICHT_ANZEIGEN'))
+			{
+				$qry .="
+					AND note.anmerkung NOT IN (".$sqlStudent->implode4SQL(unserialize(ZEUGNISNOTE_NICHT_ANZEIGEN)).")
+				";
+			};
+
+			$qry .= "
 				AND NOT EXISTS(SELECT 1 FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 					WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 					AND student_uid=".$db->db_add_param($uid_arr[$i])."
@@ -915,6 +924,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 								WHERE
 									lehrveranstaltung_id = ".$db->db_add_param($row_outgoing->lehrveranstaltung_id)."
 									AND student_uid = ".$db->db_add_param($uid_arr[$i]);
+
+						if (defined('ZEUGNISNOTE_NICHT_ANZEIGEN'))
+						{
+							$qry_outgoing_note .= "
+								AND tbl_note.anmerkung NOT IN (".$db->implode4SQL(unserialize(ZEUGNISNOTE_NICHT_ANZEIGEN)).")
+							";
+						};
 
 						if($result_outgoing_note = $db->db_query($qry_outgoing_note))
 						{

@@ -681,8 +681,11 @@ class lehreinheit extends basis_db
 							else
 							{
 								$row=$this->db_fetch_object($erg_zs);
-								$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->mitarbeiter_uid|$row->zeitsperretyp_kurzbz|$row->bezeichnung|$row->vondatum/$row->vonstunde-$row->bisdatum/$row->bisstunde - $row->vertretung_uid";
-								return false;
+                                if ($row->zeitsperretyp_kurzbz != 'ZVerfueg')
+                                {
+                                    $this->errormsg = "Kollision (Zeitsperre): $row->zeitsperre_id|$row->mitarbeiter_uid|$row->zeitsperretyp_kurzbz|$row->bezeichnung|$row->vondatum/$row->vonstunde-$row->bisdatum/$row->bisstunde - $row->vertretung_uid";
+                                    return false;
+                                }
 							}
 						}
 						return true;
