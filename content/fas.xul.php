@@ -934,8 +934,8 @@ foreach($addon_obj->result as $addon)
 				oncommand="studiensemesterChange('', 1)"
 			/>
 	</statusbarpanel>
-	<statusbarpanel>
-		<toolbarbutton id="statusbarpanel-semester-aktuell" label="Aktuelles Studiensemester" oncommand="getStudiensemesterAktuell()"/>
+	<statusbarpanel id="statusbarpanel-panel-semester-aktuell">
+		<toolbarbutton id="statusbarpanel-semester-aktuell" label="Aktuelles Studiensemester" oncommand="setStudiensemesterAktuell()"/>
 	</statusbarpanel>
 	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo DB_NAME; ?>"/>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
