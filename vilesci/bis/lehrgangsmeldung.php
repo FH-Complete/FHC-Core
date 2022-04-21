@@ -58,6 +58,7 @@ else
 $datei='';
 $zaehl=0;
 $lehrgangsname = '';
+$standortcode = null;
 
 $stsem_obj = new studiensemester();
 $stsem_obj->load($ssem);
@@ -158,16 +159,16 @@ if ($stg_kz == '')
 	exit();
 }
 
-// Standortcode
-if (defined('BIS_STANDORTCODE_LEHRGAENGE') && BIS_STANDORTCODE_LEHRGAENGE != '0')
-{
-	$standortcode = BIS_STANDORTCODE_LEHRGAENGE;
-}
-else
-{
-	echo "<H2>Standortcode f&uuml;r Lehrg&auml;nge fehlt.</H2>";
-	exit;
-}
+// Standortcode - Obsolete da Standort nun aus DB geholt wird - auch kein Eintrag in vilesci.config->BIS_STANDORTCODE_LEHRGAENGE noetig
+#####if (defined('BIS_STANDORTCODE_LEHRGAENGE') && BIS_STANDORTCODE_LEHRGAENGE != '0')
+#####{
+#####	$standortcode = BIS_STANDORTCODE_LEHRGAENGE;
+#####}
+#####else
+#####{
+#####	echo "<H2>Standortcode f&uuml;r Lehrg&auml;nge fehlt.</H2>";
+#####	exit;
+#####}
 
 $datumobj=new datum();
 
@@ -178,6 +179,7 @@ if($result = $db->db_query($qry))
 	if($row = $db->db_fetch_object($result))
 	{
 		$stgart=$row->typ;
+		$standortcode = $row->standort_code;
 		$lgartcode = $row->lgartcode;
 		$qrylgart = "SELECT lgart_biscode FROM bis.tbl_lgartcode WHERE lgartcode=".$db->db_add_param($row->lgartcode);
 		if($result_lgartcode = $db->db_query($qrylgart))
