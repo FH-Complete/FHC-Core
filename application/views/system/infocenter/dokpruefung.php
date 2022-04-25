@@ -65,7 +65,7 @@
 				if (!isset($formalReadonly)) :
 				?>
 					<td>
-						<input type="checkbox" class="form-check-input prchbox"
+						<input type="checkbox" class="form-check-input prchbox" autocomplete="off"
 							   id="prchkbx_<?php echo $dokument->akte_id ?>" <?php echo $geprueft ?>>
 						<span id="formalgeprueftam_<?php echo $dokument->akte_id ?>">
 						<?php echo isset($dokument->formal_geprueft_amum) ? date_format(date_create($dokument->formal_geprueft_amum), 'd.m.Y') : ''; ?>

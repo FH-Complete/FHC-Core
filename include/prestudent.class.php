@@ -834,11 +834,26 @@ class prestudent extends person
 				$stg_obj = new studiengang();
 				$stg_obj->load($studiengang_kz);
 			    if($stg_obj->typ=='m')
-					$qry.=" AND a.rolle='Interessent' AND a.zgvmas_code is not null AND a.zgvmas_erfuellt = 't'";
+				{
+					$qry.=" AND a.rolle='Interessent' AND a.zgvmas_code is not null";
+
+					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
+						$qry .= " AND a.zgvmas_erfuellt = 't'";
+				}
 				elseif($stg_obj->typ=='p')
-					$qry.=" AND a.rolle='Interessent' AND a.zgvdoktor_code is not null AND a.zgvdoktor_erfuellt = 't'";
+				{
+					$qry.=" AND a.rolle='Interessent' AND a.zgvdoktor_code is not null";
+
+					if (defined('ZGV_DOKTOR_ANZEIGEN') && ZGV_DOKTOR_ANZEIGEN)
+						$qry .= " AND a.zgvdoktor_erfuellt = 't'";
+				}
 				else
-					$qry.=" AND a.rolle='Interessent' AND a.zgv_code is not null AND a.zgv_erfuellt = 't'";
+				{
+					$qry.=" AND a.rolle='Interessent' AND a.zgv_code is not null";
+
+					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
+						$qry .= " AND a.zgv_erfuellt = 't'";
+				}
 				break;
 			case "reihungstestangemeldet":
 				$qry.="
@@ -2489,10 +2504,14 @@ class prestudent extends person
 		$qry = "SELECT
 					UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as kuerzel
 				FROM
-					public.tbl_prestudent
+					public.tbl_prestudent pt
 					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					JOIN public.tbl_studiengang USING (studiengang_kz)
 				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND NOT EXISTS
+						(SELECT * FROM public.tbl_prestudentstatus ps
+						WHERE ps.prestudent_id = pt.prestudent_id
+						AND status_kurzbz = 'Abbrecher' )
 					AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
 					AND typ in ('b','m','d')
 				ORDER BY status_kurzbz ASC

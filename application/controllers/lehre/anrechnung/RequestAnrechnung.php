@@ -119,7 +119,7 @@ class requestAnrechnung extends Auth_Controller
 		// Validate data
 		if (empty($_FILES['uploadfile']['name']))
 		{
-			return $this->outputJsonError($this->p->t('ui', 'errorUploadFehlt'));
+			return $this->outputJsonError($this->p->t('ui', 'errorUploadFehltOderZuGross'));
 		}
 
 		if (isEmptyString($begruendung_id) ||

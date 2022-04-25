@@ -2272,6 +2272,21 @@ if(!$error)
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='checkbuchung')
+	{
+		$person_ids = explode(';',$_POST['person_ids']);
+		$exists = false;
+		if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK') && (in_array($_POST['buchungstyp_kurzbz'], unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK))))
+		{
+			$konto = new konto();
+			$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $_POST['buchungstyp_kurzbz']);
+		}
+
+		if($exists)
+			$return = true;
+		else
+			$return = false;
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='neuebuchung')
 	{
 		//Speichert eine neue Buchung
