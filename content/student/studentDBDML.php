@@ -74,6 +74,8 @@ require_once('../../include/reihungstest.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/mobilitaet.class.php');
 require_once('../../include/studienordnung.class.php');
+require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/bisverwendung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -403,7 +405,7 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Geburtsdatum ist nicht korrekt.';
 				$error = true;
-			}			
+			}
 
 			if(!$error)
 			{
@@ -648,12 +650,12 @@ if(!$error)
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
-				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt']; 									   
+				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt'];
 				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
-				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];										  
+				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];
 				$prestudent->zgvdoktor_code = $_POST['zgvdoktor_code'];
 				$prestudent->zgvdoktorort = $_POST['zgvdoktorort'];
 				$prestudent->zgvdoktordatum = $_POST['zgvdoktordatum'];
@@ -2361,7 +2363,7 @@ if(!$error)
 			{
 				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
 					continue;
-									 
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2374,7 +2376,7 @@ if(!$error)
 					$dok->new = true;
 					if ($dokument_kurzbz === 'Sonst')
 						$sonst++;
-				  
+
 
 					if(!$dok->save())
 					{
@@ -4369,32 +4371,149 @@ if(!$error)
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
+
+// 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
+// 	{
+// 		if(isset($_POST['person_id']))
+// 		{
+// 			$qry = "SELECT mitarbeiter_uid, stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
+// 					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER);
+// 			if($result = $db->db_query($qry))
+// 			{
+// 				if($row = $db->db_fetch_object($result))
+// 				{
+// 					$mitarbeiter_uid = $row->mitarbeiter_uid;
+// 					$mitarbeiter = new mitarbeiter();
+//
+// 					if($mitarbeiter->load($mitarbeiter_uid))
+// 					{
+// 						if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+// 							&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+// 						{
+// 							$stsem = new studiensemester();
+// 							$stsem->load($semester_aktuell);
+// 							$bisverwendung = new bisverwendung();
+// 							$data = $mitarbeiter->stundensatz;
+// 							if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+// 							{
+// 								$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+// 								$bisverwendung->result[] = $bisverwendung;
+// 							}
+//
+// 							foreach($bisverwendung->result as $row_verwendung)
+// 							{
+// 								// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+// 								// geliefert da dies im Vertrag inkludiert ist.
+// 								if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+// 								{
+// 									$data = '';
+// 									break;
+// 								}
+// 								// else
+// 								// {
+// 								// 	$data = $mitarbeiter->stundensatz;
+// 								// //	echo $data;
+// 								// 	$return = true;
+// 								// }
+// 							}
+// 						}
+// 						else
+// 						{
+// 							$data = $mitarbeiter->stundensatz;
+// 							//alert($data);
+// 							$return = true;
+// 						}
+//
+// 				}
+// 				else
+// 				{
+// 					$errormsg = 'Fehler beim Laden Mitarbeiter*in';
+// 					$return = false;
+// 				}
+//
+// 		}
+// 		else
+// 		{
+// 			$errormsg = 'Mitarbeiter*in muss ausgewählt werden';
+// 			$return = false;
+// 		}
+// 	}
+// 	else
+// 	{
+// 		$errormsg = 'DB Abfrage fehlgeschlagen';
+// 		$return = false;
+// 	}
+//  }
+//
+// }
+
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
 	{
 		if(isset($_POST['person_id']))
 		{
-			$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
+			$qry = "SELECT mitarbeiter_uid, stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
 					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
 				{
-					$data = $row->stundensatz;
-					$return = true;
-				}
+					$mitarbeiter_uid = $row->mitarbeiter_uid;
+					$mitarbeiter = new mitarbeiter();
+
+					if($mitarbeiter->load($mitarbeiter_uid))
+					{
+						if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+							&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+						{
+							$stsem = new studiensemester();
+							$stsem->load($semester_aktuell);
+							$bisverwendung = new bisverwendung();
+							$data = $mitarbeiter->stundensatz;
+							if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+							{
+								$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+								$bisverwendung->result[] = $bisverwendung;
+							}
+
+							foreach($bisverwendung->result as $row_verwendung)
+							{
+								// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+								// geliefert da dies im Vertrag inkludiert ist.
+								if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+								{
+									$data = '';
+									break;
+								}
+							}
+						}
+						else
+							$data = $mitarbeiter->stundensatz;
+						$return = true;
+					}
+
+
 				else
 				{
-					$data = '80.00';
-					$return = true;
+					$errormsg = 'Fehler beim Laden Mitarbeiter*in';
+					$return = false;
 				}
-			}
-			else
-			{
-				$return = false;
-				$errormsg = 'Unbekannter Fehler';
-			}
+
+		}
+		else
+		{
+			$errormsg = 'Mitarbeiter*in muss ausgewählt werden';
+			$return = false;
 		}
 	}
+	else
+	{
+		$errormsg = 'Fehler bei Datenabfrage';
+		$return = false;
+	}
+ }
+
+}
+
 	elseif(isset($_POST['type']) && $_POST['type']=='saveanrechnung')
 	{
 		$anrechnung = new anrechnung();

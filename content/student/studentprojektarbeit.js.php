@@ -1171,6 +1171,7 @@ function StudentProjektbetreuerDetailReset()
 		document.getElementById('student-projektbetreuer-textbox-stunden').value='0.0';
 		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Begutachter';
 	}
+
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value='80.0';
 	document.getElementById('student-projektbetreuer-menulist-person').value='';
 }
@@ -1383,7 +1384,12 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 	{
 		stundensatz = val.dbdml_data
 	}
+	if (stundensatz != '')
+		default_stundensatz = 'Stundensatz (Default '+stundensatz+'):';
+	else
+		default_stundensatz = 'Stundensatz';
 
+  document.getElementById('student-projektbetreuer-label-stundensatz').value= default_stundensatz;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
 }
 

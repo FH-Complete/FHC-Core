@@ -501,7 +501,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 								<textbox id="student-projektbetreuer-textbox-stunden" disabled="true" maxlength="8"/>
 							</row>
 							<row>
-								<label value="Stundensatz" control="student-projektbetreuer-textbox-stundensatz"/>
+								<label id="student-projektbetreuer-label-stundensatz" value="Stundensatz: " control="student-projektbetreuer-textbox-stundensatz"/>
 								<textbox id="student-projektbetreuer-textbox-stundensatz" disabled="true" maxlength="5"/>
 							</row>
 							<row hidden="true"><!-- Faktor wird nicht mehr benoetigt -->
