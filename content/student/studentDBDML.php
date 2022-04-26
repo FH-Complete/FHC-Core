@@ -4372,81 +4372,6 @@ if(!$error)
 		}
 	}
 
-// 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
-// 	{
-// 		if(isset($_POST['person_id']))
-// 		{
-// 			$qry = "SELECT mitarbeiter_uid, stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
-// 					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER);
-// 			if($result = $db->db_query($qry))
-// 			{
-// 				if($row = $db->db_fetch_object($result))
-// 				{
-// 					$mitarbeiter_uid = $row->mitarbeiter_uid;
-// 					$mitarbeiter = new mitarbeiter();
-//
-// 					if($mitarbeiter->load($mitarbeiter_uid))
-// 					{
-// 						if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
-// 							&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
-// 						{
-// 							$stsem = new studiensemester();
-// 							$stsem->load($semester_aktuell);
-// 							$bisverwendung = new bisverwendung();
-// 							$data = $mitarbeiter->stundensatz;
-// 							if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
-// 							{
-// 								$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
-// 								$bisverwendung->result[] = $bisverwendung;
-// 							}
-//
-// 							foreach($bisverwendung->result as $row_verwendung)
-// 							{
-// 								// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-// 								// geliefert da dies im Vertrag inkludiert ist.
-// 								if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
-// 								{
-// 									$data = '';
-// 									break;
-// 								}
-// 								// else
-// 								// {
-// 								// 	$data = $mitarbeiter->stundensatz;
-// 								// //	echo $data;
-// 								// 	$return = true;
-// 								// }
-// 							}
-// 						}
-// 						else
-// 						{
-// 							$data = $mitarbeiter->stundensatz;
-// 							//alert($data);
-// 							$return = true;
-// 						}
-//
-// 				}
-// 				else
-// 				{
-// 					$errormsg = 'Fehler beim Laden Mitarbeiter*in';
-// 					$return = false;
-// 				}
-//
-// 		}
-// 		else
-// 		{
-// 			$errormsg = 'Mitarbeiter*in muss ausgewählt werden';
-// 			$return = false;
-// 		}
-// 	}
-// 	else
-// 	{
-// 		$errormsg = 'DB Abfrage fehlgeschlagen';
-// 		$return = false;
-// 	}
-//  }
-//
-// }
-
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
 	{
 		if(isset($_POST['person_id']))
@@ -4489,15 +4414,12 @@ if(!$error)
 						else
 							$data = $mitarbeiter->stundensatz;
 						$return = true;
-					}
-
-
+				}
 				else
 				{
 					$errormsg = 'Fehler beim Laden Mitarbeiter*in';
 					$return = false;
 				}
-
 		}
 		else
 		{
@@ -4511,7 +4433,6 @@ if(!$error)
 		$return = false;
 	}
  }
-
 }
 
 	elseif(isset($_POST['type']) && $_POST['type']=='saveanrechnung')
