@@ -456,7 +456,10 @@ if ($rtprueflingEntSperren)
 		&& isset($_POST['art']))
 	{
 		$qry = "UPDATE testtool.tbl_pruefling SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
-				WHERE prestudent_id = " . $db->db_add_param($_POST['prestudent_id']) . ";";
+				WHERE prestudent_id IN 
+						(SELECT prestudent_id FROM public.tbl_prestudent ps
+							JOIN public.tbl_person tp ON tp.person_id = ps.person_id 
+							WHERE tp.person_id = (SELECT person_id FROM public.tbl_prestudent sps WHERE sps.prestudent_id = " . $db->db_add_param($_POST['prestudent_id']) . "));";
 
 		if ($result = $db->db_query($qry))
 		{
