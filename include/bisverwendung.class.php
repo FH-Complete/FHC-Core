@@ -873,10 +873,6 @@ class bisverwendung extends basis_db
 	 */
 	public function getLastBisZAPflicht($uid)
 	{
-		$datetime = new DateTime($stichtag);
-	  $stichtag = $datetime->format('Y-m-d');
-		$bismeldung_jahr = $datetime->format('Y');
-
 		$qry = '
 				SELECT
 					*
