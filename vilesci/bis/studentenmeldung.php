@@ -1269,7 +1269,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				if($row_ap->sponsion=='' || $row_ap->sponsion==null)
 				{
-					$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
+					$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
 				}
 				$ap++;
 			}
