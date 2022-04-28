@@ -71,6 +71,16 @@ $config['navigation_header'] = array(
 						'lehre/lehrauftrag_erteilen:r'
 					)
 				),
+                'zverfueg' => array(
+                    'link' => site_url('lehre/lvplanung/AdminZeitverfuegbarkeit'),
+                    'description' => 'Zeitverf&uuml;gbarkeit',
+                    'expand' => true,
+                    'sort' => 45,
+                    'requiredPermissions' => array(
+                        'lehre/zeitverfuegbarkeit:rw',
+                        'lehre/zeitverfuegbarkeit:rw'
+                    )
+                ),
 				'zgvueberpruefung' => array(
 					'link' => site_url('system/infocenter/ZGVUeberpruefung'),
 					'description' => 'ZGV Überprüfung',

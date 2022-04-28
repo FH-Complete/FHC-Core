@@ -493,6 +493,14 @@ if(!$error)
 			$variable->name = 'semester_aktuell';
 			$variable->wert = $studiensemester_kurzbz;
 		}
+		elseif(isset($_POST['stsem_aktuell']))
+		{
+			$stsem = new studiensemester();
+			$studiensemester_kurzbz = $stsem->getakt();
+
+			$variable->name = 'semester_aktuell';
+			$variable->wert = $studiensemester_kurzbz;
+		}
 		elseif(isset($_POST['kontofilterstg']))
 		{
 			$variable->name = 'kontofilterstg';

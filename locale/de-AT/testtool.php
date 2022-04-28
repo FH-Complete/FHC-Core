@@ -61,7 +61,7 @@ $this->phrasen['testtool/einfuehrungsText']='
 					<h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1>
 					<a href="'.APP_ROOT.'cms/dms.php?id=142964" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=142976" alt="Einfuehrungsvideo" style="border: 1px solid lightgray; border-radius: 10px; width:350px;"></a>
 					<br><br>
-					<a href="'.APP_ROOT.'cms/dms.php?id=143926" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Leitfaden zum Ablauf des Reihungstests</a><br>
+					<a href="'.APP_ROOT.'cms/dms.php?id=207694" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Leitfaden zum Ablauf des Reihungstests</a><br>
 					<a href="'.APP_ROOT.'cms/dms.php?id=143928" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Master</b>-Leitfaden zum Ablauf des Reihungstests</a>
 					<br><br>
 					Unter dem folgenden Link können Sie die korrekte Darstellung des Reihungstests testen:<br><br>
@@ -71,7 +71,7 @@ $this->phrasen['testtool/einfuehrungsText']='
 					<h1 style="white-space: normal">Welcome to the placement test</h1>
 					<a href="'.APP_ROOT.'cms/dms.php?id=145596" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=142977" alt="Einfuehrungsvideo" style="border: 1px solid lightgray; border-radius: 10px; width:350px;"></a>
 					<br><br>
-					<a href="'.APP_ROOT.'cms/dms.php?id=143927" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Guideline for placement test</a><br>
+					<a href="'.APP_ROOT.'cms/dms.php?id=207696" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Guideline for placement test</a><br>
 					<a href="'.APP_ROOT.'cms/dms.php?id=143930" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Master</b>-Guideline for placement test</a>
 					<br><br>
 					Under the following link you can test the correct display of the placement test:<br><br>

@@ -423,18 +423,9 @@ if($command=="update" && $error!=true)
 							}
 							else
 							{
-								// paarbeit sollte nur ab SS2021 online bewertet werden
-								$qry_sem="SELECT 1
-											FROM lehre.tbl_projektarbeit 
-											JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-											JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-											WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
-											AND tbl_studiensemester.start::date >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')::date
-											LIMIT 1";
-
-								$result_sem=$db->db_query($qry_sem);
-								$num_rows_sem = $db->db_num_rows($result_sem);
-								if($num_rows_sem < 0)
+								// paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
+								$num_rows_sem = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
+								if(!is_numeric($num_rows_sem) || $num_rows_sem < 0)
 								{
 									echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
 								}

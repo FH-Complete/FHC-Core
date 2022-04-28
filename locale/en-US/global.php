@@ -65,6 +65,7 @@ $this->phrasen['global/drucken']='Print';
 $this->phrasen['global/und']='and';
 $this->phrasen['global/oder']='or';
 $this->phrasen['global/faelligAm']='Due on';
+$this->phrasen['global/aenderungenZuruecksetzen']= "Reset changes";
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';

@@ -14,7 +14,7 @@ $query = '
 			ps.prestudent_id AS "PreStudentID",
 			p.vorname AS "Vorname",
 			p.nachname AS "Nachname",
-			sg.kurzbzlang as "Studiengang",
+			so.studiengangkurzbzlang as "Studiengang",
 			pss.insertamum AS "AbgewiesenAm",
 			(
 				SELECT l.zeitpunkt
@@ -43,6 +43,8 @@ $query = '
 			JOIN public.tbl_prestudent ps USING(prestudent_id)
 			JOIN public.tbl_person p USING(person_id)
 			JOIN public.tbl_studiengang sg USING(studiengang_kz)
+			JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 		WHERE pss.status_kurzbz = '. $ABGEWIESENEN_STATUS .'
 		AND pss.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
 		AND (sg.typ IN ('. $STUDIENGANG_TYP .') 

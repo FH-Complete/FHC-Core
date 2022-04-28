@@ -191,8 +191,6 @@ $nation_arr['']='';
 foreach($nation->nation as $row)
 	$nation_arr[$row->code]=$row->kurztext;
 
-$adresstyp_arr = array(''=>'','h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
-
 // *** ADRESSEN ***
 echo '<h3>Adressen:</h3>';
 echo '<table class="tablesorter" data-sortlist="[[7,0],[0,0]]">
@@ -222,7 +220,7 @@ foreach ($adresse_obj->result as $row)
 	echo "<td>$row->ort</td>";
 	echo "<td>$row->gemeinde</td>";
 	echo "<td>".$nation_arr[$row->nation]."</td>";
-	echo "<td>".$adresstyp_arr[$row->typ]."</td>";
+	echo "<td>".$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE]."</td>";
 	echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
 	echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
 	$firma=new firma();

@@ -53,8 +53,6 @@ class adresse extends basis_db
 	public $rechnungsadresse=false;	//  boolean
 	public $anmerkung;			//  string
 	public $co_name;
-	public $adressentyp;
-	public $bezeichnung;
 	public $bezeichnung_mehrsprachig;
 
 	/**
@@ -522,30 +520,6 @@ class adresse extends basis_db
 			$this->result[] = $adr_obj;
 		}
 		return true;
-	}
-
-	public function getAdressentyp()
-	{
-		$qry = "SELECT * FROM public.tbl_adressentyp ORDER BY sort";
-
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$obj = new adresse();
-
-				$obj->adressentyp = $row->adressentyp_kurzbz;
-				$obj->bezeichnung = $row->bezeichnung;
-
-				$this->result[] = $obj;
-			}
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
 	}
 }
 ?>

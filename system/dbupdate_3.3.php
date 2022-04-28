@@ -3418,6 +3418,20 @@ if ($result = @$db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name 
 	}
 }
 
+// Add new name type in public.tbl_variablenname
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name = 'projektuebersicht_studiensemester';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_variablenname(name, defaultwert) VALUES('projektuebersicht_studiensemester', null);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_variablenname '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_variablenname: Added name "projektuebersicht_studiensemester"<br>';
+	}
+}
+
 // Add column projektphase_id to tbl_zeitaufzeichnung
 if(!$result = @$db->db_query("SELECT projektphase_id FROM campus.tbl_zeitaufzeichnung LIMIT 1"))
 {
@@ -5965,6 +5979,126 @@ if(!$result = @$db->db_query("SELECT behebung_parameter FROM system.tbl_issue LI
 		echo '<br>Added column behebung_parameter to table system.tbl_issue';
 }
 
+// Add table campus.tbl_zeitwunsch_gueltigkeit and migrate initial data
+if($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table_schema LIKE 'campus' AND table_name = 'tbl_zeitwunsch_gueltigkeit'"))
+{
+	if ($db->db_fetch_object($result) == false)
+	{
+		$qry = "
+			CREATE TABLE campus.tbl_zeitwunsch_gueltigkeit
+			(
+				zeitwunsch_gueltigkeit_id INTEGER NOT NULL,
+				mitarbeiter_uid CHARACTER VARYING(32) NOT NULL,
+				von DATE,
+				bis DATE,
+				insertamum TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+				insertvon CHARACTER VARYING(32),
+				updateamum TIMESTAMP WITHOUT TIME ZONE,
+				updatevon CHARACTER VARYING(32)
+			);
+
+			CREATE SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id
+				INCREMENT BY 1
+				NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+
+			-- Add Primary Key
+			ALTER TABLE campus.tbl_zeitwunsch_gueltigkeit ADD CONSTRAINT pk_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id PRIMARY KEY (zeitwunsch_gueltigkeit_id);
+			ALTER TABLE campus.tbl_zeitwunsch_gueltigkeit ALTER COLUMN zeitwunsch_gueltigkeit_id SET DEFAULT nextval('campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id');
+
+			-- Add Permissions
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO web;
+
+			GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_zeitwunsch_gueltigkeit TO vilesci;
+			GRANT SELECT, INSERT, UPDATE ON campus.tbl_zeitwunsch_gueltigkeit TO web;
+
+			-- Initial data migration
+			INSERT INTO campus.tbl_zeitwunsch_gueltigkeit
+			(
+				mitarbeiter_uid,
+				von,
+				bis,
+				insertamum,
+				insertvon,
+				updateamum,
+				updatevon
+			)
+			SELECT * FROM
+			(
+				-- Unique Mitarbeiter from Zeitwunsch Tabelle, Start of actual Studiensemester and open end
+				SELECT DISTINCT mitarbeiter_uid,
+				(SELECT start FROM public.tbl_studiensemester WHERE start <= NOW() AND ende >= NOW()),
+				NULL::DATE AS \"ende\",
+				NOW(),
+				'system',
+				NOW(),
+				'system'
+				FROM campus.tbl_zeitwunsch
+				ORDER BY mitarbeiter_uid
+			) AS init_data
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitwunsch_gueltigkeit: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'campus.tbl_zeitwunsch_gueltigkeit: Tabelle hinzugefuegt<br>';
+	}
+}
+
+// Add column zeitwunsch_id (as new primary key) and zeitwunsch_gueltigkeit_id to campus.tbl_zeitwunsch
+if ($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_zeitwunsch' AND column_name IN ('zeitwunsch_id', 'zeitwunsch_gueltigkeit_id')"))
+{
+	if ($db->db_num_rows($result) <> 2)
+	{
+		$qry = "
+			ALTER TABLE campus.tbl_zeitwunsch DROP CONSTRAINT IF EXISTS pk_tbl_zeitwunsch; -- Drop combined pk stunde/mitarbeiter_uid/tag
+
+			-- Add primary key and foreign key
+			ALTER TABLE campus.tbl_zeitwunsch ADD COLUMN IF NOT EXISTS zeitwunsch_id INTEGER;
+			ALTER TABLE campus.tbl_zeitwunsch ADD COLUMN IF NOT EXISTS zeitwunsch_gueltigkeit_id INTEGER;
+
+			-- Add comments
+			COMMENT ON COLUMN campus.tbl_zeitwunsch.zeitwunsch_gueltigkeit_id IS 'Ordnet die Zeitwuensche einer Gueltigkeitsdauer von-bis zu';
+			COMMENT ON COLUMN campus.tbl_zeitwunsch.mitarbeiter_uid IS 'DEPRECATED';
+
+			CREATE SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id
+				INCREMENT BY 1
+				NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+
+			ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_id SET DEFAULT nextval('campus.seq_zeitwunsch_zeitwunsch_id');
+			UPDATE campus.tbl_zeitwunsch SET zeitwunsch_id = nextval('campus.seq_zeitwunsch_zeitwunsch_id');
+
+			ALTER TABLE campus.tbl_zeitwunsch ADD CONSTRAINT pk_zeitwunsch_zeitwunsch_id PRIMARY KEY (zeitwunsch_id);
+			ALTER TABLE campus.tbl_zeitwunsch ADD CONSTRAINT fk_zeitwunsch_zeitwunsch_gueltigkeit_id FOREIGN KEY (zeitwunsch_gueltigkeit_id) REFERENCES campus.tbl_zeitwunsch_gueltigkeit(zeitwunsch_gueltigkeit_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			-- Set initial zeitwunsch_gueltigkeit_id values to Gueltigkeitszeitraum of actual Studiensemester
+			UPDATE campus.tbl_zeitwunsch
+			SET zeitwunsch_gueltigkeit_id = (
+				SELECT zeitwunsch_gueltigkeit_id
+				FROM campus.tbl_zeitwunsch_gueltigkeit zwg
+				WHERE tbl_zeitwunsch.mitarbeiter_uid = zwg.mitarbeiter_uid
+			);
+
+			-- Set primary key and foreign key NOT NULL
+			ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_id SET NOT NULL;
+			ALTER TABLE campus.tbl_zeitwunsch ALTER COLUMN zeitwunsch_gueltigkeit_id SET NOT NULL;
+
+			-- Set permissions
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO web;
+		";
+
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitwunsch: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo '<br>campus.tbl_zeitwunsch: Neue Spalte zeitwunsch_id hinzugefuegt.';
+	}
+}
+
 // Add index beschreibung to system.tbl_webservicelog
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservicelog_beschreibung'"))
 {
@@ -5999,6 +6133,34 @@ if(!@$db->db_query("SELECT insertvon FROM system.tbl_fehler_zustaendigkeiten LIM
 		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Spalte insertvon in system.tbl_fehler_zustaendigkeiten hinzugefügt';
+}
+
+// Insert postive Zeitsperre 'Zeitverfuegbarkeit' to tbl_zeitsperretyp
+if($result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitsperretyp WHERE zeitsperretyp_kurzbz = 'ZVerfueg';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_zeitsperretyp(zeitsperretyp_kurzbz, beschreibung) VALUES('ZVerfueg', 'Zeitverfügbarkeit');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitsperretyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'campus.tbl_zeitsperretyp: Added value \'ZVerfueg\'<br>';
+	}
+}
+
+// Add permission to administrate zeitverfuegbarkeiten
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/zeitverfuegbarkeit';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/zeitverfuegbarkeit', 'Zeitverfuegbarkeit verwalten');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/zeitverfuegbarkeit<br>';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -6093,7 +6255,8 @@ $tabellen=array(
 	"campus.tbl_zeitaufzeichnung_gd"  => array("zeitaufzeichnung_gd_id","uid","studiensemester_kurzbz","selbstverwaltete_pause","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz","freigabeamum","freigabevon"),
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
-	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon", "zeitwunsch_id", "zeitwunsch_gueltigkeit_id"),
+	"campus.tbl_zeitwunsch_gueltigkeit"  => array("zeitwunsch_gueltigkeit_id","mitarbeiter_uid","von","bis","insertamum","insertvon", "updateamum","updatevon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
 	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id","projekttyp_kurzbz","zeitaufzeichnung"),
