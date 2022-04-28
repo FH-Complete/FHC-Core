@@ -216,14 +216,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -507,14 +507,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -731,14 +731,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -838,14 +838,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -954,14 +954,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		// Wenn nur noch dieser Lektor im LVPlan verplant ist, dann wird das loeschen verhindert
@@ -1055,14 +1055,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		// Wenn nur noch diese eine Gruppe im LVPlan verplant ist, dann wird das loeschen verhindert
@@ -1180,14 +1180,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -1234,7 +1234,7 @@ if(!$error)
 			else
 			{
 				$return = false;
-				$errormsg = 'Bitte zuerst eine Lehreinheit auswaehlen';
+				$errormsg = 'Bitte zuerst einen LV-Teil auswaehlen';
 			}
 		}
 	}
@@ -1265,19 +1265,19 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
 		{
-			$leDAO=new lehreinheit();
+			$leDAO = new lehreinheit();
 			if ($_POST['do']=='create' || ($_POST['do']=='update'))
 			{
 				if($_POST['do']=='update')
@@ -1286,7 +1286,7 @@ if(!$error)
 					{
 						$return = false;
 						$error = true;
-						$errormsg = 'Fehler beim Laden der Lehreinheit';
+						$errormsg = 'Fehler beim Laden des LV-Teils';
 					}
 
 					if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
@@ -1521,7 +1521,7 @@ if(!$error)
 						if($db->db_num_rows()>0)
 						{
 							$return = false;
-							$errormsg = 'Diese Lehreinheit ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!';
+							$errormsg = 'Dieser LV-Teil ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!';
 						}
 						else
 						{
@@ -1532,7 +1532,7 @@ if(!$error)
 							else
 							{
 								$return = false;
-								$errormsg = 'Fehler beim Loeschen der Lehreinheit '.$leDAO->errormsg;
+								$errormsg = 'Fehler beim Loeschen des LV-Teils '.$leDAO->errormsg;
 							}
 						}
 					}
@@ -1907,13 +1907,13 @@ if(!$error)
 				}
 				else
 				{
-					$errormsg = 'Gruppe passt nicht zur Lehreinheit';
+					$errormsg = 'Gruppe passt nicht zum LV-Teil';
 					$return = false;
 				}
 			}
 			else
 			{
-				$errormsg = 'Gruppe passt nicht zur Lehreinheit';
+				$errormsg = 'Gruppe passt nicht zum LV-Teil';
 				$return = false;
 			}
 		}
