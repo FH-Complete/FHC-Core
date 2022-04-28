@@ -5,7 +5,7 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Attempt to register with existing mailadress\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';

@@ -249,8 +249,8 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 	'Team'
 ));
 
-// Standortcode fuer Lehrgaenge
-define('BIS_STANDORTCODE_LEHRGAENGE', '0');
+// Standortcode fuer Lehrgaenge - Obsolete da Standort nun aus DB geholt wird
+//define('BIS_STANDORTCODE_LEHRGAENGE', '0');
 
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);

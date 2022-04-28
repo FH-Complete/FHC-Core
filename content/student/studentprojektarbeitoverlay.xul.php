@@ -492,7 +492,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 									</template>
 								</menulist>
 							</row>
-							<row>
+							<row id="student-projektbetreuer-textbox-punkte-row">
 								<label value="Punkte" control="student-projektbetreuer-textbox-punkte"/>
 								<textbox id="student-projektbetreuer-textbox-punkte" disabled="true" maxlength="6"/>
 							</row>
