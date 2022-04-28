@@ -521,7 +521,7 @@ function LeDelete()
 	}
 
 	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Wollen Sie diese Lehreinheit wirklich loeschen?'))
+	if (confirm('Wollen Sie diesen LV-Teil wirklich loeschen?'))
 	{
 		//Script zum loeschen der Lehreinheit aufrufen
 		var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
@@ -539,6 +539,52 @@ function LeDelete()
 		LeDetailReset();
 		LeDetailDisableFields(true);
 	}
+}
+
+// ****
+// * LV-Teile kopieren
+// ****
+function LeCopy(art)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('lehrveranstaltung-tree');
+
+	if (tree.currentIndex==-1)
+		return;
+
+	try
+	{
+		//Ausgewaehlte LV-Teile holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
+		var lehreinheit_id = tree.view.getCellText(tree.currentIndex,col);
+		if(lehreinheit_id == '')
+		{
+			alert('Lehreinheit_id konnte nicht ermittelt werden');
+			return false;
+		}
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	//Script zum kopieren des LV-Teils aufrufen
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+
+	req.add('type','lehreinheit');
+	req.add('do','copy');
+	req.add('art',art);
+	req.add('lehreinheit_id',lehreinheit_id);
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	if(!val.dbdml_return)
+		alert(val.dbdml_errormsg)
+
+	LvTreeRefresh();
+	LeDetailReset();
+	LeDetailDisableFields(true);
 }
 
 // ****
@@ -2673,7 +2719,7 @@ function LeMitarbeiterGesamtkosten()
 /*
  * Oeffnet alle Subtrees
  */
-function LvTreeOpenAllSubtrees()
+function LvTreeOpenAllSubtrees(art)
 {
 	var tree=document.getElementById('lehrveranstaltung-tree');
 
@@ -2682,10 +2728,21 @@ function LvTreeOpenAllSubtrees()
 	else
 		return false;
 
-	for(var i=items-1;i>=0;i--)
+	if (art == 'aus')
 	{
-		if(!tree.view.isContainerOpen(i))
-			tree.view.toggleOpenState(i);
+		for(var i=items-1;i>=0;i--)
+		{
+			if(!tree.view.isContainerOpen(i))
+				tree.view.toggleOpenState(i);
+		}
+	}
+	else if (art == 'ein')
+	{
+		for(var i=items-1;i>=0;i--)
+		{
+			if(tree.view.isContainerOpen(i))
+				tree.view.toggleOpenState(i);
+		}
 	}
 }
 
