@@ -96,4 +96,30 @@ class Konto_model extends DB_Model
 
 		return $this->execQuery($query);
 	}
+
+	public function checkStudienbeitrag($uid, $stsem, $buchungstypen)
+	{
+		$query = 'SELECT tbl_konto.buchungsnr, 
+       				tbl_konto.buchungsdatum 
+					FROM public.tbl_konto,
+					public.tbl_benutzer,
+					public.tbl_student
+					WHERE
+						tbl_konto.studiensemester_kurzbz = \'' . $stsem . '\'
+						AND tbl_benutzer.uid = \'' . $uid . '\'
+						AND tbl_benutzer.uid = tbl_student.student_uid
+						AND tbl_benutzer.person_id = tbl_konto.person_id
+						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
+						AND tbl_konto.buchungstyp_kurzbz IN (\'' . $buchungstypen . '\')
+						AND 0 >= (
+							SELECT sum(betrag)
+							FROM public.tbl_konto skonto
+							WHERE skonto.buchungsnr = tbl_konto.buchungsnr_verweis
+							OR skonto.buchungsnr_verweis = tbl_konto.buchungsnr_verweis
+						)	
+					ORDER BY buchungsnr
+					';
+
+		return $this->execQuery($query);
+	}
 }
