@@ -5982,8 +5982,9 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservic
 // Add column melde_studiengang_kz to public.tbl_studiengang and prefill values
 if (!$result = @$db->db_query("SELECT melde_studiengang_kz FROM public.tbl_studiengang LIMIT 1"))
 {
-	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melde_studiengang_kz integer;
-			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT abs(studiengang_kz) FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND typ != 'l';
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melde_studiengang_kz varchar(32);
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NULL;
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT (SELECT lpad(erhalter_kz::text, 3, '0') FROM public.tbl_erhalter) || lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NOT NULL;
 			COMMENT ON COLUMN public.tbl_studiengang.melde_studiengang_kz IS 'Studiengangskennzahl, mit der der Studiengang gemeldet wird (z.B. Bismeldung)'";
 
 	if(!$db->db_query($qry))
