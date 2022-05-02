@@ -873,6 +873,10 @@ function StudentProjektbetreuerAuswahl()
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	stunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stunden" ));
 	stundensatz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
+	if (stundensatz != '')
+		default_stundensatz = 'Stundensatz (Default '+stundensatz+'):';
+	else
+		default_stundensatz = 'Stundensatz';
 	betreuerart_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betreuerart_kurzbz" ));
 	person_nachname = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_nachname" ));
     vertrag_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertrag_id" ));
@@ -887,6 +891,7 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-textbox-punkte').value=punkte;
 	document.getElementById('student-projektbetreuer-textbox-stunden').value=stunden;
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
+	document.getElementById('student-projektbetreuer-label-stundensatz').value= default_stundensatz;
 	document.getElementById('student-projektbetreuer-menulist-betreuerart').value=betreuerart_kurzbz;
 	document.getElementById('student-projektbetreuer-textbox-betreuerart_kurzbz_old').value=betreuerart_kurzbz;
 	document.getElementById('student-projektbetreuer-textbox-person_id').value=person_id;
@@ -1389,8 +1394,8 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 	else
 		default_stundensatz = 'Stundensatz';
 
-  document.getElementById('student-projektbetreuer-label-stundensatz').value= default_stundensatz;
-	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
+  document.getElementById('student-projektbetreuer-label-stundensatz').value = default_stundensatz;
+	document.getElementById('student-projektbetreuer-textbox-stundensatz').value = stundensatz;
 }
 
 // ****

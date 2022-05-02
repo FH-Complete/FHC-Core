@@ -4412,7 +4412,7 @@ if(!$error)
 							}
 						}
 						else
-							$data = $mitarbeiter->stundensatz;
+						$data = $mitarbeiter->stundensatz;
 						$return = true;
 				}
 				else
@@ -4423,8 +4423,8 @@ if(!$error)
 		}
 		else
 		{
-			$errormsg = 'Mitarbeiter*in muss ausgewählt werden';
-			$return = false;
+			$data = '00.00';
+			$return = true;
 		}
 	}
 	else
