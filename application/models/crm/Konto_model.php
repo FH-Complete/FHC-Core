@@ -117,7 +117,7 @@ class Konto_model extends DB_Model
 							WHERE skonto.buchungsnr = tbl_konto.buchungsnr_verweis
 							OR skonto.buchungsnr_verweis = tbl_konto.buchungsnr_verweis
 						)	
-					ORDER BY buchungsnr
+					ORDER BY buchungsnr DESC LIMIT 1
 					';
 
 		return $this->execQuery($query);
