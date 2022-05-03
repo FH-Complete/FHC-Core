@@ -17,7 +17,6 @@
  *
  */
 
-require_once(dirname(__FILE__).'/../config/docsbox.php');
 require_once(dirname(__FILE__).'/../../vendor/nategood/httpful/bootstrap.php');
 
 use \ZipArchive as ZipArchive;
@@ -48,7 +47,7 @@ class DocsboxLib
 	public static function convert($inputFileName, $outputFileName, $format)
 	{
 		// If a format has not been given
-		if (isEmptyString($format)) $format = self::DEFAULT_FORMAT;
+		if (($format == null) || ($format != null && ctype_space($format) === true)) $format = self::DEFAULT_FORMAT;
 
 		// Posts the file to docsbox
 		$queueId = self::_postFile($inputFileName);

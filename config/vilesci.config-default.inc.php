@@ -254,4 +254,12 @@ define('BIS_STANDORTCODE_LEHRGAENGE', '0');
 
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
+
+// Docsbox configs
+define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
+define('DOCSBOX_PATH_API', 'api/v1/');
+define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
+define('DOCSBOX_WAITING_SLEEP_TIME', 1);
+
 ?>
+
