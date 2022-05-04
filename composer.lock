@@ -1,20 +1,17 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "6bab4617977e08b2939bf959929632d4",
-    "content-hash": "3e499134721f682f298dda20263ab686",
+    "content-hash": "33cec5507642bb110f8732f138a95aa5",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
             "version": "3.3.7.1",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip"
             },
             "type": "library"
         },
@@ -47,16 +44,14 @@
             ],
             "description": "Defacto way to enable use of HTML5 sectioning elements in legacy Internet Explorer.",
             "homepage": "http://paulirish.com/2011/the-history-of-the-html5-shiv/",
-            "time": "2015-07-20 20:04:00"
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "alvaro-prieto/colResizable",
             "version": "1.6",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip"
             },
             "type": "library"
         },
@@ -65,9 +60,7 @@
             "version": "2.0.4",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/borgar/textile-js/archive/v2.0.4.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/borgar/textile-js/archive/v2.0.4.zip"
             },
             "type": "library"
         },
@@ -119,7 +112,13 @@
             "keywords": [
                 "qr code"
             ],
-            "time": "2020-04-12 07:38:35"
+            "funding": [
+                {
+                    "url": "https://ko-fi.com/codemasher",
+                    "type": "ko_fi"
+                }
+            ],
+            "time": "2020-04-12T07:38:35+00:00"
         },
         {
             "name": "chillerlan/php-traits",
@@ -168,7 +167,7 @@
                 "trait"
             ],
             "abandoned": true,
-            "time": "2018-06-22 00:30:47"
+            "time": "2018-06-22T00:30:47+00:00"
         },
         {
             "name": "chriskacerguis/codeigniter-restserver",
@@ -207,7 +206,7 @@
             ],
             "description": "REST Server for the CodeIgniter framework",
             "homepage": "https://github.com/chriskacerguis/codeigniter-restserver",
-            "time": "2017-09-23 16:44:55"
+            "time": "2017-09-23T16:44:55+00:00"
         },
         {
             "name": "christianbach/tablesorter",
@@ -225,7 +224,7 @@
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2016-09-02 11:31:54"
+            "time": "2016-09-02T11:31:54+00:00"
         },
         {
             "name": "codeigniter/framework",
@@ -258,7 +257,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2022-03-03 13:21:49"
+            "time": "2022-03-03T13:21:49+00:00"
         },
         {
             "name": "components/angular.js",
@@ -562,7 +561,7 @@
             ],
             "description": "Shim repository for Angular.js",
             "homepage": "http://angularjs.org",
-            "time": "2015-06-07 20:10:38"
+            "time": "2015-06-07T20:10:38+00:00"
         },
         {
             "name": "components/font-awesome",
@@ -597,7 +596,7 @@
                 "OFL-1.1"
             ],
             "description": "The iconic font designed for use with Twitter Bootstrap.",
-            "time": "2016-10-25 10:56:23"
+            "time": "2016-10-25T10:56:23+00:00"
         },
         {
             "name": "components/jquery",
@@ -639,7 +638,7 @@
             ],
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
-            "time": "2021-03-20 19:13:42"
+            "time": "2021-03-20T19:13:42+00:00"
         },
         {
             "name": "components/jqueryui",
@@ -724,7 +723,7 @@
                 }
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
-            "time": "2016-09-16 05:47:55"
+            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "dapphp/securimage",
@@ -774,7 +773,7 @@
                 "security"
             ],
             "abandoned": true,
-            "time": "2018-03-09 06:07:41"
+            "time": "2018-03-09T06:07:41+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -836,7 +835,7 @@
                 "rdfa",
                 "sparql"
             ],
-            "time": "2015-02-27 09:45:49"
+            "time": "2015-02-27T09:45:49+00:00"
         },
         {
             "name": "fgelinas/timepicker",
@@ -897,16 +896,14 @@
                 "fixtures"
             ],
             "abandoned": true,
-            "time": "2020-12-11 09:56:16"
+            "time": "2020-12-11T09:56:16+00:00"
         },
         {
             "name": "joeldbirch/superfish",
             "version": "1.7.9",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip"
             },
             "type": "library"
         },
@@ -925,9 +922,7 @@
             "version": "1.12.4",
             "dist": {
                 "type": "file",
-                "url": "https://code.jquery.com/jquery-1.12.4.min.js",
-                "reference": null,
-                "shasum": null
+                "url": "https://code.jquery.com/jquery-1.12.4.min.js"
             },
             "type": "library"
         },
@@ -936,9 +931,7 @@
             "version": "2.2.4",
             "dist": {
                 "type": "file",
-                "url": "https://code.jquery.com/jquery-2.2.4.min.js",
-                "reference": null,
-                "shasum": null
+                "url": "https://code.jquery.com/jquery-2.2.4.min.js"
             },
             "type": "library"
         },
@@ -947,9 +940,7 @@
             "version": "1.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/jquery/sizzle/archive/1.0.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/jquery/sizzle/archive/1.0.0.zip"
             },
             "type": "library"
         },
@@ -958,9 +949,7 @@
             "version": "1.4.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip"
             },
             "type": "library"
         },
@@ -969,9 +958,7 @@
             "version": "5.5.6",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip"
             },
             "type": "library"
         },
@@ -1039,7 +1026,7 @@
                 "json",
                 "schema"
             ],
-            "time": "2014-08-25 02:48:14"
+            "time": "2014-08-25T02:48:14+00:00"
         },
         {
             "name": "kingsquare/json-schema-form",
@@ -1073,16 +1060,14 @@
                 }
             ],
             "description": "A framework-agnostic PHP Implementation for generating simple forms based on json-schema",
-            "time": "2014-07-10 12:27:19"
+            "time": "2014-07-10T12:27:19+00:00"
         },
         {
             "name": "ludo/jquery-treetable",
             "version": "3.2.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip"
             },
             "type": "library"
         },
@@ -1135,7 +1120,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2015-03-01 12:03:08"
+            "time": "2015-03-01T12:03:08+00:00"
         },
         {
             "name": "ml/iri",
@@ -1182,7 +1167,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2014-01-21 13:43:39"
+            "time": "2014-01-21T13:43:39+00:00"
         },
         {
             "name": "ml/json-ld",
@@ -1231,16 +1216,14 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2020-06-16 17:45:06"
+            "time": "2020-06-16T17:45:06+00:00"
         },
         {
             "name": "moment/momentjs",
             "version": "2.24.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/moment/moment/archive/2.24.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/moment/moment/archive/2.24.0.zip"
             },
             "type": "library"
         },
@@ -1293,7 +1276,7 @@
                 "sorting",
                 "table"
             ],
-            "time": "2020-03-03 13:46:03"
+            "time": "2020-03-03T13:46:03+00:00"
         },
         {
             "name": "nategood/httpful",
@@ -1343,7 +1326,7 @@
                 "rest",
                 "restful"
             ],
-            "time": "2015-10-26 16:11:30"
+            "time": "2015-10-26T16:11:30+00:00"
         },
         {
             "name": "netcarver/textile",
@@ -1396,16 +1379,14 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2022-05-01 17:05:16"
+            "time": "2022-05-01T17:05:16+00:00"
         },
         {
             "name": "nicolaskruchten/pivottable",
             "version": "2.23.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/nicolaskruchten/pivottable/archive/v2.23.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/nicolaskruchten/pivottable/archive/v2.23.0.zip"
             },
             "type": "library"
         },
@@ -1414,9 +1395,7 @@
             "version": "4.2.7",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip"
             },
             "type": "library"
         },
@@ -1509,16 +1488,28 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2022-04-04 04:57:45"
+            "funding": [
+                {
+                    "url": "https://github.com/terrafrost",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpseclib",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-04-04T04:57:45+00:00"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
             "version": "1.0.7",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip"
             },
             "type": "library"
         },
@@ -1527,9 +1518,7 @@
             "version": "1.4.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip"
             },
             "type": "library"
         },
@@ -1593,31 +1582,43 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2020-10-23 09:01:57"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-23T09:01:57+00:00"
         },
         {
             "name": "tapmodo/Jcrop",
             "version": "2.0.4",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip"
             },
             "type": "library"
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.9.11",
+            "version": "5.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5"
+                "reference": "dbd8fefb0bbe96ed15f9af4518b078ae2c20e020"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3a68b67d1120ab89c6760afeb787291703c9a7d5",
-                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/dbd8fefb0bbe96ed15f9af4518b078ae2c20e020",
+                "reference": "dbd8fefb0bbe96ed15f9af4518b078ae2c20e020",
                 "shasum": ""
             },
             "type": "component",
@@ -1626,13 +1627,15 @@
                     "scripts": [
                         "tinymce.js",
                         "plugins/*/plugin.js",
-                        "themes/*/theme.js"
+                        "themes/*/theme.js",
+                        "themes/*/icons.js"
                     ],
                     "files": [
                         "tinymce.min.js",
                         "plugins/*/plugin.min.js",
                         "themes/*/theme.min.js",
-                        "skins/**"
+                        "skins/**",
+                        "icons/*/icons.min.js"
                     ]
                 }
             },
@@ -1641,16 +1644,22 @@
                 "LGPL-2.1-only"
             ],
             "description": "Web based JavaScript HTML WYSIWYG editor control.",
-            "homepage": "http://www.tinymce.com",
+            "homepage": "https://www.tiny.cloud/",
             "keywords": [
-                "editor",
+                "contenteditable",
+                "editing",
                 "html",
                 "javascript",
+                "rich editor",
+                "rich text",
+                "rich text editor",
                 "richtext",
+                "rte",
+                "text",
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2020-07-13 05:29:19"
+            "time": "2021-10-11T03:18:15+00:00"
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -1711,7 +1720,7 @@
                 "responsive",
                 "web"
             ],
-            "time": "2019-02-13 15:55:38"
+            "time": "2019-02-13T15:55:38+00:00"
         },
         {
             "name": "twig/twig",
@@ -1775,7 +1784,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2020-02-11 05:59:23"
+            "time": "2020-02-11T05:59:23+00:00"
         },
         {
             "name": "zetacomponents/base",
@@ -1839,7 +1848,7 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2021-07-25 15:46:08"
+            "time": "2021-07-25T15:46:08+00:00"
         },
         {
             "name": "zetacomponents/database",
@@ -1916,7 +1925,7 @@
             ],
             "description": "A lightweight database layer on top of PHP's PDO that allows you to utilize a database without having to take care of differences in SQL dialects.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2022-02-11 17:18:33"
+            "time": "2022-02-11T17:18:33+00:00"
         },
         {
             "name": "zetacomponents/document",
@@ -1968,7 +1977,7 @@
             ],
             "description": "The Document components provides a general conversion framework for different semantic document markup languages like XHTML, Docbook, RST and similar.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2022-02-11 17:26:31"
+            "time": "2022-02-11T17:26:31+00:00"
         },
         {
             "name": "zetacomponents/workflow",
@@ -2034,7 +2043,7 @@
             ],
             "description": "The purpose of the Workflow component is to provide the core functionality of an activity-based workflow system including the definition and execution of workflow specifications.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-database-tiein",
@@ -2101,7 +2110,7 @@
             ],
             "description": "Contains the database backend for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-event-log-tiein",
@@ -2161,7 +2170,7 @@
             ],
             "description": "Contains the EventLog listener for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2007-12-17 09:04:44"
+            "time": "2007-12-17T09:04:44+00:00"
         }
     ],
     "packages-dev": [
@@ -2216,7 +2225,21 @@
                 "regex",
                 "regular expression"
             ],
-            "time": "2022-01-21 20:24:37"
+            "funding": [
+                {
+                    "url": "https://packagist.com",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/composer",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-01-21T20:24:37+00:00"
         },
         {
             "name": "composer/xdebug-handler",
@@ -2263,7 +2286,21 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2022-02-24 20:20:32"
+            "funding": [
+                {
+                    "url": "https://packagist.com",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/composer",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-02-24T20:20:32+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -2315,7 +2352,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2021-11-30 19:35:32"
+            "time": "2021-11-30T19:35:32+00:00"
         },
         {
             "name": "pdepend/pdepend",
@@ -2362,7 +2399,13 @@
                 "BSD-3-Clause"
             ],
             "description": "Official version of pdepend to be handled with Composer",
-            "time": "2022-02-23 07:53:09"
+            "funding": [
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/pdepend/pdepend",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-02-23T07:53:09+00:00"
         },
         {
             "name": "phpmd/phpmd",
@@ -2434,7 +2477,13 @@
                 "phpmd",
                 "pmd"
             ],
-            "time": "2022-03-24 13:33:01"
+            "funding": [
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpmd/phpmd",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-03-24T13:33:01+00:00"
         },
         {
             "name": "phpmetrics/phpmetrics",
@@ -2498,7 +2547,7 @@
                 "quality",
                 "testing"
             ],
-            "time": "2022-03-24 10:19:51"
+            "time": "2022-03-24T10:19:51+00:00"
         },
         {
             "name": "phpunit/php-timer",
@@ -2547,7 +2596,7 @@
             "keywords": [
                 "timer"
             ],
-            "time": "2017-02-26 11:10:40"
+            "time": "2017-02-26T11:10:40+00:00"
         },
         {
             "name": "psr/container",
@@ -2596,7 +2645,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/log",
@@ -2643,7 +2692,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2021-05-03 11:20:27"
+            "time": "2021-05-03T11:20:27+00:00"
         },
         {
             "name": "sebastian/finder-facade",
@@ -2683,7 +2732,7 @@
             "description": "FinderFacade is a convenience wrapper for Symfony's Finder component.",
             "homepage": "https://github.com/sebastianbergmann/finder-facade",
             "abandoned": true,
-            "time": "2017-11-18 17:31:49"
+            "time": "2017-11-18T17:31:49+00:00"
         },
         {
             "name": "sebastian/phpcpd",
@@ -2733,7 +2782,7 @@
             ],
             "description": "Copy/Paste Detector (CPD) for PHP code.",
             "homepage": "https://github.com/sebastianbergmann/phpcpd",
-            "time": "2017-11-16 08:49:28"
+            "time": "2017-11-16T08:49:28+00:00"
         },
         {
             "name": "sebastian/version",
@@ -2776,7 +2825,7 @@
             ],
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
-            "time": "2016-10-03 07:35:21"
+            "time": "2016-10-03T07:35:21+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -2827,7 +2876,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2021-12-12 21:44:58"
+            "time": "2021-12-12T21:44:58+00:00"
         },
         {
             "name": "symfony/config",
@@ -2886,7 +2935,21 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/console",
@@ -2953,7 +3016,21 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/debug",
@@ -3004,7 +3081,21 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -3070,7 +3161,21 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -3115,7 +3220,21 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/finder",
@@ -3159,7 +3278,21 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2020-11-16 17:02:08"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-11-16T17:02:08+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -3222,7 +3355,21 @@
                 "portable",
                 "shim"
             ],
-            "time": "2020-10-23 09:01:57"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-23T09:01:57+00:00"
         },
         {
             "name": "theseer/fdomdocument",
@@ -3266,7 +3413,7 @@
             "description": "The classes contained within this repository extend the standard DOM to use exceptions at all occasions of errors instead of PHP warnings or notices. They also add various custom methods and shortcuts for convenience and to simplify the usage of DOM.",
             "homepage": "https://github.com/theseer/fDOMDocument",
             "abandoned": true,
-            "time": "2022-01-25 23:10:35"
+            "time": "2022-01-25T23:10:35+00:00"
         }
     ],
     "aliases": [],
@@ -3277,5 +3424,6 @@
     "platform": {
         "php": ">=5.6.40"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
