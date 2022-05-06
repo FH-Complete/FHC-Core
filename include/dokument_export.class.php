@@ -291,7 +291,7 @@ class dokument_export
 				{
 					require_once(dirname(__FILE__).'/../application/libraries/DocsboxLib.php');
 
-					$ret = DocsboxLib::convert($tempname_zip, $this->temp_filename);
+					$ret = DocsboxLib::convert($tempname_zip, $this->temp_filename, $this->outputformat);
 				}
 				else // otherwise use unoconv
 				{
@@ -480,7 +480,7 @@ class dokument_export
 		{
 			require_once(dirname(__FILE__).'/../application/libraries/DocsboxLib.php');
 
-			$ret = DocsboxLib::convert($inFile, $outFile);
+			$ret = DocsboxLib::convert($inFile, $outFile, $format);
 		}
 		else // fallback to unoconv
 		{
