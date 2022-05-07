@@ -1178,6 +1178,7 @@ function StudentProjektbetreuerDetailReset()
 	}
 
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value='80.0';
+	document.getElementById('student-projektbetreuer-label-stundensatz').value= 'Stundensatz (Default 80.0):';
 	document.getElementById('student-projektbetreuer-menulist-person').value='';
 }
 
