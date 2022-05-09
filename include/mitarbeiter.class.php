@@ -918,6 +918,10 @@ class mitarbeiter extends benutzer
 	 */
 	public function searchPersonal($filter)
 	{
+		// Filter imploden und trimmen, um preg_split(Zeichenweise trennung) durchfuehren zu koennen
+		//$searchItems_string_orig = implode(' ', $filter);
+		$searchItems_string = generateSpecialCharacterString($filter);
+
 		$qry = "SELECT
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
 					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_person.svnr
@@ -925,8 +929,8 @@ class mitarbeiter extends benutzer
 					public.tbl_mitarbeiter
 					JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
 					JOIN public.tbl_person USING(person_id)
-				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($filter).") OR
-				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($filter).") OR
+				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
+				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
 				      uid ~* ".$this->db_add_param($filter)." ";
 		if(is_numeric($filter))
 			$qry.="OR personalnummer = ".$this->db_add_param($filter)." OR svnr = ".$this->db_add_param($filter).";";

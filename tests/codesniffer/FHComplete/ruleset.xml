@@ -2,64 +2,92 @@
 <ruleset name="FHComplete">
 	<description>FHComplete's coding standard</description>
 
-	<!-- Ignored directories if phpcs is running from command line, already ignored by phpci -->
+	<!-- Ignored directories -->
 	<exclude-pattern>\.git</exclude-pattern>
 	<exclude-pattern>vendor</exclude-pattern>
 	<exclude-pattern>tests</exclude-pattern>
+	<exclude-pattern>application/controllers/api/v1</exclude-pattern>
+	<exclude-pattern>application/extensions</exclude-pattern>
+	<exclude-pattern>addons</exclude-pattern>
 
+	<!-- This ruleset is based mainly on the PSR2 standard ruleset, exluding the following rules: -->
 	<rule ref="PSR2">
+		<!-- Forces the use of namespaces -->
 		<exclude name="PSR1.Classes.ClassDeclaration" />
-		<exclude name="PSR1.Methods.CamelCapsMethodName" />
-		<exclude name="PSR1.Files.SideEffects" />
-		<exclude name="Generic.WhiteSpace.DisallowTabIndent" />
-		<exclude name="Squiz.ControlStructures.ControlSignature" />
+		<!-- Forbids the use of underscores at the beginning of properties name -->
+		<exclude name="PSR2.Classes.PropertyDeclaration" />
+		<!-- Forbids the use of classes name that contain underscores -->
 		<exclude name="Squiz.Classes.ValidClassName" />
+		<!-- Forbids the use inline control structure (ex. an if statement on one line) -->
 		<exclude name="Generic.ControlStructures.InlineControlStructure" />
-		<exclude name="Squiz.PHP.DisallowSizeFunctionsInLoops" />
+		<!-- Forces to have the bracket on the same line of the statement -->
+		<exclude name="Squiz.ControlStructures.ControlSignature" />
+		<!-- Forces to have in a single file only a class declaration, an if statement outside the class is forbidden -->
+		<exclude name="PSR1.Files.SideEffects" />
+		<!-- Forbids to have an empty line at the end of the file -->
+		<exclude name="PSR2.Files.EndFileNewline" />
+		<!-- Forbids the use of underscores at the beginning of methods name -->
+		<exclude name="PSR2.Methods.MethodDeclaration" />
+		<!-- Forbids the use of tabs -->
+		<exclude name="Generic.WhiteSpace.DisallowTabIndent" />
 	</rule>
 
+	<!-- Do not prompt any warning about the line length -->
+	<!-- Prompt an error if the line length is more than 150 -->
 	<rule ref="Generic.Files.LineLength">
 		<properties>
-			<property name="lineLimit" value="120"/>
+			<property name="lineLimit" value="9999"/>
 			<property name="absoluteLineLimit" value="150"/>
 		</properties>
+		<exclude-pattern>application/phrases/</exclude-pattern>
 	</rule>
 
+	<!-- No white spaces are allowed in array declaration between brackets -->
 	<rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
 
+	<!-- Ensures all class keywords are lowercase -->
 	<rule ref="Squiz.Classes.LowercaseClassKeywords"/>
 
-	<rule ref="Generic.CodeAnalysis.JumbledIncrementer"/>
-	<rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
-	<rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
-	<rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
-	<rule ref="Generic.CodeAnalysis.ForLoopWithTestFunctionCall"/>
-
+	<!-- Forbids the use of TODO in the comments -->
 	<rule ref="Generic.Commenting.Todo"/>
+	<!-- Tests that the stars in a doc comment align correctly -->
 	<rule ref="Squiz.Commenting.DocCommentAlignment"/>
 
-	<!-- We allow EOL after closing braces -->
-	<rule ref="FHComplete.ControlStructures.ControlSignature"/>
+	<!-- Ensures the file ends with a newline character -->
+	<rule ref="Generic.Files.EndFileNewline"/>
 
-	<rule ref="Generic.Files.LineEndings"/>
-
+	<!-- Ensures there is no space after cast tokens -->
 	<rule ref="Generic.Formatting.NoSpaceAfterCast"/>
 
+	<!-- Ensures logical operators 'and' and 'or' are not used -->
 	<rule ref="Squiz.Operators.ValidLogicalOperators"/>
 
-	<rule ref="Squiz.PHP.Eval"/>
-	<rule ref="Squiz.PHP.NonExecutableCode"/>
-	<rule ref="Generic.PHP.NoSilencedErrors"/>
-	<rule ref="Generic.PHP.ForbiddenFunctions"/>
-	<rule ref="Generic.PHP.DeprecatedFunctions"/>
-
-	<rule ref="Squiz.Scope.MemberVarScope"/>
-	<rule ref="Squiz.Scope.StaticThisUsage"/>
-
+	<!-- Ensure cast statements don't contain whitespace -->
 	<rule ref="Squiz.WhiteSpace.CastSpacing"/>
-	<rule ref="Squiz.WhiteSpace.SemicolonSpacing"/>
-	<rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
+	<!-- Verifies that operators have valid spacing surrounding them -->
 	<rule ref="Squiz.WhiteSpace.LogicalOperatorSpacing"/>
+	<!-- Checks that control structures are defined and indented correctly -->
+	<!-- The listed tokens are ignored: comment, doc comment open tag, php close tag -->
+	<rule ref="Generic.WhiteSpace.ScopeIndent">
+		<properties>
+			<property name="ignoreIndentationTokens" type="array">
+				<element value="T_COMMENT"/>
+				<element value="T_DOC_COMMENT_OPEN_TAG"/>
+				<element value="T_CLOSE_TAG"/>
+			</property>
+		</properties>
+	</rule>
+	<!-- Ensure there is no whitespace before a semicolon -->
+	<rule ref="Squiz.WhiteSpace.SemicolonSpacing"/>
 
 	<!-- All rules in ./Sniffs are included automatically -->
+	<!-- FHComplete sniffs:
+		- Classes/FHCPropertyDeclarationSniff: class properties checks, it does not check if the property name starts with an underscore "_"
+		- Classes/FHCValidClassNameSniff: class names checks, it does not check if the class name contains an underscore "_"
+		- ControlStructures/FHCControlSignatureSniff:
+			- Does not force to have whitespaces after the brackets
+			- Allows to have a bracket at newline after a control structure
+		- Methods/FHCMethodDeclarationSniff: it does not check if the method name starts with an underscore "_"
+	-->
 </ruleset>
+
