@@ -358,8 +358,6 @@ html;
 					'vorname' => $stgl->vorname
 				);
 			}
-			
-			return $stglMailAdress_arr;
 		}
 		// If not available, get assistance mail address
 		else
@@ -368,12 +366,13 @@ html;
 
 			if (hasData($result))
 			{
-				return array(
-					$result->retval[0]->email,
-					''
+                $stglMailAdress_arr[]= array(
+					'to' => $result->retval[0]->email,
+					'vorname' => ''
 				);
 			}
 		}
+        return $stglMailAdress_arr;
 	}
 
 	// Build HTML table with yesterdays new Anrechnungen of the given STG
