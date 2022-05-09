@@ -40,7 +40,7 @@ const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
  */
 function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG, $footerImg = DEFAULT_SANCHO_FOOTER_IMG, $replyTo = '', $cc = '')
 {	
-	$from = 'sancho@'. DOMAIN;
+	$from = 'noreply@'. DOMAIN;
 	$sanchoHeader_img = dirname(__FILE__). '/../skin/images/sancho/'. $headerImg;
 	$sanchoFooter_img = dirname(__FILE__). '/../skin/images/sancho/'. $footerImg;
 

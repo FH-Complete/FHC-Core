@@ -49,7 +49,7 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 
 	if ($from == '')
 	{
-		$from = 'sancho@'.DOMAIN;
+		$from = 'noreply@'.DOMAIN;
 	}
 
 	// Embed sancho header and footer image
