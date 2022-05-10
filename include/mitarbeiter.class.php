@@ -1655,5 +1655,37 @@ class mitarbeiter extends benutzer
 		return false;
 	}
 
+
+	/**
+	 * Generiert nächste freie Personalnummer anhand der sequence tbl_mitarbeiter_personalnummer_seq
+	 * @return string $personalnummer
+	 */
+	public function getNextPersonalnummer()
+	{
+		$qry = "SELECT nextval('tbl_mitarbeiter_personalnummer_seq') ";
+
+		if ($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object())
+			{
+				if ($row->nextval != '')
+				{
+					$personalnummer = $row->nextval;
+					return $personalnummer;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+					$return = false;
+				}
+			}
+		}
+		else
+		{
+				$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+				return false;
+		}
+	}
+
 }
 ?>
