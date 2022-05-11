@@ -26,8 +26,8 @@ use \ZipArchive as ZipArchive;
  */
 class DocsboxLib
 {
-	const ERROR = EXIT_ERROR;
-	const SUCCESS = EXIT_SUCCESS;
+	const ERROR = 1;
+	const SUCCESS = 0;
 	const STATUS_FINISHED = 'finished'; // Docsbox status when a document conversion ended
 	const STATUS_QUEUED = 'queued'; // Docsbox status when a file has been queued for the conversion
 	const STATUS_STARTED = 'started'; // Docsbox status when a file has started being worked
