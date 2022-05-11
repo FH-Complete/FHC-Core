@@ -108,7 +108,7 @@ if (defined('LOG_CONTENT') && LOG_CONTENT==true)
 //Easter Egg
 $easteregg = array ('antwort','leben','universum','rest','answer','universe','life','everything');
 $easteregg_intersect = array_intersect(array_map('strtolower',$searchItems), $easteregg);
-if (count($easteregg_intersect)==4)
+if (count($easteregg_intersect)==3)
 {
 	echo '<table width="100%"><tr><td align="center"><br><br><br><p style="align:center; font-size: 2000%;"><strong>42</strong></p></td></tr></table>';
 	exit;
@@ -156,6 +156,7 @@ function searchPerson($searchItems)
 				<tr>
 					<th>',$p->t('global/anrede'),'</th>
 					<th>',$p->t('global/vorname'),'</th>
+					<th>',$p->t('global/wahlname'),'</th>
 					<th>',$p->t('global/nachname'),'</th>
 					<th>',$p->t('global/studiengang'),'</th>
 					<th>',$p->t('freebusy/typ'),'</th>
@@ -178,20 +179,21 @@ function searchPerson($searchItems)
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->anrede,'</td>';
-			echo '<td>',$row->vorname,'</td>';
+			echo '<td>',$row->vorname, '</td>';
+			echo '<td>',$row->wahlname,'</td>';
 			echo '<td>';
 			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN'))
-				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname, ' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
 			else if(!CIS_SUCHE_PROFIL_ANZEIGEN)
 			{
 				$mitarbeiter = new Mitarbeiter($uid);
 				if($mitarbeiter->errormsg === NULL)
-					echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+					echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname, ' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
 				else
 					echo $row->nachname;
 			}
 			else
-				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
 			if($row->aktiv==false)
 				echo '<span style="color: red"> (ausgeschieden)</span>';
 			elseif($bisverwendung->beschausmasscode=='5')

@@ -153,6 +153,7 @@ $qry = 'SELECT DISTINCT ON
 			(nachname, vorname, person_id)
             vorname,
             nachname,
+            wahlname,
             matrikelnr,
 			tbl_studentlehrverband.semester,
             tbl_studentlehrverband.verband,
@@ -237,6 +238,16 @@ if ($result = $db->db_query($qry)) {
             if ($row->stg_kz_student == $a_o_kz) //Außerordentliche Studierende
                 $zusatz .= '(a.o.)';
 
+            //wenn Wahlname vorhanden, wird dieser anstelle des Vornamens angezeigt
+            if ($row->wahlname != '')
+            {
+              $vorname = $row->wahlname;
+            }
+            else
+            {
+              $vorname = $row->vorname;
+            }
+
             //allow admin and assistenz to see ALL fotos (even if locked by user)
             if ($show_all_fotos)
                 $row->foto_sperre = 'f';
@@ -271,7 +282,7 @@ if ($result = $db->db_query($qry)) {
 
             //add studierenden data for XML
             $data[] = array('studierende' => array(
-                    'vorname' => $row->vorname,
+                    'vorname' => $vorname,
                     'nachname' => mb_strtoupper($row->nachname, 'UTF-8'),
                     'personenkennzeichen' => trim($row->matrikelnr),
                     'geschlecht' => $row->geschlecht,
