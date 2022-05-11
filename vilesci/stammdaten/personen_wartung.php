@@ -426,6 +426,20 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				else
 					$bpk = $personToKeep_obj->bpk;
 
+				// Beide Anmerkungen behalten, wenn vorhanden und Person_id der gelöschten Person in die Anmerkung schreiben
+				$anmerkung = '';
+				if ($personToDelete_obj->anmerkungen == '' && $personToKeep_obj->anmerkungen != '')
+					$anmerkung = $personToKeep_obj->anmerkungen;
+				if ($personToKeep_obj->anmerkungen == '' && $personToDelete_obj->anmerkungen != '')
+					$anmerkung = $personToDelete_obj->anmerkungen;
+				if ($personToKeep_obj->anmerkungen != '' && $personToDelete_obj->anmerkungen != '')
+					$anmerkung = $personToKeep_obj->anmerkungen."
+Alte Anmerkungen: ".$personToDelete_obj->anmerkungen;
+
+				$anmerkung .= "
+				
+Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y H:i:s');
+
 				// Letztbenutzten Zugangscode abfragen und übernehmen
 				$zugangscode = '';
 				$log = new personlog();
@@ -492,6 +506,9 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 				// BPK erst setzen, wenn nur mehr eine Person vorhanden ist
 				$sql_query_upd1 .= "UPDATE public.tbl_person SET bpk=" . $db->db_add_param($bpk, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
+
+				// Anmerkung erst setzen, wenn nur mehr eine Person vorhanden ist
+				$sql_query_upd1 .= "UPDATE public.tbl_person SET anmerkung=" . $db->db_add_param($anmerkung, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 
 				if ($personUDF)
 					$sql_query_upd1 .= "UPDATE public.tbl_person SET udf_values=" . $db->db_add_param(json_encode($udfToKeep)) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
