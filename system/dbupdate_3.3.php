@@ -6141,6 +6141,20 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Buchungstyp ZuschussIO Beschreibung aktualisieren
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_buchungstyp WHERE buchungstyp_kurzbz = 'ZuschussIO' AND beschreibung != 'Erasmus+ Zuschuss';"))
+{
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "UPDATE public.tbl_buchungstyp SET beschreibung = 'Erasmus+ Zuschuss' WHERE buchungstyp_kurzbz = 'ZuschussIO';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_buchungstyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_buchungstyp: Spalte beschreibung von Buchungstyp ZuschussIO auf "Erasmus+ Zuschuss" geändert<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
