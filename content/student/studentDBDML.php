@@ -372,6 +372,153 @@ function isBuchungAllowedToChange($buchung_obj)
 		return true;
 }
 
+/**
+ *
+ * Prüft für einen Prestudenten, ob eine bestimmte Statusänderung valide ist.
+ * @param $prestudent_id
+ * @param $status_kurzbz des neuen/bearbeiteten Status
+ * @param $new_status_studiensemester Studiensemester des neuen/zu ändernen Status
+ * @param $new_status_datum Datum des neuen/zu ändernen Status
+ * @param $new_status_ausbildungssemester Ausbildungssemester des neuen/zu ändernen Status
+ * @param $old_status_studiensemester Studiensemester des alten Status, leer wenn neuer Status
+ * @param $old_status_ausbildungssemester Ausbildungssemester des alten Status, leer wenn neuer Status
+ * @return array
+ */
+function checkStatusaenderung(
+	$prestudent_id, $status_kurzbz, $new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester,
+	$old_status_studiensemester = '', $old_status_ausbildungssemester = ''
+)
+{
+	global $db;
+	$endstatus = array('Absolvent', 'Abbrecher');
+	// Datum des neuen Status setzen
+	$new_status_datum = new DateTime($new_status_datum);
+
+	// Wenn neuer Status
+	if ($old_status_studiensemester == '')
+	{
+		// Datum des neuen Status darf nicht in Vergangenheit liegen, sonst Probleme wenn neues Datum < Bismeldedatum
+		$current_date = new DateTime('today');
+		if ($new_status_datum < $current_date)
+		{
+			return array(
+				'error' => true,
+				'errormsg' => 'Datum eines neuen Statuseintrags darf nicht in der Vergangenheit liegen'
+			);
+		}
+	}
+
+	// start des Studiensemesters holen
+	$studiensemester = new studiensemester();
+	$studiensemester->load($new_status_studiensemester);
+	$new_status_semesterstart = new DateTime($studiensemester->start);
+
+	// Alle bisherigen prestudentstatus nach Datum sortiert
+	$qry = "SELECT status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start
+			FROM public.tbl_prestudentstatus pss
+			JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+			WHERE prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
+
+	// gerade bearbeiteten Status rausfiltern
+	if ($old_status_studiensemester != '' && $old_status_ausbildungssemester != '')
+	{
+		$qry .= " AND NOT (
+				status_kurzbz=".$db->db_add_param($status_kurzbz)
+				." AND studiensemester_kurzbz=".$db->db_add_param($old_status_studiensemester)
+				." AND ausbildungssemester=".$db->db_add_param($old_status_ausbildungssemester, FHC_INTEGER)."
+			)";
+	}
+
+	$qry .= " ORDER BY datum DESC, pss.insertamum DESC, pss.ext_id DESC";
+
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$studiensemester_start = new DateTime($row->studiensemester_start);
+			$status_datum = new DateTime($row->datum);
+
+			// Neuer/editierter Statuseintrag nach anderem Statuseintrag
+			if ($new_status_datum >= $status_datum && $new_status_semesterstart >= $studiensemester_start)
+			{
+				// Status vor bearbeiteten für spätere Checks speichern
+				if (!isset($prev_status))
+					$prev_status = $row;
+			}
+			// Neuer/editierter Statuseintrag vor anderem Statuseintrag
+			elseif ($new_status_datum < $status_datum && $new_status_semesterstart <= $studiensemester_start)
+			{
+				if (!isset($next_status))
+					$next_status = $row;
+			}
+			// Datums- oder Semesterabfolge passt nicht - Fehler
+			else
+			{
+				return array(
+					'error' => true,
+					'errormsg' => 'Datum des Statuseintrags muss nach dem Statusdatum,'
+					.' Studiensemester Startdatum nach Startdatum des vorherigen Statuseintrags sein'
+				);
+			}
+		}
+
+		// Abbrecher- oder Absolventenstatus muss Endstatus sein
+		if (
+			(isset($prev_status) && in_array($prev_status->status_kurzbz, $endstatus))
+			|| (isset($next_status) && in_array($status_kurzbz, $endstatus))
+		)
+		{
+			return array(
+				'error' => true,
+				'errormsg' => 'Nach Abbrecher- und Absolventenstatus darf kein anderer Status mehr eingetragen werden'
+			);
+		}
+
+		// wenn Unterbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
+		if (
+			$status_kurzbz == 'Unterbrecher' &&
+			((isset($prev_status) && $prev_status->status_kurzbz == 'Unterbrecher'
+				&& $new_status_ausbildungssemester != $prev_status->ausbildungssemester)
+			|| (isset($next_status) && $next_status->status_kurzbz == 'Unterbrecher'
+				&& $new_status_ausbildungssemester != $next_status->ausbildungssemester))
+		)
+		{
+			return array(
+				'error' => true,
+				'errormsg' => 'Aufeinanderfolgende Unterbrecher müssen gleiches Ausbildungssemester haben'
+			);
+		}
+
+		// wenn Abbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
+		if (
+			(isset($prev_status) && $status_kurzbz == 'Abbrecher'
+			&& $prev_status->status_kurzbz == 'Unterbrecher' && $new_status_ausbildungssemester != $prev_status->ausbildungssemester)
+			|| (isset($next_status) && $status_kurzbz == 'Unterbrecher'
+			&& $next_status->status_kurzbz == 'Abbrecher' && $new_status_ausbildungssemester != $next_status->ausbildungssemester)
+		)
+		{
+			return array(
+				'error' => true,
+				'errormsg' => 'Unterbrecher und folgender Abbrecher müssen gleiches Ausbildungssemester haben'
+			);
+		}
+
+		// keine Studenten nach Diplomand Status
+		if (
+			(isset($prev_status) && $status_kurzbz == 'Student' && $prev_status->status_kurzbz == 'Diplomand')
+			|| (isset($next_status) && $status_kurzbz == 'Diplomand' && $next_status->status_kurzbz == 'Student')
+		)
+		{
+			return array(
+				'error' => true,
+				'errormsg' => 'Nach Diplomantenstatus darf kein Studentenstatus mehr eingetragen werden'
+			);
+		}
+	}
+
+	return array('error' => false, 'errormsg' => '');
+}
+
 if(!$error)
 {
 
@@ -805,6 +952,28 @@ if(!$error)
 											$errormsg .= "\n$prestd->vorname $prestd->nachname: Person muss zuerst zum Bewerber gemacht werden!";
 											$anzahl_fehler++;
 										}
+									}
+								}
+
+								// wenn keine spezielle Berechtiung zur Umgebung, Statusänderung Checks durchführen
+								if (!$rechte->isBerechtigt('admin'))
+								{
+									$new_status_datum = isset($_POST['datum']) ? $_POST['datum'] : date('Y-m-d');
+
+									$check_statusaenderung_result = checkStatusaenderung(
+										$prestudent_id,
+										$_POST['status_kurzbz'],
+										$studiensemester,
+										$new_status_datum,
+										$sem
+									);
+
+									if (isset($check_statusaenderung_result['error']) && $check_statusaenderung_result['error'] === true)
+									{
+										$return = false;
+										$error = true;
+										$errormsg .= isset($check_statusaenderung_result['errormsg']) ? $check_statusaenderung_result['errormsg'] : '';
+										$anzahl_fehler++;
 									}
 								}
 
@@ -1305,6 +1474,28 @@ if(!$error)
 						$rolle->updateamum = date('Y-m-d H:i:s');
 						$rolle->updatevon = $user;
 						$rolle->new = false;
+					}
+
+					// Statuschecks durchführen wenn keine spezielle Berechtigung zur Umgehung
+					if (!$rechte->isBerechtigt('admin'))
+					{
+						// allgemeine Prüfung bei Änderung oder Hinzufügen eines Status, inkludiert alle Status
+						$check_statusaenderung_result = checkStatusaenderung(
+							$_POST['prestudent_id'],
+							$_POST['status_kurzbz'],
+							$_POST['studiensemester_kurzbz'],
+							$_POST['datum'],
+							$_POST['ausbildungssemester'],
+							$_POST['studiensemester_old'],
+							$_POST['ausbildungssemester_old']
+						);
+
+						if (isset($check_statusaenderung_result['error']) && $check_statusaenderung_result['error'] === true)
+						{
+							$return = false;
+							$error = true;
+							$errormsg = isset($check_statusaenderung_result['errormsg']) ? $check_statusaenderung_result['errormsg'] : '';
+						}
 					}
 
 					if(!$error)
