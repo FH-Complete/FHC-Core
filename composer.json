@@ -246,6 +246,8 @@
 
 		"afarkas/html5shiv": "3.7.*",
 
+		"chillerlan/php-qrcode": "2.0.*",
+
 		"chriskacerguis/codeigniter-restserver": "3.0.3",
 		"christianbach/tablesorter": "1.0.*",
 		"codeigniter/framework": "3.*",
