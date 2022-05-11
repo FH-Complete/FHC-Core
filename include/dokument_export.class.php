@@ -527,7 +527,7 @@ class dokument_export
 
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL);
+		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL.'/'.SIGNATUR_SIGN_API);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 7);
 		curl_setopt($ch, CURLOPT_USERAGENT, "FH-Complete");
 
