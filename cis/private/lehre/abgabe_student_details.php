@@ -36,6 +36,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
 require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/sancho.inc.php');
+require_once('../../../application/libraries/SignatureLib.php');
 
 $anzeigesprache = getSprache();
 $p = new phrasen($anzeigesprache);
@@ -111,6 +112,7 @@ $titel = $projektarbeit_obj->titel;
 $person = new person();
 $person->load($bid);
 $betreuer = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
+$uploadedDocumentSigned = null;
 
 if($uid!=$user)
 {
@@ -286,15 +288,20 @@ if($command=="update" && $error!=true)
 					move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
 					if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
-						exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'.'"');
-
-						$qry="UPDATE campus.tbl_paabgabe SET
-							abgabedatum = now(),
-							updatevon = ".$db->db_add_param($user).",
-							updateamum = now()
-							WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
-						$result=$db->db_query($qry);
-						echo $p->t('global/dateiErfolgreichHochgeladen');
+						// Check if the document is signed
+						$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
+						if (is_array($signList) && count($signList) > 0)
+						{
+							// The document is signed
+						}
+						elseif ($signList === null)
+						{
+							$uploadedDocumentSigned = 'WARNING: signature server error';
+						}
+						else
+						{
+							$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+						}
 					}
 					else
 					{
@@ -311,6 +318,21 @@ if($command=="update" && $error!=true)
 					}
 					if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
+						// Check if the document is signed
+						$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
+						if (is_array($signList) && count($signList) > 0)
+						{
+							// The document is signed
+						}
+						elseif ($signList === null)
+						{
+							$uploadedDocumentSigned = 'WARNING: signature server error';
+						}
+						else
+						{
+							$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+						}
+
 						/*$qry="UPDATE campus.tbl_paabgabe SET
 							abgabedatum = now(),
 							updatevon = '".$user."',
@@ -339,6 +361,15 @@ if($command=="update" && $error!=true)
 								$htmlstr .= '<input type="hidden" name="betreuer" value="'.$db->convert_html_chars($betreuer).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="bid" value="'.$db->convert_html_chars($bid).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
+
+								// If there are info about the signed document
+								if ($uploadedDocumentSigned != null)
+								{
+									$htmlstr .= "<tr>\n";
+									$htmlstr .= "<td colspan='2'><b>".$uploadedDocumentSigned."</b></td>";
+									$htmlstr .= "</tr>\n";
+								}
+
 								$htmlstr .= "<tr>\n";
 								$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
 								$sprache = @$db->db_query("SELECT sprache FROM public.tbl_sprache");

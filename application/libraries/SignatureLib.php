@@ -33,16 +33,13 @@ class SignatureLib
 	 */
 	public static function list($inputFileName)
 	{
-		// Generic error occurred
-		$resultList = 'Generic error occurred';
-
 		try
 		{
 			// Get the content of the given file
 			$inputFileContent = file_get_contents($inputFileName);
 			if ($inputFileContent === false) // if failed
 			{
-				$resultList = 'An error occurred while getting the content from: '.$inputFileName;
+				error_log('An error occurred while getting the content from: '.$inputFileName);
 			}
 			else
 			{
@@ -57,20 +54,22 @@ class SignatureLib
 		}
 		catch(\Httpful\Exception\ConnectionErrorException $cee) // Httpful exception
 		{
-			$resultList = $cee->getMessage();
+			error_log($cee->getMessage());
 		}
 		catch (Exception $e) // any other exception
 		{
-			$resultList = $e->getMessage();
+			error_log($e->getMessage());
 		}
 
 		// If the response is fine
-		if (isset($resultPost->body) && is_object($resultPost->body) && isset($resultPost->body->retval))
+		if (isset($resultPost->body) && is_object($resultPost->body)
+			&& isset($resultPost->body->retval) && is_array($resultPost->body->retval))
 		{
 			return $resultPost->body->retval;
 		}
 
-		return $resultList;
+		// Otherwise return a null as error
+		return null;
 	}
 }
 

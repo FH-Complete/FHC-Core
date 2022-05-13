@@ -37,6 +37,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
 require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/sancho.inc.php');
+require_once('../../../application/libraries/SignatureLib.php');
 
 if (!$db = new basis_db())
 	$db=false;
@@ -642,7 +643,29 @@ $result=@$db->db_query($qry);
 		}
 		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 		{
-			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0></a></td>";
+			$uploadedDocumentSigned = null;
+
+			// Check if the document is signed
+			$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
+			if (is_array($signList) && count($signList) > 0)
+			{
+				// The document is signed
+			}
+			elseif ($signList === null)
+			{
+				$uploadedDocumentSigned = 'WARNING: signature server error';
+			}
+			else
+			{
+				$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+			}
+
+			$htmlstr .= "		<td>
+							<a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'>
+								<img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0>
+							</a>
+							".$uploadedDocumentSigned."
+						</td>";
 		}
 		else
 		{
