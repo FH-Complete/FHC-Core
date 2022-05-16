@@ -361,15 +361,6 @@ if($command=="update" && $error!=true)
 								$htmlstr .= '<input type="hidden" name="betreuer" value="'.$db->convert_html_chars($betreuer).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="bid" value="'.$db->convert_html_chars($bid).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
-
-								// If there are info about the signed document
-								if ($uploadedDocumentSigned != null)
-								{
-									$htmlstr .= "<tr>\n";
-									$htmlstr .= "<td colspan='2'><b>".$uploadedDocumentSigned."</b></td>";
-									$htmlstr .= "</tr>\n";
-								}
-
 								$htmlstr .= "<tr>\n";
 								$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
 								$sprache = @$db->db_query("SELECT sprache FROM public.tbl_sprache");
@@ -402,6 +393,21 @@ if($command=="update" && $error!=true)
 											<td><textarea name="abstract_en" cols="46"  rows="7">'.$db->convert_html_chars($abstract_en).'</textarea></td></tr>'."\n";
 								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/seitenanzahl').':*</b></td>
 											<td><input  type="text" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'" size="5" maxlength="4"></td></tr>'."\n";
+								$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
+
+								// If there are info about the signed document
+								if ($uploadedDocumentSigned != null)
+								{
+									$htmlstr .= "<tr>\n";
+									$htmlstr .= "<td style='text-align: center;'>";
+									$htmlstr .= '<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 15px; border: 1px solid; border-radius: 4px;">
+
+											<b>'.$uploadedDocumentSigned.'</b></td>
+										</div>';
+									$htmlstr .= "</td>";
+									$htmlstr .= "</tr>\n";
+								}
+
 								$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
 								$htmlstr .="<tr><td colspan='2'><p align='justify'>".$p->t('abgabetool/eidesstattlicheErklaerung')."</p></td><td></td></tr>\n";
 								$htmlstr .= "<tr><td><b>".$p->t('abgabetool/gelesenUndAkzeptiert').":* <input type='checkbox' name='eiderklaerung'></b></td></tr>";

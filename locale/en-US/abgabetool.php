@@ -91,5 +91,5 @@ $this->phrasen['abgabetool/projektbeurteilungDownload']='Thesis-Assessment downl
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='First-/Assessor';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Second Assessor';
 $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Error when getting endupload of project work';
-$this->phrasen['abgabetool/uploadedDocumentNotSigned']='The uploaded document is not signed EN';
+$this->phrasen['abgabetool/uploadedDocumentNotSigned']='Warning! The uploaded document is not signed';
 ?>

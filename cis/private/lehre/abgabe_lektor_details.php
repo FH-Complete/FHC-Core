@@ -641,6 +641,14 @@ $result=@$db->db_query($qry);
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
+		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
+		{
+			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='".$p->t('abgabetool/kontrolleZusatzdaten')."' border=0></a></td>";
+		}
+		else
+		{
+			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+		}
 		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 		{
 			$uploadedDocumentSigned = null;
@@ -663,17 +671,14 @@ $result=@$db->db_query($qry);
 			$htmlstr .= "		<td>
 							<a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'>
 								<img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0>
-							</a>
-							".$uploadedDocumentSigned."
-						</td>";
-		}
-		else
-		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		}
-		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
-		{
-			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='".$p->t('abgabetool/kontrolleZusatzdaten')."' border=0></a></td>";
+							</a>";
+			if ($uploadedDocumentSigned != null)
+			{
+				$htmlstr .= '<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 15px; border: 1px solid; border-radius: 4px; display: inline;">
+						<b>'.$uploadedDocumentSigned.'</b></td>
+					</div>';
+			}
+			$htmlstr .= "</td>";
 		}
 		else
 		{
