@@ -572,6 +572,8 @@ class person extends basis_db
 								UPPER (vorname) ~* UPPER(".$this->db_add_param($filter).") OR
 								UPPER (nachname || ' ' || vorname) ~* UPPER(".$this->db_add_param($filter).") OR
 								UPPER (vorname || ' ' || nachname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (nachname || ' ' || wahlname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (wahlname || ' ' || nachname) ~* UPPER(".$this->db_add_param($filter).") OR
 								uid=".$this->db_add_param($filter);
 		}
 

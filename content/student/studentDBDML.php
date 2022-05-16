@@ -403,7 +403,7 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Geburtsdatum ist nicht korrekt.';
 				$error = true;
-			}			
+			}
 
 			if(!$error)
 			{
@@ -412,6 +412,7 @@ if(!$error)
 				$student->titelpre = $_POST['titelpre'];
 				$student->titelpost = $_POST['titelpost'];
 				$student->vorname = $_POST['vorname'];
+				$student->wahlname = $_POST['wahlname'];
 				$student->vornamen = $_POST['vornamen'];
 				$student->nachname = $_POST['nachname'];
 				$student->gebdatum = $_POST['geburtsdatum'];
@@ -565,6 +566,7 @@ if(!$error)
 				$person->titelpost = $_POST['titelpost'];
 				$person->vorname = $_POST['vorname'];
 				$person->vornamen = $_POST['vornamen'];
+				$person->wahlname = $_POST['wahlname'];
 				$person->nachname = $_POST['nachname'];
 				$person->gebdatum = $_POST['geburtsdatum'];
 				$person->gebort = $_POST['geburtsort'];
@@ -648,12 +650,12 @@ if(!$error)
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
-				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt']; 									   
+				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt'];
 				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
-				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];										  
+				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];
 				$prestudent->zgvdoktor_code = $_POST['zgvdoktor_code'];
 				$prestudent->zgvdoktorort = $_POST['zgvdoktorort'];
 				$prestudent->zgvdoktordatum = $_POST['zgvdoktordatum'];
@@ -2361,7 +2363,7 @@ if(!$error)
 			{
 				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
 					continue;
-									 
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2374,7 +2376,7 @@ if(!$error)
 					$dok->new = true;
 					if ($dokument_kurzbz === 'Sonst')
 						$sonst++;
-				  
+
 
 					if(!$dok->save())
 					{

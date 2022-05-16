@@ -95,6 +95,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<textbox id="student-detail-textbox-vornamen" disabled="true" maxlength="128"/>
 						</row>
 						<row>
+							<label value="Wahlname" control="student-detail-textbox-wahlname"/>
+							<textbox id="student-detail-textbox-wahlname" disabled="true" maxlength="128"/>
+						</row>
+						<row>
 							<label value="Geburtsdatum" control="student-detail-textbox-geburtsdatum"/>
 							<hbox>
 								<box class="Datum" id="student-detail-textbox-geburtsdatum" disabled="true"/>

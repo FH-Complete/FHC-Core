@@ -727,6 +727,7 @@ function StudentDetailReset()
 	document.getElementById('student-detail-textbox-titelpre').value='';
 	document.getElementById('student-detail-textbox-titelpost').value='';
 	document.getElementById('student-detail-textbox-vorname').value='';
+	document.getElementById('student-detail-textbox-wahlname').value='';
 	document.getElementById('student-detail-textbox-vornamen').value='';
 	document.getElementById('student-detail-textbox-nachname').value='';
 	document.getElementById('student-detail-textbox-geburtsdatum').value='';
@@ -759,6 +760,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-titelpre').disabled=val;
 	document.getElementById('student-detail-textbox-titelpost').disabled=val;
 	document.getElementById('student-detail-textbox-vorname').disabled=val;
+	document.getElementById('student-detail-textbox-wahlname').disabled=val;
 	document.getElementById('student-detail-textbox-vornamen').disabled=val;
 	document.getElementById('student-detail-textbox-nachname').disabled=val;
 	document.getElementById('student-detail-textbox-geburtsdatum').disabled=val;
@@ -799,6 +801,7 @@ function StudentDetailSave()
 	titelpre = document.getElementById('student-detail-textbox-titelpre').value;
 	titelpost = document.getElementById('student-detail-textbox-titelpost').value;
 	vorname = document.getElementById('student-detail-textbox-vorname').value;
+	wahlname = document.getElementById('student-detail-textbox-wahlname').value;
 	vornamen = document.getElementById('student-detail-textbox-vornamen').value;
 	nachname = document.getElementById('student-detail-textbox-nachname').value;
 	geburtsdatum = document.getElementById('student-detail-textbox-geburtsdatum').value;
@@ -857,6 +860,7 @@ function StudentDetailSave()
 	req.add('titelpre', titelpre);
 	req.add('titelpost', titelpost);
 	req.add('vorname', vorname);
+	req.add('wahlname', wahlname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
 	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
@@ -1101,6 +1105,7 @@ function StudentAuswahl()
 	titelpre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpre" ));
 	titelpost=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpost" ));
 	vorname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vorname" ));
+	wahlname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wahlname" ));
 	vornamen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vornamen" ));
 	nachname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachname" ));
 	geburtsdatum=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsdatum" ));
@@ -1144,6 +1149,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-titelpre').value=titelpre;
 	document.getElementById('student-detail-textbox-titelpost').value=titelpost;
 	document.getElementById('student-detail-textbox-vorname').value=vorname;
+	document.getElementById('student-detail-textbox-wahlname').value=wahlname;
 	document.getElementById('student-detail-textbox-vornamen').value=vornamen;
 	document.getElementById('student-detail-textbox-nachname').value=nachname;
 	document.getElementById('student-detail-textbox-geburtsdatum').value=geburtsdatum;
