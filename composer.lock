@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6bab4617977e08b2939bf959929632d4",
-    "content-hash": "3e499134721f682f298dda20263ab686",
+    "hash": "d12bb05ce04aaee58782e9ad4803c387",
+    "content-hash": "798c94bdd795a81a8bdbb43f2a09fc33",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -565,41 +565,6 @@
             "time": "2015-06-07 20:10:38"
         },
         {
-            "name": "components/font-awesome",
-            "version": "4.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/components/font-awesome.git",
-                "reference": "885308b939369d147bec93174722786bc2c4eedd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/components/font-awesome/zipball/885308b939369d147bec93174722786bc2c4eedd",
-                "reference": "885308b939369d147bec93174722786bc2c4eedd",
-                "shasum": ""
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "styles": [
-                        "css/font-awesome.css"
-                    ],
-                    "files": [
-                        "css/font-awesome.min.css",
-                        "css/font-awesome.css.map",
-                        "fonts/*"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT",
-                "OFL-1.1"
-            ],
-            "description": "The iconic font designed for use with Twitter Bootstrap.",
-            "time": "2016-10-25 10:56:23"
-        },
-        {
             "name": "components/jquery",
             "version": "3.6.0",
             "source": {
@@ -845,6 +810,28 @@
                 "type": "git",
                 "url": "https://github.com/fgelinas/timepicker",
                 "reference": "9aebe413b784696639220bc36b7c1e8a30fda129"
+            },
+            "type": "library"
+        },
+        {
+            "name": "fortawesome/font-awesome4",
+            "version": "4.7.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v4.7.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "fortawesome/font-awesome6",
+            "version": "6.1.1",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.1.1.zip",
+                "reference": null,
+                "shasum": null
             },
             "type": "library"
         },
@@ -1410,11 +1397,22 @@
             "type": "library"
         },
         {
-            "name": "olifolkerd/tabulator",
-            "version": "4.2.7",
+            "name": "olifolkerd/tabulator4",
+            "version": "4.9.3",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip",
+                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/4.9.3.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "olifolkerd/tabulator5",
+            "version": "5.2.1",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.2.1.zip",
                 "reference": null,
                 "shasum": null
             },
@@ -1607,50 +1605,26 @@
             "type": "library"
         },
         {
-            "name": "tinymce/tinymce",
+            "name": "tinymce/tinymce4",
             "version": "4.9.11",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5"
-            },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3a68b67d1120ab89c6760afeb787291703c9a7d5",
-                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5",
-                "shasum": ""
+                "url": "https://github.com/tinymce/tinymce-dist/archive/refs/tags/4.9.11.zip",
+                "reference": null,
+                "shasum": null
             },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "tinymce.js",
-                        "plugins/*/plugin.js",
-                        "themes/*/theme.js"
-                    ],
-                    "files": [
-                        "tinymce.min.js",
-                        "plugins/*/plugin.min.js",
-                        "themes/*/theme.min.js",
-                        "skins/**"
-                    ]
-                }
+            "type": "library"
+        },
+        {
+            "name": "tinymce/tinymce5",
+            "version": "5.10.3",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/tinymce/tinymce-dist/archive/refs/tags/5.10.3.zip",
+                "reference": null,
+                "shasum": null
             },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-2.1-only"
-            ],
-            "description": "Web based JavaScript HTML WYSIWYG editor control.",
-            "homepage": "http://www.tinymce.com",
-            "keywords": [
-                "editor",
-                "html",
-                "javascript",
-                "richtext",
-                "tinymce",
-                "wysiwyg"
-            ],
-            "time": "2020-07-13 05:29:19"
+            "type": "library"
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -1663,55 +1637,26 @@
             "type": "library"
         },
         {
-            "name": "twbs/bootstrap",
-            "version": "v3.4.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
-            },
+            "name": "twbs/bootstrap3",
+            "version": "3.4.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/68b0d231a13201eb14acd3dc84e51543d16e5f7e",
-                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e",
-                "shasum": ""
+                "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v3.4.1.zip",
+                "reference": null,
+                "shasum": null
             },
-            "replace": {
-                "twitter/bootstrap": "self.version"
+            "type": "library"
+        },
+        {
+            "name": "twbs/bootstrap5",
+            "version": "5.0.2",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/twbs/bootstrap/releases/download/v5.0.2/bootstrap-5.0.2-dist.zip",
+                "reference": null,
+                "shasum": null
             },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.4.x-dev"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jacob Thornton",
-                    "email": "jacobthornton@gmail.com"
-                },
-                {
-                    "name": "Mark Otto",
-                    "email": "markdotto@gmail.com"
-                }
-            ],
-            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
-            "homepage": "https://getbootstrap.com/",
-            "keywords": [
-                "JS",
-                "css",
-                "framework",
-                "front-end",
-                "less",
-                "mobile-first",
-                "responsive",
-                "web"
-            ],
-            "time": "2019-02-13 15:55:38"
+            "type": "library"
         },
         {
             "name": "twig/twig",
@@ -1776,6 +1721,17 @@
                 "templating"
             ],
             "time": "2020-02-11 05:59:23"
+        },
+        {
+            "name": "vuejs/vuejs3",
+            "version": "3.2.33",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/vue@3.2.33/dist/vue.global.prod.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
         },
         {
             "name": "zetacomponents/base",
