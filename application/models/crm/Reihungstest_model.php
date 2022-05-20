@@ -10,8 +10,8 @@ class Reihungstest_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_reihungstest';
 		$this->pk = 'reihungstest_id';
-	}	
-	
+	}
+
 	/**
 	 * Gets a test from a test id only if it is available
 	 */
@@ -35,15 +35,15 @@ class Reihungstest_model extends DB_Model
 								 WHERE rt_id = tbl_reihungstest.reihungstest_id
 							) > 0
 					  AND reihungstest_id = ?';
-		
+
 		return $this->execQuery($query, array($reihungstest_id));
 	}
-	
+
 	/**
 	 * Checks if there are active studyplans which have no public placement tests assigned yet.
 	 * Only check assignment to studyplans that are
-	 *	- Bachelor, 
-	 *	- active, 
+	 *	- Bachelor,
+	 *	- active,
 	 *	- set as online application
 	 *  - valid for 1st terms
 	 * @return array Returns object array with studyplans that have no public placement tests assigned yet.
@@ -51,20 +51,20 @@ class Reihungstest_model extends DB_Model
 	public function checkMissingReihungstest()
 	{
 		$query = '
-			SELECT 
+			SELECT
 				bezeichnung
 			FROM
 				lehre.tbl_studienplan
 			WHERE
 				studienplan_id
-			IN 
+			IN
 			(
-				SELECT DISTINCT 
+				SELECT DISTINCT
 					studienplan_id
-				FROM 
+				FROM
 					public.tbl_studiensemester
 				JOIN
-					lehre.tbl_studienplan_semester 
+					lehre.tbl_studienplan_semester
 					USING (studiensemester_kurzbz)
 				JOIN
 					lehre.tbl_studienplan
@@ -81,31 +81,31 @@ class Reihungstest_model extends DB_Model
 					tbl_studiensemester.onlinebewerbung = \'t\'
 				AND
 					tbl_studienplan.onlinebewerbung_studienplan = \'t\'
-				AND 
+				AND
 					semester = 1
 				AND
 					typ = \'b\'
 
 				EXCEPT
 
-				SELECT DISTINCT 
+				SELECT DISTINCT
 					studienplan_id
-				FROM 
-					public.tbl_reihungstest 
+				FROM
+					public.tbl_reihungstest
 				JOIN
 					public.tbl_rt_studienplan
 					USING (reihungstest_id)
-				WHERE 
-					datum >= now() 
-				AND 
+				WHERE
+					datum >= now()
+				AND
 					oeffentlich = \'t\'
 				)
 			';
-		
+
 		return $this->execQuery($query);
 	}
-	
-	/**	
+
+	/**
 	 *  Gets amount of free places.
 	 * @return array Returns object array with faculty and amount of free places
 	 * for each public actual placement test date.
@@ -132,9 +132,9 @@ class Reihungstest_model extends DB_Model
 							SELECT
 								sum(arbeitsplaetze) - ceil(sum(arbeitsplaetze)/100.0*'. REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND. ')
 							FROM
-								public.tbl_rt_ort  
+								public.tbl_rt_ort
 							JOIN
-								public.tbl_ort 
+								public.tbl_ort
 							ON (tbl_rt_ort.ort_kurzbz = tbl_ort.ort_kurzbz)
 							WHERE
 								tbl_rt_ort.rt_id = tbl_reihungstest.reihungstest_id
@@ -170,27 +170,27 @@ class Reihungstest_model extends DB_Model
 										oe_kurzbz
 									FROM
 										public.tbl_rt_studienplan
-									JOIN 	
+									JOIN
 										lehre.tbl_studienplan sp USING (studienplan_id)
-									JOIN 
+									JOIN
 										lehre.tbl_studienordnung USING (studienordnung_id)
 									JOIN
 										public.tbl_studiengang sg USING (studiengang_kz)
 										WHERE
 										tbl_rt_studienplan.reihungstest_id = tbl_reihungstest.reihungstest_id
 								)
-							AND 
+							AND
 								aktiv = true
-								
+
 							UNION ALL
-							
+
 							SELECT
 								o.oe_kurzbz, o.oe_parent_kurzbz, o.organisationseinheittyp_kurzbz
 							FROM
 								public.tbl_organisationseinheit o, meine_oes
 							WHERE
 								o.oe_kurzbz = meine_oes.oe_parent_kurzbz
-							AND 
+							AND
 								aktiv = true
 						)
 					SELECT
@@ -207,7 +207,7 @@ class Reihungstest_model extends DB_Model
 			JOIN
 				public.tbl_studiengang
 				USING (studiengang_kz)
-			WHERE 
+			WHERE
 				tbl_reihungstest.datum >= now()
 			AND
 				tbl_reihungstest.oeffentlich = \'t\'
@@ -221,10 +221,10 @@ class Reihungstest_model extends DB_Model
 			fakultaet,
 			freie_plaetze
 		';
-		
+
 		return $this->execQuery($query);
 	}
-	
+
 	/**
 	 * Checks if a registration date (Anmeldefrist) of a placement test has been reached yesterday.
 	 * @param integer $studiengang_kz Optional. Kennzahl of degree program whose registration date should be checked.
@@ -239,9 +239,9 @@ class Reihungstest_model extends DB_Model
 					SELECT CURRENT_DATE - 1
 					)
 			';
-		
+
 		$parametersArray = array();
-		
+
 		if (!isEmptyString($studiengang_kz))
 		{
 			$query .= ' AND studiengang_kz = ?';
@@ -250,7 +250,7 @@ class Reihungstest_model extends DB_Model
 
 		return $this->execQuery($query, $parametersArray);
 	}
-	
+
 	/**
 	 * Loads all applicants of a placement test for runZentraleReihungstestAnmeldefristAssistenzJob
 	 * @param integer $reihungstest_id ID of placement test
@@ -326,11 +326,11 @@ class Reihungstest_model extends DB_Model
 				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
 				AND bewerbung_abgeschicktamum IS NOT NULL
 				AND bestaetigtam IS NOT NULL
-			ORDER BY studiengang_kz, 
-				orgform_kurzbz, 
-				prioritaet, 
-				nachname, 
-				vorname, 
+			ORDER BY studiengang_kz,
+				orgform_kurzbz,
+				prioritaet,
+				nachname,
+				vorname,
 				person_id
 			';
 
@@ -439,36 +439,37 @@ class Reihungstest_model extends DB_Model
 	public function getApplicantsOfPlacementTest($reihungstest_id)
 	{
 		$query = '
-			SELECT DISTINCT tbl_rt_person.person_id,
-				anrede,
-				nachname,
-				vorname,
-				(
-					SELECT kontakt
-					FROM PUBLIC.tbl_kontakt
-					WHERE kontakttyp = \'email\'
-						AND zustellung = true
-						AND person_id = tbl_rt_person.person_id
-					ORDER BY insertamum DESC,
-						updateamum DESC LIMIT 1
-					) AS "email",
-				tbl_ort.planbezeichnung,
-				tbl_ort.lageplan
-			FROM PUBLIC.tbl_rt_person
-			JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
-			JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = reihungstest_id)
-			JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
-			JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-			LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
-			LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
-			WHERE rt_id = ?
-				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
-				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
-				AND bewerbung_abgeschicktamum IS NOT NULL
-				AND bestaetigtam IS NOT NULL
-			ORDER BY nachname,
-				vorname,
-				person_id
+		SELECT *
+		FROM
+		(SELECT DISTINCT tbl_rt_person.person_id, ps.prestudent_id, anrede, nachname, vorname,
+		 (
+		  SELECT kontakt
+		  FROM PUBLIC.tbl_kontakt
+		  WHERE kontakttyp = \'email\'
+		   AND zustellung = true
+		   AND person_id = tbl_rt_person.person_id
+		  ORDER BY insertamum DESC,
+		   updateamum DESC LIMIT 1
+		  ) AS "email",
+		 tbl_ort.planbezeichnung,
+		 tbl_ort.lageplan,
+		row_number () over (partition by tbl_rt_person.person_id order by ps.priorisierung) as row_number
+		FROM PUBLIC.tbl_rt_person
+		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
+		JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = reihungstest_id)
+		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
+		JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+		LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
+		LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
+		WHERE rt_id = ?
+		 AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
+		 AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
+		 AND bewerbung_abgeschicktamum IS NOT NULL
+		 AND bestaetigtam IS NOT NULL
+		ORDER BY nachname,
+		 vorname,
+		 person_id)
+		temp where row_number = 1
 			';
 
 		return $this->execQuery($query, array($reihungstest_id));

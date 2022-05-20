@@ -21,6 +21,10 @@ class ReihungstestJob extends JOB_Controller
 
 		// Load helpers
 		$this->load->helper('hlp_sancho_helper');
+
+		// Loads CLMessagesModel
+		$this->load->model('CL/Messages_model', 'CLMessagesModel');
+
 	}
 
 	/**
@@ -346,6 +350,7 @@ class ReihungstestJob extends JOB_Controller
 
 		// Get placement tests with testdate within the next 2 weeks
 		$resultNextTestDates = $this->ReihungstestModel->getNextPlacementtests($degreeProgram, 14);
+
 		if (hasData($resultNextTestDates))
 		{
 			$nextTestDates = $resultNextTestDates->retval;
@@ -393,7 +398,8 @@ class ReihungstestJob extends JOB_Controller
 				{
 					foreach ($testsOndate as $reihungstest)
 					{
-						// Loads applicants of a test
+						// Loads applicants of a test with prestudent ID
+						$applicants_arr = '';
 						$applicants = $this->ReihungstestModel->getApplicantsOfPlacementTest($reihungstest->reihungstest_id);
 
 						if (hasData($applicants))
@@ -405,34 +411,37 @@ class ReihungstestJob extends JOB_Controller
 							show_error(getError($applicants));
 						}
 
-						foreach ($applicants_arr as $applicant)
+						if(!empty($applicants_arr))
 						{
-							$mailcontent_data_arr = array();
-							$mailcontent_data_arr['anrede'] = $applicant->anrede;
-							$mailcontent_data_arr['nachname'] = $applicant->nachname;
-							$mailcontent_data_arr['vorname'] = $applicant->vorname;
-							$mailcontent_data_arr['rt_datum'] = date_format(date_create($reihungstest->datum), 'd.m.Y');
-							$mailcontent_data_arr['rt_uhrzeit'] = date_format(date_create($reihungstest->uhrzeit), 'H:i');
-							$mailcontent_data_arr['rt_raum'] = $applicant->planbezeichnung;
-							if ($applicant->lageplan == '')
+							foreach ($applicants_arr as $applicant)
 							{
-								$mailcontent_data_arr['wegbeschreibung'] = 'Für diesen Raum liegt noch keine Wegbeschreibung vor.<br><br>No directions were found for this room';
-							}
-							else
-							{
-								$mailcontent_data_arr['wegbeschreibung'] = $applicant->lageplan;
-							}
+								$mailcontent_data_arr = array();
+								$mailcontent_data_arr['anrede'] = $applicant->anrede;
+								$mailcontent_data_arr['nachname'] = $applicant->nachname;
+								$mailcontent_data_arr['vorname'] = $applicant->vorname;
+								$mailcontent_data_arr['rt_datum'] = date_format(date_create($reihungstest->datum), 'd.m.Y');
+								$mailcontent_data_arr['rt_uhrzeit'] = date_format(date_create($reihungstest->uhrzeit), 'H:i');
+								$mailcontent_data_arr['rt_raum'] = $applicant->planbezeichnung;
+								if ($applicant->lageplan == '')
+								{
+									$mailcontent_data_arr['wegbeschreibung'] = 'Für diesen Raum liegt noch keine Wegbeschreibung vor.<br><br>No directions were found for this room';
+								}
+								else
+								{
+									$mailcontent_data_arr['wegbeschreibung'] = $applicant->lageplan;
+								}
 
-							sendSanchoMail(
-								'Sancho_RemindApplicantsOfTest',
-								$mailcontent_data_arr,
-								$applicant->email,
-								'Ihre Anmeldung zum Reihungstest - Reminder / Your registration for the placement test - Reminder',
-								DEFAULT_SANCHO_HEADER_IMG,
-								DEFAULT_SANCHO_FOOTER_IMG,
-								$from,
-								'',
-								$bcc);
+								$sender_id = $this->config->item('system_person_id');
+
+								$sendMessage = $this->CLMessagesModel->sendExplicitTemplateSenderId
+								(
+									$sender_id,
+									$applicant->prestudent_id,
+									'infocenter',
+									'Sancho_RemindApplicantsOfTest',
+									$mailcontent_data_arr
+								);
+							}
 						}
 					}
 				}
@@ -822,7 +831,7 @@ class ReihungstestJob extends JOB_Controller
 						JOIN lehre.tbl_studienordnung USING (studienordnung_id)
 						JOIN PUBLIC.tbl_studiengang ON (tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz)
 					WHERE get_rolle_prestudent (tbl_prestudent.prestudent_id, ?) IN ('Aufgenommener','Bewerber','Wartender','Abgewiesener')
-						AND studiensemester_kurzbz = ? 
+						AND studiensemester_kurzbz = ?
 						AND tbl_studiengang.typ IN ('b', 'm')
 				)
 				SELECT * FROM prst
