@@ -1,28 +1,26 @@
 <?php
-	$this->load->view(
-		'templates/FHC-Header',
-		array(
-			'title' => 'Logs Viewer',
-			'jquery' => true,
-			'jqueryui' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'sbadmintemplate' => true,
-			'tablesorter' => true,
-			'ajaxlib' => true,
-			'filterwidget' => true,
-			'navigationwidget' => true,
-			'phrases' => array(
-				'global' => array('mailAnXversandt'),
-				'ui' => array('bitteEintragWaehlen')
-			),
-			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
-			'customJSs' => array('public/js/bootstrapper.js')
-		)
+	$includesArray = array(
+		'title' => 'Logs Viewer',
+		'jquery3' => true,
+		'jqueryui1' => true,
+		'bootstrap3' => true,
+		'fontawesome4' => true,
+		'sbadmintemplate3' => true,
+		'tablesorter2' => true,
+		'ajaxlib' => true,
+		'bootstrapper' => true, // to be used only if you know what you are doing!
+		'filterwidget' => true,
+		'navigationwidget' => true,
+		'phrases' => array(
+			'global' => array('mailAnXversandt'),
+			'ui' => array('bitteEintragWaehlen')
+		),
+		'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css'
 	);
+
+	$this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
-<body>
 	<div id="wrapper">
 
 		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -42,6 +40,6 @@
 			</div>
 		</div>
 	</div>
-</body>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
+

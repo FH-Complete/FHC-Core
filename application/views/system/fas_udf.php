@@ -3,15 +3,15 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'InfocenterDetails',
-			'jquery' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'jqueryui' => true,
+			'jquery3' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'jqueryui1' => true,
 			'dialoglib' => true,
 			'ajaxlib' => true,
 			'udfs' => true,
 			'widgets' => true,
-			'sbadmintemplate' => true,
+			'sbadmintemplate3' => true,
 			'customCSSs' => array(
 				'public/css/sbadmin2/admintemplate.css'
 			),

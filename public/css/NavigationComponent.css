@@ -1,0 +1,23 @@
+.header-menu-link-entry {
+	font-size: 18px;
+	color: #5e5e5e !important;
+}
+
+.navbar-header {
+	background-color: #f8f8f8;
+	border-color: #e7e7e7;
+}
+
+.sidebar {
+	z-index: 1;
+	position: absolute;
+	width: 250px;
+}
+
+#content {
+    position: inherit;
+    margin: 0 0 0 250px;
+    padding: 30px 30px;
+    border-left: 1px solid #e7e7e7;
+}
+

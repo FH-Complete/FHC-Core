@@ -1,6 +1,6 @@
 <?php
 $jahr = $studienjahr[0];
-$this->load->view('templates/header', array('title' => 'StudienjahrEdit', 'jquery' => true));
+$this->load->view('templates/header', array('title' => 'StudienjahrEdit', 'jquery3' => true));
 ?>
 <body>
 <div class="row">

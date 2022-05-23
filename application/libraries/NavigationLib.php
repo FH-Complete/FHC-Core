@@ -37,7 +37,7 @@ class NavigationLib
 		// Loads library ExtensionsLib
 		$this->_ci->load->library('ExtensionsLib');
 
-		$this->_navigationPage = $this->_getNavigationtPage($params); // sets the id for the related navigation widget
+		$this->_navigationPage = $this->_getNavigationPage($params); // sets the id for the related navigation widget
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ class NavigationLib
 	 * Return an unique string that identify this navigation widget
 	 * NOTE: The default value is the URI where the NavigationWidget is called
 	 */
-	private function _getNavigationtPage($params)
+	private function _getNavigationPage($params)
 	{
 		if ($params != null
 			&& is_array($params)

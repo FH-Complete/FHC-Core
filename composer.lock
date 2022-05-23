@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d12bb05ce04aaee58782e9ad4803c387",
-    "content-hash": "798c94bdd795a81a8bdbb43f2a09fc33",
+    "hash": "f35123d066def191c9f17dbbc4e78807",
+    "content-hash": "ddcd02108923c9169e0d3bcb3de85d70",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -1649,10 +1649,10 @@
         },
         {
             "name": "twbs/bootstrap5",
-            "version": "5.0.2",
+            "version": "5.1.3",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/twbs/bootstrap/releases/download/v5.0.2/bootstrap-5.0.2-dist.zip",
+                "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.1.3.zip",
                 "reference": null,
                 "shasum": null
             },

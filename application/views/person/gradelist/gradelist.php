@@ -3,10 +3,10 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Gradelist',
-			'jquery' => true,
-			'jqueryui' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
+			'jquery3' => true,
+			'jqueryui1' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
 			'ajaxlib' => true,
 			'customCSSs' => array(
 				'public/css/tools/gradelist.css',

@@ -3,10 +3,10 @@ $this->load->view(
 	'templates/FHC-Header',
 	array(
 		'title' => 'ZGV Info',
-		'jquery' => true,
-		'bootstrap' => true,
-		'fontawesome' => true,
-		'sbadmintemplate' => true,
+		'jquery3' => true,
+		'bootstrap3' => true,
+		'fontawesome4' => true,
+		'sbadmintemplate3' => true,
 		'customCSSs' => 'public/css/sbadmin2/admintemplate_contentonly.css'
 	)
 );
