@@ -1022,16 +1022,14 @@ $filters = array(
 			{
 				"name": "Projektübersicht",
 				"columns": [
-					{"name": "ProjectWorkID"},
+					{"name": "Studiengang"},
+					{"name": "StudentNachname"},
+					{"name": "Abgabedatum"},
+					{"name": "Note"},
 					{"name": "ErstNachname"},
 					{"name": "ErstAbgeschickt"},
 					{"name": "ZweitNachname"},
-					{"name": "ZweitAbgeschickt"},
-					{"name": "StudentNachname"},
-					{"name": "Note"},
-					{"name": "Abgabedatum"},
-					{"name": "Studiengang"},
-					{"name": "Kommissionsmitglieder"}
+					{"name": "ZweitAbgeschickt"}
 				],
 				"filters": []
 			}
