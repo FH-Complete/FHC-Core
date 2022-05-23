@@ -548,6 +548,8 @@ $htmlstr .= "<tr>
 $result=@$db->db_query($qry);
 	while ($row=@$db->db_fetch_object($result))
 	{
+		$uploadedDocumentSigned = null;
+
 		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
@@ -649,43 +651,52 @@ $result=@$db->db_query($qry);
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
-		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
-		{
-			$uploadedDocumentSigned = null;
 
-			// Check if the document is signed
-			$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
-			if (is_array($signList) && count($signList) > 0)
+		if (file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+		{
+			if ($row->paabgabetyp_kurzbz == 'end')
 			{
-				// The document is signed
-			}
-			elseif ($signList === null)
-			{
-				$uploadedDocumentSigned = 'WARNING: signature server error';
-			}
-			else
-			{
-				$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+				// Check if the document is signed
+				$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
+				if (is_array($signList) && count($signList) > 0)
+				{
+					// The document is signed
+				}
+				elseif ($signList === null)
+				{
+					$uploadedDocumentSigned = 'WARNING: signature server error';
+				}
+				else
+				{
+					$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+				}
 			}
 
 			$htmlstr .= "		<td>
 							<a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'>
 								<img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0>
-							</a>";
-			if ($uploadedDocumentSigned != null)
-			{
-				$htmlstr .= '<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 15px; border: 1px solid; border-radius: 4px; display: inline;">
-						<b>'.$uploadedDocumentSigned.'</b></td>
-					</div>';
-			}
-			$htmlstr .= "</td>";
+							</a>
+						</td>";
 		}
 		else
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
+
 		$htmlstr .= "	</tr>\n";
 
+		if ($uploadedDocumentSigned != null)
+		{
+			$htmlstr .= '
+				<tr>
+					<td colspan="4"></td>
+					<td colspan="5">
+						<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 15px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$uploadedDocumentSigned.'</b></td>
+						</div>
+					</td>
+				</tr>';
+		}
 
 		$htmlstr .= "</form>\n";
 	}

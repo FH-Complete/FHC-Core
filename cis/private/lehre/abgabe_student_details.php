@@ -282,41 +282,25 @@ if($command=="update" && $error!=true)
 			$extensions = explode(".", $_FILES['datei']['name']);
 			if(strtoupper(end($extensions))=='PDF')
 			{
-				if($paabgabetyp_kurzbz!='end')
+				if ($paabgabetyp_kurzbz != 'end')
 				{
 					//"normaler" Upload
 					move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
-					if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
-					{
-						// Check if the document is signed
-						$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
-						if (is_array($signList) && count($signList) > 0)
-						{
-							// The document is signed
-						}
-						elseif ($signList === null)
-						{
-							$uploadedDocumentSigned = 'WARNING: signature server error';
-						}
-						else
-						{
-							$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
-						}
-					}
-					else
+					if (!file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
 						echo $p->t('global/dateiNichtErfolgreichHochgeladen');
 					}
 				}
-				else
+				else // endupload type
 				{
 					//Upload der Endabgabe - Eingabe der Zusatzdaten
 					$command='add';
-					if(!$error)
+					if (!$error)
 					{
 						move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
 					}
-					if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
+
+					if (file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
 						// Check if the document is signed
 						$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
