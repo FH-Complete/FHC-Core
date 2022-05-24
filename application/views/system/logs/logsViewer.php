@@ -2,41 +2,39 @@
 	$includesArray = array(
 		'title' => 'Logs Viewer',
 		'jquery3' => true,
-		'jqueryui1' => true,
-		'bootstrap3' => true,
-		'fontawesome4' => true,
-		'sbadmintemplate3' => true,
+		'bootstrap5' => true,
+		'fontawesome6' => true,
 		'tablesorter2' => true,
+		'vue3' => true,
 		'ajaxlib' => true,
-		'bootstrapper' => true, // to be used only if you know what you are doing!
-		'filterwidget' => true,
-		'navigationwidget' => true,
+		'filtercomponent' => true,
+		'navigationcomponent' => true,
 		'phrases' => array(
 			'global' => array('mailAnXversandt'),
 			'ui' => array('bitteEintragWaehlen')
 		),
-		'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css'
+		'customJSs' => array('public/js/apps/LogsViewer.js')
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
-	<div id="wrapper">
+	<div id="main">
 
-		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
+		<!-- NavigationWidget -->
+		<navigation-widget :add-side-menu-entries="appSideMenuEntries"></navigation-widget>
 
-		<div id="page-wrapper">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-12">
-						<h3 class="page-header">
-							Job Logs Viewer
-						</h3>
-					</div>
+		<div id="content">
+			<div class="row">
+				<div class="col-lg-12">
+					<h3 class="page-header">
+						Job Logs Viewer
+					</h3>
 				</div>
-				<div>
-					<?php $this->load->view('system/logs/logsViewerData.php'); ?>
-				</div>
+			</div>
+			<div>
+				<!-- FilterWidget -->
+				<filter-widget filter-type="LogsViewer" @nw-new-entry="newSideMenuEntryHandler"></filter-widget>
 			</div>
 		</div>
 	</div>

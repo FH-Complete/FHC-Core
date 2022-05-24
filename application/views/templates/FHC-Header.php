@@ -34,7 +34,7 @@
 			if ($bootstrap3 === true) generateCSSsInclude('vendor/twbs/bootstrap3/dist/css/bootstrap.min.css');
 
 			// Bootstrap 5 CSS
-			if ($bootstrap5 === true) generateCSSsInclude('vendor/twbs/bootstrap5/css/bootstrap.min.css');
+			if ($bootstrap5 === true) generateCSSsInclude('vendor/twbs/bootstrap5/dist/css/bootstrap.min.css');
 
 			// jQuery UI CSS
 			if ($jqueryui1 === true) generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
