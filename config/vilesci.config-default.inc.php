@@ -195,7 +195,7 @@ define('SIGNATUR_LIST_API', 'list');
 // User für Zugriff auf Signaturserver
 define('SIGNATUR_USER', 'fhcomplete');
 // Passwort für Zugriff auf Signaturserver
-define('SIGNATUR_PASSWORD', 'Fhcomplet3Signature!');
+define('SIGNATUR_PASSWORD', 'supersecretpassword');
 // Signaturprofil das verwendet werden soll
 define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
 
