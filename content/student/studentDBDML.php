@@ -95,6 +95,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 	$data = '';
 	$error = true;
 }
+$check_statusaenderung_berechtigung = 'student/keine_studstatuspruefung';
 
 // *** FUNKTIONEN ***
 
@@ -978,7 +979,7 @@ if(!$error)
 								}
 
 								// wenn keine spezielle Berechtiung zur Umgebung, Statusänderung Checks durchführen
-								if (!$rechte->isBerechtigt('admin'))
+								if (!$rechte->isBerechtigt($check_statusaenderung_berechtigung))
 								{
 									$new_status_datum = isset($_POST['datum']) ? $_POST['datum'] : date('Y-m-d');
 
@@ -1499,7 +1500,7 @@ if(!$error)
 					}
 
 					// Statuschecks durchführen wenn keine spezielle Berechtigung zur Umgehung
-					if (!$rechte->isBerechtigt('admin'))
+					if (!$rechte->isBerechtigt($check_statusaenderung_berechtigung))
 					{
 						// allgemeine Prüfung bei Änderung oder Hinzufügen eines Status, inkludiert alle Status
 						$check_statusaenderung_result = checkStatusaenderung(
