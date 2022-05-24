@@ -124,6 +124,32 @@
 			</div>
 			<div id="collapse<?php echo $zgvpruefung->prestudent_id ?>"
 				 class="panel-collapse collapse<?php echo $infoonly ? '' : ' in' ?>">
+				<?php
+					$disabled = $disabledStg = $disabledTxt = $disabledStgTxt = '';
+					if (isEmptyString($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
+					{
+						$disabled = $disabledStg = 'disabled';
+						$disabledTxt = $disabledStgTxt = $this->p->t('infocenter', 'bewerbungMussAbgeschickt');
+					}
+
+					if ($studiengangtyp !== 'b' && $studiengangtyp !== 'm')
+					{
+						$disabled = 'disabled';
+						$disabledTxt = $this->p->t('infocenter', 'nurBachelorMasterFreigeben');
+
+						// FIT-Lehrgänge: exceptions, can be freigegeben in Infocenter
+						if (!in_array($studiengang_kz, $fit_programme_studiengaenge))
+						{
+							$disabledStg = 'disabled';
+							$disabledStgTxt = $this->p->t('infocenter', 'nurBachelorMasterFreigeben');
+						}
+					}
+
+					if (!in_array($studiengangtyp, $studienArtBerechtigung))
+						$disabledPer = 'disabled';
+					else
+						$disabledPer = '';
+				?>
 				<div class="panel-body">
 					<form action="javascript:void(0);" class="zgvform" id="zgvform_<?php echo $zgvpruefung->prestudent_id ?>">
 						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id ?>" class="prestudentidinput">
@@ -318,17 +344,17 @@
 					<?php if (!$infoonly): ?>
 						<div class="row">
 							<div class="col-xs-8 text-left zgvBearbeitungButtons" id="zgvBearbeitungButtons_<?php echo $zgvpruefung->prestudent_id ?>">
-								<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
+								<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>" <?php echo $disabledPer?>>
 									<?php echo $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
 								</button>
-								<button class="btn btn-default zgvRueckfragen" id="zgvRueckfragen_<?php echo $zgvpruefung->prestudent_id ?>">
+								<button class="btn btn-default zgvRueckfragen" <?php echo $disabledStg . ' ' . $disabledPer?> id="zgvRueckfragen_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'zgvRueckfragen') ?>
 								</button>
 								<span class="zgvStatusText" id="zgvStatusText_<?php echo $zgvpruefung->prestudent_id ?>" <?php (!(isset($zgvpruefung->statusZGV))) ?: print_r('data-info="need"')?>>
 								</span>
 							</div>
 							<div class="col-xs-4 text-right">
-								<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
+								<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>" <?php echo $disabledPer?>>
 									<?php echo  $this->p->t('ui', 'speichern') ?>
 								</button>
 							</div>
@@ -336,7 +362,7 @@
 					<?php endif; ?>
 					<br />
 					<?php
-					if (isset($zgvpruefung->prestudentUdfs))
+					if (isset($zgvpruefung->prestudentUdfs) && $studiengangtyp !== 'l')
 					{
 						echo $this->udflib->UDFWidget(
 							array(
@@ -362,6 +388,8 @@
 								<div class="form-inline">
 									<div class="input-group" id="absgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 										<select name="absgstatusgrund"
+												<?php echo $disabledStg ?>
+												<?php echo $disabledPer ?>
 												class="d-inline float-right"
 												required>
 											<option value="null"
@@ -373,7 +401,7 @@
 										</select>
 										<span class="input-group-btn">
 											<button type="button"
-													class="btn btn-default absageBtn" id="absagebtn_<?php echo $zgvpruefung->prestudent_id ?>">
+													class="btn btn-default absageBtn" <?php echo $disabledStg . ' ' . $disabledPer?> id="absagebtn_<?php echo $zgvpruefung->prestudent_id ?>">
 												<?php echo  $this->p->t('ui', 'absagen') ?>
 											</button>
 										</span>
@@ -381,25 +409,6 @@
 								</div>
 							</div><!-- /.column-absage -->
 							<?php
-							$disabled = $disabledStg = $disabledTxt = $disabledStgTxt = '';
-							if (isEmptyString($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
-							{
-								$disabled = $disabledStg = 'disabled';
-								$disabledTxt = $disabledStgTxt = $this->p->t('infocenter', 'bewerbungMussAbgeschickt');
-							}
-
-							if ($studiengangtyp !== 'b' && $studiengangtyp !== 'm')
-							{
-								$disabled = 'disabled';
-								$disabledTxt = $this->p->t('infocenter', 'nurBachelorMasterFreigeben');
-
-								// FIT-Lehrgänge: exceptions, can be freigegeben in Infocenter
-								if (!in_array($studiengang_kz, $fit_programme_studiengaenge))
-								{
-									$disabledStg = 'disabled';
-									$disabledStgTxt = $this->p->t('infocenter', 'nurBachelorMasterFreigeben');
-								}
-							}
 							if (!$infoonly) :
 							?>
 							<div class="col-lg-8 text-right">
@@ -408,6 +417,7 @@
 										<select name="frgstatusgrund"
 												class="d-inline float-right"
 											<?php echo $disabledStg ?>
+											<?php echo $disabledPer ?>
 												required>
 											<option value="null"
 													selected="selected"><?php echo ucfirst($this->p->t('ui', 'freigabeart')) . '...' ?>
@@ -417,14 +427,14 @@
 											<?php endforeach ?>
 										</select>
 										<span class="input-group-btn">
-												<button class="btn btn-default freigabebtnstg" <?php echo $disabledStg ?> id="freigabebtnstg_<?php echo $zgvpruefung->prestudent_id ?>"
+												<button class="btn btn-default freigabebtnstg" <?php echo $disabledStg . ' ' . $disabledPer?> id="freigabebtnstg_<?php echo $zgvpruefung->prestudent_id ?>"
 														data-toggle="tooltip" title="<?php echo $disabledStgTxt ?>">
 													<?php echo  $this->p->t('ui', 'freigabeAnStudiengang') ?>
 												</button>
 											</span>
 									</div>
 									<div class="input-group" id="igrfrgbtn">
-										<button type="button" id="freigabebtn_<?php echo $zgvpruefung->prestudent_id ?>" class="btn btn-default freigabebtn" <?php echo $disabled ?>
+										<button type="button" id="freigabebtn_<?php echo $zgvpruefung->prestudent_id ?>" class="btn btn-default freigabebtn" <?php echo $disabled . ' ' . $disabledPer?>
 												data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
 											<?php echo  $this->p->t('ui', 'freigabeZumReihungstest') ?>
 										</button>
@@ -489,6 +499,8 @@
 							<div class="col-lg-4 text-left">
 								<div class="input-group" id="absgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 									<select name="absgstatusgrund"
+										<?php echo $disabledStg?>
+										<?php echo $disabledPer?>
 											class="d-inline float-right"
 											required>
 										<option value="null"
@@ -500,6 +512,8 @@
 									</select>
 									<span class="input-group-btn">
 											<button type="button"
+													<?php echo $disabledStg ?>
+													<?php echo $disabledPer ?>
 													class="btn btn-default absageBtn" id="absagebtn_<?php echo $zgvpruefung->prestudent_id ?>">
 												<?php echo  $this->p->t('ui', 'absagen') ?>
 											</button>

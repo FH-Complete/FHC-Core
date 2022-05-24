@@ -142,7 +142,8 @@ class InfoCenter extends Auth_Controller
 				'getStudienjahrEnd' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'setNavigationMenuArrayJson' => 'infocenter:r',
 				'getAbsageData' => 'infocenter:r',
-				'saveAbsageForAll' => 'infocenter:rw'
+				'saveAbsageForAll' => 'infocenter:rw',
+				'getStudienartData' => 'infocenter:rw'
 			)
 		);
 
@@ -159,6 +160,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('system/Message_model', 'MessageModel');
 		$this->load->model('system/Filters_model', 'FiltersModel');
 		$this->load->model('system/PersonLock_model', 'PersonLockModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
@@ -320,12 +322,13 @@ class InfoCenter extends Auth_Controller
 
 		$this->DokumentModel->addOrder('bezeichnung');
 		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
-
+		$studienArtBerechtigung = array('studienArtBerechtigung' => array_column($this->getStudienArtBerechtigung(), 'typ'));
 		$data = array_merge(
 			$persondata,
 			$prestudentdata,
 			$dokumentdata,
-			$duplicate
+			$duplicate,
+			$studienArtBerechtigung
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
@@ -2194,18 +2197,36 @@ class InfoCenter extends Auth_Controller
 
 	public function getAbsageData()
 	{
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm']);
 
-		$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
-		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
-		$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(['b', 'm'], $studienSemester);
+		if (hasData($stg_typ))
+		{
+			$stg_typ = getData($stg_typ);
+			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
+			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
 
-		$data = array (
-			'statusgruende' => $statusgruende,
-			'studiengaenge' => $studiengaenge->retval
-		);
+			$data = array (
+				'statusgruende' => $statusgruende,
+				'studiengaenge' => $studiengaenge->retval
+			);
 
-		$this->outputJsonSuccess($data);
+			$this->outputJsonSuccess($data);
+		}
+		else
+			$this->outputJsonSuccess(null);
+	}
+
+	public function getStudienArtBerechtigung()
+	{
+		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm', 'l']);
+		return getData($stg_typ);
+	}
+	public function getStudienartData()
+	{
+		$this->outputJsonSuccess($this->getStudienArtBerechtigung());
 	}
 
 	public function saveAbsageForAll()
