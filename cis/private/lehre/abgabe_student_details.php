@@ -286,7 +286,19 @@ if($command=="update" && $error!=true)
 				{
 					//"normaler" Upload
 					move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
-					if (!file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
+					if (file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
+					{
+						exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'.'"');
+
+						$qry="UPDATE campus.tbl_paabgabe SET
+							abgabedatum = now(),
+							updatevon = ".$db->db_add_param($user).",
+							updateamum = now()
+							WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
+						$result=$db->db_query($qry);
+						echo $p->t('global/dateiErfolgreichHochgeladen');
+					}
+					else
 					{
 						echo $p->t('global/dateiNichtErfolgreichHochgeladen');
 					}
