@@ -49,8 +49,11 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<menupopup id="lehrveranstaltung-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="LehrveranstaltungNotenDelete();" id="lehrveranstaltung-noten-tree-popup-delete" hidden="false"/>
 		<menuitem label="Zertifikat erstellen" oncommand="LehrveranstaltungFFZertifikatPrint(event);" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
+		<menuitem label="Zertifikat erstellen mit Signatur" oncommand="LehrveranstaltungFFZertifikatPrint(event, true);" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
 		<menuitem label="Lehrveranstaltungszeugnis Deutsch erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'German');" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis Deutsch erstellen mit Signatur" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'German', true);" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
 		<menuitem label="Lehrveranstaltungszeugnis Englisch erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'English');" id="lehrveranstaltung-noten-tree-popup-lvzeugnis-englisch" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis Englisch erstellen mit Signatur" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'English', true);" id="lehrveranstaltung-noten-tree-popup-lvzeugnis-englisch" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">
@@ -117,6 +120,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz"  onclick="LehrveranstaltungNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-noten-tree-verband" label="Verband" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#verband" />						
+            <splitter class="tree-splitter"/>
             <treecol id="lehrveranstaltung-noten-tree-studiengang_kz_lv" label="LehrveranstaltungStudiengang_kz" flex="1" hidden="true" persist="hidden, width, ordinal"
                      class="sortDirectionIndicator"
                      sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz_lv"  onclick="LehrveranstaltungNotenTreeSort()"/>
@@ -148,6 +155,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#verband"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz_lv"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_semester"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte"/>

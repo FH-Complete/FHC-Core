@@ -5,12 +5,13 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'Login with user\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
+	$IDENTITY = '\'identity\'';
 
 $query = '
 		SELECT
@@ -41,8 +42,10 @@ $query = '
 				 LIMIT 1
 			) AS "LastActionType",
 			(
-				SELECT l.insertvon
+				SELECT CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END
 				  FROM system.tbl_log l
+				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
+				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
@@ -103,11 +106,12 @@ $query = '
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz || \':\' || sp.orgform_kurzbz)), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
@@ -125,11 +129,12 @@ $query = '
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz IN ('.$STATUS_KURZBZ.')
 
 				   AND ps.person_id = p.person_id
@@ -243,13 +248,23 @@ $query = '
 					LIMIT 1
 				)
 				LIMIT 1 
-			) AS "InfoCenterMitarbeiter"
+			) AS "InfoCenterMitarbeiter",
+			(
+				SELECT akte.akte_id
+				FROM public.tbl_akte akte
+				JOIN public.tbl_dokument USING (dokument_kurzbz)
+				WHERE akte.person_id = p.person_id
+				AND dokument_kurzbz = '. $IDENTITY .'
+				LIMIT 1
+			) AS "AktenId"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
 				   tpl.zeitpunkt,
-				   tpl.uid AS lockuser
+				   sp.nachname AS lockuser
 			  FROM system.tbl_person_lock tpl
+			  JOIN public.tbl_benutzer sb USING (uid)
+			  JOIN public.tbl_person sp ON sb.person_id = sp.person_id
 			 WHERE tpl.app = '.$APP.'
 		 ) pl USING(person_id)
 		 WHERE
@@ -313,7 +328,8 @@ $query = '
 			'Reihungstest date',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
-			'InfoCenter Mitarbeiter'
+			'InfoCenter Mitarbeiter',
+			'Identitätsnachweis'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -420,6 +436,19 @@ $query = '
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
 			}
+
+			if ($datasetRaw->{'AktenId'} !== null)
+			{
+				$datasetRaw->{'AktenId'} = sprintf(
+					'<a href="outputAkteContent/%s">Identitätsnachweis</a>',
+					$datasetRaw->{'AktenId'}
+				);
+			}
+			else
+			{
+				$datasetRaw->{'AktenId'} = '-';
+			}
+
 
 			return $datasetRaw;
 		},

@@ -22,8 +22,8 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'lehre/anrechnung_genehmigen:rw',
-				'download'  => 'lehre/anrechnung_genehmigen:rw',
+				'index'     => 'lehre/anrechnung_genehmigen:r',
+				'download'  => 'lehre/anrechnung_genehmigen:r',
 				'approve'   => 'lehre/anrechnung_genehmigen:rw',
 				'reject'    => 'lehre/anrechnung_genehmigen:rw',
 				'requestRecommendation' => 'lehre/anrechnung_genehmigen:rw',
@@ -81,7 +81,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		}
 
 		// Check if user is entitled to read the Anrechnung
-		self::_checkIfEntitledToReadAnrechnung($anrechnung_id);
+        $this->_checkIfEntitledToReadAnrechnung($anrechnung_id);
 
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
@@ -99,11 +99,16 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Get Genehmigung data
 		$genehmigungData = $this->anrechnunglib->getGenehmigungData($anrechnung_id);
 
+        $hasReadOnlyAccess =
+            $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $antragData->studiengang_kz)
+            && !$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $antragData->studiengang_kz);
+
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
 			'empfehlungData' => $empfehlungData,
-			'genehmigungData' => $genehmigungData
+			'genehmigungData' => $genehmigungData,
+            'hasReadOnlyAccess' => $hasReadOnlyAccess
 		);
 
 		$this->load->view('lehre/anrechnung/approveAnrechnungDetail.php', $viewData);
@@ -416,32 +421,22 @@ class approveAnrechnungDetail extends Auth_Controller
 	{
 		$result = $this->AnrechnungModel->load($anrechnung_id);
 
-		if(!$result = getData($result)[0])
+		if(!hasData($result))
 		{
 			show_error('Failed loading Anrechnung');
 		}
-
+		
 		$result = $this->LehrveranstaltungModel->loadWhere(array(
-			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
+			'lehrveranstaltung_id' => getData($result)[0]->lehrveranstaltung_id
 		));
 
-		if(!$result = getData($result)[0])
-		{
-			show_error('Failed loading Lehrveranstaltung');
-		}
+	    $studiengang_kz = getData($result)[0]->studiengang_kz;
 
-		// Get STGL
-		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
-
-		if($result = getData($result)[0])
-		{
-			if ($result->uid == $this->_uid)
-			{
-				return;
-			}
-		}
-
-		show_error('You are not entitled to read this Anrechnung');
+        // Check if user is entitled
+        if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $studiengang_kz))
+        {
+            show_error('You are not entitled to read this page');
+        }
 	}
 
 	/**
@@ -461,23 +456,13 @@ class approveAnrechnungDetail extends Auth_Controller
 			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
 		));
 
-		if(!$result = getData($result)[0])
-		{
-			show_error('Failed loading Lehrveranstaltung');
-		}
+		$studiengang_kz = getData($result)[0]->studiengang_kz;
 
-		// Get STGL
-		$result = $this->StudiengangModel->getLeitung($result->studiengang_kz);
-
-		if($result = getData($result)[0])
-		{
-			if ($result->uid == $this->_uid)
-			{
-				return;
-			}
-		}
-
-		show_error('You are not entitled to read this document');
+        // Check if user is entitled
+        if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $studiengang_kz))
+        {
+            show_error('You are not entitled to read this document');
+        }
 	}
 
 	/**

@@ -55,4 +55,21 @@ class Betriebsmittelperson_model extends DB_Model
 		
 		return $this->loadWhere($condition);
 	}
+
+	public function getBetriebsmittelZuordnung($cardIdentifier, $typ = 'Zutrittskarte', $ausgegeben = true)
+	{
+		$this->addJoin('wawi.tbl_betriebsmittel', 'betriebsmittel_id');
+
+		$where = 'wawi.tbl_betriebsmittel.nummer2 = \'' . $cardIdentifier . '\'
+					AND wawi.tbl_betriebsmittel.betriebsmitteltyp = \''. $typ .'\'
+					AND (retouram >= now() OR retouram IS NULL)
+					';
+
+		if ($ausgegeben)
+			$where .= 'AND ausgegebenam <= now()';
+		else
+			$where .= 'AND (ausgegebenam <= now() OR ausgegebenam IS NULL)';
+
+		return $this->loadWhere($where);
+	}
 }

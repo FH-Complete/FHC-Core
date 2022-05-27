@@ -383,6 +383,7 @@ if(!$error)
 			$error = true;
 			$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
 		}
+
 		//Studentendaten speichern
 		if(!$error)
 		{
@@ -402,7 +403,8 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Geburtsdatum ist nicht korrekt.';
 				$error = true;
-			}
+			}			
+
 			if(!$error)
 			{
 				$student->uid = $_POST['uid'];
@@ -646,10 +648,17 @@ if(!$error)
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
+				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt']; 									   
 				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
+				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];										  
+				$prestudent->zgvdoktor_code = $_POST['zgvdoktor_code'];
+				$prestudent->zgvdoktorort = $_POST['zgvdoktorort'];
+				$prestudent->zgvdoktordatum = $_POST['zgvdoktordatum'];
+				$prestudent->zgvdoktornation = $_POST['zgvdoktornation'];
+				$prestudent->zgvdoktor_erfuellt = $_POST['zgvdoktor_erfuellt'];
 				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
 				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
@@ -2263,6 +2272,21 @@ if(!$error)
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='checkbuchung')
+	{
+		$person_ids = explode(';',$_POST['person_ids']);
+		$exists = false;
+		if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK') && (in_array($_POST['buchungstyp_kurzbz'], unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK))))
+		{
+			$konto = new konto();
+			$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $_POST['buchungstyp_kurzbz']);
+		}
+
+		if($exists)
+			$return = true;
+		else
+			$return = false;
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='neuebuchung')
 	{
 		//Speichert eine neue Buchung
@@ -2337,7 +2361,7 @@ if(!$error)
 			{
 				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
 					continue;
-
+									 
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2350,6 +2374,7 @@ if(!$error)
 					$dok->new = true;
 					if ($dokument_kurzbz === 'Sonst')
 						$sonst++;
+				  
 
 					if(!$dok->save())
 					{
@@ -2544,7 +2569,6 @@ if(!$error)
 			$dokumente = explode(';',$_POST['dokumente']);
 			$errormsg = '';
 			$sonst = 0;
-
 			foreach ($dokumente as $dokument_kurzbz)
 			{
 				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
