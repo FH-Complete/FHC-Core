@@ -244,7 +244,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							</menulist>
 						</row>
 						<row>
-							<label value="Lehreinheit" control="student-projektarbeit-menulist-lehreinheit"/>
+							<label value="LV-Teil" control="student-projektarbeit-menulist-lehreinheit"/>
 							<menulist id="student-projektarbeit-menulist-lehreinheit" disabled="true"
 							          datasources="rdf:null" flex="1"
 									  style="max-width: 600px"
@@ -492,7 +492,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 									</template>
 								</menulist>
 							</row>
-							<row>
+							<row id="student-projektbetreuer-textbox-punkte-row">
 								<label value="Punkte" control="student-projektbetreuer-textbox-punkte"/>
 								<textbox id="student-projektbetreuer-textbox-punkte" disabled="true" maxlength="6"/>
 							</row>

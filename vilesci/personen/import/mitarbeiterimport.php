@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *					Manuela Thamer <manuela.thamer@technikum-wien.at>.
  */
 
 require_once('../../../config/vilesci.config.inc.php');
@@ -620,8 +621,16 @@ if(isset($_POST['save']))
 		$nachname_clean = mb_strtolower(convertProblemChars($nachname));
 		$vorname_clean = mb_strtolower(convertProblemChars($vorname));
 		$uid='';
+		$mitarbeiter = new mitarbeiter();
 
-		$uid = generateMitarbeiterUID($vorname_clean, $nachname_clean, $lektor, $fixangestellt);
+		if ($_POST['personalnummer'])
+		{
+			$personalnummer = $_POST['personalnummer'];
+		}
+		else
+			$personalnummer = $mitarbeiter->getNextPersonalnummer();
+
+		$uid = generateMitarbeiterUID($vorname_clean, $nachname_clean, $lektor, $fixangestellt, $personalnummer);
 
 		if ($wunschUid != '')
 		{
@@ -872,10 +881,10 @@ if(isset($_POST['save']))
 		}
 	}
 
-	if(!$error)
+	if (!$error)
 	{
 		$db->db_query('COMMIT');
-		die("<b>MitarbeiterIn $vorname $vornamen $nachname wurde erfolgreich angelegt</b><br><br><a href='mitarbeiterimport.php'>Neue Person anlegen</a><br>");
+		die("<b>MitarbeiterIn $vorname $vornamen $nachname ($uid) wurde erfolgreich angelegt</b><br><br><a href='mitarbeiterimport.php'>Neue Person anlegen</a><br>");
 	}
 	else
 	{
@@ -925,7 +934,8 @@ echo '<tr><td>Wunsch-UID</td><td><input type="text" name="wunschUid" id="wunschU
 echo '<span style="padding: 0 3px" id="checkUID"></span>';
 if ($showagain)
 	echo '<br>';
-echo '<button type="button" title="Prüft, ob die UID schon vorhanden ist. Keine Sonderzeichen, Umlaute oder Leerzeichen in der UID" href="#" onclick="checkWunschUid()"> Check UID </button> (optional, max. 32)
+echo '<button type="button" title="Prüft, ob die UID schon vorhanden ist. Keine Sonderzeichen, Umlaute oder Leerzeichen in der UID"
+href="#" onclick="checkWunschUid()"> Check UID </button> (optional, max. 32)
 </td></tr>';
 echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" size="30" value="'.$anrede.'" onblur="AnredeChange()"/></td></tr>';
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" size="30" value="'.$titel.'" /></td></tr>';

@@ -553,31 +553,38 @@ class konto extends basis_db
 
 	/**
 	 * Überprüft, ob das Konto einer Person ausgeglichen ist, oder ob noch Zahlungen offen sind
-	 * @param $person_id ID der Person, die geprüft werden soll
-	 * @return true wenn ausgeglichen, false wenn Zahlungen offen, false mit errormsg wenn ein Fehler aufgetreten ist
+	 * @param int $person_id ID der Person, die geprüft werden soll.
+	 * @param bool $aktuelleBuchungenOnly True, wenn nur Zahlungen mit Buchungsdatum <= aktuelles Datum berücksichtigt werden sollen.
+	 * @return boolean true wenn ausgeglichen, false wenn Zahlungen offen, false mit errormsg wenn ein Fehler aufgetreten ist
 	 */
-    public function checkKontostand($person_id)
+	public function checkKontostand($person_id, $aktuelleBuchungenOnly = false)
 	{
-		$qry="SELECT sum(betrag) as summe FROM public.tbl_konto WHERE person_id=".$this->db_add_param($person_id);
-		if($result=$this->db_query($qry))
+		$qry = "SELECT sum(betrag) as summe
+				FROM public.tbl_konto
+				WHERE person_id=".$this->db_add_param($person_id);
+
+		if($aktuelleBuchungenOnly)
+			$qry .= " AND buchungsdatum <= now()";
+
+		if ($result = $this->db_query($qry))
 		{
-			if($row=$this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
-				if($row->summe>=0)
+				if ($row->summe >= 0)
 					return true;
 				else
 					return false;
 			}
 			else
 			{
+				$this->errormsg = "Fehler beim Holen der Daten";
 				return false;
-				$this->errormsg="Fehler beim Holen der Daten";
 			}
 		}
 		else
 		{
+			$this->errormsg = "Fehler bei der Datenbankabfrage";
 			return false;
-			$this->errormsg="Fehler bei der Datenbankabfrage";
 		}
 	}
 
@@ -962,10 +969,9 @@ class konto extends basis_db
 	{
 		$qry = "SELECT betrag
 				FROM public.tbl_konto
-				JOIN public.tbl_benutzer benutzer USING(person_id)
 				WHERE person_id IN (".$this->implode4SQL(array_filter($person_ids)).")
 				AND studiensemester_kurzbz = ".$this->db_add_param($stsem)."
-				AND buchungstyp_kurzbz = ".$this->db_add_param($typ)." 
+				AND buchungstyp_kurzbz = ".$this->db_add_param($typ)."
 				GROUP BY buchungsnr";
 
 		if ($result = $this->db_query($qry))

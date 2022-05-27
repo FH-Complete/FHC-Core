@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7e7441d3ba7b9b2be1f647b9bfc2c941",
-    "content-hash": "d59d1c1f4957fc2e3dc019cbb99b5aa2",
+    "hash": "6bab4617977e08b2939bf959929632d4",
+    "content-hash": "3e499134721f682f298dda20263ab686",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -70,6 +70,105 @@
                 "shasum": null
             },
             "type": "library"
+        },
+        {
+            "name": "chillerlan/php-qrcode",
+            "version": "2.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chillerlan/php-qrcode.git",
+                "reference": "bf0382aaf2f79fa41c2dcb0f216675f74d633fe7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chillerlan/php-qrcode/zipball/bf0382aaf2f79fa41c2dcb0f216675f74d633fe7",
+                "reference": "bf0382aaf2f79fa41c2dcb0f216675f74d633fe7",
+                "shasum": ""
+            },
+            "require": {
+                "chillerlan/php-traits": "^1.1",
+                "php": ">=7.0.3"
+            },
+            "require-dev": {
+                "chillerlan/php-authenticator": "^2.0",
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "chillerlan\\QRCode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kazuhiko Arase",
+                    "homepage": "https://github.com/kazuhikoarase"
+                },
+                {
+                    "name": "Smiley",
+                    "email": "smiley@chillerlan.net",
+                    "homepage": "https://github.com/codemasher"
+                }
+            ],
+            "description": "A QR code generator. PHP 7+",
+            "homepage": "https://github.com/chillerlan/php-qrcode",
+            "keywords": [
+                "qr code"
+            ],
+            "time": "2020-04-12 07:38:35"
+        },
+        {
+            "name": "chillerlan/php-traits",
+            "version": "1.1.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chillerlan/php-traits.git",
+                "reference": "264759946b6aaeb427346b749fc9639b790b8e7f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chillerlan/php-traits/zipball/264759946b6aaeb427346b749fc9639b790b8e7f",
+                "reference": "264759946b6aaeb427346b749fc9639b790b8e7f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "chillerlan\\Traits\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Smiley",
+                    "email": "smiley@chillerlan.net",
+                    "homepage": "https://github.com/codemasher"
+                }
+            ],
+            "description": "Some useful traits for PHP 7+",
+            "homepage": "https://github.com/chillerlan/php-traits",
+            "keywords": [
+                "PHP7",
+                "container",
+                "dotenv",
+                "helper",
+                "trait"
+            ],
+            "abandoned": true,
+            "time": "2018-06-22 00:30:47"
         },
         {
             "name": "chriskacerguis/codeigniter-restserver",
@@ -1248,26 +1347,26 @@
         },
         {
             "name": "netcarver/textile",
-            "version": "v3.7.6",
+            "version": "v3.7.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/textile/php-textile.git",
-                "reference": "1846fd5aeace2a0dd57c4f770f693d12bcd7fa26"
+                "reference": "e5c32b4485741e656cfd94932da8ba7dd4a19da5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/textile/php-textile/zipball/1846fd5aeace2a0dd57c4f770f693d12bcd7fa26",
-                "reference": "1846fd5aeace2a0dd57c4f770f693d12bcd7fa26",
+                "url": "https://api.github.com/repos/textile/php-textile/zipball/e5c32b4485741e656cfd94932da8ba7dd4a19da5",
+                "reference": "e5c32b4485741e656cfd94932da8ba7dd4a19da5",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "php-coveralls/php-coveralls": "2.1.*",
-                "phpunit/phpunit": "5.7.*",
+                "phpstan/phpstan": "1.6.3",
+                "phpunit/phpunit": "^9.5.20",
                 "squizlabs/php_codesniffer": "3.*",
-                "symfony/yaml": "2.4.*"
+                "symfony/yaml": "^4.4.3"
             },
             "type": "library",
             "extra": {
@@ -1297,7 +1396,7 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2020-01-08 21:13:37"
+            "time": "2022-05-01 17:05:16"
         },
         {
             "name": "nicolaskruchten/pivottable",

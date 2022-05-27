@@ -1012,6 +1012,31 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'dataset_name' => 'projektuebersicht',
+		'filter_kurzbz' => 'alleProjekte',
+		'description' => '{Projektübersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Projektübersicht",
+				"columns": [
+					{"name": "Studiengang"},
+					{"name": "StudentNachname"},
+					{"name": "Abgabedatum"},
+					{"name": "Note"},
+					{"name": "ErstNachname"},
+					{"name": "ErstAbgeschickt"},
+					{"name": "ZweitNachname"},
+					{"name": "ZweitAbgeschickt"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
 		'app' => 'dvuh',
 		'dataset_name' => 'storno',
 		'filter_kurzbz' => 'DVUHStorno',

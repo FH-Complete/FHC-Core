@@ -247,7 +247,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menulist>
 									</row>
 									<row>
-										<label value="Lehreinheit" control="student-io-menulist-lehreinheit"/>
+										<label value="LV-Teil" control="student-io-menulist-lehreinheit"/>
 										<menulist id="student-io-menulist-lehreinheit" disabled="true"
 												  datasources="rdf:null" flex="1"
 												  ref="http://www.technikum-wien.at/lehreinheit/liste" >

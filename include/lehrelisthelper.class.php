@@ -202,9 +202,12 @@ class LehreListHelper
 		$qry = 'SELECT
 					distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, public.tbl_student.student_uid,
 					tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-					(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+					(SELECT status_kurzbz FROM public.tbl_prestudentstatus
+					WHERE prestudent_id=tbl_student.prestudent_id
+					ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 					tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
-					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang, tbl_mobilitaet.mobilitaetstyp_kurzbz,
+					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang,
+					tbl_mobilitaet.mobilitaetstyp_kurzbz, tbl_zeugnisnote.note,
 					(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN 1 ELSE 0 END) as doubledegree
 				FROM
 					campus.vw_student_lehrveranstaltung
@@ -212,7 +215,9 @@ class LehreListHelper
 					JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student ON(uid=student_uid)
 					LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 					LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
-					LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
+					LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+						AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
+						AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 					LEFT JOIN lehre.tbl_note USING (note)
 					LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 					LEFT JOIN public.tbl_studiengang ON(tbl_student.studiengang_kz=tbl_studiengang.studiengang_kz)
@@ -283,7 +288,8 @@ class LehreListHelper
 									'gruppe'=>trim($row->gruppe),
 									'zusatz'=>$zusatz,
 									'studiengang_kurzbz'=>$row->kurzbzlang,
-									'mobilitaetstyp_kurzbz'=>$row->mobilitaetstyp_kurzbz
+									'mobilitaetstyp_kurzbz'=>$row->mobilitaetstyp_kurzbz,
+									'note'=>$row->note
 									));
 				}
 			}

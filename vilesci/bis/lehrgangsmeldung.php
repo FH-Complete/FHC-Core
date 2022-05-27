@@ -58,6 +58,7 @@ else
 $datei='';
 $zaehl=0;
 $lehrgangsname = '';
+$standortcode = null;
 
 $stsem_obj = new studiensemester();
 $stsem_obj->load($ssem);
@@ -80,6 +81,7 @@ else
 {
 	echo "Ung&uuml;ltiges Semester!";
 }
+
 //ausgewählter Lehrgang
 if(isset($_GET['stg_kz']))
 {
@@ -90,11 +92,13 @@ if(isset($_GET['stg_kz']))
 	else
 	{
 		echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
+		$stg_kz = '';
 	}
 }
 else
 {
 	echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
+	$stg_kz = '';
 	exit;
 }
 //plausicheck
@@ -103,16 +107,68 @@ if(isset($_GET['plausi']))
 	$plausi=$_GET['plausi'];
 }
 
-// Standortcode
-if (defined('BIS_STANDORTCODE_LEHRGAENGE') && BIS_STANDORTCODE_LEHRGAENGE != '0')
+// Select für Lehrgänge
+if ($rechte->isBerechtigt('admin'))
 {
-	$standortcode = BIS_STANDORTCODE_LEHRGAENGE;
+	echo '<form name="frm_lehrgaenge" action='.$_SERVER['PHP_SELF'].' method="GET">';
+	echo 'Studiengang: <SELECT name="stg_kz"  onchange="document.frm_lehrgaenge.submit()">';
+	echo '<OPTION value="">Bitte auswählen</OPTION>';
+	$studiengang = new studiengang();
+	$studiengang->getAll('typ, kurzbz', true);
+	$types = new studiengang();
+	$types->getAllTypes();
+	$typ = '';
+	foreach ($studiengang->result AS $row)
+	{
+		if ($row->typ != 'l' && $row->typ != 'k')
+		{
+			continue;
+		}
+		if ($row->studiengang_kz >= 0)
+		{
+			continue;
+		}
+		if ($row->studiengang_kz == $stg_kz)
+		{
+			$selected = 'selected';
+		}
+		else
+		{
+			$selected = '';
+		}
+
+		if ($typ != $row->typ || $typ == '')
+		{
+			if ($typ != '')
+			{
+				echo '</optgroup>';
+			}
+			echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+		}
+
+		echo '<OPTION value="'.$row->studiengang_kz.'"'.$selected.'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
+
+		$typ = $row->typ;
+	}
+	echo '</select>';
+	echo '</form>';
 }
-else
+
+if ($stg_kz == '')
 {
-	echo "<H2>Standortcode f&uuml;r Lehrg&auml;nge fehlt.</H2>";
-	exit;
+	exit();
 }
+
+// Standortcode - Obsolete da Standort nun aus DB geholt wird - auch kein Eintrag in vilesci.config->BIS_STANDORTCODE_LEHRGAENGE noetig
+#####if (defined('BIS_STANDORTCODE_LEHRGAENGE') && BIS_STANDORTCODE_LEHRGAENGE != '0')
+#####{
+#####	$standortcode = BIS_STANDORTCODE_LEHRGAENGE;
+#####}
+#####else
+#####{
+#####	echo "<H2>Standortcode f&uuml;r Lehrg&auml;nge fehlt.</H2>";
+#####	exit;
+#####}
 
 $datumobj=new datum();
 
@@ -123,6 +179,7 @@ if($result = $db->db_query($qry))
 	if($row = $db->db_fetch_object($result))
 	{
 		$stgart=$row->typ;
+		$standortcode = $row->standort_code;
 		$lgartcode = $row->lgartcode;
 		$qrylgart = "SELECT lgart_biscode FROM bis.tbl_lgartcode WHERE lgartcode=".$db->db_add_param($row->lgartcode);
 		if($result_lgartcode = $db->db_query($qrylgart))

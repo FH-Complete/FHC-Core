@@ -5,7 +5,7 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Attempt to register with existing mailadress\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
@@ -106,11 +106,12 @@ $query = '
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz || \':\' || sp.orgform_kurzbz)), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
@@ -128,11 +129,12 @@ $query = '
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz IN ('.$STATUS_KURZBZ.')
 
 				   AND ps.person_id = p.person_id
