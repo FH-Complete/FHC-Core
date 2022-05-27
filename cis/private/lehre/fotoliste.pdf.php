@@ -102,6 +102,7 @@ $gruppen_string = '';
 $gruppen_string_arr = array();
 $stg_typ = $stg->typ;
 $stg_bezeichnung = $stg->bezeichnung;
+$lv_bezeichnung = '';
 
 //structure overall lehrveranstaltungs data
 if ($result = $db->db_query($qry)) {
