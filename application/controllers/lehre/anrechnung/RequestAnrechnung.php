@@ -205,9 +205,14 @@ class requestAnrechnung extends Auth_Controller
 		}
 
 		// Check if user is entitled to read dms doc
-		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 
-		$this->dmslib->download($dms_id);
+		// Get file to be downloaded from DMS
+                $download = $this->dmslib->download($dms_id, $filename);
+                if (isError($download)) return $download;
+
+                // Download file
+                $this->outputFile(getData($download));
 	}
 
 	/**
