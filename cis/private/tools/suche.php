@@ -155,8 +155,7 @@ function searchPerson($searchItems)
 			<thead>
 				<tr>
 					<th>',$p->t('global/anrede'),'</th>
-					<th>',$p->t('global/vorname'),'</th>
-					<th>',$p->t('global/wahlname'),'</th>
+					<th>',$p->t('global/vorname'), ' (' . $p->t('global/wahlname'), ')','</th>
 					<th>',$p->t('global/nachname'),'</th>
 					<th>',$p->t('global/studiengang'),'</th>
 					<th>',$p->t('freebusy/typ'),'</th>
@@ -179,8 +178,12 @@ function searchPerson($searchItems)
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->anrede,'</td>';
-			echo '<td>',$row->vorname, '</td>';
-			echo '<td>',$row->wahlname,'</td>';
+
+			if ($row->wahlname)
+				echo '<td>',$row->vorname, ' (' ,$row->wahlname, ')</td>';
+			else
+					echo '<td>',$row->vorname, '</td>';
+
 			echo '<td>';
 			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN'))
 				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname, ' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
