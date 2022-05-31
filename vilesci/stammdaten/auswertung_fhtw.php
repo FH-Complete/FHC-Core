@@ -440,6 +440,46 @@ if ($deleteAllResults)
 	}
 }
 
+$rtprueflingEntSperren = filter_input(INPUT_POST, 'rtprueflingEntSperren', FILTER_VALIDATE_BOOLEAN);
+if ($rtprueflingEntSperren)
+{
+	if (!$rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'su'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	if (isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id'])
+		&& isset($_POST['art']))
+	{
+		$qry = "UPDATE testtool.tbl_pruefling SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+				WHERE prestudent_id IN 
+						(SELECT prestudent_id FROM public.tbl_prestudent ps
+							JOIN public.tbl_person tp ON tp.person_id = ps.person_id 
+							WHERE tp.person_id = (SELECT person_id FROM public.tbl_prestudent sps WHERE sps.prestudent_id = " . $db->db_add_param($_POST['prestudent_id']) . "));";
+
+		if ($result = $db->db_query($qry))
+		{
+			$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+			echo json_encode(array(
+				'status' => 'ok',
+				'msg' => $msg));
+			exit();
+		}
+		else
+		{
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim speichern der Daten'
+			));
+			exit();
+		}
+	}
+}
+
 // Ajax-Request um einen Reihungstest freizuschalten
 $rtFreischalten = filter_input(INPUT_POST, 'rtFreischalten', FILTER_VALIDATE_BOOLEAN);
 if ($rtFreischalten)
@@ -1408,6 +1448,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_gebiet.bezeichnung AS gebiet,
 			tbl_pruefling.idnachweis,
 			tbl_pruefling.registriert,
+			tbl_pruefling.gesperrt,
 			get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) AS letzter_status
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
@@ -1530,6 +1571,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->geschlecht = $row->geschlecht;
 		$ergebnis[$row->prestudent_id]->idnachweis = $row->idnachweis;
 		$ergebnis[$row->prestudent_id]->registriert = $row->registriert;
+		$ergebnis[$row->prestudent_id]->gesperrt = $row->gesperrt;
 		$ergebnis[$row->prestudent_id]->stg_kurzbz = $row->stg_kurzbz;
 		$ergebnis[$row->prestudent_id]->stg_bez = $row->stg_bez;
 		$ergebnis[$row->prestudent_id]->ausbildungssemester = $row->ausbildungssemester;
@@ -2291,7 +2333,57 @@ else
 			});
 		}
 	}
-	
+	function prueflingEntSperren(prestudent_id, name, art)
+	{
+		if (art === true)
+			var text = "sperren";
+		else if (art === false)
+			var text = "entsperren";
+
+		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
+		{
+			data = {
+				prestudent_id: prestudent_id,
+				art: art,
+				rtprueflingEntSperren: true
+			};
+
+			$.ajax({
+				url: "auswertung_fhtw.php",
+				data: data,
+				type: "POST",
+				dataType: "json",
+				success: function(data)
+				{
+					if(data.status !== "ok")
+					{
+						$("#msgbox").attr("class","alert alert-danger");
+						$("#msgbox").show();
+						$("#msgbox").html(data["msg"]);
+					}
+					else
+					{
+						if (art === true)
+						{
+							$("#prueflingentsperren_" + prestudent_id).removeClass("hidden");
+							$("#prueflingsperren_" + prestudent_id).addClass("hidden");
+						}
+						else if (art === false)
+						{
+							$("#prueflingsperren_" + prestudent_id).removeClass("hidden");
+							$("#prueflingentsperren_" + prestudent_id).addClass("hidden");
+						}
+					}
+				},
+				error: function(data)
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+			});
+		}
+	}
 	function deleteAllResults(prestudent_id, name)
 	{
 		if (confirm("Wollen Sie ALLE Ergebnisse der Person "+name+" wirklich löschen"))
@@ -2955,6 +3047,7 @@ else
 				</th>
 				<th rowspan="2">PreId</th>
 				<th rowspan="2"><span class="glyphicon glyphicon-envelope"></span></th>
+				<th rowspan="2">Ent-/Sperren</th>
 				<th rowspan="2">Nachname</th>
 				<th rowspan="2">Vornamen</th>
 				<th rowspan="2">GebDatum</th>
@@ -3011,6 +3104,18 @@ else
 						<!--<td>$erg->prestudent_id <a href=".APP_ROOT."cis/testtool/admin/auswertung_detail_prestudent.php?prestudent_id=$erg->prestudent_id target='blank'>Details</a></td>-->
 						<td class='".$inaktiv."'>$erg->prestudent_id</td>
 						<td class='clm_email ".$inaktiv."'><a href='mailto:$erg->email'><span class='glyphicon glyphicon-envelope'></span></a></td>
+						";
+
+
+				echo "<td class='textcentered ".$inaktiv ."'>
+						<a href='#' id='prueflingsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt === 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
+							<span class='glyphicon glyphicon-remove'></span>
+						</a>
+						<a href='#' id='prueflingentsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt !== 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
+							<span class='glyphicon glyphicon-ok'></span>
+						</a>
+					</td>";
+				echo "
 						<td class='".$inaktiv."'>".$erg->nachname." ".($erg->qualifikationskurs == true ? "<span title='Qualifikationskurs' class='redcolor'>(Q)</span>" : "")."</td>
 						<td class='".$inaktiv."'>$erg->vorname</td>
 						<td class='".$inaktiv."'>" . $datum_obj->formatDatum($erg->gebdatum, 'd.m.Y') . "</td>
