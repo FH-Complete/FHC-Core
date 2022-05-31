@@ -206,6 +206,11 @@ class Mitarbeiter_model extends DB_Model
 	public function getEmployeesZeitaufzeichnungspflichtig()
 	{
 		$qry = "SELECT DISTINCT  mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beginn <= now() and  (ende >= now() OR ende is NULL) AND zeitaufzeichnungspflichtig is TRUE
+						--AND mitarbeiter_uid in ('sabo','wala','ma0080') --Urlaubsfreigabe
+						--AND mitarbeiter_uid in ('markl','ma0080') -- Monatlistenzu bestätigen
+						--AND mitarbeiter_uid in ('hrisenko','kiciak','zenzi','holnthon','ma0068') -- Monatlisten abzuschicken
+						--AND mitarbeiter_uid in ('ma0068','felleitn','wala','ma0080','ma002') --ZEITEN
+						AND mitarbeiter_uid in ('ma0068') --kein Zeitmodell
 				ORDER BY mitarbeiter_uid";
 		return $this->execQuery($qry);
 	}

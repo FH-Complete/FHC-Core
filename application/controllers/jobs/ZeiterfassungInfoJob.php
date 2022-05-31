@@ -10,7 +10,7 @@
  * @since              Version 1.0
  * @filesource
  *
- * Cronjobs to be run for sending emails informing about Zeiterfassungsreminder.
+ * Cronjobs to be run for sending reminder-emails about Zeiterfassung.
  */
 // ------------------------------------------------------------------------
 
@@ -54,12 +54,23 @@ class ZeiterfassungInfoJob extends JOB_Controller
        public function sendMail()
        {
                $allMitarbeiter = $this->_getEmplyeeUids();
+               //var_dump($allMitarbeiter);
+               //$allMitarbeiter = ['ma0068','ma0080'];
 
                $vorgesetzte_to_approve_vacation = $this->_getVorgesetztetoApproveVacationList();
                $vorgesetzte_to_approve_timesheets = $this->_getVorgesetztetoApproveTimesheetList();
 
                $mitarbeiter_to_send_timesheet_lastmonth = $this->_getEmployeeTimesheetList();
                $mitarbeiter_to_record_times_lastweek = $this->_getEmployeeLastWeeksTimeList();
+
+               //$mitarbeiter_without_zeitmodell = $this->_filterMitarbeiter();
+
+               $cnt_sup_to_approve_vacation = 0;
+               $cnt_sup_to_approve_timesheets = 0;
+               $cnt_ma_to_send_timesheet = 0;
+               $cnt_ma_to_record_times_lastweek = 0;
+               $cnt_ma_without_zeitmodell = 0;
+               $cnt_mails_total = 0;
 
                $mailingList = array();
 
@@ -69,6 +80,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        if(array_key_exists($uid, $vorgesetzte_to_approve_vacation))
                        {
                                $ma->SupVac = true;
+                               $cnt_sup_to_approve_vacation++;
                        }
                        else
                        {
@@ -77,6 +89,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        if(array_key_exists($uid, $vorgesetzte_to_approve_timesheets))
                        {
                                $ma->SupMonth = true;
+                               $cnt_sup_to_approve_timesheets++;
                        }
                        else
                        {
@@ -85,6 +98,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        if(array_key_exists($uid, $mitarbeiter_to_send_timesheet_lastmonth))
                        {
                                $ma->EmpMonth = true;
+                               $cnt_ma_to_send_timesheet++;
                        }
                        else
                        {
@@ -93,16 +107,27 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        if(array_key_exists($uid, $mitarbeiter_to_record_times_lastweek))
                        {
                                $ma->EmpWeek = true;
+                               $cnt_ma_to_record_times_lastweek++;
                        }
                        else
                        {
                                $ma->EmpWeek = false;
                        }
-
+                       //fehlendes Zeitmodell??
+                       // if(array_key_exists($uid, $mitarbeiter_without_zeitmodell))
+                       // {
+                       //         $ma->EmpZeitMod = true;
+                       //         $cnt_ma_without_zeitmodell++;
+                       // }
+                       // else
+                       // {
+                       //         $ma->EmpZeitMod = false;
+                       // }
 
                        if($ma->SupVac || $ma->SupMonth || $ma->EmpMonth || $ma->EmpWeek || $ma->EmpZeitMod)
                        {
                                array_push($mailingList, $ma);
+                               $cnt_mails_total++;
                        }
 
                }
@@ -115,6 +140,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        // Set mail recipient
                        $to = $ma->uid.'@'. DOMAIN;
 
+                       $ma_uid = $ma->uid;
                        $supVac ='';
                        $SupMonth ='';
                        $EmpMonth ='';
@@ -122,14 +148,15 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        $EmpZeitMod ='';
 
                        //Generate Email Text
-                       $ma->SupVac ? $supVac = '->Du hast noch Urlaube freizugeben. Du findest die Ulaubsfreigabe unter: <a href="'.CIS_ROOT.'cis/index.php?menu='.CIS_ROOT. 'cis/menu.php?content_id=&content='.CIS_ROOT.self::URLAUBSFREIGABE_PATH.'">Urlaubstool</a><br><br>' : '';
-                       $ma->SupMonth ? $SupMonth = '->Du hast noch Monatslisten freizugeben. Du findest die Monatslistenfreigabe unter: <a href="'.CIS_ROOT.'cis/index.php?menu='.CIS_ROOT. 'cis/menu.php?content_id=&content='.CIS_ROOT.self::MONATSLISTEN_PATH.'">Monatslisten</a><br><br>' : '';
-                       $ma->EmpMonth ? $EmpMonth = '->Du musst noch die Monatsliste von letztem Monat abschicken.<br><br>' : '';
-                       $ma->EmpWeek ? $EmpWeek = '->Du musst noch Zeiten für letzte Woche eintragen.<br><br>' : '';
-                       $ma->EmpZeitMod ? $EmpZeitMod = '->Du hast noch kein Zeitmodell hinterlegt.<br><br>' : '';
+                       $ma->SupVac ? $supVac = 'Du hast noch Urlaube freizugeben. Du findest die Urlaubsfreigabe unter: <a href="'.CIS_ROOT.'cis/index.php?menu='.CIS_ROOT. 'cis/menu.php?content_id=&content='.CIS_ROOT.self::URLAUBSFREIGABE_PATH.'">Urlaubstool</a><br><br>' : '';
+                       $ma->SupMonth ? $SupMonth = 'Du hast noch Monatslisten freizugeben. Du findest die Monatslistenfreigabe unter: <a href="'.CIS_ROOT.'cis/index.php?menu='.CIS_ROOT. 'cis/menu.php?content_id=&content='.CIS_ROOT.self::MONATSLISTEN_PATH.'">Monatslisten</a><br><br>' : '';
+                       $ma->EmpMonth ? $EmpMonth = 'Du musst noch die Monatsliste von letztem Monat abschicken.<br><br>' : '';
+                       $ma->EmpWeek ? $EmpWeek = 'Du musst noch Zeiten für letzte Woche eintragen.<br><br>' : '';
+                       $ma->EmpZeitMod ? $EmpZeitMod = 'Du hast noch kein Zeitmodell hinterlegt.<br><br>' : '';
 
                        // Prepare mail content
                        $content_data_arr = array(
+                               'ma_uid'        => $ma_uid,
                                'SupVac'        => $supVac,
                                'SupMonth'      => $SupMonth,
                                'EmpMonth'      => $EmpMonth,
@@ -137,16 +164,46 @@ class ZeiterfassungInfoJob extends JOB_Controller
                                'EmpZeitMod'    => $EmpZeitMod
                        );
 
+                       // var_dump($content_data_arr);
+
                        sendSanchoMail(
-                               'ZeiterfassungInfoMail',
+                               'Sancho_InfoMailZeiterfassung',
                                $content_data_arr,
                                $to,
-                               'Zeiterfassung Erinnerung'
-                       );
+                               'Zeiterfassung Erinnerung',
+                               DEFAULT_SANCHO_HEADER_IMG,
+                               DEFAULT_SANCHO_FOOTER_IMG
+                             );
+
                }
                $end = date("h:i:sa");
                print_r($end."\n");
                print_r(($start-$end."\n"));
+
+               print_r("___________________________________________________________________");
+               print_r("\n");
+               print_r("|");
+               print_r("\n");
+               print_r("| Job Report: Infomail Zeiterfassung\n");
+               print_r("|");
+               print_r("\n");
+               print_r("| Anzahl Urlaube freizugeben: " . $cnt_sup_to_approve_vacation);
+               print_r("\n");
+               print_r("| Anzahl Monatslisten zu bestätigen: ". $cnt_sup_to_approve_timesheets);
+               print_r("\n");
+               print_r("| Anzahl Monatslisten abzuschicken: " . $cnt_ma_to_send_timesheet);
+               print_r("\n");
+               print_r("| Anzahl fehlende Zeitaufzeichnungen letzte Woche: " . $cnt_ma_to_record_times_lastweek);
+               print_r("\n");
+               print_r("|");
+               print_r("\n");
+               print_r("| Anzahl kein hinterlegtes Zeitmodell: " . $cnt_ma_without_zeitmodell);
+               print_r("\n");
+               print_r("| Anzahl gesendeter Mails Total: " . $cnt_mails_total);
+               print_r("\n");
+               print_r("|");
+               print_r("__________________________________________________________________");
+               print_r("\n");
 
                return true;
        }
@@ -170,8 +227,9 @@ class ZeiterfassungInfoJob extends JOB_Controller
                {
                        $mitarbeiter_uid = $mitarbeiter->mitarbeiter_uid;
                        $vorgesetzte [] = getData($this->MitarbeiterModel->getVorgesetzte($mitarbeiter_uid));
-               }
 
+               }
+               //var_dump($vorgesetzte); Unittest URLAUB
                foreach ($vorgesetzte as $v)
                {
                        if(!(is_null($v)))
@@ -243,6 +301,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
        {
                $mResult = $this->TimesheetModel->getUidofMissingTimesheetsLastMonth();
                $mitarbeiterList = getData($mResult);
+               $cnt_timesheetsToSend = 0;
 
                $names = array();
 
@@ -250,9 +309,14 @@ class ZeiterfassungInfoJob extends JOB_Controller
                {
                        $uid = $mitarbeiter->uid;
                        if($this->MitarbeiterModel->isMitarbeiter($uid))
-                               $names [$uid] = $uid;
-               }
+                       {
+                            $names [$uid] = $uid;
+                            $cnt_timesheetsToSend++;
+                       }
 
+
+               }
+               //var_dump($names); //unittest MONATSLISTE abschicken
                return $names;
        }
 
@@ -280,6 +344,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                                $uids[$uid] = $uid;
                        }
                }
+               //var_dump($uids); //unittest ZEITEN last week
                return $uids;
        }
 
@@ -305,8 +370,30 @@ class ZeiterfassungInfoJob extends JOB_Controller
                return $mitarbeiterUIDs;
        }
 
-       private function _filterMitarbeiter($allMitarbeiter)
+       private function _filterMitarbeiter()
        {
+         $mResult = $this->TimesheetModel->getAllMissingZeitmodelle();
+         $mitarbeiterList = getData($mResult);
+         $mitarbeiterWithoutZeitmodell = array();
+
+
+          foreach ($mitarbeiterList as $mitarbeiter)
+          {
+                  $uid = $mitarbeiter->uid;
+                  if($this->MitarbeiterModel->isMitarbeiter($uid))
+                  {
+                       $mitarbeiterWithoutZeitmodell [$uid] = $uid;
+
+                  }
+
+
+          }
+
+         // foreach ($mitarbeiter as $ma)
+         // {
+         //   print_r
+         // }
+         return $mitarbeiterWithoutZeitmodell;
        }
 
 

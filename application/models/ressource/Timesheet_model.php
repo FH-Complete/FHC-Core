@@ -64,7 +64,7 @@ class Timesheet_model extends DB_Model
 
 				if(isset($data->STATUS) && $data->STATUS=='OK')
 				{
-					//print_r($data);
+				//	print_r($data[2]);
 					return $data->RESULT;
 				}
 				else
