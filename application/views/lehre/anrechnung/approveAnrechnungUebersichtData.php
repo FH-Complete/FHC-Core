@@ -22,7 +22,10 @@ $query = '
 			FROM public.tbl_prestudentstatus press
 			WHERE press.prestudent_id = anrechnung.prestudent_id
 			AND press.studiensemester_kurzbz = anrechnung.studiensemester_kurzbz
-			AND press.status_kurzbz = \'Student\'),
+			AND press.status_kurzbz = \'Student\'
+			ORDER BY press.datum DESC
+			LIMIT 1
+			),
 			lv.bezeichnung AS "lv_bezeichnung",
 			lv.ects,
 			(person.nachname || \' \' || person.vorname) AS "student",
@@ -56,7 +59,7 @@ $query = '
 		JOIN lehre.tbl_anrechnung_anrechnungstatus USING (anrechnung_id)
 		JOIN lehre.tbl_anrechnung_begruendung AS begruendung USING (begruendung_id)
 	)
-	
+
 	SELECT anrechnungen.*,
 	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
 	CASE
