@@ -1,4 +1,4 @@
-const Navigation = {
+const CoreNavigationCmpt = {
 	data() {
 		return {
 			headerMenu: {},
@@ -60,9 +60,10 @@ const Navigation = {
 			return this.headerMenu;
 		},
 		sideMenuEntries() {
+			
 			if (this.sideMenu != null && this.addSideMenuEntries != null && Object.keys(this.addSideMenuEntries).length > 0)
 			{
-				this.sideMenu[this.addSideMenuEntries.description] = this.addSideMenuEntries;
+				this.sideMenu = this.addSideMenuEntries;
 			}
 			return this.sideMenu;
 		}
@@ -97,6 +98,12 @@ const Navigation = {
 						<a class="nav-link" v-bind:href="menu.link">
 							<i class="fa fa-fw" v-bind:class="'fa-'+ menu.icon"></i> {{ menu.description }}
 						</a>
+						<ul class="nav-link" v-if="menu.children">
+							<!-- 2nd level -->
+							<template v-for="child in menu.children">
+								<li><a class="nav-link" v-bind:href="child.link">{{ child.description }}</a></li>
+							</template>
+						</ul>
 					</li>
 				</template>
 			</ul>

@@ -5,8 +5,8 @@ const logsViewerApp = Vue.createApp({
 		};
 	},
 	components: {
-		Navigation,
-		Filter
+		CoreNavigationCmpt,
+		CoreFilterCmpt
 	},
 	methods: {
 		newSideMenuEntryHandler(payload) {

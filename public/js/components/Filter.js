@@ -1,4 +1,4 @@
-const Filter = {
+const CoreFilterCmpt = {
 	emits: ['nwNewEntry'],
 	data() {
 		return {
@@ -9,16 +9,16 @@ const Filter = {
 	},
 	created() {
 		this.fetchFilterData();
+		this.fetchFilterMenuData();
 	},
 	updated() {
-		var filterWidgetTablesorter = $("#filterTableDataset");
+		let filterCmptTablesorter = $("#filterTableDataset");
 
 		// Checks if the table contains data (rows)
-		if (filterWidgetTablesorter.find("tbody:empty").length == 0
-			&& filterWidgetTablesorter.find("tr:empty").length == 0
-			&& filterWidgetTablesorter.hasClass("table-condensed"))
+		if (filterCmptTablesorter.find("tbody:empty").length == 0
+			&& filterCmptTablesorter.find("tr:empty").length == 0)
 		{
-			filterWidgetTablesorter.tablesorter({
+			filterCmptTablesorter.tablesorter({
 				dateFormat: "ddmmyyyy",
 				widgets: ["zebra", "filter"],
 				widgetOptions: {
@@ -26,7 +26,7 @@ const Filter = {
 				}
 			});
 
-			$.tablesorter.updateAll(filterWidgetTablesorter[0].config, true, null);
+			$.tablesorter.updateAll(filterCmptTablesorter[0].config, true, null);
 		}
 	},
 	props: {
@@ -36,21 +36,9 @@ const Filter = {
 		}
 	},
 	methods: {
-		clkNewEntry() {
-			console.log('emit');
-			this.$emit(
-				'nwNewEntry',
-				{
-					"link": "#",
-                                        "description": 'New side menu ' + Math.floor(Math.random() * 10),
-                                        "icon": "dashboard",
-                                        "sort": 1
-				}
-			);
-		},
 		fetchFilterData() {
 			FHC_AjaxClient.ajaxCallGet(
-				"widgets/Filters/getFilter",
+				"components/Filter/getFilter",
 				{
 					filterUniqueId: this.getFilterUniqueIdPrefix(),
 					filterType: this.filterType, // props!!
@@ -61,7 +49,50 @@ const Filter = {
 				}
 			);
 		},
+		fetchFilterMenuData() {
+			FHC_AjaxClient.ajaxCallGet(
+				"components/Filter/generateFilterMenu",
+				{
+					filterUniqueId: this.getFilterUniqueIdPrefix(),
+					navigation_page: this.getNavigationPage()
+				},   
+				{
+					successCallback: this.setSideMenu
+				}
+			);
+		},
+		setSideMenu(data) {
+			// Set the menu
+			if (FHC_AjaxClient.hasData(data))
+			{
+				let filters = FHC_AjaxClient.getData(data).filters;
+				let personalFilters = FHC_AjaxClient.getData(data).personalFilters;
+				let filtersArray = [];
+
+				for (let filtersCount = 0; filtersCount < filters.length; filtersCount++)
+				{
+					filtersArray[filtersArray.length] = {
+						link: filters[filtersCount].link,
+                        	                description: filters[filtersCount].desc,
+                        	                sort: filtersCount
+					};
+				}
+
+				this.$emit(
+					'nwNewEntry',
+					[{
+						link: "#",
+						description: "Filters",
+						icon: "filter",
+						children: filtersArray
+					}]
+				);
+			}
+		},
 		getFilterUniqueIdPrefix() {
+			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+		},
+		getNavigationPage: function() {
 			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 		},
 		renderTableSorter(data) {
@@ -106,7 +137,6 @@ const Filter = {
 		}
 	},
 	template: `
-		<button type="button" @click="clkNewEntry">New Entry</button>
 		<table class="tablesorter table-bordered table-responsive" id="filterTableDataset">
 			<thead>
 				<tr>
