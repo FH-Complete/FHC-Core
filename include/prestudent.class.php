@@ -876,12 +876,14 @@ class prestudent extends person
 			case "reihungstestnichtangemeldet":
 				$qry.=" AND a.rolle='Interessent'
 					AND NOT EXISTS(SELECT 1 FROM public.tbl_rt_person
+					JOIN public.tbl_reihungstest ON(rt_id = reihungstest_id)
 					WHERE
 						person_id=a.person_id
 						AND studienplan_id IN(
 							SELECT studienplan_id FROM lehre.tbl_studienplan
 							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 							WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz)
+						AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 					)";
 				break;
 			case "bewerber":
