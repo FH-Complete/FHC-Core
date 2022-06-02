@@ -155,7 +155,7 @@ function searchPerson($searchItems)
 			<thead>
 				<tr>
 					<th>',$p->t('global/anrede'),'</th>
-					<th>',$p->t('global/vorname'), ' (' . $p->t('global/wahlname'), ')','</th>
+					<th>',$p->t('global/vorname'),'</th>
 					<th>',$p->t('global/nachname'),'</th>
 					<th>',$p->t('global/studiengang'),'</th>
 					<th>',$p->t('freebusy/typ'),'</th>
@@ -180,7 +180,7 @@ function searchPerson($searchItems)
 			echo '<td>',$row->anrede,'</td>';
 
 			if ($row->wahlname)
-				echo '<td>',$row->vorname, ' (' ,$row->wahlname, ')</td>';
+				echo '<td>',$row->wahlname, ' ' ,$row->vorname, '</td>';
 			else
 					echo '<td>',$row->vorname, '</td>';
 
