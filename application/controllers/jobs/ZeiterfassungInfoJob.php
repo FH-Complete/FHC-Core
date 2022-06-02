@@ -54,8 +54,6 @@ class ZeiterfassungInfoJob extends JOB_Controller
        public function sendMail()
        {
                $allMitarbeiter = $this->_getEmplyeeUids();
-               //var_dump($allMitarbeiter);
-               //$allMitarbeiter = ['ma0068','ma0080'];
 
                $vorgesetzte_to_approve_vacation = $this->_getVorgesetztetoApproveVacationList();
                $vorgesetzte_to_approve_timesheets = $this->_getVorgesetztetoApproveTimesheetList();
@@ -63,7 +61,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                $mitarbeiter_to_send_timesheet_lastmonth = $this->_getEmployeeTimesheetList();
                $mitarbeiter_to_record_times_lastweek = $this->_getEmployeeLastWeeksTimeList();
 
-               //$mitarbeiter_without_zeitmodell = $this->_filterMitarbeiter();
+               $mitarbeiter_without_zeitmodell = $this->_filterMitarbeiter();
 
                $cnt_sup_to_approve_vacation = 0;
                $cnt_sup_to_approve_timesheets = 0;
@@ -113,16 +111,15 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        {
                                $ma->EmpWeek = false;
                        }
-                       //fehlendes Zeitmodell??
-                       // if(array_key_exists($uid, $mitarbeiter_without_zeitmodell))
-                       // {
-                       //         $ma->EmpZeitMod = true;
-                       //         $cnt_ma_without_zeitmodell++;
-                       // }
-                       // else
-                       // {
-                       //         $ma->EmpZeitMod = false;
-                       // }
+                       if(array_key_exists($uid, $mitarbeiter_without_zeitmodell))
+                       {
+                               $ma->EmpZeitMod = true;
+                               $cnt_ma_without_zeitmodell++;
+                       }
+                       else
+                       {
+                               $ma->EmpZeitMod = false;
+                       }
 
                        if($ma->SupVac || $ma->SupMonth || $ma->EmpMonth || $ma->EmpWeek || $ma->EmpZeitMod)
                        {
@@ -229,7 +226,6 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        $vorgesetzte [] = getData($this->MitarbeiterModel->getVorgesetzte($mitarbeiter_uid));
 
                }
-               //var_dump($vorgesetzte); Unittest URLAUB
                foreach ($vorgesetzte as $v)
                {
                        if(!(is_null($v)))
@@ -316,7 +312,6 @@ class ZeiterfassungInfoJob extends JOB_Controller
 
 
                }
-               //var_dump($names); //unittest MONATSLISTE abschicken
                return $names;
        }
 
@@ -344,7 +339,6 @@ class ZeiterfassungInfoJob extends JOB_Controller
                                $uids[$uid] = $uid;
                        }
                }
-               //var_dump($uids); //unittest ZEITEN last week
                return $uids;
        }
 
@@ -370,31 +364,28 @@ class ZeiterfassungInfoJob extends JOB_Controller
                return $mitarbeiterUIDs;
        }
 
+
        private function _filterMitarbeiter()
        {
-         $mResult = $this->TimesheetModel->getAllMissingZeitmodelle();
-         $mitarbeiterList = getData($mResult);
-         $mitarbeiterWithoutZeitmodell = array();
+               $mitarbeiter = $this->MitarbeiterModel->getPersonal(true,null,true)->retval;
+               $mResult = $this->TimesheetModel->getAllMissingZeitmodelle();
+               $mResult = $mResult[1];
+               $mitarbeiterWithoutZeitmodell = array();
+               $uids = array();
 
+               foreach ($mResult as $ma)
+               {
+                        array_push($uids, strtolower($ma[0]));
+               }
 
-          foreach ($mitarbeiterList as $mitarbeiter)
-          {
-                  $uid = $mitarbeiter->uid;
-                  if($this->MitarbeiterModel->isMitarbeiter($uid))
-                  {
-                       $mitarbeiterWithoutZeitmodell [$uid] = $uid;
-
-                  }
-
-
-          }
-
-         // foreach ($mitarbeiter as $ma)
-         // {
-         //   print_r
-         // }
-         return $mitarbeiterWithoutZeitmodell;
+               foreach ($mitarbeiter as $ma)
+               {
+                       $uid = $ma->uid;
+                       if(!in_array($uid,$uids))
+                       {
+                               $mitarbeiterWithoutZeitmodell [$uid] = $uid;
+                       }
+               }
+               return $mitarbeiterWithoutZeitmodell;
        }
-
-
 }
