@@ -7,6 +7,7 @@
 		'tablesorter2' => true,
 		'vue3' => true,
 		'ajaxlib' => true,
+		'jqueryui1' => true,
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
 		'phrases' => array(
@@ -21,8 +22,8 @@
 
 	<div id="main">
 
-		<!-- NavigationWidget -->
-		<navigation-widget :add-side-menu-entries="appSideMenuEntries"></navigation-widget>
+		<!-- Navigation component -->
+		<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries"></core-navigation-cmpt>
 
 		<div id="content">
 			<div class="row">
@@ -33,8 +34,8 @@
 				</div>
 			</div>
 			<div>
-				<!-- FilterWidget -->
-				<filter-widget filter-type="LogsViewer" @nw-new-entry="newSideMenuEntryHandler"></filter-widget>
+				<!-- Filter component -->
+				<core-filter-cmpt filter-type="LogsViewer" @nw-new-entry="newSideMenuEntryHandler"></core-filter-cmpt>
 			</div>
 		</div>
 	</div>

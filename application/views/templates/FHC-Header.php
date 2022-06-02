@@ -67,11 +67,7 @@
 			if ($captcha3 === true) generateCSSsInclude('vendor/dapphp/securimage/securimage.css');
 
 			// Table sorter CSS
-			if ($tablesorter2 === true)
-			{
-				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
-				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
-			}
+			if ($tablesorter2 === true) generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
 
 			// Tabulator 4 CSS
 			if ($tabulator4 === true)

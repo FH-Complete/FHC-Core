@@ -77,3 +77,4 @@
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 ?>
+
