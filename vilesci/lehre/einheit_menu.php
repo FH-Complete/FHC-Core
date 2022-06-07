@@ -24,6 +24,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/gruppemanager.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
@@ -82,12 +83,13 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 		<title>Gruppe-Verwaltung</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 
 		<?php
 		include('../../include/meta/jquery.php');
 		include('../../include/meta/jquery-tablesorter.php');
 		?>
-
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script language="JavaScript" type="text/javascript">
 		function conf_del()
 		{
@@ -110,11 +112,11 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 				return false;
 			});
 
-			$( "#mailgrp" ).click(function() {
+			$( "#mailgrp" ).click(function()
+			{
 				$( "#domain_text" ).toggle();
 				$('#gesperrt').prop('disabled', function(i, v) { return !v; });
 			});
-
 		});
 		</script>
 		<style>
@@ -125,6 +127,32 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 		#newFormTable tr:hover
 		{
 			background-color: #d1d1d1;
+		}
+		col.first-table-column
+		{
+			width: 130px;
+		}
+		.manager-uid
+		{
+			border: 1px solid black;
+			padding: 2px;
+			margin-right: 2px;
+			white-space: nowrap;
+		}
+		.manager-uid-container
+		{
+			margin-top: 2px;
+			margin-bottom: 5px;
+		}
+		.manager-delete-image
+		{
+			position: relative;
+			top: 4px;
+			cursor: pointer;
+		}
+		.manager-separator
+		{
+			margin: 2px;
 		}
 		</style>
 	</head>
@@ -214,6 +242,7 @@ function printDropDown()
 	echo '<input type="submit" value="Anzeigen" />';
 	echo '</form>';
 }
+
 function doSave()
 {
 	global $rechte;
@@ -241,8 +270,10 @@ function doSave()
 			$e->new = false;
 		}
 
+		$user = get_uid();
+
 		$e->updateamum = date('Y-m-d H:i:s');
-		$e->updatevon = get_uid();
+		$e->updatevon = $user;
 		$e->bezeichnung = $_POST['bezeichnung'];
 		$e->beschreibung = $_POST['beschreibung'];
 		$e->studiengang_kz = $_POST['studiengang_kz'];
@@ -260,10 +291,55 @@ function doSave()
 
 		if(!$e->save())
 			echo $e->errormsg;
+		else // wenn Gruppe erfolgreich gespeichert, Gruppemanager speichern
+		{
+			// Gruppe gemäss Konvention in Großbuchstaben
+			$gruppe_kurzbz = mb_strtoupper($_POST['kurzbz']);
+
+			// gruppemanager immer array, leer wenn keine angegeben
+			$gruppemanager_uids = is_array($_POST['gruppemanager']) ? $_POST['gruppemanager'] : array();
+
+			// bestehende Gruppemanager laden
+			$bestehende_gruppemanager_uids = array();
+			$gruppemanager_class = new gruppemanager();
+			if ($gruppemanager_class->load_uids($gruppe_kurzbz))
+			{
+				foreach ($gruppemanager_class->uids as $uid_obj)
+				{
+					$bestehende_gruppemanager_uids[] = $uid_obj->uid;
+				}
+			}
+
+			foreach ($gruppemanager_uids as $gruppemanager_uid)
+			{
+				// wenn Gruppemanager noch nicht zugewiesen
+				if (!in_array($gruppemanager_uid, $bestehende_gruppemanager_uids))
+				{
+					// Gruppemanager speichern
+					$gruppemgr = new gruppemanager();
+					$gruppemgr->uid = $gruppemanager_uid;
+					$gruppemgr->gruppe_kurzbz = $gruppe_kurzbz;
+					$gruppemgr->insertamum = date('Y-m-d H:i:s');
+					$gruppemgr->insertvon = $user;
+
+					if(!$gruppemgr->save())
+					echo $gruppemgr->errormsg;
+				}
+			}
+
+			// noch vorhandene Gruppenmanager aus zu löschenden entfernen
+			$geloeschte_gruppemanager_uids = array_diff($bestehende_gruppemanager_uids, $gruppemanager_uids);
+
+			// Nicht mehr vorhandene Gruppemanager löschen
+			$gruppemanager_class = new gruppemanager();
+			foreach ($geloeschte_gruppemanager_uids as $geloeschte_uid)
+			{
+				if (!$gruppemanager_class->delete($geloeschte_uid, $gruppe_kurzbz))
+				echo $gruppemanager_class->errormsg;
+			}
+		}
 	}
 }
-
-
 
 function doEdit($kurzbz,$new=false)
 {
@@ -282,6 +358,9 @@ function doEdit($kurzbz,$new=false)
 	<form name="gruppe" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 		<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b><br>
 		<table id="newFormTable" border="0">
+		<colgroup>
+			<col span="1" class="first-table-column">
+		</colgroup>
 		<tbody>
 			<tr>
 				<td>Kurzbezeichnung</td>
@@ -340,6 +419,104 @@ function doEdit($kurzbz,$new=false)
 					</SELECT>
 				</td>
 				<td></td>
+			</tr>
+			<tr>
+				<td>Gruppenadministrator</td>
+				<td>
+					<input type="text" name="gruppemanager" id="gruppemanager" autofocus="autofocus" />
+					<?php
+						$managerHtml = "<span class='manager-uid'>%s - %s %s&nbsp;"
+						."<img class='manager-delete-image' src='../../skin/images/cross.png' title='Manager entfernen' alt='Manager entfernen'>"
+						."<input type='hidden' name='gruppemanager[]' value='%s'>"
+						."</span>";
+
+						$gruppemanager_class = new gruppemanager();
+						echo "<div class='manager-uid-container'>";
+						// alle Administratoren der Gruppe anzeigen
+						if ($gruppemanager_class->load_uids($e->gruppe_kurzbz))
+						{
+							$count = 1;
+							foreach ($gruppemanager_class->uids as $uid_obj)
+							{
+								$ben = new benutzer($uid_obj->uid);
+								// Vorlagestring durch Werte ersetzen und ausgeben
+								echo sprintf($managerHtml, $uid_obj->uid, $ben->vorname, $ben->nachname, $uid_obj->uid);
+								if ($count % 5 == 0) // neue Zeile nach 5 Elementen
+									echo "<p class='manager-separator'></p>";
+								$count++;
+							}
+						}
+						echo "</div>";
+					?>
+					<script type="text/javascript">
+					$(document).ready(function()
+					{
+						// Löschen von Gruppemanager html bei Klick
+						setManagerDeleteEvent();
+
+						// autocomplete für user input Feld
+						$("#gruppemanager").autocomplete({
+							source: "einheit_autocomplete.php?work=searchUser",
+							minLength:3,
+							response: function(event, ui)
+							{
+								// Value und Label fuer die Anzeige setzen
+								for(i in ui.content)
+								{
+									ui.content[i].value=ui.content[i].uid;
+									ui.content[i].label=ui.content[i].uid+" - "+ui.content[i].vorname+" "+ui.content[i].nachname;
+								}
+							},
+							// bei Auswahl einer uid
+							select: function(event, ui)
+							{
+								// Administrator html holen
+								var managerHtml = "<?php echo $managerHtml ?>";
+								var managerHtmlValues = [ui.item.uid, ui.item.vorname, ui.item.nachname, ui.item.uid];
+
+								for (var i = 0; i < managerHtmlValues.length; i++)
+								{
+									managerHtml = managerHtml.replace(/%s/, managerHtmlValues[i]);
+								}
+
+								// Administrator unterhalb des Inputfeldes einfügen
+								if (!$("input[name='gruppemanager[]'][value='"+ui.item.uid+"']").length)
+								{
+									var numberManagers = $("input[name='gruppemanager[]']").length;
+
+									// nach 5 Managern Zeile einfügen
+									if (numberManagers % 5 == 0)
+									{
+										$(".manager-uid-container").prepend(
+											"<p class='manager-separator'></p>"
+										);
+									}
+
+									$(".manager-uid-container").prepend(
+										managerHtml
+									);
+
+									// Loeschen Event für neuen Administrator setzen
+									setManagerDeleteEvent();
+								}
+							}
+						});
+						function setManagerDeleteEvent()
+						{
+							var deleteImages = $('.manager-delete-image');
+							deleteImages.off("click");
+							deleteImages.click(function()
+							{
+								// closest manager uid parent
+								$(this).closest('.manager-uid').remove();
+							});
+						}
+					});
+
+					$("#gruppemanager").focus();
+					</script>
+				</td>
+				<td>Administratoren, die Benutzer zur Gruppe entfernen/hinzufügen können.</td>
 			</tr>
 			<tr>
 				<td>Semester</td>
