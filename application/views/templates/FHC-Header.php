@@ -59,8 +59,8 @@
 			// SB Admin 2 template CSS
 			if ($sbadmintemplate3 === true)
 			{
-				generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.css');
-				generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
+				generateCSSsInclude('vendor/blackrockdigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.css');
+				generateCSSsInclude('vendor/blackrockdigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
 			}
 
 			// Securimage CSS

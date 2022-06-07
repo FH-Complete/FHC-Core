@@ -41,12 +41,12 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 <?php if($jqueryV1) : ?>
-	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jqueryV1/jquery-1.12.4.min.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jquery1/jquery-1.12.4.min.js'); ?>"></script>
 	<script type="text/javascript" src="<?php echo base_url('vendor/christianbach/tablesorter/jquery.tablesorter.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($jqueryV2) : ?>
-	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jqueryV2/jquery-2.2.4.min.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jquery2/jquery-2.2.4.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($jqueryui) : ?>
@@ -117,3 +117,4 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 </head>
+

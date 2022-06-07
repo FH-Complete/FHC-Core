@@ -71,10 +71,10 @@
 	// SB Admin 2 template JS
 	if ($sbadmintemplate3 === true)
 	{
-		generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
-		generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
+		generateJSsInclude('vendor/blackrockdigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
+		generateJSsInclude('vendor/blackrockdigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
 		generateBackwardCompatibleJSMsIe('vendor/afarkas/html5shiv/dist/html5shiv.min.js');
-		generateBackwardCompatibleJSMsIe('vendor/scottjehl/Respond/dest/respond.min.js');
+		generateBackwardCompatibleJSMsIe('vendor/scottjehl/respond/dest/respond.min.js');
 	}
 
 	// Table sorter JS
