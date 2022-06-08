@@ -1082,7 +1082,28 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
-	)
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'gruppenadministration',
+		'filter_kurzbz' => 'Gruppenadministration',
+		'description' => '{Meine Gruppen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Gruppenadministration",
+				"columns": [
+					{"name": "gruppe_kurzbz"},
+					{"name": "gruppe_bezeichnung"},
+					{"name": "gruppe_beschreibung"},
+					{"name": "studiengang_kurzbz"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
 );
 
 // Loop through the filters array
