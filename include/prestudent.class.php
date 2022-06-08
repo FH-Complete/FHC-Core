@@ -587,7 +587,11 @@ class prestudent extends person
 				)
 
 			AND
-				status_kurzbz = 'Interessent'";
+				status_kurzbz = 'Interessent'
+			AND 
+				NOT EXISTS (
+					SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Abgewiesener'
+				)";
 
 			if (!is_null($typ) && is_string($typ))
 			{
