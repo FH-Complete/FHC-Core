@@ -18,12 +18,14 @@ class Gruppenadministration extends Auth_Controller
 			array(
 				'index' => 'admin:r',
 				'showBenutzergruppe' => 'admin:r',
-				'saveBPK' => 'admin:rw',
+				'getAllBenutzer' => 'admin:r',
+				'addBenutzer' => 'admin:rw',
 			)
 		);
 
 		// Loads models
-		$this->load->model('organisation/benutzergruppe_model', 'BenutzergruppeModel');
+		$this->load->model('person/benutzer_model', 'BenutzerModel');
+		$this->load->model('person/benutzergruppe_model', 'BenutzergruppeModel');
 
 		$this->load->library('WidgetLib');
 		$this->loadPhrases(
@@ -69,7 +71,12 @@ class Gruppenadministration extends Auth_Controller
 		$this->BenutzergruppeModel->addSelect('uid, vorname, nachname');
 		$this->BenutzergruppeModel->addJoin('public.tbl_benutzer', 'uid');
 		$this->BenutzergruppeModel->addJoin('public.tbl_person', 'person_id');
-		$benutzer = $this->BenutzergruppeModel->loadWhere(array('gruppe_kurzbz' => $gruppe_kurzbz));
+		$benutzerRes = $this->BenutzergruppeModel->loadWhere(array('gruppe_kurzbz' => $gruppe_kurzbz));
+
+		if (isError($benutzerRes))
+			show_error(getError($benutzerRes));
+
+		$benutzer = hasData($benutzerRes) ? getData($benutzerRes) : array();
 
 		$this->load->view(
 			'organisation/gruppenadministration/benutzergruppe.php',
@@ -78,27 +85,41 @@ class Gruppenadministration extends Auth_Controller
 	}
 
 	/**
-	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master
+	* Gets all Benutzer for assignment to Gruppe
+	*/
+	public function getAllBenutzer()
+	{
+		$this->BenutzerModel->addSelect('uid, vorname, nachname');
+		$this->BenutzerModel->addJoin('public.tbl_person', 'person_id');
+		$benutzerRes = $this->BenutzerModel->loadWhere(
+			array('tbl_benutzer.aktiv' => true)
+		);
+		$this->outputJson($benutzerRes);
+	}
+
+	/**
+	 * Adds a Benutzer to Gruppe
 	 */
-	// public function saveBPK()
-	// {
-	// 	$person_id = $this->input->post('person_id');
-	// 	$bpk = $this->input->post('bpk');
-	//
-	// 	if (isEmptyString($person_id))
-	// 		$result = error('PersonID missing');
-	// 	else
-	// 	{
-	// 		$result = $this->PersonModel->update(
-	// 			$person_id,
-	// 			array(
-	// 				'bpk' => $bpk,
-	// 				'updateamum' => date('Y-m-d H:i:s')
-	// 			)
-	// 		);
-	// 		redirect('person/BPKWartung/index');
-	// 	}
-	// }
+	public function addBenutzer()
+	{
+		$uid = $this->input->post('uid');
+		$gruppe_kurzbz = $this->input->post('gruppe_kurzbz');
+
+		if (isEmptyString($uid))
+			$result = error('Uid missing');
+		else
+		{
+			$result = $this->BenutzergruppeModel->insert(
+				array(
+					'uid' => $uid,
+					'gruppe_kurzbz' => $gruppe_kurzbz,
+					'insertamum' => date('Y-m-d H:i:s')
+				)
+			);
+		}
+
+		$this->outputJson($result);
+	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
