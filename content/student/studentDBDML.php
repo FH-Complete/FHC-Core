@@ -573,7 +573,7 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Geburtsdatum ist nicht korrekt.';
 				$error = true;
-			}			
+			}
 
 			if(!$error)
 			{
@@ -818,12 +818,12 @@ if(!$error)
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
-				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt']; 									   
+				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt'];
 				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
-				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];										  
+				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];
 				$prestudent->zgvdoktor_code = $_POST['zgvdoktor_code'];
 				$prestudent->zgvdoktorort = $_POST['zgvdoktorort'];
 				$prestudent->zgvdoktordatum = $_POST['zgvdoktordatum'];
@@ -1195,7 +1195,7 @@ if(!$error)
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
 		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
 		{
-			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid'))
+			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid'))
 			{
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
@@ -1211,7 +1211,7 @@ if(!$error)
 						if($row->anzahl<=1)
 						{
 							$deletePrestudent = true;
-							if (!$rechte->isBerechtigt('admin', null, 'suid'))
+							if (!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid'))
 							{
 								$return = false;
 								$errormsg = 'Die letzte Rolle kann nur durch den Administrator geloescht werden';
@@ -2575,7 +2575,7 @@ if(!$error)
 			{
 				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
 					continue;
-									 
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2588,7 +2588,7 @@ if(!$error)
 					$dok->new = true;
 					if ($dokument_kurzbz === 'Sonst')
 						$sonst++;
-				  
+
 
 					if(!$dok->save())
 					{
