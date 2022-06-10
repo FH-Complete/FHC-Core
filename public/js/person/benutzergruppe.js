@@ -3,10 +3,66 @@
  */
 
 var Benutzergruppe = {
+	getBenutzer: function(gruppe_kurzbz)
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			'person/gruppenadministration/getBenutzer',
+			{
+				gruppe_kurzbz: gruppe_kurzbz
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						// save loaded data
+						let benutzerData = FHC_AjaxClient.getData(data);
+
+						console.log(benutzerData);
+
+						let benutzerTable = $("#benutzer-table tbody");
+
+						benutzerTable.empty();
+
+						// fill table with Benutzer of Gruppe
+						for (let i = 0; i < benutzerData.length; i++)
+						{
+							let benutzer = benutzerData[i];
+							benutzerTable.append(
+								"<tr>"+
+									"<td>"+benutzer.uid+"</td>"+
+									"<td>"+benutzer.vorname+"</td>"+
+									"<td>"+benutzer.nachname+"</td>"+
+									"<td>"+
+										"<button class='btn btn-default benutzerLoeschen' id='"+benutzer.uid+"_benutzerLoeschen'>"+
+										FHC_PhrasesLib.t('ui', 'loeschen')+
+										"</button>"+
+									"</td>"+
+								"</tr>"
+							);
+
+							// add delete event to button
+							$("#"+benutzer.uid+"_benutzerLoeschen").click(
+								function() {
+									Benutzergruppe.removeBenutzer(benutzer.uid, gruppe_kurzbz);
+								}
+							)
+						}
+
+						Tablesort.addTablesorter(
+							"benutzer-table", [[0,0], [2,0]], ["filter"], 2
+						)
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
 	getAllBenutzer: function()
 	{
 		FHC_AjaxClient.ajaxCallGet(
-			'organisation/Gruppenadministration/getAllBenutzer',
+			'person/gruppenadministration/getAllBenutzer',
 			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -62,7 +118,7 @@ var Benutzergruppe = {
 	addBenutzer: function(uid, gruppe_kurzbz)
 	{
 		FHC_AjaxClient.ajaxCallPost(
-			'organisation/Gruppenadministration/addBenutzer',
+			'person/gruppenadministration/addBenutzer',
 			{
 				uid: uid,
 				gruppe_kurzbz: gruppe_kurzbz
@@ -72,7 +128,31 @@ var Benutzergruppe = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						let addBenutzerRes = FHC_AjaxClient.getData(data);
-						console.log(addBenutzerRes);
+
+						Benutzergruppe.getBenutzer(gruppe_kurzbz);
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
+	removeBenutzer: function(uid, gruppe_kurzbz)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			'person/gruppenadministration/removeBenutzer',
+			{
+				uid: uid,
+				gruppe_kurzbz: gruppe_kurzbz
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						let addBenutzerRes = FHC_AjaxClient.getData(data);
+
+						Benutzergruppe.getBenutzer(gruppe_kurzbz);
 					}
 				},
 				errorCallback: function(jqXHR, textStatus, errorThrown) {
@@ -105,16 +185,13 @@ var Benutzergruppe = {
  * When JQuery is up
  */
 $(document).ready(function() {
-
+	let gruppe_kurzbz = $("#gruppe_kurzbz").val();
 	Benutzergruppe.getAllBenutzer();
-	Tablesort.addTablesorter(
-		"benutzer-table", [[0,0], [2,0]], ['filter'], 2
-	)
+	Benutzergruppe.getBenutzer(gruppe_kurzbz);
 
 	$("#teilnehmerHinzufuegen").click(
 		function(){
 			let uid = $("#teilnehmer_uid").val();
-			let gruppe_kurzbz = $("#gruppe_kurzbz").val();
 			Benutzergruppe.addBenutzer(uid, gruppe_kurzbz);
 		}
 	);

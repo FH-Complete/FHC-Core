@@ -14,10 +14,10 @@
 			'filterwidget' => true,
 			'navigationwidget' => true,
 			'phrases' => array(
-				'ui' => array('bitteEintragWaehlen')
+				'ui'
 			),
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
-			'customJSs' => array('public/js/bootstrapper.js', 'public/js/tablesort/tablesort.js', 'public/js/organisation/benutzergruppe.js')
+			'customJSs' => array('public/js/bootstrapper.js', 'public/js/tablesort/tablesort.js', 'public/js/person/benutzergruppe.js')
 		)
 	);
 ?>
@@ -46,6 +46,7 @@
 								<input type="hidden" name="gruppe_kurzbz" id="gruppe_kurzbz" value="<?php echo $gruppe_kurzbz ?>">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" id="teilnehmerHinzufuegen">
+										<?php echo $this->p->t('gruppenadministration', 'benutzer') ?>&nbsp;
 										<?php echo $this->p->t('ui', 'hinzufuegen') ?>
 									</button>
 								</span>
@@ -63,18 +64,18 @@
 								<th><?php echo ucfirst($this->p->t('ui', 'loeschen')); ?></th>
 							</thead>
 							<tbody>
-							<?php foreach ($benutzer as $ben): ?>
+							<!-- <php foreach ($benutzer as $ben): ?>
 								<tr>
 									<td><?php echo $ben->uid; ?></td>
 									<td><?php echo $ben->vorname; ?></td>
 									<td><?php echo $ben->nachname; ?></td>
 									<td>
 										<button class="btn btn-default benutzerLoeschen" id="benutzerLoeschen">
-										<?php echo ucfirst($this->p->t('ui', 'loeschen')); ?>
+										<php echo ucfirst($this->p->t('ui', 'loeschen')); >
 										</button>
 									</td>
 								</tr>
-							<?php endforeach; ?>
+							<php endforeach; ?> -->
 							</tbody>
 						</table>
 					</div>

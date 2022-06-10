@@ -18,8 +18,10 @@ class Gruppenadministration extends Auth_Controller
 			array(
 				'index' => 'admin:r',
 				'showBenutzergruppe' => 'admin:r',
+				'getBenutzer' => 'admin:r',
 				'getAllBenutzer' => 'admin:r',
 				'addBenutzer' => 'admin:rw',
+				'removeBenutzer' => 'admin:rw'
 			)
 		);
 
@@ -53,7 +55,7 @@ class Gruppenadministration extends Auth_Controller
 		//$this->_setNavigationMenuIndex(); // define the navigation menu for this page
 
 		$this->load->view(
-			'organisation/gruppenadministration/gruppenadministration.php',
+			'person/gruppenadministration/gruppenadministration.php',
 			array('uid' => $this->_uid)
 		);
 	}
@@ -79,10 +81,26 @@ class Gruppenadministration extends Auth_Controller
 		$benutzer = hasData($benutzerRes) ? getData($benutzerRes) : array();
 
 		$this->load->view(
-			'organisation/gruppenadministration/benutzergruppe.php',
+			'person/gruppenadministration/benutzergruppe.php',
 			array('gruppe_kurzbz' => $gruppe_kurzbz, 'benutzer' => $benutzer)
 		);
 	}
+
+	/**
+	* Gets Benutzer assigned to a Gruppe
+	*/
+	public function getBenutzer()
+	{
+		$gruppe_kurzbz = $this->input->get('gruppe_kurzbz');
+
+		$this->BenutzergruppeModel->addSelect('uid, vorname, nachname');
+		$this->BenutzergruppeModel->addJoin('public.tbl_benutzer', 'uid');
+		$this->BenutzergruppeModel->addJoin('public.tbl_person', 'person_id');
+		$benutzerRes = $this->BenutzergruppeModel->loadWhere(array('gruppe_kurzbz' => $gruppe_kurzbz));
+
+		$this->outputJson($benutzerRes);
+	}
+
 
 	/**
 	* Gets all Benutzer for assignment to Gruppe
@@ -109,11 +127,50 @@ class Gruppenadministration extends Auth_Controller
 			$result = error('Uid missing');
 		else
 		{
+			$benutzerExistsRes = $this->BenutzergruppeModel->loadWhere(
+				array(
+					'uid' => $uid,
+					'gruppe_kurzbz' => $gruppe_kurzbz
+				)
+			);
+
+			if (isError($benutzerExistsRes))
+			{
+				$this->outputJsonError(getError($benutzerExistsRes));
+				return;
+			}
+
+			if (hasData($benutzerExistsRes))
+			{
+				$this->outputJsonError(getError($this->p->t('gruppenadministration', 'benutzerZugewiesen')));
+				return;
+			}
+
 			$result = $this->BenutzergruppeModel->insert(
 				array(
 					'uid' => $uid,
 					'gruppe_kurzbz' => $gruppe_kurzbz,
 					'insertamum' => date('Y-m-d H:i:s')
+				)
+			);
+		}
+
+		$this->outputJson($result);
+	}
+
+	public function removeBenutzer()
+	{
+		$uid = $this->input->post('uid');
+		$gruppe_kurzbz = $this->input->post('gruppe_kurzbz');
+
+		if (isEmptyString($uid))
+			$result = error('Uid missing');
+		else
+		{
+			$result = $this->BenutzergruppeModel->delete(
+				array(
+					'uid' => $uid,
+					'gruppe_kurzbz' => $gruppe_kurzbz
 				)
 			);
 		}
@@ -129,9 +186,9 @@ class Gruppenadministration extends Auth_Controller
 	 */
 	private function _setNavigationMenuShowDetails()
 	{
-		$this->load->library('NavigationLib', array('navigation_page' => 'organisation/Gruppenadministration/showBenutzergruppe'));
+		$this->load->library('NavigationLib', array('navigation_page' => 'person/Gruppenadministration/showBenutzergruppe'));
 
-		$link = site_url('organisation/Gruppenadministration');
+		$link = site_url('person/Gruppenadministration');
 
 		$this->navigationlib->setSessionMenu(
 			array(
@@ -156,7 +213,7 @@ class Gruppenadministration extends Auth_Controller
 	 */
 	// private function _setNavigationMenuIndex()
 	// {
-	// 	$this->load->library('NavigationLib', array('navigation_page' => 'organisation/Gruppenadministration/index'));
+	// 	$this->load->library('NavigationLib', array('navigation_page' => 'person/gruppenadministration/index'));
 	//
 	// 	$link = site_url();
 	//

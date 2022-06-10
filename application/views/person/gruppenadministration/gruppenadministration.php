@@ -36,7 +36,7 @@
 					</div>
 				</div>
 				<div>
-					<?php $this->load->view('organisation/gruppenadministration/gruppenadministrationData.php'); ?>
+					<?php $this->load->view('person/gruppenadministration/gruppenadministrationData.php'); ?>
 				</div>
 			</div>
 		</div>

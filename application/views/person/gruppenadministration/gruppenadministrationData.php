@@ -24,7 +24,7 @@
 			/* NOTE: Dont use $this here for PHP Version compatibility */
 			$datasetRaw->{'Teilnehmer'} = sprintf(
 				'<a href="%s?gruppe_kurzbz=%s&origin_page=%s&fhc_controller_id=%s">'.$this->p->t('gruppenadministration', 'zuweisenlöschen').'</a>',
-				site_url('organisation/Gruppenadministration/showBenutzergruppe'),
+				site_url('person/Gruppenadministration/showBenutzergruppe'),
 				$datasetRaw->{'gruppe_kurzbz'},
 				'index',
 				(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
