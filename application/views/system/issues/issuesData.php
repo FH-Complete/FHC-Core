@@ -1,7 +1,9 @@
 <?php
 
 $PERSON_ID = getAuthPersonId();
+// all oe kurzbz for which logged user has a funktion
 $ALL_FUNKTIONEN_OE_KURZBZ = "('" . implode("','", array_keys($all_funktionen_oe_kurzbz)) . "')";
+// all oes for which logged user has issues permissions, including permissions for "special" issue funktion
 $ALL_OE_KURZBZ_BERECHTIGT = "('" . implode("','", $all_oe_kurzbz_berechtigt) . "')";
 $RELEVANT_PRESTUDENT_STATUS = "('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')";
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
@@ -33,35 +35,50 @@ $query = "WITH zustaendigkeiten AS (
 		)";
 
 $query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
-       		inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\", 
-       		ftyp.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlertyp\", stat.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlerstatus\",
-       		verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\", fr.app AS \"Applikation\",
-       		fr.fehlertyp_kurzbz AS \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
-       		pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\", 
-                         CASE
-                             WHEN
-                             	EXISTS(SELECT 1
-                                        FROM zustaendigkeiten
-                                        WHERE fehlercode = iss.fehlercode
-                                          AND zustaendig = TRUE) /* If Zuständigkeit is defined for the oe/person, zustaendig. */
-                                 THEN 'Ja'
-							 WHEN
-                                 EXISTS(SELECT 1
-                                        FROM zustaendigkeiten
-                                        WHERE fehlercode = iss.fehlercode
-                                          AND zustaendig = FALSE) /* If Zuständigkeit is defined for different oe/person, not zustaendig. */
-                                 THEN 'Nein'
-                             ELSE 'Ja' /* If no Zuständigkeit defined, zustaendig by default. */
-                         END AS \"Hauptzuständig\"
-       			FROM system.tbl_issue iss
-				JOIN system.tbl_fehler fr USING (fehlercode)
-				JOIN system.tbl_fehlertyp ftyp USING (fehlertyp_kurzbz)
-				JOIN system.tbl_issue_status stat USING (status_kurzbz)
-				LEFT JOIN public.tbl_person pers ON iss.person_id = pers.person_id
-		 		WHERE EXISTS ( /* if oe or person is specified in fehler_zustaendigkeiten */
-				    SELECT 1 FROM zustaendigkeiten
-				    WHERE fehlercode = iss.fehlercode
-				    AND zustaendig = TRUE)";
+			inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\", 
+			ftyp.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlertyp\", stat.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlerstatus\",
+			verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\", fr.app AS \"Applikation\",
+			fr.fehlertyp_kurzbz AS \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
+			pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\", 
+			CASE
+				WHEN
+					EXISTS(SELECT 1
+							FROM zustaendigkeiten
+							WHERE fehlercode = iss.fehlercode
+							AND zustaendig = TRUE) /* If Zuständigkeit is defined for the oe/person, zustaendig. */
+					THEN 'Ja'
+				WHEN
+					EXISTS(SELECT 1
+							FROM zustaendigkeiten
+							WHERE fehlercode = iss.fehlercode
+							AND zustaendig = FALSE) /* If Zuständigkeit is defined for different oe/person, not zustaendig. */
+					THEN 'Nein'
+				ELSE 'Ja' /* If no Zuständigkeit defined, zustaendig by default. */
+			END AS \"Hauptzuständig\",
+			(
+				SELECT string_agg(vorname || ' ' || nachname, ' | ' ORDER BY vorname, nachname)
+				FROM system.tbl_fehler_zustaendigkeiten
+				JOIN public.tbl_person USING (person_id)
+				WHERE fehlercode = fr.fehlercode
+				GROUP BY fehlercode	
+			) AS \"Person Zuständigkeiten\",
+			(
+				SELECT string_agg(organisationseinheittyp_kurzbz || ' ' || oe.bezeichnung ||  COALESCE(' - ' || fu.beschreibung, ''), ' | ' ORDER BY bezeichnung, oe_kurzbz)
+				FROM system.tbl_fehler_zustaendigkeiten
+				LEFT JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
+				LEFT JOIN public.tbl_funktion fu USING (funktion_kurzbz)
+				WHERE fehlercode = fr.fehlercode
+				GROUP BY fehlercode	
+			) AS \"Organisationseinheit Zuständigkeiten\"
+			FROM system.tbl_issue iss
+			JOIN system.tbl_fehler fr USING (fehlercode)
+			JOIN system.tbl_fehlertyp ftyp USING (fehlertyp_kurzbz)
+			JOIN system.tbl_issue_status stat USING (status_kurzbz)
+			LEFT JOIN public.tbl_person pers ON iss.person_id = pers.person_id
+			WHERE EXISTS ( /* if oe or person is specified in fehler_zustaendigkeiten */
+				SELECT 1 FROM zustaendigkeiten
+				WHERE fehlercode = iss.fehlercode
+				AND zustaendig = TRUE)";
 
 // show issue if it is assigend to oe of logged in user or to student of oe of logged in user
 if (!isEmptyArray($all_oe_kurzbz_berechtigt))
@@ -111,7 +128,7 @@ $filterWidgetArray = array(
 	'datasetName' => 'issues',
 	'filter_id' => $this->input->get('filter_id'),
     'tableUniqueId' => 'issues',
-    'requiredPermissions' => 'admin',
+    'requiredPermissions' => 'system/issues_verwalten',
     'datasetRepresentation' => 'tablesorter',
 	'checkboxes' => 'issue_id',
     'columnsAliases' => array(
@@ -132,7 +149,9 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('fehlermonitoring', 'statuscode')),
 		ucfirst($this->p->t('person', 'vorname')),
 		ucfirst($this->p->t('person', 'nachname')),
-		ucfirst($this->p->t('fehlermonitoring', 'hauptzustaendig'))
+		ucfirst($this->p->t('fehlermonitoring', 'hauptzustaendig')),
+		ucfirst($this->p->t('fehlermonitoring', 'zustaendigePersonen')),
+		ucfirst($this->p->t('fehlermonitoring', 'zustaendigeOrganisationseinheiten'))
     ),
 	'formatRow' => function($datasetRaw) {
 
@@ -170,6 +189,18 @@ $filterWidgetArray = array(
 		{
 			$datasetRaw->{'Verarbeitet von'} = '-';
 		}
+
+		if ($datasetRaw->{'Person Zuständigkeiten'} == null)
+		{
+			$datasetRaw->{'Person Zuständigkeiten'} = '-';
+		}
+
+		if ($datasetRaw->{'Organisationseinheit Zuständigkeiten'} == null)
+		{
+			$datasetRaw->{'Organisationseinheit Zuständigkeiten'} = '-';
+		}
+
+
 
 		return $datasetRaw;
 	},

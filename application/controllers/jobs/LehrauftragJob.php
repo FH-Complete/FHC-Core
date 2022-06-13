@@ -359,7 +359,7 @@ class LehrauftragJob extends JOB_Controller
 			for ($i = 0; $i < $data_len; $i++)
 			{
 				// Get all users entitled by organisational unit
-				$result = $this->BenutzerrolleModel->getBenutzerByBerechtigung(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, $data[$i]['oe_kurzbz']);
+				$result = $this->BenutzerrolleModel->getBenutzerByBerechtigung(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, $data[$i]['oe_kurzbz'], 'suid');
 
 				if ($berechtigung_arr = getData($result))
 				{

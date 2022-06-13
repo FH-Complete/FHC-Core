@@ -6126,6 +6126,28 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservic
 	}
 }
 
+// ADD COLUMN insertamum to system.tbl_fehler_zustaendigkeiten
+if(!@$db->db_query("SELECT insertamum FROM system.tbl_fehler_zustaendigkeiten LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD COLUMN insertamum timestamp DEFAULT now();";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte insertamum in system.tbl_fehler_zustaendigkeiten hinzugefügt';
+}
+
+// ADD COLUMN insertvon to system.tbl_fehler_zustaendigkeiten
+if(!@$db->db_query("SELECT insertvon FROM system.tbl_fehler_zustaendigkeiten LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD COLUMN insertvon varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte insertvon in system.tbl_fehler_zustaendigkeiten hinzugefügt';
+}
+
 // Insert postive Zeitsperre 'Zeitverfuegbarkeit' to tbl_zeitsperretyp
 if($result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitsperretyp WHERE zeitsperretyp_kurzbz = 'ZVerfueg';"))
 {
@@ -6151,6 +6173,20 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
 			echo ' system.tbl_berechtigung: Added permission for lehre/zeitverfuegbarkeit<br>';
+	}
+}
+
+// Add permission for avoiding checks when saving prestudentstatus
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/keine_studstatuspruefung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/keine_studstatuspruefung', 'Ermöglicht Umgehen der Checks beim Speichern der Presstudentstatus');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'system.tbl_berechtigung: Added permission for student/keine_studstatuspruefung<br>';
 	}
 }
 
@@ -6422,7 +6458,7 @@ $tabellen=array(
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
 	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app"),
 	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
-	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz"),
+	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz", "insertamum", "insertvon"),
 	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","behebung_parameter","insertvon","insertamum","updatevon","updateamum"),
 	"system.tbl_issue_status" => array("status_kurzbz","bezeichnung_mehrsprachig"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
