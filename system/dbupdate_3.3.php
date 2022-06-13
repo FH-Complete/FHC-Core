@@ -6176,6 +6176,20 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Add permission for managing user groups
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/gruppenmanager';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/gruppenmanager', 'Manager einer Gruppe werden und die Gruppe verwalten');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/gruppenmanager<br>';
+	}
+}
+
 // Creates table public.tbl_gruppe_manager if it doesn't exist and grants privileges
 if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1'))
 {

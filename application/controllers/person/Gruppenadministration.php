@@ -16,12 +16,12 @@ class Gruppenadministration extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index' => 'admin:r',
-				'showBenutzergruppe' => 'admin:r',
-				'getBenutzer' => 'admin:r',
-				'getAllBenutzer' => 'admin:r',
-				'addBenutzer' => 'admin:rw',
-				'removeBenutzer' => 'admin:rw'
+				'index' => 'lehre/gruppenmanager:r',
+				'showBenutzergruppe' => 'lehre/gruppenmanager:r',
+				'getBenutzer' => 'lehre/gruppenmanager:r',
+				'getAllBenutzer' => 'lehre/gruppenmanager:r',
+				'addBenutzer' => 'lehre/gruppenmanager:rw',
+				'removeBenutzer' => 'lehre/gruppenmanager:rw'
 			)
 		);
 
@@ -70,19 +70,19 @@ class Gruppenadministration extends Auth_Controller
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
 
-		$this->BenutzergruppeModel->addSelect('uid, vorname, nachname');
-		$this->BenutzergruppeModel->addJoin('public.tbl_benutzer', 'uid');
-		$this->BenutzergruppeModel->addJoin('public.tbl_person', 'person_id');
-		$benutzerRes = $this->BenutzergruppeModel->loadWhere(array('gruppe_kurzbz' => $gruppe_kurzbz));
-
-		if (isError($benutzerRes))
-			show_error(getError($benutzerRes));
-
-		$benutzer = hasData($benutzerRes) ? getData($benutzerRes) : array();
+		// $this->BenutzergruppeModel->addSelect('uid, vorname, nachname');
+		// $this->BenutzergruppeModel->addJoin('public.tbl_benutzer', 'uid');
+		// $this->BenutzergruppeModel->addJoin('public.tbl_person', 'person_id');
+		// $benutzerRes = $this->BenutzergruppeModel->loadWhere(array('gruppe_kurzbz' => $gruppe_kurzbz));
+		//
+		// if (isError($benutzerRes))
+		// 	show_error(getError($benutzerRes));
+		//
+		// $benutzer = hasData($benutzerRes) ? getData($benutzerRes) : array();
 
 		$this->load->view(
 			'person/gruppenadministration/benutzergruppe.php',
-			array('gruppe_kurzbz' => $gruppe_kurzbz, 'benutzer' => $benutzer)
+			array('gruppe_kurzbz' => $gruppe_kurzbz)
 		);
 	}
 
@@ -93,8 +93,8 @@ class Gruppenadministration extends Auth_Controller
 	{
 		$gruppe_kurzbz = $this->input->get('gruppe_kurzbz');
 
-		$this->BenutzergruppeModel->addSelect('uid, vorname, nachname');
-		$this->BenutzergruppeModel->addJoin('public.tbl_benutzer', 'uid');
+		$this->BenutzergruppeModel->addSelect('uid, vorname, nachname, ben.aktiv');
+		$this->BenutzergruppeModel->addJoin('public.tbl_benutzer ben', 'uid');
 		$this->BenutzergruppeModel->addJoin('public.tbl_person', 'person_id');
 		$benutzerRes = $this->BenutzergruppeModel->loadWhere(array('gruppe_kurzbz' => $gruppe_kurzbz));
 

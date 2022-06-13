@@ -61,6 +61,7 @@
 								<th>Uid</th>
 								<th><?php echo ucfirst($this->p->t('global', 'vorname')); ?></th>
 								<th><?php echo ucfirst($this->p->t('global', 'nachname')); ?></th>
+								<th><?php echo ucfirst($this->p->t('global', 'aktiv')); ?></th>
 								<th><?php echo ucfirst($this->p->t('ui', 'entfernen')); ?></th>
 							</thead>
 							<tbody>

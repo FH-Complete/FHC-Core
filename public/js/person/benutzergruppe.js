@@ -18,9 +18,6 @@ var Benutzergruppe = {
 					{
 						// save loaded data
 						let benutzerData = FHC_AjaxClient.getData(data);
-
-						console.log(benutzerData);
-
 						let benutzerTable = $("#benutzer-table tbody");
 
 						benutzerTable.empty();
@@ -29,11 +26,13 @@ var Benutzergruppe = {
 						for (let i = 0; i < benutzerData.length; i++)
 						{
 							let benutzer = benutzerData[i];
+							console.log(benutzer.aktiv);
 							benutzerTable.append(
 								"<tr>"+
 									"<td>"+benutzer.uid+"</td>"+
 									"<td>"+benutzer.vorname+"</td>"+
 									"<td>"+benutzer.nachname+"</td>"+
+									"<td>"+(benutzer.aktiv === true ? "Ja" : "Nein")+"</td>"+
 									"<td>"+
 										"<button class='btn btn-default benutzerLoeschen' id='"+benutzer.uid+"_benutzerLoeschen'>"+
 										FHC_PhrasesLib.t('ui', 'entfernen')+
@@ -51,7 +50,7 @@ var Benutzergruppe = {
 						}
 
 						Tablesort.addTablesorter(
-							"benutzer-table", [[0,0], [2,0]], ["filter", "zebra"], 2, {headers: {3: {filter: false}}}
+							"benutzer-table", [[0,0], [2,0]], ["filter", "zebra"], 2, {headers: {4: {filter: false}}}
 						)
 					}
 				},
