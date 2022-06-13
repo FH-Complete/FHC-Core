@@ -142,7 +142,7 @@ class Gruppenadministration extends Auth_Controller
 
 			if (hasData($benutzerExistsRes))
 			{
-				$this->outputJsonError(getError($this->p->t('gruppenadministration', 'benutzerZugewiesen')));
+				$this->outputJsonError($this->p->t('gruppenadministration', 'benutzerSchonZugewiesen'));
 				return;
 			}
 

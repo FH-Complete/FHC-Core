@@ -12,6 +12,8 @@ var Benutzergruppe = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+
 					if (FHC_AjaxClient.hasData(data))
 					{
 						// save loaded data
@@ -34,7 +36,7 @@ var Benutzergruppe = {
 									"<td>"+benutzer.nachname+"</td>"+
 									"<td>"+
 										"<button class='btn btn-default benutzerLoeschen' id='"+benutzer.uid+"_benutzerLoeschen'>"+
-										FHC_PhrasesLib.t('ui', 'loeschen')+
+										FHC_PhrasesLib.t('ui', 'entfernen')+
 										"</button>"+
 									"</td>"+
 								"</tr>"
@@ -49,7 +51,7 @@ var Benutzergruppe = {
 						}
 
 						Tablesort.addTablesorter(
-							"benutzer-table", [[0,0], [2,0]], ["filter"], 2
+							"benutzer-table", [[0,0], [2,0]], ["filter", "zebra"], 2, {headers: {3: {filter: false}}}
 						)
 					}
 				},
@@ -66,6 +68,8 @@ var Benutzergruppe = {
 			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+
 					if (FHC_AjaxClient.hasData(data))
 					{
 						benutzerArr = [];
@@ -125,6 +129,8 @@ var Benutzergruppe = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+
 					if (FHC_AjaxClient.hasData(data))
 					{
 						let addBenutzerRes = FHC_AjaxClient.getData(data);
@@ -148,6 +154,8 @@ var Benutzergruppe = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+
 					if (FHC_AjaxClient.hasData(data))
 					{
 						let addBenutzerRes = FHC_AjaxClient.getData(data);
@@ -193,6 +201,7 @@ $(document).ready(function() {
 		function(){
 			let uid = $("#teilnehmer_uid").val();
 			Benutzergruppe.addBenutzer(uid, gruppe_kurzbz);
+			$("#teilnehmerSelect").val('');
 		}
 	);
 });

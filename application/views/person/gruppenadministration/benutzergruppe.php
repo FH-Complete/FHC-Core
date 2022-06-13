@@ -61,21 +61,9 @@
 								<th>Uid</th>
 								<th><?php echo ucfirst($this->p->t('global', 'vorname')); ?></th>
 								<th><?php echo ucfirst($this->p->t('global', 'nachname')); ?></th>
-								<th><?php echo ucfirst($this->p->t('ui', 'loeschen')); ?></th>
+								<th><?php echo ucfirst($this->p->t('ui', 'entfernen')); ?></th>
 							</thead>
 							<tbody>
-							<!-- <php foreach ($benutzer as $ben): ?>
-								<tr>
-									<td><?php echo $ben->uid; ?></td>
-									<td><?php echo $ben->vorname; ?></td>
-									<td><?php echo $ben->nachname; ?></td>
-									<td>
-										<button class="btn btn-default benutzerLoeschen" id="benutzerLoeschen">
-										<php echo ucfirst($this->p->t('ui', 'loeschen')); >
-										</button>
-									</td>
-								</tr>
-							<php endforeach; ?> -->
 							</tbody>
 						</table>
 					</div>
