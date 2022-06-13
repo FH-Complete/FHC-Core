@@ -1787,7 +1787,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $aktiv optional, true wenn nur aktive LVs
 	 * @param $lehrtyp optional, gewünschter Lehrtyp
 	 */
-	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null, $semester=null)
+	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null, $semester=null, $lehrmodus=null)
 	{
 
 		if (is_null($oe_kurzbz))
