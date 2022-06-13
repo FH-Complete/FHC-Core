@@ -78,4 +78,6 @@ $this->phrasen['testtool/einfuehrungsText']='
 					<a href="../public/testtool_test/testseite.php" target="_blank" class="btn btn-default">Display testpage</a>
 				</div>
 			</div>';
+$this->phrasen['testtool/prueflingGesperrt']='Bitte kontaktieren Sie die Reihungstestaufsicht!';
+
 ?>

@@ -37,7 +37,6 @@ require_once('../../../include/erhalter.class.php');
 require_once('../../../include/datum.class.php');
 
 
-$doc = new dokument_export('fotoliste');
 $output = 'pdf';
 $show_all_fotos = false;
 
@@ -61,6 +60,8 @@ $lv->load($lvid);
 
 $stg = new studiengang();
 $stg->load($lv->studiengang_kz);
+
+$doc = new dokument_export('fotoliste', $stg->oe_kurzbz);
 
 $berechtigung = new benutzerberechtigung();
 $berechtigung->getBerechtigungen($user);
