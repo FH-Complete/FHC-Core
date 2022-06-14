@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * Page for managing groups of which user is the manager
  */
-class Gruppenadministration extends Auth_Controller
+class Gruppenmanagement extends Auth_Controller
 {
 	private $_uid; // contains the UID of the logged user
 
@@ -28,6 +28,7 @@ class Gruppenadministration extends Auth_Controller
 		// Loads models
 		$this->load->model('person/benutzer_model', 'BenutzerModel');
 		$this->load->model('person/benutzergruppe_model', 'BenutzergruppeModel');
+		$this->load->model('system/Log_model', 'LogModel');
 
 		$this->load->library('WidgetLib');
 		$this->loadPhrases(
@@ -55,7 +56,7 @@ class Gruppenadministration extends Auth_Controller
 		//$this->_setNavigationMenuIndex(); // define the navigation menu for this page
 
 		$this->load->view(
-			'person/gruppenadministration/gruppenadministration.php',
+			'person/gruppenmanagement/gruppenmanagement.php',
 			array('uid' => $this->_uid)
 		);
 	}
@@ -70,18 +71,8 @@ class Gruppenadministration extends Auth_Controller
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
 
-		// $this->BenutzergruppeModel->addSelect('uid, vorname, nachname');
-		// $this->BenutzergruppeModel->addJoin('public.tbl_benutzer', 'uid');
-		// $this->BenutzergruppeModel->addJoin('public.tbl_person', 'person_id');
-		// $benutzerRes = $this->BenutzergruppeModel->loadWhere(array('gruppe_kurzbz' => $gruppe_kurzbz));
-		//
-		// if (isError($benutzerRes))
-		// 	show_error(getError($benutzerRes));
-		//
-		// $benutzer = hasData($benutzerRes) ? getData($benutzerRes) : array();
-
 		$this->load->view(
-			'person/gruppenadministration/benutzergruppe.php',
+			'person/gruppenmanagement/benutzergruppe.php',
 			array('gruppe_kurzbz' => $gruppe_kurzbz)
 		);
 	}
@@ -142,7 +133,7 @@ class Gruppenadministration extends Auth_Controller
 
 			if (hasData($benutzerExistsRes))
 			{
-				$this->outputJsonError($this->p->t('gruppenadministration', 'benutzerSchonZugewiesen'));
+				$this->outputJsonError($this->p->t('gruppenmanagement', 'benutzerSchonZugewiesen'));
 				return;
 			}
 
@@ -153,11 +144,26 @@ class Gruppenadministration extends Auth_Controller
 					'insertamum' => date('Y-m-d H:i:s')
 				)
 			);
+
+			// log the group add
+			$lastQry = $this->db->last_query();
+
+			if (isSuccess($result))
+			{
+				$this->LogModel->insert(array(
+					'mitarbeiter_uid' => $this->_uid,
+					'beschreibung' => 'Gruppenmanagement: Nutzer zu Gruppe hinzugefügt',
+					'sql' => $lastQry
+				));
+			}
 		}
 
 		$this->outputJson($result);
 	}
 
+	/**
+	 * Removes Benutzer from Gruppe
+	 */
 	public function removeBenutzer()
 	{
 		$uid = $this->input->post('uid');
@@ -175,6 +181,18 @@ class Gruppenadministration extends Auth_Controller
 			);
 		}
 
+		// log the group remove
+		$lastQry = $this->db->last_query();
+
+		if (isSuccess($result))
+		{
+			$this->LogModel->insert(array(
+				'mitarbeiter_uid' => $this->_uid,
+				'beschreibung' => 'Gruppenmanagement: Nutzer aus Gruppe entfernt',
+				'sql' => $lastQry
+			));
+		}
+
 		$this->outputJson($result);
 	}
 
@@ -186,9 +204,9 @@ class Gruppenadministration extends Auth_Controller
 	 */
 	private function _setNavigationMenuShowDetails()
 	{
-		$this->load->library('NavigationLib', array('navigation_page' => 'person/Gruppenadministration/showBenutzergruppe'));
+		$this->load->library('NavigationLib', array('navigation_page' => 'person/Gruppenmanagement/showBenutzergruppe'));
 
-		$link = site_url('person/Gruppenadministration');
+		$link = site_url('person/Gruppenmanagement');
 
 		$this->navigationlib->setSessionMenu(
 			array(
@@ -209,32 +227,8 @@ class Gruppenadministration extends Auth_Controller
 	}
 
 	/**
-	 *  Define the navigation menu for the showDetails page
+	 * Set uid of authentificated user
 	 */
-	// private function _setNavigationMenuIndex()
-	// {
-	// 	$this->load->library('NavigationLib', array('navigation_page' => 'person/gruppenadministration/index'));
-	//
-	// 	$link = site_url();
-	//
-	// 	$this->navigationlib->setSessionMenu(
-	// 		array(
-	// 			'back' => $this->navigationlib->oneLevel(
-	// 				'Zurück',	// description
-	// 				$link,			// link
-	// 				array(),		// children
-	// 				'angle-left',	// icon
-	// 				true,			// expand
-	// 				null, 			// subscriptDescription
-	// 				null, 			// subscriptLinkClass
-	// 				null, 			// subscriptLinkValue
-	// 				'', 			// target
-	// 				1 				// sort
-	// 			)
-	// 		)
-	// 	);
-	// }
-
 	private function _setAuthUID()
 	{
 		$this->_uid = getAuthUID();

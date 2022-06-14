@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Gruppenadministration',
+			'title' => 'Gruppenmanagement',
 			'jquery' => true,
 			'jqueryui' => true,
 			'bootstrap' => true,
@@ -31,12 +31,12 @@
 				<div class="row">
 					<div class="col-lg-12">
 						<h3 class="page-header">
-							<?php echo ucfirst($this->p->t('gruppenadministration', 'gruppenadministration')); ?>
+							<?php echo ucfirst($this->p->t('gruppenmanagement', 'gruppenmanagement')); ?>
 						</h3>
 					</div>
 				</div>
 				<div>
-					<?php $this->load->view('person/gruppenadministration/gruppenadministrationData.php'); ?>
+					<?php $this->load->view('person/gruppenmanagement/gruppenmanagementData.php'); ?>
 				</div>
 			</div>
 		</div>

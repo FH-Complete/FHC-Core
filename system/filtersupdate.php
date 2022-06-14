@@ -1112,14 +1112,14 @@ $filters = array(
 	),
 	array(
 		'app' => 'core',
-		'dataset_name' => 'gruppenadministration',
-		'filter_kurzbz' => 'Gruppenadministration',
+		'dataset_name' => 'gruppenmanagement',
+		'filter_kurzbz' => 'gruppenmanagement',
 		'description' => '{Meine Gruppen}',
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Gruppenadministration",
+				"name": "gruppenmanagement",
 				"columns": [
 					{"name": "gruppe_kurzbz"},
 					{"name": "gruppe_bezeichnung"},

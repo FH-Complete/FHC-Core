@@ -3,30 +3,32 @@
  */
 
 var Benutzergruppe = {
-	getBenutzer: function(gruppe_kurzbz)
-	{
+	getBenutzer: function(gruppe_kurzbz) {
 		FHC_AjaxClient.ajaxCallGet(
-			'person/gruppenadministration/getBenutzer',
+			'person/gruppenmanagement/getBenutzer',
 			{
 				gruppe_kurzbz: gruppe_kurzbz
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+					if (FHC_AjaxClient.isError(data))
+					{
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+						return;
+					}
+
+					let benutzerTable = $("#benutzer-table tbody");
+					benutzerTable.empty();
 
 					if (FHC_AjaxClient.hasData(data))
 					{
 						// save loaded data
 						let benutzerData = FHC_AjaxClient.getData(data);
-						let benutzerTable = $("#benutzer-table tbody");
-
-						benutzerTable.empty();
 
 						// fill table with Benutzer of Gruppe
 						for (let i = 0; i < benutzerData.length; i++)
 						{
 							let benutzer = benutzerData[i];
-							console.log(benutzer.aktiv);
 							benutzerTable.append(
 								"<tr>"+
 									"<td>"+benutzer.uid+"</td>"+
@@ -48,11 +50,10 @@ var Benutzergruppe = {
 								}
 							)
 						}
-
-						Tablesort.addTablesorter(
-							"benutzer-table", [[0,0], [2,0]], ["filter", "zebra"], 2, {headers: {4: {filter: false}}}
-						)
 					}
+
+					// add tablesorter to benutzergruppe table
+					Benutzergruppe._setTablesorter();
 				},
 				errorCallback: function(jqXHR, textStatus, errorThrown) {
 					FHC_DialogLib.alertError(textStatus);
@@ -60,14 +61,17 @@ var Benutzergruppe = {
 			}
 		);
 	},
-	getAllBenutzer: function()
-	{
+	getAllBenutzer: function() {
 		FHC_AjaxClient.ajaxCallGet(
-			'person/gruppenadministration/getAllBenutzer',
+			'person/gruppenmanagement/getAllBenutzer',
 			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+					if (FHC_AjaxClient.isError(data))
+					{
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+						return;
+					}
 
 					if (FHC_AjaxClient.hasData(data))
 					{
@@ -118,22 +122,24 @@ var Benutzergruppe = {
 			}
 		);
 	},
-	addBenutzer: function(uid, gruppe_kurzbz)
-	{
+	addBenutzer: function(uid, gruppe_kurzbz) {
 		FHC_AjaxClient.ajaxCallPost(
-			'person/gruppenadministration/addBenutzer',
+			'person/gruppenmanagement/addBenutzer',
 			{
 				uid: uid,
 				gruppe_kurzbz: gruppe_kurzbz
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+					if (FHC_AjaxClient.isError(data))
+					{
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+						return;
+					}
 
 					if (FHC_AjaxClient.hasData(data))
 					{
-						let addBenutzerRes = FHC_AjaxClient.getData(data);
-
+						// load Benutzer after add to show change
 						Benutzergruppe.getBenutzer(gruppe_kurzbz);
 					}
 				},
@@ -143,22 +149,24 @@ var Benutzergruppe = {
 			}
 		);
 	},
-	removeBenutzer: function(uid, gruppe_kurzbz)
-	{
+	removeBenutzer: function(uid, gruppe_kurzbz) {
 		FHC_AjaxClient.ajaxCallPost(
-			'person/gruppenadministration/removeBenutzer',
+			'person/gruppenmanagement/removeBenutzer',
 			{
 				uid: uid,
 				gruppe_kurzbz: gruppe_kurzbz
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+					if (FHC_AjaxClient.isError(data))
+					{
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+						return;
+					}
 
 					if (FHC_AjaxClient.hasData(data))
 					{
-						let addBenutzerRes = FHC_AjaxClient.getData(data);
-
+						// load Benutzer after remove to show change
 						Benutzergruppe.getBenutzer(gruppe_kurzbz);
 					}
 				},
@@ -168,8 +176,7 @@ var Benutzergruppe = {
 			}
 		);
 	},
-	_fillAutocomplete: function(autocompleteId, idFieldId, source)
-	{
+	_fillAutocomplete: function(autocompleteId, idFieldId, source) {
 		// jQuery ui autocomplete for benutzer
 		$("#"+autocompleteId).autocomplete(
 			{
@@ -185,6 +192,12 @@ var Benutzergruppe = {
 				}
 			}
 		);
+	},
+	_setTablesorter: function() {
+		Tablesort.addTablesorter(
+			// sort by first and third column asc, show filters beggining with 2 Benutzer, exclude fifth column from filter
+			"benutzer-table", [[0,0], [2,0]], ["filter", "zebra"], 2, {headers: {4: {filter: false}}}
+		)
 	}
 };
 
@@ -192,12 +205,16 @@ var Benutzergruppe = {
  * When JQuery is up
  */
 $(document).ready(function() {
+	// get the group name
 	let gruppe_kurzbz = $("#gruppe_kurzbz").val();
+
+	// load Benutzer for autocomplete selection
 	Benutzergruppe.getAllBenutzer();
+	// load Benutzer for table
 	Benutzergruppe.getBenutzer(gruppe_kurzbz);
 
-	$("#teilnehmerHinzufuegen").click(
-		function(){
+	// add click event to "add Benutzer" button
+	$("#teilnehmerHinzufuegen").click(function(){
 			let uid = $("#teilnehmer_uid").val();
 			Benutzergruppe.addBenutzer(uid, gruppe_kurzbz);
 			$("#teilnehmerSelect").val('');

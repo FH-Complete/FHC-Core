@@ -2,7 +2,7 @@
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT gruppe_kurzbz, grp.bezeichnung AS gruppe_bezeichnung, grp.beschreibung AS gruppe_beschreibung,
-		  studiengang_kz, UPPER(stg.typ||stg.kurzbz) AS studiengang_kurzbz, semester
+		  studiengang_kz, UPPER(stg.typ||stg.kurzbz) AS studiengang_kurzbz, semester, sichtbar, lehre, grp.aktiv, mailgrp, generiert
 		FROM public.tbl_gruppe grp
 		JOIN public.tbl_studiengang stg USING (studiengang_kz)
 		JOIN public.tbl_gruppe_manager grpmgr USING (gruppe_kurzbz)
@@ -12,19 +12,24 @@
 		'datasetRepresentation' => 'tablesorter',
 		'additionalColumns' => array('Teilnehmer'),
 		'columnsAliases' => array(
-			ucfirst($this->p->t('gruppenadministration', 'kurzbezeichnung')) ,
+			ucfirst($this->p->t('gruppenmanagement', 'kurzbezeichnung')) ,
 			ucfirst($this->p->t('global', 'bezeichnung')) ,
 			ucfirst($this->p->t('global', 'beschreibung')) ,
 			ucfirst($this->p->t('lehre', 'studiengangskennzahl')) ,
 			ucfirst($this->p->t('lehre', 'studiengang')),
 			ucfirst($this->p->t('lehre', 'semester')) ,
+			ucfirst($this->p->t('gruppenmanagement', 'sichtbar')) ,
+			ucfirst($this->p->t('gruppenmanagement', 'lehre')) ,
+			ucfirst($this->p->t('gruppenmanagement', 'aktiv')) ,
+			ucfirst($this->p->t('gruppenmanagement', 'mailgrp')) ,
+			ucfirst($this->p->t('gruppenmanagement', 'generiert'))
 		),
 		'formatRow' => function($datasetRaw) {
 
 			/* NOTE: Dont use $this here for PHP Version compatibility */
 			$datasetRaw->{'Teilnehmer'} = sprintf(
-				'<a href="%s?gruppe_kurzbz=%s&origin_page=%s&fhc_controller_id=%s">'.$this->p->t('gruppenadministration', 'zuweisenlöschen').'</a>',
-				site_url('person/Gruppenadministration/showBenutzergruppe'),
+				'<a href="%s?gruppe_kurzbz=%s&origin_page=%s&fhc_controller_id=%s">'.$this->p->t('gruppenmanagement', 'zuweisenlöschen').'</a>',
+				site_url('person/Gruppenmanagement/showBenutzergruppe'),
 				$datasetRaw->{'gruppe_kurzbz'},
 				'index',
 				(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
@@ -42,15 +47,19 @@
 			{
 				$datasetRaw->{'semester'} = '-';
 			}
-			//$datasetRaw->{'lehre'} = $datasetRaw->{'lehre'} == 'true' ? 'ja' : 'nein';
+			$datasetRaw->{'sichtbar'} = $datasetRaw->{'sichtbar'} == 'true' ? 'ja' : 'nein';
+			$datasetRaw->{'lehre'} = $datasetRaw->{'lehre'} == 'true' ? 'ja' : 'nein';
+			$datasetRaw->{'aktiv'} = $datasetRaw->{'aktiv'} == 'true' ? 'ja' : 'nein';
+			$datasetRaw->{'mailgrp'} = $datasetRaw->{'mailgrp'} == 'true' ? 'ja' : 'nein';
+			$datasetRaw->{'generiert'} = $datasetRaw->{'generiert'} == 'true' ? 'ja' : 'nein';
 
 			return $datasetRaw;
 		}
 	);
 
 	$filterWidgetArray['app'] = 'core';
-	$filterWidgetArray['datasetName'] = 'gruppenadministration';
-	$filterWidgetArray['filterKurzbz'] = 'gruppenadministration';
+	$filterWidgetArray['datasetName'] = 'gruppenmanagement';
+	$filterWidgetArray['filterKurzbz'] = 'gruppenmanagement';
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);

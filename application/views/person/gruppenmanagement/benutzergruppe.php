@@ -32,7 +32,7 @@
 				<div class="row">
 					<div class="col-lg-12">
 						<h3 class="page-header">
-							<?php echo ucfirst($this->p->t('gruppenadministration', 'benutzergruppe')).' '.$gruppe_kurzbz ?>
+							<?php echo ucfirst($this->p->t('gruppenmanagement', 'benutzergruppe')).' '.$gruppe_kurzbz ?>
 						</h3>
 					</div>
 				</div>
@@ -40,13 +40,12 @@
 					<div class="col-lg-12">
 						<div class="form-inline">
 							<div class="input-group" id="absgstatusgrselect_137998">
-								<!-- <label for="mitarbeiterSelect"><php echo $this->p->t('benutzergruppe', 'zustaendigerMitarbeiter') ></label> -->
 								<input type="text" class="form-control" name="teilnehmerSelect" id="teilnehmerSelect">
 								<input type="hidden" name="teilnehmer_uid" id="teilnehmer_uid">
 								<input type="hidden" name="gruppe_kurzbz" id="gruppe_kurzbz" value="<?php echo $gruppe_kurzbz ?>">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" id="teilnehmerHinzufuegen">
-										<?php echo $this->p->t('gruppenadministration', 'benutzer') ?>&nbsp;
+										<?php echo $this->p->t('gruppenmanagement', 'benutzer') ?>&nbsp;
 										<?php echo $this->p->t('ui', 'hinzufuegen') ?>
 									</button>
 								</span>
