@@ -12,23 +12,23 @@
 		'datasetRepresentation' => 'tablesorter',
 		'additionalColumns' => array('Teilnehmer'),
 		'columnsAliases' => array(
-			ucfirst($this->p->t('gruppenmanagement', 'kurzbezeichnung')) ,
-			ucfirst($this->p->t('global', 'bezeichnung')) ,
-			ucfirst($this->p->t('global', 'beschreibung')) ,
-			ucfirst($this->p->t('lehre', 'studiengangskennzahl')) ,
+			ucfirst($this->p->t('gruppenmanagement', 'kurzbezeichnung')),
+			ucfirst($this->p->t('gruppenmanagement', 'bezeichnung')),
+			ucfirst($this->p->t('gruppenmanagement', 'beschreibung')),
+			ucfirst($this->p->t('lehre', 'studiengangskennzahlLehre')),
 			ucfirst($this->p->t('lehre', 'studiengang')),
-			ucfirst($this->p->t('lehre', 'semester')) ,
-			ucfirst($this->p->t('gruppenmanagement', 'sichtbar')) ,
-			ucfirst($this->p->t('gruppenmanagement', 'lehre')) ,
-			ucfirst($this->p->t('gruppenmanagement', 'aktiv')) ,
-			ucfirst($this->p->t('gruppenmanagement', 'mailgrp')) ,
-			ucfirst($this->p->t('gruppenmanagement', 'generiert'))
+			ucfirst($this->p->t('lehre', 'semester')),
+			'Sichtbar',
+			'Lehre',
+			'Aktiv',
+			'Mailgrp',
+			'Generiert'
 		),
 		'formatRow' => function($datasetRaw) {
 
 			/* NOTE: Dont use $this here for PHP Version compatibility */
 			$datasetRaw->{'Teilnehmer'} = sprintf(
-				'<a href="%s?gruppe_kurzbz=%s&origin_page=%s&fhc_controller_id=%s">'.$this->p->t('gruppenmanagement', 'zuweisenlöschen').'</a>',
+				'<a href="%s?gruppe_kurzbz=%s&origin_page=%s&fhc_controller_id=%s">'.$this->p->t('gruppenmanagement', 'zuweisenloeschen').'</a>',
 				site_url('person/Gruppenmanagement/showBenutzergruppe'),
 				$datasetRaw->{'gruppe_kurzbz'},
 				'index',

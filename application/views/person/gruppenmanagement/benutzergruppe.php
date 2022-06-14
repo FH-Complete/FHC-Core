@@ -14,6 +14,7 @@
 			'filterwidget' => true,
 			'navigationwidget' => true,
 			'phrases' => array(
+				'gruppenmanagement',
 				'ui'
 			),
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
@@ -45,8 +46,7 @@
 								<input type="hidden" name="gruppe_kurzbz" id="gruppe_kurzbz" value="<?php echo $gruppe_kurzbz ?>">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" id="teilnehmerHinzufuegen">
-										<?php echo $this->p->t('gruppenmanagement', 'benutzer') ?>&nbsp;
-										<?php echo $this->p->t('ui', 'hinzufuegen') ?>
+										<?php echo $this->p->t('gruppenmanagement', 'benutzerHinzufuegen') ?>
 									</button>
 								</span>
 							</div>
@@ -58,9 +58,9 @@
 						<table class="table table-bordered table-condensed table-responsive" id="benutzer-table">
 							<thead>
 								<th>Uid</th>
-								<th><?php echo ucfirst($this->p->t('global', 'vorname')); ?></th>
-								<th><?php echo ucfirst($this->p->t('global', 'nachname')); ?></th>
-								<th><?php echo ucfirst($this->p->t('global', 'aktiv')); ?></th>
+								<th><?php echo ucfirst($this->p->t('person', 'vorname')); ?></th>
+								<th><?php echo ucfirst($this->p->t('person', 'nachname')); ?></th>
+								<th><?php echo ucfirst($this->p->t('gruppenmanagement', 'aktiv')); ?></th>
 								<th><?php echo ucfirst($this->p->t('ui', 'entfernen')); ?></th>
 							</thead>
 							<tbody>

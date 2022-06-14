@@ -13,7 +13,7 @@
 			'filterwidget' => true,
 			'navigationwidget' => true,
 			'phrases' => array(
-				'ui' => array('bitteEintragWaehlen')
+				'ui'
 			),
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
 			'customJSs' => array('public/js/bootstrapper.js')

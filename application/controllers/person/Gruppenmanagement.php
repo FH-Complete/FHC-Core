@@ -37,7 +37,8 @@ class Gruppenmanagement extends Auth_Controller
 				'person',
 				'lehre',
 				'ui',
-				'filter'
+				'filter',
+				'gruppenmanagement'
 			)
 		);
 
@@ -53,8 +54,6 @@ class Gruppenmanagement extends Auth_Controller
 	 */
 	public function index()
 	{
-		//$this->_setNavigationMenuIndex(); // define the navigation menu for this page
-
 		$this->load->view(
 			'person/gruppenmanagement/gruppenmanagement.php',
 			array('uid' => $this->_uid)
@@ -91,7 +90,6 @@ class Gruppenmanagement extends Auth_Controller
 
 		$this->outputJson($benutzerRes);
 	}
-
 
 	/**
 	* Gets all Benutzer for assignment to Gruppe
