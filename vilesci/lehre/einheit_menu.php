@@ -112,6 +112,21 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 				$(this).closest('.manager-uid').remove();
 			});
 		}
+		function toggleManagerAssignable()
+		{
+			var generiert = $("#generiert").prop('checked');
+
+			if (generiert === true)
+			{
+				$("#gruppemanager").prop("disabled", true);
+				$("#genGruppenManagerHinweis").removeClass("hiddenNotice");
+			}
+			else
+			{
+				$("#gruppemanager").prop("disabled", false);
+				$("#genGruppenManagerHinweis").addClass("hiddenNotice");
+			}
+		}
 		$(document).ready(function()
 		{
 			$("#t1").tablesorter(
@@ -137,6 +152,9 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 
 			// Löschen von Gruppemanager html bei Klick
 			setManagerDeleteEvent();
+
+			// Hinzufügen von Managern deaktiviert wenn generierte Gruppe
+			toggleManagerAssignable();
 
 			// autocomplete für user input Feld
 			$("#gruppemanager").autocomplete({
@@ -176,7 +194,7 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 							}
 						);
 
-						// nach 5 Managern Zeile einfügen
+						// nach 5 Managern in nächste Zeile springen
 						if (counter >= 5)
 						{
 							$(".manager-uid-container").prepend(
@@ -191,9 +209,15 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 						// Loeschen Event für neuen Administrator setzen
 						setManagerDeleteEvent();
 					}
+
+					// Feld leeren
+					$("#gruppemanager").val('');
+					return false; // prevent default, damit text nicht im Inputfeld bleibt
 				}
 			});
 
+			// Hinzufügen von Managern deaktiviert wenn Gruppe auf generiert setzen
+			$("#generiert").click(toggleManagerAssignable);
 		});
 		</script>
 		<style>
@@ -230,7 +254,7 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 		{
 			padding-bottom: 3px;
 		}
-		.hiddenManager
+		.hiddenNotice
 		{
 			display: none;
 		}
@@ -268,18 +292,6 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 	{
 		$grp_kurzbz = $_GET['einheit_id'];
 
-		// Gruppenmanager der Gruppe löschen
-		$grpmgr=new gruppemanager();
-		if ($grpmgr->load_uids($grp_kurzbz))
-		{
-			foreach($grpmgr->uids as $uid)
-			{
-				if (!$grpmgr->delete($uid->uid, $grp_kurzbz))
-					echo $grpmgr->errormsg;
-			}
-		}
-
-		// die Gruppe löschen
 		$e=new gruppe();
 		if(!$e->delete($grp_kurzbz))
 			echo $e->errormsg;
@@ -385,7 +397,7 @@ function doSave()
 
 
 		// gruppemanager immer array, leer wenn keine angegeben
-		$gruppemanager_uids = is_array($_POST['gruppemanager']) ? $_POST['gruppemanager'] : array();
+		$gruppemanager_uids = isset($_POST['gruppemanager']) && is_array($_POST['gruppemanager']) ? $_POST['gruppemanager'] : array();
 
 		// Prüfung: generierte Gruppen haben keine Manager
 		if (count($gruppemanager_uids) > 0 && $e->generiert === true)
@@ -525,8 +537,10 @@ function doEdit($kurzbz,$new=false)
 			<tr>
 				<td>Gruppenadministrator</td>
 				<td class="gruppenmanager-cell">
-					<div "<?php echo ($e->generiert?' class="hiddenManager"':'');?>">
 					<input type="text" name="gruppemanager" id="gruppemanager" autofocus="autofocus" />
+					<span class="hiddenNotice" id="genGruppenManagerHinweis">
+						Generierte Gruppen dürfen keine Administratoren haben.
+					</span>
 					<?php
 						$gruppemanager_class = new gruppemanager();
 						echo "<div class='manager-uid-container'>";
@@ -543,15 +557,8 @@ function doEdit($kurzbz,$new=false)
 									echo "<p class='manager-separator'></p>";
 								$count++;
 							}
-							// Absatz für korrekten Abstand
-							//echo "<p class='manager-separator'></p>";
 						}
-						echo "</div>";
 					?>
-					</div>
-					<div "<?php echo (!$e->generiert?' class="hiddenManager"':'');?>">
-						Generierte Gruppen dürfen keine Administratoren haben.
-					</div>
 				</td>
 				<td>Administratoren, die Benutzer zur Gruppe entfernen/hinzufügen können</td>
 			</tr>

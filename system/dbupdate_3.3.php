@@ -6176,20 +6176,6 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
-// Add permission for managing user groups
-if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/gruppenmanager';"))
-{
-	if($db->db_num_rows($result) == 0)
-	{
-		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/gruppenmanager', 'Manager einer Gruppe werden und die Gruppe verwalten');";
-
-		if(!$db->db_query($qry))
-			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
-		else
-			echo ' system.tbl_berechtigung: Added permission for lehre/gruppenmanager<br>';
-	}
-}
-
 // Creates table public.tbl_gruppe_manager if it doesn't exist and grants privileges
 if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1'))
 {
@@ -6219,7 +6205,7 @@ if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1')
 
 			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT pk_gruppe_manager PRIMARY KEY (gruppe_manager_id);
 
-			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT fk_gruppe_manager_gruppe_kurzbz FOREIGN KEY (gruppe_kurzbz) REFERENCES public.tbl_gruppe(gruppe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT fk_gruppe_manager_gruppe_kurzbz FOREIGN KEY (gruppe_kurzbz) REFERENCES public.tbl_gruppe(gruppe_kurzbz) ON UPDATE CASCADE ON DELETE CASCADE;
 			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT fk_gruppe_manager_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT uk_gruppe_manager_gruppe_kurzbz_uid UNIQUE (gruppe_kurzbz, uid);';
@@ -6240,6 +6226,20 @@ if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1')
 		echo '<strong>public.tbl_gruppe_manager: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.tbl_gruppe_manager';
+}
+
+// Add permission for managing user groups
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/gruppenmanager';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/gruppenmanager', 'Manager einer Gruppe werden und die Gruppe verwalten');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/gruppenmanager<br>';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
