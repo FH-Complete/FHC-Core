@@ -139,7 +139,8 @@ class Gruppenmanagement extends Auth_Controller
 				array(
 					'uid' => $uid,
 					'gruppe_kurzbz' => $gruppe_kurzbz,
-					'insertamum' => date('Y-m-d H:i:s')
+					'insertamum' => date('Y-m-d H:i:s'),
+					'insertvon' => $this->_uid
 				)
 			);
 
