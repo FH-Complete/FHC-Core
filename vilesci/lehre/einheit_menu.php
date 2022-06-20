@@ -110,9 +110,10 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 			{
 				// closest manager uid parent
 				$(this).closest('.manager-uid').remove();
+				adjustManagerTableCellSize();
 			});
 		}
-		function toggleManagerAssignable()
+		function showIfManagerAssignable()
 		{
 			var generiert = $("#generiert").prop('checked');
 
@@ -126,6 +127,14 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 				$("#gruppemanager").prop("disabled", false);
 				$("#genGruppenManagerHinweis").addClass("hiddenNotice");
 			}
+		}
+		function adjustManagerTableCellSize()
+		{
+			// Tabellenzelle vergrössern wenn es Administratorelemente gibt
+			if ($("input[name='gruppemanager[]']").length)
+				$("#gruppenmanager-cell").addClass("gruppenmanager-cell");
+			else
+				$("#gruppenmanager-cell").removeClass("gruppenmanager-cell");
 		}
 		$(document).ready(function()
 		{
@@ -154,7 +163,7 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 			setManagerDeleteEvent();
 
 			// Hinzufügen von Managern deaktiviert wenn generierte Gruppe
-			toggleManagerAssignable();
+			showIfManagerAssignable();
 
 			// autocomplete für user input Feld
 			$("#gruppemanager").autocomplete({
@@ -208,6 +217,8 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 
 						// Loeschen Event für neuen Administrator setzen
 						setManagerDeleteEvent();
+						// Größe der Administrator Tabellenzelle anpassen
+						adjustManagerTableCellSize();
 					}
 
 					// Feld leeren
@@ -217,7 +228,7 @@ if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
 			});
 
 			// Hinzufügen von Managern deaktiviert wenn Gruppe auf generiert setzen
-			$("#generiert").click(toggleManagerAssignable);
+			$("#generiert").click(showIfManagerAssignable);
 		});
 		</script>
 		<style>
@@ -536,16 +547,26 @@ function doEdit($kurzbz,$new=false)
 			</tr>
 			<tr>
 				<td>Gruppenadministrator</td>
-				<td class="gruppenmanager-cell">
+				<?php
+					$gruppemanagerCellClass = '';
+					$gruppemanager_class = new gruppemanager();
+					$gruppemanager_uids_result = $gruppemanager_class->load_uids($e->gruppe_kurzbz);
+
+					// richtige Tabellenzeige Grösse wenn Administratoren vorhanden
+					if ($gruppemanager_uids_result === true)
+					{
+						$gruppemanagerCellClass = ' class="gruppenmanager-cell"';
+					}
+				?>
+				<td<?php echo $gruppemanagerCellClass ?> id="gruppenmanager-cell">
 					<input type="text" name="gruppemanager" id="gruppemanager" autofocus="autofocus" />
 					<span class="hiddenNotice" id="genGruppenManagerHinweis">
 						Generierte Gruppen dürfen keine Administratoren haben.
 					</span>
 					<?php
-						$gruppemanager_class = new gruppemanager();
 						echo "<div class='manager-uid-container'>";
 						// alle Manager der Gruppe anzeigen
-						if ($gruppemanager_class->load_uids($e->gruppe_kurzbz))
+						if ($gruppemanager_uids_result === true)
 						{
 							$count = 1;
 							foreach ($gruppemanager_class->uids as $uid_obj)
