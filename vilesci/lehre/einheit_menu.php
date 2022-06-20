@@ -426,10 +426,10 @@ function doSave()
 
 			// bestehende Gruppenmanager laden
 			$bestehende_gruppemanager_uids = array();
-			$gruppemanager_class = new gruppemanager();
-			if ($gruppemanager_class->load_uids($gruppe_kurzbz))
+			$gruppemanager_hlp = new gruppemanager();
+			if ($gruppemanager_hlp->load_uids($gruppe_kurzbz))
 			{
-				foreach ($gruppemanager_class->uids as $uid_obj)
+				foreach ($gruppemanager_hlp->uids as $uid_obj)
 				{
 					$bestehende_gruppemanager_uids[] = $uid_obj->uid;
 				}
@@ -456,11 +456,11 @@ function doSave()
 			$geloeschte_gruppemanager_uids = array_diff($bestehende_gruppemanager_uids, $gruppemanager_uids);
 
 			// Nicht mehr vorhandene Gruppenmanager löschen
-			$gruppemanager_class = new gruppemanager();
+			$gruppemanager_hlp = new gruppemanager();
 			foreach ($geloeschte_gruppemanager_uids as $geloeschte_uid)
 			{
-				if (!$gruppemanager_class->delete($geloeschte_uid, $gruppe_kurzbz))
-					echo $gruppemanager_class->errormsg;
+				if (!$gruppemanager_hlp->delete($geloeschte_uid, $gruppe_kurzbz))
+					echo $gruppemanager_hlp->errormsg;
 			}
 		}
 	}
@@ -549,8 +549,8 @@ function doEdit($kurzbz,$new=false)
 				<td>Gruppenadministrator</td>
 				<?php
 					$gruppemanagerCellClass = '';
-					$gruppemanager_class = new gruppemanager();
-					$gruppemanager_uids_result = $gruppemanager_class->load_uids($e->gruppe_kurzbz);
+					$gruppemanager_hlp = new gruppemanager();
+					$gruppemanager_uids_result = $gruppemanager_hlp->load_uids($e->gruppe_kurzbz);
 
 					// richtige Tabellenzeige Grösse wenn Administratoren vorhanden
 					if ($gruppemanager_uids_result === true)
@@ -569,7 +569,7 @@ function doEdit($kurzbz,$new=false)
 						if ($gruppemanager_uids_result === true)
 						{
 							$count = 1;
-							foreach ($gruppemanager_class->uids as $uid_obj)
+							foreach ($gruppemanager_hlp->uids as $uid_obj)
 							{
 								$ben = new benutzer($uid_obj->uid);
 								// Vorlagestring durch Werte ersetzen und ausgeben
