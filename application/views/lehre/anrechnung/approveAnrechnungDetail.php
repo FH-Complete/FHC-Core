@@ -123,12 +123,20 @@ $this->load->view(
 											<tbody>
 											
 											<tr>
-												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'ects'); ?></th>
+												<th class="col-xs-2"><?php echo $this->p->t('lehre', 'ects'); ?></th>
 												<td><?php echo $antragData->ects ?></td>
+                                                <td class="col-xs-2">Bisher angerechnete ECTS
+                                                     <span class="approveAnrechnungDetail-anrechnungEctsTooltip"
+                                                       data-toggle="tooltip" data-placement="right"
+                                                       title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
+													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+												</span>
+                                                </td>
+                                                <td><?php echo $antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich. ' [Schulisch: '. $antragData->sumEctsSchulisch. ' / Beruflich: '. $antragData->sumEctsBeruflich. ']' ?></td>
 											</tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lektorInnen'); ?></th>
-												<td>
+												<td colspan="3">
 													<?php $len = count($antragData->lektoren) - 1 ?>
 													<?php foreach ($antragData->lektoren as $key => $lektor): ?>
 														<?php echo $lektor->vorname . ' ' . $lektor->nachname;
@@ -138,15 +146,15 @@ $this->load->view(
 											</tr>
 											<tr>
 												<th class="col-xs-4"><?php echo ucfirst($this->p->t('global', 'zgv')); ?></th>
-												<td><?php echo $antragData->zgv ?></td>
+												<td colspan="3"><?php echo $antragData->zgv ?></td>
 											</tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></th>
-												<td><?php echo $anrechnungData->anmerkung ?></td>
+												<td colspan="3"><?php echo $anrechnungData->anmerkung ?></td>
 											</tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></th>
-												<td>
+												<td colspan="3">
 													<a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
 													   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
 												</td>

@@ -10589,6 +10589,27 @@ Any unusual occurrences
 			)
 		)
 	),
+
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungEctsTooltipText',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Anzeige aller bisher angerechneten ECTS. Für Quereinsteiger werden die ECTS der angerechneten Semester berechnet.<br><br>Vorgabe für Anrechnungen:<br>Max. 60 ECTS schulische Qualifikation<br>Max. 60 ECTS berufliche Qualifikation<br>Max. 90 ECTS INSGESAMT (schulische + berufliche Qualifikation)',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'All previous recognized ECTS. Lateral Entries are calculated with full ECTS of all recognized semester.<br><br>Condition for Recognition of Prior Knowledge:<br>Max. 60 ECTS school qualification<br>Max. 60 ECTS professional qualification<br>Max. 90 ECTS OVERALL (school + professional qualification)',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
