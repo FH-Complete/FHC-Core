@@ -14,7 +14,7 @@
 			'global' => array('mailAnXversandt'),
 			'ui' => array('bitteEintragWaehlen')
 		),
-		'customJSs' => array('public/js/apps/LogsViewer.js')
+		'customJSModules' => array('public/js/apps/LogsViewer.js')
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);
@@ -36,6 +36,50 @@
 			<div>
 				<!-- Filter component -->
 				<core-filter-cmpt filter-type="LogsViewer" @nw-new-entry="newSideMenuEntryHandler"></core-filter-cmpt>
+				<!--
+					'datasetRepresentation' => 'tablesorter',
+               				 'columnsAliases' => array(
+               				         'Log id',
+               				         'Request id',
+               				         'Execution time',
+               				         'Executed by',
+               				         'Producer',
+               				         'Data',
+               				         'Webservice type'
+               				 ),
+               				 'formatRow' => function($datasetRaw) {
+
+               				         $datasetRaw->ExecutionTime = date_format(date_create($datasetRaw->ExecutionTime), 'd.m.Y H:i:s:u');
+
+               				         return $datasetRaw;
+               				 },
+               				 'markRow' => function($datasetRaw) {
+
+               				         $mark = '';
+
+               				         if (strpos($datasetRaw->RequestId, 'error') != false)
+               				         {
+               				                 $mark = 'text-red';
+               				         }
+
+               				         if (strpos($datasetRaw->RequestId, 'info') != false)
+               				         {
+               				                 $mark = 'text-green';
+               				         }
+
+               				         if (strpos($datasetRaw->RequestId, 'warning') != false)
+               				         {
+               				                 $mark = 'text-orange';
+               				         }
+
+               				         if (strpos($datasetRaw->RequestId, 'debug') != false)
+               				         {
+               				                 $mark = 'text-info';
+               				         }
+
+               				         return $mark;
+               				 }
+				-->
 			</div>
 		</div>
 	</div>

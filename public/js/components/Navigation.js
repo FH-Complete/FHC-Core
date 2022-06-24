@@ -1,4 +1,4 @@
-const CoreNavigationCmpt = {
+export const CoreNavigationCmpt = {
 	data() {
 		return {
 			headerMenu: {},
@@ -76,7 +76,7 @@ const CoreNavigationCmpt = {
 				<template v-for="header in headerMenuEntries">
 					<li class="nav-item dropdown">
 						<a class="nav-link header-menu-link-entry" v-bind:data-bs-toggle="this.getDataBsToggle(header)" v-bind:class="{ 'dropdown-toggle': header.children }" v-bind:href="header.link">
-							<i class="fa-solid" v-bind:class="'fa-' + header.icon" v-if="header.icon"></i> {{ header.description }}
+							<i class="fa-solid fa-fw header-menu-icon" v-bind:class="'fa-' + header.icon" v-if="header.icon"></i> {{ header.description }}
 						</a>
 						<ul class="dropdown-menu" v-if="header.children">
 							<!-- 2nd level -->
@@ -90,18 +90,22 @@ const CoreNavigationCmpt = {
 		</nav>
 
 		<!-- Left side menu -->
-		<nav class="navbar sidebar">
+		<nav class="navbar navbar-left-side">
 			<ul class="navbar-nav">
 				<!-- 1st level -->
 				<template v-for="menu in sideMenuEntries">
 					<li class="nav-item">
-						<a class="nav-link" v-bind:href="menu.link">
+						<a class="nav-link left-side-menu-link-entry" v-bind:href="menu.link" @click=menu.onClickCall>
 							<i class="fa fa-fw" v-bind:class="'fa-'+ menu.icon"></i> {{ menu.description }}
 						</a>
-						<ul class="nav-link" v-if="menu.children">
+						<ul class="nav-link left-side-menu-second-level" v-if="menu.children">
 							<!-- 2nd level -->
 							<template v-for="child in menu.children">
-								<li><a class="nav-link" v-bind:href="child.link">{{ child.description }}</a></li>
+								<li>
+									<a class="nav-link left-side-menu-link-entry" v-bind:href="child.link" @click=child.onClickCall>
+										&emsp;&emsp;{{ child.description }}
+									</a>
+								</li>
 							</template>
 						</ul>
 					</li>

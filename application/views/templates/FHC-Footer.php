@@ -15,6 +15,7 @@
 
 	// By default set the parameters to null
 	$customJSs = isset($customJSs) ? $customJSs : null;
+	$customJSModules = isset($customJSModules) ? $customJSModules : null;
 
 	// --------------------------------------------------------------------------------------------------------
 	// Javascripts
@@ -118,23 +119,14 @@
 	// NOTE: to be used only if you know what you are doing!
 	if ($bootstrapper === true) generateJSsInclude('public/js/bootstrapper.js');
 
-	// VUE Navigation Component JS
-	if ($navigationcomponent === true) generateJSsInclude('public/js/components/Navigation.js');
-
 	// NavigationWidget JS
 	if ($navigationwidget === true) generateJSsInclude('public/js/NavigationWidget.js');
-
-	// VUE Filter Component JS
-	if ($filtercomponent === true) generateJSsInclude('public/js/components/Filter.js');
 
 	// FilterWidget JS
 	if ($filterwidget === true) generateJSsInclude('public/js/FilterWidget.js');
 
 	// PhrasesLib JS
 	if ($phrases != null) generateJSsInclude('public/js/PhrasesLib.js');
-
-	// VUE Table Component JS
-	if ($tablecomponent === true) generateJSsInclude('public/js/components/Table.js');
 
 	// TableWidget JS
 	if ($tablewidget === true) generateJSsInclude('public/js/TableWidget.js');
@@ -149,6 +141,7 @@
 	// Eventually required JS
 	// NOTE: keep it as the latest
 	generateJSsInclude($customJSs);
+	generateJSModulesInclude($customJSModules);
 ?>
 	</body>
 </html>

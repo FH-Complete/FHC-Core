@@ -150,6 +150,31 @@ function generateJSsInclude($JSs)
 }
 
 /**
+ * Generates tags for the javascript modules you want to include, the parameter could by a string or an array of strings
+ */
+function generateJSModulesInclude($JSModules)
+{
+	$jsInclude = '<script type="module" src="%s"></script>';
+
+	$ci =& get_instance();
+	$cachetoken = '?'.$ci->config->item('fhcomplete_build_version');
+
+	if (isset($JSModules))
+	{
+		$tmpJSs = is_array($JSModules) ? $JSModules : array($JSModules);
+
+		for ($tmpJSsCounter = 0; $tmpJSsCounter < count($tmpJSs); $tmpJSsCounter++)
+		{
+			$toPrint = sprintf($jsInclude, base_url($tmpJSs[$tmpJSsCounter].$cachetoken)).PHP_EOL;
+
+			if ($tmpJSsCounter > 0) $toPrint = "\t\t".$toPrint;
+
+			echo $toPrint;
+		}
+	}
+}
+
+/**
  * Generates all the includes needed by the Addons
  */
 function generateAddonsJSsInclude($calledFrom)
@@ -180,3 +205,4 @@ function generateBackwardCompatibleJSMsIe($js)
 	echo '	<script type="text/javascript" src="'.$js.'"></script>'."\n";
 	echo "<![endif]-->\n";
 }
+
