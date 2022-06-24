@@ -191,7 +191,7 @@ class SearchBarLib
 	/**
 	 *
 	 */
-	private function raum($searchstr, $type)
+	private function _raum($searchstr, $type)
 	{
 		return array();
 	}

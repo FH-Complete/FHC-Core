@@ -325,6 +325,17 @@
 					"type": "file"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "axios/axios",
+				"version": "0.27.2",
+				"dist": {
+					"url": "https://unpkg.com/axios@0.27.2/dist/axios.min.js",
+					"type": "file"
+				}
+			}
 		}
 	],
 	"require": {
@@ -367,7 +378,7 @@
 		"twbs/bootstrap5": "5.1.*",
 
 		"vuejs/vuejs3": "3.2.33",
-
+		"axios/axios": "0.27.2",
 
 		"alvaro-prieto/colresizable": "1.6",
 

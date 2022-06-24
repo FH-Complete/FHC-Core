@@ -34,8 +34,12 @@ class SearchBar extends FHC_Controller
 	 */
 	public function search()
 	{
-		$searchstr = $this->input->post(self::SEARCHSTR_PARAM);
-		$types = $this->input->post(self::TYPES_PARAM);
+		//$searchstr = $this->input->post(self::SEARCHSTR_PARAM);
+		//$types = $this->input->post(self::TYPES_PARAM);
+		
+		$json = json_decode($this->input->raw_input_stream, true);
+		$searchstr = $json[self::SEARCHSTR_PARAM];
+		$types = $json[self::TYPES_PARAM];
 
 		$this->outputJson($this->searchbarlib->search($searchstr, $types));
 	}
