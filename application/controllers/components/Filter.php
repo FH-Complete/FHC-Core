@@ -26,10 +26,7 @@ class Filter extends FHC_Controller
 		$this->load->library('AuthLib');
 
 		// Loads the FilterCmptLib with HTTP GET/POST parameters
-		$this->_loadFilterCmptLib();
-
-		// Checks if the caller is allow to read this data
-		$this->_isAllowed();
+		$this->_startFilterCmptLib();
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -41,22 +38,6 @@ class Filter extends FHC_Controller
 	public function getFilter()
 	{
 		$this->outputJsonSuccess($this->filtercmptlib->getSession());
-	}
-
-	/**
-	 * Retrieves the number of records present in the current dataset and will be written on the output in JSON format
-	 */
-	public function rowNumber()
-	{
-		$rowNumber = 0;
-		$dataset = $this->filtercmptlib->getSessionElement(FilterCmptLib::SESSION_DATASET);
-
-		if (isset($dataset) && is_array($dataset))
-		{
-			$rowNumber = count($dataset);
-		}
-
-		$this->outputJsonSuccess($rowNumber);
 	}
 
 	/**
@@ -87,11 +68,11 @@ class Filter extends FHC_Controller
 
 		if ($this->filtercmptlib->removeSelectedField($selectedField) == true)
 		{
-			$this->getFilter();
+			$this->outputJsonSuccess('Field removed');
 		}
 		else
 		{
-			$this->outputJsonError('Wrong parameter');
+			$this->outputJsonError('Error occurred');
 		}
 	}
 
@@ -104,70 +85,62 @@ class Filter extends FHC_Controller
 
 		if ($this->filtercmptlib->addSelectedField($selectedField) == true)
 		{
-			$this->getFilter();
+			$this->outputJsonSuccess('Field added');
 		}
 		else
 		{
-			$this->outputJsonError('Wrong parameter');
+			$this->outputJsonError('Error occurred');
 		}
 	}
 
 	/**
 	 * Remove an applied filter (SQL where condition) from the current filter
 	 */
-	public function removeAppliedFilter()
+	public function removeFilterField()
 	{
-		$appliedFilter = $this->input->post('appliedFilter');
+		$appliedFilter = $this->input->post('filterField');
 
-		if ($this->filtercmptlib->removeAppliedFilter($appliedFilter) == true)
+		if ($this->filtercmptlib->removeFilterField($appliedFilter) == true)
 		{
-			$this->outputJsonSuccess('Removed');
+			$this->outputJsonSuccess('Field removed');
 		}
 		else
 		{
-			$this->outputJsonError('Wrong parameter');
-		}
-	}
-
-	/**
-	 * Apply all the applied filters (SQL where conditions) to the current filter
-	 */
-	public function applyFilters()
-	{
-		$appliedFilters = $this->input->post('appliedFilters');
-		$appliedFiltersOperations = $this->input->post('appliedFiltersOperations');
-		$appliedFiltersConditions = $this->input->post('appliedFiltersConditions');
-		$appliedFiltersOptions = $this->input->post('appliedFiltersOptions');
-
-		if ($this->filtercmptlib->applyFilters(
-				$appliedFilters,
-				$appliedFiltersOperations,
-				$appliedFiltersConditions,
-				$appliedFiltersOptions
-			) == true)
-		{
-			$this->outputJsonSuccess('Applied');
-		}
-		else
-		{
-			$this->outputJsonError('Wrong parameter');
+			$this->outputJsonError('Error occurred');
 		}
 	}
 
 	/**
 	 * Add a filter (SQL where clause) to be applied to the current filter
 	 */
-	public function addFilter()
+	public function addFilterField()
 	{
-		$filter = $this->input->post('filter');
+		$filterField = $this->input->post('filterField');
 
-		if ($this->filtercmptlib->addFilter($filter) == true)
+		if ($this->filtercmptlib->addFilterField($filterField) == true)
 		{
-			$this->getFilter();
+			$this->outputJsonSuccess('Field added');
 		}
 		else
 		{
-			$this->outputJsonError('Wrong parameter');
+			$this->outputJsonError('Error occurred');
+		}
+	}
+
+	/**
+	 * Apply the filter changes
+	 */
+	public function applyFilterFields()
+	{
+		$filterFields = $this->input->post('filterFields');
+
+		if ($this->filtercmptlib->applyFilterFields($filterFields) == true)
+		{
+			$this->outputJsonSuccess('Applied');
+		}
+		else
+		{
+			$this->outputJsonError('Error occurred');
 		}
 	}
 
@@ -176,9 +149,9 @@ class Filter extends FHC_Controller
 	 */
 	public function saveCustomFilter()
 	{
-		$customFilterDescription = $this->input->post('customFilterDescription');
+		$customFilterName = $this->input->post('customFilterName');
 
-		if ($this->filtercmptlib->saveCustomFilter($customFilterDescription) == true)
+		if ($this->filtercmptlib->saveCustomFilter($customFilterName) == true)
 		{
 			$this->outputJsonSuccess('Saved');
 		}
@@ -215,41 +188,22 @@ class Filter extends FHC_Controller
 		$this->outputJsonSuccess('Success');
 	}
 
-	/**
-	 * Define the navigation menu for the current filter widget
-	 */
-	public function generateFilterMenu()
-	{
-		// Generates the filters menu
-		$this->outputJsonSuccess($this->filtercmptlib->generateFilterMenu($this->input->get(FilterCmptLib::NAVIGATION_PAGE)));
-	}
-
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
-
-	/**
-	 * Checks if the user is allowed to use this filter
-	 */
-	private function _isAllowed()
-	{
-		if (!$this->filtercmptlib->isAllowed())
-		{
-			$this->terminateWithJsonError('You are not allowed to access to this content');
-		}
-	}
 
 	/**
 	 * Loads the FilterCmptLib with the FILTER_UNIQUE_ID parameter
 	 * If the parameter FILTER_UNIQUE_ID is not given then the execution of the controller is terminated and
 	 * an error message is printed
 	 */
-	private function _loadFilterCmptLib()
+	private function _startFilterCmptLib()
 	{
+		$filterUniqueId = null;
+		$filterType = null;
+
 		// If the parameter FILTER_UNIQUE_ID is present in the HTTP GET or POST
 		if (isset($_GET[self::FILTER_UNIQUE_ID]) || isset($_POST[self::FILTER_UNIQUE_ID]))
 		{
-			$filterUniqueId = null;
-
 			// If it is present in the HTTP GET
 			if (isset($_GET[self::FILTER_UNIQUE_ID]))
 			{
@@ -259,22 +213,15 @@ class Filter extends FHC_Controller
 			{
 				$filterUniqueId = $this->input->post(self::FILTER_UNIQUE_ID); // is retrieved from the HTTP POST
 			}
-
-			// Loads the FilterCmptLib that contains all the used logic
-			$this->load->library('FilterCmptLib');
-
-			$this->filtercmptlib->setFilterUniqueId($filterUniqueId);
 		}
 		else // Otherwise an error will be written in the output
 		{
 			$this->terminateWithJsonError('Parameter "'.self::FILTER_UNIQUE_ID.'" not provided!');
 		}
 
-		// If provided
+		// If the parameter FILTER_TYPE is present in the HTTP GET or POST
 		if (isset($_GET[self::FILTER_TYPE]) || isset($_POST[self::FILTER_TYPE]))
 		{
-			$filterType = null;
-
 			// If it is present in the HTTP GET
 			if (isset($_GET[self::FILTER_TYPE]))
 			{
@@ -284,11 +231,24 @@ class Filter extends FHC_Controller
 			{
 				$filterType = $this->input->post(self::FILTER_TYPE); // is retrieved from the HTTP POST
 			}
-
-			$this->filtercmptlib->setFilterType($filterType);
+		}
+		else // Otherwise an error will be written in the output
+		{
+			$this->terminateWithJsonError('Parameter "'.self::FILTER_TYPE.'" not provided!');
 		}
 
-		$this->filtercmptlib->setFilterId($this->input->get('filterId'));
+		// Loads the FilterCmptLib that contains all the used logic
+		$this->load->library(
+			'FilterCmptLib',
+			array(
+				'filterUniqueId' => $filterUniqueId,
+				'filterType' => $filterType,
+				'filterId' => $this->input->get('filter_id')
+			)
+		);
+
+		// 
+		$this->filtercmptlib->start();
 	}
 }
 

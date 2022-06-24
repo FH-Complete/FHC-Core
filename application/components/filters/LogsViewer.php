@@ -1,5 +1,8 @@
 <?php
 	$filterCmptArray = array(
+		'app' => 'core',
+		'datasetName' => 'logs',
+		//'filterKurzbz' => 'jobs48hours', // REMOVE ME
 		'query' => '
 			SELECT wsl.webservicelog_id AS "LogId",
 					wsl.request_id AS "RequestId",
@@ -11,51 +14,6 @@
 			 FROM system.tbl_webservicelog wsl
 		 ORDER BY wsl.execute_time DESC
 		',
-		'requiredPermissions' => 'admin',
-		'datasetRepresentation' => 'tablesorter',
-		'columnsAliases' => array(
-			'Log id',
-			'Request id',
-			'Execution time',
-			'Executed by',
-			'Producer',
-			'Data',
-			'Webservice type'
-		),
-		'formatRow' => function($datasetRaw) {
-
-			$datasetRaw->ExecutionTime = date_format(date_create($datasetRaw->ExecutionTime), 'd.m.Y H:i:s:u');
-
-			return $datasetRaw;
-		},
-		'markRow' => function($datasetRaw) {
-
-			$mark = '';
-
-			if (strpos($datasetRaw->RequestId, 'error') != false)
-			{
-				$mark = 'text-red';
-			}
-
-			if (strpos($datasetRaw->RequestId, 'info') != false)
-			{
-				$mark = 'text-green';
-			}
-
-			if (strpos($datasetRaw->RequestId, 'warning') != false)
-			{
-				$mark = 'text-orange';
-			}
-
-			if (strpos($datasetRaw->RequestId, 'debug') != false)
-			{
-				$mark = 'text-info';
-			}
-
-			return $mark;
-		}
+		'requiredPermissions' => 'admin'
 	);
-
-	$filterCmptArray['app'] = 'core';
-	$filterCmptArray['datasetName'] = 'logs';
 

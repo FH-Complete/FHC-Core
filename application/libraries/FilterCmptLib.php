@@ -14,9 +14,6 @@ class FilterCmptLib
 	const SESSION_FILTER_NAME = 'filterName';
 	const SESSION_FIELDS = 'fields';
 	const SESSION_SELECTED_FIELDS = 'selectedFields';
-	const SESSION_COLUMNS_ALIASES = 'columnsAliases';
-	const SESSION_ADDITIONAL_COLUMNS = 'additionalColumns';
-	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_FILTERS = 'filters';
 	const SESSION_METADATA = 'datasetMetadata';
 	const SESSION_ROW_NUMBER = 'rowNumber';
@@ -25,9 +22,8 @@ class FilterCmptLib
 	// Session dataset elements
 	const SESSION_DATASET = 'dataset';
 	const SESSION_DATASET_RELOAD = 'reloadDataset';
-	const SESSION_DATASET_REPRESENTATION = 'datasetRepresentation';
-	const SESSION_DATASET_REP_OPTIONS = 'datasetRepresentationOptions';
-	const SESSION_DATASET_REP_FIELDS_DEFS = 'datasetRepresentationFieldsDefinitions';
+
+	const SESSION_SIDE_MENU = 'sideMenu';
 
 	// Default session timeout
 	const SESSION_DEFAULT_TIMEOUT = 30;
@@ -51,34 +47,6 @@ class FilterCmptLib
 
 	// ...stament to retrieve the dataset
 	const QUERY = 'query';
-
-	// ...to specify more columns or aliases for them
-	const ADDITIONAL_COLUMNS = 'additionalColumns';
-	const CHECKBOXES = 'checkboxes';
-	const COLUMNS_ALIASES = 'columnsAliases';
-
-	// ...to format/mark records of a dataset
-	const FORMAT_ROW = 'formatRow';
-	const MARK_ROW = 'markRow';
-
-	// ...to hide the options for a filter
-	const HIDE_OPTIONS = 'hideOptions';
-	const HIDE_SELECT_FIELDS = 'hideSelectFields';
-	const HIDE_SELECT_FILTERS = 'hideSelectFilters';
-	const HIDE_SAVE = 'hideSave';
-
-	const CUSTOM_MENU = 'customMenu'; // ...to specify if the menu for this filter is custom (true) or not (false)
-	const HIDE_MENU = 'hideMenu'; // ...to specify if the menu should be shown or not
-
-	// ...to specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
-	const DATASET_REPRESENTATION = 'datasetRepresentation';
-	const DATASET_REP_OPTIONS = 'datasetRepOptions';
-	const DATASET_REP_FIELDS_DEFS = 'datasetRepFieldsDefs';
-
-	// Different dataset representations
-	const DATASET_REP_TABLESORTER = 'tablesorter';
-	const DATASET_REP_PIVOTUI = 'pivotUI';
-	const DATASET_REP_TABULATOR = 'tabulator';
 
 	// Filter operations values
 	const OP_EQUAL = 'equal';
@@ -105,20 +73,39 @@ class FilterCmptLib
 	const PERMISSION_FILTER_METHOD = 'FilterCmpt'; // Name for fake method to be checked by the PermissionLib
 	const PERMISSION_TYPE = 'r';
 
-	// Navigation page parameter name
-	const NAVIGATION_PAGE = 'navigation_page';
-
 	private $_ci; // Code igniter instance
-	private $_filterUniqueId; // unique id for this filter component
+
+	private $_filterUniqueId; // Unique id for this filter component
 	private $_filterType; // 
 	private $_filterId; // 
+
+	private $_app;
+	private $_datasetName;
+	private $_filterKurzbz;
+	private $_query;
+	private $_requiredPermissions;
+	private $_reloadDataset;
+	private $_sessionTimeout;
 
 	/**
 	 * Gets the CI instance and loads message helper
 	 */
-	public function __construct($params = null)
+	public function __construct($params)
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
+
+		// Set parameters
+		$this->_setParameters($params);
+	}
+
+	/**
+	 *
+	 */
+	private function _setParameters($params)
+	{
+		if (isset($params['filterUniqueId'])) $this->_filterUniqueId = $params['filterUniqueId'];
+		if (isset($params['filterType'])) $this->_filterType = $params['filterType'];
+		if (isset($params['filterId'])) $this->_filterId = $params['filterId'];
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -131,25 +118,17 @@ class FilterCmptLib
 	 * then NO one is allow to use this FilterCmpt
 	 * Wrapper method to permissionlib->hasAtLeastOne
 	 */
-	public function isAllowed()
+	private function _isAllowed()
 	{
 		$this->_ci->load->library('PermissionLib'); // Load permission library
 
-		// Gets the required permissions from the session if they are not provided as parameter
-		$rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS);
-
-		// 
-		if ($rq == null)
+		if (!$this->_ci->permissionlib->hasAtLeastOne($this->_requiredPermissions, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE))
 		{
-			//
-			$this->_initFilterCmpt();
-			// 
-			$this->_startFilterCmpt();
-			// Gets the required permissions from the session if they are not provided as parameter
-			$rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS);
+			$this->setSession(error('The required permission is not help by the logged user'));
+			return false;
 		}
 
-		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE);
+		return true;
 	}
 
 	/**
@@ -434,6 +413,35 @@ class FilterCmptLib
 	}
 
 	/**
+	 * Add a field to the current filter
+	 */
+	public function addSelectedField($selectedField)
+	{
+		$removeSelectedField = false;
+
+		// Checks the parameter selectedField
+		if (!isEmptyString($selectedField))
+		{
+			// Retrieves all the used fields by the current filter
+			$fields = $this->getSessionElement(self::SESSION_FIELDS);
+			// Retrieves the selected fields by the current filter
+			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
+
+			// Checks that the given selected field is present in the list of all the used fields by the current filter
+			if (in_array($selectedField, $fields))
+			{
+				array_push($selectedFields, $selectedField); // place the new filed at the end of the selected fields list
+
+				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
+
+				$removeSelectedField = true;
+			}
+		}
+
+		return $removeSelectedField;
+	}
+
+	/**
 	 * Remove a selected field from the current filter
 	 */
 	public function removeSelectedField($selectedField)
@@ -468,43 +476,14 @@ class FilterCmptLib
 	}
 
 	/**
-	 * Add a field to the current filter
+	 * Add a filter (SQL where clause) to be applied to the current filter
 	 */
-	public function addSelectedField($selectedField)
+	public function addFilterField($filterField)
 	{
-		$removeSelectedField = false;
+		$addFilterField = false;
 
-		// Checks the parameter selectedField
-		if (!isEmptyString($selectedField))
-		{
-			// Retrieves all the used fields by the current filter
-			$fields = $this->getSessionElement(self::SESSION_FIELDS);
-			// Retrieves the selected fields by the current filter
-			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
-
-			// Checks that the given selected field is present in the list of all the used fields by the current filter
-			if (in_array($selectedField, $fields))
-			{
-				array_push($selectedFields, $selectedField); // place the new filed at the end of the selected fields list
-
-				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
-
-				$removeSelectedField = true;
-			}
-		}
-
-		return $removeSelectedField;
-	}
-
-	/**
-	 * Remove an applied filter (SQL where condition) from the current filter
-	 */
-	public function removeAppliedFilter($appliedFilter)
-	{
-		$removeAppliedFilter = false;
-
-		// Checks the parameter appliedFilter
-		if (!isEmptyString($appliedFilter))
+		// Checks the parameter filter
+		if (!isEmptyString($filterField))
 		{
 			// Retrieves all the used fields by the current filter
 			$fields = $this->getSessionElement(self::SESSION_FIELDS);
@@ -512,10 +491,53 @@ class FilterCmptLib
 			$filters = $this->getSessionElement(self::SESSION_FILTERS);
 
 			// Checks that the given applied filter is present in the list of all the used fields by the current filter
-			if (in_array($appliedFilter, $fields))
+			if (in_array($filterField, $fields))
 			{
 				// Search in what position the given applied filter is
-				$pos = $this->_searchFilterByName($filters, $appliedFilter);
+				$pos = $this->_searchFilterByName($filters, $filterField);
+				if ($pos === false) // If NOT found then add it
+				{
+					// New filter definition
+					$filterDefinition = new stdClass();
+					// Sets filter definition required properties
+					$filterDefinition->name = $filterField;
+					// Sets filter definition optional properties
+					$filterDefinition->operation = null;
+					$filterDefinition->condition = null;
+					$filterDefinition->option = null;
+					// Place the new applied filter at the end of the applied filters list
+					array_push($filters, $filterDefinition);
+				}
+
+				$this->setSessionElement(self::SESSION_FILTERS, $filters); // write changes into the session
+
+				$addFilterField = true;
+			}
+		}
+
+		return $addFilterField;
+	}
+
+	/**
+	 * Remove an applied filter (SQL where condition) from the current filter
+	 */
+	public function removeFilterField($filterField)
+	{
+		$removeFilterField = false;
+
+		// Checks the parameter filterField
+		if (!isEmptyString($filterField))
+		{
+			// Retrieves all the used fields by the current filter
+			$fields = $this->getSessionElement(self::SESSION_FIELDS);
+			// Retrieves the applied filters by the current filter
+			$filters = $this->getSessionElement(self::SESSION_FILTERS);
+
+			// Checks that the given applied filter is present in the list of all the used fields by the current filter
+			if (in_array($filterField, $fields))
+			{
+				// Search in what position the given applied filter is
+				$pos = $this->_searchFilterByName($filters, $filterField);
 				if ($pos !== false) // If found
 				{
 					array_splice($filters, $pos, 1); // Then remove it and shift the rest of elements by one if needed
@@ -525,54 +547,68 @@ class FilterCmptLib
 				$this->setSessionElement(self::SESSION_FILTERS, $filters);
 				$this->setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
 
-				$removeAppliedFilter = true;
+				$removeFilterField = true;
 			}
 		}
 
-		return $removeAppliedFilter;
+		return $removeFilterField;
 	}
 
 	/**
 	 * Apply all the applied filters (SQL where conditions) to the current filter
 	 */
-	public function applyFilters($appliedFilters, $appliedFiltersOperations, $appliedFiltersConditions, $appliedFiltersOptions)
+	public function applyFilterFields($filterFields)
 	{
 		$applyFilters = false;
 
-		// Checks the required parameters: appliedFilters and appliedFiltersOperations
-		if (isset($appliedFilters) && is_array($appliedFilters)
-			&& isset($appliedFiltersOperations) && is_array($appliedFiltersOperations))
+		// Check if the parameter is an array and it is not empty
+		if (!isEmptyArray($filterFields))
 		{
-			$fields = $this->getSessionElement(self::SESSION_FIELDS); // Retrieves all the used fields by the current filter
+			$filters = array();
 
-			// Checks that the given applied filters are present in all the used fields by the current filter
-			if (!array_diff($appliedFilters, $fields))
+			// Check if the parameter is fine
+			$fine = true;
+			foreach ($filterFields as $filterField)
 			{
-				$filters = array(); // starts building the new applied filters list
-				for ($i = 0; $i < count($appliedFilters); $i++) // loops through the given applied filters
+				// If not an empty array
+				if (!isEmptyArray($filterField))
 				{
-					$filterDefinition = new stdClass(); // new applied filter definition
-
-					// Sets the filter definition required properties
-					$filterDefinition->name = $appliedFilters[$i];
-					$filterDefinition->operation = $appliedFiltersOperations[$i];
-
-					// Sets the filter definition optional properties
-					$filterDefinition->condition = null;
-					if (isset($appliedFiltersConditions) && isset($appliedFiltersConditions[$i]))
+					// 
+					if (isset($filterField['name']) && isset($filterField["operation"]) && isset($filterField["condition"])
+						&& !isEmptyString($filterField["name"]) && !isEmptyString($filterField["operation"])
+						&& !isEmptyString($filterField["condition"]))
 					{
-						$filterDefinition->condition = $appliedFiltersConditions[$i];
+						// Fine
+						$filter = new stdClass();
+						$filter->name = $filterField['name'];
+						$filter->operation = $filterField['operation'];
+						$filter->condition = $filterField['condition'];
+						if (isset($filterField['option']) && !isEmptyString($filterField['option']))
+						{
+							$filter->option = $filterField['option'];
+						}
+						else
+						{
+							$filter->option = null;
+						}
+						$filters[] = $filter;
 					}
-
-					$filterDefinition->option = null;
-					if (isset($appliedFiltersOptions) && isset($appliedFiltersOptions[$i]))
+					else // otherwise is not fine and stop checking
 					{
-						$filterDefinition->option = $appliedFiltersOptions[$i];
+						$fine = false;
+						break;
 					}
-
-					$filters[$i] = $filterDefinition; // adds the new definition to the list
 				}
+				else // 
+				{
+					$fine = false;
+					break;
+				}
+			}
 
+			// 
+			if ($fine)
+			{
 				// Write changes into the session
 				$this->setSessionElement(self::SESSION_FILTERS, $filters);
 				$this->setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
@@ -590,49 +626,6 @@ class FilterCmptLib
 	public function reloadDataset()
 	{
 		$this->setSessionElement(self::SESSION_DATASET_RELOAD, true);
-	}
-
-	/**
-	 * Add a filter (SQL where clause) to be applied to the current filter
-	 */
-	public function addFilter($filter)
-	{
-		$addFilter = false;
-
-		// Checks the parameter filter
-		if (!isEmptyString($filter))
-		{
-			// Retrieves all the used fields by the current filter
-			$fields = $this->getSessionElement(self::SESSION_FIELDS);
-			// Retrieves the applied filters by the current filter
-			$filters = $this->getSessionElement(self::SESSION_FILTERS);
-
-			// Checks that the given applied filter is present in the list of all the used fields by the current filter
-			if (in_array($filter, $fields))
-			{
-				// Search in what position the given applied filter is
-				$pos = $this->_searchFilterByName($filters, $filter);
-				if ($pos === false) // If NOT found then add it
-				{
-					// New filter definition
-					$filterDefinition = new stdClass();
-					// Sets filter definition required properties
-					$filterDefinition->name = $filter;
-					// Sets filter definition optional properties
-					$filterDefinition->operation = null;
-					$filterDefinition->condition = null;
-					$filterDefinition->option = null;
-					// Place the new applied filter at the end of the applied filters list
-					array_push($filters, $filterDefinition);
-				}
-
-				$this->setSessionElement(self::SESSION_FILTERS, $filters); // write changes into the session
-
-				$addFilter = true;
-			}
-		}
-
-		return $addFilter;
 	}
 
 	/**
@@ -743,115 +736,49 @@ class FilterCmptLib
 	}
 
 	/**
-	 * Return an unique string that identify this filter component
-	 * NOTE: The default value is the URI where the FilterCmpt is called
-	 * If the fhc_controller_id is present then is also used
-	 */
-	public function setFilterUniqueIdByParams($params)
-	{
-		if ($params != null
-			&& is_array($params)
-			&& isset($params[self::FILTER_UNIQUE_ID])
-			&& !isEmptyString($params[self::FILTER_UNIQUE_ID]))
-		{
-			$filterUniqueId = $params[self::FILTER_UNIQUE_ID];
-		}
-		else
-		{
-			// Gets the current page URI
-			$filterUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method;
-		}
-
-		$this->setFilterUniqueId($filterUniqueId);
-	}
-
-	/**
-	 *
-	 */
-	public function setFilterUniqueId($filterUniqueId)
-	{
-		// If the FHC_CONTROLLER_ID parameter is present in the HTTP GET
-		if (isset($_GET[self::FHC_CONTROLLER_ID]))
-		{
-			$filterUniqueId .= '/'.$this->_ci->input->get(self::FHC_CONTROLLER_ID); // then use it
-		}
-		elseif (isset($_POST[self::FHC_CONTROLLER_ID])) // else if the FHC_CONTROLLER_ID parameter is present in the HTTP POST
-		{
-			$filterUniqueId .= '/'.$this->_ci->input->post(self::FHC_CONTROLLER_ID); // then use it
-		}
-
-		$this->_filterUniqueId = $filterUniqueId;
-	}
-
-	/**
-	 *
-	 */
-	public function setFilterType($filterType)
-	{
-		$this->_filterType = $filterType;
-	}
-
-	/**
-	 *
-	 */
-	public function setFilterId($filterId)
-	{
-		$this->_filterId = $filterId;
-	}
-
-	/**
 	 * Generates the filters menu structure array and stores it into the session
 	 */
-	public function generateFilterMenu($navigationPage)
+	private function _generateFilterMenu($app, $datasetName)
 	{
 		$filterMenu = new stdClass();
 		$filterMenu->filters = array();
 		$filterMenu->personalFilters = array();
 
-		$session = $this->getSession(); // The filter currently stored in session (the one that is currently used)
-		if ($session != null)
+		// Loads the Filters model
+		$this->_ci->load->model('system/Filters_model', 'FiltersModel');
+
+		// Loads all the filters related to this page (same dataset_name and same app name)
+		$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetNamePersonId(
+			$app,
+			$datasetName,
+			getAuthPersonId()
+		);
+
+		// If filters were loaded
+		if (hasData($filters))
 		{
-			// Loads the Filters model
-			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
+			$childrenArray = array(); // contains all the children elements in a menu entry
+			$childrenPersonalArray = array(); // contains all the children elements in menu enty for personal filters
 
-			// Loads all the filters related to this page (same dataset_name and same app name)
-			$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetNamePersonId(
-				$session[self::APP],
-				$session[self::DATASET_NAME],
-				getAuthPersonId()
-			);
-
-			// If filters were loaded
-			if (hasData($filters))
+			// Loops through loaded filters
+			foreach (getData($filters) as $filter)
 			{
-				$childrenArray = array(); // contains all the children elements in a menu entry
-				$childrenPersonalArray = array(); // contains all the children elements in menu enty for personal filters
+				$menuEntry = new stdClass();
+				$menuEntry->desc = $filter->description[0];
+				$menuEntry->filter_id = $filter->filter_id;
 
-				// Loops through loaded filters
-				foreach (getData($filters) as $filter)
+				// If it is NOT a personal filter
+				if ($filter->person_id == null)
 				{
-					$menuEntry = new stdClass();
-					$menuEntry->desc = $filter->description[0];
-					$menuEntry->link = sprintf(
-						'%s?%s=%s',
-						site_url($navigationPage),
-						self::FILTER_ID,
-						$filter->{self::FILTER_ID}
-					);
+					$filterMenu->filters[] = $menuEntry;
+				}
+				else // otherwise
+				{
+					$menuEntry->subscriptDescription = 'Remove';
+					$menuEntry->subscriptLinkClass = 'remove-custom-filter';
+					$menuEntry->subscriptLinkValue = $filter->{self::FILTER_ID};
 
-					// If it is NOT a personal filter
-					if ($filter->person_id == null)
-					{
-						$filterMenu->filters[] = $menuEntry;
-					}
-					else // otherwise
-					{
-						$menuEntry->subscriptDescription = 'Remove';
-						$menuEntry->subscriptLinkClass = 'remove-custom-filter';
-						$menuEntry->subscriptLinkValue = $filter->{self::FILTER_ID};
-
-						$filterMenu->personalFilters[] = $menuEntry; // adds to personal filters menu array
-					}
+					$filterMenu->personalFilters[] = $menuEntry; // adds to personal filters menu array
 				}
 			}
 		}
@@ -863,10 +790,50 @@ class FilterCmptLib
 	// Private methods
 
 	/**
+	 * Checks the required parameters used to call this FilterCmpt
+	 */
+	private function _checkJSParameters()
+	{
+		//
+		if (isEmptyString($this->_filterUniqueId))
+		{
+			$this->setSession(error('Parameter "filterUniqueId" not provided'));
+			return false;
+		}
+
+		//
+		if (isEmptyString($this->_filterType))
+		{
+			$this->setSession(error('Parameter "filterType" not provided'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Contains all the logic used to load all the data needed to the FilterCmpt
 	 */
-	private function _startFilterCmpt()
+	public function start()
 	{
+		//
+		if (!$this->_checkJSParameters()) return;
+
+		// Gets the filter configuration from the file system
+		require_once(APPPATH.'components/filters/'.$this->_filterType.'.php');
+
+		// Gets the filter configuration from the extensions
+		// require_once(APPPATH.'components/extensions/'.$this->_filterType.'.php');
+
+		//
+		if (!$this->_checkPHPParameters($filterCmptArray)) return;
+
+		// 
+		$this->_initFilterCmpt($filterCmptArray);
+
+		//
+		if (!$this->_isAllowed()) return;
+
 		// Looks for expired filter components in session and drops them
 		$this->dropExpiredFilterCmpts();
 
@@ -908,8 +875,6 @@ class FilterCmptLib
 					// Save changes into session if data are valid
 					if (!isError($dataset))
 					{
-						$this->_formatDataset($dataset); // marks rows using markRow and format rowns using formatRow
-
 						// Set the new dataset and its attributes in the session
 						$this->setSessionElement(FilterCmptLib::SESSION_METADATA, $this->_ci->FiltersModel->getExecutedQueryMetaData());
 						$this->setSessionElement(FilterCmptLib::SESSION_ROW_NUMBER, count($dataset->retval));
@@ -946,8 +911,6 @@ class FilterCmptLib
 				// Save changes into session if data are valid
 				if (!isError($dataset))
 				{
-					$this->_formatDataset($dataset); // marks rows using markRow and format rowns using formatRow
-
 					// Stores an array that contains all the data useful for
 					$this->setSession(
 						array(
@@ -957,17 +920,12 @@ class FilterCmptLib
 							FilterCmptLib::SESSION_FILTER_NAME => $filterName, // the current filter name
 							FilterCmptLib::SESSION_FIELDS => $this->_ci->FiltersModel->getExecutedQueryListFields(), // all the fields of the dataset
 							FilterCmptLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
-							FilterCmptLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
-							FilterCmptLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns
-							FilterCmptLib::SESSION_CHECKBOXES => $this->_checkboxes, // the name of the field used to build the checkboxes column
 							FilterCmptLib::SESSION_FILTERS => $parsedFilterJson->filters, // all the filters used to filter the dataset
 							FilterCmptLib::SESSION_METADATA => $this->_ci->FiltersModel->getExecutedQueryMetaData(), // the metadata of the dataset
 							FilterCmptLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this filter
 							FilterCmptLib::SESSION_DATASET => $dataset->retval, // the entire dataset
 							FilterCmptLib::SESSION_DATASET_RELOAD => false, // if the dataset must be reloaded, not needed the first time
-							FilterCmptLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation, // the choosen dataset representation
-							FilterCmptLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions, // the choosen dataset representation options
-							FilterCmptLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs // the choosen dataset representation record fields definition
+							FilterCmptLib::SESSION_SIDE_MENU => $this->_generateFilterMenu($this->_app, $this->_datasetName)
 						)
 					);
 				}
@@ -984,97 +942,67 @@ class FilterCmptLib
 	/**
 	 * Checks the required parameters used to call this FilterCmpt
 	 */
-	private function _checkParameters($filterCmptArray)
+	private function _checkPHPParameters($filterCmptArray)
 	{
 		// If no options are given to this component...
 		if (!is_array($filterCmptArray) || (is_array($filterCmptArray) && count($filterCmptArray) == 0))
 		{
-			show_error('Second parameter of the component call must be a NOT empty associative array');
+			$this->setSession(error('No parameters provided'));
+			return false;
 		}
 		else // ...otherwise
 		{
-			// Parameters (app AND dataset name) OR filter id are mandatory
-			if ((!isset($filterCmptArray[FilterCmptLib::APP]) && !isset($filterCmptArray[FilterCmptLib::DATASET_NAME]))
-				&& !isset($filterCmptArray[FilterCmptLib::FILTER_ID]))
+			// Parameters app AND dataset name
+			if (!isset($filterCmptArray[FilterCmptLib::APP]) && !isset($filterCmptArray[FilterCmptLib::DATASET_NAME]))
 			{
-				show_error(
-					'The parameters ("'.FilterCmptLib::APP.'" AND "'.FilterCmptLib::DATASET_NAME.') OR "'.
-					FilterCmptLib::FILTER_ID.'" must be specified'
+				$this->setSession(
+					error(
+						'The parameters "'.FilterCmptLib::APP.'" AND "'.FilterCmptLib::DATASET_NAME.' must be specified'
+					)
 				);
+				return false;
 			}
 
 			// The query parameter is mandatory
 			if (!isset($filterCmptArray[FilterCmptLib::QUERY]))
 			{
-				show_error('The parameter "'.FilterCmptLib::QUERY.'" must be specified');
+				$this->setSession(error('The parameter "'.FilterCmptLib::QUERY.'" must be specified'));
+				return false;
 			}
 
-			// The dataset representation parameter is mandatory
-			if (!isset($filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION]))
+			//
+			if (!isset($filterCmptArray[FilterCmptLib::DATASET_NAME]))
 			{
-				show_error('The parameter "'.FilterCmptLib::DATASET_REPRESENTATION.'" must be specified');
+				$this->setSession(error('The parameter "'.FilterCmptLib::DATESET_NAME.'" must be specified'));
+				return false;
 			}
 
-			// Checks if the dataset representation parameter is valid
-			if (isset($filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION])
-				&& $filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION] != FilterCmptLib::DATASET_REP_TABLESORTER
-				&& $filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION] != FilterCmptLib::DATASET_REP_PIVOTUI
-				&& $filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION] != FilterCmptLib::DATASET_REP_TABULATOR)
+			//
+			if (!isset($filterCmptArray[FilterCmptLib::REQUIRED_PERMISSIONS]))
 			{
-				show_error(
-					'The parameter "'.FilterCmptLib::DATASET_REPRESENTATION.
-					'" must be IN ("'
-						.FilterCmptLib::DATASET_REP_TABLESORTER.'", "'
-						.FilterCmptLib::DATASET_REP_PIVOTUI.'", "'
-						.FilterCmptLib::DATASET_REP_TABULATOR.'")'
-				);
-			}
-
-			// If given the session timeout parameter must be a number
-			if (isset($filterCmptArray[FilterCmptLib::SESSION_TIMEOUT]) && !is_numeric($filterCmptArray[FilterCmptLib::SESSION_TIMEOUT]))
-			{
-				show_error('The parameter "'.FilterCmptLib::SESSION_TIMEOUT.'" must be a number');
+				$this->setSession(error('The parameter "'.FilterCmptLib::REQUIRED_PERMISSIONS.'" must be specified'));
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	/**
 	 * Checks parameters and initialize all the properties of this FilterCmpt
 	 */
-	private function _initFilterCmpt()
+	private function _initFilterCmpt($filterCmptArray)
 	{
-		// Gets the filter configuration from the file system
-		require_once(APPPATH.'components/filters/'.$this->_filterType.'.php');
-
-		// Gets the filter configuration from the extensions
-		// require_once(APPPATH.'components/extensions/'.$this->_filterType.'.php');
-
-		$this->_checkParameters($filterCmptArray);
-
 		// If here then everything is ok
 
 		// Initialize class properties
-		$this->_requiredPermissions = null;
 		$this->_app = null;
 		$this->_datasetName = null;
 		$this->_filterKurzbz = null;
-		//$this->_filterId = null;
-		$this->_reloadDataset = true; // by default the dataset is NOT cached in session
 		$this->_query = null;
-		$this->_additionalColumns = null;
-		$this->_columnsAliases = null;
-		$this->_formatRow = null;
-		$this->_markRow = null;
-		$this->_checkboxes = null;
-		$this->_hideOptions = null;
-		$this->_hideSelectFields = null;
-		$this->_hideSelectFilters = null;
-		$this->_hideSave = null;
-		$this->_hideMenu = null;
-		$this->_customMenu = null;
-		$this->_datasetRepresentation = null;
-		$this->_datasetRepresentationOptions = null;
-		$this->_datasetRepFieldsDefs = null;
+		$this->_requiredPermissions = null;
+
+		$this->_reloadDataset = true; // by default the dataset is NOT cached in session
 		$this->_sessionTimeout = FilterCmptLib::SESSION_DEFAULT_TIMEOUT;
 
 		// Retrieved the required permissions parameter if present
@@ -1099,118 +1027,10 @@ class FilterCmptLib
 			$this->_filterKurzbz = $filterCmptArray[FilterCmptLib::FILTER_KURZBZ];
 		}
 
-		if (isset($filterCmptArray[FilterCmptLib::FILTER_ID]))
-		{
-			$this->_filterId = $filterCmptArray[FilterCmptLib::FILTER_ID];
-		}
-
 		// How to retrieve data for the filter: SQL statement or a result from DB
 		if (isset($filterCmptArray[FilterCmptLib::QUERY]))
 		{
 			$this->_query = $filterCmptArray[FilterCmptLib::QUERY];
-		}
-
-		if (isset($filterCmptArray[FilterCmptLib::DATASET_RELOAD]))
-		{
-			$this->_reloadDataset = $filterCmptArray[FilterCmptLib::DATASET_RELOAD];
-		}
-
-		// Parameter is used to add extra columns to the dataset
-		if (isset($filterCmptArray[FilterCmptLib::ADDITIONAL_COLUMNS])
-			&& is_array($filterCmptArray[FilterCmptLib::ADDITIONAL_COLUMNS])
-			&& count($filterCmptArray[FilterCmptLib::ADDITIONAL_COLUMNS]) > 0)
-		{
-			$this->_additionalColumns = $filterCmptArray[FilterCmptLib::ADDITIONAL_COLUMNS];
-		}
-
-		// Parameter is used to add use aliases for the columns fo the dataset
-		if (isset($filterCmptArray[FilterCmptLib::COLUMNS_ALIASES])
-			&& is_array($filterCmptArray[FilterCmptLib::COLUMNS_ALIASES])
-			&& count($filterCmptArray[FilterCmptLib::COLUMNS_ALIASES]) > 0)
-		{
-			$this->_columnsAliases = $filterCmptArray[FilterCmptLib::COLUMNS_ALIASES];
-		}
-
-		// Parameter that contains a function to format the rows of the dataset
-		if (isset($filterCmptArray[FilterCmptLib::FORMAT_ROW]) && is_callable($filterCmptArray[FilterCmptLib::FORMAT_ROW]))
-		{
-			$this->_formatRow = $filterCmptArray[FilterCmptLib::FORMAT_ROW];
-		}
-
-		// Parameter that contains a function to mark in the GUI the rows of the dataset
-		if (isset($filterCmptArray[FilterCmptLib::MARK_ROW]) && is_callable($filterCmptArray[FilterCmptLib::MARK_ROW]))
-		{
-			$this->_markRow = $filterCmptArray[FilterCmptLib::MARK_ROW];
-		}
-
-		// Parameter used to specify the column of the dataset that will be used
-		// as id of the checkboxes column in the GUI
-		if (isset($filterCmptArray[FilterCmptLib::CHECKBOXES]))
-		{
-			$this->_checkboxes = $filterCmptArray[FilterCmptLib::CHECKBOXES];
-		}
-
-		// To specify if the filter options are shown ot not
-		if (isset($filterCmptArray[FilterCmptLib::HIDE_OPTIONS]) && is_bool($filterCmptArray[FilterCmptLib::HIDE_OPTIONS]))
-		{
-			$this->_hideOptions = $filterCmptArray[FilterCmptLib::HIDE_OPTIONS];
-		}
-
-		// To specify if the form to select fields is shown or not
-		if (isset($filterCmptArray[FilterCmptLib::HIDE_SELECT_FIELDS]) && is_bool($filterCmptArray[FilterCmptLib::HIDE_SELECT_FIELDS]))
-		{
-			$this->_hideSelectFields = $filterCmptArray[FilterCmptLib::HIDE_SELECT_FIELDS];
-		}
-
-		// To specify if the form to select filters is shown or not
-		if (isset($filterCmptArray[FilterCmptLib::HIDE_SELECT_FILTERS]) && is_bool($filterCmptArray[FilterCmptLib::HIDE_SELECT_FILTERS]))
-		{
-			$this->_hideSelectFilters = $filterCmptArray[FilterCmptLib::HIDE_SELECT_FILTERS];
-		}
-
-		// To specify if the form to save a custom FilterCmpt is shown or not
-		if (isset($filterCmptArray[FilterCmptLib::HIDE_SAVE]) && is_bool($filterCmptArray[FilterCmptLib::HIDE_SAVE]))
-		{
-			$this->_hideSave = $filterCmptArray[FilterCmptLib::HIDE_SAVE];
-		}
-
-		// If the menu should be shown or not
-		if (isset($filterCmptArray[FilterCmptLib::HIDE_MENU]) && is_bool($filterCmptArray[FilterCmptLib::HIDE_MENU]))
-		{
-			$this->_hideMenu = $filterCmptArray[FilterCmptLib::HIDE_MENU];
-		}
-
-		// If a custom menu is set
-		if (isset($filterCmptArray[FilterCmptLib::CUSTOM_MENU]) && is_bool($filterCmptArray[FilterCmptLib::CUSTOM_MENU]))
-		{
-			$this->_customMenu = $filterCmptArray[FilterCmptLib::CUSTOM_MENU];
-		}
-
-		// To specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
-		if (isset($filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION])
-			&& ($filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION] == FilterCmptLib::DATASET_REP_TABLESORTER
-			|| $filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION] == FilterCmptLib::DATASET_REP_PIVOTUI
-			|| $filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION] == FilterCmptLib::DATASET_REP_TABULATOR))
-		{
-			$this->_datasetRepresentation = $filterCmptArray[FilterCmptLib::DATASET_REPRESENTATION];
-		}
-
-		// To specify options for the dataset representation (ex: tablesorter, pivotUI, ...)
-		if (isset($filterCmptArray[FilterCmptLib::DATASET_REP_OPTIONS]) && !isEmptyString($filterCmptArray[FilterCmptLib::DATASET_REP_OPTIONS]))
-		{
-			$this->_datasetRepresentationOptions = $filterCmptArray[FilterCmptLib::DATASET_REP_OPTIONS];
-		}
-
-		// To specify how to represent each record field
-		if (isset($filterCmptArray[FilterCmptLib::DATASET_REP_FIELDS_DEFS]) && !isEmptyString($filterCmptArray[FilterCmptLib::DATASET_REP_FIELDS_DEFS]))
-		{
-			$this->_datasetRepFieldsDefs = $filterCmptArray[FilterCmptLib::DATASET_REP_FIELDS_DEFS];
-		}
-
-		// To specify the expiring session time
-		if (isset($filterCmptArray[FilterCmptLib::SESSION_TIMEOUT]) && is_numeric($filterCmptArray[FilterCmptLib::SESSION_TIMEOUT]))
-		{
-			$this->_sessionTimeout = $filterCmptArray[FilterCmptLib::SESSION_TIMEOUT];
 		}
 	}
 
@@ -1351,73 +1171,6 @@ class FilterCmptLib
 				}
 			}
 		}
-	}
-
-	/**
-	 * Calls the method _markRow and _formatRow to marks rows using markRow and format rowns using formatRow
-	 * NOTE: this method operates directly on the retrieved dataset: parameter passed by reference
-	 */
-	private function _formatDataset(&$rawDataset)
-	{
-		if (hasData($rawDataset) && is_array($rawDataset->retval))
-		{
-			// For each row of the data set
-			for ($rowCounter = 0; $rowCounter < count($rawDataset->retval); $rowCounter++)
-			{
-				// Calls the methods to mark and to format a row
-				// NOTE: keep this order! the markRow function given as parameter is supposing to work
-				// on a raw dataset, NOT on a formatted one
-				$rawDataset->retval[$rowCounter]->MARK_ROW_CLASS = $this->_markRow($rawDataset->retval[$rowCounter]);
-				$this->_formatRow($rawDataset->retval[$rowCounter]);
-			}
-		}
-	}
-
-	/**
-	 * Formats the columns of all the rows of the entire dataset
-	 * - converts booleans into strings "true" and "false"
-	 * - format dates using the format string defined in DEFAULT_DATE_FORMAT
-	 * Calls the parameter formatRow if it was given and if it is a valid funtion
-	 * NOTE: this method operates directly on the retrieved dataset: parameter passed by reference
-	 */
-	private function _formatRow(&$rawDatasetRow)
-	{
-		// For each column of the row
-		foreach ($rawDatasetRow as $columnName => $columnValue)
-		{
-			// Basic conversions
-			if (is_bool($columnValue))
-			{
-				$rawDatasetRow->{$columnName} = ($columnValue === true ? 'true' : 'false');
-			}
-			elseif (DateTime::createFromFormat('Y-m-d H:i:s', $columnValue) !== false)
-			{
-				$rawDatasetRow->{$columnName} = date(self::DEFAULT_DATE_FORMAT, strtotime($columnValue));
-			}
-		}
-
-		// If a valid function call the given formatRow
-		if ($this->_formatRow != null && is_callable($this->_formatRow))
-		{
-			$formatRowFunction = $this->_formatRow;
-			$rawDatasetRow = $formatRowFunction($rawDatasetRow);
-		}
-	}
-
-	/**
-	 * Returns a string that contains a class name used to mark rows in the dataset table
-	 * Calls the parameter markRow if it was given and if it is a valid funtion
-	 */
-	private function _markRow($rawDatasetRow)
-	{
-		// If a valid function call the given markRow
-		if ($this->_markRow != null && is_callable($this->_markRow))
-		{
-			$markRowFunction = $this->_markRow;
-			$class = $markRowFunction($rawDatasetRow);
-		}
-
-		return !isset($class) ? '' : $class;
 	}
 
 	/**
