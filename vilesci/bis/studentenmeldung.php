@@ -1235,7 +1235,7 @@ function GenerateXMLStudentBlock($row)
 
 			if($gserror!='')
 			{
-				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+				$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 				$v.=$gserror."\n";
 				return '';
 			}
@@ -1271,7 +1271,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				if($row_ap->sponsion=='' || $row_ap->sponsion==null)
 				{
-					$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
+					$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
 				}
 				$ap++;
 			}
@@ -1339,7 +1339,7 @@ function GenerateXMLStudentBlock($row)
 
 	if($error_log!='' OR $error_log1!='')
 	{
-		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+		$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 		if($error_log!='')
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fehler: ".$error_log."\n";
@@ -1363,7 +1363,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		if($error_log_hinweis != '')
 		{
-			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+			$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n\n";
 			$error_log_hinweis = '';
 		}
@@ -1665,7 +1665,7 @@ function GenerateXMLStudentBlock($row)
 				// Bei validen Daten errorlog ausgeben
 				if($error_log_io != '')
 				{
-					$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+					$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 					if($error_log_io != '')
 					{
 						$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fehler: ".$error_log_io. "\n";

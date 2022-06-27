@@ -50,4 +50,5 @@ $this->phrasen['testtool/startDrueckenUmZuBeginnen']='To start this section, ple
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='No candidate entry available.';
 $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='You have applied for the following degree programs:';
 $this->phrasen['testtool/invalideGebiete']='One or more question areas incorrect!<br>Please inform an assisting person.';
+$this->phrasen['testtool/prueflingGesperrt']='Please contact the placement test supervisor!';
 ?>

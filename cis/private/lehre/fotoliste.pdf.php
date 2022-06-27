@@ -37,7 +37,6 @@ require_once('../../../include/erhalter.class.php');
 require_once('../../../include/datum.class.php');
 
 
-$doc = new dokument_export('fotoliste');
 $output = 'pdf';
 $show_all_fotos = false;
 
@@ -61,6 +60,8 @@ $lv->load($lvid);
 
 $stg = new studiengang();
 $stg->load($lv->studiengang_kz);
+
+$doc = new dokument_export('fotoliste', $stg->oe_kurzbz);
 
 $berechtigung = new benutzerberechtigung();
 $berechtigung->getBerechtigungen($user);
@@ -224,8 +225,9 @@ if ($result = $db->db_query($qry)) {
             else
                 $zusatz = '';
 
-            if ($row->bisio_id != '' && $row->status != 'Incoming' && ($row->bis > $stsemdatumvon || $row->bis == '') && $row->von < $stsemdatumbis) //Outgoing
-                $zusatz .= '(o)(ab ' . $datum->formatDatum($row->von, 'd.m.Y') . ')';
+            if ($row->bisio_id != '' && $row->status != 'Incoming' && ($row->bis > $stsemdatumvon || $row->bis == '') && $row->von < $stsemdatumbis
+                && (anzahlTage($row->von, $row->bis) >= 30)) //Outgoing
+                $zusatz .= '(o)(ab '. $datum->formatDatum($row->von, 'd.m.Y'). ')';
 
             if ($row->note == 6) //angerechnet
                 $zusatz .= '(ar)';
