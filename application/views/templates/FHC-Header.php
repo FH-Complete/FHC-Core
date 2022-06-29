@@ -36,11 +36,8 @@
 			// Bootstrap 5 CSS
 			if ($bootstrap5 === true) generateCSSsInclude('vendor/twbs/bootstrap5/dist/css/bootstrap.min.css');
 
-			// jQuery UI CSS
-			if ($jqueryui1 === true) generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
-
-			// jQuery treetable
-			if ($jquerytreetable3 === true) generateCSSsInclude('vendor/ludo/jquery-treetable/css/jquery.treetable.css');
+			// Securimage CSS
+			if ($captcha3 === true) generateCSSsInclude('vendor/dapphp/securimage/securimage.css');
 
 			// Font Awesome 4 CSS free icons
 			if ($fontawesome4 === true) generateCSSsInclude('vendor/fortawesome/font-awesome4/css/font-awesome.min.css');
@@ -53,6 +50,12 @@
 				generateCSSsInclude('vendor/fortawesome/font-awesome6/css/brands.min.css');
 			}
 
+			// jQuery UI CSS
+			if ($jqueryui1 === true) generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
+
+			// jQuery treetable
+			if ($jquerytreetable3 === true) generateCSSsInclude('vendor/ludo/jquery-treetable/css/jquery.treetable.css');
+
 			// PivotUI CSS
 			if ($pivotui2 === true) generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');
 
@@ -62,9 +65,6 @@
 				generateCSSsInclude('vendor/blackrockdigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.css');
 				generateCSSsInclude('vendor/blackrockdigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
 			}
-
-			// Securimage CSS
-			if ($captcha3 === true) generateCSSsInclude('vendor/dapphp/securimage/securimage.css');
 
 			// Table sorter CSS
 			if ($tablesorter2 === true) generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');

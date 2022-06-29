@@ -7,6 +7,7 @@
 	// By default set the parameters to false
 
 	// External resources
+	$axios027 = isset($axios027) ? $axios027 : false;
 	$bootstrap3 = isset($bootstrap3) ? $bootstrap3 : false;
 	$bootstrap5 = isset($bootstrap5) ? $bootstrap5 : false;
 	$captcha3 = isset($captcha3) ? $captcha3 : false;
