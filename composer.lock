@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b676b82ae026f2aab04de7e7054038a3",
-    "content-hash": "6f7d38a748ab2c18b1121ee5dd24aa05",
+    "hash": "393c86b01f511234ce1dd24b2da22907",
+    "content-hash": "06657215ed20ab4859ba095652204e63",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -44,6 +44,17 @@
             "dist": {
                 "type": "zip",
                 "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "axios/axios",
+            "version": "0.27.2",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/axios@0.27.2/dist/axios.min.js",
                 "reference": null,
                 "shasum": null
             },
@@ -2574,6 +2585,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
+            "abandoned": "symfony/error-handler",
             "time": "2020-10-24 10:57:07"
         },
         {

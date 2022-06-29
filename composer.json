@@ -40,6 +40,17 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "axios/axios",
+				"version": "0.27.2",
+				"dist": {
+					"url": "https://unpkg.com/axios@0.27.2/dist/axios.min.js",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "blackrockdigital/startbootstrap-sb-admin-2",
 				"version": "3.3.7.1",
 				"dist": {
@@ -325,26 +336,19 @@
 					"type": "file"
 				}
 			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "axios/axios",
-				"version": "0.27.2",
-				"dist": {
-					"url": "https://unpkg.com/axios@0.27.2/dist/axios.min.js",
-					"type": "file"
-				}
-			}
 		}
 	],
 	"require": {
 		"php": ">=5.6.40",
 
 		"afarkas/html5shiv": "3.7.*",
+		"alvaro-prieto/colresizable": "1.6",
+		"axios/axios": "0.27.2",
+
+		"blackrockdigital/startbootstrap-sb-admin-2": "3.3.*",
+		"borgar/textile-js": "2.0.4",
 
 		"chillerlan/php-qrcode": "2.0.*",
-
 		"chriskacerguis/codeigniter-restserver": "3.0.3",
 		"christianbach/tablesorter": "1.0.*",
 		"codeigniter/framework": "3.*",
@@ -356,36 +360,10 @@
 
 		"easyrdf/easyrdf": "0.9.*",
 
+		"fgelinas/timepicker": "0.3.3",
 		"fortawesome/font-awesome4": "4.7.*",
 		"fortawesome/font-awesome6": "6.1.*",
 		"fzaninotto/faker": "1.*",
-
-		"kingsquare/json-schema-form": "*",
-
-		"michelf/php-markdown": "1.5.0",
-		"ml/json-ld": "1.*",
-		"mottie/tablesorter": "2.*",
-
-		"nategood/httpful": "0.2.*",
-		"netcarver/textile": "3.7.*",
-
-		"phpseclib/phpseclib": "2.0.*",
-
-		"tinymce/tinymce4": "4.9.*",
-		"tinymce/tinymce5": "5.10.*",
-
-		"twbs/bootstrap3": "3.4.*",
-		"twbs/bootstrap5": "5.1.*",
-
-		"vuejs/vuejs3": "3.2.33",
-		"axios/axios": "0.27.2",
-
-		"alvaro-prieto/colresizable": "1.6",
-
-		"blackrockdigital/startbootstrap-sb-admin-2": "3.3.*",
-		"borgar/textile-js": "2.0.4",
-
-		"fgelinas/timepicker": "0.3.3",
 
 		"joeldbirch/superfish": "1.7.*",
 		"jquery/jquery1": "1.*",
@@ -395,21 +373,36 @@
 		"json-forms": "1.4.0",
 		"jsoneditor": "5.5.6",
 
+		"kingsquare/json-schema-form": "*",
+
 		"ludo/jquery-treetable": "3.2.0",
 
+		"michelf/php-markdown": "1.5.0",
+		"ml/json-ld": "1.*",
 		"moment/momentjs": "2.24.0",
+		"mottie/tablesorter": "2.*",
 
+		"nategood/httpful": "0.2.*",
+		"netcarver/textile": "3.7.*",
 		"nicolaskruchten/pivottable": "2.23.0",
 
 		"olifolkerd/tabulator4": "4.9.*",
 		"olifolkerd/tabulator5": "5.2.*",
+
+		"phpseclib/phpseclib": "2.0.*",
 
 		"rmariuzzo/jquery-checkboxes": "1.0.7",
 
 		"scottjehl/respond": "1.4.2",
 
 		"tapmodo/jcrop": "2.0.4",
-		"tomazdragar/simplecropper": "1.0"
+		"tinymce/tinymce4": "4.9.*",
+		"tinymce/tinymce5": "5.10.*",
+		"tomazdragar/simplecropper": "1.0",
+		"twbs/bootstrap3": "3.4.*",
+		"twbs/bootstrap5": "5.1.*",
+
+		"vuejs/vuejs3": "3.2.33"
 	},
 	"config": {
 		"bin-dir": "vendor/bin"
