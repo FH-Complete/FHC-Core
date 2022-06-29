@@ -108,7 +108,12 @@ $addon_obj->loadAddons();
 foreach($addon_obj->result as $addon)
 {
 	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+	{
 		echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+		$addoncasetime = true;
+		require_once('../../../addons/casetime/include/functions.inc.php');
+	}
+
 }
 
 // Wenn Seite fertig geladen ist Addons aufrufen
@@ -160,62 +165,6 @@ $( document ).ready(function()
      }
    }
   return [true, ""];
-}
-
-function AddonCaseTimeLoadZeitsaldo(uid)
-{
-	$.ajax({
-		type: "GET",
-		dataType: "json",
-		url: "'.APP_ROOT.'/addons/casetime/vilesci/zeitsaldo.php?uid="+uid,
-		success: function (result)
-		{
-			if (result===false)
-			{
-				$("#zeitsaldo").html("error");
-			}
-			else
-			{
-				var DatumAktuell = new Date();
-				//var DatumAktuell = new Date(2016,0,11);
-				var MonatAktuell = DatumAktuell.getMonth()+1;
-				var MonatLetztes = MonatAktuell - 1;
-				var JahrAktuell = DatumAktuell.getFullYear();
-				var JahrLetztes = DatumAktuell.getFullYear();
-				var VorJahr = JahrAktuell -1;
-				if (MonatLetztes == 0)
-				{
-					MonatLetztes = 12;
-					JahrLetztes = JahrAktuell - 1;
-				}
-				var MonatVorLetztes = MonatLetztes -1;
-				var JahrVorLetztes = JahrLetztes;
-				if (MonatVorLetztes == 0)
-				{
-					MonatVorLetztes = 12;
-					JahrVorLetztes = JahrLetztes -1;
-				}
-
-
-				var zahl = parseFloat(result);
-				if (zahl > 0)
-					var faktor = 1;
-				else
-					var faktor = -1;
-				zahl = zahl * faktor;
-				var std = Math.floor(zahl);
-				var min = (zahl-Math.floor(zahl))*60;
-				min = Math.round(min);
-				var std_anzeigealt = std+"h:"+min+"m";
-
-				  $(\'input[name="zeitsaldo"]\').val("Aktueller Stundensaldo: "+result +" Stunden ("+std_anzeigealt+")");
-
-			}
-      },
-		error: function(){
-			alert("Error Casetime Load");
-		}
-    });
 }
 
 </script>';
@@ -399,16 +348,20 @@ function showHideStudeDropDown()
 
 <?php
 
+
+if($addoncasetime)
+{
+	$zeitsaldo = getCaseTimeZeitsaldo($uid);
+	$zeitsaldo = "Aktueller Zeitsaldo: ". $zeitsaldo . " (".formatZeitsaldo($zeitsaldo).")";
+}
+
+
 //Zeitsperre Speichern
 if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_sperre'))
 {
 
 	$error=false;
 	$error_msg='';
-	$zeitsaldo = $_POST['zeitsaldo'];
-
-	if(!substr( $zeitsaldo, 0, 4 ) === "Aktu")
-		$zeitsaldo = "";
 
 
 	//von-datum pruefen
@@ -602,55 +555,41 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 
 						$benutzer = new benutzer();
 						$benutzer->load($uid);
+						$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
+						$beschreibung = (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung);
+
 						if($datum_obj->formatDatum($zeitsperre->vondatum, 'm')>=9)
 							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y')+1;
 						else
 							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
 
+							$von = $datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y');
+							$bis = $datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y');
+
 						// Wenn ein neuer Urlaub eingetragen wurde, Freigabemail-Text
 						if ($zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 						{
-							if ($zeitsperre->new)
-							{
-							$mailSancho = " $benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:<br>";
-
-							$mailSancho.= (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung).
-							" von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y').
-							" bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y').
-							".<br>Sie können diesen unter folgender Adresse freigeben:<br><br>".
-							" <a href=". APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr .">Link Urlaubstool</a> ";
+							$zeitsaldo = " <a href=". APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr .">Link Urlaubstool</a> ";
 
 							$subject = "Freigabeansuchen";
-
-							$zeitsaldo = '';
-							}
-
+							$mailvorlage = 'Sancho_Mail_Urlaub_Neu';
 						}
 
 						// Wenn ein Zeitausgleich eingetragen wurde...
+						//manu zeitsperre neu
 						if ($zeitsperre->zeitsperretyp_kurzbz == 'ZA')
 						{
 							// ...Mail-Text für neuen Zeitausgleich
 							if ($zeitsperre->new)
 							{
-								$mailSancho = " $benutzer->nachname $benutzer->vorname hat einen neuen Zeitausgleich eingetragen:<br>";
-
-								$mailSancho.= (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung).
-								" von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y').
-								" bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y');
-
 								$subject = $p->t('urlaubstool/zeitausgleichNeu');
+								$mailvorlage = 'Sancho_Content_Zeitausgleich';
 							}
 							// ...Mail-Text für geaenderten Zeitausgleich
 							else
 							{
-									$mailSancho = " $benutzer->nachname $benutzer->vorname hat den Zeitausgleich wie folgt geändert:<br>" ;
-
-									$mailSancho.= (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung).
-									" von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y').
-									" bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y');
-
 								$subject = $subject = $p->t('urlaubstool/zeitausgleichGeaendert');
+								$mailvorlage = 'Sancho_Content_ZA_Aendern';
 							}
 						}
 
@@ -659,11 +598,15 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						//Sanchomail mit Vorlage Sancho Mail Zeitausgleich
 						$template_data = array(
 							'vorgesetzter' => $fullName,
-							'textZeitausgleich' => $mailSancho,
+							'nameMitarbeiter' => $nameMitarbeiter,
+							'beschreibung' =>$beschreibung,
+							'vonDatum' => $von,
+							'bisDatum' => $bis,
 							'Saldo'=> $zeitsaldo
 						);
 
-						if (sendSanchoMail('Sancho_Content_Zeitausgleich', $template_data, $to, $subject))
+
+						if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
 						{
 							if ($zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 							{
@@ -703,8 +646,11 @@ if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['infor
 		$zeitsperre->loadZeitsperretyp($zeitsperre->zeitsperretyp_kurzbz);
 		$zeitsperre->beschreibung = $zeitsperre->result[0]->beschreibung;
 
-    $vondatum = $zeitsperre->getVonDatum();
-    $bisdatum = $zeitsperre->getBisDatum();
+    $vonDatum = $zeitsperre->getVonDatum();
+    $bisDatum = $zeitsperre->getBisDatum();
+
+		$vonDatum = $datum_obj->formatDatum($vonDatum ,'d.m.Y');
+		$bisDatum = $datum_obj->formatDatum($bisDatum,'d.m.Y');
 
 
     if(!$zeitsperre->delete($_GET['id']))
@@ -736,41 +682,30 @@ if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['infor
 
         $benutzer = new benutzer();
         $benutzer->load($uid);
+				$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
+				$beschreibung =  (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung);
 
-	    if ($zeitsperre->zeitsperretyp_kurzbz == 'Urlaub')
-	    {
-					$mailSancho = $p->t('urlaubstool/xHatUrlaubGeloescht', array($benutzer->nachname, $benutzer->vorname)).":<br>";
-
-					$mailSancho.=  (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung).
-					" von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y').
-					" bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y');
-
-        //	$subject = $p->t('urlaubstool/freigegebenerUrlaubGeloescht');
+		    if ($zeitsperre->zeitsperretyp_kurzbz == 'Urlaub')
+		    {
 					$subject = $p->t('urlaubstool/UrlaubGeloescht');
-
-
+					$mailvorlage = 'Sancho_Mail_Urlaub_Loeschen';
 				}
 
-	    if ($zeitsperre->zeitsperretyp_kurzbz == 'ZA')
-	    {
-				$mailSancho = $p->t('urlaubstool/xHatZeitausgleichGeloescht', array($benutzer->nachname, $benutzer->vorname)) . ":<br>";
-
-				$mailSancho.= (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung).
-				" von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y').
-				" bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y');
-
-		    $subject = $p->t('urlaubstool/zeitausgleichGeloescht');
-
-	    }
+		    if ($zeitsperre->zeitsperretyp_kurzbz == 'ZA')
+		    {
+			    $subject = $p->t('urlaubstool/zeitausgleichGeloescht');
+					$mailvorlage = 'Sancho_Mail_ZA_loeschen';
+		    }
 
 				$template_data = array(
 					'vorgesetzter' => $fullName,
-					'textZeitausgleich' => $mailSancho,
-					'Saldo' => ''
+					'nameMitarbeiter' => $nameMitarbeiter,
+					'beschreibung' =>$beschreibung,
+					'vonDatum' => $vonDatum,
+					'bisDatum' => $bisDatum
 				);
 
-
-				if (sendSanchoMail('Sancho_Content_Zeitausgleich', $template_data, $to, $subject))
+				if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
         {
 						echo "<b>" . $p->t('global/erfolgreichgelöscht') . '</b><br>';
             echo "<br><b>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</b>";
@@ -997,11 +932,9 @@ if($result = $db->db_query($qry))
 }
 $content_form.= '</SELECT></td></tr>';
 
-//visible field für Zeitsaldo in Mail ZA
-$content_form.= '<span id="zeitsaldo"><input style="visibility:hidden;" name="zeitsaldo" type="text" size="32"></span>';
-
 //$content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td>
 //<td colspan="2"><span id="dienstv_span"><input'.$style.' type="text" size="32" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"'.$readonly.'></span></td></tr>';
+
 
 $content_form.= "<tr><td>".$p->t('urlaubstool/erreichbarkeit')."</td><td><SELECT name='erreichbarkeit'>";
 foreach ($erreichbarkeit_arr as $erreichbarkeit_key=>$erreichbarkeit_beschreibung)
