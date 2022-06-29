@@ -98,38 +98,8 @@ class FilterCmptLib
 		$this->_setParameters($params);
 	}
 
-	/**
-	 *
-	 */
-	private function _setParameters($params)
-	{
-		if (isset($params['filterUniqueId'])) $this->_filterUniqueId = $params['filterUniqueId'];
-		if (isset($params['filterType'])) $this->_filterType = $params['filterType'];
-		if (isset($params['filterId'])) $this->_filterId = $params['filterId'];
-	}
-
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
-
-	/**
-	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
-	 * to the authenticated user, if confirmed then is allowed to use this FilterCmpt.
-	 * If the parameter requiredPermissions is NOT given or is not present in the session,
-	 * then NO one is allow to use this FilterCmpt
-	 * Wrapper method to permissionlib->hasAtLeastOne
-	 */
-	private function _isAllowed()
-	{
-		$this->_ci->load->library('PermissionLib'); // Load permission library
-
-		if (!$this->_ci->permissionlib->hasAtLeastOne($this->_requiredPermissions, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE))
-		{
-			$this->setSession(error('The required permission is not help by the logged user'));
-			return false;
-		}
-
-		return true;
-	}
 
 	/**
 	 * Wrapper method to the session helper funtions to retrieve the whole session for this filter
@@ -140,256 +110,131 @@ class FilterCmptLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrieve one element from the session of this filter
+	 * Contains all the logic used to load all the data needed to the FilterCmpt
 	 */
-	public function getSessionElement($name)
+	public function start()
 	{
-		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
+		//
+		if (!$this->_checkJSParameters()) return;
 
-		if (isset($session[$name]))
+		// Gets the filter configuration from the file system
+		require_once(APPPATH.'components/filters/'.$this->_filterType.'.php');
+
+		// Gets the filter configuration from the extensions
+		// require_once(APPPATH.'components/extensions/'.$this->_filterType.'.php');
+
+		//
+		if (!$this->_checkPHPParameters($filterCmptArray)) return;
+
+		// 
+		$this->_initFilterCmpt($filterCmptArray);
+
+		//
+		if (!$this->_isAllowed()) return;
+
+		// Looks for expired filter components in session and drops them
+		$this->_dropExpiredFilterCmpts();
+
+		// Read the all session for this filter component
+		$session = $this->getSession();
+
+		// If session is NOT empty -> a filter was already loaded
+		if ($session != null)
 		{
-			return $session[$name];
-		}
+			// Retrieve the filterId stored in the session
+			$sessionFilterId = $this->_getSessionElement(FilterCmptLib::FILTER_ID);
 
-		return null;
-	}
-
-	/**
-	 * Wrapper method to the session helper funtions to set the whole session for this filter
-	 */
-	public function setSession($data)
-	{
-		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $data);
-	}
-
-	/**
-	 * Wrapper method to the session helper funtions to set one element in the session for this filter
-	 */
-	public function setSessionElement($name, $value)
-	{
-		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
-
-		$session[$name] = $value;
-
-		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
-	}
-
-	/**
-	 *
-	 */
-	public function dropExpiredFilterCmpts()
-	{
-		// Loads the session for all the filter components
-		$filterCmptsSession = getSession(self::SESSION_NAME);
-
-		// If something is present in session
-		if ($filterCmptsSession != null)
-		{
-			// Loops in the session for all the filter components
-			foreach ($filterCmptsSession as $filterCmpt => $filterCmptData)
+			// If the filter loaded in session is NOT the same that is being requested then empty the session
+			if ($this->_filterId != $sessionFilterId)
 			{
-				// If this filter component is not the current used filter component and the it is expired...
-				if ($this->_filterUniqueId != $filterCmpt && $filterCmptData[self::SESSION_TIMEOUT] <= time())
-				{
-					cleanSessionElement(self::SESSION_NAME, $filterCmpt); // ...remove it
-				}
+				$this->_setSession(null);
+				$session = null;
 			}
-		}
-	}
-
-	/**
-	 * Loads the definition data from DB for a filter component
-	 */
-	public function loadDefinition($filterId, $app, $datasetName, $filterKurzbz)
-	{
-		// Loads the needed models
-		$this->_ci->load->model('system/Filters_model', 'FiltersModel');
-		$this->_ci->FiltersModel->resetQuery(); // reset any previous built query
-
-		$this->_ci->FiltersModel->addSelect('system.tbl_filters.*'); // select only from table filters
-		$this->_ci->FiltersModel->addOrder('sort', 'ASC'); // sort on column sort
-		$this->_ci->FiltersModel->addLimit(1); // if more than one filter is set as default only one will be retrieved
-
-		$definition = null;
-		$whereParameters = null; // where clause parameters
-
-		// If we have a good filterId then use it!
-		if ($filterId != null && is_numeric($filterId) && $filterId > 0)
-		{
-			$whereParameters = array(
-				self::FILTER_ID => $filterId
-			);
-		}
-		else
-		{
-			// If we can univocally retrieve a filter
-			if ($app != null && $datasetName != null && $filterKurzbz != null)
+			else // else if the filter loaded in session is the same that is being requested
 			{
-				$whereParameters = array(
-					'app' => $app,
-					'dataset_name' => $datasetName,
-					'filter_kurzbz' => $filterKurzbz
-				);
-			}
-			// Else if we have only app and datasetName
-			elseif ($app != null && $datasetName != null && $filterKurzbz == null)
-			{
-				// Try to load the custom filter (person_id = logged user person_id) with the given "app" and "dataset_name"
-				// that is set as default filter (default_filter = true)
-				$whereParameters = array(
-					'app' => $app,
-					'dataset_name' => $datasetName,
-					'person_id' => getAuthPersonId(),
-					'default_filter' => true
-				);
+				// Get SESSION_DATASET_RELOAD from the session
+				$sessionReloadDataset = $this->_getSessionElement(FilterCmptLib::SESSION_DATASET_RELOAD);
 
-				$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
-				if (!hasData($definition)) // If a custom filter is NOT found
+				// if Filter changed or reload is forced by parameter then reload the Dataset
+				if ($this->_reloadDataset === true || $sessionReloadDataset === true)
 				{
-					// Try to load the global filter (person_id = null) with the given "app" and "dataset_name" that is set as
-					// default filter (default_filter = true)
-					$whereParameters = array(
-						'app' => $app,
-						'dataset_name' => $datasetName,
-						'person_id' => null,
-						'default_filter' => true
+					// Set as false to stop changing the dataset
+					$this->_setSessionElement(FilterCmptLib::SESSION_DATASET_RELOAD, false);
+
+					// Generate dataset query using filters from the session
+					$datasetQuery = $this->_generateDatasetQuery(
+						$this->_query,
+						$this->_getSessionElement(FilterCmptLib::SESSION_FILTERS)
 					);
 
-					$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
-				}
-			}
-		}
+					// Then retrieve dataset from DB
+					$dataset = $this->_getDataset($datasetQuery);
 
-		// If no definition where loaded and where parameters were set
-		if ($definition == null && $whereParameters != null)
-		{
-			$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
-
-			// Last chance!!!
-			if (!hasData($definition)) // If no data have been found until now the tries the most desperate query
-			{
-				$this->_ci->FiltersModel->addOrder('filter_id', 'ASC'); // sort on column filter_id to get the oldest
-				$whereParameters = array(
-					'app' => $app,
-					'dataset_name' => $datasetName
-				);
-
-				$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
-			}
-		}
-
-		return $definition;
-	}
-
-	/**
-	 * Checks if the json definition of this filter is valid
-	 */
-	public function parseFilterJson($definition)
-	{
-		$jsonEncodedFilter = null;
-
-		// If the definition contains data and they are valid
-		if (hasData($definition) && isset(getData($definition)[0]->filter) && trim(getData($definition)[0]->filter) != '')
-		{
-			// Get the json definition of the filter
-			$tmpJsonEncodedFilter = json_decode(getData($definition)[0]->filter);
-
-			// Checks required filter's properies
-			if (isset($tmpJsonEncodedFilter->name)
-				&& isset($tmpJsonEncodedFilter->columns)
-				&& is_array($tmpJsonEncodedFilter->columns)
-				&& isset($tmpJsonEncodedFilter->filters)
-				&& is_array($tmpJsonEncodedFilter->filters))
-			{
-				$jsonEncodedFilter = $tmpJsonEncodedFilter;
-			}
-		}
-
-		return $jsonEncodedFilter;
-	}
-
-	/**
-	 * Generate the query to retrieve the dataset for a filter
-	 */
-	public function generateDatasetQuery($query, $filters)
-	{
-		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
-
-		// If the given query is valid and the parameter filters is an array
-		if (!isEmptyString($query) && $filters != null && is_array($filters))
-		{
-			$where = ''; // starts building the SQL where clause
-
-			// Loops through the given applied filters
-			for ($filtersCounter = 0; $filtersCounter < count($filters); $filtersCounter++)
-			{
-				$filterDefinition = $filters[$filtersCounter]; // definition of one filter
-
-				// If the name of the applied filter is valid
-				if  (!isEmptyString($filterDefinition->name))
-				{
-					// Build the query conditions
-					$datasetQueryCondition = $this->_getDatasetQueryCondition($filterDefinition);
-
-					// If the built condition is valid then add it to the query clause
-					if (!isEmptyString($datasetQueryCondition))
+					// Save changes into session if data are valid
+					if (!isError($dataset))
 					{
-						// If this is NOT the first one
-						if ($filtersCounter > 0) $where .= ' AND ';
-
-						$where .= '"'.$filterDefinition->name.'"'.$datasetQueryCondition;
+						// Set the new dataset and its attributes in the session
+						$this->_setSessionElement(FilterCmptLib::SESSION_METADATA, $this->_ci->FiltersModel->getExecutedQueryMetaData());
+						$this->_setSessionElement(FilterCmptLib::SESSION_ROW_NUMBER, count($dataset->retval));
+						$this->_setSessionElement(FilterCmptLib::SESSION_DATASET, $dataset->retval);
 					}
 				}
 			}
-
-			// If the SQL where clause was built
-			if ($where != '') $datasetQuery .= ' WHERE '.$where;
 		}
 
-		return $datasetQuery;
-	}
-
-	/**
-	 * Retrieves the dataset from the DB
-	 */
-	public function getDataset($datasetQuery)
-	{
-		$dataset = null;
-
-		if ($datasetQuery != null)
+		// If the session is empty -> first time that this filter is loaded
+		if ($session == null)
 		{
-			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
+			// Load filter definition data from DB
+			$definition = $this->_loadDefinition(
+				$this->_filterId,
+				$this->_app,
+				$this->_datasetName,
+				$this->_filterKurzbz
+			);
 
-			// Execute the given SQL statement suppressing error messages
-			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
-		}
-
-		return $dataset;
-	}
-
-	/**
-	 * Get the filter name, the default is the "name" property of the JSON definition
-	 * If the property namePhrase is present into the JSON definition, then try to load that from the phrases system
-	 * NOTE: filterJson should be already checked using the method parseFilterJson
-	 */
-	public function getFilterName($filterJson)
-	{
-		$filterName = $filterJson->name; // always present, used as default
-		$trimedname = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
-		// Filter name from phrases system
-		if (isset($filterJson->namePhrase) && !isEmptyString($filterJson->namePhrase))
-		{
-			// Loads the library to use the phrases system
-			$this->_ci->load->library('PhrasesLib', array(self::FILTER_PHRASES_CATEGORY));
-
-			$tmpFilterNamePhrase = $this->_ci->phraseslib->t(self::FILTER_PHRASES_CATEGORY, $filterJson->namePhrase);
-			if (!isEmptyString($tmpFilterNamePhrase)) // if is not null or an empty string
+			// Checks and parse json present into the definition
+			$parsedFilterJson = $this->_parseFilterJson($definition);
+			if ($parsedFilterJson != null) // if the json is valid
 			{
-				$filterName = $tmpFilterNamePhrase;
+				// Generate dataset query
+				$datasetQuery = $this->_generateDatasetQuery($this->_query, $parsedFilterJson->filters);
+
+				// Then retrieve dataset from DB
+				$dataset = $this->_getDataset($datasetQuery);
+
+				// Try to load the name of the filter using the PhrasesLib
+				$filterName = $this->_getFilterName($parsedFilterJson);
+
+				// Save changes into session if data are valid
+				if (!isError($dataset))
+				{
+					// Stores an array that contains all the data useful for
+					$this->_setSession(
+						array(
+							FilterCmptLib::FILTER_ID => $this->_filterId, // the current filter id
+							FilterCmptLib::APP => $this->_app, // the current app parameter
+							FilterCmptLib::DATASET_NAME => $this->_datasetName, // the carrent dataset name
+							FilterCmptLib::SESSION_FILTER_NAME => $filterName, // the current filter name
+							FilterCmptLib::SESSION_FIELDS => $this->_ci->FiltersModel->getExecutedQueryListFields(), // all the fields of the dataset
+							FilterCmptLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
+							FilterCmptLib::SESSION_FILTERS => $parsedFilterJson->filters, // all the filters used to filter the dataset
+							FilterCmptLib::SESSION_METADATA => $this->_ci->FiltersModel->getExecutedQueryMetaData(), // the metadata of the dataset
+							FilterCmptLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this filter
+							FilterCmptLib::SESSION_DATASET => $dataset->retval, // the entire dataset
+							FilterCmptLib::SESSION_DATASET_RELOAD => false, // if the dataset must be reloaded, not needed the first time
+							FilterCmptLib::SESSION_SIDE_MENU => $this->_generateFilterMenu($this->_app, $this->_datasetName)
+						)
+					);
+				}
 			}
 		}
 
-		return $filterName;
+		// NOTE: latest operations to be performed in the session to be shure that they are always present
+		// To be always stored in the session, otherwise is not possible to load data from Filters controller
+		$this->_setSessionElement(FilterCmptLib::REQUIRED_PERMISSIONS, $this->_requiredPermissions);
+		// Renew or set the session expiring time
+		$this->_setSessionElement(FilterCmptLib::SESSION_TIMEOUT, strtotime('+'.$this->_sessionTimeout.' minutes', time()));
 	}
 
 	/**
@@ -403,12 +248,12 @@ class FilterCmptLib
 		if (isset($selectedFields) && is_array($selectedFields) && count($selectedFields) > 0)
 		{
 			// Retrieves all the used fields by the current filter
-			$fields = $this->getSessionElement(self::SESSION_FIELDS);
+			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
 
 			// Checks that the given selected fields are present in all the used fields by the current filter
 			if (!array_diff($selectedFields, $fields))
 			{
-				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
+				$this->_setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$sortSelectedFields = true;
 			}
@@ -428,16 +273,16 @@ class FilterCmptLib
 		if (!isEmptyString($selectedField))
 		{
 			// Retrieves all the used fields by the current filter
-			$fields = $this->getSessionElement(self::SESSION_FIELDS);
+			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
 			// Retrieves the selected fields by the current filter
-			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
+			$selectedFields = $this->_getSessionElement(self::SESSION_SELECTED_FIELDS);
 
 			// Checks that the given selected field is present in the list of all the used fields by the current filter
 			if (in_array($selectedField, $fields))
 			{
 				array_push($selectedFields, $selectedField); // place the new filed at the end of the selected fields list
 
-				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
+				$this->_setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$removeSelectedField = true;
 			}
@@ -457,9 +302,9 @@ class FilterCmptLib
 		if (!isEmptyString($selectedField))
 		{
 			// Retrieves all the used fields by the current filter
-			$fields = $this->getSessionElement(self::SESSION_FIELDS);
+			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
 			// Retrieves the selected fields by the current filter
-			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
+			$selectedFields = $this->_getSessionElement(self::SESSION_SELECTED_FIELDS);
 
 			// Checks that the given selected field is present in the list of all the used fields by the current filter
 			if (in_array($selectedField, $fields))
@@ -471,7 +316,7 @@ class FilterCmptLib
 					array_splice($selectedFields, $pos, 1);
 				}
 
-				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
+				$this->_setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$removeSelectedField = true;
 			}
@@ -491,9 +336,9 @@ class FilterCmptLib
 		if (!isEmptyString($filterField))
 		{
 			// Retrieves all the used fields by the current filter
-			$fields = $this->getSessionElement(self::SESSION_FIELDS);
+			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
 			// Retrieves the applied filters by the current filter
-			$filters = $this->getSessionElement(self::SESSION_FILTERS);
+			$filters = $this->_getSessionElement(self::SESSION_FILTERS);
 
 			// Checks that the given applied filter is present in the list of all the used fields by the current filter
 			if (in_array($filterField, $fields))
@@ -514,7 +359,7 @@ class FilterCmptLib
 					array_push($filters, $filterDefinition);
 				}
 
-				$this->setSessionElement(self::SESSION_FILTERS, $filters); // write changes into the session
+				$this->_setSessionElement(self::SESSION_FILTERS, $filters); // write changes into the session
 
 				$addFilterField = true;
 			}
@@ -534,9 +379,9 @@ class FilterCmptLib
 		if (!isEmptyString($filterField))
 		{
 			// Retrieves all the used fields by the current filter
-			$fields = $this->getSessionElement(self::SESSION_FIELDS);
+			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
 			// Retrieves the applied filters by the current filter
-			$filters = $this->getSessionElement(self::SESSION_FILTERS);
+			$filters = $this->_getSessionElement(self::SESSION_FILTERS);
 
 			// Checks that the given applied filter is present in the list of all the used fields by the current filter
 			if (in_array($filterField, $fields))
@@ -549,8 +394,8 @@ class FilterCmptLib
 				}
 
 				 // Write changes into the session
-				$this->setSessionElement(self::SESSION_FILTERS, $filters);
-				$this->setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
+				$this->_setSessionElement(self::SESSION_FILTERS, $filters);
+				$this->_setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
 
 				$removeFilterField = true;
 			}
@@ -615,8 +460,8 @@ class FilterCmptLib
 			if ($fine)
 			{
 				// Write changes into the session
-				$this->setSessionElement(self::SESSION_FILTERS, $filters);
-				$this->setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
+				$this->_setSessionElement(self::SESSION_FILTERS, $filters);
+				$this->_setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
 
 				$applyFilters = true;
 			}
@@ -630,7 +475,7 @@ class FilterCmptLib
 	 */
 	public function reloadDataset()
 	{
-		$this->setSessionElement(self::SESSION_DATASET_RELOAD, true);
+		$this->_setSessionElement(self::SESSION_DATASET_RELOAD, true);
 	}
 
 	/**
@@ -653,8 +498,8 @@ class FilterCmptLib
 
 		// Loads the definition to check if is already present in the DB
 		$definition = $this->_ci->FiltersModel->loadWhere(array(
-			'app' => $this->getSessionElement(self::APP),
-			'dataset_name' => $this->getSessionElement(self::DATASET_NAME),
+			'app' => $this->_getSessionElement(self::APP),
+			'dataset_name' => $this->_getSessionElement(self::DATASET_NAME),
 			'description' => $descPGArray,
 			'person_id' => $authPersonId
 		));
@@ -665,7 +510,7 @@ class FilterCmptLib
 
 		// Generates the "column" property
 		$jsonDeifinition->columns = array();
-		$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS); // retrieved the selected fields
+		$selectedFields = $this->_getSessionElement(self::SESSION_SELECTED_FIELDS); // retrieved the selected fields
 		for ($i = 0; $i < count($selectedFields); $i++)
 		{
 			// Each element is an object with a property called "name"
@@ -674,7 +519,7 @@ class FilterCmptLib
 		}
 
 		// List of applied filters
-		$jsonDeifinition->filters = $this->getSessionElement(self::SESSION_FILTERS);
+		$jsonDeifinition->filters = $this->_getSessionElement(self::SESSION_FILTERS);
 
 		// If it is already present
 		if (hasData($definition))
@@ -682,8 +527,8 @@ class FilterCmptLib
 			// update it
 			$this->_ci->FiltersModel->update(
 				array(
-					'app' => $this->getSessionElement(self::APP),
-					'dataset_name' => $this->getSessionElement(self::DATASET_NAME),
+					'app' => $this->_getSessionElement(self::APP),
+					'dataset_name' => $this->_getSessionElement(self::DATASET_NAME),
 					'description' => $descPGArray,
 					'person_id' => $authPersonId
 				),
@@ -698,8 +543,8 @@ class FilterCmptLib
 		{
 			$this->_ci->FiltersModel->insert(
 				array(
-					'app' => $this->getSessionElement(self::APP),
-					'dataset_name' => $this->getSessionElement(self::DATASET_NAME),
+					'app' => $this->_getSessionElement(self::APP),
+					'dataset_name' => $this->_getSessionElement(self::DATASET_NAME),
 					'filter_kurzbz' => uniqid($authPersonId, true),
 					'description' => $descPGArray,
 					'person_id' => $authPersonId,
@@ -739,6 +584,9 @@ class FilterCmptLib
 
 		return $removeCustomFilter;
 	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
 
 	/**
 	 * Generates the filters menu structure array and stores it into the session
@@ -791,8 +639,50 @@ class FilterCmptLib
 		return $filterMenu;
 	}
 
-	//------------------------------------------------------------------------------------------------------------------
-	// Private methods
+	/**
+	 * Wrapper method to the session helper funtions to retrieve one element from the session of this filter
+	 */
+	private function _getSessionElement($name)
+	{
+		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
+
+		if (isset($session[$name]))
+		{
+			return $session[$name];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
+	 * to the authenticated user, if confirmed then is allowed to use this FilterCmpt.
+	 * If the parameter requiredPermissions is NOT given or is not present in the session,
+	 * then NO one is allow to use this FilterCmpt
+	 * Wrapper method to permissionlib->hasAtLeastOne
+	 */
+	private function _isAllowed()
+	{
+		$this->_ci->load->library('PermissionLib'); // Load permission library
+
+		if (!$this->_ci->permissionlib->hasAtLeastOne($this->_requiredPermissions, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE))
+		{
+			$this->_setSession(error('The required permission is not help by the logged user'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 *
+	 */
+	private function _setParameters($params)
+	{
+		if (isset($params['filterUniqueId'])) $this->_filterUniqueId = $params['filterUniqueId'];
+		if (isset($params['filterType'])) $this->_filterType = $params['filterType'];
+		if (isset($params['filterId'])) $this->_filterId = $params['filterId'];
+	}
 
 	/**
 	 * Checks the required parameters used to call this FilterCmpt
@@ -802,146 +692,18 @@ class FilterCmptLib
 		//
 		if (isEmptyString($this->_filterUniqueId))
 		{
-			$this->setSession(error('Parameter "filterUniqueId" not provided'));
+			$this->_setSession(error('Parameter "filterUniqueId" not provided'));
 			return false;
 		}
 
 		//
 		if (isEmptyString($this->_filterType))
 		{
-			$this->setSession(error('Parameter "filterType" not provided'));
+			$this->_setSession(error('Parameter "filterType" not provided'));
 			return false;
 		}
 
 		return true;
-	}
-
-	/**
-	 * Contains all the logic used to load all the data needed to the FilterCmpt
-	 */
-	public function start()
-	{
-		//
-		if (!$this->_checkJSParameters()) return;
-
-		// Gets the filter configuration from the file system
-		require_once(APPPATH.'components/filters/'.$this->_filterType.'.php');
-
-		// Gets the filter configuration from the extensions
-		// require_once(APPPATH.'components/extensions/'.$this->_filterType.'.php');
-
-		//
-		if (!$this->_checkPHPParameters($filterCmptArray)) return;
-
-		// 
-		$this->_initFilterCmpt($filterCmptArray);
-
-		//
-		if (!$this->_isAllowed()) return;
-
-		// Looks for expired filter components in session and drops them
-		$this->dropExpiredFilterCmpts();
-
-		// Read the all session for this filter component
-		$session = $this->getSession();
-
-		// If session is NOT empty -> a filter was already loaded
-		if ($session != null)
-		{
-			// Retrieve the filterId stored in the session
-			$sessionFilterId = $this->getSessionElement(FilterCmptLib::FILTER_ID);
-
-			// If the filter loaded in session is NOT the same that is being requested then empty the session
-			if ($this->_filterId != $sessionFilterId)
-			{
-				$this->setSession(null);
-				$session = null;
-			}
-			else // else if the filter loaded in session is the same that is being requested
-			{
-				// Get SESSION_DATASET_RELOAD from the session
-				$sessionReloadDataset = $this->getSessionElement(FilterCmptLib::SESSION_DATASET_RELOAD);
-
-				// if Filter changed or reload is forced by parameter then reload the Dataset
-				if ($this->_reloadDataset === true || $sessionReloadDataset === true)
-				{
-					// Set as false to stop changing the dataset
-					$this->setSessionElement(FilterCmptLib::SESSION_DATASET_RELOAD, false);
-
-					// Generate dataset query using filters from the session
-					$datasetQuery = $this->generateDatasetQuery(
-						$this->_query,
-						$this->getSessionElement(FilterCmptLib::SESSION_FILTERS)
-					);
-
-					// Then retrieve dataset from DB
-					$dataset = $this->getDataset($datasetQuery);
-
-					// Save changes into session if data are valid
-					if (!isError($dataset))
-					{
-						// Set the new dataset and its attributes in the session
-						$this->setSessionElement(FilterCmptLib::SESSION_METADATA, $this->_ci->FiltersModel->getExecutedQueryMetaData());
-						$this->setSessionElement(FilterCmptLib::SESSION_ROW_NUMBER, count($dataset->retval));
-						$this->setSessionElement(FilterCmptLib::SESSION_DATASET, $dataset->retval);
-					}
-				}
-			}
-		}
-
-		// If the session is empty -> first time that this filter is loaded
-		if ($session == null)
-		{
-			// Load filter definition data from DB
-			$definition = $this->loadDefinition(
-				$this->_filterId,
-				$this->_app,
-				$this->_datasetName,
-				$this->_filterKurzbz
-			);
-
-			// Checks and parse json present into the definition
-			$parsedFilterJson = $this->parseFilterJson($definition);
-			if ($parsedFilterJson != null) // if the json is valid
-			{
-				// Generate dataset query
-				$datasetQuery = $this->generateDatasetQuery($this->_query, $parsedFilterJson->filters);
-
-				// Then retrieve dataset from DB
-				$dataset = $this->getDataset($datasetQuery);
-
-				// Try to load the name of the filter using the PhrasesLib
-				$filterName = $this->getFilterName($parsedFilterJson);
-
-				// Save changes into session if data are valid
-				if (!isError($dataset))
-				{
-					// Stores an array that contains all the data useful for
-					$this->setSession(
-						array(
-							FilterCmptLib::FILTER_ID => $this->_filterId, // the current filter id
-							FilterCmptLib::APP => $this->_app, // the current app parameter
-							FilterCmptLib::DATASET_NAME => $this->_datasetName, // the carrent dataset name
-							FilterCmptLib::SESSION_FILTER_NAME => $filterName, // the current filter name
-							FilterCmptLib::SESSION_FIELDS => $this->_ci->FiltersModel->getExecutedQueryListFields(), // all the fields of the dataset
-							FilterCmptLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
-							FilterCmptLib::SESSION_FILTERS => $parsedFilterJson->filters, // all the filters used to filter the dataset
-							FilterCmptLib::SESSION_METADATA => $this->_ci->FiltersModel->getExecutedQueryMetaData(), // the metadata of the dataset
-							FilterCmptLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this filter
-							FilterCmptLib::SESSION_DATASET => $dataset->retval, // the entire dataset
-							FilterCmptLib::SESSION_DATASET_RELOAD => false, // if the dataset must be reloaded, not needed the first time
-							FilterCmptLib::SESSION_SIDE_MENU => $this->_generateFilterMenu($this->_app, $this->_datasetName)
-						)
-					);
-				}
-			}
-		}
-
-		// NOTE: latest operations to be performed in the session to be shure that they are always present
-		// To be always stored in the session, otherwise is not possible to load data from Filters controller
-		$this->setSessionElement(FilterCmptLib::REQUIRED_PERMISSIONS, $this->_requiredPermissions);
-		// Renew or set the session expiring time
-		$this->setSessionElement(FilterCmptLib::SESSION_TIMEOUT, strtotime('+'.$this->_sessionTimeout.' minutes', time()));
 	}
 
 	/**
@@ -952,7 +714,7 @@ class FilterCmptLib
 		// If no options are given to this component...
 		if (!is_array($filterCmptArray) || (is_array($filterCmptArray) && count($filterCmptArray) == 0))
 		{
-			$this->setSession(error('No parameters provided'));
+			$this->_setSession(error('No parameters provided'));
 			return false;
 		}
 		else // ...otherwise
@@ -960,7 +722,7 @@ class FilterCmptLib
 			// Parameters app AND dataset name
 			if (!isset($filterCmptArray[FilterCmptLib::APP]) && !isset($filterCmptArray[FilterCmptLib::DATASET_NAME]))
 			{
-				$this->setSession(
+				$this->_setSession(
 					error(
 						'The parameters "'.FilterCmptLib::APP.'" AND "'.FilterCmptLib::DATASET_NAME.' must be specified'
 					)
@@ -971,21 +733,21 @@ class FilterCmptLib
 			// The query parameter is mandatory
 			if (!isset($filterCmptArray[FilterCmptLib::QUERY]))
 			{
-				$this->setSession(error('The parameter "'.FilterCmptLib::QUERY.'" must be specified'));
+				$this->_setSession(error('The parameter "'.FilterCmptLib::QUERY.'" must be specified'));
 				return false;
 			}
 
 			//
 			if (!isset($filterCmptArray[FilterCmptLib::DATASET_NAME]))
 			{
-				$this->setSession(error('The parameter "'.FilterCmptLib::DATESET_NAME.'" must be specified'));
+				$this->_setSession(error('The parameter "'.FilterCmptLib::DATESET_NAME.'" must be specified'));
 				return false;
 			}
 
 			//
 			if (!isset($filterCmptArray[FilterCmptLib::REQUIRED_PERMISSIONS]))
 			{
-				$this->setSession(error('The parameter "'.FilterCmptLib::REQUIRED_PERMISSIONS.'" must be specified'));
+				$this->_setSession(error('The parameter "'.FilterCmptLib::REQUIRED_PERMISSIONS.'" must be specified'));
 				return false;
 			}
 		}
@@ -1043,7 +805,7 @@ class FilterCmptLib
 	 * Generates a condition for a SQL where clause using the given applied filter definition.
 	 * By default an empty string is returned.
 	 */
-	private function _getDatasetQueryCondition($filterDefinition)
+	private function __getDatasetQueryCondition($filterDefinition)
 	{
 		$condition = ''; // starts building the condition
 
@@ -1194,6 +956,244 @@ class FilterCmptLib
 		}
 
 		return $columnsNames;
+	}
+
+	/**
+	 * Wrapper method to the session helper funtions to set the whole session for this filter
+	 */
+	private function _setSession($data)
+	{
+		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $data);
+	}
+
+	/**
+	 * Wrapper method to the session helper funtions to set one element in the session for this filter
+	 */
+	private function _setSessionElement($name, $value)
+	{
+		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
+
+		$session[$name] = $value;
+
+		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
+	}
+
+	/**
+	 *
+	 */
+	private function _dropExpiredFilterCmpts()
+	{
+		// Loads the session for all the filter components
+		$filterCmptsSession = getSession(self::SESSION_NAME);
+
+		// If something is present in session
+		if ($filterCmptsSession != null)
+		{
+			// Loops in the session for all the filter components
+			foreach ($filterCmptsSession as $filterCmpt => $filterCmptData)
+			{
+				// If this filter component is not the current used filter component and the it is expired...
+				if ($this->_filterUniqueId != $filterCmpt && $filterCmptData[self::SESSION_TIMEOUT] <= time())
+				{
+					cleanSessionElement(self::SESSION_NAME, $filterCmpt); // ...remove it
+				}
+			}
+		}
+	}
+
+	/**
+	 * Loads the definition data from DB for a filter component
+	 */
+	private function _loadDefinition($filterId, $app, $datasetName, $filterKurzbz)
+	{
+		// Loads the needed models
+		$this->_ci->load->model('system/Filters_model', 'FiltersModel');
+		$this->_ci->FiltersModel->resetQuery(); // reset any previous built query
+
+		$this->_ci->FiltersModel->addSelect('system.tbl_filters.*'); // select only from table filters
+		$this->_ci->FiltersModel->addOrder('sort', 'ASC'); // sort on column sort
+		$this->_ci->FiltersModel->addLimit(1); // if more than one filter is set as default only one will be retrieved
+
+		$definition = null;
+		$whereParameters = null; // where clause parameters
+
+		// If we have a good filterId then use it!
+		if ($filterId != null && is_numeric($filterId) && $filterId > 0)
+		{
+			$whereParameters = array(
+				self::FILTER_ID => $filterId
+			);
+		}
+		else
+		{
+			// If we can univocally retrieve a filter
+			if ($app != null && $datasetName != null && $filterKurzbz != null)
+			{
+				$whereParameters = array(
+					'app' => $app,
+					'dataset_name' => $datasetName,
+					'filter_kurzbz' => $filterKurzbz
+				);
+			}
+			// Else if we have only app and datasetName
+			elseif ($app != null && $datasetName != null && $filterKurzbz == null)
+			{
+				// Try to load the custom filter (person_id = logged user person_id) with the given "app" and "dataset_name"
+				// that is set as default filter (default_filter = true)
+				$whereParameters = array(
+					'app' => $app,
+					'dataset_name' => $datasetName,
+					'person_id' => getAuthPersonId(),
+					'default_filter' => true
+				);
+
+				$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
+				if (!hasData($definition)) // If a custom filter is NOT found
+				{
+					// Try to load the global filter (person_id = null) with the given "app" and "dataset_name" that is set as
+					// default filter (default_filter = true)
+					$whereParameters = array(
+						'app' => $app,
+						'dataset_name' => $datasetName,
+						'person_id' => null,
+						'default_filter' => true
+					);
+
+					$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
+				}
+			}
+		}
+
+		// If no definition where loaded and where parameters were set
+		if ($definition == null && $whereParameters != null)
+		{
+			$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
+
+			// Last chance!!!
+			if (!hasData($definition)) // If no data have been found until now the tries the most desperate query
+			{
+				$this->_ci->FiltersModel->addOrder('filter_id', 'ASC'); // sort on column filter_id to get the oldest
+				$whereParameters = array(
+					'app' => $app,
+					'dataset_name' => $datasetName
+				);
+
+				$definition = $this->_ci->FiltersModel->loadWhere($whereParameters);
+			}
+		}
+
+		return $definition;
+	}
+
+	/**
+	 * Checks if the json definition of this filter is valid
+	 */
+	private function _parseFilterJson($definition)
+	{
+		$jsonEncodedFilter = null;
+
+		// If the definition contains data and they are valid
+		if (hasData($definition) && isset(getData($definition)[0]->filter) && trim(getData($definition)[0]->filter) != '')
+		{
+			// Get the json definition of the filter
+			$tmpJsonEncodedFilter = json_decode(getData($definition)[0]->filter);
+
+			// Checks required filter's properies
+			if (isset($tmpJsonEncodedFilter->name)
+				&& isset($tmpJsonEncodedFilter->columns)
+				&& is_array($tmpJsonEncodedFilter->columns)
+				&& isset($tmpJsonEncodedFilter->filters)
+				&& is_array($tmpJsonEncodedFilter->filters))
+			{
+				$jsonEncodedFilter = $tmpJsonEncodedFilter;
+			}
+		}
+
+		return $jsonEncodedFilter;
+	}
+
+	/**
+	 * Generate the query to retrieve the dataset for a filter
+	 */
+	private function _generateDatasetQuery($query, $filters)
+	{
+		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
+
+		// If the given query is valid and the parameter filters is an array
+		if (!isEmptyString($query) && $filters != null && is_array($filters))
+		{
+			$where = ''; // starts building the SQL where clause
+
+			// Loops through the given applied filters
+			for ($filtersCounter = 0; $filtersCounter < count($filters); $filtersCounter++)
+			{
+				$filterDefinition = $filters[$filtersCounter]; // definition of one filter
+
+				// If the name of the applied filter is valid
+				if  (!isEmptyString($filterDefinition->name))
+				{
+					// Build the query conditions
+					$datasetQueryCondition = $this->__getDatasetQueryCondition($filterDefinition);
+
+					// If the built condition is valid then add it to the query clause
+					if (!isEmptyString($datasetQueryCondition))
+					{
+						// If this is NOT the first one
+						if ($filtersCounter > 0) $where .= ' AND ';
+
+						$where .= '"'.$filterDefinition->name.'"'.$datasetQueryCondition;
+					}
+				}
+			}
+
+			// If the SQL where clause was built
+			if ($where != '') $datasetQuery .= ' WHERE '.$where;
+		}
+
+		return $datasetQuery;
+	}
+
+	/**
+	 * Retrieves the dataset from the DB
+	 */
+	private function _getDataset($datasetQuery)
+	{
+		$dataset = null;
+
+		if ($datasetQuery != null)
+		{
+			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
+
+			// Execute the given SQL statement suppressing error messages
+			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
+		}
+
+		return $dataset;
+	}
+
+	/**
+	 * Get the filter name, the default is the "name" property of the JSON definition
+	 * If the property namePhrase is present into the JSON definition, then try to load that from the phrases system
+	 * NOTE: filterJson should be already checked using the method _parseFilterJson
+	 */
+	private function _getFilterName($filterJson)
+	{
+		$filterName = $filterJson->name; // always present, used as default
+		$trimedname = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
+		// Filter name from phrases system
+		if (isset($filterJson->namePhrase) && !isEmptyString($filterJson->namePhrase))
+		{
+			// Loads the library to use the phrases system
+			$this->_ci->load->library('PhrasesLib', array(self::FILTER_PHRASES_CATEGORY));
+
+			$tmpFilterNamePhrase = $this->_ci->phraseslib->t(self::FILTER_PHRASES_CATEGORY, $filterJson->namePhrase);
+			if (!isEmptyString($tmpFilterNamePhrase)) // if is not null or an empty string
+			{
+				$filterName = $tmpFilterNamePhrase;
+			}
+		}
+
+		return $filterName;
 	}
 }
 
