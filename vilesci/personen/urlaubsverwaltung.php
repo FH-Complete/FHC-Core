@@ -32,6 +32,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/addon.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -59,6 +60,23 @@ $alle = (isset($_GET['alle'])?true:false);
 $errormsg='';
 $message='';
 $error=false;
+
+//addons laden analog zu zeitsperre_resturlaub
+$addoncasetime = false;
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+	if(file_exists('../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+	{
+		echo '<script type="application/x-javascript" src="../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+		$addoncasetime = true;
+		require_once('../../addons/casetime/include/functions.inc.php');
+	}
+
+}
+
+echo "addoncasetime: " . $addoncasetime;
 
 //Kopfzeile
 echo '<html>
@@ -249,8 +267,15 @@ if($uid!='')
 			<th>Bezeichnung</th>
 			<th>Von</th>
 			<th>Bis</th>
-			<th>Vertretung</th>
-			<th>Freigegeben von, am</th>
+			<th>Vertretung</th>';
+//manu
+if($addoncasetime)
+{
+	echo '<th>Status Monatsliste</th>';
+}
+
+echo'
+<th>Freigegeben von, am</th>
 			<th>Aktualisiert am</th>
 			<th>Aktualisiert von</th>
 			<th>Edit</th>
@@ -268,6 +293,16 @@ if($uid!='')
 		echo "<td data-sorter='shortDate' data-date-format='dd.mm.yyyy'>".$datum->formatDatum($row->vondatum,'d.m.Y')." ".($row->vonstunde!=''?'(Stunde '.$row->vonstunde.')':'')."</td>";
 		echo "<td data-sorter='shortDate' data-date-format='dd.mm.yyyy'>".$datum->formatDatum($row->bisdatum,'d.m.Y')." ".($row->bisstunde!=''?'(Stunde '.$row->bisstunde.')':'')."</td>";
 		echo "<td>$row->vertretung_uid</td>";
+		if($addoncasetime)
+		{
+
+			echo '<td>';
+
+			checkStatusMonatsliste($uid,$row->vondatum, $row->bisdatum) == '' ? $statusML = "nicht abgeschickt" : $statusML = "abgeschickt";
+			//var_dump(checkStatusMonatsliste($uid,$row->vondatum, $row->bisdatum));
+			echo $statusML;
+			echo '</td>';
+		}
 		echo "<td>$row->freigabevon ".$datum->formatDatum($row->freigabeamum,'d.m.Y')."</td>";
 		echo "<td>".$datum->formatDatum($row->updateamum,'d.m.Y H:i:s')."</td>";
 		echo "<td>$row->updatevon</td>";
