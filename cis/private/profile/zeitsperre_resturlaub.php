@@ -114,7 +114,6 @@ foreach($addon_obj->result as $addon)
 
 // Überprüfen, ob addon casetime aktiv ist
 $addoncasetime = $addon_obj->checkActiveAddon("casetime");
-echo $addon_obj->checkActiveAddon("asterisk");
 
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
