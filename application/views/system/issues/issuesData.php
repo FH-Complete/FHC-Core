@@ -31,15 +31,35 @@ $query = "WITH zustaendigkeiten AS (
 		$query .= " THEN TRUE
 					ELSE FALSE
 				END AS \"zustaendig\"
-			FROM system.tbl_fehler_zustaendigkeiten zst 
+			FROM system.tbl_fehler_zustaendigkeiten zst
 		)";
 
 $query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
-			inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\", 
+			inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\",
 			ftyp.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlertyp\", stat.bezeichnung_mehrsprachig[".$LANGUAGE_INDEX."] AS \"Fehlerstatus\",
 			verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\", fr.app AS \"Applikation\",
 			fr.fehlertyp_kurzbz AS \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
-			pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\", 
+			pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\",
+			(
+				 /* show all relevant Studiengänge of person and wether it is an employee*/
+				SELECT STRING_AGG(studiengang || ' ' || last_status, ' | ')
+				    || (CASE WHEN EXISTS (
+						SELECT 1 FROM public.tbl_mitarbeiter ma
+						JOIN public.tbl_benutzer ben ON ma.mitarbeiter_uid = ben.uid
+						WHERE person_id = prestudents.person_id
+						AND ben.aktiv
+						) THEN ' | Mitarbeiter' ELSE '' END)
+				FROM (
+				    SELECT DISTINCT person_id, prestudent_id, UPPER(stg.typ || stg.kurzbz) AS studiengang, get_rolle_prestudent(ps.prestudent_id, null) AS last_status
+				    FROM public.tbl_prestudent ps
+				    JOIN public.tbl_studiengang stg USING (studiengang_kz)
+				    WHERE person_id = pers.person_id
+				    ORDER BY prestudent_id DESC
+				) prestudents
+				WHERE last_status IN ('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')
+				GROUP BY person_id
+				LIMIT 1;
+			) AS \"Zugehörigkeit\",
 			CASE
 				WHEN
 					EXISTS(SELECT 1
@@ -60,7 +80,7 @@ $query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern 
 				FROM system.tbl_fehler_zustaendigkeiten
 				JOIN public.tbl_person USING (person_id)
 				WHERE fehlercode = fr.fehlercode
-				GROUP BY fehlercode	
+				GROUP BY fehlercode
 			) AS \"Person Zuständigkeiten\",
 			(
 				SELECT string_agg(organisationseinheittyp_kurzbz || ' ' || oe.bezeichnung ||  COALESCE(' - ' || fu.beschreibung, ''), ' | ' ORDER BY bezeichnung, oe_kurzbz)
@@ -68,7 +88,7 @@ $query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern 
 				LEFT JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
 				LEFT JOIN public.tbl_funktion fu USING (funktion_kurzbz)
 				WHERE fehlercode = fr.fehlercode
-				GROUP BY fehlercode	
+				GROUP BY fehlercode
 			) AS \"Organisationseinheit Zuständigkeiten\"
 			FROM system.tbl_issue iss
 			JOIN system.tbl_fehler fr USING (fehlercode)
@@ -95,13 +115,13 @@ if (!isEmptyArray($all_oe_kurzbz_berechtigt))
 						AND NOT EXISTS (SELECT 1 /* irrelevant if already finished studies and studied a while ago */
 										FROM public.tbl_prestudentstatus ps_finished
 										JOIN public.tbl_studiensemester sem_finished USING (studiensemester_kurzbz)
-										WHERE prestudent_id = ps.prestudent_id 
+										WHERE prestudent_id = ps.prestudent_id
 										AND status_kurzbz IN ('Absolvent','Abbrecher','Abgewiesener')
 										AND datum::date + interval '2 months' < NOW()
 										AND EXISTS (SELECT 1 FROM public.tbl_prestudent /* if more recent prestudent exists, still display the issue */
 													JOIN public.tbl_prestudentstatus USING (prestudent_id)
 													JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
-													WHERE tbl_prestudentstatus.status_kurzbz IN $RELEVANT_PRESTUDENT_STATUS 
+													WHERE tbl_prestudentstatus.status_kurzbz IN $RELEVANT_PRESTUDENT_STATUS
 													AND person_id = ps.person_id
 													AND prestudent_id <> ps_finished.prestudent_id
 													AND tbl_studiensemester.start::date > sem_finished.start::date)
@@ -149,6 +169,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('fehlermonitoring', 'statuscode')),
 		ucfirst($this->p->t('person', 'vorname')),
 		ucfirst($this->p->t('person', 'nachname')),
+		ucfirst($this->p->t('fehlermonitoring', 'zugehoerigkeit')),
 		ucfirst($this->p->t('fehlermonitoring', 'hauptzustaendig')),
 		ucfirst($this->p->t('fehlermonitoring', 'zustaendigePersonen')),
 		ucfirst($this->p->t('fehlermonitoring', 'zustaendigeOrganisationseinheiten'))
@@ -180,14 +201,14 @@ $filterWidgetArray = array(
 			$datasetRaw->{'OE'} = '-';
 		}
 
-		if ($datasetRaw->{'Verarbeitet am'} == null)
-		{
-			$datasetRaw->{'Verarbeitet am'} = '-';
-		}
-
 		if ($datasetRaw->{'Verarbeitet von'} == null)
 		{
 			$datasetRaw->{'Verarbeitet von'} = '-';
+		}
+
+		if ($datasetRaw->{'Zugehörigkeit'} == null)
+		{
+			$datasetRaw->{'Zugehörigkeit'} = '-';
 		}
 
 		if ($datasetRaw->{'Person Zuständigkeiten'} == null)
@@ -199,8 +220,6 @@ $filterWidgetArray = array(
 		{
 			$datasetRaw->{'Organisationseinheit Zuständigkeiten'} = '-';
 		}
-
-
 
 		return $datasetRaw;
 	},
