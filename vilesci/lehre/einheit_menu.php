@@ -413,12 +413,12 @@ function doSave()
 		// Prüfung: generierte Gruppen haben keine Manager
 		if (count($gruppemanager_uids) > 0 && $e->generiert === true)
 		{
-			echo "Generierte Gruppen dürfen keine Administratoren haben!";
+			echo "<span class='error'>Generierte Gruppen dürfen keine Administratoren haben!</span>";
 			return;
 		}
 
 		if(!$e->save())
-			echo $e->errormsg;
+			echo "<span class='error'>".$e->errormsg."</span>";
 		else // wenn Gruppe erfolgreich gespeichert, Gruppenmanager speichern
 		{
 			// Gruppe gemäss Konvention in Großbuchstaben
@@ -581,7 +581,7 @@ function doEdit($kurzbz,$new=false)
 						}
 					?>
 				</td>
-				<td>Administratoren, die Benutzer zur Gruppe entfernen/hinzufügen können</td>
+				<td>Optional, Administratoren, die Benutzer zur Gruppe entfernen/hinzufügen können</td>
 			</tr>
 			<tr>
 				<td>Semester</td>
