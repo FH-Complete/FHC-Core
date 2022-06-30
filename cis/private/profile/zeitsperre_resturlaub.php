@@ -102,19 +102,19 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <link href="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
 <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"  type="text/css">
 <?php
+
 // ADDONS laden
 $addon_obj = new addon();
 $addon_obj->loadAddons();
 foreach($addon_obj->result as $addon)
 {
 	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
-	{
 		echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
-		$addoncasetime = true;
-		require_once('../../../addons/casetime/include/functions.inc.php');
-	}
-
 }
+
+// Überprüfen, ob addon casetime aktiv ist
+$addoncasetime = $addon_obj->checkActiveAddon("casetime");
+echo $addon_obj->checkActiveAddon("asterisk");
 
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
@@ -348,18 +348,17 @@ function showHideStudeDropDown()
 
 <?php
 
-
+$zeitsaldo = "";
 if($addoncasetime)
 {
+	require_once('../../../addons/casetime/include/functions.inc.php');
 	$zeitsaldo = getCaseTimeZeitsaldo($uid);
 	$zeitsaldo = "Aktueller Zeitsaldo: ". $zeitsaldo . " (".formatZeitsaldo($zeitsaldo).")";
 }
 
-
 //Zeitsperre Speichern
 if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_sperre'))
 {
-
 	$error=false;
 	$error_msg='';
 
@@ -569,14 +568,22 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						// Wenn ein neuer Urlaub eingetragen wurde, Freigabemail-Text
 						if ($zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 						{
-							$zeitsaldo = " <a href=". APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr .">Link Urlaubstool</a> ";
+							$link = " <a href=". APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr .">Link Urlaubstool</a> ";
 
-							$subject = "Freigabeansuchen";
+							$subject = "Freigabeansuchen Urlaub";
 							$mailvorlage = 'Sancho_Mail_Urlaub_Neu';
+
+							$template_data = array(
+								'vorgesetzter' => $fullName,
+								'nameMitarbeiter' => $nameMitarbeiter,
+								'beschreibung' =>$beschreibung,
+								'vonDatum' => $von,
+								'bisDatum' => $bis,
+								'Link'=> $link
+							);
 						}
 
 						// Wenn ein Zeitausgleich eingetragen wurde...
-						//manu zeitsperre neu
 						if ($zeitsperre->zeitsperretyp_kurzbz == 'ZA')
 						{
 							// ...Mail-Text für neuen Zeitausgleich
@@ -591,21 +598,19 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 								$subject = $subject = $p->t('urlaubstool/zeitausgleichGeaendert');
 								$mailvorlage = 'Sancho_Content_ZA_Aendern';
 							}
+							$template_data = array(
+								'vorgesetzter' => $fullName,
+								'nameMitarbeiter' => $nameMitarbeiter,
+								'beschreibung' =>$beschreibung,
+								'vonDatum' => $von,
+								'bisDatum' => $bis,
+								'Saldo'=> $zeitsaldo
+							);
 						}
 
 						$from='vilesci@'.DOMAIN;
 
 						//Sanchomail mit Vorlage Sancho Mail Zeitausgleich
-						$template_data = array(
-							'vorgesetzter' => $fullName,
-							'nameMitarbeiter' => $nameMitarbeiter,
-							'beschreibung' =>$beschreibung,
-							'vonDatum' => $von,
-							'bisDatum' => $bis,
-							'Saldo'=> $zeitsaldo
-						);
-
-
 						if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
 						{
 							if ($zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
