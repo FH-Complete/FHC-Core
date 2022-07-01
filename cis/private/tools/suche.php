@@ -275,7 +275,7 @@ function searchOE($searchItems)
 			$oe->result[] = new organisationseinheit($row->oe_kurzbz);
 	}
 
-	if(count($oe->result)>0)
+	if(is_array($oe->result) && count($oe->result)>0)
 	{
 		echo '<h2 style="padding-bottom: 10px;">',$p->t('global/organisationseinheiten'),'</h2>';
 		echo '
