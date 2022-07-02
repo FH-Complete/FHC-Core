@@ -79,3 +79,12 @@
 .searchbar_settings_types li label {
     padding: 3px;
 }
+
+.searchbar_inline_ul {
+    margin: 0;
+    padding: 0;
+}
+
+.searchbar_inline_ul li {
+    list-style: none;
+}

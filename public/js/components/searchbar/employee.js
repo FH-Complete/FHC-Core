@@ -14,7 +14,7 @@ export default {
           <div class="searchbar_grid">
               <div class="searchbar_icon">
                 <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
-                  <img v-if="res.foto !== null" :src="res.foto" 
+                  <img v-if="(typeof res.foto !== 'undefined') && (res.foto !== null)" :src="res.foto" 
                     class="rounded-circle" height="100" />
                   <i v-else class="fas fa-user-circle fa-5x"></i>
                 </action>
@@ -32,7 +32,10 @@ export default {
                   <div class="searchbar_tablerow">
                     <div class="searchbar_tablecell">OrgEinheit</div>
                     <div class="searchbar_tablecell">
-                          {{ res.organisationunit_name }}
+                        <ul class="searchbar_inline_ul" v-if="res.organisationunit_name.length > 0">
+                          <li v-for="(oe, idx) in res.organisationunit_name" :key="idx">{{ oe }}</li>
+                        </ul>
+                        <span v-else="">keine</span> 
                     </div>
                   </div>
         
