@@ -6140,19 +6140,6 @@ if (!$result = @$db->db_query("SELECT melde_studiengang_kz FROM public.tbl_studi
 		echo '<br>public.tbl_studiengang: Neue Spalte melde_studiengang_kz hinzugefuegt.';
 }
 
-// Add permission for calling certain APIs in Datenverbund extension
-if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'extension/dvuh_gui_ekz_anfordern';"))
-{
-	if($db->db_num_rows($result) == 0)
-	{
-		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('extension/dvuh_gui_ekz_anfordern', 'Berechtigung für Abfage des Ersatzkennzeichens in der Datenverbund GUI');";
-		if(!$db->db_query($qry))
-			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>system.tbl_berechtigung: Added permission for extension/dvuh_gui_ekz_anfordern';
-	}
-}
-
 // ADD COLUMN insertamum to system.tbl_fehler_zustaendigkeiten
 if(!@$db->db_query("SELECT insertamum FROM system.tbl_fehler_zustaendigkeiten LIMIT 1"))
 {
