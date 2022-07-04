@@ -1,13 +1,13 @@
 <?php
 	$includesArray = array(
 		'title' => 'Logs Viewer',
-		'jquery3' => true,
+		'axios027' => true,
 		'bootstrap5' => true,
 		'fontawesome6' => true,
+		'jquery3' => true,
+		'restclient' => true,
 		'tablesorter2' => true,
 		'vue3' => true,
-		'ajaxlib' => true,
-		'jqueryui1' => true,
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
 		'phrases' => array(
@@ -23,7 +23,7 @@
 	<div id="main">
 
 		<!-- Navigation component -->
-		<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries"></core-navigation-cmpt>
+		<core-navigation-cmpt v-bind:add-side-menu-entries="appSideMenuEntries"></core-navigation-cmpt>
 
 		<div id="content">
 			<div class="row">

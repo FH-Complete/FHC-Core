@@ -1,3 +1,5 @@
+import {CoreFetchCmpt} from '../components/Fetch.js';
+
 export const CoreNavigationCmpt = {
 	data() {
 		return {
@@ -5,47 +7,39 @@ export const CoreNavigationCmpt = {
 			sideMenu: {}
 		};
 	},
-	created() {
-		this.fetchDataHeader();
-		this.fetchDataMenu();
-	},
+	created() {},
 	props: {
 		addHeaderMenuEntries: Object,
 		addSideMenuEntries: Object
+	},
+	components: {
+		CoreFetchCmpt
 	},
 	methods: {
 		getNavigationPage() {
 			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 		},
 		fetchDataHeader() {
-			// Retrives the header menu array
-			FHC_AjaxClient.ajaxCallGet(
+			return CoreRESTClient.get(
 				'system/Navigation/header',
 				{
 					navigation_page: this.getNavigationPage()
-				},
-				{
-					successCallback: this.setHeaders
 				}
 			);
 		},
 		setHeaders(data) {
-			if (FHC_AjaxClient.hasData(data)) this.headerMenu = FHC_AjaxClient.getData(data);
+			if (CoreRESTClient.hasData(data)) this.headerMenu = CoreRESTClient.getData(data);
 		},
 		fetchDataMenu() {
-			// Retrives the side menu array
-			FHC_AjaxClient.ajaxCallGet(
+			return CoreRESTClient.get(
 				'system/Navigation/menu',
 				{
 					navigation_page: this.getNavigationPage()
-				},
-				{
-					successCallback: this.setSideMenu
 				}
 			);
 		},
 		setSideMenu(data) {
-			if (FHC_AjaxClient.hasData(data)) this.sideMenu = FHC_AjaxClient.getData(data);
+			if (CoreRESTClient.hasData(data)) this.sideMenu = CoreRESTClient.getData(data);
 		},
 		getDataBsToggle(header) {
 			return !header.children ? null : 'dropdown';
@@ -69,13 +63,22 @@ export const CoreNavigationCmpt = {
 		}
 	},
 	template: `
+		<!-- Load head menu -->
+		<core-fetch-cmpt v-bind:api-function="fetchDataHeader" @data-fetched="setHeaders"></core-fetch-cmpt>
+		<!-- Load side menu -->
+		<core-fetch-cmpt v-bind:api-function="fetchDataMenu" @data-fetched="setSideMenu"></core-fetch-cmpt>
+
 		<!-- Top menu -->
 		<nav class="navbar navbar-expand-lg navbar-header">
 			<ul class="navbar-nav">
 				<!-- 1st level -->
 				<template v-for="header in headerMenuEntries">
 					<li class="nav-item dropdown">
-						<a class="nav-link header-menu-link-entry" v-bind:data-bs-toggle="this.getDataBsToggle(header)" v-bind:class="{ 'dropdown-toggle': header.children }" v-bind:href="header.link">
+						<a class="nav-link header-menu-link-entry"
+							v-bind:data-bs-toggle="this.getDataBsToggle(header)"
+							v-bind:class="{ 'dropdown-toggle': header.children }"
+							v-bind:href="header.link"
+						>
 							<i class="fa-solid fa-fw header-menu-icon" v-bind:class="'fa-' + header.icon" v-if="header.icon"></i> {{ header.description }}
 						</a>
 						<ul class="dropdown-menu" v-if="header.children">

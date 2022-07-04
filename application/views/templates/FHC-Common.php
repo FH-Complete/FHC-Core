@@ -38,6 +38,7 @@
 	$filterwidget = isset($filterwidget) ? $filterwidget : false;
 	$navigationcomponent = isset($navigationcomponent) ? $navigationcomponent : false;
 	$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
+	$restclient = isset($restclient) ? $restclient : false;
 	$tablecomponent = isset($tablecomponent) ? $tablecomponent : false;
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$udfs = isset($udfs) ? $udfs : false;

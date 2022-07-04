@@ -1,3 +1,7 @@
+import {CoreFetchCmpt} from '../components/Fetch.js';
+
+const CORE_FILTER_CMPT_TIMEOUT = 7000;
+
 export const CoreFilterCmpt = {
 	emits: ['nwNewEntry'],
 	data() {
@@ -11,9 +15,10 @@ export const CoreFilterCmpt = {
 			notFilterFields: null
 		};
 	},
-	created() {
-		this._fetchFilterData();
+	components: {
+		CoreFetchCmpt
 	},
+	created() {},
 	updated() {
 		let filterCmptTablesorter = $("#filterTableDataset");
 
@@ -40,17 +45,22 @@ export const CoreFilterCmpt = {
 	},
 	methods: {
 		saveCustomFilter(el) {
-			FHC_AjaxClient.ajaxCallPost(
-				"components/Filter/saveCustomFilter",
+
+			CoreRESTClient.post(
+				'components/Filter/saveCustomFilter',
 				{
 					filterUniqueId: this._getCurrentPage(),
 					filterType: this.filterType,
 					customFilterName: document.getElementById('customFilterName').value
-				},   
+				},
 				{
-					successCallback: function(data) {console.log(data)}
+					timeout: CORE_FILTER_CMPT_TIMEOUT
 				}
-			);
+			)
+			.then(function (response) { console.log(response); })
+			.catch(function (error) {
+				console.error(error);
+			});
 		},
 		applyFilterFields(el) {
 			let filterFields = [];
@@ -90,117 +100,171 @@ export const CoreFilterCmpt = {
 				filterFields.push(filterField);
 			}
 
-			FHC_AjaxClient.ajaxCallPost(
-				"components/Filter/applyFilterFields",
+			CoreRESTClient.post(
+				'components/Filter/applyFilterFields',
 				{
 					filterUniqueId: this._getCurrentPage(),
 					filterType: this.filterType,
 					filterFields: filterFields
-				},   
+				},
 				{
-					successCallback: this._fetchFilterData
+					timeout: CORE_FILTER_CMPT_TIMEOUT
 				}
-			);
+			)
+			.then(this.fetchFilterData)
+			.catch(function (error) {
+				console.error(error);
+			});
 		},
 		addFilterField(el) {
-			FHC_AjaxClient.ajaxCallPost(
-				"components/Filter/addFilterField",
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
-					filterField: el.currentTarget.value
-				},   
-				{
-					successCallback: this._fetchFilterData
-				}
-			);
-		},
-		addSelectedField(el) {
-			FHC_AjaxClient.ajaxCallPost(
-				"components/Filter/addSelectedField",
+
+			CoreRESTClient.post(
+				'components/Filter/addFilterField',
 				{
 					filterUniqueId: this._getCurrentPage(),
 					filterType: this.filterType,
 					selectedField: el.currentTarget.value
-				},   
+				},
 				{
-					successCallback: this._fetchFilterData
+					timeout: CORE_FILTER_CMPT_TIMEOUT
 				}
-			);
+			)
+			.then(this.fetchFilterData)
+			.catch(function (error) {
+				console.error(error);
+			});
+		},
+		addSelectedField(el) {
+
+			CoreRESTClient.post(
+				'components/Filter/addSelectedField',
+				{
+					filterUniqueId: this._getCurrentPage(),
+					filterType: this.filterType,
+					selectedField: el.currentTarget.value
+				},
+				{
+					timeout: CORE_FILTER_CMPT_TIMEOUT
+				}
+			)
+			.then(this.fetchFilterData)
+			.catch(function (error) {
+				console.error(error);
+			});
 		},
 		removeSelectedField(el) {
-			FHC_AjaxClient.ajaxCallPost(
-				"components/Filter/removeSelectedField",
+
+			CoreRESTClient.post(
+				'components/Filter/removeSelectedField',
 				{
 					filterUniqueId: this._getCurrentPage(),
 					filterType: this.filterType,
 					selectedField: el.currentTarget.getAttribute('field-to-remove')
-				},   
+				},
 				{
-					successCallback: this._fetchFilterData
+					timeout: CORE_FILTER_CMPT_TIMEOUT
 				}
-			);
+			)
+			.then(this.fetchFilterData)
+			.catch(function (error) {
+				console.error(error);
+			});
 		},
 		removeFilterField(el) {
-			FHC_AjaxClient.ajaxCallPost(
-				"components/Filter/removeFilterField",
+
+			CoreRESTClient.post(
+				'components/Filter/removeFilterField',
 				{
 					filterUniqueId: this._getCurrentPage(),
 					filterType: this.filterType,
 					filterField: el.currentTarget.getAttribute('field-to-remove')
-				},   
+				},
 				{
-					successCallback: this._fetchFilterData
+					timeout: CORE_FILTER_CMPT_TIMEOUT
 				}
-			);
+			)
+			.then(this.fetchFilterData)
+			.catch(function (error) {
+				console.error(error);
+			});
 		},
 		fetchFilterDataById(el) {
-			FHC_AjaxClient.ajaxCallGet(
-				"components/Filter/getFilter",
+
+			var that = this;
+
+			CoreRESTClient.get(
+				'components/Filter/getFilter',
 				{
 					filterUniqueId: this._getCurrentPage(),
 					filterType: this.filterType,
 					filter_id: el.currentTarget.getAttribute("href").substring(1)
-				},   
+				},
 				{
-					successCallback: this._render
+					timeout: CORE_FILTER_CMPT_TIMEOUT
 				}
-			);
+			)
+			.then(function (response) { that.render(response.data); })
+			.catch(function (error) {
+				console.error(error);
+			});
 		},
-		_fetchFilterData() {
-			FHC_AjaxClient.ajaxCallGet(
-				"components/Filter/getFilter",
+		fetchFilterData() {
+
+			var that = this;
+
+			CoreRESTClient.get(
+				'components/Filter/getFilter',
 				{
 					filterUniqueId: this._getCurrentPage(),
 					filterType: this.filterType // props!!
-				},   
+				},
 				{
-					successCallback: this._render
+					timeout: CORE_FILTER_CMPT_TIMEOUT
+				}
+			)
+			.then(function (response) { that.render(response.data); })
+			.catch(function (error) {
+				console.error(error);
+			});
+		},
+		fetchFilterDataApi() {
+
+			return CoreRESTClient.get(
+				'components/Filter/getFilter',
+				{
+					filterUniqueId: this._getCurrentPage(),
+					filterType: this.filterType // props!!
+				},
+				{
+					timeout: CORE_FILTER_CMPT_TIMEOUT
 				}
 			);
 		},
 		_getCurrentPage: function() {
 			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 		},
-		_render(data) {
-		
-			if (FHC_AjaxClient.hasData(data))
+		render(response) {
+
+			console.log('render');
+
+			if (CoreRESTClient.hasData(response))
 			{
-				this.dataset = FHC_AjaxClient.getData(data).dataset;
-				this.fields = FHC_AjaxClient.getData(data).fields;
-				this.selectedFields = FHC_AjaxClient.getData(data).selectedFields;
+				let data = CoreRESTClient.getData(response);
+				this.dataset = data.dataset;
+				this.fields = data.fields;
+				this.selectedFields = data.selectedFields;
 				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
 
 				this.filterFields = [];
 				let tmpFilterFields = [];
-				for (let i = 0; i < FHC_AjaxClient.getData(data).datasetMetadata.length; i++)
+				for (let i = 0; i < data.datasetMetadata.length; i++)
 				{
-					for (let j = 0; j < FHC_AjaxClient.getData(data).filters.length; j++)
+					for (let j = 0; j < data.filters.length; j++)
 					{
-						if (FHC_AjaxClient.getData(data).datasetMetadata[i].name == FHC_AjaxClient.getData(data).filters[j].name)
+						if (data.datasetMetadata[i].name == data.filters[j].name)
 						{
-							let filter = FHC_AjaxClient.getData(data).filters[j];
-							filter.type = FHC_AjaxClient.getData(data).datasetMetadata[i].type;
+							let filter = data.filters[j];
+							filter.type = data.datasetMetadata[i].type;
 
 							this.filterFields.push(filter);
 							tmpFilterFields.push(filter.name);
@@ -210,12 +274,12 @@ export const CoreFilterCmpt = {
 				}
 
 				this.notFilterFields = this.fields.filter(x => tmpFilterFields.indexOf(x) === -1);
-				this._setFieldsToDisplay(FHC_AjaxClient.getData(data));
-				this._setSideMenu(FHC_AjaxClient.getData(data));
+				this._setFieldsToDisplay(data);
+				this._setSideMenu(data);
 			}
 			else
 			{
-				console.error(FHC_AjaxClient.getError(data));
+				console.error(CoreRESTClient.getError(response));
 			}
 		},
 		_setFieldsToDisplay(data) {
@@ -277,6 +341,9 @@ export const CoreFilterCmpt = {
 		}
 	},
 	template: `
+		<!-- Load filter data -->
+                <core-fetch-cmpt v-bind:api-function="fetchFilterDataApi" @data-fetched="render"></core-fetch-cmpt>
+
 		<div class="card filter-filter-options">
 			<div class="card-header filter-header-title" data-bs-toggle="collapse" data-bs-target="#collapseFilterHeader">
 				Filter options

@@ -132,9 +132,9 @@ function loadResource($path, $resources = null, $subdir = false)
 		while (($entry = readdir($dirHandler)) !== false)
 		{
 			// If entry is a directory but not the current and subdirectories should be loaded
-			if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($entry))
+			if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($path.$entry))
 			{
-				$tmpPaths[] = $entry;
+				$tmpPaths[] = $path.$entry.'/';
 			}
 			// If no resources are specified and the current file system entry is a file
 			if ($resources == null && is_file($path.$entry))
@@ -351,3 +351,42 @@ function sanitizeProblemChars($str)
 
 	return preg_replace($acentos, array_keys($acentos), htmlentities($str, ENT_NOQUOTES | ENT_HTML5, $enc));
 }
+
+/**
+ *
+ */
+function findResource($path, $resource, $subdir = false)
+{
+	// Place a / character at the and of the string if not present
+	if (strrpos($path, '/') < strlen($path) - 1) $path .= '/';
+
+	// Loads in $tmpPaths path and eventually the subdirectories
+	$tmpPaths = array($path);
+	// NOTE: Used @ to prevent ugly error messages
+	if (is_dir($path) && ($dirHandler = @opendir($path)) !== false)
+	{
+		// Reads all file system entries present in path
+		while (($entry = readdir($dirHandler)) !== false)
+		{
+			// If entry is a directory but not the current and subdirectories should be loaded
+			if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($path.$entry))
+			{
+				$tmpPaths[] = $path.$entry.'/';
+			}
+		}
+		closedir($dirHandler);
+	}
+
+	// Loops through the paths
+	foreach ($tmpPaths as $tmpPath)
+	{
+		$fileName = $tmpPath.$resource.'.php'; // Php extension
+		if (file_exists($fileName))
+		{
+			return $fileName;
+		}
+	}
+
+	return null;
+}
+

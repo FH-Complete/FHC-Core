@@ -32,7 +32,7 @@
 	// From vendor folder
 
 	// Axios V0.27
-	if ($axios027 === true) generateJSsInclude('vendor/axios/axios/axios.min.js');
+	if ($axios027 === true) generateJSsInclude('vendor/axios/axios/dist/axios.min.js');
 
 	// Bootstrap 5 JS
 	if ($bootstrap5 === true) generateJSsInclude('vendor/twbs/bootstrap5/dist/js/bootstrap.min.js');
@@ -131,6 +131,9 @@
 
 	// PhrasesLib JS
 	if ($phrases != null) generateJSsInclude('public/js/PhrasesLib.js');
+
+	// RESTClient
+	if ($restclient === true) generateJSsInclude('public/js/RESTClient.js');
 
 	// TableWidget JS
 	if ($tablewidget === true) generateJSsInclude('public/js/TableWidget.js');

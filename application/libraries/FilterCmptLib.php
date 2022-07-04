@@ -117,11 +117,25 @@ class FilterCmptLib
 		//
 		if (!$this->_checkJSParameters()) return;
 
-		// Gets the filter configuration from the file system
-		require_once(APPPATH.'components/filters/'.$this->_filterType.'.php');
+		//
+		$filePath = findResource(APPPATH.'components/filters/', $this->_filterType, true);
+		if (!isEmptyString($filePath))
+		{
+			// Gets the filter configuration from the file system
+			require_once($filePath);
+		}
+		else
+		{
+			$filePath = findResource(APPPATH.'components/extensions/', $this->_filterType, true);
+			if (!isEmptyString($filePath)) require_once($filePath);
+		}
 
-		// Gets the filter configuration from the extensions
-		// require_once(APPPATH.'components/extensions/'.$this->_filterType.'.php');
+		//
+		if (!isset($filterCmptArray))
+		{
+			$this->_setSession(error('Component definition file '.$this->_filterType.' not found'));
+			return;
+		}
 
 		//
 		if (!$this->_checkPHPParameters($filterCmptArray)) return;

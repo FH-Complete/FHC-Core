@@ -43,8 +43,8 @@
 				"name": "axios/axios",
 				"version": "0.27.2",
 				"dist": {
-					"url": "https://unpkg.com/axios@0.27.2/dist/axios.min.js",
-					"type": "file"
+					"url": "https://github.com/axios/axios/archive/refs/tags/v0.27.2.zip",
+					"type": "zip"
 				}
 			}
 		},
@@ -343,7 +343,7 @@
 
 		"afarkas/html5shiv": "3.7.*",
 		"alvaro-prieto/colresizable": "1.6",
-		"axios/axios": "0.27.2",
+		"axios/axios": "0.27.*",
 
 		"blackrockdigital/startbootstrap-sb-admin-2": "3.3.*",
 		"borgar/textile-js": "2.0.4",
