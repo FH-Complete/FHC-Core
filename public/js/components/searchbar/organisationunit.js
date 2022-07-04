@@ -46,7 +46,10 @@ export default {
                   <div class="searchbar_tablerow">
                     <div class="searchbar_tablecell">Leiter</div>
                     <div class="searchbar_tablecell">
-                        {{ res.leader_name }}
+                        <ul class="searchbar_inline_ul" v-if="res.leader_name.length > 0">
+                          <li v-for="(leader, idx) in res.leader_name" :key="idx">{{ leader }}</li>
+                        </ul>
+                        <span v-else="">N.N.</span>                                
                     </div>
                   </div>        
         
