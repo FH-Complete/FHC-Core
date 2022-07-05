@@ -14852,6 +14852,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'zugehoerigkeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zugehörigkeit",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "belonging",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
     array(
         'app' => 'core',
         'category' => 'ui',

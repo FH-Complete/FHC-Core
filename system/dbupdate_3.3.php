@@ -6126,6 +6126,20 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservic
 	}
 }
 
+// Add column melde_studiengang_kz to public.tbl_studiengang and prefill values
+if (!$result = @$db->db_query("SELECT melde_studiengang_kz FROM public.tbl_studiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melde_studiengang_kz varchar(32);
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NULL;
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT (SELECT lpad(erhalter_kz::text, 3, '0') FROM public.tbl_erhalter) || lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NOT NULL;
+			COMMENT ON COLUMN public.tbl_studiengang.melde_studiengang_kz IS 'Studiengangskennzahl, mit der der Studiengang gemeldet wird (z.B. Bismeldung)'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_studiengang: Neue Spalte melde_studiengang_kz hinzugefuegt.';
+}
+
 // ADD COLUMN insertamum to system.tbl_fehler_zustaendigkeiten
 if(!@$db->db_query("SELECT insertamum FROM system.tbl_fehler_zustaendigkeiten LIMIT 1"))
 {
@@ -6241,6 +6255,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
 			echo 'system.tbl_berechtigung: Added permission for student/keine_studstatuspruefung<br>';
+
 	}
 }
 
@@ -6479,7 +6494,7 @@ $tabellen=array(
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant","foerderrelevant","standort_code"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant","foerderrelevant","standort_code","melde_studiengang_kz"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
