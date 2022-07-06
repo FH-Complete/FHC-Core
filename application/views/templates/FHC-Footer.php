@@ -132,9 +132,6 @@
 	// PhrasesLib JS
 	if ($phrases != null) generateJSsInclude('public/js/PhrasesLib.js');
 
-	// RESTClient
-	if ($restclient === true) generateJSsInclude('public/js/RESTClient.js');
-
 	// TableWidget JS
 	if ($tablewidget === true) generateJSsInclude('public/js/TableWidget.js');
 

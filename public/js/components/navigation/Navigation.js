@@ -1,4 +1,6 @@
-import {CoreFetchCmpt} from '../components/Fetch.js';
+import {CoreNavigationAPIs} from './API.js';
+import {CoreRESTClient} from '../../RESTClient.js';
+import {CoreFetchCmpt} from '../../components/Fetch.js';
 
 export const CoreNavigationCmpt = {
 	data() {
@@ -20,23 +22,13 @@ export const CoreNavigationCmpt = {
 			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 		},
 		fetchDataHeader() {
-			return CoreRESTClient.get(
-				'system/Navigation/header',
-				{
-					navigation_page: this.getNavigationPage()
-				}
-			);
+			return CoreNavigationAPIs.getHeader(this.getNavigationPage());
 		},
 		setHeaders(data) {
 			if (CoreRESTClient.hasData(data)) this.headerMenu = CoreRESTClient.getData(data);
 		},
 		fetchDataMenu() {
-			return CoreRESTClient.get(
-				'system/Navigation/menu',
-				{
-					navigation_page: this.getNavigationPage()
-				}
-			);
+			return CoreNavigationAPIs.getMenu(this.getNavigationPage());
 		},
 		setSideMenu(data) {
 			if (CoreRESTClient.hasData(data)) this.sideMenu = CoreRESTClient.getData(data);

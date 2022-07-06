@@ -35,7 +35,7 @@ const CRC_HTTP_POST_METHOD = "post";
 /**
  * Definition and initialization of the object CoreRESTClient
  */
-const CoreRESTClient = {
+export const CoreRESTClient = {
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 

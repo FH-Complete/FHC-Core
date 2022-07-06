@@ -1,5 +1,5 @@
-import {CoreFilterCmpt} from '../components/Filter.js';
-import {CoreNavigationCmpt} from '../components/Navigation.js';
+import {CoreFilterCmpt} from '../components/filter/Filter.js';
+import {CoreNavigationCmpt} from '../components/navigation/Navigation.js';
 
 const logsViewerApp = Vue.createApp({
 	data() {

@@ -5,7 +5,6 @@
 		'bootstrap5' => true,
 		'fontawesome6' => true,
 		'jquery3' => true,
-		'restclient' => true,
 		'tablesorter2' => true,
 		'vue3' => true,
 		'filtercomponent' => true,
