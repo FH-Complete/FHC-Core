@@ -1,52 +1,58 @@
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import {CoreNavigationAPIs} from './API.js';
 import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 
+/**
+ *
+ */
 export const CoreNavigationCmpt = {
-	data() {
-		return {
-			headerMenu: {},
-			sideMenu: {}
-		};
-	},
-	created() {},
-	props: {
-		addHeaderMenuEntries: Object,
-		addSideMenuEntries: Object
-	},
 	components: {
 		CoreFetchCmpt
 	},
-	methods: {
-		getNavigationPage() {
-			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
-		},
-		fetchDataHeader() {
-			return CoreNavigationAPIs.getHeader(this.getNavigationPage());
-		},
-		setHeaders(data) {
-			if (CoreRESTClient.hasData(data)) this.headerMenu = CoreRESTClient.getData(data);
-		},
-		fetchDataMenu() {
-			return CoreNavigationAPIs.getMenu(this.getNavigationPage());
-		},
-		setSideMenu(data) {
-			if (CoreRESTClient.hasData(data)) this.sideMenu = CoreRESTClient.getData(data);
-		},
-		getDataBsToggle(header) {
-			return !header.children ? null : 'dropdown';
-		}
+	props: {
+		addHeaderMenuEntries: Object, // property used to add new header menu entries from another app/component
+		addSideMenuEntries: Object // property used to add new side menu entries from another app/component
+	},
+	data() {
+		return {
+			headerMenu: {}, // header menu entries
+			sideMenu: {} // side menu entries
+		};
 	},
 	computed: {
+		/**
+		 *
+		 */
 		headerMenuEntries() {
+			//
 			if (this.headerMenu != null && this.addHeaderMenuEntries != null && Object.keys(this.addHeaderMenuEntries).length > 0)
 			{
 				this.headerMenu[this.addHeaderMenuEntries.description] = this.addHeaderMenuEntries;
 			}
 			return this.headerMenu;
 		},
+		/**
+		 *
+		 */
 		sideMenuEntries() {
-			
+			//
 			if (this.sideMenu != null && this.addSideMenuEntries != null && Object.keys(this.addSideMenuEntries).length > 0)
 			{
 				this.sideMenu = this.addSideMenuEntries;
@@ -54,11 +60,49 @@ export const CoreNavigationCmpt = {
 			return this.sideMenu;
 		}
 	},
+	methods: {
+		/**
+		 *
+		 */
+		getNavigationPage: function() {
+			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+		},
+		/**
+		 *
+		 */
+		fetchCmptApiFunctionHeader: function() {
+			return CoreNavigationAPIs.getHeader(this.getNavigationPage());
+		},
+		/**
+		 *
+		 */
+		fetchCmptApiFunctionSideMenu: function() {
+			return CoreNavigationAPIs.getMenu(this.getNavigationPage());
+		},
+		/**
+		 *
+		 */
+		fetchCmptDataFetchedHeader: function(data) {
+			if (CoreRESTClient.hasData(data)) this.headerMenu = CoreRESTClient.getData(data);
+		},
+		/**
+		 *
+		 */
+		fetchCmptDataFetchedMenu: function(data) {
+			if (CoreRESTClient.hasData(data)) this.sideMenu = CoreRESTClient.getData(data);
+		},
+		/**
+		 *
+		 */
+		getDataBsToggle: function(header) {
+			return !header.children ? null : 'dropdown';
+		}
+	},
 	template: `
 		<!-- Load head menu -->
-		<core-fetch-cmpt v-bind:api-function="fetchDataHeader" @data-fetched="setHeaders"></core-fetch-cmpt>
+		<core-fetch-cmpt v-bind:api-function="fetchCmptApiFunctionHeader" @data-fetched="fetchCmptDataFetchedHeader"></core-fetch-cmpt>
 		<!-- Load side menu -->
-		<core-fetch-cmpt v-bind:api-function="fetchDataMenu" @data-fetched="setSideMenu"></core-fetch-cmpt>
+		<core-fetch-cmpt v-bind:api-function="fetchCmptApiFunctionSideMenu" @data-fetched="fetchCmptDataFetchedMenu"></core-fetch-cmpt>
 
 		<!-- Top menu -->
 		<nav class="navbar navbar-expand-lg navbar-header">

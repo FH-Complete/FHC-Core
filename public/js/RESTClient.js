@@ -216,8 +216,6 @@ export const CoreRESTClient = {
 	                for (var prop in axiosParameters) axiosCallObj[prop] = axiosParameters[prop];
 		}
 
-		console.log(axiosCallObj);
-
 		// Perform the ajax call via axios
 		return axios(axiosCallObj);
 	}

@@ -1,57 +1,109 @@
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ *
+ */
 export const CoreFetchCmpt = {
+	emits: ['dataFetched'], // this component can emit the event dataFetched that it is catched by this component itself
+	props: {
+		refresh: { // to refresh this component
+			type: Boolean
+		},
+		apiFunction: { // the function to call, must return a Promise
+			required: true,
+			type: Function
+		},
+		apiFunctionParameters: {} // parameters for the apiFunction, type mixed, optional
+	},
+	watch: {
+		/**
+		 * If the refresh property is changed then call fetchData
+		 */
+		refresh: function (newValue, oldValue) {
+			this.fetchData();
+		}
+	},
 	data: function() {
 		return {
-			loading: false,
-			error: false,
-			errorMessage: null
+			loading: false, // if in loading or not
+			error: false, // if an error occurred while loading data
+			errorMessage: null // the error message
 		};
 	},
-	emits: ['dataFetched'],
-	props: {
-		apiFunction: Function
-	},
-	created: function () {
+	created: function() {
 		this.fetchData();
 	},
 	methods: {
+		/**
+		 *
+		 */
 		fetchData: function() {
-			// Loader started
-	        	this.loading = true;
+	        	this.loading = true; // loader started
 
 			// Checks if the apifunction is a callable function
 			if (typeof this.apiFunction == "function")
 			{
 				// Call the function stored in apiFunction
-	        		let apiFunctionResult = this.apiFunction();
+	        		let apiFunctionResult = this.apiFunction(this.apiFunctionParameters);
 
 				// It is expected that the function returns a Promise
 				if (apiFunctionResult instanceof Promise)
 				{
-					apiFunctionResult.then(this._success).catch(this._error).then(this._finally);
+					apiFunctionResult
+						.then(this.success) // on success
+						.catch(this.error) // on error
+						.then(this.finally); // finally in any case
 				}
 				else // otherwise display an error
 				{
-					this._setError("The called apiFunction does not return a Promise");
+					this.setError("The called apiFunction does not return a Promise");
 				}
 			}
 			else // otherwise display an error
 			{
-				this._setError("Property apiFunction is not a function");
+				this.setError("Property apiFunction is not a function");
 			}
 		},
-		_setError(errorMessage) {
-			this.loading = false;
-			this.error = true;
-			this.errorMessage = errorMessage;
+		/**
+		 *
+		 */
+		setError: function(errorMessage) {
+			this.loading = false; // loading ended
+			this.error = true; // error occurred
+			this.errorMessage = errorMessage; // save the error message
 		},
-		_success: function(response) {
-			this.$emit('dataFetched', response.data);
+		/**
+		 *
+		 */
+		success: function(response) {
+			this.$emit('dataFetched', response.data); // trigger the event dataFetched
 		},
-		_error: function(error) {
-			this._setError(error.message);
+		/**
+		 *
+		 */
+		error: function(error) {
+			this.setError(error.message);
 		},
-		_finally: function() {
-			this.loading = false;
+		/**
+		 *
+		 */
+		finally: function() {
+			this.loading = false; // loading ended
 		}
 	},
 	template: `

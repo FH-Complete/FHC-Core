@@ -1,28 +1,63 @@
-import {CoreFetchCmpt} from '../components/Fetch.js';
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-const CORE_FILTER_CMPT_TIMEOUT = 7000;
+import {CoreFilterAPIs} from './API.js';
+import {CoreRESTClient} from '../../RESTClient.js';
+import {CoreFetchCmpt} from '../../components/Fetch.js';
 
+/**
+ *
+ */
 export const CoreFilterCmpt = {
 	emits: ['nwNewEntry'],
+	components: {
+		CoreFetchCmpt
+	},
+	props: {
+		filterType: {
+			type: String,
+			required: true
+		}
+	},
 	data() {
 		return {
+			// FilterCmpt properties
 			fields: null,
 			fieldsToDisplay: null,
 			dataset: null,
 			selectedFields: null,
 			notSelectedFields: null,
 			filterFields: null,
-			notFilterFields: null
+			notFilterFields: null,
+
+			// FetchCmpt binded properties
+			fetchCmptRefresh: false,
+			fetchCmptApiFunction: null,
+			fetchCmptApiFunctionParams: null,
+			fetchCmptDataFetched: null
 		};
 	},
-	components: {
-		CoreFetchCmpt
+	created() {
+		this.getFilter(); // get the filter data
 	},
-	created() {},
 	updated() {
 		let filterCmptTablesorter = $("#filterTableDataset");
 
-		// Checks if the table contains data (rows)
+		// Checks if the table contains data records
 		if (filterCmptTablesorter.find("tbody:empty").length == 0
 			&& filterCmptTablesorter.find("tr:empty").length == 0)
 		{
@@ -37,32 +72,160 @@ export const CoreFilterCmpt = {
 			$.tablesorter.updateAll(filterCmptTablesorter[0].config, true, null);
 		}
 	},
-	props: {
-		filterType: {
-			type: String,
-			required: true
-		}
-	},
 	methods: {
-		saveCustomFilter(el) {
+		/**
+		 *
+		 */
+		getFilter: function() {
+			//
+			this.startFetchCmpt(CoreFilterAPIs.getFilter, null, this.render);
+		},
+		/**
+		 *
+		 */
+		render: function(response) {
 
-			CoreRESTClient.post(
-				'components/Filter/saveCustomFilter',
+			if (CoreRESTClient.hasData(response))
+			{
+				let data = CoreRESTClient.getData(response);
+				this.dataset = data.dataset;
+				this.fields = data.fields;
+				this.selectedFields = data.selectedFields;
+				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
+
+				this.filterFields = [];
+				let tmpFilterFields = [];
+				for (let i = 0; i < data.datasetMetadata.length; i++)
 				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
+					for (let j = 0; j < data.filters.length; j++)
+					{
+						if (data.datasetMetadata[i].name == data.filters[j].name)
+						{
+							let filter = data.filters[j];
+							filter.type = data.datasetMetadata[i].type;
+
+							this.filterFields.push(filter);
+							tmpFilterFields.push(filter.name);
+							break;
+						}
+					}
+				}
+
+				this.notFilterFields = this.fields.filter(x => tmpFilterFields.indexOf(x) === -1);
+				this.setFieldsToDisplay(data);
+				this.setSideMenu(data);
+			}
+			else
+			{
+				console.error(CoreRESTClient.getError(response));
+			}
+		},
+		/**
+		 *
+		 */
+		setFieldsToDisplay: function(data) {
+
+			let arrayFieldsToDisplay = [];
+	
+			if (data.hasOwnProperty("selectedFields") && $.isArray(data.selectedFields))
+			{
+				if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+				{
+					for (let sfc = 0; sfc < data.selectedFields.length; sfc++)
+					{
+						for (let fc = 0; fc < data.fields.length; fc++)
+						{
+							if (data.selectedFields[sfc] == data.fields[fc])
+							{
+								arrayFieldsToDisplay[sfc] = data.columnsAliases[fc];
+							}
+						}
+					}
+				}
+				else
+				{
+					arrayFieldsToDisplay = data.selectedFields;
+				}
+			}
+	
+			this.fieldsToDisplay = arrayFieldsToDisplay;
+		},
+		/**
+		 *
+		 */
+		setSideMenu: function(data) {
+			// Set the menu
+			let filters = data.sideMenu.filters;
+			let personalFilters = data.sideMenu.personalFilters;
+			let filtersArray = [];
+
+			for (let filtersCount = 0; filtersCount < filters.length; filtersCount++)
+			{
+				let link = filters[filtersCount].link;
+
+				if (link == null) link = '#';
+
+				filtersArray[filtersArray.length] = {
+					link: link + filters[filtersCount].filterId,
+                	                description: filters[filtersCount].desc,
+                	                sort: filtersCount,
+					onClickCall: this.handlerGetFilterById
+				};
+			}
+
+			this.$emit(
+				'nwNewEntry',
+				[{
+					link: "#",
+					description: "Filters",
+					icon: "filter",
+					children: filtersArray
+				}]
+			);
+		},
+		/**
+		 * Used to start/refresh the FetchCmpt
+		 */
+		startFetchCmpt: function(apiFunction, apiFunctionParameters, dataFetchedCallback) {
+			// Assign the function api of the FetchCmpt binded property
+			this.fetchCmptApiFunction = apiFunction;
+
+			// In case a null value is provided set the parameters as an empty object
+			if (apiFunctionParameters == null) apiFunctionParameters = {};
+			
+			// Always needed parameters
+			apiFunctionParameters.filterUniqueId = FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+			apiFunctionParameters.filterType = this.filterType;
+
+			// Assign parameters to the FetchCmpt binded properties
+			this.fetchCmptApiFunctionParams = apiFunctionParameters;
+			// Assign data fetch callback to the FetchCmpt binded properties
+			this.fetchCmptDataFetched = dataFetchedCallback;
+			// Set the FetchCmpt binded property refresh to have the component to refresh
+			// NOTE: this should be the last one to be called because it triggers the FetchCmpt to start to refresh
+			this.fetchCmptRefresh === true ? this.fetchCmptRefresh = false : this.fetchCmptRefresh = true;
+		},
+
+		// ------------------------------------------------------------------------------------------------------------------
+		// Event handlers
+
+		/**
+		 *
+		 */
+		handlerSaveCustomFilter: function(event) {
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.saveCustomFilter,
+				{
 					customFilterName: document.getElementById('customFilterName').value
 				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(function (response) { console.log(response); })
-			.catch(function (error) {
-				console.error(error);
-			});
+				this.getFilter
+			);
 		},
-		applyFilterFields(el) {
+		/**
+		 *
+		 */
+		handlerApplyFilterFields: function(event) {
 			let filterFields = [];
 			let filterFieldDivs = document.getElementById('filterFields').getElementsByTagName('div');
 
@@ -100,249 +263,89 @@ export const CoreFilterCmpt = {
 				filterFields.push(filterField);
 			}
 
-			CoreRESTClient.post(
-				'components/Filter/applyFilterFields',
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.applyFilterFields,
 				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
 					filterFields: filterFields
 				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(this.fetchFilterData)
-			.catch(function (error) {
-				console.error(error);
-			});
-		},
-		addFilterField(el) {
-
-			CoreRESTClient.post(
-				'components/Filter/addFilterField',
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
-					selectedField: el.currentTarget.value
-				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(this.fetchFilterData)
-			.catch(function (error) {
-				console.error(error);
-			});
-		},
-		addSelectedField(el) {
-
-			CoreRESTClient.post(
-				'components/Filter/addSelectedField',
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
-					selectedField: el.currentTarget.value
-				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(this.fetchFilterData)
-			.catch(function (error) {
-				console.error(error);
-			});
-		},
-		removeSelectedField(el) {
-
-			CoreRESTClient.post(
-				'components/Filter/removeSelectedField',
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
-					selectedField: el.currentTarget.getAttribute('field-to-remove')
-				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(this.fetchFilterData)
-			.catch(function (error) {
-				console.error(error);
-			});
-		},
-		removeFilterField(el) {
-
-			CoreRESTClient.post(
-				'components/Filter/removeFilterField',
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
-					filterField: el.currentTarget.getAttribute('field-to-remove')
-				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(this.fetchFilterData)
-			.catch(function (error) {
-				console.error(error);
-			});
-		},
-		fetchFilterDataById(el) {
-
-			var that = this;
-
-			CoreRESTClient.get(
-				'components/Filter/getFilter',
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType,
-					filter_id: el.currentTarget.getAttribute("href").substring(1)
-				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(function (response) { that.render(response.data); })
-			.catch(function (error) {
-				console.error(error);
-			});
-		},
-		fetchFilterData() {
-
-			var that = this;
-
-			CoreRESTClient.get(
-				'components/Filter/getFilter',
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType // props!!
-				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
-			)
-			.then(function (response) { that.render(response.data); })
-			.catch(function (error) {
-				console.error(error);
-			});
-		},
-		fetchFilterDataApi() {
-
-			return CoreRESTClient.get(
-				'components/Filter/getFilter',
-				{
-					filterUniqueId: this._getCurrentPage(),
-					filterType: this.filterType // props!!
-				},
-				{
-					timeout: CORE_FILTER_CMPT_TIMEOUT
-				}
+				this.getFilter
 			);
 		},
-		_getCurrentPage: function() {
-			return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
-		},
-		render(response) {
-
-			console.log('render');
-
-			if (CoreRESTClient.hasData(response))
-			{
-				let data = CoreRESTClient.getData(response);
-				this.dataset = data.dataset;
-				this.fields = data.fields;
-				this.selectedFields = data.selectedFields;
-				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
-
-				this.filterFields = [];
-				let tmpFilterFields = [];
-				for (let i = 0; i < data.datasetMetadata.length; i++)
+		/**
+		 *
+		 */
+		handlerAddFilterField: function(event) {
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.addFilterField,
 				{
-					for (let j = 0; j < data.filters.length; j++)
-					{
-						if (data.datasetMetadata[i].name == data.filters[j].name)
-						{
-							let filter = data.filters[j];
-							filter.type = data.datasetMetadata[i].type;
-
-							this.filterFields.push(filter);
-							tmpFilterFields.push(filter.name);
-							break;
-						}
-					}
-				}
-
-				this.notFilterFields = this.fields.filter(x => tmpFilterFields.indexOf(x) === -1);
-				this._setFieldsToDisplay(data);
-				this._setSideMenu(data);
-			}
-			else
-			{
-				console.error(CoreRESTClient.getError(response));
-			}
+					selectedField: event.currentTarget.value
+				},
+				this.getFilter
+			);
 		},
-		_setFieldsToDisplay(data) {
-
-			let arrayFieldsToDisplay = [];
-	
-			if (data.hasOwnProperty("selectedFields") && $.isArray(data.selectedFields))
-			{
-				if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+		/**
+		 *
+		 */
+		handlerAddSelectedField: function(event) {
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.addSelectedField,
 				{
-					for (let sfc = 0; sfc < data.selectedFields.length; sfc++)
-					{
-						for (let fc = 0; fc < data.fields.length; fc++)
-						{
-							if (data.selectedFields[sfc] == data.fields[fc])
-							{
-								arrayFieldsToDisplay[sfc] = data.columnsAliases[fc];
-							}
-						}
-					}
-				}
-				else
-				{
-					arrayFieldsToDisplay = data.selectedFields;
-				}
-			}
-	
-			this.fieldsToDisplay = arrayFieldsToDisplay;
+					selectedField: event.currentTarget.value
+				},
+				this.getFilter
+			);
 		},
-		_setSideMenu(data) {
-			// Set the menu
-			let filters = data.sideMenu.filters;
-			let personalFilters = data.sideMenu.personalFilters;
-			let filtersArray = [];
-
-			for (let filtersCount = 0; filtersCount < filters.length; filtersCount++)
-			{
-				let link = filters[filtersCount].link;
-
-				if (link == null) link = '#';
-
-				filtersArray[filtersArray.length] = {
-					link: link + filters[filtersCount].filter_id,
-                	                description: filters[filtersCount].desc,
-                	                sort: filtersCount,
-					onClickCall: this.fetchFilterDataById
-				};
-			}
-
-			this.$emit(
-				'nwNewEntry',
-				[{
-					link: "#",
-					description: "Filters",
-					icon: "filter",
-					children: filtersArray
-				}]
+		/**
+		 *
+		 */
+		handlerRemoveSelectedField: function(event) {
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.removeSelectedField,
+				{
+					selectedField: event.currentTarget.getAttribute('field-to-remove')
+				},
+				this.getFilter
+			);
+		},
+		/**
+		 *
+		 */
+		handlerRemoveFilterField: function(event) {
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.removeFilterField,
+				{
+					selectedField: event.currentTarget.getAttribute('field-to-remove')
+				},
+				this.getFilter
+			);
+		},
+		/**
+		 *
+		 */
+		handlerGetFilterById: function(event) {
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.getFilterById,
+				{
+					filterId: event.currentTarget.getAttribute("href").substring(1)
+				},
+				this.render
 			);
 		}
 	},
 	template: `
 		<!-- Load filter data -->
-                <core-fetch-cmpt v-bind:api-function="fetchFilterDataApi" @data-fetched="render"></core-fetch-cmpt>
+                <core-fetch-cmpt
+			v-bind:api-function="fetchCmptApiFunction"
+			v-bind:api-function-parameters="fetchCmptApiFunctionParams"
+			v-bind:refresh="fetchCmptRefresh"
+			@data-fetched="fetchCmptDataFetched">
+		</core-fetch-cmpt>
 
 		<div class="card filter-filter-options">
 			<div class="card-header filter-header-title" data-bs-toggle="collapse" data-bs-target="#collapseFilterHeader">
@@ -359,12 +362,12 @@ export const CoreFilterCmpt = {
 									type="button"
 									class="btn-close"
 									v-bind:field-to-remove="fieldToDisplay"
-									@click=removeSelectedField>
+									@click=handlerRemoveSelectedField>
 								</button>
 							</span>
 						</template>
 					</div>
-					<select class="form-select form-select-sm" @change=addSelectedField>
+					<select class="form-select form-select-sm" @change=handlerAddSelectedField>
 						<option value="">Select a field to be displayed...</option>
 						<template v-for="hiddenField in notSelectedFields">
 							<option v-bind:value="hiddenField">{{ hiddenField }}</option>
@@ -375,7 +378,7 @@ export const CoreFilterCmpt = {
 				<!-- Filter options -->
 				<div class="filter-options-div">
 					<div>
-						<select class="form-select form-select-sm" @change=addFilterField>
+						<select class="form-select form-select-sm" @change=handlerAddFilterField>
 							<option value="">Add a field to the filter...</option>
 							<template v-for="notFilterField in notFilterFields">
 								<option v-bind:value="notFilterField">{{ notFilterField }}</option>
@@ -399,7 +402,7 @@ export const CoreFilterCmpt = {
 									class="btn btn-sm btn-outline-dark"
 									type="button"
 									v-bind:field-to-remove="filterField.name"
-									@click=removeFilterField>
+									@click=handlerRemoveFilterField>
 									&emsp;X&emsp;
 								</button>
 							</div>
@@ -421,7 +424,7 @@ export const CoreFilterCmpt = {
 									class="btn btn-sm btn-outline-dark"
 									type="button"
 									v-bind:field-to-remove="filterField.name"
-									@click=removeFilterField>
+									@click=handlerRemoveFilterField>
 									&emsp;X&emsp;
 								</button>
 							</div>
@@ -450,7 +453,7 @@ export const CoreFilterCmpt = {
 									class="btn btn-sm btn-outline-dark"
 									type="button"
 									v-bind:field-to-remove="filterField.name"
-									@click=removeFilterField>
+									@click=handlerRemoveFilterField>
 									&emsp;X&emsp;
 								</button>
 							</div>
@@ -458,14 +461,14 @@ export const CoreFilterCmpt = {
 						</template>
 					</div>
 					<div>
-						<button type="button" class="btn btn-sm btn-outline-dark" @click=applyFilterFields>Apply changes</button> 
+						<button type="button" class="btn btn-sm btn-outline-dark" @click=handlerApplyFilterFields>Apply changes</button> 
 					</div>
 				</div>
 
 				<!-- Filter save options -->
 				<div class="input-group">
 					<input type="text" class="form-control" placeholder="Custom filter name" id="customFilterName">
-					<button type="button" class="btn btn-outline-secondary" @click=saveCustomFilter>Save</button>
+					<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Save</button>
 				</div>
 			</div>
 		</div>

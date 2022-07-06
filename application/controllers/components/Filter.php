@@ -162,13 +162,13 @@ class Filter extends FHC_Controller
 	}
 
 	/**
-	 * Remove a custom filter by its filter_id
+	 * Remove a custom filter by its filterId
 	 */
 	public function removeCustomFilter()
 	{
-		$filter_id = $this->input->post('filter_id');
+		$filterId = $this->input->post('filterId');
 
-		if ($this->filtercmptlib->removeCustomFilter($filter_id) == true)
+		if ($this->filtercmptlib->removeCustomFilter($filterId) == true)
 		{
 			$this->outputJsonSuccess('Removed');
 		}
@@ -243,7 +243,7 @@ class Filter extends FHC_Controller
 			array(
 				'filterUniqueId' => $filterUniqueId,
 				'filterType' => $filterType,
-				'filterId' => $this->input->get('filter_id')
+				'filterId' => $this->input->get('filterId')
 			)
 		);
 
