@@ -284,7 +284,7 @@ class person extends basis_db
 			//Quersumme bilden
 			for ($i = 0; $i < 10; $i++)
 			{
-				$erg += $gewichtung[$i] * $this->svnr{$i};
+				$erg += $gewichtung[$i] * $this->svnr[$i];
 			}
 
 			if ($this->svnr[3] != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11

@@ -154,7 +154,7 @@ class datum
 	public function checkDatum($datum)
 	{
 		//Format dd.mm.yyyy
-		if(mb_ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})$", $datum))
+		if(mb_ereg("([0-9]{2})[.]([0-9]{2})[.]([0-9]{4})$", $datum))
 		{
 
 			$year = substr($datum, 6, 4);
