@@ -82,7 +82,7 @@ class Person_model extends DB_Model
 				}
 				else
 				{
-					$person['svnr'] = $person['svnr'] . 'v' . ($result->retval[0]->svnr{11} + 1);
+					$person['svnr'] = $person['svnr'] . 'v' . ($result->retval[0]->svnr[11] + 1);
 				}
 			}
 		}

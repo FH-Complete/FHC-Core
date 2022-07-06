@@ -1743,6 +1743,72 @@
                 "shasum": null
             },
             "type": "library"
+        },
+        {
+            "name": "primevue3/core",
+            "version": "3.1.15",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/primevue@^3/core/core.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "primevue3/organizationchart",
+            "version": "3.1.15",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/primevue@^3/organizationchart/organizationchart.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "primevue3/treetable",
+            "version": "3.1.15",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/primevue@^3/treetable/treetable.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "primevue3/column",
+            "version": "3.1.15",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/primevue@^3/column/column.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "primevue3/calendar",
+            "version": "3.1.15",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/primevue@^3/calendar/calendar.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "primevue3/skeleton",
+            "version": "3.1.15",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/primevue@^3/skeleton/skeleton.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
         }
     ],
     "packages-dev": [

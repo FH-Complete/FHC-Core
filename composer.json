@@ -163,7 +163,7 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "json-forms",
+				"name": "brutusin/json-forms",
 				"version": "1.4.0",
 				"dist": {
 					"url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
@@ -174,7 +174,7 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "jsoneditor",
+				"name": "josdejong/jsoneditor",
 				"version": "5.5.6",
 				"dist": {
 					"url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
@@ -336,6 +336,72 @@
 					"type": "file"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "primevue3/core",
+				"version": "3.15.1",
+				"dist": {
+					"url": "https://unpkg.com/primevue@^3/core/core.min.js",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "primevue3/organizationchart",
+				"version": "3.15.1",
+				"dist": {
+					"url": "https://unpkg.com/primevue@^3/organizationchart/organizationchart.min.js",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "primevue3/treetable",
+				"version": "3.15.1",
+				"dist": {
+					"url": "https://unpkg.com/primevue@^3/treetable/treetable.min.js",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "primevue3/column",
+				"version": "3.15.1",
+				"dist": {
+					"url": "https://unpkg.com/primevue@^3/column/column.min.js",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "primevue3/calendar",
+				"version": "3.15.1",
+				"dist": {
+					"url": "https://unpkg.com/primevue@^3/calendar/calendar.min.js",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "primevue3/skeleton",
+				"version": "3.15.1",
+				"dist": {
+					"url": "https://unpkg.com/primevue@^3/skeleton/skeleton.min.js",
+					"type": "file"
+				}
+			}
 		}
 	],
 	"require": {
@@ -370,8 +436,8 @@
 		"jquery/jquery2": "2.*",
 		"jquery/sizzle": "1.0.*",
 		"jquery-archive/jquery-metadata": "1.0.*",
-		"json-forms": "1.4.0",
-		"jsoneditor": "5.5.6",
+		"brutusin/json-forms": "1.4.0",
+		"josdejong/jsoneditor": "5.5.6",
 
 		"kingsquare/json-schema-form": "*",
 
@@ -402,7 +468,14 @@
 		"twbs/bootstrap3": "3.4.*",
 		"twbs/bootstrap5": "5.1.*",
 
-		"vuejs/vuejs3": "3.2.33"
+		"vuejs/vuejs3": "3.2.33",
+
+		"primevue3/core": "3.1.15",
+		"primevue3/organizationchart": "3.1.15",
+		"primevue3/treetable": "3.1.15",
+		"primevue3/column": "3.1.15",
+		"primevue3/calendar": "3.1.15",
+		"primevue3/skeleton": "3.1.15"
 	},
 	"config": {
 		"bin-dir": "vendor/bin"
