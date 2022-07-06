@@ -85,6 +85,22 @@
 			// Tinymce 5 CSS
 			if ($tinymce5 === true) generateCSSsInclude('public/css/TinyMCE5.css');
 
+			// PrimeVUE
+			if ($primevue3 == true)
+			{
+				generateCSSsInclude('vendor/npm-asset/primevue/resources/themes/bootstrap4-light-blue/theme.css');
+				generateCSSsInclude('vendor/npm-asset/primevue/resources/primevue.min.css');
+				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');
+			/*	
+				<link
+					href="https://unpkg.com/primeflex@^3/primeflex.min.css"
+			
+					rel="stylesheet"
+				/>
+				<link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet" />
+*/
+			}
+
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
 

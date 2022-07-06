@@ -338,70 +338,8 @@
 			}
 		},
 		{
-			"type": "package",
-			"package": {
-				"name": "primevue3/core",
-				"version": "3.15.1",
-				"dist": {
-					"url": "https://unpkg.com/primevue@^3/core/core.min.js",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "primevue3/organizationchart",
-				"version": "3.15.1",
-				"dist": {
-					"url": "https://unpkg.com/primevue@^3/organizationchart/organizationchart.min.js",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "primevue3/treetable",
-				"version": "3.15.1",
-				"dist": {
-					"url": "https://unpkg.com/primevue@^3/treetable/treetable.min.js",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "primevue3/column",
-				"version": "3.15.1",
-				"dist": {
-					"url": "https://unpkg.com/primevue@^3/column/column.min.js",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "primevue3/calendar",
-				"version": "3.15.1",
-				"dist": {
-					"url": "https://unpkg.com/primevue@^3/calendar/calendar.min.js",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "primevue3/skeleton",
-				"version": "3.15.1",
-				"dist": {
-					"url": "https://unpkg.com/primevue@^3/skeleton/skeleton.min.js",
-					"type": "file"
-				}
-			}
+			"type": "composer",
+			"url": "https://asset-packagist.org"
 		}
 	],
 	"require": {
@@ -470,12 +408,9 @@
 
 		"vuejs/vuejs3": "3.2.33",
 
-		"primevue3/core": "3.1.15",
-		"primevue3/organizationchart": "3.1.15",
-		"primevue3/treetable": "3.1.15",
-		"primevue3/column": "3.1.15",
-		"primevue3/calendar": "3.1.15",
-		"primevue3/skeleton": "3.1.15"
+		"npm-asset/primevue": "3.15.*",
+		"npm-asset/primeicons": "5.0.0"
+
 	},
 	"config": {
 		"bin-dir": "vendor/bin"

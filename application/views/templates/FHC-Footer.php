@@ -108,6 +108,17 @@
 	// Vue 3 JS
 	if ($vue3 === true) generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
 
+	// PrimeVue
+	if ($primevue3)
+	{
+		generateJSsInclude('vendor/npm-asset/primevue/core/core.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/organizationchart/organizationchart.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/treetable/treetable.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/column/column.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/calendar/calendar.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/skeleton/skeleton.min.js');
+	}
+
 	// --------------------------------------------------------------------------------------------------------
 	// From public folder
 

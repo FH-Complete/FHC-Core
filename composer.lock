@@ -1745,70 +1745,28 @@
             "type": "library"
         },
         {
-            "name": "primevue3/core",
-            "version": "3.1.15",
+            "name": "npm-asset/primeicons",
+            "version": "5.0.0",
             "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/primevue@^3/core/core.min.js",
-                "reference": null,
-                "shasum": null
+                "type": "tar",
+                "url": "https://registry.npmjs.org/primeicons/-/primeicons-5.0.0.tgz"
             },
-            "type": "library"
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
-            "name": "primevue3/organizationchart",
-            "version": "3.1.15",
+            "name": "npm-asset/primevue",
+            "version": "3.15.0",
             "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/primevue@^3/organizationchart/organizationchart.min.js",
-                "reference": null,
-                "shasum": null
+                "type": "tar",
+                "url": "https://registry.npmjs.org/primevue/-/primevue-3.15.0.tgz"
             },
-            "type": "library"
-        },
-        {
-            "name": "primevue3/treetable",
-            "version": "3.1.15",
-            "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/primevue@^3/treetable/treetable.min.js",
-                "reference": null,
-                "shasum": null
-            },
-            "type": "library"
-        },
-        {
-            "name": "primevue3/column",
-            "version": "3.1.15",
-            "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/primevue@^3/column/column.min.js",
-                "reference": null,
-                "shasum": null
-            },
-            "type": "library"
-        },
-        {
-            "name": "primevue3/calendar",
-            "version": "3.1.15",
-            "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/primevue@^3/calendar/calendar.min.js",
-                "reference": null,
-                "shasum": null
-            },
-            "type": "library"
-        },
-        {
-            "name": "primevue3/skeleton",
-            "version": "3.1.15",
-            "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/primevue@^3/skeleton/skeleton.min.js",
-                "reference": null,
-                "shasum": null
-            },
-            "type": "library"
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         }
     ],
     "packages-dev": [
@@ -1827,7 +1785,7 @@
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3.2 || ^7.0 || ^8.0"
+                "php": "^5.3.2 || ^7.0 || ^8.0 || ^8.1"
             },
             "require-dev": {
                 "phpstan/phpstan": "^1.3",
