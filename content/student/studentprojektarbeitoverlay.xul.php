@@ -160,8 +160,6 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-projektarbeit-checkbox-neu" checked="true" />
-	  		<label value="Projektarbeit ID"/>
-	  		<textbox id="student-projektarbeit-textbox-projektarbeit_id" disabled="true"/>
 		</vbox>
 		<groupbox flex="1">
 		<caption label="Details"/>
@@ -171,6 +169,10 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 						<column flex="5"/>
 					</columns>
 					<rows>
+						<row>
+							<label value="Projektarbeit ID" control="student-projektarbeit-textbox-projektarbeit_id"/>
+							<hbox><textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/></hbox>
+						</row>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
 							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="1024" />
