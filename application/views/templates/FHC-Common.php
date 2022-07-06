@@ -26,6 +26,7 @@
 	$tinymce4 = isset($tinymce4) ? $tinymce4 : false;
 	$tinymce5 = isset($tinymce5) ? $tinymce5 : false;
 	$vue3 = isset($vue3) ? $vue3 : false;
+	$primevue3 = isset($primevue3) ? $primevue3 : false;
 
 	// Hooks
 	$addons = isset($addons) ? $addons : false;
