@@ -1084,7 +1084,37 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
-	)
+		),
+		array(
+			'app' => 'core',
+			'dataset_name' => 'employee',
+			'filter_kurzbz' => 'mitarbeiter',
+			'description' => '{MA Uebersicht}',
+			'sort' => 1,
+			'default_filter' => true,
+			'filter' => '
+				{
+					"name": "Mitarbeiter",
+					"columns": [
+						{"name": "PersonId"},
+						{"name": "Vorname"},
+						{"name": "Nachname"},
+						{"name": "Alias"},
+						{"name": "Raum"},
+						{"name": "Geschlecht"}
+					],
+					"filters": [
+						{                              
+						"name": "Nachname",      
+						"option": "",            
+						"condition": "",         
+						"operation": ""          
+						}    
+					]
+				}
+			',
+			'oe_kurzbz' => null,
+		)
 );
 
 // Loop through the filters array
