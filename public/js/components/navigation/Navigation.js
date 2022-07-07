@@ -126,6 +126,7 @@ export const CoreNavigationCmpt = {
 					</li>
 				</template>
 			</ul>
+			<slot></slot>
 		</nav>
 
 		<!-- Left side menu -->
