@@ -123,17 +123,23 @@ $this->load->view(
 											<tbody>
 											
 											<tr>
-												<th class="col-xs-2"><?php echo $this->p->t('lehre', 'ects'); ?></th>
-												<td><?php echo $antragData->ects ?></td>
-                                                <td class="col-xs-2">Bisher angerechnete ECTS
-                                                     <span class="approveAnrechnungDetail-anrechnungEctsTooltip"
-                                                       data-toggle="tooltip" data-placement="right"
-                                                       title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
+												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'ects'); ?></th>
+                                                <td colspan="3"><span id="ects"><?php echo $antragData->ects ?></span></td>
+											</tr>
+                                            <tr>
+                                                <th class="col-xs-4">Bisher angerechnete ECTS
+                                                    <span class="approveAnrechnungDetail-anrechnungEctsTooltip"
+                                                          data-toggle="tooltip" data-placement="right"
+                                                          title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
 													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 												</span>
-                                                </td>
-                                                <td><?php echo $antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich. ' [Schulisch: '. $antragData->sumEctsSchulisch. ' / Beruflich: '. $antragData->sumEctsBeruflich. ']' ?></td>
-											</tr>
+                                                </th>
+                                                <td colspan="3">
+                                                    Total: <span id="sumEctsTotal"><?php echo $antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich ?></span>
+                                                    [Schulisch: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> /
+                                                    Beruflich: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
+                                                     <span id="sumEctsMsg"></span>
+                                            </tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lektorInnen'); ?></th>
 												<td colspan="3">
@@ -186,8 +192,10 @@ $this->load->view(
 									<div class="row">
 										<div class="col-lg-6">
 											<form id="form-empfehlung">
-												<input type="hidden" name="anrechnung_id"
-													   value="<?php echo $anrechnungData->anrechnung_id ?>">
+												<input type="hidden" name="anrechnung_id" value="<?php echo $anrechnungData->anrechnung_id ?>">
+                                                <input type="hidden" name="ects" value="<?php echo $antragData->ects ?>">
+                                                <input type="hidden" name="sumEctsSchulisch" value="<?php echo $antragData->sumEctsSchulisch ?>">
+                                                <input type="hidden" name="sumEctsBeruflich" value="<?php echo $antragData->sumEctsBeruflich ?>">
 												<table class="table table-bordered table-condensed table-fixed">
 													<tbody>
 													<tr>
