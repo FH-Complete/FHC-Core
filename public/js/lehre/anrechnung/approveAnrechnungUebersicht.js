@@ -8,6 +8,9 @@ const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 const COLOR_LIGHTGREY = "#f5f5f5";
+const COLOR_DANGER = '#f2dede';
+
+var previousSelectedRows = [];
 
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -97,6 +100,75 @@ function func_selectableCheck(row){
         status_kurzbz != ANRECHNUNGSTATUS_REJECTED &&
         status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
     );
+}
+
+// Unformat row when single row is deselected (is not done by func_rowSelectionChanged yet)
+function func_rowDeselected(row){
+
+    // Removes bg-color on single row deselection.
+    approveAnrechnung.unmarkEctsRow(row);
+}
+
+// Format rows when maximum ECTS are exceeded.
+function func_rowSelectionChanged(data, rows){
+
+    var selectedData = data;
+    var selectedRows = rows;
+
+    // If no rows selected
+    if (selectedRows.length == 0)
+    {
+        // Check there are still rows marked from previous selection...
+        if (previousSelectedRows.length > 0)
+        {
+            // ... and unmark them
+            previousSelectedRows.forEach((row) => approveAnrechnung.unmarkEctsRow(row));
+        }
+
+        // Show number of selected Rows
+        approveAnrechnung.showNumberSelectedRows(selectedRows);
+        return;
+    }
+
+    // Sum up over all anzurechnenden LV-ECTS by Prestudent
+    var result = [];
+    result = approveAnrechnung.getSumLvEctsByPreStudent(selectedData);
+
+    // Filter only Prestudenten, where ECTS exceed maximum
+    exceededEctsByPreStud =
+        result.filter((val) =>
+            (val.ectsSumAnzurechnendeLvs + val.ectsSumSchulisch) > 60 ||
+            (val.ectsSumBeruflich) > 60 ||
+            (val.ectsSumAnzurechnendeLvs + val.ectsSumSchulisch + val.ectsSumBeruflich) > 90
+        );
+
+    // Mark all Prestudenten
+    if (selectedRows.length > 0)
+    {
+        selectedRows.forEach((row) => {
+
+            //row.reformat();
+            approveAnrechnung.unmarkEctsRow(row);
+    
+            if (exceededEctsByPreStud.length > 0)
+            {
+                exceededEctsByPreStud.forEach((val) => {
+                    if (row.getData().prestudent_id == val.prestudent_id)
+                    {
+                        approveAnrechnung.markEctsRow(row);
+
+                    }
+                })
+            }
+
+        });
+    }
+
+    // Keep the selected rows for next selection.
+    previousSelectedRows = selectedRows;
+
+    // Show number of selected rows.
+    approveAnrechnung.showNumberSelectedRows(selectedRows);
 }
 
 // Performes after row was updated
@@ -595,5 +667,47 @@ var approveAnrechnung = {
                 break;
 
         }
+    },
+    markEctsRow(row){
+        row.getElement().style["background-color"] = COLOR_DANGER;
+        // row.getCell('ects').getElement().style["background-color"] = COLOR_DANGER;
+        // row.getCell('ectsSumTotal').getElement().style["background-color"] = COLOR_DANGER;
+        // row.getCell('student').getElement().style["background-color"] = COLOR_DANGER;
+    },
+    unmarkEctsRow(row){
+        row.getElement().style.removeProperty('background-color');
+        // row.getCell('ects').getElement().style.removeProperty('background-color');
+        // row.getCell('ectsSumTotal').getElement().style.removeProperty('background-color');
+        // row.getCell('student').getElement().style.removeProperty('background-color');
+    },
+    getSumLvEctsByPreStudent(selectedData){
+
+        var result = [];
+
+        selectedData.reduce((prev, curr) => {
+
+            if (!prev[curr.prestudent_id])
+            {
+                prev[curr.prestudent_id] = {
+                    anrechnung_id: curr.anrechnung_id,
+                    prestudent_id: curr.prestudent_id,
+                    ectsSumAnzurechnendeLvs: 0,
+                    ectsSumSchulisch: parseFloat(curr.ectssumschulisch),
+                    ectsSumBeruflich: parseFloat(curr.ectssumberuflich)
+                };
+
+                result.push(prev[curr.prestudent_id])
+            }
+
+            prev[curr.prestudent_id].ectsSumAnzurechnendeLvs+= parseFloat(curr.ects);
+
+            return prev;
+
+        }, {});
+
+        return result;
+    },
+    showNumberSelectedRows(rows){
+        $('#number-selected').html("Ausgewählte Zeilen: <strong>" + rows.length + "</strong>");
     }
 }

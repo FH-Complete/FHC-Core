@@ -4,6 +4,7 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
+const COLOR_DANGER = '#f2dede';
 
 
 $(function(){
@@ -35,6 +36,8 @@ $(function(){
 
     // Init tooltips
     approveAnrechnungDetail.initTooltips();
+
+    approveAnrechnungDetail.alertIfMaxEctsExceeded();
 
     // Ask if Approve Anrechnungen
     $("#approveAnrechnungDetail-approve-anrechnung-ask").click(function(){
@@ -93,6 +96,9 @@ $(function(){
                             data.retval[0].abgeschlossen_von,
                             data.retval[0].status_bezeichnung
                         );
+
+                        approveAnrechnungDetail.sumUpEcts(ects, sumEctsSchulisch, sumEctsBeruflich);
+                        approveAnrechnungDetail.alertIfMaxEctsExceeded();
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -251,17 +257,18 @@ $(function(){
                     console.log(data);
                     if (data.error && data.retval != null)
                     {
-                        console.log('inside error');
                         // Print error message
                         FHC_DialogLib.alertWarning(data.retval);
                     }
 
                     if (!data.error && data.retval != null)
                     {
-                        console.log('inside success');
                         approveAnrechnungDetail.formatGenehmigungIsWithdrawed(
                             data.retval.status_bezeichnung
                         );
+
+                        approveAnrechnungDetail.substractEcts(ects, sumEctsSchulisch, sumEctsBeruflich);
+                        approveAnrechnungDetail.alertIfMaxEctsExceeded();
 
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("anrechnung", "erfolgreichZurueckgenommen"));
 
@@ -544,5 +551,29 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
         // Hide button to withdraw approval
         $('#approveAnrechnungDetail-withdraw-request-recommedation').addClass('hidden');
+    },
+    sumUpEcts: function(ects, sumEctsSchulisch, sumEctsBeruflich){
+        $('#sumEctsTotal').text(parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text()) + parseFloat($('#ects').text()));
+        $('#sumEctsSchulisch').text(parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#ects').text()));
+
+    },
+    substractEcts: function(ects, sumEctsSchulisch, sumEctsBeruflich){
+        $('#sumEctsTotal').text(parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text()) - parseFloat($('#ects').text()));
+        $('#sumEctsSchulisch').text(parseFloat($('#sumEctsSchulisch').text()) - parseFloat($('#ects').text()));
+    },
+    alertIfMaxEctsExceeded: function(){
+        if(
+            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text())) > 60 ||
+            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsBeruflich').text())) > 60 ||
+            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
+        )
+        {
+            console.log('inside');
+            $('#sumEctsMsg').html("<br><b>ACHTUNG! Bei Anrechnung von LV: Maximale ECTS überschritten.</b></br>").css('backgroundColor', COLOR_DANGER);
+        }
+        else
+        {
+            $('#sumEctsMsg').html('').css('border', 'none');
+        }
     }
 }
