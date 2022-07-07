@@ -6259,6 +6259,17 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// ADD COLUMN studienkennung_uni to bis.tbl_gsprogramm
+if(!@$db->db_query("SELECT studienkennung_uni FROM bis.tbl_gsprogramm LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_gsprogramm ADD COLUMN studienkennung_uni varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_gsprogramm '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte studienkennung_uni in bis.tbl_gsprogramm hinzugefügt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
