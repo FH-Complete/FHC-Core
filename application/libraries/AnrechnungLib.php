@@ -82,10 +82,12 @@ class AnrechnungLib
 		$latest_zgv_bezeichnung = hasData($result) ? getData($result)[0]->bezeichnung : '';
 
         // Get Sum of berufliche and schulische ECTS
-        $sumEctsQuereinsteiger = $this->getQuereinsteigerEctsSumme($prestudent_id, $lv->studiengang_kz);
-        $sumEctsSchulisch = $this->getSchulischeAnrechnungenEctsSumme($uid);
-        $sumEctsBeruflich = $this->getBeruflicheAnrechnungenEctsSumme($uid);
-		
+        $result = $this->ci->LehrveranstaltungModel->getEctsSumSchulisch($uid, $prestudent_id, $lv->studiengang_kz);
+        $sumEctsSchulisch = getData($result)[0]->ectssumschulisch;
+
+        $result = $this->ci->LehrveranstaltungModel->getEctsSumBeruflich($uid);
+        $sumEctsBeruflich = getData($result)[0]->ectssumberuflich;
+
 		// Set the given studiensemester
 		$antrag_data->lv_id = $lv_id;
 		$antrag_data->lv_bezeichnung = $lv->bezeichnung;
