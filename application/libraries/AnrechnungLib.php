@@ -92,7 +92,7 @@ class AnrechnungLib
 		$antrag_data->lv_id = $lv_id;
 		$antrag_data->lv_bezeichnung = $lv->bezeichnung;
 		$antrag_data->ects = $lv->ects;
-        $antrag_data->sumEctsSchulisch = $sumEctsQuereinsteiger + $sumEctsSchulisch;
+        $antrag_data->sumEctsSchulisch = $sumEctsSchulisch;
         $antrag_data->sumEctsBeruflich = $sumEctsBeruflich;
 		$antrag_data->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$antrag_data->vorname = $person->vorname;
