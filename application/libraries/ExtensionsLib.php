@@ -23,7 +23,7 @@ class ExtensionsLib
 
 	// Directories that are part of the extension archive
 	private $SOFTLINK_TARGET_DIRECTORIES = array(
-		APPPATH => array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
+		APPPATH => array('config', 'components', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
 		DOC_ROOT => array('public')
 	);
 
