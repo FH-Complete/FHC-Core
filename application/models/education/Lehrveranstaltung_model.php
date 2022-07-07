@@ -440,4 +440,35 @@ class Lehrveranstaltung_model extends DB_Model
 
         return $this->execQuery($qry, array($student_uid, $student_uid));
     }
+
+    /**
+     * Get ECTS Summe aller bisher schulisch begruendeten angerechneten LVs.
+     * Derzeit wird auch jede Anrechnung, die nicht beruflich ist, als schulisch angenommen.
+     *
+     * @param $student_uid
+     * @return array|stdClass|null
+     */
+    public function getEctsSumSchulisch($student_uid, $prestudent_id, $studiengang_kz)
+    {
+        $qry = '
+            SELECT get_ects_summe_schulisch(?, ?, ?) AS ectsSumSchulisch
+        ';
+
+        return $this->execQuery($qry, array($student_uid, $prestudent_id, $studiengang_kz));
+    }
+
+    /**
+     * Get ECTS Summe aller bisher beruflich angerechneten LVs.
+     *
+     * @param $student_uid
+     * @return array|stdClass|null
+     */
+    public function getEctsSumBeruflich($student_uid)
+    {
+        $qry = '
+            SELECT get_ects_summe_beruflich(?) AS ectsSumBeruflich
+        ';
+
+        return $this->execQuery($qry, array($student_uid));
+    }
 }
