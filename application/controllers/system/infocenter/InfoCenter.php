@@ -88,6 +88,12 @@ class InfoCenter extends Auth_Controller
 			'message' => 'Type of Document %s was updated, set to %s',
 			'success' => null
 		),
+		'deletedoc' => array(
+			'logtype' => 'Action',
+			'name' => 'Document deleted',
+			'message' => 'Document %s deleted',
+			'success' => null
+		),
 	);
 
 	// Name of Interessentenstatus
@@ -131,6 +137,7 @@ class InfoCenter extends Auth_Controller
 				'reloadZgvPruefungen' => 'infocenter:r',
 				'reloadMessages' => 'infocenter:r',
 				'reloadDoks' => 'infocenter:r',
+				'reloadUebersichtDoks' => 'infocenter:r',
 				'reloadNotizen' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => array('infocenter:r', 'lehre/zgvpruefung:r'),
@@ -142,7 +149,8 @@ class InfoCenter extends Auth_Controller
 				'getStudienjahrEnd' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'setNavigationMenuArrayJson' => 'infocenter:r',
 				'getAbsageData' => 'infocenter:r',
-				'saveAbsageForAll' => 'infocenter:rw'
+				'saveAbsageForAll' => 'infocenter:rw',
+				'deleteDoc' => 'infocenter:rw',
 			)
 		);
 
@@ -396,6 +404,31 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->outputJsonSuccess(array($json));
+	}
+
+	public function deleteDoc($person_id)
+	{
+		$akte_id = $this->input->post('akteid');
+
+		if (isset($akte_id) && isset($person_id))
+		{
+			$this->load->library('AkteLib');
+			$akte = $this->aktelib->get($akte_id);
+
+			if (hasData($akte))
+			{
+				$result = $this->aktelib->remove($akte_id);
+
+				if (isError($result))
+				{
+					$this->terminateWithJsonError('Error deleting document');
+				}
+
+				$this->_log($person_id, 'deletedoc', array(getData($akte)->bezeichnung));
+
+				$this->outputJsonSuccess('success');
+			}
+		}
 	}
 
 	/**
@@ -1072,6 +1105,17 @@ class InfoCenter extends Auth_Controller
 		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
 
 		$this->load->view('system/infocenter/dokNachzureichend.php', array('dokumente_nachgereicht' => $dokumente_nachgereicht->retval));
+	}
+
+	public function reloadUebersichtDoks($person_id)
+	{
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+
+		$this->DokumentModel->addOrder('bezeichnung');
+		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
+		$data = array_merge($dokumentdata, ['dokumente' => $dokumente->retval]);
+
+		$this->load->view('system/infocenter/dokpruefung.php', $data);
 	}
 
 	/**
