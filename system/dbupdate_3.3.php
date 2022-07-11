@@ -5169,6 +5169,19 @@ if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHE
 	}
 }
 
+// Added Bezeichnung 'Hochschulzeugnis' to Anrechnungbegruendung
+if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHERE bezeichnung = 'Hochschulzeugnis';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_anrechnung_begruendung (bezeichnung) VALUES('Hochschulzeugnis');";
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_anrechnung_begruendung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' lehre.tbl_anrechnung_begruendung: Added bezeichnung "Hochschulzeugnis" <br>';
+	}
+}
+
 // Add permission to apply for Anrechnung
 if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/anrechnung_beantragen';"))
 {
