@@ -9,7 +9,7 @@ class Benutzer_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'public.tbl_benutzer';
-		$this->pk = array('uid');
+		$this->pk = 'uid';
 		$this->hasSequence = false;
 	}
 
