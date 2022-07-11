@@ -1,12 +1,18 @@
 /**
- * FH-Complete
+ * Copyright (C) 2022 fhcomplete.org
  *
- * @package	FHC-Helper
- * @author	FHC-Team
- * @copyright	Copyright (c) 2022 fhcomplete.net
- * @license	GPLv3
- * @link	https://fhcomplete.net
- * @since	Version 1.0.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -198,14 +204,14 @@ export const CoreRESTClient = {
 			timeout: CORE_REST_CLIENT_TIMEOUT // default time out
 		};
 
-		//
+		// The ajax call is HTTP GET
 		if (type == CRC_HTTP_GET_METHOD)
 		{
 			axiosCallObj.params = wsParameters;
 		}
+		// The ajax call is HTTP POST
 		else
 		{
-			axiosCallObj.headers = { "Content-Type": "multipart/form-data" };
 			axiosCallObj.data = wsParameters;
 		}
 
@@ -213,7 +219,7 @@ export const CoreRESTClient = {
 		if (typeof axiosParameters === "object")
 		{
 			// And then copies the its properties into axiosCallObj
-	                for (var prop in axiosParameters) axiosCallObj[prop] = axiosParameters[prop];
+			for (var prop in axiosParameters) axiosCallObj[prop] = axiosParameters[prop];
 		}
 
 		// Perform the ajax call via axios

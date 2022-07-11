@@ -4,16 +4,17 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * This controller operates between (interface) the JS (GUI) and the FilterCmptLib (back-end)
- * Provides data to the ajax get calls about the filter cmpt
- * Accepts ajax post calls to change the filter data
+ * Provides data to the ajax get calls about the filter component
+ * Listens to ajax post calls to change the filter data
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
  * NOTE: extends the FHC_Controller instead of the Auth_Controller because the FilterCmpt has its
- * 		own permissions check
+ * 	own permissions check
  */
 class Filter extends FHC_Controller
 {
-	const FILTER_UNIQUE_ID = 'filterUniqueId'; // Name of the filter cmpt unique id
-	const FILTER_TYPE = 'filterType'; // 
+	const FILTER_UNIQUE_ID = 'filterUniqueId'; // Name of the filter cmpt unique id (mandatory)
+	const FILTER_TYPE = 'filterType'; // The filter type (PHP filter definition) used (mandatory)
+	const FILTER_ID = 'filterId'; // The id of the used filter (optional)
 
 	/**
 	 * Calls the parent's constructor and loads the FilterCmptLib
@@ -46,11 +47,12 @@ class Filter extends FHC_Controller
 	 */
 	public function sortSelectedFields()
 	{
-		$selectedFields = $this->input->post('selectedFields');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->sortSelectedFields($selectedFields) == true)
+		if (property_exists($request, 'selectedFields')
+			&& $this->filtercmptlib->sortSelectedFields($request->selectedFields) == true)
 		{
-			$this->getFilter();
+			$this->outputJsonSuccess('Fields sorted');
 		}
 		else
 		{
@@ -64,9 +66,10 @@ class Filter extends FHC_Controller
 	 */
 	public function removeSelectedField()
 	{
-		$selectedField = $this->input->post('selectedField');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->removeSelectedField($selectedField) == true)
+		if (property_exists($request, 'selectedField')
+			&& $this->filtercmptlib->removeSelectedField($request->selectedField) == true)
 		{
 			$this->outputJsonSuccess('Field removed');
 		}
@@ -81,9 +84,10 @@ class Filter extends FHC_Controller
 	 */
 	public function addSelectedField()
 	{
-		$selectedField = $this->input->post('selectedField');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->addSelectedField($selectedField) == true)
+		if (property_exists($request, 'selectedField')
+			&& $this->filtercmptlib->addSelectedField($request->selectedField) == true)
 		{
 			$this->outputJsonSuccess('Field added');
 		}
@@ -98,9 +102,10 @@ class Filter extends FHC_Controller
 	 */
 	public function removeFilterField()
 	{
-		$appliedFilter = $this->input->post('filterField');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->removeFilterField($appliedFilter) == true)
+		if (property_exists($request, 'filterField')
+			&& $this->filtercmptlib->removeFilterField($request->filterField) == true)
 		{
 			$this->outputJsonSuccess('Field removed');
 		}
@@ -115,9 +120,10 @@ class Filter extends FHC_Controller
 	 */
 	public function addFilterField()
 	{
-		$filterField = $this->input->post('filterField');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->addFilterField($filterField) == true)
+		if (property_exists($request, 'filterField')
+			&& $this->filtercmptlib->addFilterField($request->filterField) == true)
 		{
 			$this->outputJsonSuccess('Field added');
 		}
@@ -132,9 +138,10 @@ class Filter extends FHC_Controller
 	 */
 	public function applyFilterFields()
 	{
-		$filterFields = $this->input->post('filterFields');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->applyFilterFields($filterFields) == true)
+		if (property_exists($request, 'filterFields')
+			&& $this->filtercmptlib->applyFilterFields($request->filterFields) == true)
 		{
 			$this->outputJsonSuccess('Applied');
 		}
@@ -149,9 +156,10 @@ class Filter extends FHC_Controller
 	 */
 	public function saveCustomFilter()
 	{
-		$customFilterName = $this->input->post('customFilterName');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->saveCustomFilter($customFilterName) == true)
+		if (property_exists($request, 'customFilterName')
+			&& $this->filtercmptlib->saveCustomFilter($request->customFilterName) == true)
 		{
 			$this->outputJsonSuccess('Saved');
 		}
@@ -166,9 +174,10 @@ class Filter extends FHC_Controller
 	 */
 	public function removeCustomFilter()
 	{
-		$filterId = $this->input->post('filterId');
+		$request = $this->getPostJSON();
 
-		if ($this->filtercmptlib->removeCustomFilter($filterId) == true)
+		if (property_exists($request, 'filterId')
+			&& $this->filtercmptlib->removeCustomFilter($request->filterId) == true)
 		{
 			$this->outputJsonSuccess('Removed');
 		}
@@ -200,42 +209,42 @@ class Filter extends FHC_Controller
 	{
 		$filterUniqueId = null;
 		$filterType = null;
+		$filterId = null;
 
-		// If the parameter FILTER_UNIQUE_ID is present in the HTTP GET or POST
-		if (isset($_GET[self::FILTER_UNIQUE_ID]) || isset($_POST[self::FILTER_UNIQUE_ID]))
+		// Try to get the POSTed JSON
+		$postJSON = $this->getPostJSON();
+
+		// POSTed JSON
+		if ($postJSON != null)
 		{
-			// If it is present in the HTTP GET
-			if (isset($_GET[self::FILTER_UNIQUE_ID]))
+			// If the mandatory parameters FILTER_UNIQUE_ID and FILTER_TYPE have been provided
+			if (property_exists($postJSON, self::FILTER_UNIQUE_ID) && property_exists($postJSON, self::FILTER_TYPE))
 			{
-				$filterUniqueId = $this->input->get(self::FILTER_UNIQUE_ID); // is retrieved from the HTTP GET
+				// Retrives them from the POSTed JSON
+				$filterUniqueId = $postJSON->{self::FILTER_UNIQUE_ID};
+				$filterType = $postJSON->{self::FILTER_TYPE};
 			}
-			elseif (isset($_POST[self::FILTER_UNIQUE_ID])) // Else if it is present in the HTTP POST
-			{
-				$filterUniqueId = $this->input->post(self::FILTER_UNIQUE_ID); // is retrieved from the HTTP POST
-			}
+
+			// If the optional parameter FILTER_ID has been provided
+			if (property_exists($postJSON, self::FILTER_ID)) $filterId = $postJSON->{self::FILTER_ID};
 		}
-		else // Otherwise an error will be written in the output
+		else // otherwise it is an HTTP GET call
 		{
-			$this->terminateWithJsonError('Parameter "'.self::FILTER_UNIQUE_ID.'" not provided!');
+			// If the mandatory parameters FILTER_UNIQUE_ID and FILTER_TYPE have been provided
+			if (isset($_GET[self::FILTER_UNIQUE_ID]) && isset($_GET[self::FILTER_TYPE]))
+			{
+				// Retrives them from the HTTP GET
+				$filterUniqueId = $this->input->get(self::FILTER_UNIQUE_ID);
+				$filterType = $this->input->get(self::FILTER_TYPE);
+			}
+
+			// If the optional parameter FILTER_ID has been provided
+			if (isset($_GET[self::FILTER_ID])) $filterId = $filterId = $this->input->get(self::FILTER_ID);
 		}
 
-		// If the parameter FILTER_TYPE is present in the HTTP GET or POST
-		if (isset($_GET[self::FILTER_TYPE]) || isset($_POST[self::FILTER_TYPE]))
-		{
-			// If it is present in the HTTP GET
-			if (isset($_GET[self::FILTER_TYPE]))
-			{
-				$filterType = $this->input->get(self::FILTER_TYPE); // is retrieved from the HTTP GET
-			}
-			elseif (isset($_POST[self::FILTER_TYPE])) // Else if it is present in the HTTP POST
-			{
-				$filterType = $this->input->post(self::FILTER_TYPE); // is retrieved from the HTTP POST
-			}
-		}
-		else // Otherwise an error will be written in the output
-		{
-			$this->terminateWithJsonError('Parameter "'.self::FILTER_TYPE.'" not provided!');
-		}
+		// If the mandatory parameters have _not_ been provided, then terminate the execution and return an error
+		if ($filterUniqueId == null) $this->terminateWithJsonError('Parameter "'.self::FILTER_UNIQUE_ID.'" not provided!');
+		if ($filterType == null) $this->terminateWithJsonError('Parameter "'.self::FILTER_TYPE.'" not provided!');
 
 		// Loads the FilterCmptLib that contains all the used logic
 		$this->load->library(
@@ -243,11 +252,11 @@ class Filter extends FHC_Controller
 			array(
 				'filterUniqueId' => $filterUniqueId,
 				'filterType' => $filterType,
-				'filterId' => $this->input->get('filterId')
+				'filterId' => $filterId
 			)
 		);
 
-		// 
+		// Start the component
 		$this->filtercmptlib->start();
 	}
 }
