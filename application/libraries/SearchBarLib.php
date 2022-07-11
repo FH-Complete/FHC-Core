@@ -207,13 +207,17 @@ class SearchBarLib
 				// Loop through the found leaders for this organisation unit
 				for ($i = 0; $i < count($ou->leader_uid); $i++)
 				{
-					// Empty object that will contains the leader uid and name
-					$leader = new stdClass();
-					// Set the properties name and uid
-					$leader->uid = $ou->leader_uid[$i];
-					$leader->name = $ou->leader_name[$i];
-					// Add the leader object to the leaders array
-					$ou->leaders[] = $leader;
+					// If a leader exists for this organisationunit and has a name :D
+					if (!isEmptyString($ou->leader_uid[$i]) && !isEmptyString($ou->leader_name[$i]))
+					{
+						// Empty object that will contains the leader uid and name
+						$leader = new stdClass();
+						// Set the properties name and uid
+						$leader->uid = $ou->leader_uid[$i];
+						$leader->name = $ou->leader_name[$i];
+						// Add the leader object to the leaders array
+						$ou->leaders[] = $leader;
+					}
 				}
 
 				// Remove the not needed properties leader_uid and leader_name
