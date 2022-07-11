@@ -819,7 +819,7 @@ class FilterCmptLib
 	 * Generates a condition for a SQL where clause using the given applied filter definition.
 	 * By default an empty string is returned.
 	 */
-	private function __getDatasetQueryCondition($filterDefinition)
+	private function _getDatasetQueryCondition($filterDefinition)
 	{
 		$condition = ''; // starts building the condition
 
@@ -1147,7 +1147,7 @@ class FilterCmptLib
 				if  (!isEmptyString($filterDefinition->name))
 				{
 					// Build the query conditions
-					$datasetQueryCondition = $this->__getDatasetQueryCondition($filterDefinition);
+					$datasetQueryCondition = $this->_getDatasetQueryCondition($filterDefinition);
 
 					// If the built condition is valid then add it to the query clause
 					if (!isEmptyString($datasetQueryCondition))
