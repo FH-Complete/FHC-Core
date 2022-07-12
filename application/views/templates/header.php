@@ -108,8 +108,8 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 <?php if($jsonforms) : ?>
-	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/json-forms/dist/css/brutusin-json-forms.min.css'); ?>" />
-	<script type="text/javascript" src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/brutusin/json-forms/dist/css/brutusin-json-forms.min.css'); ?>" />
+	<script type="text/javascript" src="<?php echo base_url('vendor/brutusin/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($widgetsCSS) : ?>
