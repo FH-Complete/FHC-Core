@@ -371,7 +371,7 @@ function findResource($path, $resource, $subdir = false, $extraDir = null)
 			// If entry is a directory but not the current and subdirectories should be loaded
 			if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($path.$entry))
 			{
-				if ($extension == null)
+				if ($extraDir == null)
 				{
 					$tmpPaths[] = $path.$entry.'/';
 				}
