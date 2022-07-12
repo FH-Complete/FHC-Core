@@ -82,7 +82,7 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 	<title>FHC - Nachweisliste</title>
 	<link rel="stylesheet" type="text/css" href="../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
-	<link href="../../../vendor/components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>	
+	<link href="../../../vendor/fortawesome/font-awesome4/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 
