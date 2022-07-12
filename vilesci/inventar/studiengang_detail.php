@@ -88,7 +88,7 @@
 		<script src="<?php echo $path;?>include/js/tablesort/table.js" type="text/javascript"></script>
 
 		<link rel="stylesheet" type="text/css" href="<?php echo $path;?>skin/jquery-ui-1.9.2.custom.min.css">
-		<script type="text/javascript" src="<?php echo $path;?>vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="<?php echo $path;?>vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="<?php echo $path;?>vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 		<script type="text/javascript" src="<?php echo $path;?>vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="<?php echo $path;?>include/js/jquery.ui.datepicker.translation.js"></script>

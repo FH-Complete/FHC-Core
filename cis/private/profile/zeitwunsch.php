@@ -425,7 +425,7 @@ function getStgMail($stgKz_arr)
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css">
-        <script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+        <script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
         <script type="text/javascript" src="../../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
 		// Pruefen ob nur die erlaubten Werte verwendet wurden

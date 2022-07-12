@@ -74,7 +74,7 @@ $PHP_SELF = $_SERVER['PHP_SELF']; ?>
 		<link rel="stylesheet" href="../../skin/croppie.css">
 		<link rel="stylesheet" type="text/css" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="../../skin/fhcomplete.css">
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script src="../../include/js/croppie.js"></script>
 

@@ -1189,7 +1189,7 @@ function resize($base64, $width, $height) // 828 x 1104 -> 240 x 320
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 <link href="../../skin/jquery.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript"
-	src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript"
 	src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript"
