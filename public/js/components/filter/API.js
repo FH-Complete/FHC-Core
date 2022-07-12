@@ -151,5 +151,5 @@ export const CoreFilterAPIs = {
                         }
                 );
 	}
-}
+};
 

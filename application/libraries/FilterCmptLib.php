@@ -142,7 +142,7 @@ class FilterCmptLib
 		}
 		else
 		{
-			$filePath = findResource(APPPATH.'components/extensions/', $this->_filterType, true);
+			$filePath = findResource(APPPATH.'components/extensions/', $this->_filterType, true, 'filters');
 			if (!isEmptyString($filePath)) require_once($filePath);
 		}
 

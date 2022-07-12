@@ -355,7 +355,7 @@ function sanitizeProblemChars($str)
 /**
  *
  */
-function findResource($path, $resource, $subdir = false)
+function findResource($path, $resource, $subdir = false, $extraDir = null)
 {
 	// Place a / character at the and of the string if not present
 	if (strrpos($path, '/') < strlen($path) - 1) $path .= '/';
@@ -371,7 +371,14 @@ function findResource($path, $resource, $subdir = false)
 			// If entry is a directory but not the current and subdirectories should be loaded
 			if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($path.$entry))
 			{
-				$tmpPaths[] = $path.$entry.'/';
+				if ($extension == null)
+				{
+					$tmpPaths[] = $path.$entry.'/';
+				}
+				else
+				{
+					$tmpPaths[] = $path.$entry.'/'.$extraDir.'/';
+				}
 			}
 		}
 		closedir($dirHandler);
