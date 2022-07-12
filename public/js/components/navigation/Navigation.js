@@ -28,7 +28,8 @@ export const CoreNavigationCmpt = {
 	},
 	props: {
 		addHeaderMenuEntries: Object, // property used to add new header menu entries from another app/component
-		addSideMenuEntries: Object // property used to add new side menu entries from another app/component
+		addSideMenuEntries: Object, // property used to add new side menu entries from another app/component
+		hideTopMenu: Boolean
 	},
 	data() {
 		return {
@@ -105,7 +106,7 @@ export const CoreNavigationCmpt = {
 		<core-fetch-cmpt v-bind:api-function="fetchCmptApiFunctionSideMenu" @data-fetched="fetchCmptDataFetchedMenu"></core-fetch-cmpt>
 
 		<!-- Top menu -->
-		<nav class="navbar navbar-expand-lg navbar-header">
+		<nav class="navbar navbar-expand-lg navbar-header" v-if="!hideTopMenu">
 			<ul class="navbar-nav">
 				<!-- 1st level -->
 				<template v-for="header in headerMenuEntries">
