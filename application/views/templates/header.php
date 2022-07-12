@@ -103,8 +103,8 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 <?php if($jsoneditor) : ?>
-	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.css');?>" />
-	<script type="text/javascript" src="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.js');?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/josdejong/jsoneditor/dist/jsoneditor.css');?>" />
+	<script type="text/javascript" src="<?php echo base_url('vendor/josdejong/jsoneditor/dist/jsoneditor.js');?>"></script>
 <?php endif ?>
 
 <?php if($jsonforms) : ?>

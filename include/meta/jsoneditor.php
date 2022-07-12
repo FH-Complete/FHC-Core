@@ -25,8 +25,8 @@ if($dr=='')
 	$dr='/';
 
 //Originaldateien des Herstellers
-echo '<script src="'.$dr.'vendor/jsoneditor/dist/jsoneditor.js"></script>';
-echo '<link href="'.$dr.'vendor/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">';
+echo '<script src="'.$dr.'vendor/josdejong/jsoneditor/dist/jsoneditor.js"></script>';
+echo '<link href="'.$dr.'vendor/josdejong/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">';
 
 
 ?>
