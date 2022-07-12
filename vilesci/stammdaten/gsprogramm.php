@@ -52,6 +52,7 @@ if($action=='save')
 		$gsprogramm->bezeichnung = $_POST['bezeichnung'];
 		$gsprogramm->gsprogrammtyp_kurzbz = $_POST['gsprogrammtyp_kurzbz'];
 		$gsprogramm->programm_code = $_POST['programm_code'];
+		$gsprogramm->studienkennung_uni = $_POST['studienkennung_uni'];
 		if($gsprogramm->save())
 			echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 		else
@@ -193,6 +194,13 @@ echo '
 	}
 	echo '
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>StudienkennungUni</td>
+			<td>
+				<input type="text" id="studienkennung_uni" name="studienkennung_uni" size="50" minlength="6" maxlength="14"
+				value="'.$db->convert_html_chars($gsprogramm->studienkennung_uni).'">
 			</td>
 		</tr>
 		<tr>
