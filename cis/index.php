@@ -171,7 +171,7 @@ $db = new basis_db();
 	<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
-	<link rel="stylesheet" type="text/css" href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css">
 </head>
 <script type="text/javascript">
 function changeSprache(sprache)
