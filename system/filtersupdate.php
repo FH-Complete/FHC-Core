@@ -1087,7 +1087,7 @@ $filters = array(
 		),
 		array(
 			'app' => 'core',
-			'dataset_name' => 'employee',
+			'dataset_name' => 'employees',
 			'filter_kurzbz' => 'mitarbeiter',
 			'description' => '{MA Uebersicht}',
 			'sort' => 1,
