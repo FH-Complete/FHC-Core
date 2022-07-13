@@ -366,7 +366,7 @@ if($result = $db->db_query($qry))
 			$stg_obj = new studiengang();
 			if($stg_obj->load($row->studiengang_kz))
 			{
-				
+
 
 				$maxsemester = $stg_obj->max_semester;
 				if($maxsemester == 0)
@@ -1203,6 +1203,7 @@ function GenerateXMLStudentBlock($row)
 	$qrygs="SELECT
 				tbl_mobilitaet.*,
 				tbl_gsprogramm.programm_code,
+				tbl_gsprogramm.studienkennung_uni,
 				tbl_firma.partner_code
 			FROM
 				bis.tbl_mobilitaet
@@ -1247,6 +1248,7 @@ function GenerateXMLStudentBlock($row)
 			<PartnerCode>".$rowgs->partner_code."</PartnerCode>
 			<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
 			<StudStatusCode>".$studstatuscode."</StudStatusCode>
+			".(isset($rowgs->studienkennung_uni) ? "<StudienkennungUni>".$rowgs->studienkennung_uni."</StudienkennungUni>" : "")."
 		</GS>";
 			if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
 			{
