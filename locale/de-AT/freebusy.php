@@ -6,6 +6,8 @@ $this->phrasen['freebusy/aktiv']='Aktiv';
 $this->phrasen['freebusy/PfadZuFreebusyUrl']='Ihre Freebusy URL ist unter folgendem Link erreichbar:';
 $this->phrasen['freebusy/LVPlanBezeichnung']='Persönlicher LVPlan';
 $this->phrasen['freebusy/LVPlanTyp']='LVPlan';
+$this->phrasen['freebusy/ZeitsperrenBezeichnung']='Meine Zeitsperren';
+$this->phrasen['freebusy/ZeitsperrenTyp']='Zeitsperren';
 $this->phrasen['freebusy/neuerEintrag']='Neuen Eintrag hinzufügen';
 $this->phrasen['freebusy/beschreibungstext1']='Auf dieser Seite können Sie verschiedene externe FreeBusy Informationen zu Ihrer persönlichen FreeBusy URL zusammenfassen. <br>
 												Diese wird z.B. für das hausinterne "Coodle" herangezogen.<br><br>
