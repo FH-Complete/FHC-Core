@@ -56,7 +56,7 @@ export const CoreNavigationCmpt = {
 			//
 			if (this.sideMenu != null && this.addSideMenuEntries != null && Object.keys(this.addSideMenuEntries).length > 0)
 			{
-				this.sideMenu = this.addSideMenuEntries;
+				this.sideMenu[this.addSideMenuEntries.description] = this.addSideMenuEntries;
 			}
 			return this.sideMenu;
 		}

@@ -173,20 +173,20 @@ export const CoreFilterCmpt = {
 
 				filtersArray[filtersArray.length] = {
 					link: link + filters[filtersCount].filterId,
-									description: filters[filtersCount].desc,
-									sort: filtersCount,
+					description: filters[filtersCount].desc,
+					sort: filtersCount,
 					onClickCall: this.handlerGetFilterById
 				};
 			}
 
 			this.$emit(
 				'nwNewEntry',
-				[{
+				{
 					link: "#",
 					description: "Filters",
 					icon: "filter",
 					children: filtersArray
-				}]
+				}
 			);
 		},
 		/**
@@ -325,7 +325,7 @@ export const CoreFilterCmpt = {
 			this.startFetchCmpt(
 				CoreFilterAPIs.removeFilterField,
 				{
-					selectedField: event.currentTarget.getAttribute('field-to-remove')
+					filterField: event.currentTarget.getAttribute('field-to-remove')
 				},
 				this.getFilter
 			);
