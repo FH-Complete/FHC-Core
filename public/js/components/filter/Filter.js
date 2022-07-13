@@ -23,7 +23,7 @@ import {CoreFetchCmpt} from '../../components/Fetch.js';
  *
  */
 export const CoreFilterCmpt = {
-	emits: ['nwNewEntry', 'selectRecord'],
+	emits: ['nwNewEntry'],
 	components: {
 		CoreFetchCmpt
 	},
@@ -31,14 +31,19 @@ export const CoreFilterCmpt = {
 		filterType: {
 			type: String,
 			required: true
-		}
+		},
+		tabulatorOptions: Object
 	},
 	data() {
 		return {
+			// Tabulator
+			tabulator: null,
+
 			// FilterCmpt properties
 			fields: null,
 			fieldsToDisplay: null,
 			dataset: null,
+			datasetMetadata: null,
 			selectedFields: null,
 			notSelectedFields: null,
 			filterFields: null,
@@ -55,30 +60,81 @@ export const CoreFilterCmpt = {
 		this.getFilter(); // get the filter data
 	},
 	updated() {
-		let filterCmptTablesorter = $("#filterTableDataset");
+		//
+		let dataset = JSON.parse(JSON.stringify(this.dataset));
+		let datasetMetadata = JSON.parse(JSON.stringify(this.datasetMetadata));
+		let fieldsToDisplay = JSON.parse(JSON.stringify(this.fieldsToDisplay));
+		let selectedFields = JSON.parse(JSON.stringify(this.selectedFields));
 
-		// Checks if the table contains data records
-		if (filterCmptTablesorter.find("tbody:empty").length == 0
-			&& filterCmptTablesorter.find("tr:empty").length == 0)
+		//
+		let columns = null;
+
+		//
+		if (this.tabulatorOptions != null && this.tabulatorOptions.hasOwnProperty('columns'))
 		{
-			filterCmptTablesorter.tablesorter({
-				dateFormat: "ddmmyyyy",
-				widgets: ["zebra", "filter"],
-				widgetOptions: {
-					filter_saveFilters : true
-				}
-			});
-
-			$.tablesorter.updateAll(filterCmptTablesorter[0].config, true, null);
+			columns = this.tabulatorOptions.columns;
 		}
+
+		// If columns is not valid
+		if (!Array.isArray(columns) || (Array.isArray(columns) && columns.length < datasetMetadata.length))
+		{
+			columns = []; // 
+
+			//
+			for (let i = 0; i < datasetMetadata.length; i++)
+			{
+				//
+				if (fieldsToDisplay.indexOf(datasetMetadata[i].name) != -1)
+				{
+					//
+					columns[i] = {
+						title: datasetMetadata[i].name,
+						field: datasetMetadata[i].name
+					};
+				}
+			}
+		}
+		else // 
+		{
+			let tmpColumns = [];
+
+			//
+			for (let i = 0; i < columns.length; i++)
+			{
+				if (selectedFields.indexOf(columns[i].field) != -1)
+				{
+					tmpColumns.push(columns[i]);
+				}
+			}
+
+			columns = tmpColumns;
+		}
+
+		//
+		let tabulatorOptions = {
+			height: 500,
+			layout: "fitColumns",
+			columns: columns,
+			data: JSON.parse(JSON.stringify(this.dataset)),
+			reactiveData: true
+		};
+
+		//
+		if (this.tabulatorOptions != null)
+		{
+			tabulatorOptions = this.tabulatorOptions;
+			tabulatorOptions.data = JSON.parse(JSON.stringify(this.dataset));
+			tabulatorOptions.reactiveData = true;
+			tabulatorOptions.columns = columns;
+		}
+
+		//
+		this.tabulator = new Tabulator(
+			"#filterTableDataset",
+			tabulatorOptions
+		);
 	},
 	methods: {
-		selectRecord(r) {
-			this.$emit(
-				'selectRecord',
-				r
-			);
-		},
 		/**
 		 *
 		 */
@@ -95,13 +151,14 @@ export const CoreFilterCmpt = {
 			{
 				let data = CoreRESTClient.getData(response);
 				this.dataset = data.dataset;
+				this.datasetMetadata = data.datasetMetadata;
 				this.fields = data.fields;
 				this.selectedFields = data.selectedFields;
 				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
 
 				this.filterFields = [];
 				let tmpFilterFields = [];
-				for (let i = 0; i< data.datasetMetadata.length; i++)
+				for (let i = 0; i < data.datasetMetadata.length; i++)
 				{
 					for (let j = 0; j< data.filters.length; j++)
 					{
@@ -133,9 +190,9 @@ export const CoreFilterCmpt = {
 
 			let arrayFieldsToDisplay = [];
 
-			if (data.hasOwnProperty("selectedFields") && $.isArray(data.selectedFields))
+			if (data.hasOwnProperty("selectedFields") && Array.isArray(data.selectedFields))
 			{
-				if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+				if (data.hasOwnProperty("columnsAliases") && Array.isArray(data.columnsAliases))
 				{
 					for (let sfc = 0; sfc< data.selectedFields.length; sfc++)
 					{
@@ -420,7 +477,7 @@ export const CoreFilterCmpt = {
 								<input type="hidden" name="fieldName" v-bind:value="filterField.name">
 								<span class="input-group-text">{{ filterField.name}}</span>
 								<select class="form-select form-select-sm" name="operation">
-									<option value="contains">Conrains</option>
+									<option value="contains">Contains</option>
 									<option value="ncontains">Does not contain</option>
 								</select>
 								<input type="text" class="form-control" v-bind:value="filterField.condition" name="condition">
@@ -473,26 +530,9 @@ export const CoreFilterCmpt = {
 				</div>
 			</div>
 		</div>
-		<table class="tablesorter table-bordered table-responsive" id="filterTableDataset">
-			<thead>
-				<tr>
-					<template v-for="fieldToDisplay in fieldsToDisplay">
-						<th title='{{ fieldToDisplay}}'>{{ fieldToDisplay}}</th>
-					</template>
-				</tr>
-			</thead>
-			<tbody>
-				<template v-for="record in dataset">
-					<tr class="" @click="selectRecord(record)">
-						<template v-for="(value, property) in record">
-							<template v-if="selectedFields.includes(property)">
-								<td>{{ value}}</td>
-							</template>
-						</template>
-					</tr>
-				</template>
-			</tbody>
-		</table>
+
+		<!-- Tabulator -->
+		<div id="filterTableDataset"></div>
 	`
 };
 
