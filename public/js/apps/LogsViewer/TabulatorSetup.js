@@ -15,25 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CoreFilterCmpt} from '../components/filter/Filter.js';
-import {CoreNavigationCmpt} from '../components/navigation/Navigation.js';
+/**
+ *
+ */
+export const LogsViewerTabulatorOptions = {
+	height: 500,
+	layout: 'fitColumns',
+	columns: [
+		{title: 'Log ID', field: 'LogId'},
+		{title: 'Request ID', field: 'RequestId'},
+		{title: 'Execution time', field: 'ExecutionTime'},
+		{title: 'Executed by', field: 'ExecutedBy'},
+		{title: 'Description', field: 'Description'},
+		{title: 'Data', field: 'Data'},
+		{title: 'Web service type', field: 'WebserviceType'}
+	]
+};
 
-const logsViewerApp = Vue.createApp({
-	data() {
-		return {
-			appSideMenuEntries: {}
-		};
-	},
-	components: {
-		CoreNavigationCmpt,
-		CoreFilterCmpt
-	},
-	methods: {
-		newSideMenuEntryHandler(payload) {
-			this.appSideMenuEntries = payload;
+/**
+ *
+ */
+export const LogsViewerTabulatorEventHandlers = [
+	{
+		event: "rowClick",
+		handler: function(e, row) {
+			alert(row.getData().Data);
 		}
 	}
-});
-
-logsViewerApp.mount('#main');
+];
 

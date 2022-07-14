@@ -32,7 +32,8 @@ export const CoreFilterCmpt = {
 			type: String,
 			required: true
 		},
-		tabulatorOptions: Object
+		tabulatorOptions: Object,
+		tabulatorEvents: Array
 	},
 	data() {
 		return {
@@ -133,6 +134,17 @@ export const CoreFilterCmpt = {
 			"#filterTableDataset",
 			tabulatorOptions
 		);
+
+		// 
+		if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
+		{
+			// 
+			for (let i = 0; i < this.tabulatorEvents.length; i++)
+			{
+				//
+				this.tabulator.on(this.tabulatorEvents[i].event, this.tabulatorEvents[i].handler);
+			}
+		}
 	},
 	methods: {
 		/**

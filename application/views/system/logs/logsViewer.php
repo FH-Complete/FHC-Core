@@ -12,7 +12,7 @@
 			'global' => array('mailAnXversandt'),
 			'ui' => array('bitteEintragWaehlen')
 		),
-		'customJSModules' => array('public/js/apps/LogsViewer.js')
+		'customJSModules' => array('public/js/apps/LogsViewer/LogsViewer.js')
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);
@@ -35,19 +35,8 @@
 				<!-- Filter component -->
 				<core-filter-cmpt
 					filter-type="LogsViewer"
-					:tabulator-options="{
-						height: 500,
-						layout: 'fitColumns',
-						columns: [
-							{title: 'Log ID', field: 'LogId'},
-							{title: 'Request ID', field: 'RequestId'},
-							{title: 'Execution time', field: 'ExecutionTime'},
-							{title: 'Executed by', field: 'ExecutedBy'},
-							{title: 'Description', field: 'Description'},
-							{title: 'Data', field: 'Data'},
-							{title: 'Web service type', field: 'WebserviceType'}
-						]
-					}"
+					:tabulator-options="logsViewerTabulatorOptions"
+					:tabulator-events="logsViewerTabulatorEventHandlers"
 					@nw-new-entry="newSideMenuEntryHandler">
 				</core-filter-cmpt>
 			</div>
