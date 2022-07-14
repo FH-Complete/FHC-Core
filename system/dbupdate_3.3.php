@@ -6259,6 +6259,20 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Grant SELECT to bis.tbl_gsprogramm for web-user
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_gsprogramm' AND table_schema='bis' AND grantee='web' AND privilege_type in ('SELECT')"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT SELECT ON bis.tbl_gsprogramm TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>tbl_gsprogramm Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted SELECT privileges to web for bis.tbl_gsprogramm';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
