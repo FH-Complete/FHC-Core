@@ -3126,6 +3126,7 @@ if(!$error)
 			$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
 			$bisio->mobilitaetsprogramm_code = $_POST['mobilitaetsprogramm_code'];
 			$bisio->nation_code = $_POST['nation_code'];
+			$bisio->herkunftsland_code = $_POST['herkunftsland_code'];
 			$bisio->von = $_POST['von'];
 			$bisio->bis = $_POST['bis'];
 			$bisio->student_uid = $_POST['student_uid'];

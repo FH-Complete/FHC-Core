@@ -6270,6 +6270,18 @@ if(!@$db->db_query("SELECT studienkennung_uni FROM bis.tbl_gsprogramm LIMIT 1"))
 		echo '<br>Spalte studienkennung_uni in bis.tbl_gsprogramm hinzugefügt';
 }
 
+// ADD COLUMN herkunftsland_code to bis.tbl_bisio
+if(!@$db->db_query("SELECT herkunftsland_code FROM bis.tbl_bisio LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisio ADD COLUMN herkunftsland_code varchar(3);
+			ALTER TABLE bis.tbl_bisio ADD CONSTRAINT fk_tbl_bisio_herkunftsland_code FOREIGN KEY (herkunftsland_code) REFERENCES bis.tbl_nation(nation_code) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisio '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte herkunftsland_code in bis.tbl_bisio hinzugefügt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -6285,7 +6297,7 @@ $tabellen=array(
 	"bis.tbl_beschaeftigungsausmass"  => array("beschausmasscode","beschausmassbez","min","max"),
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id","ects_erworben","ects_angerechnet"),
+	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id","ects_erworben","ects_angerechnet","herkunftsland_code"),
 	"bis.tbl_bisio_zweck"  => array("bisio_id","zweck_code"),
 	"bis.tbl_bisstandort"  => array("standort_code","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
 	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant", "homeoffice"),
