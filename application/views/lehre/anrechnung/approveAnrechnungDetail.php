@@ -325,6 +325,14 @@ $this->load->view(
 													<i class="fa fa-clipboard" aria-hidden="true"></i>
 												</span>
 											</li>
+                                            <li>
+                                                <span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEctsHoechstgrenzeUeberschritten'); ?></span>
+                                                <span class="btn-copyIntoTextarea" data-toggle="tooltip"
+                                                      data-placement="right"
+                                                      title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+													<i class="fa fa-clipboard" aria-hidden="true"></i>
+												</span>
+                                            </li>
 											<li>
 												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEmpfehlungstextUebernehmen'); ?></span>
 												<span id="empfehlungstextUebernehmen" class="btn-copyIntoTextarea" data-toggle="tooltip"
