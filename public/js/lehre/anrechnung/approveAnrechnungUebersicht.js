@@ -10,7 +10,8 @@ const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 const COLOR_LIGHTGREY = "#f5f5f5";
 const COLOR_DANGER = '#f2dede';
 
-var previousSelectedRows = [];
+var tabulator = null; // Set in tableBuilt function.
+var rowSelectionChanged = false; // Set in rowSelectionChanged function. Useful in rowUpdate to differ update behaviour.
 
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -24,6 +25,20 @@ var mut_formatStringDate = function(value, data, type, params, component) {
         var d = new Date(value);
         return ("0" + (d.getDate())).slice(-2)  + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + d.getFullYear();
     }
+}
+
+var mut_getEctsSumBisherUndNeu = function(value, data, type, params, component){
+
+    let ectsSumBisherUndNeuTotal = (data.ectsSumBisherUndNeuSchulisch + data.ectsSumBisherUndNeuBeruflich);
+    let ectsSumBisherUndNeuSchulisch = data.ectsSumBisherUndNeuSchulisch;
+    let ectsSumBisherUndNeuBeruflich = data.ectsSumBisherUndNeuBeruflich;
+
+    // Format text
+    ectsSumBisherUndNeuTotal = (ectsSumBisherUndNeuTotal > 90) ? "<span class='text-danger'><b><u>" + ectsSumBisherUndNeuTotal + "</u></b></span>" :  ectsSumBisherUndNeuTotal;
+    ectsSumBisherUndNeuSchulisch = (ectsSumBisherUndNeuSchulisch > 60) ? "<span class='text-danger'><b><u>" + ectsSumBisherUndNeuSchulisch + "</u></b></span>" : ectsSumBisherUndNeuSchulisch;
+    ectsSumBisherUndNeuBeruflich = (ectsSumBisherUndNeuBeruflich > 60) ? "<span class='text-danger'><b><u>" + ectsSumBisherUndNeuBeruflich + "</u></b></span>" : ectsSumBisherUndNeuBeruflich;
+
+    return "T: " + ectsSumBisherUndNeuTotal + " [ S: " + ectsSumBisherUndNeuSchulisch + " | B: " + ectsSumBisherUndNeuBeruflich + " ]";
 }
 
 // TABULATOR FUNCTIONS
@@ -55,6 +70,10 @@ function hf_filterTrueFalse(headerValue, rowValue){
 // Adds column details
 // Sets focus on filterbutton, if table starts with stored filter.
 function func_tableBuilt(table) {
+
+    // Store table in global var
+    tabulator = table;
+
     table.addColumn(
         {
             title: "Details",
@@ -82,13 +101,31 @@ function func_tableBuilt(table) {
 // Formats the rows
 function func_rowFormatter(row){
     let status_kurzbz = row.getData().status_kurzbz;
+    let begruendung_id = row.getData().begruendung_id;
+    let ectsSumBisherUndNeuSchulisch = row.getData().ectsSumBisherUndNeuSchulisch;
+    let ectsSumBisherUndNeuBeruflich = row.getData().ectsSumBisherUndNeuBeruflich;
 
-    row.getCells().forEach(function(cell){
-        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
+    if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
+    {
+        row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+    }
+
+    // Color column if maximum ECTS exceeded
+    if (begruendung_id != 5 && row.isSelected())
+    {
+        if (
+            (ectsSumBisherUndNeuSchulisch + ectsSumBisherUndNeuBeruflich) > 90 ||
+            ectsSumBisherUndNeuSchulisch > 60 ||
+            ectsSumBisherUndNeuBeruflich > 60
+        )
         {
-            row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+            row.getCell('ectsSumBisherUndNeu').getElement().style["background-color"] = COLOR_DANGER;
         }
-    });
+    }
+    else
+    {
+        row.getCell('ectsSumBisherUndNeu').getElement().style.removeProperty('background-color');
+    }
 }
 
 // Formats row selectable/unselectable
@@ -102,79 +139,56 @@ function func_selectableCheck(row){
     );
 }
 
-// Unformat row when single row is deselected (is not done by func_rowSelectionChanged yet)
-function func_rowDeselected(row){
-
-    // Removes bg-color on single row deselection.
-    approveAnrechnung.unmarkEctsRow(row);
-}
-
 // Format rows when maximum ECTS are exceeded.
 function func_rowSelectionChanged(data, rows){
 
     var selectedData = data;
     var selectedRows = rows;
+    var tableData = tabulator.getData(true); // only the filtered / sorted table rows
 
-    // If no rows selected
-    if (selectedRows.length == 0)
-    {
-        // Check there are still rows marked from previous selection...
-        if (previousSelectedRows.length > 0)
-        {
-            // ... and unmark them
-            previousSelectedRows.forEach((row) => approveAnrechnung.unmarkEctsRow(row));
-        }
-
-        // Show number of selected Rows
-        approveAnrechnung.showNumberSelectedRows(selectedRows);
-        return;
-    }
+    rowSelectionChanged = true;
 
     // Sum up over all anzurechnenden LV-ECTS by Prestudent
-    var result = [];
-    result = approveAnrechnung.getSumLvEctsByPreStudent(selectedData);
+    var selectedPrestudentWithAccumulatedLvEcts = [];
+    selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(selectedData);
 
-    // Filter only Prestudenten, where ECTS exceed maximum
-    exceededEctsByPreStud =
-        result.filter((val) =>
-            (val.ectsSumAnzurechnendeLvs + val.ectsSumSchulisch) > 60 ||
-            (val.ectsSumBeruflich) > 60 ||
-            (val.ectsSumAnzurechnendeLvs + val.ectsSumSchulisch + val.ectsSumBeruflich) > 90
-        );
+    // Loop through table rows
+    tableData.forEach(function(td){
 
-    // Mark all Prestudenten
-    if (selectedRows.length > 0)
-    {
-        selectedRows.forEach((row) => {
+        let selectedPrestudent = selectedPrestudentWithAccumulatedLvEcts.find(x => x.prestudent_id === td.prestudent_id);
 
-            //row.reformat();
-            approveAnrechnung.unmarkEctsRow(row);
-    
-            if (exceededEctsByPreStud.length > 0)
-            {
-                exceededEctsByPreStud.forEach((val) => {
-                    if (row.getData().prestudent_id == val.prestudent_id)
-                    {
-                        approveAnrechnung.markEctsRow(row);
+        // Add accumulated LV ECTS to bisherige ECTS in ECTS 'controlling column', if Prestudent is selected at least once
+        if (selectedPrestudent != undefined)
+        {
+            td.ectsSumBisherUndNeuSchulisch = td.ectsSumSchulisch + selectedPrestudent.ectsSumAnzurechnendeLvsSchulisch;
+            td.ectsSumBisherUndNeuBeruflich =  td.ectsSumBeruflich + selectedPrestudent.ectsSumAnzurechnendeLvsBeruflich;
 
-                    }
-                })
-            }
+        }
+        // ..else reset to bisherige ECTS
+        else
+        {
+            td.ectsSumBisherUndNeuSchulisch = td.ectsSumSchulisch;
+            td.ectsSumBisherUndNeuBeruflich =  td.ectsSumBeruflich;
+        }
+    });
 
-        });
-    }
-
-    // Keep the selected rows for next selection.
-    previousSelectedRows = selectedRows;
+    // Update ECTS columns
+    tabulator.updateData(tableData);
 
     // Show number of selected rows.
     approveAnrechnung.showNumberSelectedRows(selectedRows);
+
+    rowSelectionChanged = false;
 }
 
 // Performes after row was updated
 function func_rowUpdated(row){
-    // Refresh row formatters
-    row.reformat();
+
+    // If rowUpdate is called on row selection change, return to avoid following row deselection and formatting.
+    if (rowSelectionChanged)
+    {
+        return;
+    }
 
     // Deselect and disable new selection of updated rows
     row.deselect();
@@ -668,38 +682,38 @@ var approveAnrechnung = {
 
         }
     },
-    markEctsRow(row){
-        row.getElement().style["background-color"] = COLOR_DANGER;
-        // row.getCell('ects').getElement().style["background-color"] = COLOR_DANGER;
-        // row.getCell('ectsSumTotal').getElement().style["background-color"] = COLOR_DANGER;
-        // row.getCell('student').getElement().style["background-color"] = COLOR_DANGER;
-    },
-    unmarkEctsRow(row){
-        row.getElement().style.removeProperty('background-color');
-        // row.getCell('ects').getElement().style.removeProperty('background-color');
-        // row.getCell('ectsSumTotal').getElement().style.removeProperty('background-color');
-        // row.getCell('student').getElement().style.removeProperty('background-color');
-    },
-    getSumLvEctsByPreStudent(selectedData){
+    getSumLvEctsByPreStudent(data){
 
         var result = [];
-
-        selectedData.reduce((prev, curr) => {
+        
+        // Berechne für jeden Prestudenten die kumulierte Summe aller selektierten LV ECTS
+        data.reduce((prev, curr) => {
 
             if (!prev[curr.prestudent_id])
             {
                 prev[curr.prestudent_id] = {
-                    anrechnung_id: curr.anrechnung_id,
                     prestudent_id: curr.prestudent_id,
-                    ectsSumAnzurechnendeLvs: 0,
-                    ectsSumSchulisch: parseFloat(curr.ectssumschulisch),
-                    ectsSumBeruflich: parseFloat(curr.ectssumberuflich)
+                    ectsSumAnzurechnendeLvsSchulisch: 0,
+                    ectsSumAnzurechnendeLvsBeruflich: 0
                 };
 
                 result.push(prev[curr.prestudent_id])
             }
 
-            prev[curr.prestudent_id].ectsSumAnzurechnendeLvs+= parseFloat(curr.ects);
+            // Kumulierte Summe aller selektierten LVs, die angerechnet werden sollen, getrennt nach
+            // schulischer und beruflicher Qualifikation.
+            // Ausgenommen ist die universitäre Qualifikation (5), da diese unbegrenzt möglich sind.
+            if (curr.begruendung_id != 5)
+            {
+                if (curr.begruendung_id == 4)
+                {
+                    prev[curr.prestudent_id].ectsSumAnzurechnendeLvsBeruflich += curr.ects;
+                }
+                else
+                {
+                    prev[curr.prestudent_id].ectsSumAnzurechnendeLvsSchulisch += curr.ects;
+                }
+            }
 
             return prev;
 

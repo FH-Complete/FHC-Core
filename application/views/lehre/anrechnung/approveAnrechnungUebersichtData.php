@@ -84,6 +84,7 @@ $query = '
 	        anrechnungen.ectsSumSchulisch::float4 AS "ectsSumSchulisch",
 	        anrechnungen.ectsSumBeruflich::float4 AS "ectsSumBeruflich",
 			anrechnungen.begruendung,
+			anrechnungen.student,
 			anrechnungen.dokument_bezeichnung,
 			anrechnungen.anmerkung_student,
 			anrechnungen.zgv,
@@ -149,11 +150,13 @@ $filterWidgetArray = array(
 		'Semester',
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
 		'ECTS (LV)',
-        'ECTS (Bisher angerechnet)',
-        'ECTS schulisch',
-        'ECTS beruflich',
-		ucfirst($this->p->t('person', 'studentIn')),
+		'ECTS (LV + Bisher)',
+		'ECTS (LV + Schule)',
+		'ECTS (LV + Beruf)',
+        'ECTS (Bisher schulisch)',
+        'ECTS (Bisher beruflich',
 		ucfirst($this->p->t('global', 'begruendung')),
+		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
 		ucfirst($this->p->t('anrechnung', 'herkunft')),
 		ucfirst($this->p->t('global', 'zgv')),
@@ -175,7 +178,7 @@ $filterWidgetArray = array(
 	    headerFilterPlaceholder: " ",
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
-        selectableRangeMode: "click",   // allow range selection using shift end click on end of range
+        selectableRangeMode: "click",   // allow range selection using shift end click on end of range -- TODO: check, löst rowSelectionChanged 2* aus
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
         tableBuilt: function(){
             func_tableBuilt(this);
@@ -188,9 +191,6 @@ $filterWidgetArray = array(
         },
         rowFormatter:function(row){
             func_rowFormatter(row);
-        },
-        rowDeselected:function(row){
-            func_rowDeselected(row);
         },
         rowSelectionChanged:function(data, rows){
             func_rowSelectionChanged(data, rows);
@@ -214,11 +214,13 @@ $filterWidgetArray = array(
 		ausbildungssemester: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
 		ects: {headerFilter:"input", align:"center"},
-		ectsSumTotal: {headerFilter:"input", align:"left"},
-		ectsSumSchulisch: {visible: false, headerFilter:"input"},
-		ectsSumBeruflich: {visible: false, headerFilter:"input"},
+		ectsSumBisherUndNeu: {mutator: mut_getEctsSumBisherUndNeu, formatter:"html"},
+		ectsSumBisherUndNeuSchulisch: {headerFilter: "input", visible: false},
+		ectsSumBisherUndNeuBeruflich: {headerFilter: "input", visible: false},
+		ectsSumSchulisch: {visible: true, headerFilter:"input", align:"right"},
+		ectsSumBeruflich: {visible: true, headerFilter:"input", align:"right"},
+		begruendung: {headerFilter:"input", visible: true},
 		student: {headerFilter:"input"},
-		begruendung: {headerFilter:"input"},
 		zgv: {visible: false, headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{
 		    labelField:"dokument_bezeichnung",
