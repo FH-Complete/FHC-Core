@@ -1073,11 +1073,29 @@ function GenerateXMLStudentBlock($row)
 				{
 					$status=1;
 					$meldestatus='I';
+
+					// Wiedereintrittsdatum
+					// letzten Status des letzten Semesters holen
+					$prestudent_last_status = new prestudent();
+					$prestudent_last_status->getLastStatus($row->prestudent_id, $psem);
+
+					// Datum setzen wenn aktiver Status nach Unterbrecher
+					if ($prestudent_last_status->status_kurzbz == 'Unterbrecher')
+						$wiedereintrittsdatum = $rowstatus->datum;
 				}
 				else if($rowstatus->status_kurzbz=="Unterbrecher" )
 				{
 					$status=2;
 					$meldestatus='U';
+
+					// Unterbrechungsdatum
+					// letzten Status des letzten Semesters holen
+					$prestudent_last_status = new prestudent();
+					$prestudent_last_status->getLastStatus($row->prestudent_id, $psem);
+
+					// Datum setzen wenn aktiver Status vor Unterbrecher
+					if (in_array($prestudent_last_status->status_kurzbz, array('Student', 'Outgoing', 'Incoming', 'Praktikant', 'Diplomand')))
+						$unterbrechungsdatum = $rowstatus->datum;
 				}
 				else if($rowstatus->status_kurzbz=="Absolvent" )
 				{
@@ -1191,6 +1209,7 @@ function GenerateXMLStudentBlock($row)
 			}
 		}
 	}
+
 	//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
 	if($storgform=='')
 	{
@@ -1519,6 +1538,18 @@ function GenerateXMLStudentBlock($row)
 			<BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
 		}
 
+		if(isset($unterbrechungsdatum))
+		{
+			$datei.="
+			<UnterbrechungsDatum>".date("dmY", $datumobj->mktime_fromdate($unterbrechungsdatum))."</UnterbrechungsDatum>";
+		}
+
+		if(isset($wiedereintrittsdatum))
+		{
+			$datei.="
+			<WiedereintrittsDatum>".date("dmY", $datumobj->mktime_fromdate($wiedereintrittsdatum))."</WiedereintrittsDatum>";
+		}
+
 		/* Ausbildungssemester nicht anzeigen wenn
 			Incoming
 			Ausserordentlich Studierender
@@ -1545,7 +1576,6 @@ function GenerateXMLStudentBlock($row)
 		// wenn Mobilität vorhanden, meldestatus auf Auslandsaufenthalt setzen
 		if($db->db_num_rows($ioresults)>0)
 			$meldestatus='A';
-
 
 		// TODO: wenn extern, auch kein Meldestatus? welcher meldestatus bei GS?
 		$datei.="
