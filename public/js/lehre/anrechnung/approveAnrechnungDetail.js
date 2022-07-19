@@ -568,7 +568,6 @@ var approveAnrechnungDetail = {
             (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
         )
         {
-            console.log('inside');
             $('#sumEctsMsg').html("<br><b>ACHTUNG! Bei Anrechnung von LV: Maximale ECTS überschritten.</b></br>").css('backgroundColor', COLOR_DANGER);
         }
         else

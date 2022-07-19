@@ -127,7 +127,8 @@ $this->load->view(
                                                 <td colspan="3"><span id="ects"><?php echo $antragData->ects ?></span></td>
 											</tr>
                                             <tr>
-                                                <th class="col-xs-4">Bisher angerechnete ECTS
+                                                <th class="col-xs-4">
+                                                    <?php echo $this->p->t('anrechnung', 'bisherAngerechneteEcts'); ?>
                                                     <span class="approveAnrechnungDetail-anrechnungEctsTooltip"
                                                           data-toggle="tooltip" data-placement="right"
                                                           title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
@@ -139,6 +140,7 @@ $this->load->view(
                                                     [Schulisch: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> /
                                                     Beruflich: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
                                                      <span id="sumEctsMsg"></span>
+                                                </td>
                                             </tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lektorInnen'); ?></th>

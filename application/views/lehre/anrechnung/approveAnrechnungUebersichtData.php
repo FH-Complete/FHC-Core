@@ -79,8 +79,6 @@ $query = '
 			anrechnungen.lv_bezeichnung,
 			anrechnungen.ects::float4 AS ects,
 			NULL AS "ectsSumBisherUndNeu",
-			anrechnungen.ectsSumSchulisch::float4 AS "ectsSumBisherUndNeuSchulisch",
-			anrechnungen.ectsSumBeruflich::float4 AS "ectsSumBisherUndNeuBeruflich",
 	        anrechnungen.ectsSumSchulisch::float4 AS "ectsSumSchulisch",
 	        anrechnungen.ectsSumBeruflich::float4 AS "ectsSumBeruflich",
 			anrechnungen.begruendung,
@@ -151,8 +149,6 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
 		'ECTS (LV)',
 		'ECTS (LV + Bisher)',
-		'ECTS (LV + Schule)',
-		'ECTS (LV + Beruf)',
         'ECTS (Bisher schulisch)',
         'ECTS (Bisher beruflich',
 		ucfirst($this->p->t('global', 'begruendung')),
@@ -178,7 +174,7 @@ $filterWidgetArray = array(
 	    headerFilterPlaceholder: " ",
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
-        selectableRangeMode: "click",   // allow range selection using shift end click on end of range -- TODO: check, löst rowSelectionChanged 2* aus
+        selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
         tableBuilt: function(){
             func_tableBuilt(this);
@@ -214,9 +210,7 @@ $filterWidgetArray = array(
 		ausbildungssemester: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
 		ects: {headerFilter:"input", align:"center"},
-		ectsSumBisherUndNeu: {mutator: mut_getEctsSumBisherUndNeu, formatter:"html"},
-		ectsSumBisherUndNeuSchulisch: {headerFilter: "input", visible: false},
-		ectsSumBisherUndNeuBeruflich: {headerFilter: "input", visible: false},
+		ectsSumBisherUndNeu: {formatter: format_ectsSumBisherUndNeu},
 		ectsSumSchulisch: {visible: true, headerFilter:"input", align:"right"},
 		ectsSumBeruflich: {visible: true, headerFilter:"input", align:"right"},
 		begruendung: {headerFilter:"input", visible: true},
