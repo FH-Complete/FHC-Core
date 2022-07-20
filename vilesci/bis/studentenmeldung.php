@@ -1077,11 +1077,13 @@ function GenerateXMLStudentBlock($row)
 					// Wiedereintrittsdatum
 					// letzten Status des letzten Semesters holen
 					$prestudent_last_status = new prestudent();
-					$prestudent_last_status->getLastStatus($row->prestudent_id, $psem);
+					if ($prestudent_last_status->getLastStatus($row->prestudent_id, $psem))
+					{
+						// Datum setzen wenn aktiver Status nach Unterbrecher
+						if ($prestudent_last_status->status_kurzbz == 'Unterbrecher')
+							$wiedereintrittsdatum = $rowstatus->datum;
+					}
 
-					// Datum setzen wenn aktiver Status nach Unterbrecher
-					if ($prestudent_last_status->status_kurzbz == 'Unterbrecher')
-						$wiedereintrittsdatum = $rowstatus->datum;
 				}
 				else if($rowstatus->status_kurzbz=="Unterbrecher" )
 				{
@@ -1091,11 +1093,13 @@ function GenerateXMLStudentBlock($row)
 					// Unterbrechungsdatum
 					// letzten Status des letzten Semesters holen
 					$prestudent_last_status = new prestudent();
-					$prestudent_last_status->getLastStatus($row->prestudent_id, $psem);
+					if ($prestudent_last_status->getLastStatus($row->prestudent_id, $psem))
+					{
+						// Datum setzen wenn aktiver Status vor Unterbrecher
+						if (in_array($prestudent_last_status->status_kurzbz, array('Student', 'Outgoing', 'Incoming', 'Praktikant', 'Diplomand')))
+							$unterbrechungsdatum = $rowstatus->datum;
+					}
 
-					// Datum setzen wenn aktiver Status vor Unterbrecher
-					if (in_array($prestudent_last_status->status_kurzbz, array('Student', 'Outgoing', 'Incoming', 'Praktikant', 'Diplomand')))
-						$unterbrechungsdatum = $rowstatus->datum;
 				}
 				else if($rowstatus->status_kurzbz=="Absolvent" )
 				{
