@@ -45,6 +45,7 @@ $this->phrasen['testtool/beiDiesemGebietMuessenSieJedeFrageBeantworten']='In thi
 $this->phrasen['testtool/bearbeitungszeit']='Time';
 $this->phrasen['testtool/dieZeitIstAbgelaufen']='The time has run out!<br />Please enable JavaScript in your browser!';
 $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='This question is not intended for you';
+$this->phrasen['testtool/dasGebietIstNichtFuerSieBestimmt']='This section is not intended for you';
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Error in saving the initial view';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='To start this section, please click on <b>Start section</b> in the top left corner.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='No candidate entry available.';

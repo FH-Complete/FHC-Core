@@ -164,6 +164,9 @@ $pruefling->load($_SESSION['pruefling_id']);
 if ($pruefling->gesperrt === 't')
 	die("<script>document.location.href='prueflinggesperrt.php';</script>");
 
+if (!in_array($gebiet_id, $_SESSION['alleGebiete']))
+	die($p->t('testtool/dasGebietIstNichtFuerSieBestimmt'));
+
 $gebiet = new gebiet($gebiet_id);
 
 if($gebiet->level_start!='')
