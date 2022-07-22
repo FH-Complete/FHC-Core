@@ -1581,7 +1581,6 @@ function GenerateXMLStudentBlock($row)
 		if($db->db_num_rows($ioresults)>0)
 			$meldestatus='A';
 
-		// TODO: wenn extern, auch kein Meldestatus? welcher meldestatus bei GS?
 		$datei.="
 			<MeldeStatus>".$meldestatus."</MeldeStatus>";
 
