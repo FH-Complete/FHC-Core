@@ -122,6 +122,7 @@ class AnrechnungLib
 
 		$anrechnung_data = new StdClass();
 
+        $this->ci->AnrechnungModel->addJoin('lehre.tbl_anrechnung_begruendung', 'begruendung_id');
 		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
 
 		if (isError($result))
@@ -155,6 +156,7 @@ class AnrechnungLib
 		$anrechnung_data->prestudent_id = '';
 		$anrechnung_data->lehrveranstaltung = '';
 		$anrechnung_data->begruendung_id = '';
+		$anrechnung_data->begruendung = '';
 		$anrechnung_data->anmerkung = '';
 		$anrechnung_data->dms_id = '';
 		$anrechnung_data->insertamum = '';
@@ -165,6 +167,7 @@ class AnrechnungLib
 		$anrechnung_data->status = getUserLanguage() == 'German' ? 'neu' : 'new';
 		$anrechnung_data->dokumentname = '';
 
+        $this->ci->AnrechnungModel->addJoin('lehre.tbl_anrechnung_begruendung', 'begruendung_id');
 		$result = $this->ci->AnrechnungModel->loadWhere(
 			array(
 				'lehrveranstaltung_id' => $lehrveranstaltung_id,
@@ -810,6 +813,7 @@ class AnrechnungLib
 		$anrechnung_data->prestudent_id = $anrechnung->prestudent_id;
 		$anrechnung_data->lehrveranstaltung_id = $anrechnung->lehrveranstaltung_id;
 		$anrechnung_data->begruendung_id =  $anrechnung->begruendung_id;
+		$anrechnung_data->begruendung =  $anrechnung->bezeichnung;
 		$anrechnung_data->anmerkung = $anrechnung->anmerkung_student;
 		$anrechnung_data->dms_id = $anrechnung->dms_id;
 		$anrechnung_data->insertamum = (new DateTime($anrechnung->insertamum))->format('d.m.Y');

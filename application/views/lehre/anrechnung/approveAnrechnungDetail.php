@@ -167,6 +167,10 @@ $this->load->view(
 													   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
 												</td>
 											</tr>
+                                            <tr>
+                                                <th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
+                                                <td colspan="3"><span id="begruendung_id" data-begruendung_id="<?php echo $anrechnungData->begruendung_id ?>" ><?php echo $anrechnungData->begruendung ?></span></td>
+                                            </tr>
 											</tbody>
 										</table>
 									</div>
