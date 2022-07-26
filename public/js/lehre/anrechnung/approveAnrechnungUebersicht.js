@@ -179,14 +179,20 @@ function func_rowSelectionChanged(data, rows){
 
 // Performes after row was updated
 function func_rowUpdated(row){
+    var status_kurzbz = row.getData().status_kurzbz;
+    if ((row.getCells().length > 0) &&
+        (status_kurzbz == ANRECHNUNGSTATUS_APPROVED ||
+        status_kurzbz == ANRECHNUNGSTATUS_REJECTED ||
+        status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR)
+    )
+    {
+        // Deselect and disable new selection of updated rows
+        row.getElement().style["pointerEvents"] = "none";
 
-    // Deselect and disable new selection of updated rows
-    row.deselect();
-    row.getElement().style["pointerEvents"] = "none";
-
-    // ...but leave url links selectable
-    row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
-    row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
+        // ...but leave url links selectable
+        row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
+        row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
+    }
 }
 
 // Returns tooltip
@@ -352,13 +358,7 @@ $(function(){
         e.stopImmediatePropagation();
 
         // Get selected rows data
-        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
-            .map(function(data){
-                // reduce to necessary fields
-                return {
-                    'anrechnung_id' : data.anrechnung_id,
-                }
-            });
+        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
 
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)
@@ -381,19 +381,67 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.error && data.retval != null)
+                    if (FHC_AjaxClient.isError(data))
                     {
                         // Print error message
-                        FHC_DialogLib.alertWarning(data.retval);
+                        FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
                     }
-
-                    if (!data.error && data.retval != null)
+                    else if (FHC_AjaxClient.hasData(data))
                     {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+                        data = FHC_AjaxClient.getData(data);
+
+                        var prestudenten = Object.keys(data.prestudenten);
+
+                        // Find intersection of selected and in fact updated Anrechnungen (in case server did not approve all).
+                        var updatedData = selected_data.filter(x => prestudenten.some(prestudent => x.prestudent_id == prestudent));
+
+                        // Sum up over all anzurechnenden LV-ECTS by Prestudent
+                        var sumLvEctsByPrestudent = approveAnrechnung.getSumLvEctsByPreStudent(updatedData);
+
+                        // Loop through Prestudenten
+                        // key = Prestudent, value = Approved Anrechnungen of Prestudent
+                        Object.entries(data.prestudenten).forEach(([key, value]) => {
+
+                            var rowsToDeselect = [];
+
+                            // Get accumulated sum of all LV ECTS
+                            var sumLvEcts = sumLvEctsByPrestudent.find(x => x.prestudent_id == key);
+
+                            // Get ALL rows of that Prestudent
+                            var rows = $('#tableWidgetTabulator').tabulator('searchRows', 'prestudent_id', '=', key);
+
+                            // Loop through the rows
+                            rows.forEach(row => {
+                                var updateData = {};
+
+                                // If Anrechnung was approved...
+                                if ((value.findIndex(anrechnung_id => row.getData().anrechnung_id == anrechnung_id)) !== -1)
+                                {
+                                    // ...update status
+                                   updateData.status_kurzbz = data.status_kurzbz;
+                                   updateData.status_bezeichnung = data.status_bezeichnung;
+
+                                   // ...and store row to be deselected later on
+                                   rowsToDeselect.push(row);
+                                }
+
+                                // Update 'Bisher schulische ECTS' and 'Bisher berufliche ECTS' with the Sum of new approved ECTS
+                                updateData.ectsSumSchulisch = row.getData().ectsSumSchulisch + sumLvEcts.ectsSumAnzurechnendeLvsSchulisch,
+                                updateData.ectsSumBeruflich = row.getData().ectsSumBeruflich + sumLvEcts.ectsSumAnzurechnendeLvsBeruflich
+
+
+                                // Update row
+                               row.update(updateData);
+                                row.reformat();
+                            })
+
+                            // Deselect rows
+                            $("#tableWidgetTabulator").tabulator('deselectRow', rowsToDeselect);
+
+                        })
 
                         // Print success message
-                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenGenehmigt"));
+                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenGenehmigt"));
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -470,16 +518,21 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.error && data.retval != null)
+                    if (FHC_AjaxClient.isError(data))
                     {
                         // Print error message
-                        FHC_DialogLib.alertWarning(data.retval);
+                        FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
                     }
-
-                    if (!data.error && data.retval != null)
+                    else if (FHC_AjaxClient.hasData(data))
                     {
+                        data = FHC_AjaxClient.getData(data);
+
                         // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+                        $('#tableWidgetTabulator').tabulator('updateData', data);
+
+                        // Deselect rows
+                        var indexesToDeselect = data.map(x => x.anrechnung_id);
+                        $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
 
                         // Print success message
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenAbgelehnt"));
@@ -534,20 +587,21 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.error && data.retval != null)
+                    if (FHC_AjaxClient.isError(data))
                     {
                         // Print error message
-                        FHC_DialogLib.alertWarning(data.retval);
+                        FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
                     }
-
-                    if (!data.error && data.retval != null)
+                    else if (FHC_AjaxClient.hasData(data))
                     {
+                        data = FHC_AjaxClient.getData(data);
+
                         // Print info message, if not all selected recommendations were requested
-                        if (data.retval.length < selected_data.length){
+                        if (data.length < selected_data.length){
                             FHC_DialogLib.alertInfo(
                                 FHC_PhrasesLib.t(
                                     "ui", "empfehlungWurdeAngefordertAusnahmeWoKeineLektoren",
-                                    [selected_data.length, data.retval.length, selected_data.length - data.retval.length])
+                                    [selected_data.length, data.length, selected_data.length - data.length])
                             );
                         }
                         else
@@ -558,7 +612,11 @@ $(function(){
                     }
 
                     //Update status 'genehmigt'
-                    $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+                    $('#tableWidgetTabulator').tabulator('updateData', data);
+
+                    // Deselect rows
+                    var indexesToDeselect = data.map(x => x.anrechnung_id);
+                    $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
