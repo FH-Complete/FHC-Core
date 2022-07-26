@@ -44,7 +44,8 @@ $this->load->view(
                 'empfehlungsanforderungWirklichZuruecknehmen',
                 'erfolgreichZurueckgenommen',
                 'empfehlungPositivConfirmed',
-                'empfehlungNegativConfirmed'
+                'empfehlungNegativConfirmed',
+                'anrechnungEctsTooltipTextBeiUeberschreitung'
             )
 		),
 		'customCSSs' => array(
@@ -136,9 +137,9 @@ $this->load->view(
 												</span>
                                                 </th>
                                                 <td colspan="3">
-                                                    Total: <span id="sumEctsTotal"><?php echo $antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich ?></span>
-                                                    [Schulisch: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> /
-                                                    Beruflich: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
+                                                    Total: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
+                                                    [Schulisch: <span id="sumEctsSchulisch" value="<?php echo $antragData->sumEctsSchulisch ?>"><?php echo $antragData->sumEctsSchulisch ?></span> /
+                                                    Beruflich: <span id="sumEctsBeruflich" value="<?php echo $antragData->sumEctsBeruflich ?>"><?php echo $antragData->sumEctsBeruflich ?></span> ]
                                                      <span id="sumEctsMsg"></span>
                                                 </td>
                                             </tr>

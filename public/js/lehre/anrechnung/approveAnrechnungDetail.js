@@ -4,9 +4,6 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
-const COLOR_DANGER = '#f2dede';
-
-
 $(function(){
 
     const genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
@@ -97,7 +94,7 @@ $(function(){
                             data.retval[0].status_bezeichnung
                         );
 
-                        approveAnrechnungDetail.sumUpEcts(ects, sumEctsSchulisch, sumEctsBeruflich);
+                        approveAnrechnungDetail.sumUpEcts();
                         approveAnrechnungDetail.alertIfMaxEctsExceeded();
                     }
                 },
@@ -552,23 +549,71 @@ var approveAnrechnungDetail = {
         // Hide button to withdraw approval
         $('#approveAnrechnungDetail-withdraw-request-recommedation').addClass('hidden');
     },
-    sumUpEcts: function(ects, sumEctsSchulisch, sumEctsBeruflich){
-        $('#sumEctsTotal').text(parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text()) + parseFloat($('#ects').text()));
-        $('#sumEctsSchulisch').text(parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#ects').text()));
+    sumUpEcts: function(){
+        var ects = parseFloat($('#ects').text());
+        var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
+        var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+
+        if (begruendung_id == 4)
+        {
+            $('#sumEctsBeruflich').text(sumEctsBeruflich + ects);
+        }
+        else
+        {
+            $('#sumEctsSchulisch').text(sumEctsSchulisch + ects);
+        }
+
+        $('#sumEctsTotal').text(sumEctsSchulisch + sumEctsBeruflich + ects);
 
     },
     substractEcts: function(ects, sumEctsSchulisch, sumEctsBeruflich){
-        $('#sumEctsTotal').text(parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text()) - parseFloat($('#ects').text()));
-        $('#sumEctsSchulisch').text(parseFloat($('#sumEctsSchulisch').text()) - parseFloat($('#ects').text()));
+        var ects = parseFloat($('#ects').text());
+        var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
+        var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+
+        if (begruendung_id == 4)
+        {
+            $('#sumEctsBeruflich').text(sumEctsBeruflich - ects);
+        }
+        else
+        {
+            $('#sumEctsSchulisch').text(sumEctsSchulisch - ects);
+        }
+
+         $('#sumEctsTotal').text(sumEctsSchulisch + sumEctsBeruflich - ects);
     },
     alertIfMaxEctsExceeded: function(){
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+        if (begruendung_id == 5)
+        {
+            return;
+        }
         if(
             (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text())) > 60 ||
             (parseFloat($('#ects').text()) + parseFloat($('#sumEctsBeruflich').text())) > 60 ||
             (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
         )
         {
-            $('#sumEctsMsg').html("<br><b>ACHTUNG! Bei Anrechnung von LV: Maximale ECTS überschritten.</b></br>").css('backgroundColor', COLOR_DANGER);
+            $('#sumEctsMsg')
+                .html("<br><b>ACHTUNG! Bei Anrechnung von LV: Überschreitung der Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz</b><i class=\"fa fa-lg fa-info-circle\"></i></br>")
+                .addClass('bg-danger text-danger')
+                .tooltip({
+                    title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
+                    placement: 'right',
+                    html: true
+                });
         }
         else
         {
