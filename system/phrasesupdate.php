@@ -10569,6 +10569,26 @@ Any unusual occurrences
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'antragStellenWegenHochschulzeugnis',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'eines Hochschulzeugnisses (vgl. § 4 Abs. 5 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'a university certificate (see § 4 para. 5, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -10589,7 +10609,26 @@ Any unusual occurrences
 			)
 		)
 	),
-
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'bisherAngerechneteEcts',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Bisher angerechnete ECTS',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'All previous recognized ECTS',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
     array(
         'app' => 'core',
         'category' => 'anrechnung',
@@ -10605,6 +10644,46 @@ Any unusual occurrences
             array(
                 'sprache' => 'English',
                 'text' => 'All previous recognized ECTS. Lateral Entries are calculated with full ECTS of all recognized semester.<br><br>Condition for Recognition of Prior Knowledge:<br>Max. 60 ECTS school qualification<br>Max. 60 ECTS professional qualification<br>Max. 90 ECTS OVERALL (school + professional qualification)',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungEctsTooltipTextBeiUeberschreitung',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Vorgabe für Anrechnungen:<br>Max. 60 ECTS schulische Qualifikation<br>Max. 60 ECTS berufliche Qualifikation<br>Max. 90 ECTS INSGESAMT (schulische + berufliche Qualifikation)',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Condition for Recognition of Prior Knowledge:<br>Max. 60 ECTS school qualification<br>Max. 60 ECTS professional qualification<br>Max. 90 ECTS OVERALL (school + professional qualification)',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungEctsTextBeiUeberschreitung',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => '<br>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.<br><b>Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</b> ',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => '<br>Exceedance of maximum limit for exemption (see § 12 para. 3, Regulations of the UASTW).<br><b>Former ECTS + ECTS of this course: Total: {0} [ School  qualification: {1} | Professional qualification: {2} ]</b> ',
                 'description' => '',
                 'insertvon' => 'system'
             )
