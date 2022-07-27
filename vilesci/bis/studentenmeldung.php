@@ -1623,6 +1623,15 @@ function GenerateXMLStudentBlock($row)
 		$datei.="
 			<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
 
+		// duales studium
+		if ($row->dual === true) {
+			$dualesstudium='J';
+		} else {
+			$dualesstudium='N';
+		}
+
+		$datei.="
+			<DualesStudium>".$dualesstudium."</DualesStudium>";
 
 		// **** IO Container ****/
 		$outgoing_count=0;
