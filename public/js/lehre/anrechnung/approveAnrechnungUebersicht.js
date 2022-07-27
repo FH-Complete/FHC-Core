@@ -105,7 +105,7 @@ var format_ectsSumBisherUndNeu = function(cell, formatterParams, onRendered){
 
         if (selectedPrestudent != undefined)
         {
-            ectsSumBisherUndNeuTotal = (rowData.ectsSumSchulisch + rowData.ectsSumBeruflich) + selectedPrestudent.ectsSumAnzurechnendeLvsSchulisch;
+            ectsSumBisherUndNeuTotal = (rowData.ectsSumSchulisch + rowData.ectsSumBeruflich) + selectedPrestudent.ectsSumAnzurechnendeLvsSchulisch + selectedPrestudent.ectsSumAnzurechnendeLvsBeruflich;
             ectsSumBisherUndNeuSchulisch = rowData.ectsSumSchulisch + selectedPrestudent.ectsSumAnzurechnendeLvsSchulisch;
             ectsSumBisherUndNeuBeruflich = rowData.ectsSumBeruflich + selectedPrestudent.ectsSumAnzurechnendeLvsBeruflich;
         }

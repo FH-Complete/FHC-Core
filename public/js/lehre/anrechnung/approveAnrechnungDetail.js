@@ -239,6 +239,7 @@ $(function(){
 
         // Get form data
         let form_data = $('form').serializeArray();
+        var init_status_kurzbz = $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz');
 
         // Prepare data object for ajax call
         let data = {
@@ -264,8 +265,11 @@ $(function(){
                             data.retval.status_bezeichnung
                         );
 
-                        approveAnrechnungDetail.substractEcts(ects, sumEctsSchulisch, sumEctsBeruflich);
-                        approveAnrechnungDetail.alertIfMaxEctsExceeded();
+                        if (init_status_kurzbz == 'approved')
+                        {
+                            approveAnrechnungDetail.substractEcts(ects, sumEctsSchulisch, sumEctsBeruflich);
+                            approveAnrechnungDetail.alertIfMaxEctsExceeded();
+                        }
 
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("anrechnung", "erfolgreichZurueckgenommen"));
 
