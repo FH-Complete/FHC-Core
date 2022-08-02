@@ -64,6 +64,8 @@ else
 
 $datum_obj = new datum();
 
+
+
 echo '<html>
 <head>
 	<title>Urlaubsfreigabe</title>
@@ -137,6 +139,7 @@ if ($result = $db->db_query($qry))
 }
 if ($uid != '' && !isset($mitarbeiter[$uid]) && $uid != $user && !$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung fuer diesen Mitarbeiter');
+
 
 //Freigeben eines Urlaubes
 if (isset($_GET['action']) && $_GET['action'] == 'freigabe')
@@ -213,6 +216,8 @@ function draw_monat($monat)
 		$qry.= " AND mitarbeiter_uid=". $db->db_add_param($uid);
 	$qry.="ORDER BY vondatum, mitarbeiter_uid";
 
+
+
 	if ($result = $db->db_query($qry))
 	{
 		while ($row = $db->db_fetch_object($result))
@@ -225,10 +230,15 @@ function draw_monat($monat)
 			}
 			echo "<span title='$freigabe'>";
 			echo $mitarbeiter[$row->mitarbeiter_uid]['nachname'].' '.$datum_obj->formatDatum($row->vondatum,'d.m.Y')." - ".$datum_obj->formatDatum($row->bisdatum,'d.m.Y');
+
 			if ($vertretung->uid != '')
 				echo ' (Vertretung: '.$vertretung->nachname.')';
+
 			if($row->freigabeamum=='')
-				echo " <a href='".$_SERVER['PHP_SELF']."?action=freigabe&id=$row->zeitsperre_id&year=$year&uid=$uid' class='Item'>Freigabe</a>";
+			{
+					echo " <a href='".$_SERVER['PHP_SELF']."?action=freigabe&id=$row->zeitsperre_id&year=$year&uid=$uid' class='Item'>Freigabe</a>";
+			}
+
 			echo "</span>";
 			echo '<br>';
 		}
@@ -246,6 +256,20 @@ if ($uid!='')
 
 	echo '<div id="resturlaub">';
 	echo '</div>';
+
+	//Abschnitt zukünftige Urlaube
+	$zeitsperre = new zeitsperre();
+	$enddatum= $year ."-08-31";
+
+	if($zeitsperre->getUrlaubstage($uid))
+	{
+		echo "<br><p class= 'text-warning'>zukünftige Urlaubstage* angesucht: <span  style='margin-left: 30px;'>". $zeitsperre->getUrlaubstage($uid, $enddatum, false) . " Tage</span></p>";
+		if ($zeitsperre->getUrlaubstage($uid, $enddatum, true))
+			echo "<p>davon bereits genehmigt:<span style='margin-left: 84px;'> ". $zeitsperre->getUrlaubstage($uid, $enddatum, true) . " Tage</style></p>";
+		else
+			echo "<p>davon bereits genehmigt:<span style='margin-left: 84px;'> 0 Tage</style></p>";
+			echo "* bis 31.8.". $year;
+	}
 
 	echo '</td></tr></table>';
 }
@@ -274,6 +298,8 @@ for($i = 0;$i < 12;$i++)
 		$monat = 1;
 }
 echo '</tr></table>
+
+
 
 </body>
 </html>';

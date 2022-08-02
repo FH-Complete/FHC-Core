@@ -633,5 +633,69 @@ class zeitsperre extends basis_db
 		return true;
 	}
 
+	/**
+	 * Liefert zukünftige Urlaube eines Users ab dem heutigen Tag
+	 *
+	 * @param $user
+	 * @param $enddatum optional, wird nur abgefragt wenn != null, Format 'YYYY-MM-DD'
+	 * @param $freigegeben, wird nur abgefragt wenn != true
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getUrlaubstage($user, $enddatum=null, $freigegeben=false)
+	{
+
+		$qry = "
+			SELECT SUM(AnzahlTage) as output
+			FROM
+			(
+				SELECT
+					*
+					,(DATE_PART('day', bisdatum ::timestamp  - vondatum ::timestamp )+1) as AnzahlTage
+				FROM
+						campus.tbl_zeitsperre
+				WHERE
+					zeitsperretyp_kurzbz = 'Urlaub'
+					AND vondatum >= now()
+					AND	mitarbeiter_uid = ". $this->db_add_param($user);
+
+					if($enddatum)
+						$qry.= 'AND bisDatum <= '. $this->db_add_param($enddatum);
+
+					if( $freigegeben )
+						$qry .= 'AND freigabeamum is not null';
+
+					if($enddatum)
+					{
+					$qry .= "
+					UNION
+							SELECT *
+						,(DATE_PART('day',".$this->db_add_param($enddatum)."::timestamp - vondatum ::timestamp )+1) as AnzahlTage
+						FROM campus.tbl_zeitsperre
+						WHERE zeitsperretyp_kurzbz = 'Urlaub'
+						AND mitarbeiter_uid = ". $this->db_add_param($user);
+
+						$qry.="	AND bisDatum >=" . $this->db_add_param($enddatum)."
+						AND vonDatum <= " .$this->db_add_param($enddatum);
+
+						if( $freigegeben )
+							$qry .= 'AND freigabeamum is not null';
+
+						}
+					$qry .= ') AS countHolidays';
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+			return  $row->output;
+		}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Berechnen der Urlaubstage';
+			return false;
+		}
+	}
+
 }
 ?>
