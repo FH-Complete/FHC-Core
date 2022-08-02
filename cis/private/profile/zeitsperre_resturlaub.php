@@ -348,11 +348,15 @@ function showHideStudeDropDown()
 <?php
 
 $zeitsaldo = "";
+$urlaubssaldo = "";
 if($addoncasetime)
 {
 	require_once('../../../addons/casetime/include/functions.inc.php');
 	$zeitsaldo = getCaseTimeZeitsaldo($uid);
 	$zeitsaldo = "Aktueller Zeitsaldo: ". $zeitsaldo . " (".formatZeitsaldo($zeitsaldo).")";
+
+	$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
+	$urlaubssaldo = "<br>Aktueller Stand: " . $urlaubssaldo->{'AktuellerStand'} . " Urlaubstage";
 }
 
 //Zeitsperre Speichern
@@ -578,7 +582,8 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 								'beschreibung' =>$beschreibung,
 								'vonDatum' => $von,
 								'bisDatum' => $bis,
-								'Link'=> $link
+								'Link'=> $link,
+								'urlaubssaldo' => $urlaubssaldo
 							);
 						}
 

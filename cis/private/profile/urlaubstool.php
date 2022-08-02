@@ -388,14 +388,27 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 
 				$from='vilesci@'.DOMAIN;
 
-				//Sanchomail mit Vorlage Sancho Mail Zeitausgleich
+				// Überprüfen, ob addon casetime aktiv ist
+				$addon_obj = new addon();
+				$addoncasetime = $addon_obj->checkActiveAddon("casetime");
+
+				$urlaubssaldo = "";
+				if($addoncasetime)
+				{
+					require_once('../../../addons/casetime/include/functions.inc.php');
+					$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
+					$urlaubssaldo = "<br>Aktueller Stand: " . $urlaubssaldo->{'AktuellerStand'} . " Urlaubstage";
+				}
+
+				//Sanchomail mit Vorlage Sancho Mail Urlaub Neu
 				$template_data = array(
 					'vorgesetzter' => $fullName,
 					'nameMitarbeiter' => $nameMitarbeiter,
 					'beschreibung' =>$beschreibung,
 					'vonDatum' => $von,
 					'bisDatum' => $bis,
-					'Link'=> $link
+					'Link'=> $link,
+					'urlaubssaldo' => $urlaubssaldo
 				);
 
 
