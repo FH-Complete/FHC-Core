@@ -141,8 +141,17 @@ var format_ectsSumBisherUndNeu = function(cell, formatterParams, onRendered){
 function func_rowFormatter(row){
     let status_kurzbz = row.getData().status_kurzbz;
 
+    // If status is anything else then 'Bearbeitet von STGL-Leitung'
     if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
     {
+        // Disable new selection of updated rows
+        row.getElement().style["pointerEvents"] = "none";
+
+        // ...but leave url links selectable
+        row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
+        row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
+
+        // Color background grey
         row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
     }
 }
@@ -175,24 +184,6 @@ function func_rowSelectionChanged(data, rows){
 
     // Show number of selected rows.
     approveAnrechnung.showNumberSelectedRows(rows);
-}
-
-// Performes after row was updated
-function func_rowUpdated(row){
-    var status_kurzbz = row.getData().status_kurzbz;
-    if ((row.getCells().length > 0) &&
-        (status_kurzbz == ANRECHNUNGSTATUS_APPROVED ||
-        status_kurzbz == ANRECHNUNGSTATUS_REJECTED ||
-        status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR)
-    )
-    {
-        // Deselect and disable new selection of updated rows
-        row.getElement().style["pointerEvents"] = "none";
-
-        // ...but leave url links selectable
-        row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
-        row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
-    }
 }
 
 // Returns tooltip
@@ -431,8 +422,11 @@ $(function(){
 
 
                                 // Update row
-                               row.update(updateData);
+                                row.update(updateData);
+
+                                // Reformat row
                                 row.reformat();
+
                             })
 
                             // Deselect rows

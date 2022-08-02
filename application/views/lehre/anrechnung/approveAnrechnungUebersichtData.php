@@ -191,9 +191,6 @@ $filterWidgetArray = array(
         rowSelectionChanged:function(data, rows){
             func_rowSelectionChanged(data, rows);
         },
-        rowUpdated:function(row){
-            func_rowUpdated(row);
-        },
         tooltips: function(cell){
             return func_tooltips(cell);
         }
