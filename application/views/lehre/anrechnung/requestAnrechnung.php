@@ -212,7 +212,7 @@ $this->load->view(
 										<div class="form-inline panel-body">
 											<div class="form-group">
 												<input type="file" id="requestAnrechnung-uploadfile"
-													   name="uploadfile" accept=".pdf" size="50" data-maxsize="<?php echo (int)ini_get('upload_max_filesize') * 1024 ?>"
+													   name="uploadfile" accept=".pdf" size="50" data-maxsize="<?php echo (int)ini_get('upload_max_filesize') * 1024 * 1024 ?>"
 													   required>
 											</div>
 											<span id="requestAnrechnung-uploadTooltip" data-toggle="tooltip" data-placement="right"
