@@ -6353,7 +6353,8 @@ if(!@$db->db_query("SELECT public.get_ects_summe_schulisch('', 0, 0)"))
 										AND student_uid = var_student_uid
 										AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
 										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
-                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen  
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen 
+                        				AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern) 
 									
 									UNION 
 										
@@ -6411,6 +6412,7 @@ if(!@$db->db_query("SELECT public.get_ects_summe_beruflich('')"))
 							AND student_uid = var_student_uid
 							AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
 							AND begruendung_id = 4  -- beruflich
+							AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern)
 						
 						UNION 
 							
