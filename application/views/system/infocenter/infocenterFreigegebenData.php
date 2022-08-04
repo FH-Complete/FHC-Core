@@ -12,6 +12,7 @@
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$IDENTITY = '\'identity\'';
+	$ONLINE = '\'online\'';
 
 $query = '
 		SELECT
@@ -42,10 +43,13 @@ $query = '
 				 LIMIT 1
 			) AS "LastActionType",
 			(
-				SELECT CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END
+				SELECT CASE WHEN student.student_uid IS NULL THEN
+					(CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END)
+					ELSE '. $ONLINE .' END
 				  FROM system.tbl_log l
 				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
 				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
+				  LEFT JOIN public.tbl_student student ON tbl_benutzer.uid = student.student_uid
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
