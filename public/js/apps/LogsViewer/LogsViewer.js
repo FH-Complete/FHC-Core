@@ -22,7 +22,7 @@ import {CoreFilterCmpt} from '../../components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../components/navigation/Navigation.js';
 
 const logsViewerApp = Vue.createApp({
-	data() {
+	data: function() {
 		return {
 			appSideMenuEntries: {},
 			logsViewerTabulatorOptions: LogsViewerTabulatorOptions,
@@ -34,7 +34,7 @@ const logsViewerApp = Vue.createApp({
 		CoreFilterCmpt
 	},
 	methods: {
-		newSideMenuEntryHandler(payload) {
+		newSideMenuEntryHandler: function(payload) {
 			this.appSideMenuEntries = payload;
 		}
 	}

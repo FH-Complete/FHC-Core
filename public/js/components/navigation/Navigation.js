@@ -31,7 +31,7 @@ export const CoreNavigationCmpt = {
 		addSideMenuEntries: Object, // property used to add new side menu entries from another app/component
 		hideTopMenu: Boolean
 	},
-	data() {
+	data: function() {
 		return {
 			headerMenu: {}, // header menu entries
 			sideMenu: {} // side menu entries
@@ -41,7 +41,7 @@ export const CoreNavigationCmpt = {
 		/**
 		 *
 		 */
-		headerMenuEntries() {
+		headerMenuEntries: function() {
 			//
 			if (this.headerMenu != null && this.addHeaderMenuEntries != null && Object.keys(this.addHeaderMenuEntries).length > 0)
 			{
@@ -52,7 +52,7 @@ export const CoreNavigationCmpt = {
 		/**
 		 *
 		 */
-		sideMenuEntries() {
+		sideMenuEntries: function() {
 			//
 			if (this.sideMenu != null && this.addSideMenuEntries != null && Object.keys(this.addSideMenuEntries).length > 0)
 			{
