@@ -175,16 +175,23 @@ if(check_lektor($user))
 		
 				<?php
 					$zeilenzaehl=0;
-					$sql_query = "SELECT vorname, nachname, telefonklappe, kontakt, ort_kurzbz, beschreibung, vw_mitarbeiter.standort_id 
+					$sql_query = "SELECT vorname, nachname, telefonklappe, kontakt, ort_kurzbz, beschreibung, vw_mitarbeiter.standort_id, uid
 					FROM campus.vw_mitarbeiter 
 					JOIN public.tbl_benutzerfunktion USING (uid) 
 					JOIN public.tbl_funktion USING (funktion_kurzbz) 
 					JOIN public.tbl_kontakt USING (person_id) 
 					WHERE funktion_kurzbz='brandbeauftragt' 
-					AND (datum_bis>='now()' OR datum_bis IS NULL) 
+					AND (
+						datum_von <= 'now()'
+						OR datum_von IS NULL
+						)
+					AND (
+						datum_bis >= 'now()'
+						OR datum_bis IS NULL
+						)
 					AND campus.vw_mitarbeiter.aktiv=TRUE 
 					AND vw_mitarbeiter.standort_id IS NOT NULL 
-					AND kontakt LIKE '%61925%' 
+					AND kontakttyp='firmenhandy' 
 					ORDER BY funktion_kurzbz";
 					$result = $db->db_query($sql_query);
 					if ($db->db_num_rows($result) > 0)
@@ -202,29 +209,12 @@ if(check_lektor($user))
 						{
 								echo '
 									<tr>
-										<td width="40%">'.$row->nachname.'</td>
+										<td width="40%"><a href="../profile/index.php?uid='.$row->uid.'">'.$row->nachname.'</a></td>
 										<td width="30%">'.$row->vorname.'</td>
 										<td ><nobr>'.$row->kontakt.'</nobr></td>
 									</tr>';
 						}
 						echo '
-							</tbody></table>';
-					}
-					// An der FHTW wird als Übergangsloesung statisch die Fa. HEALTH COUNSULT als Brandschutzbeauftragte angezeigt
-					if ($db->db_num_rows($result) == 0 && CAMPUS_NAME == 'FH Technikum Wien')
-					{
-						echo '<h2 style="margin-top:0px;">'.$p->t("notfallbestimmungen/brandschutzbeauftragte").'</h2>';
-						echo '<table class="tablesorter" id="t2">
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Nummer</th>
-									</tr>
-								</thead><tbody>
-								<tr>
-									<td>HEALT COUNSULT - Sicherheitstechnik GmbH</td>
-									<td ><nobr>0650/30 96 909</nobr></td>
-								</tr>
 							</tbody></table>';
 					}
 				?>

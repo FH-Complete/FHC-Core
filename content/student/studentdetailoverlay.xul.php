@@ -71,9 +71,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<row>
 							<label value="Person ID" control="student-detail-textbox-person_id"/>
 							<hbox><textbox id="student-detail-textbox-person_id" readonly="true" maxlength="16" size="16"/></hbox>
-							<label value="Zugangscode" control="student-detail-zugangscode"/>
+							<?php $hideZugangscode = (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) ? '':' hidden="true"'; ?>
+							<label value="Zugangscode" control="student-detail-zugangscode" <?php echo $hideZugangscode; ?>/>
 							<label id="label-student-detail-link_bewerbungstool" hidden="true" value=""></label>
-							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
+							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" <?php echo $hideZugangscode; ?> onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
 							<?php $hideBpk = $rechte->isBerechtigt('student/bpk') ? '':' hidden="true"'; ?>
                             <label value="BPK" control="student-detail-textbox-bpk"<?php echo $hideBpk; ?>/>
                             <hbox><textbox id="student-detail-textbox-bpk" disabled="true" maxlength="28" size="50"<?php echo $hideBpk; ?>/></hbox>

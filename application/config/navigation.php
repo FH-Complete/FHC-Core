@@ -249,3 +249,14 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
 	)
 );
 
+$config['navigation_menu']['system/issues/Issues/*'] = array(
+	'fehlerzustaendigkeiten' => array(
+		'link' => site_url('system/issues/IssuesZustaendigkeiten'),
+		'description' => 'Fehler Zuständigkeiten',
+		'icon' => 'cogs',
+		'sort' => 100,
+		'target' => '_blank',
+		'requiredPermissions' => array('admin:rw')
+	)
+);
+

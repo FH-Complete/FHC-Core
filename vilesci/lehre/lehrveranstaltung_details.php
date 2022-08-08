@@ -121,6 +121,7 @@
 		$lv->benotung = isset($_POST['benotung']);
 		$lv->lvinfo = isset($_POST['lvinfo']);
 		$lv->lehrauftrag = isset($_POST['lehrauftrag']);
+		$lv->lehrveranstaltung_template_id = $lv->lehrtyp_kurzbz == 'tpl' ? '' : $_POST['lehrveranstaltung_template_id'];
 
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -436,6 +437,13 @@
 			<td>Lehrauftrag</td>
 			<td><input type="checkbox" name="lehrauftrag" '.($lv->lehrauftrag?'checked':'').'></td>
 		</tr>
+		<tr id="lehrveranstaltung_template_id">
+			<td>Template</td>
+			<td colspan="2"><input type="text" name="lehrveranstaltung_template_id" value="'.$lv->lehrveranstaltung_template_id.'" size="6"> <span class="text-template_name"></span></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
 		<tr>
 			<td></td>
 			<td></td>
@@ -527,6 +535,7 @@
 	<title>Lehrveranstaltung - Details</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/colorpicker.css" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<script type="text/javascript" src="../../include/js/mailcheck.js"></script>
 	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
 
@@ -665,6 +674,91 @@
 			{
 				$(this).ColorPickerSetColor(this.value);
 			});
+
+			$('input[name="lehrveranstaltung_template_id"]').autocomplete({
+				minLength: 2,
+				source: function(request, response) {
+					$.ajax({
+						dataType: "json",
+						url: "../../soap/fhcomplete.php",
+						data: {
+							typ: "json",
+							class: "lehrveranstaltung",
+							method: "loadTemplates",
+							parameter_0: request.term
+						}
+					}).then(data => {
+						for (var k in data.return) {
+							data.return[k].value = data.return[k].lehrveranstaltung_id;
+							data.return[k].name = data.return[k].bezeichnung + " [" + data.return[k].kurzbz + "]";
+							data.return[k].label = data.return[k].name + " (" + data.return[k].lehrveranstaltung_id + ")";
+						}
+						response(data.return);
+					});
+				},
+				close: function(e, ui) {
+					$(this).trigger('check.ac-template');
+				},
+				focus: function(e, ui) {
+					$(this).removeClass('input_ok input_error').val(ui.item.value).parent().parent().find('.text-template_name').text(ui.item.name);
+					return false;
+				},
+				select: function(e, ui) {
+					$(this).addClass('input_ok').val(ui.item.value).parent().parent().find('.text-template_name').text(ui.item.name);
+					return false;
+				}
+			}).focus(function(e) {
+				$(this).removeClass('input_ok input_error');
+			}).blur(function(e) {
+				$(this).trigger('check.ac-template');
+			}).on('check.ac-template', function(e) {
+				var self = $(this),
+					val = self.val();
+				if (!val) {
+					self.removeClass('input_ok input_error').parent().parent().find('.text-template_name').text('');
+				} else {
+					$.ajax({
+						dataType: "json",
+						url: "../../soap/fhcomplete.php",
+						data: {
+							typ: "json",
+							class: "lehrveranstaltung",
+							method: "loadTemplates",
+							parameter_0: val
+						},
+						success: function(data) {
+							if (self.val() == val) {
+								var label = '',
+									state = '',
+									item = null;
+
+								for (var k in data.return) {
+									if (data.return[k].lehrveranstaltung_id == val) {
+										item = data.return[k];
+										break;
+									}
+								}
+
+								if (item) {
+									state = 'input_ok';
+									label = item.bezeichnung + " [" + item.kurzbz + "]";
+								} else if (val) {
+									state = 'input_error';
+								}
+								self.removeClass('input_ok input_error').addClass(state).parent().parent().find('.text-template_name').text(label);
+							}
+						}
+					});
+				}
+			}).trigger('check.ac-template');
+
+			$('select[name="lehrtyp_kurzbz"]').change(function(e) {
+				if ($(this).val() == 'tpl') {
+					$('#lehrveranstaltung_template_id').hide();
+				} else {
+					$('#lehrveranstaltung_template_id').show();
+				}
+			}).change();
 	    });
 	</script>
 	<style type="text/css">
