@@ -27,15 +27,14 @@ export default {
       organisationunit: organisationunit
     },
     template: `
-          <form ref="searchform" class="d-flex me-3"
+          <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
             <div class="input-group me-2 bg-white">
                 <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
                     v-model="this.searchsettings.searchstr" class="form-control" 
                     type="search" placeholder="Search" aria-label="Search">
                 <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
-            </div>
-            <button @click="this.search" class="btn btn-outline-success" type="button">Search</button>
+            </div>            
         
             <div v-show="this.showresult" ref="result" 
                  class="searchbar_results" tabindex="-1">

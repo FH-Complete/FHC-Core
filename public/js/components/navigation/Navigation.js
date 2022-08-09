@@ -29,7 +29,11 @@ export const CoreNavigationCmpt = {
 	props: {
 		addHeaderMenuEntries: Object, // property used to add new header menu entries from another app/component
 		addSideMenuEntries: Object, // property used to add new side menu entries from another app/component
-		hideTopMenu: Boolean
+		hideTopMenu: Boolean,
+                leftNavCssClasses: {
+                    type: String,
+                    default: 'navbar navbar-left-side'
+                }
 	},
 	data: function() {
 		return {
@@ -131,7 +135,7 @@ export const CoreNavigationCmpt = {
 		</nav>
 
 		<!-- Left side menu -->
-		<nav class="navbar navbar-left-side">
+		<nav :class="leftNavCssClasses">
 			<ul class="navbar-nav">
 				<!-- 1st level -->
 				<template v-for="menu in sideMenuEntries">

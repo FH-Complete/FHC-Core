@@ -76,6 +76,15 @@ export default {
             this.topheight = Math.floor(this.availHeight/2);
             this.bottomheight = Math.floor(this.availHeight/2);
         },
+        isCollapsed: function() {
+            if( this.topheight === 0 ) {
+                return 'top';
+            } else if ( this.bottomheight === 0 ) {
+                return 'bottom';
+            } else {
+                return false;
+            }
+        },
         dragStart: function(e) {
             e.preventDefault();
             e.stopPropagation();
