@@ -65,7 +65,7 @@ function func_tableBuilt(table) {
                 },
                 target:"_blank"
             }
-        }, false, "status"  // place column after status
+        }, true  // place column on the very left
     );
 }
 
