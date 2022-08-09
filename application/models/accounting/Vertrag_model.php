@@ -299,6 +299,19 @@ class Vertrag_model extends DB_Model
         }
     }
 
+		/**
+		 * Gets Person_id corresponding to the contract.
+		 * @param $vertrag_id
+		 * @return array
+		 */
+			public function getPersonID($vertrag_id)
+			{
+				return $this->loadWhere(array(
+						'vertrag_id' => $vertrag_id
+				));
+			}
+
+
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods
 

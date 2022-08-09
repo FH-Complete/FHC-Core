@@ -62,7 +62,7 @@ class Vertragvertragsstatus_model extends DB_Model
 
         // Check if vertrag has already this status
         $result = $this->hasStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz);
-        
+
 		// If status is already set, return error message
         if (hasData($result))
         {
@@ -74,7 +74,7 @@ class Vertragvertragsstatus_model extends DB_Model
         {
             $result = $this->getLastStatus($vertrag_id, $mitarbeiter_uid);
             $last_status = getData($result)[0]->vertragsstatus_kurzbz;
-	
+
 			// If latest status is not 'erteilt', return error message
             if ($last_status != 'erteilt')
             {
@@ -146,7 +146,7 @@ class Vertragvertragsstatus_model extends DB_Model
     		vertragsstatus_kurzbz = \'bestellt\' AND
     		(datum)::date = date \''. $string_date .'\'
 		';
-    	
+
     	if (!$further_processed)
 		{
 			$condition .= '
@@ -158,10 +158,10 @@ class Vertragvertragsstatus_model extends DB_Model
     			)
 			';
 		}
-  
+
 		return $this->loadWhere($condition);
 	}
-	
+
 	/**
 	 * Get all contracts, where the status had been set to 'erteilt' on given date
 	 * @param string $string_date e.g. '01.11.2019' or special Date/Time inputs like 'YESTERDAY', 'TODAY', 'NOW'
@@ -175,7 +175,7 @@ class Vertragvertragsstatus_model extends DB_Model
 				vertragsstatus_kurzbz = \'erteilt\' AND
 				(datum)::date = date \''. $string_date .'\'
 			';
-		
+
 		if (!$further_processed)
 		{
 			$condition .= '
@@ -187,7 +187,38 @@ class Vertragvertragsstatus_model extends DB_Model
 					)
 				';
 		}
-		
+
 		return $this->loadWhere($condition);
 	}
+
+	/**
+	 * Get all contracts, where the status had been set to 'cancelled'
+	 * @param string $string_date e.g. '01.11.2019' or special Date/Time inputs like 'YESTERDAY', 'TODAY', 'NOW'
+	 * @param bool $further_processed If true, ALL contracts cancelled on that day are retrieved, even if they were
+	 * 								 not accepted before.
+	 * @return array
+	 */
+	public function getCancelled_fromDate($string_date = 'TODAY', $acceptedBefore = false)
+	{
+		$condition = '
+				vertragsstatus_kurzbz = \'storno\' AND
+				(datum)::date = date \''. $string_date .'\'
+			';
+
+		if (!$acceptedBefore)
+		{
+			$condition .= '
+				 AND
+				vertrag_id IN (
+					SELECT vertrag_id
+					FROM lehre.tbl_vertrag_vertragsstatus
+					WHERE vertragsstatus_kurzbz IN (\'akzeptiert\')
+					)
+				';
+		}
+
+		return $this->loadWhere($condition);
+	}
+
+
 }

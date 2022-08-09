@@ -267,6 +267,65 @@ class LehrauftragJob extends JOB_Controller
 		}
 	}
 
+	/**
+	 * This daily job sends information about all lehr-/projektauftraege cancelled the day bofore.
+	 * Receivers: lectors
+	 **/
+	public function mailLehrauftraegeCancelled()
+	{
+		// Get vertrag_id and uid of lehrauftraege that had accepted AND were cancelled YESTERDAY
+		$this->VertragvertragsstatusModel->addSelect('vertrag_id, uid');
+		$this->VertragvertragsstatusModel->addOrder('vertrag_id');
+		$result = $this->VertragvertragsstatusModel->getCancelled_fromDate('YESTERDAY');
+
+
+		/**
+		 * Build the data array to be used in the email.
+		 **/
+
+		$data_arr= array();
+		if ($vertrag_arr = getData($result))
+		{
+			foreach ($vertrag_arr as $vertrag)
+			{
+				$uid = $vertrag->uid;
+				$vertrag_id = $vertrag->vertrag_id;
+
+				$person_id = '';
+				$bezeichnung = '';
+
+				$this->VertragModel->load($vertrag_id);
+				$result = $this->VertragModel->getPersonID($vertrag_id);
+
+				if (hasData($result))
+				{
+					$bezeichnung = $result->retval[0]->bezeichnung;
+					$person_id = $result->retval[0]->person_id;
+				}
+
+				$data = array();
+				$data['uid'] = $uid;
+				$data['person_id'] = $person_id;
+				$data['vertrag_id'] = $vertrag_id;
+				$data['bezeichnung'] = $bezeichnung;
+				$data_arr []= $data;
+			}
+		}
+
+
+		// Send email
+		if ($this->_sendMail_Storniert($data_arr))
+		{
+			$this->logInfo('SUCCEDED: Sending emails about yesterdays cancelled lehrauftraege succeded.');
+		}
+		else
+		{
+			$this->logError('Error when sending emails in job MailLehrauftragStornierte');
+		}
+
+}
+
+
 	//******************************************************************************************************************
 	//	PRIVATE FUNCTIONS
 	//******************************************************************************************************************
@@ -359,7 +418,7 @@ class LehrauftragJob extends JOB_Controller
 			for ($i = 0; $i < $data_len; $i++)
 			{
 				// Get all users entitled by organisational unit
-				$result = $this->BenutzerrolleModel->getBenutzerByBerechtigung(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, $data[$i]['oe_kurzbz'], 'suid');
+				$result = $this->BenutzerrolleModel->getBenutzerByBerechtigung(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, $data[$i]['oe_kurzbz']);
 
 				if ($berechtigung_arr = getData($result))
 				{
@@ -527,4 +586,71 @@ class LehrauftragJob extends JOB_Controller
 		}
 		return true;
 	}
+
+	/**
+	 * Send Sancho eMail about cancelled Lehrauftraege.
+	 * @param $data_arr
+	 */
+	private function _sendMail_Storniert($data_arr)
+	{
+		// Loop through 'container' of mail recipients
+		foreach($data_arr as $data)
+		{
+			// Link to LehrauftragAkzeptieren
+			$url =  CIS_ROOT. 'cis/index.php?menu='.
+				CIS_ROOT. 'cis/menu.php?content_id=&content='.
+				CIS_ROOT. index_page(). self::LEHRAUFTRAG_AKZEPTIEREN_URI;
+
+			// Get first name and uid lektor from person_id
+			$first_name = '';
+			$uid = '';
+
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$this->BenutzerModel->addSelect('vorname, uid');
+			$this->BenutzerModel->addJoin('public.tbl_person', 'person_id');
+			$result = $this->BenutzerModel->loadWhere(array('person_id' => $data['person_id']));
+
+			if (hasData($result))
+			{
+				$first_name = $result->retval[0]->vorname;
+				$uid =  $result->retval[0]->uid;
+			}
+
+			//get cancellor_ name for email
+			$cancellor_name = '';
+			$cancellor_uid =  $data['uid'];
+
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$this->BenutzerModel->addSelect('vorname, nachname');
+			$this->BenutzerModel->addJoin('public.tbl_person', 'person_id');
+			$result = $this->BenutzerModel->loadWhere(array('uid' => $cancellor_uid));
+
+			if(hasData($result))
+			{
+				$cancellor_name = $result->retval[0]->vorname . " " . $result->retval[0]->nachname ;
+			}
+
+			// Set mail recipient (lector)
+			$to = $uid. '@'. DOMAIN;
+
+			// Prepare mail content
+			$content_data_arr = array(
+				'uid'=> $cancellor_uid,
+				'vorname' => $first_name,
+				'vertrag_id' => $data['vertrag_id'],
+				'bezeichnung' => $data['bezeichnung'],
+				'storniert_von' => $cancellor_name,
+				'link' => anchor($url, 'Lehraufträge Übersicht')
+			);
+
+			sendSanchoMail(
+				'LehrauftragStornierte',
+				$content_data_arr,
+				$to,
+				'Lehrauftrag wurde storniert'
+			);
+		}
+		return true;
+	}
+
 }
