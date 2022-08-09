@@ -134,34 +134,34 @@ $this->load->view(
                  id="approveAnrechnungUebersicht-begruendung-panel">
                 <div>
                     <h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'genehmigungenNegativQuestion'); ?></h4>
-                    &nbsp;<b><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></b><br><br>
-                    <ol>
-                        <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativPruefungNichtMoeglich'); ?>
-                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
-                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-                                <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </span>
-                        </li>
-                        <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertig'); ?>
-                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
-                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-                                <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </span>
-                        </li>
-                        <li><?php echo $this->p->t('anrechnung', 'genehmigungNegativEctsHoechstgrenzeUeberschritten'); ?>
-                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="left"
-                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-                                <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </span>
-                        </li>
-                        <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
-                    </ol>
-                    <br>
+                    &nbsp;<b><?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?>
                     <span class="text-danger">
                         <?php echo $this->p->t('anrechnung', 'begruendungWirdFuerAlleUebernommen'); ?>
-                    </span><br><br>
+                    </span></b>
+                    <br><br>
+                    <ol class="list-group">
+                        <li class="list-group-item"><?php echo $this->p->t('anrechnung', 'genehmigungNegativPruefungNichtMoeglich'); ?>
+                            <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip" data-placement="left"
+                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                            </span>
+                        </li>
+                        <li class="list-group-item"><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertig'); ?>
+                            <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip" data-placement="left"
+                               title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                            </span>
+                        </li>
+                        <li class="list-group-item"><?php echo $this->p->t('anrechnung', 'genehmigungNegativEctsHoechstgrenzeUeberschritten'); ?>
+                            <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip" data-placement="left"
+                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                            </span>
+                        </li>
+                    </ol>
                     <textarea class="form-control" name="begruendung" id="approveAnrechnungUebersicht-begruendung"
-                              rows="2" required></textarea>
+                              rows="2"
+                              placeholder="<?php echo $this->p->t('anrechnung', 'textUebernehmenOderEigenenBegruendungstext'); ?>" required></textarea>
                 </div>
                 <br>
                 <!-- Action Button 'Abbrechen'-->
