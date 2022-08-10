@@ -10637,13 +10637,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Anzeige aller bisher angerechneten ECTS. Für Quereinsteiger werden die ECTS der angerechneten Semester berechnet.<br><br>Vorgabe für Anrechnungen:<br>Max. 60 ECTS schulische Qualifikation<br>Max. 60 ECTS berufliche Qualifikation<br>Max. 90 ECTS INSGESAMT (schulische + berufliche Qualifikation)',
+                'text' => 'Anzeige der Summe der bisher angerechneten ECTS. Für Quereinsteiger in ein höheres Semester werden die ECTS der angerechneten Semester berücksichtigt.<br><br>Seit Oktober 2021 gelten Höchstgrenzen für Anrechnungen:<br>max. 60 ECTS für schulische Zeugnisse (anrechenbar sind nur BHS- und AHS-Zeugnisse!)<br>max. 60 ECTS für berufliche Qualifikationen<br>max. 90 ECTS INSGESAMT für schulische und berufliche Qualifikationen',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'All previous recognized ECTS. Lateral Entries are calculated with full ECTS of all recognized semester.<br><br>Condition for Recognition of Prior Knowledge:<br>Max. 60 ECTS school qualification<br>Max. 60 ECTS professional qualification<br>Max. 90 ECTS OVERALL (school + professional qualification)',
+                'text' => 'Sum of previous recognized ECTS. Lateral Entries are considered with ECTS of the recognized semester.<br><br>Maximum ECTS limits are applied since Octobre 2021:<br><br>max. 60 ECTS school qualification (BHS and AHS only)<br>max. 60 ECTS professional qualification<br>max. 90 ECTS OVERALL for school and professional qualification',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -10657,13 +10657,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Vorgabe für Anrechnungen:<br>Max. 60 ECTS schulische Qualifikation<br>Max. 60 ECTS berufliche Qualifikation<br>Max. 90 ECTS INSGESAMT (schulische + berufliche Qualifikation)',
+                'text' => 'Seit Oktober 2021 gelten Höchstgrenzen für Anrechnungen:<br>max. 60 ECTS für schulische Zeugnisse (anrechenbar sind nur BHS- und AHS-Zeugnisse!)<br>max. 60 ECTS für berufliche Qualifikationen<br>max. 90 ECTS INSGESAMT für schulische Zeugnisse und berufliche Qualifikationen',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'Condition for Recognition of Prior Knowledge:<br>Max. 60 ECTS school qualification<br>Max. 60 ECTS professional qualification<br>Max. 90 ECTS OVERALL (school + professional qualification)',
+                'text' => 'Maximum ECTS limits are applied since Octobre 2021:<br>max. 60 ECTS school qualification (BHS and AHS only)<br>max. 60 ECTS professional qualification<br>max. 90 ECTS OVERALL for school and professional qualification',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -12254,18 +12254,15 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "<h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
-                Soll die Anrechnung auf der Grundlage der beruflichen Praxis erfolgen, laden Sie bitte eine detaillierte
-                Tätigkeitsbeschreibung hoch. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
-                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
-                oder durch Bestätigungen des Arbeitgebers) erfolgen.",
+				'text' => "<h5><u>Beantragung aufgrund beruflicher Praxis</u></h5>
+                    Bitte erstellen Sie eine detaillierte Tätigkeitsbeschreibung. Dafür steht im CIS ein Formular zur Verfügung, das in ein PDF-Dokument umzuwandeln und gemeinsam mit dem Lebenslauf hochzuladen ist.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => "<h5><u>Application for recognition based on professional practice</u></h5>
-                If the exemption is to be based on professional practice, please upload a detailed job description. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).",
+                    Please supply a detailed job description. Therefore a formular is provided in CIS, that should be converted as pdf file and supplied together with your CV.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12403,7 +12400,7 @@ array(
                 Wirtschaftsinformatik
                 <br>
                 <h5><u>Bei Anrechnungen von beruflicher Praxis</u></h5>
-                Bitte geben Sie Unternehmen, Position und Funktion sowie Dauer der Beschäftigung an.",
+                Bitte erstellen Sie eine detaillierte Tätigkeitsbeschreibung. Dafür steht im CIS ein Formular zur Verfügung, das in ein PDF-Dokument umzuwandeln und gemeinsam mit dem Lebenslauf hochzuladen ist.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -12413,7 +12410,7 @@ array(
                 Please indicate where you acquired the knowledge: type of (university) school, location, subject area. Example school: HTL Mödling, vehicle technology; Example university: Vienna University of Technology, Bachelor of Business Informatics
                 <br>
                 <h5><u>If professional practice is to be recognized</u></h5>
-                Please state company, position and function as well as length of employment.",
+                Please supply a detailed job description. Therefore a formular is provided on CIS, that should be converted as pdf file and supplied together with the CV.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12554,10 +12551,8 @@ array(
                     <li>Zeitlicher Umfang der Lehrveranstaltung (z. B. SWS, ECTS, Unterrichtsstunden…)</li>
                 </ol>
                 <br>
-                <h5><u>Beantragung aufgrund nachgewiesener beruflicher Praxis</u></h5>
-                Es wird eine detaillierte Tätigkeitsbeschreibung benötigt. Dies kann durch betriebliche Ausbildungsnachweise und / oder Nachweise von
-                einschlägigen beruflichen Tätigkeiten mit Zeitangaben (z. B. durch ein qualifiziertes Arbeitszeugnis
-                oder durch Bestätigungen des Arbeitgebers) erfolgen.
+                <h5><u>Beantragung aufgrund beruflicher Praxis</u></h5>
+                Es wird eine detaillierte Tätigkeitsbeschreibung benötigt. Dafür steht im CIS ein Formular zur Verfügung, das in ein PDF-Dokument umzuwandeln und gemeinsam mit dem Lebenslauf hochzuladen ist.
                 <br><br><span class=\"text-danger\">Falls diese Informationen nicht enthalten sind, kann der Antrag nicht geprüft werden und er wird abgelehnt.</span>",
 				'description' => '',
 				'insertvon' => 'system'
@@ -12574,7 +12569,7 @@ array(
                 </ol>
                 <br>
                 <h5><u>Application for recognition based on professional practice</u></h5>
-                If the exemption is to be based on professional practice, an upload of a detailed job description is required. This can be done through proof of company training and / or proof of relevant occupational activities with time information (e.g. through a qualified job reference or through confirmation from the employer).
+                If the exemption is to be based on professional practice, an upload of a detailed job description is required. Therefore a formular is provided in CIS, that should be converted as pdf file and supplied together with the CV.
                 <br><br><span class="text-danger">If this information is not included, the application can not be checked adequately and it might need to be rejected.</span>',
 				'description' => '',
 				'insertvon' => 'system'
