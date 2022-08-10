@@ -5169,6 +5169,19 @@ if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHE
 	}
 }
 
+// Added Bezeichnung 'Hochschulzeugnis' to Anrechnungbegruendung
+if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHERE bezeichnung = 'Hochschulzeugnis';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_anrechnung_begruendung (bezeichnung) VALUES('Hochschulzeugnis');";
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_anrechnung_begruendung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' lehre.tbl_anrechnung_begruendung: Added bezeichnung "Hochschulzeugnis" <br>';
+	}
+}
+
 // Add permission to apply for Anrechnung
 if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/anrechnung_beantragen';"))
 {
@@ -6257,6 +6270,175 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo 'system.tbl_berechtigung: Added permission for student/keine_studstatuspruefung<br>';
 
 	}
+}
+
+// Neue Funktion get_ects_summe_schulisch
+if(!@$db->db_query("SELECT public.get_ects_summe_schulisch('', 0, 0)"))
+{
+	$qry = 'CREATE FUNCTION public.get_ects_summe_schulisch(character varying, integer, integer) RETURNS numeric
+			LANGUAGE plpgsql
+			AS $_$
+				DECLARE var_student_uid ALIAS FOR $1;
+				DECLARE var_prestudent_id ALIAS FOR $2;
+				DECLARE var_studiengang_kz ALIAS FOR $3;
+				DECLARE var_einstiegsausbildungssemester integer;
+				DECLARE var_einstiegsstudiensemester_kurzbz varchar(32);
+				DECLARE var_einstiegsorgform_kurzbz varchar(32);
+				DECLARE rec_quereinstiegs_studiensemester RECORD;
+				DECLARE sum_quereinstiegs_ects numeric(4, 1) := 0;
+				DECLARE sum_schulische_ects numeric(4, 1) := 0;
+				
+							
+				BEGIN
+				
+				-- IF STUDENT IS QUEREINSTEIGER, GET ECTS SUMME OF ANGERECHNETE SEMESTER
+				-- Get Einstiegssemester 
+				   SELECT INTO var_einstiegsausbildungssemester , var_einstiegsstudiensemester_kurzbz, var_einstiegsorgform_kurzbz  ausbildungssemester, studiensemester_kurzbz, orgform_kurzbz from public.tbl_prestudentstatus 
+				   WHERE prestudent_id = var_prestudent_id 
+				   AND status_kurzbz = \'Student\'
+				   ORDER BY datum, insertamum, ext_id
+				   LIMIT 1;
+				
+				-- If Einstiegssemester > 1 (= Quereinsteiger)
+				IF (var_einstiegsausbildungssemester > 1) THEN
+				-- ...get all Quereinstiegssemester
+				   FOR rec_quereinstiegs_studiensemester IN SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
+					 WHERE ende <= (select start from public.tbl_studiensemester WHERE studiensemester_kurzbz = var_einstiegsstudiensemester_kurzbz )
+					 ORDER BY start DESC
+					 LIMIT (var_einstiegsausbildungssemester -1)
+				-- ...loop the Quereinstiegssemester
+				   LOOP
+				-- ...and sum up ECTS of each Quereinstiegssemester
+					  sum_quereinstiegs_ects = sum_quereinstiegs_ects + (SELECT
+								SUM(tbl_lehrveranstaltung.ects)
+							FROM
+								lehre.tbl_studienplan
+								JOIN lehre.tbl_studienplan_lehrveranstaltung USING (studienplan_id)
+								JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+							WHERE
+								tbl_studienplan.studienplan_id = (
+									SELECT 
+										studienplan_id
+									FROM 
+										lehre.tbl_studienordnung 
+										JOIN lehre.tbl_studienplan USING (studienordnung_id) 
+										JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+										WHERE tbl_studienordnung.studiengang_kz = var_studiengang_kz 
+										AND tbl_studienplan_semester.semester = var_einstiegsausbildungssemester - 1
+										AND tbl_studienplan_semester.studiensemester_kurzbz = rec_quereinstiegs_studiensemester.studiensemester_kurzbz
+										AND tbl_studienplan.orgform_kurzbz = var_einstiegsorgform_kurzbz  
+								
+									LIMIT 1
+								)
+							AND tbl_studienplan_lehrveranstaltung.semester = var_einstiegsausbildungssemester
+							AND studienplan_lehrveranstaltung_id_parent IS NULL -- auf Modulebene
+							AND tbl_studienplan_lehrveranstaltung.export = TRUE);
+				
+							var_einstiegsausbildungssemester = var_einstiegsausbildungssemester - 1;
+				   END LOOP;
+				END IF;
+				
+				   
+				-- GET ECTS SUMME OF ALLE BISHER ANGERECHNETEN LEHRVERANSTALTUNGEN. ANRECHNUNGSGRUND: SCHULISCH.
+				SELECT INTO sum_schulische_ects COALESCE(SUM(ects), 0) FROM (
+									SELECT 
+										lehrveranstaltung_id, studiensemester_kurzbz, ects
+									FROM 
+										lehre.tbl_zeugnisnote 
+										LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz) 
+										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+										JOIN public.tbl_student USING(student_uid)
+									WHERE 
+										tbl_zeugnisnote.note = 6
+										AND student_uid = var_student_uid
+										AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
+										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen 
+                        				AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern) 
+									
+									UNION 
+										
+									SELECT 
+										lehrveranstaltung_id, studiensemester_kurzbz, ects
+									FROM 
+										lehre.tbl_anrechnung 
+										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+										JOIN public.tbl_student USING(prestudent_id)
+									WHERE 
+										genehmigt_von IS NOT NULL
+										AND student_uid = var_student_uid 
+										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen  
+				) lvsangerechnet;
+				
+				-- BUILD ECTS SUMME OF QUEREINSTIEGSSEMESTER- + ANGERECHNETEN LVs-ECTS
+				-- Summe aller bisher schulisch begründet angerechneten LVs + der Quereinstiegssemester
+				sum_schulische_ects = sum_schulische_ects + sum_quereinstiegs_ects;
+								
+				RETURN sum_schulische_ects ;
+				  
+				END;
+				$_$;
+
+			ALTER FUNCTION public.get_ects_summe_schulisch(character varying, integer, integer) OWNER TO fhcomplete;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.get_ects_summe_schulisch(student_uid, prestudent_id, studiengang_kz): '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Funktion <b>public.get_ects_summe_schulisch(student_uid, prestudent_id, studiengang_kz)</b> hinzugefügt';
+}
+
+// Neue Funktion get_ects_summe_beruflich
+if(!@$db->db_query("SELECT public.get_ects_summe_beruflich('')"))
+{
+	$qry = 'CREATE FUNCTION public.get_ects_summe_beruflich(character varying) RETURNS numeric
+			LANGUAGE plpgsql
+			AS $_$
+				DECLARE var_student_uid ALIAS FOR $1;
+				DECLARE sum_berufliche_ects numeric(4, 1) := 0;
+            
+				BEGIN
+				
+					SELECT INTO sum_berufliche_ects COALESCE(SUM(ects), 0) FROM (
+						SELECT 
+							lehrveranstaltung_id, studiensemester_kurzbz, ects
+						FROM 
+							lehre.tbl_zeugnisnote 
+							LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz) 
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+							JOIN public.tbl_student USING(student_uid)
+						WHERE 
+							tbl_zeugnisnote.note = 6
+							AND student_uid = var_student_uid
+							AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
+							AND begruendung_id = 4  -- beruflich
+							AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern)
+						
+						UNION 
+							
+						SELECT 
+							lehrveranstaltung_id, studiensemester_kurzbz, ects
+						FROM 
+							lehre.tbl_anrechnung 
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+							JOIN public.tbl_student USING(prestudent_id)
+						WHERE 
+							genehmigt_von is not null
+							AND student_uid = var_student_uid 
+							AND begruendung_id = 4  -- beruflich
+					) lvsangerechnet;
+					
+				RETURN sum_berufliche_ects;
+				
+				END;
+				$_$;
+
+			ALTER FUNCTION public.get_ects_summe_beruflich(character varying) OWNER TO fhcomplete;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.get_ects_summe_beruflich(student_uid): '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Funktion <b>public.get_ects_summe_beruflich(student_uid)</b> hinzugefügt';
 }
 
 // Grant SELECT to bis.tbl_gsprogramm for web-user
