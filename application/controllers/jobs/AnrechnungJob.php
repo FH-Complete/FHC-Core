@@ -20,6 +20,7 @@ class AnrechnungJob extends JOB_Controller
 
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
+    const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
 
 	/**
@@ -360,16 +361,16 @@ html;
 
         $result = $this->AnrechnungModel->loadWhere('
             studiensemester_kurzbz = (
-                SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND (ende + interval \'1 month\')
+                SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende)
             )
             AND genehmigt_von IS NULL                             
             AND empfehlung_anrechnung IS NULL
-            AND status_kurzbz = \'inProgressLektor\'                                -- in Bearbeitung durch Lektor
+            AND status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR) .' -- in Bearbeitung durch Lektor
             AND NOW()::date = (astat.datum + interval \'1 week\')                   -- eine Woche nach Empfehlungsanfrage
             ORDER BY astat.anrechnung_id, astat.datum DESC, astat.insertamum DESC   -- nur letzten status dabei prüfen
         ');
 
-        // Exit if there are pending recommendations
+        // Exit if there are no pending recommendations
         if (!hasData($result))
         {
             $this->logInfo('End AnrechnungJob sendMailRemindRecommendation, because no recommendations to be done.');
