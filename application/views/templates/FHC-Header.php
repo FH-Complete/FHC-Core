@@ -30,12 +30,6 @@
 			// --------------------------------------------------------------------------------------------------------
 			// From vendor folder
 
-			// Bootstrap 3 CSS
-			if ($bootstrap3 === true) generateCSSsInclude('vendor/twbs/bootstrap3/dist/css/bootstrap.min.css');
-
-			// Bootstrap 5 CSS
-			if ($bootstrap5 === true) generateCSSsInclude('vendor/twbs/bootstrap5/dist/css/bootstrap.min.css');
-
 			// Securimage CSS
 			if ($captcha3 === true) generateCSSsInclude('vendor/dapphp/securimage/securimage.css');
 
@@ -55,6 +49,12 @@
 
 			// jQuery treetable
 			if ($jquerytreetable3 === true) generateCSSsInclude('vendor/ludo/jquery-treetable/css/jquery.treetable.css');
+
+			// Bootstrap 3 CSS
+			if ($bootstrap3 === true) generateCSSsInclude('vendor/twbs/bootstrap3/dist/css/bootstrap.min.css');
+
+			// Bootstrap 5 CSS
+			if ($bootstrap5 === true) generateCSSsInclude('vendor/twbs/bootstrap5/dist/css/bootstrap.min.css');
 
 			// PivotUI CSS
 			if ($pivotui2 === true) generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');

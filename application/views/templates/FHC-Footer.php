@@ -34,18 +34,11 @@
 	// Axios V0.27
 	if ($axios027 === true) generateJSsInclude('vendor/axios/axios/dist/axios.min.js');
 
-	// Bootstrap 5 JS
-	if ($bootstrap5 === true) generateJSsInclude('vendor/twbs/bootstrap5/dist/js/bootstrap.min.js');
-
 	// Securimage JS
 	if ($captcha3 === true) generateJSsInclude('vendor/dapphp/securimage/securimage.js');
 
 	// jQuery V3
 	if ($jquery3 === true) generateJSsInclude('vendor/components/jquery/jquery.min.js');
-
-	// Bootstrap 3 JS
-	// NOTE: to be kept after jQuery!
-	if ($bootstrap3 === true) generateJSsInclude('vendor/twbs/bootstrap3/dist/js/bootstrap.min.js');
 
 	// jQuery UI
 	if ($jqueryui1 === true)
@@ -61,6 +54,13 @@
 	// jQuery treetable
 	// NOTE: keep it after jQuery includes
 	if ($jquerytreetable3 === true) generateJSsInclude('vendor/ludo/jquery-treetable/jquery.treetable.js');
+
+	// Bootstrap 3 JS
+	// NOTE: to be kept after jQuery!
+	if ($bootstrap3 === true) generateJSsInclude('vendor/twbs/bootstrap3/dist/js/bootstrap.min.js');
+
+	// Bootstrap 5 JS
+	if ($bootstrap5 === true) generateJSsInclude('vendor/twbs/bootstrap5/dist/js/bootstrap.min.js');
 
 	// Moment JS
 	if ($momentjs2 === true)
