@@ -64,6 +64,19 @@ else
 
 $datum_obj = new datum();
 
+// Überprüfen, ob addon casetime aktiv ist
+$addon_obj = new addon();
+$addoncasetime = $addon_obj->checkActiveAddon("casetime");
+
+$urlaubssaldo = "";
+if($addoncasetime)
+{
+	require_once('../../../addons/casetime/include/functions.inc.php');
+	$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
+  $urlaubssaldo = $urlaubssaldo->{'AktuellerStand'};
+
+}
+
 
 
 echo '<html>
@@ -96,14 +109,47 @@ $( document ).ready(function()
 		addon[i].init("cis/private/profile/urlaubsfreigabe.php", {uid:\''.$uid.'\'});
 	}
 });
+
 </script>';
+
+echo '
+<script type="text/javascript">
+$(document).ready(function()
+{
+	checkYear()
+
+	function checkYear()
+	{
+		var year = $("#yearGet").val();
+		var yearNow = new Date().getFullYear();
+		var monthNow = new Date().getMonth()+1;
+
+		if(	((year == yearNow) && (monthNow <9)) ||((year == (yearNow+1)) && (monthNow >8)))
+		{
+			$("#resturlaub").show();
+			$("#saldoBerechnet").show();
+		}
+		else
+		{
+			$("#resturlaub").hide();
+			$("#saldoBerechnet").hide();
+		}
+	}
+
+});
+
+</script>
+';
 
 echo '
 </head>
 
 <body>
+<input type ="hidden" value="'.$year.'" id=yearGet>
+
 <h1>Urlaubsfreigabe</h1>
 ';
+
 //Untergebene holen
 $mitarbeiter = new mitarbeiter();
 $mitarbeiter->getUntergebene($user);
@@ -257,18 +303,19 @@ if ($uid!='')
 	echo '<div id="resturlaub">';
 	echo '</div>';
 
-	//Abschnitt zukünftige Urlaube
+	//Abschnitt Saldo nach Freigabe
 	$zeitsperre = new zeitsperre();
 	$enddatum= $year ."-08-31";
 
 	if($zeitsperre->getUrlaubstage($uid))
 	{
-		echo "<br><p class= 'text-warning'>zukünftige Urlaubstage* angesucht: <span  style='margin-left: 30px;'>". $zeitsperre->getUrlaubstage($uid, $enddatum, false) . " Tage</span></p>";
-		if ($zeitsperre->getUrlaubstage($uid, $enddatum, true))
-			echo "<p>davon bereits genehmigt:<span style='margin-left: 84px;'> ". $zeitsperre->getUrlaubstage($uid, $enddatum, true) . " Tage</style></p>";
-		else
-			echo "<p>davon bereits genehmigt:<span style='margin-left: 84px;'> 0 Tage</style></p>";
-			echo "* bis 31.8.". $year;
+		$tageZuGenehmigen = $zeitsperre->getUrlaubstage($uid, $enddatum, true);
+		echo "<div id='saldoBerechnet'>";
+		echo "<br><p class= 'text-warning'>zu genehmigende Urlaubstage: <span  style='margin-left: 53px;'>". $tageZuGenehmigen ." Tag(e)</span></p>";
+		$saldo = (int)$urlaubssaldo - (int)$tageZuGenehmigen;
+		$saldo > 0 ? $color = 'green' : $color = 'red';
+		echo "<strong>Stand nach Genehmigung: <span  style='margin-left: 66px; color: ". $color ."'>" . $saldo . " Tag(e)</span></strong>";
+		echo "</div>";
 	}
 
 	echo '</td></tr></table>';

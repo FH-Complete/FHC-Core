@@ -641,7 +641,7 @@ class zeitsperre extends basis_db
 	 * @param $freigegeben, wird nur abgefragt wenn != true
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getUrlaubstage($user, $enddatum=null, $freigegeben=false)
+	public function getUrlaubstage($user, $enddatum=null, $offen=false)
 	{
 
 		$qry = "
@@ -661,8 +661,8 @@ class zeitsperre extends basis_db
 					if($enddatum)
 						$qry.= 'AND bisDatum <= '. $this->db_add_param($enddatum);
 
-					if( $freigegeben )
-						$qry .= 'AND freigabeamum is not null';
+					if( $offen )
+						$qry .= 'AND freigabeamum is null';
 
 					if($enddatum)
 					{
@@ -677,8 +677,8 @@ class zeitsperre extends basis_db
 						$qry.="	AND bisDatum >=" . $this->db_add_param($enddatum)."
 						AND vonDatum <= " .$this->db_add_param($enddatum);
 
-						if( $freigegeben )
-							$qry .= 'AND freigabeamum is not null';
+						if( $offen )
+							$qry .= 'AND freigabeamum is null';
 
 						}
 					$qry .= ') AS countHolidays';
