@@ -62,7 +62,6 @@ $this->load->view(
     }
 </style>
 
-<body>
 <div id="page-wrapper">
     <div class="container-fluid">
         <!-- header -->
@@ -293,6 +292,5 @@ $this->load->view(
         </div>
     </div>
 </div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
