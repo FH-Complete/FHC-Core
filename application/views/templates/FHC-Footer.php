@@ -87,6 +87,7 @@
 	{
 		generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js');
 		generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
+		generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 	}
 
 	// Tabulator 4 JS
