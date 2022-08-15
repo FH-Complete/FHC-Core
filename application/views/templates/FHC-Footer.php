@@ -106,7 +106,11 @@
 	if ($tinymce5 === true) generateJSsInclude('vendor/tinymce/tinymce5/tinymce.min.js');
 
 	// Vue 3 JS
-	if ($vue3 === true) generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
+	if ($vue3 === true) 
+	{
+		generateJSsInclude('vendor/vuejs/vuejs3/vue.global.prod.js');
+		generateJSsInclude('vendor/vuejs/vuerouter4/vue-router.global.js');
+	}
 
 	// PrimeVue
 	if ($primevue3)
