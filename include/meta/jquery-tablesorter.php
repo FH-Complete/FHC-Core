@@ -17,26 +17,8 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-/*
-Meta Include für JQuery Tablesorter
-require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
-Usage:
-	<script language="Javascript">
-	$(document).ready(function()
-	{
-		$("#t1").tablesorter(
-		{
-			sortList: [[0,0]],
-			widgets: ["zebra"],
-			headers: {1:{sorter: false}}
-		});
-	});
-	</script>
-*/
-$dr = DOC_ROOT;
-$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
-if($dr=='')
-	$dr='/';
+
+$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
 
 //Originaldateien des Herstellers
 echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/jquery-tablesorter/css/theme.default.css">';
