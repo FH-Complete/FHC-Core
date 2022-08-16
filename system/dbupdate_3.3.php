@@ -6203,6 +6203,72 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Creates table public.tbl_gruppe_manager if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1'))
+{
+	$qry = 'CREATE TABLE public.tbl_gruppe_manager (
+				gruppe_manager_id integer,
+				gruppe_kurzbz varchar(32) NOT NULL,
+				uid varchar(32) NOT NULL,
+				insertamum timestamp DEFAULT NOW(),
+				insertvon varchar(32)
+			);
+
+			COMMENT ON TABLE public.tbl_gruppe_manager IS \'Table to save assignments groups to their managers.\';
+			COMMENT ON COLUMN public.tbl_gruppe_manager.gruppe_kurzbz IS \'Name of group\';
+			COMMENT ON COLUMN public.tbl_gruppe_manager.uid IS \'User id of group manager\';
+
+			CREATE SEQUENCE public.seq_gruppe_manager_gruppe_manager_id
+				START WITH 1
+				INCREMENT BY 1
+				NO MINVALUE
+				NO MAXVALUE
+				CACHE 1;
+
+			ALTER TABLE public.tbl_gruppe_manager ALTER COLUMN gruppe_manager_id SET DEFAULT nextval(\'public.seq_gruppe_manager_gruppe_manager_id\'::regclass);
+
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_gruppe_manager_gruppe_manager_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_gruppe_manager_gruppe_manager_id TO fhcomplete;
+
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT pk_gruppe_manager PRIMARY KEY (gruppe_manager_id);
+
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT fk_gruppe_manager_gruppe_kurzbz FOREIGN KEY (gruppe_kurzbz) REFERENCES public.tbl_gruppe(gruppe_kurzbz) ON UPDATE CASCADE ON DELETE CASCADE;
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT fk_gruppe_manager_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT uk_gruppe_manager_gruppe_kurzbz_uid UNIQUE (gruppe_kurzbz, uid);';
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe_manager: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_gruppe_manager table created';
+
+	$qry = 'GRANT SELECT ON TABLE public.tbl_gruppe_manager TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe_manager: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.tbl_gruppe_manager';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE public.tbl_gruppe_manager TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe_manager: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.tbl_gruppe_manager';
+}
+
+// Add permission for managing user groups
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/gruppenmanager';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/gruppenmanager', 'Manager einer Gruppe werden und die Gruppe verwalten');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/gruppenmanager<br>';
+	}
+}
+
 // NOTE(chris): Add "Template" to "Lehrtyp"
 if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrtyp WHERE bezeichnung = 'Template';"))
 {

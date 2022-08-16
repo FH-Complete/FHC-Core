@@ -119,6 +119,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 30,
 					'requiredPermissions' => 'system/issues_verwalten:r'
+				),
+				'gruppenmanagement' => array(
+					'link' => site_url('person/Gruppenmanagement'),
+					'description' => 'Gruppenmanagement',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'lehre/gruppenmanager:r'
 				)
 			)
 		),
