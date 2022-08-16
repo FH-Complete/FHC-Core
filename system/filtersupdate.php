@@ -927,6 +927,7 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
 					{"name": "Person Zuständigkeiten"},
 					{"name": "Organisationseinheit Zuständigkeiten"}
 				],
@@ -963,6 +964,7 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
 					{"name": "Person Zuständigkeiten"},
 					{"name": "Organisationseinheit Zuständigkeiten"}
 				],
@@ -995,6 +997,7 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
 					{"name": "Verarbeitet von"},
 					{"name": "Verarbeitet am"}
 				],

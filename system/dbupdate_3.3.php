@@ -6126,6 +6126,20 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservic
 	}
 }
 
+// Add column melde_studiengang_kz to public.tbl_studiengang and prefill values
+if (!$result = @$db->db_query("SELECT melde_studiengang_kz FROM public.tbl_studiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melde_studiengang_kz varchar(32);
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NULL;
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT (SELECT lpad(erhalter_kz::text, 3, '0') FROM public.tbl_erhalter) || lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NOT NULL;
+			COMMENT ON COLUMN public.tbl_studiengang.melde_studiengang_kz IS 'Studiengangskennzahl, mit der der Studiengang gemeldet wird (z.B. Bismeldung)'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_studiengang: Neue Spalte melde_studiengang_kz hinzugefuegt.';
+}
+
 // ADD COLUMN insertamum to system.tbl_fehler_zustaendigkeiten
 if(!@$db->db_query("SELECT insertamum FROM system.tbl_fehler_zustaendigkeiten LIMIT 1"))
 {
@@ -6239,6 +6253,89 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
 			echo ' system.tbl_berechtigung: Added permission for lehre/gruppenmanager<br>';
+	}
+}
+
+// NOTE(chris): Add "Template" to "Lehrtyp"
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrtyp WHERE bezeichnung = 'Template';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_lehrtyp(lehrtyp_kurzbz, bezeichnung) VALUES('tpl', 'Template');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_lehrtyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_lehrtyp: Added "Template"';
+	}
+}
+
+// NOTE(chris): Add Column "lehrveranstaltung_template_id" in tbl_lehrveranstaltung
+if(!$result = @$db->db_query("SELECT lehrveranstaltung_template_id FROM lehre.tbl_lehrveranstaltung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lehrveranstaltung_template_id integer;
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD CONSTRAINT fk_lehrveranstaltung_template FOREIGN KEY (lehrveranstaltung_template_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_lehrveranstaltung: Spalte lehrveranstaltung_template_id hinzugefuegt';
+}
+
+// NOTE(chris): Add Webservice Rights for lehrveranstaltung::loadTemplates
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicerecht WHERE berechtigung_kurzbz='soap/studienordnung' AND methode = 'loadTemplates' AND klasse = 'lehrveranstaltung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, insertamum, insertvon, klasse) VALUES('soap/studienordnung', 'loadTemplates', now(), 'checksystem', 'lehrveranstaltung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicerecht '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_webservicerecht: soap/studienordnung/loadTemplates->lehrveranstaltung hinzugefügt';
+	}
+}
+
+// NOTE(chris): Add Webservice Rights for lehrveranstaltung::loadTemplateByName
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicerecht WHERE berechtigung_kurzbz='soap/studienordnung' AND methode = 'loadTemplateByName' AND klasse = 'lehrveranstaltung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, insertamum, insertvon, klasse) VALUES('soap/studienordnung', 'loadTemplateByName', now(), 'checksystem', 'lehrveranstaltung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicerecht '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_webservicerecht: soap/studienordnung/loadTemplateByName->lehrveranstaltung hinzugefügt';
+	}
+}
+
+// Add permission for avoiding checks when saving prestudentstatus
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/keine_studstatuspruefung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/keine_studstatuspruefung', 'Ermöglicht Umgehen der Checks beim Speichern der Presstudentstatus');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'system.tbl_berechtigung: Added permission for student/keine_studstatuspruefung<br>';
+
+	}
+}
+
+// Grant SELECT to bis.tbl_gsprogramm for web-user
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_gsprogramm' AND table_schema='bis' AND grantee='web' AND privilege_type in ('SELECT')"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT SELECT ON bis.tbl_gsprogramm TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>tbl_gsprogramm Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted SELECT privileges to web for bis.tbl_gsprogramm';
 	}
 }
 
@@ -6366,7 +6463,7 @@ $tabellen=array(
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrmodus" => array("lehrmodus_kurzbz","bezeichnung_mehrsprachig","aktiv"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz","lehrveranstaltung_template_id"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
@@ -6477,7 +6574,7 @@ $tabellen=array(
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant","foerderrelevant","standort_code"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant","foerderrelevant","standort_code","melde_studiengang_kz"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
