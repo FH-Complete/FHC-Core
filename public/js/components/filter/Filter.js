@@ -35,7 +35,7 @@ export const CoreFilterCmpt = {
 		tabulatorOptions: Object,
 		tabulatorEvents: Array
 	},
-	data() {
+	data: function() {
 		return {
 			// Tabulator
 			tabulator: null,
@@ -57,10 +57,10 @@ export const CoreFilterCmpt = {
 			fetchCmptDataFetched: null
 		};
 	},
-	created() {
+	created: function() {
 		this.getFilter(); // get the filter data
 	},
-	updated() {
+	updated: function() {
 		//
 		let dataset = JSON.parse(JSON.stringify(this.dataset));
 		let datasetMetadata = JSON.parse(JSON.stringify(this.datasetMetadata));
@@ -226,22 +226,21 @@ export const CoreFilterCmpt = {
 			this.fieldsToDisplay = arrayFieldsToDisplay;
 		},
 		/**
-		 *
+		 * Set the menu
 		 */
 		setSideMenu: function(data) {
-			// Set the menu
 			let filters = data.sideMenu.filters;
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
 
-			for (let filtersCount = 0; filtersCount< filters.length; filtersCount++)
+			for (let filtersCount = 0; filtersCount < filters.length; filtersCount++)
 			{
 				let link = filters[filtersCount].link;
 
 				if (link == null) link = '#';
 
 				filtersArray[filtersArray.length] = {
-					link: link + filters[filtersCount].filterId,
+					link: link + filters[filtersCount].filter_id,
 					description: filters[filtersCount].desc,
 					sort: filtersCount,
 					onClickCall: this.handlerGetFilterById
@@ -312,6 +311,13 @@ export const CoreFilterCmpt = {
 				{
 					if (filterFieldDivs[i].children[j].name != null)
 					{
+						// Condition
+						if (filterFieldDivs[i].children[j].name == 'condition' && filterFieldDivs[i].children[j].value == "")
+						{
+							alert("Please fill all the filter options");
+							return;
+						}
+
 						// Name
 						if (filterFieldDivs[i].children[j].name == 'fieldName')
 						{
@@ -411,6 +417,43 @@ export const CoreFilterCmpt = {
 				},
 				this.render
 			);
+		},
+		handlerDragOver: function(event) {
+			let draggedFieldToDisplay = event.currentTarget;
+			let fieldsToDisplayDivs = document.getElementsByClassName('filter-dnd-object');
+			let filterFilterOptions = document.getElementsByClassName('filter-filter-options')[0];
+
+			// For each draggable element
+			for (let i = 0; i < fieldsToDisplayDivs.length; i++)
+			{
+				let fieldToDisplayDiv = fieldsToDisplayDivs[i]; //
+
+				// If the dragged element is not the same element in the loop
+				if (draggedFieldToDisplay != fieldToDisplayDiv)
+				{
+					fieldToDisplayDiv.classList.remove("selection-after");
+					fieldToDisplayDiv.classList.remove("selection-before");
+
+					let fieldToDisplayDivCenter = (filterFilterOptions.offsetLeft + fieldToDisplayDiv.offsetLeft + fieldToDisplayDiv.offsetWidth) / 2;
+
+					if (event.pageX > filterFilterOptions.offsetLeft + fieldToDisplayDiv.offsetLeft
+						&& event.pageX < filterFilterOptions.offsetLeft + fieldToDisplayDiv.offsetLeft + fieldToDisplayDiv.offsetWidth)
+					{
+						if (event.pageX > fieldToDisplayDivCenter)
+						{
+							fieldToDisplayDiv.classList.add("selection-after");
+							fieldToDisplayDiv.classList.remove("selection-before");
+						}
+						else if (event.pageX < fieldToDisplayDivCenter)
+						{
+							fieldToDisplayDiv.classList.add("selection-before");
+							fieldToDisplayDiv.classList.remove("selection-after");
+						}
+					}
+				}
+			}
+		},
+		handlerOnDrop: function() {
 		}
 	},
 	template: `
@@ -431,7 +474,8 @@ export const CoreFilterCmpt = {
 				<div class="filter-options-div">
 					<div class="filter-dnd-area">
 						<template v-for="fieldToDisplay in fieldsToDisplay">
-							<span class="filter-dnd-object">
+							<div
+								class="filter-dnd-object" draggable="true" @dragover="handlerDragOver">
 								{{ fieldToDisplay}}
 								<button
 									type="button"
@@ -439,7 +483,7 @@ export const CoreFilterCmpt = {
 									v-bind:field-to-remove="fieldToDisplay"
 									@click=handlerRemoveSelectedField>
 								</button>
-							</span>
+							</div>
 						</template>
 					</div>
 					<select class="form-select form-select-sm" @change=handlerAddSelectedField>
@@ -465,7 +509,7 @@ export const CoreFilterCmpt = {
 							<div v-if="filterField.type.toLowerCase().indexOf('int') >= 0" class="input-group mb-3">
 								<input type="hidden" name="fieldName" v-bind:value="filterField.name">
 								<span class="input-group-text">{{ filterField.name}}</span>
-								<select class="form-select form-select-sm" name="operation">
+								<select class="form-select form-select-sm" name="operation" v-model="filterField.operation">
 									<option value="equal">Equal</option>
 									<option value="nequal">Not equal</option>
 									<option value="gt">Greater then</option>
@@ -488,7 +532,7 @@ export const CoreFilterCmpt = {
 								class="input-group mb-3">
 								<input type="hidden" name="fieldName" v-bind:value="filterField.name">
 								<span class="input-group-text">{{ filterField.name}}</span>
-								<select class="form-select form-select-sm" name="operation">
+								<select class="form-select form-select-sm" name="operation" v-model="filterField.operation">
 									<option value="contains">Contains</option>
 									<option value="ncontains">Does not contain</option>
 								</select>
@@ -508,14 +552,14 @@ export const CoreFilterCmpt = {
 								class="input-group mb-3">
 								<input type="hidden" name="fieldName" v-bind:value="filterField.name">
 								<span class="input-group-text">{{ filterField.name}}</span>
-								<select class="form-select form-select-sm" name="operation">
+								<select class="form-select form-select-sm" name="operation" v-model="filterField.operation">
 									<option value="gt">Greater then</option>
 									<option value="lt">Less then</option>
 									<option value="set">Is set</option>
 									<option value="nset">Is not set</option>
 								</select>
 								<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
-								<select class="form-select form-select-sm" name="option">
+								<select class="form-select form-select-sm" name="option" v-model="filterField.option">
 									<option value="minutes">Minutes</option>
 									<option value="hours">Hours</option>
 									<option value="days">Days</option>

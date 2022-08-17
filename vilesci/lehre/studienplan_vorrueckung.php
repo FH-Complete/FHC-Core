@@ -31,10 +31,12 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('lehre/studienordnung', null, 's'))
+if(!$rechte->isBerechtigt('lehre/studienplan', null, 's'))
 {
 	die($rechte->errormsg);
 }
+
+$berechtigteStgKz = $rechte->getStgKz('lehre/studienplan');
 
 echo '<!DOCTYPE HTML>
 <html>
@@ -138,7 +140,7 @@ echo '</form>';
 
 if(isset($_POST['vorruecken']) && !empty($studienplaene) && $studiensemester_kurzbz_to != '')
 {
-	if(!$rechte->isBerechtigt('lehre/studienordnung', null, 'suid'))
+	if(!$rechte->isBerechtigt('lehre/studienplan', null, 'sui'))
 	{
 		die($rechte->errormsg);
 	}
@@ -193,6 +195,7 @@ if(isset($_POST['show']) && $studiensemester_kurzbz_from != '' && $studiensemest
 							AND studiengang_kz = sto.studiengang_kz
 						)
 					AND tbl_studiengang.typ IN ('b', 'm', 'l')
+					AND tbl_studiengang.studiengang_kz IN (".implode(',',$berechtigteStgKz).")
 					AND studienplan.onlinebewerbung_studienplan = true";
 	if (substr($studiensemester_kurzbz_from,0,2) == 'SS')
 	{
@@ -244,7 +247,7 @@ if(isset($_POST['show']) && $studiensemester_kurzbz_from != '' && $studiensemest
 							</tr>';
 			}
 			echo "</tbody></table>";
-			if ($rechte->isBerechtigt('lehre/studienordnung', null, 'suid'))
+			if ($rechte->isBerechtigt('lehre/studienplan', null, 'sui'))
 			{
 				echo '<button type="submit" name="vorruecken">Ausgewählte Studienpläne vorrücken</button>';
 			}

@@ -969,10 +969,9 @@ class konto extends basis_db
 	{
 		$qry = "SELECT betrag
 				FROM public.tbl_konto
-				JOIN public.tbl_benutzer benutzer USING(person_id)
 				WHERE person_id IN (".$this->implode4SQL(array_filter($person_ids)).")
 				AND studiensemester_kurzbz = ".$this->db_add_param($stsem)."
-				AND buchungstyp_kurzbz = ".$this->db_add_param($typ)." 
+				AND buchungstyp_kurzbz = ".$this->db_add_param($typ)."
 				GROUP BY buchungsnr";
 
 		if ($result = $this->db_query($qry))

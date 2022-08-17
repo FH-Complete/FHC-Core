@@ -37,6 +37,7 @@ require_once('../../include/gebiet.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
 require_once '../../include/reihungstest.class.php';
+require_once '../../include/pruefling.class.php';
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -156,6 +157,12 @@ echo '
 <?php
 if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));
+
+$pruefling = new pruefling();
+$pruefling->load($_SESSION['pruefling_id']);
+
+if ($pruefling->gesperrt === 't')
+	die("<script>document.location.href='prueflinggesperrt.php';</script>");
 
 $gebiet = new gebiet($gebiet_id);
 

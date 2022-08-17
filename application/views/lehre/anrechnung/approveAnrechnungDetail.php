@@ -44,7 +44,8 @@ $this->load->view(
                 'empfehlungsanforderungWirklichZuruecknehmen',
                 'erfolgreichZurueckgenommen',
                 'empfehlungPositivConfirmed',
-                'empfehlungNegativConfirmed'
+                'empfehlungNegativConfirmed',
+                'anrechnungEctsTooltipTextBeiUeberschreitung'
             )
 		),
 		'customCSSs' => array(
@@ -59,7 +60,6 @@ $this->load->view(
 );
 ?>
 
-<body>
 <div id="page-wrapper">
     <div class="container-fluid">
         <!-- header  -->
@@ -124,11 +124,27 @@ $this->load->view(
 											
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'ects'); ?></th>
-												<td><?php echo $antragData->ects ?></td>
+                                                <td colspan="3"><span id="ects"><?php echo $antragData->ects ?></span></td>
 											</tr>
+                                            <tr>
+                                                <th class="col-xs-4">
+                                                    <?php echo $this->p->t('anrechnung', 'bisherAngerechneteEcts'); ?>
+                                                    <span class="approveAnrechnungDetail-anrechnungEctsTooltip"
+                                                          data-toggle="tooltip" data-placement="right"
+                                                          title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
+													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+												</span>
+                                                </th>
+                                                <td colspan="3">
+                                                    Total: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
+                                                    [Schulisch: <span id="sumEctsSchulisch" value="<?php echo $antragData->sumEctsSchulisch ?>"><?php echo $antragData->sumEctsSchulisch ?></span> /
+                                                    Beruflich: <span id="sumEctsBeruflich" value="<?php echo $antragData->sumEctsBeruflich ?>"><?php echo $antragData->sumEctsBeruflich ?></span> ]
+                                                     <span id="sumEctsMsg"></span>
+                                                </td>
+                                            </tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('lehre', 'lektorInnen'); ?></th>
-												<td>
+												<td colspan="3">
 													<?php $len = count($antragData->lektoren) - 1 ?>
 													<?php foreach ($antragData->lektoren as $key => $lektor): ?>
 														<?php echo $lektor->vorname . ' ' . $lektor->nachname;
@@ -138,19 +154,23 @@ $this->load->view(
 											</tr>
 											<tr>
 												<th class="col-xs-4"><?php echo ucfirst($this->p->t('global', 'zgv')); ?></th>
-												<td><?php echo $antragData->zgv ?></td>
+												<td colspan="3"><?php echo $antragData->zgv ?></td>
 											</tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></th>
-												<td><?php echo $anrechnungData->anmerkung ?></td>
+												<td colspan="3"><?php echo $anrechnungData->anmerkung ?></td>
 											</tr>
 											<tr>
 												<th class="col-xs-4"><?php echo $this->p->t('anrechnung', 'nachweisdokumente'); ?></th>
-												<td>
+												<td colspan="3">
 													<a href="<?php echo current_url() . '/download?dms_id=' . $anrechnungData->dms_id; ?>"
 													   target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?></a>
 												</td>
 											</tr>
+                                            <tr>
+                                                <th class="col-xs-4"><?php echo $this->p->t('global', 'begruendung'); ?></th>
+                                                <td colspan="3"><span id="begruendung_id" data-begruendung_id="<?php echo $anrechnungData->begruendung_id ?>" ><?php echo $anrechnungData->begruendung ?></span></td>
+                                            </tr>
 											</tbody>
 										</table>
 									</div>
@@ -178,8 +198,10 @@ $this->load->view(
 									<div class="row">
 										<div class="col-lg-6">
 											<form id="form-empfehlung">
-												<input type="hidden" name="anrechnung_id"
-													   value="<?php echo $anrechnungData->anrechnung_id ?>">
+												<input type="hidden" name="anrechnung_id" value="<?php echo $anrechnungData->anrechnung_id ?>">
+                                                <input type="hidden" name="ects" value="<?php echo $antragData->ects ?>">
+                                                <input type="hidden" name="sumEctsSchulisch" value="<?php echo $antragData->sumEctsSchulisch ?>">
+                                                <input type="hidden" name="sumEctsBeruflich" value="<?php echo $antragData->sumEctsBeruflich ?>">
 												<table class="table table-bordered table-condensed table-fixed">
 													<tbody>
 													<tr>
@@ -291,38 +313,44 @@ $this->load->view(
 								<div style="display: none" id="approveAnrechnungDetail-begruendung-panel">
 									<div>
 										<h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'genehmigungNegativQuestion'); ?></h4>
-										<b>&nbsp;<?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></b><br><br>
-										<ul>
-											<li>
+                                        <ul class="list-group">
+											<li class="list-group-item">
 												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativPruefungNichtMoeglich'); ?></span>
-												<span class="btn-copyIntoTextarea" data-toggle="tooltip"
+												<span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
 													  data-placement="right"
 													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-													<i class="fa fa-clipboard" aria-hidden="true"></i>
+													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
 											</li>
-											<li>
+											<li class="list-group-item">
 												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertig'); ?></span>
-												<span class="btn-copyIntoTextarea" data-toggle="tooltip"
+												<span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
 													  data-placement="right"
 													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-													<i class="fa fa-clipboard" aria-hidden="true"></i>
+													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
 											</li>
-											<li>
+                                            <li class="list-group-item">
+                                                <span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEctsHoechstgrenzeUeberschritten'); ?></span>
+                                                <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
+                                                      data-placement="right"
+                                                      title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+												</span>
+                                            </li>
+											<li class="list-group-item">
 												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEmpfehlungstextUebernehmen'); ?></span>
-												<span id="empfehlungstextUebernehmen" class="btn-copyIntoTextarea" data-toggle="tooltip"
+												<span id="empfehlungstextUebernehmen" class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
 													  data-placement="right"
 													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-													<i class="fa fa-clipboard" aria-hidden="true"></i>
+													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
 											</li>
-											<li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
 										</ul>
-										<br>
 										<textarea class="form-control" name="begruendung"
 												  id="approveAnrechnungDetail-begruendung"
-												  rows="2" required></textarea>
+												  rows="2"
+                                                  placeholder="<?php echo $this->p->t('anrechnung', 'textUebernehmenOderEigenenBegruendungstext'); ?>" required></textarea>
 									</div>
 									<br>
 									<!-- Action Button 'Abbrechen'-->
@@ -399,6 +427,5 @@ $this->load->view(
 
     </div><!--end container-fluid-->
 </div><!--end page-wrapper-->
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

@@ -255,6 +255,22 @@
 				 LIMIT 1
 			) AS "ZGVMNation",
 			(
+				SELECT upper(tbl_nation.nationengruppe_kurzbz)
+				FROM public.tbl_prestudent ps
+				JOIN bis.tbl_nation ON ps.zgvnation = tbl_nation.nation_code
+				WHERE ps.person_id = p.person_id
+				ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
+				LIMIT 1
+			) AS "ZGVNationGruppe",
+			(
+				SELECT upper(tbl_nation.nationengruppe_kurzbz)
+				FROM public.tbl_prestudent ps
+				JOIN bis.tbl_nation ON ps.zgvmanation = tbl_nation.nation_code
+				WHERE ps.person_id = p.person_id
+				ORDER BY ps.zgvmanation DESC NULLS LAST, ps.prestudent_id DESC
+				LIMIT 1
+			) AS "ZGVMNationGruppe",
+			(
 				SELECT tbl_organisationseinheit.bezeichnung
 				FROM public.tbl_benutzerfunktion 
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
@@ -361,6 +377,8 @@
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
+			'ZGV Gruppe BA',
+			'ZGV Gruppe MA',
 			'InfoCenter Mitarbeiter'
 		),
 		'formatRow' => function($datasetRaw) {
@@ -450,6 +468,16 @@
 			if ($datasetRaw->{'ZGVMNation'} == null)
 			{
 				$datasetRaw->{'ZGVMNation'} = '-';
+			}
+
+			if ($datasetRaw->{'ZGVNationGruppe'} == null)
+			{
+				$datasetRaw->{'ZGVNationGruppe'} = '-';
+			}
+
+			if ($datasetRaw->{'ZGVMNationGruppe'} == null)
+			{
+				$datasetRaw->{'ZGVMNationGruppe'} = '-';
 			}
 
 			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)

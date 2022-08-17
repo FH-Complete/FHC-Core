@@ -119,6 +119,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 30,
 					'requiredPermissions' => 'system/issues_verwalten:r'
+				),
+				'gruppenmanagement' => array(
+					'link' => site_url('person/Gruppenmanagement'),
+					'description' => 'Gruppenmanagement',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'lehre/gruppenmanager:r'
 				)
 			)
 		),
@@ -246,6 +253,17 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
 		'icon' => '',
 		'sort' => 1,
 		'requiredPermissions' => array('lehre/lehrauftrag_erteilen:r')
+	)
+);
+
+$config['navigation_menu']['system/issues/Issues/*'] = array(
+	'fehlerzustaendigkeiten' => array(
+		'link' => site_url('system/issues/IssuesZustaendigkeiten'),
+		'description' => 'Fehler Zuständigkeiten',
+		'icon' => 'cogs',
+		'sort' => 100,
+		'target' => '_blank',
+		'requiredPermissions' => array('admin:rw')
 	)
 );
 

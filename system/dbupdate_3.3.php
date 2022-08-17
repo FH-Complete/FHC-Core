@@ -2990,6 +2990,19 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+
+// Spalte gesperrt in testtool.tbl_pruefling
+if(!$result = @$db->db_query("SELECT gesperrt FROM testtool.tbl_pruefling LIMIT 1;"))
+{
+	$qry = "ALTER TABLE testtool.tbl_pruefling ADD COLUMN gesperrt boolean NOT NULL DEFAULT false;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_pruefling: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>testtool.tbl_pruefling: Spalte gesperrt hinzugefuegt!<br>';
+}
+
+
 // Kategorisierung von Services
 if(!$result = @$db->db_query("SELECT * FROM public.tbl_servicekategorie LIMIT 1"))
 {
@@ -5156,6 +5169,19 @@ if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHE
 	}
 }
 
+// Added Bezeichnung 'Hochschulzeugnis' to Anrechnungbegruendung
+if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHERE bezeichnung = 'Hochschulzeugnis';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_anrechnung_begruendung (bezeichnung) VALUES('Hochschulzeugnis');";
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_anrechnung_begruendung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' lehre.tbl_anrechnung_begruendung: Added bezeichnung "Hochschulzeugnis" <br>';
+	}
+}
+
 // Add permission to apply for Anrechnung
 if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/anrechnung_beantragen';"))
 {
@@ -6113,6 +6139,42 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_webservic
 	}
 }
 
+// Add column melde_studiengang_kz to public.tbl_studiengang and prefill values
+if (!$result = @$db->db_query("SELECT melde_studiengang_kz FROM public.tbl_studiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN melde_studiengang_kz varchar(32);
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NULL;
+			UPDATE public.tbl_studiengang stg SET melde_studiengang_kz = (SELECT (SELECT lpad(erhalter_kz::text, 3, '0') FROM public.tbl_erhalter) || lpad(abs(studiengang_kz)::text, 4, '0') FROM tbl_studiengang WHERE studiengang_kz = stg.studiengang_kz) WHERE melderelevant AND lgartcode IS NOT NULL;
+			COMMENT ON COLUMN public.tbl_studiengang.melde_studiengang_kz IS 'Studiengangskennzahl, mit der der Studiengang gemeldet wird (z.B. Bismeldung)'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_studiengang: Neue Spalte melde_studiengang_kz hinzugefuegt.';
+}
+
+// ADD COLUMN insertamum to system.tbl_fehler_zustaendigkeiten
+if(!@$db->db_query("SELECT insertamum FROM system.tbl_fehler_zustaendigkeiten LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD COLUMN insertamum timestamp DEFAULT now();";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte insertamum in system.tbl_fehler_zustaendigkeiten hinzugefügt';
+}
+
+// ADD COLUMN insertvon to system.tbl_fehler_zustaendigkeiten
+if(!@$db->db_query("SELECT insertvon FROM system.tbl_fehler_zustaendigkeiten LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_fehler_zustaendigkeiten ADD COLUMN insertvon varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_fehler_zustaendigkeiten '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte insertvon in system.tbl_fehler_zustaendigkeiten hinzugefügt';
+}
+
 // Insert postive Zeitsperre 'Zeitverfuegbarkeit' to tbl_zeitsperretyp
 if($result = @$db->db_query("SELECT 1 FROM campus.tbl_zeitsperretyp WHERE zeitsperretyp_kurzbz = 'ZVerfueg';"))
 {
@@ -6138,6 +6200,324 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
 			echo ' system.tbl_berechtigung: Added permission for lehre/zeitverfuegbarkeit<br>';
+	}
+}
+
+// Creates table public.tbl_gruppe_manager if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1'))
+{
+	$qry = 'CREATE TABLE public.tbl_gruppe_manager (
+				gruppe_manager_id integer,
+				gruppe_kurzbz varchar(32) NOT NULL,
+				uid varchar(32) NOT NULL,
+				insertamum timestamp DEFAULT NOW(),
+				insertvon varchar(32)
+			);
+
+			COMMENT ON TABLE public.tbl_gruppe_manager IS \'Table to save assignments groups to their managers.\';
+			COMMENT ON COLUMN public.tbl_gruppe_manager.gruppe_kurzbz IS \'Name of group\';
+			COMMENT ON COLUMN public.tbl_gruppe_manager.uid IS \'User id of group manager\';
+
+			CREATE SEQUENCE public.seq_gruppe_manager_gruppe_manager_id
+				START WITH 1
+				INCREMENT BY 1
+				NO MINVALUE
+				NO MAXVALUE
+				CACHE 1;
+
+			ALTER TABLE public.tbl_gruppe_manager ALTER COLUMN gruppe_manager_id SET DEFAULT nextval(\'public.seq_gruppe_manager_gruppe_manager_id\'::regclass);
+
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_gruppe_manager_gruppe_manager_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_gruppe_manager_gruppe_manager_id TO fhcomplete;
+
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT pk_gruppe_manager PRIMARY KEY (gruppe_manager_id);
+
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT fk_gruppe_manager_gruppe_kurzbz FOREIGN KEY (gruppe_kurzbz) REFERENCES public.tbl_gruppe(gruppe_kurzbz) ON UPDATE CASCADE ON DELETE CASCADE;
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT fk_gruppe_manager_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			ALTER TABLE public.tbl_gruppe_manager ADD CONSTRAINT uk_gruppe_manager_gruppe_kurzbz_uid UNIQUE (gruppe_kurzbz, uid);';
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe_manager: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_gruppe_manager table created';
+
+	$qry = 'GRANT SELECT ON TABLE public.tbl_gruppe_manager TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe_manager: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.tbl_gruppe_manager';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE public.tbl_gruppe_manager TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe_manager: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.tbl_gruppe_manager';
+}
+
+// Add permission for managing user groups
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/gruppenmanager';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/gruppenmanager', 'Manager einer Gruppe werden und die Gruppe verwalten');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/gruppenmanager<br>';
+	}
+}
+
+// NOTE(chris): Add "Template" to "Lehrtyp"
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrtyp WHERE bezeichnung = 'Template';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_lehrtyp(lehrtyp_kurzbz, bezeichnung) VALUES('tpl', 'Template');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_lehrtyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_lehrtyp: Added "Template"';
+	}
+}
+
+// NOTE(chris): Add Column "lehrveranstaltung_template_id" in tbl_lehrveranstaltung
+if(!$result = @$db->db_query("SELECT lehrveranstaltung_template_id FROM lehre.tbl_lehrveranstaltung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lehrveranstaltung_template_id integer;
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD CONSTRAINT fk_lehrveranstaltung_template FOREIGN KEY (lehrveranstaltung_template_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_lehrveranstaltung: Spalte lehrveranstaltung_template_id hinzugefuegt';
+}
+
+// NOTE(chris): Add Webservice Rights for lehrveranstaltung::loadTemplates
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicerecht WHERE berechtigung_kurzbz='soap/studienordnung' AND methode = 'loadTemplates' AND klasse = 'lehrveranstaltung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, insertamum, insertvon, klasse) VALUES('soap/studienordnung', 'loadTemplates', now(), 'checksystem', 'lehrveranstaltung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicerecht '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_webservicerecht: soap/studienordnung/loadTemplates->lehrveranstaltung hinzugefügt';
+	}
+}
+
+// NOTE(chris): Add Webservice Rights for lehrveranstaltung::loadTemplateByName
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicerecht WHERE berechtigung_kurzbz='soap/studienordnung' AND methode = 'loadTemplateByName' AND klasse = 'lehrveranstaltung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, insertamum, insertvon, klasse) VALUES('soap/studienordnung', 'loadTemplateByName', now(), 'checksystem', 'lehrveranstaltung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicerecht '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_webservicerecht: soap/studienordnung/loadTemplateByName->lehrveranstaltung hinzugefügt';
+	}
+}
+
+// Add permission for avoiding checks when saving prestudentstatus
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/keine_studstatuspruefung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/keine_studstatuspruefung', 'Ermöglicht Umgehen der Checks beim Speichern der Presstudentstatus');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'system.tbl_berechtigung: Added permission for student/keine_studstatuspruefung<br>';
+
+	}
+}
+
+// Neue Funktion get_ects_summe_schulisch
+if(!@$db->db_query("SELECT public.get_ects_summe_schulisch('', 0, 0)"))
+{
+	$qry = 'CREATE FUNCTION public.get_ects_summe_schulisch(character varying, integer, integer) RETURNS numeric
+			LANGUAGE plpgsql
+			AS $_$
+				DECLARE var_student_uid ALIAS FOR $1;
+				DECLARE var_prestudent_id ALIAS FOR $2;
+				DECLARE var_studiengang_kz ALIAS FOR $3;
+				DECLARE var_einstiegsausbildungssemester integer;
+				DECLARE var_einstiegsstudiensemester_kurzbz varchar(32);
+				DECLARE var_einstiegsorgform_kurzbz varchar(32);
+				DECLARE rec_quereinstiegs_studiensemester RECORD;
+				DECLARE sum_quereinstiegs_ects numeric(4, 1) := 0;
+				DECLARE sum_schulische_ects numeric(4, 1) := 0;
+				
+							
+				BEGIN
+				
+				-- IF STUDENT IS QUEREINSTEIGER, GET ECTS SUMME OF ANGERECHNETE SEMESTER
+				-- Get Einstiegssemester 
+				   SELECT INTO var_einstiegsausbildungssemester , var_einstiegsstudiensemester_kurzbz, var_einstiegsorgform_kurzbz  ausbildungssemester, studiensemester_kurzbz, orgform_kurzbz from public.tbl_prestudentstatus 
+				   WHERE prestudent_id = var_prestudent_id 
+				   AND status_kurzbz = \'Student\'
+				   ORDER BY datum, insertamum, ext_id
+				   LIMIT 1;
+				
+				-- If Einstiegssemester > 1 (= Quereinsteiger)
+				IF (var_einstiegsausbildungssemester > 1) THEN
+				-- ...get all Quereinstiegssemester
+				   FOR rec_quereinstiegs_studiensemester IN SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
+					 WHERE ende <= (select start from public.tbl_studiensemester WHERE studiensemester_kurzbz = var_einstiegsstudiensemester_kurzbz )
+					 ORDER BY start DESC
+					 LIMIT (var_einstiegsausbildungssemester -1)
+				-- ...loop the Quereinstiegssemester
+				   LOOP
+				-- ...and sum up ECTS of each Quereinstiegssemester
+					  sum_quereinstiegs_ects = sum_quereinstiegs_ects + (SELECT
+								SUM(tbl_lehrveranstaltung.ects)
+							FROM
+								lehre.tbl_studienplan
+								JOIN lehre.tbl_studienplan_lehrveranstaltung USING (studienplan_id)
+								JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+							WHERE
+								tbl_studienplan.studienplan_id = (
+									SELECT 
+										studienplan_id
+									FROM 
+										lehre.tbl_studienordnung 
+										JOIN lehre.tbl_studienplan USING (studienordnung_id) 
+										JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+										WHERE tbl_studienordnung.studiengang_kz = var_studiengang_kz 
+										AND tbl_studienplan_semester.semester = var_einstiegsausbildungssemester - 1
+										AND tbl_studienplan_semester.studiensemester_kurzbz = rec_quereinstiegs_studiensemester.studiensemester_kurzbz
+										AND tbl_studienplan.orgform_kurzbz = var_einstiegsorgform_kurzbz  
+								
+									LIMIT 1
+								)
+							AND tbl_studienplan_lehrveranstaltung.semester = var_einstiegsausbildungssemester
+							AND studienplan_lehrveranstaltung_id_parent IS NULL -- auf Modulebene
+							AND tbl_studienplan_lehrveranstaltung.export = TRUE);
+				
+							var_einstiegsausbildungssemester = var_einstiegsausbildungssemester - 1;
+				   END LOOP;
+				END IF;
+				
+				   
+				-- GET ECTS SUMME OF ALLE BISHER ANGERECHNETEN LEHRVERANSTALTUNGEN. ANRECHNUNGSGRUND: SCHULISCH.
+				SELECT INTO sum_schulische_ects COALESCE(SUM(ects), 0) FROM (
+									SELECT 
+										lehrveranstaltung_id, studiensemester_kurzbz, ects
+									FROM 
+										lehre.tbl_zeugnisnote 
+										LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz) 
+										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+										JOIN public.tbl_student USING(student_uid)
+									WHERE 
+										tbl_zeugnisnote.note = 6
+										AND student_uid = var_student_uid
+										AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
+										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen 
+                        				AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern) 
+									
+									UNION 
+										
+									SELECT 
+										lehrveranstaltung_id, studiensemester_kurzbz, ects
+									FROM 
+										lehre.tbl_anrechnung 
+										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+										JOIN public.tbl_student USING(prestudent_id)
+									WHERE 
+										genehmigt_von IS NOT NULL
+										AND student_uid = var_student_uid 
+										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen  
+				) lvsangerechnet;
+				
+				-- BUILD ECTS SUMME OF QUEREINSTIEGSSEMESTER- + ANGERECHNETEN LVs-ECTS
+				-- Summe aller bisher schulisch begründet angerechneten LVs + der Quereinstiegssemester
+				sum_schulische_ects = sum_schulische_ects + sum_quereinstiegs_ects;
+								
+				RETURN sum_schulische_ects ;
+				  
+				END;
+				$_$;
+
+			ALTER FUNCTION public.get_ects_summe_schulisch(character varying, integer, integer) OWNER TO fhcomplete;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.get_ects_summe_schulisch(student_uid, prestudent_id, studiengang_kz): '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Funktion <b>public.get_ects_summe_schulisch(student_uid, prestudent_id, studiengang_kz)</b> hinzugefügt';
+}
+
+// Neue Funktion get_ects_summe_beruflich
+if(!@$db->db_query("SELECT public.get_ects_summe_beruflich('')"))
+{
+	$qry = 'CREATE FUNCTION public.get_ects_summe_beruflich(character varying) RETURNS numeric
+			LANGUAGE plpgsql
+			AS $_$
+				DECLARE var_student_uid ALIAS FOR $1;
+				DECLARE sum_berufliche_ects numeric(4, 1) := 0;
+            
+				BEGIN
+				
+					SELECT INTO sum_berufliche_ects COALESCE(SUM(ects), 0) FROM (
+						SELECT 
+							lehrveranstaltung_id, studiensemester_kurzbz, ects
+						FROM 
+							lehre.tbl_zeugnisnote 
+							LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz) 
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+							JOIN public.tbl_student USING(student_uid)
+						WHERE 
+							tbl_zeugnisnote.note = 6
+							AND student_uid = var_student_uid
+							AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
+							AND begruendung_id = 4  -- beruflich
+							AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern)
+						
+						UNION 
+							
+						SELECT 
+							lehrveranstaltung_id, studiensemester_kurzbz, ects
+						FROM 
+							lehre.tbl_anrechnung 
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+							JOIN public.tbl_student USING(prestudent_id)
+						WHERE 
+							genehmigt_von is not null
+							AND student_uid = var_student_uid 
+							AND begruendung_id = 4  -- beruflich
+					) lvsangerechnet;
+					
+				RETURN sum_berufliche_ects;
+				
+				END;
+				$_$;
+
+			ALTER FUNCTION public.get_ects_summe_beruflich(character varying) OWNER TO fhcomplete;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.get_ects_summe_beruflich(student_uid): '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Funktion <b>public.get_ects_summe_beruflich(student_uid)</b> hinzugefügt';
+}
+
+// Grant SELECT to bis.tbl_gsprogramm for web-user
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_gsprogramm' AND table_schema='bis' AND grantee='web' AND privilege_type in ('SELECT')"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT SELECT ON bis.tbl_gsprogramm TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>tbl_gsprogramm Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted SELECT privileges to web for bis.tbl_gsprogramm';
 	}
 }
 
@@ -6265,7 +6645,7 @@ $tabellen=array(
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrmodus" => array("lehrmodus_kurzbz","bezeichnung_mehrsprachig","aktiv"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz","lehrveranstaltung_template_id"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
@@ -6376,7 +6756,7 @@ $tabellen=array(
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant","foerderrelevant","standort_code"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung","melderelevant","foerderrelevant","standort_code","melde_studiengang_kz"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
@@ -6396,7 +6776,7 @@ $tabellen=array(
 	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile","bezeichnung_mehrsprachig", "offsetpunkte"),
 	"testtool.tbl_kategorie"  => array("kategorie_kurzbz","gebiet_id"),
 	"testtool.tbl_kriterien"  => array("gebiet_id","kategorie_kurzbz","punkte","typ"),
-	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester"),
+	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester", "gesperrt"),
 	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","punkte","insertamum","insertvon","updateamum","updatevon","aktiv"),
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
@@ -6409,7 +6789,7 @@ $tabellen=array(
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
 	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app"),
 	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
-	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz"),
+	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz", "insertamum", "insertvon"),
 	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","behebung_parameter","insertvon","insertamum","updatevon","updateamum"),
 	"system.tbl_issue_status" => array("status_kurzbz","bezeichnung_mehrsprachig"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
