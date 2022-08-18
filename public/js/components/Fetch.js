@@ -65,9 +65,9 @@ export const CoreFetchCmpt = {
 				if (apiFunctionResult instanceof Promise)
 				{
 					apiFunctionResult
-						.then(this.success) // on success
-						.catch(this.error) // on error
-						.then(this.finally); // finally in any case
+						.then(this.successHandler) // on success
+						.catch(this.errorHandler) // on error
+						.finally(this.finallyHandler); // finally in any case
 				}
 				else // otherwise display an error
 				{
@@ -90,19 +90,19 @@ export const CoreFetchCmpt = {
 		/**
 		 *
 		 */
-		success: function(response) {
+		successHandler: function(response) {
 			this.$emit('dataFetched', response.data); // trigger the event dataFetched
 		},
 		/**
 		 *
 		 */
-		error: function(error) {
+		errorHandler: function(error) {
 			this.setError(error.message);
 		},
 		/**
 		 *
 		 */
-		finally: function() {
+		finallyHandler: function() {
 			this.loading = false; // loading ended
 		}
 	},
