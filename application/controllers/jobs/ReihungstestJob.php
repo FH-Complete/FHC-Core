@@ -437,7 +437,7 @@ class ReihungstestJob extends JOB_Controller
 								(
 									$sender_id,
 									$applicant->prestudent_id,
-									'infocenter',
+									null,
 									'Sancho_RemindApplicantsOfTest',
 									$mailcontent_data_arr
 								);
