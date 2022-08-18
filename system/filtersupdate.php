@@ -1105,8 +1105,10 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Alias"},
+					{"name": "Aktiv"},
 					{"name": "Raum"},
-					{"name": "Geschlecht"}
+					{"name": "Geschlecht"},
+					{"name": "StdKst"}
 				],
 				"filters": [
 					{                              
