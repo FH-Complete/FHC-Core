@@ -42,7 +42,6 @@ export const CoreFilterCmpt = {
 
 			// FilterCmpt properties
 			fields: null,
-			fieldsToDisplay: null,
 			dataset: null,
 			datasetMetadata: null,
 			selectedFields: null,
@@ -63,55 +62,50 @@ export const CoreFilterCmpt = {
 	updated: function() {
 		//
 		let dataset = JSON.parse(JSON.stringify(this.dataset));
-		let datasetMetadata = JSON.parse(JSON.stringify(this.datasetMetadata));
-		let fieldsToDisplay = JSON.parse(JSON.stringify(this.fieldsToDisplay));
+		let fields = JSON.parse(JSON.stringify(this.fields));
 		let selectedFields = JSON.parse(JSON.stringify(this.selectedFields));
 
 		//
 		let columns = null;
 
-		//
+		// If the tabulator options has been provided and it contains the property columns
 		if (this.tabulatorOptions != null && this.tabulatorOptions.hasOwnProperty('columns'))
 		{
 			columns = this.tabulatorOptions.columns;
 		}
 
-		// If columns is not valid
-		if (!Array.isArray(columns) || (Array.isArray(columns) && columns.length < datasetMetadata.length))
+		// If columns is not an array or it is an array with less elements then the array fields
+		if (!Array.isArray(columns) || (Array.isArray(columns) && columns.length < fields.length))
 		{
-			columns = []; // 
+			columns = []; // set it as an empty array
 
-			//
-			for (let i = 0; i < datasetMetadata.length; i++)
+			// Loop throught all the retrieved columns from database
+			for (let i = 0; i < fields.length; i++)
 			{
-				//
-				if (fieldsToDisplay.indexOf(datasetMetadata[i].name) != -1)
-				{
-					//
-					columns[i] = {
-						title: datasetMetadata[i].name,
-						field: datasetMetadata[i].name
-					};
-				}
+				// Create a new column having the title equal to the field name
+				let column = {
+					title: fields[i],
+					field: fields[i]
+				};
+
+				// If the column has to be displayed or not
+				selectedFields.indexOf(fields[i]) >= 0 ? column.visible = true : column.visible = false;
+
+				// Add the new column to the list of columns
+				columns.push(column);
 			}
 		}
-		else // 
+		else // the property columns has been provided in the tabulator options
 		{
-			let tmpColumns = [];
-
-			//
+			// Loop throught the property columns of the tabulator options
 			for (let i = 0; i < columns.length; i++)
 			{
-				if (selectedFields.indexOf(columns[i].field) != -1)
-				{
-					tmpColumns.push(columns[i]);
-				}
+				// If the column has to be displayed or not
+				selectedFields.indexOf(columns[i].field) >= 0 ? columns[i].visible = true : columns[i].visible = false;
 			}
-
-			columns = tmpColumns;
 		}
 
-		//
+		// Define a default tabulator options in case it was not provided
 		let tabulatorOptions = {
 			height: 500,
 			layout: "fitColumns",
@@ -120,28 +114,29 @@ export const CoreFilterCmpt = {
 			reactiveData: true
 		};
 
-		//
+		// If it was provided
 		if (this.tabulatorOptions != null)
 		{
+			// Then copy it...
 			tabulatorOptions = this.tabulatorOptions;
+			// ...and overwrite the properties data, reactiveData and columns
 			tabulatorOptions.data = JSON.parse(JSON.stringify(this.dataset));
 			tabulatorOptions.reactiveData = true;
 			tabulatorOptions.columns = columns;
 		}
 
-		//
+		// Start the tabulator with the buid options
 		this.tabulator = new Tabulator(
 			"#filterTableDataset",
 			tabulatorOptions
 		);
 
-		// 
+		// If event handlers have been provided
 		if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
 		{
-			// 
+			// Attach all the provided event handlers to the started tabulator
 			for (let i = 0; i < this.tabulatorEvents.length; i++)
 			{
-				//
 				this.tabulator.on(this.tabulatorEvents[i].event, this.tabulatorEvents[i].handler);
 			}
 		}
@@ -187,43 +182,12 @@ export const CoreFilterCmpt = {
 				}
 
 				this.notFilterFields = this.fields.filter(x => tmpFilterFields.indexOf(x) === -1);
-				this.setFieldsToDisplay(data);
 				this.setSideMenu(data);
 			}
 			else
 			{
 				console.error(CoreRESTClient.getError(response));
 			}
-		},
-		/**
-		 *
-		 */
-		setFieldsToDisplay: function(data) {
-
-			let arrayFieldsToDisplay = [];
-
-			if (data.hasOwnProperty("selectedFields") && Array.isArray(data.selectedFields))
-			{
-				if (data.hasOwnProperty("columnsAliases") && Array.isArray(data.columnsAliases))
-				{
-					for (let sfc = 0; sfc< data.selectedFields.length; sfc++)
-					{
-						for (let fc = 0; fc< data.fields.length; fc++)
-						{
-							if (data.selectedFields[sfc] == data.fields[fc])
-							{
-								arrayFieldsToDisplay[sfc] = data.columnsAliases[fc];
-							}
-						}
-					}
-				}
-				else
-				{
-					arrayFieldsToDisplay = data.selectedFields;
-				}
-			}
-	
-			this.fieldsToDisplay = arrayFieldsToDisplay;
 		},
 		/**
 		 * Set the menu
@@ -473,7 +437,7 @@ export const CoreFilterCmpt = {
 				<!-- Filter fields options -->
 				<div class="filter-options-div">
 					<div class="filter-dnd-area">
-						<template v-for="fieldToDisplay in fieldsToDisplay">
+						<template v-for="fieldToDisplay in selectedFields">
 							<div
 								class="filter-dnd-object" draggable="true" @dragover="handlerDragOver">
 								{{ fieldToDisplay}}
