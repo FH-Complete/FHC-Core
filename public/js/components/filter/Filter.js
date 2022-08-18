@@ -37,9 +37,6 @@ export const CoreFilterCmpt = {
 	},
 	data: function() {
 		return {
-			// Tabulator
-			tabulator: null,
-
 			// FilterCmpt properties
 			fields: null,
 			dataset: null,
@@ -126,7 +123,7 @@ export const CoreFilterCmpt = {
 		}
 
 		// Start the tabulator with the buid options
-		this.tabulator = new Tabulator(
+		let tabulator = new Tabulator(
 			"#filterTableDataset",
 			tabulatorOptions
 		);
@@ -137,7 +134,7 @@ export const CoreFilterCmpt = {
 			// Attach all the provided event handlers to the started tabulator
 			for (let i = 0; i < this.tabulatorEvents.length; i++)
 			{
-				this.tabulator.on(this.tabulatorEvents[i].event, this.tabulatorEvents[i].handler);
+				tabulator.on(this.tabulatorEvents[i].event, this.tabulatorEvents[i].handler);
 			}
 		}
 	},
