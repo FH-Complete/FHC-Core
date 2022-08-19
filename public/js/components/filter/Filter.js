@@ -99,6 +99,10 @@ export const CoreFilterCmpt = {
 			{
 				// If the column has to be displayed or not
 				selectedFields.indexOf(columns[i].field) >= 0 ? columns[i].visible = true : columns[i].visible = false;
+
+                                if( columns[i].hasOwnProperty('resizable') ) {
+                                  columns[i].visible ? columns[i].resizable = true : columns[i].resizable = false;
+                                }
 			}
 		}
 
