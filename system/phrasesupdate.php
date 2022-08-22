@@ -16537,7 +16537,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => ' Measures - performed',
+				'text' => 'Measures - performed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16557,7 +16557,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => ' ECTS - confirmed',
+				'text' => 'ECTS - confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16577,7 +16577,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => ' Plan - declined',
+				'text' => 'Plan - declined',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16597,7 +16597,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => ' Accept plan',
+				'text' => 'Accept plan',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16617,7 +16617,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => ' Accept confirmation',
+				'text' => 'Accept confirmation',
 				'description' => '',
 				'insertvon' => 'system'
 			)
