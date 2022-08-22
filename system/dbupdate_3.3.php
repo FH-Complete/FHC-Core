@@ -5668,6 +5668,19 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='dvuh'"))
 	}
 }
 
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app = 'international' "))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('international');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App international in system.tbl_app hinzugefügt';
+	}
+}
+
 // Add table issue_status
 if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue_status LIMIT 1;"))
 {
