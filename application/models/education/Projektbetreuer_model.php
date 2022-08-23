@@ -54,18 +54,28 @@ class Projektbetreuer_model extends DB_Model
 		$qry = "SELECT DISTINCT ON (pers.person_id) pers.person_id, betreuerart_kurzbz, vorname, nachname,
 				trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
 				anrede, titelpre, titelpost, gebdatum, geschlecht, pa.projekttyp_kurzbz,
-				ben.uid, ben.alias, ma.personalnummer, mitarbeiter_uid, student_uid
-			FROM lehre.tbl_projektarbeit pa
-			JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
-			JOIN public.tbl_person pers USING (person_id)
-			LEFT JOIN public.tbl_benutzer ben USING (person_id)
-			LEFT JOIN public.tbl_mitarbeiter ma ON ben.uid =  ma.mitarbeiter_uid
-			WHERE ben.aktiv
-			AND projektarbeit_id = ?
-			AND betreuerart_kurzbz = ?
-			ORDER BY pers.person_id, CASE WHEN ma.mitarbeiter_uid IS NULL THEN 1 ELSE 0 END, /*Mitarbeiter account first*/
-					CASE WHEN ben.uid IS NULL THEN 1 ELSE 0 END, /*user with account first*/
-         			ben.insertamum";
+				ben.uid, ben.alias, ma.personalnummer, mitarbeiter_uid, student_uid,
+				(
+					SELECT kontakt
+					FROM public.tbl_kontakt
+					WHERE kontakttyp = 'email'
+					AND person_id = pers.person_id
+					ORDER BY
+						CASE WHEN zustellung THEN 0 ELSE 1 END,
+						insertamum DESC NULLS LAST
+					LIMIT 1
+				) AS private_email
+				FROM lehre.tbl_projektarbeit pa
+				JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
+				JOIN public.tbl_person pers USING (person_id)
+				LEFT JOIN public.tbl_benutzer ben USING (person_id)
+				LEFT JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				WHERE (ben.aktiv OR ben.aktiv IS NULL)
+				AND projektarbeit_id = ?
+				AND betreuerart_kurzbz = ?
+				ORDER BY pers.person_id, CASE WHEN ma.mitarbeiter_uid IS NULL THEN 1 ELSE 0 END, /*Mitarbeiter account first*/
+						CASE WHEN ben.uid IS NULL THEN 1 ELSE 0 END, /*user with account first*/
+						ben.insertamum";
 
 		return $this->execQuery($qry, array($projektarbeit_id, $betreuerart_kurzbz));
 	}
@@ -102,7 +112,7 @@ class Projektbetreuer_model extends DB_Model
 				trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
 				CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email, abg.abgabedatum
 				FROM lehre.tbl_projektbetreuer betr
-				JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id 
+				JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id
 				JOIN public.tbl_person pers ON betr.person_id = pers.person_id
 				LEFT JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id AND kontakttyp = 'email' AND zustellung = true
 				LEFT JOIN public.tbl_benutzer ON pers.person_id = tbl_benutzer.person_id

@@ -28,6 +28,7 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php');
 
@@ -89,6 +90,7 @@ $htmlstr1 = '';
 $vorname='';
 $nachname='';
 $zweitbetreuer = '';
+$senatspruefer = '';
 
 $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname,
 			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname,
@@ -113,10 +115,7 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 		LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer'
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter'
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer'
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter')
+		AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Senatsvorsitz')
 		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)."
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";
 
@@ -142,6 +141,7 @@ else
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
 	{
+		// get zweitbetreuer, if any
 		$htmlstr1 = '';
 		$zweitbetreuer_obj = new person();
 		if ($zweitbetreuer_obj->load($row->zweitbetreuer_person_id))
@@ -149,13 +149,35 @@ else
 			$zweitbetreuer = ', <b>'.$db->convert_html_chars($row->zweitbetreuer_betreuerart_kurzbz).'</b>: '.$zweitbetreuer_obj->titelpre.' '.$zweitbetreuer_obj->vorname.' '.$zweitbetreuer_obj->nachname.' '.$zweitbetreuer_obj->titelpost;
 		}
 		$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_kurzbz).'</b>: ';
+
+		// get senatspruefer, if any
+		if ($row->betreuerart_kurzbz == 'Senatsvorsitz')
+		{
+			$senatspruefer_obj = new projektbetreuer();
+			$senatsprueferRes = $senatspruefer_obj->getZweitbegutachterWithToken($row->betreuer_person_id, $row->projektarbeit_id, $row->uid);
+			if ($senatsprueferRes)
+			{
+				$senatspruefer .= ', <b>Senatsprüfer</b>: ';
+				$first = true;
+				foreach($senatspruefer_obj->result as $spr)
+				{
+					if (!$first)
+						$senatspruefer .= ', ';
+					$senatspruefer .= $spr->voller_name;
+					$first = false;
+				}
+			}
+		}
+
 		$vorname=$row->vorname;
 		$nachname=$row->nachname;
 		$uid=$row->uid;
+
 		($row->btitelpre!=''?$htmlstr1 .= $row->btitelpre.' ':$htmlstr1 .= '');
 		$htmlstr1 .= $row->bvorname.' '.$row->bnachname;
 		($row->btitelpost!=''?$htmlstr1 .= ' '.$row->btitelpost:$htmlstr1 .= '');
 		$htmlstr1 .= $zweitbetreuer;
+		$htmlstr1 .= $senatspruefer;
 		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
 
 		if (is_null($row->note) && $row->aktiv === 't')
@@ -176,7 +198,7 @@ else
 			$htmlstr .= "</td>";
 		} else
 		{
-			$htmlstr  .= "<td></td>";
+			$htmlstr  .= "<td>".$row->note."</td>";
 		}
 
 

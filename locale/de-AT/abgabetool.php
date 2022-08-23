@@ -83,12 +83,13 @@ $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Gelesen und akzeptiert';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Erklärung nicht akzeptiert';
 $this->phrasen['abgabetool/downloadProjektarbeit']='Dokument herunterladen';
 $this->phrasen['abgabetool/zweitBegutachter']='ZweitbegutachterIn';
-$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Zugangstoken an ZweitbegutachterIn noch einmal senden';
-$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail an ZweitbegutachterIn (%s) gesendet';
-$this->phrasen['abgabetool/zweitbetreuerMailSenden']='Mail an ZweitbegutachterIn (%s) senden';
-$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='keine Zustellmail für Zweitbegutachter vorhanden!';
+$this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Zugangstoken noch einmal senden';
+$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail an %s (%s) gesendet';
+$this->phrasen['abgabetool/zweitbetreuerMailSenden']='Mail an %s (%s) senden';
+$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='keine Zustellmail vorhanden!';
 $this->phrasen['abgabetool/projektbeurteilungDownload']='Projektbeurteilung herunterladen';
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='Erst-/Begutachter';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Zweitbegutachter';
 $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Fehler beim Ermitteln des Enduplaods der Projektarbeit';
+$this->phrasen['abgabetool/senatsPruefer']='Prüfer';
 ?>

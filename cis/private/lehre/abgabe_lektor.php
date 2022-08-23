@@ -75,8 +75,7 @@ $sql_query = "SELECT
 				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id
 				AND public.tbl_benutzer.uid=".$db->db_add_param($getuid).")
 			".($showall?'':' AND public.tbl_benutzer.aktiv AND lehre.tbl_projektarbeit.note IS NULL ')."
-			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter'
-				OR betreuerart_kurzbz='Zweitbegutachter' OR betreuerart_kurzbz='Erstbetreuer')
+			AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Zweitbegutachter', 'Erstbetreuer', 'Senatsvorsitz', 'Senatspruefer')
 			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy
 		ORDER BY nachname";
 
