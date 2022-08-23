@@ -10557,13 +10557,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'eines Zeugnisses (vgl. § 4 Abs. 5 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+				'text' => 'eines Zeugnisses (vgl. § 4 Abs. 8 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'a certificate (see § 4 para. 5, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+				'text' => 'a certificate (see § 4 para. 8, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -10577,13 +10577,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'eines Hochschulzeugnisses (vgl. § 4 Abs. 5 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+                'text' => 'eines Hochschulzeugnisses (vgl. § 4 Abs. 8 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'a university certificate (see § 4 para. 5, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+                'text' => 'a university certificate (see § 4 para. 8, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -10597,13 +10597,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'der nachgewiesenen beruflichen Praxis ((vgl. § 4 Abs. 6 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+				'text' => 'der nachgewiesenen beruflichen Praxis (vgl. § 4 Abs. 9 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'professional practice (see § 4 para. 6, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+				'text' => 'professional practice (see § 4 para. 9, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
