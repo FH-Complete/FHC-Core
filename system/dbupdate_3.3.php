@@ -6273,6 +6273,40 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+//Spalte aktiv zu bis.tbl_zgv hinzufügen
+if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgv LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_zgv ADD COLUMN aktiv BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgv '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte aktiv zu bis.tbl_zgv hinzugefügt';
+}
+
+//Spalte aktiv zu bis.tbl_zgvmaster hinzufügen
+if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgvmaster LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_zgvmaster ADD COLUMN aktiv BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvmaster '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte aktiv zu bis.tbl_zgvmaster hinzugefügt';
+}
+
+//Spalte aktiv zu bis.tbl_zgvdoktor hinzufügen
+if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgvdoktor LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_zgvdoktor ADD COLUMN aktiv BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvdoktor '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte aktiv zu bis.tbl_zgvdoktor hinzugefügt';
+}
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -6308,9 +6342,9 @@ $tabellen=array(
 	"bis.tbl_oehbeitrag"  => array("oehbeitrag_id","studierendenbeitrag","versicherung","von_studiensemester_kurzbz","bis_studiensemester_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz","bezeichnung_mehrsprachig"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
-	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
-	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung"),
-	"bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz","bezeichnung"),
+	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung","aktiv"),
+	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung","aktiv"),
+	"bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz","bezeichnung","aktiv"),
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung","incoming","outgoing"),
 	"bis.tbl_zgvgruppe"  => array("gruppe_kurzbz","bezeichnung"),
 	"bis.tbl_zgvgruppe_zuordnung"  => array("zgvgruppe_id" ,"studiengang_kz","zgv_code","zgvmas_code","gruppe_kurzbz"),
