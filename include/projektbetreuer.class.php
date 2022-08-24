@@ -421,7 +421,7 @@ class projektbetreuer extends basis_db
 							AND projektarbeit_id = betr.projektarbeit_id
 						)
 					)
-					OR
+					OR /* either Zweitbegutachter of masterarbeit, or Kommissionsprüfer if Kommission */
 					(
 						betr.betreuerart_kurzbz  = 'Senatspruefer'
 						AND EXISTS (
