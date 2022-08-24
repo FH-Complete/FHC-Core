@@ -119,6 +119,7 @@ if(!$projektarbeit_obj->load($projektarbeit_id))
 	die('Fehler beim Laden der Projektarbeit');
 $titel = $projektarbeit_obj->titel;
 $student_uid = $projektarbeit_obj->student_uid;
+$projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
 
 // paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
 $paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
@@ -179,7 +180,7 @@ if(in_array($betreuerart, array('Erstbegutacher', 'Senatsvorsitz')))
 					// if Zweitbetreuer is the one for which token was requested, send mail
 					if ($zbg->person_id == $_GET['zweitbetreuer_person_id'])
 					{
-						$mailres = sendZweitbegutachterMail($zbg, $erstbetreuer_id, $row_std);
+						$mailres = sendZweitbegutachterMail($zbg, $erstbetreuer_id, $row_std, $projekttyp_kurzbz);
 
 						if ($mailres)
 						{
@@ -734,7 +735,7 @@ echo $htmlstr;
  * @param object $student
  * @return bool|projektbetreuer|void|null
  */
-function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id, $student)
+function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id, $student, $projekttyp_kurzbz)
 {
 	if (!isset($zweitbegutachter->email) || $zweitbegutachter->email == '')
 		return false;
@@ -758,6 +759,7 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 	{
 		$zweitbetr = $projektbetreuer->result[0];
 		$intern = isset($zweitbetr->uid);
+		$mail_subject = $projekttyp_kurzbz == 'Diplom' ? "Masterarbeitsbetreuung" : "Bachelorarbeitsbetreuung";
 		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
 		$mail_fulllink = "$mail_baselink?projektarbeit_id=".$zweitbegutachter->projektarbeit_id."&uid=".$student->uid;
 		$mail_link = $intern ? $mail_fulllink : $mail_baselink;
@@ -777,7 +779,7 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 			'ParbeitsbeurteilungEndupload',
 			$maildata,
 			$zweitbetr->email,
-			"Masterarbeitsbetreuung",
+			$mail_subject,
 			'sancho_header_min_bw.jpg',
 			'sancho_footer_min_bw.jpg'
 		);
