@@ -417,16 +417,20 @@ class InfoCenter extends Auth_Controller
 
 			if (hasData($akte))
 			{
-				$result = $this->aktelib->remove($akte_id);
-
-				if (isError($result))
+				$akte = getData($akte);
+				if ($akte->person_id === $person_id)
 				{
-					$this->terminateWithJsonError('Error deleting document');
+					$result = $this->aktelib->remove($akte_id);
+
+					if (isError($result))
+					{
+						$this->terminateWithJsonError('Error deleting document');
+					}
+
+					$this->_log($person_id, 'deletedoc', array($akte->bezeichnung));
+
+					$this->outputJsonSuccess('success');
 				}
-
-				$this->_log($person_id, 'deletedoc', array(getData($akte)->bezeichnung));
-
-				$this->outputJsonSuccess('success');
 			}
 		}
 	}
