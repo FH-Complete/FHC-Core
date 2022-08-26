@@ -125,6 +125,7 @@ echo '
 		<th>Bezeichnung</th>
 		<th>Programmcode</th>
 		<th>Typ</th>
+		<th>Studienkennung Uni</th>
 	</thead>
 	<tbody>
 		';
@@ -144,6 +145,7 @@ echo '
 				<td>'.$row->bezeichnung.'</td>
 				<td>'.$row->programm_code.'</td>
 				<td>'.(isset($typ_arr[$row->gsprogrammtyp_kurzbz])?$typ_arr[$row->gsprogrammtyp_kurzbz]:$row->gsprogrammtyp_kurzbz).'</td>
+				<td>'.$row->studienkennung_uni.'</td>
 			</tr>';
 	}
 
