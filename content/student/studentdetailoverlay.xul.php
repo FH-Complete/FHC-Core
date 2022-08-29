@@ -627,7 +627,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                                 <checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
                             </hbox>
 							<hbox>
-								<label value="Dual" control="student-prestudent-checkbox-dual"/>
+								<label value="Duales Studium" control="student-prestudent-checkbox-dual"/>
 								<checkbox id="student-prestudent-checkbox-dual" checked="false" disabled="true"/>
 							</hbox>
                             <hbox>
