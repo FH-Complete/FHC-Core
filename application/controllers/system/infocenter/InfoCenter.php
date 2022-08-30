@@ -160,6 +160,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('system/Filters_model', 'FiltersModel');
 		$this->load->model('system/PersonLock_model', 'PersonLockModel');
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
+		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
 		$this->load->model('codex/Nation_model', 'NationModel');
 
 		// Loads libraries
