@@ -1,11 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "b7f5d3d6ad8ce733cd08b79afcc5bdb4",
-    "content-hash": "49dd52ecbe8a4b94dbbf6308ed9919cb",
+    "content-hash": "d530cc4d7bd81812535eb64e87ba04f4",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -36,16 +35,14 @@
             ],
             "description": "Defacto way to enable use of HTML5 sectioning elements in legacy Internet Explorer.",
             "homepage": "http://paulirish.com/2011/the-history-of-the-html5-shiv/",
-            "time": "2015-07-20 20:04:00"
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "alvaro-prieto/colresizable",
             "version": "1.6",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip"
             },
             "type": "library"
         },
@@ -54,9 +51,7 @@
             "version": "0.27.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/axios/axios/archive/refs/tags/v0.27.2.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/axios/axios/archive/refs/tags/v0.27.2.zip"
             },
             "type": "library"
         },
@@ -65,9 +60,7 @@
             "version": "3.3.7.1",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip"
             },
             "type": "library"
         },
@@ -76,9 +69,7 @@
             "version": "2.0.4",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/borgar/textile-js/archive/v2.0.4.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/borgar/textile-js/archive/v2.0.4.zip"
             },
             "type": "library"
         },
@@ -87,9 +78,7 @@
             "version": "1.4.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip"
             },
             "type": "library"
         },
@@ -141,7 +130,7 @@
             "keywords": [
                 "qr code"
             ],
-            "time": "2020-04-12 07:38:35"
+            "time": "2020-04-12T07:38:35+00:00"
         },
         {
             "name": "chillerlan/php-traits",
@@ -190,7 +179,7 @@
                 "trait"
             ],
             "abandoned": true,
-            "time": "2018-06-22 00:30:47"
+            "time": "2018-06-22T00:30:47+00:00"
         },
         {
             "name": "chriskacerguis/codeigniter-restserver",
@@ -229,7 +218,7 @@
             ],
             "description": "REST Server for the CodeIgniter framework",
             "homepage": "https://github.com/chriskacerguis/codeigniter-restserver",
-            "time": "2017-09-23 16:44:55"
+            "time": "2017-09-23T16:44:55+00:00"
         },
         {
             "name": "christianbach/tablesorter",
@@ -247,7 +236,7 @@
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2016-09-02 11:31:54"
+            "time": "2016-09-02T11:31:54+00:00"
         },
         {
             "name": "codeigniter/framework",
@@ -280,7 +269,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2022-03-03 13:21:49"
+            "time": "2022-03-03T13:21:49+00:00"
         },
         {
             "name": "components/angular.js",
@@ -584,7 +573,7 @@
             ],
             "description": "Shim repository for Angular.js",
             "homepage": "http://angularjs.org",
-            "time": "2015-06-07 20:10:38"
+            "time": "2015-06-07T20:10:38+00:00"
         },
         {
             "name": "components/jquery",
@@ -626,7 +615,7 @@
             ],
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
-            "time": "2021-03-20 19:13:42"
+            "time": "2021-03-20T19:13:42+00:00"
         },
         {
             "name": "components/jqueryui",
@@ -711,7 +700,7 @@
                 }
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
-            "time": "2016-09-16 05:47:55"
+            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "dapphp/securimage",
@@ -761,7 +750,7 @@
                 "security"
             ],
             "abandoned": true,
-            "time": "2018-03-09 06:07:41"
+            "time": "2018-03-09T06:07:41+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -823,7 +812,7 @@
                 "rdfa",
                 "sparql"
             ],
-            "time": "2015-02-27 09:45:49"
+            "time": "2015-02-27T09:45:49+00:00"
         },
         {
             "name": "fgelinas/timepicker",
@@ -840,9 +829,7 @@
             "version": "4.7.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v4.7.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v4.7.0.zip"
             },
             "type": "library"
         },
@@ -851,9 +838,7 @@
             "version": "6.1.1",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.1.1.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.1.1.zip"
             },
             "type": "library"
         },
@@ -906,16 +891,14 @@
                 "fixtures"
             ],
             "abandoned": true,
-            "time": "2020-12-11 09:56:16"
+            "time": "2020-12-11T09:56:16+00:00"
         },
         {
             "name": "joeldbirch/superfish",
             "version": "1.7.9",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip"
             },
             "type": "library"
         },
@@ -924,9 +907,7 @@
             "version": "5.5.6",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip"
             },
             "type": "library"
         },
@@ -945,9 +926,7 @@
             "version": "1.12.4",
             "dist": {
                 "type": "file",
-                "url": "https://code.jquery.com/jquery-1.12.4.min.js",
-                "reference": null,
-                "shasum": null
+                "url": "https://code.jquery.com/jquery-1.12.4.min.js"
             },
             "type": "library"
         },
@@ -956,9 +935,7 @@
             "version": "2.2.4",
             "dist": {
                 "type": "file",
-                "url": "https://code.jquery.com/jquery-2.2.4.min.js",
-                "reference": null,
-                "shasum": null
+                "url": "https://code.jquery.com/jquery-2.2.4.min.js"
             },
             "type": "library"
         },
@@ -967,9 +944,7 @@
             "version": "1.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/jquery/sizzle/archive/1.0.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/jquery/sizzle/archive/1.0.0.zip"
             },
             "type": "library"
         },
@@ -1037,7 +1012,7 @@
                 "json",
                 "schema"
             ],
-            "time": "2014-08-25 02:48:14"
+            "time": "2014-08-25T02:48:14+00:00"
         },
         {
             "name": "kingsquare/json-schema-form",
@@ -1071,16 +1046,14 @@
                 }
             ],
             "description": "A framework-agnostic PHP Implementation for generating simple forms based on json-schema",
-            "time": "2014-07-10 12:27:19"
+            "time": "2014-07-10T12:27:19+00:00"
         },
         {
             "name": "ludo/jquery-treetable",
             "version": "3.2.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip"
             },
             "type": "library"
         },
@@ -1133,7 +1106,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2015-03-01 12:03:08"
+            "time": "2015-03-01T12:03:08+00:00"
         },
         {
             "name": "ml/iri",
@@ -1180,7 +1153,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2014-01-21 13:43:39"
+            "time": "2014-01-21T13:43:39+00:00"
         },
         {
             "name": "ml/json-ld",
@@ -1229,16 +1202,14 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2020-06-16 17:45:06"
+            "time": "2020-06-16T17:45:06+00:00"
         },
         {
             "name": "moment/momentjs",
             "version": "2.24.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/moment/moment/archive/2.24.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/moment/moment/archive/2.24.0.zip"
             },
             "type": "library"
         },
@@ -1291,7 +1262,7 @@
                 "sorting",
                 "table"
             ],
-            "time": "2020-03-03 13:46:03"
+            "time": "2020-03-03T13:46:03+00:00"
         },
         {
             "name": "nategood/httpful",
@@ -1341,7 +1312,7 @@
                 "rest",
                 "restful"
             ],
-            "time": "2015-10-26 16:11:30"
+            "time": "2015-10-26T16:11:30+00:00"
         },
         {
             "name": "netcarver/textile",
@@ -1394,16 +1365,14 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2022-05-01 17:05:16"
+            "time": "2022-05-01T17:05:16+00:00"
         },
         {
             "name": "nicolaskruchten/pivottable",
             "version": "2.23.0",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/nicolaskruchten/pivottable/archive/v2.23.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/nicolaskruchten/pivottable/archive/v2.23.0.zip"
             },
             "type": "library"
         },
@@ -1412,9 +1381,7 @@
             "version": "5.0.0",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/primeicons/-/primeicons-5.0.0.tgz",
-                "reference": null,
-                "shasum": null
+                "url": "https://registry.npmjs.org/primeicons/-/primeicons-5.0.0.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -1426,9 +1393,7 @@
             "version": "3.15.0",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/primevue/-/primevue-3.15.0.tgz",
-                "reference": null,
-                "shasum": null
+                "url": "https://registry.npmjs.org/primevue/-/primevue-3.15.0.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -1440,9 +1405,7 @@
             "version": "4.9.3",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/4.9.3.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/4.9.3.zip"
             },
             "type": "library"
         },
@@ -1451,9 +1414,7 @@
             "version": "5.2.1",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.2.1.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.2.1.zip"
             },
             "type": "library"
         },
@@ -1546,16 +1507,14 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2022-04-04 04:57:45"
+            "time": "2022-04-04T04:57:45+00:00"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
             "version": "1.0.7",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip"
             },
             "type": "library"
         },
@@ -1564,9 +1523,7 @@
             "version": "1.4.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip"
             },
             "type": "library"
         },
@@ -1630,16 +1587,14 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2020-10-23 09:01:57"
+            "time": "2020-10-23T09:01:57+00:00"
         },
         {
             "name": "tapmodo/jcrop",
             "version": "2.0.4",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip"
             },
             "type": "library"
         },
@@ -1648,9 +1603,7 @@
             "version": "4.9.11",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tinymce/tinymce-dist/archive/refs/tags/4.9.11.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tinymce/tinymce-dist/archive/refs/tags/4.9.11.zip"
             },
             "type": "library"
         },
@@ -1659,9 +1612,7 @@
             "version": "5.10.3",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tinymce/tinymce-dist/archive/refs/tags/5.10.3.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tinymce/tinymce-dist/archive/refs/tags/5.10.3.zip"
             },
             "type": "library"
         },
@@ -1680,9 +1631,7 @@
             "version": "3.4.1",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v3.4.1.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v3.4.1.zip"
             },
             "type": "library"
         },
@@ -1691,9 +1640,7 @@
             "version": "5.1.3",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.1.3.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.1.3.zip"
             },
             "type": "library"
         },
@@ -1759,16 +1706,23 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2020-02-11 05:59:23"
+            "time": "2020-02-11T05:59:23+00:00"
         },
         {
             "name": "vuejs/vuejs3",
             "version": "3.2.33",
             "dist": {
                 "type": "file",
-                "url": "https://unpkg.com/vue@3.2.33/dist/vue.global.prod.js",
-                "reference": null,
-                "shasum": null
+                "url": "https://unpkg.com/vue@3.2.33/dist/vue.global.prod.js"
+            },
+            "type": "library"
+        },
+        {
+            "name": "vuejs/vuerouter4",
+            "version": "4.1.3",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/vue-router@4.1.3/dist/vue-router.global.js"
             },
             "type": "library"
         }
@@ -1825,7 +1779,7 @@
                 "regex",
                 "regular expression"
             ],
-            "time": "2022-01-21 20:24:37"
+            "time": "2022-01-21T20:24:37+00:00"
         },
         {
             "name": "composer/xdebug-handler",
@@ -1872,7 +1826,7 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2022-02-24 20:20:32"
+            "time": "2022-02-24T20:20:32+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -1924,7 +1878,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2022-05-31 20:59:12"
+            "time": "2022-05-31T20:59:12+00:00"
         },
         {
             "name": "pdepend/pdepend",
@@ -1971,7 +1925,7 @@
                 "BSD-3-Clause"
             ],
             "description": "Official version of pdepend to be handled with Composer",
-            "time": "2022-02-23 07:53:09"
+            "time": "2022-02-23T07:53:09+00:00"
         },
         {
             "name": "phpmd/phpmd",
@@ -2043,7 +1997,7 @@
                 "phpmd",
                 "pmd"
             ],
-            "time": "2022-03-24 13:33:01"
+            "time": "2022-03-24T13:33:01+00:00"
         },
         {
             "name": "phpmetrics/phpmetrics",
@@ -2107,7 +2061,7 @@
                 "quality",
                 "testing"
             ],
-            "time": "2022-03-24 10:19:51"
+            "time": "2022-03-24T10:19:51+00:00"
         },
         {
             "name": "phpunit/php-timer",
@@ -2156,7 +2110,7 @@
             "keywords": [
                 "timer"
             ],
-            "time": "2017-02-26 11:10:40"
+            "time": "2017-02-26T11:10:40+00:00"
         },
         {
             "name": "psr/container",
@@ -2205,7 +2159,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/log",
@@ -2252,7 +2206,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2021-05-03 11:20:27"
+            "time": "2021-05-03T11:20:27+00:00"
         },
         {
             "name": "sebastian/finder-facade",
@@ -2292,7 +2246,7 @@
             "description": "FinderFacade is a convenience wrapper for Symfony's Finder component.",
             "homepage": "https://github.com/sebastianbergmann/finder-facade",
             "abandoned": true,
-            "time": "2017-11-18 17:31:49"
+            "time": "2017-11-18T17:31:49+00:00"
         },
         {
             "name": "sebastian/phpcpd",
@@ -2342,7 +2296,7 @@
             ],
             "description": "Copy/Paste Detector (CPD) for PHP code.",
             "homepage": "https://github.com/sebastianbergmann/phpcpd",
-            "time": "2017-11-16 08:49:28"
+            "time": "2017-11-16T08:49:28+00:00"
         },
         {
             "name": "sebastian/version",
@@ -2385,7 +2339,7 @@
             ],
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
-            "time": "2016-10-03 07:35:21"
+            "time": "2016-10-03T07:35:21+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -2436,7 +2390,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2021-12-12 21:44:58"
+            "time": "2021-12-12T21:44:58+00:00"
         },
         {
             "name": "symfony/config",
@@ -2495,7 +2449,7 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/console",
@@ -2562,7 +2516,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/debug",
@@ -2614,7 +2568,7 @@
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
             "abandoned": "symfony/error-handler",
-            "time": "2020-10-24 10:57:07"
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -2680,7 +2634,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -2725,7 +2679,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2020-10-24 10:57:07"
+            "time": "2020-10-24T10:57:07+00:00"
         },
         {
             "name": "symfony/finder",
@@ -2769,7 +2723,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2020-11-16 17:02:08"
+            "time": "2020-11-16T17:02:08+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -2832,7 +2786,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2020-10-23 09:01:57"
+            "time": "2020-10-23T09:01:57+00:00"
         },
         {
             "name": "theseer/fdomdocument",
@@ -2876,7 +2830,7 @@
             "description": "The classes contained within this repository extend the standard DOM to use exceptions at all occasions of errors instead of PHP warnings or notices. They also add various custom methods and shortcuts for convenience and to simplify the usage of DOM.",
             "homepage": "https://github.com/theseer/fDOMDocument",
             "abandoned": true,
-            "time": "2022-01-25 23:10:35"
+            "time": "2022-01-25T23:10:35+00:00"
         }
     ],
     "aliases": [],
@@ -2887,5 +2841,6 @@
     "platform": {
         "php": ">=5.6.40"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
 }
