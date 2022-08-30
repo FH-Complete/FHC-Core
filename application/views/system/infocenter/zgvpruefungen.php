@@ -206,9 +206,10 @@
 									 	echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
 										//echo '<option value = "null">--Bitte Eintrag wählen--</option>';
                    	foreach ($alleZGV->retval as $zgv):
-                           	$zgv->aktiv == 'true' ? $style = '' : $style = 'disabled="disabled"';
+														//zusatz
+														$zgv->aktiv == 'true' ? $zusatz = '' : $zusatz = ' --- nicht (länger) aktiv ---';
                            	$zgv->zgv_code == $zgvpruefung->zgv_code ? $selected = "selected" : $selected = "";
-                           	echo '<option '. $selected.' value= "'.$zgv->zgv_code.'" '.$style.'>'.$zgv->zgv_bez.'</option>';
+                           	echo '<option '. $selected.' value= "'.$zgv->zgv_code.'">'.$zgv->zgv_bez. $zusatz .'</option>';
                    	endforeach;
                    	echo "</select>";
 
@@ -256,9 +257,11 @@
 										$zgvpruefung->nation_code != '' ? $default = "selected" : $default = "";
 										echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
 										foreach ($allNations->retval as $nation):
-														$nation->sperre != 'true' ? $style = '' : $style = 'disabled="disabled"';
+														//zusatz
+														$nation->sperre != 'true' ? $zusatz = ' ' : $zusatz = ' --- Nation/Staat nicht existent ---';
+
 														$nation->nation_code == $zgvpruefung->zgvnation ? $selected = "selected" : $selected = "";
-														echo '<option '. $selected.' value= "'.$nation->nation_code.'" '.$style.'>'.$nation->langtext.'</option>';
+														echo '<option '. $selected.' value= "'.$nation->nation_code.'">'. $nation->langtext . $zusatz.'</option>';
 										endforeach;
 										echo "</select>";
 										?>
