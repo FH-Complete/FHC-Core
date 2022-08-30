@@ -128,9 +128,7 @@
 					<form action="javascript:void(0);" class="zgvform" id="zgvform_<?php echo $zgvpruefung->prestudent_id ?>">
 						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id ?>" class="prestudentidinput">
 						<div class="row">
-
 							<div class="col-lg-<?php echo $columns[0] ?>">
-
 								<div class="form-group">
 									<label><?php echo  ucfirst($this->p->t('global', 'letzterStatus')) . ':' ?></label>
 									<?php
@@ -148,7 +146,6 @@
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[2] ?>">
-
 								<div class="form-group form-inline">
 									<label><?php echo  ucfirst($this->p->t('lehre', 'ausbildungssemester')) . ':' ?></label>
 									<?php if (isset($zgvpruefung->prestudentstatus->ausbildungssemester)): ?>
@@ -180,14 +177,12 @@
 							</div>
 						</div>
 						<div class="row">
-
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
 									<div class="row">
 										<?php if ($infoonly): ?>
 										<div class="col-xs-8">
 										<label><?php echo  $this->p->t('infocenter', 'zgv') . ':' ?></label>
-
 											<?php echo $zgvpruefung->zgv_bez; ?>
 										</div>
 										<?php else: ?>
@@ -201,32 +196,28 @@
 											<a href="javascript:void(0)"><i class="fa fa-info-circle"></i> <?php echo  $this->p->t('infocenter', 'zgv') ?> <?php echo $studiengangkurzbz ?></a>
 										</div>
 									</div>
-
 									<?php if (!$infoonly)
 
 										//dropdown als Werte vom ZgvModel, um nicht aktive Werte als disabled anzuzeigen
 										$alleZGV = $this->ZgvModel->getAllZgv();
-										echo '<select id= "zgv_'.$zgvpruefung->prestudent_id.'" name="zgv">';
+                   	echo '<select id= "zgv_'.$zgvpruefung->prestudent_id.'" name="zgv">';
+                   	 $zgvpruefung->zgv_bez != '' ? $default = "selected" : $default = "";
 
-										$zgvpruefung->zgv_bez != '' ? $default = "selected" : $default = "";
-										echo '<option '. $selected.' value = "null">--Bitte Eintrag wählen--</option>';
+									 	echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
+										//echo '<option value = "null">--Bitte Eintrag wählen--</option>';
+                   	foreach ($alleZGV->retval as $zgv):
+                           	$zgv->aktiv == 'true' ? $style = '' : $style = 'disabled="disabled"';
+                           	$zgv->zgv_code == $zgvpruefung->zgv_code ? $selected = "selected" : $selected = "";
+                           	echo '<option '. $selected.' value= "'.$zgv->zgv_code.'" '.$style.'>'.$zgv->zgv_bez.'</option>';
+                   	endforeach;
+                   	echo "</select>";
 
-										foreach ($alleZGV->retval as $zgv):
-											$zgv->aktiv == 'true' ? $style = '' : $style = 'disabled="disabled"';
-											$zgv->zgv_code == $zgvpruefung->zgv_code ? $selected = "selected" : $selected = "";
-
-											echo '<option '. $selected.' value= "'.$zgv->zgv_code.'" '.$style.'>'.$zgv->zgv_bez.'</option>';
-										endforeach;
-										echo "</select>";
-										?>
-										
+                   	?>
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[1] ?>">
 								<div class="form-group">
 									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person', 'ort') . ':'?></label>
-
-
 									<?php if ($infoonly):
 										echo html_escape($zgvpruefung->zgvort);
 									else:
@@ -256,14 +247,21 @@
 							<div class="col-lg-<?php echo $columns[3] ?>">
 								<div class="form-group">
 									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person', 'nation') . ':'?></label>
-									<?php if ($infoonly)
-										echo $zgvpruefung->zgvnation_bez;
-									else
-										echo $this->widgetlib->widget(
-											'Nation_widget',
-											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvnation_code),
-											array('name' => 'zgvnation', 'id' => 'zgvnation_'.$zgvpruefung->prestudent_id)
-										); ?>
+
+									<?php if (!$infoonly)
+
+										//dropdown als Werte vom NationModel, um nicht aktive Werte als disabled anzuzeigen
+										$allNations = $this->NationModel->getAll();
+										echo '<select id= "zgvnation_'.$zgvpruefung->prestudent_id.'" name="zgvnation">';
+										$zgvpruefung->nation_code != '' ? $default = "selected" : $default = "";
+										echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
+										foreach ($allNations->retval as $nation):
+														$nation->sperre != 'true' ? $style = '' : $style = 'disabled="disabled"';
+														$nation->nation_code == $zgvpruefung->zgvnation ? $selected = "selected" : $selected = "";
+														echo '<option '. $selected.' value= "'.$nation->nation_code.'" '.$style.'>'.$nation->langtext.'</option>';
+										endforeach;
+										echo "</select>";
+										?>
 								</div>
 							</div>
 						</div>
@@ -354,11 +352,7 @@
 							</div>
 						</div>
 					<?php endif; ?>
-
-
-
-
-
+					<br />
 					<?php
 					if (isset($zgvpruefung->prestudentUdfs))
 					{

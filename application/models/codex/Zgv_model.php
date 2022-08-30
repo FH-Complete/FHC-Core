@@ -17,7 +17,7 @@ class Zgv_model extends DB_Model
 	 */
 	public function getAllZgv()
 	{
-		$allZgv = 'SELECT * FROM bis.tbl_zgv;';
+		$allZgv = 'SELECT * FROM bis.tbl_zgv ORDER BY zgv_bez ASC;';
 
 		return $this->execQuery($allZgv);
 	}
