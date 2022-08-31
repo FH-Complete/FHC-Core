@@ -433,7 +433,7 @@ if($command=="update" && $error!=true)
 								$row_std=$db->db_fetch_object($result_std);
 
 								// 1. Begutachter mail ohne Token
-								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
 								$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
 								$projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
 								$subject = $projektarbeit_obj->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
@@ -495,6 +495,9 @@ if($command=="update" && $error!=true)
 											{
 												$begutachterMitToken = $zweitbegutachterMitToken->result[0];
 
+												$path = $begutachterMitToken->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+												$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$path";
+												$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
 												$intern = isset($begutachterMitToken->uid);
 												$mail_link = $intern ? $mail_fulllink : $mail_baselink;
 

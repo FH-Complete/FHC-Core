@@ -144,7 +144,7 @@ if($num_rows_endupload < 0)
 }
 
 // Zweitbegutachter holen
-if(in_array($betreuerart, array('Erstbegutacher', 'Senatsvorsitz')))
+if(in_array($betreuerart, array('Erstbegutachter', 'Senatsvorsitz')))
 {
 	$alleBegutachter = new projektbetreuer();
 	$alleBegutachterRes = $alleBegutachter->getProjektbetreuer($projektarbeit_id);
@@ -154,7 +154,7 @@ if(in_array($betreuerart, array('Erstbegutacher', 'Senatsvorsitz')))
 		$zweitbetreuerArr = array();
 		foreach ($alleBegutachter->result as $begutachter)
 		{
-			if (in_array($begutachter->betreuerart_kurzbz, array('Erstbegutacher', 'Senatsvorsitz')))
+			if (in_array($begutachter->betreuerart_kurzbz, array('Erstbegutachter', 'Senatsvorsitz')))
 			{
 				// dem Erstbetreuer zugewiesene Zweitbetreuer holen
 				$erstbetreuer_id = $begutachter->person_id;
@@ -165,7 +165,7 @@ if(in_array($betreuerart, array('Erstbegutacher', 'Senatsvorsitz')))
 		}
 
 		// Mail mit Token an Zweitbegutachter senden
-		if ($zweitbegutachterRes && $paIsCurrent >= 1 && isset($_GET['zweitbegutachtertoken']) && isset($_GET['zweitbetreuer_person_id']))
+		if (count($zweitbetreuerArr) > 0 && $paIsCurrent >= 1 && isset($_GET['zweitbegutachtertoken']) && isset($_GET['zweitbetreuer_person_id']))
 		{
 			$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
 			if(!$result_std=$db->db_query($qry_std))
@@ -481,7 +481,8 @@ $endupload_vorhanden = $num_rows_endupload >= 1;
 
 if ($semester_benotbar && $endupload_vorhanden)
 {
-	$htmlstr .= "<form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung' title='Benotungsformular' target='_blank' method='GET'>";
+	$beurtPfad = $betreuerart == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+	$htmlstr .= "<form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/".$beurtPfad."' title='Benotungsformular' target='_blank' method='GET'>";
 	$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 	$htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form>";
@@ -759,8 +760,8 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 	{
 		$zweitbetr = $projektbetreuer->result[0];
 		$intern = isset($zweitbetr->uid);
-		$mail_subject = $projekttyp_kurzbz == 'Diplom' ? "Masterarbeitsbetreuung" : "Bachelorarbeitsbetreuung";
-		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+		$mail_subject = $projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
+		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungZweitbegutachter";
 		$mail_fulllink = "$mail_baselink?projektarbeit_id=".$zweitbegutachter->projektarbeit_id."&uid=".$student->uid;
 		$mail_link = $intern ? $mail_fulllink : $mail_baselink;
 

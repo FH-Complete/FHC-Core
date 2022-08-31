@@ -111,52 +111,52 @@ class Projektbetreuer_model extends DB_Model
 		$params = array($erstbegutachter_person_id, $erstbegutachter_person_id, $projektarbeit_id, $student_uid);
 
 		$qry_betr = "SELECT betr.person_id, betr.projektarbeit_id, pers.anrede, betr.zugangstoken, betr.zugangstoken_gueltigbis, tbl_benutzer.uid, kontakt,
-				trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
-				CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email, abg.abgabedatum
-				FROM lehre.tbl_projektbetreuer betr
-				JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id
-				JOIN public.tbl_person pers ON betr.person_id = pers.person_id
-				LEFT JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id AND kontakttyp = 'email' AND zustellung = true
-				LEFT JOIN public.tbl_benutzer ON pers.person_id = tbl_benutzer.person_id
-				LEFT JOIN campus.tbl_paabgabe abg ON betr.projektarbeit_id = abg.projektarbeit_id AND abg.paabgabetyp_kurzbz = 'end'
-				WHERE
-				(
+					trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
+					CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email, abg.abgabedatum
+					FROM lehre.tbl_projektbetreuer betr
+					JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id
+					JOIN public.tbl_person pers ON betr.person_id = pers.person_id
+					LEFT JOIN public.tbl_kontakt ON pers.person_id = tbl_kontakt.person_id AND kontakttyp = 'email' AND zustellung = true
+					LEFT JOIN public.tbl_benutzer ON pers.person_id = tbl_benutzer.person_id
+					LEFT JOIN campus.tbl_paabgabe abg ON betr.projektarbeit_id = abg.projektarbeit_id AND abg.paabgabetyp_kurzbz = 'end'
+					WHERE
 					(
-						betr.betreuerart_kurzbz  = 'Zweitbegutachter'
-						AND EXISTS (
-							SELECT 1 FROM lehre.tbl_projektbetreuer
-							WHERE person_id = ?
-							AND betreuerart_kurzbz = 'Erstbegutachter'
-							AND projektarbeit_id = betr.projektarbeit_id
+						(
+							betr.betreuerart_kurzbz  = 'Zweitbegutachter'
+							AND EXISTS (
+								SELECT 1 FROM lehre.tbl_projektbetreuer
+								WHERE person_id = ?
+								AND betreuerart_kurzbz = 'Erstbegutachter'
+								AND projektarbeit_id = betr.projektarbeit_id
+							)
+						)
+						OR /* either Zweitbegutachter of masterarbeit, or Kommissionsprüfer if Kommission */
+						(
+							betr.betreuerart_kurzbz  = 'Senatspruefer'
+							AND EXISTS (
+								SELECT 1 FROM lehre.tbl_projektbetreuer
+								WHERE person_id = ?
+								AND betreuerart_kurzbz = 'Senatsvorsitz'
+								AND projektarbeit_id = betr.projektarbeit_id
+							)
 						)
 					)
-					OR /* either Zweitbegutachter of masterarbeit, or Kommissionsprüfer if Kommission */
-					(
-						betr.betreuerart_kurzbz  = 'Senatspruefer'
-						AND EXISTS (
-							SELECT 1 FROM lehre.tbl_projektbetreuer
-							WHERE person_id = ?
-							AND betreuerart_kurzbz = 'Senatsvorsitz'
-							AND projektarbeit_id = betr.projektarbeit_id
-						)
-					)
-				)
-				AND betr.projektarbeit_id = ?
-				AND parb.student_uid = ?
-				AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)";
+					AND betr.projektarbeit_id = ?
+					AND parb.student_uid = ?
+					AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL)";
 
-				if (isset($zweitbegutachter_person_id))
-				{
-					$qry_betr .= " AND betr.person_id = ?";
-					$params[] = $zweitbegutachter_person_id;
-				}
+					if (isset($zweitbegutachter_person_id))
+					{
+						$qry_betr .= " AND betr.person_id = ?";
+						$params[] = $zweitbegutachter_person_id;
+					}
 
-				$qry_betr .= " ORDER BY betr.person_id DESC,
-				(CASE WHEN EXISTS ( /* if multiple accounts, prioritize mitarbeiter */
-					SELECT 1 FROM public.tbl_mitarbeiter ma
-					WHERE ma.mitarbeiter_uid = tbl_benutzer.uid
-				) THEN 0 ELSE 1 END), betr.insertamum DESC
-				LIMIT 1";
+					$qry_betr .= " ORDER BY betr.person_id DESC,
+					(CASE WHEN EXISTS ( /* if multiple accounts, prioritize mitarbeiter */
+						SELECT 1 FROM public.tbl_mitarbeiter ma
+						WHERE ma.mitarbeiter_uid = tbl_benutzer.uid
+					) THEN 0 ELSE 1 END), betr.insertamum DESC
+					LIMIT 1";
 
 		return $this->execQuery($qry_betr, $params);
 	}
