@@ -160,7 +160,10 @@
 										<?php
 											echo $this->widgetlib->widget(
 												'Dropdown_widget',
-												array('elements' => success($recipientsArray), 'emptyElement' => ucfirst($this->p->t('global', 'empfaenger')).'...'),
+												array(
+													'elements' => success($recipientsArray),
+													'emptyElement' => ucfirst($this->p->t('global', 'empfaenger')).'...'
+												),
 												array(
 													'name' => 'recipients[]',
 													'id' => 'recipients'

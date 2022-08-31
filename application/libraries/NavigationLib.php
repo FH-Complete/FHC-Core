@@ -83,9 +83,19 @@ class NavigationLib
 	 * Returns the structure for one level of the menu
 	 */
 	public function oneLevel(
-		$description, $link = '#', $children = null, $icon = '', $expand = false,
-		$subscriptDescription = null, $subscriptLinkClass = null, $subscriptLinkValue = null, $target = '',
-		$sort = null, $requiredPermissions = null, $subscriptLinkHref = '#')
+		$description,
+		$link = '#',
+		$children = null,
+		$icon = '',
+		$expand = false,
+		$subscriptDescription = null,
+		$subscriptLinkClass = null,
+		$subscriptLinkValue = null,
+		$target = '',
+		$sort = null,
+		$requiredPermissions = null,
+		$subscriptLinkHref = '#'
+	)
 	{
 		return array(
 			'description' => $description,
@@ -239,7 +249,8 @@ class NavigationLib
 					$filename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_NAVIGATION_FILENAME;
 					if (file_exists($filename))
 					{
-						unset($config);
+						$config = array(); // default value
+
 						include($filename);
 
 						if (isset($config[$configName]) && is_array($config[$configName]))
@@ -294,7 +305,7 @@ class NavigationLib
 		}
 		else
 		{
-			foreach ($navigationArray as $key=>$row)
+			foreach ($navigationArray as $key => $row)
 			{
 				// Search for * Entries
 				if (mb_strpos($key, '*') === 0 || mb_strpos($key, '*') === mb_strlen($key) - 1)

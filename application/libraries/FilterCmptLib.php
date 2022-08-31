@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \stdClass as stdClass;
+
 /**
  * Filter component logic
  */
@@ -92,8 +94,8 @@ class FilterCmptLib
 	private $_ci; // Code igniter instance
 
 	private $_filterUniqueId; // Unique id for this filter component
-	private $_filterType; // 
-	private $_filterId; // 
+	private $_filterType; //
+	private $_filterId; //
 
 	private $_app;
 	private $_datasetName;
@@ -133,6 +135,8 @@ class FilterCmptLib
 		//
 		if (!$this->_checkJSParameters()) return;
 
+		$filterCmptArray = array(); // default value
+
 		//
 		$filePath = findResource(APPPATH.'components/filters/', $this->_filterType, true);
 		if (!isEmptyString($filePath))
@@ -147,7 +151,7 @@ class FilterCmptLib
 		}
 
 		//
-		if (!isset($filterCmptArray))
+		if (!isset($filterCmptArray) && isEmptyArray($filterCmptArray))
 		{
 			$this->_setSession(error('Component definition file '.$this->_filterType.' not found'));
 			return;
@@ -156,7 +160,7 @@ class FilterCmptLib
 		//
 		if (!$this->_checkPHPParameters($filterCmptArray)) return;
 
-		// 
+		//
 		$this->_initFilterCmpt($filterCmptArray);
 
 		//
@@ -340,7 +344,8 @@ class FilterCmptLib
 			if (in_array($selectedField, $fields))
 			{
 				// If the selected field is present in the list of the selected fields by the current filter
-				if (($pos = array_search($selectedField, $selectedFields)) !== false)
+				$pos = array_search($selectedField, $selectedFields);
+				if ($pos !== false)
 				{
 					// Then remove it and shift the rest of elements by one if needed
 					array_splice($selectedFields, $pos, 1);
@@ -453,7 +458,7 @@ class FilterCmptLib
 				// If not an empty array
 				if ($filterField != null)
 				{
-					// 
+					//
 					if (isset($filterField->name) && isset($filterField->operation) && isset($filterField->condition)
 						&& !isEmptyString($filterField->name) && !isEmptyString($filterField->operation)
 						&& !isEmptyString($filterField->condition))
@@ -479,14 +484,14 @@ class FilterCmptLib
 						break;
 					}
 				}
-				else // 
+				else //
 				{
 					$fine = false;
 					break;
 				}
 			}
 
-			// 
+			//
 			if ($fine)
 			{
 				// Write changes into the session
@@ -640,9 +645,6 @@ class FilterCmptLib
 		// If filters were loaded
 		if (hasData($filters))
 		{
-			$childrenArray = array(); // contains all the children elements in a menu entry
-			$childrenPersonalArray = array(); // contains all the children elements in menu enty for personal filters
-
 			// Loops through loaded filters
 			foreach (getData($filters) as $filter)
 			{
@@ -977,12 +979,11 @@ class FilterCmptLib
 	{
 		$columnsNames = array();
 
-		foreach ($columns as $key => $obj)
+		// For each column
+		foreach ($columns as $obj)
 		{
-			if (isset($obj->name))
-			{
-				$columnsNames[] = $obj->name;
-			}
+			// If it is set the property name of the column
+			if (isset($obj->name)) $columnsNames[] = $obj->name;
 		}
 
 		return $columnsNames;
@@ -1209,7 +1210,7 @@ class FilterCmptLib
 	private function _getFilterName($filterJson)
 	{
 		$filterName = $filterJson->name; // always present, used as default
-		$trimedname = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
+
 		// Filter name from phrases system
 		if (isset($filterJson->namePhrase) && !isEmptyString($filterJson->namePhrase))
 		{

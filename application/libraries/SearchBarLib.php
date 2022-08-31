@@ -18,12 +18,14 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \stdClass as stdClass;
+
 /**
  *
  */
 class SearchBarLib
 {
-	// 
+	// Error constats
 	const ERROR_WRONG_JSON = 'ERR001';
 	const ERROR_WRONG_SEARCHSTR = 'ERR002';
 	const ERROR_NO_TYPES = 'ERR003';

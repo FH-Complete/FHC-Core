@@ -169,7 +169,9 @@ $this->load->view(
                         );
                         ?>
                     </div>
-                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
+			<button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group">
+				<?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?>
+			</button>
                 </form>
             </div>
         </div>
@@ -205,3 +207,4 @@ $this->load->view(
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
+

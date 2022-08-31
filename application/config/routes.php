@@ -67,21 +67,19 @@ $dirlist = scandir($subdir);
 
 if ($dirlist)
 {
-    $files = array_diff($dirlist, array('.','..'));
+	$files = array_diff($dirlist, array('.','..'));
 
-    foreach ($files as &$item) 
-    {
+	foreach ($files as &$item)
+	{
+		if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
+		{
+			$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
 
-        if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
-        {
-            $routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
-
-            if (file_exists($routes_file))
-            {
-                require($routes_file);                
-            }
-
-        }
-        
-  }
+			if (file_exists($routes_file))
+			{
+				require($routes_file);
+			}
+		}
+	}
 }
+

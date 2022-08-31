@@ -129,15 +129,11 @@
 								<button type="button" class="btn btn-default zgvAblehnen" id="zgvAblehnen_<?php echo $prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'zgvNichtErfuellt') ?>
 								</button>
-								<?php
-								if ($studiengang_typ === 'm') :
-								?>
+								<?php if ($studiengang_typ === 'm') : ?>
 									<button type="button" class="btn btn-default zgvAkzeptierenPruefung" id="zgvAkzeptierenPruefung_<?php echo $prestudent_id ?>">
 										<?php echo $this->p->t('infocenter', 'zgvErfuelltPruefung') ?>
 									</button>
-								<?php
-								endif;
-								?>
+								<?php endif; ?>
 								<span class="zgvStatusText" id="zgvStatusText_<?php echo $prestudent_id ?>" data-info="need">
 								</span>
 							</div>

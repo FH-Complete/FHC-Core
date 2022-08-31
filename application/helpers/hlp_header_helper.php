@@ -181,16 +181,26 @@ function generateAddonsJSsInclude($calledFrom)
 {
 	$aktive_addons = array_filter(explode(";", ACTIVE_ADDONS));
 
+	// For each active addon
 	foreach ($aktive_addons as $addon)
 	{
+		// Build the path to the hook file
 		$hookfile = DOC_ROOT.'addons/'.$addon.'/hooks.config.inc.php';
+
+		// If the hook file exists
 		if (file_exists($hookfile))
 		{
-			include($hookfile);
+			$js_hooks = array(); // default value
+
+			include($hookfile); // include the hook file where the array js_hooks should be setup
+
+			// If it contains the provided key calledFrom
 			if (key_exists($calledFrom, $js_hooks))
 			{
 				foreach ($js_hooks[$calledFrom] as $js_file)
+				{
 					generateJSsInclude('addons/'.$addon.'/'.$js_file);
+				}
 			}
 		}
 	}

@@ -49,7 +49,9 @@ $this->load->view(
         <!-- title -->
         <div class="row">
             <div class="col-lg-12 page-header">
-                <h3>Zeitverf&uuml;gbarkeiten verwalten<small>  |  Punktuelle Zeitverfügbarkeiten von Lehrenden für die LV-Planung verwalten</small></h3>
+		<h3>Zeitverf&uuml;gbarkeiten verwalten<small>
+			  |  Punktuelle Zeitverfügbarkeiten von Lehrenden für die LV-Planung verwalten</small>
+		</h3>
             </div>
         </div>
 
