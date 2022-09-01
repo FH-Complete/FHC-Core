@@ -440,6 +440,44 @@ if ($deleteAllResults)
 	}
 }
 
+// Ajax-Request um die Liste zusammenzuräumen
+$clearList = filter_input(INPUT_POST, 'clearList', FILTER_VALIDATE_BOOLEAN);
+if ($clearList)
+{
+	if (!$rechte->isBerechtigt('infocenter', null, 'suid'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	$qry = "DELETE FROM testtool.tbl_pruefling pf
+			WHERE 
+			(
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_pruefling_frage WHERE pruefling_id=pf.pruefling_id) AND
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_antwort WHERE pruefling_id=pf.pruefling_id)
+			)";
+
+	if ($result = $db->db_query($qry))
+	{
+		echo json_encode(array(
+			'status' => 'ok',
+			'msg' => $db->db_affected_rows($result).' leere Prüflinge wurden gelöscht'));   
+		exit();
+	}
+	else
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => 'Fehler beim Löschen der leeren Prüflinge'
+		));
+		exit();
+	}
+}
+
+// Ajax-Request um einen Prüfling zu sperren
 $rtprueflingEntSperren = filter_input(INPUT_POST, 'rtprueflingEntSperren', FILTER_VALIDATE_BOOLEAN);
 if ($rtprueflingEntSperren)
 {
@@ -2581,6 +2619,39 @@ else
 		});
 		window.location.href = "mailto:?bcc="+adresseArray.join(";");
 	}
+	
+	function clearList()
+	{
+		$.ajax({
+			url: "auswertung_fhtw.php",
+			data: {clearList: true},
+			type: "POST",
+			dataType: "json",
+			success: function(data)
+			{
+				if(data.status !== "ok")
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+				else
+				{
+					$("#freischaltenWarning").show();
+					$("#freischaltenInfo").hide();
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+				}
+			},
+			error: function(data)
+			{
+				$("#msgbox").attr("class","alert alert-danger");
+				$("#msgbox").show();
+				$("#msgbox").html(data["msg"]);
+			}
+		});
+	}
+	
 	function checkAllWithResult()
 	{
 		// Schleife ueber die einzelnen Elemente
@@ -2964,6 +3035,10 @@ else
 	else
 	{
 		echo '&nbsp;&nbsp;<a href="#" class="btn btn-default btn-xs" disabled="" role="button" title="Aktiv nur bei Einzelterminauswahl">Testfortschritt ansehen</a>';
+	}
+	if ($rechte->isBerechtigt('infocenter', null, 'suid'))
+	{
+		echo '&nbsp;&nbsp;<button type="button" class="btn btn-default btn-xs" onclick="clearList()" id="clearListButton" title="Löscht alle Prüflinge, bei denen keine Daten vorhanden sind">Liste aufräumen</button>';
 	}
 	echo '</div></div></form>';
 	echo '	<form class="form" role="form">

@@ -105,7 +105,7 @@ class Studiensemester_model extends DB_Model
 	/**
 	 * getPreviousFrom
 	 */
-	public function getPreviousFrom($studiensemester_kurzbz)
+	public function getPreviousFrom($studiensemester_kurzbz, $limit = 1)
 	{
 		$query = 'SELECT studiensemester_kurzbz,
 						 start,
@@ -117,9 +117,9 @@ class Studiensemester_model extends DB_Model
 									 WHERE studiensemester_kurzbz = ?
 								)
 				ORDER BY start DESC
-				   LIMIT 1';
+				   LIMIT ?';
 
-		return $this->execQuery($query, array($studiensemester_kurzbz));
+		return $this->execQuery($query, array($studiensemester_kurzbz, $limit));
 	}
 
 	/**

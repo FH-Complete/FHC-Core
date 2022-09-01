@@ -31,7 +31,9 @@ $this->load->view(
 			),
 			'anrechnung' => array(
 				'deadlineUeberschritten',
-				'benotungDerLV'
+				'benotungDerLV',
+                'anrechnungEctsTextBeiUeberschreitung',
+                'anrechnungEctsTooltipTextBeiUeberschreitung'
 			),
 			'person' => array(
 				'student',
@@ -60,7 +62,6 @@ $this->load->view(
     }
 </style>
 
-<body>
 <div id="page-wrapper">
     <div class="container-fluid">
         <!-- header -->
@@ -80,9 +81,13 @@ $this->load->view(
 				<div class="row">
 					<div class="col-lg-12">
 						<form id="requestAnrechnung-form">
+							<input type="hidden" name="anrechnung_id" id="anrechnung_id" value="<?php echo $anrechnungData->anrechnung_id ?>">
 							<input type="hidden" name="lv_id" value="<?php echo $antragData->lv_id ?>">
 							<input type="hidden" name="studiensemester" value="<?php echo $antragData->studiensemester_kurzbz ?>">
-							<!-- Antragsdaten -->
+                            <input type="hidden" name="ects" value="<?php echo $antragData->ects ?>">
+                            <input type="hidden" name="sumEctsSchulisch" value="<?php echo $antragData->sumEctsSchulisch ?>">
+                            <input type="hidden" name="sumEctsBeruflich" value="<?php echo $antragData->sumEctsBeruflich ?>">
+                            <!-- Antragsdaten -->
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="panel panel-default">
@@ -119,8 +124,23 @@ $this->load->view(
 											</tr>
 											<tr>
 												<th><?php echo $this->p->t('lehre', 'ects'); ?></th>
-												<td><?php echo $antragData->ects ?></td>
+                                                <td><span id="ects"><?php echo number_format($antragData->ects, 1) ?> ECTS</span></td>
 											</tr>
+                                            <tr>
+                                                <th>
+                                                    <?php echo $this->p->t('anrechnung', 'bisherAngerechneteEcts'); ?>
+                                                    <span data-toggle="tooltip" data-placement="right"
+                                                        title="<?php echo $this->p->t('anrechnung', 'anrechnungEctsTooltipText'); ?>">
+                                                        <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                    </span>
+                                                </th>
+                                                <td colspan="3">
+                                                    Total ECTS: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
+                                                    [ Schulisch: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> |
+                                                    Beruflich: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
+                                                    <span id="requestAnrechnung-maxEctsUeberschrittenMsg"></span>
+                                                </td>
+                                            </tr>
 											<tr>
 												<th><?php echo ucfirst($this->p->t('lehre', 'lektorInnen')); ?></th>
 												<td>
@@ -152,6 +172,17 @@ $this->load->view(
 											</span>
 											</label>
 										</div>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="radio" name="begruendung" value="5" required
+                                                    <?php echo $anrechnungData->begruendung_id == '5' ? 'checked' : ''; ?> />
+                                                <?php echo $this->p->t('anrechnung', 'antragStellenWegenHochschulzeugnis'); ?>&emsp;
+                                                <span id="requestAnrechnung-anrechnungGrundHochschulzeugnisTooltip" data-toggle="tooltip" data-placement="right"
+                                                      title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>" />
+                                                <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                                </span>
+                                            </label>
+                                        </div>
 										<div class="checkbox">
 											<label>
 												<input type="radio" name="begruendung" value="4" required
@@ -180,7 +211,7 @@ $this->load->view(
 										<div class="form-inline panel-body">
 											<div class="form-group">
 												<input type="file" id="requestAnrechnung-uploadfile"
-													   name="uploadfile" accept=".pdf" size="50" data-maxsize="<?php echo (int)ini_get('upload_max_filesize') * 1024 ?>"
+													   name="uploadfile" accept=".pdf" size="50" data-maxsize="<?php echo (int)ini_get('upload_max_filesize') * 1024 * 1024 ?>"
 													   required>
 											</div>
 											<span id="requestAnrechnung-uploadTooltip" data-toggle="tooltip" data-placement="right"
@@ -261,6 +292,5 @@ $this->load->view(
         </div>
     </div>
 </div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
