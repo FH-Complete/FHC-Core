@@ -110,9 +110,10 @@ class Projektbetreuer_model extends DB_Model
 	{
 		$params = array($erstbegutachter_person_id, $erstbegutachter_person_id, $projektarbeit_id, $student_uid);
 
-		$qry_betr = "SELECT betr.person_id, betr.projektarbeit_id, pers.anrede, betr.zugangstoken, betr.zugangstoken_gueltigbis, tbl_benutzer.uid, kontakt,
+		$qry_betr = "SELECT betr.person_id, betr.projektarbeit_id, pers.anrede, betr.zugangstoken, betr.zugangstoken_gueltigbis, tbl_benutzer.uid,
 					trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as voller_name,
-					CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email, abg.abgabedatum
+					CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email, kontakt,
+					abg.abgabedatum, betr.betreuerart_kurzbz
 					FROM lehre.tbl_projektbetreuer betr
 					JOIN lehre.tbl_projektarbeit parb ON betr.projektarbeit_id = parb.projektarbeit_id
 					JOIN public.tbl_person pers ON betr.person_id = pers.person_id

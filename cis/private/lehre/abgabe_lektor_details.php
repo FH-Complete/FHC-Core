@@ -760,8 +760,9 @@ function sendZweitbegutachterMail($zweitbegutachter, $erstbegutachter_person_id,
 	{
 		$zweitbetr = $projektbetreuer->result[0];
 		$intern = isset($zweitbetr->uid);
+		$mail_link_path = $zweitbetr->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
 		$mail_subject = $projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
-		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungZweitbegutachter";
+		$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$mail_link_path";
 		$mail_fulllink = "$mail_baselink?projektarbeit_id=".$zweitbegutachter->projektarbeit_id."&uid=".$student->uid;
 		$mail_link = $intern ? $mail_fulllink : $mail_baselink;
 
