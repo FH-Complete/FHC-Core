@@ -266,14 +266,14 @@ function showHideBezeichnungDropDown()
 	if (dd.options[dd.selectedIndex].value == 'DienstV')
 	{
 		var str = '<select name="bezeichnung" class="dd_breit">';
-		str += '<option value="Eheschließung">a) Eigene Eheschließung</option>';
-		str += '<option value="Geburt eigenes Kind">b) Geburt eines Kindes der Ehefrau/Lebensgefährtin</option>';
-		str += '<option value="Heirat Kind/Geschwister">c) Eheschließung eines Kindes/eigener Geschwister</option>';
-		str += '<option value="Eigene Sponsion/Promotion">d) Teilnahme an eigener Sponsion/Promotion</option>';
-		str += '<option value="Lebensbedr. Erkrankung P/K/E">e) Lebensbedrohliche Erkrankung Partner/Kinder/Eltern</option>';
-		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil</option>';
-		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern</option>';
-		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt</option>';
+		str += '<option value="Eheschließung">a) Eigene Eheschließung (3 Tage)</option>';
+		str += '<option value="Geburt eigenes Kind">b) Geburt eines Kindes der Ehefrau/Lebensgefährtin (2 Tage)</option>';
+		str += '<option value="Heirat Kind/Geschwister">c) Eheschließung eines Kindes/eigener Geschwister (1 Tag)</option>';
+		str += '<option value="Eigene Sponsion/Promotion">d) Teilnahme an eigener Sponsion/Promotion (1 Tag)</option>';
+		str += '<option value="Lebensbedr. Erkrankung P/K/E">e) Lebensbedrohliche Erkrankung Partner/Kinder/Eltern (3 Tage)</option>';
+		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil (3 Tage)</option>';
+		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern (1 Tag)</option>';
+		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt (2 Tage)</option>';
 		str += '<option value="Bundesheer">i) Einberufung Bundesheer</option>';
 		str += '</select>';
 
@@ -282,7 +282,7 @@ function showHideBezeichnungDropDown()
 	}
 	else if (dd.options[dd.selectedIndex].value == 'DienstF')
 	{
-		sp.innerHTML = '<font color="red"><b>Dienstfreistellungen</b> nur in Absprache mit Personalservice eintragen!</font><br><input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
+		sp.innerHTML = '<font color="red"><b>Dienstfreistellungen</b> nur in Absprache mit HR Service eintragen!</font><br><input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
 	}
 	else
 	{
@@ -690,7 +690,7 @@ if(count($zeit->result)>0)
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
 							<td>".(isset($erreichbarkeit_arr[$row->erreichbarkeit])?$erreichbarkeit_arr[$row->erreichbarkeit]:'')."</td>
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
-		if ($row->zeitsperretyp_kurzbz == 'DienstV')
+		if ($row->zeitsperretyp_kurzbz == 'DienstV' || $row->zeitsperretyp_kurzbz == 'ZVerfueg')
 			$content_table .= '<td>&nbsp;</td>';
 		else if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
@@ -702,7 +702,7 @@ if(count($zeit->result)>0)
 		{
 			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id&informSupervisor=True' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
-		elseif($row->zeitsperretyp_kurzbz!='Urlaub')
+		elseif($row->zeitsperretyp_kurzbz!='Urlaub' && $row->zeitsperretyp_kurzbz != 'ZVerfueg')
         {
             $content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
         }
@@ -762,6 +762,11 @@ if($result = $db->db_query($qry))
 {
 	while($row=$db->db_fetch_object($result))
 	{
+        if ($row->zeitsperretyp_kurzbz === 'ZVerfueg')
+        {
+            continue;
+        }
+
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
 			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->beschreibung</OPTION>";
 		else

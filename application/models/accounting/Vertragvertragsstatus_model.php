@@ -135,7 +135,7 @@ class Vertragvertragsstatus_model extends DB_Model
 
 	/**
 	 * Get all contracts, where the status had been set to 'bestellt' on given date
-	 * @param string $string_date e.g. '01.11.2019' or special Date/Time inputs like 'YESTERDAY', 'TODAY', 'NOW'
+	 * @param string $string_date e.g. 'YYYY-MM-DD' or special Date/Time inputs like 'YESTERDAY', 'TODAY', 'NOW'
 	 * @param bool $further_processed If true, ALL ordered contracts of that day are retrieved, even if they were
 	 * 								  were ALSO approved/accepted/cancelled (further processed) on that same day.
 	 * @return array
