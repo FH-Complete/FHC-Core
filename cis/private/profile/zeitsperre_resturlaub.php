@@ -282,7 +282,7 @@ function showHideBezeichnungDropDown()
 	}
 	else if (dd.options[dd.selectedIndex].value == 'DienstF')
 	{
-		sp.innerHTML = '<font color="red"><b>Dienstfreistellungen</b> nur in Absprache mit Personalservice eintragen!</font><br><input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
+		sp.innerHTML = '<font color="red"><b>Dienstfreistellungen</b> nur in Absprache mit HR Service eintragen!</font><br><input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
 	}
 	else
 	{
