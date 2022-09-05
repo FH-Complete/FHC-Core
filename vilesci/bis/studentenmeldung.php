@@ -304,7 +304,9 @@ elseif ($stg_kz == 'alleBaMa')
 		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
-		AND tbl_studiengang.typ IN ('b','m')
+		AND tbl_studiengang.typ IN ('b','m','e')
+		AND tbl_studiengang.melderelevant=TRUE
+		AND tbl_studiengang.studiengang_kz > 0
 		AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 			AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
 			OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
@@ -1269,7 +1271,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				if($row_ap->sponsion=='' || $row_ap->sponsion==null)
 				{
-					$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
+					$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
 				}
 				$ap++;
 			}
