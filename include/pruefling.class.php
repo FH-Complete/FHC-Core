@@ -31,6 +31,7 @@ class pruefling extends basis_db
 	public $registriert;
 	public $prestudent_id;
 	public $semester;
+	public $gesperrt;
 
 	// ErgebnisArray
 	public $result=array();
@@ -67,6 +68,7 @@ class pruefling extends basis_db
 				$this->registriert = $row->registriert;
 				$this->prestudent_id = $row->prestudent_id;
 				$this->semester = $row->semester;
+				$this->gesperrt = $row->gesperrt;
 				return true;
 			}
 			else
@@ -184,6 +186,7 @@ class pruefling extends basis_db
 				$this->registriert = $row->registriert;
 				$this->prestudent_id = $row->prestudent_id;
 				$this->semester = $row->semester;
+				$this->gesperrt = $row->gesperrt;
 				return true;
 			}
 			else
@@ -221,6 +224,7 @@ class pruefling extends basis_db
 				$obj->registriert = $row->registriert;
 				$obj->prestudent_id = $row->prestudent_id;
 				$obj->semester = $row->semester;
+				$obj->gesperrt = $row->gesperrt;
 
 				$this->result[] = $obj;
 			}
