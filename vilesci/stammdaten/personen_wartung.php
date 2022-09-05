@@ -438,7 +438,7 @@ Alte Anmerkungen: ".$personToDelete_obj->anmerkungen;
 
 				$anmerkung .= "
 				
-Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y H:i:s');
+Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y H:i:s')." von ".$uid;
 
 				// Letztbenutzten Zugangscode abfragen und übernehmen
 				$zugangscode = '';

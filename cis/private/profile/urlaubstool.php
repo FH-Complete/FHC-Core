@@ -35,6 +35,7 @@ require_once('../../../include/sancho.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/sprache.class.php');
+require_once('../../../include/zeitaufzeichnung.class.php');
 
 $datum_obj = new datum();
 $sprache = getSprache();
@@ -287,20 +288,59 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 
 		}
 
-		//Pruefen ob bereits ein Urlaub in den markierten Bereichen vorhanden ist und ggf Abbrechen
-		//Das Problem sollte nur beim manuellen Refresh der Seite auftreten
-		$error=false;
-		for($i=0;$i<count($akette);$i++)
+		//Prüfen, ob eine Zeitaufzeichnung vorhanden ist und ggf Abbrechen
+		$error = false;
+		for ($i = 0; $i < count($akette); $i++)
 		{
-			$zeitsperre = new zeitsperre();
+			$za = new zeitaufzeichnung();
+			$vonDatum = new DateTime($akette[$i]);
+			$bisDatum = new DateTime($ekette[$i]);
 
-			if($zeitsperre->UrlaubEingetragen($uid, $akette[$i], $ekette[$i]))
+			if ($za->existsZeitaufzeichnung($uid, $vonDatum->format('d.m.Y'), $bisDatum->format('d.m.Y')))
 			{
-				$vgmail.='<br><span class="error">'.$p->t('zeitsperre/urlaubBereitsEingetragen').'</span>';
-				$error=true;
+				$error = true;
+				$vgmail .= '<br><span class="error">'.$p->t('zeitsperre/zeitaufzeichnungVorhanden'). ' '.
+										$vonDatum->format('d.m.Y'). ' - '. $bisDatum->format('d.m.Y'). '</span>';
 				break;
 			}
 		}
+
+		//Prüfen ob eine ganztägige Zeitsperre eingetragen ist und ggf abbrechen
+		$daysToCheck = array();
+		for ($i = 0; $i < count($akette); $i++)
+		{
+			$zeitsperre = new zeitsperre();
+		  $vonDatum = new DateTime($akette[$i]);
+			$bisDatum = new DateTime($ekette[$i]);
+
+			//add here to array, weil in der foreach-Schleife, das bisdatum nicht inkludiert ist
+			$daysToCheck[] = $bisDatum->format("Y-m-d");
+
+			$daterange = new DatePeriod($vonDatum, new DateInterval('P1D'), $bisDatum);
+			foreach($daterange as $date)
+				{
+						$daysToCheck[] = $date->format("Y-m-d");
+				}
+			}
+
+			foreach ($daysToCheck AS $date)
+			{
+				$zeitsperre->getSperreByDate($uid, $date, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN);
+
+				foreach ($zeitsperre->result as $z)
+				{
+					if ($z->zeitsperretyp_kurzbz)
+					{
+						$error = true;
+
+						$z->zeitsperretyp_kurzbz == 'Urlaub' ?
+							$vgmail.='<br><span class="error">'.$p->t('zeitsperre/urlaubBereitsEingetragen').'</span>' :
+							$vgmail .= '<br><span class="error">'.$p->t('zeitsperre/zeitsperreEingetragen',[$date, $z->zeitsperretyp_kurzbz]). '</span>';
+
+						break;
+					}
+				}
+			}
 	}
 
 	if(!$error)

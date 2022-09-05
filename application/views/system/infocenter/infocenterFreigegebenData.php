@@ -199,14 +199,15 @@ $query = '
 				 LIMIT 1
 			) AS "ReihungstestApplied",
 			(
-				SELECT rtp.datum
+				SELECT CONCAT(rtp.datum, rtp.uhrzeit)
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 		  	 LEFT JOIN (
 					SELECT rtp.person_id,
 						   rt.studiensemester_kurzbz,
 						   rtp.teilgenommen,
-						   rt.datum
+						   rt.datum,
+						   rt.uhrzeit
 					  FROM public.tbl_rt_person rtp
 		   			  JOIN tbl_reihungstest rt ON(rtp.rt_id = rt.reihungstest_id)
 					 WHERE rt.stufe = 1
@@ -409,13 +410,13 @@ $query = '
 				$datasetRaw->{'ReihungstestApplied'} = 'Nein';
 			}
 
-			if ($datasetRaw->{'ReihungstestDate'} == null)
+			if ($datasetRaw->{'ReihungstestDate'} == '')
 			{
 				$datasetRaw->{'ReihungstestDate'} = '-';
 			}
 			else
 			{
-				$datasetRaw->{'ReihungstestDate'} = date_format(date_create($datasetRaw->{'ReihungstestDate'}),'Y-m-d');
+				$datasetRaw->{'ReihungstestDate'} = date_format(date_create($datasetRaw->{'ReihungstestDate'}),'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'ZGVNation'} == null)
