@@ -54,13 +54,21 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 	<vbox id="LehrveranstaltungEditor" flex="1" uid="" stg_kz="">
 	<popupset>
 		<menupopup id="lehrveranstaltung-tree-popup">
+			<menu id="lehrveranstaltung-tree-popup-lehreinheit-kopieren" label="LV-Teil kopieren">
+				<menupopup id="lehrveranstaltung-tree-popup-lehreinheit-kopieren-popup">
+					<menuitem label="Alles" oncommand="LeCopy('alle');" id="lehrveranstaltung-tree-popup-lehreinheit-kopieren-alle" hidden="false"/>
+					<menuitem label="Nur LV-Teil" oncommand="LeCopy('lvteil');" id="lehrveranstaltung-tree-popup-lehreinheit-kopieren-lvteil" hidden="false"/>
+					<menuitem label="Nur mit Gruppen" oncommand="LeCopy('gruppen');" id="lehrveranstaltung-tree-popup-lehreinheit-kopieren-gruppen" hidden="false"/>
+					<menuitem label="Nur mit Lehrenden" oncommand="LeCopy('lektoren');" id="lehrveranstaltung-tree-popup-lehreinheit-kopieren-lektoren" hidden="false"/>
+				</menupopup>
+			</menu>
 			<menuitem label="Entfernen" oncommand="LeDelete();" id="lehrveranstaltung-tree-popup-entf" disabled="false"/>
 		</menupopup>
 	</popupset>
 		<toolbox>
 			<toolbar id="lehrveranstaltung-nav-toolbar">
-			<toolbarbutton id="lehrveranstaltung-toolbar-neu" label="Neuer LV-Teil" oncommand="LeNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neue Lehreinheit anlegen" />
-			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Loeschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
+			<toolbarbutton id="lehrveranstaltung-toolbar-neu" label="Neuer LV-Teil" oncommand="LeNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen LV-Teil anlegen" />
+			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Loeschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="LV-Teil löschen"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Aktualisieren" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-lehrauftrag" label="Lehrauftrag" oncommand="LvCreateLehrauftrag()" disabled="false" image="../skin/images/person.gif" tooltiptext="Lehrauftrag ausdrucken" hidden="true"/>
 
@@ -82,7 +90,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 			<textbox id="lehrveranstaltung-toolbar-textbox-suche" control="lehrveranstaltung-toolbar-button-search" onkeypress="LehrveranstaltungSearchFieldKeyPress(event)" style="width: 300px" />
 			<button id="lehrveranstaltung-toolbar-button-search" oncommand="LehrveranstaltungSuche()" label="Suchen"/>
 			<spacer flex="1" />
-			<toolbarbutton id="lehrveranstaltung-toolbar-opensubtrees" label="Aufklappen" tooltiptext="Klappt die Untermenüs auf - mehrmaliges klicken möglich um weiter aufzuklappen" oncommand="LvTreeOpenAllSubtrees()" disabled="false" image="../skin/images/tree-diagramm.png" />
+			<toolbarbutton id="lehrveranstaltung-toolbar-opensubtrees" label="Aufklappen" tooltiptext="Klappt die Untermenüs auf - mehrmaliges klicken möglich um weiter aufzuklappen" oncommand="LvTreeOpenAllSubtrees('aus')" disabled="false" image="../skin/images/tree-diagramm.png" />
+			<toolbarbutton id="lehrveranstaltung-toolbar-opensubtrees" label="Alles Einklappen" tooltiptext="Klappt alle Untermenüs ein" oncommand="LvTreeOpenAllSubtrees('ein')" disabled="false" image="../skin/images/modul.png" />
 			</toolbar>
 		</toolbox>
 

@@ -304,7 +304,9 @@ elseif ($stg_kz == 'alleBaMa')
 		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
-		AND tbl_studiengang.typ IN ('b','m')
+		AND tbl_studiengang.typ IN ('b','m','e')
+		AND tbl_studiengang.melderelevant=TRUE
+		AND tbl_studiengang.studiengang_kz > 0
 		AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 			AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
 			OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
@@ -1233,7 +1235,7 @@ function GenerateXMLStudentBlock($row)
 
 			if($gserror!='')
 			{
-				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+				$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 				$v.=$gserror."\n";
 				return '';
 			}
@@ -1269,7 +1271,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				if($row_ap->sponsion=='' || $row_ap->sponsion==null)
 				{
-					$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
+					$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
 				}
 				$ap++;
 			}
@@ -1337,7 +1339,7 @@ function GenerateXMLStudentBlock($row)
 
 	if($error_log!='' OR $error_log1!='')
 	{
-		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+		$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 		if($error_log!='')
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fehler: ".$error_log."\n";
@@ -1361,7 +1363,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		if($error_log_hinweis != '')
 		{
-			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+			$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n\n";
 			$error_log_hinweis = '';
 		}
@@ -1663,7 +1665,7 @@ function GenerateXMLStudentBlock($row)
 				// Bei validen Daten errorlog ausgeben
 				if($error_log_io != '')
 				{
-					$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+					$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 					if($error_log_io != '')
 					{
 						$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fehler: ".$error_log_io. "\n";

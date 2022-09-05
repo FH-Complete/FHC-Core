@@ -43,7 +43,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 		$this->edit = $edit;
 		$this->data = $data;
 	}
-	
+
 
 	/**
 	 * @return string
@@ -77,7 +77,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 			$this->addError($ex->getMessage());
 		}
 	}
-	
+
 	/**
 	 * @param string $zeitaufzeichnung_id
 	 * @return void
@@ -125,7 +125,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 		$this->zeit->service_id = $service_id;
 		$this->zeit->kunde_uid = $kunde_uid;
 	}
-	
+
 	/**
 	 * @param string $start datetime
 	 * @param string $end datetime
@@ -145,7 +145,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 	 * @param string $start "Y-m-d H:i:s" formatted datetime
 	 * @param string $end "Y-m-d H:i:s" formatted datetime
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkPauseInArbeitszeit($start, $end) {
@@ -158,7 +158,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 	 * @param string $start "Y-m-d H:i:s" formatted datetime
 	 * @param string $end "Y-m-d H:i:s" formatted datetime
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkPauseValid($start, $end) {
@@ -177,7 +177,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 		$ende = $this->zeit->ende;
 		$this->zeit->ende = $this->datum->formatDatum($start, 'Y-m-d H:i:s');
 		if (!$this->zeit->save()) {
-			$this->addError($p->t("global/fehlerBeimSpeichernDerDaten") . ': ' . $this->zeit->errormsg);
+			$this->addError($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': ' . $this->zeit->errormsg);
 		}
 		//Eintrag für die Pause
 		$pause = new zeitaufzeichnung();
@@ -193,7 +193,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 		$pause->ende = $this->datum->formatDatum($end, 'Y-m-d H:i:s');
 		$pause->beschreibung = '';
 		if (!$pause->save()) {
-			$this->addError($p->t("global/fehlerBeimSpeichernDerDaten") . ': ' . $pause->errormsg);
+			$this->addError($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': ' . $pause->errormsg);
 		}
 		// Eintrag Arbeit ab der Pause
 		if ($this->zeit->new == false) {
@@ -208,7 +208,7 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 
 	/**
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function saveZeit() {
@@ -218,5 +218,5 @@ class zeitaufzeichnung_import_post extends zeitaufzeichnung_import {
 			$this->addInfo($this->p->t("global/datenWurdenGespeichert"));
 		}
 	}
-	
+
 }
