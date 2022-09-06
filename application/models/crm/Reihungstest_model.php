@@ -453,12 +453,14 @@ class Reihungstest_model extends DB_Model
 		  ) AS "email",
 		 tbl_ort.planbezeichnung,
 		 tbl_ort.lageplan,
+		 sg.oe_kurzbz,
 		row_number () over (partition by tbl_rt_person.person_id order by ps.priorisierung) as row_number
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
 		JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = reihungstest_id)
 		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
 		JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+		JOIN PUBLIC.tbl_studiengang sg ON(sg.studiengang_kz = rt.studiengang_kz)
 		LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
 		LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
 		WHERE rt_id = ?
