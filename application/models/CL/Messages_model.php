@@ -50,6 +50,8 @@ class Messages_model extends CI_Model
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		// Loads model Benutzer_model
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		// Loads model Studiengang_model
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 	}
 
@@ -280,18 +282,35 @@ class Messages_model extends CI_Model
 		$srmsbtResult = $this->MessageTokenModel->setReadMessageStatusByToken($token);
 		if (isError($srmsbtResult)) show_error(getError($srmsbtResult));
 
-		// Retrieves message sender information
-		$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
-		if (isError($senderResult)) show_error(getError($senderResult));
-		if (!hasData($senderResult)) show_error('No sender information found');
+		// Sender name
+		$sender = 'System sender'; // default fallback
 
-		$sender = getData($senderResult)[0]; // Found sender data
+		// If the sender is a person
+		if (isEmptyString($message->oe_kurzbz))
+		{
+			// And if this person is not the system sender
+			if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
+			{
+				// Retrieves message sender information
+				$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
+				if (isError($senderResult)) show_error(getError($senderResult));
+				if (!hasData($senderResult)) show_error('No sender information found');
 
-		// If the sender is not the system sender and the receiver is not the system sender
-		// and are present configurations to reply
+				$sender = getData($senderResult)[0]->vorname.' '.getData($senderResult)[0]->nachname;
+			}
+		}
+		else // otherwise if the sender is an organization unit (degree program)
+		{
+			$ouResult = $this->StudiengangModel->loadWhere(array('oe_kurzbz' => $message->oe_kurzbz));
+			if (isError($ouResult)) show_error(getError($ouResult));
+			if (!hasData($ouResult)) show_error('No organization unit information found');
+
+			$sender = getData($ouResult)[0]->bezeichnung;
+		}
+
+		// If the sender is not the system sender and configurations to reply exist
 		$hrefReply = '';
 		if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
-			&& $message->receiver_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
 			&& !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
 		{
 			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).

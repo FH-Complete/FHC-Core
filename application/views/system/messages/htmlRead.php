@@ -44,7 +44,7 @@
 											</td>
 											<td>
 
-												<?php echo $sender->vorname.' '.$sender->nachname; ?>
+												<?php echo $sender; ?>
 
 											</td>
 										</tr>
