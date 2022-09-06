@@ -72,4 +72,28 @@ class Betriebsmittelperson_model extends DB_Model
 
 		return $this->loadWhere($where);
 	}
+
+	public function getBetriebsmittelByUid($uid, $betriebsmitteltyp = null, $isRetourniert = false)
+	{
+		$this->addJoin('wawi.tbl_betriebsmittel', 'betriebsmittel_id');
+
+		$condition = ' wawi.tbl_betriebsmittelperson.uid = '. $this->escape($uid);
+
+		if (is_string($betriebsmitteltyp))
+		{
+			$condition .= ' AND betriebsmitteltyp = ' . $this->escape($betriebsmitteltyp);
+		}
+
+		if ($isRetourniert === true) {
+			$condition .= ' AND retouram IS NOT NULL';
+		}
+		elseif ($isRetourniert === false)
+		{
+			$condition .= ' AND retouram IS NULL';
+		}
+
+		$this->addOrder('ausgegebenam', 'DESC');
+
+		return $this->loadWhere($condition);
+	}
 }

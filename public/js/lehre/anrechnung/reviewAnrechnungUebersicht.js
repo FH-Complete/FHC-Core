@@ -65,7 +65,7 @@ function func_tableBuilt(table) {
                 },
                 target:"_blank"
             }
-        }, false, "status"  // place column after status
+        }, true  // place column on the very left
     );
 }
 
@@ -127,11 +127,12 @@ var format_empfehlung_anrechnung = function(cell, formatterParams){
  * (Ignore rows that are approved, rejected or in request for recommendation)
  */
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
-    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+    var resultRows = tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
         .filter(row =>
             row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
-        )
-        .forEach((row => row.select()));
+        );
+
+    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', resultRows);
 }
 
 

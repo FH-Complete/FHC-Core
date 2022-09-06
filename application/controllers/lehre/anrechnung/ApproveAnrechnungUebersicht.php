@@ -108,21 +108,29 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 
+        $json = array(
+            'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
+            'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_APPROVED),
+            'prestudenten' => []
+        );
+
 		// Approve Anrechnung
 		foreach ($data as $item)
 		{
-			if ($this->anrechnunglib->approveAnrechnung($item['anrechnung_id']))
+            // Get Prestudent
+            $this->AnrechnungModel->addSelect('prestudent_id');
+            $result = $this->AnrechnungModel->load($item['anrechnung_id']);
+            $prestudent_id = getData($result)[0]->prestudent_id;
+
+            // Approve
+            if ($this->anrechnunglib->approveAnrechnung($item['anrechnung_id']))
 			{
-				$json[]= array(
-					'anrechnung_id' => $item['anrechnung_id'],
-					'status_kurzbz' => self::ANRECHNUNGSTATUS_APPROVED,
-					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_APPROVED)
-				);
+                $json['prestudenten'][$prestudent_id][] = $item['anrechnung_id'];
 			}
 		}
 
 		// Output json to ajax
-		if (isset($json) && !isEmptyArray($json))
+		if (isset($json) && !isEmptyArray($json['prestudenten']))
 		{
 			return $this->outputJsonSuccess($json);
 		}
