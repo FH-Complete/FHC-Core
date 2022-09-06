@@ -440,6 +440,84 @@ if ($deleteAllResults)
 	}
 }
 
+// Ajax-Request um die Liste zusammenzuräumen
+$clearList = filter_input(INPUT_POST, 'clearList', FILTER_VALIDATE_BOOLEAN);
+if ($clearList)
+{
+	if (!$rechte->isBerechtigt('infocenter', null, 'suid'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	$qry = "DELETE FROM testtool.tbl_pruefling pf
+			WHERE
+			(
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_pruefling_frage WHERE pruefling_id=pf.pruefling_id) AND
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_antwort WHERE pruefling_id=pf.pruefling_id)
+			)";
+
+	if ($result = $db->db_query($qry))
+	{
+		echo json_encode(array(
+			'status' => 'ok',
+			'msg' => $db->db_affected_rows($result).' leere Prüflinge wurden gelöscht'));
+		exit();
+	}
+	else
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => 'Fehler beim Löschen der leeren Prüflinge'
+		));
+		exit();
+	}
+}
+
+// Ajax-Request um einen Prüfling zu sperren
+$rtprueflingEntSperren = filter_input(INPUT_POST, 'rtprueflingEntSperren', FILTER_VALIDATE_BOOLEAN);
+if ($rtprueflingEntSperren)
+{
+	if (!$rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'su'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	if (isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id'])
+		&& isset($_POST['art']))
+	{
+		$qry = "UPDATE testtool.tbl_pruefling SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+				WHERE prestudent_id IN
+						(SELECT prestudent_id FROM public.tbl_prestudent ps
+							JOIN public.tbl_person tp ON tp.person_id = ps.person_id
+							WHERE tp.person_id = (SELECT person_id FROM public.tbl_prestudent sps WHERE sps.prestudent_id = " . $db->db_add_param($_POST['prestudent_id']) . "));";
+
+		if ($result = $db->db_query($qry))
+		{
+			$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+			echo json_encode(array(
+				'status' => 'ok',
+				'msg' => $msg));
+			exit();
+		}
+		else
+		{
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim speichern der Daten'
+			));
+			exit();
+		}
+	}
+}
+
 // Ajax-Request um einen Reihungstest freizuschalten
 $rtFreischalten = filter_input(INPUT_POST, 'rtFreischalten', FILTER_VALIDATE_BOOLEAN);
 if ($rtFreischalten)
@@ -492,7 +570,7 @@ if ($clearList)
 	}
 
 	$qry = "DELETE FROM testtool.tbl_pruefling pf
-			WHERE 
+			WHERE
 			(
 				NOT EXISTS (SELECT 1 FROM testtool.tbl_pruefling_frage WHERE pruefling_id=pf.pruefling_id) AND
 				NOT EXISTS (SELECT 1 FROM testtool.tbl_antwort WHERE pruefling_id=pf.pruefling_id)
@@ -630,12 +708,12 @@ if ($testende)
 			$anzahl = count($OrgFormPrestudent[$orgForm]);
 			$stg = new studiengang($studiengang_kz);
 			$mailtext = '<html>
-							<head>	
+							<head>
 								<title>Sancho Mail</title>
 							</head>
 							<body>
-									<table cellpadding="0" cellspacing="0" style="border: 2px solid #000000; padding: 0px; max-width: 850px; 
-										border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">  
+									<table cellpadding="0" cellspacing="0" style="border: 2px solid #000000; padding: 0px; max-width: 850px;
+										border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
 										<tr>
 											<td align="center">
 												<table cellpadding="0" cellspacing="0" width="100%%" border="0">
@@ -1242,7 +1320,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 {
 	// Vorkommende Gebiete laden
 	$query = "
-		SELECT DISTINCT 
+		SELECT DISTINCT
 			tbl_gebiet.gebiet_id,
 			tbl_gebiet.bezeichnung AS gebiet,
 			tbl_ablauf.reihung,
@@ -1298,13 +1376,13 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	if ($orgform_kurzbz != '' && $studiengang != '')
 	{
 		$query .= " AND (tbl_ablauf.studienplan_id=(
-							SELECT studienplan_id FROM lehre.tbl_studienplan 
-							JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+							SELECT studienplan_id FROM lehre.tbl_studienplan
+							JOIN lehre.tbl_studienordnung USING (studienordnung_id)
 							WHERE studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER)."
 							AND tbl_studienplan.orgform_kurzbz = ".$db->db_add_param($orgform_kurzbz)."
 							AND tbl_studienplan.aktiv
 							AND tbl_studienordnung.status_kurzbz='approved'
-							AND ((SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigvon) <= now() 
+							AND ((SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigvon) <= now()
 									OR tbl_studienordnung.gueltigvon IS NULL)
 							AND ((SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigbis) >= now() OR tbl_studienordnung.gueltigbis IS NULL)
 							ORDER BY studienplan_id DESC LIMIT 1)
@@ -1343,7 +1421,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_studiengang.bezeichnung AS stg_bez,
 			tbl_studienplan.orgform_kurzbz,
 			tbl_gebiet.maxpunkte,
-		    tbl_gebiet.offsetpunkte,            
+		    tbl_gebiet.offsetpunkte,
 			tbl_prestudentstatus.ausbildungssemester,
 			tbl_ablauf.gewicht,
 			tbl_ort.planbezeichnung AS raum,
@@ -1352,7 +1430,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			ps.zgv_code,
 			ps.zgvmas_code,
 			tbl_rt_person.teilgenommen,
-			CASE 
+			CASE
 				WHEN tbl_prestudentstatus.statusgrund_id = 9
 					AND tbl_prestudentstatus.status_kurzbz = 'Interessent'
 					THEN true
@@ -1400,7 +1478,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 				ORDER BY insertamum DESC,
 					updateamum DESC LIMIT 1
 				) AS email,
-			CASE 
+			CASE
 				WHEN /*tbl_studiengang.typ = 'b'
 					AND*/ EXISTS (
 						SELECT 1
@@ -1445,6 +1523,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_gebiet.bezeichnung AS gebiet,
 			tbl_pruefling.idnachweis,
 			tbl_pruefling.registriert,
+			tbl_pruefling.gesperrt,
 			get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) AS letzter_status
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
@@ -1459,13 +1538,13 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		LEFT JOIN testtool.tbl_ablauf ON (testtool.tbl_ablauf.studiengang_kz = ps.studiengang_kz)
 		LEFT JOIN testtool.tbl_gebiet USING (gebiet_id)
 		WHERE 1 = 1
-			--AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) NOT IN ('Abgewiesener') /*Wenn einkommentiert, kommen zB bei alten Bewerbungen keine Ergebnisse*/ 
+			--AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) NOT IN ('Abgewiesener') /*Wenn einkommentiert, kommen zB bei alten Bewerbungen keine Ergebnisse*/
 			AND CASE WHEN
 			(
-				get_rolle_prestudent (prestudent_id, rt.studiensemester_kurzbz) IN ('Abgewiesener') 
+				get_rolle_prestudent (prestudent_id, rt.studiensemester_kurzbz) IN ('Abgewiesener')
 				AND
 				rt.datum > (
-					SELECT MAX(insertamum) 
+					SELECT MAX(insertamum)
 					FROM PUBLIC.tbl_prestudentstatus spss
 					WHERE spss.prestudent_id = ps.prestudent_id
 					AND status_kurzbz = 'Abgewiesener'
@@ -1481,9 +1560,9 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
 				WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
-				
+
 				UNION
-				
+
 				(
 					SELECT studiensemester_kurzbz
 					FROM PUBLIC.tbl_studiensemester
@@ -1494,9 +1573,9 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 							)
 					ORDER BY ende DESC LIMIT 1
 					)
-				
+
 				UNION
-				
+
 				(
 					SELECT studiensemester_kurzbz
 					FROM PUBLIC.tbl_studiensemester
@@ -1508,7 +1587,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 					ORDER BY start ASC LIMIT 1
 					)
 				)
-			/*AND bewerbung_abgeschicktamum IS NOT NULL*/ /* Leider gibt es bestaetigte Bewerbungen, die nie abgeschickt wurden */ 
+			/*AND bewerbung_abgeschicktamum IS NOT NULL*/ /* Leider gibt es bestaetigte Bewerbungen, die nie abgeschickt wurden */
 			AND bestaetigtam IS NOT NULL
 			AND tbl_gebiet.gebiet_id != 7
 		";
@@ -1547,7 +1626,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY nachname,
 				vorname,
-				person_id	
+				person_id
 	";/*print_r($query);*/
 	//echo '<pre>', var_dump($query), '</pre>';
 	if (!($result = $db->db_query($query)))
@@ -1584,6 +1663,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->geschlecht = $row->geschlecht;
 		$ergebnis[$row->prestudent_id]->idnachweis = $row->idnachweis;
 		$ergebnis[$row->prestudent_id]->registriert = $row->registriert;
+		$ergebnis[$row->prestudent_id]->gesperrt = $row->gesperrt;
 		$ergebnis[$row->prestudent_id]->stg_kurzbz = $row->stg_kurzbz;
 		$ergebnis[$row->prestudent_id]->stg_bez = $row->stg_bez;
 		$ergebnis[$row->prestudent_id]->ausbildungssemester = $row->ausbildungssemester;
@@ -2079,7 +2159,7 @@ else
 	<title>Testtool - Auswertung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link type="text/css" rel="stylesheet" href="../../skin/style.css.php">
-	
+
 	<link rel="stylesheet" type="text/css" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" >
 	<link rel="stylesheet" type="text/css" href="../../vendor/mottie/tablesorter/dist/css/theme.default.min.css">
 	<link rel="stylesheet" type="text/css" href="../../vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css">
@@ -2117,23 +2197,23 @@ else
 					var rtel = $(this).find("input[type=\'checkbox\']");
 					rtel.prop("checked",!rtel.prop("checked"));
 				}
-				showSelectedRts();				
+				showSelectedRts();
 			}
 		);
 		$(".rtlabel input[type=\'checkbox\']").change(
-			showSelectedRts	
+			showSelectedRts
 		);
 		showSelectedRts();
-		
+
 		//RT dropdown verstecken wenn Klick ausserhalb
 		$(document).mousedown(function(e)
 		{
 			var dropdown = $("#rtcheckboxes");
-			
+
 			if (!dropdown.is(e.target) && dropdown.has(e.target).length === 0 && !$("#rtcheckboxesbtn").is(e.target))
 				dropdown.hide();
 		});
-		
+
 		$( ".datepicker_datum" ).datepicker({
 				 changeMonth: true,
 				 changeYear: true,
@@ -2158,7 +2238,7 @@ else
 				$("#prestudent_id").val(ui.item.prestudent_id);
 			}
 		});
-		
+
 		$("#prestudent").on("input", function(){
 		    var numchecked = $("#rtcheckboxes input[type=checkbox]:checked").length;
 		    if (numchecked > 0)
@@ -2167,11 +2247,11 @@ else
 				showSelectedRts();
 			}
 		});
-		
+
 		$("#prestudent").keyup( function(){
 			$("#prestudent_id").val(this.value);
 		});
-		
+
 		$("#zuteilungAutocomplete").autocomplete({
 			source: "auswertung_fhtw.php?autocomplete=prestudentAdd&'.http_build_query(array('studiensemester_kurzbz' => $rtStudiensemester)).'",
 			minLength:2,
@@ -2190,9 +2270,9 @@ else
 				$("#zuteilungAutocompleteHidden").val(ui.item.prestudent_id);
 			}
 		});
-		
+
 		$("#auswertung_table").tablesorter(
-		{			
+		{
 			widgets: ["zebra", "filter", "columnSelector"],
 			sortList: [[16,1],[19,1],[3,0],[4,0]],//17th (index 16) fake hidden column for correct sort with colspan
 			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }, 16: { sorter: false, filter: false}}
@@ -2200,13 +2280,13 @@ else
 				columnSelector_container : $("#columnSelector"),
 				columnSelector_saveColumns: true}			*/
 		});
-		
+
 		//hide tablesorter filter field if column is hidden
 		var tbldatalength = $("#auswertung_table tbody tr:nth-child(1) td").length;
 		if (tbldatalength < 1)
 			$(".tablesorter-filter-row").hide();
 		else
-		{	
+		{
 			for (var i = 0; i < $("#auswertung_table tbody tr:nth-child(1) td").length; i++)
 			{
 				var colnr = i + 1;
@@ -2218,15 +2298,15 @@ else
 			}
 		}
 		/*$.tablesorter.columnSelector.attachTo( $("#auswertung_table"), "#popover-target");*/
-		
+
 		/*$("#columnSelector").popover(
 		{
 			placement: "right",
 			html: true, // required if content has HTML
 			content: $("#popover-target")
 		});*/
-		
-		$("#toggle_table").on("click", function(e) 
+
+		$("#toggle_table").on("click", function(e)
 		{
 			$("#auswertung_table").checkboxes("toggle");
 			e.preventDefault();
@@ -2236,7 +2316,7 @@ else
 				$("#mailSendButton").html("Mail an alle senden");
 		});
 
-		$("#uncheck_table").on("click", function(e) 
+		$("#uncheck_table").on("click", function(e)
 		{
 			$("#auswertung_table").checkboxes("uncheck");
 			e.preventDefault();
@@ -2245,7 +2325,7 @@ else
 			else
 				$("#mailSendButton").html("Mail an alle senden");
 		});
-		
+
 		$(".prestudentCheckbox").change(function()
 		{
 			if ($("input.prestudentCheckbox:checked").length > 0)
@@ -2253,11 +2333,11 @@ else
 			else
 				$("#mailSendButton").html("Mail an alle senden");
 		});
-						
+
 		$("#auswertung_table").checkboxes("range", true);
-		
+
 		$(".deleteColumn").hide();
-		$("#toggleDelete").on("click", function(e) 
+		$("#toggleDelete").on("click", function(e)
 		{
 			$(".deleteSpan").toggle();
 			$(".punkteSpan").toggle();
@@ -2270,17 +2350,17 @@ else
 				$(".deleteSpan").closest("td").css("text-align","right");
 			}
 		});
-		
-		$("#auswertenButton").on("click", function(e) 
+
+		$("#auswertenButton").on("click", function(e)
 		{
 			$(".loaderIcon").show();
 		});
-		
-		$("#showUebertragenOptionsButton").on("click", function(e) 
+
+		$("#showUebertragenOptionsButton").on("click", function(e)
 		{
 			$("#uebertragenOptions").toggle(300);
 		});
-		
+
 		if($("#uebertragenOptionGesamtpunkte").not(":checked"))
 		{
 			$("#div_checkbox_bewerber").addClass("disabled");
@@ -2288,7 +2368,7 @@ else
 			$("#div_checkbox_bewerber").find("label").prop("title", "Erst \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" setzen");
 			$("#uebertragenOptionBewerber").prop("disabled", true);
 		}
-		$("#uebertragenOptionGesamtpunkte").on("click", function(e) 
+		$("#uebertragenOptionGesamtpunkte").on("click", function(e)
 		{
 			if($(this).is(":checked"))
 			{
@@ -2305,7 +2385,7 @@ else
 			}
 		});
 	});
-	
+
 	function deleteResult(prestudent_id, gebiet_id, name, gebiet_bezeichnung)
 	{
 		if (confirm("Wollen Sie das Ergebnis des Gebiets "+gebiet_bezeichnung+" der Person "+name+" wirklich löschen?"))
@@ -2345,7 +2425,57 @@ else
 			});
 		}
 	}
-	
+	function prueflingEntSperren(prestudent_id, name, art)
+	{
+		if (art === true)
+			var text = "sperren";
+		else if (art === false)
+			var text = "entsperren";
+
+		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
+		{
+			data = {
+				prestudent_id: prestudent_id,
+				art: art,
+				rtprueflingEntSperren: true
+			};
+
+			$.ajax({
+				url: "auswertung_fhtw.php",
+				data: data,
+				type: "POST",
+				dataType: "json",
+				success: function(data)
+				{
+					if(data.status !== "ok")
+					{
+						$("#msgbox").attr("class","alert alert-danger");
+						$("#msgbox").show();
+						$("#msgbox").html(data["msg"]);
+					}
+					else
+					{
+						if (art === true)
+						{
+							$("#prueflingentsperren_" + prestudent_id).removeClass("hidden");
+							$("#prueflingsperren_" + prestudent_id).addClass("hidden");
+						}
+						else if (art === false)
+						{
+							$("#prueflingsperren_" + prestudent_id).removeClass("hidden");
+							$("#prueflingentsperren_" + prestudent_id).addClass("hidden");
+						}
+					}
+				},
+				error: function(data)
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+			});
+		}
+	}
 	function deleteAllResults(prestudent_id, name)
 	{
 		if (confirm("Wollen Sie ALLE Ergebnisse der Person "+name+" wirklich löschen"))
@@ -2370,7 +2500,7 @@ else
 					}
 					else
 					{
-						$("#row_"+prestudent_id).find("td.punkte, td.col_gesamtpunkte").each (function() 
+						$("#row_"+prestudent_id).find("td.punkte, td.col_gesamtpunkte").each (function()
 						{
 						  $(this).html("");
 						});
@@ -2387,7 +2517,7 @@ else
 			});
 		}
 	}
-	
+
 	function freischalten(reihungstest, art)
 	{
 		data = {
@@ -2411,7 +2541,7 @@ else
 				}
 				else
 				{
-					if (art === true) 
+					if (art === true)
 					{
 						$("#freischaltenWarning").hide();
 						$("#freischaltenInfo").show();
@@ -2435,7 +2565,7 @@ else
 			}
 		});
 	}
-	
+
 	function testende()
 	{
 		var selected = [];
@@ -2448,24 +2578,24 @@ else
 		{
 			if (confirm("Setzt bei allen markierten Personen \'Zum Reihungstest angetreten\' und informiert die entsprechende Studiengangsassistenz. Wollen Sie fortfahren?"))
 			{
-				$("#auswertung_table tr").each(function() 
+				$("#auswertung_table tr").each(function()
 				{
 					var prestudent_id = $(this).find("input.prestudentCheckbox:checked").prop("name");
-				
+
 					if (prestudent_id)
 					{
 						var rt_id = $(this).find("td.rt_id").text();
 						selected.push({prestudent_id: prestudent_id, reihungstest_id: rt_id});
 					}
 				});
-				
+
 				$(".loaderIcon").show();
-				
+
 				data = {
 					prestudents: selected,
 					testende: true
 				};
-	
+
 				$.ajax({
 					url: "auswertung_fhtw.php",
 					data: data,
@@ -2524,7 +2654,7 @@ else
 		{
 			adresse = $(this).closest("tr").find("td.clm_email a:first").attr("href");
 			adresse = adresse.replace(/^mailto?:/, "");
-			
+
 			if($.inArray(adresse, adresseArray) === -1)
 			{
 				if (counter > 0 && (counter % 100 === 0) || (adresseArray.join(";").length + adresse.length > 1988))
@@ -2539,11 +2669,11 @@ else
 					adresseArray.push(adresse);
 				}
 				counter ++;
-			}			
+			}
 		});
 		window.location.href = "mailto:?bcc="+adresseArray.join(";");
 	}
-	
+
 	function clearList()
 	{
 		$.ajax({
@@ -2575,6 +2705,7 @@ else
 			}
 		});
 	}
+
 	function checkAllWithResult()
 	{
 		// Schleife ueber die einzelnen Elemente
@@ -2611,15 +2742,15 @@ else
 		}
 		else
 		{
-			$("input.prestudentCheckbox:checked").each(function() 
+			$("input.prestudentCheckbox:checked").each(function()
 			{
 				prestudentPunkteArr.push({
-					prestudent_id: $(this).attr("name"), 
+					prestudent_id: $(this).attr("name"),
 					ergebnis:  $(this).parents("tr").find(".erg_gesamt").text(),
 					reihungstest_id: $(this).parents("tr").find(".rt_id").text(),
 				});
 		    });
-		    
+
 			$(".loaderIcon").show();
 			if ($("#uebertragenOptionGesamtpunkte:checked").length === 1)
 			{
@@ -2629,14 +2760,14 @@ else
 			{
 				zuBewerberMachen = true;
 			}
-			
+
 			data = {
 				prestudentPunkteArr: prestudentPunkteArr,
 				gesamtpunkteSetzen: gesamtpunkteSetzen,
 				zuBewerberMachen: zuBewerberMachen,
 				punkteUebertragen: true
 			};
-	
+
 			$.ajax({
 				url: "auswertung_fhtw.php",
 				data: data,
@@ -2707,7 +2838,7 @@ else
 				var rt_id = this.id;
 				if (!first)
 					rtsstr += "<br />";
-						
+
 				rtsstr += $("label[for=" + rt_id + "]").text();
 				first = false;
 			}
@@ -2715,7 +2846,7 @@ else
 		if (rtsstr === "")
 			rtsstr = "-- keine Auswahl --";
 		$("#rtcheckboxesbtn").html(rtsstr);
-			
+
 	}
 	</script>
 	</head>
@@ -2933,7 +3064,7 @@ else
 							Zuteilen
 						</button>
 					</span>
-				</div>				
+				</div>
 		';
 	}
 	if ($rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'suid'))
@@ -2961,7 +3092,11 @@ else
 	}
 	if ($rechte->isBerechtigt('infocenter', null, 'suid'))
 	{
+<<<<<<< HEAD
 		echo '&nbsp;&nbsp;<button type="button" class="btn btn-default btn-xs" onclick="clearList()" id="mailSendButton">Liste aufräumen</button>';
+=======
+		echo '&nbsp;&nbsp;<button type="button" class="btn btn-default btn-xs" onclick="clearList()" id="clearListButton" title="Löscht alle Prüflinge, bei denen keine Daten vorhanden sind">Liste aufräumen</button>';
+>>>>>>> master
 	}
 	echo '</div></div></form>';
 	echo '	<form class="form" role="form">
@@ -3001,10 +3136,10 @@ else
 			}
 		}
 	}
-	echo '	<div id="freischaltenWarning" class="alert alert-warning'.($displayWarning ? '' : ' hiddenEl').'">Um den Reihungstest starten zu können, muss dieser freigeschaltet werden  
+	echo '	<div id="freischaltenWarning" class="alert alert-warning'.($displayWarning ? '' : ' hiddenEl').'">Um den Reihungstest starten zu können, muss dieser freigeschaltet werden
 				<button class="btn btn-warning" onclick="freischalten('.$frsch_rt_id.', true)">Jetzt freischalten</button>
 			</div>';
-	echo '	<div id="freischaltenInfo" class="alert alert-info'.($displayInfo ? '' : ' hiddenEl').'">Dieser Reihungstest ist freigeschaltet. Bitte sperren Sie ihn nach dem Test 
+	echo '	<div id="freischaltenInfo" class="alert alert-info'.($displayInfo ? '' : ' hiddenEl').'">Dieser Reihungstest ist freigeschaltet. Bitte sperren Sie ihn nach dem Test
 				<button class="btn btn-info" onclick="freischalten('.$frsch_rt_id.', false)">Jetzt sperren</button>
 			</div>';
 	if ($messageSuccess != '' || $messageError != '')
@@ -3045,6 +3180,7 @@ else
 				</th>
 				<th rowspan="2">PreId</th>
 				<th rowspan="2"><span class="glyphicon glyphicon-envelope"></span></th>
+				<th rowspan="2">Ent-/Sperren</th>
 				<th rowspan="2">Nachname</th>
 				<th rowspan="2">Vornamen</th>
 				<th rowspan="2">GebDatum</th>
@@ -3100,6 +3236,18 @@ else
 						<!--<td>$erg->prestudent_id <a href=".APP_ROOT."cis/testtool/admin/auswertung_detail_prestudent.php?prestudent_id=$erg->prestudent_id target='blank'>Details</a></td>-->
 						<td class='".$inaktiv."'>$erg->prestudent_id</td>
 						<td class='clm_email ".$inaktiv."'><a href='mailto:$erg->email'><span class='glyphicon glyphicon-envelope'></span></a></td>
+						";
+
+
+				echo "<td class='textcentered ".$inaktiv ."'>
+						<a href='#' id='prueflingsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt === 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
+							<span class='glyphicon glyphicon-remove'></span>
+						</a>
+						<a href='#' id='prueflingentsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt !== 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
+							<span class='glyphicon glyphicon-ok'></span>
+						</a>
+					</td>";
+				echo "
 						<td class='".$inaktiv."'>".$erg->nachname." ".($erg->qualifikationskurs == true ? "<span title='Qualifikationskurs' class='redcolor'>(Q)</span>" : "")."</td>
 						<td class='".$inaktiv."'>$erg->vorname</td>
 						<td class='".$inaktiv."'>" . $datum_obj->formatDatum($erg->gebdatum, 'd.m.Y') . "</td>

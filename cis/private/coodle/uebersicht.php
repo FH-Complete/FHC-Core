@@ -27,6 +27,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $lang = getSprache();
 
@@ -34,6 +35,22 @@ $p = new phrasen($lang);
 
 $uid = get_uid();
 $message = '';
+
+// Administratoren duerfen die UID als Parameter uebergeben um die Umfragen von anderen Personen anzuzeigen
+if(isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	if($rechte->isBerechtigt('admin'))
+	{
+		$uid = $_GET['uid'];
+		$getParam = '&uid='.$uid;
+	}
+	else
+		$getParam = '';
+}
+else
+	$getParam = '';
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		"http://www.w3.org/TR/html4/strict.dtd">
@@ -170,7 +187,7 @@ foreach($coodle->result as $c)
 		else
 			$title=$p->t('coodle/bearbeiten');
 
-		$row.= '&nbsp;<a href="stammdaten.php?coodle_id='.$c->coodle_id.'">
+		$row.= '&nbsp;<a href="stammdaten.php?coodle_id='.$c->coodle_id.'&'.$getParam.'">
 					<img src="../../../skin/images/edit.png" title="'.$title.'">
 				</a>';
 	}

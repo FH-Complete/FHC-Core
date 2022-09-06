@@ -22,7 +22,7 @@
 					<a href="outputAkteContent/<?php echo $dokument->akte_id ?>"><?php echo isEmptyString($dokument->titel) ? $dokument->bezeichnung : $dokument->titel ?></a>
 				</td>
 				<td>
-					<select class="aktenid" id="aktenid_<?php echo $dokument->akte_id?>" <?php echo (isset($formalReadonly) ? 'disabled' : '') ?>>
+					<select class="aktenid" id="aktenid_<?php echo $dokument->akte_id?>" <?php echo (isset($formalReadonly) ? 'disabled' : '') ?> autocomplete="off">
 						<?php
 						foreach($dokumententypen as $dokumenttyp)
 							echo "<option " . ($dokumenttyp->bezeichnung === $dokument->dokument_bezeichnung ? 'selected' : '') . " value = " . $dokumenttyp->dokument_kurzbz . ">" . $dokumenttyp->bezeichnung . "</option>"
@@ -65,7 +65,7 @@
 				if (!isset($formalReadonly)) :
 				?>
 					<td>
-						<input type="checkbox" class="form-check-input prchbox"
+						<input type="checkbox" class="form-check-input prchbox" autocomplete="off"
 							   id="prchkbx_<?php echo $dokument->akte_id ?>" <?php echo $geprueft ?>>
 						<span id="formalgeprueftam_<?php echo $dokument->akte_id ?>">
 						<?php echo isset($dokument->formal_geprueft_amum) ? date_format(date_create($dokument->formal_geprueft_amum), 'd.m.Y') : ''; ?>

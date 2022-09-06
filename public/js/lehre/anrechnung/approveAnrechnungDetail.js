@@ -4,12 +4,11 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
-
-
 $(function(){
 
     const genehmigung_panel = $('#approveAnrechnungDetail-genehmigung-panel');
     const begruendung_panel = $('#approveAnrechnungDetail-begruendung-panel');
+    const hasReadOnlyAccess = $('#approveAnrechnungDetail-generell').data('readonly');
 
     // Pruefen ob Promise unterstuetzt wird
     // Tabulator funktioniert nicht mit IE
@@ -21,6 +20,11 @@ $(function(){
         return;
     }
 
+    if (hasReadOnlyAccess)
+    {
+        approveAnrechnungDetail.disableEditElements();
+    }
+
     // Set status alert color
     approveAnrechnungDetail.setStatusAlertColor();
 
@@ -29,6 +33,8 @@ $(function(){
 
     // Init tooltips
     approveAnrechnungDetail.initTooltips();
+
+    approveAnrechnungDetail.alertIfMaxEctsExceeded();
 
     // Ask if Approve Anrechnungen
     $("#approveAnrechnungDetail-approve-anrechnung-ask").click(function(){
@@ -85,8 +91,12 @@ $(function(){
                         approveAnrechnungDetail.formatGenehmigungIsPositiv(
                             data.retval[0].abgeschlossen_am,
                             data.retval[0].abgeschlossen_von,
-                            data.retval[0].status_bezeichnung
+                            data.retval[0].status_kurzbz,
+                            data.retval[0].status_bezeichnung,
                         );
+
+                        approveAnrechnungDetail.sumUpEcts();
+                        approveAnrechnungDetail.alertIfMaxEctsExceeded();
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -162,6 +172,7 @@ $(function(){
                         approveAnrechnungDetail.formatGenehmigungIsNegativ(
                             data.retval[0].abgeschlossen_am,
                             data.retval[0].abgeschlossen_von,
+                            data.retval[0].status_kurzbz,
                             data.retval[0].status_bezeichnung,
                             begruendung
                         );
@@ -230,6 +241,7 @@ $(function(){
 
         // Get form data
         let form_data = $('form').serializeArray();
+        var init_status_kurzbz = $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz');
 
         // Prepare data object for ajax call
         let data = {
@@ -242,20 +254,23 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    console.log(data);
                     if (data.error && data.retval != null)
                     {
-                        console.log('inside error');
                         // Print error message
                         FHC_DialogLib.alertWarning(data.retval);
                     }
 
                     if (!data.error && data.retval != null)
                     {
-                        console.log('inside success');
                         approveAnrechnungDetail.formatGenehmigungIsWithdrawed(
                             data.retval.status_bezeichnung
                         );
+
+                        if (init_status_kurzbz == 'approved')
+                        {
+                            approveAnrechnungDetail.substractEcts(ects, sumEctsSchulisch, sumEctsBeruflich);
+                            approveAnrechnungDetail.alertIfMaxEctsExceeded();
+                        }
 
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("anrechnung", "erfolgreichZurueckgenommen"));
 
@@ -417,6 +432,34 @@ var approveAnrechnungDetail = {
         }
         );
     },
+    disableEditElements: function()
+    {
+        // Disable:
+        // ...button Empfehlung anfordern
+        $('#approveAnrechnungDetail-request-recommendation')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Empfehlung zuruecknehmen
+        $('#approveAnrechnungDetail-withdraw-request-recommedation')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Genehmigen
+        $('#approveAnrechnungDetail-approve-anrechnung-ask')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Ablehnen
+        $('#approveAnrechnungDetail-reject-anrechnung-ask')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ...button Genehmigung zurücknehmen
+        $('#approveAnrechnungDetail-withdraw-anrechnung-approvement')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+        // ... form Empfehlungsnotiz
+        $('#form-empfehlungNotiz :input')
+            .prop('disabled', true)
+            .attr('title', FHC_PhrasesLib.t("ui", "nurLeseberechtigung"));
+    },
     copyIntoTextarea: function(elem){
 
         // Find closest textarea
@@ -443,12 +486,13 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', true);
         $('#approveAnrechnungDetail-withdraw-request-recommedation').removeClass('hidden');
     },
-    formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung){
+    formatGenehmigungIsPositiv: function(abgeschlossenAm, abgeschlossenVon, statusKurzbz, statusBezeichnung){
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').removeClass('hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-success');
+        $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz', statusKurzbz);
         $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
         $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
         $('#approveAnrechnungDetail-request-recommendation').prop('disabled', true);
@@ -458,12 +502,13 @@ var approveAnrechnungDetail = {
         // Show button to withdraw approval
         $('#approveAnrechnungDetail-withdraw-anrechnung-approvement').removeClass('hidden');
     },
-    formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusBezeichnung, begruendung){
+    formatGenehmigungIsNegativ: function(abgeschlossenAm, abgeschlossenVon, statusKurzbz, statusBezeichnung, begruendung){
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNull').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsPositiv').addClass('hidden');
         $('#approveAnrechnungDetail-genehmigungDetail-genehmigungIsNegativ').removeClass('hidden');
         $('#approveAnrechnungDetail-status_kurzbz').text(statusBezeichnung);
         $('#approveAnrechnungDetail-status_kurzbz').closest('div').removeClass('alert-warning').addClass('alert-danger');
+        $('#approveAnrechnungDetail-status_kurzbz').data('status_kurzbz', statusKurzbz);
         $('#approveAnrechnungDetail-abgeschlossenAm').text(abgeschlossenAm);
         $('#approveAnrechnungDetail-abgeschlossenVon').text(abgeschlossenVon);
         $('#approveAnrechnungDetail-genehmigungDetail-begruendung').text(begruendung);
@@ -510,5 +555,76 @@ var approveAnrechnungDetail = {
         $('#approveAnrechnungDetail-reject-anrechnung-ask').prop('disabled', false);
         // Hide button to withdraw approval
         $('#approveAnrechnungDetail-withdraw-request-recommedation').addClass('hidden');
+    },
+    sumUpEcts: function(){
+        var ects = parseFloat($('#ects').text());
+        var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
+        var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+
+        if (begruendung_id == 4)
+        {
+            $('#sumEctsBeruflich').text(sumEctsBeruflich + ects);
+        }
+        else
+        {
+            $('#sumEctsSchulisch').text(sumEctsSchulisch + ects);
+        }
+
+        $('#sumEctsTotal').text(sumEctsSchulisch + sumEctsBeruflich + ects);
+
+    },
+    substractEcts: function(ects, sumEctsSchulisch, sumEctsBeruflich){
+        var ects = parseFloat($('#ects').text());
+        var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
+        var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+
+        if (begruendung_id == 4)
+        {
+            $('#sumEctsBeruflich').text(sumEctsBeruflich - ects);
+        }
+        else
+        {
+            $('#sumEctsSchulisch').text(sumEctsSchulisch - ects);
+        }
+
+         $('#sumEctsTotal').text(sumEctsSchulisch + sumEctsBeruflich - ects);
+    },
+    alertIfMaxEctsExceeded: function(){
+        var begruendung_id = $('#begruendung_id').data('begruendung_id');
+        if (begruendung_id == 5)
+        {
+            return;
+        }
+        if(
+            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text())) > 60 ||
+            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsBeruflich').text())) > 60 ||
+            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
+        )
+        {
+            $('#sumEctsMsg')
+                .html("<br><b>ACHTUNG! Bei Anrechnung von LV: Überschreitung der Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz</b><i class=\"fa fa-lg fa-info-circle\"></i></br>")
+                .addClass('bg-danger text-danger')
+                .tooltip({
+                    title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
+                    placement: 'right',
+                    html: true
+                });
+        }
+        else
+        {
+            $('#sumEctsMsg').html('').css('border', 'none');
+        }
     }
 }

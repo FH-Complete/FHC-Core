@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Submission tool';
 $this->phrasen['abgabetool/aeltereParbeitBenoten']='Thesis handed in for older semester, please use word form for assessment!';
+$this->phrasen['abgabetool/keinEnduploadErfolgt']='Final version not uploaded yet';
 $this->phrasen['abgabetool/typ']='Type';
 $this->phrasen['abgabetool/titel']='Title';
 $this->phrasen['abgabetool/betreuerart']='Supervisor type';
@@ -89,4 +90,5 @@ $this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='Second assessor has no 
 $this->phrasen['abgabetool/projektbeurteilungDownload']='Thesis-Assessment download';
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='First-/Assessor';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Second Assessor';
+$this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Error when getting endupload of project work';
 ?>

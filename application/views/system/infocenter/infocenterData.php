@@ -6,7 +6,7 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
 	$LOGDATA_NAME_PARKED = '\'Parked\'';
 	$LOGDATA_NAME_ONHOLD = '\'Onhold\'';
 	$LOGTYPE_KURZBZ = '\'Processstate\'';
@@ -55,8 +55,10 @@
 				  a.dokument_kurzbz in ('.$AKTE_TYP.')
 			) AS "AnzahlAkte",
 			(
-				SELECT l.insertvon
+				SELECT CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END
 				  FROM system.tbl_log l
+				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
+				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
@@ -135,11 +137,12 @@
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				 -- AND pss.bestaetigtam IS NULL
@@ -160,11 +163,12 @@
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NULL
 				   AND pss.bestaetigtam IS NULL
@@ -212,11 +216,12 @@
 				 LIMIT 1
 			) AS "AnzahlStgNichtAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz IN ('.$STATUS_KURZBZ.')
 				   AND pss.bewerbung_abgeschicktamum IS NULL
 				   AND ps.person_id = p.person_id
@@ -250,6 +255,22 @@
 				 LIMIT 1
 			) AS "ZGVMNation",
 			(
+				SELECT upper(tbl_nation.nationengruppe_kurzbz)
+				FROM public.tbl_prestudent ps
+				JOIN bis.tbl_nation ON ps.zgvnation = tbl_nation.nation_code
+				WHERE ps.person_id = p.person_id
+				ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
+				LIMIT 1
+			) AS "ZGVNationGruppe",
+			(
+				SELECT upper(tbl_nation.nationengruppe_kurzbz)
+				FROM public.tbl_prestudent ps
+				JOIN bis.tbl_nation ON ps.zgvmanation = tbl_nation.nation_code
+				WHERE ps.person_id = p.person_id
+				ORDER BY ps.zgvmanation DESC NULLS LAST, ps.prestudent_id DESC
+				LIMIT 1
+			) AS "ZGVMNationGruppe",
+			(
 				SELECT tbl_organisationseinheit.bezeichnung
 				FROM public.tbl_benutzerfunktion 
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
@@ -271,8 +292,10 @@
 	 LEFT JOIN (
 				SELECT tpl.person_id,
 					   tpl.zeitpunkt,
-					   tpl.uid AS lockuser
+					   sp.nachname AS lockuser
 				  FROM system.tbl_person_lock tpl
+				  JOIN public.tbl_benutzer sb USING (uid)
+				  JOIN public.tbl_person sp ON sb.person_id = sp.person_id
 				 WHERE tpl.app = '.$APP.'
 			) pl USING(person_id)
 	 LEFT JOIN (
@@ -354,6 +377,8 @@
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
+			'ZGV Gruppe BA',
+			'ZGV Gruppe MA',
 			'InfoCenter Mitarbeiter'
 		),
 		'formatRow' => function($datasetRaw) {
@@ -410,6 +435,10 @@
 			{
 				$datasetRaw->{'OnholdDate'} = '-';
 			}
+			else
+			{
+				$datasetRaw->{'OnholdDate'} = date_format(date_create($datasetRaw->{'OnholdDate'}), 'Y-m-d H:i');
+			}
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
 			{
@@ -439,6 +468,16 @@
 			if ($datasetRaw->{'ZGVMNation'} == null)
 			{
 				$datasetRaw->{'ZGVMNation'} = '-';
+			}
+
+			if ($datasetRaw->{'ZGVNationGruppe'} == null)
+			{
+				$datasetRaw->{'ZGVNationGruppe'} = '-';
+			}
+
+			if ($datasetRaw->{'ZGVMNationGruppe'} == null)
+			{
+				$datasetRaw->{'ZGVMNationGruppe'} = '-';
 			}
 
 			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)

@@ -736,6 +736,7 @@ else
 	die($p->t('global/fehleraufgetreten'));
 
 // Kopfzeile
+
 echo '
 <table width="100%">
 	<tr>
@@ -1144,7 +1145,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			$eintrag = '';
 			foreach ($output as $k)
 			{
-				if($k->mobilitaetstyp_kurzbz == 'GS')
+				if(($k->mobilitaetstyp_kurzbz == 'GS') && ($k->studiensemester_kurzbz == $stsem))
 			 	$eintrag = ' (d.d.)';
 			}
 			$grades[$row_stud->uid]['mobility'] = $eintrag;
@@ -1191,6 +1192,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 	foreach ($grades as $uid => $data)
 	//Ausgabe Array
 	{
+
 		$htmlstring .= '<tr class="liste' . ($i % 2) . '">
 			<td><a href="mailto:' . $uid . '@' . DOMAIN . '"><img src="../../../../skin/images/button_mail.gif"></a></td>
 			<td>' . $db->convert_html_chars($uid) . '</td>
@@ -1218,6 +1220,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		$negativeteilnote = false;
 		$note_zusatztext = '';
 		$note_zusatztext_tooltip = '';
+		$ueberschreibbar = false; //Damit keine Notice Fehler kommt muss Variable bei jeden Schleifendurchgang neue gesetzt und berechnet werden.
 
 		if (isset($data['grades']))
 		{

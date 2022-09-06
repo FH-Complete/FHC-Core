@@ -35,12 +35,12 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
-					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
-					{"name": "LockUser"}
+					{"name": "LockUser"},
+					{"name": "OnholdDate"}
 				],
 				"filters": [
 					{
@@ -311,6 +311,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
+					{"name": "AktenId"},
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
@@ -347,7 +348,35 @@ $filters = array(
 					{"name": "vorname"},
 					{"name": "nachname"},
 					{"name": "svnr"},
-					{"name": "ersatzkennzeichen"}
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'leistungsstipendium',
+		'filter_kurzbz' => 'LeistungsstipendiumAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Leistungsstipendium - Alle",
+				"columns": [
+					{"name" : "Vorname"},
+					{"name" : "Nachname"},
+					{"name" : "Buchungsdatum"},
+					{"name" : "Betrag"},
+					{"name" : "Buchungstyp"},
+					{"name" : "VorgangsId"},
+					{"name" : "FoerderfallId"},
+					{"name" : "LeistungsdatenId"},
+					{"name" : "startjahr"},
+					{"name" : "endjahr"}
 				],
 				"filters": []
 			}
@@ -467,6 +496,30 @@ $filters = array(
 						"operation": "ncontains"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'abgewiesen',
+		'filter_kurzbz' => 'InfoCenterAbgewiesenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Abgewiesen - Alle",
+				"columns": [
+					{"name": "PersonID"},
+					{"name": "PreStudentID"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"},
+					{"name": "AbgewiesenAm"},
+					{"name": "Nachricht"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,
@@ -873,13 +926,16 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "PersonId"},
-					{"name": "Fehlerstatus"}
+					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
+					{"name": "Person Zuständigkeiten"},
+					{"name": "Organisationseinheit Zuständigkeiten"}
 				],
 				"filters": [
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "ncontains",
-						"condition": "behoben"
+						"condition": "resolved"
 					},
 					{
 						"name": "Hauptzuständig",
@@ -907,7 +963,10 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "PersonId"},
-					{"name": "Fehlerstatus"}
+					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
+					{"name": "Person Zuständigkeiten"},
+					{"name": "Organisationseinheit Zuständigkeiten"}
 				],
 				"filters": [
 					{
@@ -938,7 +997,9 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
-					{"name": "Verarbeitet von"}
+					{"name": "Zugehörigkeit"},
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
 				],
 				"filters": [
 					{
@@ -948,14 +1009,109 @@ $filters = array(
 						"option": "days"
 					},
 					{
-						"name": "Fehlerstatus",
+						"name": "Statuscode",
 						"operation": "contains",
-						"condition": "behoben"
+						"condition": "resolved"
 					}
 				]
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'dataset_name' => 'projektuebersicht',
+		'filter_kurzbz' => 'alleProjekte',
+		'description' => '{Projektübersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Projektübersicht",
+				"columns": [
+					{"name": "Studiengang"},
+					{"name": "StudentNachname"},
+					{"name": "Abgabedatum"},
+					{"name": "Note"},
+					{"name": "ErstNachname"},
+					{"name": "ErstAbgeschickt"},
+					{"name": "ZweitNachname"},
+					{"name": "ZweitAbgeschickt"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'dvuh',
+		'dataset_name' => 'storno',
+		'filter_kurzbz' => 'DVUHStorno',
+		'description' => '{DVUH Storno Übersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "DVUHStorno",
+				"columns": [
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "matrikelnummer"},
+					{"name": "studiengang"},
+					{"name": "studiensemester"},
+					{"name": "last_status"},
+					{"name": "bismelden"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'dvuh',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'BPKWartungDVUH',
+		'description' => '{bPK Uebersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehlende bPK",
+				"columns": [
+					{"name": "person_id"},
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "svnr"},
+					{"name": "ersatzkennzeichen"},
+					{"name": "mitarbeiter"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'fehlerZustaendigkeiten',
+		'filter_kurzbz' => 'fehlerZustaendigkeiten',
+		'description' => '{Fehler Zustaendigkeiten}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehler Zuständigkeiten",
+				"columns": [
+					{"name": "fehlercode"},
+					{"name": "person_id"},
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "oe_bezeichnung"},
+					{"name": "funktion_beschreibung"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
 	)
 );
 

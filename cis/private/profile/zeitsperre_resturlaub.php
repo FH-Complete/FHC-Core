@@ -45,7 +45,7 @@ $uid = get_uid();
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
-$typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV");
+$typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV", "CovidSB", "CovidKS");
 
 if(isset($_GET['type']))
 	$type=$_GET['type'];
@@ -69,8 +69,8 @@ $datum_obj = new datum();
 $ma= new mitarbeiter();
 
 // definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
-$zasperre = new zeitaufzeichnung();
-if ($sperrdat = $zasperre->getEintragungGesperrtBisForUser($uid))
+$zaufzeichnung = new zeitaufzeichnung();
+if ($sperrdat = $zaufzeichnung->getEintragungGesperrtBisForUser($uid))
 	$gesperrt_bis = $sperrdat;
 else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
 	$gesperrt_bis = CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS;
@@ -138,7 +138,15 @@ $( document ).ready(function()
 			rows: 4,
 			});
 
+	$("#vondatum").change(
+		function()
+		{
+			$(".error").text("");
+		}
+	)
+
 });
+
 // set holidays function which is configured in beforeShowDay
  function setHoliDays(date) {
    for (i = 0; i < holiDays.length; i++) {
@@ -258,14 +266,14 @@ function showHideBezeichnungDropDown()
 	if (dd.options[dd.selectedIndex].value == 'DienstV')
 	{
 		var str = '<select name="bezeichnung" class="dd_breit">';
-		str += '<option value="Eheschließung">a) Eigene Eheschließung</option>';
-		str += '<option value="Geburt eigenes Kind">b) Geburt eines Kindes der Ehefrau/Lebensgefährtin</option>';
-		str += '<option value="Heirat Kind/Geschwister">c) Eheschließung eines Kindes/eigener Geschwister</option>';
-		str += '<option value="Eigene Sponsion/Promotion">d) Teilnahme an eigener Sponsion/Promotion</option>';
-		str += '<option value="Lebensbedr. Erkrankung P/K/E">e) Lebensbedrohliche Erkrankung Partner/Kinder/Eltern</option>';
-		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil</option>';
-		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern</option>';
-		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt</option>';
+		str += '<option value="Eheschließung">a) Eigene Eheschließung (3 Tage)</option>';
+		str += '<option value="Geburt eigenes Kind">b) Geburt eines Kindes der Ehefrau/Lebensgefährtin (2 Tage)</option>';
+		str += '<option value="Heirat Kind/Geschwister">c) Eheschließung eines Kindes/eigener Geschwister (1 Tag)</option>';
+		str += '<option value="Eigene Sponsion/Promotion">d) Teilnahme an eigener Sponsion/Promotion (1 Tag)</option>';
+		str += '<option value="Lebensbedr. Erkrankung P/K/E">e) Lebensbedrohliche Erkrankung Partner/Kinder/Eltern (3 Tage)</option>';
+		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil (3 Tage)</option>';
+		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern (1 Tag)</option>';
+		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt (2 Tage)</option>';
 		str += '<option value="Bundesheer">i) Einberufung Bundesheer</option>';
 		str += '</select>';
 
@@ -274,7 +282,7 @@ function showHideBezeichnungDropDown()
 	}
 	else if (dd.options[dd.selectedIndex].value == 'DienstF')
 	{
-		sp.innerHTML = '<font color="red"><b>Dienstfreistellungen</b> nur in Absprache mit Personalservice eintragen!</font><br><input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
+		sp.innerHTML = '<font color="red"><b>Dienstfreistellungen</b> nur in Absprache mit HR Service eintragen!</font><br><input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
 	}
 	else
 	{
@@ -302,7 +310,9 @@ function showHideStudeDropDown()
 	|| dd.options[dd.selectedIndex].value == 'Urlaub'
 	|| dd.options[dd.selectedIndex].value == 'Krank'
 	|| dd.options[dd.selectedIndex].value == 'DienstF'
-	|| dd.options[dd.selectedIndex].value == 'DienstV')
+	|| dd.options[dd.selectedIndex].value == 'DienstV'
+	|| dd.options[dd.selectedIndex].value == 'CovidSB'
+	|| dd.options[dd.selectedIndex].value == 'CovidKS')
 	{
 		document.getElementById('vonStd').style.visibility = 'hidden';
 		document.getElementById('bisStd').style.visibility = 'hidden';
@@ -348,6 +358,40 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	{
 		$error=true;
 		$error_msg .= $p->t('zeitsperre/bisDatumUngueltig').' ';
+	}
+
+	//Prüfen auf vorhandene Zeitaufzeichnung
+	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
+	  && $zaufzeichnung->existsZeitaufzeichnung($uid, $_POST['vondatum'], $_POST['bisdatum'])
+	  // Nur Zeitaufzeichnungsrelevante Typen sollen das speichern blockieren
+	  && in_array($_POST['zeitsperretyp_kurzbz'], zeitsperre::getBlockierendeZeitsperren()))
+	{
+		$error = true;
+		$error_msg .= $p->t('zeitsperre/zeitaufzeichnungVorhanden');
+	}
+
+	//Prüfen auf vorhandene Zeitsperre
+	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
+	&& in_array($_POST['zeitsperretyp_kurzbz'], zeitsperre::getBlockierendeZeitsperren()))
+	{
+		$von = $_POST['vondatum'];
+		$von2 = new DateTime($von);
+		$von2 = $von2->format('Y-m-d');
+		$zeitsperre = new zeitsperre();
+
+		if ($zeitsperre->getSperreByDate($uid, $von2, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN))
+		{
+			foreach ($zeitsperre->result as $z)
+			{
+				// Beim editieren nicht mit dem eigenen Eintrag kollidieren
+				if($_GET['type'] == 'edit_sperre' && $z->zeitsperre_id == $_GET['id'])
+					continue;
+
+				$typ = $z->zeitsperretyp_kurzbz;
+				$error = true;
+				$error_msg .= $p->t('zeitsperre/zeitsperreEingetragen', [$von, $typ]);
+			}
+		}
 	}
 
 	//von - bis-datum pruefen von darf nicht groesser als bis sein
@@ -646,7 +690,7 @@ if(count($zeit->result)>0)
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
 							<td>".(isset($erreichbarkeit_arr[$row->erreichbarkeit])?$erreichbarkeit_arr[$row->erreichbarkeit]:'')."</td>
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
-		if ($row->zeitsperretyp_kurzbz == 'DienstV')
+		if ($row->zeitsperretyp_kurzbz == 'DienstV' || $row->zeitsperretyp_kurzbz == 'ZVerfueg')
 			$content_table .= '<td>&nbsp;</td>';
 		else if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
@@ -658,7 +702,7 @@ if(count($zeit->result)>0)
 		{
 			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id&informSupervisor=True' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
-		elseif($row->zeitsperretyp_kurzbz!='Urlaub')
+		elseif($row->zeitsperretyp_kurzbz!='Urlaub' && $row->zeitsperretyp_kurzbz != 'ZVerfueg')
         {
             $content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
         }
@@ -718,6 +762,11 @@ if($result = $db->db_query($qry))
 {
 	while($row=$db->db_fetch_object($result))
 	{
+        if ($row->zeitsperretyp_kurzbz === 'ZVerfueg')
+        {
+            continue;
+        }
+
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
 			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->beschreibung</OPTION>";
 		else

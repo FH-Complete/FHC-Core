@@ -70,13 +70,15 @@ else
 				<row>
 					<label value="Typ" control="adresse-menulist-typ"/>
 					<menulist id="adresse-menulist-typ"
-					          flex="1">
+							  datasources="<?php echo APP_ROOT ?>rdf/adressentyp.rdf.php" flex="1"
+							  ref="http://www.technikum-wien.at/adressentyp/liste">
+						<template>
 							<menupopup>
-								<menuitem value="h" label="Hauptwohnsitz"/>
-								<menuitem value="n" label="Nebenwohnsitz"/>
-								<menuitem value="f" label="Firma"/>
-								<menuitem value="r" label="Rechnungsadresse"/>
+								<menuitem value="rdf:http://www.technikum-wien.at/adressentyp/rdf#adressentyp"
+										  label="rdf:http://www.technikum-wien.at/adressentyp/rdf#bezeichnung"
+										  uri="rdf:*"/>
 							</menupopup>
+						</template>
 					</menulist>
 				</row>
 				<row>

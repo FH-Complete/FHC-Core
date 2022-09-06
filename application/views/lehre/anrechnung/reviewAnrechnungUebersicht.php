@@ -80,7 +80,6 @@ $this->load->view(
 );
 ?>
 
-<body>
 <div id="page-wrapper">
     <div class="container-fluid">
         <!-- title -->
@@ -127,30 +126,31 @@ $this->load->view(
                  id="reviewAnrechnungUebersicht-begruendung-panel">
                 <div>
                     <h4 class="panel panel-body panel-danger text-danger"><?php echo $this->p->t('anrechnung', 'empfehlungenNegativQuestion'); ?></h4>
-                    <b>&ensp;<?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></b><br><br>
-                    <ul>
-                        <li>
-                            <span><?php echo $this->p->t('anrechnung', 'empfehlungNegativPruefungNichtMoeglich'); ?></span>
-                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="right"
-                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-                                <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </span>
-                        </li>
-                        <li>
-                            <span><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?></span>
-                            <span class="btn-copyIntoTextarea" data-toggle="tooltip" data-placement="right"
-                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-                                <i class="fa fa-clipboard" aria-hidden="true"></i>
-                            </span>
-                        </li>
-                        <li><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></li>
-                    </ul>
-                    <br>
-                    <span class="text-danger">
+                    <b><span>&ensp;<?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></span>
+                        <span class="text-danger">
                         <?php echo $this->p->t('anrechnung', 'begruendungWirdFuerAlleUebernommen'); ?>
-                    </span><br><br>
+                        </span></b>
+                    <br><br>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <span><?php echo $this->p->t('anrechnung', 'empfehlungNegativPruefungNichtMoeglich'); ?></span>
+                            <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip" data-placement="right"
+                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                            </span>
+                        </li>
+                        <li class="list-group-item">
+                            <span><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?></span>
+                            <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip" data-placement="right"
+                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+                                <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                            </span>
+                        </li>
+                    </ul>
                     <textarea class="form-control" name="begruendung" id="reviewAnrechnungUebersicht-begruendung"
-                              rows="2" required></textarea>
+                              rows="2"
+                              placeholder="<?php echo $this->p->t('anrechnung', 'textUebernehmenOderEigenenBegruendungstext'); ?>"
+                              required></textarea>
                 </div>
                 <br>
                 <!-- Action Button Abbrechen & Bestaetigen-->
@@ -235,7 +235,6 @@ $this->load->view(
         </div>
     </div>
 </div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
 

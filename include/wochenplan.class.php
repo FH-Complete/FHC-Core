@@ -754,8 +754,9 @@ class wochenplan extends basis_db
 							if ($lehrstunde->grp!=null && $lehrstunde->grp!='0' && $lehrstunde->grp!='')
 								$lvb.=$lehrstunde->grp;
 						}
-						if (count($lehrstunde->gruppe_kurzbz)>0)
+						if ($lehrstunde->gruppe_kurzbz != '')
 							$lvb=$lehrstunde->gruppe_kurzbz;
+
 						$lehrverband[]=$lvb;
 						// Lehrfach
 						$lf=$lehrstunde->lehrfach;
@@ -1235,7 +1236,9 @@ class wochenplan extends basis_db
 				if (isset($wunsch[$i][$j]))
 				{
 					$index=$wunsch[$i][$j];
-					if ($index==-3)
+
+					// Negative und positive Zeitsperren beruecksichtigen
+					if ($index==-3 || $index == 4)
 					{
 						//Wenn eine Zeitsperre eingetragen ist, dann diese im Tooltiptext anzeigen
 						$zeitsperre = new zeitsperre();
@@ -1456,8 +1459,9 @@ class wochenplan extends basis_db
 									if ($lehrstunde->grp!=null && $lehrstunde->grp!='0' && $lehrstunde->grp!='')
 										$lvb.=$lehrstunde->grp;
 								}
-								if (count($lehrstunde->gruppe_kurzbz)>0)
+								if ($lehrstunde->gruppe_kurzbz != '')
 									$lvb=$lehrstunde->gruppe_kurzbz;
+
 								$lehrverband[]=$lvb;
 								// Lehrfach
 								$lf=htmlspecialchars($lehrstunde->lehrfach);

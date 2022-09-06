@@ -28,16 +28,28 @@ require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/freebusy.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
   
-$user=get_uid();
+$user = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
 $action = (isset($_REQUEST['action'])?$_REQUEST['action']:'');
 $id = (isset($_REQUEST['id'])?$_REQUEST['id']:'');
+
+// Administratoren duerfen die UID als Parameter uebergeben um die Umfragen von anderen Personen anzuzeigen
+if(isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if($rechte->isBerechtigt('admin'))
+	{
+		$user = $_GET['uid'];
+	}
+}
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">

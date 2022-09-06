@@ -41,16 +41,16 @@ class LehreListHelper
 	protected $lv;
 	protected $lehreinheit;
 	protected $stg;
-	
+
 	protected $arr_lehrende;
 	protected $studentuids;
 	protected $data;
-		
+
 	protected $gruppen_string;
 	protected $lehrende_string;
 	protected $raum_string;
 
-	public function __construct(basis_db $db, $studiensemester, $lvid, 
+	public function __construct(basis_db $db, $studiensemester, $lvid,
 		lehrveranstaltung $lv, studiengang $stg, $lehreinheit='')
 	{
 		$this->db = $db;
@@ -63,39 +63,39 @@ class LehreListHelper
 		$this->arr_lehrende = array();
 		$this->studentuids = array();
 		$this->data = array();
-		
+
 		$this->gruppen_string = '';
 		$this->lehrende_string = '';
 		$this->raum_string = '';
-		
+
 		$this->loadMemberGroups();
 		$this->loadPlannedRooms();
 		$this->initData();
 		$this->loadLehrende();
 		$this->loadStudierende();
 	}
-	
-	public function getData() 
+
+	public function getData()
 	{
 		return $this->data;
 	}
-	
-	public function getStudentUids() 
+
+	public function getStudentUids()
 	{
 		return $this->studentuids;
 	}
-	
-	public function getArr_Lehrende() 
+
+	public function getArr_Lehrende()
 	{
 		return $this->arr_lehrende;
 	}
-	
+
 	public function getLehrende_String()
 	{
 		return $this->lehrende_string;
 	}
-	
-	protected function loadMemberGroups() 
+
+	protected function loadMemberGroups()
 	{
 		// Teilnehmende Gruppen laden
 		$qry = "SELECT DISTINCT ON(kuerzel, semester, verband, gruppe, gruppe_kurzbz)
@@ -124,7 +124,7 @@ class LehreListHelper
 			}
 		}
 	}
-	
+
 	protected function loadPlannedRooms()
 	{
 		// Verplante Räume laden
@@ -153,7 +153,7 @@ class LehreListHelper
 			}
 		}
 	}
-	
+
 	protected function initData()
 	{
 		$studiengang_bezeichnung=$this->stg->bezeichnung;
@@ -175,8 +175,8 @@ class LehreListHelper
 			'raum'=>$this->raum_string,
 		);
 	}
-	
-	protected function loadLehrende() 
+
+	protected function loadLehrende()
 	{
 		//Lehrende der LV laden und in ein Array schreiben
 		$lehrende = new lehreinheitmitarbeiter();
@@ -187,31 +187,37 @@ class LehreListHelper
 			foreach($lehrende->result AS $row)
 			{
 				$this->data[]=array('lehrende'=>array('uid'=>$row->uid,'name'=>$row->vorname.' '.$row->nachname));
-				$this->arr_lehrende[]=mb_strtoupper($row->uid);				
-				$this->lehrende_string .= (strlen($this->lehrende_string) > 0) 
-					? ', ' . $row->vorname . ' ' . $row->nachname 
+				$this->arr_lehrende[]=mb_strtoupper($row->uid);
+				$this->lehrende_string .= (strlen($this->lehrende_string) > 0)
+					? ', ' . $row->vorname . ' ' . $row->nachname
 					: $row->vorname . ' ' . $row->nachname;
 			}
 		}
 	}
-	
-	protected function loadStudierende() 
+
+	protected function loadStudierende()
 	{
 		//Studierende der LV laden und in ein Array schreiben
 
 		$qry = 'SELECT
-					distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, public.tbl_student.student_uid, 
+					distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, public.tbl_student.student_uid,
 					tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-					(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+					(SELECT status_kurzbz FROM public.tbl_prestudentstatus
+					WHERE prestudent_id=tbl_student.prestudent_id
+					ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 					tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
-					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang, tbl_mobilitaet.mobilitaetstyp_kurzbz
+					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang,
+					tbl_mobilitaet.mobilitaetstyp_kurzbz, tbl_zeugnisnote.note,
+					(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN 1 ELSE 0 END) as doubledegree
 				FROM
 					campus.vw_student_lehrveranstaltung
 					JOIN public.tbl_benutzer USING(uid)
 					JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student ON(uid=student_uid)
 					LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 					LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
-					LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
+					LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+						AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
+						AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 					LEFT JOIN lehre.tbl_note USING (note)
 					LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 					LEFT JOIN public.tbl_studiengang ON(tbl_student.studiengang_kz=tbl_studiengang.studiengang_kz)
@@ -224,7 +230,7 @@ class LehreListHelper
 		if($this->lehreinheit!='')
 			$qry.=' AND vw_student_lehrveranstaltung.lehreinheit_id='.$this->db->db_add_param($this->lehreinheit, FHC_INTEGER);
 
-		$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
+		$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
 
 		$stsem_obj = new studiensemester();
 		$stsem_obj->load($this->studiensemester);
@@ -253,8 +259,10 @@ class LehreListHelper
 					else
 						$zusatz='';
 
-					if($row->bisio_id!='' && $row->status!='Incoming' && ($row->bis > $stsemdatumvon || $row->bis=='') && $row->von < $stsemdatumbis) //Outgoing
-						$zusatz.='(o)(ab '.$datum->formatDatum($row->von,'d.m.Y').')';
+					//Outgoing
+					if($row->bisio_id != '' && $row->status != 'Incoming' && ($row->bis > $stsemdatumvon || $row->bis == '')
+					&& $row->von < $stsemdatumbis && (anzahlTage($row->von, $row->bis) >= 30))
+						$zusatz .= '(o)(ab '.$datum->formatDatum($row->von, 'd.m.Y').')';
 
 					if($row->lkt_ueberschreibbar == 'f') // angerechnet / intern angerechnet / nicht zugelassen
 						$zusatz.= '('. $row->anmerkung. ')';
@@ -265,14 +273,12 @@ class LehreListHelper
 					if($row->stg_kz_student==$a_o_kz) //Außerordentliche Studierende
 						$zusatz.='(a.o.)';
 
-					if($row->mobilitaetstyp_kurzbz !='') //Double Degree Student
-						$zusatz.='(d.d.)';
+					if(($row->mobilitaetstyp_kurzbz != '') && ($row->doubledegree == 1)) //Double Degree Student
+						$zusatz .= '(d.d.)';
 
-					//$zusatz.='test';
-					
 					$this->studentuids[] = $row->student_uid;
 					$this->data[]=array('student'=>array(
-									'uid' => $row->student_uid, 
+									'uid' => $row->student_uid,
 									'vorname'=>$row->vorname,
 									'nachname'=>$row->nachname,
 									'personenkennzeichen'=>trim($row->matrikelnr),
@@ -282,7 +288,8 @@ class LehreListHelper
 									'gruppe'=>trim($row->gruppe),
 									'zusatz'=>$zusatz,
 									'studiengang_kurzbz'=>$row->kurzbzlang,
-									'mobilitaetstyp_kurzbz'=>$row->mobilitaetstyp_kurzbz
+									'mobilitaetstyp_kurzbz'=>$row->mobilitaetstyp_kurzbz,
+									'note'=>$row->note
 									));
 				}
 			}

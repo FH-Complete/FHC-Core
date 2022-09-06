@@ -47,6 +47,7 @@ require_once('../include/studienordnung.class.php');
 require_once('../include/dokument_export.class.php');
 require_once('../include/dokument.class.php');
 require_once('../include/pdf.class.php');
+require_once('../include/lehrveranstaltung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -458,7 +459,7 @@ else
 			}
 
 			$dokument->setFilename($filename);
-			
+
 			if ($sign === true)
 			{
 				$dokument->sign($user);
@@ -520,6 +521,18 @@ else
 						{
 							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
 						}
+						elseif ($xsl === 'LVZeugnisEng' || $xsl === 'LVZeugnis' || $xsl === 'Zertifikat')
+						{
+							$lehrveranstaltung = new lehrveranstaltung($_GET['lvid']);
+							$vorlage->dokument_kurzbz = $xsl;
+							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss . ' '. $lehrveranstaltung->bezeichnung, 0, 64);
+							$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss. '_' . str_replace(' ', '_', $lehrveranstaltung->bezeichnung), 0, 60);
+						}
+						elseif ($xsl == 'SZeugnis')
+						{
+							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+							$titel = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+						}
 						else
 						{
 							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss, 0, 64);
@@ -566,7 +579,7 @@ else
 			$dokument->setFilename($filename);
 
 			$error = false;
-			
+
 			// XML-tag archivierbar ergaenzen
 			$dokument->setXMLTag_archivierbar();
 
@@ -578,7 +591,7 @@ else
 			{
 				$dokument->sign($user);
 			}
-			
+
 			if ($dokument->create($output))
 				$doc = $dokument->output(false);
 			else
