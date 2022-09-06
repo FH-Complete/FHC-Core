@@ -754,8 +754,9 @@ class wochenplan extends basis_db
 							if ($lehrstunde->grp!=null && $lehrstunde->grp!='0' && $lehrstunde->grp!='')
 								$lvb.=$lehrstunde->grp;
 						}
-						if (count($lehrstunde->gruppe_kurzbz)>0)
+						if ($lehrstunde->gruppe_kurzbz != '')
 							$lvb=$lehrstunde->gruppe_kurzbz;
+
 						$lehrverband[]=$lvb;
 						// Lehrfach
 						$lf=$lehrstunde->lehrfach;
@@ -1458,8 +1459,9 @@ class wochenplan extends basis_db
 									if ($lehrstunde->grp!=null && $lehrstunde->grp!='0' && $lehrstunde->grp!='')
 										$lvb.=$lehrstunde->grp;
 								}
-								if (count($lehrstunde->gruppe_kurzbz)>0)
+								if ($lehrstunde->gruppe_kurzbz != '')
 									$lvb=$lehrstunde->gruppe_kurzbz;
+
 								$lehrverband[]=$lvb;
 								// Lehrfach
 								$lf=htmlspecialchars($lehrstunde->lehrfach);
