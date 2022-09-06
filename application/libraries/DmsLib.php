@@ -50,62 +50,57 @@ class DmsLib
 		$kategorie_kurzbz = null, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null
 	)
 	{
-			// write file with content of fileHandle
-			$writeFileResult = $this->_writeNewFile($name, $fileHandle);
+			// create unique filename, using original document name to detect file extension
+			$filename = $this->_getUniqueFilename($name);
 
-			if (isError($writeFileResult)) return $writeFileResult;
+			// copy file from fileHandle to dms folder
+			$copyFileResult = $this->_copyFile($fileHandle, $filename);
 
-			if (hasData($writeFileResult))
+			if (isError($copyFileResult)) return $copyFileResult;
+
+			// if file written successful, insert dms
+			$dmsResult = $this->_ci->DmsModel->insert(
+				array(
+					'kategorie_kurzbz' => $kategorie_kurzbz,
+					'dokument_kurzbz' => $dokument_kurzbz
+				)
+			);
+
+			if (isError($dmsResult)) return $dmsResult;
+
+			if (hasData($dmsResult))
 			{
-				$writeFileData = getData($writeFileResult);
-				$filename = $writeFileData->filename;
+				$dms_id = getData($dmsResult);
+				$version = 0;
 
-				// if file written successful, insert dms
-				$dmsResult = $this->_ci->DmsModel->insert(
-					array(
-						'kategorie_kurzbz' => $kategorie_kurzbz,
-						'dokument_kurzbz' => $dokument_kurzbz
-					)
+				// insert dms version
+				$dmsVersion = array(
+					'dms_id' => $dms_id,
+					'version' => $version,
+					'filename' => $filename,
+					'mimetype' => $mimetype,
+					'name' => $name,
+					'beschreibung' => $beschreibung,
+					'cis_suche' => $cis_suche,
+					'schlagworte' => $schlagworte,
+					'insertvon' => $this->_who,
+					'insertamum' => date('Y-m-d H:i:s')
 				);
 
-				if (isError($dmsResult)) return $dmsResult;
+				$dmsVersionResult = $this->_ci->DmsVersionModel->insert($dmsVersion);
 
-				if (hasData($dmsResult))
-				{
-					$dms_id = getData($dmsResult);
-					$version = 0;
+				if (isError($dmsVersionResult)) return $dmsVersionResult;
 
-					// insert dms version
-					$dmsVersion = array(
-						'dms_id' => $dms_id,
-						'version' => $version,
-						'filename' => $filename,
-						'mimetype' => $mimetype,
-						'name' => $name,
-						'beschreibung' => $beschreibung,
-						'cis_suche' => $cis_suche,
-						'schlagworte' => $schlagworte,
-						'insertvon' => $this->_who,
-						'insertamum' => date('Y-m-d H:i:s')
-					);
+				// return dms info
+				$resObj = new stdClass();
+				$resObj->dms_id = $dms_id;
+				$resObj->version = $version;
+				$resObj->filename = $filename;
 
-					$dmsVersionResult = $this->_ci->DmsVersionModel->insert($dmsVersion);
-
-					if (isError($dmsVersionResult)) return $dmsVersionResult;
-
-					// return dms info
-					$resObj = new stdClass();
-					$resObj->dms_id = $dms_id;
-					$resObj->version = $version;
-					$resObj->filename = $filename;
-
-					return success($resObj);
-				}
-				else
-					return error("error when inserting DMS");
+				return success($resObj);
 			}
 			else
-				return error("file could not be written");
+				return error("error when inserting DMS");
 	}
 
 	/**
@@ -125,46 +120,41 @@ class DmsLib
 
 			$originalName = isset($name) ? $name : $lastVersion->name;
 
-			// write new file with content of fileHandle
-			$writeFileResult = $this->_writeNewFile($originalName, $fileHandle);
+			// create unique filename, using original document name to detect file extension
+			$filename = $this->_getUniqueFilename($originalName);
 
-			if (isError($writeFileResult)) return $writeFileResult;
+			// copy file from fileHandle to dms folder
+			$copyFileResult = $this->_copyFile($fileHandle, $filename);
 
-			if (hasData($writeFileResult))
-			{
-				$writeFileData = getData($writeFileResult);
-				$filename = $writeFileData->filename;
+			if (isError($copyFileResult)) return $copyFileResult;
 
-				// insert new version
-				$newVersionNumber = $lastVersion->version + 1;
+			// insert new version
+			$newVersionNumber = $lastVersion->version + 1;
 
-				// if new parameters given, use them, otherwise use parameters from last version
-				$newVersion = array(
-					'dms_id' => $dms_id,
-					'name' => $originalName,
-					'filename' => $filename,
-					'version' => $newVersionNumber,
-					'mimetype' => isset($mimetype) ? $mimetype : $lastVersion->mimetype,
-					'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
-					'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
-					'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
-					'insertvon' => $this->_who,
-					'insertamum' => date('Y-m-d H:i:s')
-				);
+			// if new parameters given, use them, otherwise use parameters from last version
+			$newVersion = array(
+				'dms_id' => $dms_id,
+				'name' => $originalName,
+				'filename' => $filename,
+				'version' => $newVersionNumber,
+				'mimetype' => isset($mimetype) ? $mimetype : $lastVersion->mimetype,
+				'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
+				'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
+				'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
+				'insertvon' => $this->_who,
+				'insertamum' => date('Y-m-d H:i:s')
+			);
 
-				$addVersionResult = $this->_ci->DmsVersionModel->insert($newVersion);
+			$addVersionResult = $this->_ci->DmsVersionModel->insert($newVersion);
 
-				if (isError($addVersionResult)) return $addVersionResult;
+			if (isError($addVersionResult)) return $addVersionResult;
 
-				// return dms info
-				$resObj = new stdClass();
-				$resObj->version = $newVersionNumber;
-				$resObj->filename = $filename;
+			// return dms info
+			$resObj = new stdClass();
+			$resObj->version = $newVersionNumber;
+			$resObj->filename = $filename;
 
-				return success($resObj);
-			}
-			else
-				return error("file could not be written");
+			return success($resObj);
 		}
 		else
 			return error("last version not found");
@@ -185,44 +175,37 @@ class DmsLib
 		if (hasData($lastVersionResult))
 		{
 			$lastVersion = getData($lastVersionResult);
+			$filename = $lastVersion->filename;
 
 			// update file in filesystem
-			$writeFileResult = $this->_writeFile($lastVersion->filename, $fileHandle);
+			$copyFileResult = $this->_copyFile($fileHandle, $filename);
 
-			if (isError($writeFileResult)) return $writeFileResult;
+			if (isError($copyFileResult)) return $copyFileResult;
 
-			if (hasData($writeFileResult))
-			{
-				$writeFileData = getData($writeFileResult);
-				$filename = $writeFileData->filename;
+			// if new parameters given, use them, otherwise use parameters from last version
+			$newVersion = array(
+				'name' => isset($name) ? $name : $lastVersion->name,
+				'filename' => $filename,
+				'mimetype' => isset($mimetype) ? $mimetype : $lastVersion->mimetype,
+				'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
+				'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
+				'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
+			);
 
-				// if new parameters given, use them, otherwise use parameters from last version
-				$newVersion = array(
-					'name' => isset($name) ? $name : $lastVersion->name,
-					'filename' => $filename,
-					'mimetype' => isset($mimetype) ? $mimetype : $lastVersion->mimetype,
-					'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
-					'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
-					'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
-				);
+			// update last dms version
+			$addVersionResult = $this->_ci->DmsVersionModel->update(
+				array($dms_id, $lastVersion->version),
+				$newVersion
+			);
 
-				// update last dms version
-				$addVersionResult = $this->_ci->DmsVersionModel->update(
-					array($dms_id, $lastVersion->version),
-					$newVersion
-				);
+			if (isError($addVersionResult)) return $addVersionResult;
 
-				if (isError($addVersionResult)) return $addVersionResult;
+			// return dms info
+			$resObj = new stdClass();
+			$resObj->version = $lastVersion->version;
+			$resObj->filename = $filename;
 
-				// return dms info
-				$resObj = new stdClass();
-				$resObj->version = $lastVersion->version;
-				$resObj->filename = $filename;
-
-				return success($resObj);
-			}
-			else
-				return error("file could not be written");
+			return success($resObj);
 		}
 		else
 			return error("last version not found");
@@ -441,67 +424,34 @@ class DmsLib
 	// Private methods
 
 	/**
-	 * Writes file with content of fileHandle using original document name for file extension
+	 * Copies file from sourceFileHandle to destinationFilename in DMS folder
+	 * Returns success or error on fail
 	 */
-	private function _writeNewFile($originalName, $fileHandle)
+	private function _copyFile($sourceFileHandle, $destinationFilename)
 	{
-		// create unique filename, using original document name to detect file extension
-		$filename = $this->_getUniqueFilename($originalName);
+		// get file location from file handle
+		$metaData = stream_get_meta_data($sourceFileHandle);
 
-		// write the file
-		return $this->_writeFile($filename, $fileHandle);
-	}
-
-	/**
-	 * Writes file with content of fileHandle
-	 * Returns number of bytes written and filename
-	 */
-	private function _writeFile($filename, $fileHandle)
-	{
-		// file content provided by fileHandle
-		$fileContent = '';
-
-		$readBlockResult = success();
-
-		// While the end of the file is not reached and the read does not fail
-		while (!feof($fileHandle) && isSuccess($readBlockResult = $this->_ci->DmsFSModel->readBlock($fileHandle)))
+		if (isset($metaData['uri']) && !isEmptyString($metaData['uri']))
 		{
-			// Concatenate the content of the file
-			$fileContent .= getData($readBlockResult);
+			// if file location determined, copy file
+			$source = $metaData['uri'];
+
+			if (copy($source, DMS_PATH.$destinationFilename))
+			{
+				return success();
+			}
+			else
+			{
+				// error if copy returned false
+				return error('error occured while copying file');
+			}
 		}
-
-		// If an error occurred while reading then return it
-		if (isError($readBlockResult)) return $readBlockResult;
-
-		// open file for writing
-		$openFileResult = $this->_ci->DmsFSModel->openReadWrite($filename);
-
-		if (isError($openFileResult)) return $openFileResult;
-
-		if (!hasData($openFileResult)) return error("File could not be opened");
-
-		$newFileHandle = getData($openFileResult);
-
-		// write file
-		$writeFileResult = $this->_ci->DmsFSModel->write($newFileHandle, $fileContent);
-
-		if (isError($writeFileResult)) return $writeFileResult;
-
-		// return number of bytes written and filename
-		$resObj = new stdClass();
-		$resObj->bytesWritten = 0;
-		$resObj->filename = '';
-
-		if (hasData($writeFileResult))
+		else
 		{
-			$resObj->bytesWritten = getData($writeFileResult);
-			$resObj->filename = $filename;
+			// error when source location could not be determined
+			return error('error occured while getting source file name');
 		}
-
-		// close handle
-		$closeResult = $this->_ci->DmsFSModel->close($newFileHandle, $fileContent);
-
-		if (isError($closeResult)) return $closeResult;
 
 		return success($resObj);
 	}
@@ -527,7 +477,7 @@ class DmsLib
 
 	// -----------------------------------------------------------------------------------------------------------
 	// Deprecated methods, not to be used
-	
+
 	/**
 	 * Load a DMS Document.
 	 * If no version is particularly given, the latest version is loaded.
@@ -543,7 +493,7 @@ class DmsLib
 			$this->_ci->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
 			$this->_ci->DmsModel->addOrder('version', 'DESC');
 			$this->_ci->DmsModel->addLimit(1);
-			
+
 			if (!is_numeric($version))
 			{
 				return $this->_ci->DmsModel->load($dms_id);
@@ -620,7 +570,7 @@ class DmsLib
 
 		return $result;
 	}
-	
+
 	/**
 	 * Uploads a document and saves it to DMS
 	 * @param $dms DMS assoc array
@@ -659,7 +609,7 @@ class DmsLib
 		// Return result of uploaded data
 		return success($upload_data);
 	}
-	
+
 	/**
 	 * Download a document.
 	 *
@@ -678,7 +628,7 @@ class DmsLib
 		if (hasData($fileInfoResult))
 		{
 			$fileObj = getData($fileInfoResult);
-		
+
 			// Change filename, if filename is provided
 			if (!isEmptyString($filename)) $fileObj->name = $filename;
 
@@ -694,7 +644,7 @@ class DmsLib
 		// If no data have been found then return an empty success
 		return success();
 	}
-	
+
 	/**
 	 * Get file information.
 	 *
@@ -706,7 +656,7 @@ class DmsLib
 	{
 		// Checks the dms_id parameter
 		if (!is_numeric($dms_id)) return error('Wrong parameter');
-		
+
 		// Load DMS from database
 		$result = $this->load($dms_id, $version);
 		if (isError($result)) return error(getError($result));
@@ -951,4 +901,3 @@ class DmsLib
 		$this->_ci->upload->initialize($config);
 	}
 }
-
