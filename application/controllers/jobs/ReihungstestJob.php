@@ -3,6 +3,8 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class ReihungstestJob extends JOB_Controller
 {
+	const OU_SENDER_TEST_REMINDER = 'infocenter';
+
 	/**
 	 * Constructor
 	 */
@@ -433,11 +435,10 @@ class ReihungstestJob extends JOB_Controller
 
 								$sender_id = $this->config->item('system_person_id');
 
-								$sendMessage = $this->CLMessagesModel->sendExplicitTemplateSenderId
-								(
+								$sendMessage = $this->CLMessagesModel->sendExplicitTemplateSenderId(
 									$sender_id,
 									$applicant->prestudent_id,
-									$applicant->oe_kurzbz,
+									self::OU_SENDER_TEST_REMINDER,
 									'Sancho_RemindApplicantsOfTest',
 									$mailcontent_data_arr
 								);
