@@ -1,4 +1,20 @@
 <?php
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 class Reihungstest_model extends DB_Model
 {
@@ -432,10 +448,10 @@ class Reihungstest_model extends DB_Model
 	}
 
 	/**
- * Loads all applicants of a placement test
- * @param integer $reihungstest_id ID of placement test
- * @return array Returns object array with data of applicants.
- */
+	 * Loads all applicants of a placement test
+	 * @param integer $reihungstest_id ID of placement test
+	 * @return array Returns object array with data of applicants.
+	 */
 	public function getApplicantsOfPlacementTest($reihungstest_id)
 	{
 		$query = '

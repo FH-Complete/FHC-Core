@@ -1,4 +1,23 @@
 <?php
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+use \stdClass as stdClass;
+use \DateTime as DateTime;
 
 /**
  * Messages GUI logic
@@ -27,6 +46,7 @@ class Messages_model extends CI_Model
 	const TYPE_PRESTUDENTS = 'prestudents';
 
 	const ALT_OE = 'infocenter'; // alternative organisation unit when no one is found for a presetudent
+	const SYSTEM_SENDER_NAME = 'System sender';
 
 	/**
 	 * Constructor
@@ -52,7 +72,6 @@ class Messages_model extends CI_Model
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		// Loads model Studiengang_model
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -283,7 +302,7 @@ class Messages_model extends CI_Model
 		if (isError($srmsbtResult)) show_error(getError($srmsbtResult));
 
 		// Sender name
-		$sender = 'System sender'; // default fallback
+		$sender = self::SYSTEM_SENDER_NAME; // default fallback
 
 		// If the sender is a person
 		if (isEmptyString($message->oe_kurzbz))
@@ -495,11 +514,11 @@ class Messages_model extends CI_Model
 		// Get the senders uid (if user is an active employee)
 		$this->BenutzerModel->addSelect('uid');
 		$this->BenutzerModel->addJoin('public.tbl_mitarbeiter ma', 'ma.mitarbeiter_uid = uid');
-		if (!$result = getData($this->BenutzerModel->getFromPersonId($sender_id)))
-		{
-			show_error('No sender_uid found');
-		}
-		$sender_uid = $result[0]->uid;
+		$benutzerResult = $this->BenutzerModel->getFromPersonId($sender_id);
+		if (isError($benutzerResult)) show_error(getError($benutzerResult));
+		if (!hasData($benutzerResult)) show_error('No sender uid found');
+
+		$sender_uid = getData($benutzerResult)[0]->uid;
 
 		// Adds the organisation unit to each prestudent
 		if (isEmptyString($oe_kurzbz) && hasData($msgVarsData) && hasData($prestudentsData))
@@ -551,8 +570,6 @@ class Messages_model extends CI_Model
 		$senderResult = $this->MessageTokenModel->getSenderData($receiver_id);
 		if (isError($senderResult)) show_error(getError($senderResult));
 		if (!hasData($senderResult)) show_error('No sender information found');
-
-		$sender = getData($senderResult)[0]; // Found sender data
 
 		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
 		if (isError($messageResult)) show_error(getError($messageResult));
@@ -783,7 +800,10 @@ class Messages_model extends CI_Model
 	{
 		return sprintf(
 			self::REPLY_BODY_FORMAT,
-			date_format(date_create($sentDate), 'd.m.Y H:i'), $receiverName, $receiverSurname, $body
+			date_format(date_create($sentDate), 'd.m.Y H:i'),
+			$receiverName,
+			$receiverSurname,
+			$body
 		);
 	}
 
@@ -948,18 +968,20 @@ class Messages_model extends CI_Model
 		if (!is_object($otherMsgVarsDataObj)) show_error('Must pass an object to merge with data of logged in user');
 
 		// If it is a return object, extract the simple data object
-		if (isSuccess($otherMsgVarsDataObj))
-		{
-			$otherMsgVarsDataObj = getData($otherMsgVarsDataObj)[0];
-		}
+		if (isSuccess($otherMsgVarsDataObj)) $otherMsgVarsDataObj = getData($otherMsgVarsDataObj)[0];
 
 		// Retrieve message vars data of the logged in user
-		if (!$msgVarsDataLoggedInUser = getData($this->MessageModel->getMsgVarsDataByLoggedInUser($uid))[0])
-		{
-			return success(array($otherMsgVarsDataObj));   // If failed, return at least given object as expected success object
-		}
+		$msgVarsDataLoggedInUserResult = $this->MessageModel->getMsgVarsDataByLoggedInUser($uid);
+		if (isError($msgVarsDataLoggedInUserResult)) show_error(getError($msgVarsDataLoggedInUserResult));
 
-		return success(array((object)(array_merge((array) $otherMsgVarsDataObj, (array) $msgVarsDataLoggedInUser))));
+		// If no data have been found return only the given otherMsgVarsDataObj
+		if (!hasData($msgVarsDataLoggedInUserResult)) return success(array($otherMsgVarsDataObj));
 
+		// Otherwise get them...
+		$msgVarsDataLoggedInUser = getData($this->MessageModel->getMsgVarsDataByLoggedInUser($uid))[0];
+
+		// ...and return them merged with the otherMsgVarsDataObj
+		return success(array((object)(array_merge((array)$otherMsgVarsDataObj, (array)$msgVarsDataLoggedInUser))));
 	}
 }
+

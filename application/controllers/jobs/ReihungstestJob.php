@@ -1,5 +1,25 @@
 <?php
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+use \stdClass as stdClass;
+use \DateTime as DateTime;
 
 class ReihungstestJob extends JOB_Controller
 {
@@ -26,7 +46,6 @@ class ReihungstestJob extends JOB_Controller
 
 		// Loads CLMessagesModel
 		$this->load->model('CL/Messages_model', 'CLMessagesModel');
-
 	}
 
 	/**
@@ -70,7 +89,8 @@ class ReihungstestJob extends JOB_Controller
 				'ReihungstestJob',
 				$content_data_arr,
 				MAIL_INFOCENTER,
-				'Support für die Reihungstest-Verwaltung');
+				'Support für die Reihungstest-Verwaltung'
+			);
 		}
 	}
 
@@ -119,6 +139,8 @@ class ReihungstestJob extends JOB_Controller
 
 		foreach ($reachedRegistration_rt_arr as $reihungstest)
 		{
+			$reihungstestDatum = date_format(date_create($reihungstest->datum), 'd.m.Y');
+
 			$applicants = $this->ReihungstestModel->getApplicantsOfPlacementTestForCronjob($reihungstest->reihungstest_id);
 
 			if (hasData($applicants))
@@ -159,14 +181,22 @@ class ReihungstestJob extends JOB_Controller
 				}
 				if ($applicantCounter == 0)
 				{
-					$mailcontent = '<p style="font-family: verdana, sans-serif;">Der Anmeldeschluss für den zentralen Reihungstest am ' . date_format(date_create($reihungstest->datum), 'd.m.Y') . ' um ' . $reihungstest->uhrzeit . ' Uhr wurde gestern erreicht.</p>';
-					$mailcontent .= '<p style="font-family: verdana, sans-serif;"><b>Für den Studiengang '.$studiengang_kuerzel.' nehmen keine InteressentInnen an diesem Reihungstest teil</b></p>';
+					$mailcontent = '<p style="font-family: verdana, sans-serif;">Der Anmeldeschluss für den zentralen Reihungstest am ' .
+						$reihungstestDatum . ' um ' . $reihungstest->uhrzeit . ' Uhr wurde gestern erreicht.</p>';
+
+					$mailcontent .= '<p style="font-family: verdana, sans-serif;"><b>Für den Studiengang '.
+						$studiengang_kuerzel.
+						' nehmen keine InteressentInnen an diesem Reihungstest teil</b></p>';
 				}
 				else
 				{
-					$mailcontent = '<p style="font-family: verdana, sans-serif;">Der Anmeldeschluss für den zentralen Reihungstest am ' . date_format(date_create($reihungstest->datum), 'd.m.Y') . ' um ' . $reihungstest->uhrzeit . ' Uhr wurde gestern erreicht.</p>';
+					$mailcontent = '<p style="font-family: verdana, sans-serif;">Der Anmeldeschluss für den zentralen Reihungstest am ' .
+						$reihungstestDatum .
+						' um ' . $reihungstest->uhrzeit . ' Uhr wurde gestern erreicht.</p>';
+
 					$mailcontent .= '
-					<p style="font-family: verdana, sans-serif;"><b>' . $applicantCounter . '</b> InteressentIn(nen) des Studiengangs ' . $studiengang_kuerzel . ' nehmen daran teil:</p>
+					<p style="font-family: verdana, sans-serif;"><b>' . $applicantCounter . '</b> InteressentIn(nen) des Studiengangs ' .
+					$studiengang_kuerzel . ' nehmen daran teil:</p>
 					<p style="font-family: verdana, sans-serif;">
 						<a href="'.APP_ROOT.'vilesci/stammdaten/auswertung_fhtw.php?reihungstest='.$reihungstest->reihungstest_id.'&studiengang='.$bachelorStudiengang->studiengang_kz.'" target="_blank">
 							Liste der Anmeldungen
@@ -182,12 +212,13 @@ class ReihungstestJob extends JOB_Controller
 						'Sancho_ReihungstestteilnehmerJob',
 						$mailcontent_data_arr,
 						$bachelorStudiengang->email,
-						'Anmeldeschluss Reihungstest ' . date_format(date_create($reihungstest->datum), 'd.m.Y') . ' ' . $reihungstest->uhrzeit . ' Uhr',
+						'Anmeldeschluss Reihungstest ' . $reihungstestDatum . ' ' . $reihungstest->uhrzeit . ' Uhr',
 						'sancho_header_min_bw.jpg',
 						'sancho_footer_min_bw.jpg',
 						$from,
 						'',
-						$bcc);
+						$bcc
+					);
 				}
 			}
 		}
@@ -235,7 +266,6 @@ class ReihungstestJob extends JOB_Controller
 		}
 
 		$studiengang = '';
-		$mailReceipients = ''; // String with all mailadresses
 		$mailcontent_data_arr = array();
 		$headerstyle = 'style="background: #DCE4EF; border: 1px solid #FFF; padding: 4px; text-align: left;"';
 		$rowstyle = 'style="background-color: #EEEEEE; padding: 4px;"';
@@ -254,10 +284,10 @@ class ReihungstestJob extends JOB_Controller
 						$mailcontent .= $applicants_list;
 						$mailcontent .= '</tbody></table>';
 						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
-											<a href="'.APP_ROOT.'vilesci/stammdaten/auswertung_fhtw.php?reihungstest='.$applicant->reihungstest_id.'&studiengang='.$studiengang.'" target="_blank">
-												Liste der Anmeldungen
-											</a>
-										</p>';
+							<a href="'.APP_ROOT.'vilesci/stammdaten/auswertung_fhtw.php?reihungstest='.$applicant->reihungstest_id.'&studiengang='.$studiengang.'" target="_blank">
+								Liste der Anmeldungen
+							</a>
+						</p>';
 						$mailcontent_data_arr['table'] = $mailcontent;
 						sendSanchoMail(
 							'Sancho_ReihungstestteilnehmerJob',
@@ -268,12 +298,15 @@ class ReihungstestJob extends JOB_Controller
 							'sancho_footer_min_bw.jpg',
 							$from,
 							'',
-							$bcc);
+							$bcc
+						);
 						$applicants_list = '';
 						$mailcontent_data_arr = array();
 					}
 
-					$mailcontent = '<p style="font-family: verdana, sans-serif;">Folgende InteressentInnen wurden <b>nach</b> der Anmeldefrist zu einem Reihungstest hinzugefügt.<br>Details siehe Link</p>';
+					$mailcontent = '<p style="font-family: verdana, sans-serif;">
+						Folgende InteressentInnen wurden <b>nach</b> der Anmeldefrist zu einem Reihungstest hinzugefügt.<br>Details siehe Link
+					</p>';
 					$mailcontent .= '
 					<table width="100%" style="cellpadding: 3px; font-family: verdana, sans-serif; border: 1px solid #000000;">
 						<thead>
@@ -289,7 +322,6 @@ class ReihungstestJob extends JOB_Controller
 				}
 
 				$studiengang = $applicant->studiengang_kz;
-				$mailReceipients .= $applicant->email . ';';
 				$applicants_list .= '
 						<tr ' . $rowstyle . '>
 						<td>' . date_format(date_create($applicant->datum), 'd.m.Y') . '</td>
@@ -305,10 +337,10 @@ class ReihungstestJob extends JOB_Controller
 			$mailcontent .= $applicants_list;
 			$mailcontent .= '</tbody></table>';
 			$mailcontent .= '<p style="font-family: verdana, sans-serif;">
-								<a href="'.APP_ROOT.'vilesci/stammdaten/auswertung_fhtw.php?reihungstest='.$applicant->reihungstest_id.'&studiengang='.$studiengang.'" target="_blank">
-									Liste der Anmeldungen
-								</a>
-							</p>';
+				<a href="'.APP_ROOT.'vilesci/stammdaten/auswertung_fhtw.php?reihungstest='.$applicant->reihungstest_id.'&studiengang='.$studiengang.'" target="_blank">
+					Liste der Anmeldungen
+				</a>
+			</p>';
 			$mailcontent_data_arr['table'] = $mailcontent;
 			sendSanchoMail(
 				'Sancho_ReihungstestteilnehmerJob',
@@ -319,7 +351,8 @@ class ReihungstestJob extends JOB_Controller
 				'sancho_footer_min_bw.jpg',
 				$from,
 				'',
-				$bcc);
+				$bcc
+			);
 		}
 	}
 
@@ -364,7 +397,8 @@ class ReihungstestJob extends JOB_Controller
 				$testsOndate = array();
 
 				// Deduct days till 2 working days are reached
-				for ($i = 1; ; $i++)
+				// NOTE: the condition is to avoid a never ending loop
+				for ($i = 1; $workingdays < 10; $i++)
 				{
 					if (isDateWorkingDay($testDates->datum, $i) === true)
 					{
@@ -413,7 +447,7 @@ class ReihungstestJob extends JOB_Controller
 							show_error(getError($applicants));
 						}
 
-						if(!empty($applicants_arr))
+						if (!empty($applicants_arr))
 						{
 							foreach ($applicants_arr as $applicant)
 							{
@@ -435,7 +469,7 @@ class ReihungstestJob extends JOB_Controller
 
 								$sender_id = $this->config->item('system_person_id');
 
-								$sendMessage = $this->CLMessagesModel->sendExplicitTemplateSenderId(
+								$this->CLMessagesModel->sendExplicitTemplateSenderId(
 									$sender_id,
 									$applicant->prestudent_id,
 									self::OU_SENDER_TEST_REMINDER,
@@ -504,7 +538,7 @@ class ReihungstestJob extends JOB_Controller
 				person_id,
 				tbl_reihungstest.studiensemester_kurzbz,
 				tbl_reihungstest.reihungstest_id,
-				(SELECT(tbl_reihungstest.datum::text || \' \' || tbl_reihungstest.uhrzeit::text)::timestamp) AS reihungstest_timestamp
+				(SELECT(tbl_reihungstest.datum::text || \' \' || tbl_reihungstest.uhrzeit::text)::timestamp) as reihungstest_timestamp
 			');
 			$this->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
 			$this->PrestudentModel->addJoin('public.tbl_studiengangstyp', 'typ');
@@ -550,11 +584,9 @@ class ReihungstestJob extends JOB_Controller
 		}
 
 		// Sort by STG. This is important to send the mails clustered by STG to the different STG assistances.
-		usort($result_arr, function ($a, $b)
-		{
-			if ($a->studiengang_kz == $b->studiengang_kz) {
-				return 0;
-			}
+		usort($result_arr, function ($a, $b) {
+			if ($a->studiengang_kz == $b->studiengang_kz) return 0;
+
 			return ($a->studiengang_kz < $b->studiengang_kz) ? -1 : 1;
 		});
 
@@ -697,6 +729,7 @@ class ReihungstestJob extends JOB_Controller
 		}
 
 		// Set associative array with the prepared HTML tables and URL be used by the template's variables
+		$content_data_arr = array();
 		$content_data_arr['studienplan_list'] = $studienplan_list;
 		$content_data_arr['freie_plaetze_list'] = $freie_plaetze_list;
 		$content_data_arr['link'] = site_url('/organisation/Reihungstest');
@@ -719,7 +752,9 @@ class ReihungstestJob extends JOB_Controller
 			$counter++;
 		}
 
+		$content_data_arr = array();
 		$content_data_arr['link'] = $content;
+
 		return $content_data_arr;
 	}
 
@@ -818,13 +853,13 @@ class ReihungstestJob extends JOB_Controller
 			return;
 		}
 
-		$qry = "WITH prst AS (
+		$qry = "WITH prst as (
 					SELECT DISTINCT
-						get_rolle_prestudent (tbl_prestudent.prestudent_id, ?) AS laststatus,
+						get_rolle_prestudent (tbl_prestudent.prestudent_id, ?) as laststatus,
 						tbl_prestudentstatus.studiensemester_kurzbz,
-						tbl_prestudentstatus.datum AS prestudenstatus_datum,
+						tbl_prestudentstatus.datum as prestudenstatus_datum,
 						tbl_prestudent.*,
-						tbl_studiengang.typ AS studiengang_typ
+						tbl_studiengang.typ as studiengang_typ
 					FROM PUBLIC.tbl_person
 						JOIN PUBLIC.tbl_prestudent USING (person_id)
 						JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
@@ -837,11 +872,21 @@ class ReihungstestJob extends JOB_Controller
 				)
 				SELECT * FROM prst
 				WHERE prestudenstatus_datum >= (SELECT CURRENT_DATE - 1)
-				AND (studiengang_typ = 'b' OR (studiengang_typ = 'm' AND EXISTS (SELECT 1 /* Master Studiengänge berücksichtigen wenn auch Bachelor im gleichen Semester */
-																					FROM prst prstb
-																					WHERE studiengang_typ = 'b'
-																					AND laststatus != 'Abgewiesener'
-																					AND prstb.person_id = prst.person_id )))
+				AND (
+					studiengang_typ = 'b'
+					OR
+					(
+						studiengang_typ = 'm'
+						AND
+						EXISTS (
+							SELECT 1 /* Master Studiengänge berücksichtigen wenn auch Bachelor im gleichen Semester */
+							FROM prst prstb
+							WHERE studiengang_typ = 'b'
+							AND laststatus != 'Abgewiesener'
+							AND prstb.person_id = prst.person_id
+						)
+					)
+				)
 				ORDER BY studiengang_kz, laststatus";
 
 		// Encode Params
@@ -873,12 +918,12 @@ class ReihungstestJob extends JOB_Controller
 				// Alle niedrigeren Prios laden
 				$qryNiedrPrios = "
 						SELECT DISTINCT
-							get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') AS laststatus,
+							get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') as laststatus,
 							tbl_studienplan.orgform_kurzbz,
 							tbl_person.nachname,
 							tbl_person.vorname,
 							tbl_prestudent.*,
-							tbl_studiengang.typ AS studiengang_typ
+							tbl_studiengang.typ as studiengang_typ
 						FROM PUBLIC.tbl_person
 							JOIN PUBLIC.tbl_prestudent USING (person_id)
 							JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
@@ -1029,12 +1074,12 @@ class ReihungstestJob extends JOB_Controller
 		// Mails senden
 		if (!isEmptyArray($mailArray))
 		{
-			foreach ($mailArray AS $stg=>$orgform)
+			foreach ($mailArray as $stg => $orgform)
 			{
 				$studiengang = $this->StudiengangModel->load($stg);
 				$mailcontent = '';
 
-				foreach ($orgform AS $art=>$value)
+				foreach ($orgform as $art => $value)
 				{
 					// Orgform nur dazu schreiben, wenn es mehr als Eine gibt
 					if (count($orgform) > 1)
@@ -1044,12 +1089,12 @@ class ReihungstestJob extends JOB_Controller
 					if (isset($value['AbgewiesenGesetztWartender']) && !isEmptyArray($value['AbgewiesenGesetztWartender']))
 					{
 						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
-									Folgende Personen auf der Warteliste wurden in einem höher priorisierten Studiengang aufgenommen und haben deshalb einen Status "Abgewiesen" erhalten:</p>';
+							Folgende Personen auf der Warteliste wurden in einem höher priorisierten Studiengang aufgenommen und haben deshalb einen Status "Abgewiesen" erhalten:
+						</p>';
 						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
-						//$mailcontent .= '<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Zuvor Warteliste</th></thead>';
 						$mailcontent .= '					<tbody>';
 						sort($value['AbgewiesenGesetztWartender']);
-						foreach ($value['AbgewiesenGesetztWartender'] AS $key=>$bewerber)
+						foreach ($value['AbgewiesenGesetztWartender'] as $key => $bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
@@ -1060,10 +1105,9 @@ class ReihungstestJob extends JOB_Controller
 						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
 									Folgende Aufgenommene wurden in einem höher priorisierten Studiengang aufgenommen:</p>';
 						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
-						//$mailcontent .= '<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Aufgenommene</th></thead>';
 						$mailcontent .= '					<tbody>';
 						sort($value['AufnahmeHoeherePrio']);
-						foreach ($value['AufnahmeHoeherePrio'] AS $key=>$bewerber)
+						foreach ($value['AufnahmeHoeherePrio'] as $key => $bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
@@ -1076,7 +1120,7 @@ class ReihungstestJob extends JOB_Controller
 						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
 						$mailcontent .= '					<tbody>';
 						sort($value['AbgewiesenHoeherePrio']);
-						foreach ($value['AbgewiesenHoeherePrio'] AS $key=>$bewerber)
+						foreach ($value['AbgewiesenHoeherePrio'] as $key => $bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
@@ -1087,10 +1131,9 @@ class ReihungstestJob extends JOB_Controller
 						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
 										Folgende BewerberInnen wurden zu Abgewiesenen gemacht:</p>';
 						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
-						//$mailcontent .= '<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Aufgenommene</th></thead>';
 						$mailcontent .= '					<tbody>';
 						sort($value['AbgewiesenWeilBewerber']);
-						foreach ($value['AbgewiesenWeilBewerber'] AS $key => $bewerber)
+						foreach ($value['AbgewiesenWeilBewerber'] as $key => $bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
@@ -1098,6 +1141,7 @@ class ReihungstestJob extends JOB_Controller
 					}
 				}
 
+				$mailcontent_data_arr = array();
 				$mailcontent_data_arr['table'] = $mailcontent;
 
 				// Send email in Sancho design
@@ -1112,9 +1156,11 @@ class ReihungstestJob extends JOB_Controller
 						'sancho_footer_min_bw.jpg',
 						$from,
 						'',
-						$bcc);
+						$bcc
+					);
 				}
 			}
 		}
 	}
 }
+
