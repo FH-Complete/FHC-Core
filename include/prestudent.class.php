@@ -2376,13 +2376,13 @@ class prestudent extends person
 	}
 
 	/**
- * Prueft, ob eine Person bereits einmal auf der FHTW Studierend war
+ * Prueft, ob eine Person Abbrecher war
  * @param int $person_id ID der zu überprüfenden Person.
  * @return true wenn vorhanden
  *		 false wenn nicht vorhanden
  *		 false und errormsg wenn Fehler aufgetreten ist
  */
-public function isPastStudent($person_id)
+public function isPastAbbrecher($person_id)
 {
 	if (!is_numeric($person_id))
 	{
@@ -2395,7 +2395,7 @@ public function isPastStudent($person_id)
 		JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		JOIN public.tbl_studiengang USING (studiengang_kz)
 		WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-		AND status_kurzbz in ('Student')
+		AND status_kurzbz in ('Abbrecher')
 		AND typ in ('b','m','d')
 	 ";
 
