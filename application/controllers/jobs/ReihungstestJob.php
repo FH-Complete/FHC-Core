@@ -20,6 +20,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 use \stdClass as stdClass;
 use \DateTime as DateTime;
+use \DB_Model as DB_Model;
 
 class ReihungstestJob extends JOB_Controller
 {
