@@ -10557,13 +10557,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'eines Zeugnisses (vgl. § 4 Abs. 5 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+				'text' => 'eines Zeugnisses (vgl. § 4 Abs. 8 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'a certificate (see § 4 para. 5, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+				'text' => 'a certificate (see § 4 para. 8, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -10577,13 +10577,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'eines Hochschulzeugnisses (vgl. § 4 Abs. 5 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+                'text' => 'eines Hochschulzeugnisses (vgl. § 4 Abs. 8 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'a university certificate (see § 4 para. 5, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+                'text' => 'a university certificate (see § 4 para. 8, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -10597,13 +10597,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'der nachgewiesenen beruflichen Praxis ((vgl. § 4 Abs. 6 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+				'text' => 'der nachgewiesenen beruflichen Praxis (vgl. § 4 Abs. 9 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'professional practice (see § 4 para. 6, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+				'text' => 'professional practice (see § 4 para. 9, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -15176,13 +15176,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Im Rahmen des <b>KVP</b> <i>(Kontinuierlicher Verbesserungsprozess)</i> können Sie hier wichtige Fehler und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im KVP geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.",
+				'text' => "Im Rahmen der Weiterentwicklung von Lehrveranstaltungen können Sie hier wichtige Ideen für die Weiterentwicklung und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im Weiteren Ablauf geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Im Rahmen des <b>KVP</b> <i>(Kontinuierlicher Verbesserungsprozess)</i> können Sie hier wichtige Fehler und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im KVP geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.",
+				'text' => "Im Rahmen der Weiterentwicklung von Lehrveranstaltungen können Sie hier wichtige Ideen für die Weiterentwicklung und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im Weiteren Ablauf geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16107,7 +16107,657 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'studiensemesterGeplant',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiensemester geplant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'bestaetigungHochladen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigung hochladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'massnahmeLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Maßnahme löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete measure',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'massnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Maßnahmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Measures',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'internationalskills',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'International skills',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'International skills',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'massnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Internationalisierungsmaßnahmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Internationalization measures',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'internationalbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ab dem Studienjahr 2022/23 ist der Erwerb von internationalen und interkulturellen Kompetenzen Teil des Curriculums. <br />
+							Auf der Grundlage der vorliegenden Maßnahmen absolvieren Sie im Laufe ihres Studiums Internationalisierungsaktivitäten, die mit unterschiedlichen ECTS-Punkten hinterlegt sind. <br />
+							In Summe müssen 5 ECTS erworben werden, die im 6. Semester wirksam werden. <br/> 
+							Das Modul „International skills“ wird mit der Beurteilung „Mit Erfolg teilgenommen“ abgeschlossen. <br />
+							Bitte wählen Sie die für Sie in Frage kommenden Maßnahmen aus und planen Sie das entsprechende Semester. <br />
+							Sobald die 5 ECTS erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Starting with the study year 2022/23, the acquisition of international and intercultural competencies is part of the curriculum.<br />
+							On the basis of the measures at-hand, you will complete internationalization activities during the course of your studies, which are assigned different ECTS credits.<br />
+							In total, 5 ECTS must be acquired, which become effective in the 6th semester.<br />
+							The module “International skills” is completed with the assessment "Successfully participated". <br />
+							Please select the measures that apply to you and schedule the appropriate semester. <br />
+							Once the 5 ECTS have been achieved, the degree program will review the documents you have uploaded.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'nurBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur für Bachelorstudiengänge.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Only for bachelor programmes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'bezeichnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bezeichnung Deutsch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'title german',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'bezeichnungeng',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bezeichnung Englisch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'title english',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'beschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beschreibung Deutsch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'description german',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'beschreibungeng',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beschreibung Englisch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'description english',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'massnahmeBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Massnahme bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit measure',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'massnahmeLoeschenConfirm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wollen Sie die ausgewählte Maßnahme wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to delete the measure?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'fileLoeschenConfirm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wollen Sie die ausgewählte Bestätigung wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to delete the confirmation?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'planAblehnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wollen Sie die ausgewählte Maßnahme wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to delete the measure?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'entbestaetigenConfirm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wollen Sie die Bestätigung wirklich widerrufen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to cancel the confirmation?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'entakzeptierenConfirm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wollen Sie die Planbestätigung wirklich widerrufen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to cancel the plan confirmation?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'allegeplanten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle geplanten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'alleMassnahmenJetzt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Maßnahmen anzeigen die im jetzigen Studiensemester geplant sind',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show all measures that are planned for the current study semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'alleStudierendeJetzt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Studierende anzeigen aus dem jetzigen Studiensemester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show all students from the current study semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'lastSemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Studierende anzeigen aus dem letzten Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show all students from the last semester"',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'meinMassnahmeplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mein Maßnahmenplan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'My action plan',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'ectsBestaetigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ECTS bestätigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ECTS confirmed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'ectsMassnahme',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ECTS - Maßnahme',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ECTS - Measures',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'geplanteMassnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Maßnahmen - geplant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Measures - planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'akzpetierteMassnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Plan - akzeptiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plan - accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'durchgefuehrteMassnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Maßnahmen - durchgeführt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Measures - performed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'bestaetigteMassnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ECTS - bestätigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ECTS - confirmed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'abgelehnteMassnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Plan - abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plan - declined',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'planAkzeptieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Plan akzeptieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accept plan',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'bestaetigungAkzeptieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigung akzeptieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accept confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

@@ -5681,6 +5681,46 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='dvuh'"))
 	}
 }
 
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app = 'international' "))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('international');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App international in system.tbl_app hinzugefügt';
+	}
+}
+
+
+// Add DMS category "international_nachweis"
+if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz = 'international_nachweis';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_dms_kategorie (
+					kategorie_kurzbz,
+					bezeichnung,
+					beschreibung,
+					parent_kategorie_kurzbz,
+					oe_kurzbz,
+					berechtigung_kurzbz
+			   ) VALUES(
+					'international_nachweis',
+					'International Nachweis',
+					'Nachweis der Internationalisierungsmaßnahmen',
+					'fas',
+					'etw',
+					NULL
+			   );";
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' campus.tbl_dms_kategorie: Added category "international_nachweis"!<br>';
+	}
+}
 // Add table issue_status
 if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_issue_status LIMIT 1;"))
 {
@@ -6452,6 +6492,20 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 			echo '<strong>tbl_gsprogramm Berechtigungen: '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Granted SELECT privileges to web for bis.tbl_gsprogramm';
+	}
+}
+
+// Insert document type Grant Agreement
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_dokument WHERE dokument_kurzbz = 'GrantAgr';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_dokument(dokument_kurzbz, bezeichnung, bezeichnung_mehrsprachig) VALUES('GrantAgr', 'Grant Agreement', '{\"Grant Agreement\",\"Grant Agreement\"}');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_dokument: Added value \'GrantAgr\'<br>';
 	}
 }
 
