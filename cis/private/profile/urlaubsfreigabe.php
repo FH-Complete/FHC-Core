@@ -310,9 +310,10 @@ if ($uid!='')
 	if($zeitsperre->getUrlaubstage($uid))
 	{
 		$tageZuGenehmigen = $zeitsperre->getUrlaubstage($uid, $enddatum, true);
+		$alleZukuenftigenTage = $zeitsperre->getUrlaubstage($uid, $enddatum, false);
 		echo "<div id='saldoBerechnet'>";
 		echo "<br><p class= 'text-warning'>zu genehmigende Urlaubstage: <span  style='margin-left: 53px;'>". $tageZuGenehmigen ." Tag(e)</span></p>";
-		$saldo = (int)$urlaubssaldo - (int)$tageZuGenehmigen;
+		$saldo = (int)$urlaubssaldo - (int)$alleZukuenftigenTage;
 		$saldo > 0 ? $color = 'green' : $color = 'red';
 		echo "<strong>Stand nach Genehmigung: <span  style='margin-left: 66px; color: ". $color ."'>" . $saldo . " Tag(e)</span></strong>";
 		echo "</div>";
