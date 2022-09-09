@@ -350,6 +350,7 @@ function showHideStudeDropDown()
 $zeitsaldo = "";
 if($addoncasetime)
 {
+	require_once('../../../addons/casetime/config.inc.php');
 	require_once('../../../addons/casetime/include/functions.inc.php');
 	$zeitsaldo = getCaseTimeZeitsaldo($uid);
 	$zeitsaldo = "Aktueller Zeitsaldo: ". $zeitsaldo . " (".formatZeitsaldo($zeitsaldo).")";
