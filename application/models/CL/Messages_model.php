@@ -523,7 +523,7 @@ class Messages_model extends CI_Model
 		// Adds the organisation unit to each prestudent
 		if (isEmptyString($oe_kurzbz) && hasData($msgVarsData) && hasData($prestudentsData))
 		{
-			$this->CLMessagesModel->_addOeToPrestudents($msgVarsData, $prestudentsData);
+			$this->_addOeToPrestudents($msgVarsData, $prestudentsData);
 		}
 
 		foreach (getData($msgVarsData) as $receiver)
