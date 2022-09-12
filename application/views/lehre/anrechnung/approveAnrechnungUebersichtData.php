@@ -16,7 +16,7 @@ $query = '
 			anrechnung.dms_id,
 			anrechnung.studiensemester_kurzbz,
 			stg.studiengang_kz,
-			stg.bezeichnung AS "stg_bezeichnung",
+			stg.bezeichnung AS stg_bezeichnung,
 			lv.orgform_kurzbz,
 			(SELECT ausbildungssemester
 			FROM public.tbl_prestudentstatus press
@@ -26,8 +26,10 @@ $query = '
 			ORDER BY press.datum DESC
 			LIMIT 1
 			),
-			lv.bezeichnung AS "lv_bezeichnung",
-			lv.ects,
+			lv.bezeichnung AS lv_bezeichnung,
+			lv.ects::numeric(4,1),
+	        get_ects_summe_schulisch(student.student_uid, anrechnung.prestudent_id, stg.studiengang_kz) AS ectsSumSchulisch,
+	        get_ects_summe_beruflich(student.student_uid) AS ectsSumBeruflich,
 			(person.nachname || \' \' || person.vorname) AS "student",
 			begruendung.bezeichnung AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
@@ -49,7 +51,9 @@ $query = '
 			WHERE anrechnung_id = anrechnung.anrechnung_id
 			ORDER BY insertamum DESC
 			LIMIT 1
-			) AS status_kurzbz
+			) AS status_kurzbz,
+			student.student_uid,
+			anrechnung.prestudent_id
 		FROM lehre.tbl_anrechnung AS anrechnung
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_person AS person USING (person_id)
@@ -58,44 +62,69 @@ $query = '
 		LEFT JOIN campus.tbl_dms_version AS dmsversion USING (dms_id)
 		JOIN lehre.tbl_anrechnung_anrechnungstatus USING (anrechnung_id)
 		JOIN lehre.tbl_anrechnung_begruendung AS begruendung USING (begruendung_id)
+		JOIN public.tbl_student student USING (prestudent_id)
+		WHERE anrechnung.studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+	    AND stg.studiengang_kz IN (' . $STUDIENGAENGE_ENTITLED . ')
 	)
 
-	SELECT anrechnungen.*,
-	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
-	CASE
-		WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
-		ELSE
-		(SELECT insertamum::date
-			FROM lehre.tbl_anrechnungstatus
-			JOIN lehre.tbl_anrechnung_anrechnungstatus USING (status_kurzbz)
-			WHERE anrechnung_id = anrechnungen.anrechnung_id
-			AND status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR . '\'
-			ORDER BY insertamum DESC
-			LIMIT 1)
-	END "empfehlungsanfrageAm",
-	CASE
-		WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
-		ELSE
-		(SELECT COALESCE(
-				STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = TRUE),
-				STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = FALSE)
-			) empfehlungsanfrageAn
-			FROM (
-				SELECT DISTINCT ON (benutzer.uid) uid, vorname, nachname,
-				CASE WHEN lehrfunktion_kurzbz = \'LV-Leitung\' THEN TRUE ELSE FALSE END AS lvleiter
-				FROM lehre.tbl_lehreinheit
-				JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
-				JOIN public.tbl_benutzer benutzer ON lema.mitarbeiter_uid = benutzer.uid
-				JOIN public.tbl_person USING (person_id)
-				WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
-				AND lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id
-				AND lema.mitarbeiter_uid NOT like \'_Dummy%\'
-				AND benutzer.aktiv = TRUE
-				AND tbl_person.aktiv = TRUE
-				ORDER BY benutzer.uid, lvleiter DESC, nachname, vorname
-				) as tmp_lvlektoren
-			)
-	END "empfehlungsanfrageAn"
+	SELECT  anrechnungen.anrechnung_id,
+            anrechnungen.lehrveranstaltung_id,
+			anrechnungen.begruendung_id,
+			anrechnungen.dms_id,
+			anrechnungen.studiensemester_kurzbz,
+			anrechnungen.studiengang_kz,
+			anrechnungen.stg_bezeichnung,
+			anrechnungen.orgform_kurzbz,
+			anrechnungen.ausbildungssemester,
+			anrechnungen.lv_bezeichnung,
+			anrechnungen.ects::float4 AS ects,
+			NULL AS "ectsSumBisherUndNeu",
+	        anrechnungen.ectsSumSchulisch::float4 AS "ectsSumSchulisch",
+	        anrechnungen.ectsSumBeruflich::float4 AS "ectsSumBeruflich",
+			anrechnungen.begruendung,
+			anrechnungen.student,
+			anrechnungen.dokument_bezeichnung,
+			anrechnungen.anmerkung_student,
+			anrechnungen.zgv,
+            anrechnungen.antragsdatum,
+			anrechnungen.empfehlung_anrechnung,
+			anrechnungen.status_kurzbz,
+            array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
+            anrechnungen.prestudent_id,
+            CASE
+                WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
+                ELSE
+                (SELECT insertamum::date
+                    FROM lehre.tbl_anrechnungstatus
+                    JOIN lehre.tbl_anrechnung_anrechnungstatus USING (status_kurzbz)
+                    WHERE anrechnung_id = anrechnungen.anrechnung_id
+                    AND status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR . '\'
+                    ORDER BY insertamum DESC
+                    LIMIT 1)
+            END "empfehlungsanfrageAm",
+            CASE
+                WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
+                ELSE
+                (SELECT COALESCE(
+                        STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = TRUE),
+                        STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') FILTER (WHERE lvleiter = FALSE)
+                    ) empfehlungsanfrageAn
+                    FROM (
+                        SELECT DISTINCT ON (benutzer.uid) uid, vorname, nachname,
+                        CASE WHEN lehrfunktion_kurzbz = \'LV-Leitung\' THEN TRUE ELSE FALSE END AS lvleiter
+                        FROM lehre.tbl_lehreinheit
+                        JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+                        JOIN public.tbl_benutzer benutzer ON lema.mitarbeiter_uid = benutzer.uid
+                        JOIN public.tbl_person USING (person_id)
+                        WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+                        AND lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id
+                        AND lema.mitarbeiter_uid NOT like \'_Dummy%\'
+                        AND benutzer.aktiv = TRUE
+                        AND tbl_person.aktiv = TRUE
+                        ORDER BY benutzer.uid, lvleiter DESC, nachname, vorname
+                        ) as tmp_lvlektoren
+                    )
+            END "empfehlungsanfrageAn"
 	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
@@ -118,9 +147,12 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('lehre', 'organisationsform')),
 		'Semester',
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
-		'ECTS',
-		ucfirst($this->p->t('person', 'studentIn')),
+		'ECTS (LV)',
+		'ECTS (LV + Bisher)',
+        'ECTS (Bisher schulisch)',
+        'ECTS (Bisher beruflich',
 		ucfirst($this->p->t('global', 'begruendung')),
+		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
 		ucfirst($this->p->t('anrechnung', 'herkunft')),
 		ucfirst($this->p->t('global', 'zgv')),
@@ -128,6 +160,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
 		'Status',
+	  	'PrestudentID',
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')),
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAn'))
 	),
@@ -155,8 +188,8 @@ $filterWidgetArray = array(
         rowFormatter:function(row){
             func_rowFormatter(row);
         },
-         rowUpdated:function(row){
-            func_rowUpdated(row);
+        rowSelectionChanged:function(data, rows){
+            func_rowSelectionChanged(data, rows);
         },
         tooltips: function(cell){
             return func_tooltips(cell);
@@ -174,8 +207,11 @@ $filterWidgetArray = array(
 		ausbildungssemester: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
 		ects: {headerFilter:"input", align:"center"},
+		ectsSumBisherUndNeu: {formatter: format_ectsSumBisherUndNeu},
+		ectsSumSchulisch: {visible: false, headerFilter:"input", align:"right"},
+		ectsSumBeruflich: {visible: false, headerFilter:"input", align:"right"},
+		begruendung: {headerFilter:"input", visible: true},
 		student: {headerFilter:"input"},
-		begruendung: {headerFilter:"input"},
 		zgv: {visible: false, headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{
 		    labelField:"dokument_bezeichnung",
@@ -187,6 +223,7 @@ $filterWidgetArray = array(
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false, headerFilter:"input"},
 		status_bezeichnung: {headerFilter:"input"},
+		prestudent_id: {visible: false, headerFilter:"input"},
 		empfehlungsanfrageAm: {visible: false, align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlungsanfrageAn: {visible: false, headerFilter:"input"}
 	 }', // col properties

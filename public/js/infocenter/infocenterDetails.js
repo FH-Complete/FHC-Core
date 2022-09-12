@@ -543,8 +543,8 @@ var InfocenterDetails = {
 
 			var prestudentdata = prestudentresponse.retval;
 
-			var prestudent_id = freigabedata.prestudent_id;
-			var statusgrund_id = freigabedata.statusgrund_id;
+			var prestudent_id = parseInt(freigabedata.prestudent_id);
+			var statusgrund_id = parseInt(freigabedata.statusgrund_id);
 			var rtfreigabe = !$.isNumeric(statusgrund_id);//no Statusgrund - RT Freigabe
 
 			var rtFreigegeben = false;
