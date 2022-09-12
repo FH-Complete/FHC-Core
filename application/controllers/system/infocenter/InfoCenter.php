@@ -333,13 +333,12 @@ class InfoCenter extends Auth_Controller
 
 		$this->DokumentModel->addOrder('bezeichnung');
 		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
-		$studienArtBerechtigung = array('studienArtBerechtigung' => array_column($this->getStudienArtBerechtigung(), 'typ'));
+
 		$data = array_merge(
 			$persondata,
 			$prestudentdata,
 			$dokumentdata,
-			$duplicate,
-			$studienArtBerechtigung
+			$duplicate
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
@@ -1986,10 +1985,13 @@ class InfoCenter extends Auth_Controller
 		$abwstatusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
 		$intstatusgruende = $this->StatusgrundModel->getStatus(self::INTERESSENTSTATUS)->retval;
 
+		$studienArtBerechtigung = array_column($this->getStudienArtBerechtigung(), 'typ');
+
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
 			'abwstatusgruende' => $abwstatusgruende,
-			'intstatusgruende' => $intstatusgruende
+			'intstatusgruende' => $intstatusgruende,
+			'studienArtBerechtigung' => $studienArtBerechtigung
 		);
 
 		return $data;
