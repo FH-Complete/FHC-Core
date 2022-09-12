@@ -8,7 +8,7 @@
 		JOIN public.tbl_gruppe_manager grpmgr USING (gruppe_kurzbz)
 		WHERE grp.aktiv = TRUE
 		AND grpmgr.uid = \''.$uid.'\'',
-		'requiredPermissions' => 'admin',
+		'requiredPermissions' => 'lehre/gruppenmanager',
 		'datasetRepresentation' => 'tablesorter',
 		'additionalColumns' => array('Teilnehmer'),
 		'columnsAliases' => array(

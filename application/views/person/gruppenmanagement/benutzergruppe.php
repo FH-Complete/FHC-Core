@@ -11,7 +11,6 @@
 			'tablesorter' => true,
 			'ajaxlib' => true,
 			'dialoglib' => true,
-			'filterwidget' => true,
 			'navigationwidget' => true,
 			'phrases' => array(
 				'gruppenmanagement',
