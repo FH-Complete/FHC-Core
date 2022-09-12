@@ -6,13 +6,13 @@ class requestAnrechnung extends Auth_Controller
 {
 	const REQUEST_ANRECHNUNG_URI = '/lehre/anrechnung/RequestAnrechnung';
 	const APPROVE_ANRECHNUNG_URI = '/lehre/anrechnung/ApproveAnrechnungUebersicht';
-	
+
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_KF = 'inProgressKF';
 	const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
-	
+
 	public function __construct()
 	{
 		// Set required permissions
@@ -23,22 +23,22 @@ class requestAnrechnung extends Auth_Controller
 				'download'  => 'student/anrechnung_beantragen:rw',
 			)
 		);
-		
+
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
-		
+
 		// Load libraries
 		$this->load->library('WidgetLib');
 		$this->load->library('PermissionLib');
 		$this->load->library('AnrechnungLib');
 		$this->load->library('DmsLib');
-		
+
 		// Load helpers
 		$this->load->helper('form');
 		$this->load->helper('url');
 		$this->load->helper('hlp_sancho_helper');
-		
+
 		// Load configs
 		$this->load->config('anrechnung');
 		
@@ -208,11 +208,11 @@ class requestAnrechnung extends Auth_Controller
 		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 
 		// Get file to be downloaded from DMS
-                $download = $this->dmslib->download($dms_id, $filename);
-                if (isError($download)) return $download;
+        $download = $this->dmslib->download($dms_id);
+        if (isError($download)) return $download;
 
-                // Download file
-                $this->outputFile(getData($download));
+        // Download file
+        $this->outputFile(getData($download));
 	}
 
 	/**
@@ -221,10 +221,10 @@ class requestAnrechnung extends Auth_Controller
 	private function _setAuthUID()
 	{
 		$this->_uid = getAuthUID();
-		
+
 		if (!$this->_uid) show_error('User authentification failed');
 	}
-	
+
 	/**
 	 * Check if application deadline is expired.
 	 *
@@ -237,7 +237,7 @@ class requestAnrechnung extends Auth_Controller
 	private function _isExpired($start, $ende, $studiensemester_kurzbz)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		
+
 		// If start is not given, set to Semesterstart.
 		if (!isset($start) || isEmptyString($start))
 		{
@@ -245,7 +245,7 @@ class requestAnrechnung extends Auth_Controller
 			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
 			$start = getData($result)[0]->start;
 		}
-		
+
 		// If ende is not given, set to Semesterende.
 		if (!isset($ende) || isEmptyString($ende))
 		{
@@ -253,15 +253,15 @@ class requestAnrechnung extends Auth_Controller
 			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
 			$ende = getData($result)[0]->ende;
 		}
-		
+
 		$today = new DateTime('today midnight');
 		$start = new DateTime($start);
 		$ende = new DateTime($ende);
-		
+
 		// True if expired
 		return ($today < $start || $today > $ende);
 	}
-	
+
 	/**
 	 * Check if user is entitled to read dms doc.
 	 *
@@ -273,9 +273,9 @@ class requestAnrechnung extends Auth_Controller
 		{
 			show_error('Failed loading Student');
 		}
-		
+
 		$result = $this->AnrechnungModel->loadWhere(array('dms_id' => $dms_id));
-		
+
 		if($result = getData($result)[0])
 		{
 			if ($result->prestudent_id == $student->prestudent_id)
@@ -283,10 +283,10 @@ class requestAnrechnung extends Auth_Controller
 				return;
 			}
 		}
-		
+
 		show_error('You are not entitled to read this document');
 	}
-	
+
 	/**
 	 * Check if application already exists.
 	 *
@@ -302,15 +302,15 @@ class requestAnrechnung extends Auth_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'prestudent_id' => $prestudent_id
 		));
-		
+
 		if (isError($result))
 		{
 			show_error(getError($result));
 		}
-		
+
 		return hasData($result);
 	}
-	
+
 	/**
 	 * Check if applications' study semester is actual study semester.
 	 *
@@ -322,10 +322,10 @@ class requestAnrechnung extends Auth_Controller
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$result = $this->StudiensemesterModel->getNearest();
 		$actual_ss = getData($result)[0]->studiensemester_kurzbz;
-		
+
 		return $studiensemester_kurzbz == $actual_ss;
 	}
-	
+
 	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
 		// Get Note of Lehrveranstaltung
@@ -336,12 +336,12 @@ class requestAnrechnung extends Auth_Controller
 				'lehrveranstaltung_id' => $lehrveranstaltung_id
 			)
 		);
-		
+
 		// If Lehrveranstaltung has Note
 		if (hasData($result))
 		{
 			$note = getData($result)[0]->note;
-			
+
 			// Check if Note is a blocking grade
 			if (in_array($note, $this->config->item('grades_blocking_application')))
 			{
@@ -350,7 +350,7 @@ class requestAnrechnung extends Auth_Controller
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Upload file via DMS library.
 	 *
@@ -367,7 +367,7 @@ class requestAnrechnung extends Auth_Controller
 			'insertamum'        => (new DateTime())->format('Y-m-d H:i:s'),
 			'insertvon'         => $this->_uid
 		);
-		
+
 		// Upload document
 		return $this->dmslib->upload($dms, 'uploadfile', array('pdf'));
 	}
