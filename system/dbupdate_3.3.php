@@ -6327,18 +6327,18 @@ if(!@$db->db_query("SELECT public.get_ects_summe_schulisch('', 0, 0)"))
 				DECLARE rec_quereinstiegs_studiensemester RECORD;
 				DECLARE sum_quereinstiegs_ects numeric(4, 1) := 0;
 				DECLARE sum_schulische_ects numeric(4, 1) := 0;
-				
-							
+
+
 				BEGIN
-				
+
 				-- IF STUDENT IS QUEREINSTEIGER, GET ECTS SUMME OF ANGERECHNETE SEMESTER
-				-- Get Einstiegssemester 
-				   SELECT INTO var_einstiegsausbildungssemester , var_einstiegsstudiensemester_kurzbz, var_einstiegsorgform_kurzbz  ausbildungssemester, studiensemester_kurzbz, orgform_kurzbz from public.tbl_prestudentstatus 
-				   WHERE prestudent_id = var_prestudent_id 
+				-- Get Einstiegssemester
+				   SELECT INTO var_einstiegsausbildungssemester , var_einstiegsstudiensemester_kurzbz, var_einstiegsorgform_kurzbz  ausbildungssemester, studiensemester_kurzbz, orgform_kurzbz from public.tbl_prestudentstatus
+				   WHERE prestudent_id = var_prestudent_id
 				   AND status_kurzbz = \'Student\'
 				   ORDER BY datum, insertamum, ext_id
 				   LIMIT 1;
-				
+
 				-- If Einstiegssemester > 1 (= Quereinsteiger)
 				IF (var_einstiegsausbildungssemester > 1) THEN
 				-- ...get all Quereinstiegssemester
@@ -6357,66 +6357,66 @@ if(!@$db->db_query("SELECT public.get_ects_summe_schulisch('', 0, 0)"))
 								JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 							WHERE
 								tbl_studienplan.studienplan_id = (
-									SELECT 
+									SELECT
 										studienplan_id
-									FROM 
-										lehre.tbl_studienordnung 
-										JOIN lehre.tbl_studienplan USING (studienordnung_id) 
+									FROM
+										lehre.tbl_studienordnung
+										JOIN lehre.tbl_studienplan USING (studienordnung_id)
 										JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
-										WHERE tbl_studienordnung.studiengang_kz = var_studiengang_kz 
+										WHERE tbl_studienordnung.studiengang_kz = var_studiengang_kz
 										AND tbl_studienplan_semester.semester = var_einstiegsausbildungssemester - 1
 										AND tbl_studienplan_semester.studiensemester_kurzbz = rec_quereinstiegs_studiensemester.studiensemester_kurzbz
-										AND tbl_studienplan.orgform_kurzbz = var_einstiegsorgform_kurzbz  
-								
+										AND tbl_studienplan.orgform_kurzbz = var_einstiegsorgform_kurzbz
+
 									LIMIT 1
 								)
 							AND tbl_studienplan_lehrveranstaltung.semester = var_einstiegsausbildungssemester
 							AND studienplan_lehrveranstaltung_id_parent IS NULL -- auf Modulebene
 							AND tbl_studienplan_lehrveranstaltung.export = TRUE);
-				
+
 							var_einstiegsausbildungssemester = var_einstiegsausbildungssemester - 1;
 				   END LOOP;
 				END IF;
-				
-				   
+
+
 				-- GET ECTS SUMME OF ALLE BISHER ANGERECHNETEN LEHRVERANSTALTUNGEN. ANRECHNUNGSGRUND: SCHULISCH.
 				SELECT INTO sum_schulische_ects COALESCE(SUM(ects), 0) FROM (
-									SELECT 
+									SELECT
 										lehrveranstaltung_id, studiensemester_kurzbz, ects
-									FROM 
-										lehre.tbl_zeugnisnote 
-										LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz) 
+									FROM
+										lehre.tbl_zeugnisnote
+										LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz)
 										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 										JOIN public.tbl_student USING(student_uid)
-									WHERE 
+									WHERE
 										tbl_zeugnisnote.note = 6
 										AND student_uid = var_student_uid
 										AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
 										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
-                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen 
-                        				AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern) 
-									
-									UNION 
-										
-									SELECT 
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen
+                        				AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern)
+
+									UNION
+
+									SELECT
 										lehrveranstaltung_id, studiensemester_kurzbz, ects
-									FROM 
-										lehre.tbl_anrechnung 
+									FROM
+										lehre.tbl_anrechnung
 										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 										JOIN public.tbl_student USING(prestudent_id)
-									WHERE 
+									WHERE
 										genehmigt_von IS NOT NULL
-										AND student_uid = var_student_uid 
+										AND student_uid = var_student_uid
 										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
-                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen  
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen
 				) lvsangerechnet;
-				
+
 				-- BUILD ECTS SUMME OF QUEREINSTIEGSSEMESTER- + ANGERECHNETEN LVs-ECTS
 				-- Summe aller bisher schulisch begründet angerechneten LVs + der Quereinstiegssemester
 				sum_schulische_ects = sum_schulische_ects + sum_quereinstiegs_ects;
-								
+
 				RETURN sum_schulische_ects ;
-				  
+
 				END;
 				$_$;
 
@@ -6436,40 +6436,40 @@ if(!@$db->db_query("SELECT public.get_ects_summe_beruflich('')"))
 			AS $_$
 				DECLARE var_student_uid ALIAS FOR $1;
 				DECLARE sum_berufliche_ects numeric(4, 1) := 0;
-            
+
 				BEGIN
-				
+
 					SELECT INTO sum_berufliche_ects COALESCE(SUM(ects), 0) FROM (
-						SELECT 
+						SELECT
 							lehrveranstaltung_id, studiensemester_kurzbz, ects
-						FROM 
-							lehre.tbl_zeugnisnote 
-							LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz) 
+						FROM
+							lehre.tbl_zeugnisnote
+							LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz)
 							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 							JOIN public.tbl_student USING(student_uid)
-						WHERE 
+						WHERE
 							tbl_zeugnisnote.note = 6
 							AND student_uid = var_student_uid
 							AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
 							AND begruendung_id = 4  -- beruflich
 							AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern)
-						
-						UNION 
-							
-						SELECT 
+
+						UNION
+
+						SELECT
 							lehrveranstaltung_id, studiensemester_kurzbz, ects
-						FROM 
-							lehre.tbl_anrechnung 
+						FROM
+							lehre.tbl_anrechnung
 							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 							JOIN public.tbl_student USING(prestudent_id)
-						WHERE 
+						WHERE
 							genehmigt_von is not null
-							AND student_uid = var_student_uid 
+							AND student_uid = var_student_uid
 							AND begruendung_id = 4  -- beruflich
 					) lvsangerechnet;
-					
+
 				RETURN sum_berufliche_ects;
-				
+
 				END;
 				$_$;
 
@@ -6509,6 +6509,40 @@ if($result = @$db->db_query("SELECT 1 FROM public.tbl_dokument WHERE dokument_ku
 	}
 }
 
+//Spalte aktiv zu bis.tbl_zgv hinzufügen
+if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgv LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_zgv ADD COLUMN aktiv BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgv '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte aktiv zu bis.tbl_zgv hinzugefügt';
+}
+
+//Spalte aktiv zu bis.tbl_zgvmaster hinzufügen
+if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgvmaster LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_zgvmaster ADD COLUMN aktiv BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvmaster '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte aktiv zu bis.tbl_zgvmaster hinzugefügt';
+}
+
+//Spalte aktiv zu bis.tbl_zgvdoktor hinzufügen
+if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgvdoktor LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_zgvdoktor ADD COLUMN aktiv BOOLEAN NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvdoktor '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte aktiv zu bis.tbl_zgvdoktor hinzugefügt';
+}
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -6544,9 +6578,9 @@ $tabellen=array(
 	"bis.tbl_oehbeitrag"  => array("oehbeitrag_id","studierendenbeitrag","versicherung","von_studiensemester_kurzbz","bis_studiensemester_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz","bezeichnung_mehrsprachig"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
-	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
-	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung"),
-	"bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz","bezeichnung"),
+	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung","aktiv"),
+	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung","aktiv"),
+	"bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz","bezeichnung","aktiv"),
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung","incoming","outgoing"),
 	"bis.tbl_zgvgruppe"  => array("gruppe_kurzbz","bezeichnung"),
 	"bis.tbl_zgvgruppe_zuordnung"  => array("zgvgruppe_id" ,"studiengang_kz","zgv_code","zgvmas_code","gruppe_kurzbz"),

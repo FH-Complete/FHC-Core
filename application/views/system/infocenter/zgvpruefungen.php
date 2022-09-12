@@ -223,11 +223,21 @@
 										</div>
 									</div>
 									<?php if (!$infoonly)
-										echo $this->widgetlib->widget(
-											'Zgv_widget',
-											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgv_code),
-											array('name' => 'zgv', 'id' => 'zgv_'.$zgvpruefung->prestudent_id)
-										); ?>
+										//dropdown als Werte vom ZgvModel, um nicht aktive Werte mit Zusatz anzuzeigen
+										$alleZGV = $this->ZgvModel->getAllZgv();
+                   	echo '<select id= "zgv_'.$zgvpruefung->prestudent_id.'" name="zgv">';
+                   	 $zgvpruefung->zgv_bez != '' ? $default = "selected" : $default = "";
+
+									 	echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
+										//echo '<option value = "null">--Bitte Eintrag wählen--</option>';
+                   	foreach ($alleZGV->retval as $zgv):
+														//zusatz
+														$zgv->aktiv == 'true' ? $zusatz = '' : $zusatz = ' --- nicht (länger) aktiv ---';
+                           	$zgv->zgv_code == $zgvpruefung->zgv_code ? $selected = "selected" : $selected = "";
+                           	echo '<option '. $selected.' value= "'.$zgv->zgv_code.'">'.$zgv->zgv_bez. $zusatz .'</option>';
+                   	endforeach;
+                   	echo "</select>";
+                   	?>
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[1] ?>">
@@ -262,14 +272,22 @@
 							<div class="col-lg-<?php echo $columns[3] ?>">
 								<div class="form-group">
 									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person', 'nation') . ':'?></label>
-									<?php if ($infoonly)
-										echo $zgvpruefung->zgvnation_bez;
-									else
-										echo $this->widgetlib->widget(
-											'Nation_widget',
-											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvnation_code),
-											array('name' => 'zgvnation', 'id' => 'zgvnation_'.$zgvpruefung->prestudent_id)
-										); ?>
+
+									<?php if (!$infoonly)
+										//dropdown als Werte vom NationModel, um nicht aktive Werte  mit Zusatz anzuzeigen
+										$allNations = $this->NationModel->getAll();
+										echo '<select id= "zgvnation_'.$zgvpruefung->prestudent_id.'" name="zgvnation">';
+										$zgvpruefung->nation_code != '' ? $default = "selected" : $default = "";
+										echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
+										foreach ($allNations->retval as $nation):
+														//zusatz
+														$nation->sperre != 'true' ? $zusatz = ' ' : $zusatz = ' --- Nation/Staat nicht existent ---';
+
+														$nation->nation_code == $zgvpruefung->zgvnation ? $selected = "selected" : $selected = "";
+														echo '<option '. $selected.' value= "'.$nation->nation_code.'">'. $nation->langtext . $zusatz.'</option>';
+										endforeach;
+										echo "</select>";
+										?>
 								</div>
 							</div>
 						</div>
@@ -278,15 +296,23 @@
 							<div class="row">
 								<div class="col-lg-<?php echo $columns[0] ?>">
 									<div class="form-group"><label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ':'?></label>
-										<?php
-										if ($infoonly)
-											echo $zgvpruefung->zgvmas_bez;
-										else
-											echo $this->widgetlib->widget(
-												'Zgvmaster_widget',
-												array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvmas_code),
-												array('name' => 'zgvmas', 'id' => 'zgvmas_'.$zgvpruefung->prestudent_id)
-											); ?>
+
+											<?php if (!$infoonly)
+												//dropdown als Werte vom ZgvmasterModel, um nicht aktive Werte mit Zusatz anzuzeigen
+												$alleZGVmaster = $this->ZgvmasterModel->getAllZgvmaster();
+												echo '<select id= "zgvmas_'.$zgvpruefung->prestudent_id.'" name="zgvmas">';
+												 $zgvpruefung->zgvmas_bez != '' ? $default = "selected" : $default = "";
+
+												echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
+
+												foreach ($alleZGVmaster->retval as $zgvmaster):
+																//zusatz
+																$zgvmaster->aktiv == 'true' ? $zusatz = '' : $zusatz = ' --- nicht (länger) aktiv ---';
+																$zgvmaster->zgvmas_code == $zgvpruefung->zgvmas_code ? $selected = "selected" : $selected = "";
+																echo '<option '. $selected.' value= "'.$zgvmaster->zgvmas_code.'">'.$zgvmaster->zgvmas_bez. $zusatz .'</option>';
+												endforeach;
+												echo "</select>";
+												?>
 									</div>
 								</div>
 								<div class="col-lg-<?php echo $columns[1] ?>">
@@ -322,15 +348,25 @@
 								</div>
 								<div class="col-lg-<?php echo $columns[3] ?>">
 									<div class="form-group"><label><?php echo $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre', 'master') . ' ' . $this->p->t('person', 'nation') . ':'?></label>
-										<?php
-										if ($infoonly)
-											echo $zgvpruefung->zgvmanation_bez;
-										else
-											echo $this->widgetlib->widget(
-												'Nation_widget',
-												array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvmanation_code),
-												array('name' => 'zgvmanation', 'id' => 'zgvmanation_'.$zgvpruefung->prestudent_id)
-											); ?>
+
+											<?php if (!$infoonly)
+												//dropdown als Werte vom NationModel, um nicht aktive Werte  mit Zusatz anzuzeigen
+												$allNations = $this->NationModel->getAll();
+												echo '<select id= "zgvmanation_'.$zgvpruefung->prestudent_id.'" name="zgvmanation">';
+
+												$zgvpruefung->zgvmanation_code != '' ? $default = "selected" : $default = "";
+												echo '<option '. $default.' value = "null">--Bitte Eintrag wählen--</option>';
+												foreach ($allNations->retval as $nation):
+																//zusatz
+																$nation->sperre != 'true' ? $zusatz = ' ' : $zusatz = ' --- Nation/Staat nicht existent ---';
+
+																$nation->nation_code == $zgvpruefung->zgvmanation_code ? $selected = "selected" : $selected = "";
+																echo '<option '. $selected.' value= "'.$nation->nation_code.'">'. $nation->langtext . $zusatz.'</option>';
+												endforeach;
+												echo "</select>";
+												?>
+
+
 									</div>
 								</div>
 							</div>
@@ -566,4 +602,3 @@
 		endforeach; // end foreach zgvpruefungen
 	?>
 </div><!-- /.panel-group -->
-
