@@ -727,9 +727,9 @@ echo '
 								16: {sorter: false, filter: false},
 								19: {sorter: false, filter: false},
 								20: {sorter: false, filter: false},
-								21: {sorter: false, filter: false},
 								22: {sorter: false, filter: false},
-								23: {sorter: false, filter: false}},
+								23: {sorter: false, filter: false},
+								24: {sorter: false, filter: false}},
 					widgetOptions : {filter_functions : {
 										// Add select menu to this column
 										12 : {
@@ -1083,7 +1083,8 @@ if ($result_lv!=0)
 		  <th>Zeugnis</th>
 		  <th title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th>Koordinator</th>
-		  <th class=\"lvinfo\" >LV-Info</th>\n";
+		  <th class=\"lvinfo\" >LV-Info</th>
+		  <th>Template</th>\n";
 
 		  if($write_admin)
 		  {
@@ -1294,6 +1295,10 @@ if ($result_lv!=0)
 		}
 		else
 			echo 'vorhanden';
+		echo '</td>';
+		//Template
+		echo "<td align='right'>";
+		echo $db->convert_html_chars($row->lehrveranstaltung_template_id);
 		echo '</td>';
 		if($write_admin)
 		{

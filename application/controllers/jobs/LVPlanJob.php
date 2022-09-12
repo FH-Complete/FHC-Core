@@ -240,11 +240,13 @@ class LVPlanJob extends JOB_Controller
         }
 
         // Send mail to STG Assistenz
+		/*
         $result = $this->_sendMailToStg($uidByStg_arr);
         if (isError($result))
         {
             $this->logError(getError($result));
         }
+		*/
 
         // Send mail to Kompetenzfeld Leitung
         $result = $this->_sendMailToKF($uidByOe_arr);

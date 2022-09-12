@@ -1477,7 +1477,7 @@ if(!$error)
 									$lema_new->insertamum = date('Y-m-d H:i:s');
 									$lema_new->insertvon = $user;
 									$lema_new->ext_id = $row->ext_id;
-									$lema_new->vertrag_id = $row->vertrag_id;
+									$lema_new->vertrag_id = '';
 
 									if (!$lema_new->save(true))
 									{
