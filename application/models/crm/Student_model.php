@@ -66,4 +66,20 @@ class Student_model extends DB_Model
 
 		return $result->retval[0]->student_uid;
 	}
+
+	public function searchStudent($filter)
+	{
+		$this->addSelect('vorname, nachname, gebdatum, person.person_id, student_uid');
+		$this->addJoin('public.tbl_prestudent ps', 'prestudent_id');
+		$this->addJoin('public.tbl_person person', 'person_id');
+
+		$result = $this->loadWhere(
+			"lower(student_uid) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(person.nachname) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(person.vorname) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(person.nachname || ' ' || person.vorname) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(person.vorname || ' ' || person.nachname) like ".$this->db->escape('%'.$filter.'%'));
+
+		return $result;
+	}
 }

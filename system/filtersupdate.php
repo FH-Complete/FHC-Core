@@ -1112,6 +1112,27 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'gruppenmanagement',
+		'filter_kurzbz' => 'gruppenmanagement',
+		'description' => '{Meine Gruppen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "gruppenmanagement",
+				"columns": [
+					{"name": "gruppe_kurzbz"},
+					{"name": "gruppe_bezeichnung"},
+					{"name": "gruppe_beschreibung"},
+					{"name": "studiengang_kurzbz"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 
