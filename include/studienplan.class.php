@@ -27,6 +27,8 @@
  */
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/lehrveranstaltung.class.php');
+require_once(dirname(__FILE__).'/studienordnung.class.php');
 
 class studienplan extends basis_db
 {
@@ -525,6 +527,25 @@ class studienplan extends basis_db
 	 */
 	public function saveStudienplanLehrveranstaltung()
 	{
+
+		$lv = new lehrveranstaltung();
+		$lv->load($this->lehrveranstaltung_id);
+		if ($lv->lehrtyp_kurzbz == 'tpl') {
+			$lv->lehrtyp_kurzbz = 'lv';
+			$sp = new studienplan();
+			$sp->loadStudienplan($this->studienplan_id);
+			$so = new studienordnung();
+			$so->loadStudienordnung($sp->studienordnung_id);
+			$lv->studiengang_kz = $so->studiengang_kz;
+			$lv->semester = $this->semester;
+			$lv->lehrveranstaltung_template_id = $this->lehrveranstaltung_id;
+			if (!$lv->save(true)) {
+				$this->errormsg = "Fehler beim kopieren des Templates: " . $lv->errormsg;
+				return false;
+			}
+
+			$this->lehrveranstaltung_id = $lv->lehrveranstaltung_id;
+		}
 
 		if ($this->new)
 		{

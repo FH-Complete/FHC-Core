@@ -1029,7 +1029,10 @@ function StudentCount()
 // ****
 function StudentAuswahl()
 {
-	document.getElementById('student-toolbar-label-anzahl').value = 'Anzahl: ' + StudentCount();
+	var tree=document.getElementById('student-tree');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	document.getElementById('student-toolbar-label-anzahl').value = 'Anzahl: ' + StudentCount() + '/' + items;
 
 	if(!StudentTreeLoadDataOnSelect)
 	{

@@ -121,7 +121,7 @@ abstract class FHC_Controller extends CI_Controller
 	protected function terminateWithJsonError($message)
 	{
 		header('Content-Type: application/json');
-		echo json_encode(error($message));
+		echo json_encode(error($message)); // KEEP IT!!!
 		exit;
 	}
 
@@ -132,31 +132,41 @@ abstract class FHC_Controller extends CI_Controller
 	{
 		$this->output->set_content_type('application/json')->set_output(json_encode($mixed));
 	}
-	
+
+	/**
+	 * To download the given file represented by the fileObj parameter.
+	 * fileObj has the following structure:
+	 * 	$fileObj->filename
+	 * 	$fileObj->file
+	 * 	$fileObj->name
+	 * 	$fileObj->mimetype
+	 * 	$fileObj->disposition
+	 */
 	protected function outputFile($fileObj)
 	{
-		if (file_exists($fileObj->file))
+		// If the file exists
+		if (isset($fileObj->file) && !isEmptyString($fileObj->file) && file_exists($fileObj->file))
 		{
-			$finfo  = new finfo(FILEINFO_MIME);
-			
 			header('Content-Description: File Transfer');
-			header('Content-Type: '. $finfo->file($fileObj->file));
+			header('Content-Type: '. $fileObj->mimetype);
 			header('Expires: 0');
 			header('Cache-Control: must-revalidate');
 			header('Pragma: public');
 			header('Content-Length: ' . filesize($fileObj->file));
-			
-			if (isset($fileObj->disposition) && ($fileObj->disposition == 'inline' || $fileObj->disposition == 'attachment'))
+
+			if (isset($fileObj->disposition)
+				&& ($fileObj->disposition == 'inline' || $fileObj->disposition == 'attachment'))
 			{
 				header('Content-Disposition: '. $fileObj->disposition. '; filename="'. $fileObj->name. '"');
 			}
-			
-			readfile($fileObj->file);
-			
-			exit;
+
+			readfile($fileObj->file); // reads the file content to the output buffer
 		}
-		
-		return false;
+		else
+		{
+			// Otherwise print an error
+			show_error('The provided file does not exist: '.(isset($fileObj->file) ? $fileObj->file : 'file not given'));
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

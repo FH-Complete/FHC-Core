@@ -71,9 +71,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<row>
 							<label value="Person ID" control="student-detail-textbox-person_id"/>
 							<hbox><textbox id="student-detail-textbox-person_id" readonly="true" maxlength="16" size="16"/></hbox>
-							<label value="Zugangscode" control="student-detail-zugangscode"/>
+							<?php $hideZugangscode = (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) ? '':' hidden="true"'; ?>
+							<label value="Zugangscode" control="student-detail-zugangscode" <?php echo $hideZugangscode; ?>/>
 							<label id="label-student-detail-link_bewerbungstool" hidden="true" value=""></label>
-							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
+							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" <?php echo $hideZugangscode; ?> onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
 							<?php $hideBpk = $rechte->isBerechtigt('student/bpk') ? '':' hidden="true"'; ?>
                             <label value="BPK" control="student-detail-textbox-bpk"<?php echo $hideBpk; ?>/>
                             <hbox><textbox id="student-detail-textbox-bpk" disabled="true" maxlength="28" size="50"<?php echo $hideBpk; ?>/></hbox>
@@ -338,13 +339,26 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<menulist id="student-prestudent-menulist-zgvcode" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/zgv.rdf.php?optional=true" flex="1"
 									ref="http://www.technikum-wien.at/zgv/alle"
+									xmlns:ZGV="http://www.technikum-wien.at/zgv/rdf#"
 									style="min-width: 130px">
 								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/zgv/rdf#code"
-												label="rdf:http://www.technikum-wien.at/zgv/rdf#kurzbz"
-												uri="rdf:*"/>
+									<rule ZGV:aktiv='f'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/zgv/rdf#code"
+													label="rdf:http://www.technikum-wien.at/zgv/rdf#kurzbz"
+													uri="rdf:*"
+													style="text-decoration:line-through;"
+													/>
 										</menupopup>
+									</rule>
+									<rule>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/zgv/rdf#code"
+													label="rdf:http://www.technikum-wien.at/zgv/rdf#kurzbz"
+													uri="rdf:*"
+													/>
+										</menupopup>
+									</rule>
 								</template>
 							</menulist>
 							<label value="ZGV Ort" control="student-prestudent-textbox-zgvort"/>
@@ -395,14 +409,26 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<menulist id="student-prestudent-menulist-zgvmastercode" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/zgvmaster.rdf.php?optional=true" flex="1"
 									ref="http://www.technikum-wien.at/zgvmaster/alle"
+									xmlns:ZGVMASTER="http://www.technikum-wien.at/zgvmaster/rdf#"
 									style="min-width: 130px" >
 								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
-												label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
-												uri="rdf:*"
-												/>
-										</menupopup>
+									<rule ZGVMASTER:aktiv='f'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
+													label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
+													uri="rdf:*"
+													style="text-decoration:line-through;"
+													/>
+											</menupopup>
+										</rule>
+										<rule>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
+														label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
+														uri="rdf:*"
+														/>
+												</menupopup>
+											</rule>
 								</template>
 							</menulist>
 							<label value="ZGV Master Ort" control="student-prestudent-textbox-zgvmasterort"/>
@@ -455,13 +481,26 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<label value="ZGV Doktor" control="student-prestudent-menulist-zgvdoktorcode"/>
 							<menulist id="student-prestudent-menulist-zgvdoktorcode" disabled="true"
 									datasources="<?php echo APP_ROOT ?>rdf/zgvdoktor.rdf.php?optional=true" flex="1"
-									ref="http://www.technikum-wien.at/zgvdoktor/alle" >
+									ref="http://www.technikum-wien.at/zgvdoktor/alle"
+									xmlns:ZGVDOKTOR="http://www.technikum-wien.at/zgvdoktor/rdf#">
 								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#code"
-												label="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#kurzbz"
-												uri="rdf:*"/>
-									</menupopup>
+									<rule ZGVDOKTOR:aktiv='f'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#code"
+													label="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#kurzbz"
+													uri="rdf:*"
+													style="text-decoration:line-through;"
+													/>
+										</menupopup>
+									</rule>
+									<rule>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#code"
+													label="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#kurzbz"
+													uri="rdf:*"
+													/>
+										</menupopup>
+									</rule>
 								</template>
 							</menulist>
 						<label value="ZGV Doktor Ort" control="student-prestudent-textbox-zgvdoktorort"/>
