@@ -230,14 +230,14 @@
 										{
 											$selected = ($zgvpruefung->zgv_code === $zgv->zgv_code) ? 'selected' : '';
 											$aktiv = '';
-											$style = '';
+											$class = '';
 											if (!$zgv->aktiv)
 											{
-												$aktiv = '--- nicht (länger) aktiv ---';
-												$style = 'bold';
+												$aktiv = '(inaktiv)';
+												$class = 'gesperrtoption';
 											}
 
-											echo "<option " . $selected . " value='" . $zgv->zgv_code . "' style='font-weight:". $style ."'>" . $zgv->zgv_bez . " " . $aktiv ."</option>";
+											echo "<option " . $selected . " value='" . $zgv->zgv_code . "' class='". $class ."'>" . $zgv->zgv_bez . " " . $aktiv ."</option>";
 										}
 									echo "</select>";
 									endif;?>
@@ -287,13 +287,13 @@
 										{
 											$selected = ($nation->nation_code === $zgvpruefung->zgvnation_code) ? 'selected' : '';
 											$sperre = '';
-											$style = '';
+											$class = '';
 											if ($nation->sperre == 'true')
 											{
-												$sperre = '--- Nation/Staat nicht existent ---';
-												$style = 'bold';
+												$sperre = '(gesperrt)';
+												$class = 'gesperrtoption';
 											}
-											echo "<option " . $selected . " value='" . $nation->nation_code . "' style='font-weight:" . $style . "'>" . $nation->langtext . " " . $sperre ."</option>";
+											echo "<option " . $selected . " value='" . $nation->nation_code . "' class='" . $class ."'>" . $nation->langtext . " " . $sperre ."</option>";
 										}
 										echo "</select>";
 									}
@@ -318,13 +318,13 @@
 											{
 												$selected = ($zgvpruefung->zgvmas_code === $zgv->zgvmas_code) ? 'selected' : '';
 												$aktiv = '';
-												$style = '';
+												$class = '';
 												if (!$zgv->aktiv)
 												{
-													$aktiv = '--- nicht (länger) aktiv ---';
-													$style = 'bold';
+													$aktiv = '(inaktiv)';
+													$class = 'gesperrtoption';
 												}
-												echo "<option " . $selected . " value='" . $zgv->zgvmas_code . "' style='font-weight:" . $style . "'>" . $zgv->zgvmas_bez . " " . $aktiv ."</option>";
+												echo "<option " . $selected . " value='" . $zgv->zgvmas_code . "' class='" . $class . "'>" . $zgv->zgvmas_bez . " " . $aktiv ."</option>";
 											}
 											echo "</select>";
 										}
@@ -377,15 +377,15 @@
 											{
 												$selected = ($nation->nation_code === $zgvpruefung->zgvmanation_code) ? 'selected' : '';
 												$sperre = '';
-												$style = '';
+												$class = '';
 
 												if ($nation->sperre == 'true')
 												{
-													$sperre = '--- Nation/Staat nicht existent ---';
-													$style = 'bold';
+													$sperre = '(gesperrt)';
+													$class = 'gesperrtoption';
 												}
 
-												echo "<option " . $selected . " value='" . $nation->nation_code . "' style='font-weight:" . $style . "'>" . $nation->langtext . " " . $sperre ."</option>";
+												echo "<option " . $selected . " value='" . $nation->nation_code . "' class='" . $class . "'>" . $nation->langtext . " " . $sperre ."</option>";
 											}
 											echo "</select>";
 										}
