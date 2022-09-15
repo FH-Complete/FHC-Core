@@ -691,14 +691,19 @@ if($result = $db->db_query($qry))
 					return '';
 				}
 				$gsblock.="
-			<GS>
-				<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
-				<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
-				<StudTyp>".$studtyp."</StudTyp>
-				<PartnerCode>".$rowgs->partner_code."</PartnerCode>
-				<StudStatusCode>".$studstatuscode."</StudStatusCode>
-				".(isset($rowgs->studienkennung_uni) ? "<StudienkennungUni>".$rowgs->studienkennung_uni."</StudienkennungUni>" : "")."
-			</GS>";
+				<GS>
+					<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
+					<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
+					<StudTyp>".$studtyp."</StudTyp>
+					<PartnerCode>".$rowgs->partner_code."</PartnerCode>
+					<StudStatusCode>".$studstatuscode."</StudStatusCode>";
+					if (isset($rowgs->studienkennung_uni))
+					{
+						$gsblock.="
+					<StudienkennungUNI>".$rowgs->studienkennung_uni."</StudienkennungUNI>";
+					}
+					$gsblock.="
+				</GS>";
 			}
 		}
 
@@ -782,15 +787,17 @@ if($result = $db->db_query($qry))
 			$datei.="
 			<StudentIn>
 				<PersKz>".trim($row->matrikelnr)."</PersKz>
-				<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>
-				<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-				<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
-
+				<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>";
+				
 				if (!$ausserordentlich)
 				{
 					$datei .= "
-					<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
+				<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
 				}
+
+			$datei.="
+				<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
+				<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
 
 				if ($row->titelpre != '')
 				{
@@ -823,8 +830,7 @@ if($result = $db->db_query($qry))
 				if($row->bpk != '' && $row->bpk != null)
 				{
 					$datei.="
-					<bPK>".$row->bpk."</bPK>
-					";
+				<bPK>".$row->bpk."</bPK>";
 				}
 
 				$datei.="
