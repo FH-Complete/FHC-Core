@@ -53,6 +53,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
         	<BT:code></BT:code>
         	<BT:bezeichnung>-- keine Auswahl --</BT:bezeichnung>
         	<BT:kurzbz>-- keine Auswahl --</BT:kurzbz>
+					<BT:aktiv></BT:aktiv>
       	</RDF:Description>
       </RDF:li>
 ';
@@ -70,6 +71,7 @@ if($db->db_query($qry))
         	<BT:code><![CDATA[<?php echo $row->zgv_code;  ?>]]></BT:code>
         	<BT:bezeichnung><![CDATA[<?php echo $row->zgv_bez; ?>]]></BT:bezeichnung>
         	<BT:kurzbz><![CDATA[<?php echo $row->zgv_kurzbz; ?>]]></BT:kurzbz>
+					<BT:aktiv><![CDATA[<?php echo $row->aktiv; ?>]]></BT:aktiv>
       	</RDF:Description>
       </RDF:li>
 <?php
