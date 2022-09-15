@@ -7,8 +7,9 @@ abstract class IssueProducer_Controller extends JOB_Controller
 {
 	const ISSUES_FOLDER = 'issues';
 	const CHECK_ISSUE_EXISTS_METHOD_NAME = 'checkIfIssueExists';
+	const PRODUCE_ISSUE_METHOD_NAME = 'produceIssue';
 
-	protected $_codeLibMappings;
+	protected $_fehlerLibMappings;
 
 	public function __construct()
 	{
@@ -20,73 +21,51 @@ abstract class IssueProducer_Controller extends JOB_Controller
 	}
 
 	/**
-	 * Initializes issue resolution.
+	 * Initializes issue production.
 	 */
-	public function run()
+	public function produceIssue($fehler_kurzbz, $person_id, $oe_kurzbz, $paramsForChecking, $paramsForProduction)
 	{
-		$this->logInfo("Issue producer job started");
+		// get libname from fehler_kurzbz
+		$libName = $this->_fehlerLibMappings[$fehler_kurzbz];
+		
+		// if called from extension (extension name set), path includes extension names, otherwise it is the core library folder
+		$libRootPath = isset($this->_extensionName) ? 'extensions/' . $this->_extensionName . '/' : '';
+		$issuesLibPath = $libRootPath . self::ISSUES_FOLDER . '/';
+		$issuesLibFilePath = DOC_ROOT . 'application/' . $libRootPath . 'libraries/' . self::ISSUES_FOLDER . '/' . $libName . '.php';
 
-		foreach ($this->_codeLibMappings as $fehlercode => $library)
+		// check if library file exists
+		if (!file_exists($issuesLibFilePath)) return error("Issue library file " . $issuesLibFilePath . " does not exist");
+
+		// load library connected to fehler_kurzbz
+		$this->load->library($issuesLibPath . $libName);
+
+		$lowercaseLibName = mb_strtolower($libName);
+
+		// check if method is defined in library class
+		if (!is_callable(array($this->{$lowercaseLibName}, self::CHECK_ISSUE_EXISTS_METHOD_NAME)))
+			return error("Method " . self::CHECK_ISSUE_EXISTS_METHOD_NAME . " is not defined in library $lowercaseLibName");
+
+		// call the function for checking for issue resolution
+		$issueExistsRes = $this->{$lowercaseLibName}->{self::CHECK_ISSUE_EXISTS_METHOD_NAME}($paramsForChecking);
+
+		if (isError($issueExistsRes)) return $issueExistsRes;
+
+		$issueExistsData = getData($issueExistsRes);
+
+		if ($issueExistsData === true)
 		{
-			// add person id and oe kurzbz automatically as params, merge it with additional params
-			// decode bewerbung_parameter into assoc array
-			$params = array_merge(
-				array('issue_id' => $issue->issue_id, 'issue_person_id' => $issue->person_id, 'issue_oe_kurzbz' => $issue->oe_kurzbz),
-				isset($issue->behebung_parameter) ? json_decode($issue->behebung_parameter, true) : array()
+			// write issue if it was detected
+			$produceRes = $this->{$lowercaseLibName}->{self::PRODUCE_ISSUE_METHOD_NAME}(
+				$fehler_kurzbz,
+				isset($params['person_id']) ? $params['person_id'] : null,
+				isset($params['oe_kurzbz']) ? $params['oe_kurzbz'] : null,
+				$paramsForProduction
 			);
 
-			// if called from extension (extension name set), path includes extension names, otherwise it is the core library folder
-			$libRootPath = isset($this->_extensionName) ? 'extensions/' . $this->_extensionName . '/' : '';
-			$issuesLibPath = $libRootPath . self::ISSUES_FOLDER . '/';
-			$issuesLibFilePath = DOC_ROOT . 'application/' . $libRootPath . 'libraries/' . self::ISSUES_FOLDER . '/' . $libName . '.php';
+			if (isError($produceRes))
+				return $produceRes;
 
-			// check if library file exists
-			if (!file_exists($issuesLibFilePath))
-			{
-				// log error and continue with next issue if not
-				$this->logError("Issue library file " . $issuesLibFilePath . " does not exist");
-				continue;
-			}
-
-			// load library connected to fehlercode
-			$this->load->library(
-				$issuesLibPath . $libName
-			);
-
-			$lowercaseLibName = mb_strtolower($libName);
-
-			// check if method is defined in libary class
-			if (!is_callable(array($this->{$lowercaseLibName}, self::CHECK_ISSUE_EXISTS_METHOD_NAME)))
-			{
-				// log error and continue with next issue if not
-				$this->logError("Method " . self::CHECK_ISSUE_EXISTS_METHOD_NAME . " is not defined in library $lowercaseLibName");
-				continue;
-			}
-
-			// call the function for checking for issue resolution
-			$issueResolvedRes = $this->{$lowercaseLibName}->{self::CHECK_ISSUE_EXISTS_METHOD_NAME}($params);
-
-			if (isError($issueResolvedRes))
-			{
-				$this->logError(getError($issueResolvedRes));
-			}
-			else
-			{
-				$issueResolvedData = getData($issueResolvedRes);
-
-				if ($issueResolvedData === true)
-				{
-					// set issue to resolved if needed
-					$behobenRes = $this->issueslib->setBehoben($issue->issue_id, null);
-
-					if (isError($behobenRes))
-						$this->logError(getError($behobenRes));
-					else
-						$this->logInfo("Issue " . $issue->issue_id . " successfully resolved");
-				}
-			}
+			return success("Issue " . $issue->issue_id . " successfully written");
 		}
-
-		$this->logInfo("Issue resolve job ended");
 	}
 }

@@ -169,6 +169,9 @@ class IssuesLib
 		return $this->_changeIssueStatus($issue_id, $data, $user);
 	}
 
+	// --------------------------------------------------------------------------------------------------------------
+	// Private methods
+
 	/**
 	 * Changes status of an issue.
 	 * @param int $issue_id
@@ -215,8 +218,15 @@ class IssuesLib
 	 * @param string $inhalt_extern
 	 * @return object success or error
 	 */
-	private function _addIssue($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlertext_params = null, $resolution_params = null, $fehlercode_extern = null, $inhalt_extern = null)
-	{
+	private function _addIssue(
+		$fehlercode,
+		$person_id = null,
+		$oe_kurzbz = null,
+		$fehlertext_params = null,
+		$resolution_params = null,
+		$fehlercode_extern = null,
+		$inhalt_extern = null
+	) {
 		if (isEmptyString($person_id) && isEmptyString($oe_kurzbz))
 			return error("Person_id or oe_kurzbz must be set.");
 

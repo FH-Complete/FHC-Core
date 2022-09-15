@@ -73,13 +73,11 @@ abstract class IssueResolver_Controller extends JOB_Controller
 						}
 
 						// load library connected to fehlercode
-						$this->load->library(
-							$issuesLibPath . $libName
-						);
+						$this->load->library($issuesLibPath . $libName);
 
 						$lowercaseLibName = mb_strtolower($libName);
 
-						// check if method is defined in libary class
+						// check if method is defined in library class
 						if (!is_callable(array($this->{$lowercaseLibName}, self::CHECK_ISSUE_RESOLVED_METHOD_NAME)))
 						{
 							// log error and continue with next issue if not
