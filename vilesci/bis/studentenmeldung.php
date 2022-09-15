@@ -1011,25 +1011,25 @@ function GenerateXMLStudentBlock($row)
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgCode ('".$row->zgvmas_code."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMaCode ('".$row->zgvmas_code."')";
 			}
 			if($row->zgvmadatum=='' || $row->zgvmadatum==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."')";
 			}
 			else
 			{
 				if($row->zgvmadatum>date("Y-m-d"))
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
 				}
 				if($row->zgvmadatum<$row->zgvdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
 				}
 				if($row->zgvmadatum<$row->gebdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 				}
 			}
 		}
@@ -1281,7 +1281,7 @@ function GenerateXMLStudentBlock($row)
 			<PartnerCode>".$rowgs->partner_code."</PartnerCode>
 			<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
 			<StudStatusCode>".$studstatuscode."</StudStatusCode>
-			".(isset($rowgs->studienkennung_uni) ? "<StudienkennungUni>".$rowgs->studienkennung_uni."</StudienkennungUni>" : "")."
+			".(isset($rowgs->studienkennung_uni) ? "<StudienkennungUNI>".$rowgs->studienkennung_uni."</StudienkennungUNI>" : "")."
 		</GS>";
 			if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
 			{
@@ -1417,6 +1417,19 @@ function GenerateXMLStudentBlock($row)
 			<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
 		}
 
+		// duales studium
+		if ($row->dual === 't')
+		{
+			$dualesstudium='J';
+		}
+		else
+		{
+			$dualesstudium='N';
+		}
+
+		$datei.="
+			<DualesStudium>".$dualesstudium."</DualesStudium>";
+
 		$datei .= "
 			<GeburtsDatum>" . date("dmY", $datumobj->mktime_fromdate($row->gebdatum)) . "</GeburtsDatum>
 			<Geschlecht>" . strtoupper($row->geschlecht) . "</Geschlecht>";
@@ -1513,9 +1526,9 @@ function GenerateXMLStudentBlock($row)
 		if($stgart==2) // Master-Studiengang
 		{
 			$datei.="
-			<ZugangMaStgCode>".$row->zgvmas_code."</ZugangMaStgCode>";
+			<ZugangMaCode>".$row->zgvmas_code."</ZugangMaCode>";
 			$datei.="
-			<ZugangMaStgDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMaStgDatum>";
+			<ZugangMaDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMaDatum>";
 
 			if($aktstatus!='Incoming' && !$ausserordentlich)
 			{
@@ -1622,16 +1635,6 @@ function GenerateXMLStudentBlock($row)
 
 		$datei.="
 			<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
-
-		// duales studium
-		if ($row->dual === true) {
-			$dualesstudium='J';
-		} else {
-			$dualesstudium='N';
-		}
-
-		$datei.="
-			<DualesStudium>".$dualesstudium."</DualesStudium>";
 
 		// **** IO Container ****/
 		$outgoing_count=0;
@@ -2003,7 +2006,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			<OrgFormCode>".$orgform_code_array[$bworgform]."</OrgFormCode>";
 			if($stgart==2)
 				$datei.='
-			<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
+			<ZugangMaCode>'.$key.'</ZugangMaCode>';
 			else
 				$datei.='
 			<ZugangCode>'.$key.'</ZugangCode>';
