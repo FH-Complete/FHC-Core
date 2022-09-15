@@ -7,49 +7,6 @@ const COLOR_DANGER = '#f2dede';
 $(function(){
     const uploadMaxFilesize = $('#requestAnrechnung-uploadfile').data('maxsize')  ; // in byte
 
-    let status_kurzbz = $('#requestAnrechnung-status_kurzbz').data('status_kurzbz');
-    if (status_kurzbz != ' ' && status_kurzbz != ANRECHNUNGSTATUS_APPROVED)
-    {
-        var ectsLv = parseFloat($('#ects').text());
-        var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
-        var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
-        var begruendung_id = $('#requestAnrechnung-form :input[name="begruendung"]:checked').val();
-
-        // If Begründung is 'Hochschulzeugnis', return. They are accepted without limit.
-        if (begruendung_id == 5)
-        {
-            exit;
-        }
-
-        // If max ECTS is ecceeded
-        if (begruendung_id == 4)
-        {
-            if ((sumEctsSchulisch + sumEctsBeruflich + ectsLv) > 90 ||
-                (sumEctsBeruflich + ectsLv) > 60
-            )
-            {
-                // Get ECTS Überschreitungs-message, depending on schulische or berufliche Qualifikation
-                var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
-
-                // Add to Checkbox text
-                $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
-            }
-        }
-        else
-        {
-            if ((sumEctsSchulisch + sumEctsBeruflich + ectsLv) > 90 ||
-                (sumEctsSchulisch + ectsLv) > 60
-            )
-            {
-                // Get ECTS Überschreitungs-message, depending on schulische or berufliche Qualifikation
-                var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
-
-                // Add to Checkbox text
-                $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
-            }
-        }
-    }
-
     // Set status alert color
     requestAnrechnung.setStatusAlertColor();
 
@@ -62,8 +19,11 @@ $(function(){
     // Init tooltips
     requestAnrechnung.initTooltips();
 
-    // // Alert message, if maximum ECTS exceeded
+    // Alert message, if maximum ECTS exceeded
     requestAnrechnung.alertIfMaxEctsExceeded();
+
+    // Alert message inside Begruendungsbox, if maximum ECTS exceeded
+    requestAnrechnung.alertIfMaxEctsExceededInsideBegruendungsbox();
 
     // Set chars counter for textarea 'Herkunft der Kenntnisse'
     requestAnrechnung.setCharsCounter();
@@ -316,6 +276,51 @@ var requestAnrechnung = {
                     placement: 'right',
                     html: true
                 });
+        }
+    },
+    alertIfMaxEctsExceededInsideBegruendungsbox: function(){
+        let status_kurzbz = $('#requestAnrechnung-status_kurzbz').data('status_kurzbz');
+
+        if (status_kurzbz != ' ' && status_kurzbz != ANRECHNUNGSTATUS_APPROVED)
+        {
+            var ectsLv = parseFloat($('#ects').text());
+            var sumEctsSchulisch = parseFloat($('#sumEctsSchulisch').text());
+            var sumEctsBeruflich = parseFloat($('#sumEctsBeruflich').text());
+            var begruendung_id = $('#requestAnrechnung-form :input[name="begruendung"]:checked').val();
+
+            // If Begründung is 'Hochschulzeugnis', return. They are accepted without limit.
+            if (begruendung_id == 5)
+            {
+                return;
+            }
+
+            // If max ECTS is ecceeded
+            if (begruendung_id == 4)
+            {
+                if ((sumEctsSchulisch + sumEctsBeruflich + ectsLv) > 90 ||
+                    (sumEctsBeruflich + ectsLv) > 60
+                )
+                {
+                    // Get ECTS Überschreitungs-message, depending on schulische or berufliche Qualifikation
+                    var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
+
+                    // Add to Checkbox text
+                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
+                }
+            }
+            else
+            {
+                if ((sumEctsSchulisch + sumEctsBeruflich + ectsLv) > 90 ||
+                    (sumEctsSchulisch + ectsLv) > 60
+                )
+                {
+                    // Get ECTS Überschreitungs-message, depending on schulische or berufliche Qualifikation
+                    var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
+
+                    // Add to Checkbox text
+                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
+                }
+            }
         }
     },
     getMsgBeiEctsUeberschreitung: function(begruendung_id, ects, sumEctsSchulisch, sumEctsBeruflich){

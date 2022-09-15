@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header für no cache
+// header fï¿½r no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -52,6 +52,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
         	<ZGVDOKTOR:code></ZGVDOKTOR:code>
         	<ZGVDOKTOR:bezeichnung>-- keine Auswahl --</ZGVDOKTOR:bezeichnung>
         	<ZGVDOKTOR:kurzbz>-- keine Auswahl --</ZGVDOKTOR:kurzbz>
+					<ZGVDOKTOR:aktiv></ZGVDOKTOR:aktiv>
       	</RDF:Description>
       </RDF:li>
 ';
@@ -69,6 +70,7 @@ if($db->db_query($qry))
         	<ZGVDOKTOR:code><![CDATA[<?php echo $row->zgvdoktor_code;  ?>]]></ZGVDOKTOR:code>
         	<ZGVDOKTOR:bezeichnung><![CDATA[<?php echo $row->zgvdoktor_bez; ?>]]></ZGVDOKTOR:bezeichnung>
         	<ZGVDOKTOR:kurzbz><![CDATA[<?php echo $row->zgvdoktor_kurzbz; ?>]]></ZGVDOKTOR:kurzbz>
+					<ZGVDOKTOR:aktiv><![CDATA[<?php echo $row->aktiv; ?>]]></ZGVDOKTOR:aktiv>
       	</RDF:Description>
       </RDF:li>
 <?php

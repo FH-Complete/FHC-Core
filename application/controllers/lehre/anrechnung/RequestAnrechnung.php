@@ -41,7 +41,7 @@ class requestAnrechnung extends Auth_Controller
 
 		// Load configs
 		$this->load->config('anrechnung');
-
+		
 		// Load language phrases
 		$this->loadPhrases(
 			array(
@@ -52,59 +52,59 @@ class requestAnrechnung extends Auth_Controller
 				'lehre'
 			)
 		);
-
+		
 		$this->_setAuthUID();
-
+		
 		$this->setControllerId();
 	}
-
+	
 	public function index()
 	{
 		$studiensemester_kurzbz = $this->input->get('studiensemester');
 		$lehrveranstaltung_id = $this->input->get('lv_id');
-
+		
 		if (isEmptyString($lehrveranstaltung_id) || isEmptyString($studiensemester_kurzbz))
 		{
 			show_error('Missing correct parameter');
 		}
-
+		
 		// Exit if user is not a student
 		$result = $this->StudentModel->load(array('student_uid' => $this->_uid));
-
+		
 		if (!hasData($result))
 		{
 			show_error('Cant load user');
 		}
-
+		
 		// Get Prestudent ID
 		$prestudent_id = getData($result)[0]->prestudent_id;
-
+		
 		// Check if application deadline is expired
 		$is_expired = self::_isExpired(
 			$this->config->item('submit_application_start'),
 			$this->config->item('submit_application_end'),
 			$studiensemester_kurzbz
 		);
-
+		
 		// Check if Lehrveranstaltung was already graded with application blocking grades
 		$is_blocked = self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id);
-
+		
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
 
 		// Get Antrag data
 		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id);
-
+		
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
 			'is_expired' => $is_expired,
 			'is_blocked' => $is_blocked
 		);
-
+		
 		$this->load->view('lehre/anrechnung/requestAnrechnung.php', $viewData);
 	}
-
+	
 	/**
 	 * Apply Anrechnungsantrag and send to STGL
 	 */
@@ -129,35 +129,35 @@ class requestAnrechnung extends Auth_Controller
 		{
 			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
 		}
-
+		
 		if (isEmptyString($bestaetigung))
 		{
 			return $this->outputJsonError($this->p->t('ui', 'errorBestaetigungFehlt'));
 		}
-
+		
 		// Exit if user is not a student
 		$result = $this->StudentModel->load(array('student_uid' => $this->_uid));
-
+		
 		if (!hasData($result))
 		{
 			return $this->outputJsonError('Cant load user');
 		}
-
+		
 		// Get Prestudent ID
 		$prestudent_id = getData($result)[0]->prestudent_id;
-
+		
 		// Exit if application already exists
 		if (self::_applicationExists($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id))
 		{
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragBereitsGestellt'));
 		}
-
+		
 		// Exit if application is not for actual studysemester
 		if (!self::_applicationIsForActualSS($studiensemester_kurzbz))
 		{
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragNurImAktSS'));
 		}
-
+		
 		// Upload document
 		$result = self::_uploadFile();
 
@@ -165,10 +165,10 @@ class requestAnrechnung extends Auth_Controller
 		{
 			return $this->outputJsonError($result->retval);
 		}
-
+		
 		// Hold just inserted DMS ID
 		$lastInsert_dms_id = $result->retval['dms_id'];
-
+		
 		// Save Anrechnung and Anrechnungstatus
 		$result = $this->AnrechnungModel->createAnrechnungsantrag(
 			$prestudent_id,
@@ -178,12 +178,12 @@ class requestAnrechnung extends Auth_Controller
 			$lastInsert_dms_id,
 			$anmerkung
 		);
-
+		
 		if (isError($result))
 		{
 			$this->terminateWithJsonError(getError($result));
 		}
-
+		
 		// Output to AJAX
 		$this->outputJsonSuccess(array(
 			'antragdatum' => (new DateTime())->format('d.m.Y'),
