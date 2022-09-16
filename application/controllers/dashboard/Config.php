@@ -11,59 +11,38 @@ class Config extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index' => 'basis/mitarbeiter:r',
-				'dummy' => 'basis/mitarbeiter:r',
+				'index'			=> 'basis/mitarbeiter:r',
+				'dummy'			=> 'basis/mitarbeiter:r',
+				'genWidgetId'	=> 'basis/mitarbeiter:r'
 			)
 		);
 		
-		$this->load->model('dashboard/Dashboard_Preset_model', 'DashboardPresetModel');
-		$this->load->model('dashboard/Dashboard_Override_model', 'DashboardOverrideModel');
+		$this->load->library('dashboard/DashboardLib', null, 'DashboardLib');
 	}
 	
 	public function index() 
 	{
-		$res_presets = $this->DashboardPresetModel->getPresets(1, 'ma0080');
-		$defaultconfig = array();
+		$dashboard_kurzbz = $this->input->get('db');
+		$uid = $this->input->get('uid');
 		
-		if( isSuccess($res_presets) && hasData($res_presets) ) 
-		{
-			$presets = getData($res_presets);
-			foreach ($presets as $presetobj)
-			{
-				if( null !== ($preset = json_decode($presetobj->preset, true)) )
-				{
-					$defaultconfig = array_replace_recursive($defaultconfig, 
-						$preset);
-				}
-			}
+		$dashboard = $this->DashboardLib->getDashboardByKurzbz($dashboard_kurzbz);
+		if(!$dashboard) {
+			$this->outputJsonError(array(
+				'error' => 'Dashboard ' . $dashboard_kurzbz . ' not found.'
+			));
 		}
 		
-		$res_userconfig = $this->DashboardOverrideModel->getOverride(1, 'ma0080');
-		$mergedconfig = array();
-		if( isSuccess($res_userconfig) && hasData($res_userconfig) ) 
-		{
-			$data = getData($res_userconfig);
-			if( null !== ($userconfig = json_decode($data[0]->override, true)) )
-			{
-				$mergedconfig = array_replace_recursive($defaultconfig, $userconfig);
-			}
-		}
-/*
-		header('Content-Type: text/plain');
-		print_r($defaultconfig);
-		print_r($userconfig);
-		print_r($mergedconfig);
-		die();
-*/
-/*
-		$ret = array(
-			'defaultconfig' => $defaultconfig,
-			'userconfig' => $userconfig,
-			'mergedconfig' => $mergedconfig
-		);
-		$this->outputJsonSuccess($ret);
- */
+		$mergedconfig = $this->DashboardLib->getMergedConfig($dashboard->dashboard_id, $uid);
 		$this->outputJsonSuccess($mergedconfig);
+	}
+	
+	public function genWidgetId() 
+	{
+		$dashboard_kurzbz = $this->input->get('db');
+		$widgetid = $this->DashboardLib->generateWidgetId($dashboard_kurzbz);
+		$this->outputJsonSuccess(array(
+			'widgetid' => $widgetid['widgetid']
+		));
 	}
 	
 	public function dummy() 
