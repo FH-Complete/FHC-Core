@@ -581,7 +581,7 @@ else
 
 $sql_query .= " GROUP BY tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.bezeichnung";
 
-$sql_query .= " ORDER BY tbl_lehrveranstaltung.bezeichnung LIMIT 10";
+$sql_query .= " ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
 if($fb_kurzbz=='' && $stg_kz=='' && $semester=='0' && $oe_kurzbz=='')
 	$result_lv='';
