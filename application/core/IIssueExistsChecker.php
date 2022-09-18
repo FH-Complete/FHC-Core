@@ -17,5 +17,5 @@ interface IIssueExistsChecker
 	 * @param array $params parameters needed for issue detection
 	 * @return object with success(true) if issue exists, success(false) otherwise
 	 */
-	public function produceIssue($person_id, $oe_kurzbz, $paramsForProducing);
+	//public function produceIssue($person_id, $oe_kurzbz, $paramsForProducing);
 }

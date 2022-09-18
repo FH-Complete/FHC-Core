@@ -43,7 +43,6 @@ abstract class IssueResolver_Controller extends JOB_Controller
 			}
 			else
 			{
-
 				$openIssues = getData($openIssuesRes);
 
 				foreach ($openIssues as $issue)

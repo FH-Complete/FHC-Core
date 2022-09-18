@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lib
+class PlausicheckLib
 {
 	private $_ci; // Code igniter instance
 
@@ -14,12 +14,5 @@ class Lib
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->model('', '');
-	}
-
-	public function getStudents()
-	{
-		$qry = '
-			
-		';
 	}
 }
