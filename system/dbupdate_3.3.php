@@ -6254,6 +6254,108 @@ if(!@$db->db_query("SELECT wahlname FROM public.tbl_person LIMIT 1"))
 		echo '<br>public.tbl_person: Spalte wahlname hinzugefügt';
 }
 
+// Adds Column wahlname to campus.vw_student
+if (!$result = @$db->db_query('SELECT wahlname FROM campus.vw_student LIMIT 1'))
+{
+	$qry = "
+		CREATE OR REPLACE VIEW campus.vw_student AS
+		SELECT tbl_benutzer.uid,
+		    tbl_student.matrikelnr,
+		    tbl_student.prestudent_id,
+		    tbl_student.studiengang_kz,
+		    tbl_student.semester,
+		    tbl_student.verband,
+		    tbl_student.gruppe,
+		    tbl_benutzer.person_id,
+		    tbl_benutzer.alias,
+		    tbl_person.geburtsnation,
+		    tbl_person.sprache,
+		    tbl_person.anrede,
+		    tbl_person.titelpost,
+		    tbl_person.titelpre,
+		    tbl_person.nachname,
+		    tbl_person.vorname,
+		    tbl_person.vornamen,
+		    tbl_person.gebdatum,
+		    tbl_person.gebort,
+		    tbl_person.gebzeit,
+		    tbl_person.foto,
+		    tbl_person.anmerkung,
+		    tbl_person.homepage,
+		    tbl_person.svnr,
+		    tbl_person.ersatzkennzeichen,
+		    tbl_person.geschlecht,
+		    tbl_person.familienstand,
+		    tbl_person.anzahlkinder,
+		    tbl_benutzer.aktiv,
+		    tbl_student.updateamum,
+		    tbl_student.updatevon,
+		    tbl_student.insertamum,
+		    tbl_student.insertvon,
+		    tbl_student.ext_id,
+		    tbl_benutzer.updateaktivam,
+		    tbl_benutzer.updateaktivvon,
+		    tbl_benutzer.aktivierungscode,
+		    ( SELECT tbl_kontakt.kontakt
+		           FROM tbl_kontakt
+		          WHERE tbl_kontakt.person_id = tbl_person.person_id AND tbl_kontakt.kontakttyp::text = 'email'::text
+		          ORDER BY tbl_kontakt.zustellung DESC
+		         LIMIT 1) AS email_privat,
+		    tbl_person.wahlname
+		   FROM public.tbl_student
+		     JOIN public.tbl_benutzer ON tbl_student.student_uid::text = tbl_benutzer.uid::text
+		     JOIN public.tbl_person USING (person_id);";
+
+	 if (!$db->db_query($qry))
+ 		echo '<strong>campus.vw_student: '.$db->db_last_error().'</strong><br>';
+ 	else
+ 		echo '<br>campus.vw_student: added column wahlname';
+}
+
+
+// Adds Column wahlname to campus.vw_benutzer
+if (!$result = @$db->db_query('SELECT wahlname FROM campus.vw_benutzer LIMIT 1'))
+{
+	$qry = "
+		CREATE OR REPLACE VIEW campus.vw_benutzer AS
+			SELECT tbl_benutzer.person_id,
+		    tbl_benutzer.uid,
+		    tbl_benutzer.alias,
+		    tbl_person.geburtsnation,
+		    tbl_person.sprache,
+		    tbl_person.anrede,
+		    tbl_person.titelpost,
+		    tbl_person.titelpre,
+		    tbl_person.nachname,
+		    tbl_person.vorname,
+		    tbl_person.vornamen,
+		    tbl_person.gebdatum,
+		    tbl_person.gebort,
+		    tbl_person.gebzeit,
+		    tbl_person.foto,
+		    tbl_person.geschlecht,
+		    tbl_person.anmerkung,
+		    tbl_person.homepage,
+		    tbl_person.svnr,
+		    tbl_person.ersatzkennzeichen,
+		    tbl_person.familienstand,
+		    tbl_person.anzahlkinder,
+		    tbl_benutzer.aktiv,
+		    tbl_benutzer.insertamum,
+		    tbl_benutzer.insertvon,
+		    tbl_benutzer.updateamum,
+		    tbl_benutzer.updatevon,
+		    tbl_benutzer.ext_id,
+		    tbl_person.wahlname
+		   FROM public.tbl_benutzer
+		     JOIN public.tbl_person USING (person_id);";
+
+	 if (!$db->db_query($qry))
+ 		echo '<strong>campus.vw_benutzer: '.$db->db_last_error().'</strong><br>';
+ 	else
+ 		echo '<br>campus.vw_benutzer: added column wahlname';
+}
+
 // Creates table public.tbl_gruppe_manager if it doesn't exist and grants privileges
 if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1'))
 {
