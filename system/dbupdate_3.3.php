@@ -6356,6 +6356,68 @@ if (!$result = @$db->db_query('SELECT wahlname FROM campus.vw_benutzer LIMIT 1')
  		echo '<br>campus.vw_benutzer: added column wahlname';
 }
 
+// Adds Column wahlname to campus.vw_mitarbeiter
+if (!$result = @$db->db_query('SELECT wahlname FROM campus.vw_mitarbeiter LIMIT 1'))
+{
+	$qry = "
+		CREATE OR REPLACE VIEW campus.vw_mitarbeiter AS
+		SELECT tbl_benutzer.uid,
+			tbl_mitarbeiter.ausbildungcode,
+			tbl_mitarbeiter.personalnummer,
+			tbl_mitarbeiter.kurzbz,
+			tbl_mitarbeiter.lektor,
+			tbl_mitarbeiter.fixangestellt,
+			tbl_mitarbeiter.telefonklappe,
+			tbl_benutzer.person_id,
+			tbl_benutzer.alias,
+			tbl_person.geburtsnation,
+			tbl_person.sprache,
+			tbl_person.anrede,
+			tbl_person.titelpost,
+			tbl_person.titelpre,
+			tbl_person.nachname,
+			tbl_person.vorname,
+			tbl_person.vornamen,
+			tbl_person.gebdatum,
+			tbl_person.gebort,
+			tbl_person.gebzeit,
+			tbl_person.foto,
+			tbl_mitarbeiter.anmerkung,
+			tbl_person.homepage,
+			tbl_person.svnr,
+			tbl_person.ersatzkennzeichen,
+			tbl_person.geschlecht,
+			tbl_person.familienstand,
+			tbl_person.anzahlkinder,
+			tbl_mitarbeiter.ort_kurzbz,
+			tbl_benutzer.aktiv,
+			tbl_mitarbeiter.bismelden,
+			tbl_mitarbeiter.standort_id,
+			tbl_mitarbeiter.updateamum,
+			tbl_mitarbeiter.updatevon,
+			tbl_mitarbeiter.insertamum,
+			tbl_mitarbeiter.insertvon,
+			tbl_mitarbeiter.ext_id,
+			tbl_benutzer.aktivierungscode,
+			( SELECT tbl_kontakt.kontakt
+				   FROM tbl_kontakt
+				  WHERE tbl_kontakt.person_id = tbl_person.person_id AND tbl_kontakt.kontakttyp::text = 'email'::text
+				  ORDER BY tbl_kontakt.zustellung DESC
+				 LIMIT 1) AS email_privat,
+			tbl_benutzer.updateaktivam,
+			tbl_benutzer.updateaktivvon,
+			GREATEST(tbl_person.updateamum, tbl_benutzer.updateamum, tbl_mitarbeiter.updateamum) AS lastupdate,
+			tbl_person.wahlname
+			FROM public.tbl_mitarbeiter
+			 JOIN public.tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
+			 JOIN public.tbl_person USING (person_id);";
+
+	 if (!$db->db_query($qry))
+ 		echo '<strong>campus.vw_mitarbeiter: '.$db->db_last_error().'</strong><br>';
+ 	else
+ 		echo '<br>campus.vw_mitarbeiter: added column wahlname';
+}
+
 // Creates table public.tbl_gruppe_manager if it doesn't exist and grants privileges
 if (!$result = @$db->db_query('SELECT 1 FROM public.tbl_gruppe_manager LIMIT 1'))
 {
