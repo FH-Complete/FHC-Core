@@ -211,6 +211,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'getstudienplancontent' && isset($_
 		document.getElementById('nachname').disabled = val;
 		document.getElementById('vorname').disabled = val;
 		document.getElementById('vornamen').disabled = val;
+		document.getElementById('wahlname').disabled = val;
 		document.getElementById('geschlecht').disabled = val;
 		document.getElementById('geburtsdatum').disabled = val;
 
@@ -374,6 +375,7 @@ $anrede = (isset($_REQUEST['anrede'])?$_REQUEST['anrede']:'');
 $nachname = (isset($_REQUEST['nachname'])?$_REQUEST['nachname']:'');
 $vorname = (isset($_REQUEST['vorname'])?$_REQUEST['vorname']:'');
 $vornamen = (isset($_REQUEST['vornamen'])?$_REQUEST['vornamen']:'');
+$wahlname = (isset($_REQUEST['wahlname'])?$_REQUEST['wahlname']:'');
 $geschlecht = (isset($_REQUEST['geschlecht'])?$_REQUEST['geschlecht']:'');
 $geburtsdatum = (isset($_REQUEST['geburtsdatum'])?$_REQUEST['geburtsdatum']:'');
 $adresse = (isset($_REQUEST['adresse'])?$_REQUEST['adresse']:'');
@@ -396,6 +398,7 @@ $anrede = utf8($anrede);
 $nachname = utf8($nachname);
 $vorname = utf8($vorname);
 $vornamen = utf8($vornamen);
+$wahlname = utf8($wahlname);
 $geschlecht = utf8($geschlecht);
 $geburtsdatum = utf8($geburtsdatum);
 $adresse = utf8($adresse);
@@ -543,6 +546,7 @@ if (isset($_POST['save']))
 			$geburtsdatum = $person->gebdatum;
 			$vorname = $person->vorname;
 			$vornamen = $person->vornamen;
+			$wahlname = $person->wahlname;
 			$nachname = $person->nachname;
 			$titel = $person->titelpre;
 			$titelpost = $person->titelpost;
@@ -559,6 +563,7 @@ if (isset($_POST['save']))
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
 		$person->vornamen = $vornamen;
+		$person->wahlname = $wahlname;
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
 		$person->geburtsnation = $geburtsnation;
@@ -942,6 +947,7 @@ echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlen
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname </td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Weitere Vornamen </td><td><input type="text" id="vornamen" maxlength="32" name="vornamen" value="'.$vornamen.'" /></td></tr>';
+echo '<tr><td>Wahlname </td><td><input type="text" id="wahlname" maxlength="32" name="wahlname" value="'.$wahlname.'" /></td></tr>';
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" required="required" autofocus/></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
@@ -1142,7 +1148,7 @@ if ($where != '')
 
 	if ($result = $db->db_query($qry))
 	{
-		echo '<table style="margin-top: 0px" class="tablesorter" id="t1"><thead><tr><th></th><th>Nachname</th><th>Vorname</th><th>Weitere<br/>Vornamen</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr></thead>';
+		echo '<table style="margin-top: 0px" class="tablesorter" id="t1"><thead><tr><th></th><th>Nachname</th><th>Vorname</th><th>Wahlname</th><th>Weitere<br/>Vornamen</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr></thead>';
 		echo '<tfoot><tr><td style="padding: 4px"><input type="radio" name="person_id" value="0" onclick="disablefields(this)"></td><td style="padding: 4px" colspan="3">Neue Person anlegen</td></tr></tfoot><tbody>';
 		while($row = $db->db_fetch_object($result))
 		{
@@ -1161,7 +1167,7 @@ if ($where != '')
 			}
 			$status = mb_substr($status, 0, mb_strlen($status)-2);
 
-			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
+			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->wahlname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
 			if ($result_adr = $db->db_query($qry_adr))
 				while ($row_adr = $db->db_fetch_object($result_adr))

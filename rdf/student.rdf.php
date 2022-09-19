@@ -196,6 +196,7 @@ function draw_content_liste($row)
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
 			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
+			<STUDENT:wahlname><![CDATA['.$row->wahlname.']]></STUDENT:wahlname>
 			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
 			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
@@ -304,6 +305,7 @@ function draw_content($row)
 			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
 			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
+			<STUDENT:wahlname><![CDATA['.$row->wahlname.']]></STUDENT:wahlname>
 			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
 			<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
@@ -424,6 +426,7 @@ function draw_empty_content()
 			<STUDENT:titelpre><![CDATA[]]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA[]]></STUDENT:titelpost>
 			<STUDENT:vornamen><![CDATA[]]></STUDENT:vornamen>
+			<STUDENT:wahlname><![CDATA[]]></STUDENT:wahlname>
 			<STUDENT:vorname><![CDATA[]]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA[KEINE RESULTATE]]></STUDENT:nachname>
 			<STUDENT:geburtsdatum><![CDATA[]]></STUDENT:geburtsdatum>
@@ -609,7 +612,7 @@ if($xmlformat=='rdf')
 
 		$sql_query="
 		SELECT
-			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, vornamen, geschlecht,
+			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, wahlname, vornamen, geschlecht,
 			nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
@@ -879,8 +882,11 @@ if($xmlformat=='rdf')
 					WHERE
 						UPPER(nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(wahlname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
-						UPPER(nachname || ' ' || vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).");";
+						UPPER(nachname || ' ' || vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(wahlname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(nachname || ' ' || wahlname) = UPPER(".$db->db_add_param($searchItems_string_orig).");";
 
 				if($db->db_query($qry))
 				{
@@ -931,6 +937,8 @@ if($xmlformat=='rdf')
 				{
 					$qry .= "	UPPER(vorname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								UPPER(nachname || ' ' || vorname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(nachname || ' ' || wahlname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(wahlname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								student_uid ~* LOWER(".$db->db_add_param($searchItems_string).")";
 				}
 				else
@@ -1194,6 +1202,7 @@ else
 				<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
 				<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
 				<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
+				<wahlname><![CDATA['.$student->wahlname.']]></wahlname>
 				<vorname><![CDATA['.$student->vorname.']]></vorname>
 				<nachname><![CDATA['.$student->nachname.']]></nachname>
 				<matrikelnummer><![CDATA['.$student->matrikelnr.']]></matrikelnummer>
