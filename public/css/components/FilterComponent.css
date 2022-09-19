@@ -1,23 +1,18 @@
 .filter-header-title {
-	font-weight: bold;
-	font-size: 16px;
-	text-decoration: none;
-	color: #333;
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	padding-top: 0.75rem !important;
+	text-align: right;
+}
+
+.filter-header-title-span-filter {
+	margin-right: 7px;
+}
+
+.filter-header-title-span-icon {
+	margin-right: 3px;
 	cursor: pointer;
 }
 
-.filter-filter-options {
-	margin-bottom: 30px;
-}
-
 .filter-options-div {
-	margin-bottom: 12px;
-	padding-bottom: 12px;
-	border-bottom-style: solid;
-	border-bottom-color: rgba(0, 0, 0, 0.125);
-	border-bottom-width: 1px;
+	padding: 10px;
 }
 
 .filter-dnd-area {
@@ -63,5 +58,9 @@
         height: 100%;
         margin-left: 3px;
         border-right: 2px solid #428bca;
+}
+
+.filter-table-dataset {
+	margin-top: 20px;
 }
 

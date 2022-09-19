@@ -103,13 +103,13 @@
 			if ($dialoglib === true) generateCSSsInclude('public/css/DialogLib.css');
 
 			// VUE FilterWidget CSS
-			if ($filtercomponent === true) generateCSSsInclude('public/css/FilterComponent.css');
+			if ($filtercomponent === true) generateCSSsInclude('public/css/components/FilterComponent.css');
 
 			// FilterWidget CSS
 			if ($filterwidget === true) generateCSSsInclude('public/css/FilterWidget.css');
 
 			// VUE NavigationWidget CSS
-			if ($navigationcomponent === true) generateCSSsInclude('public/css/NavigationComponent.css');
+			if ($navigationcomponent === true) generateCSSsInclude('public/css/components/NavigationComponent.css');
 
 			// NavigationWidget CSS
 			if ($navigationwidget === true) generateCSSsInclude('public/css/NavigationWidget.css');

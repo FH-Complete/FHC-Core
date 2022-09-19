@@ -28,6 +28,7 @@ export const CoreFilterCmpt = {
 		CoreFetchCmpt
 	},
 	props: {
+		title: String,
 		filterType: {
 			type: String,
 			required: true
@@ -38,6 +39,7 @@ export const CoreFilterCmpt = {
 	data: function() {
 		return {
 			// FilterCmpt properties
+			filterName: null,
 			fields: null,
 			dataset: null,
 			datasetMetadata: null,
@@ -158,6 +160,7 @@ export const CoreFilterCmpt = {
 			if (CoreRESTClient.hasData(response))
 			{
 				let data = CoreRESTClient.getData(response);
+				this.filterName = data.filterName;
 				this.dataset = data.dataset;
 				this.datasetMetadata = data.datasetMetadata;
 				this.fields = data.fields;
@@ -430,130 +433,185 @@ export const CoreFilterCmpt = {
 			@data-fetched="fetchCmptDataFetched">
 		</core-fetch-cmpt>
 
-		<div class="card filter-filter-options">
-			<div class="card-header filter-header-title" data-bs-toggle="collapse" data-bs-target="#collapseFilterHeader">
-				Filter options
+		<div class="row">
+			<div class="col-lg-12">
+				<h3 class="page-header">
+					{{ title }}
+				</h3>
 			</div>
-			<div id="collapseFilterHeader" class="card-body collapse">
-				<!-- Filter fields options -->
-				<div class="filter-options-div">
-					<div class="filter-dnd-area">
-						<template v-for="fieldToDisplay in selectedFields">
-							<div
-								class="filter-dnd-object" draggable="true" @dragover="handlerDragOver">
-								{{ fieldToDisplay}}
-								<button
-									type="button"
-									class="btn-close"
-									v-bind:field-to-remove="fieldToDisplay"
-									@click=handlerRemoveSelectedField>
-								</button>
-							</div>
-						</template>
-					</div>
-					<select class="form-select form-select-sm" @change=handlerAddSelectedField>
-						<option value="">Select a field to be displayed...</option>
-						<template v-for="hiddenField in notSelectedFields">
-							<option v-bind:value="hiddenField">{{ hiddenField}}</option>
-						</template>
-					</select>
-				</div>
-				<!-- Filter options -->
-				<div class="filter-options-div">
-					<div>
-						<select class="form-select form-select-sm" @change=handlerAddFilterField>
-							<option value="">Add a field to the filter...</option>
-							<template v-for="notFilterField in notFilterFields">
-								<option v-bind:value="notFilterField">{{ notFilterField}}</option>
+		</div>
+
+		<div id="filterCollapsables">
+
+			<div class="filter-header-title">
+				<span class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
+				<span data-bs-toggle="collapse" data-bs-target="#collapseFilters" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
+				<span data-bs-toggle="collapse" data-bs-target="#collapseColumns" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
+			</div>
+
+			<div id="collapseColumns" class="card-body collapse" data-bs-parent="#filterCollapsables">
+				<div class="card">
+					<!-- Filter fields options -->
+					<div class="row card-body filter-options-div">
+						<div class="filter-dnd-area">
+							<template v-for="fieldToDisplay in selectedFields">
+								<div
+									class="filter-dnd-object" draggable="true" @dragover="handlerDragOver">
+									{{ fieldToDisplay}}
+									<button
+										type="button"
+										class="btn-close"
+										v-bind:field-to-remove="fieldToDisplay"
+										@click=handlerRemoveSelectedField>
+									</button>
+								</div>
 							</template>
-						</select>
-					</div>
-					<div id="filterFields" class="filter-filter-fields">
-						<template v-for="filterField in filterFields">
-							<!-- Numeric -->
-							<div v-if="filterField.type.toLowerCase().indexOf('int') >= 0" class="input-group mb-3">
-								<input type="hidden" name="fieldName" v-bind:value="filterField.name">
-								<span class="input-group-text">{{ filterField.name}}</span>
-								<select class="form-select form-select-sm" name="operation" v-model="filterField.operation">
-									<option value="equal">Equal</option>
-									<option value="nequal">Not equal</option>
-									<option value="gt">Greater then</option>
-									<option value="lt">Less then</option>
-								</select>
-								<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
-								<button
-									class="btn btn-sm btn-outline-dark"
-									type="button"
-									v-bind:field-to-remove="filterField.name"
-									@click=handlerRemoveFilterField>
-									&emsp;X&emsp;
-								</button>
-							</div>
-							<!-- Text -->
-							<div
-								v-if="filterField.type.toLowerCase().indexOf('varchar') >= 0
-									|| filterField.type.toLowerCase().indexOf('text') >= 0
-									|| filterField.type.toLowerCase().indexOf('bpchar') >= 0"
-								class="input-group mb-3">
-								<input type="hidden" name="fieldName" v-bind:value="filterField.name">
-								<span class="input-group-text">{{ filterField.name}}</span>
-								<select class="form-select form-select-sm" name="operation" v-model="filterField.operation">
-									<option value="contains">Contains</option>
-									<option value="ncontains">Does not contain</option>
-								</select>
-								<input type="text" class="form-control" v-bind:value="filterField.condition" name="condition">
-								<button
-									class="btn btn-sm btn-outline-dark"
-									type="button"
-									v-bind:field-to-remove="filterField.name"
-									@click=handlerRemoveFilterField>
-									&emsp;X&emsp;
-								</button>
-							</div>
-							<!-- Timestamp and date -->
-							<div
-								v-if="filterField.type.toLowerCase().indexOf('timestamp') >= 0
-									|| filterField.type.toLowerCase().indexOf('date') >= 0"
-								class="input-group mb-3">
-								<input type="hidden" name="fieldName" v-bind:value="filterField.name">
-								<span class="input-group-text">{{ filterField.name}}</span>
-								<select class="form-select form-select-sm" name="operation" v-model="filterField.operation">
-									<option value="gt">Greater then</option>
-									<option value="lt">Less then</option>
-									<option value="set">Is set</option>
-									<option value="nset">Is not set</option>
-								</select>
-								<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
-								<select class="form-select form-select-sm" name="option" v-model="filterField.option">
-									<option value="minutes">Minutes</option>
-									<option value="hours">Hours</option>
-									<option value="days">Days</option>
-									<option value="months">Months</option>
-								</select>
-								<button
-									class="btn btn-sm btn-outline-dark"
-									type="button"
-									v-bind:field-to-remove="filterField.name"
-									@click=handlerRemoveFilterField>
-									&emsp;X&emsp;
-								</button>
-							</div>
-						</template>
-					</div>
-					<div>
-						<button type="button" class="btn btn-sm btn-outline-dark" @click=handlerApplyFilterFields>Apply changes</button>
+						</div>
+						<div class="col-7">
+							<select class="form-select" @change=handlerAddSelectedField>
+								<option value="">Wählen Sie ein anzuzeigendes Feld aus...</option>
+								<template v-for="hiddenField in notSelectedFields">
+									<option v-bind:value="hiddenField">{{ hiddenField }}</option>
+								</template>
+							</select>
+						</div>
 					</div>
 				</div>
-				<!-- Filter save options -->
-				<div class="input-group">
-					<input type="text" class="form-control" placeholder="Custom filter name" id="customFilterName">
-					<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Save</button>
+			</div>
+
+			<div id="collapseFilters" class="card-body collapse" data-bs-parent="#filterCollapsables">
+				<div class="card">
+				<!-- Filter options -->
+					<div class="card-body filter-options-div">
+						<div class="col-9">
+							<select class="form-select" @change=handlerAddFilterField>
+								<option value="">Feld zum Filter hinzufügen...</option>
+								<template v-for="notFilterField in notFilterFields">
+									<option v-bind:value="notFilterField">{{ notFilterField}}</option>
+								</template>
+							</select>
+						</div>
+						<div id="filterFields" class="filter-filter-fields">
+							<template v-for="filterField in filterFields">
+
+								<!-- Numeric -->
+								<div v-if="filterField.type.toLowerCase().indexOf('int') >= 0" class="row">
+									<div class="col-3">
+										<input type="hidden" name="fieldName" v-bind:value="filterField.name">
+										<span class="input-group-text">{{ filterField.name}}</span>
+									</div>
+									<div class="col-2">
+										<select class="form-select" name="operation" v-model="filterField.operation">
+											<option value="equal">Gleich</option>
+											<option value="nequal">Nicht gleich</option>
+											<option value="gt">Größer als</option>
+											<option value="lt">Weniger als</option>
+										</select>
+									</div>
+									<div class="col-3">
+										<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
+									</div>
+									<div class="col">
+										<button
+											class="btn btn-outline-dark"
+											type="button"
+											v-bind:field-to-remove="filterField.name"
+											@click=handlerRemoveFilterField>
+											&emsp;X&emsp;
+										</button>
+									</div>
+								</div>
+
+								<!-- Text -->
+								<div
+									v-if="filterField.type.toLowerCase().indexOf('varchar') >= 0
+										|| filterField.type.toLowerCase().indexOf('text') >= 0
+										|| filterField.type.toLowerCase().indexOf('bpchar') >= 0"
+									class="row">
+									<div class="col-3">
+										<input type="hidden" name="fieldName" v-bind:value="filterField.name">
+										<span class="input-group-text">{{ filterField.name}}</span>
+									</div>
+									<div class="col-2">
+										<select class="form-select" name="operation" v-model="filterField.operation">
+											<option value="contains">Enthält</option>
+											<option value="ncontains">Enthält nicht</option>
+										</select>
+									</div>
+									<div class="col-3">
+										<input type="text" class="form-control" v-bind:value="filterField.condition" name="condition">
+									</div>
+									<div class="col">
+										<button
+											class="btn btn-outline-dark"
+											type="button"
+											v-bind:field-to-remove="filterField.name"
+											@click=handlerRemoveFilterField>
+											&emsp;X&emsp;
+										</button>
+									</div>
+								</div>
+
+								<!-- Timestamp and date -->
+								<div
+									v-if="filterField.type.toLowerCase().indexOf('timestamp') >= 0
+										|| filterField.type.toLowerCase().indexOf('date') >= 0"
+									class="row">
+									<div class="col-3">
+										<input type="hidden" name="fieldName" v-bind:value="filterField.name">
+										<span class="input-group-text">{{ filterField.name}}</span>
+									</div>
+									<div class="col-2">
+										<select class="form-select" name="operation" v-model="filterField.operation">
+											<option value="gt">Größer als</option>
+											<option value="lt">Weniger als</option>
+											<option value="set">Eingestellt ist</option>
+											<option value="nset">Eingestellt nicht ist</option>
+										</select>
+									</div>
+									<div class="col-1">
+										<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
+									</div>
+									<div class="col-2">
+										<select class="form-select" name="option" v-model="filterField.option">
+											<option value="minutes">Minuten</option>
+											<option value="hours">Stunden</option>
+											<option value="days">Tage</option>
+											<option value="months">Monate</option>
+										</select>
+									</div>
+									<div class="col">
+										<button
+											class="btn btn-outline-dark"
+											type="button"
+											v-bind:field-to-remove="filterField.name"
+											@click=handlerRemoveFilterField>
+											&emsp;X&emsp;
+										</button>
+									</div>
+								</div>
+							</template>
+						</div>
+
+						<!-- Filter save options -->
+						<div class="row">
+							<div class="col-7">
+								<div class="input-group">
+									<input type="text" class="form-control" placeholder="Filternamen eingeben..." id="customFilterName">
+									<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Fitler speichern</button>
+								</div>
+							</div>
+							<div class="col">
+								<button type="button" class="btn btn-outline-dark" @click=handlerApplyFilterFields>Filter anwenden</button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- Tabulator -->
-		<div id="filterTableDataset"></div>
+		<div id="filterTableDataset" class="filter-table-dataset"></div>
 	`
 };
 
