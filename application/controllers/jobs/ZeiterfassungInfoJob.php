@@ -35,6 +35,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
                $this->load->model('ressource/Zeitsperre_model', 'ZeitsperreModel');
                $this->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
+               $this->load->model('person/Person_model', 'PersonModel');
 
                // Load libraries
                $this->load->library('PermissionLib');
@@ -137,7 +138,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
                        // Set mail recipient
                        $to = $ma->uid.'@'. DOMAIN;
 
-                       $ma_uid = $ma->uid;
+                       $ma_name = getData($this->PersonModel->getFullName($ma->uid));
                        $supVac ='';
                        $SupMonth ='';
                        $EmpMonth ='';
@@ -153,7 +154,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
 
                        // Prepare mail content
                        $content_data_arr = array(
-                               'ma_uid'        => $ma_uid,
+                               'ma_name'        => $ma_name,
                                'SupVac'        => $supVac,
                                'SupMonth'      => $SupMonth,
                                'EmpMonth'      => $EmpMonth,
