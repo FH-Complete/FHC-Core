@@ -218,7 +218,7 @@ if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POS
 
 				$from='vilesci@'.DOMAIN;
 
-				//Sanchomail mit Vorlage Sancho Mail Zeitausgleich
+				//Sanchomail mit Vorlage Sancho Mail Urlaub
 				$template_data = array(
 					'vorgesetzter' => $fullName,
 					'nameMitarbeiter' => $nameMitarbeiter,
@@ -428,14 +428,27 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 
 				$from='vilesci@'.DOMAIN;
 
-				//Sanchomail mit Vorlage Sancho Mail Zeitausgleich
+				// Überprüfen, ob addon casetime aktiv ist
+				$addon_obj = new addon();
+				$addoncasetime = $addon_obj->checkActiveAddon("casetime");
+				$urlaubssaldo = "";
+				if($addoncasetime)
+				{
+					require_once('../../../addons/casetime/config.inc.php');
+					require_once('../../../addons/casetime/include/functions.inc.php');
+					$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
+					$urlaubssaldo = "Aktueller Urlaubssaldo: ". $urlaubssaldo->{'AktuellerStand'} . " Tage";
+				}
+
+				//Sanchomail mit Vorlage Sancho Mail Urlaub Neu
 				$template_data = array(
 					'vorgesetzter' => $fullName,
 					'nameMitarbeiter' => $nameMitarbeiter,
 					'beschreibung' =>$beschreibung,
 					'vonDatum' => $von,
 					'bisDatum' => $bis,
-					'Link'=> $link
+					'Link'=> $link,
+					'urlaubssaldo' => $urlaubssaldo
 				);
 
 
@@ -596,6 +609,7 @@ echo '
 			}
 		});
 		</script>';
+
 ?>
 		<script language="Javascript">
 		function conf_del()
