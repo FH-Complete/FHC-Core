@@ -6,9 +6,9 @@
 class PlausiIssueProducer extends JOB_Controller
 {
 	const PLAUSI_ISSUES_FOLDER = 'issues/plausichecks';
-	const EXECUTE_PLAUSI_CHECK_METHOD_NAME = 'executePlausiCheck'
+	const EXECUTE_PLAUSI_CHECK_METHOD_NAME = 'executePlausiCheck';
 
-	private _fehlerLibMappings;
+	private $_fehlerLibMappings;
 
 	public function __construct()
 	{
@@ -17,7 +17,7 @@ class PlausiIssueProducer extends JOB_Controller
 		// set fehler which can be produced by the job
 		// structure: fehler_kurzbz => class (library) name for resolving
 		$this->_fehlerLibMappings = array(
-			'' => ''
+			'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent'
 			//'zgvDatumInZukunft' => 'ZgvDatumInZukunft',
 			//'zgvDatumVorGeburtsdatum' => 'ZgvDatumVorGeburtsdatum',
 			//'zgvMasterDatumInZukunft' => 'ZgvMasterDatumInZukunft',
@@ -47,20 +47,17 @@ class PlausiIssueProducer extends JOB_Controller
 
 			if (isError($studiensemesterRes)) $this->logError(getError($studiensemesterRes));
 			
-			if (hasData($studiensemesterRes))
-			{
-				$studiensemester_kurzbz = getData($studiensemesterRes);
-			}
+			if (hasData($studiensemesterRes)) $studiensemester_kurzbz = getData($studiensemesterRes);
 		}
-
 
 		$this->logInfo("Plausicheck issue producer job started");
 
 		foreach ($this->_fehlerLibMappings as $fehler_kurzbz => $libName)
 		{
 			// get path of library for issue to be produced
-			$issuesLibPath = DOC_ROOT . 'application/libraries' . self::PLAUSI_ISSUES_FOLDER;
-			$issuesLibFilePath = $issuesLibPath . '/' . $libName . '.php';
+			$issuesLibPath = DOC_ROOT . 'application/libraries/' . self::PLAUSI_ISSUES_FOLDER . '/';
+			//$issuesLibPath = base_url('application/libraries/' . self::PLAUSI_ISSUES_FOLDER . '/');
+			$issuesLibFilePath = $issuesLibPath . $libName . '.php';
 
 			// check if library file exists
 			if (!file_exists($issuesLibFilePath))
@@ -71,7 +68,7 @@ class PlausiIssueProducer extends JOB_Controller
 			}
 
 			// load library connected to fehlercode
-			$this->load->library($issuesLibPath . $libName);
+			$this->load->library(self::PLAUSI_ISSUES_FOLDER . '/'.$libName);
 
 			$lowercaseLibName = mb_strtolower($libName);
 
@@ -83,8 +80,13 @@ class PlausiIssueProducer extends JOB_Controller
 				continue;
 			}
 
+			// get the data needed for issue check
+			$paramsForCheck = array(
+				'studiensemester_kurzbz' => $studiensemester_kurzbz
+			);
+			
 			// call the function for checking for issue production
-			$executePlausiRes = $this->{$lowercaseLibName}->{self::EXECUTE_PLAUSI_CHECK_METHOD_NAME}();
+			$executePlausiRes = $this->{$lowercaseLibName}->{self::EXECUTE_PLAUSI_CHECK_METHOD_NAME}($paramsForCheck);
 
 			if (isError($executePlausiRes))
 			{
@@ -106,10 +108,10 @@ class PlausiIssueProducer extends JOB_Controller
 						$resolution_params = isset($plausiData['resolution_params']) ? $plausiData['resolution_params'] : null;
 						
 						// write the issue
-						$addIssueRes = $this->IssuesLib->addFhcIssue($fehler_kurzbz, $person_id, $oe_kurzbz, $fehlertext_params, $resolution_params);
+						$addIssueRes = $this->issueslib->addFhcIssue($fehler_kurzbz, $person_id, $oe_kurzbz, $fehlertext_params, $resolution_params);
 
 						if (isError($addIssueRes))
-							$this->logError(getError($behobenRes));
+							$this->logError(getError($addIssueRes));
 						else
 							$this->logInfo("Plausicheck issue " . $fehler_kurzbz . " successfully produced");
 					}
