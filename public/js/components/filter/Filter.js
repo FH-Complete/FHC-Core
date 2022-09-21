@@ -215,6 +215,20 @@ export const CoreFilterCmpt = {
 				};
 			}
 
+			for (let filtersCount = 0; filtersCount < personalFilters.length; filtersCount++)
+			{
+				let link = personalFilters[filtersCount].link;
+
+				if (link == null) link = '#';
+
+				filtersArray[filtersArray.length] = {
+					link: link + personalFilters[filtersCount].filter_id,
+					description: personalFilters[filtersCount].desc,
+					sort: filtersCount,
+					onClickCall: this.handlerGetFilterById
+				};
+			}
+
 			this.$emit(
 				'nwNewEntry',
 				{
