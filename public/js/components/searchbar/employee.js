@@ -28,9 +28,19 @@ export default {
                 <div class="mb-3"></div>
         
                 <div class="searchbar_table">
-        
+
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">OrgEinheit</div>
+                    <div class="searchbar_tablecell">Standard-Kostenstelle</div>
+                    <div class="searchbar_tablecell">
+                        <ul class="searchbar_inline_ul" v-if="res.standardkostenstelle.length > 0">
+                          <li v-for="(stdkst, idx) in res.standardkostenstelle" :key="idx">{{ stdkst }}</li>
+                        </ul>
+                        <span v-else="">keine</span>
+                    </div>
+                  </div>
+
+                  <div class="searchbar_tablerow">
+                    <div class="searchbar_tablecell">Organisations-Einheit</div>
                     <div class="searchbar_tablecell">
                         <ul class="searchbar_inline_ul" v-if="res.organisationunit_name.length > 0">
                           <li v-for="(oe, idx) in res.organisationunit_name" :key="idx">{{ oe }}</li>
@@ -49,7 +59,7 @@ export default {
                   </div>
         
                   <div class="searchbar_tablerow">
-                    <div class="searchbar_tablecell">Phone</div>
+                    <div class="searchbar_tablecell">Telefon</div>
                     <div class="searchbar_tablecell">
                         <a :href="this.telurl">
                           {{ res.phone }}
