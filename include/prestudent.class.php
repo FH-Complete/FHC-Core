@@ -2336,15 +2336,10 @@ class prestudent extends person
 		}
 
 		$qry = "SELECT count(*) as anzahl
-				FROM 	public.tbl_prestudent pt
+				FROM public.tbl_prestudent
 				JOIN public.tbl_prestudentstatus USING (prestudent_id)
 				JOIN public.tbl_studiengang USING (studiengang_kz)
 				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-				AND NOT EXISTS
-					(SELECT * FROM public.tbl_prestudentstatus ps
-					WHERE ps.prestudent_id = pt.prestudent_id
-					AND status_kurzbz not in ('Abbrecher'))
-				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
 				AND typ in ('b','m','d')";
 
 		if ($this->db_query($qry))
@@ -2378,11 +2373,11 @@ class prestudent extends person
 	/**
  * Prueft, ob eine Person Abbrecher war
  * @param int $person_id ID der zu überprüfenden Person.
- * @return true wenn vorhanden
+ * @return true wenn letzter Status Abbrecher und nicht Student ist
  *		 false wenn nicht vorhanden
  *		 false und errormsg wenn Fehler aufgetreten ist
  */
-public function isPastAbbrecher($person_id)
+public function isAbbrecher($person_id)
 {
 	if (!is_numeric($person_id))
 	{
@@ -2390,20 +2385,22 @@ public function isPastAbbrecher($person_id)
 		return false;
 	}
 
-	$qry = "SELECT count(*) as anzahl
-		FROM 	public.tbl_prestudent pt
-		JOIN public.tbl_prestudentstatus USING (prestudent_id)
-		JOIN public.tbl_studiengang USING (studiengang_kz)
-		WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-		AND status_kurzbz in ('Abbrecher')
-		AND typ in ('b','m','d')
+	$qry = "SELECT s.status_kurzbz
+			FROM public.tbl_prestudent
+			JOIN public.tbl_prestudentstatus s USING (prestudent_id)
+			JOIN public.tbl_studiengang USING (studiengang_kz)
+			WHERE person_id = ".$this->db_add_param($person_id)."
+			AND status_kurzbz in ('Abbrecher','Student')
+			AND typ in ('b','m','d')
+			ORDER BY s.bestaetigtam DESC NULLS LAST, s.insertamum DESC
+			LIMIT 1
 	 ";
 
 	if ($this->db_query($qry))
 	{
 		if ($row = $this->db_fetch_object())
 		{
-			if ($row->anzahl > 0)
+			if ($row->status_kurzbz == 'Abbrecher')
 			{
 				$this->errormsg = '';
 				return true;
