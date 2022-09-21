@@ -269,47 +269,49 @@ export const CoreFilterCmpt = {
 		 */
 		handlerApplyFilterFields: function(event) {
 			let filterFields = [];
-			let filterFieldDivs = document.getElementById('filterFields').getElementsByTagName('div');
+			let filterFieldDivRows = document.getElementById('filterFields').getElementsByClassName('row');
 
-			for (let i = 0; i< filterFieldDivs.length; i++)
+			for (let i = 0; i< filterFieldDivRows.length; i++)
 			{
 				let filterField = {};
 
-				for (let j = 0; j< filterFieldDivs[i].children.length; j++)
+				for (let j = 0; j< filterFieldDivRows[i].children.length; j++)
 				{
-					if (filterFieldDivs[i].children[j].name != null)
+					let filterColumn = filterFieldDivRows[i].children[j];
+					let filterColumnElement = filterColumn.children[0];
+
+					if (filterColumnElement.name != null)
 					{
 						// Condition
-						if (filterFieldDivs[i].children[j].name == 'condition' && filterFieldDivs[i].children[j].value == "")
+						if (filterColumnElement.name == 'condition' && filterColumnElement.value == "")
 						{
 							alert("Please fill all the filter options");
 							return;
 						}
-
 						// Name
-						if (filterFieldDivs[i].children[j].name == 'fieldName')
+						if (filterColumnElement.name == 'fieldName')
 						{
-							filterField.name = filterFieldDivs[i].children[j].value;
+							filterField.name = filterColumnElement.value;
 						}
 						// Operation
-						if (filterFieldDivs[i].children[j].name == 'operation')
+						if (filterColumnElement.name == 'operation')
 						{
-							filterField.operation = filterFieldDivs[i].children[j].value;
+							filterField.operation = filterColumnElement.value;
 						}
 						// Condition
-						if (filterFieldDivs[i].children[j].name == 'condition')
+						if (filterColumnElement.name == 'condition')
 						{
-							filterField.condition = filterFieldDivs[i].children[j].value;
+							filterField.condition = filterColumnElement.value;
 						}
 						// Option
-						if (filterFieldDivs[i].children[j].name == 'option')
+						if (filterColumnElement.name == 'option')
 						{
-							filterField.option = filterFieldDivs[i].children[j].value;
+							filterField.option = filterColumnElement.value;
 						}
 					}
 				}
 
-				filterFields.push(filterField);
+				if (Object.entries(filterField).length > 0) filterFields.push(filterField);
 			}
 
 			//
