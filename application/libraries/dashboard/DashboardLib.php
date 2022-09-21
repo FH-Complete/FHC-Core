@@ -94,4 +94,95 @@ class DashboardLib
 		return $userconfig;
 	}
 	
+	public function getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid) 
+	{
+		$override = $this->getOverride($dashboard_kurzbz, $uid);
+		if( null !== $override ) {
+			return $override;			
+		}
+		
+		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
+		
+		$emptyoverride = new stdClass();
+		$emptyoverride->dashboard_id = $dashboard->dashboard_id;
+		$emptyoverride->uid = $uid;
+		$emptyoverride->override = '{"widgets": {}}';
+		
+		return $emptyoverride;
+	}
+	
+	public function getPresetOrCreateEmptyPreset($dashboard_kurzbz, $funktion_kurzbz) 
+	{
+		$preset = $this->getPreset($dashboard_kurzbz, $funktion_kurzbz);
+		if( null !== $preset ) {
+			return $preset;			
+		}
+		
+		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
+		
+		$emptypreset = new stdClass();
+		$emptypreset->dashboard_id = $dashboard->dashboard_id;
+		$emptypreset->funktion_kurzbz = $funktion_kurzbz;
+		$emptypreset->preset = '{"widgets": {}}';
+		
+		return $emptypreset;
+	}
+	
+	public function getPreset($dashboard_kurzbz, $funktion_kurzbz) 
+	{
+		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
+		$preset = null;
+		
+		$result = $this->_ci->DashboardPresetModel
+			->getPresetByDashboardAndFunktion($dashboard->dashboard_id, $funktion_kurzbz);
+		
+		if( isSuccess($result) && hasData($result) && ($presets = getData($result)) ) 
+		{
+			$preset = $presets[0];
+		}
+		
+		return $preset;
+	}
+
+	public function getOverride($dashboard_kurzbz, $uid) 
+	{
+		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
+		$override = null;
+		
+		$result = $this->_ci->DashboardOverrideModel
+			->getOverride($dashboard->dashboard_id, $uid);
+		
+		if( isSuccess($result) && hasData($result) && ($overrides = getData($result)) ) 
+		{
+			$override = $overrides[0];
+		}
+		
+		return $override;
+	}
+	
+	public function insertOrUpdatePreset($preset) 
+	{
+		if( isset($preset->preset_id) && $preset->preset_id > 0 ) 
+		{
+			$result = $this->_ci->DashboardPresetModel->update($preset->preset_id, $preset);
+		} else 
+		{
+			$result = $this->_ci->DashboardPresetModel->insert($preset);
+		}
+		
+		return $result;
+	}
+	
+	public function insertOrUpdateOverride($override) 
+	{
+		if( isset($override->override_id) && $override->override_id > 0 ) 
+		{
+			$result = $this->_ci->DashboardOverrideModel->update($override->override_id, $override);
+		} else 
+		{
+			$result = $this->_ci->DashboardOverrideModel->insert($override);
+		}
+		
+		return $result;
+	}	
 }
