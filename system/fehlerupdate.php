@@ -106,7 +106,202 @@ $fehlerArr = array(
 		'fehlertext' => 'Erworbene ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
+	),
+
+	/** Plausichecks **/
+	array(
+		'fehlercode' => 'CORE_INOUT_0007',
+		'fehler_kurzbz' => 'IncomingHeimatNationOesterreich',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Heimatnation bei Incoming Österreich',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_INOUT_0008',
+		'fehler_kurzbz' => 'IncomingOhneIoDatensatz',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Incoming hat keinen IO Datensatz',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STG_0001',
+		'fehler_kurzbz' => 'StgPrestudentUngleichStgStudent',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Studiengang des Prestudenten ist ungleich dem Studiengang des Studenten. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STG_0002',
+		'fehler_kurzbz' => 'OrgformStgUngleichOrgformPrestudent',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Organisationsform des Studienganges stimmt nicht mit Organisationsformen der Studenten überein. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STG_0003',
+		'fehler_kurzbz' => 'PrestudentMischformOhneOrgform',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Organisationsform ist für Studierenden/BewerberIn in Mischformstudiengang ist nicht eingetragen. (Studiensemester %s, prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STG_0004',
+		'fehler_kurzbz' => 'PrestudentStgUngleichStgStudienplan',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Studiengang des Prestudenten passt nicht zu Studiengang des Studienplans. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0001',
+		'fehler_kurzbz' => 'AbbrecherAktiv',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'AbbrecherIn hat aktiven Benutzer. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0002',
+		'fehler_kurzbz' => 'StudentstatusNachAbbrecher',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Aktiver Status nach Abbrecher Status. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0003',
+		'fehler_kurzbz' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Aktuelles Ausbildungssemester bei StudentIn stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0004',
+		'fehler_kurzbz' => 'InaktiverStudentAktiverStatus',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Inaktiver Benutzer hat aktiven Status. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0005',
+		'fehler_kurzbz' => 'InskriptionVorLetzerBismeldung',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Datum der Inskription liegt vor dem Datum der letzten BIS-Meldung. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0006',
+		'fehler_kurzbz' => 'DatumStudiensemesterFalscheReihenfolge',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Datum und Studiensemester sind bei den Status in falscher Reihenfolge. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0007',
+		'fehler_kurzbz' => 'AktiverStudentOhneStatus',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Aktive/r StudentIn ohne Status im Studiensemester %s (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0008',
+		'fehler_kurzbz' => 'StudienplanUngueltig',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Studienplan ist im Ausbildungssemester %s nicht gültig (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0009',
+		'fehler_kurzbz' => 'FalscheAnzahlAbschlusspruefungen',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Mehrere oder keine bestandenen Abschlussprüfungen (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0010',
+		'fehler_kurzbz' => 'DatumAbschlusspruefungFehlt',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Kein Abschlussprüfung Datum (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0011',
+		'fehler_kurzbz' => 'DatumSponsionFehlt',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Kein Sponsionsdatum (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0012',
+		'fehler_kurzbz' => 'BewerberNichtZumRtAngetreten',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Bewerber nicht zum Reihungstest angetreten (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0013',
+		'fehler_kurzbz' => 'AktSemesterNull',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Aktuelles Ausbildungssemester ist 0 (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0014',
+		'fehler_kurzbz' => 'AbschlussstatusFehlt',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Kein Abschlussstatus (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0001',
+		'fehler_kurzbz' => 'GbDatumWeitZurueck',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Geburtsdatum vor dem 01.01.1920.',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0002',
+		'fehler_kurzbz' => 'NationNichtOeAberGmeinde',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Nation der Adresse ist ungleich Österreich, es ist aber eine österreichische Gemeinde angegeben',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0003',
+		'fehler_kurzbz' => 'FalscheAnzahlHeimatadressen',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Es sind mehrere oder keine Heimatadressen eingetragen',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
+		'fehlercode' => 'CORE_PERSON_0004',
+		'fehler_kurzbz' => 'NationNichtOeAberGmeinde',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Es sind mehrere oder keine Zustelladressen eingetragen',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
 	)
+	/** Plausichecks end **/
 );
 
 // Loop through the filters array
