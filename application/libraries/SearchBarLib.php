@@ -125,11 +125,18 @@ class SearchBarLib
 				b.uid || \''.'@'.DOMAIN.'\' AS email,
 				TRIM(COALESCE(k.kontakt, \'\') || \' \' || COALESCE(m.telefonklappe, \'\')) AS phone,
 				\''.base_url(self::PHOTO_IMG_URL).'\' || p.person_id AS photo_url, 
-				ARRAY_AGG(DISTINCT(oe.bezeichnung)) AS standardkostenstelle 
+				ARRAY_AGG(DISTINCT(stdkst.bezeichnung)) AS standardkostenstelle 
 			  FROM public.tbl_mitarbeiter m
 			  JOIN public.tbl_benutzer b ON(b.uid = m.mitarbeiter_uid)
-			  JOIN public.tbl_benutzerfunktion bf ON bf.uid = b.uid AND bf.funktion_kurzbz = \'kstzuordnung\'  
-			  JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = bf.oe_kurzbz 
+			  JOIN (
+				SELECT o.bezeichnung, bf.uid
+				  FROM public.tbl_benutzerfunktion bf
+				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				 WHERE bf.funktion_kurzbz = \'kstzuordnung\'
+				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
+				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
+				GROUP BY o.bezeichnung, bf.uid
+			) stdkst ON stdkst.uid = b.uid 
 			  JOIN public.tbl_person p USING(person_id)
 			  JOIN (
 				SELECT o.bezeichnung, bf.uid
