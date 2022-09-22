@@ -263,4 +263,9 @@ define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
 define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
+
+
 ?>
