@@ -122,7 +122,7 @@ class SearchBarLib
 				p.person_id AS person_id,
 				p.vorname || \' \' || p.nachname AS name,
 				ARRAY_AGG(DISTINCT(org.bezeichnung)) AS organisationunit_name,
-				b.uid || \''.'@'.DOMAIN.'\' AS email,
+				COALESCE(b.alias, b.uid) || \''.'@'.DOMAIN.'\' AS email,
 				TRIM(COALESCE(k.kontakt, \'\') || \' \' || COALESCE(m.telefonklappe, \'\')) AS phone,
 				\''.base_url(self::PHOTO_IMG_URL).'\' || p.person_id AS photo_url, 
 				ARRAY_AGG(DISTINCT(stdkst.bezeichnung)) AS standardkostenstelle 
