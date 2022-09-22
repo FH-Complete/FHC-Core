@@ -614,7 +614,7 @@ export const CoreFilterCmpt = {
 							<div class="col-7">
 								<div class="input-group">
 									<input type="text" class="form-control" placeholder="Filternamen eingeben..." id="customFilterName">
-									<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Fitler speichern</button>
+									<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Filter speichern</button>
 								</div>
 							</div>
 							<div class="col">
