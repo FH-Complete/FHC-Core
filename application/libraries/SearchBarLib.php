@@ -155,6 +155,8 @@ class SearchBarLib
 			 WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			    OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			    OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			    OR org.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			    OR stdkst.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
 		');
 
