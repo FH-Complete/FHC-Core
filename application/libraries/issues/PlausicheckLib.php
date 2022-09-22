@@ -26,7 +26,7 @@ class PlausicheckLib
 	// Studiengang checks
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Studiengang should be the same for prestudent and student.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -58,7 +58,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Orgform of a Studiengang in Studienplan should be the same as orgform of student.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -100,7 +100,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Students in "mixed" Studiengang should have Orgform.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -132,7 +132,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Studiengang should be the same for prestudent and studienplan.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -142,7 +142,7 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				distinct tbl_person.vorname, tbl_person.nachname,
+				DISTINCT tbl_person.vorname, tbl_person.nachname,
 				tbl_prestudent.studiengang_kz as studiengang,
 				tbl_prestudent.prestudent_id
 			FROM
@@ -167,7 +167,7 @@ class PlausicheckLib
 	// Studentstatus checks
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Abbrecher cannot be active.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -196,7 +196,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * There shouldn't be any status after Abbrecher status.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -248,7 +248,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Ausbildungssemester of prestudent must be the same as Ausbildungssemester of prestudentstatus.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -258,7 +258,7 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				distinct(student.student_uid), prestudent.prestudent_id, status.ausbildungssemester,
+				DISTINCT(student.student_uid), prestudent.prestudent_id, status.ausbildungssemester,
 				lv.semester, student.studiengang_kz studiengang
 			FROM
 				public.tbl_student student
@@ -282,7 +282,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Students with inactive status shouldn't have an active Benutzer.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -292,7 +292,7 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				distinct(student.student_uid), student.studiengang_kz studiengang
+				DISTINCT(student.student_uid), student.studiengang_kz studiengang
 			FROM
 				public.tbl_benutzer benutzer
 				JOIN public.tbl_student student on(benutzer.uid = student.student_uid)
@@ -311,7 +311,9 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Students of a semester shouldn't start studies before the date of Bismeldung.
+	 * e.g. If student studies in WS2022 datum of status shouldn't be before 15.4.2020
+	 * e.g. If student studies in SS2022 datum of status shouldn't be before 15.11.2022
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -348,7 +350,7 @@ class PlausicheckLib
 			$students = getData($qryRes);
 
 			// get Bismeldedatum
-			$datumBis = $this->_getDateForInscription($studiensemester_kurzbz);
+			$datumBis = $this->_getBisdateFromSemester($studiensemester_kurzbz);
 
 			foreach ($students as $student)
 			{
@@ -378,7 +380,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Status Dates and status studysemester dates should be in correct order.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -461,7 +463,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Students with active Benutzer should have a status in the current semester.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -523,7 +525,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Studiengang should be valid in current Ausbildungssemester of prestudent.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -533,7 +535,7 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				distinct tbl_person.vorname, tbl_person.nachname,
+				DISTINCT tbl_person.vorname, tbl_person.nachname,
 				tbl_prestudent.prestudent_id,
 				tbl_studienplan.bezeichnung,
 				tbl_prestudent.studiengang_kz as studiengang,
@@ -569,7 +571,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Students with finished studies should have exactly one final exam.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -616,7 +618,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Date of final exam shouldn't be missing for Absolvent.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -643,7 +645,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Date of sponsion shouldn't be missing for Absolvent.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -670,7 +672,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Bewerber should have participated in Reihungstest.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -716,7 +718,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Current Ausbildungssemester shouldn't be 0.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -744,7 +746,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Prestudent should have a final status.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -789,7 +791,7 @@ class PlausicheckLib
 	// Person checks
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Birthdate is too long ago.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -820,11 +822,11 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Nation is not Austria, but address has austrian Gemeinde.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
-	public function getNationNichtOeAberGmeinde($person_id = null)
+	public function getNationNichtOesterreichAberGemeinde($person_id = null)
 	{
 		$params = array();
 
@@ -851,7 +853,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Students should have exactly one home address.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -885,7 +887,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Students should have exactly one delivery address.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -922,7 +924,7 @@ class PlausicheckLib
 	// I/O checks
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Incoming shouldn't have austrian home address.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -953,7 +955,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang must be the same for prestudent and student.
+	 * Incoming should have IN/OUT data.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -990,6 +992,9 @@ class PlausicheckLib
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
+	/**
+	 * Get final exams in a semester which are invalid (e.g. missing data)
+	 */
 	private function _getInvalidAbschlusspruefungen($studiensemester_kurzbz, $prestudent_id = null)
 	{
 		$params = array($studiensemester_kurzbz);
@@ -1026,7 +1031,10 @@ class PlausicheckLib
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
-	private function _getDateForInscription($studiensemester_kurzbz)
+	/**
+	 * Gets Bismeldedate from Studiensemester.
+	 */
+	private function _getBisdateFromSemester($studiensemester_kurzbz)
 	{
 		$semesterYear = substr($studiensemester_kurzbz, 2, 6);
 		$semesterType = substr($studiensemester_kurzbz, 0, 2);

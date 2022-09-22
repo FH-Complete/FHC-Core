@@ -279,7 +279,7 @@ $fehlerArr = array(
 	),
 	array(
 		'fehlercode' => 'CORE_PERSON_0002',
-		'fehler_kurzbz' => 'NationNichtOeAberGmeinde',
+		'fehler_kurzbz' => 'NationNichtOesterreichAberGemeinde',
 		'fehlercode_extern' => null,
 		'fehlertext' => 'Nation der Adresse ist ungleich Österreich, es ist aber eine österreichische Gemeinde angegeben',
 		'fehlertyp_kurzbz' => 'error',
