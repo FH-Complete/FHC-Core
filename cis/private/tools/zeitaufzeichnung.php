@@ -859,17 +859,6 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 	else if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
 		echo '<span id="triggerPhasenReset" style="color:#ff0000"><b>' .$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
 
-	//check if Arbeitspaket ausgewählt werden muss
-	else if (!$projekt->zeitaufzeichnung && !$projektphase_id)
-	{
-		echo '<span id="triggerPhasenReset" style="color:#ff0000"><b>' .$p->t("global/fehlerBeimSpeichernDerDaten").': Bitte ein Arbeitspaket wählen!</b></span>';
-	}
-
-	//check if phase bebuchbar
-	else if ($phaseBebuchbar == 'f')
-	{
-		echo '<span id="triggerPhasenReset" style="color:#ff0000"><b>' .$p->t("global/fehlerBeimSpeichernDerDaten").': Dieses Arbeitspaket darf nicht bebucht werden</b></span>';
-	}
 	// NOTE(chris): Save
 	else if (isset($_POST['save']) || isset($_POST['edit']))
 	{
