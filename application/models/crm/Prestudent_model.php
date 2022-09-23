@@ -667,4 +667,25 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery($query, array($prestudent_id));
 	}
 
+	/**
+	* get all prestudents of a Person_id with certain status
+	* @param $personId
+	* @param $prestudentStatus
+	* @return array all prestudents of the person (with certain status)
+	*/
+	public function getPrestudentsOfPersonId($personId, $prestudentStatus)
+	{
+		return $this->execQuery(
+			'SELECT prestudent_id
+				FROM public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				WHERE person_id = ?
+				AND get_rolle_prestudent(prestudent_id, null) = ?',
+			array(
+				$personId,
+				$prestudentStatus
+			)
+				);
+	}
+
 }

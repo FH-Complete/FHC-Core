@@ -114,18 +114,40 @@ class Abschlusspruefung_model extends DB_Model
 		return success($abschlusspruefungdata);
 	}
 
+/**
+* get all Absolvents with a Date Sponsion without filled master zgv field
+*/
 	public function getAbsolventsWithSponsionDate()
 	{
-		$qry = "SELECT ps.prestudent_id
+		$qry = "SELECT ps.prestudent_id, ap.sponsion, p.person_id
 						FROM lehre.tbl_abschlusspruefung ap
 						JOIN public.tbl_student st USING (student_uid)
 						JOIN public.tbl_prestudent ps USING (prestudent_id)
 						JOIN public.tbl_prestudentstatus pstatus USING (prestudent_id)
+						JOIN public.tbl_person p USING (person_id)
+						JOIN public.tbl_studiengang sg ON (sg.studiengang_kz = ps.studiengang_kz)
 						WHERE ap.sponsion < now()
-						AND  ap.sponsion >= '2022-07-01' --just for testing
 						AND ps.zgvmadatum is NULL
 						AND pstatus.status_kurzbz in ('Absolvent')
+						AND sg.typ != 'l'
 						ORDER BY ap.Sponsion DESC";
 		return $this->execQuery($qry);
 	}
+
+	/**
+ * update ZGV Master
+ */
+public function insertDatumSponsionAsZgvmadatum($prestudentId, $datumSponsion)
+{
+	return $this->execQuery(
+		'UPDATE public.tbl_prestudent
+			SET zgvmadatum = ?
+			WHERE prestudent_id = ?',
+		array(
+			$datumSponsion,
+			$prestudentId
+		)
+			);
+}
+
 }
