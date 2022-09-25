@@ -7,7 +7,7 @@ require_once('IPlausiChecker.php');
 /**
  *
  */
-class StgPrestudentUngleichStgStudent implements IPlausiChecker
+class FalscheAnzahlZustelladressen implements IPlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -16,10 +16,11 @@ class StgPrestudentUngleichStgStudent implements IPlausiChecker
 		$this->_ci =& get_instance(); // get code igniter instance
 
 		// pass parameters needed for plausicheck
+		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getPrestudentenStgUngleichStgStudent($studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getFalscheAnzahlZustelladressen($studiensemester_kurzbz, $studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 

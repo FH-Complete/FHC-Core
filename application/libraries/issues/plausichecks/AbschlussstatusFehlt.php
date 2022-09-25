@@ -7,7 +7,7 @@ require_once('IPlausiChecker.php');
 /**
  *
  */
-class StgPrestudentUngleichStgStudent implements IPlausiChecker
+class AbschlussstatusFehlt implements IPlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -19,7 +19,7 @@ class StgPrestudentUngleichStgStudent implements IPlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getPrestudentenStgUngleichStgStudent($studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getAbschlussstatusFehlt($studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
