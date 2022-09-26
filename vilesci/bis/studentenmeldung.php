@@ -1090,16 +1090,25 @@ function GenerateXMLStudentBlock($row)
 					$status=2;
 					$meldestatus='U';
 
-					// Unterbrechungsdatum
-					// letzten Status des letzten Semesters holen
-					$prestudent_last_status = new prestudent();
-					if ($prestudent_last_status->getLastStatus($row->prestudent_id, $psem))
-					{
-						// Datum setzen wenn aktiver Status vor Unterbrecher
-						if (in_array($prestudent_last_status->status_kurzbz, array('Student', 'Outgoing', 'Incoming', 'Praktikant', 'Diplomand')))
-							$unterbrechungsdatum = $rowstatus->datum;
-					}
+					$qryVorherigerErsterStatus = "
+						SELECT status.datum, status.status_kurzbz
+						FROM public.tbl_prestudentstatus status
+						JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+						WHERE prestudent_id = ".$db->db_add_param($row->prestudent_id)."
+						AND sem.start::date <= (SELECT start from public.tbl_studiensemester WHERE studiensemester_kurzbz = ".$db->db_add_param($ssem).")::date
+						ORDER BY sem.start DESC, status.datum DESC";
 
+					$unterbrechungsdatum = null;
+					if($result_unt = $db->db_query($qryVorherigerErsterStatus))
+					{
+						while($row_unt = $db->db_fetch_object($result_unt))
+						{
+							if($row_unt->status_kurzbz === 'Unterbrecher')
+								$unterbrechungsdatum = $row_unt->datum;
+							else
+								break;
+						}
+					}
 				}
 				else if($rowstatus->status_kurzbz=="Absolvent" )
 				{
