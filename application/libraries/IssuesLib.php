@@ -262,6 +262,7 @@ class IssuesLib
 							return error("Invalid parameters for resolution");
 					}
 
+					// insert new issue
 					return $this->_ci->IssueModel->insert(
 						array(
 							'fehlercode' => $fehlercode,
@@ -277,8 +278,8 @@ class IssuesLib
 						)
 					);
 				}
-				else
-					return success($openIssueCount);
+				else // return success if issue already exists
+					return success("Issue already exists");
 			}
 			else
 				return error("Number of open issues could not be determined");

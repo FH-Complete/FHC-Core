@@ -2,18 +2,16 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once('IPlausiChecker.php');
+require_once('PlausiChecker.php');
 
 /**
  *
  */
-class DatumSponsionFehlt implements IPlausiChecker
+class DatumSponsionFehlt extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
 		$results = array();
-
-		$this->_ci =& get_instance(); // get code igniter instance
 
 		// pass parameters needed for plausicheck
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
@@ -34,8 +32,11 @@ class DatumSponsionFehlt implements IPlausiChecker
 				$results[] = array(
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
-					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
-					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id)
+					'fehlertext_params' => array(
+						'prestudent_id' => $prestudent->prestudent_id,
+						'abschlusspruefung_id' => $prestudent->abschlusspruefung_id
+					),
+					'resolution_params' =>  array('abschlusspruefung_id' => $prestudent->abschlusspruefung_id)
 				);
 			}
 		}

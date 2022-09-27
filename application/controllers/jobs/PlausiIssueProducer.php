@@ -46,9 +46,10 @@ class PlausiIssueProducer extends JOB_Controller
 					// write the issue
 					$addIssueRes = $this->issueslib->addFhcIssue($fehler_kurzbz, $person_id, $oe_kurzbz, $fehlertext_params, $resolution_params);
 
+					// log if error, or log info if inserted new issue
 					if (isError($addIssueRes))
 						$this->logError(getError($addIssueRes));
-					else
+					elseif (hasData($addIssueRes) && is_integer(getData($addIssueRes)))
 						$this->logInfo("Plausicheck issue " . $fehler_kurzbz . " successfully produced, person_id: " . $person_id);
 				}
 			}

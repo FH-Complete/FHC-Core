@@ -121,7 +121,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_INOUT_0008',
 		'fehler_kurzbz' => 'IncomingOhneIoDatensatz',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Incoming hat keinen IO Datensatz',
+		'fehlertext' => 'Incoming hat keinen IO Datensatz (prestudent_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -145,7 +145,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STG_0003',
 		'fehler_kurzbz' => 'PrestudentMischformOhneOrgform',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Organisationsform ist für Studierenden/BewerberIn in Mischformstudiengang nicht eingetragen. (Studiensemester %s, prestudent_id %s)',
+		'fehlertext' => 'Organisationsform ist für Studierenden/BewerberIn in Mischformstudiengang nicht eingetragen. (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -153,7 +153,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STG_0004',
 		'fehler_kurzbz' => 'PrestudentStgUngleichStgStudienplan',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Studiengang des Prestudenten passt nicht zu Studiengang des Studienplans. (prestudent_id %s, studienplan_id %s)',
+		'fehlertext' => 'Studiengang des Prestudenten passt nicht zu Studiengang des Studienplans. (prestudent_id %s, Studienplan %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -177,7 +177,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0003',
 		'fehler_kurzbz' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Aktuelles Ausbildungssemester bei StudentIn stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein. (Studiensemester %s, prestudent_id %s)',
+		'fehlertext' => 'Aktuelles Ausbildungssemester bei StudentIn stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein. (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -209,7 +209,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0007',
 		'fehler_kurzbz' => 'AktiverStudentOhneStatus',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Aktive/r StudentIn ohne Status im Studiensemester %s (prestudent_id %s)',
+		'fehlertext' => 'Aktive/r StudentIn ohne Status %s (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -217,7 +217,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0008',
 		'fehler_kurzbz' => 'StudienplanUngueltig',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Studienplan ist im Ausbildungssemester %s nicht gültig (prestudent_id %s)',
+		'fehlertext' => 'Studienplan %s ist im Ausbildungssemester %s nicht gültig (prestudent_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -233,7 +233,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0010',
 		'fehler_kurzbz' => 'DatumAbschlusspruefungFehlt',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Kein Abschlussprüfung Datum (abschlusspruefung_id %s, prestudent_id %s)',
+		'fehlertext' => 'Kein Abschlussprüfung Datum (prestudent_id %s, abschlusspruefung_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -241,7 +241,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0011',
 		'fehler_kurzbz' => 'DatumSponsionFehlt',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Kein Sponsionsdatum (abschlusspruefung_id %s, prestudent_id %s)',
+		'fehlertext' => 'Kein Sponsionsdatum (prestudent_id %s, abschlusspruefung_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -257,7 +257,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0013',
 		'fehler_kurzbz' => 'AktSemesterNull',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Aktuelles Ausbildungssemester ist 0 (prestudent_id %s)',
+		'fehlertext' => 'Aktuelles Ausbildungssemester ist 0 (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -281,7 +281,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_PERSON_0002',
 		'fehler_kurzbz' => 'NationNichtOesterreichAberGemeinde',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Nation der Adresse ist ungleich Österreich, es ist aber eine österreichische Gemeinde (%s) angegeben',
+		'fehlertext' => 'Nation der Adresse ist ungleich Österreich, es ist aber eine österreichische Gemeinde (%s) angegeben (adresse_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),

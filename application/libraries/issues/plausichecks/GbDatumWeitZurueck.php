@@ -2,40 +2,36 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once('IPlausiChecker.php');
+require_once('PlausiChecker.php');
 
 /**
  *
  */
-class GbDatumWeitZurueck implements IPlausiChecker
+class GbDatumWeitZurueck extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
 		$results = array();
-
-		$this->_ci =& get_instance(); // get code igniter instance
 
 		// pass parameters needed for plausicheck
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getGbDatumWeitZurueck($studiensemester_kurzbz, $studiengang_kz);
+		$personRes = $this->_ci->plausichecklib->getGbDatumWeitZurueck($studiensemester_kurzbz, $studiengang_kz);
 
-		if (isError($prestudentRes)) return $prestudentRes;
+		if (isError($personRes)) return $personRes;
 
-		if (hasData($prestudentRes))
+		if (hasData($personRes))
 		{
-			$prestudents = getData($prestudentRes);
+			$persons = getData($personRes);
 
 			// populate results with data necessary for writing issues
-			foreach ($prestudents as $prestudent)
+			foreach ($persons as $person)
 			{
 				$results[] = array(
-					'person_id' => $prestudent->person_id,
-					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
-					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
-					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id)
+					'person_id' => $person->person_id,
+					'resolution_params' => array('person_id' => $person->person_id)
 				);
 			}
 		}

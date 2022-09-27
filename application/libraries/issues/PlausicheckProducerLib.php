@@ -13,7 +13,9 @@ class PlausicheckProducerLib
 	// set fehler which can be produced by the job
 	// structure: fehler_kurzbz => class (library) name for resolving
 	private $_fehlerLibMappings = array(
-		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent'
+		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
+		'AbbrecherAktiv' => 'AbbrecherAktiv',
+		'AbschlussstatusFehlt' => 'AbschlussstatusFehlt',
 		//'zgvDatumInZukunft' => 'ZgvDatumInZukunft',
 		//'zgvDatumVorGeburtsdatum' => 'ZgvDatumVorGeburtsdatum',
 		//'zgvMasterDatumInZukunft' => 'ZgvMasterDatumInZukunft',
@@ -33,9 +35,6 @@ class PlausicheckProducerLib
 
 		// load models
 		$this->_ci->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
-
-		// load libraries
-		$this->_ci->load->library('issues/PlausicheckLib'); // load plausicheck library
 
 		// get current Studiensemester
 		$studiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();

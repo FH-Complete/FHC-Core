@@ -2,18 +2,16 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once('IPlausiChecker.php');
+require_once('PlausiChecker.php');
 
 /**
  *
  */
-class FalscheAnzahlAbschlusspruefungen implements IPlausiChecker
+class FalscheAnzahlAbschlusspruefungen extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
 		$results = array();
-
-		$this->_ci =& get_instance(); // get code igniter instance
 
 		// pass parameters needed for plausicheck
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;

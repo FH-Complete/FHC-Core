@@ -2,18 +2,16 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once('IPlausiChecker.php');
+require_once('PlausiChecker.php');
 
 /**
  *
  */
-class AbbrecherAktiv implements IPlausiChecker
+class AbbrecherAktiv extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
 		$results = array();
-
-		$this->_ci =& get_instance(); // get code igniter instance
 
 		// pass parameters needed for plausicheck
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;

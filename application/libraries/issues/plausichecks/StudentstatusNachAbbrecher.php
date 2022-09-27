@@ -2,25 +2,22 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once('IPlausiChecker.php');
+require_once('PlausiChecker.php');
 
 /**
  *
  */
-class StudentstatusNachAbbrecher implements IPlausiChecker
+class StudentstatusNachAbbrecher extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
 		$results = array();
 
-		$this->_ci =& get_instance(); // get code igniter instance
-
 		// pass parameters needed for plausicheck
-		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getStudentstatusNachAbbrecher($studiensemester_kurzbz, $studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getStudentstatusNachAbbrecher($studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
