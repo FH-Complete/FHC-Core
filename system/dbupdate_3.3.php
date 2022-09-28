@@ -6521,6 +6521,9 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// add Dashboard Schema and Tables
+include __DIR__ . '/dashboard/dbupdate_dashboard.php';
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
