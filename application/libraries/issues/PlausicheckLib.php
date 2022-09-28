@@ -17,6 +17,7 @@ class PlausicheckLib
 		// load models
 		$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->_ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// get database for queries
 		$this->_db = new DB_Model();
@@ -901,8 +902,9 @@ class PlausicheckLib
 				)
 				/* check only valid begininng with 2018 */
 				AND '2018-01-01'<(SELECT max(datum) FROM public.tbl_prestudentstatus WHERE prestudent_id=pre.prestudent_id)
-				AND NOT EXISTS(
-					SELECT 1 FROM public.tbl_prestudentstatus ps
+				AND NOT EXISTS( /* no end status */
+					SELECT 1
+					FROM public.tbl_prestudentstatus ps
 					WHERE
 						prestudent_id=pre.prestudent_id
 						AND status_kurzbz IN('Abbrecher','Abgewiesener','Absolvent','Incoming')
@@ -912,8 +914,23 @@ class PlausicheckLib
 
 		if (isset($studiensemester_kurzbz))
 		{
-			$qry .= " AND status.studiensemester_kurzbz = ?";
-			$params[] = $studiensemester_kurzbz;
+			$prevStudiensemesterRes = $this->_ci->StudiensemesterModel->getPreviousFrom($studiensemester_kurzbz);
+			
+			if (isError($prevStudiensemesterRes)) return $prevStudiensemesterRes;
+			
+			if (hasData($prevStudiensemesterRes))
+			{
+				// if Studiensemester given, check only if has status in current or previous semester
+				$prevStudiensemester = getData($prevStudiensemesterRes)[0]->studiensemester_kurzbz;
+				$qry .= " AND EXISTS (
+							SELECT 1
+							FROM public.tbl_prestudentstatus ps
+							WHERE studiensemester_kurzbz IN (?, ?)
+							AND ps.prestudent_id = pre.prestudent_id
+						)";
+				$params[] = $prevStudiensemester;
+				$params[] = $studiensemester_kurzbz;
+			}
 		}
 
 		if (isset($studiengang_kz))
