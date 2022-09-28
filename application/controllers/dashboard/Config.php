@@ -177,37 +177,41 @@ class Config extends Auth_Controller
 		$defaultconfig = array(
 			'title' => 'CIS Dashboard',
 			'widgets' => array(
-				'd39ba153ac9e60a21ed694cc3728f4dd' => array(
-					'title' => 'test1',
-					'type' => 'kpi',
-					'config' => array(),
-					'place' => array(
-						'row' => 1,
-						'col' => 3,
-						'width' => 1,
-						'height' => 1
-					)
+				'nofunction' => array(
+					'd39ba153ac9e60a21ed694cc3728f4dd' => array(
+						'title' => 'test1',
+						'type' => 'kpi',
+						'config' => array(),
+						'place' => array(
+							'row' => 1,
+							'col' => 3,
+							'width' => 1,
+							'height' => 1
+						)
+					),
+					'c6c526b78a0e4bc3a0b67e00f983fc33' => array(
+						'title' => 'test2',
+						'type' => 'url',
+						'config' => array(),
+						'place' => array(
+							'row' => 3,
+							'col' => 1,
+							'width' => 1,
+							'height' => 1
+						)
+					),
 				),
-				'c6c526b78a0e4bc3a0b67e00f983fc33' => array(
-					'title' => 'test2',
-					'type' => 'url',
-					'config' => array(),
-					'place' => array(
-						'row' => 3,
-						'col' => 1,
-						'width' => 1,
-						'height' => 1
-					)
-				),
-				'3f1ebb24bdaa2b82fbdacf7d55977412' => array(
-					'title' => 'test3',
-					'type' => 'chart',
-					'config' => array(),
-					'place' => array(
-						'row' => 2,
-						'col' => 1,
-						'width' => 3,
-						'height' => 3
+				'leitung' => array(
+					'3f1ebb24bdaa2b82fbdacf7d55977412' => array(
+						'title' => 'test3',
+						'type' => 'chart',
+						'config' => array(),
+						'place' => array(
+							'row' => 2,
+							'col' => 1,
+							'width' => 3,
+							'height' => 3
+						)
 					)
 				)
 			)
@@ -215,16 +219,18 @@ class Config extends Auth_Controller
 		
 		$userconfig = array(
 			'widgets' => array(
-				'd39ba153ac9e60a21ed694cc3728f4dd' => array(
-					'modifier' => 'bold',
-					'visible' => false,
-					'place' => array(
-						'width' => 2,
-						'height' => 2
+				'nofunction' => array(
+					'd39ba153ac9e60a21ed694cc3728f4dd' => array(
+						'modifier' => 'bold',
+						'visible' => false,
+						'place' => array(
+							'width' => 2,
+							'height' => 2
+						)
+					),
+					'c6c526b78a0e4bc3a0b67e00f983fc33' => array(
+						'type' => 'test'
 					)
-				),
-				'c6c526b78a0e4bc3a0b67e00f983fc33' => array(
-					'type' => 'test'
 				)
 			)
 		);
