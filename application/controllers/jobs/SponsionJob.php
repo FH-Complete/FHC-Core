@@ -3,7 +3,7 @@
  * FH-Complete
  *
  *
- * Cronjobs to be run for inserting the date of Sponsion as Date ZGV of absolvents
+ * Cronjobs to be run for inserting the date of Sponsion as Date ZGV
  */
 // ------------------------------------------------------------------------
 
@@ -25,33 +25,28 @@ class SponsionJob extends JOB_Controller
 
   public function insertDate()
   {
-    $allAbsolventsWithDateSponsion = $this->AbschlusspruefungModel->getAbsolventsWithSponsionDate()->retval;
-    $count = 0;
     $countBewerbungen = 0;
 
+    //Bewerbungen vom aktuellen Semester + nächstes Semester berücksichtigen
+    $date_actual = new DateTime('first day of this month midnight');	// date obj of actual date
+    $month = $date_actual->format('m');	// string month of actual timesheet
+    $year = $date_actual->format('Y');	// string year of actual timesheet
+    $nextYear = $year+1;
+
     print_r("-----------------------------------------------------------------\n");
-    print_r("Cronjob START\n");
-    print_r("Sponsionsdatum als ZGV-Datum eintragen:\n");
+    $semester1 = "WS" . $year;
+    $semester2 = ($month>= 6) ? "SS" . $nextYear : "SS" . $year;
 
-    foreach ($allAbsolventsWithDateSponsion as $absolvent)
-    {
-      $this->AbschlusspruefungModel->insertDatumSponsionAsZgvmadatum($absolvent->prestudent_id, $absolvent->sponsion);
+    $allInteressenten = $this->PrestudentModel->getAllInteressentenWithMasterSponsion($semester1, $semester2)->retval;
 
-      //get all prestudents of person_id with Status Interessent
-      $allBewerbungen =  $this->PrestudentModel->getPrestudentsOfPersonId($absolvent->person_id, 'Interessent')->retval;
-      foreach ($allBewerbungen as $bewerbung)
-      {
-        $this->AbschlusspruefungModel->insertDatumSponsionAsZgvmadatum($bewerbung->prestudent_id, $absolvent->sponsion);
-        print_r (" Bewerbung: personId: " .  $absolvent->person_id . " prestudentId: " . $bewerbung->prestudent_id. " DateSponsion: " . $absolvent->sponsion."\n");
-        $countBewerbungen++;
-      }
-      $count++;
-    }
+        foreach($allInteressenten as $interessent)
+        {
+          $this->AbschlusspruefungModel->insertDatumSponsionAsZgvmadatum($interessent->prestudent_id, $interessent->sponsion);
+           $countBewerbungen++;
+        }
 
-    print_r("\nAnzahl Absolventen: " . $count);
-    print_r("\nAnzahl Inserts Bewerbungen: " . $countBewerbungen);
-    print_r("\nCronjob END\n");
-    print_r("-----------------------------------------------------------------\n");
+    print_r("Anzahl Inserts Bewerbungen: " . $countBewerbungen);
+    print_r("\n-----------------------------------------------------------------\n");
 
     return true;
   }

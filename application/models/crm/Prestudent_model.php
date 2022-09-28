@@ -667,25 +667,36 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery($query, array($prestudent_id));
 	}
 
+
 	/**
-	* get all prestudents of a Person_id with certain status
-	* @param $personId
-	* @param $prestudentStatus
-	* @return array all prestudents of the person (with certain status)
+	* get all Interessenten without ZGVmasdatum and with Sponsionsdate
+	* @param $semesterkurzbz1 und $semesterkurzbz2 
+	* @return array all prestudents with sponsionsdate
 	*/
-	public function getPrestudentsOfPersonId($personId, $prestudentStatus)
+	public function getAllInteressentenWithMasterSponsion($semesterkurzbz1, $semesterkurzbz2=null)
 	{
 		return $this->execQuery(
-			'SELECT prestudent_id
-				FROM public.tbl_prestudent
-				JOIN public.tbl_prestudentstatus USING (prestudent_id)
-				WHERE person_id = ?
-				AND get_rolle_prestudent(prestudent_id, null) = ?',
+			'SELECT ps.prestudent_id, person_id, ap.sponsion
+			FROM
+				public.tbl_prestudent ps
+				JOIN public.tbl_prestudentstatus USING(prestudent_id)
+				JOIN public.tbl_person p USING (person_id)
+				JOIN public.tbl_prestudent ps2 USING (person_id)
+				JOIN public.tbl_student st ON (st.prestudent_id = ps2.prestudent_id)
+				JOIN lehre.tbl_abschlusspruefung ap USING (student_uid)
+				JOIN public.tbl_studiengang sg ON (sg.studiengang_kz = ps2.studiengang_kz)
+			WHERE
+			get_rolle_prestudent(ps.prestudent_id, null) = \'Interessent\'
+			AND ps.zgvmadatum is NULL
+			AND get_rolle_prestudent(ps2.prestudent_id, null) = \'Absolvent\'
+			AND sg.typ != \'l\'
+			AND tbl_prestudentstatus.studiensemester_kurzbz in (?,?)',
 			array(
-				$personId,
-				$prestudentStatus
+				$semesterkurzbz1,
+				$semesterkurzbz2
 			)
-				);
+		);
 	}
+
 
 }
