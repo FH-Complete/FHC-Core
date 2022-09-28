@@ -292,8 +292,16 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td>Lehrmodus*</td>
-			<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
+			<td>Lehrmodus*</td>';
+
+			if (defined('DEFAULT_LEHRMODUS') && DEFAULT_LEHRMODUS != '')
+			{
+				$htmlstr .= '<td><select name="lehrmodus_kurzbz">';
+			}
+			else
+			{
+				$htmlstr .= '<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
+			}
 
 		$lehrmodus_arr = new lehrmodus();
 		$lehrmodus_arr->getAll();
@@ -301,6 +309,8 @@
 		foreach ($lehrmodus_arr->result as $lehrmodus)
 		{
 			if ($lehrmodus->lehrmodus_kurzbz == $lv->lehrmodus_kurzbz)
+				$sel = ' selected';
+			else if (defined('DEFAULT_LEHRMODUS') && ($lehrmodus->lehrmodus_kurzbz == DEFAULT_LEHRMODUS) && ($lv->lehrmodus_kurzbz == ''))
 				$sel = ' selected';
 			else
 				$sel = '';
