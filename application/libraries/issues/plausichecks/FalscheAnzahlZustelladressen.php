@@ -26,7 +26,7 @@ class FalscheAnzahlZustelladressen extends PlausiChecker
 		{
 			$persons = getData($personRes);
 
-			// populate results with data necessary for writing person
+			// populate results with data necessary for writing issues
 			foreach ($persons as $person)
 			{
 				$results[] = array(

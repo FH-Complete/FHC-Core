@@ -35,7 +35,7 @@ class InaktiverStudentAktiverStatus extends PlausiChecker
 					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
 					'resolution_params' => array(
 						'prestudent_id' => $prestudent->prestudent_id,
-						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz
+						'studiensemester_kurzbz' => $studiensemester_kurzbz
 					)
 				);
 			}

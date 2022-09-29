@@ -32,7 +32,7 @@ class AktiverStudentOhneStatus extends PlausiChecker
 				$results[] = array(
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
-					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
+					'fehlertext_params' => array('studiensemester_kurzbz' => $studiensemester_kurzbz, 'prestudent_id' => $prestudent->prestudent_id),
 					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id, 'studiensemester_kurzbz' => $studiensemester_kurzbz)
 				);
 			}

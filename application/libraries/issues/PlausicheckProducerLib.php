@@ -13,20 +13,30 @@ class PlausicheckProducerLib
 	// set fehler which can be produced by the job
 	// structure: fehler_kurzbz => class (library) name for resolving
 	private $_fehlerLibMappings = array(
-		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
 		'AbbrecherAktiv' => 'AbbrecherAktiv',
 		'AbschlussstatusFehlt' => 'AbschlussstatusFehlt',
-		//'zgvDatumInZukunft' => 'ZgvDatumInZukunft',
-		//'zgvDatumVorGeburtsdatum' => 'ZgvDatumVorGeburtsdatum',
-		//'zgvMasterDatumInZukunft' => 'ZgvMasterDatumInZukunft',
-		//'zgvMasterDatumVorZgvdatum' => 'ZgvMasterDatumVorZgvdatum',
-		//'zgvMasterDatumVorGeburtsdatum' => 'ZgvMasterDatumVorGeburtsdatum',
-		//'keinAufenthaltszweckPlausi' => 'KeinAufenthaltszweckPlausi',
-		//'zuVieleZweckeIncomingPlausi' => 'ZuVieleZweckeIncomingPlausi',
-		//'falscherIncomingZweckPlausi' => 'FalscherIncomingZweckPlausi',
-		//'outgoingAufenthaltfoerderungfehltPlausi' => 'OutgoingAufenthaltfoerderungfehltPlausi',
-		//'outgoingAngerechneteEctsFehlenPlausi' => 'OutgoingAngerechneteEctsFehlenPlausi',
-		//'outgoingErworbeneEctsFehlenPlausi' => 'OutgoingErworbeneEctsFehlenPlausi'
+		'AktSemesterNull' => 'AktSemesterNull',
+		'AktiverStudentOhneStatus' => 'AktiverStudentOhneStatus',
+		'AusbildungssemPrestudentUngleichAusbildungssemStatus' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
+		'BewerberNichtZumRtAngetreten' => 'BewerberNichtZumRtAngetreten',
+		'DatumAbschlusspruefungFehlt' => 'DatumAbschlusspruefungFehlt',
+		'DatumSponsionFehlt' => 'DatumSponsionFehlt',
+		'DatumStudiensemesterFalscheReihenfolge' => 'DatumStudiensemesterFalscheReihenfolge',
+		'FalscheAnzahlAbschlusspruefungen' => 'FalscheAnzahlAbschlusspruefungen',
+		'FalscheAnzahlHeimatadressen' => 'FalscheAnzahlHeimatadressen',
+		'FalscheAnzahlZustelladressen' => 'FalscheAnzahlZustelladressen',
+		'GbDatumWeitZurueck' => 'GbDatumWeitZurueck',
+		'InaktiverStudentAktiverStatus' => 'InaktiverStudentAktiverStatus',
+		'IncomingHeimatNationOesterreich' => 'IncomingHeimatNationOesterreich',
+		'IncomingOhneIoDatensatz' => 'IncomingOhneIoDatensatz',
+		'InskriptionVorLetzerBismeldung' => 'InskriptionVorLetzerBismeldung',
+		'NationNichtOesterreichAberGemeinde' => 'NationNichtOesterreichAberGemeinde',
+		'OrgformStgUngleichOrgformPrestudent' => 'OrgformStgUngleichOrgformPrestudent',
+		'PrestudentMischformOhneOrgform' => 'PrestudentMischformOhneOrgform',
+		'PrestudentStgUngleichStgStudienplan' => 'PrestudentStgUngleichStgStudienplan',
+		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
+		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher'
+		//'StudienplanUngueltig' => 'StudienplanUngueltig',
 	);
 
 	public function __construct()

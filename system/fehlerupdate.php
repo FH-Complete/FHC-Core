@@ -273,7 +273,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_PERSON_0001',
 		'fehler_kurzbz' => 'GbDatumWeitZurueck',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Geburtsdatum vor dem 01.01.1920.',
+		'fehlertext' => 'Geburtsdatum vor dem 01.01.1920',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -295,7 +295,7 @@ $fehlerArr = array(
 	),
 	array(
 		'fehlercode' => 'CORE_PERSON_0004',
-		'fehler_kurzbz' => 'NationNichtOeAberGmeinde',
+		'fehler_kurzbz' => 'FalscheAnzahlZustelladressen',
 		'fehlercode_extern' => null,
 		'fehlertext' => 'Es sind mehrere oder keine Zustelladressen eingetragen',
 		'fehlertyp_kurzbz' => 'error',

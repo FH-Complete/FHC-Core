@@ -14,10 +14,11 @@ class IncomingHeimatNationOesterreich extends PlausiChecker
 		$results = array();
 
 		// pass parameters needed for plausicheck
+		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$personRes = $this->_ci->plausichecklib->getIncomingHeimatNationOesterreich($studiengang_kz);
+		$personRes = $this->_ci->plausichecklib->getIncomingHeimatNationOesterreich($studiensemester_kurzbz, $studiengang_kz);
 
 		if (isError($personRes)) return $personRes;
 

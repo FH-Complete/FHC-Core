@@ -75,7 +75,8 @@ class PlausicheckLib
 		$qry = "
 			SELECT
 				prestudent.person_id, prestudent.prestudent_id, status.studiensemester_kurzbz,
-				studiengang.orgform_kurzbz as stg_oe_kurzbz, status.orgform_kurzbz as student_oe_kurzbz
+				studiengang.orgform_kurzbz as stg_orgform, status.orgform_kurzbz as student_orgform,
+				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_studiengang studiengang
 				JOIN public.tbl_student student USING(studiengang_kz)
@@ -94,7 +95,7 @@ class PlausicheckLib
 					WHERE
 						tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
 						AND tbl_studienplan.orgform_kurzbz = status.orgform_kurzbz)";
-		
+
 		if (isset($prestudent_id))
 		{
 			$qry .= " AND prestudent.prestudent_id = ?";
@@ -164,7 +165,7 @@ class PlausicheckLib
 		$qry = "
 			SELECT
 				DISTINCT ON (ps.prestudent_id) ps.person_id, ps.prestudent_id,
-				stplan.bezeichnung AS studienplan, stg.orgform_kurzbz AS prestudent_stg_oe_kurzbz
+				stplan.bezeichnung AS studienplan, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_prestudent ps
 				JOIN public.tbl_prestudentstatus USING(prestudent_id)
@@ -249,7 +250,7 @@ class PlausicheckLib
 				public.tbl_student student
 				JOIN public.tbl_prestudent prestudent USING(prestudent_id)
 				JOIN public.tbl_prestudentstatus prestatus USING(prestudent_id)
-				JOIN public.tbl_studiengang stg ON prestudent.studienang_kz = stg.studiengang_kz
+				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
 			WHERE
 				prestatus.status_kurzbz = 'Abbrecher'
 				AND stg.melderelevant";
@@ -266,6 +267,7 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		// TODO - maybe also put in sql?
 		$qryRes = $this->_db->execReadOnlyQuery($qry, $params);
 
 		if (isError($qryRes)) return $qryRes;
@@ -276,7 +278,7 @@ class PlausicheckLib
 
 			foreach ($students as $student)
 			{
-				$lastStatusRes = $this->_ci->PrestudentModel->getLastStatus($student->prestudent_id);
+				$lastStatusRes = $this->_ci->PrestudentstatusModel->getLastStatus($student->prestudent_id);
 
 				if (isError($lastStatusRes)) return $lastStatusRes;
 
@@ -304,7 +306,8 @@ class PlausicheckLib
 		$qry = "
 			SELECT
 				DISTINCT(student.student_uid), prestudent.person_id, prestudent.prestudent_id,
-				status.ausbildungssemester, lv.semester, status.studiensemester_kurzbz
+				status.ausbildungssemester, lv.semester, status.studiensemester_kurzbz,
+				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_student student
 				JOIN public.tbl_studentlehrverband lv USING(student_uid)
@@ -350,11 +353,12 @@ class PlausicheckLib
 				public.tbl_benutzer benutzer
 				JOIN public.tbl_student student on(benutzer.uid = student.student_uid)
 				JOIN public.tbl_prestudent prestudent USING(prestudent_id)
-				JOIN public.tbl_studiengang ON prestudent.studiengang_kz = stg.studiengang_kz
+				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
 			WHERE
 				benutzer.aktiv=false
 				AND get_rolle_prestudent(prestudent_id, ?) IN ('Student', 'Diplomand', 'Unterbrecher', 'Praktikant')
-				AND stg.melderelevant";
+				AND stg.melderelevant
+				AND prestudent.bismelden";
 
 		if (isset($studiengang_kz))
 		{
@@ -416,6 +420,7 @@ class PlausicheckLib
 
 		if (isError($qryRes)) return $qryRes;
 
+		// TODO: maybe do this in query already instead?
 		if (hasData($qryRes))
 		{
 			$students = getData($qryRes);
@@ -432,7 +437,12 @@ class PlausicheckLib
 
 				if (hasData($firstStatusRes))
 				{
-					$datumInscription = date_format(date_create(getData($firstStatusRes)[0]->datum), 'Y-m-d');
+					$firstStatus = getData($firstStatusRes)[0];
+
+					if ($firstStatus->studiensemester_kurzbz != $studiensemester_kurzbz)
+						continue;
+
+					$datumInscription = date_format(date_create($firstStatus->datum), 'Y-m-d');
 
 					// if student inscription was before Bismeldedatum
 					if ($datumInscription < $datumBis)
@@ -517,9 +527,10 @@ class PlausicheckLib
 				$prestudentsSemesterSorted = hasData($qryOrderSemesterRes) ? getData($qryOrderSemesterRes) : array();
 
 				// get all status of student, sorted by status date
-				$this->PrestudentstatusModel->addSelect('studiensemester_kurzbz');
-				$this->PrestudentstatusModel->addOrder('datum DESC, insertamum DESC');
-				$qryOrderDateRes=$this->PrestudentstatusModel->loadWhere(array('prestudent_id' => $student->prestudent_id));
+				$this->_ci->PrestudentstatusModel->addSelect('studiensemester_kurzbz');
+				$this->_ci->PrestudentstatusModel->addOrder('datum', 'DESC');
+				$this->_ci->PrestudentstatusModel->addOrder('insertamum', 'DESC');
+				$qryOrderDateRes = $this->_ci->PrestudentstatusModel->loadWhere(array('prestudent_id' => $student->prestudent_id));
 
 				if (isError($qryOrderDateRes)) return $qryOrderDateRes;
 
@@ -554,16 +565,18 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				DISTINCT (student_uid), prestudent.person_id, prestudent.prestudent_id, status.studienesemester_kurzbz
+				DISTINCT (student_uid), prestudent.person_id, prestudent.prestudent_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_student student
 				JOIN public.tbl_benutzer benutzer on (benutzer.uid = student.student_uid)
 				JOIN public.tbl_prestudent prestudent USING(prestudent_id)
-				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
 			WHERE
 				benutzer.aktiv=TRUE
-				AND stg.melderelevant";
+				AND stg.melderelevant
+				AND prestudent.bismelden";
+
+				// TODO - why use getLastStatus function - maybe use not exists for two semester instead - faster??
 
 		if (isset($studiengang_kz))
 		{
@@ -591,7 +604,7 @@ class PlausicheckLib
 
 			if (hasData($nextStudiensemesterRes))
 			{
-				$nextStudiensemester = getData($nextStudiensemesterRes)[0];
+				$nextStudiensemester = getData($nextStudiensemesterRes)[0]->studiensemester_kurzbz;
 
 				foreach ($students as $student)
 				{
@@ -613,7 +626,7 @@ class PlausicheckLib
 	}
 
 	/**
-	 * Studiengang should be valid in current Ausbildungssemester of prestudent.
+	 * Studienplan should be valid in current Ausbildungssemester of prestudent.
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
@@ -628,7 +641,7 @@ class PlausicheckLib
 				status.status_kurzbz,
 				status.studiensemester_kurzbz,
 				status.ausbildungssemester,
-				stg.prestudent_stg_oe_kurzbz
+				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_prestudent pre
 				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
@@ -648,6 +661,7 @@ class PlausicheckLib
 						AND tbl_studienplan_semester.studiensemester_kurzbz = status.studiensemester_kurzbz
 				)
 				AND status.studiensemester_kurzbz=?
+				AND pre.bismelden
 				AND stg.melderelevant";
 
 		if (isset($studiengang_kz))
@@ -699,9 +713,7 @@ class PlausicheckLib
 						FROM bis.tbl_mobilitaet
 						WHERE prestudent_id = pre.prestudent_id
 						AND studiensemester_kurzbz = status.studiensemester_kurzbz
-					)
-			) studenten
-			WHERE anzahl_abschlusspruefungen != 1";
+					)";
 
 		if (isset($studiensemester_kurzbz))
 		{
@@ -721,6 +733,9 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		$qry .= ") studenten
+			WHERE anzahl_abschlusspruefungen != 1";
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -733,7 +748,7 @@ class PlausicheckLib
 	{
 		$results = array();
 
-		$pruefungenRes = $this->_getInvalidAbschlusspruefungen($studiensemester_kurzbz, $studiengang_kz, $prestudent_id);
+		$pruefungenRes = $this->_getInvalidAbschlusspruefungen($studiensemester_kurzbz, $studiengang_kz, $abschlusspruefung_id);
 
 		if (isError($pruefungenRes)) return $pruefungenRes;
 
@@ -755,11 +770,11 @@ class PlausicheckLib
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
-	public function getDatumSponsionFehlt($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
+	public function getDatumSponsionFehlt($studiensemester_kurzbz, $studiengang_kz = null, $abschlusspruefung_id = null)
 	{
 		$results = array();
 
-		$pruefungenRes = $this->_getInvalidAbschlusspruefungen($studiensemester_kurzbz, $studiengang_kz, $prestudent_id);
+		$pruefungenRes = $this->_getInvalidAbschlusspruefungen($studiensemester_kurzbz, $studiengang_kz, $abschlusspruefung_id);
 
 		if (isError($pruefungenRes)) return $pruefungenRes;
 
@@ -787,8 +802,6 @@ class PlausicheckLib
 
 		if (isError($previousStudiensemesterRes)) return $previousStudiensemesterRes;
 
-		$previousStudiensemester = hasData($previousStudiensemesterRes) ? getData($previousStudiensemesterRes)[0]->studiensemester_kurzbz : '';
-
 		$params = array($studiensemester_kurzbz);
 
 		$qry = "
@@ -801,19 +814,20 @@ class PlausicheckLib
 				LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
 				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
 			WHERE
-				AND status_kurzbz='Bewerber'
+				status_kurzbz='Bewerber'
 				AND reihungstestangetreten=false
 				AND stg.melderelevant
 				AND prestudent.bismelden";
 
-		if (!isEmptyString($previousStudiensemester))
+		if (hasData($previousStudiensemesterRes))
 		{
-			$qry .= "AND (studiensemester_kurzbz=? OR studiensemester_kurzbz=?)";
+			$previousStudiensemester = getData($previousStudiensemesterRes)[0]->studiensemester_kurzbz;
+			$qry .= " AND (studiensemester_kurzbz=? OR studiensemester_kurzbz=?)";
 			$params[] = $previousStudiensemester;
 		}
 		else
 		{
-			$qry .= "AND studiensemester_kurzbz=?";
+			$qry .= " AND studiensemester_kurzbz=?";
 		}
 
 		if (isset($studiengang_kz))
@@ -915,9 +929,9 @@ class PlausicheckLib
 		if (isset($studiensemester_kurzbz))
 		{
 			$prevStudiensemesterRes = $this->_ci->StudiensemesterModel->getPreviousFrom($studiensemester_kurzbz);
-			
+
 			if (isError($prevStudiensemesterRes)) return $prevStudiensemesterRes;
-			
+
 			if (hasData($prevStudiensemesterRes))
 			{
 				// if Studiensemester given, check only if has status in current or previous semester
@@ -1057,13 +1071,14 @@ class PlausicheckLib
 					GROUP BY person_id
 				) adressen
 				JOIN public.tbl_person USING(person_id)
-				JOIN public.tbl_prestudent USING(person_id)
+				JOIN public.tbl_prestudent pre USING(person_id)
 				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 				JOIN public.tbl_student USING(prestudent_id)
-				JOIN public.tbl_studiengang stg ON tbl_prestudent.studiengang_kz = stg.studiengang_kz
+				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
 			WHERE
 				anzahl_adressen != 1
-				AND stg.melderelevant";
+				AND stg.melderelevant
+				AND pre.bismelden";
 
 		if (isset($studiensemester_kurzbz))
 		{
@@ -1106,13 +1121,14 @@ class PlausicheckLib
 					GROUP BY person_id
 				) adressen
 				JOIN public.tbl_person USING(person_id)
-				JOIN public.tbl_prestudent USING(person_id)
+				JOIN public.tbl_prestudent pre USING(person_id)
 				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 				JOIN public.tbl_student USING(prestudent_id)
-				JOIN public.tbl_studiengang stg ON tbl_prestudent.studiengang_kz = stg.studiengang_kz
+				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
 			WHERE
 				anzahl_adressen != 1
-				AND stg.melderelevant";
+				AND stg.melderelevant
+				AND pre.bismelden";
 
 		if (isset($studiensemester_kurzbz))
 		{
@@ -1143,24 +1159,26 @@ class PlausicheckLib
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
-	public function getIncomingHeimatNationOesterreich($studiengang_kz = null, $person_id = null)
+	public function getIncomingHeimatNationOesterreich($studiensemester_kurzbz, $studiengang_kz = null, $person_id = null)
 	{
-		$params = array();
+		$params = array($studiensemester_kurzbz);
 
 		$qry = "
 			SELECT
 				DISTINCT pers.person_id
 			FROM
 				public.tbl_prestudent pre
-				JOIN public.tbl_prestudentstatus prestatus
+				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 				JOIN public.tbl_person pers USING(person_id)
 				JOIN public.tbl_adresse addr USING(person_id)
-				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
+				JOIN public.tbl_studiengang stg USING(studiengang_kz)
 			WHERE
-				prestat.status_kurzbz = 'Incoming'
+				status.status_kurzbz = 'Incoming'
 				AND addr.nation = 'A'
 				AND addr.heimatadresse
-				AND stg.melderelevant";
+				AND status.studiensemester_kurzbz = ?
+				AND stg.melderelevant
+				AND pre.bismelden";
 
 		if (isset($studiengang_kz))
 		{
@@ -1188,7 +1206,7 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				DISTINCT ON(student_uid, nachname, vorname),
+				DISTINCT ON(student_uid, nachname, vorname)
 				tbl_person.person_id,
 				tbl_prestudent.prestudent_id,
 				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
@@ -1225,23 +1243,23 @@ class PlausicheckLib
 	/**
 	 * Get final exams in a semester which are invalid (e.g. missing data)
 	 */
-	private function _getInvalidAbschlusspruefungen($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null)
+	private function _getInvalidAbschlusspruefungen($studiensemester_kurzbz = null, $studiengang_kz = null, $abschlusspruefung_id = null)
 	{
 		$params = array();
 
 		$qry = "
 			SELECT
-				pre.prestudent_id, pruefung.sponsion, pruefung.datum, pruefung.abschlusspruefung_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+				pre.person_id, pre.prestudent_id,
+				pruefung.sponsion, pruefung.datum, pruefung.abschlusspruefung_id,
+				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_prestudent pre
 				JOIN public.tbl_student stud USING(prestudent_id)
 				JOIN public.tbl_prestudentstatus prestatus USING(prestudent_id)
 				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
 				JOIN lehre.tbl_abschlusspruefung pruefung ON stud.student_uid = pruefung.student_uid
-				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
 			WHERE
 				status_kurzbz = 'Absolvent'
-				AND stg.melderelevant
 				AND NOT EXISTS ( /* exclude gs */
 					SELECT 1
 					FROM bis.tbl_mobilitaet
@@ -1251,6 +1269,7 @@ class PlausicheckLib
 				AND abschlussbeurteilung_kurzbz!='nicht'
 				AND abschlussbeurteilung_kurzbz IS NOT NULL
 				AND (pruefung.datum IS NULL OR pruefung.sponsion IS NULL)
+				AND pre.bismelden
 				AND stg.melderelevant";
 
 		if (isset($studiensemester_kurzbz))
@@ -1265,10 +1284,10 @@ class PlausicheckLib
 			$params[] = $studiengang_kz;
 		}
 
-		if (isset($prestudent_id))
+		if (isset($abschlusspruefung_id))
 		{
-			$qry .= " AND pre.prestudent_id = ?";
-			$params[] = $prestudent_id;
+			$qry .= " AND pruefung.abschlusspruefung_id = ?";
+			$params[] = $abschlusspruefung_id;
 		}
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
@@ -1284,16 +1303,12 @@ class PlausicheckLib
 
 		if ($semesterType == 'SS')
 		{
-			$date = "15.11.".($semesterYear - 1);
-			$date = date_format(date_create($date), 'Y-m-d');
-			return $date;
+			return date_format(date_create(($semesterYear - 1)."-11-15"), 'Y-m-d');
 		}
 
 		if ($semesterType == 'WS')
 		{
-			$date = '15.04'.$semesterYear;
-			$date = date_format(date_create($date, 'Y-m-d'));
-			return $date;
+			return date_format(date_create($semesterYear."-04-15"), 'Y-m-d');
 		}
 	}
 }
