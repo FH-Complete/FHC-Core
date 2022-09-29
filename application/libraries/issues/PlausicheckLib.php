@@ -558,7 +558,7 @@ class PlausicheckLib
 	 * @param int prestudent_id if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
-	public function getAktiverStudentOhneStatus($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
+	public function getAktiverStudentOhneStatus($studiengang_kz = null, $prestudent_id = null)
 	{
 		$params = array();
 		$results = array();
@@ -574,9 +574,17 @@ class PlausicheckLib
 			WHERE
 				benutzer.aktiv=TRUE
 				AND stg.melderelevant
-				AND prestudent.bismelden";
+				AND prestudent.bismelden
+				AND NOT EXISTS (
+					SELECT 1
+					FROM public.tbl_prestudentstatus
+					JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+					WHERE prestudent_id = prestudent.prestudent_id
+					AND sem.ende::date > NOW() - interval '4 months'
+				)";
 
 				// TODO - why use getLastStatus function - maybe use not exists for two semester instead - faster??
+				// generell - kein Status in Zukunft - sollte nicht mehr aktiv sein, aber: auch 4 Monate Puffer, wenn im Sommer noch nicht vorgerückt z.B.
 
 		if (isset($studiengang_kz))
 		{
@@ -590,39 +598,7 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
-		$qryRes = $this->_db->execReadOnlyQuery($qry, $params);
-
-		if (isError($qryRes)) return $qryRes;
-
-		if (hasData($qryRes))
-		{
-			$students = getData($qryRes);
-
-			$nextStudiensemesterRes = $this->_ci->StudiensemesterModel->getNextFrom($studiensemester_kurzbz);
-
-			if (isError($nextStudiensemesterRes)) return $nextStudiensemesterRes;
-
-			if (hasData($nextStudiensemesterRes))
-			{
-				$nextStudiensemester = getData($nextStudiensemesterRes)[0]->studiensemester_kurzbz;
-
-				foreach ($students as $student)
-				{
-					$lastStatusCurrSemRes = $this->_ci->PrestudentstatusModel->getLastStatus($student->prestudent_id, $studiensemester_kurzbz);
-
-					if (isError($lastStatusCurrSemRes)) return $lastStatusCurrSemRes;
-
-					$lastStatusNextSemRes = $this->_ci->PrestudentstatusModel->getLastStatus($student->prestudent_id, $nextStudiensemester);
-
-					if (isError($lastStatusNextSemRes)) return $lastStatusNextSemRes;
-
-					if (!hasData($lastStatusCurrSemRes) && !hasData($lastStatusNextSemRes))
-						$results[] = $student;
-				}
-			}
-		}
-
-		return success($results);
+		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
 	/**

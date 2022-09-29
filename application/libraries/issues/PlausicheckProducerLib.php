@@ -49,7 +49,6 @@ class PlausicheckProducerLib
 		// get current Studiensemester
 		$studiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();
 		if (hasData($studiensemesterRes)) $this->_currentStudiensemester = getData($studiensemesterRes)[0]->studiensemester_kurzbz;
-
 	}
 
 	public function producePlausicheck($fehler_kurzbz, $studiensemester_kurzbz = null, $studiengang_kz = null)

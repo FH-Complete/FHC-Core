@@ -209,7 +209,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0007',
 		'fehler_kurzbz' => 'AktiverStudentOhneStatus',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Aktive/r StudentIn ohne Status %s (prestudent_id %s, Studiensemester %s)',
+		'fehlertext' => 'Aktive/r StudentIn ohne Status (prestudent_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
