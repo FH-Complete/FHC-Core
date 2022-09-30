@@ -46,6 +46,14 @@ class Zgv extends API_Controller
 	}
 
 	/**
+	 * @return zgv
+	 */
+	public function getAllZgv()
+	{
+		$this->response($this->Zgv_model->getAllZgv(), REST_Controller::HTTP_OK);
+	}
+
+	/**
 	 * @return void
 	 */
 	public function postZgv()

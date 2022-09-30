@@ -8,6 +8,12 @@ const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
 const COLOR_LIGHTGREY = "#f5f5f5";
+const COLOR_DANGER = '#f2dede';
+
+var tabulator = null; // Set in tableBuilt function.
+
+// Array with accumulated LV ECTS by Prestudent. Used to find out if max ECTS are exceeded.
+var selectedPrestudentWithAccumulatedLvEcts = [];
 
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -52,6 +58,10 @@ function hf_filterTrueFalse(headerValue, rowValue){
 // Adds column details
 // Sets focus on filterbutton, if table starts with stored filter.
 function func_tableBuilt(table) {
+
+    // Store table in global var
+    tabulator = table;
+
     table.addColumn(
         {
             title: "Details",
@@ -66,7 +76,7 @@ function func_tableBuilt(table) {
                 },
                 target:"_blank"
             }
-        }, false, "status"  // place column after status
+        }, true  // place column on the very left
     );
 
     // Set focus on filterbutton
@@ -76,16 +86,74 @@ function func_tableBuilt(table) {
     }
 }
 
+/**
+ * Formats column ECTS (LV + Bisher).
+ */
+var format_ectsSumBisherUndNeu = function(cell, formatterParams, onRendered){
+    let row = cell.getRow();
+    let rowData = row.getData();
+
+    let begruendung_id = (rowData.begruendung_id);
+    let ectsSumBisherUndNeuTotal = (rowData.ectsSumSchulisch + rowData.ectsSumBeruflich);
+    let ectsSumBisherUndNeuSchulisch = rowData.ectsSumSchulisch;
+    let ectsSumBisherUndNeuBeruflich = rowData.ectsSumBeruflich;
+
+    // If exists, add accumulated LV ECTS to bisherige ECTS
+    if (selectedPrestudentWithAccumulatedLvEcts.length > 0)
+    {
+        let selectedPrestudent = selectedPrestudentWithAccumulatedLvEcts.find(x => x.prestudent_id === rowData.prestudent_id);
+
+        if (selectedPrestudent != undefined)
+        {
+            ectsSumBisherUndNeuTotal = (rowData.ectsSumSchulisch + rowData.ectsSumBeruflich) + selectedPrestudent.ectsSumAnzurechnendeLvsSchulisch + selectedPrestudent.ectsSumAnzurechnendeLvsBeruflich;
+            ectsSumBisherUndNeuSchulisch = rowData.ectsSumSchulisch + selectedPrestudent.ectsSumAnzurechnendeLvsSchulisch;
+            ectsSumBisherUndNeuBeruflich = rowData.ectsSumBeruflich + selectedPrestudent.ectsSumAnzurechnendeLvsBeruflich;
+        }
+
+        // Color column if maximum ECTS exceeded
+        if (begruendung_id != 5 && row.isSelected())
+        {
+
+            if (
+                (ectsSumBisherUndNeuSchulisch + ectsSumBisherUndNeuBeruflich) > 90 ||
+                ectsSumBisherUndNeuSchulisch > 60 ||
+                ectsSumBisherUndNeuBeruflich > 60
+            )
+            {
+                cell.getElement().style["background-color"] = COLOR_DANGER;
+            }
+        }
+        else
+        {
+            cell.getElement().style.removeProperty('background-color');
+        }
+    }
+
+    // If max ECTS is exceeded, format font color / weight
+    ectsSumBisherUndNeuTotal = (ectsSumBisherUndNeuTotal > 90) ? "<span class='text-danger'><b><u>" + ectsSumBisherUndNeuTotal + "</u></b></span>" :  ectsSumBisherUndNeuTotal;
+    ectsSumBisherUndNeuSchulisch = (ectsSumBisherUndNeuSchulisch > 60) ? "<span class='text-danger'><b><u>" + ectsSumBisherUndNeuSchulisch + "</u></b></span>" : ectsSumBisherUndNeuSchulisch;
+    ectsSumBisherUndNeuBeruflich = (ectsSumBisherUndNeuBeruflich > 60) ? "<span class='text-danger'><b><u>" + ectsSumBisherUndNeuBeruflich + "</u></b></span>" : ectsSumBisherUndNeuBeruflich;
+
+    return "T: " + ectsSumBisherUndNeuTotal + " [ S: " + ectsSumBisherUndNeuSchulisch + " | B: " + ectsSumBisherUndNeuBeruflich + " ]";
+}
+
 // Formats the rows
 function func_rowFormatter(row){
     let status_kurzbz = row.getData().status_kurzbz;
 
-    row.getCells().forEach(function(cell){
-        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
-        {
-            row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
-        }
-    });
+    // If status is anything else then 'Bearbeitet von STGL-Leitung'
+    if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_STGL)
+    {
+        // Disable new selection of updated rows
+        row.getElement().style["pointerEvents"] = "none";
+
+        // ...but leave url links selectable
+        row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
+        row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
+
+        // Color background grey
+        row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+    }
 }
 
 // Formats row selectable/unselectable
@@ -99,18 +167,23 @@ function func_selectableCheck(row){
     );
 }
 
-// Performes after row was updated
-function func_rowUpdated(row){
-    // Refresh row formatters
-    row.reformat();
+// Calculate dynamically sum of all LV ECTS by Student and display, when maximum ECTS are exceeded.
+// data = selected data, rows = selected rows
+function func_rowSelectionChanged(data, rows){
 
-    // Deselect and disable new selection of updated rows
-    row.deselect();
-    row.getElement().style["pointerEvents"] = "none";
+    // Sum up over all anzurechnenden LV-ECTS by Prestudent
+    selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
 
-    // ...but leave url links selectable
-    row.getCell('dokument_bezeichnung').getElement().firstChild.style["pointerEvents"] = "auto";
-    row.getCell('details').getElement().firstChild.style["pointerEvents"] = "auto";
+    // Loop through all active rows
+    var rowManager = tabulator.rowManager;
+    for (var i = 0; i < rowManager.activeRows.length; i++) {
+
+        // Reinitialize row -> triggers formatters.
+        rowManager.activeRows[i].reinitialize();
+    }
+
+    // Show number of selected rows.
+    approveAnrechnung.showNumberSelectedRows(rows);
 }
 
 // Returns tooltip
@@ -136,11 +209,12 @@ var format_empfehlung_anrechnung = function(cell, formatterParams){
  * (Ignore rows that are approved, rejected or in request for recommendation)
  */
 function tableWidgetHook_selectAllButton(tableWidgetDiv){
-    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+    var resultRows = tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
         .filter(row =>
             row.getData().status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_STGL
-        )
-        .forEach((row => row.select()));
+        );
+
+    tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', resultRows);
 }
 
 
@@ -275,13 +349,7 @@ $(function(){
         e.stopImmediatePropagation();
 
         // Get selected rows data
-        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
-            .map(function(data){
-                // reduce to necessary fields
-                return {
-                    'anrechnung_id' : data.anrechnung_id,
-                }
-            });
+        let selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData');
 
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)
@@ -304,19 +372,70 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.error && data.retval != null)
+                    if (FHC_AjaxClient.isError(data))
                     {
                         // Print error message
-                        FHC_DialogLib.alertWarning(data.retval);
+                        FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
                     }
-
-                    if (!data.error && data.retval != null)
+                    else if (FHC_AjaxClient.hasData(data))
                     {
-                        // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+                        data = FHC_AjaxClient.getData(data);
+
+                        var prestudenten = Object.keys(data.prestudenten);
+
+                        // Find intersection of selected and in fact updated Anrechnungen (in case server did not approve all).
+                        var updatedData = selected_data.filter(x => prestudenten.some(prestudent => x.prestudent_id == prestudent));
+
+                        // Sum up over all anzurechnenden LV-ECTS by Prestudent
+                        var sumLvEctsByPrestudent = approveAnrechnung.getSumLvEctsByPreStudent(updatedData);
+
+                        // Loop through Prestudenten
+                        // key = Prestudent, value = Approved Anrechnungen of Prestudent
+                        Object.entries(data.prestudenten).forEach(([key, value]) => {
+
+                            var rowsToDeselect = [];
+
+                            // Get accumulated sum of all LV ECTS
+                            var sumLvEcts = sumLvEctsByPrestudent.find(x => x.prestudent_id == key);
+
+                            // Get ALL rows of that Prestudent
+                            var rows = $('#tableWidgetTabulator').tabulator('searchRows', 'prestudent_id', '=', key);
+
+                            // Loop through the rows
+                            rows.forEach(row => {
+                                var updateData = {};
+
+                                // If Anrechnung was approved...
+                                if ((value.findIndex(anrechnung_id => row.getData().anrechnung_id == anrechnung_id)) !== -1)
+                                {
+                                    // ...update status
+                                   updateData.status_kurzbz = data.status_kurzbz;
+                                   updateData.status_bezeichnung = data.status_bezeichnung;
+
+                                   // ...and store row to be deselected later on
+                                   rowsToDeselect.push(row);
+                                }
+
+                                // Update 'Bisher schulische ECTS' and 'Bisher berufliche ECTS' with the Sum of new approved ECTS
+                                updateData.ectsSumSchulisch = row.getData().ectsSumSchulisch + sumLvEcts.ectsSumAnzurechnendeLvsSchulisch,
+                                updateData.ectsSumBeruflich = row.getData().ectsSumBeruflich + sumLvEcts.ectsSumAnzurechnendeLvsBeruflich
+
+
+                                // Update row
+                                row.update(updateData);
+
+                                // Reformat row
+                                row.reformat();
+
+                            })
+
+                            // Deselect rows
+                            $("#tableWidgetTabulator").tabulator('deselectRow', rowsToDeselect);
+
+                        })
 
                         // Print success message
-                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenGenehmigt"));
+                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenGenehmigt"));
                     }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
@@ -393,16 +512,21 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.error && data.retval != null)
+                    if (FHC_AjaxClient.isError(data))
                     {
                         // Print error message
-                        FHC_DialogLib.alertWarning(data.retval);
+                        FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
                     }
-
-                    if (!data.error && data.retval != null)
+                    else if (FHC_AjaxClient.hasData(data))
                     {
+                        data = FHC_AjaxClient.getData(data);
+
                         // Update status 'genehmigt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+                        $('#tableWidgetTabulator').tabulator('updateData', data);
+
+                        // Deselect rows
+                        var indexesToDeselect = data.map(x => x.anrechnung_id);
+                        $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
 
                         // Print success message
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "anrechnungenWurdenAbgelehnt"));
@@ -457,20 +581,21 @@ $(function(){
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.error && data.retval != null)
+                    if (FHC_AjaxClient.isError(data))
                     {
                         // Print error message
-                        FHC_DialogLib.alertWarning(data.retval);
+                        FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
                     }
-
-                    if (!data.error && data.retval != null)
+                    else if (FHC_AjaxClient.hasData(data))
                     {
+                        data = FHC_AjaxClient.getData(data);
+
                         // Print info message, if not all selected recommendations were requested
-                        if (data.retval.length < selected_data.length){
+                        if (data.length < selected_data.length){
                             FHC_DialogLib.alertInfo(
                                 FHC_PhrasesLib.t(
                                     "ui", "empfehlungWurdeAngefordertAusnahmeWoKeineLektoren",
-                                    [selected_data.length, data.retval.length, selected_data.length - data.retval.length])
+                                    [selected_data.length, data.length, selected_data.length - data.length])
                             );
                         }
                         else
@@ -481,7 +606,11 @@ $(function(){
                     }
 
                     //Update status 'genehmigt'
-                    $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+                    $('#tableWidgetTabulator').tabulator('updateData', data);
+
+                    // Deselect rows
+                    var indexesToDeselect = data.map(x => x.anrechnung_id);
+                    $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
@@ -595,5 +724,47 @@ var approveAnrechnung = {
                 break;
 
         }
+    },
+    getSumLvEctsByPreStudent(data){
+
+        var result = [];
+        
+        // Berechne für jeden Prestudenten die kumulierte Summe aller selektierten LV ECTS
+        data.reduce((prev, curr) => {
+
+            if (!prev[curr.prestudent_id])
+            {
+                prev[curr.prestudent_id] = {
+                    prestudent_id: curr.prestudent_id,
+                    ectsSumAnzurechnendeLvsSchulisch: 0,
+                    ectsSumAnzurechnendeLvsBeruflich: 0
+                };
+
+                result.push(prev[curr.prestudent_id])
+            }
+
+            // Kumulierte Summe aller selektierten LVs, die angerechnet werden sollen, getrennt nach
+            // schulischer und beruflicher Qualifikation.
+            // Ausgenommen ist die universitäre Qualifikation (5), da diese unbegrenzt möglich sind.
+            if (curr.begruendung_id != 5)
+            {
+                if (curr.begruendung_id == 4)
+                {
+                    prev[curr.prestudent_id].ectsSumAnzurechnendeLvsBeruflich += curr.ects;
+                }
+                else
+                {
+                    prev[curr.prestudent_id].ectsSumAnzurechnendeLvsSchulisch += curr.ects;
+                }
+            }
+
+            return prev;
+
+        }, {});
+
+        return result;
+    },
+    showNumberSelectedRows(rows){
+        $('#number-selected').html("Ausgewählte Zeilen: <strong>" + rows.length + "</strong>");
     }
 }
