@@ -244,6 +244,7 @@ protected function checkPhaseBebuchbar($phase)
 */
 protected function checkIfArbeitspaketZuWaehlen($projekt_kurzbz, $phase)
 {
+	$this->project->load($projekt_kurzbz);
 	if (!$this->project->zeitaufzeichnung && !$phase)
 	{
 		throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Bitte ein Arbeitspaket wählen!');
