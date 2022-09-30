@@ -167,7 +167,7 @@ else
 	//Lektoren ermitteln
 
 	$qry = "SELECT
-				distinct vorname, nachname
+				distinct vorname, nachname, wahlname
 			FROM
 				campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
 			WHERE
@@ -211,7 +211,7 @@ else
 	$qry = "
 	SELECT
 		distinct on(nachname, vorname, person_id)
-		vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
+		vorname, nachname, wahlname, matrikelnr, person_id, tbl_student.student_uid as uid,
 		tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 		(SELECT status_kurzbz
 			FROM public.tbl_prestudentstatus
@@ -277,6 +277,8 @@ else
 					$worksheet->write($lines,1,$elem->uid);
 					$worksheet->write($lines,2,$elem->nachname.$inc);
 					$worksheet->write($lines,3,$elem->vorname);
+					//wenn Wahlname vorhanden überschreibt dieser den Vornamen
+					$worksheet->write($lines,3,$elem->wahlname);
 					$worksheet->write($lines,4,'="'.$elem->semester.$elem->verband.$elem->gruppe.'"');
 					$worksheet->write($lines,5,'="'.trim($elem->matrikelnr).'"',$format_highlight);
 					$worksheet->write($lines,6, $note, $format_highlightright);

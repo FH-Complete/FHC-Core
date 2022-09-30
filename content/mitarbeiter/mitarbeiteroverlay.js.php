@@ -414,6 +414,7 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-textbox-titelpost').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-nachname').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-vorname').disabled=val;
+	document.getElementById('mitarbeiter-detail-textbox-wahlname').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-vornamen').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-geburtsort').disabled=val;
@@ -535,6 +536,7 @@ function MitarbeiterAuswahl()
 	titelpre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpre" ));
 	titelpost=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpost" ));
 	vorname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vorname" ));
+	wahlname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wahlname" ));
 	vornamen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vornamen" ));
 	nachname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachname" ));
 	geburtsdatum=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsdatum" ));
@@ -576,6 +578,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-textbox-titelpre').value=titelpre;
 	document.getElementById('mitarbeiter-detail-textbox-titelpost').value=titelpost;
 	document.getElementById('mitarbeiter-detail-textbox-vorname').value=vorname;
+	document.getElementById('mitarbeiter-detail-textbox-wahlname').value=wahlname;
 	document.getElementById('mitarbeiter-detail-textbox-vornamen').value=vornamen;
 	document.getElementById('mitarbeiter-detail-textbox-nachname').value=nachname;
 	document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').value=geburtsdatum;
@@ -631,7 +634,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-textbox-alias').value=alias;
 
 	// ***** KONTAKTE *****
-	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
+	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id+'&'+gettimestamp());
 
 	// ***** BETRIEBSMITTEL *****
 	document.getElementById('mitarbeiter-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
@@ -818,6 +821,7 @@ function MitarbeiterSave()
 	titelpre = document.getElementById('mitarbeiter-detail-textbox-titelpre').value;
 	titelpost = document.getElementById('mitarbeiter-detail-textbox-titelpost').value;
 	vorname = document.getElementById('mitarbeiter-detail-textbox-vorname').value;
+	wahlname = document.getElementById('mitarbeiter-detail-textbox-wahlname').value;
 	vornamen = document.getElementById('mitarbeiter-detail-textbox-vornamen').value;
 	nachname = document.getElementById('mitarbeiter-detail-textbox-nachname').value;
 	geburtsdatum = document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').value;
@@ -873,6 +877,7 @@ function MitarbeiterSave()
 	req.add('titelpre', titelpre);
 	req.add('titelpost', titelpost);
 	req.add('vorname', vorname);
+	req.add('wahlname', wahlname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
 	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
@@ -988,6 +993,7 @@ function MitarbeiterDetailgetSpaltenname(id)
 	if(id=='mitarbeiter-treecol-titelpre') return 'titelpre';
 	if(id=='mitarbeiter-treecol-vorname') return 'vorname';
 	if(id=='mitarbeiter-treecol-vornamen') return 'vornamen';
+	if(id=='mitarbeiter-treecol-wahlname') return 'wahlname';
 	if(id=='mitarbeiter-treecol-nachname') return 'nachname';
 	if(id=='mitarbeiter-treecol-titelpost') return 'titelpost';
 	if(id=='mitarbeiter-treecol-personalnummer') return 'personalnummer';

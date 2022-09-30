@@ -136,7 +136,7 @@ if (! check_student($user))
 }
 else
 {
-	$qry = "SELECT vw_student.vorname, vw_student.nachname, vw_student.prestudent_id, tbl_studiengang.studiengang_kz
+	$qry = "SELECT vw_student.vorname, vw_student.nachname, vw_student.wahlname, vw_student.prestudent_id, tbl_studiengang.studiengang_kz
 		FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz)
 		WHERE campus.vw_student.uid = " . $db->db_add_param($user) . ";";
 
@@ -148,6 +148,7 @@ else
 
 		$vorname = $row->vorname;
 		$nachname = $row->nachname;
+		$wahlname = $row->wahlname;
 		$prestudent_id = $row->prestudent_id;
 		$stg_obj = new studiengang();
 		$stg_obj->load($row->studiengang_kz);
@@ -313,7 +314,7 @@ else
 					// Noten ohne Wert werden entfernen
 					if(isset($notenarr[$row->note]['notenwert']))
 					{
-						$notenSummenArray[$row->lehrveranstaltung_id]['notenwert'] = $notenarr[$row->note]['notenwert'];					
+						$notenSummenArray[$row->lehrveranstaltung_id]['notenwert'] = $notenarr[$row->note]['notenwert'];
 						$notenSummenArray[$row->lehrveranstaltung_id]['ects'] = $row->ects;
 					}
 				}

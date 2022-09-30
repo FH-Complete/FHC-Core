@@ -176,4 +176,20 @@ class MessageToken_model extends DB_Model
 
 		return $this->execQuery($sql, array($oe_kurzbz));
 	}
+
+	/**
+	 *
+	 */
+	public function crossClientData($token, $relationmessage_id, $receiver_id)
+	{
+		$sql = 'SELECT mm.message_id
+			  FROM public.tbl_msg_message mm
+			  JOIN public.tbl_msg_recipient mr USING(message_id)
+			 WHERE mr.token = ?
+			   AND mm.message_id = ?
+			   AND mm.person_id = ?';
+
+		return $this->execQuery($sql, array($token, $relationmessage_id, $receiver_id));
+	}
 }
+
