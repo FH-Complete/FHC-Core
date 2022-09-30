@@ -111,9 +111,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
+			<treecol id="mitarbeiter-treecol-wahlname" label="Wahlname" flex="1" persist="hidden, width, ordinal" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#wahlname"  onclick="MitarbeiterTreeSort()"/>
+			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-treecol-vornamen" label="Vornamen" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen"  onclick="MitarbeiterTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#wahlname"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-treecol-titelpost" label="TitelPost" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
@@ -208,7 +212,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
    							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre" />
    							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname" />
    							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname" />
-   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen" />
+								<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#wahlname" />
+								<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen" />
    							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost" />
    							<?php
 							if($rechte->isBerechtigt('mitarbeiter/persoenlich'))

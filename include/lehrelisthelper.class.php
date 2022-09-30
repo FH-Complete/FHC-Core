@@ -200,7 +200,7 @@ class LehreListHelper
 		//Studierende der LV laden und in ein Array schreiben
 
 		$qry = 'SELECT
-					distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, public.tbl_student.student_uid,
+					distinct on(nachname, vorname, person_id) vorname, nachname, wahlname, matrikelnr, public.tbl_student.student_uid,
 					tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 					(SELECT status_kurzbz FROM public.tbl_prestudentstatus
 					WHERE prestudent_id=tbl_student.prestudent_id
@@ -276,10 +276,24 @@ class LehreListHelper
 					if(($row->mobilitaetstyp_kurzbz != '') && ($row->doubledegree == 1)) //Double Degree Student
 						$zusatz .= '(d.d.)';
 
+					if(($row->wahlname != ''))
+					{
+						//als Zusatz speichern
+						//$zusatz .= '(Wahlname: ' . $row->wahlname . ')';
+
+						//wenn vorhanden statt Vornamen anzeigen
+						$vorname = $row->wahlname;
+					}
+					else
+					{
+						$vorname = $row->vorname;
+					}
+
+
 					$this->studentuids[] = $row->student_uid;
 					$this->data[]=array('student'=>array(
 									'uid' => $row->student_uid,
-									'vorname'=>$row->vorname,
+									'vorname'=>$vorname,
 									'nachname'=>$row->nachname,
 									'personenkennzeichen'=>trim($row->matrikelnr),
 									'matr_nr'=>$row->matr_nr,

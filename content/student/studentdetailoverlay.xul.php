@@ -96,6 +96,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<textbox id="student-detail-textbox-vornamen" disabled="true" maxlength="128"/>
 						</row>
 						<row>
+							<label value="Wahlname" control="student-detail-textbox-wahlname"/>
+							<textbox id="student-detail-textbox-wahlname" disabled="true" maxlength="128"/>
+						</row>
+						<row>
 							<label value="Geburtsdatum" control="student-detail-textbox-geburtsdatum"/>
 							<hbox>
 								<box class="Datum" id="student-detail-textbox-geburtsdatum" disabled="true"/>
@@ -303,17 +307,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<menuitem label="Status vorrücken" oncommand="StudentPrestudentRolleVorruecken();" id="student-prestudent-rolle-tree-popup-move_forward" hidden="false"/>
 	</menupopup>
 </popupset>
-		<vbox hidden="true">
-			<label value="Neu"/>
-			<checkbox id="student-prestudent-checkbox-new" checked="false" />
-			<label value="Person_id"/>
-			<textbox id="student-prestudent-textbox-person_id" disabled="true"/>
-			<label value="Prestudent_id"/>
-			<textbox id="student-prestudent-textbox-prestudent_id" disabled="true"/>
-			<label value="studiengang_kz"/>
-			<textbox id="student-prestudent-textbox-studiengang_kz" disabled="true"/>
-		</vbox>
-
+		<hbox hidden="true">
+			<toolbox flex="1">
+				<label value="Neu"/>
+				<checkbox id="student-prestudent-checkbox-new" checked="false" />
+				<label value="studiengang_kz"/>
+				<textbox id="student-prestudent-textbox-studiengang_kz"/>
+			</toolbox>
+		</hbox>
 			<groupbox id="student-detail-groupbox-zgv">
 			<caption id="student-detail-groupbox-caption" label="Zugangsvoraussetzung" />
 				<grid id="student-prestudent-grid-zgv" style="margin:4px;" flex="1">
@@ -330,6 +331,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<column flex="1"/>
 					</columns>
 					<rows>
+						<?php
+						$hidden = 'hidden="true"';
+						$rechte = new benutzerberechtigung();
+						$rechte->getBerechtigungen($user);
+						if($rechte->isBerechtigt('admin'))
+							$hidden = '';
+						?>
+						<row <?php echo $hidden ?>>
+							<label value="Prestudent_id"/>
+							<hbox><textbox id="student-prestudent-textbox-prestudent_id" readonly="true" maxlength="16" size="16"/></hbox>
+							<label value="Person_id"/>
+							<hbox><textbox id="student-prestudent-textbox-person_id" readonly="true" maxlength="16" size="16"/></hbox>
+						</row>
 						<row>
 							<label value="ZGV" control="student-prestudent-menulist-zgvcode"/>
 							<menulist id="student-prestudent-menulist-zgvcode" disabled="true"
