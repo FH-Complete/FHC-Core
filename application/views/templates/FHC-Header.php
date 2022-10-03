@@ -90,7 +90,8 @@
 			{
 				generateCSSsInclude('vendor/npm-asset/primevue/resources/themes/bootstrap4-light-blue/theme.css');
 				generateCSSsInclude('vendor/npm-asset/primevue/resources/primevue.min.css');
-				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');			
+				generateCSSsInclude('vendor/npm-asset/primevue/resources/primeflex.min.css');
+				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');
 			}
 
 			// --------------------------------------------------------------------------------------------------------
