@@ -4,6 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class PlausicheckProducerLib
 {
+	const CI_LIBRARY_PATH = 'application/libraries';
 	const PLAUSI_ISSUES_FOLDER = 'issues/plausichecks';
 	const EXECUTE_PLAUSI_CHECK_METHOD_NAME = 'executePlausiCheck';
 
@@ -36,7 +37,7 @@ class PlausicheckProducerLib
 		'PrestudentStgUngleichStgStudienplan' => 'PrestudentStgUngleichStgStudienplan',
 		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
 		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher'
-		//'StudienplanUngueltig' => 'StudienplanUngueltig',
+		//'StudienplanUngueltig' => 'StudienplanUngueltig'
 	);
 
 	public function __construct()
@@ -59,8 +60,7 @@ class PlausicheckProducerLib
 		if (isEmptyString($studiensemester_kurzbz)) $studiensemester_kurzbz = $this->_currentStudiensemester;
 
 		// get path of library for issue to be produced
-		$issuesLibPath = DOC_ROOT . 'application/libraries/' . self::PLAUSI_ISSUES_FOLDER . '/';
-		//$issuesLibPath = base_url('application/libraries/' . self::PLAUSI_ISSUES_FOLDER . '/');
+		$issuesLibPath = DOC_ROOT . self::CI_LIBRARY_PATH . '/' . self::PLAUSI_ISSUES_FOLDER . '/';
 		$issuesLibFilePath = $issuesLibPath . $libName . '.php';
 
 		// check if library file exists

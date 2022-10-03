@@ -31,7 +31,7 @@ class IncomingHeimatNationOesterreich extends PlausiChecker
 			{
 				$results[] = array(
 					'person_id' => $person->person_id,
-					'resolution_params' => array('person_id' => $person->person_id)
+					'resolution_params' => array('person_id' => $person->person_id, 'studiensemester_kurzbz' => $studiensemester_kurzbz)
 				);
 			}
 		}

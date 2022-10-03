@@ -22,7 +22,8 @@ class IssueResolver extends IssueResolver_Controller
 			'CORE_INOUT_0003' => 'CORE_INOUT_0003',
 			'CORE_INOUT_0004' => 'CORE_INOUT_0004',
 			'CORE_INOUT_0005' => 'CORE_INOUT_0005',
-			'CORE_INOUT_0006' => 'CORE_INOUT_0006'
+			'CORE_INOUT_0006' => 'CORE_INOUT_0006',
+			'CORE_INOUT_0007' => 'CORE_INOUT_0007'
 		);
 	}
 }

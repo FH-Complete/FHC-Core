@@ -1077,7 +1077,7 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				DISTINCT pers.person_id
+				DISTINCT pers.person_id, status.studiensemester_kurzbz
 			FROM
 				public.tbl_prestudent pre
 				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
