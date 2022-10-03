@@ -9,6 +9,8 @@ class DashboardLib
 {
 	const WIDGET_ID_RANDOM_BYTES = 16;
 	const DEFAULT_DASHBOARD_KURZBZ = 'fhcomplete';
+	const SECTION_IF_FUNKTION_KURZBZ_IS_NULL = 'general';
+	const USEROVERRIDE_SECTION = 'custom';
 	
 	private $_ci; // CI instance
 	
@@ -106,7 +108,7 @@ class DashboardLib
 		$emptyoverride = new stdClass();
 		$emptyoverride->dashboard_id = $dashboard->dashboard_id;
 		$emptyoverride->uid = $uid;
-		$emptyoverride->override = '{"widgets": {}}';
+		$emptyoverride->override = '{"widgets": {"' . self::USEROVERRIDE_SECTION . '": {}}}';
 		
 		return $emptyoverride;
 	}
@@ -123,7 +125,8 @@ class DashboardLib
 		$emptypreset = new stdClass();
 		$emptypreset->dashboard_id = $dashboard->dashboard_id;
 		$emptypreset->funktion_kurzbz = $funktion_kurzbz;
-		$emptypreset->preset = '{"widgets": {}}';
+		$section = ($funktion_kurzbz !== null) ? $funktion_kurzbz : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
+		$emptypreset->preset = '{"widgets": {"' . $funktion_kurzbz . '": {}}}';
 		
 		return $emptypreset;
 	}
@@ -184,5 +187,32 @@ class DashboardLib
 		}
 		
 		return $result;
-	}	
+	}
+
+	public function addWidgetToWidgets(&$widgets, $section, $widget, $widgetid) 
+	{
+		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
+		if( !isset($widgets[$section]) || !is_array($widgets[$section]) ) 
+		{
+			$widgets[$section] = array();
+		}
+		
+		$widgets[$section][$widgetid] = $widget;
+	}
+	
+	public function removeWidgetFromWidgets(&$widgets, $section, $widgetid) 
+	{
+		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;		
+		if(isset($widgets[$section]) && isset($widgets[$section][$widgetid]) ) 
+		{
+			unset($widgets[$section][$widgetid]);
+			if(empty($widgets[$section])) {
+				unset($widgets[$section]);
+			}
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }

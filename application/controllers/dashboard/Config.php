@@ -61,7 +61,8 @@ class Config extends Auth_Controller
 		$preset_decoded = json_decode($preset->preset, true);
 		$widgetid = $this->DashboardLib->generateWidgetId($dashboard_kurzbz);
 		
-		$preset_decoded['widgets'][$widgetid['widgetid']] = $input->widget;
+		$this->DashboardLib->addWidgetToWidgets($preset_decoded['widgets'], 
+			$funktion_kurzbz, $input->widget, $widgetid['widgetid']);
 		
 		$preset->preset = json_encode($preset_decoded);
 				
@@ -91,11 +92,8 @@ class Config extends Auth_Controller
 		
 		$preset_decoded = json_decode($preset->preset, true);
 		
-		if( isset($preset_decoded['widgets'][$widgetid]) )
-		{
-			unset($preset_decoded['widgets'][$widgetid]);
-		}
-		else
+		if( $this->DashboardLib->removeWidgetFromWidgets($preset_decoded['widgets'], 
+			$funktion_kurzbz, $widgetid) )
 		{
 			http_response_code(404);
 			$this->terminateWithJsonError('widgetid ' . $widgetid . ' not found');
@@ -115,6 +113,7 @@ class Config extends Auth_Controller
 	{
 		$input = json_decode($this->input->raw_input_stream);
 		$dashboard_kurzbz = $input->db;
+		$funktion_kurzbz = $input->funktion_kurzbz;
 		$uid = $input->uid;
 		
 		$override = $this->DashboardLib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid);		
@@ -122,8 +121,9 @@ class Config extends Auth_Controller
 		$override_decoded = json_decode($override->override, true);
 		$widgetid = isset($input->widgetid) ? array('widgetid' => $input->widgetid) 
 			: $this->DashboardLib->generateWidgetId($dashboard_kurzbz);
-		
-		$override_decoded['widgets'][$widgetid['widgetid']] = $input->widget;
+
+		$this->DashboardLib->addWidgetToWidgets($override_decoded['widgets'], 
+			$funktion_kurzbz, $input->widget, $widgetid['widgetid']);
 		
 		$override->override = json_encode($override_decoded);
 				
@@ -140,6 +140,7 @@ class Config extends Auth_Controller
 	{
 		$input = json_decode($this->input->raw_input_stream);
 		$dashboard_kurzbz = $input->db;
+		$funktion_kurzbz = $input->funktion_kurzbz;
 		$uid = $input->uid;
 		$widgetid = $input->widgetid;
 		
@@ -152,11 +153,8 @@ class Config extends Auth_Controller
 		
 		$override_decoded = json_decode($override->override, true);
 		
-		if( array_key_exists($widgetid, $override_decoded['widgets']) )
-		{
-			unset($override_decoded['widgets'][$widgetid]);
-		}
-		else
+		if( !$this->DashboardLib->removeWidgetFromWidgets($override_decoded['widgets'], 
+			$funktion_kurzbz, $widgetid) )
 		{
 			http_response_code(404);
 			$this->terminateWithJsonError('widgetid ' . $widgetid . ' not found');
