@@ -137,7 +137,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STG_0002',
 		'fehler_kurzbz' => 'OrgformStgUngleichOrgformPrestudent',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Organisationsform des Studienganges stimmt nicht mit Organisationsformen der Studenten überein. (prestudent_id %s)',
+		'fehlertext' => 'Organisationsform des Studienganges %s stimmt nicht mit Organisationsformen der Studenten %s überein. (prestudent_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -193,7 +193,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0005',
 		'fehler_kurzbz' => 'InskriptionVorLetzerBismeldung',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Datum der Inskription liegt vor dem Datum der letzten BIS-Meldung. (prestudent_id %s)',
+		'fehlertext' => 'Datum der Inskription liegt vor dem Datum der letzten BIS-Meldung %s. (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),

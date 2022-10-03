@@ -32,7 +32,11 @@ class OrgformStgUngleichOrgformPrestudent extends PlausiChecker
 				$results[] = array(
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
-					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
+					'fehlertext_params' => array(
+						'stg_orgform' => $prestudent->stg_orgform,
+						'student_orgform' => $prestudent->student_orgform,
+						'prestudent_id' => $prestudent->prestudent_id
+					),
 					'resolution_params' => array(
 						'prestudent_id' => $prestudent->prestudent_id,
 						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz

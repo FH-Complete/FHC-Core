@@ -32,7 +32,11 @@ class InskriptionVorLetzerBismeldung extends PlausiChecker
 				$results[] = array(
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
-					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
+					'fehlertext_params' => array(
+						'datum_bismeldung' => date_format(date_create($prestudent->datum_bismeldung), 'd.m.Y'),
+						'prestudent_id' => $prestudent->prestudent_id,
+						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz
+					),
 					'resolution_params' => array(
 						'prestudent_id' => $prestudent->prestudent_id,
 						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz
