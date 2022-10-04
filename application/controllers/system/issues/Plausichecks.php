@@ -25,17 +25,6 @@ class Plausichecks extends Auth_Controller
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
-		//~ $this->loadPhrases(
-			//~ array(
-				//~ 'global',
-				//~ 'ui',
-				//~ 'filter',
-				//~ 'lehre',
-				//~ 'person',
-				//~ 'fehlermonitoring'
-			//~ )
-		//~ );
-
 		$this->_setAuthUID(); // sets property uid
 	}
 
@@ -51,20 +40,18 @@ class Plausichecks extends Auth_Controller
 		$studiengang_kz = $this->input->get('studiengang_kz');
 		$fehler_kurzbz = $this->input->get('fehler_kurzbz');
 
-		// message array for storing info output
-		$messages = array();
+		// issues array for passing issue texts
+		$issueTexts = array();
 		// all fehler kurzbz which are going to be checked
 		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckproducerlib->getFehlerKurzbz();
 		// set Studiengang to null if not passed
 		if (isEmptyString($studiengang_kz)) $studiengang_kz = null;
 
-		$messages[] = "Plausicheck Lauf gestartet";
-
 		// get the data returned by Plausicheck
 		foreach ($fehlerKurzbz as $fehler_kurzbz)
 		{
 			// execute the check
-			$messages[] = "Prüfe " . $fehler_kurzbz . "...";
+			$issueTexts[$fehler_kurzbz] = array();
 			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheck($fehler_kurzbz, $studiensemester_kurzbz, $studiengang_kz);
 
 			if (isError($plausicheckRes)) $this->terminateWithJsonError(getError($plausicheckRes));
@@ -92,17 +79,15 @@ class Plausichecks extends Auth_Controller
 					{
 						$fehlerText = getData($fehlerRes)[0]->fehlertext;
 						$fehlerText = isEmptyArray($fehlertext_params) ? $fehlerText : vsprintf($fehlerText, $fehlertext_params);
-						$messages[] = $fehlerText;
+						if (isset($person_id)) $fehlerText .= ", person_id: $person_id";
+						if (isset($oe_kurzbz)) $fehlerText .= ", oe_kurzbz: $oe_kurzbz";
+						$issueTexts[$fehler_kurzbz][] = $fehlerText;
 					}
 				}
 			}
-			else
-				$messages[] = "Nichts gefunden für Fehler $fehler_kurzbz";
 		}
 
-		$messages[] = "Plausicheck Lauf gestoppt";
-
-		$this->outputJsonSuccess($messages);
+		$this->outputJsonSuccess($issueTexts);
 	}
 
 	private function _getFilterData()

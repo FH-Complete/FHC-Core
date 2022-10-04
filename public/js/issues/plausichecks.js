@@ -16,18 +16,30 @@ var Plausichecks = {
 				successCallback: function (data, textStatus, jqXHR) {
 					if (FHC_AjaxClient.isError(data)) FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
 
+					let messageStr = "<strong>Plausichecks Prüfung Start</strong>";
+
 					if (FHC_AjaxClient.hasData(data))
 					{
-						let messageStr = "";
-						let messages = FHC_AjaxClient.getData(data);
+						let issueTexts = FHC_AjaxClient.getData(data);
 
-						for (let i = 0; i < messages.length; i++)
+						for (let fehler_kurzbz in issueTexts)
 						{
-							messageStr += messages[i]+"<br />";
-						}
+							messageStr += "<br /><br /><span>Prüfe " + fehler_kurzbz + "...</span>";
+							let texts = issueTexts[fehler_kurzbz];
 
-						$("#plausioutput").html(messageStr);
+							if (texts.length == 0) {
+								messageStr += "<br /><span class='text-success'>Keine Issues für " + fehler_kurzbz + "</span>";
+								continue;
+							}
+
+							for (i = 0; i < texts.length; i++)
+							{
+								messageStr += "<br /><span class='text-danger'>" + texts[i] + "</span>";
+							}
+						}
 					}
+					messageStr += "<br /><br /><strong>Plausichecks Prüfung Ende</strong>";
+					$("#plausioutput").html(messageStr);
 				},
 				errorCallback: function (jqXHR, textStatus, errorThrown) {
 					FHC_DialogLib.alertError(textStatus);
@@ -35,6 +47,7 @@ var Plausichecks = {
 			}
 		);
 	},
+
 };
 
 /**

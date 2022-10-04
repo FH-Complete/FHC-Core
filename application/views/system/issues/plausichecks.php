@@ -12,10 +12,6 @@ $this->load->view(
 		'ajaxlib' => true,
 		'navigationwidget' => true,
 		'dialoglib' => true,
-		//~ 'phrases' => array(
-			//~ 'ui',
-			//~ 'fehlermonitoring'
-		//~ ),
 		//'customCSSs' => array('public/css/issues/issuesZustaendigkeiten.css', 'public/css/sbadmin2/tablesort_bootstrap.css'),
 		'customJSs' => array('public/js/issues/plausichecks.js')
 	)
@@ -101,7 +97,6 @@ $this->load->view(
 			</div>
 		</div>
 	</div>
-
 </div>
 </body>
 
