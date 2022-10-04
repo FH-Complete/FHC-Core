@@ -137,7 +137,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STG_0002',
 		'fehler_kurzbz' => 'OrgformStgUngleichOrgformPrestudent',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Organisationsform des Studienganges %s stimmt nicht mit Organisationsformen der Studenten %s überein. (prestudent_id %s)',
+		'fehlertext' => 'Organisationsform des Studienganges (%s) stimmt nicht mit Organisationsformen des Studenten (%s) überein. (prestudent_id %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
