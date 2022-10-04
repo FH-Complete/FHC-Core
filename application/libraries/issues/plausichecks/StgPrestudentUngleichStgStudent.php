@@ -17,7 +17,7 @@ class StgPrestudentUngleichStgStudent extends PlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getPrestudentenStgUngleichStgStudent($studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getStgPrestudentUngleichStgStudent($studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 

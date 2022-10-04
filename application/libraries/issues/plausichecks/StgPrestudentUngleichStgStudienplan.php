@@ -7,7 +7,7 @@ require_once('PlausiChecker.php');
 /**
  *
  */
-class PrestudentStgUngleichStgStudienplan extends PlausiChecker
+class StgPrestudentUngleichStgStudienplan extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -17,7 +17,7 @@ class PrestudentStgUngleichStgStudienplan extends PlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getPrestudentStgUngleichStgStudienplan($studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getStgPrestudentUngleichStgStudienplan($studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
@@ -32,7 +32,7 @@ class PrestudentStgUngleichStgStudienplan extends PlausiChecker
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
 					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id, 'studienplan' => $prestudent->studienplan),
-					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id)
+					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id, 'studienordnung_id' => $prestudent->studienordnung_id)
 				);
 			}
 		}

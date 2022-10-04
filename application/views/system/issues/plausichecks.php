@@ -82,7 +82,7 @@ $this->load->view(
 				<div class="col-xs-2 form-group">
 					<label>&nbsp;</label>
 					<br />
-					<button class="btn btn-default" id="plausistart">Plausichecks starten</button>
+					<button class="btn btn-default text-right" id="plausistart">Plausichecks starten</button>
 				</div>
 			</div>
 			<div class="row">

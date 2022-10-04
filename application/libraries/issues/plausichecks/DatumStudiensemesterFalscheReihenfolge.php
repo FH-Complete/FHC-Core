@@ -14,11 +14,10 @@ class DatumStudiensemesterFalscheReihenfolge extends PlausiChecker
 		$results = array();
 
 		// pass parameters needed for plausicheck
-		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getDatumStudiensemesterFalscheReihenfolge($studiensemester_kurzbz, $studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getDatumStudiensemesterFalscheReihenfolge($studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
@@ -34,8 +33,7 @@ class DatumStudiensemesterFalscheReihenfolge extends PlausiChecker
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
 					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
 					'resolution_params' => array(
-						'prestudent_id' => $prestudent->prestudent_id,
-						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz
+						'prestudent_id' => $prestudent->prestudent_id
 					)
 				);
 			}

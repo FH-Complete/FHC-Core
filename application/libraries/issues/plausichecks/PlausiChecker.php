@@ -1,7 +1,7 @@
 <?php
 
 /**
- * classing defining method and ressources to use for plausicheck issue producer
+ * class defining ressources and method to use for plausicheck issue producer
  */
 abstract class PlausiChecker
 {

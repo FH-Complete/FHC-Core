@@ -79,8 +79,8 @@ class Plausichecks extends Auth_Controller
 					{
 						$fehlerText = getData($fehlerRes)[0]->fehlertext;
 						$fehlerText = isEmptyArray($fehlertext_params) ? $fehlerText : vsprintf($fehlerText, $fehlertext_params);
-						if (isset($person_id)) $fehlerText .= ", person_id: $person_id";
-						if (isset($oe_kurzbz)) $fehlerText .= ", oe_kurzbz: $oe_kurzbz";
+						if (isset($person_id)) $fehlerText .= "; person_id: $person_id";
+						if (isset($oe_kurzbz)) $fehlerText .= "; oe_kurzbz: $oe_kurzbz";
 						$issueTexts[$fehler_kurzbz][] = $fehlerText;
 					}
 				}

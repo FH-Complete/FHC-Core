@@ -54,7 +54,7 @@ var Plausichecks = {
  * When JQuery is up
  */
 $(document).ready(function () {
-	// set event for adding a new Zuständigkeit
+	// start the Plausicheck run on button click
 	$("#plausistart").click(
 		function () {
 			Plausichecks.startPlausichecks(

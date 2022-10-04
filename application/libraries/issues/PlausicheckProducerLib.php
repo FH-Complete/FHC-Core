@@ -34,7 +34,7 @@ class PlausicheckProducerLib
 		'NationNichtOesterreichAberGemeinde' => 'NationNichtOesterreichAberGemeinde',
 		'OrgformStgUngleichOrgformPrestudent' => 'OrgformStgUngleichOrgformPrestudent',
 		'PrestudentMischformOhneOrgform' => 'PrestudentMischformOhneOrgform',
-		'PrestudentStgUngleichStgStudienplan' => 'PrestudentStgUngleichStgStudienplan',
+		'StgPrestudentUngleichStgStudienplan' => 'StgPrestudentUngleichStgStudienplan',
 		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
 		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher'
 		//'StudienplanUngueltig' => 'StudienplanUngueltig'

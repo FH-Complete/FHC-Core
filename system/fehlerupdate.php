@@ -151,7 +151,7 @@ $fehlerArr = array(
 	),
 	array(
 		'fehlercode' => 'CORE_STG_0004',
-		'fehler_kurzbz' => 'PrestudentStgUngleichStgStudienplan',
+		'fehler_kurzbz' => 'StgPrestudentUngleichStgStudienplan',
 		'fehlercode_extern' => null,
 		'fehlertext' => 'Studiengang des Prestudenten passt nicht zu Studiengang des Studienplans. (prestudent_id %s, Studienplan %s)',
 		'fehlertyp_kurzbz' => 'error',
@@ -326,11 +326,11 @@ for ($fehlerCounter = 0; $fehlerCounter < count($fehlerArr); $fehlerCounter++)
 	{
 		$selectFehlerQuery = 'SELECT 1
 								FROM system.tbl_fehler
-							   WHERE fehlercode = '.$db->db_add_param($fehler['fehlercode']);
+								WHERE fehlercode = '.$db->db_add_param($fehler['fehlercode']);
 
 		// If no error occurred while loading a fehler from the DB
-	   	if ($dbFehlerDefinition = @$db->db_query($selectFehlerQuery))
-	   	{
+		if ($dbFehlerDefinition = @$db->db_query($selectFehlerQuery))
+		{
 			// If NO filters were loaded: insert
 			if ($db->db_num_rows($dbFehlerDefinition) == 0)
 			{
