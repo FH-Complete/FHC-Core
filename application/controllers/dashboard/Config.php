@@ -14,9 +14,9 @@ class Config extends Auth_Controller
 				'index'							=> 'dashboard/benutzer:r',
 				'dummy'							=> 'dashboard/benutzer:r',
 				'genWidgetId'					=> 'dashboard/benutzer:rw',
-				'addWidgetToPreset'				=> 'dashboard/admin:rw',
+				'addWidgetsToPreset'			=> 'dashboard/admin:rw',
 				'removeWidgetFromPreset'		=> 'dashboard/admin:rw',
-				'addWidgetToUserOverride'		=> 'dashboard/benutzer:rw',
+				'addWidgetsToUserOverride'		=> 'dashboard/benutzer:rw',
 				'removeWidgetFromUserOverride'	=> 'dashboard/benutzer:rw'
 			)
 		);
@@ -46,11 +46,11 @@ class Config extends Auth_Controller
 		$dashboard_kurzbz = $this->input->get('db');
 		$widgetid = $this->DashboardLib->generateWidgetId($dashboard_kurzbz);
 		$this->outputJsonSuccess(array(
-			'widgetid' => $widgetid['widgetid']
+			'widgetid' => $widgetid
 		));
 	}
 	
-	public function addWidgetToPreset() 
+	public function addWidgetsToPreset() 
 	{
 		$input = json_decode($this->input->raw_input_stream);
 		$dashboard_kurzbz = $input->db;
@@ -59,10 +59,9 @@ class Config extends Auth_Controller
 		$preset = $this->DashboardLib->getPresetOrCreateEmptyPreset($dashboard_kurzbz, $funktion_kurzbz);		
 		
 		$preset_decoded = json_decode($preset->preset, true);
-		$widgetid = $this->DashboardLib->generateWidgetId($dashboard_kurzbz);
 		
-		$this->DashboardLib->addWidgetToWidgets($preset_decoded['widgets'], 
-			$funktion_kurzbz, $input->widget, $widgetid['widgetid']);
+		$this->DashboardLib->addWidgetsToWidgets($preset_decoded['widgets'], 
+			$dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
 		
 		$preset->preset = json_encode($preset_decoded);
 				
@@ -109,7 +108,7 @@ class Config extends Auth_Controller
 		$this->outputJsonSuccess(array('msg' => 'preset successfully updated.'));
 	}
 
-	public function addWidgetToUserOverride() 
+	public function addWidgetsToUserOverride() 
 	{
 		$input = json_decode($this->input->raw_input_stream);
 		$dashboard_kurzbz = $input->db;
@@ -119,11 +118,9 @@ class Config extends Auth_Controller
 		$override = $this->DashboardLib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid);		
 		
 		$override_decoded = json_decode($override->override, true);
-		$widgetid = isset($input->widgetid) ? array('widgetid' => $input->widgetid) 
-			: $this->DashboardLib->generateWidgetId($dashboard_kurzbz);
 
-		$this->DashboardLib->addWidgetToWidgets($override_decoded['widgets'], 
-			$funktion_kurzbz, $input->widget, $widgetid['widgetid']);
+		$this->DashboardLib->addWidgetsToWidgets($override_decoded['widgets'], 
+			$dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
 		
 		$override->override = json_encode($override_decoded);
 				

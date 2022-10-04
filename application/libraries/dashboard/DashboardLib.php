@@ -31,10 +31,7 @@ class DashboardLib
 		$widgetid_input = time() . '_' . $dashboard_kurzbz . '_' 
 			. bin2hex(random_bytes(self::WIDGET_ID_RANDOM_BYTES));
 		$widgetid = md5($widgetid_input);
-		return array(
-			'widgetid' => $widgetid,
-			'widgetid_input' => $widgetid_input
-		);
+		return $widgetid;
 	}
 	
 	public function getDashboardByKurzbz($dashboard_kurzbz) 
@@ -131,11 +128,12 @@ class DashboardLib
 		return $emptypreset;
 	}
 	
-	public function getPreset($dashboard_kurzbz, $funktion_kurzbz) 
+	public function getPreset($dashboard_kurzbz, $section) 
 	{
 		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
 		$preset = null;
 		
+		$funktion_kurzbz = ($section === self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL) ? null : $section;
 		$result = $this->_ci->DashboardPresetModel
 			->getPresetByDashboardAndFunktion($dashboard->dashboard_id, $funktion_kurzbz);
 		
@@ -189,6 +187,18 @@ class DashboardLib
 		return $result;
 	}
 
+	public function addWidgetsToWidgets(&$widgets, $dashboard_kurzbz, $section, $addwigets)
+	{
+		foreach ($addwigets as $widget)
+		{
+			if(!isset($widget->widgetid))
+			{
+				$widget->widgetid = $this->generateWidgetId($dashboard_kurzbz);
+			}
+			$this->addWidgetToWidgets($widgets, $section, $widget, $widget->widgetid);
+		}
+	}
+	
 	public function addWidgetToWidgets(&$widgets, $section, $widget, $widgetid) 
 	{
 		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
@@ -206,7 +216,7 @@ class DashboardLib
 		if(isset($widgets[$section]) && isset($widgets[$section][$widgetid]) ) 
 		{
 			unset($widgets[$section][$widgetid]);
-			if(empty($widgets[$section])) {
+			if(empty($widgets[$section]) && $section !== self::USEROVERRIDE_SECTION) {
 				unset($widgets[$section]);
 			}
 			return true;
