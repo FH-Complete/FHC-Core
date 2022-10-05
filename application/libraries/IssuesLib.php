@@ -236,7 +236,15 @@ class IssuesLib
 		if (hasData($fehlerRes))
 		{
 			$fehlertextVorlage = getData($fehlerRes)[0]->fehlertext;
-			$fehlertext = isEmptyArray($fehlertext_params) ? $fehlertextVorlage : vsprintf($fehlertextVorlage, $fehlertext_params);
+
+			$fehlertext = $fehlertextVorlage;
+			if (!isEmptyArray($fehlertext_params))
+			{
+				if (count($fehlertext_params) != substr_count($fehlertextVorlage, '%s'))
+					return error('Wrong number of parameters for Fehlertext, fehler_kurzbz ' . $fehlercode);
+
+				$fehlertext = vsprintf($fehlertextVorlage, $fehlertext_params);
+			}
 
 			$openIssuesCountRes = $this->_ci->IssueModel->getOpenIssueCount($fehlercode, $person_id, $oe_kurzbz, $fehlercode_extern);
 
