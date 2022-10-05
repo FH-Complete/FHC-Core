@@ -222,12 +222,25 @@
 											<a href="javascript:void(0)"><i class="fa fa-info-circle"></i> <?php echo  $this->p->t('infocenter', 'zgv') ?> <?php echo $studiengangkurzbz ?></a>
 										</div>
 									</div>
-									<?php if (!$infoonly)
-										echo $this->widgetlib->widget(
-											'Zgv_widget',
-											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgv_code),
-											array('name' => 'zgv', 'id' => 'zgv_'.$zgvpruefung->prestudent_id)
-										); ?>
+									<?php if (!$infoonly):
+									echo "<select id='zgv_" . $zgvpruefung->prestudent_id . "' name='zgv' class='form-control'>";
+										$selectedDefault = (is_null($zgvpruefung->zgv_code) ? 'selected' : '');
+										echo "<option " . $selectedDefault . " value='null'>Bitte Eintrag wählen...</option>";
+										foreach ($all_zgvs as $zgv)
+										{
+											$selected = ($zgvpruefung->zgv_code === $zgv->zgv_code) ? 'selected' : '';
+											$aktiv = '';
+											$class = '';
+											if (!$zgv->aktiv)
+											{
+												$aktiv = '(inaktiv)';
+												$class = 'gesperrtoption';
+											}
+
+											echo "<option " . $selected . " value='" . $zgv->zgv_code . "' class='". $class ."'>" . $zgv->zgv_bez . " " . $aktiv ."</option>";
+										}
+									echo "</select>";
+									endif;?>
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[1] ?>">
@@ -265,11 +278,26 @@
 									<?php if ($infoonly)
 										echo $zgvpruefung->zgvnation_bez;
 									else
-										echo $this->widgetlib->widget(
-											'Nation_widget',
-											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvnation_code),
-											array('name' => 'zgvnation', 'id' => 'zgvnation_'.$zgvpruefung->prestudent_id)
-										); ?>
+									{
+										echo "<select id='zgvnation_" . $zgvpruefung->prestudent_id . "' name='zgvnation' class='form-control'>";
+										$selectedDefault = (is_null($zgvpruefung->zgvnation_code) ? 'selected' : '');
+										echo "<option " . $selectedDefault . " value='null'>Bitte Eintrag wählen...</option>";
+
+										foreach ($all_nations as $nation)
+										{
+											$selected = ($nation->nation_code === $zgvpruefung->zgvnation_code) ? 'selected' : '';
+											$sperre = '';
+											$class = '';
+											if ($nation->sperre == 'true')
+											{
+												$sperre = '(gesperrt)';
+												$class = 'gesperrtoption';
+											}
+											echo "<option " . $selected . " value='" . $nation->nation_code . "' class='" . $class ."'>" . $nation->langtext . " " . $sperre ."</option>";
+										}
+										echo "</select>";
+									}
+									?>
 								</div>
 							</div>
 						</div>
@@ -282,11 +310,25 @@
 										if ($infoonly)
 											echo $zgvpruefung->zgvmas_bez;
 										else
-											echo $this->widgetlib->widget(
-												'Zgvmaster_widget',
-												array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvmas_code),
-												array('name' => 'zgvmas', 'id' => 'zgvmas_'.$zgvpruefung->prestudent_id)
-											); ?>
+										{
+											echo "<select id='zgvmas_" . $zgvpruefung->prestudent_id . "' name='zgvmas' class='form-control'>";
+											$selectedDefault = (is_null($zgvpruefung->zgvmas_code) ? 'selected' : '');
+											echo "<option " . $selectedDefault . " value='null'>Bitte Eintrag wählen...</option>";
+											foreach ($all_zgvs_master as $zgv)
+											{
+												$selected = ($zgvpruefung->zgvmas_code === $zgv->zgvmas_code) ? 'selected' : '';
+												$aktiv = '';
+												$class = '';
+												if (!$zgv->aktiv)
+												{
+													$aktiv = '(inaktiv)';
+													$class = 'gesperrtoption';
+												}
+												echo "<option " . $selected . " value='" . $zgv->zgvmas_code . "' class='" . $class . "'>" . $zgv->zgvmas_bez . " " . $aktiv ."</option>";
+											}
+											echo "</select>";
+										}
+										?>
 									</div>
 								</div>
 								<div class="col-lg-<?php echo $columns[1] ?>">
@@ -326,11 +368,28 @@
 										if ($infoonly)
 											echo $zgvpruefung->zgvmanation_bez;
 										else
-											echo $this->widgetlib->widget(
-												'Nation_widget',
-												array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvmanation_code),
-												array('name' => 'zgvmanation', 'id' => 'zgvmanation_'.$zgvpruefung->prestudent_id)
-											); ?>
+										{
+											echo "<select id='zgvmanation_" . $zgvpruefung->prestudent_id . "' name='zgvmanation' class='form-control'>";
+											$selectedDefault = (is_null($zgvpruefung->zgvmanation_code) ? 'selected' : '');
+											echo "<option " . $selectedDefault . " value='null'>Bitte Eintrag wählen...</option>";
+
+											foreach ($all_nations as $nation)
+											{
+												$selected = ($nation->nation_code === $zgvpruefung->zgvmanation_code) ? 'selected' : '';
+												$sperre = '';
+												$class = '';
+
+												if ($nation->sperre == 'true')
+												{
+													$sperre = '(gesperrt)';
+													$class = 'gesperrtoption';
+												}
+
+												echo "<option " . $selected . " value='" . $nation->nation_code . "' class='" . $class . "'>" . $nation->langtext . " " . $sperre ."</option>";
+											}
+											echo "</select>";
+										}
+										?>
 									</div>
 								</div>
 							</div>
