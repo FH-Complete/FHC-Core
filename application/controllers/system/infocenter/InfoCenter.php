@@ -1987,11 +1987,23 @@ class InfoCenter extends Auth_Controller
 
 		$studienArtBerechtigung = array_column($this->getStudienArtBerechtigung(), 'typ');
 
+		$this->ZgvModel->addOrder('zgv_bez');
+		$allZGVs = getData($this->ZgvModel->load());
+
+		$this->ZgvModel->addOrder('zgvmas_bez');
+		$allZGVsMaster = getData($this->ZgvmasterModel->load());
+
+		$this->NationModel->addOrder('langtext');
+		$allNations = getData($this->NationModel->load());
+
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
 			'abwstatusgruende' => $abwstatusgruende,
 			'intstatusgruende' => $intstatusgruende,
-			'studienArtBerechtigung' => $studienArtBerechtigung
+			'studienArtBerechtigung' => $studienArtBerechtigung,
+			'all_zgvs' => $allZGVs,
+			'all_zgvs_master' => $allZGVsMaster,
+			'all_nations' => $allNations,
 		);
 
 		return $data;
