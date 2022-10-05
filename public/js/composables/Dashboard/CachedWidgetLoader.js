@@ -1,0 +1,29 @@
+let __widgets = {};
+let __widgetsStarted = {};
+let __path = '';
+
+export default {
+	getWidget(id) {
+		return __widgets[id];
+	},
+	loadWidget(id) {
+		if (__widgets[id])
+			return Promise.resolve(__widgets[id]);
+		if (__widgetsStarted[id])
+			return __widgetsStarted[id];
+		if (!__path)
+			return Promise.reject('Widget could not be loaded because there is no path yet!');
+
+		__widgetsStarted[id] = new Promise((resolve, reject) => {
+			axios.get(__path, {params:{id}}).then(res => {
+				__widgets[id] = res.data.retval;
+				__widgetsStarted[id] = undefined;
+				resolve(__widgets[id]);
+			}).catch(error => reject(error.response.data.retval.error));
+		});
+		return __widgetsStarted[id];
+	},
+	setPath(path) {
+		__path = path;
+	}
+}

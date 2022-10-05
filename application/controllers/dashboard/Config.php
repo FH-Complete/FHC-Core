@@ -130,7 +130,7 @@ class Config extends Auth_Controller
 			$this->terminateWithJsonError('override could not be saved');
 		}
 		
-		$this->outputJsonSuccess(array('msg' => 'override successfully stored.'));
+		$this->outputJsonSuccess(array('msg' => 'override successfully stored.', 'data' => $override_decoded));
 	}
 	
 	public function removeWidgetFromUserOverride()

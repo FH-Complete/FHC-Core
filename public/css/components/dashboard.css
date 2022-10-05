@@ -1,0 +1,16 @@
+.alert-danger .form-check-input:checked {
+	border-color: #842029;
+	background-color: #842029;
+}
+
+.draganddropcontainer {
+	grid-template-columns:repeat(4,1fr);
+	gap: 1rem;
+	place-items: stretch;
+	place-content: stretch;
+}
+@media(max-width: 577px) {
+	.draganddropcontainer {
+		grid-template-columns:repeat(2,1fr);
+	}
+}
