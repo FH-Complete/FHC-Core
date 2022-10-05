@@ -79,10 +79,10 @@ $this->load->view(
 						<?php endforeach; ?>
 					</select>
 				</div>
-				<div class="col-xs-2 form-group">
+				<div class="col-xs-2 form-group text-right">
 					<label>&nbsp;</label>
 					<br />
-					<button class="btn btn-default text-right" id="plausistart">Plausichecks starten</button>
+					<button class="btn btn-default" id="plausistart">Plausichecks starten</button>
 				</div>
 			</div>
 			<div class="row">
