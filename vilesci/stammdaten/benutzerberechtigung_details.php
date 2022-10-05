@@ -271,6 +271,7 @@ if(isset($_POST['schick']))
 				$berechtigung_kurzbz = (isset($value['berechtigung_kurzbz']) ? $value['berechtigung_kurzbz'] : '');
 				$art = (isset($value['art']) ? $value['art'] : '');
 				$oe_kurzbz = (isset($value['oe_kurzbz']) ? $value['oe_kurzbz'] : '');
+				//echo '<pre>', var_dump($oe_kurzbz), '</pre>';
 				$kostenstelle_id = (isset($value['kostenstelle_id']) ? $value['kostenstelle_id'] : '');
 				$start = (isset($value['start']) ? $value['start'] : '');
 				$ende = (isset($value['ende']) ? $value['ende'] : '');
@@ -290,7 +291,27 @@ if(isset($_POST['schick']))
 				else
 				{
 					if(!$ber->load($benutzerberechtigung_id))
+					{
 						die('Fehler beim Laden der Berechtigung');
+					}
+					//Nur bei geänderten Datensätzen das Updatedatum setzen
+					if ($ber->berechtigung_kurzbz != $berechtigung_kurzbz
+						|| $ber->art != $art
+						|| $ber->oe_kurzbz != $oe_kurzbz
+						|| $ber->rolle_kurzbz != $rolle_kurzbz
+						|| $ber->uid != $uid
+						|| $ber->funktion_kurzbz != $funktion_kurzbz
+						|| $ber->studiensemester_kurzbz != $studiensemester_kurzbz
+						|| $ber->start != $start
+						|| $ber->ende != $ende
+						|| $ber->kostenstelle_id != $kostenstelle_id
+						|| $ber->anmerkung != $anmerkung
+						|| $ber->negativ != isset($value['negativ'])
+					)
+					{
+						$ber->updateamum = date('Y-m-d H:i:s');
+						$ber->updatevon = $user;
+					}
 				}
 				if (isset($value['negativ']))
 					$ber->negativ = true;
@@ -307,8 +328,6 @@ if(isset($_POST['schick']))
 				$ber->studiensemester_kurzbz = $studiensemester_kurzbz;
 				$ber->start = $start;
 				$ber->ende = $ende;
-				$ber->updateamum = date('Y-m-d H:i:s');
-				$ber->updatevon = $user;
 				$ber->kostenstelle_id = $kostenstelle_id;
 				$ber->anmerkung = $anmerkung;
 
@@ -425,6 +444,10 @@ foreach ($oe->result AS $row)
 
 $kostenstelle = new wawi_kostenstelle();
 $kostenstelle->getAll();
+foreach ($kostenstelle->result AS $row)
+{
+	$kst_arr[$row->kostenstelle_id] = $row->bezeichnung;
+}
 
 if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 {
@@ -483,13 +506,21 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					$i++;
 					if ($i==1)
 					{
-						$htmlstr .= "<p>Geerbte Berechtigungen aus Funktion(en) ";
+						$htmlstr .= "<p>Geerbte Berechtigungen aus Funktion(en): ";
 					}
-					$htmlstr .= ($i > 1 ? "</a>, <a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz' target='_blank'>" : "<a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz' target='_blank'>").$funktion_bezeichnung->beschreibung;
+					if ($i > 1)
+					{
+						$htmlstr .= "</a>, ";
+					}
+
+					$htmlstr .= "<a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz' target='_blank'>";
+					$htmlstr .= $funktion_bezeichnung->beschreibung;
 				}
 			}
-			if(!empty($funktionsrecht))
+			if(isset($funktionsrecht))
+			{
 				$htmlstr .= '</a></p>';
+			}
 		}
 	}
 	elseif(isset($_REQUEST['funktion_kurzbz']) && $_REQUEST['funktion_kurzbz']!='')
@@ -576,6 +607,12 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	}
 
 	//Kostenstelle
+	$htmlstr .= "		<td class='ks_column'>";
+	$htmlstr .= "			<input type='hidden' name='dataset[0][kostenstelle_id]' value=''>";
+	$htmlstr .= "			<input type='text' placeholder='Kostenstelle' id='kostenstelle_autocomplete_neu' class='kostenstelle_autocomplete'>";
+	$htmlstr .= "		</td>";
+
+	/*
 	$htmlstr .= "		<td class='ks_column'><select id='kostenstelle_neu' name='dataset[0][kostenstelle_id]' style='width: 200px;'>";
 	$htmlstr .= "			<option value=''>&nbsp;</option>";
 
@@ -588,7 +625,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 		$htmlstr .= "		<option value='".$kst->kostenstelle_id."' ".$class.">".$kst->bezeichnung.'</option>';
 	}
-	$htmlstr .= "		</select></td>";
+	$htmlstr .= "		</select></td>";*/
 
 	//Negativ
 	$htmlstr .= "		<td align='center'><input type='checkbox' name='dataset[0][negativ]'></td>";
@@ -612,6 +649,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	// Tabelle für bestehende Berechtigungen
 	////////////////
 
+	$htmlstr .= "<p style='font-size: small' id='anzahl'></p>";
 	$htmlstr .= "<form action='benutzerberechtigung_details.php?uid=".$uid."&funktion_kurzbz=".$funktion_kurzbz."' method='POST'>";
 
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>";
@@ -666,19 +704,22 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		{
 			$titel="ccc";
 			$style = 'style="border-left: 10px solid tomato; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
+			$data = 'rot';
 		}
 		elseif ($b->start!='' && strtotime($b->start) > $heute)
 		{
 			$titel="bbb";
 			$style = 'style="border-left: 10px solid gold; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
+			$data = 'gelb';
 		}
 		else
 		{
 			$titel="aaa";
 			$style = 'style="border-left: 10px solid LightGreen; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
+			$data = 'gruen';
 		}
 		// Auswahlcheckbox
-		$htmlstr .= "		<td $style class='auswahlcheckboxen' name='td_$b->benutzerberechtigung_id'>";
+		$htmlstr .= "		<td $style class='auswahlcheckboxen' name='td_$b->benutzerberechtigung_id' data-".$data."='".$data."'>";
 		$htmlstr .= "			<span style='display: none'>".$titel."</span>";
 		$htmlstr .= "			<input type='checkbox' class='auswahlcheckbox' name='dataset[$b->benutzerberechtigung_id][check]'>";
 		$htmlstr .= "		</td>";
@@ -732,7 +773,14 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 		//Kostenstelle
 		$htmlstr .= "		<td class='ks_column'>";
-		$htmlstr .= "		<select name='dataset[$b->benutzerberechtigung_id][kostenstelle_id]' style='width: 200px;'>";
+		$htmlstr .= "			<span style='display: none'>".$b->kostenstelle_id."</span>";
+		$htmlstr .= "			<input type='hidden' name='dataset[$b->benutzerberechtigung_id][kostenstelle_id]' value='$b->kostenstelle_id'>";
+		$htmlstr .= "			<input type='text' class='kostenstelle_autocomplete' value='".($b->kostenstelle_id != '' ? $kst_arr[$b->kostenstelle_id] : '')."'>";
+		$htmlstr .= "		</td>";
+
+
+
+		/*$htmlstr .= "		<select name='dataset[$b->benutzerberechtigung_id][kostenstelle_id]' style='width: 200px;'>";
 		$htmlstr .= "		<option value=''>&nbsp;</option>";
 
 		foreach ($kostenstelle->result as $kst)
@@ -748,7 +796,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 			$htmlstr .= "	<option value='".$kst->kostenstelle_id."' ".$sel." ".$class.">".$kst->bezeichnung.'</option>';
 		}
-		$htmlstr .= "		</select></td>";
+		$htmlstr .= "		</select></td>";*/
 
 		//Negativ-Checkbox
 		$htmlstr .= "		<td align='center'>";
@@ -769,7 +817,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 		//Anmerkung
 		$htmlstr .= "		<td>";
-		$htmlstr .= "			<input type='text' name='dataset[$b->benutzerberechtigung_id][anmerkung]' value='".$b->anmerkung."' title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung))."' size='30' maxlength='256'>";
+		$htmlstr .= "			<input type='text' name='dataset[$b->benutzerberechtigung_id][anmerkung]' value='".$b->anmerkung."' title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung))."' size='50' maxlength='256'>";
 		$htmlstr .= "		</td>";
 
 		//Info
@@ -957,6 +1005,12 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					$(this).siblings('input:hidden').val(ui.item.oe_kurzbz);
 				}
 			});
+			$(".oe_kurzbz_autocomplete").on( "input", function() {
+				if ($(this).val() == '')
+				{
+					$(this).siblings('input:hidden').val('');
+				}
+			});
 
 			$(".benutzer_autocomplete").autocomplete({
 				source: "benutzerberechtigung_autocomplete.php?autocomplete=benutzer",
@@ -977,6 +1031,30 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				position: { my : "left bottom", at: "left top" }
 			});
 
+			$(".kostenstelle_autocomplete").autocomplete({
+				source: "benutzerberechtigung_autocomplete.php?autocomplete=kostenstelle",
+				minLength:2,
+				response: function(event, ui)
+				{
+					//Value und Label fuer die Anzeige setzen
+					for(i in ui.content)
+					{
+						ui.content[i].value=ui.content[i].bezeichnung;
+						ui.content[i].label=ui.content[i].bezeichnung;
+					}
+				},
+				select: function(event, ui)
+				{
+					$(this).siblings('input:hidden').val(ui.item.kostenstelle_id);
+				}
+			});
+			$(".kostenstelle_autocomplete").on( "input", function() {
+				if ($(this).val() == '')
+				{
+					$(this).siblings('input:hidden').val('');
+				}
+			});
+
 			$("#toggle_t1").on('click', function(e) {
 				$(".auswahlcheckboxen").checkboxes('toggle');
 				e.preventDefault();
@@ -986,6 +1064,11 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				$(".auswahlcheckboxen").checkboxes('uncheck');
 				e.preventDefault();
 			});
+
+			var aktiv = $('td.auswahlcheckboxen[data-gruen]').length + $('td.auswahlcheckboxen[data-gelb]').length;
+			var inaktiv = $('td.auswahlcheckboxen[data-rot]').length;
+
+			$("#anzahl").html(aktiv + inaktiv + " Einträge (" + aktiv + " Aktive, " + inaktiv + " Inaktive)");
 
 			/*$('input.auswahlcheckbox').each(function ()
 			{
