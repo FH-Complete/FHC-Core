@@ -23,6 +23,7 @@ require_once ('../../include/studiengang.class.php');
 require_once ('../../include/berechtigung.class.php');
 require_once ('../../include/organisationseinheit.class.php');
 require_once ('../../include/sprache.class.php');
+require_once ('../../include/wawi_kostenstelle.class.php');
 
 if (! $db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -107,6 +108,28 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'oe_kurzbz'
 				$item['bezeichnung'] = html_entity_decode($row->bezeichnung);
 				$result_obj[] = $item;
 			}
+		}
+		echo json_encode($result_obj);
+	}
+	exit();
+}
+
+if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'kostenstelle')
+{
+	$search = trim((isset($_REQUEST['term']) ? $_REQUEST['term'] : ''));
+	if (is_null($search) || $search == '')
+		exit();
+
+	$kst = new wawi_kostenstelle();
+
+	if ($kst->getAll($search))
+	{
+		$result_obj = array();
+		foreach ($kst->result as $row)
+		{
+			$item['kostenstelle_id'] = html_entity_decode($row->kostenstelle_id);
+			$item['bezeichnung'] = html_entity_decode($row->bezeichnung);
+			$result_obj[] = $item;
 		}
 		echo json_encode($result_obj);
 	}
