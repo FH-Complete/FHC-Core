@@ -115,6 +115,9 @@ var IssuesDataset = {
 			}
 		);
 	},
+	/**
+	 * sends request for changing issue status
+	 */
 	changeIssueStatus: function(issue_ids, status_kurzbz) {
 		FHC_AjaxClient.ajaxCallPost(
 			'system/issues/Issues/changeIssueStatus',
