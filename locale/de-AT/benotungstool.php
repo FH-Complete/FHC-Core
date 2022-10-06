@@ -171,6 +171,7 @@ $this->phrasen['benotungstool/zeunis']='Zeugnis';
 $this->phrasen['benotungstool/handbuch']='Handbuch';
 $this->phrasen['benotungstool/punkte']='Punkte';
 $this->phrasen['benotungstool/importAnweisung']='Kopieren Sie die Spalten Personenkennzeichen und Note aus der Notenliste (bzw. StudentenUid und Note aus dem MoodleExport) und fügen Sie diese in folgendes Feld ein';
+$this->phrasen['benotungstool/importAnweisungNachp']='Kopieren Sie die Spalten Personenkennzeichen, Datum und Note aus der Notenliste (bzw. StudentenUid, Datum und Note aus dem MoodleExport) und fügen Sie diese in folgendes Feld ein';
 $this->phrasen['benotungstool/pruefung']='Prüfung';
 $this->phrasen['benotungstool/notenlisteImport']='Notenliste für den LV-Noten-Import (Excel)';
 $this->phrasen['benotungstool/bearbeitetvon']='Bearbeitet von';

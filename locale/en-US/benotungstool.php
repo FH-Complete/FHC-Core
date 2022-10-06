@@ -170,6 +170,7 @@ $this->phrasen['benotungstool/zeunis']='Transcript';
 $this->phrasen['benotungstool/handbuch']='Handbook';
 $this->phrasen['benotungstool/punkte']='Points';
 $this->phrasen['benotungstool/importAnweisung']='Copy the columns "personal identifier" and "grade" from the grade list (or "student ID number" and "grade" from the moodle export file) and insert them in the following field';
+$this->phrasen['benotungstool/importAnweisungNachp']='Copy the columns "personal identifier", "date" and "grade" from the grade list (or "student ID number", "date" and "grade" from the moodle export file) and insert them in the following field';
 $this->phrasen['benotungstool/pruefung']='Examination';
 $this->phrasen['benotungstool/notenlisteImport']='Grade list for the subject grade import (Excel)';
 $this->phrasen['benotungstool/geaenderteNotenVorhanden']='There are changed grades. Please send the changes to the assistant by clicking "Approval"';
