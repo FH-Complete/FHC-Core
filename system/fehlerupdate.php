@@ -177,7 +177,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0003',
 		'fehler_kurzbz' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Aktuelles Ausbildungssemester bei StudentIn stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein. (prestudent_id %s, Studiensemester %s)',
+		'fehlertext' => 'Aktuelles Ausbildungssemester bei StudentIn (Lehrverband) stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein. (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
