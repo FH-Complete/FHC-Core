@@ -100,20 +100,16 @@ var IssuesDataset = {
 			IssuesDataset.changeIssueStatus(issue_ids, status_kurzbz);
 		});
 
-		$(".selectAll").click(function()
-			{
-				//select only trs if not filtered by tablesorter
-				var trs = $("#filterTableDataset tbody tr").not(".filtered");
-				trs.find("input[name=issue_id\\[\\]]").prop("checked", true);
-			}
-		);
+		$(".selectAll").click(function() {
+			//select only trs if not filtered by tablesorter
+			var trs = $("#filterTableDataset tbody tr").not(".filtered");
+			trs.find("input[name=issue_id\\[\\]]").prop("checked", true);
+		});
 
-		$(".unselectAll").click(function()
-			{
+		$(".unselectAll").click(function() {
 				var trs = $("#filterTableDataset tbody tr").not(".filtered");
 				trs.find("input[name=issue_id\\[\\]]").prop("checked", false);
-			}
-		);
+		});
 	},
 	/**
 	 * sends request for changing issue status
