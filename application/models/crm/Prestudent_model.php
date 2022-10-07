@@ -669,11 +669,11 @@ class Prestudent_model extends DB_Model
 
 
 	/**
-	* get all Interessenten without ZGVmasdatum and with Sponsionsdate
-	* @param $semesterkurzbz1 und $semesterkurzbz2 
-	* @return array all prestudents with sponsionsdate
-	*/
-	public function getAllInteressentenWithMasterSponsion($semesterkurzbz1, $semesterkurzbz2=null)
+	 * get all Interessenten without ZGVmasdatum and with Sponsionsdate
+	 * @param $semesterkurzbz1 und $semesterkurzbz2
+	 * @return array all prestudents with sponsionsdate
+	 */
+	public function getAllInteressentenWithMasterSponsion($semesterkurzbz1, $semesterkurzbz2 = null)
 	{
 		return $this->execQuery(
 			'SELECT ps.prestudent_id, person_id, ap.sponsion
@@ -697,6 +697,4 @@ class Prestudent_model extends DB_Model
 			)
 		);
 	}
-
-
 }

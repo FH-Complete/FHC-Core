@@ -113,22 +113,4 @@ class Abschlusspruefung_model extends DB_Model
 
 		return success($abschlusspruefungdata);
 	}
-
-
-/**
- * update ZGV Master
- */
-public function insertDatumSponsionAsZgvmadatum($prestudentId, $datumSponsion)
-{
-	return $this->execQuery(
-		'UPDATE public.tbl_prestudent
-			SET zgvmadatum = ?
-			WHERE prestudent_id = ?',
-		array(
-			$datumSponsion,
-			$prestudentId
-		)
-			);
-}
-
 }
