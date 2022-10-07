@@ -74,8 +74,8 @@ class PlausicheckLib
 		$qry = "
 			SELECT
 				prestudent.person_id, prestudent.prestudent_id, status.studiensemester_kurzbz,
-				studiengang.orgform_kurzbz as stg_orgform, status.orgform_kurzbz as student_orgform,
-				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+				studiengang.orgform_kurzbz AS stg_orgform, status.orgform_kurzbz AS student_orgform,
+				prestudent.studiengang_kz AS student_studiengang, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_studiengang studiengang
 				JOIN public.tbl_student student USING(studiengang_kz)
@@ -89,7 +89,8 @@ class PlausicheckLib
 				AND studiengang.studiengang_kz < 10000
 				AND status.studiensemester_kurzbz = ?
 				AND NOT EXISTS(
-					SELECT 1 FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					SELECT 1 FROM lehre.tbl_studienplan
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 					WHERE
 						tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
 						AND tbl_studienplan.orgform_kurzbz = status.orgform_kurzbz)";
@@ -171,7 +172,8 @@ class PlausicheckLib
 				JOIN public.tbl_person USING(person_id)
 				JOIN public.tbl_studiengang stg ON ps.studiengang_kz = stg.studiengang_kz
 			WHERE
-				ps.studiengang_kz<>stordnung.studiengang_kz";
+				ps.studiengang_kz<>stordnung.studiengang_kz
+				AND stg.melderelevant";
 
 		if (isset($studiengang_kz))
 		{
@@ -284,7 +286,7 @@ class PlausicheckLib
 		$qry = "
 			SELECT
 				DISTINCT(student.student_uid), prestudent.person_id, prestudent.prestudent_id,
-				status.ausbildungssemester, lv.semester, status.studiensemester_kurzbz,
+				status.ausbildungssemester AS status_ausbildungssemester, lv.semester AS student_ausbildungssemester, status.studiensemester_kurzbz,
 				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_student student
