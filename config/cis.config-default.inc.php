@@ -256,4 +256,7 @@ define('CIS_ZEITWUNSCH_GD', false);
 
 // Covid-Status anzeigen
 define('CIS_SHOW_COVID_STATUS', false);
+
+//Vertrag Allin
+define ('DEFAULT_ALLIN_DIENSTVERTRAG',[110,111]);
 ?>
