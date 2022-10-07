@@ -49,7 +49,7 @@ class SponsionJob extends JOB_Controller
         }
 
         $this->logInfo('Start Sponsion Job');
-        $this->logInfo('Check Applications of Semester ' . $semester . 'and '. $nextSemester);
+        $this->logInfo('Check Applications of Semester ' . $semester . ' and '. $nextSemester);
 
         $allInteressenten = $this->PrestudentModel->getAllInteressentenWithMasterSponsion($semester, $nextSemester);
 

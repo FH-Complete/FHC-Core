@@ -688,7 +688,10 @@ class Prestudent_model extends DB_Model
 			WHERE
 			get_rolle_prestudent(ps.prestudent_id, null) = \'Interessent\'
 			AND ps.zgvmadatum is NULL
+			AND ps.prestudent_id <> ps2.prestudent_id
 			AND get_rolle_prestudent(ps2.prestudent_id, null) = \'Absolvent\'
+			AND ap.sponsion < NOW()
+			AND ap.abschlussbeurteilung_kurzbz in (\'bestanden\', \'gut\', \'ausgezeichnet\')
 			AND sg.typ != \'l\'
 			AND tbl_prestudentstatus.studiensemester_kurzbz in (?,?)',
 			array(
