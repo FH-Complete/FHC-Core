@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *					Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 /**
  * Seite zum Eintragen von Urlaubstagen
@@ -30,11 +31,13 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/mail.class.php');
+require_once('../../../include/sancho.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/sprache.class.php');
 require_once('../../../include/zeitaufzeichnung.class.php');
 
+$datum_obj = new datum();
 $sprache = getSprache();
 $lang = new sprache();
 $lang->load($sprache);
@@ -174,6 +177,8 @@ if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POS
 
     $vondatum = $zeitsperre->getVonDatum();
     $bisdatum = $zeitsperre->getBisDatum();
+		$vondatum = $datum_obj->formatDatum($vondatum ,'d.m.Y');
+		$bisdatum = $datum_obj->formatDatum($bisdatum,'d.m.Y');
 
     if(!$zeitsperre->delete($_GET['delete']))
         echo $zeitsperre->errormsg;
@@ -204,13 +209,25 @@ if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POS
 
         $benutzer = new benutzer();
         $benutzer->load($uid);
-        $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
-            $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
-        $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
 
+				//new sanchomail
+				$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
+				$beschreibung = $zeitsperre->bezeichnung;
+				$subject = "Urlaub wurde gelöscht";
+				$mailvorlage = 'Sancho_Mail_Urlaub_Loeschen';
 
-        $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
-        if($mail->send())
+				$from='vilesci@'.DOMAIN;
+
+				//Sanchomail mit Vorlage Sancho Mail Urlaub
+				$template_data = array(
+					'vorgesetzter' => $fullName,
+					'nameMitarbeiter' => $nameMitarbeiter,
+					'beschreibung' =>$beschreibung,
+					'vonDatum' => $vondatum,
+					'bisDatum' => $bisdatum
+				);
+
+				if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
         {
             $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</span>";
         }
@@ -384,13 +401,19 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 
 				$benutzer = new benutzer();
 				$benutzer->load($uid);
-				$message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
-						   $p->t('urlaubstool/xHatNeuenUrlaubEingetragen',array($benutzer->nachname,$benutzer->vorname)).":\n";
+
+				$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
+				$beschreibung = (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung);
+
+				// $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
+				// 		   $p->t('urlaubstool/xHatNeuenUrlaubEingetragen',array($benutzer->nachname,$benutzer->vorname)).":\n";
 
 				for($i=0;$i<count($akette);$i++)
 				{
-					$message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($akette[$i]))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($ekette[$i]))."\n";
+					$von = date("d.m.Y", strtotime($akette[$i]));
+					$bis = date("d.m.Y", strtotime($ekette[$i]));
 				}
+
 
 				//Ab September wird das neue Jahr uebergeben
 				if(date("m",strtotime($akette[0]))>=9)
@@ -398,11 +421,41 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 			   	else
 			   		$jahr = date("Y", strtotime($akette[0]));
 
-				$message.="\n".$p->t('urlaubstool/sieKoennenDiesenUnterFolgenderAdresseFreigeben').":\n".
-				APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
+				$link = " <a href=". APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr .">Link Urlaubstool</a> ";
 
-				$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigabeansuchenUrlaub'), $message);
-				if($mail->send())
+				$subject = "Freigabeansuchen Urlaub";
+				$mailvorlage = 'Sancho_Mail_Urlaub_Neu';
+
+				$from='vilesci@'.DOMAIN;
+
+				// Überprüfen, ob addon casetime aktiv ist
+				$addon_obj = new addon();
+				$addoncasetime = $addon_obj->checkActiveAddon("casetime");
+				$urlaubssaldo = "";
+				if($addoncasetime)
+				{
+					require_once('../../../addons/casetime/config.inc.php');
+					require_once('../../../addons/casetime/include/functions.inc.php');
+					$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
+					$urlaubssaldo = "Aktueller Urlaubssaldo: ". $urlaubssaldo->{'AktuellerStand'} . " Tage";
+				}
+
+				//Sanchomail mit Vorlage Sancho Mail Urlaub Neu
+				$template_data = array(
+					'vorgesetzter' => $fullName,
+					'nameMitarbeiter' => $nameMitarbeiter,
+					'beschreibung' =>$beschreibung,
+					'vonDatum' => $von,
+					'bisDatum' => $bis,
+					'Link'=> $link,
+					'urlaubssaldo' => $urlaubssaldo
+				);
+
+
+				if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
+
+			//	$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigabeansuchenUrlaub'), $message);
+				//if($mail->send())
 				{
 					$vgmail="<span style='color:green;'>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</span>";
 				}
@@ -541,17 +594,6 @@ $datum_obj = new datum();
 		<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 <?php
-// ADDONS laden
-$addon_obj = new addon();
-$addon_obj->loadAddons();
-foreach($addon_obj->result as $addon)
-{
-	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
-	{
-		echo '
-		<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
-	}
-}
 
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
@@ -567,6 +609,7 @@ echo '
 			}
 		});
 		</script>';
+
 ?>
 		<script language="Javascript">
 		function conf_del()
