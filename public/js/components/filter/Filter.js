@@ -644,6 +644,8 @@ export const CoreFilterCmpt = {
 											|| filterField.type.toLowerCase().indexOf('bpchar') >= 0">
 										<div class="col-2">
 											<select class="form-select" name="operation" v-model="filterField.operation">
+												<option value="equal">Gleich</option>
+												<option value="nequal">Nicht gleich</option>
 												<option value="contains">Enthält</option>
 												<option value="ncontains">Enthält nicht</option>
 											</select>

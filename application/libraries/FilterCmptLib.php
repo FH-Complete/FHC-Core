@@ -768,15 +768,31 @@ class FilterCmptLib
 			{
 				// comparison (==)
 				case self::OP_EQUAL:
-					if (is_numeric($filterDefinition->condition)) $condition = '= '.$filterDefinition->condition;
+					// Numeric
+					if (is_numeric($filterDefinition->condition))
+					{
+						$condition = '= '.$filterDefinition->condition;
+					}
+					else // string type
+					{
+						$condition = '= \''.$this->_ci->FiltersModel->escapeLike($filterDefinition->condition).'\'';
+					}
 					break;
 				// not equal (!=)
 				case self::OP_NOT_EQUAL:
-					if (is_numeric($filterDefinition->condition)) $condition = '!= '.$filterDefinition->condition;
+					// Numeric
+					if (is_numeric($filterDefinition->condition))
+					{
+						$condition = '!= '.$filterDefinition->condition;
+					}
+					else // string type
+					{
+						$condition = '!= \''.$this->_ci->FiltersModel->escapeLike($filterDefinition->condition).'\'';
+					}
 					break;
 				// greater than (>)
 				case self::OP_GREATER_THAN:
-					// It it's a date type
+					// If it's a date type
 					if (is_numeric($filterDefinition->condition)
 						&& isset($filterDefinition->option)
 						&& ($filterDefinition->option == self::OPT_HOURS
@@ -793,7 +809,7 @@ class FilterCmptLib
 					break;
 				// less than (<)
 				case self::OP_LESS_THAN:
-					// It it's a date type
+					// If it's a date type
 					if (is_numeric($filterDefinition->condition)
 						&& isset($filterDefinition->option)
 						&& ($filterDefinition->option == self::OPT_HOURS
