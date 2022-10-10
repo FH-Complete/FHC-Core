@@ -15,13 +15,13 @@
 	padding: 10px;
 }
 
-.filter-dnd-area {
+.filter-fields-area {
 	height: 50px;
 	padding: 3px;
 	margin-bottom: 10px;
 }
 
-.filter-dnd-object {
+.filter-fields-field {
 	height: 100%;
 	margin-left: 7px;
 	padding: 11px;
@@ -32,7 +32,7 @@
 	border-width: 1px;
 	border-radius: 7px;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	cursor: move;
+	cursor: pointer;
 }
 
 .filter-filter-fields {

@@ -147,9 +147,20 @@ export const CoreNavigationCmpt = {
 							<!-- 2nd level -->
 							<template v-for="child in menu.children">
 								<li>
+								<span>
 									<a class="nav-link left-side-menu-link-entry" v-bind:href="child.link" @click=child.onClickCall>
 										&emsp;&emsp;{{ child.description }}
 									</a>
+									<a
+										class="nav-link left-side-menu-link-entry"
+										v-bind:class="child.subscriptLinkClass"
+										v-if="child.subscriptDescription"
+										v-bind:href="child.link"
+										@click=child.onClickSubscriptCall
+									>
+										{{ child.subscriptDescription }}
+									</a>
+								</span>
 								</li>
 							</template>
 						</ul>

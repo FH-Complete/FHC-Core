@@ -19,6 +19,10 @@ import {CoreFilterAPIs} from './API.js';
 import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 
+//
+const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
+const FILTER_COMPONENT_NEW_FILTER_TYPE = 'Filter Component New Filter Type';
+
 /**
  *
  */
@@ -29,6 +33,10 @@ export const CoreFilterCmpt = {
 	},
 	props: {
 		title: String,
+		sideMenu: {
+			type: Boolean,
+			default: true
+		},
 		filterType: {
 			type: String,
 			required: true
@@ -46,13 +54,17 @@ export const CoreFilterCmpt = {
 			selectedFields: null,
 			notSelectedFields: null,
 			filterFields: null,
-			notFilterFields: null,
+			columnsAlias: null,
+
+			availableFilters: null,
 
 			// FetchCmpt binded properties
 			fetchCmptRefresh: false,
 			fetchCmptApiFunction: null,
 			fetchCmptApiFunctionParams: null,
-			fetchCmptDataFetched: null
+			fetchCmptDataFetched: null,
+
+			tabulator: null
 		};
 	},
 	created: function() {
@@ -102,19 +114,23 @@ export const CoreFilterCmpt = {
 				// If the column has to be displayed or not
 				selectedFields.indexOf(columns[i].field) >= 0 ? columns[i].visible = true : columns[i].visible = false;
 
-                                if( columns[i].hasOwnProperty('resizable') ) {
-                                  columns[i].visible ? columns[i].resizable = true : columns[i].resizable = false;
+                                if (columns[i].hasOwnProperty('resizable'))
+				{
+                        		columns[i].visible ? columns[i].resizable = true : columns[i].resizable = false;
                                 }
 			}
 		}
+
+		this.columnsAlias = columns;
 
 		// Define a default tabulator options in case it was not provided
 		let tabulatorOptions = {
 			height: 500,
 			layout: "fitColumns",
+			movableColumns: true,
+			reactiveData: true,
 			columns: columns,
-			data: JSON.parse(JSON.stringify(this.dataset)),
-			reactiveData: true
+			data: JSON.parse(JSON.stringify(this.dataset))
 		};
 
 		// If it was provided
@@ -122,14 +138,15 @@ export const CoreFilterCmpt = {
 		{
 			// Then copy it...
 			tabulatorOptions = this.tabulatorOptions;
-			// ...and overwrite the properties data, reactiveData and columns
+			// ...and overwrite the properties data, reactiveData, movableColumns and columns
 			tabulatorOptions.data = JSON.parse(JSON.stringify(this.dataset));
-			tabulatorOptions.reactiveData = true;
 			tabulatorOptions.columns = columns;
+			tabulatorOptions.reactiveData = true;
+			tabulatorOptions.movableColumns = true;
 		}
 
 		// Start the tabulator with the buid options
-		let tabulator = new Tabulator(
+		this.tabulator = new Tabulator(
 			"#filterTableDataset",
 			tabulatorOptions
 		);
@@ -140,7 +157,7 @@ export const CoreFilterCmpt = {
 			// Attach all the provided event handlers to the started tabulator
 			for (let i = 0; i < this.tabulatorEvents.length; i++)
 			{
-				tabulator.on(this.tabulatorEvents[i].event, this.tabulatorEvents[i].handler);
+				this.tabulator.on(this.tabulatorEvents[i].event, this.tabulatorEvents[i].handler);
 			}
 		}
 	},
@@ -166,12 +183,11 @@ export const CoreFilterCmpt = {
 				this.fields = data.fields;
 				this.selectedFields = data.selectedFields;
 				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
-
 				this.filterFields = [];
-				let tmpFilterFields = [];
+
 				for (let i = 0; i < data.datasetMetadata.length; i++)
 				{
-					for (let j = 0; j< data.filters.length; j++)
+					for (let j = 0; j < data.filters.length; j++)
 					{
 						if (data.datasetMetadata[i].name == data.filters[j].name)
 						{
@@ -179,14 +195,20 @@ export const CoreFilterCmpt = {
 							filter.type = data.datasetMetadata[i].type;
 
 							this.filterFields.push(filter);
-							tmpFilterFields.push(filter.name);
 							break;
 						}
 					}
 				}
 
-				this.notFilterFields = this.fields.filter(x => tmpFilterFields.indexOf(x) === -1);
-				this.setSideMenu(data);
+				// If the side menu is active
+				if (this.sideMenu === true)
+				{
+					this.setSideMenu(data);
+				}
+				else // otherwise use the dropdown in the filter options
+				{
+					this.setDropDownMenu(data);
+				}
 			}
 			else
 			{
@@ -224,10 +246,16 @@ export const CoreFilterCmpt = {
 				filtersArray[filtersArray.length] = {
 					link: link + personalFilters[filtersCount].filter_id,
 					description: personalFilters[filtersCount].desc,
+					subscriptDescription: personalFilters[filtersCount].subscriptDescription,
+					subscriptLinkClass: personalFilters[filtersCount].subscriptLinkClass,
+					subscriptLinkValue: personalFilters[filtersCount].subscriptLinkValue,
 					sort: filtersCount,
-					onClickCall: this.handlerGetFilterById
+					onClickCall: this.handlerGetFilterById,
+					onClickSubscriptCall: this.handlerRemoveCustomFilter
 				};
 			}
+
+			this.availableFilters = filtersArray;
 
 			this.$emit(
 				'nwNewEntry',
@@ -238,6 +266,40 @@ export const CoreFilterCmpt = {
 					children: filtersArray
 				}
 			);
+		},
+		/**
+		 * Set the drop down menu
+		 */
+		setDropDownMenu: function(data) {
+			let filters = data.sideMenu.filters;
+			let personalFilters = data.sideMenu.personalFilters;
+			let filtersArray = [];
+
+			for (let filtersCount = 0; filtersCount < filters.length; filtersCount++)
+			{
+				let link = filters[filtersCount].link;
+
+				if (link == null) link = '#';
+
+				filtersArray[filtersArray.length] = {
+					option: filters[filtersCount].filter_id,
+					description: filters[filtersCount].desc
+				};
+			}
+
+			for (let filtersCount = 0; filtersCount < personalFilters.length; filtersCount++)
+			{
+				let link = personalFilters[filtersCount].link;
+
+				if (link == null) link = '#';
+
+				filtersArray[filtersArray.length] = {
+					option: personalFilters[filtersCount].filter_id,
+					description: personalFilters[filtersCount].desc
+				};
+			}
+
+			this.availableFilters = filtersArray;
 		},
 		/**
 		 * Used to start/refresh the FetchCmpt
@@ -281,6 +343,19 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
+		handlerRemoveCustomFilter: function(event) {
+			//
+			this.startFetchCmpt(
+				CoreFilterAPIs.removeCustomFilter,
+				{
+					filterId: event.currentTarget.getAttribute("href").substring(1)
+				},
+				this.getFilter
+			);
+		},
+		/**
+		 *
+		 */
 		handlerApplyFilterFields: function(event) {
 			let filterFields = [];
 			let filterFieldDivRows = document.getElementById('filterFields').getElementsByClassName('row');
@@ -294,7 +369,11 @@ export const CoreFilterCmpt = {
 					let filterColumn = filterFieldDivRows[i].children[j];
 					let filterColumnElement = filterColumn.children[0];
 
-					if (filterColumnElement.name != null)
+					// If the first column then search for the fields dropdown
+					if (j == 0) filterColumnElement = filterColumnElement.querySelector('select[name=fieldName]');
+
+					// If the filter name is _not_ null and it is _not_ a new filter
+					if (filterColumnElement.name != null && filterColumnElement.name != FILTER_COMPONENT_NEW_FILTER)
 					{
 						// Condition
 						if (filterColumnElement.name == 'condition' && filterColumnElement.value == "")
@@ -302,6 +381,7 @@ export const CoreFilterCmpt = {
 							alert("Please fill all the filter options");
 							return;
 						}
+
 						// Name
 						if (filterColumnElement.name == 'fieldName')
 						{
@@ -340,41 +420,66 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerAddFilterField: function(event) {
-			//
-			this.startFetchCmpt(
-				CoreFilterAPIs.addFilterField,
+		handlerChangeFilterField: function(oldValue, newValue) {
+
+			// If an old filter has been changed
+			if (oldValue != "")
+			{
+				for (let i = 0; i < this.filterFields.length; i++)
 				{
-					filterField: event.currentTarget.value
-				},
-				this.getFilter
-			);
+					if (this.filterFields[i].name == oldValue)
+					{
+						this.filterFields.splice(i, 1);
+						break;
+					}
+				}
+			}
+
+			// Then add the new filter
+			for (let i = 0; i < this.datasetMetadata.length; i++)
+			{
+				if (this.datasetMetadata[i].name == newValue)
+				{
+					let filter = {
+						name: this.datasetMetadata[i].name,
+						type: this.datasetMetadata[i].type
+					};
+
+					this.filterFields.push(filter);
+					break;
+				}
+			}
 		},
 		/**
 		 *
 		 */
-		handlerAddSelectedField: function(event) {
-			//
-			this.startFetchCmpt(
-				CoreFilterAPIs.addSelectedField,
-				{
-					selectedField: event.currentTarget.value
-				},
-				this.getFilter
-			);
+		handlerAddNewFilter: function(event) {
+			// Adds a new empty filter
+			this.filterFields.push({
+				name: FILTER_COMPONENT_NEW_FILTER,
+				type: FILTER_COMPONENT_NEW_FILTER_TYPE
+			});
 		},
-		/**
+		/*
 		 *
 		 */
-		handlerRemoveSelectedField: function(event) {
-			//
-			this.startFetchCmpt(
-				CoreFilterAPIs.removeSelectedField,
-				{
-					selectedField: event.currentTarget.getAttribute('field-to-remove')
-				},
-				this.getFilter
-			);
+		handlerToggleSelectedField: function(event) {
+
+			// If it is a selected field
+			if (this.selectedFields.indexOf(event.target.innerText) != -1)
+			{
+				// then hide it
+				this.tabulator.hideColumn(event.target.innerText);
+				// and remove it from the this.selectedFields property
+				this.selectedFields.splice(this.selectedFields.indexOf(event.target.innerText), 1);
+			}
+			else // otherwise
+			{
+				// show it
+				this.tabulator.showColumn(event.target.innerText);
+				// and add it to the this.selectedFields property
+				this.selectedFields.push(event.target.innerText);
+			}
 		},
 		/**
 		 *
@@ -393,51 +498,30 @@ export const CoreFilterCmpt = {
 		 *
 		 */
 		handlerGetFilterById: function(event) {
-			//
+
+			let filterId = null;
+
+			// Get the attribute href if side menu is rendered
+			let attr = event.currentTarget.getAttribute("href");
+
+			// Otherwise get the value of the drop down menu
+			if (attr == null)
+			{
+				filterId = event.currentTarget.value;
+			}
+			else
+			{
+				filterId = attr.substring(1);
+			}
+
+			// Ajax call
 			this.startFetchCmpt(
 				CoreFilterAPIs.getFilterById,
 				{
-					filterId: event.currentTarget.getAttribute("href").substring(1)
+					filterId: filterId
 				},
 				this.render
 			);
-		},
-		handlerDragOver: function(event) {
-			let draggedFieldToDisplay = event.currentTarget;
-			let fieldsToDisplayDivs = document.getElementsByClassName('filter-dnd-object');
-			let filterFilterOptions = document.getElementsByClassName('filter-filter-options')[0];
-
-			// For each draggable element
-			for (let i = 0; i < fieldsToDisplayDivs.length; i++)
-			{
-				let fieldToDisplayDiv = fieldsToDisplayDivs[i]; //
-
-				// If the dragged element is not the same element in the loop
-				if (draggedFieldToDisplay != fieldToDisplayDiv)
-				{
-					fieldToDisplayDiv.classList.remove("selection-after");
-					fieldToDisplayDiv.classList.remove("selection-before");
-
-					let fieldToDisplayDivCenter = (filterFilterOptions.offsetLeft + fieldToDisplayDiv.offsetLeft + fieldToDisplayDiv.offsetWidth) / 2;
-
-					if (event.pageX > filterFilterOptions.offsetLeft + fieldToDisplayDiv.offsetLeft
-						&& event.pageX < filterFilterOptions.offsetLeft + fieldToDisplayDiv.offsetLeft + fieldToDisplayDiv.offsetWidth)
-					{
-						if (event.pageX > fieldToDisplayDivCenter)
-						{
-							fieldToDisplayDiv.classList.add("selection-after");
-							fieldToDisplayDiv.classList.remove("selection-before");
-						}
-						else if (event.pageX < fieldToDisplayDivCenter)
-						{
-							fieldToDisplayDiv.classList.add("selection-before");
-							fieldToDisplayDiv.classList.remove("selection-after");
-						}
-					}
-				}
-			}
-		},
-		handlerOnDrop: function() {
 		}
 	},
 	template: `
@@ -469,27 +553,16 @@ export const CoreFilterCmpt = {
 				<div class="card">
 					<!-- Filter fields options -->
 					<div class="row card-body filter-options-div">
-						<div class="filter-dnd-area">
-							<template v-for="fieldToDisplay in selectedFields">
+						<div class="filter-fields-area">
+							<template v-for="fieldToDisplay in fields">
 								<div
-									class="filter-dnd-object" draggable="true" @dragover="handlerDragOver">
-									{{ fieldToDisplay}}
-									<button
-										type="button"
-										class="btn-close"
-										v-bind:field-to-remove="fieldToDisplay"
-										@click=handlerRemoveSelectedField>
-									</button>
+									class="filter-fields-field"
+									v-bind:class="selectedFields.indexOf(fieldToDisplay) != -1 ? 'text-light bg-dark' : '' "
+									@click=handlerToggleSelectedField
+								>
+									{{ fieldToDisplay }}
 								</div>
 							</template>
-						</div>
-						<div class="col-7">
-							<select class="form-select" @change=handlerAddSelectedField>
-								<option value="">Wählen Sie ein anzuzeigendes Feld aus...</option>
-								<template v-for="hiddenField in notSelectedFields">
-									<option v-bind:value="hiddenField">{{ hiddenField }}</option>
-								</template>
-							</select>
 						</div>
 					</div>
 				</div>
@@ -498,113 +571,129 @@ export const CoreFilterCmpt = {
 			<div id="collapseFilters" class="card-body collapse" data-bs-parent="#filterCollapsables">
 				<div class="card">
 				<!-- Filter options -->
+					<div class="card-body" v-if="!sideMenu">
+						<select
+							class="form-select"
+							@change="handlerGetFilterById"
+						>
+							<option value="">Bitte auswählen...</option>
+							<template v-for="availableFilter in availableFilters">
+								<option v-bind:value="availableFilter.option">{{ availableFilter.description }}</option>
+							</template>
+						</select>
+					</div>
 					<div class="card-body filter-options-div">
-						<div class="col-9">
-							<select class="form-select" @change=handlerAddFilterField>
-								<option value="">Feld zum Filter hinzufügen...</option>
-								<template v-for="notFilterField in notFilterFields">
-									<option v-bind:value="notFilterField">{{ notFilterField}}</option>
-								</template>
-							</select>
+						<div>
+							<span>
+								Neuer Filter
+							</span>
+							<span>
+								<button class="btn btn-outline-dark" type="button" @click=handlerAddNewFilter>+</button>
+							</span>
 						</div>
 						<div id="filterFields" class="filter-filter-fields">
-							<template v-for="filterField in filterFields">
+							<template v-for="(filterField, index) in filterFields">
+								<div class="row">
 
-								<!-- Numeric -->
-								<div v-if="filterField.type.toLowerCase().indexOf('int') >= 0" class="row">
-									<div class="col-3">
-										<input type="hidden" name="fieldName" v-bind:value="filterField.name">
-										<span class="input-group-text">{{ filterField.name}}</span>
+									<div class="col-5">
+										<div class="input-group">
+											<span class="input-group-text">Filter {{ index + 1 }}</span>
+											<select
+												class="form-select"
+												name="fieldName"
+												v-bind:value="filterField.name"
+												@change="handlerChangeFilterField(filterField.name, $event.target.value)"
+											>
+												<option value="">Feld zum Filter hinzufügen...</option>
+												<template v-for="columnAlias in columnsAlias">
+													<option v-bind:value="columnAlias.field">{{ columnAlias.title }}</option>
+												</template>
+											</select>
+										</div>
 									</div>
-									<div class="col-2">
-										<select class="form-select" name="operation" v-model="filterField.operation">
-											<option value="equal">Gleich</option>
-											<option value="nequal">Nicht gleich</option>
-											<option value="gt">Größer als</option>
-											<option value="lt">Weniger als</option>
-										</select>
-									</div>
-									<div class="col-3">
-										<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
-									</div>
-									<div class="col">
-										<button
-											class="btn btn-outline-dark"
-											type="button"
-											v-bind:field-to-remove="filterField.name"
-											@click=handlerRemoveFilterField>
-											&emsp;X&emsp;
-										</button>
-									</div>
-								</div>
 
-								<!-- Text -->
-								<div
-									v-if="filterField.type.toLowerCase().indexOf('varchar') >= 0
-										|| filterField.type.toLowerCase().indexOf('text') >= 0
-										|| filterField.type.toLowerCase().indexOf('bpchar') >= 0"
-									class="row">
-									<div class="col-3">
-										<input type="hidden" name="fieldName" v-bind:value="filterField.name">
-										<span class="input-group-text">{{ filterField.name}}</span>
-									</div>
-									<div class="col-2">
-										<select class="form-select" name="operation" v-model="filterField.operation">
-											<option value="contains">Enthält</option>
-											<option value="ncontains">Enthält nicht</option>
-										</select>
-									</div>
-									<div class="col-3">
-										<input type="text" class="form-control" v-bind:value="filterField.condition" name="condition">
-									</div>
-									<div class="col">
-										<button
-											class="btn btn-outline-dark"
-											type="button"
-											v-bind:field-to-remove="filterField.name"
-											@click=handlerRemoveFilterField>
-											&emsp;X&emsp;
-										</button>
-									</div>
-								</div>
+									<!-- Numeric -->
+									<template
+										v-if="filterField.type.toLowerCase().indexOf('int') >= 0">
+										<div class="col-2">
+											<select class="form-select" name="operation" v-model="filterField.operation">
+												<option value="equal">Gleich</option>
+												<option value="nequal">Nicht gleich</option>
+												<option value="gt">Größer als</option>
+												<option value="lt">Weniger als</option>
+											</select>
+										</div>
+										<div class="col-3">
+											<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
+										</div>
+										<div class="col">
+											<button
+												class="btn btn-outline-dark"
+												type="button"
+												v-bind:field-to-remove="filterField.name"
+												@click=handlerRemoveFilterField>
+												&emsp;X&emsp;
+											</button>
+										</div>
+									</template>
 
-								<!-- Timestamp and date -->
-								<div
-									v-if="filterField.type.toLowerCase().indexOf('timestamp') >= 0
-										|| filterField.type.toLowerCase().indexOf('date') >= 0"
-									class="row">
-									<div class="col-3">
-										<input type="hidden" name="fieldName" v-bind:value="filterField.name">
-										<span class="input-group-text">{{ filterField.name}}</span>
-									</div>
-									<div class="col-2">
-										<select class="form-select" name="operation" v-model="filterField.operation">
-											<option value="gt">Größer als</option>
-											<option value="lt">Weniger als</option>
-											<option value="set">Eingestellt ist</option>
-											<option value="nset">Eingestellt nicht ist</option>
-										</select>
-									</div>
-									<div class="col-1">
-										<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
-									</div>
-									<div class="col-2">
-										<select class="form-select" name="option" v-model="filterField.option">
-											<option value="minutes">Minuten</option>
-											<option value="hours">Stunden</option>
-											<option value="days">Tage</option>
-											<option value="months">Monate</option>
-										</select>
-									</div>
-									<div class="col">
-										<button
-											class="btn btn-outline-dark"
-											type="button"
-											v-bind:field-to-remove="filterField.name"
-											@click=handlerRemoveFilterField>
-											&emsp;X&emsp;
-										</button>
-									</div>
+									<!-- Text -->
+									<template
+										v-if="filterField.type.toLowerCase().indexOf('varchar') >= 0
+											|| filterField.type.toLowerCase().indexOf('text') >= 0
+											|| filterField.type.toLowerCase().indexOf('bpchar') >= 0">
+										<div class="col-2">
+											<select class="form-select" name="operation" v-model="filterField.operation">
+												<option value="contains">Enthält</option>
+												<option value="ncontains">Enthält nicht</option>
+											</select>
+										</div>
+										<div class="col-3">
+											<input type="text" class="form-control" v-bind:value="filterField.condition" name="condition">
+										</div>
+										<div class="col">
+											<button
+												class="btn btn-outline-dark"
+												type="button"
+												v-bind:field-to-remove="filterField.name"
+												@click=handlerRemoveFilterField>
+												&emsp;X&emsp;
+											</button>
+										</div>
+									</template>
+
+									<!-- Timestamp and date -->
+									<template
+										v-if="filterField.type.toLowerCase().indexOf('timestamp') >= 0
+											|| filterField.type.toLowerCase().indexOf('date') >= 0">
+										<div class="col-2">
+											<select class="form-select" name="operation" v-model="filterField.operation">
+												<option value="gt">Größer als</option>
+												<option value="lt">Weniger als</option>
+												<option value="set">Eingestellt ist</option>
+												<option value="nset">Eingestellt nicht ist</option>
+											</select>
+										</div>
+										<div class="col-1">
+											<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
+										</div>
+										<div class="col-2">
+											<select class="form-select" name="option" v-model="filterField.option">
+												<option value="minutes">Minuten</option>
+												<option value="hours">Stunden</option>
+												<option value="days">Tage</option>
+												<option value="months">Monate</option>
+											</select>
+										</div>
+										<div class="col">
+											<button
+												class="btn btn-outline-dark"
+												type="button"
+												v-bind:field-to-remove="filterField.name"
+												@click=handlerRemoveFilterField
+											> - </button>
+										</div>
+									</template>
 								</div>
 							</template>
 						</div>
@@ -614,7 +703,7 @@ export const CoreFilterCmpt = {
 							<div class="col-7">
 								<div class="input-group">
 									<input type="text" class="form-control" placeholder="Filternamen eingeben..." id="customFilterName">
-									<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Fitler speichern</button>
+									<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Filter speichern</button>
 								</div>
 							</div>
 							<div class="col">

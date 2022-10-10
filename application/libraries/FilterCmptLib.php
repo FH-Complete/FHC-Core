@@ -272,95 +272,6 @@ class FilterCmptLib
 	}
 
 	/**
-	 * Change the sort of the selected fields of the current filter
-	 */
-	public function sortSelectedFields($selectedFields)
-	{
-		$sortSelectedFields = false;
-
-		// Checks the parameter selectedFields
-		if (isset($selectedFields) && is_array($selectedFields) && count($selectedFields) > 0)
-		{
-			// Retrieves all the used fields by the current filter
-			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
-
-			// Checks that the given selected fields are present in all the used fields by the current filter
-			if (!array_diff($selectedFields, $fields))
-			{
-				$this->_setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
-
-				$sortSelectedFields = true;
-			}
-		}
-
-		return $sortSelectedFields;
-	}
-
-	/**
-	 * Add a field to the current filter
-	 */
-	public function addSelectedField($selectedField)
-	{
-		$removeSelectedField = false;
-
-		// Checks the parameter selectedField
-		if (!isEmptyString($selectedField))
-		{
-			// Retrieves all the used fields by the current filter
-			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
-			// Retrieves the selected fields by the current filter
-			$selectedFields = $this->_getSessionElement(self::SESSION_SELECTED_FIELDS);
-
-			// Checks that the given selected field is present in the list of all the used fields by the current filter
-			if (in_array($selectedField, $fields))
-			{
-				array_push($selectedFields, $selectedField); // place the new filed at the end of the selected fields list
-
-				$this->_setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
-
-				$removeSelectedField = true;
-			}
-		}
-
-		return $removeSelectedField;
-	}
-
-	/**
-	 * Remove a selected field from the current filter
-	 */
-	public function removeSelectedField($selectedField)
-	{
-		$removeSelectedField = false;
-
-		// Checks the parameter selectedField
-		if (!isEmptyString($selectedField))
-		{
-			// Retrieves all the used fields by the current filter
-			$fields = $this->_getSessionElement(self::SESSION_FIELDS);
-			// Retrieves the selected fields by the current filter
-			$selectedFields = $this->_getSessionElement(self::SESSION_SELECTED_FIELDS);
-
-			// Checks that the given selected field is present in the list of all the used fields by the current filter
-			if (in_array($selectedField, $fields))
-			{
-				// If the selected field is present in the list of the selected fields by the current filter
-				$pos = array_search($selectedField, $selectedFields);
-				if ($pos !== false)
-				{
-					// Then remove it and shift the rest of elements by one if needed
-					array_splice($selectedFields, $pos, 1);
-				}
-
-				$this->_setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
-
-				$removeSelectedField = true;
-			}
-		}
-
-		return $removeSelectedField;
-	}
-
-	/**
 	 * Add a filter (SQL where clause) to be applied to the current filter
 	 */
 	public function addFilterField($filterField)
@@ -665,7 +576,7 @@ class FilterCmptLib
 				}
 				else // otherwise
 				{
-					$menuEntry->subscriptDescription = 'Remove';
+					$menuEntry->subscriptDescription = '(Remove)';
 					$menuEntry->subscriptLinkClass = 'remove-custom-filter';
 					$menuEntry->subscriptLinkValue = $filter->{self::FILTER_ID};
 

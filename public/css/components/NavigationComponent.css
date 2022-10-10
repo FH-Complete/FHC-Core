@@ -55,6 +55,14 @@
 	border-bottom: none !important;
 }
 
+.left-side-menu-second-level span {
+	display: inline-flex;
+}
+
+.remove-custom-filter {
+	font-size: 10px !important;
+}
+
 .left-side-menu-link-entry {
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
