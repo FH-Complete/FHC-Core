@@ -524,6 +524,14 @@ class statistik extends basis_db
 			}
 			foreach($_REQUEST as $name=>$value)
 			{
+				// Inputs, die in eckigen Klammern stehen, werden als Array interpretiert
+				if (substr($value, 0, 1) == '[' && substr($value, -1) == ']')
+				{
+					//Eckige Klammern entfernen und String aufsplitten
+					$value = substr($value, 1);
+					$value = substr($value, 0, -1);
+					$value = explode(',', $value);
+				}
 				if (is_array($value))
 				{
 					$in = $this->db_implode4SQL($value);
@@ -532,7 +540,6 @@ class statistik extends basis_db
 				else
 					$sql = str_replace('$'.$name,$this->db_add_param($value),$sql);
 			}
-
 			if($this->data = $this->db_query($sql))
 			{
 				$this->html.= '<thead><tr>';
