@@ -727,33 +727,27 @@ class ReihungstestJob extends JOB_Controller
 			tbl_reihungstest.reihungstest_id,
 			tbl_studienplan.studienplan_id,
 			tbl_reihungstest.studiensemester_kurzbz,
-			tbl_studienordnung.studiengang_kz
+			tbl_studienordnung.studiengang_kz,
+			tbl_studienplan.orgform_kurzbz
 		FROM
 			public.tbl_reihungstest
-			JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
-			JOIN lehre.tbl_studienplan USING(studienplan_id)
-			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+				JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
+				JOIN lehre.tbl_studienplan USING(studienplan_id)
+				JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 		WHERE
-			NOT EXISTS(
-				SELECT 1 FROM lehre.tbl_studienplan_semester
-				WHERE studienplan_id=tbl_rt_studienplan.studienplan_id
-					AND tbl_studienplan_semester.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
-			)
+			EXISTS (
+				SELECT studienplan_id
+				FROM lehre.tbl_studienordnung sordnung
+					JOIN lehre.tbl_studienplan USING (studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+				WHERE sordnung.studiengang_kz = tbl_studienordnung.studiengang_kz
+					AND tbl_studienplan_semester.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
+					AND tbl_studienplan.studienplan_id NOT IN
+					(
+						SELECT studienplan_id FROM tbl_rt_studienplan WHERE reihungstest_id = tbl_reihungstest.reihungstest_id
+					)
 			AND tbl_reihungstest.datum >= now()
-			AND NOT EXISTS(
-				SELECT
-					1
-				FROM
-					public.tbl_rt_studienplan rtstp
-					JOIN lehre.tbl_studienplan stp USING(studienplan_id)
-					JOIN lehre.tbl_studienordnung sto USING(studienordnung_id)
-					JOIN lehre.tbl_studienplan_semester stpsem USING(studienplan_id)
-				WHERE
-					sto.studiengang_kz=tbl_studienordnung.studiengang_kz
-					AND rtstp.reihungstest_id=tbl_reihungstest.reihungstest_id
-					AND stpsem.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
-			)
-		";
+          )";
 
 		$db = new DB_Model();
 		$result_rt = $db->execReadOnlyQuery($qry);
@@ -763,7 +757,9 @@ class ReihungstestJob extends JOB_Controller
 				// find an active studyplan for the same degree program with is valid in this semester
 				$result_stpl = $this->StudienplanModel->getStudienplaeneBySemester(
 					$row_rt->studiengang_kz,
-					$row_rt->studiensemester_kurzbz
+					$row_rt->studiensemester_kurzbz,
+					null,
+					$row_rt->orgform_kurzbz
 				);
 
 				if (hasData($result_stpl)) {
