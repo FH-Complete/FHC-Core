@@ -166,7 +166,9 @@ ALTER TABLE dashboard.tbl_dashboard_widget OWNER TO fhcomplete;
 CREATE TABLE dashboard.tbl_widget (
     widget_id integer NOT NULL,
     widget_kurzbz character varying(32) NOT NULL,
-    beschreibung text
+    beschreibung text,
+    arguments jsonb NOT NULL,
+    setup jsonb NOT NULL
 );
 
 
