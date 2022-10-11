@@ -256,9 +256,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				}
 
 				$obj = new zeugnisnote();
-
-				$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
-
+				$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz, (defined('ZEUGNISNOTE_NICHT_ANZEIGEN')) ? unserialize(ZEUGNISNOTE_NICHT_ANZEIGEN) : null);
 				$ects_gesamt = $ects_gesamt_positiv = 0;
 				$prestudent_id = $row->prestudent_id;
 

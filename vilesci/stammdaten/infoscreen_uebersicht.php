@@ -115,15 +115,15 @@ if($action=='new' || $action=='update')
 	<table>
 	<tr>
 		<td>Bezeichnung</td>
-		<td><input type="text" name="bezeichnung" value="',$basis->convert_html_chars($infoscreen->bezeichnung),'" /></td>
+		<td><input type="text" name="bezeichnung" size="60" maxlength="64" value="',$basis->convert_html_chars($infoscreen->bezeichnung),'" /></td>
 	</tr>
 	<tr>
 		<td>Beschreibung</td>
-		<td><input type="text" name="beschreibung" value="',$basis->convert_html_chars($infoscreen->beschreibung),'" /></td>
+		<td><input type="text" name="beschreibung" size="60" value="',$basis->convert_html_chars($infoscreen->beschreibung),'" /></td>
 	</tr>
 	<tr>
 		<td>IP Adresse</td>
-		<td><input type="text" name="ipadresse" value="',$basis->convert_html_chars($infoscreen->ipadresse),'" /></td>
+		<td><input type="text" name="ipadresse" size="50" maxlength="50" value="',$basis->convert_html_chars($infoscreen->ipadresse),'" /></td>
 	</tr>
 	<tr>
 		<td></td>

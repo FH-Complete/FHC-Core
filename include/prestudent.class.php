@@ -587,7 +587,11 @@ class prestudent extends person
 				)
 
 			AND
-				status_kurzbz = 'Interessent'";
+				status_kurzbz = 'Interessent'
+			AND 
+				NOT EXISTS (
+					SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Abgewiesener'
+				)";
 
 			if (!is_null($typ) && is_string($typ))
 			{
@@ -834,11 +838,26 @@ class prestudent extends person
 				$stg_obj = new studiengang();
 				$stg_obj->load($studiengang_kz);
 			    if($stg_obj->typ=='m')
-					$qry.=" AND a.rolle='Interessent' AND a.zgvmas_code is not null AND a.zgvmas_erfuellt = 't'";
+				{
+					$qry.=" AND a.rolle='Interessent' AND a.zgvmas_code is not null";
+
+					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
+						$qry .= " AND a.zgvmas_erfuellt = 't'";
+				}
 				elseif($stg_obj->typ=='p')
-					$qry.=" AND a.rolle='Interessent' AND a.zgvdoktor_code is not null AND a.zgvdoktor_erfuellt = 't'";
+				{
+					$qry.=" AND a.rolle='Interessent' AND a.zgvdoktor_code is not null";
+
+					if (defined('ZGV_DOKTOR_ANZEIGEN') && ZGV_DOKTOR_ANZEIGEN)
+						$qry .= " AND a.zgvdoktor_erfuellt = 't'";
+				}
 				else
-					$qry.=" AND a.rolle='Interessent' AND a.zgv_code is not null AND a.zgv_erfuellt = 't'";
+				{
+					$qry.=" AND a.rolle='Interessent' AND a.zgv_code is not null";
+
+					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
+						$qry .= " AND a.zgv_erfuellt = 't'";
+				}
 				break;
 			case "reihungstestangemeldet":
 				$qry.="
@@ -861,12 +880,14 @@ class prestudent extends person
 			case "reihungstestnichtangemeldet":
 				$qry.=" AND a.rolle='Interessent'
 					AND NOT EXISTS(SELECT 1 FROM public.tbl_rt_person
+					JOIN public.tbl_reihungstest ON(rt_id = reihungstest_id)
 					WHERE
 						person_id=a.person_id
 						AND studienplan_id IN(
 							SELECT studienplan_id FROM lehre.tbl_studienplan
 							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 							WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz)
+						AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 					)";
 				break;
 			case "bewerber":
@@ -2520,5 +2541,81 @@ class prestudent extends person
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+
+	/**
+	 * Prueft, ob eine Person offene Bewerbungen besitzt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn vorhanden, false wenn nicht vorhanden
+	 */
+	public function existsOffeneBewerbung($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps
+				WHERE
+					person_id = ".$this->db_add_param($person_id)."
+				And
+					get_rolle_prestudent(prestudent_id, null) in ('Interessent','Bewerber','Aufgenommener','Wartender');";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+			if ($num_rows > 0)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+
+	/**
+	 * Prueft, ob es sich um einen Student / Unterbrecher handelt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn zutreffend, false wenn nicht zutreffend
+	 */
+	public function isStudent($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps
+				WHERE
+					person_id = ".$this->db_add_param($person_id)."
+				And
+					get_rolle_prestudent(prestudent_id, null) in ('Student','Unterbrecher');";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+			if ($num_rows > 0)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
 	}
 }

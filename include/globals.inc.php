@@ -2,13 +2,14 @@
 	// Hintergrundfarben fuer Tabellen beim Zeitwunsch
 	global $cfgStdBgcolor;
 	$cfgStdBgcolor=array();
-	$cfgStdBgcolor[0]="#CC0000";
-	$cfgStdBgcolor[1]="#FF2200";
-	$cfgStdBgcolor[2]="#FF9922";
-	$cfgStdBgcolor[3]="#FFFF55";
-	$cfgStdBgcolor[4]="#C0ECC3";
-	$cfgStdBgcolor[5]="#48FA66";
-	$cfgStdBgcolor[6]="#CCFFCC";
+	$cfgStdBgcolor[0]="#CC0000"; // rot
+	$cfgStdBgcolor[1]="#FF2200"; // hellrot
+	$cfgStdBgcolor[2]="#FF9922"; // orange
+	$cfgStdBgcolor[3]="#FFFF55"; // gelb
+	$cfgStdBgcolor[4]="#C0ECC3"; // hellgrün mittel
+	$cfgStdBgcolor[5]="#48FA66"; // dunkelgrün mittel
+	$cfgStdBgcolor[6]="#CCFFCC"; // hellgrün heller
+	$cfgStdBgcolor[7]="#59b359	"; // dunkelgrün dunkler
 
 	// Mehrsprachige Wochentage
 	global $tagbez;

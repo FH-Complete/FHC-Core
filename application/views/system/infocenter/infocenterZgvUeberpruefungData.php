@@ -4,11 +4,6 @@ $APP = '\'infocenter\'';
 $INTERESSENT_STATUS = '\'Interessent\'';
 $TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 $LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
-
-$uid = get_uid();
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($uid);
-$oeKurz = $rechte->getOEkurzbz('lehre/zgvpruefung');
 $oeKurz = '\''. implode('\',\'', $oeKurz) . '\'';
 
 $query = '

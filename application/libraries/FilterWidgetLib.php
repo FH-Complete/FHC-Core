@@ -340,20 +340,25 @@ class FilterWidgetLib
 			{
 				$filterDefinition = $filters[$filtersCounter]; // definition of one filter
 
-				if ($filtersCounter > 0)
-					$where .= ' AND '; // if it's NOT the last one
-
-				if (!isEmptyString($filterDefinition->name)) // if the name of the applied filter is valid
+				// If the name of the applied filter is valid
+				if (!isEmptyString($filterDefinition->name))
 				{
-					// ...build the condition
-					$where .= '"'.$filterDefinition->name.'"'.$this->_getDatasetQueryCondition($filterDefinition);
+					// Build the query conditions
+					$datasetQueryCondition = $this->_getDatasetQueryCondition($filterDefinition);
+
+					// If the built condition is valid then add it to the query clause
+					if (!isEmptyString($datasetQueryCondition))
+					{
+						// // If this is NOT the first one
+						if ($filtersCounter > 0) $where .= ' AND ';
+
+						$where .= '"'.$filterDefinition->name.'"'.$datasetQueryCondition;
+					}
 				}
 			}
 
-			if ($where != '') // if the SQL where clause was built
-			{
-				$datasetQuery .= ' WHERE '.$where;
-			}
+			// If the SQL where clause was built
+			if ($where != '') $datasetQuery .= ' WHERE '.$where;
 		}
 
 		return $datasetQuery;
