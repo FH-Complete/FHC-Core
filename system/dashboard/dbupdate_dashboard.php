@@ -72,7 +72,6 @@ ALTER TABLE dashboard.tbl_dashboard_benutzer_override OWNER TO fhcomplete;
 --
 
 CREATE SEQUENCE dashboard.tbl_dashboard_benutzer_override_override_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -94,7 +93,6 @@ ALTER SEQUENCE dashboard.tbl_dashboard_benutzer_override_override_id_seq OWNED B
 --
 
 CREATE SEQUENCE dashboard.tbl_dashboard_dashboard_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -130,7 +128,6 @@ ALTER TABLE dashboard.tbl_dashboard_preset OWNER TO fhcomplete;
 --
 
 CREATE SEQUENCE dashboard.tbl_dashboard_preset_preset_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -177,7 +174,6 @@ ALTER TABLE dashboard.tbl_widget OWNER TO fhcomplete;
 --
 
 CREATE SEQUENCE dashboard.tbl_widget_widget_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -427,3 +423,40 @@ EODASHBOARDSQL;
 		}
 	}
 }
+
+// Add permission: dashboard/admin
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'dashboard/admin';"))
+{
+    if($db->db_num_rows($result) == 0)
+    {
+        $qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('dashboard/admin', 'Adminberechtigung');";
+
+        if(!$db->db_query($qry))
+        {
+            echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+        }
+        else
+        {
+            echo 'system.tbl_berechtigung: Added permission for dashboard/admin<br>';
+        }
+    }
+}
+
+// Add permission: dashboard/benutzer
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'dashboard/benutzer';"))
+{
+    if($db->db_num_rows($result) == 0)
+    {
+        $qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('dashboard/benutzer', 'Benutzerberechtigung');";
+
+        if(!$db->db_query($qry))
+        {
+            echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+        }
+        else
+        {
+            echo 'system.tbl_berechtigung: Added permission for dashboard/benutzer<br>';
+        }
+    }
+}
+
