@@ -37,37 +37,43 @@ class Widget extends Auth_Controller
 		);
 		
 		$this->load->library('dashboard/DashboardLib', null, 'DashboardLib');
+		$this->load->model('dashboard/Dashboard_Widget_model', 'DashboardWidgetModel');
 	}
 	
 	public function index() 
 	{
 		$widget_id = $this->input->get('id');
 
-		foreach ($this->demoData as $widget) {
-			if ($widget["id"] == $widget_id)
-				return $this->outputJsonSuccess($widget);
-		}
-		return $this->outputJsonSuccess([
-			"id" => 0,
-			"name" => 'Widget Not Found',
-			"file" => 'DashboardWidget/Default.js',
-			"arguments" => [
-				"className" => 'alert-danger',
-				"title" => 'Widget Not Found',
-				"msg" => 'The widget with the id ' . $widget_id . ' could not be found'
-			],
-			"size" => [
-				"width" => 1,
-				"height" => 1
-			]
-		]);
+		$widget = $this->DashboardWidgetModel->load($widget_id);
+
+		if (isError($widget) || !getData($widget))
+			return $this->outputJsonSuccess([
+				"widget_id" => 0,
+				"widget_kurzbz" => "notfound",
+				"arguments" => json_encode([
+					"className" => 'alert-danger',
+					"title" => 'Widget Not Found',
+					"msg" => 'The widget with the id ' . $widget_id . ' could not be found'
+				]),
+				"setup" => json_encode([
+					"name" => 'Widget Not Found',
+					"file" => 'DashboardWidget/Default.js',
+					"width" => 1,
+					"height" => 1
+				])
+			]);
+		return $this->outputJsonSuccess(current(getData($widget)));
 	}
 	
 	public function getWidgetsForDashboard() 
 	{
 		$db = $this->input->get('db');
+		$result = $this->DashboardWidgetModel->getAllForDashboard($db);
 
-		$this->outputJsonSuccess($this->demoData);
+		if (isError($result))
+			return $this->outputJsonError(getError($result));
+
+		$this->outputJsonSuccess(getData($result));
 	}
 	
 	public function addWidgetToUserOverride() 

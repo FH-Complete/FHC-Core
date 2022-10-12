@@ -16,6 +16,8 @@ export default {
 
 		__widgetsStarted[id] = new Promise((resolve, reject) => {
 			axios.get(__path, {params:{id}}).then(res => {
+				res.data.retval.arguments = JSON.parse(res.data.retval.arguments);
+				res.data.retval.setup = JSON.parse(res.data.retval.setup);
 				__widgets[id] = res.data.retval;
 				__widgetsStarted[id] = undefined;
 				resolve(__widgets[id]);

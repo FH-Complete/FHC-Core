@@ -31,7 +31,7 @@ export default {
 		isResizeable() {
 			if (!this.widget)
 				return false;
-			return this.widget.size.width.max || this.widget.size.height.max;
+			return this.widget.setup.width.max || this.widget.setup.height.max;
 		},
 		ready() {
 			return this.component && this.arguments !== null
@@ -88,9 +88,9 @@ export default {
 	},
 	async created() {
 		this.widget = await CachedWidgetLoader.loadWidget(this.id);
-		let component = (await import('../' + this.widget.file)).default;
-		this.$options.components['widget' + this.widget.id] = component;
-		this.component = 'widget' + this.widget.id;
+		let component = (await import('../' + this.widget.setup.file)).default;
+		this.$options.components['widget' + this.widget.widget_id] = component;
+		this.component = 'widget' + this.widget.widget_id;
 		this.arguments = {...this.widget.arguments, ...this.config};
 		this.tmpConfig = {...this.arguments};
 	},
@@ -100,7 +100,7 @@ export default {
 	template: `<div v-if="!hidden || editMode" :class="'dashboard-item card overflow-hidden ' + (arguments ? arguments.className : '')" @mousedown="mouseDown($event)" @dragstart="startDrag($event)" :draggable="!!editMode">
 		<div v-if="editMode && widget" class="card-header d-flex">
 			<span ref="dragHandle" class="col-auto pe-3"><i class="fa-solid fa-grip-vertical"></i></span>
-			<span class="col">{{ widget.name }}</span>
+			<span class="col">{{ widget.setup.name }}</span>
 			<a v-if="hasConfig" class="col-auto ps-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
 			<a v-if="custom" class="col-auto ps-1" href="#" @click.prevent="$emit('remove')">
 				<i class="fa-solid fa-trash"></i>
@@ -117,7 +117,7 @@ export default {
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 v-if="widget" class="modal-title">Config for {{ widget.name }}</h5>
+						<h5 v-if="widget" class="modal-title">Config for {{ widget.setup.name }}</h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">

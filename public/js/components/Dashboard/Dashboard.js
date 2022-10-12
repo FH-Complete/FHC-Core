@@ -27,6 +27,10 @@ export default {
 					db: this.dashboard
 				}}).then(res => {
 					//console.log(res.data.retval);
+					res.data.retval.forEach(widget => {
+						widget.arguments = JSON.parse(widget.arguments);
+						widget.setup = JSON.parse(widget.setup);
+					});
 					this.widgets = res.data.retval;
 				}).catch(err => console.error('ERROR:', err));
 			}
@@ -151,12 +155,12 @@ export default {
 					</div>
 					<div class="modal-body">
 						<div v-if="listReady" class="row">
-							<div v-for="widget in widgets" :v-key="widget.id" class="col">
-								<div class="card h-100" @click="widgetCreate(widget.id)">
-									<img class="card-img-top" :src="widget.icon" :alt="'pictogram for ' + widget.name">
+							<div v-for="widget in widgets" :v-key="widget.widget_id" class="col">
+								<div class="card h-100" @click="widgetCreate(widget.widget_id)">
+									<img class="card-img-top" :src="widget.setup.icon" :alt="'pictogram for ' + (widget.setup.name || widget.widget_kurzbz)">
 									<div class="card-body">
-										<h5 class="card-title">{{ widget.name }}</h5>
-										<p class="card-text">{{ widget.description }}</p>
+										<h5 class="card-title">{{ widget.setup.name || widget.widget_kurzbz }}</h5>
+										<p class="card-text">{{ widget.beschreibung }}</p>
 									</div>
 								</div>
 							</div>
