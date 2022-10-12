@@ -402,6 +402,7 @@ foreach ($noten_obj->result as $row)
 			url += '&typ='+typ;
 			url += '&'+ts;
 
+
 			$.ajax({
 				type:"GET",
 				url: url,
@@ -602,6 +603,42 @@ foreach ($noten_obj->result as $row)
 		$('#noteimporttextarea').focus();
 	}
 
+	// ****
+	// * Oeffnet ein Fenster fuer den Import von Noten für die Nachprüfung aus dem Excel
+	// ****
+	function GradeImportNachp()
+	{
+		var str = "<form name='gradeimportNachp_form'><center><table style='width: 95%'>";
+		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
+		var anlegendiv = document.getElementById("nachpruefung_div");
+		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
+		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisungNachp');?>:</td>';
+		str	+= '<td></td><tr><td><textarea id="noteimporttextareaNachp" name="notenimportNachp"></textarea></td></tr>';
+		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulkNachp(\"Termin2\");'>";
+		str += "</td><td></td></tr></table></center></form>";
+		anlegendiv.innerHTML = str;
+		anlegendiv.style.visibility = "visible";
+		$('#noteimporttextareaNachp').focus();
+	}
+
+	// ****
+	// * Oeffnet ein Fenster fuer den Import von Noten für Termin3 aus dem Excel
+	// ****
+	function GradeImportTermin3()
+	{
+		var str = "<form name='gradeimportNachp_form'><center><table style='width: 95%'>";
+		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
+		var anlegendiv = document.getElementById("nachpruefung_div");
+		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
+		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisungNachp');?>:</td>';
+		str	+= '<td></td><tr><td><textarea id="noteimporttextareaNachp" name="notenimportNachp"></textarea></td></tr>';
+		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulkNachp(\"Termin3\");'>";
+		str += "</td><td></td></tr></table></center></form>";
+		anlegendiv.innerHTML = str;
+		anlegendiv.style.visibility = "visible";
+		$('#noteimporttextareaTermin3').focus();
+	}
+
 	// Speichert die Noten ueber den Import
 	function saveGradeBulk()
 	{
@@ -690,6 +727,105 @@ foreach ($noten_obj->result as $row)
 	  				alert('Request fehlgeschlagen');
 	  			}
 	  		});
+
+		}
+		else
+		{
+			alert('<?php echo $p->t('benotungstool/hilfeImport');?>');
+		}
+	}
+
+	// Speichert die Noten der Nachprüfung ueber den Import
+	function saveGradeBulkNachp(typ)
+	{
+		data = $('#noteimporttextareaNachp').val();
+		closeDiv();
+
+		//Reihen ermitteln
+		var rows = data.split("\n");
+		var i=0;
+		var params='';
+		alertMsg = '';
+
+		var gradedata = {};
+		var validGrades = '';
+
+		<?php
+		// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
+		// Fill Array $gradesArray with valid grades
+		if (CIS_GESAMTNOTE_PUNKTE == false)
+		{
+			$gradesArray = array();
+			foreach ($noten_obj->result as $row_note)
+			{
+				if ($row_note->lehre && $row_note->aktiv)
+					$gradesArray[] = '"' . $row_note->anmerkung . '"';
+			}
+			// Output JS variable with valid grades
+			echo 'var validGrades = [' . implode(',', $gradesArray) . '];';
+		}
+		?>
+
+		for(row in rows)
+		{
+			zeile = rows[row].split("	");
+
+			<?php
+			// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
+			if (CIS_GESAMTNOTE_PUNKTE == false)
+				echo '	// check for valid grades
+				if (validGrades.indexOf(zeile[2]) === -1 && typeof(zeile[2]) != "undefined" && zeile[2] != "")
+				{
+					alertMsg = alertMsg+"Die Note "+zeile[2]+" ist nicht zulaessig. Die Zeile wurde uebersprungen. \n";
+					continue;
+				}';
+			?>
+
+			if (zeile[0]!='' && zeile[1]!='' && zeile[2]!='')
+			{
+				gradedata['student_uid_'+i]=zeile[0];
+				gradedata['datumNachp_'+i]=zeile[1];
+				<?php
+				if (CIS_GESAMTNOTE_PUNKTE)
+					echo "gradedata['punkte_'+i]= zeile[2];";
+				else
+					echo "gradedata['note_'+i]= zeile[2];";
+				?>
+
+				i++;
+			}
+		}
+
+		if (alertMsg != "")
+			alert(alertMsg);
+
+		if (i>0)
+		{
+
+			var jetzt = new Date();
+			var ts = jetzt.getTime();
+			var url= '<?php echo "nachpruefungeintragen.php?lvid=".urlencode($lvid)."&stsem=".urlencode($stsem); ?>';
+			url += '&sammel=1';
+			url += '&typ=' + typ;
+			url += '&submit=1&'+ts;
+			$.ajax({
+				type:"POST",
+				url: url,
+				data: gradedata,
+				success:function(result)
+				{
+					var resp = result;
+					if (resp!='')
+					{
+						alert(resp);
+					}
+					window.location.reload();
+					},
+					error:function(result)
+					{
+						alert('Request Nachprüfung fehlgeschlagen');
+					}
+				});
 
 		}
 		else
@@ -1052,11 +1188,15 @@ $htmlstring .= "<th>" . $p->t('benotungstool/punkte') . ' / ' . $p->t('benotungs
 
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
 {
-	$htmlstring .= "<th colspan='2'>" . $p->t('benotungstool/nachpruefung') . "</th>";
+	$htmlstring .= "<th colspan='2'><br>" . $p->t('benotungstool/nachpruefung') . "<br>
+	<input type='button' onclick='GradeImportNachp()' value='" . $p->t('benotungstool/importieren') . "'>
+	</th>";
 }
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 {
-	$htmlstring .= "<th colspan='2' nowrap>" . $p->t('benotungstool/nachpruefung2') . "</th>";
+	$htmlstring .= "<th colspan='2' nowrap><br>" . $p->t('benotungstool/nachpruefung') . "<br>
+	<input type='button' onclick='GradeImportTermin3()' value='" . $p->t('benotungstool/importieren') . "'>
+	</th>";
 }
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
 {
