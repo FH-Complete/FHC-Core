@@ -294,7 +294,7 @@ class PlausicheckLib
 
 		$qry = "
 			SELECT
-				DISTINCT(student.student_uid), prestudent.person_id, prestudent.prestudent_id,
+				DISTINCT(student.student_uid), student.student_uid, prestudent.person_id, prestudent.prestudent_id,
 				status.ausbildungssemester AS status_ausbildungssemester, lv.semester AS student_ausbildungssemester, status.studiensemester_kurzbz,
 				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM

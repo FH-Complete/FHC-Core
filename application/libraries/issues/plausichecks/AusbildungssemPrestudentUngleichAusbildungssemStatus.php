@@ -36,8 +36,9 @@ class AusbildungssemPrestudentUngleichAusbildungssemStatus extends PlausiChecker
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
 					'fehlertext_params' => array(
-						'student_ausbildungssemester' => $prestudent->student_ausbildungssemester,
 						'status_ausbildungssemester' => $prestudent->status_ausbildungssemester,
+						'student_ausbildungssemester' => $prestudent->student_ausbildungssemester,
+						'student_uid' => $prestudent->student_uid,
 						'prestudent_id' => $prestudent->prestudent_id,
 						'studiensemester_kurzbz' => $prestudent->studiensemester_kurzbz
 					),
