@@ -52,7 +52,13 @@ class PlausicheckProducerLib
 		if (hasData($studiensemesterRes)) $this->_currentStudiensemester = getData($studiensemesterRes)[0]->studiensemester_kurzbz;
 	}
 
-	public function producePlausicheck($fehler_kurzbz, $studiensemester_kurzbz = null, $studiengang_kz = null)
+	/**
+	 * Executes check for a fehler_kurzbz, returns the result.
+	 * @param $fehler_kurzbz string
+	 * @param $studiensemester_kurzbz string optionally needed for issue production
+	 * @param $studiengang_kz int optionally needed for issue production
+	 */
+	public function producePlausicheckIssue($fehler_kurzbz, $studiensemester_kurzbz = null, $studiengang_kz = null)
 	{
 		$libName = $this->_fehlerLibMappings[$fehler_kurzbz];
 
@@ -85,6 +91,9 @@ class PlausicheckProducerLib
 		return $this->_ci->{$lowercaseLibName}->{self::EXECUTE_PLAUSI_CHECK_METHOD_NAME}($paramsForCheck);
 	}
 
+	/**
+	 * Gets all fehler_kurzbz for fehler which need to be checked.
+	 */
 	public function getFehlerKurzbz()
 	{
 		return array_keys($this->_fehlerLibMappings);

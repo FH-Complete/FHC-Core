@@ -120,11 +120,18 @@ $config['navigation_header'] = array(
 					'sort' => 30,
 					'requiredPermissions' => 'system/issues_verwalten:r'
 				),
+				'plausichecks' => array(
+					'link' => site_url('system/issues/Plausichecks'),
+					'description' => 'Plausichecks',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'system/issues_verwalten:r'
+				),
 				'gruppenmanagement' => array(
 					'link' => site_url('person/Gruppenmanagement'),
 					'description' => 'Gruppenmanagement',
 					'expand' => true,
-					'sort' => 40,
+					'sort' => 50,
 					'requiredPermissions' => 'lehre/gruppenmanager:r'
 				)
 			)

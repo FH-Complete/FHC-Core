@@ -28,7 +28,8 @@ class PlausicheckLib
 
 	/**
 	 * Studiengang should be the same for prestudent and student.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getStgPrestudentUngleichStgStudent($studiengang_kz = null, $prestudent_id = null)
@@ -64,7 +65,9 @@ class PlausicheckLib
 
 	/**
 	 * Orgform of a Studiengang in Studienplan should be the same as orgform of student.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getOrgformStgUngleichOrgformPrestudent($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -74,8 +77,8 @@ class PlausicheckLib
 		$qry = "
 			SELECT
 				prestudent.person_id, prestudent.prestudent_id, status.studiensemester_kurzbz,
-				studiengang.orgform_kurzbz as stg_orgform, status.orgform_kurzbz as student_orgform,
-				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+				studiengang.orgform_kurzbz AS stg_orgform, status.orgform_kurzbz AS student_orgform,
+				prestudent.studiengang_kz AS student_studiengang, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_studiengang studiengang
 				JOIN public.tbl_student student USING(studiengang_kz)
@@ -89,7 +92,8 @@ class PlausicheckLib
 				AND studiengang.studiengang_kz < 10000
 				AND status.studiensemester_kurzbz = ?
 				AND NOT EXISTS(
-					SELECT 1 FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					SELECT 1 FROM lehre.tbl_studienplan
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 					WHERE
 						tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
 						AND tbl_studienplan.orgform_kurzbz = status.orgform_kurzbz)";
@@ -114,7 +118,9 @@ class PlausicheckLib
 
 	/**
 	 * Students in "mixed" Studiengang should have Orgform.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getPrestudentMischformOhneOrgform($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -152,7 +158,9 @@ class PlausicheckLib
 
 	/**
 	 * Studiengang should be the same for prestudent and studienplan.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param studienordnung_id int if check is to be executed only for a certain studienordnung_id
 	 * @return success with prestudents or error
 	 */
 	public function getStgPrestudentUngleichStgStudienplan($studiengang_kz = null, $prestudent_id = null, $studienordnung_id = null)
@@ -171,7 +179,8 @@ class PlausicheckLib
 				JOIN public.tbl_person USING(person_id)
 				JOIN public.tbl_studiengang stg ON ps.studiengang_kz = stg.studiengang_kz
 			WHERE
-				ps.studiengang_kz<>stordnung.studiengang_kz";
+				ps.studiengang_kz<>stordnung.studiengang_kz
+				AND stg.melderelevant";
 
 		if (isset($studiengang_kz))
 		{
@@ -199,7 +208,8 @@ class PlausicheckLib
 
 	/**
 	 * Abbrecher cannot be active.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getAbbrecherAktiv($studiengang_kz = null, $prestudent_id = null)
@@ -236,7 +246,8 @@ class PlausicheckLib
 
 	/**
 	 * There shouldn't be any status after Abbrecher status.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getStudentstatusNachAbbrecher($studiengang_kz = null, $prestudent_id = null)
@@ -272,7 +283,9 @@ class PlausicheckLib
 
 	/**
 	 * Ausbildungssemester of prestudent (lehrverband) must be the same as Ausbildungssemester of prestudentstatus.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getAusbildungssemPrestudentUngleichAusbildungssemStatus($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -282,7 +295,7 @@ class PlausicheckLib
 		$qry = "
 			SELECT
 				DISTINCT(student.student_uid), prestudent.person_id, prestudent.prestudent_id,
-				status.ausbildungssemester, lv.semester, status.studiensemester_kurzbz,
+				status.ausbildungssemester AS status_ausbildungssemester, lv.semester AS student_ausbildungssemester, status.studiensemester_kurzbz,
 				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_student student
@@ -314,7 +327,9 @@ class PlausicheckLib
 
 	/**
 	 * Students with active status should have an active Benutzer.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getInaktiverStudentAktiverStatus($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -361,7 +376,9 @@ class PlausicheckLib
 	 * Students of a semester shouldn't start studies before the date of Bismeldung.
 	 * e.g. If student studies in WS2022 datum of status shouldn't be before 15.4.2020
 	 * e.g. If student studies in SS2022 datum of status shouldn't be before 15.11.2022
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getInskriptionVorLetzerBismeldung($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -415,7 +432,8 @@ class PlausicheckLib
 
 	/**
 	 * Status Dates and status studysemester dates should be in correct order.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getDatumStudiensemesterFalscheReihenfolge($studiengang_kz = null, $prestudent_id = null)
@@ -467,7 +485,8 @@ class PlausicheckLib
 
 	/**
 	 * Students with active Benutzer should have a status in the current semester.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getAktiverStudentOhneStatus($studiengang_kz = null, $prestudent_id = null)
@@ -512,7 +531,9 @@ class PlausicheckLib
 
 	/**
 	 * Studienplan should be valid in current Ausbildungssemester of prestudent.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getStudienplanUngueltig($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -566,7 +587,9 @@ class PlausicheckLib
 
 	/**
 	 * Students with finished studies should have exactly one final exam.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getFalscheAnzahlAbschlusspruefungen($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null)
@@ -626,7 +649,9 @@ class PlausicheckLib
 
 	/**
 	 * Date of final exam shouldn't be missing for Absolvent.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param abschlusspruefung_id int if check is to be executed for a certain Abschlussprüfung
 	 * @return success with prestudents or error
 	 */
 	public function getDatumAbschlusspruefungFehlt($studiensemester_kurzbz = null, $studiengang_kz = null, $abschlusspruefung_id = null)
@@ -652,7 +677,9 @@ class PlausicheckLib
 
 	/**
 	 * Date of sponsion shouldn't be missing for Absolvent.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param abschlusspruefung_id int if check is to be executed only for a certain Abschlussprüfung
 	 * @return success with prestudents or error
 	 */
 	public function getDatumSponsionFehlt($studiensemester_kurzbz = null, $studiengang_kz = null, $abschlusspruefung_id = null)
@@ -678,7 +705,9 @@ class PlausicheckLib
 
 	/**
 	 * Bewerber should have participated in Reihungstest.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getBewerberNichtZumRtAngetreten($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -732,7 +761,9 @@ class PlausicheckLib
 
 	/**
 	 * Current Ausbildungssemester shouldn't be 0.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getAktSemesterNull($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
@@ -770,8 +801,9 @@ class PlausicheckLib
 
 	/**
 	 * Prestudent should have a final status.
-	 *
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getAbschlussstatusFehlt($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null)
@@ -852,7 +884,9 @@ class PlausicheckLib
 
 	/**
 	 * Birthdate is too long ago.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param person_id int if check is to be executed only for one person
 	 * @return success with prestudents or error
 	 */
 	public function getGbDatumWeitZurueck($studiensemester_kurzbz = null, $studiengang_kz = null, $person_id = null)
@@ -870,7 +904,7 @@ class PlausicheckLib
 					SELECT 1
 					FROM public.tbl_prestudent
 					JOIN public.tbl_prestudentstatus status USING(prestudent_id)
-					JOIN public.tbl_studiengang USING(studiengang_kz)
+					JOIN public.tbl_studiengang stg USING(studiengang_kz)
 					WHERE person_id = pers.person_id";
 
 		if (isset($studiensemester_kurzbz))
@@ -898,7 +932,8 @@ class PlausicheckLib
 
 	/**
 	 * Nation is not Austria, but address has austrian Gemeinde.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param person_id int if check is to be executed only for one person
 	 * @return success with prestudents or error
 	 */
 	public function getNationNichtOesterreichAberGemeinde($studiengang_kz = null, $person_id = null)
@@ -936,7 +971,9 @@ class PlausicheckLib
 
 	/**
 	 * Students should have exactly one home address.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param person_id int if check is to be executed only for one person
 	 * @return success with prestudents or error
 	 */
 	public function getFalscheAnzahlHeimatadressen($studiensemester_kurzbz = null, $studiengang_kz = null, $person_id = null)
@@ -986,7 +1023,9 @@ class PlausicheckLib
 
 	/**
 	 * Students should have exactly one delivery address.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param person_id int if check is to be executed only for one person
 	 * @return success with prestudents or error
 	 */
 	public function getFalscheAnzahlZustelladressen($studiensemester_kurzbz = null, $studiengang_kz = null, $person_id = null)
@@ -1039,7 +1078,9 @@ class PlausicheckLib
 
 	/**
 	 * Incoming shouldn't have austrian home address.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param person_id int if check is to be executed only for one person
 	 * @return success with prestudents or error
 	 */
 	public function getIncomingHeimatNationOesterreich($studiensemester_kurzbz, $studiengang_kz = null, $person_id = null)
@@ -1080,7 +1121,8 @@ class PlausicheckLib
 
 	/**
 	 * Incoming should have IN/OUT data.
-	 * @param int prestudent_id if check is to be executed only for one prestudent
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return success with prestudents or error
 	 */
 	public function getIncomingOhneIoDatensatz($studiengang_kz = null, $prestudent_id = null)
@@ -1125,6 +1167,9 @@ class PlausicheckLib
 
 	/**
 	 * Get final exams in a semester which are invalid (e.g. missing data)
+	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiengang
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param abschlusspruefung_id int if check is to be executed for certain Abschlussprüfung
 	 */
 	private function _getInvalidAbschlusspruefungen($studiensemester_kurzbz = null, $studiengang_kz = null, $abschlusspruefung_id = null)
 	{
@@ -1178,6 +1223,7 @@ class PlausicheckLib
 
 	/**
 	 * Gets Bismeldedate from Studiensemester.
+	 * @param studiensemester_kurzbz string
 	 */
 	private function _getBisdateFromSemester($studiensemester_kurzbz)
 	{

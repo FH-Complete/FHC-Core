@@ -15,6 +15,8 @@ class PlausiIssueProducer extends JOB_Controller
 
 	/**
 	 * Runs issue production job.
+	 * @param studiensemester_kurzbz string job is run for students of a certain semester.
+	 * @param studiengang_kz int job is run for students of certain Studiengang.
 	 */
 	public function run($studiensemester_kurzbz = null, $studiengang_kz = null)
 	{
@@ -27,7 +29,7 @@ class PlausiIssueProducer extends JOB_Controller
 		{
 			// execute the check
 			$this->logInfo("Checking " . $fehler_kurzbz . "...");
-			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheck($fehler_kurzbz, $studiensemester_kurzbz, $studiengang_kz);
+			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue($fehler_kurzbz, $studiensemester_kurzbz, $studiengang_kz);
 
 			if (isError($plausicheckRes)) $this->logError(getError($plausicheckRes));
 

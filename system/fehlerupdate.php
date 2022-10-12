@@ -137,7 +137,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STG_0002',
 		'fehler_kurzbz' => 'OrgformStgUngleichOrgformPrestudent',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Organisationsform des Studienganges (%s) stimmt nicht mit Organisationsformen des Studenten (%s) überein. (prestudent_id %s)',
+		'fehlertext' => 'Es ist kein Studienplan mit Studiengang (%s) und Organisationsform (%s) des Studenten zugewiesen. (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),
@@ -177,7 +177,7 @@ $fehlerArr = array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0003',
 		'fehler_kurzbz' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
 		'fehlercode_extern' => null,
-		'fehlertext' => 'Aktuelles Ausbildungssemester bei StudentIn (Lehrverband) stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein. (prestudent_id %s, Studiensemester %s)',
+		'fehlertext' => 'Aktuelles Ausbildungssemester %s bei StudentIn (Lehrverband) stimmt nicht mit dem Ausbildungssemester %s des aktuellen Status überein. (prestudent_id %s, Studiensemester %s)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core'
 	),

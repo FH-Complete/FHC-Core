@@ -4,8 +4,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Plausichecks extends Auth_Controller
 {
-	private $_uid;
-
 	public function __construct()
 	{
 		parent::__construct(
@@ -24,16 +22,20 @@ class Plausichecks extends Auth_Controller
 		$this->load->model('system/Fehler_model', 'FehlerModel');
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
-		$this->_setAuthUID(); // sets property uid
 	}
 
+	/*
+	 * Get data for filtering the plausichecks and load the view.
+	 */
 	public function index()
 	{
 		$filterData = $this->_getFilterData();
 		$this->load->view('system/issues/plausichecks', $filterData);
 	}
 
+	/**
+	 * Initiate plausichecks run.
+	 */
 	public function runChecks()
 	{
 		$studiensemester_kurzbz = $this->input->get('studiensemester_kurzbz');
@@ -52,7 +54,7 @@ class Plausichecks extends Auth_Controller
 		{
 			// execute the check
 			$issueTexts[$fehler_kurzbz] = array();
-			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheck($fehler_kurzbz, $studiensemester_kurzbz, $studiengang_kz);
+			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue($fehler_kurzbz, $studiensemester_kurzbz, $studiengang_kz);
 
 			if (isError($plausicheckRes)) $this->terminateWithJsonError(getError($plausicheckRes));
 
@@ -98,6 +100,9 @@ class Plausichecks extends Auth_Controller
 		$this->outputJsonSuccess($issueTexts);
 	}
 
+	/**
+	 * Get the data needed for filtering for limiting checks.
+	 */
 	private function _getFilterData()
 	{
 		$this->StudiensemesterModel->addOrder('start', 'DESC');
@@ -125,15 +130,5 @@ class Plausichecks extends Auth_Controller
 			'studiengaenge' => hasData($studiengaengeRes) ? getData($studiengaengeRes) : array(),
 			'fehler' => $fehlerKurzbz
 		);
-	}
-
-	/**
-	 * Retrieve the UID of the logged user and checks if it is valid
-	 */
-	private function _setAuthUID()
-	{
-		$this->_uid = getAuthUID();
-
-		if (!$this->_uid) show_error('User authentification failed');
 	}
 }

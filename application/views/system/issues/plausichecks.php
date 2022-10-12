@@ -12,7 +12,7 @@ $this->load->view(
 		'ajaxlib' => true,
 		'navigationwidget' => true,
 		'dialoglib' => true,
-		//'customCSSs' => array('public/css/issues/issuesZustaendigkeiten.css', 'public/css/sbadmin2/tablesort_bootstrap.css'),
+		'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css'),
 		'customJSs' => array('public/js/issues/plausichecks.js')
 	)
 );
@@ -68,7 +68,7 @@ $this->load->view(
 						<?php endforeach; ?>
 					</select>
 				</div>
-				<div class="col-xs-4 form-group">
+				<div class="col-xs-3 col-lg-4 form-group">
 					<label>Fehler</label>
 					<select class="form-control" name="fehler_kurzbz" id="fehler_kurzbz">
 						<option value="" selected="selected">Alle</option>';
@@ -79,10 +79,10 @@ $this->load->view(
 						<?php endforeach; ?>
 					</select>
 				</div>
-				<div class="col-xs-2 form-group text-right">
+				<div class="col-xs-3 col-lg-2 form-group text-right">
 					<label>&nbsp;</label>
 					<br />
-					<button class="btn btn-default" id="plausistart">Plausichecks starten</button>
+					<button class="btn btn-default" id="plausistart">Checks starten</button>
 				</div>
 			</div>
 			<div class="row">

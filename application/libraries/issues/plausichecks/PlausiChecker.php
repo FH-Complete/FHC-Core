@@ -17,7 +17,7 @@ abstract class PlausiChecker
 
 	/**
 	 * Executes a plausi check.
-	 * @param array $params parameters needed for executing the check
+	 * @param $paramsForChecking array parameters needed for executing the check
 	 * @return array with objects which failed the plausi check
 	 */
 	abstract public function executePlausiCheck($paramsForChecking);
