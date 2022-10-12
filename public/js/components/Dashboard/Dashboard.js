@@ -1,5 +1,6 @@
 import DashboardSection from "./Section.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import ObjectUtils from "../../composables/ObjectUtils.js";
 
 export default {
 	props: [
@@ -52,7 +53,6 @@ export default {
 					newId = i;
 					break;
 				}
-				console.log(newId);
 				this.tmpCreate.widget.id = newId;
 				this.sections.forEach(section => {
 					if (section.name == this.tmpCreate.section_name)
@@ -73,7 +73,7 @@ export default {
 					if (this.sections[i].name == section_name) {
 						for (var wid in this.sections[i].widgets) {
 							if (this.sections[i].widgets[wid].id == k) {
-								payload[k] = {...this.sections[i].widgets[wid], ...payload[k]};
+								payload[k] = ObjectUtils.mergeDeep(this.sections[i].widgets[wid], payload[k]);
 								break;
 							}
 						}
@@ -82,7 +82,7 @@ export default {
 				}
 				payload[k].widgetid = k;
 			}
-			return axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
+			axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
 				db: this.dashboard,
 				uid: 'ma0168',
 				funktion_kurzbz: section_name,
