@@ -518,6 +518,67 @@ if ($rtprueflingEntSperren)
 	}
 }
 
+// Ajax-Request um einen Prüfling Zeit für ein bestimmtes Gebiet hinzuzufügen
+$prueflingAddTime = filter_input(INPUT_POST, 'prueflingAddTime', FILTER_VALIDATE_BOOLEAN);
+if ($prueflingAddTime)
+{
+	if (!$rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'su'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	if (isset($_POST['pruefling_id']) && is_numeric($_POST['pruefling_id'])
+		&& isset($_POST['gebiet']) && is_numeric($_POST['gebiet'])
+		&& isset($_POST['time']) && is_numeric($_POST['time']))
+	{
+		$qry = "UPDATE testtool.tbl_pruefling_frage
+					SET begintime = 
+						CASE WHEN 
+							(begintime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute') > NOW())
+						THEN
+							NOW()
+						ELSE
+							(begintime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute'))
+						END,
+					endtime = 
+						CASE WHEN 
+							(endtime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute') > NOW())
+						THEN
+							NOW()
+						ELSE
+							(endtime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute'))
+						END
+					WHERE prueflingfrage_id IN
+					(
+						SELECT prueflingfrage_id
+						FROM testtool.tbl_pruefling
+							JOIN testtool.tbl_pruefling_frage USING (pruefling_id)
+							JOIN testtool.tbl_frage ON tbl_pruefling_frage.frage_id = tbl_frage.frage_id
+						WHERE pruefling_id = ". $db->db_add_param($_POST['pruefling_id']) . " AND gebiet_id = ". $db->db_add_param($_POST['gebiet']) ."
+					)";
+		
+		if ($result = $db->db_query($qry))
+		{
+			echo json_encode(array(
+				'status' => 'ok',
+				'msg' => 'Zeit hinzugefügt'));
+			exit();
+		}
+		else
+		{
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim speichern der Daten'
+			));
+			exit();
+		}
+	}
+}
+
 // Ajax-Request um einen Reihungstest freizuschalten
 $rtFreischalten = filter_input(INPUT_POST, 'rtFreischalten', FILTER_VALIDATE_BOOLEAN);
 if ($rtFreischalten)
@@ -1289,7 +1350,8 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_ablauf.reihung,
 			tbl_ablauf.studiengang_kz,
 			tbl_ablauf.semester,
-		    tbl_ablauf.gewicht
+		    tbl_ablauf.gewicht,
+			tbl_gebiet.zeit
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
 		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
@@ -1366,6 +1428,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		}
 		$gebiet[$row->gebiet_id]->name = $row->gebiet;
 		$gebiet[$row->gebiet_id]->gebiet_id = $row->gebiet_id;
+		$gebiet[$row->gebiet_id]->zeit = $row->zeit;
 		//gewicht ist meist für alle Studiengänge gleich (Bachelor, Master und Distance haben jeweilsandere Gebiete)
 		if (!isset($gebiet[$row->gebiet_id]->gewicht))
 		{
@@ -1487,6 +1550,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_pruefling.idnachweis,
 			tbl_pruefling.registriert,
 			tbl_pruefling.gesperrt,
+			tbl_pruefling.pruefling_id,
 			get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) AS letzter_status
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
@@ -1601,7 +1665,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->prestudent_id = $row->prestudent_id;
 		$ergebnis[$row->prestudent_id]->person_id = $row->person_id;
 		$ergebnis[$row->prestudent_id]->reihungstest_id = $row->reihungstest_id;
-		//$ergebnis[$row->prestudent_id]->pruefling_id = $row->pruefling_id;
+		$ergebnis[$row->prestudent_id]->pruefling_id = $row->pruefling_id;
 		$ergebnis[$row->prestudent_id]->nachname = $row->nachname;
 		$ergebnis[$row->prestudent_id]->vorname = $row->vorname;
 		$ergebnis[$row->prestudent_id]->gebdatum = $row->gebdatum;
@@ -2422,6 +2486,47 @@ else
 			});
 		}
 	}
+	function prueflingAddTime(pruefling_id, gebiet)
+	{
+		var datetime = $("#prueflingAddTime_" + pruefling_id + "_gebiet_" + gebiet).val();
+		var min = parseInt(datetime.split(":")[1]);
+		data = {
+			pruefling_id: pruefling_id,
+			gebiet: gebiet,
+			time: min,
+			prueflingAddTime: true
+		};
+
+		$.ajax({
+			url: "auswertung_fhtw.php",
+			data: data,
+			type: "POST",
+			dataType: "json",
+			success: function(data)
+			{
+				if(data.status !== "ok")
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+				else
+				{
+					$("#msgbox").attr("class","alert alert-success");
+					$(".loaderIcon").hide();
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+					$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+				}
+			},
+			error: function(data)
+			{
+				$("#msgbox").attr("class","alert alert-danger");
+				$("#msgbox").show();
+				$("#msgbox").html(data["msg"]);
+			}
+		});
+	}
 	function deleteAllResults(prestudent_id, name)
 	{
 		if (confirm("Wollen Sie ALLE Ergebnisse der Person "+name+" wirklich löschen"))
@@ -3143,7 +3248,7 @@ else
 
 		foreach ($gebiet AS $gbt)
 		{
-			echo '<th colspan="3">' . $gbt->name . '</th>';
+			echo '<th colspan="4">' . $gbt->name . '</th>';
 		}
 
 		echo '</tr>
@@ -3158,6 +3263,7 @@ else
 			echo "<th><small>Punkte</small></th>";
 			echo "<th><small>Punkte mit Offset</small></th>";
 			echo "<th><small>Prozent</small></th>";
+			echo "<th><small>Zeit hinzufügen</small></th>";
 		}
 
 		echo '</tr></thead><tbody>';
@@ -3265,10 +3371,34 @@ else
 						echo '</td>';
 						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->punktemitoffset != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->punktemitoffset, 2, ',', ' ') : '') . '</td>';
 						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->prozent != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->prozent, 2, ',', ' ') . ' %' : '') . '</td>';
+						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>';
+
+						if (!is_null($erg->pruefling_id))
+						{
+							echo
+								'<select id="prueflingAddTime_'.$erg->pruefling_id .'_gebiet_' . $gbt->gebiet_id . '">';
+							$time = strtotime($gbt->zeit);
+							$minutes = date('i', $time);
+
+							if ($minutes <= 5)
+								echo '<option>'. $minutes .'</option>';
+							else
+							{
+								echo
+									'<option>00:05:00</option>
+									<option>'. $gbt->zeit .'</option>';
+							}
+
+							echo '</select>
+								<a href="#" id="prueflingAddTime_'.$erg->pruefling_id .'" onclick="prueflingAddTime('.  $erg->pruefling_id.  '' . ', ' .$gbt->gebiet_id .')">
+									<span class="glyphicon glyphicon-ok"></span>
+								</a>';
+						}
+						echo '</td>';
 					}
 					else
 					{
-						echo '<td></td><td></td><td></td>';
+						echo '<td></td><td></td><td></td><td></td>';
 					}
 				}
 
