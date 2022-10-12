@@ -242,7 +242,6 @@ class PlausicheckLib
 	public function getStudentstatusNachAbbrecher($studiengang_kz = null, $prestudent_id = null)
 	{
 		$params = array();
-		$result = array();
 
 		$qry = "
 			SELECT
@@ -268,7 +267,6 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
-		// TODO - maybe also put in sql?
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -321,6 +319,12 @@ class PlausicheckLib
 	 */
 	public function getInaktiverStudentAktiverStatus($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
 	{
+		$aktStudiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();
+
+		if (isError($aktStudiensemesterRes)) return $aktStudiensemesterRes;
+
+		$studiensemester_kurzbz = hasData($aktStudiensemesterRes) ? getData($aktStudiensemesterRes)[0]->studiensemester_kurzbz : '';
+
 		$params = array($studiensemester_kurzbz);
 
 		$qry = "
@@ -333,7 +337,8 @@ class PlausicheckLib
 				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
 			WHERE
 				benutzer.aktiv=false
-				AND get_rolle_prestudent(prestudent_id, ?) IN ('Student', 'Diplomand', 'Unterbrecher', 'Praktikant')
+				AND EXISTS (SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id = prestudent.prestudent_id AND studiensemester_kurzbz = ?)
+				AND get_rolle_prestudent(prestudent_id, NULL) IN ('Student', 'Diplomand', 'Unterbrecher', 'Praktikant')
 				AND stg.melderelevant
 				AND prestudent.bismelden";
 
@@ -365,7 +370,6 @@ class PlausicheckLib
 		$datumBis = $this->_getBisdateFromSemester($studiensemester_kurzbz);
 
 		$params = array($datumBis, $studiensemester_kurzbz, $datumBis);
-		$results = array();
 
 		// get active students
 		$qry = "
@@ -417,7 +421,6 @@ class PlausicheckLib
 	public function getDatumStudiensemesterFalscheReihenfolge($studiengang_kz = null, $prestudent_id = null)
 	{
 		$params = array();
-		$results = array();
 
 		// all active students with Status student in current semester
 		$qry = "
@@ -470,7 +473,6 @@ class PlausicheckLib
 	public function getAktiverStudentOhneStatus($studiengang_kz = null, $prestudent_id = null)
 	{
 		$params = array();
-		$results = array();
 
 		$qry = "
 			SELECT
