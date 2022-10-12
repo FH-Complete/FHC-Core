@@ -746,8 +746,8 @@ class ReihungstestJob extends JOB_Controller
 					(
 						SELECT studienplan_id FROM tbl_rt_studienplan WHERE reihungstest_id = tbl_reihungstest.reihungstest_id
 					)
-			AND tbl_reihungstest.datum >= now()
-          )";
+			)
+			AND tbl_reihungstest.datum >= now()";
 
 		$db = new DB_Model();
 		$result_rt = $db->execReadOnlyQuery($qry);
