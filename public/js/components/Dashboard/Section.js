@@ -263,7 +263,7 @@ export default {
 				id = evt.dataTransfer.getData('itemID');
 				let widget = CachedWidgetLoader.getWidget(this.items[id].widget);
 				if (widget) {
-					let minmaxW = widget.size.width;
+					let minmaxW = widget.setup.width;
 					if (minmaxW.max)
 						minmaxW.min = minmaxW.min || 1;
 					else
@@ -273,7 +273,7 @@ export default {
 					if (w > minmaxW.max)
 						w = minmaxW.max;
 					
-					let minmaxH = widget.size.height;
+					let minmaxH = widget.setup.height;
 					if (minmaxH.max)
 						minmaxH.min = minmaxH.min || 1;
 					else
