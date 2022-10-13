@@ -43,7 +43,6 @@ export default {
 			this.tmpCreate.widget.widget = widget;
 			axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
 				db: this.dashboard,
-				uid: 'ma0168',
 				funktion_kurzbz: this.tmpCreate.section_name,
 				widgets: [this.tmpCreate.widget]
 			}).then(result => {
@@ -74,6 +73,10 @@ export default {
 						for (var wid in this.sections[i].widgets) {
 							if (this.sections[i].widgets[wid].id == k) {
 								payload[k] = ObjectUtils.mergeDeep(this.sections[i].widgets[wid], payload[k]);
+								// NOTE(chris): remove internal props
+								for (var prop in {_x:1,_y:1,_w:1,_h:1,index:1,id:1})
+									if (payload[k][prop])
+										delete payload[k][prop];
 								break;
 							}
 						}
@@ -84,7 +87,6 @@ export default {
 			}
 			axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
 				db: this.dashboard,
-				uid: 'ma0168',
 				funktion_kurzbz: section_name,
 				widgets: payload
 			}).then(result => {
@@ -92,14 +94,15 @@ export default {
 					if (section.name == section_name) {
 						section.widgets.forEach((widget, i) => {
 							if (payload[widget.id]) {
-								// TODO(chris): revert placement on failure
-								delete payload[widget.id].place; // TODO(chris): find out why overwriting place bugs out
-								section.widgets[i] = {...widget, ...payload[widget.id]};
+								payload[widget.id].id = widget.id;
+								payload[widget.id].index = widget.index;
+								section.widgets[i] = payload[widget.id];
 							}
 						});
 					}
 				});
 			}).catch(error => {
+				// TODO(chris): revert placement on failure
 				console.error('ERROR: ', error);
 				alert('ERROR: ' + error.response.data.retval);
 			});
@@ -107,7 +110,6 @@ export default {
 		widgetRemove(section_name, id) {
 			axios.post(this.apiurl + '/Config/removeWidgetFromUserOverride', {
 				db: this.dashboard,
-				uid: 'ma0168',
 				funktion_kurzbz: section_name,
 				widgetid: id
 			}).then(result => {
@@ -124,8 +126,7 @@ export default {
 	created() {
 		CachedWidgetLoader.setPath(this.apiurl + '/Widget');
 		axios.get(this.apiurl + '/Config', {params:{
-			db: this.dashboard,
-			uid: 'ma0168'
+			db: this.dashboard
 		}}).then(res => {
 			//console.log(res.data.retval);
 			for (var name in res.data.retval.widgets) {

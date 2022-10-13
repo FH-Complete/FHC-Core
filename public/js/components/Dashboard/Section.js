@@ -11,6 +11,7 @@ export default {
 		editMode: 0,
 		gridXLast: 0,
 		gridYLast: 0,
+		dataTransfer: {}
 	}),
 	props: [
 		"name",
@@ -161,10 +162,12 @@ export default {
 
 			evt.dataTransfer.dropEffect = 'move';
 			evt.dataTransfer.effectAllowed = 'move';
-			evt.dataTransfer.setData('itemAction', 'm');
-			evt.dataTransfer.setData('itemId', item.index);
-			evt.dataTransfer.setData('itemW', this.itemCoords[item.index].w);
-			evt.dataTransfer.setData('itemH', this.itemCoords[item.index].h);
+			this.dataTransfer = {
+				action: 'm',
+				id: item.index,
+				w: this.itemCoords[item.index].w,
+				h: this.itemCoords[item.index].h
+			}
 		},
 		startResize(evt, item) {
 			this.gridXLast = -1;
@@ -175,10 +178,12 @@ export default {
 			evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
 			evt.dataTransfer.dropEffect = 'move';
 			evt.dataTransfer.effectAllowed = 'move';
-			evt.dataTransfer.setData('itemAction', 'r');
-			evt.dataTransfer.setData('itemId', item.index);
-			evt.dataTransfer.setData('itemX', this.itemCoords[item.index].x);
-			evt.dataTransfer.setData('itemY', this.itemCoords[item.index].y);
+			this.dataTransfer = {
+				action: 'r',
+				id: item.index,
+				x: this.itemCoords[item.index].x,
+				y: this.itemCoords[item.index].y
+			}
 		},
 		occupyFields(id, x, y, w, h) {
 			var c;
@@ -225,7 +230,7 @@ export default {
 		},
 		onDragOver(evt) {
 			let id, x, y, w, h;
-			const action = evt.dataTransfer.getData('itemAction');
+			const action = this.dataTransfer.action;
 			const rect = this.containerRect;
 			const gridX = Math.floor(this.gridWidth * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
 			const gridY = Math.floor(this.gridHeight * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
@@ -236,22 +241,22 @@ export default {
 			this.gridYLast = gridY;
 
 			if (action == 'm') {
-				x = gridX + 1;
-				y = gridY + 1;
-				w = parseInt(evt.dataTransfer.getData('itemW'));
-				h = parseInt(evt.dataTransfer.getData('itemH'));
+				x = Math.max(gridX + 1, 1);
+				y = Math.max(gridY + 1, 1);
+				w = parseInt(this.dataTransfer.w);
+				h = parseInt(this.dataTransfer.h);
 
 				if (x + w > this.gridWidth + 1)
 					x = this.gridWidth + 1 - w;
 
-				id = evt.dataTransfer.getData('itemID');
+				id = this.dataTransfer.id;
 				this.occupyFields(id, x, y, w, h);
 
 				this.itemCoords[id].x = x;
 				this.itemCoords[id].y = y;
 			} else if (action == 'r') {
-				x = parseInt(evt.dataTransfer.getData('itemX'));
-				y = parseInt(evt.dataTransfer.getData('itemY'));
+				x = parseInt(this.dataTransfer.x);
+				y = parseInt(this.dataTransfer.y);
 				w = gridX + 2 - x;
 				h = gridY + 2 - y;
 				w = Math.max(1, w);
@@ -260,7 +265,7 @@ export default {
 				if (x + w > this.gridWidth + 1)
 					w = this.gridWidth + 1 - x;
 
-				id = evt.dataTransfer.getData('itemID');
+				id = this.dataTransfer.id;
 				let widget = CachedWidgetLoader.getWidget(this.items[id].widget);
 				if (widget) {
 					let minmaxW = widget.setup.width;
@@ -303,9 +308,9 @@ export default {
 				}
 			}
 			
-			id = evt.dataTransfer.getData('itemId');
+			id = this.dataTransfer.id;
 			
-			const action = evt.dataTransfer.getData('itemAction');
+			const action = this.dataTransfer.action;
 			update[this.items[id].id] = {place:{}};
 			update[this.items[id].id].place[this.gridWidth] = {};
 
