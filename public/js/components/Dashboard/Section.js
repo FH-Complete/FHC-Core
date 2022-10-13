@@ -241,8 +241,8 @@ export default {
 			this.gridYLast = gridY;
 
 			if (action == 'm') {
-				x = gridX + 1;
-				y = gridY + 1;
+				x = Math.max(gridX + 1, 1);
+				y = Math.max(gridY + 1, 1);
 				w = parseInt(this.dataTransfer.w);
 				h = parseInt(this.dataTransfer.h);
 
