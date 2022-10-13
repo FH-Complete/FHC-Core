@@ -887,22 +887,17 @@ or not exists
 		$tagesbeginn = '';
 		$tagesende = '';
 		$pausesumme = 0;
-		$tagessaldo = '';
-		$elsumme = '00:00';
-		$pflichtpause = false;
 		$blockingError = false;
 		$datum = new datum();
 
-		$this->getListeUserFromTo($uid, $datumday, $datumday, null);
+		$this->getListeUserFromTo($uid, $datumday, $datumday);
 
 		foreach ($this->result as $row)
 		{
-			$datumtag = $datum->formatDatum($row->datum, 'Y-m-d');
-
-			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn)) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
 			$tagesbeginn = $datum->formatDatum($row->start, 'H:i');
 
-			if (($tagesende == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+			if (($tagesende == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende)) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
 				$tagesende = $datum->formatDatum($row->ende, 'H:i');
 
 			if ($row->aktivitaet_kurzbz == "Pause")
@@ -912,38 +907,23 @@ or not exists
 			}
 		}
 
-		$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) - $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) - 3600;
+		$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende)) - $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn));
 
-		list($h2, $m2) = explode(':', $elsumme);
-		$elsumme = $h2 * 3600 + $m2 * 60;
-
-
-		if ($datum->formatDatum($datumday, 'Y-m-d') >= '2019-11-06')
+		if ($datum->formatDatum($datumday, 'Y-m-d') < '2019-11-06')
 		{
-			$pausesumme = $pausesumme;
+			if ($tagessaldo > 21600 && $tagessaldo < 23400)
+			{
+				$pausesumme = $tagessaldo - 18000;
+			}
+			elseif ($tagessaldo > 21600)
+			{
+				$pausesumme = $pausesumme + 1800;
+			}
 		}
-		elseif ($tagessaldo > 18000 && $tagessaldo < 19800 && $pflichtpause == false && $elsumme == 0)
-		{
-			$pausesumme = $tagessaldo - 18000;
-		}
-		elseif ($tagessaldo > 18000 && $pflichtpause == false && $elsumme == 0)
-		{
-			$pausesumme = $pausesumme + 1800;
-		}
-
-		if ($elsumme > 0)
-		{
-			$pausesumme = $pausesumme + $elsumme;
-			$pflichtpause = true;
-		}
-
-		$tagessaldo = $tagessaldo - $pausesumme;
 
 		//check if blocking error
-		if (($tagessaldo >= 19800 && $pausesumme < 1800) || ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000))
-		{
+		if ($tagessaldo > 21600 && $pausesumme < 1800)
 			$blockingError = true;
-		}
 
 		return $blockingError;
 	}

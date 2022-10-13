@@ -1508,7 +1508,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 					list($h1, $m1) = explode(':', $pausesumme);
 					$pausesumme = $h1*3600+$m1*60;
-					$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s'))-$datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s'))-3600;
+					$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s'))-$datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s'));
 					foreach($extlehrearr as $el)
 					{
 						if ($el["start"] > $tagesbeginn && $el["ende"] < $tagesende)
@@ -1516,17 +1516,16 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					}
 					list($h2, $m2) = explode(':', $elsumme);
 					$elsumme = $h2*3600+$m2*60;
-					if ($datum->formatDatum($tag, 'Y-m-d') >= '2019-11-06')
+					if ($datum->formatDatum($tag, 'Y-m-d') < '2019-11-06')
 					{
-						$pausesumme = $pausesumme;
-					}
-					else if ($tagessaldo > 18000 && $tagessaldo < 19800 && $pflichtpause==false && $elsumme == 0)
-					{
-						$pausesumme = $tagessaldo-18000;
-					}
-					else if ($tagessaldo>18000 && $pflichtpause==false && $elsumme == 0)
-					{
-						$pausesumme = $pausesumme+1800;
+						if ($tagessaldo > 21600 && $tagessaldo < 23400 && $pflichtpause == false && $elsumme == 0)
+						{
+							$pausesumme = $tagessaldo - 18000;
+						}
+						else if ($tagessaldo > 21600 && $pflichtpause == false && $elsumme == 0)
+						{
+							$pausesumme = $pausesumme + 1800;
+						}
 					}
 
 					if ($elsumme > 0){
@@ -1534,7 +1533,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						$pflichtpause = true;
 					}
 
-					$tagessaldo = $tagessaldo-$pausesumme;
+					$tagessaldo = $tagessaldo - $pausesumme;
 					// fehlende Pausen berechnen
 					$pausefehlt_str = '';
 
@@ -1560,7 +1559,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						}
 					}
 
-					$tagessaldo = date('H:i', ($tagessaldo));
+					$tagessaldo = gmdate('H:i', ($tagessaldo));
 					$colspan = ($za_simple)?6:8;
 					echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="'.$colspan.'")>';
 
@@ -1583,7 +1582,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>
 			        	'.$p->t("zeitaufzeichnung/pause").':
 			        </td>
-			        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
+			        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.gmdate('H:i', ($pausesumme)).'</td>
 			        <td '.$style.' colspan="3" align="right">';
 					if ($tag > $sperrdatum)
 					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
@@ -1599,7 +1598,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					$tagesbeginn = '';
 					$tagesende = '';
 					$pflichtpause = false;
-					$wochensaldo = $datum_obj->sumZeit($wochensaldo,$tagessaldo );
+					$wochensaldo = $datum_obj->sumZeit($wochensaldo,$tagessaldo);
 
 				}
 				// Nach jeder Woche eine Summenzeile einfuegen und eine neue Tabelle beginnen
