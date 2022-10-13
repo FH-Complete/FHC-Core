@@ -43,7 +43,6 @@ export default {
 			this.tmpCreate.widget.widget = widget;
 			axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
 				db: this.dashboard,
-				uid: 'ma0168',
 				funktion_kurzbz: this.tmpCreate.section_name,
 				widgets: [this.tmpCreate.widget]
 			}).then(result => {
@@ -84,7 +83,6 @@ export default {
 			}
 			axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
 				db: this.dashboard,
-				uid: 'ma0168',
 				funktion_kurzbz: section_name,
 				widgets: payload
 			}).then(result => {
@@ -107,7 +105,6 @@ export default {
 		widgetRemove(section_name, id) {
 			axios.post(this.apiurl + '/Config/removeWidgetFromUserOverride', {
 				db: this.dashboard,
-				uid: 'ma0168',
 				funktion_kurzbz: section_name,
 				widgetid: id
 			}).then(result => {
@@ -124,8 +121,7 @@ export default {
 	created() {
 		CachedWidgetLoader.setPath(this.apiurl + '/Widget');
 		axios.get(this.apiurl + '/Config', {params:{
-			db: this.dashboard,
-			uid: 'ma0168'
+			db: this.dashboard
 		}}).then(res => {
 			//console.log(res.data.retval);
 			for (var name in res.data.retval.widgets) {
