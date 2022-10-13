@@ -20,33 +20,33 @@
  * Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at >
  * Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
-require_once ('../../../../config/cis.config.inc.php');
-require_once ('../../../../config/global.config.inc.php');
-require_once ('../../../../include/functions.inc.php');
-require_once ('../../../../include/lehrveranstaltung.class.php');
-require_once ('../../../../include/studiengang.class.php');
-require_once ('../../../../include/studiensemester.class.php');
-require_once ('../../../../include/lehreinheit.class.php');
-require_once ('../../../../include/benutzerberechtigung.class.php');
-require_once ('../../../../include/uebung.class.php');
-require_once ('../../../../include/beispiel.class.php');
-require_once ('../../../../include/studentnote.class.php');
-require_once ('../../../../include/datum.class.php');
-require_once ('../../../../include/legesamtnote.class.php');
-require_once ('../../../../include/lvgesamtnote.class.php');
-require_once ('../../../../include/zeugnisnote.class.php');
-require_once ('../../../../include/pruefung.class.php');
-require_once ('../../../../include/person.class.php');
-require_once ('../../../../include/benutzer.class.php');
-require_once ('../../../../include/mitarbeiter.class.php');
-require_once ('../../../../include/mail.class.php');
-require_once ('../../../../include/phrasen.class.php');
-require_once ('../../../../include/note.class.php');
-require_once ('../../../../include/notenschluessel.class.php');
-require_once ('../../../../include/studienplan.class.php');
-require_once ('../../../../include/addon.class.php');
-require_once ('../../../../include/mobilitaet.class.php');
-require_once ('../../../../include/student.class.php');
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
+require_once('../../../../include/functions.inc.php');
+require_once('../../../../include/lehrveranstaltung.class.php');
+require_once('../../../../include/studiengang.class.php');
+require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../include/lehreinheit.class.php');
+require_once('../../../../include/benutzerberechtigung.class.php');
+require_once('../../../../include/uebung.class.php');
+require_once('../../../../include/beispiel.class.php');
+require_once('../../../../include/studentnote.class.php');
+require_once('../../../../include/datum.class.php');
+require_once('../../../../include/legesamtnote.class.php');
+require_once('../../../../include/lvgesamtnote.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
+require_once('../../../../include/pruefung.class.php');
+require_once('../../../../include/person.class.php');
+require_once('../../../../include/benutzer.class.php');
+require_once('../../../../include/mitarbeiter.class.php');
+require_once('../../../../include/mail.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/note.class.php');
+require_once('../../../../include/notenschluessel.class.php');
+require_once('../../../../include/studienplan.class.php');
+require_once('../../../../include/addon.class.php');
+require_once('../../../../include/mobilitaet.class.php');
+require_once('../../../../include/student.class.php');
 
 $summe_stud = 0;
 $summe_t2 = 0;
@@ -190,7 +190,7 @@ foreach ($noten_obj->result as $row)
 	$noten_array[$row->note]['lehre'] = $row->lehre;
 	$noten_array[$row->note]['lkt_ueberschreibbar'] = $row->lkt_ueberschreibbar;
 	$noten_array[$row->note]['anmerkung'] = $row->anmerkung;
-	foreach ($sprachen->result AS $s)
+	foreach ($sprachen->result as $s)
 		$noten_array[$row->note]['bezeichnung_mehrsprachig'][$s->sprache] = $row->bezeichnung_mehrsprachig[$s->sprache];
 }
 
@@ -376,7 +376,7 @@ foreach ($noten_obj->result as $row)
 		var datum_test = datum.split(".");
 		if (datum_test[0].length != 2 || datum_test[1].length != 2 	|| datum_test[2].length!=4
 			|| isNaN(datum_test[2]) || datum_test[1]>12 || datum_test[1]<1 || datum_test[0]>31 || datum_test[0]<1)
-			alert("Invalid Date Format: DD.MM.YYYY");
+			alert("Das Datum entspricht nicht dem Format TT.MM.JJJJ!");
 		else
 		{
 			var anlegendiv = document.getElementById("nachpruefung_div");
@@ -939,7 +939,6 @@ if (defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && CIS_ANWESENHEITSLIST
 {
 	$hrefpath = "../notenliste.xls.php?stg=$stg_obj->studiengang_kz&lvid=$lvid&stsem=$stsem";
 	echo "<br><a class='Item' href='" . $hrefpath . "'>" . $p->t('benotungstool/notenlisteImport') . "</a>";
-
 }
 
 // eingetragene lv-gesamtnoten freigeben
@@ -1333,7 +1332,6 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 	foreach ($grades as $uid => $data)
 	//Ausgabe Array
 	{
-
 		$htmlstring .= '<tr class="liste' . ($i % 2) . '">
 			<td><a href="mailto:' . $uid . '@' . DOMAIN . '"><img src="../../../../skin/images/button_mail.gif"></a></td>
 			<td>' . $db->convert_html_chars($uid) . '</td>
@@ -1465,7 +1463,6 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			// Punkte
 			if (CIS_GESAMTNOTE_PUNKTE)
 			{
-
 				$htmlstring .= '
 				<input type="text"
 					name="punkte"
