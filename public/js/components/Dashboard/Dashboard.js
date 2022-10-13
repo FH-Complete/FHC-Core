@@ -73,6 +73,10 @@ export default {
 						for (var wid in this.sections[i].widgets) {
 							if (this.sections[i].widgets[wid].id == k) {
 								payload[k] = ObjectUtils.mergeDeep(this.sections[i].widgets[wid], payload[k]);
+								// NOTE(chris): remove internal props
+								for (var prop in {_x:1,_y:1,_w:1,_h:1,index:1,id:1})
+									if (payload[k][prop])
+										delete payload[k][prop];
 								break;
 							}
 						}
@@ -90,14 +94,15 @@ export default {
 					if (section.name == section_name) {
 						section.widgets.forEach((widget, i) => {
 							if (payload[widget.id]) {
-								// TODO(chris): revert placement on failure
-								delete payload[widget.id].place; // TODO(chris): find out why overwriting place bugs out
-								section.widgets[i] = {...widget, ...payload[widget.id]};
+								payload[widget.id].id = widget.id;
+								payload[widget.id].index = widget.index;
+								section.widgets[i] = payload[widget.id];
 							}
 						});
 					}
 				});
 			}).catch(error => {
+				// TODO(chris): revert placement on failure
 				console.error('ERROR: ', error);
 				alert('ERROR: ' + error.response.data.retval);
 			});
