@@ -99,6 +99,8 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 		{
 			$id=mb_substr($row, mb_strlen('student_uid_'));
 
+			$response2 = '';
+
 			$student_uid = $_POST['student_uid_'.$id];
 			$note = null;
 			$punkte = null;
@@ -115,24 +117,21 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 			$punkte=str_replace(',','.', $punkte);
 
 			$datum = $_POST['datumNachp_'.$id];
+			$datum_obj = new datum();
+			$datum = $datum_obj->checkformatDatum($datum, 'Y-m-d', true) OR die('Invalid date format');
 
 			// //check ob Matrikelnummer anstelle der student_uid übergeben wurde
-			//
-			//
-			// $student = new student();
-			//
-			//
-			// $response2 = true;
-			// if (!$student->checkIfValidStudentUID($student_uid))
-			// {
-			// 	//UID ermitteln
-			// 	if(!$student_uid = $student->getUidFromMatrikelnummer($student_uid))
-			// 	{
-			// 		$response2 = false;
-			// 		$response2.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($student_uid));
-			// 		continue;
-			// 	}
-			// }
+
+			$student = new student();
+			if (!$student->checkIfValidStudentUID($student_uid))
+			{
+				//UID ermitteln
+				if(!$student_uid = $student->getUidFromMatrikelnummer($student_uid))
+				{
+					$response2.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($student_uid));
+					continue;
+				}
+			}
 
 
 			$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
@@ -146,7 +145,7 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 
 				echo "\ndb " . " lvid ". $lvid . " note " . $note . " student_uid " . $student_uid . " datum " . $datum . " studiensem " .
 				$stsem . " lehreinheit_id_pr " . $lehreinheit_id . " typ " . $typ . " response" . $response . "\n";
-		//		echo $response;
+				echo $response2;
 
 			}
 			else
@@ -168,7 +167,6 @@ else
 		$datum = $datum_obj->checkformatDatum($datum, 'Y-m-d', true) OR die('Invalid date format');
 	}
 
-	// 	echo "Variante Einzel";
 	else
 		die('Fehlerhafte Parameteruebergabe');
 
