@@ -120,8 +120,7 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 			$datum_obj = new datum();
 			$datum = $datum_obj->checkformatDatum($datum, 'Y-m-d', true) OR die('Invalid date format');
 
-			// //check ob Matrikelnummer anstelle der student_uid übergeben wurde
-
+			//check ob Matrikelnummer anstelle der student_uid übergeben wurde
 			$student = new student();
 			if (!$student->checkIfValidStudentUID($student_uid))
 			{
@@ -138,9 +137,6 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 
 			if(isset($_POST['student_uid_'.$id]) && (isset($_POST['note_'.$id]) || isset($_POST['punkte_'.$id])) && isset($_POST['datumNachp_'.$id]))
 			{
-				// echo "\ndb " . " lvid ". $lvid . " note " . $note . " student_uid " . $student_uid . " datum " . $datum . " studiensem " .
-				// $stsem . " lehreinheit_id_pr " . $lehreinheit_id . " typ " . $typ .  "\n";
-
 				$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note, $punkte);
 
 				echo "\ndb " . " lvid ". $lvid . " note " . $note . " student_uid " . $student_uid . " datum " . $datum . " studiensem " .
@@ -354,6 +350,48 @@ function savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ
 				}
 				$pr_2->save();
 			}
+		}
+	}
+	elseif ($typ == "Termin3")
+	{
+		$prTermin3 = new Pruefung();
+		$pr_3 = new Pruefung();
+
+		if ($prTermin3->getPruefungen($student_uid, 'Termin3', $lvid, $stsem))
+		{
+			if	($prTermin3->result)
+			{
+				$pr_3->load($prTermin3->result[0]->pruefung_id);
+				$pr_3->new = null;
+				$pr_3->updateamum = $jetzt;
+				$pr_3->updatevon = $user;
+				$old_note = $pr_3->note;
+				$pr_3->note = $note;
+				$pr_3->punkte = $punkte;
+				$pr_3->datum = $datum;
+				$pr_3->anmerkung = "";
+				$response = "Prüfung Termin3 aktualisiert";
+			}
+			else
+			{
+				$pr_3->lehreinheit_id = $lehreinheit_id;
+				$pr_3->student_uid = $student_uid;
+				$pr_3->mitarbeiter_uid = $user;
+				$pr_3->note = $note;
+				$pr_3->punkte = $punkte;
+				$pr_3->pruefungstyp_kurzbz = $typ;
+				$pr_3->datum = $datum;
+				$pr_3->anmerkung = "";
+				$pr_3->insertamum = $jetzt;
+				$pr_3->insertvon = $user;
+				$pr_3->updateamum = null;
+				$pr_3->updatevon = null;
+				$pr_3->ext_id = null;
+				$pr_3->new = true;
+				$old_note = -1;
+				$response = "neue Prüfung Termin3";
+			}
+			$pr_3->save();
 		}
 	}
 	else

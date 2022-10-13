@@ -1194,7 +1194,7 @@ if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN
 }
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 {
-	$htmlstring .= "<th colspan='2' nowrap><br>" . $p->t('benotungstool/nachpruefung') . "<br>
+	$htmlstring .= "<th colspan='2' nowrap><br>" . $p->t('benotungstool/nachpruefung2') . "<br>
 	<input type='button' onclick='GradeImportTermin3()' value='" . $p->t('benotungstool/importieren') . "'>
 	</th>";
 }
