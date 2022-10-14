@@ -821,7 +821,16 @@ if(!$error)
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
 				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt'];
-				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				// Die Master-ZGV darf nur mit einem eigenen Recht geändert werden
+				if($rechte->isBerechtigt('student/editMakkZgv',$_POST['studiengang_kz'],'suid'))
+				{
+					$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				}
+				elseif ($prestudent->zgvmas_code != $_POST['zgvmas_code'])
+				{
+					$errormsg = 'Keine Berechtigung zum Ändern der ZGV';
+					$error = true;
+				}
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
