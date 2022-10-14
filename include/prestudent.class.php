@@ -2335,94 +2335,49 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT count(*) as anzahl
-				FROM public.tbl_prestudent
-				JOIN public.tbl_prestudentstatus USING (prestudent_id)
-				JOIN public.tbl_studiengang USING (studiengang_kz)
-				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-				AND typ in ('b','m','d')";
 
-		if ($this->db_query($qry))
-		{
-			if ($row = $this->db_fetch_object())
-			{
-				if ($row->anzahl > 0)
+		echo $qry = "
+				SELECT t.prestudent_id, t.status_kurzbz, t.bestaetigtam FROM
+				(
+					SELECT prestudent_id, status_kurzbz, bestaetigtam,
+					RANK() OVER (PARTITION BY prestudent_id ORDER BY bestaetigtam DESC) stat_rank
+					FROM public.tbl_prestudent
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE person_id= ".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND bestaetigtam is not NULL
+					AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student','Abbrecher')
+				) as t
+				WHERE stat_rank = 1";
+
+				$db = new basis_db();
+				$arrayPrestudents = array();
+
+				if ($db->db_query($qry))
 				{
-					$this->errormsg = '';
-					return true;
+					$num_rows = $db->db_num_rows();
+
+					if ($num_rows > 0)
+					{
+						while ($row = $db->db_fetch_object())
+						{
+							if ($row->status_kurzbz != 'Abbrecher')
+								$arrayPrestudents[] = $row->status_kurzbz;
+						}
+						if ($arrayPrestudents)
+						{
+							return true;
+						}
+					}
+					else
+						return false;
 				}
 				else
 				{
-					$this->errormsg = '';
+					$this->errormsg = 'Fehler beim Laden der Daten';
 					return false;
 				}
-			}
-			else
-			{
-				$this->errormsg = 'Fehler beim Laden der Daten';
-				return false;
-			}
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
 	}
 
-	/**
- * Prueft, ob eine Person Abbrecher war
- * @param int $person_id ID der zu überprüfenden Person.
- * @return true wenn letzter Status Abbrecher und nicht Student ist
- *		 false wenn nicht vorhanden
- *		 false und errormsg wenn Fehler aufgetreten ist
- */
-public function isAbbrecher($person_id)
-{
-	if (!is_numeric($person_id))
-	{
-		$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
-		return false;
-	}
-
-	$qry = "SELECT s.status_kurzbz
-			FROM public.tbl_prestudent
-			JOIN public.tbl_prestudentstatus s USING (prestudent_id)
-			JOIN public.tbl_studiengang USING (studiengang_kz)
-			WHERE person_id = ".$this->db_add_param($person_id)."
-			AND status_kurzbz in ('Abbrecher','Student')
-			AND typ in ('b','m','d')
-			ORDER BY s.bestaetigtam DESC NULLS LAST, s.insertamum DESC
-			LIMIT 1
-	 ";
-
-	if ($this->db_query($qry))
-	{
-		if ($row = $this->db_fetch_object())
-		{
-			if ($row->status_kurzbz == 'Abbrecher')
-			{
-				$this->errormsg = '';
-				return true;
-			}
-			else
-			{
-				$this->errormsg = '';
-				return false;
-			}
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
-	else
-	{
-		$this->errormsg = 'Fehler beim Laden der Daten';
-		return false;
-	}
-}
 
 	/**
 	 * Befüllt MasterZGV-Felder: Nation mit Österreich und MasterZGV-code mit FH-Bachelor(I)
