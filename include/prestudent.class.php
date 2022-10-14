@@ -2345,7 +2345,7 @@ class prestudent extends person
 					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE person_id= ".$this->db_add_param($person_id, FHC_INTEGER)."
 					AND bestaetigtam is not NULL
-					AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student','Abbrecher')
+					AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
 				) as t
 				WHERE stat_rank = 1";
 
@@ -2360,7 +2360,6 @@ class prestudent extends person
 					{
 						while ($row = $db->db_fetch_object())
 						{
-							if ($row->status_kurzbz != 'Abbrecher')
 								$arrayPrestudents[] = $row->status_kurzbz;
 						}
 						if ($arrayPrestudents)
