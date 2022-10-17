@@ -124,6 +124,13 @@ if (isset($_REQUEST['lehrveranstaltung_name']))
 else
 	$lehrveranstaltung_name = '';
 
+if (isset($_REQUEST['lehrveranstaltung_kurzbz']))
+{
+	$lehrveranstaltung_kurzbz = trim($_REQUEST['lehrveranstaltung_kurzbz']);
+}
+else
+	$lehrveranstaltung_kurzbz = '';
+
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
 
@@ -549,6 +556,11 @@ if($lehrveranstaltung_name != '')
 	$sql_query.= " OR UPPER(tbl_lehrveranstaltung.bezeichnung_english) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")) ";
 }
 
+if($lehrveranstaltung_kurzbz != '')
+{
+	$sql_query.= " AND (UPPER(tbl_lehrveranstaltung.kurzbz) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_kurzbz.'%', FHC_STRING).")) ";
+}
+
 //Wenn nicht admin, werden erst nur die aktiven angezeigt, es koennen aber auch die inaktiven eingeblendet werden
 
 $aktiv = '';
@@ -611,7 +623,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 $outp.='</SELECT>';
 
 //Orgform DropDown
-$outp.= ' Orgform <SELECT name="orgform"><option value="-1">--Alle--</option>';
+$outp.= ' Orgform <SELECT name="orgform" id="select_orgform"><option value="-1">--Alle--</option>';
 $outp.= '<OPTION value="none" '.($orgform_kurzbz=='none'?'selected':'').'>Ohne Orgform</OPTION>';
 $orgform = new organisationsform();
 $orgform->getOrgformLV();
@@ -660,7 +672,11 @@ $outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary style=
 	$outp .= '</select>';
 
 	//Lehrveranstaltung ID Input
-	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
+	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 70px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
+
+	//Lehrveranstaltung Suche Kurzbezeichnung
+	$outp.= ' Kurzbz <input type="text" name="lehrveranstaltung_kurzbz" style="width: 80px" id="lehrveranstaltung_kurzbz" 
+					maxlength="16" value="'.$lehrveranstaltung_kurzbz.'" title="">';
 
 	//Lehrveranstaltung Suche Bezeichnung
 	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 450px" id="lehrveranstaltung_name"
@@ -757,12 +773,13 @@ echo '
 			function checksubmit()
 			{
 				if(document.getElementById("select_stg_kz").value==\'\'
-				&& document.getElementById("select_fachbereich_kurzbz").value==\'\'
+				&& document.getElementById("select_orgform").value==\'-1\'
 				&& document.getElementById("select_oe_kurzbz").value==\'\'
 				&& document.getElementById("lehrveranstaltung_id").value==\'\'
-				&& document.getElementById("lehrveranstaltung_name").value==\'\')
+				&& document.getElementById("lehrveranstaltung_name").value==\'\'
+				&& document.getElementById("lehrveranstaltung_kurzbz").value==\'\')
 				{
-					alert("Die Felder Studiengang, Institut, Organisationseinheit, ID und Name dürfen nicht gleichzeitig auf \'Alle\' gesetzt, bzw. leer sein");
+					alert("Die Felder Studiengang, Orgform, Organisationseinheit, ID, Kurzbz und Name dürfen nicht gleichzeitig auf \'Alle\' gesetzt, bzw. leer sein");
 					return false;
 				}
 				else if(document.getElementById("lehrveranstaltung_name").value !=\'\')
@@ -994,7 +1011,8 @@ echo '
 				var details = document.getElementById("detailTag");
 				if(document.getElementById("lehrveranstaltung_name").value!=""
 								|| document.getElementById("select_oe_kurzbz").value!=""
-								|| document.getElementById("lehrveranstaltung_id").value!="")
+								|| document.getElementById("lehrveranstaltung_id").value!=""
+								|| document.getElementById("lehrveranstaltung_kurzbz").value!="")
 				{
 					details.open = true;
 					return false;

@@ -423,7 +423,7 @@ class InfoCenter extends Auth_Controller
 			if (hasData($akte))
 			{
 				$akte = getData($akte);
-				if ($akte->person_id === $person_id)
+				if ($akte->person_id === (int)$person_id)
 				{
 					$result = $this->aktelib->remove($akte_id);
 

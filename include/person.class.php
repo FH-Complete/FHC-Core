@@ -66,6 +66,7 @@ class person extends basis_db
 	public $matr_nr;			//varchar(32)
 	public $bpk; 				//varchar(255)
 	public $udf_values;				//json
+	public $wahlname;
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional eine Person
@@ -95,7 +96,7 @@ class person extends basis_db
 							gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 							familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
 							geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre,
-							matr_nr, bpk";
+							matr_nr, bpk, wahlname";
 			if ($hasUDF = $udf->personHasUDF())
 				$qry .= ", udf_values ";
 
@@ -142,6 +143,7 @@ class person extends basis_db
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$this->matr_nr = $row->matr_nr;
 				$this->bpk = $row->bpk;
+				$this->wahlname = $row->wahlname;
 				if ($hasUDF)
 				{
 					$this->udf_values = $row->udf_values;
@@ -441,7 +443,7 @@ class person extends basis_db
 			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
 			                    geschlecht, geburtsnation, staatsbuergerschaft, kurzbeschreibung, zugangscode,
-								foto_sperre, matr_nr, bpk)
+								foto_sperre, matr_nr, bpk, wahlname)
 			        VALUES('.$this->db_add_param($this->sprache).','.
 						$this->db_add_param($this->anrede).','.
 						$this->db_add_param($this->titelpost).','.
@@ -471,7 +473,8 @@ class person extends basis_db
 				        $this->db_add_param($this->zugangscode).','.
 				        $this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
 						$this->db_add_param($this->matr_nr).','.
-						$this->db_add_param($this->bpk).');';
+						$this->db_add_param($this->bpk).','.
+						$this->db_add_param($this->wahlname).');';
 		}
 		else
 		{
@@ -510,7 +513,8 @@ class person extends basis_db
 				   ' foto_sperre='.$this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
 				   ' zugangscode='.$this->db_add_param($this->zugangscode).','.
 				   ' matr_nr ='.$this->db_add_param($this->matr_nr).','.
-				   ' bpk = '.$this->db_add_param($this->bpk).
+				   ' bpk = '.$this->db_add_param($this->bpk).','.
+					 ' wahlname = '.$this->db_add_param($this->wahlname).
 			       ' WHERE person_id='.$this->person_id.';';
 		}
 
@@ -568,6 +572,8 @@ class person extends basis_db
 								UPPER (vorname) ~* UPPER(".$this->db_add_param($filter).") OR
 								UPPER (nachname || ' ' || vorname) ~* UPPER(".$this->db_add_param($filter).") OR
 								UPPER (vorname || ' ' || nachname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (nachname || ' ' || wahlname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (wahlname || ' ' || nachname) ~* UPPER(".$this->db_add_param($filter).") OR
 								uid=".$this->db_add_param($filter);
 		}
 
@@ -611,6 +617,7 @@ class person extends basis_db
 				$l->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$l->matr_nr = $row->matr_nr;
 				$l->bpk = $row->bpk;
+				$l->wahlname = $row->wahlname;
 				$this->personen[] = $l;
 			}
 		}
@@ -684,6 +691,7 @@ class person extends basis_db
 			$adrObj->nachname = $row->nachname;
 			$adrObj->vorname = $row->vorname;
 			$adrObj->vornamen = $row->vornamen;
+			$adrObj->wahlname = $row->wahlname;
 			$adrObj->gebdatum = $row->gebdatum;
 			$adrObj->gebort = $row->gebort;
 			$adrObj->gebzeit = $row->gebzeit;
@@ -868,6 +876,7 @@ class person extends basis_db
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$this->matr_nr = $row->matr_nr;
 				$this->bpk = $row->bpk;
+				$this->wahlname = $row->wahlname;
 			}
 			else
 			{
@@ -986,6 +995,7 @@ class person extends basis_db
 				$this->updateaktivam = $row->updateaktivam;
 				$this->aktivierungscode = $row->aktivierungscode;
 				$this->bpk = $row->bpk;
+				$this->wahlname = $row->wahlname;
 				return true;
 			}
 			else
