@@ -6346,6 +6346,20 @@ CREATE OR REPLACE VIEW public.vw_msg_vars AS (
 				echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
 			else
 				echo '<br>public.vw_msg_vars changed Studiengang DE and Studiengang EN';
+
+			$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars TO web;';
+
+			if(!$db->db_query($qry))
+				echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars';
+
+			$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars TO vilesci;';
+
+			if(!$db->db_query($qry))
+				echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars';
 		}
 	}
 }
