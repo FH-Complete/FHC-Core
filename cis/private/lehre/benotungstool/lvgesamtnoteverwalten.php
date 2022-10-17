@@ -606,7 +606,7 @@ foreach ($noten_obj->result as $row)
 	// ****
 	// * Oeffnet ein Fenster fuer den Import von Noten für die Nachprüfung aus dem Excel
 	// ****
-	function GradeImportNachp()
+	function GradeImportNachp(termin)
 	{
 		var str = "<form name='gradeimportNachp_form'><center><table style='width: 95%'>";
 		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
@@ -614,29 +614,12 @@ foreach ($noten_obj->result as $row)
 		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
 		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisungNachp');?>:</td>';
 		str	+= '<td></td><tr><td><textarea id="noteimporttextareaNachp" name="notenimportNachp"></textarea></td></tr>';
-		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulkNachp(\"Termin2\");'>";
+
+		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulkNachp(\""+ termin +"\");'>";
 		str += "</td><td></td></tr></table></center></form>";
 		anlegendiv.innerHTML = str;
 		anlegendiv.style.visibility = "visible";
 		$('#noteimporttextareaNachp').focus();
-	}
-
-	// ****
-	// * Oeffnet ein Fenster fuer den Import von Noten für Termin3 aus dem Excel
-	// ****
-	function GradeImportTermin3()
-	{
-		var str = "<form name='gradeimportNachp_form'><center><table style='width: 95%'>";
-		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
-		var anlegendiv = document.getElementById("nachpruefung_div");
-		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
-		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisungNachp');?>:</td>';
-		str	+= '<td></td><tr><td><textarea id="noteimporttextareaNachp" name="notenimportNachp"></textarea></td></tr>';
-		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulkNachp(\"Termin3\");'>";
-		str += "</td><td></td></tr></table></center></form>";
-		anlegendiv.innerHTML = str;
-		anlegendiv.style.visibility = "visible";
-		$('#noteimporttextareaTermin3').focus();
 	}
 
 	// Speichert die Noten ueber den Import
@@ -1188,13 +1171,13 @@ $htmlstring .= "<th>" . $p->t('benotungstool/punkte') . ' / ' . $p->t('benotungs
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
 {
 	$htmlstring .= "<th colspan='2'><br>" . $p->t('benotungstool/nachpruefung') . "<br>
-	<input type='button' onclick='GradeImportNachp()' value='" . $p->t('benotungstool/importieren') . "'>
+	<input type='button' onclick='GradeImportNachp(\"Termin2\")' value='" . $p->t('benotungstool/importieren') . "'>
 	</th>";
 }
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 {
 	$htmlstring .= "<th colspan='2' nowrap><br>" . $p->t('benotungstool/nachpruefung2') . "<br>
-	<input type='button' onclick='GradeImportTermin3()' value='" . $p->t('benotungstool/importieren') . "'>
+	<input type='button' onclick='GradeImportNachp(\"Termin3\")' value='" . $p->t('benotungstool/importieren') . "'>
 	</th>";
 }
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
