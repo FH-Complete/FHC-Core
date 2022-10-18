@@ -749,6 +749,7 @@ foreach ($noten_obj->result as $row)
 		}
 		?>
 
+
 		for(row in rows)
 		{
 			zeile = rows[row].split("	");
@@ -778,6 +779,7 @@ foreach ($noten_obj->result as $row)
 				i++;
 			}
 		}
+
 
 		if (alertMsg != "")
 			alert(alertMsg);
@@ -1306,7 +1308,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			foreach ($addon_obj->result as $row)
 			{
 				if (file_exists('../../../../addons/' . $row->kurzbz . '/cis/grades.inc.php'))
-					include ('../../../../addons/' . $row->kurzbz . '/cis/grades.inc.php');
+					include('../../../../addons/' . $row->kurzbz . '/cis/grades.inc.php');
 			}
 		}
 	}

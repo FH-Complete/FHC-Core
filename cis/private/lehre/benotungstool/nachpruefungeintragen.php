@@ -105,6 +105,7 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 			$note = null;
 			$punkte = null;
 			$datum = null;
+			$response = '';
 			if(isset($_POST['note_'.$id]))
 				$note = $_POST['note_'.$id];
 			elseif(isset($_POST['punkte_'.$id]))

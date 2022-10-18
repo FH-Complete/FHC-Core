@@ -35,6 +35,7 @@ require_once('../../../include/note.class.php');
 require_once('../../../include/notenschluessel.class.php');
 require_once('../../../include/Excel/excel.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/pruefung.class.php');
 
 $uid = get_uid();
 
@@ -191,6 +192,19 @@ else
 	}
 
 	//Studenten holen
+
+	//Spaltengruppe für Nachprüfung
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+	{
+		$worksheet->write($lines,8,$p->t('benotungstool/nachpruefung'),$format_bold);
+	}
+
+	//Spaltengruppe für 2.Nebensprüfungstermin
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+	{
+		$worksheet->write($lines,12,$p->t('benotungstool/nachpruefung2'),$format_bold);
+	}
+
 	$lines++;
 	$worksheet->write($lines,1,$p->t('global/uid'),$format_border_bottom);
 	$worksheet->write($lines,2,$p->t('global/nachname'),$format_border_bottom);
@@ -202,6 +216,26 @@ else
 		$worksheet->write($lines,6,$p->t('benotungstool/punkte'),$format_border_bottom);
 	else
 		$worksheet->write($lines,6,$p->t('benotungstool/note'),$format_border_bottom);
+
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+	{
+		$worksheet->write($lines,8,$p->t('global/uid'),$format_border_bottom);
+		$worksheet->write($lines,9,$p->t('global/datum'),$format_border_bottom);
+		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+		$worksheet->write($lines,10,$p->t('benotungstool/punkte'),$format_border_bottom);
+			else
+		$worksheet->write($lines,10,$p->t('benotungstool/note'),$format_border_bottom);
+	}
+
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+{
+	$worksheet->write($lines,12,$p->t('global/uid'),$format_border_bottom);
+	$worksheet->write($lines,13,$p->t('global/uid'),$format_border_bottom);
+	if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+		$worksheet->write($lines,14,$p->t('benotungstool/punkte'),$format_border_bottom);
+	else
+		$worksheet->write($lines,14,$p->t('benotungstool/note'),$format_border_bottom);
+}
 
 	$stsem_obj = new studiensemester();
 	$stsem_obj->load($stsem);
@@ -282,6 +316,39 @@ else
 					$worksheet->write($lines,4,'="'.$elem->semester.$elem->verband.$elem->gruppe.'"');
 					$worksheet->write($lines,5,'="'.trim($elem->matrikelnr).'"',$format_highlight);
 					$worksheet->write($lines,6, $note, $format_highlightright);
+
+					// Nachprüfung
+					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+					{
+						$worksheet->write($lines,8, $elem->uid, $format_highlightright);
+						$pr = new Pruefung();
+						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $sem);
+						$output2 = $pr->result;
+
+						if ($output2)
+						{
+							$resultPr = $output2[0];
+							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright);
+							$worksheet->write($lines,10, $resultPr->note, $format_highlightright);
+						}
+					}
+
+					// Nachprüfung
+					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+					{
+						$worksheet->write($lines,12, $elem->uid, $format_highlightright);
+						$pr = new Pruefung();
+						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $sem);
+						$output3 = $pr->result;
+
+						if ($output3)
+						{
+							$resultPr = $output3[0];
+							$worksheet->write($lines,13, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright);
+							$worksheet->write($lines,14, $resultPr->note, $format_highlightright);
+						}
+					}
+
 					$i++;
 					$lines++;
 	   			}
