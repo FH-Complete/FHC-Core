@@ -499,6 +499,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				$rechte_funktion = new benutzerberechtigung();
 				$rechte_funktion->loadBenutzerRollen(null, $recht);
 				$funktionsrecht = $rechte_funktion->berechtigungen; // Hat die Funktion ein Recht?
+				$anzahlFunktionsrechte = count($funktionsrecht);
 				$funktion_bezeichnung = new funktion();
 				$funktion_bezeichnung->load($recht);
 				if(!empty($funktionsrecht))
@@ -515,6 +516,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 					$htmlstr .= "<a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz' target='_blank'>";
 					$htmlstr .= $funktion_bezeichnung->beschreibung;
+					$htmlstr .= " (".$anzahlFunktionsrechte.")";
 				}
 			}
 			if(isset($funktionsrecht))
