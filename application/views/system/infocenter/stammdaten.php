@@ -117,7 +117,7 @@
 							<?php $lastMailAdress = $kontakt->kontakt;
 							endif;
 							if (($kontakt->kontakttyp === 'telefon' || $kontakt->kontakttyp === 'mobil'))
-								echo '<input type="text" data-value="'. $kontakt->kontakt_id .'" class="kontakt_nummer" readonly value="'. $kontakt->kontakt . '"';
+								echo '<input type="text" data-value="'. $kontakt->kontakt_id .'" class="kontakt_nummer" readonly value="'. $kontakt->kontakt . '">';
 							else
 								echo $kontakt->kontakt;
 							if ($kontakt->kontakttyp === 'email'):
