@@ -130,14 +130,15 @@ if (!isEmptyArray($all_oe_kurzbz_berechtigt))
 				)";
 }
 
-$query .= " ORDER BY CASE
-				WHEN iss.status_kurzbz = '".IssuesLib::STATUS_NEU."' THEN 0
-				WHEN iss.status_kurzbz = '".IssuesLib::STATUS_IN_BEARBEITUNG."' THEN 1
-				ELSE 2
-			END,
+$query .= " ORDER BY
 			CASE
 				WHEN fehlertyp_kurzbz = '".IssuesLib::ERRORTYPE_CODE."' THEN 0
 				WHEN fehlertyp_kurzbz = '".IssuesLib::WARNINGTYPE_CODE."' THEN 1
+				ELSE 2
+			END,
+			CASE
+				WHEN iss.status_kurzbz = '".IssuesLib::STATUS_NEU."' THEN 0
+				WHEN iss.status_kurzbz = '".IssuesLib::STATUS_IN_BEARBEITUNG."' THEN 1
 				ELSE 2
 			END,
 			datum DESC, fehlercode, issue_id DESC";
