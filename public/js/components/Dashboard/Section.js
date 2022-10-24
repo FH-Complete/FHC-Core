@@ -1,3 +1,4 @@
+import BsConfirm from "../Bootstrap/Confirm.js";
 import DashboardItem from "./Item.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
 
@@ -14,6 +15,7 @@ export default {
 		dataTransfer: {}
 	}),
 	props: [
+		"adminMode",
 		"name",
 		"widgets"
 	],
@@ -66,9 +68,9 @@ export default {
 				let h = item._h !== undefined ? item._h : itemCoords[item.index].h;
 				for (var c = 0; c < occupiers.length + gridWidth; c++) {
 					if (occupiers[c] === undefined) {
-						var occupied = false;
-						for (var i = 0; i < w; i++) {
-							for (var j = 0; j < h; j++) {
+						var occupied = false, i, j;
+						for (i = 0; i < w; i++) {
+							for (j = 0; j < h; j++) {
 								if (occupiers[c + i + j * gridWidth] !== undefined) {
 									i = w;
 									occupied = true;
@@ -79,8 +81,8 @@ export default {
 						if (!occupied) {
 							item.place[gridWidth].x = c%gridWidth + 1;
 							item.place[gridWidth].y = Math.floor(c/gridWidth) + 1;
-							for (var i = 0; i < w; i++) {
-								for (var j = 0; j < h; j++) {
+							for (i = 0; i < w; i++) {
+								for (j = 0; j < h; j++) {
 									occupiers[c + i + j * gridWidth] = item.index;
 								}
 							}
@@ -295,7 +297,7 @@ export default {
 				this.itemCoords[id].h = h;
 			}
 		},
-		onDrop(evt) {
+		onDrop() {
 			let id = 0;
 			let update = {};
 			while ((id = this.movedObjects.pop())) {
@@ -346,9 +348,7 @@ export default {
 		},
 		removeWidget(item, revert) {
 			if (item.custom) {
-				if (confirm('Are you sure you want to delete this widget?')) {
-					this.$emit('widgetRemove', this.name, item.id);
-				}
+				BsConfirm.popup('Are you sure you want to delete this widget?').then(() => this.$emit('widgetRemove', this.name, item.id));
 			} else {
 				let update = {};
 				update[item.id] = { hidden: !revert };
@@ -365,6 +365,10 @@ export default {
 			payload[this.name] = update;
 			this.$emit('widgetUpdate', this.name, payload);
 		}
+	},
+	created() {
+		if (this.adminMode)
+			this.editMode = 1;
 	},
 	mounted() {
 		let self = this;
@@ -401,6 +405,7 @@ export default {
 					v-for="item in items" 
 					:key="item.id" 
 					:id="item.widget" 
+					:loading="item.loading"
 					:config="item.config" 
 					:custom="item.custom" 
 					:hidden="item.hidden" 

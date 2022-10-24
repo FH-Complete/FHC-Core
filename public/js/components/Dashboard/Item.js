@@ -1,11 +1,13 @@
+import BsModal from "../Bootstrap/Modal.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
 
 export default {
-	components: {},
+	components: {
+		BsModal
+	},
 	data: () => ({
 		component: '',
 		arguments: null,
-		configModal: null,
 		target: false,
 		widget: null,
 		tmpConfig: {},
@@ -25,7 +27,8 @@ export default {
 		"height",
 		"custom",
 		"hidden",
-		"editMode"
+		"editMode",
+		"loading"
 	],
 	computed: {
 		isResizeable() {
@@ -55,7 +58,7 @@ export default {
 		},
 		openConfig() {
 			this.tmpConfig = {...this.arguments};
-			this.configModal.show();
+			this.$refs.config.show();
 		},
 		setConfig(hasConfig) {
 			this.hasConfig = hasConfig;
@@ -82,7 +85,7 @@ export default {
 		config() {
 			this.arguments = {...this.widget.arguments, ...this.config};
 			this.tmpConfig = {...this.arguments};
-			this.configModal.hide();
+			this.$refs.config.hide();
 			this.isLoading = false;
 		}
 	},
@@ -94,10 +97,12 @@ export default {
 		this.arguments = {...this.widget.arguments, ...this.config};
 		this.tmpConfig = {...this.arguments};
 	},
-	mounted() {
-		this.configModal = new bootstrap.Modal(this.$refs.config);
-	},
-	template: `<div v-if="!hidden || editMode" :class="'dashboard-item card overflow-hidden ' + (arguments ? arguments.className : '')" @mousedown="mouseDown($event)" @dragstart="startDrag($event)" :draggable="!!editMode">
+	template: `<div v-if="loading">
+		<div class="d-flex justify-content-center align-items-center h-100">
+			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+		</div>
+	</div>
+	<div v-else-if="!hidden || editMode" :class="'dashboard-item card overflow-hidden ' + (arguments ? arguments.className : '')" @mousedown="mouseDown($event)" @dragstart="startDrag($event)" :draggable="!!editMode">
 		<div v-if="editMode && widget" class="card-header d-flex">
 			<span ref="dragHandle" class="col-auto pe-3"><i class="fa-solid fa-grip-vertical"></i></span>
 			<span class="col">{{ widget.setup.name }}</span>
@@ -113,24 +118,19 @@ export default {
 			<component :is="component" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
-		<div ref="config" class="modal" tabindex="-1">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 v-if="widget" class="modal-title">Config for {{ widget.setup.name }}</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<component v-if="ready && !isLoading" :is="component" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
-						<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary" @click="changeConfig">Save changes</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<bs-modal ref="config">
+			<template v-slot:title>
+				{{ widget ? 'Config for ' + widget.setup.name : '' }}
+			</template>
+			<template v-slot:default>
+				<component v-if="ready && !isLoading" :is="component" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
+				<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
+			</template>
+			<template v-slot:footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" @click="changeConfig">Save changes</button>
+			</template>
+		</bs-modal>
 		<div v-if="editMode && isResizeable" class="card-footer d-flex justify-content-end p-0">
 			<span ref="resizeHandle" class="col-auto ps-1" @dragstart.prevent="$emit('resize')"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></span>
 		</div>

@@ -1,4 +1,5 @@
 import DashboardSection from "./Section.js";
+import DashboardWidgetPicker from "./Widget/Picker.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
 import ObjectUtils from "../../composables/ObjectUtils.js";
 
@@ -9,21 +10,15 @@ export default {
 	],
 	data: () => ({
 		sections: [],
-		widgets: [],
-		isLoading: 0,
-		tmpCreate: null,
+		widgets: null
 	}),
 	components: {
-		DashboardSection
-	},
-	computed: {
-		listReady() {
-			return this.widgets.length && !this.isLoading;
-		}
+		DashboardSection,
+		DashboardWidgetPicker
 	},
 	methods: {
 		widgetAdd(section_name, widget) {
-			if (!this.widgets.length) {
+			if (this.widgets === null) {
 				axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {params:{
 					db: this.dashboard
 				}}).then(res => {
@@ -35,34 +30,32 @@ export default {
 					this.widgets = res.data.retval;
 				}).catch(err => console.error('ERROR:', err));
 			}
-			this.tmpCreate = {section_name,widget};
-			this.listModal.show();
-		},
-		widgetCreate(widget) {
-			this.isLoading = 1;
-			this.tmpCreate.widget.widget = widget;
-			axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
-				db: this.dashboard,
-				funktion_kurzbz: this.tmpCreate.section_name,
-				widgets: [this.tmpCreate.widget]
-			}).then(result => {
-				let newId = 0;
-				let sec = result.data.retval.data.widgets[this.tmpCreate.section_name];
-				for (var i in sec) {
-					newId = i;
-					break;
-				}
-				this.tmpCreate.widget.id = newId;
+			this.$refs.widgetpicker.getWidget().then(widget_id => {
+				widget.widget = widget_id;
+				let loading = {...widget};
+				loading.loading = true;
 				this.sections.forEach(section => {
-					if (section.name == this.tmpCreate.section_name)
-						section.widgets.push(this.tmpCreate.widget);
+					if (section.name == section_name)
+						section.widgets.push(loading);
 				});
-			}).catch(error => {
-				console.error('ERROR: ', error);
-				alert('ERROR: ' + error.response.data.retval);
-			}).finally(() => {
-				this.listModal.hide();
-				this.isLoading = 0;
+				
+				axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
+					db: this.dashboard,
+					funktion_kurzbz: section_name,
+					widgets: [widget]
+				}).then(result => {
+					let newId = Object.keys(result.data.retval.data.widgets[section_name]).pop();
+					widget.id = newId;
+					this.sections.forEach(section => {
+						if (section.name == section_name) {
+							section.widgets.splice(section.widgets.indexOf(loading),1);
+							section.widgets.push(widget);
+						}
+					});
+				}).catch(error => {
+					console.error('ERROR: ', error);
+					alert('ERROR: ' + error.response.data.retval);
+				});
 			});
 		},
 		widgetUpdate(section_name, payload) {
@@ -89,7 +82,7 @@ export default {
 				db: this.dashboard,
 				funktion_kurzbz: section_name,
 				widgets: payload
-			}).then(result => {
+			}).then(() => {
 				this.sections.forEach(section => {
 					if (section.name == section_name) {
 						section.widgets.forEach((widget, i) => {
@@ -112,7 +105,7 @@ export default {
 				db: this.dashboard,
 				funktion_kurzbz: section_name,
 				widgetid: id
-			}).then(result => {
+			}).then(() => {
 				this.sections.forEach(section => {
 					if (section.name == section_name)
 						section.widgets = section.widgets.filter(widget => widget.id != id);
@@ -142,34 +135,8 @@ export default {
 			}
 		}).catch(err => console.error('ERROR:', err));
 	},
-	mounted() {
-		this.listModal = new bootstrap.Modal(this.$refs.widgetlist);
-	},
 	template: `<div class="core-dashboard">
 		<dashboard-section v-for="section in sections" :key="section.name" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
-		<div ref="widgetlist" class="modal" tabindex="-1">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Create new widget</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div v-if="listReady" class="row">
-							<div v-for="widget in widgets" :v-key="widget.widget_id" class="col">
-								<div class="card h-100" @click="widgetCreate(widget.widget_id)">
-									<img class="card-img-top" :src="widget.setup.icon" :alt="'pictogram for ' + (widget.setup.name || widget.widget_kurzbz)">
-									<div class="card-body">
-										<h5 class="card-title">{{ widget.setup.name || widget.widget_kurzbz }}</h5>
-										<p class="card-text">{{ widget.beschreibung }}</p>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<dashboard-widget-picker ref="widgetpicker" :widgets="widgets"></dashboard-widget-picker>
 	</div>`
 }
