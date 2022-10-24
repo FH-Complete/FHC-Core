@@ -3,10 +3,10 @@ export default {
 		"config",
 		"width",
 		"height",
-		"setConfig",
 		"configMode"
 	],
 	emits: [
+		"setConfig",
 		"change" // TODO(chris): do we need this?
 	]
 }
