@@ -293,8 +293,9 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td>Lehrmodus*</td>
-			<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
+			<td>Lehrmodus*</td>';
+
+		$htmlstr .= '<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
 
 		$lehrmodus_arr = new lehrmodus();
 		$lehrmodus_arr->getAll();
@@ -302,6 +303,8 @@
 		foreach ($lehrmodus_arr->result as $lehrmodus)
 		{
 			if ($lehrmodus->lehrmodus_kurzbz == $lv->lehrmodus_kurzbz)
+				$sel = ' selected';
+			else if (isset($_GET['neu']) && defined('DEFAULT_LEHRMODUS') && ($lehrmodus->lehrmodus_kurzbz == DEFAULT_LEHRMODUS) && ($lv->lehrmodus_kurzbz == ''))
 				$sel = ' selected';
 			else
 				$sel = '';
@@ -511,7 +514,7 @@
 			$htmlstr.='<br><b>Verwendung in folgenden Studienplänen</b>: ';
 			$stdplan = new studienplan();
 			if ($stdplan->getStudienplanLehrveranstaltung($lv->lehrveranstaltung_id))
-			foreach($stdplan->result as $result) 
+			foreach($stdplan->result as $result)
 				$htmlstr .= $result->bezeichnung . "; ";
 
 			$htmlstr.='</span>';

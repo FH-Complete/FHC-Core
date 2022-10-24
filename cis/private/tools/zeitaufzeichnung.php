@@ -158,7 +158,7 @@ $angezeigte_tage = '50';
 
 $zs = new zeitsperre();
 if ($alle)
-	$zs->getZeitsperrenForZeitaufzeichnung($user,'180');
+	$zs->getZeitsperrenForZeitaufzeichnung($user,'360');
 else
 	$zs->getZeitsperrenForZeitaufzeichnung($user,$angezeigte_tage);
 
@@ -1440,7 +1440,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 	    else
 	    {
 	    	if ($alle==true)
-	    		$za->getListeUserFull($user, '');
+	    		$za->getListeUserFull($user, '360');
 	    	else
 	    		$za->getListeUserFull($user, $angezeigte_tage);
 	    }
