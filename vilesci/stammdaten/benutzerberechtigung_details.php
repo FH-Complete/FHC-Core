@@ -592,7 +592,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 	//Art
 	$htmlstr .= "		<td>";
-	$htmlstr .= "			<input id='art_neu' type='text' name='dataset[0][art]' value='' size='5' maxlength='5' placeholder='suid'>";
+	$htmlstr .= "			<input id='art_neu' type='text' name='dataset[0][art]' value='' size='5' maxlength='5' placeholder='suid' style='text-transform: lowercase;'>";
 	$htmlstr .= "		</td>";
 
 	//Organisationseinheit
@@ -727,7 +727,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</td>";
 
 		//Rolle
-		$htmlstr .= "		<td style='padding: 1px;'>";
+		$htmlstr .= "		<td style='padding: 1px; white-space: nowrap'>";
 		$htmlstr .= "			<select class='rolle_select' name='dataset[$b->benutzerberechtigung_id][rolle_kurzbz]'>";
 		$htmlstr .= "		<option value='' name=''>&nbsp;</option>";
 		for ($i = 0; $i < sizeof($rolle_arr); $i++)
@@ -741,6 +741,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			$htmlstr .= "<option value='".$rolle_arr[$i]."' id='".$rolle_arr[$i]."' ".$sel.">".$rolle_arr[$i]."</option>";
 		}
 		$htmlstr .= "		</select>";
+		if ($b->rolle_kurzbz != '')
+		{
+			$htmlstr .= "	<a href='berechtigungrolle.php?rolle_kurzbz=".$b->rolle_kurzbz."' target='_blank'>?&nbsp;</a>";
+		}
 		$htmlstr.="</td>";
 
 		//Berechtigung
@@ -756,7 +760,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		//Art
 		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>";
 		$htmlstr .= "			<span style='display: none'>".$b->art."</span>";
-		$htmlstr .= "			<input type='text' class='suid_input' name='dataset[$b->benutzerberechtigung_id][art]' value='".$b->art."' size='4' maxlength='4'>";
+		$htmlstr .= "			<input type='text' class='suid_input' name='dataset[$b->benutzerberechtigung_id][art]' value='".$b->art."' size='4' maxlength='4' style='text-transform: lowercase;'>";
 		$htmlstr .= "		</td>";
 
 		//Organisationseinheit
@@ -930,10 +934,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				 changeMonth: true,
 				 changeYear: true,
 				 dateFormat: 'yy-mm-dd',
-				 showOn: "button",
-			     buttonImage: "../../skin/images/date_edit.png",
+				 showOn: "focus"
+			     /*buttonImage: "../../skin/images/date_edit.png",
 			     buttonImageOnly: true,
-			     buttonText: "Select date"
+			     buttonText: "Select date"*/
 				 });
 
 			$("#t1").tablesorter(
