@@ -1,6 +1,6 @@
 let __widgets = {};
 let __widgetsStarted = {};
-let __path = '';
+let __path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard/Widget';
 
 export default {
 	getWidget(id) {

@@ -4,17 +4,21 @@ import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.j
 import ObjectUtils from "../../composables/ObjectUtils.js";
 
 export default {
+	components: {
+		DashboardSection,
+		DashboardWidgetPicker
+	},
 	props: [
-		"dashboard",
-		"apiurl"
+		"dashboard"
 	],
 	data: () => ({
 		sections: [],
 		widgets: null
 	}),
-	components: {
-		DashboardSection,
-		DashboardWidgetPicker
+	computed: {
+		apiurl() {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard';
+		}
 	},
 	methods: {
 		widgetAdd(section_name, widget) {
@@ -117,7 +121,6 @@ export default {
 		}
 	},
 	created() {
-		CachedWidgetLoader.setPath(this.apiurl + '/Widget');
 		axios.get(this.apiurl + '/Config', {params:{
 			db: this.dashboard
 		}}).then(res => {
