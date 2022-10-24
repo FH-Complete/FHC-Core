@@ -212,6 +212,7 @@ if (isset($_POST['vorr']))
 	$statisticAdded = 0;
 	$statisticUebersprungen = 0;
 	$statisticStudienplanKorrektur = 0;
+	$errorMsg = array();
 
 	$stg_help = new studiengang();
 	if (!$stg_help->load($stg_kz))
@@ -306,11 +307,38 @@ if (isset($_POST['vorr']))
 				//auf statusgrund_kurzbz abfragen
 				$statusgrundObj = new statusgrund($row_status->statusgrund_id);
 				$statusgrundId = null;
-				if ($statusgrundObj->statusgrund_kurzbz === "prewiederholer" && $row_status->ausbildungssemester > 1)
+				if (isset($statusgrundObj->statusgrund_kurzbz) && $statusgrundObj->statusgrund_kurzbz === "prewiederholer" && $row_status->ausbildungssemester > 1)
 				{
 					$s = $row->semester_stlv - 1;
 					$ausbildungssemester = $row_status->ausbildungssemester - 1;
 					$statusgrundId = $statusgrundObj->getByStatusgrundKurzbz('wiederholer')->statusgrund_id;
+				}
+
+				// Wenn VORRUECKUNG_STATUS_MAX_SEMESTER true ist und
+				// der Student kein Wiederholer ist und
+				// der aktuelle Status "Student" im Max-Semester des Studiengangs ist, wird übersprungen
+				if (VORRUECKUNG_STATUS_MAX_SEMESTER
+					&& $statusgrundId == ''
+					&& $row_status->ausbildungssemester == $max[$stg_kz]
+					&& $row_status->status_kurzbz == 'Student')
+				{
+					$statisticUebersprungen++;
+					$errorMsg['Studenten im letzten Ausbildungssemester ohne Diplomandenstatus']++;
+					continue;
+
+					/*
+					$sqlInsertDiplomand = "INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz,
+								studiensemester_kurzbz, ausbildungssemester, datum, insertamum,
+								insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id, statusgrund_id)
+							VALUES (".$db->db_add_param($row->prestudent_id).", ".
+						$db->db_add_param($status_kurzbz).", ".
+						$db->db_add_param($next_ss).", ".
+						$db->db_add_param($ausbildungssemester).", now(), now(), ".
+						$db->db_add_param($user).",	NULL, NULL, NULL, ".
+						$db->db_add_param($row_status->orgform_kurzbz).", ".
+						$db->db_add_param($studienplan_id).", ".
+						$db->db_add_param($statusgrundId).");";
+					*/
 				}
 
 				$lvb = new lehrverband();
@@ -352,6 +380,7 @@ if (isset($_POST['vorr']))
 								$db->db_add_param($row->gruppe_stlv).",NULL,NULL,now(),".
 								$db->db_add_param($user).",NULL);";
 				}
+				//Check, ob schon ein Status für das Zielsemester vorhanden ist
 				$qry_chk = "SELECT
 							*
 						FROM
@@ -360,7 +389,8 @@ if (isset($_POST['vorr']))
 							prestudent_id=".$db->db_add_param($row->prestudent_id)."
 							AND studiensemester_kurzbz=".$db->db_add_param($next_ss).";";
 
-				if ($db->db_num_rows($db->db_query($qry_chk)) < 1)
+				if ($db->db_num_rows($db->db_query($qry_chk)) < 1
+				&& $row_status->status_kurzbz != 'Absolvent')
 				{
 					// Pruefen ob der Studienplan fuer das vorgerueckte Semester noch gueltig ist
 					// und GGf einen besseren Studienplan suchen
@@ -405,9 +435,15 @@ if (isset($_POST['vorr']))
 		}
 	}
 	echo '<span class="ok">';
-	echo 'Vorgerückte Personen:'.$statisticAdded.'<br>';
-	echo 'Übersprungene Personen:'.$statisticUebersprungen.'<br>';
-	echo 'Studienplanzuordnung korrigiert:'.$statisticStudienplanKorrektur.'<br>';
+	echo 'Vorgerückte Personen: '.$statisticAdded.'<br>';
+	echo 'Übersprungene Personen: '.$statisticUebersprungen.'<br>';
+	echo 'Studienplanzuordnung korrigiert: '.$statisticStudienplanKorrektur.'<br>';
+	echo '</span>';
+	echo '<span class="error">';
+	foreach($errorMsg AS $key=>$value)
+	{
+		echo 'Fehler: '.$key.': '.$value;
+	}
 	echo '</span>';
 }
 
