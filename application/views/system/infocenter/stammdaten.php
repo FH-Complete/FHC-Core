@@ -111,13 +111,13 @@
 					<td><?php echo ucfirst($kontakt->kontakttyp) ?></td>
 				<?php endif; ?>
 					<td>
-						<?php echo '<span class="'.$kontakt->kontakttyp.'">';?>
+						<?php echo '<span class="'.$kontakt->kontakttyp.'" data-value="'. $kontakt->kontakt .'">';?>
 						<?php if ($kontakt->kontakttyp === 'email'): ?>
 							<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
 							<?php $lastMailAdress = $kontakt->kontakt;
 							endif;
 							if (($kontakt->kontakttyp === 'telefon' || $kontakt->kontakttyp === 'mobil'))
-								echo '<input type="text" data-value="'. $kontakt->kontakt_id .'" class="kontakt_nummer" readonly value="'. $kontakt->kontakt . '">';
+								echo '<input type="text" data-value="'. $kontakt->kontakt_id .'" class="kontakt_nummer" readonly value="'. $kontakt->kontakt . '"/>';
 							else
 								echo $kontakt->kontakt;
 							if ($kontakt->kontakttyp === 'email'):
