@@ -12,12 +12,13 @@ class News_model extends DB_Model
 		$this->pk = 'news_id';
 	}
 
+    /**
+     * Get all News ordered by date. (most actual on top)
+     * @param null $limit   Amount of news.
+     * @return array
+     */
     public function getAll($limit = null)
     {
-        // TODO check ob über content table. Aktuell sind die news texte NULL, deshalb über content table holen.
-//        $this->addJoin('campus.tbl_content', 'content_id');
-//        $this->addJoin('campus.tbl_contentsprache', 'content_id');
-
         return $this->loadWhere('
             text IS NOT NULL
             AND datum <= NOW() AND (datum_bis IS NULL OR datum_bis >= now()::date)
