@@ -4,16 +4,14 @@ import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.j
 
 // TODO(chris): handle overflow (moving outside the box)
 export default {
-	data: () => ({
-		gridWidth: 0,
-		containerRect: {top:0,left:0},
-		changeHeight: 1,
-		movedObjects: [],
-		editMode: 0,
-		gridXLast: 0,
-		gridYLast: 0,
-		dataTransfer: {}
-	}),
+	components: {
+		DashboardItem
+	},
+	inject: {
+		adminMode: {
+			default: false
+		}
+	},
 	props: [
 		"adminMode",
 		"name",
@@ -24,8 +22,17 @@ export default {
 		"widgetUpdate",
 		"widgetRemove"
 	],
-	components: {
-		DashboardItem
+	data() {
+		return {
+			gridWidth: 0,
+			containerRect: {top:0,left:0},
+			changeHeight: 1,
+			movedObjects: [],
+			editMode: this.adminMode ? 1 : 0,
+			gridXLast: 0,
+			gridYLast: 0,
+			dataTransfer: {}
+		}
 	},
 	computed: {
 		items() {
