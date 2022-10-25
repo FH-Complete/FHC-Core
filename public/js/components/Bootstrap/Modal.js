@@ -91,7 +91,7 @@ export default {
 					<h5 class="modal-title"><slot name="title"/></h5>
 					<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body px-4 py-5">
 					<slot></slot>
 				</div>
 				<div v-if="$slots.footer" class="modal-footer">
