@@ -6783,7 +6783,6 @@ if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgvdoktor LIMIT 1"))
 		echo '<br>Spalte aktiv zu bis.tbl_zgvdoktor hinzugefügt';
 }
 
-
 // ADD COLUMN studienkennung_uni to bis.tbl_gsprogramm
 if(!@$db->db_query("SELECT studienkennung_uni FROM bis.tbl_gsprogramm LIMIT 1"))
 {
@@ -6805,6 +6804,50 @@ if(!@$db->db_query("SELECT herkunftsland_code FROM bis.tbl_bisio LIMIT 1"))
 		echo '<strong>bis.tbl_bisio '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Spalte herkunftsland_code in bis.tbl_bisio hinzugefügt';
+}
+
+// Add table extension.tbl_mo_outgoing_lv
+if(!$result = @$db->db_query("SELECT 1 FROM extension.tbl_mo_outgoing_lv LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE extension.tbl_mo_outgoing_lv
+		(
+			outgoing_lehrveranstaltung_id integer,
+			mo_lvid integer NOT NULL,
+			lv_nr_gast varchar(64) NOT NULL,
+			lv_bez_gast varchar(128),
+			studiensemester_kurzbz varchar(16) NOT NULL,
+			ects_punkte_gast numeric(5,2),
+			akkreditiert boolean default FALSE NOT NULL,
+			insertamum timestamp without time zone default now(),
+			insertvon varchar(32),
+			updateamum timestamp without time zone,
+			updatevon varchar(32)
+		);
+
+		ALTER TABLE extension.tbl_mo_outgoing_lv ADD CONSTRAINT pk_mo_outgoing_lv PRIMARY KEY (outgoing_lehrveranstaltung_id);
+		ALTER TABLE extension.tbl_mo_outgoing_lv ADD CONSTRAINT uk_mo_outgoing_lv_mo_lvid UNIQUE (mo_lvid);
+		ALTER TABLE extension.tbl_mo_outgoing_lv ADD CONSTRAINT fk_mo_outgoing_lv_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		CREATE SEQUENCE extension.seq_mo_outgoing_lv_outgoing_lehrveranstaltung_id
+			START WITH 1
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+
+		ALTER TABLE extension.tbl_mo_outgoing_lv ALTER COLUMN outgoing_lehrveranstaltung_id SET DEFAULT nextval('extension.seq_mo_outgoing_lv_outgoing_lehrveranstaltung_id');
+
+		GRANT SELECT, UPDATE, INSERT, DELETE ON extension.tbl_mo_outgoing_lv TO vilesci;
+		GRANT SELECT, UPDATE, INSERT ON extension.tbl_mo_outgoing_lv TO web;
+		GRANT SELECT, UPDATE ON extension.seq_mo_outgoing_lv_outgoing_lehrveranstaltung_id TO vilesci;
+		GRANT SELECT, UPDATE ON extension.seq_mo_outgoing_lv_outgoing_lehrveranstaltung_id TO web;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>extension.tbl_mo_outgoing_lv: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'extension.tbl_mo_outgoing_lv: Tabelle hinzugefuegt<br>';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
