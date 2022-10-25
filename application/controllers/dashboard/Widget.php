@@ -21,8 +21,58 @@ class Widget extends Auth_Controller
 				"width" => [ "max" => 3 ],
 				"height" => [ "max" => 3 ]
 			]
-		]
-	];
+        ],
+        [
+            "id" => 2,
+            "name" => 'News',
+            "description" => 'Das ist ein News Widget',
+            "icon" => '../../skin/images/fh_technikum_wien_illustration_klein.png',
+            "file" => 'DashboardWidget/News.js',
+            "arguments" => [],
+            "size" => [
+                "width" => ["min" => 1, "max" => 4],
+                "height" => ["min" => 1, "max" => 2]
+            ],
+        ],
+        [
+            "id" => 3,
+            "name" => 'URL',
+            "description" => 'Das ist ein URL Widget',
+            "icon" => '../../skin/images/fh_technikum_wien_illustration_klein.png',
+            "file" => 'Widgets/Url.js',
+            "arguments" => [],
+            "size" => [
+                "width" => 1,
+                "height" => ["min" => 1, "max" => 2]
+            ]
+        ],
+        [
+            "id" => 4,
+            "name" => 'Ampel',
+            "description" => 'Das ist ein Ampel Widget',
+            "icon" => '../../skin/images/fh_technikum_wien_illustration_klein.png',
+            "file" => 'Widgets/Ampel.js',
+            "arguments" => [],
+            "size" => [
+                "width" => 1,
+                "height" => ["min" => 1, "max" => 2]
+            ]
+        ],
+        [
+            "id" => 5,
+            "name" => 'KPI',
+            "description" => 'Das ist ein KPI Widget',
+            "icon" => '../../skin/images/fh_technikum_wien_illustration_klein.png',
+            "file" => 'Widgets/Kpi.js',
+            "arguments" => [
+                "source" => 'random'
+            ],
+            "size" => [
+                "width" => 1,
+                "height" => 1
+            ]
+        ],
+    ];
 
 	public function __construct()
 	{
@@ -75,5 +125,5 @@ class Widget extends Auth_Controller
 
 		$this->outputJsonSuccess(getData($result));
 	}
-	
+
 }
