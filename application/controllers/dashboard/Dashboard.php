@@ -34,10 +34,6 @@ class Dashboard extends Auth_Controller
 	{
 		$this->load->view('dashboard/dashboard.php', []);
 	}
-    // TODO löschen
-    public function test(){
-        echo "<pre>"; print_r('in Dashboard Test function'); echo "</pre>";
-    }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods
