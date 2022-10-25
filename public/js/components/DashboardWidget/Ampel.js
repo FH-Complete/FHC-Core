@@ -14,7 +14,7 @@ export default {
     ],
     computed: {
         widgetAmpeln () {
-            return this.ampeln.slice(0, 2);  // show only newest 2 ampeln
+            return this.ampeln.slice(0, 4);  // show only newest 4 ampeln
         },
         offcanvasAmpeln ()
         {
