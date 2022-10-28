@@ -7,36 +7,19 @@ defined('BASEPATH') || exit('No direct script access allowed');
  */
 class Widget extends Auth_Controller
 {
-	private $demoData = [
-		[
-			"id" => 1,
-			"name" => 'Widget 1',
-			"description" => 'Das ist ein Test Widget',
-			"icon" => 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Farben-Testbild.svg',
-			"file" => 'DashboardWidget/Widget1.js',
-			"arguments" => [
-				"test" => 2
-			],
-			"size" => [
-				"width" => [ "max" => 3 ],
-				"height" => [ "max" => 3 ]
-			]
-		]
-	];
-
 	public function __construct()
 	{
 		parent::__construct(
 			array(
 				'index'							=> 'dashboard/benutzer:r',
+				'getAll'						=> 'dashboard/admin:r',
 				'getWidgetsForDashboard'		=> 'dashboard/benutzer:rw',
-				'addWidgetToUserOverride'		=> 'dashboard/benutzer:rw',
-				'updateWidgetsToUserOverride'	=> 'dashboard/benutzer:rw',
-				'removeWidgetFromUserOverride'	=> 'dashboard/benutzer:rw'
+				'setAllowed'					=> 'dashboard/admin:rw'
 			)
 		);
 		
 		$this->load->library('dashboard/DashboardLib', null, 'DashboardLib');
+		$this->load->model('dashboard/Widget_model', 'WidgetModel');
 		$this->load->model('dashboard/Dashboard_Widget_model', 'DashboardWidgetModel');
 	}
 	
@@ -44,7 +27,7 @@ class Widget extends Auth_Controller
 	{
 		$widget_id = $this->input->get('id');
 
-		$widget = $this->DashboardWidgetModel->load($widget_id);
+		$widget = $this->WidgetModel->load($widget_id);
 
 		if (isError($widget) || !getData($widget))
 			return $this->outputJsonSuccess([
@@ -65,15 +48,61 @@ class Widget extends Auth_Controller
 		return $this->outputJsonSuccess(current(getData($widget)));
 	}
 	
-	public function getWidgetsForDashboard() 
+	public function getAll() 
 	{
-		$db = $this->input->get('db');
-		$result = $this->DashboardWidgetModel->getAllForDashboard($db);
+		$dashboard_id = $this->input->get('dashboard_id');
+		$result = $this->WidgetModel->getWithAllowedForDashboard($dashboard_id);
 
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
 
-		$this->outputJsonSuccess(getData($result));
+		$this->outputJsonSuccess(getData($result) ?: []);
 	}
 	
+	public function getWidgetsForDashboard() 
+	{
+		$db = $this->input->get('db');
+		$result = $this->WidgetModel->getForDashboard($db);
+
+		if (isError($result)) {
+			http_response_code(404);
+			$this->terminateWithJsonError([
+				'error' => getError($result)
+			]);
+		}
+
+		$this->outputJsonSuccess(getData($result) ?: []);
+	}
+	
+	public function setAllowed() {
+		$input = $this->getPostJSON();
+
+		$dashboard_id = $input->dashboard_id;
+		$widget_id = $input->widget_id;
+		$action = $input->action;
+
+		if ($action == 'add') {
+			$result = $this->DashboardWidgetModel->insert([
+				'dashboard_id' => $dashboard_id, 
+				'widget_id' => $widget_id
+			]);
+		} elseif ($action == 'delete') {
+			$result = $this->DashboardWidgetModel->delete([
+				'dashboard_id' => $dashboard_id, 
+				'widget_id' => $widget_id
+			]);
+		} else {
+			http_response_code(404); // TODO(chris): 400?
+			$this->terminateWithJsonError([
+				'error' => 'action value invalid'
+			]);
+		}
+		if (isError($result)) {
+			http_response_code(404);
+			$this->terminateWithJsonError([
+				'error' => getError($result)
+			]);
+		}
+		return $this->outputJsonSuccess(getData($result));
+	}
 }

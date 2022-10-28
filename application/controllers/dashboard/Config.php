@@ -17,12 +17,16 @@ class Config extends Auth_Controller
 				'addWidgetsToPreset'			=> 'dashboard/admin:rw',
 				'removeWidgetFromPreset'		=> 'dashboard/admin:rw',
 				'addWidgetsToUserOverride'		=> 'dashboard/benutzer:rw',
-				'removeWidgetFromUserOverride'	=> 'dashboard/benutzer:rw'
+				'removeWidgetFromUserOverride'	=> 'dashboard/benutzer:rw',
+				'Funktionen'					=> 'dashboard/admin:r',
+				'Preset'						=> 'dashboard/admin:r',
+				'PresetBatch'					=> 'dashboard/admin:r'
 			)
 		);
 		
 		$this->load->library('dashboard/DashboardLib', null, 'DashboardLib');
 		$this->load->library('AuthLib', null, 'AuthLib');
+		$this->load->model('ressource/Funktion_model', 'FunktionModel');
 	}
 	
 	public function index() 
@@ -91,9 +95,8 @@ class Config extends Auth_Controller
 		}
 		
 		$preset_decoded = json_decode($preset->preset, true);
-		
-		if( $this->DashboardLib->removeWidgetFromWidgets($preset_decoded['widgets'], 
-			$funktion_kurzbz, $widgetid) )
+		if (!$this->DashboardLib->removeWidgetFromWidgets($preset_decoded['widgets'], 
+			$funktion_kurzbz, $widgetid))
 		{
 			http_response_code(404);
 			$this->terminateWithJsonError('widgetid ' . $widgetid . ' not found');
@@ -166,6 +169,50 @@ class Config extends Auth_Controller
 			$this->terminateWithJsonError('failed to remove widget');	
 		}
 		$this->outputJsonSuccess(array('msg' => 'override successfully updated.'));
+	}
+	
+	public function Funktionen()
+	{
+		$funktionen = $this->FunktionModel->load();
+
+		if (isError($funktionen)) {
+			http_response_code(404);
+			$this->terminateWithJsonError([
+				'error' => getError($funktionen)
+			]);
+		}
+		
+		return $this->outputJsonSuccess(getData($funktionen) ?: []);
+	}
+	
+	public function Preset()
+	{
+		$db = $this->input->get('db');
+		$funktion = $this->input->get('funktion');
+
+		$conf = $this->DashboardLib->getPreset($db, $funktion);
+
+		if (!$conf)
+			return $this->outputJsonSuccess(['widgets' => [$funktion => []]]);
+
+		return $this->outputJsonSuccess(json_decode($conf->preset, true));
+	}
+	
+	public function PresetBatch()
+	{
+		$db = $this->input->get('db');
+		$funktionen = $this->input->get('funktionen');
+		$result = [];
+
+		foreach ($funktionen as $funktion) {
+			$conf = $this->DashboardLib->getPreset($db, $funktion);
+			if ($conf)
+				$result[$funktion] = json_decode($conf->preset, true)['widgets'][$funktion];
+			else
+				$result[$funktion] = [];
+		}
+
+		return $this->outputJsonSuccess($result);
 	}
 	
 }
