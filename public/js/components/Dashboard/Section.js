@@ -13,7 +13,6 @@ export default {
 		}
 	},
 	props: [
-		"adminMode",
 		"name",
 		"widgets"
 	],
@@ -372,10 +371,6 @@ export default {
 			payload[this.name] = update;
 			this.$emit('widgetUpdate', this.name, payload);
 		}
-	},
-	created() {
-		if (this.adminMode)
-			this.editMode = 1;
 	},
 	mounted() {
 		let self = this;

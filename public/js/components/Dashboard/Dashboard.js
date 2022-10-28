@@ -1,6 +1,5 @@
 import DashboardSection from "./Section.js";
 import DashboardWidgetPicker from "./Widget/Picker.js";
-import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
 import ObjectUtils from "../../composables/ObjectUtils.js";
 
 export default {

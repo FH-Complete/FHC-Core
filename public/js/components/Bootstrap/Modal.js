@@ -46,11 +46,12 @@ export default {
 		}
 	},
 	mounted() {
-		this.modal = new bootstrap.Modal(this.$refs.modal, {
-			backdrop: this.backdrop,
-			focus: this.focus,
-			keyboard: this.keyboard
-		});
+		if (this.$refs.modal)
+			this.modal = new bootstrap.Modal(this.$refs.modal, {
+				backdrop: this.backdrop,
+				focus: this.focus,
+				keyboard: this.keyboard
+			});
 	},
 	popup(body, options, title, footer) {
 		const BsModal = this;
@@ -80,8 +81,8 @@ export default {
 				}
 			});
 			const wrapper = document.createElement("div");
-			instance.mount(wrapper);
 			document.body.appendChild(wrapper);
+			instance.mount(wrapper);
 		});
 	},
 	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" @[\`shown.bs.modal\`]="$emit('shownBsModal')">
