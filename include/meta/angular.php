@@ -17,10 +17,7 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-
-$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
-
 //Originaldateien des Herstellers
-echo '<script src="'.$dr.'vendor/components/angular.js/angular.min.js"></script>';
+echo '<script src="'.BASE_LOCATION.'vendor/components/angular.js/angular.min.js"></script>';
 
 ?>

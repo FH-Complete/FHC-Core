@@ -17,11 +17,8 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-
-$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
-
 //Originaldateien des Herstellers
-echo '<script src="'.$dr.'vendor/josdejong/jsoneditor/dist/jsoneditor.js"></script>';
-echo '<link href="'.$dr.'vendor/josdejong/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">';
+echo '<script src="'.BASE_LOCATION.'vendor/josdejong/jsoneditor/dist/jsoneditor.js"></script>';
+echo '<link href="'.BASE_LOCATION.'vendor/josdejong/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">';
 
 ?>

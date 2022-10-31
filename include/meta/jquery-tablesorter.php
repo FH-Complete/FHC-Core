@@ -17,15 +17,13 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-
-$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
-
+ 
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/jquery-tablesorter/css/theme.default.css">';
-echo '<script src="'.$dr.'FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js"></script>';
-echo '<script src="'.$dr.'FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.widgets.js"></script>';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'FHC-vendor/jquery-tablesorter/css/theme.default.css">';
+echo '<script src="'.BASE_LOCATION.'FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js"></script>';
+echo '<script src="'.BASE_LOCATION.'FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.widgets.js"></script>';
 
 //Anpassungen
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/jquery-tablesorter/tablesort.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'include/vendor_custom/jquery-tablesorter/tablesort.css">';
 
 ?>

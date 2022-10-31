@@ -17,10 +17,7 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-
-$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
-
 //Originaldateien des Herstellers
-echo '<script src="'.$dr.'vendor/jquery/jquery2/jquery-2.2.4.min.js"></script>';
+echo '<script src="'.BASE_LOCATION.'vendor/jquery/jquery2/jquery-2.2.4.min.js"></script>';
 
 ?>
