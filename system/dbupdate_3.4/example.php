@@ -1,4 +1,5 @@
 <?php
+if (! defined('DB_NAME')) exit('No direct script access allowed');
 //EXAMPLE
 /*
 if(!$result = @$db->db_query("SELECT statusgrund_id FROM public.tbl_prestudentstatus LIMIT 1"))
