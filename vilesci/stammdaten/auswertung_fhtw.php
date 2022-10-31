@@ -1481,6 +1481,41 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 							AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
 						)
 				END AS punkte,
+			CASE WHEN (
+				(SELECT count(*)
+				FROM testtool.tbl_pruefling_frage
+				WHERE tbl_pruefling_frage.pruefling_id = tbl_pruefling.pruefling_id
+					AND tbl_pruefling_frage.frage_id IN (
+						SELECT frage.frage_id
+						FROM testtool.tbl_gebiet gebiet
+							JOIN testtool.tbl_frage frage USING(gebiet_id)
+						WHERE gebiet_id = tbl_gebiet.gebiet_id
+					)
+				AND begintime IS NOT NULL) > 0)
+			THEN
+				(CASE WHEN
+					(SELECT count(*)
+					FROM testtool.tbl_pruefling_frage
+					WHERE tbl_pruefling_frage.pruefling_id = tbl_pruefling.pruefling_id
+						AND tbl_pruefling_frage.frage_id IN (
+							SELECT frage.frage_id
+							FROM testtool.tbl_gebiet gebiet
+								JOIN testtool.tbl_frage frage USING(gebiet_id)
+							WHERE gebiet_id = tbl_gebiet.gebiet_id)
+							AND endtime IS NULL
+					) = (
+						SELECT count(*)
+						FROM testtool.tbl_pruefling_frage
+						WHERE tbl_pruefling_frage.pruefling_id = tbl_pruefling.pruefling_id
+							AND tbl_pruefling_frage.frage_id IN (
+								SELECT frage.frage_id
+								FROM testtool.tbl_gebiet gebiet
+									JOIN testtool.tbl_frage frage USING(gebiet_id)
+								WHERE gebiet_id = tbl_gebiet.gebiet_id)
+					)
+				THEN TRUE ELSE FALSE END
+			)
+			ELSE TRUE END AS gebiet_markieren,
 			rt.reihungstest_id,
 		    tbl_gebiet.gebiet_id,
 			tbl_gebiet.bezeichnung AS gebiet,
@@ -1628,6 +1663,8 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		}
 
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->name = $row->gebiet;
+
+		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->gebiet_markieren = $row->gebiet_markieren === 't';
 
 		if ($row->punkte >= $row->maxpunkte)
 		{
@@ -3246,8 +3283,7 @@ else
 							$zerovalclass = ' zerovalcolor';
 						}
 
-						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>
-								';
+						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap style=background-color:' . ($erg->gebiet[$gbt->gebiet_id]->gebiet_markieren ? 'yellow' : '') .'>';
 						// Punkte können nur gelöscht werden, solange "Zum Reihungstest angetreten" nicht gesetzt ist
 						if ($erg->teilgenommen == false || $rechte->isBerechtigt('admin'))
 						{
