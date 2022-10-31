@@ -17,16 +17,11 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-//require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
-$dr = DOC_ROOT;
-$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
-if($dr=='')
-	$dr='/';
+$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
 
 //Originaldateien des Herstellers
-echo '<script src="'.$dr.'vendor/jsoneditor/dist/jsoneditor.js"></script>';
-echo '<link href="'.$dr.'vendor/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">';
-
+echo '<script src="'.$dr.'vendor/josdejong/jsoneditor/dist/jsoneditor.js"></script>';
+echo '<link href="'.$dr.'vendor/josdejong/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">';
 
 ?>

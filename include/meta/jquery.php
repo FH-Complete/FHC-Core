@@ -17,15 +17,10 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-//require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
-$dr = DOC_ROOT;
-$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
-if($dr=='')
-	$dr='/';
+$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
 
 //Originaldateien des Herstellers
-echo '<script src="'.$dr.'vendor/jquery/jqueryV2/jquery-2.2.4.min.js"></script>';
-
+echo '<script src="'.$dr.'vendor/jquery/jquery2/jquery-2.2.4.min.js"></script>';
 
 ?>
