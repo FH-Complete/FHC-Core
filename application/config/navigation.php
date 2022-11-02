@@ -15,7 +15,7 @@ $config['navigation_header'] = array(
 			'description' => 'Organisation',
 			'sort' => 20,
 			'requiredPermissions' => 'basis/vilesci:r',
-			'children'=> array(
+			'children' => array(
 				'vilesci' => array(
 					'link' => base_url('vilesci'),
 					'icon' => '',
@@ -40,7 +40,7 @@ $config['navigation_header'] = array(
 			'description' => 'Lehre',
 			'sort' => 30,
 			'requiredPermissions' => 'basis/vilesci:r',
-			'children'=> array(
+			'children' => array(
 				'cis' => array(
 					'link' => CIS_ROOT,
 					'icon' => '',
@@ -71,16 +71,16 @@ $config['navigation_header'] = array(
 						'lehre/lehrauftrag_erteilen:r'
 					)
 				),
-                'zverfueg' => array(
-                    'link' => site_url('lehre/lvplanung/AdminZeitverfuegbarkeit'),
-                    'description' => 'Zeitverf&uuml;gbarkeit',
-                    'expand' => true,
-                    'sort' => 45,
-                    'requiredPermissions' => array(
-                        'lehre/zeitverfuegbarkeit:rw',
-                        'lehre/zeitverfuegbarkeit:rw'
-                    )
-                ),
+				'zverfueg' => array(
+					'link' => site_url('lehre/lvplanung/AdminZeitverfuegbarkeit'),
+					'description' => 'Zeitverf&uuml;gbarkeit',
+					'expand' => true,
+					'sort' => 45,
+					'requiredPermissions' => array(
+						'lehre/zeitverfuegbarkeit:rw',
+						'lehre/zeitverfuegbarkeit:rw'
+					)
+				),
 				'zgvueberpruefung' => array(
 					'link' => site_url('system/infocenter/ZGVUeberpruefung'),
 					'description' => 'ZGV Überprüfung',
@@ -98,7 +98,7 @@ $config['navigation_header'] = array(
 			'description' => 'Personen',
 			'sort' => 40,
 			'requiredPermissions' => 'basis/vilesci:r',
-			'children'=> array(
+			'children' => array(
 				'messages' => array(
 					'link' => site_url('system/messages/MessageClient/read'),
 					'icon' => '',
@@ -136,7 +136,7 @@ $config['navigation_header'] = array(
 			'expand' => false,
 			'sort' => 50,
 			'requiredPermissions' => 'admin:r',
-			'children'=> array(
+			'children' => array(
 				'extensions' => array(
 					'link' => site_url('system/extensions/Manager'),
 					'description' => 'Extensions Manager',
@@ -201,7 +201,8 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/*'] = array(
 		'icon' => 'dashboard',
 		'sort' => 1,
 		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r','lehre/lehrauftrag_erteilen:r')
-	),'lehrauftragBestellen' => array(
+	),
+	'lehrauftragBestellen' => array(
 		'link' => site_url('lehre/lehrauftrag/Lehrauftrag'),
 		'description' => 'Lehrauftrag bestellen',
 		'icon' => '',
@@ -223,6 +224,7 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/*'] = array(
 		'requiredPermissions' => array('lehre/lehrauftrag_erteilen:r')
 	)
 );
+
 $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
 	'lehrauftragDashboard' => array(
 		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
@@ -230,7 +232,8 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
 		'icon' => 'dashboard',
 		'sort' => 1,
 		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r','lehre/lehrauftrag_erteilen:r')
-	),'lehrauftragBestellen' => array(
+	),
+	'lehrauftragBestellen' => array(
 		'link' => site_url('lehre/lehrauftrag/Lehrauftrag'),
 		'description' => 'Lehrauftrag bestellen',
 		'icon' => '',
@@ -263,3 +266,4 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'requiredPermissions' => array('admin:rw')
 	)
 );
+
