@@ -175,6 +175,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('codex/Nation_model', 'NationModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('person/Geschlecht_model', 'GeschlechtModel');
+		$this->load->model('person/adresse_model', 'AdresseModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
@@ -1367,7 +1368,7 @@ class InfoCenter extends Auth_Controller
 			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 
 		$kontakte = $this->input->post('kontakt');
-		foreach($kontakte as $kontakt)
+		foreach ($kontakte as $kontakt)
 		{
 			$kontaktExists = $this->KontaktModel->loadWhere(array(
 				'kontakt_id' => $kontakt['id'],
@@ -1396,6 +1397,47 @@ class InfoCenter extends Auth_Controller
 
 				if (isError($update))
 					$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+			}
+		}
+		
+		$adressen = $this->input->post('adresse');
+		
+		foreach ($adressen as $adresse)
+		{
+			$adresseExists = $this->AdresseModel->loadWhere(array(
+				'adresse_id' => $adresse['id'],
+				'person_id' => $person_id,
+			));
+			
+			if (hasData($adresseExists))
+			{
+				$adresse = $adresse['value'];
+				$adresseExists = getData($adresseExists)[0];
+				if ($adresseExists->strasse !== $adresse['strasse'] ||
+					$adresseExists->plz !== $adresse['plz'] ||
+					$adresseExists->ort !== $adresse['ort'] ||
+					$adresseExists->nation !== $adresse['nation'])
+				{
+					$update = $this->AdresseModel->update(
+						array
+						(
+							'adresse_id' => $adresseExists->adresse_id
+						),
+						array
+						(
+							'strasse' => isEmptyString($adresse['strasse']) ? null : $adresse['strasse'],
+							'plz' => isEmptyString($adresse['plz']) ? null : $adresse['plz'],
+							'ort' => isEmptyString($adresse['ort']) ? null : $adresse['ort'],
+							'nation' => isEmptyString($adresse['nation']) ? null : $adresse['nation'],
+							'updateamum' => date('Y-m-d H:i:s'),
+							'updatevon' => $this->_uid
+						)
+					);
+					
+					if (isError($update))
+						$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+				}
+				
 			}
 		}
 

@@ -3,36 +3,52 @@
 		<table class="table">
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','titelpre')) ?></strong></td>
-				<td><input type="text" id="titelpre" readonly value="<?php echo $stammdaten->titelpre ?>"></td>
+				<td>
+					<div class='stammdaten' id="titelpre"><?php echo $stammdaten->titelpre ?></div>
+				</td>
+					<!--<input type="text" id="titelpre" readonly value="<?php /*echo $stammdaten->titelpre */?>">-->
 			</tr>
 
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','vorname')) ?></strong></td>
-				<td><input type="text" id="vorname" readonly value="<?php echo $stammdaten->vorname ?>"></td>
+				<td>
+					<div class='stammdaten' id="vorname"><?php echo $stammdaten->vorname ?></div>
+
+					<!--<input type="text" id="vorname" readonly value="<?php /*echo $stammdaten->vorname */?>">-->
+				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','nachname')) ?></strong></td>
 				<td>
-					<input type="text" id="nachname" readonly value="<?php echo $stammdaten->nachname ?>"></td>
+					<div class='stammdaten' id="nachname"><?php echo $stammdaten->nachname ?></div>
+					<!--<input type="text" id="nachname" readonly value="<?php /*echo $stammdaten->nachname */?>">-->
+				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','titelpost')) ?></strong></td>
-				<td><input type="text"  id="titelpost" readonly value="<?php echo $stammdaten->titelpost ?>"></td>
+				<td>
+					<div class='stammdaten' id="titelpost"><?php echo $stammdaten->titelpost ?></div>
+					<!--<input type="text"  id="titelpost" readonly value="<?php /*echo $stammdaten->titelpost */?>">-->
+				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','geburtsdatum')) ?></strong></td>
 				<td>
-					<input type="text"  id="gebdatum" readonly value="<?php echo date_format(date_create($stammdaten->gebdatum), 'd.m.Y') ?>" placeholder="DD.MM.YYYY"></td>
+					<div class='stammdaten' id="gebdatum"><?php echo date_format(date_create($stammdaten->gebdatum), 'd.m.Y') ?></div>
+					<!--<input type="text"  id="gebdatum" readonly value="<?php /*echo date_format(date_create($stammdaten->gebdatum), 'd.m.Y') */?>" placeholder="DD.MM.YYYY">-->
+				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','svnr')) ?></strong></td>
 				<td>
-					<input type="text"  id="svnr" readonly value="<?php echo $stammdaten->svnr ?>"></td>
+					<div class='stammdaten' id="svnr"><?php echo $stammdaten->svnr ?></div>
+					<!--<input type="text"  id="svnr" readonly value="<?php /*echo $stammdaten->svnr */?>">-->
+				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','staatsbuergerschaft')) ?></strong></td>
 				<td>
-					<select id="buergerschaft" readonly>
+					<select id="buergerschaft" disabled>
 						<?php
 						foreach ($all_nations as $nation)
 						{
@@ -50,7 +66,7 @@
 					<?php
 						$language = getUserLanguage() == 'German' ? 0 : 1;
 					?>
-					<select id="geschlecht" readonly>
+					<select id="geschlecht" disabled>
 						<?php
 						foreach ($all_genders as $gender)
 						{
@@ -67,7 +83,7 @@
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','geburtsnation')) ?></strong></td>
 				<td>
-					<select id="gebnation" readonly>
+					<select id="gebnation" disabled>
 
 					<?php
 						foreach ($all_nations as $nation)
@@ -82,7 +98,10 @@
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','geburtsort')) ?></strong></td>
-				<td><input type="text" id="gebort" readonly value="<?php echo $stammdaten->gebort ?>"></td>
+				<td>
+					<div class='stammdaten' id="gebort"><?php echo $stammdaten->gebort ?></div>
+					<!--<input type="text" id="gebort" readonly value="<?php /*echo $stammdaten->gebort */?>">-->
+				</td>
 			</tr>
 		</table>
 	</div>
@@ -111,14 +130,14 @@
 					<td><?php echo ucfirst($kontakt->kontakttyp) ?></td>
 				<?php endif; ?>
 					<td>
-						<?php echo '<span class="'.$kontakt->kontakttyp.'" data-value="'. $kontakt->kontakt .'">';?>
+						<?php echo '<span class="kontakt '.$kontakt->kontakttyp.'" data-id="'. $kontakt->kontakt_id .'" data-value="' . $kontakt->kontakt .'">';?>
 						<?php if ($kontakt->kontakttyp === 'email'): ?>
 							<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
 							<?php $lastMailAdress = $kontakt->kontakt;
 							endif;
-							if (($kontakt->kontakttyp === 'telefon' || $kontakt->kontakttyp === 'mobil'))
-								echo '<input type="text" data-value="'. $kontakt->kontakt_id .'" class="kontakt_nummer" readonly value="'. $kontakt->kontakt . '"/>';
-							else
+							/*if (($kontakt->kontakttyp === 'telefon' || $kontakt->kontakttyp === 'mobil'))
+								echo '<input type="text" data-value="'. $kontakt->kontakt_id .'" class="kontakt" readonly value="'. $kontakt->kontakt . '"/>';
+							else*/
 								echo $kontakt->kontakt;
 							if ($kontakt->kontakttyp === 'email'):
 							?>
@@ -135,8 +154,33 @@
 						<?php echo  ucfirst($this->p->t('person','adresse')) ?>
 					</td>
 					<td>
-						<?php echo isset($adresse) ? $adresse->strasse.', '.$adresse->plz.' '.$adresse->ort : '' ?>
-						<?php echo isset($adresse->nationkurztext) ? '<br />'.$adresse->nationkurztext : '' ?>
+						<?php if (isset($adresse)): ?>
+							<div class="row adresse col-sm-12" data-value="<?php echo $adresse->adresse_id ?>">
+								<div id="strasse_<?php echo $adresse->adresse_id ?>"><?php echo $adresse->strasse ?></div>
+								<!--<input type="text" id="strasse_<?php /*echo $adresse->adresse_id */?>" readonly value="<?php /*echo $adresse->strasse */?>">-->
+								
+								<div id="plz_<?php echo $adresse->adresse_id ?>"><?php echo $adresse->plz ?></div>
+								<!--<input type="text" id="plz_<?php /*echo $adresse->adresse_id */?>" readonly value="<?php /*echo $adresse->plz */?>">-->
+								
+								<div id="ort_<?php echo $adresse->adresse_id ?>"><?php echo $adresse->ort ?></div>
+								<!--<input type="text" id="ort_<?php /*echo $adresse->adresse_id */?>" readonly value="<?php /*echo $adresse->ort */?>">-->
+							
+							<?php if (isset($adresse->nationkurztext)): ?>
+								<select id="nation_<?php echo $adresse->adresse_id ?>" disabled>
+									<?php
+									foreach ($all_nations as $nation)
+									{
+										$selected = '';
+										if ($nation->nation_code === $adresse->nation)
+											$selected = 'selected';
+										echo "<option value='". $nation->nation_code ."' " . $selected . ">". $nation->langtext . "</option>";
+									}
+									?>
+								</select>
+							</div>
+							<br />
+							<?php endif; ?>
+						<?php endif; ?>
 					</td>
 					<td>
 						<?php echo ($adresse->heimatadresse === true ? 'Heimatadresse' : '').
