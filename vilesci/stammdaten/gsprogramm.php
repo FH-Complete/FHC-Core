@@ -52,6 +52,7 @@ if($action=='save')
 		$gsprogramm->bezeichnung = $_POST['bezeichnung'];
 		$gsprogramm->gsprogrammtyp_kurzbz = $_POST['gsprogrammtyp_kurzbz'];
 		$gsprogramm->programm_code = $_POST['programm_code'];
+		$gsprogramm->studienkennung_uni = $_POST['studienkennung_uni'];
 		if($gsprogramm->save())
 			echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 		else
@@ -82,7 +83,7 @@ echo '<!DOCTYPE HTML>
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -124,6 +125,7 @@ echo '
 		<th>Bezeichnung</th>
 		<th>Programmcode</th>
 		<th>Typ</th>
+		<th>Studienkennung Uni</th>
 	</thead>
 	<tbody>
 		';
@@ -143,6 +145,7 @@ echo '
 				<td>'.$row->bezeichnung.'</td>
 				<td>'.$row->programm_code.'</td>
 				<td>'.(isset($typ_arr[$row->gsprogrammtyp_kurzbz])?$typ_arr[$row->gsprogrammtyp_kurzbz]:$row->gsprogrammtyp_kurzbz).'</td>
+				<td>'.$row->studienkennung_uni.'</td>
 			</tr>';
 	}
 
@@ -193,6 +196,13 @@ echo '
 	}
 	echo '
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>StudienkennungUni</td>
+			<td>
+				<input type="text" id="studienkennung_uni" name="studienkennung_uni" size="50" minlength="6" maxlength="14"
+				value="'.$db->convert_html_chars($gsprogramm->studienkennung_uni).'">
 			</td>
 		</tr>
 		<tr>

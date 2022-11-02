@@ -313,7 +313,7 @@ class Lehrveranstaltung_model extends DB_Model
 	/**
 	 * Sucht nach LV Templates und gibt Id und Label ("bezeichnung [kurzbz]") aus
 	 * Diese funktion ist für autocomplete gedacht
-	 * 
+	 *
 	 * @param string $filter Suchfilter
 	 * @return \stdClass A return object
 	 */
@@ -337,7 +337,7 @@ class Lehrveranstaltung_model extends DB_Model
 	/**
 	 * Lädt Template und gibt Id und Label ("bezeichnung [kurzbz]") zurück
 	 * Diese funktion ist für autocomplete gedacht
-	 * 
+	 *
 	 * @param string $name
 	 * @return \stdClass A return object
 	 */
@@ -355,4 +355,120 @@ class Lehrveranstaltung_model extends DB_Model
 		return $this->execQuery($qry);
 	}
 
+
+    /**
+     * Get ECTS Summe pro angerechnetes Quereinstiegssemester.
+     *
+     * @param $studiengang_kz
+     * @param $studiensemester_kurzbz
+     * @param $ausbildungssemester
+     * @param $orgform_kurzbz
+     * @return array|stdClass|null
+     */
+    public function getSumQuereinstiegsECTSProSemester($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz)
+    {
+        $qry = '
+            SELECT
+                sum(tbl_lehrveranstaltung.ects) as "sum_ects"
+            FROM
+                lehre.tbl_studienplan
+                JOIN lehre.tbl_studienplan_lehrveranstaltung USING (studienplan_id)
+                JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+            WHERE
+                tbl_studienplan.studienplan_id = (
+                    SELECT 
+                        studienplan_id
+                    FROM 
+                        lehre.tbl_studienordnung 
+                        JOIN lehre.tbl_studienplan USING (studienordnung_id) 
+                        JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+                    WHERE tbl_studienordnung.studiengang_kz = ?
+                        AND tbl_studienplan_semester.semester = ?
+                        AND tbl_studienplan_semester.studiensemester_kurzbz = ?
+                        AND tbl_studienplan.orgform_kurzbz = ?
+                
+                    LIMIT 1
+                )
+            AND tbl_studienplan_lehrveranstaltung.semester = ?
+            AND studienplan_lehrveranstaltung_id_parent IS NULL -- auf Modulebene
+            AND tbl_studienplan_lehrveranstaltung.export = TRUE
+        ';
+
+        return $this->execQuery($qry, array(
+            $studiengang_kz, $ausbildungssemester, $studiensemester_kurzbz, $orgform_kurzbz, $ausbildungssemester)
+        );
+    }
+
+    /**
+     * Get ECTS Summe aller bisher angerechneten LVs.
+     * Wenn keine explizite Begruendung angegeben ist, wird eine schulische Begruendung angenommen.
+     *
+     * @param $student_uid
+     * @return array|stdClass|null
+     */
+    public function getSumAngerechneteECTSByBegruendung($student_uid)
+    {
+        $qry = '
+            SELECT sum(ects), begruendung_id FROM (
+                SELECT 
+                    lehrveranstaltung_id, studiensemester_kurzbz, ects, COALESCE(begruendung_id, 1) as begruendung_id -- fallback auf externes Zeugnis
+            FROM 
+                lehre.tbl_zeugnisnote 
+                LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz) 
+                JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+                JOIN public.tbl_student USING(student_uid)
+            WHERE 
+                tbl_zeugnisnote.note = 6
+                AND student_uid = ?
+                AND (lehre.tbl_anrechnung.prestudent_id = tbl_student.prestudent_id 
+                         OR lehre.tbl_anrechnung.prestudent_id is null)
+                
+            UNION 
+                
+            SELECT 
+                lehrveranstaltung_id, studiensemester_kurzbz, ects, begruendung_id -- fallback auf externes Zeugnis
+            FROM 
+                lehre.tbl_anrechnung 
+                JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+                JOIN public.tbl_student USING(prestudent_id)
+            WHERE 
+                genehmigt_von is not null
+                AND student_uid = ? 
+            ) lvsangerechnet 
+            GROUP BY begruendung_id
+        ';
+
+        return $this->execQuery($qry, array($student_uid, $student_uid));
+    }
+
+    /**
+     * Get ECTS Summe aller bisher schulisch begruendeten angerechneten LVs.
+     * Derzeit wird auch jede Anrechnung, die nicht beruflich ist, als schulisch angenommen.
+     *
+     * @param $student_uid
+     * @return array|stdClass|null
+     */
+    public function getEctsSumSchulisch($student_uid, $prestudent_id, $studiengang_kz)
+    {
+        $qry = '
+            SELECT get_ects_summe_schulisch(?, ?, ?) AS ectsSumSchulisch
+        ';
+
+        return $this->execQuery($qry, array($student_uid, $prestudent_id, $studiengang_kz));
+    }
+
+    /**
+     * Get ECTS Summe aller bisher beruflich angerechneten LVs.
+     *
+     * @param $student_uid
+     * @return array|stdClass|null
+     */
+    public function getEctsSumBeruflich($student_uid)
+    {
+        $qry = '
+            SELECT get_ects_summe_beruflich(?) AS ectsSumBeruflich
+        ';
+
+        return $this->execQuery($qry, array($student_uid));
+    }
 }
