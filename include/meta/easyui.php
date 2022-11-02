@@ -17,23 +17,16 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-//require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
-
-$dr = DOC_ROOT;
-$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
-if($dr=='')
-	$dr='/';
-
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/easyui/themes/icon.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/easyui/themes/gray/easyui.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'FHC-vendor/easyui/themes/icon.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'FHC-vendor/easyui/themes/gray/easyui.css">';
 
-echo '<script src="'.$dr.'FHC-vendor/easyui/jquery.min.js"></script>';
-echo '<script src="'.$dr.'FHC-vendor/easyui/jquery.easyui.min.js"></script>';
+echo '<script src="'.BASE_LOCATION.'FHC-vendor/easyui/jquery.min.js"></script>';
+echo '<script src="'.BASE_LOCATION.'FHC-vendor/easyui/jquery.easyui.min.js"></script>';
 
 
 //Anpassungen
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/easyui/easyui.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/easyui/icon.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'include/vendor_custom/easyui/easyui.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'include/vendor_custom/easyui/icon.css">';
 
 ?>

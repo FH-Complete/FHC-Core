@@ -169,6 +169,15 @@ abstract class FHC_Controller extends CI_Controller
 		}
 	}
 
+	/**
+	 * Return the JSON decoded HTTP POST request
+	 * If the request is not in JSON format then a null value is returned
+	 */
+	protected function getPostJSON()
+	{
+		return json_decode($this->input->raw_input_stream);
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -185,3 +194,4 @@ abstract class FHC_Controller extends CI_Controller
 		}
 	}
 }
+

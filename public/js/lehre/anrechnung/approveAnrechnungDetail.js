@@ -607,9 +607,10 @@ var approveAnrechnungDetail = {
         {
             return;
         }
-        if(
-            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text())) > 60 ||
-            (parseFloat($('#ects').text()) + parseFloat($('#sumEctsBeruflich').text())) > 60 ||
+
+        if (
+            (begruendung_id != 4 && (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()))) > 60 ||
+            (begruendung_id == 4 && (parseFloat($('#ects').text()) + parseFloat($('#sumEctsBeruflich').text()))) > 60 ||
             (parseFloat($('#ects').text()) + parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
         )
         {
