@@ -105,6 +105,26 @@ else
 
 	$ical->importFreeBusy($doc, 'LVPLAN');
 }
+
+//Zeitsperren
+$fp = fopen(APP_ROOT.'cis/public/freebusy_zeitsperren.php/'.$uid,'r');
+if (!$fp)
+{
+	echo "URL kann nicht geoeffnet werden<br />\n";
+}
+else
+{
+	$doc = '';
+	while (!feof($fp))
+	{
+		$line = fgets($fp);
+		$doc.=$line;
+	}
+	fclose($fp);
+
+	$ical->importFreeBusy($doc, 'Zeitsperren');
+}
+
 echo $ical->getFreeBusy();
 echo "\nEND:VCALENDAR";
 ?>

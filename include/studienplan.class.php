@@ -952,21 +952,34 @@ class studienplan extends basis_db
 	/**
 	 * Laedt die Studienplaene zu denen eine Lehrveranstaltung zugeordnet ist
 	 */
-	public function getStudienplanLehrveranstaltung($lehrveranstaltung_id, $studiensemester_kurzbz)
+	public function getStudienplanLehrveranstaltung($lehrveranstaltung_id, $studiensemester_kurzbz = null)
 	{
 		$qry= "
 			SELECT
-			distinct tbl_studienplan.*
+				DISTINCT tbl_studienplan.*
 			FROM
-			lehre.tbl_studienplan
-			JOIN lehre.tbl_studienplan_lehrveranstaltung USING(studienplan_id)
+				lehre.tbl_studienplan
+				JOIN lehre.tbl_studienplan_lehrveranstaltung 
+					USING(studienplan_id)
 			WHERE
-			tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
-			AND EXISTS (
-			SELECT 1 FROM lehre.tbl_studienplan_semester
-			WHERE studienplan_id=tbl_studienplan.studienplan_id
-			AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
-			AND semester = tbl_studienplan_lehrveranstaltung.semester)
+				tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id IN (
+					SELECT 
+						lv.lehrveranstaltung_id
+					FROM
+						lehre.tbl_lehrveranstaltung AS lv
+						LEFT JOIN lehre.tbl_lehrveranstaltung AS t ON t.lehrveranstaltung_id=lv.lehrveranstaltung_template_id
+					WHERE
+						lv.lehrtyp_kurzbz<>'tpl'
+						AND (lv.lehrveranstaltung_id=" . $this->db_add_param($lehrveranstaltung_id, FHC_INTEGER) . " OR (lv.lehrveranstaltung_template_id=" . $this->db_add_param($lehrveranstaltung_id, FHC_INTEGER) . " AND t.lehrtyp_kurzbz='tpl'))
+					)
+				AND EXISTS (
+					SELECT 1 
+					FROM 
+						lehre.tbl_studienplan_semester
+					WHERE studienplan_id=tbl_studienplan.studienplan_id".
+						($studiensemester_kurzbz != null ? "
+						AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz) : "")."
+						AND semester = tbl_studienplan_lehrveranstaltung.semester)
 			ORDER BY bezeichnung";
 
 		if($result = $this->db_query($qry))
