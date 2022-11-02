@@ -926,7 +926,10 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "PersonId"},
-					{"name": "Fehlerstatus"}
+					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
+					{"name": "Person Zuständigkeiten"},
+					{"name": "Organisationseinheit Zuständigkeiten"}
 				],
 				"filters": [
 					{
@@ -960,7 +963,10 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "PersonId"},
-					{"name": "Fehlerstatus"}
+					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
+					{"name": "Person Zuständigkeiten"},
+					{"name": "Organisationseinheit Zuständigkeiten"}
 				],
 				"filters": [
 					{
@@ -991,6 +997,7 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "PersonId"},
 					{"name": "Fehlerstatus"},
+					{"name": "Zugehörigkeit"},
 					{"name": "Verarbeitet von"},
 					{"name": "Verarbeitet am"}
 				],
@@ -1022,16 +1029,14 @@ $filters = array(
 			{
 				"name": "Projektübersicht",
 				"columns": [
-					{"name": "ProjectWorkID"},
+					{"name": "Studiengang"},
+					{"name": "StudentNachname"},
+					{"name": "Abgabedatum"},
+					{"name": "Note"},
 					{"name": "ErstNachname"},
 					{"name": "ErstAbgeschickt"},
 					{"name": "ZweitNachname"},
-					{"name": "ZweitAbgeschickt"},
-					{"name": "StudentNachname"},
-					{"name": "Note"},
-					{"name": "Abgabedatum"},
-					{"name": "Studiengang"},
-					{"name": "Kommissionsmitglieder"}
+					{"name": "ZweitAbgeschickt"}
 				],
 				"filters": []
 			}
@@ -1079,6 +1084,82 @@ $filters = array(
 					{"name": "svnr"},
 					{"name": "ersatzkennzeichen"},
 					{"name": "mitarbeiter"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'employees',
+		'filter_kurzbz' => 'mitarbeiter',
+		'description' => '{MA Uebersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Mitarbeiter",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Alias"},
+					{"name": "Aktiv"},
+					{"name": "Raum"},
+					{"name": "Geschlecht"},
+					{"name": "Standardkostenstelle"}
+				],
+				"filters": [
+					{                              
+					"name": "Nachname",      
+					"option": "",            
+					"condition": "",         
+					"operation": ""          
+					}    
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'fehlerZustaendigkeiten',
+		'filter_kurzbz' => 'fehlerZustaendigkeiten',
+		'description' => '{Fehler Zustaendigkeiten}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehler Zuständigkeiten",
+				"columns": [
+					{"name": "fehlercode"},
+					{"name": "person_id"},
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "oe_bezeichnung"},
+					{"name": "funktion_beschreibung"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'gruppenmanagement',
+		'filter_kurzbz' => 'gruppenmanagement',
+		'description' => '{Meine Gruppen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "gruppenmanagement",
+				"columns": [
+					{"name": "gruppe_kurzbz"},
+					{"name": "gruppe_bezeichnung"},
+					{"name": "gruppe_beschreibung"},
+					{"name": "studiengang_kurzbz"}
 				],
 				"filters": []
 			}

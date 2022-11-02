@@ -438,7 +438,7 @@ Alte Anmerkungen: ".$personToDelete_obj->anmerkungen;
 
 				$anmerkung .= "
 				
-Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y H:i:s');
+Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y H:i:s')." von ".$uid;
 
 				// Letztbenutzten Zugangscode abfragen und übernehmen
 				$zugangscode = '';
@@ -1189,7 +1189,7 @@ function resize($base64, $width, $height) // 828 x 1104 -> 240 x 320
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 <link href="../../skin/jquery.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript"
-	src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript"
 	src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript"
@@ -1338,12 +1338,12 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 	echo '<br><br><div contenteditable="true" style="width: 100%; height : 150px; border : 1px dotted grey; overflow-y:auto; text-align: left; font-size: 9pt">' . $messageOutput . '</div><br>';
 
 	// Tabellen anzeigen
-	echo '<form name="form_table" action="personen_wartung.php?filter=' . $db->convert_html_chars($filter) . '" method="POST">';
+	echo '<form name="form_table" action="personen_wartung.php?filter='.$db->convert_html_chars($filter).'&person_id_1='.$person_id_1.'&person_id_2='.$person_id_2.'" method="POST">';
 	echo '<div style="text-align: center"><input type="submit" value="Zusammenlegen" class="button" onclick="return checkPersonen()"></div>';
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
 
-	echo '<td valign="top" style="text-align: center;"><span style="font-size: 1.5em; font-style: bold; color: red;">Person wird gelöscht:</span>';
+	echo '<td valign="top" style="text-align: center;"><span style="font-size: 1.5em; color: red;">Person wird gelöscht:</span>';
 
 	// Tabelle 1
 	echo '<table id="t1" class="tablesorter" style="padding-right: 5px"><thead><tr>';
