@@ -940,7 +940,7 @@ or not exists
 		$tagessaldo = $tagessaldo - $pausesumme;
 
 		//check if blocking error
-		if (($tagessaldo > 19800 && $pausesumme < 1800) || ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000))
+		if (($tagessaldo >= 19800 && $pausesumme < 1800) || ($tagessaldo > 18000 && $tagessaldo < 19800 && $pausesumme < $tagessaldo - 18000))
 		{
 			$blockingError = true;
 		}

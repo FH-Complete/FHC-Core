@@ -831,6 +831,7 @@ class lehreinheit extends basis_db
 		}
 		while($row = $this->db_fetch_object())
 		{
+			if(!isset($this->lehreinheiten[$row->unr])) $this->lehreinheiten[$row->unr] = new stdClass();
 			$this->lehreinheiten[$row->unr]->lehreinheit_id[]=$row->lehreinheit_id;
 			$this->lehreinheiten[$row->unr]->lvnr[]=$row->lvnr;
 			$this->lehreinheiten[$row->unr]->unr=$row->unr;

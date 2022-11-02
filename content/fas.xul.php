@@ -26,6 +26,7 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/variable.class.php');
 require_once('../include/addon.class.php');
+require_once('../include/datum.class.php');
 
 $user=get_uid();
 
@@ -44,6 +45,8 @@ if(!$variable->loadVariables($user))
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+
+$datum_obj = new datum();
 
 if(!$rechte->isBerechtigt('basis/fas'))
 	die('Sie haben keine Berechtigung für diese Seite');
@@ -248,6 +251,7 @@ foreach($addon_obj->result as $addon)
 				label = '$stsem->studiensemester_kurzbz'
 				type = 'radio'
 				command = 'menu-properties-studiensemester:command'
+				tooltiptext = '(".$datum_obj->formatDatum($stsem->start, "d.m.Y")." - ".$datum_obj->formatDatum($stsem->ende, "d.m.Y").")'
 				checked = ".($variable->variable->semester_aktuell==$stsem->studiensemester_kurzbz?"'true' ":"'false'")." />";
        		}
        ?>
@@ -934,8 +938,8 @@ foreach($addon_obj->result as $addon)
 				oncommand="studiensemesterChange('', 1)"
 			/>
 	</statusbarpanel>
-	<statusbarpanel>
-		<toolbarbutton id="statusbarpanel-semester-aktuell" label="Aktuelles Studiensemester" oncommand="getStudiensemesterAktuell()"/>
+	<statusbarpanel id="statusbarpanel-panel-semester-aktuell">
+		<toolbarbutton id="statusbarpanel-semester-aktuell" label="Aktuelles Studiensemester" oncommand="setStudiensemesterAktuell()"/>
 	</statusbarpanel>
 	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo DB_NAME; ?>"/>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />

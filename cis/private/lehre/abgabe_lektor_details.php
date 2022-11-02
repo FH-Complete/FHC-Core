@@ -120,19 +120,26 @@ if(!$projektarbeit_obj->load($projektarbeit_id))
 $titel = $projektarbeit_obj->titel;
 $student_uid = $projektarbeit_obj->student_uid;
 
-// paarbeit sollte nur ab SS2021 online bewertet werden
-$qry_sem="SELECT 1
-		FROM lehre.tbl_projektarbeit
-    	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-		JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
-		AND tbl_studiensemester.start::date >= (SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz = 'SS2021')::date
-		LIMIT 1";
-$result_sem=$db->db_query($qry_sem);
-$num_rows_sem = $db->db_num_rows($result_sem);
-if($num_rows_sem < 0)
+// paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
+$num_rows_sem = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
+
+if(!is_numeric($num_rows_sem) || $num_rows_sem < 0)
 {
 	echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
+}
+
+// Endupload sollte vor Benotung durchgeführt worden sein
+$qry_endupload="SELECT 1
+		FROM campus.tbl_paabgabe
+		WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
+		AND paabgabetyp_kurzbz='end'
+		AND abgabedatum IS NOT NULL
+		LIMIT 1";
+$result_endupload=$db->db_query($qry_endupload);
+$num_rows_endupload = $db->db_num_rows($result_endupload);
+if($num_rows_endupload < 0)
+{
+	echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerErmittelnEnduploadProjektarbeit')."</font><br>&nbsp;";
 }
 
 // Zweitbegutachter holen
@@ -457,7 +464,11 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 $htmlstr .= "<table id='beurteilungheadertable' width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
 $htmlstr .= "<td width=10% align=center>";
-if ($num_rows_sem >= 1)
+
+$semester_benotbar = $num_rows_sem >= 1;
+$endupload_vorhanden = $num_rows_endupload >= 1;
+
+if ($semester_benotbar && $endupload_vorhanden)
 {
 	$htmlstr .= "<form action='../../../index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung' title='Benotungsformular' target='_blank' method='GET'>";
 	$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
@@ -466,9 +477,10 @@ if ($num_rows_sem >= 1)
 }
 else
 {
+	$quick_info = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenoten') : $p->t('abgabetool/keinEnduploadErfolgt');
 	$htmlstr .= "<form action='javascript:void(0);'>";
-	$htmlstr .= "<input type='submit' value='".$p->t('abgabetool/benoten')."' title='".$p->t('abgabetool/aeltereParbeitBenoten')."'
-					alt='".$p->t('abgabetool/aeltereParbeitBenoten')."' disabled>";
+	$htmlstr .= "<input type='submit' value='".$p->t('abgabetool/benoten')."' title='".$quick_info."'
+					alt='".$quick_info."' disabled>";
 	$htmlstr .= "</form>";
 }
 $htmlstr .= "</td>";

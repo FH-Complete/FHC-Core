@@ -233,12 +233,21 @@ if (isset($_REQUEST["submit"]))
 						continue;
 					}
 					$punkte=str_replace(',','.', $punkte);
-					//UID ermitteln
+
+					//check ob statt Matrikelnummer nicht bereits student_uid (Moodle Grade Import) vorliegt..
 					$student = new student();
-					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
+					if (!$student->checkIfValidStudentUID($matrikelnummer))
 					{
-						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
-						continue;
+						//UID ermitteln
+						if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
+						{
+							$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
+							continue;
+						}
+					}
+					else
+					{
+						$student_uid = $matrikelnummer;
 					}
 
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
