@@ -2542,4 +2542,80 @@ class prestudent extends person
 			return false;
 		}
 	}
+
+	/**
+	 * Prueft, ob eine Person offene Bewerbungen besitzt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn vorhanden, false wenn nicht vorhanden
+	 */
+	public function existsOffeneBewerbung($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps
+				WHERE
+					person_id = ".$this->db_add_param($person_id)."
+				And
+					get_rolle_prestudent(prestudent_id, null) in ('Interessent','Bewerber','Aufgenommener','Wartender');";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+			if ($num_rows > 0)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+
+	/**
+	 * Prueft, ob es sich um einen Student / Unterbrecher handelt
+	 * @param int $person_id ID der zu überprüfenden Person.
+	 * @return true wenn zutreffend, false wenn nicht zutreffend
+	 */
+	public function isStudent($person_id)
+	{
+		if (!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$db = new basis_db();
+
+		$qry = "SELECT
+					prestudent_id
+				FROM
+					tbl_prestudent ps
+				WHERE
+					person_id = ".$this->db_add_param($person_id)."
+				And
+					get_rolle_prestudent(prestudent_id, null) in ('Student','Unterbrecher');";
+
+		if ($db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows();
+			if ($num_rows > 0)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
+	}
 }

@@ -138,7 +138,7 @@ class Studiensemester extends Auth_Controller
 		$start = $this->input->post("semstart");
 		$ende = $this->input->post("semende");
 		$studienjahr_kurzbz = $this->input->post("studienjahrkurzbz");
-		$beschreibung = $this->input->post("beschreibung");
+		$beschreibung = isEmptyString($this->input->post("beschreibung")) ? null : $this->input->post("beschreibung");
 		$onlinebewerbung = $this->input->post("onlinebewerbung");
 		$onlinebewerbung = isset($onlinebewerbung);
 
