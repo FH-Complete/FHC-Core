@@ -150,22 +150,57 @@ function generateJSsInclude($JSs)
 }
 
 /**
+ * Generates tags for the javascript modules you want to include, the parameter could by a string or an array of strings
+ */
+function generateJSModulesInclude($JSModules)
+{
+	$jsInclude = '<script type="module" src="%s"></script>';
+
+	$ci =& get_instance();
+	$cachetoken = '?'.$ci->config->item('fhcomplete_build_version');
+
+	if (isset($JSModules))
+	{
+		$tmpJSs = is_array($JSModules) ? $JSModules : array($JSModules);
+
+		for ($tmpJSsCounter = 0; $tmpJSsCounter < count($tmpJSs); $tmpJSsCounter++)
+		{
+			$toPrint = sprintf($jsInclude, base_url($tmpJSs[$tmpJSsCounter].$cachetoken)).PHP_EOL;
+
+			if ($tmpJSsCounter > 0) $toPrint = "\t\t".$toPrint;
+
+			echo $toPrint;
+		}
+	}
+}
+
+/**
  * Generates all the includes needed by the Addons
  */
 function generateAddonsJSsInclude($calledFrom)
 {
 	$aktive_addons = array_filter(explode(";", ACTIVE_ADDONS));
 
+	// For each active addon
 	foreach ($aktive_addons as $addon)
 	{
+		// Build the path to the hook file
 		$hookfile = DOC_ROOT.'addons/'.$addon.'/hooks.config.inc.php';
+
+		// If the hook file exists
 		if (file_exists($hookfile))
 		{
-			include($hookfile);
+			$js_hooks = array(); // default value
+
+			include($hookfile); // include the hook file where the array js_hooks should be setup
+
+			// If it contains the provided key calledFrom
 			if (key_exists($calledFrom, $js_hooks))
 			{
 				foreach ($js_hooks[$calledFrom] as $js_file)
+				{
 					generateJSsInclude('addons/'.$addon.'/'.$js_file);
+				}
 			}
 		}
 	}
@@ -180,3 +215,4 @@ function generateBackwardCompatibleJSMsIe($js)
 	echo '	<script type="text/javascript" src="'.$js.'"></script>'."\n";
 	echo "<![endif]-->\n";
 }
+
