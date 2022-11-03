@@ -14,3 +14,14 @@
 		grid-template-columns:repeat(2,1fr);
 	}
 }
+
+.mirror-x {
+	transform: scaleX(-1);
+}
+
+.cursor-nw-resize {
+	cursor: nw-resize;
+}
+.cursor-move {
+	cursor: move;
+}

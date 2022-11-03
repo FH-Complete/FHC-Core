@@ -103,14 +103,14 @@ export default {
 		</div>
 	</div>
 	<div v-else-if="!hidden || editMode" :class="'dashboard-item card overflow-hidden ' + (arguments ? arguments.className : '')" @mousedown="mouseDown($event)" @dragstart="startDrag($event)" :draggable="!!editMode">
-		<div v-if="editMode && widget" class="card-header d-flex">
-			<span ref="dragHandle" class="col-auto pe-3"><i class="fa-solid fa-grip-vertical"></i></span>
+		<div v-if="editMode && widget" class="card-header d-flex ps-0 pe-2">
+			<span ref="dragHandle" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
 			<span class="col">{{ widget.setup.name }}</span>
-			<a v-if="hasConfig" class="col-auto ps-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
-			<a v-if="custom" class="col-auto ps-1" href="#" @click.prevent="$emit('remove')">
+			<a v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
+			<a v-if="custom" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
 				<i class="fa-solid fa-trash"></i>
 			</a>
-			<div v-else class="col-auto ps-1 form-switch">
+			<div v-else class="col-auto px-1 form-switch">
 				<input class="form-check-input ms-0" type="checkbox" role="switch" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
 			</div>
 		</div>
@@ -132,7 +132,7 @@ export default {
 			</template>
 		</bs-modal>
 		<div v-if="editMode && isResizeable" class="card-footer d-flex justify-content-end p-0">
-			<span ref="resizeHandle" class="col-auto ps-1" @dragstart.prevent="$emit('resize')"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></span>
+			<span ref="resizeHandle" class="col-auto px-1 cursor-nw-resize" @dragstart.prevent="$emit('resize')"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
 		</div>
 	</div>`
 }
