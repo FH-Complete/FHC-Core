@@ -3,10 +3,10 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Gradelist',
-			'jquery' => true,
-			'jqueryui' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
+			'jquery3' => true,
+			'jqueryui1' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
 			'ajaxlib' => true,
 			'customCSSs' => array(
 				'public/css/tools/gradelist.css',
@@ -31,14 +31,26 @@
 					</div>
 				</div>
 				<div>
-					<b><?php echo $this->p->t('lehre', 'notendurchschnitt'); ?>
-						<img src="../../../../skin/images/information.png" title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt')); ?>" />:</b>
+					<b>
+						<?php echo $this->p->t('lehre', 'notendurchschnitt'); ?>
+						<img
+							src="../../../../skin/images/information.png"
+							title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt')); ?>"
+						/>:
+					</b>
 					<?php echo $courses['overall']['notendurchschnitt'] ?><br>
-					<b><?php echo $this->p->t('lehre', 'gewichteternotendurchschnitt'); ?>
-						<img src="../../../../skin/images/information.png" title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt_gewichtet')); ?>" />:</b>
+					<b>
+						<?php echo $this->p->t('lehre', 'gewichteternotendurchschnitt'); ?>
+						<img
+							src="../../../../skin/images/information.png"
+							title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt_gewichtet')); ?>"
+						/>:
+					</b>
 					<?php echo $courses['overall']['notendurchschnittgewichtet'] ?><br>
-					<b><?php echo $this->p->t('lehre', 'ects'); ?>
-						<img src="../../../../skin/images/information.png" title="Summe der positiv absolvierten ECTS" />:</b>
+					<b>
+						<?php echo $this->p->t('lehre', 'ects'); ?>
+						<img src="../../../../skin/images/information.png" title="Summe der positiv absolvierten ECTS" />:
+					</b>
 					<?php echo $courses['overall']['ectssumme_positiv'] ?><br>
 					<br>
 					<?php
@@ -54,3 +66,4 @@
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
+

@@ -528,6 +528,13 @@ class Messages_model extends CI_Model
 	 */
 	public function sendReply($receiver_id, $subject, $body, $relationmessage_id, $token)
 	{
+		// Checks that the receiver_id, relationmessage_id and token belongs to the same message
+		$crossedDataResult = $this->MessageTokenModel->crossClientData($token, $relationmessage_id, $receiver_id);
+		if (isError($crossedDataResult)) show_error(getError($crossedDataResult));
+		if (!hasData($crossedDataResult)) show_error(
+			'The parameters token, relationmessage_id and receiver_id do not belong to the same message'
+		);
+
 		// Retrieves message sender information
 		$senderResult = $this->MessageTokenModel->getSenderData($receiver_id);
 		if (isError($senderResult)) show_error(getError($senderResult));

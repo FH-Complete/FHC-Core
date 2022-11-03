@@ -556,7 +556,7 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getOrganisationunitsByPersonId($person_id)
 	{
-		$query = 'SELECT o.oe_kurzbz,
+		$query = 'SELECT DISTINCT o.oe_kurzbz,
 						o.bezeichnung,
 						(CASE
 							WHEN sg.typ = \'b\' THEN ps.prestudent_id

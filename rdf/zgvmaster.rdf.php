@@ -52,6 +52,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
         	<ZGVMASTER:code></ZGVMASTER:code>
         	<ZGVMASTER:bezeichnung>-- keine Auswahl --</ZGVMASTER:bezeichnung>
         	<ZGVMASTER:kurzbz>-- keine Auswahl --</ZGVMASTER:kurzbz>
+					<ZGVMASTER:aktiv></ZGVMASTER:aktiv>
       	</RDF:Description>
       </RDF:li>
 ';
@@ -69,6 +70,7 @@ if($db->db_query($qry))
         	<ZGVMASTER:code><![CDATA[<?php echo $row->zgvmas_code;  ?>]]></ZGVMASTER:code>
         	<ZGVMASTER:bezeichnung><![CDATA[<?php echo $row->zgvmas_bez; ?>]]></ZGVMASTER:bezeichnung>
         	<ZGVMASTER:kurzbz><![CDATA[<?php echo $row->zgvmas_kurzbz; ?>]]></ZGVMASTER:kurzbz>
+					<ZGVMASTER:aktiv><![CDATA[<?php echo $row->aktiv?>]]></ZGVMASTER:aktiv>
       	</RDF:Description>
       </RDF:li>
 <?php
