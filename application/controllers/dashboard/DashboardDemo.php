@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  */
-class Dashboard extends Auth_Controller
+class DashboardDemo extends Auth_Controller
 {
     private $_uid;  // uid of the logged user
 
@@ -32,7 +32,7 @@ class Dashboard extends Auth_Controller
     // Public methods
 	public function index()
 	{
-		$this->load->view('dashboard/dashboard.php', []);
+		$this->load->view('dashboard/dashboard_demo.php', []);
 	}
 
     // -----------------------------------------------------------------------------------------------------------------
