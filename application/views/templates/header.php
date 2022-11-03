@@ -41,12 +41,12 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 <?php if($jqueryV1) : ?>
-	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jqueryV1/jquery-1.12.4.min.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jquery1/jquery-1.12.4.min.js'); ?>"></script>
 	<script type="text/javascript" src="<?php echo base_url('vendor/christianbach/tablesorter/jquery.tablesorter.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($jqueryV2) : ?>
-	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jqueryV2/jquery-2.2.4.min.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jquery2/jquery-2.2.4.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($jqueryui) : ?>
@@ -95,7 +95,7 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 <?php if($tinymce) : ?>
-	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce/tinymce.min.js');?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce4/tinymce.min.js');?>"></script>
 <?php endif ?>
 
 <?php if($textile) : ?>
@@ -103,13 +103,13 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 <?php if($jsoneditor) : ?>
-	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.css');?>" />
-	<script type="text/javascript" src="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.js');?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/josdejong/jsoneditor/dist/jsoneditor.css');?>" />
+	<script type="text/javascript" src="<?php echo base_url('vendor/josdejong/jsoneditor/dist/jsoneditor.js');?>"></script>
 <?php endif ?>
 
 <?php if($jsonforms) : ?>
-	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/json-forms/dist/css/brutusin-json-forms.min.css'); ?>" />
-	<script type="text/javascript" src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/brutusin/json-forms/dist/css/brutusin-json-forms.min.css'); ?>" />
+	<script type="text/javascript" src="<?php echo base_url('vendor/brutusin/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($widgetsCSS) : ?>
@@ -117,3 +117,4 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 </head>
+

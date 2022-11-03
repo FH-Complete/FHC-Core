@@ -235,7 +235,7 @@ if (! $funktion->load ( $kurzbz )) {
 <link href="../../skin/tablesort.css" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<?php
 	include("../../include/meta/jquery-tablesorter.php");
 	?>

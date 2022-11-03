@@ -1,0 +1,90 @@
+/*
+ * Hederer
+ */
+.navbar-header {
+	background-color: #f8f8f8;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	border-style: solid;
+	border-color: #e7e7e7;
+	border-width: 0 0 1px;
+}
+
+.header-menu-link-entry {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 18px;
+	line-height: 1.42857143;
+	color: #5e5e5e !important;
+	padding-top: 15px !important;
+	padding-right: 7px !important;
+	padding-left: 7px !important;
+}
+
+.header-menu-icon {
+	top: 0px;
+	margin-right: 3px;
+	font-size: 16px;
+}
+
+/*
+ * Left side
+ */
+.navbar-left-side {
+	z-index: 1;
+	position: absolute;
+	width: 250px;
+	border-right: 1px solid #e7e7e7;
+	background-color: #f8f8f8;
+}
+
+.navbar-left-side ul {
+	width: 250px;
+}
+
+.navbar-left-side ul li {
+	border-bottom: 1px solid #e7e7e7;
+}
+
+.left-side-menu-second-level {
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+}
+
+.left-side-menu-second-level li {
+	border-bottom: none !important;
+}
+
+.left-side-menu-second-level span {
+	display: inline-flex;
+}
+
+.remove-custom-filter {
+	font-size: 10px !important;
+}
+
+.left-side-menu-link-entry {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #23527c;
+	padding-top: 10px !important;
+	padding-bottom: 10px !important;
+	padding-left: 7px !important;
+	padding-right: 7px !important;
+	text-decoration: none;
+}
+
+.left-side-menu-link-entry:hover {
+	background-color: #eee;
+}
+
+/*
+ * To be moved outside
+ */
+#content {
+	position: inherit;
+	margin: 0 0 0 250px;
+	padding: 30px 30px;
+}
+
