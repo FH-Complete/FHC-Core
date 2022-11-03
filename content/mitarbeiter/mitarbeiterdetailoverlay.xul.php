@@ -85,6 +85,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<label value="Vornamen" control="mitarbeiter-detail-textbox-vornamen"/>
 									<textbox id="mitarbeiter-detail-textbox-vornamen" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>
 							</row>
+							<row>
+								<label value="Wahlname" control="mitarbeiter-detail-textbox-wahlname"/>
+								<textbox id="mitarbeiter-detail-textbox-wahlname" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>
+							</row>
 							<row <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?>>
 									<label value="Geburtsdatum" control="mitarbeiter-detail-textbox-geburtsdatum" />
 									<hbox>

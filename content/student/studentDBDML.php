@@ -582,6 +582,7 @@ if(!$error)
 				$student->titelpre = $_POST['titelpre'];
 				$student->titelpost = $_POST['titelpost'];
 				$student->vorname = $_POST['vorname'];
+				$student->wahlname = $_POST['wahlname'];
 				$student->vornamen = $_POST['vornamen'];
 				$student->nachname = $_POST['nachname'];
 				$student->gebdatum = $_POST['geburtsdatum'];
@@ -735,6 +736,7 @@ if(!$error)
 				$person->titelpost = $_POST['titelpost'];
 				$person->vorname = $_POST['vorname'];
 				$person->vornamen = $_POST['vornamen'];
+				$person->wahlname = $_POST['wahlname'];
 				$person->nachname = $_POST['nachname'];
 				$person->gebdatum = $_POST['geburtsdatum'];
 				$person->gebort = $_POST['geburtsort'];
@@ -3126,6 +3128,7 @@ if(!$error)
 			$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
 			$bisio->mobilitaetsprogramm_code = $_POST['mobilitaetsprogramm_code'];
 			$bisio->nation_code = $_POST['nation_code'];
+			$bisio->herkunftsland_code = $_POST['herkunftsland_code'];
 			$bisio->von = $_POST['von'];
 			$bisio->bis = $_POST['bis'];
 			$bisio->student_uid = $_POST['student_uid'];
