@@ -27,6 +27,11 @@ export default {
 				this.callbacks.resolve(widget_id);
 			this.callbacks = {};
 			this.$refs.modal.hide();
+		},
+		path(src) {
+			if (src[0] == '/')
+				return FHC_JS_DATA_STORAGE_OBJECT.app_root + src;
+			return src;
 		}
 	},
 	template: `<div class="dashboard-widget-picker">
@@ -39,7 +44,7 @@ export default {
 					</div>
 					<div v-for="widget in widgets" :key="widget.widget_id" class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
 						<div class="card h-100" @click="pick(widget.widget_id)">
-							<img class="card-img-top" :src="widget.setup.icon" :alt="'pictogram for ' + (widget.setup.name || widget.widget_kurzbz)">
+							<img class="card-img-top" :src="path(widget.setup.icon)" :alt="'pictogram for ' + (widget.setup.name || widget.widget_kurzbz)">
 							<div class="card-body">
 								<h5 class="card-title">{{ widget.setup.name || widget.widget_kurzbz }}</h5>
 								<p class="card-text">{{ widget.beschreibung }}</p>
