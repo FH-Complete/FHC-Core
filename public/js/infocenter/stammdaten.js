@@ -24,13 +24,13 @@ $(document).ready(function ()
 
 		var adresse = [];
 		$('.adresse').each(function(){
-			var id = $(this).data('value');
+			var id = $(this).data('id');
 			adresse.push({
 				id: id,
 				value: {
-					'strasse': $('#input_strasse_' + id).val(),
-					'plz': $('#input_plz_' + id).val(),
-					'ort': $('#input_ort_' + id).val(),
+					'strasse': $('#strasse_' + id).val(),
+					'plz': $('#plz_' + id).val(),
+					'ort': $('#ort_' + id).val(),
 					'nation': $('#nation_' + id).val(),
 				}
 			});
@@ -38,16 +38,16 @@ $(document).ready(function ()
 
 		var data = {
 			"personid" : personid,
-			"titelpre" : $('#titelpre').val(),
-			"vorname" : $('#vorname').val(),
-			"nachname" : $('#nachname').val(),
-			"titelpost" : $('#titelpost').val(),
-			"gebdatum" : $('#gebdatum').val(),
-			"svnr" : $('#svnr').val(),
+			"titelpre" : $('#titelpre_input').val(),
+			"vorname" : $('#vorname_input').val(),
+			"nachname" : $('#nachname_input').val(),
+			"titelpost" : $('#titelpost_input').val(),
+			"gebdatum" : $('#gebdatum_input').val(),
+			"svnr" : $('#svnr_input').val(),
 			"buergerschaft" : $('#buergerschaft').val(),
 			"geschlecht" : $('#geschlecht').val(),
 			"gebnation" : $('#gebnation').val(),
-			"gebort" : $('#gebort').val(),
+			"gebort" : $('#gebort_input').val(),
 			"kontakt" : kontakt,
 			"adresse" : adresse,
 		};
@@ -66,9 +66,7 @@ var Stammdaten = {
 					if (FHC_AjaxClient.isSuccess(data))
 					{
 						FHC_DialogLib.alertSuccess("Done!");
-						Stammdaten._showKontakt();
-						Stammdaten._showAdresse();
-						Stammdaten._hide();
+						Stammdaten._updated();
 					}
 					else
 					{
@@ -82,51 +80,11 @@ var Stammdaten = {
 		);
 	},
 
-	_showKontakt: function()
-	{
-		$('.kontakt_input').each(function() {
-			var span = $(this).parent('td').children('span');
-			var value = $(this).val();
-
-			var oldSpanValue = span.data('value');
-			span.data('value', value);
-			var newhtml = span.html().replace(oldSpanValue, value);
-			span.html(newhtml);
-			if (span.hasClass('email'))
-				span.find('a').attr('href', 'mailto:' + value);
-
-			span.show();
-			$(this).remove();
-		});
-	},
-
-	_showAdresse: function()
-	{
-		$('.adresse').each(function() {
-			var adressenID = $(this).data('value');
-			$(this).children('input').each(function() {
-				$(this).attr('id');
-				var div = $(this).attr('id').replace('input_', '');
-				$('#' + div).html($(this).val())
-				$('#' + div).show();
-				$(this).remove();
-			});
-		});
-
-	},
-
 	_hide: function()
 	{
-		var stammdatenform = $('.stammdaten_form');
-		stammdatenform.find('select').attr('disabled', true);
-
-		$('.stammdaten').each(function(){
-			var id = $(this).attr('id');
-			var div = $('<div />');
-			div.attr('id', id);
-			div.addClass('stammdaten');
-			div.html($(this).val());
-			$(this).parent('td').html(div);
+		$('.stammdaten_input').each(function(){
+			$(this).parent('td').children('div').show();
+			$(this).remove();
 		});
 
 		$('.kontakt_input').each(function(){
@@ -138,9 +96,6 @@ var Stammdaten = {
 			$(this).parent('div').children('div').show();
 			$(this).remove();
 		});
-
-		$('.editActionStammdaten').hide();
-		$('.editStammdaten').show();
 	},
 
 	_show: function()
@@ -148,10 +103,11 @@ var Stammdaten = {
 		$('.stammdaten').each(function() {
 			var id = $(this).attr('id');
 			var input = $('<input />');
-			input.attr('id', id);
-			input.addClass('form-control stammdaten');
+			input.attr('id', id + '_input');
+			input.addClass('form-control stammdaten_input');
 			input.val($(this).html());
-			$(this).parent('td').html(input);
+			$(this).hide();
+			$(this).parent('td').append(input);
 		});
 
 		$('.kontakt').each(function() {
@@ -169,17 +125,17 @@ var Stammdaten = {
 		});
 
 		$('.adresse').each(function() {
-			var adressenID = $(this).data('value');
+			var adressenID = $(this).data('id');
 			$($(this).children('div').get().reverse()).each(function() {
 				$(this).hide();
-				var id = $(this).attr('id');
-
+				var type = $(this).data('type');
+				var value = $(this).data('value');
 				var input = $('<input />');
-				var value = $(this).html();
 
-				input.attr('id', 'input_' + Stammdaten._getPlaceholder(id) + "_" + adressenID);
+				input.attr('data-type', type);
+				input.attr('id', type + '_' + adressenID);
 				input.attr('value', value);
-				input.attr('placeholder', Stammdaten._getPlaceholder(id).toUpperCase());
+				input.attr('placeholder', type.toUpperCase());
 				input.addClass('form-control adresse_input');
 				input.val(value);
 				$(this).parent().prepend(input);
@@ -193,8 +149,47 @@ var Stammdaten = {
 		$('.editStammdaten').hide();
 	},
 
-	_getPlaceholder(elementid)
+	_updated: function()
 	{
-		return elementid.substr(0, elementid.indexOf("_"));
-	}
+		$('.kontakt_input').each(function() {
+			var span = $(this).parent('td').children('span');
+			var value = $(this).val();
+
+			var oldSpanValue = span.data('value');
+			span.data('value', value);
+			var newhtml = span.html().replace(oldSpanValue, value);
+			span.html(newhtml);
+			if (span.hasClass('email'))
+				span.find('a').attr('href', 'mailto:' + value);
+
+			span.show();
+			$(this).remove();
+		});
+
+		$('.adresse').each(function() {
+			$(this).children('input').each(function() {
+				var value = $(this).val();
+				var type = $(this).data('type');
+				var div = $('div[data-type="' + type + '"]');
+				div.data('value', value);
+				div.html(value);
+				div.show();
+				$(this).remove();
+			});
+		});
+
+		$('.stammdaten_input').each(function() {
+			var div = $(this).parent('td').children('div');
+			var value = $(this).val();
+			div.html(value);
+			div.show();
+			$(this).remove();
+		});
+
+		var stammdatenform = $('.stammdaten_form');
+		stammdatenform.find('select').attr('disabled', true);
+
+		$('.editActionStammdaten').hide();
+		$('.editStammdaten').show();
+	},
 }

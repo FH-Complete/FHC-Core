@@ -6,43 +6,36 @@
 				<td>
 					<div class='stammdaten' id="titelpre"><?php echo $stammdaten->titelpre ?></div>
 				</td>
-					<!--<input type="text" id="titelpre" readonly value="<?php /*echo $stammdaten->titelpre */?>">-->
 			</tr>
 
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','vorname')) ?></strong></td>
 				<td>
 					<div class='stammdaten' id="vorname"><?php echo $stammdaten->vorname ?></div>
-
-					<!--<input type="text" id="vorname" readonly value="<?php /*echo $stammdaten->vorname */?>">-->
 				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','nachname')) ?></strong></td>
 				<td>
 					<div class='stammdaten' id="nachname"><?php echo $stammdaten->nachname ?></div>
-					<!--<input type="text" id="nachname" readonly value="<?php /*echo $stammdaten->nachname */?>">-->
 				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','titelpost')) ?></strong></td>
 				<td>
 					<div class='stammdaten' id="titelpost"><?php echo $stammdaten->titelpost ?></div>
-					<!--<input type="text"  id="titelpost" readonly value="<?php /*echo $stammdaten->titelpost */?>">-->
 				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','geburtsdatum')) ?></strong></td>
 				<td>
 					<div class='stammdaten' id="gebdatum"><?php echo date_format(date_create($stammdaten->gebdatum), 'd.m.Y') ?></div>
-					<!--<input type="text"  id="gebdatum" readonly value="<?php /*echo date_format(date_create($stammdaten->gebdatum), 'd.m.Y') */?>" placeholder="DD.MM.YYYY">-->
 				</td>
 			</tr>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','svnr')) ?></strong></td>
 				<td>
 					<div class='stammdaten' id="svnr"><?php echo $stammdaten->svnr ?></div>
-					<!--<input type="text"  id="svnr" readonly value="<?php /*echo $stammdaten->svnr */?>">-->
 				</td>
 			</tr>
 			<tr>
@@ -100,7 +93,6 @@
 				<td><strong><?php echo  ucfirst($this->p->t('person','geburtsort')) ?></strong></td>
 				<td>
 					<div class='stammdaten' id="gebort"><?php echo $stammdaten->gebort ?></div>
-					<!--<input type="text" id="gebort" readonly value="<?php /*echo $stammdaten->gebort */?>">-->
 				</td>
 			</tr>
 		</table>
@@ -135,10 +127,7 @@
 							<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
 							<?php $lastMailAdress = $kontakt->kontakt;
 							endif;
-							/*if (($kontakt->kontakttyp === 'telefon' || $kontakt->kontakttyp === 'mobil'))
-								echo '<input type="text" data-value="'. $kontakt->kontakt_id .'" class="kontakt" readonly value="'. $kontakt->kontakt . '"/>';
-							else*/
-								echo $kontakt->kontakt;
+							echo $kontakt->kontakt;
 							if ($kontakt->kontakttyp === 'email'):
 							?>
 							</a>
@@ -155,16 +144,13 @@
 					</td>
 					<td>
 						<?php if (isset($adresse)): ?>
-							<div class="row adresse col-sm-12" data-value="<?php echo $adresse->adresse_id ?>">
-								<div id="strasse_<?php echo $adresse->adresse_id ?>"><?php echo $adresse->strasse ?></div>
-								<!--<input type="text" id="strasse_<?php /*echo $adresse->adresse_id */?>" readonly value="<?php /*echo $adresse->strasse */?>">-->
+							<div class="row adresse col-sm-12" data-id="<?php echo $adresse->adresse_id ?>">
+								<div class="float-left" data-value="<?php echo $adresse->strasse ?>" data-type="strasse"><?php echo $adresse->strasse ?></div>
 								
-								<div id="plz_<?php echo $adresse->adresse_id ?>"><?php echo $adresse->plz ?></div>
-								<!--<input type="text" id="plz_<?php /*echo $adresse->adresse_id */?>" readonly value="<?php /*echo $adresse->plz */?>">-->
+								<div class="float-left" data-value="<?php echo $adresse->plz ?>" data-type="plz"><?php echo $adresse->plz ?></div>
 								
-								<div id="ort_<?php echo $adresse->adresse_id ?>"><?php echo $adresse->ort ?></div>
-								<!--<input type="text" id="ort_<?php /*echo $adresse->adresse_id */?>" readonly value="<?php /*echo $adresse->ort */?>">-->
-							
+								<div class="float-left" data-value="<?php echo $adresse->ort ?>" data-type="ort"><?php echo $adresse->ort ?></div>
+
 							<?php if (isset($adresse->nationkurztext)): ?>
 								<select id="nation_<?php echo $adresse->adresse_id ?>" disabled>
 									<?php
