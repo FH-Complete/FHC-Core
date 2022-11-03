@@ -24,16 +24,10 @@
 		<core-navigation-cmpt v-bind:add-side-menu-entries="appSideMenuEntries"></core-navigation-cmpt>
 
 		<div id="content">
-			<div class="row">
-				<div class="col-lg-12">
-					<h3 class="page-header">
-						Job Logs Viewer
-					</h3>
-				</div>
-			</div>
 			<div>
 				<!-- Filter component -->
 				<core-filter-cmpt
+					title="Job Logs Viewer"
 					filter-type="LogsViewer"
 					:tabulator-options="logsViewerTabulatorOptions"
 					:tabulator-events="logsViewerTabulatorEventHandlers"

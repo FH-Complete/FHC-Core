@@ -42,62 +42,6 @@ class Filter extends FHC_Controller
 	}
 
 	/**
-	 * Change the sort of the selected fields of the current filter and
-	 * its data will be written on the output in JSON format
-	 */
-	public function sortSelectedFields()
-	{
-		$request = $this->getPostJSON();
-
-		if (property_exists($request, 'selectedFields')
-			&& $this->filtercmptlib->sortSelectedFields($request->selectedFields) == true)
-		{
-			$this->outputJsonSuccess('Fields sorted');
-		}
-		else
-		{
-			$this->outputJsonError('Wrong parameter');
-		}
-	}
-
-	/**
-	 * Remove a selected field from the current filter and
-	 * its data will be written on the output in JSON format
-	 */
-	public function removeSelectedField()
-	{
-		$request = $this->getPostJSON();
-
-		if (property_exists($request, 'selectedField')
-			&& $this->filtercmptlib->removeSelectedField($request->selectedField) == true)
-		{
-			$this->outputJsonSuccess('Field removed');
-		}
-		else
-		{
-			$this->outputJsonError('Error occurred');
-		}
-	}
-
-	/**
-	 * Add a field to the current filter and its data will be written on the output in JSON format
-	 */
-	public function addSelectedField()
-	{
-		$request = $this->getPostJSON();
-
-		if (property_exists($request, 'selectedField')
-			&& $this->filtercmptlib->addSelectedField($request->selectedField) == true)
-		{
-			$this->outputJsonSuccess('Field added');
-		}
-		else
-		{
-			$this->outputJsonError('Error occurred');
-		}
-	}
-
-	/**
 	 * Remove an applied filter (SQL where condition) from the current filter
 	 */
 	public function removeFilterField()

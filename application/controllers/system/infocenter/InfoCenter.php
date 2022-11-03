@@ -88,6 +88,12 @@ class InfoCenter extends Auth_Controller
 			'message' => 'Type of Document %s was updated, set to %s',
 			'success' => null
 		),
+		'deletedoc' => array(
+			'logtype' => 'Action',
+			'name' => 'Document deleted',
+			'message' => 'Document %s deleted',
+			'success' => null
+		),
 	);
 
 	// Name of Interessentenstatus
@@ -131,6 +137,7 @@ class InfoCenter extends Auth_Controller
 				'reloadZgvPruefungen' => 'infocenter:r',
 				'reloadMessages' => 'infocenter:r',
 				'reloadDoks' => 'infocenter:r',
+				'reloadUebersichtDoks' => 'infocenter:r',
 				'reloadNotizen' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => array('infocenter:r', 'lehre/zgvpruefung:r'),
@@ -142,7 +149,9 @@ class InfoCenter extends Auth_Controller
 				'getStudienjahrEnd' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'setNavigationMenuArrayJson' => 'infocenter:r',
 				'getAbsageData' => 'infocenter:r',
-				'saveAbsageForAll' => 'infocenter:rw'
+				'saveAbsageForAll' => 'infocenter:rw',
+				'deleteDoc' => 'infocenter:rw',
+				'getStudienartData' => 'infocenter:rw'
 			)
 		);
 
@@ -159,6 +168,10 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('system/Message_model', 'MessageModel');
 		$this->load->model('system/Filters_model', 'FiltersModel');
 		$this->load->model('system/PersonLock_model', 'PersonLockModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('codex/Zgv_model', 'ZgvModel');
+		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
+		$this->load->model('codex/Nation_model', 'NationModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
@@ -396,6 +409,35 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->outputJsonSuccess(array($json));
+	}
+
+	public function deleteDoc($person_id)
+	{
+		$akte_id = $this->input->post('akteid');
+
+		if (isset($akte_id) && isset($person_id))
+		{
+			$this->load->library('AkteLib');
+			$akte = $this->aktelib->get($akte_id);
+
+			if (hasData($akte))
+			{
+				$akte = getData($akte);
+				if ($akte->person_id === (int)$person_id)
+				{
+					$result = $this->aktelib->remove($akte_id);
+
+					if (isError($result))
+					{
+						$this->terminateWithJsonError('Error deleting document');
+					}
+
+					$this->_log($person_id, 'deletedoc', array($akte->bezeichnung));
+
+					$this->outputJsonSuccess('success');
+				}
+			}
+		}
 	}
 
 	/**
@@ -1072,6 +1114,17 @@ class InfoCenter extends Auth_Controller
 		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
 
 		$this->load->view('system/infocenter/dokNachzureichend.php', array('dokumente_nachgereicht' => $dokumente_nachgereicht->retval));
+	}
+
+	public function reloadUebersichtDoks($person_id)
+	{
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+
+		$this->DokumentModel->addOrder('bezeichnung');
+		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
+		$data = array_merge($dokumentdata, ['dokumente' => $dokumente->retval]);
+
+		$this->load->view('system/infocenter/dokpruefung.php', $data);
 	}
 
 	/**
@@ -1932,10 +1985,25 @@ class InfoCenter extends Auth_Controller
 		$abwstatusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
 		$intstatusgruende = $this->StatusgrundModel->getStatus(self::INTERESSENTSTATUS)->retval;
 
+		$studienArtBerechtigung = array_column($this->getStudienArtBerechtigung(), 'typ');
+
+		$this->ZgvModel->addOrder('zgv_bez');
+		$allZGVs = getData($this->ZgvModel->load());
+
+		$this->ZgvModel->addOrder('zgvmas_bez');
+		$allZGVsMaster = getData($this->ZgvmasterModel->load());
+
+		$this->NationModel->addOrder('langtext');
+		$allNations = getData($this->NationModel->load());
+
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
 			'abwstatusgruende' => $abwstatusgruende,
-			'intstatusgruende' => $intstatusgruende
+			'intstatusgruende' => $intstatusgruende,
+			'studienArtBerechtigung' => $studienArtBerechtigung,
+			'all_zgvs' => $allZGVs,
+			'all_zgvs_master' => $allZGVsMaster,
+			'all_nations' => $allNations,
 		);
 
 		return $data;
@@ -2194,18 +2262,36 @@ class InfoCenter extends Auth_Controller
 
 	public function getAbsageData()
 	{
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm']);
 
-		$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
-		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
-		$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(['b', 'm'], $studienSemester);
+		if (hasData($stg_typ))
+		{
+			$stg_typ = getData($stg_typ);
+			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
+			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
 
-		$data = array (
-			'statusgruende' => $statusgruende,
-			'studiengaenge' => $studiengaenge->retval
-		);
+			$data = array (
+				'statusgruende' => $statusgruende,
+				'studiengaenge' => $studiengaenge->retval
+			);
 
-		$this->outputJsonSuccess($data);
+			$this->outputJsonSuccess($data);
+		}
+		else
+			$this->outputJsonSuccess(null);
+	}
+
+	public function getStudienArtBerechtigung()
+	{
+		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm', 'l']);
+		return getData($stg_typ);
+	}
+	public function getStudienartData()
+	{
+		$this->outputJsonSuccess($this->getStudienArtBerechtigung());
 	}
 
 	public function saveAbsageForAll()

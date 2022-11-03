@@ -70,6 +70,7 @@ $this->phrasen['global/aenderungenZuruecksetzen']= "Reset changes";
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';
 $this->phrasen['global/nachname']='Last Name';
+$this->phrasen['global/wahlname']='Name of Choice';
 $this->phrasen['global/anrede']='Title';
 $this->phrasen['global/name']='Name';
 $this->phrasen['global/uid']='UID';

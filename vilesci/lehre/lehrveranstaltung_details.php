@@ -29,6 +29,7 @@
 	require_once('../../include/lehrtyp.class.php');
 	require_once('../../include/lehrmodus.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/studienplan.class.php');
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -292,8 +293,9 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td>Lehrmodus*</td>
-			<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
+			<td>Lehrmodus*</td>';
+
+		$htmlstr .= '<td><select name="lehrmodus_kurzbz"><option value="">-- keine Auswahl --</option>';
 
 		$lehrmodus_arr = new lehrmodus();
 		$lehrmodus_arr->getAll();
@@ -301,6 +303,8 @@
 		foreach ($lehrmodus_arr->result as $lehrmodus)
 		{
 			if ($lehrmodus->lehrmodus_kurzbz == $lv->lehrmodus_kurzbz)
+				$sel = ' selected';
+			else if (isset($_GET['neu']) && defined('DEFAULT_LEHRMODUS') && ($lehrmodus->lehrmodus_kurzbz == DEFAULT_LEHRMODUS) && ($lv->lehrmodus_kurzbz == ''))
 				$sel = ' selected';
 			else
 				$sel = '';
@@ -508,19 +512,10 @@
 			}
 
 			$htmlstr.='<br><b>Verwendung in folgenden Studienplänen</b>: ';
-			$qry ="SELECT distinct tbl_studienplan.bezeichnung
-					FROM
-						lehre.tbl_studienplan_lehrveranstaltung
-						JOIN lehre.tbl_studienplan USING(studienplan_id)
-					WHERE lehrveranstaltung_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
-					ORDER BY tbl_studienplan.bezeichnung desc';
-			if($result = $db->db_query($qry))
-			{
-				while($row = $db->db_fetch_object($result))
-				{
-					$htmlstr.= $row->bezeichnung.'; ';
-				}
-			}
+			$stdplan = new studienplan();
+			if ($stdplan->getStudienplanLehrveranstaltung($lv->lehrveranstaltung_id))
+			foreach($stdplan->result as $result)
+				$htmlstr .= $result->bezeichnung . "; ";
 
 			$htmlstr.='</span>';
 			// Details Ende

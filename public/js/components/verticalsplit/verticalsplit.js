@@ -36,7 +36,7 @@ export default {
         <div ref="bottompanel" class="verticalsplitted"
              :style="{height: this.bottomheightcss}">
             <slot name="bottom">
-                <p>Bottom Panel</p>
+                <p/>
             </slot>
         </div>
     </div>

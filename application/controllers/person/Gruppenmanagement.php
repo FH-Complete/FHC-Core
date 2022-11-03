@@ -27,6 +27,7 @@ class Gruppenmanagement extends Auth_Controller
 
 		// Loads models
 		$this->load->model('person/benutzer_model', 'BenutzerModel');
+		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('person/benutzergruppe_model', 'BenutzergruppeModel');
 		$this->load->model('system/Log_model', 'LogModel');
 
@@ -149,11 +150,8 @@ class Gruppenmanagement extends Auth_Controller
 
 			if (isSuccess($result))
 			{
-				$this->LogModel->insert(array(
-					'mitarbeiter_uid' => $this->_uid,
-					'beschreibung' => 'Gruppenmanagement: Nutzer zu Gruppe hinzugefügt',
-					'sql' => $lastQry
-				));
+				$beschreibung = 'Gruppenmanagement: Nutzer zu Gruppe hinzugefügt';
+				$this->_writeLog($this->_uid, $beschreibung, $lastQry);
 			}
 		}
 
@@ -185,11 +183,8 @@ class Gruppenmanagement extends Auth_Controller
 
 		if (isSuccess($result))
 		{
-			$this->LogModel->insert(array(
-				'mitarbeiter_uid' => $this->_uid,
-				'beschreibung' => 'Gruppenmanagement: Nutzer aus Gruppe entfernt',
-				'sql' => $lastQry
-			));
+			$beschreibung = 'Gruppenmanagement: Nutzer aus Gruppe entfernt';
+			$this->_writeLog($this->_uid, $beschreibung, $lastQry);
 		}
 
 		$this->outputJson($result);
@@ -234,4 +229,26 @@ class Gruppenmanagement extends Auth_Controller
 
 		if (!$this->_uid) show_error('User authentification failed');
 	}
+
+	/**
+	 * Writes an entry in the log table
+	 */
+	private function _writeLog($uid, $beschreibung, $lastQry)
+	{
+		$mitarbeiterResult = $this->MitarbeiterModel->load(array('mitarbeiter_uid'=>$this->_uid));
+
+		if(!isSuccess($mitarbeiterResult) || !hasData($mitarbeiterResult))
+		{
+			$uid = DUMMY_LEKTOR_UID;
+			$beschreibung .= ': '.$this->_uid;
+			$beschreibung = mb_substr($beschreibung, 0, 64);
+		}
+
+		$this->LogModel->insert(array(
+			'mitarbeiter_uid' => $uid,
+			'beschreibung' => $beschreibung,
+			'sql' => $lastQry
+		));
+	}
+
 }

@@ -17,15 +17,12 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-
-$dr = isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER["CONTEXT_PREFIX"].'/' : '/';
-
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/angular-tablesort/tablesort.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'FHC-vendor/angular-tablesort/tablesort.css">';
 
-echo '<script src="'.$dr.'FHC-vendor/angular-tablesort/js/angular-tablesort.js"></script>';
+echo '<script src="'.BASE_LOCATION.'FHC-vendor/angular-tablesort/js/angular-tablesort.js"></script>';
 
 //Anpassungen
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/angular-tablesorter/tablesort.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.BASE_LOCATION.'include/vendor_custom/angular-tablesorter/tablesort.css">';
 
 ?>

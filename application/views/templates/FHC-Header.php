@@ -90,7 +90,8 @@
 			{
 				generateCSSsInclude('vendor/npm-asset/primevue/resources/themes/bootstrap4-light-blue/theme.css');
 				generateCSSsInclude('vendor/npm-asset/primevue/resources/primevue.min.css');
-				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');			
+				// generateCSSsInclude('vendor/npm-asset/primevue/resources/primeflex.min.css');
+				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');
 			}
 
 			// --------------------------------------------------------------------------------------------------------
@@ -103,13 +104,13 @@
 			if ($dialoglib === true) generateCSSsInclude('public/css/DialogLib.css');
 
 			// VUE FilterWidget CSS
-			if ($filtercomponent === true) generateCSSsInclude('public/css/FilterComponent.css');
+			if ($filtercomponent === true) generateCSSsInclude('public/css/components/FilterComponent.css');
 
 			// FilterWidget CSS
 			if ($filterwidget === true) generateCSSsInclude('public/css/FilterWidget.css');
 
 			// VUE NavigationWidget CSS
-			if ($navigationcomponent === true) generateCSSsInclude('public/css/NavigationComponent.css');
+			if ($navigationcomponent === true) generateCSSsInclude('public/css/components/NavigationComponent.css');
 
 			// NavigationWidget CSS
 			if ($navigationwidget === true) generateCSSsInclude('public/css/NavigationWidget.css');

@@ -1108,7 +1108,7 @@ $filters = array(
 					{"name": "Aktiv"},
 					{"name": "Raum"},
 					{"name": "Geschlecht"},
-					{"name": "StdKst"}
+					{"name": "Standardkostenstelle"}
 				],
 				"filters": [
 					{                              

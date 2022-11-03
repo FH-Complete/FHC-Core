@@ -43,6 +43,22 @@ export const CoreFilterAPIs = {
 	/**
 	 *
 	 */
+	removeCustomFilter: function(wsParams) {
+		return CoreRESTClient.post(
+                        'components/Filter/removeCustomFilter',
+                        {
+                                filterUniqueId: wsParams.filterUniqueId,
+                                filterType: wsParams.filterType,
+                                filterId: wsParams.filterId
+                        },
+                        {
+                                timeout: CORE_FILTER_CMPT_TIMEOUT
+                        }
+                );
+	},
+	/**
+	 *
+	 */
 	applyFilterFields: function(wsParams) {
 		return CoreRESTClient.post(
                         'components/Filter/applyFilterFields',
@@ -66,38 +82,6 @@ export const CoreFilterAPIs = {
                                 filterUniqueId: wsParams.filterUniqueId,
                                 filterType: wsParams.filterType,
                                 filterField: wsParams.filterField
-                        },
-                        {
-                                timeout: CORE_FILTER_CMPT_TIMEOUT
-                        }
-                );
-	},
-	/**
-	 *
-	 */
-	addSelectedField: function(wsParams) {
-		return CoreRESTClient.post(
-                        'components/Filter/addSelectedField',
-                        {
-                                filterUniqueId: wsParams.filterUniqueId,
-                                filterType: wsParams.filterType,
-                                selectedField: wsParams.selectedField
-                        },
-                        {
-                                timeout: CORE_FILTER_CMPT_TIMEOUT
-                        }
-                );
-	},
-	/**
-	 *
-	 */
-	removeSelectedField: function(wsParams) {
-		return CoreRESTClient.post(  
-                        'components/Filter/removeSelectedField',
-                        {
-                                filterUniqueId: wsParams.filterUniqueId,
-                                filterType: wsParams.filterType,
-                                selectedField: wsParams.selectedField
                         },
                         {
                                 timeout: CORE_FILTER_CMPT_TIMEOUT
