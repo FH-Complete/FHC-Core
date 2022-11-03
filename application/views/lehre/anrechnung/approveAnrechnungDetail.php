@@ -3,10 +3,10 @@ $this->load->view(
 	'templates/FHC-Header',
 	array(
 		'title' => $this->p->t('anrechnung', 'anrechnungenGenehmigen'),
-		'jquery' => true,
-		'jqueryui' => true,
-		'bootstrap' => true,
-		'fontawesome' => true,
+		'jquery3' => true,
+		'jqueryui1' => true,
+		'bootstrap3' => true,
+		'fontawesome4' => true,
 		'ajaxlib' => true,
 		'dialoglib' => true,
 		'phrases' => array(
