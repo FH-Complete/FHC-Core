@@ -27,6 +27,7 @@ export default {
 		widgetAdd(section_name, widget) {
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
+				delete widget.custom;
 				let loading = {...widget};
 				loading.loading = true;
 				this.sections.forEach(section => {
@@ -41,6 +42,7 @@ export default {
 				}).then(result => {
 					let newId = Object.keys(result.data.retval.data.widgets[section_name]).pop();
 					widget.id = newId;
+					widget.custom = 1;
 					this.sections.forEach(section => {
 						if (section.name == section_name) {
 							section.widgets.splice(section.widgets.indexOf(loading),1);

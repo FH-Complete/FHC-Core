@@ -76,7 +76,7 @@ class Config extends Auth_Controller
 			$this->terminateWithJsonError('preset could not be saved');
 		}
 		
-		$this->outputJsonSuccess(array('msg' => 'preset successfully stored.'));
+		$this->outputJsonSuccess(array('msg' => 'preset successfully stored.', 'data' => $preset_decoded));
 	}
 	
 	public function removeWidgetFromPreset()
