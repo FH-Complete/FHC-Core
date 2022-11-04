@@ -19,7 +19,7 @@
  *
  */
 export const LogsViewerTabulatorOptions = {
-	height: 500,
+	height: 700,
 	layout: 'fitColumns',
 	columns: [
 		{title: 'Log ID', field: 'LogId'},
@@ -29,7 +29,17 @@ export const LogsViewerTabulatorOptions = {
 		{title: 'Description', field: 'Description'},
 		{title: 'Data', field: 'Data'},
 		{title: 'Web service type', field: 'WebserviceType'}
-	]
+	],
+	rowFormatter: function(row) {
+		if (row.getData().RequestId.includes("error"))
+		{
+			row.getElement().style.color = "red";
+		}
+		else if (row.getData().RequestId.includes("warning"))
+		{
+			row.getElement().style.color = "orange";
+		}
+	}
 };
 
 /**
