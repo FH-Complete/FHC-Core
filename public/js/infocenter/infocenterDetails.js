@@ -378,6 +378,11 @@ var InfocenterDetails = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						var engdate = $.datepicker.parseDate("yy-mm-dd", FHC_AjaxClient.getData(data)[0]);
+
+						if (engdate.getDate() === 31)
+							engdate.setDate(engdate.getDate() - 1);
+						engdate.setMonth(engdate.getMonth() + 3);
+
 						var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
 						$("#postponedate").val(gerdate);
 					}
@@ -538,8 +543,8 @@ var InfocenterDetails = {
 
 			var prestudentdata = prestudentresponse.retval;
 
-			var prestudent_id = freigabedata.prestudent_id;
-			var statusgrund_id = freigabedata.statusgrund_id;
+			var prestudent_id = parseInt(freigabedata.prestudent_id);
+			var statusgrund_id = parseInt(freigabedata.statusgrund_id);
 			var rtfreigabe = !$.isNumeric(statusgrund_id);//no Statusgrund - RT Freigabe
 
 			var rtFreigegeben = false;

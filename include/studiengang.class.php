@@ -27,35 +27,36 @@ class studiengang extends basis_db
 	public $new;	  			// boolean
 	public $result = array();	// studiengang Objekt
 
-	public $studiengang_kz;		// integer
-	public $kurzbz;				// varchar(5)
-	public $kurzbzlang;			// varchar(10)
-	public $bezeichnung;		// varchar(128)
-	public $english;			// varchar(128)
-	public $typ;				// char(1)
-	public $farbe;				// char(6)
-	public $email;				// varchar(64)
-	public $max_semester;		// smallint
-	public $max_verband;		// char(1)
-	public $max_gruppe;			// char(1)
-	public $erhalter_kz;		// smallint
-	public $bescheid;			// varchar(256)
-	public $bescheidbgbl1;		// varchar(16)
-	public $bescheidbgbl2;		// varchar(16)
-	public $bescheidgz;			// varchar(16)
-	public $bescheidvom;		// Date
-	public $titelbescheidvom;	// Date
-	public $ext_id;				// bigint
-	public $orgform_kurzbz;		// varchar(3)
-	public $zusatzinfo_html;	// text
-	public $sprache;			// varchar(16)
-	public $testtool_sprachwahl;// boolean
-	public $studienplaetze;		// smallint
-	public $oe_kurzbz;			// varchar(32)
-	public $onlinebewerbung;	// boolean
-	public $melderelevant;		// boolean
-	public $foerderrelevant;	// boolean
-	public $standort_code;		// integer
+	public $studiengang_kz;			// integer
+	public $kurzbz;					// varchar(5)
+	public $kurzbzlang;				// varchar(10)
+	public $bezeichnung;			// varchar(128)
+	public $english;				// varchar(128)
+	public $typ;					// char(1)
+	public $farbe;					// char(6)
+	public $email;					// varchar(64)
+	public $max_semester;			// smallint
+	public $max_verband;			// char(1)
+	public $max_gruppe;				// char(1)
+	public $erhalter_kz;			// smallint
+	public $bescheid;				// varchar(256)
+	public $bescheidbgbl1;			// varchar(16)
+	public $bescheidbgbl2;			// varchar(16)
+	public $bescheidgz;				// varchar(16)
+	public $bescheidvom;			// Date
+	public $titelbescheidvom;		// Date
+	public $ext_id;					// bigint
+	public $orgform_kurzbz;			// varchar(3)
+	public $zusatzinfo_html;		// text
+	public $sprache;				// varchar(16)
+	public $testtool_sprachwahl;	// boolean
+	public $studienplaetze;			// smallint
+	public $oe_kurzbz;				// varchar(32)
+	public $onlinebewerbung;		// boolean
+	public $melderelevant;			// boolean
+	public $foerderrelevant;		// boolean
+	public $standort_code;			// integer
+	public $melde_studiengang_kz;	// varchar(32)
 
 	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
 	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
@@ -134,6 +135,7 @@ class studiengang extends basis_db
 				$this->melderelevant = $this->db_parse_bool($row->melderelevant);
 				$this->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$this->standort_code = $row->standort_code;
+				$this->melde_studiengang_kz = $row->melde_studiengang_kz;
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
 				$this->bezeichnung_arr['English'] = $this->english;
@@ -210,6 +212,7 @@ class studiengang extends basis_db
 			$stg_obj->melderelevant = $this->db_parse_bool($row->melderelevant);
 			$stg_obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 			$stg_obj->standort_code = $row->standort_code;
+			$stg_obj->melde_studiengang_kz = $row->melde_studiengang_kz;
 
 			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English'] = $row->english;
@@ -431,6 +434,7 @@ class studiengang extends basis_db
 			$stg_obj->melderelevant = $this->db_parse_bool($row->melderelevant);
 			$stg_obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 			$stg_obj->standort_code = $row->standort_code;
+			$stg_obj->melde_studiengang_kz = $row->melde_studiengang_kz;
 
 			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English'] = $row->english;
@@ -474,6 +478,11 @@ class studiengang extends basis_db
 			$this->errormsg = 'studiengang_kz ungueltig!';
 			return false;
 		}
+		if(isset($this->melde_studiengang_kz) && $this->melde_studiengang_kz != '' && !is_numeric($this->melde_studiengang_kz))
+		{
+			$this->errormsg = 'melde_studiengang_kz ungueltig!';
+			return false;
+		}
 		$this->errormsg = '';
 		return true;
 	}
@@ -500,7 +509,8 @@ class studiengang extends basis_db
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
 				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, onlinebewerbung, orgform_kurzbz, zusatzinfo_html,
-				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige) VALUES ('.
+				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige,
+				melderelevant, foerderrelevant, standort_code, melde_studiengang_kz) VALUES ('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->kurzbz).', '.
 				$this->db_add_param($this->kurzbzlang).', '.
@@ -534,7 +544,8 @@ class studiengang extends basis_db
 				$this->db_add_param($this->projektarbeit_note_anzeige, FHC_BOOLEAN).','.
 				$this->db_add_param($this->melderelevant, FHC_BOOLEAN).','.
 				$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).','.
-				$this->db_add_param($this->standort_code).');';
+				$this->db_add_param($this->standort_code).','.
+				$this->db_add_param($this->melde_studiengang_kz).');';
 		}
 		else
 		{
@@ -574,7 +585,8 @@ class studiengang extends basis_db
 				'mischform='.$this->db_add_param($this->mischform, FHC_BOOLEAN).', '.
 				'melderelevant='.$this->db_add_param($this->melderelevant, FHC_BOOLEAN).', '.
 				'foerderrelevant='.$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).', '.
-				'standort_code='.$this->db_add_param($this->standort_code).' '.
+				'standort_code='.$this->db_add_param($this->standort_code).', '.
+				'melde_studiengang_kz='.$this->db_add_param($this->melde_studiengang_kz).' '.
 				'WHERE studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER, false).';';
 		}
 
@@ -700,6 +712,7 @@ class studiengang extends basis_db
 				$this->melderelevant = $this->db_parse_bool($row->melderelevant);
 				$this->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$this->standort_code = $row->standort_code;
+				$this->melde_studiengang_kz = $row->melde_studiengang_kz;
 				$this->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
@@ -843,6 +856,7 @@ class studiengang extends basis_db
 				$obj->melderelevant = $this->db_parse_bool($row->melderelevant);
 				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$obj->standort_code = $row->standort_code;
+				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 				$this->result[] = $obj;
@@ -1023,6 +1037,7 @@ class studiengang extends basis_db
 				$obj->melderelevant = $this->db_parse_bool($row->melderelevant);
 				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$obj->standort_code = $row->standort_code;
+				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
 
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;
@@ -1103,7 +1118,7 @@ class studiengang extends basis_db
 				return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Studiengänge die vom übergeben Typ sind
 	 * @param string $typ
@@ -1118,13 +1133,13 @@ class studiengang extends basis_db
 					tbl_studiengang.typ=".$this->db_add_param($typ)."
 				ORDER BY
 					kurzbz";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new studiengang();
-				
+
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->kurzbzlang = $row->kurzbzlang;
@@ -1160,10 +1175,11 @@ class studiengang extends basis_db
 				$obj->melderelevant = $this->db_parse_bool($row->melderelevant);
 				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$obj->standort_code = $row->standort_code;
-				
+				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
+
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;

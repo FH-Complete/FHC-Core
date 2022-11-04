@@ -219,7 +219,8 @@ function getUserAmpelData($user)
 							'verfallszeit' => $row->verfallszeit,
 							'beschreibung' => $row->beschreibung,
 							'abgelaufen' => $abgelaufen,
-							'active' => $active);
+							'active' => $active,
+							'buttontext' => $row->buttontext);
 	}
 
 	return array($user_ampel_arr, $cnt_ueberfaellig);
@@ -285,9 +286,9 @@ function getActualUserAmpelData($user_ampel_arr, $semester_start)
 <html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" type="text/css" href="../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="../../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css">
 <script type="text/javascript" src="../../../vendor/components/jquery/jquery.min.js"></script>
-<script type="text/javascript" src="../../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 <title><?php echo $p->t('tools/ampelsystem') ?></title>
 
 <!--style for sancho typewriting effect-->
@@ -491,7 +492,12 @@ function typeWrite(span){
 				<p><br></p>
 				<form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?ampel_id='. urlencode($user_ampel['ampel_id']) . '&type=bestaetigen'; ?>">
 					<button type="type" type="submit" class="btn btn-default pull-right"
-						<?php if ($user_ampel['abgelaufen'] || $user_ampel['bestaetigt']) echo 'disabled data-toggle="tooltip" data-placement="top" title="' . $p->t('tools/ampelBestaetigtAbgelaufen'). '"'?>><?php echo $p->t('global/bestaetigen') ?>
+						<?php if ($user_ampel['abgelaufen'] || $user_ampel['bestaetigt']) echo 'disabled data-toggle="tooltip" data-placement="top" title="' . $p->t('tools/ampelBestaetigtAbgelaufen'). '"'?>>
+						<?php
+							if ($user_ampel['buttontext'][$sprache] != '')
+								echo $user_ampel['buttontext'][$sprache];
+							else
+								echo $p->t('global/bestaetigen') ?>
 					</button>
 				</form>
 			</div>

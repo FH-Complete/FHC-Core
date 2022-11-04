@@ -51,9 +51,9 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			{
 			    $("#myTable").tablesorter(
 				{
-					sortList: [[3,0],[2,0]],
-					widgets: [\'zebra\'],
-					headers: {8:{sorter:false}}
+					sortList: [[2,0]],
+					widgets: [\'zebra\',\'filter\', \'stickyHeaders\'],
+					headers: {9:{sorter:false,filter: false}}
 				});
 			}
 		);
@@ -127,6 +127,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Beschreibung</th>
 			<th>Organisationseinheit</th>
 			<th>Kategorie</th>
+			<th>Content ID</th>
 			<th>Design</th>
 			<th>Betrieb</th>
 			<th>Operativ</th>
@@ -144,6 +145,7 @@ foreach($service->result as $row)
 	echo '<td>',$row->oe_kurzbz,'</td>';
 	$title = (isset($servicekategorie_arr[$row->servicekategorie_kurzbz])?$servicekategorie_arr[$row->servicekategorie_kurzbz]:'');
 	echo '<td><span title="'.$service->convert_html_chars($title).'">',$row->servicekategorie_kurzbz,'</span></td>';
+	echo '<td>',$row->content_id,'</td>';
 	echo '<td>',$row->design_uid,'</td>';
 	echo '<td>',$row->betrieb_uid,'</td>';
 	echo '<td>',$row->operativ_uid,'</td>';

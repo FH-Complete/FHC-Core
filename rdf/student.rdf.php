@@ -127,14 +127,16 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif($filter2=='zgvohnedatum')
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
-		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum
+		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum,zgvdoktor_code, zgvdoktordatum
 			FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id);
 		if($db->db_query($qry))
 		{
 			if($row_filter = $db->db_fetch_object())
 			{
 				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='')
-				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
+				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum=='')
+				|| ($row_filter->zgvdoktor_code!='' && $row_filter->zgvdoktordatum=='')
+				)
 					return true;
 				else
 					return false;
@@ -161,15 +163,15 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif ( preg_match('/^stud-statusgrund-([0-9]+)$/', $filter2, $studstatusgrund) )
 	{
 	    // Alle Studenten mit Statusgrund in tbl_prestudentstatus
-	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus ps JOIN 
-				    public.tbl_prestudent p ON p.prestudent_id = ps.prestudent_id AND 
+	    $qry = "SELECT count(*) AS anzahl FROM public.tbl_prestudentstatus ps JOIN
+				    public.tbl_prestudent p ON p.prestudent_id = ps.prestudent_id AND
 				    ps. studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				    p. person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
-				    p.studiengang_kz=" . $db->db_add_param($studiengang_kz, FHC_INTEGER) . " AND 
+				    p.studiengang_kz=" . $db->db_add_param($studiengang_kz, FHC_INTEGER) . " AND
 				    ps.statusgrund_id = " . $db->db_add_param($studstatusgrund[1], FHC_INTEGER);
 	    //echo $qry . "\n";
-	    $filtered = ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) ) 
-		      ? true 
+	    $filtered = ( $db->db_query($qry) && ($row_filter = $db->db_fetch_object()) && ($row_filter->anzahl > 0) )
+		      ? true
 		      : false;
 	    return $filtered;
 	}
@@ -194,6 +196,7 @@ function draw_content_liste($row)
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
 			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
+			<STUDENT:wahlname><![CDATA['.$row->wahlname.']]></STUDENT:wahlname>
 			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
 			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
@@ -214,6 +217,7 @@ function draw_content_liste($row)
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
 			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
+			<STUDENT:bpk><![CDATA['.$row->bpk.']]></STUDENT:bpk>
 
 			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 			<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
@@ -301,6 +305,7 @@ function draw_content($row)
 			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
 			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
+			<STUDENT:wahlname><![CDATA['.$row->wahlname.']]></STUDENT:wahlname>
 			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
 			<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
@@ -330,6 +335,7 @@ function draw_content($row)
 			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
 			<STUDENT:link_bewerbungstool><![CDATA['.CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.$row->zugangscode.'&emailAdresse='.$mail_privat.']]></STUDENT:link_bewerbungstool>
+			<STUDENT:bpk><![CDATA['.$row->bpk.']]></STUDENT:bpk>
 
 			<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
@@ -375,11 +381,19 @@ function draw_prestudent($row)
 				<STUDENT:zgvdatum><![CDATA['.$datum_obj->convertISODate($row->zgvdatum).']]></STUDENT:zgvdatum>
 				<STUDENT:zgvdatum_iso><![CDATA['.$row->zgvdatum.']]></STUDENT:zgvdatum_iso>
 				<STUDENT:zgvnation><![CDATA['.$row->zgvnation.']]></STUDENT:zgvnation>
+				<STUDENT:zgv_erfuellt><![CDATA['.$row->zgv_erfuellt.']]></STUDENT:zgv_erfuellt>
 				<STUDENT:zgvmas_code><![CDATA['.$row->zgvmas_code.']]></STUDENT:zgvmas_code>
 				<STUDENT:zgvmaort><![CDATA['.$row->zgvmaort.']]></STUDENT:zgvmaort>
 				<STUDENT:zgvmadatum><![CDATA['.$datum_obj->convertISODate($row->zgvmadatum).']]></STUDENT:zgvmadatum>
 				<STUDENT:zgvmadatum_iso><![CDATA['.$row->zgvmadatum.']]></STUDENT:zgvmadatum_iso>
 				<STUDENT:zgvmanation><![CDATA['.$row->zgvmanation.']]></STUDENT:zgvmanation>
+				<STUDENT:zgvmas_erfuellt><![CDATA['.$row->zgvmas_erfuellt.']]></STUDENT:zgvmas_erfuellt>
+				<STUDENT:zgvdoktor_code><![CDATA['.$row->zgvdoktor_code.']]></STUDENT:zgvdoktor_code>
+				<STUDENT:zgvdoktorort><![CDATA['.$row->zgvdoktorort.']]></STUDENT:zgvdoktorort>
+				<STUDENT:zgvdoktordatum><![CDATA['.$datum_obj->convertISODate($row->zgvdoktordatum).']]></STUDENT:zgvdoktordatum>
+				<STUDENT:zgvdoktordatum_iso><![CDATA['.$row->zgvdoktordatum.']]></STUDENT:zgvdoktordatum_iso>
+				<STUDENT:zgvdoktornation><![CDATA['.$row->zgvdoktornation.']]></STUDENT:zgvdoktornation>
+				<STUDENT:zgvdoktor_erfuellt><![CDATA['.$row->zgvdoktor_erfuellt.']]></STUDENT:zgvdoktor_erfuellt>
 				<STUDENT:ausstellungsstaat><![CDATA['.$row->ausstellungsstaat.']]></STUDENT:ausstellungsstaat>
 				<STUDENT:aufnahmeschluessel><![CDATA['.$row->aufnahmeschluessel.']]></STUDENT:aufnahmeschluessel>
 				<STUDENT:facheinschlberuf><![CDATA['.($row->facheinschlberuf?'true':'false').']]></STUDENT:facheinschlberuf>
@@ -412,6 +426,7 @@ function draw_empty_content()
 			<STUDENT:titelpre><![CDATA[]]></STUDENT:titelpre>
 			<STUDENT:titelpost><![CDATA[]]></STUDENT:titelpost>
 			<STUDENT:vornamen><![CDATA[]]></STUDENT:vornamen>
+			<STUDENT:wahlname><![CDATA[]]></STUDENT:wahlname>
 			<STUDENT:vorname><![CDATA[]]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA[KEINE RESULTATE]]></STUDENT:nachname>
 			<STUDENT:geburtsdatum><![CDATA[]]></STUDENT:geburtsdatum>
@@ -441,6 +456,7 @@ function draw_empty_content()
 			<STUDENT:mail_intern><![CDATA[]]></STUDENT:mail_intern>
 			<STUDENT:zugangscode><![CDATA[]]></STUDENT:zugangscode>
 			<STUDENT:link_bewerbungstool><![CDATA[]]></STUDENT:link_bewerbungstool>
+			<STUDENT:bpk><![CDATA[]]></STUDENT:bpk>
 
 			<STUDENT:aktiv><![CDATA[]]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA[]]></STUDENT:uid>
@@ -453,7 +469,7 @@ function draw_empty_content()
 			<STUDENT:matr_nr><![CDATA[]]></STUDENT:matr_nr>
 			<STUDENT:studiengang_studiengangsleitung><![CDATA[]]></STUDENT:studiengang_studiengangsleitung>
 			<STUDENT:anzahl_notizen><![CDATA[]]></STUDENT:anzahl_notizen>
-			
+
 			<STUDENT:prestudent_id><![CDATA[]]></STUDENT:prestudent_id>
 			<STUDENT:studiengang_kz_prestudent><![CDATA[]]></STUDENT:studiengang_kz_prestudent>
 			<STUDENT:studiengang_kz><![CDATA[]]></STUDENT:studiengang_kz>
@@ -596,7 +612,7 @@ if($xmlformat=='rdf')
 
 		$sql_query="
 		SELECT
-			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, vornamen, geschlecht,
+			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, wahlname, vornamen, geschlecht,
 			nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
@@ -608,7 +624,7 @@ if($xmlformat=='rdf')
 			AS email_privat,
 			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
 			 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr,
-			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode
+			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode, p.bpk
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON (student_uid=uid)
@@ -764,8 +780,16 @@ if($xmlformat=='rdf')
 	}
 	else
 	{
-		// String aufsplitten und Sonderzeichen entfernen
-		$searchItems = explode(' ',TRIM(str_replace(',', '', $filter),' 	!.?'));
+		// Sonderzeichen entfernen und String aufsplitten
+		// Replace commas with whitespace
+		$filter = str_replace(',', ' ', $filter);
+		// Replace multiple whitespaces with just one
+		$filter = preg_replace('/\s/', ' ', $filter);
+		// Trim whitespaces and special characters from the string
+		$filter = trim($filter,' 		!.?');
+		// Explode string
+		$searchItems = explode(' ',$filter);
+
 		$kriterienliste = array("#email","#name","#pid","#preid","#tel", "#ref");
 		$suchkriterium = '';
 
@@ -858,8 +882,11 @@ if($xmlformat=='rdf')
 					WHERE
 						UPPER(nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(wahlname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
-						UPPER(nachname || ' ' || vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).");";
+						UPPER(nachname || ' ' || vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(wahlname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(nachname || ' ' || wahlname) = UPPER(".$db->db_add_param($searchItems_string_orig).");";
 
 				if($db->db_query($qry))
 				{
@@ -910,6 +937,8 @@ if($xmlformat=='rdf')
 				{
 					$qry .= "	UPPER(vorname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								UPPER(nachname || ' ' || vorname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(nachname || ' ' || wahlname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(wahlname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								student_uid ~* LOWER(".$db->db_add_param($searchItems_string).")";
 				}
 				else
@@ -1173,6 +1202,7 @@ else
 				<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
 				<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
 				<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
+				<wahlname><![CDATA['.$student->wahlname.']]></wahlname>
 				<vorname><![CDATA['.$student->vorname.']]></vorname>
 				<nachname><![CDATA['.$student->nachname.']]></nachname>
 				<matrikelnummer><![CDATA['.$student->matrikelnr.']]></matrikelnummer>

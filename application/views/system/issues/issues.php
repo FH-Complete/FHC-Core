@@ -3,22 +3,23 @@ $this->load->view(
 	'templates/FHC-Header',
 	array(
 		'title' => 'Fehler Monitoring',
-		'jquery' => true,
-		'jqueryui' => true,
-		'jquerycheckboxes' => true,
-		'bootstrap' => true,
-		'fontawesome' => true,
-		'sbadmintemplate' => true,
-		'tablesorter' => true,
+		'jquery3' => true,
+		'jqueryui1' => true,
+		'jquerycheckboxes1' => true,
+		'bootstrap3' => true,
+		'fontawesome4' => true,
+		'sbadmintemplate3' => true,
+		'tablesorter2' => true,
 		'ajaxlib' => true,
 		'filterwidget' => true,
 		'navigationwidget' => true,
 		'dialoglib' => true,
 		'phrases' => array(
-			'ui' => array('bitteEintragWaehlen')
+			'ui',
+			'fehlermonitoring'
 		),
 		'customCSSs' => array('public/css/issues/issuesDataset.css', 'public/css/sbadmin2/tablesort_bootstrap.css'),
-		'customJSs' => array('public/js/issues/issuesDataset.js', 'public/js/bootstrapper.js')
+		'customJSs' => array('public/js/issues/issuesDataset.js', 'public/js/bootstrapper.js'),
 	)
 );
 ?>
@@ -33,7 +34,7 @@ $this->load->view(
 			<div class="row">
 				<div class="col-lg-12">
 					<h3 class="page-header">
-						Fehler Monitoring
+						<?php echo $this->p->t('fehlermonitoring', 'fehlerMonitoring') ?>
 					</h3>
 				</div>
 			</div>

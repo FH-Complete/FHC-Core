@@ -25,6 +25,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/coodle.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
 $sprache = getSprache();
@@ -35,6 +36,22 @@ $message='';
 
 if(!check_lektor($user))
 	die($p->t('global/keineBerechtigung'));
+
+// Administratoren duerfen die UID als Parameter uebergeben um die Umfragen von anderen Personen anzuzeigen
+if(isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if($rechte->isBerechtigt('admin'))
+	{
+		$user = $_GET['uid'];
+		$getParam = '&uid='.$user;
+	}
+	else
+		$getParam = '';
+}
+else
+	$getParam = '';
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -47,7 +64,7 @@ echo '
 	<link rel="stylesheet" href="../../../skin/styles/jquery.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 	<link rel="stylesheet" href="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" type="text/css"/>
-	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>

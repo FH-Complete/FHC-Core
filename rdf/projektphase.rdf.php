@@ -36,9 +36,9 @@ $projekt_kurzbz = isset($_GET['projekt_kurzbz'])?$_GET['projekt_kurzbz'] : '';
 if($projektphase_id != '')
 {
 	$phase = new projektphase();
-	$timestamp = time(); 
+	$timestamp = time();
 	$timestamp = date('Y-m-d');
-	
+
 	if(!$phase->load($projektphase_id))
 		die('Fehler beim Laden der Phase');
 	$ergebnis = $phase->getFortschritt($projektphase_id);
@@ -47,7 +47,7 @@ if($projektphase_id != '')
 	// hat phase schon begonnen
 	if($timestamp <= $phase->start || $phase->start == '')
 		$ergebnis = "-";
-	
+
 	$oRdf->obj[$i]->setAttribut('projektphase_id',$phase->projektphase_id);
 	$oRdf->obj[$i]->setAttribut('projekt_kurzbz',$phase->projekt_kurzbz);
 	$oRdf->obj[$i]->setAttribut('projektphase_fk',$phase->projektphase_fk);
@@ -63,78 +63,93 @@ if($projektphase_id != '')
     $oRdf->obj[$i]->setAttribut('farbe',$phase->farbe);
     $oRdf->obj[$i]->setAttribut('typ',$phase->typ);
     $oRdf->obj[$i]->setAttribut('ressource_id',$phase->ressource_id);
-	
+	$oRdf->obj[$i]->setAttribut('zeitaufzeichnung',$phase->zeitaufzeichnung);
+
 	if($phase->projektphase_fk!='')
 		$oRdf->addSequence($phase->projektphase_id, $phase->projektphase_fk);
 	else
 		$oRdf->addSequence($phase->projektphase_id);
-		
-}else if($projekt_kurzbz != '')
+
+}
+else if($projekt_kurzbz != '')
 {
 	$projektphase = new projektphase();
-	
+
 	// gesetzt wenn abfrage für fk ansonsten lade alle phasen zur projekt_kurzbz
 	if(isset($_GET['phase_id']))
 		$projektphase->getProjektphasenForFk($projekt_kurzbz, $_GET['phase_id']);
-	else 
-		$projektphase->getProjektphasen($projekt_kurzbz); 
-	
+	else
+		$projektphase->getProjektphasen($projekt_kurzbz);
+
 	if(isset($_GET['optional']))
 	{
 		$idx=$oRdf->newObjekt('opt');
-		
-		$oRdf->obj[$idx]->setAttribut('projektphase_id','');		
-		$oRdf->obj[$idx]->setAttribut('projekt_kurzbz', '');		
+
+		$oRdf->obj[$idx]->setAttribut('projektphase_id','');
+		$oRdf->obj[$idx]->setAttribut('projekt_kurzbz', '');
 		$oRdf->obj[$idx]->setAttribut('projektphase_fk', '');
-		$oRdf->obj[$idx]->setAttribut('bezeichnung','< Auswahl >');		
-		$oRdf->obj[$idx]->setAttribut('beschreibung', '');		
+		$oRdf->obj[$idx]->setAttribut('bezeichnung','< Auswahl >');
+		$oRdf->obj[$idx]->setAttribut('beschreibung', '');
 		$oRdf->obj[$idx]->setAttribut('start', '');
 		$oRdf->obj[$idx]->setAttribut('ende', '');
-		$oRdf->obj[$idx]->setAttribut('budget', '');		
-		$oRdf->obj[$idx]->setAttribut('personentage', '');	
+		$oRdf->obj[$idx]->setAttribut('budget', '');
+		$oRdf->obj[$idx]->setAttribut('personentage', '');
         $oRdf->obj[$idx]->setAttribut('farbe', '');
         $oRdf->obj[$idx]->setAttribut('typ', '');
-		
+		$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung','');
+
 		$oRdf->addSequence('opt');
 	}
-		
+
 	foreach($projektphase->result as $phase)
 	{
 		$idx=$oRdf->newObjekt($phase->projektphase_id);
-		
-		$oRdf->obj[$idx]->setAttribut('projektphase_id',$phase->projektphase_id);		
-		$oRdf->obj[$idx]->setAttribut('projekt_kurzbz', $phase->projekt_kurzbz);		
+
+		$oRdf->obj[$idx]->setAttribut('projektphase_id',$phase->projektphase_id);
+		$oRdf->obj[$idx]->setAttribut('projekt_kurzbz', $phase->projekt_kurzbz);
 		$oRdf->obj[$idx]->setAttribut('projektphase_fk', $phase->projektphase_fk);
-		$oRdf->obj[$idx]->setAttribut('bezeichnung',$phase->bezeichnung);		
-		$oRdf->obj[$idx]->setAttribut('beschreibung', $phase->beschreibung);		
+		$oRdf->obj[$idx]->setAttribut('bezeichnung',$phase->bezeichnung);
+		$oRdf->obj[$idx]->setAttribut('beschreibung', $phase->beschreibung);
 		$oRdf->obj[$idx]->setAttribut('start', $phase->start);
 		$oRdf->obj[$idx]->setAttribut('ende', $phase->ende);
-		$oRdf->obj[$idx]->setAttribut('budget', $phase->budget);		
+		$oRdf->obj[$idx]->setAttribut('budget', $phase->budget);
 		$oRdf->obj[$idx]->setAttribut('personentage', $phase->personentage);
         $oRdf->obj[$idx]->setAttribut('farbe', $phase->farbe);
         $oRdf->obj[$idx]->setAttribut('typ', $phase->typ);
-	
+		$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung',$phase->zeitaufzeichnung);
+
 		$oRdf->addSequence($phase->projektphase_id);
 	}
-	
+
 }
 else
 {
 	$projekt_obj = new projekt();
-    
-    if(!isset($_REQUEST['filter']))
-        $projekt_obj->getProjekte();
-    else
-    {
-        if($_REQUEST['filter']=='aktuell')
-            $projekt_obj->getProjekteAktuell();
-        else if($_REQUEST['filter']=='kommende')
-            $projekt_obj->getProjekteAktuell(true);
-    }
-    
+
+	if(isset($_REQUEST['filterprj']))
+	{
+		$projekt_obj2 = new projekt();
+		if($projekt_obj2->load($_REQUEST['filterprj']))
+		{
+			$projekt_obj->result[] = $projekt_obj2;
+		}
+	}
+	else
+	{
+	    if(!isset($_REQUEST['filter']))
+	        $projekt_obj->getProjekte();
+	    else
+	    {
+	        if($_REQUEST['filter']=='aktuell')
+	            $projekt_obj->getProjekteAktuell();
+	        else if($_REQUEST['filter']=='kommende')
+	            $projekt_obj->getProjekteAktuell(true);
+	    }
+	}
+
 	$projektphase_obj = new projektphase();
 	$sequenzProjektphase = array();
-		
+
 	$descr='';
 	$sequenz='';
 	$lastOE=null;
@@ -149,7 +164,7 @@ else
 		if ($lastOE!=$currentOE || $i==0)
 		{
 			$idx=$oRdf->newObjekt($projekt->oe_kurzbz);
-	
+
 			$oRdf->obj[$idx]->setAttribut('bezeichnung',$projekt->oe_kurzbz);
 			$oRdf->obj[$idx]->setAttribut('oe_kurzbz',$projekt->oe_kurzbz);
 			$oRdf->obj[$idx]->setAttribut('projekt_kurzbz','');
@@ -163,14 +178,15 @@ else
 			$oRdf->obj[$idx]->setAttribut('beginn','');
 			$oRdf->obj[$idx]->setAttribut('ende','');
 			$oRdf->obj[$idx]->setAttribut('typ','organisationseinheit');
-			
+			$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung','');
+
 			$oRdf->addSequence($projekt->oe_kurzbz);
-			
+
 			$lastOE=$currentOE;
 		}
-		
+
 		$idx=$oRdf->newObjekt($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz);
-	
+
 		$oRdf->obj[$idx]->setAttribut('bezeichnung',$projekt->titel);
 		$oRdf->obj[$idx]->setAttribut('oe_kurzbz',$projekt->oe_kurzbz);
 		$oRdf->obj[$idx]->setAttribut('projekt_kurzbz',$projekt->projekt_kurzbz);
@@ -184,26 +200,28 @@ else
 		$oRdf->obj[$idx]->setAttribut('beginn',$datum_obj->formatDatum($projekt->beginn,'d.m.Y'));
 		$oRdf->obj[$idx]->setAttribut('ende',$datum_obj->formatDatum($projekt->ende,'d.m.Y'));
 		$oRdf->obj[$idx]->setAttribut('typ','projekt');
-		
+		$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung',$projekt->zeitaufzeichnung);
+
+
 		$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz, $projekt->oe_kurzbz);
-				
+
 		$projektphase_obj->getProjektphasen($projekt->projekt_kurzbz);
 		$tmpStr='';
 		for ($j=0;$j<count($projektphase_obj->result);$j++)
 		{
 			$projektphase=$projektphase_obj->result[$j];
-					
-			$timestamp = time(); 
+
+			$timestamp = time();
 			$timestamp = date('Y-m-d');
 
 			$ergebnis = $projektphase->getFortschritt($projektphase->projektphase_id);
-			
+
 			// hat phase schon begonnen
 			if($timestamp <= $projektphase->start || $projektphase->start == '')
 				$ergebnis = "-";
-			
+
 			$idx=$oRdf->newObjekt($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_id);
-	
+
 			$oRdf->obj[$idx]->setAttribut('bezeichnung',$projektphase->bezeichnung);
 			$oRdf->obj[$idx]->setAttribut('oe_kurzbz',$projekt->oe_kurzbz);
 			$oRdf->obj[$idx]->setAttribut('projekt_kurzbz',$projektphase->projekt_kurzbz);
@@ -223,6 +241,7 @@ else
 			$oRdf->obj[$idx]->setAttribut('typ',strtolower($projektphase->typ));
 			$oRdf->obj[$idx]->setAttribut('ressource_bezeichnung',$projektphase->ressource_bezeichnung);
 			$oRdf->obj[$idx]->setAttribut('ressource_id',$projektphase->ressource_id);
+			$oRdf->obj[$idx]->setAttribut('zeitaufzeichnung',$projektphase->zeitaufzeichnung);
 			if (!is_null($projektphase->projektphase_fk))
 				$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_id, $projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_fk);
 			else

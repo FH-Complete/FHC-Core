@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Abgabetool';
 $this->phrasen['abgabetool/aeltereParbeitBenoten']='Projektarbeit für älteres Semester, bitte Word-Formular zur Benotung verwenden!';
+$this->phrasen['abgabetool/keinEnduploadErfolgt']='Endupload ist noch nicht erfolgt';
 $this->phrasen['abgabetool/typ']='Typ';
 $this->phrasen['abgabetool/titel']='Titel';
 $this->phrasen['abgabetool/betreuerart']='Betreuerart';
@@ -89,4 +90,5 @@ $this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='keine Zustellmail für 
 $this->phrasen['abgabetool/projektbeurteilungDownload']='Projektbeurteilung herunterladen';
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='Erst-/Begutachter';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Zweitbegutachter';
+$this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Fehler beim Ermitteln des Enduplaods der Projektarbeit';
 ?>

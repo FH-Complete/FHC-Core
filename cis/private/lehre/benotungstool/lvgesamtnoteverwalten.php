@@ -45,6 +45,8 @@ require_once ('../../../../include/note.class.php');
 require_once ('../../../../include/notenschluessel.class.php');
 require_once ('../../../../include/studienplan.class.php');
 require_once ('../../../../include/addon.class.php');
+require_once ('../../../../include/mobilitaet.class.php');
+require_once ('../../../../include/student.class.php');
 
 $summe_stud = 0;
 $summe_t2 = 0;
@@ -80,6 +82,8 @@ if (! $lv_obj->load($lvid))
 // Studiengang laden
 $stg_obj = new studiengang($lv_obj->studiengang_kz);
 
+$stg_obj->studiengang_kz;
+
 $datum_obj = new datum();
 
 if (isset($_GET['stsem']))
@@ -108,7 +112,7 @@ echo '<!DOCTYPE HTML>
 	<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
 	<link href="../../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -732,6 +736,7 @@ else
 	die($p->t('global/fehleraufgetreten'));
 
 // Kopfzeile
+
 echo '
 <table width="100%">
 	<tr>
@@ -798,6 +803,7 @@ if (defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && CIS_ANWESENHEITSLIST
 {
 	$hrefpath = "../notenliste.xls.php?stg=$stg_obj->studiengang_kz&lvid=$lvid&stsem=$stsem";
 	echo "<br><a class='Item' href='" . $hrefpath . "'>" . $p->t('benotungstool/notenlisteImport') . "</a>";
+
 }
 
 // eingetragene lv-gesamtnoten freigeben
@@ -1113,8 +1119,8 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 					campus.vw_student_lehrveranstaltung
 					JOIN campus.vw_student USING(uid)
 				WHERE
-					studiensemester_kurzbz = " . $db->db_add_param($stsem) . "
-					AND lehrveranstaltung_id = " . $db->db_add_param($lvid) . "
+					studiensemester_kurzbz = ". $db->db_add_param($stsem). "
+					AND lehrveranstaltung_id = ". $db->db_add_param($lvid). "
 				ORDER BY nachname, vorname ";
 
 	if ($result_stud = $db->db_query($qry_stud))
@@ -1122,10 +1128,28 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		$i = 1;
 		$errorshown = false;
 		$summe_stud = $db->db_num_rows($result_stud);
+
+		//Ergänzung um Mobility-Eintrag (d.d.)
 		while ($row_stud = $db->db_fetch_object($result_stud))
 		{
 			$grades[$row_stud->uid]['vorname'] = $row_stud->vorname;
 			$grades[$row_stud->uid]['nachname'] = $row_stud->nachname;
+
+			$student = new student();
+			$student->load($row_stud->uid);
+			$student->result[]= $student;
+			$prestudent_id = $student->prestudent_id;
+
+			$mobility = new mobilitaet();
+			$mobility->loadPrestudent($prestudent_id);
+			$output = $mobility->result;
+			$eintrag = '';
+			foreach ($output as $k)
+			{
+				if(($k->mobilitaetstyp_kurzbz == 'GS') && ($k->studiensemester_kurzbz == $stsem))
+			 	$eintrag = ' (d.d.)';
+			}
+			$grades[$row_stud->uid]['mobility'] = $eintrag;
 
 			// Noten aus Uebungstool
 			$le = new lehreinheit();
@@ -1167,12 +1191,14 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 
 	$anzahlChanged = 0;
 	foreach ($grades as $uid => $data)
+	//Ausgabe Array
 	{
+
 		$htmlstring .= '<tr class="liste' . ($i % 2) . '">
 			<td><a href="mailto:' . $uid . '@' . DOMAIN . '"><img src="../../../../skin/images/button_mail.gif"></a></td>
 			<td>' . $db->convert_html_chars($uid) . '</td>
 			<td id= '. $uid. "_nn". '>' . $db->convert_html_chars($data['nachname']) . '</td>
-			<td id= '. $uid. "_vn". '>' . $db->convert_html_chars($data['vorname']) . '</td>';
+			<td id= '. $uid. "_vn". '>' . $db->convert_html_chars($data['vorname']) .  $db->convert_html_chars($data['mobility']) .'</td>';
 
 		// Bereits eingetragene Note ermitteln
 		if ($lvgesamtnote = new lvgesamtnote($lvid, $uid, $stsem))
@@ -1195,6 +1221,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		$negativeteilnote = false;
 		$note_zusatztext = '';
 		$note_zusatztext_tooltip = '';
+		$ueberschreibbar = false; //Damit keine Notice Fehler kommt muss Variable bei jeden Schleifendurchgang neue gesetzt und berechnet werden.
 
 		if (isset($data['grades']))
 		{
@@ -1618,6 +1645,12 @@ echo $htmlstring;
 ?>
 
 <div id="nachpruefung_div"></div>
+
+<div id="legende">
+	<hr>
+	<h3>Legende</h2>
+	<p>(d.d.)... Double Degree Program</p>
+</div>
 
 </body>
 </html>

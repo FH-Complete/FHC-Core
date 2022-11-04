@@ -50,10 +50,10 @@ if(!$rechte->isBerechtigt('student/stammdaten',null,'suid') && !$rechte->isBerec
 	die('Sie haben keine Berechtigung für diese Seite');
 
 $error_log='';
+$error_log_hinweis='';
 $error_log1='';
 $error_log_all="";
 $error_log_io = ''; // error log fuer plausichecks von incomings/outgoings
-$stgart='';
 $fehler='';
 $maxsemester=0;
 $v='';
@@ -81,6 +81,7 @@ $aktstatus='';
 $aktstatus_datum='';
 $mob='';
 $gast='';
+$herkunft='';
 $avon='';
 $abis='';
 $zweck='';
@@ -105,6 +106,8 @@ $student_data=array();
 $datum_obj = new datum();
 
 //Beginn- und Endedatum des aktuellen Semesters
+// Update 07.12.2021 kindlm: scheint nicht verwendet zu werden
+/*
 $qry="SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$db->db_add_param($ssem).";";
 if($result = $db->db_query($qry))
 {
@@ -113,7 +116,8 @@ if($result = $db->db_query($qry))
 		$beginn=$row->start;
 		$ende=$row->ende;
 	}
-}
+}*/
+
 //Ermittlung aktuelles und letztes BIS-Meldedatum
 if(mb_strstr($ssem,"WS"))
 {
@@ -129,6 +133,13 @@ else
 {
 	die('Ung&uuml;ltiges Studiensemester!');
 }
+
+//Wenn bisdatum als GET-Parameter übergeben wird, dieses Datum nehmen
+if (isset($_GET['bisdatum']))
+{
+	$bisdatum = $_GET['bisdatum'];
+}
+
 //ausgewaehlter Studiengang
 if(isset($_GET['stg_kz']))
 {
@@ -140,15 +151,17 @@ else
 }
 
 /*
+Obsolete - Standort wird nun aus DB geholt
  standortcode 22=Wien
 derzeit fuer alle Studierende der gleiche Standort
 ToDo: Standort sollte pro Student konfigurierbar sein.
-*/
+
 $standortcode='22';
-if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859')))
+if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859','871')))
 	$standortcode='14'; // Pinkafeld
 elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271','781')))
 	$standortcode='3'; // Eisenstadt
+*/
 
 $datumobj=new datum();
 
@@ -177,112 +190,95 @@ $kodex_studstatuscode_array['Unterbrecher']=2;
 $kodex_studstatuscode_array['Absolvent']   =3;
 $kodex_studstatuscode_array['Abbrecher']   =4;
 
-//Studiengangsdaten auslesen
-$stg_obj = new studiengang();
-if($stg_obj->load($stg_kz))
-{
-	$maxsemester=$stg_obj->max_semester;
-	if($maxsemester==0)
-	{
-		echo "Die maximale Semesteranzahl des Studienganges ist nicht angegeben!";
-		exit;
-	}
-
-	$erhalter = sprintf('%03s',$stg_obj->erhalter_kz);
-
-	switch($stg_obj->typ)
-	{
-		case 'b': $stgart=1; break;
-		case 'm': $stgart=2; break;
-		case 'd': $stgart=3; break;
-		case 'e': $stgart=4; break;
-		default: die('<h2>Dieser Studiengangstyp kann nicht gemeldet werden. Typ muss (b, m, d oder e) sein</h2>'); break;
-	}
-
-	// DoubleDegree Studierende werden per Default aus BB gemeldet.
-	// Wenn es ein reiner VZ Studiengang ist, dann sollen diese aber als VZ gemeldet werden.
-	if($stg_obj->orgform_kurzbz=='VZ')
-		$orgform_code_array['DDP']=$orgform_code_array['VZ'];
-
-	$orgform_code = $orgform_code_array[$stg_obj->orgform_kurzbz];
-	$orgform_kurzbz=$stg_obj->orgform_kurzbz;
-}
-else
-	die('Fehler:'.$stg_obj->errormsg);
-
-
 //Ausgabe aktiver Studenten, die nicht gemeldet werden
-$qry_akt="
-	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
-	FROM
-		public.tbl_student
-		JOIN public.tbl_benutzer ON(student_uid=uid)
-		JOIN public.tbl_person USING (person_id)
-		JOIN public.tbl_prestudent USING (prestudent_id)
-		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
-	WHERE
-		bismelden=FALSE
-		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
-		AND (tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)." AND status_kurzbz IN ('Student','Diplomand','Unterbrecher','Praktikant','Outgoing'))
-		AND tbl_prestudent.prestudent_id NOT IN
-			(
-			SELECT prestudent_id
-			FROM public.tbl_prestudentstatus
-			WHERE
-			 	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)."
-			 	AND (status_kurzbz='Abbrecher' OR status_kurzbz='Absolvent')
-			 )
-	ORDER BY student_uid, nachname, vorname
-	";
-if($result_akt = $db->db_query($qry_akt))
+if ($stg_kz != 'alleBaMa')
 {
-	while($row_akt = $db->db_fetch_object($result_akt))
+	$qry_akt = "
+		SELECT
+			DISTINCT ON(student_uid, nachname, vorname) *,
+			public.tbl_person.person_id AS pers_id,
+			public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+			public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+		FROM
+			public.tbl_student
+			JOIN public.tbl_benutzer ON(student_uid=uid)
+			JOIN public.tbl_person USING (person_id)
+			JOIN public.tbl_prestudent USING (prestudent_id)
+			JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+			JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
+		WHERE
+			bismelden=FALSE
+			AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
+			AND (tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)." AND status_kurzbz IN ('Student','Diplomand','Unterbrecher','Praktikant','Outgoing'))
+			AND tbl_prestudent.prestudent_id NOT IN
+				(
+				SELECT prestudent_id
+				FROM public.tbl_prestudentstatus
+				WHERE
+				    tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)."
+				    AND (status_kurzbz='Abbrecher' OR status_kurzbz='Absolvent')
+				 )
+		ORDER BY student_uid, nachname, vorname
+		";
+	if ($result_akt = $db->db_query($qry_akt))
 	{
-		$v.="<u><b>Person (UID, Vorname, Nachname) '".$row_akt->student_uid."', '".$row_akt->nachname."', '".$row_akt->vorname."'</u></b> hat Status $row_akt->status_kurzbz, wird aber nicht BIS gemeldet!!! <br>\n";
-		$anzahl_fehler++;
+		while ($row_akt = $db->db_fetch_object($result_akt))
+		{
+			$v .= "<u><b>Person (UID, Vorname, Nachname) '".$row_akt->student_uid."', '".$row_akt->nachname."', '".$row_akt->vorname."'</u></b> hat Status $row_akt->status_kurzbz, wird aber nicht BIS gemeldet!!! <br>\n";
+			$anzahl_fehler++;
+		}
 	}
 }
 
+if ($stg_kz != 'alleBaMa')
+{
 //Incoming ohne I/O Datensatz anzeigen
-$qry_in="
+	$qry_in = "
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
 		AND (status_kurzbz='Incoming' AND NOT EXISTS (SELECT 1 FROM bis.tbl_bisio WHERE student_uid=tbl_student.student_uid))
 	ORDER BY student_uid, nachname, vorname
 	";
-if($result_in = $db->db_query($qry_in))
-{
-	while($row_in = $db->db_fetch_object($result_in))
+	if ($result_in = $db->db_query($qry_in))
 	{
-		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row_in->student_uid."', '".$row_in->nachname."', '".$row_in->vorname."' ($row_in->status_kurzbz): </u>\n";
-		$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Es fehlt der I/O-Datensatz\n\n";
-		$anzahl_fehler++;
+		while ($row_in = $db->db_fetch_object($result_in))
+		{
+			$v .= "<u>Bei Student (UID, Vorname, Nachname) '".$row_in->student_uid."', '".$row_in->nachname."', '".$row_in->vorname."' ($row_in->status_kurzbz): </u>\n";
+			$v .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Es fehlt der I/O-Datensatz\n\n";
+			$anzahl_fehler++;
+		}
 	}
 }
-
 //Hauptselect
 // An der FHTW können nur die Incomings ausgelesen werden, wenn die stg_kz 10006 übergeben wird
 if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
 {
 	$qry="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
 		AND (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
@@ -291,17 +287,54 @@ if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
 	ORDER BY student_uid, nachname, vorname
 	";
 }
-else
+// Wenn "alleBaMa" als $stg_kz übergeben wird, wird ein großes XML mit allen Studiengängen geladen
+elseif ($stg_kz == 'alleBaMa')
 {
 	$qry="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
+	WHERE
+		bismelden=TRUE
+		AND tbl_studiengang.typ IN ('b','m','e')
+		AND tbl_studiengang.melderelevant=TRUE
+		AND tbl_studiengang.studiengang_kz > 0
+		AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
+			AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
+			OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
+			OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
+			OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
+			OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
+			OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
+		)))
+	ORDER BY tbl_student.studiengang_kz, matrikelnr, nachname, vorname
+	";
+}
+else
+{
+	$qry="
+	SELECT
+		DISTINCT ON(student_uid, nachname, vorname) *,
+		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
+		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+	FROM
+		public.tbl_student
+		JOIN public.tbl_benutzer ON(student_uid=uid)
+		JOIN public.tbl_person USING (person_id)
+		JOIN public.tbl_prestudent USING (prestudent_id)
+		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang ON (tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
@@ -320,25 +353,78 @@ else
 
 if($result = $db->db_query($qry))
 {
-	$header ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<Erhalter>
-  <ErhKz>".$erhalter."</ErhKz>
-  <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
-  <StudierendenBewerberMeldung>
-    <Studiengang>
-      <StgKz>".$stg_kz."</StgKz>";
 
-
-	$datei .= $header;
-	$dateiNurBewerber .= $header;
+	$stg_kz_index = '';
 
 	while($row = $db->db_fetch_object($result))
 	{
-		$datei.= GenerateXMLStudentBlock($row);
+		$row->pre_foerderrelevant = $db->db_parse_bool($row->pre_foerderrelevant);
+		$row->stg_foerderrelevant = $db->db_parse_bool($row->stg_foerderrelevant);
+
+		if ($row->studiengang_kz != $stg_kz_index)
+		{
+			//Studiengangsdaten auslesen
+			$stg_obj = new studiengang();
+			if($stg_obj->load($row->studiengang_kz))
+			{
+
+
+				$maxsemester = $stg_obj->max_semester;
+				if($maxsemester == 0)
+				{
+					echo "Die maximale Semesteranzahl des Studienganges ist nicht angegeben!";
+					exit;
+				}
+
+				$erhalter = sprintf('%03s',$stg_obj->erhalter_kz);
+
+				switch($stg_obj->typ)
+				{
+					case 'b': $stgart = 1; break;
+					case 'm': $stgart = 2; break;
+					case 'd': $stgart = 3; break;
+					case 'e': $stgart = 4; break;
+					default: die('<h2>Dieser Studiengangstyp kann nicht gemeldet werden. Typ muss (b, m, d oder e) sein</h2>'); break;
+				}
+
+				// DoubleDegree Studierende werden per Default aus BB gemeldet.
+				// Wenn es ein reiner VZ Studiengang ist, dann sollen diese aber als VZ gemeldet werden.
+				if($stg_obj->orgform_kurzbz == 'VZ')
+					$orgform_code_array['DDP'] = $orgform_code_array['VZ'];
+
+				$orgform_code = $orgform_code_array[$stg_obj->orgform_kurzbz];
+				$orgform_kurzbz = $stg_obj->orgform_kurzbz;
+			}
+			else
+				die('Fehler:'.$stg_obj->errormsg);
+
+			// Header am Beginn rausschreiben
+			if ($stg_kz_index == '')
+			{
+				$header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Erhalter>
+  <ErhKz>".$erhalter."</ErhKz>
+  <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
+  <StudierendenBewerberMeldung>";
+
+				$datei .= $header;
+				$dateiNurBewerber .= $header;
+			}
+			if ($stg_kz_index != '' && $row->studiengang_kz != $stg_kz_index)
+			{
+				$datei .= "
+	</Studiengang>";
+			}
+			$stg_kz_index = $row->studiengang_kz;
+			$datei .= "
+	<Studiengang>
+      <StgKz>".$row->studiengang_kz."</StgKz>";
+		}
+		$datei .= GenerateXMLStudentBlock($row);
 	}
 
 	//Bewerberblock bei Ausserordentlichen nicht anzeigen
-	if($stg_kz!=('9'.$erhalter))
+	/*if($stg_kz!=('9'.$erhalter))
 	{
 		$stg_obj = new studiengang();
 
@@ -359,7 +445,7 @@ if($result = $db->db_query($qry))
 			$datei.=$bewerberBlock;
 			$dateiNurBewerber.=$bewerberBlock;
 		}
-	}
+	}*/
 }
 
 $footer="
@@ -392,26 +478,26 @@ echo '	</head>
 	{
 		$("#t1").tablesorter(
 		{
-			sortList: [[6,1],[5,1],[4,1],[2,0],[3,0]], 
+			sortList: [[6,1],[5,1],[4,1],[2,0],[3,0]],
 			widgets: ["zebra", "filter", "stickyHeaders"],
-			widgetOptions : {	filter_functions:  
-								{ 
-									// Add select menu to this column 
+			widgetOptions : {	filter_functions:
+								{
+									// Add select menu to this column
 									4 : {
-									"Abbrecher" : function(e, n, f, i, $r, c, data) { return /Abbrecher/.test(e); }, 
+									"Abbrecher" : function(e, n, f, i, $r, c, data) { return /Abbrecher/.test(e); },
 									"Absolvent" : function(e, n, f, i, $r, c, data) { return /Absolvent/.test(e); },
 									"Diplomand" : function(e, n, f, i, $r, c, data) { return /Diplomand/.test(e); },
 									"Incoming" : function(e, n, f, i, $r, c, data) { return /Incoming/.test(e); },
 									"Student" : function(e, n, f, i, $r, c, data) { return /Student/.test(e); },
-									"Unterbrecher" : function(e, n, f, i, $r, c, data) { return /Unterbrecher/.test(e); }, 
+									"Unterbrecher" : function(e, n, f, i, $r, c, data) { return /Unterbrecher/.test(e); },
 									}
-								} 
-							} 
+								}
+							}
 		});
 		$("#t2").tablesorter(
 		{
-			sortList: [[0,0],[1,0]], 
-			widgets: ["zebra", "filter", "stickyHeaders"] 
+			sortList: [[0,0],[1,0]],
+			widgets: ["zebra", "filter", "stickyHeaders"]
 		});
 	});
 	</script>
@@ -420,6 +506,7 @@ if ($rechte->isBerechtigt('admin'))
 {
 	echo '<form name="frm_studiengang" action='.$_SERVER['PHP_SELF'].' method="GET">';
 	echo 'Studiengang: <SELECT name="stg_kz"  onchange="document.frm_studiengang.submit()">';
+	echo '<OPTION value="alleBaMa" '.($stg_kz == 'alleBaMa' ? 'selected' : '').'>Alle Bachelor und Master</OPTION>';
 	$studiengang = new studiengang();
 	$studiengang->getAll('typ, kurzbz', true);
 	$types = new studiengang();
@@ -427,6 +514,10 @@ if ($rechte->isBerechtigt('admin'))
 	$typ = '';
 	foreach ($studiengang->result AS $row)
 	{
+		if ($row->typ != 'b' && $row->typ != 'm' && $row->typ != 'd' && $row->typ != 'e')
+		{
+			continue;
+		}
 		if ($row->studiengang_kz == $stg_kz)
 		{
 			$selected = 'selected';
@@ -452,10 +543,17 @@ if ($rechte->isBerechtigt('admin'))
 	echo '</select>';
 	echo '</form>';
 }
-$studiengang = new studiengang($stg_kz);
-$typ = new studiengang($stg_kz);
-$typ->getStudiengangTyp($studiengang->typ);
-echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft! Studiengang: ".$db->convert_html_chars($stg_kz)." - ".$typ->bezeichnung." ".$studiengang->bezeichnung."</H1>\n";
+if ($stg_kz != 'alleBaMa')
+{
+	$studiengang = new studiengang($stg_kz);
+	$typ = new studiengang($stg_kz);
+	$typ->getStudiengangTyp($studiengang->typ);
+	echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft. Studiengang: ".$db->convert_html_chars($stg_kz)." - ".$typ->bezeichnung." ".$studiengang->bezeichnung."</H1>\n";
+}
+else
+{
+	echo "<H1>BIS - Studentendaten aller Bachelor- und Master-Studiengänge werden überprüft.</H1>\n";
+}
 echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$db->convert_html_chars($ssem)."): </H2><br>";
 echo nl2br($v."\n\n");
 
@@ -679,10 +777,12 @@ function GenerateXMLStudentBlock($row)
 	global $v;
 	global $stgart, $maxsemester, $orgform_kurzbz, $bisprevious,$anzahl_fehler;
 	global $iosem, $stsem, $usem, $asem, $absem, $stlist, $gssem;
-	global $verwendete_orgformen, $datum_obj,$orgform_code_array,$standortcode;
+	//global $verwendete_orgformen, $datum_obj,$orgform_code_array,$standortcode;
+	global $verwendete_orgformen, $datum_obj,$orgform_code_array;
 	global $kodex_studientyp_array, $kodex_studstatuscode_array;
 	global $stg_kz;
 	$error_log='';
+	$error_log_hinweis='';
 	$error_log1='';
 	$error_log_io = '';
 	$datei = '';
@@ -758,6 +858,29 @@ function GenerateXMLStudentBlock($row)
 		$email = $row->student_uid. '@'. DOMAIN;
 	}
 
+	// private eMail-Adresse
+	$email_privat = '';
+	$qry_privmail = "
+		SELECT kontakt
+		FROM public.tbl_kontakt
+		WHERE zustellung = TRUE
+	  	AND kontakttyp = 'email'
+		AND person_id=". $db->db_add_param($row->pers_id). "
+		ORDER BY insertamum DESC
+		LIMIT 1;
+	";
+
+	if ($privmail_result = $db->db_query($qry_privmail))
+	{
+		if($db->db_num_rows($privmail_result) == 1)
+		{
+			if ($row_privmail = $db->db_fetch_object($privmail_result))
+			{
+				$email_privat = $row_privmail->kontakt;
+			}
+		}
+	}
+
 	if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -792,7 +915,7 @@ function GenerateXMLStudentBlock($row)
 	}
 	if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 	{
-		$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
+		$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
 	}
 	if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 	{
@@ -822,9 +945,9 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
-	/*if($row->bpk == '' || $row->bpk == null)
+	if($row->bpk == '' || $row->bpk == null)
 	{
-		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
+		$error_log_hinweis .= (!empty($error_log_hinweis) ? ', ' : '') . "bPK fehlt";
 	}
 	if($row->bpk != '' && $row->bpk != null)
 	{
@@ -837,7 +960,7 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 		}
-	}*/
+	}
 	if (!$ausserordentlich && !$incoming)
 	{
 		if ($zustell_plz == '' || $zustell_plz == null)
@@ -888,25 +1011,25 @@ function GenerateXMLStudentBlock($row)
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgCode ('".$row->zgvmas_code."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMaCode ('".$row->zgvmas_code."')";
 			}
 			if($row->zgvmadatum=='' || $row->zgvmadatum==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."')";
 			}
 			else
 			{
 				if($row->zgvmadatum>date("Y-m-d"))
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
 				}
 				if($row->zgvmadatum<$row->zgvdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
 				}
 				if($row->zgvmadatum<$row->gebdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 				}
 			}
 		}
@@ -949,18 +1072,62 @@ function GenerateXMLStudentBlock($row)
 					|| $rowstatus->status_kurzbz=="Diplomand")
 				{
 					$status=1;
+					$meldestatus='I';
+
+					// Wiedereintrittsdatum
+					// letzten Status des letzten Semesters holen
+					$prestudent_last_status = new prestudent();
+					if ($prestudent_last_status->getLastStatus($row->prestudent_id, $psem))
+					{
+						// Datum setzen wenn aktiver Status nach Unterbrecher
+						if ($prestudent_last_status->status_kurzbz == 'Unterbrecher')
+							$wiedereintrittsdatum = $rowstatus->datum;
+					}
+
 				}
 				else if($rowstatus->status_kurzbz=="Unterbrecher" )
 				{
 					$status=2;
+					$meldestatus='U';
+
+					$qryVorherigerErsterStatus = "
+						SELECT status.datum, status.status_kurzbz
+						FROM public.tbl_prestudentstatus status
+						JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+						WHERE prestudent_id = ".$db->db_add_param($row->prestudent_id)."
+						AND sem.start::date <= (SELECT start from public.tbl_studiensemester WHERE studiensemester_kurzbz = ".$db->db_add_param($ssem).")::date
+						ORDER BY sem.start DESC, status.datum DESC";
+
+					$unterbrechungsdatum = null;
+					if($result_unt = $db->db_query($qryVorherigerErsterStatus))
+					{
+						while($row_unt = $db->db_fetch_object($result_unt))
+						{
+							if($row_unt->status_kurzbz === 'Unterbrecher')
+								$unterbrechungsdatum = $row_unt->datum;
+							else
+								break;
+						}
+					}
 				}
 				else if($rowstatus->status_kurzbz=="Absolvent" )
 				{
 					$status=3;
+					$meldestatus='I';
 				}
 				else if($rowstatus->status_kurzbz=="Abbrecher" )
 				{
 					$status=4;
+					$meldestatus='O';
+					// Checken, ob der Student Abbrecher vor der Meldung war und noch nie gemeldet wurde
+					$qryAbbrecher = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id = ".$db->db_add_param($row->prestudent_id)." AND status_kurzbz='Student' AND datum <=".$db->db_add_param($bisprevious);
+					if($resultAbbrecher = $db->db_query($qryAbbrecher))
+					{
+						if ($db->db_num_rows($resultAbbrecher) == 0)
+						{
+							//$error_log .= (!empty($error_log) ? ', ' : '')."Der Student ist Abbrecher vor der ersten BIS-Meldung. Bitte im FAS das Hakerl bei \"Bismelden\" im Reiter \"Prestudent\" entfernen";
+						}
+					}
 				}
 				else
 				{
@@ -1001,21 +1168,26 @@ function GenerateXMLStudentBlock($row)
 						}
 					}
 
+					// statuscode und meldestatus von studstatus ableiten
 					if($ausserordentlich)
 					{
 						$status=1;
+						$meldestatus='I';
 					}
 					else if($rowstatus->status_kurzbz=="Incoming")
 					{
 						$status=1;
+						$meldestatus='A';
 					}
 					else if($rowstatus->status_kurzbz=="Absolvent" )
 					{
 						$status=3;
+						$meldestatus='I';
 					}
 					else if($rowstatus->status_kurzbz=="Abbrecher" )
 					{
 						$status=4;
+						$meldestatus='O';
 					}
 					else
 					{
@@ -1050,6 +1222,7 @@ function GenerateXMLStudentBlock($row)
 			}
 		}
 	}
+
 	//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
 	if($storgform=='')
 	{
@@ -1072,6 +1245,7 @@ function GenerateXMLStudentBlock($row)
 	$qrygs="SELECT
 				tbl_mobilitaet.*,
 				tbl_gsprogramm.programm_code,
+				tbl_gsprogramm.studienkennung_uni,
 				tbl_firma.partner_code
 			FROM
 				bis.tbl_mobilitaet
@@ -1104,7 +1278,7 @@ function GenerateXMLStudentBlock($row)
 
 			if($gserror!='')
 			{
-				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+				$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 				$v.=$gserror."\n";
 				return '';
 			}
@@ -1116,6 +1290,7 @@ function GenerateXMLStudentBlock($row)
 			<PartnerCode>".$rowgs->partner_code."</PartnerCode>
 			<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
 			<StudStatusCode>".$studstatuscode."</StudStatusCode>
+			".(isset($rowgs->studienkennung_uni) ? "<StudienkennungUNI>".$rowgs->studienkennung_uni."</StudienkennungUNI>" : "")."
 		</GS>";
 			if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
 			{
@@ -1140,7 +1315,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				if($row_ap->sponsion=='' || $row_ap->sponsion==null)
 				{
-					$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
+					$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
 				}
 				$ap++;
 			}
@@ -1194,9 +1369,10 @@ function GenerateXMLStudentBlock($row)
 			$beginndatum='';
 	}
 	$ausstellungsstaat='';
+	$ausstellungsstaat_master='';
 	if($row->zgvmanation!='' && $stgart==2) // Master
-		$ausstellungsstaat = $row->zgvmanation;
-	elseif($row->zgvnation!='')
+		$ausstellungsstaat_master = $row->zgvmanation;
+	if($row->zgvnation!='')
 		$ausstellungsstaat = $row->zgvnation;
 	else
 		$ausstellungsstaat = $row->ausstellungsstaat;
@@ -1208,7 +1384,7 @@ function GenerateXMLStudentBlock($row)
 
 	if($error_log!='' OR $error_log1!='')
 	{
-		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+		$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 		if($error_log!='')
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fehler: ".$error_log."\n";
@@ -1217,6 +1393,11 @@ function GenerateXMLStudentBlock($row)
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$error_log1;
 		}
+		if($error_log_hinweis != '')
+		{
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+			$error_log_hinweis = '';
+		}
 		$anzahl_fehler++;
 		$v.="\n";
 		$error_log='';
@@ -1224,7 +1405,14 @@ function GenerateXMLStudentBlock($row)
 		return '';
 	}
 	else
+	{
+		if($error_log_hinweis != '')
 		{
+			$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n\n";
+			$error_log_hinweis = '';
+		}
+
 		$datei .= "
 		<StudentIn>
 			<PersKz>" . trim($row->matrikelnr) . "</PersKz>";
@@ -1237,6 +1425,19 @@ function GenerateXMLStudentBlock($row)
 			$datei .= "
 			<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
 		}
+
+		// duales studium
+		if ($row->dual === 't')
+		{
+			$dualesstudium='J';
+		}
+		else
+		{
+			$dualesstudium='N';
+		}
+
+		$datei.="
+			<DualesStudium>".$dualesstudium."</DualesStudium>";
 
 		$datei .= "
 			<GeburtsDatum>" . date("dmY", $datumobj->mktime_fromdate($row->gebdatum)) . "</GeburtsDatum>
@@ -1263,15 +1464,19 @@ function GenerateXMLStudentBlock($row)
 			$datei .= "
 			<SVNR>" . $row->svnr . "</SVNR>";
 		}
-		if ($row->ersatzkennzeichen != '')
+
+		// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
+		if ($row->ersatzkennzeichen != '' && $row->svnr == null)
 		{
 			$datei .= "
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
 		}
 
-		/*$datei .= "
-			<bPK>" . $row->bpk . "</bPK>
-		";*/
+		if($row->bpk != '' && $row->bpk != null)
+		{
+			$datei.="
+			<bPK>".$row->bpk."</bPK>";
+		}
 
 		$datei .= "
 			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
@@ -1280,14 +1485,11 @@ function GenerateXMLStudentBlock($row)
 			<HeimatStrasse><![CDATA[" . $strasse . "]]></HeimatStrasse>
 			<HeimatNation>" . $nation . "</HeimatNation>";
 
-		if (!$ausserordentlich && !$incoming)
-		{
-			$datei .= "
+		$datei .= "
 			<ZustellPLZ>" . $zustell_plz . "</ZustellPLZ>
 			<ZustellGemeinde>" . $zustell_gemeinde . "</ZustellGemeinde>
 			<ZustellStrasse>" . $zustell_strasse . "</ZustellStrasse>
 			<ZustellNation>" . $zustell_nation . "</ZustellNation>";
-		}
 
 		if ($co_name != '')
 		{
@@ -1296,11 +1498,16 @@ function GenerateXMLStudentBlock($row)
 			";
 		}
 
+		if ($email_privat != '')
+		{
+			$datei .= "
+			<eMailAdresse>" . $email_privat . "</eMailAdresse>";
+		}
+
 		if ($email != '')
 		{
 			$datei .= "
-			<eMailAdresse>" . $email . "</eMailAdresse>
-			";
+			<eMailAdresseBE>" . $email . "</eMailAdresseBE>";
 		}
 
 		if(!$ausserordentlich)
@@ -1309,29 +1516,39 @@ function GenerateXMLStudentBlock($row)
 			<ZugangCode>".$row->zgv_code."</ZugangCode>";
 			$datei.="
 			<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
+
+			if($aktstatus!='Incoming')
+			{
+				if($row->zgvnation!='')
+					$ausstellungsstaat = $row->zgvnation;
+				else
+					$ausstellungsstaat = $row->ausstellungsstaat;
+
+				if($ausstellungsstaat!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
+				{
+					$datei.='
+			<ZugangAusstellungsstaat>'.$ausstellungsstaat.'</ZugangAusstellungsstaat>';
+				}
+			}
 		}
 
 		if($stgart==2) // Master-Studiengang
 		{
 			$datei.="
-			<ZugangMaStgCode>".$row->zgvmas_code."</ZugangMaStgCode>";
+			<ZugangMaCode>".$row->zgvmas_code."</ZugangMaCode>";
 			$datei.="
-			<ZugangMaStgDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMaStgDatum>";
-		}
+			<ZugangMaDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMaDatum>";
 
-		if($aktstatus!='Incoming' && !$ausserordentlich)
-		{
-			if($row->zgvmanation!='' && $stgart=='2')
-				$ausstellungsstaat = $row->zgvmanation;
-			elseif($row->zgvnation!='')
-				$ausstellungsstaat = $row->zgvnation;
-			else
-				$ausstellungsstaat = $row->ausstellungsstaat;
-
-			if($ausstellungsstaat!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
+			if($aktstatus!='Incoming' && !$ausserordentlich)
 			{
-				$datei.='
-			<Ausstellungsstaat>'.$ausstellungsstaat.'</Ausstellungsstaat>';
+				if($row->zgvmanation!='')
+					$ausstellungsstaat_master = $row->zgvmanation;
+
+				if($ausstellungsstaat_master!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
+				{
+					$datei.='
+			<ZugangMaAusstellungsstaat>'.$ausstellungsstaat_master.'</ZugangMaAusstellungsstaat>';
+				}
 			}
 		}
 
@@ -1345,6 +1562,18 @@ function GenerateXMLStudentBlock($row)
 		{
 			$datei.="
 			<BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
+		}
+
+		if(isset($unterbrechungsdatum))
+		{
+			$datei.="
+			<UnterbrechungsDatum>".date("dmY", $datumobj->mktime_fromdate($unterbrechungsdatum))."</UnterbrechungsDatum>";
+		}
+
+		if(isset($wiedereintrittsdatum))
+		{
+			$datei.="
+			<WiedereintrittsDatum>".date("dmY", $datumobj->mktime_fromdate($wiedereintrittsdatum))."</WiedereintrittsDatum>";
 		}
 
 		/* Ausbildungssemester nicht anzeigen wenn
@@ -1363,6 +1592,20 @@ function GenerateXMLStudentBlock($row)
 				<StudStatusCode>".$status."</StudStatusCode>";
 		}
 
+		// IO container query
+		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
+					AND (von>".$db->db_add_param($bisprevious)." OR bis IS NULL OR bis>".$db->db_add_param($bisprevious).")
+					AND von<=".$db->db_add_param($bisdatum).";";
+
+		$ioresults=$db->db_query($qryio);
+
+		// wenn Mobilität vorhanden, meldestatus auf Auslandsaufenthalt setzen
+		if($db->db_num_rows($ioresults)>0)
+			$meldestatus='A';
+
+		$datei.="
+			<MeldeStatus>".$meldestatus."</MeldeStatus>";
+
 		if($orgform_code_array[$storgform]!=1 && !$ausserordentlich) // Wenn nicht Vollzeit und nicht Ausserordentlich
 		{
 			$datei.="
@@ -1372,7 +1615,7 @@ function GenerateXMLStudentBlock($row)
 		if(!$ausserordentlich)
 		{
 			$datei.="
-			<StandortCode>".$standortcode."</StandortCode>";
+			<StandortCode>".$row->standort_code."</StandortCode>";
 		}
 		/*
 		 * BMWFFoerderrung derzeit fuer alle Studierende auf Ja gesetzt
@@ -1383,19 +1626,26 @@ function GenerateXMLStudentBlock($row)
 		 *
 		 * ToDo: sollte pro Studierenden konfigurierbar sein
 		 */
-		if($aktstatus=='Incoming' || $ausserordentlich
-			|| ($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
-			$bmwf='N';
-		else
+		//if($aktstatus=='Incoming' || $ausserordentlich
+		//	|| ($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
+		//	$bmwf='N';
+		//else
+		//	$bmwf='J';
+
+		if ($row->pre_foerderrelevant === true) {
 			$bmwf='J';
+		} else if ($row->pre_foerderrelevant === false) {
+			$bmwf='N';
+		} else if ($row->stg_foerderrelevant === true) {
+			$bmwf='J';
+		} else {
+			$bmwf='N';
+		}
 
 		$datei.="
 			<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
 
 		// **** IO Container ****/
-		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
-					AND (von>".$db->db_add_param($bisprevious)." OR bis IS NULL OR bis>".$db->db_add_param($bisprevious).")
-					AND von<=".$db->db_add_param($bisdatum).";";
 		$outgoing_count=0;
 		if($resultio = $db->db_query($qryio))
 		{
@@ -1403,6 +1653,7 @@ function GenerateXMLStudentBlock($row)
 			{
 				$mob=$rowio->mobilitaetsprogramm_code;
 				$gast=$rowio->nation_code;
+				$herkunft=$rowio->herkunftsland_code;
 				$avon=date("dmY", $datumobj->mktime_fromdate($rowio->von));
 				$abis=date("dmY", $datumobj->mktime_fromdate($rowio->bis));
 				$adauer = (is_null($rowio->von) || is_null($rowio->bis))
@@ -1414,6 +1665,11 @@ function GenerateXMLStudentBlock($row)
 				$bisio_zweck->getZweck($rowio->bisio_id);
 				$zweck_code_arr = array();
 
+				// Es muss immer mindestens 1 Aufenthaltszweck geben
+				if (count($bisio_zweck->result) == 0)
+				{
+					$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Es muss mindestens ein Aufenthaltszweck eingetragen sein";
+				}
 				// Bei Incomings...
 				if ($aktstatus == 'Incoming')
 				{
@@ -1500,7 +1756,7 @@ function GenerateXMLStudentBlock($row)
 				// Bei validen Daten errorlog ausgeben
 				if($error_log_io != '')
 				{
-					$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+					$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 					if($error_log_io != '')
 					{
 						$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fehler: ".$error_log_io. "\n";
@@ -1516,6 +1772,7 @@ function GenerateXMLStudentBlock($row)
 					<IO>
 						<MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
 						<GastlandCode>".$gast."</GastlandCode>
+						<HerkunftslandCode>".$herkunft."</HerkunftslandCode>
 						<AufenthaltVon>".$avon."</AufenthaltVon>";
 						if($datumobj->mktime_fromdate($rowio->bis)<$datumobj->mktime_fromdate($bisdatum) && $datumobj->mktime_fromdate($rowio->bis)>$datumobj->mktime_fromdate($bisprevious))
 						{
@@ -1531,12 +1788,12 @@ function GenerateXMLStudentBlock($row)
 						if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
 						{
 							$datei.="
-							<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
+							<ECTSerworben>".round($rowio->ects_erworben)."</ECTSerworben>";
 						}
 						if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
 						{
 							$datei.="
-							<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
+							<ECTSangerechnet>".round($rowio->ects_angerechnet)."</ECTSangerechnet>";
 						}
 						foreach ($aufenthaltfoerderung_code_arr as $aufenthaltfoerderung_code)
 						{
@@ -1758,7 +2015,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			<OrgFormCode>".$orgform_code_array[$bworgform]."</OrgFormCode>";
 			if($stgart==2)
 				$datei.='
-			<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
+			<ZugangMaCode>'.$key.'</ZugangMaCode>';
 			else
 				$datei.='
 			<ZugangCode>'.$key.'</ZugangCode>';

@@ -47,7 +47,7 @@ $datum_obj = new datum();
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -149,7 +149,7 @@ $datum_obj = new datum();
 			{
 				echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 				echo "<script type='text/javascript'>\n";
-				echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
+				//echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
 				echo "</script>\n";
 				$action='update';
 				$service_id = $service->service_id;

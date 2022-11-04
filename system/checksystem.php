@@ -83,6 +83,16 @@ echo '<div>';
 	require_once('filtersupdate.php');
 echo '</div>';
 
+// ******** fehlerupdate ************/
+echo '<H2>Issues time!</H2>';
+
+echo '<div>';
+echo 'fehlerupdate.php wird aufgerufen...';
+echo '</div>';
+echo '<div>';
+require_once('fehlerupdate.php');
+echo '</div>';
+
 
 // ******** Berechtigungen Prüfen ************/
 echo '<h2>Berechtigungen pruefen</h2>';
@@ -129,6 +139,7 @@ $berechtigungen = array(
 	array('basis/tempus','Tempus zugriff'),
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
+	array('basis/variable_persoenlich','Verwaltung eigener Variablen'),
 	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
 	array('basis/servicezeitaufzeichnung','Erlaubt Erfassung von servicebezogenen (Service, OE, Kunde) Daten in der Zeitaufzeichnung'),
 	array('buchung/typen','Verwaltung von Buchungstypen'),

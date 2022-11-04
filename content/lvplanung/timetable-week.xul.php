@@ -351,6 +351,8 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 {
 	$lehrstunde=new lehrstunde();
+	$sql='';
+	$geloeschteDaten = '';
 
 	if($rechte->isBerechtigt('lehre/lvplan',null,'uid'))
 	{
@@ -359,8 +361,14 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 		{
 			foreach ($stpl_id as $stundenplan_id)
 			{
+				$lehrstunde->load($stundenplan_id,$db_stpl_table);
+				$geloeschteDaten .= 'Lektor: '.$lehrstunde->lektor_uid.', Datum: '.
+									$lehrstunde->datum.', Stunde: '.$lehrstunde->stunde.', Ort: '.
+									$lehrstunde->ort_kurzbz.', Verband: '.strtoupper($lehrstunde->studiengang).'-'.
+									$lehrstunde->sem.$lehrstunde->ver.$lehrstunde->grp.', Spezialgruppe: '.$lehrstunde->gruppe_kurzbz.'; ';
 				$lehrstunde->delete($stundenplan_id,$db_stpl_table);
 				$error_msg.=$lehrstunde->errormsg;
+				$sql.=$lehrstunde->lastqry.'; ';
 			}
 		}
 
@@ -369,8 +377,14 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 		{
 			foreach ($stpl_idx as $stundenplan_id)
 			{
+				$lehrstunde->load($stundenplan_id,$db_stpl_table);
+				$geloeschteDaten .= 'Lektor: '.$lehrstunde->lektor_uid.', Datum: '.
+									$lehrstunde->datum.', Stunde: '.$lehrstunde->stunde.', Ort: '.
+									$lehrstunde->ort_kurzbz.', Verband: '.strtoupper($lehrstunde->studiengang).'-'.
+									$lehrstunde->sem.$lehrstunde->ver.$lehrstunde->grp.', Spezialgruppe: '.$lehrstunde->gruppe_kurzbz.'; ';
 				$lehrstunde->delete($stundenplan_id,$db_stpl_table);
 				$error_msg.=$lehrstunde->errormsg;
+				$sql.=$lehrstunde->lastqry.'; ';
 			}
 		}
 
@@ -399,6 +413,19 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 				$reservierung->delete($reservierung_id);
 				$error_msg.=$reservierung->errormsg;
 			}
+		}
+
+		//UNDO Befehl schreiben
+		if($error_msg=='' && $sql!='')
+		{
+			$log = new log();
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->sqlundo = NULL;
+			$log->sql = $sql.' /* Geloeschte Daten: '.$geloeschteDaten.'*/';
+			$log->beschreibung = 'Stundenloeschung';
+			$log->mitarbeiter_uid = $uid;
+			if(!$log->save(true))
+				$error_msg.='Fehler: '.$log->errormsg;
 		}
 	}
 	else
@@ -654,12 +681,12 @@ while ($begin<=$ende)
 	{
 		$wunsch=new zeitwunsch();
 		if ($type=='lektor')
-			if ($wunsch->loadPerson($pers_uid,$datum))
+			if ($wunsch->loadPerson($pers_uid,montag($datum)))
 				$zeitwunsch=$wunsch->zeitwunsch;
 			else
 				$error_msg.=$wunsch->errormsg;
 		if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
-			if ($wunsch->loadZwLE($lva_id,$datum))
+			if ($wunsch->loadZwLE($lva_id,montag($datum)))
 				$zeitwunsch=$wunsch->zeitwunsch;
 			else
 				$error_msg.=$wunsch->errormsg;

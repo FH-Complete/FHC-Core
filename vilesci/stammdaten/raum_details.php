@@ -115,9 +115,15 @@
 		$sg_update->gebteil = $gebteil;
 		$sg_update->oe_kurzbz = $oe_kurzbz;
 		$sg_update->arbeitsplaetze = $arbeitsplaetze;
+		$sg_update->updateamum = date('Y-m-d H:i:s');
+		$sg_update->updatevon = $user;
 
 		if ($_POST["neu"] == "true")
+		{
+			$sg_update->insertamum = date('Y-m-d H:i:s');
+			$sg_update->insertvon = $user;
 			$sg_update->new = 1;
+		}
 
 		if(!$sg_update->save())
 		{
@@ -410,7 +416,7 @@
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>

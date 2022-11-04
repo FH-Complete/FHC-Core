@@ -413,6 +413,12 @@ if(!$error)
 			}
 			if(!$error)
 			{
+				//Check, ob OE aktiv ist, sonst Hinweis ausgeben
+				$oe = new organisationseinheit($_POST['oe_kurzbz']);
+				if ($oe->aktiv === false)
+				{
+					$errormsg = 'ACHTUNG: Die Organisationseinheit ist inaktiv. Änderungen wurden gespeichert.';
+				}
 				$benutzerfunktion->oe_kurzbz = $_POST['oe_kurzbz'];
 				$benutzerfunktion->semester = $_POST['semester'];
 				$benutzerfunktion->fachbereich_kurzbz = $_POST['fachbereich_kurzbz'];
@@ -483,6 +489,14 @@ if(!$error)
 			}
 			else
 				$studiensemester_kurzbz = $_POST['stsem'];
+
+			$variable->name = 'semester_aktuell';
+			$variable->wert = $studiensemester_kurzbz;
+		}
+		elseif(isset($_POST['stsem_aktuell']))
+		{
+			$stsem = new studiensemester();
+			$studiensemester_kurzbz = $stsem->getNearest();
 
 			$variable->name = 'semester_aktuell';
 			$variable->wert = $studiensemester_kurzbz;

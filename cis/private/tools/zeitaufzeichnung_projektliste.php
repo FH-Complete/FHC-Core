@@ -48,6 +48,11 @@ $sprache_index = $sprache_obj->index;
 
 $uid = get_uid();
 
+$mitarbeiter = new mitarbeiter();
+$mitarbeiter->getUntergebene($uid, true);
+$untergebenen_arr = array();
+$untergebenen_arr = $mitarbeiter->untergebene;
+
 //Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
 //des uebergebenen Users anzeigen
 if (isset($_GET['uid']))
@@ -55,7 +60,7 @@ if (isset($_GET['uid']))
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 
-	if ($rechte->isBerechtigt('admin'))
+	if ($rechte->isBerechtigt('admin') || (in_array($_GET['uid'], $untergebenen_arr)))
 	{
 		$uid = $_GET['uid'];
 	}
@@ -74,9 +79,9 @@ $year = $_GET['projexpjahr'];
 
 $monthtext = $monatsname[$sprache_index][$month - 1];
 $username = $benutzer->vorname." ".$benutzer->nachname;
-$mitarbeiter = new mitarbeiter();
 $mitarbeiter->load($uid);
 $persnr = $mitarbeiter->personalnummer;
+
 $daysinmonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
 $date = new datum();
@@ -750,7 +755,7 @@ foreach ($projektnames as $projektname)
 				}
 
 				$worksheet->setColumn($spalte, $spalte, $phasewidth);
-				$worksheet->write($zeile, $spalte++, $projekt->beschreibung, $format_cell_leftrightline);
+				$worksheet->writeString($zeile, $spalte++, $projekt->beschreibung, $format_cell_leftrightline);
 			}
 		}
 		else

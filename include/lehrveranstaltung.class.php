@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 fhcomplete.org
+/* Copyright (C) 2021 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
- * 			Stefan Puraner	<puraner@technikum-wien.at>
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ * 			Stefan Puraner	<puraner@technikum-wien.at> and
+ *			Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 require_once(dirname(__FILE__) . '/basis_db.class.php');
 require_once(dirname(__FILE__) . '/functions.inc.php');
@@ -68,6 +69,7 @@ class lehrveranstaltung extends basis_db
 	public $semester_alternativ; // smallint
 	public $farbe;
 	public $lehrauftrag=true;
+	public $lehrveranstaltung_template_id; // integer
 
 
 	public $studienplan_lehrveranstaltung_id;
@@ -157,6 +159,7 @@ class lehrveranstaltung extends basis_db
 			$this->lvnr = $row->lvnr;
 			$this->semester_alternativ = $row->semester_alternativ;
 			$this->farbe = $row->farbe;
+			$this->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 
 			$this->sws = $row->sws;
 			$this->lvs = $row->lvs;
@@ -236,6 +239,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
+			$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
@@ -386,6 +390,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
+			$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -515,6 +520,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
+			$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -597,6 +603,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
+			$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -728,6 +735,25 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Semesterwochen muss ein eine gueltige ganze Zahl sein';
 			return false;
 		}
+		if ($this->lehrveranstaltung_template_id != '')
+		{
+			if (!isint($this->lehrveranstaltung_template_id)) {
+				$this->errormsg = 'Lehrveranstaltung Template Id muss eine gültige ganze Zahl sein';
+				return false;
+			} elseif($this->lehrtyp_kurzbz == 'tpl') {
+				$this->errormsg = 'Lehrveranstaltung Template Id darf bei Lehrveranstaltungen des Typs "Template" nicht gesetzt werden';
+				return false;
+			} else {
+				$template = new lehrveranstaltung($this->lehrveranstaltung_template_id);
+				if ($template->errormsg) {
+					$this->errormsg = 'Lehrveranstaltung Template: ' . $template->errormsg;
+					return false;
+				} elseif ($template->lehrtyp_kurzbz != 'tpl') {
+					$this->errormsg = 'Lehrveranstaltung Template: Als Lehrtyp muss Template ausgewählt sein';
+					return false;
+				}
+			}
+		}
 		$this->errormsg = '';
 		return true;
 	}
@@ -752,7 +778,7 @@ class lehrveranstaltung extends basis_db
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, insertamum,
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
 				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz,
-				raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe,sws,lvs,alvs,lvps,las,benotung,lvinfo,
+				raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe, lehrveranstaltung_template_id,sws,lvs,alvs,lvps,las,benotung,lvinfo,
 				lehrauftrag, lehrmodus_kurzbz) VALUES ('.
 					$this->db_add_param($this->studiengang_kz). ', '.
 					$this->db_add_param($this->bezeichnung). ', '.
@@ -789,6 +815,7 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->lvnr).','.
 					$this->db_add_param($this->semester_alternativ).','.
 					$this->db_add_param($this->farbe).','.
+					$this->db_add_param($this->lehrveranstaltung_template_id, FHC_INTEGER).','.
 					$this->db_add_param($this->sws).','.
 					$this->db_add_param($this->lvs).','.
 					$this->db_add_param($this->alvs).','.
@@ -845,6 +872,7 @@ class lehrveranstaltung extends basis_db
 					'lvnr = ' . $this->db_add_param($this->lvnr) . ', ' .
 					'semester_alternativ = '.$this->db_add_param($this->semester_alternativ).', '.
 					'farbe = '.$this->db_add_param($this->farbe).', '.
+					'lehrveranstaltung_template_id = '.$this->db_add_param($this->lehrveranstaltung_template_id, FHC_INTEGER).', '.
 					'sws = '.$this->db_add_param($this->sws).', '.
 					'lvs = '.$this->db_add_param($this->lvs).', '.
 					'alvs = '.$this->db_add_param($this->alvs).', '.
@@ -959,6 +987,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->lvnr = $row->lvnr;
 				$lv_obj->semester_alternativ = $row->semester_alternativ;
 				$lv_obj->farbe = $row->farbe;
+				$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -1053,6 +1082,7 @@ class lehrveranstaltung extends basis_db
 				$l->lvnr = $row->lvnr;
 				$l->semester_alternativ = $row->semester_alternativ;
 				$l->farbe = $row->farbe;
+				$l->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 				$l->benotung = $this->db_parse_bool($row->benotung);
 				$l->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$l->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -1136,6 +1166,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
+			$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -1235,6 +1266,7 @@ class lehrveranstaltung extends basis_db
 				$obj->lvnr = $row->lvnr;
 				$obj->semester_alternativ = $row->semester_alternativ;
 				$obj->farbe = $row->farbe;
+				$obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 				$obj->stpllv_sort = $row->stpllv_sort;
 				$obj->benotung = $this->db_parse_bool($row->benotung);
 				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
@@ -1308,7 +1340,7 @@ class lehrveranstaltung extends basis_db
 		return $childs;
 	}
 
-		/**
+	/**
 	 * Generiert die Subtrees des Lehrveranstaltungstrees
 	 */
 	public function hasChildren($studienplan_lehrveranstaltung_id)
@@ -1359,6 +1391,7 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
 				$obj->oe_kurzbz = $lv->oe_kurzbz;
 				$obj->lvnr = $lv->lvnr;
+				$obj->lehrveranstaltung_template_id = $lv->lehrveranstaltung_template_id;
 				$obj->benotung = $this->db_parse_bool($lv->benotung);
 				$obj->lvinfo =$this->db_parse_bool( $lv->lvinfo);
 				$obj->zeugnis = $this->db_parse_bool($lv->zeugnis);
@@ -1384,6 +1417,7 @@ class lehrveranstaltung extends basis_db
 			$obj->stpllv_koordinator = $this->stpllv_koordinator;
 			$obj->oe_kurzbz = $this->oe_kurzbz;
 			$obj->lvnr = $this->lvnr;
+			$obj->lehrveranstaltung_template_id = $this->lehrveranstaltung_template_id;
 			$obj->benotung = $this->db_parse_bool($this->benotung);
 			$obj->lvinfo =$this->db_parse_bool( $this->lvinfo);
 			$obj->zeugnis = $this->db_parse_bool($this->zeugnis);
@@ -1423,6 +1457,7 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_pflicht = $lv->stpllv_pflicht;
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
 				$obj->lvnr = $lv->lvnr;
+				$obj->lehrveranstaltung_template_id = $lv->lehrveranstaltung_template_id;
 				$obj->stpllv_sort = $lv->stpllv_sort;
 				$obj->oe_kurzbz = $lv->oe_kurzbz;
 				$obj->sws = $lv->sws;
@@ -1466,6 +1501,7 @@ class lehrveranstaltung extends basis_db
 			$obj->stpllv_pflicht = $this->stpllv_pflicht;
 			$obj->stpllv_koordinator = $this->stpllv_koordinator;
 			$obj->lvnr = $this->lvnr;
+			$obj->lehrveranstaltung_template_id = $this->lehrveranstaltung_template_id;
 			$obj->benotung = $this->db_parse_bool($this->benotung);
 			$obj->lvinfo =$this->db_parse_bool( $this->lvinfo);
 			$obj->zeugnis = $this->db_parse_bool($this->zeugnis);
@@ -1573,6 +1609,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
 				$lv_obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
 				$lv_obj->farbe = $row->farbe;
+				$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -1659,6 +1696,7 @@ class lehrveranstaltung extends basis_db
                 $lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
 				$lv_obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
                 $lv_obj->farbe = $row->farbe;
+                $lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
                 $lv_obj->benotung = $this->db_parse_bool($row->benotung);
                 $lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
                 $lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -1749,7 +1787,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $aktiv optional, true wenn nur aktive LVs
 	 * @param $lehrtyp optional, gewünschter Lehrtyp
 	 */
-	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null, $semester=null)
+	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null, $semester=null, $lehrmodus=null)
 	{
 
 		if (is_null($oe_kurzbz))
@@ -1830,6 +1868,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
+			$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 			$lv_obj->oe_kurzbz = $row->oe_kurzbz;
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
@@ -1960,6 +1999,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->lvnr = $row->lvnr;
 				$lv_obj->semester_alternativ = $row->semester_alternativ;
 				$lv_obj->farbe = $row->farbe;
+				$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -2087,6 +2127,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->lvnr = $row->lvnr;
 				$lv_obj->semester_alternativ = $row->semester_alternativ;
 				$lv_obj->farbe = $row->farbe;
+				$lv_obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -2275,7 +2316,7 @@ class lehrveranstaltung extends basis_db
 	}
 
 	/**
-	 * Lädt alle Lehrveranstaltungen eine Studienplans
+	 * Lädt alle Lehrveranstaltungen eines Studienplans
 	 * Optionale Filterung nach Lehrtyp und Semester
 	 * @param type $studienplan_id
 	 * @param type $lehrtyp_kurzbz
@@ -2357,6 +2398,7 @@ class lehrveranstaltung extends basis_db
 				$obj->lvnr = $row->lvnr;
 				$obj->semester_alternativ = $row->semester_alternativ;
 				$obj->farbe = $row->farbe;
+				$obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
 				$obj->benotung = $this->db_parse_bool($row->benotung);
 				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -2438,6 +2480,44 @@ class lehrveranstaltung extends basis_db
 					tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."
 					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 				ORDER BY sort LIMIT 1";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->mitarbeiter_uid;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Eintrag gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt den LV-Leiter einer Lehrveranstaltung
+	 * ist keiner der Lektoren als LV-Leitung eingetragen, wird Null zurückgegeben
+	 * @param int $lehrveranstaltung_id ID der Lehrveranstaltung.
+	 * @param char $studiensemester_kurzbz Studiensemester.
+	 * @return char $mitarbeiter_uid UID des Mitarbeiters oder NULL, wenn keine LV-Leitung vorhanden
+	 */
+	public function getEingetrageneLVLeitung($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					mitarbeiter_uid
+				FROM
+					lehre.tbl_lehreinheit
+					JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+				WHERE
+					tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."
+					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND lehrfunktion_kurzbz='LV-Leitung';";
 
 		if($result = $this->db_query($qry))
 		{
@@ -2626,5 +2706,75 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Sucht nach LV Templates und gibt Id und Label ("bezeichnung [kurzbz]") aus
+	 * Diese funktion ist für autocomplete gedacht
+	 * 
+	 * @param string $filter Suchfilter
+	 * @return array
+	 */
+	public function loadTemplates($filter)
+	{
+		$filter = strtolower($filter);
+		$qry = "SELECT
+					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					tbl_lehrveranstaltung.lehrtyp_kurzbz = 'tpl' AND (
+						CAST(tbl_lehrveranstaltung.lehrveranstaltung_id AS TEXT) LIKE '%".$this->db_escape($filter)."%' OR 
+						LOWER(tbl_lehrveranstaltung.bezeichnung) LIKE '%".$this->db_escape($filter).	"%' OR 
+						LOWER(tbl_lehrveranstaltung.kurzbz) LIKE '%".$this->db_escape($filter).	"%'
+					)
+			";
+		$lehrveranstaltungen = [];
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$lehrveranstaltungen[] = $row;
+			}
+			return $lehrveranstaltungen;
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage';
+			return [];
+		}
+	}
+
+	/**
+	 * Lädt Template und gibt Id und Label ("bezeichnung [kurzbz]") zurück
+	 * Diese funktion ist für autocomplete gedacht
+	 * 
+	 * @param string $name
+	 * @return stdClass | null
+	 */
+	public function loadTemplateByName($name)
+	{
+		$qry = "SELECT
+					tbl_lehrveranstaltung.lehrveranstaltung_id as id, CONCAT(tbl_lehrveranstaltung.bezeichnung, ' [', tbl_lehrveranstaltung.kurzbz, ']') as label
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					tbl_lehrveranstaltung.lehrtyp_kurzbz = 'tpl' AND (
+						CAST(tbl_lehrveranstaltung.lehrveranstaltung_id AS TEXT) = '".($name ? $this->db_escape($name) : 0)."' OR tbl_lehrveranstaltung.bezeichnung = '".$this->db_escape($name).	"' OR tbl_lehrveranstaltung.kurzbz = '".$this->db_escape($name).	"'
+					)
+			";
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				return $row;
+			}
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+		}
+		return null;
+	}
+
 }
 ?>

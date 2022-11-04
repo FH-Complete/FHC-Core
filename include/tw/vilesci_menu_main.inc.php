@@ -72,7 +72,7 @@ $menu=array
 		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
 		'Studienordnung'=>array('name'=>'Studienordnung', 'link'=>'lehre/studienordnung.php', 'target'=>'_blank','permissions'=>array('lehre/studienordnung')),
 		'StudienplanGueltigkeit'=>array('name'=>'Studienplan Gültigkeit', 'link'=>'lehre/studienplan_gueltigkeit.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
-		'StudienplanVorruecken'=>array('name'=>'Studienplan vorrücken', 'link'=>'lehre/studienplan_vorrueckung.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
+		'StudienplanVorruecken'=>array('name'=>'Studienplan vorrücken', 'link'=>'lehre/studienplan_vorrueckung.php', 'target'=>'main','permissions'=>array('lehre/studienplan')),
 
 		'Freifach'=>array
 		(
@@ -190,6 +190,7 @@ $menu=array
 		'StudienplanZuteilung'=>array('name'=>'Studienplan Zuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main','permissions'=>array('assistenz')),
 		'lv_merge'=>array('name'=>'LVs zusammenlegen', 'link'=>'lehre/lv_merge.php', 'target'=>'main','permissions'=>array('lehre/lehrveranstaltung')),
 		'akteupdate'=>array('name'=>'Akten überschreiben', 'link'=>'personen/akteupdate.php', 'target'=>'main','permissions'=>array('admin')),
+		'gemeindeupdate'=>array('name'=>'Gemeinden aktualisieren', 'link'=>'stammdaten/set_gemeinde.php', 'target'=>'main','permissions'=>array('basis/gemeinde')),
 	),
 	'Auswertung'=>	array
 	(

@@ -19,7 +19,7 @@
  */
 /*
  * GUI fuer die FreeBusy Verwaltung
- * 
+ *
  * Mit diesem Tool koennen FreeBusy URLs aus verschiedenen Quellen zu einer
  * FreeBusy URL zusammengefasst werden
  */
@@ -28,16 +28,28 @@ require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/freebusy.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
-  
-$user=get_uid();
+
+$user = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
 $action = (isset($_REQUEST['action'])?$_REQUEST['action']:'');
 $id = (isset($_REQUEST['id'])?$_REQUEST['id']:'');
+
+// Administratoren duerfen die UID als Parameter uebergeben um die Umfragen von anderen Personen anzuzeigen
+if(isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if($rechte->isBerechtigt('admin'))
+	{
+		$user = $_GET['uid'];
+	}
+}
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
@@ -48,23 +60,23 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<title>'.$p->t('freebusy/titel').'</title>
-	
+
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script> 
+<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript">
-	$(document).ready(function() 
+	$(document).ready(function()
 	{
 		$("#myTable").tablesorter(
 		{
 			sortList: [[0,1]],
 			widgets: [\'zebra\']
-		});			
+		});
 	});
-	
+
 	function seturl()
 	{
 		url = $("#typ option:selected").attr("url");
@@ -104,25 +116,25 @@ if($action=='delete')
 elseif($action=='save')
 {
 	//Speichern von Eintraegen
-	
+
 	$id = (isset($_POST['id'])?$_POST['id']:'');
 	$aktiv = isset($_POST['aktiv']);
-	
+
 	if(isset($_POST['bezeichnung']))
 		$bezeichnung = $_POST['bezeichnung'];
 	else
 		die($p->t('global/fehlerBeiDerParameteruebergabe'));
-		
+
 	if(isset($_POST['typ']))
 		$typ = $_POST['typ'];
 	else
 		die($p->t('global/fehlerBeiDerParameteruebergabe'));
-		
+
 	if(isset($_POST['url']))
 		$url = $_POST['url'];
 	else
 		die($p->t('global/fehlerBeiDerParameteruebergabe'));
-		
+
 	//Pruefen ob die URL geoeffnet werden kann
 	$fp = @fopen($url,'r');
 	if (!$fp)
@@ -130,7 +142,7 @@ elseif($action=='save')
 	else
 	{
 		fclose($fp);
-		
+
 		$fb = new freebusy();
 		if($id!='')
 		{
@@ -138,8 +150,8 @@ elseif($action=='save')
 				die($p->t('global/fehleraufgetreten'));
 			if($fb->uid!=$user)
 				die($p->t('global/keineBerechtigungZumAendernDesDatensatzes'));
-				
-		
+
+
 			$fb->new=false;
 		}
 		else
@@ -149,20 +161,20 @@ elseif($action=='save')
 			$fb->insertvon = $user;
 			$fb->uid = $user;
 		}
-		
+
 		$fb->updateamum = date('Y-m-d H:i:s');
 		$fb->updatevon = $user;
 		$fb->bezeichnung = $bezeichnung;
 		$fb->url = $url;
 		$fb->freebusytyp_kurzbz = $typ;
 		$fb->aktiv = $aktiv;
-		
+
 		if($fb->save())
 			echo '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
 		else
-			echo '<span class="error">'.$p->t('global/fehleraufgetreten').'</span>';	
+			echo '<span class="error">'.$p->t('global/fehleraufgetreten').'</span>';
 	}
-	
+
 }
 
 //Tabelle mit den vorhandenen Eintraegen anzeigen
@@ -189,7 +201,17 @@ echo '<table id="myTable" class="tablesorter">
 	echo '<td></td>';
 	echo '<td></td>';
 	echo '</tr>';
-	
+
+	//zeitsperren
+	echo '<tr>';
+	echo '<td>'.$p->t('freebusy/ZeitsperrenBezeichnung').'</td>';
+	echo '<td>'.$p->t('freebusy/ZeitsperrenTyp').'</td>';
+	echo '<td></td>';
+	echo '<td>'.$p->t('global/ja').'</td>';
+	echo '<td></td>';
+	echo '<td></td>';
+	echo '</tr>';
+
 foreach($fb->result as $row)
 {
 	$typ = new freebusy();
@@ -211,7 +233,7 @@ echo '<a href="'.$_SERVER['PHP_SELF'].'?action=neu">'.$p->t('freebusy/neuerEintr
 if($action=='edit' || $action=='neu')
 {
 	$fb = new freebusy();
-	
+
 	if($action=='neu')
 	{
 		$new = true;
@@ -224,7 +246,7 @@ if($action=='edit' || $action=='neu')
 		if(!$fb->load($id))
 			die($p->t('global/fehlerBeimLadenDesDatensatzes'));
 	}
-	
+
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">';
 	echo '<input type="hidden" name="id" value="'.$fb->freebusy_id.'" />';
 	echo '<table>
@@ -247,7 +269,7 @@ if($action=='edit' || $action=='neu')
 			$selected='selected';
 		else
 			$selected='';
-		
+
 		$vorlage = mb_str_replace('$uid',$user, $row->url_vorlage);
 		echo '<OPTION value="'.$db->convert_html_chars($row->freebusytyp_kurzbz).'" '.$selected.' url="'.$db->convert_html_chars($vorlage).'">'.$db->convert_html_chars($row->bezeichnung),'</OPTION>';
 	}

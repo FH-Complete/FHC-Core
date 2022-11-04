@@ -34,10 +34,9 @@ var InfocenterPersonDataset = {
 
 		var auswahlStudienart =
 			'<select class="form-control auswahlStudienArt" style="width:auto;">' +
-				'<option data-id="all"> Alle </option>' +
-				'<option data-id="master"> Master </option>' +
-				'<option data-id="bachelor"> Bachelor </option>' +
 			'</select>';
+
+		InfocenterPersonDataset.getStudienartData(infocenter_studiengangstyp);
 
 		var auswahlAbsageToggle =
 			'<a class="absageToggle">Erweiterte Einstellungen</a>';
@@ -49,6 +48,11 @@ var InfocenterPersonDataset = {
 			'<select class="form-control auswahlAbsageStg" style="width:auto; float:left;">' +
 			'<option value="null" selected="selected"> Studiengang </option>' +
 			'</select>' +
+			'<select class="form-control auswahlAbsageAbgeschickt" style="width:auto; float:left;">' +
+			'<option value="null" selected="selected"> Bewerbung abgeschickt? </option>' +
+			'<option value="true"> Ja </option>' +
+			'<option value="false"> Nein </option>' +
+			'</select>' +
 			'<button class="btn btn-default auswahlAbsageBtn" style="float:left"> Absage </button>';
 
 		InfocenterPersonDataset.getAbsageData();
@@ -57,7 +61,7 @@ var InfocenterPersonDataset = {
 			'<i class="fa fa-chevron-left"></i>' +
 			'</button>&nbsp;' +
 			infocenter_studiensemester +
-			'&nbsp;<button class="btn btn-default btn-sm incStudiensemester">' +
+			'&nbsp;<button class="btn btn-default btn-xs incStudiensemester">' +
 			'<i class="fa fa-chevron-right"></i>' +
 			'</button>';
 
@@ -85,11 +89,9 @@ var InfocenterPersonDataset = {
 			"<div class='h-divider'></div><hr class='studiensemesterline'>"
 		);
 
-		InfocenterPersonDataset.selectStudiengangTyp(infocenter_studiengangstyp)
-
 		$('.auswahlStudienArt').change(function()
 		{
-			InfocenterPersonDataset.changeStudengangsTyp($(this).find('option:selected').attr('data-id'));
+			InfocenterPersonDataset.changeStudengangsTyp($(this).find('option:selected').val());
 		});
 
 		$("#datasetActionsBottom").append(
@@ -178,22 +180,6 @@ var InfocenterPersonDataset = {
 		);
 	},
 
-	selectStudiengangTyp: function(typ)
-	{
-		switch (typ)
-		{
-			case 'b, m' :
-				$('.auswahlStudienArt [data-id="all"]').attr('selected', 'selected');
-				break;
-			case 'b' :
-				$('.auswahlStudienArt [data-id="bachelor"]').attr('selected', 'selected');
-				break;
-			case 'm' :
-				$('.auswahlStudienArt [data-id="master"]').attr('selected', 'selected');
-				break;
-		}
-	},
-
 	/**
 	 * sets functionality for the actions above and beneath the person table
 	 */
@@ -252,20 +238,12 @@ var InfocenterPersonDataset = {
 		});
 	},
 
-	changeStudengangsTyp: function($typ)
+	changeStudengangsTyp: function(typ)
 	{
-		switch ($typ)
-		{
-			case 'all' :
-				var change = 'b\', \'m';
-				break;
-			case 'bachelor' :
-				var change = 'b';
-				break;
-			case 'master' :
-				var change = 'm';
-				break;
-		}
+		let change = typ;
+
+		if (typ === 'all')
+			change = change = 'b\', \'m\', \'l';
 
 		FHC_AjaxClient.showVeil();
 
@@ -327,6 +305,7 @@ var InfocenterPersonDataset = {
 
 		var statusgrund = $('.absgstatusgrund').val();
 		var studiengang = $('.auswahlAbsageStg').val();
+		var abgeschickt = $('.auswahlAbsageAbgeschickt').val();
 
 		var personen = [];
 
@@ -340,7 +319,8 @@ var InfocenterPersonDataset = {
 			{
 				'statusgrund': statusgrund,
 				'studiengang': studiengang,
-				'personen' : personen
+				'personen' : personen,
+				'abgeschickt' : abgeschickt
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -365,7 +345,8 @@ var InfocenterPersonDataset = {
 			'system/infocenter/InfoCenter/getAbsageData',
 			{},
 			{
-				successCallback: function(data, textStatus, jqXHR) {
+				successCallback: function(data, textStatus, jqXHR)
+				{
 					if (FHC_AjaxClient.hasData(data))
 					{
 						data = FHC_AjaxClient.getData(data);
@@ -382,6 +363,42 @@ var InfocenterPersonDataset = {
 							}))
 						})
 
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
+	getStudienartData: function(infocenter_studiengangstyp)
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			'system/infocenter/InfoCenter/getStudienartData',
+			{},
+			{
+				successCallback: function(data, textStatus, jqXHR)
+				{
+					if (FHC_AjaxClient.hasData(data))
+					{
+						data = FHC_AjaxClient.getData(data);
+
+						let all = data.map(item => item.typ).join('\',\'');
+						$('.auswahlStudienArt').append($("<option/>")
+							.val(all)
+							.text('Alle')
+						);
+
+						$.each(data, function(key, value)
+						{
+							let isSelected;
+							isSelected = (infocenter_studiengangstyp === value.typ && all.length !== 1) ? 'selected' : false;
+							$('.auswahlStudienArt').append($("<option/>")
+								.val(value.typ)
+								.text(value.bezeichnung)
+								.attr('selected', isSelected)
+							)
+						});
 					}
 				},
 				errorCallback: function(jqXHR, textStatus, errorThrown) {

@@ -31,6 +31,7 @@ class pruefling extends basis_db
 	public $registriert;
 	public $prestudent_id;
 	public $semester;
+	public $gesperrt;
 
 	// ErgebnisArray
 	public $result=array();
@@ -67,6 +68,7 @@ class pruefling extends basis_db
 				$this->registriert = $row->registriert;
 				$this->prestudent_id = $row->prestudent_id;
 				$this->semester = $row->semester;
+				$this->gesperrt = $row->gesperrt;
 				return true;
 			}
 			else
@@ -184,6 +186,7 @@ class pruefling extends basis_db
 				$this->registriert = $row->registriert;
 				$this->prestudent_id = $row->prestudent_id;
 				$this->semester = $row->semester;
+				$this->gesperrt = $row->gesperrt;
 				return true;
 			}
 			else
@@ -221,6 +224,7 @@ class pruefling extends basis_db
 				$obj->registriert = $row->registriert;
 				$obj->prestudent_id = $row->prestudent_id;
 				$obj->semester = $row->semester;
+				$obj->gesperrt = $row->gesperrt;
 
 				$this->result[] = $obj;
 			}
@@ -361,13 +365,13 @@ class pruefling extends basis_db
 
 			$qry = "
 				SELECT DISTINCT ON (vw_auswertung_ablauf.gebiet_id) gebiet_id,
-					vw_auswertung_ablauf.*, 
+					vw_auswertung_ablauf.*,
 					tbl_studiengang.typ
-				FROM 
+				FROM
 					testtool.vw_auswertung_ablauf
-				JOIN 
+				JOIN
 					public.tbl_studiengang USING (studiengang_kz)
-				WHERE 
+				WHERE
 					reihungstest_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER);
 
 			//	Ggf. die Basis-Fragengebiete ermitteln (ohne Quereinsteigergebiete)
@@ -387,8 +391,8 @@ class pruefling extends basis_db
 				if (!empty($basis_gebiet_id_toString))
 				{
 					$qry .= "
-					AND 
-						gebiet_id IN (". $basis_gebiet_id_toString. ") 
+					AND
+						gebiet_id IN (". $basis_gebiet_id_toString. ")
 				";
 				}
 			}
@@ -400,13 +404,16 @@ class pruefling extends basis_db
 				{
 					$excluded_gebiete = unserialize(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE);
 					$exclude_gebiet_id_arr = $excluded_gebiete;
-					$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
-					$qry .= " 
-						AND 
-							gebiet_id NOT IN (". $exclude_gebiet_id_toString. ")
-						AND 
-							typ = 'b' 
-					";
+					if (is_array($exclude_gebiet_id_arr) && count($exclude_gebiet_id_arr) > 0)
+					{
+						$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
+						$qry .= "
+							AND
+								gebiet_id NOT IN (". $exclude_gebiet_id_toString. ")
+							AND
+								typ = 'b'
+						";
+					}
 				}
 			}
 
@@ -421,21 +428,21 @@ class pruefling extends basis_db
 							prestudent_id
 						FROM
 							public.tbl_rt_person
-						JOIN 
+						JOIN
 							public.tbl_prestudent USING(person_id)
 						JOIN
 							public.tbl_prestudentstatus USING (prestudent_id, studienplan_id)
-						JOIN 
+						JOIN
 							tbl_reihungstest ON (
-								tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id			
+								tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id
 							)
 						WHERE
 							tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-						AND 
+						AND
 							tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
-						AND 
+						AND
 							tbl_prestudentstatus.status_kurzbz='Interessent'
-						AND 
+						AND
 							tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
 						ORDER BY tbl_reihungstest.datum DESC, tbl_prestudent.priorisierung ASC LIMIT 1
 					)

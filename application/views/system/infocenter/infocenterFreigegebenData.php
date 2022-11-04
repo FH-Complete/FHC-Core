@@ -5,13 +5,16 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
+	$ORG_NAME = '\'InfoCenter\'';
+	$IDENTITY = '\'identity\'';
+	$ONLINE = '\'online\'';
 
-	$query = '
+$query = '
 		SELECT
 			p.person_id AS "PersonId",
 			p.vorname AS "Vorname",
@@ -27,7 +30,7 @@
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "LastAction",
 			(
@@ -36,16 +39,21 @@
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "LastActionType",
 			(
-				SELECT l.insertvon
+				SELECT CASE WHEN student.student_uid IS NULL THEN
+					(CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END)
+					ELSE '. $ONLINE .' END
 				  FROM system.tbl_log l
+				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
+				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
+				  LEFT JOIN public.tbl_student student ON tbl_benutzer.uid = student.student_uid
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 				   AND l.person_id = p.person_id
-			  ORDER BY l.zeitpunkt DESC
+			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "User/Operator",
 			(
@@ -102,11 +110,12 @@
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz || \':\' || sp.orgform_kurzbz)), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
@@ -124,11 +133,12 @@
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz IN ('.$STATUS_KURZBZ.')
 
 				   AND ps.person_id = p.person_id
@@ -172,7 +182,7 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
-			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+			  ORDER BY rtp.teilgenommen NULLS FIRST, pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "ReihungstestAngetreten",
 			(
@@ -193,21 +203,25 @@
 				 LIMIT 1
 			) AS "ReihungstestApplied",
 			(
-				SELECT rtp.datum
+				SELECT (ARRAY_TO_STRING(array_agg(DISTINCT(CONCAT(rtp.datum, \' \', to_char(rtp.uhrzeit, \'HH24:MI\'), \' \', studiengang.kurzbzlang))), \', \'))
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 		  	 LEFT JOIN (
 					SELECT rtp.person_id,
 						   rt.studiensemester_kurzbz,
 						   rtp.teilgenommen,
-						   rt.datum
+						   rt.datum,
+						   rt.uhrzeit,
+						   rt.studiengang_kz
 					  FROM public.tbl_rt_person rtp
 		   			  JOIN tbl_reihungstest rt ON(rtp.rt_id = rt.reihungstest_id)
 					 WHERE rt.stufe = 1
 				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
+				JOIN tbl_studiengang studiengang ON rtp.studiengang_kz = studiengang.studiengang_kz
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
 				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+				   GROUP BY pss.datum, pss.insertamum, pss.ext_id
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "ReihungstestDate",
@@ -231,23 +245,34 @@
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
 				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				AND tbl_organisationseinheit.bezeichnung = '.$ORG_NAME.'
 				AND tbl_benutzerfunktion.uid = (
 					SELECT l.insertvon
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
 					AND l.person_id = p.person_id
-					ORDER BY l.zeitpunkt DESC
+					ORDER BY l.log_id DESC
 					LIMIT 1
 				)
 				LIMIT 1 
-			) AS "InfoCenterMitarbeiter"
+			) AS "InfoCenterMitarbeiter",
+			(
+				SELECT akte.akte_id
+				FROM public.tbl_akte akte
+				JOIN public.tbl_dokument USING (dokument_kurzbz)
+				WHERE akte.person_id = p.person_id
+				AND dokument_kurzbz = '. $IDENTITY .'
+				LIMIT 1
+			) AS "AktenId"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
 				   tpl.zeitpunkt,
-				   tpl.uid AS lockuser
+				   sp.nachname AS lockuser
 			  FROM system.tbl_person_lock tpl
+			  JOIN public.tbl_benutzer sb USING (uid)
+			  JOIN public.tbl_person sp ON sb.person_id = sp.person_id
 			 WHERE tpl.app = '.$APP.'
 		 ) pl USING(person_id)
 		 WHERE
@@ -311,7 +336,8 @@
 			'Reihungstest date',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
-			'InfoCenter Mitarbeiter'
+			'InfoCenter Mitarbeiter',
+			'Identitätsnachweis'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -391,13 +417,9 @@
 				$datasetRaw->{'ReihungstestApplied'} = 'Nein';
 			}
 
-			if ($datasetRaw->{'ReihungstestDate'} == null)
+			if ($datasetRaw->{'ReihungstestDate'} == '')
 			{
 				$datasetRaw->{'ReihungstestDate'} = '-';
-			}
-			else
-			{
-				$datasetRaw->{'ReihungstestDate'} = date_format(date_create($datasetRaw->{'ReihungstestDate'}),'Y-m-d');
 			}
 
 			if ($datasetRaw->{'ZGVNation'} == null)
@@ -410,14 +432,27 @@
 				$datasetRaw->{'ZGVMNation'} = '-';
 			}
 
-			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'InfoCenter')
-			{
-				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
-			}
-			else
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
 			}
+			else
+			{
+				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+			}
+
+			if ($datasetRaw->{'AktenId'} !== null)
+			{
+				$datasetRaw->{'AktenId'} = sprintf(
+					'<a href="outputAkteContent/%s">Identitätsnachweis</a>',
+					$datasetRaw->{'AktenId'}
+				);
+			}
+			else
+			{
+				$datasetRaw->{'AktenId'} = '-';
+			}
+
 
 			return $datasetRaw;
 		},
