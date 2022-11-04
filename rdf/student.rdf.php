@@ -1218,6 +1218,7 @@ else
 				<student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
+				<studiengang_bezeichnung_eng><![CDATA['.$studiengang->english.']]></studiengang_bezeichnung_eng>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
 				<studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
 				<studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>

@@ -233,7 +233,7 @@ if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('
 	if (isset($_GET['ss']))
 		$stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen, $_GET['ss']);
 
-	if ((($xsl=='Inskription') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
+	if ((($xsl == 'Inskription') || ($xsl == 'InskriptionEng') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
 	{
 		die('Der Studienbeitrag wurde noch nicht bezahlt');
 	}
