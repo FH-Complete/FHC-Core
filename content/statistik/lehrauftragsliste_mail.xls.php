@@ -128,7 +128,7 @@ $format_colored->setFgColor(10);
 
 $workbook->setCustomColor(10, 238, 238, 0);
 $oe_colored =& $workbook->addFormat();
-$oe_colored->setFgColor(10);
+$oe_colored->setFgColor(11);
 
 $format_number_colored =& $workbook->addFormat();
 $format_number_colored->setNumFormat('0,0.00');
@@ -588,17 +588,19 @@ if ($result_stg = $db->db_query($qry_stg))
 				if (isset($row['geaendert']) && $row['geaendert'] == true)
 				{
 					$format = $format_colored;
+					$formatOE = $format_colored;
 					$formatnb = $format_number_colored;
-				}
-				else if(isset($row['organisationgeaendert']) && $row['organisationgeaendert'] === true)
-				{
-					$format = $oe_colored;
-					$formatnb = $format_number;
 				}
 				else
 				{
 					$format = $format_normal;
+					$formatOE = $format_normal;
 					$formatnb = $format_number;
+				}
+
+				if(isset($row['organisationgeaendert']) && $row['organisationgeaendert'] === true)
+				{
+					$formatOE = $oe_colored;
 				}
 				//Studiengang
 				$worksheet->write($zeile, $i, $studiengang->kuerzel, $format);
@@ -619,11 +621,11 @@ if ($result_stg = $db->db_query($qry_stg))
 				$worksheet->write($zeile, ++$i, $row['fixangestellt'], $format);
 				$gesamt->write($gesamtsheet_row, $i, $row['fixangestellt'], $format);
 				//OE-Zuordnung
-				$worksheet->write($zeile, ++$i, $row['oezuordnung'], $format);
-				$gesamt->write($gesamtsheet_row, $i, $row['oezuordnung'], $format);
+				$worksheet->write($zeile, ++$i, $row['oezuordnung'], $formatOE);
+				$gesamt->write($gesamtsheet_row, $i, $row['oezuordnung'], $formatOE);
 				//Department der OE-Zuordnung
-				$worksheet->write($zeile, ++$i, $row['department'], $format);
-				$gesamt->write($gesamtsheet_row, $i, $row['department'], $format);
+				$worksheet->write($zeile, ++$i, $row['department'], $formatOE);
+				$gesamt->write($gesamtsheet_row, $i, $row['department'], $formatOE);
 				//LVStunden
 				$lvstunden = str_replace(', ', '.', $row['lvstunden']);
 				$worksheet->write($zeile, ++$i, $lvstunden, $format);
