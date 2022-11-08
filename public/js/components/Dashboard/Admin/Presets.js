@@ -53,7 +53,7 @@ export default {
 					console.error('ERROR: ', error);
 					alert('ERROR: ' + error.response.data.retval);
 				});
-			});
+			}).catch(() => {});
 		},
 		widgetUpdate(section_name, payload) {
 			payload = payload[section_name];
