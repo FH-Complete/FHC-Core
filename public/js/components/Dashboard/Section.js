@@ -130,8 +130,8 @@ export default {
 			if (evt.target != this.$refs.container || !this.editMode)
 				return;
 			const rect = this.containerRect;
-			const gridX = Math.floor(this.gridWidth * (evt.clientX - rect.left) / this.$refs.container.clientWidth) + 1;
-			const gridY = Math.floor(this.gridHeight * (evt.clientY - rect.top) / this.$refs.container.clientHeight) + 1;
+			const gridX = Math.floor(this.gridWidth * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
+			const gridY = Math.floor(this.gridHeight * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
 			if (this.gridOccupiers[gridY * this.gridWidth + gridX] === undefined) {
 				let widget = { widget: 1, config: {}, place: {}, custom: 1 };
 				widget.place[this.gridWidth] = {
