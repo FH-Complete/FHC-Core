@@ -273,17 +273,6 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "tinymce/tinymce4",
-				"version": "4.9.11",
-				"dist": {
-					"url": "https://github.com/tinymce/tinymce-dist/archive/refs/tags/4.9.11.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
 				"name": "tinymce/tinymce5",
 				"version": "5.10.3",
 				"dist": {
@@ -413,7 +402,6 @@
 		"scottjehl/respond": "1.4.2",
 
 		"tapmodo/jcrop": "2.0.4",
-		"tinymce/tinymce4": "4.9.*",
 		"tinymce/tinymce5": "5.10.*",
 		"tomazdragar/simplecropper": "1.0",
 		"twbs/bootstrap3": "3.4.*",
