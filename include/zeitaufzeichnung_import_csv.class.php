@@ -176,6 +176,8 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			$this->mapLehreIntern($data);
 			$this->prepareZeitaufzeichnung($data);
 			$this->checkImporttage($data[self::STARTDT]);
+			$this->checkPauseInArbeitszeit($data[self::STARTDT], $data[self::ENDEDT]);
+			$this->checkPauseValid($data[self::STARTDT], $data[self::ENDEDT]);
 			$this->saveZeit($data[self::STARTDT], $data[self::ENDEDT]);
 		} catch (Exception $ex) {
 			$this->addError($ex->getMessage(), true);
@@ -383,6 +385,8 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 
 	/**
 	 * @return void
+	 *
+	 * @throws Exception
 	 */
 	protected function savePause() {
 		$pause = new zeitaufzeichnung();
@@ -399,7 +403,7 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 		$pause->homeoffice = $this->zeit->homeoffice;
 		if(!$pause->save())
 		{
-			$this->addError($this->p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg, true);
+			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg, true);
 		}
 	}
 
@@ -407,6 +411,7 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 	 * @param string $start datetimestring
 	 * @param string $end datetimestring
 	 * @return void
+
 	 */
 	protected function saveZeit($start, $end) {
 		if ($start != $end) {
@@ -418,6 +423,7 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 		} else {
 			$this->anzahl++;
 		}
+
 	}
 
 	/**
