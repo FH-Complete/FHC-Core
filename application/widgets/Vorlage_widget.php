@@ -2,7 +2,7 @@
 
 class Vorlage_widget extends DropdownWidget
 {
-    public function display($widgetData)
+	public function display($widgetData)
 	{
 		// All organization units to which the user belongs
 		$oe_kurzbz = $widgetData['oe_kurzbz'];
@@ -31,30 +31,32 @@ class Vorlage_widget extends DropdownWidget
 		);
 
 		$this->loadDropDownView($widgetData);
-    }
+	}
 
-    /**
-     * Get all the vorlage with mimetype = text/html
-     */
-    private function _getAllHTMLVorlage()
-    {
+	/**
+	 * Get all the vorlage with mimetype = text/html
+	 */
+	private function _getAllHTMLVorlage()
+	{
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 		$this->VorlageModel->addOrder('bezeichnung');
+		$this->VorlageModel->addJoin('public.tbl_vorlagestudiengang', 'vorlage_kurzbz');
+		$this->VorlageModel->addGroupBy('vorlage_kurzbz', 'bezeichnung');
 
 		$this->addSelectToModel($this->VorlageModel, 'vorlage_kurzbz', 'bezeichnung');
 
-		return $this->VorlageModel->loadWhere(array('mimetype' => 'text/html'));
-    }
+		return $this->VorlageModel->loadWhere(array('mimetype' => 'text/html', 'aktiv' => true, 'bezeichnung !=' => '""'));
+	}
 
-    /**
-     * Get all the vorlage that belongs to the organisation units of the user
-     * and the parents of those organisation units until the root of the
-     * organisation unit tree
-     */
-    private function _getUserVorlage($oe_kurzbz)
-    {
+	/**
+	 * Get all the vorlage that belongs to the organisation units of the user
+	 * and the parents of those organisation units until the root of the
+	 * organisation unit tree
+	 */
+	private function _getUserVorlage($oe_kurzbz)
+	{
 		// Loads library OrganisationseinheitLib
-        $this->load->library('OrganisationseinheitLib');
+		$this->load->library('OrganisationseinheitLib');
 
 		$vorlage = success(array()); // Default value
 
@@ -73,7 +75,7 @@ class Vorlage_widget extends DropdownWidget
 
 		$alias = 'templates';
 
-	    $fields = array(
+		$fields = array(
 			'templates.vorlage_kurzbz AS id',
 			'templates.bezeichnung || \' (\' || UPPER(templates.oe_kurzbz) || \')\' AS description'
 		);
@@ -159,3 +161,4 @@ class Vorlage_widget extends DropdownWidget
 		return $vorlage;
 	}
 }
+
