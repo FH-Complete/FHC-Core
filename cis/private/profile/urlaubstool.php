@@ -170,19 +170,22 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 
 //Bereits freigegebenen Eintrag löschen
 //Eintragung löschen
-if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POST['delete']) && isset($_POST['informSupervisor'])))
+if(isset($_GET['delete']))
 {
     $zeitsperre = new zeitsperre();
     $zeitsperre->load($_GET['delete']);
 
     $vondatum = $zeitsperre->getVonDatum();
     $bisdatum = $zeitsperre->getBisDatum();
-		$vondatum = $datum_obj->formatDatum($vondatum ,'d.m.Y');
-		$bisdatum = $datum_obj->formatDatum($bisdatum,'d.m.Y');
+	$vondatum = $datum_obj->formatDatum($vondatum ,'d.m.Y');
+	$bisdatum = $datum_obj->formatDatum($bisdatum,'d.m.Y');
 
     if(!$zeitsperre->delete($_GET['delete']))
+	{
         echo $zeitsperre->errormsg;
-
+	}
+	else
+	{
         //Mail an Vorgesetzten
         $prsn = new person();
 
@@ -207,48 +210,36 @@ if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POS
                 }
             }
 
-        $benutzer = new benutzer();
-        $benutzer->load($uid);
+	        $benutzer = new benutzer();
+	        $benutzer->load($uid);
 
-				//new sanchomail
-				$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
-				$beschreibung = $zeitsperre->bezeichnung;
-				$subject = "Urlaub wurde gelöscht";
-				$mailvorlage = 'Sancho_Mail_Urlaub_Loeschen';
+			//new sanchomail
+			$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
+			$beschreibung = $zeitsperre->bezeichnung;
+			$subject = "Urlaub wurde gelöscht";
+			$mailvorlage = 'Sancho_Mail_Urlaub_Loeschen';
 
-				$from='vilesci@'.DOMAIN;
+			$from='vilesci@'.DOMAIN;
 
-				//Sanchomail mit Vorlage Sancho Mail Urlaub
-				$template_data = array(
-					'vorgesetzter' => $fullName,
-					'nameMitarbeiter' => $nameMitarbeiter,
-					'beschreibung' =>$beschreibung,
-					'vonDatum' => $vondatum,
-					'bisDatum' => $bisdatum
-				);
+			//Sanchomail mit Vorlage Sancho Mail Urlaub
+			$template_data = array(
+				'vorgesetzter' => $fullName,
+				'nameMitarbeiter' => $nameMitarbeiter,
+				'beschreibung' =>$beschreibung,
+				'vonDatum' => $vondatum,
+				'bisDatum' => $bisdatum
+			);
 
-				if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
-        {
-            $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</span>";
-        }
-        else
-        {
-            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
-        }
+			if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
+	        {
+	            $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</span>";
+	        }
+	        else
+	        {
+	            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
+	        }
+		}
     }
-    else
-    {
-        $vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
-    }
-}
-
-
-//Eintragung löschen
-if((isset($_GET['delete']) || isset($_POST['delete'])))
-{
-	$zeitsperre = new zeitsperre();
-	if(!$zeitsperre->delete($_GET['delete']))
-		echo $zeitsperre->errormsg;
 }
 
 //Eintragung speichern
@@ -594,6 +585,17 @@ $datum_obj = new datum();
 		<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 <?php
+// ADDONS laden
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+       if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+       {
+               echo '
+               <script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+       }
+}
 
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
@@ -900,7 +902,7 @@ for ($i=0;$i<6;$i++)
 					if($hgfarbe[$j+7*$i]=='#CDDDEE')
 					{
 						$k=$j+7*$i;
-						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]&informSupervisor=True' onclick='return conf_del()'>";
+						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]' onclick='return conf_del()'>";
                         echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
 					}
 				}

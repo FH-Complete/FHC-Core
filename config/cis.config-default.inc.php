@@ -261,5 +261,9 @@ define('CIS_ZEITWUNSCH_GD', false);
 define('CIS_SHOW_COVID_STATUS', false);
 
 //Vertrag Allin
-define ('DEFAULT_ALLIN_DIENSTVERTRAG',[110,111]);
+define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
+
 ?>
