@@ -115,13 +115,13 @@ $this->load->view(
 									<?php echo $this->p->t('abschlusspruefung', 'pruefungsbeginn') ?>
                                 </td>
                                 <td class="timecellwidth">
-                                    <input class="timepicker form-control" name="pruefungsbeginn" id="pruefungsbeginn" value="<?php echo isEmptyString($abschlusspruefung->pruefungsbeginn) ? '' : date_format(date_create($abschlusspruefung->pruefungsbeginn), 'H:i') ?>">
+                                    <input class="timepicker form-control" name="pruefungsbeginn" id="pruefungsbeginn" value="<?php echo isEmptyString($abschlusspruefung->pruefungsbeginn) ? '' : date_format(date_create($abschlusspruefung->pruefungsende), 'H:i') ?>">
                                 </td>
                                 <td class="cellbg namecellwidth">
 									<?php echo $this->p->t('abschlusspruefung', 'pruefungsende') ?>
                                 </td>
                                 <td class="timecellwidth">
-                                    <input class="timepicker form-control" name="pruefungsende" id="pruefungsende" value="<?php echo isEmptyString($abschlusspruefung->pruefungsbeginn) ? '' : date_format(date_create($abschlusspruefung->pruefungsende), 'H:i') ?>">
+                                    <input class="timepicker form-control" name="pruefungsende" id="pruefungsende" value="">
                                 </td>
                             </tr>
                             <tr>
