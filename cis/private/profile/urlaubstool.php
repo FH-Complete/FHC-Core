@@ -52,8 +52,8 @@ $mehrarbeitsstunden = '0';
 $anspruch = '25';
 $zaehl=1;
 $tage=array();			//Array Tage für Kalenderanzeige
-$hgfarbe=array_fill(0,44,'#E9ECEE'); 	//Array mit Hintegrundfarben der Kalenderfelder
-$datensatz=array_fill(0,44,0);
+$hgfarbe=array_fill(0, 44, '#E9ECEE'); 	//Array mit Hintegrundfarben der Kalenderfelder
+$datensatz=array_fill(0, 44, 0);
 $freigabevon=array();
 $freigabeamum=array();
 $vertretung_uid=array();
@@ -125,7 +125,6 @@ if (isset($_GET['hgfarbe']))
 }
 else
 {
-
 	if (!isset($_GET['spmonat']))
 	{
 		for($i=0;$i<44;$i++)
@@ -172,46 +171,46 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 //Eintragung löschen
 if(isset($_GET['delete']))
 {
-    $zeitsperre = new zeitsperre();
-    $zeitsperre->load($_GET['delete']);
+	  $zeitsperre = new zeitsperre();
+	  $zeitsperre->load($_GET['delete']);
 
-    $vondatum = $zeitsperre->getVonDatum();
-    $bisdatum = $zeitsperre->getBisDatum();
-	$vondatum = $datum_obj->formatDatum($vondatum ,'d.m.Y');
-	$bisdatum = $datum_obj->formatDatum($bisdatum,'d.m.Y');
+	  $vondatum = $zeitsperre->getVonDatum();
+	  $bisdatum = $zeitsperre->getBisDatum();
+		$vondatum = $datum_obj->formatDatum($vondatum ,'d.m.Y');
+		$bisdatum = $datum_obj->formatDatum($bisdatum,'d.m.Y');
 
-    if(!$zeitsperre->delete($_GET['delete']))
-	{
-        echo $zeitsperre->errormsg;
-	}
-	else
-	{
-        //Mail an Vorgesetzten
-        $prsn = new person();
+	  if(!$zeitsperre->delete($_GET['delete']))
+		{
+	    echo $zeitsperre->errormsg;
+		}
+		else
+		{
+	    //Mail an Vorgesetzten
+	    $prsn = new person();
 
-        $vorgesetzter = $ma->getVorgesetzte($uid);
-        if($vorgesetzter)
-        {
-            $to='';
-            $fullName ='';
-            foreach($ma->vorgesetzte as $vg)
-            {
-                if($to!='')
-                {
-                    $to.=', '.$vg.'@'.DOMAIN;
-                    $name = $prsn->getFullNameFromBenutzer($vg);
-                    $fullName.=', '.$name;
-                }
-                else
-                {
-                    $to.=$vg.'@'.DOMAIN;
-                    $name = $prsn->getFullNameFromBenutzer($vg);
-                    $fullName.=$name;
-                }
-            }
+	    $vorgesetzter = $ma->getVorgesetzte($uid);
+	    if($vorgesetzter)
+	    {
+	        $to='';
+	        $fullName ='';
+	        foreach($ma->vorgesetzte as $vg)
+	        {
+	            if($to!='')
+	            {
+	                $to.=', '.$vg.'@'.DOMAIN;
+	                $name = $prsn->getFullNameFromBenutzer($vg);
+	                $fullName.=', '.$name;
+	            }
+	            else
+	            {
+	                $to.=$vg.'@'.DOMAIN;
+	                $name = $prsn->getFullNameFromBenutzer($vg);
+	                $fullName.=$name;
+	            }
+	        }
 
-	        $benutzer = new benutzer();
-	        $benutzer->load($uid);
+      $benutzer = new benutzer();
+      $benutzer->load($uid);
 
 			//new sanchomail
 			$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
@@ -238,7 +237,7 @@ if(isset($_GET['delete']))
 	        {
 	            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
 	        }
-		}
+				}
     }
 }
 
@@ -428,7 +427,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 					require_once('../../../addons/casetime/config.inc.php');
 					require_once('../../../addons/casetime/include/functions.inc.php');
 					$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
-					$urlaubssaldo = "Aktueller Urlaubssaldo: ". $urlaubssaldo->{'AktuellerStand'} . " Tage";
+					$urlaubssaldo = $urlaubssaldo->{'AktuellerStand'};
 				}
 
 				//Sanchomail mit Vorlage Sancho Mail Urlaub Neu
@@ -898,12 +897,12 @@ for ($i=0;$i<6;$i++)
 				}
 				elseif(isset($freigabeamum[$j+7*$i]))
 				{
-                    echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurch', array($freigabevon[$j+7*$i])).': '.$freigabevon[$j+7*$i].'"><span> </span>';
+          echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurch', array($freigabevon[$j+7*$i])).': '.$freigabevon[$j+7*$i].'"><span> </span>';
 					if($hgfarbe[$j+7*$i]=='#CDDDEE')
 					{
 						$k=$j+7*$i;
 						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]' onclick='return conf_del()'>";
-                        echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
+            echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
 					}
 				}
 				else

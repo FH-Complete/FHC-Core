@@ -356,7 +356,7 @@ if($addoncasetime)
 	$zeitsaldo = getCaseTimeZeitsaldo($uid);
 	$zeitsaldo = "Aktueller Zeitsaldo: ". $zeitsaldo . " (".formatZeitsaldo($zeitsaldo).")";
 	$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
-	$urlaubssaldo = "Aktueller Urlaubssaldo: ". $urlaubssaldo->{'AktuellerStand'} . " Tage";
+	$urlaubssaldo = $urlaubssaldo->{'AktuellerStand'};
 }
 
 //Zeitsperre Speichern
