@@ -8,12 +8,12 @@
 			'bootstrap3' => true,
 			'ajaxlib' => true,
 			'fontawesome4' => true,
-			'tinymce5' => true,
+			'tinymce3' => true,
 			'sbadmintemplate3' => true,
 			'dialoglib' => true,
 			'widgets' => true,
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
-			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/messageWrite.js')
+			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/fasMessageWrite.js')
 		)
 	);
 ?>
@@ -194,3 +194,4 @@
 </body>
 
 <?php $this->load->view("templates/FHC-Footer"); ?>
+

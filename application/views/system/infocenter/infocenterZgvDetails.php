@@ -10,7 +10,7 @@
 			'dialoglib' => true,
 			'ajaxlib' => true,
 			'tablesorter2' => true,
-			'tinymce4' => true,
+			'tinymce5' => true,
 			'sbadmintemplate3' => true,
 			'addons' => true,
 			'navigationwidget' => true,

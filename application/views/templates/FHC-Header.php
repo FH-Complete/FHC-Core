@@ -79,9 +79,6 @@
 			// Tabulator 5 CSS
 			if ($tabulator5 === true) generateCSSsInclude('vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css');
 
-			// Tinymce 4 CSS
-			if ($tinymce4 === true) generateCSSsInclude('public/css/TinyMCE4.css');
-
 			// Tinymce 5 CSS
 			if ($tinymce5 === true) generateCSSsInclude('public/css/TinyMCE5.css');
 

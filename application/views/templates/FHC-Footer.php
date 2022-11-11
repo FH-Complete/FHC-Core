@@ -100,8 +100,8 @@
 	// Tabulator 5 JS
 	if ($tabulator5 === true) generateJSsInclude('vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js');
 
-	// Tinymce 4 JS
-	if ($tinymce4 === true) generateJSsInclude('vendor/tinymce/tinymce4/tinymce.min.js');
+	// Tinymce 3 JS
+	if ($tinymce3 === true) generateJSsInclude('include/tiny_mce/tiny_mce.js');
 
 	// Tinymce 5 JS
 	if ($tinymce5 === true) generateJSsInclude('vendor/tinymce/tinymce5/tinymce.min.js');
