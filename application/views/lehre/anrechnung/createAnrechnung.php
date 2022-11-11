@@ -3,13 +3,13 @@ $this->load->view(
 	'templates/FHC-Header',
 	array(
 		'title' => $this->p->t('anrechnung', 'neueAnrechnung'),
-		'jquery' => true,
-		'jqueryui' => true,
-		'bootstrap' => true,
-		'fontawesome' => true,
+		'jquery3' => true,
+		'jqueryui1' => true,
+		'bootstrap3' => true,
+		'fontawesome4' => true,
 		'ajaxlib' => true,
 		'dialoglib' => true,
-		'tabulator' => true,
+		'tabulator4' => true,
 		'tablewidget' => true,
 		'phrases' => array(
 			'global' => array(
@@ -101,7 +101,7 @@ $this->load->view(
 				<th class="col-xs-5 col-lg-2"><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?> *</th>
 				<td>
 					<select name="lehrveranstaltung_id" id="select-lehrveranstaltung" class="form-control select-w500">
-						<option value="" <?php echo set_select('lehrveranstaltung', '', TRUE); ?> >
+						<option value="" <?php echo set_select('lehrveranstaltung', '', true); ?> >
 							<?php echo $this->p->t('ui', 'bitteWaehlen'); ?>
 						</option>
 					</select>
@@ -112,7 +112,7 @@ $this->load->view(
 				<th class="col-xs-5 col-lg-2"><?php echo $this->p->t('global', 'begruendung'); ?> *</th>
 				<td>
 					<select name="begruendung_id" id="select-begruendung" class="form-control select-w500">
-						<option value="" <?php echo set_select('begruendung', '', TRUE); ?> >
+						<option value="" <?php echo set_select('begruendung', '', true); ?> >
 							<?php echo $this->p->t('ui', 'bitteWaehlen'); ?>
 						</option>
 						<?php foreach ($begruendungen as $begruendung) : ?>

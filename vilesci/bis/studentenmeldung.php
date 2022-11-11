@@ -81,6 +81,7 @@ $aktstatus='';
 $aktstatus_datum='';
 $mob='';
 $gast='';
+$herkunft='';
 $avon='';
 $abis='';
 $zweck='';
@@ -366,7 +367,7 @@ if($result = $db->db_query($qry))
 			$stg_obj = new studiengang();
 			if($stg_obj->load($row->studiengang_kz))
 			{
-				
+
 
 				$maxsemester = $stg_obj->max_semester;
 				if($maxsemester == 0)
@@ -1010,25 +1011,25 @@ function GenerateXMLStudentBlock($row)
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgCode ('".$row->zgvmas_code."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMaCode ('".$row->zgvmas_code."')";
 			}
 			if($row->zgvmadatum=='' || $row->zgvmadatum==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."')";
 			}
 			else
 			{
 				if($row->zgvmadatum>date("Y-m-d"))
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
 				}
 				if($row->zgvmadatum<$row->zgvdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
 				}
 				if($row->zgvmadatum<$row->gebdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMaStgDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
+						$error_log.=(!empty($error_log)?', ':'')."ZugangMaDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 				}
 			}
 		}
@@ -1071,18 +1072,53 @@ function GenerateXMLStudentBlock($row)
 					|| $rowstatus->status_kurzbz=="Diplomand")
 				{
 					$status=1;
+					$meldestatus='I';
+
+					// Wiedereintrittsdatum
+					// letzten Status des letzten Semesters holen
+					$prestudent_last_status = new prestudent();
+					if ($prestudent_last_status->getLastStatus($row->prestudent_id, $psem))
+					{
+						// Datum setzen wenn aktiver Status nach Unterbrecher
+						if ($prestudent_last_status->status_kurzbz == 'Unterbrecher')
+							$wiedereintrittsdatum = $rowstatus->datum;
+					}
+
 				}
 				else if($rowstatus->status_kurzbz=="Unterbrecher" )
 				{
 					$status=2;
+					$meldestatus='U';
+
+					$qryVorherigerErsterStatus = "
+						SELECT status.datum, status.status_kurzbz
+						FROM public.tbl_prestudentstatus status
+						JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+						WHERE prestudent_id = ".$db->db_add_param($row->prestudent_id)."
+						AND sem.start::date <= (SELECT start from public.tbl_studiensemester WHERE studiensemester_kurzbz = ".$db->db_add_param($ssem).")::date
+						ORDER BY sem.start DESC, status.datum DESC";
+
+					$unterbrechungsdatum = null;
+					if($result_unt = $db->db_query($qryVorherigerErsterStatus))
+					{
+						while($row_unt = $db->db_fetch_object($result_unt))
+						{
+							if($row_unt->status_kurzbz === 'Unterbrecher')
+								$unterbrechungsdatum = $row_unt->datum;
+							else
+								break;
+						}
+					}
 				}
 				else if($rowstatus->status_kurzbz=="Absolvent" )
 				{
 					$status=3;
+					$meldestatus='I';
 				}
 				else if($rowstatus->status_kurzbz=="Abbrecher" )
 				{
 					$status=4;
+					$meldestatus='O';
 					// Checken, ob der Student Abbrecher vor der Meldung war und noch nie gemeldet wurde
 					$qryAbbrecher = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id = ".$db->db_add_param($row->prestudent_id)." AND status_kurzbz='Student' AND datum <=".$db->db_add_param($bisprevious);
 					if($resultAbbrecher = $db->db_query($qryAbbrecher))
@@ -1132,21 +1168,26 @@ function GenerateXMLStudentBlock($row)
 						}
 					}
 
+					// statuscode und meldestatus von studstatus ableiten
 					if($ausserordentlich)
 					{
 						$status=1;
+						$meldestatus='I';
 					}
 					else if($rowstatus->status_kurzbz=="Incoming")
 					{
 						$status=1;
+						$meldestatus='A';
 					}
 					else if($rowstatus->status_kurzbz=="Absolvent" )
 					{
 						$status=3;
+						$meldestatus='I';
 					}
 					else if($rowstatus->status_kurzbz=="Abbrecher" )
 					{
 						$status=4;
+						$meldestatus='O';
 					}
 					else
 					{
@@ -1181,6 +1222,7 @@ function GenerateXMLStudentBlock($row)
 			}
 		}
 	}
+
 	//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
 	if($storgform=='')
 	{
@@ -1203,6 +1245,7 @@ function GenerateXMLStudentBlock($row)
 	$qrygs="SELECT
 				tbl_mobilitaet.*,
 				tbl_gsprogramm.programm_code,
+				tbl_gsprogramm.studienkennung_uni,
 				tbl_firma.partner_code
 			FROM
 				bis.tbl_mobilitaet
@@ -1247,6 +1290,7 @@ function GenerateXMLStudentBlock($row)
 			<PartnerCode>".$rowgs->partner_code."</PartnerCode>
 			<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
 			<StudStatusCode>".$studstatuscode."</StudStatusCode>
+			".(isset($rowgs->studienkennung_uni) ? "<StudienkennungUNI>".$rowgs->studienkennung_uni."</StudienkennungUNI>" : "")."
 		</GS>";
 			if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
 			{
@@ -1325,9 +1369,10 @@ function GenerateXMLStudentBlock($row)
 			$beginndatum='';
 	}
 	$ausstellungsstaat='';
+	$ausstellungsstaat_master='';
 	if($row->zgvmanation!='' && $stgart==2) // Master
-		$ausstellungsstaat = $row->zgvmanation;
-	elseif($row->zgvnation!='')
+		$ausstellungsstaat_master = $row->zgvmanation;
+	if($row->zgvnation!='')
 		$ausstellungsstaat = $row->zgvnation;
 	else
 		$ausstellungsstaat = $row->ausstellungsstaat;
@@ -1380,6 +1425,19 @@ function GenerateXMLStudentBlock($row)
 			$datei .= "
 			<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
 		}
+
+		// duales studium
+		if ($row->dual === 't')
+		{
+			$dualesstudium='J';
+		}
+		else
+		{
+			$dualesstudium='N';
+		}
+
+		$datei.="
+			<DualesStudium>".$dualesstudium."</DualesStudium>";
 
 		$datei .= "
 			<GeburtsDatum>" . date("dmY", $datumobj->mktime_fromdate($row->gebdatum)) . "</GeburtsDatum>
@@ -1458,29 +1516,39 @@ function GenerateXMLStudentBlock($row)
 			<ZugangCode>".$row->zgv_code."</ZugangCode>";
 			$datei.="
 			<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
+
+			if($aktstatus!='Incoming')
+			{
+				if($row->zgvnation!='')
+					$ausstellungsstaat = $row->zgvnation;
+				else
+					$ausstellungsstaat = $row->ausstellungsstaat;
+
+				if($ausstellungsstaat!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
+				{
+					$datei.='
+			<ZugangAusstellungsstaat>'.$ausstellungsstaat.'</ZugangAusstellungsstaat>';
+				}
+			}
 		}
 
 		if($stgart==2) // Master-Studiengang
 		{
 			$datei.="
-			<ZugangMaStgCode>".$row->zgvmas_code."</ZugangMaStgCode>";
+			<ZugangMaCode>".$row->zgvmas_code."</ZugangMaCode>";
 			$datei.="
-			<ZugangMaStgDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMaStgDatum>";
-		}
+			<ZugangMaDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMaDatum>";
 
-		if($aktstatus!='Incoming' && !$ausserordentlich)
-		{
-			if($row->zgvmanation!='' && $stgart=='2')
-				$ausstellungsstaat = $row->zgvmanation;
-			elseif($row->zgvnation!='')
-				$ausstellungsstaat = $row->zgvnation;
-			else
-				$ausstellungsstaat = $row->ausstellungsstaat;
-
-			if($ausstellungsstaat!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
+			if($aktstatus!='Incoming' && !$ausserordentlich)
 			{
-				$datei.='
-			<Ausstellungsstaat>'.$ausstellungsstaat.'</Ausstellungsstaat>';
+				if($row->zgvmanation!='')
+					$ausstellungsstaat_master = $row->zgvmanation;
+
+				if($ausstellungsstaat_master!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
+				{
+					$datei.='
+			<ZugangMaAusstellungsstaat>'.$ausstellungsstaat_master.'</ZugangMaAusstellungsstaat>';
+				}
 			}
 		}
 
@@ -1494,6 +1562,18 @@ function GenerateXMLStudentBlock($row)
 		{
 			$datei.="
 			<BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
+		}
+
+		if(isset($unterbrechungsdatum))
+		{
+			$datei.="
+			<UnterbrechungsDatum>".date("dmY", $datumobj->mktime_fromdate($unterbrechungsdatum))."</UnterbrechungsDatum>";
+		}
+
+		if(isset($wiedereintrittsdatum))
+		{
+			$datei.="
+			<WiedereintrittsDatum>".date("dmY", $datumobj->mktime_fromdate($wiedereintrittsdatum))."</WiedereintrittsDatum>";
 		}
 
 		/* Ausbildungssemester nicht anzeigen wenn
@@ -1511,6 +1591,20 @@ function GenerateXMLStudentBlock($row)
 			$datei.="
 				<StudStatusCode>".$status."</StudStatusCode>";
 		}
+
+		// IO container query
+		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
+					AND (von>".$db->db_add_param($bisprevious)." OR bis IS NULL OR bis>".$db->db_add_param($bisprevious).")
+					AND von<=".$db->db_add_param($bisdatum).";";
+
+		$ioresults=$db->db_query($qryio);
+
+		// wenn Mobilität vorhanden, meldestatus auf Auslandsaufenthalt setzen
+		if($db->db_num_rows($ioresults)>0)
+			$meldestatus='A';
+
+		$datei.="
+			<MeldeStatus>".$meldestatus."</MeldeStatus>";
 
 		if($orgform_code_array[$storgform]!=1 && !$ausserordentlich) // Wenn nicht Vollzeit und nicht Ausserordentlich
 		{
@@ -1551,11 +1645,7 @@ function GenerateXMLStudentBlock($row)
 		$datei.="
 			<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
 
-
 		// **** IO Container ****/
-		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
-					AND (von>".$db->db_add_param($bisprevious)." OR bis IS NULL OR bis>".$db->db_add_param($bisprevious).")
-					AND von<=".$db->db_add_param($bisdatum).";";
 		$outgoing_count=0;
 		if($resultio = $db->db_query($qryio))
 		{
@@ -1563,6 +1653,7 @@ function GenerateXMLStudentBlock($row)
 			{
 				$mob=$rowio->mobilitaetsprogramm_code;
 				$gast=$rowio->nation_code;
+				$herkunft=$rowio->herkunftsland_code;
 				$avon=date("dmY", $datumobj->mktime_fromdate($rowio->von));
 				$abis=date("dmY", $datumobj->mktime_fromdate($rowio->bis));
 				$adauer = (is_null($rowio->von) || is_null($rowio->bis))
@@ -1681,6 +1772,7 @@ function GenerateXMLStudentBlock($row)
 					<IO>
 						<MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
 						<GastlandCode>".$gast."</GastlandCode>
+						<HerkunftslandCode>".$herkunft."</HerkunftslandCode>
 						<AufenthaltVon>".$avon."</AufenthaltVon>";
 						if($datumobj->mktime_fromdate($rowio->bis)<$datumobj->mktime_fromdate($bisdatum) && $datumobj->mktime_fromdate($rowio->bis)>$datumobj->mktime_fromdate($bisprevious))
 						{
@@ -1923,7 +2015,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			<OrgFormCode>".$orgform_code_array[$bworgform]."</OrgFormCode>";
 			if($stgart==2)
 				$datei.='
-			<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
+			<ZugangMaCode>'.$key.'</ZugangMaCode>';
 			else
 				$datei.='
 			<ZugangCode>'.$key.'</ZugangCode>';
