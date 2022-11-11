@@ -68,8 +68,7 @@ class raumtyp extends basis_db
 
 			$raumtyp_obj->beschreibung = $row->beschreibung;
 			$raumtyp_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
-			$raumtyp_obj->aktiv = $row->aktiv;
-
+			$raumtyp_obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 			$this->result[] = $raumtyp_obj;
 		}
@@ -101,8 +100,7 @@ class raumtyp extends basis_db
 		{
 			$this->beschreibung 	= $row->beschreibung;
 			$this->raumtyp_kurzbz 	= $row->kurzbz;
-			$this->aktiv 	= $row->aktiv;
-
+			$this->aktiv 	= $this->db_parse_bool($row->aktiv);
 		}
 		else
 		{
