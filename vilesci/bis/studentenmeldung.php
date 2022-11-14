@@ -351,12 +351,6 @@ else
 	";
 }
 
-$header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<Erhalter>
-  <ErhKz>".$erhalter."</ErhKz>
-  <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
-  <StudierendenBewerberMeldung>";
-
 if($result = $db->db_query($qry))
 {
 	$stg_kz_index = '';
@@ -406,7 +400,11 @@ if($result = $db->db_query($qry))
 			// Erstes Studiengang Tag am Beginn rausschreiben
 			if ($stg_kz_index == '')
 			{
-				$header .= "
+				$header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Erhalter>
+  <ErhKz>".$erhalter."</ErhKz>
+  <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
+  <StudierendenBewerberMeldung>
 	<Studiengang>
       <StgKz>".$row->studiengang_kz."</StgKz>";
 				$datei .= $header;
