@@ -1,0 +1,90 @@
+/* 
+    Created on : Jun 15, 2022, 3:21:25 PM
+    Author     : bambi
+*/
+
+.searchbar_settings {
+    position: absolute; 
+    z-index: 9999; 
+    background-color: #fff; 
+    border: 2px solid #666; 
+    padding: 1rem;
+}
+
+.searchbar_results {
+    position: absolute; 
+    z-index: 9998; 
+    background-color: #fff; 
+    border: 2px solid #666;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.searchbar_result {
+    border-bottom: 1px solid #666;
+    margin-bottom: 1rem;
+}
+
+.searchbar_grid {
+    display: grid;
+    grid-template-columns: [icon] 100px [data] auto;
+}
+
+.searchbar_icon {
+    grid-column-start: icon;
+    grid-column-end: span 1;
+}
+
+.searchbar_data {
+    grid-column-start: data;
+    grid-column-end: span 1;
+}
+
+.searchbar_actions {
+    display: flex;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.searchbar_actions li {
+    list-style: none;
+    text-align: center;
+    padding: 3px;
+}
+
+.searchbar_table {
+    display: table;
+}
+
+.searchbar_tablerow {
+    display: table-row;
+}
+
+.searchbar_tablecell {
+    display: table-cell;
+    min-width: 175px;
+    padding: 0 6px;
+}
+
+.searchbar_settings_types {
+    display: flex;
+    padding: 0;
+}
+
+.searchbar_settings_types li {
+    list-style: none;
+    padding: 5px;
+}
+
+.searchbar_settings_types li label {
+    padding: 3px;
+}
+
+.searchbar_inline_ul {
+    margin: 0;
+    padding: 0;
+}
+
+.searchbar_inline_ul li {
+    list-style: none;
+}
