@@ -33,14 +33,16 @@ define('INFOSCREEN_PASSWORD', '');
 // Name des Servers (benoetigt fuer Cronjobs
 define('SERVER_NAME', 'localhost');
 
+// Pfad zu Applikation
+define('BASE_LOCATION','/');
 // URL zu FHComplete Root
-define('APP_ROOT', 'http://www.fhcomlete.org/build/');
+define('APP_ROOT', 'http://www.fhcomlete.org'.BASE_LOCATION);
 // URL zu RDF Verzeichnis
-define('XML_ROOT', 'http://www.fhcomlete.org/build/rdf/');
+define('XML_ROOT', 'http://www.fhcomlete.org'.BASE_LOCATION.'rdf/');
 // Pfad zu Document Root
 define('DOC_ROOT', '/var/www/html/build/');
 // URL zu CIS
-define('CIS_ROOT', 'http://www.fhcomlete.org/build/');
+define('CIS_ROOT', 'http://www.fhcomlete.org/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH', 'tw');

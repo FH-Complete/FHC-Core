@@ -12,5 +12,7 @@ var Bootstrapper = {
 		$("input[type=text], select, textarea").addClass("form-control");
 		$("button, input[type=button]").addClass("btn btn-default");
 		$("table").addClass("table-condensed");
+		$("#tableDataset").addClass('table-bordered');
 	}
 };
+
