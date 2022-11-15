@@ -148,6 +148,7 @@ $this->phrasen['benotungstool/pruefungAnlegenFuer']='Create an examination for '
 $this->phrasen['benotungstool/kreuzerltool']='"Kreuzerl" tool';
 $this->phrasen['benotungstool/studentIstLvNichtZugeordnet']='Student is not assigned to this course. The grade was not accepted!';
 $this->phrasen['benotungstool/studentMitMatrikelnummerExistiertNicht']='Student with student ID number %s does not exist.';
+$this->phrasen['benotungstool/NachpruefungNichtZulaessig']='Re-examination for student %s not allowed.';
 $this->phrasen['benotungstool/datumsformatUnzulaessig']='The date %s is not in valid format TT.MM.JJJJ.';
 $this->phrasen['benotungstool/noteNichtUeberschreibbar']='Transcript grade %2$s for student with Personal identifier %1$s is not rewritable';
 $this->phrasen['benotungstool/fehlerhafteNoteBeiStudent']='Incorrect grade for student %s %s';

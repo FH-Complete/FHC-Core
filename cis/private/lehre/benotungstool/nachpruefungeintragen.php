@@ -95,6 +95,8 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 {
 	$errorMatrnr = '';
 	$errorDatum = '';
+	$errorNachp = '';
+	
 	foreach ($_POST as $row => $val)
 	{
 		if(mb_strstr(mb_strtolower($row), 'student_uid_'))
@@ -140,6 +142,14 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 				}
 			}
 
+			//check ob eine Note vorhanden ist oder (intern) angerechnet wurde
+			$lvnote = new lvgesamtnote();
+			if (!$lvnote->load($lvid, $student_uid, $stsem))
+			{
+				$errorNachp.="\n".$p->t('benotungstool/NachpruefungNichtZulaessig', array($student_uid));
+				continue;
+			}
+
 			$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
 
 			if(isset($_POST['student_uid_'.$id]) && (isset($_POST['note_'.$id]) || isset($_POST['punkte_'.$id])) && isset($_POST['datumNachp_'.$id]))
@@ -152,7 +162,7 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 			}
 		}
 	}
-	echo $errorMatrnr . $errorDatum;
+	echo $errorMatrnr . $errorDatum . $errorNachp;
 }
 else
 {
