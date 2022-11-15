@@ -3,14 +3,14 @@ $this->load->view(
     'templates/FHC-Header',
     array(
         'title' => 'Lehrauftrag erteilen',
-        'jquery' => true,
-        'jqueryui' => true,
-        'jquerycheckboxes' => true,
-        'bootstrap' => true,
-        'fontawesome' => true,
-        'sbadmintemplate' => true,
-        'tabulator' => true,
-        'momentjs' => true,
+        'jquery3' => true,
+        'jqueryui1' => true,
+        'jquerycheckboxes1' => true,
+        'bootstrap3' => true,
+        'fontawesome4' => true,
+        'sbadmintemplate3' => true,
+        'tabulator4' => true,
+        'momentjs2' => true,
         'ajaxlib' => true,
         'dialoglib' => true,
         'tablewidget' => true,
@@ -210,3 +210,4 @@ $this->load->view(
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
+

@@ -45,12 +45,12 @@ $datum_obj = new datum();
 	<title>Ampel - Details</title>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../vendor/components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../vendor/fortawesome/font-awesome4/css/font-awesome.min.css">
 	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css">
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function()

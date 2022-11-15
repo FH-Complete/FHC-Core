@@ -3,12 +3,12 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Prüfungsprotokoll',
-			'jquery' => true,
-			'jqueryui' => true,
-			'jquerycheckboxes' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'tablesorter' => true,
+			'jquery3' => true,
+			'jqueryui1' => true,
+			'jquerycheckboxes1' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'tablesorter2' => true,
 			'ajaxlib' => true,
 			'dialoglib' => true,
 			'tablewidget' => true,
@@ -33,25 +33,25 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<h3 class="page-header">
-					<?php echo $this->p->t('abschlusspruefung','pruefungsprotokoll'); ?>
+					<?php echo $this->p->t('abschlusspruefung', 'pruefungsprotokoll'); ?>
 				</h3>
 			</div>
 		</div>
-		<?php echo $this->p->t('abschlusspruefung','einfuehrungstext'); ?>
+		<?php echo $this->p->t('abschlusspruefung', 'einfuehrungstext'); ?>
         <br><br>
         <div class="row">
             <div class="col-lg-12">
                 <form action="" method="post">
-                    <label><?php echo $this->p->t('ui','zeitraum'); ?>:&nbsp;&nbsp;</label>
+                    <label><?php echo $this->p->t('ui', 'zeitraum'); ?>:&nbsp;&nbsp;</label>
                     <div class="btn-group" role="group">
                         <button type="submit" class="btn btn-default <?php echo $period == 'today' ? 'active' : ''?>"
-                                name="period" value="today"><?php echo $this->p->t('ui','heute'); ?></button>
+                                name="period" value="today"><?php echo $this->p->t('ui', 'heute'); ?></button>
                         <button type="submit" class="btn btn-default <?php echo $period == 'lastWeek' ? 'active' : ''?>"
-                                name="period" value="lastWeek"><?php echo $this->p->t('ui','letzteWoche'); ?></button>
+                                name="period" value="lastWeek"><?php echo $this->p->t('ui', 'letzteWoche'); ?></button>
                         <button type="submit" class="btn btn-default <?php echo $period == 'upcoming' ? 'active' : ''?>"
-                                name="period" value="upcoming"><?php echo $this->p->t('ui','zukuenftige'); ?></button>
+                                name="period" value="upcoming"><?php echo $this->p->t('ui', 'zukuenftige'); ?></button>
                         <button type="submit" class="btn btn-default <?php echo $period == 'all' ? 'active' : ''?>"
-                                name="period" value="all"><?php echo $this->p->t('ui','alle'); ?></button>
+                                name="period" value="all"><?php echo $this->p->t('ui', 'alle'); ?></button>
                     </div>
                 </form>
             </div>
