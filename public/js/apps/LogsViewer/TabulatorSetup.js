@@ -22,13 +22,13 @@ export const LogsViewerTabulatorOptions = {
 	height: 700,
 	layout: 'fitColumns',
 	columns: [
-		{title: 'Log ID', field: 'LogId'},
-		{title: 'Request ID', field: 'RequestId'},
-		{title: 'Execution time', field: 'ExecutionTime'},
-		{title: 'Executed by', field: 'ExecutedBy'},
-		{title: 'Description', field: 'Description'},
-		{title: 'Data', field: 'Data'},
-		{title: 'Web service type', field: 'WebserviceType'}
+		{title: 'Log ID', field: 'LogId', headerFilter: true},
+		{title: 'Request ID', field: 'RequestId', headerFilter: true},
+		{title: 'Execution time', field: 'ExecutionTime', headerFilter: true},
+		{title: 'Executed by', field: 'ExecutedBy', headerFilter: true},
+		{title: 'Description', field: 'Description', headerFilter: true},
+		{title: 'Data', field: 'Data', headerFilter: true},
+		{title: 'Web service type', field: 'WebserviceType', headerFilter: true}
 	],
 	rowFormatter: function(row) {
 		if (row.getData().RequestId.includes("error"))
