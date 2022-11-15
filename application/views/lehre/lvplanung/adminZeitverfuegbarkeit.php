@@ -3,16 +3,16 @@ $this->load->view(
     'templates/FHC-Header',
     array(
         'title' => 'Zeitverfuegbarkeit verwalten',
-        'jquery' => true,
-        'jqueryui' => true,
-        'bootstrap' => true,
-        'fontawesome' => true,
-        'momentjs' => true,
+        'jquery3' => true,
+        'jqueryui1' => true,
+        'bootstrap3' => true,
+        'fontawesome4' => true,
+        'momentjs2' => true,
         'ajaxlib' => true,
-        'tabulator' => true,
+        'tabulator4' => true,
         'tablewidget' => true,
         'navigationwidget' => true,
-        'sbadmintemplate' => true,
+        'sbadmintemplate3' => true,
         'phrases' => array(
             'global' => array(
                 'bis',
@@ -49,7 +49,9 @@ $this->load->view(
         <!-- title -->
         <div class="row">
             <div class="col-lg-12 page-header">
-                <h3>Zeitverf&uuml;gbarkeiten verwalten<small>  |  Punktuelle Zeitverfügbarkeiten von Lehrenden für die LV-Planung verwalten</small></h3>
+		<h3>Zeitverf&uuml;gbarkeiten verwalten<small>
+			  |  Punktuelle Zeitverfügbarkeiten von Lehrenden für die LV-Planung verwalten</small>
+		</h3>
             </div>
         </div>
 

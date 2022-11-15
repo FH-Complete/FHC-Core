@@ -78,8 +78,8 @@ class Gruppenmanagement extends Auth_Controller
 	}
 
 	/**
-	* Gets Benutzer assigned to a Gruppe
-	*/
+	 * Gets Benutzer assigned to a Gruppe
+	 */
 	public function getBenutzer()
 	{
 		$gruppe_kurzbz = $this->input->get('gruppe_kurzbz');
@@ -93,8 +93,8 @@ class Gruppenmanagement extends Auth_Controller
 	}
 
 	/**
-	* Gets all Benutzer for assignment to Gruppe
-	*/
+	 * Gets all Benutzer for assignment to Gruppe
+	 */
 	public function getAllBenutzer()
 	{
 		$this->BenutzerModel->addSelect('uid, vorname, nachname');
