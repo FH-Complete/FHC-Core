@@ -521,7 +521,7 @@ if (isset($zweitbetreuerArr) && is_array($zweitbetreuerArr)) // wenn es Zweitbet
 	{
 		if ($bart !== $zweitbetreuer->betreuerart_kurzbz)
 		{
-			$htmlstr .= ($zweitbetreuer->betreuerart_kurzbz == 'Senatspruefer' ? $p->t('abgabetool/senatsPruefer') : $p->t('abgabetool/zweitBegutachter'));
+			$htmlstr .= ($zweitbetreuer->betreuerart_kurzbz == 'Senatsmitglied' ? $p->t('abgabetool/senatsMitglied') : $p->t('abgabetool/zweitBegutachter'));
 			$htmlstr .= ": ";
 			$bart = $zweitbetreuer->betreuerart_kurzbz;
 		}

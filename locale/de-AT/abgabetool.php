@@ -91,5 +91,5 @@ $this->phrasen['abgabetool/projektbeurteilungDownload']='Projektbeurteilung heru
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='Erst-/Begutachter';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Zweitbegutachter';
 $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Fehler beim Ermitteln des Enduplaods der Projektarbeit';
-$this->phrasen['abgabetool/senatsPruefer']='Prüfer';
+$this->phrasen['abgabetool/senatsMitglied']='Mitglied Prüfungssenat';
 ?>

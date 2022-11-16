@@ -10397,7 +10397,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Senatsvorsitz',
+				'text' => 'Vorsitz Prüfungssenat',
 				'description' => '',
 				'insertvon' => 'system'
 			),

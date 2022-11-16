@@ -423,7 +423,7 @@ class projektbetreuer extends basis_db
 					)
 					OR /* either Zweitbegutachter of masterarbeit, or Kommissionsprüfer if Kommission */
 					(
-						betr.betreuerart_kurzbz  = 'Senatspruefer'
+						betr.betreuerart_kurzbz  = 'Senatsmitglied'
 						AND EXISTS (
 							SELECT 1 FROM lehre.tbl_projektbetreuer
 							WHERE person_id = ".$this->db_add_param($erstbegutachter_person_id, FHC_INTEGER)."
@@ -477,7 +477,7 @@ class projektbetreuer extends basis_db
 							LEFT JOIN public.tbl_benutzer USING(person_id)
 							WHERE projektarbeit_id = ".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
 							AND tbl_projektbetreuer.person_id = ".$this->db_add_param($zweitbegutachter_person_id, FHC_INTEGER)."
-							AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatspruefer')
+							AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatsmitglied')
 							LIMIT 1";
 
 		if ($betreueruidres = $this->db_query($betreuerUidQry))
@@ -520,7 +520,7 @@ class projektbetreuer extends basis_db
 						zugangstoken_gueltigbis = CURRENT_DATE + interval '1 year'
 						WHERE projektarbeit_id = " . $this->db_add_param($projektarbeit_id, FHC_INTEGER) . "
 						AND person_id = " . $this->db_add_param($row_betr->person_id, FHC_INTEGER) . "
-						AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatspruefer')";
+						AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatsmitglied')";
 
 					if ($this->db_query($qry_upd))
 					{

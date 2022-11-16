@@ -90,16 +90,19 @@ $htmlstr1 = '';
 $vorname='';
 $nachname='';
 $zweitbetreuer = '';
-$senatspruefer = '';
+$senatsmitglied = '';
 
 $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname,
 			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname,
 			(SELECT titelpre FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpre,
 			(SELECT titelpost FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpost,
+			tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
 			(SELECT person_id FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
 			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_person_id,
 			(SELECT betreuerart_kurzbz FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
 			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_betreuerart_kurzbz,
+			(SELECT tbl_betreuerart.beschreibung FROM lehre.tbl_projektbetreuer JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz) WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
+			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied') LIMIT 1) AS zweitbetreuer_betreuerart_beschreibung,
 			tbl_projektbetreuer.person_id AS betreuer_person_id,
 			tbl_projekttyp.bezeichnung AS prjbez, *,
 			lehre.tbl_projektbetreuer.note as note,
@@ -114,6 +117,7 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 		LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
+		LEFT JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz)
 		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 		AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Senatsvorsitz')
 		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)."
@@ -148,26 +152,30 @@ else
 		{
 			$zweitbetreuer = ', <b>'.$db->convert_html_chars($row->zweitbetreuer_betreuerart_kurzbz).'</b>: '.$zweitbetreuer_obj->titelpre.' '.$zweitbetreuer_obj->vorname.' '.$zweitbetreuer_obj->nachname.' '.$zweitbetreuer_obj->titelpost;
 		}
-		$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_kurzbz).'</b>: ';
 
-		// get senatspruefer, if any
+		// get senatsmitglied, if any
 		if ($row->betreuerart_kurzbz == 'Senatsvorsitz')
 		{
-			$senatspruefer_obj = new projektbetreuer();
-			$senatsprueferRes = $senatspruefer_obj->getZweitbegutachterWithToken($row->betreuer_person_id, $row->projektarbeit_id, $row->uid);
-			if ($senatsprueferRes)
+			// write beschreibung of Betreuerart for Senatsvorsitz
+			$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_beschreibung).'</b>: ';
+
+			$senatsmitglied_obj = new projektbetreuer();
+			$senatsmitgliedRes = $senatsmitglied_obj->getZweitbegutachterWithToken($row->betreuer_person_id, $row->projektarbeit_id, $row->uid);
+			if ($senatsmitgliedRes)
 			{
-				$senatspruefer .= ', <b>Senatsprüfer</b>: ';
+				$senatsmitglied .= ', <b>'.$db->convert_html_chars($row->zweitbetreuer_betreuerart_beschreibung).'</b>: ';
 				$first = true;
-				foreach($senatspruefer_obj->result as $spr)
+				foreach($senatsmitglied_obj->result as $spr)
 				{
 					if (!$first)
-						$senatspruefer .= ', ';
-					$senatspruefer .= $spr->voller_name;
+						$senatsmitglied .= ', ';
+					$senatsmitglied .= $spr->voller_name;
 					$first = false;
 				}
 			}
 		}
+		else
+			$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_kurzbz).'</b>: ';
 
 		$vorname=$row->vorname;
 		$nachname=$row->nachname;
@@ -177,7 +185,7 @@ else
 		$htmlstr1 .= $row->bvorname.' '.$row->bnachname;
 		($row->btitelpost!=''?$htmlstr1 .= ' '.$row->btitelpost:$htmlstr1 .= '');
 		$htmlstr1 .= $zweitbetreuer;
-		$htmlstr1 .= $senatspruefer;
+		$htmlstr1 .= $senatsmitglied;
 		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
 
 		if (is_null($row->note) && $row->aktiv === 't')

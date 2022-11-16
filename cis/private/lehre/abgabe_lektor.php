@@ -61,8 +61,10 @@ $sql_query = "SELECT
 			FROM
 			(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
 			tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
-			tbl_projektbetreuer.betreuerart_kurzbz, tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
-			 FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
+			tbl_projektbetreuer.betreuerart_kurzbz, tbl_betreuerart.beschreibung AS betreuerart_beschreibung, tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
+			FROM lehre.tbl_projektarbeit
+			LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
+			LEFT JOIN lehre.tbl_betreuerart using(betreuerart_kurzbz)
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
 			LEFT JOIN public.tbl_student on(public.tbl_benutzer.uid=public.tbl_student.student_uid)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
@@ -75,7 +77,7 @@ $sql_query = "SELECT
 				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id
 				AND public.tbl_benutzer.uid=".$db->db_add_param($getuid).")
 			".($showall?'':' AND public.tbl_benutzer.aktiv AND lehre.tbl_projektarbeit.note IS NULL ')."
-			AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Zweitbegutachter', 'Erstbetreuer', 'Senatsvorsitz', 'Senatspruefer')
+			AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Zweitbegutachter', 'Erstbetreuer', 'Senatsvorsitz', 'Senatsmitglied')
 			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy
 		ORDER BY nachname";
 
@@ -111,7 +113,7 @@ else
 		$htmlstr .= "       <td>".strtoupper($row->typ.$row->kurzbz)."</td>\n";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->studiensemester_kurzbz)."</td>\n";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->titel)."</td>\n";
-		$htmlstr .= "       <td>".$db->convert_html_chars($row->betreuerart_kurzbz)."</td>\n";
+		$htmlstr .= "       <td>".($row->betreuerart_beschreibung == null ? $db->convert_html_chars($row->betreuerart_kurzbz) : $db->convert_html_chars($row->betreuerart_beschreibung))."</td>\n";
 		$htmlstr .= "   </tr>\n";
 		$i++;
 	}

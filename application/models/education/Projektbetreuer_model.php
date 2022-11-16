@@ -133,7 +133,7 @@ class Projektbetreuer_model extends DB_Model
 						)
 						OR /* either Zweitbegutachter of masterarbeit, or Kommissionsprüfer if Kommission */
 						(
-							betr.betreuerart_kurzbz  = 'Senatspruefer'
+							betr.betreuerart_kurzbz  = 'Senatsmitglied'
 							AND EXISTS (
 								SELECT 1 FROM lehre.tbl_projektbetreuer
 								WHERE person_id = ?
@@ -176,7 +176,7 @@ class Projektbetreuer_model extends DB_Model
 							LEFT JOIN public.tbl_benutzer USING(person_id)
 							WHERE projektarbeit_id = ?
 							AND tbl_projektbetreuer.person_id = ?
-							AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatspruefer')
+							AND betreuerart_kurzbz IN ('Zweitbegutachter', 'Senatsmitglied')
 							LIMIT 1";
 
 		$betreueruidRes = $this->execQuery($betreuerUidQry, array($projektarbeit_id, $zweitbegutachter_person_id));
