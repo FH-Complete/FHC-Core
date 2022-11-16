@@ -20,6 +20,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
 {
 	const URLAUBSFREIGABE_PATH = 'cis/private/profile/urlaubsfreigabe.php';
 	const MONATSLISTEN_PATH = 'addons/casetime/cis/timesheet_overview.php';
+	const PROJEKTLISTE_PATH = 'addons/reports/cis/index.php';
 	/*	* Constructor	*/
 	public function __construct()
 	{
@@ -33,6 +34,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
 		$this->load->model('ressource/Zeitsperre_model', 'ZeitsperreModel');
 		$this->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('project/Projekt_ressource_model', 'ProjektRessourceModel');
 
 		// Load libraries
 		$this->load->library('PermissionLib');
@@ -48,6 +50,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
  * c) Employees, who did not send last months timesheet yet
  * d) Employees, who have not recorded their working hours last week
  * e) Employees, who do not have a "Zeitmodel" yet
+ * f) Emplyoyees, who are projectleaders
  */
 	public function sendMail()
 	{
@@ -60,12 +63,14 @@ class ZeiterfassungInfoJob extends JOB_Controller
 		$mitarbeiter_to_record_times_lastweek = $this->_getEmployeeLastWeeksTimeList();
 
 		$mitarbeiter_without_zeitmodell = $this->_filterMitarbeiter();
+		$mitarbeiter_projektleiter = $this->_getProjektleiter();
 
 		$cnt_sup_to_approve_vacation = 0;
 		$cnt_sup_to_approve_timesheets = 0;
 		$cnt_ma_to_send_timesheet = 0;
 		$cnt_ma_to_record_times_lastweek = 0;
 		$cnt_ma_without_zeitmodell = 0;
+		$cnt_ma_projektleitend = 0;
 		$cnt_mails_total = 0;
 
 		$mailingList = array();
@@ -118,8 +123,18 @@ class ZeiterfassungInfoJob extends JOB_Controller
 			{
 				$ma->EmpZeitMod = false;
 			}
+			//projektleiter
+			if(array_key_exists($uid, $mitarbeiter_projektleiter))
+			{
+				$ma->EmpProLei = true;
+				$cnt_ma_projektleitend++;
+			}
+			else
+			{
+				$ma->EmpProLei = false;
+			}
 
-			if($ma->SupVac || $ma->SupMonth || $ma->EmpMonth || $ma->EmpWeek || $ma->EmpZeitMod)
+			if($ma->SupVac || $ma->SupMonth || $ma->EmpMonth || $ma->EmpWeek || $ma->EmpZeitMod || $ma->EmpProLei)
 			{
 				array_push($mailingList, $ma);
 				$cnt_mails_total++;
@@ -140,24 +155,34 @@ class ZeiterfassungInfoJob extends JOB_Controller
 			$EmpMonth ='';
 			$EmpWeek ='';
 			$EmpZeitMod ='';
+			$EmpProLei ='';
+
+			if(array_key_exists($ma->uid, $mitarbeiter_projektleiter))
+			{
+				$projekteMa = implode(', ', $mitarbeiter_projektleiter[$ma->uid]);
+			}
 
 			//Generate Email Text
 			$ma->SupVac ? $supVac = 'Du hast noch Urlaube freizugeben. Du findest die Urlaubsfreigabe unter:
-				<a href="'.CIS_ROOT.'cis/index.php?menu='.CIS_ROOT. 'cis/menu.php?content_id=&content='.CIS_ROOT.self::URLAUBSFREIGABE_PATH.'">Urlaubstool</a><br><br>' : '';
+				<a href="'.CIS_ROOT.self::URLAUBSFREIGABE_PATH.'">Urlaubstool</a><br><br>' : '';
 			$ma->SupMonth ? $SupMonth = 'Du hast noch Monatslisten freizugeben. Du findest die Monatslistenfreigabe unter:
-				<a href="'.CIS_ROOT.'cis/index.php?menu='.CIS_ROOT. 'cis/menu.php?content_id=&content='.CIS_ROOT.self::MONATSLISTEN_PATH.'">Monatslisten</a><br><br>' : '';
+				<a href="'.CIS_ROOT.self::MONATSLISTEN_PATH.'">Monatslisten</a><br><br>' : '';
 			$ma->EmpMonth ? $EmpMonth = 'Du musst noch die Monatsliste von letztem Monat abschicken.<br><br>' : '';
 			$ma->EmpWeek ? $EmpWeek = 'Du musst noch Zeiten für letzte Woche eintragen.<br><br>' : '';
 			$ma->EmpZeitMod ? $EmpZeitMod = 'Du hast noch kein Zeitmodell hinterlegt.<br><br>' : '';
+			$ma->EmpProLei ? $EmpProLei = 'Bitte kontrolliere die Aufzeichnungen deiner Projekte ('. $projekteMa. '):
+				<a href="'.CIS_ROOT.self::PROJEKTLISTE_PATH.'">Projektaufzeichnungen</a><br><br>' : '';
+
 
 			// Prepare mail content
 			$content_data_arr = array(
-				'ma_name'        => $ma_name,
+				'ma_name'       => $ma_name,
 				'SupVac'        => $supVac,
 				'SupMonth'      => $SupMonth,
 				'EmpMonth'      => $EmpMonth,
 				'EmpWeek'       => $EmpWeek,
-				'EmpZeitMod'    => $EmpZeitMod
+				'EmpZeitMod'    => $EmpZeitMod,
+				'EmpProLei'		=> $EmpProLei
 			);
 
 			sendSanchoMail(
@@ -191,6 +216,8 @@ class ZeiterfassungInfoJob extends JOB_Controller
 		print_r("|");
 		print_r("\n");
 		print_r("| Anzahl kein hinterlegtes Zeitmodell: " . $cnt_ma_without_zeitmodell);
+		print_r("\n");
+		print_r("| Anzahl projektleitender Mitarbeiter: " . $cnt_ma_projektleitend);
 		print_r("\n");
 		print_r("| Anzahl gesendeter Mails Total: " . $cnt_mails_total);
 		print_r("\n");
@@ -324,7 +351,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
 		foreach ($mitarbeiter as $ma)
 		{
 			$uid = $ma->uid;
-			if(!in_array($uid,$mitarbeiterLastWeekExists))
+			if(!in_array($uid, $mitarbeiterLastWeekExists))
 			{
 				$uids[$uid] = $uid;
 			}
@@ -377,5 +404,25 @@ class ZeiterfassungInfoJob extends JOB_Controller
 			}
 		}
 		return $mitarbeiterWithoutZeitmodell;
+	}
+
+	private function _getProjektleiter()
+	{
+
+		$mitarbeiter = $this->MitarbeiterModel->getEmployeesZeitaufzeichnungspflichtig()->retval;
+		$projektleiter = $this->ProjektRessourceModel->getProjektleiterActiveProjects()->retval;
+
+		$projektleitendeMitarbeiter = array();
+		foreach ($projektleiter as $pl)
+		{
+			foreach ($mitarbeiter as $ma)
+			{
+				if($pl->mitarbeiter_uid == $ma->mitarbeiter_uid)
+				{
+					$projektleitendeMitarbeiter[$pl->mitarbeiter_uid][]= $pl->titel;
+				}
+			}
+		}
+		return $projektleitendeMitarbeiter;
 	}
 }
