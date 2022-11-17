@@ -20,7 +20,7 @@ class ZeiterfassungInfoJob extends JOB_Controller
 {
 	const URLAUBSFREIGABE_PATH = 'cis/private/profile/urlaubsfreigabe.php';
 	const MONATSLISTEN_PATH = 'addons/casetime/cis/timesheet_overview.php';
-	const PROJEKTLISTE_PATH = 'addons/reports/cis/index.php';
+	const PROJEKTLISTE_PATH = 'addons/reports/cis/index.php?reportgruppe_id=32';
 	/*	* Constructor	*/
 	public function __construct()
 	{
@@ -142,7 +142,6 @@ class ZeiterfassungInfoJob extends JOB_Controller
 		}
 		$start = date("h:i:sa");
 
-		print_r(date("h:i:sa\n"));
 		// Loop through 'container' of mail recipients
 		foreach ($mailingList as $ma)
 		{
@@ -195,35 +194,17 @@ class ZeiterfassungInfoJob extends JOB_Controller
 			);
 		}
 		$end = date("h:i:sa");
-		print_r($end."\n");
-		print_r(($start-$end."\n"));
 
-		print_r("___________________________________________________________________");
-		print_r("\n");
-		print_r("|");
-		print_r("\n");
-		print_r("| Job Report: Infomail Zeiterfassung\n");
-		print_r("|");
-		print_r("\n");
-		print_r("| Anzahl Urlaube freizugeben: " . $cnt_sup_to_approve_vacation);
-		print_r("\n");
-		print_r("| Anzahl Monatslisten zu bestätigen: ". $cnt_sup_to_approve_timesheets);
-		print_r("\n");
-		print_r("| Anzahl Monatslisten abzuschicken: " . $cnt_ma_to_send_timesheet);
-		print_r("\n");
-		print_r("| Anzahl fehlende Zeitaufzeichnungen letzte Woche: " . $cnt_ma_to_record_times_lastweek);
-		print_r("\n");
-		print_r("|");
-		print_r("\n");
-		print_r("| Anzahl kein hinterlegtes Zeitmodell: " . $cnt_ma_without_zeitmodell);
-		print_r("\n");
-		print_r("| Anzahl projektleitender Mitarbeiter: " . $cnt_ma_projektleitend);
-		print_r("\n");
-		print_r("| Anzahl gesendeter Mails Total: " . $cnt_mails_total);
-		print_r("\n");
-		print_r("|");
-		print_r("__________________________________________________________________");
-		print_r("\n");
+		//Logs Viewer
+		$this->logInfo('START Job Report: Infomail Zeiterfassung (' . $start . ')');
+		$this->logInfo($cnt_sup_to_approve_vacation . " Urlaub(e) freizugeben");
+		$this->logInfo($cnt_sup_to_approve_timesheets . " Monatsliste(n) zu bestaetigen");
+		$this->logInfo($cnt_ma_to_send_timesheet ." Monatsliste(n) abzuschicken");
+		$this->logInfo($cnt_ma_to_record_times_lastweek ." fehlende Zeitaufzeichnung(en) letzte Woche");
+		$this->logInfo($cnt_ma_without_zeitmodell . " Zeitmodell(e) nicht hinterlegt ");
+		$this->logInfo($cnt_ma_projektleitend . " projektleitende(r) Mitarbeiter*in");
+		$this->logInfo($cnt_mails_total . " gesendete Mails Total");
+		$this->logInfo("ENDE Job Report: Infomail Zeiterfassung (" . $end . ")");
 
 		return true;
 	}
