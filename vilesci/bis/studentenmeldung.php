@@ -416,9 +416,29 @@ if($result = $db->db_query($qry))
 		$datei .= GenerateXMLStudentBlock($row);
 
 		// wenn neuer Studiengang oder letzter Durchlauf...
-		if ($stg_kz_index != '' && ($row->studiengang_kz != $stg_kz_index || $row_num == $num_rows))
+		if (($row_num > 1 && $row->studiengang_kz != $stg_kz_index) || $row_num == $num_rows)
 		{
-			//Bewerberblock bei neuem Studiengang, und am Ende noch einmal
+			// ...Studiengang Tag schliessen
+			$stgClose = "
+	</Studiengang>";
+			$datei .= $stgClose;
+			$dateiNurBewerber .= $stgClose;
+		}
+
+		// wenn neuer Studiengang...
+		if ($row->studiengang_kz != $stg_kz_index)
+		{
+			if ($row_num > 1)
+			{
+				// ...neuen Studiengang Tag öffnen
+				$stgOpen = "
+		<Studiengang>
+		  <StgKz>".$row->studiengang_kz."</StgKz>";
+				$datei .= $stgOpen;
+				$dateiNurBewerber .= $stgOpen;
+			}
+
+			//Bewerberblock
 			// (bei Ausserordentlichen nicht anzeigen)
 			if($row->studiengang_kz!=('9'.$erhalter))
 			{
@@ -431,35 +451,16 @@ if($result = $db->db_query($qry))
 					foreach($orgcodes as $code)
 					{
 						$bewerberBlock=GenerateXMLBewerberBlock($row->studiengang_kz, $code);
-						$datei.=$bewerberBlock;
 						$dateiNurBewerber.=$bewerberBlock;
 					}
 				}
 				else
 				{
 					$bewerberBlock=GenerateXMLBewerberBlock($row->studiengang_kz);
-					$datei.=$bewerberBlock;
 					$dateiNurBewerber.=$bewerberBlock;
 				}
 			}
-
-			// ...Studiengang Tag schliessen
-			$stgClose = "
-	</Studiengang>";
-			$datei .= $stgClose;
-			$dateiNurBewerber .= $stgClose;
-		}
-
-		// wenn neuer Studiengang...
-		if ($stg_kz_index != '' && $row->studiengang_kz != $stg_kz_index)
-		{
-					// ...neuen Studiengang Tag öffnen
-					$stgOpen = "
-			<Studiengang>
-			  <StgKz>".$row->studiengang_kz."</StgKz>";
-					$datei .= $stgOpen;
-					$dateiNurBewerber .= $stgOpen;
-		}
+		};
 
 		// Studiengang kz speichern und Zeile erhöhen
 		$stg_kz_index = $row->studiengang_kz;
@@ -743,7 +744,7 @@ if(file_exists($ddd))
 }
 
 if(file_exists($dddNurBew))
-	echo '<a href="'.$dddNurBew.'" target="_blank" download>XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.' - nur Bewerberdaten</a><br>';
+	echo '<a href="'.$dddNurBew.'" target="_blank" download>XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.' - Bewerberdaten</a><br>';
 
 if(file_exists($eee))
 {
@@ -1610,7 +1611,7 @@ function GenerateXMLStudentBlock($row)
 		if($studtyp!='E')
 		{
 			$datei.="
-				<StudStatusCode>".$status."</StudStatusCode>";
+			<StudStatusCode>".$status."</StudStatusCode>";
 		}
 
 		// IO container query
@@ -2037,7 +2038,7 @@ function GenerateXMLBewerberBlock($studiengang_kz, $orgformcode=null)
 			<OrgFormCode>".$orgform_code_array[$bworgform]."</OrgFormCode>";
 			if($stgart==2)
 				$datei.='
-			<ZugangMaCode>'.$key.'</ZugangMaCode>';
+			<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
 			else
 				$datei.='
 			<ZugangCode>'.$key.'</ZugangCode>';
