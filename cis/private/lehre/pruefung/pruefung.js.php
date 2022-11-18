@@ -353,7 +353,7 @@ function writePruefungsTable(e, data, anmeldung)
 		var time = termin[1].substring(0,5);
 		termin = termin[0].split("-");
 
-		// Studierende dürfen sich 2 Monate vor Prüfungen anmelden?
+		// Studierende dürfen sich 2 Monate vor Prüfungen anmelden
 		var minimumFrist = new Date(termin[0], termin[1]-1,termin[2]);
         minimumFrist.setMonth(minimumFrist.getMonth() - 2);
 
