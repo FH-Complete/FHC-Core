@@ -79,7 +79,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungData($anrechnung_id);
-		
+
 		// Get Antrag data
 		$antragData = $this->anrechnunglib->getAntragData(
 			$anrechnungData->prestudent_id,
@@ -110,7 +110,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
-		
+
 		// Get lectors person data
 		if (!$person = getData($this->PersonModel->getByUID($this->_uid))[0])
 		{
@@ -217,15 +217,18 @@ class reviewAnrechnungDetail extends Auth_Controller
 		}
 
 		// Check if user is entitled to read dms doc
-		self::_checkIfEntitledToReadDMSDoc($dms_id);
-		
+		$this->_checkIfEntitledToReadDMSDoc($dms_id);
+
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
-		
-		// Download file
-		$this->dmslib->download($dms_id, $filename);
-	}
 
+		// Get file to be downloaded from DMS
+		$download = $this->dmslib->download($dms_id, $filename);
+		if (isError($download)) return $download;
+
+		// Download file
+		$this->outputFile(getData($download));
+	}
 
 	/**
 	 * Retrieve the UID of the logged user and checks if it is valid
@@ -319,15 +322,10 @@ class reviewAnrechnungDetail extends Auth_Controller
 		// Send mail to STGL of each studiengang
 		foreach ($studiengang_kz_arr as $studiengang_kz)
 		{
-			// Get STGL mail address, if available, otherwise get assistance mail address
-			list ($to, $vorname) = $this->_getSTGLMailAddress($studiengang_kz);
-
 			// Get full name of lector
 			$this->load->model('person/Person_model', 'PersonModel');
-			if (!$lector_name = getData($this->PersonModel->getFullName($this->_uid)))
-			{
-				show_error ('Failed retrieving person');
-			}
+			$result = $this->PersonModel->getFullName($this->_uid);
+			$lector_name = hasData($result) ? getData($result) : 'Ein Lektor';
 
 			// Link to Antrag genehmigen
 			$url =
@@ -335,22 +333,26 @@ class reviewAnrechnungDetail extends Auth_Controller
 				CIS_ROOT. 'cis/menu.php?content_id=&content='.
 				CIS_ROOT. index_page(). self::APPROVE_ANRECHNUNG_URI;
 
-			// Prepare mail content
-			$body_fields = array(
-				'vorname'                       => $vorname,
-				'lektor_name'                   => $lector_name,
-				'empfehlung'                    => $empfehlung ? 'positive' : 'negative',
-				'link'		                    => anchor($url, 'Anrechnungsanträge Übersicht')
-			);
+            // Get STGL mail address, if available, otherwise get assistance mail address
+            if( !$result = $this->_getSTGLMailAddress($studiengang_kz)) return false;
+            foreach ($result as $stgl)
+            {
+                // Prepare mail content
+                $body_fields = array(
+                    'vorname'                       => $stgl['vorname'],
+                    'lektor_name'                   => $lector_name,
+                    'empfehlung'                    => $empfehlung ? 'positive' : 'negative',
+                    'link'		                    => anchor($url, 'Anrechnungsanträge Übersicht')
+                );
 
-			sendSanchoMail(
-				'AnrechnungEmpfehlungAbgeben',
-				$body_fields,
-				$to,
-				'Anerkennung nachgewiesener Kenntnisse: Empfehlung wurde abgegeben'
-			);
+                sendSanchoMail(
+                    'AnrechnungEmpfehlungAbgeben',
+                    $body_fields,
+                    $stgl['to'],
+                    'Anerkennung nachgewiesener Kenntnisse: Empfehlung wurde abgegeben'
+                );
+            }
 		}
-
 		return true;
 	}
 
@@ -361,13 +363,18 @@ class reviewAnrechnungDetail extends Auth_Controller
 		$result = $this->StudiengangModel->getLeitung($stg_kz);
 
 		// Get STGL mail address, if available
-		if (hasData($result))
-		{
-			return array(
-				$result->retval[0]->uid. '@'. DOMAIN,
-				$result->retval[0]->vorname
-			);
-		}
+        if (hasData($result))
+        {
+            foreach (getData($result) as $stgl)
+            {
+                $stglMailAdress_arr[]= array(
+                    'to' => $stgl->uid. '@'. DOMAIN,
+                    'vorname' => $stgl->vorname
+                );
+            }
+
+            return $stglMailAdress_arr;
+        }
 		// ...otherwise get assistance mail address
 		else
 		{
@@ -379,6 +386,10 @@ class reviewAnrechnungDetail extends Auth_Controller
 					$result->retval[0]->email,
 					''
 				);
+			}
+			else
+			{
+				return false;
 			}
 		}
 	}

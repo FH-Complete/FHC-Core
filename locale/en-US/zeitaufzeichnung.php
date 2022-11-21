@@ -65,3 +65,4 @@ $this->phrasen['zeitaufzeichnung/pauseEinfuegen']='insert break automatically';
 $this->phrasen['zeitaufzeichnung/zeitraumZuKurz']='Timeslot too short for automatic break.';
 $this->phrasen['zeitaufzeichnung/supportAnfragen']='<p><hr>Contact for support<br><a href="mailto:zeiterfassung@technikum-wien.at">zeiterfassung@technikum-wien.at</a></p>';
 $this->phrasen['zeitaufzeichnung/homeofficeNichtErlaubt']='Homeoffice for day %s not allowed';
+$this->phrasen['zeitaufzeichnung/zeitsperreVorhanden']='<p>Please note: There is a timeout for the day %s: %s!</p>';

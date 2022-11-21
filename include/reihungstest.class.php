@@ -1247,15 +1247,16 @@ class reihungstest extends basis_db
 	 */
 	public function getReihungstestPersonDatum($prestudent_id, $datum)
 	{
-		$qry = "SELECT
-					tbl_rt_person.*
-				FROM
-					public.tbl_rt_person
-					JOIN public.tbl_prestudent USING(person_id)
-					JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
-				WHERE
-					tbl_prestudent.prestudent_id = ".$this->db_add_param($prestudent_id)."
-					AND tbl_reihungstest.datum=".$this->db_add_param($datum);
+		$qry = "SELECT rt_person.*
+				FROM tbl_prestudent ps
+				JOIN tbl_prestudentstatus pss ON ps.prestudent_id = pss.prestudent_id
+				JOIN tbl_rt_person rt_person ON ps.person_id = rt_person.person_id
+				JOIN tbl_reihungstest rt ON rt_person.rt_id = rt.reihungstest_id
+				JOIN tbl_rt_studienplan rtstp ON rt.reihungstest_id = rtstp.reihungstest_id
+				WHERE ps.prestudent_id = ".$this->db_add_param($prestudent_id)."
+				AND rtstp.studienplan_id = pss.studienplan_id
+				AND rt.datum=".$this->db_add_param($datum);
+
 		if ($result = $this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object($result))

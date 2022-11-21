@@ -284,6 +284,10 @@ function onLektorSelect(event)
 
 	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
 	var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+	//Wenn der Filter angewendet wurde, gibt es keinen Parent. Daher wird hier der stg_idx auf 0 gesetzt.
+	if(stg_idx == -1 && uid != '')
+		stg_idx = 0;
+
 	if (stg_idx != -1)
 		var stg_kz=tree.view.getCellText(stg_idx,col);
 	else
@@ -328,6 +332,29 @@ function onLektorSelect(event)
 	{
 		debug(e);
 	}
+}
+
+function LektorFunktionLoadZeitwunschAdminUrl(){
+
+    var treeLektor = document.getElementById('tree-lektor');
+    var col = treeLektor.columns ? treeLektor.columns["uid"] : "uid";
+    try
+    {
+        var uid = treeLektor.view.getCellText(treeLektor.currentIndex,col);
+    }
+    catch(e)
+    {
+    }
+
+    if (uid == '' || uid == undefined)
+    {
+        alert('LektorIn auswählen, um Zeitwünsche einsehen zu können.');
+        return;
+    }
+    else
+    {
+        window.open('<?php echo APP_ROOT ?>vilesci/personen/zeitwunsch.php?uid=' + uid);
+    }
 }
 
 function loadURL(event)

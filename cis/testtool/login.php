@@ -55,7 +55,7 @@ if (isset($_GET['logout']) && $_GET['logout'] == true)
 
 	echo '
 		<script language="Javascript">
-			location = location.pathname;       // clean the login.php-url from querystring
+			location = "logout.html";       // clean the login.php-url from querystring
 			parent.menu.location = parent.menu.location.pathname;   // clean the menu.php-url from querystring
 			parent.topbar.location = parent.topbar.location.pathname;   // clean the topbar.php-url from querystring
 		</script>
@@ -365,13 +365,13 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+	<link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" type="text/css"/>
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/ui/i18n/datepicker-de.js"></script>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 
 	$(document).ready(function()

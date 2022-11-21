@@ -37,7 +37,6 @@ require_once('../../../include/erhalter.class.php');
 require_once('../../../include/datum.class.php');
 
 
-$doc = new dokument_export('fotoliste');
 $output = 'pdf';
 $show_all_fotos = false;
 
@@ -61,6 +60,8 @@ $lv->load($lvid);
 
 $stg = new studiengang();
 $stg->load($lv->studiengang_kz);
+
+$doc = new dokument_export('fotoliste', $stg->oe_kurzbz);
 
 $berechtigung = new benutzerberechtigung();
 $berechtigung->getBerechtigungen($user);
@@ -102,6 +103,7 @@ $gruppen_string = '';
 $gruppen_string_arr = array();
 $stg_typ = $stg->typ;
 $stg_bezeichnung = $stg->bezeichnung;
+$lv_bezeichnung = '';
 
 //structure overall lehrveranstaltungs data
 if ($result = $db->db_query($qry)) {
@@ -153,6 +155,7 @@ $qry = 'SELECT DISTINCT ON
 			(nachname, vorname, person_id)
             vorname,
             nachname,
+            wahlname,
             matrikelnr,
 			tbl_studentlehrverband.semester,
             tbl_studentlehrverband.verband,
@@ -224,8 +227,9 @@ if ($result = $db->db_query($qry)) {
             else
                 $zusatz = '';
 
-            if ($row->bisio_id != '' && $row->status != 'Incoming' && ($row->bis > $stsemdatumvon || $row->bis == '') && $row->von < $stsemdatumbis) //Outgoing
-                $zusatz .= '(o)(ab ' . $datum->formatDatum($row->von, 'd.m.Y') . ')';
+            if ($row->bisio_id != '' && $row->status != 'Incoming' && ($row->bis > $stsemdatumvon || $row->bis == '') && $row->von < $stsemdatumbis
+                && (anzahlTage($row->von, $row->bis) >= 30)) //Outgoing
+                $zusatz .= '(o)(ab '. $datum->formatDatum($row->von, 'd.m.Y'). ')';
 
             if ($row->note == 6) //angerechnet
                 $zusatz .= '(ar)';
@@ -235,6 +239,16 @@ if ($result = $db->db_query($qry)) {
 
             if ($row->stg_kz_student == $a_o_kz) //Außerordentliche Studierende
                 $zusatz .= '(a.o.)';
+
+            //wenn Wahlname vorhanden, wird dieser anstelle des Vornamens angezeigt
+            if ($row->wahlname != '')
+            {
+              $vorname = $row->wahlname;
+            }
+            else
+            {
+              $vorname = $row->vorname;
+            }
 
             //allow admin and assistenz to see ALL fotos (even if locked by user)
             if ($show_all_fotos)
@@ -270,7 +284,7 @@ if ($result = $db->db_query($qry)) {
 
             //add studierenden data for XML
             $data[] = array('studierende' => array(
-                    'vorname' => $row->vorname,
+                    'vorname' => $vorname,
                     'nachname' => mb_strtoupper($row->nachname, 'UTF-8'),
                     'personenkennzeichen' => trim($row->matrikelnr),
                     'geschlecht' => $row->geschlecht,

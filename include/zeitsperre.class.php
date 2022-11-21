@@ -23,6 +23,9 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class zeitsperre extends basis_db
 {
+	const NUR_BLOCKIERENDE_ZEITSPERREN = true;
+	const BLOCKIERENDE_ZEITSPERREN = "'Krank','Urlaub','ZA','DienstV','PflegeU','DienstF','CovidSB','CovidKS'";
+
 	public $new;     			// boolean
 	public $result = array(); 	// news Objekt
 
@@ -55,6 +58,11 @@ class zeitsperre extends basis_db
 
 		if($zeitsperre_id != null)
 			$this->load($zeitsperre_id);
+	}
+
+	public static function getBlockierendeZeitsperren()
+	{
+		return explode("','",trim(self::BLOCKIERENDE_ZEITSPERREN, '\''));
 	}
 
 	/**
@@ -368,11 +376,13 @@ class zeitsperre extends basis_db
 	 *
 	 * @param $user
 	 * @param $datum
-	 * @param $stunde
+	 * @param $stunde optional, wird nur abgefragt, wenn != null
+	 * @param $nurblockierend boolean default false
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getSperreByDate($user, $datum, $stunde)
+	public function getSperreByDate($user, $datum, $stunde=null, $nurblockierend=false)
 	{
+		$this->result = array();
 		$qry = "
 			SELECT
 				*
@@ -380,16 +390,23 @@ class zeitsperre extends basis_db
 				campus.tbl_zeitsperre
 			WHERE
 				vondatum<=".$this->db_add_param($datum)."
-				AND bisdatum>=".$this->db_add_param($datum)." AND
-				((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND
-				((bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") OR bisstunde is null OR bisdatum<>".$this->db_add_param($datum).") AND
-				mitarbeiter_uid=".$this->db_add_param($user);
+				AND bisdatum>=".$this->db_add_param($datum);
+
+			if( $nurblockierend ) {
+				$qry .= " AND zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
+			}
+
+			if(!is_null($stunde))
+				$qry.=" AND
+					((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND
+					((bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") OR bisstunde is null OR bisdatum<>".$this->db_add_param($datum).")";
+
+				$qry .= "AND mitarbeiter_uid=".$this->db_add_param($user);
 
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
-
 				$obj = new zeitsperre();
 
 				$obj->zeitsperre_id = $row->zeitsperre_id;
@@ -482,7 +499,7 @@ class zeitsperre extends basis_db
 
 		$qry = "select datum::date, freigabevon, zeitsperretyp_kurzbz
 					from  (SELECT generate_series(vondatum::timestamp, bisdatum::timestamp, '1 day') as datum, freigabevon, mitarbeiter_uid, zeitsperretyp_kurzbz FROM campus.tbl_zeitsperre where vonstunde is null and bisstunde is null) a
-					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '".$anz_tage." Days') and zeitsperretyp_kurzbz in ('Krank','Urlaub', 'ZA', 'DienstV','PflegeU', 'DienstF','CovidSB','CovidKS')";
+					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '".$anz_tage." Days') and zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
 
 
 
@@ -520,5 +537,60 @@ class zeitsperre extends basis_db
 		return $this->bisdatum;
 	}
 
+
+	/**
+	 * Liefert die Zeitsperren eines Users innerhalb einer bestimmten Zeitspanne.
+	 * Einschränkung nach Zeitsperrentyp möglich.
+	 *
+	 * @param $uid
+	 * @param $von string Datum im Format YYYY-MM-DD
+	 * @param $bis string Datum im Format YYYY-MM-DD
+	 * @param null $zeitsperretyp_kurzbz
+	 * @return bool
+	 */
+	public function getVonBis($uid, $von, $bis, $zeitsperretyp_kurzbz = null)
+	{
+		$qry = '
+			SELECT 
+				zeitsperre_id, zeitsperretyp_kurzbz, vondatum, vonstunde, bisdatum, bisstunde
+			FROM 
+				campus.tbl_zeitsperre
+				LEFT JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz)
+			WHERE 
+				mitarbeiter_uid = '. $this->db_add_param($uid). ' 
+				AND (
+					(vondatum BETWEEN '.$this->db_add_param($von).' AND '.$this->db_add_param($bis).')
+					OR
+					(bisdatum BETWEEN '.$this->db_add_param($von).' AND '.$this->db_add_param($bis).')
+				)';
+
+		if (!is_null($zeitsperretyp_kurzbz))
+		{
+			$qry.= '
+				 AND zeitsperretyp_kurzbz = '. $this->db_add_param($zeitsperretyp_kurzbz);
+		}
+
+		if (!$this->db_query($qry))
+		{
+			$this->errormsg=$this->db_last_error();
+			return false;
+		}
+		else
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+				$obj->zeitsperre_id = $row->zeitsperre_id;
+				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
+				$obj->vondatum = $row->vondatum;
+				$obj->vonstunde = $row->vonstunde;
+				$obj->bisdatum = $row->bisdatum;
+				$obj->bisstunde = $row->bisstunde;
+
+				$this->result[]= $obj;
+			}
+			return true;
+		}
+	}
 }
 ?>

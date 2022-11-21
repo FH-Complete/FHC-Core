@@ -44,4 +44,7 @@ $this->phrasen['zeitsperre/legendeDurchwahl']='(123)...Extension';
 $this->phrasen['zeitsperre/vertretungNichtKorrekt']='The selected substitute is invalid. Please check the substitute an try again.';
 $this->phrasen['zeitsperre/vorSperrdatum']='Date is before last open timesheet date';
 $this->phrasen['zeitsperre/abwesend']='absent';
+$this->phrasen['zeitsperre/zeitaufzeichnungVorhanden']='It exists at least one time record in the specified period.';
+$this->phrasen['zeitsperre/zeitsperreEingetragen']='There already exists an unavailability on the <strong>%s</strong> of the type <strong>%s</strong>.
+				Please delete the existing before creating a new one for this date!';
 ?>

@@ -112,7 +112,7 @@ echo '<!DOCTYPE HTML>
 	<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
 	<link href="../../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -803,6 +803,7 @@ if (defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && CIS_ANWESENHEITSLIST
 {
 	$hrefpath = "../notenliste.xls.php?stg=$stg_obj->studiengang_kz&lvid=$lvid&stsem=$stsem";
 	echo "<br><a class='Item' href='" . $hrefpath . "'>" . $p->t('benotungstool/notenlisteImport') . "</a>";
+
 }
 
 // eingetragene lv-gesamtnoten freigeben
@@ -1192,6 +1193,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 	foreach ($grades as $uid => $data)
 	//Ausgabe Array
 	{
+
 		$htmlstring .= '<tr class="liste' . ($i % 2) . '">
 			<td><a href="mailto:' . $uid . '@' . DOMAIN . '"><img src="../../../../skin/images/button_mail.gif"></a></td>
 			<td>' . $db->convert_html_chars($uid) . '</td>
@@ -1219,6 +1221,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		$negativeteilnote = false;
 		$note_zusatztext = '';
 		$note_zusatztext_tooltip = '';
+		$ueberschreibbar = false; //Damit keine Notice Fehler kommt muss Variable bei jeden Schleifendurchgang neue gesetzt und berechnet werden.
 
 		if (isset($data['grades']))
 		{

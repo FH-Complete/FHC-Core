@@ -118,6 +118,7 @@ foreach ($obj->result as $row)
 				<NOTE:student_vorname><![CDATA['.$benutzer->vorname.']]></NOTE:student_vorname>
 				<NOTE:studiengang><![CDATA['.(isset($stg_arr[$benutzer->studiengang_kz])?$stg_arr[$benutzer->studiengang_kz]:'').']]></NOTE:studiengang>
 				<NOTE:studiengang_kz><![CDATA['.$benutzer->studiengang_kz.']]></NOTE:studiengang_kz>
+				<NOTE:verband><![CDATA['.$benutzer->verband.']]></NOTE:verband>
 				<NOTE:studiengang_lv><![CDATA['.$stg_arr[$lv_obj->studiengang_kz].']]></NOTE:studiengang_lv>
 				<NOTE:studiengang_kz_lv><![CDATA['.$lv_obj->studiengang_kz.']]></NOTE:studiengang_kz_lv>
 				<NOTE:semester_lv><![CDATA['.$lv_obj->semester.']]></NOTE:semester_lv>

@@ -37,6 +37,11 @@ else
 		$ip = $_SERVER["REMOTE_ADDR"];
 }
 
+if(isset($_GET['norefresh']))
+	$norefresh = true;
+else
+	$norefresh = false;
+
 $infoscreen = new infoscreen();
 $i=-1;
 $refreshzeit = 40; // Default Refreshzeit
@@ -90,9 +95,12 @@ if(isset($infoscreen_content) && isset($infoscreen_content[$aktuellerContentIdx]
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="refresh" content="',$refreshzeit,'">
-	<link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+	if (!$norefresh)
+	{
+		echo '<meta http-equiv="refresh" content="',$refreshzeit,'">';
+	}
+echo '	<link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
 ';
 
 //Skript fuer den automatischen bildlauf
@@ -161,21 +169,22 @@ echo '
 echo '<!-- Last content:'.$lastinfoscreencontent.' ID:'.$infoscreen_id.' IP:'.$ip.'-->';
 if($infoscreen_id!='' && isset($content[$aktuellerContentIdx]))
 {
-
 	echo '<center style="height: 100%"><iframe id="content" src="../../cms/content.php?content_id='.$content[$aktuellerContentIdx].'" ></iframe></center>';
 }
 else
 {
-	echo '<br><br><br>
-		<center>
-		<h1>Informationsbildschirm - '.CAMPUS_NAME.'</h1>
-		<br><br><br>
-		Dieser Informationsbildschirm wurde noch nicht registriert
-		<br><br>
-		IP-Adresse:'.$ip.'
-		</center>';
+	echo '	<table style="width: 100%; height: 100%">
+				<tr>
+					<td style="height: 80%; vertical-align: center; text-align: center">
+						<img style="height: 900px" src="../../skin/styles/'.EXT_FKT_PATH.'/logo_200x400.png" />
+					</td>
+				</tr>
+				<tr>
+					<td style="height: 20%; vertical-align: bottom; text-align: right; color: #CCCCCC; padding: 50px">'.$ip.'</td>
+				</tr>
+			</table>
+';
 }
-
 echo '
 </body>
 </html>';
