@@ -271,7 +271,8 @@ if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
 		DISTINCT ON(student_uid, nachname, vorname) *,
 		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
 		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
-		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant,
+		COALESCE(tbl_prestudent.standort_code, tbl_studiengang.standort_code) AS bis_standort_code
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -295,7 +296,8 @@ elseif ($stg_kz == 'alleBaMa')
 		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *,
 		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
 		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
-		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant,
+		COALESCE(tbl_prestudent.standort_code, tbl_studiengang.standort_code) AS bis_standort_code
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -327,7 +329,8 @@ else
 		DISTINCT ON(student_uid, nachname, vorname) *,
 		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
 		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
-		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant,
+		COALESCE(tbl_prestudent.standort_code, tbl_studiengang.standort_code) AS bis_standort_code
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -1637,7 +1640,7 @@ function GenerateXMLStudentBlock($row)
 		if(!$ausserordentlich)
 		{
 			$datei.="
-			<StandortCode>".$row->standort_code."</StandortCode>";
+			<StandortCode>".$row->bis_standort_code."</StandortCode>";
 		}
 		/*
 		 * BMWFFoerderrung derzeit fuer alle Studierende auf Ja gesetzt
