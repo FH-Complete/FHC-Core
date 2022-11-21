@@ -220,33 +220,40 @@ class ZeiterfassungInfoJob extends JOB_Controller
 	private function _getVorgesetztetoApproveVacationList()
 	{
 		$mResult = $this->ZeitsperreModel->getMitarbeiterListWithPendingVacation();
-		$mitarbeiterList = getData($mResult);
-		$vorgesetzte = array();
 		$toSend = array();
-
-		foreach ($mitarbeiterList as $mitarbeiter)
+		if (hasData($mResult))
 		{
-			$mitarbeiter_uid = $mitarbeiter->mitarbeiter_uid;
-			$vorgesetzte[] = getData($this->MitarbeiterModel->getVorgesetzte($mitarbeiter_uid));
-		}
+			$mitarbeiterList = getData($mResult);
+			$vorgesetzte = array();
 
-		foreach ($vorgesetzte as $v)
-		{
-			if(!(is_null($v)))
+			foreach ($mitarbeiterList as $mitarbeiter)
 			{
-				foreach ($v as $obj)
+				$mitarbeiter_uid = $mitarbeiter->mitarbeiter_uid;
+				$vorgesetzte[] = getData($this->MitarbeiterModel->getVorgesetzte($mitarbeiter_uid));
+			}
+
+			foreach ($vorgesetzte as $v)
+			{
+				if(!(is_null($v)))
 				{
-					$name = $obj->vorgesetzter;
-					if (!(is_null($name)) && !array_key_exists($name, $toSend))
+					foreach ($v as $obj)
 					{
-						$toSend[$name] = 1;
-					}
-					else
-					{
-						$toSend[$name] += 1;
+						$name = $obj->vorgesetzter;
+						if (!(is_null($name)) && !array_key_exists($name, $toSend))
+						{
+							$toSend[$name] = 1;
+						}
+						else
+						{
+							$toSend[$name] += 1;
+						}
 					}
 				}
 			}
+		}
+		elseif (isError($mResult))
+		{
+			show_error(getError($mResult));
 		}
 		return $toSend;
 	}
@@ -258,33 +265,40 @@ class ZeiterfassungInfoJob extends JOB_Controller
 	private function _getVorgesetztetoApproveTimesheetList()
 	{
 		$mResult = $this->TimesheetModel->getPendingTimesheets();
-		$mitarbeiterList = getData($mResult);
-		$vorgesetzte = array();
-		$toSend = array();
-
-		foreach ($mitarbeiterList as $mitarbeiter)
+		if (hasData($mResult))
 		{
-			$uid = $mitarbeiter->uid;
-			$vorgesetzte[] = getData($this->MitarbeiterModel->getVorgesetzte($uid));
-		}
+			$mitarbeiterList = getData($mResult);
+			$vorgesetzte = array();
+			$toSend = array();
 
-		foreach ($vorgesetzte as $v)
-		{
-			if (!is_null($v))
+			foreach ($mitarbeiterList as $mitarbeiter)
 			{
-				foreach ($v as $obj)
+				$uid = $mitarbeiter->uid;
+				$vorgesetzte[] = getData($this->MitarbeiterModel->getVorgesetzte($uid));
+			}
+
+			foreach ($vorgesetzte as $v)
+			{
+				if (!is_null($v))
 				{
-					$name = $obj->vorgesetzter;
-					if (!array_key_exists($name, $toSend))
+					foreach ($v as $obj)
 					{
-						$toSend[$name] = 1;
-					}
-					else
-					{
-						$toSend[$name] += 1;
+						$name = $obj->vorgesetzter;
+						if (!array_key_exists($name, $toSend))
+						{
+							$toSend[$name] = 1;
+						}
+						else
+						{
+							$toSend[$name] += 1;
+						}
 					}
 				}
 			}
+		}
+		elseif (isError($mResult))
+		{
+			show_error(getError($mResult));
 		}
 		return $toSend;
 	}
@@ -296,19 +310,25 @@ class ZeiterfassungInfoJob extends JOB_Controller
 	private function _getEmployeeTimesheetList()
 	{
 		$mResult = $this->TimesheetModel->getUidofMissingTimesheetsLastMonth();
-		$mitarbeiterList = getData($mResult);
-		$cnt_timesheetsToSend = 0;
-
 		$names = array();
-
-		foreach ($mitarbeiterList as $mitarbeiter)
+		if (hasData($mResult))
 		{
-			$uid = $mitarbeiter->uid;
-			if($this->MitarbeiterModel->isMitarbeiter($uid))
+			$mitarbeiterList = getData($mResult);
+			$cnt_timesheetsToSend = 0;
+
+			foreach ($mitarbeiterList as $mitarbeiter)
 			{
-				$names[$uid] = $uid;
-				$cnt_timesheetsToSend++;
+				$uid = $mitarbeiter->uid;
+				if($this->MitarbeiterModel->isMitarbeiter($uid))
+				{
+					$names[$uid] = $uid;
+					$cnt_timesheetsToSend++;
+				}
 			}
+		}
+		elseif (isError($mResult))
+		{
+			show_error(getError($mResult));
 		}
 		return $names;
 	}
@@ -319,90 +339,138 @@ class ZeiterfassungInfoJob extends JOB_Controller
 	 */
 	private function _getEmployeeLastWeeksTimeList()
 	{
-		$mitarbeiter = $this->MitarbeiterModel->getPersonal(true, null, true)->retval;
-		$zeitaufzeichnungLastWeek = $this->ZeitaufzeichnungModel->zeitaufzeichnungExistsForLastWeekList()->retval;
+		$mResult = $this->MitarbeiterModel->getPersonal(true, null, true);
+		$mitarbeiter = getData($mResult);
+		$zResult = $this->ZeitaufzeichnungModel->zeitaufzeichnungExistsForLastWeekList();
+		$zeitaufzeichnungLastWeek = getData($zResult);
 		$mitarbeiterLastWeekExists = array();
 		$uids = array();
 
-		foreach ($zeitaufzeichnungLastWeek as $name)
+		if (hasData($zResult))
 		{
-			$mitarbeiterLastWeekExists[] = $name->uid;
+			foreach ($zeitaufzeichnungLastWeek as $name)
+			{
+				$mitarbeiterLastWeekExists[] = $name->uid;
+			}
+		}
+		elseif (isError($zResult))
+		{
+			show_error(getError($zResult));
 		}
 
-		foreach ($mitarbeiter as $ma)
+		if (hasData($mResult))
 		{
-			$uid = $ma->uid;
-			if(!in_array($uid, $mitarbeiterLastWeekExists))
+			foreach ($mitarbeiter as $ma)
 			{
-				$uids[$uid] = $uid;
+				$uid = $ma->uid;
+				if(!in_array($uid, $mitarbeiterLastWeekExists))
+				{
+					$uids[$uid] = $uid;
+				}
 			}
+		}
+		elseif (isError($mResult))
+		{
+			show_error(getError($mResult));
 		}
 		return $uids;
 	}
 
 	private function _getEmplyeeUids()
 	{
-		$mitarbeiter = $this->MitarbeiterModel->getEmployeesZeitaufzeichnungspflichtig()->retval;
+		$mResult = $this->MitarbeiterModel->getEmployeesZeitaufzeichnungspflichtig();
+		$mitarbeiter = getData($mResult);
 		$mitarbeiterUIDs = array();
 
-		foreach ($mitarbeiter as $ma)
+		if (hasData($mResult))
 		{
-			$mitarbeiterObj = new StdClass();
-			$mitarbeiterObj->uid = $ma->mitarbeiter_uid;
-			//$mitarbeiterObj->vorname = $ma->vorname;
-			$mitarbeiterObj->SupVac = false;
-			$mitarbeiterObj->SupMonth = false;
-			$mitarbeiterObj->EmpMonth = false;
-			$mitarbeiterObj->EmpWeek = false;
-			$mitarbeiterObj->EmpZeitMod = false;
+			foreach ($mitarbeiter as $ma)
+			{
+				$mitarbeiterObj = new StdClass();
+				$mitarbeiterObj->uid = $ma->mitarbeiter_uid;
+				$mitarbeiterObj->SupVac = false;
+				$mitarbeiterObj->SupMonth = false;
+				$mitarbeiterObj->EmpMonth = false;
+				$mitarbeiterObj->EmpWeek = false;
+				$mitarbeiterObj->EmpZeitMod = false;
 
-			array_push($mitarbeiterUIDs, $mitarbeiterObj);
+				array_push($mitarbeiterUIDs, $mitarbeiterObj);
+			}
 		}
-
+		elseif (isError($mResult))
+		{
+			show_error(getError($mResult));
+		}
 		return $mitarbeiterUIDs;
 	}
 
 
 	private function _filterMitarbeiter()
 	{
-		$mitarbeiter = $this->MitarbeiterModel->getPersonal(true, null, true)->retval;
-		$mResult = $this->TimesheetModel->getAllMissingZeitmodelle();
-		$mResult = $mResult[1];
+		$mResult = $this->MitarbeiterModel->getPersonal(true, null, true);
+		$mitarbeiter = getData($mResult);
+
+		$zResult = $this->TimesheetModel->getAllMissingZeitmodelle();
+		$zeitmodelle = $zResult[1];
+
 		$mitarbeiterWithoutZeitmodell = array();
 		$uids = array();
 
-		foreach ($mResult as $ma)
+		if (!is_null($zResult))
 		{
-			array_push($uids, strtolower($ma[0]));
-		}
-
-		foreach ($mitarbeiter as $ma)
-		{
-			$uid = $ma->uid;
-			if(!in_array($uid, $uids))
+			foreach ($zeitmodelle as $zm)
 			{
-				$mitarbeiterWithoutZeitmodell[$uid] = $uid;
+				array_push($uids, strtolower($zm[0]));
 			}
 		}
+		if (hasData($mResult))
+		{
+			foreach ($mitarbeiter as $ma)
+			{
+				$uid = $ma->uid;
+				if(!in_array($uid, $uids))
+				{
+					$mitarbeiterWithoutZeitmodell[$uid] = $uid;
+				}
+			}
+		}
+		elseif (isError($mResult))
+		{
+			show_error(getError($mResult));
+		}
+
 		return $mitarbeiterWithoutZeitmodell;
 	}
 
 	private function _getProjektleiter()
 	{
+		$mResult = $this->MitarbeiterModel->getEmployeesZeitaufzeichnungspflichtig();
+		$mitarbeiter = getData($mResult);
 
-		$mitarbeiter = $this->MitarbeiterModel->getEmployeesZeitaufzeichnungspflichtig()->retval;
-		$projektleiter = $this->ProjektRessourceModel->getProjektleiterActiveProjects()->retval;
+		$pResult = $this->ProjektRessourceModel->getProjektleiterActiveProjects();
+		$projektleiter = getData($pResult);
 
 		$projektleitendeMitarbeiter = array();
-		foreach ($projektleiter as $pl)
+		if(hasData($pResult) && hasData($mResult))
 		{
-			foreach ($mitarbeiter as $ma)
+			foreach ($projektleiter as $pl)
 			{
-				if($pl->mitarbeiter_uid == $ma->mitarbeiter_uid)
+				foreach ($mitarbeiter as $ma)
 				{
-					$projektleitendeMitarbeiter[$pl->mitarbeiter_uid][]= $pl->titel;
+					if($pl->mitarbeiter_uid == $ma->mitarbeiter_uid)
+					{
+						$projektleitendeMitarbeiter[$pl->mitarbeiter_uid][]= $pl->titel;
+					}
 				}
 			}
+		}
+		elseif (isError($mResult))
+		{
+			show_error(getError($mResult));
+		}
+		elseif (isError($pResult))
+		{
+			show_error(getError($pResult));
 		}
 		return $projektleitendeMitarbeiter;
 	}
