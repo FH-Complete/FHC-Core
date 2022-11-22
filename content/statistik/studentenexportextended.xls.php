@@ -179,6 +179,8 @@ $worksheet->write($zeile, ++$i, "RT_PUNKTE2", $format_bold);
 $maxlength[$i] = 10;
 $worksheet->write($zeile, ++$i, "RT_GESAMTPUNKTE", $format_bold);
 $maxlength[$i] = 18;
+$worksheet->write($zeile,++$i,"ANMERKUNG", $format_bold);
+$maxlength[$i]=30;												 				  
 $worksheet->write($zeile, ++$i, "PRIORITÄT", $format_bold);
 $maxlength[$i] = 8;
 
@@ -660,6 +662,20 @@ function draw_content($row)
 	$worksheet->write($zeile, $i, $row->rt_gesamtpunkte);
 	$i++;
 	
+	//Anmerkung
+	$qry_1 = "SELECT anmerkung FROM public.tbl_prestudent WHERE prestudent_id='".addslashes($row->prestudent_id)."' LIMIT 1";
+
+		if($db->db_query($qry_1))
+		{
+			if($row_1 = $db->db_fetch_object())
+			{	
+				if(mb_strlen($row_1->anmerkung)>$maxlength[$i])
+					$maxlength[$i]=mb_strlen($row_1->anmerkung);
+				
+				$worksheet->write($zeile,$i, $row_1->anmerkung);
+			}
+		}
+		$i++;
 	//Priorisierung
 	$prio = $prio_relativ.' ('.$row->priorisierung.')';
 	if (mb_strlen($prio) > $maxlength[$i])
