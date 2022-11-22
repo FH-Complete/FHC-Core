@@ -180,7 +180,7 @@ $maxlength[$i] = 10;
 $worksheet->write($zeile, ++$i, "RT_GESAMTPUNKTE", $format_bold);
 $maxlength[$i] = 18;
 $worksheet->write($zeile,++$i,"ANMERKUNG", $format_bold);
-$maxlength[$i]=30;												 				  
+$maxlength[$i]=30;
 $worksheet->write($zeile, ++$i, "PRIORITÄT", $format_bold);
 $maxlength[$i] = 8;
 
@@ -661,17 +661,17 @@ function draw_content($row)
 		$maxlength[$i] = mb_strlen($row->rt_gesamtpunkte);
 	$worksheet->write($zeile, $i, $row->rt_gesamtpunkte);
 	$i++;
-	
+
 	//Anmerkung
-	$qry_1 = "SELECT anmerkung FROM public.tbl_prestudent WHERE prestudent_id='".addslashes($row->prestudent_id)."' LIMIT 1";
+	$qry_1 = "SELECT anmerkung FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." LIMIT 1";
 
 		if($db->db_query($qry_1))
 		{
 			if($row_1 = $db->db_fetch_object())
-			{	
+			{
 				if(mb_strlen($row_1->anmerkung)>$maxlength[$i])
 					$maxlength[$i]=mb_strlen($row_1->anmerkung);
-				
+
 				$worksheet->write($zeile,$i, $row_1->anmerkung);
 			}
 		}
