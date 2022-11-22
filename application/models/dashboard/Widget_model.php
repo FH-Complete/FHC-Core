@@ -15,8 +15,8 @@ class Widget_model extends DB_Model
 	public function getWithAllowedForDashboard($dashboard_id)
 	{
 		$this->addSelect($this->dbTable . '.*');
-		$this->addSelect('CASE WHEN dashboard_id = ? THEN 1 ELSE 0 END AS allowed', false);
-		$this->addJoin('dashboard.tbl_dashboard_widget', 'widget_id', 'LEFT');
+		$this->addSelect('CASE WHEN dashboard_id IS NULL THEN 0 ELSE 1 END AS allowed', false);
+		$this->db->join('dashboard.tbl_dashboard_widget dw', $this->dbTable . '.widget_id=dw.widget_id AND dashboard_id = ?', 'LEFT', false);
 
 		return $this->execQuery($this->db->get_compiled_select($this->dbTable), [$dashboard_id]);
 	}
