@@ -16,7 +16,6 @@ class Plausichecks extends Auth_Controller
 		// Load libraries
 		$this->load->library('issues/PlausicheckProducerLib');
 		$this->load->library('WidgetLib');
-		//$this->load->library('IssuesLib');
 
 		// Load models
 		$this->load->model('system/Fehler_model', 'FehlerModel');
