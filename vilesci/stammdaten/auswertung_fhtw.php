@@ -3381,7 +3381,7 @@ else
 							$minutes = date('i', $time);
 
 							if ($minutes <= 5)
-								echo '<option>'. $minutes .'</option>';
+								echo '<option>'. $gbt->zeit .'</option>';
 							else
 							{
 								echo
