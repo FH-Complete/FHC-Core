@@ -24,13 +24,16 @@ export default {
 	data() {
 		return {
 			gridWidth: 0,
-			containerRect: {top:0,left:0},
 			changeHeight: 1,
 			movedObjects: [],
 			editMode: this.adminMode ? 1 : 0,
-			gridXLast: 0,
-			gridYLast: 0,
-			dataTransfer: {}
+			gridXLast: -1, // NOTE(chris): 0 based
+			gridYLast: -1,
+			dragging: 0,
+			dataTransfer: {},
+			gridAddFound: false,
+			gridXAdd: -1, // NOTE(chris): 0 based
+			gridYAdd: -1
 		}
 	},
 	computed: {
@@ -38,7 +41,7 @@ export default {
 			this.widgets.forEach((item,i) => item.index = i);
 			return this.widgets;
 		},
-		itemCoords() {
+		itemCoords() { // NOTE(chris): 1 based
 			if (!this.gridWidth)
 				return [];
 			let itemCoords = this.items.map(item => item.place[this.gridWidth] || this.createItemPlacement(item));
@@ -103,11 +106,13 @@ export default {
 			if (!this.gridWidth || !this.changeHeight)
 				return 0;
 			let minH = 0;
-			this.itemCoords.forEach((item,i) => minH = Math.max(minH, (!this.editMode && this.items[i].hidden) ? 0 : item.y + item.h - 1));
+			this.itemCoords.forEach((item,i) => minH = Math.max(minH, (!this.editMode && this.items[i].hidden) ? 0 : item.y - 1 + item.h));
 			// TODO(chris): the extraline should only be present if all slots are occupied
-			return minH + this.editMode;
+			if (minH == 0 && this.editMode)
+				return 1;
+			return minH + this.editMode*this.dragging;
 		},
-		gridOccupiers() {
+		gridOccupiers() { // NOTE(chris): 0 based
 			let occupiers = [];
 			let gridWidth = this.gridWidth;
 			this.items.forEach(item => {
@@ -123,20 +128,26 @@ export default {
 				}
 			});
 			return occupiers;
+		},
+		cssBg() {
+			if (!this.editMode || this.dragging || !this.gridAddFound)
+				return 'transparent';
+			let x = this.gridXAdd, y = this.gridYAdd, h = this.gridHeight-1 || 1, w = this.gridWidth-1 || 1;
+			return `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 1448 1512"><path fill="lightgray" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>')` + (100 * x/w) + '% ' + (100 * y/h) + '%/' + (100/this.gridWidth) + '% ' + (100/this.gridHeight) + '% no-repeat;cursor:pointer';
 		}
 	},
 	methods: {
 		addWidget(evt) {
 			if (evt.target != this.$refs.container || !this.editMode)
 				return;
-			const rect = this.containerRect;
+			const rect = this.$refs.container.getBoundingClientRect();
 			const gridX = Math.floor(this.gridWidth * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
 			const gridY = Math.floor(this.gridHeight * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
 			if (this.gridOccupiers[gridY * this.gridWidth + gridX] === undefined) {
 				let widget = { widget: 1, config: {}, place: {}, custom: 1 };
 				widget.place[this.gridWidth] = {
-					x: gridX,
-					y: gridY,
+					x: gridX+1,
+					y: gridY+1,
 					w: 1,
 					h: 1
 				};
@@ -162,7 +173,29 @@ export default {
 			});*/
 			return item.place[this.gridWidth];
 		},
+		onMouseMove(evt) {
+			if (!this.editMode || this.dragging) {
+				this.gridXAdd = this.gridYAdd = -1;
+				return;
+			}
+			
+			const rect = this.$refs.container.getBoundingClientRect();
+			const gridX = Math.floor(this.gridWidth * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
+			const gridY = Math.floor(this.gridHeight * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
+
+			if (this.gridXAdd == gridX && this.gridYAdd == gridY)
+				return;
+			// TODO(chris): only mark it when its not occupied
+			this.gridXAdd = gridX;
+			this.gridYAdd = gridY;
+			this.gridAddFound = (this.gridOccupiers[gridX + gridY * this.gridWidth] === undefined);
+		},
+		onMouseLeave() {
+			this.gridXAdd = this.gridYAdd = -1;
+			this.gridAddFound = false;
+		},
 		startDrag(evt, item) {
+			this.dragging = 1;
 			this.gridXLast = -1;
 			this.gridYLast = -1;
 			item._x = this.itemCoords[item.index].x;
@@ -178,6 +211,7 @@ export default {
 			}
 		},
 		startResize(evt, item) {
+			this.dragging = 1;
 			this.gridXLast = -1;
 			this.gridYLast = -1;
 			item._w = this.itemCoords[item.index].w;
@@ -239,7 +273,7 @@ export default {
 		onDragOver(evt) {
 			let id, x, y, w, h;
 			const action = this.dataTransfer.action;
-			const rect = this.containerRect;
+			const rect = this.$refs.container.getBoundingClientRect();
 			const gridX = Math.floor(this.gridWidth * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
 			const gridY = Math.floor(this.gridHeight * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
 
@@ -304,6 +338,9 @@ export default {
 			}
 		},
 		onDrop() {
+			this.dragging = 0;
+			this.gridXLast = -1;
+			this.gridYLast = -1;
 			let id = 0;
 			let update = {};
 			while ((id = this.movedObjects.pop())) {
@@ -376,14 +413,12 @@ export default {
 		let self = this;
 		let cont = self.$refs.container;
 		self.gridWidth = window.getComputedStyle(cont).getPropertyValue('grid-template-columns').split(" ").length;
-		self.containerRect = cont.getBoundingClientRect();
 		
 		window.addEventListener('resize', () => {
 			for (const child of cont.children) {
 				child.style.display = 'none';
 			}
 			self.gridWidth = window.getComputedStyle(cont).getPropertyValue('grid-template-columns').split(" ").length;
-			self.containerRect = cont.getBoundingClientRect();
 			for (const child of cont.children) {
 				child.style.display = '';
 			}
@@ -394,14 +429,16 @@ export default {
 			<span class="col">{{name}}</span>
 			<button class="col-auto btn" @click.prevent="editMode = editMode ? 0 : 1"><i class="fa-solid fa-gear"></i></button>
 		</h3>
-		<div class="position-relative" :style="'height:0;padding-bottom:' + (gridHeight * 100/gridWidth) + '%'">
+		<div :h="gridHeight" :w="gridWidth" class="position-relative" :style="'height:0;padding-bottom:' + (gridHeight * 100/gridWidth) + '%'">
 			<div ref="container" 
 				class="position-absolute top-0 left-0 w-100 h-100 draganddropcontainer" 
-				:style="'display:grid;grid-template-rows:repeat('+gridHeight+',1fr)'" 
+				:style="'display:grid;grid-template-rows:repeat('+gridHeight+',1fr);background:'+cssBg" 
 				@click="addWidget($event)" 
 				@drop="onDrop($event, 1)" 
 				@dragover.prevent="onDragOver" 
-				@dragenter.prevent>
+				@dragenter.prevent
+				@mousemove="onMouseMove"
+				@mouseleave="onMouseLeave">
 				
 				<dashboard-item 
 					v-for="item in items" 

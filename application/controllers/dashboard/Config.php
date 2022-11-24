@@ -207,7 +207,13 @@ class Config extends Auth_Controller
 		foreach ($funktionen as $funktion) {
 			$conf = $this->DashboardLib->getPreset($db, $funktion);
 			if ($conf)
-				$result[$funktion] = json_decode($conf->preset, true)['widgets'][$funktion];
+			{
+				$preset = json_decode($conf->preset, true);
+				if (!isset($preset['widgets']) || !isset($preset['widgets'][$funktion]))
+					$result[$funktion] = [];
+				else
+					$result[$funktion] = $preset['widgets'][$funktion];
+			}
 			else
 				$result[$funktion] = [];
 		}

@@ -14,6 +14,7 @@ export default {
 	data: () => ({
 		funktionen: {},
 		sections: [],
+		tmpLoading: ''
 	}),
 	computed: {
 		apiurl() {
@@ -117,10 +118,14 @@ export default {
 		loadSections(evt) {
 			let funktionen = Array.from(evt.target.querySelectorAll("option:checked"),e=>e.value);
 			this.sections = [];
+			this.tmpLoading = funktionen.join('###');
 			axios.get(this.apiurl + '/Config/PresetBatch', {params: {
 				db: this.dashboard,
 				funktionen
 			}}).then(res => {
+				if (this.tmpLoading !== funktionen.join('###'))
+					return; // NOTE(chris): prevent race condition
+				
 				for (var section in res.data.retval) {
 					let widgets = [];
 					for (var wid in res.data.retval[section]) {
@@ -145,10 +150,16 @@ export default {
 			});
 		}).catch(err => console.error('ERROR:', err));
 	},
+	watch: {
+		dashboard() {
+			// TODO(chris): this should be done without a watcher
+			this.loadSections({target:this.$refs.funktionenList});
+		}
+	},
 	template: `<div class="dashboard-admin-presets">
 		<div class="row">
 			<div class="col-3">
-				<select class="form-control" multiple @input="loadSections">
+				<select ref="funktionenList" style="height:30em" class="form-control" multiple @input="loadSections">
 					<option v-for="name,id in funktionen" :key="id" :value="id">{{ name }}</option>
 				</select>
 			</div>
