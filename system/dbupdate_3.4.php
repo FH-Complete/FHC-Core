@@ -28,7 +28,8 @@ require_once('dbupdate_3.4/example2.php');
 ...
 */
 
-require_once('dbupdate_3.4/26173_index_webservicelog.php');
+// add Dashboard Schema, Tables and Permissions
+include __DIR__ . '/dbupdate_3.4/dbupdate_dashboard.php';
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -124,6 +125,11 @@ $tabellen=array(
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon", "zeitwunsch_id", "zeitwunsch_gueltigkeit_id"),
 	"campus.tbl_zeitwunsch_gueltigkeit"  => array("zeitwunsch_gueltigkeit_id","mitarbeiter_uid","von","bis","insertamum","insertvon", "updateamum","updatevon"),
+	"dashboard.tbl_dashboard" => array("dashboard_id", "dashboard_kurzbz", "beschreibung"),
+	"dashboard.tbl_dashboard_benutzer_override" => array("override_id", "dashboard_id", "uid", "override"),
+	"dashboard.tbl_dashboard_preset" => array("preset_id", "dashboard_id", "funktion_kurzbz", "preset"),
+	"dashboard.tbl_dashboard_widget" => array("dashboard_id", "widget_id"),
+	"dashboard.tbl_widget" => array("widget_id", "widget_kurzbz", "beschreibung"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
 	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id","projekttyp_kurzbz","zeitaufzeichnung"),
