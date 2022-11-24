@@ -11,9 +11,9 @@ class Widget extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index'							=> 'dashboard/benutzer:r',
+				'index'							=> ['dashboard/benutzer:r', 'dashboard/admin:r'],
 				'getAll'						=> 'dashboard/admin:r',
-				'getWidgetsForDashboard'		=> 'dashboard/benutzer:rw',
+				'getWidgetsForDashboard'		=> ['dashboard/benutzer:rw', 'dashboard/admin:r'],
 				'setAllowed'					=> 'dashboard/admin:rw'
 			)
 		);
