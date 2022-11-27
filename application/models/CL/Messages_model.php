@@ -571,8 +571,8 @@ class Messages_model extends CI_Model
 		if (isError($personLogSender)) return $personLogSender;
 
 		// if sender is Mitarbeiter, add person log for receiver too
-		$personLogReceiver = $this->_personLogForReceiver($sender_id, $receiver_id, getData($message)[0]);
-		if (isError($personLogReceiver)) return $personLogReceiver;
+		//~ $personLogReceiver = $this->_personLogForReceiver($sender_id, $receiver_id, getData($message)[0]);
+		//~ if (isError($personLogReceiver)) return $personLogReceiver;
 
 		return success('Messages sent successfully');
 	}
