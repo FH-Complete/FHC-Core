@@ -350,6 +350,8 @@ $tabellen=array(
 	"wawi.tbl_aufteilung_default"  => array("aufteilung_id","kostenstelle_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
 );
 
+require_once('dbupdate_3.4/25999_cis4_cms.php');
+
 $tabs=array_keys($tabellen);
 //print_r($tabs);
 $i=0;
