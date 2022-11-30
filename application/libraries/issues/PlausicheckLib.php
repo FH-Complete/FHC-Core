@@ -1169,7 +1169,7 @@ class PlausicheckLib
 	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return object success or error
 	 */
-	public function getIncomingUndGsFoerderrelevant($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
+	public function getIncomingOrGsFoerderrelevant($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
 	{
 		$params = array($studiensemester_kurzbz, $studiensemester_kurzbz);
 

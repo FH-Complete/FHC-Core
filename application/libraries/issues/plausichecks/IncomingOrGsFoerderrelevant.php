@@ -7,7 +7,7 @@ require_once('PlausiChecker.php');
 /**
  *
  */
-class IncomingUndGsFoerderrelevant extends PlausiChecker
+class IncomingOrGsFoerderrelevant extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -18,7 +18,7 @@ class IncomingUndGsFoerderrelevant extends PlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getIncomingUndGsFoerderrelevant($studiensemester_kurzbz, $studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getIncomingOrGsFoerderrelevant($studiensemester_kurzbz, $studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 

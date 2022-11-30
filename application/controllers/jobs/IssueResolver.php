@@ -25,6 +25,7 @@ class IssueResolver extends IssueResolver_Controller
 			'CORE_INOUT_0006' => 'CORE_INOUT_0006',
 			'CORE_INOUT_0007' => 'CORE_INOUT_0007',
 			'CORE_INOUT_0008' => 'CORE_INOUT_0008',
+			'CORE_INOUT_0009' => 'CORE_INOUT_0009',
 			'CORE_STG_0001' => 'CORE_STG_0001',
 			'CORE_STG_0002' => 'CORE_STG_0002',
 			'CORE_STG_0003' => 'CORE_STG_0003',

@@ -30,7 +30,7 @@ class PlausicheckProducerLib
 		'InaktiverStudentAktiverStatus' => 'InaktiverStudentAktiverStatus',
 		'IncomingHeimatNationOesterreich' => 'IncomingHeimatNationOesterreich',
 		'IncomingOhneIoDatensatz' => 'IncomingOhneIoDatensatz',
-		'IncomingUndGsFoerderrelevant' => 'IncomingUndGsFoerderrelevant',
+		'IncomingOrGsFoerderrelevant' => 'IncomingOrGsFoerderrelevant',
 		'InskriptionVorLetzerBismeldung' => 'InskriptionVorLetzerBismeldung',
 		'NationNichtOesterreichAberGemeinde' => 'NationNichtOesterreichAberGemeinde',
 		'OrgformStgUngleichOrgformPrestudent' => 'OrgformStgUngleichOrgformPrestudent',
