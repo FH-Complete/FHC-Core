@@ -13,7 +13,6 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($headers) ? $headers = '' : $headers = $headers;
 !isset($tinymce) ? $tinymce = false : $tinymce = $tinymce;
 !isset($jsoneditor) ? $jsoneditor = false : $jsoneditor = $jsoneditor;
-!isset($jsonforms) ? $jsonforms = false : $jsonforms = $jsonforms;
 !isset($textile) ? $textile = false : $textile = $textile;
 !isset($widgetsCSS) ? $widgetsCSS = false : $widgetsCSS = $widgetsCSS;
 !isset($datepicker) ? $datepicker = false : $datepicker = $datepicker;
@@ -105,11 +104,6 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php if($jsoneditor) : ?>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/josdejong/jsoneditor/dist/jsoneditor.css');?>" />
 	<script type="text/javascript" src="<?php echo base_url('vendor/josdejong/jsoneditor/dist/jsoneditor.js');?>"></script>
-<?php endif ?>
-
-<?php if($jsonforms) : ?>
-	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/brutusin/json-forms/dist/css/brutusin-json-forms.min.css'); ?>" />
-	<script type="text/javascript" src="<?php echo base_url('vendor/brutusin/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($widgetsCSS) : ?>

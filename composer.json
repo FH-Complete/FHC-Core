@@ -163,17 +163,6 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "brutusin/json-forms",
-				"version": "1.4.0",
-				"dist": {
-					"url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
 				"name": "josdejong/jsoneditor",
 				"version": "5.5.6",
 				"dist": {
@@ -385,15 +374,11 @@
 		"jquery/jquery2": "2.*",
 		"jquery/sizzle": "1.0.*",
 		"jquery-archive/jquery-metadata": "1.0.*",
-		"brutusin/json-forms": "1.4.0",
 		"josdejong/jsoneditor": "5.5.6",
-
-		"kingsquare/json-schema-form": "*",
 
 		"ludo/jquery-treetable": "3.2.0",
 
 		"michelf/php-markdown": "1.5.0",
-		"ml/json-ld": "1.*",
 		"moment/momentjs": "2.24.0",
 		"mottie/tablesorter": "2.*",
 
