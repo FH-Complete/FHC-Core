@@ -1162,6 +1162,71 @@ class PlausicheckLib
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
+	/**
+	 * Incoming or gemeinsame Studien students should not receive funding (not be förderrelevant).
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @return object success or error
+	 */
+	public function getIncomingUndGsFoerderrelevant($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
+	{
+		$params = array($studiensemester_kurzbz, $studiensemester_kurzbz);
+
+		$qry = "
+			SELECT
+				DISTINCT ON(prestudent_id)
+				pers.person_id,
+				ps.prestudent_id,
+				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+			FROM
+				public.tbl_student stud
+				JOIN public.tbl_benutzer ON(student_uid=uid)
+				JOIN public.tbl_person pers USING(person_id)
+				JOIN public.tbl_prestudent ps USING(prestudent_id)
+				JOIN public.tbl_studiengang stg ON(stg.studiengang_kz=stud.studiengang_kz)
+			WHERE
+				(
+					EXISTS
+					(
+						SELECT 1
+						FROM
+							public.tbl_prestudentstatus
+						WHERE
+							prestudent_id = ps.prestudent_id
+							AND status_kurzbz = 'Incoming'
+							AND studiensemester_kurzbz = ?
+					)
+					OR EXISTS (
+						SELECT 1
+						FROM
+							bis.tbl_mobilitaet
+							JOIN public.tbl_prestudent USING(prestudent_id)
+						WHERE
+							prestudent_id = ps.prestudent_id
+							AND gsstudientyp_kurzbz = 'Extern'
+							AND studiensemester_kurzbz = ?
+					)
+				)
+				AND (ps.foerderrelevant <> FALSE OR ps.foerderrelevant IS NULL)
+				AND bismelden=TRUE
+				AND stg.melderelevant";
+
+		if (isset($studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz = ?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($prestudent_id))
+		{
+			$qry .= " AND ps.prestudent_id = ?";
+			$params[] = $prestudent_id;
+		}
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 

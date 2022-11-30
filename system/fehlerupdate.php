@@ -126,6 +126,14 @@ $fehlerArr = array(
 		'app' => 'core'
 	),
 	array(
+		'fehlercode' => 'CORE_INOUT_0009',
+		'fehler_kurzbz' => 'IncomingUndGsFoerderrelevant',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Incoming oder gemeinsames Studium ist nicht als nicht förderrelevant markiert. (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
 		'fehlercode' => 'CORE_STG_0001',
 		'fehler_kurzbz' => 'StgPrestudentUngleichStgStudent',
 		'fehlercode_extern' => null,
