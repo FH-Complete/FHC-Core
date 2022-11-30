@@ -139,7 +139,9 @@ foreach($verwendungcodex->result as $row)
 // Prüfe Zeitraum zur Erstellung einer BIS-Meldung
 $studiensemester = new studiensemester();
 
-$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
+//Test
+//$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
+$stsem = 'SS2022';
 
 
 
@@ -149,6 +151,8 @@ if(mb_strstr($stsem, 'SS'))
 	$studiensemester->load($stsem);
 	$jahr = $datum_obj->formatDatum($studiensemester->start, 'Y');
 	$stichtag = date("Y-m-d", mktime(0, 0, 0, 12, 31, $jahr - 1)); // 31.12. des vorangehenden Kalenderjahres zur BIS Meldung TODO: oder Abfragetag mitgeben?
+	//Test Stichtag
+	echo $stichtag;
 }
 else
 {
@@ -170,6 +174,8 @@ $ws = new studiensemester($ws_kurzbz);
 
 // Alle gemeldeten Mitarbeiter holen
 $mitarbeiter = new mitarbeiter();
+//Test Stichtag1
+echo "stichtag" . $beginn_imJahr->format('Y-m-d');
 $mitarbeiter->getMitarbeiterBISMeldung($beginn_imJahr->format('Y-m-d'));
 $mitarbeiter_arr = $mitarbeiter->result;
 
@@ -335,7 +341,9 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	 * Exkludiert Funktionen, die einem Lehrgang bzw. STG, die nicht BIS-gemeldet werden, zugeordnet sind.
 	 */
 	// -------------------------------------------------------------------------------------------------------------
-	$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr);
+	//Test
+	//$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr); //VARIANTE1
+	$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr, $stichtag); //VARIANTE2
 
 	// Container Funktion dem Container Person anhaengen
 	// -----------------------------------------------------------------------------------------------------------------
@@ -813,10 +821,13 @@ function _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
  * @return array
  *
  */
-function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr)
+ //Test
+//function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr) //Variante1
+function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr, $stichtag) //Variante2
 {
 	$entwicklungsteam = new Entwicklungsteam();
-	$entwicklungsteam->getEntwicklungsteam($uid);
+	//$entwicklungsteam->getEntwicklungsteam($uid, null); //Variante1
+	$entwicklungsteam->getEntwicklungsteamBis($uid, $stichtag); //Variante2
 	$entwicklungsteam_arr = $entwicklungsteam->result;
 
 	if (!empty($entwicklungsteam_arr))
@@ -1018,26 +1029,6 @@ function _generateXML($person_arr)
 					$xml .= '</Studiengang>';
 				}
 			}
-
-			// if ($funktion->funktionscode == 7 || $funktion->funktionscode == 5)
-			// {
-			// 	if (is_array($funktion->studiengang))
-			// 	{
-			// 		foreach ($funktion->studiengang as $studiengang)
-			// 		{
-			// 			$xml .= '<Studiengang>';
-			// 			$xml .= '<StgKz><![CDATA['. $studiengang["studieng_kz"]. ']]></StgKz>';
-			// 			$xml .= '</Studiengang>';
-			// 		}
-			// 	}
-			// 	else if (!is_null($funktion->studiengang))
-			// 	{
-			// 		$xml .= '<Studiengang>';
-			// 		$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
-			// 		$xml .= '</Studiengang>';
-			// 	}
-			// }
-
 			$xml .= '</Funktion>';
 		}
 
@@ -1208,6 +1199,8 @@ function _outputHTML($person_arr)
 						echo $funktion->studiengang.' ';
 					}
 				}
+				//Test
+				//Variante: EW-Teams mit Zeitraum anzeigen
 				if ($funktion->funktionscode == 7)
 				{
 					if (is_array($funktion->studiengang))

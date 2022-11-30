@@ -171,7 +171,7 @@ class entwicklungsteam extends basis_db
 	 * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function save($new=null)
+	public function save($new = null)
 	{
 		if(!$this->validate())
 			return false;
@@ -192,7 +192,6 @@ class entwicklungsteam extends basis_db
 			       $this->db_add_param($this->updatevon).', '.
 			       $this->db_add_param($this->insertamum).', '.
 			       $this->db_add_param($this->insertvon).');';
-
 		}
 		else
 		{
@@ -226,7 +225,7 @@ class entwicklungsteam extends basis_db
 	 * @param $uid UID des Mitarbeiters
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getEntwicklungsteam($mitarbeiter_uid, $studiengang_kz=null)
+	public function getEntwicklungsteam($mitarbeiter_uid, $studiengang_kz = null)
 	{
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode)
@@ -349,6 +348,60 @@ class entwicklungsteam extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Entwicklungsteameinträge.';
+			return false;
+		}
+	}
+
+	/*
+	 * Laedt alle Entwicklungsteameintraege eines Mitarbeiters für eine bestimmte Bisperiode
+	 * @param $uid UID des Mitarbeiters
+	 * @param $stichtag Stichtag im Format 'Y-m-d'
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getEntwicklungsteamBis($mitarbeiter_uid, $stichtag, $studiengang_kz = null)
+	{
+		$datetime = new DateTime($stichtag);
+		$bismeldung_jahr = $datetime->format('Y');
+
+		//laden des Datensatzes
+			$qry = "SELECT *
+					FROM bis.tbl_entwicklungsteam
+					JOIN bis.tbl_besqual USING(besqualcode)
+					WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)."
+					AND (beginn <= make_date(". $this->db_add_param($bismeldung_jahr). "::INTEGER, 12, 31))
+					AND (ende is NULL OR ende >= make_date(". $this->db_add_param($bismeldung_jahr). "::INTEGER, 1, 1))";
+
+		if($studiengang_kz!=null)
+			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz);
+
+        $qry.=";";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new entwicklungsteam();
+
+				$obj->entwicklungsteam_id = $row->entwicklungsteam_id;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->besqualcode = $row->besqualcode;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
+				$obj->besqual = $row->besqualbez;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
 			return false;
 		}
 	}
