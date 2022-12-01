@@ -2488,8 +2488,7 @@ else
 	}
 	function prueflingAddTime(pruefling_id, gebiet)
 	{
-		var datetime = $("#prueflingAddTime_" + pruefling_id + "_gebiet_" + gebiet).val();
-		var min = parseInt(datetime.split(":")[1]);
+		var min = $("#prueflingAddTime_" + pruefling_id + "_gebiet_" + gebiet).val();
 		data = {
 			pruefling_id: pruefling_id,
 			gebiet: gebiet,
@@ -3375,19 +3374,17 @@ else
 
 						if (!is_null($erg->pruefling_id))
 						{
-							echo
-								'<select id="prueflingAddTime_'.$erg->pruefling_id .'_gebiet_' . $gbt->gebiet_id . '">';
 							$time = strtotime($gbt->zeit);
 							$minutes = date('i', $time);
+							echo '<select id="prueflingAddTime_'.$erg->pruefling_id .'_gebiet_' . $gbt->gebiet_id . '">';
 
-							if ($minutes <= 5)
-								echo '<option>'. $gbt->zeit .'</option>';
-							else
+							for ($i = 2; $i <= 10; $i = $i +2)
 							{
-								echo
-									'<option>00:05:00</option>
-									<option>'. $gbt->zeit .'</option>';
+								if ($i < $minutes)
+									echo '<option value="'. $i .'">00:' . sprintf("%02d", $i) .':00</option>';
 							}
+
+							echo '<option value="'. $minutes .'">'. $gbt->zeit .'</option>';
 
 							echo '</select>
 								<a href="#" id="prueflingAddTime_'.$erg->pruefling_id .'" onclick="prueflingAddTime('.  $erg->pruefling_id.  '' . ', ' .$gbt->gebiet_id .')">
