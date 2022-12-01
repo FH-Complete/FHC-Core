@@ -1169,9 +1169,9 @@ class PlausicheckLib
 	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @return object success or error
 	 */
-	public function getIncomingOrGsFoerderrelevant($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
+	public function getIncomingOrGsFoerderrelevant($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null)
 	{
-		$params = array($studiensemester_kurzbz, $studiensemester_kurzbz);
+		$params = array();
 
 		$qry = "
 			SELECT
@@ -1184,19 +1184,11 @@ class PlausicheckLib
 				JOIN public.tbl_benutzer ON(student_uid=uid)
 				JOIN public.tbl_person pers USING(person_id)
 				JOIN public.tbl_prestudent ps USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 				JOIN public.tbl_studiengang stg ON(stg.studiengang_kz=stud.studiengang_kz)
 			WHERE
 				(
-					EXISTS
-					(
-						SELECT 1
-						FROM
-							public.tbl_prestudentstatus
-						WHERE
-							prestudent_id = ps.prestudent_id
-							AND status_kurzbz = 'Incoming'
-							AND studiensemester_kurzbz = ?
-					)
+					status.status_kurzbz = 'Incoming'
 					OR EXISTS (
 						SELECT 1
 						FROM
@@ -1205,12 +1197,17 @@ class PlausicheckLib
 						WHERE
 							prestudent_id = ps.prestudent_id
 							AND gsstudientyp_kurzbz = 'Extern'
-							AND studiensemester_kurzbz = ?
 					)
 				)
 				AND (ps.foerderrelevant <> FALSE OR ps.foerderrelevant IS NULL)
 				AND bismelden=TRUE
 				AND stg.melderelevant";
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$qry .= " AND status.studiensemester_kurzbz = ?";
+			$params[] = $studiensemester_kurzbz;
+		}
 
 		if (isset($studiengang_kz))
 		{
