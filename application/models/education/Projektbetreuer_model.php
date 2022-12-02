@@ -87,14 +87,14 @@ class Projektbetreuer_model extends DB_Model
 	 */
     public function getBetreuerByToken($zugangstoken)
 	{
-		$qry = '
+		$qry = "
 			SELECT tbl_projektbetreuer.person_id, tbl_projektbetreuer.projektarbeit_id, student_uid
 			FROM lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
 			WHERE zugangstoken = ? AND zugangstoken_gueltigbis >= NOW()
 			ORDER BY tbl_projektbetreuer.insertamum DESC, projektarbeit_id DESC
 			LIMIT 1
-		';
+		";
 
 		return $this->execQuery($qry, array($zugangstoken));
 	}
@@ -205,5 +205,30 @@ class Projektbetreuer_model extends DB_Model
 		}
 		else
 			return success("Account vorhanden, kein Token benötigt");
+	}
+
+	/**
+	 * Gets betreuerart of a Betreuer for a Projektarbeit.
+	 * Main Betreuer are prioritized (normally one Betreuer should be assigned to a Projektarbeit another time with a different Betreuerart).
+	 * @param int projektarbeit_id
+	 * @param int betreuer_person_id
+	 * @return object success or error
+	 */
+	public function getBetreuerart($projektarbeit_id, $betreuer_person_id)
+	{
+		$qry = "SELECT betreuerart_kurzbz
+				FROM lehre.tbl_projektbetreuer
+				WHERE projektarbeit_id = ?
+				AND person_id = ?
+				ORDER BY CASE WHEN betreuerart_kurzbz = 'Senatsvorsitz' THEN 1 /*Senatsvorsitz has priority*/
+					WHEN betreuerart_kurzbz = 'Begutachter' THEN 2
+					WHEN betreuerart_kurzbz = 'Erstbegutachter' THEN 3
+					WHEN betreuerart_kurzbz = 'Zweitbegutachter' THEN 4
+					WHEN betreuerart_kurzbz = 'Senatsmitglied' THEN 5
+					ELSE 5
+				END, insertamum DESC
+				LIMIT 1";
+
+		return $this->execQuery($qry, array($projektarbeit_id, $betreuer_person_id));
 	}
 }
