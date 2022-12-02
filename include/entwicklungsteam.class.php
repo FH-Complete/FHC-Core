@@ -368,7 +368,7 @@ class entwicklungsteam extends basis_db
 					FROM bis.tbl_entwicklungsteam
 					JOIN bis.tbl_besqual USING(besqualcode)
 					WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)."
-					AND (beginn <= make_date(". $this->db_add_param($bismeldung_jahr). "::INTEGER, 12, 31))
+					AND (beginn is NULL OR beginn <= make_date(". $this->db_add_param($bismeldung_jahr). "::INTEGER, 12, 31))
 					AND (ende is NULL OR ende >= make_date(". $this->db_add_param($bismeldung_jahr). "::INTEGER, 1, 1))";
 
 		if($studiengang_kz!=null)

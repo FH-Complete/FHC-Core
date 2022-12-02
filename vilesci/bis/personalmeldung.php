@@ -138,12 +138,7 @@ foreach($verwendungcodex->result as $row)
 
 // Prüfe Zeitraum zur Erstellung einer BIS-Meldung
 $studiensemester = new studiensemester();
-
-//Test
-//$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
-$stsem = 'SS2022';
-
-
+$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
 
 $datum_obj = new datum();
 if(mb_strstr($stsem, 'SS'))
@@ -151,8 +146,6 @@ if(mb_strstr($stsem, 'SS'))
 	$studiensemester->load($stsem);
 	$jahr = $datum_obj->formatDatum($studiensemester->start, 'Y');
 	$stichtag = date("Y-m-d", mktime(0, 0, 0, 12, 31, $jahr - 1)); // 31.12. des vorangehenden Kalenderjahres zur BIS Meldung TODO: oder Abfragetag mitgeben?
-	//Test Stichtag
-	echo $stichtag;
 }
 else
 {
@@ -174,8 +167,6 @@ $ws = new studiensemester($ws_kurzbz);
 
 // Alle gemeldeten Mitarbeiter holen
 $mitarbeiter = new mitarbeiter();
-//Test Stichtag1
-echo "stichtag" . $beginn_imJahr->format('Y-m-d');
 $mitarbeiter->getMitarbeiterBISMeldung($beginn_imJahr->format('Y-m-d'));
 $mitarbeiter_arr = $mitarbeiter->result;
 
@@ -341,9 +332,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	 * Exkludiert Funktionen, die einem Lehrgang bzw. STG, die nicht BIS-gemeldet werden, zugeordnet sind.
 	 */
 	// -------------------------------------------------------------------------------------------------------------
-	//Test
-	//$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr); //VARIANTE1
-	$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr, $stichtag); //VARIANTE2
+	$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr, $stichtag);
 
 	// Container Funktion dem Container Person anhaengen
 	// -----------------------------------------------------------------------------------------------------------------
@@ -821,24 +810,21 @@ function _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
  * @return array
  *
  */
- //Test
-//function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr) //Variante1
-function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr, $stichtag) //Variante2
+function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr, $stichtag)
 {
 	$entwicklungsteam = new Entwicklungsteam();
-	//$entwicklungsteam->getEntwicklungsteam($uid, null); //Variante1
-	$entwicklungsteam->getEntwicklungsteamBis($uid, $stichtag); //Variante2
+	//nur aktuelle bzw EW-Teameinträge ohne Datumseinträgen werden berücksichtigt
+	$entwicklungsteam->getEntwicklungsteamBis($uid, $stichtag);
 	$entwicklungsteam_arr = $entwicklungsteam->result;
 
 	if (!empty($entwicklungsteam_arr))
 	{
 		// Lehrgaenge und STG, die nicht BIS gemeldet werden, extrahieren
-		$entwicklungsteam_arr = array_filter($entwicklungsteam_arr, function ($obj)
-		{
+		$entwicklungsteam_arr = array_filter($entwicklungsteam_arr, function ($obj) {
 			return
-			!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
-			$obj->studiengang_kz > 0 &&
-			$obj->studiengang_kz < 10000;
+				!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
+				$obj->studiengang_kz > 0 &&
+				$obj->studiengang_kz < 10000;
 		});
 	}
 
@@ -846,29 +832,27 @@ function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr, $stichtag) /
 	{
 		// Hoechste besondere Qualifikation
 		$besondere_qualifikation_code_arr = array();
-		foreach($entwicklungsteam_arr as $row_entw)
-			$besondere_qualifikation_code_arr[] = $row_entw->besqualcode;
-
-		$besondere_qualifikation_code = max($besondere_qualifikation_code_arr);
-
-		// alle Studiengaenge mit Person als Teil des Entwicklungsteams um Start- und Ende-Datum ergaenzen
+		// Studiengaenge, wo Person Teil des Entwicklungsteams gewesen ist
 		$studiengang_kz_arr = array();
 		foreach($entwicklungsteam_arr as $row_entw)
 		{
-			$stgkz = $row_entw->studiengang_kz;
-			$studiengang_kz_arr[$row_entw->entwicklungsteam_id]["studieng_kz"] = setLeadingZero(intval($stgkz), 4);
-			$studiengang_kz_arr[$row_entw->entwicklungsteam_id]["start"] = $row_entw->beginn;
-			$studiengang_kz_arr[$row_entw->entwicklungsteam_id]["ende"]= $row_entw->ende;
+			$besondere_qualifikation_code_arr[] = $row_entw->besqualcode;
+			$studiengang_kz_arr[] = $row_entw->studiengang_kz;
 		}
-		sort($studiengang_kz_arr);							// sortieren
+		$besondere_qualifikation_code = max($besondere_qualifikation_code_arr);
 
+		sort($studiengang_kz_arr);							// sortieren
+		foreach($studiengang_kz_arr as &$studiengang_kz)	// fuehrende Nullen fuer STG
+		{
+			$studiengang_kz = setLeadingZero(intval($studiengang_kz), 4);
+		}
 
 		// Funktionsobjekt generieren und dem Funktionscontainer anhaengen
 		$funktion_obj = new StdClass();
 		$funktion_obj->funktionscode = 7;
 		$funktion_obj->besondereQualifikationCode = $besondere_qualifikation_code;
 		$funktion_obj->studiengang = $studiengang_kz_arr;
-		$funktion_arr[]= $funktion_obj;
+		$funktion_arr[] = $funktion_obj;
 	}
 
 	return $funktion_arr;
@@ -886,8 +870,7 @@ function _getLehrecontainer($sws_proStg_arr)
 	if (!empty($sws_proStg_arr))
 	{
 		// Lehrgaenge und STG, die nicht BIS gemeldet werden, extrahieren
-		$sws_proStg_arr = array_filter($sws_proStg_arr, function ($obj)
-		{
+		$sws_proStg_arr = array_filter($sws_proStg_arr, function ($obj) {
 			return
 				!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
 				$obj->studiengang_kz > 0 &&
@@ -992,7 +975,7 @@ function _generateXML($person_arr)
 				? '<BesondereQualifikationCode><![CDATA['. $funktion->besondereQualifikationCode. ']]></BesondereQualifikationCode>'
 				: '';
 
-			if ($funktion->funktionscode == 5)
+			if (($funktion->funktionscode == 5) || ($funktion->funktionscode == 7))
 			{
 				if (is_array($funktion->studiengang))
 				{
@@ -1011,24 +994,24 @@ function _generateXML($person_arr)
 				}
 			}
 
-			if ($funktion->funktionscode == 7)
-			{
-				if (is_array($funktion->studiengang))
-				{
-					foreach ($funktion->studiengang as $studiengang)
-					{
-						$xml .= '<Studiengang>';
-						$xml .= '<StgKz><![CDATA['. $studiengang["studieng_kz"]. ']]></StgKz>';
-						$xml .= '</Studiengang>';
-					}
-				}
-				elseif (!is_null($funktion->studiengang))
-				{
-					$xml .= '<Studiengang>';
-					$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
-					$xml .= '</Studiengang>';
-				}
-			}
+			// if ($funktion->funktionscode == 7)
+			// {
+			// 	if (is_array($funktion->studiengang))
+			// 	{
+			// 		foreach ($funktion->studiengang as $studiengang)
+			// 		{
+			// 			$xml .= '<Studiengang>';
+			// 			$xml .= '<StgKz><![CDATA['. $studiengang["studieng_kz"]. ']]></StgKz>';
+			// 			$xml .= '</Studiengang>';
+			// 		}
+			// 	}
+			// 	elseif (!is_null($funktion->studiengang))
+			// 	{
+			// 		$xml .= '<Studiengang>';
+			// 		$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
+			// 		$xml .= '</Studiengang>';
+			// 	}
+			// }
 			$xml .= '</Funktion>';
 		}
 
@@ -1185,38 +1168,13 @@ function _outputHTML($person_arr)
 					<td>'. $funktion->besondereQualifikationCode. '</td>
 					<td>';
 
-				if ($funktion->funktionscode == 5)
+				if (($funktion->funktionscode == 5) || ($funktion->funktionscode == 7))
 				{
 					if (is_array($funktion->studiengang))
 					{
 						foreach ($funktion->studiengang as $studiengang)
 						{
 							echo $studiengang.' ';
-						}
-					}
-					elseif (!is_null($funktion->studiengang))
-					{
-						echo $funktion->studiengang.' ';
-					}
-				}
-				//Test
-				//Variante: EW-Teams mit Zeitraum anzeigen
-				if ($funktion->funktionscode == 7)
-				{
-					if (is_array($funktion->studiengang))
-					{
-						foreach ($funktion->studiengang as $studiengang)
-						{
-							echo $studiengang["studieng_kz"].' ';
-
-							if ($studiengang["start"] != "")
-							{
-								$beginn = new DateTime($studiengang["start"]);
-								$ende = new DateTime($studiengang["ende"]);
-								echo "(". $beginn->format('d.m.Y'). " bis " . $ende->format('d.m.Y') . ")<br>";
-							}
-							else
-								echo "<br>";
 						}
 					}
 					elseif (!is_null($funktion->studiengang))
