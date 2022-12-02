@@ -28,6 +28,7 @@ require_once('dbupdate_3.4/example2.php');
 ...
 */
 
+require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/19154.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
