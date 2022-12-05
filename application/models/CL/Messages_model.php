@@ -22,6 +22,7 @@ class Messages_model extends CI_Model
 
 	const NO_AUTH_UID = 'online'; // hard coded uid if no authentication is performed
 
+	const CRON_PREFIX = 'cron_';
 	// Recipients types
 	const TYPE_PERSONS = 'persons';
 	const TYPE_PRESTUDENTS = 'prestudents';
@@ -744,7 +745,13 @@ class Messages_model extends CI_Model
 	{
 		// In case the message is accessed via ViewMessage controller -> no authentication
 		// If no authentication is performed then use a hard coded uid
-		$loggedUserUID = isLogged() ? getAuthUID() : self::NO_AUTH_UID;
+		// In case if a cron is performed then use the prefix and the classname
+		if (is_cli())
+		{
+			$loggedUserUID = substr(self::CRON_PREFIX . $this->router->class, 0, 32);
+		}
+		else
+			$loggedUserUID = isLogged() ? getAuthUID() : self::NO_AUTH_UID;
 
 		$message = 'Message sent from person '.$sender_id.' to '.$receiver_id.', message id: '.$message_id;
 		if (!isEmptyString($receiverOU)) $message .= ', receiverOU: '.$receiverOU;

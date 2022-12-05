@@ -16,6 +16,8 @@
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$ONLINE = '\'online\'';
+	$SYSTEM = '\'system\'';
+	$CRON_PREFIX = '\'cron_%\'';
 
 	$query = '
 		SELECT
@@ -56,9 +58,22 @@
 				  a.dokument_kurzbz in ('.$AKTE_TYP.')
 			) AS "AnzahlAkte",
 			(
-				SELECT CASE WHEN student.student_uid IS NULL THEN
-					(CASE WHEN sp.nachname IS NULL THEN l.insertvon ELSE sp.nachname END)
-					ELSE '. $ONLINE .' END
+				SELECT
+				  CASE WHEN l.insertvon LIKE '. $CRON_PREFIX .' THEN
+					'. $SYSTEM .'
+				  ELSE (
+					CASE WHEN student.student_uid IS NULL THEN (
+					  CASE WHEN sp.nachname IS NULL THEN
+						l.insertvon
+					  ELSE
+						sp.nachname
+					  END
+					)
+					ELSE
+					  '. $ONLINE .'
+					END
+				  )
+				  END
 				  FROM system.tbl_log l
 				  LEFT JOIN  public.tbl_benutzer on l.insertvon = tbl_benutzer.uid
 				  LEFT JOIN public.tbl_person sp on tbl_benutzer.person_id = sp.person_id
@@ -275,22 +290,30 @@
 				LIMIT 1
 			) AS "ZGVMNationGruppe",
 			(
-				SELECT tbl_organisationseinheit.bezeichnung
-				FROM public.tbl_benutzerfunktion 
-				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
-				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
-				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
-				AND tbl_organisationseinheit.bezeichnung = '.$ORG_NAME.'
-				AND tbl_benutzerfunktion.uid = (
-					SELECT l.insertvon
-					FROM system.tbl_log l
-					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
-					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
-					AND l.person_id = p.person_id
-					ORDER BY l.log_id DESC
-					LIMIT 1
-				)
-				LIMIT 1 
+				SELECT
+				  CASE WHEN (l.insertvon LIKE '. $CRON_PREFIX .') THEN
+					true
+				  ELSE (
+					CASE WHEN (tbl_organisationseinheit.bezeichnung = '. $ORG_NAME .') THEN
+					  true
+					ELSE
+					  false
+					END
+				  )
+				  END
+				FROM system.tbl_log l
+				LEFT JOIN public.tbl_benutzerfunktion ON l.insertvon = tbl_benutzerfunktion.uid
+				LEFT JOIN public.tbl_organisationseinheit ON tbl_benutzerfunktion.oe_kurzbz = tbl_organisationseinheit.oe_kurzbz
+				WHERE l.taetigkeit_kurzbz IN ('. $TAETIGKEIT_KURZBZ . ')
+				  AND l.logdata->>\'name\' NOT IN ('. $LOGDATA_NAME .')
+				  AND l.person_id = p.person_id
+				  AND (
+					(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now())
+					AND
+					(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				  )
+				ORDER BY l.log_id DESC
+				LIMIT 1
 			) AS "InfoCenterMitarbeiter"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
@@ -484,7 +507,7 @@
 				$datasetRaw->{'ZGVMNationGruppe'} = '-';
 			}
 
-			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'false')
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
 			}

@@ -9,6 +9,8 @@
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
+	$SYSTEM = '\'system\'';
+	$CRON_PREFIX = '\'cron_%\'';
 
 $query = '
 		SELECT
@@ -30,7 +32,12 @@ $query = '
 				 LIMIT 1
 			) AS "LastAction",
 			(
-				SELECT l.insertvon
+				SELECT
+				  CASE WHEN l.insertvon LIKE '. $CRON_PREFIX .' THEN
+					'. $SYSTEM .'
+				  ELSE
+					l.insertvon
+				  END
 				  FROM system.tbl_log l
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
 				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
@@ -179,22 +186,30 @@ $query = '
 				 LIMIT 1
 			) AS "ZGVMNation",
 			(
-				SELECT tbl_organisationseinheit.bezeichnung
-				FROM public.tbl_benutzerfunktion 
-				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
-				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
-				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
-				AND tbl_organisationseinheit.bezeichnung = '.$ORG_NAME.'
-				AND tbl_benutzerfunktion.uid = (
-					SELECT l.insertvon
-					FROM system.tbl_log l
-					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
-					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
-					AND l.person_id = p.person_id
-					ORDER BY l.log_id DESC
-					LIMIT 1
-				)
-				LIMIT 1 
+				SELECT
+				  CASE WHEN (l.insertvon LIKE '. $CRON_PREFIX .') THEN
+					true
+				  ELSE (
+					CASE WHEN (tbl_organisationseinheit.bezeichnung = '. $ORG_NAME .') THEN
+					  true
+					ELSE
+					  false
+					END
+				  )
+				  END
+				FROM system.tbl_log l
+				LEFT JOIN public.tbl_benutzerfunktion ON l.insertvon = tbl_benutzerfunktion.uid
+				LEFT JOIN public.tbl_organisationseinheit ON tbl_benutzerfunktion.oe_kurzbz = tbl_organisationseinheit.oe_kurzbz
+				WHERE l.taetigkeit_kurzbz IN ('. $TAETIGKEIT_KURZBZ . ')
+				  AND l.logdata->>\'name\' NOT IN ('. $LOGDATA_NAME .')
+				  AND l.person_id = p.person_id
+				  AND (
+					(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now())
+					AND
+					(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
+				  )
+				ORDER BY l.log_id DESC
+				LIMIT 1
 			) AS "InfoCenterMitarbeiter"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
@@ -225,6 +240,7 @@ $query = '
 				)
 			)
 	ORDER BY "LastAction" DESC';
+
 
 	$filterWidgetArray = array(
 		'query' => $query,
@@ -350,7 +366,7 @@ $query = '
 				$datasetRaw->{'ZGVMNation'} = '-';
 			}
 
-			if ($datasetRaw->{'InfoCenterMitarbeiter'} === null)
+			if ($datasetRaw->{'InfoCenterMitarbeiter'} === 'false')
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Nein';
 			}
