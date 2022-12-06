@@ -200,6 +200,29 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
 	}
+	/**
+	 * Gets all fachbereichsleiter of a Lehrveranstaltung
+	 * @param $lehrveranstaltung_id
+	 * @return array|null
+	 */
+	public function getFachbereichByLv($lehrveranstaltung_id)
+	{
+		$query = "select distinct vorname, nachname, uid, true as lvleiter
+				FROM
+				lehre.tbl_lehrveranstaltung lv
+				JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
+				JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)	
+				join public.tbl_benutzer b using (uid)
+				join public.tbl_person p using (person_id)
+				where
+				bf.datum_von <= now()::date
+				and (bf.datum_bis >= now()::date or bf.datum_bis is null)
+				and bf.funktion_kurzbz = 'Leitung'
+				AND og.organisationseinheittyp_kurzbz = 'Fachbereich'
+				and lehrveranstaltung_id = ?";
+
+		return $this->execQuery($query, array($lehrveranstaltung_id));
+	}
 
 	/**
 	 * Gets Lehrveranstaltungen of a student
