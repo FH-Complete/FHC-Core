@@ -93,7 +93,7 @@ class requestAnrechnung extends Auth_Controller
 		$anrechnungData = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
 
 		// Get Antrag data
-		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id);
+		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id, $anrechnungData->anrechnung_id);
 		
 		$viewData = array(
 			'antragData' => $antragData,

@@ -93,7 +93,8 @@ class approveAnrechnungDetail extends Auth_Controller
 		$antragData = $this->anrechnunglib->getAntragData(
 			$anrechnungData->prestudent_id,
 			$anrechnungData->studiensemester_kurzbz,
-			$anrechnungData->lehrveranstaltung_id
+			$anrechnungData->lehrveranstaltung_id,
+            $anrechnungData->anrechnung_id
 		);
 
 		// Get Empfehlung data
