@@ -28,6 +28,9 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			)
 		);
 
+		// Load configs
+		$this->load->config('anrechnung');
+
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 		$this->load->model('education/Anrechnungstatus_model', 'AnrechnungstatusModel');
@@ -207,14 +210,20 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			// Request Recommendation
 			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
 			{
-				// Get full name of LV Leitung.
-				// If LV Leitung is not present, get full name of LV lectors.
-				$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
-				$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
-					? implode(', ', array_column($lector_arr, 'fullname'))
-					: '';
+                // Get full name of Fachbereichsleitung or LV Leitung.
+                if($this->config->item('fbl') === TRUE)
+                {
+                    $result = $this->anrechnunglib->getFachbereichleitung($item['anrechnung_id']);
+                }
+                else
+                {
+                    // If LV Leitung is not present, get full name of LV lectors.
+                    $result = $this->anrechnunglib->getLectors($item['anrechnung_id']);
+                }
 
-				$retval[]= array(
+                $empfehlungsanfrage_an = !isEmptyArray($result) ? implode(', ', array_column($result, 'fullname')) : '';
+
+                $retval[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
 					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
