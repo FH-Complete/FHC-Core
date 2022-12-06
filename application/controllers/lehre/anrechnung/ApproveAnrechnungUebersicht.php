@@ -328,7 +328,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	 * @param $mail_params
 	 * @return bool
 	 */
-	private function _sendSanchoMailToLectors($mail_params)
+	private function _sendSanchoMail($mail_params)
 	{
 		// Get Lehrveranstaltungen
 		$anrechnung_arr = array();
@@ -344,18 +344,25 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		$anrechnung_arr = array_unique($anrechnung_arr, SORT_REGULAR);
 
-
-		/**
-		 * Get lectors (prio for LV-Leitung, if not present to all lectors of LV.
-		 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
-		 * **/
-		$lector_arr = $this->_getLectors($anrechnung_arr);
+        /**
+         * Get mail receivers.
+         * If retrieving lectors: prio for LV-Leitung, if not present to all lectors of LV.
+         * This function will receive a unique array to avoid sending more mails to one and the same user.
+         **/
+        if($this->config->item('fbl') === TRUE)
+        {
+            $receiver_arr = $this->_getFachbereichleitung($anrechnung_arr);
+        }
+        else
+        {
+            $receiver_arr = $this->_getLectors($anrechnung_arr);
+        }
 
 		// Send mail to lectors
-		foreach ($lector_arr as $lector)
+		foreach ($receiver_arr as $receiver)
 		{
-			$to = $lector->uid;
-			$vorname = $lector->vorname;
+			$to = $receiver->uid. '@'. DOMAIN;
+			$vorname = $receiver->vorname;
 
 			// Get full name of stgl
 			$this->load->model('person/Person_model', 'PersonModel');
@@ -439,4 +446,34 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		return $lector_arr;
 	}
+
+    /**
+     * Get Fachbereichsleitung with unique uids.
+     *
+     * @param $anrechnung_arr
+     * @return array
+     */
+    private function _getFachbereichleitung($anrechnung_arr)
+    {
+        $fbl_arr = array();
+
+        // Get lectors
+        foreach($anrechnung_arr as $anrechnung)
+        {
+            $this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+            $result = $this->LehrveranstaltungModel->getFachbereichByLv($anrechnung['lehrveranstaltung_id']);
+
+            if (!hasData($result))
+            {
+                show_error('No Fachbereichsleitung found');
+            }
+
+            $fbl_arr = array_merge($fbl_arr, getData($result));
+        }
+
+        // Make Fachbereichsleiter array unique
+        $fbl_arr = array_unique($fbl_arr, SORT_REGULAR);
+
+        return $fbl_arr;
+    }
 }

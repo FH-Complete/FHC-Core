@@ -496,18 +496,24 @@ class approveAnrechnungDetail extends Auth_Controller
 
 
 		/**
-		 * Get lectors (prio for LV-Leitung, if not present to all lectors of LV.
+         * Get mail receivers.
+		 * If config is default (lectors): prio for LV-Leitung, if not present to all lectors of LV.
 		 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
 		 * **/
-		$lector_arr = $this->_getLectors($anrechnung_arr);
+        if ($this->config->item('fbl') === TRUE)
+        {
+            $receiver_arr = $this->_getFachbereichleitung($lehrveranstaltung_id);
+        }
+        else
+        {
+            $receiver_arr = $this->_getLectors($studiensemester_kurzbz, $lehrveranstaltung_id);
+        }
 
-
-
-		// Send mail to lectors
-		foreach ($lector_arr as $lector)
+		// Send mail
+		foreach ($receiver_arr as $receiver)
 		{
-			$to = $lector->uid;
-			$vorname = $lector->vorname;
+			$to = $receiver->uid. '@'. DOMAIN;;
+			$vorname = $receiver->vorname;
 
 			// Get full name of stgl
 			$this->load->model('person/Person_model', 'PersonModel');
@@ -591,6 +597,14 @@ class approveAnrechnungDetail extends Auth_Controller
 		return $lector_arr;
 
 	}
+
+    // Get Fachbereichsleitungen
+    private function _getFachbereichleitung($lehrveranstaltung_id)
+    {
+        $result = $this->LehrveranstaltungModel->getFachbereichByLv($lehrveranstaltung_id);
+
+        return hasData($result) ? getData($result) : show_error('Failed retrieving Fachbereichsleitung');
+    }
 
 	private function _saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id)
 	{
