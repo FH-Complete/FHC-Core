@@ -231,9 +231,9 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 
 		if($result = getData($result))
 		{
-			$entitled_lector_arr = array_column($result, 'uid');
+			$entitled_uid_arr = array_column($result, 'uid');
 
-			if (in_array($this->_uid, $entitled_lector_arr))
+			if (in_array($this->_uid, $entitled_uid_arr))
 			{
 				return;
 			}

@@ -556,12 +556,8 @@ $(function(){
             }
         }
 
-        selected_data.map(function(data){
-            // reduce to necessary fields
-            return {
-                'anrechnung_id' : data.anrechnung_id,
-            }
-        });
+        // Reduce to necessary fields
+        selected_data = selected_data.map(data => ({'anrechnung_id' : data.anrechnung_id}));
 
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)
@@ -570,14 +566,9 @@ $(function(){
             return;
         }
 
-        // Prepare data object for ajax call
-        let data = {
-            'data': selected_data
-        };
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
-            data,
+            {data: selected_data},
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
@@ -604,8 +595,8 @@ $(function(){
                             FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
                         }
 
-                    //Update status 'genehmigt'
-                    $('#tableWidgetTabulator').tabulator('updateData', data);
+                        //Update status 'genehmigt'
+                        $('#tableWidgetTabulator').tabulator('updateData', data);
 
                         // Deselect rows
                         var indexesToDeselect = data.map(x => x.anrechnung_id);
