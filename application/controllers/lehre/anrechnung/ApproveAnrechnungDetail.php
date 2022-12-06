@@ -220,15 +220,12 @@ class approveAnrechnungDetail extends Auth_Controller
 		}
 
 		$retval = array();
-		$counter = 0;
-
-		foreach ($data as $item)
-		{
-			// Check if Anrechnungs-LV has lector
-			if (!$this->anrechnunglib->LVhasLector($item['anrechnung_id']))
-			{
-				// Count up LV with no lector
-				$counter++;
+        
+        // Check if Anrechnungs-LV has lector
+        if (!$this->anrechnunglib->LVhasLector($anrechnung_id))
+        {
+            $this->terminateWithJsonError('LV has no lector');
+        }
 
 			// Get Fachbereichsleitung or LV Leitung.
             if($this->config->item('fbl') === TRUE)
@@ -274,9 +271,9 @@ class approveAnrechnungDetail extends Auth_Controller
 		}
 
 		// Output json to ajax
-		if (isEmptyArray($retval) && $counter > 0)
+		if (isEmptyArray($retval))
 		{
-			return $this->outputJsonError(
+			$this->terminateWithJsonError(
 				"Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
 			);
 		}

@@ -248,9 +248,14 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 
 		// Output json to ajax
-		if (isEmptyArray($retval) && $counter == 0)
+		if (isEmptyArray($retval))
 		{
-			return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
+            if ($counter > 0)
+            {
+                $this->terminateWithJsonError('Bei '. $counter.' LV sind keine LektorInnen zugeteilt.');
+            }
+
+			$this->terminateWithJsonError('Es wurden keine Empfehlungen angefordert');
 		}
 
 		return $this->outputJsonSuccess($retval);

@@ -603,14 +603,14 @@ $(function(){
                             // Print success message
                             FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
                         }
-                    }
 
                     //Update status 'genehmigt'
                     $('#tableWidgetTabulator').tabulator('updateData', data);
 
-                    // Deselect rows
-                    var indexesToDeselect = data.map(x => x.anrechnung_id);
-                    $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
+                        // Deselect rows
+                        var indexesToDeselect = data.map(x => x.anrechnung_id);
+                        $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
+                    }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
