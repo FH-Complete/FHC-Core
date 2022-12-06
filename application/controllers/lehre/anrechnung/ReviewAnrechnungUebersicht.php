@@ -226,8 +226,14 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 			show_error('Failed retrieving Anrechnung');
 		}
 
-		$result = $this->LehrveranstaltungModel
-			->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+        if ($this->config->item('fbl') === TRUE)
+        {
+            $result = $this->LehrveranstaltungModel->getFachbereichByLv($result->lehrveranstaltung_id);
+        }
+        else
+        {
+            $result = $this->LehrveranstaltungModel->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+        }
 
 		if($result = getData($result))
 		{
