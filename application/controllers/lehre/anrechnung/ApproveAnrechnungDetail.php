@@ -264,7 +264,10 @@ class approveAnrechnungDetail extends Auth_Controller
 		 * */
 		if (!isEmptyArray($retval))
 		{
-			self::_sendSanchoMailToLectors($retval);
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                $this->_sendSanchoMailToLectors($anrechnung_id);
+            }
 
 			// Output json to ajax
 			return $this->outputJsonSuccess($retval);

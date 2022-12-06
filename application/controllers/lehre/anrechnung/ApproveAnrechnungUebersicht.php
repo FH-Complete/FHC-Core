@@ -235,13 +235,16 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 
 		/**
-		 * Send mails to lectors
+		 * Send mails
 		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
 		 * even if they are required for more recommendations
 		 * */
 		if (!isEmptyArray($retval))
 		{
-			self::_sendSanchoMailToLectors($retval);
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                $this->_sendSanchoMail($retval);
+            }
 		}
 
 		// Output json to ajax

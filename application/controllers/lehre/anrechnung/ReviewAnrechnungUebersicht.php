@@ -26,6 +26,9 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 			)
 		);
 
+		// Load configs
+		$this->load->config('anrechnung');
+
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 		$this->load->model('education/Anrechnungstatus_model', 'AnrechnungstatusModel');
@@ -111,16 +114,19 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 			 * Send mails to STGL (if not present STGL, send to STGL assistance)
 			 * NOTE: mails are sent at the end to ensure sending only one mail to each STGL
 			 * */
-			if (!$this->_sendSanchoMails($json, true))
-			{
-				show_error('Failed sending emails');
-			}
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                if (!$this->_sendSanchoMails($json, true))
+                {
+                    show_error('Failed sending emails');
+                }
+            }
 
 			return $this->outputJsonSuccess($json);
 		}
 		else
 		{
-			return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
+			$this->terminateWithJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 		}
 	}
 
@@ -154,10 +160,13 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		if (isset($json) && !isEmptyArray($json))
 		{
 			// Send mails to STGL (if not present STGL, send to STGL assistance)
-			if (!$this->_sendSanchoMails($json, false))
-			{
-				show_error('Failed sending emails');
-			}
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                if (!$this->_sendSanchoMails($json, false))
+                {
+                    show_error('Failed sending emails');
+                }
+            }
 
 			return $this->outputJsonSuccess($json);
 		}
