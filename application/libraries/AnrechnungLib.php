@@ -274,14 +274,21 @@ class AnrechnungLib
 		if (hasData($result))
 		{
 			$empfehlung_data->empfehlungsanfrageAm = (new DateTime($result->retval[0]->insertamum))->format('d.m.Y');
-			
-			// Get lectors who received request for recommendation
-			$lector_arr = self::getLectors($anrechnung_id);
-			
-			if (!isEmptyArray($lector_arr))
-			{
-				$empfehlung_data->empfehlungsanfrageAn = implode(', ', array_column($lector_arr, 'fullname'));
-			}
+
+            // Get users who received request for recommendation (Fachbereichsleitung / Lektor)
+            if($this->ci->config->item('fbl') === TRUE)
+            {
+                $res = $this->getFachbereichleitung($anrechnung_id);
+            }
+            else
+            {
+                $res = $this->getLectors($anrechnung_id);
+            }
+
+            if (!isEmptyArray($res))
+            {
+                $empfehlung_data->empfehlungsanfrageAn = implode(', ', array_column($res, 'fullname'));
+            }
 		}
 
 		if (is_null($anrechnung->empfehlung_anrechnung))
@@ -802,6 +809,40 @@ class AnrechnungLib
 		
 		return $lector_arr;
 	}
+
+    /**
+     * Get Fachbereichsleitung.
+     *
+     * @param $anrechnung_id
+     * @return false|mixed|null
+     */
+    public function getFachbereichleitung($anrechnung_id)
+    {
+        $this->ci->AnrechnungModel->addSelect('lehrveranstaltung_id');
+        $result = $this->ci->AnrechnungModel->load($anrechnung_id);
+
+        $lehrveranstaltung_id = getData($result)[0]->lehrveranstaltung_id;
+
+        // Get FBLs
+        $result = $this->ci->LehrveranstaltungModel->getFachbereichByLv($lehrveranstaltung_id);
+
+        if (!hasData($result))
+        {
+            return false;
+        }
+
+        $fbl_arr = getData($result);
+
+        foreach ($fbl_arr as $fbl)
+        {
+            $fbl->fullname = $fbl->vorname. ' '. $fbl->nachname;
+        }
+
+        // Now make the fbl array unique
+        $fbl_arr = array_unique($fbl_arr, SORT_REGULAR);
+
+        return $fbl_arr;
+    }
 
 	// Return an object with Anrechnungdata
 	private function _setAnrechnungDataObject($anrechnung)
