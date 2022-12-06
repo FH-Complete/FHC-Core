@@ -62,6 +62,8 @@ JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)
 /*AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'*/
 	AND le.lehre = TRUE
 AND bf.funktion_kurzbz = \'Leitung\'
+and bf.datum_von <= now()
+and (bf.datum_bis >= now() or bf.datum_bis is null)
 AND og.organisationseinheittyp_kurzbz = \'Fachbereich\'	
 AND bf.uid =  \'' . $LEKTOR_UID . '\'
 	AND EXISTS (
