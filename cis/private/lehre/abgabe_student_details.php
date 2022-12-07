@@ -433,8 +433,10 @@ if($command=="update" && $error!=true)
 								$row_std=$db->db_fetch_object($result_std);
 
 								// 1. Begutachter mail ohne Token
-								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
 								$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
+								$projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
+								$subject = $projektarbeit_obj->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
 								$abgabetyp = $paabgabetyp_kurzbz == 'end' ? 'Endabgabe' : 'Zwischenabgabe';
 
 								$maildata = array();
@@ -452,7 +454,7 @@ if($command=="update" && $error!=true)
 									'ParbeitsbeurteilungEndupload',
 									$maildata,
 									$row_betr->mitarbeiter_uid."@".DOMAIN,
-									"Bachelor-/Masterarbeitsbetreuung",
+									$subject,
 									'sancho_header_min_bw.jpg',
 									'sancho_footer_min_bw.jpg',
 									$user."@".DOMAIN);
@@ -465,48 +467,66 @@ if($command=="update" && $error!=true)
 								// 2. Begutachter mail, wenn Endabgabe, mit Token wenn extern
 								if ($paabgabetyp_kurzbz == 'end')
 								{
-									$projektbetreuer = new projektbetreuer();
-									$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
+									// Zweitbegutachter holen
+									$zweitbegutachter = new projektbetreuer();
+									$zweitbegutachterRes = $zweitbegutachter->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
 
-									if ($zweitbetr)
+									if ($zweitbegutachterRes)
 									{
-										$tokenGenRes = $projektbetreuer->generateZweitbegutachterToken($zweitbetr->person_id, $projektarbeit_id);
+										$zweitbegutachterResults = $zweitbegutachter->result;
 
-										if (!$tokenGenRes)
-											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
-
-										$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
-
-										if (!$zweitbetr)
-											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
-
-										$intern = isset($zweitbetr->uid);
-										$mail_link = $intern ? $mail_fulllink : $mail_baselink;
-
-										$zweitbetmaildata = array();
-										$zweitbetmaildata['geehrt'] = "geehrte" . ($zweitbetr->anrede == "Herr" ? "r" : "");
-										$zweitbetmaildata['anrede'] = $zweitbetr->anrede;
-										$zweitbetmaildata['betreuer_voller_name'] = $zweitbetr->voller_name;
-										$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
-										$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
-										$zweitbetmaildata['abgabetyp'] = $abgabetyp;
-										$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-										$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
-										$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $zweitbetr->zugangstoken . "</p>" : "";
-
-										$mailres = sendSanchoMail(
-											'ParbeitsbeurteilungEndupload',
-											$zweitbetmaildata,
-											$zweitbetr->email,
-											"Masterarbeitsbetreuung",
-											'sancho_header_min_bw.jpg',
-											'sancho_footer_min_bw.jpg',
-											$user . "@" . DOMAIN
-										);
-
-										if (!$mailres)
+										foreach ($zweitbegutachterResults as $begutachter)
 										{
-											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+											// token generieren, wenn noch nicht vorhanden und notwendig (wird in methode überprüft)
+											$tokenGenRes = $zweitbegutachter->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
+
+											if (!$tokenGenRes)
+												echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+
+											// Zweitbegutachter (evtl. mit Token) holen
+											$zweitbegutachterMitToken = new projektbetreuer();
+											$begutachterMitTokenRes = $zweitbegutachterMitToken->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid, $begutachter->person_id);
+
+											if (!$begutachterMitTokenRes)
+												echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+
+											// Email an Zweitbegutachter senden
+											if (isset($zweitbegutachterMitToken->result[0]))
+											{
+												$begutachterMitToken = $zweitbegutachterMitToken->result[0];
+
+												$path = $begutachterMitToken->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+												$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$path";
+												$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
+												$intern = isset($begutachterMitToken->uid);
+												$mail_link = $intern ? $mail_fulllink : $mail_baselink;
+
+												$zweitbetmaildata = array();
+												$zweitbetmaildata['geehrt'] = "geehrte" . ($begutachterMitToken->anrede == "Herr" ? "r" : "");
+												$zweitbetmaildata['anrede'] = $begutachterMitToken->anrede;
+												$zweitbetmaildata['betreuer_voller_name'] = $begutachterMitToken->voller_name;
+												$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
+												$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
+												$zweitbetmaildata['abgabetyp'] = $abgabetyp;
+												$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
+												$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+												$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+
+												$mailres = sendSanchoMail(
+													'ParbeitsbeurteilungEndupload',
+													$zweitbetmaildata,
+													$begutachterMitToken->email,
+													$subject,
+													'sancho_header_min_bw.jpg',
+													'sancho_footer_min_bw.jpg',
+													$user . "@" . DOMAIN
+												);
+
+												if (!$mailres)
+												{
+													echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+												}
+											}
 										}
 									}
 								}

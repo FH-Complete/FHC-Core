@@ -84,11 +84,12 @@ $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Declaration not accepted
 $this->phrasen['abgabetool/downloadProjektarbeit']='Download File';
 $this->phrasen['abgabetool/zweitBegutachter']='Second assessor';
 $this->phrasen['abgabetool/zweitbetreuerTokenMailSenden']='Resend access token to second assessor';
-$this->phrasen['abgabetool/zweitbetreuerMailSenden']='Send mail to second assessor (%s)';
-$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail sent to second assessor (%s)';
-$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='Second assessor has no delivery mail adress!';
+$this->phrasen['abgabetool/zweitbetreuerMailSenden']='Send mail to assessor %s (%s)';
+$this->phrasen['abgabetool/zweitbegutachterMailGesendet']='Mail sent to assessor %s (%s)';
+$this->phrasen['abgabetool/zweitBegutachterEmailFehlt']='Assessor has no delivery mail adress!';
 $this->phrasen['abgabetool/projektbeurteilungDownload']='Thesis-Assessment download';
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='First-/Assessor';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Second Assessor';
 $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Error when getting endupload of project work';
+$this->phrasen['abgabetool/senatsMitglied']='Examiner';
 ?>
