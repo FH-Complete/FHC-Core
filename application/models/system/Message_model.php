@@ -93,6 +93,7 @@ class Message_model extends DB_Model
 						m.insertamum,
 						m.relationmessage_id,
 						m.oe_kurzbz,
+						oe.bezeichnung AS oebezeichnung,
 						se.person_id AS sepersonid,
 						se.anrede AS seanrede,
 						se.titelpost AS setitelpost,
@@ -114,6 +115,7 @@ class Message_model extends DB_Model
 						JOIN public.tbl_msg_recipient r ON m.message_id = r.message_id
 						JOIN public.tbl_person se ON (m.person_id = se.person_id)
 						JOIN public.tbl_person re ON (r.person_id = re.person_id)
+						JOIN public.tbl_organisationseinheit oe ON (m.oe_kurzbz = oe.oe_kurzbz)
 						LEFT JOIN (
 							SELECT message_id, person_id, status, statusinfo, insertamum
 							  FROM public.tbl_msg_status
@@ -171,14 +173,14 @@ class Message_model extends DB_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 		}
 	}
-	
+
 	/**
 	 * Get message variables for logged in user
 	 */
 	public function getMsgVarsLoggedInUser()
 	{
 		$result = $this->db->query('SELECT * FROM public.vw_msg_vars_user WHERE 0 = 1');
-		
+
 		if ($result)
 		{
 			return success($result->list_fields());
@@ -208,7 +210,7 @@ class Message_model extends DB_Model
 
 		return $this->execQuery(sprintf($query, is_array($person_id) ? 'IN' : '='), array($person_id));
 	}
-	
+
 	/**
 	 * Get message vars data for logged in user
 	 * @param string uid The UID should ONLY be passed if this method is called by a cronjob.
@@ -225,9 +227,9 @@ class Message_model extends DB_Model
 		{
 			$params = array(getAuthUID());
 		}
-		
+
 		$query = 'SELECT * FROM public.vw_msg_vars_user WHERE my_uid = ?';
-		
+
 		return $this->execQuery($query, $params);
 	}
 }

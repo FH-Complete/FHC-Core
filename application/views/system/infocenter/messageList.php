@@ -17,7 +17,7 @@ $widthColumn = $msgExists === true ? 8 : 12;
 		<?php foreach ($messages as $message): ?>
 			<tr id="<?php echo $message->message_id.'_'.$message->repersonid ?>" style="cursor: pointer">
 				<td><?php echo isset($message->insertamum) ? date_format(date_create($message->insertamum), 'd.m.Y H:i:s') : '' ?></td>
-				<td><?php echo $message->sevorname.' '.$message->senachname ?></td>
+				<td><?php echo isset($message->oebezeichnung) ? $message->oebezeichnung : $message->sevorname.' '.$message->senachname ?></td>
 				<td><?php echo $message->revorname.' '.$message->renachname ?></td>
 				<td><?php echo $message->subject ?></td>
 				<td><?php echo isset($message->statusamum) ? date_format(date_create($message->statusamum), 'd.m.Y H:i:s') : '' ?></td>
