@@ -56,7 +56,7 @@ $query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern 
 				    WHERE person_id = pers.person_id
 				    ORDER BY prestudent_id DESC
 				) prestudents
-				WHERE last_status IN ('Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')
+				WHERE last_status IN ('Abgewiesener','Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')
 				GROUP BY person_id
 				LIMIT 1;
 			) AS \"Zugehörigkeit\",
@@ -89,7 +89,9 @@ $query .= "SELECT issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern 
 				LEFT JOIN public.tbl_funktion fu USING (funktion_kurzbz)
 				WHERE fehlercode = fr.fehlercode
 				GROUP BY fehlercode
-			) AS \"Organisationseinheit Zuständigkeiten\"
+			) AS \"Organisationseinheit Zuständigkeiten\",
+			pers.bpk AS \"BPK\",
+			pers.matr_nr AS \"Matrikelnummer\"
 			FROM system.tbl_issue iss
 			JOIN system.tbl_fehler fr USING (fehlercode)
 			JOIN system.tbl_fehlertyp ftyp USING (fehlertyp_kurzbz)
@@ -172,7 +174,9 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('fehlermonitoring', 'zugehoerigkeit')),
 		ucfirst($this->p->t('fehlermonitoring', 'hauptzustaendig')),
 		ucfirst($this->p->t('fehlermonitoring', 'zustaendigePersonen')),
-		ucfirst($this->p->t('fehlermonitoring', 'zustaendigeOrganisationseinheiten'))
+		ucfirst($this->p->t('fehlermonitoring', 'zustaendigeOrganisationseinheiten')),
+	    'BPK',
+	    'Matrikelnummer'
     ),
 	'formatRow' => function($datasetRaw) {
 
@@ -219,6 +223,16 @@ $filterWidgetArray = array(
 		if ($datasetRaw->{'Organisationseinheit Zuständigkeiten'} == null)
 		{
 			$datasetRaw->{'Organisationseinheit Zuständigkeiten'} = '-';
+		}
+
+		if ($datasetRaw->{'BPK'} == null)
+		{
+			$datasetRaw->{'BPK'} = '-';
+		}
+
+		if ($datasetRaw->{'Matrikelnummer'} == null)
+		{
+			$datasetRaw->{'Matrikelnummer'} = '-';
 		}
 
 		return $datasetRaw;
