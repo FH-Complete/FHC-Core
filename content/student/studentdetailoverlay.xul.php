@@ -355,7 +355,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<rule ZGV:aktiv='f'>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/zgv/rdf#code"
-													label="rdf:http://www.technikum-wien.at/zgv/rdf#kurzbz"
+													label="rdf:http://www.technikum-wien.at/zgv/rdf#bezeichnung"
 													uri="rdf:*"
 													style="text-decoration:line-through;"
 													/>
@@ -364,7 +364,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<rule>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/zgv/rdf#code"
-													label="rdf:http://www.technikum-wien.at/zgv/rdf#kurzbz"
+													label="rdf:http://www.technikum-wien.at/zgv/rdf#bezeichnung"
 													uri="rdf:*"
 													/>
 										</menupopup>
@@ -425,7 +425,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<rule ZGVMASTER:aktiv='f'>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
-													label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
+													label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#bezeichnung"
 													uri="rdf:*"
 													style="text-decoration:line-through;"
 													/>
@@ -434,7 +434,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<rule>
 											<menupopup>
 												<menuitem value="rdf:http://www.technikum-wien.at/zgvmaster/rdf#code"
-														label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#kurzbz"
+														label="rdf:http://www.technikum-wien.at/zgvmaster/rdf#bezeichnung"
 														uri="rdf:*"
 														/>
 												</menupopup>
@@ -497,7 +497,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<rule ZGVDOKTOR:aktiv='f'>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#code"
-													label="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#kurzbz"
+													label="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#bezeichnung"
 													uri="rdf:*"
 													style="text-decoration:line-through;"
 													/>
@@ -506,7 +506,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<rule>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#code"
-													label="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#kurzbz"
+													label="rdf:http://www.technikum-wien.at/zgvdoktor/rdf#bezeichnung"
 													uri="rdf:*"
 													/>
 										</menupopup>

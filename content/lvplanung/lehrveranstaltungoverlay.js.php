@@ -820,7 +820,12 @@ function LeAuswahl()
 			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
 
 			//Notizen Tab ausblenden
-			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
+			document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
+
+			if(document.getElementById('lehrveranstaltung-tabs').selectedItem === document.getElementById('lehrveranstaltung-tab-notizen'))
+			{
+				document.getElementById('lehrveranstaltung-tabs').selectedItem = document.getElementById('lehrveranstaltung-tab-detail');
+			}
 
 			//LV-Angebot Tab einblenden und Gruppen laden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=false;
@@ -853,7 +858,7 @@ function LeAuswahl()
 			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=true;
 
 			//Notizen Tab einblenden
-			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
+			document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
 
 			//LV-Angebot Tab ausblenden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=true;
