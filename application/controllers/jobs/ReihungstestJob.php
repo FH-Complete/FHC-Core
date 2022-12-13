@@ -24,8 +24,6 @@ use \DB_Model as DB_Model;
 
 class ReihungstestJob extends JOB_Controller
 {
-	const OU_SENDER_TEST_REMINDER = 'infocenter';
-
 	/**
 	 * Constructor
 	 */
@@ -473,7 +471,7 @@ class ReihungstestJob extends JOB_Controller
 								$this->CLMessagesModel->sendExplicitTemplateSenderId(
 									$sender_id,
 									$applicant->prestudent_id,
-									self::OU_SENDER_TEST_REMINDER,
+									OU_SENDER_TEST_REMINDER,
 									'Sancho_RemindApplicantsOfTest',
 									$mailcontent_data_arr
 								);
@@ -1164,4 +1162,3 @@ class ReihungstestJob extends JOB_Controller
 		}
 	}
 }
-
