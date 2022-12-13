@@ -472,10 +472,65 @@ class projektarbeit extends basis_db
 
 	/**
 	 * Prüft ob Projektarbeit aktuell ist (ab bestimmtem Semester).
+	 * Masterarbeiten sind ab der Änderung zur Gewichtung der Punkte aktuell,
+	 * Bachelorarbeiten schon ab dem Umstieg auf das Online Beurteilungsformular.
 	 * @param $projektarbeit_id
 	 * @return int -1 wenn Fehler, 0 wenn nicht aktuell, 1 wenn aktuell
 	 */
 	public function projektarbeitIsCurrent($projektarbeit_id)
+	{
+		// paarbeit sollte nur ab einem Studiensemester online bewertet werden
+		$qry="SELECT 1
+				FROM lehre.tbl_projektarbeit
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+				WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
+				AND
+				(
+					(
+						projekttyp_kurzbz = 'Diplom'
+						AND tbl_studiensemester.start::date >= (
+							SELECT start
+							FROM public.tbl_studiensemester
+							WHERE studiensemester_kurzbz = 'SS2023'
+						)::date
+					)
+					OR
+					(
+						projekttyp_kurzbz <> 'Diplom'
+						AND tbl_studiensemester.start::date >= (
+							SELECT start
+							FROM public.tbl_studiensemester
+							WHERE studiensemester_kurzbz = 'SS2022'
+						)::date
+					)
+				)
+				LIMIT 1";
+
+		$result_sem=$this->db_query($qry);
+
+		if (!$result_sem)
+		{
+			$this->errormsg = "Fehler beim Ermitteln der Projektarbeit Aktualität";
+			return -1;
+		}
+
+		$num_rows = $this->db_num_rows($result_sem);
+
+		if ($num_rows < 0)
+		{
+			$this->errormsg = "Fehler beim Ermitteln der Anzahl der aktuellen Projektarbeiten";
+		}
+
+		return $num_rows;
+	}
+
+	/**
+	 * Prüft ob Projektarbeit aktuell ist (ab bestimmtem Semester), vor der Änderung zur Gewichtung der Punkte.
+	 * @param $projektarbeit_id
+	 * @return int -1 wenn Fehler, 0 wenn nicht aktuell, 1 wenn aktuell
+	 */
+	public function projektarbeitIsCurrentBeforeWeightening($projektarbeit_id)
 	{
 		// paarbeit sollte nur ab einem Studiensemester online bewertet werden
 		$qry="SELECT 1
