@@ -685,11 +685,15 @@ class reihungstest extends basis_db
 					tbl_reihungstest.studiensemester_kurzbz,
 					tbl_reihungstest.stufe,
 					tbl_reihungstest.anmeldefrist,
-					tbl_reihungstest.aufnahmegruppe_kurzbz
+					tbl_reihungstest.aufnahmegruppe_kurzbz,
+					tbl_studiengang.typ,
+					tbl_studiengang.kurzbzlang
 				FROM
 					public.tbl_rt_person
 				JOIN 
 					public.tbl_reihungstest ON (rt_id=reihungstest_id)
+				LEFT JOIN
+					public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
 				WHERE
 					tbl_rt_person.person_id=".$this->db_add_param($person_id);
 
@@ -728,6 +732,8 @@ class reihungstest extends basis_db
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
 				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+				$obj->typ = $row->typ;
+				$obj->kurzbzlang = $row->kurzbzlang;
 
 				$this->result[] = $obj;
 			}
