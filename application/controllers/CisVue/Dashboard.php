@@ -27,7 +27,7 @@ class Dashboard extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('cis/Dashboard.php');
+		$this->load->view('CisVue/Dashboard.php');
 	}
 
 	

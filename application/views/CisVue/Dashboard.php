@@ -6,12 +6,14 @@ $includesArray = array(
 	],
 );
 
-$this->load->view('templates/CIS-Header', $includesArray);
+$this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 
 <div id="content">
+	<h2>Dashboard</h2>
+	<hr>
 	<fhc-dashboard dashboard="CIS"/>
 </div>
 
-<?php $this->load->view('templates/CIS-Footer', $includesArray); ?>
+<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>
 

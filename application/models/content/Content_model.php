@@ -78,21 +78,8 @@ class Content_model extends DB_Model
 			c.template_kurzbz, 
 			s.titel,
 			s.content, 
-			"./*c.oe_kurzbz, 
-			s.sprache,
-			s.contentsprache_id, 
-			s.version, 
-			s.sichtbar, 
-			s.reviewvon, 
-			s.reviewamum,
-			s.updateamum, 
-			s.updatevon, 
-			s.insertamum, 
-			s.insertvon, */"
 			c.menu_open, 
 			c.aktiv, 
-			"./*s.gesperrt_uid, 
-			c.beschreibung,*/"
 			k.child_content_id,
 			k.sort FROM (
 				SELECT 
@@ -128,10 +115,23 @@ class Content_model extends DB_Model
 				campus.tbl_contentsprache s USING(contentsprache_id)
 			LEFT JOIN 
 				campus.tbl_contentchild k ON(m.content_id=k.content_id)
+			WHERE EXISTS (
+				SELECT 1 
+				FROM campus.tbl_contentgruppe 
+				JOIN public.vw_gruppen USING(gruppe_kurzbz) 
+				WHERE (
+					tbl_contentgruppe.content_id=c.content_id
+					OR NOT EXISTS (
+						SELECT 1 
+						FROM campus.tbl_contentgruppe 
+						WHERE content_id=c.content_id
+					)
+				)
+				AND vw_gruppen.uid=?
+			)
 			ORDER BY content_id, sort";
 
-		#DEFAULT_LANGUAGE, $sprache, $root_content_id
-		$result = $this->execQuery($sql, [DEFAULT_LANGUAGE, $sprache, $root_content_id]);
+		$result = $this->execQuery($sql, [DEFAULT_LANGUAGE, $sprache, $root_content_id, $uid]);
 
 		if (isError($result))
 			return $result;
@@ -158,20 +158,7 @@ class Content_model extends DB_Model
 			}
 		}
 
-		return success($result[$root_content_id]);
-
-		# !LOCKED ||
-		$berechtigt = "SELECT 
-					1
-				FROM 
-					campus.tbl_contentgruppe 
-					JOIN public.vw_gruppen USING(gruppe_kurzbz) 
-				WHERE
-					(tbl_contentgruppe.content_id=$content_id
-						OR NOT EXISTS (SELECT 1 FROM campus.tbl_contentgruppe WHERE content_id=$content_id))
-					AND vw_gruppen.uid=$uid";
-
-		
+		return success(isset($result[$root_content_id]) ? $result[$root_content_id] : null);
 	}
 
 }

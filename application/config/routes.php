@@ -61,7 +61,8 @@ $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisa
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
-$route['cis'] = 'cis/dashboard';
+$route['CisHtml'] = 'CisHtml/dashboard';
+$route['CisVue'] = 'CisVue/dashboard';
 
 // load routes from extensions
 $subdir = 'application/config/extensions';

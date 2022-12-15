@@ -15,7 +15,7 @@
 	<?php } ?>
 	<ul id="<?= $menu_id; ?>" class="nav w-100 collapse<?= $entry->menu_open ? ' show' : ''; ?>">
 		<?php foreach ($entry->childs as $child) 
-			$this->load->view('templates/CIS-Menu/Entry', ['entry' => $child, 'menu_id' => $menu_id]);
+			$this->load->view('templates/CISHTML-Menu/Entry', ['entry' => $child, 'menu_id' => $menu_id]);
 		?>
 	</ul>
 <?php } else { ?>

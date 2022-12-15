@@ -1,4 +1,6 @@
 <?php
+if (is_array($entry) && isset($entry['content_id']))
+	$entry = (object)$entry;
 $menu_id .= '-' . $entry->content_id;
 
 switch ($entry->template_kurzbz) {
@@ -6,7 +8,7 @@ switch ($entry->template_kurzbz) {
 		$url = '';
 		$target = '';
 		$xml = new DOMDocument();
-		if($entry->content!='')
+		if($entry->content != '')
 		{
 			$xml->loadXML($entry->content);
 			if ($xml->getElementsByTagName('url')->item(0))
@@ -24,15 +26,15 @@ switch ($entry->template_kurzbz) {
 		if ($target == 'content')
 			$target = '';
 
-		$this->load->view('templates/CIS-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => $url, 'target' => $target]);
+		$this->load->view('templates/CISHTML-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => $url, 'target' => $target]);
 		break;
 	}
 	case 'include': {
-		$this->load->view('templates/CIS-Menu/EntryInclude', ['entry' => $entry, 'menu_id' => $menu_id . '-' . $entry->content_id]);
+		$this->load->view('templates/CISHTML-Menu/EntryInclude', ['entry' => $entry, 'menu_id' => $menu_id]);
 		break;
 	}
 	default: {
-		$this->load->view('templates/CIS-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => APP_ROOT . 'index.ci.php/cis/cms/content/' . $entry->content_id]);
+		$this->load->view('templates/CISHTML-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => APP_ROOT . 'index.ci.php/CisHtml/Cms/content/' . $entry->content_id]);
 		break;
 	}
 }

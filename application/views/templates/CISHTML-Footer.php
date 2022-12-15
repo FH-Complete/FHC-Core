@@ -14,8 +14,6 @@ $includesArray = array(
 );
 ?>
 
-		</main>
-	</div>
-</div>
+</main>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
