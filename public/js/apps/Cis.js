@@ -5,6 +5,10 @@ import fhcapifactory from "./api/fhcapifactory.js";
 Vue.$fhcapi = fhcapifactory;
 
 Vue.createApp({
+    components: {
+        FhcSearchbar,
+        CisMenu
+    },
     data: function() {
         return {
             searchbaroptions: {
@@ -66,9 +70,5 @@ Vue.createApp({
         searchfunction: function(searchsettings) {
             return Vue.$fhcapi.Search.search(searchsettings);
         }
-    },
-    components: {
-        FhcSearchbar,
-        CisMenu
     }
 }).mount('#cis-header');
