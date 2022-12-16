@@ -23,6 +23,7 @@ export default {
                     return '';
                 // TODO(chris): replace get params
                 url = url.childNodes[0].nodeValue + "";
+                url = url.replace(/^\.\.\/cms\/news\.php/, FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/news');
                 url = url.replace(/^\.\.\//, FHC_JS_DATA_STORAGE_OBJECT.app_root);
                 return url;
             }

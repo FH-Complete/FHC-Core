@@ -20,6 +20,8 @@ switch ($entry->template_kurzbz) {
 			if ($xml->getElementsByTagName('target')->item(0))
 				$target = $xml->getElementsByTagName('target')->item(0)->nodeValue;
 
+			if (strpos($url, '../cms/news.php') === 0)
+				$url = APP_ROOT . 'cis.php/CisHtml/Cms/news' . substr($url, 15);
 			if (strpos($url, '../') === 0)
 				$url = APP_ROOT . substr($url, 3);
 		}
@@ -34,7 +36,7 @@ switch ($entry->template_kurzbz) {
 		break;
 	}
 	default: {
-		$this->load->view('templates/CISHTML-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => APP_ROOT . 'index.ci.php/CisHtml/Cms/content/' . $entry->content_id]);
+		$this->load->view('templates/CISHTML-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => APP_ROOT . 'cis.php/CisHtml/Cms/content/' . $entry->content_id]);
 		break;
 	}
 }
