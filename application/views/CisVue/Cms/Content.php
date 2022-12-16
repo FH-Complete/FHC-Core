@@ -1,5 +1,6 @@
 <?php
 $includesArray = array(
+	'customJSModules' => ['public/js/apps/Cis/Cms.js'],
 	'customCSSs' => [
 		'public/css/Cis4/Cms.css',
 		#'skin/style.css.php'
