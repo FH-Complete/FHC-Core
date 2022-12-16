@@ -37,6 +37,7 @@ class CisHmvc extends FHC_Controller
 	 */
 	public function index()
 	{
+		// TODO(chris): CI can't handle empty ("//") parameters
 		$path = explode('/', uri_string());
 		array_shift($path); // NOTE(chris): remove cis4/
 		
@@ -63,62 +64,90 @@ class CisHmvc extends FHC_Controller
 		if (!$current) {
 			return $this->notfound();
 		}
-		switch ($current['orig']->template_kurzbz) {
-			case 'redirect': {
-				list ($url, $target) = $this->getRedirectUrlAndTarget($current['orig']->content);
-				if (substr($url, 0, 1) == '#')
-				{
-					$controller = 'CisHmvc';
-					$action = 'notfound';
-					break;
-				}
-				if ($target)
-				{
-					$controller = 'CisHmvc';
-					$action = 'redirect';
-					array_unshift($params, $url);
-					break;
-				}
-				if (preg_match('/^(\.\.\/|\.\/)*index\.ci\.php\/(.*)$/', $url, $matches))
-				{
-					list ($controller, $action, $p) = $this->getControllerMethodAndParamsFromUrl($matches[2]);
-					if (!$controller)
+		if (!$path)
+		{
+			$controller = 'CisHmvc/Dashboard';
+			$action = 'index';
+		}
+		else
+		{
+			switch ($current['orig']->template_kurzbz) {
+				case 'redirect': {
+					list ($url, $target) = $this->getRedirectUrlAndTarget($current['orig']->content);
+					if (substr($url, 0, 1) == '#')
 					{
 						$controller = 'CisHmvc';
 						$action = 'notfound';
+						break;
 					}
-					else
+					if ($target)
 					{
-						while (count($p))
-							array_unshift($params, array_pop($p));
+						$controller = 'CisHmvc';
+						$action = 'redirect';
+						array_unshift($params, $url);
+						break;
 					}
+					if (preg_match('/^(\.\.\/|\.\/)*index\.ci\.php\/(.*)$/', $url, $matches))
+					{
+						list ($controller, $action, $p) = $this->getControllerMethodAndParamsFromUrl($matches[2]);
+						if (!$controller)
+						{
+							$controller = 'CisHmvc';
+							$action = 'notfound';
+						}
+						else
+						{
+							while (count($p))
+								array_unshift($params, array_pop($p));
+						}
+						break;
+					}
+					if (preg_match('/^(\.\.\/|\.\/)*cms\/news\.php(.*)$/', $url, $matches))
+					{
+						$controller = 'CisHmvc/Cms';
+						$action = 'news';
+						$p = parse_url($url . '?infoscreen=0', PHP_URL_QUERY);
+						if ($p)
+						{
+							parse_str($p, $p);
+							$params += array_values(array_merge([
+								'infoscreen' => false,
+								'studiengang_kz' => null,
+								'semester' => null,
+								'mischen' => true,
+								'titel' => '',
+								'edit' => false,
+								'sichtbar' => true
+							], $p));
+						}
+						break;
+					}
+					if (preg_match('/^(\.\.\/|\.\/)*(addons|cms|cis)\/(.*)$/', $url, $matches))
+					{
+						$controller = 'CisHmvc/Cms';
+						$action = 'legacy';
+						array_unshift($params, $matches[2] . "/" . $matches[3]);
+						break;
+					}
+					
+					$controller = 'CisHmvc/cms';
+					$action = 'debug';
+					array_unshift($params, $current['orig']);
 					break;
 				}
-				if (preg_match('/^(\.\.\/|\.\/)*(addons|cms|cis)\/(.*)$/', $url, $matches))
-				{
+				case 'contentohnetitel':
+				case 'contentmittitel': {
 					$controller = 'CisHmvc/Cms';
-					$action = 'legacy';
-					array_unshift($params, $matches[2] . "/" . $matches[3]);
+					$action = 'content';
+					array_unshift($params, $current['orig']->content_id);
 					break;
 				}
-				
-				$controller = 'CisHmvc/cms';
-				$action = 'debug';
-				array_unshift($params, $current['orig']);
-				break;
-			}
-			case 'contentohnetitel':
-			case 'contentmittitel': {
-				$controller = 'CisHmvc/cms';
-				$action = 'content';
-				array_unshift($params, $current['orig']->content_id);
-				break;
-			}
-			default: {
-				$controller = 'CisHmvc/cms';
-				$action = 'debug';
-				array_unshift($params, $current['orig']);
-				break;
+				default: {
+					$controller = 'CisHmvc/Cms';
+					$action = 'debug';
+					array_unshift($params, $current['orig']);
+					break;
+				}
 			}
 		}
 
