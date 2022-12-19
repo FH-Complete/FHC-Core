@@ -922,7 +922,7 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 			$name = $mit->anrede.' '.$mit->vorname.' '.$mit->nachname.' ('.$mit->kurzbz.')';
 
 			$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
-			$mail = new mail($adressen, 'vilesci@' . DOMAIN, $betreff, '');
+			$mail = new mail($adressen, 'noreply@' . DOMAIN, $betreff, '');
 			$htmlcontent = "<html>
 				<body>
 					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
@@ -931,14 +931,14 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 					<br>eingetragen.\n<br><br>
 					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
 
-            $htmlcontent .= $studlist;
+			$htmlcontent .= $studlist;
 
 			$htmlcontent.= "
-					<br>Anzahl der Noten:" . $neuenoten . "
+					<br>Anzahl der Noten: " . $neuenoten . "
 					<br><br>" . $p->t('abgabetool/mailVerschicktAn') . ": " . $adressen . "
 				</body></html>";
 			$mail->setHTMLContent($htmlcontent);
-			$mail->setReplyTo($lektor_adresse);
+			$mail->setReplyTo($lektor_adresse );
 			$mail->send();
 		}
 	}
