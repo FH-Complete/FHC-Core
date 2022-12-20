@@ -1119,13 +1119,26 @@ class lehrstunde extends basis_db
 		}
 		elseif($student_uid!='')
 		{
-			$qry.=" lehreinheit_id in (
-				SELECT
-					lehreinheit_id
-				FROM
-					campus.vw_student_lehrveranstaltung
-				WHERE
-					uid=".$this->db_add_param($student_uid)." AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).")";
+			$qry.=" tbl_lehreinheit.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+					AND (
+						EXISTS
+						(
+							SELECT 1 FROM public.tbl_studentlehrverband stlv
+							WHERE student_uid=".$this->db_add_param($student_uid)."
+								AND studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+								AND studiengang_kz = stpl.studiengang_kz
+								AND (semester = stpl.semester OR stpl.semester IS NULL)
+								AND (verband = stpl.verband OR stpl.verband IS NULL OR stpl.verband ='0' OR stpl.verband = '')
+								AND (gruppe = stpl.gruppe OR stpl.gruppe IS NULL OR stpl.gruppe ='0' OR stpl.gruppe = '')
+								AND stpl.gruppe_kurzbz IS NULL
+						)
+						OR EXISTS
+						(
+							SELECT 1 FROM public.tbl_benutzergruppe
+							WHERE uid=".$this->db_add_param($student_uid)."
+								AND gruppe_kurzbz = stpl.gruppe_kurzbz
+						)
+					) ";
 		}
 		else
 			return false;
