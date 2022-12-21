@@ -1137,6 +1137,7 @@ class lehrstunde extends basis_db
 							SELECT 1 FROM public.tbl_benutzergruppe
 							WHERE uid=".$this->db_add_param($student_uid)."
 								AND gruppe_kurzbz = stpl.gruppe_kurzbz
+								AND (studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)." OR studiensemester_kurzbz IS NULL)
 						)
 					) ";
 		}
