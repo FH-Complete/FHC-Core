@@ -1120,6 +1120,7 @@ class lehrstunde extends basis_db
 		elseif($student_uid!='')
 		{
 			$qry.=" tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					-- if student is assigned to lehreinheit through lehreinheitgruppe.
 					AND (
 					 lehreinheit_id IN (
 							SELECT tbl_lehreinheit.lehreinheit_id
@@ -1138,36 +1139,41 @@ class lehrstunde extends basis_db
 								lehre.tbl_lehreinheit
 							WHERE
 							(
-								(
-									tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
-									AND tbl_lehreinheit.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
-									AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz
-									AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester
-									AND (
-										btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text)
-										OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = '')
-										AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL
-									)
-									AND (
-										btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text)
-										OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = '')
-										AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL
-									)
+								tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
+								AND tbl_lehreinheit.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
+								AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz
+								AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester
+								AND (
+									btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text)
+									OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = '')
+									AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL
+								)
+								AND (
+									btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text)
+									OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = '')
+									AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL
 								)
 							)
-							AND student_uid=".$this->db_add_param($student_uid)." AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+							AND student_uid=".$this->db_add_param($student_uid)."
+							AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 						)
 					OR
+						-- if student is directly assigned in studienplan
 						EXISTS
 						(
-							SELECT 1 FROM public.tbl_studentlehrverband lvb
-							JOIN lehre.tbl_lehreinheit le ON lvb.studiensemester_kurzbz = le.studiensemester_kurzbz AND le.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
+							WITH stud_lvb AS (
+								SELECT studiengang_kz, semester, verband, gruppe, studiensemester_kurzbz
+								FROM public.tbl_studentlehrverband
+								WHERE student_uid=".$this->db_add_param($student_uid)."
+								AND studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+							)
+							SELECT 1 FROM stud_lvb
+							JOIN lehre.tbl_lehreinheit le ON stud_lvb.studiensemester_kurzbz = le.studiensemester_kurzbz AND le.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
 							WHERE
 								studiengang_kz = stpl.studiengang_kz
 								AND (semester = stpl.semester OR stpl.semester IS NULL)
 								AND (verband = stpl.verband OR stpl.verband IS NULL OR stpl.verband ='0' OR stpl.verband = '')
 								AND (gruppe = stpl.gruppe OR stpl.gruppe IS NULL OR stpl.gruppe ='0' OR stpl.gruppe = '')
-								AND lvb.student_uid=".$this->db_add_param($student_uid)." AND lvb.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
 								AND stpl.gruppe_kurzbz IS NULL
 						)
 					) ";
