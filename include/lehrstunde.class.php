@@ -570,8 +570,6 @@ class lehrstunde extends basis_db
 			$sql_query_stdplan.=' WHERE'.$sql_query;
 		}
 
-		var_dump($sql_query_stdplan);
-
 		//Datenbankabfrage
 		if (!$this->db_query($sql_query_stdplan))
 		{
