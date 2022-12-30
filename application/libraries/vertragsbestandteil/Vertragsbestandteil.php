@@ -6,7 +6,7 @@ namespace vertragsbestandteil;
  *
  * @author bambi
  */
-abstract class Vertragsbestandteil
+abstract class Vertragsbestandteil  implements \JsonSerializable
 {
 	protected $vertragsbestandteil_id;
 	protected $dienstverhaeltnis_id;
@@ -148,6 +148,11 @@ abstract class Vertragsbestandteil
 		
 		return (object) $tmp;
 	}
+
+	public function jsonSerialize()
+    {
+        return get_object_vars($this);
+    }
 	
 	public function __toString() 
 	{
