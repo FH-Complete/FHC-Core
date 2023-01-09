@@ -1092,6 +1092,38 @@ $filters = array(
 	),
 	array(
 		'app' => 'core',
+		'dataset_name' => 'employees',
+		'filter_kurzbz' => 'mitarbeiter',
+		'description' => '{MA Uebersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Mitarbeiter",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Alias"},
+					{"name": "Aktiv"},
+					{"name": "Raum"},
+					{"name": "Geschlecht"},
+					{"name": "Standardkostenstelle"}
+				],
+				"filters": [
+					{                              
+					"name": "Nachname",      
+					"option": "",            
+					"condition": "",         
+					"operation": ""          
+					}    
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
 		'dataset_name' => 'fehlerZustaendigkeiten',
 		'filter_kurzbz' => 'fehlerZustaendigkeiten',
 		'description' => '{Fehler Zustaendigkeiten}',
