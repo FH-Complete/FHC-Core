@@ -642,5 +642,30 @@ class zeitsperre extends basis_db
 			return true;
 		}
 	}
+
+	/**
+	 * liefert alle Tage eines Zeitintervalls
+	 *
+	 * @param $startDate Startdatum im Format Y-m-d
+	 * @param $endDate Endedatum im Format Y-m-d
+	 * @return $dateArray
+	 */
+	public function getDatesFromRange($startDate, $endDate)
+	{
+		$dateArray = array();
+
+		$interval = new DateInterval('P1D');
+
+		$realEnd = new DateTime($endDate);
+		$realEnd->add($interval);
+
+		$period = new DatePeriod(new DateTime($startDate), $interval, $realEnd);
+
+		foreach($period as $date)
+		{
+			$dateArray[] = $date->format('Y-m-d');
+		}
+		return $dateArray;
+	}
 }
 ?>

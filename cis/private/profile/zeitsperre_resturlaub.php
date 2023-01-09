@@ -382,19 +382,28 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$von = $_POST['vondatum'];
 		$von2 = new DateTime($von);
 		$von2 = $von2->format('Y-m-d');
+		$bis = $_POST['bisdatum'];
+		$bis2= new DateTime($bis);
+		$bis2 = $bis2->format('Y-m-d');
 		$zeitsperre = new zeitsperre();
+		$zsInterval = $zeitsperre->getDatesFromRange($von2, $bis2);
 
-		if ($zeitsperre->getSperreByDate($uid, $von2, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN))
+		foreach ($zsInterval as $day)
 		{
-			foreach ($zeitsperre->result as $z)
+			if ($zeitsperre->getSperreByDate($uid, $day, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN))
 			{
-				// Beim editieren nicht mit dem eigenen Eintrag kollidieren
-				if($_GET['type'] == 'edit_sperre' && $z->zeitsperre_id == $_GET['id'])
-					continue;
+				foreach ($zeitsperre->result as $z)
+				{
+					// Beim editieren nicht mit dem eigenen Eintrag kollidieren
+					if($_GET['type'] == 'edit_sperre' && $z->zeitsperre_id == $_GET['id'])
+						continue;
 
-				$typ = $z->zeitsperretyp_kurzbz;
-				$error = true;
-				$error_msg .= $p->t('zeitsperre/zeitsperreEingetragen', [$von, $typ]);
+					$typ = $z->zeitsperretyp_kurzbz;
+					$date = new DateTime($day);
+					$date = $date->format('d.m.Y');
+					$error = true;
+					$error_msg .= $p->t('zeitsperre/zeitsperreEingetragen', [$date, $typ]).'<br>';
+				}
 			}
 		}
 	}
