@@ -46,6 +46,7 @@ $uid = get_uid();
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
 $typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV", "CovidSB", "CovidKS");
+$dataKS = array();
 
 if(isset($_GET['type']))
 	$type=$_GET['type'];
@@ -72,7 +73,7 @@ $ma= new mitarbeiter();
 $zaufzeichnung = new zeitaufzeichnung();
 if ($sperrdat = $zaufzeichnung->getEintragungGesperrtBisForUser($uid))
 	$gesperrt_bis = $sperrdat;
-else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
+elseif (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
 	$gesperrt_bis = CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS;
 else
 	$gesperrt_bis = '2015-08-31';
@@ -158,6 +159,8 @@ $( document ).ready(function()
    }
   return [true, ""];
 }
+
+
 </script>';
 
 ?>
@@ -259,6 +262,7 @@ function checkdatum()
 	return true;
 }
 
+
 function showHideBezeichnungDropDown()
 {
 	var dd = document.zeitsperre_form.zeitsperretyp_kurzbz;
@@ -347,6 +351,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	$error_msg='';
 
 
+
 	//von-datum pruefen
 	if(isset($_POST['vondatum']) && !$datum_obj->checkDatum($_POST['vondatum']))
 	{
@@ -394,59 +399,126 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		}
 	}
 
+	//Prüfen auf angrenzenden Krankenstand //Manu
+	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
+		&& $_GET['type']=='new_sperre'
+		&& $error!=true
+		&& ($_POST['zeitsperretyp_kurzbz'] == 'Krank' ))
+	{
+		$vonDay = $_POST['vondatum'];
+		$von2 = new DateTime($von);
+		$von2 = $von2->format('Y-m-d');
+		$bisDay = $_POST['bisdatum'];
+
+		//grenzt Tag an einen anderen Krankenstand an?
+		$zs = new Zeitsperre();
+		if ($zs->getAngrenzendenKrankenstand($uid, $von2))
+		{
+			$krankenstand = $zs->result;
+			foreach ($krankenstand as $ks)
+			{
+				$text = "Es gibt einen <b>bestehenden Krankenstand von " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum)) .
+				" bis " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->bisdatum)) . "</b>.<br>";
+				$link = "<button><a href = '$PHP_SELF?type=edit&id=$ks->zeitsperre_id&editKS=1' style='text-decoration: none;color:black;'>
+				Bestehenden Krankenstand verlängern</a></button>";
+				echo $text;
+				echo $link;
+				echo "<br>";
+
+
+				$bezeichnung = $_POST['bezeichnung'];
+				$von = $_POST['vondatum'];
+				$von2 = new DateTime($von);
+				$von2 = $von2->format('Y-m-d');
+				$bis = $_POST['bisdatum'];
+				$bis2 = new DateTime($bis);
+				$bis2 = $bis2->format('Y-m-d');
+				$vertretung = $_POST['vertretung_uid'];
+				$erreichbarkeit = $_POST['erreichbarkeit'];
+				$readonly = 'readonly';
+
+				echo "<br><b>Neuer Krankenstand: von " . $von . " bis " . $bis . ": " .
+				$_POST['bezeichnung'] . "</b>";
+
+				if ($_POST['vertretung_uid'])
+				{
+					echo ", vertreten von ". $_POST['vertretung_uid'] . " (" . $erreichbarkeit .")";
+				}
+					echo "
+					<form method='POST' name='zeitsperre_form' action='$PHP_SELF?type=new_sperre&newKS=1' onsubmit='return checkdatum()'>
+
+					  <input type='hidden' name='zeitsperretyp_kurzbz' value='Krank' readonly= $readonly>
+					  <input type='hidden' name='bezeichnung' value = '$bezeichnung' readonly= $readonly>
+					  <input type='hidden' name='vonDatum' value ='$von2' readonly= $readonly >
+					  <input type='hidden' name='bisDatum' value ='$bis2' readonly= $readonly >
+					  <input type='hidden' name='vertretung' value ='$vertretung' readonly= $readonly >
+					  <input type='hidden' name='erreichbarkeit' value ='$erreichbarkeit' readonly= $readonly>
+					  <input type='submit' value='Als neuen Krankenstand eintragen'>
+					</form>
+					";
+				exit();
+			}
+		}
+	}
+
 	//von - bis-datum pruefen von darf nicht groesser als bis sein
 	// 09.02.2009 simane
-	$vondatum=0;
-	if(isset($_POST['vondatum']))
+	if(!isset($_GET['newKS']))
 	{
-		$date=explode('.',$_POST['vondatum']);
-		if (@checkdate($date[1], $date[0], $date[2]))
+		$vondatum=0;
+		if(isset($_POST['vondatum']))
 		{
-			 $vondatum=$date[2].$date[1].$date[0];
-			 $vondatum_iso = $date[2].'-'.$date[1].'-'.$date[0];
+			$date=explode('.', $_POST['vondatum']);
+			if (@checkdate($date[1], $date[0], $date[2]))
+			{
+				 $vondatum=$date[2].$date[1].$date[0];
+				 $vondatum_iso = $date[2].'-'.$date[1].'-'.$date[0];
+			}
+			else
+			{
+				$error=true;
+				$error_msg .= $p->t('zeitsperre/vonDatumUngueltig').' ';
+			}
 		}
 		else
 		{
 			$error=true;
-			$error_msg .= $p->t('zeitsperre/vonDatumUngueltig').' ';
 		}
-	}
-	else
-	{
-		$error=true;
-	}
 
-	$bisdatum=0;
-	if(isset($_POST['bisdatum']))
-	{
-		$date=explode('.',$_POST['bisdatum']);
-		if (@checkdate($date[1], $date[0], $date[2]))
+		$bisdatum=0;
+		if(isset($_POST['bisdatum']))
 		{
-			 $bisdatum=$date[2].$date[1].$date[0];
+			$date=explode('.', $_POST['bisdatum']);
+			if (@checkdate($date[1], $date[0], $date[2]))
+			{
+				 $bisdatum=$date[2].$date[1].$date[0];
+			}
+			else
+			{
+				$error=true;
+				$error_msg .= $p->t('zeitsperre/bisDatumUngueltig').' ';
+			}
 		}
 		else
 		{
 			$error=true;
-			$error_msg .= $p->t('zeitsperre/bisDatumUngueltig').' ';
+		}
+
+		if($vondatum > $bisdatum)
+		{
+			$error=true;
+			$error_msg .= $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
+		}
+
+		//von-datum pruefen TODO
+		if($vondatum_iso < $gesperrt_bis && in_array($_POST['zeitsperretyp_kurzbz'], $typen_arr)
+			&& (!isset($_GET['editKS']) ))
+		{
+			$error=true;
+			$error_msg .= $p->t('zeitsperre/vorSperrdatum');
 		}
 	}
-	else
-	{
-		$error=true;
-	}
 
-	if($vondatum > $bisdatum)
-	{
-		$error=true;
-		$error_msg .= $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
-	}
-
-	//von-datum pruefen TODO
-	if($vondatum_iso < $gesperrt_bis && in_array($_POST['zeitsperretyp_kurzbz'],$typen_arr))
-	{
-		$error=true;
-		$error_msg .= $p->t('zeitsperre/vorSperrdatum');
-	}
 
 	$zeitsperre = new zeitsperre();
 
@@ -476,94 +548,118 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$zeitsperre->insertvon = $uid;
 	}
 
-	if(!$error && $_POST['zeitsperretyp_kurzbz']=='Urlaub')
+	if(!isset($_GET['newKS']))
 	{
-		if($zeitsperre->zeitsperre_id!='')
-			$id = $zeitsperre->zeitsperre_id;
-		else
-			$id = null;
-		if($zeitsperre->UrlaubEingetragen($uid, $datum_obj->formatDatum($_POST['vondatum']),$datum_obj->formatDatum($_POST['bisdatum']), $id))
+		if(!$error && $_POST['zeitsperretyp_kurzbz']=='Urlaub')
 		{
-			$error = true;
-			$error_msg.=$p->t('zeitsperre/urlaubBereitsEingetragen');
-		}
-	}
-	if(!$error)
-	{
-		$zeitsperre->zeitsperretyp_kurzbz = $_POST['zeitsperretyp_kurzbz'];
-		$zeitsperre->mitarbeiter_uid = $uid;
-		$zeitsperre->bezeichnung = $_POST['bezeichnung'];
-		$zeitsperre->vondatum = $datum_obj->formatDatum($_POST['vondatum']);
-		$zeitsperre->vonstunde = $_POST['vonstunde'];
-		$zeitsperre->bisdatum = $datum_obj->formatDatum($_POST['bisdatum']);
-		$zeitsperre->bisstunde = $_POST['bisstunde'];
-		$zeitsperre->erreichbarkeit_kurzbz = $_POST['erreichbarkeit'];
-		$zeitsperre->vertretung_uid = $_POST['vertretung_uid'];
-		$zeitsperre->updateamum = date('Y-m-d H:i:s');
-		$zeitsperre->updatevon = $uid;
-
-		if($zeitsperre->save())
-		{
-			echo "<h3>".$p->t('global/erfolgreichgespeichert')."</h3>";
-			if(URLAUB_TOOLS)
+			if($zeitsperre->zeitsperre_id!='')
+				$id = $zeitsperre->zeitsperre_id;
+			else
+				$id = null;
+			if($zeitsperre->UrlaubEingetragen($uid, $datum_obj->formatDatum($_POST['vondatum']), $datum_obj->formatDatum($_POST['bisdatum']), $id))
 			{
-				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
+				$error = true;
+				$error_msg.=$p->t('zeitsperre/urlaubBereitsEingetragen');
+			}
+		}
+
+		if(!$error)
+		{
+			$zeitsperre->zeitsperretyp_kurzbz = $_POST['zeitsperretyp_kurzbz'];
+			$zeitsperre->mitarbeiter_uid = $uid;
+			$zeitsperre->bezeichnung = $_POST['bezeichnung'];
+			$zeitsperre->vondatum = $datum_obj->formatDatum($_POST['vondatum']);
+			$zeitsperre->vonstunde = $_POST['vonstunde'];
+			$zeitsperre->bisdatum = $datum_obj->formatDatum($_POST['bisdatum']);
+			$zeitsperre->bisstunde = $_POST['bisstunde'];
+			$zeitsperre->erreichbarkeit_kurzbz = $_POST['erreichbarkeit'];
+			$zeitsperre->vertretung_uid = $_POST['vertretung_uid'];
+			$zeitsperre->updateamum = date('Y-m-d H:i:s');
+			$zeitsperre->updatevon = $uid;
+
+			if($zeitsperre->save())
+			{
+				echo "<h3>".$p->t('global/erfolgreichgespeichert')."</h3>";
+				if(URLAUB_TOOLS)
 				{
-					//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
-					$prsn = new person();
-
-                    $vorgesetzter = $ma->getVorgesetzte($uid);
-					if($vorgesetzter)
+					if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 					{
-						$to='';
-						$fullName='';
-						foreach($ma->vorgesetzte as $vg)
-						{
-							if (!empty($to))
-                            {
-								$to.=',';
-								$fullName.=',';
-                            }
-							$to.=trim($vg.'@'.DOMAIN);
-							$name = $prsn->getFullNameFromBenutzer($vg);
-							$fullName.=$name;
-						}
+						//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
+						$prsn = new person();
 
-						$benutzer = new benutzer();
-						$benutzer->load($uid);
-						if($datum_obj->formatDatum($zeitsperre->vondatum, 'm')>=9)
-							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y')+1;
-						else
-							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
+						$vorgesetzter = $ma->getVorgesetzte($uid);
+						if($vorgesetzter)
+						{
+							$to='';
+							$fullName='';
+							foreach($ma->vorgesetzte as $vg)
+							{
+								if (!empty($to))
+								{
+									$to.=',';
+									$fullName.=',';
+								}
+								$to.=trim($vg.'@'.DOMAIN);
+								$name = $prsn->getFullNameFromBenutzer($vg);
+								$fullName.=$name;
+							}
 
-						$message = "Dies ist eine automatische Mail! \n".
-								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
-								   "$zeitsperre->bezeichnung von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y')." bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y')."\n\n".
-								   "Sie können diesen unter folgender Adresse freigeben:\n".
-								   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
-						$from='vilesci@'.DOMAIN;
-						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
-						if($mail->send())
-						{
-							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</b>";
+							$benutzer = new benutzer();
+							$benutzer->load($uid);
+							if($datum_obj->formatDatum($zeitsperre->vondatum, 'm')>=9)
+								$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y')+1;
+							else
+								$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
+
+							$message = "Dies ist eine automatische Mail! \n".
+									   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
+									   "$zeitsperre->bezeichnung von ".$datum_obj->formatDatum($zeitsperre->vondatum, 'd.m.Y')." bis ".$datum_obj->formatDatum($zeitsperre->bisdatum, 'd.m.Y')."\n\n".
+									   "Sie können diesen unter folgender Adresse freigeben:\n".
+									   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
+							$from='vilesci@'.DOMAIN;
+							$mail = new mail($to, $from, 'Freigabeansuchen', $message);
+							if($mail->send())
+							{
+								echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt', array($fullName))."</b>";
+							}
+							else
+							{
+								echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten', array($fullName))."</span>";
+							}
 						}
 						else
 						{
-							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."</span>";
+							echo "<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
 						}
-					}
-					else
-					{
-						echo "<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
 					}
 				}
 			}
+			else
+				echo "<span class='error'>".$p->t('global/fehleraufgetreten')."</span>";
 		}
 		else
-			echo "<span class='error'>".$p->t('global/fehleraufgetreten')."</span>";
+			echo "<span class='error'>$error_msg</span>";
 	}
+
+	//Krankenstand neu
 	else
-		echo "<span class='error'>$error_msg</span>";
+	{
+		if(!$error)
+		{
+			$zeitsperre->zeitsperretyp_kurzbz = $_POST['zeitsperretyp_kurzbz'];
+			$zeitsperre->mitarbeiter_uid = $uid;
+			$zeitsperre->bezeichnung = $_POST['bezeichnung'];
+			$zeitsperre->vondatum = $_POST['vonDatum'];
+			$zeitsperre->bisdatum = $datum_obj->formatDatum($_POST['bisDatum']);
+			$zeitsperre->erreichbarkeit_kurzbz = $_POST['erreichbarkeit'];
+			$zeitsperre->vertretung_uid = $_POST['vertretung'];
+			$zeitsperre->updateamum = date('Y-m-d H:i:s');
+			$zeitsperre->updatevon = $uid;
+		}
+
+			if($zeitsperre->save())
+				echo "<h3>".$p->t('global/erfolgreichgespeichert')."</h3>";
+	}
 }
 
 //loeschen eines bereits freigegebenen Urlaubs
@@ -605,20 +701,20 @@ if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['infor
         $benutzer = new benutzer();
         $benutzer->load($uid);
         $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
-            $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
+            $p->t('urlaubstool/xHatUrlaubGeloescht', array($benutzer->nachname,$benutzer->vorname)).":\n";
 
 
         $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
 
 
-        $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
+        $mail = new mail($to, 'vilesci@'.DOMAIN, $p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
         if($mail->send())
         {
-            echo "<br><b>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</b>";
+            echo "<br><b>".$p->t('urlaubstool/VorgesetzteInformiert', array($fullName))."</b>";
         }
         else
         {
-            echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
+            echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten', array($fullName))."!</span>";
         }
     }
     else
@@ -628,7 +724,7 @@ if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['infor
 }
 
 //loeschen einer zeitsperre
-if(isset($_GET['type']) && $_GET['type']=='delete_sperre' && !isset($_GET['informSupervisor'])   )
+if(isset($_GET['type']) && $_GET['type']=='delete_sperre' && !isset($_GET['informSupervisor']))
 {
 	$zeit = new zeitsperre();
 	$zeit->load($_GET['id']);
@@ -636,11 +732,11 @@ if(isset($_GET['type']) && $_GET['type']=='delete_sperre' && !isset($_GET['infor
 	//besitzer dieses datensatzes ist
 	if($zeit->mitarbeiter_uid==$uid)
 	{
-		if ($zeit->vondatum < $gesperrt_bis  && in_array($zeit->zeitsperretyp_kurzbz,$typen_arr))
+		if ($zeit->vondatum < $gesperrt_bis && in_array($zeit->zeitsperretyp_kurzbz, $typen_arr))
 		{
 			echo "<span class='error'>".$p->t('zeitsperre/vorSperrdatum')."</span>";
 		}
-		else if($zeit->delete($_GET['id']))
+		elseif($zeit->delete($_GET['id']))
 		{
 			echo $p->t('global/erfolgreichgelöscht');
 		}
@@ -692,13 +788,13 @@ if(count($zeit->result)>0)
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
 		if ($row->zeitsperretyp_kurzbz == 'DienstV' || $row->zeitsperretyp_kurzbz == 'ZVerfueg')
 			$content_table .= '<td>&nbsp;</td>';
-		else if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
+		elseif ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz, $typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
 		else
 			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
-		if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
+		if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz, $typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
-		else if($row->vondatum>=date("Y-m-d",time()) && $row->zeitsperretyp_kurzbz=='Urlaub')
+		elseif($row->vondatum>=date("Y-m-d", time()) && $row->zeitsperretyp_kurzbz=='Urlaub')
 		{
 			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id&informSupervisor=True' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
@@ -717,6 +813,13 @@ else
 
 $zeitsperre = new zeitsperre();
 $action = "$PHP_SELF?type=new_sperre";
+
+//standardvalues
+	$readonlyKS='';
+	$disabledKS='';
+	$styleKS='';
+	$classKS = ' class="datepicker_datum"';
+
 //wenn ein datensatz editiert werden soll, dann diesen laden
 if(isset($_GET['type']) && $_GET['type']=='edit')
 {
@@ -733,6 +836,17 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 	else
 	{
 		die("<span class='error'>".$p->t('global/fehlerBeiDerParameteruebergabe')."</span>");
+	}
+
+	//manu
+	if(isset($_GET['editKS']) && $_GET['editKS'] == 1)
+	{
+		//alle Parameter außer bis als readonly definieren");
+		$readonlyKS=' readonly="readonly"';	//für Textfelder
+		$disabledKS=' disabled';				//für select-options
+		$styleKS=' style="border: 1px solid #999; color: #999;"';	//disabled-Optik
+		$classKS = '';
+		$action.='&editKS=1';
 	}
 }
 
@@ -770,12 +884,12 @@ if($result = $db->db_query($qry))
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
 			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->beschreibung</OPTION>";
 		else
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled>$row->beschreibung</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled $disabledKS>$row->beschreibung</OPTION>";
 	}
 }
 $content_form.= '</SELECT></td></tr>';
 $content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td colspan="2"><span id="dienstv_span"><input'.$style.' type="text" size="32" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"'.$readonly.'></span></td></tr>';
-$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> <a href="javascript:void(0);" onClick="setBisDatum()">&dArr;</a></td><td id="vonStd"  style="text-align:right;"> ';
+$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style. $styleKS . ' type="text" '.$class. $classKS .' size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y', $datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly . $readonlyKS .'> <a href="javascript:void(0);" onClick="setBisDatum()">&dArr;</a></td><td id="vonStd"  style="text-align:right;"> ';
 //dropdown fuer vonstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 
@@ -785,19 +899,19 @@ if($zeitsperre->vonstunde=='')
 else
 	$content_form.= "<OPTION value=''$disabled>*</OPTION>\n";
 
-for($i=0;$i<$num_rows_stunde;$i++)
+for($i=0; $i<$num_rows_stunde; $i++)
 {
 	$row = $db->db_fetch_object($result_stunde, $i);
 
 	if($zeitsperre->vonstunde==$row->stunde)
-		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i', strtotime($row->beginn)).' - '.date('H:i', strtotime($row->ende))." Uhr)</OPTION>\n";
 	else
-		$content_form.= "<OPTION value='$row->stunde'$disabled>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde'$disabled>$row->stunde (".date('H:i', strtotime($row->beginn)).' - '.date('H:i', strtotime($row->ende))." Uhr)</OPTION>\n";
 }
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td id="bisStd"  style="text-align:right;"> ';
+$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y', $datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td id="bisStd"  style="text-align:right;"> ';
 //dropdown fuer bisstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 $content_form.= " <SELECT name='bisstunde'$style>\n";
@@ -807,13 +921,13 @@ if($zeitsperre->bisstunde=='')
 else
 	$content_form.= "<OPTION value=''$disabled>*</OPTION>\n";
 
-for($i=0;$i<$num_rows_stunde;$i++)
+for($i=0; $i<$num_rows_stunde; $i++)
 {
 	$row = $db->db_fetch_object($result_stunde, $i);
 	if($zeitsperre->bisstunde==$row->stunde)
-		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i', strtotime($row->beginn)).' - '.date('H:i', strtotime($row->ende))." Uhr)</OPTION>\n";
 	else
-		$content_form.= "<OPTION value='$row->stunde'$disabled>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde'$disabled>$row->stunde (".date('H:i', strtotime($row->beginn)).' - '.date('H:i', strtotime($row->ende))." Uhr)</OPTION>\n";
 }
 
 $content_form.= "</SELECT></td></tr>";
@@ -837,7 +951,7 @@ if($result = $db->db_query($qry))
 $content_form.= '</SELECT></td></tr>';
 
 $content_form.= "<tr><td>".$p->t('urlaubstool/erreichbarkeit')."</td><td><SELECT name='erreichbarkeit'>";
-foreach ($erreichbarkeit_arr as $erreichbarkeit_key=>$erreichbarkeit_beschreibung)
+foreach ($erreichbarkeit_arr as $erreichbarkeit_key => $erreichbarkeit_beschreibung)
 {
 	if($zeitsperre->erreichbarkeit_kurzbz == $erreichbarkeit_key)
 		$content_form.= "<OPTION value='$erreichbarkeit_key' selected>$erreichbarkeit_beschreibung</OPTION>\n";
@@ -850,7 +964,10 @@ $content_form.= '</SELECT></td>';
 $content_form.= '<td style="text-align:right;">';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
+{
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/speichern')."'>";
+}
+
 
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/hinzufuegen')."'>";

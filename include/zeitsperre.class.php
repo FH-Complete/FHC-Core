@@ -52,7 +52,7 @@ class zeitsperre extends basis_db
 	 * Konstruktor
 	 * @param $zeitsperre_id ID der zu ladenden Funktion
 	 */
-	public function __construct($zeitsperre_id=null)
+	public function __construct($zeitsperre_id = null)
 	{
 		parent::__construct();
 
@@ -62,7 +62,7 @@ class zeitsperre extends basis_db
 
 	public static function getBlockierendeZeitsperren()
 	{
-		return explode("','",trim(self::BLOCKIERENDE_ZEITSPERREN, '\''));
+		return explode("','", trim(self::BLOCKIERENDE_ZEITSPERREN, '\''));
 	}
 
 	/**
@@ -72,7 +72,7 @@ class zeitsperre extends basis_db
 	 * aktuellen Geschaeftsjahres geholt (1.9.-31.8.)
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getzeitsperren($uid, $bisgrenze=true)
+	public function getzeitsperren($uid, $bisgrenze = true)
 	{
 		unset($this->result);
 		$this->result=array();
@@ -94,10 +94,8 @@ class zeitsperre extends basis_db
 
 		if($this->db_query($qry))
 		{
-
 			while($row = $this->db_fetch_object())
 			{
-
 				$obj = new zeitsperre();
 
 				$obj->zeitsperre_id = $row->zeitsperre_id;
@@ -123,7 +121,6 @@ class zeitsperre extends basis_db
 				$obj->freigabevon = $row->freigabevon;
 
 				$this->result[] = $obj;
-
 			}
 			return true;
 		}
@@ -380,7 +377,7 @@ class zeitsperre extends basis_db
 	 * @param $nurblockierend boolean default false
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getSperreByDate($user, $datum, $stunde=null, $nurblockierend=false)
+	public function getSperreByDate($user, $datum, $stunde = null, $nurblockierend = false)
 	{
 		$this->result = array();
 		$qry = "
@@ -392,16 +389,17 @@ class zeitsperre extends basis_db
 				vondatum<=".$this->db_add_param($datum)."
 				AND bisdatum>=".$this->db_add_param($datum);
 
-			if( $nurblockierend ) {
-				$qry .= " AND zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
-			}
+		if($nurblockierend)
+		{
+			$qry .= " AND zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
+		}
 
-			if(!is_null($stunde))
-				$qry.=" AND
-					((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND
-					((bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") OR bisstunde is null OR bisdatum<>".$this->db_add_param($datum).")";
+		if(!is_null($stunde))
+			$qry.=" AND
+				((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND
+				((bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") OR bisstunde is null OR bisdatum<>".$this->db_add_param($datum).")";
 
-				$qry .= "AND mitarbeiter_uid=".$this->db_add_param($user);
+			$qry .= "AND mitarbeiter_uid=".$this->db_add_param($user);
 
 		if($result = $this->db_query($qry))
 		{
@@ -427,7 +425,6 @@ class zeitsperre extends basis_db
 				$obj->freigabevon = $row->freigabevon;
 
 				$this->result[] = $obj;
-
 			}
 			return true;
 		}
@@ -446,7 +443,7 @@ class zeitsperre extends basis_db
 	 * @param $bis
 	 * @param $id Eintrag mit dieser ID wird nicht beruecksichtigt (zB bei Editieren von Eintraegen)
 	 */
-	function UrlaubEingetragen($uid, $von, $bis, $id=null)
+	public function UrlaubEingetragen($uid, $von, $bis, $id = null)
 	{
 
 		$qry = "SELECT
@@ -485,14 +482,14 @@ class zeitsperre extends basis_db
 		}
 	}
 
-	 /**
+	/**
 	 * Liefert die Zeitsperren eines Users für die Zeitaufzeichnung
 	 *
 	 * @param $uid
 	 * @param $anz_tage
 	 * @return array 'datum'->'zeitsperre_kurzbz'
 	 */
-	public function getZeitsperrenForZeitaufzeichnung($uid, $anz_tage=50)
+	public function getZeitsperrenForZeitaufzeichnung($uid, $anz_tage = 50)
 	{
 		unset($this->result);
 		$this->result=array();
@@ -501,22 +498,16 @@ class zeitsperre extends basis_db
 					from  (SELECT generate_series(vondatum::timestamp, bisdatum::timestamp, '1 day') as datum, freigabevon, mitarbeiter_uid, zeitsperretyp_kurzbz FROM campus.tbl_zeitsperre where vonstunde is null and bisstunde is null) a
 					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '".$anz_tage." Days') and zeitsperretyp_kurzbz in (" . self::BLOCKIERENDE_ZEITSPERREN . ")";
 
-
-
-
 		if($this->db_query($qry))
 		{
-
 			while($row = $this->db_fetch_object())
 			{
-
-				if ($row->zeitsperretyp_kurzbz == 'Urlaub' && $row->freigabevon == NULL)
+				if ($row->zeitsperretyp_kurzbz == 'Urlaub' && $row->freigabevon == null)
 					$result[$row->datum] = "Urlaubsantrag (Freigabe fehlt)";
 				else
 					$result[$row->datum] = $row->zeitsperretyp_kurzbz;
 
 				$this->result = $result;
-
 			}
 			return true;
 		}
@@ -551,13 +542,13 @@ class zeitsperre extends basis_db
 	public function getVonBis($uid, $von, $bis, $zeitsperretyp_kurzbz = null)
 	{
 		$qry = '
-			SELECT 
+			SELECT
 				zeitsperre_id, zeitsperretyp_kurzbz, vondatum, vonstunde, bisdatum, bisstunde
-			FROM 
+			FROM
 				campus.tbl_zeitsperre
 				LEFT JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz)
-			WHERE 
-				mitarbeiter_uid = '. $this->db_add_param($uid). ' 
+			WHERE
+				mitarbeiter_uid = '. $this->db_add_param($uid). '
 				AND (
 					(vondatum BETWEEN '.$this->db_add_param($von).' AND '.$this->db_add_param($bis).')
 					OR
@@ -586,6 +577,65 @@ class zeitsperre extends basis_db
 				$obj->vonstunde = $row->vonstunde;
 				$obj->bisdatum = $row->bisdatum;
 				$obj->bisstunde = $row->bisstunde;
+
+				$this->result[]= $obj;
+			}
+			return true;
+		}
+	}
+
+	/**
+	 * Liefert zurück, ob es einen angrenzenden Krankenstand gibt
+	 * Einschränkung nach Zeitsperrentyp möglich.
+	 *
+	 * @param $uid
+	 * @param $day string Datum im Format YYYY-MM-DD
+	 * @param null $zeitsperretyp_kurzbz
+	 * @return bool
+	 */
+	public function getAngrenzendenKrankenstand($uid, $vonDay)
+	{
+		//gibt es einen Tag davor einen Krankenstand?
+		//echo $vonDay;
+		$DayBefore = strtotime("-1 day", strtotime($vonDay));
+		$woTag = date("w", $DayBefore);
+
+		//wenn vonTag Montag: gibt es einen Krankenstand bis Freitag davor?
+		if($woTag == 0)
+		{
+			$DayBefore = strtotime("-3 day", strtotime($vonDay));
+		}
+
+		$DateToCheck = date("Y-m-d", $DayBefore);
+
+		$qry = '
+			SELECT
+				zeitsperre_id, zeitsperretyp_kurzbz, vondatum, bisdatum
+			FROM
+				campus.tbl_zeitsperre
+			WHERE
+				mitarbeiter_uid = '. $this->db_add_param($uid). '
+			AND
+				zeitsperretyp_kurzbz = \'Krank\'
+			AND
+				bisdatum < '.$this->db_add_param($vonDay) . '
+			AND
+				bisdatum >= '.$this->db_add_param($DateToCheck) .';';
+
+		if (!$this->db_query($qry))
+		{
+			$this->errormsg=$this->db_last_error();
+			return false;
+		}
+		else
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+				$obj->zeitsperre_id = $row->zeitsperre_id;
+				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
+				$obj->vondatum = $row->vondatum;
+				$obj->bisdatum = $row->bisdatum;
 
 				$this->result[]= $obj;
 			}
