@@ -270,12 +270,28 @@ function drawLehrauftrag($uid)
 
 	//Lehreinheiten
 	$qry = "
-		SELECT
-			*
-		FROM
-			campus.vw_lehreinheit
-			JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id, mitarbeiter_uid)
-			JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
+		 SELECT
+			tbl_lehreinheit.lehreinheit_id,
+			lv.bezeichnung AS lv_bezeichnung,
+			tbl_lehreinheit.lehrform_kurzbz,
+			lehrfach.oe_kurzbz AS lehrfach_oe_kurzbz,
+			legruppe.gruppe_kurzbz,
+			lv.studiengang_kz AS lv_studiengang_kz,
+			lv.semester AS lv_semester,
+			legruppe.semester,
+			legruppe.studiengang_kz,
+			legruppe.verband,
+			legruppe.gruppe,
+			lema.semesterstunden,
+			lema.stundensatz,
+			lema.faktor
+		FROM lehre.tbl_lehreinheit
+			JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
+			JOIN lehre.tbl_lehrveranstaltung lehrfach ON tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id
+			JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+			JOIN tbl_mitarbeiter USING (mitarbeiter_uid)
+			LEFT JOIN lehre.tbl_lehreinheitgruppe legruppe USING (lehreinheit_id)
+			JOIN lehre.tbl_vertrag_vertragsstatus vvst ON lema.vertrag_id = vvst.vertrag_id
 		WHERE
 			mitarbeiter_uid=".$db->db_add_param($uid)."
 			AND studiensemester_kurzbz=".$db->db_add_param($ss). "
@@ -284,22 +300,22 @@ function drawLehrauftrag($uid)
 
 	if ($studiengang_kz != '') //$studiengang_kz!='0' &&
 	{
-		$qry .= " AND lv_studiengang_kz=".$db->db_add_param($studiengang_kz);
+		$qry .= " AND lv.studiengang_kz=".$db->db_add_param($studiengang_kz);
 	}
 	elseif (!empty($xsl_oe_kurzbz))
 	{
 		if ($xsl_oe_kurzbz == 'etw')
 		{
-			$qry .= " AND lv_studiengang_kz > 0";
+			$qry .= " AND lv.studiengang_kz > 0";
 		}
 
 		if ($xsl_oe_kurzbz == 'lehrgang')
 		{
-			$qry .= " AND lv_studiengang_kz <= 0";
+			$qry .= " AND lv.studiengang_kz <= 0";
 		}
 	}
 
-	$qry .= " ORDER BY lv_orgform_kurzbz, lv_bezeichnung, lehreinheit_id";
+	$qry .= " ORDER BY lv.orgform_kurzbz, lv.bezeichnung, lehreinheit_id";
 	$lv = array();
 	$anzahl_lvs = 0;
 	if ($result = $db->db_query($qry))
@@ -355,8 +371,8 @@ function drawLehrauftrag($uid)
 
 			if ($row->gruppe_kurzbz != '')
 				$gruppen[] = $row->gruppe_kurzbz;
-			else
-				$gruppen[] = trim($stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe).' ';
+			elseif (isset($stg_arr[$row->studiengang_kz]))
+				$gruppen[] =  trim($stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe).' ';
 
 			$stunden = $row->semesterstunden;
 			$satz = $row->stundensatz;
