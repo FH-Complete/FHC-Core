@@ -687,7 +687,7 @@ class reihungstest extends basis_db
 					tbl_reihungstest.anmeldefrist,
 					tbl_reihungstest.aufnahmegruppe_kurzbz,
 					tbl_studiengang.typ,
-					tbl_studiengang.kurzbzlang
+					UPPER(typ::varchar(1) || kurzbz) AS stg_kuerzel
 				FROM
 					public.tbl_rt_person
 				JOIN 
@@ -733,7 +733,7 @@ class reihungstest extends basis_db
 				$obj->anmeldefrist = $row->anmeldefrist;
 				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$obj->typ = $row->typ;
-				$obj->kurzbzlang = $row->kurzbzlang;
+				$obj->stg_kuerzel = $row->stg_kuerzel;
 
 				$this->result[] = $obj;
 			}
