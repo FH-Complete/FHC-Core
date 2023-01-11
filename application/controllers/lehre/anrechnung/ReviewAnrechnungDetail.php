@@ -94,10 +94,14 @@ class reviewAnrechnungDetail extends Auth_Controller
 		// Get Empfehlung data
 		$empfehlungData = $this->anrechnunglib->getEmpfehlungData($anrechnung_id);
 
+        // False if LV-Leitung is present and user is not LV-Leitung. Otherwise always true.
+        $isEmpfehlungsberechtigt = $this->anrechnunglib->isEmpfehlungsberechtigt($anrechnung_id);
+
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
-			'empfehlungData' => $empfehlungData
+			'empfehlungData' => $empfehlungData,
+            'isEmpfehlungsberechtigt' => $isEmpfehlungsberechtigt
 		);
 
 		$this->load->view('lehre/anrechnung/reviewAnrechnungDetail.php', $viewData);

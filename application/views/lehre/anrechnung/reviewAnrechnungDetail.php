@@ -287,12 +287,12 @@ $this->load->view(
 						<div class="pull-right">
 							<button id="reviewAnrechnungDetail-dont-recommend-anrechnung-ask" class="btn btn-danger btn-w200"
 									type="button"
-								<?php echo is_null($empfehlungData->empfehlung) ? '' : 'disabled' ?>>
+								<?php echo (is_null($empfehlungData->empfehlung) && $isEmpfehlungsberechtigt) ? '' : 'disabled' ?>>
 								<?php echo ucfirst($this->p->t('anrechnung', 'nichtEmpfehlen')); ?>
 							</button>
 							<button id="reviewAnrechnungDetail-recommend-anrechnung-ask" class="btn btn-primary btn-w200"
 									type="button"
-								<?php echo is_null($empfehlungData->empfehlung) ? '' : 'disabled' ?>>
+								<?php echo (is_null($empfehlungData->empfehlung) && $isEmpfehlungsberechtigt) ? '' : 'disabled' ?>>
 								<?php echo ucfirst($this->p->t('anrechnung', 'empfehlen')); ?>
 							</button>
 						</div>
