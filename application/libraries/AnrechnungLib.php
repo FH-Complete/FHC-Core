@@ -795,11 +795,14 @@ class AnrechnungLib
 		
 		// Check if lv has LV-Leitung
 		$key = array_search(true, array_column($result, 'lvleiter'));
-		
-		// If lv has LV-Leitung, keep only the one
+
+		// If lv has 1 or more LV-Leitungen, keep only them
 		if ($key !== false)
 		{
-			$lector_arr[]= $result[$key];
+            foreach ($result as $lector)
+            {
+                if ($lector->lvleiter) $lector_arr[]= $lector;
+            }
 		}
 		// ...otherwise keep all lectors
 		else
