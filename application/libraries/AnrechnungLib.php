@@ -762,6 +762,21 @@ class AnrechnungLib
 		// Continue, if LV has no lector (there is no one to ask for recommendation)
 		return hasData($result) ? true : false;
 	}
+
+    /**
+     * Check if user is allowed to recommend Anrechnung.
+     *
+     * @param $anrechnung_id
+     * @return bool
+     */
+    public function isEmpfehlungsberechtigt($anrechnung_id)
+    {
+        // Get lv-leitungen or, if not present, all lectors of lv.
+        $lector_arr = $this->getLectors($anrechnung_id);
+
+        // Return false if lv-leitung is present and user is not lv-leitung. Otherways return always true.
+        return in_array(getAuthUID(), array_column($lector_arr, 'uid'));
+    }
 	
 	/**
 	 * Get LV Leitung. If not present, get all LV lectors.
