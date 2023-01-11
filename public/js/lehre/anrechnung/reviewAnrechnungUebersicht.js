@@ -51,6 +51,12 @@ function hf_filterTrueFalse(headerValue, rowValue){
     }
 }
 
+// Filters empfehlungsberechtigt boolean values
+function hf_empfehlungsberechtigt(headerValue, rowValue){
+
+    return rowValue == headerValue.toString();
+}
+
 // Adds column details
 function func_tableBuilt(table) {
     table.addColumn(
@@ -74,9 +80,10 @@ function func_tableBuilt(table) {
 // Formats the rows
 function func_rowFormatter(row){
     let status_kurzbz = row.getData().status_kurzbz;
+    let empfehlungsberechtigt = row.getData().empfehlungsberechtigt;
 
     row.getCells().forEach(function(cell){
-        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR)
+        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || empfehlungsberechtigt == "false")
         {
             row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
         }
@@ -86,9 +93,10 @@ function func_rowFormatter(row){
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
     let status_kurzbz = row.getData().status_kurzbz;
+    let empfehlungsberechtigt = row.getData().empfehlungsberechtigt;
 
     return (
-        status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+        status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || empfehlungsberechtigt == "false"
     );
 }
 

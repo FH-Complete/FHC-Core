@@ -46,16 +46,40 @@ $query = '
 		LEFT JOIN campus.tbl_dms_version AS dmsversion USING (dms_id)
 		JOIN lehre.tbl_anrechnung_anrechnungstatus USING (anrechnung_id)
 		JOIN lehre.tbl_anrechnung_begruendung AS begruendung USING (begruendung_id)
-	)
+		WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+	),
+	tbl_lvleitungen AS 
+    (
+        SELECT DISTINCT ON (benutzer.uid, lehrveranstaltung_id) lehrveranstaltung_id, uid, 
+            CASE WHEN lehrfunktion_kurzbz = \'LV-Leitung\' THEN TRUE 
+            ELSE FALSE 
+            END AS lvleiter
+        FROM lehre.tbl_lehreinheit
+        JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+        JOIN public.tbl_benutzer benutzer ON lema.mitarbeiter_uid = benutzer.uid
+        JOIN public.tbl_person USING (person_id)
+        JOIN lehre.tbl_anrechnung USING (lehrveranstaltung_id)
+        WHERE tbl_lehreinheit.studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+        AND benutzer.aktiv = TRUE
+        AND tbl_person.aktiv = TRUE
+        ORDER BY lehrveranstaltung_id, benutzer.uid, lehrfunktion_kurzbz DESC
+    )
 	
 	SELECT DISTINCT ON (anrechnungen.*, lema.mitarbeiter_uid) anrechnungen.*,
-	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung"
+	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
+	CASE 
+        -- erst prüfen, ob es überhaupt eine LV Leitung gibt (wenn nicht, dann immer empfehlungsberechtigt)
+        WHEN EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE) 
+        -- wenn ja, return true, wenn user LV Leitung ist oder false, wenn nicht
+        THEN (SELECT EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE AND uid = \'' . $LEKTOR_UID . '\'))
+        -- wenn es keine LV Leitung, return immer true
+        ELSE TRUE
+	END AS empfehlungsberechtigt
 	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
 	JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
-	WHERE anrechnungen.studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
-	AND le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
+	WHERE le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
 	AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'
 	AND le.lehre = TRUE
 	AND EXISTS (
@@ -89,7 +113,8 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
-		'Status'
+		'Status',
+        'empfehlungsberechtigt'
 	),
 	'datasetRepOptions' => '{
 		height: func_height(this),
@@ -98,6 +123,7 @@ $filterWidgetArray = array(
 		persistentSort:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",
+	    initialHeaderFilter: [{field:"empfehlungsberechtigt", value: true}], 
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
@@ -139,7 +165,10 @@ $filterWidgetArray = array(
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false, headerFilter:"input"},
-		status_bezeichnung: {headerFilter:"input"}
+		status_bezeichnung: {headerFilter:"input"},
+		empfehlungsberechtigt: {formatter:"tickCross", align:"center", 
+		    headerFilter:"tickCross", headerFilterParams:{"tristate": true, "initial": true}, headerFilterFunc: hf_empfehlungsberechtigt
+        }
 	 }', // col properties
 );
 
