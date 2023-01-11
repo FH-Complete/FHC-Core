@@ -285,11 +285,6 @@ if ($result_stg = $db->db_query($qry_stg))
 					AND studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)."
 					AND tbl_lehreinheitmitarbeiter.semesterstunden <> 0
 					AND tbl_lehreinheitmitarbeiter.semesterstunden IS NOT NULL
-					AND EXISTS (
-						SELECT lehreinheit_id
-						FROM lehre.tbl_lehreinheitgruppe
-						WHERE lehreinheit_id = tbl_lehreinheit.lehreinheit_id
-						)
 				ORDER BY nachname,
 					vorname,
 					tbl_mitarbeiter.mitarbeiter_uid";
@@ -442,13 +437,7 @@ if ($result_stg = $db->db_query($qry_stg))
 										tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 										tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 										tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
-										EXISTS (
-											SELECT lehreinheit_id
-											FROM
-												lehre.tbl_lehreinheitgruppe
-											WHERE
-												lehreinheit_id=tbl_lehreinheit.lehreinheit_id) AND
-												tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).");";
+										tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).");";
 
 			if ($result = $db->db_query($qry))
 			{
