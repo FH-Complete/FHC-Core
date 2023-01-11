@@ -81,6 +81,19 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			show_error(getError($studiengang_kz_arr));
 		}
 
+        // Get oes the user is entitled for
+        $oe_kurzbz_arr_schreibberechtigt = array();
+        if ($oe_arr = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN))
+        {
+            foreach($oe_arr as $oe)
+            {
+                $berechtigt = $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $oe);
+
+                if ($berechtigt) $oe_kurzbz_arr_schreibberechtigt[]= $oe;
+            }
+        }
+
+        // Check if permission is readonly
         $hasReadOnlyAccess =
             $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's')
             && !$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid');
@@ -90,7 +103,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		$viewData = array(
 			'studiensemester_selected' => $studiensemester_kurzbz,
-			'studiengaenge_entitled' => $studiengang_kz_arr,
+            'studiengaenge_entitled' => $studiengang_kz_arr,                // alle STG mit Lese- und Schreibberechtigung
+            'oes_schreibberechtigt' => $oe_kurzbz_arr_schreibberechtigt,    // alle STG nur mit Schreibberechtigung
             'hasReadOnlyAccess' => $hasReadOnlyAccess,
             'hasCreateAnrechnungAccess' => $hasCreateAnrechnungAccess
 		);

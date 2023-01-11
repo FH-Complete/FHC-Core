@@ -3,7 +3,8 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 
 $STUDIENSEMESTER = $studiensemester_selected;
-$STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);
+$STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);						// alle STG mit Lese- und Schreibberechtigung
+$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'". implode(', ', $oes_schreibberechtigt). "'";		// alle STG nur mit Schreibberechtigung
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '0' : '1';
 
 $query = '
@@ -14,6 +15,10 @@ $query = '
 			anrechnung.lehrveranstaltung_id,
 			anrechnung.begruendung_id,
 			anrechnung.dms_id,
+			CASE
+				WHEN stg.typ || stg.kurzbz IN (' . $ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT . ') THEN TRUE
+				ELSE FALSE
+			END "schreibberechtigt",
 			anrechnung.studiensemester_kurzbz,
 			stg.studiengang_kz,
 			stg.bezeichnung AS stg_bezeichnung,
@@ -71,6 +76,7 @@ $query = '
             anrechnungen.lehrveranstaltung_id,
 			anrechnungen.begruendung_id,
 			anrechnungen.dms_id,
+			anrechnungen.schreibberechtigt,
 			anrechnungen.studiensemester_kurzbz,
 			anrechnungen.studiengang_kz,
 			anrechnungen.stg_bezeichnung,
@@ -141,6 +147,7 @@ $filterWidgetArray = array(
 		'lehrveranstaltung_id',
 		'begruendung_id',
 		'dms_id',
+		'schreibberechtigt',
 		'studiensemester_kurzbz',
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),
@@ -172,6 +179,7 @@ $filterWidgetArray = array(
 		persistentFilter:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",
+	    initialHeaderFilter: [{field:"schreibberechtigt", value: true}], 
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
@@ -200,6 +208,10 @@ $filterWidgetArray = array(
 		lehrveranstaltung_id: {visible: false, headerFilter:"input"},
 		begruendung_id: {visible: false, headerFilter:"input"},
 		dms_id: {visible: false, headerFilter:"input"},
+		schreibberechtigt: {
+			formatter:"tickCross", align:"center", 
+		    headerFilter:"tickCross", headerFilterParams:{"tristate": true, "initial": true}, headerFilterFunc: hf_schreibberechtigt
+		},
 		studiensemester_kurzbz: {visible: false, headerFilter:"input"},
 		studiengang_kz: {visible: false, headerFilter:"input"},
 		stg_bezeichnung: {headerFilter:"input"},

@@ -57,6 +57,12 @@ function hf_filterTrueFalse(headerValue, rowValue){
     }
 }
 
+// Filters schreibberechtigt boolean values
+function hf_schreibberechtigt(headerValue, rowValue){
+
+    return rowValue == headerValue.toString();
+}
+
 // Adds column details
 // Sets focus on filterbutton, if table starts with stored filter.
 function func_tableBuilt(table) {
@@ -173,19 +179,22 @@ function func_selectableCheck(row){
 // data = selected data, rows = selected rows
 function func_rowSelectionChanged(data, rows){
 
-    // Sum up over all anzurechnenden LV-ECTS by Prestudent
-    selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
+    if (tabulator != null)
+    {
+        // Sum up over all anzurechnenden LV-ECTS by Prestudent
+        selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
 
-    // Loop through all active rows
-    var rowManager = tabulator.rowManager;
-    for (var i = 0; i < rowManager.activeRows.length; i++) {
+        // Loop through all active rows
+        var rowManager = tabulator.rowManager;
+        for (var i = 0; i < rowManager.activeRows.length; i++) {
 
-        // Reinitialize row -> triggers formatters.
-        rowManager.activeRows[i].reinitialize();
+            // Reinitialize row -> triggers formatters.
+            rowManager.activeRows[i].reinitialize();
+        }
+
+        // Show number of selected rows.
+        approveAnrechnung.showNumberSelectedRows(rows);
     }
-
-    // Show number of selected rows.
-    approveAnrechnung.showNumberSelectedRows(rows);
 }
 
 // Returns tooltip
