@@ -78,7 +78,6 @@ elseif (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GES
 else
 	$gesperrt_bis = '2015-08-31';
 
-//echo $gesperrt_bis;
 
 //Stundentabelleholen
 if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
@@ -351,7 +350,6 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	$error_msg='';
 
 
-
 	//von-datum pruefen
 	if(isset($_POST['vondatum']) && !$datum_obj->checkDatum($_POST['vondatum']))
 	{
@@ -408,7 +406,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		}
 	}
 
-	//Prüfen auf angrenzenden Krankenstand //Manu
+	//Prüfen auf angrenzenden Krankenstand
 	if (isset($_POST['bisdatum']) && isset($_POST['vondatum'])
 		&& $_GET['type']=='new_sperre'
 		&& $error!=true
@@ -426,14 +424,33 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 			$krankenstand = $zs->result;
 			foreach ($krankenstand as $ks)
 			{
-				$text = "Es gibt einen <b>bestehenden Krankenstand von " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum)) .
-				" bis " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->bisdatum)) . "</b>.<br>";
-				$link = "<button><a href = '$PHP_SELF?type=edit&id=$ks->zeitsperre_id&editKS=1' style='text-decoration: none;color:black;'>
-				Bestehenden Krankenstand verlängern</a></button>";
+				$text = "<p>Es gibt einen <b>bestehenden Krankenstand von " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum)) .
+				" bis " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->bisdatum)) . "</b>. Möchten Sie diesen bis <b>" . $bisDay . " </b>verlängern?</p>";
+
+				$bezeichnung = isset($ks->bezeichnung) ? $ks->bezeichnung : '';
+				$vertretung_uid = isset($ks->vertretung_uid) ? $ks->vertretung_uid : '';
+				$erreichbarkeit_kurzbz = isset($ks->erreichbarkeit_kurzbz) ? $ks->erreichbarkeit_kurzbz : '';
+				$vonedit = date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum));
+				$bisedit = $_POST['bisdatum'];
+				$readonly = 'readonly';
+
+				$link = "
+					<form method='POST' name='zeitsperre_form' action='$PHP_SELF?type=edit_sperre&id=$ks->zeitsperre_id&editKS=1' onsubmit='return checkdatum()'>
+
+					  <input type='hidden' name='zeitsperretyp_kurzbz' value='$ks->zeitsperretyp_kurzbz' readonly= $readonly>
+					  <input type='hidden' name='bezeichnung' value = '$bezeichnung' readonly= $readonly>
+					  <input type='hidden' name='vondatum' value ='$vonedit' readonly= $readonly >
+					  <input type='hidden' name='bisdatum' value ='$bisedit' readonly= $readonly >
+						<input type='hidden' name='vonstunde' value ='' readonly= $readonly >
+					  <input type='hidden' name='bisstunde' value ='' readonly= $readonly >
+					  <input type='hidden' name='vertretung_uid' value ='$vertretung_uid' readonly= $readonly >
+					  <input type='hidden' name='erreichbarkeit' value ='$erreichbarkeit_kurzbz' readonly= $readonly>
+					  <input type='submit' value='Bestehenden Krankenstand verlängern'>
+					</form>
+				";
 				echo $text;
 				echo $link;
-				echo "<br>";
-
+				echo "<br><hr><br>";
 
 				$bezeichnung = $_POST['bezeichnung'];
 				$von = $_POST['vondatum'];
@@ -446,14 +463,15 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 				$erreichbarkeit = $_POST['erreichbarkeit'];
 				$readonly = 'readonly';
 
-				echo "<br><b>Neuer Krankenstand: von " . $von . " bis " . $bis . ": " .
+				echo "<p><b>Neuer Krankenstand: von " . $von . " bis " . $bis . ": " .
 				$_POST['bezeichnung'] . "</b>";
 
 				if ($_POST['vertretung_uid'])
 				{
 					echo ", vertreten von ". $_POST['vertretung_uid'] . " (" . $erreichbarkeit .")";
 				}
-					echo "
+				echo "</p>";
+				echo "
 					<form method='POST' name='zeitsperre_form' action='$PHP_SELF?type=new_sperre&newKS=1' onsubmit='return checkdatum()'>
 
 					  <input type='hidden' name='zeitsperretyp_kurzbz' value='Krank' readonly= $readonly>
@@ -464,6 +482,10 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 					  <input type='hidden' name='erreichbarkeit' value ='$erreichbarkeit' readonly= $readonly>
 					  <input type='submit' value='Als neuen Krankenstand eintragen'>
 					</form>
+</td></tr></table>
+</div>
+</body>
+</html>
 					";
 				exit();
 			}
@@ -588,7 +610,8 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 
 			if($zeitsperre->save())
 			{
-				echo "<h3>".$p->t('global/erfolgreichgespeichert')."</h3>";
+				echo "<h3 style='color: green'>".$p->t('global/erfolgreichgespeichert')."</h3>";
+				unset($_POST);
 				if(URLAUB_TOOLS)
 				{
 					if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
@@ -667,7 +690,8 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		}
 
 			if($zeitsperre->save())
-				echo "<h3>".$p->t('global/erfolgreichgespeichert')."</h3>";
+				echo "<h3 style='color: green'>".$p->t('global/erfolgreichgespeichert')."</h3>";
+				unset($_POST);
 	}
 }
 
@@ -797,11 +821,11 @@ if(count($zeit->result)>0)
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
 		if ($row->zeitsperretyp_kurzbz == 'DienstV' || $row->zeitsperretyp_kurzbz == 'ZVerfueg')
 			$content_table .= '<td>&nbsp;</td>';
-		elseif ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz, $typen_arr))
+		elseif ($row->vondatum < $gesperrt_bis and in_array($row->zeitsperretyp_kurzbz, $typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
 		else
 			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
-		if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz, $typen_arr))
+		if ($row->vondatum < $gesperrt_bis and in_array($row->zeitsperretyp_kurzbz, $typen_arr))
 			$content_table .= '<td>&nbsp;</td>';
 		elseif($row->vondatum>=date("Y-m-d", time()) && $row->zeitsperretyp_kurzbz=='Urlaub')
 		{
@@ -847,7 +871,6 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		die("<span class='error'>".$p->t('global/fehlerBeiDerParameteruebergabe')."</span>");
 	}
 
-	//manu
 	if(isset($_GET['editKS']) && $_GET['editKS'] == 1)
 	{
 		//alle Parameter außer bis als readonly definieren");
@@ -857,6 +880,18 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		$classKS = '';
 		$action.='&editKS=1';
 	}
+}
+else
+{
+	// mit eventuell schon geposteten Werten initialisieren
+	if(isset($_POST['zeitsperretyp_kurzbz'])) $zeitsperre->zeitsperretyp_kurzbz = $_POST['zeitsperretyp_kurzbz'];
+	if(isset($_POST['bezeichnung'])) $zeitsperre->bezeichnung = $_POST['bezeichnung'];
+	if(isset($_POST['vondatum'])) $zeitsperre->vondatum = $datum_obj->formatDatum($_POST['vondatum']);
+	if(isset($_POST['vonstunde'])) $zeitsperre->vonstunde = $_POST['vonstunde'];
+	if(isset($_POST['bisdatum'])) $zeitsperre->bisdatum = $datum_obj->formatDatum($_POST['bisdatum']);
+	if(isset($_POST['bisstunde'])) $zeitsperre->bisstunde = $_POST['bisstunde'];
+	if(isset($_POST['erreichbarkeit'])) $zeitsperre->erreichbarkeit_kurzbz = $_POST['erreichbarkeit'];
+	if(isset($_POST['vertretung_uid'])) $zeitsperre->vertretung_uid = $_POST['vertretung_uid'];
 }
 
 if($zeitsperre->freigabeamum!='' && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
@@ -904,7 +939,7 @@ $content_form.= $p->t('zeitsperre/stundeInklusive');
 
 $content_form.= " <SELECT name='vonstunde'$style>\n";
 if($zeitsperre->vonstunde=='')
-	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
+	$content_form.= "<OPTION value='' selected>*</OPTION>\n";
 else
 	$content_form.= "<OPTION value=''$disabled>*</OPTION>\n";
 
@@ -926,7 +961,7 @@ $content_form.= $p->t('zeitsperre/stundeInklusive');
 $content_form.= " <SELECT name='bisstunde'$style>\n";
 
 if($zeitsperre->bisstunde=='')
-	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
+	$content_form.= "<OPTION value='' selected>*</OPTION>\n";
 else
 	$content_form.= "<OPTION value=''$disabled>*</OPTION>\n";
 
@@ -1001,6 +1036,6 @@ echo '</table>';
 ?>
 </td></tr></table>
 </div>
-<body>
+</body>
 </html>
 <?php echo '<script>showHideStudeDropDown();</script>'; ?>

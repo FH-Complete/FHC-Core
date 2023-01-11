@@ -596,7 +596,6 @@ class zeitsperre extends basis_db
 	public function getAngrenzendenKrankenstand($uid, $vonDay)
 	{
 		//gibt es einen Tag davor einen Krankenstand?
-		//echo $vonDay;
 		$DayBefore = strtotime("-1 day", strtotime($vonDay));
 		$woTag = date("w", $DayBefore);
 
@@ -610,7 +609,7 @@ class zeitsperre extends basis_db
 
 		$qry = '
 			SELECT
-				zeitsperre_id, zeitsperretyp_kurzbz, vondatum, bisdatum
+				*
 			FROM
 				campus.tbl_zeitsperre
 			WHERE
@@ -631,13 +630,7 @@ class zeitsperre extends basis_db
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$obj = new stdClass();
-				$obj->zeitsperre_id = $row->zeitsperre_id;
-				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
-				$obj->vondatum = $row->vondatum;
-				$obj->bisdatum = $row->bisdatum;
-
-				$this->result[]= $obj;
+				$this->result[]= $row;
 			}
 			return true;
 		}
@@ -653,12 +646,9 @@ class zeitsperre extends basis_db
 	public function getDatesFromRange($startDate, $endDate)
 	{
 		$dateArray = array();
-
 		$interval = new DateInterval('P1D');
-
 		$realEnd = new DateTime($endDate);
 		$realEnd->add($interval);
-
 		$period = new DatePeriod(new DateTime($startDate), $interval, $realEnd);
 
 		foreach($period as $date)
