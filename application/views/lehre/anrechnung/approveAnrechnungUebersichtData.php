@@ -107,8 +107,39 @@ $query = '
                     AND status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR . '\'
                     ORDER BY insertamum DESC
                     LIMIT 1)
-            END "empfehlungsanfrageAm",
-            CASE
+            END "empfehlungsanfrageAm",';
+
+$this->load->config('anrechnung');
+if ($this->config->item('fbl') === TRUE)
+{
+	$query.= ' CASE
+                WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
+                ELSE
+                (SELECT COALESCE(
+                        STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') 
+                    ) empfehlungsanfrageAn
+                    FROM (
+                        SELECT DISTINCT ON (benutzer.uid) bf.uid, vorname, nachname
+                        FROM lehre.tbl_lehreinheit
+					JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+					JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
+					JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)		
+                        JOIN public.tbl_benutzer benutzer ON bf.uid = benutzer.uid
+                        JOIN public.tbl_person USING (person_id)
+                        WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+						and bf.datum_von <= now()
+						and (bf.datum_bis >= now() or bf.datum_bis is null)
+                        AND lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id
+                        AND benutzer.aktiv = TRUE
+                        AND tbl_person.aktiv = TRUE
+                        ORDER BY benutzer.uid, nachname, vorname
+                        ) as tmp_lvlektoren
+                    )
+            END "empfehlungsanfrageAn"';
+}
+else
+{
+	$query.= ' CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
                 ELSE
                 (SELECT COALESCE(
@@ -130,8 +161,10 @@ $query = '
                         ORDER BY benutzer.uid, lvleiter DESC, nachname, vorname
                         ) as tmp_lvlektoren
                     )
-            END "empfehlungsanfrageAn"
-	FROM anrechnungen
+            END "empfehlungsanfrageAn"';
+}
+
+$query.= '	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
 	AND studiengang_kz IN (' . $STUDIENGAENGE_ENTITLED . ')
@@ -147,7 +180,7 @@ $filterWidgetArray = array(
 		'lehrveranstaltung_id',
 		'begruendung_id',
 		'dms_id',
-		'schreibberechtigt',
+		'Schreibberechtigt',
 		'studiensemester_kurzbz',
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),

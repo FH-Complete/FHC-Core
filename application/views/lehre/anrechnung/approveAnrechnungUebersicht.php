@@ -124,14 +124,7 @@ $this->load->view(
         <!-- Tabelle -->
         <div class="row">
             <div class="col-xs-12">
-                <?php
-                // Load configs
-                $this->load->config('anrechnung');
-                if ($this->config->item('fbl') === TRUE)
-                    $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData_fbl.php');
-                else
-                    $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php');
-                ?>
+                <?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
             </div>
         </div>
         <!-- Genehmigen / Ablehnen Panel -->

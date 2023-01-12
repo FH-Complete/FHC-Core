@@ -63,32 +63,77 @@ $query = '
         AND benutzer.aktiv = TRUE
         AND tbl_person.aktiv = TRUE
         ORDER BY lehrveranstaltung_id, benutzer.uid, lehrfunktion_kurzbz DESC
-    )
-	
-	SELECT DISTINCT ON (anrechnungen.*, lema.mitarbeiter_uid) anrechnungen.*,
-	array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
-	CASE 
-        -- erst prüfen, ob es überhaupt eine LV Leitung gibt (wenn nicht, dann immer empfehlungsberechtigt)
-        WHEN EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE) 
-        -- wenn ja, return true, wenn user LV Leitung ist oder false, wenn nicht
-        THEN (SELECT EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE AND uid = \'' . $LEKTOR_UID . '\'))
-        -- wenn es keine LV Leitung, return immer true
-        ELSE TRUE
-	END AS empfehlungsberechtigt
-	FROM anrechnungen
-	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
-	JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
-	JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
-	WHERE le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
-	AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'
-	AND le.lehre = TRUE
-	AND EXISTS (
-		SELECT 1
-		FROM lehre.tbl_anrechnung_anrechnungstatus
-		WHERE anrechnung_id = anrechnungen.anrechnung_id
-		AND status_kurzbz=\'inProgressLektor\'
-	)
-';
+    )';
+
+$this->load->config('anrechnung');
+if ($this->config->item('fbl') === TRUE)
+{
+    $query.= '
+        SELECT DISTINCT /*ON (anrechnungen.*, bf.uid)*/ 
+            CASE 
+            -- erst prüfen, ob es überhaupt eine LV Leitung gibt (wenn nicht, dann immer empfehlungsberechtigt)
+            WHEN EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE) 
+            -- wenn ja, return true, wenn user LV Leitung ist oder false, wenn nicht
+            THEN (SELECT EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE AND uid = \'' . $LEKTOR_UID . '\'))
+            -- wenn es keine LV Leitung, return immer true
+            ELSE TRUE
+        END AS empfehlungsberechtigt,
+        anrechnungen.*,
+        array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung"
+        FROM anrechnungen
+        JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
+        JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
+        /*JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)*/
+        JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+        JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
+        JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)	
+            WHERE anrechnungen.studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+            AND le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
+        /*AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'*/
+            AND le.lehre = TRUE
+        AND bf.funktion_kurzbz = \'Leitung\'
+        and bf.datum_von <= now()
+        and (bf.datum_bis >= now() or bf.datum_bis is null)
+        AND og.organisationseinheittyp_kurzbz = \'Fachbereich\'	
+        AND bf.uid =  \'' . $LEKTOR_UID . '\'
+            AND EXISTS (
+                SELECT 1
+                FROM lehre.tbl_anrechnung_anrechnungstatus
+                WHERE anrechnung_id = anrechnungen.anrechnung_id
+                AND status_kurzbz=\'inProgressLektor\'
+            )
+        order by empfehlung_anrechnung NULLS FIRST, antragsdatum
+    ';
+}
+else
+{
+    $query.= '
+        SELECT DISTINCT ON (anrechnungen.*, lema.mitarbeiter_uid) 
+        CASE 
+            -- erst prüfen, ob es überhaupt eine LV Leitung gibt (wenn nicht, dann immer empfehlungsberechtigt)
+            WHEN EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE) 
+            -- wenn ja, return true, wenn user LV Leitung ist oder false, wenn nicht
+            THEN (SELECT EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE AND uid = \'' . $LEKTOR_UID . '\'))
+            -- wenn es keine LV Leitung, return immer true
+            ELSE TRUE
+        END AS empfehlungsberechtigt,
+        anrechnungen.*,
+        array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung"
+        FROM anrechnungen
+        JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
+        JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
+        JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+        WHERE le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
+        AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'
+        AND le.lehre = TRUE
+        AND EXISTS (
+            SELECT 1
+            FROM lehre.tbl_anrechnung_anrechnungstatus
+            WHERE anrechnung_id = anrechnungen.anrechnung_id
+            AND status_kurzbz=\'inProgressLektor\'
+        )
+    ';
+}
 
 $filterWidgetArray = array(
 	'query' => $query,
@@ -96,6 +141,7 @@ $filterWidgetArray = array(
 	'requiredPermissions' => 'lehre/anrechnung_empfehlen',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
+        'Empfehlungsberechtigt',
 		'anrechnung_id',
 		'lehrveranstaltung_id',
 		'begruendung_id',
@@ -113,8 +159,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
-		'Status',
-        'empfehlungsberechtigt'
+		'Status'
 	),
 	'datasetRepOptions' => '{
 		height: func_height(this),
@@ -148,6 +193,9 @@ $filterWidgetArray = array(
         }
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
+		empfehlungsberechtigt: {formatter:"tickCross", align:"center", headerTooltip:"Berechtigt wenn man die LV leitet oder wenn der LV keine LV-Leitung zugeordnet ist.",
+		    headerFilter:"tickCross", headerFilterParams:{"tristate": true, "initial": true}, headerFilterFunc: hf_empfehlungsberechtigt
+        },
 		anrechnung_id: {visible: false, headerFilter:"input"},
 		lehrveranstaltung_id: {visible: false, headerFilter:"input"},
 		begruendung_id: {visible: false, headerFilter:"input"},
@@ -165,10 +213,7 @@ $filterWidgetArray = array(
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false, headerFilter:"input"},
-		status_bezeichnung: {headerFilter:"input"},
-		empfehlungsberechtigt: {formatter:"tickCross", align:"center", 
-		    headerFilter:"tickCross", headerFilterParams:{"tristate": true, "initial": true}, headerFilterFunc: hf_empfehlungsberechtigt
-        }
+		status_bezeichnung: {headerFilter:"input"}
 	 }', // col properties
 );
 
