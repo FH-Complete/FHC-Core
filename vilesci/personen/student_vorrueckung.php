@@ -65,8 +65,8 @@ echo '
 	{
 		$("#t1").tablesorter(
 		{
-			sortList: [[0,0]],
-			widgets: ["zebra"],
+			sortList: [[7,0],[0,0],[1,0]],
+			widgets: ["zebra","filter"],
 		});
 	});
 	</script>
@@ -212,7 +212,7 @@ if (isset($_POST['vorr']))
 	$statisticAdded = 0;
 	$statisticUebersprungen = 0;
 	$statisticStudienplanKorrektur = 0;
-	$errorMsg = array();
+	$errorMsg = array('Studenten im letzten Ausbildungssemester ohne Diplomandenstatus' => 0);
 
 	$stg_help = new studiengang();
 	if (!$stg_help->load($stg_kz))
@@ -322,23 +322,8 @@ if (isset($_POST['vorr']))
 					&& $row_status->ausbildungssemester == $max[$stg_kz]
 					&& $row_status->status_kurzbz == 'Student')
 				{
-					$statisticUebersprungen++;
-					$errorMsg['Studenten im letzten Ausbildungssemester ohne Diplomandenstatus']++;
+					$errorMsg['Studenten im letzten Ausbildungssemester ohne Diplomandenstatus'] = $errorMsg['Studenten im letzten Ausbildungssemester ohne Diplomandenstatus']+1;
 					continue;
-
-					/*
-					$sqlInsertDiplomand = "INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz,
-								studiensemester_kurzbz, ausbildungssemester, datum, insertamum,
-								insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id, statusgrund_id)
-							VALUES (".$db->db_add_param($row->prestudent_id).", ".
-						$db->db_add_param($status_kurzbz).", ".
-						$db->db_add_param($next_ss).", ".
-						$db->db_add_param($ausbildungssemester).", now(), now(), ".
-						$db->db_add_param($user).",	NULL, NULL, NULL, ".
-						$db->db_add_param($row_status->orgform_kurzbz).", ".
-						$db->db_add_param($studienplan_id).", ".
-						$db->db_add_param($statusgrundId).");";
-					*/
 				}
 
 				$lvb = new lehrverband();
@@ -435,14 +420,22 @@ if (isset($_POST['vorr']))
 		}
 	}
 	echo '<span class="ok">';
-	echo 'Vorgerückte Personen: '.$statisticAdded.'<br>';
-	echo 'Übersprungene Personen: '.$statisticUebersprungen.'<br>';
-	echo 'Studienplanzuordnung korrigiert: '.$statisticStudienplanKorrektur.'<br>';
+	if ($statisticAdded > 0)
+		echo 'Vorgerückte Personen: '.$statisticAdded.'<br>';
+	if ($statisticStudienplanKorrektur > 0)
+		echo 'Studienplanzuordnung korrigiert: '.$statisticStudienplanKorrektur.'<br>';
+	echo '</span>';
+	echo '<span class="warning">';
+	if ($statisticUebersprungen > 0)
+		echo $statisticUebersprungen.' Personen wurden übersprungen, weil schon ein Eintrag im Zielsemester vorhanden ist<br>';
 	echo '</span>';
 	echo '<span class="error">';
-	foreach($errorMsg AS $key=>$value)
+	foreach($errorMsg AS $text=>$anzahl)
 	{
-		echo 'Fehler: '.$key.': '.$value;
+		if ($anzahl > 0)
+		{
+			echo $anzahl.' '.$text;
+		}
 	}
 	echo '</span>';
 }
