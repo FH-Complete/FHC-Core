@@ -25,14 +25,14 @@ export default {
 		},
 		current() {
 			if (this.currentSemester === null)
-				return { semester: null, lvs: null };
+				return { semester: null, lvs: [] };
 			if (this.lvs[this.currentSemester] === undefined) {
 				this.lvs[this.currentSemester] = {
 					semester: this.currentSemester, 
 					lvs: null
 				};
 				axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Lvs/' + this.currentSemester).then(res => {
-					this.lvs[this.currentSemester].lvs = res.data.retval;
+					this.lvs[this.currentSemester].lvs = res.data.retval || [];
 					this.firstLoad = false;
 				});
 			}
@@ -81,7 +81,7 @@ export default {
 	},
 	created() {
 		axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Studiensemester').then(res => {
-			this.studiensemester = res.data.retval;
+			this.studiensemester = res.data.retval || [];
 			const hash = location.hash.substring(1);
 			if (hash && this.studiensemester.filter(s => s.studiensemester_kurzbz == hash).length)
 				this.currentSemester = hash;
@@ -89,8 +89,9 @@ export default {
 				this.currentSemester = this.nearestSem;
 		});
 	},
-	template: `<div class="mylv-student" v-if="ready">
-		<div class="row justify-content-center mb-3">
+	template: `
+	<div class="mylv-student" v-if="ready">
+		<div v-if="currentSemester" class="row justify-content-center mb-3">
 			<div class="col-auto d-none">
 				<label class="col-form-label">{{p.t('lehre/studiensemester')}}</label>
 			</div>
@@ -107,6 +108,9 @@ export default {
 					</button>
 				</div>
 			</div>
+		</div>
+		<div class="alert alert-danger" role="alert" v-else>
+			{{p.t('lehre/noLvFound')}}
 		</div>
 		<mylv-semester v-bind="current"/>
 	</div>

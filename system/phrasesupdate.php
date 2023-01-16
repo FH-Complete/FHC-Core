@@ -17240,6 +17240,26 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'noLvFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Keine Lehrveranstaltungen gefunden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No LVs found",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'leitung',
 		'insertvon' => 'system',
