@@ -19,7 +19,11 @@ export default {
 			default: true
 		},
 		noCloseBtn: Boolean,
-		dialogClass: [String,Array,Object]
+		dialogClass: [String,Array,Object],
+		bodyClass: {
+			type: [String,Array,Object],
+			default: 'px-4 py-5'
+		}
 	},
 	emits: [
 		"hideBsModal",
@@ -64,9 +68,9 @@ export default {
 						ref: 'modal',
 						'onHidden.bs.modal': instance.unmount
 					}}, {
-						title: () => title,
-						default: () => body,
-						footer: () => footer
+						title: title ? () => title : undefined,
+						default: body ? () => body : undefined,
+						footer: footer ? () => footer : undefined
 					});
 				},
 				mounted() {
@@ -92,7 +96,7 @@ export default {
 					<h5 class="modal-title"><slot name="title"/></h5>
 					<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body px-4 py-5">
+				<div class="modal-body" :class="bodyClass">
 					<slot></slot>
 				</div>
 				<div v-if="$slots.footer" class="modal-footer">

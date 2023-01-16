@@ -10,6 +10,7 @@ export default {
         rootUrl: String,
         logoUrl: String,
         avatarUrl: String,
+        logoutUrl: String,
         searchbaroptions: Object,
         searchfunction: Function
     },
@@ -45,7 +46,7 @@ export default {
                 <li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
                 <li><a class="btn btn-level-2 rounded-0 d-block" href="#">Ampeln</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="btn btn-level-2 rounded-0 d-block" href="#">Logout</a></li>
+                <li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
             </ul>
             <div id="nav-main-menu" class="collapse collapse-horizontal show">
                 <div>
