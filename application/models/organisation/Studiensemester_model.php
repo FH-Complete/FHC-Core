@@ -204,4 +204,22 @@ class Studiensemester_model extends DB_Model
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
+
+	/**
+	 * @param string		$student_uid
+	 * 
+	 * @return StdClass
+	 */
+	public function getWhereStudentHasLvs($student_uid)
+	{
+		$this->addDistinct();
+		$this->addSelect($this->dbTable . '.*');
+
+		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'studiensemester_kurzbz');
+		$this->db->where("v.lehreverzeichnis<>''");
+
+		$this->addOrder($this->dbTable . '.start');
+		
+		return $this->loadWhere(['uid' => $student_uid, 'v.lehre' => true]);
+	}
 }
