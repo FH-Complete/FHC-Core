@@ -15,11 +15,6 @@ class MyLv extends Auth_Controller
 		parent::__construct([
 			'index' => 'student/anrechnung_beantragen:r' // TODO(chris): permissions?
 		]);
-
-		// Loads phrases system
-		$this->loadPhrases([
-			'global'
-		]);
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
