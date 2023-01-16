@@ -1,6 +1,25 @@
 <?php
 
+/**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify   
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+use phpseclib\Crypt\Twofish;
 
 /**
  *
@@ -28,15 +47,20 @@ class DB_Model extends CI_Model
 	const PGSQL_FLOAT4_TYPE = 'float4';
 	const PGSQL_FLOAT8_TYPE = 'float8';
 
+	// Name of the config entry containing an array of password that can be used to encrypt/decrypt
+	const ENCRYPTION_PASSWORDS = 'encryption_passwords';
+
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  	// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 				// True if this table has a primary key that uses a sequence
+	protected $passwordName; // Eventually the name of the password that is used to encrypt/decrypt
+	protected $encryptedColumns; // Eventually an array of columns to be encrypted/decrypted
 
 	private $executedQueryMetaData;
 	private $executedQueryListFields;
 
-	private $debugMode;
+	private $debugMode; // Debug mode enable (true) or disabled (false)
 
 	/**
 	 * Constructor
@@ -46,20 +70,25 @@ class DB_Model extends CI_Model
 		// Call parent constructor
 		parent::__construct();
 
-		// Set properties
-		$this->hasSequence = true;
-
-		// Loads DB conns and confs
+		// Loads DB connections and configs
 		$this->load->database($dbtype);
 
+		// Loads the DB config to encrypt/decrypt data
+		$this->config->load('db_crypt');
+
+		// Set properties
+		$this->hasSequence = true;
+		$this->passwordName = null;
+		$this->encryptedColumns = null;
+		$this->debugMode = isset($this->db->db_debug) && $this->db->db_debug === true;
+
+		// Loads UDF model
 		$this->load->model('system/UDF_model', 'UDFModel');
 
 		// Loads the UDF library
 		$this->load->library('UDFLib');
 		// Loads the logs library
 		$this->load->library('LogLib');
-
-		$this->debugMode = isset($this->db->db_debug) && $this->db->db_debug === true;
 	}
 
 	// ------------------------------------------------------------------------------------------
@@ -92,6 +121,9 @@ class DB_Model extends CI_Model
 
 		// If this table has UDF and the validation of them is ok
 		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable))) return $validate;
+
+		//
+		$this->_encrypt($data);
 
 		// DB-INSERT
 		$insert = $this->db->insert($this->dbTable, $data);
@@ -160,6 +192,9 @@ class DB_Model extends CI_Model
 		}
 
 		$this->db->where($tmpId);
+
+		//
+		$this->_encrypt($data);
 
 		// DB-UPDATE
 		$update = $this->db->update($this->dbTable, $data);
@@ -265,6 +300,9 @@ class DB_Model extends CI_Model
 
 		if ($result)
 		{
+			// Decrypt data if needed
+			$this->_decrypt($result);
+
 			return success($this->_toPhp($result));
 		}
 		else
@@ -327,6 +365,9 @@ class DB_Model extends CI_Model
 
 		// Execute the query
 		$resultDB = $this->db->get_where($this->dbTable, $where);
+
+		// Decrypt data if needed
+		$this->_decrypt($resultDB);
 
 		$this->_logLastQuery();
 
@@ -851,6 +892,99 @@ class DB_Model extends CI_Model
 
 	// ------------------------------------------------------------------------------------------
 	// Private methods
+	//
+	//
+
+
+	/**
+	 * If the cryptography is enabled and correctly configured
+	 */
+	private function _isCryptoEnabledAndValid()
+	{
+		// Get the password list to decrypt/encrypt from the configuration
+		$encryptionPasswords = $this->config->item(self::ENCRYPTION_PASSWORDS);
+
+		// If not configured or wrongly configured
+		if (isEmptyArray($encryptionPasswords)) return false;
+
+		// If array of encrypted columns is defined or wrongly defined for this model
+		if (isEmptyArray($this->encryptedColumns)) return false;
+
+		// If no decryption/encryption password name is defined for this model
+		if (isEmptyString($this->passwordName)) return false;
+
+		// If the configured password name does not exists in the password list to decrypt/encrypt
+		if (!array_key_exists($this->passwordName, $encryptionPasswords)) return false;
+
+		// 
+		return true;
+	}
+
+	/**
+	 * Returns a cipher to decrypt/encrypt data
+	 */
+	private function _getCipher()
+	{
+		// Set the cipher type
+		$cipher = new Twofish();
+		// Set the password to encrypt using the chosen one
+		$cipher->setPassword($this->config->item(self::ENCRYPTION_PASSWORDS)[$this->passwordName]);
+
+		return $cipher;
+	}
+
+	/**
+	 * To encrypt data
+	 * Data is an associative array that contains column names as keys and the colum value as array value
+	 */
+	private function _encrypt(&$data)
+	{
+		// If no encryption is configured or not correctly configured then exit this method
+		if (!$this->_isCryptoEnabledAndValid()) return;
+
+		// Gets the cipher
+		$cipher = $this->_getCipher();
+
+		// For each column that is going to be inserted/updated
+		foreach ($data as $column => $value)
+		{
+			// If the current column is in the list of the columns to be encrypted
+			if (in_array($column, $this->encryptedColumns))
+			{
+				// Encrypt it!
+				$data[$column] = base64_encode($cipher->encrypt($value));
+			}
+		}
+	}
+
+	/**
+	 * To decrypt data
+	 * dbResult is an array of objects, each object is a representation of a database record,
+	 * each property of the object is the column name and the property value is the database value
+	 */
+	private function _decrypt(&$dbResult)
+	{
+		// If no encryption is configured or not correctly configured then exit this method
+		if (!$this->_isCryptoEnabledAndValid()) return;
+
+		// Gets the cipher
+		$cipher = $this->_getCipher();
+
+		// For each record from database
+		foreach ($dbResult->result() as $record)
+		{
+			// For each column to be encrypted
+			foreach ($this->encryptedColumns as $column)
+			{
+				// If the current record contains such a column
+				if (property_exists($record, $column))
+				{
+					// Decrypt it!
+					$record->{$column} = $cipher->decrypt(base64_decode($record->{$column}));
+				}
+			}
+		}
+	}
 
 	/**
 	 * Invalid ID
