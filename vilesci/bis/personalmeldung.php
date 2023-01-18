@@ -138,7 +138,8 @@ foreach($verwendungcodex->result as $row)
 
 // Prüfe Zeitraum zur Erstellung einer BIS-Meldung
 $studiensemester = new studiensemester();
-$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
+//$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
+$stsem = 'SS2022';
 
 $datum_obj = new datum();
 if(mb_strstr($stsem, 'SS'))
@@ -376,6 +377,9 @@ $xml = '';
 
 _outputHTML($person_arr);
 $xml = _generateXML($person_arr);
+echo "<pre>";
+var_dump($person_arr);
+echo "</pre>";
 
 $xml_datei = 'bisdaten/bismeldung_mitarbeiter.xml';
 $dateiausgabe = fopen($xml_datei, 'w');
