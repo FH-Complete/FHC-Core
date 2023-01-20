@@ -421,74 +421,72 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$zs = new Zeitsperre();
 		if ($zs->getAngrenzendenKrankenstand($uid, $von2))
 		{
-			$krankenstand = $zs->result;
-			foreach ($krankenstand as $ks)
+			$ks = $zs->result[0];
+
+			$text = "<p>Es gibt einen <b>bestehenden Krankenstand von " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum)) .
+			" bis " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->bisdatum)) . "</b>. Möchten Sie diesen bis <b>" . $bisDay . " </b>verlängern?</p>";
+
+			$bezeichnung = isset($ks->bezeichnung) ? $ks->bezeichnung : '';
+			$vertretung_uid = isset($ks->vertretung_uid) ? $ks->vertretung_uid : '';
+			$erreichbarkeit_kurzbz = isset($ks->erreichbarkeit_kurzbz) ? $ks->erreichbarkeit_kurzbz : '';
+			$vonedit = date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum));
+			$bisedit = $_POST['bisdatum'];
+			$readonly = 'readonly';
+
+			$link = "
+				<form method='POST' name='zeitsperre_form' action='$PHP_SELF?type=edit_sperre&id=$ks->zeitsperre_id&editKS=1' onsubmit='return checkdatum()'>
+
+				  <input type='hidden' name='zeitsperretyp_kurzbz' value='$ks->zeitsperretyp_kurzbz' readonly= $readonly>
+				  <input type='hidden' name='bezeichnung' value = '$bezeichnung' readonly= $readonly>
+				  <input type='hidden' name='vondatum' value ='$vonedit' readonly= $readonly >
+				  <input type='hidden' name='bisdatum' value ='$bisedit' readonly= $readonly >
+					<input type='hidden' name='vonstunde' value ='' readonly= $readonly >
+				  <input type='hidden' name='bisstunde' value ='' readonly= $readonly >
+				  <input type='hidden' name='vertretung_uid' value ='$vertretung_uid' readonly= $readonly >
+				  <input type='hidden' name='erreichbarkeit' value ='$erreichbarkeit_kurzbz' readonly= $readonly>
+				  <input type='submit' value='Bestehenden Krankenstand verlängern'>
+				</form>
+			";
+			echo $text;
+			echo $link;
+			echo "<br><hr><br>";
+
+			$bezeichnung = $_POST['bezeichnung'];
+			$von = $_POST['vondatum'];
+			$von2 = new DateTime($von);
+			$von2 = $von2->format('Y-m-d');
+			$bis = $_POST['bisdatum'];
+			$bis2 = new DateTime($bis);
+			$bis2 = $bis2->format('Y-m-d');
+			$vertretung = $_POST['vertretung_uid'];
+			$erreichbarkeit = $_POST['erreichbarkeit'];
+			$readonly = 'readonly';
+
+			echo "<p><b>Neuer Krankenstand: von " . $von . " bis " . $bis . ": " .
+			$_POST['bezeichnung'] . "</b>";
+
+			if ($_POST['vertretung_uid'])
 			{
-				$text = "<p>Es gibt einen <b>bestehenden Krankenstand von " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum)) .
-				" bis " . date('d.m.Y', $datum_obj->mktime_fromdate($ks->bisdatum)) . "</b>. Möchten Sie diesen bis <b>" . $bisDay . " </b>verlängern?</p>";
-
-				$bezeichnung = isset($ks->bezeichnung) ? $ks->bezeichnung : '';
-				$vertretung_uid = isset($ks->vertretung_uid) ? $ks->vertretung_uid : '';
-				$erreichbarkeit_kurzbz = isset($ks->erreichbarkeit_kurzbz) ? $ks->erreichbarkeit_kurzbz : '';
-				$vonedit = date('d.m.Y', $datum_obj->mktime_fromdate($ks->vondatum));
-				$bisedit = $_POST['bisdatum'];
-				$readonly = 'readonly';
-
-				$link = "
-					<form method='POST' name='zeitsperre_form' action='$PHP_SELF?type=edit_sperre&id=$ks->zeitsperre_id&editKS=1' onsubmit='return checkdatum()'>
-
-					  <input type='hidden' name='zeitsperretyp_kurzbz' value='$ks->zeitsperretyp_kurzbz' readonly= $readonly>
-					  <input type='hidden' name='bezeichnung' value = '$bezeichnung' readonly= $readonly>
-					  <input type='hidden' name='vondatum' value ='$vonedit' readonly= $readonly >
-					  <input type='hidden' name='bisdatum' value ='$bisedit' readonly= $readonly >
-						<input type='hidden' name='vonstunde' value ='' readonly= $readonly >
-					  <input type='hidden' name='bisstunde' value ='' readonly= $readonly >
-					  <input type='hidden' name='vertretung_uid' value ='$vertretung_uid' readonly= $readonly >
-					  <input type='hidden' name='erreichbarkeit' value ='$erreichbarkeit_kurzbz' readonly= $readonly>
-					  <input type='submit' value='Bestehenden Krankenstand verlängern'>
-					</form>
-				";
-				echo $text;
-				echo $link;
-				echo "<br><hr><br>";
-
-				$bezeichnung = $_POST['bezeichnung'];
-				$von = $_POST['vondatum'];
-				$von2 = new DateTime($von);
-				$von2 = $von2->format('Y-m-d');
-				$bis = $_POST['bisdatum'];
-				$bis2 = new DateTime($bis);
-				$bis2 = $bis2->format('Y-m-d');
-				$vertretung = $_POST['vertretung_uid'];
-				$erreichbarkeit = $_POST['erreichbarkeit'];
-				$readonly = 'readonly';
-
-				echo "<p><b>Neuer Krankenstand: von " . $von . " bis " . $bis . ": " .
-				$_POST['bezeichnung'] . "</b>";
-
-				if ($_POST['vertretung_uid'])
-				{
-					echo ", vertreten von ". $_POST['vertretung_uid'] . " (" . $erreichbarkeit .")";
-				}
-				echo "</p>";
-				echo "
-					<form method='POST' name='zeitsperre_form' action='$PHP_SELF?type=new_sperre&newKS=1' onsubmit='return checkdatum()'>
-
-					  <input type='hidden' name='zeitsperretyp_kurzbz' value='Krank' readonly= $readonly>
-					  <input type='hidden' name='bezeichnung' value = '$bezeichnung' readonly= $readonly>
-					  <input type='hidden' name='vonDatum' value ='$von2' readonly= $readonly >
-					  <input type='hidden' name='bisDatum' value ='$bis2' readonly= $readonly >
-					  <input type='hidden' name='vertretung' value ='$vertretung' readonly= $readonly >
-					  <input type='hidden' name='erreichbarkeit' value ='$erreichbarkeit' readonly= $readonly>
-					  <input type='submit' value='Als neuen Krankenstand eintragen'>
-					</form>
-</td></tr></table>
-</div>
-</body>
-</html>
-					";
-				exit();
+				echo ", vertreten von ". $_POST['vertretung_uid'] . " (" . $erreichbarkeit .")";
 			}
+			echo "</p>";
+			echo "
+				<form method='POST' name='zeitsperre_form' action='$PHP_SELF?type=new_sperre&newKS=1' onsubmit='return checkdatum()'>
+
+				  <input type='hidden' name='zeitsperretyp_kurzbz' value='Krank' readonly= $readonly>
+				  <input type='hidden' name='bezeichnung' value = '$bezeichnung' readonly= $readonly>
+				  <input type='hidden' name='vonDatum' value ='$von2' readonly= $readonly >
+				  <input type='hidden' name='bisDatum' value ='$bis2' readonly= $readonly >
+				  <input type='hidden' name='vertretung' value ='$vertretung' readonly= $readonly >
+				  <input type='hidden' name='erreichbarkeit' value ='$erreichbarkeit' readonly= $readonly>
+				  <input type='submit' value='Als neuen Krankenstand eintragen'>
+				</form>
+					</td></tr></table>
+					</div>
+					</body>
+					</html>
+				";
+			exit();
 		}
 	}
 

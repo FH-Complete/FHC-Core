@@ -619,7 +619,10 @@ class zeitsperre extends basis_db
 			AND
 				bisdatum < '.$this->db_add_param($vonDay) . '
 			AND
-				bisdatum >= '.$this->db_add_param($DateToCheck) .';';
+				bisdatum >= '.$this->db_add_param($DateToCheck) .'
+			ORDER BY bisdatum DESC
+			LIMIT 1
+				;';
 
 		if (!$this->db_query($qry))
 		{
