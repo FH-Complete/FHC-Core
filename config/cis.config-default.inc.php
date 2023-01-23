@@ -44,14 +44,17 @@ define('PAABGABE_PATH','/var/fhcomplete/documents/paabgabe/');
 // Pfad zu den Rauminfos
 define('RAUMINFO_PATH','/var/www/html/build/rauminfos/');
 
+// Pfad zu Applikation
+define('BASE_LOCATION','/');
+
 // URL zu RDF Verzeichnis
-define('XML_ROOT','http://www.fhcomplete.org/build/rdf/');
+define('XML_ROOT','http://www.fhcomplete.org'.BASE_LOCATION.'rdf/');
 // URL zu Application Root
-define('APP_ROOT','http://www.fhcomplete.org/build/');
+define('APP_ROOT','http://www.fhcomplete.org/'.BASE_LOCATION);
 // Pfad zu Document Root
 define('DOC_ROOT','/var/www/html/build/');
 // URL zu Vilesci Root
-define('VILESCI_ROOT','http://www.fhcomplete.org/build/');
+define('VILESCI_ROOT','http://www.fhcomplete.org/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
