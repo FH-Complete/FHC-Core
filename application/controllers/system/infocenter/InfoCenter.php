@@ -176,6 +176,8 @@ class InfoCenter extends Auth_Controller
 		// Loads libraries
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
+		
+		$this->load->config('infocenter');
 
 		$this->loadPhrases(
 			array(
@@ -1996,6 +1998,8 @@ class InfoCenter extends Auth_Controller
 		$this->NationModel->addOrder('langtext');
 		$allNations = getData($this->NationModel->load());
 
+		$additional_stg = explode(',', ($this->config->item('infocenter_studiengang_kz')));
+
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
 			'abwstatusgruende' => $abwstatusgruende,
@@ -2004,6 +2008,7 @@ class InfoCenter extends Auth_Controller
 			'all_zgvs' => $allZGVs,
 			'all_zgvs_master' => $allZGVsMaster,
 			'all_nations' => $allNations,
+			'additional_stg' => $additional_stg
 		);
 
 		return $data;
@@ -2262,12 +2267,10 @@ class InfoCenter extends Auth_Controller
 
 	public function getAbsageData()
 	{
-		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
-		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm']);
+		$stg_typ = $this->getStudienArtBerechtigung(['b', 'm']);
 
-		if (hasData($stg_typ))
+		if (!is_null($stg_typ))
 		{
-			$stg_typ = getData($stg_typ);
 			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
 			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
 			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
@@ -2283,15 +2286,16 @@ class InfoCenter extends Auth_Controller
 			$this->outputJsonSuccess(null);
 	}
 
-	public function getStudienArtBerechtigung()
+	public function getStudienArtBerechtigung($typ = null)
 	{
 		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
-		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm', 'l']);
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, $typ);
 		return getData($stg_typ);
 	}
+
 	public function getStudienartData()
 	{
-		$this->outputJsonSuccess($this->getStudienArtBerechtigung());
+		$this->outputJsonSuccess($this->getStudienArtBerechtigung(['b', 'm', 'l']));
 	}
 
 	public function saveAbsageForAll()
