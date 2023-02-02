@@ -3102,9 +3102,9 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	{
 		exists = StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kurzbz, studiengang_kz);
 	}
-	if (exists)
+	if (exists.dbdml_return)
 	{
-		if(!confirm('Die Buchung ist bereits vorhanden. Trotzdem fortfahren?'))
+		if(!confirm(exists.dbdml_data))
 			return false;
 	}
 
@@ -3159,7 +3159,7 @@ function StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kur
 
 	var val =  new ParseReturnValue(response);
 
-	return(val.dbdml_return);
+	return val;
 }
 
 // *****

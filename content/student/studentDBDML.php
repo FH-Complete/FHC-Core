@@ -2499,7 +2499,23 @@ if(!$error)
 		}
 
 		if($exists)
+		{
 			$return = true;
+			$zusatz = "\n";
+			if (count($exists) > 10)
+			{
+				$zusatz .= "und ";
+				$persons = implode("\n- ", array_slice($exists, 0, 10));
+				if (count($exists) === 11)
+					$zusatz .= "einer weiteren Person.";
+				else
+					$zusatz .= (count($exists) - 10) . " weiteren Personen.";
+			}
+			else
+				$persons = implode("\n- ", $exists);
+
+			$data = "Es ist bereits eine Buchung vorhanden:\n- ". $persons  . $zusatz ." Trotzdem fortfahren?";
+		}
 		else
 			$return = false;
 	}
