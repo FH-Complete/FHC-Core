@@ -1117,14 +1117,14 @@ class InfoCenter extends Auth_Controller
 
 	public function reloadDoks($person_id)
 	{
-		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false);
 
 		$this->load->view('system/infocenter/dokNachzureichend.php', array('dokumente_nachgereicht' => $dokumente_nachgereicht->retval));
 	}
 
 	public function reloadUebersichtDoks($person_id)
 	{
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false);
 
 		$this->DokumentModel->addOrder('bezeichnung');
 		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
@@ -1920,14 +1920,14 @@ class InfoCenter extends Auth_Controller
 		if (!isset($stammdaten->retval))
 			return null;
 
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false);
 
 		if (isError($dokumente))
 		{
 			show_error(getError($dokumente));
 		}
 
-		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false);
 
 		if (isError($dokumente_nachgereicht))
 		{
@@ -2298,8 +2298,8 @@ class InfoCenter extends Auth_Controller
 		$prestudentstatus = $prestudent->prestudentstatus;
 		$person_id = $prestudent->person_id;
 		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false)->retval;
-		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true)->retval;
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false)->retval;
+		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false)->retval;
 
 		//fill mail variables
 		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
