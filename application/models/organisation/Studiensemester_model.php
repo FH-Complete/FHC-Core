@@ -215,6 +215,7 @@ class Studiensemester_model extends DB_Model
 		$this->addDistinct();
 		$this->addSelect($this->dbTable . '.*');
 
+		// TODO(chris): Potentielle Anpassung "Eine UID"
 		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'studiensemester_kurzbz');
 		$this->db->where("v.lehreverzeichnis<>''");
 

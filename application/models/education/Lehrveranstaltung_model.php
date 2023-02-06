@@ -276,7 +276,7 @@ class Lehrveranstaltung_model extends DB_Model
 		*/
 		// TODO(chris): module or kf
 		#$this->addSelect($this->dbTable . '.*');
-		$this->addSelect('v.*');
+		#$this->addSelect('v.*');
 		$this->addSelect($this->dbTable . '.benotung');
 		$this->addSelect($this->dbTable . '.lvinfo');
 		$this->addSelect($this->dbTable . '.farbe');
@@ -288,6 +288,7 @@ class Lehrveranstaltung_model extends DB_Model
 		
 		$this->addSelect('v.sprache');
 		$this->addSelect('v.ects');
+		$this->addSelect('znn.positiv');
 
 		#$this->addSelect('splv.module');
 		$this->addSelect($lvbezeichnung . ' AS bezeichnung');
@@ -297,6 +298,7 @@ class Lehrveranstaltung_model extends DB_Model
 		$this->addSelect('COALESCE(gnn.' . $bezeichnung . ', gnn.bezeichnung, gn.note::text) AS lvnote');
 		$this->addSelect('COALESCE(znn.' . $bezeichnung . ', znn.bezeichnung, zn.note::text) AS znote');
 
+		// TODO(chris): Potentielle Anpassung "Eine UID"
 		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'lehrveranstaltung_id');
 		$this->addJoin('public.tbl_studiengang sg', $this->dbTable . '.studiengang_kz = sg.studiengang_kz');
 		$this->db->where("v.lehreverzeichnis<>''");
@@ -306,6 +308,8 @@ class Lehrveranstaltung_model extends DB_Model
 
 		$this->addJoin('lehre.tbl_zeugnisnote zn', 'zn.lehrveranstaltung_id=v.lehrveranstaltung_id AND zn.student_uid=v.uid AND zn.studiensemester_kurzbz=v.studiensemester_kurzbz', 'LEFT');
 		$this->addJoin('lehre.tbl_note znn', 'zn.note=znn.note', 'LEFT');
+
+		$this->addOrder('bezeichnung');
 
 		/*if (!defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") || !CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN) {
 			$modulebezeichnung = str_replace('v.', 'm.', $lvbezeichnung);

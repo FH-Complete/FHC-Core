@@ -82,7 +82,7 @@ export default {
 	popup(options) {
 		return BsModal.popup.bind(this)(null, options);
 	},
-	template: `<bs-modal ref="modalContainer" class="bootstrap-alert" v-bind="$props" body-class="" dialog-class="modal-fullscreen">
+	template: `<bs-modal ref="modalContainer" class="bootstrap-alert" v-bind="$props" body-class="" dialog-class="modal-lg">
 		<template v-slot:title>
 			{{p.t('lvinfo/lehrveranstaltungsinformationen')}}
 		</template>
@@ -167,7 +167,7 @@ export default {
 				<div v-if="Object.keys(info.lvinfo).length > 1" class="text-end">
 					<div class="btn-group" role="group" :title="p.t('global/verfuegbareSprachen')" :aria-label="p.t('global/verfuegbareSprachen')">
 						<template v-for="lang in info.sprachen" :key="lang.index">
-							<button v-if="info.lvinfo[lang.sprache]" type="button" class="btn btn-outline-primary" :class="lang.sprache == currentLang ? 'active' : ''" @click.prevent="info.lastLang = lang.sprache"><img class="d-block" :src="'data:image/gif;base64, ' + lang.flagge" :alt="lang.bezeichnung[lang.index]"></button>
+							<button v-if="info.lvinfo[lang.sprache]" type="button" class="btn btn-outline-primary" :class="lang.sprache == currentLang ? 'active' : ''" @click.prevent="info.lastLang = lang.sprache">{{lang.bezeichnung[lang.index-1]}}</button>
 						</template>
 					</div>
 				</div>

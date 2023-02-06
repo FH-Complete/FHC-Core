@@ -36,7 +36,7 @@ export default {
 				<small>{{semester}}.{{p.t('lehre/semester')}}</small>
 			</h4>
 			<div class="row">
-				<div v-for="lv in lehrveranstaltungen" :key="lv.lehrveranstaltung_id" class="col-sm-4 mb-3">
+				<div v-for="lv in lehrveranstaltungen" :key="lv.lehrveranstaltung_id" class="col-sm-4 col-md-3 mb-3">
 					<mylv-semester-studiengang-lv v-bind="lv" class="text-center h-100"></mylv-semester-studiengang-lv>
 				</div>
 			</div>

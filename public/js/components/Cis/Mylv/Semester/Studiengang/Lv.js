@@ -1,9 +1,13 @@
 import LvPruefungen from "./Lv/Pruefungen.js";
 import LvInfo from "./Lv/Info.js";
+import Phrasen from "../../../../../mixins/Phrasen.js";
 
 // TODO(chris): L10n
 
 export default {
+	mixins: [
+		Phrasen
+	],
 	inject: ['studien_semester'],
 	props: {
 		lehrveranstaltung_id: Number,
@@ -19,7 +23,8 @@ export default {
 		orgform_kurzbz: String,
 		sprache: String,
 		ects: Number,
-		incoming: Number
+		incoming: Number,
+		positiv: Boolean
 	},
 	data: () => {
 		return {
@@ -28,7 +33,7 @@ export default {
 		}
 	},
 	computed: {
-		bodyStyle() {
+		bodyStyle() {return {};
 			const bodyStyle = {};
 			if (this.farbe)
 				bodyStyle['background-color'] = '#' + this.farbe;
@@ -70,13 +75,14 @@ export default {
 		<div v-if="module" class="card-header">
 			{{module}}
 		</div>
-		<div class="card-body" :style="bodyStyle">
-			<h5 class="card-title">{{bezeichnung}}</h5>
+		<div class="card-body d-flex justify-content-center align-items-center" :style="bodyStyle">
+			<h6 class="card-title">{{bezeichnung}}</h6>
 		</div>
 		<div class="card-footer">
 			<div class="row">
 				<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
-					{{ grade || '-' }}
+					<i class="fa fa-check text-success" v-if="positiv"></i>
+					{{ grade || p.t('lehre/noGrades') }}
 				</a>
 				<div v-if="lvinfo" class="col text-end">
 					<a class="card-link" href="#" @click.prevent="openInfos">

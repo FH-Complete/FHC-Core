@@ -265,6 +265,9 @@
   #cis-main {
     padding-left: var(--fhc-cis-main-px);
   }
+  #cis-main > :first-child {
+    margin-top: var(--fhc-cis-header-height);
+  }
   #cis-header {
     background-color: var(--fhc-cis-primary);
     height: var(--fhc-cis-header-height);

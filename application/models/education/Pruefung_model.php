@@ -42,12 +42,13 @@ class Pruefung_model extends DB_Model
 	 * 
 	 * @param string		$uid
 	 * @param string		$lehrveranstaltung_id
-	 * @param string|null	$lehrveranstaltung_id
+	 * @param string|null	$sprache
 	 * 
 	 * @return object
 	 */
 	public function getByStudentAndLv($uid, $lehrveranstaltung_id, $sprache = null)
 	{
+		// TODO(chris): Potentielle Anpassung "Eine UID"
 		$this->dbTable = 'lehre.tbl_pruefung';
 
 		if ($sprache) {
