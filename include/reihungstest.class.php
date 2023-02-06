@@ -60,6 +60,9 @@ class reihungstest extends basis_db
 	public $anmeldedatum; // date
 	public $teilgenommen; // boolean
 	public $punkte; // numeric
+	
+	public $zugangs_ueberpruefung = false; //boolean
+	public $zugangscode; //smallint
 
 
 	/**
@@ -114,6 +117,8 @@ class reihungstest extends basis_db
 				$this->stufe = $row->stufe;
 				$this->anmeldefrist = $row->anmeldefrist;
 				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+				$this->zugangs_ueberpruefung = $this->db_parse_bool($row->zugangs_ueberpruefung);
+				$this->zugangscode = $row->zugangscode;
 
 				return true;
 			}
@@ -229,7 +234,7 @@ class reihungstest extends basis_db
 
 			$qry = 'BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit,
 				insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet,
-				studiensemester_kurzbz, stufe, anmeldefrist, aufnahmegruppe_kurzbz) VALUES('.
+				studiensemester_kurzbz, stufe, anmeldefrist, aufnahmegruppe_kurzbz, zugangs_ueberpruefung, zugangscode) VALUES('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->ort_kurzbz).', '.
 				$this->db_add_param($this->anmerkung).', '.
@@ -243,7 +248,9 @@ class reihungstest extends basis_db
 				$this->db_add_param($this->studiensemester_kurzbz).','.
 				$this->db_add_param($this->stufe, FHC_INTEGER).','.
 				$this->db_add_param($this->anmeldefrist).','.
-				$this->db_add_param($this->aufnahmegruppe_kurzbz).');';
+				$this->db_add_param($this->aufnahmegruppe_kurzbz). ',' .
+				$this->db_add_param($this->zugangs_ueberpruefung, FHC_BOOLEAN).','.
+				$this->db_add_param($this->zugangscode) . ');';
 		}
 		else
 		{
@@ -261,7 +268,9 @@ class reihungstest extends basis_db
 				'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '.
 				'stufe='.$this->db_add_param($this->stufe, FHC_INTEGER).', '.
 				'anmeldefrist='.$this->db_add_param($this->anmeldefrist).', '.
-				'aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).' '.
+				'aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).', '.
+				'zugangs_ueberpruefung='.$this->db_add_param($this->zugangs_ueberpruefung, FHC_BOOLEAN).', '.
+				'zugangscode='.$this->db_add_param($this->zugangscode).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';
 		}
 

@@ -271,7 +271,8 @@ if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
 		DISTINCT ON(student_uid, nachname, vorname) *,
 		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
 		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
-		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant,
+		COALESCE(tbl_prestudent.standort_code, tbl_studiengang.standort_code) AS bis_standort_code
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -295,7 +296,8 @@ elseif ($stg_kz == 'alleBaMa')
 		DISTINCT ON(tbl_student.studiengang_kz, matrikelnr, nachname, vorname) *,
 		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
 		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
-		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant,
+		COALESCE(tbl_prestudent.standort_code, tbl_studiengang.standort_code) AS bis_standort_code
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -327,7 +329,8 @@ else
 		DISTINCT ON(student_uid, nachname, vorname) *,
 		public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat,
 		public.tbl_prestudent.foerderrelevant as pre_foerderrelevant,
-		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant
+		public.tbl_studiengang.foerderrelevant as stg_foerderrelevant,
+		COALESCE(tbl_prestudent.standort_code, tbl_studiengang.standort_code) AS bis_standort_code
 	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
@@ -353,9 +356,10 @@ else
 
 if($result = $db->db_query($qry))
 {
-
 	$stg_kz_index = '';
 
+	$num_rows = $db->db_num_rows($result);
+	$row_num = 1;
 	while($row = $db->db_fetch_object($result))
 	{
 		$row->pre_foerderrelevant = $db->db_parse_bool($row->pre_foerderrelevant);
@@ -367,8 +371,6 @@ if($result = $db->db_query($qry))
 			$stg_obj = new studiengang();
 			if($stg_obj->load($row->studiengang_kz))
 			{
-
-
 				$maxsemester = $stg_obj->max_semester;
 				if($maxsemester == 0)
 				{
@@ -398,58 +400,78 @@ if($result = $db->db_query($qry))
 			else
 				die('Fehler:'.$stg_obj->errormsg);
 
-			// Header am Beginn rausschreiben
+			// Erstes Studiengang Tag am Beginn rausschreiben
 			if ($stg_kz_index == '')
 			{
 				$header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
   <ErhKz>".$erhalter."</ErhKz>
   <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
-  <StudierendenBewerberMeldung>";
-
+  <StudierendenBewerberMeldung>
+	<Studiengang>
+      <StgKz>".$row->studiengang_kz."</StgKz>";
 				$datei .= $header;
 				$dateiNurBewerber .= $header;
 			}
-			if ($stg_kz_index != '' && $row->studiengang_kz != $stg_kz_index)
-			{
-				$datei .= "
-	</Studiengang>";
-			}
-			$stg_kz_index = $row->studiengang_kz;
-			$datei .= "
-	<Studiengang>
-      <StgKz>".$row->studiengang_kz."</StgKz>";
 		}
+
+		// Student Daten schreiben
 		$datei .= GenerateXMLStudentBlock($row);
-	}
 
-	//Bewerberblock bei Ausserordentlichen nicht anzeigen
-	/*if($stg_kz!=('9'.$erhalter))
-	{
-		$stg_obj = new studiengang();
-
-		if($orgform_code==3 || $stg_obj->isMischform($stg_kz,$ssem) || $stg_obj->isMischform($stg_kz,$psem))
+		// wenn neuer Studiengang oder letzter Durchlauf...
+		if (($row_num > 1 && $row->studiengang_kz != $stg_kz_index) || $row_num == $num_rows)
 		{
-			$orgcodes = array_unique($orgform_code_array);
-			//Mischform
-			foreach($orgcodes as $code)
+			// ...Studiengang Tag schliessen
+			$stgClose = "
+	</Studiengang>";
+			$datei .= $stgClose;
+			$dateiNurBewerber .= $stgClose;
+		}
+
+		// wenn neuer Studiengang...
+		if ($row->studiengang_kz != $stg_kz_index)
+		{
+			if ($row_num > 1)
 			{
-				$bewerberBlock=GenerateXMLBewerberBlock($code);
-				$datei.=$bewerberBlock;
-				$dateiNurBewerber.=$bewerberBlock;
+				// ...neuen Studiengang Tag öffnen
+				$stgOpen = "
+		<Studiengang>
+		  <StgKz>".$row->studiengang_kz."</StgKz>";
+				$datei .= $stgOpen;
+				$dateiNurBewerber .= $stgOpen;
 			}
-		}
-		else
-		{
-			$bewerberBlock=GenerateXMLBewerberBlock();
-			$datei.=$bewerberBlock;
-			$dateiNurBewerber.=$bewerberBlock;
-		}
-	}*/
+
+			//Bewerberblock
+			// (bei Ausserordentlichen nicht anzeigen)
+			if($row->studiengang_kz!=('9'.$erhalter))
+			{
+				$stg_obj = new studiengang();
+
+				if($orgform_code==3 || $stg_obj->isMischform($row->studiengang_kz,$ssem) || $stg_obj->isMischform($row->studiengang_kz,$psem))
+				{
+					$orgcodes = array_unique($orgform_code_array);
+					//Mischform
+					foreach($orgcodes as $code)
+					{
+						$bewerberBlock=GenerateXMLBewerberBlock($row->studiengang_kz, $code);
+						$dateiNurBewerber.=$bewerberBlock;
+					}
+				}
+				else
+				{
+					$bewerberBlock=GenerateXMLBewerberBlock($row->studiengang_kz);
+					$dateiNurBewerber.=$bewerberBlock;
+				}
+			}
+		};
+
+		// Studiengang kz speichern und Zeile erhöhen
+		$stg_kz_index = $row->studiengang_kz;
+		$row_num++;
+	}
 }
 
 $footer="
-    </Studiengang>
   </StudierendenBewerberMeldung>
 </Erhalter>";
 
@@ -722,8 +744,11 @@ if(file_exists($ddd))
 {
 	echo '<a href="archiv.php?meldung='.$ddd.'&html='.$eee.'&stg='.$stg_kz.'&sem='.$ssem.'&typ=studenten&action=archivieren">BIS-Meldung Stg '.$stg_kz.' archivieren</a><br>';
 	echo '<a href="'.$ddd.'" target="_blank" download>XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.'</a><br>';
-	echo '<a href="'.$dddNurBew.'" target="_blank" download>XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.' - nur Bewerberdaten</a><br>';
 }
+
+if(file_exists($dddNurBew))
+	echo '<a href="'.$dddNurBew.'" target="_blank" download>XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.' - Bewerberdaten</a><br>';
+
 if(file_exists($eee))
 {
 	echo '<a href="'.$eee.'">BIS-Melde&uuml;bersicht der BIS-Meldung Stg '.$stg_kz.'</a><br><br>';
@@ -1589,7 +1614,7 @@ function GenerateXMLStudentBlock($row)
 		if($studtyp!='E')
 		{
 			$datei.="
-				<StudStatusCode>".$status."</StudStatusCode>";
+			<StudStatusCode>".$status."</StudStatusCode>";
 		}
 
 		// IO container query
@@ -1615,7 +1640,7 @@ function GenerateXMLStudentBlock($row)
 		if(!$ausserordentlich)
 		{
 			$datei.="
-			<StandortCode>".$row->standort_code."</StandortCode>";
+			<StandortCode>".$row->bis_standort_code."</StandortCode>";
 		}
 		/*
 		 * BMWFFoerderrung derzeit fuer alle Studierende auf Ja gesetzt
@@ -1901,11 +1926,11 @@ function GenerateXMLStudentBlock($row)
  * Wenn der Parameter orgformcode uebergeben wird, werden nur die Bewerberzahlen dieser Orgform geliefert
  * sonst alle
  */
-function GenerateXMLBewerberBlock($orgformcode=null)
+function GenerateXMLBewerberBlock($studiengang_kz, $orgformcode=null)
 {
 	global $db;
 	global $ssem, $stgart, $psem;
-	global $stg_kz, $bisdatum;
+	global $bisdatum;
 	global $bwlist, $orgform_kurzbz;
 	global $bewerbercount,$orgform_code_array;
 	$datei = '';
@@ -1924,11 +1949,12 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			JOIN public.tbl_person USING(person_id)
 			LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
 		WHERE (studiensemester_kurzbz=".$db->db_add_param($ssem)." OR studiensemester_kurzbz=".$db->db_add_param($psem).")
-			AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
+			AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz)."
 			AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 			AND status_kurzbz='Bewerber'
 			AND reihungstestangetreten
 			";
+
 		if(!is_null($orgformcode))
 			$qrybw.=" AND tbl_orgform.code=".$db->db_add_param($orgformcode);
 
@@ -2015,7 +2041,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			<OrgFormCode>".$orgform_code_array[$bworgform]."</OrgFormCode>";
 			if($stgart==2)
 				$datei.='
-			<ZugangMaCode>'.$key.'</ZugangMaCode>';
+			<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
 			else
 				$datei.='
 			<ZugangCode>'.$key.'</ZugangCode>';

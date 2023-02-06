@@ -1749,5 +1749,33 @@ class mitarbeiter extends benutzer
 		}
 	}
 
+	public function getMitarbeiterKostenstelle($von, $bis, $uid = null)
+	{
+		if (is_null($uid))
+			$uid = $this->uid;
+		
+		$qry = "
+			SELECT o.oe_kurzbz AS standardkostenstelle, o.bezeichnung
+			FROM public.tbl_benutzerfunktion bf
+				JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				WHERE bf.funktion_kurzbz = 'kstzuordnung'
+				AND (bf.datum_bis IS NULL OR datum_bis >= ". $this->db_add_param($von). ")
+				AND (bf.datum_von IS NULL OR datum_von <= ". $this->db_add_param($bis). ")
+					AND bf.uid = ". $this->db_add_param($uid);
+
+		if ($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+				$obj->oekurzbz = $row->standardkostenstelle;
+				$obj->bezeichnung = $row->bezeichnung;
+				
+				$this->result []= $obj;
+			}
+			return true;
+		}
+	}
+
 }
 ?>

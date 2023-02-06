@@ -71,7 +71,6 @@ $this->phrasen['testtool/einfuehrungsText']='
 					<h1 style="white-space: normal">Welcome to the placement test</h1>
 					<a href="'.APP_ROOT.'cms/dms.php?id=145596" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=142977" alt="Einfuehrungsvideo" style="border: 1px solid lightgray; border-radius: 10px; width:350px;"></a>
 					<br><br>
-					<a href="'.APP_ROOT.'cms/dms.php?id=207696" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Guideline for placement test</a><br>
 					<a href="'.APP_ROOT.'cms/dms.php?id=143930" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Master</b>-Guideline for placement test</a>
 					<br><br>
 					Under the following link you can test the correct display of the placement test:<br><br>
@@ -79,5 +78,8 @@ $this->phrasen['testtool/einfuehrungsText']='
 				</div>
 			</div>';
 $this->phrasen['testtool/prueflingGesperrt']='Bitte kontaktieren Sie die Reihungstestaufsicht!';
+$this->phrasen['testtool/freischaltcode']='Freischaltcode';
+$this->phrasen['testtool/freischalttext']='Ihren Freischaltcode erhalten Sie am Tag des Reihungstests nach erfolgter Einführung im ZOOM-Meeting (siehe Leitfaden) von der Aufsicht. <br /> Wir wünschen Ihnen viel Erfolg.';
+
 
 ?>
