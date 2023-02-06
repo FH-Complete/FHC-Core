@@ -1,0 +1,160 @@
+.fhc-calendar-week-page-header {
+  background-color: #e9ecef;
+}
+
+.fhc-calendar-months .col-4,
+.fhc-calendar-years .col-4 {
+  padding: 0.1875em 0;
+}
+.show-weeks .fhc-calendar-months .col-4,
+.show-weeks .fhc-calendar-years .col-4 {
+  padding: 0.1875em 0.25em;
+}
+.fhc-calendar-months .col-4 button,
+.fhc-calendar-years .col-4 button {
+  aspect-ratio: 28/18;
+}
+
+.fhc-calendar-month-page {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 1.5em repeat(6, 1fr);
+}
+.fhc-calendar-month-page.show-weeks {
+  grid-template-columns: 1.5em repeat(7, 1fr);
+  grid-template-rows: 1.5em repeat(6, 1fr);
+}
+
+.fhc-calendar-month-page-weekday,
+.fhc-calendar-month-page-day {
+  color: inherit;
+}
+
+.fhc-calendar-week .carousel-item {
+  padding: 0.75em;
+}
+
+.fhc-calendar-week-page {
+  aspect-ratio: 7/6;
+  min-height: 0;
+}
+.fhc-calendar-week-page > div {
+  transform: translate(-0.75em, -0.75em);
+  width: calc(100% + 1.5em);
+  height: calc(100% + 1.5em);
+}
+.fhc-calendar-week-page > div > div {
+  padding-left: 3em;
+}
+.fhc-calendar-week-page .events {
+  display: grid;
+  grid-template-columns: 3em repeat(7, 1fr);
+  margin-left: -3em;
+  min-height: 266.6666666667%;
+  background-image: linear-gradient(#f8f9fa calc(100% / 24 - .5px), #dee2e6 calc(100% / 24 - .5px), #dee2e6 calc(100% / 24 + .5px), #f8f9fa calc(100% / 24 + .5px), #f8f9fa calc(200% / 24 - .5px), #dee2e6 calc(200% / 24 - .5px), #dee2e6 calc(200% / 24 + .5px), #f8f9fa calc(200% / 24 + .5px), #f8f9fa calc(300% / 24 - .5px), #dee2e6 calc(300% / 24 - .5px), #dee2e6 calc(300% / 24 + .5px), #f8f9fa calc(300% / 24 + .5px), #f8f9fa calc(400% / 24 - .5px), #dee2e6 calc(400% / 24 - .5px), #dee2e6 calc(400% / 24 + .5px), #f8f9fa calc(400% / 24 + .5px), #f8f9fa calc(500% / 24 - .5px), #dee2e6 calc(500% / 24 - .5px), #dee2e6 calc(500% / 24 + .5px), #f8f9fa calc(500% / 24 + .5px), #f8f9fa calc(600% / 24 - .5px), #dee2e6 calc(600% / 24 - .5px), #dee2e6 calc(600% / 24 + .5px), #f8f9fa calc(600% / 24 + .5px), #f8f9fa calc(700% / 24 - .5px), #dee2e6 calc(700% / 24 - .5px), #dee2e6 calc(700% / 24 + .5px), #f8f9fa calc(700% / 24 + .5px), #f8f9fa calc(800% / 24 - .5px), #dee2e6 calc(800% / 24 - .5px), #dee2e6 calc(800% / 24 + .5px), #fff calc(800% / 24 + .5px), #fff calc(900% / 24 - .5px), #dee2e6 calc(900% / 24 - .5px), #dee2e6 calc(900% / 24 + .5px), #fff calc(900% / 24 + .5px), #fff calc(1000% / 24 - .5px), #dee2e6 calc(1000% / 24 - .5px), #dee2e6 calc(1000% / 24 + .5px), #fff calc(1000% / 24 + .5px), #fff calc(1100% / 24 - .5px), #dee2e6 calc(1100% / 24 - .5px), #dee2e6 calc(1100% / 24 + .5px), #fff calc(1100% / 24 + .5px), #fff calc(1200% / 24 - .5px), #dee2e6 calc(1200% / 24 - .5px), #dee2e6 calc(1200% / 24 + .5px), #fff calc(1200% / 24 + .5px), #fff calc(1300% / 24 - .5px), #dee2e6 calc(1300% / 24 - .5px), #dee2e6 calc(1300% / 24 + .5px), #fff calc(1300% / 24 + .5px), #fff calc(1400% / 24 - .5px), #dee2e6 calc(1400% / 24 - .5px), #dee2e6 calc(1400% / 24 + .5px), #fff calc(1400% / 24 + .5px), #fff calc(1500% / 24 - .5px), #dee2e6 calc(1500% / 24 - .5px), #dee2e6 calc(1500% / 24 + .5px), #fff calc(1500% / 24 + .5px), #fff calc(1600% / 24 - .5px), #dee2e6 calc(1600% / 24 - .5px), #dee2e6 calc(1600% / 24 + .5px), #fff calc(1600% / 24 + .5px), #fff calc(1700% / 24 - .5px), #dee2e6 calc(1700% / 24 - .5px), #dee2e6 calc(1700% / 24 + .5px), #f8f9fa calc(1700% / 24 + .5px), #f8f9fa calc(1800% / 24 - .5px), #dee2e6 calc(1800% / 24 - .5px), #dee2e6 calc(1800% / 24 + .5px), #f8f9fa calc(1800% / 24 + .5px), #f8f9fa calc(1900% / 24 - .5px), #dee2e6 calc(1900% / 24 - .5px), #dee2e6 calc(1900% / 24 + .5px), #f8f9fa calc(1900% / 24 + .5px), #f8f9fa calc(2000% / 24 - .5px), #dee2e6 calc(2000% / 24 - .5px), #dee2e6 calc(2000% / 24 + .5px), #f8f9fa calc(2000% / 24 + .5px), #f8f9fa calc(2100% / 24 - .5px), #dee2e6 calc(2100% / 24 - .5px), #dee2e6 calc(2100% / 24 + .5px), #f8f9fa calc(2100% / 24 + .5px), #f8f9fa calc(2200% / 24 - .5px), #dee2e6 calc(2200% / 24 - .5px), #dee2e6 calc(2200% / 24 + .5px), #f8f9fa calc(2200% / 24 + .5px), #f8f9fa calc(2300% / 24 - .5px), #dee2e6 calc(2300% / 24 - .5px), #dee2e6 calc(2300% / 24 + .5px), #f8f9fa calc(2300% / 24 + .5px));
+}
+.fhc-calendar-week-page .events .day {
+  gap: 1px;
+}
+.fhc-calendar-week-page .events .hours, .fhc-calendar-week-page .events .day {
+  display: grid;
+}
+
+.fhc-calendar-lg .fhc-calendar-month-page-day,
+.fhc-calendar-lg .fhc-calendar-month-page-weekday,
+.fhc-calendar-md .fhc-calendar-month-page-day,
+.fhc-calendar-md .fhc-calendar-month-page-weekday {
+  border: solid 1px #dee2e6;
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day,
+.fhc-calendar-md .fhc-calendar-month-page-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day.active,
+.fhc-calendar-md .fhc-calendar-month-page-day.active {
+  border-color: var(--bs-secondary);
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day .events,
+.fhc-calendar-md .fhc-calendar-month-page-day .events {
+  display: block;
+  overflow: scroll;
+  font-size: 0.7em;
+}
+.fhc-calendar-lg .fhc-calendar-month-page-day .events span,
+.fhc-calendar-md .fhc-calendar-month-page-day .events span {
+  display: block;
+  margin: 0.2em;
+  padding: 0.1em 0.4em;
+  border-radius: 0.1em;
+}
+.fhc-calendar-lg .fhc-calendar-years .col-4,
+.fhc-calendar-md .fhc-calendar-years .col-4 {
+  padding: 0.09375em 0;
+}
+.show-weeks .fhc-calendar-lg .fhc-calendar-years .col-4,
+.show-weeks .fhc-calendar-md .fhc-calendar-years .col-4 {
+  padding: 0.09375em 0.25em;
+}
+.fhc-calendar-lg .fhc-calendar-years .col-4 button,
+.fhc-calendar-md .fhc-calendar-years .col-4 button {
+  aspect-ratio: 28/9;
+}
+
+.fhc-calendar-xs {
+  font-size: 0.6em;
+}
+
+.fhc-calendar-sm .fhc-calendar-month-page {
+  font-size: 0.8em;
+}
+
+.fhc-calendar-sm .fhc-calendar-month-page-weekday,
+.fhc-calendar-xs .fhc-calendar-month-page-weekday {
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day,
+.fhc-calendar-xs .fhc-calendar-month-page-day {
+  position: relative;
+  aspect-ratio: 1;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day.active .no,
+.fhc-calendar-xs .fhc-calendar-month-page-day.active .no {
+  background-color: rgba(var(--bs-info-rgb), 0.25);
+  border-radius: 50%;
+  font-weight: bold;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day:not(.active):hover .no,
+.fhc-calendar-xs .fhc-calendar-month-page-day:not(.active):hover .no {
+  background-color: rgba(var(--bs-secondary-rgb), 0.25);
+  border-radius: 50%;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day .no,
+.fhc-calendar-xs .fhc-calendar-month-page-day .no {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  height: 80%;
+  margin: 10%;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day .events,
+.fhc-calendar-xs .fhc-calendar-month-page-day .events {
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 10%;
+  overflow: hidden;
+  display: flex;
+}
+.fhc-calendar-sm .fhc-calendar-month-page-day .events span,
+.fhc-calendar-xs .fhc-calendar-month-page-day .events span {
+  overflow: hidden;
+}
+
+/*# sourceMappingURL=calendar.css.map */
