@@ -1,10 +1,12 @@
 import FhcDashboard from '../../components/Dashboard/Dashboard.js';
 
-Vue.createApp({
+const app = Vue.createApp({
   data: () => ({
       appSideMenuEntries: {}
     }),
   components: {
     FhcDashboard
   }
-}).mount('#content');
+});
+app.config.unwrapInjectedRef = true;
+app.mount('#content');

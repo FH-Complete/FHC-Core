@@ -1,7 +1,7 @@
 import {CoreNavigationCmpt} from '../../components/navigation/Navigation.js';
 import DashboardAdmin from '../../components/Dashboard/Admin.js';
 
-Vue.createApp({
+const app = Vue.createApp({
   data: () => ({
       appSideMenuEntries: {}
     }),
@@ -9,4 +9,6 @@ Vue.createApp({
     CoreNavigationCmpt,
     DashboardAdmin
   }
-}).mount('#main');
+});
+app.config.unwrapInjectedRef = true;
+app.mount('#main');

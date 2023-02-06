@@ -1,3 +1,5 @@
+@import './calendar.css';
+
 .alert-danger .form-check-input:checked {
 	border-color: #842029;
 	background-color: #842029;
