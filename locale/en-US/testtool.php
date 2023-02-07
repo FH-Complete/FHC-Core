@@ -52,4 +52,6 @@ $this->phrasen['testtool/keinPrueflingseintragVorhanden']='No candidate entry av
 $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='You have applied for the following degree programs:';
 $this->phrasen['testtool/invalideGebiete']='One or more question areas incorrect!<br>Please inform an assisting person.';
 $this->phrasen['testtool/prueflingGesperrt']='Please contact the placement test supervisor!';
+$this->phrasen['testtool/freischaltcode']='Activation code';
+$this->phrasen['testtool/freischalttext']='You will receive your activation code on the day of the placement test after the introduction in the ZOOM meeting (see guideline) from the supervisor.<br /> We wish you good luck.'
 ?>
