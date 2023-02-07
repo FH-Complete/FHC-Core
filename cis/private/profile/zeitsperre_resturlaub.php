@@ -324,6 +324,10 @@ function showHideStudeDropDown()
 	{
 		document.getElementById('vonStd').style.visibility = 'hidden';
 		document.getElementById('bisStd').style.visibility = 'hidden';
+
+		// Stunde entfernen
+		document.getElementById('vonstunde').selectedIndex = 0;
+		document.getElementById('bisstunde').selectedIndex = 0;
 	}
 	else
 	{
@@ -884,7 +888,7 @@ $content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="
 //dropdown fuer vonstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 
-$content_form.= " <SELECT name='vonstunde'$style>\n";
+$content_form.= " <SELECT id='vonstunde' name='vonstunde'$style>\n";
 if($zeitsperre->vonstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
 else
@@ -905,7 +909,7 @@ $content_form.= "</SELECT></td></tr>";
 $content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td id="bisStd"  style="text-align:right;"> ';
 //dropdown fuer bisstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
-$content_form.= " <SELECT name='bisstunde'$style>\n";
+$content_form.= " <SELECT id='bisstunde' name='bisstunde'$style>\n";
 
 if($zeitsperre->bisstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
