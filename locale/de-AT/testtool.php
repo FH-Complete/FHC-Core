@@ -45,6 +45,7 @@ $this->phrasen['testtool/beiDiesemGebietMuessenSieJedeFrageBeantworten']='Bei di
 $this->phrasen['testtool/bearbeitungszeit']='Bearbeitungszeit';
 $this->phrasen['testtool/dieZeitIstAbgelaufen']='Die Zeit ist abgelaufen!<br /> Bitte aktivieren Sie Javascript in Ihrem Browser!';
 $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='Diese Frage ist nicht für Sie bestimmt';
+$this->phrasen['testtool/dasGebietIstNichtFuerSieBestimmt']='Das Gebiet ist nicht für Sie bestimmt';
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Fehler beim Speichern der Erstansicht';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu starten, drücken Sie bitte links oben auf <b>Gebiet starten</b>.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
