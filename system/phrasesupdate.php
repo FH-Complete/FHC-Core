@@ -15711,6 +15711,46 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'kvp',
+		'phrase' => 'new.error.nostandardcourse.title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fehler",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Error",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.error.nostandardcourse.msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dieser Moodle Kurs ist keinem standardisierten Quellkurs zugeordnet",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "This Moodle Course is not derived from a standardized Source Course",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
 		'phrase' => 'admin.title.oes',
 		'insertvon' => 'system',
 		'phrases' => array(
