@@ -22,7 +22,10 @@ export default {
 			}
 
 			return this.allNewsList.slice(0, quantity);
-		}
+		},
+                placeHolderImgURL: function() {
+                    return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/fh_technikum_wien_illustration_klein.png';
+                }
 	},
 	created(){
 		axios
@@ -69,7 +72,7 @@ export default {
        <div v-else class="h-100" :class="'row row-cols-' + width">
         <div v-for="news in newsList" :key="news.id">
             <div class="card h-100">
-                <img src="../../skin/images/fh_technikum_wien_illustration_klein.png" class="card-img-top">
+                <img :src="placeHolderImgURL" class="card-img-top">
                 <div class="card-footer"><span class="card-subtitle small text-muted">{{ formatDateTime(news.insertamum) }}</span></div>
                 <div class="card-body">
                   <a href="#newsModal" class="card-title h5 stretched-link" @click="setSingleNews(news)">{{ news.betreff }}</a><br>
@@ -85,7 +88,7 @@ export default {
   <BsModal ref="newsModal" id="newsModal" dialog-class="modal-lg">
     <template #title>
       <div class="row">
-        <div class="col-5"><img src="../../skin/images/fh_technikum_wien_illustration_klein.png" class="img-fluid rounded-start"></div>
+        <div class="col-5"><img :src="placeHolderImgURL" class="img-fluid rounded-start"></div>
         <div class="col-7 d-flex align-items-end">
           <p>{{ singleNews.betreff }}<br><small class="text-muted">{{ formatDateTime(singleNews.insertamum) }}</small></p>
         </div>
@@ -101,7 +104,7 @@ export default {
     <div class="row row-cols-5 g-4 h-100 px-5">
      <div v-for="news in allNewsList" :key="news.id">
             <div class="card h-100">
-                <img src="../../skin/images/fh_technikum_wien_illustration_klein.png" class="card-img-top">
+                <img :src="placeHolderImgURL" class="card-img-top">
                 <div class="card-footer"><span class="card-subtitle small">{{ formatDateTime(news.insertamum) }}</span></div>
                 <div class="card-body">
                   <a href="" class="card-title h5 stretched-link" @click="setSingleNews1(news)">{{ news.betreff }}</a><br>
