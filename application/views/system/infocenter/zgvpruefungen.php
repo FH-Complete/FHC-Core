@@ -2,7 +2,7 @@
 	<?php
 	$unique_studsemester = array();
 	$first = true;
-	$fit_programme_studiengaenge = array(10021, 10027);
+	$fit_programme_studiengaenge = $additional_stg;
 	foreach ($zgvpruefungen as $zgvpruefung):
 		$infoonly = $zgvpruefung->infoonly;
 		$studiengangkurzbz = $studiengangbezeichnung = $studiengangtyp = '';

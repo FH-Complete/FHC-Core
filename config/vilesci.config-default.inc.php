@@ -268,4 +268,7 @@ define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
 
 //Default Lehrmodus
 define ('DEFAULT_LEHRMODUS','regulaer');
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
 ?>
