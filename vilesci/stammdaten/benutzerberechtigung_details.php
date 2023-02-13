@@ -473,7 +473,23 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$name->load($uid);
 
 		$htmlstr .= "Berechtigungen von <b>".$name->nachname." ".$name->vorname." (".$uid.")</b>";
-		$htmlstr .= "<p class='inserterror'>".$errorstr."</p><p class='insertok'>".$successstr."</p>";
+		$message = '';
+		$class = '';
+		if ($errorstr != '' || $successstr != '')
+		{
+			if ($successstr != '')
+			{
+				$class = 'class="alert alert-success"';
+				$message = $successstr;
+			}
+			elseif ($errorstr != '')
+			{
+				$class = 'class="alert alert-danger"';
+				$message = $errorstr;
+			}
+		}
+		$htmlstr .= '	<div id="msgbox" '.$class.'>'.$message.'</div>';
+		//$htmlstr .= "<p class='inserterror'>".$errorstr."</p><p class='insertok'>".$successstr."</p>";
 
 		//Formular zum Kopieren von Berechtigungen
 		//$htmlstr .= "<form action='benutzerberechtigung_details.php?uid=".$uid."' method='POST' name='berechtigung_kopieren'>";
@@ -562,8 +578,6 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					<th>Gültig ab</th>
 					<th>Gültig bis</th>
 					<th>Anmerkung</th>
-					<th>Info</th>
-					<th></th>
 					<th></th>
 				</tr></thead><tbody>";
 
@@ -641,7 +655,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	//Anmerkung
 	$htmlstr .= "		<td><input id='anmerkung_neu' type='text' name='dataset[0][anmerkung]' value='' size='30' maxlength='256'></td>";
 
-	$htmlstr .= "		<td><input type='submit' name='schick' value='Speichern' onclick='return validateNewData()'></td>";
+	$htmlstr .= "		<td><input type='submit' name='schick' value='Neu anlegen' onclick='return validateNewData()'></td>";
 	$htmlstr .= "</form>";
 	$htmlstr .= "	</tr></tbody></table>";
 
@@ -656,32 +670,32 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>";
 	$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$funktion_kurzbz."'>";
-	$htmlstr .= "	<table style='width: 100%; white-space: nowrap; margin-bottom: -8px;'>
+	/*$htmlstr .= "	<table style='width: 100%; white-space: nowrap; margin-bottom: -8px;'>
 					<tr>
 						<td style='width: 33.3%; padding-left: 10px;'>
-							<a href='#' data-toggle='checkboxes' data-action='toggle' id='toggle_t1'><img src='../../skin/images/checkbox_toggle.png' name='toggle'></a>
-							<a href='#' data-toggle='checkboxes' data-action='uncheck' id='uncheck_t1'><img src='../../skin/images/checkbox_uncheck.png' name='toggle'></a>
+
 						</td>
 					</tr>
 					</table>
-					";
+					";*/
 	$htmlstr .= "<table id='t1' class='tablesorter'>";
-	$htmlstr .= "<thead><tr></tr>";
+	$htmlstr .= "<thead>";
 	$htmlstr .= "<tr>
-					<th style='width: 30px'></th>
+					<th style='width: 30px'><a href='#' data-toggle='checkboxes' data-action='toggle' id='toggle_t1'><img src='../../skin/images/checkbox_toggle.png' name='toggle'></a>
+							<a href='#' data-toggle='checkboxes' data-action='uncheck' id='uncheck_t1'><img src='../../skin/images/checkbox_uncheck.png' name='toggle'></a></th>
 					<th>Rolle</th>
 					<th>Berechtigung</th>
 					<th style='width: 30px'>Art</th>
 					<th class='oe_column'>Organisationseinheit</th>
 					<th class='ks_column'>Kostenstelle</th>
-					<!--<th>Semester</th>-->
+					
 					<th style='width: 30px'>Neg</th>
 					<th>Gültig ab</th>
 					<th>Gültig bis</th>
 					<th>Anmerkung</th>
 					<th style='width: 30px'>Info</th>
 					<th></th>
-					<!--<th></th>-->
+				
 				</tr></thead><tbody>";
 
 	foreach($rights->berechtigungen as $b)
@@ -743,7 +757,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</select>";
 		if ($b->rolle_kurzbz != '')
 		{
-			$htmlstr .= "	<a href='berechtigungrolle.php?rolle_kurzbz=".$b->rolle_kurzbz."' target='_blank'>?&nbsp;</a>";
+			$htmlstr .= "	<a href='berechtigungrolle.php?rolle_kurzbz=".$b->rolle_kurzbz."' target='_blank' style='color: unset'><span class='glyphicon glyphicon-eye-open'></span></a>";
 		}
 		$htmlstr.="</td>";
 
@@ -754,7 +768,11 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 										class='berechtigung_autocomplete' 
 										name='dataset[$b->benutzerberechtigung_id][berechtigung_kurzbz]' 
 										value='".$b->berechtigung_kurzbz."'
-										title='".($b->berechtigung_kurzbz != '' ? $berechtigung_arr[$b->berechtigung_kurzbz] : '')."'>";
+										title='".($b->berechtigung_kurzbz != '' ? $berechtigung_arr[$b->berechtigung_kurzbz] : '')."'
+										data-toggle='tooltip' 
+										data-html='true' 
+										data-placement='auto' 
+										data-original-title='Foo'>";
 		$htmlstr .= "		</td>";
 
 		//Art
@@ -827,20 +845,36 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</td>";
 
 		//Info
-		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><img src='../../skin/images/information.png' alt='information' title='Angelegt von ".$b->insertvon." am ".$b->insertamum." Zuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'></td>";
+		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'>
+								<span 
+									class='glyphicon glyphicon-info-sign' 
+									title='Angelegt von ".$b->insertvon." am ".$b->insertamum." Zuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'
+									data-toggle='tooltip' 
+									data-html='true' 
+									data-placement='auto' 
+									data-original-title='Foo'>
+							</span></td>";
 
 		$htmlstr .= "		<td style='white-space: nowrap'>";
-		$htmlstr .= "			<button type='submit' name='copy' value='$b->benutzerberechtigung_id' id='copy_$b->benutzerberechtigung_id' style='margin-right: 10px'>Duplizieren</button>";
-		$htmlstr .= "			<button type='submit' name='delete' value='$b->benutzerberechtigung_id' id='delete_$b->benutzerberechtigung_id'>Löschen</button>";
+		$htmlstr .= "			<button type='submit' name='copy' value='$b->benutzerberechtigung_id' id='copy_$b->benutzerberechtigung_id' style='margin-right: 5px; border:none'><span class='glyphicon glyphicon-duplicate'></span></button>";
+		$htmlstr .= "			<button type='submit' name='delete' value='$b->benutzerberechtigung_id' id='delete_$b->benutzerberechtigung_id' style='border:none'><span class='glyphicon glyphicon-remove'></span></button>";
 		$htmlstr .= "		</td>";
 		$htmlstr .= "	</tr>";
 	}
 	$htmlstr .= "</tbody></table>";
-	$htmlstr .= '<div id="bottomArea">
-					<input style="margin-bottom: 5px;" type="submit" name="schick" value="Speichern" onclick="return validateSpeichern()"><br>';
-	$htmlstr .= '<input type="text" placeholder="Zu UID übertragen" class="benutzer_autocomplete" id="input_uebertragen_nach" name="uebertragen_nach" style="margin-left: 20px; margin-right: 0">';
-	$htmlstr .= '<input type="submit" id="button_uebertragen" name="uebertragen" value="Zu UID übertragen" style="margin-left: 0" onclick="return validateUebertragen()">
-					<input type="submit" id="button_mehrfachloeschen" name="delete_multi" value="Markierte löschen" style="margin-left: 20px; margin-right: 0" onclick="return validateDeleteMulti()">
+	$htmlstr .= '<div id="bottomArea" >
+					<div class="input-group">
+						<button type="submit" class="btn btn-success" name="schick" onclick="return validateSpeichern()" style="margin-bottom: 10px">Speichern</button>
+						<div class="input-group" style="width: 180px; margin-bottom: 10px">
+							<input type="text" id="input_uebertragen_nach" name="uebertragen_nach" class="form-control benutzer_autocomplete" placeholder="Zu UID übertragen">
+							<div class="input-group-btn">
+								<button class="btn btn-default" type="submit" id="button_uebertragen" name="uebertragen" onclick="return validateUebertragen()">
+									<i class="glyphicon glyphicon-transfer" style="line-height: unset"></i>
+								</button>
+							</div>
+						</div>
+						<button type="submit" id="button_mehrfachloeschen" name="delete_multi" value="delete_multi" class="btn btn-warning" onclick="return validateDeleteMulti()">Markierte löschen</button>
+					</div>
 				</div>';
 	$htmlstr .= "</form>";
 
@@ -856,18 +890,19 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css">
 	<script src="../../include/js/mailcheck.js"></script>
 	<script src="../../include/js/datecheck.js"></script>
-<!--	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>-->
+<!--	<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>-->
 <!--	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>-->
 <!--	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>-->
 	<?php
 	include('../../include/meta/jquery.php');
 	include('../../include/meta/jquery-tablesorter.php');
 	?>
-	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<!--	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>-->
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js"></script>
+<!--	<script type="text/javascript" src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js"></script>-->
 	<style type="text/css">
 
 	<?php if(1==2): ?>
@@ -913,23 +948,64 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		}
 		#bottomArea
 		{
-			width: 500px;
-			border-top-left-radius: 10px;
-			border-top-right-radius: 10px;
-			text-align: center; 
-			position: sticky; 
-			bottom: 0px; 
+			width: 250px;
+			/*border-top-left-radius: 10px;*/
+			/*border-top-right-radius: 10px;*/
+			text-align: center;
+			position: sticky;
+			bottom: 0px;
+			right: 0px;
 			padding: 10px;
 			background-color: rgba(238,238,238,0.9);
 			border-top: 1px solid #999;
-            border-left: 1px solid #999;
-            border-right: 1px solid #999;
-			margin: auto;
+			border-left: 1px solid #999;
+			/*border-right: 1px solid #999;*/
+			margin-left: auto;
+			display: block ruby;
+		}
+		#msgbox
+        {
+			width: max-content;
+			text-align: center;
+			position: absolute;
+			top: 0px;
+			padding: 10px;
+			margin-left: auto;
+			margin-right: auto;
+			left: 0;
+			right: 0;
+		}
+		.ui-tooltip
+		{
+			padding:8px;
+			position:absolute;
+			max-width:300px;
+			opacity: 1 !important;
+			box-shadow: unset;
+			border-radius: unset !important;
+			background: black;
+			color: white;
+			border: 4px solid black;
 		}
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function()
 		{
+			// $("[data-toggle=\"popover\"]").popover();
+			// $("[data-toggle=\"popover\"]").popover({html:true});
+			$("[data-toggle='tooltip']").tooltip({
+				show: {
+							effect:'toggle',
+							delay:0
+						},
+						content: function () {
+							return $(this).prop("title");
+						},
+				hide: {
+							effect:'toggle',
+							delay:0
+						}
+			});
 			$( ".datepicker_datum" ).datepicker({
 				 changeMonth: true,
 				 changeYear: true,
@@ -943,14 +1019,14 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			$("#t1").tablesorter(
 				{
 					sortList: [[0,0],[1,0],[2,0],[4,0]],
-					widgets: ["filter", "stickyHeaders"],
+					widgets: ["filter"],
 					headers: {6:{sorter:false, filter:false},10:{sorter:false, filter:false},11:{sorter:false, filter:false}},
 					widgetOptions : {	filter_functions : {
 							// Add select menu to this column
 							0 : {
-								"Grün" : function(e, n, f, i, $r, c, data) { return /a/.test(e); },
-								"Gelb" : function(e, n, f, i, $r, c, data) { return /b/.test(e); },
-								"Rot" : function(e, n, f, i, $r, c, data) { return /c/.test(e); }
+								"Aktive" : function(e, n, f, i, $r, c, data) { return /a/.test(e); },
+								"Wartende" : function(e, n, f, i, $r, c, data) { return /b/.test(e); },
+								"Inaktive" : function(e, n, f, i, $r, c, data) { return /c/.test(e); }
 							}
 						}},
 					// Um die Werte im Dropdown sortieren zu können
@@ -1083,6 +1159,13 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			//if (typeof $("#filterTableDataset").checkboxes === 'function')
 			//	$("#filterTableDataset").checkboxes("range", true);
 			//$("input.auswahlcheckbox").checkboxes('range', true); //Wählt ALLE Checkboxen. Funktioniert nicht mit anderem selector
+
+			window.setTimeout(function()
+			{
+				$(".alert-success").fadeTo(500, 0).slideUp(500, function(){
+					$(this).remove();
+				});
+			}, 1500);
 		});
 
 		function validateUebertragen()
