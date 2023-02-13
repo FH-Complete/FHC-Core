@@ -47,7 +47,7 @@ $this->phrasen['abgabetool/seitenanzahl']='Seitenanzahl';
 $this->phrasen['abgabetool/pflichtfeld']='Pflichtfeld';
 $this->phrasen['abgabetool/emailAnBetreuer']='Email an Betreuer schreiben';
 $this->phrasen['abgabetool/dateiupload']='Dateiupload';
-$this->phrasen['abgabetool/nurPDF']='nur PDF bis max. 15 MB';
+$this->phrasen['abgabetool/nurPDF']='nur PDF bis max. 30 MB';
 $this->phrasen['abgabetool/terminVorbei']='Termin vorbei';
 $this->phrasen['abgabetool/projektabgabeUebersicht']='Projektabgabe - Übersicht';
 $this->phrasen['abgabetool/termin']='Termin';
@@ -68,7 +68,7 @@ $this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Fehler beim Versenden d
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Betreuer nicht gefunden. Kein Mail verschickt!';
 $this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Fehler bei Ermittlung der Aktualit&auml;t der Projektarbeit';
 $this->phrasen['abgabetool/keinPDF']='Upload ist keine pdf-Datei! Bitte wiederholen Sie den Fileupload.';
-$this->phrasen['abgabetool/dateiZuGross']='Die Datei ist zu groß! Maximale Dateigröße 15 MB';
+$this->phrasen['abgabetool/dateiZuGross']='Die Datei ist zu groß! Maximale Dateigröße 30 MB';
 $this->phrasen['abgabetool/fehlerTerminVorbei']='Die Abgabefrist für diesen Termin ist bereits abgelaufen.';
 
 $this->phrasen['abgabetool/eidesstattlicheErklaerung']='Ich erkläre hiermit an Eides statt, dass ich die vorliegende Arbeit selbständig angefertigt habe.
