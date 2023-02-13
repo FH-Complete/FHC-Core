@@ -1114,6 +1114,50 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
+	 * Gibt ein Array mit den UIDs der Vorgesetzten zum Zeitpunkt des korrespondierenden Timesheets zurück
+	 * @return uid
+	 */
+	public function getVorgesetzteMonatTimesheet($uid, $timesheetDate)
+	{
+		$return=false;
+
+		$qry = "SELECT
+					uid  as vorgesetzter
+				FROM
+					public.tbl_benutzerfunktion
+				WHERE
+					funktion_kurzbz='Leitung' AND
+					(datum_von is null OR datum_von<=".$this->db_add_param($timesheetDate).") AND
+					(datum_bis is null OR datum_bis>=".$this->db_add_param($timesheetDate).") AND
+					oe_kurzbz in (SELECT oe_kurzbz
+									FROM public.tbl_benutzerfunktion
+									WHERE
+									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
+									(datum_von is null OR (datum_von<= ".$this->db_add_param($timesheetDate).")) AND
+									(datum_bis is null OR (datum_bis>=".$this->db_add_param($timesheetDate)."))
+									);";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				if ($row->vorgesetzter!='')
+				{
+					$this->vorgesetzte[]=$row->vorgesetzter;
+					$return=true;
+				}
+			}
+
+			$this->vorgesetzte = array_unique($this->vorgesetzte);
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+		}
+		return $return;
+	}
+
+	/**
 	 * Gibt UID des letzten Vorgesetzten zurück
 	 * @param string $uid Mitarbeiter.
 	 * @return uid letzter Vorgesetzter
@@ -1702,6 +1746,34 @@ class mitarbeiter extends benutzer
 		{
 				$this->errormsg = "Fehler bei der Abfrage aufgetreten";
 				return false;
+		}
+	}
+
+	public function getMitarbeiterKostenstelle($von, $bis, $uid = null)
+	{
+		if (is_null($uid))
+			$uid = $this->uid;
+		
+		$qry = "
+			SELECT o.oe_kurzbz AS standardkostenstelle, o.bezeichnung
+			FROM public.tbl_benutzerfunktion bf
+				JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				WHERE bf.funktion_kurzbz = 'kstzuordnung'
+				AND (bf.datum_bis IS NULL OR datum_bis >= ". $this->db_add_param($von). ")
+				AND (bf.datum_von IS NULL OR datum_von <= ". $this->db_add_param($bis). ")
+					AND bf.uid = ". $this->db_add_param($uid);
+
+		if ($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+				$obj->oekurzbz = $row->standardkostenstelle;
+				$obj->bezeichnung = $row->bezeichnung;
+				
+				$this->result []= $obj;
+			}
+			return true;
 		}
 	}
 

@@ -533,7 +533,7 @@ export const CoreFilterCmpt = {
 			@data-fetched="fetchCmptDataFetched">
 		</core-fetch-cmpt>
 
-		<div class="row">
+		<div class="row" v-if="title != null && title != ''">
 			<div class="col-lg-12">
 				<h3 class="page-header">
 					{{ title }}
