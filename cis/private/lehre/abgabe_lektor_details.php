@@ -225,12 +225,14 @@ echo '
 				cursor: pointer;
 				outline: inherit;
 			}
+
 			#zweitbetrmailicon {
 				top: 4px;
 				height: 18px;
 				width: 18px;
 				position: relative;
 			}
+
 			#tokenmailicon {
 				top: 2px;
 				height: 15px;
@@ -238,6 +240,9 @@ echo '
 				position: relative;
 			}
 
+			.warningtext {
+				color: #8a6d3b;
+			}
 		</style>
 
 		<script language="Javascript">
@@ -508,7 +513,10 @@ else
 {
 	$htmlstr .= "<td>&nbsp;</td></tr>";
 }
-$htmlstr .= "<tr><td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
+$htmlstr .= "<tr>
+					<td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td>
+					<td align='center' class='warningtext'>".(isset($quick_info) ? $quick_info : '')."</td>
+					<td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
 $htmlstr .= "</tr>\n";
 
 if (isset($zweitbetreuerArr) && is_array($zweitbetreuerArr)) // wenn es Zweitbetreuer gibt
