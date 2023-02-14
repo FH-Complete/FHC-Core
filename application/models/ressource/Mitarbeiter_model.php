@@ -205,8 +205,16 @@ class Mitarbeiter_model extends DB_Model
 
 	public function getEmployeesZeitaufzeichnungspflichtig()
 	{
-		$qry = "SELECT DISTINCT  mitarbeiter_uid FROM bis.tbl_bisverwendung WHERE beginn <= now() and  (ende >= now() OR ende is NULL) AND zeitaufzeichnungspflichtig is TRUE
-				ORDER BY mitarbeiter_uid";
+		$qry = "
+			SELECT
+				DISTINCT  mitarbeiter_uid
+			FROM
+				bis.tbl_bisverwendung
+			WHERE
+				beginn <= now() and (ende >= now() OR ende is NULL)
+				AND zeitaufzeichnungspflichtig is TRUE
+			ORDER BY mitarbeiter_uid";
+		
 		return $this->execQuery($qry);
 	}
 }
