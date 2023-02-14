@@ -12,68 +12,87 @@ class Zeitsperre_model extends DB_Model
 		$this->pk = 'zeitsperre_id';
 	}
 
-    /**
-     * Save or update Zeitsperre.
-     *
-     * @param $zeitsperretyp_kurzbz
-     * @param $mitarbeiter_uid
-     * @param $vonDatum
-     * @param $bisDatum
-     * @param null $vonStunde
-     * @param null $bisStunde
-     * @param null $bezeichnung
-     * @param null $vertretung_uid
-     * @param null $erreichbarkeit_kurzbz
-     * @param null $freigabeamum
-     * @param null $freigabevon
-     * @return array
-     */
-    public function save($zeitsperretyp_kurzbz, $mitarbeiter_uid, $vonDatum, $bisDatum,
-                         $vonStunde = null, $bisStunde = null, $bezeichnung = null, $vertretung_uid = null,
-                         $erreichbarkeit_kurzbz = null, $freigabeamum = null, $freigabevon = null)
-    {
-        return $this->insert(array(
-            'zeitsperretyp_kurzbz' => $zeitsperretyp_kurzbz,
-            'mitarbeiter_uid' => $mitarbeiter_uid,
-            'vondatum' => $vonDatum,
-            'bisdatum' => $bisDatum,
-            'vonstunde' => $vonStunde,
-            'bisstunde' => $bisStunde,
-            'bezeichnung' => $bezeichnung,
-            'vertretung_uid' => $vertretung_uid,
-            'insertvon' => getAuthUID(),
-            'insertamum' => (new DateTime())->format('Y-m-d H:i:s'),
-            'erreichbarkeit_kurzbz' => $erreichbarkeit_kurzbz,
-            'freigabeamum' => $freigabeamum,
-            'freigabevon' => $freigabevon
-            ));
-    }
+	/**
+	 * Save or update Zeitsperre.
+	 *
+	 * @param $zeitsperretyp_kurzbz
+	 * @param $mitarbeiter_uid
+	 * @param $vonDatum
+	 * @param $bisDatum
+	 * @param null $vonStunde
+	 * @param null $bisStunde
+	 * @param null $bezeichnung
+	 * @param null $vertretung_uid
+	 * @param null $erreichbarkeit_kurzbz
+	 * @param null $freigabeamum
+	 * @param null $freigabevon
+	 * @return array
+	 */
+	public function save($zeitsperretyp_kurzbz, $mitarbeiter_uid, $vonDatum, $bisDatum,
+						 $vonStunde = null, $bisStunde = null, $bezeichnung = null, $vertretung_uid = null,
+						 $erreichbarkeit_kurzbz = null, $freigabeamum = null, $freigabevon = null)
+	{
+		return $this->insert(array(
+			'zeitsperretyp_kurzbz' => $zeitsperretyp_kurzbz,
+			'mitarbeiter_uid' => $mitarbeiter_uid,
+			'vondatum' => $vonDatum,
+			'bisdatum' => $bisDatum,
+			'vonstunde' => $vonStunde,
+			'bisstunde' => $bisStunde,
+			'bezeichnung' => $bezeichnung,
+			'vertretung_uid' => $vertretung_uid,
+			'insertvon' => getAuthUID(),
+			'insertamum' => (new DateTime())->format('Y-m-d H:i:s'),
+			'erreichbarkeit_kurzbz' => $erreichbarkeit_kurzbz,
+			'freigabeamum' => $freigabeamum,
+			'freigabevon' => $freigabevon
+			));
+	}
 
-    /**
-     * Delete Zeitsperre.
-     * @return array|stdClass|null
-     */
-    public function deleteEntriesForCurrentDay()
-    {
-        $today = date('Y-m-d');
-        $qry = "DELETE FROM " . $this->dbTable . "
-                WHERE vondatum = '" . $today . "';";
+	/**
+	 * Delete Zeitsperre.
+	 * @return array|stdClass|null
+	 */
+	public function deleteEntriesForCurrentDay()
+	{
+		$today = date('Y-m-d');
+		$qry = "DELETE FROM " . $this->dbTable . "
+				WHERE vondatum = '" . $today . "';";
 
-        return $this->execQuery($qry);
-    }
+		return $this->execQuery($qry);
+	}
 
-		public function getMitarbeiterListWithPendingVacation()
-		{
-			$qry = "SELECT
+	/**
+	 * get Employees with pending Vacation entries
+	 */
+	public function getMitarbeiterListWithPendingVacation()
+	{
+		$qry = "SELECT
+				DISTINCT mitarbeiter_uid
+			FROM
+				campus.tbl_zeitsperre
+			WHERE
+				freigabeamum is NULL
+				AND zeitsperretyp_kurzbz='Urlaub'
+				AND vondatum>=now()
+			ORDER BY mitarbeiter_uid ASC;";
+		return $this->execQuery($qry);
+	}
+
+	/**
+	 * Get list of Persons with Zeitsperre within the last week
+	 */
+	public function zeitsperreExistsForLastWeekList()
+	{
+		$qry = "SELECT
 					DISTINCT mitarbeiter_uid
-				FROM
-					campus.tbl_zeitsperre
+				FROM campus.tbl_zeitsperre
 				WHERE
-					freigabeamum is NULL
-					AND zeitsperretyp_kurzbz='Urlaub'
-					AND vondatum>=now()
-				ORDER BY mitarbeiter_uid ASC;";
-			return $this->execQuery($qry);
-		}
+					(vondatum >= now()-'7 days'::interval AND vondatum <= now())
+					OR
+					(bisdatum >= now()-'7 days'::interval AND bisdatum <= now())";
 
+		return $this->execQuery($qry);
+
+	}
 }
