@@ -519,8 +519,8 @@ if ($rtprueflingEntSperren)
 }
 
 // Ajax-Request um einen Prüfling Zeit für ein bestimmtes Gebiet hinzuzufügen
-$prueflingAddTime = filter_input(INPUT_POST, 'prueflingAddTime', FILTER_VALIDATE_BOOLEAN);
-if ($prueflingAddTime)
+$prestudentAddTime = filter_input(INPUT_POST, 'prestudentAddTime', FILTER_VALIDATE_BOOLEAN);
+if ($prestudentAddTime)
 {
 	if (!$rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'su'))
 	{
@@ -531,7 +531,7 @@ if ($prueflingAddTime)
 		exit();
 	}
 
-	if (isset($_POST['pruefling_id']) && is_numeric($_POST['pruefling_id'])
+	if (isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id'])
 		&& isset($_POST['gebiet']) && is_numeric($_POST['gebiet'])
 		&& isset($_POST['time']) && is_numeric($_POST['time']))
 	{
@@ -552,14 +552,19 @@ if ($prueflingAddTime)
 						ELSE
 							(endtime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute'))
 						END
-					WHERE prueflingfrage_id IN
-					(
-						SELECT prueflingfrage_id
-						FROM testtool.tbl_pruefling
-							JOIN testtool.tbl_pruefling_frage USING (pruefling_id)
-							JOIN testtool.tbl_frage ON tbl_pruefling_frage.frage_id = tbl_frage.frage_id
-						WHERE pruefling_id = ". $db->db_add_param($_POST['pruefling_id']) . " AND gebiet_id = ". $db->db_add_param($_POST['gebiet']) ."
-					)";
+				WHERE prueflingfrage_id IN
+				(
+					SELECT prueflingfrage_id
+					FROM testtool.tbl_pruefling
+					JOIN testtool.tbl_pruefling_frage USING (pruefling_id)
+					JOIN testtool.tbl_frage ON tbl_pruefling_frage.frage_id = tbl_frage.frage_id
+					JOIN tbl_prestudent ps on tbl_pruefling.prestudent_id = ps.prestudent_id
+					JOIN tbl_prestudent pss USING (person_id)
+					WHERE pss.prestudent_id = ". $db->db_add_param($_POST['prestudent_id']) . "
+					AND gebiet_id = ". $db->db_add_param($_POST['gebiet']) ."
+					AND (extract(day FROM begintime) = extract(day FROM CURRENT_DATE) OR begintime IS NULL)
+				)";
+
 		
 		if ($result = $db->db_query($qry))
 		{
@@ -2486,14 +2491,14 @@ else
 			});
 		}
 	}
-	function prueflingAddTime(pruefling_id, gebiet)
+	function prestudentAddTime(prestudent_id, gebiet)
 	{
-		var min = $("#prueflingAddTime_" + pruefling_id + "_gebiet_" + gebiet).val();
+		var min = $("#prestudentAddTime_" + prestudent_id + "_gebiet_" + gebiet).val();
 		data = {
-			pruefling_id: pruefling_id,
+			prestudent_id: prestudent_id,
 			gebiet: gebiet,
 			time: min,
-			prueflingAddTime: true
+			prestudentAddTime: true
 		};
 
 		$.ajax({
@@ -3372,25 +3377,22 @@ else
 						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->prozent != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->prozent, 2, ',', ' ') . ' %' : '') . '</td>';
 						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>';
 
-						if (!is_null($erg->pruefling_id))
+						$time = strtotime($gbt->zeit);
+						$minutes = date('i', $time);
+						echo '<select id="prestudentAddTime_'.$erg->prestudent_id .'_gebiet_' . $gbt->gebiet_id . '">';
+						
+						for ($i = 2; $i <= 10; $i = $i +2)
 						{
-							$time = strtotime($gbt->zeit);
-							$minutes = date('i', $time);
-							echo '<select id="prueflingAddTime_'.$erg->pruefling_id .'_gebiet_' . $gbt->gebiet_id . '">';
-
-							for ($i = 2; $i <= 10; $i = $i +2)
-							{
-								if ($i < $minutes)
-									echo '<option value="'. $i .'">00:' . sprintf("%02d", $i) .':00</option>';
-							}
-
-							echo '<option value="'. $minutes .'">'. $gbt->zeit .'</option>';
-
-							echo '</select>
-								<a href="#" id="prueflingAddTime_'.$erg->pruefling_id .'" onclick="prueflingAddTime('.  $erg->pruefling_id.  '' . ', ' .$gbt->gebiet_id .')">
+							if ($i < $minutes)
+								echo '<option value="'. $i .'">00:' . sprintf("%02d", $i) .':00</option>';
+						}
+						
+						echo '<option value="'. $minutes .'">'. $gbt->zeit .'</option>';
+						
+						echo '</select>
+								<a href="#" class="prestudentAddTime_'.$erg->prestudent_id .'" onclick="prestudentAddTime('.  $erg->prestudent_id.  '' . ', ' .$gbt->gebiet_id .')">
 									<span class="glyphicon glyphicon-ok"></span>
 								</a>';
-						}
 						echo '</td>';
 					}
 					else
