@@ -1,4 +1,4 @@
-import gehaltsbestandteil from './gehaltsbestandteil';
+import gehaltsbestandteil from './gehaltsbestandteil.js';
 
 export default {
   template: `
