@@ -2,15 +2,16 @@ import vertragsbestandteilstunden from './vertragsbestandteil_stunden.js';
 import vertragsbestandteilzeitaufzeichnung from './vertragsbestandteil_zeitaufzeichnung.js';
 import vertragsbestandteilfunktion from './vertragsbestandteil_funktion.js';
 import vertragsbestandteilfreitext from './vertragsbestandteil_freitext.js';
+import presetable from '../../mixins/vbform/presetable.js';
+import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
   template: `
-  <div class="row">
-    <div class="col-7">
-      <form>
-        <div class="row">
+      <div>
+        <div class="row py-2 border-bottom mb-3">
           <div class="col">
             <select v-model="vertragsbestandteiltyp" class="form-select form-select-sm" aria-label=".form-select-sm example">
+              <option value="" selected disabled>Vertragsbestandteil wählen</option>
               <option value="vertragsbestandteilstunden">Vertragsbestandteil Stunden</option>
               <option value="vertragsbestandteilzeitaufzeichnung">Vertragsbestandteil Zeitaufzeichnung</option>
               <option value="vertragsbestandteilfunktion">Vertragsbestandteil Funktion</option>
@@ -18,38 +19,23 @@ export default {
             </select>
           </div>
           <div class="col">
-            <button class="btn btn-primary btn-sm" @click="addVB">Vertragsbestandteil hinzufuegen</button>
+            <button class="btn btn-primary btn-sm" @click="addVB" v-bind:disabled="(this.vertragsbestandteiltyp === '')">Vertragsbestandteil hinzufuegen</button>
           </div>
           <div class="col">
-            <button class="btn btn-secondary btn-sm" @click="getJSON">get JSON</button>
+            <button class="btn btn-secondary btn-sm float-end" @click="getJSON">get JSON</button>
           </div>
         </div>
-        <component v-bind:ref="vb.id" v-bind:is="vb.type" v-for="vb in vbs" v-bind:id="vb.id" @removeVB="removeVB"></component>
-      </form>
-    </div>
-    <div class="col-5">
-      <pre style="background-color: #000; color: #0f0; padding: .5em; height: 90vh;">
-{{resjson}}
-      </pre>
-    </div>
-  </div>
+        <component v-bind:ref="config.guioptions.id" v-bind:is="config.type" v-for="config in children"
+          v-bind:config="config" :key="config.guioptions.id" @removeVB="removeVB"></component>
+      </div>
   `,
   data: function() {
     return {
-      vertragsbestandteiltyp: 'vertragsbestandteil',
+      vertragsbestandteiltyp: '',
       payload: {
+        type: 'formdata',
         vbs: []
-      },
-      vbs: [
-        {
-          type: 'vertragsbestandteilstunden',
-          id: 'test1'
-        },
-        {
-          type: 'vertragsbestandteilzeitaufzeichnung',
-          id: 'test2'
-        }
-      ],
+      }
     };
   },
   components: {
@@ -58,41 +44,51 @@ export default {
     'vertragsbestandteilfunktion': vertragsbestandteilfunktion,
     'vertragsbestandteilfreitext': vertragsbestandteilfreitext,
   },
+  mixins: [
+    presetable
+  ],
+  emits: {
+    vbhjsonready: null
+  },
   methods: {
     addVB: function(e) {
       e.preventDefault();
       e.stopPropagation();
 
-      var vbid = 'test' + (this.vbs.length + 1);
-      this.vbs.push({
+      if( this.vertragsbestandteiltyp === '') {
+        return;
+      }
+
+      this.children.unshift({
         type: this.vertragsbestandteiltyp,
-        id: vbid
+        guioptions: {
+          id: uuid.get_uuid(),
+          removeable: true
+        }
       });
     },
     removeVB: function(payload) {
-      var vbs = this.vbs.filter(function(vb) {
-        return vb.id !== payload.id;
+      var children = this.children.filter(function(vb) {
+        return vb.guioptions.id !== payload.id;
       });
-      this.vbs = vbs;
+      this.children = children;
     },
     getJSON: function(e) {
       e.preventDefault();
       e.stopPropagation();
 
-      var vbs = this.vbs;
+      var children = this.children;
       var that = this;
 
       this.payload = {
+        type: 'formdata',
         vbs: []
       };
-      vbs.forEach(function(vb) {
-        that.payload.vbs.push(that.$refs[vb.id][0].getPayload());
+      children.forEach(function(vb) {
+        that.payload.vbs.push(that.$refs[vb.guioptions.id][0].getPayload());
       });
-    }
-  },
-  computed: {
-    resjson: function() {
-      return JSON.stringify(this.payload, null, 2);
+
+      this.$emit('vbhjsonready', JSON.stringify(this.payload, null, 2));
     }
   }
 }
