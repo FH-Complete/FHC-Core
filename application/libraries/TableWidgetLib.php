@@ -33,6 +33,7 @@ class TableWidgetLib
 	const SESSION_FIELDS = 'fields';
 	const SESSION_COLUMNS_ALIASES = 'columnsAliases';
 	const SESSION_ADDITIONAL_COLUMNS = 'additionalColumns';
+	const SESSION_ENCRYPTED_COLUMNS = 'encryptedColumns';
 	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_METADATA = 'datasetMetadata';
 	const SESSION_ROW_NUMBER = 'rowNumber';
@@ -66,6 +67,7 @@ class TableWidgetLib
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
 	const CHECKBOXES = 'checkboxes';
 	const COLUMNS_ALIASES = 'columnsAliases';
+	const ENCRYPTED_COLUMNS = 'encryptedColumns';
 
 	// ...to format/mark records of a dataset
 	const FORMAT_ROW = 'formatRow';
@@ -194,7 +196,7 @@ class TableWidgetLib
 	/**
 	 * Retrieves the dataset from the DB
 	 */
-	public function getDataset($datasetQuery)
+	public function getDataset($datasetQuery, $encryptedColumns)
 	{
 		$dataset = null;
 
@@ -203,7 +205,7 @@ class TableWidgetLib
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
 
 			// Execute the given SQL statement suppressing error messages
-			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
+			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery, null, $encryptedColumns);
 		}
 
 		return $dataset;

@@ -57,6 +57,8 @@ class TableWidget extends Widget
 
 	private $_sessionTimeout; // session expiring time
 
+	private $_encryptedColumns; // contains info about encrypted columns
+
 	private static $_TableWidgetInstance; // static property that contains the instance of itself
 
 	/**
@@ -144,6 +146,7 @@ class TableWidget extends Widget
 		$this->_datasetRepresentationOptions = null;
 		$this->_datasetRepFieldsDefs = null;
 		$this->_sessionTimeout = TableWidgetLib::SESSION_DEFAULT_TIMEOUT;
+		$this->_encryptedColumns = null;
 
 		// Retrieved the required permissions parameter if present
 		if (isset($args[TableWidgetLib::REQUIRED_PERMISSIONS]))
@@ -222,6 +225,14 @@ class TableWidget extends Widget
 		if (isset($args[TableWidgetLib::SESSION_TIMEOUT]) && is_numeric($args[TableWidgetLib::SESSION_TIMEOUT]))
 		{
 			$this->_sessionTimeout = $args[TableWidgetLib::SESSION_TIMEOUT];
+		}
+
+		// Parameter is used to define the ecrypted columns
+		if (isset($args[TableWidgetLib::ENCRYPTED_COLUMNS])
+			&& is_array($args[TableWidgetLib::ENCRYPTED_COLUMNS])
+			&& count($args[TableWidgetLib::ENCRYPTED_COLUMNS]) > 0)
+		{
+			$this->_encryptedColumns = $args[TableWidgetLib::ENCRYPTED_COLUMNS];
 		}
 	}
 
@@ -305,7 +316,7 @@ class TableWidget extends Widget
 				$datasetQuery = $this->tablewidgetlib->generateDatasetQuery($this->_query);
 
 				// Then retrieve dataset from DB
-				$dataset = $this->tablewidgetlib->getDataset($datasetQuery);
+				$dataset = $this->tablewidgetlib->getDataset($datasetQuery, $this->_encryptedColumns);
 
 				// Save changes into session if data are valid
 				if (!isError($dataset))
@@ -327,7 +338,7 @@ class TableWidget extends Widget
 			$datasetQuery = $this->tablewidgetlib->generateDatasetQuery($this->_query);
 
 			// Then retrieve dataset from DB
-			$dataset = $this->tablewidgetlib->getDataset($datasetQuery);
+			$dataset = $this->tablewidgetlib->getDataset($datasetQuery, $this->_encryptedColumns);
 
 			// Save changes into session if data are valid
 			if (!isError($dataset))
@@ -341,6 +352,7 @@ class TableWidget extends Widget
 						TableWidgetLib::SESSION_FIELDS => $this->tablewidgetlib->getExecutedQueryListFields(), // all the fields of the dataset
 						TableWidgetLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
 						TableWidgetLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns
+						TableWidgetLib::SESSION_ENCRYPTED_COLUMNS => $this->_encryptedColumns, // encrypted columns
 						TableWidgetLib::SESSION_CHECKBOXES => $this->_checkboxes, // the name of the field used to build the checkboxes column
 						TableWidgetLib::SESSION_METADATA => $this->tablewidgetlib->getExecutedQueryMetaData(), // the metadata of the dataset
 						TableWidgetLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this table
