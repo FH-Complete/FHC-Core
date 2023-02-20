@@ -4,6 +4,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Plausichecks extends Auth_Controller
 {
+	const GENERIC_ISSUE_OCCURED_TEXT = 'Issue aufgetreten';
+
 	public function __construct()
 	{
 		parent::__construct(
@@ -78,20 +80,27 @@ class Plausichecks extends Auth_Controller
 					// optionally replace fehler parameters in text, output the fehlertext
 					if (hasData($fehlerRes))
 					{
+						// use issue fehler text from database if present
 						$fehlerText = getData($fehlerRes)[0]->fehlertext;
 
 						if (!isEmptyArray($fehlertext_params))
 						{
+							// replace placeholder with params, if present
 							if (count($fehlertext_params) != substr_count($fehlerText, '%s'))
 								$this->terminateWithJsonError('Wrong number of parameters for Fehlertext, fehler_kurzbz ' . $fehler_kurzbz);
 
 							$fehlerText = vsprintf($fehlerText, $fehlertext_params);
 						}
-
-						if (isset($person_id)) $fehlerText .= "; person_id: $person_id";
-						if (isset($oe_kurzbz)) $fehlerText .= "; oe_kurzbz: $oe_kurzbz";
-						$issueTexts[$fehler_kurzbz][] = $fehlerText;
 					}
+					else // if no issue text found, use generic text
+					{
+						$fehlerText = self::GENERIC_ISSUE_OCCURED_TEXT;
+					}
+
+					// add generic parameters to issue text
+					if (isset($person_id)) $fehlerText .= "; person_id: $person_id";
+					if (isset($oe_kurzbz)) $fehlerText .= "; oe_kurzbz: $oe_kurzbz";
+					$issueTexts[$fehler_kurzbz][] = $fehlerText;
 				}
 			}
 		}
