@@ -1,4 +1,4 @@
-import gehaltsbestandteil from './gehaltsbestandteil';
+import gehaltsbestandteil from './gehaltsbestandteil.js';
 import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
 
