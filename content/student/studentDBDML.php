@@ -1797,7 +1797,13 @@ if(!$error)
 														$stg = $prestd->studiengang_kz;
 														$stg_obj = new studiengang();
 														$stg_obj->load(ltrim($stg,'0'));
-														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
+
+														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
+														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
+														$nachname_clean = str_replace(' ','_', $nachname_clean);
+														$vorname_clean = str_replace(' ','_', $vorname_clean);
+
+														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr,$vorname_clean,$nachname_clean);
 														$matrikelnummer = generateMatrikelnr($stg_obj->oe_kurzbz);
 
 														if($matrikelnummer != null)
@@ -1822,11 +1828,6 @@ if(!$error)
 														$benutzer->person_id = $prestd->person_id;
 														$benutzer->aktiv = true;
 														$benutzer->aktivierungscode = generateActivationKey();
-
-														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
-														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
-														$nachname_clean = str_replace(' ','_', $nachname_clean);
-														$vorname_clean = str_replace(' ','_', $vorname_clean);
 
 														if(!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT===true)
 														{
