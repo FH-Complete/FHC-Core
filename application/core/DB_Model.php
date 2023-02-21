@@ -923,7 +923,7 @@ class DB_Model extends CI_Model
 						$value,
 						$encryptionPassword
 					),
-					false
+					false // no escaping
 				);
 			}
 			else // otherwise copy this element as it is
@@ -1035,12 +1035,18 @@ class DB_Model extends CI_Model
 							{
 								$operator = null; // operator not found in the column name
 
-								// Custom operators
-								if (strpos($column, '>') != false
-									|| strpos($column, '<') != false
-									|| strpos($column, '>=') != false
+								// Custom operators with 2 chars
+								if (strpos($column, '>=') != false
 									|| strpos($column, '<=') != false
 									|| strpos($column, '!=') != false
+									|| strpos($column, '<>') != false
+								)
+								{
+									$operator = ' '.substr(trim($column), -2).' ';
+								}
+								// Custom operators with 1 chars
+								elseif (strpos($column, '>') != false
+									|| strpos($column, '<') != false
 									|| strpos($column, '=') != false
 								)
 								{

@@ -20,5 +20,10 @@
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 // NOTE: if database encryption is _not_ used then leave this array empty!
-$config['encryption_passwords'] = array();
+$config['encryption_passwords'] = array(
+	// 'password name 1' => 'password 1'
+	// 'password name 2' => 'password 2'
+	// 'password name ...' => 'password ...'
+	// 'password name N' => 'password N'
+);
 
