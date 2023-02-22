@@ -2,12 +2,20 @@ import vertragsbestandteilstunden from './vertragsbestandteil_stunden.js';
 import vertragsbestandteilzeitaufzeichnung from './vertragsbestandteil_zeitaufzeichnung.js';
 import vertragsbestandteilfunktion from './vertragsbestandteil_funktion.js';
 import vertragsbestandteilfreitext from './vertragsbestandteil_freitext.js';
+import vertragsbestandteilkuendigungsfrist from './vertragsbestandteil_kuendigungsfrist.js';
 import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
+import dvneuanlage from './dvneuanlage.js';
+import dvaenderung from './dvaenderung.js';
+import sharedstate from './vbsharedstate.js';
 
 export default {
   template: `
       <div>
+        <div class="row g-2 py-2 mb-3">
+          <dvaenderung ref="formheader" :config="data" v-if="isaenderung"></dvaenderung>
+          <dvneuanlage ref="formheader" :config="data" v-else=""></dvneuanlage>
+        </div>
         <div class="row py-2 border-bottom mb-3">
           <div class="col">
             <select v-model="vertragsbestandteiltyp" class="form-select form-select-sm" aria-label=".form-select-sm example">
@@ -16,6 +24,7 @@ export default {
               <option value="vertragsbestandteilzeitaufzeichnung">Vertragsbestandteil Zeitaufzeichnung</option>
               <option value="vertragsbestandteilfunktion">Vertragsbestandteil Funktion</option>
               <option value="vertragsbestandteilfreitext">Vertragsbestandteil Freitext</option>
+              <option value="vertragsbestandteilkuendigungsfrist">Vertragsbestandteil Kündigungsfrist</option>
             </select>
           </div>
           <div class="col">
@@ -29,8 +38,12 @@ export default {
           v-bind:config="config" :key="config.guioptions.id" @removeVB="removeVB"></component>
       </div>
   `,
+  props: [
+    'data'
+  ],
   data: function() {
     return {
+      sharedstate: sharedstate,
       vertragsbestandteiltyp: '',
       payload: {
         type: 'formdata',
@@ -43,6 +56,9 @@ export default {
     'vertragsbestandteilzeitaufzeichnung': vertragsbestandteilzeitaufzeichnung,
     'vertragsbestandteilfunktion': vertragsbestandteilfunktion,
     'vertragsbestandteilfreitext': vertragsbestandteilfreitext,
+    'vertragsbestandteilkuendigungsfrist': vertragsbestandteilkuendigungsfrist,
+    'dvneuanlage': dvneuanlage,
+    'dvaenderung': dvaenderung
   },
   mixins: [
     presetable
@@ -82,6 +98,7 @@ export default {
 
       this.payload = {
         type: 'formdata',
+        data: this.$refs.formheader.getPayload(),
         vbs: []
       };
       children.forEach(function(vb) {
@@ -89,6 +106,11 @@ export default {
       });
 
       this.$emit('vbhjsonready', JSON.stringify(this.payload, null, 2));
+    },
+  },
+  computed: {
+    isaenderung: function() {
+      return ((typeof this.data.dienstverhaeltnisid !== 'undefined') && parseInt(this.data.dienstverhaeltnisid) > 0);
     }
   }
 }

@@ -15,7 +15,7 @@ export default {
           <option value="sonstiges">Sonstiges</option>
         </select>
       </div>
-      <gueltigkeit ref="gueltigkeit"></gueltigkeit>
+      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
       <div class="col-1">
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
       </div>

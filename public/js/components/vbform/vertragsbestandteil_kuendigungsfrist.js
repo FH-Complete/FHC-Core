@@ -8,21 +8,25 @@ export default {
     <div class="row g-2">
       <div class="col-3">
         <div class="input-group input-group-sm mb-3">
-          <input v-model="stunden" type="text" class="form-control form-control-sm" placeholder="Stunden" aria-label="stunden">
-          <span class="input-group-text">Std/Woche</span>
+          <input v-model="arbeitgeber_frist" type="text" class="form-control form-control-sm" placeholder="Arbeitgeber Frist" aria-label="arbeitgeber_frist">
+          <span class="input-group-text">Wochen</span>
         </div>
       </div>
-      <div class="col-4">&nbsp;</div>
+      <div class="col-3">
+        <div class="input-group input-group-sm mb-3">
+          <input v-model="arbeitnehmer_frist" type="text" class="form-control form-control-sm" placeholder="Arbeitnehmer Frist" aria-label="arbeitnehmer_frist">
+          <span class="input-group-text">Wochen</span>
+        </div>
+      </div>
+      <div class="col-1">&nbsp;</div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
       <div class="col-1">
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
       </div>
     </div>
-    <gehaltsbestandteilhelper ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>
   `,
   components: {
-    'gehaltsbestandteilhelper': gehaltsbestandteilhelper,
     'gueltigkeit': gueltigkeit
   },
   mixins: [
@@ -33,7 +37,8 @@ export default {
   },
   data: function () {
     return {
-      stunden: ''
+      arbeitgeber_frist: '',
+      arbeitnehmer_frist: ''
     }
   },
   created: function() {
@@ -41,12 +46,16 @@ export default {
   },
   methods: {
     setDataFromConfig: function() {
-      if( typeof this.config.data === 'undefined' ) {
+      if( typeof this.config?.data === 'undefined' ) {
         return;
       }
 
-      if( typeof this.config.data.stunden !== 'undefined' ) {
-        this.stunden = this.config.data.stunden;
+      if( typeof this.config.data.arbeitgeber_frist !== 'undefined' ) {
+        this.arbeitgeber_frist = this.config.data.arbeitgeber_frist;
+      }
+
+      if( typeof this.config.data.arbeitnehmer_frist !== 'undefined' ) {
+        this.arbeitnehmer_frist = this.config.data.arbeitnehmer_frist;
       }
     },
     removeVB: function() {
@@ -57,10 +66,10 @@ export default {
         type: this.config.type,
         guioptions: this.config.guioptions,
         data: {
-          stunden: this.stunden,
+          arbeitgeber_frist: this.arbeitgeber_frist,
+          arbeitnehmer_frist: this.arbeitnehmer_frist,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
-        },
-        gbs: this.$refs.gbh.getPayload()
+        }
       };
     }
   }

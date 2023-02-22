@@ -8,6 +8,9 @@ export default [
       label: 'Leer',
       description: 'keine vordefinierten Vertrags- und Gehaltsbestandteile. Alles kann/muss manuell angelegt werden.'
     },
+    data: {
+      dienstverhaeltnisid: null
+    },
     vbs: []
   },
   {
@@ -16,6 +19,11 @@ export default [
       id: 'neustd',
       label: 'Neuanlage Standard DV',
       description: 'Standard Dienstvertrag Vorlage'
+    },
+    data: {
+      dienstverhaeltnisid: null,
+      unternehmen: 'fhtw',
+      vertragsart_kurzbz: 'echterDV'
     },
     vbs: [
       {
@@ -51,6 +59,17 @@ export default [
         }
       },
       {
+        type: 'vertragsbestandteilkuendigungsfrist',
+        guioptions: {
+          id: uuid.get_uuid(),
+          removable: false
+        },
+        data: {
+          arbeitgeber_frist: 6,
+          arbeitnehmer_frist: 4
+        }
+      },
+      {
         type: 'vertragsbestandteilfunktion',
         guioptions: {
           id: uuid.get_uuid(),
@@ -65,6 +84,9 @@ export default [
       id: 'allin',
       label: 'AllIn',
       description: 'AllIn Vertrag'
+    },
+    data: {
+      dienstverhaeltnisid: null
     },
     vbs: [
       {
@@ -133,6 +155,18 @@ export default [
       "label": "Test Zwischenspeichern",
       "description": "generiertes JSON aus ausgeflltem Formular als POC für das Zwischenspeichern"
     },
+    "data": {
+      "dienstverhaeltnisid": 135,
+      "gueltigkeit": {
+        "guioptions": {
+          "sharedstatemode": "set"
+        },
+        "data": {
+          "gueltig_ab": "01.06.2023",
+          "gueltig_bis": "31.12.2023"
+        }
+      }
+    },
     "vbs": [
       {
         "type": "vertragsbestandteilstunden",
@@ -143,8 +177,13 @@ export default [
         "data": {
           "stunden": "38,5",
           "gueltigkeit": {
-            "gueltig_ab": "01.03.2023",
-            "gueltig_bis": ""
+            "guioptions": {
+              "sharedstatemode": "reflect"
+            },
+            "data": {
+              "gueltig_ab": "01.03.2023",
+              "gueltig_bis": ""
+            }
           }
         },
         "gbs": [
@@ -158,8 +197,13 @@ export default [
               "gehaltstyp": "grund",
               "betrag": "3500",
               "gueltigkeit": {
-                "gueltig_ab": "01.03.2023",
-                "gueltig_bis": ""
+                "guioptions": {
+                  "sharedstatemode": "reflect"
+                },
+                "data": {
+                  "gueltig_ab": "01.03.2023",
+                  "gueltig_bis": ""
+                }
               },
               "valorisierung": true
             }
@@ -177,8 +221,13 @@ export default [
           "azgrelevant": false,
           "homeoffice": true,
           "gueltigkeit": {
-            "gueltig_ab": "01.03.2023",
-            "gueltig_bis": ""
+            "guioptions": {
+              "sharedstatemode": "reflect"
+            },
+            "data": {
+              "gueltig_ab": "01.03.2023",
+              "gueltig_bis": ""
+            }
           }
         }
       },
@@ -194,8 +243,13 @@ export default [
           "freitext": "Es wird AllIn vereinbart.",
           "kuendigungsrelevant": "",
           "gueltigkeit": {
-            "gueltig_ab": "01.03.2023",
-            "gueltig_bis": ""
+            "guioptions": {
+              "sharedstatemode": "reflect"
+            },
+            "data": {
+              "gueltig_ab": "01.03.2023",
+              "gueltig_bis": ""
+            }
           }
         },
         "gbs": [
@@ -209,8 +263,13 @@ export default [
               "gehaltstyp": "zulage",
               "betrag": "500",
               "gueltigkeit": {
-                "gueltig_ab": "01.03.2023",
-                "gueltig_bis": ""
+                "guioptions": {
+                  "sharedstatemode": "reflect"
+                },
+                "data": {
+                  "gueltig_ab": "01.03.2023",
+                  "gueltig_bis": ""
+                }
               },
               "valorisierung": false
             }

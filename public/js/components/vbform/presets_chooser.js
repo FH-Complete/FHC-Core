@@ -17,7 +17,7 @@ export default {
     </div>
 
     <div class="col-6">
-      <vertragsbestandteilhelper v-bind:preset="selectedpreset" @vbhjsonready="process_json"></vertragsbestandteilhelper>
+      <vertragsbestandteilhelper v-bind:preset="selectedpresetvbs" v-bind:data="selectedpresetdata" @vbhjsonready="process_json"></vertragsbestandteilhelper>
     </div>
 
     <div class="col-4">
@@ -31,7 +31,8 @@ export default {
   data: function() {
     return {
       selectedpresetidx: 0,
-      selectedpreset: [],
+      selectedpresetvbs: [],
+      selectedpresetdata: {},
       vbhjson: ''
     }
   },
@@ -43,7 +44,8 @@ export default {
     selectpreset: function(idx) {
       if( typeof this.presets[idx] !== 'undefined' ) {
         this.seletedpresetidx = idx;
-        this.selectedpreset = this.presets[idx].vbs;
+        this.selectedpresetvbs = this.presets[idx].vbs;
+        this.selectedpresetdata = this.presets[idx].data;
       }
     },
     isactive: function(idx) {

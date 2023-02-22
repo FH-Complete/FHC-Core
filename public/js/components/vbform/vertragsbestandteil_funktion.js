@@ -12,7 +12,7 @@ export default {
       <div class="col">
         <input v-model="orget" type="text" class="form-control form-control-sm" placeholder="Organisations-Einheit" aria-label="orget">
       </div>
-      <gueltigkeit ref="gueltigkeit"></gueltigkeit>
+      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
       <div class="col-1">
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
       </div>
@@ -33,9 +33,7 @@ export default {
   data: function () {
     return {
       funktion: '',
-      orget: '',
-      gueltig_ab: '',
-      gueltig_bis: ''
+      orget: ''
     }
   },
   created: function() {
