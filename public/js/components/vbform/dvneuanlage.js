@@ -21,7 +21,7 @@ export default {
     </select>
   </div>
   <div class="col-1">&nbsp;</div>
-  <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'"></gueltigkeit>
+  <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
   <div class="col-1">&nbsp;</div>
   `,
   data: function() {
@@ -57,6 +57,7 @@ export default {
     },
     getPayload: function() {
       return {
+        dienstverhaeltnisid: null,
         unternehmen: this.unternehmen,
         vertragsart_kurzbz: this.vertragsart_kurzbz,
         gueltigkeit: this.$refs.gueltigkeit.getPayload()

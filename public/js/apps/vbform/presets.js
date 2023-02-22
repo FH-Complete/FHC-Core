@@ -162,8 +162,8 @@ export default [
           "sharedstatemode": "set"
         },
         "data": {
-          "gueltig_ab": "01.06.2023",
-          "gueltig_bis": "31.12.2023"
+          "gueltig_ab": "01.03.2023",
+          "gueltig_bis": ""
         }
       }
     },

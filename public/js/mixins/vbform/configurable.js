@@ -11,8 +11,13 @@ export default {
       return (this.config?.gbs !== undefined) ? this.config.gbs : [];
     },
     getgueltigkeit: function() {
-      return (this.config?.data?.gueltigkeit !== undefined)
-        ? this.config.data.gueltigkeit : {};
+      if( this.config?.gueltigkeit !== undefined ) {
+        return this.config.gueltigkeit;
+      } else if ( this.config?.data?.gueltigkeit !== undefined ) {
+        return this.config.data.gueltigkeit;
+      } else {
+        return {};
+      }
     }
   }
 }
