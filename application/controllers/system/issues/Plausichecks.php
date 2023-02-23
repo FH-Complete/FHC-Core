@@ -15,6 +15,7 @@ class Plausichecks extends Auth_Controller
 
 		// Load libraries
 		$this->load->library('issues/PlausicheckProducerLib');
+		$this->load->library('issues/PlausicheckDefinitionLib');
 		$this->load->library('WidgetLib');
 
 		// Load models
@@ -44,16 +45,20 @@ class Plausichecks extends Auth_Controller
 		// issues array for passing issue texts
 		$issueTexts = array();
 		// all fehler kurzbz which are going to be checked
-		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckproducerlib->getFehlerKurzbz();
+		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckdefinitionlib->getFehlerKurzbz();
+		$fehlerLibMappings = $this->plausicheckdefinitionlib->getFehlerLibMappings();
 		// set Studiengang to null if not passed
 		if (isEmptyString($studiengang_kz)) $studiengang_kz = null;
 
 		// get the data returned by Plausicheck
 		foreach ($fehlerKurzbz as $fehler_kurzbz)
 		{
-			// execute the check
 			$issueTexts[$fehler_kurzbz] = array();
-			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue($fehler_kurzbz, $studiensemester_kurzbz, $studiengang_kz);
+			// get library name for producing issue
+			$libName = $fehlerLibMappings[$fehler_kurzbz];
+
+			// execute the check
+			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue($libName, $studiensemester_kurzbz, $studiengang_kz);
 
 			if (isError($plausicheckRes)) $this->terminateWithJsonError(getError($plausicheckRes));
 
@@ -121,7 +126,7 @@ class Plausichecks extends Auth_Controller
 
 		if (isError($studiengaengeRes)) show_error(getError($studiengaengeRes));
 
-		$fehlerKurzbz = $this->plausicheckproducerlib->getFehlerKurzbz();
+		$fehlerKurzbz = $this->plausicheckdefinitionlib->getFehlerKurzbz();
 
 		return array(
 			'semester' => hasData($studiensemesterRes) ? getData($studiensemesterRes) : array(),

@@ -2,6 +2,9 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * Library containing database queries for execution of core plausichecks.
+ */
 class PlausicheckLib
 {
 	private $_ci; // Code igniter instance
