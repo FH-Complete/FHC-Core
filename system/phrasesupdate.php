@@ -17203,6 +17203,67 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'statusSetzen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status setzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Set state',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'statusAuswahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status ausw&auml;hlen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'statusZuruecksetzen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status zur&uuml;cksetzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reset status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
 );
 
 

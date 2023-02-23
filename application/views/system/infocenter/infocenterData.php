@@ -7,9 +7,7 @@
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
-	$LOGDATA_NAME_PARKED = '\'Parked\'';
-	$LOGDATA_NAME_ONHOLD = '\'Onhold\'';
-	$LOGTYPE_KURZBZ = '\'Processstate\'';
+	$POSTPONE_STATUS_PARKED = '\'parked\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
@@ -27,8 +25,6 @@
 			p.staatsbuergerschaft AS "Nation",
 			pl.zeitpunkt AS "LockDate",
 			pl.lockuser AS "LockUser",
-			pd.parkdate AS "ParkDate",
-		    ohd.onholddate AS "OnholdDate",
 			(
 				SELECT l.zeitpunkt
 				  FROM system.tbl_log l
@@ -291,7 +287,25 @@
 					LIMIT 1
 				)
 				LIMIT 1 
-			) AS "InfoCenterMitarbeiter"
+			) AS "InfoCenterMitarbeiter",
+			(
+				SELECT datum_bis
+				FROM public.tbl_rueckstellung
+				WHERE datum_bis >= NOW()
+					AND status_kurzbz = '. $POSTPONE_STATUS_PARKED .'
+					AND person_id = p.person_id
+				ORDER BY datum_bis DESC
+				LIMIT 1
+			) AS "ParkDate",
+			(
+				SELECT datum_bis
+				FROM public.tbl_rueckstellung
+				WHERE datum_bis >= NOW()
+					AND status_kurzbz != '. $POSTPONE_STATUS_PARKED .'
+					AND person_id = p.person_id
+				ORDER BY datum_bis DESC
+				LIMIT 1
+			) AS "OnholdDate"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 				SELECT tpl.person_id,
@@ -302,22 +316,6 @@
 				  JOIN public.tbl_person sp ON sb.person_id = sp.person_id
 				 WHERE tpl.app = '.$APP.'
 			) pl USING(person_id)
-	 LEFT JOIN (
-				SELECT l.person_id,
-					   l.zeitpunkt AS parkdate
-				  FROM system.tbl_log l
-				 WHERE l.logtype_kurzbz = '.$LOGTYPE_KURZBZ.'
-				   AND l.logdata->>\'name\' = '.$LOGDATA_NAME_PARKED.'
-				   AND l.zeitpunkt >= NOW()
-			) pd USING(person_id)
-	LEFT JOIN (
-				SELECT l.person_id,
-					   l.zeitpunkt AS onholddate
-				  FROM system.tbl_log l
-				 WHERE l.logtype_kurzbz = '.$LOGTYPE_KURZBZ.'
-				   AND l.logdata->>\'name\' = '.$LOGDATA_NAME_ONHOLD.'
-				   AND l.zeitpunkt >= NOW()
-			) ohd USING(person_id)
 		 WHERE
 			EXISTS (
 				SELECT 1
@@ -344,7 +342,7 @@
 						   AND spss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 					)
 			)
-	ORDER BY "LastAction" ASC';
+	ORDER BY "OnholdDate" DESC NULLS FIRST, "ParkDate" DESC NULLS FIRST, "LastAction" ASC';
 
 	$filterWidgetArray = array(
 		'query' => $query,
@@ -366,8 +364,6 @@
 			ucfirst($this->p->t('person', 'nation')),
 			ucfirst($this->p->t('global', 'sperrdatum')),
 			ucfirst($this->p->t('global', 'gesperrtVon')),
-			ucfirst($this->p->t('global', 'parkdatum')),
-			ucfirst($this->p->t('global', 'rueckstelldatum')),
 			ucfirst($this->p->t('global', 'letzteAktion')),
 			'Aktionstyp',
 			'AnzahlAktePflicht',
@@ -383,7 +379,9 @@
 			'ZGV Nation MA',
 			'ZGV Gruppe BA',
 			'ZGV Gruppe MA',
-			'InfoCenter Mitarbeiter'
+			'InfoCenter Mitarbeiter',
+			ucfirst($this->p->t('global', 'parkdatum')),
+			ucfirst($this->p->t('global', 'rueckstelldatum'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -433,6 +431,10 @@
 			if ($datasetRaw->{'ParkDate'} == null)
 			{
 				$datasetRaw->{'ParkDate'} = '-';
+			}
+			else
+			{
+				$datasetRaw->{'ParkDate'} = date_format(date_create($datasetRaw->{'ParkDate'}), 'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'OnholdDate'} == null)
