@@ -38,7 +38,7 @@ class PlausicheckDefinitionLib
 	);
 
 	/**
-	 * Gets all fehler_kurzbz for fehler which need to be checked.
+	 * Gets all fehler_kurzbz-library mappings for fehler which need to be checked.
 	 */
 	public function getFehlerLibMappings()
 	{

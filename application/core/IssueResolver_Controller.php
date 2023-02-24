@@ -62,8 +62,6 @@ abstract class IssueResolver_Controller extends JOB_Controller
 						isset($issue->behebung_parameter) ? json_decode($issue->behebung_parameter, true) : array()
 					);
 
-					// TODO: what if extension/library folder changes?
-
 					// if called from extension (extension name set), path includes extension names
 					$libRootPath = isset($this->_extensionName) ? self::EXTENSIONS_FOLDER . '/' . $this->_extensionName . '/' : '';
 
