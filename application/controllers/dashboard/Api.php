@@ -8,8 +8,8 @@ class Api extends Auth_Controller
         parent::__construct(
             array(
                 'index'		=> 'dashboard/admin:rw',
-                'getNews'	=> 'dashboard/admin:rw',
-                'getAmpeln'	=> 'dashboard/admin:rw',
+                'getNews'	=> 'dashboard/benutzer:r',
+                'getAmpeln'	=> 'dashboard/benutzer:r',
             )
         );
 
