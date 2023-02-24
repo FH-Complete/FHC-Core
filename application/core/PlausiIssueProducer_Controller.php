@@ -11,7 +11,10 @@ abstract class PlausiIssueProducer_Controller extends JOB_Controller
 	{
 		parent::__construct();
 
-		$this->load->library('issues/PlausicheckProducerLib');
+		// pass extension name if calling from extension
+		$extensionName = isset($this->_extensionName) ? $this->_extensionName : null;
+
+		$this->load->library('issues/PlausicheckProducerLib', array('extensionName' => $extensionName));
 		$this->load->library('IssuesLib');
 	}
 

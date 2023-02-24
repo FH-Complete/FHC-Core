@@ -12,9 +12,13 @@ class PlausicheckProducerLib
 
 	private $_ci; // ci instance
 	private $_currentStudiensemester; // current Studiensemester
+	private $_extensionName;
 
-	public function __construct()
+	public function __construct($params = null)
 	{
+		// set extension name if called from extension
+		if (isset($params['extensionName'])) $this->_extensionName = $params['extensionName'];
+
 		$this->_ci =& get_instance(); // get ci instance
 
 		// load models
