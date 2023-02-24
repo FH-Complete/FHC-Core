@@ -1,4 +1,4 @@
-import CalendarHeader from './Header';
+import CalendarHeader from './Header.js';
 
 export default {
 	components: {

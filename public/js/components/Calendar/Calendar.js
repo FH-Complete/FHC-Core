@@ -27,11 +27,16 @@ export default {
 			showWeeks: this.showWeeks,
 			noMonthView: this.noMonthView,
 			noWeekView: this.noWeekView,
-			eventsAreNull: Vue.computed(() => this.events === null)
+			eventsAreNull: Vue.computed(() => this.events === null),
+			classHeader: this.classHeader
 		};
 	},
 	props: {
 		events: Array,
+		initialDate: {
+			type: [Date, String],
+			default: new Date()
+		},
 		showWeeks: {
 			type: Boolean,
 			default: true
@@ -39,6 +44,10 @@ export default {
 		initialMode: {
 			type: String,
 			default: 'month'
+		},
+		classHeader: {
+			type: [String,Object,Array],
+			default: ''
 		},
 		minimized: Boolean,
 		noWeekView: Boolean,
@@ -103,7 +112,7 @@ export default {
 		if (!this.noMonthView)
 			allowedInitialModes.push('month');
 		this.mode = allowedInitialModes[allowedInitialModes.indexOf(this.initialMode)] || allowedInitialModes.pop();
-		this.date.set(new Date(2023,0,1));
+		this.date.set(new Date(this.initialDate));
 		this.focusDate.set(this.date);
 	},
 	mounted() {

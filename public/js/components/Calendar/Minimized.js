@@ -7,7 +7,8 @@ export default {
 	inject: [
 		'size',
 		'minimized',
-		'date'
+		'date',
+		'classHeader'
 	],
 	data() {
 		return {
@@ -22,7 +23,7 @@ export default {
 	},
 	template: `
 	<div class="fhc-calendar-minimized">
-		<div class="card-header d-grid">
+		<div class="card-header d-grid" :class="classHeader">
 			<button class="btn btn-link link-secondary text-decoration-none" @click="maximize">{{ date.format({dateStyle: ['long','full','full','full'][this.size]}) }}</button>
 		</div>
 	</div>`
