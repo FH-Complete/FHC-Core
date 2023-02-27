@@ -72,6 +72,9 @@ class Messages_model extends CI_Model
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		// Loads model Studiengang_model
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
+		// Loads model Organisationseinheitsmodel
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -318,6 +321,18 @@ class Messages_model extends CI_Model
 				$sender = getData($senderResult)[0]->vorname.' '.getData($senderResult)[0]->nachname;
 			}
 		}
+		//case ReihungstestReminderJob
+		elseif($message->oe_kurzbz == OU_SENDER_TEST_REMINDER)
+		{
+
+			$ouResult = $this->OrganisationseinheitModel->loadWhere(array('oe_kurzbz' => $message->oe_kurzbz));
+
+			if (isError($ouResult)) show_error(getError($ouResult));
+			if (!hasData($ouResult)) show_error('No organization unit information found');
+
+			$sender = getData($ouResult)[0]->bezeichnung;
+		}
+
 		else // otherwise if the sender is an organization unit (degree program)
 		{
 			$ouResult = $this->StudiengangModel->loadWhere(array('oe_kurzbz' => $message->oe_kurzbz));
@@ -991,4 +1006,3 @@ class Messages_model extends CI_Model
 		return success(array((object)(array_merge((array)$otherMsgVarsDataObj, (array)$msgVarsDataLoggedInUser))));
 	}
 }
-
