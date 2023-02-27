@@ -61,4 +61,17 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_rueckstellung LIMIT 1;"))
 		echo '<strong>public.tbl_rueckstellung: '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' public.tbl_rueckstellung: Tabelle hinzugefuegt<br>';
+
+	//Übernahme von "zurückgestellten" und "geparkten" Personen
+	$qry = "
+		INSERT INTO public.tbl_rueckstellung (person_id, status_kurzbz, datum_bis, insertvon)
+		SELECT person_id, lower(l.logdata->>'name'), zeitpunkt, insertvon
+		FROM system.tbl_log l
+		WHERE (l.logdata->>'name' = 'Onhold' OR l.logdata->>'name' = 'Parked')
+			AND zeitpunkt >= NOW()";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_rueckstellung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_rueckstellung: Bestehene Eintraege uebernommen<br>';
 }
