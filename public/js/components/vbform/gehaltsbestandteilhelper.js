@@ -4,15 +4,14 @@ import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
   template: `
-  <div class="row g-2 py-2">
-    <div class="col">
-      <a class="fs-6 fw-light" href="javascript:void(0);" @click="addGB"><i class="fas fa-plus"></i> Gehaltsbestandteil hinzufuegen</a>
-    </div>
-  </div>
+  <gehaltsbestandteil v-bind:ref="config.guioptions.id" v-for="config in children"
+    v-bind:config="config" :key="config.guioptions.id" @removeGB="removeGB"></gehaltsbestandteil>
   <div class="row">
-    <div class="col">
-        <gehaltsbestandteil v-bind:ref="config.guioptions.id" v-for="config in children"
-          v-bind:config="config" :key="config.guioptions.id" @removeGB="removeGB"></gehaltsbestandteil>
+    <div class="col-1">
+      &nbsp;
+    </div>
+    <div class="col-11">
+      <a class="fs-6 fw-light" href="javascript:void(0);" @click="addGB"><i class="fas fa-plus"></i> Gehaltsbestandteil hinzufuegen</a>
     </div>
   </div>
   `,
@@ -32,7 +31,7 @@ export default {
       e.preventDefault();
       e.stopPropagation();
 
-      this.children.unshift({
+      this.children.push({
         type: 'gehaltsbestandteil',
         guioptions: {
           id: uuid.get_uuid(),

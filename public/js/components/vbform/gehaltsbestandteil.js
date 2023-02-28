@@ -4,7 +4,10 @@ import configurable from '../../mixins/vbform/configurable.js';
 export default {
   template: `
   <div class="row g-2 py-2">
-    <div class="col-3">
+    <div class="col-1">
+      &nbsp;
+    </div>
+    <div class="col-2">
       <select v-model="gehaltstyp" class="form-select form-select-sm" aria-label=".form-select-sm example">
         <option value="" selected disabled>Gehaltstyp wählen</option>
         <option value="basis">Basisgehalt</option>

@@ -12,10 +12,12 @@ import sharedstate from './vbsharedstate.js';
 export default {
   template: `
       <div>
-        <div class="row g-2 py-2 mb-3">
+        <div class="row g-2 py-2 border-bottom mb-3">
           <dvaenderung ref="formheader" :config="data" v-if="isaenderung"></dvaenderung>
           <dvneuanlage ref="formheader" :config="data" v-else=""></dvneuanlage>
         </div>
+        <component v-bind:ref="config.guioptions.id" v-bind:is="config.type" v-for="config in children"
+          v-bind:config="config" :key="config.guioptions.id" @removeVB="removeVB"></component>
         <div class="row py-2 border-bottom mb-3">
           <div class="col">
             <select v-model="vertragsbestandteiltyp" class="form-select form-select-sm" aria-label=".form-select-sm example">
@@ -34,8 +36,6 @@ export default {
             <button class="btn btn-secondary btn-sm float-end" @click="getJSON">get JSON</button>
           </div>
         </div>
-        <component v-bind:ref="config.guioptions.id" v-bind:is="config.type" v-for="config in children"
-          v-bind:config="config" :key="config.guioptions.id" @removeVB="removeVB"></component>
       </div>
   `,
   props: [
@@ -75,7 +75,7 @@ export default {
         return;
       }
 
-      this.children.unshift({
+      this.children.push({
         type: this.vertragsbestandteiltyp,
         guioptions: {
           id: uuid.get_uuid(),
@@ -110,7 +110,9 @@ export default {
   },
   computed: {
     isaenderung: function() {
-      return ((typeof this.data.dienstverhaeltnisid !== 'undefined') && parseInt(this.data.dienstverhaeltnisid) > 0);
+      return ((typeof this.data.dienstverhaeltnisid !== 'undefined')
+        && !isNaN(parseInt(this.data.dienstverhaeltnisid))
+        && parseInt(this.data.dienstverhaeltnisid) > 0);
     }
   }
 }

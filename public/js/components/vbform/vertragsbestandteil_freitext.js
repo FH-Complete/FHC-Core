@@ -12,6 +12,7 @@ export default {
           <option value="allin">AllIn</option>
           <option value="ersatzkraft">Ersatzarbeitskraft</option>
           <option value="zusatzvbg">Zusatzvereinbarung</option>
+          <option value="befristung">Befristung</option>
           <option value="sonstiges">Sonstiges</option>
         </select>
       </div>

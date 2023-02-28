@@ -4,10 +4,10 @@ import configurable from '../../mixins/vbform/configurable.js';
 
 export default {
   template: `
-  <div class="border-bottom py-2 mb-3">
+  <div class="py-2" :class="vbcssclasses">
     <div class="row g-2">
       <div class="col">
-        <input v-model="funktion" type="text" class="form-control form-control-sm" placeholder="Funktion" aria-label="funktion">
+        <input v-model="funktion" :disabled="isinputdisabled('funktion')" type="text" class="form-control form-control-sm" placeholder="Funktion" aria-label="funktion">
       </div>
       <div class="col">
         <input v-model="orget" type="text" class="form-control form-control-sm" placeholder="Organisations-Einheit" aria-label="orget">
@@ -17,7 +17,7 @@ export default {
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
       </div>
     </div>
-    <gehaltsbestandteilhelper ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
+    <gehaltsbestandteilhelper v-if="canhavegehaltsbestandteile" ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>
   `,
   components: {
@@ -52,6 +52,9 @@ export default {
     removeVB: function() {
       this.$emit('removeVB', {id: this.config.guioptions.id});
     },
+    getGehaltsbestandteilePayload: function() {
+      return (!this.$refs?.gbh === undefined) ? this.$refs.gbh.getPayload() : [];
+    },
     getPayload: function() {
       return {
         type: this.config.type,
@@ -61,7 +64,7 @@ export default {
           orget: this.orget,
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         },
-        gbs: this.$refs.gbh.getPayload()
+        gbs: this.getGehaltsbestandteilePayload()
       };
     }
   }

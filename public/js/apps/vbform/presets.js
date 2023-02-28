@@ -73,7 +73,46 @@ export default [
         type: 'vertragsbestandteilfunktion',
         guioptions: {
           id: uuid.get_uuid(),
-          removable: false
+          removable: false,
+          canhavegehaltsbestandteile: false,
+          nobottomborder: true,
+          nobottommargin: true,
+          disabled: [
+            'funktion'
+          ]
+        },
+        data: {
+          funktion: 'Standardkostenstelle'
+        }
+      },
+      {
+        type: 'vertragsbestandteilfunktion',
+        guioptions: {
+          id: uuid.get_uuid(),
+          removable: false,
+          canhavegehaltsbestandteile: false,
+          nobottomborder: true,
+          nobottommargin: true,
+          disabled: [
+            'funktion'
+          ]
+        },
+        data: {
+          funktion: 'Diszpl-Zuordnung'
+        }
+      },
+      {
+        type: 'vertragsbestandteilfunktion',
+        guioptions: {
+          id: uuid.get_uuid(),
+          removable: false,
+          canhavegehaltsbestandteile: false,
+          disabled: [
+            'funktion'
+          ]
+        },
+        data: {
+          funktion: 'Fachliche-Zuordnung'
         }
       }
     ]
