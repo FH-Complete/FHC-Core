@@ -309,13 +309,39 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getLastPrestudent($person_id, $withzgv = false)
 	{
-		$qry = 'SELECT * FROM public.tbl_prestudent
-				WHERE person_id = ?
+		$qry = 'SELECT * FROM public.tbl_prestudent ps
 				%s
+				WHERE ps.person_id = ?
 				ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
 				LIMIT 1';
 
-		$zgvwhere = $withzgv === true ? 'AND zgv_code IS NOT NULL' : '';
+		$zgvwhere = '';
+		if ($withzgv === true)
+		{
+			$zgvwhere = '
+				LEFT JOIN (
+					SELECT ps2.zgvmas_code,
+						ps2.zgvmanation,
+						ps2.zgvmadatum,
+						ps2.zgvmaort,
+						ps2.zgvmas_erfuellt,
+						ps2.person_id
+					FROM tbl_prestudent ps2
+					WHERE zgvmas_code IS NOT NULL
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
+				) zgvmas ON zgvmas.person_id = ps.person_id
+				LEFT JOIN (
+					SELECT ps2.zgv_code,
+						ps2.zgvnation,
+						ps2.zgvdatum,
+						ps2.zgvort,
+						ps2.zgv_erfuellt,
+						ps2.person_id
+					FROM tbl_prestudent ps2
+					WHERE zgv_code IS NOT NULL
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
+				)zgv ON zgv.person_id = ps.person_id';
+		}
 
 		$qry = sprintf($qry, $zgvwhere);
 

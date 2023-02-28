@@ -215,6 +215,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</groupbox>
 						<hbox>
 							<spacer flex="1" />
+							<button id="student-mobilitaet-button-kopie-speichern" oncommand="StudentMobilitaetSpeichern(true)" label="Als Kopie speichern" disabled="true"/>
 							<button id="student-mobilitaet-button-speichern" oncommand="StudentMobilitaetSpeichern()" label="Speichern" disabled="true"/>
 						</hbox>
 					</vbox>

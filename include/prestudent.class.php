@@ -588,7 +588,7 @@ class prestudent extends person
 
 			AND
 				status_kurzbz = 'Interessent'
-			AND 
+			AND
 				NOT EXISTS (
 					SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Abgewiesener'
 				)";
@@ -2327,50 +2327,50 @@ class prestudent extends person
 	 *		 false wenn nicht vorhanden
 	 *		 false und errormsg wenn Fehler aufgetreten ist
 	 */
-	public function existsZGVIntern($person_id)
-	{
-		if (!is_numeric($person_id))
-		{
-			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
-			return false;
-		}
+	 public function existsZGVIntern($person_id)
+ 	{
+ 		if (!is_numeric($person_id))
+ 		{
+ 			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+ 			return false;
+ 		}
 
+ 		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent
+ 				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+ 				JOIN public.tbl_studiengang USING (studiengang_kz)
+ 				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+ 				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
+ 				AND typ = 'b'
+				AND get_rolle_prestudent(prestudent_id, null) != 'Abbrecher';";
 
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent
-				JOIN public.tbl_prestudentstatus USING (prestudent_id)
-				JOIN public.tbl_studiengang USING (studiengang_kz)
-				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-				AND status_kurzbz in ('Absolvent','Diplomand','Unterbrecher','Student')
-				AND typ in ('b','m','d')";
+ 		if ($this->db_query($qry))
+ 		{
+ 			if ($row = $this->db_fetch_object())
+ 			{
+ 				if ($row->anzahl > 0)
+ 				{
+ 					$this->errormsg = '';
+ 					return true;
+ 				}
+ 				else
+ 				{
+ 					$this->errormsg = '';
+ 					return false;
+ 				}
+ 			}
+ 			else
+ 			{
+ 				$this->errormsg = 'Fehler beim Laden der Daten';
+ 				return false;
+ 			}
+ 		}
+ 		else
+ 		{
+ 			$this->errormsg = 'Fehler beim Laden der Daten';
+ 			return false;
+ 		}
+ 	}
 
-
-		if ($this->db_query($qry))
-		{
-			if ($row = $this->db_fetch_object())
-			{
-				if ($row->anzahl > 0)
-				{
-					$this->errormsg = '';
-					return true;
-				}
-				else
-				{
-					$this->errormsg = '';
-					return false;
-				}
-			}
-			else
-			{
-				$this->errormsg = 'Fehler beim Laden der Daten';
-				return false;
-			}
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
 
 	/**
 	 * Befüllt MasterZGV-Felder: Nation mit Österreich und MasterZGV-code mit FH-Bachelor(I)
