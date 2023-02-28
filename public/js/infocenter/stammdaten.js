@@ -96,6 +96,8 @@ var Stammdaten = {
 			$(this).parent('div').children('div').show();
 			$(this).remove();
 		});
+
+		Stammdaten._setReadOnly(true);
 	},
 
 	_show: function()
@@ -142,11 +144,7 @@ var Stammdaten = {
 			});
 		});
 
-		var stammdatenform = $('.stammdaten_form');
-
-		stammdatenform.find('select').attr('disabled', false);
-		$('.editActionStammdaten').show();
-		$('.editStammdaten').hide();
+		Stammdaten._setReadOnly(false);
 	},
 
 	_updated: function()
@@ -186,10 +184,25 @@ var Stammdaten = {
 			$(this).remove();
 		});
 
-		var stammdatenform = $('.stammdaten_form');
-		stammdatenform.find('select').attr('disabled', true);
-
-		$('.editActionStammdaten').hide();
-		$('.editStammdaten').show();
+		Stammdaten._setReadOnly(true);
 	},
+
+	_setReadOnly: function(readonly)
+	{
+		var stammdatenform = $('.stammdaten_form');
+
+		stammdatenform.find('select').attr('disabled', readonly);
+
+		if (readonly === true)
+		{
+			$('.editActionStammdaten').hide();
+			$('.editStammdaten').show();
+		}
+		else
+		{
+			$('.editActionStammdaten').show();
+			$('.editStammdaten').hide();
+		}
+
+	}
 }
