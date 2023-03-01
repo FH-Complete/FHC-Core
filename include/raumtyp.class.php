@@ -52,10 +52,14 @@ class raumtyp extends basis_db
 	 * Laedt alle verfuegbaren Raumtypen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll()
+	public function getAll($aktiv = null)
 	{
-		$qry = 'SELECT * FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_raumtyp';
 
+		if (!is_null($aktiv))
+			$qry .= ' WHERE aktiv = '.$this->db_add_param($aktiv, FHC_BOOLEAN);
+
+		$qry .= ' ORDER BY raumtyp_kurzbz';
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
