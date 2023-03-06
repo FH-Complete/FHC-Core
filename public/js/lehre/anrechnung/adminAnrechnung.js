@@ -134,7 +134,6 @@ var adminAnrechnung = {
     prependRow: function (anrechnungszeitraum_id, studiensemester_kurzbz, anrechnungstart, anrechnungende) {
         $('#azrTable').prepend($(
             '<tr data-anrechnungszeitraum_id="' + anrechnungszeitraum_id + '">' +
-            '<td>' + anrechnungszeitraum_id + '</td>' +
             '<td class="studiensemester_kurzbz">' + studiensemester_kurzbz + '</td>' +
             '<td class="anrechnungstart">' + anrechnungstart + '</td>' +
             '<td class="anrechnungende">' + anrechnungende + '</td>' +
