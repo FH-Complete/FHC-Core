@@ -41,3 +41,17 @@ if (!$result = @$db->db_query('SELECT 1 FROM lehre.tbl_anrechnungszeitraum LIMIT
     else
         echo ' lehre.tbl_anrechnungszeitraum: Tabelle hinzugefuegt<br>';
 }
+
+// Add permission to admin Anrechnungen
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/anrechnungszeitfenster';"))
+{
+    if($db->db_num_rows($result) == 0)
+    {
+        $qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/anrechnungszeitfenster', 'Anrechnungszeitfenster anlegen');";
+
+        if(!$db->db_query($qry))
+            echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+        else
+            echo ' system.tbl_berechtigung: Added permission for lehre/anrechnungszeitfenster<br>';
+    }
+}

@@ -9,10 +9,10 @@ class AdminAnrechnung extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index'     => 'admin:rw',
-				'save'     => 'admin:rw',
-				'edit'     => 'admin:rw',
-				'delete'     => 'admin:rw'
+				'index'     => 'lehre/anrechnungszeitfenster:rw',
+				'save'      => 'lehre/anrechnungszeitfenster:rw',
+				'edit'      => 'lehre/anrechnungszeitfenster:rw',
+				'delete'    => 'lehre/anrechnungszeitfenster:rw'
 			)
 		);
 		

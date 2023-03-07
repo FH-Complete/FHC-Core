@@ -9,7 +9,7 @@ $query = '
 $filterWidgetArray = array(
 	'query' => $query,
 	'tableUniqueId' => 'adminAnrechnung',
-	'requiredPermissions' => 'admin',
+	'requiredPermissions' => 'lehre/anrechnungszeitfenster',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
         'AzrID',
@@ -22,12 +22,12 @@ $filterWidgetArray = array(
 	'datasetRepOptions' => '{
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
-		//persistentLayout:true,
+		persistentLayout:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",
         index: "anrechnungszeitraum_id",         // assign specific column as unique id (important for row indexing)
         selectable: false,                  // allow row selection
-		//tableWidgetHeader: true,
+		tableWidgetHeader: true,
 		tableBuilt: function(){
             func_tableBuilt(this);
         },
