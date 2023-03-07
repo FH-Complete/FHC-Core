@@ -13185,6 +13185,46 @@ array(
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'bearbeitetVon',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "bearbeitet von",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "edited by",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'bearbeitetAm',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "bearbeitet am",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "edited on",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'global',
