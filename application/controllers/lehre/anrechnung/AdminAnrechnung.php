@@ -36,10 +36,7 @@ class AdminAnrechnung extends Auth_Controller
                 'anrechnung'
 			)
 		);
-		
-		// Load configs
-		$this->load->config('anrechnung');
-		
+
 		$this->_setAuthUID();
 		
 		$this->setControllerId();
