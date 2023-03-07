@@ -3,7 +3,7 @@ $includesArray = array(
     'title' => $this->p->t('anrechnung', 'neueAnrechnung'),
     'jquery3' => true,
     'jqueryui1' => true,
-    'bootstrap5' => true,
+    'bootstrap3' => true,
     'fontawesome6' => true,
     'ajaxlib' => true,
     'dialoglib' => true,
@@ -23,7 +23,8 @@ $includesArray = array(
             'aktion',
             'geloescht',
             'gespeichert',
-            'frageSicherLoeschen'
+            'frageSicherLoeschen',
+            'spaltenEinstellen'
         ),
         'lehre' => array('studiensemester')
     ),
@@ -46,57 +47,59 @@ $this->load->view('templates/FHC-Header', $includesArray);
         <!--Titel-->
         <div class="page-header">
             <h3><?php echo $this->p->t('anrechnung', 'anrechnungenVerwalten'); ?></h3>
-        </div>
+        </div><br>
 
         <!--Untertitel-->
-        <h4 class="mt-5"><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4>
+        <h4><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4><br>
 
-        <div class="col-sm-4 mt-4">
-            <button class="btn btn-primary azrOpenModal" data-bs-toggle="modal" data-bs-target="#azrModal" value="insert">
-                <i class="fa fa-plus me-1"></i><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
+        <div class="col-xs-4">
+            <button class="btn btn-primary azrOpenModal" data-toggle="modal" data-target="#azrModal" value="insert">
+                <i class="fa fa-plus"></i> <?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
             </button>
         </div>
 
         <!-- Tabelle -->
         <div class="row">
-            <div class="col-6">
+            <div class="col-lg-10">
                 <?php $this->load->view('lehre/anrechnung/adminAnrechnungData.php'); ?>
             </div>
         </div>
 
         <!-- Modal (für insert und update von Anrechnungszeitraum)-->
-        <div class="modal hide" id="azrModal" tabindex="-1" aria-labelledby="azrModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" id="azrModal" tabindex="-1" role="dialog" aria-labelledby="azrModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="azrModalLabel"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <div class="modal-body row g-1">
-                        <input type="hidden" id="anrechnungszeitraum_id" value="">
-                        <input type="hidden" id="defaultStudiensemester_kurzbz" value="<?php echo $studiensemester_kurzbz ?>">
-                        <div class="col-sm-4">
-                            <label for="studiensemester" class="small">Studiensemester</label>
-                            <?php
-                            echo $this->widgetlib->widget(
-                                'Studiensemester_widget',
-                                array(
-                                    DropdownWidget::SELECTED_ELEMENT => $studiensemester_kurzbz
-                                ),
-                                array(
-                                    'name' => 'studiensemester',
-                                    'id' => 'studiensemester'
-                                )
-                            );
-                            ?>
-                        </div>
-                        <div class="col-sm-4">
-                            <label for="azrStart" class="small">Anr.-Zeitraum Start</label>
-                            <input type="date" id="azrStart" value="" class="form-control" required>
-                        </div>
-                        <div class="col-sm-4">
-                            <label for="azrEnde" class="small">Anr.-Zeitraum Ende</label>
-                            <input type="date" id="azrEnde" value="" class="form-control" required>
+                    <div class="modal-body">
+                        <div class="row">
+                            <input type="hidden" id="anrechnungszeitraum_id" value="">
+                            <input type="hidden" id="defaultStudiensemester_kurzbz" value="<?php echo $studiensemester_kurzbz ?>">
+                            <div class="col-xs-4">
+                                <label for="studiensemester" class="small">Studiensemester</label>
+                                <?php
+                                echo $this->widgetlib->widget(
+                                    'Studiensemester_widget',
+                                    array(
+                                        DropdownWidget::SELECTED_ELEMENT => $studiensemester_kurzbz
+                                    ),
+                                    array(
+                                        'name' => 'studiensemester',
+                                        'id' => 'studiensemester'
+                                    )
+                                );
+                                ?>
+                            </div>
+                            <div class="col-xs-4">
+                                <label for="azrStart" class="small">Anr.-Zeitraum Start</label>
+                                <input type="date" id="azrStart" value="" class="form-control" required>
+                            </div>
+                            <div class="col-xs-4">
+                                <label for="azrEnde" class="small">Anr.-Zeitraum Ende</label>
+                                <input type="date" id="azrEnde" value="" class="form-control" required>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">

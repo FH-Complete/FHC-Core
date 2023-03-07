@@ -24,7 +24,7 @@ var addActionButtons = function(cell) {
     editBtn.innerHTML = "<i class=\"fa fa-edit\"></i>";
     editBtn.classList.add("azrEditBtn");
     editBtn.classList.add("btn");
-    editBtn.classList.add("btn-outline-secondary");
+    editBtn.classList.add("btn-default");
     editBtn.addEventListener("click", function(){
         adminAnrechnung.editRow(cell);
     });
@@ -37,8 +37,8 @@ var addActionButtons = function(cell) {
     delBtn.innerHTML = "<i class=\"fa fa-times\"></i>";
     delBtn.classList.add("azrDeleteBtn");
     delBtn.classList.add("btn");
-    delBtn.classList.add("btn-outline-secondary");
-    delBtn.classList.add("ms-1");
+    delBtn.classList.add("btn-default");
+    delBtn.style.marginLeft = '5px';
     delBtn.addEventListener("click", function(){
         adminAnrechnung.deleteRow(cell);
     });
