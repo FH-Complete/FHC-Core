@@ -7,7 +7,6 @@ $includesArray = array(
     'fontawesome6' => true,
     'ajaxlib' => true,
     'dialoglib' => true,
-    'tablesorter2' => true,
     'tabulator4' => true,
     'tablewidget' => true,
     'phrases' => array(
