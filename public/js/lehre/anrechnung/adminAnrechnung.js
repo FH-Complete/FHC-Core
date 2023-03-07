@@ -1,8 +1,61 @@
+// Adds column details
+function func_tableBuilt(table) {
+    table.addColumn(
+        {
+            title: "Aktion",
+            align: "center",
+            width: 150,
+            formatter: addActionButtons,
+        }, false  // place column right
+    );
+
+}
+
+// Returns relative height (depending on screen size)
+function func_height(table){
+    return $(window).height() * 0.50;
+}
+
+var addActionButtons = function(cell) {
+
+    // Create edit button
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.innerHTML = "<i class=\"fa fa-edit\"></i>";
+    editBtn.classList.add("azrEditBtn");
+    editBtn.classList.add("btn");
+    editBtn.classList.add("btn-outline-secondary");
+    editBtn.addEventListener("click", function(){
+        adminAnrechnung.editRow(cell);
+    });
+
+
+
+    // Create delete button
+    var delBtn= document.createElement("button");
+    delBtn.type = "button";
+    delBtn.innerHTML = "<i class=\"fa fa-times\"></i>";
+    delBtn.classList.add("azrDeleteBtn");
+    delBtn.classList.add("btn");
+    delBtn.classList.add("btn-outline-secondary");
+    delBtn.classList.add("ms-1");
+    delBtn.addEventListener("click", function(){
+        adminAnrechnung.deleteRow(cell);
+    });
+
+    // Add buttons to cell
+    var buttonHolder = document.createElement("span");
+    buttonHolder.appendChild(editBtn);
+    buttonHolder.appendChild(delBtn);
+
+    return buttonHolder;
+}
+
 $(function () {
 
     // Open Modal and set values for insert or update Anrechnungszeitraum
     $(document).on('click', '.azrOpenModal', function(){
-
+        
         // Open Modal
         $('#azrModal').modal('show');
 
@@ -25,66 +78,18 @@ $(function () {
             $('.modal-footer #azrInsertOrUpdateBtn').val('insert');
         }
 
-        if (mode === 'update')
-        {
-            let row = $(this).closest('tr');
-            var anrechnungszeitraum_id = row.data('anrechnungszeitraum_id');
-            var studiensemester_kurzbz = row.find('.studiensemester_kurzbz').text();
-            var anrechnungstart = row.find('.anrechnungstart').text();
-            var anrechnungende = row.find('.anrechnungende').text();
-
-            $('.modal-header #azrModalLabel').text('Anrechnungszeitraum bearbeiten');
-
-            $('.modal-body #anrechnungszeitraum_id').val(anrechnungszeitraum_id);
-            $('.modal-body #studiensemester').val(studiensemester_kurzbz).change();
-            $('.modal-body #azrStart').val(anrechnungstart);
-            $('.modal-body #azrEnde').val(anrechnungende);
-
-            $('.modal-footer #azrInsertOrUpdateBtn').val('update');
-        }
     });
 
-    // Insert or update Anrechnungszeitraum
-    $(document).on('click', '#azrInsertOrUpdateBtn', function(){
-
-        var anrechnungszeitraum_id = $('.modal-body #anrechnungszeitraum_id').val();
+    // Insert Anrechnungszeitraum
+    $(document).on('click', '#azrInsertBtn', function(){
         var studiensemester_kurzbz = $('.modal-body #studiensemester').val();
         var anrechnungstart = $('.modal-body #azrStart').val();
         var anrechnungende = $('.modal-body #azrEnde').val();
 
-        // insert or update
-        let mode = this.value;
-
-        if (mode === 'insert')
-        {
-            // Insert Anrechnungszeitraum
-            adminAnrechnung.insertAzr(studiensemester_kurzbz, anrechnungstart, anrechnungende);
-        }
-
-        if (mode === 'update')
-        {
-            // Update Anrechnungszeitraum
-            adminAnrechnung.updateAzr(anrechnungszeitraum_id, studiensemester_kurzbz, anrechnungstart, anrechnungende);
-        }
+        // Insert Anrechnungszeitraum
+        adminAnrechnung.insertAzr(studiensemester_kurzbz, anrechnungstart, anrechnungende);
     });
 
-    // Delete Anrechnungszeitraum
-    $('#azrTable').on('click', '.azrDeleteBtn', function(){
-
-        if(!confirm(FHC_PhrasesLib.t("ui", "frageSicherLoeschen")))
-        {
-            return;
-        }
-
-        var anrechnungszeitraum_id = $(this).closest('tr').data('anrechnungszeitraum_id');
-        var row = $(this).closest('tr');
-
-        // Delete Anrechnungszeitraum
-        adminAnrechnung.deleteAzr(anrechnungszeitraum_id);
-
-        // Remove row
-        row.remove();
-    });
 
 })
 
@@ -109,13 +114,13 @@ var adminAnrechnung = {
                     {
                         data = FHC_AjaxClient.getData(data);
 
-                        // Add row on top
-                        adminAnrechnung.prependRow(
-                            data.anrechnungszeitraum_id,
-                            studiensemester_kurzbz,
-                            anrechnungstart,
-                            anrechnungende
-                        );
+                        // Update row
+                        $('#tableWidgetTabulator').tabulator('addData', [{
+                            anrechnungszeitraum_id: data.anrechnungszeitraum_id,
+                            studiensemester_kurzbz: studiensemester_kurzbz,
+                            anrechnungstart: anrechnungstart,
+                            anrechnungende: anrechnungende
+                        }], true); // true to add row on top
 
                         // Close Modal
                         $('#azrModal').modal('hide');
@@ -131,18 +136,24 @@ var adminAnrechnung = {
             }
         );
     },
-    prependRow: function (anrechnungszeitraum_id, studiensemester_kurzbz, anrechnungstart, anrechnungende) {
-        $('#azrTable').prepend($(
-            '<tr data-anrechnungszeitraum_id="' + anrechnungszeitraum_id + '">' +
-            '<td class="studiensemester_kurzbz">' + studiensemester_kurzbz + '</td>' +
-            '<td class="anrechnungstart">' + anrechnungstart + '</td>' +
-            '<td class="anrechnungende">' + anrechnungende + '</td>' +
-            '<td>' +
-            '<button class="btn btn-outline-secondary azrOpenModal" value="update"><i class="fa fa-edit"></i></button>' +
-            '<button class="btn btn-outline-secondary ms-1 azrDeleteBtn"><i class="fa fa-times"></i></button>' +
-            '</td>' +
-            '</tr>'
-        ))
+    editRow: function (cell){
+        // Open Modal
+        $('#azrModal').modal('show');
+
+        let row = cell.getRow();
+        var anrechnungszeitraum_id = row.getData().anrechnungszeitraum_id;
+        var studiensemester_kurzbz = row.getData().studiensemester_kurzbz;
+        var anrechnungstart = row.getData().anrechnungstart;
+        var anrechnungende = row.getData().anrechnungende;
+
+        $('.modal-header #azrModalLabel').text('Anrechnungszeitraum bearbeiten');
+
+        $('.modal-body #anrechnungszeitraum_id').val(anrechnungszeitraum_id);
+        $('.modal-body #studiensemester').val(studiensemester_kurzbz).change();
+        $('.modal-body #azrStart').val(anrechnungstart);
+        $('.modal-body #azrEnde').val(anrechnungende);
+
+        $('.modal-footer #azrInsertOrUpdateBtn').val('update');
     },
     updateAzr: function (anrechnungszeitraum_id, studiensemester_kurzbz, anrechnungstart, anrechnungende) {
         FHC_AjaxClient.ajaxCallPost(
@@ -164,7 +175,12 @@ var adminAnrechnung = {
                     if (FHC_AjaxClient.hasData(data))
                     {
                         // Update row
-                        adminAnrechnung.updateRow(anrechnungszeitraum_id, studiensemester_kurzbz, anrechnungstart, anrechnungende);
+                        $('#tableWidgetTabulator').tabulator('updateData', [{
+                            anrechnungszeitraum_id: anrechnungszeitraum_id,
+                            studiensemester_kurzbz: studiensemester_kurzbz,
+                            anrechnungstart: anrechnungstart,
+                            anrechnungende: anrechnungende
+                        }]);
 
                         // Close Modal
                         $('#azrModal').modal('hide');
@@ -180,12 +196,6 @@ var adminAnrechnung = {
                 }
             }
         );
-    },
-    updateRow: function (anrechnungszeitraum_id, studiensemester_kurzbz, anrechnungstart, anrechnungende){
-        let row = $('#azrTable').find('tr').filter('[data-anrechnungszeitraum_id=' + anrechnungszeitraum_id + ']');
-        row.find('.studiensemester_kurzbz').text(studiensemester_kurzbz);
-        row.find('.anrechnungstart').text(anrechnungstart);
-        row.find('.anrechnungende').text(anrechnungende);
     },
     deleteAzr: function(anrechnungszeitraum_id){
         FHC_AjaxClient.ajaxCallPost(
@@ -203,6 +213,9 @@ var adminAnrechnung = {
 
                     if (FHC_AjaxClient.hasData(data))
                     {
+                        let row = $('#tableWidgetTabulator').tabulator('getRow', anrechnungszeitraum_id);
+                        row.delete(anrechnungszeitraum_id);
+
                         // Success message
                         FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "geloescht"));
 
@@ -214,5 +227,14 @@ var adminAnrechnung = {
                 }
             }
         );
+    },
+    deleteRow: function (cell){
+        if(!confirm(FHC_PhrasesLib.t("ui", "frageSicherLoeschen")))
+        {
+            return;
+        }
+
+        // Delete Anrechnungszeitraum
+        adminAnrechnung.deleteAzr(cell.getRow().getData().anrechnungszeitraum_id);
     }
 }

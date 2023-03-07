@@ -57,31 +57,11 @@ $this->load->view('templates/FHC-Header', $includesArray);
             </button>
         </div>
 
-        <!--Tabelle-->
-        <div class="row col-6">
-            <table class="table table-condensed mt-3" id="azrTable">
-                <thead>
-                    <tr>
-                        <th><?php echo $this->p->t('lehre', 'studiensemester'); ?></th>
-                        <th><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumStart'); ?></th>
-                        <th><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumEnde'); ?></th>
-                        <th><?php echo $this->p->t('ui', 'aktion'); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach($anrechnungszeitraum_arr as $azr):?>
-                    <tr data-anrechnungszeitraum_id="<?php echo $azr->anrechnungszeitraum_id ?>">
-                        <td class="studiensemester_kurzbz"><?php echo $azr->studiensemester_kurzbz ?></td>
-                        <td class="anrechnungstart"><?php echo $azr->anrechnungstart ?></td>
-                        <td class="anrechnungende"><?php echo $azr->anrechnungende ?></td>
-                        <td>
-                            <button class="btn btn-outline-secondary azrOpenModal" data-bs-toggle="modal" data-bs-target="#azrModal" value="update"><i class="fa fa-edit"></i></button>
-                            <button type="button" class="btn btn-outline-secondary ms-1 azrDeleteBtn"><i class="fa fa-times"></i></button>
-                        </td>
-                    </tr>
-                    <?php endforeach;?>
-                </tbody>
-            </table>
+        <!-- Tabelle -->
+        <div class="row">
+            <div class="col-6">
+                <?php $this->load->view('lehre/anrechnung/adminAnrechnungData.php'); ?>
+            </div>
         </div>
 
         <!-- Modal (für insert und update von Anrechnungszeitraum)-->
@@ -120,7 +100,7 @@ $this->load->view('templates/FHC-Header', $includesArray);
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="azrInsertOrUpdateBtn" class="btn btn-primary" value=""><?php echo $this->p->t('ui', 'speichern'); ?></button>
+                        <button type="button" id="azrInsertBtn" class="btn btn-primary" value=""><?php echo $this->p->t('ui', 'speichern'); ?></button>
                     </div>
                 </div>
             </div>
