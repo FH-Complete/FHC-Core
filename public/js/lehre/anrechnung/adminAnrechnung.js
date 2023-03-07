@@ -16,6 +16,17 @@ function func_height(table){
     return $(window).height() * 0.50;
 }
 
+// Converts string date postgre style to string DD.MM.YYYY.
+// This will allow correct filtering.
+var formatDate = function(cell, formatterParams){
+    let postgreDate = cell.getValue();
+    if (postgreDate != null)
+    {
+        var d = new Date(postgreDate);
+        return ("0" + (d.getDate())).slice(-2)  + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + d.getFullYear();
+    }
+}
+
 var addActionButtons = function(cell) {
 
     // Create edit button
@@ -89,7 +100,6 @@ $(function () {
         // Insert Anrechnungszeitraum
         adminAnrechnung.insertAzr(studiensemester_kurzbz, anrechnungstart, anrechnungende);
     });
-
 
 })
 

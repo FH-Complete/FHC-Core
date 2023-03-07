@@ -35,8 +35,8 @@ $filterWidgetArray = array(
 	'datasetRepFieldsDefs' => '{
 		anrechnungszeitraum_id: {visible: false, headerFilter:"input"},
 		studiensemester_kurzbz: {headerFilter:"input"},
-		anrechnungstart:        {headerFilter:"input"},
-		anrechnungende:         {headerFilter:"input"},
+		anrechnungstart:        {headerFilter:"input", formatter: formatDate},
+		anrechnungende:         {headerFilter:"input", formatter: formatDate},
 		insertamum:             {visible: false, headerFilter:"input"},
 		insertvon:              {visible: false, headerFilter:"input"}
 	 }'
