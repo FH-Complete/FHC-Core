@@ -21,7 +21,7 @@ $filterWidgetArray = array(
 	),
 	'datasetRepOptions' => '{
 		height: func_height(this),
-		layout: "fitColumns",           // fit columns to width of table
+		layout: "fitDataFill",           
 		persistentLayout:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",

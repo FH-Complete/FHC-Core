@@ -1,6 +1,6 @@
 <?php
 $includesArray = array(
-    'title' => $this->p->t('anrechnung', 'neueAnrechnung'),
+    'title' => $this->p->t('anrechnung', 'anrechnungenVerwalten'),
     'jquery3' => true,
     'jqueryui1' => true,
     'bootstrap3' => true,
@@ -9,6 +9,8 @@ $includesArray = array(
     'dialoglib' => true,
     'tabulator4' => true,
     'tablewidget' => true,
+    'sbadmintemplate3' => true,
+    'navigationwidget' => true,
     'phrases' => array(
         'anrechnung' => array(
             'anrechnungenVerwalten',
@@ -39,33 +41,38 @@ $includesArray = array(
 $this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
+<div id="wrapper">
 
-<div id="main">
-    <div class="content">
+    <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
 
-        <!--Titel-->
-        <div class="page-header">
-            <h3><?php echo $this->p->t('anrechnung', 'anrechnungenVerwalten'); ?></h3>
-        </div><br>
+    <div id="page-wrapper">
+        <div class="container-fluid">
 
-        <!--Untertitel-->
-        <h4><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4><br>
+            <!--Titel-->
+            <div class="page-header">
+                <h3><?php echo $this->p->t('anrechnung', 'anrechnungenVerwalten'); ?></h3>
+            </div><br>
 
-        <div class="col-xs-4">
-            <button class="btn btn-primary azrOpenModal" data-toggle="modal" data-target="#azrModal" value="insert">
-                <i class="fa fa-plus"></i> <?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
-            </button>
-        </div>
+            <!--Untertitel-->
+            <h4><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumFestlegen'); ?></h4><br>
 
-        <!-- Tabelle -->
-        <div class="row">
-            <div class="col-lg-10">
-                <?php $this->load->view('lehre/anrechnung/adminAnrechnungData.php'); ?>
+            <div class="row">
+                <div class="col-xs-4">
+                    <button class="btn btn-primary azrOpenModal" data-toggle="modal" data-target="#azrModal" value="insert">
+                        <i class="fa fa-plus"></i> <?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <!-- Modal (für insert und update von Anrechnungszeitraum)-->
-        <div class="modal fade" id="azrModal" tabindex="-1" role="dialog" aria-labelledby="azrModalLabel" aria-hidden="true">
+            <!-- Tabelle -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <?php $this->load->view('lehre/anrechnung/adminAnrechnungData.php'); ?>
+                </div>
+            </div>
+
+            <!-- Modal (für insert und update von Anrechnungszeitraum)-->
+            <div class="modal fade" id="azrModal" tabindex="-1" role="dialog" aria-labelledby="azrModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -106,6 +113,8 @@ $this->load->view('templates/FHC-Header', $includesArray);
                     </div>
                 </div>
             </div>
+        </div>
+
         </div>
     </div>
 </div>
