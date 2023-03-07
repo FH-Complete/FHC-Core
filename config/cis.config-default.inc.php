@@ -261,7 +261,6 @@ define('CIS_ZEITWUNSCH_GD', false);
 define('CIS_SHOW_COVID_STATUS', false);
 
 // Docsbox configs
-define('DOCSBOX_ENABLED', false);
 define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
 define('DOCSBOX_PATH_API', 'api/v1/');
 define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
