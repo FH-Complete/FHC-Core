@@ -15711,6 +15711,46 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'kvp',
+		'phrase' => 'new.error.nostandardcourse.title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fehler",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Error",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'new.error.nostandardcourse.msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dieser Moodle Kurs ist keinem standardisierten Quellkurs zugeordnet",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "This Moodle Course is not derived from a standardized Source Course",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
 		'phrase' => 'admin.title.oes',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -16241,7 +16281,9 @@ array(
 							In Summe müssen 5 ECTS erworben werden, die im 6. Semester wirksam werden. <br/>
 							Das Modul „International skills“ wird mit der Beurteilung „Mit Erfolg teilgenommen“ abgeschlossen. <br />
 							Bitte wählen Sie die für Sie in Frage kommenden Maßnahmen aus und planen Sie das entsprechende Semester. <br />
-							Sobald die 5 ECTS erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente.',
+							Sobald die 5 ECTS erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente. <br /><br />
+							Fragen zum Status Ihrer Maßnahme u.ä. richten Sie bitte an den Studiengang. <br />
+							Bei allen weiteren Fragen zum Thema Organisation und Finanzierung des Auslandsaufenthalts und/oder Sprachkurs gibt Ihnen das International Office der FH Technikum Wien unter <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a> gerne Auskunft.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -16252,7 +16294,10 @@ array(
 							In total, 5 ECTS must be acquired, which become effective in the 6th semester.<br />
 							The module “International skills” is completed with the assessment "Successfully participated". <br />
 							Please select the measures that apply to you and schedule the appropriate semester. <br />
-							Once the 5 ECTS have been achieved, the degree program will review the documents you have uploaded.',
+							Once the 5 ECTS have been achieved, the degree program will review the documents you have uploaded. <br /><br />
+							Please direct questions regarding the status of your measure and the like should be directed to the study program. <br />
+							For all further questions regarding the organization and financing of your stay abroad and/or language course, please contact the International Office of the UAS Technikum Wien at <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a>.
+							',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17137,7 +17182,27 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'stammdatenFeldFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte Nachname, Geschlecht und Geburtsdatum ausfüllen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please fill out the last name, gender and date of birth.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
