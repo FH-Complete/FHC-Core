@@ -121,6 +121,13 @@ else
 	$format_highlightright->setBorderColor('white');
 	$format_highlightright->setAlign('right');
 
+	$format_highlightright_date=& $workbook->addFormat();
+	$format_highlightright_date->setFgColor(15);
+	$format_highlightright_date->setBorder(1);
+	$format_highlightright_date->setBorderColor('white');
+	$format_highlightright_date->setAlign('right');
+	$format_highlightright_date->setNumFormat(49);
+
 	$format_border_bottom =& $workbook->addFormat();
 	$format_border_bottom ->setBottom(2);
 	$format_border_bottom->setBold();
@@ -230,7 +237,7 @@ else
 	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 {
 	$worksheet->write($lines,12,$p->t('global/uid'),$format_border_bottom);
-	$worksheet->write($lines,13,$p->t('global/uid'),$format_border_bottom);
+	$worksheet->write($lines,13,$p->t('global/datum'),$format_border_bottom);
 	if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 		$worksheet->write($lines,14,$p->t('benotungstool/punkte'),$format_border_bottom);
 	else
@@ -328,9 +335,14 @@ else
 						if ($output2)
 						{
 							$resultPr = $output2[0];
-							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright);
+							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
 							$worksheet->write($lines,10, $resultPr->note, $format_highlightright);
 						}
+                                                else 
+                                                {
+                                                        $worksheet->write($lines,9, '', $format_highlightright_date);
+                                                        $worksheet->write($lines,10, '', $format_highlightright);
+                                                }
 					}
 
 					// Nachprüfung
@@ -344,9 +356,14 @@ else
 						if ($output3)
 						{
 							$resultPr = $output3[0];
-							$worksheet->write($lines,13, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright);
+							$worksheet->write($lines,13, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
 							$worksheet->write($lines,14, $resultPr->note, $format_highlightright);
 						}
+                                                else
+                                                {
+                                                        $worksheet->write($lines,13, '', $format_highlightright_date);
+                                                        $worksheet->write($lines,14, '', $format_highlightright);
+                                                }
 					}
 
 					$i++;
