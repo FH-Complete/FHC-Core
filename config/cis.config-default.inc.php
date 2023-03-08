@@ -260,10 +260,17 @@ define('CIS_ZEITWUNSCH_GD', false);
 // Covid-Status anzeigen
 define('CIS_SHOW_COVID_STATUS', false);
 
+// Docsbox configs
+define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
+define('DOCSBOX_PATH_API', 'api/v1/');
+define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
+define('DOCSBOX_WAITING_SLEEP_TIME', 1);
+
 //Vertrag Allin
 define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
 
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
+
 
 ?>
