@@ -771,8 +771,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 										title='".($b->berechtigung_kurzbz != '' ? $berechtigung_arr[$b->berechtigung_kurzbz] : '')."'
 										data-toggle='tooltip' 
 										data-html='true' 
-										data-placement='auto' 
-										data-original-title='Foo'>";
+										data-placement='auto'>";
 		$htmlstr .= "		</td>";
 
 		//Art
@@ -841,7 +840,16 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 		//Anmerkung
 		$htmlstr .= "		<td>";
-		$htmlstr .= "			<input type='text' name='dataset[$b->benutzerberechtigung_id][anmerkung]' value='".$b->anmerkung."' title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung))."' size='50' maxlength='256'>";
+		$htmlstr .= "			<input 
+									type='text' 
+									name='dataset[$b->benutzerberechtigung_id][anmerkung]' 
+									value='".$b->anmerkung."' 
+									title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung))."' 
+									data-toggle='tooltip' 
+									data-html='true' 
+									data-placement='auto'
+									size='50' 
+									maxlength='256'>";
 		$htmlstr .= "		</td>";
 
 		//Info
