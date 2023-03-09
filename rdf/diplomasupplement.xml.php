@@ -1126,7 +1126,7 @@ function printLehrveranstaltungTree($tree)
 	usort($tree, "cmp");
 	foreach($tree as $lv)
 	{
-		if ($lv->lehre)
+		if ($lv->export)
 		{
 			$db = new basis_db();
 			$lv_alvs = new lehrveranstaltung();
@@ -1179,7 +1179,7 @@ function printLehrveranstaltungTree($tree)
 			echo '              <lv_sws><![CDATA['.$lv->sws.']]></lv_sws>';
 			echo '              <lv_lvs><![CDATA['.$lv->lvs.']]></lv_lvs>';
 			echo '              <lv_pflicht><![CDATA['.$lv->stpllv_pflicht.']]></lv_pflicht>';
-			echo '              <lv_studplan><![CDATA['.$lv->lehre.']]></lv_studplan>';
+			echo '              <lv_studplan><![CDATA['.$lv->export.']]></lv_studplan>';
 			echo '              <lv_gen><![CDATA['.$lv->genehmigung.']]></lv_gen>';
 			echo '              <lv_anmerkung><![CDATA['.clearHtmlTags($lv->anmerkung).']]></lv_anmerkung>';
 			echo '				<lv_sprache><![CDATA['.$sp->getBezeichnung($lv->sprache, constant("DEFAULT_LANGUAGE")).']]></lv_sprache>';
