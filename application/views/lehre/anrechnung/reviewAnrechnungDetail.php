@@ -21,6 +21,7 @@ $this->load->view(
 				'systemfehler',
 				'bitteMindEinenAntragWaehlen',
 				'bitteBegruendungAngeben',
+                'bitteBegruendungVervollstaendigen',
 				'anrechnungenWurdenEmpfohlen',
 				'anrechnungenWurdenNichtEmpfohlen'
 			),
@@ -234,7 +235,7 @@ $this->load->view(
 												</span>
 											</li>
 											<li class="list-group-item">
-												<span><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?></span>&emsp;
+												<span><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertigWeil'); ?></span>&emsp;
 												<span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
 													  data-placement="right"
 													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
