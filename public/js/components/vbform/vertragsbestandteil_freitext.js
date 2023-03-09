@@ -7,7 +7,7 @@ export default {
   <div class="border-bottom py-2 mb-3">
     <div class="row g-2 py-2">
       <div class="col-7">
-        <select v-model="freitexttyp" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select v-model="freitexttyp" :disabled="isinputdisabled('freitexttyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option value="" selected>Freitexttyp wählen</option>
           <option value="allin">AllIn</option>
           <option value="ersatzkraft">Ersatzarbeitskraft</option>
@@ -21,19 +21,19 @@ export default {
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
       </div>
     </div>
-    <div class="row g-2 py-2">
+    <div class="row g-2 py-2" v-show="showinput('titel')">
       <div class="col-11">
         <input v-model="titel" type="text" class="form-control form-control-sm" placeholder="Titel" aria-label="Titel">
       </div>
       <div class="col-1">&nbsp;</div>
     </div>
-    <div class="row g-2 py-2">
+    <div class="row g-2 py-2" v-show="showinput('freitext')">
       <div class="col-11">
         <textarea v-model="freitext" rows="5" class="form-control form-control-sm" placeholder="Freitext" aria-label="Freitext"></textarea>
       </div>
       <div class="col-1">&nbsp;</div>
     </div>
-    <gehaltsbestandteilhelper ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
+    <gehaltsbestandteilhelper ref="gbh" v-if="canhavegehaltsbestandteile" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>
   `,
   components: {
@@ -76,6 +76,9 @@ export default {
     removeVB: function() {
       this.$emit('removeVB', {id: this.config.guioptions.id});
     },
+    getGehaltsbestandteilePayload: function() {
+      return (!this.$refs?.gbh === undefined) ? this.$refs.gbh.getPayload() : [];
+    },
     getPayload: function() {
       return {
         type: 'vertragsbestandteilfreitext',
@@ -87,7 +90,7 @@ export default {
           kuendigungsrelevant: this.kuendigungsrelevant,
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         },
-        gbs: this.$refs.gbh.getPayload()
+        gbs: this.getGehaltsbestandteilePayload()
       };
     }
   }

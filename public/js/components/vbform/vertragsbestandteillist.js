@@ -14,7 +14,7 @@ export default {
           <div class="col">
             <a class="fs-6 fw-light" href="javascript:void(0);" @click="addVB"><i class="fas fa-plus-square"></i></a>
             &nbsp;
-            <em>{{ title }}</em>
+            <em>{{ title }}{{ childcount }}</em>
           </div>
         </div>
         <component ref="parts" v-bind:is="config.type" v-for="config in getChildren()"
@@ -63,12 +63,18 @@ export default {
       }
 
       var vbid = uuid.get_uuid();
+      var guioptions = (this.preset.guioptions?.childdefaults?.guioptions !== undefined)
+                     ? JSON.parse(JSON.stringify(this.preset.guioptions.childdefaults.guioptions))
+                     : {};
+      guioptions.id = vbid;
+      guioptions.removeable = true;
+      var data = (this.preset.guioptions?.childdefaults?.data !== undefined)
+                     ? JSON.parse(JSON.stringify(this.preset.guioptions.childdefaults.data))
+                     : {};
       this.store.addVB(vbid, {
         type: this.vertragsbestandteiltyp,
-        guioptions: {
-          id: vbid,
-          removeable: true
-        }
+        guioptions: guioptions,
+        data: data
       });
       this.children.push(vbid);
     },
@@ -82,10 +88,7 @@ export default {
     getPayload: function() {
       this.payload = {
         type: 'vertragsbestandteillist',
-        guioptions: {
-          title: this.title,
-          vertragsbestandteiltyp: this.vertragsbestandteiltyp
-        },
+        guioptions: JSON.parse(JSON.stringify(this.preset.guioptions)),
         children: JSON.parse(JSON.stringify(this.children))
       };
       this.updateVBsInStore();
@@ -107,6 +110,11 @@ export default {
       }
 
       return vbs;
+    }
+  },
+  computed: {
+    childcount: function() {
+      return (this.children.length > 0) ? ' (' + this.children.length + ')' : '';
     }
   }
 }

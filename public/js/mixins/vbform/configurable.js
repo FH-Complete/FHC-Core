@@ -8,6 +8,12 @@ export default {
         return false;
       }
       return this.config.guioptions.disabled.includes(inputname);
+    },
+    showinput: function(inputname) {
+      if( this.config?.guioptions?.hidden === undefined ) {
+        return true;
+      }
+      return !this.config.guioptions.hidden.includes(inputname);
     }
   },
   computed: {

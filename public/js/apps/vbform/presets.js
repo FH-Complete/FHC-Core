@@ -102,7 +102,24 @@ export default [
                 type: 'vertragsbestandteillist',
                 guioptions: {
                   title: 'Befristung',
-                  vertragsbestandteiltyp: 'vertragsbestandteilfreitext'
+                  vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+                  childdefaults: {
+                    guioptions: {
+                      canhavegehaltsbestandteile: false,
+                      disabled: [
+                        'freitexttyp'
+                      ],
+                      hidden: [
+                        'titel',
+                        'freitext'
+                      ]
+                    },
+                    data: {
+                      freitexttyp: "befristung",
+                      titel: "Befristung",
+                      freitext: "befristeter Dienstvertrag"
+                    }
+                  }
                 },
                 children: []
               }
