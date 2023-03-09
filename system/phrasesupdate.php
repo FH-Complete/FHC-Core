@@ -12017,7 +12017,7 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Anrechnungszeitraum hinzuf&uuml;gen',
+                'text' => 'Anrechnungszeitraum hinzufügen',
                 'description' => '',
                 'insertvon' => 'system'
             ),

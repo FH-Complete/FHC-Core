@@ -1,4 +1,7 @@
-// Adds column details
+// TABULATOR
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Add Edit and Update Buttons to table rows
 function func_tableBuilt(table) {
     table.addColumn(
         {
@@ -27,6 +30,7 @@ var formatDate = function(cell, formatterParams){
     }
 }
 
+// Create Edit and Update Buttons for table rows
 var addActionButtons = function(cell) {
 
     // Create edit button
@@ -62,32 +66,21 @@ var addActionButtons = function(cell) {
     return buttonHolder;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 $(function () {
 
-    // Open Modal and set values for insert or update Anrechnungszeitraum
+    // Empty Modal fields on 'Anrechnungszeitraum hinzufuegen'
     $(document).on('click', '.azrOpenModal', function(){
-        
-        // Open Modal
-        $('#azrModal').modal('show');
 
-        // insert or update
-        let mode = this.value;
-
-        if (mode === 'insert')
-        {
             let defaultStudiensemester_kurzbz = $('.modal-body #defaultStudiensemester_kurzbz').val();
 
-            $('.modal-header #azrModalLabel').text('Anrechnungszeitraum hinzufügen');
-
-            $(".modal").show();
+            $('.modal-header #azrModalLabel').text(FHC_PhrasesLib.t("anrechnung", "anrechnungszeitraumHinzufuegen"));
 
             $('.modal-body #anrechnungszeitraum_id').val('');
             $('.modal-body #studiensemester').val(defaultStudiensemester_kurzbz).change();
             $('.modal-body #azrStart').val('');
             $('.modal-body #azrEnde').val('');
-
-            $('.modal-footer #azrInsertOrUpdateBtn').val('insert');
-        }
 
     });
 
@@ -163,7 +156,6 @@ var adminAnrechnung = {
         $('.modal-body #azrStart').val(anrechnungstart);
         $('.modal-body #azrEnde').val(anrechnungende);
 
-        $('.modal-footer #azrInsertOrUpdateBtn').val('update');
     },
     updateAzr: function (anrechnungszeitraum_id, studiensemester_kurzbz, anrechnungstart, anrechnungende) {
         FHC_AjaxClient.ajaxCallPost(

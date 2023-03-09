@@ -58,7 +58,7 @@ $this->load->view('templates/FHC-Header', $includesArray);
 
             <div class="row">
                 <div class="col-xs-4">
-                    <button class="btn btn-primary azrOpenModal" data-toggle="modal" data-target="#azrModal" value="insert">
+                    <button class="btn btn-primary azrOpenModal" data-toggle="modal" data-target="#azrModal">
                         <i class="fa fa-plus"></i> <?php echo $this->p->t('anrechnung', 'anrechnungszeitraumHinzufuegen'); ?>
                     </button>
                 </div>
