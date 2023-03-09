@@ -8,13 +8,13 @@ export default {
     }
   },
   created: function() {
-    this.children = JSON.parse(JSON.stringify(this.preset));
+    this.children = JSON.parse(JSON.stringify(this.preset.children));
   },
   watch: {
     preset: function() {
       this.children = [];
       this.$nextTick(function() {
-        this.children = JSON.parse(JSON.stringify(this.preset));
+        this.children = JSON.parse(JSON.stringify(this.preset.children));
       });
     }
   }

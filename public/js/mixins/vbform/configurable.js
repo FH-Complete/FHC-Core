@@ -20,7 +20,8 @@ export default {
         ? true : this.config.guioptions.canhavegehaltsbestandteile;
     },
     getgehaltsbestandteile: function() {
-      return (this.config?.gbs !== undefined) ? this.config.gbs : [];
+      var gbs = (this.config?.gbs !== undefined) ? this.config.gbs : [];
+      return { children: gbs };
     },
     getgueltigkeit: function() {
       if( this.config?.gueltigkeit !== undefined ) {

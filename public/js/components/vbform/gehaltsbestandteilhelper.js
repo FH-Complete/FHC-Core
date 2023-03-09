@@ -4,7 +4,7 @@ import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
   template: `
-  <gehaltsbestandteil v-bind:ref="config.guioptions.id" v-for="config in children"
+  <gehaltsbestandteil ref="parts" v-for="config in children"
     v-bind:config="config" :key="config.guioptions.id" @removeGB="removeGB"></gehaltsbestandteil>
   <div class="row">
     <div class="col-1">
@@ -46,15 +46,13 @@ export default {
       this.children = children;
     },
     getPayload: function() {
-      var children = this.children;
-      var that = this;
+      var payload = [];
 
-      this.payload = [];
-      children.forEach(function(gb) {
-        that.payload.push(that.$refs[gb.guioptions.id][0].getPayload());
-      });
+      for( var i in this.$refs.parts ) {
+        payload.push(this.$refs.parts[i].getPayload());
+      }
 
-      return this.payload;
+      return payload;
     }
   }
 }

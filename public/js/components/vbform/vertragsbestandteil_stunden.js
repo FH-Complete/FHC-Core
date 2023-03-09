@@ -1,10 +1,14 @@
 import gehaltsbestandteilhelper from './gehaltsbestandteilhelper.js';
 import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
+import errors from './errors.js';
+import infos from './infos.js';
 
 export default {
   template: `
   <div class="border-bottom py-2 mb-3">
+    <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
+    <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2">
       <div class="col-3">
         <div class="input-group input-group-sm mb-3">
@@ -23,7 +27,9 @@ export default {
   `,
   components: {
     'gehaltsbestandteilhelper': gehaltsbestandteilhelper,
-    'gueltigkeit': gueltigkeit
+    'gueltigkeit': gueltigkeit,
+    'infos': infos,
+    'errors': errors
   },
   mixins: [
     configurable

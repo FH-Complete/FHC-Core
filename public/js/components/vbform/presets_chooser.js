@@ -1,28 +1,18 @@
-import vertragsbestandteilhelper from './vertragsbestandteilhelper.js';
-import debug_viewer from './debug_viewer.js';
-
 export default {
   template: `
   <div class="row g-2 py-2">
-    <div class="col-2">
-
-      <div class="d-flex align-items-start">
-        <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <button v-for="(preset, idx) in presets" @click="selectpreset(idx)" class="nav-link"
-            v-bind:class="isactive(idx)" data-bs-toggle="pill" type="button"
-            :title="preset.guioptions.description">{{ preset.guioptions.label }}</button>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="col-6">
-      <vertragsbestandteilhelper v-bind:preset="selectedpresetvbs" v-bind:data="selectedpresetdata" @vbhjsonready="process_json"></vertragsbestandteilhelper>
-    </div>
-
     <div class="col-4">
-      <debug_viewer v-bind:text="vbhjson"></debug_viewer>
+
+      <select v-model="selectedpresetidx" @change="selectpreset">
+        <option v-for="(preset, idx) in presets" :key="idx"
+                :value="idx"
+                :selected="idx === selectedpresetidx">
+                  {{ preset.guioptions.label }}
+                </option>
+      </select>
+
     </div>
+    <div class="col-8">&nbsp;</div>
   </div>
   `,
   props:[
@@ -30,31 +20,16 @@ export default {
   ],
   data: function() {
     return {
-      selectedpresetidx: 0,
-      selectedpresetvbs: [],
-      selectedpresetdata: {},
-      vbhjson: ''
+      selectedpresetidx: 1
     }
   },
-  components: {
-    'vertragsbestandteilhelper': vertragsbestandteilhelper,
-    'debug_viewer': debug_viewer
-  },
+  emits: [
+    "presetselected"
+  ],
   methods: {
-    selectpreset: function(idx) {
-      if( typeof this.presets[idx] !== 'undefined' ) {
-        this.seletedpresetidx = idx;
-        this.selectedpresetvbs = this.presets[idx].vbs;
-        this.selectedpresetdata = this.presets[idx].data;
-      }
-    },
-    isactive: function(idx) {
-      return (idx === this.selectedpresetidx) ? 'active' : '';
-    },
-    process_json: function(payload) {
-      this.vbhjson = payload;
+    selectpreset: function() {
+      var preset = this.presets[this.selectedpresetidx];
+      this.$emit("presetselected", preset);
     }
-  },
-  computed: {
   }
 }
