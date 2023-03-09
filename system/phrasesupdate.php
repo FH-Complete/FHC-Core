@@ -11369,6 +11369,46 @@ Any unusual occurrences
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'empfehlungNegativKenntnisseNichtGleichwertigWeil',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte Begründung ergänzen.]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please add reason.]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertigWeil',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte ergänzen oder Empfehlungstext des Lektors übernehmen und ggf. redigieren.]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please complete or adopt the text of the lectors recommendation and edit it if necessary]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -11429,6 +11469,26 @@ Any unusual occurrences
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'bitteBegruendungVervollstaendigen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Bitte vervollständigen Sie die Begründung.',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Please complete the reason.',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
