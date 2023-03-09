@@ -141,6 +141,13 @@ $(function(){
             return;
         }
 
+        // Check if forgot to fulfill begruendung
+        if (begruendung.trim().endsWith('weil') || begruendung.endsWith('because of'))
+        {
+            FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungVervollstaendigen"));
+            return;
+        }
+
         // Get form data
         let form_data = $('form').serializeArray();
 
@@ -471,11 +478,29 @@ var approveAnrechnungDetail = {
             textarea.val($.trim($('#approveAnrechnungDetail-empfehlungDetail-begruendung').text()));
             return;
         }
-        else
+        
+        // Find Begruendung span
+        let textspan = $(elem).parent().find('span:first');
+
+        // Get Begruendung
+        let begruendung = textspan.text();
+
+        // Check if Begruendung has helptext
+        let hasHelptext = textspan.children('span #helpTxtBegruendungErgaenzen').length > 0;
+
+        if (hasHelptext)
         {
-            // Copy begruendung into textarea
-            textarea.val($.trim($(elem).parent().find('span:first').text()));
+            let helptext = textspan.children('span #helpTxtBegruendungErgaenzen').text();
+
+            // Remove helptext
+            begruendung = begruendung.replace(helptext, '');
+
+            // Focus into textarea to encourage writing
+            textarea.focus();
         }
+
+        // Copy begruendung into textarea
+        textarea.val($.trim(begruendung));
     },
     formatEmpfehlungIsRequested: function(statusBezeichnung, empfehlungsanfrageAm, empfehlungsanfrageAn) {
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm').html(empfehlungsanfrageAm);
