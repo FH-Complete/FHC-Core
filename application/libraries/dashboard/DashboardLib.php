@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') || exit('No direct script access allowed');
+
+use \stdClass as stdClass;
+
 /**
  * Description of DashboardLib
  *
@@ -14,7 +17,7 @@ class DashboardLib
 	
 	private $_ci; // CI instance
 	
-	public function __construct($params=null)
+	public function __construct($params = null)
 	{
 		// Loads CI instance
 		$this->_ci =& get_instance();
@@ -24,25 +27,24 @@ class DashboardLib
 		$this->_ci->load->model('dashboard/Dashboard_Override_model', 'DashboardOverrideModel');
 	}
 
-	public function generateWidgetId($dashboard_kurzbz='') 
+	public function generateWidgetId($dashboard_kurzbz = '')
 	{
-		$dashboard_kurzbz = (!empty($dashboard_kurzbz)) ? $dashboard_kurzbz 
-			: self::DEFAULT_DASHBOARD_KURZBZ;
-		$widgetid_input = time() . '_' . $dashboard_kurzbz . '_' 
-			. bin2hex(random_bytes(self::WIDGET_ID_RANDOM_BYTES));
+		$dashboard_kurzbz = (!empty($dashboard_kurzbz)) ? $dashboard_kurzbz : self::DEFAULT_DASHBOARD_KURZBZ;
+		$widgetid_input = time() . '_' . $dashboard_kurzbz . '_' . bin2hex(random_bytes(self::WIDGET_ID_RANDOM_BYTES));
 		$widgetid = md5($widgetid_input);
 		return $widgetid;
 	}
 	
 	public function getDashboardByKurzbz($dashboard_kurzbz) 
 	{
-		$dashboard = null;
 		$result = $this->_ci->DashboardModel->getDashboardByKurzbz($dashboard_kurzbz);
-		if( isSuccess($result) && ($dashboards = getData($result)) ) 
+
+		if (hasData($result)) 
 		{
-			$dashboard = $dashboards[0];
+			return current(getData($result))
 		}
-		return $dashboard;
+
+		return null;
 	}
 	
 	public function getMergedConfig($dashboard_id, $uid) 
@@ -60,12 +62,13 @@ class DashboardLib
 		$res_presets = $this->_ci->DashboardPresetModel->getPresets($dashboard_id, $uid);
 		$defaultconfig = array();
 		
-		if( isSuccess($res_presets) && hasData($res_presets) ) 
+		if (hasData($res_presets))
 		{
 			$presets = getData($res_presets);
 			foreach ($presets as $presetobj)
 			{
-				if( null !== ($preset = json_decode($presetobj->preset, true)) )
+				$preset = json_decode($presetobj->preset, true);
+				if (null !== $preset)
 				{
 					$defaultconfig = array_replace_recursive($defaultconfig, 
 						$preset);
@@ -79,18 +82,18 @@ class DashboardLib
 	public function getUserConfig($dashboard_id, $uid)
 	{
 		$res_userconfig = $this->_ci->DashboardOverrideModel->getOverride($dashboard_id, $uid);
-		$userconfig = array();
 		
-		if( isSuccess($res_userconfig) && hasData($res_userconfig) ) 
+		if (hasData($res_userconfig))
 		{
 			$data = getData($res_userconfig);
-			if( null !== ($decodedconfig = json_decode($data[0]->override, true)) )
+			$decodedconfig = json_decode(current($data)->override, true);
+			if (null !==  $decodedconfig)
 			{
-				$userconfig = $decodedconfig;
+				return $decodedconfig;
 			}
 		}
 		
-		return $userconfig;
+		return [];
 	}
 	
 	public function getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid) 
@@ -123,7 +126,7 @@ class DashboardLib
 		$emptypreset->dashboard_id = $dashboard->dashboard_id;
 		$emptypreset->funktion_kurzbz = $funktion_kurzbz;
 		$section = ($funktion_kurzbz !== null) ? $funktion_kurzbz : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		$emptypreset->preset = '{"widgets": {"' . $funktion_kurzbz . '": {}}}';
+		$emptypreset->preset = '{"widgets": {"' . $section . '": {}}}';
 		
 		return $emptypreset;
 	}
@@ -131,34 +134,32 @@ class DashboardLib
 	public function getPreset($dashboard_kurzbz, $section) 
 	{
 		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
-		$preset = null;
 		
 		$funktion_kurzbz = ($section === self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL) ? null : $section;
 		$result = $this->_ci->DashboardPresetModel
 			->getPresetByDashboardAndFunktion($dashboard->dashboard_id, $funktion_kurzbz);
 		
-		if( isSuccess($result) && hasData($result) && ($presets = getData($result)) ) 
+		if (hasData($result)) 
 		{
-			$preset = $presets[0];
+			return current(getData($result));
 		}
 		
-		return $preset;
+		return null;
 	}
 
 	public function getOverride($dashboard_kurzbz, $uid) 
 	{
 		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
-		$override = null;
 		
 		$result = $this->_ci->DashboardOverrideModel
 			->getOverride($dashboard->dashboard_id, $uid);
 		
-		if( isSuccess($result) && hasData($result) && ($overrides = getData($result)) ) 
+		if (hasData($result)) 
 		{
-			$override = $overrides[0];
+			return current(getData($result));
 		}
 		
-		return $override;
+		return null;
 	}
 	
 	public function insertOrUpdatePreset($preset) 

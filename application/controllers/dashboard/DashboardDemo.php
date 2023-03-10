@@ -47,5 +47,4 @@ class DashboardDemo extends Auth_Controller
 
         if (!$this->_uid) show_error('User authentification failed');
     }
-
 }

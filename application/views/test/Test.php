@@ -1,5 +1,6 @@
 <?php
-$this->load->view('templates/FHC-Header',
+$this->load->view(
+	'templates/FHC-Header',
 	array(
 		'title' => 'FH-Complete',
 		'bootstrap5' => true,

@@ -60,7 +60,7 @@ EOSQL;
 	 * @param string funktion_kurzbz
 	 * @return array
 	 */
-	public function getPresetByDashboardAndFunktion($dashboard_id, $funktion_kurzbz) 
+	public function getPresetByDashboardAndFunktion($dashboard_id, $funktion_kurzbz)
 	{
 		return $this->loadWhere(array('dashboard_id' => $dashboard_id, 'funktion_kurzbz' => $funktion_kurzbz));
 	}
