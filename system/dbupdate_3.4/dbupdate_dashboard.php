@@ -25,7 +25,7 @@ if (! defined('DB_NAME')) exit('No direct script access allowed');
 if (($result = $db->db_query("SELECT schema_name FROM information_schema.schemata WHERE schema_name='dashboard'")))
 {
 	if ($db->db_num_rows($result) == 0)
-	{
+	{// TODO(chris): Rechte "Web"?
 		$qry = <<<EODASHBOARDSQL
 		
 --
