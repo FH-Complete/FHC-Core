@@ -31,6 +31,8 @@ require_once('dbupdate_3.4/example2.php');
 require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
 require_once('dbupdate_3.4/17512_fehlercode_constraints.php');
+require_once('dbupdate_3.4/28260_vertraege.php');
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -137,6 +139,25 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_sachaufwand" => array("sachaufwand_id","mitarbeiter_uid","sachaufwandtyp_kurzbz","dienstverhaeltnis_id","beginn","ende","anmerkung","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_sachaufwandtyp" => array("sachaufwandtyp_kurzbz","bezeichnung","sort", "aktiv"),
+	"hr.tbl_dienstverhaeltnis" => array("dienstverhaeltnis_id","mitarbeiter_uid","vertragsart_kurzbz","oe_kurzbz","von","bis","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_vertragsart" => array("vertragsart_kurzbz","bezeichnung","anmerkung","dientverhaeltnis","vertragsart_kurzbz_parent","aktiv","sort"),
+	"hr.tbl_vertragsbestandteil" => array("vertragsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteiltyp_kurzbz","von", "bis","insertamum", "insertvon","updateamum","updatevon"),
+	"hr.tbl_vertragsbestandteiltyp" => array("vertragsbestandteiltyp_kurzbz","bezeichnung","ueberlappend"),
+	"hr.tbl_vertragsbestandteil_funktion" => array("vertragsbestandteil_id","benutzerfunktion_id",),
+	"hr.tbl_vertragsbestandteil_stunden" => array("vertragsbestandteil_id","wochenstunden","teilzeittyp_kurzbz"),
+	"hr.tbl_vertragsbestandteil_freitext" => array("vertragsbestandteil_id","freitexttyp_kurzbz","titel","anmerkung",),
+	"hr.tbl_vertragsbestandteil_freitexttyp" => array("freitexttyp_kurzbz","bezeichnung","ueberlappend","kuendigungsrelevant"),
+	"hr.tbl_vertragsbestandteil_zeitaufzeichnung" => array("vertragsbestandteil_id","zeitaufzeichnung","azgrelevant","homeoffice"),
+	"hr.tbl_vertragsbestandteil_urlaubsanspruch" => array("vertragsbestandteil_id", "tage"),
+	"hr.tbl_vertragsbestandteil_kuendigungsfrist" => array("vertragsbestandteil_id", "arbeitgeber_frist", "arbeitnehmer_frist"),
+	"hr.tbl_vertragsbestandteil_karenz" => array("vertragsbestandteil_id", "karenztyp_kurzbz","geplanter_geburtstermin","tatsaechlicher_geburtstermin"),
+	"hr.tbl_karenztyp" => array("karenztyp_kurzbz","bezeichnung"),
+	"hr.tbl_teilzeittyp" => array("teilzeittyp_kurzbz","bezeichnung","aktiv"),
+	"hr.tbl_gehaltsbestandteil" => array("gehaltsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteil_id","gehaltstyp_kurzbz","von","bis","anmerkung","grundbetrag","betrag_valorisiert","valorisierungssperre","insertamum", "insertvon","updateamum","updatevon","valorisierung","auszahlungen"),
+	"hr.tbl_gehaltsabrechnung" => array("gehaltsabrechnung_id", "datum","betrag","gehaltsbestandteil_id"),
+	"hr.tbl_gehaltstyp" => array("gehaltstyp_kurzbz","bezeichnung","valorisierung","sort","aktiv"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
@@ -216,7 +237,7 @@ $tabellen=array(
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_fotostatus"  => array("fotostatus_kurzbz","beschreibung"),
-	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
+	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester", "hrrelevant","vertragsrelevant"),
 	"public.tbl_geschlecht"  => array("geschlecht","bezeichnung_mehrsprachig","sort"),
 	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt","zutrittssystem","aufnahmegruppe","direktinskription"),
