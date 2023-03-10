@@ -77,7 +77,7 @@ export default {
       this.$emit('removeVB', {id: this.config.guioptions.id});
     },
     getGehaltsbestandteilePayload: function() {
-      return (!this.$refs?.gbh === undefined) ? this.$refs.gbh.getPayload() : [];
+      return (this.$refs?.gbh !== undefined) ? this.$refs.gbh.getPayload() : [];
     },
     getPayload: function() {
       return {

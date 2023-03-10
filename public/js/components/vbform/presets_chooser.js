@@ -1,3 +1,5 @@
+import store from './vbsharedstate.js';
+
 export default {
   template: `
   <div class="row g-2 py-2">
@@ -20,6 +22,7 @@ export default {
   ],
   data: function() {
     return {
+      store: store,
       selectedpresetidx: 1
     }
   },
@@ -29,6 +32,7 @@ export default {
   methods: {
     selectpreset: function() {
       var preset = this.presets[this.selectedpresetidx];
+      this.store.reset();
       this.$emit("presetselected", preset);
     }
   }

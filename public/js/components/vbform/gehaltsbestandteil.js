@@ -62,17 +62,13 @@ export default {
   },
   methods: {
     setDataFromConfig: function() {
-      if( typeof this.config.data === 'undefined' ) {
-        return;
-      }
-
-      if( typeof this.config.data.gehaltstyp !== 'undefined' ) {
+      if( typeof this.config?.data?.gehaltstyp !== 'undefined' ) {
         this.gehaltstyp = this.config.data.gehaltstyp;
       }
-      if( typeof this.config.data.betrag !== 'undefined' ) {
+      if( typeof this.config?.data?.betrag !== 'undefined' ) {
         this.betrag = this.config.data.betrag;
       }
-      if( typeof this.config.data.valorisierung !== 'undefined' ) {
+      if( typeof this.config?.data?.valorisierung !== 'undefined' ) {
         this.valorisierung = this.config.data.valorisierung;
       }
     },
@@ -82,7 +78,7 @@ export default {
     getPayload: function() {
       return {
         type: this.config.type,
-        guioptions: this.config.guioptions,
+        guioptions: JSON.parse(JSON.stringify(this.config.guioptions)),
         data: {
           gehaltstyp: this.gehaltstyp,
           betrag: this.betrag,

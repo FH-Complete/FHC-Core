@@ -59,9 +59,7 @@ export default [
     data: {
       dienstverhaeltnisid: null
     },
-    vbs: {
-
-    }
+    vbs: {}
   },
   {
     type: 'preset',

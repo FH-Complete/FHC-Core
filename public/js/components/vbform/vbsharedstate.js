@@ -29,5 +29,13 @@ export default Vue.reactive({
   },
   getVBsPayload: function() {
     return JSON.parse(JSON.stringify(this.vbs));
+  },
+  reset: function() {
+    this.gueltigkeit = {
+      gueltig_ab: '',
+      gueltig_bis: ''
+    };
+    this.dv = {};
+    this.vbs = {};
   }
 });

@@ -62,15 +62,19 @@ Vue.createApp({
     'vbformhelper': vbformhelper
   },
   created: function() {
-    var vbs = JSON.parse(JSON.stringify(this.preset.vbs));
-    for( var key in vbs ) {
-      this.store.addVB(key, vbs[key]);
-    }
-    this.store.setDV(JSON.parse(JSON.stringify(this.preset.data)));
+    this.presettostore();
   },
   methods: {
     presetselected: function(preset) {
       this.preset = preset;
+      this.presettostore();
+    },
+    presettostore: function() {
+      var vbs = JSON.parse(JSON.stringify(this.preset.vbs));
+      for( var key in vbs ) {
+        this.store.addVB(key, vbs[key]);
+      }
+      this.store.setDV(JSON.parse(JSON.stringify(this.preset.data)));
     },
     processJSON: function(payload) {
       this.vbhjson = payload;
