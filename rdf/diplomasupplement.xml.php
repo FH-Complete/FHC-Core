@@ -53,13 +53,12 @@ $db = new basis_db();
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
-
 	if(isset($_GET['uid']))
 		$uid = $_GET['uid'];
 	else
 		$uid = null;
 
-	$uid_arr = explode(";",$uid);
+	$uid_arr = explode(";", $uid);
 
 	echo "<?xml version='1.0' encoding='UTF-8' standalone='yes'?> ";
 	echo "<supplements>";
@@ -149,7 +148,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$angerechneteECTS=($semesterNumberStart-1)*30; // 30 ECTS pro Semester
 			echo '		<angerechnete_ects_quereinstieg>'.$angerechneteECTS.'</angerechnete_ects_quereinstieg>';
 		}
-		echo '      <start_semester>'.substr($prestudent->studiensemester_kurzbz,2,6).'</start_semester>';
+		echo '      <start_semester>'.substr($prestudent->studiensemester_kurzbz, 2, 6).'</start_semester>';
 		echo '      <start_semester_number>'.$prestudent->ausbildungssemester.'</start_semester_number>';
 		$prestudent->getLastStatus($row->prestudent_id, null);
 		$semesterNumberEnd = $prestudent->ausbildungssemester;
@@ -631,7 +630,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				//	$summe += $lv->ects;
 
 				echo '	<lv_summe_ects_semester><![CDATA['.$summe_ects_semester.']]></lv_summe_ects_semester>';
-				echo '	<lv_summe_sws_semester><![CDATA['.round($summe_sws_semester,2).']]></lv_summe_sws_semester>';
+				echo '	<lv_summe_sws_semester><![CDATA['.round($summe_sws_semester, 2).']]></lv_summe_sws_semester>';
 
 				$summe_ects_orgform += $summe_ects_semester;
 				$summe_sws_orgform += $summe_sws_semester;
@@ -677,16 +676,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			// Array der Semester
 			$aktuellesSemester = $semester_kurzbz;
 
-			$semester = mb_substr($semester_kurzbz[0],0,2);
-			$year = mb_substr($semester_kurzbz[0], 2,4);
+			$semester = mb_substr($semester_kurzbz[0], 0, 2);
+			$year = mb_substr($semester_kurzbz[0], 2, 4);
 
 			if($semester == 'SS')
 				$semester_kurzbz = 'Summer Semester '.$year;
-			else if($semester == 'WS')
+			elseif($semester == 'WS')
 			{
-				$helpyear = mb_substr($year, 2,2);
+				$helpyear = mb_substr($year, 2, 2);
 				$helpyear +=1;
-				$helpyear = sprintf("%02d",$helpyear);
+				$helpyear = sprintf("%02d", $helpyear);
 				$semester_kurzbz = 'Winter Semester '.$year.'/'.$helpyear;
 			}
 
@@ -825,11 +824,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					if($result_lehrform = $db->db_query($qry_lehrform))
 					{
 						while($row_lehrform = $db->db_fetch_object($result_lehrform))
-						{	if($y != 0)
-							$lehrform_kurzbz = $lehrform_kurzbz.', '.$row_lehrform->lehrform_kurzbz;
-						else
-							$lehrform_kurzbz = $row_lehrform->lehrform_kurzbz;
-							$y++;
+						{
+							if($y != 0)
+								$lehrform_kurzbz = $lehrform_kurzbz.', '.$row_lehrform->lehrform_kurzbz;
+							else
+								$lehrform_kurzbz = $row_lehrform->lehrform_kurzbz;
+								$y++;
 						}
 					}
 					$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['lehrform_kurzbz']= $lehrform_kurzbz;
@@ -853,7 +853,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 
 					$datum = new datum();
-					$benotungsdatum = $datum->formatDatum($benotungsdatum,'d/m/Y');
+					$benotungsdatum = $datum->formatDatum($benotungsdatum, 'd/m/Y');
 					$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['benotungsdatum']= $benotungsdatum;
 
 					$bezeichnung_englisch = $row_stud->bezeichnung_english;
@@ -1187,9 +1187,9 @@ function printLehrveranstaltungTree($tree)
 
 			$objLVInfo = new lvinfo();
 			// ***************** LV-Info ***************
-			if ($objLVInfo->exists($lv->lehrveranstaltung_id,'German'))
+			if ($objLVInfo->exists($lv->lehrveranstaltung_id, 'German'))
 			{
-				if(!$objLVInfo->load($lv->lehrveranstaltung_id,'German'))
+				if(!$objLVInfo->load($lv->lehrveranstaltung_id, 'German'))
 					die('Fehler beim laden der deutschen LV-Informationen');
 				//var_dump($objLVInfo);
 				echo '              <lvinfo_sprache><![CDATA['.clearHtmlTags($objLVInfo->sprache).']]></lvinfo_sprache>';
@@ -1204,9 +1204,9 @@ function printLehrveranstaltungTree($tree)
 				echo '              <lvinfo_anmerkungen><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen>';
 				echo '              <lvinfo_anwesenheit><![CDATA['.clearHtmlTags($objLVInfo->anwesenheit).']]></lvinfo_anwesenheit>';
 			}
-			if ($objLVInfo->exists($lv->lehrveranstaltung_id,'English'))
+			if ($objLVInfo->exists($lv->lehrveranstaltung_id, 'English'))
 			{
-				if(!$objLVInfo->load($lv->lehrveranstaltung_id,'English'))
+				if(!$objLVInfo->load($lv->lehrveranstaltung_id, 'English'))
 					die('Fehler beim laden der englischen LV-Informationen');
 				//var_dump($objLVInfo);
 				echo '              <lvinfo_sprache><![CDATA['.clearHtmlTags($objLVInfo->sprache).']]></lvinfo_sprache>';
@@ -1221,7 +1221,18 @@ function printLehrveranstaltungTree($tree)
 				echo '              <lvinfo_anmerkungen_en><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen_en>';
 				echo '              <lvinfo_anwesenheit_en><![CDATA['.clearHtmlTags($objLVInfo->anwesenheit).']]></lvinfo_anwesenheit_en>';
 			}
-			if ($lv->lehrtyp_kurzbz!='modul')
+
+			//Wenn Modul verpflichtend und alle Childs frei wählbar, soll Modul für ects gezählt werden
+			$allChildsFree = true;
+			foreach ($lv->childs as $child)
+			{
+				if($child->stpllv_pflicht)
+				{
+					$allChildsFree = false;
+				}
+			}
+
+			if(($lv->lehrtyp_kurzbz!='modul' && $lv->stpllv_pflicht) || ($allChildsFree && $lv->lehrtyp_kurzbz=='modul' && $lv->stpllv_pflicht))
 			{
 				$summe_ects_semester += $lv->ects;
 				$summe_sws_semester += $sws;
@@ -1231,12 +1242,11 @@ function printLehrveranstaltungTree($tree)
 			if(isset($lv->childs) && count($lv->childs)>0)
 			{
 				echo '<singlelehrveranstaltungen>';
-				printLehrveranstaltungTree($lv->childs);
+				printLehrveranstaltungTree($lv->childs, count($lv->childs));
 				echo '</singlelehrveranstaltungen>';
 			}
-			echo '      </lehrveranstaltung>';
+			echo '</lehrveranstaltung>';
 		}
 	}
 }
-
 ?>
