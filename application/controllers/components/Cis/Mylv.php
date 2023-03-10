@@ -149,7 +149,9 @@ class Mylv extends Auth_Controller
 						$key = $set->lvinfo_set_kurzbz;
 						if (!isset($lvi->data[$key]))
 							continue;
-						$info['header'] = $set->lvinfo_set_bezeichnung[$lvi->sprache];
+						$info = [
+							'header' => $set->lvinfo_set_bezeichnung[$lvi->sprache]
+						];
 						if (isset($set->einleitungstext[$lvi->sprache]))
 							$info['subheader'] = $set->einleitungstext[$lvi->sprache];
 						switch ($set->lvinfo_set_typ)

@@ -2,6 +2,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DOMDocument as DOMDocument;
+
 /**
  * 
  */
@@ -220,8 +222,8 @@ class CisHmvc extends FHC_Controller
 		if ($xml->getElementsByTagName('url')->item(0))
 			$url = $xml->getElementsByTagName('url')->item(0)->nodeValue;
 		// TODO(chris): get params
-		if (strpos($url, '$') !== FALSE)
-			var_dump($url);
+		/*if (strpos($url, '$') !== FALSE)
+			var_dump($url);*/
 		if (isset($params) && is_array($params))
 			foreach ($params as $key=>$value)
 				$url = str_replace('$' . $key, addslashes($value), $url);
@@ -302,7 +304,7 @@ class CisHmvc extends FHC_Controller
 			'Õ'=>'O', 'Ö'=>'Oe', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'Ue', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
 			'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'ae', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e',
 			'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o',
-			'ô'=>'o', 'õ'=>'o', 'ö'=>'oe', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ü'=>'ue', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b',
+			'ô'=>'o', 'õ'=>'o', 'ö'=>'oe', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ü'=>'ue', /*'ý'=>'y', duplicate? => see quality check*/'ý'=>'y', 'þ'=>'b',
 			'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r', '/' => '-', ' ' => '-'
 		];
 		$text = preg_replace(['/\s{2,}/', '/[\t\n]/'], ' ', $text);

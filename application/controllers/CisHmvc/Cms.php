@@ -55,7 +55,6 @@ class Cms extends Auth_Controller
 	 */
 	public function legacy($url)
 	{
-		$msg = $url;
 		$this->load->view('CisHmvc/Cms/Legacy', ['url' => $url]);
 	}
 

@@ -2,6 +2,10 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+use \DOMDocument as DOMDocument;
+use \XSLTProcessor as XSLTProcessor;
+
 /**
  * TODO(chris): NEWS: edit & delete button links and confirm
  * TODO(chris): NEWS: news_infoscreen xlst
@@ -97,14 +101,14 @@ class CmsLib
 			return $template;
 		$template = current(getData($template));
 
-		$XML = new \DOMDocument();
+		$XML = new DOMDocument();
 		$XML->loadXML($content->content);
 
-		$xsltemplate = new \DOMDocument();
+		$xsltemplate = new DOMDocument();
 		$xsltemplate->loadXML($template->xslt_xhtml_c4);
 
 		//Transformation
-		$processor = new \XSLTProcessor();
+		$processor = new XSLTProcessor();
 		$processor->importStylesheet($xsltemplate);
 
 		$content = $processor->transformToXML($XML);
@@ -214,7 +218,7 @@ class CmsLib
 		foreach ($news as $newsobj) {
 			if ($studiengang_kz && $edit && !$newsobj->studiengang_kz)
 				continue;
-			$date = new \DateTime($newsobj->datum);
+			$date = new DateTime($newsobj->datum);
 			$datum = '<datum><![CDATA[' . $date->format('d.m.Y') . ']]></datum>';
 			$datum .= '<datumdetail><![CDATA[' . $date->format('Y-m-d H:i') . ']]></datumdetail>';
 			$id = $edit ? '<news_id><![CDATA[' . $newsobj->news_id . ']]></news_id>' : '';
@@ -254,14 +258,14 @@ class CmsLib
 			return $template;
 		$template = current(getData($template));
 
-		$XML = new \DOMDocument();
+		$XML = new DOMDocument();
 		$XML->loadXML($xml);
 		
-		$xsltemplate = new \DOMDocument();
+		$xsltemplate = new DOMDocument();
 		$xsltemplate->loadXML($template->xslt_xhtml_c4);
 
 		//Transformation
-		$processor = new \XSLTProcessor();
+		$processor = new XSLTProcessor();
 		$processor->importStylesheet($xsltemplate);
 
 		$content = $processor->transformToDoc($XML);
