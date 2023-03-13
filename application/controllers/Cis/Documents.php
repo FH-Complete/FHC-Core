@@ -106,6 +106,18 @@ class Documents extends Auth_Controller
 			}
 		}
 
+		$selfservice = null;
+		if (!defined('CIS_DOKUMENTE_SELFSERVICE') || CIS_DOKUMENTE_SELFSERVICE) {
+			$this->load->model('crm/Akte_model', 'AkteModel');
+			$result = $this->AkteModel->getArchiv(getAuthPersonId(), null, true);
+			if (isError($result))
+				return $this->view->load('errors/html/error_db.php', [
+					'heading' => 'Database Error',
+					'message' => getError($result)
+				]);
+			$selfservice = getData($result) ?: [];
+		}
+
 		
 		// TODO(chris): in array stsem stsemArray:
 		// TODO(chris): - inskriptionsbestaetigung (konto)
@@ -127,7 +139,8 @@ class Documents extends Auth_Controller
 			'studiengaenge' => $studiengaenge,
 			'inskriptionsbestaetigungen' => $inskriptionsbestaetigungen,
 			'studienbuchblatt' => defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN,
-			'studienerfolgsbestaetigung' => defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN
+			'studienerfolgsbestaetigung' => defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN,
+			'selfservice' => $selfservice
 		]);
 	}
 

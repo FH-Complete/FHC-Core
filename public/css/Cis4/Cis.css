@@ -306,3 +306,44 @@
     display: block;
   }
 }
+/* Typography */
+.fhc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  border-bottom: 1px solid #dee2e6;
+  margin: 1rem 0;
+}
+.fhc-header > h1 {
+  font-size: calc(1.3rem + 0.6vw);
+}
+@media (min-width: 1200px) {
+  .fhc-header > h1 {
+    font-size: 1.75rem;
+  }
+}
+.fhc-header > h1 > small {
+  color: #6c757d;
+  font-size: 1rem;
+}
+.fhc-header > h1 > small:before {
+  content: " | ";
+}
+.fhc-header > a {
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+}
+.fhc-header > a:after {
+  color: var(--bs-body-color);
+  content: "\f059";
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: var(--fa-display, inline-block);
+  font-style: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-rendering: auto;
+  font-family: var(--fa-style-family, "Font Awesome 6 Free");
+  font-weight: var(--fa-style, 900);
+  margin-inline-start: 0.5rem;
+}
