@@ -41,7 +41,7 @@ class DashboardLib
 
 		if (hasData($result)) 
 		{
-			return current(getData($result))
+			return current(getData($result));
 		}
 
 		return null;
