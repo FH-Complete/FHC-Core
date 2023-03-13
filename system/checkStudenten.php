@@ -492,7 +492,7 @@ if ($result = $db->db_query($qry))
 /*
  *	 Studierende im aktuellen StSem die in Mischformstudiengängen keine Orgform eingetragen haben
  */
-$text .= "<br><br>Suche alle Bewerber die keine Orgform eingetragen haben.<br><br>";
+$text .= "<br><br>Suche alle Studierenden die keine Orgform eingetragen haben.<br><br>";
 
 $qry = "
 SELECT

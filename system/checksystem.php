@@ -205,6 +205,7 @@ $berechtigungen = array(
 	array('student/anwesenheit','Anwesenheiten im FAS'),
 	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
 	array('student/editBakkZgv','Bearbeiten der Bachelor ZGV eines PreStudenten'),
+	array('student/editMakkZgv','Bearbeiten der Master ZGV eines PreStudenten'),
 	array('student/noten','Notenverwaltung'),
 	array('student/stammdaten','Stammdaten der Studenten'),
 	array('student/vorrueckung','Studentenvorrückung'),
