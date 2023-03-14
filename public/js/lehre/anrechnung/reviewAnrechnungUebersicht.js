@@ -1,4 +1,6 @@
 const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
+const CONTROLLER_URL = BASE_URL + '/' + CALLED_PATH;
 const APPROVE_ANRECHNUNG_DETAIL_URI = "lehre/anrechnung/ReviewAnrechnungDetail";
 
 const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
@@ -119,6 +121,18 @@ var format_empfehlung_anrechnung = function(cell, formatterParams){
         : (cell.getValue() ==  'true')
             ? FHC_PhrasesLib.t("ui", "ja")
             : FHC_PhrasesLib.t("ui", "nein");
+}
+
+/**
+ * Returns formatter params for field dokument_bezeichnung (= Spalte Nachweisdokumente)
+ * NOTE: Returning a formatter param object fixes the problem, that tabulator did not know the url after refreshing the page.
+ */
+function paramLookup_dokBez(cell){
+    return {
+        labelField: 'dokument_bezeichnung',
+        url: CONTROLLER_URL + '/download?dms_id=' + cell.getData().dms_id,
+        target: '_blank'
+    }
 }
 
 /*

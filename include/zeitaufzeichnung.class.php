@@ -897,6 +897,8 @@ or not exists
 
 		foreach ($this->result as $row)
 		{
+			if($row->aktivitaet_kurzbz == 'DienstreiseMT' ) continue;
+
 			$datumtag = $datum->formatDatum($row->datum, 'Y-m-d');
 
 			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')

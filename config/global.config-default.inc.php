@@ -316,4 +316,7 @@ define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE', true);
 
 // Gibt an, ob im CIS die Zahlungsreferenz angezeigt wird
 define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
+
+define('DOCSBOX_ENABLED', false);
+
 ?>
