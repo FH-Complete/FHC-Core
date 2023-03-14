@@ -4647,7 +4647,9 @@ if(!$error)
 							{
 								// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
 								// geliefert da dies im Vertrag inkludiert ist.
-								if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+								if (defined('DEFAULT_ECHTER_DIENSTVERTRAG')
+								 && in_array($row_verwendung->ba1code,DEFAULT_ECHTER_DIENSTVERTRAG)
+								 && $row_verwendung->inkludierte_lehre == -1)
 								{
 									$data = '';
 									break;
