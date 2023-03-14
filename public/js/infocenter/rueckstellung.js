@@ -138,11 +138,12 @@ var Rueckstellung = {
 	_refreshRueckstellung: function(rueckstellungobj)
 	{
 		var personid = $("#hiddenpersonid").val();
-		var rueckstellungdate = $.datepicker.parseDate("yy-mm-dd", rueckstellungobj.datum_bis);
+		var rueckstellungdate = $.datepicker.parseDate("yy-mm-dd", rueckstellungobj.bis);
 		var gerrueckstellungdate = $.datepicker.formatDate("dd.mm.yy", rueckstellungdate);
 
 		var removetext = FHC_PhrasesLib.t('infocenter', 'statusZuruecksetzen');
-		var rueckstellungdtext = FHC_PhrasesLib.t('global', 'status') + ": '" + rueckstellungobj.bezeichnung + "' " + FHC_PhrasesLib.t('global', 'bis') + ": " + gerrueckstellungdate;
+		var rueckstellungdtext = FHC_PhrasesLib.t('global', 'status') + ": '" + rueckstellungobj.bezeichnung + "' " + FHC_PhrasesLib.t('global', 'bis') + ": " + gerrueckstellungdate +
+			" " + FHC_PhrasesLib.t('ui', 'von') + ": " + rueckstellungobj.von;
 		var currdate = new Date();
 
 
@@ -172,14 +173,16 @@ var Rueckstellung = {
 		var personid = $("#hiddenpersonid").val();
 		$("#postponing").html(
 			'<div class="form-group form-inline">'+
-			'<select id="rueckstellungtype" class="form-control">' +
-				'<option disabled selected>' + FHC_PhrasesLib.t('infocenter', 'statusAuswahl') + '</option>' +
-			'</select>' + '&nbsp;&nbsp;' +
-			'<button class="btn btn-default" id="addRueckstellung" type="button""><i class="fa fa-clock-o"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'statusSetzen') + '</button>&nbsp;'+
-			'<label id="rueckstellungdatelabel">'+FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
-			'<input id="rueckstellungdate" type="text" class="form-control" placeholder="Parkdatum">&nbsp;'+
-			'<i class="fa fa-info-circle"  data-toggle="tooltip" title="'+FHC_PhrasesLib.t('infocenter', 'parkenZurueckstellenInfo')+'"></i></label>'+
-			'<span class="text-danger" id="rueckstellungmsg"></span>'+
+				'<div class="form-group">' +
+					'<select id="rueckstellungtype" class="form-control">' +
+					'<option disabled selected>' + FHC_PhrasesLib.t('infocenter', 'statusAuswahl') + '</option>' +
+					'</select>' + '&nbsp;&nbsp;' +
+					'<button class="btn btn-default" id="addRueckstellung" type="button""><i class="fa fa-clock-o"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'statusSetzen') + '</button>&nbsp;'+
+					'<label id="rueckstellungdatelabel">'+FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
+					'<input id="rueckstellungdate" type="text" class="form-control" placeholder="Parkdatum">&nbsp;'+
+					'<i class="fa fa-info-circle"  data-toggle="tooltip" title="'+FHC_PhrasesLib.t('infocenter', 'parkenZurueckstellenInfo')+'"></i></label>'+
+					'<span class="text-danger" id="rueckstellungmsg"></span>'+
+				'</div>' +
 			'</div>');
 
 		Rueckstellung.getStatus();

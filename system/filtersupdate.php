@@ -40,7 +40,8 @@ $filters = array(
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
-					{"name": "OnholdDate"}
+					{"name": "OnholdDate"},
+					{"name": "Rueckstellgrund"}
 				],
 				"filters": [
 					{

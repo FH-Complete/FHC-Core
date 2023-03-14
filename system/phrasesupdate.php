@@ -3747,8 +3747,8 @@ $phrases = array(
 		)
 	),
 	array(
-		'app' => 'core',
-		'category' => 'global',
+		'app' => 'infocenter',
+		'category' => 'infocenter',
 		'phrase' => 'rueckstelldatum',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -3761,6 +3761,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'onHold date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rueckstellgrund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rückstellgrund',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'onHold reason',
 				'description' => '',
 				'insertvon' => 'system'
 			)

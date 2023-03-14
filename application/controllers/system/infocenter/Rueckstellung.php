@@ -21,7 +21,7 @@ class Rueckstellung extends Auth_Controller
 		
 		$this->load->model('crm/Rueckstellung_model', 'RueckstellungModel');
 		$this->load->model('crm/RueckstellungStatus_model', 'RueckstellungStatusModel');
-		
+		$this->load->model('person/Person_model', 'PersonModel');
 		$this->_setAuthUID(); // sets property uid
 		
 		$this->_ci =& get_instance(); // get code igniter instance
@@ -36,7 +36,17 @@ class Rueckstellung extends Auth_Controller
 			$this->terminateWithJsonError($this->_ci->p->t('ui', 'fehlerBeimLesen'));
 		
 		if (hasData($rueckstellung))
-			$result = getData($rueckstellung)[0];
+		{
+			$rueckstellung = getData($rueckstellung)[0];
+			$fullName = getData($this->_ci->PersonModel->getFullName($rueckstellung->insertvon));
+			
+			$result = array(
+				'von' => $fullName,
+				'bezeichnung' => $rueckstellung->bezeichnung,
+				'bis' => $rueckstellung->datum_bis
+			);
+		}
+		
 		
 		$this->outputJsonSuccess($result);
 	}
@@ -77,6 +87,7 @@ class Rueckstellung extends Auth_Controller
 	
 	public function getStatus($aktiv = true)
 	{
+		$this->_ci->RueckstellungStatusModel->addOrder('sort');
 		$result = $this->_ci->RueckstellungStatusModel->loadWhere(array('aktiv' => $aktiv));
 		
 		if (isError($result))

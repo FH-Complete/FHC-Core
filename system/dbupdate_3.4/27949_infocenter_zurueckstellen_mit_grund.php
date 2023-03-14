@@ -10,13 +10,16 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_rueckstellung_status LIMI
 		(
 			status_kurzbz character varying(32),
 			bezeichnung_mehrsprachig character varying(256)[],
+			sort integer,
 			aktiv boolean default true
 		);
 		ALTER TABLE public.tbl_rueckstellung_status ADD CONSTRAINT pk_tbl_postpone_status_status_kurzbz PRIMARY KEY (status_kurzbz);
-		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig) VALUES('parked', '{BewerberIn parken, Park applicant}');
-		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig) VALUES('onhold', '{BewerberIn zurückstellen, Put applicant on hold}');
-		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig) VALUES('onhold_zgv', '{BewerberIn zurückstellen (ZGV), Put applicant on hold (ZGV)}');
-		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig) VALUES('onhold_drittstaat', '{BewerberIn zurückstellen (Drittstaaten), Put applicant on hold (third countries)}');
+		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig, sort) VALUES('parked', '{Parken, Park}', 1);
+		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig, sort) VALUES('onhold_bmi', '{Bundesministerium, Federal Ministry}', 2);
+		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig, sort) VALUES('onhold_zgv', '{ZGV Prüfung, ZGV examination}', 3);
+		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig, sort) VALUES('onhold_drittstaat', '{Drittstaat, Third country}', 4);
+		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig, sort) VALUES('onhold_remone', '{Reminder 1, Reminder 1}', 5);
+		INSERT INTO public.tbl_rueckstellung_status(status_kurzbz, bezeichnung_mehrsprachig, sort) VALUES('onhold_remtwo', '{Reminder 2, Reminder 2}', 6);
 		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_rueckstellung_status TO vilesci;
 		GRANT SELECT ON public.tbl_rueckstellung_status TO web;
 	";
@@ -65,10 +68,15 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_rueckstellung LIMIT 1;"))
 	//Übernahme von "zurückgestellten" und "geparkten" Personen
 	$qry = "
 		INSERT INTO public.tbl_rueckstellung (person_id, status_kurzbz, datum_bis, insertvon)
-		SELECT person_id, lower(l.logdata->>'name'), zeitpunkt, insertvon
+		SELECT person_id,
+				CASE WHEN
+					(lower(l.logdata->>'name') = 'onhold')
+				THEN 'onhold_remone'
+					ELSE lower(l.logdata->>'name')
+				END,
+				zeitpunkt, insertvon
 		FROM system.tbl_log l
-		WHERE (l.logdata->>'name' = 'Onhold' OR l.logdata->>'name' = 'Parked')
-			AND zeitpunkt >= NOW()";
+		WHERE (l.logdata->>'name' = 'Onhold' OR l.logdata->>'name' = 'Parked') AND zeitpunkt >= NOW();";
 	
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_rueckstellung: '.$db->db_last_error().'</strong><br>';

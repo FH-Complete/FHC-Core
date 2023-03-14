@@ -305,7 +305,16 @@
 					AND person_id = p.person_id
 				ORDER BY datum_bis DESC
 				LIMIT 1
-			) AS "OnholdDate"
+			) AS "OnholdDate",
+			(
+				SELECT array_to_json(bezeichnung_mehrsprachig::varchar[])->>0
+				FROM public.tbl_rueckstellung
+				JOIN public.tbl_rueckstellung_status USING (status_kurzbz)
+				WHERE datum_bis >= NOW()
+					AND person_id = p.person_id
+				ORDER BY datum_bis DESC
+				LIMIT 1
+			) AS "Rueckstellgrund"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 				SELECT tpl.person_id,
@@ -381,7 +390,8 @@
 			'ZGV Gruppe MA',
 			'InfoCenter Mitarbeiter',
 			ucfirst($this->p->t('global', 'parkdatum')),
-			ucfirst($this->p->t('global', 'rueckstelldatum'))
+			ucfirst($this->p->t('infocenter', 'rueckstelldatum')),
+			ucfirst($this->p->t('infocenter', 'rueckstellgrund')),
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -493,6 +503,11 @@
 			else
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+			}
+			
+			if ($datasetRaw->{'Rueckstellgrund'} === null)
+			{
+				$datasetRaw->{'Rueckstellgrund'} = '-';
 			}
 
 			return $datasetRaw;
