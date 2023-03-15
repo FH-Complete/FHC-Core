@@ -47,7 +47,7 @@ $this->phrasen['abgabetool/seitenanzahl']='Number of Pages';
 $this->phrasen['abgabetool/pflichtfeld']='Required Field';
 $this->phrasen['abgabetool/emailAnBetreuer']='Write E-Mail to Assessor';
 $this->phrasen['abgabetool/dateiupload']='Fileupload';
-$this->phrasen['abgabetool/nurPDF']='only PDF max. 15 MB';
+$this->phrasen['abgabetool/nurPDF']='only PDF max. 30 MB';
 $this->phrasen['abgabetool/terminVorbei']='Deadline passed';
 $this->phrasen['abgabetool/projektabgabeUebersicht']='Project submission - Overview';
 $this->phrasen['abgabetool/termin']='Deadline';
@@ -67,7 +67,7 @@ $this->phrasen['abgabetool/fehlerMailZweitBegutachter']='Error sending E-Mail to
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Assessor not found. No E-Mail sent!';
 $this->phrasen['abgabetool/fehlerAktualitaetProjektarbeit']='Error when checking if current thesis';
 $this->phrasen['abgabetool/keinPDF']='Upload-File ist not a PDF! Please retry the Fileupload.';
-$this->phrasen['abgabetool/dateiZuGross']='The File is too big! Maximum File size: 15 MB';
+$this->phrasen['abgabetool/dateiZuGross']='The File is too big! Maximum File size: 30 MB';
 $this->phrasen['abgabetool/fehlerTerminVorbei']='The deadline for this upload has already expired.';
 
 $this->phrasen['abgabetool/eidesstattlicheErklaerung']='I confirm that this paper is entirely my own work.

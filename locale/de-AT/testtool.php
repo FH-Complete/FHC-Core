@@ -45,6 +45,7 @@ $this->phrasen['testtool/beiDiesemGebietMuessenSieJedeFrageBeantworten']='Bei di
 $this->phrasen['testtool/bearbeitungszeit']='Bearbeitungszeit';
 $this->phrasen['testtool/dieZeitIstAbgelaufen']='Die Zeit ist abgelaufen!<br /> Bitte aktivieren Sie Javascript in Ihrem Browser!';
 $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='Diese Frage ist nicht für Sie bestimmt';
+$this->phrasen['testtool/dasGebietIstNichtFuerSieBestimmt']='Das Gebiet ist nicht für Sie bestimmt';
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Fehler beim Speichern der Erstansicht';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu starten, drücken Sie bitte links oben auf <b>Gebiet starten</b>.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
@@ -78,5 +79,8 @@ $this->phrasen['testtool/einfuehrungsText']='
 				</div>
 			</div>';
 $this->phrasen['testtool/prueflingGesperrt']='Bitte kontaktieren Sie die Reihungstestaufsicht!';
+$this->phrasen['testtool/freischaltcode']='Freischaltcode';
+$this->phrasen['testtool/freischalttext']='Ihren Freischaltcode erhalten Sie am Tag des Reihungstests nach erfolgter Einführung im ZOOM-Meeting (siehe Leitfaden) von der Aufsicht. <br /> Wir wünschen Ihnen viel Erfolg.';
+
 
 ?>
