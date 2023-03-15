@@ -139,13 +139,6 @@ $this->load->view(
                                 <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
                             </span>
                         </li>
-                        <li class="list-group-item">
-                            <span><?php echo $this->p->t('anrechnung', 'empfehlungNegativKenntnisseNichtGleichwertig'); ?></span>
-                            <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip" data-placement="right"
-                                  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-                                <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
-                            </span>
-                        </li>
                     </ul>
                     <textarea class="form-control" name="begruendung" id="reviewAnrechnungUebersicht-begruendung"
                               rows="2"
