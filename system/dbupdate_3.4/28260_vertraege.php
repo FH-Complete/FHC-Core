@@ -81,7 +81,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			gehaltsabrechnung_id serial NOT NULL,
 			datum date,
 			betrag bytea,
-			gehaltsbestandteil_id integer,
+			gehaltsbestandteil_id integer NOT NULL,
 			CONSTRAINT tbl_gehaltsabrechnung_pk PRIMARY KEY (gehaltsabrechnung_id)
 		);
 
