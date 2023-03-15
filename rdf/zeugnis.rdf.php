@@ -364,7 +364,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 						$qry = "SELECT tbl_bisio.* FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 								WHERE tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id'
-								AND student_uid=".$db->db_add_param($uid_arr[$i]);
+								AND prestudent_id=".$db->db_add_param($prestudent_id);
 						if($result_bisio = $db->db_query($qry))
 						{
 							if($row_bisio = $db->db_fetch_object($result_bisio))

@@ -186,6 +186,7 @@ $qry = 'SELECT DISTINCT ON
 			campus.vw_student_lehrveranstaltung
             JOIN public.tbl_benutzer USING(uid)
 			JOIN public.tbl_person USING(person_id)
+			LEFT JOIN public.tbl_prestudent ON tbl_person.person_id = tbl_prestudent.person_id
             LEFT JOIN public.tbl_student ON(uid=student_uid)
             LEFT JOIN public.tbl_studiengang ON(tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 			LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
@@ -193,7 +194,7 @@ $qry = 'SELECT DISTINCT ON
 			LEFT JOIN lehre.tbl_zeugnisnote ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
                 AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
                 AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-            LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
+            LEFT JOIN bis.tbl_bisio ON(tbl_bisio.prestudent_id = tbl_prestudent.prestudent_id)
 		WHERE
 			vw_student_lehrveranstaltung.lehrveranstaltung_id=' . $db->db_add_param($lvid, FHC_INTEGER) . ' AND
 			vw_student_lehrveranstaltung.studiensemester_kurzbz=' . $db->db_add_param($studiensemester);

@@ -125,7 +125,7 @@ class Lehrveranstaltung_model extends DB_Model
 	public function getStudentsByLv($studiensemester_kurzbz, $lehrveranstaltung_id, $active = null)
 	{
 		$query = "SELECT
-			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr,
+			distinct on(nachname, vorname, tbl_person.person_id) vorname, nachname, matrikelnr,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
@@ -136,11 +136,12 @@ class Lehrveranstaltung_model extends DB_Model
 			campus.vw_student_lehrveranstaltung
 			JOIN public.tbl_benutzer USING(uid)
 			JOIN public.tbl_person USING(person_id)
+			LEFT JOIN public.tbl_prestudent ON tbl_person.person_id = tbl_prestudent.person_id
 			LEFT JOIN public.tbl_student ON(uid=student_uid)
 			LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
+			LEFT JOIN bis.tbl_bisio ON(tbl_prestudent.prestudent_id = tbl_bisio.prestudent_id)
 			LEFT JOIN public.tbl_studiengang ON(vw_student_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
 		WHERE
 			vw_student_lehrveranstaltung.studiensemester_kurzbz=?
@@ -156,7 +157,7 @@ class Lehrveranstaltung_model extends DB_Model
 		}
 
 		$query .=
-		" ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC";
+		" ORDER BY nachname, vorname, tbl_person.person_id, tbl_bisio.bis DESC";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz, $lehrveranstaltung_id));
 	}

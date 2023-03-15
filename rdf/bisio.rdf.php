@@ -36,10 +36,10 @@ require_once('../include/datum.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-if(isset($_GET['uid']))
-	$uid = $_GET['uid'];
+if(isset($_GET['prestudent_id']))
+	$prestudent_id = $_GET['prestudent_id'];
 else
-	$uid = null;
+	$prestudent_id = null;
 
 if(isset($_GET['bisio_id']))
 	$bisio_id = $_GET['bisio_id'];
@@ -61,11 +61,11 @@ echo '
 //Daten holen
 $ioobj = new bisio();
 
-//Wenn die UID uebergeben wurde, dann werden alle
+//Wenn die prestudent_id uebergeben wurde, dann werden alle
 //Eintraege dieser Person geladen
-if($uid)
+if($prestudent_id)
 {
-	if($ioobj->getIO($uid))
+	if($ioobj->getIO($prestudent_id))
 	{
 		foreach ($ioobj->result as $row)
 			draw_content($row);
@@ -116,7 +116,7 @@ function draw_content($row)
 	            <IO:von><![CDATA['.$datum->convertISODate($row->von).']]></IO:von>
 	            <IO:bis_iso><![CDATA['.$row->bis.']]></IO:bis_iso>
 	            <IO:bis><![CDATA['.$datum->convertISODate($row->bis).']]></IO:bis>
-	            <IO:student_uid><![CDATA['.$row->student_uid.']]></IO:student_uid>
+	            <IO:prestudent_id><![CDATA['.$row->prestudent_id.']]></IO:prestudent_id>
 	            <IO:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></IO:lehreinheit_id>
 	            <IO:ort><![CDATA['.$row->ort.']]></IO:ort>
 	            <IO:universitaet><![CDATA['.$row->universitaet.']]></IO:universitaet>

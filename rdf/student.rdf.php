@@ -656,9 +656,9 @@ if($xmlformat=='rdf')
 		{
 			$stsem_obj = new studiensemester();
 			$stsem_obj->load($studiensemester_kurzbz);
-			$qry = "SELECT prestudent_id
+			$qry = "SELECT bis.tbl_bisio.prestudent_id
 					FROM
-						bis.tbl_bisio JOIN public.tbl_student USING(student_uid)
+						bis.tbl_bisio
 					WHERE
 						(
 						(tbl_bisio.von>=".$db->db_add_param($stsem_obj->start)." AND tbl_bisio.von<=".$db->db_add_param($stsem_obj->ende).")
@@ -667,7 +667,7 @@ if($xmlformat=='rdf')
 						OR
 						(tbl_bisio.von<=".$db->db_add_param($stsem_obj->start)." AND tbl_bisio.bis>=".$db->db_add_param($stsem_obj->ende).")
 						)
-						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id=tbl_student.prestudent_id)
+						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id = tbl_bisio.prestudent_id)
 					";
 		}
 		if($db->db_query($qry))

@@ -123,10 +123,10 @@ foreach($data as $key => $value)
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid AND zn.studiensemester_kurzbz = " . $db->db_add_param($studiensemester) . ") "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
 		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
-        . "AND tbl_student.student_uid NOT IN ("
-            . "SELECT stud.student_uid "
+        . "AND tbl_student.prestudent_id NOT IN ("
+            . "SELECT bis.prestudent_id "
             . "FROM bis.tbl_bisio bis "
-            . "JOIN public.tbl_student stud ON bis.student_uid = stud.student_uid "
+            . "JOIN public.tbl_student stud ON bis.prestudent_id = stud.prestudent_id "
             . "WHERE bis.von <= " . $db->db_add_param($currentDay) . "::DATE AND bis.bis >= " . $db->db_add_param($currentDay) . "::DATE) "
 		. "ORDER BY nachname ASC";
 

@@ -1504,12 +1504,12 @@ function StudentAuswahl()
 		StudentAkteTreeDatasource.addXMLSinkObserver(StudentAkteTreeSinkObserver);
 	}
 
-	if(uid!='')
+	if(prestudent_id!='')
 	{
 		// *** Incomming/Outgoing ***
 		bisiotree = document.getElementById('student-io-tree');
 
-		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
+		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
 		try
 		{
@@ -3529,7 +3529,7 @@ function StudentIOAuswahl()
 	von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#von" ));
 	bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
-	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
+	prestudent_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
 	lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
 	lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
 	studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
@@ -3603,7 +3603,7 @@ function StudentIOAuswahl()
 	document.getElementById('student-io-menulist-herkunftsland').value=herkunftsland_code;
 	document.getElementById('student-io-textbox-von').value=von;
 	document.getElementById('student-io-textbox-bis').value=bis;
-	document.getElementById('student-io-detail-textbox-uid').value=student_uid;
+	document.getElementById('student-io-detail-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-io-detail-checkbox-neu').checked=false;
 	document.getElementById('student-io-detail-textbox-bisio_id').value=bisio_id;
 	document.getElementById('student-io-textbox-ort').value=ort;
@@ -3881,7 +3881,7 @@ function StudentIODetailSpeichern()
 	nation_code = document.getElementById('student-io-menulist-nation').value;
 	herkunftsland_code = document.getElementById('student-io-menulist-herkunftsland').value;
 	zweck_code = document.getElementById('student-io-menulist-zweck').value;
-	uid = document.getElementById('student-io-detail-textbox-uid').value;
+	prestudent_id = document.getElementById('student-io-detail-textbox-prestudent_id').value;
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
 	bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
 	lehreinheit_id = document.getElementById('student-io-menulist-lehreinheit').value;
@@ -3919,7 +3919,7 @@ function StudentIODetailSpeichern()
 	req.add('nation_code', nation_code);
 	req.add('herkunftsland_code', herkunftsland_code);
 	req.add('zweck_code', zweck_code);
-	req.add('student_uid', uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('ort', ort);
@@ -4019,12 +4019,12 @@ function StudentIONeu()
 	if(tag<10)
 		tag='0'+tag;
 
-	var uid = document.getElementById('student-detail-textbox-uid').value;
+	var prestudent_id = document.getElementById('student-io-detail-textbox-prestudent_id').value;
 	var defaultdatum = tag+'.'+monat+'.'+jahr;
 	var mobilitaetsprogramm = 7; // ERASMUS
 
 	//UID ins Textfeld schreiben
-	document.getElementById('student-io-detail-textbox-uid').value = uid;
+	document.getElementById('student-io-detail-textbox-prestudent_id').value = prestudent_id;
 	document.getElementById('student-io-detail-checkbox-neu').checked = true;
 	document.getElementById('student-io-textbox-von').value = defaultdatum;
 	document.getElementById('student-io-textbox-bis').value = defaultdatum;
@@ -4056,7 +4056,7 @@ function StudentIONeu()
 	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', 'A');
 	req.add('herkunftsland_code', 'A');
-	req.add('student_uid', uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', stg_kz);
 	req.add('lehreinheit_id', '');
 	req.add('ort', '');

@@ -375,7 +375,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					WHERE tbl_bisio_zweck.bisio_id = tbl_bisio.bisio_id
 				) zweck, ort, universitaet
 				FROM bis.tbl_bisio
-				WHERE student_uid=".$db->db_add_param($uid_arr[$i]);
+				WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER);
 
 		if($db->db_query($qry))
 		{
@@ -661,7 +661,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$qry .= "
 				AND NOT EXISTS(SELECT 1 FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 					WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
-					AND student_uid=".$db->db_add_param($uid_arr[$i])."
+					AND prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER)."
 					AND tbl_lehreinheit.studiensemester_kurzbz in(".$sqlStudent->implode4SQL($aktuellesSemester)."))
 			ORDER BY sort, tbl_lehrveranstaltung.bezeichnung;";
 
@@ -836,7 +836,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 								FROM bis.tbl_bisio
 								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 								WHERE lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
-								AND student_uid=".$db->db_add_param($uid_arr[$i]).")
+								AND prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER).")
 						ORDER BY beginn DESC, projektarbeit_id DESC LIMIT 1;";
 
 					if($result_thesis = $db->db_query($qry))
@@ -899,7 +899,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 						JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 					WHERE
-						student_uid = ".$db->db_add_param($uid_arr[$i]);
+						prestudent_id = ".$db->db_add_param($row->prestudent_id, FHC_INTEGER);
 
 			if($result_outgoing = $db->db_query($qry_outgoing))
 			{

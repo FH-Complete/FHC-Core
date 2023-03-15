@@ -105,8 +105,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-io-detail-checkbox-neu" checked="true" />
-			<label value="Uid"/>
-			<textbox id="student-io-detail-textbox-uid" disabled="true"/>
+			<label value="Prestudent ID"/>
+			<textbox id="student-io-detail-textbox-prestudent_id" disabled="true"/>
 			<label value="BisIO ID"/>
 			<textbox id="student-io-detail-textbox-bisio_id" disabled="true"/>
 		</vbox>

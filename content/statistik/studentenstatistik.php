@@ -124,7 +124,7 @@ if($stsem!='')
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Incoming' AND studiensemester_kurzbz=".$db->db_add_param($stsem)."
 					) a) AS inc,
-				(SELECT count(*) FROM (SELECT distinct student_uid FROM public.tbl_student JOIN bis.tbl_bisio USING (student_uid)
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN bis.tbl_bisio USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND (bis>=".$db->db_add_param($stsem_obj->start)." OR bis is null) AND von<=".$db->db_add_param($stsem_obj->ende)."
 					) a) AS out,";
 
@@ -272,7 +272,7 @@ if($stsem!='')
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Incoming' AND studiensemester_kurzbz=".$db->db_add_param($stsem)."
 					) a) AS inc,
-				(SELECT count(*) FROM (SELECT distinct student_uid FROM public.tbl_student JOIN bis.tbl_bisio USING (student_uid)
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN bis.tbl_bisio USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND (bis>=".$db->db_add_param($stsem_obj->start)." OR bis is null) AND von<=".$db->db_add_param($stsem_obj->ende)."
 					) a) AS out,";
 

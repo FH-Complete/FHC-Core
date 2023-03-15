@@ -210,8 +210,8 @@ else
 
 	$qry = "
 	SELECT
-		distinct on(nachname, vorname, person_id)
-		vorname, nachname, wahlname, matrikelnr, person_id, tbl_student.student_uid as uid,
+		distinct on(nachname, vorname, tbl_person.person_id)
+		vorname, nachname, wahlname, matrikelnr, tbl_person.person_id, tbl_student.student_uid as uid,
 		tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 		(SELECT status_kurzbz
 			FROM public.tbl_prestudentstatus
@@ -222,14 +222,17 @@ else
 		(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN '1' ELSE '' END) as doubledegree,
 		tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung
 	FROM
-		campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
-		JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
+		campus.vw_student_lehrveranstaltung
+		JOIN public.tbl_benutzer USING(uid)
+		JOIN public.tbl_person ON(tbl_benutzer.person_id = tbl_person.person_id)
+		JOIN public.tbl_prestudent ON (tbl_person.person_id = tbl_prestudent.person_id)
+		JOIN public.tbl_student ON(uid=student_uid)
 		LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 		LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
 			AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
 				AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-		LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+		LEFT JOIN bis.tbl_bisio ON(tbl_bisio.prestudent_id = tbl_prestudent.prestudent_id)
+		LEFT JOIN bis.tbl_mobilitaet ON(tbl_mobilitaet.prestudent_id = tbl_prestudent.prestudent_id)
 		LEFT JOIN lehre.tbl_note USING(note)
 	WHERE
 		vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
@@ -238,7 +241,7 @@ else
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 
-	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
+	$qry.=' ORDER BY nachname, vorname, tbl_person.person_id, tbl_bisio.bis, doubledegree DESC';
 
 	if($result = $db->db_query($qry))
 	{

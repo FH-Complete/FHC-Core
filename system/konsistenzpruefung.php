@@ -494,7 +494,7 @@ $qry = "SELECT
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
 		WHERE
-			NOT EXISTS(SELECT 1 FROM bis.tbl_bisio WHERE student_uid=tbl_student.student_uid)
+			NOT EXISTS(SELECT 1 FROM bis.tbl_bisio WHERE tbl_bisio.prestudent_id = tbl_prestudent.prestudent_id)
 			AND EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id AND status_kurzbz='Incoming')";
 
 if($result = $db->db_query($qry))

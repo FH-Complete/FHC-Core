@@ -3157,7 +3157,7 @@ if(!$error)
 			$bisio->herkunftsland_code = $_POST['herkunftsland_code'];
 			$bisio->von = $_POST['von'];
 			$bisio->bis = $_POST['bis'];
-			$bisio->student_uid = $_POST['student_uid'];
+			$bisio->prestudent_id = $_POST['prestudent_id'];
 			$bisio->lehreinheit_id = $_POST['lehreinheit_id'];
 			$bisio->ort = $_POST['ort'];
 			$bisio->universitaet = $_POST['universitaet'];
@@ -3186,13 +3186,13 @@ if(!$error)
 		$bisio = new bisio();
 		if($bisio->load($_POST['bisio_id']))
 		{
-			$student = new student();
-			if($student->load($bisio->student_uid))
+			$prestudent = new prestudent();
+			if($prestudent->load($bisio->prestudent_id))
 			{
 
 				//Speichert einen BisIO Eintrag
-				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
-				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('assistenz',$prestudent->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$prestudent->studiengang_kz, 'suid'))
 				{
 					$error = true;
 					$return = false;
@@ -3223,7 +3223,7 @@ if(!$error)
 			}
 			else
 			{
-				$errormsg = $student->errormsg;
+				$errormsg = $prestudent->errormsg;
 				$return = false;
 			}
 		}
@@ -3238,12 +3238,12 @@ if(!$error)
 		$bisio = new bisio();
 		if($bisio->load($_POST['bisio_id']))
 		{
-			$student = new student();
-			if($student->load($bisio->student_uid))
+			$prestudent = new prestudent();
+			if($prestudent->load($bisio->prestudent_id))
 			{
 				//Speichert einen BisIO Eintrag
-				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
-				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('assistenz',$prestudent->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$prestudent->studiengang_kz, 'suid'))
 				{
 					$error = true;
 					$return = false;
@@ -3273,7 +3273,7 @@ if(!$error)
 			}
 			else
 			{
-				$errormsg = $student->errormsg;
+				$errormsg = $prestudent->errormsg;
 				$return = false;
 			}
 		}
@@ -3288,13 +3288,13 @@ if(!$error)
 		$bisio = new bisio();
 		if($bisio->load($_POST['bisio_id']))
 		{
-			$student = new student();
-			if($student->load($bisio->student_uid))
+			$prestudent = new prestudent();
+			if($prestudent->load($bisio->prestudent_id))
 			{
 
 				//Speichert einen BisIO Eintrag
-				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
-				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('assistenz',$prestudent->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$prestudent->studiengang_kz, 'suid'))
 				{
 					$error = true;
 					$return = false;
@@ -3325,7 +3325,7 @@ if(!$error)
 			}
 			else
 			{
-				$errormsg = $student->errormsg;
+				$errormsg = $prestudent->errormsg;
 				$return = false;
 			}
 		}
@@ -3340,12 +3340,12 @@ if(!$error)
 		$bisio = new bisio();
 		if($bisio->load($_POST['bisio_id']))
 		{
-			$student = new student();
-			if($student->load($bisio->student_uid))
+			$prestudent = new prestudent();
+			if($prestudent->load($bisio->prestudent_id))
 			{
 				//Speichert einen BisIO Eintrag
-				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
-				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigt('assistenz',$prestudent->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$prestudent->studiengang_kz, 'suid'))
 				{
 					$error = true;
 					$return = false;
@@ -3375,7 +3375,7 @@ if(!$error)
 			}
 			else
 			{
-				$errormsg = $student->errormsg;
+				$errormsg = $prestudent->errormsg;
 				$return = false;
 			}
 		}

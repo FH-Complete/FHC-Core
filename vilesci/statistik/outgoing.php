@@ -76,14 +76,14 @@ foreach($stsem->studiensemester as $row)
 		  	JOIN public.tbl_person USING(person_id)
 		  	JOIN public.tbl_studiengang USING(studiengang_kz)
 		  	JOIN public.tbl_student USING(prestudent_id)
-		  	JOIN bis.tbl_bisio USING(student_uid)
+		  	JOIN bis.tbl_bisio ON tbl_bisio.prestudent_id = tbl_prestudent.prestudent_id
 		  WHERE
 		  	 
 		  	(
 		  		(tbl_bisio.von>='$row->start' AND tbl_bisio.von<='$row->ende')
 		  	 OR (tbl_bisio.bis<='$row->ende' AND tbl_bisio.bis>='$row->start')
 		  	)
-		  	AND get_rolle_prestudent (prestudent_id, '$row->studiensemester_kurzbz')<>'Incoming' ";
+		  	AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '$row->studiensemester_kurzbz')<>'Incoming' ";
 	if($studiengang_kz!='')
 		$qry.=" AND tbl_student.studiengang_kz='".addslashes($studiengang_kz)."'";
 	$qry.=" ORDER BY stg";

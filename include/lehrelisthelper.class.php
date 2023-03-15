@@ -200,7 +200,7 @@ class LehreListHelper
 		//Studierende der LV laden und in ein Array schreiben
 
 		$qry = 'SELECT
-					distinct on(nachname, vorname, person_id) vorname, nachname, wahlname, matrikelnr, public.tbl_student.student_uid,
+					distinct on(nachname, vorname, tbl_person.person_id) vorname, nachname, wahlname, matrikelnr, public.tbl_student.student_uid,
 					tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 					(SELECT status_kurzbz FROM public.tbl_prestudentstatus
 					WHERE prestudent_id=tbl_student.prestudent_id
@@ -213,16 +213,18 @@ class LehreListHelper
 				FROM
 					campus.vw_student_lehrveranstaltung
 					JOIN public.tbl_benutzer USING(uid)
-					JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student ON(uid=student_uid)
+					JOIN public.tbl_person USING(person_id)
+					LEFT JOIN public.tbl_prestudent ON (tbl_person.person_id = tbl_prestudent.person_id)
+					LEFT JOIN public.tbl_student ON(uid=student_uid)
 					LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 					LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 					LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
 						AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
 						AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 					LEFT JOIN lehre.tbl_note USING (note)
-					LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
+					LEFT JOIN bis.tbl_bisio ON(tbl_prestudent.prestudent_id = tbl_bisio.prestudent_id)
 					LEFT JOIN public.tbl_studiengang ON(tbl_student.studiengang_kz=tbl_studiengang.studiengang_kz)
-					LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+					LEFT JOIN bis.tbl_mobilitaet ON(tbl_prestudent.prestudent_id = tbl_mobilitaet.prestudent_id)
 				WHERE
 					vw_student_lehrveranstaltung.lehrveranstaltung_id='.$this->db->db_add_param($this->lvid, FHC_INTEGER).'	AND
 					vw_student_lehrveranstaltung.studiensemester_kurzbz='.$this->db->db_add_param($this->studiensemester);
@@ -231,7 +233,7 @@ class LehreListHelper
 		if($this->lehreinheit!='')
 			$qry.=' AND vw_student_lehrveranstaltung.lehreinheit_id='.$this->db->db_add_param($this->lehreinheit, FHC_INTEGER);
 
-		$qry.=' ORDER BY nachname, vorname, person_id, daysout DESC, doubledegree DESC';
+		$qry.=' ORDER BY nachname, vorname, tbl_person.person_id, daysout DESC, doubledegree DESC';
 
 		$stsem_obj = new studiensemester();
 		$stsem_obj->load($this->studiensemester);
