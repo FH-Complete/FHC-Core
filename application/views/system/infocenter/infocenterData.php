@@ -314,6 +314,7 @@
 					SELECT srueck.rueckstellung_id
 					FROM public.tbl_rueckstellung srueck
 					WHERE srueck.person_id = tbl_rueckstellung.person_id
+						AND datum_bis >= NOW()
 					ORDER BY srueck.datum_bis DESC LIMIT 1
 				)
 			) rueck ON rueck.person_id = p.person_id
