@@ -263,13 +263,10 @@ var reviewAnrechnung = {
 
             // Remove helptext
             begruendung = begruendung.replace(helptext, '');
-
-            // Focus into textarea to encourage writing
-            textarea.focus();
         }
 
-        // Copy begruendung into textarea
-        textarea.val($.trim(begruendung));
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim(begruendung)).focus();
 
     },
     formatEmpfehlungIsTrue: function(empfehlungAm, emfehlungVon, statusBezeichnung){

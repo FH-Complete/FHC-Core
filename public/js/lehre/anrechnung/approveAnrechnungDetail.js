@@ -495,12 +495,10 @@ var approveAnrechnungDetail = {
             // Remove helptext
             begruendung = begruendung.replace(helptext, '');
 
-            // Focus into textarea to encourage writing
-            textarea.focus();
         }
 
-        // Copy begruendung into textarea
-        textarea.val($.trim(begruendung));
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim(begruendung)).focus();
     },
     formatEmpfehlungIsRequested: function(statusBezeichnung, empfehlungsanfrageAm, empfehlungsanfrageAn) {
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm').html(empfehlungsanfrageAm);
