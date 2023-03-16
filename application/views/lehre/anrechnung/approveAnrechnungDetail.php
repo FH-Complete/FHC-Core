@@ -347,6 +347,9 @@ $this->load->view(
 													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
 											</li>
+                                            <li class="list-group-item" onclick="{ $(this).closest('div').find('textarea').val('').focus()}">
+                                                <span><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></span>
+                                            </li>
 										</ul>
 										<textarea class="form-control" name="begruendung"
 												  id="approveAnrechnungDetail-begruendung"
