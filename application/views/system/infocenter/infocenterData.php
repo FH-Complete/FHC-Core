@@ -288,33 +288,8 @@
 				)
 				LIMIT 1 
 			) AS "InfoCenterMitarbeiter",
-			(
-				SELECT datum_bis
-				FROM public.tbl_rueckstellung
-				WHERE datum_bis >= NOW()
-					AND status_kurzbz = '. $POSTPONE_STATUS_PARKED .'
-					AND person_id = p.person_id
-				ORDER BY datum_bis DESC
-				LIMIT 1
-			) AS "ParkDate",
-			(
-				SELECT datum_bis
-				FROM public.tbl_rueckstellung
-				WHERE datum_bis >= NOW()
-					AND status_kurzbz != '. $POSTPONE_STATUS_PARKED .'
-					AND person_id = p.person_id
-				ORDER BY datum_bis DESC
-				LIMIT 1
-			) AS "OnholdDate",
-			(
-				SELECT array_to_json(bezeichnung_mehrsprachig::varchar[])->>0
-				FROM public.tbl_rueckstellung
-				JOIN public.tbl_rueckstellung_status USING (status_kurzbz)
-				WHERE datum_bis >= NOW()
-					AND person_id = p.person_id
-				ORDER BY datum_bis DESC
-				LIMIT 1
-			) AS "Rueckstellgrund"
+			rueck.datum_bis AS "HoldDate",
+			rueck.bezeichnung AS "Rueckstellgrund"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 				SELECT tpl.person_id,
@@ -325,6 +300,23 @@
 				  JOIN public.tbl_person sp ON sb.person_id = sp.person_id
 				 WHERE tpl.app = '.$APP.'
 			) pl USING(person_id)
+	LEFT JOIN (
+				SELECT
+					tbl_rueckstellung.person_id,
+					tbl_rueckstellung.datum_bis,
+					tbl_rueckstellung.status_kurzbz,
+					array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung
+				FROM public.tbl_rueckstellung
+				JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
+				JOIN public.tbl_person sp ON tbl_rueckstellung.person_id = sp.person_id
+				WHERE tbl_rueckstellung.rueckstellung_id =
+				(
+					SELECT srueck.rueckstellung_id
+					FROM public.tbl_rueckstellung srueck
+					WHERE srueck.person_id = tbl_rueckstellung.person_id
+					ORDER BY srueck.datum_bis DESC LIMIT 1
+				)
+			) rueck ON rueck.person_id = p.person_id
 		 WHERE
 			EXISTS (
 				SELECT 1
@@ -351,7 +343,12 @@
 						   AND spss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 					)
 			)
-	ORDER BY "OnholdDate" DESC NULLS FIRST, "ParkDate" DESC NULLS FIRST, "LastAction" ASC';
+	ORDER BY CASE
+		WHEN rueck.status_kurzbz IS NULL THEN 1
+		WHEN rueck.status_kurzbz = ' .$POSTPONE_STATUS_PARKED .' THEN 2
+		WHEN rueck.status_kurzbz != '. $POSTPONE_STATUS_PARKED .' THEN 3
+	END,
+	rueck.datum_bis NULLS LAST, "LastAction" ASC';
 
 	$filterWidgetArray = array(
 		'query' => $query,
@@ -389,9 +386,8 @@
 			'ZGV Gruppe BA',
 			'ZGV Gruppe MA',
 			'InfoCenter Mitarbeiter',
-			ucfirst($this->p->t('global', 'parkdatum')),
 			ucfirst($this->p->t('infocenter', 'rueckstelldatum')),
-			ucfirst($this->p->t('infocenter', 'rueckstellgrund')),
+			ucfirst($this->p->t('infocenter', 'rueckstellgrund'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -438,22 +434,13 @@
 				$datasetRaw->{'LockUser'} = '-';
 			}
 
-			if ($datasetRaw->{'ParkDate'} == null)
+			if ($datasetRaw->{'HoldDate'} == null)
 			{
-				$datasetRaw->{'ParkDate'} = '-';
+				$datasetRaw->{'HoldDate'} = '-';
 			}
 			else
 			{
-				$datasetRaw->{'ParkDate'} = date_format(date_create($datasetRaw->{'ParkDate'}), 'Y-m-d H:i');
-			}
-
-			if ($datasetRaw->{'OnholdDate'} == null)
-			{
-				$datasetRaw->{'OnholdDate'} = '-';
-			}
-			else
-			{
-				$datasetRaw->{'OnholdDate'} = date_format(date_create($datasetRaw->{'OnholdDate'}), 'Y-m-d H:i');
+				$datasetRaw->{'HoldDate'} = date_format(date_create($datasetRaw->{'HoldDate'}), 'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
@@ -520,17 +507,13 @@
 			{
 				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
-
-			if ($datasetRaw->OnholdDate != null)
-			{
+			
+			if ($datasetRaw->Rueckstellgrund != null && $datasetRaw->Rueckstellgrund !== 'Parken')
 				$mark = "onhold";
-			}
-
+			
 			// Parking has priority over locking
-			if ($datasetRaw->ParkDate != null)
-			{
+			if ($datasetRaw->Rueckstellgrund === 'Parken')
 				$mark = "text-info";
-			}
 
 			return $mark;
 		}
