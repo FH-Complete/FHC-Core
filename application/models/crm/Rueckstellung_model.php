@@ -30,14 +30,4 @@ class Rueckstellung_model extends DB_Model
 
 		return $this->loadWhere($where);
 	}
-
-	public function set($person_id, $datum_bis, $status_kurzbz, $uid)
-	{
-		$exists = $this->getByPersonId($person_id, $status_kurzbz);
-		
-		if (hasData($exists))
-			return error("Rueckstellung entry already exists");
-		
-		return $this->insert(array('person_id' => $person_id, 'status_kurzbz' => $status_kurzbz, 'datum_bis' => $datum_bis, 'insertvon' => $uid));
-	}
 }

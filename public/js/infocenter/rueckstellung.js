@@ -73,7 +73,10 @@ var Rueckstellung = {
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 					if (FHC_AjaxClient.hasData(data))
+					{
 						Rueckstellung.get(personid);
+						InfocenterDetails._refreshLog()
+					}
 					else
 					{
 						onRueckstellungError();
@@ -152,7 +155,7 @@ var Rueckstellung = {
 
 		var callbackforundo = function ()
 		{
-			Rueckstellung.delete(personid);
+			Rueckstellung.delete(personid, rueckstellungobj.status_kurzbz);
 		}
 
 		var rueckstellunghtml = rueckstellungdtext+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
