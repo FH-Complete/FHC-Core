@@ -300,14 +300,14 @@ class PlausicheckLib
 			FROM
 				public.tbl_student student
 				JOIN public.tbl_studentlehrverband lv USING(student_uid)
-				JOIN public.tbl_prestudent prestudent USING(prestudent_id)
-				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
+				JOIN public.tbl_prestudent prestudent ON lv.prestudent_id = prestudent.prestudent_id
+				JOIN public.tbl_prestudentstatus status on prestudent.prestudent_id = status.prestudent_id
 				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
 			WHERE
 				status.studiensemester_kurzbz = ?
 				AND lv.studiensemester_kurzbz = ?
 				AND status.status_kurzbz NOT IN ('Interessent','Bewerber','Aufgenommener','Wartender','Abgewiesener','Unterbrecher')
-				AND get_rolle_prestudent (prestudent_id, ?)='Student'
+				AND get_rolle_prestudent (prestudent.prestudent_id, ?)='Student'
 				AND status.ausbildungssemester != lv.semester";
 
 		if (isset($studiengang_kz))
@@ -1133,18 +1133,18 @@ class PlausicheckLib
 			SELECT
 				DISTINCT ON(student_uid, nachname, vorname)
 				tbl_person.person_id,
-				tbl_prestudent.prestudent_id,
+				ps.prestudent_id,
 				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
 			FROM
 				public.tbl_student
 				JOIN public.tbl_benutzer ON(student_uid=uid)
 				JOIN public.tbl_person USING(person_id)
-				JOIN public.tbl_prestudent USING(prestudent_id)
-				JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+				JOIN public.tbl_prestudent ps USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus ON(ps.prestudent_id=tbl_prestudentstatus.prestudent_id)
 				JOIN public.tbl_studiengang stg ON(stg.studiengang_kz=tbl_student.studiengang_kz)
 			WHERE
 				bismelden=TRUE
-				AND status_kurzbz='Incoming' AND NOT EXISTS (SELECT 1 FROM bis.tbl_bisio WHERE student_uid=tbl_student.student_uid)
+				AND status_kurzbz='Incoming' AND NOT EXISTS (SELECT 1 FROM bis.tbl_bisio WHERE prestudent_id=ps.prestudent_id )
 				AND stg.melderelevant";
 
 		if (isset($studiengang_kz))
@@ -1155,7 +1155,7 @@ class PlausicheckLib
 
 		if (isset($prestudent_id))
 		{
-			$qry .= " AND tbl_prestudent.prestudent_id = ?";
+			$qry .= " AND ps.prestudent_id = ?";
 			$params[] = $prestudent_id;
 		}
 
