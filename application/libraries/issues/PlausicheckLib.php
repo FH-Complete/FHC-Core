@@ -86,16 +86,22 @@ class PlausicheckLib
 				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 				JOIN public.tbl_benutzer benutzer on(benutzer.uid = student.student_uid)
 				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
+				LEFT JOIN lehre.tbl_studienplan stpl USING (studienplan_id)
 			WHERE
 				benutzer.aktiv = true
-				AND status.status_kurzbz='Student'
+				AND status.status_kurzbz IN ('Student', 'Unterbrecher', 'Abbrecher', 'Diplomand', 'Absolvent')
 				AND studiengang.studiengang_kz < 10000
 				AND status.studiensemester_kurzbz = ?
+				AND NOT (status.orgform_kurzbz IS NULL AND studiengang.mischform = FALSE)
 				AND NOT EXISTS(
-					SELECT 1 FROM lehre.tbl_studienplan
-					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					SELECT 1
+					FROM
+						lehre.tbl_studienplan
+					JOIN
+						lehre.tbl_studienordnung USING(studienordnung_id)
 					WHERE
-						tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
+						tbl_studienplan.studienplan_id = stpl.studienplan_id
+						AND tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
 						AND tbl_studienplan.orgform_kurzbz = status.orgform_kurzbz)";
 
 		if (isset($prestudent_id))
@@ -106,7 +112,7 @@ class PlausicheckLib
 
 		if (isset($studiengang_kz))
 		{
-			$qry .= " AND stg.studiengang_kz = ?";
+			$qry .= " AND studiengang.studiengang_kz = ?";
 			$params[] = $studiengang_kz;
 		}
 
