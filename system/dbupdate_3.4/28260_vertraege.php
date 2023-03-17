@@ -12,7 +12,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 		ALTER SCHEMA hr OWNER TO fhcomplete;
 
-		CREATE TABLE hr.tbl_dienstverhaeltnis 
+		CREATE TABLE hr.tbl_dienstverhaeltnis
 		(
 			dienstverhaeltnis_id serial NOT NULL,
 			mitarbeiter_uid character varying(32),
@@ -27,7 +27,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			CONSTRAINT tbl_dienstverhaeltnis_pk PRIMARY KEY (dienstverhaeltnis_id)
 		);
 
-		CREATE TABLE hr.tbl_vertragsbestandteil 
+		CREATE TABLE hr.tbl_vertragsbestandteil
 		(
 			vertragsbestandteil_id serial NOT NULL,
 			dienstverhaeltnis_id integer,
@@ -41,7 +41,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			CONSTRAINT tbl_vertragsbestandteil_pk PRIMARY KEY (vertragsbestandteil_id)
 		);
 
-		CREATE TABLE hr.tbl_gehaltsbestandteil 
+		CREATE TABLE hr.tbl_gehaltsbestandteil
 		(
 			gehaltsbestandteil_id serial NOT NULL,
 			dienstverhaeltnis_id integer NOT NULL,
@@ -68,7 +68,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		COMMENT ON COLUMN hr.tbl_gehaltsbestandteil.valorisierung IS E'Wird dieser Bestandteil mitvalorisiert';
 		COMMENT ON COLUMN hr.tbl_gehaltsbestandteil.valorisierungssperre IS E'Bis zu welchem Datum ist dieser Bestandteil von der Valorisierung ausgenommen';
 
-		ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_dienstverhaeltnis_fk FOREIGN KEY (dienstverhaeltnis_id) 
+		ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_dienstverhaeltnis_fk FOREIGN KEY (dienstverhaeltnis_id)
 		REFERENCES hr.tbl_dienstverhaeltnis (dienstverhaeltnis_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -76,7 +76,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_dienstverhaeltnis (dienstverhaeltnis_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_gehaltsabrechnung 
+		CREATE TABLE hr.tbl_gehaltsabrechnung
 		(
 			gehaltsabrechnung_id serial NOT NULL,
 			datum date,
@@ -95,7 +95,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_gehaltstyp 
+		CREATE TABLE hr.tbl_gehaltstyp
 		(
 			gehaltstyp_kurzbz character varying(32) NOT NULL,
 			bezeichnung varchar(256),
@@ -111,7 +111,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_gehaltstyp (gehaltstyp_kurzbz) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_vertragsart 
+		CREATE TABLE hr.tbl_vertragsart
 		(
 			vertragsart_kurzbz varchar(32) NOT NULL,
 			bezeichnung varchar(256),
@@ -130,7 +130,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_vertragsart (vertragsart_kurzbz) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_sachaufwand 
+		CREATE TABLE hr.tbl_sachaufwand
 		(
 			sachaufwand_id serial NOT NULL,
 			mitarbeiter_uid character varying(32),
@@ -150,7 +150,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_sachaufwandtyp 
+		CREATE TABLE hr.tbl_sachaufwandtyp
 		(
 			sachaufwandtyp_kurzbz character varying(32) NOT NULL,
 			bezeichnung character varying(256),
@@ -174,7 +174,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_vertragsbestandteiltyp 
+		CREATE TABLE hr.tbl_vertragsbestandteiltyp
 		(
 			vertragsbestandteiltyp_kurzbz varchar(32) NOT NULL,
 			bezeichnung varchar(256),
@@ -189,7 +189,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_vertragsbestandteiltyp (vertragsbestandteiltyp_kurzbz) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_funktion 
+		CREATE TABLE hr.tbl_vertragsbestandteil_funktion
 		(
 			vertragsbestandteil_id integer NOT NULL,
 			benutzerfunktion_id integer,
@@ -200,29 +200,29 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES public.tbl_benutzerfunktion (benutzerfunktion_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_stunden 
+		CREATE TABLE hr.tbl_vertragsbestandteil_stunden
 		(
 			vertragsbestandteil_id integer NOT NULL,
 			wochenstunden smallint,
 			teilzeittyp_kurzbz character varying(32),
 			CONSTRAINT tbl_vertragsbestandteil_stunden_pk PRIMARY KEY (vertragsbestandteil_id)
 		);
-		
+
 		COMMENT ON COLUMN hr.tbl_vertragsbestandteil_stunden.teilzeittyp_kurzbz IS E'Altersteilzeit, Elternteilzeit';
 
-		CREATE TABLE hr.tbl_teilzeittyp 
+		CREATE TABLE hr.tbl_teilzeittyp
 		(
 			teilzeittyp_kurzbz character varying(32) NOT NULL,
 			bezeichnung varchar(256) NOT NULL,
 			aktiv boolean NOT NULL DEFAULT true,
 			CONSTRAINT tbl_teilzeittyp_pk PRIMARY KEY (teilzeittyp_kurzbz)
 		);
-		
+
 		ALTER TABLE hr.tbl_vertragsbestandteil_stunden ADD CONSTRAINT tbl_teilzeittyp_fk FOREIGN KEY (teilzeittyp_kurzbz)
 		REFERENCES hr.tbl_teilzeittyp (teilzeittyp_kurzbz) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_freitext 
+		CREATE TABLE hr.tbl_vertragsbestandteil_freitext
 		(
 			vertragsbestandteil_id integer NOT NULL,
 			freitexttyp_kurzbz varchar(32),
@@ -231,7 +231,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			CONSTRAINT tbl_vertragsbestandteil_freitext_pk PRIMARY KEY (vertragsbestandteil_id)
 		);
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_freitexttyp 
+		CREATE TABLE hr.tbl_vertragsbestandteil_freitexttyp
 		(
 			freitexttyp_kurzbz varchar(32) NOT NULL,
 			bezeichnung varchar(128),
@@ -259,7 +259,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_zeitaufzeichnung 
+		CREATE TABLE hr.tbl_vertragsbestandteil_zeitaufzeichnung
 		(
 			vertragsbestandteil_id integer NOT NULL,
 			zeitaufzeichnung bool,
@@ -268,14 +268,14 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			CONSTRAINT tbl_vertragsbestandteil_zeitaufzeichnung_pk PRIMARY KEY (vertragsbestandteil_id)
 		);
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_urlaubsanspruch 
+		CREATE TABLE hr.tbl_vertragsbestandteil_urlaubsanspruch
 		(
 			vertragsbestandteil_id integer NOT NULL,
 			tage smallint,
 			CONSTRAINT tbl_vertragsbestandteil_urlaubsanspruch_pk PRIMARY KEY (vertragsbestandteil_id)
 		);
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_kuendigungsfrist 
+		CREATE TABLE hr.tbl_vertragsbestandteil_kuendigungsfrist
 		(
 			vertragsbestandteil_id integer NOT NULL,
 			arbeitgeber_frist smallint,
@@ -295,7 +295,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_vertragsbestandteil_karenz 
+		CREATE TABLE hr.tbl_vertragsbestandteil_karenz
 		(
 			vertragsbestandteil_id integer NOT NULL,
 			karenztyp_kurzbz varchar(32),
@@ -308,7 +308,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_karenztyp 
+		CREATE TABLE hr.tbl_karenztyp
 		(
 			karenztyp_kurzbz varchar(32) NOT NULL,
 			bezeichnung character varying(256) NOT NULL,
@@ -328,9 +328,9 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_vertragsart (vertragsart_kurzbz) MATCH SIMPLE
 		ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_sachaufwand TO vilesci;		
+		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_sachaufwand TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_sachaufwandtyp TO vilesci;
-		
+
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_dienstverhaeltnis TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_vertragsart TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_vertragsbestandteil TO vilesci;
@@ -345,7 +345,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_vertragsbestandteil_karenz TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_karenztyp TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_teilzeittyp TO vilesci;
-		
+
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsbestandteil TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsabrechnung TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltstyp TO vilesci;
@@ -359,16 +359,16 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		INSERT INTO hr.tbl_teilzeittyp(teilzeittyp_kurzbz, bezeichnung) VALUES('altersteilzeit','Altersteilzeit');
 		INSERT INTO hr.tbl_teilzeittyp(teilzeittyp_kurzbz, bezeichnung) VALUES('elternteilzeit','Elternteilzeit');
 
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('echterdv','Echter DV','Echter Dienstvertrag', true, null, true, 100);
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('studentischehilfskr','Studentische Hilfskraft','Studentische Hilfskraft', true, 'echterdv', true, 101);
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('echterdv','Echter DV','Echter Dienstvertrag', true, null, true, 100);
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('studentischehilfskr','Studentische Hilfskraft','Studentische Hilfskraft', true, 'echterdv', true, 101);
 
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('freierdv','Freier DV','Freier Dienstvertrag', false, null, true, 200);
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('externerlehrender','externer Lehrender','Externer Lehrender Freier DV', true, 'freierdv', true, 201);
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('gastlektor','Gastlektor','Gastlektor', true, 'freierdv', true, 202);
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('echterfreier','Echter Freier DV','Echter Freier DV', true, 'freierdv', true, 203);
-		
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('werkvertrag','Werkvertrag','Werkvertrag', true, null, true, 300);
-		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dientverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('ueberlassungsvertrag','Überlassungsvertrag','Überlassungsvertrag', true, 'werkvertrag', true, 300);
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('freierdv','Freier DV','Freier Dienstvertrag', false, null, true, 200);
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('externerlehrender','externer Lehrender','Externer Lehrender Freier DV', true, 'freierdv', true, 201);
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('gastlektor','Gastlektor','Gastlektor', true, 'freierdv', true, 202);
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('echterfreier','Echter Freier DV','Echter Freier DV', true, 'freierdv', true, 203);
+
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('werkvertrag','Werkvertrag','Werkvertrag', true, null, true, 300);
+		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('ueberlassungsvertrag','Überlassungsvertrag','Überlassungsvertrag', true, 'werkvertrag', true, 300);
 
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('basisgehalt','Basisgehalt', true, 1, true);
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('grundgehalt','Grundgehalt', true, 2, true);
