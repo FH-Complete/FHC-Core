@@ -631,11 +631,15 @@ class zeitsperre extends basis_db
 		}
 		else
 		{
-			while($row = $this->db_fetch_object())
+			if(($row = $this->db_fetch_object()))
 			{
 				$this->result[]= $row;
+			        return true;
 			}
-			return true;
+                        else
+                        {
+			        return false;
+                        }
 		}
 	}
 
