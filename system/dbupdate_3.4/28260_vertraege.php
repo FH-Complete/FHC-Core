@@ -30,8 +30,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		CREATE TABLE hr.tbl_vertragsbestandteil
 		(
 			vertragsbestandteil_id serial NOT NULL,
-			dienstverhaeltnis_id integer,
-			vertragsbestandteiltyp_kurzbz varchar(32),
+			dienstverhaeltnis_id integer NOT NULL,
+			vertragsbestandteiltyp_kurzbz varchar(32) NOT NULL,
 			von date,
 			bis date,
 			insertamum timestamp,
@@ -203,7 +203,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		CREATE TABLE hr.tbl_vertragsbestandteil_stunden
 		(
 			vertragsbestandteil_id integer NOT NULL,
-			wochenstunden smallint,
+			wochenstunden numeric(4,2),
 			teilzeittyp_kurzbz character varying(32),
 			CONSTRAINT tbl_vertragsbestandteil_stunden_pk PRIMARY KEY (vertragsbestandteil_id)
 		);
@@ -225,7 +225,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		CREATE TABLE hr.tbl_vertragsbestandteil_freitext
 		(
 			vertragsbestandteil_id integer NOT NULL,
-			freitexttyp_kurzbz varchar(32),
+			freitexttyp_kurzbz varchar(32) NOT NULL,
 			titel varchar(256),
 			anmerkung text,
 			CONSTRAINT tbl_vertragsbestandteil_freitext_pk PRIMARY KEY (vertragsbestandteil_id)
@@ -262,9 +262,9 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		CREATE TABLE hr.tbl_vertragsbestandteil_zeitaufzeichnung
 		(
 			vertragsbestandteil_id integer NOT NULL,
-			zeitaufzeichnung bool,
-			azgrelevant bool,
-			homeoffice bool,
+			zeitaufzeichnung boolean NOT NULL,
+			azgrelevant boolean NOT NULL,
+			homeoffice boolean NOT NULL,
 			CONSTRAINT tbl_vertragsbestandteil_zeitaufzeichnung_pk PRIMARY KEY (vertragsbestandteil_id)
 		);
 
