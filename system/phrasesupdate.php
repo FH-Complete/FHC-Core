@@ -11392,6 +11392,26 @@ Any unusual occurrences
     array(
         'app' => 'core',
         'category' => 'anrechnung',
+        'phrase' => 'empfehlungNegativKenntnisseNichtGleichwertigWeilHinweis',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
         'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertigWeil',
         'insertvon' => 'system',
         'phrases' => array(
@@ -11404,6 +11424,26 @@ Any unusual occurrences
             array(
                 'sprache' => 'English',
                 'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please complete or adopt the text of the lectors recommendation and edit it if necessary]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertigWeilHinweis',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>',
                 'description' => '',
                 'insertvon' => 'system'
             )
