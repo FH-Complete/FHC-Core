@@ -151,6 +151,7 @@ $this->load->view(
                                 <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
                             </span>
                         </li>
+                        <li class="list-group-item disabled"><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertigWeilHinweis'); ?></li>
                     </ol>
                     <textarea class="form-control" name="begruendung" id="approveAnrechnungUebersicht-begruendung"
                               rows="2"

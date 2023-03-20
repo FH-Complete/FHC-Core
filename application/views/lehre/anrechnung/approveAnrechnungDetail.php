@@ -323,14 +323,6 @@ $this->load->view(
 													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
 											</li>
-											<li class="list-group-item">
-												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertigWeil'); ?></span>
-												<span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
-													  data-placement="right"
-													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
-												</span>
-											</li>
                                             <li class="list-group-item">
                                                 <span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEctsHoechstgrenzeUeberschritten'); ?></span>
                                                 <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
@@ -339,6 +331,14 @@ $this->load->view(
 													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
                                             </li>
+											<li class="list-group-item">
+												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertigWeil'); ?></span>
+												<span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
+													  data-placement="right"
+													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+												</span>
+											</li>
 											<li class="list-group-item">
 												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEmpfehlungstextUebernehmen'); ?></span>
 												<span id="empfehlungstextUebernehmen" class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
