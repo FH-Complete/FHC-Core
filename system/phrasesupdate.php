@@ -11557,13 +11557,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Andere Begr&uuml;ndung. Bitte im Notizfeld kurz angeben.',
+				'text' => 'Andere Begründung. Bitte im Notizfeld angeben.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Other reasons. Please briefly state the reasons in the field for comments.',
+				'text' => 'Other reasons. Please state the reasons in the field for comments.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -13133,13 +13133,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Empfehlungstext des Lektors als Begr&uuml;ndung &uuml;bernehmen.",
+				'text' => "Empfehlungstext des Lektors als Begründung übernehmen und ggf. redigieren.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Copy the lectors recommendation text as reason for the rejection.",
+				'text' => "Copy the lectors recommendation text as reason for the rejection and edit if necessary",
 				'description' => '',
 				'insertvon' => 'system'
 			)
