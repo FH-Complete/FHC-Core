@@ -14,8 +14,7 @@ class Rueckstellung extends Auth_Controller
 				'get' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'set' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'delete' => array('infocenter:r', 'lehre/zgvpruefung:r'),
-				'getStatus' => array('infocenter:rw', 'lehre/zgvpruefung:rw'),
-				'getStudienjahrEnd' => array('infocenter:r', 'lehre/zgvpruefung:r'),
+				'getStatus' => array('infocenter:rw', 'lehre/zgvpruefung:rw')
 			)
 		);
 		
