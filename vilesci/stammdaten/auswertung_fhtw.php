@@ -440,6 +440,44 @@ if ($deleteAllResults)
 	}
 }
 
+// Ajax-Request um die Liste zusammenzuräumen
+$clearList = filter_input(INPUT_POST, 'clearList', FILTER_VALIDATE_BOOLEAN);
+if ($clearList)
+{
+	if (!$rechte->isBerechtigt('infocenter', null, 'suid'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	$qry = "DELETE FROM testtool.tbl_pruefling pf
+			WHERE 
+			(
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_pruefling_frage WHERE pruefling_id=pf.pruefling_id) AND
+				NOT EXISTS (SELECT 1 FROM testtool.tbl_antwort WHERE pruefling_id=pf.pruefling_id)
+			)";
+
+	if ($result = $db->db_query($qry))
+	{
+		echo json_encode(array(
+			'status' => 'ok',
+			'msg' => $db->db_affected_rows($result).' leere Prüflinge wurden gelöscht'));   
+		exit();
+	}
+	else
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => 'Fehler beim Löschen der leeren Prüflinge'
+		));
+		exit();
+	}
+}
+
+// Ajax-Request um einen Prüfling zu sperren
 $rtprueflingEntSperren = filter_input(INPUT_POST, 'rtprueflingEntSperren', FILTER_VALIDATE_BOOLEAN);
 if ($rtprueflingEntSperren)
 {
@@ -467,6 +505,72 @@ if ($rtprueflingEntSperren)
 			echo json_encode(array(
 				'status' => 'ok',
 				'msg' => $msg));
+			exit();
+		}
+		else
+		{
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim speichern der Daten'
+			));
+			exit();
+		}
+	}
+}
+
+// Ajax-Request um einen Prüfling Zeit für ein bestimmtes Gebiet hinzuzufügen
+$prestudentAddTime = filter_input(INPUT_POST, 'prestudentAddTime', FILTER_VALIDATE_BOOLEAN);
+if ($prestudentAddTime)
+{
+	if (!$rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'su'))
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $rechte->errormsg
+		));
+		exit();
+	}
+
+	if (isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id'])
+		&& isset($_POST['gebiet']) && is_numeric($_POST['gebiet'])
+		&& isset($_POST['time']) && is_numeric($_POST['time']))
+	{
+		$qry = "UPDATE testtool.tbl_pruefling_frage
+					SET begintime = 
+						CASE WHEN 
+							(begintime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute') > NOW())
+						THEN
+							NOW()
+						ELSE
+							(begintime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute'))
+						END,
+					endtime = 
+						CASE WHEN 
+							(endtime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute') > NOW())
+						THEN
+							NOW()
+						ELSE
+							(endtime + (" .$db->db_add_param($_POST['time']) . " * interval '1 minute'))
+						END
+				WHERE prueflingfrage_id IN
+				(
+					SELECT prueflingfrage_id
+					FROM testtool.tbl_pruefling
+					JOIN testtool.tbl_pruefling_frage USING (pruefling_id)
+					JOIN testtool.tbl_frage ON tbl_pruefling_frage.frage_id = tbl_frage.frage_id
+					JOIN tbl_prestudent ps on tbl_pruefling.prestudent_id = ps.prestudent_id
+					JOIN tbl_prestudent pss USING (person_id)
+					WHERE pss.prestudent_id = ". $db->db_add_param($_POST['prestudent_id']) . "
+					AND gebiet_id = ". $db->db_add_param($_POST['gebiet']) ."
+					AND (extract(day FROM begintime) = extract(day FROM CURRENT_DATE) OR begintime IS NULL)
+				)";
+
+		
+		if ($result = $db->db_query($qry))
+		{
+			echo json_encode(array(
+				'status' => 'ok',
+				'msg' => 'Zeit hinzugefügt'));
 			exit();
 		}
 		else
@@ -1251,7 +1355,8 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_ablauf.reihung,
 			tbl_ablauf.studiengang_kz,
 			tbl_ablauf.semester,
-		    tbl_ablauf.gewicht
+		    tbl_ablauf.gewicht,
+			tbl_gebiet.zeit
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
 		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
@@ -1328,6 +1433,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		}
 		$gebiet[$row->gebiet_id]->name = $row->gebiet;
 		$gebiet[$row->gebiet_id]->gebiet_id = $row->gebiet_id;
+		$gebiet[$row->gebiet_id]->zeit = $row->zeit;
 		//gewicht ist meist für alle Studiengänge gleich (Bachelor, Master und Distance haben jeweilsandere Gebiete)
 		if (!isset($gebiet[$row->gebiet_id]->gewicht))
 		{
@@ -1449,6 +1555,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			tbl_pruefling.idnachweis,
 			tbl_pruefling.registriert,
 			tbl_pruefling.gesperrt,
+			tbl_pruefling.pruefling_id,
 			get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) AS letzter_status
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
@@ -1563,7 +1670,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->prestudent_id = $row->prestudent_id;
 		$ergebnis[$row->prestudent_id]->person_id = $row->person_id;
 		$ergebnis[$row->prestudent_id]->reihungstest_id = $row->reihungstest_id;
-		//$ergebnis[$row->prestudent_id]->pruefling_id = $row->pruefling_id;
+		$ergebnis[$row->prestudent_id]->pruefling_id = $row->pruefling_id;
 		$ergebnis[$row->prestudent_id]->nachname = $row->nachname;
 		$ergebnis[$row->prestudent_id]->vorname = $row->vorname;
 		$ergebnis[$row->prestudent_id]->gebdatum = $row->gebdatum;
@@ -2071,7 +2178,7 @@ else
 	<link rel="stylesheet" type="text/css" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" >
 	<link rel="stylesheet" type="text/css" href="../../vendor/mottie/tablesorter/dist/css/theme.default.min.css">
 	<link rel="stylesheet" type="text/css" href="../../vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css">
-	<link rel="stylesheet" type="text/css" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="../../public/css/tools/auswertung_fhtw.css">
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
@@ -2079,7 +2186,7 @@ else
 	<script type="text/javascript" src="../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"></script>
 	<script type="text/javascript" src="../../vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js"></script>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js"></script>
 	';
 
@@ -2384,6 +2491,46 @@ else
 			});
 		}
 	}
+	function prestudentAddTime(prestudent_id, gebiet)
+	{
+		var min = $("#prestudentAddTime_" + prestudent_id + "_gebiet_" + gebiet).val();
+		data = {
+			prestudent_id: prestudent_id,
+			gebiet: gebiet,
+			time: min,
+			prestudentAddTime: true
+		};
+
+		$.ajax({
+			url: "auswertung_fhtw.php",
+			data: data,
+			type: "POST",
+			dataType: "json",
+			success: function(data)
+			{
+				if(data.status !== "ok")
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+				else
+				{
+					$("#msgbox").attr("class","alert alert-success");
+					$(".loaderIcon").hide();
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+					$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+				}
+			},
+			error: function(data)
+			{
+				$("#msgbox").attr("class","alert alert-danger");
+				$("#msgbox").show();
+				$("#msgbox").html(data["msg"]);
+			}
+		});
+	}
 	function deleteAllResults(prestudent_id, name)
 	{
 		if (confirm("Wollen Sie ALLE Ergebnisse der Person "+name+" wirklich löschen"))
@@ -2581,6 +2728,39 @@ else
 		});
 		window.location.href = "mailto:?bcc="+adresseArray.join(";");
 	}
+	
+	function clearList()
+	{
+		$.ajax({
+			url: "auswertung_fhtw.php",
+			data: {clearList: true},
+			type: "POST",
+			dataType: "json",
+			success: function(data)
+			{
+				if(data.status !== "ok")
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+				else
+				{
+					$("#freischaltenWarning").show();
+					$("#freischaltenInfo").hide();
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+				}
+			},
+			error: function(data)
+			{
+				$("#msgbox").attr("class","alert alert-danger");
+				$("#msgbox").show();
+				$("#msgbox").html(data["msg"]);
+			}
+		});
+	}
+	
 	function checkAllWithResult()
 	{
 		// Schleife ueber die einzelnen Elemente
@@ -2965,6 +3145,10 @@ else
 	{
 		echo '&nbsp;&nbsp;<a href="#" class="btn btn-default btn-xs" disabled="" role="button" title="Aktiv nur bei Einzelterminauswahl">Testfortschritt ansehen</a>';
 	}
+	if ($rechte->isBerechtigt('infocenter', null, 'suid'))
+	{
+		echo '&nbsp;&nbsp;<button type="button" class="btn btn-default btn-xs" onclick="clearList()" id="clearListButton" title="Löscht alle Prüflinge, bei denen keine Daten vorhanden sind">Liste aufräumen</button>';
+	}
 	echo '</div></div></form>';
 	echo '	<form class="form" role="form">
 			<div class="panel panel-default hiddenEl" id="uebertragenOptions">
@@ -3068,7 +3252,7 @@ else
 
 		foreach ($gebiet AS $gbt)
 		{
-			echo '<th colspan="3">' . $gbt->name . '</th>';
+			echo '<th colspan="4">' . $gbt->name . '</th>';
 		}
 
 		echo '</tr>
@@ -3083,6 +3267,7 @@ else
 			echo "<th><small>Punkte</small></th>";
 			echo "<th><small>Punkte mit Offset</small></th>";
 			echo "<th><small>Prozent</small></th>";
+			echo "<th><small>Zeit hinzufügen</small></th>";
 		}
 
 		echo '</tr></thead><tbody>';
@@ -3190,10 +3375,29 @@ else
 						echo '</td>';
 						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->punktemitoffset != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->punktemitoffset, 2, ',', ' ') : '') . '</td>';
 						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->prozent != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->prozent, 2, ',', ' ') . ' %' : '') . '</td>';
+						echo '<td class="rightaligned ' . $zerovalclass . 'pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>';
+
+						$time = strtotime($gbt->zeit);
+						$minutes = date('i', $time);
+						echo '<select id="prestudentAddTime_'.$erg->prestudent_id .'_gebiet_' . $gbt->gebiet_id . '">';
+						
+						for ($i = 2; $i <= 10; $i = $i +2)
+						{
+							if ($i < $minutes)
+								echo '<option value="'. $i .'">00:' . sprintf("%02d", $i) .':00</option>';
+						}
+						
+						echo '<option value="'. $minutes .'">'. $gbt->zeit .'</option>';
+						
+						echo '</select>
+								<a href="#" class="prestudentAddTime_'.$erg->prestudent_id .'" onclick="prestudentAddTime('.  $erg->prestudent_id.  '' . ', ' .$gbt->gebiet_id .')">
+									<span class="glyphicon glyphicon-ok"></span>
+								</a>';
+						echo '</td>';
 					}
 					else
 					{
-						echo '<td></td><td></td><td></td>';
+						echo '<td></td><td></td><td></td><td></td>';
 					}
 				}
 

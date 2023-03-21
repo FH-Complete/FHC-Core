@@ -727,6 +727,7 @@ function StudentDetailReset()
 	document.getElementById('student-detail-textbox-titelpre').value='';
 	document.getElementById('student-detail-textbox-titelpost').value='';
 	document.getElementById('student-detail-textbox-vorname').value='';
+	document.getElementById('student-detail-textbox-wahlname').value='';
 	document.getElementById('student-detail-textbox-vornamen').value='';
 	document.getElementById('student-detail-textbox-nachname').value='';
 	document.getElementById('student-detail-textbox-geburtsdatum').value='';
@@ -759,6 +760,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-titelpre').disabled=val;
 	document.getElementById('student-detail-textbox-titelpost').disabled=val;
 	document.getElementById('student-detail-textbox-vorname').disabled=val;
+	document.getElementById('student-detail-textbox-wahlname').disabled=val;
 	document.getElementById('student-detail-textbox-vornamen').disabled=val;
 	document.getElementById('student-detail-textbox-nachname').disabled=val;
 	document.getElementById('student-detail-textbox-geburtsdatum').disabled=val;
@@ -799,6 +801,7 @@ function StudentDetailSave()
 	titelpre = document.getElementById('student-detail-textbox-titelpre').value;
 	titelpost = document.getElementById('student-detail-textbox-titelpost').value;
 	vorname = document.getElementById('student-detail-textbox-vorname').value;
+	wahlname = document.getElementById('student-detail-textbox-wahlname').value;
 	vornamen = document.getElementById('student-detail-textbox-vornamen').value;
 	nachname = document.getElementById('student-detail-textbox-nachname').value;
 	geburtsdatum = document.getElementById('student-detail-textbox-geburtsdatum').value;
@@ -857,6 +860,7 @@ function StudentDetailSave()
 	req.add('titelpre', titelpre);
 	req.add('titelpost', titelpost);
 	req.add('vorname', vorname);
+	req.add('wahlname', wahlname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
 	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
@@ -1025,7 +1029,10 @@ function StudentCount()
 // ****
 function StudentAuswahl()
 {
-	document.getElementById('student-toolbar-label-anzahl').value = 'Anzahl: ' + StudentCount();
+	var tree=document.getElementById('student-tree');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	document.getElementById('student-toolbar-label-anzahl').value = 'Anzahl: ' + StudentCount() + '/' + items;
 
 	if(!StudentTreeLoadDataOnSelect)
 	{
@@ -1101,6 +1108,7 @@ function StudentAuswahl()
 	titelpre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpre" ));
 	titelpost=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpost" ));
 	vorname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vorname" ));
+	wahlname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wahlname" ));
 	vornamen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vornamen" ));
 	nachname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachname" ));
 	geburtsdatum=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsdatum" ));
@@ -1144,6 +1152,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-titelpre').value=titelpre;
 	document.getElementById('student-detail-textbox-titelpost').value=titelpost;
 	document.getElementById('student-detail-textbox-vorname').value=vorname;
+	document.getElementById('student-detail-textbox-wahlname').value=wahlname;
 	document.getElementById('student-detail-textbox-vornamen').value=vornamen;
 	document.getElementById('student-detail-textbox-nachname').value=nachname;
 	document.getElementById('student-detail-textbox-geburtsdatum').value=geburtsdatum;
@@ -1818,6 +1827,20 @@ function StudentPrestudentDisableFields(val)
 	else
 	{
 		document.getElementById('student-prestudent-menulist-zgvcode').disabled=true;
+	}
+
+	<?php
+	$studiengaengeMaster = $rechte->getStgKz('student/editMakkZgv');
+	// Anlegen eines Arrays mit allen berechtigten Stg-Kz
+	echo ' var berechtigte_master_studiengaenge = ['.implode(',',$studiengaengeMaster).'];';
+	?>
+	if (berechtigte_master_studiengaenge.indexOf(studiengang_kz) >= 0)
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=true;
 	}
 
 	//Status Tree leeren
@@ -3093,9 +3116,9 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	{
 		exists = StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kurzbz, studiengang_kz);
 	}
-	if (exists)
+	if (exists.dbdml_return)
 	{
-		if(!confirm('Die Buchung ist bereits vorhanden. Trotzdem fortfahren?'))
+		if(!confirm(exists.dbdml_data))
 			return false;
 	}
 
@@ -3150,7 +3173,7 @@ function StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kur
 
 	var val =  new ParseReturnValue(response);
 
-	return(val.dbdml_return);
+	return val;
 }
 
 // *****
@@ -3502,6 +3525,7 @@ function StudentIOAuswahl()
 
 	mobilitaetsprogramm_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mobilitaetsprogramm_code" ));
 	nation_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nation_code" ));
+	herkunftsland_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#herkunftsland_code" ));
 	von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#von" ));
 	bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
@@ -3576,6 +3600,7 @@ function StudentIOAuswahl()
 
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value=mobilitaetsprogramm_code;
 	document.getElementById('student-io-menulist-nation').value=nation_code;
+	document.getElementById('student-io-menulist-herkunftsland').value=herkunftsland_code;
 	document.getElementById('student-io-textbox-von').value=von;
 	document.getElementById('student-io-textbox-bis').value=bis;
 	document.getElementById('student-io-detail-textbox-uid').value=student_uid;
@@ -3810,6 +3835,7 @@ function StudentIODetailDisableFields(val)
 	document.getElementById('student-io-textbox-bis').disabled=val;
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').disabled=val;
 	document.getElementById('student-io-menulist-nation').disabled=val;
+	document.getElementById('student-io-menulist-herkunftsland').disabled=val;
 	document.getElementById('student-io-menulist-zweck').disabled=val;
 	document.getElementById('student-io-button-speichern').disabled=val;
 	document.getElementById('student-io-menulist-lehrveranstaltung').disabled=val;
@@ -3835,6 +3861,7 @@ function StudentIOResetFileds()
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value='7';
 	document.getElementById('student-io-menulist-zweck').value='2';
 	document.getElementById('student-io-menulist-nation').value='A';
+	document.getElementById('student-io-menulist-herkunftsland').value='A';
 	document.getElementById('student-io-textbox-ort').value='';
 	document.getElementById('student-io-textbox-universitaet').value='';
 	document.getElementById('student-io-textbox-ects_angerechnet').value='';
@@ -3852,6 +3879,7 @@ function StudentIODetailSpeichern()
 	bis = document.getElementById('student-io-textbox-bis').value;
 	mobilitaetsprogramm = document.getElementById('student-io-menulist-mobilitaetsprogramm').value;
 	nation_code = document.getElementById('student-io-menulist-nation').value;
+	herkunftsland_code = document.getElementById('student-io-menulist-herkunftsland').value;
 	zweck_code = document.getElementById('student-io-menulist-zweck').value;
 	uid = document.getElementById('student-io-detail-textbox-uid').value;
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
@@ -3889,6 +3917,7 @@ function StudentIODetailSpeichern()
 	req.add('bis', ConvertDateToISO(bis));
 	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', nation_code);
+	req.add('herkunftsland_code', herkunftsland_code);
 	req.add('zweck_code', zweck_code);
 	req.add('student_uid', uid);
 	req.add('studiengang_kz', studiengang_kz);
@@ -4026,6 +4055,7 @@ function StudentIONeu()
 	req.add('bis', ConvertDateToISO(defaultdatum));
 	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', 'A');
+	req.add('herkunftsland_code', 'A');
 	req.add('student_uid', uid);
 	req.add('studiengang_kz', stg_kz);
 	req.add('lehreinheit_id', '');

@@ -80,10 +80,10 @@ echo '
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8" />
-	<link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+	<link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script language="Javascript" type="text/javascript">
 	//<![CDATA[
 	function killChildNodes(an_element)
@@ -163,6 +163,9 @@ $pruefling->load($_SESSION['pruefling_id']);
 
 if ($pruefling->gesperrt === 't')
 	die("<script>document.location.href='prueflinggesperrt.php';</script>");
+
+if (!in_array($gebiet_id, $_SESSION['alleGebiete']))
+	die($p->t('testtool/dasGebietIstNichtFuerSieBestimmt'));
 
 $gebiet = new gebiet($gebiet_id);
 

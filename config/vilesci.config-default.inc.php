@@ -33,14 +33,16 @@ define('INFOSCREEN_PASSWORD', '');
 // Name des Servers (benoetigt fuer Cronjobs
 define('SERVER_NAME', 'localhost');
 
+// Pfad zu Applikation
+define('BASE_LOCATION','/');
 // URL zu FHComplete Root
-define('APP_ROOT', 'http://www.fhcomlete.org/build/');
+define('APP_ROOT', 'http://www.fhcomlete.org'.BASE_LOCATION);
 // URL zu RDF Verzeichnis
-define('XML_ROOT', 'http://www.fhcomlete.org/build/rdf/');
+define('XML_ROOT', 'http://www.fhcomlete.org'.BASE_LOCATION.'rdf/');
 // Pfad zu Document Root
 define('DOC_ROOT', '/var/www/html/build/');
 // URL zu CIS
-define('CIS_ROOT', 'http://www.fhcomlete.org/build/');
+define('CIS_ROOT', 'http://www.fhcomlete.org/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH', 'tw');
@@ -255,6 +257,12 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
 
+// Docsbox configs
+define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
+define('DOCSBOX_PATH_API', 'api/v1/');
+define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
+define('DOCSBOX_WAITING_SLEEP_TIME', 1);
+
 // Bei folgenden Buchungstypen wird ein Anlegen geprüft ob bereits ein Eintrag für diesen Typ vorhanden ist im selben
 // Semester und ggf ein Hinweis ausgegeben
 define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
@@ -263,4 +271,12 @@ define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
 define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
+
+//Default Lehrmodus
+define ('DEFAULT_LEHRMODUS','regulaer');
+
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
+
 ?>

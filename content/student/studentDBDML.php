@@ -95,6 +95,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 	$data = '';
 	$error = true;
 }
+$check_statusaenderung_berechtigung = 'student/keine_studstatuspruefung';
 
 // *** FUNKTIONEN ***
 
@@ -372,6 +373,175 @@ function isBuchungAllowedToChange($buchung_obj)
 		return true;
 }
 
+/**
+ *
+ * Prüft für einen Prestudenten, ob eine bestimmte Statusänderung valide ist.
+ * @param $prestudent_id
+ * @param $status_kurzbz des neuen/bearbeiteten Status
+ * @param $new_status_studiensemester Studiensemester des neuen/zu ändernen Status
+ * @param $new_status_datum Datum des neuen/zu ändernen Status
+ * @param $new_status_ausbildungssemester Ausbildungssemester des neuen/zu ändernen Status
+ * @param $old_status_studiensemester Studiensemester des alten Status, leer wenn neuer Status
+ * @param $old_status_ausbildungssemester Ausbildungssemester des alten Status, leer wenn neuer Status
+ * @return array
+ */
+function checkStatusaenderung(
+	$prestudent_id, $status_kurzbz, $new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester,
+	$old_status_studiensemester = '', $old_status_ausbildungssemester = ''
+)
+{
+	global $db;
+	// Es ist ein neuer Status wenn es kein altes Semester gibt
+	$isNewStatus = $old_status_studiensemester == '' && $old_status_ausbildungssemester == '';
+	// status_kurzbz für Endstatus
+	$endstatusArr = array('Absolvent', 'Abbrecher');
+	// Datum des neuen Status setzen
+	$new_status_datum = new DateTime($new_status_datum);
+
+	// Wenn neuer Status
+	if ($isNewStatus)
+	{
+		// Datum des neuen Status darf nicht in Vergangenheit liegen, sonst Probleme wenn neues Datum < Bismeldedatum
+		$current_date = new DateTime('today');
+		if ($new_status_datum < $current_date)
+		{
+			return array(
+				'error' => true,
+				'errormsg' => 'Datum eines neuen Statuseintrags darf nicht in der Vergangenheit liegen'
+			);
+		}
+	}
+
+	// start des Studiensemesters holen
+	$studiensemester = new studiensemester();
+	$studiensemester->load($new_status_studiensemester);
+	$new_status_semesterstart = new DateTime($studiensemester->start);
+
+	// Alle bisherigen prestudentstatus nach Datum sortiert
+	$qry = "SELECT status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start
+			FROM public.tbl_prestudentstatus pss
+			JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+			WHERE prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
+
+	// zu ändernden Status rausfiltern wenn Status bearbeitet wird
+	if (!$isNewStatus)
+	{
+		$qry .= " AND NOT (
+				status_kurzbz=".$db->db_add_param($status_kurzbz)
+				." AND studiensemester_kurzbz=".$db->db_add_param($old_status_studiensemester)
+				." AND ausbildungssemester=".$db->db_add_param($old_status_ausbildungssemester, FHC_INTEGER)."
+			)";
+	}
+
+	$qry .= " ORDER BY datum DESC, pss.insertamum DESC, pss.ext_id DESC";
+
+	$statusArr = array();
+	if ($result = $db->db_query($qry))
+	{
+		$newStatusInserted = false;
+
+		// für jeden Status
+		while ($row = $db->db_fetch_object($result))
+		{
+			$studiensemester_start = new DateTime($row->studiensemester_start);
+			$status_datum = new DateTime($row->datum);
+
+			// Neuer/editierter Statuseintrag nach bestehendem Statuseintrag
+			if ($new_status_datum >= $status_datum && $new_status_semesterstart >= $studiensemester_start)
+			{
+				if (!$newStatusInserted)
+				{
+					// neuer Status erstmals größer als Datum eines bestehenden Status -> neuen Status einfügen
+					$new_status = new stdClass();
+					$new_status->status_kurzbz = $status_kurzbz;
+					$new_status->studiensemester_kurzbz = $new_status_studiensemester;
+					$new_status->datum = $new_status_datum;
+					$new_status->ausbildungssemester = $new_status_ausbildungssemester;
+					$statusArr[] = $new_status;
+					$newStatusInserted = true;
+				}
+
+				// Gültige Zeitabfolge, bestehenden Status hinzufügen
+				$statusArr[] = $row;
+			}
+			// oder Neuer/editierter Statuseintrag nach bestehendem Statuseintrag
+			elseif ($new_status_datum <= $status_datum && $new_status_semesterstart <= $studiensemester_start)
+			{
+				// Gültige Zeitabfolge, bestehenden Status hinzufügen
+				$statusArr[] = $row;
+			}
+			else
+			{
+				// Zeitabfolge ungültig, Fehler
+				return array(
+					'error' => true,
+					'errormsg' => 'Datum des Statuseintrags muss nach dem Statusdatum,'
+						.' Semesterstartdatum nach Semesterstartdatum des vorherigen Statuseintrags sein'
+				);
+			}
+		}
+
+		// Prüfungen den Prestudentstatus betreffend
+		// Über alle gespeicherten Status gehen und Statusabfolge prüfen
+		for ($i = 0; $i < count($statusArr); $i++)
+		{
+			$curr_status = $statusArr[$i];
+			$curr_status_kurzbz = $curr_status->status_kurzbz;
+			$curr_status_ausbildungssemester = $curr_status->ausbildungssemester;
+			$next_idx = $i - 1; //absteigend sortiert, nächster Status ist vorheriger Eintrag
+			$next_status = isset($statusArr[$next_idx]) ? $statusArr[$next_idx] : null;
+
+			// Abbrecher- oder Absolventenstatus muss Endstatus sein
+			if (isset($next_status) && in_array($curr_status_kurzbz, $endstatusArr))
+			{
+				return array(
+					'error' => true,
+					'errormsg' => 'Nach Abbrecher- und Absolventenstatus darf kein anderer Status mehr eingetragen werden'
+				);
+			}
+
+			// wenn Unterbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
+			if (
+				$curr_status_kurzbz == 'Unterbrecher' && isset($next_status) && $next_status->status_kurzbz == 'Unterbrecher'
+				&& $curr_status_ausbildungssemester != $next_status->ausbildungssemester
+			)
+			{
+				return array(
+					'error' => true,
+					'errormsg' => 'Aufeinanderfolgende Unterbrecher müssen gleiches Ausbildungssemester haben'
+				);
+			}
+
+			// wenn Abbrecher auf Unterbrecher folgt, muss Ausbildungssemester gleich sein
+			if (
+				isset($next_status) && $curr_status_kurzbz == 'Unterbrecher'
+				&& $next_status->status_kurzbz == 'Abbrecher' && $curr_status_ausbildungssemester != $next_status->ausbildungssemester
+			)
+			{
+				return array(
+					'error' => true,
+					'errormsg' => 'Unterbrecher und folgender Abbrecher müssen gleiches Ausbildungssemester haben'
+				);
+			}
+
+			// keine Studenten nach Diplomand Status
+			if (
+				isset($next_status) && $curr_status_kurzbz == 'Diplomand' && $next_status->status_kurzbz == 'Student'
+			)
+			{
+				return array(
+					'error' => true,
+					'errormsg' => 'Nach Diplomantenstatus darf kein Studentenstatus mehr eingetragen werden'
+				);
+			}
+		}
+	}
+	else
+		return array('error' => true, 'errormsg' => 'Fehler bei Statusänderungcheck');
+
+	return array('error' => false, 'errormsg' => '');
+}
+
 if(!$error)
 {
 
@@ -403,7 +573,7 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Geburtsdatum ist nicht korrekt.';
 				$error = true;
-			}			
+			}
 
 			if(!$error)
 			{
@@ -412,6 +582,7 @@ if(!$error)
 				$student->titelpre = $_POST['titelpre'];
 				$student->titelpost = $_POST['titelpost'];
 				$student->vorname = $_POST['vorname'];
+				$student->wahlname = $_POST['wahlname'];
 				$student->vornamen = $_POST['vornamen'];
 				$student->nachname = $_POST['nachname'];
 				$student->gebdatum = $_POST['geburtsdatum'];
@@ -565,6 +736,7 @@ if(!$error)
 				$person->titelpost = $_POST['titelpost'];
 				$person->vorname = $_POST['vorname'];
 				$person->vornamen = $_POST['vornamen'];
+				$person->wahlname = $_POST['wahlname'];
 				$person->nachname = $_POST['nachname'];
 				$person->gebdatum = $_POST['geburtsdatum'];
 				$person->gebort = $_POST['geburtsort'];
@@ -648,12 +820,21 @@ if(!$error)
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
-				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt']; 									   
-				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt'];
+				// Die Master-ZGV darf nur mit einem eigenen Recht geändert werden
+				if($rechte->isBerechtigt('student/editMakkZgv',$_POST['studiengang_kz'],'suid'))
+				{
+					$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				}
+				elseif ($prestudent->zgvmas_code != $_POST['zgvmas_code'])
+				{
+					$errormsg = 'Keine Berechtigung zum Ändern der ZGV';
+					$error = true;
+				}
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
-				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];										  
+				$prestudent->zgvmas_erfuellt = $_POST['zgvmas_erfuellt'];
 				$prestudent->zgvdoktor_code = $_POST['zgvdoktor_code'];
 				$prestudent->zgvdoktorort = $_POST['zgvdoktorort'];
 				$prestudent->zgvdoktordatum = $_POST['zgvdoktordatum'];
@@ -805,6 +986,28 @@ if(!$error)
 											$errormsg .= "\n$prestd->vorname $prestd->nachname: Person muss zuerst zum Bewerber gemacht werden!";
 											$anzahl_fehler++;
 										}
+									}
+								}
+
+								// wenn keine spezielle Berechtiung zur Umgebung, Statusänderung Checks durchführen
+								if (!$rechte->isBerechtigt($check_statusaenderung_berechtigung))
+								{
+									$new_status_datum = isset($_POST['datum']) ? $_POST['datum'] : date('Y-m-d');
+
+									$check_statusaenderung_result = checkStatusaenderung(
+										$prestudent_id,
+										$_POST['status_kurzbz'],
+										$studiensemester,
+										$new_status_datum,
+										$sem
+									);
+
+									if (isset($check_statusaenderung_result['error']) && $check_statusaenderung_result['error'] === true)
+									{
+										$return = false;
+										$error = true;
+										$errormsg .= isset($check_statusaenderung_result['errormsg']) ? $check_statusaenderung_result['errormsg'] : '';
+										$anzahl_fehler++;
 									}
 								}
 
@@ -1003,7 +1206,7 @@ if(!$error)
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
 		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
 		{
-			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid'))
+			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid'))
 			{
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
@@ -1019,7 +1222,7 @@ if(!$error)
 						if($row->anzahl<=1)
 						{
 							$deletePrestudent = true;
-							if (!$rechte->isBerechtigt('admin', null, 'suid'))
+							if (!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid'))
 							{
 								$return = false;
 								$errormsg = 'Die letzte Rolle kann nur durch den Administrator geloescht werden';
@@ -1307,6 +1510,28 @@ if(!$error)
 						$rolle->new = false;
 					}
 
+					// Statuschecks durchführen wenn keine spezielle Berechtigung zur Umgehung
+					if (!$rechte->isBerechtigt($check_statusaenderung_berechtigung))
+					{
+						// allgemeine Prüfung bei Änderung oder Hinzufügen eines Status, inkludiert alle Status
+						$check_statusaenderung_result = checkStatusaenderung(
+							$_POST['prestudent_id'],
+							$_POST['status_kurzbz'],
+							$_POST['studiensemester_kurzbz'],
+							$_POST['datum'],
+							$_POST['ausbildungssemester'],
+							$_POST['studiensemester_old'],
+							$_POST['ausbildungssemester_old']
+						);
+
+						if (isset($check_statusaenderung_result['error']) && $check_statusaenderung_result['error'] === true)
+						{
+							$return = false;
+							$error = true;
+							$errormsg = isset($check_statusaenderung_result['errormsg']) ? $check_statusaenderung_result['errormsg'] : '';
+						}
+					}
+
 					if(!$error)
 					{
 						// Bei Studenten wird der Studentlehrverband Eintrag angelegt/korrigiert
@@ -1572,7 +1797,13 @@ if(!$error)
 														$stg = $prestd->studiengang_kz;
 														$stg_obj = new studiengang();
 														$stg_obj->load(ltrim($stg,'0'));
-														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
+
+														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
+														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
+														$nachname_clean = str_replace(' ','_', $nachname_clean);
+														$vorname_clean = str_replace(' ','_', $vorname_clean);
+
+														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr,$vorname_clean,$nachname_clean);
 														$matrikelnummer = generateMatrikelnr($stg_obj->oe_kurzbz);
 
 														if($matrikelnummer != null)
@@ -1597,11 +1828,6 @@ if(!$error)
 														$benutzer->person_id = $prestd->person_id;
 														$benutzer->aktiv = true;
 														$benutzer->aktivierungscode = generateActivationKey();
-
-														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
-														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
-														$nachname_clean = str_replace(' ','_', $nachname_clean);
-														$vorname_clean = str_replace(' ','_', $vorname_clean);
 
 														if(!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT===true)
 														{
@@ -2283,7 +2509,23 @@ if(!$error)
 		}
 
 		if($exists)
+		{
 			$return = true;
+			$zusatz = "\n";
+			if (count($exists) > 10)
+			{
+				$zusatz .= "und ";
+				$persons = implode("\n- ", array_slice($exists, 0, 10));
+				if (count($exists) === 11)
+					$zusatz .= "einer weiteren Person.";
+				else
+					$zusatz .= (count($exists) - 10) . " weiteren Personen.";
+			}
+			else
+				$persons = implode("\n- ", $exists);
+
+			$data = "Es ist bereits eine Buchung vorhanden:\n- ". $persons  . $zusatz ." Trotzdem fortfahren?";
+		}
 		else
 			$return = false;
 	}
@@ -2361,7 +2603,7 @@ if(!$error)
 			{
 				if ($dokument_kurzbz === 'Sonst' && $sonst !== 0)
 					continue;
-									 
+
 				if($dokument_kurzbz!='')
 				{
 					$dok = new dokument();
@@ -2374,7 +2616,7 @@ if(!$error)
 					$dok->new = true;
 					if ($dokument_kurzbz === 'Sonst')
 						$sonst++;
-				  
+
 
 					if(!$dok->save())
 					{
@@ -2912,6 +3154,7 @@ if(!$error)
 			$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
 			$bisio->mobilitaetsprogramm_code = $_POST['mobilitaetsprogramm_code'];
 			$bisio->nation_code = $_POST['nation_code'];
+			$bisio->herkunftsland_code = $_POST['herkunftsland_code'];
 			$bisio->von = $_POST['von'];
 			$bisio->bis = $_POST['bis'];
 			$bisio->student_uid = $_POST['student_uid'];

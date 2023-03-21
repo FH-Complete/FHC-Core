@@ -92,6 +92,7 @@ $lgartcode='';
 $melderelevant = false;
 $foerderrelevant = false;
 $standort_code='';
+$melde_studiengang_kz = '';
 $schick = filter_input(INPUT_POST, 'schick');
 $onlinebewerbung = false;
 
@@ -155,6 +156,7 @@ if($schick)
 	$melderelevant = filter_input(INPUT_POST, 'melderelevant', FILTER_VALIDATE_BOOLEAN);
 	$foerderrelevant = filter_input(INPUT_POST, 'foerderrelevant', FILTER_VALIDATE_BOOLEAN);
 	$standort_code = filter_input(INPUT_POST, 'standort_code');
+	$melde_studiengang_kz = filter_input(INPUT_POST, 'melde_studiengang_kz');
 
 	$ext_id = filter_input(INPUT_POST, 'ext_id');
 
@@ -223,6 +225,7 @@ if($schick)
 		$sg_update->melderelevant = $melderelevant;
 		$sg_update->foerderrelevant = $foerderrelevant;
 		$sg_update->standort_code = $standort_code;
+		$sg_update->melde_studiengang_kz = $melde_studiengang_kz;
 
 		$sg_update->bescheidvom=$date->formatDatum($sg_update->bescheidvom,'Y-m-d');
 		$sg_update->titelbescheidvom=$date->formatDatum($sg_update->titelbescheidvom,'Y-m-d');
@@ -292,6 +295,7 @@ if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_RE
 	$melderelevant = $sg->melderelevant;
 	$foerderrelevant = $sg->foerderrelevant;
 	$standort_code = $sg->standort_code;
+	$melde_studiengang_kz = $sg->melde_studiengang_kz;
 }
 
 $erh = new erhalter();
@@ -308,7 +312,7 @@ if (!$erh->getAll('kurzbz'))
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<script src="../../include/js/mailcheck.js"></script>
 		<script src="../../include/js/datecheck.js"></script>
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -611,6 +615,12 @@ if (!$erh->getAll('kurzbz'))
 					</td>
 					<td valign="top">
 						<table>
+							<tr>
+								<td>Meldestudiengangskennzahl</td>
+								<td>
+									<input class="detail" type="text" name="melde_studiengang_kz" size="16" maxlength="7" value="<?php echo $melde_studiengang_kz ?>" onchange="submitable()">
+								</td>
+							</tr>
 							<tr>
 								<td>Bezeichnung</td>
 								<td>

@@ -309,13 +309,39 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getLastPrestudent($person_id, $withzgv = false)
 	{
-		$qry = 'SELECT * FROM public.tbl_prestudent
-				WHERE person_id = ?
+		$qry = 'SELECT * FROM public.tbl_prestudent ps
 				%s
+				WHERE ps.person_id = ?
 				ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
 				LIMIT 1';
 
-		$zgvwhere = $withzgv === true ? 'AND zgv_code IS NOT NULL' : '';
+		$zgvwhere = '';
+		if ($withzgv === true)
+		{
+			$zgvwhere = '
+				LEFT JOIN (
+					SELECT ps2.zgvmas_code,
+						ps2.zgvmanation,
+						ps2.zgvmadatum,
+						ps2.zgvmaort,
+						ps2.zgvmas_erfuellt,
+						ps2.person_id
+					FROM tbl_prestudent ps2
+					WHERE zgvmas_code IS NOT NULL
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
+				) zgvmas ON zgvmas.person_id = ps.person_id
+				LEFT JOIN (
+					SELECT ps2.zgv_code,
+						ps2.zgvnation,
+						ps2.zgvdatum,
+						ps2.zgvort,
+						ps2.zgv_erfuellt,
+						ps2.person_id
+					FROM tbl_prestudent ps2
+					WHERE zgv_code IS NOT NULL
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
+				)zgv ON zgv.person_id = ps.person_id';
+		}
 
 		$qry = sprintf($qry, $zgvwhere);
 
@@ -556,13 +582,14 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getOrganisationunitsByPersonId($person_id)
 	{
-		$query = 'SELECT o.oe_kurzbz,
+		$query = 'SELECT DISTINCT o.oe_kurzbz,
 						o.bezeichnung,
 						(CASE
 							WHEN sg.typ = \'b\' THEN ps.prestudent_id
-							WHEN sg.typ = \'m\' THEN ps.prestudent_id
+							WHEN sg.typ = \'m\' THEN mps.prestudent_id
             				ELSE NULL
-       					END) AS prestudent_id
+       					END) AS prestudent_id,
+       					sg.typ
 					FROM public.tbl_prestudent p
 			  		JOIN public.tbl_studiengang sg USING(studiengang_kz)
 					JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
@@ -571,11 +598,17 @@ class Prestudent_model extends DB_Model
 							  FROM public.tbl_prestudentstatus
 							 WHERE status_kurzbz = \'Bewerber\'
 						) ps USING(prestudent_id)
+				LEFT JOIN (
+					SELECT prestudent_id
+					FROM public.tbl_prestudentstatus
+					WHERE status_kurzbz = \'Interessent\' AND bestaetigtam IS NOT NULL
+				) mps ON p.prestudent_id = mps.prestudent_id
 				   WHERE p.person_id = ?
 				GROUP BY o.oe_kurzbz,
 						o.bezeichnung,
 						sg.typ,
 						ps.prestudent_id,
+						mps.prestudent_id,
 						p.prestudent_id
 				ORDER BY o.bezeichnung';
 

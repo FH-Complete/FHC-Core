@@ -319,7 +319,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null)
 	{
-		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, wahlname, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
 					homepage, campus.vw_mitarbeiter.updateamum, campus.vw_mitarbeiter.updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
 					LEFT OUTER JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE TRUE';
@@ -364,6 +364,7 @@ class mitarbeiter extends benutzer
 			$l->titelpre=$row->titelpre;
 			$l->titelpost=$row->titelpost;
 			$l->vorname=$row->vorname;
+			$l->wahlname=$row->wahlname;
 			$l->vornamen=$row->vornamen;
 			$l->nachname=$row->nachname;
 			$l->gebdatum=$row->gebdatum;
@@ -475,6 +476,7 @@ class mitarbeiter extends benutzer
 			$l->titelpre=$row->titelpre;
 			$l->titelpost=$row->titelpost;
 			$l->vorname=$row->vorname;
+			$l->wahlname=$row->wahlname;
 			$l->vornamen=$row->vornamen;
 			$l->nachname=$row->nachname;
 			$l->gebdatum=$row->gebdatum;
@@ -601,7 +603,7 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 
-		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+		$qry = "SELECT uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
 				WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND mitarbeiter_uid=uid AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
 
 		if($this->db_query($qry))
@@ -616,6 +618,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 
 				$this->result[] = $obj;
@@ -752,6 +755,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->nachname = $row->nachname;
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
@@ -833,7 +837,12 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter);
+		$qry = "SELECT * FROM campus.vw_mitarbeiter
+		WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).")
+		OR lower(wahlname) ~* lower(".$this->db_add_param($filter).")
+		--OR lower(wahlname || ' ' || nachname) like lower(".$this->db_add_param($filter).")
+		--OR lower(nachname || ' ' || wahlname) like lower(".$this->db_add_param($filter).")
+		OR uid ~* ".$this->db_add_param($filter);
 		$qry .= " ORDER BY nachname, vorname, kurzbz;";
 
 		if($this->db_query($qry))
@@ -849,6 +858,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
+				$obj->wahlname = $row->wahlname;
 				$obj->aktiv =$this->db_parse_bool($row->aktiv);
 				$obj->fixangestellt = $this->db_parse_bool($row->fixangestellt);
 
@@ -871,14 +881,17 @@ class mitarbeiter extends benutzer
 	 */
 	public function search($filter, $limit=null, $aktiv=true, $positivePersonalnr=false)
 	{
-		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
+		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, wahlname, uid
 			FROM campus.vw_mitarbeiter
 			WHERE
 				lower(nachname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(uid) like lower('%".$this->db_escape($filter)."%')
 				OR lower(vorname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(wahlname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(vorname || ' ' || nachname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(wahlname || ' ' || nachname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(nachname || ' ' || wahlname) like lower('%".$this->db_escape($filter)."%')
 			ORDER BY nachname, vorname";
 
 		if(!is_null($limit) && is_numeric($limit))
@@ -897,6 +910,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
+				$obj->wahlname = $row->wahlname;
 
 				$this->result[] = $obj;
 			}
@@ -931,6 +945,8 @@ class mitarbeiter extends benutzer
 					JOIN public.tbl_person USING(person_id)
 				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
 				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
+							lower(COALESCE(wahlname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
+							lower(COALESCE(nachname,'') ||' '|| COALESCE(wahlname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
 				      uid ~* ".$this->db_add_param($filter)." ";
 		if(is_numeric($filter))
 			$qry.="OR personalnummer = ".$this->db_add_param($filter)." OR svnr = ".$this->db_add_param($filter).";";
@@ -950,6 +966,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->nachname = $row->nachname;
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
@@ -1075,6 +1092,50 @@ class mitarbeiter extends benutzer
 									(datum_bis is null OR datum_bis>=now())
 								  );";
 
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				if ($row->vorgesetzter!='')
+				{
+					$this->vorgesetzte[]=$row->vorgesetzter;
+					$return=true;
+				}
+			}
+
+			$this->vorgesetzte = array_unique($this->vorgesetzte);
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+		}
+		return $return;
+	}
+
+	/**
+	 * Gibt ein Array mit den UIDs der Vorgesetzten zum Zeitpunkt des korrespondierenden Timesheets zurück
+	 * @return uid
+	 */
+	public function getVorgesetzteMonatTimesheet($uid, $timesheetDate)
+	{
+		$return=false;
+
+		$qry = "SELECT
+					uid  as vorgesetzter
+				FROM
+					public.tbl_benutzerfunktion
+				WHERE
+					funktion_kurzbz='Leitung' AND
+					(datum_von is null OR datum_von<=".$this->db_add_param($timesheetDate).") AND
+					(datum_bis is null OR datum_bis>=".$this->db_add_param($timesheetDate).") AND
+					oe_kurzbz in (SELECT oe_kurzbz
+									FROM public.tbl_benutzerfunktion
+									WHERE
+									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
+									(datum_von is null OR (datum_von<= ".$this->db_add_param($timesheetDate).")) AND
+									(datum_bis is null OR (datum_bis>=".$this->db_add_param($timesheetDate)."))
+									);";
 
 		if($this->db_query($qry))
 		{
@@ -1509,6 +1570,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->nachname = $row->nachname;
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
@@ -1684,6 +1746,34 @@ class mitarbeiter extends benutzer
 		{
 				$this->errormsg = "Fehler bei der Abfrage aufgetreten";
 				return false;
+		}
+	}
+
+	public function getMitarbeiterKostenstelle($von, $bis, $uid = null)
+	{
+		if (is_null($uid))
+			$uid = $this->uid;
+		
+		$qry = "
+			SELECT o.oe_kurzbz AS standardkostenstelle, o.bezeichnung
+			FROM public.tbl_benutzerfunktion bf
+				JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				WHERE bf.funktion_kurzbz = 'kstzuordnung'
+				AND (bf.datum_bis IS NULL OR datum_bis >= ". $this->db_add_param($von). ")
+				AND (bf.datum_von IS NULL OR datum_von <= ". $this->db_add_param($bis). ")
+					AND bf.uid = ". $this->db_add_param($uid);
+
+		if ($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+				$obj->oekurzbz = $row->standardkostenstelle;
+				$obj->bezeichnung = $row->bezeichnung;
+				
+				$this->result []= $obj;
+			}
+			return true;
 		}
 	}
 

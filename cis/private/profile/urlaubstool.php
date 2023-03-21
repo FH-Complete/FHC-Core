@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *					Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
 /**
  * Seite zum Eintragen von Urlaubstagen
@@ -30,10 +31,13 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/mail.class.php');
+require_once('../../../include/sancho.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/sprache.class.php');
+require_once('../../../include/zeitaufzeichnung.class.php');
 
+$datum_obj = new datum();
 $sprache = getSprache();
 $lang = new sprache();
 $lang->load($sprache);
@@ -48,8 +52,8 @@ $mehrarbeitsstunden = '0';
 $anspruch = '25';
 $zaehl=1;
 $tage=array();			//Array Tage für Kalenderanzeige
-$hgfarbe=array_fill(0,44,'#E9ECEE'); 	//Array mit Hintegrundfarben der Kalenderfelder
-$datensatz=array_fill(0,44,0);
+$hgfarbe=array_fill(0, 44, '#E9ECEE'); 	//Array mit Hintegrundfarben der Kalenderfelder
+$datensatz=array_fill(0, 44, 0);
 $freigabevon=array();
 $freigabeamum=array();
 $vertretung_uid=array();
@@ -59,26 +63,26 @@ $erreichbarkeit_kurzbz=array();
 //$monatsname = array("Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
 
 $jahre = array();			//Array Jahreszahlen für Auswahl (immer aktuelles Jahr und die 4 nächsten Jahre)
-$akette=array_fill(0,1,0);
-$ekette=array_fill(0,1,0);
-$links='';
-$rechts='';
-$tag=array();
-$vertretung='';
-$erreichbar='';
-$vgmail='';
-$vtmail='';
-$spmonat=array();
-$hgchange=false;
-$wvon='';
-$wbis='';
-$datensatz='';
-$t=getdate();
+$akette = array_fill(0, 1, 0);
+$ekette = array_fill(0, 1, 0);
+$links = '';
+$rechts = '';
+$tag = array();
+$vertretung = '';
+$erreichbar = '';
+$vgmail = '';
+$vtmail = '';
+$spmonat = array();
+$hgchange = false;
+$wvon = '';
+$wbis = '';
+$datensatz = '';
+$t = getdate();
 $uid = get_uid();
-$taste=0;
+$taste = 0;
 
-$ma= new mitarbeiter();
-for($i=0;$i<6;$i++)
+$ma = new mitarbeiter();
+for($i = 0; $i<6; $i++)
 {
 	$jahre[$i]="$t[year]"+($i-1);
 }
@@ -117,14 +121,13 @@ else
 }
 if (isset($_GET['hgfarbe']))
 {
-	$hgfarbe=explode(",",$_GET['hgfarbe']);
+	$hgfarbe=explode(",", $_GET['hgfarbe']);
 }
 else
 {
-
 	if (!isset($_GET['spmonat']))
 	{
-		for($i=0;$i<44;$i++)
+		for($i=0; $i<44; $i++)
 		{
 			if(!isset($hgfarbe[$i]) || $hgfarbe[$i]!='#FFFC7F')
 				$hgfarbe[$i]='#E9ECEE';
@@ -166,71 +169,76 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 
 //Bereits freigegebenen Eintrag löschen
 //Eintragung löschen
-if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POST['delete']) && isset($_POST['informSupervisor'])))
-{
-    $zeitsperre = new zeitsperre();
-    $zeitsperre->load($_GET['delete']);
-
-    $vondatum = $zeitsperre->getVonDatum();
-    $bisdatum = $zeitsperre->getBisDatum();
-
-    if(!$zeitsperre->delete($_GET['delete']))
-        echo $zeitsperre->errormsg;
-
-        //Mail an Vorgesetzten
-        $prsn = new person();
-
-        $vorgesetzter = $ma->getVorgesetzte($uid);
-        if($vorgesetzter)
-        {
-            $to='';
-            $fullName ='';
-            foreach($ma->vorgesetzte as $vg)
-            {
-                if($to!='')
-                {
-                    $to.=', '.$vg.'@'.DOMAIN;
-                    $name = $prsn->getFullNameFromBenutzer($vg);
-                    $fullName.=', '.$name;
-                }
-                else
-                {
-                    $to.=$vg.'@'.DOMAIN;
-                    $name = $prsn->getFullNameFromBenutzer($vg);
-                    $fullName.=$name;
-                }
-            }
-
-        $benutzer = new benutzer();
-        $benutzer->load($uid);
-        $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
-            $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
-        $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
-
-
-        $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
-        if($mail->send())
-        {
-            $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</span>";
-        }
-        else
-        {
-            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
-        }
-    }
-    else
-    {
-        $vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
-    }
-}
-
-
-//Eintragung löschen
-if((isset($_GET['delete']) || isset($_POST['delete'])))
+if(isset($_GET['delete']))
 {
 	$zeitsperre = new zeitsperre();
+	$zeitsperre->load($_GET['delete']);
+
+	$vondatum = $zeitsperre->getVonDatum();
+	$bisdatum = $zeitsperre->getBisDatum();
+	$vondatum = $datum_obj->formatDatum($vondatum, 'd.m.Y');
+	$bisdatum = $datum_obj->formatDatum($bisdatum, 'd.m.Y');
+
 	if(!$zeitsperre->delete($_GET['delete']))
+	{
 		echo $zeitsperre->errormsg;
+	}
+	else
+	{
+		//Mail an Vorgesetzten
+		$prsn = new person();
+
+		$vorgesetzter = $ma->getVorgesetzte($uid);
+		if($vorgesetzter)
+		{
+			$to='';
+			$fullName ='';
+			foreach($ma->vorgesetzte as $vg)
+			{
+				if($to!='')
+				{
+					$to.=', '.$vg.'@'.DOMAIN;
+					$name = $prsn->getFullNameFromBenutzer($vg);
+					$fullName.=', '.$name;
+				}
+				else
+				{
+					$to.=$vg.'@'.DOMAIN;
+					$name = $prsn->getFullNameFromBenutzer($vg);
+					$fullName.=$name;
+				}
+			}
+
+			$benutzer = new benutzer();
+			$benutzer->load($uid);
+
+			//new sanchomail
+			$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
+			$beschreibung = $zeitsperre->bezeichnung;
+			$subject = "Urlaub wurde gelöscht";
+			$mailvorlage = 'Sancho_Mail_Urlaub_Loeschen';
+
+			$from='vilesci@'.DOMAIN;
+
+			//Sanchomail mit Vorlage Sancho Mail Urlaub
+			$template_data = array(
+				'vorgesetzter' => $fullName,
+				'nameMitarbeiter' => $nameMitarbeiter,
+				'beschreibung' =>$beschreibung,
+				'vonDatum' => $vondatum,
+				'bisDatum' => $bisdatum
+			);
+
+			if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
+			{
+				$vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert', array($fullName))."</span>";
+			}
+			else
+			{
+				$vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten', array($fullName))."!</span>";
+			}
+		}
+	}
 }
 
 //Eintragung speichern
@@ -254,10 +262,10 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		$wtag=$_GET['wtag'];
 		$akette[0]=$wtag[0];
 		$ekette[0]=$wtag[0];
-		for($i=1,$j=0;$i<count($wtag);$i++)
+		for($i=1, $j=0; $i<count($wtag); $i++)
 		{
 			//ketten bilden
-			if($wtag[$i]==date("Y-m-d",strtotime("+1 Day",strtotime($wtag[$i-1]))))
+			if($wtag[$i]==date("Y-m-d", strtotime("+1 Day", strtotime($wtag[$i-1]))))
 			{
 				$ekette[$j]=$wtag[$i];
 			}
@@ -267,28 +275,66 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				$akette[$j]=$wtag[$i];
 				$ekette[$j]=$wtag[$i];
 			}
-
 		}
 
-		//Pruefen ob bereits ein Urlaub in den markierten Bereichen vorhanden ist und ggf Abbrechen
-		//Das Problem sollte nur beim manuellen Refresh der Seite auftreten
-		$error=false;
-		for($i=0;$i<count($akette);$i++)
+		//Prüfen, ob eine Zeitaufzeichnung vorhanden ist und ggf Abbrechen
+		$error = false;
+		for ($i = 0; $i < count($akette); $i++)
+		{
+			$za = new zeitaufzeichnung();
+			$vonDatum = new DateTime($akette[$i]);
+			$bisDatum = new DateTime($ekette[$i]);
+
+			if ($za->existsZeitaufzeichnung($uid, $vonDatum->format('d.m.Y'), $bisDatum->format('d.m.Y')))
+			{
+				$error = true;
+				$vgmail .= '<br><span class="error">'.$p->t('zeitsperre/zeitaufzeichnungVorhanden'). ' '.
+										$vonDatum->format('d.m.Y'). ' - '. $bisDatum->format('d.m.Y'). '</span>';
+				break;
+			}
+		}
+
+		//Prüfen ob eine ganztägige Zeitsperre eingetragen ist und ggf abbrechen
+		$daysToCheck = array();
+		for ($i = 0; $i < count($akette); $i++)
 		{
 			$zeitsperre = new zeitsperre();
+			$vonDatum = new DateTime($akette[$i]);
+			$bisDatum = new DateTime($ekette[$i]);
 
-			if($zeitsperre->UrlaubEingetragen($uid, $akette[$i], $ekette[$i]))
+			//add here to array, weil in der foreach-Schleife, das bisdatum nicht inkludiert ist
+			$daysToCheck[] = $bisDatum->format("Y-m-d");
+
+			$daterange = new DatePeriod($vonDatum, new DateInterval('P1D'), $bisDatum);
+			foreach($daterange as $date)
 			{
-				$vgmail.='<br><span class="error">'.$p->t('zeitsperre/urlaubBereitsEingetragen').'</span>';
-				$error=true;
-				break;
+				$daysToCheck[] = $date->format("Y-m-d");
+			}
+		}
+
+		foreach ($daysToCheck as $date)
+		{
+			$zeitsperre->getSperreByDate($uid, $date, null, zeitsperre::NUR_BLOCKIERENDE_ZEITSPERREN);
+
+			foreach ($zeitsperre->result as $z)
+			{
+				if ($z->zeitsperretyp_kurzbz)
+				{
+					$error = true;
+
+					$z->zeitsperretyp_kurzbz == 'Urlaub' ?
+						$vgmail.='<br><span class="error">'.$p->t('zeitsperre/urlaubBereitsEingetragen').'</span>' :
+						$vgmail .= '<br><span class="error">'.$p->t('zeitsperre/zeitsperreEingetragen', [$date, $z->zeitsperretyp_kurzbz]). '</span>';
+
+					break;
+				}
 			}
 		}
 	}
 
 	if(!$error)
 	{
-		for($i=0;$i<count($akette);$i++)
+		for($i=0; $i<count($akette); $i++)
 		{
 			$zeitsperre = new zeitsperre();
 
@@ -314,12 +360,11 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				$error = true;
 				echo $zeitsperre->errormsg;
 			}
-
 		}
 		if(!$error)
 		{
 			//Mail an Vorgesetzten
-            $prsn = new person();
+			$prsn = new person();
 
 			$vorgesetzter = $ma->getVorgesetzte($uid);
 			if($vorgesetzter)
@@ -344,31 +389,67 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 
 				$benutzer = new benutzer();
 				$benutzer->load($uid);
-				$message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
-						   $p->t('urlaubstool/xHatNeuenUrlaubEingetragen',array($benutzer->nachname,$benutzer->vorname)).":\n";
 
-				for($i=0;$i<count($akette);$i++)
+				$nameMitarbeiter =  $benutzer->vorname. " ". $benutzer->nachname;
+				$beschreibung = (!empty($zeitsperre->bezeichnung) ? $zeitsperre->bezeichnung : $zeitsperre->beschreibung);
+
+				// $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
+				// 		   $p->t('urlaubstool/xHatNeuenUrlaubEingetragen',array($benutzer->nachname,$benutzer->vorname)).":\n";
+
+				for($i=0; $i<count($akette); $i++)
 				{
-					$message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($akette[$i]))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($ekette[$i]))."\n";
+					$von = date("d.m.Y", strtotime($akette[$i]));
+					$bis = date("d.m.Y", strtotime($ekette[$i]));
 				}
 
+
 				//Ab September wird das neue Jahr uebergeben
-				if(date("m",strtotime($akette[0]))>=9)
-			   		$jahr = date("Y", strtotime($akette[0]))+1;
-			   	else
-			   		$jahr = date("Y", strtotime($akette[0]));
+				if(date("m", strtotime($akette[0]))>=9)
+					$jahr = date("Y", strtotime($akette[0]))+1;
+				else
+					$jahr = date("Y", strtotime($akette[0]));
 
-				$message.="\n".$p->t('urlaubstool/sieKoennenDiesenUnterFolgenderAdresseFreigeben').":\n".
-				APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
+				$link = " <a href=". APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr .">Link Urlaubstool</a> ";
 
-				$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigabeansuchenUrlaub'), $message);
-				if($mail->send())
+				$subject = "Freigabeansuchen Urlaub";
+				$mailvorlage = 'Sancho_Mail_Urlaub_Neu';
+
+				$from='vilesci@'.DOMAIN;
+
+				// Überprüfen, ob addon casetime aktiv ist
+				$addon_obj = new addon();
+				$addoncasetime = $addon_obj->checkActiveAddon("casetime");
+				$urlaubssaldo = "";
+				if($addoncasetime)
 				{
-					$vgmail="<span style='color:green;'>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</span>";
+					require_once('../../../addons/casetime/config.inc.php');
+					require_once('../../../addons/casetime/include/functions.inc.php');
+					$urlaubssaldo = getCastTimeUrlaubssaldo($uid);
+					$urlaubssaldo = $urlaubssaldo->{'AktuellerStand'};
+				}
+
+				//Sanchomail mit Vorlage Sancho Mail Urlaub Neu
+				$template_data = array(
+					'vorgesetzter' => $fullName,
+					'nameMitarbeiter' => $nameMitarbeiter,
+					'beschreibung' =>$beschreibung,
+					'vonDatum' => $von,
+					'bisDatum' => $bis,
+					'Link'=> $link,
+					'urlaubssaldo' => $urlaubssaldo
+				);
+
+
+				if (sendSanchoMail($mailvorlage, $template_data, $to, $subject))
+
+			//	$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigabeansuchenUrlaub'), $message);
+				//if($mail->send())
+				{
+					$vgmail="<span style='color:green;'>".$p->t('urlaubstool/freigabemailWurdeVersandt', array($fullName))."</span>";
 				}
 				else
 				{
-					$vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."!</span>";
+					$vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten', array($to))."!</span>";
 				}
 			}
 			else
@@ -382,14 +463,13 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 			}
 		}
 	}
-
 }
 
 //Eintragungen laden
-if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
+if ((isset($wmonat) || isset($wmonat)) && (isset($wjahr) || isset($wjahr)))
 {
 	//Urlaubstageage markieren
-	$mbeginn=mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]);
+	$mbeginn=mktime(0, 0, 0, ($wmonat+1), 1, $jahre[$wjahr]);
 	$ttt=getdate($mbeginn);
 	$wotag="$ttt[wday]";
 	if ($wotag==0)
@@ -407,22 +487,22 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	}
 	//$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]));
 	//$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
-	$ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
+	$ttt=getdate(mktime(0, 0, 0, ($wmonat+1), $mende, $jahre[$wjahr]));
 	if($wmonat==0)
 	{
-		$wvon=date("Y-m-d",mktime(0, 0, 0, 12 , $mendev-($wotag-1), ($jahre[$wjahr])-1));
+		$wvon=date("Y-m-d", mktime(0, 0, 0, 12, $mendev-($wotag-1), ($jahre[$wjahr])-1));
 	}
 	else
 	{
-		$wvon=date("Y-m-d",mktime(0, 0, 0, ($wmonat) , $mendev-($wotag-1), ($jahre[$wjahr])));
+		$wvon=date("Y-m-d", mktime(0, 0, 0, ($wmonat), $mendev-($wotag-1), ($jahre[$wjahr])));
 	}
 	if($wmonat==11)
 	{
-		$wbis=date("Y-m-d",mktime(0, 0, 0, 1 , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]+1));
+		$wbis=date("Y-m-d", mktime(0, 0, 0, 1, (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]+1));
 	}
 	else
 	{
-		$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+2) , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
+		$wbis=date("Y-m-d", mktime(0, 0, 0, ($wmonat+2), (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
 	}
 	$qry="SELECT * FROM campus.tbl_zeitsperre
 		WHERE zeitsperretyp_kurzbz='Urlaub'
@@ -437,19 +517,19 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 		{
 			//echo " ".$row->vondatum;
 			//echo "-".$row->bisdatum;
-			for($i=1;$i<=$mende+($wotag-1)+(7-($ttt['wday']==0?7:$ttt['wday']));$i++)
+			for($i=1; $i<=$mende+($wotag-1)+(7-($ttt['wday']==0?7:$ttt['wday'])); $i++)
 			{
-				if(date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))>=$row->vondatum
-				&& date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $i-$wotag+1, $jahre[$wjahr]))<=$row->bisdatum)
+				if(date("Y-m-d", mktime(0, 0, 0, ($wmonat+1), $i-$wotag+1, $jahre[$wjahr]))>=$row->vondatum
+				&& date("Y-m-d", mktime(0, 0, 0, ($wmonat+1), $i-$wotag+1, $jahre[$wjahr]))<=$row->bisdatum)
 				{
-					if($row->freigabevon!='' && $row->vondatum<=date("Y-m-d",time()))
+					if($row->freigabevon!='' && $row->vondatum<=date("Y-m-d", time()))
 					{
 						$hgfarbe[$i]='#bbb';
 					}
-					elseif ($row->freigabevon!=''  && $row->vondatum>date("Y-m-d",time()))
-                    {
+					elseif ($row->freigabevon!='' && $row->vondatum>date("Y-m-d", time()))
+					{
 						$hgfarbe[$i]='#CDDDEE';
-                    }
+					}
 					else
 					{
 						$hgfarbe[$i]='#FFFC7F';
@@ -473,7 +553,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 					}
 				}
 			}
-			for($i=$mende+$wotag+(7-($ttt['wday']==0?7:$ttt['wday']));$i<44;$i++)
+			for($i=$mende+$wotag+(7-($ttt['wday']==0?7:$ttt['wday'])); $i<44; $i++)
 			{
 				$hgfarbe[$i]='#E9ECEE';
 				$datensatz[$i]=0;
@@ -496,7 +576,7 @@ $datum_obj = new datum();
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 		<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -527,57 +607,59 @@ echo '
 			}
 		});
 		</script>';
-?>
-		<script language="Javascript">
-		function conf_del()
-		{
-			return confirm('<?php echo $p->t('urlaubstool/eintragWirklichLoeschen');?>');
-		}
 
-		function checkval()
+?>
+<script language="Javascript">
+function conf_del()
+{
+	return confirm('<?php echo $p->t('urlaubstool/eintragWirklichLoeschen');?>');
+}
+
+function checkval()
+{
+	if(document.getElementById('vertretung_uid').value=='')
+	{
+		alert('<?php echo $p->t('urlaubstool/zuerstVertretungAuswaehlen');?>');
+		return false;
+	}
+	else
+		return true;
+}
+$(document).ready(function()
+{
+	$("#vertretung").autocomplete({
+	source: "urlaubstool_autocomplete.php?autocomplete=mitarbeiter",
+	minLength:2,
+	response: function(event, ui)
+	{
+		//Value und Label fuer die Anzeige setzen
+		for(i in ui.content)
 		{
-			if(document.getElementById('vertretung_uid').value=='')
-			{
-				alert('<?php echo $p->t('urlaubstool/zuerstVertretungAuswaehlen');?>');
-				return false;
-			}
-			else
-				return true;
+			ui.content[i].value=ui.content[i].uid;
+			ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
 		}
-		$(document).ready(function()
-		{
-			$("#vertretung").autocomplete({
-			source: "urlaubstool_autocomplete.php?autocomplete=mitarbeiter",
-			minLength:2,
-			response: function(event, ui)
-			{
-				//Value und Label fuer die Anzeige setzen
-				for(i in ui.content)
-				{
-					ui.content[i].value=ui.content[i].uid;
-					ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
-				}
-			},
-			select: function(event, ui)
-			{
-				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
-				$("#vertretung").val(ui.item.uid);
-			}
-			});
-		})
-		</script>
-		<style type="text/css">
-		.urlaube th, .urlaube td, .urlaube
-		{
-			-moz-border-radius:10px;
-			-khtml-border-radius:10px;
-		}
-		</style>
-		<title><?php echo $p->t('urlaubstool/urlaubstool');?></title>
-	</head>
+	},
+	select: function(event, ui)
+	{
+		//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+		$("#vertretung").val(ui.item.uid);
+	}
+	});
+})
+</script>
+<style type="text/css">
+.urlaube th, .urlaube td, .urlaube
+{
+	-moz-border-radius:10px;
+	-khtml-border-radius:10px;
+}
+</style>
+<title><?php echo $p->t('urlaubstool/urlaubstool');?></title>
+</head>
 <body>
 <?php
 echo "<H1>".$p->t('urlaubstool/urlaubstool')." (".$uid.")</H1>";
+
 
 //Anzeige Resturlaubsberechnung
 echo '<table width="100%">';
@@ -624,7 +706,7 @@ echo '
 		style="vertical-align: middle;" alt="links">&nbsp;
 <SELECT name="wmonat">';
 
-for($i=0;$i<12;$i++)
+for($i=0; $i<12; $i++)
 {
 	if($wmonat==$i)
 	{
@@ -640,7 +722,7 @@ echo "</SELECT>\n";
 
 echo '&nbsp;<INPUT name="rechts" type="image" src="../../../skin/images/right_lvplan.png" style="vertical-align: middle;" alt="rechts">';
 echo '&nbsp;<SELECT name="wjahr">';
-for($i=0;$i<5;$i++)
+for($i=0; $i<5; $i++)
 {
 	if($wjahr==$i)
 	{
@@ -685,7 +767,7 @@ if($result = $db->db_query($qry))
 echo  '</SELECT>';
 
 //Tage
-$mbeginn=mktime(0, 0, 0, ($wmonat+1) , 1, $jahre[$wjahr]);
+$mbeginn=mktime(0, 0, 0, ($wmonat+1), 1, $jahre[$wjahr]);
 $ttt=getdate($mbeginn);
 $wotag="$ttt[wday]";
 if ($wotag==0)
@@ -702,9 +784,9 @@ else
 {
 	$mendev = cal_days_in_month(CAL_GREGORIAN, ($wmonat), $jahre[$wjahr]);
 }
-$ttt=getdate(mktime(0, 0, 0, ($wmonat+1) , $mende, $jahre[$wjahr]));
+$ttt=getdate(mktime(0, 0, 0, ($wmonat+1), $mende, $jahre[$wjahr]));
 //echo "monatsende:".$mende;
-for($i=1;$i<43;$i++)
+for($i=1; $i<43; $i++)
 {
 	if($i>=$wotag && $zaehl<=$mende)
 	{
@@ -715,22 +797,22 @@ for($i=1;$i<43;$i++)
 	{
 		if($wmonat==0)
 		{
-			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, 12 , $mendev+$i-($wotag-1), $jahre[$wjahr]-1));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, 12, $mendev+$i-($wotag-1), $jahre[$wjahr]-1));
 		}
 		else
 		{
-			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, ($wmonat) , $mendev+$i-($wotag-1), $jahre[$wjahr]));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, ($wmonat), $mendev+$i-($wotag-1), $jahre[$wjahr]));
 		}
 	}
 	elseif ($i>$mende && $i<=$mende+($wotag-1)+(7-($ttt['wday']==0?7:$ttt['wday'])))
 	{
 		if($wmonat==11)
 		{
-			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, 1 , $i-$mende-$wotag+1, $jahre[$wjahr+1]));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, 1, $i-$mende-$wotag+1, $jahre[$wjahr+1]));
 		}
 		else
 		{
-			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, ($wmonat+2) , $i-$mende-$wotag+1, $jahre[$wjahr]));
+			$tage[$i]=date("d.m.Y", mktime(0, 0, 0, ($wmonat+2), $i-$mende-$wotag+1, $jahre[$wjahr]));
 		}
 	}
 	else
@@ -748,17 +830,17 @@ echo '	<input type="submit" name="speichern" value="'.$p->t('urlaubstool/eintrag
 <table border=0 width="95%" align="left" class="urlaube">
 	<tr>';
 
-for($i=1;$i<=7;$i++)
+for($i=1; $i<=7; $i++)
 	echo "\n".'<th style="width:14%; background-color: #A5AFB6">'.$tagbez[$lang->index][$i].'</th>';
 
 echo '</tr>';
-for ($i=0;$i<6;$i++)
+for ($i=0; $i<6; $i++)
 {
 	echo "\n".'<tr height="50" style="font-family:Arial,sans-serif; font-size:30px; color:black">';
-	for ($j=1;$j<8;$j++)
+	for ($j=1; $j<8; $j++)
 	{
 		echo "\n";
-		if(strlen(stristr($tage[$j+7*$i],"."))>0)
+		if(strlen(stristr($tage[$j+7*$i], "."))>0)
 		{
 			if($j%6==0 || $j==7)
 			{
@@ -782,7 +864,7 @@ for ($i=0;$i<6;$i++)
 		}
 		if($tage[$j+7*$i]!='')
 		{
-			if($hgfarbe[$j+7*$i]=='#FFFC7F' )//|| $hgfarbe[$j+7*$i]=='#CDDDEE')
+			if($hgfarbe[$j+7*$i]=='#FFFC7F')//|| $hgfarbe[$j+7*$i]=='#CDDDEE')
 			{
 				echo '<b title='.$p->t('urlaubstool/vertretung').': '.$vertretung_uid[$j+7*$i].' - '.$p->t('urlaubstool/erreichbar').': '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';;
 				$k=$j+7*$i;
@@ -792,16 +874,16 @@ for ($i=0;$i<6;$i++)
 			elseif($hgfarbe[$j+7*$i]=='#E9ECEE')
 			{
 				echo '<b>'.$tage[$j+7*$i].'</b><br>';
-				if(strlen(stristr($tage[$j+7*$i],"."))>0)
+				if(strlen(stristr($tage[$j+7*$i], "."))>0)
 				{
-					echo '<input type="checkbox" name="wtag[]" 
-					value="'.date("Y-m-d",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'" 
-					id="'.date("d.m.Y",mktime(0, 0, 0, substr($tage[$j+7*$i],3,2) , substr($tage[$j+7*$i],0,2), substr($tage[$j+7*$i],6,4))).'"></td>';
+					echo '<input type="checkbox" name="wtag[]"
+					value="'.date("Y-m-d", mktime(0, 0, 0, substr($tage[$j+7*$i], 3, 2), substr($tage[$j+7*$i], 0, 2), substr($tage[$j+7*$i], 6, 4))).'"
+					id="'.date("d.m.Y", mktime(0, 0, 0, substr($tage[$j+7*$i], 3, 2), substr($tage[$j+7*$i], 0, 2), substr($tage[$j+7*$i], 6, 4))).'"></td>';
 				}
 				else
 				{
-					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'" 
-                    id="'.date("d.m.Y",mktime(0, 0, 0, ($wmonat+1) , $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
+					echo '<input type="checkbox" name="wtag[]" value="'.date("Y-m-d", mktime(0, 0, 0, ($wmonat+1), $tage[$j+7*$i], $jahre[$wjahr])).'"
+					id="'.date("d.m.Y", mktime(0, 0, 0, ($wmonat+1), $tage[$j+7*$i], $jahre[$wjahr])).'"></td>';
 				}
 			}
 			else
@@ -813,12 +895,12 @@ for ($i=0;$i<6;$i++)
 				}
 				elseif(isset($freigabeamum[$j+7*$i]))
 				{
-                    echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurch', array($freigabevon[$j+7*$i])).': '.$freigabevon[$j+7*$i].'"><span> </span>';
+					echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurch', array($freigabevon[$j+7*$i])).': '.$freigabevon[$j+7*$i].'"><span> </span>';
 					if($hgfarbe[$j+7*$i]=='#CDDDEE')
 					{
 						$k=$j+7*$i;
-						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]&informSupervisor=True' onclick='return conf_del()'>";
-                        echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
+						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]' onclick='return conf_del()'>";
+						echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
 					}
 				}
 				else

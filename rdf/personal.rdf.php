@@ -152,6 +152,7 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:nachname><![CDATA['.$mitarbeiter->nachname.']]></MITARBEITER:nachname>
     		<MITARBEITER:vorname><![CDATA['.$mitarbeiter->vorname.']]></MITARBEITER:vorname>
     		<MITARBEITER:vornamen><![CDATA['.$mitarbeiter->vornamen.']]></MITARBEITER:vornamen>
+				<MITARBEITER:wahlname><![CDATA['.$mitarbeiter->wahlname.']]></MITARBEITER:wahlname>
     		<MITARBEITER:anrede><![CDATA['.$mitarbeiter->anrede.']]></MITARBEITER:anrede>
     		<MITARBEITER:geschlecht><![CDATA['.$mitarbeiter->geschlecht.']]></MITARBEITER:geschlecht>
     		<MITARBEITER:geburtsdatum><![CDATA['.$datum->convertISODate($mitarbeiter->gebdatum).']]></MITARBEITER:geburtsdatum>

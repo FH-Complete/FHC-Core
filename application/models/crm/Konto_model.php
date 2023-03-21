@@ -74,10 +74,11 @@ class Konto_model extends DB_Model
 		}
 	}
 
-	public function getLastStudienbeitrag($uid, $buchungstypen)
+	public function getStudienbeitraege($uid, $buchungstypen)
 	{
 		$query = 'SELECT konto.studiensemester_kurzbz
-					FROM public.tbl_konto konto,
+					FROM public.tbl_konto konto
+							JOIN public.tbl_studiensemester studiensemester ON konto.studiensemester_kurzbz = studiensemester.studiensemester_kurzbz,
 						public.tbl_benutzer,
 						public.tbl_student
 					WHERE tbl_benutzer.uid = \'' . $uid . '\'
@@ -91,7 +92,7 @@ class Konto_model extends DB_Model
 						WHERE skonto.buchungsnr = konto.buchungsnr_verweis
 						OR skonto.buchungsnr_verweis = konto.buchungsnr_verweis
 						)
-					ORDER BY buchungsnr DESC LIMIT 1;
+					ORDER BY studiensemester.start DESC;
 					';
 
 		return $this->execQuery($query);

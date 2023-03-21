@@ -507,4 +507,21 @@ class Studiengang_model extends DB_Model
 
 		return $this->execQuery($query, array($typ, $semester));
 	}
+
+	public function getStudiengangTyp($studiengang_kz, $typ = null)
+	{
+		$query = "SELECT DISTINCT(sgt.*)
+					FROM tbl_studiengangstyp sgt JOIN tbl_studiengang sg on sgt.typ = sg.typ 
+					WHERE studiengang_kz IN ?";
+
+		$params[] = $studiengang_kz;
+
+		if (!is_null($typ))
+		{
+			$query .= " AND sgt.typ IN ?";
+			$params[] = $typ;
+		}
+
+		return $this->execQuery($query, $params);
+	}
 }

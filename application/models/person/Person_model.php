@@ -82,7 +82,7 @@ class Person_model extends DB_Model
 				}
 				else
 				{
-					$person['svnr'] = $person['svnr'] . 'v' . ($result->retval[0]->svnr{11} + 1);
+					$person['svnr'] = $person['svnr'] . 'v' . ($result->retval[0]->svnr[11] + 1);
 				}
 			}
 		}
@@ -283,8 +283,8 @@ class Person_model extends DB_Model
 								SELECT p2.person_id
 								FROM public.tbl_person p
 								JOIN public.tbl_person p2
-								ON p.vorname = p2.vorname
-								AND p.nachname = p2.nachname
+								ON lower(p.vorname) = lower(p2.vorname)
+								AND lower(p.nachname) = lower(p2.nachname)
 								AND p.gebdatum = p2.gebdatum
 								AND p.person_id = ?
 							)
@@ -310,8 +310,8 @@ class Person_model extends DB_Model
 								SELECT p2.person_id
 								FROM public.tbl_person p
 								JOIN public.tbl_person p2
-								ON p.vorname = p2.vorname
-								AND p.nachname = p2.nachname
+								ON lower(p.vorname) = lower(p2.vorname)
+								AND lower(p.nachname) = lower(p2.nachname)
 								AND p.gebdatum = p2.gebdatum
 								AND p.person_id = ?
 							)
@@ -321,8 +321,18 @@ class Person_model extends DB_Model
 					JOIN public.tbl_status USING(status_kurzbz)
 					WHERE status_kurzbz = 'Abbrecher'
 				)
-				";
 
-		return $this->execQuery($qry, array($person_id, $person_id));
+				UNION
+
+				SELECT p2.person_id
+				FROM tbl_person p1
+				INNER JOIN (
+					SELECT vorname, nachname, gebdatum, person_id
+					FROM tbl_person
+					) p2
+					ON (lower(p1.vorname) = lower(p2.vorname) AND lower(p1.nachname) = lower(p2.nachname) AND p1.gebdatum = p2.gebdatum)
+				WHERE p1.person_id != p2.person_id AND (p1.person_id = ?)";
+
+		return $this->execQuery($qry, array($person_id, $person_id, $person_id));
 	}
 }
