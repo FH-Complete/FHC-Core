@@ -104,26 +104,7 @@ class Rueckstellung extends Auth_Controller
 		
 		$this->outputJsonSuccess(getData($result));
 	}
-	
-	/**
-	 * Gets the End date of the current Studienjahr
-	 */
-	public function getStudienjahrEnd()
-	{
-		$this->load->model('organisation/studienjahr_model', 'StudienjahrModel');
-		
-		$result = $this->_ci->StudienjahrModel->getCurrStudienjahr();
-		
-		$json = null;
-		
-		if (hasData($result))
-		{
-			$json = $result->retval[0]->ende;
-		}
-		
-		$this->outputJsonSuccess(array($json));
-	}
-	
+
 	/**
 	 * Retrieve the UID of the logged user and checks if it is valid
 	 */

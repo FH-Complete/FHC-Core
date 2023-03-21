@@ -111,33 +111,6 @@ var Rueckstellung = {
 			}
 		);
 	},
-	getStudienjahrEnd: function()
-	{
-		FHC_AjaxClient.ajaxCallGet(
-			CONTROLLER_RUECKSTELLUNG_URL + "/getStudienjahrEnd",
-			null,
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-					{
-						var engdate = $.datepicker.parseDate("yy-mm-dd", FHC_AjaxClient.getData(data)[0]);
-
-						if (engdate.getDate() === 31)
-							engdate.setDate(engdate.getDate() - 1);
-						engdate.setMonth(engdate.getMonth() + 3);
-
-						var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
-						$("#rueckstellungdate").val(gerdate);
-					}
-				},
-				errorCallback: function()
-				{
-					FHC_DialogLib.alertError("error when getting Studienjahr end");
-				},
-				veilTimeout: 0
-			}
-		);
-	},
 	_refreshRueckstellung: function(rueckstellungobj)
 	{
 		var personid = $("#hiddenpersonid").val();
@@ -189,7 +162,10 @@ var Rueckstellung = {
 			'</div>');
 
 		Rueckstellung.getStatus();
-		Rueckstellung.getStudienjahrEnd();
+
+		var rueckstelldate = new Date();
+		rueckstelldate.setDate(rueckstelldate.getDate() + 14);
+		$('#rueckstellungdate').attr("value", $.datepicker.formatDate("dd.mm.yy", rueckstelldate));
 
 		$("#rueckstellungdate").datepicker({
 			"dateFormat": "dd.mm.yy",
