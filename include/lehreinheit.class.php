@@ -663,10 +663,10 @@ class lehreinheit extends basis_db
 							$sql_lkt=mb_substr($sql_lkt,3);
 							$sql_query="SELECT * FROM campus.tbl_zeitsperre
 											WHERE ($sql_lkt) AND
-												(  (vondatum<".$this->db_add_param($datum)." AND bisdatum>".$this->db_add_param($datum).")
-												OR (vondatum=".$this->db_add_param($datum)." AND bisdatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde)." AND bisstunde>=".$this->db_add_param($stunde).")
-												OR (vondatum=".$this->db_add_param($datum)." AND bisdatum>".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).")
-												OR (vondatum<".$this->db_add_param($datum)." AND bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") )";
+												(vondatum <= ".$this->db_add_param($datum)." AND
+													bisdatum >= ".$this->db_add_param($datum)." AND
+													(vonstunde <= ". $this->db_add_param($stunde)." OR vonstunde IS NULL) AND
+													(bisstunde >= ". $this->db_add_param($stunde)." OR bisstunde IS NULL))";
 							//echo $sql_query.'<br>';
 							if (!$this->db_query($sql_query))
 							{
@@ -681,8 +681,11 @@ class lehreinheit extends basis_db
 							else
 							{
 								$row=$this->db_fetch_object($erg_zs);
-								$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->mitarbeiter_uid|$row->zeitsperretyp_kurzbz|$row->bezeichnung|$row->vondatum/$row->vonstunde-$row->bisdatum/$row->bisstunde - $row->vertretung_uid";
-								return false;
+                                if ($row->zeitsperretyp_kurzbz != 'ZVerfueg')
+                                {
+                                    $this->errormsg = "Kollision (Zeitsperre): $row->zeitsperre_id|$row->mitarbeiter_uid|$row->zeitsperretyp_kurzbz|$row->bezeichnung|$row->vondatum/$row->vonstunde-$row->bisdatum/$row->bisstunde - $row->vertretung_uid";
+                                    return false;
+                                }
 							}
 						}
 						return true;
@@ -828,6 +831,7 @@ class lehreinheit extends basis_db
 		}
 		while($row = $this->db_fetch_object())
 		{
+			if(!isset($this->lehreinheiten[$row->unr])) $this->lehreinheiten[$row->unr] = new stdClass();
 			$this->lehreinheiten[$row->unr]->lehreinheit_id[]=$row->lehreinheit_id;
 			$this->lehreinheiten[$row->unr]->lvnr[]=$row->lvnr;
 			$this->lehreinheiten[$row->unr]->unr=$row->unr;

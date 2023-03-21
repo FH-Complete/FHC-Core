@@ -6,7 +6,7 @@ class Issues extends Auth_Controller
 {
 	private $_uid;
 
-	const FUNKTION_KURZBZ = 'ass'; // // user having this funktion can see issues for oes assigned with this funktion
+	const FUNKTION_KURZBZ = 'ass'; // user having this funktion can see issues for oes assigned with this funktion
 	const BERECHTIGUNG_KURZBZ = 'system/issues_verwalten'; // user having this permission can see issues for oes assigned with this permission
 
 	public function __construct()
@@ -39,6 +39,7 @@ class Issues extends Auth_Controller
 		);
 
 		$this->_setAuthUID(); // sets property uid
+		$this->setControllerId(); // sets the controller id
 	}
 
 	public function index()
@@ -80,7 +81,7 @@ class Issues extends Auth_Controller
 			}
 
 			if (isEmptyString($changeIssueMethod))
-				$errors[] = error("Invalid issue status given");
+				$errors[] = "Invalid issue status given";
 			else
 			{
 				$issueRes = $this->issueslib->{$changeIssueMethod}($issue_id, $user);
@@ -127,7 +128,7 @@ class Issues extends Auth_Controller
 			{
 				$all_funktionen_oe_kurzbz[$benutzerfunktion->oe_kurzbz][] = $benutzerfunktion->funktion_kurzbz;
 
-				// separate oes for the funktion needed for displaying issues
+				// separate oes for the additional funktion which enables displaying issues
 				if ($benutzerfunktion->funktion_kurzbz == self::FUNKTION_KURZBZ)
 				{
 					$oe_kurzbz_for_funktion[] = $benutzerfunktion->oe_kurzbz;
@@ -153,7 +154,9 @@ class Issues extends Auth_Controller
 		}
 
 		// add oes for which there is the "manage issues" Berechtigung
-		if (!$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ))
+		$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ);
+
+		if (!$oe_kurzbz_berechtigt)
 			show_error('No permission or error when checking permissions');
 
 		$all_oe_kurzbz_berechtigt = array_unique(array_merge($oe_kurzbz_for_funktion, $oe_kurzbz_berechtigt));

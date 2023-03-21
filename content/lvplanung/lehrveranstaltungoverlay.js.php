@@ -43,6 +43,7 @@ var lehrveranstaltungLvGesamtNotenSelectUID=null; //LehreinheitID des Noten Eint
 var lehrveranstaltungNotenTreeloaded=false;
 var lehrveranstaltungGesamtNotenTreeloaded=false;
 var LehrveranstaltungAusbildungssemesterFilter='';
+var LeDetailsDisabled = false; //Damit die Details von der Lehreinheit disabled bleiben soland der Rebuild nicht fertig ist
 
 // Config-Eintrag, ob Vertragsdetails angezeigt werden sollen
 var lehrveranstaltung_vertragsdetails_anzeigen = Boolean(<?php echo (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>);
@@ -80,6 +81,7 @@ var LvTreeListener =
 	didRebuild : function(builder)
   	{
   		//debug('didrebuild');
+		LeDetailsDisabled = false;
 		//timeout nur bei Mozilla notwendig da sonst die rows
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
@@ -452,7 +454,7 @@ function LvTreeSelectLehreinheit()
 		return false;
 
 	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
-	if(LvSelectLehreinheit_id!=null)
+	if(LvSelectLehreinheit_id!=null && LeDetailsDisabled === false)
 	{
 		//Den Subtree der Lehrveranstaltung oeffnen zu der zuletzt die Lehreinheit gespeichert/angelegt wurde
 	   	//da diese sonst nicht markiert werden kann
@@ -521,7 +523,7 @@ function LeDelete()
 	}
 
 	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Wollen Sie diese Lehreinheit wirklich loeschen?'))
+	if (confirm('Wollen Sie diesen LV-Teil wirklich loeschen?'))
 	{
 		//Script zum loeschen der Lehreinheit aufrufen
 		var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
@@ -539,6 +541,52 @@ function LeDelete()
 		LeDetailReset();
 		LeDetailDisableFields(true);
 	}
+}
+
+// ****
+// * LV-Teile kopieren
+// ****
+function LeCopy(art)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('lehrveranstaltung-tree');
+
+	if (tree.currentIndex==-1)
+		return;
+
+	try
+	{
+		//Ausgewaehlte LV-Teile holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
+		var lehreinheit_id = tree.view.getCellText(tree.currentIndex,col);
+		if(lehreinheit_id == '')
+		{
+			alert('Lehreinheit_id konnte nicht ermittelt werden');
+			return false;
+		}
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	//Script zum kopieren des LV-Teils aufrufen
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+
+	req.add('type','lehreinheit');
+	req.add('do','copy');
+	req.add('art',art);
+	req.add('lehreinheit_id',lehreinheit_id);
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+	if(!val.dbdml_return)
+		alert(val.dbdml_errormsg)
+
+	LvTreeRefresh();
+	LeDetailReset();
+	LeDetailDisableFields(true);
 }
 
 // ****
@@ -708,6 +756,7 @@ function LeDetailSave()
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
 		LeDetailDisableFields(true);
+		LeDetailsDisabled = true;
 		//LvTreeRefresh();
 		LvSelectLehreinheit_id=val.dbdml_data;
 		LvOpenLehrveranstaltung_id=lehrveranstaltung;
@@ -774,7 +823,12 @@ function LeAuswahl()
 			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
 
 			//Notizen Tab ausblenden
-			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
+			document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
+
+			if(document.getElementById('lehrveranstaltung-tabs').selectedItem === document.getElementById('lehrveranstaltung-tab-notizen'))
+			{
+				document.getElementById('lehrveranstaltung-tabs').selectedItem = document.getElementById('lehrveranstaltung-tab-detail');
+			}
 
 			//LV-Angebot Tab einblenden und Gruppen laden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=false;
@@ -799,7 +853,8 @@ function LeAuswahl()
 		}
 		else
 		{
-			LeDetailDisableFields(false);
+			if (LeDetailsDisabled === false)
+				LeDetailDisableFields(false);
 			LehrveranstaltungNotenDisableFields(true);
 			LehrveranstaltungNotenTreeUnload();
 
@@ -807,7 +862,7 @@ function LeAuswahl()
 			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=true;
 
 			//Notizen Tab einblenden
-			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
+			document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
 
 			//LV-Angebot Tab ausblenden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=true;
@@ -2673,7 +2728,7 @@ function LeMitarbeiterGesamtkosten()
 /*
  * Oeffnet alle Subtrees
  */
-function LvTreeOpenAllSubtrees()
+function LvTreeOpenAllSubtrees(art)
 {
 	var tree=document.getElementById('lehrveranstaltung-tree');
 
@@ -2682,10 +2737,21 @@ function LvTreeOpenAllSubtrees()
 	else
 		return false;
 
-	for(var i=items-1;i>=0;i--)
+	if (art == 'aus')
 	{
-		if(!tree.view.isContainerOpen(i))
-			tree.view.toggleOpenState(i);
+		for(var i=items-1;i>=0;i--)
+		{
+			if(!tree.view.isContainerOpen(i))
+				tree.view.toggleOpenState(i);
+		}
+	}
+	else if (art == 'ein')
+	{
+		for(var i=items-1;i>=0;i--)
+		{
+			if(tree.view.isContainerOpen(i))
+				tree.view.toggleOpenState(i);
+		}
 	}
 }
 

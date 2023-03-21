@@ -21,6 +21,7 @@ $this->phrasen['lvplan/lehrverbaende']='Lehrverbände';
 $this->phrasen['lvplan/uebersichtDerLehrverbaende']='Übersicht der Lehrverbände';
 $this->phrasen['lvplan/fehlerUndFeedback']='Feedback geben';
 $this->phrasen['lvplan/lvKoordinationsstelle']='LV-Koordinationsstelle';
+$this->phrasen['lvplan/lvPlanung']='LV-Planung';
 $this->phrasen['lvplan/reservierungen']='Reservierungen';
 $this->phrasen['lvplan/reservierungWurdeGeloescht']='Reservierung wurde geloescht';
 $this->phrasen['lvplan/alleReservierungen']='Alle Reservierungen';

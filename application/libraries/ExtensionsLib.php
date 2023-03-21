@@ -1,4 +1,20 @@
 <?php
+/**
+ * Copyright (C) 2022 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -33,7 +49,7 @@ class ExtensionsLib
 
 	// Directories that are part of the extension archive
 	private $SOFTLINK_TARGET_DIRECTORIES = array(
-		APPPATH => array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
+		APPPATH => array('config', 'components', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
 		DOC_ROOT => array('public')
 	);
 
@@ -200,6 +216,7 @@ class ExtensionsLib
 
 			// Select all the version of this extension
 			$this->_ci->ExtensionsModel->addSelect('extension_id');
+
 			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName, 'server_kurzbz' => SERVER_NAME));
 
 			// If something was found
@@ -209,10 +226,7 @@ class ExtensionsLib
 				{
 					// Remove them all
 					$result = $this->_ci->ExtensionsModel->delete($extension->extension_id);
-					if (isSuccess($result))
-					{
-						$delExtension = true;
-					}
+					if (isSuccess($result)) $delExtension = true;
 				}
 			}
 		}
@@ -510,9 +524,13 @@ class ExtensionsLib
 				// If no errors occurred then check the JSON file content within the uploaded extension
 				if ($extensionJson != null)
 				{
+					// Default value
+					$fhcomplete_version = 0;
+
 					require_once('version.php'); // get the core version
+
 					// Checks if the required core version of the extension is the same of this system
-					if (isset($extensionJson->core_version) && $extensionJson->core_version == $fhcomplete_version)
+					if (isset($extensionJson->core_version) && version_compare($extensionJson->core_version, $fhcomplete_version, '<='))
 					{
 						$this->_printMessage('Required core version: '.$extensionJson->core_version);
 						$this->_printMessage('Current core version: '.$fhcomplete_version);
@@ -681,10 +699,10 @@ class ExtensionsLib
 					$this->_printMessage($sql);
 
 					// Try to execute that
-					$result = @$this->_ci->ExtensionsModel->executeQuery($sql);
+					$resultQuery = @$this->_ci->ExtensionsModel->executeQuery($sql);
 
-					// If was not a success
-					if (!isSuccess($result))
+					// If _not_ a success
+					if (!isSuccess($resultQuery))
 					{
 						$this->_errorOccurred = true;
 						$this->_printFailure(' error occurred while executing the query');
@@ -694,7 +712,7 @@ class ExtensionsLib
 					else
 					{
 						$this->_printMessage('Query result:');
-						var_dump(getData($result)); // KEEP IT!!!
+						var_dump(getData($resultQuery)); // KEEP IT!!!
 						$this->_ci->eprintflib->printEOL();
 					}
 				}

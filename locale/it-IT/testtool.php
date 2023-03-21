@@ -7,6 +7,7 @@ $this->phrasen['testtool/bitteZuerstAnmelden']='';
 $this->phrasen['testtool/blaettern']='';
 $this->phrasen['testtool/demo']='';
 $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='';
+$this->phrasen['testtool/dasGebietIstNichtFuerSieBestimmt']='';
 $this->phrasen['testtool/dieZeitIstAbgelaufen']='';
 $this->phrasen['testtool/einleitung']='';
 $this->phrasen['testtool/esWurdeKeineFrageGefunden']='';
