@@ -21,8 +21,8 @@ $query = '
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
 			(SELECT COALESCE(
-				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . ',
-				array_to_json(zgv.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . '
+				zgvmaster.bezeichnung[' . $LANGUAGE_INDEX . '],
+				zgv.bezeichnung[' . $LANGUAGE_INDEX . ']
 				) AS zgv
 			FROM public.tbl_prestudent
 			LEFT JOIN bis.tbl_zgv zgv USING (zgv_code)
@@ -79,7 +79,7 @@ if ($this->config->item('fbl') === TRUE)
             ELSE TRUE
         END AS empfehlungsberechtigt,
         anrechnungen.*,
-        array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung"
+        anrechnungstatus.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '] AS "status_bezeichnung"
         FROM anrechnungen
         JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
         JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
@@ -118,7 +118,7 @@ else
             ELSE TRUE
         END AS empfehlungsberechtigt,
         anrechnungen.*,
-        array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung"
+        anrechnungstatus.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '] AS "status_bezeichnung"
         FROM anrechnungen
         JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
         JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)

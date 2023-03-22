@@ -5,7 +5,7 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);						// alle STG mit Lese- und Schreibberechtigung
 $ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'". implode(', ', $oes_schreibberechtigt). "'";		// alle STG nur mit Schreibberechtigung
-$LANGUAGE_INDEX = getUserLanguage() == 'German' ? '0' : '1';
+$LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
 $query = '
 	WITH anrechnungen AS
@@ -40,8 +40,8 @@ $query = '
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
 			(SELECT COALESCE(
-				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . ',
-				array_to_json(zgv.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . '
+				zgvmaster.bezeichnung[' . $LANGUAGE_INDEX . '],
+				zgv.bezeichnung[' . $LANGUAGE_INDEX . ']
 				) AS zgv
 			FROM public.tbl_prestudent
 			LEFT JOIN bis.tbl_zgv zgv USING (zgv_code)
@@ -95,7 +95,7 @@ $query = '
             anrechnungen.antragsdatum,
 			anrechnungen.empfehlung_anrechnung,
 			anrechnungen.status_kurzbz,
-            array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
+            anrechnungstatus.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '] AS "status_bezeichnung",
             anrechnungen.prestudent_id,
             CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
