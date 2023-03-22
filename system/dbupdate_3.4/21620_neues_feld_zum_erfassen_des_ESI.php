@@ -89,8 +89,10 @@ if (!$result = @$db->db_query('SELECT 0 FROM public.tbl_kennzeichen WHERE 0 = 1'
 
 			ALTER TABLE public.tbl_kennzeichen ADD CONSTRAINT pk_tbl_kennzeichen PRIMARY KEY (kennzeichen_id);
 
-			ALTER TABLE public.tbl_kennzeichen ADD CONSTRAINT fk_kennzeichen_person FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE public.tbl_kennzeichen ADD CONSTRAINT fk_kennzeichen_kennzeichentyp_kurzbz FOREIGN KEY (kennzeichentyp_kurzbz) REFERENCES public.tbl_kennzeichentyp(kennzeichentyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE public.tbl_kennzeichen ADD CONSTRAINT fk_kennzeichen_person FOREIGN KEY (person_id)
+				REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE public.tbl_kennzeichen ADD CONSTRAINT fk_kennzeichen_kennzeichentyp_kurzbz FOREIGN KEY (kennzeichentyp_kurzbz)
+				REFERENCES public.tbl_kennzeichentyp(kennzeichentyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 			-- create unique constraint, no person can have the same kennzeichen twice
 			ALTER TABLE public.tbl_kennzeichen ADD CONSTRAINT uk_kennzeichen_person_id_inhalt UNIQUE (person_id, kennzeichentyp_kurzbz, inhalt);
@@ -113,4 +115,32 @@ if (!$result = @$db->db_query('SELECT 0 FROM public.tbl_kennzeichen WHERE 0 = 1'
 		echo '<strong>public.tbl_kennzeichen: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.tbl_kennzeichen';
+}
+
+// public.tbl_kennzeichentyp: add type esi
+if ($result = $db->db_query("SELECT 1 FROM public.tbl_kennzeichentyp WHERE kennzeichentyp_kurzbz='esi'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO public.tbl_kennzeichentyp(kennzeichentyp_kurzbz, bezeichnung) VALUES('esi', 'European Student Identifier');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Kennzeichentyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neuer Kennzeichentyp esi in public.tbl_kennzeichentyp hinzugefügt';
+	}
+}
+
+// system.tbl_jobtypes: add type esi
+if ($result = $db->db_query("SELECT 1 FROM system.tbl_jobtypes WHERE type='generateESI'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_jobtypes(type, description) VALUES('generateESI', 'Generate and save European Student Identifier');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Jobtyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neuer Jobtyp generateESI in system.tbl_jobtypes hinzugefügt';
+	}
 }
