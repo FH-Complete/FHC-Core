@@ -33,7 +33,8 @@ class AdminAnrechnung extends Auth_Controller
 				'global',
 				'ui',
                 'lehre',
-                'anrechnung'
+                'anrechnung',
+                'table'
 			)
 		);
 
