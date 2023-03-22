@@ -194,7 +194,7 @@ $filterWidgetArray = array(
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
 		empfehlungsberechtigt: {formatter:"tickCross", align:"center", headerTooltip:"Berechtigt wenn man die LV leitet oder wenn der LV keine LV-Leitung zugeordnet ist.",
-		    headerFilter:"tickCross", headerFilterParams:{"tristate": true, "initial": true}, headerFilterFunc: hf_empfehlungsberechtigt
+		    headerFilter:"tickCross", headerFilterParams:{"tristate": true}, headerFilterFunc: hf_empfehlungsberechtigt
         },
 		anrechnung_id: {visible: false, headerFilter:"input"},
 		lehrveranstaltung_id: {visible: false, headerFilter:"input"},
