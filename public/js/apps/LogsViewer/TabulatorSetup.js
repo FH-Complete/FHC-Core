@@ -22,22 +22,32 @@ export const LogsViewerTabulatorOptions = {
 	height: 700,
 	layout: 'fitColumns',
 	columns: [
-		{title: 'Log ID', field: 'LogId'},
-		{title: 'Request ID', field: 'RequestId'},
-		{title: 'Execution time', field: 'ExecutionTime'},
-		{title: 'Executed by', field: 'ExecutedBy'},
-		{title: 'Description', field: 'Description'},
-		{title: 'Data', field: 'Data'},
-		{title: 'Web service type', field: 'WebserviceType'}
+		{title: 'Log ID', field: 'LogId', headerFilter: true},
+		{title: 'Request ID', field: 'RequestId', headerFilter: true},
+		{title: 'Execution time', field: 'ExecutionTime', headerFilter: true},
+		{title: 'Executed by', field: 'ExecutedBy', headerFilter: true},
+		{title: 'Description', field: 'Description', headerFilter: true},
+		{title: 'Data', field: 'Data', headerFilter: true},
+		{title: 'Web service type', field: 'WebserviceType', headerFilter: true}
 	],
 	rowFormatter: function(row) {
-		if (row.getData().RequestId.includes("error"))
+
+		let data = row.getData(); // get data for this row
+
+		// If data is not null and provides the property RequestId and it is not null
+		if (data != null && data.hasOwnProperty('RequestId') && data.RequestId != null)
 		{
-			row.getElement().style.color = "red";
-		}
-		else if (row.getData().RequestId.includes("warning"))
-		{
-			row.getElement().style.color = "orange";
+			let requestId = data.RequestId;
+
+			if (requestId.includes("error"))
+			{
+				row.getElement().style.color = "red";
+			}
+			else if (requestId.includes("warning"))
+			{
+				row.getElement().style.color = "orange";
+			
+			}
 		}
 	}
 };

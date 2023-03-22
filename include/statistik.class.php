@@ -525,7 +525,7 @@ class statistik extends basis_db
 			foreach($_REQUEST as $name=>$value)
 			{
 				// Inputs, die in eckigen Klammern stehen, werden als Array interpretiert
-				if (substr($value, 0, 1) == '[' && substr($value, -1) == ']')
+				if (is_string($value) && substr($value, 0, 1) == '[' && substr($value, -1) == ']')
 				{
 					//Eckige Klammern entfernen und String aufsplitten
 					$value = substr($value, 1);

@@ -45,10 +45,13 @@ $this->phrasen['testtool/beiDiesemGebietMuessenSieJedeFrageBeantworten']='In thi
 $this->phrasen['testtool/bearbeitungszeit']='Time';
 $this->phrasen['testtool/dieZeitIstAbgelaufen']='The time has run out!<br />Please enable JavaScript in your browser!';
 $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='This question is not intended for you';
+$this->phrasen['testtool/dasGebietIstNichtFuerSieBestimmt']='This section is not intended for you';
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Error in saving the initial view';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='To start this section, please click on <b>Start section</b> in the top left corner.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='No candidate entry available.';
 $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='You have applied for the following degree programs:';
 $this->phrasen['testtool/invalideGebiete']='One or more question areas incorrect!<br>Please inform an assisting person.';
 $this->phrasen['testtool/prueflingGesperrt']='Please contact the placement test supervisor!';
+$this->phrasen['testtool/freischaltcode']='Activation code';
+$this->phrasen['testtool/freischalttext']='You will receive your activation code on the day of the placement test after the introduction in the ZOOM meeting (see guideline) from the supervisor.<br /> We wish you good luck.'
 ?>

@@ -58,7 +58,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
       </RDF:li>
 ';
 }
-$qry = 'SELECT * FROM bis.tbl_zgv ORDER BY zgv_kurzbz';
+$qry = 'SELECT * FROM bis.tbl_zgv ORDER BY zgv_bez';
 $db = new basis_db();
 
 if($db->db_query($qry))
