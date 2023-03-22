@@ -212,7 +212,6 @@ $filterWidgetArray = array(
 		persistentFilter:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",
-	    initialHeaderFilter: [{field:"schreibberechtigt", value: true}], 
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
@@ -243,7 +242,7 @@ $filterWidgetArray = array(
 		dms_id: {visible: false, headerFilter:"input"},
 		schreibberechtigt: {
 			formatter:"tickCross", align:"center", 
-		    headerFilter:"tickCross", headerFilterParams:{"tristate": true, "initial": true}, headerFilterFunc: hf_schreibberechtigt
+		    headerFilter:"tickCross", headerFilterParams:{tristate: true}, headerFilterFunc: hf_schreibberechtigt
 		},
 		studiensemester_kurzbz: {visible: false, headerFilter:"input"},
 		studiengang_kz: {visible: false, headerFilter:"input"},
