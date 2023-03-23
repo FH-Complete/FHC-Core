@@ -4,7 +4,7 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 
 $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);						// alle STG mit Lese- und Schreibberechtigung
-$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'". implode(', ', $oes_schreibberechtigt). "'";		// alle STG nur mit Schreibberechtigung
+$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'". implode('\',\'', $oes_schreibberechtigt). "'";		// alle OE nur mit Schreibberechtigung; singlequote für jeden string notwendig
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
 $query = '
