@@ -10,6 +10,7 @@ require_once('schedulers/ESIScheduler.php');
 class ESIJob extends JQW_Controller
 {
 	const ESI_PREFIX = 'urn:schac:personalUniqueCode:int:esi:at:';
+	const INSERT_VON = 'generateEsiJob';
 
 	/**
 	 * Controller initialization
@@ -19,11 +20,8 @@ class ESIJob extends JQW_Controller
 		parent::__construct();
 
 		// load models
-		$this->load->model('Person_model', 'PersonModel');
-		$this->load->model('Kennzeichen_model', 'KennzeichenModel');
-
-		// load libraries
-		//$this->load->library('extensions/FHC-Core-DVUH/DVUHIssueLib');
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('person/Kennzeichen_model', 'KennzeichenModel');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -39,6 +37,7 @@ class ESIJob extends JQW_Controller
 
 		// Gets the latest jobs
 		$lastJobs = $this->getLastJobs(ESIScheduler::JOB_TYPE_GENERATE_ESI);
+
 		if (isError($lastJobs))
 		{
 			$this->logError(getCode($lastJobs).': '.getError($lastJobs), ESIScheduler::JOB_TYPE_GENERATE_ESI);
@@ -69,7 +68,7 @@ class ESIJob extends JQW_Controller
 
 					if (hasData($activeKennzeichenRes))
 					{
-						$this->logError("Active ESI for person Id $prestudent_id already exists");
+						$this->logError("Active ESI for person Id $person_id already exists");
 						continue;
 					}
 
@@ -91,7 +90,7 @@ class ESIJob extends JQW_Controller
 						continue;
 					}
 
-					$esi = self::ESI_PREFIX.$matrikelnr;
+					$esi = self::ESI_PREFIX.$matr_nr;
 
 					// check if ESI was already used
 					$this->KennzeichenModel->addSelect('1');
@@ -101,27 +100,24 @@ class ESIJob extends JQW_Controller
 
 					if (hasData($existingKennzeichenRes))
 					{
-						$this->logError("ESI $esi for person Id $prestudent_id already exists");
+						$this->logError("ESI $esi for person Id $person_id already exists");
 						continue;
 					}
 
 					// if everything ok, save the esi for the person
-					$saveEsiResult = $this->Kennzeichen_model->insert(
+					$saveEsiResult = $this->KennzeichenModel->insert(
 						array(
 							'person_id' => $person_id,
 							'kennzeichentyp_kurzbz' => ESIScheduler::KENNZEICHENTYP_KURZBZ,
 							'inhalt' => $esi,
-							'aktiv' => true
+							'aktiv' => true,
+							'insertvon' => self::INSERT_VON
 						)
 					);
 
 					if (isError($saveEsiResult))
 					{
 						$this->logError("Error when sending ESI, person Id $person_id ".getError($saveEsiResult));
-					}
-					elseif (hasData($saveEsiResult))
-					{
-						// TODO everything ok
 					}
 				}
 			}
@@ -133,7 +129,7 @@ class ESIJob extends JQW_Controller
 				array(JobsQueueLib::STATUS_DONE, date('Y-m-d H:i:s')) // Job properties new values
 			);
 
-			if (hasData($lastJobs)) $this->updateJobsQueue($jobType, getData($lastJobs));
+			if (hasData($lastJobs)) $this->updateJobsQueue(ESIScheduler::JOB_TYPE_GENERATE_ESI, getData($lastJobs));
 		}
 
 		$this->logInfo(ESIScheduler::JOB_TYPE_GENERATE_ESI.' job stop');
