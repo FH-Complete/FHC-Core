@@ -42,6 +42,7 @@ require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
 require_once('../../../../include/notenschluessel.class.php');
 require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/note.class.php');
 
 
 if (!$db = new basis_db())
@@ -79,6 +80,17 @@ $stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
+//Notenanmerkung für Eintragung von nichtnumerischen Noten wie en (entschuldigt), ue(unentschuldigt)
+$noten_anmerkung = array();
+$noten_arr = array();
+$note_obj = new note();
+$note_obj->getAll();
+foreach($note_obj->result as $row)
+{
+	$noten_anmerkung[$row->anmerkung] = $row->note;
+	$noten_arr[$row->note] = $row;
+}
+
 if(!isset($_GET['typ']))
 {
 	$typ='Termin2';
@@ -96,7 +108,7 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 	$errorMatrnr = '';
 	$errorDatum = '';
 	$errorNachp = '';
-	
+
 	foreach ($_POST as $row => $val)
 	{
 		if(mb_strstr(mb_strtolower($row), 'student_uid_'))
@@ -154,6 +166,11 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 
 			if(isset($_POST['student_uid_'.$id]) && (isset($_POST['note_'.$id]) || isset($_POST['punkte_'.$id])) && isset($_POST['datumNachp_'.$id]))
 			{
+				if(!is_numeric($note))
+				{
+					if(isset($noten_anmerkung[$note]))
+						$note = $noten_anmerkung[$note];
+				}
 				$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note, $punkte);
 			}
 			else
