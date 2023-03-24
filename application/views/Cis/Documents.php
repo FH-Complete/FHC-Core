@@ -1,131 +1,210 @@
 <?php
-$includesArray = array();
+$includesArray = array(
+	'tabulator5' => true,
+	'customJSModules' => ['public/js/apps/Cis/Documents.js']
+);
 
 $this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <div id="content">
 	<div class="fhc-header">
-		<h1><?= $this->p->t('global', 'dokumente'); ?><small><?= $this->p->t('tools', 'bestaetigungenZeugnisse'); ?></small></h1>
-	</div>
-	
-	<div class="row mb-3 justify-content-end">
-		<div class="col-auto">
-			<select class="form-select" onchange="location = this.value">
-				<?php foreach ($stsemArray as $sem) { ?>
-					<option value="<?= site_url('Cis/Documents/Semester/' . $sem); ?>"<?= $sem == $stsem ? ' selected': ''; ?>>
-						<?= $sem; ?>
-					</option>
-				<?php } ?>
-			</select>
-		</div>
+		<h1><?= $this->p->t('tools', 'dokumente'); ?><small><?= $this->p->t('tools', 'bestaetigungenZeugnisse'); ?></small></h1>
 	</div>
 
-	<?php if ($hasSemester) { ?>
-		<div class="card mb-3">
-			<h3 class="card-header h5"><?= $this->p->t('tools', 'inskriptionsbestaetigung'); ?></h3>
-			<ul class="list-group list-group-flush">
-				<?php foreach ($inskriptionsbestaetigungen as $stg => $hasPaid) { ?>
-					<?php if (count($studiengaenge) != 1) { ?>
-						<li class="list-group-item fw-bold">
-							<?= $studiengaenge[$stg]->bezeichnung; ?>
-						</li>
+	<div class="row">
+		<div class="col<?= $selfservice ? '-8' : ''; ?>">
+			<div class="fhc-table mb-3">
+				<div class="fhc-table-header d-flex align-items-center mb-2 gap-2">
+					<h3 class="h5 col m-0"><?= $this->p->t('tools', 'inskriptionsbestaetigung'); ?><?= $studienbuchblatt ? ' & ' . $this->p->t('tools', 'studienbuchblatt') : ''; ?></h3>
+					<?php if (count($stgs) != 1) { ?>
+						<div class="col-auto">
+							<select class="form-select" @input="changeFilter('inscriptiontable', 'Stg', $event)">
+								<option value="">Alle</option>
+								<?php foreach ($stgs as $stg) { ?>
+									<option value="<?= $stg->bezeichnung; ?>">
+										<?= $stg->bezeichnung; ?>
+									</option>
+								<?php } ?>
+							</select>
+						</div>
 					<?php } ?>
-					<?php if ($hasPaid) { ?>
-						<li class="list-group-item">
-							<a class="text-decoration-none" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=' . $stsem . '&uid=' . $uid . '&xsl_stg_kz=' . $stg); ?>">
-								<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $this->p->t('tools', 'inskriptionsbestaetigung') . ' ' . $stsem; ?>
-							</a>
-						</li>
-					<?php } else { ?>
-						<li class="list-group-item list-group-item-danger">
-							<?= $this->p->t('tools', 'studienbeitragFuerSSNochNichtBezahlt', ['stsem' => $stsem]); ?>
-						</li>
-					<?php } ?>
-				<?php } ?>
-			</ul>
-		</div>
-		<?php if ($studienbuchblatt) { ?>
-			<div class="card mb-3">
-				<h3 class="card-header h5"><?= $this->p->t('tools', 'studienbuchblatt'); ?></h3>
-				<ul class="list-group list-group-flush">
-					<?php foreach ($inskriptionsbestaetigungen as $stg => $hasPaid) { ?>
-						<?php if (count($studiengaenge) != 1) { ?>
-							<li class="list-group-item fw-bold">
-								<?= $studiengaenge[$stg]->bezeichnung; ?>
-							</li>
-						<?php } ?>
-						<?php if ($hasPaid) { ?>
-							<li class="list-group-item">
-								<?php /* TODO(chris): studiengang_kz? */ ?>
-								<a class="text-decoration-none" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=' . $stsem . '&uid=' . $uid); ?>">
-									<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $this->p->t('tools', 'studienbuchblatt') . ' ' . $stsem; ?>
-								</a>
-							</li>
-						<?php } else { ?>
-							<li class="list-group-item list-group-item-danger">
-								<?= $this->p->t('tools', 'studienbeitragFuerSSNochNichtBezahlt', ['stsem' => $stsem]); ?>
-							</li>
-						<?php } ?>
-					<?php } ?>
-				</ul>
-			</div>
-		<?php } ?>
-		<?php if ($studienerfolgsbestaetigung) { ?>
-			<div class="card mb-3">
-				<h3 class="card-header h5"><?= $this->p->t('tools', 'studienerfolgsbestaetigung'); ?></h3>
-				<ul class="list-group list-group-flush">
-					<?php foreach ($studiengaenge as $stg => $bezeichnung) { ?>
-						<?php if (count($studiengaenge) != 1) { ?>
-							<li class="list-group-item fw-bold">
-								<?= $bezeichnung; ?>
-							</li>
-						<?php } ?>
-						<?php foreach (['' => '&typ=finanzamt', ' (' . $this->p->t('tools', 'vorlageWohnsitzfinanzamt') . ')' => ''] as $finanz_bez => $finanz_param) { ?>
-							<?php foreach (['de' => [$this->p->t('public', 'deutsch'), 'Studienerfolg'], 'en' => [$this->p->t('public', 'englisch'), 'StudienerfolgEng']] as $lang_kurz => $lang) { ?>
-								<?php foreach ([$stsem => $stsem, $this->p->t('tools', 'alleStudiensemester') => 'alle&all=1'] as $sem_bez => $sem_param) { ?>
-									<li class="list-group-item">
-										<a class="text-decoration-none" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xsl=' . $lang[1] . '&xml=studienerfolg.rdf.php&ss=' . $sem_param . '&uid=' . $uid . $finanz_param); ?>">
-											<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $this->p->t('tools', 'studienerfolgsbestaetigung') . ' ' . $sem_bez . ' ' . $lang[0] . $finanz_bez; ?>
-										</a>
-									</li>
+					<div class="col-auto">
+						<select class="form-select" @input="changeFilter('inscriptiontable', 'Stsem', $event)">
+							<option value="">Alle</option>
+							<?php foreach ($stsemArray as $sem) { ?>
+								<option value="<?= $sem; ?>">
+									<?= $sem; ?>
+								</option>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<table ref="inscriptiontable">
+					<thead>
+						<tr>
+							<th tabulator-formatter="html">Dokument</th>
+							<?php if (count($stgs) != 1) { ?>
+								<th tabulator-field="Stg">Studiengang</th>
+							<?php } ?>
+							<th tabulator-field="Stsem">Studiensemester</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($stgs as $stg) { ?>
+							<?php foreach ($stg->studiensemester as $stsem => $sem) { ?>
+								<?php if (true && $sem->inskriptionsbestaetigung) { ?>
+									<tr>
+										<td>
+												<a class="text-decoration-none" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=' . $stsem . '&uid=' . $uid . '&xsl_stg_kz=' . $stg->studiengang_kz); ?>">
+													<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $this->p->t('tools', 'inskriptionsbestaetigung'); ?>
+												</a>
+										</td>
+										<?php if (count($stgs) != 1) { ?>
+											<td><?= $stg->bezeichnung; ?></td>
+										<?php } ?>
+										<td><?= $stsem; ?></td>
+									</tr>
+									<?php if ($studienbuchblatt) { ?>
+										<tr>
+											<td>
+												<a class="text-decoration-none" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=' . $stsem . '&uid=' . $uid); ?>">
+													<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $this->p->t('tools', 'studienbuchblatt'); ?>
+												</a>
+											</td>
+											<?php if (count($stgs) != 1) { ?>
+												<td><?= $stg->bezeichnung; ?></td>
+											<?php } ?>
+											<td><?= $stsem; ?></td>
+										</tr>
+									<?php } ?>
 								<?php } ?>
 							<?php } ?>
 						<?php } ?>
-					<?php } ?>
-				</ul>
+					</tbody>
+				</table>
+			</div>
+			<?php if ($studienerfolgsbestaetigung) { ?>
+				<div class="fhc-table mb-3">
+					<div class="fhc-table-header d-flex align-items-center mb-2 gap-2">
+						<h3 class="h5 col m-0"><?= $this->p->t('tools', 'studienerfolgsbestaetigung'); ?></h3>
+						<?php if (count($stgs) != 1) { ?>
+							<div class="col-auto">
+								<select class="form-select" @input="changeFilter('studienerfolgsbestaetigungtable', 'Stg', $event)">
+									<option value="">Alle</option>
+									<?php foreach ($stgs as $stg) { ?>
+										<option value="<?= $stg->bezeichnung; ?>">
+											<?= $stg->bezeichnung; ?>
+										</option>
+									<?php } ?>
+								</select>
+							</div>
+						<?php } ?>
+						<div class="col-auto">
+							<select class="form-select" @input="changeFilter('studienerfolgsbestaetigungtable', 'Stsem', $event)">
+								<option value="">Alle</option>
+								<option value="<?= $this->p->t('tools', 'alleStudiensemester'); ?>"><?= $this->p->t('tools', 'alleStudiensemester'); ?></option>
+								<?php foreach ($stsemArray as $sem) { ?>
+									<option value="<?= $sem; ?>">
+										<?= $sem; ?>
+									</option>
+								<?php } ?>
+							</select>
+						</div>
+						<div class="col-auto">
+							<select class="form-select" @input="changeFilter('studienerfolgsbestaetigungtable', 'Lang', $event)">
+								<option value="">Alle</option>
+								<option value="<?= $this->p->t('global', 'deutsch'); ?>"><?= $this->p->t('global', 'deutsch'); ?></option>
+								<option value="<?= $this->p->t('global', 'englisch'); ?>"><?= $this->p->t('global', 'englisch'); ?></option>
+							</select>
+						</div>
+					</div>
+					<table ref="studienerfolgsbestaetigungtable">
+						<thead>
+							<tr>
+								<th tabulator-formatter="html">Dokument</th>
+								<?php if (count($stgs) != 1) { ?>
+									<th tabulator-field="Stg">Studiengang</th>
+								<?php } ?>
+								<th tabulator-field="Stsem">Studiensemester</th>
+								<th tabulator-field="Lang">Sprache</th>
+								<th tabulator-field="Finance" tabulator-formatter="tickCross"><?= $this->p->t('tools', 'vorlageWohnsitzfinanzamt'); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach (['Studienerfolg' => $this->p->t('global', 'deutsch'), 'StudienerfolgEng' => $this->p->t('global', 'englisch')] as $lang_xsl => $lang) { ?>
+								<?php foreach ([true, false] as $finance) { ?>
+									<?php foreach ($stgs as $stg) { ?>
+										<tr>
+											<td>
+												<a class="text-decoration-none" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xsl=' . $lang_xsl . '&xml=studienerfolg.rdf.php&ss=alle&all=1&uid=' . $uid . ($finance ? '&typ=finanzamt' : '')); ?>">
+													<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $this->p->t('tools', 'studienerfolgsbestaetigung'); ?>
+												</a>
+											</td>
+											<?php if (count($stgs) != 1) { ?>
+												<td><?= $stg->bezeichnung; ?></td>
+											<?php } ?>
+											<td><?= $this->p->t('tools', 'alleStudiensemester'); ?></td>
+											<td><?= $lang; ?></td>
+											<td><?= $finance; ?></td>
+										</tr>
+										<?php foreach ($stg->studiensemester as $stsem => $sem) { ?>
+											<tr>
+												<td>
+													<a class="text-decoration-none" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xsl=' . $lang_xsl . '&xml=studienerfolg.rdf.php&ss=' . $stsem . '&uid=' . $uid . ($finance ? '&typ=finanzamt' : '')); ?>">
+														<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $this->p->t('tools', 'studienerfolgsbestaetigung'); ?>
+													</a>
+												</td>
+												<?php if (count($stgs) != 1) { ?>
+													<td><?= $stg->bezeichnung; ?></td>
+												<?php } ?>
+												<td><?= $stsem; ?></td>
+												<td><?= $lang; ?></td>
+												<td><?= $finance; ?></td>
+											</tr>
+										<?php } ?>
+									<?php } ?>
+								<?php } ?>
+							<?php } ?>
+						</tbody>
+					</table>
+				</div>
+			<?php } ?>
+			<?php if ($selfservice !== null) { ?>
+				<div class="fhc-table mb-3">
+					<div class="fhc-table-header d-flex align-items-center mb-2 gap-2">
+						<h3 class="h5 col m-0"><?= $this->p->t('tools', 'abschlussdokumente'); ?></h3>
+					</div>
+					<table ref="abschlussdokumentetable">
+						<thead>
+							<tr>
+								<th tabulator-formatter="html">Dokument</th>
+								<th tabulator-field="Date">Datum</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ($selfservice as $row) { ?>
+								<tr>
+									<td>
+										<a class="text-decoration-none" target="_blank" href="<?= site_url('Cis/Documents/download/' . $row->akte_id . ($row->person_id != getAuthPersonId() ? '/' . $uid : '')); ?>">
+										<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $row->bezeichnung; ?>
+									</a>
+									<td><?= (new DateTime($row->erstelltam))->format('d.m.Y'); ?></td>
+								</tr>
+							<?php } ?>
+						</tbody>
+					</table>
+				</div>
+			<?php } ?>
+		</div>
+		<?php if ($selfservice) { ?>
+			<div class="col-4">
+				<div class="alert alert-warning" role="alert">
+					<?= $this->p->t('tools', 'warnungDruckDigitaleSignatur'); ?>
+				</div>
 			</div>
 		<?php } ?>
-	<?php } else { ?>
-		<div class="alert alert-danger" role="alert">
-			<?= $this->p->t('tools', 'keinStatusImStudiensemester', ['stsem' => $stsem]); ?>
-		</div>
-	<?php } ?>
-
-	<?php if ($selfservice !== null) { ?>
-		<div class="card mb-3">
-			<h3 class="card-header h5"><?= $this->p->t('tools', 'abschlussdokumente'); ?></h3>
-			<ul class="list-group list-group-flush">
-				<?php if (count($selfservice)) { ?>
-					<li class="list-group-item list-group-item-warning">
-						<?= $this->p->t('tools', 'warnungDruckDigitaleSignatur'); ?>
-					</li>
-					<?php foreach ($selfservice as $row) { ?>
-						<li class="list-group-item">
-							<a class="text-decoration-none" target="_blank" href="<?= base_url('dokumente.php?action=download&id='.$row->akte_id.'&uid='.$uid); ?>">
-								<?php /* TODO(chris): datum & link */ ?>
-								<img class="align-baseline" src="<?= base_url('skin/images/pdfpic.gif'); ?>" alt="PDF"> <?= $row->bezeichnung; ?>
-							</a>
-						</li>
-					<?php } ?>
-				<?php } else { ?>
-					<li class="list-group-item list-group-item-danger">
-						<?= $this->p->t('tools', 'nochKeineAbschlussdokumenteVorhanden'); ?>
-					</li>
-				<?php } ?>
-			</ul>
-		</div>
-	<?php } ?>
+	</div>
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>
