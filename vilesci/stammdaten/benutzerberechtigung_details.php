@@ -259,6 +259,70 @@ if(isset($_POST['uebertragen']) && $_POST['uebertragen_nach'] != '')
 	}
 }
 
+if(isset($_POST['setDate_multi']) && $_POST['setDate_multi'] != '')
+{
+	if(!$rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
+		die($rechte->errormsg);
+
+	if (isset($_POST['dataset']))
+	{
+		$i = 0;
+		foreach ($_POST['dataset'] AS $benutzerberechtigung_id => $value)
+		{
+			// Nur markierte Einträge bearbeiten
+			if (!isset($value['check']))
+			{
+				continue;
+			}
+
+			$ber = new benutzerberechtigung();
+			if(!$ber->load($benutzerberechtigung_id))
+			{
+				die('Fehler beim Laden der Berechtigung');
+			}
+
+			$ber->ende = date('Y-m-d',strtotime("-1 days"));
+			$ber->updateamum = date('Y-m-d H:i:s');
+			$ber->updatevon = $user;
+
+			if(!$ber->save())
+			{
+				$errorstr .= "Das Ende-Datum des Datensatzes mit der ID ".$benutzerberechtigung_id." konnte nicht gespeichert werden!".$ber->errormsg;
+			}
+			else
+			{
+				$i ++;
+				//Log schreiben
+				$log = new log();
+
+				$logdata = var_export((array) $ber, true);
+				$log->new = true;
+				$log->sql = $logdata;
+				$log->sqlundo = 'Kein Undo vorhanden';
+				$log->executetime = date('Y-m-d H:i:s');
+				$log->mitarbeiter_uid = $user;
+				$log->beschreibung = 'Berechtigung für '.$uid.' beendet';
+
+				if(!$log->save())
+				{
+					$errorstr .= "<span style='color: red'><b>Fehler beim schreiben des Log-Eintrags</b></span><br>";
+				}
+			}
+		}
+		if ($errorstr == '')
+		{
+			$successstr .= "<span style='color: green'><b>Ende-Datum bei ".$i." Rechten erfolgreich beendet</b></span><br>";
+		}
+	}
+
+
+
+	//$reloadstr .= "<script type='text/javascript'>";
+	//$reloadstr .= "	parent.uebersicht.location.href='benutzerberechtigung_uebersicht.php';";
+	//$reloadstr .= "</script>";
+
+}
+
 if(isset($_POST['schick']))
 {
 	if($rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
@@ -418,9 +482,10 @@ if (!$b = new berechtigung())
 $b->getRollen();
 foreach($b->result as $berechtigung)
 {
-	$rolle_arr[] = $berechtigung->rolle_kurzbz;
+	$rolle_arr[$berechtigung->rolle_kurzbz] = $berechtigung->beschreibung;
 }
-sort($rolle_arr);
+ksort($rolle_arr, SORT_STRING | SORT_FLAG_CASE);
+
 $b->getBerechtigungen();
 foreach($b->result as $berechtigung)
 {
@@ -592,10 +657,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	//Rolle
 	$htmlstr .= "		<td><select name='dataset[0][rolle_kurzbz]' id='rolle_kurzbz_neu'>";
 	$htmlstr .= "			<option value=''>&nbsp;</option>";
-	for ($i = 0; $i < sizeof($rolle_arr); $i++)
+	foreach ($rolle_arr AS $key => $value)
 	{
-		$sel = "";
-		$htmlstr .= "				<option value='".$rolle_arr[$i]."' ".$sel.">".$rolle_arr[$i]."</option>";
+		$htmlstr .= "				<option value='".$key."'
+											title='".$value."'>".$key."</option>";
 	}
 	$htmlstr .= "		</select></td>";
 
@@ -683,8 +748,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "<tr>
 					<th style='width: 30px'><a href='#' data-toggle='checkboxes' data-action='toggle' id='toggle_t1'><img src='../../skin/images/checkbox_toggle.png' name='toggle'></a>
 							<a href='#' data-toggle='checkboxes' data-action='uncheck' id='uncheck_t1'><img src='../../skin/images/checkbox_uncheck.png' name='toggle'></a></th>
-					<th>Rolle</th>
-					<th>Berechtigung</th>
+					<th style='width: 100px'>Rolle</th>
+					<th style='width: 100px'>Berechtigung</th>
 					<th style='width: 30px'>Art</th>
 					<th class='oe_column'>Organisationseinheit</th>
 					<th class='ks_column'>Kostenstelle</th>
@@ -742,22 +807,32 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 		//Rolle
 		$htmlstr .= "		<td style='padding: 1px; white-space: nowrap'>";
-		$htmlstr .= "			<select class='rolle_select' name='dataset[$b->benutzerberechtigung_id][rolle_kurzbz]'>";
+		$htmlstr .= "			<select class='rolle_select' 
+										name='dataset[$b->benutzerberechtigung_id][rolle_kurzbz]' 
+										title='".(isset($rolle_arr[$b->rolle_kurzbz])?$rolle_arr[$b->rolle_kurzbz]:"")."'
+										data-toggle='tooltip' 
+										data-html='true' 
+										data-placement='auto'>";
 		$htmlstr .= "		<option value='' name=''>&nbsp;</option>";
-		for ($i = 0; $i < sizeof($rolle_arr); $i++)
+		foreach ($rolle_arr AS $key => $value)
 		{
-			if ($b->rolle_kurzbz == $rolle_arr[$i])
+			if ($b->rolle_kurzbz == $key)
 			{
-				$sel = " selected";
+				$sel = " selected='selected'";
 			}
 			else
 				$sel = "";
-			$htmlstr .= "<option value='".$rolle_arr[$i]."' id='".$rolle_arr[$i]."' ".$sel.">".$rolle_arr[$i]."</option>";
+			$htmlstr .= "<option value='".$key."' 
+									id='".$key."' 
+									".$sel."
+									title='".$value."'>".$key."</option>";
 		}
 		$htmlstr .= "		</select>";
 		if ($b->rolle_kurzbz != '')
 		{
-			$htmlstr .= "	<a href='berechtigungrolle.php?rolle_kurzbz=".$b->rolle_kurzbz."' target='_blank' style='color: unset'><span class='glyphicon glyphicon-eye-open'></span></a>";
+			$htmlstr .= "	<a href='berechtigungrolle.php?rolle_kurzbz=".$b->rolle_kurzbz."' 
+								target='_blank' 
+								style='color: unset'><span class='glyphicon glyphicon-eye-open'></span></a>";
 		}
 		$htmlstr.="</td>";
 
@@ -827,13 +902,13 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</td>";
 
 		//Gültig ab
-		$htmlstr .= "		<td style='white-space: nowrap'>";
+		$htmlstr .= "		<td style='white-space: nowrap; width: 9rem'>";
 		$htmlstr .= "			<span style='display: none'>".$b->start."</span>";
 		$htmlstr .= "		    <input class='datepicker_datum' type='text' name='dataset[$b->benutzerberechtigung_id][start]' value='".$b->start."' size='10' maxlength='10'>";
 		$htmlstr .= "		</td>";
 
 		// Gültig bis
-		$htmlstr .= "		<td style='white-space: nowrap'>";
+		$htmlstr .= "		<td style='white-space: nowrap; width: 9rem'>";
 		$htmlstr .= "			<span style='display: none'>".$b->ende."</span>";
 		$htmlstr .= "		    <input class='datepicker_datum' type='text' name='dataset[$b->benutzerberechtigung_id][ende]' value='".$b->ende."' size='10' maxlength='10'>";
 		$htmlstr .= "		</td>";
@@ -842,7 +917,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		<td>";
 		$htmlstr .= "			<input 
 									type='text' 
-									name='dataset[$b->benutzerberechtigung_id][anmerkung]' 
+									name='dataset[$b->benutzerberechtigung_id][anmerkung]'
+									class='input_anmerkung' 
 									value='".$b->anmerkung."' 
 									title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung))."' 
 									data-toggle='tooltip' 
@@ -856,36 +932,54 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'>
 								<span 
 									class='glyphicon glyphicon-info-sign' 
-									title='Angelegt von ".$b->insertvon." am ".$b->insertamum." Zuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'
+									title='Angelegt von ".$b->insertvon." am ".$b->insertamum."<br>Zuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'
 									data-toggle='tooltip' 
 									data-html='true' 
-									data-placement='auto' 
-									data-original-title='Foo'>
+									data-placement='auto'>
 							</span></td>";
 
-		$htmlstr .= "		<td style='white-space: nowrap'>";
-		$htmlstr .= "			<button type='submit' name='copy' value='$b->benutzerberechtigung_id' id='copy_$b->benutzerberechtigung_id' style='margin-right: 5px; border:none'><span class='glyphicon glyphicon-duplicate'></span></button>";
-		$htmlstr .= "			<button type='submit' name='delete' value='$b->benutzerberechtigung_id' id='delete_$b->benutzerberechtigung_id' style='border:none'><span class='glyphicon glyphicon-remove'></span></button>";
+		$htmlstr .= "		<td style='white-space: nowrap; width: 5rem'>";
+		$htmlstr .= "			<button type='submit' 
+										name='copy' 
+										value='$b->benutzerberechtigung_id' 
+										id='copy_$b->benutzerberechtigung_id' 
+										style='margin-right: 5px; border:none'
+										title='Duplizieren'
+										data-toggle='tooltip' 
+										data-html='true' 
+										data-placement='auto'><span class='glyphicon glyphicon-duplicate'></span></button>";
+		$htmlstr .= "			<button type='submit' 
+										name='delete' 
+										value='$b->benutzerberechtigung_id' 
+										id='delete_$b->benutzerberechtigung_id' 
+										style='border:none'
+										title='Löschen'
+										data-toggle='tooltip' 
+										data-html='true' 
+										data-placement='auto'><span class='glyphicon glyphicon-remove'></span></button>";
 		$htmlstr .= "		</td>";
 		$htmlstr .= "	</tr>";
 	}
 	$htmlstr .= "</tbody></table>";
 	$htmlstr .= '<div id="bottomArea" >
 					<div class="input-group">
-						<button type="submit" class="btn btn-success" name="schick" onclick="return validateSpeichern()" style="margin-bottom: 10px">Speichern</button>
-						<div class="input-group" style="width: 180px; margin-bottom: 10px">
-							<input type="text" id="input_uebertragen_nach" name="uebertragen_nach" class="form-control benutzer_autocomplete" placeholder="Zu UID übertragen">
-							<div class="input-group-btn">
-								<button class="btn btn-default" type="submit" id="button_uebertragen" name="uebertragen" onclick="return validateUebertragen()">
-									<i class="glyphicon glyphicon-transfer" style="line-height: unset"></i>
-								</button>
+						<button type="submit" class="btn btn-default" name="schick" onclick="return validateSpeichern()" style="margin-bottom: 10px">Speichern</button>
+						<div class="form-inline" style="">
+							<div class="input-group" style="width: 180px;">
+								<input type="text" id="input_uebertragen_nach" name="uebertragen_nach" class="form-control benutzer_autocomplete" placeholder="Zu UID übertragen">
+								<div class="input-group-btn">
+									<button class="btn btn-default" type="submit" id="button_uebertragen" name="uebertragen" onclick="return validateUebertragen()">
+										<i class="glyphicon glyphicon-transfer" style="line-height: unset"></i>
+									</button>
+								</div>
 							</div>
+							<button type="submit" id="button_mehrfachbeenden" name="setDate_multi" value="setDate_multi" class="btn btn-default" onclick="return validateBeenden()">Ende setzen</button>
+							<button type="submit" id="button_mehrfachloeschen" name="delete_multi" value="delete_multi" class="btn btn-warning" onclick="return validateDeleteMulti()">Markierte löschen</button>
 						</div>
-						<button type="submit" id="button_mehrfachloeschen" name="delete_multi" value="delete_multi" class="btn btn-warning" onclick="return validateDeleteMulti()">Markierte löschen</button>
 					</div>
 				</div>';
 	$htmlstr .= "</form>";
-
+	$htmlstr .= "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>";
 }
 
 ?>
@@ -910,7 +1004,203 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	?>
 <!--	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>-->
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<!--	<script type="text/javascript" src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js"></script>-->
+	<script type="text/javascript">
+		////////////////////////
+		/* Checkboxes Script manuell eingefügt und bearbeitet, damit die Range-Funktion auch in mehrspaltigem Layout funktioniert. */
+		////////////////////////
+		'use strict';
+
+		(function ($) {
+
+			/**
+			 * Create a new checkbox context.
+			 *
+			 * @param {Object} context DOM context.
+			 */
+			var Checkboxes = function (context) {
+				this.$context = context;
+			};
+
+			/**
+			 * Check all checkboxes in context.
+			 */
+			Checkboxes.prototype.check = function () {
+				this.$context.find(':checkbox')
+					.filter(':not(:disabled)')
+					.filter(':visible')
+					.prop('checked', true);
+			};
+
+			/**
+			 * Uncheck all checkboxes in context.
+			 */
+			Checkboxes.prototype.uncheck = function () {
+				this.$context.find(':checkbox:visible')
+					.filter(':not(:disabled)')
+					.prop('checked', false);
+			};
+
+			/**
+			 * Toggle the state of all checkboxes in context.
+			 */
+			Checkboxes.prototype.toggle = function () {
+				this.$context.find(':checkbox:visible')
+					.filter(':not(:disabled)')
+					.each(function () {
+						var $checkbox = $(this);
+						$checkbox.prop('checked', !$checkbox.is(':checked'));
+					});
+			};
+
+			/**
+			 * Set the maximum number of checkboxes that can be checked.
+			 *
+			 * @param {Number} max The maximum number of checkbox allowed to be checked.
+			 */
+			Checkboxes.prototype.max = function (max) {
+				if (max > 0) {
+					// Enable max.
+					var instance = this;
+					this.$context.on('click.checkboxes.max', ':checkbox', function () {
+						if (instance.$context.find(':checked').length === max) {
+							instance.$context.find(':checkbox:not(:checked)').prop('disabled', true);
+						} else {
+							instance.$context.find(':checkbox:not(:checked)').prop('disabled', false);
+						}
+					});
+				} else {
+					// Disable max.
+					this.$context.off('click.checkboxes.max');
+				}
+			};
+
+			/**
+			 * Enable or disable range selection.
+			 *
+			 * @param {Boolean} enable Indicate is range selection has to be enabled.
+			 */
+			Checkboxes.prototype.range = function (enable, selector) {
+									if (enable) {
+										var instance = this;
+
+										if (!selector) selector = ':checkbox'
+
+										this.$context.on('click.checkboxes.range', selector, function (event) {
+											var $checkbox = $(event.target);
+
+											if (event.shiftKey && instance.$last) {
+												var $checkboxes = instance.$context.find(selector + ':visible');
+												var from = $checkboxes.index(instance.$last);
+												var to = $checkboxes.index($checkbox);
+												var start = Math.min(from, to);
+												var end = Math.max(from, to) + 1;
+
+												$checkboxes.slice(start, end)
+													.filter(':not(:disabled)')
+													.prop('checked', $checkbox.prop('checked'));
+											}
+											instance.$last = $checkbox;
+										});
+									} else {
+										this.$context.off('click.checkboxes.range');
+									}
+								};
+
+			///////////////////////////////
+			/* Checkboxes jQuery plugin. */
+			///////////////////////////////
+
+			// Keep old Checkboxes jQuery plugin, if any, to no override it.
+			var old = $.fn.checkboxes;
+
+			/**
+			 * Checkboxes jQuery plugin.
+			 *
+			 * @param {String} method Method to invoke.
+			 *
+			 * @return {Object} jQuery object.
+			 */
+			$.fn.checkboxes = function (method) {
+				// Get extra arguments as method arguments.
+				var methodArgs = Array.prototype.slice.call(arguments, 1);
+
+				return this.each(function () {
+					var $this = $(this);
+
+					// Check if we already have an instance.
+					var instance = $this.data('checkboxes');
+					if (!instance) {
+						$this.data('checkboxes', (instance = new Checkboxes($this, typeof method === 'object' && method)));
+					}
+
+					// Check if we need to invoke a public method.
+					if (typeof method === 'string' && instance[method]) {
+						instance[method].apply(instance, methodArgs);
+					}
+				});
+			};
+
+			// Store a constructor reference.
+			$.fn.checkboxes.Constructor = Checkboxes;
+
+
+			////////////////////////////////////
+			/* Checkboxes jQuery no conflict. */
+			////////////////////////////////////
+
+			/**
+			 * No conflictive Checkboxes jQuery plugin.
+			 */
+			$.fn.checkboxes.noConflict = function () {
+				$.fn.checkboxes = old;
+				return this;
+			};
+
+
+			//////////////////////////
+			/* Checkboxes data-api. */
+			//////////////////////////
+
+			/**
+			 * Handle data-api click.
+			 *
+			 * @param {Object} event Click event.
+			 */
+			var dataApiClickHandler = function (event) {
+				var el = $(event.target);
+				var href = el.attr('href');
+				var $context = $(el.data('context') || (href && href.replace(/.*(?=#[^\s]+$)/, '')));
+				var action = el.data('action');
+
+				if ($context && action) {
+					if (!el.is(':checkbox')) {
+						event.preventDefault();
+					}
+					$context.checkboxes(action);
+				}
+			};
+
+			/**
+			 * Handle data-api DOM ready.
+			 */
+			var dataApiDomReadyHandler = function () {
+				$('[data-toggle^=checkboxes]').each(function () {
+					var el = $(this),
+						actions = el.data();
+					delete actions.toggle;
+					for (var action in actions) {
+						el.checkboxes(action, actions[action]);
+					}
+				});
+			};
+
+			// Register data-api listeners.
+			$(document).on('click.checkboxes.data-api', '[data-toggle^=checkboxes]', dataApiClickHandler);
+			$(document).on('ready.checkboxes.data-api', dataApiDomReadyHandler);
+
+		})(window.jQuery);
+
+	</script>
 	<style type="text/css">
 
 	<?php if(1==2): ?>
@@ -927,18 +1217,19 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		{
             border: 1px solid gray;
 		}
-		input, select
+		#t1 tbody input, #t1 tbody select
 		{
 			margin: 0 4px;
-			background-color: white;
+			background-color: #E9E9ED !important;
+			/*border: none;*/
 		}
-		input[type=submit]
+		#t1 tbody input[type=submit]
 		{
 			padding: 1px 4px;
 		}
-		input[type=submit]:hover
+		#t1 tbody input[type=submit]:hover
 		{
-			background-color: #f3f3f3;
+			background-color: #E9E9ED;
 		}
 		.berechtigung_autocomplete
 		{
@@ -946,7 +1237,15 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		}
 		.oe_kurzbz_autocomplete
 		{
-			width: 250px;
+			width: 95%;
+		}
+		.kostenstelle_autocomplete
+		{
+			width: 95%;
+		}
+		.input_anmerkung
+		{
+			width: 95%;
 		}
 		th
 		{
@@ -956,11 +1255,11 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		}
 		#bottomArea
 		{
-			width: 250px;
+			/*width: 250px;*/
 			/*border-top-left-radius: 10px;*/
 			/*border-top-right-radius: 10px;*/
 			text-align: center;
-			position: sticky;
+			position: fixed;
 			bottom: 0px;
 			right: 0px;
 			padding: 10px;
@@ -1028,7 +1327,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				{
 					sortList: [[0,0],[1,0],[2,0],[4,0]],
 					widgets: ["filter"],
-					headers: {6:{sorter:false, filter:false},10:{sorter:false, filter:false},11:{sorter:false, filter:false}},
+					headers: {0:{sorter:false},6:{sorter:false, filter:false},10:{sorter:false, filter:false},11:{sorter:false, filter:false}},
 					widgetOptions : {	filter_functions : {
 							// Add select menu to this column
 							0 : {
@@ -1155,15 +1454,23 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				e.preventDefault();
 			});
 
+			$("#t1").checkboxes("range", true, ".auswahlcheckboxen :checkbox");
+
 			var aktiv = $('td.auswahlcheckboxen[data-gruen]').length + $('td.auswahlcheckboxen[data-gelb]').length;
 			var inaktiv = $('td.auswahlcheckboxen[data-rot]').length;
 
 			$("#anzahl").html(aktiv + inaktiv + " Einträge (" + aktiv + " Aktive, " + inaktiv + " Inaktive)");
 
-			/*$('input.auswahlcheckbox').each(function ()
+			/*$('.checkbox').each(function ()
 			{
 				$("#t1").checkboxes('range', true);
 			});*/
+
+			$("#uncheck_t1").on('click', function(e) {
+							$(".auswahlcheckboxen").checkboxes('uncheck');
+							e.preventDefault();
+						});
+
 			//if (typeof $("#filterTableDataset").checkboxes === 'function')
 			//	$("#filterTableDataset").checkboxes("range", true);
 			//$("input.auswahlcheckbox").checkboxes('range', true); //Wählt ALLE Checkboxen. Funktioniert nicht mit anderem selector
@@ -1186,6 +1493,17 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			else if($('#input_uebertragen_nach').val() == '')
 			{
 				alert('Bitte eine UID angeben');
+				return false;
+			}
+			else
+				return true;
+		}
+
+		function validateBeenden()
+		{
+			if($('input.auswahlcheckbox:checked').length == 0)
+			{
+				alert('Bitte mindestens eine Berechtigung auswählen');
 				return false;
 			}
 			else
