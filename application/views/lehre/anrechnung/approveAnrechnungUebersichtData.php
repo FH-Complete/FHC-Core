@@ -120,14 +120,15 @@ if ($configFachbereichsleitung === TRUE)
                     FROM (
                         SELECT DISTINCT ON (benutzer.uid) bf.uid, vorname, nachname
                         FROM lehre.tbl_lehreinheit
-					JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
-					JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
-					JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)		
+						JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+						JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
+						JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)		
                         JOIN public.tbl_benutzer benutzer ON bf.uid = benutzer.uid
                         JOIN public.tbl_person USING (person_id)
                         WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
 						and bf.datum_von <= now()
 						and (bf.datum_bis >= now() or bf.datum_bis is null)
+						AND bf.funktion_kurzbz = \'Leitung\'
                         AND lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id
                         AND benutzer.aktiv = TRUE
                         AND tbl_person.aktiv = TRUE
