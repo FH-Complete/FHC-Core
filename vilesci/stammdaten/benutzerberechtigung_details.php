@@ -65,7 +65,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if (!$db = new basis_db())
-	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
+	die('Fehler beim öffnen der Datenbankverbindung');
 
 if(!$rechte->isBerechtigt('basis/berechtigung'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
@@ -554,14 +554,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			}
 		}
 		$htmlstr .= '	<div id="msgbox" '.$class.'>'.$message.'</div>';
-		//$htmlstr .= "<p class='inserterror'>".$errorstr."</p><p class='insertok'>".$successstr."</p>";
 
-		//Formular zum Kopieren von Berechtigungen
-		//$htmlstr .= "<form action='benutzerberechtigung_details.php?uid=".$uid."' method='POST' name='berechtigung_kopieren'>";
-		//$htmlstr .= "Berechtigungen (aktive) kopieren von UID <input id='uid_von' name='uid_von' type='text'>";
-		//$htmlstr .= "<input type='submit' name='kopieren' value='Kopieren' onclick=\"if (document.getElementById('uid_von').value == '')  {alert('UID darf nicht leer sein'); return false}\">";
-		//$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>";
-		//$htmlstr .= "</form>";
 		$i = 0;
 
 		// Zusätzlich jede Funktion mit einer gültigen Berechtigung anzeigen
@@ -604,6 +597,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			{
 				$htmlstr .= '</a></p>';
 			}
+		}
+		if (count($bn) > 0)
+		{
+			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Detailliste Rechte</a></p>";
 		}
 	}
 	elseif(isset($_REQUEST['funktion_kurzbz']) && $_REQUEST['funktion_kurzbz']!='')
@@ -784,29 +781,32 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		if ($b->ende!='' && strtotime($b->ende) < $heute)
 		{
 			$titel="ccc";
-			$style = 'style="border-left: 10px solid tomato; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
+			$style = 'style="border-left: 10px solid tomato; border-right: 10px solid transparent; text-align: center; vertical-align: middle; background-color: #d0d7e0;"';
+			$inaktiv_style = 'style="background-color: #d0d7e0;"';
 			$data = 'rot';
 		}
 		elseif ($b->start!='' && strtotime($b->start) > $heute)
 		{
 			$titel="bbb";
 			$style = 'style="border-left: 10px solid gold; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
+			$inaktiv_style = '';
 			$data = 'gelb';
 		}
 		else
 		{
 			$titel="aaa";
 			$style = 'style="border-left: 10px solid LightGreen; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
+			$inaktiv_style = '';
 			$data = 'gruen';
 		}
 		// Auswahlcheckbox
-		$htmlstr .= "		<td $style class='auswahlcheckboxen' name='td_$b->benutzerberechtigung_id' data-".$data."='".$data."'>";
+		$htmlstr .= "		<td $style $inaktiv_style class='auswahlcheckboxen' name='td_$b->benutzerberechtigung_id' data-".$data."='".$data."'>";
 		$htmlstr .= "			<span style='display: none'>".$titel."</span>";
 		$htmlstr .= "			<input type='checkbox' class='auswahlcheckbox' name='dataset[$b->benutzerberechtigung_id][check]'>";
 		$htmlstr .= "		</td>";
 
 		//Rolle
-		$htmlstr .= "		<td style='padding: 1px; white-space: nowrap'>";
+		$htmlstr .= "		<td $inaktiv_style style='padding: 1px; white-space: nowrap'>";
 		$htmlstr .= "			<select class='rolle_select' 
 										name='dataset[$b->benutzerberechtigung_id][rolle_kurzbz]' 
 										title='".(isset($rolle_arr[$b->rolle_kurzbz])?$rolle_arr[$b->rolle_kurzbz]:"")."'
@@ -832,12 +832,12 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		{
 			$htmlstr .= "	<a href='berechtigungrolle.php?rolle_kurzbz=".$b->rolle_kurzbz."' 
 								target='_blank' 
-								style='color: unset'><span class='glyphicon glyphicon-eye-open'></span></a>";
+								style='color: unset'><span class='glyphicon glyphicon-share'></span></a>";
 		}
 		$htmlstr.="</td>";
 
 		//Berechtigung
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>";
+		$htmlstr .= "		<td $inaktiv_style name='td_$b->benutzerberechtigung_id'>";
 		$htmlstr .= "			<span style='display: none'>".$b->berechtigung_kurzbz."</span>";
 		$htmlstr .= "			<input type='text' 
 										class='berechtigung_autocomplete' 
@@ -850,7 +850,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</td>";
 
 		//Art
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>";
+		$htmlstr .= "		<td $inaktiv_style name='td_$b->benutzerberechtigung_id'>";
 		$htmlstr .= "			<span style='display: none'>".$b->art."</span>";
 		$htmlstr .= "			<input type='text' class='suid_input' name='dataset[$b->benutzerberechtigung_id][art]' value='".$b->art."' size='4' maxlength='4' style='text-transform: lowercase;'>";
 		$htmlstr .= "		</td>";
@@ -858,11 +858,11 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		//Organisationseinheit
 		if($funktion_kurzbz != '')
 		{
-			$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'>OE aus MA-Funktion</td>";
+			$htmlstr .= "		<td $inaktiv_style class='oe_column' name='td_$b->benutzerberechtigung_id'>OE aus MA-Funktion</td>";
 		}
 		else
 		{
-			$htmlstr .= "		<td class='oe_column'>";
+			$htmlstr .= "		<td $inaktiv_style class='oe_column'>";
 			$htmlstr .= "			<span style='display: none'>".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz] : '')."</span>";
 			$htmlstr .= "			<input type='hidden' name='dataset[$b->benutzerberechtigung_id][oe_kurzbz]' value='$b->oe_kurzbz'>";
 			$htmlstr .= "			<input type='text' class='oe_kurzbz_autocomplete' value='".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz] : '')."'>";
@@ -870,7 +870,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		}
 
 		//Kostenstelle
-		$htmlstr .= "		<td class='ks_column'>";
+		$htmlstr .= "		<td $inaktiv_style class='ks_column'>";
 		$htmlstr .= "			<span style='display: none'>".$b->kostenstelle_id."</span>";
 		$htmlstr .= "			<input type='hidden' name='dataset[$b->benutzerberechtigung_id][kostenstelle_id]' value='$b->kostenstelle_id'>";
 		$htmlstr .= "			<input type='text' class='kostenstelle_autocomplete' value='".($b->kostenstelle_id != '' ? $kst_arr[$b->kostenstelle_id] : '')."'>";
@@ -897,24 +897,24 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</select></td>";*/
 
 		//Negativ-Checkbox
-		$htmlstr .= "		<td align='center'>";
+		$htmlstr .= "		<td $inaktiv_style align='center'>";
 		$htmlstr .= "		    <input type='checkbox' name='dataset[$b->benutzerberechtigung_id][negativ]' ".($b->negativ?'checked="checked"':'').">";
 		$htmlstr .= "		</td>";
 
 		//Gültig ab
-		$htmlstr .= "		<td style='white-space: nowrap; width: 9rem'>";
+		$htmlstr .= "		<td $inaktiv_style style='white-space: nowrap; width: 9rem'>";
 		$htmlstr .= "			<span style='display: none'>".$b->start."</span>";
 		$htmlstr .= "		    <input class='datepicker_datum' type='text' name='dataset[$b->benutzerberechtigung_id][start]' value='".$b->start."' size='10' maxlength='10'>";
 		$htmlstr .= "		</td>";
 
 		// Gültig bis
-		$htmlstr .= "		<td style='white-space: nowrap; width: 9rem'>";
+		$htmlstr .= "		<td $inaktiv_style style='white-space: nowrap; width: 9rem'>";
 		$htmlstr .= "			<span style='display: none'>".$b->ende."</span>";
 		$htmlstr .= "		    <input class='datepicker_datum' type='text' name='dataset[$b->benutzerberechtigung_id][ende]' value='".$b->ende."' size='10' maxlength='10'>";
 		$htmlstr .= "		</td>";
 
 		//Anmerkung
-		$htmlstr .= "		<td>";
+		$htmlstr .= "		<td $inaktiv_style>";
 		$htmlstr .= "			<input 
 									type='text' 
 									name='dataset[$b->benutzerberechtigung_id][anmerkung]'
@@ -929,7 +929,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</td>";
 
 		//Info
-		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'>
+		$htmlstr .= "		<td $inaktiv_style align='center' name='td_$b->benutzerberechtigung_id'>
 								<span 
 									class='glyphicon glyphicon-info-sign' 
 									title='Angelegt von ".$b->insertvon." am ".$b->insertamum."<br>Zuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'
@@ -938,7 +938,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 									data-placement='auto'>
 							</span></td>";
 
-		$htmlstr .= "		<td style='white-space: nowrap; width: 5rem'>";
+		$htmlstr .= "		<td $inaktiv_style style='white-space: nowrap; width: 5rem'>";
 		$htmlstr .= "			<button type='submit' 
 										name='copy' 
 										value='$b->benutzerberechtigung_id' 
@@ -1293,6 +1293,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			background: black;
 			color: white;
 			border: 4px solid black;
+		}
+		td button
+        {
+			background-color: transparent;
 		}
 	</style>
 	<script type="text/javascript">
