@@ -269,7 +269,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		if($this->config->item('fbl') === TRUE)
         {
-            $result = $this->LehrveranstaltungModel->getFachbereichByLv($result->lehrveranstaltung_id); 
+            $result = $this->LehrveranstaltungModel->getLeitungOfLvOe($result->lehrveranstaltung_id);
         }
 		else
         {
@@ -304,7 +304,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		if($this->config->item('fbl') === TRUE)
         {
-			$result = $this->LehrveranstaltungModel->getFachbereichByLv($result->lehrveranstaltung_id);
+			$result = $this->LehrveranstaltungModel->getLeitungOfLvOe($result->lehrveranstaltung_id);
         }
 		else
         {

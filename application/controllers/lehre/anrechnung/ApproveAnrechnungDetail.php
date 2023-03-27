@@ -231,7 +231,7 @@ class approveAnrechnungDetail extends Auth_Controller
         // Get Fachbereichsleitung or LV Leitung.
         if($this->config->item('fbl') === TRUE)
         {
-            $result = $this->anrechnunglib->getFachbereichleitung($anrechnung_id);
+            $result = $this->anrechnunglib->getLeitungOfLvOe($anrechnung_id);
         }
         else
         {
@@ -487,7 +487,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		 * **/
         if ($this->config->item('fbl') === TRUE)
         {
-            $receiver_arr = $this->_getFachbereichleitung($lehrveranstaltung_id);
+            $receiver_arr = $this->_getLeitungOfLvOe($lehrveranstaltung_id);
         }
         else
         {
@@ -578,12 +578,12 @@ class approveAnrechnungDetail extends Auth_Controller
 
 	}
 
-    // Get Fachbereichsleitungen
-    private function _getFachbereichleitung($lehrveranstaltung_id)
+    // Get Leitungen of Lehrveranstaltungs-Organisationseinheit
+    private function _getLeitungOfLvOe($lehrveranstaltung_id)
     {
-        $result = $this->LehrveranstaltungModel->getFachbereichByLv($lehrveranstaltung_id);
+        $result = $this->LehrveranstaltungModel->getLeitungOfLvOe($lehrveranstaltung_id);
 
-        return hasData($result) ? getData($result) : show_error('Failed retrieving Fachbereichsleitung');
+        return hasData($result) ? getData($result) : show_error('Failed retrieving Leitung of Lehrveranstaltungs-Organisationseinheit');
     }
 
 	private function _saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id)

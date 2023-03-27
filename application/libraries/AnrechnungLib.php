@@ -289,10 +289,10 @@ class AnrechnungLib
 		{
 			$empfehlung_data->empfehlungsanfrageAm = (new DateTime($result->retval[0]->insertamum))->format('d.m.Y');
 
-            // Get users who received request for recommendation (Fachbereichsleitung / Lektor)
+            // Get users who received request for recommendation
             if($this->ci->config->item('fbl') === TRUE)
             {
-                $res = $this->getFachbereichleitung($anrechnung_id);
+                $res = $this->getLeitungOfLvOe($anrechnung_id);
             }
             else
             {
@@ -843,37 +843,37 @@ class AnrechnungLib
 	}
 
     /**
-     * Get Fachbereichsleitung.
+     * Get Leitung of Lehrveranstaltungs-Organisationseinheit.
      *
      * @param $anrechnung_id
      * @return false|mixed|null
      */
-    public function getFachbereichleitung($anrechnung_id)
+    public function getLeitungOfLvOe($anrechnung_id)
     {
         $this->ci->AnrechnungModel->addSelect('lehrveranstaltung_id');
         $result = $this->ci->AnrechnungModel->load($anrechnung_id);
 
         $lehrveranstaltung_id = getData($result)[0]->lehrveranstaltung_id;
 
-        // Get FBLs
-        $result = $this->ci->LehrveranstaltungModel->getFachbereichByLv($lehrveranstaltung_id);
+        // Get Leitungen
+        $result = $this->ci->LehrveranstaltungModel->getLeitungOfLvOe($lehrveranstaltung_id);
 
         if (!hasData($result))
         {
             return false;
         }
 
-        $fbl_arr = getData($result);
+        $oeLeitung_arr = getData($result);
 
-        foreach ($fbl_arr as $fbl)
+        foreach ($oeLeitung_arr as $oeLeitung)
         {
-            $fbl->fullname = $fbl->vorname. ' '. $fbl->nachname;
+            $oeLeitung->fullname = $oeLeitung->vorname. ' '. $oeLeitung->nachname;
         }
 
-        // Now make the fbl array unique
-        $fbl_arr = array_unique($fbl_arr, SORT_REGULAR);
+        // Now make the array unique
+        $oeLeitung_arr = array_unique($oeLeitung_arr, SORT_REGULAR);
 
-        return $fbl_arr;
+        return $oeLeitung_arr;
     }
 
 	// Return an object with Anrechnungdata

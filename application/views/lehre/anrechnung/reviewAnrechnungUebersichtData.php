@@ -69,39 +69,26 @@ $this->load->config('anrechnung');
 if ($this->config->item('fbl') === TRUE)
 {
     $query.= '
-        SELECT DISTINCT /*ON (anrechnungen.*, bf.uid)*/ 
-            CASE 
-            -- erst prüfen, ob es überhaupt eine LV Leitung gibt (wenn nicht, dann immer empfehlungsberechtigt)
-            WHEN EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE) 
-            -- wenn ja, return true, wenn user LV Leitung ist oder false, wenn nicht
-            THEN (SELECT EXISTS (SELECT 1 FROM tbl_lvleitungen WHERE lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id AND lvleiter = TRUE AND uid = \'' . $LEKTOR_UID . '\'))
-            -- wenn es keine LV Leitung, return immer true
-            ELSE TRUE
-        END AS empfehlungsberechtigt,
-        anrechnungen.*,
-        anrechnungstatus.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '] AS "status_bezeichnung"
+        SELECT 
+        -- immer empfehlungsberechtigt, da hier nur Leitungen der LV-OE eine Empfehlungsanfrage erhalten
+        TRUE AS empfehlungsberechtigt, 
+        anrechnungen.*
         FROM anrechnungen
-        JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
-        JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
-        /*JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)*/
         JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
-        JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
-        JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)	
-            WHERE anrechnungen.studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
-            AND le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
-        /*AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'*/
-            AND le.lehre = TRUE
-        AND bf.funktion_kurzbz = \'Leitung\'
+        JOIN public.tbl_organisationseinheit og using (oe_kurzbz)      -- OE der LV
+        JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)
+         -- Aktive Leitung der LV-OE	
+        WHERE bf.funktion_kurzbz = \'Leitung\'
         and bf.datum_von <= now()
         and (bf.datum_bis >= now() or bf.datum_bis is null)
-        AND og.organisationseinheittyp_kurzbz = \'Fachbereich\'	
         AND bf.uid =  \'' . $LEKTOR_UID . '\'
-            AND EXISTS (
-                SELECT 1
-                FROM lehre.tbl_anrechnung_anrechnungstatus
-                WHERE anrechnung_id = anrechnungen.anrechnung_id
-                AND status_kurzbz=\'inProgressLektor\'
-            )
+        -- check, dass es für diese Anrechnung eine Empfehlungsanfrage gibt
+        AND EXISTS (
+            SELECT 1
+            FROM lehre.tbl_anrechnung_anrechnungstatus
+            WHERE anrechnung_id = anrechnungen.anrechnung_id
+            AND status_kurzbz=\'inProgressLektor\'
+        ) 
         order by empfehlung_anrechnung NULLS FIRST, antragsdatum
     ';
 }

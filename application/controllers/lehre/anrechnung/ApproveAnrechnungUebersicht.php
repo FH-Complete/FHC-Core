@@ -227,7 +227,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
                 // Get full name of Fachbereichsleitung or LV Leitung.
                 if($this->config->item('fbl') === TRUE)
                 {
-                    $result = $this->anrechnunglib->getFachbereichleitung($item['anrechnung_id']);
+                    $result = $this->anrechnunglib->getLeitungOfLvOe($item['anrechnung_id']);
                 }
                 else
                 {
@@ -370,7 +370,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
          **/
         if($this->config->item('fbl') === TRUE)
         {
-            $receiver_arr = $this->_getFachbereichleitung($anrechnung_arr);
+            $receiver_arr = $this->_getLeitungOfLvOe($anrechnung_arr);
         }
         else
         {
@@ -467,32 +467,32 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	}
 
     /**
-     * Get Fachbereichsleitung with unique uids.
+     * Get Leitungen of Lehrveranstaltungs-Organisationseinheit with unique uids.
      *
      * @param $anrechnung_arr
      * @return array
      */
-    private function _getFachbereichleitung($anrechnung_arr)
+    private function _getLeitungOfLvOe($anrechnung_arr)
     {
-        $fbl_arr = array();
+        $oeLeitung_arr = array();
 
-        // Get lectors
+        // Get Leitungen
         foreach($anrechnung_arr as $anrechnung)
         {
             $this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-            $result = $this->LehrveranstaltungModel->getFachbereichByLv($anrechnung['lehrveranstaltung_id']);
+            $result = $this->LehrveranstaltungModel->getLeitungOfLvOe($anrechnung['lehrveranstaltung_id']);
 
             if (!hasData($result))
             {
-                show_error('No Fachbereichsleitung found');
+                show_error('No Leitung found');
             }
 
-            $fbl_arr = array_merge($fbl_arr, getData($result));
+            $oeLeitung_arr = array_merge($oeLeitung_arr, getData($result));
         }
 
-        // Make Fachbereichsleiter array unique
-        $fbl_arr = array_unique($fbl_arr, SORT_REGULAR);
+        // Make array unique
+        $oeLeitung_arr = array_unique($oeLeitung_arr, SORT_REGULAR);
 
-        return $fbl_arr;
+        return $oeLeitung_arr;
     }
 }

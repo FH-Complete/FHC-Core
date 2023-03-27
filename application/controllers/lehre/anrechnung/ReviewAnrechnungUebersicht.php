@@ -75,7 +75,8 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 		}
 
 		$viewData = array(
-			'studiensemester_selected' => $studiensemester_kurzbz
+			'studiensemester_selected' => $studiensemester_kurzbz,
+            'configFachbereichsleitung' => $this->config->item('fbl')
 		);
 
 		$this->load->view('lehre/anrechnung/reviewAnrechnungUebersicht.php', $viewData);
@@ -228,7 +229,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 
         if ($this->config->item('fbl') === TRUE)
         {
-            $result = $this->LehrveranstaltungModel->getFachbereichByLv($result->lehrveranstaltung_id);
+            $result = $this->LehrveranstaltungModel->getLeitungOfLvOe($result->lehrveranstaltung_id);
         }
         else
         {
