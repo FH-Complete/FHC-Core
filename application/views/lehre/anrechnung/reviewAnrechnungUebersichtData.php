@@ -1,7 +1,7 @@
 <?php
 $STUDIENSEMESTER = $studiensemester_selected;
 $LEKTOR_UID = getAuthUID();
-$LANGUAGE_INDEX = getUserLanguage() == 'German' ? '0' : '1';
+$LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
 $query = '
 	WITH anrechnungen AS
