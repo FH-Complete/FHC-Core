@@ -109,8 +109,7 @@ $query = '
                     LIMIT 1)
             END "empfehlungsanfrageAm",';
 
-$this->load->config('anrechnung');
-if ($this->config->item('fbl') === TRUE)
+if ($configFachbereichsleitung === TRUE)
 {
 	$query.= ' CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL

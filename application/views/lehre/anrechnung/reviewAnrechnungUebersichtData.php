@@ -65,8 +65,7 @@ $query = '
         ORDER BY lehrveranstaltung_id, benutzer.uid, lehrfunktion_kurzbz DESC
     )';
 
-$this->load->config('anrechnung');
-if ($this->config->item('fbl') === TRUE)
+if ($configFachbereichsleitung === TRUE)
 {
     $query.= '
         SELECT 

@@ -106,7 +106,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
             'studiengaenge_entitled' => $studiengang_kz_arr,                // alle STG mit Lese- und Schreibberechtigung
             'oes_schreibberechtigt' => $oe_kurzbz_arr_schreibberechtigt,    // alle STG nur mit Schreibberechtigung
             'hasReadOnlyAccess' => $hasReadOnlyAccess,
-            'hasCreateAnrechnungAccess' => $hasCreateAnrechnungAccess
+            'hasCreateAnrechnungAccess' => $hasCreateAnrechnungAccess,
+            'configFachbereichsleitung' => $this->config->item('fbl')
 		);
 
 		$this->load->view('lehre/anrechnung/approveAnrechnungUebersicht.php', $viewData);
