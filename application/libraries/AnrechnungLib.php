@@ -771,6 +771,10 @@ class AnrechnungLib
      */
     public function isEmpfehlungsberechtigt($anrechnung_id)
     {
+        if($this->ci->config->item('fbl') === TRUE)
+        {
+            return true;
+        }
         // Get lv-leitungen or, if not present, all lectors of lv.
         $lector_arr = $this->getLectors($anrechnung_id);
 
