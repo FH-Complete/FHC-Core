@@ -6,7 +6,7 @@ $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 $query = '
 	WITH anrechnungen AS
 	(
-		SELECT DISTINCT
+		SELECT DISTINCT ON (anrechnung_id)
 			anrechnung.anrechnung_id,
 			anrechnung.lehrveranstaltung_id,
 			anrechnung.begruendung_id,
@@ -37,7 +37,8 @@ $query = '
 			WHERE anrechnung_id = anrechnung.anrechnung_id
 			ORDER BY insertamum DESC
 			LIMIT 1
-			) AS status_kurzbz
+			) AS status_kurzbz,
+           anrechnungstatus.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '] AS "status_bezeichnung"
 		FROM lehre.tbl_anrechnung AS anrechnung
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_person AS person USING (person_id)
@@ -46,8 +47,12 @@ $query = '
 		LEFT JOIN campus.tbl_dms_version AS dmsversion USING (dms_id)
 		JOIN lehre.tbl_anrechnung_anrechnungstatus USING (anrechnung_id)
 		JOIN lehre.tbl_anrechnung_begruendung AS begruendung USING (begruendung_id)
+        JOIN lehre.tbl_anrechnungstatus as anrechnungstatus USING (status_kurzbz)
 		WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+		-- Order to distinct on last anrechnungstatus
+		ORDER BY anrechnung.anrechnung_id, lehre.tbl_anrechnung_anrechnungstatus.insertamum DESC
 	),
+	-- Allen Lektoren einer LV und flag, welche LV-Leitung innehaben
 	tbl_lvleitungen AS 
     (
         SELECT DISTINCT ON (benutzer.uid, lehrveranstaltung_id) lehrveranstaltung_id, uid, 
@@ -55,10 +60,10 @@ $query = '
             ELSE FALSE 
             END AS lvleiter
         FROM lehre.tbl_lehreinheit
+        JOIN anrechnungen USING (lehrveranstaltung_id)  -- LVs auf Anrechnungen beschränken
         JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
         JOIN public.tbl_benutzer benutzer ON lema.mitarbeiter_uid = benutzer.uid
         JOIN public.tbl_person USING (person_id)
-        JOIN lehre.tbl_anrechnung USING (lehrveranstaltung_id)
         WHERE tbl_lehreinheit.studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
         AND benutzer.aktiv = TRUE
         AND tbl_person.aktiv = TRUE
@@ -103,15 +108,14 @@ else
             -- wenn es keine LV Leitung, return immer true
             ELSE TRUE
         END AS empfehlungsberechtigt,
-        anrechnungen.*,
-        anrechnungstatus.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '] AS "status_bezeichnung"
+        anrechnungen.*
         FROM anrechnungen
-        JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
         JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
         JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
         WHERE le.studiensemester_kurzbz = anrechnungen.studiensemester_kurzbz
         AND lema.mitarbeiter_uid = \'' . $LEKTOR_UID . '\'
         AND le.lehre = TRUE
+        -- check, dass es für diese Anrechnung eine Empfehlungsanfrage gibt
         AND EXISTS (
             SELECT 1
             FROM lehre.tbl_anrechnung_anrechnungstatus

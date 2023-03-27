@@ -133,7 +133,7 @@ if ($configFachbereichsleitung === TRUE)
                         AND benutzer.aktiv = TRUE
                         AND tbl_person.aktiv = TRUE
                         ORDER BY benutzer.uid, nachname, vorname
-                        ) as tmp_lvlektoren
+                        ) as tmp_empfehlungsanfrageEmpfaenger
                     )
             END "empfehlungsanfrageAn"';
 }
@@ -159,7 +159,7 @@ else
                         AND benutzer.aktiv = TRUE
                         AND tbl_person.aktiv = TRUE
                         ORDER BY benutzer.uid, lvleiter DESC, nachname, vorname
-                        ) as tmp_lvlektoren
+                        ) as tmp_empfehlungsanfrageEmpfaenger
                     )
             END "empfehlungsanfrageAn"';
 }
