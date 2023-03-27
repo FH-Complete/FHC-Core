@@ -27,6 +27,7 @@ require_once('dbupdate_3.4/example.php');
 require_once('dbupdate_3.4/example2.php');
 ...
 */
+require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
