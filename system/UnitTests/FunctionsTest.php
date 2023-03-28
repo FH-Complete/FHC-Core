@@ -18,10 +18,13 @@
  * Authors: Werner Masik <werner@gefi.at>,
  */
 
+use PHPUnit\Framework\TestCase;
+
+
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 
-class FunctionsTest extends PHPUnit_Framework_TestCase
+class FunctionsTest extends TestCase
 {
 	
     public function setUp()

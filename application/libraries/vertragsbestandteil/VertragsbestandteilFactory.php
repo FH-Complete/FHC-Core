@@ -23,9 +23,9 @@ class VertragsbestandteilFactory
 	const VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG = 'zeitaufzeichnung';
 	const VERTRAGSBESTANDTEIL_LEHRE = 'lehre';
 	
-	public static function getVertragsbestandteil($data) 
+	public static function getVertragsbestandteil($data)
 	{
-		$vertragsbestandteiltyp_kurzbz = isset($data->vertragsbestandteiltyp_kurzbz) 
+		$vertragsbestandteiltyp_kurzbz = isset($data->vertragsbestandteiltyp_kurzbz)
 			? $data->vertragsbestandteiltyp_kurzbz : false;
 		if( false === $vertragsbestandteiltyp_kurzbz )
 		{
@@ -51,6 +51,36 @@ class VertragsbestandteilFactory
 				$vertragsbestandteil->hydrateByStdClass($data);
 				break;
 
+			case self::VERTRAGSBESTANDTEIL_KUENDIGUNGSFRIST:
+				$vertragsbestandteil = new VertragsbestandteilKuendigungsfrist();
+				$vertragsbestandteil->hydrateByStdClass($data);
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_FREITEXT:
+				$vertragsbestandteil = new VertragsbestandteilFreitext();
+				$vertragsbestandteil->hydrateByStdClass($data);
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG:
+				$vertragsbestandteil = new VertragsbestandteilZeitaufzeichnung();
+				$vertragsbestandteil->hydrateByStdClass($data);
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_BEFRISTUNG:
+				$vertragsbestandteil = new VertragsbestandteilBefristung();
+				$vertragsbestandteil->hydrateByStdClass($data);
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_KARENZ:
+				$vertragsbestandteil = new VertragsbestandteilKarenz();
+				$vertragsbestandteil->hydrateByStdClass($data);
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_URLAUBSANSPRUCH:
+				$vertragsbestandteil = new VertragsbestandteilUrlaubsanspruch();
+				$vertragsbestandteil->hydrateByStdClass($data);
+				break;
+
 			default:
 				throw new Exception('Unknown vertragsbestandteiltyp_kurzbz ' 
 					. $vertragsbestandteiltyp_kurzbz);			
@@ -59,7 +89,7 @@ class VertragsbestandteilFactory
 		return $vertragsbestandteil;
 	}
 	
-	public static function getVertragsbestandteilDBModel($vertragsbestandteil_kurzbz)
+	public static function getVertragsbestandteilDBModel($vertragsbestandteil_kurzbz): \DB_model
 	{
 		$CI = get_instance();
 		
@@ -73,19 +103,49 @@ class VertragsbestandteilFactory
 				break;
 
 			case self::VERTRAGSBESTANDTEIL_FUNKTION:
-				$CI->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model', 
+				$CI->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model',
 					'VertragsbestandteilFunktion_model');
 				$vertragsbestandteildbmodel = $CI->VertragsbestandteilFunktion_model;
 				break;
 
 			case self::VERTRAGSBESTANDTEIL_GEHALT:
-					$CI->load->model('vertragsbestandteil/VertragsbestandteilGehalt_model', 
-						'VertragsbestandteilGehalt_model');
-					$vertragsbestandteildbmodel = $CI->VertragsbestandteilGehalt_model;
+					$CI->load->model('vertragsbestandteil/Gehaltsbestandteil_model',
+						'Gehaltsbestandteil_model');
+					$vertragsbestandteildbmodel = $CI->Gehaltsbestandteil_model;
 					break;
-			
+
+			case self::VERTRAGSBESTANDTEIL_FREITEXT:
+				$CI->load->model('vertragsbestandteil/VertragsbestandteilFreitext_model',
+					'VertragsbestandteilFreitext_model');
+				$vertragsbestandteildbmodel = $CI->VertragsbestandteilFreitext_model;
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_KUENDIGUNGSFRIST:
+				$CI->load->model('vertragsbestandteil/VertragsbestandteilKuendigungsfrist_model',
+					'VertragsbestandteilKuendigungsfrist_model');
+				$vertragsbestandteildbmodel = $CI->VertragsbestandteilKuendigungsfrist_model;
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_KARENZ:
+				$CI->load->model('vertragsbestandteil/VertragsbestandteilKarenz_model',
+					'VertragsbestandteilKarenz_model');
+				$vertragsbestandteildbmodel = $CI->VertragsbestandteilKarenz_model;
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG:
+				$CI->load->model('vertragsbestandteil/VertragsbestandteilZeitaufzeichnung_model',
+					'VertragsbestandteilZeitaufzeichnung_model');
+				$vertragsbestandteildbmodel = $CI->VertragsbestandteilZeitaufzeichnung_model;
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_URLAUBSANSPRUCH:
+				$CI->load->model('vertragsbestandteil/VertragsbestandteilUrlaubsanspruch_model',
+					'VertragsbestandteilUrlaubsanspruch_model');
+				$vertragsbestandteildbmodel = $CI->VertragsbestandteilUrlaubsanspruch_model;
+				break;
+
 			default:
-				throw new Exception('Unknown vertragsbestandteil_kurzbz ' 
+				throw new Exception('Unknown vertragsbestandteil_kurzbz '
 					. $vertragsbestandteil_kurzbz);
 		}
 		

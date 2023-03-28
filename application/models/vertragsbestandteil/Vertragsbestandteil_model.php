@@ -53,7 +53,7 @@ class Vertragsbestandteil_model extends DB_Model
 EOSQL;
 
 		// echo $sql . "\n\n";
-		$query = $this->db->query($sql);
+		$query = $this->db->query($sql);   // TODO add decryption
 
 		$vertragsbestandteile = array();
 		foreach( $query->result() as $row ) {
@@ -68,5 +68,49 @@ EOSQL;
 		}
 
 		return $vertragsbestandteile;
+	}
+
+
+	public function getVertragsbestandteil($id)
+	{	
+
+		$sql = <<<EOSQL
+			SELECT
+				v.*, 
+				
+				s.wochenstunden, s.karenz, 
+				
+				f.benutzerfunktion_id, f.anmerkung, f. kuendigungsrelevant,
+				
+				g.von as gehalt_von, g.bis as gehalt_bis, g.dienstverhaeltnis_id as gehalt_dienstverhaeltnis_id, g.grundbetrag,
+				g.betrag_valorisiert,g.valorisieren,gehaltstyp_kurzbz,valorisierungssperre
+			FROM
+				hr.tbl_vertragsbestandteil v
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_funktion f USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_gehaltsbestandteil g USING(vertragsbestandteil_id)
+			WHERE
+				v.vertragsbestandteil_id = {$this->escape($id)}
+			;
+EOSQL;
+
+		// echo $sql . "\n\n";
+		$query = $this->db->query($sql);
+
+		$vertragsbestandteil = array();
+		try
+		{
+			$vertragsbestandteile = VertragsbestandteilFactory::getVertragsbestandteil($row);  // TODO add decryption
+		}
+		catch (Exception $ex)
+		{
+			echo $ex->getMessage() . "\n";
+		}
+
+		return $vertragsbestandteil;
+		
 	}
 }

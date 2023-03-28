@@ -1,8 +1,8 @@
 <?php
 
+require_once __DIR__ . '/IEncryption.php';
 
-
-class Gehaltsbestandteil_model extends DB_Model
+class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 {
 
     public function __construct()
@@ -10,14 +10,15 @@ class Gehaltsbestandteil_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_gehaltsbestandteil';
 		$this->pk = 'gehaltsbestandteil_id';
-        $encryptionkey_filename = APPPATH.'config/extensions/FHC-Core-Personalverwaltung/keys.config.inc.php';
-        require($encryptionkey_filename);
 	}
+
+    public function getEncryptedColumns(): array
+    {
+        return ['grundbetrag' => 'ENCRYPTIONKEY', 'betrag_valorisiert' => 'ENCRYPTIONKEY'];
+    }
 
     public function getCurrentGBTByDV($dienstverhaeltnis_id)
     {
-        $result = null;
-
 		$qry = "
         SELECT
             gehaltsbestandteil_id,
@@ -28,8 +29,8 @@ class Gehaltsbestandteil_model extends DB_Model
             gehaltstyp_kurzbz,
             valorisierungssperre,
             valorisieren,
-            pgp_sym_decrypt(grundbetrag,?) grundbetrag,
-            pgp_sym_decrypt(betrag_valorisiert,?) betrag_valorisiert,
+            grundbetrag,
+            betrag_valorisiert,
             gt.bezeichnung as gehaltstyp_bezeichnung
         FROM hr.tbl_gehaltsbestandteil gbt JOIN hr.tbl_gehaltstyp gt using(gehaltstyp_kurzbz)
         WHERE gbt.dienstverhaeltnis_id=? AND
@@ -37,7 +38,7 @@ class Gehaltsbestandteil_model extends DB_Model
         ORDER BY gt.sort
         ";
 
-        return $this->execQuery($qry, array(ENCRYPTIONKEY, ENCRYPTIONKEY, $dienstverhaeltnis_id));
+        return $this->execQuery($qry, array($dienstverhaeltnis_id), $this->getEncryptedColumns());
 
     }
 

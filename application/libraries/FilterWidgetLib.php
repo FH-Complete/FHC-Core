@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
@@ -16,6 +33,7 @@ class FilterWidgetLib
 	const SESSION_SELECTED_FIELDS = 'selectedFields';
 	const SESSION_COLUMNS_ALIASES = 'columnsAliases';
 	const SESSION_ADDITIONAL_COLUMNS = 'additionalColumns';
+	const SESSION_ENCRYPTED_COLUMNS = 'encryptedColumns';
 	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_FILTERS = 'filters';
 	const SESSION_METADATA = 'datasetMetadata';
@@ -56,6 +74,7 @@ class FilterWidgetLib
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
 	const CHECKBOXES = 'checkboxes';
 	const COLUMNS_ALIASES = 'columnsAliases';
+	const ENCRYPTED_COLUMNS = 'encryptedColumns';
 
 	// ...to format/mark records of a dataset
 	const FORMAT_ROW = 'formatRow';
@@ -367,7 +386,7 @@ class FilterWidgetLib
 	/**
 	 * Retrieves the dataset from the DB
 	 */
-	public function getDataset($datasetQuery)
+	public function getDataset($datasetQuery, $encryptedColumns)
 	{
 		$dataset = null;
 
@@ -376,7 +395,7 @@ class FilterWidgetLib
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
 
 			// Execute the given SQL statement suppressing error messages
-			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
+			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery, null, $encryptedColumns);
 		}
 
 		return $dataset;

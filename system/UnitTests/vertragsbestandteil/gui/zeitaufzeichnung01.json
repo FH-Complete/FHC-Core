@@ -1,0 +1,264 @@
+{
+    "type": "formdata",
+    "children": [
+      {
+        "type": "tabs",
+        "guioptions": {},
+        "children": [
+          {
+            "type": "tab",
+            "guioptions": {
+              "title": "Allgemein",
+              "id": "allgemein"
+            },
+            "children": [
+              {
+                "type": "dv",
+                "guioptions": {},
+                "children": []
+              },
+              {
+                "type": "vertragsbestandteillist",
+                "guioptions": {
+                  "title": "Kündigungsfrist",
+                  "vertragsbestandteiltyp": "vertragsbestandteilkuendigungsfrist"
+                },
+                "children": []
+              },
+              {
+                "type": "vertragsbestandteillist",
+                "guioptions": {
+                  "title": "Befristung",
+                  "vertragsbestandteiltyp": "vertragsbestandteilfreitext",
+                  "childdefaults": {
+                    "guioptions": {
+                      "canhavegehaltsbestandteile": false,
+                      "disabled": [
+                        "freitexttyp"
+                      ],
+                      "hidden": [
+                        "titel",
+                        "freitext"
+                      ]
+                    },
+                    "data": {
+                      "freitexttyp": "befristung",
+                      "titel": "Befristung",
+                      "freitext": "befristeter Dienstvertrag"
+                    }
+                  }
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "type": "tab",
+            "guioptions": {
+              "title": "Arbeitszeit & Basisgehalt",
+              "id": "arbeitszeit"
+            },
+            "children": [
+              {
+                "type": "vertragsbestandteillist",
+                "guioptions": {
+                  "title": "Arbeitszeit",
+                  "vertragsbestandteiltyp": "vertragsbestandteilstunden",
+                  "errors": [
+                    "test1",
+                    "test2"
+                  ],
+                  "infos": []
+                },
+                "children": [
+                  "439336ad-05ee-4b2a-9a0c-df7dc1c7245e"
+                ]
+              },
+              {
+                "type": "vertragsbestandteillist",
+                "guioptions": {
+                  "title": "Zeitaufzeichnung",
+                  "vertragsbestandteiltyp": "vertragsbestandteilzeitaufzeichnung",
+                  "errors": [],
+                  "infos": []
+                },
+                "children": [
+                  "7625d25d-8fd9-476b-94a6-4fbb72c147d4"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tab",
+            "guioptions": {
+              "title": "Funktionen",
+              "id": "funktionen"
+            },
+            "children": [
+              {
+                "type": "vertragsbestandteillist",
+                "guioptions": {
+                  "title": "Funktion",
+                  "vertragsbestandteiltyp": "vertragsbestandteilfunktion",
+                  "errors": [],
+                  "infos": []
+                },
+                "children": [
+                  "81c92565-82fe-40ec-ad35-454c3218fb3b"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tab",
+            "guioptions": {
+              "title": "Zusatzvereinbarungen",
+              "id": "zusatzvereinbarungen"
+            },
+            "children": [
+              {
+                "type": "vertragsbestandteillist",
+                "guioptions": {
+                  "title": "Zusatzvereinbarungen",
+                  "vertragsbestandteiltyp": "vertragsbestandteilfreitext"
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "type": "tab",
+            "guioptions": {
+              "title": "Sonstiges",
+              "id": "sonstiges"
+            },
+            "children": [
+              {
+                "type": "vertragsbestandteillist",
+                "guioptions": {
+                  "title": "Kündigungsfrist",
+                  "vertragsbestandteiltyp": "vertragsbestandteilkuendigungsfrist",
+                  "errors": [],
+                  "infos": []
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "data": {
+      "dienstverhaeltnisid": null,
+      "unternehmen": "",
+      "vertragsart_kurzbz": "",
+      "gueltigkeit": {
+        "guioptions": {
+          "sharedstatemode": "set"
+        },
+        "data": {
+          "gueltig_ab": "",
+          "gueltig_bis": ""
+        }
+      }
+    },
+    "vbs": {
+      "439336ad-05ee-4b2a-9a0c-df7dc1c7245e": {
+        "type": "vertragsbestandteilstunden",
+        "guioptions": {
+          "id": "439336ad-05ee-4b2a-9a0c-df7dc1c7245e",
+          "infos": [
+            "test info 1",
+            "test info 2"
+          ],
+          "errors": [
+            "test error 1",
+            "test error 2"
+          ]
+        },
+        "data": {
+          "stunden": "38,5",
+          "gueltigkeit": {
+            "guioptions": {
+              "sharedstatemode": "reflect"
+            },
+            "data": {
+              "gueltig_ab": "",
+              "gueltig_bis": ""
+            }
+          }
+        },
+        "gbs": [
+          {
+            "type": "gehaltsbestandteil",
+            "guioptions": {
+              "infos": [
+                "test info 1",
+                "test info 2"
+              ],
+              "errors": [
+                "test error 1",
+                "test error 2"
+              ]
+            },
+            "data": {
+              "gehaltstyp": "",
+              "betrag": "",
+              "gueltigkeit": {
+                "guioptions": {
+                  "sharedstatemode": "reflect"
+                },
+                "data": {
+                  "gueltig_ab": "",
+                  "gueltig_bis": ""
+                }
+              },
+              "valorisierung": true
+            }
+          }
+        ]
+      },
+      "81c92565-82fe-40ec-ad35-454c3218fb3b": {
+        "type": "vertragsbestandteilfunktion",
+        "guioptions": {
+          "id": "81c92565-82fe-40ec-ad35-454c3218fb3b"
+        },
+        "data": {
+          "funktion": "Leitung",
+          "orget": "",
+          "gueltigkeit": {
+            "guioptions": {
+              "sharedstatemode": "reflect"
+            },
+            "data": {
+              "gueltig_ab": "",
+              "gueltig_bis": ""
+            }
+          }
+        },
+        "gbs": []
+      },
+      "7625d25d-8fd9-476b-94a6-4fbb72c147d4": {
+        "type": "vertragsbestandteilzeitaufzeichnung",
+        "guioptions": {
+          "id": "7625d25d-8fd9-476b-94a6-4fbb72c147d4",
+          "removeable": true
+        },
+        "data": {
+          "zeitaufzeichnung": true,
+          "azgrelevant": "",
+          "homeoffice": true,
+          "gueltigkeit": {
+            "guioptions": {
+              "sharedstatemode": "reflect"
+            },
+            "data": {
+              "gueltig_ab": "",
+              "gueltig_bis": ""
+            }
+          }
+        }
+      }
+    }
+  }
+      
