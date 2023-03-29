@@ -28,6 +28,8 @@ require_once('dbupdate_3.4/example2.php');
 ...
 */
 
+require_once('dbupdate_3.4/feature_18732_Neue_Zeitsperre_Mutterschutz.php');
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
