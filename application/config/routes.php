@@ -50,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples: my-controller/index -> my_controller/index
 |   my-controller/my-method -> my_controller/my_method
 */
-$route['default_controller'] = 'Vilesci';
+$route['default_controller'] = defined('CIS4') && CIS4 ? 'Cis4' : 'Vilesci';
 $route['translate_uri_dashes'] = FALSE;
 
 // Class name conflicts

@@ -1,5 +1,6 @@
 <?php
 $includesArray = array(
+	'title' => 'Documents',
 	'tabulator5' => true,
 	'customJSModules' => ['public/js/apps/Cis/Documents.js']
 );

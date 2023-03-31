@@ -58,6 +58,7 @@
 // Loads FHC config files
 require_once 'config/global.config.inc.php';
 require_once 'config/cis.config.inc.php';
+define('CIS4', true);
 
 // Check if the CI_ENVIRONMENT constants is set and eventually use it to set the CI_ENV environment variable
 if (defined('CI_ENVIRONMENT')) $_SERVER['CI_ENV'] = CI_ENVIRONMENT;

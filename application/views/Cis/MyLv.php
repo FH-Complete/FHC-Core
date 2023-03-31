@@ -1,5 +1,6 @@
 <?php
 $includesArray = array(
+	'title' => 'MyLv',
 	'customJSModules' => ['public/js/apps/Cis/MyLv/Student.js']
 );
 

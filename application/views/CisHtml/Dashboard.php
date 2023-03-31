@@ -1,5 +1,6 @@
 <?php
 $includesArray = array(
+	'title' => 'Dashboard',
 	'customJSModules' => ['public/js/apps/Dashboard/Fhc.js'],
 	'customCSSs' => [
 		'public/css/components/dashboard.css'
