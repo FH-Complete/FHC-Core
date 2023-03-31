@@ -72,6 +72,64 @@ class Content_model extends DB_Model
 	 */
 	public function getMenu($root_content_id, $uid, $sprache=DEFAULT_LANGUAGE)
 	{
+		if ($root_content_id === null) {
+			$res = json_decode('{
+				"content_id": 1000000,
+				"template_kurzbz": "contentmittitel",
+				"titel": "CIS4",
+				"content": "<content></content>",
+				"menu_open": true,
+				"aktiv": true,
+				"childs": [
+					{
+						"content_id": 1000001,
+						"template_kurzbz": "redirect",
+						"titel": "News",
+						"content": "<content><url><![CDATA[../cis.php/CisHtml/Cms/news]]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
+					},
+					{
+						"content_id": 1000002,
+						"template_kurzbz": "redirect",
+						"titel": "COVID-19",
+						"content": "<content><url><![CDATA[../cis.php/CisHtml/Cms/content/10012]]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
+					},
+					{
+						"content_id": 1000003,
+						"template_kurzbz": "redirect",
+						"titel": "Meine LV",
+						"content": "<content><url><![CDATA[../cis.php/Cis/MyLv]]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
+					},
+					{
+						"content_id": 1000004,
+						"template_kurzbz": "redirect",
+						"titel": "Stundenplan",
+						"content": "<content><url><![CDATA[../cis.php/Cis/Stundenplan]]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
+					},
+					{
+						"content_id": 1000005,
+						"template_kurzbz": "redirect",
+						"titel": "Dokumente",
+						"content": "<content><url><![CDATA[../cis.php/Cis/Documents]]></url><target><![CDATA[]]></target></content>",
+						"menu_open": false,
+						"aktiv": true,
+						"childs": []
+					}
+				]
+			}');
+			return success($res);
+		}
 		$sql = "
 		SELECT 
 			c.content_id, 
