@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 class zeitsperre extends basis_db
 {
 	const NUR_BLOCKIERENDE_ZEITSPERREN = true;
-	const BLOCKIERENDE_ZEITSPERREN = "'Krank','Urlaub','ZA','DienstV','PflegeU','DienstF','CovidSB','CovidKS'";
+	const BLOCKIERENDE_ZEITSPERREN = "'Krank','Urlaub','ZA','DienstV','PflegeU','DienstF','CovidSB','CovidKS','Mutter'";
 
 	public $new;     			// boolean
 	public $result = array(); 	// news Objekt
@@ -551,13 +551,13 @@ class zeitsperre extends basis_db
 	public function getVonBis($uid, $von, $bis, $zeitsperretyp_kurzbz = null)
 	{
 		$qry = '
-			SELECT 
+			SELECT
 				zeitsperre_id, zeitsperretyp_kurzbz, vondatum, vonstunde, bisdatum, bisstunde
-			FROM 
+			FROM
 				campus.tbl_zeitsperre
 				LEFT JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz)
-			WHERE 
-				mitarbeiter_uid = '. $this->db_add_param($uid). ' 
+			WHERE
+				mitarbeiter_uid = '. $this->db_add_param($uid). '
 				AND (
 					(vondatum BETWEEN '.$this->db_add_param($von).' AND '.$this->db_add_param($bis).')
 					OR
