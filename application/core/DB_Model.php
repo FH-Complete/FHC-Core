@@ -123,7 +123,7 @@ class DB_Model extends CI_Model
 		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable))) return $validate;
 
 		// Add the pgp_sym_eccrypt postgresql function to the set clause if needed
-		$this->_addEncrypt($encryptedColumns, $data);
+		if (!empty($encryptedColumns)) $this->_addEncrypt($encryptedColumns, $data);
 
 		// DB-INSERT
 		$insert = $this->db->insert($this->dbTable, $data);
@@ -194,7 +194,7 @@ class DB_Model extends CI_Model
 		$this->db->where($tmpId);
 
 		// Add the pgp_sym_eccrypt postgresql function to the set clause if needed
-		$this->_addEncrypt($encryptedColumns, $data);
+		if (!empty($encryptedColumns)) $this->_addEncrypt($encryptedColumns, $data);
 
 		// DB-UPDATE
 		$update = $this->db->update($this->dbTable, $data);
