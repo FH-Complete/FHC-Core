@@ -105,12 +105,12 @@ $fieldheadings = array(
 if ($rechte->isBerechtigt('basis/servicezeitaufzeichnung'))
 {
 	$za_simple = 0;
-	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'FuE','FuEallg', 'Lehre', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe', 'Weiterbildung', 'LVEntwicklung');
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'FuE','FuEallg', 'Lehre', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe', 'Weiterbildung', 'LVEntwicklung', 'Pflegefs');
 }
 else
 {
 	$za_simple = 1;
-	$activities = array('Admin', 'FuE','FuEallg','Lehre', 'Pause', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe', 'Weiterbildung', 'LVEntwicklung');
+	$activities = array('Admin', 'FuE','FuEallg','Lehre', 'Pause', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe', 'Weiterbildung', 'LVEntwicklung', 'Pflegefs');
 }
 
 $activities_str = "'".implode("','", $activities)."'";
@@ -1720,7 +1720,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						$pflichtpause = true;
 					}
 				}
-				elseif ($row->aktivitaet_kurzbz=='Ersatzruhe')
+				elseif ($row->aktivitaet_kurzbz=='Ersatzruhe' || $row->aktivitaet_kurzbz=='Pflegefs')
 				{
 					$ersumme = $datum_obj->sumZeit($ersumme, $row->diff);
 					$ersumme_woche = $datum_obj->sumZeit($ersumme_woche, $row->diff);
@@ -1730,7 +1730,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				$style = '';
 				if ($row->zeitaufzeichnung_id == $zeitaufzeichnung_id)
 					$style = 'style="border-top: 3px solid #8DBDD8; border-bottom: 3px solid #8DBDD8"';
-				if ($row->aktivitaet_kurzbz=='Pause' || $row->aktivitaet_kurzbz=='LehreExtern'|| $row->aktivitaet_kurzbz=='Ersatzruhe')
+				if ($row->aktivitaet_kurzbz=='Pause' || $row->aktivitaet_kurzbz=='LehreExtern'|| $row->aktivitaet_kurzbz=='Ersatzruhe' || $row->aktivitaet_kurzbz=='Pflegefs')
 					$style .= ' style="color: grey;"';
 				if($db->convert_html_chars($row->homeoffice)=='t')
 				{
@@ -1779,10 +1779,10 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			        echo "</td>\n";
 			        echo "   </tr>\n";
 
-		        if (($tagesbeginn=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+		        if (($tagesbeginn=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe' && $row->aktivitaet_kurzbz != 'Pflegefs')
 					$tagesbeginn = $row->start;
 
-				if (($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+				if (($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe' && $row->aktivitaet_kurzbz != 'Pflegefs')
 					$tagesende = $row->ende;
 				if ($row->aktivitaet_kurzbz == 'LehreExtern')
 					$extlehrearr[] = array("start"=>$row->start, "ende"=>$row->ende, "diff"=>$row->diff);

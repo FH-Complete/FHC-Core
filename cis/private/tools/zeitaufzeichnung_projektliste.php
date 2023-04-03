@@ -96,7 +96,7 @@ $projektlines = array();
 $dayStart = $dayEnd = '';
 $projektnames = $projektphasenames = $tosubtract = $allpauseranges = array();
 $projektTiteles = array();
-$activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde'];//aktivitaetstypen which should be subtracted fromworktime
+$activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde', 'Pflegefs'];//aktivitaetstypen which should be subtracted fromworktime
 $ztaufdata = $ztauf->result;
 $totalmonthsum = 0.00;
 $projektmonthsums = array();

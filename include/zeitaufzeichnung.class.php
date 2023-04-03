@@ -901,10 +901,10 @@ or not exists
 
 			$datumtag = $datum->formatDatum($row->datum, 'Y-m-d');
 
-			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format = 'Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe' && $row->aktivitaet_kurzbz != 'Pflegefs')
 			$tagesbeginn = $datum->formatDatum($row->start, 'H:i');
 
-			if (($tagesende == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+			if (($tagesende == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format = 'Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format = 'Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe' && $row->aktivitaet_kurzbz != 'Pflegefs')
 				$tagesende = $datum->formatDatum($row->ende, 'H:i');
 
 			if ($row->aktivitaet_kurzbz == "Pause")
