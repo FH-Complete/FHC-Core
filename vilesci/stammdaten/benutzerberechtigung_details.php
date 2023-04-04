@@ -600,7 +600,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		}
 		if (count($bn) > 0)
 		{
-			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Detailliste Rechte</a></p>";
+			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Rechte Details</a></p>";
 		}
 	}
 	elseif(isset($_REQUEST['funktion_kurzbz']) && $_REQUEST['funktion_kurzbz']!='')
@@ -650,7 +650,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>";
 	$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$funktion_kurzbz."'>";
 
-	$htmlstr .= "<td>Neu: </td>";
+	$htmlstr .= "<td>Neu:&nbsp;</td>";
 	//Rolle
 	$htmlstr .= "		<td><select name='dataset[0][rolle_kurzbz]' id='rolle_kurzbz_neu'>";
 	$htmlstr .= "			<option value=''>&nbsp;</option>";
@@ -678,16 +678,16 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	}
 	else
 	{
-		$htmlstr .= "		<td class='oe_column'>";
+		$htmlstr .= "		<td class='oe_column' style='width: 300px'>";
 		$htmlstr .= "			<input type='hidden' name='dataset[0][oe_kurzbz]' value=''>";
-		$htmlstr .= "			<input type='text' placeholder='Organisationseinheit' id='oe_kurzbz_neu_autocomplete' class='oe_kurzbz_autocomplete'>";
+		$htmlstr .= "			<input type='text' placeholder='Organisationseinheit' id='oe_kurzbz_neu_autocomplete' class='oe_kurzbz_autocomplete' style='width: 100%'>";
 		$htmlstr .= "		</td>";
 	}
 
 	//Kostenstelle
-	$htmlstr .= "		<td class='ks_column'>";
+	$htmlstr .= "		<td class='ks_column' style='width: 300px'>";
 	$htmlstr .= "			<input type='hidden' name='dataset[0][kostenstelle_id]' value=''>";
-	$htmlstr .= "			<input type='text' placeholder='Kostenstelle' id='kostenstelle_autocomplete_neu' class='kostenstelle_autocomplete'>";
+	$htmlstr .= "			<input type='text' placeholder='Kostenstelle' id='kostenstelle_autocomplete_neu' class='kostenstelle_autocomplete' style='width: 100%'>";
 	$htmlstr .= "		</td>";
 
 	/*
@@ -715,7 +715,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "		<td nowrap><input class='datepicker_datum' type='text' name='dataset[0][ende]' value='' size='10' maxlength='10'></td>";
 
 	//Anmerkung
-	$htmlstr .= "		<td><input id='anmerkung_neu' type='text' name='dataset[0][anmerkung]' value='' size='30' maxlength='256'></td>";
+	$htmlstr .= "		<td><input id='anmerkung_neu' type='text' name='dataset[0][anmerkung]' value='' size='100' maxlength='256'></td>";
 
 	$htmlstr .= "		<td><input type='submit' name='schick' value='Neu anlegen' onclick='return validateNewData()'></td>";
 	$htmlstr .= "</form>";
@@ -782,32 +782,32 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		{
 			$titel="ccc";
 			$style = 'style="border-left: 10px solid tomato; border-right: 10px solid transparent; text-align: center; vertical-align: middle; background-color: #d0d7e0;"';
-			$inaktiv_style = 'style="background-color: #d0d7e0;"';
+			$inaktiv_class = 'inaktiv';
 			$data = 'rot';
 		}
 		elseif ($b->start!='' && strtotime($b->start) > $heute)
 		{
 			$titel="bbb";
 			$style = 'style="border-left: 10px solid gold; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
-			$inaktiv_style = '';
+			$inaktiv_class = '';
 			$data = 'gelb';
 		}
 		else
 		{
 			$titel="aaa";
 			$style = 'style="border-left: 10px solid LightGreen; border-right: 10px solid transparent; text-align: center; vertical-align: middle"';
-			$inaktiv_style = '';
+			$inaktiv_class = '';
 			$data = 'gruen';
 		}
 		// Auswahlcheckbox
-		$htmlstr .= "		<td $style $inaktiv_style class='auswahlcheckboxen' name='td_$b->benutzerberechtigung_id' data-".$data."='".$data."'>";
+		$htmlstr .= "		<td $style class='auswahlcheckboxen' name='td_$b->benutzerberechtigung_id' data-".$data."='".$data."'>";
 		$htmlstr .= "			<span style='display: none'>".$titel."</span>";
-		$htmlstr .= "			<input type='checkbox' class='auswahlcheckbox' name='dataset[$b->benutzerberechtigung_id][check]'>";
+		$htmlstr .= "			<input type='checkbox' class='auswahlcheckbox $inaktiv_class' name='dataset[$b->benutzerberechtigung_id][check]'>";
 		$htmlstr .= "		</td>";
 
 		//Rolle
-		$htmlstr .= "		<td $inaktiv_style style='padding: 1px; white-space: nowrap'>";
-		$htmlstr .= "			<select class='rolle_select' 
+		$htmlstr .= "		<td style='padding: 1px; white-space: nowrap'>";
+		$htmlstr .= "			<select class='rolle_select $inaktiv_class'
 										name='dataset[$b->benutzerberechtigung_id][rolle_kurzbz]' 
 										title='".(isset($rolle_arr[$b->rolle_kurzbz])?$rolle_arr[$b->rolle_kurzbz]:"")."'
 										data-toggle='tooltip' 
@@ -837,10 +837,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr.="</td>";
 
 		//Berechtigung
-		$htmlstr .= "		<td $inaktiv_style name='td_$b->benutzerberechtigung_id'>";
+		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>";
 		$htmlstr .= "			<span style='display: none'>".$b->berechtigung_kurzbz."</span>";
 		$htmlstr .= "			<input type='text' 
-										class='berechtigung_autocomplete' 
+										class='berechtigung_autocomplete $inaktiv_class' 
 										name='dataset[$b->benutzerberechtigung_id][berechtigung_kurzbz]' 
 										value='".$b->berechtigung_kurzbz."'
 										title='".($b->berechtigung_kurzbz != '' ? $berechtigung_arr[$b->berechtigung_kurzbz] : '')."'
@@ -850,30 +850,30 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</td>";
 
 		//Art
-		$htmlstr .= "		<td $inaktiv_style name='td_$b->benutzerberechtigung_id'>";
+		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>";
 		$htmlstr .= "			<span style='display: none'>".$b->art."</span>";
-		$htmlstr .= "			<input type='text' class='suid_input' name='dataset[$b->benutzerberechtigung_id][art]' value='".$b->art."' size='4' maxlength='4' style='text-transform: lowercase;'>";
+		$htmlstr .= "			<input type='text' class='suid_input $inaktiv_class' name='dataset[$b->benutzerberechtigung_id][art]' value='".$b->art."' size='4' maxlength='4' style='text-transform: lowercase;'>";
 		$htmlstr .= "		</td>";
 
 		//Organisationseinheit
 		if($funktion_kurzbz != '')
 		{
-			$htmlstr .= "		<td $inaktiv_style class='oe_column' name='td_$b->benutzerberechtigung_id'>OE aus MA-Funktion</td>";
+			$htmlstr .= "		<td  class='oe_column' name='td_$b->benutzerberechtigung_id'>OE aus MA-Funktion</td>";
 		}
 		else
 		{
-			$htmlstr .= "		<td $inaktiv_style class='oe_column'>";
+			$htmlstr .= "		<td class='oe_column'>";
 			$htmlstr .= "			<span style='display: none'>".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz] : '')."</span>";
 			$htmlstr .= "			<input type='hidden' name='dataset[$b->benutzerberechtigung_id][oe_kurzbz]' value='$b->oe_kurzbz'>";
-			$htmlstr .= "			<input type='text' class='oe_kurzbz_autocomplete' value='".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz] : '')."'>";
+			$htmlstr .= "			<input type='text' class='oe_kurzbz_autocomplete $inaktiv_class' value='".($b->oe_kurzbz != '' ? $oe_arr[$b->oe_kurzbz] : '')."'>";
 			$htmlstr .= "		</td>";
 		}
 
 		//Kostenstelle
-		$htmlstr .= "		<td $inaktiv_style class='ks_column'>";
+		$htmlstr .= "		<td class='ks_column'>";
 		$htmlstr .= "			<span style='display: none'>".$b->kostenstelle_id."</span>";
 		$htmlstr .= "			<input type='hidden' name='dataset[$b->benutzerberechtigung_id][kostenstelle_id]' value='$b->kostenstelle_id'>";
-		$htmlstr .= "			<input type='text' class='kostenstelle_autocomplete' value='".($b->kostenstelle_id != '' ? $kst_arr[$b->kostenstelle_id] : '')."'>";
+		$htmlstr .= "			<input type='text' class='kostenstelle_autocomplete $inaktiv_class' value='".($b->kostenstelle_id != '' ? $kst_arr[$b->kostenstelle_id] : '')."'>";
 		$htmlstr .= "		</td>";
 
 
@@ -897,28 +897,28 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</select></td>";*/
 
 		//Negativ-Checkbox
-		$htmlstr .= "		<td $inaktiv_style align='center'>";
-		$htmlstr .= "		    <input type='checkbox' name='dataset[$b->benutzerberechtigung_id][negativ]' ".($b->negativ?'checked="checked"':'').">";
+		$htmlstr .= "		<td align='center'>";
+		$htmlstr .= "		    <input type='checkbox' class='$inaktiv_class' name='dataset[$b->benutzerberechtigung_id][negativ]' ".($b->negativ?'checked="checked"':'').">";
 		$htmlstr .= "		</td>";
 
 		//Gültig ab
-		$htmlstr .= "		<td $inaktiv_style style='white-space: nowrap; width: 9rem'>";
+		$htmlstr .= "		<td style='white-space: nowrap; width: 9rem'>";
 		$htmlstr .= "			<span style='display: none'>".$b->start."</span>";
-		$htmlstr .= "		    <input class='datepicker_datum' type='text' name='dataset[$b->benutzerberechtigung_id][start]' value='".$b->start."' size='10' maxlength='10'>";
+		$htmlstr .= "		    <input class='datepicker_datum $inaktiv_class' type='text' name='dataset[$b->benutzerberechtigung_id][start]' value='".$b->start."' size='10' maxlength='10'>";
 		$htmlstr .= "		</td>";
 
 		// Gültig bis
-		$htmlstr .= "		<td $inaktiv_style style='white-space: nowrap; width: 9rem'>";
+		$htmlstr .= "		<td style='white-space: nowrap; width: 9rem'>";
 		$htmlstr .= "			<span style='display: none'>".$b->ende."</span>";
-		$htmlstr .= "		    <input class='datepicker_datum' type='text' name='dataset[$b->benutzerberechtigung_id][ende]' value='".$b->ende."' size='10' maxlength='10'>";
+		$htmlstr .= "		    <input class='datepicker_datum $inaktiv_class' type='text' name='dataset[$b->benutzerberechtigung_id][ende]' value='".$b->ende."' size='10' maxlength='10'>";
 		$htmlstr .= "		</td>";
 
 		//Anmerkung
-		$htmlstr .= "		<td $inaktiv_style>";
+		$htmlstr .= "		<td>";
 		$htmlstr .= "			<input 
 									type='text' 
 									name='dataset[$b->benutzerberechtigung_id][anmerkung]'
-									class='input_anmerkung' 
+									class='input_anmerkung $inaktiv_class' 
 									value='".$b->anmerkung."' 
 									title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung))."' 
 									data-toggle='tooltip' 
@@ -929,7 +929,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "		</td>";
 
 		//Info
-		$htmlstr .= "		<td $inaktiv_style align='center' name='td_$b->benutzerberechtigung_id'>
+		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'>
 								<span 
 									class='glyphicon glyphicon-info-sign' 
 									title='Angelegt von ".$b->insertvon." am ".$b->insertamum."<br>Zuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'
@@ -938,7 +938,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 									data-placement='auto'>
 							</span></td>";
 
-		$htmlstr .= "		<td $inaktiv_style style='white-space: nowrap; width: 5rem'>";
+		$htmlstr .= "		<td style='white-space: nowrap; width: 5rem'>";
 		$htmlstr .= "			<button type='submit' 
 										name='copy' 
 										value='$b->benutzerberechtigung_id' 
@@ -1298,6 +1298,15 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
         {
 			background-color: transparent;
 		}
+		.inaktiv
+        {
+			border: 1px dotted gray;
+			color: gray;
+		}
+		.tablesorter-filter
+        {
+			background-color: #f3f3f3 !important;
+		}
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function()
@@ -1367,11 +1376,17 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				minLength:2,
 				response: function(event, ui)
 				{
-					//Value und Label fuer die Anzeige setzen
-					for(i in ui.content)
+					if (!ui.content.length)
 					{
-						ui.content[i].value=ui.content[i].berechtigung_kurzbz;
-						ui.content[i].label=ui.content[i].berechtigung_kurzbz+" - "+ui.content[i].beschreibung;
+						var noResult = { value:"",label:"Keine Ergebnisse" };
+						ui.content.push(noResult);
+					}
+					else
+					{//Value und Label fuer die Anzeige setzen
+						for (i in ui.content) {
+							ui.content[i].value = ui.content[i].berechtigung_kurzbz;
+							ui.content[i].label = ui.content[i].berechtigung_kurzbz + " - " + ui.content[i].beschreibung;
+						}
 					}
 				},
 				select: function(event, ui)
@@ -1386,11 +1401,18 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				minLength:2,
 				response: function(event, ui)
 				{
-					//Value und Label fuer die Anzeige setzen
-					for(i in ui.content)
+					if (!ui.content.length)
 					{
-						ui.content[i].value=ui.content[i].organisationseinheittyp_kurzbz+" "+ui.content[i].bezeichnung;
-						ui.content[i].label=ui.content[i].organisationseinheittyp_kurzbz+" "+ui.content[i].bezeichnung;
+						var noResult = { value:"",label:"Keine Ergebnisse" };
+						ui.content.push(noResult);
+					}
+					else
+					{
+						//Value und Label fuer die Anzeige setzen
+						for (i in ui.content) {
+							ui.content[i].value = ui.content[i].organisationseinheittyp_kurzbz + " " + ui.content[i].bezeichnung;
+							ui.content[i].label = ui.content[i].organisationseinheittyp_kurzbz + " " + ui.content[i].bezeichnung;
+						}
 					}
 				},
 				select: function(event, ui)
@@ -1410,11 +1432,19 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				minLength:2,
 				response: function(event, ui)
 				{
-					//Value und Label fuer die Anzeige setzen
-					for(i in ui.content)
+					if (!ui.content.length)
 					{
-						ui.content[i].value=ui.content[i].uid;
-						ui.content[i].label=ui.content[i].nachname+" "+ui.content[i].vorname;
+						var noResult = { value:"",label:"Keine Ergebnisse" };
+						ui.content.push(noResult);
+					}
+					else
+					{
+						//Value und Label fuer die Anzeige setzen
+						for(i in ui.content)
+						{
+							ui.content[i].value=ui.content[i].uid;
+							ui.content[i].label=ui.content[i].nachname+" "+ui.content[i].vorname;
+						}
 					}
 				},
 				select: function(event, ui)
@@ -1429,11 +1459,18 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				minLength:2,
 				response: function(event, ui)
 				{
-					//Value und Label fuer die Anzeige setzen
-					for(i in ui.content)
+					if (!ui.content.length)
 					{
-						ui.content[i].value=ui.content[i].bezeichnung;
-						ui.content[i].label=ui.content[i].bezeichnung;
+						var noResult = { value:"",label:"Keine Ergebnisse" };
+						ui.content.push(noResult);
+					}
+					else
+					{
+						//Value und Label fuer die Anzeige setzen
+						for (i in ui.content) {
+							ui.content[i].value = ui.content[i].bezeichnung;
+							ui.content[i].label = ui.content[i].bezeichnung;
+						}
 					}
 				},
 				select: function(event, ui)
