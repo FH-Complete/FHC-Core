@@ -334,24 +334,24 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 			</tbody>
 		</table>
 
-		<br>
+		<br><div style="vertical-align: top">
 			<?php
 			if($edit):
 				?>
 				<form method="POST">
-					Kurzbz: <input type="text" name="kurzbz" value="<?php echo $rolle_edit->rolle_kurzbz ?>" disabled />
-					Beschreibung: <input type="text" name="beschreibung" value="<?php echo $rolle_edit->beschreibung ?>" />
+					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="<?php echo $rolle_edit->rolle_kurzbz ?>" disabled />
+					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /><?php echo $rolle_edit->beschreibung ?></textarea>
 					&nbsp;<input type="submit" name="edit" value="Speichern" />
 				</form>
 		<a href="<?php echo basename(__FILE__) ?>">Neue Rolle anlegen</a>
 			<?php else: ?>
 				<form method="POST">
-					Kurzbz: <input type="text" name="kurzbz" value="" />
-					Beschreibung: <input type="text" name="beschreibung" value="" />
+					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="" />
+					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /></textarea>
 					&nbsp;<input type="submit" name="save" value="Anlegen" />
 				</form>
 			<?php endif; ?>
 	<?php } ?>
-
+			</div>
 	</body>
 </html>
