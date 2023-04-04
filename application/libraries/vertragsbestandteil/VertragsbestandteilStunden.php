@@ -1,8 +1,11 @@
 <?php
+
 namespace vertragsbestandteil;
 
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
+
+
 
 /**
  * Description of VertragsbestandteilStunden

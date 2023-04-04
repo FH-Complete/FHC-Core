@@ -150,8 +150,8 @@
     ],
     "data": {
       "dienstverhaeltnisid": null,
-      "unternehmen": "fhtw",
-      "vertragsart_kurzbz": "echterDV",
+      "unternehmen": "gst",
+      "vertragsart_kurzbz": "echterdv",
       "gueltigkeit": {
         "guioptions": {
           "sharedstatemode": "set"

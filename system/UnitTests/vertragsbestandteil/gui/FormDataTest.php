@@ -22,7 +22,7 @@ class FormDataTest extends TestCase
 		$dataDV = $formDataMapper->getData();		
 		$this->assertNotEmpty($dataDV);
 		$this->assertNotEmpty($dataDV['unternehmen']);
-		$this->assertEquals('fhtw', $dataDV['unternehmen']);
+		$this->assertEquals('gst', $dataDV['unternehmen']);
 		$this->assertNull($dataDV['dienstverhaeltnisid']);
 		$this->assertNotEmpty($dataDV['vertragsart_kurzbz']);
 		$this->assertEquals('echterDV', $dataDV['vertragsart_kurzbz']);

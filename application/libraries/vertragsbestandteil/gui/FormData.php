@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . "/AbstractBestandteil.php";
+require_once __DIR__ . "/GUIGueltigkeit.php";
 
 class FormData extends AbstractBestandteil {
 
@@ -61,7 +62,10 @@ class FormData extends AbstractBestandteil {
         $this->getJSONDataInt($this->data['dienstverhaeltnisid'], $decodedData, 'dienstverhaeltnisid');
         $this->getJSONData($this->data['unternehmen'], $decodedData, 'unternehmen');
         $this->getJSONData($this->data['vertragsart_kurzbz'], $decodedData, 'vertragsart_kurzbz');
-        $this->getJSONData($this->data['gueltigkeit'], $decodedData, 'gueltigkeit');
+        $gueltigkeit = new GUIGueltigkeit();
+        $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
+        $this->data['gueltigkeit'] = $gueltigkeit;
+        //$this->getJSONData($this->data['gueltigkeit'], $decodedData, 'gueltigkeit');
     }
 
     private function generateDvJSON()

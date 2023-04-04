@@ -1,5 +1,11 @@
 <?php
 
+require_once __DIR__ .'/GUIVertragsbestandteilStunden.php';
+require_once __DIR__ .'/GUIVertragsbestandteilFunktion.php';
+require_once __DIR__ .'/GUIVertragsbestandteilKuendigungsfrist.php';
+require_once __DIR__ .'/GUIVertragsbestandteilZeitaufzeichnung.php';
+require_once __DIR__ .'/GUIVertragsbestandteilZusatzvereinbarung.php';
+
 class GUIHandlerFactory {
 
     public static function getGUIHandler($type)

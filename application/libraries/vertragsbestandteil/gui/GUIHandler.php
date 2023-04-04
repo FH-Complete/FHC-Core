@@ -1,9 +1,11 @@
 <?php
 
-use phpDocumentor\Reflection\Types\Integer;
-use PhpParser\Node\Expr;
 
 require_once __DIR__ . '/FormData.php';
+require_once __DIR__ . '/GUIHandlerFactory.php';
+require_once __DIR__ . '/../../../models/vertragsbestandteil/Dienstverhaeltnis_model.php';
+require_once __DIR__ . '/../VertragsbestandteilLib.php';
+require_once __DIR__ . '/util.php';
 
 /**
  * GUIHandler takes JSON from GUI and manages the process of
@@ -23,7 +25,9 @@ class GUIHandler
         $this->userUID = $userUID;
         $this->CI = get_instance();
         $this->CI->load->model('vertragsbestandteil/Dienstverhaeltnis_model',
-					'Dienstverhaeltnis_model');
+			'Dienstverhaeltnis_model');
+        $this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib', 
+            null, 'VertragsbestandteilLib');
 		
 
     }
@@ -43,13 +47,19 @@ class GUIHandler
 
         // DV
         $dvData = $formDataMapper->getData();
-        $this->handleDV($dvData);
+        $res = $this->handleDV($dvData);
 
-		// VBS
-		$vbsList = $formDataMapper->getVbs();
+        if ($res === false)
+        {
+            // TODO write error message
+        } else {
 
-        foreach ($vbsList as $vbsID => $vbs) {
-            $this->handleVBS($dvData['dienstverhaeltnis_id'] ,$vbs);
+		    // VBS
+		    $vbsList = $formDataMapper->getVbs();
+
+            foreach ($vbsList as $vbsID => $vbs) {
+                $this->handleVBS($dvData['dienstverhaeltnisid'] ,$vbs);
+            }
         }
 
         return $formDataMapper->generateJSON();
@@ -68,29 +78,50 @@ class GUIHandler
         if (isset($dienstverhaeltnisid) && intval($dienstverhaeltnisid > 0))
         {
             // DV exists
-            $ret = $this->updateDV($dv);
+            $res = $this->updateDV($dv);
+            if (isSuccess($res))
+            {
+                return true;
+            }
         } else {            
             // DV is new
-            $ret = $this->insertDV($dv);
-            // write back new id
-            $dv['dienstverhaeltnisid'] = $ret['dienstverhaeltnis_id'];
+            $res = $this->insertDV($dv);
+            if (isSuccess($res))
+            {
+                // write back new id
+                $dv['dienstverhaeltnisid'] = $res->retval[0]->dienstverhaeltnis_id;
+                return true;
+            } 
+            
         }
+
+        return false;
         
     }
 
-    private function handleVBS($vbs)
+    private function handleVBS($dienstverhaeltnis_id, $vbs)
     {
+        /**  @var GUIVertragsbestandteilFunktion */
         $vbsMapper = GUIHandlerFactory::getGUIHandler($vbs['type']);
 		$vbsMapper->mapJSON($vbs);
 		$vbsData = $vbsMapper->getData();
 
         // merge GUI-Data with DB-Data
-        $vbsInstance = $vbsMapper->generateVertragsbestandteil($vbsData['id']);
+        $vbsInstance = $vbsMapper->generateVertragsbestandteil(isset($vbsData['id'])?$vbsData['id']:null);
+        if ($vbsInstance->getDienstverhaeltnis_id() === null) 
+        {
+            $vbsInstance->setDienstverhaeltnis_id($dienstverhaeltnis_id);
+            $vbsInstance->setInsertvon($this->userUID);
+            $vbsInstance->setInsertamum((new DateTime())->format("Y-m-d h:m:s"));
+        } else {
+            $vbsInstance->setUpdatevon($this->userUID);
+            $vbsInstance->setUpdateamum((new DateTime())->format("Y-m-d h:m:s"));
+        }
         
         // TODO Validate?
         
         // store
-        $this->VertragsbestandteilLib->store($vbsInstance);
+         $this->CI->VertragsbestandteilLib->storeVertragsbestandteil($vbsInstance);
 
 		// GBS
         /*
@@ -111,12 +142,20 @@ class GUIHandler
 
     // ------------------------------------
     // DV does not have a dedicated handler
-
     private function insertDV($dvJSON)
     {
+        $dvJSON['mitarbeiter_uid'] = $this->employeeUID;
         $now = new DateTime();
+        $dvJSON['von'] = string2Date($dvJSON['gueltigkeit']->getData()['gueltig_ab']);
+        $dvJSON['bis'] = string2Date($dvJSON['gueltigkeit']->getData()['gueltig_bis']);
+        $dvJSON['oe_kurzbz'] = $dvJSON['unternehmen'];
         $dvJSON['insertvon'] = $this->userUID;
         $dvJSON['insertamum'] = $now->format(DateTime::ATOM);
+
+        unset($dvJSON['dienstverhaeltnisid']);
+        unset($dvJSON['children']);
+        unset($dvJSON['gueltigkeit']);
+        unset($dvJSON['unternehmen']);
 
         $result = $this->CI->Dienstverhaeltnis_model->insert($dvJSON);
 
@@ -132,15 +171,24 @@ class GUIHandler
 
     private function updateDV($dvJSON)
     {
+        $dvJSON['mitarbeiter_uid'] = $this->employeeUID;
+        $dvJSON['von'] = string2Date($dvJSON['gueltigkeit']->getData()['gueltig_ab']);
+        $dvJSON['bis'] = string2Date($dvJSON['gueltigkeit']->getData()['gueltig_bis']);
+        $dvJSON['oe_kurzbz'] = $dvJSON['unternehmen'];
         $now = new DateTime();
-        $dvJSON['updatevon'] = getAuthUID();
+        $dvJSON['updatevon'] = $this->userUID;
         $dvJSON['updateamum'] = $now->format(DateTime::ATOM);
+        $dvJSON['dienstverhaeltnis_id'] = $dvJSON['dienstverhaeltnisid'];
 
         unset($dvJSON['insertamum']);
         unset($dvJSON['insertvon']);
+        unset($dvJSON['dienstverhaeltnisid']);
+        unset($dvJSON['children']);
+        unset($dvJSON['gueltigkeit']);
+        unset($dvJSON['unternehmen']);
         
-
-        $result = $this->CI->Dienstverhaeltnis_model->update($dvJSON['kontakt_id'], $dvJSON);
+        $result = $this->CI->Dienstverhaeltnis_model->update($dvJSON);
+        //$result = $this->CI->Dienstverhaeltnis_model->update($dvJSON['kontakt_id'], $dvJSON);
 
         if (isError($result))
         {

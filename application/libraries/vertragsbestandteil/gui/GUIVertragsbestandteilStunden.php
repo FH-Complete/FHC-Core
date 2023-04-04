@@ -1,10 +1,18 @@
 <?php
 
-use vertragsbestandteil\VertragsbestandteilFactory;
+
 
 require_once __DIR__ . "/AbstractGUIVertragsbestandteil.php";
 require_once __DIR__ . "/GUIGehaltsbestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
+require_once __DIR__ . "/../VertragsbestandteilFactory.php";
+require_once __DIR__ . "/../Vertragsbestandteil.php";
+require_once __DIR__ .'/../VertragsbestandteilStunden.php';
+
+
+use vertragsbestandteil\VertragsbestandteilFactory;
+use vertragsbestandteil\VertragsbestandteilStunden;
+
 
 class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil implements JsonSerializable
 {    
@@ -111,12 +119,12 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
             // load VBS            
             $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
         } else {
-            $vbs = new vertragsbestandteil\VertragsbestandteilStunden();
-        } 
-        // merge       
+            $vbs = new vertragsbestandteil\VertragsbestandteilStunden();            
+        }
+        // merge
         $vbs->setWochenstunden($this->data['stunden']);
-        $vbs->setVon($this->data['gueltigkeit']->getData()['gueltig_ab']);
-        $vbs->setBis($this->data['gueltigkeit']->getData()['gueltig_bis']);
+        $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+        $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         return $vbs;
     }
 

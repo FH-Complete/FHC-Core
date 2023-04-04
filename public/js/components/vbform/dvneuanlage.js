@@ -6,8 +6,8 @@ export default {
   <div class="col-3">
     <select v-model="unternehmen" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option value="" selected disabled>Unternehmen wählen</option>
-      <option value="fhtw">FH Technikum Wien</option>
-      <option value="twacademy">Technikum Wien GmbH</option>
+      <option value="gst">FH Technikum Wien</option>
+      <option value="gmbh">Technikum Wien GmbH</option>
     </select>
   </div>
   <div class="col-3">

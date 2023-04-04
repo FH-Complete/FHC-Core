@@ -108,7 +108,20 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 
 
     public function generateVertragsbestandteil($id) {
-        // TODO
+        /** @var vertragsbestandteil\VertragsbestandteilFunktion */
+        $vbs = null;
+        if (isset($vbsData['id']) && $vbsData['id'] > 0)
+        {
+            // load VBS            
+            $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+        } else {
+            $vbs = new vertragsbestandteil\VertragsbestandteilFunktion();            
+        }
+        // merge
+        $vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);
+        $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+        $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+        return $vbs;
     }
 
     public function jsonSerialize() {
