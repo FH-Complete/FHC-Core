@@ -73,7 +73,7 @@ $(document).ready(function()
 								{ 
 									// Add select menu to this column 
 									6 : { 
-									"Ja" : function(e, n, f, i, $r, c, data) { return /Ja/.test(e); }, 
+									"Ja" : function(e, n, f, i, $r, c, data) { return e == "Ja" || e == "" },
 									"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
 									}, 
 									7 : { 
