@@ -4115,6 +4115,26 @@ When on hold, the date is only a reminder.',
         )
     ),
 	array(
+		'app' => 'infocenter', 
+		'category' => 'infocenter',
+		'phrase' => 'kaution', 
+		'insertvon' => 'system', 
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kaution',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English', 
+				'text' => 'Deposit',
+				'description' => '', 
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'core',
 		'category' => 'password',
 		'phrase' => 'changeFor',
