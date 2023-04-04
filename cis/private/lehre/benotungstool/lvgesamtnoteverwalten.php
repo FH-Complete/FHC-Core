@@ -145,8 +145,8 @@ echo '<!DOCTYPE HTML>
 		position:absolute;
 		top:100px;
 		left:300px;
-		width:400px;
-		height:200px;
+		min-width:450px;
+		min-height:200px;
 		background-color:#cccccc;
 		visibility:hidden;
 		border-style:solid;
@@ -594,8 +594,8 @@ foreach ($noten_obj->result as $row)
 		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 		var anlegendiv = document.getElementById("nachpruefung_div");
 		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
-		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisung');?>:</td>';
-		str	+= '<td></td><tr><td><textarea id="noteimporttextarea" name="notenimport"></textarea></td></tr>';
+		str += '<tr><td><div style="width: 400px;"><?php echo $p->t('benotungstool/importAnweisung');?>:</div></td>';
+		str	+= '<td></td><tr><td><textarea style="width: 400px;" id="noteimporttextarea" name="notenimport"></textarea></td></tr>';
 		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulk();'>";
 		str += "</td><td></td></tr></table></center></form>";
 		anlegendiv.innerHTML = str;
@@ -612,8 +612,8 @@ foreach ($noten_obj->result as $row)
 		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 		var anlegendiv = document.getElementById("nachpruefung_div");
 		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
-		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisungNachp');?>:</td>';
-		str	+= '<td></td><tr><td><textarea id="noteimporttextareaNachp" name="notenimportNachp"></textarea></td></tr>';
+		str += '<tr><td><div style="width: 400px;"><?php echo $p->t('benotungstool/importAnweisungNachp');?>:</div></td>';
+		str	+= '<td></td><tr><td><textarea style="width: 400px;" id="noteimporttextareaNachp" name="notenimportNachp"></textarea></td></tr>';
 
 		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulkNachp(\""+ termin +"\");'>";
 		str += "</td><td></td></tr></table></center></form>";
