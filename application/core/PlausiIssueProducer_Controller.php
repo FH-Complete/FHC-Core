@@ -14,16 +14,12 @@ abstract class PlausiIssueProducer_Controller extends JOB_Controller
 		// pass extension name if calling from extension
 		$extensionName = isset($this->_extensionName) ? $this->_extensionName : null;
 
+		// load libraries
 		$this->load->library('issues/PlausicheckProducerLib', array('extensionName' => $extensionName));
 		$this->load->library('IssuesLib');
 	}
 
-	/**
-	 * Runs issue production job.
-	 * @param studiensemester_kurzbz string job is run for students of a certain semester.
-	 * @param studiengang_kz int job is run for students of certain Studiengang.
-	 */
-	public function run($studiensemester_kurzbz = null, $studiengang_kz = null)
+	protected function producePlausicheckIssues($params)
 	{
 		$this->logInfo("Plausicheck issue producer job started");
 
@@ -34,8 +30,7 @@ abstract class PlausiIssueProducer_Controller extends JOB_Controller
 			$this->logInfo("Checking " . $fehler_kurzbz . "...");
 			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue(
 				$libName,
-				$studiensemester_kurzbz,
-				$studiengang_kz
+				$params
 			);
 
 			if (isError($plausicheckRes)) $this->logError(getError($plausicheckRes));
