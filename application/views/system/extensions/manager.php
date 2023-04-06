@@ -6,19 +6,19 @@
 			'title' => 'Extensions manager',
 
 			// JS & CSS includes
-			'jquery' => true,
-			'jqueryui' => true,
-			'jquerycheckboxes' => true,
-			'bootstrap' => true,
+			'jquery3' => true,
+			'jqueryui1' => true,
+			'jquerycheckboxes1' => true,
+			'bootstrap3' => true,
+			'tabulator4' => true,
 
 			// Styles includes
-			'fontawesome' => true,
-			'sbadmintemplate' => true,
+			'fontawesome4' => true,
+			'sbadmintemplate3' => true,
 
 			// FHC JS & CSS includes
 			'ajaxlib' => true,
 			'dialoglib' => true,
-			'tabulator' => true,
 			'tablewidget' => true,
 			'phrases' => array(
 				'extensions',
