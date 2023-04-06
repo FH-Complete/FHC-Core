@@ -1,6 +1,6 @@
 <?php
 
-class VertragsbestandteilStunden_model extends DB_Model
+class VertragsbestandteilZeitaufzeichnung_model extends DB_Model
 {
 
 	public function __construct()

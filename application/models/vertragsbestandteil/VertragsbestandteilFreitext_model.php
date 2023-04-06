@@ -1,6 +1,6 @@
 <?php
 
-class VertragsbestandteilFreitet_model extends DB_Model
+class VertragsbestandteilFreitext_model extends DB_Model
 {
 
 	public function __construct()

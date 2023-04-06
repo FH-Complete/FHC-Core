@@ -13,6 +13,7 @@ class MigrateContract extends CLI_Controller
 {
 
 	private $matching_ba1_vertragsart;
+	private $OE_DEFAULT = 'gst';
 
 	/**
 	 * Constructor
@@ -27,15 +28,15 @@ class MigrateContract extends CLI_Controller
 		$this->matching_ba1_vertragsart = array(
 			'101'=>'DV zum Bund',
 			'102'=>'DV anderen Gebietskörperschaft',
-			'103'=>'EchterDV',
+			'103'=>'echterdv',
 			'104'=>'Lehr- oder Ausbildungsverhältnis',
-			'105'=>'ext. LehrendeR (freier DV)',
+			'105'=>'freierdv',
 			'106'=>'Andere Bildungseinrichtung',
-			'107'=>'Werkvertrag (Sonstiges)',
-			'108'=>'Stud. Hilfskraft (Echter DV)',
-			'109'=>'Überlassungsvertrag',
-			'110'=>'Echter Freier DV',
-			'111'=>'EchterDV', //All-In
+			'107'=>'werkvertrag',
+			'108'=>'studentischehilfskr',
+			'109'=>'ueberlassungsvertrag',
+			'110'=>'echterfreier',
+			'111'=>'echterdv', //All-In
 		);
 	}
 
@@ -55,6 +56,160 @@ class MigrateContract extends CLI_Controller
 		*/
 		//$this->outputJson($contracts);
 		var_dump($contracts);
+		$this->_saveJSON($contracts);
+	}
+
+	private function _saveJSON($contracts)
+	{
+		$this->load->model('vertragsbestandteil/Dienstverhaeltnis_model','DienstverhaeltnisModel');
+		$this->load->model('vertragsbestandteil/Vertragsbestandteil_model','VertragsbestandteilModel');
+		$this->load->model('vertragsbestandteil/VertragsbestandteilStunden_model','VertragsbestandteilStundenModel');
+		$this->load->model('vertragsbestandteil/VertragsbestandteilZeitaufzeichnung_model','VertragsbestandteilZeitaufzeichnungModel');
+		$this->load->model('vertragsbestandteil/VertragsbestandteilFreitext_model','VertragsbestandteilFreitextModel');
+		$this->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model','VertragsbestandteilFunktionModel');
+
+		$failed = false;
+		$this->db->trans_begin();
+
+		foreach($contracts['dv'] as $row_dv)
+		{
+			// Dienstvertrag erstellen
+			$resultDV = $this->DienstverhaeltnisModel->insert(
+				array(
+				'mitarbeiter_uid' => $row_dv['mitarbeiter_uid'],
+				'vertragsart_kurzbz' => $row_dv['vertragsart_kurzbz'],
+				'oe_kurzbz' => $row_dv['oe_kurzbz'],
+				'von' => $row_dv['von'],
+				'bis' => $row_dv['bis'],
+				'insertamum' => date('Y-m-d H:i:s'),
+				'insertvon' => 'MigrateContract'
+				)
+			);
+
+			if (isSuccess($resultDV) && hasData($resultDV))
+			{
+				$dv_id = getData($resultDV);
+
+				// Vertragsbetandteile erstellen
+				foreach($row_dv['vbs'] as $row_vbs)
+				{
+					$resultVBS = $this->VertragsbestandteilModel->insert(
+						array(
+						'dienstverhaeltnis_id' => $dv_id,
+						'vertragsbestandteiltyp_kurzbz' => $row_vbs['vertragsbestandteiltyp_kurzbz'],
+						'von' => $row_vbs['von'],
+						'bis' => $row_vbs['bis'],
+						'insertamum' => date('Y-m-d H:i:s'),
+						'insertvon' => 'MigrateContract'
+						)
+					);
+
+					if (isSuccess($resultVBS) && hasData($resultVBS))
+					{
+						$vbs_id = getData($resultVBS);
+						echo 'VBS:'.$vbs_id;
+					
+						switch($row_vbs['vertragsbestandteiltyp_kurzbz'])
+						{
+							case 'stunden':
+								$resultVBS = $this->_insertVBSStunden($vbs_id, $row_vbs);
+								break;
+							case 'zeitaufzeichnung':
+								$resultVBS = $this->_insertVBSZeitaufzeichnung($vbs_id, $row_vbs);
+								break;
+							case 'funktion':
+								$resultVBS = $this->_insertVBSFunktion($vbs_id, $row_vbs);
+								break;
+							case 'freitext':
+								$resultVBS = $this->_insertVBSFreitext($vbs_id, $row_vbs);
+								break;
+							case 'karenz':
+								$resultVBS = $this->_insertVBSKarenz($vbs_id, $row_vbs);
+								break;
+						}
+
+						if (isError($resultVBS))
+						{
+							echo "FAILED:".getError($resultVBS);
+							$failed = true;
+						}
+					}
+					else
+					{
+						$failed = true;
+					}
+				}
+			}
+			else
+			{
+				$failed = true;
+			}
+		}
+
+		if(!$failed)
+		{
+			$this->db->trans_commit();
+		}
+		else
+		{
+			echo "ROLLBACK";
+			$this->db->trans_rollback();
+		}
+	}
+	
+	private function _insertVBSKarenz($vbs_id, $row_vbs)
+	{
+		return $this->VertragsbestandteilKarenzModel->insert(
+			array(
+			'vertragsbestandteil_id' => $vbs_id,
+			'karenztyp_kurzbz' => $row_vbs['karenztyp_kurzbz']
+			)
+		);
+	}
+
+	private function _insertVBSFreitext($vbs_id, $row_vbs)
+	{
+		return $this->VertragsbestandteilFreitextModel->insert(
+			array(
+			'vertragsbestandteil_id' => $vbs_id,
+			'freitexttyp_kurzbz' => $row_vbs['freitexttyp_kurzbz'],
+			'titel' => $row_vbs['titel'],
+			'anmerkung' => $row_vbs['anmerkung']
+			)
+		);
+	}
+
+	private function _insertVBSFunktion($vbs_id, $row_vbs)
+	{
+		return $this->VertragsbestandteilFunktionModel->insert(
+			array(
+			'vertragsbestandteil_id' => $vbs_id,
+			'benutzerfunktion_id' => $row_vbs['benutzerfunktion_id']
+			)
+		);
+	}
+
+	private function _insertVBSZeitaufzeichnung($vbs_id, $row_vbs)
+	{
+		return $this->VertragsbestandteilZeitaufzeichnungModel->insert(
+			array(
+			'vertragsbestandteil_id' => $vbs_id,
+			'zeitaufzeichnung' => $row_vbs['zeitaufzeichnung'],
+			'azgrelevant' => $row_vbs['azgrelevant'],
+			'homeoffice' => $row_vbs['homeoffice']
+			)
+		);
+	}
+
+	private function _insertVBSStunden($vbs_id, $row_vbs)
+	{
+		return $this->VertragsbestandteilStundenModel->insert(
+			array(
+			'vertragsbestandteil_id' => $vbs_id,
+			'wochenstunden' => $row_vbs['wochenstunden'],
+			'teilzeittyp_kurzbz' => $row_vbs['teilzeittyp_kurzbz']
+			)
+		);
 	}
 
 	/**
@@ -384,6 +539,7 @@ class MigrateContract extends CLI_Controller
 		$contracts['dv'][$newDvIndex]['mitarbeiter_uid'] = $row_verwendung->mitarbeiter_uid;
 		$contracts['dv'][$newDvIndex]['von'] = $row_verwendung->beginn;
 		$contracts['dv'][$newDvIndex]['bis'] = $row_verwendung->ende;
+		$contracts['dv'][$newDvIndex]['oe_kurzbz'] = $this->OE_DEFAULT;
 		$contracts['dv'][$newDvIndex]['vertragsart_kurzbz'] = $this->matching_ba1_vertragsart[$row_verwendung->ba1code];
 
 		return $newDvIndex;
