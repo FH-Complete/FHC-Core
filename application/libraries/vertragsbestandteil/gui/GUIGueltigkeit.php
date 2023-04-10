@@ -38,7 +38,7 @@ class GUIGueltigkeit implements JsonSerializable {
         {
             throw new \Exception('missing guioptions');
         }
-        $this->getJSONData($this->guioptions, $decodedData, 'guioptions');
+        $this->guioptions = $decodedData;
     }
 
     private function mapData(&$decoded)
