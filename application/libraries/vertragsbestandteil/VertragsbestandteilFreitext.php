@@ -19,7 +19,7 @@ class VertragsbestandteilFreitext extends Vertragsbestandteil
 	public function hydrateByStdClass($data)
 	{
 		parent::hydrateByStdClass($data);
-		isset($data->freitexttyp_kurzbz) && $this->setFreitexttypKurzbz($data->freitexttyp_kurzbz);
+		isset($data->freitexttyp) && $this->setFreitexttypKurzbz($data->freitexttyp);
 		isset($data->titel) && $this->setTitel($data->titel);
 		isset($data->freitext) && $this->setAnmerkung($data->freitext);
 	}
