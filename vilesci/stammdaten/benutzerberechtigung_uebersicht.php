@@ -73,7 +73,7 @@ $(document).ready(function()
 								{ 
 									// Add select menu to this column 
 									6 : { 
-									"Ja" : function(e, n, f, i, $r, c, data) { return /Ja/.test(e); }, 
+									"Ja" : function(e, n, f, i, $r, c, data) { return e == "Ja" || e == "" },
 									"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
 									}, 
 									7 : { 
@@ -361,7 +361,15 @@ if($berechtigung_kurzbz != '')
 		{
 			$htmlstr .= "<h3>".$berechtigung_kurzbz."</h3>\n";
 			$htmlstr .= "<table id='t2' class='tablesorter'><thead><tr>\n";
-			$htmlstr .= "<th>Rolle</th><th>Funktion</th><th>Nachname</th><th>Vorname</th><th>UID</th><th>Art</th><th>Benutzer Aktiv</th><th>Status</th><th>Aktion</th>"; 
+			$htmlstr .= "<th>Rolle</th>
+							<th>Funktion</th>
+							<th>Nachname</th>
+							<th>Vorname</th>
+							<th>UID</th>
+							<th>Art</th>
+							<th data-value='Ja'>Benutzer Aktiv</th>
+							<th data-value='Aktiv'>Status</th>
+							<th>Aktion</th>";
 			$htmlstr .= "</tr></thead><tbody>\n";
 	
 			foreach($berechtigungen->result as $row)
@@ -554,8 +562,8 @@ if($rolle_kurzbz != '')
 						<th>Vorname</th>
 						<th>UID</th>
 						<th>Art</th>
-						<th>Benutzer Aktiv</th>
-						<th>Status</th>
+						<th data-value='Ja'>Benutzer Aktiv</th>
+						<th data-value='Aktiv'>Status</th>
 						<th>Aktion</th>";
 		$htmlstr .= "</tr></thead><tbody>\n";
 
