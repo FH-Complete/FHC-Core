@@ -278,6 +278,14 @@ $fehlerArr = array(
 		'app' => 'core'
 	),
 	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0015',
+		'fehler_kurzbz' => 'AktiverStudentstatusOhneKontobuchung',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Keine Kontobuchung bei aktivem Studentstatus (prestudent_id %s, Studiensemester %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core'
+	),
+	array(
 		'fehlercode' => 'CORE_PERSON_0001',
 		'fehler_kurzbz' => 'GbDatumWeitZurueck',
 		'fehlercode_extern' => null,

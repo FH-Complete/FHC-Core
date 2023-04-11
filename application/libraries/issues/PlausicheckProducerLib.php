@@ -18,6 +18,7 @@ class PlausicheckProducerLib
 		'AbschlussstatusFehlt' => 'AbschlussstatusFehlt',
 		'AktSemesterNull' => 'AktSemesterNull',
 		'AktiverStudentOhneStatus' => 'AktiverStudentOhneStatus',
+		'AktiverStudentstatusOhneKontobuchung' => 'AktiverStudentstatusOhneKontobuchung',
 		'AusbildungssemPrestudentUngleichAusbildungssemStatus' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
 		'BewerberNichtZumRtAngetreten' => 'BewerberNichtZumRtAngetreten',
 		'DatumAbschlusspruefungFehlt' => 'DatumAbschlusspruefungFehlt',
