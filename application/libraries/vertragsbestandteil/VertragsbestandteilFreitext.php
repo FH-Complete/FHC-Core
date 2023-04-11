@@ -6,9 +6,9 @@ use vertragsbestandteil\VertragsbestandteilFactory;
 
 class VertragsbestandteilFreitext extends Vertragsbestandteil
 {
-	protected $anmerkung;
-	protected $kuendigungrelevant;
 	protected $freitexttyp_kurzbz;
+	protected $titel;
+	protected $anmerkung;
 	
 	public function __construct()
 	{
@@ -19,18 +19,18 @@ class VertragsbestandteilFreitext extends Vertragsbestandteil
 	public function hydrateByStdClass($data)
 	{
 		parent::hydrateByStdClass($data);
-		isset($data->anmerkung) && $this->setAnmerkung($data->anmerkung);
-		isset($data->kuendigungrelevant) && $this->setKuendigungrelevant($data->kuendigungrelevant);
 		isset($data->freitexttyp_kurzbz) && $this->setFreitexttypKurzbz($data->freitexttyp_kurzbz);
+		isset($data->titel) && $this->setTitel($data->titel);
+		isset($data->freitext) && $this->setAnmerkung($data->freitext);
 	}
 		
 	public function toStdClass(): \stdClass
 	{
 		$tmp = array(
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
-			'anmerkung' => $this->getAnmerkung(),
-			'kuendigungrelevant' => $this->getKuendigungrelevant(),
-			'freitexttyp_kurzbz' => $this->getFreitexttypKurzbz()
+			'freitexttyp_kurzbz' => $this->getFreitexttypKurzbz(), 
+			'titel' => $this->getTitel(), 
+			'anmerkung' => $this->getAnmerkung()
 		);
 		
 		$tmp = array_filter($tmp, function($v) {
@@ -44,7 +44,7 @@ class VertragsbestandteilFreitext extends Vertragsbestandteil
 	{
 		$txt = <<<EOTXT
 		anmerkung: {$this->getAnmerkung()}
-		kuendigungrelevant: {$this->getKuendigungrelevant()}
+		titel: {$this->getTitel()}
 		freitexttyp_kurzbz: {$this->getFreitexttypKurzbz()}
 
 EOTXT;
@@ -70,19 +70,19 @@ EOTXT;
 	}
 
 	/**
-	 * Get the value of kuendigungrelevant
+	 * Get the value of titel
 	 */
-	public function getKuendigungrelevant()
+	public function getTitel()
 	{
-		return $this->kuendigungrelevant;
+		return $this->titel;
 	}
 
 	/**
-	 * Set the value of kuendigungrelevant
+	 * Set the value of titel
 	 */
-	public function setKuendigungrelevant($kuendigungrelevant): self
+	public function setTitel($titel): self
 	{
-		$this->kuendigungrelevant = $kuendigungrelevant;
+		$this->titel = $titel;
 
 		return $this;
 	}
