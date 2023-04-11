@@ -74,6 +74,7 @@ class VertragsbestandteilLib
 		{
 			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
 			$this->CI->db->trans_rollback();
+			throw new Exception('Storing Vertragsbestandteil failed.');
 		}	
 	}
 	
