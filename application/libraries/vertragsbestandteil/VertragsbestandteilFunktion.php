@@ -72,7 +72,7 @@ EOTXT;
 	{
 		parent::hydrateByStdClass($data);
 		isset($data->benutzerfunktion_id) && $this->setBenutzerfunktion_id($data->benutzerfunktion_id);
-		isset($data->funktion_kurzbz) && isset($data->oe_kurzbz) 
+		isset($data->funktion) && isset($data->orget) 
 			&& isset($mitarbeiter_uid) && $this->createBenutzerfunktionData($data);
 		
 	}
@@ -91,8 +91,8 @@ EOTXT;
 	protected function createBenutzerfunktionData($data)
 	{
 		$this->benutzerfunktiondata = (object) array(
-			'funktion_kurzbz' => $data->funktion_kurzbz,
-			'oe_kurzbz' => $data->oe_kurzbz,
+			'funktion_kurzbz' => $data->funktion,
+			'oe_kurzbz' => $data->orget,
 			'uid' => $data->mitarbeiter_uid, 
 			'datum_von' => $this->getVon(), 
 			'datum_bis' => $this->getBis(),
