@@ -35,7 +35,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 			return;
 		}
 		
-		$ret = $this->BenutzerfunktionModel->insert($this->benutzerfunktiondata);
+		$ret = $this->CI->BenutzerfunktionModel->insert($this->benutzerfunktiondata);
 		
 		if(isError($ret) )
 		{
@@ -96,7 +96,7 @@ EOTXT;
 			'uid' => $data->mitarbeiter_uid, 
 			'datum_von' => $this->getVon(), 
 			'datum_bis' => $this->getBis(),
-			'insertamum' => strftime('%Y-%m-%d %H:%M:%s'),
+			'insertamum' => strftime('%Y-%m-%d %H:%M:%S'),
 			'insertvon' => getAuthUID()
 		);
 	}
