@@ -171,5 +171,9 @@ EOTXT;
 		
 	}
 	
-	public abstract function toStdClass();	
+	public function beforePersist() {
+		// can be overridden in childs
+	}
+	
+	public abstract function toStdClass();
 }

@@ -12,22 +12,44 @@ use vertragsbestandteil\VertragsbestandteilFactory;
 class VertragsbestandteilFunktion extends Vertragsbestandteil
 {
 	protected $benutzerfunktion_id;
-	protected $anmerkung;
-	protected $kuendigungsrelevant;
+	protected $benutzerfunktiondata;
 
+	protected $CI;
+	
 	public function __construct()
 	{
+		$this->benutzerfunktiondata = null;
+		
 		$this->setVertragsbestandteiltyp_kurzbz(
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FUNKTION);
+		
+		$this->CI = get_instance();
+		$this->CI->load->model('person/Benutzerfunktion_model', 
+			'BenutzerfunktionModel');
+	}
+	
+	public function beforePersist()
+	{
+		if( $this->benutzerfunktiondata === null) 
+		{
+			return;
+		}
+		
+		$ret = $this->BenutzerfunktionModel->insert($this->benutzerfunktiondata);
+		
+		if(isError($ret) )
+		{
+			throw new Exception('failed to create Benutzerfunktion');
+		}
+		
+		$this->setBenutzerfunktion_id(getData($ret));
 	}
 	
 	public function toStdClass()
 	{
 		$tmp = array(
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
-			'benutzerfunktion_id' => $this->getBenutzerfunktion_id(),
-			'anmerkung' => $this->getAnmerkung(),
-			'kuendigungsrelevant' => $this->getKuendigungsrelevant()
+			'benutzerfunktion_id' => $this->getBenutzerfunktion_id()
 		);
 		
 		$tmp = array_filter($tmp, function($v) {
@@ -41,8 +63,6 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 	{
 		$txt = <<<EOTXT
 		benutzerfunktion_id: {$this->getBenutzerfunktion_id()}
-		anmerkung: {$this->getAnmerkung()}
-		kuendigungsrelevant: {$this->getKuendigungsrelevant()}
 
 EOTXT;
 		return parent::__toString() . $txt;
@@ -52,23 +72,14 @@ EOTXT;
 	{
 		parent::hydrateByStdClass($data);
 		isset($data->benutzerfunktion_id) && $this->setBenutzerfunktion_id($data->benutzerfunktion_id);
-		isset($data->anmerkung) && $this->setAnmerkung($data->anmerkung);
-		isset($data->kuendigungsrelevant) && $this->setKuendigungsrelevant($data->kuendigungsrelevant);
+		isset($data->funktion_kurzbz) && isset($data->oe_kurzbz) 
+			&& isset($mitarbeiter_uid) && $this->createBenutzerfunktionData($data);
+		
 	}
-
+	
 	public function getBenutzerfunktion_id()
 	{
 		return $this->benutzerfunktion_id;
-	}
-
-	public function getAnmerkung()
-	{
-		return $this->anmerkung;
-	}
-
-	public function getKuendigungsrelevant()
-	{
-		return $this->kuendigungsrelevant;
 	}
 	
 	public function setBenutzerfunktion_id($benutzerfunktion_id)
@@ -76,15 +87,17 @@ EOTXT;
 		$this->benutzerfunktion_id = $benutzerfunktion_id;
 		return $this;
 	}
-	public function setAnmerkung($anmerkung)
+	
+	protected function createBenutzerfunktionData($data)
 	{
-		$this->anmerkung = $anmerkung;
-		return $this;
-	}
-
-	public function setKuendigungsrelevant($kuendigungsrelevant)
-	{
-		$this->kuendigungsrelevant = $kuendigungsrelevant;
-		return $this;
+		$this->benutzerfunktiondata = (object) array(
+			'funktion_kurzbz' => $data->funktion_kurzbz,
+			'oe_kurzbz' => $data->oe_kurzbz,
+			'uid' => $data->mitarbeiter_uid, 
+			'datum_von' => $this->getVon(), 
+			'datum_bis' => $this->getBis(),
+			'insertamum' => strftime('%Y-%m-%d %H:%M:%s'),
+			'insertvon' => getAuthUID()
+		);
 	}
 }

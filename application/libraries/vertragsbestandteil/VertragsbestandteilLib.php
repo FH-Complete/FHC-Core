@@ -81,6 +81,7 @@ class VertragsbestandteilLib
 	protected function insertVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil, 
 		Vertragsbestandteil $vertragsbestandteil_secondary = null /* i.e. Gehaltsbestandteil connected to Stunden*/)
 	{
+		$vertragsbestandteil->beforePersist();
 		$ret = $this->VertragsbestandteilModel->insert($vertragsbestandteil->baseToStdClass());
 		if( hasData($ret) ) 
 		{
@@ -134,6 +135,7 @@ class VertragsbestandteilLib
 	{
 		$vertragsbestandteil->setUpdateamum(strftime('%Y-%m-%d %H:%M'))
 			->setUpdatevon('ma0080');
+		$vertragsbestandteil->beforePersist();
 		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
 			$vertragsbestandteil->baseToStdClass());
 		
