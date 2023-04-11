@@ -2,6 +2,8 @@
 require_once __DIR__ . '/Vertragsbestandteil.php';
 require_once __DIR__ . '/VertragsbestandteilStunden.php';
 require_once __DIR__ . '/VertragsbestandteilFunktion.php';
+require_once __DIR__ . '/VertragsbestandteilZeitaufzeichnung.php';
+require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
 
 use vertragsbestandteil\Vertragsbestandteil;
