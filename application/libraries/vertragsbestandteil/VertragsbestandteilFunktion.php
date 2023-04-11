@@ -71,9 +71,9 @@ EOTXT;
 	public function hydrateByStdClass($data)
 	{
 		parent::hydrateByStdClass($data);
-		isset($data->benutzerfunktion_id) && $this->setBenutzerfunktion_id($data->benutzerfunktion_id);
+		isset($data->benutzerfunktionid) && $this->setBenutzerfunktion_id($data->benutzerfunktionid);
 		isset($data->funktion) && isset($data->orget) 
-			&& isset($mitarbeiter_uid) && $this->createBenutzerfunktionData($data);
+			&& isset($data->mitarbeiter_uid) && $this->createBenutzerfunktionData($data);
 		
 	}
 	
