@@ -1508,6 +1508,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			$elsumme = '00:00';
 			$ersumme = '00:00';
 			$ersumme_woche = '00:00';
+			$pfsumme = '00:00';
+			$pfsumme_woche = '00:00';
 			$datum_obj = new datum();
 			$tagesbeginn = '';
 			$tagesende = '';
@@ -1612,12 +1614,18 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					{
 						$erstr = '';
 					}
+					if ($pfsumme != '00:00')
+						$pfstr = ' (+ '.$pfsumme.' PFS)';
+					else
+					{
+						$pfstr = '';
+					}
 					echo '</td>
 			        <td align="right" colspan="2" '.$style.'>
 			        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>
 			        	'.$p->t("zeitaufzeichnung/pause").':
 			        </td>
-			        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
+			        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.$pfstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
 			        <td '.$style.' colspan="3" align="right">';
 					if ($tag > $sperrdatum)
 					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
@@ -1629,6 +1637,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					$pausesumme='00:00';
 					$elsumme='00:00';
 					$ersumme = '00:00';
+					$pfsumme = '00:00';
+					$er_pf_summe = '00:00';
 					$extlehrearr = array();
 					$tagesbeginn = '';
 					$tagesende = '';
@@ -1643,18 +1653,24 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				if($woche!=$datumwoche)
 				{
 					if ($ersumme_woche != '00:00')
-						$erstr = ' (+ '.$ersumme_woche.')';
+					{
+						$er_pf_summe+= $ersumme_woche;
+					}
+					if ($pfsumme_woche != '00:00')
+					{
+						$er_pf_summe+= $pfsumme_woche;
+					}
+					if ($er_pf_summe != '00:00')
+						$erpfstr = ' (+ '.$er_pf_summe.')';
 					else
 					{
-						$erstr = '';
+						$erpfstr = '';
 					}
 					echo '
-
-
 							<tr>
 								<th  colspan="'.$colspan.'" style="background-color: #8DBDD8;"></th>
 								<th style="background-color: #8DBDD8;" align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
-								<th style="background-color: #8DBDD8;" align="right" style="font-weight: normal;"><b>'.$wochensaldo.$erstr.'</b></th>
+								<th style="background-color: #8DBDD8;" align="right" style="font-weight: normal;"><b>'.$wochensaldo.$erpfstr.'</b></th>
 								<th style="background-color: #8DBDD8;" colspan="3"></th>
 							</tr>
 
@@ -1678,6 +1694,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					$wochensaldo = '00:00';
 					$ersumme = '00:00';
 					$ersumme_woche = '00:00';
+					$pfsumme = '00:00';
+					$pfsumme_woche = '00:00';
 				}
 
 				// Dienstreisen NEU
@@ -1720,10 +1738,15 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						$pflichtpause = true;
 					}
 				}
-				elseif ($row->aktivitaet_kurzbz=='Ersatzruhe' || $row->aktivitaet_kurzbz=='Pflegefs')
+				elseif ($row->aktivitaet_kurzbz=='Ersatzruhe')
 				{
 					$ersumme = $datum_obj->sumZeit($ersumme, $row->diff);
 					$ersumme_woche = $datum_obj->sumZeit($ersumme_woche, $row->diff);
+				}
+				elseif ($row->aktivitaet_kurzbz=='Pflegefs')
+				{
+					$pfsumme = $datum_obj->sumZeit($pfsumme, $row->diff);
+					$pfsumme_woche = $datum_obj->sumZeit($pfsumme_woche, $row->diff);
 				}
 				else
 					$tagessumme = $datum_obj->sumZeit($tagessumme, $row->diff);

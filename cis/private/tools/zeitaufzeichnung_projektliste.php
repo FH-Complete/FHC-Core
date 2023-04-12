@@ -88,7 +88,7 @@ $date = new datum();
 $ztauf = new zeitaufzeichnung();
 $projektphaseclass = new projektphase();
 
-$activitiesToIgnore = array('DienstreiseMT', 'Ersatzruhe');//aktivitaetstypen which shouldn't be added to worktime
+$activitiesToIgnore = array('DienstreiseMT', 'Ersatzruhe', 'Pflegefs');//aktivitaetstypen which shouldn't be added to worktime
 $ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$daysinmonth, $activitiesToIgnore);
 
 //objects for one projectline of list (corresponds to one day)
@@ -96,7 +96,7 @@ $projektlines = array();
 $dayStart = $dayEnd = '';
 $projektnames = $projektphasenames = $tosubtract = $allpauseranges = array();
 $projektTiteles = array();
-$activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde', 'Pflegefs'];//aktivitaetstypen which should be subtracted fromworktime
+$activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde'];//aktivitaetstypen which should be subtracted fromworktime
 $ztaufdata = $ztauf->result;
 $totalmonthsum = 0.00;
 $projektmonthsums = array();
