@@ -39,6 +39,8 @@ abstract class Vertragsbestandteil  implements \JsonSerializable
 	
 	public function addGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
 	{
+		$gehaltsbestandteil->setDienstverhaeltnis_id($this->getDienstverhaeltnis_id());
+		$gehaltsbestandteil->setVertragsbestandteil_id($this->getVertragsbestandteil_id());
 		$this->gehaltsbestandteile[] = $gehaltsbestandteil;
 		return $this;
 	}
@@ -96,12 +98,20 @@ abstract class Vertragsbestandteil  implements \JsonSerializable
 	public function setVertragsbestandteil_id($vertragsbestandteil_id)
 	{
 		$this->vertragsbestandteil_id = $vertragsbestandteil_id;
+		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
+		{
+			$gehaltsbestandteil->setVertragsbestandteil_id($vertragsbestandteil_id);
+		}
 		return $this;
 	}
 
 	public function setDienstverhaeltnis_id($dienstverhaeltnis_id)
 	{
 		$this->dienstverhaeltnis_id = $dienstverhaeltnis_id;
+		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
+		{
+			$gehaltsbestandteil->setDienstverhaeltnis_id($dienstverhaeltnis_id);
+		}
 		return $this;
 	}
 
