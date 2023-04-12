@@ -6,7 +6,6 @@ require_once __DIR__ . '/VertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
-require_once __DIR__ . '/GehaltsbestandteilLib.php';
 
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
@@ -21,13 +20,20 @@ class VertragsbestandteilLib
 	protected $CI;
 	/** @var Vertragsbestandteil_model */
 	protected $VertragsbestandteilModel;
-
+	/** 
+	 * @var GehaltsbestandteilLib
+	 */
+	protected $GehaltsbestandteilLib;
+	
 	public function __construct()
 	{
 		$this->CI = get_instance();
 		$this->CI->load->model('vertragsbestandteil/Vertragsbestandteil_model', 
 			'VertragsbestandteilModel');
 		$this->VertragsbestandteilModel = $this->CI->VertragsbestandteilModel;
+		$this->CI->load->library('vertragsbestandteil/GehaltsbestandteilLib', 
+			null, 'GehaltsbestandteilLib');
+		$this->GehaltsbestandteilLib = $this->CI->GehaltsbestandteilLib;
 	}
 
 	public function handleGUIData($guidata, $employeeUID, $userUID)
@@ -82,8 +88,7 @@ class VertragsbestandteilLib
 		}	
 	}
 	
-	protected function insertVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil, 
-		Vertragsbestandteil $vertragsbestandteil_secondary = null /* i.e. Gehaltsbestandteil connected to Stunden*/)
+	protected function insertVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
 	{
 		$vertragsbestandteil->beforePersist();
 		$ret = $this->VertragsbestandteilModel->insert($vertragsbestandteil->baseToStdClass());
@@ -105,34 +110,17 @@ class VertragsbestandteilLib
 			throw new Exception('error updating vertragsbestandteil ' 
 				. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
 		}
-
-		if ($vertragsbestandteil_secondary == null) return;
-
-		if (!is_array($vertragsbestandteil_secondary))
-		{
-			$vertragsbestandteil_secondary = [$vertragsbestandteil_secondary];
-		}
-
-		foreach ($vertragsbestandteil_secondary as $vb)
-		{
-			$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
-				$vb->getVertragsbestandteiltyp_kurzbz());
-			
-			if ($specialisedModel instanceof IEncryption)
-			{
-				$retspecial = $specialisedModel->insert($vb->toStdClass(), $specialisedModel->getEncryptedColumns());
-			} else 
-			{
-				$retspecial = $specialisedModel->insert($vb->toStdClass());
-			}			
-			
-			if(isError($retspecial) )
-			{
-				throw new Exception('error updating secondary vertragsbestandteil '
-					. $vb->getVertragsbestandteiltyp_kurzbz());
-			}
-		}
 		
+		try 
+		{
+			$gehaltsbestandteile = $vertragsbestandteil->getGehaltsbestandteile();
+			$this->GehaltsbestandteilLib->storeGehaltsbestandteile($gehaltsbestandteile);
+		} 
+		catch(Exception $ex) 
+		{
+			throw new Exception('VertragsbestandteilLib insertVertragsbestandteil '
+				. 'failed to store Gehaltsbestandteile. ' . $ex->getMessage());
+		}
 	}
 	
 	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
@@ -156,6 +144,17 @@ class VertragsbestandteilLib
 		{
 			throw new Exception('error updating vertragsbestandteil ' 
 				. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+		}
+		
+		try 
+		{
+			$gehaltsbestandteile = $vertragsbestandteil->getGehaltsbestandteile();
+			$this->GehaltsbestandteilLib->storeGehaltsbestandteile($gehaltsbestandteile);
+		} 
+		catch(Exception $ex) 
+		{
+			throw new Exception('VertragsbestandteilLib updateVertragsbestandteil '
+				. 'failed to store Gehaltsbestandteile. ' . $ex->getMessage());
 		}
 	}
 }
