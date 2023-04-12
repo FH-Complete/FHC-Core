@@ -1,17 +1,16 @@
 <?php
 namespace vertragsbestandteil;
 
-use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
 
 /**
  * Salary always depends on employment (Dienstverhältnis) and optionally on part of contract (Vetragsbestandteil)
  */
-class VertragsbestandteilGehalt extends Vertragsbestandteil
+class Gehaltsbestandteil 
 {
 	protected $gehaltsbestandteil_id;
-	protected $gehalt_von;
-	protected $gehalt_bis;
+    protected $gueltig_ab;
+    protected $gueltig_bis;
 	protected $anmerkung;
 	protected $grundbetrag;
 	protected $betrag_valorisiert;
@@ -21,43 +20,9 @@ class VertragsbestandteilGehalt extends Vertragsbestandteil
 	protected $valorisierungssperre;
 
 	public function __construct()
-	{
-		$this->setVertragsbestandteiltyp_kurzbz(
-			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_GEHALT);
-	}
+	{	
+	}	
 
-	public function hydrateByStdClass($data)
-	{
-		parent::hydrateByStdClass($data);
-		isset($data->gehalt_von) && $this->setGehaltVon($data->gehalt_von);
-		isset($data->gehalt_bis) && $this->setGehaltBis($data->gehalt_bis);
-		isset($data->anmerkung) && $this->setAnmerkung($data->anmerkung);
-		isset($data->gehalt_dienstverhaeltnis_id) && $this->setGehaltDienstverhaeltnisID($data->gehalt_dienstverhaeltnis_id);
-		isset($data->gehaltstyp_kurzbz) && $this->setGehaltstypKurzbz($data->gehaltstyp_kurzbz);
-		isset($data->valorisierungssperre) && $this->setValorisierungssperre($data->valorisierungssperre);
-	}
-
-	public function getGehaltVon()
-	{
-		return $this->gehalt_von;
-	}
-
-	public function getGehaltBis()
-	{
-		return $this->gehalt_bis;
-	}
-
-	public function setGehaltVon($von)
-	{
-		$this->gehalt_von = $von;
-		return $this;
-	}
-
-	public function setGehaltBis($bis)
-	{
-		$this->gehalt_bis = $bis;
-		return $this;
-	}
 
 	/**
 	 * Get the value of gehaltsbestandteil_id
@@ -203,16 +168,11 @@ class VertragsbestandteilGehalt extends Vertragsbestandteil
 		return $this;
 	}
 
-
-
-
 	public function toStdClass(): \stdClass
 	{
 		$tmp = array(			
-			'von' => $this->getVon(),
-			'bis' => $this->getBis(),
-			'gehalt_von' => $this->getGehaltVon(),
-			'gehalt_bis' => $this->getGehaltBis(),
+			'gueltig_ab' => $this->getGueltigAb(),
+			'gueltig_bis' => $this->getGueltigBis(),
 			'gehalt_dienstverhaeltnis_id' => $this->getGehaltDienstverhaeltnisID(),
 			'grundbetrag' => $this->getGrundbetrag(),
 			'betrag_valorisiert' => $this->getBetragValorisiert(),
@@ -242,4 +202,40 @@ EOTXT;
 	}
 
 	
+
+    /**
+     * Get the value of gueltig_ab
+     */
+    public function getGueltigAb()
+    {
+        return $this->gueltig_ab;
+    }
+
+    /**
+     * Set the value of gueltig_ab
+     */
+    public function setGueltigAb($gueltig_ab): self
+    {
+        $this->gueltig_ab = $gueltig_ab;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of gueltig_bis
+     */
+    public function getGueltigBis()
+    {
+        return $this->gueltig_bis;
+    }
+
+    /**
+     * Set the value of gueltig_bis
+     */
+    public function setGueltigBis($gueltig_bis): self
+    {
+        $this->gueltig_bis = $gueltig_bis;
+
+        return $this;
+    }
 }

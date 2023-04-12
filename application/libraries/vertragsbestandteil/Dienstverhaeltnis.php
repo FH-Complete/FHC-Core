@@ -15,7 +15,7 @@ class Dienstverhaeltnis {
     /** @var integer */
     protected $dienstverhaeltnis_id;
     /** @var integer */
-    protected $unternehmen;  // TODO link zu orgeinheit
+    protected $unternehmen;  
     /** @var string */
     protected $vertragsart_kurzbz;
     protected $gueltig_ab;
