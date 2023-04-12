@@ -18,6 +18,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 	
 	public function __construct()
 	{
+		parent::__construct();
 		$this->benutzerfunktiondata = null;
 		
 		$this->setVertragsbestandteiltyp_kurzbz(

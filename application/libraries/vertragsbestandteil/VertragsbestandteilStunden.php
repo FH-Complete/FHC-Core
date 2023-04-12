@@ -19,6 +19,7 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 	
 	public function __construct()
 	{
+		parent::__construct();
 		$this->setVertragsbestandteiltyp_kurzbz(
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_STUNDEN);
 	}

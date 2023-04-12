@@ -12,6 +12,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 	
 	public function __construct()
 	{
+		parent::__construct();
 		$this->setVertragsbestandteiltyp_kurzbz(
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG);
 	}
