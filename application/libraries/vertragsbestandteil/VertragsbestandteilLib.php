@@ -6,6 +6,7 @@ require_once __DIR__ . '/VertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
+require_once __DIR__ . '/GehaltsbestandteilLib.php';
 
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
@@ -136,8 +137,7 @@ class VertragsbestandteilLib
 	
 	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
 	{
-		$vertragsbestandteil->setUpdateamum(strftime('%Y-%m-%d %H:%M'))
-			->setUpdatevon('ma0080');
+		$vertragsbestandteil->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$vertragsbestandteil->beforePersist();
 		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
 			$vertragsbestandteil->baseToStdClass());

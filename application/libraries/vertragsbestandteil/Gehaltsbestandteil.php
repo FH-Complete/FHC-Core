@@ -1,185 +1,245 @@
 <?php
 namespace vertragsbestandteil;
 
-use vertragsbestandteil\VertragsbestandteilFactory;
-
 /**
  * Salary always depends on employment (Dienstverhältnis) and optionally on part of contract (Vetragsbestandteil)
  */
 class Gehaltsbestandteil 
 {
 	protected $gehaltsbestandteil_id;
-    protected $gueltig_ab;
-    protected $gueltig_bis;
+	protected $dienstverhaeltnis_id;
+	protected $vertragsbestandteil_id;
+	protected $gehaltstyp_kurzbz;
+	protected $von;
+    protected $bis;
 	protected $anmerkung;
 	protected $grundbetrag;
 	protected $betrag_valorisiert;
-	protected $valorisieren;
-	protected $gehalt_dienstverhaeltnis_id;
-	protected $gehaltstyp_kurzbz;
 	protected $valorisierungssperre;
+	protected $valorisierung;
+	protected $auszahlungen;
+	
+	protected $insertamum;
+	protected $insertvon;
+	protected $updateamum;
+	protected $updatevon;
 
-	public function __construct()
-	{	
-	}	
-
-
-	/**
-	 * Get the value of gehaltsbestandteil_id
-	 */
-	public function getGehaltsbestandteilId()
+    public function hydrateByStdClass($data)
+	{		
+		isset($data->gehaltsbestandteil_id) && $this->setGehaltsbestandteil_id($data->gehaltsbestandteil_id);
+		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
+		isset($data->vertragsbestandteil_id) && $this->setVertragsbestandteil_id($data->vertragsbestandteil_id);
+		isset($data->gehaltstyp_kurzbz) && $this->setGehaltstyp_kurzbz($data->gehaltstyp_kurzbz);
+		isset($data->von) && $this->setVon($data->von);
+		isset($data->bis) && $this->setBis($data->bis);
+		isset($data->anmerkung) && $this->setAnmerkung($data->anmerkung);
+		isset($data->grundbetrag) && $this->setGrundbetrag($data->grundbetrag);
+		isset($data->betrag_valorisiert) && $this->setBetrag_valorisiert($data->betrag_valorisiert);
+		isset($data->valorisierungssperre) && $this->setValorisierungssperre($data->valorisierungssperre);
+		isset($data->valorisierung) && $this->setValorisierung($data->valorisierung);
+		isset($data->auszahlungen) && $this->setAuszahlungen($data->auszahlungen);
+		
+		isset($data->insertamum) && $this->setInsertamum($data->insertamum);
+		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
+		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
+		isset($data->updatevon) && $this->setUpdatevon($data->updatevon);
+	}
+	
+	public function getGehaltsbestandteil_id()
 	{
 		return $this->gehaltsbestandteil_id;
 	}
 
-	/**
-	 * Set the value of gehaltsbestandteil_id
-	 */
-	public function setGehaltsbestandteilId($gehaltsbestandteil_id): self
+	public function getDienstverhaeltnis_id()
 	{
-		$this->gehaltsbestandteil_id = $gehaltsbestandteil_id;
-
-		return $this;
+		return $this->dienstverhaeltnis_id;
 	}
 
-	/**
-	 * Get the value of anmerkung
-	 */
+	public function getVertragsbestandteil_id()
+	{
+		return $this->vertragsbestandteil_id;
+	}
+
+	public function getGehaltstyp_kurzbz()
+	{
+		return $this->gehaltstyp_kurzbz;
+	}
+
+	public function getVon()
+	{
+		return $this->von;
+	}
+
+	public function getBis()
+	{
+		return $this->bis;
+	}
+
 	public function getAnmerkung()
 	{
 		return $this->anmerkung;
 	}
 
-	/**
-	 * Set the value of anmerkung
-	 */
-	public function setAnmerkung($anmerkung): self
-	{
-		$this->anmerkung = $anmerkung;
-
-		return $this;
-	}
-
-	/**
-	 * Get the value of grundbetrag
-	 */
 	public function getGrundbetrag()
 	{
 		return $this->grundbetrag;
 	}
 
-	/**
-	 * Set the value of grundbetrag
-	 */
-	public function setGrundbetrag($grundbetrag): self
-	{
-		$this->grundbetrag = $grundbetrag;
-
-		return $this;
-	}
-
-	/**
-	 * Get the value of betrag_valorisiert
-	 */
-	public function getBetragValorisiert()
+	public function getBetrag_valorisiert()
 	{
 		return $this->betrag_valorisiert;
 	}
 
-	/**
-	 * Set the value of betrag_valorisiert
-	 */
-	public function setBetragValorisiert($betrag_valorisiert): self
-	{
-		$this->betrag_valorisiert = $betrag_valorisiert;
-
-		return $this;
-	}
-
-	/**
-	 * Get the value of valorisieren
-	 */
-	public function getValorisieren()
-	{
-		return $this->valorisieren;
-	}
-
-	/**
-	 * Set the value of valorisieren
-	 */
-	public function setValorisieren($valorisieren): self
-	{
-		$this->valorisieren = $valorisieren;
-
-		return $this;
-	}
-
-	/**
-	 * Get the value of dienstverhaeltnis_id
-	 */
-	public function getGehaltDienstverhaeltnisID()
-	{
-		return $this->gehalt_dienstverhaeltnis_id;
-	}
-
-	/**
-	 * Set the value of dienstverhaeltnis_id
-	 */
-	public function setGehaltDienstverhaeltnisID($dienstverhaeltnis_id): self
-	{
-		$this->gehalt_dienstverhaeltnis_id = $dienstverhaeltnis_id;
-
-		return $this;
-	}
-
-	/**
-	 * Get the value of gehaltstyp_kurzbz
-	 */
-	public function getGehaltstypKurzbz()
-	{
-		return $this->gehaltstyp_kurzbz;
-	}
-
-	/**
-	 * Set the value of gehaltstyp_kurzbz
-	 */
-	public function setGehaltstypKurzbz($gehaltstyp_kurzbz): self
-	{
-		$this->gehaltstyp_kurzbz = $gehaltstyp_kurzbz;
-
-		return $this;
-	}
-
-	/**
-	 * Get the value of valorisierungssperre
-	 */
 	public function getValorisierungssperre()
 	{
 		return $this->valorisierungssperre;
 	}
 
-	/**
-	 * Set the value of valorisierungssperre
-	 */
-	public function setValorisierungssperre($valorisierungssperre): self
+	public function getValorisierung()
 	{
-		$this->valorisierungssperre = $valorisierungssperre;
+		return $this->valorisierung;
+	}
 
+	public function getAuszahlungen()
+	{
+		return $this->auszahlungen;
+	}
+
+	public function getInsertamum()
+	{
+		return $this->insertamum;
+	}
+
+	public function getInsertvon()
+	{
+		return $this->insertvon;
+	}
+
+	public function getUpdateamum()
+	{
+		return $this->updateamum;
+	}
+
+	public function getUpdatevon()
+	{
+		return $this->updatevon;
+	}
+
+	public function setGehaltsbestandteil_id($gehaltsbestandteil_id)
+	{
+		$this->gehaltsbestandteil_id = $gehaltsbestandteil_id;
 		return $this;
 	}
 
+	public function setDienstverhaeltnis_id($dienstverhaeltnis_id)
+	{
+		$this->dienstverhaeltnis_id = $dienstverhaeltnis_id;
+		return $this;
+	}
+
+	public function setVertragsbestandteil_id($vertragsbestandteil_id)
+	{
+		$this->vertragsbestandteil_id = $vertragsbestandteil_id;
+		return $this;
+	}
+
+	public function setGehaltstyp_kurzbz($gehaltstyp_kurzbz)
+	{
+		$this->gehaltstyp_kurzbz = $gehaltstyp_kurzbz;
+		return $this;
+	}
+
+	public function setVon($von)
+	{
+		$this->von = $von;
+		return $this;
+	}
+
+	public function setBis($bis)
+	{
+		$this->bis = $bis;
+		return $this;
+	}
+
+	public function setAnmerkung($anmerkung)
+	{
+		$this->anmerkung = $anmerkung;
+		return $this;
+	}
+
+	public function setGrundbetrag($grundbetrag)
+	{
+		$this->grundbetrag = $grundbetrag;
+		return $this;
+	}
+
+	public function setBetrag_valorisiert($betrag_valorisiert)
+	{
+		$this->betrag_valorisiert = $betrag_valorisiert;
+		return $this;
+	}
+
+	public function setValorisierungssperre($valorisierungssperre)
+	{
+		$this->valorisierungssperre = $valorisierungssperre;
+		return $this;
+	}
+
+	public function setValorisierung($valorisierung)
+	{
+		$this->valorisierung = $valorisierung;
+		return $this;
+	}
+
+	public function setAuszahlungen($auszahlungen)
+	{
+		$this->auszahlungen = $auszahlungen;
+		return $this;
+	}
+
+	public function setInsertamum($insertamum)
+	{
+		$this->insertamum = $insertamum;
+		return $this;
+	}
+
+	public function setInsertvon($insertvon)
+	{
+		$this->insertvon = $insertvon;
+		return $this;
+	}
+
+	public function setUpdateamum($updateamum)
+	{
+		$this->updateamum = $updateamum;
+		return $this;
+	}
+
+	public function setUpdatevon($updatevon)
+	{
+		$this->updatevon = $updatevon;
+		return $this;
+	}
+	
 	public function toStdClass(): \stdClass
 	{
-		$tmp = array(			
-			'gueltig_ab' => $this->getGueltigAb(),
-			'gueltig_bis' => $this->getGueltigBis(),
-			'gehalt_dienstverhaeltnis_id' => $this->getGehaltDienstverhaeltnisID(),
+		$tmp = array(
+			'gehaltsbestandteil_id' => $this->getGehaltsbestandteil_id(),
+			'dienstverhaeltnis_id' => $this->getDienstverhaeltnis_id(),
+			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
+			'gehaltstyp_kurzbz' => $this->getGehaltstyp_kurzbz(),
+			'von' => $this->getVon(),
+			'bis' => $this->getBis(),
+			'anmerkung' => $this->getAnmerkung(),
 			'grundbetrag' => $this->getGrundbetrag(),
-			'betrag_valorisiert' => $this->getBetragValorisiert(),
-			'valorisieren' => $this->getValorisieren(),
-			'gehaltstyp_kurzbz' => $this->getGehaltstypKurzbz(),
+			'betrag_valorisiert' => $this->getBetrag_valorisiert(),
 			'valorisierungssperre' => $this->getValorisierungssperre(),
-			'anmerkung' => $this->getAnmerkung()
+			'valorisierung' => $this->getValorisierung(),
+			'auszahlungen' => $this->getAuszahlungen(),
+			'insertamum' => $this->getInsertamum(),
+			'insertvon' => $this->getInsertvon(),
+			'updateamum' => $this->getUpdateamum(),
+			'updatevon' => $this->getUpdatevon()
 		);
 
 		$tmp = array_filter($tmp, function($v) {
@@ -192,50 +252,24 @@ class Gehaltsbestandteil
 	public function __toString()
 	{
 		$txt = <<<EOTXT
+		gehaltsbestandteil_id: {$this->getGehaltsbestandteil_id()}
+		dienstverhaeltnis_id: {$this->getDienstverhaeltnis_id()}
+		vertragsbestandteil_id: {$this->getVertragsbestandteil_id()}
+		gehaltstyp_kurzbz: {$this->getGehaltstyp_kurzbz()}
 		von: {$this->getVon()}
 		bis: {$this->getBis()}
+		anmerkung: {$this->getAnmerkung()}
 		grundbetrag: {$this->getGrundbetrag()}
-		valorisieren: {$this->getValorisieren()}
+		betrag_valorisiert: {$this->getBetrag_valorisiert()}
+		valorisierungssperre: {$this->getValorisierungssperre()}
+		valorisierung: {$this->getValorisierung()}
+		auszahlungen: {$this->getAuszahlungen()}
+		insertamum: {$this->getInsertamum()}
+		insertvon: {$this->getInsertvon()}
+		updateamum: {$this->getUpdateamum()}
+		updatevon: {$this->getUpdatevon()}
 
 EOTXT;
-		return parent::__toString() . $txt;
+		return $txt;
 	}
-
-	
-
-    /**
-     * Get the value of gueltig_ab
-     */
-    public function getGueltigAb()
-    {
-        return $this->gueltig_ab;
-    }
-
-    /**
-     * Set the value of gueltig_ab
-     */
-    public function setGueltigAb($gueltig_ab): self
-    {
-        $this->gueltig_ab = $gueltig_ab;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of gueltig_bis
-     */
-    public function getGueltigBis()
-    {
-        return $this->gueltig_bis;
-    }
-
-    /**
-     * Set the value of gueltig_bis
-     */
-    public function setGueltigBis($gueltig_bis): self
-    {
-        $this->gueltig_bis = $gueltig_bis;
-
-        return $this;
-    }
 }

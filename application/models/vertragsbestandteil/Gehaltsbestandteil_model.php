@@ -14,7 +14,16 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 
     public function getEncryptedColumns(): array
     {
-        return ['grundbetrag' => 'ENCRYPTIONKEY', 'betrag_valorisiert' => 'ENCRYPTIONKEY'];
+		return array(
+			'grundbetrag' => array(
+				DB_Model::CRYPT_CAST => 'numeric',
+				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEY'
+			),
+			'betrag_valorisiert' => array(
+				DB_Model::CRYPT_CAST => 'numeric',
+				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEY'
+			)
+		);
     }
 
     public function getCurrentGBTByDV($dienstverhaeltnis_id)

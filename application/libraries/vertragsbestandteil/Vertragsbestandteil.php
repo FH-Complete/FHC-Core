@@ -18,6 +18,13 @@ abstract class Vertragsbestandteil  implements \JsonSerializable
 	protected $updateamum;
 	protected $updatevon;
 	
+	protected $gehaltsbestandteile;
+	
+	public function __construct()
+	{
+		$this->gehaltsbestandteile = array();
+	}
+	
 	public function hydrateByStdClass($data)
 	{		
 		isset($data->vertragsbestandteil_id) && $this->setVertragsbestandteil_id($data->vertragsbestandteil_id);
@@ -28,6 +35,17 @@ abstract class Vertragsbestandteil  implements \JsonSerializable
 		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
 		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
 		isset($data->updatevon) && $this->setUpdatevon($data->updatevon);
+	}
+	
+	public function addGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
+	{
+		$this->gehaltsbestandteile[] = $gehaltsbestandteil;
+		return $this;
+	}
+	
+	public function getGehaltsbestandteile() 
+	{
+		return $this->gehaltsbestandteile;
 	}
 	
 	public function getVertragsbestandteil_id()
