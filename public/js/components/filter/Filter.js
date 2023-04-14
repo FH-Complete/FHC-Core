@@ -139,7 +139,7 @@ export const CoreFilterCmpt = {
 	},
 	beforeCreate() {
 		if (!this.tableOnly == !this.filterType)
-			console.warn('You can not have a filter-type in table-only mode!');
+			alert('You can not have a filter-type in table-only mode!');
 	},
 	created() {
 		this.uuid = _uuid++;
