@@ -41,27 +41,59 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 		<title>Berechtigungen Uebersicht</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
+		<?php
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+		?>
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script language="Javascript">
 			$(document).ready(function()
+			{
+				$("#t1").tablesorter(
+				{
+					sortList: [[0,0]],
+					widgets: ["zebra"],
+					headers: {3:{sorter:false}}
+				});
+
+				$("#t2").tablesorter(
+				{
+					sortList: [[0,0]],
+					widgets: ["zebra"],
+					headers: {2:{sorter:false}}
+				});
+
+				// Breite des Autocompletes korrigieren um das Springen zu verhindern
+				$.extend($.ui.autocomplete.prototype.options, {
+					open: function(event, ui) {
+						$(this).autocomplete("widget").css({
+							"width": ($(".ui-menu-item").width()+ 20 + "px"),
+							"padding-left": "5px"
+						});
+					}
+				});
+
+				$(".berechtigung_autocomplete").autocomplete({
+					source: "benutzerberechtigung_autocomplete.php?autocomplete=berechtigung",
+					minLength:2,
+					response: function(event, ui)
 					{
-						$("#t1").tablesorter(
-							{
-								sortList: [[0,0]],
-								widgets: ["zebra"],
-								headers: {3:{sorter:false}}
-							});
-						$("#t2").tablesorter(
-								{
-									sortList: [[0,0]],
-									widgets: ["zebra"],
-									headers: {2:{sorter:false}}
-								});
-					});
+						//Value und Label fuer die Anzeige setzen
+						for(i in ui.content)
+						{
+							ui.content[i].value=ui.content[i].berechtigung_kurzbz;
+							ui.content[i].label=ui.content[i].berechtigung_kurzbz+" - "+ui.content[i].beschreibung;
+						}
+					},
+					select: function(event, ui)
+					{
+						//Ausgewaehlte Ressource zuweisen und Textfeld wieder leeren
+						$(this).val(ui.item.berechtigung_kurzbz);
+					}
+				});
+			});
 			function confdel()
 			{
 				var value=prompt('Achtung! Sie sind dabei eine Rolle zu löschen. Die Zuordnungen gehen dadurch verloren! Um diese Rolle wirklich zu Löschen tippen Sie "LÖSCHEN" in das untenstehende Feld.');
@@ -71,11 +103,42 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 				else
 					return false;
 			}
+			function validateNewData()
+			{
+				if($('#berechtigung_neu_autocomplete').val() == '')
+				{
+					alert('Berechtigung darf nicht leer sein')
+					return false;
+				}
+				else if ($('#art_neu').val() == '')
+				{
+					alert('Art darf nicht leer sein')
+					return false;
+				}
+				else if ($('#art_neu').val() != '')
+				{
+					var eingabe, c, erlaubt = 'suid', laenge;
+					eingabe = $('#art_neu').val();
+					eingabe = eingabe.toLowerCase();
+					laenge = eingabe.length;
+					for (c = 0; c < laenge; c++)
+					{
+						d = eingabe.charAt(c);
+						if (erlaubt.indexOf(d) == -1)
+						{
+							alert ('Erlaubte Werte für Art sind s,u,i,d');
+							return false;
+						}
+					}
+				}
+				else
+					return true;
+			}
 		</script>
 	</head>
 
 	<body class="background_main">
-		<h2>Berechtigung - Rolle - Übersicht</h2>
+		<h2>Berechtigung - Rolle - <?php echo $rolle_kurzbz ?></h2>
 
 	<?php
 	if(isset($rolle_kurzbz))
@@ -107,25 +170,24 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 			if(!$berechtigung->deleteRolleBerechtigung($rolle_kurzbz, $berechtigung_kurzbz)): ?>
 				<b>Fehler beim Löschen: </b><?php echo $berechtigung->errormsg ?>
 			<?php else: ?>
-				<b>Berechtigung gelöscht!</b>
+				<b>Berechtigung <?php echo $berechtigung_kurzbz.' mit '.$art ?> gelöscht!</b>
 			<?php endif;
 		} ?>
 
-		<br>
 		<a href="<?php echo basename(__FILE__) ?>">
-			Zurück
+			Zurück zur Rollenübersicht
 		</a>
-		<h3>RolleBerechtigung "<?php echo $rolle_kurzbz ?>":</h3>
-
+		<br><br>
 		<?php
 		$berechtigung = new berechtigung();
 		$berechtigung->getBerechtigungen();
 		?>
 		<form action="<?php echo basename(__FILE__) ?>" method="GET">
+			<input type="text" placeholder="Berechtigung" id="berechtigung_neu_autocomplete" class="berechtigung_autocomplete" name="berechtigung_kurzbz" style="width: 300px">
 			<input type="hidden" name="rolle_kurzbz" value="<?php echo $rolle_kurzbz ?>">
-			<SELECT name="berechtigung_kurzbz">
+<!--			<SELECT name="berechtigung_kurzbz">-->
 		<?php
-		$berechtigungen = new berechtigung();
+		/*$berechtigungen = new berechtigung();
 		$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
 		$berechtigungen_arr = array();
 		foreach ($berechtigungen->result as $row)
@@ -137,10 +199,10 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 						<?php echo array_search($row->berechtigung_kurzbz,$berechtigungen_arr)!==false ? 'disabled' : '' ?>>
 					<?php echo $row->berechtigung_kurzbz ?>
 				</OPTION>
-		<?php endforeach; ?>
-			</SELECT>
-			<input type="text" value="suid" size="4" name="art">
-			<input type="submit" name="save" value="Hinzufügen">
+		<?php endforeach; */?>
+<!--			</SELECT>-->
+			<input type="text" id="art_neu" value="suid" size="4" name="art">
+			<input type="submit" name="save" value="Hinzufügen" onclick="return validateNewData()">
 		</form>
 
 		<table id="t1" class="tablesorter">
@@ -154,6 +216,8 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 			</thead>
 			<tbody>
 		<?php
+		$berechtigungen = new berechtigung();
+		$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
 
 		foreach($berechtigungen->result as $rolle): ?>
 				<tr>
@@ -161,7 +225,7 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 					<td><?php echo $rolle->art ?></td>
 					<td><?php echo $rolle->beschreibung ?></td>
 					<td>
-						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>">
+						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>&art=<?php echo $rolle->art ?>">
 							entfernen
 						</a>
 					</td>
@@ -270,24 +334,24 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 			</tbody>
 		</table>
 
-		<br>
+		<br><div style="vertical-align: top">
 			<?php
 			if($edit):
 				?>
 				<form method="POST">
-					Kurzbz: <input type="text" name="kurzbz" value="<?php echo $rolle_edit->rolle_kurzbz ?>" disabled />
-					Beschreibung: <input type="text" name="beschreibung" value="<?php echo $rolle_edit->beschreibung ?>" />
+					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="<?php echo $rolle_edit->rolle_kurzbz ?>" disabled />
+					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /><?php echo $rolle_edit->beschreibung ?></textarea>
 					&nbsp;<input type="submit" name="edit" value="Speichern" />
 				</form>
 		<a href="<?php echo basename(__FILE__) ?>">Neue Rolle anlegen</a>
 			<?php else: ?>
 				<form method="POST">
-					Kurzbz: <input type="text" name="kurzbz" value="" />
-					Beschreibung: <input type="text" name="beschreibung" value="" />
+					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="" />
+					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /></textarea>
 					&nbsp;<input type="submit" name="save" value="Anlegen" />
 				</form>
 			<?php endif; ?>
 	<?php } ?>
-
+			</div>
 	</body>
 </html>

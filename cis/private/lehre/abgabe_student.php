@@ -28,6 +28,7 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php');
 
@@ -89,21 +90,26 @@ $htmlstr1 = '';
 $vorname='';
 $nachname='';
 $zweitbetreuer = '';
+$senatsmitglied = '';
 
 $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname,
 			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname,
 			(SELECT titelpre FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpre,
 			(SELECT titelpost FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpost,
+			tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
 			(SELECT person_id FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
 			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_person_id,
 			(SELECT betreuerart_kurzbz FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
 			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_betreuerart_kurzbz,
+			(SELECT tbl_betreuerart.beschreibung FROM lehre.tbl_projektbetreuer JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz) WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
+			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied') LIMIT 1) AS zweitbetreuer_betreuerart_beschreibung,
 			tbl_projektbetreuer.person_id AS betreuer_person_id,
 			tbl_projekttyp.bezeichnung AS prjbez, *,
 			lehre.tbl_projektbetreuer.note as note,
 			public.tbl_benutzer.aktiv as aktiv,
 			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuer_person_id = tbl_projektbetreuer.person_id) AS babgeschickt,
-			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_abgeschickt
+			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_abgeschickt,
+			(SELECT datum FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz = 'end' AND abgabedatum IS NOT NULL AND projektarbeit_id = tbl_projektarbeit.projektarbeit_id LIMIT 1) AS abgegeben
 		FROM lehre.tbl_projektarbeit
 		LEFT JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
 		LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
@@ -112,11 +118,9 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 		LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
+		LEFT JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz)
 		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer'
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter'
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer'
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter')
+		AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Senatsvorsitz')
 		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)."
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";
 
@@ -142,20 +146,47 @@ else
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
 	{
+		// get zweitbetreuer, if any
 		$htmlstr1 = '';
 		$zweitbetreuer_obj = new person();
 		if ($zweitbetreuer_obj->load($row->zweitbetreuer_person_id))
 		{
 			$zweitbetreuer = ', <b>'.$db->convert_html_chars($row->zweitbetreuer_betreuerart_kurzbz).'</b>: '.$zweitbetreuer_obj->titelpre.' '.$zweitbetreuer_obj->vorname.' '.$zweitbetreuer_obj->nachname.' '.$zweitbetreuer_obj->titelpost;
 		}
-		$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_kurzbz).'</b>: ';
+
+		// get senatsmitglied, if any
+		if ($row->betreuerart_kurzbz == 'Senatsvorsitz')
+		{
+			// write beschreibung of Betreuerart for Senatsvorsitz
+			$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_beschreibung).'</b>: ';
+
+			$senatsmitglied_obj = new projektbetreuer();
+			$senatsmitgliedRes = $senatsmitglied_obj->getZweitbegutachterWithToken($row->betreuer_person_id, $row->projektarbeit_id, $row->uid);
+			if ($senatsmitgliedRes)
+			{
+				$senatsmitglied .= ', <b>'.$db->convert_html_chars($row->zweitbetreuer_betreuerart_beschreibung).'</b>: ';
+				$first = true;
+				foreach($senatsmitglied_obj->result as $spr)
+				{
+					if (!$first)
+						$senatsmitglied .= ', ';
+					$senatsmitglied .= $spr->voller_name;
+					$first = false;
+				}
+			}
+		}
+		else
+			$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_kurzbz).'</b>: ';
+
 		$vorname=$row->vorname;
 		$nachname=$row->nachname;
 		$uid=$row->uid;
+
 		($row->btitelpre!=''?$htmlstr1 .= $row->btitelpre.' ':$htmlstr1 .= '');
 		$htmlstr1 .= $row->bvorname.' '.$row->bnachname;
 		($row->btitelpost!=''?$htmlstr1 .= ' '.$row->btitelpost:$htmlstr1 .= '');
 		$htmlstr1 .= $zweitbetreuer;
+		$htmlstr1 .= $senatsmitglied;
 		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
 
 		if (is_null($row->note) && $row->aktiv === 't')
@@ -174,11 +205,15 @@ else
 				$htmlstr .= "<a href='../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->zweitbetreuer_betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->zweitbetreuer_person_id."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungZweitDownload')."</a>";
 
 			$htmlstr .= "</td>";
-		} else
-		{
-			$htmlstr  .= "<td></td>";
 		}
-
+		elseif (!is_null($row->abgegeben))
+		{
+			$htmlstr  .= "<td>".$p->t('abgabetool/abgegeben')."</td>";
+		}
+		else
+		{
+			$htmlstr  .= "<td>-</td>";
+		}
 
 		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".strtoupper($row->typ.$row->kurzbz)."</td>\n";
@@ -217,7 +252,7 @@ echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>

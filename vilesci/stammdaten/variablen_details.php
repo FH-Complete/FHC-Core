@@ -117,7 +117,7 @@ if(isset($_POST["schick"]))
 		$variable=new variable();
 		
 		if($variable->load($uid, $name))
-			$varialbe->new = false;
+			$variable->new = false;
 		else 
 			$variable->new = true;
 		

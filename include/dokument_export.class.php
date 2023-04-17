@@ -50,17 +50,24 @@ class dokument_export
 		if(!isset($vorlage))
 			return;
 
-		exec('unoconv --version',$ret_arr);
-		if(isset($ret_arr[0]))
+		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
 		{
-			$hlp = explode(' ',$ret_arr[0]);
-			if(isset($hlp[1]))
-				$this->unoconv_version = $hlp[1];
-			else
-				die('Could not get Unoconv Version');
+			// Use docsbox!!
 		}
 		else
-			die('Unoconv not found');
+		{
+			exec('unoconv --version',$ret_arr);
+			if(isset($ret_arr[0]))
+			{
+				$hlp = explode(' ',$ret_arr[0]);
+				if(isset($hlp[1]))
+					$this->unoconv_version = $hlp[1];
+				else
+					die('Could not get Unoconv Version');
+			}
+			else
+				die('Unoconv not found');
+		}
 
 		//Vorlage aus der Datenbank holen
 		$this->vorlage = new vorlage();
@@ -276,21 +283,32 @@ class dokument_export
 		{
 			case 'pdf':
 			case 'doc':
+				$ret = 0;
 				$this->temp_filename = $this->temp_folder . '/out.' . $this->outputformat;
 
-				// Unoconv Version 0.6 hat eine Bug wodurch die Berechtigungen des PDF/Doc nicht korrekt gesetzt
-				// werden. Deshalb wird dies hier speziell behandelt.
-				// Die 2. Variante hat den Vorteil dass hier eine bessere Fehlerbehandlung moeglich ist
-				if($this->unoconv_version=='0.6')
-					$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . '  %2$s > %1$s';
-				else
-					$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . ' --output %s %s 2>&1';
+				// If it is set to use docsbox
+				if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
+				{
+					require_once(dirname(__FILE__).'/../application/libraries/DocsboxLib.php');
 
-				$command = sprintf($command, $this->temp_filename, $tempname_zip);
+					$ret = DocsboxLib::convert($tempname_zip, $this->temp_filename, $this->outputformat);
+				}
+				else // otherwise use unoconv
+				{
+					// Unoconv Version 0.6 hat eine Bug wodurch die Berechtigungen des PDF/Doc nicht korrekt gesetzt
+					// werden. Deshalb wird dies hier speziell behandelt.
+					// Die 2. Variante hat den Vorteil dass hier eine bessere Fehlerbehandlung moeglich ist
+					if ($this->unoconv_version == '0.6')
+						$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . '  %2$s > %1$s';
+					else
+						$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . ' --output %s %s 2>&1';
 
-				exec($command, $out, $ret);
+					$command = sprintf($command, $this->temp_filename, $tempname_zip);
 
-				if($ret!=0)
+					exec($command, $out, $ret);
+				}
+
+				if ($ret != 0)
 				{
 					$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte versuchen Sie es in einer Minute erneut oder kontaktieren Sie einen Administrator';
 					return false;
@@ -455,15 +473,27 @@ class dokument_export
 	*/
 	public function convert($inFile, $outFile, $format = "pdf")
 	{
-		if($this->unoconv_version=='0.6')
-			$command = 'unoconv -f %1$s  %3$s > %2$s';
-		else
-			$command = 'unoconv -f %s --output %s %s 2>&1';
-		$command = sprintf($command, $format, $outFile, $inFile);
+		$ret = 0;
 
-		exec($command, $out, $ret);
+		// If it is set to use DOCSBOX
+		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
+		{
+			require_once(dirname(__FILE__).'/../application/libraries/DocsboxLib.php');
 
-		if($ret!=0)
+			$ret = DocsboxLib::convert($inFile, $outFile, $format);
+		}
+		else // fallback to unoconv
+		{
+			if($this->unoconv_version=='0.6')
+				$command = 'unoconv -f %1$s  %3$s > %2$s';
+			else
+				$command = 'unoconv -f %s --output %s %s 2>&1';
+			$command = sprintf($command, $format, $outFile, $inFile);
+
+			exec($command, $out, $ret);
+		}
+
+		if ($ret != 0)
 		{
 			$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte versuchen Sie es in einer Minute erneut oder kontaktieren Sie einen Administrator';
 			return false;

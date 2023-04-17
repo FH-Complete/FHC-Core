@@ -49,7 +49,7 @@ if (!$filter->loadAll())
 		<title>Filter Übersicht</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 		<?php
 		include("../../include/meta/jquery-tablesorter.php");
 		?>
@@ -81,7 +81,7 @@ if (!$filter->loadAll())
 		<form name="formular">
 			<input type="hidden" name="check" value="">
 		</form>
-		<table class="tablesorter" id="t1">
+		<table class="tablesorter" id="t1" style="table-layout: fixed">
 			<thead>
 				<tr>
 					<th onmouseup="document.formular.check.value=0">
@@ -144,8 +144,8 @@ if (!$filter->loadAll())
 						<td>
 							<?php echo $db->convert_html_chars($filter->htmlattr) ?>
 						</td>
-						<td>
-							<?php echo $db->convert_html_chars(substr($filter->sql,0,32)) ?>...
+						<td style="text-overflow: ellipsis; white-space: nowrap; overflow:hidden;">
+							<?php echo $db->convert_html_chars($filter->sql) ?>
 						</td>
 						<td>
 							<form action="<?php echo basename(__FILE__) ?>" name="form_<?php echo $filter->filter_id ?>" method="POST">

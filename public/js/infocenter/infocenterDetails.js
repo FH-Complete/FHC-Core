@@ -150,6 +150,12 @@ var InfocenterDetails = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						var prestudent = data.retval[0];
+
+						if (prestudent.zgv_code === null && prestudent.zgvmas_code === null)
+						{
+							btn.after("<span id='zgvUebernehmenNotice' class='text-warning'>&nbsp;&nbsp;keine ZGV vorhanden</span>");
+						}
+
 						var zgvcode = prestudent.zgv_code !== null ? prestudent.zgv_code : "null";
 						var zgvort = prestudent.zgvort !== null ? prestudent.zgvort : "";
 						var zgvdatum = prestudent.zgvdatum;
@@ -183,7 +189,7 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						btn.after("&nbsp;&nbsp;<span id='zgvUebernehmenNotice' class='text-warning'>keine ZGV vorhanden</span>");
+						btn.after("<span id='zgvUebernehmenNotice' class='text-warning'>&nbsp;&nbsp;Fehler beim Laden der Daten</span>");
 					}
 				},
 				errorCallback: function()
@@ -543,8 +549,8 @@ var InfocenterDetails = {
 
 			var prestudentdata = prestudentresponse.retval;
 
-			var prestudent_id = freigabedata.prestudent_id;
-			var statusgrund_id = freigabedata.statusgrund_id;
+			var prestudent_id = parseInt(freigabedata.prestudent_id);
+			var statusgrund_id = parseInt(freigabedata.statusgrund_id);
 			var rtfreigabe = !$.isNumeric(statusgrund_id);//no Statusgrund - RT Freigabe
 
 			var rtFreigegeben = false;
