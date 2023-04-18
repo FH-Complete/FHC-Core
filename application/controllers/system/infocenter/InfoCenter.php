@@ -121,6 +121,7 @@ class InfoCenter extends Auth_Controller
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'saveDocTyp' => 'infocenter:rw',
+				'updateStammdaten' => 'infocenter:rw',
 				'saveNachreichung' => 'infocenter:rw',
 				'getPrestudentData' => 'infocenter:r',
 				'getLastPrestudentWithZgvJson' => 'infocenter:r',
@@ -172,10 +173,15 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
 		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
 		$this->load->model('codex/Nation_model', 'NationModel');
+		$this->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->load->model('person/Geschlecht_model', 'GeschlechtModel');
+		$this->load->model('person/adresse_model', 'AdresseModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
+
+		$this->load->config('infocenter');
 
 		$this->loadPhrases(
 			array(
@@ -1111,14 +1117,14 @@ class InfoCenter extends Auth_Controller
 
 	public function reloadDoks($person_id)
 	{
-		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false);
 
 		$this->load->view('system/infocenter/dokNachzureichend.php', array('dokumente_nachgereicht' => $dokumente_nachgereicht->retval));
 	}
 
 	public function reloadUebersichtDoks($person_id)
 	{
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false);
 
 		$this->DokumentModel->addOrder('bezeichnung');
 		$dokumentdata = array('dokumententypen' => (getData($this->DokumentModel->load())));
@@ -1318,6 +1324,126 @@ class InfoCenter extends Auth_Controller
 		);
 
 		$this->outputJsonSuccess('success');
+	}
+
+	public function updateStammdaten()
+	{
+		if (isEmptyString($this->input->post('nachname')) ||
+			isEmptyString($this->input->post('geschlecht')) ||
+			isEmptyString($this->input->post('gebdatum')))
+		{
+			$this->terminateWithJsonError($this->p->t('infocenter', 'stammdatenFeldFehlt'));
+		}
+
+		$datum = explode('.', $this->input->post('gebdatum'));
+
+		if (!checkdate($datum[1], $datum[0], $datum[2]))
+		{
+			$this->terminateWithJsonError($this->p->t('infocenter', 'datumUngueltig'));
+		}
+
+		$person_id = $this->input->post('personid');
+
+		$update = $this->PersonModel->update(
+			array
+			(
+				'person_id' => $person_id
+			),
+			array
+			(
+				'titelpre' => isEmptyString($this->input->post('titelpre')) ? null : $this->input->post('titelpre'),
+				'vorname' => isEmptyString($this->input->post('vorname')) ? null : $this->input->post('vorname'),
+				'nachname' => $this->input->post('nachname'),
+				'titelpost' => isEmptyString($this->input->post('titelpost')) ? null : $this->input->post('titelpost'),
+				'gebdatum' => isEmptyString($this->input->post('gebdatum')) ? null : date("Y-m-d", strtotime($this->input->post('gebdatum'))),
+				'svnr' => isEmptyString($this->input->post('svnr')) ? null : $this->input->post('svnr'),
+				'staatsbuergerschaft' => isEmptyString($this->input->post('buergerschaft')) ? null : $this->input->post('buergerschaft'),
+				'geschlecht' => $this->input->post('geschlecht'),
+				'geburtsnation' => isEmptyString($this->input->post('gebnation')) ? null : $this->input->post('gebnation'),
+				'gebort' => isEmptyString($this->input->post('gebort')) ? null : $this->input->post('gebort'),
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $this->_uid
+			)
+		);
+
+		if (isError($update))
+			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+
+		$kontakte = $this->input->post('kontakt');
+		foreach ($kontakte as $kontakt)
+		{
+			$kontaktExists = $this->KontaktModel->loadWhere(array(
+				'kontakt_id' => $kontakt['id'],
+				'person_id' => $person_id,
+			));
+
+			if (hasData($kontaktExists))
+			{
+				$kontaktExists = getData($kontaktExists)[0];
+
+				if ($kontaktExists->kontakt === $kontakt['value'])
+					continue;
+
+				$update = $this->KontaktModel->update(
+					array
+					(
+						'kontakt_id' => $kontakt['id']
+					),
+					array
+					(
+						'kontakt' => isEmptyString($kontakt['value']) ? null : $kontakt['value'],
+						'updateamum' => date('Y-m-d H:i:s'),
+						'updatevon' => $this->_uid
+					)
+				);
+
+				if (isError($update))
+					$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+			}
+		}
+
+		$adressen = $this->input->post('adresse');
+
+		foreach ($adressen as $adresse)
+		{
+			$adresseExists = $this->AdresseModel->loadWhere(array(
+				'adresse_id' => $adresse['id'],
+				'person_id' => $person_id,
+			));
+
+			if (hasData($adresseExists))
+			{
+				$adresse = $adresse['value'];
+				$adresseExists = getData($adresseExists)[0];
+				if ($adresseExists->strasse !== $adresse['strasse'] ||
+					$adresseExists->plz !== $adresse['plz'] ||
+					$adresseExists->ort !== $adresse['ort'] ||
+					$adresseExists->nation !== $adresse['nation'])
+				{
+					$update = $this->AdresseModel->update(
+						array
+						(
+							'adresse_id' => $adresseExists->adresse_id
+						),
+						array
+						(
+							'strasse' => isEmptyString($adresse['strasse']) ? null : $adresse['strasse'],
+							'plz' => isEmptyString($adresse['plz']) ? null : $adresse['plz'],
+							'ort' => isEmptyString($adresse['ort']) ? null : $adresse['ort'],
+							'nation' => isEmptyString($adresse['nation']) ? null : $adresse['nation'],
+							'updateamum' => date('Y-m-d H:i:s'),
+							'updatevon' => $this->_uid
+						)
+					);
+
+					if (isError($update))
+						$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+				}
+
+			}
+		}
+
+		$this->outputJsonSuccess('Success');
 	}
 
 	public function saveNachreichung($person_id)
@@ -1794,14 +1920,14 @@ class InfoCenter extends Auth_Controller
 		if (!isset($stammdaten->retval))
 			return null;
 
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false);
 
 		if (isError($dokumente))
 		{
 			show_error(getError($dokumente));
 		}
 
-		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false);
 
 		if (isError($dokumente_nachgereicht))
 		{
@@ -1996,6 +2122,12 @@ class InfoCenter extends Auth_Controller
 		$this->NationModel->addOrder('langtext');
 		$allNations = getData($this->NationModel->load());
 
+
+		$additional_stg = explode(',', ($this->config->item('infocenter_studiengang_kz')));
+
+		$this->GeschlechtModel->addOrder('sort');
+		$allGenders = getData($this->GeschlechtModel->load());
+
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
 			'abwstatusgruende' => $abwstatusgruende,
@@ -2004,6 +2136,8 @@ class InfoCenter extends Auth_Controller
 			'all_zgvs' => $allZGVs,
 			'all_zgvs_master' => $allZGVsMaster,
 			'all_nations' => $allNations,
+			'additional_stg' => $additional_stg,
+			'all_genders' => $allGenders
 		);
 
 		return $data;
@@ -2164,8 +2298,8 @@ class InfoCenter extends Auth_Controller
 		$prestudentstatus = $prestudent->prestudentstatus;
 		$person_id = $prestudent->person_id;
 		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
-		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false)->retval;
-		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true)->retval;
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false, false)->retval;
+		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true, false)->retval;
 
 		//fill mail variables
 		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
@@ -2262,12 +2396,10 @@ class InfoCenter extends Auth_Controller
 
 	public function getAbsageData()
 	{
-		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
-		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm']);
+		$stg_typ = $this->getStudienArtBerechtigung(['b', 'm']);
 
-		if (hasData($stg_typ))
+		if (!is_null($stg_typ))
 		{
-			$stg_typ = getData($stg_typ);
 			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
 			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
 			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
@@ -2283,15 +2415,16 @@ class InfoCenter extends Auth_Controller
 			$this->outputJsonSuccess(null);
 	}
 
-	public function getStudienArtBerechtigung()
+	public function getStudienArtBerechtigung($typ = null)
 	{
 		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
-		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, ['b', 'm', 'l']);
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, $typ);
 		return getData($stg_typ);
 	}
+
 	public function getStudienartData()
 	{
-		$this->outputJsonSuccess($this->getStudienArtBerechtigung());
+		$this->outputJsonSuccess($this->getStudienArtBerechtigung(['b', 'm', 'l']));
 	}
 
 	public function saveAbsageForAll()

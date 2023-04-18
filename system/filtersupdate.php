@@ -1035,7 +1035,6 @@ $filters = array(
 					{"name": "Note"},
 					{"name": "ErstNachname"},
 					{"name": "ErstAbgeschickt"},
-					{"name": "ZweitNachname"},
 					{"name": "ZweitAbgeschickt"}
 				],
 				"filters": []
@@ -1111,12 +1110,12 @@ $filters = array(
 					{"name": "Standardkostenstelle"}
 				],
 				"filters": [
-					{                              
-					"name": "Nachname",      
-					"option": "",            
-					"condition": "",         
-					"operation": ""          
-					}    
+					{
+					"name": "Nachname",
+					"option": "",
+					"condition": "",
+					"operation": ""
+					}
 				]
 			}
 		',

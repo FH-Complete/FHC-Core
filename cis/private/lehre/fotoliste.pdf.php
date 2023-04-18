@@ -180,7 +180,8 @@ $qry = 'SELECT DISTINCT ON
             tbl_person.matr_nr,
             tbl_person.geschlecht,
             tbl_person.foto,
-            tbl_person.foto_sperre
+            tbl_person.foto_sperre,
+			(tbl_bisio.bis::timestamp - tbl_bisio.von::timestamp) as daysout
 		FROM
 			campus.vw_student_lehrveranstaltung
             JOIN public.tbl_benutzer USING(uid)
@@ -200,7 +201,7 @@ $qry = 'SELECT DISTINCT ON
 if ($lehreinheit != '')
     $qry .= ' AND vw_student_lehrveranstaltung.lehreinheit_id=' . $db->db_add_param($lehreinheit, FHC_INTEGER);
 
-$qry .= ' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
+$qry .= ' ORDER BY nachname, vorname, person_id, daysout DESC';
 
 $stsem_obj = new studiensemester();
 $stsem_obj->load($studiensemester);
@@ -289,7 +290,7 @@ if ($result = $db->db_query($qry)) {
                     'personenkennzeichen' => trim($row->matrikelnr),
                     'geschlecht' => $row->geschlecht,
                     'foto_gesperrt' => $row->foto_sperre, // f/t
-                    'foto_url' => $foto_url,
+                    'foto_url' => 'Pictures/' . trim($row->person_id) . '.jpg',
                     'studiengruppe' => $student_studiengruppe,
                     'verband' => trim($row->verband),
                     'gruppe' => trim($row->gruppe),
