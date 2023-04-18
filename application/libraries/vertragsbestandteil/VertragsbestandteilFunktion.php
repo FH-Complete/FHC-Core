@@ -104,11 +104,12 @@ EOTXT;
 	
 	public function validate()
 	{
-		if( (inval($this->benutzerfunktion_id) < 1) 
+		if( (intval($this->benutzerfunktion_id) < 1) 
 			&& ($this->benutzerfunktiondata === NULL) ) {
-			$this->isvalid = false;
 			$this->validationerrors[] = 'Eine bestehende Funktion oder eine '
 				. 'Funktion und eine Organisationseinheit müssen ausgewählt sein.';
 		}
+		
+		parent::validate();
 	}
 }

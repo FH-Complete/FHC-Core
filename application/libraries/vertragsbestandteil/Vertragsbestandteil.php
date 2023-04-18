@@ -219,7 +219,13 @@ EOTXT;
 	}
 	
 	public function validate() {
-		return array();
+		if( count($this->validationerrors) > 0 ) {
+			$this->isvalid = false;
+		} else {
+			$this->isvalid = true;
+		}
+		
+		return $this->isvalid;
 	}
 	
 	public abstract function toStdClass();
