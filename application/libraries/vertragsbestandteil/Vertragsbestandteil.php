@@ -20,9 +20,14 @@ abstract class Vertragsbestandteil  implements \JsonSerializable
 	
 	protected $gehaltsbestandteile;
 	
+	protected $isvalid;
+	protected $validationerrors;
+
 	public function __construct()
 	{
 		$this->gehaltsbestandteile = array();
+		$this->isvalid = false;
+		$this->validationerrors = array();
 	}
 	
 	public function hydrateByStdClass($data)
@@ -201,6 +206,20 @@ EOTXT;
 	
 	public function beforePersist() {
 		// can be overridden in childs
+	}
+	
+	public function isValid()
+	{
+		return $this->isvalid;
+	}
+
+	public function getValidationErrors()
+	{
+		return $this->validationerrors;
+	}
+	
+	public function validate() {
+		return array();
 	}
 	
 	public abstract function toStdClass();
