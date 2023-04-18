@@ -110,6 +110,6 @@ EOTXT;
 				. 'Funktion und eine Organisationseinheit müssen ausgewählt sein.';
 		}
 		
-		parent::validate();
+		return parent::validate();
 	}
 }
