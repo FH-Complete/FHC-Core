@@ -33,6 +33,7 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/addon.class.php');
+require_once('../../include/benutzerfunktion.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -132,7 +133,7 @@ echo '	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker
 
 //Rechte Pruefen
 $rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
+$rechte->getBerechtigungen($user, true);
 
 if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
@@ -143,6 +144,16 @@ echo 'Zeitsperren der UID <INPUT type="hidden" id="uid" name="uid" value="uid">
 		<input type="text" id="ma_name" name="uid" value="'.$uid.'">';
 echo '<input type="submit" name="submit" value="Anzeigen">';
 echo '</form>';
+
+//OEs mit Leitungsfunktion User laden
+$bf = new benutzerfunktion();
+$oes = $bf->getBenutzerFunktionByUid($user, 'Leitung');
+
+$leitungInOes = array();
+foreach ($bf->result as $oe)
+{
+	$leitungInOes[] = $oe->oe_kurzbz;
+}
 
 //Loeschen von Zeitsperren
 if($action=='delete')
@@ -242,8 +253,23 @@ if($errormsg!='')
 if($message!='')
 	echo "<br><div class='insertok'>$message</div><br>";
 
+//Check, if user Leitungsfunktion für die OE des gewünschten uid besitzt
+$ber = false;
+$bf = new benutzerfunktion();
+$bf->getBenutzerFunktionByUid($uid);
+foreach ($bf->result as $oe)
+{
+	if(in_array($oe->oe_kurzbz, $leitungInOes))
+	{
+		$ber = true;
+	}
+}
+
+if($uid!='' && !$ber)
+	echo( "Keine Berechtigungen, um Abwesenheiten von " . $uid . " zu bearbeiten!");
+
 //Zeitsperren des Mitarbeiters anzeigen
-if($uid!='')
+if($uid!='' && $ber)
 {
 	$mitarbeiter = new mitarbeiter();
 	if(!$mitarbeiter->load($uid))
@@ -265,19 +291,19 @@ if($uid!='')
 			<th>Bis</th>
 			<th>Vertretung</th>';
 
-if($addoncasetime)
-{
-	echo '<th>Status Monatsliste</th>';
-}
+	if($addoncasetime)
+	{
+		echo '<th>Status Monatsliste</th>';
+	}
 
-echo'
-<th>Freigegeben von, am</th>
-			<th>Aktualisiert am</th>
-			<th>Aktualisiert von</th>
-			<th>Edit</th>
-			<th>Copy</th>
-			<th>Delete</th>
-		</tr>
+	echo'
+	<th>Freigegeben von, am</th>
+	<th>Aktualisiert am</th>
+	<th>Aktualisiert von</th>
+	<th>Edit</th>
+	<th>Copy</th>
+	<th>Delete</th>
+	</tr>
 	</thead>
 	<tbody>';
 	foreach ($zeitsperre->result as $row)
@@ -296,9 +322,9 @@ echo'
 			checkStatusMonatsliste($uid,$row->vondatum, $row->bisdatum) == '' ? $mlAbgeschickt = false : $mlAbgeschickt = true;
 
 			if($mlAbgeschickt)
-				echo "abgeschickt";
+			echo "abgeschickt";
 			else
-				echo "nicht abgeschickt";
+			echo "nicht abgeschickt";
 
 			echo '</td>';
 		}
@@ -322,6 +348,7 @@ echo'
 
 
 		echo '</tr>';
+
 	}
 	echo '</tbody></table>';
 
