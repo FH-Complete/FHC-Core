@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2023 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@ use \DB_Model as DB_Model;
 
 class ReihungstestJob extends JOB_Controller
 {
+	// OE used to as sender for the test deadline reminder
+	const OU_SENDER_TEST_REMINDER = 'infocenter';
+
 	/**
 	 * Constructor
 	 */
@@ -466,12 +469,10 @@ class ReihungstestJob extends JOB_Controller
 									$mailcontent_data_arr['wegbeschreibung'] = $applicant->lageplan;
 								}
 
-								$sender_id = $this->config->item('system_person_id');
-
 								$this->CLMessagesModel->sendExplicitTemplateSenderId(
-									$sender_id,
+									$this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID),
 									$applicant->prestudent_id,
-									OU_SENDER_TEST_REMINDER,
+									self::OU_SENDER_TEST_REMINDER,
 									'Sancho_RemindApplicantsOfTest',
 									$mailcontent_data_arr
 								);

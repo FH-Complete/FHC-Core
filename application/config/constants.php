@@ -149,5 +149,3 @@ define('MSG_ERR_INVALID_RECIPIENTS',	46);
 define('MSG_ERR_INVALID_OU',			47);
 define('MSG_ERR_INVALID_TOKEN',			48);
 
-// Message sender OE unit for reminder application Test
-define('OU_SENDER_TEST_REMINDER', 'infocenter');

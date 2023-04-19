@@ -109,8 +109,8 @@ class InfoCenter extends Auth_Controller
 	 * Constructor
 	 */
 	public function __construct()
-    {
-        parent::__construct(
+	{
+        	parent::__construct(
 			array(
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
@@ -166,7 +166,6 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('crm/ZGVPruefungStatus_model', 'ZGVPruefungStatusModel');
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('person/Person_model', 'PersonModel');
-		$this->load->model('system/Message_model', 'MessageModel');
 		$this->load->model('system/Filters_model', 'FiltersModel');
 		$this->load->model('system/PersonLock_model', 'PersonLockModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -176,6 +175,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('person/Geschlecht_model', 'GeschlechtModel');
 		$this->load->model('person/adresse_model', 'AdresseModel');
+		$this->load->model('CL/Messages_model', 'CLMessagesModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
@@ -199,7 +199,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->library('VariableLib', array('uid' => $this->_uid));
 
 		$this->setControllerId(); // sets the controller id
-    }
+	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Public methods
@@ -1085,8 +1085,23 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function reloadMessages($person_id)
 	{
-		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
-		$this->load->view('system/infocenter/messageList.php', array('messages' => $messages->retval));
+		$messages = $this->CLMessagesModel->getReceivedAndSentMessages($person_id);
+
+		// If there are messages
+		if (hasData($messages))
+		{
+			$personexists = $this->PersonModel->load($person_id);
+
+			if (isError($personexists)) show_error(getError($personexists));
+
+			if (!hasData($personexists)) show_error('Person does not exist!');
+
+			$this->load->view('system/infocenter/messageList.php', getData($messages));
+		}
+		elseif (isError($messages)) // Otherwise if an error occurred
+		{
+			show_error(getError($messages));
+		}
 	}
 
 	/**
@@ -1522,6 +1537,78 @@ class InfoCenter extends Auth_Controller
 
 		$this->outputJsonSuccess("Done!");
 	}
+
+	/**
+	 * One day I'll be given some nice comment
+	 */
+	public function getAbsageData()
+	{
+		$stg_typ = $this->getStudienArtBerechtigung(['b', 'm']);
+
+		if (!is_null($stg_typ))
+		{
+			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
+			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
+
+			$data = array (
+				'statusgruende' => $statusgruende,
+				'studiengaenge' => $studiengaenge->retval
+			);
+
+			$this->outputJsonSuccess($data);
+		}
+		else
+			$this->outputJsonSuccess(null);
+	}
+
+	/**
+	 * One day I'll be given some nice comment
+	 */
+	public function getStudienArtBerechtigung($typ = null)
+	{
+		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, $typ);
+		return getData($stg_typ);
+	}
+
+	/**
+	 * One day I'll be given some nice comment
+	 */
+	public function getStudienartData()
+	{
+		$this->outputJsonSuccess($this->getStudienArtBerechtigung(['b', 'm', 'l']));
+	}
+
+	/**
+	 * One day I'll be given some nice comment
+	 */
+	public function saveAbsageForAll()
+	{
+		$statusgrund = $this->input->post('statusgrund');
+		$studiengang = $this->input->post('studiengang');
+		$abgeschickt = $this->input->post('abgeschickt');
+		$personen = $this->input->post('personen');
+		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+
+		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
+			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
+
+		foreach($personen as $person)
+		{
+			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
+
+			if (!hasData($prestudent))
+				continue;
+
+			$prestudentData = getData($prestudent);
+
+			$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+		}
+
+		$this->outputJsonSuccess("Success");
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -1934,7 +2021,7 @@ class InfoCenter extends Auth_Controller
 			show_error(getError($dokumente_nachgereicht));
 		}
 
-		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
+		$messages = $this->CLMessagesModel->getReceivedAndSentMessages($person_id);
 
 		if (isError($messages))
 		{
@@ -1967,13 +2054,13 @@ class InfoCenter extends Auth_Controller
 		$data = array (
 			'lockedby' => $lockedby,
 			'lockedbyother' => $lockedbyother,
-			'stammdaten' => $stammdaten->retval,
-			'dokumente' => $dokumente->retval,
-			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
-			'messages' => $messages->retval,
+			'stammdaten' => getData($stammdaten),
+			'dokumente' => getData($dokumente),
+			'dokumente_nachgereicht' => getData($dokumente_nachgereicht),
+			'messages' => getData($messages),
 			'logs' => $logs,
-			'notizen' => $notizen->retval,
-			'notizenbewerbung' => $notizen_bewerbung->retval
+			'notizen' => getData($notizen),
+			'notizenbewerbung' => getData($notizen_bewerbung)
 		);
 
 		return $data;
@@ -2020,6 +2107,7 @@ class InfoCenter extends Auth_Controller
 				//parse Anmerkung for Alternative (Prio is given in orgform and sprache anyway)
 				$zgvpruefung->prestudentstatus->alternative = is_numeric($position) ? substr($zgvpruefung->prestudentstatus->anmerkung, $position) : null;
 			}
+
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
 			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus)
 				|| isset($zgvpruefung->prestudentstatus->bestaetigtam)
@@ -2030,15 +2118,19 @@ class InfoCenter extends Auth_Controller
 			//wether prestudent was freigegeben for RT/Stg
 			$zgvpruefung->isRtFreigegeben = false;
 			$zgvpruefung->isStgFreigegeben = false;
-			$zgvpruefung->sendStgFreigabeMsg = true;//wether Stgudiengangfreigabemessage can be sent (for "exceptions", Studiengänge with no message sending)
+			// Wether Stgudiengangfreigabemessage can be sent (for "exceptions", Studiengänge with no message sending)
+			$zgvpruefung->sendStgFreigabeMsg = true;
 
 			$isFreigegeben = null;
 			if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
 			{
 				$this->PrestudentstatusModel->addSelect('bestaetigtam, statusgrund_id, tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund');
 				$this->PrestudentstatusModel->addJoin('public.tbl_status_grund', 'statusgrund_id', 'LEFT');
-				$isFreigegeben = $this->PrestudentstatusModel->loadWhere(array('studiensemester_kurzbz' => $zgvpruefung->prestudentstatus->studiensemester_kurzbz,
-															  'tbl_prestudentstatus.status_kurzbz' => self::INTERESSENTSTATUS, 'prestudent_id' => $prestudent->prestudent_id));
+				$isFreigegeben = $this->PrestudentstatusModel->loadWhere(array(
+					'studiensemester_kurzbz' => $zgvpruefung->prestudentstatus->studiensemester_kurzbz,
+					'tbl_prestudentstatus.status_kurzbz' => self::INTERESSENTSTATUS,
+					'prestudent_id' => $prestudent->prestudent_id)
+				);
 			}
 
 			if (hasData($isFreigegeben))
@@ -2061,38 +2153,38 @@ class InfoCenter extends Auth_Controller
 							$zgvpruefung->isRtFreigegeben = true;
 					}
 				}
-            }
+			}
 
-            //application priority change possible?
-            $zgvpruefung->changeup = false;
-            $zgvpruefung->changedown = false;
-            $zgvpruefung->hasBewerber = false;
-
-            if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
-            {
-                if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
-                {
-                    $studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
-                    //show warning if there is already another bewerber (RT result already exists)
-                    $bewerber = $this->PersonModel->hasBewerber($person_id, $studiensemester, 'b');
-
-                    if (hasData($bewerber))
-                    {
-                        $bewerbercnt = getData($bewerber);
-
-                        if (is_numeric($bewerbercnt[0]->anzahl_bewerber) && $bewerbercnt[0]->anzahl_bewerber > 0)
-                        {
-                            $zgvpruefung->hasBewerber = true;
-                        }
-                    }
-
-                    $zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
-                    $zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
-                }
-            }
+			// Application priority change possible?
+			$zgvpruefung->changeup = false;
+			$zgvpruefung->changedown = false;
+			$zgvpruefung->hasBewerber = false;
+			
+			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
+			{
+				if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
+				{
+					$studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
+					//show warning if there is already another bewerber (RT result already exists)
+					$bewerber = $this->PersonModel->hasBewerber($person_id, $studiensemester, 'b');
+					
+					if (hasData($bewerber))
+					{
+						$bewerbercnt = getData($bewerber);
+						
+						if (is_numeric($bewerbercnt[0]->anzahl_bewerber) && $bewerbercnt[0]->anzahl_bewerber > 0)
+						{
+							$zgvpruefung->hasBewerber = true;
+						}
+					}
+					
+					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
+					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
+				}
+			}
 			$zgvExist = $this->ZGVPruefungModel->loadWhere(array('prestudent_id' => $zgvpruefung->prestudent_id));
 
-            if (isSuccess($zgvExist) && hasData($zgvExist))
+			if (isSuccess($zgvExist) && hasData($zgvExist))
 			{
 				$this->ZGVPruefungStatusModel->addOrder('datum', 'DESC');
 				$this->ZGVPruefungStatusModel->addLimit(1);
@@ -2252,7 +2344,13 @@ class InfoCenter extends Auth_Controller
 		$studiengang_mail = $prestudentdata->studiengangmail;
 		$studiengang_typ = $prestudentdata->studiengangtyp;
 
-		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung, 'studiengang_mail' => $studiengang_mail, 'studiengang_typ' => $studiengang_typ);
+		return array(
+			'person_id' => $person_id,
+			'studiengang_kurzbz' => $studiengang_kurzbz,
+			'studiengang_bezeichnung' => $studiengang_bezeichnung,
+			'studiengang_mail' => $studiengang_mail,
+			'studiengang_typ' => $studiengang_typ
+		);
 	}
 
 	/**
@@ -2358,11 +2456,6 @@ class InfoCenter extends Auth_Controller
 			'nachname' => $person->nachname,
 			'prestudentid' => $prestudent_id,
 			'statusgrund' => $statusgrund,
-			/*'zgvbez' => $prestudent->zgv_bez,
-			'zgvort' => $zgvort,
-			'zgvdatum' => $zgvdatum,
-			'zgvnation' => $zgvnation,
-			*/
 			'notizentext' => $notizentext,
 			'dokumente' => $dokumenteMail,
 			'dokumente_nachgereicht' => $dokumenteNachzureichenMail,
@@ -2393,63 +2486,5 @@ class InfoCenter extends Auth_Controller
 			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
 		}
 	}
-
-	public function getAbsageData()
-	{
-		$stg_typ = $this->getStudienArtBerechtigung(['b', 'm']);
-
-		if (!is_null($stg_typ))
-		{
-			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
-			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
-			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
-
-			$data = array (
-				'statusgruende' => $statusgruende,
-				'studiengaenge' => $studiengaenge->retval
-			);
-
-			$this->outputJsonSuccess($data);
-		}
-		else
-			$this->outputJsonSuccess(null);
-	}
-
-	public function getStudienArtBerechtigung($typ = null)
-	{
-		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
-		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, $typ);
-		return getData($stg_typ);
-	}
-
-	public function getStudienartData()
-	{
-		$this->outputJsonSuccess($this->getStudienArtBerechtigung(['b', 'm', 'l']));
-	}
-
-	public function saveAbsageForAll()
-	{
-		$statusgrund = $this->input->post('statusgrund');
-		$studiengang = $this->input->post('studiengang');
-		$abgeschickt = $this->input->post('abgeschickt');
-		$personen = $this->input->post('personen');
-		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
-
-		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
-			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
-
-		foreach($personen as $person)
-		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
-
-			if (!hasData($prestudent))
-				continue;
-
-			$prestudentData = getData($prestudent);
-
-			$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
-		}
-
-		$this->outputJsonSuccess("Success");
-	}
 }
+

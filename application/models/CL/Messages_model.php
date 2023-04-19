@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2023 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -225,12 +225,23 @@ class Messages_model extends CI_Model
 				$jsonRecord->message_id = $receivedMessage->message_id;
 				$jsonRecord->subject = $receivedMessage->subject;
 				$jsonRecord->body = $receivedMessage->body;
-				$jsonRecord->from = $receivedMessage->vorname.' '.$receivedMessage->nachname;
 				$sentDate = new DateTime($receivedMessage->sent);
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
-				$jsonRecord->status = $receivedMessage->status;
-				$jsonRecord->statusPersonId = $receivedMessage->statuspersonid;
+				$jsonRecord->status = $receivedMessage->lastStatus;
+				$jsonRecord->statusPersonId = $receivedMessage->senderPersonId;
 				$jsonRecord->token = $receivedMessage->token;
+				$jsonRecord->from = self::SYSTEM_SENDER_NAME; // default fallback
+
+				// If the sender id is the system sender then use the organisation unit
+				if ($receivedMessage->senderPersonId == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
+				{
+					// If the oe exists
+					if (!isEmptyString($receivedMessage->oe)) $jsonRecord->from = $receivedMessage->oe;
+				}
+				else // otherwise use the name and surname of the person sender
+				{
+					$jsonRecord->from = $receivedMessage->senderName.' '.$receivedMessage->senderSurname;
+				}
 
 				$jsonArray[] = $jsonRecord;
 			}
@@ -264,17 +275,20 @@ class Messages_model extends CI_Model
 				$jsonRecord->body = $sentMessage->body;
 				$sentDate = new DateTime($sentMessage->sent);
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
-				$jsonRecord->status = $sentMessage->status;
-				$jsonRecord->statusPersonId = $sentMessage->statuspersonid;
+				$jsonRecord->status = $sentMessage->lastStatus;
+				$jsonRecord->statusPersonId = $sentMessage->senderPersonId;
 				$jsonRecord->token = $sentMessage->token;
+				$jsonRecord->to = self::SYSTEM_SENDER_NAME; // default fallback
 
-				if ($sentMessage->person_id == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
+				// If the recipient id is the system sender then use the organisation unit
+				if ($sentMessage->recipientPersonId == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
 				{
-					$jsonRecord->to = $sentMessage->oe;
+					// If the oe exists
+					if (!isEmptyString($sentMessage->oe)) $jsonRecord->to = $sentMessage->oe;
 				}
-				else
+				else // otherwise use the name and surname of the person recipient
 				{
-					$jsonRecord->to = $sentMessage->vorname.' '.$sentMessage->nachname;
+					$jsonRecord->to = $sentMessage->recipientName.' '.$sentMessage->recipientSurname;
 				}
 
 				$jsonArray[] = $jsonRecord;
@@ -308,38 +322,33 @@ class Messages_model extends CI_Model
 		$sender = self::SYSTEM_SENDER_NAME; // default fallback
 
 		// If the sender is a person
-		if (isEmptyString($message->oe_kurzbz))
+		if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
 		{
-			// And if this person is not the system sender
-			if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
-			{
-				// Retrieves message sender information
-				$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
-				if (isError($senderResult)) show_error(getError($senderResult));
-				if (!hasData($senderResult)) show_error('No sender information found');
+			// Retrieves message sender information
+			$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
+			if (isError($senderResult)) show_error(getError($senderResult));
+			if (!hasData($senderResult)) show_error('No sender information found');
 
-				$sender = getData($senderResult)[0]->vorname.' '.getData($senderResult)[0]->nachname;
-			}
+			$sender = getData($senderResult)[0]->vorname.' '.getData($senderResult)[0]->nachname;
 		}
-		//case ReihungstestReminderJob
-		elseif($message->oe_kurzbz == OU_SENDER_TEST_REMINDER)
-		{
-
-			$ouResult = $this->OrganisationseinheitModel->loadWhere(array('oe_kurzbz' => $message->oe_kurzbz));
-
-			if (isError($ouResult)) show_error(getError($ouResult));
-			if (!hasData($ouResult)) show_error('No organization unit information found');
-
-			$sender = getData($ouResult)[0]->bezeichnung;
-		}
-
 		else // otherwise if the sender is an organization unit (degree program)
 		{
+			// Looks into the degree programs
 			$ouResult = $this->StudiengangModel->loadWhere(array('oe_kurzbz' => $message->oe_kurzbz));
-			if (isError($ouResult)) show_error(getError($ouResult));
-			if (!hasData($ouResult)) show_error('No organization unit information found');
 
-			$sender = getData($ouResult)[0]->bezeichnung;
+			if (isError($ouResult)) show_error(getError($ouResult));
+
+			// If not found here
+			if (!hasData($ouResult))
+			{
+				// Then looks into the organisation units
+				$ouResult = $this->OrganisationseinheitModel->loadWhere(array('oe_kurzbz' => $message->oe_kurzbz));
+
+				if (isError($ouResult)) show_error(getError($ouResult));
+			}
+
+			// If found then set it, otherwise the fallback is used
+			if (hasData($ouResult)) $sender = getData($ouResult)[0]->bezeichnung;
 		}
 
 		// If the sender is not the system sender and configurations to reply exist
@@ -752,6 +761,17 @@ class Messages_model extends CI_Model
 		}
 	}
 
+	/**
+	 * Returns all the received and sent messages for the given person
+	 */
+	public function getReceivedAndSentMessages($person_id)
+	{
+		return $this->RecipientModel->getReceivedAndSentMessages(
+			$person_id,
+			$this->config->item(MessageLib::CFG_OU_RECEIVERS)
+		);
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -984,7 +1004,7 @@ class Messages_model extends CI_Model
 	 * @param object $otherMsgVarsDataObj Can be success object or simple object.
 	 * @return object Returns success object.
 	 */
-	public function _addMsgVarsDataOfLoggedInUser($otherMsgVarsDataObj, $uid = null)
+	private function _addMsgVarsDataOfLoggedInUser($otherMsgVarsDataObj, $uid = null)
 	{
 		// First check if param type is object
 		if (!is_object($otherMsgVarsDataObj)) show_error('Must pass an object to merge with data of logged in user');
@@ -1006,3 +1026,4 @@ class Messages_model extends CI_Model
 		return success(array((object)(array_merge((array)$otherMsgVarsDataObj, (array)$msgVarsDataLoggedInUser))));
 	}
 }
+

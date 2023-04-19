@@ -267,69 +267,14 @@ class Recipient_model extends DB_Model
 	 */
 	public function getReceivedMessages($person_id, $functions)
 	{
-		$sql = '-- Messages sent directly to the person
-				SELECT mr.message_id,
-						mm.relationmessage_id,
-						mm.subject,
-						mm.body,
-						mm.insertamum AS sent,
-						p.vorname,
-						p.nachname,
-						MAX(ms.status) AS status,
-						ms.person_id AS statusPersonId,
-						mr.token
-				  FROM public.tbl_msg_recipient mr
-				  JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
-				  JOIN public.tbl_msg_status ms ON (ms.message_id = mr.message_id AND ms.person_id = mr.person_id)
-				  JOIN public.tbl_person p ON (p.person_id = mm.person_id)
-				 WHERE mr.person_id = ?
-			  GROUP BY mr.message_id,
-			  			mm.relationmessage_id,
-						mm.subject,
-						mm.body,
-						mm.insertamum,
-						p.vorname,
-						p.nachname,
-						ms.person_id,
-						mr.token
-				 UNION
-				-- Messages sent to a person that belongs to the recipient organisation unit
-				SELECT mrou.message_id,
-						mm.relationmessage_id,
-						mm.subject,
-						mm.body,
-						mm.insertamum AS sent,
-						pr.vorname,
-						pr.nachname,
-						MAX(ms.status) AS status,
-						ms.person_id AS statusPersonId,
-						mrou.token
-				  FROM public.tbl_person p
-				  JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
-				  JOIN (
-					  	SELECT uid, oe_kurzbz
-						  FROM public.tbl_benutzerfunktion
-						 WHERE (datum_von IS NULL OR datum_von <= NOW())
-					  	   AND (datum_bis IS NULL OR datum_bis >= NOW())
-						   AND funktion_kurzbz IN ?
-						) bf ON (bf.uid = b.uid)
-				  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
-				  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
-				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
-				  JOIN public.tbl_person pr ON (pr.person_id = mm.person_id)
-				 WHERE p.person_id = ?
-			  GROUP BY mrou.message_id,
-			  			mm.relationmessage_id,
-						mm.subject,
-						mm.body,
-						mm.insertamum,
-						pr.vorname,
-						pr.nachname,
-						ms.person_id,
-						mrou.token
-			  ORDER BY sent DESC';
-
-		return $this->execQuery($sql, array($person_id, $functions, $person_id));
+		return $this->execQuery(
+			$this->_getReceivedMessagesQuery().' ORDER BY sent DESC',
+			array(
+				$person_id,
+				$functions,
+				$person_id
+			)
+		);
 	}
 
 	/**
@@ -337,38 +282,7 @@ class Recipient_model extends DB_Model
 	 */
 	public function getSentMessages($person_id)
 	{
-		$sql = 'SELECT mm.message_id,
-						mm.relationmessage_id,
-						mm.subject,
-						mm.body,
-						mm.insertamum AS sent,
-						p.person_id,
-						p.vorname,
-						p.nachname,
-						MAX(ms.status) AS status,
-						ms.person_id AS statusPersonId,
-						oe.bezeichnung AS oe,
-						mr.token
-				  FROM public.tbl_msg_message mm
-				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
-				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND ms.person_id = mr.person_id)
-				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
-			 LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
-				 WHERE mm.person_id = ?
-			  GROUP BY mm.message_id,
-			  			mm.relationmessage_id,
-						mm.subject,
-						mm.body,
-						mm.insertamum,
-						p.person_id,
-						p.vorname,
-						p.nachname,
-						ms.person_id,
-						oe.bezeichnung,
-						mr.token
-			  ORDER BY sent DESC';
-
-		return $this->execQuery($sql, array($person_id));
+		return $this->execQuery($this->_getSentMessagesQuery().' ORDER BY sent DESC', array($person_id));
 	}
 
 	/**
@@ -393,4 +307,170 @@ class Recipient_model extends DB_Model
 
 		return $this->execQuery($sql, array($messageIds));
 	}
+
+	/**
+	 *
+	 */
+	public function getReceivedAndSentMessages($person_id, $functions)
+	{
+		return $this->execQuery(
+			$this->_getReceivedMessagesQuery().
+			' UNION '.
+			$this->_getSentMessagesQuery().
+			' ORDER BY sent DESC',
+			array(
+				$person_id,
+				$functions,
+				$person_id,
+				$person_id
+			)
+		);
+	}
+
+	// -------------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * Returns the query used to get the sent messages for a given person
+	 */
+	private function _getSentMessagesQuery()
+	{
+		return 'SELECT mm.message_id,
+				mm.relationmessage_id,
+				mm.subject,
+				mm.body,
+				mm.insertamum AS sent,
+				pr.person_id AS "recipientPersonId",
+				pr.vorname AS "recipientName",
+				pr.nachname AS "recipientSurname",
+				ps.person_id AS "senderPersonId",
+				ps.vorname AS "senderName",
+				ps.nachname AS "senderSurname",
+				(SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatus",
+				(SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatusDate",
+				oe.oe_kurzbz AS "oeId",
+				COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
+				mr.token
+			  FROM public.tbl_msg_message mm
+			  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
+			  JOIN public.tbl_person pr ON (pr.person_id = mr.person_id)
+			  JOIN public.tbl_person ps ON (ps.person_id = mm.person_id)
+		     LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
+		     LEFT JOIN public.tbl_studiengang sg ON (sg.oe_kurzbz = mr.oe_kurzbz)
+			 WHERE mm.person_id = ?
+		      GROUP BY mm.message_id,
+		  		mm.relationmessage_id,
+				mm.subject,
+				mm.body,
+				mm.insertamum,
+				pr.person_id,
+				pr.vorname,
+				pr.nachname,
+				ps.person_id,
+				ps.vorname,
+				ps.nachname,
+				"lastStatus",
+				"lastStatusDate",
+				oe.oe_kurzbz,
+				oe,
+				mr.token';
+	}
+
+	/**
+	 * Returns the query used to get the received messages for a given person
+	 */
+	private function _getReceivedMessagesQuery()
+	{
+		return '-- Messages sent directly to the person
+			SELECT mr.message_id,
+				mm.relationmessage_id,
+				mm.subject,
+				mm.body,
+				mm.insertamum AS sent,
+				pr.person_id AS "recipientPersonId",
+				pr.vorname AS "recipientName",
+				pr.nachname AS "recipientSurname",
+				ps.person_id AS "senderPersonId",
+				ps.vorname AS "senderName",
+				ps.nachname AS "senderSurname",
+				(SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatus",
+				(SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatusDate",
+				oe.oe_kurzbz AS "oeId",
+				COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
+				mr.token
+			  FROM public.tbl_msg_recipient mr
+			  JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
+			  JOIN public.tbl_person ps ON (ps.person_id = mm.person_id)
+			  JOIN public.tbl_person pr ON (pr.person_id = mr.person_id)
+		     LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mm.oe_kurzbz)
+		     LEFT JOIN public.tbl_studiengang sg ON (sg.oe_kurzbz = mm.oe_kurzbz)
+			 WHERE mr.person_id = ?
+		      GROUP BY mr.message_id,
+		  		mm.relationmessage_id,
+				mm.subject,
+				mm.body,
+				mm.insertamum,
+				pr.person_id,
+				pr.vorname,
+				pr.nachname,
+				ps.person_id,
+				ps.vorname,
+				ps.nachname,
+				"lastStatus",
+				"lastStatusDate",
+				oe.oe_kurzbz,
+				oe,
+				mr.token
+			 UNION
+			-- Messages sent to a person that belongs to the recipient organisation unit
+			SELECT mrou.message_id,
+				mm.relationmessage_id,
+				mm.subject,
+				mm.body,
+				mm.insertamum AS sent,
+				pr.person_id AS "recipientPersonId",
+				pr.vorname AS "recipientName",
+				pr.nachname AS "recipientSurname",
+				ps.person_id AS "senderPersonId",
+				ps.vorname AS "senderName",
+				ps.nachname AS "senderSurname",
+				(SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mrou.message_id AND person_id = mrou.person_id) AS "lastStatus",
+				(SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mrou.message_id AND person_id = mrou.person_id) AS "lastStatusDate",
+				oe.oe_kurzbz AS "oeId",
+				COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
+				mrou.token
+			  FROM public.tbl_person p
+			  JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
+			  JOIN (
+			  	SELECT uid, oe_kurzbz
+				  FROM public.tbl_benutzerfunktion
+				 WHERE (datum_von IS NULL OR datum_von <= NOW())
+			  	   AND (datum_bis IS NULL OR datum_bis >= NOW())
+				   AND funktion_kurzbz IN ?
+			  ) bf ON (bf.uid = b.uid)
+			  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
+			  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
+			  JOIN public.tbl_person ps ON (ps.person_id = mm.person_id)
+			  JOIN public.tbl_person pr ON (pr.person_id = mrou.person_id)
+		     LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mrou.oe_kurzbz)
+		     LEFT JOIN public.tbl_studiengang sg ON (sg.oe_kurzbz = mrou.oe_kurzbz)
+			 WHERE p.person_id = ?
+		      GROUP BY mrou.message_id,
+		  		mm.relationmessage_id,
+				mm.subject,
+				mm.body,
+				mm.insertamum,
+				pr.person_id,
+				pr.vorname,
+				pr.nachname,
+				ps.person_id,
+				ps.vorname,
+				ps.nachname,
+				"lastStatus",
+				"lastStatusDate",
+				oe.oe_kurzbz,
+				oe,
+				mrou.token';
+	}
 }
+
