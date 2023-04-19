@@ -279,4 +279,7 @@ define ('DEFAULT_LEHRMODUS','regulaer');
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
 
+// Person id of the system sender for the messaging system
+define('MESSAGING_SYSTEM_PERSON_ID', 92);
+
 ?>

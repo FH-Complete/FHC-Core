@@ -41,43 +41,142 @@ else
 	die('Parameter person_id is missing');
 
 $db = new basis_db();
-$qry = "
-SELECT
-	m.message_id AS message_id,
-	m.subject AS subject,
-	m.body AS body,
-	m.insertamum AS insertamum,
-	m.relationmessage_id AS relationmessage_id,
-	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = m.person_id) as sender,
-	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
-	m.person_id as sender_id,
-	r.person_id as recipient_id,
-	MAX(ss.status) as status,
-	MAX(ss.insertamum) as statusdatum
-FROM public.tbl_msg_message m
-     JOIN public.tbl_msg_recipient r USING(message_id)
-     JOIN public.tbl_msg_status ss ON(r.message_id = ss.message_id AND ss.person_id = r.person_id)
-WHERE m.person_id = ".$db->db_add_param($person_id, FHC_INTEGER)."
-GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
-UNION ALL
-SELECT
-	m.message_id AS message_id,
-	m.subject AS subject,
-	m.body AS body,
-	m.insertamum AS insertamum,
-	m.relationmessage_id AS relationmessage_id,
-	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = m.person_id) as sender,
-	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
-	m.person_id as sender_id,
-	r.person_id as recipient_id,
-	MAX(ss.status) as status,
-	MAX(ss.insertamum) as statusdatum
-FROM public.tbl_msg_recipient r
-     JOIN public.tbl_msg_status ss USING(message_id, person_id)
-     JOIN public.tbl_msg_message m USING(message_id)
-WHERE r.person_id = ".$db->db_add_param($person_id, FHC_INTEGER)."
-GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
-ORDER BY insertamum";
+
+$qry = '-- Messages sent from the given person
+       SELECT mm.message_id,
+               mm.relationmessage_id,
+               mm.subject,
+               mm.body,
+               mm.insertamum AS sent,
+               pr.person_id AS "recipientPersonId",
+               pr.vorname AS "recipientName",
+               pr.nachname AS "recipientSurname",
+               ps.person_id AS "senderPersonId",
+               ps.vorname AS "senderName",
+               ps.nachname AS "senderSurname",
+               (SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatus",
+               (SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatusDate",
+               oe.oe_kurzbz AS "oeId",
+               COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
+               mr.token
+         FROM public.tbl_msg_message mm
+         JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
+         JOIN public.tbl_person pr ON (pr.person_id = mr.person_id)
+         JOIN public.tbl_person ps ON (ps.person_id = mm.person_id)
+    LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
+    LEFT JOIN public.tbl_studiengang sg ON (sg.oe_kurzbz = mr.oe_kurzbz)
+        WHERE mm.person_id = '.$db->db_add_param($person_id, FHC_INTEGER).'
+     GROUP BY mm.message_id,
+               mm.relationmessage_id,
+               mm.subject,
+               mm.body,
+               mm.insertamum,
+               pr.person_id,
+               pr.vorname,
+               pr.nachname,
+               ps.person_id,
+               ps.vorname,
+               ps.nachname,
+               "lastStatus",
+               "lastStatusDate",
+               oe.oe_kurzbz,
+               oe,
+       	mr.token
+	UNION
+	-- Messages sent directly to the person
+                        SELECT mr.message_id,
+                                mm.relationmessage_id,
+                                mm.subject,
+                                mm.body,
+                                mm.insertamum AS sent,
+                                pr.person_id AS "recipientPersonId",
+                                pr.vorname AS "recipientName",
+                                pr.nachname AS "recipientSurname",
+                                ps.person_id AS "senderPersonId",
+                                ps.vorname AS "senderName",
+                                ps.nachname AS "senderSurname",
+                                (SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatus",
+                                (SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatusDate",
+                                oe.oe_kurzbz AS "oeId",
+                                COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
+                                mr.token
+                          FROM public.tbl_msg_recipient mr
+                          JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
+                          JOIN public.tbl_person ps ON (ps.person_id = mm.person_id)
+                          JOIN public.tbl_person pr ON (pr.person_id = mr.person_id)
+                     LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mm.oe_kurzbz)
+                     LEFT JOIN public.tbl_studiengang sg ON (sg.oe_kurzbz = mm.oe_kurzbz)
+                         WHERE mr.person_id = '.$db->db_add_param($person_id, FHC_INTEGER).'
+                      GROUP BY mr.message_id,
+                                mm.relationmessage_id,
+                                mm.subject,
+                                mm.body,
+                                mm.insertamum,
+                                pr.person_id,
+                                pr.vorname,
+                                pr.nachname,
+                                ps.person_id,
+                                ps.vorname,
+                                ps.nachname,
+                                "lastStatus",
+                                "lastStatusDate",
+                                oe.oe_kurzbz,
+                                oe,
+                                mr.token
+                         UNION
+-- Messages sent to a person that belongs to the recipient organisation unit
+                        SELECT mrou.message_id,
+                                mm.relationmessage_id,
+                                mm.subject,
+                                mm.body,
+                                mm.insertamum AS sent,
+                                pr.person_id AS "recipientPersonId",
+                                pr.vorname AS "recipientName",
+                                pr.nachname AS "recipientSurname",
+                                ps.person_id AS "senderPersonId",
+                                ps.vorname AS "senderName",
+                                ps.nachname AS "senderSurname",
+                                (SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mrou.message_id AND person_id = mrou.person_id) AS "lastStatus",
+                                (SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mrou.message_id AND person_id = mrou.person_id) AS "lastStatusDate",
+                                oe.oe_kurzbz AS "oeId",
+                                COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
+                                mrou.token
+                          FROM public.tbl_person p
+                          JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
+                          JOIN (
+                                SELECT uid, oe_kurzbz
+                                  FROM public.tbl_benutzerfunktion
+                                 WHERE (datum_von IS NULL OR datum_von <= NOW())
+                                   AND (datum_bis IS NULL OR datum_bis >= NOW())
+                                   AND funktion_kurzbz IN (\'ass\')
+                          ) bf ON (bf.uid = b.uid)
+                          JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
+                          JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
+                          JOIN public.tbl_person ps ON (ps.person_id = mm.person_id)
+                          JOIN public.tbl_person pr ON (pr.person_id = mrou.person_id)
+                     LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mrou.oe_kurzbz)
+                     LEFT JOIN public.tbl_studiengang sg ON (sg.oe_kurzbz = mrou.oe_kurzbz)
+                         WHERE p.person_id = '.$db->db_add_param($person_id, FHC_INTEGER).'
+                      GROUP BY mrou.message_id,
+                                mm.relationmessage_id,
+                                mm.subject,
+                                mm.body,
+                                mm.insertamum,
+                                pr.person_id,
+                                pr.vorname,
+                                pr.nachname,
+                                ps.person_id,
+                                ps.vorname,
+                                ps.nachname,
+                                "lastStatus",
+                                "lastStatusDate",
+                                oe.oe_kurzbz,
+                                oe,
+                                mrou.token
+';
+
+
+// $db->db_add_param($person_id, FHC_INTEGER)
 
 if($db->db_query($qry))
 {
@@ -85,34 +184,56 @@ if($db->db_query($qry))
 	while($row = $db->db_fetch_object())
 	{
 		$status = '';
-		if ($row->status == 0)
+		if ($row->lastStatus == 0)
 		{
 			$status = 'Unread';
 		}
-		else if ($row->status == 1)
+		else if ($row->lastStatus == 1)
 		{
 			$status = 'Read';
 		}
-		else if ($row->status == 2)
+		else if ($row->lastStatus == 2)
 		{
 			$status = 'Archived';
 		}
-		else if ($row->status == 3)
+		else if ($row->lastStatus == 3)
 		{
 			$status = 'Deleted';
 		}
 
-		$i=$oRdf->newObjekt($row->message_id);
-		$oRdf->obj[$i]->setAttribut('subject',$row->subject,true);
-		$oRdf->obj[$i]->setAttribut('body',$row->body,true);
-		$oRdf->obj[$i]->setAttribut('message_id',$row->message_id,true);
-		$oRdf->obj[$i]->setAttribut('insertamum',$row->insertamum,true);
-		$oRdf->obj[$i]->setAttribut('status',$status,true);
-		$oRdf->obj[$i]->setAttribut('statusdatum',$datum_obj->formatDatum($row->statusdatum,'d.m.Y H:i'),true);
-		$oRdf->obj[$i]->setAttribut('sender',$row->sender,true);
-		$oRdf->obj[$i]->setAttribut('recipient',$row->recipient,true);
-		$oRdf->obj[$i]->setAttribut('sender_id',$row->sender_id,true);
-		$oRdf->obj[$i]->setAttribut('recipient_id',$row->recipient_id,true);
+		$sender = $recipient = 'System sender'; // default fallback
+
+		// If the sender is not the system sender
+		if ($row->senderPersonId != MESSAGING_SYSTEM_PERSON_ID)
+		{
+			$sender = $row->senderName.' '.$row->senderSurname;
+		}
+		elseif ($row->oeId != null) // otherwise take the oe
+		{
+			$sender = $row->oe;
+		}
+
+		// If the recipient is not the system sender
+		if ($row->recipientPersonId != MESSAGING_SYSTEM_PERSON_ID)
+		{
+			$recipient = $row->recipientName.' '.$row->recipientSurname;
+		}
+		elseif ($row->oeId != null) // otherwise take the oe
+		{
+			$recipient = $row->oe;
+		}
+
+		$i = $oRdf->newObjekt($row->message_id);
+		$oRdf->obj[$i]->setAttribut('subject', $row->subject, true);
+		$oRdf->obj[$i]->setAttribut('body', $row->body, true);
+		$oRdf->obj[$i]->setAttribut('message_id', $row->message_id, true);
+		$oRdf->obj[$i]->setAttribut('insertamum', $row->sent, true);
+		$oRdf->obj[$i]->setAttribut('status', $status, true);
+		$oRdf->obj[$i]->setAttribut('statusdatum', $datum_obj->formatDatum($row->lastStatusDate, 'd.m.Y H:i'), true);
+		$oRdf->obj[$i]->setAttribut('sender', $sender, true);
+		$oRdf->obj[$i]->setAttribut('recipient', $recipient, true);
+		$oRdf->obj[$i]->setAttribut('sender_id', $row->senderPersonId, true);
+		$oRdf->obj[$i]->setAttribut('recipient_id', $row->recipientPersonId, true);
 
 		if($row->relationmessage_id!='')
 			$oRdf->addSequence($row->message_id, $row->relationmessage_id);
