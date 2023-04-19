@@ -2057,7 +2057,7 @@ class InfoCenter extends Auth_Controller
 			'stammdaten' => getData($stammdaten),
 			'dokumente' => getData($dokumente),
 			'dokumente_nachgereicht' => getData($dokumente_nachgereicht),
-			'messages' => getData($messages),
+			'messages' => getData($messages) == null ? array() : getData($messages),
 			'logs' => $logs,
 			'notizen' => getData($notizen),
 			'notizenbewerbung' => getData($notizen_bewerbung)
