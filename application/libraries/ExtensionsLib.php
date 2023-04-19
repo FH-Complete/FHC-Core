@@ -220,7 +220,10 @@ class ExtensionsLib
 	 */
 	public function getInstalledExtensions()
 	{
-		return $this->_ci->ExtensionsModel->getInstalledExtensions();
+		// Loading models
+		$this->_ci->load->model('system/ExtensionsNOPriv_model', 'ExtensionsNOPrivModel');
+
+		return $this->_ci->ExtensionsNOPrivModel->getInstalledExtensions();
 	}
 
 	/**
