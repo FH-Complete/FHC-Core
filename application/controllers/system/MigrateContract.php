@@ -67,6 +67,7 @@ class MigrateContract extends CLI_Controller
 		$this->load->model('vertragsbestandteil/VertragsbestandteilZeitaufzeichnung_model','VertragsbestandteilZeitaufzeichnungModel');
 		$this->load->model('vertragsbestandteil/VertragsbestandteilFreitext_model','VertragsbestandteilFreitextModel');
 		$this->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model','VertragsbestandteilFunktionModel');
+		$this->load->model('vertragsbestandteil/VertragsbestandteilKarenz_model','VertragsbestandteilKarenzModel');
 
 		$failed = false;
 		$this->db->trans_begin();
