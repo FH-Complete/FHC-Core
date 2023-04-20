@@ -660,6 +660,8 @@ class lehrstunde extends basis_db
 				$stunde->titel=$row->titel;
 				$stunde->anmerkung=$row->beschreibung;
 				$stunde->anmerkung_lehreinheit=$row->beschreibung;
+				$stunde->updateamum=$row->insertamum;
+				$stunde->updatevon=$row->insertvon;
 				$stunde->farbe='';
 				$this->lehrstunden[]=$stunde;
 			}
