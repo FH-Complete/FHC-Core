@@ -17,11 +17,11 @@ $widthColumn = $msgExists === true ? 8 : 12;
 		<?php foreach ($messages as $message): ?>
 			<tr id="<?php echo $message->message_id.'_'.$message->recipientPersonId ?>" style="cursor: pointer">
 				<td><?php echo isset($message->sent) ? date_format(date_create($message->sent), 'd.m.Y H:i:s') : '' ?></td>
-				<td><?php 
+				<td><?php
 					echo $message->senderPersonId == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID) && isset($message->oeId) ?
 						$message->oe : $message->senderName.' '.$message->senderSurname;
 				?></td>
-				<td><?php 
+				<td><?php
 					echo $message->recipientPersonId == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID) && isset($message->oeId) ?
 						$message->oe : $message->recipientName.' '.$message->recipientSurname;
 				?></td>

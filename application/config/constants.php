@@ -10,26 +10,26 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 | Used to indicate the conditions under which the script is exit()ing.
 |
 */
-define('EXIT_SUCCESS',						0); // no errors
-define('EXIT_ERROR',						1); // generic error
-define('EXIT_MODEL',						2); // model error
-define('EXIT_CONFIG',						3); // configuration error
-define('EXIT_UNKNOWN_FILE',					4); // file not found
-define('EXIT_UNKNOWN_CLASS',				5); // unknown class
-define('EXIT_UNKNOWN_METHOD',				6); // unknown class method
-define('EXIT_USER_INPUT',					7); // invalid user input
-define('EXIT_DATABASE',						8); // database error
-define('EXIT_VALIDATION_UDF',				10); // UDF validation has been failed
+define('EXIT_SUCCESS',				0); // no errors
+define('EXIT_ERROR',				1); // generic error
+define('EXIT_MODEL',				2); // model error
+define('EXIT_CONFIG',				3); // configuration error
+define('EXIT_UNKNOWN_FILE',			4); // file not found
+define('EXIT_UNKNOWN_CLASS',			5); // unknown class
+define('EXIT_UNKNOWN_METHOD',			6); // unknown class method
+define('EXIT_USER_INPUT',			7); // invalid user input
+define('EXIT_DATABASE',				8); // database error
+define('EXIT_VALIDATION_UDF',			10); // UDF validation has been failed
 define('EXIT_VALIDATION_UDF_MIN_VALUE',		11); // UDF validation has been failed -> MIN VALUE
 define('EXIT_VALIDATION_UDF_MAX_VALUE',		12); // UDF validation has been failed -> MAX VALUE
 define('EXIT_VALIDATION_UDF_MIN_LENGTH',	13); // UDF validation has been failed -> MIN LENGTH
 define('EXIT_VALIDATION_UDF_MAX_LENGTH',	14); // UDF validation has been failed -> MAX LENGTH
-define('EXIT_VALIDATION_UDF_REGEX',			15); // UDF validation has been failed -> REGEX
+define('EXIT_VALIDATION_UDF_REGEX',		15); // UDF validation has been failed -> REGEX
 define('EXIT_VALIDATION_UDF_REQUIRED',		16); // UDF validation has been failed -> REQUIRED
 define('EXIT_VALIDATION_UDF_NOT_VALID_VAL',	17); // UDF validation has been failed -> Not valid value, object or array
 
-define('EXIT_AUTO_MIN',						1000); // lowest automatically-assigned error code
-define('EXIT_AUTO_MAX',						2000); // highest automatically-assigned error code
+define('EXIT_AUTO_MIN',				1000); // lowest automatically-assigned error code
+define('EXIT_AUTO_MAX',				2000); // highest automatically-assigned error code
 
 /*
 |--------------------------------------------------------------------------
@@ -45,7 +45,7 @@ define('BEGINNING_OF_TIME',					'1970-01-01');
 */
 // Foreign authentication methods
 define('AUTH_HBALDAP',	'httpBasicAuthLDAP');
-define('AUTH_BT',		'bewerbung');
+define('AUTH_BT',	'bewerbung');
 
 // Login methods
 define('AUTH_LDAP',	'ldap');
@@ -53,7 +53,7 @@ define('AUTH_DB',	'database');
 define('AUTH_SSO',	'sso');
 
 // Authentication return codes
-define('AUTH_SUCCESS',				0);
+define('AUTH_SUCCESS',			0);
 define('AUTH_NOT_AUTHENTICATED',	1);
 define('AUTH_INVALID_CREDENTIALS',	2);
 
@@ -112,7 +112,7 @@ define('FOPEN_READ_WRITE_CREATE_STRICT', 'x+b');
 | of this setting
 |
 */
-define('SHOW_DEBUG_BACKTRACE', TRUE);
+define('SHOW_DEBUG_BACKTRACE', true);
 
 /*
 |--------------------------------------------------------------------------
@@ -127,25 +127,25 @@ define('EMAIL_CONFIG_INDEX', 'mail');
 |--------------------------------------------------------------------------
 */
 // Message statuses
-define('MSG_STATUS_UNREAD',		0);
-define('MSG_STATUS_READ',		1);
+define('MSG_STATUS_UNREAD',	0);
+define('MSG_STATUS_READ',	1);
 define('MSG_STATUS_ARCHIVED',	2);
 define('MSG_STATUS_DELETED',	3);
 
 // Message priorities
-define('MSG_PRIORITY_LOW',		1);
+define('MSG_PRIORITY_LOW',	1);
 define('MSG_PRIORITY_NORMAL',	2);
-define('MSG_PRIORITY_HIGH',		3);
+define('MSG_PRIORITY_HIGH',	3);
 define('MSG_PRIORITY_URGENT',	4);
 
 // Message error status
-define('MSG_ERR_INVALID_SUBJECT',		40);
-define('MSG_ERR_INVALID_BODY',			41);
-define('MSG_ERR_INVALID_TEMPLATE',		42);
-define('MSG_ERR_INVALID_MSG_ID',		43);
-define('MSG_ERR_INVALID_STATUS_ID',		44);
-define('MSG_ERR_INVALID_SENDER',		45);
+define('MSG_ERR_INVALID_SUBJECT',	40);
+define('MSG_ERR_INVALID_BODY',		41);
+define('MSG_ERR_INVALID_TEMPLATE',	42);
+define('MSG_ERR_INVALID_MSG_ID',	43);
+define('MSG_ERR_INVALID_STATUS_ID',	44);
+define('MSG_ERR_INVALID_SENDER',	45);
 define('MSG_ERR_INVALID_RECIPIENTS',	46);
-define('MSG_ERR_INVALID_OU',			47);
-define('MSG_ERR_INVALID_TOKEN',			48);
+define('MSG_ERR_INVALID_OU',		47);
+define('MSG_ERR_INVALID_TOKEN',		48);
 

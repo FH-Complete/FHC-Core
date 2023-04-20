@@ -462,7 +462,8 @@ class ReihungstestJob extends JOB_Controller
 								$mailcontent_data_arr['rt_raum'] = $applicant->planbezeichnung;
 								if ($applicant->lageplan == '')
 								{
-									$mailcontent_data_arr['wegbeschreibung'] = 'Für diesen Raum liegt noch keine Wegbeschreibung vor.<br><br>No directions were found for this room';
+									$mailcontent_data_arr['wegbeschreibung'] = 'Für diesen Raum liegt noch keine Wegbeschreibung vor.
+										<br><br>No directions were found for this room';
 								}
 								else
 								{
@@ -931,7 +932,10 @@ class ReihungstestJob extends JOB_Controller
 							JOIN PUBLIC.tbl_studiengang ON (tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz)
 						WHERE tbl_prestudent.person_id = ".$row_ps->person_id."
 							AND tbl_prestudent.prestudent_id != ".$row_ps->prestudent_id."
-							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender')
+							AND get_rolle_prestudent(
+								tbl_prestudent.prestudent_id,
+								'".$row_ps->studiensemester_kurzbz."'
+							) IN ('Aufgenommener','Bewerber','Wartender')
 							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
 							AND tbl_studiengang.typ IN ('b', 'm')
 							AND priorisierung > ".$row_ps->priorisierung."

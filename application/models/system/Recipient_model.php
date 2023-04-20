@@ -127,7 +127,11 @@ class Recipient_model extends DB_Model
 		else
 		{
 			array_push($parametersArray, $person_id, $person_id);
-			$sql = sprintf($sql, 'WHERE person_id = ? AND message_id NOT IN (SELECT message_id FROM public.tbl_msg_status WHERE status >= 3 AND person_id = ?)');
+			$sql = sprintf(
+				$sql,
+				'WHERE person_id = ?
+				   AND message_id NOT IN (SELECT message_id FROM public.tbl_msg_status WHERE status >= 3 AND person_id = ?)'
+			);
 		}
 
 		if ($oe_kurzbz != null)
@@ -410,8 +414,18 @@ class Recipient_model extends DB_Model
 				ps.person_id AS "senderPersonId",
 				ps.vorname AS "senderName",
 				ps.nachname AS "senderSurname",
-				(SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatus",
-				(SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mm.message_id AND person_id = mr.person_id) AS "lastStatusDate",
+				(
+					SELECT MAX(status)
+					  FROM public.tbl_msg_status
+					 WHERE message_id = mm.message_id
+					   AND person_id = mr.person_id
+				) AS "lastStatus",
+				(
+					SELECT MAX(insertamum)
+					  FROM public.tbl_msg_status
+					 WHERE message_id = mm.message_id
+					   AND person_id = mr.person_id
+				) AS "lastStatusDate",
 				oe.oe_kurzbz AS "oeId",
 				COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
 				mr.token
@@ -451,8 +465,18 @@ class Recipient_model extends DB_Model
 				ps.person_id AS "senderPersonId",
 				ps.vorname AS "senderName",
 				ps.nachname AS "senderSurname",
-				(SELECT MAX(status) FROM public.tbl_msg_status WHERE message_id = mrou.message_id AND person_id = mrou.person_id) AS "lastStatus",
-				(SELECT MAX(insertamum) FROM public.tbl_msg_status WHERE message_id = mrou.message_id AND person_id = mrou.person_id) AS "lastStatusDate",
+				(
+					SELECT MAX(status)
+					  FROM public.tbl_msg_status
+					 WHERE message_id = mrou.message_id
+					   AND person_id = mrou.person_id
+				) AS "lastStatus",
+				(
+					SELECT MAX(insertamum)
+					  FROM public.tbl_msg_status
+					 WHERE message_id = mrou.message_id
+					  AND person_id = mrou.person_id
+				) AS "lastStatusDate",
 				oe.oe_kurzbz AS "oeId",
 				COALESCE(sg.bezeichnung, oe.bezeichnung) AS oe,
 				mrou.token

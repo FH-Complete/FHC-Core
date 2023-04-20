@@ -110,7 +110,7 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function __construct()
 	{
-        	parent::__construct(
+		parent::__construct(
 			array(
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
@@ -407,7 +407,7 @@ class InfoCenter extends Auth_Controller
 						'saveformalgep',
 						array(
 							isEmptyString($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel,
-							is_null($timestamp) ? 'NULL' : $timestamp
+							is_null($timestamp) ? 'null' : $timestamp
 						)
 					);
 				}
@@ -608,7 +608,8 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
 	 */
-	private function sendZgvMail($mail, $typ, $person){
+	private function sendZgvMail($mail, $typ, $person)
+	{
 		$data = array(
 			'vorname' => $person->vorname,
 			'nachname' => $person->nachname,
@@ -692,7 +693,6 @@ class InfoCenter extends Auth_Controller
 				'openZgv' => $openZgv
 			)
 		);
-
 	}
 
 	/**
@@ -866,7 +866,7 @@ class InfoCenter extends Auth_Controller
 
 		$person_id = $logdata['person_id'];
 
-		$akteresult = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'formal_geprueft_amum !=' => NULL));
+		$akteresult = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'formal_geprueft_amum !=' => null));
 
 		if (hasData($lastStatus) && isSuccess($akteresult))
 		{
@@ -1243,7 +1243,9 @@ class InfoCenter extends Auth_Controller
 		$person_id = $this->input->post('person_id');
 		$date = $this->input->post('onholddate');
 
-		$result = $this->personloglib->setOnHold($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
+		$result = $this->personloglib->setOnHold(
+			$person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid
+		);
 
 		$this->outputJson($result);
 	}
@@ -1454,7 +1456,6 @@ class InfoCenter extends Auth_Controller
 					if (isError($update))
 						$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 				}
-
 			}
 		}
 
@@ -1464,7 +1465,7 @@ class InfoCenter extends Auth_Controller
 	public function saveNachreichung($person_id)
 	{
 		$nachreichungAm = $this->input->post('nachreichungAm');
-		$nachreichungAnmerkung = empty($this->input->post('nachreichungAnmerkung')) ? NULL : $this->input->post('nachreichungAnmerkung');
+		$nachreichungAnmerkung = empty($this->input->post('nachreichungAnmerkung')) ? null : $this->input->post('nachreichungAnmerkung');
 		$typ = $this->input->post('typ');
 
 		$allowedTypes = [
@@ -1521,14 +1522,14 @@ class InfoCenter extends Auth_Controller
 				array(
 					'dokument_kurzbz' => $allowedTypes[$typ],
 					'person_id' => $person_id,
-					'erstelltam' => NULL,
+					'erstelltam' => null,
 					'gedruckt' => false,
 					'anmerkung' => $nachreichungAnmerkung,
 					'updateamum' => $today,
 					'updatevon' => get_uid(),
 					'insertamum' => $today,
 					'insertvon' => get_uid(),
-					'uid' => NULL,
+					'uid' => null,
 					'nachgereicht' => true,
 					'nachgereicht_am' => $nachreichungAm
 				)
@@ -2098,14 +2099,19 @@ class InfoCenter extends Auth_Controller
 				//get orgform for german and english
 				if (isset($zgvpruefung->prestudentstatus->bezeichnung_orgform) && is_array($zgvpruefung->prestudentstatus->bezeichnung_orgform))
 				{
-					$zgvpruefung->prestudentstatus->bezeichnung_orgform_german = getPhraseByLanguage($zgvpruefung->prestudentstatus->bezeichnung_orgform, 'German');
-					$zgvpruefung->prestudentstatus->bezeichnung_orgform_english = getPhraseByLanguage($zgvpruefung->prestudentstatus->bezeichnung_orgform, 'English');
+					$zgvpruefung->prestudentstatus->bezeichnung_orgform_german = getPhraseByLanguage(
+						$zgvpruefung->prestudentstatus->bezeichnung_orgform, 'German'
+					);
+					$zgvpruefung->prestudentstatus->bezeichnung_orgform_english = getPhraseByLanguage(
+						$zgvpruefung->prestudentstatus->bezeichnung_orgform, 'English'
+					);
 				}
 
 				$position = strpos($zgvpruefung->prestudentstatus->anmerkung, 'Alt:');
 
 				//parse Anmerkung for Alternative (Prio is given in orgform and sprache anyway)
-				$zgvpruefung->prestudentstatus->alternative = is_numeric($position) ? substr($zgvpruefung->prestudentstatus->anmerkung, $position) : null;
+				$zgvpruefung->prestudentstatus->alternative = is_numeric($position) ?
+					substr($zgvpruefung->prestudentstatus->anmerkung, $position) : null;
 			}
 
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
@@ -2124,7 +2130,9 @@ class InfoCenter extends Auth_Controller
 			$isFreigegeben = null;
 			if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
 			{
-				$this->PrestudentstatusModel->addSelect('bestaetigtam, statusgrund_id, tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund');
+				$this->PrestudentstatusModel->addSelect(
+					'bestaetigtam, statusgrund_id, tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund'
+				);
 				$this->PrestudentstatusModel->addJoin('public.tbl_status_grund', 'statusgrund_id', 'LEFT');
 				$isFreigegeben = $this->PrestudentstatusModel->loadWhere(array(
 					'studiensemester_kurzbz' => $zgvpruefung->prestudentstatus->studiensemester_kurzbz,
@@ -2139,11 +2147,14 @@ class InfoCenter extends Auth_Controller
 				{
 					if (isset($prestudentstatus->bestaetigtam))
 					{
-						//if statusgrund set - freigegeben for Studiengang, otherwise freigegeben for RT
+						// If statusgrund set - freigegeben for Studiengang, otherwise freigegeben for RT
 						if (isset($prestudentstatus->statusgrund_id))
 						{
 							if (isset($prestudentstatus->bezeichnung_statusgrund[0])
-								&& in_array($prestudentstatus->bezeichnung_statusgrund[0], $this->_statusgruendeNoStgFreigabeMessage))
+								&& in_array(
+									$prestudentstatus->bezeichnung_statusgrund[0],
+									$this->_statusgruendeNoStgFreigabeMessage)
+							)
 								$zgvpruefung->sendStgFreigabeMsg = false;
 							else
 								$zgvpruefung->isStgFreigegeben = true;
@@ -2160,7 +2171,8 @@ class InfoCenter extends Auth_Controller
 			$zgvpruefung->changedown = false;
 			$zgvpruefung->hasBewerber = false;
 			
-			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
+			if (isset($zgvpruefung->prestudentstatus->status_kurzbz)
+				&& $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
 			{
 				if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
 				{
@@ -2178,8 +2190,12 @@ class InfoCenter extends Auth_Controller
 						}
 					}
 					
-					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
-					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
+					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange(
+						$zgvpruefung->prestudent_id, $studiensemester, -1
+					);
+					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange(
+						$zgvpruefung->prestudent_id, $studiensemester, 1
+					);
 				}
 			}
 			$zgvExist = $this->ZGVPruefungModel->loadWhere(array('prestudent_id' => $zgvpruefung->prestudent_id));
@@ -2189,7 +2205,11 @@ class InfoCenter extends Auth_Controller
 				$this->ZGVPruefungStatusModel->addOrder('datum', 'DESC');
 				$this->ZGVPruefungStatusModel->addLimit(1);
 
-				$statusZGV = $this->ZGVPruefungStatusModel->loadWhere(array('zgvpruefung_id' => $zgvExist->retval[0]->zgvpruefung_id));
+				$statusZGV = $this->ZGVPruefungStatusModel->loadWhere(
+					array(
+						'zgvpruefung_id' => $zgvExist->retval[0]->zgvpruefung_id
+					)
+				);
 
 				if (isSuccess($statusZGV) && hasData($statusZGV))
 					$zgvpruefung->statusZGV = $statusZGV->retval[0]->status;
@@ -2220,7 +2240,7 @@ class InfoCenter extends Auth_Controller
 		$this->GeschlechtModel->addOrder('sort');
 		$allGenders = getData($this->GeschlechtModel->load());
 
-		$data = array (
+		$data = array(
 			'zgvpruefungen' => $zgvpruefungen,
 			'abwstatusgruende' => $abwstatusgruende,
 			'intstatusgruende' => $intstatusgruende,
@@ -2243,7 +2263,7 @@ class InfoCenter extends Auth_Controller
 	{
 		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 
-		@usort($zgvpruefungen, function ($a, $b) {
+		@usort($zgvpruefungen, function($a, $b) {
 			//sort:
 			// 1: Studiensemester
 			if (isset($a->prestudentstatus->studiensemester_kurzbz) || isset($b->prestudentstatus->studiensemester_kurzbz))
@@ -2426,8 +2446,13 @@ class InfoCenter extends Auth_Controller
 		foreach ($dokumenteNachzureichen as $dokument)
 		{
 			$anmerkung = !isEmptyString($dokument->anmerkung) ? ' | Anmerkung: '.$dokument->anmerkung : '';
-			$nachgereichtam = !isEmptyString($dokument->nachgereicht_am) ? ' | wird nachgereicht bis '.date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : '';
-			$dokumenteNachzureichenMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung, 'anmerkung' => $anmerkung, 'nachgereicht_am' => $nachgereichtam);
+			$nachgereichtam = !isEmptyString($dokument->nachgereicht_am) ?
+				' | wird nachgereicht bis '.date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : '';
+			$dokumenteNachzureichenMail[] = array(
+				'dokument_bezeichnung' => $dokument->dokument_bezeichnung,
+				'anmerkung' => $anmerkung,
+				'nachgereicht_am' => $nachgereichtam
+			);
 		}
 
 		$notizenBewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung')->retval;
@@ -2465,7 +2490,11 @@ class InfoCenter extends Auth_Controller
 		$this->load->library('LogLib');
 		$this->load->helper('hlp_sancho');
 
-		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' für '.$prestudentstatus->studiengangbezeichnung.$orgform.' freigegeben';
+		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').
+			$person->vorname.' '.
+			$person->nachname.' für '.
+			$prestudentstatus->studiengangbezeichnung.
+			$orgform.' freigegeben';
 
 		$receiver = $prestudent->studiengangmail;
 
