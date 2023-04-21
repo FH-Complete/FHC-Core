@@ -1035,6 +1035,7 @@ $filters = array(
 					{"name": "Note"},
 					{"name": "ErstNachname"},
 					{"name": "ErstAbgeschickt"},
+					{"name": "ZweitNachname"},
 					{"name": "ZweitAbgeschickt"}
 				],
 				"filters": []
@@ -1115,6 +1116,35 @@ $filters = array(
 					"option": "",
 					"condition": "",
 					"operation": ""
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'personalIssueViewer',
+		'filter_kurzbz' => 'offeneFehlerPersonal',
+		'description' => '{Personal Fehlermonitoring}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Offene Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Statuscode"}
+				],
+				"filters": [
+					{
+						"name": "Statuscode",
+						"operation": "ncontains",
+						"condition": "resolved"
 					}
 				]
 			}
