@@ -170,9 +170,8 @@ class Issues extends Auth_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Gets language index of currently logged in user.
+	 * @return object int (the index, start at 1)
 	 */
 	private function _getLanguageIndex()
 	{
