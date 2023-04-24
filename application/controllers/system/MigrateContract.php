@@ -1,8 +1,8 @@
 <?php
 /*
- * Job zur einmaligen Migration der Mitarbeiterverträge aus der tbl_bisverwendung in die neue 
+ * Job zur einmaligen Migration der Mitarbeiterverträge aus der tbl_bisverwendung in die neue
  * Vertragsstruktur im HR Schema
- * 
+ *
  * Aufruf:
  * php index.ci.php system/MigrateContracts/index/oesi
  */
@@ -24,7 +24,7 @@ class MigrateContract extends CLI_Controller
 
 		$this->load->model('codex/bisverwendung_model', 'BisVerwendungModel');
 		$this->load->model('person/benutzerfunktion_model', 'BenutzerfunktionModel');
-		
+
 		$this->matching_ba1_vertragsart = array(
 			'101'=>'DV zum Bund',
 			'102'=>'DV anderen Gebietskörperschaft',
@@ -109,7 +109,7 @@ class MigrateContract extends CLI_Controller
 					{
 						$vbs_id = getData($resultVBS);
 						echo 'VBS:'.$vbs_id;
-					
+
 						switch($row_vbs['vertragsbestandteiltyp_kurzbz'])
 						{
 							case 'stunden':
@@ -157,7 +157,7 @@ class MigrateContract extends CLI_Controller
 			$this->db->trans_rollback();
 		}
 	}
-	
+
 	private function _insertVBSKarenz($vbs_id, $row_vbs)
 	{
 		return $this->VertragsbestandteilKarenzModel->insert(
@@ -284,7 +284,7 @@ class MigrateContract extends CLI_Controller
 				$karenztyp = 'bildungskarenz';
 			else
 				$karenztyp = 'elternkarenz';
-			
+
 			// VBS anlegen und Funktion zuweisen
 			$newVBSIndex = $this->_getNewVBSIndex($contracts, $dv);
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['vertragsbestandteiltyp_kurzbz'] = 'karenz';
@@ -294,10 +294,10 @@ class MigrateContract extends CLI_Controller
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['geplanter_geburtstermin'] = null;
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['tatsaechlicher_geburtstermin'] = null;
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['hint'] = 'Dauer:'.$dauer;
-		}		
+		}
 	}
 
-	/** 
+	/**
 	 * Holt die Funktionen die Vertragsrelevant sind und verknüpft diese
 	 */
 	private function _addVertragsbestandteilFunktion(&$contracts, $user)
@@ -325,7 +325,7 @@ class MigrateContract extends CLI_Controller
 					 && ($row_contract['bis'] == '' || $row_contract['bis'] >= $row_funktion->datum_von)
 					 && (
 							(
-							isset($row_funktion->datum_bis) && isset($row_contract['bis']) 
+							isset($row_funktion->datum_bis) && isset($row_contract['bis'])
 							&& $row_funktion->datum_bis <= $row_contract['bis']
 							)
 							|| $row_funktion->datum_bis == ''
@@ -371,7 +371,7 @@ class MigrateContract extends CLI_Controller
 	}
 
 	/**
-	 * Prueft ob schon ein Vertragsbestandteil fuer Zeitaufzeichnung vorhanden ist das in den Zeitraum passt 
+	 * Prueft ob schon ein Vertragsbestandteil fuer Zeitaufzeichnung vorhanden ist das in den Zeitraum passt
 	 * bzw direkt anschließt. Wenn es direkt anschließend ist und die Art gleich sind wird die Laufzeit verlaengert
 	 * Ansonsten wird ein neuer VBS angelegt
 	 */
@@ -383,7 +383,7 @@ class MigrateContract extends CLI_Controller
 			{
 				if ($row_vbs['vertragsbestandteiltyp_kurzbz'] == 'zeitaufzeichnung')
 				{
-					if ($this->_isVBSAngrenzend($row_verwendung, $row_vbs) 
+					if ($this->_isVBSAngrenzend($row_verwendung, $row_vbs)
 						&& $row_vbs['zeitaufzeichnung'] == $row_verwendung->zeitaufzeichnungspflichtig
 						&& $row_vbs['azgrelevant'] == $row_verwendung->azgrelevant
 						&& $row_vbs['homeoffice'] == $row_verwendung->homeoffice
@@ -446,14 +446,14 @@ class MigrateContract extends CLI_Controller
 	}
 
 	/**
-	 * Prueft ob schon ein Vertragsbestandteil mit diesem Stundenausmass vorhanden ist das in den Zeitraum passt 
+	 * Prueft ob schon ein Vertragsbestandteil mit diesem Stundenausmass vorhanden ist das in den Zeitraum passt
 	 * bzw direkt anschließt. Wenn es direkt anschließend ist und die Stunden gleich sind wird die Laufzeit verlaengert
 	 * Ansonsten wird ein neuer VBS angelegt
 	 */
 	private function _addVertragsbestandteilStunden(&$contracts, $dv, $row_verwendung)
 	{
 		// Nur anlegen wenn im aktuellen Eintrag auch Stunden eingetragen sind
-		if ($row_verwendung->vertragsstunden != '')
+		if ($row_verwendung->vertragsstunden != '' && $row_verwendung->vertragsstunden != '0.00')
 		{
 			if (isset($contracts['dv'][$dv]['vbs']))
 			{
@@ -462,7 +462,7 @@ class MigrateContract extends CLI_Controller
 					if ($row_vbs['vertragsbestandteiltyp_kurzbz'] == 'stunden')
 					{
 						if ($this->_isVBSAngrenzend($row_verwendung, $row_vbs) && $row_vbs['wochenstunden'] == $row_verwendung->vertragsstunden)
-						{						
+						{
 							// stunden bleiben gleich - Ende des VBS verlaengern
 							$contracts['dv'][$dv]['vbs'][$index_vbs]['bis'] = $row_verwendung->ende;
 							return true;
@@ -522,8 +522,8 @@ class MigrateContract extends CLI_Controller
 							(isset($row_dv['bis']) && $row_verwendung->ende != '' && ($row_dv['bis'] == '' || $row_dv['bis'] >= $row_verwendung->ende)
 							)
 							|| // direkt angrenzend an dieses DV
-							(isset($row_dv['bis']) 
-							&& ($row_dv['bis'] == '' 
+							(isset($row_dv['bis'])
+							&& ($row_dv['bis'] == ''
 								|| $row_dv['bis'] == $dtstart->sub(new DateInterval('P1D'))->format('Y-m-d')
 								)
 							)
@@ -535,7 +535,7 @@ class MigrateContract extends CLI_Controller
 				}
 			}
 		}
-		
+
 		$newDvIndex = $this->_getNewDVIndex($contracts);
 		$contracts['dv'][$newDvIndex]['mitarbeiter_uid'] = $row_verwendung->mitarbeiter_uid;
 		$contracts['dv'][$newDvIndex]['von'] = $row_verwendung->beginn;
@@ -564,7 +564,7 @@ class MigrateContract extends CLI_Controller
 	{
 		if (isset($contracts['dv']) && is_array($contracts['dv']))
 			return max(array_keys($contracts['dv'])) + 1;
-		else	
+		else
 			return 0;
 	}
 }
