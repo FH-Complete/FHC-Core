@@ -248,6 +248,10 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			<td>'.$gebietdetails->maxpunkte.'</td>
 		</tr>
 		<tr>
+				<td align="right">Offsetpunkte:</td>
+				<td>'.$gebietdetails->offsetpunkte.'</td>
+			</tr>
+		<tr>
 			<td align="right">Antworten pro Zeile:</td>
 			<td>'.$gebietdetails->antwortenprozeile.'</td>
 		</tr>

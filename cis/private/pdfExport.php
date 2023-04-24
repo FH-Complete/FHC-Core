@@ -150,14 +150,14 @@ if (isset($_GET['betreuerart_kurzbz']))
 if (isset($_GET['xsl']) && $_GET['xsl'] == 'Zahlung')
 {
 	$requestdata = $_SERVER['QUERY_STRING'];
-	
+
 	$log = new Webservicelog();
 	$log->webservicetyp_kurzbz = 'content';
 	$log->request_id = isset($_GET['buchungsnummern']) && !empty($_GET['buchungsnummern']) ? $_GET['buchungsnummern'] : NULL;
 	$log->beschreibung = 'Zahlungsbestaetigungsdownload';
 	$log->request_data = $requestdata;
 	$log->execute_user = get_uid();
-	
+
 	$log->save(true);
 }
 
@@ -207,6 +207,7 @@ if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
 	switch ($_GET['betreuerart_kurzbz'])
 	{
 		case 'Begutachter' :
+		case 'Senatsvorsitz' :
 			$xsl = 'ProjektBeurteilungBA';
 			break;
 		case 'Erstbegutachter' :
