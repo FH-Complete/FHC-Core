@@ -57,6 +57,12 @@ function hf_filterTrueFalse(headerValue, rowValue){
     }
 }
 
+// Filters schreibberechtigt boolean values
+function hf_schreibberechtigt(headerValue, rowValue){
+
+    return rowValue == headerValue.toString();
+}
+
 // Adds column details
 // Sets focus on filterbutton, if table starts with stored filter.
 function func_tableBuilt(table) {
@@ -173,19 +179,22 @@ function func_selectableCheck(row){
 // data = selected data, rows = selected rows
 function func_rowSelectionChanged(data, rows){
 
-    // Sum up over all anzurechnenden LV-ECTS by Prestudent
-    selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
+    if (tabulator != null)
+    {
+        // Sum up over all anzurechnenden LV-ECTS by Prestudent
+        selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
 
-    // Loop through all active rows
-    var rowManager = tabulator.rowManager;
-    for (var i = 0; i < rowManager.activeRows.length; i++) {
+        // Loop through all active rows
+        var rowManager = tabulator.rowManager;
+        for (var i = 0; i < rowManager.activeRows.length; i++) {
 
-        // Reinitialize row -> triggers formatters.
-        rowManager.activeRows[i].reinitialize();
+            // Reinitialize row -> triggers formatters.
+            rowManager.activeRows[i].reinitialize();
+        }
+
+        // Show number of selected rows.
+        approveAnrechnung.showNumberSelectedRows(rows);
     }
-
-    // Show number of selected rows.
-    approveAnrechnung.showNumberSelectedRows(rows);
 }
 
 // Returns tooltip
@@ -570,12 +579,8 @@ $(function(){
             }
         }
 
-        selected_data.map(function(data){
-            // reduce to necessary fields
-            return {
-                'anrechnung_id' : data.anrechnung_id,
-            }
-        });
+        // Reduce to necessary fields
+        selected_data = selected_data.map(data => ({'anrechnung_id' : data.anrechnung_id}));
 
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)
@@ -584,14 +589,9 @@ $(function(){
             return;
         }
 
-        // Prepare data object for ajax call
-        let data = {
-            'data': selected_data
-        };
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
-            data,
+            {data: selected_data},
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
@@ -617,14 +617,14 @@ $(function(){
                             // Print success message
                             FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
                         }
+
+                        //Update status 'genehmigt'
+                        $('#tableWidgetTabulator').tabulator('updateData', data);
+
+                        // Deselect rows
+                        var indexesToDeselect = data.map(x => x.anrechnung_id);
+                        $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
                     }
-
-                    //Update status 'genehmigt'
-                    $('#tableWidgetTabulator').tabulator('updateData', data);
-
-                    // Deselect rows
-                    var indexesToDeselect = data.map(x => x.anrechnung_id);
-                    $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
@@ -701,8 +701,8 @@ var approveAnrechnung = {
         // Find closest textarea
         let textarea = $(elem).closest('div').find('textarea');
 
-        // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().text()));
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim($(elem).parent().text())).focus();
     },
     focusFilterbuttonIfTableStartsWithStoredFilter(filters){
         switch (filters[0].value) {

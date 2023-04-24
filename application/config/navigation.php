@@ -164,7 +164,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'system/developer:r'
-				)
+				),
+                'anrechnungen' => array(
+                    'link' => site_url('lehre/anrechnung/AdminAnrechnung'),
+                    'description' => 'Anrechnungen',
+                    'expand' => true,
+                    'sort' => 30,
+                    'requiredPermissions' => 'lehre/anrechnungszeitfenster:rw'
+                )
 			)
 		)
 	)
@@ -182,6 +189,15 @@ $config['navigation_menu']['Vilesci/index'] = array(
 		'icon' => 'dashboard',
 		'sort' => 1
 	)
+);
+
+$config['navigation_menu']['Vilesci/index'] = array(
+    'dashboard' => array(
+        'link' => '#',
+        'description' => 'Dashboard',
+        'icon' => 'dashboard',
+        'sort' => 1
+    )
 );
 
 $config['navigation_menu']['organisation/Reihungstest/index'] = array(
