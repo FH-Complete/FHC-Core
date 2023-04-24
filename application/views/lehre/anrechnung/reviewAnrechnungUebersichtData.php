@@ -197,7 +197,7 @@ $filterWidgetArray = array(
 		ects: {headerFilter:"input", align:"center"},
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
-		zgv: {visible: false, headerFilter:"input"},
+		zgv: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},

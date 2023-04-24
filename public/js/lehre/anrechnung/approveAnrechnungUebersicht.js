@@ -701,8 +701,8 @@ var approveAnrechnung = {
         // Find closest textarea
         let textarea = $(elem).closest('div').find('textarea');
 
-        // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().text()));
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim($(elem).parent().text())).focus();
     },
     focusFilterbuttonIfTableStartsWithStoredFilter(filters){
         switch (filters[0].value) {

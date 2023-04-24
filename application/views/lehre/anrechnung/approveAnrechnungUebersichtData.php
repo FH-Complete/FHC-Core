@@ -256,7 +256,7 @@ $filterWidgetArray = array(
 		ectsSumBeruflich: {visible: false, headerFilter:"input", align:"right"},
 		begruendung: {headerFilter:"input", visible: true},
 		student: {headerFilter:"input"},
-		zgv: {visible: false, headerFilter:"input"},
+		zgv: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
