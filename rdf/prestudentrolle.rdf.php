@@ -119,6 +119,10 @@ foreach($ps->result as $row)
 			<ROLLE:statusgrund_id><![CDATA['.$row->statusgrund_id.']]></ROLLE:statusgrund_id>
 			<ROLLE:statusgrund><![CDATA['.(isset($statusgrund_arr[$row->statusgrund_id])?$statusgrund_arr[$row->statusgrund_id]:'').']]></ROLLE:statusgrund>
 			<ROLLE:lehrverband><![CDATA['.$lehrverband.']]></ROLLE:lehrverband>
+			<ROLLE:insertamum><![CDATA['.$datum->formatDatum($row->insertamum,'d.m.Y H:i:s').']]></ROLLE:insertamum>
+			<ROLLE:insertvon><![CDATA['.$row->insertvon.']]></ROLLE:insertvon>
+			<ROLLE:updateamum><![CDATA['.$datum->formatDatum($row->updateamum,'d.m.Y H:i:s').']]></ROLLE:updateamum>
+			<ROLLE:updatevon><![CDATA['.$row->updatevon.']]></ROLLE:updatevon>
       	</RDF:Description>
       </RDF:li>
 	';

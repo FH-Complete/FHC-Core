@@ -92,4 +92,5 @@ $this->phrasen['abgabetool/projektbeurteilungErstDownload']='First-/Assessor';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Second Assessor';
 $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Error when getting endupload of project work';
 $this->phrasen['abgabetool/senatsMitglied']='Examiner';
+$this->phrasen['abgabetool/abgegeben']='handed in, in assessment';
 ?>
