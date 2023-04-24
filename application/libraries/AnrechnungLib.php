@@ -37,33 +37,30 @@ class AnrechnungLib
 	 * @param $lv_id
 	 * @return StdClass
 	 */
-	public function getAntragData($prestudent_id, $studiensemester_kurzbz, $lv_id, $anrechnung_id)
+	public function getAntragData($prestudent_id, $studiensemester_kurzbz, $lv_id, $anrechnung_id = null)
 	{
 		$antrag_data = new StdClass();
 		
 		// Get students UID.
 		$uid = $this->ci->StudentModel->getUID($prestudent_id);
 
-		// Get lehrveranstaltung data.
-        // If it is a first time request for Anrechnung...
-        if (isEmptyString($anrechnung_id))
-        {
-            //...get LV by student to check also, if student is assigned to that lv
-            $result = $this->ci->LehrveranstaltungModel->getLvByStudent($uid, $studiensemester_kurzbz, $lv_id);
-            if (!hasData($result))
-            {
-                // ...and break, if course is not assigned to student
-                show_error('You are not assigned to this course yet.');
-            }
-        }
-        //...in any other case (STGL View; Lector View; Student View when Anrechnung exist)
-        else
-        {
-            $result = $this->ci->LehrveranstaltungModel->load($lv_id);
-        }
+		// If Anrechnung exists
+		if (is_numeric($anrechnung_id))
+		{
+			// Just load LV by lv_id
+			$result = $this->ci->LehrveranstaltungModel->load($lv_id);
+			$lv = getData($result)[0];
+		}
+		// If Anrechnung not exists
+		else
+		{
+			// Load LV, but check if student is assigned to that LV. Break, if not.
+			if(!$lv = getData($this->ci->LehrveranstaltungModel->getLvByStudent($uid, $studiensemester_kurzbz, $lv_id))[0])
+			{
+				show_error('You are not assigned to this course yet.');
+			}
+		}
 
-        $lv = getData($result)[0];
-		
 		// Get the students personal data
 		if (!$person = getData($this->ci->PersonModel->getByUid($uid))[0])
 		{
