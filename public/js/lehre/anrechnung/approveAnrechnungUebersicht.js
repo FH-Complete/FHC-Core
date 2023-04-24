@@ -742,7 +742,7 @@ var approveAnrechnung = {
     getSumLvEctsByPreStudent(data){
 
         var result = [];
-        
+
         // Berechne für jeden Prestudenten die kumulierte Summe aller selektierten LV ECTS
         data.reduce((prev, curr) => {
 

@@ -1829,6 +1829,20 @@ function StudentPrestudentDisableFields(val)
 		document.getElementById('student-prestudent-menulist-zgvcode').disabled=true;
 	}
 
+	<?php
+	$studiengaengeMaster = $rechte->getStgKz('student/editMakkZgv');
+	// Anlegen eines Arrays mit allen berechtigten Stg-Kz
+	echo ' var berechtigte_master_studiengaenge = ['.implode(',',$studiengaengeMaster).'];';
+	?>
+	if (berechtigte_master_studiengaenge.indexOf(studiengang_kz) >= 0)
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=true;
+	}
+
 	//Status Tree leeren
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
 
@@ -3102,9 +3116,9 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	{
 		exists = StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kurzbz, studiengang_kz);
 	}
-	if (exists)
+	if (exists.dbdml_return)
 	{
-		if(!confirm('Die Buchung ist bereits vorhanden. Trotzdem fortfahren?'))
+		if(!confirm(exists.dbdml_data))
 			return false;
 	}
 
@@ -3159,7 +3173,7 @@ function StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kur
 
 	var val =  new ParseReturnValue(response);
 
-	return(val.dbdml_return);
+	return val;
 }
 
 // *****
