@@ -117,7 +117,7 @@ $this->load->view(
         <!-- Tabelle -->
         <div class="row">
             <div class="col-xs-12">
-				<?php $this->load->view('lehre/anrechnung/reviewAnrechnungUebersichtData.php'); ?>
+				<?php $this->load->view('lehre/anrechnung/reviewAnrechnungUebersichtData.php');?>
             </div>
         </div>
         <!-- Empfehlung / Nicht Empfehlung Panel -->

@@ -37,18 +37,32 @@ class AnrechnungLib
 	 * @param $lv_id
 	 * @return StdClass
 	 */
-	public function getAntragData($prestudent_id, $studiensemester_kurzbz, $lv_id)
+	public function getAntragData($prestudent_id, $studiensemester_kurzbz, $lv_id, $anrechnung_id)
 	{
 		$antrag_data = new StdClass();
 		
 		// Get students UID.
 		$uid = $this->ci->StudentModel->getUID($prestudent_id);
-		
-		// Get lehrveranstaltung data. Break, if course is not assigned to student.
-		if(!$lv = getData($this->ci->LehrveranstaltungModel->getLvByStudent($uid, $studiensemester_kurzbz, $lv_id))[0])
-		{
-			show_error('You are not assigned to this course yet.');
-		}
+
+		// Get lehrveranstaltung data.
+        // If it is a first time request for Anrechnung...
+        if (isEmptyString($anrechnung_id))
+        {
+            //...get LV by student to check also, if student is assigned to that lv
+            $result = $this->ci->LehrveranstaltungModel->getLvByStudent($uid, $studiensemester_kurzbz, $lv_id);
+            if (!hasData($result))
+            {
+                // ...and break, if course is not assigned to student
+                show_error('You are not assigned to this course yet.');
+            }
+        }
+        //...in any other case (STGL View; Lector View; Student View when Anrechnung exist)
+        else
+        {
+            $result = $this->ci->LehrveranstaltungModel->load($lv_id);
+        }
+
+        $lv = getData($result)[0];
 		
 		// Get the students personal data
 		if (!$person = getData($this->ci->PersonModel->getByUid($uid))[0])
@@ -274,14 +288,21 @@ class AnrechnungLib
 		if (hasData($result))
 		{
 			$empfehlung_data->empfehlungsanfrageAm = (new DateTime($result->retval[0]->insertamum))->format('d.m.Y');
-			
-			// Get lectors who received request for recommendation
-			$lector_arr = self::getLectors($anrechnung_id);
-			
-			if (!isEmptyArray($lector_arr))
-			{
-				$empfehlung_data->empfehlungsanfrageAn = implode(', ', array_column($lector_arr, 'fullname'));
-			}
+
+            // Get users who received request for recommendation
+            if($this->ci->config->item('fbl') === TRUE)
+            {
+                $res = $this->getLeitungOfLvOe($anrechnung_id);
+            }
+            else
+            {
+                $res = $this->getLectors($anrechnung_id);
+            }
+
+            if (!isEmptyArray($res))
+            {
+                $empfehlung_data->empfehlungsanfrageAn = implode(', ', array_column($res, 'fullname'));
+            }
 		}
 
 		if (is_null($anrechnung->empfehlung_anrechnung))
@@ -741,6 +762,25 @@ class AnrechnungLib
 		// Continue, if LV has no lector (there is no one to ask for recommendation)
 		return hasData($result) ? true : false;
 	}
+
+    /**
+     * Check if user is allowed to recommend Anrechnung.
+     *
+     * @param $anrechnung_id
+     * @return bool
+     */
+    public function isEmpfehlungsberechtigt($anrechnung_id)
+    {
+        if($this->ci->config->item('fbl') === TRUE)
+        {
+            return true;
+        }
+        // Get lv-leitungen or, if not present, all lectors of lv.
+        $lector_arr = $this->getLectors($anrechnung_id);
+
+        // Return false if lv-leitung is present and user is not lv-leitung. Otherways return always true.
+        return in_array(getAuthUID(), array_column($lector_arr, 'uid'));
+    }
 	
 	/**
 	 * Get LV Leitung. If not present, get all LV lectors.
@@ -774,11 +814,14 @@ class AnrechnungLib
 		
 		// Check if lv has LV-Leitung
 		$key = array_search(true, array_column($result, 'lvleiter'));
-		
-		// If lv has LV-Leitung, keep only the one
+
+		// If lv has 1 or more LV-Leitungen, keep only them
 		if ($key !== false)
 		{
-			$lector_arr[]= $result[$key];
+            foreach ($result as $lector)
+            {
+                if ($lector->lvleiter) $lector_arr[]= $lector;
+            }
 		}
 		// ...otherwise keep all lectors
 		else
@@ -802,6 +845,40 @@ class AnrechnungLib
 		
 		return $lector_arr;
 	}
+
+    /**
+     * Get Leitung of Lehrveranstaltungs-Organisationseinheit.
+     *
+     * @param $anrechnung_id
+     * @return false|mixed|null
+     */
+    public function getLeitungOfLvOe($anrechnung_id)
+    {
+        $this->ci->AnrechnungModel->addSelect('lehrveranstaltung_id');
+        $result = $this->ci->AnrechnungModel->load($anrechnung_id);
+
+        $lehrveranstaltung_id = getData($result)[0]->lehrveranstaltung_id;
+
+        // Get Leitungen
+        $result = $this->ci->LehrveranstaltungModel->getLeitungOfLvOe($lehrveranstaltung_id);
+
+        if (!hasData($result))
+        {
+            return false;
+        }
+
+        $oeLeitung_arr = getData($result);
+
+        foreach ($oeLeitung_arr as $oeLeitung)
+        {
+            $oeLeitung->fullname = $oeLeitung->vorname. ' '. $oeLeitung->nachname;
+        }
+
+        // Now make the array unique
+        $oeLeitung_arr = array_unique($oeLeitung_arr, SORT_REGULAR);
+
+        return $oeLeitung_arr;
+    }
 
 	// Return an object with Anrechnungdata
 	private function _setAnrechnungDataObject($anrechnung)

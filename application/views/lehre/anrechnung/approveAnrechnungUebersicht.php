@@ -124,7 +124,7 @@ $this->load->view(
         <!-- Tabelle -->
         <div class="row">
             <div class="col-xs-12">
-				<?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
+                <?php $this->load->view('lehre/anrechnung/approveAnrechnungUebersichtData.php'); ?>
             </div>
         </div>
         <!-- Genehmigen / Ablehnen Panel -->

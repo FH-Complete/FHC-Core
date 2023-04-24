@@ -194,17 +194,9 @@ $(function(){
         // Get form data
         let form_data = $('#form-empfehlung').serializeArray();
 
-
-        // Prepare data object for ajax call
-        let data = {
-            'data': [{
-                'anrechnung_id' : form_data[0].value
-            }]
-        };
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
-            data,
+            {anrechnung_id: form_data[0].value},
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
