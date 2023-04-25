@@ -105,6 +105,9 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 EOTXT;
 		return parent::__toString() . $txt;
 	}
-
 	
+	public function validate()
+	{
+		return parent::validate();
+	}
 }

@@ -4,7 +4,7 @@ namespace vertragsbestandteil;
 /**
  * Salary always depends on employment (Dienstverhältnis) and optionally on part of contract (Vetragsbestandteil)
  */
-class Gehaltsbestandteil 
+class Gehaltsbestandteil implements IValidation
 {
 	protected $gehaltsbestandteil_id;
 	protected $dienstverhaeltnis_id;
@@ -23,7 +23,16 @@ class Gehaltsbestandteil
 	protected $insertvon;
 	protected $updateamum;
 	protected $updatevon;
+	
+	protected $isvalid;
+	protected $validationerrors;
 
+	public function __construct()
+	{
+		$this->isvalid = false;
+		$this->validationerrors = array();
+	}
+	
     public function hydrateByStdClass($data)
 	{		
 		isset($data->gehaltsbestandteil_id) && $this->setGehaltsbestandteil_id($data->gehaltsbestandteil_id);
@@ -271,5 +280,28 @@ class Gehaltsbestandteil
 
 EOTXT;
 		return $txt;
+	}
+	
+	public function isValid()
+	{
+		return $this->isvalid;
+	}
+
+	public function getValidationErrors()
+	{
+		return $this->validationerrors;
+	}
+	
+	public function validate() {
+		//do Validation here
+		
+		// return status after Validation
+		if( count($this->validationerrors) > 0 ) {
+			$this->isvalid = false;
+		} else {
+			$this->isvalid = true;
+		}
+		
+		return $this->isvalid;
 	}
 }

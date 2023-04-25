@@ -6,7 +6,7 @@ namespace vertragsbestandteil;
  *
  * @author bambi
  */
-abstract class Vertragsbestandteil  implements \JsonSerializable
+abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 {
 	protected $vertragsbestandteil_id;
 	protected $dienstverhaeltnis_id;

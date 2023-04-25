@@ -1,6 +1,7 @@
 <?php
-
 require_once __DIR__ . '/IEncryption.php';
+
+use vertragsbestandteil\Gehaltsbestandteil;
 
 class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 {
@@ -48,7 +49,61 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
         ";
 
         return $this->execQuery($qry, array($dienstverhaeltnis_id), $this->getEncryptedColumns());
-
     }
+	
+	public function getGehaltsbestandteile($dienstverhaeltnis_id=1, $stichtag=null)
+	{
+		$stichtagclause = '';
+		if( !is_null($stichtag) )
+		{
+			$date = strftime('%Y-%m-%d', strtotime($stichtag));
+			$stichtagclause = 'AND ' . $this->escape($date)
+				. ' BETWEEN COALESCE(v.von, \'1970-01-01\'::date)'
+				. ' AND COALESCE(v.bis, \'2170-01-01\'::date)';
+		}
 
+		$sql = <<<EOSQL
+			SELECT
+				g.*
+			FROM
+				hr.tbl_gehaltsbestandteil g
+			WHERE
+				g.dienstverhaeltnis_id = ? 
+				{$stichtagclause}
+			;
+EOSQL;
+
+		$query = $this->execReadOnlyQuery(
+			$query,
+			array($dienstverhaeltnis_id),
+			$this->getEncryptedColumns()
+		);
+
+		$gehaltsbestandteile = array(); 
+		if( null !== ($rows = getData($query)) )
+		{
+			foreach( $rows as $row ) {
+				$tmpgb = new Gehaltsbestandteil();
+				$tmpgb->hydrateByStdClass($row);
+				$gehaltsbestandteile[] = $tmpgb;
+			}
+		}
+
+		return $gehaltsbestandteile;
+	}
+
+
+	public function getGehaltsbestandteil($id)
+	{	
+		$query = $this->load($id, $this->getEncryptedColumns());
+		$gehaltsbestandteil = null;
+		
+		if( null !== ($row = getData($query)) )
+		{
+			$gehaltsbestandteil = new Gehaltsbestandteil();
+			$gehaltsbestandteil->hydrateByStdClass($row[0]);
+		}
+
+		return $gehaltsbestandteil;
+	}
 }

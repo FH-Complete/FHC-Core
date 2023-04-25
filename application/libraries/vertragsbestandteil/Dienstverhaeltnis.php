@@ -11,7 +11,7 @@ const TYPE_ECHT_FREI = 'echterfreier';
 const TYPE_WERKVERTRAG = 'werkvertrag';
 const TYPE_UEBERLASSUNG = 'ueberlassungsvertrag';
 
-class Dienstverhaeltnis {
+class Dienstverhaeltnis implements IValidation {
     /** @var integer */
     protected $dienstverhaeltnis_id;
     /** @var integer */
@@ -20,7 +20,16 @@ class Dienstverhaeltnis {
     protected $vertragsart_kurzbz;
     protected $gueltig_ab;
     protected $gueltig_bis;
+	
+	protected $isvalid;
+	protected $validationerrors;
 
+	public function __construct()
+	{
+		$this->isvalid = false;
+		$this->validationerrors = array();
+	}
+	
     public function toStdClass(): \stdClass
 	{
 		$tmp = array(
@@ -141,4 +150,27 @@ EOTXT;
 
         return $this;
     }
+	
+	public function isValid()
+	{
+		return $this->isvalid;
+	}
+
+	public function getValidationErrors()
+	{
+		return $this->validationerrors;
+	}
+	
+	public function validate() {
+		//do Validation here
+		
+		// return status after Validation
+		if( count($this->validationerrors) > 0 ) {
+			$this->isvalid = false;
+		} else {
+			$this->isvalid = true;
+		}
+		
+		return $this->isvalid;
+	}
 }

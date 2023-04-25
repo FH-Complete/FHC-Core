@@ -105,4 +105,9 @@ EOTXT;
 
 		return $this;
 	}
+	
+	public function validate()
+	{
+		return parent::validate();
+	}
 }
