@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/IValidation.php';
-
 namespace vertragsbestandteil;
+
+require_once __DIR__ . '/IValidation.php';
 
 const TYPE_ECHT = 'echterdv';
 const TYPE_STUDENTISCHE_HILFSKRAFT = 'studentischehilfskr';
@@ -13,14 +13,16 @@ const TYPE_WERKVERTRAG = 'werkvertrag';
 const TYPE_UEBERLASSUNG = 'ueberlassungsvertrag';
 
 class Dienstverhaeltnis implements IValidation {
-    /** @var integer */
     protected $dienstverhaeltnis_id;
-    /** @var integer */
-    protected $unternehmen;  
-    /** @var string */
+	protected $mitarbeiter_uid;
     protected $vertragsart_kurzbz;
-    protected $gueltig_ab;
-    protected $gueltig_bis;
+    protected $oe_kurzbz;      
+    protected $von;
+    protected $bis;
+	protected $insertamum;
+	protected $insertvon;
+	protected $updateamum;
+	protected $updatevon;
 	
 	protected $isvalid;
 	protected $validationerrors;
@@ -31,12 +33,26 @@ class Dienstverhaeltnis implements IValidation {
 		$this->validationerrors = array();
 	}
 	
+	public function hydrateByStdClass($data)
+	{		
+		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
+		isset($data->mitarbeiter_uid) && $this->setMitarbeiter_uid($data->mitarbeiter_uid);
+		isset($data->vertragsart_kurzbz) && $this->setVertragsart_kurzbz($data->vertragsart_kurzbz);
+		isset($data->oe_kurzbz) && $this->setOe_kurzbz($data->oe_kurzbz);		
+		isset($data->von) && $this->setVon($data->von);
+		isset($data->bis) && $this->setBis($data->bis);
+		isset($data->insertamum) && $this->setInsertamum($data->insertamum);
+		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
+		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
+		isset($data->updatevon) && $this->setUpdatevon($data->updatevon);
+	}
+	
     public function toStdClass(): \stdClass
 	{
 		$tmp = array(
 			'dienstverhaeltnis_id' => $this->getDienstverhaeltnisId(),
 			'vertragsart_kurzbz' => $this->getVertragsartKurzbz(),
-            'unternehmen' => $this->getUnternehmen(),
+            'oe_kurzbz' => $this->getUnternehmen(),
 			'gueltig_ab' => $this->getGueltigAb(),
             'gueltig_bis' => $this->getGueltigBis(),
 		);
@@ -61,96 +77,115 @@ EOTXT;
 		return $txt;
 	}
 
+	public function getDienstverhaeltnis_id()
+	{
+		return $this->dienstverhaeltnis_id;
+	}
 
-    /**
-     * Get the value of dienstverhaeltnis_id
-     */
-    public function getDienstverhaeltnisId()
-    {
-        return $this->dienstverhaeltnis_id;
-    }
+	public function getMitarbeiter_uid()
+	{
+		return $this->mitarbeiter_uid;
+	}
 
-    /**
-     * Set the value of dienstverhaeltnis_id
-     */
-    public function setDienstverhaeltnisId($dienstverhaeltnis_id): self
-    {
-        $this->dienstverhaeltnis_id = $dienstverhaeltnis_id;
+	public function getVertragsart_kurzbz()
+	{
+		return $this->vertragsart_kurzbz;
+	}
 
-        return $this;
-    }
+	public function getOe_kurzbz()
+	{
+		return $this->oe_kurzbz;
+	}
 
-    /**
-     * Get the value of unternehmen
-     */
-    public function getUnternehmen()
-    {
-        return $this->unternehmen;
-    }
+	public function getVon()
+	{
+		return $this->von;
+	}
 
-    /**
-     * Set the value of unternehmen
-     */
-    public function setUnternehmen($unternehmen): self
-    {
-        $this->unternehmen = $unternehmen;
+	public function getBis()
+	{
+		return $this->bis;
+	}
 
-        return $this;
-    }
+	public function getInsertamum()
+	{
+		return $this->insertamum;
+	}
 
-    /**
-     * Get the value of vertragsart_kurzbz
-     */
-    public function getVertragsartKurzbz()
-    {
-        return $this->vertragsart_kurzbz;
-    }
+	public function getInsertvon()
+	{
+		return $this->insertvon;
+	}
 
-    /**
-     * Set the value of vertragsart_kurzbz
-     */
-    public function setVertragsartKurzbz($vertragsart_kurzbz): self
-    {
-        $this->vertragsart_kurzbz = $vertragsart_kurzbz;
+	public function getUpdateamum()
+	{
+		return $this->updateamum;
+	}
 
-        return $this;
-    }
+	public function getUpdatevon()
+	{
+		return $this->updatevon;
+	}
 
-    /**
-     * Get the value of gueltig_ab
-     */
-    public function getGueltigAb()
-    {
-        return $this->gueltig_ab;
-    }
+	public function setDienstverhaeltnis_id($dienstverhaeltnis_id)
+	{
+		$this->dienstverhaeltnis_id = $dienstverhaeltnis_id;
+		return $this;
+	}
 
-    /**
-     * Set the value of gueltig_ab
-     */
-    public function setGueltigAb($gueltig_ab): self
-    {
-        $this->gueltig_ab = $gueltig_ab;
+	public function setMitarbeiter_uid($mitarbeiter_uid)
+	{
+		$this->mitarbeiter_uid = $mitarbeiter_uid;
+		return $this;
+	}
 
-        return $this;
-    }
+	public function setVertragsart_kurzbz($vertragsart_kurzbz)
+	{
+		$this->vertragsart_kurzbz = $vertragsart_kurzbz;
+		return $this;
+	}
 
-    /**
-     * Get the value of gueltig_bis
-     */
-    public function getGueltigBis()
-    {
-        return $this->gueltig_bis;
-    }
+	public function setOe_kurzbz($oe_kurzbz)
+	{
+		$this->oe_kurzbz = $oe_kurzbz;
+		return $this;
+	}
 
-    /**
-     * Set the value of gueltig_bis
-     */
-    public function setGueltigBis($gueltig_bis): self
-    {
-        $this->gueltig_bis = $gueltig_bis;
+	public function setVon($von)
+	{
+		$this->von = $von;
+		return $this;
+	}
 
-        return $this;
-    }
+	public function setBis($bis)
+	{
+		$this->bis = $bis;
+		return $this;
+	}
+
+	public function setInsertamum($insertamum)
+	{
+		$this->insertamum = $insertamum;
+		return $this;
+	}
+
+	public function setInsertvon($insertvon)
+	{
+		$this->insertvon = $insertvon;
+		return $this;
+	}
+
+	public function setUpdateamum($updateamum)
+	{
+		$this->updateamum = $updateamum;
+		return $this;
+	}
+
+	public function setUpdatevon($updatevon)
+	{
+		$this->updatevon = $updatevon;
+		return $this;
+	}
 	
 	public function isValid()
 	{
@@ -164,6 +199,18 @@ EOTXT;
 	
 	public function validate() {
 		//do Validation here
+		
+		if( empty($this->mitarbeiter_uid) ) {
+			$this->validationerrors[] = 'Mitarbeiter_UID fehlt.';
+		}
+
+		if( empty($this->oe_kurzbz) ) {
+			$this->validationerrors[] = 'Unternehmen fehlt.';
+		}
+
+		if( empty($this->vertragsart_kurzbz) ) {
+			$this->validationerrors[] = 'Vertragsart fehlt.';
+		}
 		
 		// return status after Validation
 		if( count($this->validationerrors) > 0 ) {

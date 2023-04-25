@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/IValidation.php';
+require_once __DIR__ . '/Dienstverhaeltnis.php';
 require_once __DIR__ . '/Vertragsbestandteil.php';
 require_once __DIR__ . '/VertragsbestandteilStunden.php';
 require_once __DIR__ . '/VertragsbestandteilFunktion.php';
@@ -8,6 +9,7 @@ require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
 
+use vertragsbestandteil\Dienstverhaeltnis;
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
 
@@ -19,6 +21,8 @@ use vertragsbestandteil\VertragsbestandteilFactory;
 class VertragsbestandteilLib
 {		
 	protected $CI;
+	/** @var Dienstverhaeltnis_model */
+	protected $DienstverhaeltnisModel;
 	/** @var Vertragsbestandteil_model */
 	protected $VertragsbestandteilModel;
 	/** 
@@ -29,6 +33,9 @@ class VertragsbestandteilLib
 	public function __construct()
 	{
 		$this->CI = get_instance();
+		$this->CI->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 
+			'DienstverhaeltnisModel');
+		$this->DienstverhaeltnisModel = $this->CI->DienstverhaeltnisModel;
 		$this->CI->load->model('vertragsbestandteil/Vertragsbestandteil_model', 
 			'VertragsbestandteilModel');
 		$this->VertragsbestandteilModel = $this->CI->VertragsbestandteilModel;
@@ -51,6 +58,18 @@ class VertragsbestandteilLib
 		return $ret;
 	}
 
+	public function fetchDienstverhaeltnis($dienstverhaeltnis_id)
+	{
+		$result = $this->DienstverhaeltnisModel->load($dienstverhaeltnis_id);
+		$dv = null;
+		if(null !== ($row = getData($result))) 
+		{
+			$dv = new Dienstverhaeltnis();
+			$dv->hydrateByStdClass($row[0]);
+		}
+		return $dv;
+	}
+	
 	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null)
 	{
 		return $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag);
@@ -59,6 +78,18 @@ class VertragsbestandteilLib
 	public function fetchVertragsbestandteil($vertragsbestandteil_id)
 	{
 		return $this->VertragsbestandteilModel->getVertragsbestandteil($vertragsbestandteil_id);
+	}
+	
+	public function storeDienstverhaeltnis(Dienstverhaeltnis $dv)
+	{
+		if( inval($dv->getDienstverhaeltnis_id()) > 0 )
+		{
+			$this->insertDienstverhaeltnis($dv);
+		}
+		else 
+		{
+			$this->updateDienstverhaeltnis($dv);
+		}
 	}
 	
 	public function storeVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil) 
@@ -87,6 +118,19 @@ class VertragsbestandteilLib
 			$this->CI->db->trans_rollback();
 			throw new Exception('Storing Vertragsbestandteil failed.');
 		}	
+	}
+	
+	protected function insertDienstverhaeltnis(Dienstverhaeltnis $dv)
+	{
+		$ret = $this->DienstverhaeltnisModel->insert($dv->toStdClass());
+		if( hasData($ret) ) 
+		{
+			$dv->setDienstverhaeltnis_id(getData($ret));
+		}
+		else
+		{
+			throw new Exception('error inserting dienstverhaeltnis');
+		}
 	}
 	
 	protected function insertVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
@@ -121,6 +165,17 @@ class VertragsbestandteilLib
 		{
 			throw new Exception('VertragsbestandteilLib insertVertragsbestandteil '
 				. 'failed to store Gehaltsbestandteile. ' . $ex->getMessage());
+		}
+	}
+
+	protected function updateDienstverhaeltnis(Dienstverhaeltnis $dv)
+	{
+		$dv->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
+		$ret = $this->DienstverhaeltnisModel->update($dv->getDienstverhaeltnis_id(),
+			$dv->toStdClass());
+		if(isError($ret) )
+		{
+			throw new Exception('error updating dienstverhaeltnis');
 		}
 	}
 	
