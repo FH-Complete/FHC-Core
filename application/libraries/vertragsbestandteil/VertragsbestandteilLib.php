@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/IValidation.php';
 require_once __DIR__ . '/Vertragsbestandteil.php';
 require_once __DIR__ . '/VertragsbestandteilStunden.php';
 require_once __DIR__ . '/VertragsbestandteilFunktion.php';

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/IValidation.php';
 require_once __DIR__ . '/Gehaltsbestandteil.php';
 
 use vertragsbestandteil\Gehaltsbestandteil;
