@@ -80,6 +80,10 @@ EOTXT;
 	
 	public function validate()
 	{
+		if( (floatval($this->benutzerfunktion_id) < 1 ) ) {
+			$this->validationerrors[] = 'Stunden zu niedrig.';
+		}
+		
 		return parent::validate();
 	}
 }
