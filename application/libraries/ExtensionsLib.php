@@ -19,6 +19,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \stdClass as stdClass;
+use \PharData as PharData;
 
 /**
  * Library to manage core extensions
@@ -457,7 +458,7 @@ class ExtensionsLib
 					require_once('version.php'); // get the core version
 
 					// Checks if the required core version of the extension is the same of this system
-					if (isset($extensionJson->core_version) && version_compare($extensionJson->core_version, $fhcomplete_version,'<='))
+					if (isset($extensionJson->core_version) && version_compare($extensionJson->core_version, $fhcomplete_version, '<='))
 					{
 						$this->_printMessage('Required core version: '.$extensionJson->core_version);
 						$this->_printMessage('Current core version: '.$fhcomplete_version);
