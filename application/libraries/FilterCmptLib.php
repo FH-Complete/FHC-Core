@@ -508,10 +508,12 @@ class FilterCmptLib
 			$saveCustomFilter = true;
 		}
 
-		if ($saveCustomFilter === true) 
+		if ($saveCustomFilter === true)
 		{
-			$this->_setSessionElement(FilterCmptLib::SESSION_SIDE_MENU, 
-				$this->_generateFilterMenu($this->_app, $this->_datasetName));	
+			$this->_setSessionElement(
+				FilterCmptLib::SESSION_SIDE_MENU,
+				$this->_generateFilterMenu($this->_app, $this->_datasetName)
+			);
 		}
 		
 		return $saveCustomFilter;

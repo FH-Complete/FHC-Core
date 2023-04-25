@@ -17,6 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+use \stdClass as stdClass;
+
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
@@ -120,7 +122,8 @@ class DB_Model extends CI_Model
 		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
-		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable))) return $validate;
+		$validate = $this->_prepareUDFsWrite($data, $this->dbTable);
+		if (isError($validate)) return $validate;
 
 		// Add the pgp_sym_eccrypt postgresql function to the set clause if needed
 		$this->_addEncrypt($encryptedColumns, $data);
@@ -174,7 +177,8 @@ class DB_Model extends CI_Model
 		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
-		if (isError($validate = $this->_prepareUDFsWrite($data, $this->dbTable, $id))) return $validate;
+		$validate = $this->_prepareUDFsWrite($data, $this->dbTable, $id);
+		if (isError($validate)) return $validate;
 
 		$tmpId = $id;
 
@@ -341,7 +345,8 @@ class DB_Model extends CI_Model
 			// NOTE: $this->db->list_fields($tables[$t]) doesn't work if there are two tables with
 			// the same name in two different schemas, use this workaround
 			$fields = array();
-			if (isSuccess($lstColumns = $this->_list_columns($schemaAndTable->schema, $schemaAndTable->table)))
+			$lstColumns = $this->_list_columns($schemaAndTable->schema, $schemaAndTable->table);
+			if (isSuccess($lstColumns))
 			{
 				$fields = $lstColumns->retval;
 			}
@@ -419,7 +424,8 @@ class DB_Model extends CI_Model
 					$tmpFilteredArray = array_filter(get_object_vars($sideTableObj));
 					if (isset($tmpFilteredArray) && count($tmpFilteredArray) > 0)
 					{
-						if (($k = $this->_findMainTable($mainTableObj, $returnArray)) === false)
+						$k = $this->_findMainTable($mainTableObj, $returnArray);
+						if ($k === false)
 						{
 							$mainTableObj->{$sideTableProperty} = array($sideTableObj);
 							$returnArray[$returnArrayCounter++] = $mainTableObj;
@@ -802,8 +808,7 @@ class DB_Model extends CI_Model
 		$cleanedQuery = trim(preg_replace('/\t|\n|\r|;/', '', $query)); //
 
 		//
-		if (
-			(stripos($cleanedQuery, 'INSERT') > 0 || stripos($cleanedQuery, 'INSERT') == false)
+		if ((stripos($cleanedQuery, 'INSERT') > 0 || stripos($cleanedQuery, 'INSERT') == false)
 			&& (stripos($cleanedQuery, 'UPDATE') > 0 || stripos($cleanedQuery, 'UPDATE') == false)
 			&& (stripos($cleanedQuery, 'CREATE') > 0 || stripos($cleanedQuery, 'CREATE') == false)
 			&& (stripos($cleanedQuery, 'DELETE') > 0 || stripos($cleanedQuery, 'DELETE') == false)
@@ -881,7 +886,8 @@ class DB_Model extends CI_Model
 		$result->schema = DB_Model::DEFAULT_SCHEMA;
 
 		// If a schema is specified
-		if (($pos = strpos($schemaAndTable, '.')) !==  false)
+		$pos = strpos($schemaAndTable, '.');
+		if ($pos !==  false)
 		{
 			$result->schema = substr($schemaAndTable, 0, $pos);
 			$result->table = substr($schemaAndTable, $pos + 1);
@@ -911,9 +917,8 @@ class DB_Model extends CI_Model
 				&& array_key_exists(self::CRYPT_PASSWORD_NAME, $encryptedColumns[$column]))
 			{
 				// Password to encrypt data
-				$encryptionPassword = $this->config->item(self::CRYPT_CONF_PASSWORDS)[
-					$encryptedColumns[$column][self::CRYPT_PASSWORD_NAME]
-				];
+				$cryptConfPasswords = $this->config->item(self::CRYPT_CONF_PASSWORDS);
+				$encryptionPassword = $cryptConfPasswords[$encryptedColumns[$column][self::CRYPT_PASSWORD_NAME]];
 
 				// Add the encrypted column to the set clause without escaping
 				$this->db->set(
@@ -952,15 +957,11 @@ class DB_Model extends CI_Model
 					&& array_key_exists(self::CRYPT_PASSWORD_NAME, $definition))
 				{
 					// And if exists the wanted password to decrypt in the configs
-					if (array_key_exists(
-						$definition[self::CRYPT_PASSWORD_NAME],
-						$this->config->item(self::CRYPT_CONF_PASSWORDS))
-					)
+					if (array_key_exists($definition[self::CRYPT_PASSWORD_NAME], $this->config->item(self::CRYPT_CONF_PASSWORDS)))
 					{
 						// Password to decrypt data
-						$decryptionPassword = $this->config->item(self::CRYPT_CONF_PASSWORDS)[
-							$definition[self::CRYPT_PASSWORD_NAME]
-						];
+						$cryptConfPasswords = $this->config->item(self::CRYPT_CONF_PASSWORDS);
+						$decryptionPassword = $cryptConfPasswords[$definition[self::CRYPT_PASSWORD_NAME]];
 
 						// Find and replace all the occurrences of the provided encrypted columns
 						// with the postgresql decryption function
@@ -997,15 +998,11 @@ class DB_Model extends CI_Model
 					&& array_key_exists(self::CRYPT_PASSWORD_NAME, $definition))
 				{
 					// And if exists the wanted password to decrypt in the configs
-					if (array_key_exists(
-						$definition[self::CRYPT_PASSWORD_NAME],
-						$this->config->item(self::CRYPT_CONF_PASSWORDS))
-					)
+					if (array_key_exists($definition[self::CRYPT_PASSWORD_NAME], $this->config->item(self::CRYPT_CONF_PASSWORDS)))
 					{
 						// Password to decrypt data
-						$decryptionPassword = $this->config->item(self::CRYPT_CONF_PASSWORDS)[
-							$definition[self::CRYPT_PASSWORD_NAME]
-						];
+						$cryptConfPasswords = $this->config->item(self::CRYPT_CONF_PASSWORDS);
+						$decryptionPassword = $cryptConfPasswords[$definition[self::CRYPT_PASSWORD_NAME]];
 
 						// -----------------------------------------
 						// SELECT
@@ -1063,14 +1060,12 @@ class DB_Model extends CI_Model
 								)
 								{
 									// Then rename the column using the postgresql decryption function
-									$tmpWhere[
-										sprintf(
-											self::CRYPT_WHERE_TEMPLATE,
-											$encryptedColumn,
-											$decryptionPassword,
-											$definition[self::CRYPT_CAST]
-										).$operator
-									] = $condition;
+									$tmpWhere[sprintf(
+										self::CRYPT_WHERE_TEMPLATE,
+										$encryptedColumn,
+										$decryptionPassword,
+										$definition[self::CRYPT_CAST]
+									).$operator] = $condition;
 								}
 								else // otherwise copy the column as it is
 								{
@@ -1127,11 +1122,11 @@ class DB_Model extends CI_Model
 		{
 			if ($id != null)
 			{
-				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable, $this->_getUDFsNoPerms($id));
+				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $schemaAndTable, $this->_getUDFsNoPerms($id));
 			}
 			else
 			{
-				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $this->dbTable);
+				$prepareUDFsWrite = $this->udflib->prepareUDFsWrite($data, $schemaAndTable);
 			}
 		}
 

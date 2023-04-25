@@ -19,6 +19,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \stdClass as stdClass;
+
 /**
  * FilterWidget logic
  */
@@ -139,7 +141,7 @@ class FilterWidgetLib
 	/**
 	 * Gets the CI instance and loads message helper
 	 */
-	public function __construct($params = null)
+	public function __construct()
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 	}
@@ -409,7 +411,7 @@ class FilterWidgetLib
 	public function getFilterName($filterJson)
 	{
 		$filterName = $filterJson->name; // always present, used as default
-		$trimedname = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
+
 		// Filter name from phrases system
 		if (isset($filterJson->namePhrase) && !isEmptyString($filterJson->namePhrase))
 		{
@@ -470,7 +472,8 @@ class FilterWidgetLib
 			if (in_array($selectedField, $fields))
 			{
 				// If the selected field is present in the list of the selected fields by the current filter
-				if (($pos = array_search($selectedField, $selectedFields)) !== false)
+				$pos = array_search($selectedField, $selectedFields);
+				if ($pos !== false)
 				{
 					// Then remove it and shift the rest of elements by one if needed
 					array_splice($selectedFields, $pos, 1);
@@ -769,7 +772,6 @@ class FilterWidgetLib
 		$this->_ci->load->library('NavigationLib', array(self::NAVIGATION_PAGE => $navigationPage));
 
 		$filterMenu = null;
-		$currentMenu = $this->_ci->navigationlib->getSessionMenu(); // The navigation menu currently stored in session
 
 		$session = $this->getSession(); // The filter currently stored in session (the one that is currently used)
 		if ($session != null)
