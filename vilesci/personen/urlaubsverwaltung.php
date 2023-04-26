@@ -131,34 +131,38 @@ echo '	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker
 	<h2>Zeitsperren (Urlaube) der MitarbeiterInnen</h2>
 	';
 
+
+$redirect = basename($_SERVER['REQUEST_URI'], '?' . $_SERVER['QUERY_STRING']);
+
 //Rechte Pruefen
 $rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user, true);
+$rechte->getBerechtigungen($user);
+$berechtigt = false;
 
-if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
-	die('Sie haben keine Berechtigung für diese Seite');
+$bf = new benutzerfunktion();
+$bf->getBenutzerFunktionByUid($uid);
+foreach ($bf->result as $oe)
+{
+	if($oe->funktion_kurzbz == "oezuordnung")
+		if($rechte->isBerechtigt('mitarbeiter/zeitsperre:begrenzt', $oe->oe_kurzbz, 'suid'))
+			$berechtigt = true;
+}
+
+if($uid && !$berechtigt && $uid != $user)
+	die("Sie haben keine Berechtigung um Mitarbeiter*in " . $uid . " zu bearbeiten!<br><br> <a href='$redirect'>Zurück</a>");
 
 //Formular zur Eingabe der UID
-echo '<form  accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'" mehtod="GET">';
+echo '<form  accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 echo 'Zeitsperren der UID <INPUT type="hidden" id="uid" name="uid" value="uid">
 		<input type="text" id="ma_name" name="uid" value="'.$uid.'">';
 echo '<input type="submit" name="submit" value="Anzeigen">';
 echo '</form>';
 
-//OEs mit Leitungsfunktion User laden
-$bf = new benutzerfunktion();
-$oes = $bf->getBenutzerFunktionByUid($user, 'Leitung');
-
-$leitungInOes = array();
-foreach ($bf->result as $oe)
-{
-	$leitungInOes[] = $oe->oe_kurzbz;
-}
 
 //Loeschen von Zeitsperren
 if($action=='delete')
 {
-	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+	if(!$berechtigt)
 		die('Sie haben keine Berechtigung für diese Aktion');
 
 	if($zeitsperre_id!='' && is_numeric($zeitsperre_id))
@@ -176,7 +180,7 @@ if($action=='delete')
 //Kopieren einer Zeitsperre
 if($action=='copy')
 {
-	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+	if(!$berechtigt)
 		die('Sie haben keine Berechtigung für diese Aktion');
 
 	if($zeitsperre_id!='' && is_numeric($zeitsperre_id))
@@ -199,7 +203,7 @@ if($action=='copy')
 
 if(isset($_POST['save']))
 {
-	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+	if(!$berechtigt)
 		die('Sie haben keine Berechtigung für diese Aktion');
 
 	//Speichern der Daten
@@ -253,23 +257,9 @@ if($errormsg!='')
 if($message!='')
 	echo "<br><div class='insertok'>$message</div><br>";
 
-//Check, if user Leitungsfunktion für die OE des gewünschten uid besitzt
-$ber = false;
-$bf = new benutzerfunktion();
-$bf->getBenutzerFunktionByUid($uid);
-foreach ($bf->result as $oe)
-{
-	if(in_array($oe->oe_kurzbz, $leitungInOes))
-	{
-		$ber = true;
-	}
-}
-
-if($uid!='' && !$ber)
-	echo( "Keine Berechtigungen, um Abwesenheiten von " . $uid . " zu bearbeiten!");
 
 //Zeitsperren des Mitarbeiters anzeigen
-if($uid!='' && $ber)
+if($uid!='')
 {
 	$mitarbeiter = new mitarbeiter();
 	if(!$mitarbeiter->load($uid))
