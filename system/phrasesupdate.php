@@ -17383,6 +17383,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'abgewiesenam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abgewiesen am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Rejected on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
