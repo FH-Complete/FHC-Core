@@ -326,7 +326,7 @@ if($command=="update" && $error!=true)
 						}
 						else
 						{
-							$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+							$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSignedStudent');
 						}
 
 						/*$qry="UPDATE campus.tbl_paabgabe SET
@@ -395,7 +395,7 @@ if($command=="update" && $error!=true)
 								if ($uploadedDocumentSigned != null)
 								{
 									$htmlstr .= "<tr>\n";
-									$htmlstr .= "<td style='text-align: center;'>";
+									$htmlstr .= "<td colspan='2' style='text-align: center;'>";
 									$htmlstr .= '<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 15px; border: 1px solid; border-radius: 4px;">
 
 											<b>'.$uploadedDocumentSigned.'</b></td>

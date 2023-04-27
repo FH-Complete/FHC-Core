@@ -592,18 +592,9 @@ while ($row=@$db->db_fetch_object($result))
 	$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
 	$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 
+	$uploadedDocumentSigned = null;
 	if (!$row->abgabedatum)
 	{
-		$uploadedDocumentSigned = null;
-
-		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$row->projektarbeit_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-		$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
-		$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
-		$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
-
 		if ($row->datum<date('Y-m-d'))
 		{
 			//Termin vorbei - weiß auf rot
@@ -638,8 +629,7 @@ while ($row=@$db->db_fetch_object($result))
 			$fcol='#000000';
 		}
 	}
-	//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
-	//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked="checked" style="background-color:#FF0000;"':'')." disabled>";
+
 	if($row->fixtermin=='t')
 	{
 		$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
@@ -684,113 +674,6 @@ while ($row=@$db->db_fetch_object($result))
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
-
-		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
-		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked="checked" style="background-color:#FF0000;"':'')." disabled>";
-		if($row->fixtermin=='t')
-		{
-			$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
-		}
-		else
-		{
-			$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='".$p->t('abgabetool/variablerAbgabetermin')."' border=0></td>";
-		}
-		$htmlstr .= "		</td>\n";
-		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol." ' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
-		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
-		//$htmlstr .= "			<option value=''>&nbsp;</option>";
-		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp";
-		$result_typ=@$db->db_query($qry_typ);
-		while ($row_typ=@$db->db_fetch_object($result_typ))
-		{
-			if($row->paabgabetyp_kurzbz==$row_typ->paabgabetyp_kurzbz)
-			{
-				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."' selected>$row_typ->bezeichnung</option>";
-			}
-			else
-			{
-				if($row_typ->paabgabetyp_kurzbz!='end' && $row_typ->paabgabetyp_kurzbz!='note' && $row_typ->paabgabetyp_kurzbz!='enda')
-				{
-					$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
-				}
-			}
-		}
-		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";
-		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
-		if($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
-		{
-			$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."' title='".$p->t('abgabetool/terminaenderungSpeichern')."'></td>";
-
-			if(!$row->abgabedatum)
-			{
-				$htmlstr .= "		<td><input type='submit' name='del' value='".$p->t('global/loeschen')."' onclick='return confdel()' title='".$p->t('abgabetool/terminLoeschen')."'></td>";
-			}
-			else
-			{
-				$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-			}
-		}
-		else
-		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		}
-		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
-		{
-			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='".$p->t('abgabetool/kontrolleZusatzdaten')."' border=0></a></td>";
-		}
-		else
-		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		}
-
-		if (file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
-		{
-			if ($row->paabgabetyp_kurzbz == 'end')
-			{
-				// Check if the document is signed
-				$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
-				if (is_array($signList) && count($signList) > 0)
-				{
-					// The document is signed
-				}
-				elseif ($signList === null)
-				{
-					$uploadedDocumentSigned = 'WARNING: signature server error';
-				}
-				else
-				{
-					$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
-				}
-			}
-
-			$htmlstr .= "		<td>
-							<a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'>
-								<img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0>
-							</a>
-						</td>";
-		}
-		else
-		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		}
-
-		$htmlstr .= "	</tr>\n";
-
-		if ($uploadedDocumentSigned != null)
-		{
-			$htmlstr .= '
-				<tr>
-					<td colspan="4"></td>
-					<td colspan="5">
-						<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 15px; border: 1px solid; border-radius: 4px; ">
-							<b>'.$uploadedDocumentSigned.'</b></td>
-						</div>
-					</td>
-				</tr>';
-		}
-
-		$htmlstr .= "</form>\n";
 	}
 	else
 	{
@@ -812,6 +695,53 @@ while ($row=@$db->db_fetch_object($result))
 	{
 		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 	}
+
+	if (file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+	{
+		$signaturVorhanden = false;
+		if ($row->paabgabetyp_kurzbz == 'end')
+		{
+			// Check if the document is signed
+			$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
+			if (is_array($signList) && count($signList) > 0)
+			{
+				$signaturVorhanden = true;
+				// The document is signed
+			}
+			elseif ($signList === null)
+			{
+				$uploadedDocumentSigned = 'WARNING: signature server error';
+			}
+			else
+			{
+				$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+			}
+		}
+		if ($uploadedDocumentSigned != null)
+		{
+			$htmlstr .= '
+					<td>
+						<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$uploadedDocumentSigned.'</b>
+						</div>
+					</td>';
+		}
+		elseif($signaturVorhanden)
+		{
+			$htmlstr .= '
+					<td>
+						<div style="color: #198754; background-color: #d1e7dd; border-color: #a3cfbb; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$p->t('abgabetool/uploadedDocumentSigned').'</b>
+						</div>
+					</td>';
+		}
+	}
+	else
+	{
+		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	}
+
+
 	$htmlstr .= "	</tr>\n";
 
 
@@ -830,7 +760,7 @@ $htmlstr .= '<tr id="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
 //$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
 $htmlstr .= "<td>&nbsp;&nbsp;</td>";
 
-$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
+$htmlstr .= "		<td><input type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 $qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end' AND paabgabetyp_kurzbz!='enda' AND paabgabetyp_kurzbz!='note'";

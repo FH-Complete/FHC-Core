@@ -91,7 +91,9 @@ $this->phrasen['abgabetool/projektbeurteilungDownload']='Projektbeurteilung heru
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='Erst-/Begutachter';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Zweitbegutachter';
 $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Fehler beim Ermitteln des Enduplaods der Projektarbeit';
-$this->phrasen['abgabetool/uploadedDocumentNotSigned']='Warnung! Das hochgeladene Dokument ist nicht signiert';
+$this->phrasen['abgabetool/uploadedDocumentNotSignedStudent']='Achtung - Das Dokument enthält keine elektronische Signatur. Bitte signieren Sie das Dokument.';
+$this->phrasen['abgabetool/uploadedDocumentNotSigned']='Signatur fehlt';
+$this->phrasen['abgabetool/uploadedDocumentSigned']='Signatur vorhanden';
 $this->phrasen['abgabetool/senatsMitglied']='Mitglied Prüfungssenat';
 $this->phrasen['abgabetool/abgegeben']='Abgegeben, in Beurteilung';
 ?>
