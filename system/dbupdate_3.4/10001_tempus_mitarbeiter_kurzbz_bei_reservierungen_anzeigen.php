@@ -2,7 +2,7 @@
 if (! defined('DB_NAME')) exit('No direct script access allowed');
 
 // lehre.vw_stundenplandev erweitern
-if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM lehre.vw_stundenplandev"))
+if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM lehre.vw_stundenplandev LIMIT 1"))
 {
 	$qry = "
 		CREATE OR REPLACE VIEW lehre.vw_stundenplandev
@@ -62,7 +62,7 @@ if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM lehre.vw_stundenpl
 }
 
 // lehre.vw_stundenplan erweitern
-if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM lehre.vw_stundenplan"))
+if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM lehre.vw_stundenplan LIMIT 1"))
 {
 	$qry = "CREATE OR REPLACE VIEW lehre.vw_stundenplan AS
 			SELECT
@@ -94,7 +94,7 @@ if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM lehre.vw_stundenpl
 }
 
 // campus.vw_reservierung erweitern
-if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM campus.vw_reservierung"))
+if (!$result = @$db->db_query("SELECT mitarbeiter_kurzbz FROM campus.vw_reservierung LIMIT 1"))
 {
 	$qry = "CREATE OR REPLACE view campus.vw_reservierung
 				(reservierung_id, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel, beschreibung, semester, verband,
