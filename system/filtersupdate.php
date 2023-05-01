@@ -1126,12 +1126,12 @@ $filters = array(
 		'app' => 'personalverwaltung',
 		'dataset_name' => 'personalIssueViewer',
 		'filter_kurzbz' => 'offeneFehlerPersonal',
-		'description' => '{Personal Fehlermonitoring}',
+		'description' => '{Alle offenen Fehler}',
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Offene Fehler",
+				"name": "Alle offenen Fehler",
 				"columns": [
 					{"name": "Datum"},
 					{"name": "Inhalt"},
@@ -1144,6 +1144,43 @@ $filters = array(
 					{
 						"name": "Statuscode",
 						"operation": "ncontains",
+						"condition": "resolved"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'personalIssueViewer',
+		'filter_kurzbz' => 'FehlerLetzte7TageBearbeitetPersonal',
+		'description' => '{Letzten 7 Tage bearbeitet}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Statuscode"},
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
+				],
+				"filters": [
+					{
+						"name": "Verarbeitet am",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					},
+					{
+						"name": "Statuscode",
+						"operation": "contains",
 						"condition": "resolved"
 					}
 				]
