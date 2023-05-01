@@ -50,11 +50,16 @@ class Dienstverhaeltnis implements IValidation {
     public function toStdClass(): \stdClass
 	{
 		$tmp = array(
-			'dienstverhaeltnis_id' => $this->getDienstverhaeltnisId(),
-			'vertragsart_kurzbz' => $this->getVertragsartKurzbz(),
-            'oe_kurzbz' => $this->getUnternehmen(),
-			'gueltig_ab' => $this->getGueltigAb(),
-            'gueltig_bis' => $this->getGueltigBis(),
+			'dienstverhaeltnis_id' => $this->getDienstverhaeltnis_id(),
+			'mitarbeiter_uid' => $this->getMitarbeiter_uid(),
+			'vertragsart_kurzbz' => $this->getVertragsart_kurzbz(),
+            'oe_kurzbz' => $this->getOe_kurzbz(),
+			'von' => $this->getVon(),
+            'bis' => $this->getBis(),
+			'insertamum' => $this->getInsertamum(),
+			'insertvon' => $this->getInsertvon(),
+			'updateamum' => $this->getUpdateamum(),
+			'updatevon' => $this->getUpdatevon()
 		);
 		
 		$tmp = array_filter($tmp, function($v) {
@@ -68,10 +73,12 @@ class Dienstverhaeltnis implements IValidation {
     public function __toString()
 	{
 		$txt = <<<EOTXT
-		dienstverhaeltnis_id: {$this->getDienstverhaeltnisId()}
-		vertragsart_kurzbz: {$this->getVertragsartKurzbz()}
-		gueltig_ab: {$this->getGueltigAb()}
-        gueltig_bis: {$this->getGueltigBis()}
+		dienstverhaeltnis_id: {$this->getDienstverhaeltnis_id()}
+		mitarbeiter_uid: {$this->getMitarbeiter_uid()}
+		vertragsart_kurzbz: {$this->getVertragsart_kurzbz()}
+		oe_kurzbz: {$this->getOe_kurzbz()}
+		von: {$this->getVon()}
+        bis: {$this->getBis()}
 
 EOTXT;
 		return $txt;

@@ -30,8 +30,11 @@ class VertragsbestandteilLib
 	 */
 	protected $GehaltsbestandteilLib;
 	
+	protected $loggedInUser;
+	
 	public function __construct()
 	{
+		$this->loggedInUser = getAuthUID();
 		$this->CI = get_instance();
 		$this->CI->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 
 			'DienstverhaeltnisModel');
@@ -82,13 +85,13 @@ class VertragsbestandteilLib
 	
 	public function storeDienstverhaeltnis(Dienstverhaeltnis $dv)
 	{
-		if( inval($dv->getDienstverhaeltnis_id()) > 0 )
+		if( intval($dv->getDienstverhaeltnis_id()) > 0 )
 		{
-			$this->insertDienstverhaeltnis($dv);
+			$this->updateDienstverhaeltnis($dv);
 		}
 		else 
 		{
-			$this->updateDienstverhaeltnis($dv);
+			$this->insertDienstverhaeltnis($dv);			
 		}
 	}
 	
@@ -122,6 +125,8 @@ class VertragsbestandteilLib
 	
 	protected function insertDienstverhaeltnis(Dienstverhaeltnis $dv)
 	{
+		$dv->setInsertvon($this->loggedInUser)
+			->setInsertamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->DienstverhaeltnisModel->insert($dv->toStdClass());
 		if( hasData($ret) ) 
 		{
@@ -135,6 +140,8 @@ class VertragsbestandteilLib
 	
 	protected function insertVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
 	{
+		$vertragsbestandteil->setInsertvon($this->loggedInUser)
+			->setInsertamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$vertragsbestandteil->beforePersist();
 		$ret = $this->VertragsbestandteilModel->insert($vertragsbestandteil->baseToStdClass());
 		if( hasData($ret) ) 
@@ -170,7 +177,8 @@ class VertragsbestandteilLib
 
 	protected function updateDienstverhaeltnis(Dienstverhaeltnis $dv)
 	{
-		$dv->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
+		$dv->setUpdatevon($this->loggedInUser)
+			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->DienstverhaeltnisModel->update($dv->getDienstverhaeltnis_id(),
 			$dv->toStdClass());
 		if(isError($ret) )
@@ -181,7 +189,8 @@ class VertragsbestandteilLib
 	
 	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
 	{
-		$vertragsbestandteil->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
+		$vertragsbestandteil->setUpdatevon($this->loggedInUser)
+			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$vertragsbestandteil->beforePersist();
 		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
 			$vertragsbestandteil->baseToStdClass());

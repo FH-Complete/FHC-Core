@@ -15,8 +15,11 @@ class GehaltsbestandteilLib
 	/** @var Gehaltsbestandteil_model */
 	protected $GehaltsbestandteilModel;
 
+	protected $loggedInUser;
+	
 	public function __construct()
 	{
+		$this->loggedInUser = getAuthUID();
 		$this->CI = get_instance();
 		$this->CI->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 
 			'GehaltsbestandteilModel');
@@ -63,6 +66,8 @@ class GehaltsbestandteilLib
 	
 	protected function insertGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
 	{
+		$gehaltsbestandteil->setInsertvon($this->loggedInUser)
+			->setInsertamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->GehaltsbestandteilModel->insert($gehaltsbestandteil->toStdClass(),
 			$this->GehaltsbestandteilModel->getEncryptedColumns());
 		if( hasData($ret) ) 
@@ -77,7 +82,8 @@ class GehaltsbestandteilLib
 	
 	protected function updateGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
 	{
-		$gehaltsbestandteil->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
+		$gehaltsbestandteil->setUpdatevon($this->loggedInUser)
+			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->GehaltsbestandteilModel->update($gehaltsbestandteil->getGehaltsbestandteil_id(), 
 			$gehaltsbestandteil->toStdClass(),
 			$this->GehaltsbestandteilModel->getEncryptedColumns());

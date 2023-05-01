@@ -80,7 +80,7 @@ EOTXT;
 	
 	public function validate()
 	{
-		if( (floatval($this->benutzerfunktion_id) < 1 ) ) {
+		if( (floatval($this->wochenstunden) < 1 ) ) {
 			$this->validationerrors[] = 'Stunden zu niedrig.';
 		}
 		

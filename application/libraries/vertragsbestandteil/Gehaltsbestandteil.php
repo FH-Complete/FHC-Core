@@ -294,7 +294,10 @@ EOTXT;
 	
 	public function validate() {
 		//do Validation here
-		
+		if( empty($this->grundbetrag) )
+		{
+			$this->validationerrors[] = "Betrag fehlt.";
+		}
 		// return status after Validation
 		if( count($this->validationerrors) > 0 ) {
 			$this->isvalid = false;
