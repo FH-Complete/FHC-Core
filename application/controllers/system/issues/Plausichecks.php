@@ -58,7 +58,13 @@ class Plausichecks extends Auth_Controller
 			$libName = $fehlerLibMappings[$fehler_kurzbz];
 
 			// execute the check
-			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue($libName, $studiensemester_kurzbz, $studiengang_kz);
+			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue(
+				$libName,
+				array(
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'studiengang_kz' => $studiengang_kz
+				)
+			);
 
 			if (isError($plausicheckRes)) $this->terminateWithJsonError(getError($plausicheckRes));
 
@@ -72,7 +78,6 @@ class Plausichecks extends Auth_Controller
 					$person_id = isset($plausiData['person_id']) ? $plausiData['person_id'] : null;
 					$oe_kurzbz = isset($plausiData['oe_kurzbz']) ? $plausiData['oe_kurzbz'] : null;
 					$fehlertext_params = isset($plausiData['fehlertext_params']) ? $plausiData['fehlertext_params'] : null;
-					$resolution_params = isset($plausiData['resolution_params']) ? $plausiData['resolution_params'] : null;
 
 					// get Text of the Fehler
 					$this->FehlerModel->addSelect('fehlertext');
