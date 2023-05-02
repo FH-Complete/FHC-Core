@@ -4019,7 +4019,7 @@ function StudentIONeu()
 	if(tag<10)
 		tag='0'+tag;
 
-	var prestudent_id = document.getElementById('student-io-detail-textbox-prestudent_id').value;
+	var prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
 	var defaultdatum = tag+'.'+monat+'.'+jahr;
 	var mobilitaetsprogramm = 7; // ERASMUS
 
