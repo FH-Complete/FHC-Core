@@ -298,6 +298,22 @@ EOTXT;
 		{
 			$this->validationerrors[] = "Betrag fehlt.";
 		}
+		
+		$von = \DateTimeImmutable::createFromFormat('Y-m-d', $this->von);
+		$bis = \DateTimeImmutable::createFromFormat('Y-m-d', $this->bis);
+		
+		if( false === $von ) {
+			$this->validationerrors[] = 'Beginn muss ein gültiges Datum sein.';
+		}
+		
+		if( $this->bis !== null && $bis === false ) {
+			$this->validationerrors[] = 'Ende muss ein gültiges Datum oder leer sein.';
+		}
+		
+		if( $this-> bis !== null && $von && $bis && $von > $bis ) {
+			$this->validationerrors[] = 'Das Beginndatum muss vor dem Endedatum liegen.';
+		}
+		
 		// return status after Validation
 		if( count($this->validationerrors) > 0 ) {
 			$this->isvalid = false;

@@ -31,21 +31,29 @@ class Vertragsbestandteil_model extends DB_Model
 		$sql = <<<EOSQL
 			SELECT
 				v.*, 
-				
-				s.wochenstunden, s.karenz, 
-				
-				f.benutzerfunktion_id, f.anmerkung, f. kuendigungsrelevant,
-				
-				g.von as gehalt_von, g.bis as gehalt_bis, g.dienstverhaeltnis_id as gehalt_dienstverhaeltnis_id, g.grundbetrag,
-				g.betrag_valorisiert,g.valorisieren,gehaltstyp_kurzbz,valorisierungssperre
+				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung, 
+				f.benutzerfunktion_id, 
+				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin, 
+				kf.arbeitgeber_frist, kf.arbeitnehmer_frist, 
+				s.wochenstunden, s.teilzeittyp_kurzbz, 
+				u.tage, 
+				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice				
 			FROM
 				hr.tbl_vertragsbestandteil v
 			LEFT JOIN
-				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
+				hr.tbl_vertragsbestandteil_freitext ft USING(vertragsbestandteil_id)
 			LEFT JOIN
 				hr.tbl_vertragsbestandteil_funktion f USING(vertragsbestandteil_id)
 			LEFT JOIN
-				hr.tbl_gehaltsbestandteil g USING(vertragsbestandteil_id)
+				hr.tbl_vertragsbestandteil_karenz k USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_kuendigungsfrist kf USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_urlaubsanspruch u USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_zeitaufzeichnung z USING(vertragsbestandteil_id)
 			WHERE
 				v.dienstverhaeltnis_id = {$this->escape($dienstverhaeltnis_id)}
 				{$stichtagclause}
@@ -77,21 +85,29 @@ EOSQL;
 		$sql = <<<EOSQL
 			SELECT
 				v.*, 
-				
-				s.wochenstunden, s.karenz, 
-				
-				f.benutzerfunktion_id, f.anmerkung, f. kuendigungsrelevant,
-				
-				g.von as gehalt_von, g.bis as gehalt_bis, g.dienstverhaeltnis_id as gehalt_dienstverhaeltnis_id, g.grundbetrag,
-				g.betrag_valorisiert,g.valorisieren,gehaltstyp_kurzbz,valorisierungssperre
+				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung, 
+				f.benutzerfunktion_id, 
+				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin, 
+				kf.arbeitgeber_frist, kf.arbeitnehmer_frist, 
+				s.wochenstunden, s.teilzeittyp_kurzbz, 
+				u.tage, 
+				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice				
 			FROM
 				hr.tbl_vertragsbestandteil v
 			LEFT JOIN
-				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
+				hr.tbl_vertragsbestandteil_freitext ft USING(vertragsbestandteil_id)
 			LEFT JOIN
 				hr.tbl_vertragsbestandteil_funktion f USING(vertragsbestandteil_id)
 			LEFT JOIN
-				hr.tbl_gehaltsbestandteil g USING(vertragsbestandteil_id)
+				hr.tbl_vertragsbestandteil_karenz k USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_kuendigungsfrist kf USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_urlaubsanspruch u USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_zeitaufzeichnung z USING(vertragsbestandteil_id)
 			WHERE
 				v.vertragsbestandteil_id = {$this->escape($id)}
 			;

@@ -222,4 +222,14 @@ class VertragsbestandteilLib
 				. 'failed to store Gehaltsbestandteile. ' . $ex->getMessage());
 		}
 	}
+	
+	public function isOverlappingExistingDV(Dienstverhaeltnis $dv) 
+	{
+		return $this->DienstverhaeltnisModel->isOverlappingExistingDV(
+			$dv->getMitarbeiter_uid(), 
+			$dv->getOe_kurzbz(), 
+			$dv->getVon(), 
+			$dv->getBis()
+		);
+	}
 }

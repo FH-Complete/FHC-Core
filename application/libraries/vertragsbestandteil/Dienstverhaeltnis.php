@@ -204,8 +204,11 @@ EOTXT;
 		return $this->validationerrors;
 	}
 	
-	public function validate() {
+	public function validate() {		
 		//do Validation here
+		$ci = get_instance();
+		$ci->load->library('vertragsbestandteil/VertragsbestandteilLib', 
+            null, 'VertragsbestandteilLib');
 		
 		if( empty($this->mitarbeiter_uid) ) {
 			$this->validationerrors[] = 'Mitarbeiter_UID fehlt.';
@@ -217,6 +220,27 @@ EOTXT;
 
 		if( empty($this->vertragsart_kurzbz) ) {
 			$this->validationerrors[] = 'Vertragsart fehlt.';
+		}
+		
+		$von = \DateTimeImmutable::createFromFormat('Y-m-d', $this->von);
+		$bis = \DateTimeImmutable::createFromFormat('Y-m-d', $this->bis);
+		
+		if( false === $von ) {
+			$this->validationerrors[] = 'Beginn muss ein gültiges Datum sein.';
+		}
+		
+		if( $this->bis !== null && $bis === false ) {
+			$this->validationerrors[] = 'Ende muss ein gültiges Datum oder leer sein.';
+		}
+		
+		if( $this-> bis !== null && $von && $bis && $von > $bis ) {
+			$this->validationerrors[] = 'Das Beginndatum muss vor dem Endedatum liegen.';
+		}
+		
+		// TODO check for overlapping DVs
+		if( $ci->VertragsbestandteilLib->isOverlappingExistingDV($this) ) 
+		{
+			$this->validationerrors[] = 'Es existiert bereits ein überlappendes Dienstverhältnis';
 		}
 		
 		// return status after Validation

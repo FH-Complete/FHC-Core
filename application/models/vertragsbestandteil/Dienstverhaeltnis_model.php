@@ -73,4 +73,30 @@ class Dienstverhaeltnis_model extends DB_Model
         return $this->execQuery($qry, array($uid));
     }
 
+	public function isOverlappingExistingDV($mitarbeiter_uid, $oe_kurzbz, $von, $bis)
+	{
+		$query = <<<EOSQL
+			SELECT 
+				count(*) AS dvcount
+			FROM
+				hr.tbl_dienstverhaeltnis dv
+			WHERE
+				dv.mitarbeiter_uid = ?
+			AND
+				dv.oe_kurzbz = ?
+			AND
+				?::date <= COALESCE(dv.bis, '2170-12-31'::date)
+			AND 
+				COALESCE(?::date, '2170-12-31'::date) >= dv.von
+EOSQL;
+		
+		$ret = $this->execReadOnlyQuery($query, 
+			array($mitarbeiter_uid, $oe_kurzbz, $von, $bis));
+		
+		if( ($dvcount = getData($ret)) && ($dvcount[0]->dvcount > 0) ) {
+			return true;
+		}
+		
+		return false;	
+	}
 }
