@@ -312,5 +312,42 @@ class berechtigung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Sucht nach Berechtigungen
+	 * @param string $searchItem Suchbegriff
+	 * @return boolean
+	 */
+	public function searchBerechtigungen($searchItem)
+	{
+		$this->result=array();
+		$qry = 'SELECT * FROM system.tbl_berechtigung WHERE
+				(
+					LOWER(berechtigung_kurzbz) LIKE LOWER(\'%'.$this->db_escape(($searchItem)).'%\')
+					OR
+					LOWER(beschreibung) LIKE LOWER(\'%'.$this->db_escape(($searchItem)).'%\')
+				)';
+
+		$qry .= ' ORDER BY berechtigung_kurzbz';
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new berechtigung();
+
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Berechtigungen';
+			return false;
+		}
+	}
 }
 ?>

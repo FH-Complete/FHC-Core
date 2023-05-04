@@ -86,16 +86,22 @@ class PlausicheckLib
 				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 				JOIN public.tbl_benutzer benutzer on(benutzer.uid = student.student_uid)
 				JOIN public.tbl_studiengang stg ON prestudent.studiengang_kz = stg.studiengang_kz
+				LEFT JOIN lehre.tbl_studienplan stpl USING (studienplan_id)
 			WHERE
 				benutzer.aktiv = true
-				AND status.status_kurzbz='Student'
+				AND status.status_kurzbz IN ('Student', 'Unterbrecher', 'Abbrecher', 'Diplomand', 'Absolvent')
 				AND studiengang.studiengang_kz < 10000
 				AND status.studiensemester_kurzbz = ?
+				AND NOT (status.orgform_kurzbz IS NULL AND studiengang.mischform = FALSE)
 				AND NOT EXISTS(
-					SELECT 1 FROM lehre.tbl_studienplan
-					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					SELECT 1
+					FROM
+						lehre.tbl_studienplan
+					JOIN
+						lehre.tbl_studienordnung USING(studienordnung_id)
 					WHERE
-						tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
+						tbl_studienplan.studienplan_id = stpl.studienplan_id
+						AND tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
 						AND tbl_studienplan.orgform_kurzbz = status.orgform_kurzbz)";
 
 		if (isset($prestudent_id))
@@ -106,7 +112,7 @@ class PlausicheckLib
 
 		if (isset($studiengang_kz))
 		{
-			$qry .= " AND stg.studiengang_kz = ?";
+			$qry .= " AND studiengang.studiengang_kz = ?";
 			$params[] = $studiengang_kz;
 		}
 
@@ -863,6 +869,57 @@ class PlausicheckLib
 				$params[] = $studiensemester_kurzbz;
 			}
 		}
+
+		if (isset($studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz = ?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($prestudent_id))
+		{
+			$qry .= " AND pre.prestudent_id = ?";
+			$params[] = $prestudent_id;
+		}
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Student with active status should have been charged, i.e. have a Kontobuchung with a negative or zero value.
+	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @return success with prestudents or error
+	 */
+	public function getAktiverStudentstatusOhneKontobuchung($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
+	{
+		$params = array($studiensemester_kurzbz);
+
+		$qry = "
+			SELECT
+				DISTINCT ON (pre.prestudent_id)
+				pre.person_id, pre.prestudent_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz, status.studiensemester_kurzbz
+			FROM
+				public.tbl_prestudent pre
+				JOIN public.tbl_person pers USING(person_id)
+				JOIN public.tbl_prestudentstatus status USING(prestudent_id)
+				JOIN public.tbl_studiengang stg USING(studiengang_kz)
+			WHERE
+				status.studiensemester_kurzbz = ?
+				AND status.status_kurzbz IN ('Student', 'Incoming')
+				AND NOT EXISTS (
+					SELECT 1
+					FROM
+						public.tbl_konto
+					WHERE
+						person_id = pers.person_id
+						AND studiensemester_kurzbz = status.studiensemester_kurzbz
+						AND buchungsnr_verweis IS NULL
+						AND betrag <= 0
+				)
+				AND stg.melderelevant
+				AND pre.bismelden";
 
 		if (isset($studiengang_kz))
 		{
