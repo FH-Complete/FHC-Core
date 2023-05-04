@@ -906,6 +906,9 @@ class DB_Model extends CI_Model
 	 */
 	private function _addEncrypt($encryptedColumns, &$data)
 	{
+		// If encryptedColumns is not defined then exit
+		if (isEmptyArray($encryptedColumns)) return;
+
 		$tmpData = array(); // Temporary array used to copy not encrypted columns
 
 		// For each column that is going to be inserted/updated
