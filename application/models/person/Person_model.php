@@ -88,7 +88,7 @@ class Person_model extends DB_Model
 		if (isset($person['svnr']) && $person['svnr'] != '')
 		{
 			$this->PersonModel->addOrder('svnr', 'DESC');
-			$result =  $this->PersonModel->loadWhere(array(
+			$result = $this->PersonModel->loadWhere(array(
 				'person_id != ' => $person['person_id'],
 				'SUBSTRING(svnr FROM 1 FOR 10) = ' => $person['svnr'])
 			);
@@ -156,7 +156,8 @@ class Person_model extends DB_Model
 			'lower(nachname) like '.$this->db->escape('%'.$filter.'%')."
 			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
 			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%'));
+			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%')
+		);
 
 		return $result;
 	}
@@ -170,8 +171,12 @@ class Person_model extends DB_Model
 	 */
 	public function getPersonStammdaten($person_id, $zustellung_only = false)
 	{
-		$this->addSelect('public.tbl_person.*, tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code, tbl_person.geburtsnation AS geburtsnation_code, 
-		s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addSelect('public.tbl_person.*,
+			tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code,
+			tbl_person.geburtsnation AS geburtsnation_code, 
+			s.kurztext as staatsbuergerschaft,
+			g.kurztext as geburtsnation'
+		);
 		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
 		$this->addJoin('bis.tbl_nation g', 'public.tbl_person.geburtsnation = g.nation_code', 'LEFT');
 
@@ -276,7 +281,8 @@ class Person_model extends DB_Model
 	 */
 	public function getFullName($uid)
 	{
-		if (!$result = getData($this->getByUid($uid))[0])
+		$result = getData($this->getByUid($uid))[0];
+		if (!$result)
 		{
 			show_error('Failed loading person');
 		}
