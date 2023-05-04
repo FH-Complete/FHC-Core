@@ -4,7 +4,7 @@
  * Vertragsstruktur im HR Schema
  *
  * Aufruf:
- * php index.ci.php system/MigrateContracts/index/oesi
+ * php index.ci.php system/MigrateContract/index/oesi
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
@@ -350,7 +350,7 @@ class MigrateContract extends CLI_Controller
 						if ($dtende_fkt < $dtende_dv)
 							$endedatum = $row_funktion->datum_bis;
 						else
-							$endedatum = $row_contract['von'];
+							$endedatum = $row_contract['bis'];
 
 						// VBS anlegen und Funktion zuweisen
 						$newVBSIndex = $this->_getNewVBSIndex($contracts, $dv);
@@ -453,15 +453,15 @@ class MigrateContract extends CLI_Controller
 	private function _addVertragsbestandteilStunden(&$contracts, $dv, $row_verwendung)
 	{
 		// Nur anlegen wenn im aktuellen Eintrag auch Stunden eingetragen sind
-		if ($row_verwendung->vertragsstunden != '' && $row_verwendung->vertragsstunden != '0.00')
+		if ($row_verwendung->vertragsstunden != '')
 		{
 			if (isset($contracts['dv'][$dv]['vbs']))
 			{
 				foreach ($contracts['dv'][$dv]['vbs'] as $index_vbs=>$row_vbs)
 				{
-					if ($row_vbs['vertragsbestandteiltyp_kurzbz'] == 'stunden')
+					if ($row_vbs['vertragsbestandteiltyp_kurzbz'] == 'stunden' || ($row_vbs['vertragsbestandteiltyp_kurzbz'] == 'karenz' && $row_verwendung->vertragsstunden === '0.00'))
 					{
-						if ($this->_isVBSAngrenzend($row_verwendung, $row_vbs) && $row_vbs['wochenstunden'] == $row_verwendung->vertragsstunden)
+						if ($this->_isVBSAngrenzend($row_verwendung, $row_vbs) && ($row_vbs['wochenstunden'] == $row_verwendung->vertragsstunden || $row_verwendung->vertragsstunden === '0.00'))
 						{
 							// stunden bleiben gleich - Ende des VBS verlaengern
 							$contracts['dv'][$dv]['vbs'][$index_vbs]['bis'] = $row_verwendung->ende;
