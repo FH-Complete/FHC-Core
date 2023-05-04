@@ -3,8 +3,9 @@ const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
 const ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR = 'inProgressLektor';
 
 $STUDIENSEMESTER = $studiensemester_selected;
-$STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);
-$LANGUAGE_INDEX = getUserLanguage() == 'German' ? '0' : '1';
+$STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);						// alle STG mit Lese- und Schreibberechtigung
+$ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'". implode('\',\'', $oes_schreibberechtigt). "'";		// alle OE nur mit Schreibberechtigung; singlequote für jeden string notwendig
+$LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
 
 $query = '
 	WITH anrechnungen AS
@@ -14,6 +15,10 @@ $query = '
 			anrechnung.lehrveranstaltung_id,
 			anrechnung.begruendung_id,
 			anrechnung.dms_id,
+			CASE
+				WHEN stg.typ || stg.kurzbz IN (' . $ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT . ') THEN TRUE
+				ELSE FALSE
+			END "schreibberechtigt",
 			anrechnung.studiensemester_kurzbz,
 			stg.studiengang_kz,
 			stg.bezeichnung AS stg_bezeichnung,
@@ -35,8 +40,8 @@ $query = '
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
 			(SELECT COALESCE(
-				array_to_json(zgvmaster.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . ',
-				array_to_json(zgv.bezeichnung::varchar[])->>' . $LANGUAGE_INDEX . '
+				zgvmaster.bezeichnung[' . $LANGUAGE_INDEX . '],
+				zgv.bezeichnung[' . $LANGUAGE_INDEX . ']
 				) AS zgv
 			FROM public.tbl_prestudent
 			LEFT JOIN bis.tbl_zgv zgv USING (zgv_code)
@@ -71,6 +76,7 @@ $query = '
             anrechnungen.lehrveranstaltung_id,
 			anrechnungen.begruendung_id,
 			anrechnungen.dms_id,
+			anrechnungen.schreibberechtigt,
 			anrechnungen.studiensemester_kurzbz,
 			anrechnungen.studiengang_kz,
 			anrechnungen.stg_bezeichnung,
@@ -89,7 +95,7 @@ $query = '
             anrechnungen.antragsdatum,
 			anrechnungen.empfehlung_anrechnung,
 			anrechnungen.status_kurzbz,
-            array_to_json(anrechnungstatus.bezeichnung_mehrsprachig::varchar[])->>' . $LANGUAGE_INDEX . ' AS "status_bezeichnung",
+            anrechnungstatus.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '] AS "status_bezeichnung",
             anrechnungen.prestudent_id,
             CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
@@ -101,8 +107,39 @@ $query = '
                     AND status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR . '\'
                     ORDER BY insertamum DESC
                     LIMIT 1)
-            END "empfehlungsanfrageAm",
-            CASE
+            END "empfehlungsanfrageAm",';
+
+if ($configFachbereichsleitung === TRUE)
+{
+	$query.= ' CASE
+                WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
+                ELSE
+                (SELECT COALESCE(
+                        STRING_AGG(CONCAT_WS(\' \', vorname, nachname), \', \') 
+                    ) empfehlungsanfrageAn
+                    FROM (
+                        SELECT DISTINCT ON (benutzer.uid) bf.uid, vorname, nachname
+                        FROM lehre.tbl_lehreinheit
+						JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+						JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
+						JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)		
+                        JOIN public.tbl_benutzer benutzer ON bf.uid = benutzer.uid
+                        JOIN public.tbl_person USING (person_id)
+                        WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
+						and bf.datum_von <= now()
+						and (bf.datum_bis >= now() or bf.datum_bis is null)
+						AND bf.funktion_kurzbz = \'Leitung\'
+                        AND lehrveranstaltung_id = anrechnungen.lehrveranstaltung_id
+                        AND benutzer.aktiv = TRUE
+                        AND tbl_person.aktiv = TRUE
+                        ORDER BY benutzer.uid, nachname, vorname
+                        ) as tmp_empfehlungsanfrageEmpfaenger
+                    )
+            END "empfehlungsanfrageAn"';
+}
+else
+{
+	$query.= ' CASE
                 WHEN (anrechnungen.empfehlung_anrechnung IS NULL AND anrechnungen.status_kurzbz = \'' . ANRECHNUNGSTATUS_PROGRESSED_BY_STGL . '\') THEN NULL
                 ELSE
                 (SELECT COALESCE(
@@ -122,10 +159,12 @@ $query = '
                         AND benutzer.aktiv = TRUE
                         AND tbl_person.aktiv = TRUE
                         ORDER BY benutzer.uid, lvleiter DESC, nachname, vorname
-                        ) as tmp_lvlektoren
+                        ) as tmp_empfehlungsanfrageEmpfaenger
                     )
-            END "empfehlungsanfrageAn"
-	FROM anrechnungen
+            END "empfehlungsanfrageAn"';
+}
+
+$query.= '	FROM anrechnungen
 	JOIN lehre.tbl_anrechnungstatus as anrechnungstatus ON (anrechnungstatus.status_kurzbz = anrechnungen.status_kurzbz)
 	WHERE studiensemester_kurzbz = \'' . $STUDIENSEMESTER . '\'
 	AND studiengang_kz IN (' . $STUDIENGAENGE_ENTITLED . ')
@@ -141,6 +180,7 @@ $filterWidgetArray = array(
 		'lehrveranstaltung_id',
 		'begruendung_id',
 		'dms_id',
+		'Schreibberechtigt',
 		'studiensemester_kurzbz',
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),
@@ -167,9 +207,7 @@ $filterWidgetArray = array(
 	'datasetRepOptions' => '{
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
-		persistentLayout:true,
-		persistentSort:true,
-		persistentFilter:true,
+		persistenceID: "approveAnrechnungUebersicht_V1",
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    headerFilterPlaceholder: " ",
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
@@ -200,6 +238,10 @@ $filterWidgetArray = array(
 		lehrveranstaltung_id: {visible: false, headerFilter:"input"},
 		begruendung_id: {visible: false, headerFilter:"input"},
 		dms_id: {visible: false, headerFilter:"input"},
+		schreibberechtigt: {
+			formatter:"tickCross", align:"center", 
+		    headerFilter:"tickCross", headerFilterParams:{tristate: true}, headerFilterFunc: hf_schreibberechtigt
+		},
 		studiensemester_kurzbz: {visible: false, headerFilter:"input"},
 		studiengang_kz: {visible: false, headerFilter:"input"},
 		stg_bezeichnung: {headerFilter:"input"},
@@ -212,12 +254,8 @@ $filterWidgetArray = array(
 		ectsSumBeruflich: {visible: false, headerFilter:"input", align:"right"},
 		begruendung: {headerFilter:"input", visible: true},
 		student: {headerFilter:"input"},
-		zgv: {visible: false, headerFilter:"input"},
-		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams:{
-		    labelField:"dokument_bezeichnung",
-			url:function(cell){return "'. current_url() .'/download?dms_id=" + cell.getData().dms_id},
-		    target:"_blank"
-		}},
+		zgv: {headerFilter:"input"},
+		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
 		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
 		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},

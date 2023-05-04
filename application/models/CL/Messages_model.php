@@ -128,8 +128,8 @@ class Messages_model extends CI_Model
 			{
 				$ouOptions .= sprintf(
 					"\n".'<option value="%s">%s</option>',
-					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : self::ALT_OE,
-					$ou->bezeichnung . (is_numeric($ou->prestudent_id) ? '' : ' *')
+					($ou->typ === 'l' ? $ou->oe_kurzbz : (is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : self::ALT_OE)),
+					$ou->bezeichnung . ((is_numeric($ou->prestudent_id) || $ou->typ === 'l' ) ? '' : ' *')
 				);
 			}
 		}
