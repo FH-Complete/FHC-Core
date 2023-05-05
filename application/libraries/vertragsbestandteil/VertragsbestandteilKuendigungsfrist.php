@@ -86,6 +86,28 @@ EOTXT;
 
 	public function validate()
 	{
+		if( !(filter_var($this->arbeitgeber_frist, FILTER_VALIDATE_INT, 
+				array(
+					'options' => array(
+						'min_range' => 0,
+						'max_range' => 52
+					)
+				)
+			)) ) {
+			$this->validationerrors[] = 'Arbeitgeberfrist muss eine Wochenanzahl im Bereich 1 bis 52 sein.';
+		}
+		
+		if( !(filter_var($this->arbeitnehmer_frist, FILTER_VALIDATE_INT, 
+				array(
+					'options' => array(
+						'min_range' => 1,
+						'max_range' => 52
+					)
+				)
+			)) ) {
+			$this->validationerrors[] = 'Arbeitnehmerfrist muss eine Wochenanzahl im Bereich 1 bis 52 sein.';
+		}
+		
 		return parent::validate();
 	}
 }

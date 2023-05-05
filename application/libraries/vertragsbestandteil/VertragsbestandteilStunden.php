@@ -88,7 +88,7 @@ EOTXT;
 					)
 				)
 			)) ) {
-			$this->validationerrors[] = 'Stunden muss eine Kommazahl im Bereichs 0 bis 100 sein.';
+			$this->validationerrors[] = 'Stunden muss eine Kommazahl im Bereich 0 bis 100 sein.';
 		}
 		
 		return parent::validate();
