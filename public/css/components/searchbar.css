@@ -33,6 +33,7 @@
 .searchbar_icon {
     grid-column-start: icon;
     grid-column-end: span 1;
+    margin-right: .75em;
 }
 
 .searchbar_data {

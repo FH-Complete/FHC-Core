@@ -15,7 +15,7 @@ export default {
               <div class="searchbar_icon">
                 <action :res="this.res" :action="this.actions.defaultaction" @actionexecuted="$emit('actionexecuted')">
                   <img v-if="(typeof res.photo_url !== 'undefined') && (res.photo_url !== null)" :src="res.photo_url" 
-                    class="rounded-circle" height="100" />
+                    class="img-thumbnail" height="100" />
                   <i v-else class="fas fa-user-circle fa-5x"></i>
                 </action>
               </div>
