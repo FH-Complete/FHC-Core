@@ -294,6 +294,11 @@ EOTXT;
 	
 	public function validate() {
 		//do Validation here
+		if( empty($this->gehaltstyp_kurzbz) ) 
+		{
+			$this->validationerrors[] = "Ein Gehaltstyp muss ausgewählt sein.";
+		}
+		
 		if( empty($this->grundbetrag) )
 		{
 			$this->validationerrors[] = "Betrag fehlt.";

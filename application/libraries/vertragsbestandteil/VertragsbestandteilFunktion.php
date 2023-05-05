@@ -91,6 +91,11 @@ EOTXT;
 	
 	protected function createBenutzerfunktionData($data)
 	{
+		if( empty($data->funktion) || empty($data->orget) ) 
+		{
+			return;
+		}
+		
 		$this->benutzerfunktiondata = (object) array(
 			'funktion_kurzbz' => $data->funktion,
 			'oe_kurzbz' => $data->orget,
