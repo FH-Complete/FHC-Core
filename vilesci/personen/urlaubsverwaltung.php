@@ -148,9 +148,6 @@ foreach ($bf->result as $oe)
 			$berechtigt = true;
 }
 
-if($uid && !$berechtigt && $uid != $user)
-	die("Sie haben keine Berechtigung um Mitarbeiter*in " . $uid . " zu bearbeiten!<br><br> <a href='$redirect'>Zurück</a>");
-
 //Formular zur Eingabe der UID
 echo '<form  accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 echo 'Zeitsperren der UID <INPUT type="hidden" id="uid" name="uid" value="uid">
@@ -158,6 +155,8 @@ echo 'Zeitsperren der UID <INPUT type="hidden" id="uid" name="uid" value="uid">
 echo '<input type="submit" name="submit" value="Anzeigen">';
 echo '</form>';
 
+if(!$berechtigt)
+	die("Sie haben keine Berechtigung um Mitarbeiter*in " . $uid . " zu bearbeiten!<br><br> <a href='$redirect'>Zurück</a>");
 
 //Loeschen von Zeitsperren
 if($action=='delete')
