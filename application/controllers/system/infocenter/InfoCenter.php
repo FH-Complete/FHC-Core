@@ -142,12 +142,6 @@ class InfoCenter extends Auth_Controller
 				'reloadNotizen' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => array('infocenter:r', 'lehre/zgvpruefung:r'),
-				'getPostponeDate' => array('infocenter:r', 'lehre/zgvpruefung:r'),
-				'park' => 'infocenter:rw',
-				'unpark' => 'infocenter:rw',
-				'setOnHold' => 'infocenter:rw',
-				'removeOnHold' => array('infocenter:rw', 'lehre/zgvpruefung:rw'),
-				'getStudienjahrEnd' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'setNavigationMenuArrayJson' => 'infocenter:r',
 				'getAbsageData' => 'infocenter:r',
 				'saveAbsageForAll' => 'infocenter:rw',
@@ -164,6 +158,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
 		$this->load->model('crm/ZGVPruefung_model', 'ZGVPruefungModel');
 		$this->load->model('crm/ZGVPruefungStatus_model', 'ZGVPruefungStatusModel');
+		$this->load->model('crm/Rueckstellung_model', 'RueckstellungModel');
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('system/Message_model', 'MessageModel');
@@ -606,7 +601,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Sendet bei einer neuen ZGV Prüfung die Mail raus an den Studiengang
+	 * Sendet bei einer neuen ZGV Prüfung eine Mail an den Studiengang
 	 */
 	private function sendZgvMail($mail, $typ, $person){
 		$data = array(
@@ -697,7 +692,7 @@ class InfoCenter extends Auth_Controller
 
 	/**
 	 * Fügt einen neuen ZGV Status hinzu oder updated einen bestehenden
-	 * Falls es erfolgreich war, sendet er die Mail raus
+	 * Falls es erfolgreich war, wird eine Mail rausgeschickt
 	 */
 	public function zgvRueckfragen()
 	{
@@ -751,7 +746,8 @@ class InfoCenter extends Auth_Controller
 				$this->sendZgvMail($mail, $typ, $person);
 			elseif (isError($insert))
 				$this->terminateWithJsonError('Fehler beim Speichern');
-		}else
+		}
+		else
 		{
 			$insert = $this->ZGVPruefungModel->insert(
 				array(
@@ -781,7 +777,7 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$hold = false;
-		if ($this->personloglib->getOnHoldDate($person_id) !== null)
+		if (hasData($this->RueckstellungModel->getByPersonId($person_id, 'onhold_zgv')))
 			$hold = true;
 
 		$this->outputJsonSuccess(
@@ -1162,107 +1158,7 @@ class InfoCenter extends Auth_Controller
 			->set_output($aktecontent->retval)
 			->_display();
 	}
-
-	/**
-	 * Gets the date until which a person is parked
-	 * @param $person_id
-	 */
-	public function getPostponeDate($person_id)
-	{
-		$result = array(
-			'type' => null,
-			'date' => null
-		);
-
-		$parkedDate = $this->personloglib->getParkedDate($person_id);
-
-		if (isset($parkedDate))
-		{
-			$result['type'] = 'parked';
-			$result['date'] = $parkedDate;
-		}
-		else
-		{
-			$onholdDate = $this->personloglib->getOnHoldDate($person_id);
-
-			if (isset($onholdDate))
-			{
-				$result['type'] = 'onhold';
-				$result['date'] = $onholdDate;
-			}
-		}
-
-		$this->outputJsonSuccess($result);
-	}
-
-	/**
-	 * Initializes parking of a person, i.e. a person is not expected to do any actions while parked
-	 */
-	public function park()
-	{
-		$person_id = $this->input->post('person_id');
-		$date = $this->input->post('parkdate');
-
-		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Removes parking of a person
-	 */
-	public function unPark()
-	{
-		$person_id = $this->input->post('person_id');
-
-		$result = $this->personloglib->unPark($person_id);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Sets a person on hold ("zurückstellen")
-	 */
-	public function setOnHold()
-	{
-		$person_id = $this->input->post('person_id');
-		$date = $this->input->post('onholddate');
-
-		$result = $this->personloglib->setOnHold($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Removed on hold status of a person
-	 */
-	public function removeOnHold()
-	{
-		$person_id = $this->input->post('person_id');
-
-		$result = $this->personloglib->removeOnHold($person_id);
-
-		$this->outputJson($result);
-	}
-
-	/**
-	 * Gets the End date of the current Studienjahr
-	 */
-	public function getStudienjahrEnd()
-	{
-		$this->load->model('organisation/studienjahr_model', 'StudienjahrModel');
-
-		$result = $this->StudienjahrModel->getCurrStudienjahr();
-
-		$json = null;
-
-		if (hasData($result))
-		{
-			$json = $result->retval[0]->ende;
-		}
-
-		$this->outputJsonSuccess(array($json));
-	}
+	
 
 	/**
 	 * Wrapper for setNavigationMenu, returns JSON message
@@ -1483,7 +1379,6 @@ class InfoCenter extends Auth_Controller
 
 		if($nachreichungAm < $today)
 			$this->terminateWithJsonError($this->p->t('infocenter', 'nachreichDatumNichtVergangenheit'));
-
 
 		$akte = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'dokument_kurzbz' => $allowedTypes[$typ]));
 
