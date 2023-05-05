@@ -17,6 +17,7 @@ class DashboardDemo extends Auth_Controller
         parent::__construct(
             array(
                 'index' => 'user:r',
+                'admin' => 'dashboard/admin:rw'
             )
         );
 
@@ -34,6 +35,13 @@ class DashboardDemo extends Auth_Controller
 	{
 		$this->load->view('dashboard/dashboard_demo.php', []);
 	}
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Public methods
+    public function admin()
+    {
+        $this->load->view('dashboard/dashboard_demo_admin.php', []);
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods

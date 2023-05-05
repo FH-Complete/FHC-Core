@@ -114,6 +114,8 @@ class DashboardLib
 	
 	public function getPresetOrCreateEmptyPreset($dashboard_kurzbz, $funktion_kurzbz)
 	{
+		if ($funktion_kurzbz === self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL)
+			$funktion_kurzbz = null;
 		$preset = $this->getPreset($dashboard_kurzbz, $funktion_kurzbz);
 		if (null !== $preset) {
 			return $preset;

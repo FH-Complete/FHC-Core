@@ -399,6 +399,7 @@ GRANT ALL ON SEQUENCE dashboard.tbl_dashboard_preset_preset_id_seq TO vilesci;
 --
 
 GRANT SELECT ON TABLE dashboard.tbl_dashboard_widget TO web;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE dashboard.tbl_dashboard_widget TO vilesci;
 
 
 --
@@ -406,6 +407,7 @@ GRANT SELECT ON TABLE dashboard.tbl_dashboard_widget TO web;
 --
 
 GRANT SELECT ON TABLE dashboard.tbl_widget TO web;
+GRANT SELECT,INSERT,UPDATE ON TABLE dashboard.tbl_widget TO vilesci;
 
 
 --
