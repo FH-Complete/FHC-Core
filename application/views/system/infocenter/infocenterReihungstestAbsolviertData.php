@@ -9,6 +9,7 @@
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
+	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
 
 $query = '
 		SELECT
@@ -195,7 +196,14 @@ $query = '
 					LIMIT 1
 				)
 				LIMIT 1 
-			) AS "InfoCenterMitarbeiter"
+			) AS "InfoCenterMitarbeiter",
+			(
+				SELECT SUM(konto.betrag)
+				FROM public.tbl_konto konto
+				WHERE konto.person_id = p.person_id
+					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
+					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -256,7 +264,8 @@ $query = '
 			'Reihungstest Datum',
 			'ZGV Nation BA',
 			'ZGV Nation MA',
-			'InfoCenter Mitarbeiter'
+			'InfoCenter Mitarbeiter',
+			ucfirst($this->p->t('infocenter', 'kaution'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -357,6 +366,19 @@ $query = '
 			else
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
+			}
+
+			if ($datasetRaw->{'Kaution'} === null)
+			{
+				$datasetRaw->{'Kaution'} = '-';
+			}
+			else if ($datasetRaw->{'Kaution'} === '0.00')
+			{
+				$datasetRaw->{'Kaution'} = 'Bezahlt';
+			}
+			else
+			{
+				$datasetRaw->{'Kaution'} = 'Offen';
 			}
 
 			return $datasetRaw;

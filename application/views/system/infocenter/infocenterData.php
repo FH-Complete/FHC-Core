@@ -12,6 +12,7 @@
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
+	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$ONLINE = '\'online\'';
 
@@ -272,9 +273,9 @@
 			) AS "ZGVMNationGruppe",
 			(
 				SELECT tbl_organisationseinheit.bezeichnung
-				FROM public.tbl_benutzerfunktion 
+				FROM public.tbl_benutzerfunktion
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
-				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now()) 
+				WHERE (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von <= now())
 				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis >= now())
 				AND tbl_organisationseinheit.bezeichnung = '.$ORG_NAME.'
 				AND tbl_benutzerfunktion.uid = (
@@ -286,10 +287,18 @@
 					ORDER BY l.log_id DESC
 					LIMIT 1
 				)
-				LIMIT 1 
+				LIMIT 1
 			) AS "InfoCenterMitarbeiter",
 			rueck.datum_bis AS "HoldDate",
-			rueck.bezeichnung AS "Rueckstellgrund"
+			rueck.bezeichnung AS "Rueckstellgrund",
+			(
+				SELECT SUM(konto.betrag)
+				FROM public.tbl_konto konto
+				LEFT JOIN tbl_konto skonto ON (skonto.buchungsnr_verweis = konto.buchungsnr)
+				WHERE konto.person_id = p.person_id
+					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
+					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 				SELECT tpl.person_id,
@@ -388,7 +397,8 @@
 			'ZGV Gruppe MA',
 			'InfoCenter Mitarbeiter',
 			ucfirst($this->p->t('infocenter', 'rueckstelldatum')),
-			ucfirst($this->p->t('infocenter', 'rueckstellgrund'))
+			ucfirst($this->p->t('infocenter', 'rueckstellgrund')),
+			ucfirst($this->p->t('infocenter', 'kaution'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -492,10 +502,23 @@
 			{
 				$datasetRaw->{'InfoCenterMitarbeiter'} = 'Ja';
 			}
-			
+
 			if ($datasetRaw->{'Rueckstellgrund'} === null)
 			{
 				$datasetRaw->{'Rueckstellgrund'} = '-';
+			}
+
+			if ($datasetRaw->{'Kaution'} === null)
+			{
+				$datasetRaw->{'Kaution'} = '-';
+			}
+			else if ($datasetRaw->{'Kaution'} === '0.00')
+			{
+				$datasetRaw->{'Kaution'} = 'Bezahlt';
+			}
+			else
+			{
+				$datasetRaw->{'Kaution'} = 'Offen';
 			}
 
 			return $datasetRaw;
@@ -508,10 +531,10 @@
 			{
 				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
-			
+
 			if ($datasetRaw->Rueckstellgrund != null && $datasetRaw->Rueckstellgrund !== 'Parken')
 				$mark = "onhold";
-			
+
 			// Parking has priority over locking
 			if ($datasetRaw->Rueckstellgrund === 'Parken')
 				$mark = "text-info";
