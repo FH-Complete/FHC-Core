@@ -32,6 +32,7 @@ require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
 require_once('dbupdate_3.4/17512_fehlercode_constraints.php');
 require_once('dbupdate_3.4/19154_beurteilungsformulare_pruefungssenat.php');
+require_once('dbupdate_3.4/28089_plausichecks_in_extension_hinzufuegen.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

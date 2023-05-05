@@ -20,21 +20,22 @@ var Plausichecks = {
 
 					if (FHC_AjaxClient.hasData(data))
 					{
-						let issueTexts = FHC_AjaxClient.getData(data);
+						let issueData = FHC_AjaxClient.getData(data);
 
-						for (let fehler_kurzbz in issueTexts)
+						for (let fehler_kurzbz in issueData)
 						{
 							messageStr += "<br /><br /><span>Prüfe " + fehler_kurzbz + "...</span>";
-							let texts = issueTexts[fehler_kurzbz];
+							let issues = issueData[fehler_kurzbz];
 
-							if (texts.length == 0) {
+							if (issues.length == 0) {
 								messageStr += "<br /><span class='text-success'>Keine Issues für " + fehler_kurzbz + "</span>";
 								continue;
 							}
 
-							for (i = 0; i < texts.length; i++)
+							for (i = 0; i < issues.length; i++)
 							{
-								messageStr += "<br /><span class='text-danger'>" + texts[i] + "</span>";
+								let className = issues[i].type == 'warning' ? 'text-warning' : 'text-danger';
+								messageStr += "<br /><span class='"+className+"'>" + issues[i].fehlertext + "</span>";
 							}
 						}
 					}
@@ -46,7 +47,7 @@ var Plausichecks = {
 				}
 			}
 		);
-	},
+	}
 
 };
 

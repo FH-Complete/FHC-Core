@@ -43,7 +43,7 @@ class Plausichecks extends Auth_Controller
 		$fehler_kurzbz = $this->input->get('fehler_kurzbz');
 
 		// issues array for passing issue texts
-		$issueTexts = array();
+		$allIssues = array();
 		// all fehler kurzbz which are going to be checked
 		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckdefinitionlib->getFehlerKurzbz();
 		$fehlerLibMappings = $this->plausicheckdefinitionlib->getFehlerLibMappings();
@@ -53,7 +53,7 @@ class Plausichecks extends Auth_Controller
 		// get the data returned by Plausicheck
 		foreach ($fehlerKurzbz as $fehler_kurzbz)
 		{
-			$issueTexts[$fehler_kurzbz] = array();
+			$allIssues[$fehler_kurzbz] = array();
 			// get library name for producing issue
 			$libName = $fehlerLibMappings[$fehler_kurzbz];
 
@@ -80,7 +80,7 @@ class Plausichecks extends Auth_Controller
 					$fehlertext_params = isset($plausiData['fehlertext_params']) ? $plausiData['fehlertext_params'] : null;
 
 					// get Text of the Fehler
-					$this->FehlerModel->addSelect('fehlertext');
+					$this->FehlerModel->addSelect('fehlertext, fehlertyp_kurzbz');
 					$fehlerRes = $this->FehlerModel->loadWhere(array('fehler_kurzbz' => $fehler_kurzbz));
 
 					if (isError($fehlerRes)) $this->outputJsonError(getError($fehlerRes));
@@ -88,7 +88,9 @@ class Plausichecks extends Auth_Controller
 					// optionally replace fehler parameters in text, output the fehlertext
 					if (hasData($fehlerRes))
 					{
-						$fehlerText = getData($fehlerRes)[0]->fehlertext;
+						$fehler = getData($fehlerRes)[0];
+						$fehlerText = $fehler->fehlertext;
+						$fehlerTyp = $fehler->fehlertyp_kurzbz;
 
 						if (!isEmptyArray($fehlertext_params))
 						{
@@ -100,13 +102,17 @@ class Plausichecks extends Auth_Controller
 
 						if (isset($person_id)) $fehlerText .= "; person_id: $person_id";
 						if (isset($oe_kurzbz)) $fehlerText .= "; oe_kurzbz: $oe_kurzbz";
-						$issueTexts[$fehler_kurzbz][] = $fehlerText;
+
+						$issueObj = new StdClass();
+						$issueObj->fehlertext = $fehlerText;
+						$issueObj->type = $fehlerTyp;
+						$allIssues[$fehler_kurzbz][] = $issueObj;
 					}
 				}
 			}
 		}
 
-		$this->outputJsonSuccess($issueTexts);
+		$this->outputJsonSuccess($allIssues);
 	}
 
 	/**
