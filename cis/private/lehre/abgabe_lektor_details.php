@@ -37,6 +37,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
 require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/sancho.inc.php');
+require_once('../../../application/libraries/SignatureLib.php');
 
 if (!$db = new basis_db())
 	$db=false;
@@ -590,7 +591,9 @@ while ($row=@$db->db_fetch_object($result))
 	$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
 	$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
 	$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
-	if(!$row->abgabedatum)
+
+	$uploadedDocumentSigned = null;
+	if (!$row->abgabedatum)
 	{
 		if ($row->datum<date('Y-m-d'))
 		{
@@ -626,8 +629,7 @@ while ($row=@$db->db_fetch_object($result))
 			$fcol='#000000';
 		}
 	}
-	//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
-	//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked="checked" style="background-color:#FF0000;"':'')." disabled>";
+
 	if($row->fixtermin=='t')
 	{
 		$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
@@ -659,11 +661,12 @@ while ($row=@$db->db_fetch_object($result))
 	$htmlstr .= "		</select></td>\n";
 	$htmlstr .= "		<td><input type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";
 	$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
-	if($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
+
+	if ($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
 	{
 		$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."' title='".$p->t('abgabetool/terminaenderungSpeichern')."'></td>";
 
-		if(!$row->abgabedatum)
+		if (!$row->abgabedatum)
 		{
 			$htmlstr .= "		<td><input type='submit' name='del' value='".$p->t('global/loeschen')."' onclick='return confdel()' title='".$p->t('abgabetool/terminLoeschen')."'></td>";
 		}
@@ -692,6 +695,53 @@ while ($row=@$db->db_fetch_object($result))
 	{
 		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 	}
+
+	if (file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+	{
+		$signaturVorhanden = false;
+		if ($row->paabgabetyp_kurzbz == 'end')
+		{
+			// Check if the document is signed
+			$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
+			if (is_array($signList) && count($signList) > 0)
+			{
+				$signaturVorhanden = true;
+				// The document is signed
+			}
+			elseif ($signList === null)
+			{
+				$uploadedDocumentSigned = 'WARNING: signature server error';
+			}
+			else
+			{
+				$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+			}
+		}
+		if ($uploadedDocumentSigned != null)
+		{
+			$htmlstr .= '
+					<td>
+						<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$uploadedDocumentSigned.'</b>
+						</div>
+					</td>';
+		}
+		elseif($signaturVorhanden)
+		{
+			$htmlstr .= '
+					<td>
+						<div style="color: #198754; background-color: #d1e7dd; border-color: #a3cfbb; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$p->t('abgabetool/uploadedDocumentSigned').'</b>
+						</div>
+					</td>';
+		}
+	}
+	else
+	{
+		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	}
+
+
 	$htmlstr .= "	</tr>\n";
 
 
@@ -710,7 +760,7 @@ $htmlstr .= '<tr id="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
 //$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
 $htmlstr .= "<td>&nbsp;&nbsp;</td>";
 
-$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
+$htmlstr .= "		<td><input type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 $qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end' AND paabgabetyp_kurzbz!='enda' AND paabgabetyp_kurzbz!='note'";

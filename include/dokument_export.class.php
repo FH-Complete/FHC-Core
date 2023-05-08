@@ -557,7 +557,7 @@ class dokument_export
 
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL);
+		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL.'/'.SIGNATUR_SIGN_API);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 7);
 		curl_setopt($ch, CURLOPT_USERAGENT, "FH-Complete");
 
@@ -589,18 +589,19 @@ class dokument_export
 			curl_close($ch);
 			$resultdata = json_decode($result);
 
-			if (isset($resultdata->success) && $resultdata->success == 'true')
+			// If it is success
+			if (isset($resultdata->error) && $resultdata->error == 0)
 			{
 				$this->signed_filename = $this->temp_folder .'/signed.pdf';
-				file_put_contents($this->signed_filename, base64_decode($resultdata->document));
+				file_put_contents($this->signed_filename, base64_decode($resultdata->retval));
 				return true;
 			}
-			else
+			else // otherwise if it is an error
 			{
-				if(isset($resultdata->errormsg))
-					$this->errormsg = $resultdata->errormsg;
+				if(isset($resultdata->retval))
+					$this->errormsg = $resultdata->retval;
 				else
-					$this->errormsg = 'Unknown Error:'.print_r($resultdata,true);
+					$this->errormsg = 'Unknown Error:'.print_r($resultdata, true);
 				return false;
 			}
 		}
