@@ -270,16 +270,17 @@ else
 			AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
 				AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 		LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+		LEFT JOIN bis.tbl_mobilitaet ON (bis.tbl_mobilitaet.prestudent_id = public.tbl_student.prestudent_id)
 		LEFT JOIN lehre.tbl_note USING(note)
 	WHERE
 		vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
-		AND	vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);";";
+		AND vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);";";
 
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 
 	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
+
 
 	if($result = $db->db_query($qry))
 	{
@@ -338,7 +339,7 @@ else
 							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
 							$worksheet->write($lines,10, $resultPr->note, $format_highlightright);
 						}
-                                                else 
+                                                else
                                                 {
                                                         $worksheet->write($lines,9, '', $format_highlightright_date);
                                                         $worksheet->write($lines,10, '', $format_highlightright);
