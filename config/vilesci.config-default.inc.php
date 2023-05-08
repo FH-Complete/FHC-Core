@@ -201,6 +201,9 @@ define('SIGNATUR_PASSWORD', 'supersecretpassword');
 // Signaturprofil das verwendet werden soll
 define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
 
+// Signaturpruefung im Abgabetool aktivieren
+define('ABGABETOOL_CHECK_SIGNATURE',false);
+
 /**
  * Datenverbund Anbindung
  */

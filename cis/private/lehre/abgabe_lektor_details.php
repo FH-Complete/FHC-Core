@@ -701,20 +701,23 @@ while ($row=@$db->db_fetch_object($result))
 		$signaturVorhanden = false;
 		if ($row->paabgabetyp_kurzbz == 'end')
 		{
-			// Check if the document is signed
-			$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
-			if (is_array($signList) && count($signList) > 0)
+			if(defined('ABGABETOOL_CHECK_SIGNATURE') && ABGABETOOL_CHECK_SIGNATURE)
 			{
-				$signaturVorhanden = true;
-				// The document is signed
-			}
-			elseif ($signList === null)
-			{
-				$uploadedDocumentSigned = 'WARNING: signature server error';
-			}
-			else
-			{
-				$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+				// Check if the document is signed
+				$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
+				if (is_array($signList) && count($signList) > 0)
+				{
+					$signaturVorhanden = true;
+					// The document is signed
+				}
+				elseif ($signList === null)
+				{
+					$uploadedDocumentSigned = 'WARNING: signature server error';
+				}
+				else
+				{
+					$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+				}
 			}
 		}
 		if ($uploadedDocumentSigned != null)

@@ -224,6 +224,9 @@ define('SIGNATUR_PASSWORD', 'supersecretpassword');
 // Signaturprofil das verwendet werden soll
 define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
 
+// Signaturpruefung im Abgabetool aktivieren
+define('ABGABETOOL_CHECK_SIGNATURE',false);
+
 //Gibt an, ob das Studienbuchblatt im CIS gedruckt werden kann
 define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',true);
 

@@ -346,20 +346,23 @@ if($command=="update" && $error!=true)
 
 					if (file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
-						// Check if the document is signed
-						$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
-						if (is_array($signList) && count($signList) > 0)
-						{$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
-							// The document is signed
-						}
-						elseif ($signList === null)
+						if(defined('ABGABETOOL_CHECK_SIGNATURE') && ABGABETOOL_CHECK_SIGNATURE)
 						{
-							$uploadedDocumentSigned = 'WARNING: signature server error';
-						}
-						else
-						{
-							$signaturVorhanden = false;
-							$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSignedStudent');
+							// Check if the document is signed
+							$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
+							if (is_array($signList) && count($signList) > 0)
+							{
+								// The document is signed
+							}
+							elseif ($signList === null)
+							{
+								$uploadedDocumentSigned = 'WARNING: signature server error';
+							}
+							else
+							{
+								$signaturVorhanden = false;
+								$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSignedStudent');
+							}
 						}
 
 						/*$qry="UPDATE campus.tbl_paabgabe SET
