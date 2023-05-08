@@ -94,6 +94,7 @@ else
 	$abstract = (isset($_POST['abstract'])?$_POST['abstract']:'-1');
 	$abstract_en = (isset($_POST['abstract_en'])?$_POST['abstract_en']:'-1');
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
+	$signaturVorhanden = (isset($_POST['signaturVorhanden']) && $_POST['signaturVorhanden']=='true'?true:false);
 }
 
 $user = get_uid();
@@ -260,6 +261,35 @@ if($command=='add')
 				echo "<font color=\"#FF0000\">".$p->t('global/fehleraufgetreten')."</font><br>&nbsp;";
 				$command='';
 			}
+
+			if ($signaturVorhanden === false)
+			{
+				// Mail an Studiengang wenn keine Signatur gefunden wurde
+				$student = new student();
+				if(!$student->load($projektarbeit_obj->student_uid))
+					die($p->t('global/userNichtGefunden'));
+
+				$stg_obj = new studiengang();
+				if(!$stg_obj->load($student->studiengang_kz))
+					die($p->t('global/fehlerBeimLesenAusDatenbank'));
+
+				$subject = 'Abgabe ohne Signatur';
+				$tomail = $stg_obj->email;
+				$data = array(
+					'vorname' => $student->vorname,
+					'nachname' => $student->nachname,
+					'studiengang' => $stg_obj->bezeichnung
+				);
+
+				$mailres = sendSanchoMail(
+					'ParbeitsbeurteilungSiganturFehlt',
+					$data,
+					$tomail,
+					$subject,
+					'sancho_header_min_bw.jpg',
+					'sancho_footer_min_bw.jpg'
+				);
+			}
 		}
 		else
 		{
@@ -301,7 +331,7 @@ if($command=="update" && $error!=true)
 					else
 					{
 						echo $p->t('global/dateiNichtErfolgreichHochgeladen');
-					}
+					}$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
 				}
 				else // endupload type
 				{
@@ -312,12 +342,14 @@ if($command=="update" && $error!=true)
 						move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
 					}
 
+					$signaturVorhanden = true;
+
 					if (file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
 						// Check if the document is signed
 						$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
 						if (is_array($signList) && count($signList) > 0)
-						{
+						{$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
 							// The document is signed
 						}
 						elseif ($signList === null)
@@ -326,6 +358,7 @@ if($command=="update" && $error!=true)
 						}
 						else
 						{
+							$signaturVorhanden = false;
 							$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSignedStudent');
 						}
 
@@ -357,6 +390,7 @@ if($command=="update" && $error!=true)
 								$htmlstr .= '<input type="hidden" name="betreuer" value="'.$db->convert_html_chars($betreuer).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="bid" value="'.$db->convert_html_chars($bid).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
+								$htmlstr .= '<input type="hidden" name="signaturVorhanden" value="'.($signaturVorhanden?'true':'false').'">'."\n";
 								$htmlstr .= "<tr>\n";
 								$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
 								$sprache = @$db->db_query("SELECT sprache FROM public.tbl_sprache");
