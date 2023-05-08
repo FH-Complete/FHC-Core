@@ -70,7 +70,7 @@ export default {
 							if (this.sections[i].widgets[wid].id == k) {
 								payload[k] = ObjectUtils.mergeDeep(this.sections[i].widgets[wid], payload[k]);
 								// NOTE(chris): remove internal props
-								for (var prop in {_x:1,_y:1,_w:1,_h:1,index:1,id:1})
+								for (var prop in {_x:1,_y:1,_w:1,_h:1,index:1,id:1,preset:1})
 									if (payload[k][prop])
 										delete payload[k][prop];
 								break;
@@ -126,14 +126,19 @@ export default {
 			//console.log(res.data.retval);
 			for (var name in res.data.retval.widgets) {
 				let widgets = [];
+				let remove = [];
 				for (var wid in res.data.retval.widgets[name]) {
 					res.data.retval.widgets[name][wid].id = wid;
-					widgets.push(res.data.retval.widgets[name][wid]);
+					if (res.data.retval.widgets[name][wid].custom || res.data.retval.widgets[name][wid].preset)
+						widgets.push(res.data.retval.widgets[name][wid]);
+					else
+						remove.push(wid);
 				}
 				this.sections.push({
 					name: name,
 					widgets: widgets
 				});
+				remove.forEach(wid => this.widgetRemove(name, wid));
 			}
 		}).catch(err => console.error('ERROR:', err));
 	},

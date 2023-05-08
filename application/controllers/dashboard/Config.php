@@ -18,9 +18,9 @@ class Config extends Auth_Controller
 				'removeWidgetFromPreset'		=> 'dashboard/admin:rw',
 				'addWidgetsToUserOverride'		=> 'dashboard/benutzer:rw',
 				'removeWidgetFromUserOverride'	=> 'dashboard/benutzer:rw',
-				'Funktionen'					=> 'dashboard/admin:r',
-				'Preset'						=> 'dashboard/admin:r',
-				'PresetBatch'					=> 'dashboard/admin:r'
+				'funktionen'					=> 'dashboard/admin:r',
+				'preset'						=> 'dashboard/admin:r',
+				'presetBatch'					=> 'dashboard/admin:r'
 			)
 		);
 		
@@ -164,7 +164,7 @@ class Config extends Auth_Controller
 		$this->outputJsonSuccess(array('msg' => 'override successfully updated.'));
 	}
 	
-	public function Funktionen()
+	public function funktionen()
 	{
 		$funktionen = $this->FunktionModel->load();
 
@@ -178,7 +178,7 @@ class Config extends Auth_Controller
 		return $this->outputJsonSuccess(getData($funktionen) ?: []);
 	}
 	
-	public function Preset()
+	public function preset()
 	{
 		$db = $this->input->get('db');
 		$funktion = $this->input->get('funktion');
@@ -191,7 +191,7 @@ class Config extends Auth_Controller
 		return $this->outputJsonSuccess(json_decode($conf->preset, true));
 	}
 	
-	public function PresetBatch()
+	public function presetBatch()
 	{
 		$db = $this->input->get('db');
 		$funktionen = $this->input->get('funktionen');

@@ -97,14 +97,15 @@ export default {
 		this.arguments = {...this.widget.arguments, ...this.config};
 		this.tmpConfig = {...this.arguments};
 	},
-	template: `<div v-if="loading">
+	template: `
+	<div v-if="loading">
 		<div class="d-flex justify-content-center align-items-center h-100">
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 	</div>
-	<div v-else-if="!hidden || editMode" :class="'dashboard-item card overflow-hidden ' + (arguments ? arguments.className : '')" @mousedown="mouseDown($event)" @dragstart="startDrag($event)" :draggable="!!editMode">
+	<div v-else-if="!hidden || editMode" :class="'dashboard-item card overflow-hidden h-100 ' + (arguments && arguments.className ? arguments.className : '')">
 		<div v-if="editMode && widget" class="card-header d-flex ps-0 pe-2">
-			<span ref="dragHandle" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
+			<span drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
 			<span class="col">{{ widget.setup.name }}</span>
 			<a v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig"><i class="fa-solid fa-gear"></i></a>
 			<a v-if="custom" class="col-auto px-1" href="#" @click.prevent="$emit('remove')">
@@ -132,7 +133,7 @@ export default {
 			</template>
 		</bs-modal>
 		<div v-if="editMode && isResizeable" class="card-footer d-flex justify-content-end p-0">
-			<span ref="resizeHandle" class="col-auto px-1 cursor-nw-resize" @dragstart.prevent="$emit('resize')"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
+			<span drag-action="resize" class="col-auto px-1 cursor-nw-resize"><i class="fa-solid fa-up-right-and-down-left-from-center mirror-x"></i></span>
 		</div>
 	</div>`
 }
