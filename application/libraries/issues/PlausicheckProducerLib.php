@@ -23,9 +23,8 @@ class PlausicheckProducerLib
 
 	/**
 	 * Executes plausicheck using a given library, returns the result.
-	 * @param $libName string
-	 * @param $studiensemester_kurzbz string optionally needed for issue production
-	 * @param $studiengang_kz int optionally needed for issue production
+	 * @param $libName string name of library producing the issue
+	 * @param $params parameters passed to issue production method
 	 */
 	public function producePlausicheckIssue($libName, $params)
 	{
