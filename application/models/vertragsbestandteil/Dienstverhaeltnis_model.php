@@ -27,6 +27,8 @@ class Dienstverhaeltnis_model extends DB_Model
             tbl_mitarbeiter.fixangestellt,
             tbl_person.person_id,
             tbl_benutzer.alias,
+            org.oe_kurzbz,
+            org.bezeichnung oe_bezeichnung,
             dv.von,
             dv.bis,     
             dv.vertragsart_kurzbz,       
@@ -36,6 +38,7 @@ class Dienstverhaeltnis_model extends DB_Model
             JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
             JOIN tbl_person USING (person_id)
             JOIN hr.tbl_dienstverhaeltnis dv ON(tbl_benutzer.uid::text = dv.mitarbeiter_uid::text)
+            JOIN public.tbl_organisationseinheit org USING(oe_kurzbz)
         WHERE tbl_benutzer.uid=?
         ORDER BY dv.von desc
         ";
