@@ -72,7 +72,7 @@ EOTXT;
 					)
 				)
 			)) ) {
-			$this->validationerrors[] = 'Arbeitgeberfrist muss eine Tagesanzahl im Bereich 1 bis 50 sein.';
+			$this->validationerrors[] = 'Urlaubsanspruch muss eine Tagesanzahl im Bereich 1 bis 50 sein.';
 		}
 		
 		return parent::validate();

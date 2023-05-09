@@ -6,6 +6,7 @@ require_once __DIR__ . '/VertragsbestandteilStunden.php';
 require_once __DIR__ . '/VertragsbestandteilFunktion.php';
 require_once __DIR__ . '/VertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
+require_once __DIR__ . '/VertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
 
