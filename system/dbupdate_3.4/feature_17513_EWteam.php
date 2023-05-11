@@ -119,3 +119,31 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 			echo '<br>bis.tbl_entwicklungsteam: Primary Key tbl_entwicklungsteam_pk (entwicklungsteam_id) hinzugefügt';
 	}
 }
+
+// Add permission for managing entries entwicklungsteam
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'stgv/editEntwicklungsteam';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('stgv/editEntwicklungsteam', 'Recht zum Bearbeiten von Entwicklungsteameinträgen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'system.tbl_berechtigung: Added permission for stgv/editEntwicklungsteam<br>';
+	}
+}
+
+//Berechtigung 'stgv/editEntwicklungsteam' zu Rolle addonStgv hinzufuegen
+if($result = @$db->db_query("SELECT 1 from system.tbl_rolleberechtigung WHERE berechtigung_kurzbz = 'stgv/editEntwicklungsteam' AND rolle_kurzbz = 'addonStgv';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES ('stgv/editEntwicklungsteam', 'addonStgv', 'suid');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_rolleberechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'system.tbl_rolleberechtigung: Added stgv/editEntwicklungsteam to Rolle addonStgv<br>';
+	}
+}
