@@ -6905,7 +6905,6 @@ if (!$result = @$db->db_query("SELECT aktiv FROM bis.tbl_zgvdoktor LIMIT 1"))
 		echo '<br>Spalte aktiv zu bis.tbl_zgvdoktor hinzugefügt';
 }
 
-
 // ADD COLUMN studienkennung_uni to bis.tbl_gsprogramm
 if(!@$db->db_query("SELECT studienkennung_uni FROM bis.tbl_gsprogramm LIMIT 1"))
 {
