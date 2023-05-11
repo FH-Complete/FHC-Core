@@ -939,6 +939,8 @@ if($xmlformat=='rdf')
 								UPPER(nachname || ' ' || vorname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								UPPER(nachname || ' ' || wahlname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								UPPER(wahlname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(vorname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
 								student_uid ~* LOWER(".$db->db_add_param($searchItems_string).")";
 				}
 				else
