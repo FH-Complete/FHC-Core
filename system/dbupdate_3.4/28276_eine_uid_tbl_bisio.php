@@ -12,6 +12,13 @@ if(!$result = @$db->db_query("SELECT prestudent_id FROM bis.tbl_bisio LIMIT 1"))
 		echo '<strong>bis.tbl_bisio: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>bis.tbl_bisio: Spalte prestudent_id hinzugefuegt';
+	
+	$qry = "CREATE INDEX idx_bisio_prestudent_id ON bis.tbl_bisio USING btree (prestudent_id);";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisio: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_bisio: Index prestudent_id hinzugefuegt';
 
 	$qry = "CREATE OR REPLACE view bis.vw_bisio
 			(studiensemester_kurzbz, status_kurzbz, person_id, prestudent_id, student_uid, bisio_id,
