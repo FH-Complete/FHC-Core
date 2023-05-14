@@ -6,6 +6,7 @@
 class PlausiIssueProducer extends PlausiIssueProducer_Controller
 {
 	private $_currentStudiensemester;
+	protected $_app = 'core';
 
 	public function __construct()
 	{

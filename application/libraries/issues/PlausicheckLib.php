@@ -33,9 +33,10 @@ class PlausicheckLib
 	 * Studiengang should be the same for prestudent and student.
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getStgPrestudentUngleichStgStudent($studiengang_kz = null, $prestudent_id = null)
+	public function getStgPrestudentUngleichStgStudent($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -63,6 +64,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -71,10 +78,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getOrgformStgUngleichOrgformPrestudent($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getOrgformStgUngleichOrgformPrestudent(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array($studiensemester_kurzbz);
 
 		$qry = "
@@ -107,16 +119,22 @@ class PlausicheckLib
 						AND tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
 						AND tbl_studienplan.orgform_kurzbz = status.orgform_kurzbz)";
 
+		if (isset($studiengang_kz))
+		{
+			$qry .= " AND studiengang.studiengang_kz = ?";
+			$params[] = $studiengang_kz;
+		}
+
 		if (isset($prestudent_id))
 		{
 			$qry .= " AND prestudent.prestudent_id = ?";
 			$params[] = $prestudent_id;
 		}
 
-		if (isset($studiengang_kz))
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
 		{
-			$qry .= " AND studiengang.studiengang_kz = ?";
-			$params[] = $studiengang_kz;
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
 		}
 
 		$qry .= "
@@ -130,10 +148,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getPrestudentMischformOhneOrgform($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getPrestudentMischformOhneOrgform(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array($studiensemester_kurzbz);
 
 		$qry = "
@@ -162,6 +185,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -170,10 +199,15 @@ class PlausicheckLib
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @param studienordnung_id int if check is to be executed only for a certain studienordnung_id
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getStgPrestudentUngleichStgStudienplan($studiengang_kz = null, $prestudent_id = null, $studienordnung_id = null)
-	{
+	public function getStgPrestudentUngleichStgStudienplan(
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$studienordnung_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -209,6 +243,12 @@ class PlausicheckLib
 			$params[] = $studienordnung_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -219,9 +259,10 @@ class PlausicheckLib
 	 * Abbrecher cannot be active.
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getAbbrecherAktiv($studiengang_kz = null, $prestudent_id = null)
+	public function getAbbrecherAktiv($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -250,6 +291,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -257,9 +304,10 @@ class PlausicheckLib
 	 * There shouldn't be any status after Abbrecher status.
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getStudentstatusNachAbbrecher($studiengang_kz = null, $prestudent_id = null)
+	public function getStudentstatusNachAbbrecher($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -287,6 +335,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -295,10 +349,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getAusbildungssemPrestudentUngleichAusbildungssemStatus($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getAusbildungssemPrestudentUngleichAusbildungssemStatus(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array($studiensemester_kurzbz, $studiensemester_kurzbz, $studiensemester_kurzbz);
 
 		$qry = "
@@ -331,6 +390,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -339,10 +404,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getInaktiverStudentAktiverStatus($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getInaktiverStudentAktiverStatus(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$aktStudiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();
 
 		if (isError($aktStudiensemesterRes)) return $aktStudiensemesterRes;
@@ -378,6 +448,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -388,10 +464,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getInskriptionVorLetzerBismeldung($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getInskriptionVorLetzerBismeldung(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		// get Bismeldedatum
 		$datumBis = $this->_getBisdateFromSemester($studiensemester_kurzbz);
 
@@ -436,6 +517,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -443,9 +530,10 @@ class PlausicheckLib
 	 * Status Dates and status studysemester dates should be in correct order.
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if check is to be executed only for certain Studiengaenge
 	 * @return success with prestudents or error
 	 */
-	public function getDatumStudiensemesterFalscheReihenfolge($studiengang_kz = null, $prestudent_id = null)
+	public function getDatumStudiensemesterFalscheReihenfolge($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -489,6 +577,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -496,9 +590,10 @@ class PlausicheckLib
 	 * Students with active Benutzer should have a status in the current semester.
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getAktiverStudentOhneStatus($studiengang_kz = null, $prestudent_id = null)
+	public function getAktiverStudentOhneStatus($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -535,6 +630,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -543,10 +644,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getStudienplanUngueltig($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getStudienplanUngueltig(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array($studiensemester_kurzbz);
 
 		$qry = "
@@ -591,6 +697,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -599,10 +711,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getFalscheAnzahlAbschlusspruefungen($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getFalscheAnzahlAbschlusspruefungen(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -650,6 +767,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		$qry .= ") studenten
 			WHERE anzahl_abschlusspruefungen != 1";
 
@@ -661,13 +784,23 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param abschlusspruefung_id int if check is to be executed for a certain Abschlussprüfung
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getDatumAbschlusspruefungFehlt($studiensemester_kurzbz = null, $studiengang_kz = null, $abschlusspruefung_id = null)
-	{
+	public function getDatumAbschlusspruefungFehlt(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$abschlusspruefung_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$results = array();
 
-		$pruefungenRes = $this->_getInvalidAbschlusspruefungen($studiensemester_kurzbz, $studiengang_kz, $abschlusspruefung_id);
+		$pruefungenRes = $this->_getInvalidAbschlusspruefungen(
+			$studiensemester_kurzbz,
+			$studiengang_kz,
+			$abschlusspruefung_id,
+			$exkludierte_studiengang_kz
+		);
 
 		if (isError($pruefungenRes)) return $pruefungenRes;
 
@@ -689,13 +822,23 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param abschlusspruefung_id int if check is to be executed only for a certain Abschlussprüfung
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getDatumSponsionFehlt($studiensemester_kurzbz = null, $studiengang_kz = null, $abschlusspruefung_id = null)
-	{
+	public function getDatumSponsionFehlt(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$abschlusspruefung_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$results = array();
 
-		$pruefungenRes = $this->_getInvalidAbschlusspruefungen($studiensemester_kurzbz, $studiengang_kz, $abschlusspruefung_id);
+		$pruefungenRes = $this->_getInvalidAbschlusspruefungen(
+			$studiensemester_kurzbz,
+			$studiengang_kz,
+			$abschlusspruefung_id,
+			$exkludierte_studiengang_kz
+		);
 
 		if (isError($pruefungenRes)) return $pruefungenRes;
 
@@ -717,10 +860,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getBewerberNichtZumRtAngetreten($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getBewerberNichtZumRtAngetreten(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$previousStudiensemesterRes = $this->_ci->StudiensemesterModel->getPreviousFrom($studiensemester_kurzbz);
 
 		if (isError($previousStudiensemesterRes)) return $previousStudiensemesterRes;
@@ -765,6 +913,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -773,9 +927,10 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getAktSemesterNull($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
+	public function getAktSemesterNull($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array($studiensemester_kurzbz);
 
@@ -805,6 +960,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -813,10 +974,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getAbschlussstatusFehlt($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getAbschlussstatusFehlt(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -885,6 +1051,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -893,10 +1065,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getAktiverStudentstatusOhneKontobuchung($studiensemester_kurzbz, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getAktiverStudentstatusOhneKontobuchung(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array($studiensemester_kurzbz);
 
 		$qry = "
@@ -936,6 +1113,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -947,10 +1130,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param person_id int if check is to be executed only for one person
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getGbDatumWeitZurueck($studiensemester_kurzbz = null, $studiengang_kz = null, $person_id = null)
-	{
+	public function getGbDatumWeitZurueck(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$person_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -987,6 +1175,12 @@ class PlausicheckLib
 			$params[] = $person_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -996,7 +1190,7 @@ class PlausicheckLib
 	 * @param person_id int if check is to be executed only for one person
 	 * @return success with prestudents or error
 	 */
-	public function getNationNichtOesterreichAberGemeinde($studiengang_kz = null, $person_id = null)
+	public function getNationNichtOesterreichAberGemeinde($studiengang_kz = null, $person_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -1026,6 +1220,12 @@ class PlausicheckLib
 			$params[] = $person_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -1034,10 +1234,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param person_id int if check is to be executed only for one person
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getFalscheAnzahlHeimatadressen($studiensemester_kurzbz = null, $studiengang_kz = null, $person_id = null)
-	{
+	public function getFalscheAnzahlHeimatadressen(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$person_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -1078,6 +1283,12 @@ class PlausicheckLib
 			$params[] = $person_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -1086,10 +1297,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param person_id int if check is to be executed only for one person
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getFalscheAnzahlZustelladressen($studiensemester_kurzbz = null, $studiengang_kz = null, $person_id = null)
-	{
+	public function getFalscheAnzahlZustelladressen(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$person_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -1130,6 +1346,12 @@ class PlausicheckLib
 			$params[] = $person_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -1141,10 +1363,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param person_id int if check is to be executed only for one person
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getIncomingHeimatNationOesterreich($studiensemester_kurzbz, $studiengang_kz = null, $person_id = null)
-	{
+	public function getIncomingHeimatNationOesterreich(
+		$studiensemester_kurzbz,
+		$studiengang_kz = null,
+		$person_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array($studiensemester_kurzbz);
 
 		$qry = "
@@ -1176,6 +1403,12 @@ class PlausicheckLib
 			$params[] = $person_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -1183,9 +1416,10 @@ class PlausicheckLib
 	 * Incoming should have IN/OUT data.
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getIncomingOhneIoDatensatz($studiengang_kz = null, $prestudent_id = null)
+	public function getIncomingOhneIoDatensatz($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -1219,6 +1453,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -1227,10 +1467,15 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return object success or error
 	 */
-	public function getIncomingOrGsFoerderrelevant($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null)
-	{
+	public function getIncomingOrGsFoerderrelevant(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$prestudent_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -1281,6 +1526,12 @@ class PlausicheckLib
 			$params[] = $prestudent_id;
 		}
 
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
@@ -1292,9 +1543,14 @@ class PlausicheckLib
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiengang
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param abschlusspruefung_id int if check is to be executed for certain Abschlussprüfung
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 */
-	private function _getInvalidAbschlusspruefungen($studiensemester_kurzbz = null, $studiengang_kz = null, $abschlusspruefung_id = null)
-	{
+	private function _getInvalidAbschlusspruefungen(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$abschlusspruefung_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -1338,6 +1594,12 @@ class PlausicheckLib
 		{
 			$qry .= " AND pruefung.abschlusspruefung_id = ?";
 			$params[] = $abschlusspruefung_id;
+		}
+
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
 		}
 
 		return $this->_db->execReadOnlyQuery($qry, $params);

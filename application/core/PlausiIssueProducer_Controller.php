@@ -6,16 +6,18 @@
 abstract class PlausiIssueProducer_Controller extends JOB_Controller
 {
 	protected $_fehlerLibMappings;
+	protected $_app;
 
-	public function __construct()
+	public function __construct($app = null)
 	{
 		parent::__construct();
 
 		// pass extension name if calling from extension
 		$extensionName = isset($this->_extensionName) ? $this->_extensionName : null;
+		//$app = isset($this->_app) ? $this->_app : null;
 
 		// load libraries
-		$this->load->library('issues/PlausicheckProducerLib', array('extensionName' => $extensionName));
+		$this->load->library('issues/PlausicheckProducerLib', array('extensionName' => $extensionName, 'app' => $this->_app));
 		$this->load->library('IssuesLib');
 	}
 
@@ -30,6 +32,7 @@ abstract class PlausiIssueProducer_Controller extends JOB_Controller
 			$this->logInfo("Checking " . $fehler_kurzbz . "...");
 			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue(
 				$libName,
+				$fehler_kurzbz,
 				$params
 			);
 

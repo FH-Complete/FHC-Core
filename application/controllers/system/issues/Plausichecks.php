@@ -16,7 +16,7 @@ class Plausichecks extends Auth_Controller
 		);
 
 		// Load libraries
-		$this->load->library('issues/PlausicheckProducerLib');
+		$this->load->library('issues/PlausicheckProducerLib', array('app' => 'core'));
 		$this->load->library('issues/PlausicheckDefinitionLib');
 		$this->load->library('WidgetLib');
 
@@ -62,6 +62,7 @@ class Plausichecks extends Auth_Controller
 			// execute the check
 			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue(
 				$libName,
+				$fehler_kurzbz,
 				array(
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,
 					'studiengang_kz' => $studiengang_kz

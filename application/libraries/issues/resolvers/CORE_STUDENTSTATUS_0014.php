@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Prestudent should have a final status.
  */
 class CORE_STUDENTSTATUS_0014 implements IIssueResolvedChecker
 {

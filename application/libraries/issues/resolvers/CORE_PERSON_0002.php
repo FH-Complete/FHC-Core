@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Nation of person should be austria if Gemeinde (city) is austrian.
  */
 class CORE_PERSON_0002 implements IIssueResolvedChecker
 {

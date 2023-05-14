@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Orgform of a Studiengang in Studienplan should be the same as orgform of student.
  */
 class CORE_STG_0002 implements IIssueResolvedChecker
 {

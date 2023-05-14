@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Current Ausbildungssemester shouldn't be 0.
  */
 class CORE_STUDENTSTATUS_0013 implements IIssueResolvedChecker
 {
