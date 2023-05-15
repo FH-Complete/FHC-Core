@@ -36,6 +36,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
 require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/sancho.inc.php');
+require_once('../../../application/libraries/SignatureLib.php');
 
 $anzeigesprache = getSprache();
 $p = new phrasen($anzeigesprache);
@@ -93,6 +94,7 @@ else
 	$abstract = (isset($_POST['abstract'])?$_POST['abstract']:'-1');
 	$abstract_en = (isset($_POST['abstract_en'])?$_POST['abstract_en']:'-1');
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
+	$signaturVorhanden = (isset($_POST['signaturVorhanden']) && $_POST['signaturVorhanden']=='true'?true:false);
 }
 
 $user = get_uid();
@@ -111,6 +113,7 @@ $titel = $projektarbeit_obj->titel;
 $person = new person();
 $person->load($bid);
 $betreuer = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
+$uploadedDocumentSigned = null;
 
 if($uid!=$user)
 {
@@ -258,6 +261,35 @@ if($command=='add')
 				echo "<font color=\"#FF0000\">".$p->t('global/fehleraufgetreten')."</font><br>&nbsp;";
 				$command='';
 			}
+
+			if ($signaturVorhanden === false)
+			{
+				// Mail an Studiengang wenn keine Signatur gefunden wurde
+				$student = new student();
+				if(!$student->load($projektarbeit_obj->student_uid))
+					die($p->t('global/userNichtGefunden'));
+
+				$stg_obj = new studiengang();
+				if(!$stg_obj->load($student->studiengang_kz))
+					die($p->t('global/fehlerBeimLesenAusDatenbank'));
+
+				$subject = 'Abgabe ohne Signatur';
+				$tomail = $stg_obj->email;
+				$data = array(
+					'vorname' => $student->vorname,
+					'nachname' => $student->nachname,
+					'studiengang' => $stg_obj->bezeichnung
+				);
+
+				$mailres = sendSanchoMail(
+					'ParbeitsbeurteilungSiganturFehlt',
+					$data,
+					$tomail,
+					$subject,
+					'sancho_header_min_bw.jpg',
+					'sancho_footer_min_bw.jpg'
+				);
+			}
 		}
 		else
 		{
@@ -280,11 +312,11 @@ if($command=="update" && $error!=true)
 			$extensions = explode(".", $_FILES['datei']['name']);
 			if(strtoupper(end($extensions))=='PDF')
 			{
-				if($paabgabetyp_kurzbz!='end')
+				if ($paabgabetyp_kurzbz != 'end')
 				{
 					//"normaler" Upload
 					move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
-					if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
+					if (file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
 						exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'.'"');
 
@@ -299,18 +331,40 @@ if($command=="update" && $error!=true)
 					else
 					{
 						echo $p->t('global/dateiNichtErfolgreichHochgeladen');
-					}
+					}$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
 				}
-				else
+				else // endupload type
 				{
 					//Upload der Endabgabe - Eingabe der Zusatzdaten
 					$command='add';
-					if(!$error)
+					if (!$error)
 					{
 						move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
 					}
-					if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
+
+					$signaturVorhanden = true;
+
+					if (file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 					{
+						if(defined('ABGABETOOL_CHECK_SIGNATURE') && ABGABETOOL_CHECK_SIGNATURE)
+						{
+							// Check if the document is signed
+							$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
+							if (is_array($signList) && count($signList) > 0)
+							{
+								// The document is signed
+							}
+							elseif ($signList === null)
+							{
+								$uploadedDocumentSigned = 'WARNING: signature server error';
+							}
+							else
+							{
+								$signaturVorhanden = false;
+								$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSignedStudent');
+							}
+						}
+
 						/*$qry="UPDATE campus.tbl_paabgabe SET
 							abgabedatum = now(),
 							updatevon = '".$user."',
@@ -339,6 +393,7 @@ if($command=="update" && $error!=true)
 								$htmlstr .= '<input type="hidden" name="betreuer" value="'.$db->convert_html_chars($betreuer).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="bid" value="'.$db->convert_html_chars($bid).'">'."\n";
 								$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
+								$htmlstr .= '<input type="hidden" name="signaturVorhanden" value="'.($signaturVorhanden?'true':'false').'">'."\n";
 								$htmlstr .= "<tr>\n";
 								$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
 								$sprache = @$db->db_query("SELECT sprache FROM public.tbl_sprache");
@@ -371,6 +426,21 @@ if($command=="update" && $error!=true)
 											<td><textarea name="abstract_en" cols="46"  rows="7">'.$db->convert_html_chars($abstract_en).'</textarea></td></tr>'."\n";
 								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/seitenanzahl').':*</b></td>
 											<td><input  type="text" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'" size="5" maxlength="4"></td></tr>'."\n";
+								$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
+
+								// If there are info about the signed document
+								if ($uploadedDocumentSigned != null)
+								{
+									$htmlstr .= "<tr>\n";
+									$htmlstr .= "<td colspan='2' style='text-align: center;'>";
+									$htmlstr .= '<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 15px; border: 1px solid; border-radius: 4px;">
+
+											<b>'.$uploadedDocumentSigned.'</b></td>
+										</div>';
+									$htmlstr .= "</td>";
+									$htmlstr .= "</tr>\n";
+								}
+
 								$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
 								$htmlstr .="<tr><td colspan='2'><p align='justify'>".$p->t('abgabetool/eidesstattlicheErklaerung')."</p></td><td></td></tr>\n";
 								$htmlstr .= "<tr><td><b>".$p->t('abgabetool/gelesenUndAkzeptiert').":* <input type='checkbox' name='eiderklaerung'></b></td></tr>";
@@ -433,8 +503,10 @@ if($command=="update" && $error!=true)
 								$row_std=$db->db_fetch_object($result_std);
 
 								// 1. Begutachter mail ohne Token
-								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/Projektarbeitsbeurteilung";
+								$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
 								$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
+								$projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
+								$subject = $projektarbeit_obj->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
 								$abgabetyp = $paabgabetyp_kurzbz == 'end' ? 'Endabgabe' : 'Zwischenabgabe';
 
 								$maildata = array();
@@ -452,7 +524,7 @@ if($command=="update" && $error!=true)
 									'ParbeitsbeurteilungEndupload',
 									$maildata,
 									$row_betr->mitarbeiter_uid."@".DOMAIN,
-									"Bachelor-/Masterarbeitsbetreuung",
+									$subject,
 									'sancho_header_min_bw.jpg',
 									'sancho_footer_min_bw.jpg',
 									$user."@".DOMAIN);
@@ -465,48 +537,66 @@ if($command=="update" && $error!=true)
 								// 2. Begutachter mail, wenn Endabgabe, mit Token wenn extern
 								if ($paabgabetyp_kurzbz == 'end')
 								{
-									$projektbetreuer = new projektbetreuer();
-									$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
+									// Zweitbegutachter holen
+									$zweitbegutachter = new projektbetreuer();
+									$zweitbegutachterRes = $zweitbegutachter->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
 
-									if ($zweitbetr)
+									if ($zweitbegutachterRes)
 									{
-										$tokenGenRes = $projektbetreuer->generateZweitbegutachterToken($zweitbetr->person_id, $projektarbeit_id);
+										$zweitbegutachterResults = $zweitbegutachter->result;
 
-										if (!$tokenGenRes)
-											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
-
-										$zweitbetr = $projektbetreuer->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid);
-
-										if (!$zweitbetr)
-											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
-
-										$intern = isset($zweitbetr->uid);
-										$mail_link = $intern ? $mail_fulllink : $mail_baselink;
-
-										$zweitbetmaildata = array();
-										$zweitbetmaildata['geehrt'] = "geehrte" . ($zweitbetr->anrede == "Herr" ? "r" : "");
-										$zweitbetmaildata['anrede'] = $zweitbetr->anrede;
-										$zweitbetmaildata['betreuer_voller_name'] = $zweitbetr->voller_name;
-										$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
-										$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
-										$zweitbetmaildata['abgabetyp'] = $abgabetyp;
-										$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-										$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
-										$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($zweitbetr->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $zweitbetr->zugangstoken . "</p>" : "";
-
-										$mailres = sendSanchoMail(
-											'ParbeitsbeurteilungEndupload',
-											$zweitbetmaildata,
-											$zweitbetr->email,
-											"Masterarbeitsbetreuung",
-											'sancho_header_min_bw.jpg',
-											'sancho_footer_min_bw.jpg',
-											$user . "@" . DOMAIN
-										);
-
-										if (!$mailres)
+										foreach ($zweitbegutachterResults as $begutachter)
 										{
-											echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+											// token generieren, wenn noch nicht vorhanden und notwendig (wird in methode überprüft)
+											$tokenGenRes = $zweitbegutachter->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
+
+											if (!$tokenGenRes)
+												echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+
+											// Zweitbegutachter (evtl. mit Token) holen
+											$zweitbegutachterMitToken = new projektbetreuer();
+											$begutachterMitTokenRes = $zweitbegutachterMitToken->getZweitbegutachterWithToken($bid, $projektarbeit_id, $row_std->uid, $begutachter->person_id);
+
+											if (!$begutachterMitTokenRes)
+												echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+
+											// Email an Zweitbegutachter senden
+											if (isset($zweitbegutachterMitToken->result[0]))
+											{
+												$begutachterMitToken = $zweitbegutachterMitToken->result[0];
+
+												$path = $begutachterMitToken->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+												$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$path";
+												$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$row_std->uid;
+												$intern = isset($begutachterMitToken->uid);
+												$mail_link = $intern ? $mail_fulllink : $mail_baselink;
+
+												$zweitbetmaildata = array();
+												$zweitbetmaildata['geehrt'] = "geehrte" . ($begutachterMitToken->anrede == "Herr" ? "r" : "");
+												$zweitbetmaildata['anrede'] = $begutachterMitToken->anrede;
+												$zweitbetmaildata['betreuer_voller_name'] = $begutachterMitToken->voller_name;
+												$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
+												$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
+												$zweitbetmaildata['abgabetyp'] = $abgabetyp;
+												$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
+												$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+												$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+
+												$mailres = sendSanchoMail(
+													'ParbeitsbeurteilungEndupload',
+													$zweitbetmaildata,
+													$begutachterMitToken->email,
+													$subject,
+													'sancho_header_min_bw.jpg',
+													'sancho_footer_min_bw.jpg',
+													$user . "@" . DOMAIN
+												);
+
+												if (!$mailres)
+												{
+													echo "<font color=\"#FF0000\">" . $p->t('abgabetool/fehlerMailZweitBegutachter') . "</font><br>&nbsp;";
+												}
+											}
 										}
 									}
 								}

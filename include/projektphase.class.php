@@ -718,10 +718,10 @@ class projektphase extends basis_db
 				(
 					(
 						(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-						AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+						AND (tbl_projekt.ende + interval '7 month 1 day' >=now() OR tbl_projekt.ende is null)
 					) AND (
 						(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-						AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+						AND (tbl_projektphase.ende + interval '7 month 1 day' >=now() OR tbl_projektphase.ende is null)
 					)
 				)
 				AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
@@ -787,10 +787,10 @@ class projektphase extends basis_db
 		(
 			(
 				(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-				AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+				AND (tbl_projekt.ende + interval '7 month 1 day' >=now() OR tbl_projekt.ende is null)
 			) AND (
 				(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
-				AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+				AND (tbl_projektphase.ende + interval '7 month 1 day' >=now() OR tbl_projektphase.ende is null)
 			)
 		)
 		AND mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)."
@@ -828,6 +828,40 @@ class projektphase extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+
+	/**
+	 * Gibt zurück, ob für eine Projektphase Zeitaufzeichnungsbuchung erlaubt ist
+	 * @param  $projektphase_id die zu überprüfende Projektphase
+	 * @return boolean true, wenn Buchung erlaubt
+	 */
+	public function getPhasenZA($projektphase_id)
+	{
+	$qry = "
+		SELECT
+			fue.tbl_projektphase.zeitaufzeichnung
+		FROM
+			fue.tbl_projektphase
+		WHERE
+			tbl_projektphase.projektphase_id = ".$this->db_add_param($projektphase_id);
+
+			if ($this->db_query($qry))
+			{
+				if ($row = $this->db_fetch_object())
+				{
+					return $row->zeitaufzeichnung;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Laden der Daten';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
 	}
 }
 ?>
