@@ -141,6 +141,13 @@ $(function(){
             return;
         }
 
+        // Check if forgot to fulfill begruendung
+        if (begruendung.trim().endsWith('weil') || begruendung.endsWith('because of'))
+        {
+            FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "bitteBegruendungVervollstaendigen"));
+            return;
+        }
+
         // Get form data
         let form_data = $('form').serializeArray();
 
@@ -194,17 +201,9 @@ $(function(){
         // Get form data
         let form_data = $('#form-empfehlung').serializeArray();
 
-
-        // Prepare data object for ajax call
-        let data = {
-            'data': [{
-                'anrechnung_id' : form_data[0].value
-            }]
-        };
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
-            data,
+            {anrechnung_id: form_data[0].value},
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
@@ -471,11 +470,27 @@ var approveAnrechnungDetail = {
             textarea.val($.trim($('#approveAnrechnungDetail-empfehlungDetail-begruendung').text()));
             return;
         }
-        else
+        
+        // Find Begruendung span
+        let textspan = $(elem).parent().find('span:first');
+
+        // Get Begruendung
+        let begruendung = textspan.text();
+
+        // Check if Begruendung has helptext
+        let hasHelptext = textspan.children('span #helpTxtBegruendungErgaenzen').length > 0;
+
+        if (hasHelptext)
         {
-            // Copy begruendung into textarea
-            textarea.val($.trim($(elem).parent().find('span:first').text()));
+            let helptext = textspan.children('span #helpTxtBegruendungErgaenzen').text();
+
+            // Remove helptext
+            begruendung = begruendung.replace(helptext, '');
+
         }
+
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim(begruendung)).focus();
     },
     formatEmpfehlungIsRequested: function(statusBezeichnung, empfehlungsanfrageAm, empfehlungsanfrageAn) {
         $('#approveAnrechnungDetail-empfehlungDetail-empfehlungsanfrageAm').html(empfehlungsanfrageAm);

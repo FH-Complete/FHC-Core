@@ -40,7 +40,9 @@ $filters = array(
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
-					{"name": "OnholdDate"}
+					{"name": "HoldDate"},
+					{"name": "Rueckstellgrund"},
+					{"name": "Kaution"}
 				],
 				"filters": [
 					{
@@ -511,13 +513,14 @@ $filters = array(
 			{
 				"name": "Abgewiesen - Alle",
 				"columns": [
-					{"name": "PersonID"},
+					{"name": "PersonId"},
 					{"name": "PreStudentID"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
-					{"name": "Nachricht"}
+					{"name": "Nachricht"},
+					{"name": "Kaution"}
 				],
 				"filters": []
 			}
@@ -1035,7 +1038,6 @@ $filters = array(
 					{"name": "Note"},
 					{"name": "ErstNachname"},
 					{"name": "ErstAbgeschickt"},
-					{"name": "ZweitNachname"},
 					{"name": "ZweitAbgeschickt"}
 				],
 				"filters": []
@@ -1111,12 +1113,12 @@ $filters = array(
 					{"name": "Standardkostenstelle"}
 				],
 				"filters": [
-					{                              
-					"name": "Nachname",      
-					"option": "",            
-					"condition": "",         
-					"operation": ""          
-					}    
+					{
+					"name": "Nachname",
+					"option": "",
+					"condition": "",
+					"operation": ""
+					}
 				]
 			}
 		',

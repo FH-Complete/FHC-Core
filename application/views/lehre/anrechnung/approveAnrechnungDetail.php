@@ -23,6 +23,7 @@ $this->load->view(
 				'systemfehler',
 				'bitteMindEinenAntragWaehlen',
 				'bitteBegruendungAngeben',
+                'bitteBegruendungVervollstaendigen',
 				'empfehlungWurdeAngefordert',
 				'anrechnungenWurdenGenehmigt',
 				'anrechnungenWurdenAbgelehnt',
@@ -322,14 +323,6 @@ $this->load->view(
 													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
 											</li>
-											<li class="list-group-item">
-												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertig'); ?></span>
-												<span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
-													  data-placement="right"
-													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
-													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
-												</span>
-											</li>
                                             <li class="list-group-item">
                                                 <span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEctsHoechstgrenzeUeberschritten'); ?></span>
                                                 <span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
@@ -339,6 +332,14 @@ $this->load->view(
 												</span>
                                             </li>
 											<li class="list-group-item">
+												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertigWeil'); ?></span>
+												<span class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
+													  data-placement="right"
+													  title="<?php echo $this->p->t('ui', 'textUebernehmen'); ?>">
+													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+												</span>
+											</li>
+											<li class="list-group-item">
 												<span><?php echo $this->p->t('anrechnung', 'genehmigungNegativEmpfehlungstextUebernehmen'); ?></span>
 												<span id="empfehlungstextUebernehmen" class="btn-copyIntoTextarea pull-right" data-toggle="tooltip"
 													  data-placement="right"
@@ -346,6 +347,9 @@ $this->load->view(
 													<i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
 												</span>
 											</li>
+                                            <li class="list-group-item" onclick="{ $(this).closest('div').find('textarea').val('').focus()}">
+                                                <span><?php echo $this->p->t('anrechnung', 'andereBegruendung'); ?></span>
+                                            </li>
 										</ul>
 										<textarea class="form-control" name="begruendung"
 												  id="approveAnrechnungDetail-begruendung"

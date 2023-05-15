@@ -894,8 +894,10 @@ or not exists
 
 		foreach ($this->result as $row)
 		{
-			if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn)) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
-			$tagesbeginn = $datum->formatDatum($row->start, 'H:i');
+			if($row->aktivitaet_kurzbz == 'DienstreiseMT' ) continue;
+			
+                        if (($tagesbeginn == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn)) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
+			        $tagesbeginn = $datum->formatDatum($row->start, 'H:i');
 
 			if (($tagesende == '' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende)) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
 				$tagesende = $datum->formatDatum($row->ende, 'H:i');
