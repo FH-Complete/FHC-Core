@@ -1197,6 +1197,20 @@ else
 			else
 				$studienjahr = intval($semester/2)+1;
 
+			$abbrecher = ($prestudent->status_kurzbz === 'Abbrecher' ? 'true' : 'false');
+			
+			$abbrecher_ende = '';
+			$studiensemester_abbrecher_kurzbz='';
+			$qry = "SELECT * FROM public.tbl_prestudentstatus
+					WHERE prestudent_id='$student->prestudent_id' AND status_kurzbz = 'Abbrecher' ORDER BY datum LIMIT 1";
+			if($db->db_query($qry))
+			{
+				if($row = $db->db_fetch_object())
+				{
+					$abbrecher_ende = $row->datum;
+					$studiensemester_abbrecher_kurzbz = $row->studiensemester_kurzbz;
+				}
+			}
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -1220,6 +1234,7 @@ else
 				<student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
+				<studiengang_bezeichnung_eng><![CDATA['.$studiengang->english.']]></studiengang_bezeichnung_eng>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
 				<studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
 				<studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
@@ -1243,6 +1258,9 @@ else
 				<studienjahr_kurzbz><![CDATA['.$stsem->studienjahr_kurzbz.']]></studienjahr_kurzbz>
 				<studiensemester_aktuell_bezeichnung><![CDATA['.$stsem->bezeichnung.']]></studiensemester_aktuell_bezeichnung>
 				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
+				<abbrecher><![CDATA['.$abbrecher.']]></abbrecher>
+				<abbrecher_ende><![CDATA['.$datum_obj->convertISODate($abbrecher_ende).']]></abbrecher_ende>
+				<studiensemester_abbrecher_kurzbz><![CDATA['.$studiensemester_abbrecher_kurzbz.']]></studiensemester_abbrecher_kurzbz>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
 				<anmerkungpre><![CDATA['.$prestudent->anmerkung.']]></anmerkungpre>
