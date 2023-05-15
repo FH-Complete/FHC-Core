@@ -1,4 +1,6 @@
 const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
+const CONTROLLER_URL = BASE_URL + '/' + CALLED_PATH;
 const APPROVE_ANRECHNUNG_DETAIL_URI = "lehre/anrechnung/ReviewAnrechnungDetail";
 
 const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
@@ -49,6 +51,12 @@ function hf_filterTrueFalse(headerValue, rowValue){
     }
 }
 
+// Filters empfehlungsberechtigt boolean values
+function hf_empfehlungsberechtigt(headerValue, rowValue){
+
+    return rowValue == headerValue.toString();
+}
+
 // Adds column details
 function func_tableBuilt(table) {
     table.addColumn(
@@ -72,9 +80,10 @@ function func_tableBuilt(table) {
 // Formats the rows
 function func_rowFormatter(row){
     let status_kurzbz = row.getData().status_kurzbz;
+    let empfehlungsberechtigt = row.getData().empfehlungsberechtigt;
 
     row.getCells().forEach(function(cell){
-        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR)
+        if (status_kurzbz != ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || empfehlungsberechtigt == "false")
         {
             row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
         }
@@ -84,9 +93,10 @@ function func_rowFormatter(row){
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
     let status_kurzbz = row.getData().status_kurzbz;
+    let empfehlungsberechtigt = row.getData().empfehlungsberechtigt;
 
     return (
-        status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR
+        status_kurzbz == ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || empfehlungsberechtigt == "false"
     );
 }
 
@@ -119,6 +129,18 @@ var format_empfehlung_anrechnung = function(cell, formatterParams){
         : (cell.getValue() ==  'true')
             ? FHC_PhrasesLib.t("ui", "ja")
             : FHC_PhrasesLib.t("ui", "nein");
+}
+
+/**
+ * Returns formatter params for field dokument_bezeichnung (= Spalte Nachweisdokumente)
+ * NOTE: Returning a formatter param object fixes the problem, that tabulator did not know the url after refreshing the page.
+ */
+function paramLookup_dokBez(cell){
+    return {
+        labelField: 'dokument_bezeichnung',
+        url: CONTROLLER_URL + '/download?dms_id=' + cell.getData().dms_id,
+        target: '_blank'
+    }
 }
 
 /*
@@ -427,7 +449,7 @@ var reviewAnrechnung = {
         // Find closest textarea
         let textarea = $(elem).closest('div').find('textarea');
 
-        // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().text()));
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim($(elem).parent().text())).focus();
     }
 }

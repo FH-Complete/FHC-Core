@@ -188,13 +188,21 @@ define('FHC_REST_PASSWORD', 'password');
  * Signatur
  * DEFAULT: https://signatur.example.com/api/sign
  */
-define('SIGNATUR_URL', 'https://signatur.example.com/api/sign');
+// Generic URL
+define('SIGNATUR_URL', 'https://signatur.dev.technikum-wien.at/api');
+// Sign API
+define('SIGNATUR_SIGN_API', 'sign');
+// List API
+define('SIGNATUR_LIST_API', 'list');
 // User für Zugriff auf Signaturserver
-define('SIGNATUR_USER', 'username');
+define('SIGNATUR_USER', 'fhcomplete');
 // Passwort für Zugriff auf Signaturserver
-define('SIGNATUR_PASSWORD', 'password');
+define('SIGNATUR_PASSWORD', 'supersecretpassword');
 // Signaturprofil das verwendet werden soll
 define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
+
+// Signaturpruefung im Abgabetool aktivieren
+define('ABGABETOOL_CHECK_SIGNATURE',false);
 
 /**
  * Datenverbund Anbindung
@@ -257,6 +265,12 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
 
+// Docsbox configs
+define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
+define('DOCSBOX_PATH_API', 'api/v1/');
+define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
+define('DOCSBOX_WAITING_SLEEP_TIME', 1);
+
 // Bei folgenden Buchungstypen wird ein Anlegen geprüft ob bereits ein Eintrag für diesen Typ vorhanden ist im selben
 // Semester und ggf ein Hinweis ausgegeben
 define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
@@ -268,4 +282,9 @@ define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
 
 //Default Lehrmodus
 define ('DEFAULT_LEHRMODUS','regulaer');
+
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
+
 ?>
