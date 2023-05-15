@@ -479,12 +479,11 @@ if(isset($_POST['copy']) && $_POST['copy'] != '')
 if (!$b = new berechtigung())
 	die($b->errormsg);
 
-$b->getRollen();
+$b->getRollen('rolle_kurzbz');
 foreach($b->result as $berechtigung)
 {
 	$rolle_arr[$berechtigung->rolle_kurzbz] = $berechtigung->beschreibung;
 }
-ksort($rolle_arr, SORT_STRING | SORT_FLAG_CASE);
 
 $b->getBerechtigungen();
 foreach($b->result as $berechtigung)

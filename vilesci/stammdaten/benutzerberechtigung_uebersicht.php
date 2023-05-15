@@ -251,7 +251,7 @@ $htmlstr='
 			<select id="rolle_kurzbz" name="rolle_kurzbz">
 				<option value=""></option>';
 			$rollen = new berechtigung();
-			$rollen->getRollen();
+			$rollen->getRollen('rolle_kurzbz');
 			foreach($rollen->result as $rolle)
 			{
 				if ($rolle_kurzbz == $rolle->rolle_kurzbz)

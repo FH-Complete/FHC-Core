@@ -137,8 +137,10 @@ $menu=array
 		'User'=>array
 		(
 			'name'=>'User', 'permissions'=>array('basis/variable','basis/berechtigung'),
+			'Rechte'=>array('name'=>'Rechte', 'link'=>'stammdaten/berechtigungen.php', 'target'=>'main','permissions'=>array('basis/berechtigung')),
 			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main','permissions'=>array('basis/berechtigung')),
 			'Rollen'=>array('name'=>'Rollen', 'link'=>'stammdaten/berechtigungrolle.php', 'target'=>'main','permissions'=>array('basis/berechtigung')),
+			'Funktionen'=>array('name'=>'Funktionen', 'link'=>'personen/funktion.php', 'target'=>'main', 'permissions'=>array('mitarbeiter')),
 			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main', 'target'=>'main','permissions'=>array('basis/variable')),
 		),
 		'Personal'=>array

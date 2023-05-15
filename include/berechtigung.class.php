@@ -103,14 +103,38 @@ class berechtigung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Loescht ein Recht
+	 *
+	 * @param $berechtigung_kurzbz
+	 */
+	public function delete($berechtigung_kurzbz)
+	{
+		$qry = "DELETE FROM system.tbl_berechtigung WHERE berechtigung_kurzbz=".$this->db_add_param($berechtigung_kurzbz).";";
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen des Rechts:'.$this->db_last_error();
+			return false;
+		}
+	}
 	
 	/**
 	 * Holt alle BerechtigungsRollen
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function getRollen()
+	public function getRollen($order = null)
 	{
 		$qry = 'SELECT * FROM system.tbl_rolle';
+		if ($order != '')
+		{
+			$qry .= " ORDER BY $order";
+		}
 
 		if($this->db_query($qry))
 		{
