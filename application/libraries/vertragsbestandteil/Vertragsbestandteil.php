@@ -184,7 +184,9 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 
 	public function jsonSerialize()
     {
-        return get_object_vars($this);
+		$vars = get_object_vars($this);
+		unset($vars['CI']);
+        return $vars;
     }
 	
 	public function __toString() 
