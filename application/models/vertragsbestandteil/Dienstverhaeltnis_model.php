@@ -48,8 +48,12 @@ class Dienstverhaeltnis_model extends DB_Model
     }
 
 
-    public function getCurrentDVByPersonUID($uid)
+    public function getCurrentDVByPersonUID($uid, $dateAsUnixTS)
     {
+
+        $date = DateTime::createFromFormat( 'U', $dateAsUnixTS );
+        $datestring = $date->format("Y-m-d");
+
 		$qry = "
         SELECT 
             dv.dienstverhaeltnis_id,
@@ -61,19 +65,19 @@ class Dienstverhaeltnis_model extends DB_Model
             tbl_person.person_id,
             tbl_benutzer.alias,
             dv.von,
-            dv.bis,     
-            dv.vertragsart_kurzbz,       
+            dv.bis,
+            dv.vertragsart_kurzbz,
             dv.updateamum,
             dv.updatevon
         FROM tbl_mitarbeiter
             JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
             JOIN tbl_person USING (person_id)
             JOIN hr.tbl_dienstverhaeltnis dv ON(tbl_benutzer.uid::text = dv.mitarbeiter_uid::text)
-        WHERE tbl_benutzer.uid=? and (dv.von<=CURRENT_DATE::text::date and (dv.bis is null OR dv.bis>=CURRENT_DATE::text::date))
+        WHERE tbl_benutzer.uid=? and (dv.von<=? and (dv.bis is null OR dv.bis>=?))
         ORDER BY dv.von desc
         ";
 
-        return $this->execQuery($qry, array($uid));
+        return $this->execQuery($qry, array($uid, $datestring, $datestring));
     }
 
 	public function isOverlappingExistingDV($mitarbeiter_uid, $oe_kurzbz, $von, $bis)
