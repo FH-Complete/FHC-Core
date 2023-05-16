@@ -4213,8 +4213,7 @@ if(!$error)
 				$pruefung->insertamum = date('Y-m-d H:i:s');
 				$pruefung->insertvon = $user;
 			}
-
-			$pruefung->student_uid = $_POST['student_uid'];
+			$pruefung->prestudent_id = $_POST['prestudent_id'];
 			$pruefung->vorsitz = $_POST['vorsitz'];
 			$pruefung->pruefer1 = $_POST['pruefer1'];
 			$pruefung->pruefer2 = $_POST['pruefer2'];

@@ -53,7 +53,9 @@ $abschlusspruefung = new abschlusspruefung($abschlusspruefung_id);
 
 $studiensemester_kurzbz = filter_input(INPUT_GET, "ss");
 
-$student = new student($abschlusspruefung->student_uid);
+$student = new student();
+$uid = $student->getUid($abschlusspruefung->prestudent_id);
+$student->load($uid);
 
 $studiengang = new studiengang($student->studiengang_kz);
 

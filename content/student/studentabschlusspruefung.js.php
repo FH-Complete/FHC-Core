@@ -107,10 +107,10 @@ var StudentAbschlusspruefungAkadgradDDListener =
 // ****
 // * Laedt die Daten fuer den Abschlusspruefungen Tree
 // ****
-function StudentAbschlusspruefungTreeLoad(uid)
+function StudentAbschlusspruefungTreeLoad(prestudent_id)
 {
 	tree = document.getElementById('student-abschlusspruefung-tree');
-	url='<?php echo APP_ROOT;?>rdf/abschlusspruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/abschlusspruefung.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
 	//Alte Observer entfernen
 	try
@@ -334,7 +334,7 @@ function StudentAbschlusspruefungAuswahl()
 
 	//Daten holen
 
-	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
+	prestudent_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
 	vorsitz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vorsitz" ));
 	vorsitz_nachname = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vorsitz_nachname" ));
 	pruefer1 = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefer1" ));
@@ -463,7 +463,7 @@ function StudentAbschlusspruefungSpeichern()
 		return false;
 	}
 
-	var student_uid = getTreeCellText(tree, "student-treecol-uid", tree.currentIndex);
+	var prestudent_id = getTreeCellText(tree, "student-treecol-prestudent_id", tree.currentIndex);
 
 	//Datum pruefen
 	if(datum!='' && !CheckDatum(datum))
@@ -483,7 +483,7 @@ function StudentAbschlusspruefungSpeichern()
 
 	req.add('type', 'saveabschlusspruefung');
 
-	req.add('student_uid', student_uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('vorsitz', vorsitz);
 	req.add('pruefer1', pruefer1);
 	req.add('pruefer2', pruefer2);
@@ -685,14 +685,14 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event, lang)
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
-	var uids='';
+	var prestudent_ids='';
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
-			uids = uids + uid;
+			prestudent_id = ';'+getTreeCellText(tree,"student-treecol-prestudent_id", v);
+			prestudent_ids = prestudent_ids + prestudent_id;
 			anzahl++;
 		}
 	}
@@ -711,7 +711,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event, lang)
 		var output='pdf';
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&prestudent_ids='+prestudent_ids+'&xsl_stg_kz='+stg_kz+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -829,16 +829,16 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event, sprache)
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
-	var uids='';
+	var prestudent_ids='';
 	var stg_kz='';
 	for (var t = 0; t < numRanges; t++)
 	{
-  		tree.view.selection.getRangeAt(t,start,end);
+		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
+			prestudent_id = ';'+getTreeCellText(tree,"student-treecol-prestudent_id", v);
 			stg_kz = getTreeCellText(tree,"student-treecol-studiengang_kz", v);
-			uids = uids + uid;
+			prestudent_ids = prestudent_ids + prestudent_id;
 			anzahl++;
 		}
 	}
@@ -856,7 +856,7 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event, sprache)
 		var output='pdf';
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&prestudent_ids='+prestudent_ids+'&xsl_stg_kz='+stg_kz+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -946,15 +946,15 @@ function StudentAbschlusspruefungPrintBescheidMultiple(event, sprache)
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
-	var uids='';
+	var prestudent_ids='';
 	var stg_kz=0;
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
-			uids = uids + uid;
+			prestudent_id = ';'+getTreeCellText(tree,"student-treecol-prestudent_id", v);
+			prestudent_ids = prestudent_ids + prestudent_id;
 			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 			anzahl++;
 		}
@@ -973,7 +973,7 @@ function StudentAbschlusspruefungPrintBescheidMultiple(event, sprache)
 		var output='pdf';
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&uid='+uids+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&prestudent_ids='+prestudent_ids+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 // ****
 // * Druckt die Urkunde fuer eine Abschlusspruefung fuer mehrere Studenten auf einmal aus.
@@ -1023,15 +1023,15 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(event, sprache)
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
-	var uids='';
+	var prestudent_ids='';
 	var stg_kz=0;
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
-			uids = uids + uid;
+			prestudent_id = ';'+getTreeCellText(tree,"student-treecol-prestudent_id", v);
+			prestudent_ids = prestudent_ids + prestudent_id;
 			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 			anzahl++;
 		}
@@ -1050,7 +1050,7 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(event, sprache)
 		var output='pdf';
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&uid='+uids+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&prestudent_ids='+prestudent_ids+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -1071,7 +1071,7 @@ function StudentAbschlusspruefungPrintUrkunde(event, sprache)
 	//Ausgewaehlte Nr holen
 	var abschlusspruefung_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-abschlusspruefung_id", tree.currentIndex);
 	var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", tree.currentIndex);
-	var uid = getTreeCellText(tree,"student-abschlusspruefung-treecol-student_uid", tree.currentIndex);
+	var prestudent_id = getTreeCellText(tree,"student-abschlusspruefung-treecol-prestudent_id", tree.currentIndex);
 
 	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
 		xsl='Bakkurkunde';
@@ -1101,7 +1101,7 @@ function StudentAbschlusspruefungPrintUrkunde(event, sprache)
 		var output='pdf';
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid=;'+uid+'&abschlusspruefung_id='+abschlusspruefung_id+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&prestudent_ids=;'+prestudent_id+'&abschlusspruefung_id='+abschlusspruefung_id+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 function StudentAbschlusspruefungTypChange()

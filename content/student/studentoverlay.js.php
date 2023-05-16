@@ -1686,11 +1686,11 @@ function StudentAuswahl()
 		anrechnungtree.builder.addListener(StudentAnrechnungTreeListener);
 	}
 
-	if(uid!='')
+	if(prestudent_id!='')
 	{
 		// ****** Abschlusspruefung ******** //
 		StudentAbschlusspruefungDetailDisableFields(true);
-		StudentAbschlusspruefungTreeLoad(uid);
+		StudentAbschlusspruefungTreeLoad(prestudent_id);
 	}
 
 	if(uid!='')

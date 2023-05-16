@@ -107,34 +107,33 @@ foreach ($headline as $title)
 
 // Daten holen
 $qry = "SELECT
-			titelpre, vorname, nachname, titelpost,
-			(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'')
-				|| ' ' || COALESCE(titelpost,'') FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id)
-			 WHERE uid=vorsitz) as vorsitz,
-			(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'')
-				|| ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer1) as pruefer1,
-			(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'')
-				|| ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer2) as pruefer2,
-			(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' '
-				|| COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer3) as pruefer3,
-			(SELECT bezeichnung FROM lehre.tbl_abschlussbeurteilung
-				WHERE tbl_abschlussbeurteilung.abschlussbeurteilung_kurzbz
-					= tbl_abschlusspruefung.abschlussbeurteilung_kurzbz) as bezeichnung,
-					tbl_pruefungstyp.beschreibung, datum, sponsion, tbl_abschlusspruefung.anmerkung
+			tbl_pruefungstyp.pruefungstyp_kurzbz , tbl_person.titelpre, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpost,
+			concat_ws(' ', vorsitz_person.titelpre, vorsitz_person.vorname, vorsitz_person.nachname, vorsitz_person.titelpost) as vorsitz,
+			concat_ws(' ', erst_pruefer.titelpre, erst_pruefer.vorname, erst_pruefer.nachname, erst_pruefer.titelpost) as pruefer1,
+			concat_ws(' ', zweit_pruefer.titelpre, zweit_pruefer.vorname, zweit_pruefer.nachname, zweit_pruefer.titelpost) as pruefer2,
+			concat_ws(' ', dritt_pruefer.titelpre, dritt_pruefer.vorname, dritt_pruefer.nachname, dritt_pruefer.titelpost) as pruefer3,
+			tbl_abschlussbeurteilung.bezeichnung,
+			tbl_pruefungstyp.beschreibung, datum, sponsion, tbl_abschlusspruefung.anmerkung
 		FROM
-			lehre.tbl_abschlusspruefung, public.tbl_studentlehrverband, public.tbl_benutzer, public.tbl_person,
-			lehre.tbl_pruefungstyp
+			lehre.tbl_abschlusspruefung
+			JOIN public.tbl_prestudent USING (prestudent_id)
+			JOIN public.tbl_person USING (person_id)
+			JOIN public.tbl_benutzer ON tbl_person.person_id = tbl_benutzer.person_id
+			JOIN public.tbl_studentlehrverband ON uid = tbl_studentlehrverband.student_uid AND tbl_prestudent.studiengang_kz = tbl_studentlehrverband.studiengang_kz
+			JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz)
+			LEFT JOIN lehre.tbl_abschlussbeurteilung USING (abschlussbeurteilung_kurzbz)
+			LEFT JOIN public.tbl_benutzer vorsitz_benutzer ON vorsitz_benutzer.uid = tbl_abschlusspruefung.vorsitz
+			LEFT JOIN public.tbl_person vorsitz_person ON vorsitz_benutzer.person_id = vorsitz_person.person_id
+		    LEFT JOIN public.tbl_person erst_pruefer ON erst_pruefer.person_id = tbl_abschlusspruefung.pruefer1
+		    LEFT JOIN public.tbl_person zweit_pruefer ON zweit_pruefer.person_id = tbl_abschlusspruefung.pruefer2
+		    LEFT JOIN public.tbl_person dritt_pruefer ON dritt_pruefer.person_id = tbl_abschlusspruefung.pruefer3
 		WHERE
-			tbl_abschlusspruefung.student_uid=public.tbl_studentlehrverband.student_uid AND
 			tbl_studentlehrverband.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
-			tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($studiengang_kz)." AND
-			tbl_benutzer.uid = tbl_abschlusspruefung.student_uid AND
-			tbl_person.person_id = tbl_benutzer.person_id AND
-			tbl_abschlusspruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz
+			tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($studiengang_kz)."
 		";
 if ($semester != '')
 	$qry .= " AND tbl_studentlehrverband.semester=".$db->db_add_param($semester);
-$qry .= ' ORDER BY nachname, vorname';
+$qry .= ' ORDER BY tbl_person.nachname, tbl_person.vorname';
 $zeile = 1;
 if ($db->db_query($qry))
 {

@@ -65,9 +65,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		>
 		<!-- onselect="StudentAbschlusspruefungAuswahl();" - wird jetzt per JS gesetzt -->
 			<treecols>
-				<treecol id="student-abschlusspruefung-treecol-student_uid" label="UID" flex="1" persist="hidden, width" hidden="true"
+				<treecol id="student-abschlusspruefung-treecol-prestudent_id" label="PreStudentInnenID" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#student_uid" onclick="StudentAbschlusspruefungTreeSort()"/>
+					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#prestudent_id" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="student-abschlusspruefung-treecol-vorsitz" label="Vorsitz" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"

@@ -241,7 +241,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 												lehre.tbl_abschlusspruefung
 												LEFT JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz)
 											WHERE
-												tbl_abschlusspruefung.student_uid=".$db->db_add_param($uid_arr[$i])."
+												tbl_abschlusspruefung.prestudent_id=".$db->db_add_param($row->prestudent_id)."
 											ORDER BY datum DESC LIMIT 1";
 					if($result_abschlusspruefung = $db->db_query($qry_abschlusspruefung))
 					{

@@ -315,7 +315,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					lehre.tbl_abschlusspruefung
 					LEFT JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz)
 				WHERE
-					student_uid=".$db->db_add_param($uid_arr[$i])."
+					prestudent_id=".$db->db_add_param($row->prestudent_id)."
 				ORDER BY datum DESC LIMIT 1";
 
 		if($db->db_query($qry))
@@ -416,7 +416,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					lehre.tbl_abschlusspruefung
 					JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz)
 				WHERE
-					student_uid=".$db->db_add_param($uid_arr[$i])."
+					prestudent_id=".$db->db_add_param($row->prestudent_id)."
 				ORDER BY datum DESC LIMIT 1";
 
 		$sponsion_datum = date('d.m.Y');

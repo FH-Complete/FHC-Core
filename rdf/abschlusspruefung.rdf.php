@@ -87,13 +87,16 @@ function draw_content_xml($row)
 	//Nachnamen der Pruefer holden
 	$person = new person();
 	$mitarbeiter = new mitarbeiter();
-	$student= new student($row->student_uid);
-	$prestudent = new prestudent($student->prestudent_id);
+	$student= new student();
+	$uid = $student->getUid($row->prestudent_id);
+	$student->load($uid);
 
-	$nation=new nation($student->geburtsnation);
+	$prestudent = new prestudent($row->prestudent_id);
+
+	$nation=new nation($prestudent->geburtsnation);
 	$geburtsnation=$nation->kurztext;
 	$geburtsnation_engl=$nation->engltext;
-	$nation->load($student->staatsbuergerschaft);
+	$nation->load($prestudent->staatsbuergerschaft);
 	$staatsbuergerschaft=$nation->kurztext;
 	$staatsbuergerschaft_engl=$nation->engltext;
 
@@ -101,7 +104,7 @@ function draw_content_xml($row)
 	$akadgrad = new akadgrad($row->akadgrad_id);
 	$vorsitz_geschlecht = '';
 
-	if ($prestudent->getLastStatus($student->prestudent_id))
+	if ($prestudent->getLastStatus($prestudent->prestudent_id))
 	{
 		$studienplan_id = $prestudent->studienplan_id;
 		$studienordnung = new studienordnung();
@@ -370,7 +373,7 @@ if ($xmlformat=='rdf')
 		<RDF:li>
 			<RDF:Description id="'.$row->abschlusspruefung_id.'"  about="'.$rdf_url.'/'.$row->abschlusspruefung_id.'" >
 				<ABSCHLUSSPRUEFUNG:abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></ABSCHLUSSPRUEFUNG:abschlusspruefung_id>
-				<ABSCHLUSSPRUEFUNG:student_uid><![CDATA['.$row->student_uid.']]></ABSCHLUSSPRUEFUNG:student_uid>
+				<ABSCHLUSSPRUEFUNG:prestudent_id><![CDATA['.$row->prestudent_id.']]></ABSCHLUSSPRUEFUNG:prestudent_id>
 				<ABSCHLUSSPRUEFUNG:vorsitz><![CDATA['.$row->vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz>
 				<ABSCHLUSSPRUEFUNG:vorsitz_nachname><![CDATA['.$vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz_nachname>
 				<ABSCHLUSSPRUEFUNG:pruefer1><![CDATA['.$row->pruefer1.']]></ABSCHLUSSPRUEFUNG:pruefer1>
@@ -409,9 +412,9 @@ if ($xmlformat=='rdf')
 		<RDF:Seq about="'.$rdf_url.'/liste">
 	';
 
-	if(isset($_GET['student_uid']))
+	if(isset($_GET['prestudent_id']))
 	{
-		$pruefung->getAbschlusspruefungen($_GET['student_uid']);
+		$pruefung->getAbschlusspruefungen($_GET['prestudent_id']);
 
 		foreach ($pruefung->result as $row)
 			draw_content($row);
@@ -436,16 +439,16 @@ elseif ($xmlformat=='xml')
 	$pruefung = new abschlusspruefung();
 	echo "\n<abschlusspruefung>\n";
 
-	if(isset($_GET['uid']))
+	if(isset($_GET['prestudent_ids']))
 	{
-		$uids = explode(';',$_GET['uid']);
+		$prestudent_ids = explode(';',$_GET['prestudent_ids']);
 
-		foreach ($uids as $uid)
+		foreach ($prestudent_ids as $prestudent_id)
 		{
-			if($uid!='')
+			if($prestudent_id!='')
 			{
 				$pruefung = new abschlusspruefung();
-				if($pruefung->getAbschlusspruefungen($uid))
+				if($pruefung->getAbschlusspruefungen($prestudent_id))
 				{
 					foreach ($pruefung->result as $row)
 						draw_content_xml($row);
@@ -453,9 +456,9 @@ elseif ($xmlformat=='xml')
 			}
 		}
 	}
-	elseif(isset($_GET['student_uid']))
+	elseif(isset($_GET['prestudent_id']))
 	{
-		$pruefung->getAbschlusspruefungen($_GET['student_uid']);
+		$pruefung->getAbschlusspruefungen($_GET['prestudent_id']);
 
 		foreach ($pruefung->result as $row)
 			draw_content_xml($row);
@@ -468,7 +471,7 @@ elseif ($xmlformat=='xml')
 			die('Eintrag wurde nicht gefunden');
 	}
 	else
-		die('Student_uid oder Abschlusspruefung_id muss uebergeben werden');
+		die('Prestudent_id oder Abschlusspruefung_id muss uebergeben werden');
 
 	echo "\n</abschlusspruefung>";
 }

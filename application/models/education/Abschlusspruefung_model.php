@@ -34,8 +34,9 @@ class Abschlusspruefung_model extends DB_Model
 								zweitprueferpers.vorname AS vorname_zweitpruefer, zweitprueferpers.nachname AS nachname_zweitpruefer, zweitprueferpers.titelpre AS titelpre_zweitpruefer, zweitprueferpers.titelpost AS titelpost_zweitpruefer 
 								');
 		$this->addJoin('lehre.tbl_abschlusspruefung_antritt', 'pruefungsantritt_kurzbz', 'LEFT');
-		$this->addJoin('public.tbl_benutzer studentben', 'tbl_abschlusspruefung.student_uid = studentben.uid');
-		$this->addJoin('public.tbl_person studentpers', 'studentben.person_id = studentpers.person_id');
+		$this->addJoin('public.tbl_prestudent prestudent', 'tbl_abschlusspruefung.prestudent_id = prestudent.prestudent_id');
+		$this->addJoin('public.tbl_person studentpers', 'prestudent.person_id = studentpers.person_id');
+		$this->addJoin('public.tbl_benutzer studentben', 'studentpers.person_id = studentben.person_id');
 		$this->addJoin('public.tbl_student', 'studentben.uid = tbl_student.student_uid');
 		$this->addJoin('public.tbl_benutzer vorsitzenderben', 'vorsitz = vorsitzenderben.uid', 'LEFT');
 		$this->addJoin('public.tbl_person vorsitzenderpers', 'vorsitzenderben.person_id = vorsitzenderpers.person_id', 'LEFT');

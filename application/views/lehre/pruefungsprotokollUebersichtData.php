@@ -11,10 +11,9 @@ SELECT
 	tbl_abschlusspruefung.freigabedatum
 FROM
 	lehre.tbl_abschlusspruefung
-	JOIN public.tbl_student USING(student_uid)
-	JOIN public.tbl_benutzer ON(student_uid=uid)
+	JOIN public.tbl_prestudent USING(prestudent_id)
 	JOIN public.tbl_person USING(person_id)
-	JOIN public.tbl_studiengang ON(tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
+	JOIN public.tbl_studiengang ON(tbl_studiengang.studiengang_kz=tbl_prestudent.studiengang_kz)
 	JOIN public.tbl_studiengangstyp USING(typ)
 WHERE
 	vorsitz='".$UID."'

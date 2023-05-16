@@ -1328,7 +1328,7 @@ function GenerateXMLStudentBlock($row)
 	//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
 	if($aktstatus=='Absolvent' && !$gemeinsamestudien)
 	{
-		$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid=".$db->db_add_param($row->student_uid)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
+		$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
 		if($result_ap = $db->db_query($qry_ap))
 		{
 			$ap=0;

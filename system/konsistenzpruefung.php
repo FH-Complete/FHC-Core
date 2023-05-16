@@ -618,7 +618,7 @@ $qry = "SELECT
 		WHERE
 			tbl_student.studiengang_kz<1000 AND tbl_student.studiengang_kz>0
 			AND EXISTS (SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Absolvent' AND prestudent_id=tbl_student.prestudent_id)
-			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_abschlusspruefung WHERE student_uid=tbl_student.student_uid)";
+			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_abschlusspruefung WHERE tbl_abschlusspruefung.prestudent_id = tbl_prestudent.prestudent_id)";
 
 if($result = $db->db_query($qry))
 {

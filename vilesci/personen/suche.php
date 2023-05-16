@@ -965,7 +965,7 @@ function casDeletePrestudent($db, $prestudent_id, $trans=true)
 	{
 		$qry = '
 			DELETE FROM lehre.tbl_abschlusspruefung
-				WHERE student_uid IN (SELECT student_uid FROM public.tbl_student WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).')';
+				WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).')';
 		if(!$db->db_query($qry))
 			$error = true;
 	}
