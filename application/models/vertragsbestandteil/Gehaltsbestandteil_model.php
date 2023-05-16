@@ -28,7 +28,7 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
     }
 
     public function getCurrentGBTByDV($dienstverhaeltnis_id)
-    {
+    {/*
 		$qry = "
         SELECT
             gehaltsbestandteil_id,
@@ -39,12 +39,30 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
             gehaltstyp_kurzbz,
             valorisierungssperre,
             gbt.valorisierung,
-            grundbetrag,
-            betrag_valorisiert,
+            grundbetrag as grund_betrag_decrypted,
+            betrag_valorisiert as betrag_val_decrypted,
             gt.bezeichnung as gehaltstyp_bezeichnung
         FROM hr.tbl_gehaltsbestandteil gbt JOIN hr.tbl_gehaltstyp gt using(gehaltstyp_kurzbz)
         WHERE gbt.dienstverhaeltnis_id=? AND
             (gbt.von<=CURRENT_DATE::text::date and (gbt.bis is null OR gbt.bis>=CURRENT_DATE::text::date))
+        ORDER BY gt.sort
+        "; */
+
+		$qry = "
+        SELECT
+            gehaltsbestandteil_id,
+            von,
+            bis,
+            anmerkung,
+            dienstverhaeltnis_id,
+            gehaltstyp_kurzbz,
+            valorisierungssperre,
+            gbt.valorisierung,
+            grundbetrag as grund_betrag_decrypted,
+            betrag_valorisiert as betrag_val_decrypted,
+            gt.bezeichnung as gehaltstyp_bezeichnung
+        FROM hr.tbl_gehaltsbestandteil gbt JOIN hr.tbl_gehaltstyp gt using(gehaltstyp_kurzbz)
+        WHERE gbt.dienstverhaeltnis_id=? 
         ORDER BY gt.sort
         ";
 

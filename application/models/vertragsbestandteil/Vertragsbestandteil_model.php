@@ -17,6 +17,48 @@ class Vertragsbestandteil_model extends DB_Model
 		$this->pk = 'vertragsbestandteil_id';
 	}
 
+	protected function getVertragsbestandteilSQL()
+	{
+		$sql = <<<EOSQL
+		SELECT
+				v.*,
+				bf.funktion_kurzbz, funktion.beschreibung funktion_bezeichnung,
+				oe.oe_kurzbz, oe.bezeichnung oe_bezeichnung, sap.oe_kurzbz_sap,
+				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung,
+				f.benutzerfunktion_id,
+				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin,
+				kf.arbeitgeber_frist, kf.arbeitnehmer_frist,
+				s.wochenstunden, s.teilzeittyp_kurzbz,
+				u.tage,
+				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice
+			FROM
+				hr.tbl_vertragsbestandteil v
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_freitext ft USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_funktion f USING(vertragsbestandteil_id)
+			LEFT JOIN 
+				public.tbl_benutzerfunktion bf USING(benutzerfunktion_id)
+			LEFT JOIN
+				public.tbl_funktion funktion USING(funktion_kurzbz)
+			LEFT JOIN
+				public.tbl_organisationseinheit oe USING(oe_kurzbz)
+			LEFT JOIN
+				sync.tbl_sap_organisationsstruktur sap USING(oe_kurzbz)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_karenz k USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_kuendigungsfrist kf USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_urlaubsanspruch u USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_zeitaufzeichnung z USING(vertragsbestandteil_id)
+EOSQL;
+		return $sql;
+	}
+
 	public function getVertragsbestandteile($dienstverhaeltnis_id=1, $stichtag=null)
 	{
 		$stichtagclause = '';
@@ -29,31 +71,7 @@ class Vertragsbestandteil_model extends DB_Model
 		}
 
 		$sql = <<<EOSQL
-			SELECT
-				v.*, 
-				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung, 
-				f.benutzerfunktion_id, 
-				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin, 
-				kf.arbeitgeber_frist, kf.arbeitnehmer_frist, 
-				s.wochenstunden, s.teilzeittyp_kurzbz, 
-				u.tage, 
-				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice				
-			FROM
-				hr.tbl_vertragsbestandteil v
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_freitext ft USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_funktion f USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_karenz k USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_kuendigungsfrist kf USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_urlaubsanspruch u USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_zeitaufzeichnung z USING(vertragsbestandteil_id)
+			{$this->getVertragsbestandteilSQL()}
 			WHERE
 				v.dienstverhaeltnis_id = {$this->escape($dienstverhaeltnis_id)}
 				{$stichtagclause}
@@ -61,10 +79,16 @@ class Vertragsbestandteil_model extends DB_Model
 EOSQL;
 
 		// echo $sql . "\n\n";
-		$query = $this->db->query($sql);   // TODO add decryption
+		$query = $this->execReadOnlyQuery($sql);   // TODO add decryption
+		$data = getData($query);
+
+		if ($data == null)
+		{
+			return array();
+		}
 
 		$vertragsbestandteile = array();
-		foreach( $query->result() as $row ) {
+		foreach( $data as $row ) {
 			try
 			{
 				$vertragsbestandteile[] = VertragsbestandteilFactory::getVertragsbestandteil($row);
@@ -75,6 +99,7 @@ EOSQL;
 			}
 		}
 
+		$dummy = json_encode($vertragsbestandteile);
 		return $vertragsbestandteile;
 	}
 
@@ -83,31 +108,7 @@ EOSQL;
 	{	
 
 		$sql = <<<EOSQL
-			SELECT
-				v.*, 
-				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung, 
-				f.benutzerfunktion_id, 
-				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin, 
-				kf.arbeitgeber_frist, kf.arbeitnehmer_frist, 
-				s.wochenstunden, s.teilzeittyp_kurzbz, 
-				u.tage, 
-				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice				
-			FROM
-				hr.tbl_vertragsbestandteil v
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_freitext ft USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_funktion f USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_karenz k USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_kuendigungsfrist kf USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_stunden s USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_urlaubsanspruch u USING(vertragsbestandteil_id)
-			LEFT JOIN
-				hr.tbl_vertragsbestandteil_zeitaufzeichnung z USING(vertragsbestandteil_id)
+			{$this->getVertragsbestandteilSQL()}
 			WHERE
 				v.vertragsbestandteil_id = {$this->escape($id)}
 			;

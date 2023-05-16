@@ -73,8 +73,11 @@ EOTXT;
 	{
 		parent::hydrateByStdClass($data);
 		isset($data->benutzerfunktionid) && $this->setBenutzerfunktion_id($data->benutzerfunktionid);
+		isset($data->benutzerfunktion_id) && $this->setBenutzerfunktion_id($data->benutzerfunktion_id);
 		isset($data->funktion) && isset($data->orget) 
 			&& isset($data->mitarbeiter_uid) && $this->createBenutzerfunktionData($data);
+		isset($data->funktion_bezeichnung) && isset($data->oe_bezeichnung) 
+			&& $this->createBenutzerfunktionData4Display($data);
 		
 	}
 	
@@ -104,6 +107,22 @@ EOTXT;
 			'datum_bis' => $this->getBis(),
 			'insertamum' => strftime('%Y-%m-%d %H:%M:%S'),
 			'insertvon' => getAuthUID()
+		);
+	}
+
+	protected function createBenutzerfunktionData4Display($data)
+	{
+		if( empty($data->funktion_bezeichnung) || empty($data->oe_bezeichnung) ) 
+		{
+			return;
+		}
+		
+		$this->benutzerfunktiondata = (object) array(
+			'funktion_kurzbz' => $data->funktion_kurzbz,
+			'funktion_bezeichnung' => $data->funktion_bezeichnung,
+			'oe_kurzbz' => $data->oe_kurzbz,
+			'oe_bezeichnung' => $data->oe_bezeichnung,
+			'oe_kurzbz_sap' => $data->oe_kurzbz_sap
 		);
 	}
 	
