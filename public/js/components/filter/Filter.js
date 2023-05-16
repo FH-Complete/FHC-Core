@@ -18,6 +18,8 @@
 import {CoreFilterAPIs} from './API.js';
 import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
+import FilterConfig from './Filter/Config.js';
+import FilterColumns from './Filter/Columns.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -29,10 +31,14 @@ var _uuid = 0;
  *
  */
 export const CoreFilterCmpt = {
-	emits: ['nwNewEntry'],
 	components: {
-		CoreFetchCmpt
+		CoreFetchCmpt,
+		FilterConfig,
+		FilterColumns
 	},
+	emits: [
+		'nwNewEntry'
+	],
 	props: {
 		title: String,
 		sideMenu: {
@@ -135,19 +141,16 @@ export const CoreFilterCmpt = {
 			if (!this.uuid)
 				return '';
 			return '-' + this.uuid;
+		},
+		columnsForFilter() {
+			if (!this.filteredColumns || !this.datasetMetadata)
+				return [];
+			const filterTitles = this.filteredColumns.reduce((a,c) => {
+				a[c.field] = c.title;
+				return a;
+			}, {});
+			return this.datasetMetadata.map(el => ({...el, ...{title: filterTitles[el.name]}}));
 		}
-	},
-	beforeCreate() {
-		if (!this.tableOnly == !this.filterType)
-			alert('You can not have a filter-type in table-only mode!');
-	},
-	created() {
-		this.uuid = _uuid++;
-		if (!this.tableOnly)
-			this.getFilter(); // get the filter data
-	},
-	mounted() {
-		this.initTabulator();
 	},
 	methods: {
 		initTabulator() {
@@ -230,7 +233,7 @@ export const CoreFilterCmpt = {
 							filter.type = data.datasetMetadata[i].type;
 
 							this.filterFields.push(filter);
-							break;
+							//break;
 						}
 					}
 				}
@@ -266,6 +269,7 @@ export const CoreFilterCmpt = {
 				if (link == null) link = '#';
 
 				filtersArray[filtersArray.length] = {
+					id: filters[filtersCount].filter_id,
 					link: link + filters[filtersCount].filter_id,
 					description: filters[filtersCount].desc,
 					sort: filtersCount,
@@ -280,6 +284,7 @@ export const CoreFilterCmpt = {
 				if (link == null) link = '#';
 
 				filtersArray[filtersArray.length] = {
+					id: personalFilters[filtersCount].filter_id,
 					link: link + personalFilters[filtersCount].filter_id,
 					description: personalFilters[filtersCount].desc,
 					subscriptDescription: personalFilters[filtersCount].subscriptDescription,
@@ -318,6 +323,7 @@ export const CoreFilterCmpt = {
 				if (link == null) link = '#';
 
 				filtersArray[filtersArray.length] = {
+					id: filters[filtersCount].filter_id,
 					option: filters[filtersCount].filter_id,
 					description: filters[filtersCount].desc
 				};
@@ -330,6 +336,7 @@ export const CoreFilterCmpt = {
 				if (link == null) link = '#';
 
 				filtersArray[filtersArray.length] = {
+					id: personalFilters[filtersCount].filter_id,
 					option: personalFilters[filtersCount].filter_id,
 					description: personalFilters[filtersCount].desc
 				};
@@ -366,12 +373,12 @@ export const CoreFilterCmpt = {
 		/**
 		 *
 		 */
-		handlerSaveCustomFilter: function(event) {
+		handlerSaveCustomFilter: function(customFilterName) {
 			//
 			this.startFetchCmpt(
 				CoreFilterAPIs.saveCustomFilter,
 				{
-					customFilterName: this.$refscustomFilterName.value
+					customFilterName
 				},
 				this.getFilter
 			);
@@ -389,148 +396,8 @@ export const CoreFilterCmpt = {
 				this.getFilter
 			);
 		},
-		/**
-		 *
-		 */
-		handlerApplyFilterFields: function(event) {
-			let filterFields = [];
-			let filterFieldDivRows = document.getElementById('filterFields').getElementsByClassName('row');
 
-			for (let i = 0; i< filterFieldDivRows.length; i++)
-			{
-				let filterField = {};
-
-				for (let j = 0; j< filterFieldDivRows[i].children.length; j++)
-				{
-					let filterColumn = filterFieldDivRows[i].children[j];
-					let filterColumnElement = filterColumn.children[0];
-
-					// If the first column then search for the fields dropdown
-					if (j == 0) filterColumnElement = filterColumnElement.querySelector('select[name=fieldName]');
-
-					// If the filter name is _not_ null and it is _not_ a new filter
-					if (filterColumnElement.name != null && filterColumnElement.name != FILTER_COMPONENT_NEW_FILTER)
-					{
-						// Condition
-						if (filterColumnElement.name == 'condition' && filterColumnElement.value == "")
-						{
-							alert("Please fill all the filter options");
-							return;
-						}
-
-						// Name
-						if (filterColumnElement.name == 'fieldName')
-						{
-							filterField.name = filterColumnElement.value;
-						}
-						// Operation
-						if (filterColumnElement.name == 'operation')
-						{
-							filterField.operation = filterColumnElement.value;
-						}
-						// Condition
-						if (filterColumnElement.name == 'condition')
-						{
-							filterField.condition = filterColumnElement.value;
-						}
-						// Option
-						if (filterColumnElement.name == 'option')
-						{
-							filterField.option = filterColumnElement.value;
-						}
-					}
-				}
-
-				if (Object.entries(filterField).length > 0) filterFields.push(filterField);
-			}
-
-			//
-			this.startFetchCmpt(
-				CoreFilterAPIs.applyFilterFields,
-				{
-					filterFields: filterFields
-				},
-				this.getFilter
-			);
-		},
-		/**
-		 *
-		 */
-		handlerChangeFilterField: function(oldValue, newValue) {
-
-			// If an old filter has been changed
-			if (oldValue != "")
-			{
-				for (let i = 0; i < this.filterFields.length; i++)
-				{
-					if (this.filterFields[i].name == oldValue)
-					{
-						this.filterFields.splice(i, 1);
-						break;
-					}
-				}
-			}
-
-			// Then add the new filter
-			for (let i = 0; i < this.datasetMetadata.length; i++)
-			{
-				if (this.datasetMetadata[i].name == newValue)
-				{
-					let filter = {
-						name: this.datasetMetadata[i].name,
-						type: this.datasetMetadata[i].type
-					};
-
-					this.filterFields.push(filter);
-					break;
-				}
-			}
-		},
-		/**
-		 *
-		 */
-		handlerAddNewFilter: function(event) {
-			// Adds a new empty filter
-			this.filterFields.push({
-				name: FILTER_COMPONENT_NEW_FILTER,
-				type: FILTER_COMPONENT_NEW_FILTER_TYPE
-			});
-		},
 		/*
-		 *
-		 */
-		handlerToggleSelectedField(field) {
-
-			// If it is a selected field
-			if (this.selectedFields.indexOf(field) != -1)
-			{
-				// then hide it
-				this.tabulator.hideColumn(field);
-				// and remove it from the this.selectedFields property
-				this.selectedFields.splice(this.selectedFields.indexOf(field), 1);
-			}
-			else // otherwise
-			{
-				// show it
-				this.tabulator.showColumn(field);
-				// and add it to the this.selectedFields property
-				this.selectedFields.push(field);
-			}
-		},
-		/**
-		 *
-		 */
-		handlerRemoveFilterField: function(event) {
-			//
-			this.startFetchCmpt(
-				CoreFilterAPIs.removeFilterField,
-				{
-					filterField: event.currentTarget.getAttribute('field-to-remove')
-				},
-				this.getFilter
-			);
-		},
-		/**
 		 *
 		 */
 		handlerGetFilterById: function(event) {
@@ -550,15 +417,39 @@ export const CoreFilterCmpt = {
 				filterId = attr.substring(1);
 			}
 
+			this.switchFilter(filterId);
+		},
+		switchFilter(filterId) {
 			// Ajax call
 			this.startFetchCmpt(
 				CoreFilterAPIs.getFilterById,
 				{
-					filterId: filterId
+					filterId
 				},
 				this.render
 			);
+		},
+		applyFilterConfig(filterFields) {
+			this.startFetchCmpt(
+				CoreFilterAPIs.applyFilterFields,
+				{
+					filterFields
+				},
+				this.getFilter
+			);
 		}
+	},
+	beforeCreate() {
+		if (!this.tableOnly == !this.filterType)
+			alert('You can not have a filter-type in table-only mode!');
+	},
+	created() {
+		this.uuid = _uuid++;
+		if (!this.tableOnly)
+			this.getFilter(); // get the filter data
+	},
+	mounted() {
+		this.initTabulator();
 	},
 	template: `
 		<!-- Load filter data -->
@@ -586,172 +477,29 @@ export const CoreFilterCmpt = {
 				<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
 			</div>
 
-			<div :id="'collapseColumns' + idExtra" class="card-body collapse" :data-bs-parent="'#filterCollapsables' + idExtra">
-				<div class="card">
-					<!-- Filter fields options -->
-					<div class="row card-body filter-options-div">
-						<div class="filter-fields-area">
-							<template v-for="fieldToDisplay in fields">
-								<div
-									class="filter-fields-field"
-									v-bind:class="selectedFields.indexOf(fieldToDisplay) != -1 ? 'text-light bg-dark' : '' "
-									@click="handlerToggleSelectedField(fieldToDisplay)"
-								>
-									{{ fieldNames[fieldToDisplay] || fieldToDisplay }}
-								</div>
-							</template>
-						</div>
-					</div>
-				</div>
-			</div>
+			<filter-columns
+				:id="'collapseColumns' + idExtra"
+				class="card-body collapse"
+				:data-bs-parent="'#filterCollapsables' + idExtra"
+				:fields="fields"
+				:selected="selectedFields"
+				:names="fieldNames"
+				@hide="tabulator.hideColumn($event)"
+				@show="tabulator.showColumn($event)"
+			></filter-columns>
 
-			<div v-if="!tableOnly" :id="'collapseFilters' + idExtra" class="card-body collapse" :data-bs-parent="'#filterCollapsables' + idExtra">
-				<div class="card">
-				<!-- Filter options -->
-					<div class="card-body" v-if="!sideMenu">
-						<select
-							class="form-select"
-							@change="handlerGetFilterById"
-						>
-							<option value="">Bitte auswählen...</option>
-							<template v-for="availableFilter in availableFilters">
-								<option v-bind:value="availableFilter.option">{{ availableFilter.description }}</option>
-							</template>
-						</select>
-					</div>
-					<div class="card-body filter-options-div">
-						<div>
-							<span>
-								Neuer Filter
-							</span>
-							<span>
-								<button class="btn btn-outline-dark" type="button" @click=handlerAddNewFilter>+</button>
-							</span>
-						</div>
-						<div :id="'filterFields' + idExtra" class="filter-filter-fields">
-							<template v-for="(filterField, index) in filterFields">
-								<div class="row">
-
-									<div class="col-5">
-										<div class="input-group">
-											<span class="input-group-text">Filter {{ index + 1 }}</span>
-											<select
-												class="form-select"
-												name="fieldName"
-												v-bind:value="filterField.name"
-												@change="handlerChangeFilterField(filterField.name, $event.target.value)"
-											>
-												<option value="">Feld zum Filter hinzufügen...</option>
-												<template v-for="columnAlias in filteredColumns">
-													<option v-bind:value="columnAlias.field">{{ columnAlias.title }}</option>
-												</template>
-											</select>
-										</div>
-									</div>
-
-									<!-- Numeric -->
-									<template
-										v-if="filterField.type.toLowerCase().indexOf('int') >= 0">
-										<div class="col-2">
-											<select class="form-select" name="operation" v-model="filterField.operation">
-												<option value="equal">Gleich</option>
-												<option value="nequal">Nicht gleich</option>
-												<option value="gt">Größer als</option>
-												<option value="lt">Weniger als</option>
-											</select>
-										</div>
-										<div class="col-3">
-											<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
-										</div>
-										<div class="col">
-											<button
-												class="btn btn-outline-dark"
-												type="button"
-												v-bind:field-to-remove="filterField.name"
-												@click=handlerRemoveFilterField>
-												&emsp;X&emsp;
-											</button>
-										</div>
-									</template>
-
-									<!-- Text -->
-									<template
-										v-if="filterField.type.toLowerCase().indexOf('varchar') >= 0
-											|| filterField.type.toLowerCase().indexOf('text') >= 0
-											|| filterField.type.toLowerCase().indexOf('bpchar') >= 0">
-										<div class="col-2">
-											<select class="form-select" name="operation" v-model="filterField.operation">
-												<option value="equal">Gleich</option>
-												<option value="nequal">Nicht gleich</option>
-												<option value="contains">Enthält</option>
-												<option value="ncontains">Enthält nicht</option>
-											</select>
-										</div>
-										<div class="col-3">
-											<input type="text" class="form-control" v-bind:value="filterField.condition" name="condition">
-										</div>
-										<div class="col">
-											<button
-												class="btn btn-outline-dark"
-												type="button"
-												v-bind:field-to-remove="filterField.name"
-												@click=handlerRemoveFilterField>
-												&emsp;X&emsp;
-											</button>
-										</div>
-									</template>
-
-									<!-- Timestamp and date -->
-									<template
-										v-if="filterField.type.toLowerCase().indexOf('timestamp') >= 0
-											|| filterField.type.toLowerCase().indexOf('date') >= 0">
-										<div class="col-2">
-											<select class="form-select" name="operation" v-model="filterField.operation">
-												<option value="gt">Größer als</option>
-												<option value="lt">Weniger als</option>
-												<option value="set">Eingestellt ist</option>
-												<option value="nset">Eingestellt nicht ist</option>
-											</select>
-										</div>
-										<div class="col-1">
-											<input type="number" class="form-control" v-bind:value="filterField.condition" name="condition">
-										</div>
-										<div class="col-2">
-											<select class="form-select" name="option" v-model="filterField.option">
-												<option value="minutes">Minuten</option>
-												<option value="hours">Stunden</option>
-												<option value="days">Tage</option>
-												<option value="months">Monate</option>
-											</select>
-										</div>
-										<div class="col">
-											<button
-												class="btn btn-outline-dark"
-												type="button"
-												v-bind:field-to-remove="filterField.name"
-												@click=handlerRemoveFilterField
-											> - </button>
-										</div>
-									</template>
-								</div>
-							</template>
-						</div>
-
-						<!-- Filter save options -->
-						<div class="row">
-							<div class="col-7">
-								<div class="input-group">
-									<input ref="customFilterName" type="text" class="form-control" placeholder="Filternamen eingeben..." :id="'customFilterName' + idExtra">
-									<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Filter speichern</button>
-								</div>
-							</div>
-							<div class="col">
-								<button type="button" class="btn btn-outline-dark" @click=handlerApplyFilterFields>Filter anwenden</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<filter-config
+				v-if="!tableOnly"
+				:id="'collapseFilters' + idExtra"
+				class="card-body collapse"
+				:data-bs-parent="'#filterCollapsables' + idExtra"
+				:filters="!sideMenu ? (availableFilters || []) : []"
+				:columns="columnsForFilter"
+				:fields="filterFields || []"
+				@switch-filter="switchFilter"
+				@apply-filter-config="applyFilterConfig"
+				@save-custom-filter="handlerSaveCustomFilter"
+			></filter-config>
 		</div>
 
 		<!-- Tabulator -->
