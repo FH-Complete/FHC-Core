@@ -38,7 +38,7 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
             dienstverhaeltnis_id,
             gehaltstyp_kurzbz,
             valorisierungssperre,
-            valorisieren,
+            gbt.valorisierung,
             grundbetrag,
             betrag_valorisiert,
             gt.bezeichnung as gehaltstyp_bezeichnung
