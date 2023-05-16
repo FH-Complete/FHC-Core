@@ -35,11 +35,11 @@ export default {
 			default: []
 		}
 	},
-	emits: [
-		'switchFilter',
-		'applyFilterConfig',
-		'saveCustomFilter'
-	],
+	emits: {
+		switchFilter: ['filterId'],
+		applyFilterConfig: ['filterFields'],
+		saveCustomFilter: ['customFilterName']
+	},
 	data: function() {
 		return {
 			currentFields: []

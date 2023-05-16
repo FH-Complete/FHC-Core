@@ -30,10 +30,10 @@ export default {
 			default: []
 		}
 	},
-	emits: [
-		'hide',
-		'show'
-	],
+	emits: {
+		hide: ['fieldName'],
+		show: ['fieldName']
+	},
 	data: function() {
 		return {
 			selectedFields: []
