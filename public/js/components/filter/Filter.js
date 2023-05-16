@@ -40,6 +40,7 @@ export const CoreFilterCmpt = {
 		'nwNewEntry'
 	],
 	props: {
+		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
 		title: String,
 		sideMenu: {
 			type: Boolean,
@@ -444,6 +445,8 @@ export const CoreFilterCmpt = {
 			alert('You can not have a filter-type in table-only mode!');
 	},
 	created() {
+		if (this.sideMenu && (!this.$props.onNwNewEntry || !(this.$props.onNwNewEntry instanceof Function)))
+			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
 		if (!this.tableOnly)
 			this.getFilter(); // get the filter data
@@ -451,7 +454,7 @@ export const CoreFilterCmpt = {
 	mounted() {
 		this.initTabulator();
 	},
-	template: `
+	template: `{{$attrs}}
 		<!-- Load filter data -->
 		<core-fetch-cmpt
 			v-if="!tableOnly"
