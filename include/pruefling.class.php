@@ -557,5 +557,31 @@ class pruefling extends basis_db
 			return false;
 		}
 	}
+	
+	public function isGesperrt($pruefling_id)
+	{
+		$qry = "SELECT spruefling.gesperrt
+				FROM testtool.tbl_pruefling
+				JOIN public.tbl_prestudent USING(prestudent_id)
+				JOIN public.tbl_person USING (person_id)
+				JOIN public.tbl_prestudent pss ON pss.person_id = tbl_person.person_id
+				JOIN testtool.tbl_pruefling spruefling ON pss.prestudent_id = spruefling.prestudent_id
+				WHERE tbl_pruefling.pruefling_id = ".$this->db_add_param($pruefling_id, FHC_INTEGER)."
+					AND spruefling.gesperrt
+				LIMIT 1";
+		
+		if($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) == 0)
+				return false;
+			else
+				return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
 }
 ?>
