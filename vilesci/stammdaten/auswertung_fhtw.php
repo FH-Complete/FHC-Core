@@ -2515,6 +2515,7 @@ else
 							$("#msgbox").attr("class","alert alert-warning");
 							$("#msgbox").show();
 							$("#msgbox").html(data["msg"]);
+							$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
 						}
 						else
 						{
