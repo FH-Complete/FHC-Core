@@ -490,22 +490,58 @@ if ($rtprueflingEntSperren)
 		exit();
 	}
 
-	if (isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id'])
+	if (isset($_POST['person_id']) && is_numeric($_POST['person_id'])
 		&& isset($_POST['art']))
 	{
-		$qry = "UPDATE testtool.tbl_pruefling SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
-				WHERE prestudent_id IN 
-						(SELECT prestudent_id FROM public.tbl_prestudent ps
-							JOIN public.tbl_person tp ON tp.person_id = ps.person_id 
-							WHERE tp.person_id = (SELECT person_id FROM public.tbl_prestudent sps WHERE sps.prestudent_id = " . $db->db_add_param($_POST['prestudent_id']) . "));";
+		$qry = "SELECT pruefling_id
+				FROM testtool.tbl_pruefling
+				WHERE prestudent_id IN (
+					SELECT prestudent_id
+					FROM public.tbl_prestudent
+						WHERE person_id = ". $db->db_add_param($_POST['person_id']) . "
+				)";
 
+		
 		if ($result = $db->db_query($qry))
 		{
-			$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
-			echo json_encode(array(
-				'status' => 'ok',
-				'msg' => $msg));
-			exit();
+			
+			if ($db->db_num_rows($result) === 0)
+			{
+				echo json_encode(array(
+					'status' => 'warning',
+					'msg' => 'Kein Pruefling gefunden!'
+				));
+				exit();
+			}
+			else
+			{
+				$pruefling_ids = array();
+				while ($row = $db->db_fetch_object($result))
+				{
+					$pruefling_ids[] = $row->pruefling_id;
+				}
+				
+				
+				$qry = "UPDATE testtool.tbl_pruefling SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+						WHERE pruefling_id IN (" . $db->db_implode4SQL($pruefling_ids) . ")";
+				
+				if ($result_update = $db->db_query($qry))
+				{
+					$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+					echo json_encode(array(
+						'status' => 'ok',
+						'msg' => $msg));
+					exit();
+				}
+				else
+				{
+					echo json_encode(array(
+						'status' => 'fehler',
+						'msg' => 'Fehler beim speichern der Daten'
+					));
+					exit();
+				}
+			}
 		}
 		else
 		{
@@ -1650,6 +1686,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	}
 
 	$gebiete_arr = array();
+	$gesperrt_arr = array();
 	while ($row = $db->db_fetch_object($result))
 	{
 		// Hack für BEW-BB, wenn auch BEW-DL-Ergebnisse vorliegen
@@ -1666,7 +1703,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			$ergebnis[$row->prestudent_id] = new stdClass();
 			$gebiete_arr[$row->prestudent_id] = array();
 		}
-
+		
+		if (!isset($gesperrt_arr[$row->person_id]))
+			$gesperrt_arr[$row->person_id] = new stdClass();
+		
 		$ergebnis[$row->prestudent_id]->prestudent_id = $row->prestudent_id;
 		$ergebnis[$row->prestudent_id]->person_id = $row->person_id;
 		$ergebnis[$row->prestudent_id]->reihungstest_id = $row->reihungstest_id;
@@ -1678,7 +1718,6 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->geschlecht = $row->geschlecht;
 		$ergebnis[$row->prestudent_id]->idnachweis = $row->idnachweis;
 		$ergebnis[$row->prestudent_id]->registriert = $row->registriert;
-		$ergebnis[$row->prestudent_id]->gesperrt = $row->gesperrt;
 		$ergebnis[$row->prestudent_id]->stg_kurzbz = $row->stg_kurzbz;
 		$ergebnis[$row->prestudent_id]->stg_bez = $row->stg_bez;
 		$ergebnis[$row->prestudent_id]->ausbildungssemester = $row->ausbildungssemester;
@@ -1690,6 +1729,13 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->teilgenommen = $db->db_parse_bool($row->teilgenommen);
 		$ergebnis[$row->prestudent_id]->qualifikationskurs = $db->db_parse_bool($row->qualifikationskurs);
 		$ergebnis[$row->prestudent_id]->letzter_status = $row->letzter_status;
+		$ergebnis[$row->prestudent_id]->gesperrt = $row->gesperrt;
+
+		$gesperrt = $db->db_parse_bool($row->gesperrt);
+		if (!isset($gesperrt_arr[$row->person_id]->gesperrt) || ($gesperrt_arr[$row->person_id]->gesperrt !== true && $gesperrt === true))
+		{
+			$gesperrt_arr[$row->person_id]->gesperrt = $gesperrt;
+		}
 
 		if (!isset($ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]))
 		{
@@ -2440,7 +2486,7 @@ else
 			});
 		}
 	}
-	function prueflingEntSperren(prestudent_id, name, art)
+	function prueflingEntSperren(person_id, name, art)
 	{
 		if (art === true)
 			var text = "sperren";
@@ -2450,7 +2496,7 @@ else
 		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
 		{
 			data = {
-				prestudent_id: prestudent_id,
+				person_id: person_id,
 				art: art,
 				rtprueflingEntSperren: true
 			};
@@ -2464,21 +2510,30 @@ else
 				{
 					if(data.status !== "ok")
 					{
-						$("#msgbox").attr("class","alert alert-danger");
-						$("#msgbox").show();
-						$("#msgbox").html(data["msg"]);
+						if (data.status === "warning")
+						{
+							$("#msgbox").attr("class","alert alert-warning");
+							$("#msgbox").show();
+							$("#msgbox").html(data["msg"]);
+						}
+						else
+						{
+							$("#msgbox").attr("class","alert alert-danger");
+							$("#msgbox").show();
+							$("#msgbox").html(data["msg"]);
+						}
 					}
 					else
 					{
 						if (art === true)
 						{
-							$("#prueflingentsperren_" + prestudent_id).removeClass("hidden");
-							$("#prueflingsperren_" + prestudent_id).addClass("hidden");
+							$(".prueflingentsperren_" + person_id).removeClass("hidden");
+							$(".prueflingsperren_" + person_id).addClass("hidden");
 						}
 						else if (art === false)
 						{
-							$("#prueflingsperren_" + prestudent_id).removeClass("hidden");
-							$("#prueflingentsperren_" + prestudent_id).addClass("hidden");
+							$(".prueflingsperren_" + person_id).removeClass("hidden");
+							$(".prueflingentsperren_" + person_id).addClass("hidden");
 						}
 					}
 				},
@@ -3293,10 +3348,10 @@ else
 
 
 				echo "<td class='textcentered ".$inaktiv ."'>
-						<a href='#' id='prueflingsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt === 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
+						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
 							<span class='glyphicon glyphicon-remove'></span>
 						</a>
-						<a href='#' id='prueflingentsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt !== 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
+						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
 							<span class='glyphicon glyphicon-ok'></span>
 						</a>
 					</td>";
