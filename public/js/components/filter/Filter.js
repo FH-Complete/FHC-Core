@@ -20,6 +20,7 @@ import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
+import TableDownload from './Table/Download.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -34,7 +35,8 @@ export const CoreFilterCmpt = {
 	components: {
 		CoreFetchCmpt,
 		FilterConfig,
-		FilterColumns
+		FilterColumns,
+		TableDownload
 	},
 	emits: [
 		'nwNewEntry'
@@ -52,7 +54,11 @@ export const CoreFilterCmpt = {
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
-		tableOnly: Boolean
+		tableOnly: Boolean,
+		download: {
+			type: [Boolean, String, Function, Array, Object],
+			default: false
+		}
 	},
 	data: function() {
 		return {
@@ -454,7 +460,7 @@ export const CoreFilterCmpt = {
 	mounted() {
 		this.initTabulator();
 	},
-	template: `{{$attrs}}
+	template: `
 		<!-- Load filter data -->
 		<core-fetch-cmpt
 			v-if="!tableOnly"
@@ -478,6 +484,7 @@ export const CoreFilterCmpt = {
 				<span v-if="!tableOnly" class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
 				<span v-if="!tableOnly" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
 				<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
+				<table-download class="filter-header-title-span-icon fa-xl text-dark" :tabulator="tabulator" :config="download"></table-download>
 			</div>
 
 			<filter-columns
