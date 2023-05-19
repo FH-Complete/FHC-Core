@@ -104,6 +104,152 @@ $sprachen->getAll(true);
 
 $errormsg = '';
 
+// eingetragene lv-gesamtnoten freigeben
+if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
+{
+	// Passwort pruefen
+	if (checkldapuser($user, $_REQUEST['passwort']))
+	{
+		$jetzt = date("Y-m-d H:i:s");
+		$neuenoten = 0;
+
+		$studlist = "<table border='1'>
+		<tr>";
+
+		// entweder personenbezogene Daten einbinden
+		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+        {
+            $studlist .= "
+                <td><b>" . $p->t('global/personenkz') . "</b></td>
+                <td><b>" . $p->t('global/studiengang') . "</b></td>
+			    <td><b>" . $p->t('global/nachname') . "</b></td>
+			    <td><b>" . $p->t('global/vorname') . "</b></td>
+            ";
+
+            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+            {
+                $studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
+            }
+            $studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
+
+            $studlist .= "<td><b>" . $p->t('benotungstool/bearbeitetvon') . "</b></td></tr>\n";
+		}
+		// oder anonymisiert nur die UIDs einbinden
+		else
+		{
+			$studlist .= "
+                <td><b>" . $p->t('global/uid') . "</b></td></tr>\n
+            ";
+		}
+
+		// studentenquery
+		$qry_stud = "SELECT
+						DISTINCT uid, vorname, nachname, matrikelnr, kurzbzlang
+					FROM
+						campus.vw_student_lehrveranstaltung
+						JOIN campus.vw_student USING(uid)
+						JOIN public.tbl_studiengang ON campus.vw_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
+					WHERE
+						studiensemester_kurzbz = " . $db->db_add_param($stsem) . "
+						AND lehrveranstaltung_id = " . $db->db_add_param($lvid, FHC_INTEGER) . "
+					ORDER BY nachname, vorname ";
+		if ($result_stud = $db->db_query($qry_stud))
+		{
+			$i = 1;
+			while ($row_stud = $db->db_fetch_object($result_stud))
+			{
+				$lvgesamtnote = new lvgesamtnote();
+				if ($lvgesamtnote->load($lvid, $row_stud->uid, $stsem))
+				{
+					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
+					{
+						$lvgesamtnote->freigabedatum = $jetzt;
+						$lvgesamtnote->freigabevon_uid = $user;
+						$lvgesamtnote->save();
+
+						if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+						{
+							$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->kurzbzlang) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
+
+                            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+                            {
+                                $studlist .= "<td>";
+                                if ($lvgesamtnote->punkte != '')
+                                    $studlist .= trim(number_format($lvgesamtnote->punkte, 2));
+                                $studlist .= "</td>\n";
+                            }
+                            $studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
+
+                            $studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
+                            if ($lvgesamtnote->updatevon != '')
+                                $studlist .= " (" . $lvgesamtnote->updatevon . ")";
+                            $studlist .= "</td></tr>\n";
+						}
+						else
+						{
+							$studlist .= "<tr><td>" . trim($row_stud->uid) . "</td></tr>\n";
+						}
+
+						$neuenoten ++;
+					}
+				}
+			}
+		}
+
+		$studlist .= "</table>";
+
+		// mail an assistentin und den user selber verschicken
+		if ($neuenoten > 0)
+		{
+			$lv = new lehrveranstaltung($lvid);
+			$sg = new studiengang($lv->studiengang_kz);
+			$lektor_adresse = $user . "@" . DOMAIN;
+			$adressen = $sg->email . ", " . $user . "@" . DOMAIN;
+
+			$studienplan = new studienplan();
+			$studienplan->getStudienplanLehrveranstaltung($lvid, $stsem);
+			$studienplan_bezeichnung = '';
+			foreach ($studienplan->result as $row)
+				$studienplan_bezeichnung .= $row->bezeichnung . ' ';
+
+			$mit = new mitarbeiter();
+			$mit->load($user);
+			$name = $mit->anrede.' '.$mit->vorname.' '.$mit->nachname.' ('.$mit->kurzbz.')';
+
+			$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
+			$mail = new mail($adressen, 'vilesci@' . DOMAIN, $betreff, '');
+			$htmlcontent = "<html>
+				<body>
+					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
+					<b>" . $sg->kuerzel . ' ' . $lv->semester . '.Semester
+					' . $lv->bezeichnung . " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
+					<br>eingetragen.\n<br><br>
+					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
+
+            $htmlcontent .= $studlist;
+
+			$htmlcontent.= "
+					<br>Anzahl der Noten:" . $neuenoten . "
+					<br><br>" . $p->t('abgabetool/mailVerschicktAn') . ": " . $adressen . "
+				</body></html>";
+			$mail->setHTMLContent($htmlcontent);
+			$mail->setReplyTo($lektor_adresse);
+			$mail->send();
+		}
+
+		http_response_code(303);
+		header('Location: ' . $_SERVER['REQUEST_URI']);
+		exit;
+	}
+	else
+	{
+		$errormsg = $p->t('gesamtnote/passwortFalsch');
+	}
+}
+
 echo '<!DOCTYPE HTML>
 <html>
 <head>
@@ -924,148 +1070,6 @@ if (defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && CIS_ANWESENHEITSLIST
 {
 	$hrefpath = "../notenliste.xls.php?stg=$stg_obj->studiengang_kz&lvid=$lvid&stsem=$stsem";
 	echo "<br><a class='Item' href='" . $hrefpath . "'>" . $p->t('benotungstool/notenlisteImport') . "</a>";
-}
-
-// eingetragene lv-gesamtnoten freigeben
-if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
-{
-	// Passwort pruefen
-	if (checkldapuser($user, $_REQUEST['passwort']))
-	{
-		$jetzt = date("Y-m-d H:i:s");
-		$neuenoten = 0;
-
-		$studlist = "<table border='1'>
-		<tr>";
-
-		// entweder personenbezogene Daten einbinden
-		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
-        {
-            $studlist .= "
-                <td><b>" . $p->t('global/personenkz') . "</b></td>
-                <td><b>" . $p->t('global/studiengang') . "</b></td>
-			    <td><b>" . $p->t('global/nachname') . "</b></td>
-			    <td><b>" . $p->t('global/vorname') . "</b></td>
-            ";
-
-            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-            {
-                $studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
-            }
-            $studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
-
-            $studlist .= "<td><b>" . $p->t('benotungstool/bearbeitetvon') . "</b></td></tr>\n";
-		}
-		// oder anonymisiert nur die UIDs einbinden
-		else
-		{
-			$studlist .= "
-                <td><b>" . $p->t('global/uid') . "</b></td></tr>\n
-            ";
-		}
-
-		// studentenquery
-		$qry_stud = "SELECT
-						DISTINCT uid, vorname, nachname, matrikelnr, kurzbzlang
-					FROM
-						campus.vw_student_lehrveranstaltung
-						JOIN campus.vw_student USING(uid)
-						JOIN public.tbl_studiengang ON campus.vw_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
-					WHERE
-						studiensemester_kurzbz = " . $db->db_add_param($stsem) . "
-						AND lehrveranstaltung_id = " . $db->db_add_param($lvid, FHC_INTEGER) . "
-					ORDER BY nachname, vorname ";
-		if ($result_stud = $db->db_query($qry_stud))
-		{
-			$i = 1;
-			while ($row_stud = $db->db_fetch_object($result_stud))
-			{
-				$lvgesamtnote = new lvgesamtnote();
-				if ($lvgesamtnote->load($lvid, $row_stud->uid, $stsem))
-				{
-					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
-					{
-						$lvgesamtnote->freigabedatum = $jetzt;
-						$lvgesamtnote->freigabevon_uid = $user;
-						$lvgesamtnote->save();
-
-						if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
-						{
-							$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
-							$studlist .= "<td>" . trim($row_stud->kurzbzlang) . "</td>";
-							$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
-							$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
-
-                            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-                            {
-                                $studlist .= "<td>";
-                                if ($lvgesamtnote->punkte != '')
-                                    $studlist .= trim(number_format($lvgesamtnote->punkte, 2));
-                                $studlist .= "</td>\n";
-                            }
-                            $studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
-
-                            $studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
-                            if ($lvgesamtnote->updatevon != '')
-                                $studlist .= " (" . $lvgesamtnote->updatevon . ")";
-                            $studlist .= "</td></tr>\n";
-						}
-						else
-						{
-							$studlist .= "<tr><td>" . trim($row_stud->uid) . "</td></tr>\n";
-						}
-
-						$neuenoten ++;
-					}
-				}
-			}
-		}
-
-		$studlist .= "</table>";
-
-		// mail an assistentin und den user selber verschicken
-		if ($neuenoten > 0)
-		{
-			$lv = new lehrveranstaltung($lvid);
-			$sg = new studiengang($lv->studiengang_kz);
-			$lektor_adresse = $user . "@" . DOMAIN;
-			$adressen = $sg->email . ", " . $user . "@" . DOMAIN;
-
-			$studienplan = new studienplan();
-			$studienplan->getStudienplanLehrveranstaltung($lvid, $stsem);
-			$studienplan_bezeichnung = '';
-			foreach ($studienplan->result as $row)
-				$studienplan_bezeichnung .= $row->bezeichnung . ' ';
-
-			$mit = new mitarbeiter();
-			$mit->load($user);
-			$name = $mit->anrede.' '.$mit->vorname.' '.$mit->nachname.' ('.$mit->kurzbz.')';
-
-			$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
-			$mail = new mail($adressen, 'vilesci@' . DOMAIN, $betreff, '');
-			$htmlcontent = "<html>
-				<body>
-					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
-					<b>" . $sg->kuerzel . ' ' . $lv->semester . '.Semester
-					' . $lv->bezeichnung . " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
-					<br>eingetragen.\n<br><br>
-					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
-
-            $htmlcontent .= $studlist;
-
-			$htmlcontent.= "
-					<br>Anzahl der Noten:" . $neuenoten . "
-					<br><br>" . $p->t('abgabetool/mailVerschicktAn') . ": " . $adressen . "
-				</body></html>";
-			$mail->setHTMLContent($htmlcontent);
-			$mail->setReplyTo($lektor_adresse);
-			$mail->send();
-		}
-	}
-	else
-	{
-		$errormsg = $p->t('gesamtnote/passwortFalsch');
-	}
 }
 
 if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
