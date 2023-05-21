@@ -32,11 +32,9 @@ class IssuesKonfiguration extends Auth_Controller
 
 		$this->loadPhrases(
 			array(
-				//~ 'global',
+				'global',
 				'ui',
 				'filter',
-				//~ 'lehre',
-				//~ 'person',
 				'fehlermonitoring'
 			)
 		);
@@ -85,13 +83,13 @@ class IssuesKonfiguration extends Auth_Controller
 			? $this->FehlerkonfigurationstypModel->load()
 			: $this->FehlerkonfigurationstypModel->loadWhere(array('app' => $app));
 
-		if (isError($konfRes)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerKonfigurationstypenLaden'));
+		if (isError($konfRes)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerFehlerKonfigurationLaden'));
 
 		// get all Fehler, optionally filtered by app
 		$params = array('fehlercode_extern' => null);
 		$this->FehlerModel->addSelect('fehlercode, fehler_kurzbz, fehlertyp_kurzbz, fehlertext');
 		$this->FehlerModel->addOrder('fehlercode');
-		if (isEmptyString($app)) $params['app'] = $app;
+		if (!isEmptyString($app)) $params['app'] = $app;
 		$fehlerRes = $this->FehlerModel->loadWhere($params);
 
 		if (isError($fehlerRes)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerFehlerLaden'));
@@ -121,7 +119,7 @@ class IssuesKonfiguration extends Auth_Controller
 		// check if all params passed
 		if (isEmptyString($konfigurationstyp_kurzbz)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'ungueltigerKonfigurationstyp'));
 
-		if (isEmptyString($fehlercode)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'ungueltigerFehlercode'));
+		if (isEmptyString($fehlercode)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlercodeFehlt'));
 
 		// separate by semicolon if multiple values passed
 		$konfigurationsWert = explode(';', $konfigurationsWert);
@@ -153,7 +151,7 @@ class IssuesKonfiguration extends Auth_Controller
 					default:
 						$valid = is_string($konfWert) && preg_match('/^[A-Za-z0-9_]+$/', $konfWert);
 				}
-				if (!$valid) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'ungueltigerKonfigurationswert', $konfigurationsdatentyp));
+				if (!$valid) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'ungueltigerKonfigurationswert', array($konfigurationsdatentyp)));
 			}
 		}
 
@@ -180,7 +178,7 @@ class IssuesKonfiguration extends Auth_Controller
 			if (!is_array($existingKonf)) $existingKonf = array($existingKonf);
 
 			$newKonf = json_encode(array_values(array_unique(array_merge($existingKonf, $konfigurationsWert))));
-			if (!$newKonf) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerJsonKodierung'));
+			if (!$newKonf) $this->terminateWithJsonError("error when encoding JSON");
 
 			$result = $this->FehlerkonfigurationModel->update(
 				array('konfigurationstyp_kurzbz' => $konfigurationstyp_kurzbz, 'fehlercode' => $fehlercode),
@@ -190,7 +188,7 @@ class IssuesKonfiguration extends Auth_Controller
 		else // if no konfiguration exists, add new konfiguration entry
 		{
 			$newKonf = json_encode($konfigurationsWert);
-			if (!$newKonf) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerJsonKodierung'));
+			if (!$newKonf) $this->terminateWithJsonError("error when encoding JSON");
 
 			$result = $this->FehlerkonfigurationModel->insert(
 				array(
@@ -218,7 +216,7 @@ class IssuesKonfiguration extends Auth_Controller
 		if (isEmptyString($konfigurationstyp_kurzbz)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'ungueltigerKonfigurationstyp'));
 
 		// check if fehlercode correctly passed
-		if (isEmptyString($fehlercode)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'ungueltigerFehlercode'));
+		if (isEmptyString($fehlercode)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlercodeFehlt'));
 
 		$this->outputJson(
 			$this->FehlerkonfigurationModel->delete(
