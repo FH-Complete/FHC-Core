@@ -40,7 +40,9 @@ $filters = array(
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
-					{"name": "OnholdDate"}
+					{"name": "HoldDate"},
+					{"name": "Rueckstellgrund"},
+					{"name": "Kaution"}
 				],
 				"filters": [
 					{
@@ -511,13 +513,14 @@ $filters = array(
 			{
 				"name": "Abgewiesen - Alle",
 				"columns": [
-					{"name": "PersonID"},
+					{"name": "PersonId"},
 					{"name": "PreStudentID"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
-					{"name": "Nachricht"}
+					{"name": "Nachricht"},
+					{"name": "Kaution"}
 				],
 				"filters": []
 			}

@@ -7,10 +7,11 @@
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$LOGDATA_NAME = '\'Message sent\'';
 	$LOGDATA_VON = '\'online\'';
+	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
 
 $query = '
 		SELECT
-			p.person_id AS "PersonID",
+			p.person_id AS "PersonId",
 			ps.prestudent_id AS "PreStudentID",
 			p.vorname AS "Vorname",
 			p.nachname AS "Nachname",
@@ -37,7 +38,15 @@ $query = '
 				AND l.zeitpunkt >= pss.insertamum
 			  ORDER BY l.log_id DESC
 				 LIMIT 1
-			) AS "Nachricht"
+			) AS "Nachricht",
+			(
+				SELECT SUM(konto.betrag)
+				FROM public.tbl_konto konto
+				LEFT JOIN tbl_konto skonto ON (skonto.buchungsnr_verweis = konto.buchungsnr)
+				WHERE konto.person_id = p.person_id
+					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
+					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+			) AS "Kaution"
 		FROM
 			public.tbl_prestudentstatus pss
 			JOIN public.tbl_prestudent ps USING(prestudent_id)
@@ -60,14 +69,16 @@ $query = '
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
 		'datasetRepresentation' => 'tablesorter',
+		'checkboxes' => 'PersonId',
 		'columnsAliases' => array(
-			'PersonID',
+			'PersonId',
 			'PreStudentID',
-			'Vorname',
-			'Nachname',
-			'Studiengang',
-			'Abgewiesen am',
-			'Nachricht'
+			ucfirst($this->p->t('person', 'vorname')) ,
+			ucfirst($this->p->t('person', 'nachname')),
+			ucfirst($this->p->t('lehre', 'studiengang')),
+			ucfirst($this->p->t('infocenter', 'abgewiesenam')),
+			ucfirst($this->p->t('global', 'nachricht')),
+			ucfirst($this->p->t('infocenter', 'kaution'))
 		),
 
 		'formatRow' => function($datasetRaw) {
@@ -78,6 +89,19 @@ $query = '
 			else
 			{
 				$datasetRaw->{'Nachricht'} = 'Ja';
+			}
+
+			if ($datasetRaw->{'Kaution'} === null)
+			{
+				$datasetRaw->{'Kaution'} = '-';
+			}
+			else if ($datasetRaw->{'Kaution'} === '0.00')
+			{
+				$datasetRaw->{'Kaution'} = 'Bezahlt';
+			}
+			else
+			{
+				$datasetRaw->{'Kaution'} = 'Offen';
 			}
 
 			$datasetRaw->{'AbgewiesenAm'} = date_format(date_create($datasetRaw->{'AbgewiesenAm'}),'Y-m-d H:i');
