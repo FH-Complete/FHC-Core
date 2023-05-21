@@ -26,7 +26,7 @@ class PlausicheckProducerLib
 		$this->_ci =& get_instance(); // get ci instance
 
 		// load models
-		$this->_ci->load->model('system/fehlerkonfiguration_model', 'FehlerkonfigurationModel');
+		$this->_ci->load->model('system/Fehlerkonfiguration_model', 'FehlerkonfigurationModel');
 
 		// get all configuration parameters for the application
 		$fehlerkonfigurationRes = $this->_ci->FehlerkonfigurationModel->getKonfiguration($app);

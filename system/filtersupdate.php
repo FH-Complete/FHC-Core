@@ -1213,6 +1213,28 @@ $filters = array(
 	),
 	array(
 		'app' => 'core',
+		'dataset_name' => 'fehlerKonfiguration',
+		'filter_kurzbz' => 'fehlerKonfiguration',
+		'description' => '{Fehler Konfiguration}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehler Konfiguration",
+				"columns": [
+					{"name": "konfigurationstyp_kurzbz"},
+					{"name": "fehlercode"},
+					{"name": "fehler_kurzbz"},
+					{"name": "konfiguration"},
+					{"name": "app"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
+	),
+	array(
+		'app' => 'core',
 		'dataset_name' => 'gruppenmanagement',
 		'filter_kurzbz' => 'gruppenmanagement',
 		'description' => '{Meine Gruppen}',

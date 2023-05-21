@@ -1,5 +1,5 @@
 <?php
-class Fehlerkonfiguration_model extends DB_Model
+class Fehlerkonfigurationstyp_model extends DB_Model
 {
 
 	/**
@@ -8,9 +8,8 @@ class Fehlerkonfiguration_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = 'system.tbl_fehler_konfiguration';
-		$this->pk = array('konfigurationstyp_kurzbz', 'fehlercode');
-		$this->hasSequence = false;
+		$this->dbTable = 'system.tbl_fehler_konfigurationstyp';
+		$this->pk = array('konfigurationstyp_kurzbz');
 	}
 
 	/**
