@@ -33,6 +33,9 @@ class approveAnrechnungDetail extends Auth_Controller
 			)
 		);
 
+		//Load configs
+		$this->load->config('anrechnung');
+
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 		$this->load->model('education/Anrechnungstatus_model', 'AnrechnungstatusModel');
@@ -90,7 +93,8 @@ class approveAnrechnungDetail extends Auth_Controller
 		$antragData = $this->anrechnunglib->getAntragData(
 			$anrechnungData->prestudent_id,
 			$anrechnungData->studiensemester_kurzbz,
-			$anrechnungData->lehrveranstaltung_id
+			$anrechnungData->lehrveranstaltung_id,
+            $anrechnungData->anrechnung_id
 		);
 
 		// Get Empfehlung data
@@ -209,48 +213,46 @@ class approveAnrechnungDetail extends Auth_Controller
 	 */
 	public function requestRecommendation()
 	{
-		$data = $this->input->post('data');
+		$anrechnung_id = $this->input->post('anrechnung_id');
 
-		if(isEmptyArray($data))
+		if(isEmptyString($anrechnung_id))
 		{
 			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
 		}
 
 		$retval = array();
-		$counter = 0;
+        
+        // Check if Anrechnungs-LV has lector
+        if (!$this->anrechnunglib->LVhasLector($anrechnung_id))
+        {
+            $this->terminateWithJsonError('LV has no lector');
+        }
 
-		foreach ($data as $item)
-		{
-			// Check if Anrechnungs-LV has lector
-			if (!$this->anrechnunglib->LVhasLector($item['anrechnung_id']))
-			{
-				// Count up LV with no lector
-				$counter++;
+        // Get Fachbereichsleitung or LV Leitung.
+        if($this->config->item('fbl') === TRUE)
+        {
+            $result = $this->anrechnunglib->getLeitungOfLvOe($anrechnung_id);
+        }
+        else
+        {
+            // If LV Leitung is not present, gets all LV lectors.
+            $result = $this->anrechnunglib->getLectors($anrechnung_id);
+        }
 
-				// Break, if LV has no lector
-				break;
-			}
+        $empfehlungsanfrage_an = !isEmptyArray($result) ? implode(', ', array_column($result, 'fullname')) : '';
 
-			// Get full name of LV Leitung.
-			// If LV Leitung is not present, get full name of LV lectors.
-			$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
-			$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
-				? implode(', ', array_column($lector_arr, 'fullname'))
-				: '';
-
-			// Request Recommendation
-			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
-			{
-				$retval[]= array(
-					'anrechnung_id' => $item['anrechnung_id'],
-					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
-					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
-					'empfehlung_anrechnung' => null,
-					'empfehlungsanfrageAm' => (new DateTime())->format('d.m.Y'),
-					'empfehlungsanfrageAn' => $empfehlungsanfrage_an
-				);
-			}
-		}
+        // Request Recommendation
+        if($this->anrechnunglib->requestRecommendation($anrechnung_id))
+        {
+            $retval[]= array(
+                'anrechnung_id' => $anrechnung_id,
+                'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
+                'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
+                'empfehlung_anrechnung' => null,
+                'empfehlungsanfrageAm' => (new DateTime())->format('d.m.Y'),
+                'empfehlungsanfrageAn' => $empfehlungsanfrage_an
+            );
+        }
 
 		/**
 		 * Send mails to lectors
@@ -259,21 +261,24 @@ class approveAnrechnungDetail extends Auth_Controller
 		 * */
 		if (!isEmptyArray($retval))
 		{
-			self::_sendSanchoMailToLectors($retval);
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                $this->_sendSanchoMailToLectors($anrechnung_id);
+            }
 
 			// Output json to ajax
 			return $this->outputJsonSuccess($retval);
 		}
 
 		// Output json to ajax
-		if (isEmptyArray($retval) && $counter > 0)
+		if (isEmptyArray($retval))
 		{
-			return $this->outputJsonError(
+			$this->terminateWithJsonError(
 				"Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
 			);
 		}
 
-		return $this->outputJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
+		$this->terminateWithJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
 	}
 
 	/**
@@ -467,39 +472,33 @@ class approveAnrechnungDetail extends Auth_Controller
 
 	/**
 	 * Send mail to lectors asking for recommendation. (first to LV-Leitung, if not present to all lectors of lv)
-	 * @param $mail_params
+	 * @param $anrechnung_id
 	 * @return bool
 	 */
-	private function _sendSanchoMailToLectors($mail_params)
+	private function _sendSanchoMailToLectors($anrechnung_id)
 	{
-		// Get Lehrveranstaltungen
-		$anrechnung_arr = array();
-
-		foreach ($mail_params as $item)
-		{
-			$this->AnrechnungModel->addSelect('lehrveranstaltung_id, studiensemester_kurzbz');
-			$anrechnung_arr[]= array(
-				'lehrveranstaltung_id' => $this->AnrechnungModel->load($item['anrechnung_id'])->retval[0]->lehrveranstaltung_id,
-				'studiensemester_kurzbz' => $this->AnrechnungModel->load($item['anrechnung_id'])->retval[0]->studiensemester_kurzbz
-			);
-		}
-
-		$anrechnung_arr = array_unique($anrechnung_arr, SORT_REGULAR);
-
+        $lehrveranstaltung_id = $this->AnrechnungModel->load($anrechnung_id)->retval[0]->lehrveranstaltung_id;
+        $studiensemester_kurzbz =  $this->AnrechnungModel->load($anrechnung_id)->retval[0]->studiensemester_kurzbz;
 
 		/**
-		 * Get lectors (prio for LV-Leitung, if not present to all lectors of LV.
+         * Get mail receivers.
+		 * If config is default (lectors): prio for LV-Leitung, if not present to all lectors of LV.
 		 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
 		 * **/
-		$lector_arr = $this->_getLectors($anrechnung_arr);
+        if ($this->config->item('fbl') === TRUE)
+        {
+            $receiver_arr = $this->_getLeitungOfLvOe($lehrveranstaltung_id);
+        }
+        else
+        {
+            $receiver_arr = $this->_getLectors($studiensemester_kurzbz, $lehrveranstaltung_id);
+        }
 
-
-
-		// Send mail to lectors
-		foreach ($lector_arr as $lector)
+		// Send mail
+		foreach ($receiver_arr as $receiver)
 		{
-			$to = $lector->uid;
-			$vorname = $lector->vorname;
+			$to = $receiver->uid. '@'. DOMAIN;;
+			$vorname = $receiver->vorname;
 
 			// Get full name of stgl
 			$this->load->model('person/Person_model', 'PersonModel');
@@ -537,35 +536,30 @@ class approveAnrechnungDetail extends Auth_Controller
 	 * @param $anrechnung_arr
 	 * @return array
 	 */
-	private function _getLectors($anrechnung_arr)
+	private function _getLectors($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
 		$lector_arr = array();
 
-		// Get lectors
-		foreach($anrechnung_arr as $anrechnung)
-		{
-			$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-			$result = $this->LehrveranstaltungModel->getLecturersByLv($anrechnung['studiensemester_kurzbz'], $anrechnung['lehrveranstaltung_id']);
+        $result = $this->LehrveranstaltungModel->getLecturersByLv($studiensemester_kurzbz, $lehrveranstaltung_id);
 
-			if (!$result = getData($result))
-			{
-				show_error('Failed retrieving lectors of Lehrveranstaltung');
-			}
+        if (!$result = getData($result))
+        {
+            show_error('Failed retrieving lectors of Lehrveranstaltung');
+        }
 
-			// Check if lv has LV-Leitung
-			$key = array_search(true, array_column($result, 'lvleiter'));
+        // Check if lv has LV-Leitung
+        $key = array_search(true, array_column($result, 'lvleiter'));
 
-			// If lv has LV-Leitung, keep only the one
-			if ($key !== false)
-			{
-				$lector_arr[]= $result[$key];
-			}
-			// ...otherwise keep all lectors
-			else
-			{
-				$lector_arr = array_merge($lector_arr, $result);
-			}
-		}
+        // If lv has LV-Leitung, keep only the one
+        if ($key !== false)
+        {
+            $lector_arr[]= $result[$key];
+        }
+        // ...otherwise keep all lectors
+        else
+        {
+            $lector_arr = array_merge($lector_arr, $result);
+        }
 
 		/**
 		 * NOTE: This step is only done to make the array unique by uid, vorname and nachname in the following step
@@ -583,6 +577,14 @@ class approveAnrechnungDetail extends Auth_Controller
 		return $lector_arr;
 
 	}
+
+    // Get Leitungen of Lehrveranstaltungs-Organisationseinheit
+    private function _getLeitungOfLvOe($lehrveranstaltung_id)
+    {
+        $result = $this->LehrveranstaltungModel->getLeitungOfLvOe($lehrveranstaltung_id);
+
+        return hasData($result) ? getData($result) : show_error('Failed retrieving Leitung of Lehrveranstaltungs-Organisationseinheit');
+    }
 
 	private function _saveEmpfehlungsNotiz($anrechnung_id, $empfehlungstext, $notiz_id)
 	{
@@ -606,8 +608,5 @@ class approveAnrechnungDetail extends Auth_Controller
 			trim($empfehlungstext),
 			$this->_uid
 		);
-
-
 	}
-
 }

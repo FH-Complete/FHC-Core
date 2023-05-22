@@ -251,7 +251,11 @@
 			$raumtyp->getAll();
 			foreach($raumtyp->result as $row)
 			{
-				$htmlstr.= '<OPTION value="'.$row->raumtyp_kurzbz.'">'.$row->beschreibung.' ('.$row->raumtyp_kurzbz.')</OPTION>';
+				$inaktiv = '';
+				if (!$db->db_parse_bool($row->aktiv))
+					$inaktiv = 'disabled';
+				
+				$htmlstr.= '<OPTION value="'.$row->raumtyp_kurzbz.'" '. $inaktiv .'>'.$row->beschreibung.' ('.$row->raumtyp_kurzbz.')</OPTION>';
 			}
 			$htmlstr.='</SELECT>
 			Hierarchie: <input type="text" name="hierarchie" size="1" value="'.($hierarchiemax+1).'">
