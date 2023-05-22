@@ -55,6 +55,7 @@ export const CoreFilterCmpt = {
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
 		tableOnly: Boolean,
+		reload: Boolean,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
 			default: false
@@ -73,6 +74,7 @@ export const CoreFilterCmpt = {
 			filterFields: null,
 
 			availableFilters: null,
+			selectedFilter: null,
 
 			// FetchCmpt binded properties
 			fetchCmptRefresh: false,
@@ -160,6 +162,12 @@ export const CoreFilterCmpt = {
 		}
 	},
 	methods: {
+		reloadTable() {
+			if (this.tableOnly)
+				this.tabulator.reload();
+			else
+				this.getFilter();
+		},
 		initTabulator() {
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
@@ -211,8 +219,16 @@ export const CoreFilterCmpt = {
 		 *
 		 */
 		getFilter: function() {
-			//
-			this.startFetchCmpt(CoreFilterAPIs.getFilter, null, this.render);
+			if (this.selectedFilter === null)
+				this.startFetchCmpt(CoreFilterAPIs.getFilter, null, this.render);
+			else
+				this.startFetchCmpt(
+					CoreFilterAPIs.getFilterById,
+					{
+						filterId: this.selectedFilter
+					},
+					this.render
+				);
 		},
 		/**
 		 *
@@ -381,6 +397,7 @@ export const CoreFilterCmpt = {
 		 *
 		 */
 		handlerSaveCustomFilter: function(customFilterName) {
+			this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
 				CoreFilterAPIs.saveCustomFilter,
@@ -394,11 +411,14 @@ export const CoreFilterCmpt = {
 		 *
 		 */
 		handlerRemoveCustomFilter: function(event) {
+			filterId = event.currentTarget.getAttribute("href").substring(1);
+			if (filterId === this.selectedFilter)
+				this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
 				CoreFilterAPIs.removeCustomFilter,
 				{
-					filterId: event.currentTarget.getAttribute("href").substring(1)
+					filterId: filterId
 				},
 				this.getFilter
 			);
@@ -427,16 +447,11 @@ export const CoreFilterCmpt = {
 			this.switchFilter(filterId);
 		},
 		switchFilter(filterId) {
-			// Ajax call
-			this.startFetchCmpt(
-				CoreFilterAPIs.getFilterById,
-				{
-					filterId
-				},
-				this.render
-			);
+			this.selectedFilter = filterId;
+			this.getFilter();
 		},
 		applyFilterConfig(filterFields) {
+			this.selectedFilter = null;
 			this.startFetchCmpt(
 				CoreFilterAPIs.applyFilterFields,
 				{
@@ -480,11 +495,18 @@ export const CoreFilterCmpt = {
 
 		<div :id="'filterCollapsables' + idExtra">
 
-			<div class="filter-header-title">
-				<span v-if="!tableOnly" class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
-				<span v-if="!tableOnly" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
-				<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
-				<table-download class="filter-header-title-span-icon fa-xl text-dark" :tabulator="tabulator" :config="download"></table-download>
+			<div class="d-flex flex-row-reverse justify-content-between">
+				<div class="filter-header-title">
+					<span v-if="!tableOnly" class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
+					<span v-if="!tableOnly" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
+					<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
+					<table-download class="filter-header-title-span-icon fa-xl text-dark" :tabulator="tabulator" :config="download"></table-download>
+				</div>
+				<div v-if="reload" class="filter-header-title">
+					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
+						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
+					</button>
+				</div>
 			</div>
 
 			<filter-columns
