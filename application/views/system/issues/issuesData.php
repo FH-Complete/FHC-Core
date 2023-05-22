@@ -35,7 +35,7 @@ $query = "WITH zustaendigkeiten AS (
 
 $query .= "
 			SELECT
-				issue_id, fehlercode AS \"Fehlercode\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
+				issue_id, fehlercode AS \"Fehlercode\", fehler_kurzbz AS \"Fehler Kurzbezeichnung\", iss.fehlercode_extern AS \"Fehlercode extern\", datum AS \"Datum\",
 				inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\",
 				ftyp.bezeichnung_mehrsprachig[".$language_index."] AS \"Fehlertyp\",
 				stat.bezeichnung_mehrsprachig[".$language_index."] AS \"Fehlerstatus\",
@@ -181,6 +181,7 @@ $filterWidgetArray = array(
 	'columnsAliases' => array(
 		'ID',
 		ucfirst($this->p->t('fehlermonitoring', 'fehlercode')),
+		ucfirst($this->p->t('fehlermonitoring', 'fehlerkurzbz')),
 		ucfirst($this->p->t('fehlermonitoring', 'fehlercodeExtern')),
 		ucfirst($this->p->t('global', 'datum')),
 		ucfirst($this->p->t('fehlermonitoring', 'inhalt')),
@@ -204,6 +205,11 @@ $filterWidgetArray = array(
 		'Matrikelnummer'
 	),
 	'formatRow' => function ($datasetRaw) {
+
+		if ($datasetRaw->{'Fehler Kurzbezeichnung'} == null)
+		{
+			$datasetRaw->{'Fehler Kurzbezeichnung'} = '-';
+		}
 
 		if ($datasetRaw->{'Fehlercode extern'} == null)
 		{
