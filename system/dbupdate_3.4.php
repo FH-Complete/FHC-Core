@@ -37,6 +37,7 @@ require_once('dbupdate_3.4/10001_tempus_mitarbeiter_kurzbz_bei_reservierungen_an
 require_once('dbupdate_3.4/27949_infocenter_zurueckstellen_mit_grund.php');
 require_once('dbupdate_3.4/27107_vilesci_erfassung_abwesenheiten_reinigung.php');
 require_once('dbupdate_3.4/24913_tabelle_raumtyp_neues_attribut_aktiv.php');
+require_once('dbupdate_3.4/29144_prestudent_status_nach_bismeldung_sperren.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -55,6 +56,7 @@ $tabellen=array(
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id","ects_erworben","ects_angerechnet","herkunftsland_code"),
 	"bis.tbl_bisio_zweck"  => array("bisio_id","zweck_code"),
+	"bis.tbl_bismeldestichtag"  => array("studiensemester_kurzbz","meldestichtag"),
 	"bis.tbl_bisstandort"  => array("standort_code","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
 	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig","azgrelevant", "homeoffice"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
