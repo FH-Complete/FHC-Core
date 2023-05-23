@@ -866,12 +866,12 @@ if (isset($_GET['resend']))
 			echo '<br><br><div class="alert alert-info" style="width: 800px">
 			<span class="glyphicon glyphicon-info-sign"></span>
 			Sie können ihre vorläufigen Terminzusagen in ihr Kalendersystem einbinden.<br>
-			Importieren Sie dazu die .ics-Datei aus folgendem Link in ihren Kalender:<br>
-			<a href="'.APP_ROOT.'cis/public/ical_coodle.php/'.$uid.'" target="_blank">
-			'.APP_ROOT.'cis/public/ical_coodle.php/'.$uid.'
+			Importieren Sie dazu die .ics-Datei des folgenden Links in ihren Kalender:<br>
+			<a href="'.APP_ROOT.'cis/public/ical_coodle.php/cipher_encryption/'.encryptData($uid,LVPLAN_CYPHER_KEY).'" target="_blank">
+			'.APP_ROOT.'cis/public/ical_coodle.php/cipher_encryption/'.encryptData($uid,LVPLAN_CYPHER_KEY).'
 			</a>
 			<br><br>
-			Die Datei enthält ihre Terminzusagen aus <u>allen laufenden Umfragen</u> in anonymisierter Form.
+			Die Datei enthält ihre Terminzusagen aus <b>allen laufenden Umfragen</b>    .
 			</div>';
 		}
 
