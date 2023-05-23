@@ -10,6 +10,7 @@ class VertragsbestandteilUrlaubsanspruch extends Vertragsbestandteil
 	
 	public function __construct()
 	{
+		parent::__construct();
 		$this->setVertragsbestandteiltyp_kurzbz(
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_URLAUBSANSPRUCH);
 	}
@@ -61,5 +62,19 @@ EOTXT;
 		return parent::__toString() . $txt;
 	}
 
-	
+	public function validate()
+	{
+		if( !(filter_var($this->tage, FILTER_VALIDATE_INT, 
+				array(
+					'options' => array(
+						'min_range' => 1,
+						'max_range' => 50
+					)
+				)
+			)) ) {
+			$this->validationerrors[] = 'Urlaubsanspruch muss eine Tagesanzahl im Bereich 1 bis 50 sein.';
+		}
+		
+		return parent::validate();
+	}
 }

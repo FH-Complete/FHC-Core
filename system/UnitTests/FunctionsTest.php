@@ -18,11 +18,12 @@
  * Authors: Werner Masik <werner@gefi.at>,
  */
 
+
+
+require_once(__DIR__.'/../../config/vilesci.config.inc.php');
+require_once(__DIR__.'/../../include/functions.inc.php');
+
 use PHPUnit\Framework\TestCase;
-
-
-require_once('../../config/vilesci.config.inc.php');
-require_once('../../include/functions.inc.php');
 
 class FunctionsTest extends TestCase
 {

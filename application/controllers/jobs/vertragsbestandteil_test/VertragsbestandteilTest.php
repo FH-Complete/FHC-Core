@@ -17,6 +17,8 @@ class VertragsbestandteilTest extends JOB_Controller
 
 		$this->load->library('vertragsbestandteil/VertragsbestandteilLib', 
 			null, 'VertragsbestandteilLib');
+		$this->load->library('vertragsbestandteil/GehaltsbestandteilLib', 
+			null, 'GehaltsbestandteilLib');
 	}
 	
 	public function testFetch() 
@@ -83,5 +85,30 @@ class VertragsbestandteilTest extends JOB_Controller
 		{
 			echo "Insert failed.\n";
 		}
+	}
+	
+	public function testGehaltsbestandteilInsert() 
+	{
+		$data = new stdClass();
+		$data->gehaltsbestandteil_id = 2;
+		/*
+		$data->dienstverhaeltnis_id = 39;
+		$data->vertragsbestandteil_id = 123;
+		$data->gehaltstyp_kurzbz = 'zulage';
+		$data->von = '2023-04-01';
+		$data->bis = '2023-08-31';
+		$data->anmerkung = 'test anmerkung';
+		$data->grundbetrag = 100;
+		$data->betrag_valorisiert = 100;
+		$data->valorisierung = true;
+		*/
+		$data->auszahlungen = 12;
+		
+		$gb = new \vertragsbestandteil\Gehaltsbestandteil();
+		$gb->hydrateByStdClass($data);
+		
+		print_r($gb->toStdClass());
+		
+		$this->GehaltsbestandteilLib->storeGehaltsbestandteil($gb);
 	}
 }

@@ -404,6 +404,9 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		COMMENT ON TABLE hr.tbl_sachaufwand IS E'Zusatzvergütungen für Mitarbeiter';
 		COMMENT ON TABLE hr.tbl_sachaufwandtyp IS E'Key-Table for Sachaufwand';
 		COMMENT ON TABLE hr.tbl_teilzeittyp IS E'Key-Table Altersteilzeit, Elternteilzeit';
+
+		GRANT USAGE ON hr.tbl_dienstverhaeltnis_dienstverhaeltnis_id_seq TO vilesci;
+		GRANT USAGE ON hr.tbl_vertragsbestandteil_vertragsbestandteil_id_seq TO vilesci;
 		";
 
 		if (! $db->db_query($qry))

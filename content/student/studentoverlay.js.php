@@ -2191,14 +2191,26 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	// Convert bewerbung_abgeschicktamum to ISO-Date
 	if(bewerbung_abgeschicktamum != '')
 	{
-		if(bewerbung_abgeschicktamum.length != 19)
+		if(bewerbung_abgeschicktamum.length < 10)
 		{
-			bewerbung_abgeschicktamum = '';
+			alert('Abgeschicktdatum ist ungueltig');
+			return false;
 		}
 		else
 		{
 			datepart = bewerbung_abgeschicktamum.substring(0, 10);
 			timepart = bewerbung_abgeschicktamum.substring(11);
+
+			timepart_arr = timepart.split(':');
+
+			for (i = 0; i <= 2; i++)
+			{
+				if (typeof timepart_arr[i] === 'undefined' || timepart_arr[i].length !== 2)
+				{
+					timepart_arr[i] = '00';
+				}
+			}
+			
 			arr = datepart.split('.');
 
 			if(arr[0].length==1)
@@ -2207,7 +2219,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 			if(arr[1].length==1)
 				arr[1]='0'+arr[1];
 
-			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart;
+			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart_arr.join(":");
 		}
 	}
 

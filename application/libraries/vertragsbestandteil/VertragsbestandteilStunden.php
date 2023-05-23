@@ -1,8 +1,11 @@
 <?php
+
 namespace vertragsbestandteil;
 
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
+
+
 
 /**
  * Description of VertragsbestandteilStunden
@@ -12,10 +15,11 @@ use vertragsbestandteil\VertragsbestandteilFactory;
 class VertragsbestandteilStunden extends Vertragsbestandteil
 {
 	protected $wochenstunden;
-	protected $karenz;
+	protected $teilzeittyp_kurzbz;
 	
 	public function __construct()
 	{
+		parent::__construct();
 		$this->setVertragsbestandteiltyp_kurzbz(
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_STUNDEN);
 	}
@@ -24,7 +28,7 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 	{
 		parent::hydrateByStdClass($data);
 		isset($data->wochenstunden) && $this->setWochenstunden($data->wochenstunden);
-		isset($data->karenz) && $this->setKarenz($data->karenz);
+		isset($data->teilzeittyp_kurzbz) && $this->setTeilzeittyp_kurzbz($data->teilzeittyp_kurzbz);
 	}
 	
 	public function getWochenstunden()
@@ -32,9 +36,9 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 		return $this->wochenstunden;
 	}
 
-	public function getKarenz()
+	public function getTeilzeittyp_kurzbz()
 	{
-		return $this->karenz;
+		return $this->teilzeittyp_kurzbz;
 	}
 
 	public function setWochenstunden($wochenstunden)
@@ -43,9 +47,9 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 		return $this;
 	}
 
-	public function setKarenz($karenz)
+	public function setTeilzeittyp_kurzbz($teilzeittyp_kurzbz)
 	{
-		$this->karenz = $karenz;
+		$this->teilzeittyp_kurzbz = $teilzeittyp_kurzbz;
 		return $this;
 	}
 	
@@ -54,7 +58,7 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 		$tmp = array(
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
 			'wochenstunden' => $this->getWochenstunden(),
-			'karenz' => $this->getKarenz()
+			'teilzeittyp_kurzbz' => $this->getTeilzeittyp_kurzbz()
 		);
 		
 		$tmp = array_filter($tmp, function($v) {
@@ -68,9 +72,25 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 	{
 		$txt = <<<EOTXT
 		wochenstunden: {$this->getWochenstunden()}
-		karenz: {$this->getKarenz()}
+		teilzeittyp_kurzbz: {$this->getTeilzeittyp_kurzbz()}
 
 EOTXT;
 		return parent::__toString() . $txt;
+	}
+	
+	public function validate()
+	{
+		if( !(filter_var($this->wochenstunden, FILTER_VALIDATE_FLOAT, 
+				array(
+					'options' => array(
+						'min_range' => 0,
+						'max_range' => 100
+					)
+				)
+			)) ) {
+			$this->validationerrors[] = 'Stunden muss eine Kommazahl im Bereich 0 bis 100 sein.';
+		}
+		
+		return parent::validate();
 	}
 }

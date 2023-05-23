@@ -12,6 +12,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 	
 	public function __construct()
 	{
+		parent::__construct();
 		$this->setVertragsbestandteiltyp_kurzbz(
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG);
 	}
@@ -104,6 +105,9 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 EOTXT;
 		return parent::__toString() . $txt;
 	}
-
 	
+	public function validate()
+	{
+		return parent::validate();
+	}
 }

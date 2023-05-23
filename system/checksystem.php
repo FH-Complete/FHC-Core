@@ -28,7 +28,7 @@ require_once('../version.php');
 require_once('../include/benutzerberechtigung.class.php');
 
 // Datenbank Verbindung
-$db = new basis_db();
+	$db = new basis_db();
 echo '<html>
 <head>
 	<title>CheckSystem</title>

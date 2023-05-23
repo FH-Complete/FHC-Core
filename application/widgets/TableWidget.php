@@ -441,24 +441,6 @@ class TableWidget extends Widget
 	}
 
 	/**
-	 * Utility method that retrieves the name of the columns present in a table JSON definition
-	 */
-	private function _getColumnsNames($columns)
-	{
-		$columnsNames = array();
-
-		foreach ($columns as $key => $obj)
-		{
-			if (isset($obj->name))
-			{
-				$columnsNames[] = $obj->name;
-			}
-		}
-
-		return $columnsNames;
-	}
-
-	/**
 	 * Loads a view using the given viewName and eventually other parameters
 	 */
 	private static function _loadView($viewName, $parameters = null)
@@ -467,3 +449,4 @@ class TableWidget extends Widget
 		$ci->load->view($viewName, $parameters);
 	}
 }
+

@@ -554,7 +554,7 @@ class FilterWidget extends Widget
 	private function _setFilterMenu()
 	{
 		// Generates the filters structure array
-		$filterMenu = $this->filterwidgetlib->generateFilterMenu(
+		$this->filterwidgetlib->generateFilterMenu(
 			$this->router->directory.$this->router->class.'/'.$this->router->method
 		);
 	}
@@ -633,7 +633,7 @@ class FilterWidget extends Widget
 	{
 		$columnsNames = array();
 
-		foreach ($columns as $key => $obj)
+		foreach ($columns as $obj)
 		{
 			if (isset($obj->name))
 			{

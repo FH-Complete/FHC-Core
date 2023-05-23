@@ -93,7 +93,7 @@ class TableWidgetLib
 	/**
 	 * Gets the CI instance and loads message helper
 	 */
-	public function __construct($params = null)
+	public function __construct()
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 	}
