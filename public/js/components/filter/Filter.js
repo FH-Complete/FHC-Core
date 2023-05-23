@@ -59,7 +59,11 @@ export const CoreFilterCmpt = {
 		download: {
 			type: [Boolean, String, Function, Array, Object],
 			default: false
-		}
+		},
+		newBtnShow: Boolean,
+		newBtnClass: [String, Array, Object],
+		newBtnDisabled: Boolean,
+		newBtnLabel: String
 	},
 	data: function() {
 		return {
@@ -513,7 +517,11 @@ export const CoreFilterCmpt = {
 					<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
 					<table-download class="filter-header-title-span-icon fa-xl text-dark" :tabulator="tabulator" :config="download"></table-download>
 				</div>
-				<div v-if="reload || $slots.actions" class="filter-header-title">
+				<div v-if="newBtnShow || reload || $slots.actions" class="filter-header-title d-flex gap-2 align-items-baseline">
+					<button v-if="newBtnShow" class="btn btn-outline-secondary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
+						<span class="fa-solid fa-plus" aria-hidden="true"></span>
+						{{ newBtnLabel }}
+					</button>
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
