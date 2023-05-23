@@ -688,14 +688,14 @@ class reihungstest extends basis_db
 					tbl_reihungstest.aufnahmegruppe_kurzbz,
 					tbl_studiengang.typ,
 					UPPER(typ::varchar(1) || kurzbz) AS stg_kuerzel,
-			       	tbl_studiengang.bezeichnung,
-					tbl_studiengang.english
+					so.studiengangbezeichnung as bezeichnung,
+       				so.studiengangbezeichnung_englisch as english
 				FROM
 					public.tbl_rt_person
-				JOIN 
-					public.tbl_reihungstest ON (rt_id=reihungstest_id)
-				LEFT JOIN
-					public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
+				JOIN public.tbl_reihungstest ON (rt_id=reihungstest_id)
+				JOIN public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
+				JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				WHERE
 					tbl_rt_person.person_id=".$this->db_add_param($person_id);
 
