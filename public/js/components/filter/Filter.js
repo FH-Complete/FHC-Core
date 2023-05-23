@@ -83,7 +83,9 @@ export const CoreFilterCmpt = {
 			fetchCmptDataFetched: null,
 
 			tabulator: null,
-			tableBuilt: false
+			tableBuilt: false,
+			tabulatorHasSelector: false,
+			selectedData: []
 		};
 	},
 	computed: {
@@ -130,6 +132,8 @@ export const CoreFilterCmpt = {
 				{
 					// If the column has to be displayed or not
 					col.visible = selectedFields.indexOf(col.field) >= 0;
+					if (col.formatter == 'rowSelection')
+						col.visible = true;
 
 					if (col.hasOwnProperty('resizable'))
 						col.resizable = col.visible;
@@ -182,6 +186,9 @@ export const CoreFilterCmpt = {
 				tabulatorOptions.columns = this.filteredColumns;
 			}
 
+			if (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length)
+				this.tabulatorHasSelector = true;
+
 			// Start the tabulator with the build options
 			this.tabulator = new Tabulator(
 				this.$refs.table,
@@ -195,6 +202,9 @@ export const CoreFilterCmpt = {
 					this.tabulator.on(evt.event, evt.handler);
 			}
 			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			this.tabulator.on("rowSelectionChanged", data => {
+				this.selectedData = data;
+			});
 			if (this.tableOnly) {
 				this.tabulator.on('tableBuilt', () => {
 					const cols = this.tabulator.getColumns();
@@ -213,6 +223,7 @@ export const CoreFilterCmpt = {
 		},
 		_updateTabulator() {
 			this.tabulator.setData(this.filteredData);
+			this.tabulatorHasSelector = this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 		},
 		/**
@@ -502,10 +513,12 @@ export const CoreFilterCmpt = {
 					<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
 					<table-download class="filter-header-title-span-icon fa-xl text-dark" :tabulator="tabulator" :config="download"></table-download>
 				</div>
-				<div v-if="reload" class="filter-header-title">
+				<div v-if="reload || $slots.actions" class="filter-header-title">
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
+					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten: </span>
+					<slot name="actions" v-bind="tabulatorHasSelector ? selectedData : []"></slot>
 				</div>
 			</div>
 
