@@ -1781,6 +1781,15 @@
             "type": "library"
         },
         {
+            "name": "popperjs/popperjs2",
+            "version": "2.11.6",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/@popperjs/core@2"
+            },
+            "type": "library"
+        },
+        {
             "name": "twig/twig",
             "version": "v1.42.5",
             "source": {
