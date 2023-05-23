@@ -130,6 +130,17 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 				continue;
 			}
 			$punkte=str_replace(',', '.', $punkte);
+			if($punkte!='')
+			{
+				// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
+				$notenschluessel = new notenschluessel();
+				$note_pruef = $notenschluessel->getNote($punkte, $lvid, $stsem);
+				if($note_pruef!=$note)
+				{
+					$note = $note_pruef;
+					$note_dirty=true;
+				}
+			}
 
 			$datum = $_POST['datumNachp_'.$id];
 			//check Datumsformat
@@ -172,6 +183,10 @@ if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 						$note = $noten_anmerkung[$note];
 				}
 				$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note, $punkte);
+				if($response!='neu' && $response!='update' && $response!='update_f')
+				{
+					echo $response;
+				}
 			}
 			else
 			{
