@@ -445,6 +445,7 @@ class wochenplan extends basis_db
 			$this->std_plan[$tag][$stunde][$idx]->stundenplan_id=$this->wochenplan->lehrstunden[$i]->stundenplan_id;
 			$this->std_plan[$tag][$stunde][$idx]->lektor_uid=$this->wochenplan->lehrstunden[$i]->lektor_uid;
 			$this->std_plan[$tag][$stunde][$idx]->lektor=$this->wochenplan->lehrstunden[$i]->lektor_kurzbz;
+			$this->std_plan[$tag][$stunde][$idx]->mitarbeiter_kurzbz=$this->wochenplan->lehrstunden[$i]->mitarbeiter_kurzbz;
 			$this->std_plan[$tag][$stunde][$idx]->ort=$this->wochenplan->lehrstunden[$i]->ort_kurzbz;
 			$this->std_plan[$tag][$stunde][$idx]->stg=$this->wochenplan->lehrstunden[$i]->studiengang;
 			$this->std_plan[$tag][$stunde][$idx]->stg_kz=$this->wochenplan->lehrstunden[$i]->studiengang_kz;
@@ -736,7 +737,10 @@ class wochenplan extends basis_db
 					{
 						$unr[]=$lehrstunde->unr;
 						// Lektoren
-						$lektor[]=$lehrstunde->lektor;
+						if ($lehrstunde->mitarbeiter_kurzbz === null)
+							$lektor[] = $lehrstunde->lektor;
+						else
+							$lektor[]=$lehrstunde->mitarbeiter_kurzbz;
 						// Lehrverband
 						$typ='';
 						if ($lehrstunde->reservierung)
@@ -1450,7 +1454,10 @@ class wochenplan extends basis_db
 							if ($lehrstunde->unr==$unr)
 							{
 								// Lektoren
-								$lektor[]=$lehrstunde->lektor;
+								if ($lehrstunde->mitarbeiter_kurzbz === null)
+									$lektor[] = $lehrstunde->lektor;
+								else
+									$lektor[]=$lehrstunde->mitarbeiter_kurzbz;
 								// Lehrverband
 								$lvb=$lehrstunde->stg.'-'.$lehrstunde->sem;
 								if ($lehrstunde->ver!=null && $lehrstunde->ver!='0' && $lehrstunde->ver!='')
@@ -2364,7 +2371,10 @@ class wochenplan extends basis_db
 
 						$unr[]=$lehrstunde->unr;
 						// Lektoren
-						$lektor[]=$lehrstunde->lektor;
+						if ($lehrstunde->mitarbeiter_kurzbz === null)
+							$lektor[] = $lehrstunde->lektor;
+						else
+							$lektor[]=$lehrstunde->mitarbeiter_kurzbz;
 						$lektor_uids[]=$lehrstunde->lektor_uid;
 						// Lehrverband
 						$lvb=$lehrstunde->stg.'-'.$lehrstunde->sem;
@@ -2516,6 +2526,7 @@ class wochenplan extends basis_db
 									if (!mb_strstr($this->std_plan[$i][$j][$idx1]->lektor,$this->std_plan[$i][$j][$idx]->lektor))
 									{
 										$this->std_plan[$i][$j][$idx]->lektor.=' / '.$this->std_plan[$i][$j][$idx1]->lektor;
+										$this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz.=' / '.$this->std_plan[$i][$j][$idx1]->mitarbeiter_kurzbz;
 									}
 
 									//Ort
@@ -2549,7 +2560,7 @@ class wochenplan extends basis_db
 							//"Betreff","Beginnt am","Beginnt um","Endet am","Endet um","Ganztaegiges Ereignis","Erinnerung Ein/Aus","Erinnerung am","Erinnerung um","Besprechungsplanung","Erforderliche Teilnehmer","Optionale Teilnehmer","Besprechungsressourcen","Abrechnungsinformationen","Beschreibung",
 							//"Kategorien","Ort","Prioritaet","Privat","Reisekilometer","Vertraulichkeit","Zeitspanne zeigen als"
 							echo $this->crlf.'"'.$this->std_plan[$i][$j][$idx]->lehrfach.(isset($this->std_plan[$i][$j][$idx]->lehrform) && $this->std_plan[$i][$j][$idx]->lehrform!=''?'-'.$this->std_plan[$i][$j][$idx]->lehrform:'').($lvb!=''?' - '.$lvb:'').'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
-							echo $this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf.$this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","StundenplanFH","'.$this->std_plan[$i][$j][$idx]->ort.'","Normal","Aus",,"Normal","2"';
+							echo $this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf.(($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","StundenplanFH","'.$this->std_plan[$i][$j][$idx]->ort.'","Normal","Aus",,"Normal","2"';
 						}
 						elseif ($target=='ical')
 						{
@@ -2564,9 +2575,9 @@ class wochenplan extends basis_db
 							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
 
 							echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
-								.'UID:'.'FH'.str_replace(',',' ',$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical.$this->crlf)
+								.'UID:'.'FH'.str_replace(',',' ',$lvb.$this->std_plan[$i][$j][$idx]->ort.(($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical.$this->crlf)
 								.'SUMMARY:'.str_replace(',',' ',$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf)
-								.'DESCRIPTION:'.str_replace(',',' ',$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'').$this->crlf)
+								.'DESCRIPTION:'.str_replace(',',' ',$lehrfach[$idx].'\n'.(($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'').$this->crlf)
 								.'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
 								.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
 								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
@@ -2606,9 +2617,9 @@ class wochenplan extends basis_db
 							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
 							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
 
-							$UID = 'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical;
+							$UID = 'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.(($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical;
 							$Summary = $lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb;
-							$description = $lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'');
+							$description = $lehrfach[$idx].'\n'.(($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'');
 
 							$UID = str_replace(',',' ',$UID);
 							$Summary = str_replace(',',' ',$Summary);
@@ -2646,7 +2657,7 @@ class wochenplan extends basis_db
 						else
 						{
 							echo $this->crlf.'"'.$lehrfach[$idx].'","'.$lvplan_kategorie.'","'.$this->std_plan[$i][$j][$idx]->ort.'","Stundenplan'.$this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf;
-							echo $this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","Stundenplan",';
+							echo (($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","Stundenplan",';
 							echo '"'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'",,,,,';
 						}
 					}

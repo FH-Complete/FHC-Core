@@ -33,7 +33,10 @@ require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
 require_once('dbupdate_3.4/17512_fehlercode_constraints.php');
 require_once('dbupdate_3.4/27388_anrechnungen_zeitfenster_pflegen.php');
 require_once('dbupdate_3.4/19154_beurteilungsformulare_pruefungssenat.php');
+require_once('dbupdate_3.4/10001_tempus_mitarbeiter_kurzbz_bei_reservierungen_anzeigen.php');
 require_once('dbupdate_3.4/27949_infocenter_zurueckstellen_mit_grund.php');
+require_once('dbupdate_3.4/27107_vilesci_erfassung_abwesenheiten_reinigung.php');
+require_once('dbupdate_3.4/24913_tabelle_raumtyp_neues_attribut_aktiv.php');
 require_once('dbupdate_3.4/28089_plausichecks_in_extension_hinzufuegen.php');
 require_once('dbupdate_3.4/29133_einzelne_studiengaenge_aus_issuechecks_ausnehmen.php');
 
