@@ -24,8 +24,8 @@ var Plausichecks = {
 
 						for (let fehler_kurzbz in issueData)
 						{
-							messageStr += "<br /><br /><span>Prüfe " + fehler_kurzbz + "...</span>";
-							let issues = issueData[fehler_kurzbz];
+							let issues = issueData[fehler_kurzbz]['data'];
+							messageStr += "<br /><br /><span>Prüfe " + fehler_kurzbz + " ("+issueData[fehler_kurzbz]['fehlercode']+")...</span>";
 
 							if (issues.length == 0) {
 								messageStr += "<br /><span class='text-success'>Keine Issues für " + fehler_kurzbz + "</span>";

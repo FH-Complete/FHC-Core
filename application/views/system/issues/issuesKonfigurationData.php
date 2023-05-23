@@ -25,7 +25,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('fehlermonitoring', 'fehlercode')),
 		ucfirst($this->p->t('fehlermonitoring', 'fehlerkurzbz')),
 		ucfirst($this->p->t('fehlermonitoring', 'konfigurationswert')),
-		'application',
+		'Application',
 		ucfirst($this->p->t('fehlermonitoring', 'konfigurationsbeschreibung')),
 		ucfirst($this->p->t('fehlermonitoring', 'konfigurationsdatentyp')),
 		ucfirst($this->p->t('fehlermonitoring', 'fehlertext')),
