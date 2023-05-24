@@ -42,7 +42,8 @@ export default {
 		config: {
 			type: [Boolean, String, Function, Array, Object],
 			default: false
-		}
+		},
+		iconClass: [String, Array, Object]
 	},
 	computed: {
 		currentConfig() {
@@ -215,7 +216,7 @@ export default {
 				aria-title="Download"
 				@click.prevent="download(currentConfig[0])"
 			>
-				<span class="fa-solid fa-download" aria-hidden="true"></span>
+				<span :class="iconClass || 'fa-solid fa-xl fa-download'" aria-hidden="true"></span>
 			</a>
 		</template>
 		<div v-else class="dropdown d-inline">
@@ -229,7 +230,7 @@ export default {
 				data-bs-toggle="dropdown"
 				aria-expanded="false"
 			>
-				<span class="fa-solid fa-download" aria-hidden="true"></span>
+				<span :class="iconClass || 'fa-solid fa-xl fa-download'" aria-hidden="true"></span>
 			</a>
 			<ul class="dropdown-menu dropdown-menu-end">
 				<li v-for="(conf, i) in currentConfig" :key="i">

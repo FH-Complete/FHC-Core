@@ -64,16 +64,14 @@ export default {
 	template: `
 	<div class="filter-columns">
 		<div class="card">
-			<div class="row card-body filter-options-div">
-				<div class="filter-fields-area">
-					<div
-						v-for="fieldToDisplay in fields"
-						class="filter-fields-field"
-						:class="selected.indexOf(fieldToDisplay) != -1 ? 'text-light bg-dark' : '' "
-						@click="toggle(fieldToDisplay)"
-					>
-						{{ names[fieldToDisplay] || fieldToDisplay }}
-					</div>
+			<div class="d-flex flex-wrap gap-2 p-3 justify-content-center">
+				<div
+					v-for="fieldToDisplay in fields"
+					class="btn"
+					:class="selected.indexOf(fieldToDisplay) != -1 ? 'btn-dark' : 'btn-outline-dark' "
+					@click="toggle(fieldToDisplay)"
+				>
+					{{ names[fieldToDisplay] || fieldToDisplay }}
 				</div>
 			</div>
 		</div>

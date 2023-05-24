@@ -510,14 +510,8 @@ export const CoreFilterCmpt = {
 
 		<div :id="'filterCollapsables' + idExtra">
 
-			<div class="d-flex flex-row-reverse justify-content-between">
-				<div class="filter-header-title">
-					<span v-if="!tableOnly" class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
-					<span v-if="!tableOnly" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
-					<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
-					<table-download class="filter-header-title-span-icon fa-xl text-dark" :tabulator="tabulator" :config="download"></table-download>
-				</div>
-				<div v-if="newBtnShow || reload || $slots.actions" class="filter-header-title d-flex gap-2 align-items-baseline">
+			<div class="d-flex flex-row justify-content-between flex-wrap">
+				<div v-if="newBtnShow || reload || $slots.actions" class="d-flex gap-2 align-items-baseline flex-wrap">
 					<button v-if="newBtnShow" class="btn btn-outline-secondary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
 						<span class="fa-solid fa-plus" aria-hidden="true"></span>
 						{{ newBtnLabel }}
@@ -527,6 +521,16 @@ export const CoreFilterCmpt = {
 					</button>
 					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten: </span>
 					<slot name="actions" v-bind="tabulatorHasSelector ? selectedData : []"></slot>
+				</div>
+				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
+					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
+					<a v-if="!tableOnly" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
+						<span class="fa-solid fa-xl fa-filter"></span>
+					</a>
+					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
+						<span class="fa-solid fa-xl fa-table-columns"></span>
+					</a>
+					<table-download class="btn btn-link px-0 text-dark" :tabulator="tabulator" :config="download"></table-download>
 				</div>
 			</div>
 
