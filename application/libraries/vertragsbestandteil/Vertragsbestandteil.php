@@ -100,6 +100,12 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 		return $this->updatevon;
 	}
 
+	public function setGehaltsbestandteile($gehaltsbestandteile)
+	{
+		$this->gehaltsbestandteile = $gehaltsbestandteile;
+		return $this;
+	}
+	
 	public function setVertragsbestandteil_id($vertragsbestandteil_id)
 	{
 		$this->vertragsbestandteil_id = $vertragsbestandteil_id;

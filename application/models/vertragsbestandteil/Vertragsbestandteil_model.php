@@ -59,15 +59,21 @@ EOSQL;
 		return $sql;
 	}
 
-	public function getVertragsbestandteile($dienstverhaeltnis_id=1, $stichtag=null)
+	public function getVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
 		$stichtagclause = '';
 		if( !is_null($stichtag) )
 		{
 			$date = strftime('%Y-%m-%d', strtotime($stichtag));
-			$stichtagclause = 'AND ' . $this->escape($date)
+			$stichtagclause = 'AND (' . $this->escape($date)
 				. ' BETWEEN COALESCE(v.von, \'1970-01-01\'::date)'
 				. ' AND COALESCE(v.bis, \'2170-01-01\'::date)';
+			if( $includefuture ) 
+			{
+				$stichtagclause .= ' OR COALESCE(v.von, \'1970-01-01\'::date) > ' 
+					. $this->escape($date);
+			}
+			$stichtagclause .= ')';
 		}
 
 		$sql = <<<EOSQL
