@@ -1,7 +1,7 @@
 <?php
 if (! defined('DB_NAME')) exit('No direct script access allowed');
 
-// lehre.tbl_betreuerart: add type Senatsvorsitz
+// Changed Fehler Type from Error to Warning
 if($result = $db->db_query("SELECT 1 FROM system.tbl_fehler WHERE fehlertyp_kurzbz='error' AND fehler_kurzbz IN ('AbschlussstatusFehlt', 'AusbildungssemPrestudentUngleichAusbildungssemStatus', 'BewerberNichtZumRtAngetreten', 'GbDatumWeitZurueck', 'InaktiverStudentAktiverStatus')"))
 {
 	if($db->db_num_rows($result)>0)
