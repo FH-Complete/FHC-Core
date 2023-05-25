@@ -69,31 +69,31 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
         return $this->execQuery($qry, array($dienstverhaeltnis_id), $this->getEncryptedColumns());
     }
 	
-	public function getGehaltsbestandteile($dienstverhaeltnis_id=1, $stichtag=null)
+	public function getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
 		$stichtagclause = '';
 		if( !is_null($stichtag) )
 		{
 			$date = strftime('%Y-%m-%d', strtotime($stichtag));
-			$stichtagclause = 'AND ' . $this->escape($date)
-				. ' BETWEEN COALESCE(v.von, \'1970-01-01\'::date)'
-				. ' AND COALESCE(v.bis, \'2170-01-01\'::date)';
+			$stichtagclause = 'AND (' . $this->escape($date)
+				. ' BETWEEN COALESCE(von, \'1970-01-01\'::date)'
+				. ' AND COALESCE(bis, \'2170-01-01\'::date)';
+			if( $includefuture ) 
+			{
+				$stichtagclause .= ' OR COALESCE(v.von, \'1970-01-01\'::date) > ' 
+					. $this->escape($date);
+			}
+			$stichtagclause .= ')';
 		}
 
-		$sql = <<<EOSQL
-			SELECT
-				g.*
-			FROM
-				hr.tbl_gehaltsbestandteil g
-			WHERE
-				g.dienstverhaeltnis_id = ? 
+		$this->addSelect('*');
+		$where = <<<EOSQL
+				dienstverhaeltnis_id = {$this->escape($dienstverhaeltnis_id)} 
 				{$stichtagclause}
-			;
 EOSQL;
 
-		$query = $this->execReadOnlyQuery(
-			$query,
-			array($dienstverhaeltnis_id),
+		$query = $this->loadWhere(
+			$where,
 			$this->getEncryptedColumns()
 		);
 

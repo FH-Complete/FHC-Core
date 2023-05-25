@@ -41,6 +41,7 @@ class lehrstunde extends basis_db
 	public $unr;			// @brief Unterrichtsnummer
 	public $lektor_uid;		// @brief UID des Lektors
 	public $lektor_kurzbz; 	// @brief Kurzbezeichnung des Lektors
+	public $mitarbeiter_kurzbz; 	    // @brief Kurzbezeichnung
 	public $datum;			// @brief Datum
 	public $stunde;			// @brief Unterrichts-Stunde des Tages
 	public $ort_kurzbz;		// @brief Ort in dem der Unterricht stattfindet
@@ -116,6 +117,7 @@ class lehrstunde extends basis_db
 			$this->unr=$row->unr;
 			$this->lektor_uid=$row->uid;
 			$this->lektor_kurzbz=$row->lektor;
+			$this->mitarbeiter_kurzbz=$row->mitarbeiter_kurzbz;
 			$this->datum=$row->datum;
 			$this->stunde=$row->stunde;
 			$this->ort_kurzbz=$row->ort_kurzbz;
@@ -590,6 +592,7 @@ class lehrstunde extends basis_db
 			$stunde->unr=$row->unr;
 			$stunde->lektor_uid=$row->uid;
 			$stunde->lektor_kurzbz=$row->lektor;
+			$stunde->mitarbeiter_kurzbz=$row->mitarbeiter_kurzbz;
 			$stunde->datum=$row->datum;
 			$stunde->stunde=$row->stunde;
 			$stunde->ort_kurzbz=$row->ort_kurzbz;
@@ -663,6 +666,7 @@ class lehrstunde extends basis_db
 				$stunde->updateamum=$row->insertamum;
 				$stunde->updatevon=$row->insertvon;
 				$stunde->farbe='';
+				$stunde->mitarbeiter_kurzbz = $row->mitarbeiter_kurzbz;
 				$this->lehrstunden[]=$stunde;
 			}
 		}

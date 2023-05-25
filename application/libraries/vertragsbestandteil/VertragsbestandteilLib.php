@@ -76,7 +76,31 @@ class VertragsbestandteilLib
 	
 	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null)
 	{
-		return $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag);
+		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag);
+		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag);
+		
+		$gbsByVBid = array();
+		foreach( $gbs as $gb ) 
+		{
+			if( intval($gb->getVertragsbestandteil_id()) > 0 ) 
+			{
+				if( !isset($gbsByVBid[$gb->getVertragsbestandteil_id()]) 
+					|| !is_array($gbsByVBid[$gb->getVertragsbestandteil_id()]) ) {
+					$gbsByVBid[$gb->getVertragsbestandteil_id()] = array();
+				}
+				$gbsByVBid[$gb->getVertragsbestandteil_id()][] = $gb;
+			}
+		}
+		
+		foreach ($vbs as $vb)
+		{
+			if( isset($gbsByVBid[$vb->getVertragsbestandteil_id()]) ) 
+			{
+				$vb->setGehaltsbestandteile($gbsByVBid[$vb->getVertragsbestandteil_id()]);
+			}
+		}
+		
+		return $vbs;
 	}
 
 	public function fetchVertragsbestandteil($vertragsbestandteil_id)

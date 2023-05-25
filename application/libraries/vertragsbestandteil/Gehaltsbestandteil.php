@@ -4,7 +4,7 @@ namespace vertragsbestandteil;
 /**
  * Salary always depends on employment (Dienstverhältnis) and optionally on part of contract (Vetragsbestandteil)
  */
-class Gehaltsbestandteil implements IValidation
+class Gehaltsbestandteil implements IValidation, \JsonSerializable
 {
 	protected $gehaltsbestandteil_id;
 	protected $dienstverhaeltnis_id;
@@ -229,6 +229,13 @@ class Gehaltsbestandteil implements IValidation
 		$this->updatevon = $updatevon;
 		return $this;
 	}
+	
+	public function jsonSerialize()
+    {
+		$vars = get_object_vars($this);
+		unset($vars['CI']);
+        return $vars;
+    }
 	
 	public function toStdClass(): \stdClass
 	{
