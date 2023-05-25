@@ -8,6 +8,7 @@ require_once __DIR__ . '/VertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
+require_once __DIR__ . '/VertragsbestandteilKarenz.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
 
 use vertragsbestandteil\Dienstverhaeltnis;
