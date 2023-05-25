@@ -27,7 +27,7 @@ export default {
       organisationunit: organisationunit
     },
     template: `
-          <form ref="searchform" class="d-flex me-3" action="javascript:void(0);" 
+          <form ref="searchform" class="d-flex me-3 position-relative" action="javascript:void(0);" 
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
             <div class="input-group me-2 bg-white">
                 <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
@@ -78,10 +78,7 @@ export default {
         calcSearchResultExtent: function() {
             var rect = this.$refs.searchbox.getBoundingClientRect();
             //console.log(window.innerWidth + ' ' + window.innerHeight + ' ' + JSON.stringify(rect));
-            this.$refs.result.style.top = Math.floor(rect.bottom + 3) + 'px';
-            this.$refs.result.style.right = Math.floor(window.innerWidth - rect.right) + 'px';
-            this.$refs.result.style.width = Math.floor(window.innerWidth * 0.75) + 'px';
-            this.$refs.result.style.height = Math.floor(window.innerHeight * 0.75) + 'px';
+             this.$refs.result.style.height = Math.floor(window.innerHeight * 0.80) + 'px';
         },
         search: function() {
             if( this.searchtimer !== null ) {
