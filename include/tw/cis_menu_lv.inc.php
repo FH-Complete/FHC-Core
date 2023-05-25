@@ -68,28 +68,7 @@ function checkZeilenUmbruch()
 	if(!defined('CIS_LEHRVERANSTALTUNG_LVINFO_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_LVINFO_ANZEIGEN)
 	{
 		$text='';
-
-		$qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND genehmigt=true AND sprache='".ATTR_SPRACHE_DE."' AND aktiv=true";
 		$need_br=false;
-
-		if($result=$db->db_query($qry))
-		{
-			if($db->db_num_rows($result)>0)
-			{
-				 $text.= "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=de','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$p->t('global/deutsch')."&nbsp;</a>";
-				 $need_br=true;
-			}
-		}
-		$qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND genehmigt=true AND sprache='".ATTR_SPRACHE_EN."' AND aktiv=true";
-		if($result=$db->db_query($qry))
-		{
-			if($db->db_num_rows($result)>0)
-			{
-				$row1=$db->db_fetch_object($result);
-				$text.= "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=en','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$p->t('global/englisch')."</a>";
-				$need_br=true;
-			}
-		}
 
 		// Bearbeiten Button anzeigen wenn Lektor der LV und bearbeiten fuer Lektoren aktiviert ist
 		// Oder Berechtigung zum Bearbeiten eingetragen ist

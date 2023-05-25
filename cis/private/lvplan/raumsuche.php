@@ -107,7 +107,7 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return che
 		'.$p->t('lvplan/raumtyp').' <SELECT name="raumtyp" style="width: 100px;">
 		<OPTION value="">'.$p->t('global/alle').'</OPTION>';
 $raumtyp_obj = new raumtyp();
-$raumtyp_obj->getAll();
+$raumtyp_obj->getAll(true);
 
 foreach ($raumtyp_obj->result as $row)
 {
