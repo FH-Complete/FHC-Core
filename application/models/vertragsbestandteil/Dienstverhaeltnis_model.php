@@ -80,8 +80,10 @@ class Dienstverhaeltnis_model extends DB_Model
         return $this->execQuery($qry, array($uid, $datestring, $datestring));
     }
 
-	public function isOverlappingExistingDV($mitarbeiter_uid, $oe_kurzbz, $von, $bis)
+	public function isOverlappingExistingDV($mitarbeiter_uid, $oe_kurzbz, $von, $bis, $dvid=null)
 	{
+		$dvidclause = (intval($dvid) > 0) ? 'AND dv.dienstverhaeltnis_id != ' . $dvid  : '';
+		
 		$query = <<<EOSQL
 			SELECT 
 				count(*) AS dvcount
@@ -94,11 +96,26 @@ class Dienstverhaeltnis_model extends DB_Model
 			AND
 				?::date <= COALESCE(dv.bis, '2170-12-31'::date)
 			AND 
-				COALESCE(?::date, '2170-12-31'::date) >= dv.von
+				COALESCE(?::date, '2170-12-31'::date) >= dv.von 
+			AND (
+				SELECT 
+					COUNT(*) AS karenzen 
+				FROM 
+					hr.tbl_vertragsbestandteil vb 
+				WHERE 
+					vb.dienstverhaeltnis_id = dv.dienstverhaeltnis_id 
+				AND 
+					vb.vertragsbestandteiltyp_kurzbz = 'karenz' 
+				AND 
+					?::date >= COALESCE(vb.von, '1970-01-01'::date) 
+				AND 
+					COALESCE(?::date, '2170-12-31'::date) <= COALESCE(vb.bis, '2170-12-31') 
+			) = 0 
+			{$dvidclause}
 EOSQL;
 		
 		$ret = $this->execReadOnlyQuery($query, 
-			array($mitarbeiter_uid, $oe_kurzbz, $von, $bis));
+			array($mitarbeiter_uid, $oe_kurzbz, $von, $bis, $von, $bis));
 		
 		if( ($dvcount = getData($ret)) && ($dvcount[0]->dvcount > 0) ) {
 			return true;

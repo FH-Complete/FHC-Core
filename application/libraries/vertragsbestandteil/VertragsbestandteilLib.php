@@ -254,7 +254,8 @@ class VertragsbestandteilLib
 			$dv->getMitarbeiter_uid(), 
 			$dv->getOe_kurzbz(), 
 			$dv->getVon(), 
-			$dv->getBis()
+			$dv->getBis(),
+			$dv->getDienstverhaeltnis_id()
 		);
 	}
 }
