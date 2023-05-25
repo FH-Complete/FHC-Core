@@ -244,18 +244,22 @@ if (in_array($stsem, $stsem_arr))
 				<th>'.$p->t('global/name').'</th>
 			</tr>
 			</thead>
-			<tbody><tr>';
+			<tbody>';
 	if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
 	{
 		$path = "../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz;
-		echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
-		echo '<td><a href="'.$path.'">'.$p->t('tools/inskriptionsbestaetigung').' '.$stsem.'</a></td>';
+		echo '<tr><td><img src="../../../skin/images/pdfpic.gif" /></td>';
+		echo '<td><a href="'.$path.'">'.$p->t('tools/inskriptionsbestaetigung').' '.$stsem.' ' . $p->t('global/deutsch'). '</a></td></tr>';
+		
+		$patheng = "../pdfExport.php?xsl=InskriptionEng&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz;
+		echo '<tr><td><img src="../../../skin/images/pdfpic.gif" /></td>';
+		echo '<td><a href="'.$patheng.'">'.$p->t('tools/inskriptionsbestaetigung').' '.$stsem.' ' . $p->t('global/englisch'). '</a></td></tr>';
 	}
 	else
 	{
-		echo '<td colspan="2">'.$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem)).'</td>';
+		echo '<tr><td colspan="2">'.$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem)).'</td></tr>';
 	}
-	echo '</tr></tbody></table>';
+	echo '</tbody></table>';
 	
 	if (defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN)
 	{

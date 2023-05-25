@@ -53,7 +53,7 @@ $menu=array
 		(
 			'name'=>'Mitarbeiter','permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Zeitwünsche', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main','permissions'=>array('mitarbeiter')),
-			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre')),
+			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre:begrenzt')),
 		),
 
 		'Vorrueckung'=>	array
@@ -119,7 +119,7 @@ $menu=array
 		(
 			'name'=>'Mitarbeiter','permissions'=>array('admin','mitarbeiter','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
-			'Zeitsperren'=>array('name'=>'Zeitsperren/Urlaub', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre')),
+			'Zeitsperren'=>array('name'=>'Zeitsperren/Urlaub', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main','permissions'=>array('mitarbeiter/zeitsperre:begrenzt')),
 		),
 		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.php', 'target'=>'main','permissions'=>array('basis/betriebsmittel')),
 		'AnwesenheitslistenBarcode'=>array('name'=>'Anwesenheitslisten mit Barcodes', 'link'=>'personen/anwesenheitslisten_barcode.php', 'target'=>'main','permissions'=>array('basis/person')),
