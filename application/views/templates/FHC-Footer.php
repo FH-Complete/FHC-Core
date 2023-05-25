@@ -60,11 +60,7 @@
 	if ($bootstrap3 === true) generateJSsInclude('vendor/twbs/bootstrap3/dist/js/bootstrap.min.js');
 
 	// Bootstrap 5 JS
-	if ($bootstrap5 === true) 
-	{
-		generateJSsInclude('vendor/popperjs/popperjs2/core@2');
-		generateJSsInclude('vendor/twbs/bootstrap5/dist/js/bootstrap.min.js');
-	}
+	if ($bootstrap5 === true) generateJSsInclude('vendor/twbs/bootstrap5/dist/js/bootstrap.bundle.min.js');
 
 	// Moment JS
 	if ($momentjs2 === true)

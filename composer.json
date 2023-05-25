@@ -329,17 +329,6 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "popperjs/popperjs2",
-				"version": "2.11.6",
-				"dist": {
-					"url": "https://unpkg.com/@popperjs/core@2",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
 				"name": "vuejs/vuejs3",
 				"version": "3.2.33",
 				"dist": {
@@ -451,7 +440,6 @@
 		"tomazdragar/simplecropper": "1.0",
 		"twbs/bootstrap3": "3.4.*",
 		"twbs/bootstrap5": "5.1.*",
-		"popperjs/popperjs2": "2.11.*",
 
 		"vuejs/vuejs3": "3.2.33",
 		"vuejs/vuerouter4": "4.1.3",
