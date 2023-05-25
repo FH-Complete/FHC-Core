@@ -31,9 +31,9 @@ export default {
             @focusin="this.searchfocusin" @focusout="this.searchfocusout">
             <div class="input-group me-2 bg-white">
                 <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
-                    v-model="this.searchsettings.searchstr" class="form-control" 
-                    type="search" placeholder="Search" aria-label="Search">
-                <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-outline-secondary" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
+                    v-model="this.searchsettings.searchstr" class="form-control"
+                    type="search" placeholder="Suche..." aria-label="Search">
+                <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-light border-start" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
             </div>            
         
             <div v-show="this.showresult" ref="result" 
