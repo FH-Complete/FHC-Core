@@ -31,6 +31,31 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 	
 	public function beforePersist()
 	{
+		if( isset($this->benutzerfunktion_id) && intval($this->benutzerfunktion_id) > 0 ) 
+		{
+			$this->beforePersitExisting();
+		} 
+		else 
+		{
+			$this->beforePersitNew();
+		}
+	}
+	
+	protected function beforePersitExisting() {
+		$data = (object) array(
+			'datum_bis' => $this->getBis(),
+			'updateamum' => strftime('%Y-%m-%d %H:%M:%S'),
+			'updatevon' => getAuthUID()
+		);
+		$ret = $this->CI->BenutzerfunktionModel->update($this->getBenutzerfunktion_id(), $data);
+		
+		if(isError($ret) )
+		{
+			throw new Exception('failed to update Benutzerfunktion');
+		}
+	}
+
+	protected function beforePersitNew() {
 		if( $this->benutzerfunktiondata === null) 
 		{
 			return;
@@ -43,9 +68,9 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 			throw new Exception('failed to create Benutzerfunktion');
 		}
 		
-		$this->setBenutzerfunktion_id(getData($ret));
+		$this->setBenutzerfunktion_id(getData($ret));		
 	}
-	
+
 	public function toStdClass()
 	{
 		$tmp = array(

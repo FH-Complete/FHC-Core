@@ -26,9 +26,9 @@ class GehaltsbestandteilLib
 		$this->GehaltsbestandteilModel = $this->CI->GehaltsbestandteilModel;
 	}
 
-	public function fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null)
+	public function fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
-		return $this->GehaltsbestandteilModel->getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag);
+		return $this->GehaltsbestandteilModel->getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
 	}
 
 	public function fetchGehaltsbestandteil($gehaltsbestandteil_id)
@@ -91,6 +91,15 @@ class GehaltsbestandteilLib
 		if(isError($ret) )
 		{
 			throw new Exception('error updating gehaltsbestandteil');
+		}
+	}
+	
+	public function deleteGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
+	{
+		$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
+		if(isError($ret) )
+		{
+			throw new Exception('error deleting gehaltsbestandteil');
 		}
 	}
 }

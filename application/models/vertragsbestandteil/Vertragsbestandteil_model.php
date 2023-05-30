@@ -120,19 +120,23 @@ EOSQL;
 			;
 EOSQL;
 
-		// echo $sql . "\n\n";
-		$query = $this->db->query($sql);
-
-		$vertragsbestandteil = array();
-		try
+		$query = $this->execReadOnlyQuery($sql);		
+		
+		$vertragsbestandteil = null;
+		
+		if( hasData($query) ) 
 		{
-			$vertragsbestandteile = VertragsbestandteilFactory::getVertragsbestandteil($row);  // TODO add decryption
+			$data = getData($query)[0];
+			try
+			{
+				$vertragsbestandteil = VertragsbestandteilFactory::getVertragsbestandteil($data);  // TODO add decryption
+			}
+			catch (Exception $ex)
+			{
+				echo $ex->getMessage() . "\n";
+			}
 		}
-		catch (Exception $ex)
-		{
-			echo $ex->getMessage() . "\n";
-		}
-
+		
 		return $vertragsbestandteil;
 		
 	}

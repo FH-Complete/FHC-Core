@@ -21,7 +21,10 @@ use vertragsbestandteil\VertragsbestandteilFactory;
  * @author bambi
  */
 class VertragsbestandteilLib
-{		
+{
+	const INCLUDE_FUTURE = true;
+	const DO_NOT_INCLUDE_FUTURE = false;
+	
 	protected $CI;
 	/** @var Dienstverhaeltnis_model */
 	protected $DienstverhaeltnisModel;
@@ -75,10 +78,10 @@ class VertragsbestandteilLib
 		return $dv;
 	}
 	
-	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null)
+	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
-		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag);
-		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag);
+		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
 		
 		$gbsByVBid = array();
 		foreach( $gbs as $gb ) 
@@ -258,5 +261,23 @@ class VertragsbestandteilLib
 			$dv->getBis(),
 			$dv->getDienstverhaeltnis_id()
 		);
+	}
+	
+	public function deleteVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
+	{
+		$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
+			$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+		$retspecial = $specialisedModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
+		if(isError($retspecial) )
+		{
+			throw new Exception('error deleting vertragsbestandteil ' 
+				. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+		}
+		
+		$ret = $this->VertragsbestandteilModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
+		if(isError($ret) )
+		{
+			throw new Exception('error deleting vertragsbestandteil');
+		}
 	}
 }

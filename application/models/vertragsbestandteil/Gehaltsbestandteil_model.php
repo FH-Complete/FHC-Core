@@ -80,7 +80,7 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 				. ' AND COALESCE(bis, \'2170-01-01\'::date)';
 			if( $includefuture ) 
 			{
-				$stichtagclause .= ' OR COALESCE(v.von, \'1970-01-01\'::date) > ' 
+				$stichtagclause .= ' OR COALESCE(von, \'1970-01-01\'::date) > ' 
 					. $this->escape($date);
 			}
 			$stichtagclause .= ')';
@@ -113,6 +113,7 @@ EOSQL;
 
 	public function getGehaltsbestandteil($id)
 	{	
+		$this->addSelect('*');
 		$query = $this->load($id, $this->getEncryptedColumns());
 		$gehaltsbestandteil = null;
 		
