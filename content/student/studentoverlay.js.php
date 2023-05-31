@@ -1829,6 +1829,20 @@ function StudentPrestudentDisableFields(val)
 		document.getElementById('student-prestudent-menulist-zgvcode').disabled=true;
 	}
 
+	<?php
+	$studiengaengeMaster = $rechte->getStgKz('student/editMakkZgv');
+	// Anlegen eines Arrays mit allen berechtigten Stg-Kz
+	echo ' var berechtigte_master_studiengaenge = ['.implode(',',$studiengaengeMaster).'];';
+	?>
+	if (berechtigte_master_studiengaenge.indexOf(studiengang_kz) >= 0)
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=true;
+	}
+
 	//Status Tree leeren
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
 
@@ -2177,14 +2191,26 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	// Convert bewerbung_abgeschicktamum to ISO-Date
 	if(bewerbung_abgeschicktamum != '')
 	{
-		if(bewerbung_abgeschicktamum.length != 19)
+		if(bewerbung_abgeschicktamum.length < 10)
 		{
-			bewerbung_abgeschicktamum = '';
+			alert('Abgeschicktdatum ist ungueltig');
+			return false;
 		}
 		else
 		{
 			datepart = bewerbung_abgeschicktamum.substring(0, 10);
 			timepart = bewerbung_abgeschicktamum.substring(11);
+
+			timepart_arr = timepart.split(':');
+
+			for (i = 0; i <= 2; i++)
+			{
+				if (typeof timepart_arr[i] === 'undefined' || timepart_arr[i].length !== 2)
+				{
+					timepart_arr[i] = '00';
+				}
+			}
+			
 			arr = datepart.split('.');
 
 			if(arr[0].length==1)
@@ -2193,7 +2219,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 			if(arr[1].length==1)
 				arr[1]='0'+arr[1];
 
-			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart;
+			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart_arr.join(":");
 		}
 	}
 
@@ -2359,7 +2385,7 @@ function StudentAddRolle(rolle, semester, studiensemester, statusgrund_id)
 // ****
 // * Druckt die Instkriptionsbestaetigung
 // ****
-function StudentPrintInskriptionsbestaetigung(event)
+function StudentPrintInskriptionsbestaetigung(event, xsl)
 {
 	tree = document.getElementById('student-tree');
 	//Alle markierten Studenten holen
@@ -2396,7 +2422,7 @@ function StudentPrintInskriptionsbestaetigung(event)
 		var output='pdf';
 
 	if(anzahl>0)
-		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem+'&output='+output,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl='+ xsl +'&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem+'&output='+output,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }
@@ -3102,9 +3128,9 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	{
 		exists = StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kurzbz, studiengang_kz);
 	}
-	if (exists)
+	if (exists.dbdml_return)
 	{
-		if(!confirm('Die Buchung ist bereits vorhanden. Trotzdem fortfahren?'))
+		if(!confirm(exists.dbdml_data))
 			return false;
 	}
 
@@ -3159,7 +3185,7 @@ function StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kur
 
 	var val =  new ParseReturnValue(response);
 
-	return(val.dbdml_return);
+	return val;
 }
 
 // *****

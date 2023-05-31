@@ -26,6 +26,7 @@
 				'public/js/tablesort/tablesort.js',
 				'public/js/infocenter/messageList.js',
 				'public/js/infocenter/infocenterDetails.js',
+				'public/js/infocenter/rueckstellung.js',
 				'public/js/infocenter/zgvUeberpruefung.js'
 			),
 			'phrases' => array(

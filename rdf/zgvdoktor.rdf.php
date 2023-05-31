@@ -57,7 +57,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
       </RDF:li>
 ';
 }
-$qry = 'SELECT * FROM bis.tbl_zgvdoktor ORDER BY zgvdoktor_code';
+$qry = 'SELECT * FROM bis.tbl_zgvdoktor ORDER BY zgvdoktor_bez';
 $db = new basis_db();
 
 if($db->db_query($qry))

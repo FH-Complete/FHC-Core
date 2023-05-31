@@ -199,26 +199,46 @@ $p = new phrasen($sprache);
 		  	    	<label value="Raumtyp" />
 		  			<menulist id="lehrveranstaltung-detail-menulist-raumtyp" disabled="true"
 		  			          datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
+											xmlns:RAUMTYP="http://www.technikum-wien.at/raumtyp/rdf#"
 				              ref="http://www.technikum-wien.at/raumtyp/liste" >
-						<template>
-							<menupopup>
-								<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
-										  uri="rdf:*"/>
-							</menupopup>
-						</template>
+							<template>
+								<rule RAUMTYP:aktiv='true'>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+										          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
+												  uri="rdf:*"/>
+									</menupopup>
+								</rule>
+								<rule>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+															label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
+															uri="rdf:*" style="text-decoration:line-through;"/>
+									</menupopup>
+								</rule>
+							</template>
 					</menulist>
 		  			<label value="Raumtyp alternativ" />
 		  			<menulist id="lehrveranstaltung-detail-menulist-raumtypalternativ" disabled="true"
-		  					  datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
+		  					  		datasources="<?php echo APP_ROOT ?>rdf/raumtyp.rdf.php" flex="1"
+											xmlns:RAUMTYP="http://www.technikum-wien.at/raumtyp/rdf#"
 				              ref="http://www.technikum-wien.at/raumtyp/liste" >
-						<template>
-							<menupopup>
-								<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
-								          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
-										  uri="rdf:*"/>
-								</menupopup>
-						</template>
+							<template>
+								<rule RAUMTYP:aktiv='true'>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+										          label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
+												  uri="rdf:*"/>
+									</menupopup>
+								</rule>
+								<rule>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz"
+															label="rdf:http://www.technikum-wien.at/raumtyp/rdf#kurzbz rdf:http://www.technikum-wien.at/raumtyp/rdf#beschreibung"
+															uri="rdf:*" style="text-decoration:line-through;"/>
+									</menupopup>
+								</rule>
+							</template>
 					</menulist>
 		  		</row>
 
@@ -469,12 +489,24 @@ $p = new phrasen($sprache);
 				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="LektorIn:"/>
 						 <menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" disabled="true" oncommand="LeMitarbeiterLektorChange(); LeMitarbeiterValueChanged();"
 	    		                   datasources="<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php"
+								   xmlns:MITARBEITER="http://www.technikum-wien.at/mitarbeiter/rdf#"
 			                       ref="http://www.technikum-wien.at/mitarbeiter/_alle" flex="1">
 				         <template>
-				            <menupopup>
-				               <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"
-				                         value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
-				            </menupopup>
+							 <rule MITARBEITER:aktiv='inaktiv'>
+								 <menupopup>
+									 <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"
+												value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+												style="text-decoration:line-through;"
+									 />
+								 </menupopup>
+							 </rule>
+							 <rule>
+								 <menupopup>
+									 <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"
+												value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
+								 </menupopup>
+							 </rule>
+				         
 				         </template>
 			   		 	</menulist>
 						<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" value="<?php echo $p->t('lehrveranstaltung/LehreinheitmitarbeiterAnmerkung'); ?>"/>

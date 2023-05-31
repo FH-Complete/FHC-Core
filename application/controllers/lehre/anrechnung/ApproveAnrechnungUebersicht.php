@@ -28,6 +28,9 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			)
 		);
 
+		// Load configs
+		$this->load->config('anrechnung');
+
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 		$this->load->model('education/Anrechnungstatus_model', 'AnrechnungstatusModel');
@@ -78,6 +81,19 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			show_error(getError($studiengang_kz_arr));
 		}
 
+        // Get oes the user is entitled for
+        $oe_kurzbz_arr_schreibberechtigt = array();
+        if ($oe_arr = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN))
+        {
+            foreach($oe_arr as $oe)
+            {
+                $berechtigt = $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $oe);
+
+                if ($berechtigt) $oe_kurzbz_arr_schreibberechtigt[]= $oe;
+            }
+        }
+
+        // Check if permission is readonly
         $hasReadOnlyAccess =
             $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's')
             && !$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid');
@@ -87,9 +103,11 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		$viewData = array(
 			'studiensemester_selected' => $studiensemester_kurzbz,
-			'studiengaenge_entitled' => $studiengang_kz_arr,
+            'studiengaenge_entitled' => $studiengang_kz_arr,                // alle STG mit Lese- und Schreibberechtigung
+            'oes_schreibberechtigt' => $oe_kurzbz_arr_schreibberechtigt,    // alle STG nur mit Schreibberechtigung
             'hasReadOnlyAccess' => $hasReadOnlyAccess,
-            'hasCreateAnrechnungAccess' => $hasCreateAnrechnungAccess
+            'hasCreateAnrechnungAccess' => $hasCreateAnrechnungAccess,
+            'configFachbereichsleitung' => $this->config->item('fbl')
 		);
 
 		$this->load->view('lehre/anrechnung/approveAnrechnungUebersicht.php', $viewData);
@@ -207,14 +225,20 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			// Request Recommendation
 			if($this->anrechnunglib->requestRecommendation($item['anrechnung_id']))
 			{
-				// Get full name of LV Leitung.
-				// If LV Leitung is not present, get full name of LV lectors.
-				$lector_arr = $this->anrechnunglib->getLectors($item['anrechnung_id']);
-				$empfehlungsanfrage_an = !isEmptyArray($lector_arr)
-					? implode(', ', array_column($lector_arr, 'fullname'))
-					: '';
+                // Get full name of Fachbereichsleitung or LV Leitung.
+                if($this->config->item('fbl') === TRUE)
+                {
+                    $result = $this->anrechnunglib->getLeitungOfLvOe($item['anrechnung_id']);
+                }
+                else
+                {
+                    // If LV Leitung is not present, get full name of LV lectors.
+                    $result = $this->anrechnunglib->getLectors($item['anrechnung_id']);
+                }
 
-				$retval[]= array(
+                $empfehlungsanfrage_an = !isEmptyArray($result) ? implode(', ', array_column($result, 'fullname')) : '';
+
+                $retval[]= array(
 					'anrechnung_id' => $item['anrechnung_id'],
 					'status_kurzbz' => self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR,
 					'status_bezeichnung' => $this->anrechnunglib->getStatusbezeichnung(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR),
@@ -226,19 +250,27 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 
 		/**
-		 * Send mails to lectors
+		 * Send mails
 		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
 		 * even if they are required for more recommendations
 		 * */
 		if (!isEmptyArray($retval))
 		{
-			self::_sendSanchoMailToLectors($retval);
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                $this->_sendSanchoMail($retval);
+            }
 		}
 
 		// Output json to ajax
-		if (isEmptyArray($retval) && $counter == 0)
+		if (isEmptyArray($retval))
 		{
-			return $this->outputJsonError('Es wurden keine Empfehlungen angefordert');
+            if ($counter > 0)
+            {
+                $this->terminateWithJsonError('Bei '. $counter.' LV sind keine LektorInnen zugeteilt.');
+            }
+
+			$this->terminateWithJsonError('Es wurden keine Empfehlungen angefordert');
 		}
 
 		return $this->outputJsonSuccess($retval);
@@ -316,7 +348,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 	 * @param $mail_params
 	 * @return bool
 	 */
-	private function _sendSanchoMailToLectors($mail_params)
+	private function _sendSanchoMail($mail_params)
 	{
 		// Get Lehrveranstaltungen
 		$anrechnung_arr = array();
@@ -332,18 +364,25 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		$anrechnung_arr = array_unique($anrechnung_arr, SORT_REGULAR);
 
-
-		/**
-		 * Get lectors (prio for LV-Leitung, if not present to all lectors of LV.
-		 * Anyway this function will receive a unique array to avoid sending more mails to one and the same lector.
-		 * **/
-		$lector_arr = $this->_getLectors($anrechnung_arr);
+        /**
+         * Get mail receivers.
+         * If retrieving lectors: prio for LV-Leitung, if not present to all lectors of LV.
+         * This function will receive a unique array to avoid sending more mails to one and the same user.
+         **/
+        if($this->config->item('fbl') === TRUE)
+        {
+            $receiver_arr = $this->_getLeitungOfLvOe($anrechnung_arr);
+        }
+        else
+        {
+            $receiver_arr = $this->_getLectors($anrechnung_arr);
+        }
 
 		// Send mail to lectors
-		foreach ($lector_arr as $lector)
+		foreach ($receiver_arr as $receiver)
 		{
-			$to = $lector->uid;
-			$vorname = $lector->vorname;
+			$to = $receiver->uid. '@'. DOMAIN;
+			$vorname = $receiver->vorname;
 
 			// Get full name of stgl
 			$this->load->model('person/Person_model', 'PersonModel');
@@ -427,4 +466,34 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		return $lector_arr;
 	}
+
+    /**
+     * Get Leitungen of Lehrveranstaltungs-Organisationseinheit with unique uids.
+     *
+     * @param $anrechnung_arr
+     * @return array
+     */
+    private function _getLeitungOfLvOe($anrechnung_arr)
+    {
+        $oeLeitung_arr = array();
+
+        // Get Leitungen
+        foreach($anrechnung_arr as $anrechnung)
+        {
+            $this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+            $result = $this->LehrveranstaltungModel->getLeitungOfLvOe($anrechnung['lehrveranstaltung_id']);
+
+            if (!hasData($result))
+            {
+                show_error('No Leitung found');
+            }
+
+            $oeLeitung_arr = array_merge($oeLeitung_arr, getData($result));
+        }
+
+        // Make array unique
+        $oeLeitung_arr = array_unique($oeLeitung_arr, SORT_REGULAR);
+
+        return $oeLeitung_arr;
+    }
 }

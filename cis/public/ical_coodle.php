@@ -28,13 +28,27 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/coodle.class.php');
 require_once('../../include/ical.class.php');
 
-$uid = mb_substr($_SERVER['PATH_INFO'],1);
+
+$params = mb_substr($_SERVER['PATH_INFO'],1);
+$paramsArray = explode('/',$params);
+$private = false;
+
+if ($paramsArray[0] == 'cipher_encryption')
+{
+	$uid = decryptData($paramsArray[1],LVPLAN_CYPHER_KEY);
+	$private = true;
+}
+else
+{
+	$uid = $paramsArray[0];
+}
 
 $bn = new benutzer();
 if(!$bn->load($uid))
 	die('User invalid');
 	
 header("Content-Type: text/calendar; charset=UTF-8");
+header("Content-disposition: filename=Coodle Terminzusagen.ics");
 
 echo "BEGIN:VCALENDAR\n";
 echo "VERSION:2.0\n";
@@ -80,7 +94,7 @@ foreach($umfragen->result as $umfrage)
 		if($ressource_id = $ressource->RessourceExists($umfrage->coodle_id, $uid))
 		{	
 			// Terminvorschlaege laden die angekreuzt wurden
-			$termine = new coodle();
+			$termine = new coodle($umfrage->coodle_id);
 			$termine->getRessourceTermin($umfrage->coodle_id, $ressource_id);
 			foreach($termine->result as $termin)
 			{
@@ -91,10 +105,22 @@ foreach($umfragen->result as $umfrage)
 				$date->add($interval);
 				$uhrzeit_ende = $date->format('H:i:s');
 				$dtende = $date->format('Ymd\THis');
+				$ersteller = new benutzer($termine->ersteller_uid);
+				if ($private == true)
+				{
+					$summary = 'Coodle Terminoption '.strip_tags($termine->titel);
+					$description = 'Erstellt von '.$ersteller->vorname.' '.$ersteller->nachname;
+				}
+				else
+				{
+					$summary = 'Coodle Terminoption';
+					$description = '';
+				}
 
 				echo "\nBEGIN:VEVENT";
-				echo "\nUID:Coodle_Terminoption".$dtstart."_".$dtende."";
-				echo "\nSUMMARY:Coodle Terminoption";
+				echo "\nUID:Coodle_Terminoption".$dtstart."_".$dtende;
+				echo "\nSUMMARY:".$summary;
+				echo "\nDESCRIPTION:".$description;
 				echo "\nDTSTART;TZID=Europe/Vienna:$dtstart";
 				echo "\nDTEND;TZID=Europe/Vienna:$dtende";
 				echo "\nTRANSP:OPAQUE";
