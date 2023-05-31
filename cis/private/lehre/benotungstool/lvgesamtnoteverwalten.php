@@ -341,6 +341,9 @@ foreach ($noten_obj->result as $row)
 }
 
 ?>
+
+	const CIS_GESAMTNOTE_PUNKTE = <?php echo CIS_GESAMTNOTE_PUNKTE ? 'true' : 'false';?>;
+
 	function getOffset(pos)
 	{
 		var x,y;
@@ -799,33 +802,48 @@ foreach ($noten_obj->result as $row)
 		}
 		?>
 
+		var linenumber = 0;
 		for(row in rows)
 		{
-			zeile = rows[row].split("	");
-
-			<?php
-			// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
-			if (CIS_GESAMTNOTE_PUNKTE == false)
-				echo '	// check for valid grades
-				if (validGrades.indexOf(zeile[1]) === -1 && typeof(zeile[1]) != "undefined" && zeile[1] != "")
-				{
-					alertMsg = alertMsg+"Die Note "+zeile[1]+" ist nicht zulaessig. Die Zeile wurde uebersprungen. \n";
-					continue;
-				}';
-			?>
-
-			if (zeile[0]!='' && zeile[1]!='')
+			linenumber++;
+			if( rows[row] == '' ) 
 			{
-				gradedata['matrikelnr_'+i]=zeile[0];
-				<?php
-				if (CIS_GESAMTNOTE_PUNKTE)
-					echo "gradedata['punkte_'+i]= zeile[1];";
-				else
-					echo "gradedata['note_'+i]= zeile[1];";
-				?>
-
-				i++;
+				//skip empty lines
+				continue;
 			}
+			zeile = rows[row].split("	");
+			
+			if( zeile.length < 2 )
+			{
+			  alertMsg = alertMsg + "Zeile " + linenumber + ': ' 
+			  + 'Zu wenig Paramter - 2 erforderlich.  '
+			  + 'Die Zeile wurde uebersprungen.' + "\n\n";
+			  continue;
+			}
+
+			if (CIS_GESAMTNOTE_PUNKTE == false)
+			{
+				// check for valid grades
+				if (validGrades.indexOf(zeile[1]) === -1)
+				{
+					alertMsg = alertMsg + "Zeile " + linenumber + ': '
+						+ "Die Note "+zeile[1]+" ist nicht zulaessig. "
+						+ "Die Zeile wurde uebersprungen. \n\n";
+					continue;
+				}
+			}
+
+			gradedata['matrikelnr_'+i]=zeile[0];
+			if (CIS_GESAMTNOTE_PUNKTE)
+			{
+				gradedata['punkte_'+i]= zeile[1];
+			}
+			else
+			{
+				gradedata['note_'+i]= zeile[1];
+			}
+
+			i++;
 		}
 
 		if (alertMsg != "")
@@ -895,35 +913,70 @@ foreach ($noten_obj->result as $row)
 		}
 		?>
 
-
+		var linenumber = 0;
 		for(row in rows)
 		{
-			zeile = rows[row].split("	");
-
-			<?php
-			// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
-			if (CIS_GESAMTNOTE_PUNKTE == false)
-				echo '	// check for valid grades
-				if (validGrades.indexOf(zeile[2]) === -1 && typeof(zeile[2]) != "undefined" && zeile[2] != "")
-				{
-					alertMsg = alertMsg+"Die Note "+zeile[2]+" ist nicht zulaessig. Die Zeile wurde uebersprungen. \n";
-					continue;
-				}';
-			?>
-
-			if (zeile[0]!='' && zeile[1]!='' && zeile[2]!='')
+			linenumber++;
+			if( rows[row] == '' ) 
 			{
-				gradedata['student_uid_'+i]=zeile[0];
-				gradedata['datumNachp_'+i]=zeile[1];
-				<?php
-				if (CIS_GESAMTNOTE_PUNKTE)
-					echo "gradedata['punkte_'+i]= zeile[2];";
-				else
-					echo "gradedata['note_'+i]= zeile[2];";
-				?>
-
-				i++;
+				//skip empty lines
+				continue;
 			}
+			zeile = rows[row].split("	");
+			
+			if( zeile.length < 3 )
+			{
+			  alertMsg = alertMsg + "Zeile " + linenumber + ': ' 
+			  + 'Zu wenig Paramter - 3 erforderlich.  '
+			  + 'Die Zeile wurde uebersprungen.' + "\n\n";
+			  continue;
+			}
+			
+			if( zeile[1] == '' && zeile[2] == '' )
+			{
+				// ignore lines just copied from excel 
+				continue;
+			}
+			
+			if( zeile[2] == '' ) 
+			{
+				alertMsg = alertMsg + "Zeile " + linenumber + ': '
+					+ "Die Note oder Punkte fehlen. "
+					+ "Die Zeile wurde uebersprungen. \n\n";
+				continue;			
+			}
+			
+			if (CIS_GESAMTNOTE_PUNKTE == false) 
+			{
+				// check for valid grades
+				if (validGrades.indexOf(zeile[2]) === -1)
+				{
+					alertMsg = alertMsg + "Zeile " + linenumber + ': '
+						+ "Die Note "+zeile[2]+" ist nicht zulaessig. "
+						+ "Die Zeile wurde uebersprungen. \n\n";
+					continue;
+				}
+			}
+
+			if( !zeile[1].match(/[0-9]{2}\.[0-9]{2}\.[0-9]{4}/)  ) 
+			{
+				alertMsg = alertMsg + "Zeile " + linenumber + ': '
+					+ "Das Datum "+zeile[1]+" fehlt oder ist nicht zulaessig. "
+					+ "Die Zeile wurde uebersprungen. \n\n";
+				continue;
+			}
+
+			gradedata['student_uid_'+i]=zeile[0];
+			gradedata['datumNachp_'+i]=zeile[1];
+			if (CIS_GESAMTNOTE_PUNKTE)
+			{
+				gradedata['punkte_'+i]= zeile[2];
+			}
+			else
+			{
+				gradedata['note_'+i]= zeile[2];
+			}
+			i++;
 		}
 
 
