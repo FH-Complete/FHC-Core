@@ -35,6 +35,17 @@ class SignatureLib
 	{
 		try
 		{
+			// Dont send Document if it is bigger than 30 MB (Limit of Signature Server)
+			if (filesize($inputFileName) > 30000000)
+			{
+				$returnObject = new stdClass();
+				$returnObject->code = 1;
+				$returnObject->error = 1;
+				$returnObject->retval = 'File to big';
+
+				return $returnObject;
+			}
+
 			// Get the content of the given file
 			$inputFileContent = file_get_contents($inputFileName);
 			if ($inputFileContent === false) // if failed
@@ -72,4 +83,3 @@ class SignatureLib
 		return null;
 	}
 }
-
