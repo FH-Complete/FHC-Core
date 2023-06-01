@@ -121,15 +121,15 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 				<td><input  type="text" name="sprache" id="sprache" value="'.$db->convert_html_chars($row_zd->sprache).'" size="10" maxlength="8" readonly="readonly"></td>
 			</tr>
 			<tr>
-				<td width="30%"><b>'.$p->t('abgabetool/kontrollierteSchlagwoerter').':*</b></td>
+				<td width="30%"><b>'.$p->t('abgabetool/kontrollierteSchlagwoerter').':</b></td>
 				<td width="40%"><input type="text" name="kontrollschlagwoerter" id="kontrollschlagwoerter" value="'.$db->convert_html_chars($row_zd->kontrollschlagwoerter).'" size="60" maxlength="150" readonly="readonly"></td>
 			</tr>
 			<tr>
-				<td><b>'.$p->t('abgabetool/deutscheSchlagwoerter').': </b></td>
+				<td><b>'.$p->t('abgabetool/deutscheSchlagwoerter').':* </b></td>
 				<td><input type="text" name="schlagwoerter" value="'.$db->convert_html_chars($row_zd->schlagwoerter).'" size="60" maxlength="150" readonly="readonly"></td>
 			</tr>
 			<tr>
-				<td><b>'.$p->t('abgabetool/englischeSchlagwoerter').': </b></td>
+				<td><b>'.$p->t('abgabetool/englischeSchlagwoerter').':* </b></td>
 				<td><input type="text" name="schlagwoerter_en" value="'.$db->convert_html_chars($row_zd->schlagwoerter_en).'" size="60" maxlength="150" readonly="readonly"></td>
 			</tr>
 			<tr>

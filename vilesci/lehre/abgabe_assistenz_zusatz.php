@@ -120,15 +120,15 @@ echo '<div>Student: <b>'.$uid.'</b><br>Titel: <b>'.
 	<td><input type="text" name="sprache" id="sprache" value="'.(isset($row_zd->sprache)?$db->convert_html_chars($row_zd->sprache):'').'" size="10" maxlength="8" readonly="readonly"></td>
 </tr>
 <tr>
-	<td width="30%"><b>Kontrollierte Schlagw&ouml;rter:*</b></td>
+	<td width="30%"><b>Kontrollierte Schlagw&ouml;rter:</b></td>
 	<td width="40%"><input type="text" name="kontrollschlagwoerter" id="kontrollschlagwoerter" value="'.(isset($row_zd->kontrollschlagwoerter)?$db->convert_html_chars($row_zd->kontrollschlagwoerter):'').'" size="60" maxlength="150" readonly="readonly"></td>
 </tr>
 <tr>
-	<td><b>Dt. Schlagw&ouml;rter:</b></td>
+	<td><b>Dt. Schlagw&ouml;rter:*</b></td>
 	<td><input type="text" name="schlagwoerter" value="'.(isset($row_zd->schlagwoerter)?$db->convert_html_chars($row_zd->schlagwoerter):'').'" size="60" maxlength="150" readonly="readonly"></td>
 </tr>
 <tr>
-	<td><b>Engl. Schlagw&ouml;rter:</b></td>
+	<td><b>Engl. Schlagw&ouml;rter:*</b></td>
 	<td><input  type="text" name="schlagwoerter_en" value="'.(isset($row_zd->schlagwoerter_en)?$db->convert_html_chars($row_zd->schlagwoerter_en):'').'" size="60" maxlength="150" readonly="readonly"></td>
 </tr>
 <tr>
