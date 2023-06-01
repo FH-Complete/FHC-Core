@@ -54,6 +54,13 @@ foreach ($stg_obj->result as $stg)
 	$stg_arr[$stg->studiengang_kz] = $stg->kuerzel;
 }
 
+//Default BA1Codes für echte Dienstverträge aus Config Laden
+$arrEchterDV = [103, 110];
+if (defined('DEFAULT_ECHTER_DIENSTVERTRAG') && DEFAULT_ECHTER_DIENSTVERTRAG != '')
+{
+	$arrEchterDV = DEFAULT_ECHTER_DIENSTVERTRAG;
+}
+
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'');
 $semester = (isset($_GET['semester'])?$_GET['semester']:'');
 $stsem_von = (isset($_GET['stsem_von'])?$_GET['stsem_von']:'');
@@ -359,7 +366,7 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 										{
 											// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
 											// geliefert da dies im Vertrag inkludiert ist.
-											if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+											if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
 											{
 												$lem_obj->stundensatz = '';
 												break;
