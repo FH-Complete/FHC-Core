@@ -710,6 +710,10 @@ while ($row=@$db->db_fetch_object($result))
 					$signaturVorhanden = true;
 					// The document is signed
 				}
+				elseif (isset($signList->code) && $signList->code == 1)
+				{
+					$uploadedDocumentSigned = $p->t('abgabetool/uploaddDocumentToBigForSignature');
+				}
 				elseif ($signList === null)
 				{
 					$uploadedDocumentSigned = 'WARNING: signature server error';
