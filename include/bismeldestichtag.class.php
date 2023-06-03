@@ -18,6 +18,7 @@
  * Authors: Alexei Karpenko <karpenko@technikum-wien.at>,
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/studiensemester.class.php');
 
 class bismeldestichtag extends basis_db
 {
@@ -51,7 +52,7 @@ class bismeldestichtag extends basis_db
 	 */
 	public function load($meldestichtag_id)
 	{
-		$qry = "SELECT * FROM bis.tbl_meldestichtag WHERE meldestichtag_id=".$this->db_add_param($meldestichtag_id, FHC_INTEGER);
+		$qry = "SELECT * FROM bis.tbl_bismeldestichtag WHERE meldestichtag_id=".$this->db_add_param($meldestichtag_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -96,30 +97,32 @@ class bismeldestichtag extends basis_db
 	 * @param $frage_id
 	 * @return boolean
 	 */
-	public function getLastMeldestichtag($studiensemester_kurzbz = null)
+	public function getLastReachedMeldestichtag($studiensemester_kurzbz = null)
 	{
 		$qry = "SELECT
-					meldestichtag, studiensemester_kurzbz
+					meldestichtag_id, meldestichtag, studiensemester_kurzbz, insertamum, insertvon, updateamum, updatevon
 				FROM
-					bis.tbl_meldestichtag";
+					bis.tbl_bismeldestichtag
+				WHERE
+					meldestichtag < NOW()";
 
 		if (isset($studiensemester_kurzbz))
 		{
 			$qry .=	"
-				WHERE
+				AND
 					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		}
 
 		$qry .= "
 				ORDER BY
 					meldestichtag DESC
-				LIMIT 1;"
+				LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$obj = new antwort();
+				$obj = new bismeldestichtag();
 
 				$obj->meldestichtag_id = $row->meldestichtag_id;
 				$obj->meldestichtag = $row->meldestichtag;
@@ -139,6 +142,34 @@ class bismeldestichtag extends basis_db
 			$this->errormsg = 'Meldestichtag konnte nicht geladen werden';
 			return false;
 		}
+	}
+
+	/**
+	 * Prüft, ob Meldestichtag für ein bestimmtes Studiensemester und Statusdatum erreicht ist.
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @param $status_datum
+	 * @return boolean true wenn erreicht, oder false
+	 */
+	public function checkMeldestichtagErreicht($studiensemester_kurzbz, $status_datum)
+	{
+		$erreicht = false;
+		// Studiensemester ende holen
+		$studiensemester = new studiensemester();
+		if ($studiensemester->load($studiensemester_kurzbz))
+			$studiensemester_ende = new DateTime($studiensemester->ende);
+
+		// letztes erreichtes Bismeldedatum holen
+		if ($this->getLastReachedMeldestichtag() && isset($this->result[0]))
+			$lastReachedMeldestichtag = new DateTime($this->result[0]->meldestichtag);
+
+		$statusDatum = new DateTime($status_datum);
+
+		// Prüfen, ob Studentstatusdatum oder Studiensemester vor dem Stichtagsdatum liegen
+		if (isset($studiensemester_ende) && isset($lastReachedMeldestichtag) && isset($statusDatum))
+			$erreicht = $statusDatum < $lastReachedMeldestichtag || $studiensemester_ende < $lastReachedMeldestichtag;
+
+		return $erreicht;
 	}
 }
 ?>

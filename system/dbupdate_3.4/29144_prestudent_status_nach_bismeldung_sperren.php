@@ -5,7 +5,7 @@ if (! defined('DB_NAME')) exit('No direct script access allowed');
 // Creates table bis.tbl_bismeldestichtag if it doesn't exist and grants privileges
 if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_bismeldestichtag LIMIT 1'))
 {
-	$qry = 'CREATE TABLE bis.tbl_bismeldestichtag (
+	$qry = "CREATE TABLE bis.tbl_bismeldestichtag (
 				meldestichtag_id integer,
 				meldestichtag date NOT NULL,
 				studiensemester_kurzbz varchar(16) NOT NULL,
@@ -15,7 +15,7 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_bismeldestichtag LIMIT 1'))
 				updatevon varchar(32)
 			);
 
-			COMMENT ON TABLE bis.tbl_bismeldestichtag IS \'Deadline Dates for BIS reporting\';
+			COMMENT ON TABLE bis.tbl_bismeldestichtag IS 'Deadline Dates for BIS reporting';
 
 			ALTER TABLE bis.tbl_bismeldestichtag ADD CONSTRAINT pk_bismeldestichtag PRIMARY KEY (meldestichtag_id);
 
@@ -25,9 +25,8 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_bismeldestichtag LIMIT 1'))
 				NO MINVALUE
 				CACHE 1;
 
-			ALTER TABLE bis.tbl_bismeldestichtag ALTER COLUMN meldestichtag_id SET DEFAULT nextval(\'tbl_meldestichtag_meldestichtag_id_seq\');
-
-			ALTER TABLE bis.tbl_bismeldestichtag ADD CONSTRAINT fk_bismeldestichtag_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;';
+			ALTER TABLE bis.tbl_bismeldestichtag ALTER COLUMN meldestichtag_id SET DEFAULT nextval('bis.tbl_meldestichtag_meldestichtag_id_seq');
+			ALTER TABLE bis.tbl_bismeldestichtag ADD CONSTRAINT fk_bismeldestichtag_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
 
 	if (!$db->db_query($qry))
 		echo '<strong>bis.tbl_bismeldestichtag: '.$db->db_last_error().'</strong><br>';

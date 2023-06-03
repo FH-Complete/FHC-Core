@@ -995,6 +995,18 @@ if(!$error)
 								{
 									$new_status_datum = isset($_POST['datum']) ? $_POST['datum'] : date('Y-m-d');
 
+									$bismeldestichtag = new bismeldestichtag();
+
+									$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($studiensemester, $new_status_datum);
+
+									if ($meldestichtag_erreicht === true)
+									{
+										$return = false;
+										$error = true;
+										$errormsg .= 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
+										$anzahl_fehler++;
+									}
+
 									$check_statusaenderung_result = checkStatusaenderung(
 										$prestudent_id,
 										$_POST['status_kurzbz'],
@@ -1205,12 +1217,23 @@ if(!$error)
 
 		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['status_kurzbz']) &&
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
-		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
+		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']) &&
+		   isset($_POST['datum']))
 		{
-			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid'))
+			$erweiterteBerechtigungen = $rechte->isBerechtigt('admin', null, 'suid') || $rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
+
+			$bismeldestichtag = new bismeldestichtag();
+			$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['studiensemester_kurzbz'], $_POST['datum']);
+
+			if($_POST['status_kurzbz']=='Student' && !$erweiterteBerechtigungen)
 			{
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
+			}
+			elseif ($meldestichtag_erreicht && !$erweiterteBerechtigungen)
+			{
+				$return = false;
+				$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht gelöscht werden.';
 			}
 			else
 			{
@@ -1530,6 +1553,17 @@ if(!$error)
 							$return = false;
 							$error = true;
 							$errormsg = isset($check_statusaenderung_result['errormsg']) ? $check_statusaenderung_result['errormsg'] : '';
+						}
+
+						// Prüfung, ob Meldestichtag erreicht ist
+						$bismeldestichtag = new bismeldestichtag();
+						$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['studiensemester_kurzbz'], $_POST['datum']);
+
+						if ($meldestichtag_erreicht === true)
+						{
+							$return = false;
+							$error = true;
+							$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
 						}
 					}
 

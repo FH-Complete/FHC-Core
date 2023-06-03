@@ -31,6 +31,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/bismeldestichtag.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
@@ -58,6 +59,11 @@ if(isset($_GET['ausbildungssemester']))
 else
 	$ausbildungssemester='';
 
+if(isset($_GET['datum']))
+	$datum=$_GET['datum'];
+else
+	$datum='';
+
 $vorname = '';
 $nachname = '';
 if($prestudent_id!='')
@@ -67,6 +73,10 @@ if($prestudent_id!='')
 
 	$vorname = $prestudent->vorname;
 	$nachname = $prestudent->nachname;
+
+	// Prüfen, ob Studnetrolle vor dem aktuellen Meldestichtag ist. In diesem Fall darf die Rolle nicht mehr bearbeitet werden.
+	$bismeldestichtag = new bismeldestichtag();
+	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($studiensemester_kurzbz, $datum) ? ' disabled="true"' : '';
 }
 $db = new basis_db();
 $user=get_uid();
@@ -112,7 +122,7 @@ $user=get_uid();
 					<label value="Studiensemester" control="student-rolle-menulist-studiensemester"/>
 					<menulist id="student-rolle-menulist-studiensemester"
 					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php?order=desc" flex="1"
-					          ref="http://www.technikum-wien.at/studiensemester/liste" >
+					          ref="http://www.technikum-wien.at/studiensemester/liste"<?php echo $disabled ?> >
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
@@ -124,7 +134,7 @@ $user=get_uid();
 	  			</row>
 	  			<row>
 	  				<label value="Ausbildungssemester" control="student-rolle-menulist-ausbildungssemester"/>
-					<menulist id="student-rolle-menulist-ausbildungssemester" >
+					<menulist id="student-rolle-menulist-ausbildungssemester"<?php echo $disabled ?> >
 						<menupopup>
 						<?php
 
@@ -163,7 +173,7 @@ $user=get_uid();
 				?>
 				<row hidden="<?php echo $hidden; ?>">
 					<label value="Organisationsform" control="student-rolle-menulist-orgform_kurzbz"/>
-					<menulist id="student-rolle-menulist-orgform_kurzbz" >
+					<menulist id="student-rolle-menulist-orgform_kurzbz"<?php echo $disabled ?> >
 						<menupopup>
 						<menuitem value="" label="-- keine Auswahl --"/>
 						<?php
@@ -181,13 +191,13 @@ $user=get_uid();
 				</row>
 				<row>
 					<label value="Datum" control="student-rolle-datum-datum"/>
-					<box class='Datum' id="student-rolle-datum-datum" />
+					<box class='Datum' id="student-rolle-datum-datum"<?php echo $disabled ?>/>
 				</row>
 				<row>
 					<label value="Bestätigt am" control="student-rolle-datum-bestaetigt_datum"/>
-					<box class='Datum' id="student-rolle-datum-bestaetigt_datum" />
+					<box class='Datum' id="student-rolle-datum-bestaetigt_datum"<?php echo $disabled ?> />
 				</row>
-				<?php 
+				<?php
 						$readonly = 'readonly="true"';
 						$rechte = new benutzerberechtigung();
 						$rechte->getBerechtigungen($user);
@@ -196,11 +206,11 @@ $user=get_uid();
 					?>
 				<row>
 					<label value="Bewerbung abgeschickt am" control="student-rolle-datum-bewerbung_abgeschicktamum"/>
-					<textbox id="student-rolle-datum-bewerbung_abgeschicktamum" <?php echo $readonly ?>/>
+					<textbox id="student-rolle-datum-bewerbung_abgeschicktamum" <?php echo $readonly ?><?php echo $disabled ?>/>
 				</row>
 				<row>
 					<label value="Studienplan" control="student-rolle-menulist-studienplan"/>
-					<menulist id="student-rolle-menulist-studienplan" >
+					<menulist id="student-rolle-menulist-studienplan"<?php echo $disabled ?> >
 						<menupopup>
 						<menuitem value="" label="-- keine Auswahl --"/>
 						<?php
@@ -217,7 +227,7 @@ $user=get_uid();
 				</row>
 				<row>
 					<label value="Anmerkung"/>
-					<textbox id="student-rolle-textbox-anmerkung" multiline="true" />
+					<textbox id="student-rolle-textbox-anmerkung" multiline="true"<?php echo $disabled ?> />
 				</row>
 				<row>
 					<label value="Aufnahmestufe"/>
@@ -248,7 +258,7 @@ $user=get_uid();
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-		<button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern" />
+		<button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern"<?php echo $disabled ?> />
 	</hbox>
 </groupbox>
 </vbox>

@@ -2000,6 +2000,7 @@ function StudentPrestudentRolleDelete()
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var datum = getTreeCellText(tree, 'student-prestudent-tree-rolle-datum', tree.currentIndex);
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	if(confirm('Diese Rolle wirklich loeschen?'))
@@ -2028,6 +2029,7 @@ function StudentPrestudentRolleDelete()
 				req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 				req.add('ausbildungssemester', ausbildungssemester);
 				req.add('studiengang_kz', studiengang_kz);
+				req.add('datum', datum);
 
 				var response = req.executePOST();
 
@@ -2059,6 +2061,7 @@ function StudentPrestudentRolleDelete()
 			req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 			req.add('ausbildungssemester', ausbildungssemester);
 			req.add('studiengang_kz', studiengang_kz);
+			req.add('datum', datum);
 
 			var response = req.executePOST();
 
@@ -2151,8 +2154,9 @@ function StudentRolleBearbeiten()
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var datum = getTreeCellText(tree, 'student-prestudent-tree-rolle-datum', tree.currentIndex);
 
-	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","status=no, width=500, height=450, centerscreen, resizable");
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester+'&datum='+datum,"Status","status=no, width=500, height=450, centerscreen, resizable");
 }
 
 // ****
@@ -2210,7 +2214,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 					timepart_arr[i] = '00';
 				}
 			}
-			
+
 			arr = datepart.split('.');
 
 			if(arr[0].length==1)
