@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * There shouldn't be any status after Abbrecher status.
  */
 class CORE_STUDENTSTATUS_0002 implements IIssueResolvedChecker
 {

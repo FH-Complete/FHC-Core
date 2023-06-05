@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Birth date of person shouldn't be too long ago.
  */
 class CORE_PERSON_0001 implements IIssueResolvedChecker
 {
