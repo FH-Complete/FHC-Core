@@ -151,6 +151,70 @@ class VertragsbestandteilLib
 			throw new Exception('Storing Vertragsbestandteil failed.');
 		}	
 	}
+
+	public function deleteDienstverhaeltnis(Dienstverhaeltnis $dv)
+	{
+		$this->CI->db->trans_begin();
+		try
+		{
+			if( intval($dv->getDienstverhaeltnis_id()) > 0 )
+			{
+				$vbs = $this->fetchVertragsbestandteile($dv->getDienstverhaeltnis_id());
+				foreach ($vbs as $vb)
+				{
+					$this->deleteVertragsbestandteil($vb);
+				}
+
+				$ret = $this->DienstverhaeltnisModel->delete($dv->getDienstverhaeltnis_id());
+				if(isError($ret) )
+				{
+					log_message('debug', "Delete DV failed");
+					throw new Exception('error deleting dienstverhaeltnis '
+						. $dv->getDienstverhaeltnis_id());
+				}
+
+				if( $this->CI->db->trans_status() === false )
+				{
+					log_message('debug', "Transaction failed");
+					throw new Exception("Transaction failed");
+				}
+				$this->CI->db->trans_commit();
+			}
+		}
+		catch (Exception $ex)
+		{
+			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
+			$this->CI->db->trans_rollback();
+			return $ex->getMessage();
+		}
+
+		return true;
+
+	}
+
+	public function deleteVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
+	{
+		$this->CI->db->trans_begin();
+		try
+		{
+			if( intval($vertragsbestandteil->getVertragsbestandteil_id()) > 0 )
+			{
+				$this->deleteVertragsbestandteilHelper($vertragsbestandteil);
+			}
+			if( $this->CI->db->trans_status() === false )
+			{
+				log_message('debug', "Transaction failed");
+				throw new Exception("Transaction failed");
+			}
+			$this->CI->db->trans_commit();
+		}
+		catch (Exception $ex)
+		{
+			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
+			$this->CI->db->trans_rollback();
+			throw new Exception('Delete Vertragsbestandteil failed.');
+		}
+	}
 	
 	protected function insertDienstverhaeltnis(Dienstverhaeltnis $dv)
 	{
@@ -216,12 +280,45 @@ class VertragsbestandteilLib
 		}
 	}
 	
+	private function deleteVertragsbestandteilHelper(Vertragsbestandteil $vertragsbestandteil)
+	{
+
+		$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
+			$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+		$retspecial = $specialisedModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
+		
+		if(isError($retspecial) )
+		{
+			throw new Exception('error deleting vertragsbestandteil '
+				. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+		}
+		
+		try
+		{
+			$gehaltsbestandteile = $vertragsbestandteil->getGehaltsbestandteile();
+			$this->GehaltsbestandteilLib->deleteGehaltsbestandteile($gehaltsbestandteile);
+		}
+		catch(Exception $ex)
+		{
+			throw new Exception('VertragsbestandteilLib updateVertragsbestandteil '
+				. 'failed to store Gehaltsbestandteile. ' . $ex->getMessage());
+		}
+
+
+		$ret = $this->VertragsbestandteilModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
+
+		if(isError($ret) )
+		{
+			throw new Exception('error deleting vertragsbestandteil');
+		}
+	}
+
 	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
 	{
 		$vertragsbestandteil->setUpdatevon($this->loggedInUser)
 			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$vertragsbestandteil->beforePersist();
-		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
+		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(),
 			$vertragsbestandteil->baseToStdClass());
 		
 		if(isError($ret) )
@@ -261,23 +358,5 @@ class VertragsbestandteilLib
 			$dv->getBis(),
 			$dv->getDienstverhaeltnis_id()
 		);
-	}
-	
-	public function deleteVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
-	{
-		$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
-			$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
-		$retspecial = $specialisedModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
-		if(isError($retspecial) )
-		{
-			throw new Exception('error deleting vertragsbestandteil ' 
-				. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
-		}
-		
-		$ret = $this->VertragsbestandteilModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
-		if(isError($ret) )
-		{
-			throw new Exception('error deleting vertragsbestandteil');
-		}
 	}
 }

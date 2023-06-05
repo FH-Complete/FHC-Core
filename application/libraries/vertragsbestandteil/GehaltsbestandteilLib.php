@@ -93,11 +93,20 @@ class GehaltsbestandteilLib
 			throw new Exception('error updating gehaltsbestandteil');
 		}
 	}
-	
+
+	public function deleteGehaltsbestandteile($gehaltsbestandteile)
+	{
+		foreach( $gehaltsbestandteile as $gehaltsbestandteil )
+		{
+			$this->deleteGehaltsbestandteil($gehaltsbestandteil);
+		}
+	}
+
 	public function deleteGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
 	{
 		$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
-		if(isError($ret) )
+		
+		if (isError($ret))
 		{
 			throw new Exception('error deleting gehaltsbestandteil');
 		}
