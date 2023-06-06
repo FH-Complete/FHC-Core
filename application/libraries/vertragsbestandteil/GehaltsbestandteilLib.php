@@ -114,6 +114,11 @@ class GehaltsbestandteilLib
 	
 	public function endGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil, $enddate)
 	{
+		if( $gehaltsbestandteil->getBis() !== null && $gehaltsbestandteil->getBis() < $enddate ) 
+		{
+			return;
+		}
+		
 		$ret = $this->GehaltsbestandteilModel->update($gehaltsbestandteil->getGehaltsbestandteil_id(), 
 			(object) array(
 				'bis' => $enddate, 

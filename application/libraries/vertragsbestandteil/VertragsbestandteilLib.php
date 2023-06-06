@@ -362,6 +362,11 @@ class VertragsbestandteilLib
 	
 	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate)
 	{
+		if( $dv->getBis() !== null && $dv->getBis() < $enddate ) 
+		{
+			return 'Dienstverhältnis ist bereits beendet.';
+		}
+		
 		$this->CI->db->trans_begin();
 		try
 		{
@@ -411,6 +416,11 @@ class VertragsbestandteilLib
 	
 	public function endVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil, $enddate)
 	{
+		if( $vertragsbestandteil->getBis() !== null && $vertragsbestandteil->getBis() < $enddate ) 
+		{
+			return;
+		}
+		
 		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
 			(object) array(
 				'bis' => $enddate, 
