@@ -111,4 +111,19 @@ class GehaltsbestandteilLib
 			throw new Exception('error deleting gehaltsbestandteil');
 		}
 	}
+	
+	public function endGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil, $enddate)
+	{
+		$ret = $this->GehaltsbestandteilModel->update($gehaltsbestandteil->getGehaltsbestandteil_id(), 
+			(object) array(
+				'bis' => $enddate, 
+				'updatevon' => getAuthUID(),
+				'updateamum' => strftime('%Y-%m-%d %H:%M')
+			));
+		
+		if (isError($ret))
+		{
+			throw new Exception('error ending gehaltsbestandteil');
+		}
+	}
 }
