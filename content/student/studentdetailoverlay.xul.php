@@ -675,11 +675,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                             <label value="Anmerkung" control="student-prestudent-textbox-anmerkung"/>
                             <textbox id="student-prestudent-textbox-anmerkung" disabled="true"/>
                             <hbox>
-                                <?php $keine_studstatuspruefung = $rechte->isBerechtigt('student/keine_studstatuspruefung'); ?>
-                                <label value="Bismelden" control="student-prestudent-checkbox-bismelden"
-                                <?php echo $keine_studstatuspruefung?'':' hidden="true"'; ?>/>
-                                <checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"
-                                <?php echo $keine_studstatuspruefung?'':' hidden="true"'; ?>/>
+                                <label value="Bismelden" control="student-prestudent-checkbox-bismelden"/>
+                                <checkbox id="student-prestudent-checkbox-bismelden" checked="true" disabled="true"/>
                             </hbox>
 							<hbox>
 								<label value="Duales Studium" control="student-prestudent-checkbox-dual"/>
