@@ -192,6 +192,12 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
     {
 		$vars = get_object_vars($this);
 		unset($vars['CI']);
+		
+		// TODO cleanup workaroung for vb freitext where db column is anmerkung and formfield is freitext
+		if( isset($vars['anmerkung']) ) {
+			$vars['freitext'] = $vars['anmerkung'];
+		}
+		
         return $vars;
     }
 	

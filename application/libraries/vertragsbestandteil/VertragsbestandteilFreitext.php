@@ -24,6 +24,7 @@ class VertragsbestandteilFreitext extends Vertragsbestandteil
 		isset($data->freitexttyp_kurzbz) && $this->setFreitexttypKurzbz($data->freitexttyp_kurzbz);
 		isset($data->titel) && $this->setTitel($data->titel);
 		isset($data->freitext) && $this->setAnmerkung($data->freitext);
+		isset($data->anmerkung) && $this->setAnmerkung($data->anmerkung);
 	}
 		
 	public function toStdClass(): \stdClass
@@ -109,6 +110,18 @@ EOTXT;
 	
 	public function validate()
 	{
+		if( empty($this->freitexttyp_kurzbz) ) {
+			$this->validationerrors[] = 'Bitte einen gültigen Freitexttyp auswählen.';
+		}
+		
+		if( empty($this->titel) ) {
+			$this->validationerrors[] = 'Bitte einen Titel angeben.';
+		}
+		
+		if( empty($this->anmerkung) ) {
+			$this->validationerrors[] = 'Bitte eine Beschreibung eingeben.';
+		}
+		
 		return parent::validate();
 	}
 }
