@@ -1796,7 +1796,6 @@ function StudentPrestudentDisableFields(val)
 
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
-	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
 	document.getElementById('student-prestudent-menulist-foerderrelevant').disabled=val;
 	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
@@ -1841,6 +1840,20 @@ function StudentPrestudentDisableFields(val)
 	else
 	{
 		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=true;
+	}
+
+	// bismelden checkbox deaktivieren wenn Recht nicht vorhanden ist
+	<?php
+		$editBismelden = $rechte->isBerechtigt('student/editBismelden') ? 'true' : 'false';
+		echo ' var editBismelden = '.$editBismelden.';';
+	?>
+	if (editBismelden == true)
+	{
+		document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-checkbox-bismelden').disabled=true;
 	}
 
 	//Status Tree leeren
