@@ -210,7 +210,7 @@ class filter extends basis_db
 						$html.="\n\t\t\t</select>";
 						break;
 					case 'datepicker':
-						$html .= '<input type="text" id="' . $filter->kurzbz . '" name="' . $filter->kurzbz . '">';
+						$html .= '<input type="text" id="' . $filter->kurzbz . '" class="form-control" name="' . $filter->kurzbz . '">';
 						$html .= '<script>';
 						$html .= '$("#' . $filter->kurzbz . '").datepicker({ dateFormat: \'yy-mm-dd\' });';
 						$html .= '</script>';

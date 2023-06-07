@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Ausbildungssemester of prestudent (lehrverband) must be the same as Ausbildungssemester of prestudentstatus.
  */
 class CORE_STUDENTSTATUS_0003 implements IIssueResolvedChecker
 {

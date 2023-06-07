@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Date of sponsion shouldn't be missing for Absolvent.
  */
 class CORE_STUDENTSTATUS_0011 implements IIssueResolvedChecker
 {
