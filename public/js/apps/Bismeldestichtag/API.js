@@ -15,32 +15,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- *
- */
-export const BismeldestichtagTabulatorOptions = {
-	height: 700,
-	layout: 'fitColumns',
-	columns: [
-		{title: 'ID', field: 'Id', headerFilter: true},
-		{title: 'Meldestichtag',field: 'Meldestichtag', headerFilter: true, formatter: function(cell){
-				return cell.getValue().replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
-			}
-		},
-		{title: 'Studiensemester', field: 'Studiensemester', headerFilter: true}
-	]
-};
+import {CoreRESTClient} from '../../RESTClient.js';
+
+//
+const CORE_BISMELDESTICHTAG_CMPT_TIMEOUT = 2000;
 
 /**
  *
  */
-export const BismeldestichtagTabulatorEventHandlers = [
-	{
-		event: "rowClick",
-		handler: function(e, row) {
-			let data = row.getData();
-			alert(data.Studiensemester + ': ' + data.Meldestichtag);
-		}
+export const BismeldestichtagAPIs = {
+	/**
+	 *
+	 */
+	getStudiensemester: function() {
+		return CoreRESTClient.get(
+			'codex/Bismeldestichtag/getStudiensemester',
+			null,
+			{
+				timeout: CORE_BISMELDESTICHTAG_CMPT_TIMEOUT
+			}
+		);
+	},
+	addBismeldestichtag: function(wsParams) {
+		return CoreRESTClient.post(
+			'codex/Bismeldestichtag/addBismeldestichtag',
+			{
+				meldestichtag: wsParams.meldestichtag,
+				studiensemester_kurzbz: wsParams.studiensemester_kurzbz
+			},
+			{
+				timeout: CORE_BISMELDESTICHTAG_CMPT_TIMEOUT
+			}
+		);
 	}
-];
+};
 
