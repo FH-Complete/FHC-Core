@@ -91,10 +91,9 @@ class bismeldestichtag extends basis_db
 	}
 
 	/**
-	 * Liefert die Antwort eines Pruefling zu einer Frage
+	 * Liefert zuletzt erreichten Meldestichtag
 	 *
-	 * @param $pruefling_id
-	 * @param $frage_id
+	 * @param $studiensemester_kurzbz
 	 * @return boolean
 	 */
 	public function getLastReachedMeldestichtag($studiensemester_kurzbz = null)

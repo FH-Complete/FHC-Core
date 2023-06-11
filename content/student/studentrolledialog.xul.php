@@ -93,6 +93,9 @@ $user=get_uid();
 <vbox>
 <textbox id="student-rolle-textbox-prestudent_id" value="" hidden="true" />
 <groupbox id="student-rolle-groupbox" flex="1">
+	<?php if ($disabled): ?>
+		<label class="warning">Meldestichtag erreicht - Bearbeiten nicht mehr möglich</label>
+	<?php endif; ?>
 	<caption label="Details<?php echo ($nachname!=''?" $nachname $vorname":'');?>"/>
 		<grid id="student-rolle-grid-detail" style="margin:4px;" flex="1">
 		  	<columns  >
