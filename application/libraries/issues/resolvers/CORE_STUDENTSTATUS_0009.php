@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Students with finished studies should have exactly one final exam.
  */
 class CORE_STUDENTSTATUS_0009 implements IIssueResolvedChecker
 {
@@ -14,10 +14,10 @@ class CORE_STUDENTSTATUS_0009 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('issues/PlausicheckLib');
+		$this->_ci->load->library('issues/plausichecks/FalscheAnzahlAbschlusspruefungen');
 
 		// check if issue persists
-		$checkRes = $this->_ci->plausichecklib->getFalscheAnzahlAbschlusspruefungen(null, null, $params['prestudent_id']);
+		$checkRes = $this->_ci->falscheanzahlabschlusspruefungen->getFalscheAnzahlAbschlusspruefungen(null, null, $params['prestudent_id']);
 
 		if (isError($checkRes)) return $checkRes;
 
