@@ -69,17 +69,16 @@ class FalscheAnzahlAbschlusspruefungen extends PlausiChecker
 		$qry = "
 			SELECT * FROM (
 				SELECT
-					DISTINCT ON(pre.prestudent_id) pre.person_id, pre.prestudent_id, student_uid, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz,
+					DISTINCT ON(pre.prestudent_id) pre.person_id, pre.prestudent_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz,
 					(
 						SELECT COUNT(*)
 						FROM lehre.tbl_abschlusspruefung
-						WHERE student_uid = stud.student_uid
+						WHERE prestudent_id = pre.prestudent_id
 						AND abschlussbeurteilung_kurzbz != 'nicht'
 						AND abschlussbeurteilung_kurzbz IS NOT NULL
 					) AS anzahl_abschlusspruefungen
 				FROM
 					public.tbl_prestudent pre
-					JOIN public.tbl_student stud USING(prestudent_id)
 					JOIN public.tbl_prestudentstatus status USING(prestudent_id)
 					JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
 				WHERE

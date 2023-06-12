@@ -79,7 +79,7 @@ class DatumAbschlusspruefungFehlt extends PlausiChecker
 				JOIN public.tbl_student stud USING(prestudent_id)
 				JOIN public.tbl_prestudentstatus prestatus USING(prestudent_id)
 				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
-				JOIN lehre.tbl_abschlusspruefung pruefung ON stud.student_uid = pruefung.student_uid
+				JOIN lehre.tbl_abschlusspruefung pruefung ON pre.prestudent_id = pruefung.prestudent_id
 			WHERE
 				status_kurzbz = 'Absolvent'
 				AND NOT EXISTS ( /* exclude gs */
