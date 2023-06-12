@@ -87,6 +87,4 @@ class StgPrestudentUngleichStgStudent extends PlausiChecker
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
-
-
 }

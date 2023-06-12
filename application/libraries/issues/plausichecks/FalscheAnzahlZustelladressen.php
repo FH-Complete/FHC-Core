@@ -110,6 +110,4 @@ class FalscheAnzahlZustelladressen extends PlausiChecker
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
-
-
 }

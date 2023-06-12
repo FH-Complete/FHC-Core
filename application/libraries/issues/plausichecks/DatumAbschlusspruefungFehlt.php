@@ -120,42 +120,4 @@ class DatumAbschlusspruefungFehlt extends PlausiChecker
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
-
-	/**
-	 * Date of final exam shouldn't be missing for Absolvent.
-	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
-	 * @param studiengang_kz int if check is to be executed for certain Studiengang
-	 * @param abschlusspruefung_id int if check is to be executed for a certain Abschlussprüfung
-	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
-	 * @return success with prestudents or error
-	 */
-	//~ public function getDatumAbschlusspruefungFehlt(
-		//~ $studiensemester_kurzbz = null,
-		//~ $studiengang_kz = null,
-		//~ $abschlusspruefung_id = null,
-		//~ $exkludierte_studiengang_kz = null
-	//~ ) {
-		//~ $results = array();
-
-		//~ $pruefungenRes = $this->_getInvalidAbschlusspruefungen(
-			//~ $studiensemester_kurzbz,
-			//~ $studiengang_kz,
-			//~ $abschlusspruefung_id,
-			//~ $exkludierte_studiengang_kz
-		//~ );
-
-		//~ if (isError($pruefungenRes)) return $pruefungenRes;
-
-		//~ if (hasData($pruefungenRes))
-		//~ {
-			//~ $pruefungen = getData($pruefungenRes);
-
-			//~ foreach ($pruefungen as $pruefung)
-			//~ {
-				//~ if (isEmptyString($pruefung->datum)) $results[] = $pruefung;
-			//~ }
-		//~ }
-
-		//~ return success($results);
-	//~ }
 }
