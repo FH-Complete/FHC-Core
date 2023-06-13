@@ -47,6 +47,18 @@ export const BismeldestichtagAPIs = {
 				timeout: CORE_BISMELDESTICHTAG_CMPT_TIMEOUT
 			}
 		);
+	},
+	deleteBismeldestichtag: function(wsParams) {
+		return CoreRESTClient.post(
+			'codex/Bismeldestichtag/deleteBismeldestichtag',
+			{
+				meldestichtag: wsParams.meldestichtag,
+				studiensemester_kurzbz: wsParams.studiensemester_kurzbz
+			},
+			{
+				timeout: CORE_BISMELDESTICHTAG_CMPT_TIMEOUT
+			}
+		);
 	}
 };
 

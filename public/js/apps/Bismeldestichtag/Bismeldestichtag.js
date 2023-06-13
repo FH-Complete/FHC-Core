@@ -65,7 +65,7 @@ const bismeldestichtagApp = Vue.createApp({
 			);
 		},
 		/**
-		 * Define Bismeldestichtag call and method to be executed after the call
+		 * Define add Bismeldestichtag call and method to be executed after the call
 		 */
 		handlerAddBismeldestichtag: function(event) {
 			this.startFetchCmpt(
@@ -75,6 +75,19 @@ const bismeldestichtagApp = Vue.createApp({
 					studiensemester_kurzbz: this.currSem
 				},
 				this.fetchCmptDataFetchedAddBismeldestichtag
+			);
+		},
+		/**
+		 * Define delete Bismeldestichtag call and method to be executed after the call
+		 */
+		handlerDeleteBismeldestichtag: function(event) {
+			this.startFetchCmpt(
+				BismeldestichtagAPIs.deleteBismeldestichtag,
+				{
+					meldestichtag: this.meldestichtag,
+					studiensemester_kurzbz: this.currSem
+				},
+				this.fetchCmptDataFetchedDeleteBismeldestichtag
 			);
 		},
 		/**
@@ -92,7 +105,7 @@ const bismeldestichtagApp = Vue.createApp({
 				alert("No response data");
 		},
 		/**
-		 * Called after Bismeldestichtag response is received
+		 * Called after Add Bismeldestichtag response is received
 		 */
 		fetchCmptDataFetchedAddBismeldestichtag: function(data) {
 			if (CoreRESTClient.isError(data))
@@ -101,6 +114,20 @@ const bismeldestichtagApp = Vue.createApp({
 			{
 				window.location.reload();
 				alert("Successfully added Bismeldestichtag");
+			}
+			else
+				alert("No response data");
+		},
+		/**
+		 * Called after Add Bismeldestichtag response is received
+		 */
+		fetchCmptDataFetchedDeleteBismeldestichtag: function(data) {
+			if (CoreRESTClient.isError(data))
+				alert(CoreRESTClient.getError(data));
+			else if (CoreRESTClient.hasData(data))
+			{
+				window.location.reload();
+				alert("Successfully deletted Bismeldestichtag");
 			}
 			else
 				alert("No response data");

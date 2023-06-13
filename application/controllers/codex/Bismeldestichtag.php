@@ -15,8 +15,9 @@ class Bismeldestichtag extends Auth_Controller
 		parent::__construct(
 			array(
 				'index' => 'admin:r',
+				'getStudiensemester' => 'admin:r',
 				'addBismeldestichtag' => 'admin:rw',
-				'getStudiensemester' => 'admin:r'
+				'deleteBismeldestichtag' => 'admin:rw'
 			)
 		);
 
@@ -103,6 +104,43 @@ class Bismeldestichtag extends Auth_Controller
 			$this->outputJson($this->BismeldestichtagModel->insert(
 				array('meldestichtag' => $request->meldestichtag, 'studiensemester_kurzbz' => $request->studiensemester_kurzbz)
 			));
+		}
+	}
+
+	public function deleteBismeldestichtag()
+	{
+		// get request data
+		$request = $this->getPostJSON();
+
+		// check request data
+		if (!property_exists($request, 'meldestichtag') || isEmptyString($request->meldestichtag))
+			$this->terminateWithJsonError('Error occured: Meldestichtag missing');
+		if (!property_exists($request, 'studiensemester_kurzbz') || isEmptyString($request->studiensemester_kurzbz))
+			$this->terminateWithJsonError('Error occured: Studiensemester missing');
+
+		$meldestichtag = $request->meldestichtag;
+		$studiensemester_kurzbz = $request->studiensemester_kurzbz;
+
+		// check if Bismeldestichtag already exists
+		$this->BismeldestichtagModel->addSelect('meldestichtag_id');
+		$bismeldestichtagRes = $this->BismeldestichtagModel->loadWhere(
+			array('meldestichtag' => $meldestichtag, 'studiensemester_kurzbz' => $studiensemester_kurzbz)
+		);
+
+		if (hasData($bismeldestichtagRes))
+		{
+			$meldestichtag_id = getData($bismeldestichtagRes)[0]->meldestichtag_id;
+
+			// delete if Stichtag does exist
+			$this->outputJson($this->BismeldestichtagModel->delete(
+				array('meldestichtag_id' => $meldestichtag_id)
+			));
+
+		}
+		else
+		{
+			// return error if not exists
+			$this->outputJsonError('Bismeldestichtag does not exist');
 		}
 	}
 }

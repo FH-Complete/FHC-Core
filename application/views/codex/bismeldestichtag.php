@@ -35,16 +35,25 @@
 				<verticalsplit>
 					<template #top>
 						<!-- input fields -->
-						<div class="input-group">
-							<input type="date" class="form-control" name="meldestichtag" v-model="meldestichtag">
-							<select class="form-control" name="studiensemester_kurzbz" v-model="currSem">
-								<option v-for="sem in semList" :value="sem.studiensemester_kurzbz">
-									{{ sem.studiensemester_kurzbz }}
-								</option>
-							</select>
-							<div class="input-group-btn">
-								<button type="button" class="btn btn-secondary" @click="handlerAddBismeldestichtag">
-									<?php echo $this->p->t('bismeldestichtag', 'stichtagHinzufuegen') ?>
+						<div class="row">
+							<div class="col-9">
+								<div class="input-group">
+									<input type="date" class="form-control" name="meldestichtag" v-model="meldestichtag">
+									<select class="form-control" name="studiensemester_kurzbz" v-model="currSem">
+										<option v-for="sem in semList" :value="sem.studiensemester_kurzbz">
+											{{ sem.studiensemester_kurzbz }}
+										</option>
+									</select>
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-dark" @click="handlerAddBismeldestichtag">
+											<?php echo $this->p->t('bismeldestichtag', 'stichtagHinzufuegen') ?>
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="col-3 text-center">
+								<button type="button" class="btn btn-dark" @click="handlerDeleteBismeldestichtag">
+									<?php echo $this->p->t('bismeldestichtag', 'stichtagLoeschen') ?>
 								</button>
 							</div>
 						</div>
