@@ -674,38 +674,39 @@ function drawTree($tree, $depth)
 
 function checkKompatibleLvs($kompatibleLVs, $student, $row_tree, $noten_arr, $note_pruef_arr, $p, $uid, $negativeNote= null)
 {
+	global $anrechnung;
 	$positiv = false;
 	$found = false;
 	$i = 0;
+
 	while(!$found && $i < count($kompatibleLVs))
 	{
 		foreach($kompatibleLVs as $komp)
 		{
-
-			$anrechnung = new anrechnung();
-			$anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
-
-			if(count($anrechnung->result) == 1)
+			if(count($anrechnung->result))
 			{
-				$lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-				if(isset($noten_arr[$lv]))
+				foreach($anrechnung->result as $row)
 				{
-					$positiv=false;
-					foreach($noten_arr[$lv] as $note)
+					$lv = $row->lehrveranstaltung_id_kompatibel;
+					if(isset($noten_arr[$lv]) && $lv == $komp && $row_tree->lehrveranstaltung_id == $row->lehrveranstaltung_id)
 					{
-						if($note_pruef_arr[$note]->positiv)
-							$positiv=true;
-					}
+						$positiv=false;
+						foreach($noten_arr[$lv] as $note)
+						{
+							if($note_pruef_arr[$note]->positiv)
+								$positiv=true;
+						}
 
-					$found = true;
-				}
-				else
-				{
-					/* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
-					 * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
-					 */
-					if(!$found)
-						$found = false;
+						$found = true;
+					}
+					else
+					{
+						/* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
+                         * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
+                         */
+						if(!$found)
+							$found = false;
+					}
 				}
 			}
 			$i++;
