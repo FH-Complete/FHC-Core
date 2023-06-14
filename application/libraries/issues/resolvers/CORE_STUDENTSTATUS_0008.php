@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Studienplan should be valid in current Ausbildungssemester of prestudent.
  */
 class CORE_STUDENTSTATUS_0008 implements IIssueResolvedChecker
 {

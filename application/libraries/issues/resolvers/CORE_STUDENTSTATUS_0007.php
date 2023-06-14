@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Students with active Benutzer should have a status in the current semester.
  */
 class CORE_STUDENTSTATUS_0007 implements IIssueResolvedChecker
 {
