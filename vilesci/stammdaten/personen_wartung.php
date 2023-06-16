@@ -319,6 +319,90 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					}
 				}
 			}
+
+			if($result = @$db->db_query("SELECT 1 FROM public.tbl_kennzeichen LIMIT 1"))
+			{
+				$kennzeichen_has_personToKeep = array();
+				$kennzeichen_has_personToDelete = array();
+
+				$kennzeichen_query = "
+					SELECT *
+					FROM public.tbl_kennzeichen
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)
+					ORDER BY kennzeichentyp_kurzbz, aktiv DESC";
+				
+				if ($result = $db->db_query($kennzeichen_query))
+				{
+					while ($row = $db->db_fetch_object($result))
+					{
+						if ($row->person_id === $personToKeep)
+						{
+							$kennzeichen_has_personToKeep[] = $row;
+						}
+						else if ($row->person_id === $personToDelete)
+						{
+							$kennzeichen_has_personToDelete[] = $row;
+						}
+					}
+				}
+
+				if (!empty($kennzeichen_has_personToDelete))
+				{
+					foreach ($kennzeichen_has_personToDelete as $kennzeichen_toDelete)
+					{
+						$kennzeichen_toKeep_Kurzbz = array_column($kennzeichen_has_personToKeep, 'kennzeichentyp_kurzbz');
+
+						if (in_array($kennzeichen_toDelete->kennzeichentyp_kurzbz, $kennzeichen_toKeep_Kurzbz))
+						{
+							$kennzeichen_toKeep_Keys = array_keys($kennzeichen_toKeep_Kurzbz, $kennzeichen_toDelete->kennzeichentyp_kurzbz);
+
+							foreach ($kennzeichen_toKeep_Keys as $key)
+							{
+								if (($kennzeichen_has_personToKeep[$key]->aktiv === 't' && $kennzeichen_toDelete->aktiv === 'f') ||
+									($kennzeichen_has_personToKeep[$key]->aktiv === 'f' && $kennzeichen_toDelete->aktiv === 't') ||
+									($kennzeichen_has_personToKeep[$key]->aktiv === 'f' && $kennzeichen_toDelete->aktiv === 'f'))
+								{
+									if ($kennzeichen_has_personToKeep[$key]->inhalt !== $kennzeichen_toDelete->inhalt)
+									{
+										$sql_query_upd1 .= "UPDATE public.tbl_kennzeichen SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+										$kennzeichen_has_personToKeep[] = $kennzeichen_toDelete;
+										continue 2;
+									}
+									else
+									{
+										if ($kennzeichen_toDelete->aktiv === 'f')
+										{
+											$sql_query_upd1 .= "DELETE FROM public.tbl_kennzeichen WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+											$msg_warning[] = "Das nicht aktive Kennzeichen mit der ID '" . $kennzeichen_toDelete->kennzeichen_id . "' wurde gelöscht, <br>
+																da es der gleiche Inhalt wie beim Kennzeichen mit der ID '". $kennzeichen_has_personToKeep[$key]->kennzeichen_id ."' ist.";
+											continue 2;
+										}
+										$msg_error[] = 'Beide Personen haben ein Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.') und den gleichen Inhalt. Können nicht zusammengelegt werden.<br>
+														Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+										$error = true;
+										break 2;
+									}
+								}
+								else if ($kennzeichen_has_personToKeep[$key]->aktiv === 't' && $kennzeichen_toDelete->aktiv === 't')
+								{
+									$msg_error[] = 'Beide Personen haben ein aktives Kennzeichen mit dem gleichen Typ ('. $kennzeichen_toDelete->kennzeichentyp_kurzbz.'). Können nicht zusammengelegt werden.<br>
+													Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+										$error = true;
+										break 2;
+								}
+							}
+						}
+						else
+						{
+							$sql_query_upd1 .= "UPDATE public.tbl_kennzeichen SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+						}
+					}
+				}
+			}
+
 			if ($error == false)
 			{
 				// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
