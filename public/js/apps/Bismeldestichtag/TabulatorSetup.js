@@ -19,7 +19,8 @@
  *
  */
 export const BismeldestichtagTabulatorOptions = {
-	height: 700,
+	maxHeight: "100%",
+	minHeight: 50,
 	layout: 'fitColumns',
 	columns: [
 		{title: 'ID', field: 'Id', headerFilter: true},
