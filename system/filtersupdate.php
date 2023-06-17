@@ -1256,6 +1256,30 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'softwareManagement',
+		'filter_kurzbz' => 'SoftwareManagement',
+		'description' => '{Software Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "SoftwareManagement",
+				"columns": [
+					{"name": "Software Kurzbezeichnung"},
+					{"name": "Version"},
+					{"name": "Beschreibung"},
+					{"name": "Hersteller"},
+					{"name": "Betriebssystem"},
+					{"name": "Aktiv"},
+					{"name": "Softwarestatus Kurzbezeichnung"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 
