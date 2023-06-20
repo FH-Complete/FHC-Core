@@ -37,6 +37,9 @@ class AnrechnungJob extends JOB_Controller
 		$this->load->helper('hlp_sancho_helper');
 
         $this->load->library('AnrechnungLib');
+
+        // Load configs
+        $this->load->config('anrechnung');
 	}
 
 	/**
@@ -258,7 +261,15 @@ class AnrechnungJob extends JOB_Controller
         $arr_lvLector_arr = array();
         foreach ($anrechnung_id_arr as $anrechnung_id)
         {
-            $arr_lvLector_arr[]= $this->anrechnunglib->getLectors($anrechnung_id); // Returns LV Leitung. If not present, then all lectors of LV.
+            // Get full name of Fachbereichsleitung or LV Leitung.
+            if($this->config->item('fbl') === TRUE)
+            {
+                $arr_lvLector_arr[] = $this->anrechnunglib->getLeitungOfLvOe($anrechnung_id);
+            }
+            else
+            {
+                $arr_lvLector_arr[] = $this->anrechnunglib->getLectors($anrechnung_id); // Returns LV Leitung. If not present, then all lectors of LV.
+            }
         }
 
         // Unique lector array to send only one mail per lector
