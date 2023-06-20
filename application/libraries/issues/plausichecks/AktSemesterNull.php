@@ -13,12 +13,15 @@ class AktSemesterNull extends PlausiChecker
 	{
 		$results = array();
 
+		// get parameters from config
+		$exkludierte_studiengang_kz = isset($this->_config['exkludierteStudiengaenge']) ? $this->_config['exkludierteStudiengaenge'] : null;
+
 		// pass parameters needed for plausicheck
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getAktSemesterNull($studiensemester_kurzbz, $studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getAktSemesterNull($studiensemester_kurzbz, $studiengang_kz, null, $exkludierte_studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 

@@ -1,0 +1,7 @@
+#konfigSelect, #fehlercodeSelect {
+	float: left;
+}
+
+#konfigurationstypInfoIcon,#fehlercodeInfoIcon {
+	cursor: pointer;
+}

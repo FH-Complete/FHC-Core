@@ -6,6 +6,8 @@
 abstract class IssueResolver_Controller extends JOB_Controller
 {
 	const CI_PATH = 'application';
+	const CI_LIBRARY_FOLDER = 'libraries';
+	const EXTENSIONS_FOLDER = 'extensions';
 	const ISSUE_RESOLVERS_FOLDER = 'issues/resolvers';
 	const CHECK_ISSUE_RESOLVED_METHOD_NAME = 'checkIfIssueIsResolved';
 
@@ -60,10 +62,15 @@ abstract class IssueResolver_Controller extends JOB_Controller
 						isset($issue->behebung_parameter) ? json_decode($issue->behebung_parameter, true) : array()
 					);
 
-					// if called from extension (extension name set), path includes extension names, otherwise it is the core library folder
-					$libRootPath = isset($this->_extensionName) ? 'extensions/' . $this->_extensionName . '/' : '';
+					// if called from extension (extension name set), path includes extension names
+					$libRootPath = isset($this->_extensionName) ? self::EXTENSIONS_FOLDER . '/' . $this->_extensionName . '/' : '';
+
+					// path for loading issue library
 					$issuesLibPath = $libRootPath . self::ISSUE_RESOLVERS_FOLDER . '/';
-					$issuesLibFilePath = DOC_ROOT . self::CI_PATH . '/' . $libRootPath . 'libraries/' . self::ISSUE_RESOLVERS_FOLDER . '/' . $libName . '.php';
+
+					// file path of library for check if file exists
+					$issuesLibFilePath = DOC_ROOT . self::CI_PATH
+						. '/' . $libRootPath . self::CI_LIBRARY_FOLDER . '/' . self::ISSUE_RESOLVERS_FOLDER . '/' . $libName . '.php';
 
 					// check if library file exists
 					if (!file_exists($issuesLibFilePath))
