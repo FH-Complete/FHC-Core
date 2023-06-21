@@ -22,7 +22,7 @@ class VertragsbestandteilKarenz extends Vertragsbestandteil
 		parent::hydrateByStdClass($data);
 		isset($data->karenztyp_kurzbz) && $this->setKarenztypKurzbz($data->karenztyp_kurzbz);
 		isset($data->geplanter_geburtstermin) && $this->setGeplanterGeburtstermin($data->geplanter_geburtstermin);
-		isset($data->tatsaechlicher_geburtstermin) && $this->setGeburtstermin($data->tatsaechlicher_geburtstermin);		
+		isset($data->tatsaechlicher_geburtstermin) && $this->setTatsaechlicherGeburtstermin($data->tatsaechlicher_geburtstermin);		
 	}	
 	
 	/**
@@ -82,6 +82,7 @@ class VertragsbestandteilKarenz extends Vertragsbestandteil
 	public function toStdClass(): \stdClass
 	{
 		$tmp = array(
+			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
 			'karenztyp_kurzbz' => $this->getKarenztypKurzbz(),
 			'tatsaechlicher_geburtstermin' => $this->getTatsaechlicherGeburtstermin(),
 			'geplanter_geburtstermin' => $this->getGeplanterGeburtstermin()
@@ -107,6 +108,29 @@ EOTXT;
 
 	public function validate()
 	{
+		if( empty($this->karenztyp_kurzbz) ) {
+			$this->validationerrors[] = 'Ein Karenztyp muss ausgewählt sein.';
+		}
+		
+		if( $this->karenztyp_kurzbz === 'elternkarenz' ) {			
+			$geplant = \DateTimeImmutable::createFromFormat('Y-m-d', $this->geplanter_geburtstermin);
+			$tatsaechlich = \DateTimeImmutable::createFromFormat('Y-m-d', $this->tatsaechlicher_geburtstermin);
+
+			if( false === $geplant ) {
+				$this->validationerrors[] = 'Bei Elternkarenz muss der geplanter Geburtstermin ein gültiges Datum sein.';
+			}
+			
+			if( !empty($this->tatsaechlicher_geburtstermin) && $tatsaechlich === false ) {
+				$this->validationerrors[] = 'Bei Elternkarenz muss der tatsaechliche Geburtstermin leer oder ein gültiges Datum sein.';
+			}
+		}		
+		
+		$bis = \DateTimeImmutable::createFromFormat('Y-m-d', $this->bis);
+		
+		if( false === $bis ) {
+			$this->validationerrors[] = 'Bei einer Karenz muss ein gültiges Ende-Datum angegeben werden.';
+		}
+		
 		return parent::validate();
 	}
 }
