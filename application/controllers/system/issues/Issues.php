@@ -26,6 +26,7 @@ class Issues extends Auth_Controller
 		// Load models
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->load->model('system/Sprache_model', 'SpracheModel');
 
 		$this->loadPhrases(
 			array(
@@ -45,10 +46,11 @@ class Issues extends Auth_Controller
 	public function index()
 	{
 		$oes_for_issues = $this->_getOesForIssues();
+		$language_index = $this->_getLanguageIndex();
 
 		$this->load->view(
 			'system/issues/issues',
-			$oes_for_issues
+			array_merge($oes_for_issues, array('language_index' => $language_index))
 		);
 	}
 
@@ -165,5 +167,29 @@ class Issues extends Auth_Controller
 			'all_funktionen_oe_kurzbz' => $all_funktionen_oe_kurzbz,
 			'all_oe_kurzbz_berechtigt' => $all_oe_kurzbz_berechtigt
 		);
+	}
+
+	/**
+	 * Gets language index of currently logged in user.
+	 * @return object int (the index, start at 1)
+	 */
+	private function _getLanguageIndex()
+	{
+		$idx = 1;
+		$this->SpracheModel->addSelect('sprache, index');
+		$langRes = $this->SpracheModel->load();
+
+		if (hasData($langRes))
+		{
+			$userLang = getUserLanguage();
+			$lang = getData($langRes);
+
+			foreach ($lang as $l)
+			{
+				if ($l->sprache == $userLang) $idx = $l->index;
+			}
+		}
+
+		return $idx;
 	}
 }

@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Person should have only one delivery adress.
  */
 class CORE_PERSON_0004 implements IIssueResolvedChecker
 {

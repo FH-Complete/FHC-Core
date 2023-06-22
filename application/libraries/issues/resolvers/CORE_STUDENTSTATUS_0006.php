@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Status Dates and status studysemester dates should be in correct order.
  */
 class CORE_STUDENTSTATUS_0006 implements IIssueResolvedChecker
 {
