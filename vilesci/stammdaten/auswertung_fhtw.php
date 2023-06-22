@@ -501,46 +501,55 @@ if ($rtprueflingEntSperren)
 						WHERE person_id = ". $db->db_add_param($_POST['person_id']) . "
 				)";
 
-		
 		if ($result = $db->db_query($qry))
 		{
-			
 			if ($db->db_num_rows($result) === 0)
 			{
-				echo json_encode(array(
-					'status' => 'warning',
-					'msg' => 'Kein Pruefling gefunden!'
-				));
-				exit();
+				$ps = new prestudent();
+				$ps->getPrestudenten($_POST['person_id']);
+
+				$prestudent = new prestudent($ps->result[0]->prestudent_id);
+				$prestudent->getLastStatus($prestudent->prestudent_id);
+
+				$pruefling = new pruefling();
+				$pruefling->new = true;
+				$pruefling->studiengang_kz = $prestudent->studiengang_kz;
+				$pruefling->registriert = date('Y-m-d H:i:s');
+				$pruefling->semester = $prestudent->ausbildungssemester;
+				$pruefling->prestudent_id = $prestudent->prestudent_id;
+				$pruefling->gesperrt = true;
+
+				$resultSperre = $pruefling->save();
 			}
 			else
 			{
 				$pruefling_ids = array();
+
 				while ($row = $db->db_fetch_object($result))
-				{
 					$pruefling_ids[] = $row->pruefling_id;
-				}
-				
-				
-				$qry = "UPDATE testtool.tbl_pruefling SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+
+				$qry = "UPDATE testtool.tbl_pruefling
+						SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
 						WHERE pruefling_id IN (" . $db->db_implode4SQL($pruefling_ids) . ")";
-				
-				if ($result_update = $db->db_query($qry))
-				{
-					$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
-					echo json_encode(array(
-						'status' => 'ok',
-						'msg' => $msg));
-					exit();
-				}
-				else
-				{
-					echo json_encode(array(
-						'status' => 'fehler',
-						'msg' => 'Fehler beim speichern der Daten'
-					));
-					exit();
-				}
+
+				$resultSperre = $db->db_query($qry);
+			}
+
+			if ($resultSperre)
+			{
+				$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+				echo json_encode(array(
+					'status' => 'ok',
+					'msg' => $msg));
+				exit();
+			}
+			else
+			{
+				echo json_encode(array(
+					'status' => 'fehler',
+					'msg' => 'Fehler beim speichern der Daten'
+				));
+				exit();
 			}
 		}
 		else
