@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Students in "mixed" Studiengang should have Orgform.
  */
 class CORE_STG_0003 implements IIssueResolvedChecker
 {

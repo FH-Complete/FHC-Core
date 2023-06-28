@@ -13,11 +13,14 @@ class AktiverStudentOhneStatus extends PlausiChecker
 	{
 		$results = array();
 
+		// get parameters from config
+		$exkludierte_studiengang_kz = isset($this->_config['exkludierteStudiengaenge']) ? $this->_config['exkludierteStudiengaenge'] : null;
+
 		// pass parameters needed for plausicheck
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getAktiverStudentOhneStatus($studiengang_kz);
+		$prestudentRes = $this->_ci->plausichecklib->getAktiverStudentOhneStatus($studiengang_kz, null, $exkludierte_studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 

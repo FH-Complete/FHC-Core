@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Studiengang should be the same for prestudent and student.
  */
 class CORE_STG_0001 implements IIssueResolvedChecker
 {

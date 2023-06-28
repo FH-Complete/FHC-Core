@@ -38,6 +38,8 @@ require_once('dbupdate_3.4/10001_tempus_mitarbeiter_kurzbz_bei_reservierungen_an
 require_once('dbupdate_3.4/27949_infocenter_zurueckstellen_mit_grund.php');
 require_once('dbupdate_3.4/27107_vilesci_erfassung_abwesenheiten_reinigung.php');
 require_once('dbupdate_3.4/24913_tabelle_raumtyp_neues_attribut_aktiv.php');
+require_once('dbupdate_3.4/28089_plausichecks_in_extension_hinzufuegen.php');
+require_once('dbupdate_3.4/29133_einzelne_studiengaenge_aus_issuechecks_ausnehmen.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -309,6 +311,9 @@ $tabellen=array(
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
 	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app"),
 	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
+	"system.tbl_fehler_konfiguration" => array("konfigurationstyp_kurzbz","fehlercode","konfiguration","insertamum","insertvon","updateamum","updatevon"),
+	"system.tbl_fehler_konfigurationsdatentyp" => array("konfigurationsdatentyp"),
+	"system.tbl_fehler_konfigurationstyp" => array("konfigurationstyp_kurzbz","beschreibung","konfigurationsdatentyp","app"),
 	"system.tbl_fehler_zustaendigkeiten" => array("fehlerzustaendigkeiten_id","fehlercode","person_id","oe_kurzbz","funktion_kurzbz", "insertamum", "insertvon"),
 	"system.tbl_issue" => array("issue_id","fehlercode","fehlercode_extern","inhalt","inhalt_extern","person_id","oe_kurzbz","datum","verarbeitetvon","verarbeitetamum","status_kurzbz","behebung_parameter","insertvon","insertamum","updatevon","updateamum"),
 	"system.tbl_issue_status" => array("status_kurzbz","bezeichnung_mehrsprachig"),

@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Incoming should have IN/OUT data entry.
  */
 class CORE_INOUT_0008 implements IIssueResolvedChecker
 {

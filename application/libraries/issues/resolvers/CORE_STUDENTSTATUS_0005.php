@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Students of a semester shouldn't start studies before the date of Bismeldung.
  */
 class CORE_STUDENTSTATUS_0005 implements IIssueResolvedChecker
 {
