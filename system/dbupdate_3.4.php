@@ -36,6 +36,7 @@ require_once('dbupdate_3.4/19154_beurteilungsformulare_pruefungssenat.php');
 require_once('dbupdate_3.4/27949_infocenter_zurueckstellen_mit_grund.php');
 require_once('dbupdate_3.4/27107_vilesci_erfassung_abwesenheiten_reinigung.php');
 require_once('dbupdate_3.4/24913_tabelle_raumtyp_neues_attribut_aktiv.php');
+require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
