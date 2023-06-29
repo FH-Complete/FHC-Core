@@ -33,7 +33,7 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_bismeldestichtag LIMIT 1'))
 	else
 		echo '<br>bis.tbl_bismeldestichtag table created';
 
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bismeldestichtag TO web;';
+	$qry = 'GRANT SELECT ON TABLE bis.tbl_bismeldestichtag TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>bis.tbl_bismeldestichtag: '.$db->db_last_error().'</strong><br>';
 	else
