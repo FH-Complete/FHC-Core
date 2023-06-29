@@ -27,9 +27,9 @@ class bismeldestichtag extends basis_db
 	public $meldestichtag;			// date
 	public $studiensemester_kurzbz;	// varchar(16)
 	public $insertamum;				// timestamp
-	public $insertvon;				// varchar(16)
+	public $insertvon;				// varchar(32)
 	public $updateamum;				// timestamp
-	public $updatevon;				// varchar(16)
+	public $updatevon;				// varchar(32)
 
 	// ErgebnisArray
 	public $result=array();
@@ -144,19 +144,23 @@ class bismeldestichtag extends basis_db
 	}
 
 	/**
-	 * Prüft, ob Meldestichtag für ein bestimmtes Studiensemester und Statusdatum erreicht ist.
+	 * Prüft, ob Meldestichtag für ein bestimmtes Statusdatum und Studiensemester erreicht ist.
 	 *
-	 * @param $studiensemester_kurzbz
 	 * @param $status_datum
+	 * @param $studiensemester_kurzbz
 	 * @return boolean true wenn erreicht, oder false
 	 */
-	public function checkMeldestichtagErreicht($studiensemester_kurzbz, $status_datum)
+	public function checkMeldestichtagErreicht($status_datum, $studiensemester_kurzbz = null)
 	{
 		$erreicht = false;
-		// Studiensemester ende holen
-		$studiensemester = new studiensemester();
-		if ($studiensemester->load($studiensemester_kurzbz))
-			$studiensemester_ende = new DateTime($studiensemester->ende);
+
+		if (isset($studiensemester_kurzbz))
+		{
+			// Studiensemester ende holen
+			$studiensemester = new studiensemester();
+			if ($studiensemester->load($studiensemester_kurzbz))
+				$studiensemester_ende = new DateTime($studiensemester->ende);
+		}
 
 		// letztes erreichtes Bismeldedatum holen
 		if ($this->getLastReachedMeldestichtag() && isset($this->result[0]))
@@ -165,8 +169,15 @@ class bismeldestichtag extends basis_db
 		$statusDatum = new DateTime($status_datum);
 
 		// Prüfen, ob Studentstatusdatum oder Studiensemester vor dem Stichtagsdatum liegen
-		if (isset($studiensemester_ende) && isset($lastReachedMeldestichtag) && isset($statusDatum))
-			$erreicht = $statusDatum < $lastReachedMeldestichtag || $studiensemester_ende < $lastReachedMeldestichtag;
+		if (isset($statusDatum))
+		{
+			if (isset($lastReachedMeldestichtag))
+				$erreicht = $statusDatum < $lastReachedMeldestichtag;
+
+			if (isset($studiensemester_ende))
+				$erreicht = $erreicht || $studiensemester_ende < $lastReachedMeldestichtag;
+
+		}
 
 		return $erreicht;
 	}

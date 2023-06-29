@@ -23,7 +23,6 @@ import {CoreNavigationCmpt} from '../../components/navigation/Navigation.js';
 import {CoreRESTClient} from '../../RESTClient.js';
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 import {BismeldestichtagAPIs} from './API.js';
-import verticalsplit from '../../components/verticalsplit/verticalsplit.js';
 
 const bismeldestichtagApp = Vue.createApp({
 	data: function() {
@@ -44,8 +43,7 @@ const bismeldestichtagApp = Vue.createApp({
 		CoreNavigationCmpt,
 		CoreFilterCmpt,
 		BismeldestichtagAPIs,
-		CoreFetchCmpt,
-		verticalsplit
+		CoreFetchCmpt
 	},
 	created() {
 		this.handlerStudiensemester();

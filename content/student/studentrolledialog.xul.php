@@ -76,7 +76,7 @@ if($prestudent_id!='')
 
 	// Prüfen, ob Studnetrolle vor dem aktuellen Meldestichtag ist. In diesem Fall darf die Rolle nicht mehr bearbeitet werden.
 	$bismeldestichtag = new bismeldestichtag();
-	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($studiensemester_kurzbz, $datum) ? ' disabled="true"' : '';
+	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($datum) ? ' disabled="true"' : '';
 }
 $db = new basis_db();
 $user=get_uid();

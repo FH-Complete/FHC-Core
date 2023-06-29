@@ -997,7 +997,7 @@ if(!$error)
 
 									$bismeldestichtag = new bismeldestichtag();
 
-									$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($studiensemester, $new_status_datum);
+									$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($new_status_datum);
 
 									if ($meldestichtag_erreicht === true)
 									{
@@ -1223,7 +1223,7 @@ if(!$error)
 			$erweiterteBerechtigungen = $rechte->isBerechtigt('admin', null, 'suid') || $rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
 
 			$bismeldestichtag = new bismeldestichtag();
-			$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['studiensemester_kurzbz'], $_POST['datum']);
+			$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
 
 			if($_POST['status_kurzbz']=='Student' && !$erweiterteBerechtigungen)
 			{
@@ -1557,7 +1557,7 @@ if(!$error)
 
 						// Prüfung, ob Meldestichtag erreicht ist
 						$bismeldestichtag = new bismeldestichtag();
-						$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['studiensemester_kurzbz'], $_POST['datum']);
+						$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
 
 						if ($meldestichtag_erreicht === true)
 						{

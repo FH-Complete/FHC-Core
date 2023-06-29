@@ -104,7 +104,7 @@ foreach($ps->result as $row)
 
 	// prüfen, ob Meldestichtag erreicht
 	$bismeldestichtag = new bismeldestichtag();
-	$stichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($row->studiensemester_kurzbz, $row->datum);
+	$stichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($row->datum);
 
 	// Variablen für layout von prestudentstatus Anzeige
 	$stichtagsaktiv = $stichtag_erreicht ? 'stichtagsinaktiv' : 'stichtagsaktiv';
