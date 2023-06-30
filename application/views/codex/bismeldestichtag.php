@@ -29,65 +29,40 @@
 
 		<div id="content">
 				<!-- input fields -->
-<!--
-				<div class="row">
-					<div class="col-6">
-							<input type="date" class="form-control" name="meldestichtag" v-model="meldestichtag">
-					</div>
-					<div class="col-3">
-							<select class="form-control" name="studiensemester_kurzbz" v-model="currSem">
-								<option v-for="sem in semList" :value="sem.studiensemester_kurzbz">
-									{{ sem.studiensemester_kurzbz }}
-								</option>
-							</select>
-					</div>
-					<div class="col-3 text-center">
+			<div class="row">
+				<div class="col-9">
+					<div class="input-group">
+						<input type="date" class="form-control" name="meldestichtag" v-model="meldestichtag">
+						<select class="form-select" name="studiensemester_kurzbz" v-model="currSem">
+							<option v-for="sem in semList" :value="sem.studiensemester_kurzbz">
+								{{ sem.studiensemester_kurzbz }}
+							</option>
+						</select>
+						<div class="input-group-btn">
 							<button type="button" class="btn btn-primary" @click="handlerAddBismeldestichtag">
-								<?php //echo $this->p->t('bismeldestichtag', 'stichtagHinzufuegen') ?>
+								<?php echo $this->p->t('bismeldestichtag', 'stichtagHinzufuegen') ?>
 							</button>
+						</div>
 					</div>
--->
-
-			<div class="input-group">
-				<input type="date" class="form-control" name="meldestichtag" v-model="meldestichtag">
-				<select class="form-select" name="studiensemester_kurzbz" v-model="currSem">
-					<option v-for="sem in semList" :value="sem.studiensemester_kurzbz">
-						{{ sem.studiensemester_kurzbz }}
-					</option>
-				</select>
-				<div class="input-group-btn">
-					<button type="button" class="btn btn-primary" @click="handlerAddBismeldestichtag">
-						<?php echo $this->p->t('bismeldestichtag', 'stichtagHinzufuegen') ?>
+				</div>
+				<div class="col-3 text-center">
+					<button type="button" class="btn btn-primary" @click="handlerDeleteBismeldestichtag">
+						<?php echo $this->p->t('bismeldestichtag', 'stichtagLoeschen') ?>
 					</button>
 				</div>
 			</div>
-<!--
-					<div class="col-2 text-center">
-						<button type="button" class="btn btn-primary" @click="handlerDeleteBismeldestichtag">
-							<?php echo $this->p->t('bismeldestichtag', 'stichtagLoeschen') ?>
-						</button>
-					</div>
--->
-<!--
+			<br />
+			<!-- Filter component -->
+			<div class="row">
+				<div class="col-12">
+					<core-filter-cmpt
+						title="<?php echo $this->p->t('bismeldestichtag', 'stichtageVerwalten') ?>"
+						filter-type="Bismeldestichtag"
+						:tabulator-options="bismeldestichtagTabulatorOptions"
+						:tabulator-events="bismeldestichtagTabulatorEventHandlers"
+						@nw-new-entry="newSideMenuEntryHandler">
+					</core-filter-cmpt>
 				</div>
--->
-				<br />
-				<!-- Filter component -->
-<!--
-				<div class="row">
-					<div class="col-12">
--->
-						<core-filter-cmpt
-							title="<?php echo $this->p->t('bismeldestichtag', 'stichtageVerwalten') ?>"
-							filter-type="Bismeldestichtag"
-							:tabulator-options="bismeldestichtagTabulatorOptions"
-							:tabulator-events="bismeldestichtagTabulatorEventHandlers"
-							@nw-new-entry="newSideMenuEntryHandler">
-						</core-filter-cmpt>
-<!--
-					</div>
-				</div>
--->
 			</div>
 		</div>
 	</div>
