@@ -1268,6 +1268,7 @@ $filters = array(
 			{
 				"name": "SoftwareManagement",
 				"columns": [
+					{"name": "ID"},
 					{"name": "Software Kurzbezeichnung"},
 					{"name": "Version"},
 					{"name": "Beschreibung"},
