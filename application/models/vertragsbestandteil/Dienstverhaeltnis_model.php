@@ -13,7 +13,7 @@ class Dienstverhaeltnis_model extends DB_Model
     /**
      * @return list of DV
      */
-    public function getDVByPersonUID($uid)
+    public function getDVByPersonUID($uid, $oe_kurzbz=null, $datum=null)
     {
         $result = null;
 
@@ -39,11 +39,26 @@ class Dienstverhaeltnis_model extends DB_Model
             JOIN tbl_person USING (person_id)
             JOIN hr.tbl_dienstverhaeltnis dv ON(tbl_benutzer.uid::text = dv.mitarbeiter_uid::text)
             JOIN public.tbl_organisationseinheit org USING(oe_kurzbz)
-        WHERE tbl_benutzer.uid=?
+        WHERE tbl_benutzer.uid=?";
+		$data = array($uid);
+
+		if(!is_null($oe_kurzbz))
+		{
+			$qry.=" AND oe_kurzbz=?";
+			$data[] = $oe_kurzbz;
+		}
+
+		if (!is_null($datum))
+		{
+			$qry.=" AND ? BETWEEN dv.von AND COALESCE(dv.bis, '2999-12-31')";
+			$data[] = $datum;
+		}
+
+		$qry .="
         ORDER BY dv.von desc
         ";
 
-        return $this->execQuery($qry, array($uid));
+        return $this->execQuery($qry, $data);
 		
     }
 

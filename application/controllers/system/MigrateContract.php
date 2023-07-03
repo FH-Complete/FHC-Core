@@ -3,8 +3,11 @@
  * Job zur einmaligen Migration der Mitarbeiterverträge aus der tbl_bisverwendung in die neue
  * Vertragsstruktur im HR Schema
  *
- * Aufruf:
+ * Aufruf pro Person
  * php index.ci.php system/MigrateContract/index/oesi
+ *
+ * Aufruf fuer Alle
+ * php index.ci.php system/MigrateContract/index
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
@@ -26,10 +29,12 @@ class MigrateContract extends CLI_Controller
 		$this->load->model('person/benutzerfunktion_model', 'BenutzerfunktionModel');
 
 		$this->matching_ba1_vertragsart = array(
-			'101'=>'DV zum Bund',
+			//'101'=>'DV zum Bund', // TODO was tun wir damit
+			'101'=>'freierdv', // TODO was tun wir damit
 			'102'=>'DV anderen Gebietskörperschaft',
 			'103'=>'echterdv',
-			'104'=>'Lehr- oder Ausbildungsverhältnis',
+			//'104'=>'Lehr- oder Ausbildungsverhältnis', // TODO was tun wir mit dem?
+			'104'=>'studentischehilfskr',
 			'105'=>'freierdv',
 			'106'=>'Andere Bildungseinrichtung',
 			'107'=>'werkvertrag',
@@ -48,15 +53,35 @@ class MigrateContract extends CLI_Controller
 	 */
 	public function index($user = null)
 	{
-		$contracts = $this->_transformUser($user);
+		if (!is_null($user))
+		{
+			$contracts = $this->_transformUser($user);
 
-		/*
-		Format:
-		$contracts['dv'][]['vbs'][]
-		*/
-		//$this->outputJson($contracts);
-		var_dump($contracts);
-		$this->_saveJSON($contracts);
+			/*
+			Format:
+			$contracts['dv'][]['vbs'][]
+			*/
+			//$this->outputJson($contracts);
+			var_dump($contracts);
+			$this->_saveJSON($contracts);
+		}
+		else
+		{
+			$qry = "SELECT distinct mitarbeiter_uid FROM bis.tbl_bisverwendung";
+			$db = new DB_Model();
+	
+			$resultUser = $db->execReadOnlyQuery($qry);
+			if (hasData($resultUser))
+			{
+				$users = getData($resultUser);
+				foreach($users as $user)
+				{
+					$contracts = $this->_transformUser($user->mitarbeiter_uid);
+					$this->_saveJSON($contracts);
+				}
+			}
+
+		}
 	}
 
 	private function _saveJSON($contracts)
@@ -461,7 +486,7 @@ class MigrateContract extends CLI_Controller
 				{
 					if ($row_vbs['vertragsbestandteiltyp_kurzbz'] == 'stunden' || ($row_vbs['vertragsbestandteiltyp_kurzbz'] == 'karenz' && $row_verwendung->vertragsstunden === '0.00'))
 					{
-						if ($this->_isVBSAngrenzend($row_verwendung, $row_vbs) && ($row_vbs['wochenstunden'] == $row_verwendung->vertragsstunden || $row_verwendung->vertragsstunden === '0.00'))
+						if ($this->_isVBSAngrenzend($row_verwendung, $row_vbs) && ((isset($row_vbs['wochenstunden']) && $row_vbs['wochenstunden'] == $row_verwendung->vertragsstunden) || $row_verwendung->vertragsstunden === '0.00'))
 						{
 							// stunden bleiben gleich - Ende des VBS verlaengern
 							$contracts['dv'][$dv]['vbs'][$index_vbs]['bis'] = $row_verwendung->ende;
@@ -506,12 +531,25 @@ class MigrateContract extends CLI_Controller
 	 */
 	private function _getOrCreateDV(&$contracts, $row_verwendung)
 	{
+		$unternehmen = $this->OE_DEFAULT;
+		$resultUnternehmen = $this->_getUnternehmen($row_verwendung);
+		if(hasData($resultUnternehmen))
+		{
+			$unternehmen = getData($resultUnternehmen)[0]->oe_kurzbz;
+		}
+		else
+		{
+			// Fallback Unternehmen wird verwendet falls keine Zuordnung ermittelt werden kann
+		}
+
 		if (isset($contracts['dv']) && is_array($contracts['dv']))
 		{
 			foreach($contracts['dv'] as $indexdv => $row_dv)
 			{
-				// Vertragsart ist die selbe
-				if ($row_dv['vertragsart_kurzbz'] == $this->matching_ba1_vertragsart[$row_verwendung->ba1code])
+				// Vertragsart ist die selbe und selbes Unternehmen
+				if ($row_dv['vertragsart_kurzbz'] == $this->matching_ba1_vertragsart[$row_verwendung->ba1code]
+					&& $row_dv['oe_kurzbz'] == $unternehmen
+				)
 				{
 
 					$dtstart = new DateTime($row_verwendung->beginn);
@@ -540,10 +578,84 @@ class MigrateContract extends CLI_Controller
 		$contracts['dv'][$newDvIndex]['mitarbeiter_uid'] = $row_verwendung->mitarbeiter_uid;
 		$contracts['dv'][$newDvIndex]['von'] = $row_verwendung->beginn;
 		$contracts['dv'][$newDvIndex]['bis'] = $row_verwendung->ende;
-		$contracts['dv'][$newDvIndex]['oe_kurzbz'] = $this->OE_DEFAULT;
+		$contracts['dv'][$newDvIndex]['oe_kurzbz'] = $unternehmen;
 		$contracts['dv'][$newDvIndex]['vertragsart_kurzbz'] = $this->matching_ba1_vertragsart[$row_verwendung->ba1code];
 
 		return $newDvIndex;
+	}
+
+	/**
+	 * Ermittelt in welchem Unternehmen die Person zum betreffenden Zeitpunkt ist.
+	 */
+	private function _getUnternehmen($row_verwendung)
+	{
+		
+		$resultUnternehmen = $this->_findUnternehmen($row_verwendung->mitarbeiter_uid, "'kstzuordnung', 'oezuordnung'", $row_verwendung->beginn);
+
+		// Wenn zeitlich keine passende Unternehmenszuordnung vorhanden ist, dann suchen ob generell eine Zuordnung ermittelt werden kann
+		if(!hasData($resultUnternehmen))
+		{
+			$resultUnternehmen = $this->_findUnternehmen($row_verwendung->mitarbeiter_uid, "'kstzuordnung', 'oezuordnung'");
+
+			// Falls nicht wird nach erweiterten Funktionen gesucht um die Zuordnung zu ermitteln.
+			if(!hasData($resultUnternehmen))
+			{
+				$resultUnternehmen = $this->_findUnternehmen($row_verwendung->mitarbeiter_uid, "'kstzuordnung', 'oezuordnung','hilfskraft','Leitung','fbk','fbl'");
+			}
+		}
+
+		return $resultUnternehmen;			
+	}
+
+	/**
+	 * Detailsuche fuer die Ermittlung des Unternehmenszuordnung einer Person
+	 */
+	private function _findUnternehmen($uid, $fkt=null, $datum=null)
+	{
+		$db = new DB_Model();
+
+		$qry = "
+		WITH RECURSIVE meine_oes(oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz) as 
+		(
+			SELECT 
+				oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz
+			FROM 
+				public.tbl_organisationseinheit 
+			WHERE 
+				oe_kurzbz=(SELECT 
+						oe_kurzbz 
+					FROM 
+						public.tbl_benutzerfunktion 
+					WHERE 
+						uid=".$db->escape($uid);
+
+		if(!is_null($datum))
+			$qry.=" AND ".$db->escape($datum)." BETWEEN datum_von AND COALESCE(datum_bis, '2999-12-31')";
+
+		if(!is_null($fkt))
+			$qry.=" AND funktion_kurzbz in ($fkt)";
+
+		$qry.="
+					ORDER BY funktion_kurzbz, datum_von LIMIT 1)
+			UNION ALL
+			SELECT 
+				o.oe_kurzbz, o.oe_parent_kurzbz, o.organisationseinheittyp_kurzbz
+			FROM 
+				public.tbl_organisationseinheit o, meine_oes 
+			WHERE 
+				o.oe_kurzbz=meine_oes.oe_parent_kurzbz 
+		)
+		SELECT 
+			oe_kurzbz
+		FROM 
+			meine_oes 
+		WHERE 
+			oe_parent_kurzbz is null
+		LIMIT 1
+		";
+
+		$resultUnternehmen = $db->execReadOnlyQuery($qry);
+		return $resultUnternehmen;
 	}
 
 	/**

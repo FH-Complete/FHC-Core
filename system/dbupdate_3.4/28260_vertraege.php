@@ -12,6 +12,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 		ALTER SCHEMA hr OWNER TO fhcomplete;
 
+		CREATE EXTENSION pgcrypto;
+
 		CREATE TABLE hr.tbl_dienstverhaeltnis
 		(
 			dienstverhaeltnis_id serial NOT NULL,
@@ -346,6 +348,13 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_karenztyp TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_teilzeittyp TO vilesci;
 
+		GRANT SELECT ON hr.tbl_dienstverhaeltnis TO web;
+		GRANT SELECT ON hr.tbl_vertragsart TO web;
+		GRANT SELECT ON hr.tbl_vertragsbestandteil TO web;
+		GRANT SELECT ON hr.tbl_vertragsbestandteiltyp TO web;
+		GRANT SELECT ON hr.tbl_vertragsbestandteil_stunden TO web;
+		GRANT SELECT ON hr.tbl_vertragsbestandteil_zeitaufzeichnung TO web;
+		
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsbestandteil TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsabrechnung TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltstyp TO vilesci;
@@ -374,6 +383,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('grundgehalt','Grundgehalt', true, 2, true);
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('zulage','Zulage', true, 3, true);
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('praemie','Prämie', false, 4, true);
+		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('lohnausgleichatz','Lohnausgleich ATZ', false, 5, true);
 
 		INSERT INTO hr.tbl_vertragsbestandteil_freitexttyp(freitexttyp_kurzbz, bezeichnung, ueberlappend, kuendigungsrelevant) VALUES('allin','All-In', false, false);
 		INSERT INTO hr.tbl_vertragsbestandteil_freitexttyp(freitexttyp_kurzbz, bezeichnung, ueberlappend, kuendigungsrelevant) VALUES('ersatzarbeitskraft','Ersatzarbeitskraft', false, true);
@@ -407,6 +417,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 		GRANT USAGE ON hr.tbl_dienstverhaeltnis_dienstverhaeltnis_id_seq TO vilesci;
 		GRANT USAGE ON hr.tbl_vertragsbestandteil_vertragsbestandteil_id_seq TO vilesci;
+
+		GRANT USAGE ON hr.tbl_gehaltsbestandteil_gehaltsbestandteil_id_seq TO vilesci;
 		";
 
 		if (! $db->db_query($qry))
