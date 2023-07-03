@@ -194,8 +194,8 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
-			this.tabulator.setData(this.filteredData);
 			this.tabulator.setColumns(this.filteredColumns);
+			this.tabulator.setData(this.filteredData);
 		},
 		/**
 		 *
@@ -371,7 +371,7 @@ export const CoreFilterCmpt = {
 			this.startFetchCmpt(
 				CoreFilterAPIs.saveCustomFilter,
 				{
-					customFilterName: this.$refscustomFilterName.value
+					customFilterName: this.$refs.customFilterName.value
 				},
 				this.getFilter
 			);
