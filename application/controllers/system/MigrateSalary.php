@@ -119,7 +119,7 @@ class MigrateSalary extends CLI_Controller
 							if ($data[$i] != '')
 							{
 								// Gehalt hat sich geändert
-								if ($monat != 0)
+								if ($monat != 0 && isset($gehaltsarr[$gehaltsindex]))
 									$gehaltsarr[$gehaltsindex]['ende'] = $monate[$monat-1];
 
 								$gehaltsindex++;
@@ -134,7 +134,7 @@ class MigrateSalary extends CLI_Controller
 								// Gehalt wurde beendet
 								if($monat!=0)
 									$gehaltsarr[$gehaltsindex]['ende'] = $monate[$monat-1];
-								//$gehaltsindex++;
+								$gehaltsindex++;
 							}
 						}
 					}
@@ -157,7 +157,6 @@ class MigrateSalary extends CLI_Controller
 	 */
 	private function _saveGehalt($uid, $gehaltsarr)
 	{		
-		
 		$failed = false;
 		$this->db->trans_begin();
 
