@@ -25,12 +25,12 @@ export default {
 		lvzugelassen() {
 			let zwischen = {};
 			for (let k in this.lvs){
-				zwischen[k] = this.lvs[k].filter(lv=>lv.antrag_zugelassen);
+				zwischen[k] = this.lvs[k] ? this.lvs[k].filter(lv=>lv.antrag_zugelassen) : null;
 			}
 			return zwischen;
 		},
 		lvzugelassenLength() {
-			return Object.values(this.lvzugelassen).reduce((result, current) => result + current.length, 0);
+			return Object.values(this.lvzugelassen).reduce((result, current) => result + (current ? current.length : 0), 0);
 		}
 	},
 	methods: {
@@ -86,7 +86,7 @@ export default {
 								<span>{{sem.substr(1)}}</span>
 							</span>
 						</caption>
-						<thead>
+						<thead v-if="lv_arr !== null">
 							<tr>
 								<th scope="col">{{p.t('ui','bezeichnung')}}</th>
 								<th scope="col">{{p.t('lehre','lehrform')}}</th>
@@ -98,33 +98,38 @@ export default {
 							</tr>
 						</thead>
 						<tbody>
-							<tr v-for="lv in lv_arr">
-								<td>
-									<label class="w-100 m-1" :for="'flexSwitchCheckLv_' + lv.lehrveranstaltung_id">
-										{{lv.bezeichnung}}
-									</label>
-								</td>
-								<td>
-									<div class="m-1">
-										{{lv.lehrform_kurzbz}}
-									</div>
-								</td>
-								<td>
-									<div class="m-1">
-										{{lv.ects}}
-									</div>
-								</td>
-								<td>
-									<div class="m-1">
-										{{lv.note || '---'}}
-									</div>
-								</td>
-								<td>
-									<div class="m-1">
-									{{lv.antrag_anmerkung}}
-									</div>
-								</td>
+							<tr v-if="lv_arr === null" class="table-warning">
+								<td colspan="5">{{p.t('studierendenantrag/error_stg_last_semester')}}</td>
 							</tr>
+							<template v-else>
+								<tr v-for="lv in lv_arr">
+									<td>
+										<label class="w-100 m-1" :for="'flexSwitchCheckLv_' + lv.lehrveranstaltung_id">
+											{{lv.bezeichnung}}
+										</label>
+									</td>
+									<td>
+										<div class="m-1">
+											{{lv.lehrform_kurzbz}}
+										</div>
+									</td>
+									<td>
+										<div class="m-1">
+											{{lv.ects}}
+										</div>
+									</td>
+									<td>
+										<div class="m-1">
+											{{lv.note || '---'}}
+										</div>
+									</td>
+									<td>
+										<div class="m-1">
+										{{lv.antrag_anmerkung}}
+										</div>
+									</td>
+								</tr>
+							</template>
 						</tbody>
 					</table>
 				</template>

@@ -765,14 +765,16 @@ class AntragLib
 		);
 		if (isError($result))
 			return $result;
-		$lvsA = getData($result) ?: [];
-		foreach($lvsA as $lv)
-		{
-			if (isset($lvszugewiesen[$lv->lehrveranstaltung_id]) &&
-				($lvszugewiesen[$lv->lehrveranstaltung_id]->note == $this->_ci->config->item('wiederholung_note_nicht_zugelassen')))
+		$lvsA = $result->retval; // NOTE(chris): don't use getData() because we want to differenciate [] and null
+		if ($lvsA) {
+			foreach($lvsA as $lv)
 			{
-				$lv->antrag_zugelassen = true;
-				$lv->antrag_anmerkung = $lvszugewiesen[$lv->lehrveranstaltung_id]->anmerkung;
+				if (isset($lvszugewiesen[$lv->lehrveranstaltung_id]) &&
+					($lvszugewiesen[$lv->lehrveranstaltung_id]->note == $this->_ci->config->item('wiederholung_note_nicht_zugelassen')))
+				{
+					$lv->antrag_zugelassen = true;
+					$lv->antrag_anmerkung = $lvszugewiesen[$lv->lehrveranstaltung_id]->anmerkung;
+				}
 			}
 		}
 
@@ -798,7 +800,7 @@ class AntragLib
 		}
 
 		return success([
-			'1' . $semA => $lvsA ?: [],
+			'1' . $semA => $lvsA,
 			'2' . $semB => $lvsB ?: []
 		]);
 	}
@@ -822,13 +824,23 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		$result = getData($result);
-		if (!$result)
+		if (!$result) {
+			$result = $this->_ci->StudiengangModel->load($studiengang_kz);
+			if (isError($result))
+				return $result;
+			if (!hasData($result))
+				return error('No Studiengang found with studiengang_kz: ' . $studiengang_kz);
+			$stg = current(getData($result));
+			
+			if ($ausbildungssemester > $stg->max_semester)
+				return success();
 			return error('No studienplan found for stg: ' .
 				$studiengang_kz .
 				', studiensemester: ' .
 				$studiensemester_kurzbz .
 				', ausbildungssemester: ' .
 				($ausbildungssemester));
+		}
 		if (count($result) > 1)
 			return error('Multiple studienplaene found for stg: ' .
 				$studiengang_kz .

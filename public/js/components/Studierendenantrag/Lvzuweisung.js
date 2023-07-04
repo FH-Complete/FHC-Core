@@ -108,6 +108,14 @@ export default {
 				{
 					let res = {};
 					for (var k in result.data.retval) {
+						if (result.data.retval[k] === null) {
+							const alert = document.createElement('div');
+							alert.innerHTML = this.p.t('studierendenantrag', 'error_stg_last_semester');
+							alert.className = 'alert alert-warning';
+							alert.role = 'alert';
+							this.$refs["lvtable" + k.substr(0,1)].append(alert);
+							continue;
+						}
 						let lvs = result.data.retval[k].reduce((obj,lv) => {
 							obj[lv.studienplan_lehrveranstaltung_id] = lv;
 							return obj;
@@ -129,8 +137,9 @@ export default {
 						var table = new Tabulator(this.$refs["lvtable" + k.substr(0,1)], {
 							data: current,
 							dataTree: true,
-							dataTreeStartExpanded:true, //start with an expanded tree
-							dataTreeChildIndent:15,
+							dataTreeStartExpanded: true, //start with an expanded tree
+							dataTreeChildIndent: 15,
+							layout: "fitDataStretch",
 							columns: [
 								{title: this.p.t('ui','bezeichnung'), field: "bezeichnung"},
 								{title: this.p.t('lehre','lehrform'), field: "lehrform_kurzbz"},
@@ -197,7 +206,7 @@ export default {
 											input.type = "text";
 											input.value = cell.getValue() || "";
 											input.addEventListener('input', () => {
-												lvs[data.studienplan_lehrveranstaltung_id].antrag_zugelassen = input.value;
+												lvs[data.studienplan_lehrveranstaltung_id].antrag_anmerkung = input.value;
 											});
 											return input;
 										}

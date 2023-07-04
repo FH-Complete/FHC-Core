@@ -19906,6 +19906,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_stg_last_semester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Studiengang hat nicht genügend Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The course does not have enough semesters',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 
