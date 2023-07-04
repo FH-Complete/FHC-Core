@@ -65,13 +65,15 @@ export default {
 			).then(
 				result => {
 					this.data = result.data.retval;
-					if (!this.data.status || this.data.status == 'ErsteAufforderungVersandt' || this.data.status == 'ZweiteAufforderungVersandt')
+					if (!this.data.status || this.data.status == 'ErsteAufforderungVersandt' || this.data.status == 'ZweiteAufforderungVersandt') {
 						this.data.status = 'Offen';
+						this.data.statustyp = this.p.t('studierendenantrag', 'status_open');
+					}
 					this.$emit('update:status', this.data.status);
 					this.$emit("setStatus", {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
-							severity: this.statusSeverity
-						});
+						msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+						severity: this.statusSeverity
+					});
 					return result;
 				}
 			);
@@ -87,7 +89,7 @@ export default {
 			let nextState = repeat ? 'Erstellt' : 'Verzichtet';
 
 			this.$emit('setStatus', {
-				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t_ref('studierendenantrag', 'status_saving')}),
+				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_saving')}),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -114,7 +116,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t_ref('studierendenantrag', 'status_error')}),
+							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_error')}),
 							severity: 'danger'
 						});
 					}
