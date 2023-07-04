@@ -39,7 +39,8 @@ export const CoreFilterCmpt = {
 		TableDownload
 	},
 	emits: [
-		'nwNewEntry'
+		'nwNewEntry',
+		'click:new'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
