@@ -100,8 +100,8 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_status
 			 CACHE 1;
 		ALTER TABLE campus.tbl_studierendenantrag_status ALTER COLUMN studierendenantrag_status_id SET DEFAULT nextval('campus.tbl_studierendenantrag_status_studierendenantrag_status_id_seq');
 
-		GRANT SELECT, INSERT ON campus.tbl_studierendenantrag_status TO vilesci;
-		GRANT SELECT, INSERT ON campus.tbl_studierendenantrag_status TO web;
+		GRANT SELECT, INSERT, DELETE ON campus.tbl_studierendenantrag_status TO vilesci;
+		GRANT SELECT, INSERT, DELETE ON campus.tbl_studierendenantrag_status TO web;
 		GRANT SELECT, UPDATE ON campus.tbl_studierendenantrag_status_studierendenantrag_status_id_seq TO vilesci;
 		GRANT SELECT, UPDATE ON campus.tbl_studierendenantrag_status_studierendenantrag_status_id_seq TO web;";
 

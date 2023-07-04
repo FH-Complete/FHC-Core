@@ -288,6 +288,7 @@ class AntragLib
 				}
 				else
 				{
+					$studierendenantrag_status_id = getData($result);
 					$resultAntrag = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
 					if (isError($resultAntrag))
 						return $resultAntrag;
@@ -298,6 +299,11 @@ class AntragLib
 
 						// Prestudentstatus und Unterbrechungsfolgeaktionen setzen
 					$result = $this->_ci->prestudentlib->setUnterbrecher($resultAntrag->prestudent_id, $resultAntrag->studiensemester_kurzbz, $studierendenantrag_id);
+
+					if (isError($result)) {
+						$this->_ci->StudierendenantragstatusModel->delete($studierendenantrag_status_id);
+						return $result;
+					}
 
 							//Mail
 					$subject = 'Unterbrechung freigegeben';

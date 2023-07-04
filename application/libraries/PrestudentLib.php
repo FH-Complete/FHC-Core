@@ -203,8 +203,23 @@ class PrestudentLib
 		if (isError($result))
 			return $result;
 		$result = getData($result);
-		if (!$result)
-			return error('Kein Prestudent in diesem Studiensemester gefunden');
+		if (!$result) {
+			/** TODO(chris): Zukünftige Unterbrecher so nicht möglich
+			 * - Verband und Gruppe dürfen noch nicht gesetzt werden
+			 * - Keine Garantie das Ausbildungssemester gleich bleibt (weiter Unterbrechungen oder eine Wiederholung in der Zwischenzeit)
+			 * - LVs eventuell nicht zugewießen
+			 * Mögliche Lösung: JOB!
+
+			$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
+			if (!$result) {
+				return error('Kein Prestudent status gefunden');
+			}
+			$result->studiensemester_kurzbz*/
+			return error('Kein Prestudent status gefunden');
+		}
 
 		$prestudent_status = current($result);
 
