@@ -1,6 +1,8 @@
 <?php
 namespace vertragsbestandteil;
 
+use DateTimeImmutable;
+
 /**
  * Salary always depends on employment (Dienstverhältnis) and optionally on part of contract (Vetragsbestandteil)
  */
@@ -82,6 +84,21 @@ class Gehaltsbestandteil implements IValidation, \JsonSerializable
 	public function getBis()
 	{
 		return $this->bis;
+	}
+
+	public function getVonDateTime()
+	{
+		return $this->toDateTime($this->von);
+	}
+
+	public function getBisDateTime()
+	{
+		return $this->toDateTime($this->bis);
+	}
+
+	protected function toDateTime($d) {
+		if ($d == null) return null;
+		return new DateTimeImmutable($d);
 	}
 
 	public function getAnmerkung()

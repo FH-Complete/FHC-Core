@@ -71,13 +71,14 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 			$this->getEncryptedColumns());
     }
 
-	public function getGBTChartDataByDV($dienstverhaeltnis_id)
+	public function getGBTChartDataByDV_old($dienstverhaeltnis_id)
     {		
 
 		$qry = "
         WITH gbt as
 			(select von,bis,grundbetrag as grund_betrag_decrypted  from hr.tbl_gehaltsbestandteil where dienstverhaeltnis_id=?)
-			select von,bis, (select sum(gbt.grund_betrag_decrypted) as sum_betrag  from gbt where gbt.von<=gbtmeta.von and (gbt.bis is null or gbt.bis>=gbtmeta.von)
+			select von,bis, (select sum(gbt.grund_betrag_decrypted) as sum_betrag
+			from gbt where gbt.von<=gbtmeta.von and (gbt.bis is null or gbt.bis>=gbtmeta.von)
 			) as summe from gbt as gbtmeta order by von,bis
         ";
 
@@ -85,6 +86,7 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 			array($dienstverhaeltnis_id),
 			$this->getEncryptedColumns());
     }
+
 	
 	public function getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
