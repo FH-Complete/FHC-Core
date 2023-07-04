@@ -66,7 +66,6 @@ class Wiederholung extends FHC_Controller
 		}
 		$result = $result->retval;
 		if (!$result) {
-			// TODO(chris): ERROR Message
 			$this->output->set_status_header(REST_Controller::HTTP_FORBIDDEN);
 			return $this->outputJsonError($this->p->t('studierendenantrag','error_no_student_no_failed_exam'));
 		}
