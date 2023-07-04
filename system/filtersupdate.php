@@ -1268,13 +1268,12 @@ $filters = array(
 			{
 				"name": "SoftwareManagement",
 				"columns": [
-					{"name": "Software Kurzbezeichnung"},
-					{"name": "Version"},
-					{"name": "Beschreibung"},
-					{"name": "Hersteller"},
-					{"name": "Betriebssystem"},
-					{"name": "Aktiv"},
-					{"name": "Softwarestatus Kurzbezeichnung"}
+					{"name": "software_kurzbz"},
+					{"name": "version"},
+					{"name": "beschreibung"},
+					{"name": "hersteller"},
+					{"name": "os"},
+					{"name": "aktiv"}
 				],
 				"filters": []
 			}

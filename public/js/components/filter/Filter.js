@@ -226,9 +226,9 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
+			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
 			this.tabulatorHasSelector = this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
-			this.tabulator.setColumns(this.filteredColumns);
 		},
 		/**
 		 *
