@@ -204,4 +204,34 @@ class Studiensemester_model extends DB_Model
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
+
+	public function getFollowingSemester($studienplan_ids, $studiensemester_kurzbz, $ausbildungssemester)
+	{
+		$query = '
+			WITH RECURSIVE following(studiensemester_kurzbz, semester, start) AS (
+				SELECT studiensemester_kurzbz, ?, start
+				FROM public.tbl_studiensemester
+				WHERE studiensemester_kurzbz=?
+			UNION ALL
+				SELECT * FROM (
+					SELECT s.studiensemester_kurzbz, s.semester, ss.start
+					FROM lehre.tbl_studienplan_semester s
+					JOIN public.tbl_studiensemester ss USING(studiensemester_kurzbz)
+					INNER JOIN following a ON(s.semester=a.semester+1 AND ss.start > a.start)
+					WHERE studienplan_id IN ?
+					ORDER BY start ASC
+					LIMIT 1
+				) wrapper
+			)
+			SELECT sem.*, following.semester
+			FROM following
+			LEFT JOIN ' . $this->dbTable . ' sem USING(studiensemester_kurzbz)
+			ORDER BY start';
+
+		return $this->execQuery($query, [
+			$ausbildungssemester,
+			$studiensemester_kurzbz,
+			$studienplan_ids
+		]);
+	}
 }

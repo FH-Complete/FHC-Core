@@ -511,10 +511,10 @@ class Studiengang_model extends DB_Model
 	public function getStudiengangTyp($studiengang_kz, $typ = null)
 	{
 		$query = "SELECT DISTINCT(sgt.*)
-					FROM tbl_studiengangstyp sgt JOIN tbl_studiengang sg on sgt.typ = sg.typ 
+					FROM tbl_studiengangstyp sgt JOIN tbl_studiengang sg on sgt.typ = sg.typ
 					WHERE studiengang_kz IN ?";
 
-		$params[] = $studiengang_kz;
+		$params = [$studiengang_kz];
 
 		if (!is_null($typ))
 		{
@@ -523,5 +523,54 @@ class Studiengang_model extends DB_Model
 		}
 
 		return $this->execQuery($query, $params);
+	}
+
+	/**
+	 * @param array		$studiengang_kzs
+	 * @param array		$not_antrag_typ		(optional) If the prestudent has an antrag with one of the specified types it will be excluded from the result
+	 * @param array		$prestudent_stati	(optional)
+	 *
+	 * @return stdClass
+	 */
+	public function getAktivePrestudenten($studiengang_kzs, $not_antrag_typ = null)
+	{
+		$this->load->config('studierendenantrag');
+
+		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+
+		$this->addSelect($this->dbTable . '.studiengang_kz');
+		$this->addSelect($this->dbTable . '.bezeichnung');
+		$this->addSelect('o.orgform_kurzbz');
+		$this->addSelect('o.bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform', false);
+		$this->addSelect('ps.ausbildungssemester AS semester');
+		$this->addSelect('ps.studiensemester_kurzbz');
+		$this->addSelect('p.prestudent_id');
+		$this->addSelect('pers.vorname');
+		$this->addSelect('pers.nachname');
+
+		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+		$this->addJoin(
+			'public.tbl_prestudentstatus ps',
+			'ps.prestudent_id=p.prestudent_id
+				AND ps.studiensemester_kurzbz=get_stdsem_prestudent(p.prestudent_id, NULL)
+				AND ps.ausbildungssemester=get_absem_prestudent(p.prestudent_id, NULL)
+				AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, NULL)'
+		);
+		$this->addJoin('bis.tbl_orgform o', $this->dbTable . '.orgform_kurzbz=o.orgform_kurzbz');
+		$this->addJoin('public.tbl_person pers', 'person_id');
+
+		$this->db->where_in($this->dbTable . '.studiengang_kz', $studiengang_kzs);
+		$this->db->where_in('ps.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist'));
+		$this->db->where($this->dbTable . ".aktiv", true);
+
+		if ($not_antrag_typ !== null && is_array($not_antrag_typ)) {
+			$this->addJoin('campus.tbl_studierendenantrag a', 'a.prestudent_id=p.prestudent_id', 'LEFT');
+			$this->db->group_start();
+			$this->db->where_not_in('a.typ', $not_antrag_typ);
+			$this->db->or_where('a.typ IS NULL');
+			$this->db->group_end();
+		}
+
+		return $this->load();
 	}
 }
