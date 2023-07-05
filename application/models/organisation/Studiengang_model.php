@@ -564,11 +564,10 @@ class Studiengang_model extends DB_Model
 		$this->db->where($this->dbTable . ".aktiv", true);
 
 		if ($not_antrag_typ !== null && is_array($not_antrag_typ)) {
-			$this->addJoin('campus.tbl_studierendenantrag a', 'a.prestudent_id=p.prestudent_id', 'LEFT');
-			$this->db->group_start();
-			$this->db->where_not_in('a.typ', $not_antrag_typ);
-			$this->db->or_where('a.typ IS NULL');
-			$this->db->group_end();
+			foreach($not_antrag_typ as $k => $v)
+				$not_antrag_typ[$k] = $this->db->escape($v);
+			$this->addJoin('campus.tbl_studierendenantrag a', 'a.prestudent_id=p.prestudent_id and a.typ in ('. implode(',', $not_antrag_typ ).')', 'LEFT');
+			$this->db->where('a.typ IS NULL');
 		}
 
 		if ($query) {

@@ -5,4 +5,4 @@ const app = Vue.createApp({
 		StudierendenantragLeitung
 	}
 });
-app.use(primevue.config.default).mount('#wrapper');
+app.use(primevue.config.default,{zIndex: {overlay: 9999}}).mount('#wrapper');

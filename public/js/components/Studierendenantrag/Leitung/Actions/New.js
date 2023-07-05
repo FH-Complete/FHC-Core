@@ -21,21 +21,16 @@ export default {
 	},
 	computed: {
 		newUrl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldung/' + this.student;
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldung/' + this.student.prestudent_id;
 		},
 		students() {
-			return this.data.sort(
-				(a, b) => a.nachname == b.nachname ?
-					(
-						a.vorname == b.vorname ?
-							a.bezeichnung > b.bezeichnung :
-							a.vorname > b.vorname
-					) :
-					a.nachname > b.nachname
+			return this.data.map((current)=>
+			{
+				current.name = current.nachname.toUpperCase() + " " + current.vorname + " (" + current.bezeichnung + ")";
+				return current;
+			}).sort(
+				(a, b) => a.name > b.name ? 1 : -1
 			);
-		},
-		hasNoData() {
-			return !Object.values(this.data).length;
 		}
 	},
 	methods: {
@@ -47,9 +42,8 @@ export default {
 			}), {
 				dialogClass: 'modal-fullscreen'
 			}, this.p.t('studierendenantrag', 'antrag_header')).then(() => {
-				this.data = [];
-				this.loadSelects();
 				this.$emit('reload');
+				this.student = '';
 			});
 		},
 		loadData(evt) {
@@ -68,25 +62,6 @@ export default {
 					return result;
 				}
 			);
-		},
-		loadSelects() {
-			if (this.hasNoData) {
-				return axios.post(
-					FHC_JS_DATA_STORAGE_OBJECT.app_root +
-					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-					'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/',
-					{query: 'felix'}
-				).then(
-					result => {
-						if (result.data.error) {
-							BsAlert.popup(result.data.retval, {dialogClass: 'alert alert-danger'});
-						} else {
-							this.data = result.data.retval;
-						}
-						return result;
-					}
-				);
-			}
 		}
 	},
 	template: `
@@ -105,38 +80,31 @@ export default {
 					<div class="modal-body">
 						<label for="newAntragModalAutoComplete">{{p.t('person','studentIn')}}</label>
 						<!-- TODO(chris): IMPLEMENT!! -->
-						<auto-complete
-							v-model="student"
-							:suggestions="data"
-							@complete="loadData"
-							inputId="newAntragModalAutoComplete"
-							dropdown
-							>
-							<template #option="slotProps">
-								<div>
-									{{slotProps.nachname}} {{slotProps.vorname}} ({{slotProps.bezeichnung}}) [{{slotProps.prestudent_id}}]
-								</div>
-							</template>
-						</auto-complete>
-						<!--div v-if="hasNoData">
-							loading...
+						<div>
+							<auto-complete
+								class="w-100"
+								v-model="student"
+								:suggestions="students"
+								optionLabel = "name"
+								@complete="loadData"
+								inputId="newAntragModalAutoComplete"
+								dropdown
+								>
+								<template #option="slotProps">
+									<div :title="slotProps.option.prestudent_id">
+									{{slotProps.option.name}}
+									</div>
+								</template>
+							</auto-complete>
 						</div>
-						<div v-else class="mb-3">
-							<label for="newAntragModalStudent">{{p.t('person','studentIn')}}</label>
-							<select id="newAntragModalStudent" class="form-select" v-model="student">
-								<option v-for="item in students" :value="item.prestudent_id" :key="item.prestudent_id">
-									{{item.nachname}} {{item.vorname}} ({{item.bezeichnung}}) [{{item.prestudent_id}}]
-								</option>
-							</select>
-						</div-->
 					</div>
 					<div class="modal-footer">
-						<a :href="newUrl"
+						<button
 							class="btn btn-primary"
-							target="_blank"
+							:disabled="!this.student"
 							@click.prevent="openForm">
 							{{p.t('studierendenantrag','btn_create')}}
-						</a>
+						</button>
 					</div>
 				</div>
 			</div>
