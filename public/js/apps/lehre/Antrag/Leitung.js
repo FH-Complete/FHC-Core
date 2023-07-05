@@ -5,4 +5,4 @@ const app = Vue.createApp({
 		StudierendenantragLeitung
 	}
 });
-app.mount('#wrapper');
+app.use(primevue.config.default).mount('#wrapper');

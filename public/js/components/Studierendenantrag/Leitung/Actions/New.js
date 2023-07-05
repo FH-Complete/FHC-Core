@@ -4,7 +4,8 @@ import Phrasen from '../../../../mixins/Phrasen.js';
 
 export default {
 	components: {
-		BsModal
+		BsModal,
+		AutoComplete: primevue.autocomplete
 	},
 	mixins: [
 		Phrasen
@@ -15,8 +16,7 @@ export default {
 	data() {
 		return {
 			data: [],
-			student: '',
-			stg: ''
+			student: ''
 		}
 	},
 	computed: {
@@ -24,13 +24,13 @@ export default {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldung/' + this.student;
 		},
 		students() {
-			if (!this.stg)
-				return [];
-			if (!this.data[this.stg])
-				return [];
-			return this.data[this.stg].studenten.sort(
+			return this.data.sort(
 				(a, b) => a.nachname == b.nachname ?
-					a.vorname > b.vorname :
+					(
+						a.vorname == b.vorname ?
+							a.bezeichnung > b.bezeichnung :
+							a.vorname > b.vorname
+					) :
 					a.nachname > b.nachname
 			);
 		},
@@ -47,15 +47,17 @@ export default {
 			}), {
 				dialogClass: 'modal-fullscreen'
 			}, this.p.t('studierendenantrag', 'antrag_header')).then(() => {
+				this.data = [];
 				this.loadSelects();
 				this.$emit('reload');
 			});
 		},
-		loadSelects() {
-			return axios.get(
+		loadData(evt) {
+			axios.post(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/'
+				'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/',
+				evt
 			).then(
 				result => {
 					if (result.data.error) {
@@ -66,14 +68,30 @@ export default {
 					return result;
 				}
 			);
+		},
+		loadSelects() {
+			if (this.hasNoData) {
+				return axios.post(
+					FHC_JS_DATA_STORAGE_OBJECT.app_root +
+					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+					'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/',
+					{query: 'felix'}
+				).then(
+					result => {
+						if (result.data.error) {
+							BsAlert.popup(result.data.retval, {dialogClass: 'alert alert-danger'});
+						} else {
+							this.data = result.data.retval;
+						}
+						return result;
+					}
+				);
+			}
 		}
-	},
-	created() {
-		return this.loadSelects();
 	},
 	template: `
 	<div class="studierendenantrag-leitung-actions-new" v-if="data">
-		<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newAntragModal" :disabled="hasNoData">
+		<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newAntragModal">
 			<i class="fa fa-plus"></i>
 			{{p.t('studierendenantrag','btn_new')}}
 		</button>
@@ -85,22 +103,32 @@ export default {
 						<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="p.t('ui','schliessen')"></button>
 					</div>
 					<div class="modal-body">
-						<div class="mb-3">
-							<label for="newAntragModalStg">{{p.t('lehre','studiengang')}}</label>
-							<select id="newAntragModalStg" class="form-select" v-model="stg">
-								<option v-for="(stg, stg_kz) in data" :value="stg_kz" :key="stg_kz">
-									{{stg.bezeichnung}} ({{stg.orgform}})
-								</option>
-							</select>
+						<label for="newAntragModalAutoComplete">{{p.t('person','studentIn')}}</label>
+						<!-- TODO(chris): IMPLEMENT!! -->
+						<auto-complete
+							v-model="student"
+							:suggestions="data"
+							@complete="loadData"
+							inputId="newAntragModalAutoComplete"
+							dropdown
+							>
+							<template #option="slotProps">
+								<div>
+									{{slotProps.nachname}} {{slotProps.vorname}} ({{slotProps.bezeichnung}}) [{{slotProps.prestudent_id}}]
+								</div>
+							</template>
+						</auto-complete>
+						<!--div v-if="hasNoData">
+							loading...
 						</div>
-						<div class="mb-3">
+						<div v-else class="mb-3">
 							<label for="newAntragModalStudent">{{p.t('person','studentIn')}}</label>
-							<select v-model="student" id="newAntragModalStudent" class="form-select">
-								<option  v-for="(stg, stg_kz) in students" :value="stg.prestudent_id" :key="stg.prestudent_id">
-									{{stg.nachname}} {{stg.vorname}}
+							<select id="newAntragModalStudent" class="form-select" v-model="student">
+								<option v-for="item in students" :value="item.prestudent_id" :key="item.prestudent_id">
+									{{item.nachname}} {{item.vorname}} ({{item.bezeichnung}}) [{{item.prestudent_id}}]
 								</option>
 							</select>
-						</div>
+						</div-->
 					</div>
 					<div class="modal-footer">
 						<a :href="newUrl"

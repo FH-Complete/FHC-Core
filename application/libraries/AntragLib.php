@@ -1188,13 +1188,15 @@ class AntragLib
 		return $stsems;
 	}
 
-	public function getAbmeldeBerechtigtForStg($studiengaenge)
+	public function getAktivePrestudentenInStgs($studiengaenge, $query)
 	{
 		$blacklist = $this->_ci->config->item('stgkz_blacklist_abmeldung');
 		$studiengaenge = array_diff($studiengaenge, $blacklist);
-		return $this->_ci->StudiengangModel->getAktivePrestudenten($studiengaenge, [
-			Studierendenantrag_model::TYP_ABMELDUNG
-		]);
+		return $this->_ci->StudiengangModel->getAktivePrestudenten(
+			$studiengaenge,
+			[ Studierendenantrag_model::TYP_ABMELDUNG ],
+			$query
+		);
 	}
 
 	public function getFailedExamForPrestudent($prestudent_id)

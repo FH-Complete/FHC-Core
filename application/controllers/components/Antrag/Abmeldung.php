@@ -167,9 +167,12 @@ class Abmeldung extends FHC_Controller
 	{
 		$this->load->library('PermissionLib');
 
+		$_POST = json_decode($this->input->raw_input_stream, true);
+		$query = $this->input->post('query');
+
 		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag');
 
-		$result = $this->antraglib->getAbmeldeBerechtigtForStg($studiengaenge);
+		$result = $this->antraglib->getAktivePrestudentenInStgs($studiengaenge, $query);
 		if (isError($result)) {
 			return $this->outputJsonError(getError($result));
 		}
@@ -177,6 +180,8 @@ class Abmeldung extends FHC_Controller
 		if (!$result) {
 			return $this->outputJsonSuccess([]);
 		}
+
+		return $this->outputJsonSuccess($result);
 
 		$sortedStudents = [];
 		foreach ($result as $item) {

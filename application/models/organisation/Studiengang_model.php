@@ -532,7 +532,7 @@ class Studiengang_model extends DB_Model
 	 *
 	 * @return stdClass
 	 */
-	public function getAktivePrestudenten($studiengang_kzs, $not_antrag_typ = null)
+	public function getAktivePrestudenten($studiengang_kzs, $not_antrag_typ = null, $query = null)
 	{
 		$this->load->config('studierendenantrag');
 
@@ -568,6 +568,21 @@ class Studiengang_model extends DB_Model
 			$this->db->group_start();
 			$this->db->where_not_in('a.typ', $not_antrag_typ);
 			$this->db->or_where('a.typ IS NULL');
+			$this->db->group_end();
+		}
+
+		if ($query) {
+			$query = explode(' ', $query);
+			$this->db->group_start();
+			foreach ($query as $q) {
+				$this->db->group_start();
+					$this->db->where('pers.vorname ILIKE', "%" . $q . "%");
+					$this->db->or_where('pers.nachname ILIKE', "%" . $q . "%");
+					$this->db->or_where($this->dbTable . '.bezeichnung ILIKE', "%" . $q . "%");
+					if (is_numeric($q))
+						$this->db->or_where('p.prestudent_id', $q);
+				$this->db->group_end();
+			}
 			$this->db->group_end();
 		}
 
