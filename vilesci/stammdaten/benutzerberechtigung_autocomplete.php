@@ -98,17 +98,29 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'oe_kurzbz'
 
 	if(is_array($oe->result) && count($oe->result) > 0)
 	{
-		$result_obj = array();
+		$resultArray = array();
 		foreach($oe->result as $row)
 		{
 			if($row->aktiv==true)
 			{
-				$item['oe_kurzbz'] = html_entity_decode($row->oe_kurzbz);
-				$item['organisationseinheittyp_kurzbz'] = html_entity_decode($row->organisationseinheittyp_kurzbz);
-				$item['bezeichnung'] = html_entity_decode($row->bezeichnung);
-				$result_obj[] = $item;
+				$resultArray[html_entity_decode($row->oe_kurzbz)] = array('organisationseinheittyp_kurzbz' => html_entity_decode($row->organisationseinheittyp_kurzbz),'bezeichnung' => html_entity_decode($row->bezeichnung));
 			}
 		}
+
+		usort($resultArray, function($a, $b)
+		{
+		    return $a['organisationseinheittyp_kurzbz'] <=> $b['organisationseinheittyp_kurzbz'];
+		});
+
+		$result_obj = array();
+		foreach($resultArray as $key => $value)
+		{
+				$item['oe_kurzbz'] = $key;
+				$item['organisationseinheittyp_kurzbz'] = $value['organisationseinheittyp_kurzbz'];
+				$item['bezeichnung'] = $value['bezeichnung'];
+				$result_obj[] = $item;
+		}
+
 		echo json_encode($result_obj);
 	}
 	exit();

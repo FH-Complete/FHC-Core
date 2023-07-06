@@ -599,7 +599,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		}
 		if (count($bn) > 0)
 		{
-			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Rechte Details</a></p>";
+			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Rechte Detailaufschlüsselung</a></p>";
 		}
 	}
 	elseif(isset($_REQUEST['funktion_kurzbz']) && $_REQUEST['funktion_kurzbz']!='')

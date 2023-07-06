@@ -46,7 +46,7 @@ $saveNew = filter_input(INPUT_POST, 'saveNew');
 ?>
 <html>
 	<head>
-		<title>Rechte</title>
+		<title>Rechte Übersicht</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
@@ -87,7 +87,7 @@ $saveNew = filter_input(INPUT_POST, 'saveNew');
 	</head>
 
 	<body class="background_main">
-		<h2>Rechte</h2>
+		<h2>Rechte Übersicht</h2>
 
 	<?php
 		if(isset($saveNew))

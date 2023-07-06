@@ -182,7 +182,7 @@ $(document).ready(function()
 </head>
 
 <body class="background_main" onload="document.getElementById(\'searchbox\').focus()">
-<h2>Benutzerberechtigungen Übersicht</h2>';
+<h2>Berechtigungen Übersicht</h2>';
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -229,7 +229,7 @@ $htmlstr='
 		<div id="erweitertesuche">
 		<hr>
 		<form accept-charset="UTF-8" name="searchrechte" method="GET">
-			Berechtigung:
+			Rechte:
 			<select id="berechtigung_kurzbz" name="berechtigung_kurzbz">
 				<option value=""></option>';
 			$berechtigung = new berechtigung();
