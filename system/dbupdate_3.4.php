@@ -39,6 +39,7 @@ require_once('dbupdate_3.4/27107_vilesci_erfassung_abwesenheiten_reinigung.php')
 require_once('dbupdate_3.4/24913_tabelle_raumtyp_neues_attribut_aktiv.php');
 require_once('dbupdate_3.4/28089_plausichecks_in_extension_hinzufuegen.php');
 require_once('dbupdate_3.4/29133_einzelne_studiengaenge_aus_issuechecks_ausnehmen.php');
+require_once('dbupdate_3.4/30537_anmerkung_in_tbl_rolleberechtigung.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -326,7 +327,7 @@ $tabellen=array(
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
-	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
+	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art","anmerkung","insertamum","insertvon"),
 	"system.tbl_verarbeitungstaetigkeit" => array("taetigkeit_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig","aktiv"),
 	"system.tbl_webservicelog"  => array("webservicelog_id","webservicetyp_kurzbz","request_id","beschreibung","request_data","execute_time","execute_user"),
 	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon","klasse"),
