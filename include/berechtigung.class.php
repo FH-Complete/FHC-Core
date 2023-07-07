@@ -82,6 +82,7 @@ class berechtigung extends basis_db
 	public function save($new=null)
 	{
 		if(is_null($new))
+			$new = $this->new;
 
 		if($new)
 		{
