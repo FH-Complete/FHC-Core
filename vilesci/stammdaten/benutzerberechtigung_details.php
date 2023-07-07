@@ -479,12 +479,11 @@ if(isset($_POST['copy']) && $_POST['copy'] != '')
 if (!$b = new berechtigung())
 	die($b->errormsg);
 
-$b->getRollen();
+$b->getRollen('rolle_kurzbz');
 foreach($b->result as $berechtigung)
 {
 	$rolle_arr[$berechtigung->rolle_kurzbz] = $berechtigung->beschreibung;
 }
-ksort($rolle_arr, SORT_STRING | SORT_FLAG_CASE);
 
 $b->getBerechtigungen();
 foreach($b->result as $berechtigung)
@@ -600,7 +599,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		}
 		if (count($bn) > 0)
 		{
-			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Rechte Details</a></p>";
+			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Rechte Detailaufschlüsselung</a></p>";
 		}
 	}
 	elseif(isset($_REQUEST['funktion_kurzbz']) && $_REQUEST['funktion_kurzbz']!='')

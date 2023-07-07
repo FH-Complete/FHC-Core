@@ -35,10 +35,12 @@ if(!$rechte->isBerechtigt('basis/berechtigung'))
 
 $rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
 $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
+$copy = filter_input(INPUT_POST, 'copy');
+$vergleich = filter_input(INPUT_GET, 'vergleich');
 ?>
 <html>
 	<head>
-		<title>Berechtigungen Uebersicht</title>
+		<title>Rollen Uebersicht</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
@@ -54,15 +56,37 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 				$("#t1").tablesorter(
 				{
 					sortList: [[0,0]],
-					widgets: ["zebra"],
-					headers: {3:{sorter:false}}
+					widgets: ["zebra", "filter", "stickyHeaders"],
+					headers: {3:{filter:false, sorter:false}},
+					widgetOptions : {filter_saveFilters : true}
 				});
 
 				$("#t2").tablesorter(
 				{
 					sortList: [[0,0]],
-					widgets: ["zebra"],
-					headers: {2:{sorter:false}}
+					widgets: ["zebra", "filter", "stickyHeaders"],
+					headers: {2:{filter:false, sorter:false}},
+					widgetOptions : {filter_saveFilters : true}
+				});
+				$("#t3").tablesorter(
+				{
+					sortList: [],
+					widgets: ["zebra"]
+				});
+				$("#t4").tablesorter(
+				{
+					sortList: [],
+					widgets: ["zebra"]
+				});
+				$('.resetsaved').click(function()
+				{
+					$(".tablesorter").trigger("filterReset");
+					window.location("<?php echo $_SERVER['PHP_SELF'] ?>");
+					return false;
+				});
+				$("textarea").keyup(function()
+				{
+					$(this).siblings("span").text((256 - $(this).val().length));
 				});
 
 				// Breite des Autocompletes korrigieren um das Springen zu verhindern
@@ -93,16 +117,15 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 						$(this).val(ui.item.berechtigung_kurzbz);
 					}
 				});
-			});
-			function confdel()
-			{
-				var value=prompt('Achtung! Sie sind dabei eine Rolle zu löschen. Die Zuordnungen gehen dadurch verloren! Um diese Rolle wirklich zu Löschen tippen Sie "LÖSCHEN" in das untenstehende Feld.');
 
-				if(value=='LÖSCHEN')
-					return true;
-				else
-					return false;
-			}
+				$(".copyButton").click(function(event)
+				{
+					event.preventDefault();
+					$(this).siblings().show();
+					$(this).hide();
+				});
+			});
+
 			function validateNewData()
 			{
 				if($('#berechtigung_neu_autocomplete').val() == '')
@@ -138,14 +161,16 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 	</head>
 
 	<body class="background_main">
-		<h2>Berechtigung - Rolle - <?php echo $rolle_kurzbz ?></h2>
+
 
 	<?php
 	if(isset($rolle_kurzbz))
 	{
+		echo '<h2>Berechtigungen der Rolle "'.$rolle_kurzbz.'"</h2>';
 		$berechtigung_kurzbz = filter_input(INPUT_GET, 'berechtigung_kurzbz');
 		$art = filter_input(INPUT_GET, 'art');
 		$save = filter_input(INPUT_GET, 'save');
+		$anmerkung = filter_input(INPUT_GET, 'anmerkung');
 
 		if(isset($save))
 		{
@@ -155,10 +180,17 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 				$berechtigung->rolle_kurzbz = $rolle_kurzbz;
 				$berechtigung->berechtigung_kurzbz = $berechtigung_kurzbz;
 				$berechtigung->art = $art;
+				$berechtigung->anmerkung = $anmerkung;
+				$berechtigung->insertamum = date('Y-m-d H:i:s');
+				$berechtigung->insertvon = $user;
 
 				if($berechtigung->saveRolleBerechtigung()): ?>
 					<b>Zuteilung gespeichert</b>
-				<?php else: ?>
+				<?php
+					$berechtigung_kurzbz = '';
+					$art = 'suid';
+					$anmerkung = '';
+				else: ?>
 					<b>Fehler beim Speichern der Zuteilung: <?php echo $berechtigung->errormsg ?>
 				<?php endif;
 			}
@@ -175,7 +207,7 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 		} ?>
 
 		<a href="<?php echo basename(__FILE__) ?>">
-			Zurück zur Rollenübersicht
+			Zurück zur Rollen Übersicht
 		</a>
 		<br><br>
 		<?php
@@ -183,35 +215,41 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 		$berechtigung->getBerechtigungen();
 		?>
 		<form action="<?php echo basename(__FILE__) ?>" method="GET">
-			<input type="text" placeholder="Berechtigung" id="berechtigung_neu_autocomplete" class="berechtigung_autocomplete" name="berechtigung_kurzbz" style="width: 300px">
+			<div style="vertical-align: top">
+			<input type="text" 
+					value="<?php echo $berechtigung_kurzbz ?>"
+					placeholder="Berechtigung" 
+					id="berechtigung_neu_autocomplete" 
+					class="berechtigung_autocomplete" 
+					name="berechtigung_kurzbz" 
+					style="width: 300px">
 			<input type="hidden" name="rolle_kurzbz" value="<?php echo $rolle_kurzbz ?>">
-<!--			<SELECT name="berechtigung_kurzbz">-->
-		<?php
-		/*$berechtigungen = new berechtigung();
-		$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
-		$berechtigungen_arr = array();
-		foreach ($berechtigungen->result as $row)
-		{
-			$berechtigungen_arr[] = $row->berechtigung_kurzbz;
-		}
-		foreach ($berechtigung->result as $row): ?>
-				<OPTION value="<?php echo $row->berechtigung_kurzbz ?>"
-						<?php echo array_search($row->berechtigung_kurzbz,$berechtigungen_arr)!==false ? 'disabled' : '' ?>>
-					<?php echo $row->berechtigung_kurzbz ?>
-				</OPTION>
-		<?php endforeach; */?>
-<!--			</SELECT>-->
-			<input type="text" id="art_neu" value="suid" size="4" name="art">
+			<input type="text" 
+					id="art_neu" 
+					value="<?php echo ($art != '' ? $art : 'suid') ?>"
+					size="4" 
+					name="art">
+			<textarea type="text"
+					placeholder="Anmerkung"
+					id="anmerkung_neu"
+					rows="2"
+					cols="50"
+					size="200"
+					maxlength="256"
+					name="anmerkung"
+					style="vertical-align: top; font-family: inherit; font-size: small;"><?php echo $anmerkung ?></textarea>
 			<input type="submit" name="save" value="Hinzufügen" onclick="return validateNewData()">
+			</div>
 		</form>
-
+		<button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>
 		<table id="t1" class="tablesorter">
 			<thead>
 				<tr>
 					<th>Kurzbz</th>
 					<th>Art</th>
 					<th>Beschreibung</th>
-					<th></th>
+					<th>Anmerkung</th>
+					<th colspan="2"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -224,9 +262,15 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 					<td><?php echo $rolle->berechtigung_kurzbz ?></td>
 					<td><?php echo $rolle->art ?></td>
 					<td><?php echo $rolle->beschreibung ?></td>
+					<td><?php echo $rolle->anmerkung ?></td>
 					<td>
-						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>&art=<?php echo $rolle->art ?>">
-							entfernen
+						<a href="<?php echo basename(__FILE__) ?>?rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
+							Bearbeiten
+						</a>
+					</td>
+					<td>
+						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
+							Recht entfernen
 						</a>
 					</td>
 				</tr>
@@ -235,8 +279,166 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 		</table>
 		<?php
 	}
+	elseif(isset($vergleich))
+	{
+		echo '<h2>Rollen vergleichen</h2>';
+		$rolle1 = filter_input(INPUT_GET, 'rolle_kurzbz1');
+		$rolle2 = filter_input(INPUT_GET, 'rolle_kurzbz2');
+		 ?>
+
+		<a href="<?php echo basename(__FILE__) ?>">
+			Zurück zur Rollen Übersicht
+		</a>
+		<br><br>
+
+		<?php
+		$rollen1Arr = array();
+		$rollen2Arr = array();
+		$rollenGesamt = array();
+		$rollen = new berechtigung();
+		$rollen->getRolleBerechtigung($rolle1);
+		foreach ($rollen->result AS $recht)
+		{
+			$rollen1Arr[$recht->berechtigung_kurzbz] = $recht->art;
+		}
+		$rollen = new berechtigung();
+		$rollen->getRolleBerechtigung($rolle2);
+		foreach ($rollen->result AS $recht)
+		{
+			$rollen2Arr[$recht->berechtigung_kurzbz] = $recht->art;
+		}
+		$rollenGesamt = array_merge($rollen1Arr,$rollen2Arr);
+		ksort($rollenGesamt);
+
+		echo '	<form action="'.basename(__FILE__).'?vergleich=vergleich" method="GET" style="width: 60%">
+					<div style="width: 100%">
+						<div style="width: 50%; float: left;">
+							Rolle 1:
+							<select id="rolle_kurzbz" name="rolle_kurzbz1">
+								<option value="">Bitte auswählen</option>';
+							$rollen = new berechtigung();
+							$rollen->getRollen('rolle_kurzbz');
+							foreach($rollen->result as $rolle)
+							{
+								if ($rolle1 == $rolle->rolle_kurzbz)
+									$selected = 'selected="selected"';
+								else
+									$selected = '';
+
+								echo '<option value="'.$rolle->rolle_kurzbz.'"  title="'.$rolle->beschreibung.'" '.$selected.'>'.$rolle->rolle_kurzbz.'</option>';
+							}
+							echo '</select>';
+							if (isset($rolle1))
+							{
+								echo '	<table id="t3" class="tablesorter">
+											<thead>
+											<tr>
+												<th>Kurzbz</th>
+												<th>Art</th>
+											</tr>
+											</thead>
+											<tbody>';
+
+											foreach ($rollenGesamt AS $recht => $art)
+											{
+												if (array_key_exists($recht, $rollen1Arr))
+												{
+													if ($art != $rollen1Arr[$recht])
+													{
+														echo '	<tr>
+																	<td style="border: 1px solid transparent">'.$recht.'</td>
+																	<td style="border: 1px solid black">'.$rollen1Arr[$recht].'</td>
+																</tr>';
+													}
+													else
+													{
+														echo '	<tr>
+																	<td style="border: 1px solid transparent">'.$recht.'</td>
+																	<td style="border: 1px solid transparent">'.$art.'</td>
+																</tr>';
+													}
+
+												}
+												else
+												{
+													echo '	<tr>
+																<td style="border: 1px solid black; border-right: 0">&nbsp;</td>
+																<td style="border: 1px solid black; border-left: 0">&nbsp;</td>
+															</tr>';
+												}
+											}
+											echo '
+											</tbody>
+										</table>';
+							}
+						echo '
+						</div>
+						<div style="width: 50%; float: left;">
+							Rolle 2:
+							<select id="rolle_kurzbz" name="rolle_kurzbz2">
+								<option value="">Bitte auswählen</option>';
+							$rollen = new berechtigung();
+							$rollen->getRollen('rolle_kurzbz');
+							foreach($rollen->result as $rolle)
+							{
+								if ($rolle2 == $rolle->rolle_kurzbz)
+									$selected = 'selected="selected"';
+								else
+									$selected = '';
+
+								echo '<option value="'.$rolle->rolle_kurzbz.'"  title="'.$rolle->beschreibung.'" '.$selected.'>'.$rolle->rolle_kurzbz.'</option>';
+							}
+							echo '</select>';
+							echo '<input style="margin-left: 20px" type="submit" name="vergleich" value="Vergleichen">';
+							if (isset($rolle2))
+							{
+								echo '	<table id="t4" class="tablesorter">
+											<thead>
+											<tr>
+												<th>Kurzbz</th>
+												<th>Art</th>
+											</tr>
+											</thead>
+											<tbody>';
+								foreach ($rollenGesamt AS $recht => $art)
+								{
+									if (array_key_exists($recht, $rollen2Arr))
+									{
+										if ($art != $rollen2Arr[$recht])
+										{
+											echo '	<tr>
+														<td style="border: 1px solid transparent">'.$recht.'</td>
+														<td style="border: 1px solid black">'.$rollen2Arr[$recht].'</td>
+													</tr>';
+										}
+										else
+										{
+											echo '	<tr>
+														<td style="border: 1px solid transparent">'.$recht.'</td>
+														<td style="border: 1px solid transparent">'.$art.'</td>
+													</tr>';
+										}
+									}
+									else
+									{
+										echo '	<tr>
+													<td style="border: 1px solid black; border-right: 0">&nbsp;</td>
+													<td style="border: 1px solid black; border-left: 0">&nbsp;</td>
+												</tr>';
+									}
+								}
+											echo '
+											</tbody>
+										</table>';
+							}
+						echo '
+						</div>						
+					</div>
+				</form>';
+	}
 	else
 	{
+		echo '<h2>Rollen Übersicht</h2>';
 		$save = filter_input(INPUT_POST, 'save');
 		$edit = filter_input(INPUT_POST, 'edit');
 
@@ -273,9 +475,54 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 		{
 			$berechtigung = new berechtigung();
 			if($berechtigung->deleteRolle($kurzbz))
-				echo 'Rolle wurde entfernt';
+				echo 'Die Rolle '.$kurzbz.' wurde erfolgreich gelöscht';
 			else
 				echo 'Fehler beim Löschen:'.$berechtigung->errormsg;
+		}
+
+		if(isset($copy))
+		{
+			$kurzbz = filter_input(INPUT_POST, 'kurzbz');
+			$copyName = filter_input(INPUT_POST, 'copy_name');
+			$beschreibung = filter_input(INPUT_POST, 'beschreibung');
+
+			if(isset($kurzbz))
+			{
+				$berechtigung = new berechtigung();
+				$berechtigung->rolle_kurzbz = $copyName;
+				$berechtigung->beschreibung = $beschreibung;
+				$berechtigung->new = true;
+
+				if($berechtigung->saveRolle())
+				{
+					$rollenrechte = new berechtigung();
+					$rollenrechte->getRolleBerechtigung($kurzbz);
+					foreach($rollenrechte->result as $rollenrecht)
+					{
+						$newRolleRecht = new berechtigung();
+						$newRolleRecht->rolle_kurzbz = $copyName;
+						$newRolleRecht->berechtigung_kurzbz = $rollenrecht->berechtigung_kurzbz;
+						$newRolleRecht->art = $rollenrecht->art;
+						$newRolleRecht->anmerkung = $rollenrecht->anmerkung;
+						$newRolleRecht->insertamum = date('Y-m-d H:i:s');
+						$newRolleRecht->insertvon = $user;
+						if(!$newRolleRecht->saveRolleBerechtigung())
+						{
+							echo 'Fehler beim Speichern des Rechts '.$rollenrecht->berechtigung_kurzbz.' zur Rolle '.$rollenrecht->rolle_kurzbz;
+							break;
+						}
+					}
+					echo 'Rolle erfolgreich kopiert';
+				}
+				else
+				{
+					echo 'Fehler beim kopieren der Rolle '.$kurzbz.':'.$berechtigung->errormsg;
+				}
+			}
+			else
+			{
+				echo 'Zum Speichern der Daten muss die kurzbz und die Beschreibung angegeben werden';
+			}
 		}
 
 		if(isset($edit))
@@ -292,13 +539,18 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 		$berechtigung = new berechtigung();
 		$berechtigung->getRollen(); ?>
 
-		<h3>Rollen:</h3>
+		<p style="text-align: right">
+			<a href="<?php echo basename(__FILE__) ?>?vergleich=vergleich">
+				Rollen vergleichen
+			</a>
+		</p>
+		<button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>
 		<table id="t2" class="tablesorter">
 			<thead>
 				<tr>
 					<th>Kurzbz</th>
 					<th>Beschreibung</th>
-					<th colspan="2">Aktion</th>
+					<th colspan="3">Aktion</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -325,7 +577,18 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 						</a>
 					</td>
 					<td>
-						<a href="<?php echo basename(__FILE__) ?>?kurzbz=<?php echo $rolle->rolle_kurzbz ?>&delete=1" onclick="return confdel()">
+						<form method="POST" style="display: none">
+							<input type="text" placeholder="Name der Kopie" maxlength="32" size="35" name="copy_name" value=""/>
+							<input type="hidden" name="kurzbz" value="<?php echo $rolle->rolle_kurzbz ?>"/>
+							<input type="hidden" name="beschreibung" value="<?php echo $rolle->beschreibung ?>"/>
+							<input type="submit" name="copy" value="Jetzt kopieren" />
+						</form>
+						<a class="copyButton" href="">
+							Rolle kopieren
+						</a>
+					</td>
+					<td>
+						<a href="<?php echo basename(__FILE__) ?>?kurzbz=<?php echo $rolle->rolle_kurzbz ?>&delete=1" onclick="return confirm('Achtung! Das Löschen einer Rolle löscht auch alle Zuordnungen dieser Rolle zu BenutzerInnen.\n\nWollen Sie die Rolle <?php echo $rolle->rolle_kurzbz ?> wirklich löschen?');">
 							Rolle löschen
 						</a>
 					</td>
@@ -341,6 +604,7 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 				<form method="POST">
 					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="<?php echo $rolle_edit->rolle_kurzbz ?>" disabled />
 					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /><?php echo $rolle_edit->beschreibung ?></textarea>
+					<span style="color: grey; display: inline-block; width: 30px;"><?php echo (256 - strlen($rolle_edit->beschreibung)) ?></span>
 					&nbsp;<input type="submit" name="edit" value="Speichern" />
 				</form>
 		<a href="<?php echo basename(__FILE__) ?>">Neue Rolle anlegen</a>
@@ -348,6 +612,7 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 				<form method="POST">
 					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="" />
 					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /></textarea>
+					<span style="color: grey; display: inline-block; width: 30px;" id="countdown_textarea_new">256</span>
 					&nbsp;<input type="submit" name="save" value="Anlegen" />
 				</form>
 			<?php endif; ?>
