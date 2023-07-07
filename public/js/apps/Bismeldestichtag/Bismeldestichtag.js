@@ -27,7 +27,6 @@ import {BismeldestichtagAPIs} from './API.js';
 const bismeldestichtagApp = Vue.createApp({
 	data: function() {
 		return {
-			appSideMenuEntries: {},
 			bismeldestichtagTabulatorOptions: BismeldestichtagTabulatorOptions,
 			bismeldestichtagTabulatorEventHandlers: BismeldestichtagTabulatorEventHandlers,
 			meldestichtag: null, // date of Meldestichtag
@@ -49,9 +48,6 @@ const bismeldestichtagApp = Vue.createApp({
 		this.handlerStudiensemester();
 	},
 	methods: {
-		newSideMenuEntryHandler: function(payload) {
-			this.appSideMenuEntries = payload;
-		},
 		/**
 		 * Define Studiensemester call and method to be executed after the call
 		 */
@@ -60,6 +56,16 @@ const bismeldestichtagApp = Vue.createApp({
 				BismeldestichtagAPIs.getStudiensemester,
 				null,
 				this.fetchCmptDataFetchedStudiensemester
+			);
+		},
+		/**
+		 * Define Studiensemester call and method to be executed after the call
+		 */
+		handlerBismeldestichtage: function() {
+			this.startFetchCmpt(
+				BismeldestichtagAPIs.getBismeldestichtage,
+				null,
+				this.fetchCmptDataFetchedBismeldestichtage
 			);
 		},
 		/**
@@ -98,6 +104,21 @@ const bismeldestichtagApp = Vue.createApp({
 				let semRes = CoreRESTClient.getData(data);
 				this.semList = semRes.semList;
 				this.currSem = semRes.currSem;
+				this.handlerBismeldestichtage();
+			}
+			else
+				alert("No response data");
+		},
+		/**
+		 * Called after Bismeldestichtage response is received
+		 */
+		fetchCmptDataFetchedBismeldestichtage: function(data) {
+			console.log(data);
+			if (CoreRESTClient.isError(data)) alert(CoreRESTClient.getError(data));
+			if (CoreRESTClient.hasData(data))
+			{
+				let meldestichtage = CoreRESTClient.getData(data);
+				this.$refs.bismeldestichtageTable.tabulator.setData(meldestichtage);
 			}
 			else
 				alert("No response data");
@@ -110,8 +131,7 @@ const bismeldestichtagApp = Vue.createApp({
 				alert(CoreRESTClient.getError(data));
 			else if (CoreRESTClient.hasData(data))
 			{
-				window.location.reload();
-				alert("Successfully added Bismeldestichtag");
+				this.handlerBismeldestichtage();
 			}
 			else
 				alert("No response data");
@@ -124,8 +144,7 @@ const bismeldestichtagApp = Vue.createApp({
 				alert(CoreRESTClient.getError(data));
 			else if (CoreRESTClient.hasData(data))
 			{
-				window.location.reload();
-				alert("Successfully deletted Bismeldestichtag");
+				this.handlerBismeldestichtage();
 			}
 			else
 				alert("No response data");

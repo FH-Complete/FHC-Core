@@ -16,6 +16,7 @@ class Bismeldestichtag extends Auth_Controller
 			array(
 				'index' => 'admin:r',
 				'getStudiensemester' => 'admin:r',
+				'getBismeldestichtage' => 'admin:r',
 				'addBismeldestichtag' => 'admin:rw',
 				'deleteBismeldestichtag' => 'admin:rw'
 			)
@@ -73,6 +74,19 @@ class Bismeldestichtag extends Auth_Controller
 		$this->outputJsonSuccess(
 			array('semList' => $semList, 'currSem' => $currSem)
 		);
+	}
+
+	public function getBismeldestichtage()
+	{
+		$this->BismeldestichtagModel->addSelect('meldestichtag, studiensemester_kurzbz');
+		$this->BismeldestichtagModel->addOrder('meldestichtag', 'DESC');
+		$this->BismeldestichtagModel->addOrder('meldestichtag_id', 'DESC');
+		$this->outputJson($this->BismeldestichtagModel->load());
+
+		//~ if (hasData($bismeldestichtagRes))
+			//~ $this->outputJsonSuccess(getData($bismeldestichtagRes));
+		//~ else
+			//~ $this->outputJsonSuccess(array());
 	}
 
 	public function addBismeldestichtag()

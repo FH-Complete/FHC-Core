@@ -36,6 +36,15 @@ export const BismeldestichtagAPIs = {
 			}
 		);
 	},
+	getBismeldestichtage: function() {
+		return CoreRESTClient.get(
+			'codex/Bismeldestichtag/getBismeldestichtage',
+			null,
+			{
+				timeout: CORE_BISMELDESTICHTAG_CMPT_TIMEOUT
+			}
+		);
+	},
 	addBismeldestichtag: function(wsParams) {
 		return CoreRESTClient.post(
 			'codex/Bismeldestichtag/addBismeldestichtag',

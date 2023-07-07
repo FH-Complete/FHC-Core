@@ -1256,25 +1256,6 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
-	),
-	array(
-		'app' => 'core',
-		'dataset_name' => 'bismeldestichtag',
-		'filter_kurzbz' => 'bismeldestichtag',
-		'description' => '{Bismeldestichtage verwalten}',
-		'sort' => 1,
-		'default_filter' => true,
-		'filter' => '
-			{
-				"name": "bismeldestichtag",
-				"columns": [
-					{"name": "Meldestichtag"},
-					{"name": "Studiensemester"}
-				],
-				"filters": []
-			}
-		',
-		'oe_kurzbz' => null,
 	)
 );
 

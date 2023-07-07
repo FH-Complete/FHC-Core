@@ -17,9 +17,9 @@
 	<div id="main">
 
 		<!-- Navigation component -->
-		<core-navigation-cmpt v-bind:add-side-menu-entries="appSideMenuEntries"></core-navigation-cmpt>
+		<core-navigation-cmpt></core-navigation-cmpt>
 
-		<!-- fetch component -->
+		<!-- Fetch component -->
 		<core-fetch-cmpt
 			v-bind:api-function="fetchCmptApiFunction"
 			v-bind:api-function-parameters="fetchCmptApiFunctionParams"
@@ -57,10 +57,11 @@
 				<div class="col-12">
 					<core-filter-cmpt
 						title="<?php echo $this->p->t('bismeldestichtag', 'stichtageVerwalten') ?>"
-						filter-type="Bismeldestichtag"
+						ref="bismeldestichtageTable"
+						:side-menu="false"
 						:tabulator-options="bismeldestichtagTabulatorOptions"
 						:tabulator-events="bismeldestichtagTabulatorEventHandlers"
-						@nw-new-entry="newSideMenuEntryHandler">
+						:table-only="true">
 					</core-filter-cmpt>
 				</div>
 			</div>

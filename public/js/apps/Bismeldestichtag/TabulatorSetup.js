@@ -23,12 +23,11 @@ export const BismeldestichtagTabulatorOptions = {
 	minHeight: 50,
 	layout: 'fitColumns',
 	columns: [
-		{title: 'ID', field: 'Id', headerFilter: true},
-		{title: 'Meldestichtag',field: 'Meldestichtag', headerFilter: true, formatter: function(cell){
+		{title: 'Meldestichtag',field: 'meldestichtag', headerFilter: true, formatter: function(cell){
 				return cell.getValue().replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
 			}
 		},
-		{title: 'Studiensemester', field: 'Studiensemester', headerFilter: true}
+		{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true}
 	]
 };
 
