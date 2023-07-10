@@ -20,7 +20,7 @@ class AbbrecherAktiv extends PlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getAbbrecherAktiv($studiengang_kz, null, $exkludierte_studiengang_kz);
+		$prestudentRes = $this->getAbbrecherAktiv($studiengang_kz, null, $exkludierte_studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
@@ -42,5 +42,50 @@ class AbbrecherAktiv extends PlausiChecker
 
 		// return the results
 		return success($results);
+	}
+
+	/**
+	 * Abbrecher cannot be active.
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
+	 * @return success with prestudents or error
+	 */
+	public function getAbbrecherAktiv($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				pre.person_id, pre.prestudent_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+			FROM
+				public.tbl_prestudentstatus pre_status
+				JOIN public.tbl_prestudent pre USING(prestudent_id)
+				JOIN public.tbl_student student USING(prestudent_id)
+				JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
+			WHERE
+				pre_status.status_kurzbz ='Abbrecher'
+				AND benutzer.aktiv=true";
+
+		if (isset($studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz = ?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($prestudent_id))
+		{
+			$qry .= " AND pre.prestudent_id = ?";
+			$params[] = $prestudent_id;
+		}
+
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 }
