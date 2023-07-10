@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "03cfe5f5e33ab66a5009b6ffcb2c5fa0",
+    "content-hash": "1105a07a83f98040eedbe34b23e11ee3",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1627,15 +1627,6 @@
                 }
             ],
             "time": "2023-06-13T08:41:47+00:00"
-        },
-        {
-            "name": "popperjs/core",
-            "version": "2.10.2",
-            "dist": {
-                "type": "file",
-                "url": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-            },
-            "type": "library"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
