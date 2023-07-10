@@ -36,9 +36,9 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'benutzer')
 	$search = trim((isset($_REQUEST['term']) ? $_REQUEST['term'] : ''));
 	if (is_null($search) || $search == '')
 		exit();
-	
+
 	$benutzer = new benutzer();
-	
+
 	if ($benutzer->search(array(
 		$search
 	)))
@@ -61,9 +61,9 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'berechtigu
 	$search = trim((isset($_REQUEST['term']) ? $_REQUEST['term'] : ''));
 	if (is_null($search) || $search == '')
 		exit();
-	
+
 	$berechtigung = new berechtigung();
-	
+
 	if ($berechtigung->searchBerechtigungen($search))
 	{
 		$result_obj = array();
@@ -107,9 +107,9 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'oe_kurzbz'
 			}
 		}
 
-		usort($resultArray, function($a, $b)
+		uasort($resultArray, function($a, $b)
 		{
-		    return $a['organisationseinheittyp_kurzbz'] <=> $b['organisationseinheittyp_kurzbz'];
+		    return $a['organisationseinheittyp_kurzbz'].$a['bezeichnung'] <=> $b['organisationseinheittyp_kurzbz'].$b['bezeichnung'];
 		});
 
 		$result_obj = array();
