@@ -81,7 +81,7 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		if(!hasData($result))
-			return error("Kein Prestudent gefunden: " . $prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', "error_no_prestudent", ['prestudent_id' => $prestudent_id]));
 
 		$prestudent = getData($result)[0];
 		if($prestudent->person_id == getAuthPersonId())
@@ -134,7 +134,7 @@ class AntragLib
 			}
 			if(!hasData($result))
 			{
-				$errors[] = 'no Antrag found for '. $studierendenantrag_id;
+				$errors[] = $this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]);
 				continue;
 			}
 			$status = getData($result)[0];
@@ -165,7 +165,7 @@ class AntragLib
 						$prestudent_status = getData($resultPrestudentStatus)[0];
 
 						$vorlage ='Sancho_Mail_Antrag_A_Approve';
-						$subject = 'Abmeldung freigegeben';
+						$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_A_Approve');
 
 						$result = $this->_ci->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon);
 						if (isError($result))
@@ -176,7 +176,7 @@ class AntragLib
 
 						$result = $this->_ci->PersonModel->loadPrestudent($antrag->prestudent_id);
 						$data = [
-							'nameStudent' => 'Student*in'
+							'nameStudent' => $this->_ci->p->t('person', 'studentIn')
 						];
 						if (hasData($result)) {
 							$person = current(getData($result));
@@ -195,7 +195,7 @@ class AntragLib
 							$person = current(getData($res));
 							$name = trim($person->vorname . ' ' . $person->nachname);
 						} else {
-							$name = 'Student*in';
+							$name = $this->_ci->p->t('person', 'studentIn');
 						}
 						$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
 						if (hasData($res)) {
@@ -208,7 +208,7 @@ class AntragLib
 									'grund' => $status->grund
 								],
 								$email,
-								'Abmeldung durch Studiengangsleitung'
+								$this->_ci->p->t('studierendenantrag', 'mail_subject_A_Stgl')
 							);
 						}
 					}
@@ -301,10 +301,10 @@ class AntragLib
 				]);
 				if (isError($result))
 				{
-					$errors['failed_' . $studierendenantrag_id] = 'Could not approve Unterbrechung for studierendenantrag_id: ' .
-					$studierendenantrag_id .
-					'<br>Details:<br>' .
-					getError($result)['message'];
+					$errors['failed_' . $studierendenantrag_id] = $this->_ci->p->t('studierendenantrag', 'error_U_Approve', [
+						'studierendenantrag_id' => $studierendenantrag_id,
+						'message' => getError($result)['message']
+					]);
 				}
 				else
 				{
@@ -314,7 +314,7 @@ class AntragLib
 						return $resultAntrag;
 					$resultAntrag = getData($resultAntrag);
 					if (!$resultAntrag)
-						return error('No antrag found with id: ' . $studierendenantrag_id);
+						return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]));
 					$resultAntrag = current($resultAntrag);
 
 						// Prestudentstatus und Unterbrechungsfolgeaktionen setzen
@@ -326,30 +326,27 @@ class AntragLib
 					}
 
 							//Mail
-					$subject = 'Unterbrechung freigegeben';
+					$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_U_Approve');
 					$mail = [];
 
 					if (isset($data['errors']['person_id']))
 					{
 								//send assistenz mit id
-						$errors[] = 'Mail to student not sent and student name not found<br>Details:<br>' . $data['errors']['person_id'];
-						$mail['ass'] = 'Student/in (' . $data['antrag']->prestudent_id . ')';
+						$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_and_name', ['message' => $data['errors']['person_id']]);
+						$mail['ass'] = $this->_ci->p->t('studierendenantrag', 'StudentIn', ['prestudent_id' => $data['antrag']->prestudent_id]);
 					}
 					elseif (isset($data['errors']['email']))
 					{
 						if (isset($data['errors']['person']))
 						{
 									//send assistenz mit id
-							$errors[] = 'Mail to student not sent and student name not found<br>Details:<br>' .
-							$data['errors']['email'] .
-							'<br>' .
-							$data['errors']['person'];
-							$mail['ass'] = 'Student/in (' . $data['antrag']->prestudent_id . ')';
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_and_name', ['message' => $data['errors']['email'] . '<br>' . $data['errors']['person']]);
+							$mail['ass'] = $this->_ci->p->t('studierendenantrag', 'StudentIn', ['prestudent_id' => $data['antrag']->prestudent_id]);
 						}
 						else
 						{
 									//send assistenz mit name
-							$errors[] = 'Mail to student not sent<br>Details:<br>' . $data['errors']['email'];
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail', ['message' => $data['errors']['email']]);
 							$mail['ass'] = trim($data['person']->vorname . ' ' . $data['person']->nachname);
 						}
 					}
@@ -358,9 +355,9 @@ class AntragLib
 						if (isset($data['errors']['person']))
 						{
 									//send assistenz mit id & student mit "Student/in"
-							$errors[] = 'Student name not found<br>Details:<br>' . $data['errors']['person'];
-							$mail['ass'] = 'Student/in (' . $data['antrag']->prestudent_id . ')';
-							$mail['stu'] = 'Student/in';
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_name', ['message' => $data['errors']['person']]);
+							$mail['ass'] = $this->_ci->p->t('studierendenantrag', 'StudentIn', ['prestudent_id' => $data['antrag']->prestudent_id]);
+							$mail['stu'] = $this->_ci->p->t('person', 'StudentIn');
 						}
 						else
 						{
@@ -381,7 +378,7 @@ class AntragLib
 							$data['prestudent_status']->email,
 							$subject
 						)) {
-							$errors[] = 'Failed to send email to ' . $data['prestudent_status']->email;
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_to', $data['prestudent_status']);
 						}
 					}
 					if (isset($mail['stu'])) {
@@ -394,7 +391,7 @@ class AntragLib
 							$data['email'],
 							$subject
 						)) {
-							$errors[] = 'Failed to send email to ' . $data['email'];
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_to', $data);
 						}
 					}
 				}
@@ -428,10 +425,10 @@ class AntragLib
 				if (is_array($error_msg) && isset($error_msg['message']))
 					$error_msg = $error_msg['message'];
 
-				$errors['failed_' . $studierendenantrag_id] = 'Could not reject Unterbrechung for studierendenantrag_id: ' .
-					$studierendenantrag_id .
-					'<br>Details:<br>' .
-					$error_msg;
+				$errors['failed_' . $studierendenantrag_id] = $this->_ci->p->t('studierendenantrag', 'error_U_Reject', [
+					'studierendenantrag_id' => $studierendenantrag_id,
+					'message' => $error_msg
+				]);
 			} else {
 				$data = getData($data);
 
@@ -442,10 +439,10 @@ class AntragLib
 					'grund' => $grund
 				]);
 				if (isError($result)) {
-					$errors['failed_' . $studierendenantrag_id] = 'Could not reject Unterbrechung for studierendenantrag_id: ' .
-						$studierendenantrag_id .
-						'<br>Details:<br>' .
-						getError($result)['message'];
+					$errors['failed_' . $studierendenantrag_id] = $this->_ci->p->t('studierendenantrag', 'error_U_Reject', [
+					'studierendenantrag_id' => $studierendenantrag_id,
+					'message' => getError($result)['message']
+				]);
 				} else {
 					$name = '';
 
@@ -455,12 +452,12 @@ class AntragLib
 							$error_msg[] = $data['errors']['person_id'];
 						if (isset($data['errors']['email']))
 							$error_msg[] = $data['errors']['email'];
-						$error_msg = 'Mail to student not sent<br>Details:<br>' . implode('<br>', $error_msg);
+						$error_msg = $this->_ci->p->t('studierendenantrag', 'error_mail', ['message' => implode('<br>', $error_msg)]);
 						$errors[] = $error_msg;
 					} else {
 						if (isset($data['errors']['person'])) {
 							//send student mit "Student/in"
-							$errors[] = 'Student name not found<br>Details:<br>' . $data['errors']['person'];
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_name', ['message' => $data['errors']['person']]);
 							$name = 'Student/in';
 						} else {
 							//send normal
@@ -479,9 +476,9 @@ class AntragLib
 								'abmeldungLinkCIS' => CIS_ROOT . 'index.ci.php/lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id
 							],
 							$data['email'],
-							'Unterbrechung abgelehnt'
+							$this->_ci->p->t('studierendenantrag', 'mail_subject_U_Reject')
 						))
-							$errors[] = 'Failed to send email to ' . $data['email'];
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_to', $data);
 				}
 			}
 		}
@@ -508,7 +505,7 @@ class AntragLib
 
 		$res = getData($res);
 		if (!$res)
-			return error('No Studierendenantrag found for studierendenantrag_id: ' . $studierendenantrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]));
 
 		$result['antrag'] = $antrag = current($res);
 
@@ -519,7 +516,7 @@ class AntragLib
 
 		$res = getData($res);
 		if (!$res)
-			return error('No Prestudentstatus found for prestudent_id: ' . $antrag->prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', $antrag));
 
 		$result['prestudent_status'] = current($res);
 
@@ -531,7 +528,7 @@ class AntragLib
 		} else {
 			$res = getData($res);
 			if (!$res) {
-				$errors['person_id'] = 'No Prestudent found for prestudent_id: ' . $antrag->prestudent_id;
+				$errors['person_id'] = $this->_ci->p->t('studierendenantrag', 'error_no_prestudent', $antrag);
 			} else {
 				$person_id = current($res)->person_id;
 
@@ -541,7 +538,7 @@ class AntragLib
 				} else {
 					$res = getData($res);
 					if (!$res) {
-						$errors['person'] = 'No Person found for person_id: ' . $person_id;
+						$errors['person'] = $this->_ci->p->t('studierendenantrag', 'error_no_person', ['person_id' => $person_id]);
 					} else {
 						$result['person'] = current($res);
 					}
@@ -554,7 +551,7 @@ class AntragLib
 					$res = getData($res);
 
 					if (!$res) {
-						$errors['email'] = 'No email contact found for person_id: ' . $person_id;
+						$errors['email'] = $this->_ci->p->t('studierendenantrag', 'error_no_email', ['person_id' => $person_id]);
 					} else {
 						$result['email'] = current($res)->kontakt;
 					}
@@ -607,7 +604,7 @@ class AntragLib
 			}
 			else
 			{
-				return error('Antrag bereits vorhanden!');
+				return error($this->_ci->p->t('global', 'antragBereitsGestellt'));
 			}
 		}
 
@@ -638,7 +635,7 @@ class AntragLib
 				return $res;
 			$res = getData($res);
 			if (!$res)
-				return error('No Prestudentstatus found for prestudent_id: ' . $prestudent_id);
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', ['prestudent_id' => $prestudent_id]));
 
 			$prestudent_status = current($res);
 			$email = $prestudent_status->email;
@@ -651,7 +648,7 @@ class AntragLib
 					'lvzuweisungLinkCIS' => CIS_ROOT . 'index.ci.php/lehre/Antrag/Wiederholung/assistenz/' . $antrag_id
 				],
 				$email,
-				'Neue*r Wiederholer*in'
+				$this->_ci->p->t('studierendenantrag', 'mail_subject_W_New')
 			);
 		}
 
@@ -731,7 +728,7 @@ class AntragLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No antrag found with id: ' . $antrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $antrag_id]));
 		$antrag = current($result);
 
 
@@ -740,7 +737,7 @@ class AntragLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No studiengang and ausbildungssemester found for antrag with id: ' . $antrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_and_sem', ['id' => $antrag_id]));
 		$result = current($result);
 		$studiengang_kz = $result->studiengang_kz;
 		$orgform_kurzbz = $result->orgform_kurzbz;
@@ -762,7 +759,7 @@ class AntragLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No studiensemster found after: ' . $antrag->studiensemester_kurzbz);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_sem_after', ['semester' => $antrag->studiensemester_kurzbz]));
 		$semA = current($result)->studiensemester_kurzbz;
 
 		$result = $this->_ci->StudiensemesterModel->getNextFrom($semA);
@@ -770,7 +767,7 @@ class AntragLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No studiensemster found after: ' . $semA);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_sem_after', ['semester' => $semA]));
 		$semB = current($result)->studiensemester_kurzbz;
 
 		$result = $this->_ci->StudierendenantraglehrveranstaltungModel->loadWhere(['studierendenantrag_id' => $antrag_id]);
@@ -858,25 +855,23 @@ class AntragLib
 			if (isError($result))
 				return $result;
 			if (!hasData($result))
-				return error('No Studiengang found with studiengang_kz: ' . $studiengang_kz);
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_stg', ['studiengang_kz' => $studiengang_kz]));
 			$stg = current(getData($result));
 			
 			if ($ausbildungssemester > $stg->max_semester)
 				return success();
-			return error('No studienplan found for stg: ' .
-				$studiengang_kz .
-				', studiensemester: ' .
-				$studiensemester_kurzbz .
-				', ausbildungssemester: ' .
-				($ausbildungssemester));
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_studienplan', [
+				'studiengang_kz' => $studiengang_kz,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'semester' => $ausbildungssemester
+			]));
 		}
 		if (count($result) > 1)
-			return error('Multiple studienplaene found for stg: ' .
-				$studiengang_kz .
-				', studiensemester: ' .
-				$studiensemester_kurzbz .
-				', ausbildungssemester: ' .
-				$ausbildungssemester);
+			return error($this->_ci->p->t('studierendenantrag', 'error_multiple_studienplan', [
+				'studiengang_kz' => $studiengang_kz,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'semester' => $ausbildungssemester
+			]));
 		$studienplan = current($result);
 
 		return $this->_ci->StudienplanModel->getStudienplanLehrveranstaltungForPrestudent(
@@ -1095,7 +1090,7 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error('No Studentstatus found for: ' . $prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', ['prestudent_id' => $prestudent_id]));
 		$result = current(getData($result));
 		return success($result);
 	}
@@ -1106,7 +1101,7 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error('No Studentstatus found for: ' . $prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', ['prestudent_id' => $prestudent_id]));
 		$resultDetails = current(getData($result));
 
 		$where = [
@@ -1127,7 +1122,10 @@ class AntragLib
 			}
 		}
 		if (!$resultAntrag)
-			return error('No Antrag ' . trim(($typ ?: '') . ' ') . 'found for: ' . $prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found_prestudent', [
+				'typ' => $typ ?: '',
+				'prestudent_id' => $prestudent_id
+			]));
 
 		$resultDetails->status = $resultAntrag->status;
 		$resultDetails->statustyp = $resultAntrag->statustyp;
@@ -1149,7 +1147,7 @@ class AntragLib
 		return $result;
 
 		if (!hasData($result))
-			return error("No Antrag found with id: " . $studierendenantrag_id);
+			return error($this->_ci->p->t('studierendenantrag', "error_no_antrag_found", ['id' => $studierendenantrag_id]));
 		$resultAntrag = current(getData($result));
 
 		$result = $this->_ci->PrestudentstatusModel->loadLastWithStgDetails($resultAntrag->prestudent_id, $resultAntrag->studiensemester_kurzbz);
@@ -1160,7 +1158,7 @@ class AntragLib
 			if (isError($result))
 				return $result;
 			if (!hasData($result))
-				return error('No Studentstatus found for: ' . $resultAntrag->prestudent_id);
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', $resultAntrag));
 		}
 		$resultDetails = current(getData($result));
 
@@ -1268,7 +1266,7 @@ class AntragLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No studiengang email found for: ' . $antrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_email', ['id' => $antrag_id]));
 
 		$email = current($result)->email;
 
@@ -1277,7 +1275,7 @@ class AntragLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No studiengang found for: ' . $antrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_antrag', ['id' => $antrag_id]));
 
 		$result = current($result);
 		$studiengang_kz = $result->studiengang_kz;
@@ -1288,7 +1286,7 @@ class AntragLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No studiengang found for: ' . $antrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_antrag', ['id' => $antrag_id]));
 
 		$stg = current($result);
 
@@ -1296,7 +1294,7 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error('No Antrag found for: ' . $antrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $antrag_id]));
 		$result = current(getData($result));
 		$prestudent_id = $result->prestudent_id;
 
@@ -1304,7 +1302,7 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error('No Person found for prestudent: ' . $prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_person_prestudent', ['prestudent_id' => $prestudent_id]));
 		$result = current(getData($result));
 		$student = trim($result->vorname . ' ' . $result->nachname);
 
@@ -1328,9 +1326,9 @@ class AntragLib
 				'mitarbeiter' => $mitarbeiter
 			],
 			$email,
-			'Wiederholung von Stgleitung freigegeben'
+			$this->_ci->p->t('studierendenantrag', 'mail_subject_W_Approve')
 		))
-			return error('Email konnte nicht versendet werden an '. $email);
+			return error($this->_ci->p->t('studierendenantrag', 'error_mail_to', ['email' => $email]));
 
 		return success();
 	}

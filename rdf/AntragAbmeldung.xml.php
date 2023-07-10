@@ -35,9 +35,8 @@ else
 	die('<error>Format not supported</error>');
 
 
-// TODO(chris): mehrsprachig
 $query = "
-	SELECT tbl_studiengang.bezeichnung, bezeichnung_mehrsprachig[1], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, vorname, nachname, studiengang_kz, public.get_absem_prestudent(prestudent_id, NULL) AS semester, tbl_studierendenantrag.grund
+	SELECT tbl_studiengang.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, vorname, nachname, studiengang_kz, public.get_absem_prestudent(prestudent_id, NULL) AS semester, tbl_studierendenantrag.grund
 	FROM
 	campus.tbl_studierendenantrag
 	JOIN public.tbl_student USING (prestudent_id)

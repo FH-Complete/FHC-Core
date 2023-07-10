@@ -45,7 +45,10 @@ class PrestudentLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('Kein Prestudent in diesem Studiensemester gefunden');
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+				'prestudent_id' => $prestudent_id,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz
+			]));
 
 		$prestudent_status = current($result);
 
@@ -55,7 +58,7 @@ class PrestudentLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No student found for ' . $prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
 		$student = current($result);
 
@@ -218,7 +221,10 @@ class PrestudentLib
 				return error('Kein Prestudent status gefunden');
 			}
 			$result->studiensemester_kurzbz*/
-			return error('Kein Prestudent status gefunden');
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+				'prestudent_id' => $prestudent_id,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz
+			]));
 		}
 
 		$prestudent_status = current($result);
@@ -229,7 +235,7 @@ class PrestudentLib
 			return $result;
 		$result = getData($result);
 		if (!$result)
-			return error('No student found for ' . $prestudent_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_student_for_prestudent', ['prestudent_id' => $prestudent_id]));
 
 		$student = current($result);
 
@@ -238,7 +244,7 @@ class PrestudentLib
 			return $resultAntrag;
 		$resultAntrag = getData($resultAntrag);
 		if (!$resultAntrag)
-			return error('No antrag found with id: ' . $studierendenantrag_id);
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]));
 
 		$antrag = current($resultAntrag);
 

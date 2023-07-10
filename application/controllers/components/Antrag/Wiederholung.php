@@ -157,7 +157,6 @@ class Wiederholung extends FHC_Controller
 		$result = $result->retval;
 		if (!$result)
 		{
-			// TODO(chris): ERROR Message
 			return $this->outputJsonError(['db' => $this->p->t('studierendenantrag', 'error_no_student')]);
 		}
 		elseif ($result == -2)

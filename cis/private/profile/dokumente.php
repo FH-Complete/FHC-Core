@@ -231,7 +231,6 @@ if (in_array($stsem, $stsem_arr))
 {
 	$studierendenantrag = new studierendenantrag();
 	if ($studierendenantrag->loadUserAntrag($student_studiengang->prestudent_id, $stsem) && $studierendenantrag->result) {
-		// TODO(chris): Phrasen!
 		echo '<h2>' . $p->t('studierendenantrag/antraege_header') . '</h2>';
 		echo '<table class="tablesorter" style="width:auto;">
 				<thead>
