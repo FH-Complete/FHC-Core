@@ -232,7 +232,7 @@ if (in_array($stsem, $stsem_arr))
 	$studierendenantrag = new studierendenantrag();
 	if ($studierendenantrag->loadUserAntrag($student_studiengang->prestudent_id, $stsem) && $studierendenantrag->result) {
 		// TODO(chris): Phrasen!
-		echo '<h2>' . $p->t('tools/studierendenantrag') . '</h2>';
+		echo '<h2>' . $p->t('studierendenantrag/antraege_header') . '</h2>';
 		echo '<table class="tablesorter" style="width:auto;">
 				<thead>
 				<tr>
@@ -245,7 +245,7 @@ if (in_array($stsem, $stsem_arr))
 			$path = "../pdfExport.php?xsl=Antrag" . $antrag->typ . "&xml=Antrag" . $antrag->typ . ".xml.php&uid=" . $uid . "&id=" . $antrag->studierendenantrag_id;
 			echo '<tr>';
 			echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
-			echo '<td><a href="'.$path.'">' . $p->t('tools/studierendenantrag_' . $antrag->typ) . '</a></td>';
+			echo '<td><a href="'.$path.'">' . $p->t('studierendenantrag/title_' . $antrag->typ) . '</a></td>';
 			echo '</tr>';
 		}
 		echo '</tbody></table>';
