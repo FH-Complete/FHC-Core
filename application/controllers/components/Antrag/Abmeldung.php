@@ -182,25 +182,5 @@ class Abmeldung extends FHC_Controller
 		}
 
 		return $this->outputJsonSuccess($result);
-
-		$sortedStudents = [];
-		foreach ($result as $item) {
-			if (!isset($sortedStudents[$item->studiengang_kz]))
-				$sortedStudents[$item->studiengang_kz] = [
-					'bezeichnung' => $item->bezeichnung,
-					'orgform' => $item->orgform,
-					'studenten' => []
-				];
-			$sortedStudents[$item->studiengang_kz]['studenten'][] = [
-				'semester' => $item->semester,
-				'prestudent_id' => $item->prestudent_id,
-				'name' => trim($item->vorname . ' ' . $item->nachname),
-				'vorname' => $item->vorname,
-				'nachname' => $item->nachname,
-				'studiensemester_kurzbz' => $item->studiensemester_kurzbz
-			];
-		}
-
-		$this->outputJsonSuccess($sortedStudents);
 	}
 }
