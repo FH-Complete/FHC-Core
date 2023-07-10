@@ -84,7 +84,7 @@ class Studierendenantrag_model extends DB_Model
 		return $this->loadWhere($where);
 	}
 
-	public function loadWithStatusWhere($where)
+	public function loadWithStatusWhere($where, $types = null)
 	{
 		$lang = 'SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->escape(getUserLanguage());
 
@@ -96,6 +96,10 @@ class Studierendenantrag_model extends DB_Model
 			'campus.tbl_studierendenantrag_statustyp t',
 			'campus.get_status_studierendenantrag(studierendenantrag_id)=t.studierendenantrag_statustyp_kurzbz'
 		);
+
+		if ($types && is_array($types)) {
+			$this->db->where_in('typ' => $types);
+		}
 
 		$this->addOrder('datum', 'DESC');
 
@@ -186,8 +190,6 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
 		$this->addJoin('bis.tbl_orgform', 'orgform_kurzbz');
 		$this->addJoin('campus.tbl_studierendenantrag_statustyp st', 'campus.get_status_studierendenantrag(studierendenantrag_id)=st.studierendenantrag_statustyp_kurzbz','LEFT');
-
-		$this->db->where_in('public.get_rolle_prestudent(p.prestudent_id, null)', $this->config->item('antrag_prestudentstatus_whitelist'));
 
 		return $this->loadWhere([
 			'p.person_id' => $person_id

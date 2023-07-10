@@ -912,7 +912,7 @@ class AntragLib
 		$datumStatus = $result->datum;
 
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
-			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id, 'typ IN' => [Studierendenantrag_model::TYP_ABMELDUNG, Studierendenantrag_model::TYP_ABMELDUNG_STGL], 'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED]);
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id, 'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED], [Studierendenantrag_model::TYP_ABMELDUNG, Studierendenantrag_model::TYP_ABMELDUNG_STGL]);
 			if (isError($result))
 				return $result;
 			if (hasData($result))
