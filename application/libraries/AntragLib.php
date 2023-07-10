@@ -126,7 +126,7 @@ class AntragLib
 		$errors = [];
 		foreach ($studierendenantrag_ids as $studierendenantrag_id) {
 
-			$result = $this->_ci->StudierendenantragModel->loadIdAndStatusWhere(['studierendenantrag_id' => $studierendenantrag_id]);
+			$result = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
 			if (isError($result))
 			{
 				$errors[] = getError($result);
@@ -138,13 +138,6 @@ class AntragLib
 				continue;
 			}
 			$status = getData($result)[0];
-
-			if($status->status ==  Studierendenantragstatus_model::STATUS_CREATED_STGL)
-			{
-				$status_approved = Studierendenantragstatus_model::STATUS_APPROVED_STGL;
-			}
-			else
-				$status_approved = Studierendenantragstatus_model::STATUS_APPROVED;
 
 			$result = $this->_ci->StudierendenantragstatusModel->insert([
 				'studierendenantrag_id' => $studierendenantrag_id,
@@ -191,6 +184,33 @@ class AntragLib
 						}
 						// NOTE(chris): Sancho mail
 						sendSanchoMail($vorlage, $data, $prestudent_status->email, $subject);
+					}
+				}
+				if ($status->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
+					$res = $this->_ci->PrestudentModel->load($status->prestudent_id);
+					if (hasData($res)) {
+						$prestudent = current(getData($res));
+						$res = $this->_ci->PersonModel->load($prestudent->person_id);
+						if (hasData($res)) {
+							$person = current(getData($res));
+							$name = trim($person->vorname . ' ' . $person->nachname);
+						} else {
+							$name = 'Student*in';
+						}
+						$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
+						if (hasData($res)) {
+							$kontakt = current(getData($res));
+							$email = $kontakt->kontakt;
+							sendSanchoMail(
+								'Sancho_Mail_Antrag_A_Stgl',
+								[
+									'name' => $name,
+									'grund' => $status->grund
+								],
+								$email,
+								'Abmeldung durch Studiengangsleitung'
+							);
+						}
 					}
 				}
 			}
@@ -892,7 +912,7 @@ class AntragLib
 		$datumStatus = $result->datum;
 
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
-			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id, 'typ' => Studierendenantrag_model::TYP_ABMELDUNG, 'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED]);
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id, 'typ IN' => [Studierendenantrag_model::TYP_ABMELDUNG, Studierendenantrag_model::TYP_ABMELDUNG_STGL], 'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED]);
 			if (isError($result))
 				return $result;
 			if (hasData($result))
@@ -909,9 +929,9 @@ class AntragLib
 		$result= getData($result);
 		foreach ($result as $antrag)
 		{
-			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG)
+			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG || $antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
 			{
-				if ($antrag->status == Studierendenantragstatus_model::STATUS_CREATED || $antrag->status == Studierendenantragstatus_model::STATUS_CREATED_STGL)
+				if ($antrag->status == Studierendenantragstatus_model::STATUS_CREATED)
 					return success(-1);
 				elseif ($antrag->status == Studierendenantragstatus_model::STATUS_APPROVED && $antrag->datum > $datumStatus)
 					return success(-1);
@@ -970,9 +990,9 @@ class AntragLib
 		$result= getData($result);
 		foreach ($result as $antrag)
 		{
-			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG)
+			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG || $antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
 			{
-				if($antrag->status == Studierendenantragstatus_model::STATUS_CREATED || $antrag->status == Studierendenantragstatus_model::STATUS_CREATED_STGL)
+				if($antrag->status == Studierendenantragstatus_model::STATUS_CREATED)
 					return success(-2);
 				elseif($antrag->status == Studierendenantragstatus_model::STATUS_APPROVED && $antrag->datum > $datumStatus)
 					return success(-2);
@@ -1043,9 +1063,9 @@ class AntragLib
 		$result= getData($result);
 		foreach ($result as $antrag)
 		{
-			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG)
+			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG || $antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
 			{
-				if($antrag->status == Studierendenantragstatus_model::STATUS_CREATED || $antrag->status == Studierendenantragstatus_model::STATUS_CREATED_STGL)
+				if($antrag->status == Studierendenantragstatus_model::STATUS_CREATED)
 					return success(-2);
 				elseif($antrag->status == Studierendenantragstatus_model::STATUS_APPROVED && $antrag->datum > $datumStatus)
 					return success(-2);

@@ -3,9 +3,7 @@ class Studierendenantragstatus_model extends DB_Model
 {
 
 	const STATUS_CREATED = 'Erstellt';
-	const STATUS_CREATED_STGL = 'ErstelltStgl';
 	const STATUS_APPROVED = 'Genehmigt';
-	const STATUS_APPROVED_STGL = 'GenehmigtStgl';
 	const STATUS_REJECTED = 'Abgelehnt';
 	const STATUS_PASS = 'Verzichtet';
 	const STATUS_REOPENED = 'Offen';
