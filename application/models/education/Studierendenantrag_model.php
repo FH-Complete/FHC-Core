@@ -98,7 +98,7 @@ class Studierendenantrag_model extends DB_Model
 		);
 
 		if ($types && is_array($types)) {
-			$this->db->where_in('typ' => $types);
+			$this->db->where_in('typ', $types);
 		}
 
 		$this->addOrder('datum', 'DESC');

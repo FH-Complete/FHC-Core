@@ -25,6 +25,7 @@ class AntragJob extends JOB_Controller
 		$this->load->model('education/Studierendenantragstatus_model', 'StudierendenantragstatusModel');
 		$this->load->model('education/Pruefung_model', 'PruefungModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
 	}
 
 	/**
@@ -297,74 +298,62 @@ class AntragJob extends JOB_Controller
 					continue;
 				$url = site_url('lehre/Studierendenantrag/wiederholung/' . $prestudent->prestudent_id);
 				$urlCIS = CIS_ROOT . 'index.ci.php/lehre/Studierendenantrag/wiederholung/' . $prestudent->prestudent_id;
-				$email = $this->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
-				if (isError($email)) {
-					$this->logError(getError($email));
-				} else {
-					$email = getData($email);
+				$email = $this->StudentModel->getEmailFH($this->StudentModel->getUID($prestudent->prestudent_id));
 
-					if (!$email) {
-						$this->logError('No email contact found for person_id: ' . $prestudent->person_id);
-					}
-					else
+				$fristende = new DateTime($prestudent->datum);
+				$fristende->add(DateInterval::createFromDateString($modifier_deadline));
+
+				$dataMail = array(
+					'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
+					'pers_kz'=> $prestudent->matrikelnr,
+					'studiengang' => $prestudent->bezeichnung,
+					'lvbezeichnung' => $prestudent->lvbezeichnung,
+					'datum_kp' => $prestudent->datum,
+					'studiensemester'=> $prestudent->studiensemester_kurzbz,
+					'orgform'=> $prestudent->orgform,
+					'prestudent_id' => $prestudent->prestudent_id,
+					'url' => $url,
+					'urlCIS' => $urlCIS,
+					'fristablauf' => $fristende->format('d.m.Y')
+				);
+				
+				// NOTE(chris): Sancho mail
+				if(sendSanchoMail('Sancho_Mail_Antrag_W_' . $name, $dataMail, $email, $subject))
+				{
+					$antrag_id = null;
+					$result = $this->StudierendenantragModel->loadWhere([
+						'prestudent_id' => $prestudent->prestudent_id,
+						'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG
+					]);
+					if (isError($result))
+						$this->logError(getError($result));
+					elseif (hasData($result))
+						$antrag_id = current(getData($result) ?: []) -> studierendenantrag_id;
+					if ($antrag_id == null)
 					{
-						$email = current($email)->kontakt;
-						$fristende = new DateTime($prestudent->datum);
-						$fristende->add(DateInterval::createFromDateString($modifier_deadline));
-
-						$dataMail = array(
-							'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
-							'pers_kz'=> $prestudent->matrikelnr,
-							'studiengang' => $prestudent->bezeichnung,
-							'lvbezeichnung' => $prestudent->lvbezeichnung,
-							'datum_kp' => $prestudent->datum,
-							'studiensemester'=> $prestudent->studiensemester_kurzbz,
-							'orgform'=> $prestudent->orgform,
+						$result = $this->StudierendenantragModel->insert([
 							'prestudent_id' => $prestudent->prestudent_id,
-							'url' => $url,
-							'urlCIS' => $urlCIS,
-							'fristablauf' => $fristende->format('d.m.Y')
-						);
-						
-						// NOTE(chris): Sancho mail
-						if(sendSanchoMail('Sancho_Mail_Antrag_W_' . $name, $dataMail, $email, $subject))
-						{
-							$antrag_id = null;
-							$result = $this->StudierendenantragModel->loadWhere([
-								'prestudent_id' => $prestudent->prestudent_id,
-								'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG
-							]);
-							if (isError($result))
-								$this->logError(getError($result));
-							elseif (hasData($result))
-								$antrag_id = current(getData($result) ?: []) -> studierendenantrag_id;
-							if ($antrag_id == null)
-							{
-								$result = $this->StudierendenantragModel->insert([
-									'prestudent_id' => $prestudent->prestudent_id,
-									'studiensemester_kurzbz'=> $prestudent->studiensemester_kurzbz,
-									'datum' => date('c'),
-									'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
-									'insertvon' => 'AntragJob'
-								]);
-								if (isError($result))
-									$this->logError(getError($result));
-								else
-									$antrag_id = getData($result);
-							}
-							if ($antrag_id)
-							{
-								$result = $this->StudierendenantragstatusModel->insert([
-									'studierendenantrag_id' => $antrag_id,
-									'studierendenantrag_statustyp_kurzbz' => $status_to,
-									'insertvon' => 'AntragJob'
-								]);
-								if (isError($result))
-									$this->logError(getError($result));
-							}
-							$count++;
-						}
+							'studiensemester_kurzbz'=> $prestudent->studiensemester_kurzbz,
+							'datum' => date('c'),
+							'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
+							'insertvon' => 'AntragJob'
+						]);
+						if (isError($result))
+							$this->logError(getError($result));
+						else
+							$antrag_id = getData($result);
 					}
+					if ($antrag_id)
+					{
+						$result = $this->StudierendenantragstatusModel->insert([
+							'studierendenantrag_id' => $antrag_id,
+							'studierendenantrag_statustyp_kurzbz' => $status_to,
+							'insertvon' => 'AntragJob'
+						]);
+						if (isError($result))
+							$this->logError(getError($result));
+					}
+					$count++;
 				}
 			}
 			$this->logInfo($count . " Mails '" . $subject . "' sent");
