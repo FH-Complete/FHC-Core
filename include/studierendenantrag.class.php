@@ -108,7 +108,7 @@ class studierendenantrag extends basis_db
 	 */
 	public function loadUserAntrag($prestudent_id, $stsem = null)
 	{
-		$qry = "SELECT * FROM campus.tbl_studierendenantrag WHERE prestudent_id=" . $this->db_add_param($prestudent_id, FHC_INTEGER);
+		$qry = "SELECT * FROM campus.tbl_studierendenantrag WHERE typ IN ('Abmeldung','AbmeldungStgl','Unterbrechung') AND campus.get_status_studierendenantrag(studierendenantrag_id)='Genehmigt' AND prestudent_id=" . $this->db_add_param($prestudent_id, FHC_INTEGER);
 		
 		if ($stsem)
 		{

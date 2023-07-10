@@ -240,13 +240,15 @@ if (in_array($stsem, $stsem_arr))
 					<th>'.$p->t('global/name').'</th>
 				</tr>
 				</thead>
-				<tbody><tr>';
+				<tbody>';
 		foreach ($studierendenantrag->result as $antrag) {
 			$path = "../pdfExport.php?xsl=Antrag" . $antrag->typ . "&xml=Antrag" . $antrag->typ . ".xml.php&uid=" . $uid . "&id=" . $antrag->studierendenantrag_id;
+			echo '<tr>';
 			echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
 			echo '<td><a href="'.$path.'">' . $p->t('tools/studierendenantrag_' . $antrag->typ) . '</a></td>';
+			echo '</tr>';
 		}
-		echo '</tr></tbody></table>';
+		echo '</tbody></table>';
 	}
 
 
