@@ -201,7 +201,7 @@ class Leitung extends FHC_Controller
 
 	public function canBeObjected($studierendenantrag_id)
 	{
-		return $this->antraglib->hasStatus($studierendenantrag_id, Studierendenantragstatus_model::STATUS_APPROVED_STGL);
+		return $this->antraglib->hasType($studierendenantrag_id, Studierendenantrag_model::TYP_ABMELDUNG_STGL);
 	}
 
 	public function isObjected($studierendenantrag_id)
@@ -239,6 +239,11 @@ class Leitung extends FHC_Controller
 		}
 
 		return $this->outputJsonSuccess($studierendenantrag_id);
+	}
+
+	public function approveAbmeldungStgl()
+	{
+		return $this->approveAbmeldung();
 	}
 
 	public function approveUnterbrechung()

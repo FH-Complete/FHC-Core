@@ -76,6 +76,23 @@ class Abmeldung extends FHC_Controller
 		$this->outputJsonSuccess(getData($result));
 	}
 
+	public function getDetailsForAntrag($studierendenantrag_id)
+	{
+		if (!$this->antraglib->isEntitledToShowAntrag($studierendenantrag_id))	return show_404();
+
+		$result = $this->antraglib->getDetailsForAntrag($studierendenantrag_id);
+		if (isError($result)) {
+			return $this->outputJsonError(getError($result));
+		}
+
+		$data = getData($result);
+
+		if ($data->typ !== Studierendenantrag_model::TYP_ABMELDUNG_STGL)
+			return show_404();
+
+		$this->outputJsonSuccess($data);
+	}
+
 	public function createAntrag()
 	{
 		$this->load->library('form_validation');

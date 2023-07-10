@@ -85,15 +85,15 @@ class AntragLib
 
 		$prestudent = getData($result)[0];
 		if($prestudent->person_id == getAuthPersonId())
-			$status = Studierendenantragstatus_model::STATUS_CREATED;
+			$typ = Studierendenantrag_model::TYP_ABMELDUNG;
 		else
-			$status = Studierendenantragstatus_model::STATUS_CREATED_STGL;
+			$typ = Studierendenantrag_model::TYP_ABMELDUNG_STGL;
 
 		$result = $this->_ci->StudierendenantragModel->insert([
 			'prestudent_id' => $prestudent_id,
 			'studiensemester_kurzbz'=> $studiensemester_kurzbz,
 			'datum' => date('c'),
-			'typ' => Studierendenantrag_model::TYP_ABMELDUNG,
+			'typ' => $typ,
 			'insertvon' => $insertvon,
 			'grund' => $grund
 		]);
@@ -105,7 +105,7 @@ class AntragLib
 
 		$result = $this->_ci->StudierendenantragstatusModel->insert([
 			'studierendenantrag_id' => $antrag_id,
-			'studierendenantrag_statustyp_kurzbz' => $status,
+			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_CREATED,
 			'insertvon' => $insertvon
 		]);
 
@@ -148,7 +148,7 @@ class AntragLib
 
 			$result = $this->_ci->StudierendenantragstatusModel->insert([
 				'studierendenantrag_id' => $studierendenantrag_id,
-				'studierendenantrag_statustyp_kurzbz' => $status_approved,
+				'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
 				'insertvon' => $insertvon
 			]);
 			if (isError($result))
@@ -160,7 +160,7 @@ class AntragLib
 					$errors[] = getError($resultPrestudent);
 					continue;
 				}
-				if ($status_approved == Studierendenantragstatus_model::STATUS_APPROVED)
+				if ($status->typ == Studierendenantrag_model::TYP_ABMELDUNG)
 				{
 					$antrag = getData($resultPrestudent)[0];
 
@@ -1480,6 +1480,25 @@ class AntragLib
 			$status = [$status];
 
 		return in_array($lastStatus->studierendenantrag_statustyp_kurzbz, $status);
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 * @param string|array	$type
+	 *
+	 * @return boolean
+	 */
+	public function hasType($antrag_id, $type)
+	{
+		$result = $this->_ci->StudierendenantragModel->load($antrag_id);
+		if (!hasData($result))
+			return false;
+		$antrag = getData($result)[0];
+
+		if (!is_array($type))
+			$type = [$type];
+
+		return in_array($antrag->typ, $type);
 	}
 
 

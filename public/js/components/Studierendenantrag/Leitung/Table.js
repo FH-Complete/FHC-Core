@@ -230,7 +230,7 @@ export default {
 							'content/pdfExport.php?xml=Antrag' + data.typ + '.xml.php&xsl=Antrag' + data.typ + '&id='+ data.studierendenantrag_id +'&output=pdf';
 							container.append(button);
 						}
-						if(data.typ == 'Abmeldung' && data.status == 'GenehmigtStgl')
+						if(data.typ == 'AbmeldungStgl' && data.status == 'Genehmigt')
 						{
 							// NOTE(chris): Object
 							let button = document.createElement('button');
@@ -240,7 +240,7 @@ export default {
 							container.append(button);
 						}
 
-						if(data.typ == 'Abmeldung' && data.status == 'Beeinsprucht')
+						if(data.typ == 'AbmeldungStgl' && data.status == 'Beeinsprucht')
 						{
 							// NOTE(chris): Deny Objection
 							let button = document.createElement('button');
@@ -294,7 +294,7 @@ export default {
 						if (this.stgL.includes(data.studiengang_kz))
 						{
 							// NOTE(chris): Approve
-							if ((data.typ == 'Wiederholung' && data.status == 'Lvszugewiesen') || (data.typ != 'Wiederholung' && (data.status == 'Erstellt' || data.status == 'ErstelltStgl'))) {
+							if ((data.typ == 'Wiederholung' && data.status == 'Lvszugewiesen') || (data.typ != 'Wiederholung' && data.status == 'Erstellt')) {
 								let button = document.createElement('button');
 								button.innerHTML = this.p.t('studierendenantrag', 'btn_approve');
 								button.className = "btn btn-outline-secondary";

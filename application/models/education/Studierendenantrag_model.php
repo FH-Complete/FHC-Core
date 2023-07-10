@@ -3,6 +3,7 @@ class Studierendenantrag_model extends DB_Model
 {
 
 	const TYP_ABMELDUNG = 'Abmeldung';
+	const TYP_ABMELDUNG_STGL = 'AbmeldungStgl';
 	const TYP_UNTERBRECHUNG = 'Unterbrechung';
 	const TYP_WIEDERHOLUNG = 'Wiederholung';
 

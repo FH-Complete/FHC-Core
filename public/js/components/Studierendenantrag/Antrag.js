@@ -1,4 +1,5 @@
 import StudierendenantragAbmeldung from './Form/Abmeldung.js';
+import StudierendenantragAbmeldungStgl from './Form/AbmeldungStgl.js';
 import StudierendenantragUnterbrechung from './Form/Unterbrechung.js';
 import StudierendenantragWiederholung from './Form/Wiederholung.js';
 import Phrasen from '../../mixins/Phrasen.js';
@@ -6,6 +7,7 @@ import Phrasen from '../../mixins/Phrasen.js';
 export default {
 	components: {
 		StudierendenantragAbmeldung,
+		StudierendenantragAbmeldungStgl,
 		StudierendenantragUnterbrechung,
 		StudierendenantragWiederholung
 	},

@@ -79,6 +79,7 @@ export default {
 								@complete="loadData"
 								inputId="newAntragModalAutoComplete"
 								dropdown
+								dropdown-mode="current"
 								>
 								<template #option="slotProps">
 									<div :title="slotProps.option.prestudent_id">

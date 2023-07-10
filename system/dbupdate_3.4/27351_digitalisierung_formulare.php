@@ -27,9 +27,7 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statust
 			(studierendenantrag_statustyp_kurzbz, bezeichnung)
 			VALUES
 			('Erstellt', '{\"Erstellt\",\"Created\"}'),
-			('ErstelltStgl', '{\"Erstellt\",\"Created\"}'),
 			('Genehmigt', '{\"Genehmigt\",\"Approved\"}'),
-			('GenehmigtStgl', '{\"Vorläufig Genehmigt\",\"Provisionally Approved\"}'),
 			('Beeinsprucht', '{\"Beeinsprucht\",\"Objected\"}'),
 			('Abgelehnt', '{\"Abgelehnt\",\"Rejected\"}'),
 			('Verzichtet', '{\"Verzichtet\",\"Pass\"}'),
