@@ -547,6 +547,7 @@ class Studiengang_model extends DB_Model
 		$this->addSelect('p.prestudent_id');
 		$this->addSelect('pers.vorname');
 		$this->addSelect('pers.nachname');
+		$this->addSelect("CONCAT(UPPER(pers.nachname), ' ', pers.vorname, ' (', " . $this->dbTable . ".bezeichnung, ')') AS name");
 
 		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
 		$this->addJoin(
@@ -584,6 +585,8 @@ class Studiengang_model extends DB_Model
 			}
 			$this->db->group_end();
 		}
+
+		$this->addOrder('name');
 
 		return $this->load();
 	}

@@ -22,15 +22,6 @@ export default {
 	computed: {
 		newUrl() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldung/' + this.student.prestudent_id;
-		},
-		students() {
-			return this.data.map((current)=>
-			{
-				current.name = current.nachname.toUpperCase() + " " + current.vorname + " (" + current.bezeichnung + ")";
-				return current;
-			}).sort(
-				(a, b) => a.name > b.name ? 1 : -1
-			);
 		}
 	},
 	methods: {
@@ -79,12 +70,11 @@ export default {
 					</div>
 					<div class="modal-body">
 						<label for="newAntragModalAutoComplete">{{p.t('person','studentIn')}}</label>
-						<!-- TODO(chris): IMPLEMENT!! -->
 						<div>
 							<auto-complete
 								class="w-100"
 								v-model="student"
-								:suggestions="students"
+								:suggestions="data"
 								optionLabel = "name"
 								@complete="loadData"
 								inputId="newAntragModalAutoComplete"
