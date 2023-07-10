@@ -474,7 +474,9 @@ class AntragLib
 							[
 								'name' => $name,
 								'grund' => $grund,
-								'abmeldungLink' => site_url('lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id)
+								'prestudent_id' => $data['prestudent_status']->prestudent_id,
+								'abmeldungLink' => site_url('lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id),
+								'abmeldungLinkCIS' => CIS_ROOT . 'index.ci.php/lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id
 							],
 							$data['email'],
 							'Unterbrechung abgelehnt'
@@ -645,7 +647,8 @@ class AntragLib
 				'Sancho_Mail_Antrag_W_New',
 				[
 					'antrag_id' => $antrag_id,
-					'lvzuweisungLink' => site_url('lehre/Antrag/Wiederholung/assistenz/' . $antrag_id)
+					'lvzuweisungLink' => site_url('lehre/Antrag/Wiederholung/assistenz/' . $antrag_id),
+					'lvzuweisungLinkCIS' => CIS_ROOT . 'index.ci.php/lehre/Antrag/Wiederholung/assistenz/' . $antrag_id
 				],
 				$email,
 				'Neue*r Wiederholer*in'

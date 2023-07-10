@@ -67,6 +67,7 @@ class AntragJob extends JOB_Controller
 				'datum_wiedereinstieg' => $datum->format('d.m.Y')
 			);
 
+			// NOTE(chris): Sancho mail
 			if(sendSanchoMail('Sancho_Mail_Antrag_U_Reminder', $data, $antrag->email, 'Reminder: Unterbrechung Wiedereinstieg'))
 			{
 				$count++;
@@ -295,6 +296,7 @@ class AntragJob extends JOB_Controller
 				if (in_array($stg_kz, $this->config->item('stgkz_blacklist_wiederholung')))
 					continue;
 				$url = site_url('lehre/Studierendenantrag/wiederholung/' . $prestudent->prestudent_id);
+				$urlCIS = CIS_ROOT . 'index.ci.php/lehre/Studierendenantrag/wiederholung/' . $prestudent->prestudent_id;
 				$email = $this->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
 				if (isError($email)) {
 					$this->logError(getError($email));
@@ -318,9 +320,13 @@ class AntragJob extends JOB_Controller
 							'datum_kp' => $prestudent->datum,
 							'studiensemester'=> $prestudent->studiensemester_kurzbz,
 							'orgform'=> $prestudent->orgform,
+							'prestudent_id' => $prestudent->prestudent_id,
 							'url' => $url,
+							'urlCIS' => $urlCIS,
 							'fristablauf' => $fristende->format('d.m.Y')
 						);
+						
+						// NOTE(chris): Sancho mail
 						if(sendSanchoMail('Sancho_Mail_Antrag_W_' . $name, $dataMail, $email, $subject))
 						{
 							$antrag_id = null;
