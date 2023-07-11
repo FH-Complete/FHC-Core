@@ -35,7 +35,7 @@ class PrestudentLib
 
 	}
 
-	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null)
+	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null)
 	{
 		if (!$insertvon)
 			$insertvon = getAuthUID();
@@ -62,23 +62,30 @@ class PrestudentLib
 
 		$student = current($result);
 
-		//Status updaten
-		$result = $this->_ci->PrestudentstatusModel->insert([
+		if(!$datum)
+			$datum = date('c');
+
+		if(!$bestaetigtam)
+			$bestaetigtam = date('c');
+
+		//Status und Statusgrund updaten
+		$result = $this->_ci->PrestudentstatusModel->withGrund($statusgrund_kurzbz)->insert([
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_ABBRECHER,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'ausbildungssemester' => $prestudent_status->ausbildungssemester,
-			'datum' => date('c'),
+			'datum' => $datum,
 			'insertvon' => $insertvon,
 			'insertamum' => date('c'),
 			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
 			'studienplan_id'=> $prestudent_status->studienplan_id,
 			'bestaetigtvon' => $insertvon,
-			'bestaetigtam' => date('c')
+			'bestaetigtam' => $bestaetigtam
 		]);
 
 		if (isError($result))
 			return $result;
+
 
 		//Verband anlegen
 		$result = $this->_ci->LehrverbandModel->load([

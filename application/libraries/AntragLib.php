@@ -137,26 +137,21 @@ class AntragLib
 				$errors[] = $this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]);
 				continue;
 			}
-			$status = getData($result)[0];
+			$antrag = getData($result)[0];
+
+			$insertam = date('c');
 
 			$result = $this->_ci->StudierendenantragstatusModel->insert([
 				'studierendenantrag_id' => $studierendenantrag_id,
 				'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
-				'insertvon' => $insertvon
+				'insertvon' => $insertvon,
+				'insertam' => $insertam
 			]);
 			if (isError($result))
 				$errors[] = getError($result);
 			else {
-				$resultPrestudent = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
-				if (isError($resultPrestudent))
+				if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG)
 				{
-					$errors[] = getError($resultPrestudent);
-					continue;
-				}
-				if ($status->typ == Studierendenantrag_model::TYP_ABMELDUNG)
-				{
-					$antrag = getData($resultPrestudent)[0];
-
 					$resultPrestudentStatus = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail($antrag->prestudent_id);
 					if (isError($resultPrestudentStatus))
 						$errors[] = getError($resultPrestudentStatus);
@@ -167,7 +162,7 @@ class AntragLib
 						$vorlage ='Sancho_Mail_Antrag_A_Approve';
 						$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_A_Approve');
 
-						$result = $this->_ci->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon);
+						$result = $this->_ci->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon, 'abbrecherStud', $antrag->datum, $insertam) ;
 						if (isError($result))
 						{
 							$errors[] = getError($result);
@@ -186,8 +181,35 @@ class AntragLib
 						sendSanchoMail($vorlage, $data, $prestudent_status->email, $subject);
 					}
 				}
-				if ($status->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
-					$res = $this->_ci->PrestudentModel->load($status->prestudent_id);
+				if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
+					$result = $this->_ci->PrestudentstatusModel->getLastStatus($antrag->prestudent_id, '', 'Student');
+					if (isError($result))
+					{
+						$errors[] = getError($result);
+						continue;
+					}
+					if(!hasData($result))
+					{
+						$errors[] = $this->_ci->p->t('studierendenantrag', 'error_no_prestudentstatus', ['prestudent_id' => $antrag->prestudent_id]);
+						continue;
+					}
+					$prestudentstatus = getData($result)[0];
+
+					$result = $this->_ci->PrestudentstatusModel->withGrund('preabbrecher')->update([
+						'prestudent_id' => $prestudentstatus->prestudent_id,
+						'status_kurzbz'=>$prestudentstatus->status_kurzbz,
+						'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
+						'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
+					],[]);
+					if (isError($result))
+					{
+						$errors[] = getError($result);
+						continue;
+					}
+
+
+					$res = $this->_ci->PrestudentModel->load($antrag->prestudent_id);
+
 					if (hasData($res)) {
 						$prestudent = current(getData($res));
 						$res = $this->_ci->PersonModel->load($prestudent->person_id);
@@ -205,7 +227,7 @@ class AntragLib
 								'Sancho_Mail_Antrag_A_Stgl',
 								[
 									'name' => $name,
-									'grund' => $status->grund
+									'grund' => $antrag->grund
 								],
 								$email,
 								$this->_ci->p->t('studierendenantrag', 'mail_subject_A_Stgl')
@@ -857,7 +879,7 @@ class AntragLib
 			if (!hasData($result))
 				return error($this->_ci->p->t('studierendenantrag', 'error_no_stg', ['studiengang_kz' => $studiengang_kz]));
 			$stg = current(getData($result));
-			
+
 			if ($ausbildungssemester > $stg->max_semester)
 				return success();
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_studienplan', [

@@ -316,4 +316,20 @@ class Prestudentstatus_model extends DB_Model
 
 		return $this->loadWhere($whereArr);
 	}
+
+	/**
+	 * call like this:
+	 * $this->PrestudentstatusModel->withGrund('grund_kurzbz')->update($id, $otherData);
+	 * or:
+	 * $this->PrestudentstatusModel->withGrund('grund_kurzbz')->insert($otherData);
+	 * @param string $statusgrund_kurzbz
+	 * @return object $this
+	 */
+	public function withGrund($statusgrund_kurzbz)
+	{
+		if($statusgrund_kurzbz)
+			$this->db->set('statusgrund_id', '(SELECT statusgrund_id FROM public.tbl_status_grund WHERE statusgrund_kurzbz =' . $this->db->escape($statusgrund_kurzbz) .')', FALSE);
+
+		return $this;
+	}
 }

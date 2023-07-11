@@ -285,3 +285,42 @@ if (!$result = @$db->db_query("SELECT public.get_stdsem_prestudent(0, null)")) {
 	else
 		echo '<br>public.get_stdsem_prestudent(integer, character varying): function created';
 }
+
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_status_grund WHERE statusgrund_kurzbz = 'abbrecherStgl';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_status_grund(statusgrund_kurzbz, status_kurzbz, aktiv, beschreibung, bezeichnung_mehrsprachig) VALUES('abbrecherStgl', 'Abbrecher', TRUE, '{\"durch Stgl\", \"by Course Director\"}', '{\"durch Stgl\", \"by Course Director\"}');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_status_grund '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' public.tbl_status_grund: Added Statusgrund abbrecherStgl for Abbrecher<br>';
+	}
+}
+
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_status_grund WHERE statusgrund_kurzbz = 'abbrecherStud';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_status_grund(statusgrund_kurzbz, status_kurzbz, aktiv, beschreibung, bezeichnung_mehrsprachig) VALUES('abbrecherStud', 'Abbrecher', TRUE, '{\"durch Stud\", \"by Student\"}', '{\"durch Stud\", \"by Student\"}');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_status_grund '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' public.tbl_status_grund: Added Statusgrund abbrecherStud for Abbrecher<br>';
+	}
+}
+
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_status_grund WHERE statusgrund_kurzbz = 'preabbrecher';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_status_grund(statusgrund_kurzbz, status_kurzbz, aktiv, beschreibung, bezeichnung_mehrsprachig) VALUES('preabbrecher', 'Student', TRUE, '{\"Pre-Abbrecher\", \"Pre-Aborted\"}', '{\"Pre-Abbrecher\", \"Pre-Aborted\"}');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_status_grund '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' public.tbl_status_grund: Added Statusgrund pre-abbrecher for Student<br>';
+	}
+}

@@ -177,9 +177,14 @@ class AntragJob extends JOB_Controller
 		$dateDeadline = new DateTime();
 		$dateDeadline->sub(DateInterval::createFromDateString($modifier_deadline));
 
+		$this->StudierendenantragModel->addSelect('prestudent_id');
+		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
+		$this->StudierendenantragModel->addSelect('s.insertamum');
+
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere(
 				[
-					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED_STGL,
+					'typ' => Studierendenantrag_model::TYP_ABMELDUNG_STGL,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
 					's.insertamum <=' => $dateDeadline->format('c')
 				]
 			);
@@ -195,8 +200,8 @@ class AntragJob extends JOB_Controller
 
 			foreach ($antraege as $antrag)
 			{
-				$result = $this->antraglib->approveAbmeldung([$antrag->studierendenantrag_id], $insertvon);
 
+				$result = $this->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon, 'abbrecherStgl', $antrag->insertamum);
 				if (isError($result))
 					$this->logError(getError($result));
 				else
@@ -316,7 +321,7 @@ class AntragJob extends JOB_Controller
 					'urlCIS' => $urlCIS,
 					'fristablauf' => $fristende->format('d.m.Y')
 				);
-				
+
 				// NOTE(chris): Sancho mail
 				if(sendSanchoMail('Sancho_Mail_Antrag_W_' . $name, $dataMail, $email, $subject))
 				{
