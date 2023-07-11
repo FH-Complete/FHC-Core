@@ -98,12 +98,11 @@ $qry_stg = "SELECT distinct studiengang_kz, typ, kurzbz
 				SELECT
 					studiengang_kz
 				FROM
-					lehre.tbl_projektbetreuer, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+					lehre.tbl_projektbetreuer JOIN lehre.tbl_projektarbeit ON tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id
+					JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_projektarbeit.lehreinheit_id
+					JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
 				WHERE
-					lehre.tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-					tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id AND
-					tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+					lehre.tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 				) as foo
 				JOIN public.tbl_studiengang USING (studiengang_kz)
 				";
@@ -191,14 +190,21 @@ if ($result_stg = $db->db_query($qry_stg))
 		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden", $format_bold);
 		$worksheet->write(2, ++$i, "Gesamtkosten", $format_bold);
 		$gesamt->write($gesamtsheet_row, $i, "Gesamtkosten", $format_bold);
-		$worksheet->write(2, ++$i, "Gesamtstunden angenommen", $format_bold);
-		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden angenommen", $format_bold);
-		$worksheet->write(2, ++$i, "Gesamtkosten angenommen", $format_bold);
-		$gesamt->write($gesamtsheet_row, $i, "Gesamtkosten angenommen", $format_bold);
+		
+		$worksheet->write(2, ++$i, "Gesamtstunden bestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden bestellt", $format_bold);
+		$worksheet->write(2, ++$i, "Gesamtkosten bestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtkosten bestellt", $format_bold);
+		
 		$worksheet->write(2, ++$i, "Gesamtstunden erteilt", $format_bold);
 		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden erteilt", $format_bold);
 		$worksheet->write(2, ++$i, "Gesamtkosten erteilt", $format_bold);
 		$gesamt->write($gesamtsheet_row, $i, "Gesamtkosten erteilt", $format_bold);
+
+		$worksheet->write(2, ++$i, "Gesamtstunden angenommen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden angenommen", $format_bold);
+		$worksheet->write(2, ++$i, "Gesamtkosten angenommen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtkosten angenommen", $format_bold);
 
 		//Daten holen
 		$qry = "SELECT tbl_lehreinheit.*,
@@ -272,26 +278,20 @@ if ($result_stg = $db->db_query($qry_stg))
 							THEN 't'
 						ELSE 'f'
 						END AS geaendert,
-					(SELECT
-						vertragsstatus_kurzbz
-					FROM
-						lehre.tbl_vertrag_vertragsstatus
-					WHERE
-						vertrag_id = tbl_lehreinheitmitarbeiter.vertrag_id
-					ORDER BY datum DESC
-					LIMIT 1) as vertragsstatus
-				FROM lehre.tbl_lehreinheit,
-					lehre.tbl_lehreinheitmitarbeiter,
-					PUBLIC.tbl_mitarbeiter,
-					PUBLIC.tbl_benutzer,
-					PUBLIC.tbl_person,
-					lehre.tbl_lehrveranstaltung
-				WHERE tbl_person.person_id = tbl_benutzer.person_id
-					AND tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid
-					AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid
-					AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id
-					AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
-					AND studiengang_kz = ".$db->db_add_param($studiengang_kz)."
+					 (SELECT
+							ARRAY_TO_STRING(ARRAY_AGG(vertragsstatus_kurzbz), ',')
+							FROM
+								lehre.tbl_vertrag_vertragsstatus
+							WHERE
+								vertrag_id = tbl_lehreinheitmitarbeiter.vertrag_id
+						) as vertragsstatus
+				FROM lehre.tbl_lehreinheit
+				    JOIN lehre.tbl_lehreinheitmitarbeiter ON tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id
+				    JOIN PUBLIC.tbl_mitarbeiter ON tbl_lehreinheitmitarbeiter.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid
+					JOIN PUBLIC.tbl_benutzer ON tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid
+					JOIN PUBLIC.tbl_person ON tbl_person.person_id = tbl_benutzer.person_id
+					JOIN lehre.tbl_lehrveranstaltung ON  tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
+				WHERE studiengang_kz = ".$db->db_add_param($studiengang_kz)."
 					AND studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)."
 					AND tbl_lehreinheitmitarbeiter.semesterstunden <> 0
 					AND tbl_lehreinheitmitarbeiter.semesterstunden IS NOT NULL
@@ -312,6 +312,7 @@ if ($result_stg = $db->db_query($qry_stg))
 			$gesamtsheet_row++;
 			while ($row = $db->db_fetch_object($result))
 			{
+				$row->vertragsstatus = explode(',', $row->vertragsstatus);
 				//Gesamtstunden und Kosten ermitteln
 				if (array_key_exists($row->mitarbeiter_uid, $liste))
 				{
@@ -324,32 +325,48 @@ if ($result_stg = $db->db_query($qry_stg))
 					$liste[$row->mitarbeiter_uid]['gesamtkosten'] =
 						$liste[$row->mitarbeiter_uid]['gesamtkosten'] + ($row->semesterstunden * $row->stundensatz);
 
-					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
+					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt']))
 					{
-						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
-						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] = 0;
 					}
-					
+
 					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt']))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] = 0;
 					}
 
-					if ($row->vertragsstatus == 'akzeptiert')
+					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
 					{
-						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] =
-							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
-						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
-							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+					}
+
+					if (in_array('bestellt', $row->vertragsstatus))
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
-					else if ($row->vertragsstatus == 'erteilt')
+
+					if (in_array('erteilt', $row->vertragsstatus))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] + $row->semesterstunden;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt']
+							+ ($row->semesterstunden * $row->stundensatz);
+					}
+
+					if (in_array('akzeptiert', $row->vertragsstatus))
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
 				}
@@ -360,32 +377,48 @@ if ($result_stg = $db->db_query($qry_stg))
 					$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $row->semesterstunden;
 					$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden * $row->stundensatz;
 
-					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
+					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt']))
 					{
-						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
-						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] = 0;
 					}
-					
+
 					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt']))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] = 0;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] = 0;
 					}
 
-					if ($row->vertragsstatus == 'akzeptiert')
+					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
 					{
-						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] =
-							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
-						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
-							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+					}
+
+					if (in_array('bestellt', $row->vertragsstatus))
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['gesamtstunden_bestellt'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt'] =
+							$liste[$row->mitarbeiter_uid]['gesamtkosten_bestellt']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
-					else if ($row->vertragsstatus == 'erteilt')
+
+					if (in_array('erteilt', $row->vertragsstatus))
 					{
 						$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtstunden_erteilt'] + $row->semesterstunden;
 						$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt'] =
 							$liste[$row->mitarbeiter_uid]['gesamtkosten_erteilt']
+							+ ($row->semesterstunden * $row->stundensatz);
+					}
+
+					if (in_array('akzeptiert', $row->vertragsstatus))
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
 							+ ($row->semesterstunden * $row->stundensatz);
 					}
 				}
@@ -469,27 +502,23 @@ if ($result_stg = $db->db_query($qry_stg))
 						WHERE meine_oes.organisationseinheittyp_kurzbz = 'Department'
 						) AS department
 					FROM
-						lehre.tbl_projektbetreuer, public.tbl_person, public.tbl_benutzer,
-						public.tbl_mitarbeiter, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit,
-						lehre.tbl_lehrveranstaltung
+						lehre.tbl_projektbetreuer JOIN public.tbl_person ON tbl_projektbetreuer.person_id=tbl_person.person_id
+						JOIN public.tbl_benutzer ON tbl_benutzer.person_id=tbl_person.person_id
+						JOIN public.tbl_mitarbeiter ON tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid
+						JOIN lehre.tbl_projektarbeit ON tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id
+						JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id
+						JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
 					WHERE
-						tbl_projektbetreuer.person_id=tbl_person.person_id AND
-						tbl_person.person_id=tbl_benutzer.person_id AND
-						tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
-						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
-						tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 						tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 						NOT EXISTS (SELECT
 										mitarbeiter_uid
 									FROM
-										lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+										lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit ON tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
+										JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
 									WHERE
 										mitarbeiter_uid=tbl_benutzer.uid AND
-										tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 										tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
-										tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 										tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 										tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
 										EXISTS (
@@ -550,32 +579,29 @@ if ($result_stg = $db->db_query($qry_stg))
 							ELSE
 								'f'
 						END as geaendert,
-						(
-							SELECT
-							vertragsstatus_kurzbz
+						(SELECT
+							ARRAY_TO_STRING(ARRAY_AGG(vertragsstatus_kurzbz), ',')
 							FROM
 								lehre.tbl_vertrag_vertragsstatus
 							WHERE
 								vertrag_id = tbl_projektbetreuer.vertrag_id
-							ORDER BY datum DESC
-							LIMIT 1
 						) as vertragsstatus
-					FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
-						public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student
+					FROM
+						lehre.tbl_projektbetreuer JOIN public.tbl_benutzer ON tbl_projektbetreuer.person_id = tbl_benutzer.person_id
+						JOIN lehre.tbl_projektarbeit ON tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
+						JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_projektarbeit.lehreinheit_id
+						JOIN lehre.tbl_lehrveranstaltung ON tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+						JOIN campus.vw_student ON vw_student.uid = student_uid
 					WHERE
-						tbl_projektbetreuer.person_id = tbl_benutzer.person_id
-						AND tbl_benutzer.uid = ".$db->db_add_param($uid)."
-						AND tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
-						AND student_uid = vw_student.uid
-						AND tbl_lehreinheit.lehreinheit_id = tbl_projektarbeit.lehreinheit_id
+						tbl_benutzer.uid = ".$db->db_add_param($uid)."
 						AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
-						AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 						AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 
 				if ($result = $db->db_query($qry))
 				{
 					while ($row = $db->db_fetch_object($result))
 					{
+						$row->vertragsstatus = explode(',', $row->vertragsstatus);
 						$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
 						$liste[$uid]['gesamtkosten'] =
 							$liste[$uid]['gesamtkosten'] + ($row->stunden * $row->stundensatz);
@@ -586,31 +612,47 @@ if ($result_stg = $db->db_query($qry_stg))
 						{
 							$liste[$uid]['geaendert'] = true;
 						}
-						if (!isset($liste[$uid]['gesamtstunden_akzeptiert']))
+
+						if (!isset($liste[$uid]['gesamtstunden_bestellt']))
 						{
-							$liste[$uid]['gesamtstunden_akzeptiert'] = 0;
-							$liste[$uid]['gesamtkosten_akzeptiert'] = 0;
+							$liste[$uid]['gesamtstunden_bestellt'] = 0;
+							$liste[$uid]['gesamtkosten_bestellt'] = 0;
 						}
-						
+
 						if (!isset($liste[$uid]['gesamtstunden_erteilt']))
 						{
 							$liste[$uid]['gesamtstunden_erteilt'] = 0;
 							$liste[$uid]['gesamtkosten_erteilt'] = 0;
 						}
 
-						if ($row->vertragsstatus == 'akzeptiert')
+						if (!isset($liste[$uid]['gesamtstunden_akzeptiert']))
 						{
-							$liste[$uid]['gesamtstunden_akzeptiert'] =
-								$liste[$uid]['gesamtstunden_akzeptiert'] + $row->stunden;
-							$liste[$uid]['gesamtkosten_akzeptiert'] =
-								$liste[$uid]['gesamtkosten_akzeptiert'] + ($row->stunden * $row->stundensatz);
+							$liste[$uid]['gesamtstunden_akzeptiert'] = 0;
+							$liste[$uid]['gesamtkosten_akzeptiert'] = 0;
 						}
-						else if ($row->vertragsstatus == 'erteilt')
+
+						if (in_array('bestellt', $row->vertragsstatus))
+						{
+							$liste[$uid]['gesamtstunden_bestellt'] =
+								$liste[$uid]['gesamtstunden_bestellt'] + $row->stunden;
+							$liste[$uid]['gesamtkosten_bestellt'] =
+								$liste[$uid]['gesamtkosten_bestellt'] + ($row->stunden * $row->stundensatz);
+						}
+
+						if (in_array('erteilt', $row->vertragsstatus))
 						{
 							$liste[$uid]['gesamtstunden_erteilt'] =
 								$liste[$uid]['gesamtstunden_erteilt'] + $row->stunden;
 							$liste[$uid]['gesamtkosten_erteilt'] =
 								$liste[$uid]['gesamtkosten_erteilt'] + ($row->stunden * $row->stundensatz);
+						}
+
+						if (in_array('akzeptiert', $row->vertragsstatus))
+						{
+							$liste[$uid]['gesamtstunden_akzeptiert'] =
+								$liste[$uid]['gesamtstunden_akzeptiert'] + $row->stunden;
+							$liste[$uid]['gesamtkosten_akzeptiert'] =
+								$liste[$uid]['gesamtkosten_akzeptiert'] + ($row->stunden * $row->stundensatz);
 						}
 					}
 				}
@@ -695,14 +737,16 @@ if ($result_stg = $db->db_query($qry_stg))
 				$gesamtkosten_row = str_replace(', ', '.', $row['gesamtkosten']);
 				$worksheet->writeNumber($zeile, ++$i, $gesamtkosten_row, $formatnb);
 				$gesamt->writeNumber($gesamtsheet_row, $i, $gesamtkosten_row, $formatnb);
-				//Gesamtstunden akzeptiert
-				$gesamtstunden_akzeptiert = str_replace(', ', '.', $row['gesamtstunden_akzeptiert']);
-				$worksheet->write($zeile, ++$i, $gesamtstunden_akzeptiert, $formatnb);
-				$gesamt->write($gesamtsheet_row, $i, $gesamtstunden_akzeptiert, $formatnb);
-				//Gesamtkosten akzeptiert
-				$gesamtkosten_akzeptiert_row = str_replace(', ', '.', $row['gesamtkosten_akzeptiert']);
-				$worksheet->writeNumber($zeile, ++$i, $gesamtkosten_akzeptiert_row, $formatnb);
-				$gesamt->writeNumber($gesamtsheet_row, $i, $gesamtkosten_akzeptiert_row, $formatnb);
+				
+				//Gesamtstunden bestellt
+				$gesamtstunden_bestellt = str_replace(', ', '.', $row['gesamtstunden_bestellt']);
+				$worksheet->write($zeile, ++$i, $gesamtstunden_bestellt, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $gesamtstunden_bestellt, $formatnb);
+				//Gesamtkosten bestellt
+				$gesamtkosten_bestellt_row = str_replace(', ', '.', $row['gesamtkosten_bestellt']);
+				$worksheet->writeNumber($zeile, ++$i, $gesamtkosten_bestellt_row, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $gesamtkosten_bestellt_row, $formatnb);
+				
 				//Gesamtstunden erteilt
 				$gesamtstunden_erteilt = str_replace(', ', '.', $row['gesamtstunden_erteilt']);
 				$worksheet->write($zeile, ++$i, $gesamtstunden_erteilt, $formatnb);
@@ -711,6 +755,15 @@ if ($result_stg = $db->db_query($qry_stg))
 				$gesamtkosten_erteilt_row = str_replace(', ', '.', $row['gesamtkosten_erteilt']);
 				$worksheet->writeNumber($zeile, ++$i, $gesamtkosten_erteilt_row, $formatnb);
 				$gesamt->writeNumber($gesamtsheet_row, $i, $gesamtkosten_erteilt_row, $formatnb);
+				
+				//Gesamtstunden akzeptiert
+				$gesamtstunden_akzeptiert = str_replace(', ', '.', $row['gesamtstunden_akzeptiert']);
+				$worksheet->write($zeile, ++$i, $gesamtstunden_akzeptiert, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $gesamtstunden_akzeptiert, $formatnb);
+				//Gesamtkosten akzeptiert
+				$gesamtkosten_akzeptiert_row = str_replace(', ', '.', $row['gesamtkosten_akzeptiert']);
+				$worksheet->writeNumber($zeile, ++$i, $gesamtkosten_akzeptiert_row, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $gesamtkosten_akzeptiert_row, $formatnb);
 
 				//Kosten zu den Gesamtkosten hinzurechnen
 				$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
@@ -731,15 +784,15 @@ if ($result_stg = $db->db_query($qry_stg))
 				else
 					$liste_gesamt[$uid]['gesamtkosten'] = $row['gesamtkosten'];
 
-				if (isset($liste_gesamt[$uid]['gesamtstunden_akzeptiert']))
-					$liste_gesamt[$uid]['gesamtstunden_akzeptiert'] += $row['gesamtstunden_akzeptiert'];
+				if (isset($liste_gesamt[$uid]['gesamtstunden_bestellt']))
+					$liste_gesamt[$uid]['gesamtstunden_bestellt'] += $row['gesamtstunden_bestellt'];
 				else
-					$liste_gesamt[$uid]['gesamtstunden_akzeptiert'] = $row['gesamtstunden_akzeptiert'];
-
-				if (isset($liste_gesamt[$uid]['gesamtkosten_akzeptiert']))
-					$liste_gesamt[$uid]['gesamtkosten_akzeptiert'] += $row['gesamtkosten_akzeptiert'];
+					$liste_gesamt[$uid]['gesamtstunden_bestellt'] = $row['gesamtstunden_bestellt'];
+				
+				if (isset($liste_gesamt[$uid]['gesamtkosten_bestellt']))
+					$liste_gesamt[$uid]['gesamtkosten_bestellt'] += $row['gesamtkosten_bestellt'];
 				else
-					$liste_gesamt[$uid]['gesamtkosten_akzeptiert'] = $row['gesamtkosten_akzeptiert'];
+					$liste_gesamt[$uid]['gesamtkosten_bestellt'] = $row['gesamtkosten_bestellt'];
 
 				if (isset($liste_gesamt[$uid]['gesamtstunden_erteilt']))
 					$liste_gesamt[$uid]['gesamtstunden_erteilt'] += $row['gesamtstunden_erteilt'];
@@ -750,6 +803,16 @@ if ($result_stg = $db->db_query($qry_stg))
 					$liste_gesamt[$uid]['gesamtkosten_erteilt'] += $row['gesamtkosten_erteilt'];
 				else
 					$liste_gesamt[$uid]['gesamtkosten_erteilt'] = $row['gesamtkosten_erteilt'];
+
+				if (isset($liste_gesamt[$uid]['gesamtstunden_akzeptiert']))
+					$liste_gesamt[$uid]['gesamtstunden_akzeptiert'] += $row['gesamtstunden_akzeptiert'];
+				else
+					$liste_gesamt[$uid]['gesamtstunden_akzeptiert'] = $row['gesamtstunden_akzeptiert'];
+				
+				if (isset($liste_gesamt[$uid]['gesamtkosten_akzeptiert']))
+					$liste_gesamt[$uid]['gesamtkosten_akzeptiert'] += $row['gesamtkosten_akzeptiert'];
+				else
+					$liste_gesamt[$uid]['gesamtkosten_akzeptiert'] = $row['gesamtkosten_akzeptiert'];
 			}
 
 			//Gesamtkosten anzeigen
