@@ -18366,38 +18366,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
-		'phrase' => 'antraege_header',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Anträge auf Änderung des Studierendenstatus',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Requests for changing the Studierendenstatus',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'studierendenantrag',
 		'phrase' => 'antrag_header',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antrag auf Änderung des Studierendenstatus',
+				'text' => 'Verwaltung des Studierendenstatus',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Request for changing the Studierendenstatus',
+				'text' => 'Management of student status',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19073,13 +19053,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Genehmigen',
+				'text' => 'Bestätigen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Approve',
+				'text' => 'Confirm',
 				'description' => '',
 				'insertvon' => 'system'
 			)

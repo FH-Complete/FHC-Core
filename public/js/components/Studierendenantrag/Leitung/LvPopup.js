@@ -141,7 +141,7 @@ export default {
 				<label class="form-check-label" for="cbid">{{p.t('studierendenantrag','fuer_x_uebernehmen', {count: countRemaining})}}</label>
 			</div>
 			<button type="button" class="btn btn-primary" @click="submit(true)">{{p.t('studierendenantrag','btn_approve')}}</button>
-			<button type="button" class="btn btn-secondary" @click="submit(false)">{{p.t('ui','skip')}}</button>
+			<button v-if="countRemaining > 0" type="button" class="btn btn-secondary" @click="submit(false)">{{p.t('ui','skip')}}</button>
 		</template>
 	</bs-modal>`
 }

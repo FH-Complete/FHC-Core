@@ -25,7 +25,7 @@ $this->load->view(
 <div id="wrapper">
 
 	<div class="fhc-header">
-		<h1 class="h2"><?= $this->p->t('studierendenantrag', 'antraege_header'); ?></h1>
+		<h1 class="h2"><?= $this->p->t('studierendenantrag', 'antrag_header'); ?></h1>
 	</div>
 
 	<div class="fhc-container row">
