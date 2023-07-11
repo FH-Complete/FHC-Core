@@ -59,7 +59,7 @@ class Issue_model extends DB_Model
 	 * @param string $fehlercode_extern if provided, only issues with this external fehlercode are counted (for identifying issues from external systems).
 	 * @return Object success with number of issues or error
 	 */
-	public function getOpenIssueCount($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlercode_extern = null)
+	public function getOpenIssueCount($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlercode_extern = null, $behebung_parameter = null)
 	{
 		$params = array($fehlercode);
 		// issue exists for a fehlercode (or fehlercode_extern), person_id, oe_kurzbz, if not verarbeitet yet
@@ -83,6 +83,19 @@ class Issue_model extends DB_Model
 		{
 			$qry .= ' AND oe_kurzbz = ?';
 			$params[] = $oe_kurzbz;
+		}
+
+		if (isset($behebung_parameter) && !isEmptyArray($behebung_parameter))
+		{
+			// convert array to JSON string for postgres
+			$behebung_parameter_string = json_encode($behebung_parameter);
+
+			if ($behebung_parameter_string)
+			{
+				// check if jsonb value is equal to the passed parameters array (if value contains array and array contains value)
+				$qry .= ' AND behebung_parameter @> ? AND behebung_parameter <@ ?';
+				$params = array_merge($params, array($behebung_parameter_string, $behebung_parameter_string));
+			}
 		}
 
 		return $this->execQuery($qry, $params);
