@@ -1656,9 +1656,8 @@ function StudentAuswahl()
 		StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
 		lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);
 
-		// *** AntragNoten Tree MANU***
 		var antragnotentree = document.getElementById('student-antragnoten-tree');
-		// TODO(chris): semester übergeben
+
 		url='<?php echo APP_ROOT;?>index.ci.php/components/Antrag/Wiederholung/getLvsAsRdf/'+prestudent_id+"?"+gettimestamp();
 
 		try
