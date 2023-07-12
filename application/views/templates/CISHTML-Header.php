@@ -27,7 +27,7 @@ if (!isset($menu)) {
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
-	<a id="nav-logo" href="<?= site_url('CisHtml'); ?>">
+	<a id="nav-logo" href="<?= site_url(''); ?>">
 		<img src="<?= base_url('/public/images/logo-300x160.png'); ?>" alt="Logo">
 	</a>
 	<nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
