@@ -85,7 +85,7 @@ class Content_model extends DB_Model
 						"content_id": 1000001,
 						"template_kurzbz": "redirect",
 						"titel": "News",
-						"content": "<content><url><![CDATA[../cis.php/CisHtml/Cms/news]]></url><target><![CDATA[]]></target></content>",
+						"content": "<content><url><![CDATA[' . site_url('/CisHtml/Cms/news') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
@@ -94,7 +94,7 @@ class Content_model extends DB_Model
 						"content_id": 1000002,
 						"template_kurzbz": "redirect",
 						"titel": "COVID-19",
-						"content": "<content><url><![CDATA[../cis.php/CisHtml/Cms/content/10012]]></url><target><![CDATA[]]></target></content>",
+						"content": "<content><url><![CDATA[' . site_url('/CisHtml/Cms/content/10012') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
@@ -103,7 +103,7 @@ class Content_model extends DB_Model
 						"content_id": 1000003,
 						"template_kurzbz": "redirect",
 						"titel": "Meine LV",
-						"content": "<content><url><![CDATA[../cis.php/Cis/MyLv]]></url><target><![CDATA[]]></target></content>",
+						"content": "<content><url><![CDATA[' . site_url('/Cis/MyLv') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
@@ -112,7 +112,7 @@ class Content_model extends DB_Model
 						"content_id": 1000004,
 						"template_kurzbz": "redirect",
 						"titel": "Stundenplan",
-						"content": "<content><url><![CDATA[../cis.php/Cis/Stundenplan]]></url><target><![CDATA[]]></target></content>",
+						"content": "<content><url><![CDATA[' . site_url('/Cis/Stundenplan') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
@@ -121,7 +121,7 @@ class Content_model extends DB_Model
 						"content_id": 1000005,
 						"template_kurzbz": "redirect",
 						"titel": "Dokumente",
-						"content": "<content><url><![CDATA[../cis.php/Cis/Documents]]></url><target><![CDATA[]]></target></content>",
+						"content": "<content><url><![CDATA[' . site_url('/Cis/Documents') . ']]></url><target><![CDATA[]]></target></content>",
 						"menu_open": false,
 						"aktiv": true,
 						"childs": []
