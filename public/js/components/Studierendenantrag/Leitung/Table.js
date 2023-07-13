@@ -84,7 +84,7 @@ export default {
 		this.table = new Tabulator(this.$refs.table, {
 			placeholder:"Keine zu bearbeitenden Datensätze",
 			movableColumns: true,
-			maxHeight: '50vh',
+			height: '50vh',
 			layout: "fitDataStretch", // TODO(chris): wont work when changed
 			ajaxURL: this.ajaxUrl,
 			persistence: { // NOTE(chris): do not store column titles

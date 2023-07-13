@@ -82,7 +82,7 @@ class Studierendenantrag extends FHC_Controller
 
 		$stgL = [];
 		if ($studiengaenge) {
-			$result = $this->StudierendenantragModel->loadForStudiengaenge($studiengaenge);
+			$result = $this->StudiengangModel->loadWithOrgform($studiengaenge);
 			if (isError($result))
 				return show_error(getError($result));
 			$antraege = getData($result) ?: [];
@@ -99,7 +99,7 @@ class Studierendenantrag extends FHC_Controller
 
 		$stgA = [];
 		if ($stgsNeuanlage) {
-			$result = $this->StudierendenantragModel->loadForStudiengaenge($stgsNeuanlage);
+			$result = $this->StudiengangModel->loadWithOrgform($stgsNeuanlage);
 			if (isError($result))
 				return show_error(getError($result));
 			$antraege = getData($result) ?: [];

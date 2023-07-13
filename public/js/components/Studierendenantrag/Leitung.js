@@ -23,45 +23,41 @@ export default {
 		return {
 			filter: undefined,
 			selectedData: [],
-			columns: []
+			columns: [],
+			stgs: []
 		}
 	},
 	computed: {
-		stgs(){
-			if(!this.stgL || !this.stgA)
-				return[];
-			let undesiredOutput = [...this.stgL, ...this.stgA];
-			let desiredOutput = undesiredOutput.reduce(
-				(accumulator, currentValue)=>
-				{
-					accumulator[currentValue.studiengang_kz] = currentValue;
-					return accumulator;
-				},
-				{}
-			);
-			return Object.values(desiredOutput);
-
-		},
-		stgkzL()
-		{
+		stgkzL() {
 			if (!this.stgL)
 				return [];
 			return this.stgL.map(stg => stg.studiengang_kz);
 		},
-		stgkzA()
-		{
+		stgkzA() {
 			if (!this.stgA)
 				return [];
 			return this.stgA.map(stg => stg.studiengang_kz);
 		}
 	},
 	methods: {
+		loadFilter() {
+			axios.get(
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+				'/components/Antrag/Leitung/getActiveStgs'
+			).then(result => {
+				this.stgs = Object.values(result.data.retval).sort((a,b) => a.bezeichnung == b.bezeichnung ? (a.orgform == b.orgform ? 0 : (a.orgform > b.orgform ? 1 : -1)) : (a.bezeichnung > b.bezeichnung ? 1 : -1));
+			}).catch(error => {
+				console.error(error);
+			});
+		},
 		changeFilter(evt) {
 			this.filter = evt.target.value || undefined;
 			this.reload();
 		},
 		reload() {
 			this.$refs.table.reload(this.filter);
+			this.loadFilter();
 		},
 		download() {
 			this.$refs.table.download();
@@ -269,6 +265,9 @@ export default {
 				msg = error.message;
 			BsAlert.popup(msg, {dialogClass: 'alert alert-danger'});
 		}
+	},
+	created() {
+		this.loadFilter();
 	},
 	template: `
 	<div class="studierendenantrag-leitung fhc-table">

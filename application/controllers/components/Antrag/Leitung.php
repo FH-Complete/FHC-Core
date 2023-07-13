@@ -29,6 +29,50 @@ class Leitung extends FHC_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
+	public function getActiveStgs()
+	{
+		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe');
+		$stgsNeuanlage = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag');
+
+		$stgs = [];
+
+		if ($studiengaenge) {
+			$result = $this->StudierendenantragModel->loadForStudiengaenge($studiengaenge);
+
+			if (isError($result))
+				return $this->outputJson($result);
+			$antraege = getData($result) ?: [];
+
+			foreach ($antraege as $antrag) {
+				if (!isset($stgs[$antrag->studiengang_kz])) {
+					$stgs[$antrag->studiengang_kz] = new stdClass();
+					$stgs[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
+					$stgs[$antrag->studiengang_kz]->orgform = $antrag->orgform;
+					$stgs[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
+				}
+			}
+		}
+
+		if ($stgsNeuanlage) {
+			$result = $this->StudierendenantragModel->loadForStudiengaenge($stgsNeuanlage);
+
+			if (isError($result))
+				return $this->outputJson($result);
+			$antraege = getData($result) ?: [];
+
+			foreach ($antraege as $antrag) {
+				if (!isset($stgs[$antrag->studiengang_kz])) {
+					$stgs[$antrag->studiengang_kz] = new stdClass();
+					$stgs[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
+					$stgs[$antrag->studiengang_kz]->orgform = $antrag->orgform;
+					$stgs[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
+				}
+			}
+		}
+
+		$this->outputJsonSuccess($stgs);
+	}
+
 	public function getAntraege($studiengang = null)
 	{
 

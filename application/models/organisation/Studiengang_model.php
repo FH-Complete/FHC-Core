@@ -525,6 +525,20 @@ class Studiengang_model extends DB_Model
 		return $this->execQuery($query, $params);
 	}
 
+	public function loadWithOrgform($studiengang_kzs)
+	{
+		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('o.bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform');
+		
+		$this->addJoin('bis.tbl_orgform o', 'orgform_kurzbz');
+
+		$this->db->where_in($this->dbTable . '.studiengang_kz', $studiengang_kzs);
+
+		return $this->load();
+	}
+
 	/**
 	 * @param array		$studiengang_kzs
 	 * @param array		$not_antrag_typ		(optional) If the prestudent has an antrag with one of the specified types it will be excluded from the result
