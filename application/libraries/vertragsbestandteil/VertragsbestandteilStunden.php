@@ -49,7 +49,8 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 
 	public function setTeilzeittyp_kurzbz($teilzeittyp_kurzbz)
 	{
-		$this->teilzeittyp_kurzbz = $teilzeittyp_kurzbz;
+		$this->teilzeittyp_kurzbz = ($teilzeittyp_kurzbz !== '') 
+			? $teilzeittyp_kurzbz : null;
 		return $this;
 	}
 	
