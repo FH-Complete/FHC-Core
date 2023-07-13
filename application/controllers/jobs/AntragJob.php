@@ -200,7 +200,6 @@ class AntragJob extends JOB_Controller
 
 			foreach ($antraege as $antrag)
 			{
-
 				$result = $this->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon, 'abbrecherStgl', $antrag->insertamum);
 				if (isError($result))
 					$this->logError(getError($result));

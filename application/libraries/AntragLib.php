@@ -145,7 +145,7 @@ class AntragLib
 				'studierendenantrag_id' => $studierendenantrag_id,
 				'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
 				'insertvon' => $insertvon,
-				'insertam' => $insertam
+				'insertamum' => $insertam
 			]);
 			if (isError($result))
 				$errors[] = getError($result);
@@ -240,6 +240,81 @@ class AntragLib
 
 		if (count($errors))
 			return error(implode(',', $errors));
+
+		return success();
+	}
+
+	/**
+	 * @param integer		$studierendenantrag_id
+	 * @param string		$insertvon
+	 *
+	 * @return stdClass
+	 */
+	public function denyObjectionAbmeldung($studierendenantrag_id, $insertvon)
+	{
+		$result = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
+		if (isError($result))
+		{
+			return $result;
+		}
+		if(!hasData($result))
+		{
+			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]));
+		}
+		$antrag = getData($result)[0];
+
+		$result = $this->_ci->StudierendenantragstatusModel->loadWhere([
+			'studierendenantrag_id' => $studierendenantrag_id,
+			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
+		]);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return error($this->_ci->p->t('studierendenantrag', 'error_not_approved'));
+
+		$status = current(getData($result));
+
+		$result = $this->_ci->StudierendenantragstatusModel->insert([
+			'studierendenantrag_id' => $studierendenantrag_id,
+			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
+			'insertvon' => $insertvon
+		]);
+		if (isError($result))
+			return $result;
+		else {
+			$result = $this->_ci->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon, 'abbrecherStgl', $status->insertamum);
+
+			if (isError($result))
+				return $result;
+
+			$res = $this->_ci->PrestudentModel->load($antrag->prestudent_id);
+
+			if (hasData($res)) {
+				$prestudent = current(getData($res));
+				$res = $this->_ci->PersonModel->load($prestudent->person_id);
+				if (hasData($res)) {
+					$person = current(getData($res));
+					$name = trim($person->vorname . ' ' . $person->nachname);
+				} else {
+					$name = $this->_ci->p->t('person', 'studentIn');
+				}
+				$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
+				if (hasData($res)) {
+					$kontakt = current(getData($res));
+					$email = $kontakt->kontakt;
+					sendSanchoMail(
+						// TODO(chris): Vorlage erstellen
+						'Sancho_Mail_Antrag_A_ObjectionDenied',
+						[
+							'name' => $name,
+							'grund' => $antrag->grund
+						],
+						$email,
+						$this->_ci->p->t('studierendenantrag', 'mail_subject_A_ObjectionDenied')
+					);
+				}
+			}
+		}
 
 		return success();
 	}

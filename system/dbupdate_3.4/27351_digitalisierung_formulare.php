@@ -28,15 +28,16 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statust
 			VALUES
 			('Erstellt', '{\"Erstellt\",\"Created\"}'),
 			('Genehmigt', '{\"Genehmigt\",\"Approved\"}'),
-			('Beeinsprucht', '{\"Beeinsprucht\",\"Objected\"}'),
 			('Abgelehnt', '{\"Abgelehnt\",\"Rejected\"}'),
 			('Verzichtet', '{\"Verzichtet\",\"Pass\"}'),
 			('Offen', '{\"Offen\",\"Reopened\"}'),
 			('Zurückgezogen', '{\"Zurückgezogen\",\"Cancelled\"}'),
+			('Lvszugewiesen', '{\"Lvszugewiesen\",\"Lvsassigned\"}'),
 			('EmailVersandt', '{\"Email Versandt\",\"Reminder Sent\"}'),
 			('ErsteAufforderungVersandt', '{\"1.Aufforderung Versandt\",\"1st Request Sent\"}'),
 			('ZweiteAufforderungVersandt', '{\"2.Aufforderung Versandt\",\"2nd Request Sent\"}'),
-			('Lvszugewiesen', '{\"Lvszugewiesen\",\"Lvsassigned\"}');
+			('Beeinsprucht', '{\"Beeinsprucht\",\"Objected\"}'),
+			('EinspruchAbgelehnt', '{\"Einspruch abgelehnt\",\"Objection denied\"}');
 			";
 		if (!$db->db_query($qry))
 			echo '<strong>campus.tbl_studierendenantrag_statustyp (insert): '.$db->db_last_error().'</strong><br>';

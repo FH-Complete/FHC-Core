@@ -145,7 +145,7 @@ class Leitung extends FHC_Controller
 
 		$studierendenantrag_id = $this->input->post('studierendenantrag_id');
 
-		$result = $this->antraglib->approveAbmeldung([$studierendenantrag_id], getAuthUID());
+		$result = $this->antraglib->denyObjectionAbmeldung($studierendenantrag_id, getAuthUID());
 
 		if (isError($result))
 			return $this->outputJsonError(['studierendenantrag_id' => getError($result)]);
