@@ -29,6 +29,18 @@ class AntragJob extends JOB_Controller
 	}
 
 	/**
+	 * Send infomail to Stgl
+	 */
+	public function sendStglSammelmail()
+	{
+		// TODO(chris): get all Abmeldung:Created, Unterbrechung:Created, Wiederholung:LvZugeordnet
+		// TODO(chris): get stgs for all these
+		// TODO(chris): get stgls for all these
+		// TODO(chris): sort antraege in stgls
+		// TODO(chris): send email
+	}
+
+	/**
 	 * Send reminder to Assistant for Wiedereinstieg Unterbrecher
 	 *
 	 */
