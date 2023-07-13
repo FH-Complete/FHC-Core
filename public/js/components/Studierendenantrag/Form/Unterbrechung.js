@@ -53,9 +53,18 @@ export default {
 				this.prestudentId;
 		},
 		datumWsFormatted() {
-			if(!this.data.datum_wiedereinstieg)
-				return '';
-			let datum = new Date(this.data.datum_wiedereinstieg);
+			let datumUnformatted = '';
+
+			if (this.studierendenantragId) {
+				if (this.data.datum_wiedereinstieg)
+					datumUnformatted = this.data.datum_wiedereinstieg;
+			} else {
+				if (this.stsem !== null && this.data.studiensemester[this.stsem].wiedereinstieg)
+					datumUnformatted = this.data.studiensemester[this.stsem].wiedereinstieg;
+			}
+			if (datumUnformatted === '')
+				return datumUnformatted;
+			let datum = new Date(datumUnformatted);
 			return datum.toLocaleDateString();
 		}
 	},
@@ -93,7 +102,7 @@ export default {
 			formData.append("studiensemester", this.stsem !== null && this.data.studiensemester[this.stsem].studiensemester_kurzbz);
 			formData.append("prestudent_id", this.data.prestudent_id);
 			formData.append("grund", this.$refs.grund.value);
-			formData.append("datum_wiedereinstieg", this.$refs.datum_wiedereinstieg && this.$refs.datum_wiedereinstieg.value);
+			formData.append("datum_wiedereinstieg", this.stsem !== null && this.data.studiensemester[this.stsem].wiedereinstieg);
 
 			axios.post(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
@@ -267,21 +276,11 @@ export default {
 					<div v-if="data.studierendenantrag_id">
 						{{datumWsFormatted}}
 					</div>
-					<div v-else>
-						<select v-if="stsem === null" class="form-select" disabled>
-							<option value="" disabled selected>
-								{{p.t('ui/select_studiensemester')}}
-							</option>
-						</select>
-						<select v-else ref="datum_wiedereinstieg" class="form-select">
-							<option
-								v-for="sem in data.studiensemester[stsem].wiedereinstieg"
-								:key="sem.studiensemester_kurzbz"
-								:value="sem.start"
-							>
-								{{sem.studiensemester_kurzbz}}
-							</option>
-						</select>
+					<div v-else-if="stsem === null" class="form-control">
+						{{p.t('ui/select_studiensemester')}}
+					</div>
+					<div v-else class="form-control">
+						{{datumWsFormatted}}
 					</div>
 
 					<div v-if="errors.datum_wiedereinstieg.length" class="invalid-feedback d-block">

@@ -1279,35 +1279,38 @@ class AntragLib
 		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
+		$semester = [];
+
 		$result = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester);
 		if (!hasData($result))
-			return [];
+			return $semester;
 
-		$studienplaene = getData($result);
-		$studienplan_ids = array_map(function ($studienplan) {
-			return $studienplan->studienplan_id;
-		}, $studienplaene);
-
-		$result = $this->_ci->StudiensemesterModel->getFollowingSemester($studienplan_ids, $studiensemester_kurzbz, $ausbildungssemester);
+		$result = $this->_ci->StudiensemesterModel->getNextFrom($studiensemester_kurzbz);
 		if (!hasData($result))
-			return [];
+			return $semester;
+		$nextSem = current(getData($result));
 
-		$stsems = getData($result);
+		$semester[] = [
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'wiedereinstieg' => $nextSem->start
+		];
 
-		$result = $this->_ci->StudiensemesterModel->loadWhere();
+		$result = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $nextSem->studiensemester_kurzbz, $ausbildungssemester+1);
 		if (!hasData($result))
-			return [];
-		$result = getData($result);
-		usort($result, function($a, $b) {
-			return $a->start > $b->start ? 1 : -1;
-		});
-		foreach ($stsems as $stsem) {
-			$stsem->wiedereinstieg = array_filter($result, function ($sem) use ($stsem) {
-				return $sem->start > $stsem->ende;
-			});
-		}
+			return $semester;
 
-		return $stsems;
+		$result = $this->_ci->StudiensemesterModel->getNextFrom($nextSem->studiensemester_kurzbz);
+		if (!hasData($result))
+			return $semester;
+
+		$semAfterNext = current(getData($result));
+
+		$semester[] = [
+			'studiensemester_kurzbz' => $nextSem->studiensemester_kurzbz,
+			'wiedereinstieg' => $semAfterNext->start
+		];
+
+		return $semester;
 	}
 
 	public function getAktivePrestudentenInStgs($studiengaenge, $query)
