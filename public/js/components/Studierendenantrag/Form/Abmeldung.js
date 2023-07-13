@@ -15,7 +15,8 @@ export default {
 		'setStatus'
 	],
 	props: {
-		prestudentId: Number
+		prestudentId: Number,
+		studierendenantragId: Number
 	},
 	data() {
 		return {
@@ -35,6 +36,13 @@ export default {
 				case 'Genehmigt': return 'success';
 				default: return 'info';
 			}
+		},
+		loadUrl() {
+			if (this.studierendenantragId)
+				return '/components/Antrag/Abmeldung/getDetailsForAntrag/'+
+				this.studierendenantragId;
+			return '/components/Antrag/Abmeldung/getDetailsForNewAntrag/' +
+				this.prestudentId;
 		}
 	},
 	methods: {
@@ -42,8 +50,7 @@ export default {
 			return axios.get(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Abmeldung/getDetailsForNewAntrag/' +
-				this.prestudentId
+				this.loadUrl
 			).then(
 				result => {
 					this.data = result.data.retval;
