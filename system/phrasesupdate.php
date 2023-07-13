@@ -18351,13 +18351,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ich werde das Studienjahr nicht wiederholen',
+				'text' => 'Ich werde das Studienjahr nicht wiederholen und Abbrechen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'I will not repeat the academic year',
+				'text' => 'I will not repeat the academic year and will drop out',
 				'description' => '',
 				'insertvon' => 'system'
 			)
