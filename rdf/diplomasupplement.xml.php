@@ -147,6 +147,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			$angerechneteECTS=($semesterNumberStart-1)*30; // 30 ECTS pro Semester
 			echo '		<angerechnete_ects_quereinstieg>'.$angerechneteECTS.'</angerechnete_ects_quereinstieg>';
+
+            $end_semester_anrechnung = $semesterNumberStart - 1;
+            echo '      <start_semester_anrechnung_number>1</start_semester_anrechnung_number>';
+            echo '      <end_semester_anrechnung_number>'. $end_semester_anrechnung .'</end_semester_anrechnung_number>';
 		}
 		echo '      <start_semester>'.substr($prestudent->studiensemester_kurzbz, 2, 6).'</start_semester>';
 		echo '      <start_semester_number>'.$prestudent->ausbildungssemester.'</start_semester_number>';
@@ -602,17 +606,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$ects_total = 0;
 		$ects_total_positiv = 0;
 
-		//Anrechungng Quereinsteiger
+		//Anrechnung Quereinsteiger
 		echo ' <anrechnungen>';
 
-		//Version Studienordnung
+    	//Version Studienordnung
 		if($semesterNumberStart>1)
 		{
 			$maxSemester = $semesterNumberStart;
 			$summe_ects_orgform = 0;
 			$summe_sws_orgform = 0;
 			for($j = 1; $j <$maxSemester; $j++)
-			//for($j = 1; $j <7; $j++) //testing
 			{
 				$summe_ects_semester = 0;
 				$summe_sws_semester = 0;
@@ -623,7 +626,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$lv->loadLehrveranstaltungStudienplan($studienplan_id, $j);
 				$tree = $lv->getLehrveranstaltungTree();
 
-				//var_dump($tree);
 				printLehrveranstaltungTree($tree);
 
 				//if ($lv->lehrtyp_kurzbz!='modul')
