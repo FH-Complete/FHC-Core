@@ -369,6 +369,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE dashboard.tbl_dashboard_benutzer_over
 -- Name: SEQUENCE tbl_dashboard_benutzer_override_override_id_seq; Type: ACL; Schema: dashboard; Owner: fhcomplete
 --
 
+GRANT ALL ON SEQUENCE dashboard.tbl_dashboard_benutzer_override_override_id_seq TO web;
 GRANT ALL ON SEQUENCE dashboard.tbl_dashboard_benutzer_override_override_id_seq TO vilesci;
 
 
