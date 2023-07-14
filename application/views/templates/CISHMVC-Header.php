@@ -1,3 +1,11 @@
+<?php
+	if (!isset($menu)) {
+		$menu = [];
+		if (property_exists($this->router, 'menu') && $this->router->menu && property_exists($this->router->menu, 'children')) {
+			$menu = $this->router->menu->children;
+		}
+	}
+?>
 <header id="cis-header" class="navbar-dark">
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
@@ -6,11 +14,13 @@
 		<img src="<?= base_url('/public/images/logo-300x160.png'); ?>" alt="Logo">
 	</a>
 	<nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
-		<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
-			<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#nav-main-menu" aria-expanded="true" aria-controls="nav-main-menu">
-				<i class="fa fa-arrow-circle-left"></i>
-			</button>
-		</div>
+		<?php if ($menu) { ?>
+			<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
+				<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#nav-main-menu" aria-expanded="true" aria-controls="nav-main-menu">
+					<i class="fa fa-arrow-circle-left"></i>
+				</button>
+			</div>
+		<?php } ?>
 		<div class="offcanvas-body p-0">
 			<fhc-searchbar id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
 			<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
@@ -22,15 +32,17 @@
 				<li><hr class="dropdown-divider"></li>
 				<li><a class="btn btn-level-2 rounded-0 d-block" href="<?= site_url('Cis/Auth/logout'); ?>">Logout</a></li>
 			</ul>
-			<div id="nav-main-menu" class="collapse collapse-horizontal show">
-				<div>
-				<?php 
-					foreach($menu as $entry) {
-					$this->load->view('templates/CISHMVC-Menu/Entry', ['entry' => $entry, 'menu_id' => 'menu']);
-				}
-				?>
+			<?php if ($menu) { ?>
+				<div id="nav-main-menu" class="collapse collapse-horizontal show">
+					<div>
+						<?php
+								foreach ($menu as $entry) {
+									$this->load->view('templates/CISHMVC-Menu/Entry', ['entry' => $entry, 'menu_id' => 'menu']);
+								}
+						?>
+					</div>
 				</div>
-			</div>
+			<?php } ?>
 		</div>
 	</nav>
 </header>
