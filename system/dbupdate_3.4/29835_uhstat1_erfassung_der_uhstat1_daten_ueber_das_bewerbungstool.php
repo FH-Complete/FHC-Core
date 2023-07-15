@@ -12,7 +12,7 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_abschluss LIMIT 1'))
 				bezeichnung character varying(128)[],
 				aktiv boolean NOT NULL DEFAULT true,
 				in_oesterreich boolean,
-				CONSTRAINT tbl_abschluss_pk PRIMARY KEY (ausbildung_code)
+				CONSTRAINT pk_tbl_abschluss PRIMARY KEY (ausbildung_code)
 			);
 
 			COMMENT ON TABLE bis.tbl_abschluss IS 'Key-Table of graduation';
@@ -102,6 +102,8 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1'))
 			REFERENCES public.tbl_person (person_id) MATCH SIMPLE
 			ON DELETE RESTRICT ON UPDATE CASCADE;
 
+			ALTER TABLE bis.tbl_uhstat1daten ADD CONSTRAINT uk_uhstat1daten_person_id UNIQUE(person_id);
+
 			COMMENT ON TABLE bis.tbl_uhstat1daten IS 'UHSTAT1 data for a person (statistical data)';
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.geburtsstaat IS 'Birthplace of person';
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.mutter_geburtsstaat IS 'Birth country of mother of person';
@@ -115,6 +117,8 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1'))
 
 			GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_uhstat1daten TO web;
 			GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_uhstat1daten TO vilesci;
+			GRANT SELECT, UPDATE ON bis.tbl_uhstat1daten_uhstat1daten_id_seq TO vilesci;
+			GRANT SELECT, UPDATE ON bis.tbl_uhstat1daten_uhstat1daten_id_seq TO web;
 		";
 
 	if(!$db->db_query($qry))
