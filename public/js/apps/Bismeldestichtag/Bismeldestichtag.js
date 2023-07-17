@@ -42,7 +42,8 @@ const bismeldestichtagApp = Vue.createApp({
 		CoreNavigationCmpt,
 		CoreFilterCmpt,
 		BismeldestichtagAPIs,
-		CoreFetchCmpt
+		CoreFetchCmpt,
+		"datepicker": VueDatePicker
 	},
 	created() {
 		this.handlerStudiensemester();

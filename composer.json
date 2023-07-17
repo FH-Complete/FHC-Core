@@ -349,6 +349,28 @@
 			}
 		},
 		{
+			"type": "package",
+			"package": {
+					"name": "vuejs/vuedatepicker_js",
+					"version": "4.2.3",
+					"dist": {
+							"url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/vue-datepicker.iife.js",
+							"type": "file"
+					}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+					"name": "vuejs/vuedatepicker_css",
+					"version": "4.2.3",
+					"dist": {
+							"url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/main.css",
+							"type": "file"
+					}
+			}
+		},
+		{
 			"type": "composer",
 			"url": "https://asset-packagist.org"
 		}
