@@ -89,6 +89,17 @@ $config['wiederholung_job_request_2_date_modifier'] = '+3 weeks';
 $config['wiederholung_job_deadline_date_modifier'] = '+1 month';
 
 /**
+ * before this exam dates for Wiederholer will be ignored
+ *
+ * @var string           A string formated as Date
+ *
+ */
+$config['digitalization_start'] = '2022-07-01';
+
+
+
+
+/**
  * Objection period - the student will be abgemeldet if he hasn't objected in this period
  *
  * @var string           A string formated as PHP DateTime modifier
