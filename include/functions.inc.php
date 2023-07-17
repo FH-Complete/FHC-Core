@@ -1196,4 +1196,28 @@ function anzahlTage($date1, $date2)
 	$diff = $date2_ts - $date1_ts;
 	return round($diff / 86400);
 }
+
+/**
+ * Checks if the provided SQL string contains PostgreSQL functions to decrypt data, returns a boolean
+ */
+function hasSQLDecryption($sql)
+{
+	return stripos($sql, 'PGP_SYM_DECRYPT') !== false;
+}
+
+/**
+ * Checks if the provided SQL string contains PostgreSQL functions to decrypt data,
+ * and if it is used a variable instead of a readable password. Returns a boolean
+ */
+function isSQLDecryptionValid($sql)
+{
+	// If the SQL string contains decryption functions and there are _no_ password variables
+	if (hasSQLDecryption($sql) && strpos($sql, '${') === false)
+	{
+		return false; // then return false
+	}
+
+	return true; // in any other case return true
+}
+
 ?>

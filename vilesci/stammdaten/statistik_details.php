@@ -26,6 +26,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/statistik.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/berechtigung.class.php');
+require_once('../../include/functions.inc.php');
 
 if(!$db = new basis_db())
 {
@@ -140,18 +141,29 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 			$statistik->berechtigung_kurzbz = $berechtigung_kurzbz;
 			$statistik->preferences = $preferences;
 
-			$success = $statistik->save();
+			// Check if the SQL string contains functions to decrypt data and if there are
+			// variables to replace the value of the password (no clear password wanted!)
+			if (isSQLDecryptionValid($statistik->sql))
+			{
+				$success = $statistik->save();
 
-			if($success):
+				if($success):
+					?>
+					<span class="ok">Daten erfolgreich gespeichert</span>
+					<script type='text/javascript'>
+						parent.uebersicht_statistik.location.href = 'statistik_uebersicht.php';
+					</script>
+				<?php else: ?>
+					<span class="error"><?php echo $statistik->errormsg ?></span>
+				<?php
+				endif;
+			}
+			else // in case the SQL string is not valid display an error
+			{
 				?>
-				<span class="ok">Daten erfolgreich gespeichert</span>
-				<script type='text/javascript'>
-					parent.uebersicht_statistik.location.href = 'statistik_uebersicht.php';
-				</script>
-			<?php else: ?>
-				<span class="error"><?php echo $statistik->errormsg ?></span>
-			<?php
-			endif;
+				<span class="error"><?php echo 'It is not possible to store a SQL that contains clear passwords to decrypt data from the DB' ?></span>
+				<?php
+			}
 		}
 
 		$preferences = trim($statistik->preferences);
