@@ -688,8 +688,8 @@ class reihungstest extends basis_db
 					tbl_reihungstest.aufnahmegruppe_kurzbz,
 					tbl_studiengang.typ,
 					UPPER(typ::varchar(1) || kurzbz) AS stg_kuerzel,
-					so.studiengangbezeichnung as bezeichnung,
-       				so.studiengangbezeichnung_englisch as english
+					so.studiengangbezeichnung,
+       				so.studiengangbezeichnung_englisch
 				FROM
 					public.tbl_rt_person
 				JOIN public.tbl_reihungstest ON (rt_id=reihungstest_id)
@@ -736,8 +736,8 @@ class reihungstest extends basis_db
 				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$obj->typ = $row->typ;
 				$obj->stg_kuerzel = $row->stg_kuerzel;
-				$obj->bezeichnung = $row->bezeichnung;
-				$obj->english = $row->english;
+				$obj->studiengangbezeichnung = $row->studiengangbezeichnung;
+				$obj->studiengangbezeichnung_englisch = $row->studiengangbezeichnung_englisch;
 
 				$this->result[] = $obj;
 			}
