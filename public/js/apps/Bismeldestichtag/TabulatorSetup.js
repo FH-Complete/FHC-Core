@@ -24,7 +24,7 @@ export const BismeldestichtagTabulatorOptions = {
 	layout: 'fitColumns',
 	columns: [
 		{title: 'Meldestichtag',field: 'meldestichtag', headerFilter: true, formatter: function(cell){
-				return cell.getValue().replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
+				return BismeldestichtagTabulatorHelperFunctions._formatDate(cell.getValue());
 			}
 		},
 		{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true},
@@ -45,9 +45,14 @@ export const BismeldestichtagTabulatorEventHandlers = [
 			if (e.target.nodeName == 'DIV')
 			{
 				let data = row.getData();
-				alert(data.studiensemester_kurzbz + ': ' + data.meldestichtag_id);
+				alert(data.studiensemester_kurzbz + ': ' + BismeldestichtagTabulatorHelperFunctions._formatDate(data.meldestichtag));
 			}
 		}
 	}
 ];
 
+let BismeldestichtagTabulatorHelperFunctions = {
+	_formatDate: function(date){
+		return date.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
+	}
+}
