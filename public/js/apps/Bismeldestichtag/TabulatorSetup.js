@@ -27,7 +27,11 @@ export const BismeldestichtagTabulatorOptions = {
 				return cell.getValue().replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
 			}
 		},
-		{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true}
+		{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true},
+		{title: 'Löschen', field: 'meldestichtag_id', headerFilter: false, formatter:function(cell){
+				return '<button class="btn btn-primary delete-btn" data-meldestichtag-id="'+cell.getValue()+'">Löschen</button>';
+			}
+		}
 	]
 };
 
@@ -38,8 +42,11 @@ export const BismeldestichtagTabulatorEventHandlers = [
 	{
 		event: "rowClick",
 		handler: function(e, row) {
-			let data = row.getData();
-			alert(data.Studiensemester + ': ' + data.Meldestichtag);
+			if (e.target.nodeName == 'DIV')
+			{
+				let data = row.getData();
+				alert(data.studiensemester_kurzbz + ': ' + data.meldestichtag_id);
+			}
 		}
 	}
 ];

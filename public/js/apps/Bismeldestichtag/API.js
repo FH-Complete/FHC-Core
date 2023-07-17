@@ -61,8 +61,7 @@ export const BismeldestichtagAPIs = {
 		return CoreRESTClient.post(
 			'codex/Bismeldestichtag/deleteBismeldestichtag',
 			{
-				meldestichtag: wsParams.meldestichtag,
-				studiensemester_kurzbz: wsParams.studiensemester_kurzbz
+				meldestichtag_id: wsParams.meldestichtag_id
 			},
 			{
 				timeout: CORE_BISMELDESTICHTAG_CMPT_TIMEOUT

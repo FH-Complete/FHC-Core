@@ -28,9 +28,9 @@
 		</core-fetch-cmpt>
 
 		<div id="content">
-				<!-- input fields -->
+			<!-- input fields -->
 			<div class="row">
-				<div class="col-9">
+				<div class="col-12">
 					<div class="input-group">
 						<input type="date" class="form-control" name="meldestichtag" v-model="meldestichtag">
 						<select class="form-select" name="studiensemester_kurzbz" v-model="currSem">
@@ -44,11 +44,6 @@
 							</button>
 						</div>
 					</div>
-				</div>
-				<div class="col-3 text-center">
-					<button type="button" class="btn btn-primary" @click="handlerDeleteBismeldestichtag">
-						<?php echo $this->p->t('bismeldestichtag', 'stichtagLoeschen') ?>
-					</button>
 				</div>
 			</div>
 			<br />

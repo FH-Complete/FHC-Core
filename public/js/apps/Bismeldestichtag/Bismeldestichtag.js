@@ -84,12 +84,11 @@ const bismeldestichtagApp = Vue.createApp({
 		/**
 		 * Define delete Bismeldestichtag call and method to be executed after the call
 		 */
-		handlerDeleteBismeldestichtag: function(event) {
+		handlerDeleteBismeldestichtag: function(meldestichtag_id) {
 			this.startFetchCmpt(
 				BismeldestichtagAPIs.deleteBismeldestichtag,
 				{
-					meldestichtag: this.meldestichtag,
-					studiensemester_kurzbz: this.currSem
+					meldestichtag_id: meldestichtag_id
 				},
 				this.fetchCmptDataFetchedDeleteBismeldestichtag
 			);
@@ -107,21 +106,38 @@ const bismeldestichtagApp = Vue.createApp({
 				this.handlerBismeldestichtage();
 			}
 			else
-				alert("No response data");
+				alert("No Studiensemester data");
 		},
 		/**
 		 * Called after Bismeldestichtage response is received
 		 */
 		fetchCmptDataFetchedBismeldestichtage: function(data) {
-			console.log(data);
 			if (CoreRESTClient.isError(data)) alert(CoreRESTClient.getError(data));
 			if (CoreRESTClient.hasData(data))
 			{
-				let meldestichtage = CoreRESTClient.getData(data);
-				this.$refs.bismeldestichtageTable.tabulator.setData(meldestichtage);
+				// set the Meldestichtagedata
+				this.$refs.bismeldestichtageTable.tabulator.setData(CoreRESTClient.getData(data));
+
+				// save delete Bismeldestichtag function
+				let funcDeleteBismeldestichtag = this.handlerDeleteBismeldestichtag;
+
+				let btns = document.getElementsByClassName('delete-btn');
+
+				// add click events for deletion
+				for (let btn in btns)
+				{
+					if (btns[btn].addEventListener)
+					{
+						btns[btn].addEventListener('click',
+							function(){
+								funcDeleteBismeldestichtag(btns[btn].getAttribute('data-meldestichtag-id'));
+							}
+						);
+					}
+				}
 			}
 			else
-				alert("No response data");
+				this.$refs.bismeldestichtageTable.tabulator.setData([]);
 		},
 		/**
 		 * Called after Add Bismeldestichtag response is received

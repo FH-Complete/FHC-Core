@@ -78,15 +78,10 @@ class Bismeldestichtag extends Auth_Controller
 
 	public function getBismeldestichtage()
 	{
-		$this->BismeldestichtagModel->addSelect('meldestichtag, studiensemester_kurzbz');
+		$this->BismeldestichtagModel->addSelect('meldestichtag_id, meldestichtag, studiensemester_kurzbz');
 		$this->BismeldestichtagModel->addOrder('meldestichtag', 'DESC');
 		$this->BismeldestichtagModel->addOrder('meldestichtag_id', 'DESC');
 		$this->outputJson($this->BismeldestichtagModel->load());
-
-		//~ if (hasData($bismeldestichtagRes))
-			//~ $this->outputJsonSuccess(getData($bismeldestichtagRes));
-		//~ else
-			//~ $this->outputJsonSuccess(array());
 	}
 
 	public function addBismeldestichtag()
@@ -127,34 +122,12 @@ class Bismeldestichtag extends Auth_Controller
 		$request = $this->getPostJSON();
 
 		// check request data
-		if (!property_exists($request, 'meldestichtag') || isEmptyString($request->meldestichtag))
-			$this->terminateWithJsonError('Error occured: Meldestichtag missing');
-		if (!property_exists($request, 'studiensemester_kurzbz') || isEmptyString($request->studiensemester_kurzbz))
-			$this->terminateWithJsonError('Error occured: Studiensemester missing');
+		if (!property_exists($request, 'meldestichtag_id'))
+			$this->terminateWithJsonError('Error occured: Meldestichtag Id missing');
 
-		$meldestichtag = $request->meldestichtag;
-		$studiensemester_kurzbz = $request->studiensemester_kurzbz;
+		$meldestichtag_id = $request->meldestichtag_id;
 
-		// check if Bismeldestichtag already exists
-		$this->BismeldestichtagModel->addSelect('meldestichtag_id');
-		$bismeldestichtagRes = $this->BismeldestichtagModel->loadWhere(
-			array('meldestichtag' => $meldestichtag, 'studiensemester_kurzbz' => $studiensemester_kurzbz)
-		);
-
-		if (hasData($bismeldestichtagRes))
-		{
-			$meldestichtag_id = getData($bismeldestichtagRes)[0]->meldestichtag_id;
-
-			// delete if Stichtag does exist
-			$this->outputJson($this->BismeldestichtagModel->delete(
-				array('meldestichtag_id' => $meldestichtag_id)
-			));
-
-		}
-		else
-		{
-			// return error if not exists
-			$this->outputJsonError('Bismeldestichtag does not exist');
-		}
+		// deletetion
+		$this->outputJson($this->BismeldestichtagModel->delete($meldestichtag_id));
 	}
 }
