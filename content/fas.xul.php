@@ -125,7 +125,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-statistic-studentendetails:command" oncommand="StatistikPrintStudentExportExtended();"/>
   <command id="menu-statistic-stromanalyse:command" oncommand="StatistikPrintStromanalyse();"/>
   <command id="menu-dokumente-bewerberakt:command" oncommand="StudentPrintBewerberakt(event);"/>
-  <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung(event);"/>
+  <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung(event, 'Inskription');"/>
+  <command id="menu-dokumente-inskriptionsbestaetigungeng:command" oncommand="StudentPrintInskriptionsbestaetigung(event, 'InskriptionEng');"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis',event);"/>
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng',event);"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement(event);"/>
@@ -513,6 +514,12 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-inskriptionsbestaetigung.label;"
                command   =  "menu-dokumente-inskriptionsbestaetigung:command"
                accesskey = "&menu-dokumente-inskriptionsbestaetigung.accesskey;"/>
+		  <menuitem
+					  id        =  "menu-dokumente-inskriptionsbestaetigungeng"
+					  key       =  "menu-dokumente-inskriptionsbestaetigungeng:key"
+					  label     = "&menu-dokumente-inskriptionsbestaetigungeng.label;"
+					  command   =  "menu-dokumente-inskriptionsbestaetigungeng:command"
+					  accesskey = "&menu-dokumente-inskriptionsbestaetigungeng.accesskey;"/>
           <menuitem
                id        =  "menu-statistic-lehrauftraege"
                key       =  "menu-statistic-lehrauftraege:key"

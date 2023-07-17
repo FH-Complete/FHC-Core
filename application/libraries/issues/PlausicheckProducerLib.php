@@ -4,78 +4,70 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class PlausicheckProducerLib
 {
-	const CI_LIBRARY_PATH = 'application/libraries';
+	const CI_PATH = 'application';
+	const CI_LIBRARY_FOLDER = 'libraries';
+	const EXTENSIONS_FOLDER = 'extensions';
 	const PLAUSI_ISSUES_FOLDER = 'issues/plausichecks';
 	const EXECUTE_PLAUSI_CHECK_METHOD_NAME = 'executePlausiCheck';
 
 	private $_ci; // ci instance
-	private $_currentStudiensemester; // current Studiensemester
+	private $_extensionName; // name of extension
+	private $_app; // name of application
+	private $_konfiguration = array(); // konfigratio parameters
 
-	// set fehler which can be produced by the job
-	// structure: fehler_kurzbz => class (library) name for resolving
-	private $_fehlerLibMappings = array(
-		'AbbrecherAktiv' => 'AbbrecherAktiv',
-		'AbschlussstatusFehlt' => 'AbschlussstatusFehlt',
-		'AktSemesterNull' => 'AktSemesterNull',
-		'AktiverStudentOhneStatus' => 'AktiverStudentOhneStatus',
-		'AktiverStudentstatusOhneKontobuchung' => 'AktiverStudentstatusOhneKontobuchung',
-		'AusbildungssemPrestudentUngleichAusbildungssemStatus' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
-		'BewerberNichtZumRtAngetreten' => 'BewerberNichtZumRtAngetreten',
-		'DatumAbschlusspruefungFehlt' => 'DatumAbschlusspruefungFehlt',
-		'DatumSponsionFehlt' => 'DatumSponsionFehlt',
-		'DatumStudiensemesterFalscheReihenfolge' => 'DatumStudiensemesterFalscheReihenfolge',
-		'FalscheAnzahlAbschlusspruefungen' => 'FalscheAnzahlAbschlusspruefungen',
-		'FalscheAnzahlHeimatadressen' => 'FalscheAnzahlHeimatadressen',
-		'FalscheAnzahlZustelladressen' => 'FalscheAnzahlZustelladressen',
-		'GbDatumWeitZurueck' => 'GbDatumWeitZurueck',
-		'InaktiverStudentAktiverStatus' => 'InaktiverStudentAktiverStatus',
-		'IncomingHeimatNationOesterreich' => 'IncomingHeimatNationOesterreich',
-		'IncomingOhneIoDatensatz' => 'IncomingOhneIoDatensatz',
-		'IncomingOrGsFoerderrelevant' => 'IncomingOrGsFoerderrelevant',
-		'InskriptionVorLetzerBismeldung' => 'InskriptionVorLetzerBismeldung',
-		'NationNichtOesterreichAberGemeinde' => 'NationNichtOesterreichAberGemeinde',
-		'OrgformStgUngleichOrgformPrestudent' => 'OrgformStgUngleichOrgformPrestudent',
-		'PrestudentMischformOhneOrgform' => 'PrestudentMischformOhneOrgform',
-		'StgPrestudentUngleichStgStudienplan' => 'StgPrestudentUngleichStgStudienplan',
-		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
-		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher'
-		//'StudienplanUngueltig' => 'StudienplanUngueltig'
-	);
-
-	public function __construct()
+	public function __construct($params = null)
 	{
+		// set extension name if called from extension
+		if (isset($params['extensionName'])) $this->_extensionName = $params['extensionName'];
+
+		// set application
+		$app = isset($params['app']) ? $params['app'] : null;
+
 		$this->_ci =& get_instance(); // get ci instance
 
 		// load models
-		$this->_ci->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
+		$this->_ci->load->model('system/Fehlerkonfiguration_model', 'FehlerkonfigurationModel');
 
-		// get current Studiensemester
-		$studiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();
-		if (hasData($studiensemesterRes)) $this->_currentStudiensemester = getData($studiensemesterRes)[0]->studiensemester_kurzbz;
+		// get all configuration parameters for the application
+		$fehlerkonfigurationRes = $this->_ci->FehlerkonfigurationModel->getKonfiguration($app);
+
+		if (hasData($fehlerkonfigurationRes))
+		{
+			$fehlerkonfiguration = getData($fehlerkonfigurationRes);
+
+			foreach ($fehlerkonfiguration as $fk)
+			{
+				$this->_konfiguration[$fk->fehler_kurzbz][$fk->konfigurationstyp_kurzbz] = $fk->konfiguration;
+			}
+		}
 	}
 
 	/**
-	 * Executes check for a fehler_kurzbz, returns the result.
-	 * @param $fehler_kurzbz string
-	 * @param $studiensemester_kurzbz string optionally needed for issue production
-	 * @param $studiengang_kz int optionally needed for issue production
+	 * Executes plausicheck using a given library, returns the result.
+	 * @param $libName string name of library producing the issue
+	 * @param $fehler_kurzbz string unique short name of fehler, for which issue is produced
+	 * @param $params parameters passed to issue production method
 	 */
-	public function producePlausicheckIssue($fehler_kurzbz, $studiensemester_kurzbz = null, $studiengang_kz = null)
+	public function producePlausicheckIssue($libName, $fehler_kurzbz, $params)
 	{
-		$libName = $this->_fehlerLibMappings[$fehler_kurzbz];
+		// if called from extension (extension name set), path includes extension names
+		$libRootPath = isset($this->_extensionName) ? self::EXTENSIONS_FOLDER . '/' . $this->_extensionName . '/' : '';
 
-		// get Studiensemester
-		if (isEmptyString($studiensemester_kurzbz)) $studiensemester_kurzbz = $this->_currentStudiensemester;
+		// path for loading issue library
+		$issuesLibPath = $libRootPath . self::PLAUSI_ISSUES_FOLDER . '/';
 
-		// get path of library for issue to be produced
-		$issuesLibPath = DOC_ROOT . self::CI_LIBRARY_PATH . '/' . self::PLAUSI_ISSUES_FOLDER . '/';
-		$issuesLibFilePath = $issuesLibPath . $libName . '.php';
+		// file path of library for check if file exists
+		$issuesLibFilePath = DOC_ROOT . self::CI_PATH
+			. '/' . $libRootPath . self::CI_LIBRARY_FOLDER . '/' . self::PLAUSI_ISSUES_FOLDER . '/' . $libName . '.php';
 
 		// check if library file exists
 		if (!file_exists($issuesLibFilePath)) return error("Issue library file " . $issuesLibFilePath . " does not exist");
 
+		// load konfiguration parameters of the fehler_kurzbz
+		$config = isset($this->_konfiguration[$fehler_kurzbz]) ? $this->_konfiguration[$fehler_kurzbz] : null;
+
 		// load library connected to fehlercode
-		$this->_ci->load->library(self::PLAUSI_ISSUES_FOLDER . '/'.$libName);
+		$this->_ci->load->library($issuesLibPath . $libName, $config);
 
 		$lowercaseLibName = mb_strtolower($libName);
 
@@ -83,21 +75,7 @@ class PlausicheckProducerLib
 		if (!is_callable(array($this->_ci->{$lowercaseLibName}, self::EXECUTE_PLAUSI_CHECK_METHOD_NAME)))
 			return error("Method " . self::EXECUTE_PLAUSI_CHECK_METHOD_NAME . " is not defined in library $lowercaseLibName");
 
-		// pass the data needed for issue check
-		$paramsForCheck = array(
-			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'studiengang_kz' => $studiengang_kz
-		);
-
 		// call the function for checking for issue production
-		return $this->_ci->{$lowercaseLibName}->{self::EXECUTE_PLAUSI_CHECK_METHOD_NAME}($paramsForCheck);
-	}
-
-	/**
-	 * Gets all fehler_kurzbz for fehler which need to be checked.
-	 */
-	public function getFehlerKurzbz()
-	{
-		return array_keys($this->_fehlerLibMappings);
+		return $this->_ci->{$lowercaseLibName}->{self::EXECUTE_PLAUSI_CHECK_METHOD_NAME}($params);
 	}
 }
