@@ -30,6 +30,7 @@ class SearchBarLib
 	const ERROR_WRONG_SEARCHSTR = 'ERR002';
 	const ERROR_NO_TYPES = 'ERR003';
 	const ERROR_WRONG_TYPES = 'ERR004';
+	const ERROR_NOT_AUTH = 'ERR005';
 
 	// List of allowed types of search
 	const ALLOWED_TYPES = ['mitarbeiter', 'organisationunit', 'raum', 'person', 'student', 'prestudent', 'document', 'cms'];
