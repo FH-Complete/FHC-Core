@@ -14,7 +14,7 @@ class Phrasen extends FHC_Controller
 	/**
 	 * @param string $module
 	 */
-	public function LoadModule($module)
+	public function loadModule($module)
 	{
 		$this->load->library('PhrasesLib', [$module], 'pj');
 		$this->outputJsonSuccess(json_decode($this->pj->getJSON()));

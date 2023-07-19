@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+
 // ------------------------------------------------------------------------
 // Collection of utility functions for general purpose
 // ------------------------------------------------------------------------
@@ -405,3 +407,17 @@ function findResource($path, $resource, $subdir = false, $extraDir = null)
 	return null;
 }
 
+/**
+ * check if String can be converted to a date
+ */
+function isValidDate($dateString)
+{
+	try
+	{
+		return (new DateTime($dateString)) !== false;
+	}
+	catch(Exception $e)
+	{
+		return false;
+	}
+}

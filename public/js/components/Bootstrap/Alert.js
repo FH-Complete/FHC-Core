@@ -13,8 +13,8 @@ export default {
 			default: 'modal-dialog-centered'
 		},
 		/*
-		 * NOTE(chris): 
-		 * Hack to expose in "emits" declared events to $props which we use 
+		 * NOTE(chris):
+		 * Hack to expose in "emits" declared events to $props which we use
 		 * in the v-bind directive to forward all events.
 		 * @see: https://github.com/vuejs/core/issues/3432
 		*/

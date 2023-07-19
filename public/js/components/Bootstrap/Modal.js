@@ -58,7 +58,14 @@ export default {
 			});
 	},
 	popup(body, options, title, footer) {
-		const BsModal = this;
+		const BsModal = this,
+			slots = {};
+		if (body !== undefined)
+			slots.default = () => body;
+		if (title !== undefined)
+			slots.title = () => title;
+		if (footer !== undefined)
+			slots.footer = () => footer;
 		return new Promise((resolve,reject) => {
 			const instance = Vue.createApp({
 				setup() {
@@ -67,11 +74,7 @@ export default {
 					},...options, ...{
 						ref: 'modal',
 						'onHidden.bs.modal': instance.unmount
-					}}, {
-						title: title ? () => title : undefined,
-						default: body ? () => body : undefined,
-						footer: footer ? () => footer : undefined
-					});
+					}}, slots);
 				},
 				mounted() {
 					this.$refs.modal.show();
@@ -85,8 +88,8 @@ export default {
 				}
 			});
 			const wrapper = document.createElement("div");
-			document.body.appendChild(wrapper);
 			instance.mount(wrapper);
+			document.body.appendChild(wrapper);
 		});
 	},
 	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" @[\`shown.bs.modal\`]="$emit('shownBsModal')">
