@@ -35,7 +35,7 @@ export default {
 			BsPrompt.popup('New Dashboard name').then(
 				name => {
 					_name = name;
-					return axios.post(this.apiurl + '/Dashboard/Create', {
+					return axios.post(this.apiurl + '/Dashboard/create', {
 						dashboard_kurzbz: name
 					})
 				}
@@ -51,14 +51,14 @@ export default {
 		},
 		dashboardUpdate(dashboard) {
 			// TODO(chris): Loading or message
-			axios.post(this.apiurl + '/Dashboard/Update', dashboard).then(() => {
+			axios.post(this.apiurl + '/Dashboard/update', dashboard).then(() => {
 				let old = this.dashboards.find(el => el.dashboard_id == dashboard.dashboard_id);
 				old.dashboard_kurzbz = dashboard.dashboard_kurzbz;
 				old.beschreibung = dashboard.beschreibung;
 			}).catch(err => console.error('ERROR:', err));
 		},
 		dashboardDelete(dashboard_id) {
-			axios.post(this.apiurl + '/Dashboard/Delete', {dashboard_id}).then(() => {
+			axios.post(this.apiurl + '/Dashboard/delete', {dashboard_id}).then(() => {
 				this.current = -1;
 				this.dashboards = this.dashboards.filter(el => el.dashboard_id != dashboard_id);
 			}).catch(err => console.error('ERROR:', err));

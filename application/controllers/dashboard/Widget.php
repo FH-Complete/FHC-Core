@@ -23,7 +23,7 @@ class Widget extends Auth_Controller
 		$this->load->model('dashboard/Dashboard_Widget_model', 'DashboardWidgetModel');
 	}
 	
-	public function index() 
+	public function index()
 	{
 		$widget_id = $this->input->get('id');
 
@@ -48,7 +48,7 @@ class Widget extends Auth_Controller
 		return $this->outputJsonSuccess(current(getData($widget)));
 	}
 	
-	public function getAll() 
+	public function getAll()
 	{
 		$dashboard_id = $this->input->get('dashboard_id');
 		$result = $this->WidgetModel->getWithAllowedForDashboard($dashboard_id);
@@ -59,7 +59,7 @@ class Widget extends Auth_Controller
 		$this->outputJsonSuccess(getData($result) ?: []);
 	}
 	
-	public function getWidgetsForDashboard() 
+	public function getWidgetsForDashboard()
 	{
 		$db = $this->input->get('db');
 		$result = $this->WidgetModel->getForDashboard($db);
@@ -74,7 +74,8 @@ class Widget extends Auth_Controller
 		$this->outputJsonSuccess(getData($result) ?: []);
 	}
 	
-	public function setAllowed() {
+	public function setAllowed()
+	{
 		$input = $this->getPostJSON();
 
 		$dashboard_id = $input->dashboard_id;
@@ -83,12 +84,12 @@ class Widget extends Auth_Controller
 
 		if ($action == 'add') {
 			$result = $this->DashboardWidgetModel->insert([
-				'dashboard_id' => $dashboard_id, 
+				'dashboard_id' => $dashboard_id,
 				'widget_id' => $widget_id
 			]);
 		} elseif ($action == 'delete') {
 			$result = $this->DashboardWidgetModel->delete([
-				'dashboard_id' => $dashboard_id, 
+				'dashboard_id' => $dashboard_id,
 				'widget_id' => $widget_id
 			]);
 		} else {

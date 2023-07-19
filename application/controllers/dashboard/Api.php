@@ -9,7 +9,7 @@ class Api extends Auth_Controller
 			array(
 				'index'		=> 'dashboard/admin:rw',
 				'getNews'	=> 'dashboard/benutzer:r',
-				'getAmpeln'	=> 'dashboard/benutzer:r',
+                'getAmpeln'	=> 'dashboard/benutzer:r',
 			)
 		);
 
@@ -34,9 +34,8 @@ class Api extends Auth_Controller
 
 		$result = $this->NewsModel->getAll($limit);
 
-		if(hasData($result))
+		if (hasData($result))
 		{
-
 			$this->outputJson(getData($result), REST_Controller::HTTP_OK);
 		}
 		else
@@ -49,21 +48,20 @@ class Api extends Auth_Controller
 	/**
 	 * Get Ampeln.
 	 */
-	public function getAmpeln(){
+	public function getAmpeln()
+	{
 
 		$this->load->model('content/Ampel_model', 'AmpelModel');
 		$result = $this->AmpelModel->getByUser($this->_uid);
 
-		if(hasData($result))
+		if (hasData($result))
 		{
-
 			$this->outputJson(getData($result), REST_Controller::HTTP_OK);
 		}
 		else
 		{
 			$this->terminateWithJsonError('fehler entdeckt');
 		}
-
 	}
 
 	/**

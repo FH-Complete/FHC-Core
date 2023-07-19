@@ -12,5 +12,4 @@ class Dashboard_Widget_model extends DB_Model
 		$this->pk = ['dashboard_id', 'widget_id'];
 		$this->hasSequence = false;
 	}
-
 }

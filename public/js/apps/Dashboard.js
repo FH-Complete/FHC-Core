@@ -8,9 +8,5 @@ Vue.createApp({
   components: {
     CoreNavigationCmpt,
     CoreDashboard
-    /*,
-    "CoreFilterCmpt": CoreFilterCmpt,
-    "verticalsplit": verticalsplit,
-    "searchbar": searchbar*/
   }
 }).mount('#main');

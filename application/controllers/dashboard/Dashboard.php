@@ -12,9 +12,9 @@ class Dashboard extends Auth_Controller
 		parent::__construct(
 			array(
 				'index'							=> 'dashboard/admin:r',
-				'Create'						=> 'dashboard/admin:rw',
-				'Update'						=> 'dashboard/admin:rw',
-				'Delete'						=> 'dashboard/admin:rw'
+				'create'						=> 'dashboard/admin:rw',
+				'update'						=> 'dashboard/admin:rw',
+				'delete'						=> 'dashboard/admin:rw'
 			)
 		);
 		
@@ -22,7 +22,7 @@ class Dashboard extends Auth_Controller
 		$this->load->model('dashboard/Dashboard_model', 'DashboardModel');
 	}
 	
-	public function index() 
+	public function index()
 	{
 		$result = $this->DashboardModel->load();
 
@@ -36,7 +36,7 @@ class Dashboard extends Auth_Controller
 		return $this->outputJsonSuccess(getData($result) ?: []);
 	}
 	
-	public function Create() 
+	public function create()
 	{
 		$input = $this->getPostJSON();
 
@@ -52,7 +52,7 @@ class Dashboard extends Auth_Controller
 		return $this->outputJsonSuccess(getData($result) ?: []);
 	}
 	
-	public function Update() 
+	public function update()
 	{
 		$input = $this->getPostJSON();
 
@@ -68,7 +68,7 @@ class Dashboard extends Auth_Controller
 		return $this->outputJsonSuccess(getData($result) ?: []);
 	}
 	
-	public function Delete() 
+	public function delete()
 	{
 		$input = $this->getPostJSON();
 
@@ -83,5 +83,4 @@ class Dashboard extends Auth_Controller
 		
 		return $this->outputJsonSuccess(getData($result) ?: []);
 	}
-	
 }

@@ -18,9 +18,9 @@ class Config extends Auth_Controller
 				'removeWidgetFromPreset'		=> 'dashboard/admin:rw',
 				'addWidgetsToUserOverride'		=> 'dashboard/benutzer:rw',
 				'removeWidgetFromUserOverride'	=> 'dashboard/benutzer:rw',
-				'Funktionen'					=> 'dashboard/admin:r',
-				'Preset'						=> 'dashboard/admin:r',
-				'PresetBatch'					=> 'dashboard/admin:r'
+				'funktionen'					=> 'dashboard/admin:r',
+				'preset'						=> 'dashboard/admin:r',
+				'presetBatch'					=> 'dashboard/admin:r'
 			)
 		);
 		
@@ -29,7 +29,7 @@ class Config extends Auth_Controller
 		$this->load->model('ressource/Funktion_model', 'FunktionModel');
 	}
 	
-	public function index() 
+	public function index()
 	{
 		$dashboard_kurzbz = $this->input->get('db');
 		$uid = $this->AuthLib->getAuthObj()->username;
@@ -46,7 +46,7 @@ class Config extends Auth_Controller
 		$this->outputJsonSuccess($mergedconfig);
 	}
 	
-	public function genWidgetId() 
+	public function genWidgetId()
 	{
 		$dashboard_kurzbz = $this->input->get('db');
 		$widgetid = $this->DashboardLib->generateWidgetId($dashboard_kurzbz);
@@ -55,23 +55,22 @@ class Config extends Auth_Controller
 		));
 	}
 	
-	public function addWidgetsToPreset() 
+	public function addWidgetsToPreset()
 	{
 		$input = json_decode($this->input->raw_input_stream);
 		$dashboard_kurzbz = $input->db;
 		$funktion_kurzbz = $input->funktion_kurzbz;
 		
-		$preset = $this->DashboardLib->getPresetOrCreateEmptyPreset($dashboard_kurzbz, $funktion_kurzbz);		
+		$preset = $this->DashboardLib->getPresetOrCreateEmptyPreset($dashboard_kurzbz, $funktion_kurzbz);
 		
 		$preset_decoded = json_decode($preset->preset, true);
 		
-		$this->DashboardLib->addWidgetsToWidgets($preset_decoded['widgets'], 
-			$dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
+		$this->DashboardLib->addWidgetsToWidgets($preset_decoded['widgets'], $dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
 		
 		$preset->preset = json_encode($preset_decoded);
 				
 		$result = $this->DashboardLib->insertOrUpdatePreset($preset);
-		if( isError($result) ) {
+		if (isError($result)) {
 			http_response_code(500);
 			$this->terminateWithJsonError('preset could not be saved');
 		}
@@ -87,16 +86,13 @@ class Config extends Auth_Controller
 		$widgetid = $input->widgetid;
 				
 		$preset = $this->DashboardLib->getPreset($dashboard_kurzbz, $funktion_kurzbz);
-		if( $preset === null ) {
+		if ($preset === null) {
 			http_response_code(404);
-			$this->terminateWithJsonError('preset for dashboard ' 
-				. $dashboard_kurzbz . ' and funktion ' . $funktion_kurzbz 
-				. ' not found.');
+			$this->terminateWithJsonError('preset for dashboard ' . $dashboard_kurzbz . ' and funktion ' . $funktion_kurzbz . ' not found.');
 		}
 		
 		$preset_decoded = json_decode($preset->preset, true);
-		if (!$this->DashboardLib->removeWidgetFromWidgets($preset_decoded['widgets'], 
-			$funktion_kurzbz, $widgetid))
+		if (!$this->DashboardLib->removeWidgetFromWidgets($preset_decoded['widgets'], $funktion_kurzbz, $widgetid))
 		{
 			http_response_code(404);
 			$this->terminateWithJsonError('widgetid ' . $widgetid . ' not found');
@@ -104,32 +100,31 @@ class Config extends Auth_Controller
 		
 		$preset->preset = json_encode($preset_decoded);
 		$result = $this->DashboardLib->insertOrUpdatePreset($preset);
-		if( isError($result) ) 
+		if (isError($result))
 		{
 			http_response_code(500);
-			$this->terminateWithJsonError('failed to remove widget');	
+			$this->terminateWithJsonError('failed to remove widget');
 		}
 		$this->outputJsonSuccess(array('msg' => 'preset successfully updated.'));
 	}
 
-	public function addWidgetsToUserOverride() 
+	public function addWidgetsToUserOverride()
 	{
 		$input = json_decode($this->input->raw_input_stream);
 		$dashboard_kurzbz = $input->db;
 		$funktion_kurzbz = $input->funktion_kurzbz;
 		$uid = $this->AuthLib->getAuthObj()->username;
 		
-		$override = $this->DashboardLib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid);		
+		$override = $this->DashboardLib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid);
 		
 		$override_decoded = json_decode($override->override, true);
 
-		$this->DashboardLib->addWidgetsToWidgets($override_decoded['widgets'], 
-			$dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
+		$this->DashboardLib->addWidgetsToWidgets($override_decoded['widgets'], $dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
 		
 		$override->override = json_encode($override_decoded);
 				
 		$result = $this->DashboardLib->insertOrUpdateOverride($override);
-		if( isError($result) ) {
+		if (isError($result)) {
 			http_response_code(500);
 			$this->terminateWithJsonError('override could not be saved');
 		}
@@ -146,16 +141,14 @@ class Config extends Auth_Controller
 		$widgetid = $input->widgetid;
 		
 		$override = $this->DashboardLib->getOverride($dashboard_kurzbz, $uid);
-		if( empty($override) ) {
+		if (empty($override)) {
 			http_response_code(404);
-			$this->terminateWithJsonError('userconfig for dashboard ' 
-				. $dashboard_kurzbz . ' not found.');
+			$this->terminateWithJsonError('userconfig for dashboard ' . $dashboard_kurzbz . ' not found.');
 		}
 		
 		$override_decoded = json_decode($override->override, true);
 		
-		if( !$this->DashboardLib->removeWidgetFromWidgets($override_decoded['widgets'], 
-			$funktion_kurzbz, $widgetid) )
+		if (!$this->DashboardLib->removeWidgetFromWidgets($override_decoded['widgets'], $funktion_kurzbz, $widgetid))
 		{
 			http_response_code(404);
 			$this->terminateWithJsonError('widgetid ' . $widgetid . ' not found');
@@ -163,15 +156,15 @@ class Config extends Auth_Controller
 		
 		$override->override = json_encode($override_decoded);
 		$result = $this->DashboardLib->insertOrUpdateOverride($override, $uid);
-		if( isError($result) ) 
+		if (isError($result))
 		{
 			http_response_code(500);
-			$this->terminateWithJsonError('failed to remove widget');	
+			$this->terminateWithJsonError('failed to remove widget');
 		}
 		$this->outputJsonSuccess(array('msg' => 'override successfully updated.'));
 	}
 	
-	public function Funktionen()
+	public function funktionen()
 	{
 		$funktionen = $this->FunktionModel->load();
 
@@ -185,7 +178,7 @@ class Config extends Auth_Controller
 		return $this->outputJsonSuccess(getData($funktionen) ?: []);
 	}
 	
-	public function Preset()
+	public function preset()
 	{
 		$db = $this->input->get('db');
 		$funktion = $this->input->get('funktion');
@@ -198,7 +191,7 @@ class Config extends Auth_Controller
 		return $this->outputJsonSuccess(json_decode($conf->preset, true));
 	}
 	
-	public function PresetBatch()
+	public function presetBatch()
 	{
 		$db = $this->input->get('db');
 		$funktionen = $this->input->get('funktionen');
@@ -220,5 +213,4 @@ class Config extends Auth_Controller
 
 		return $this->outputJsonSuccess($result);
 	}
-	
 }

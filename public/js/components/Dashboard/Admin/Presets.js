@@ -29,6 +29,7 @@ export default {
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
 				delete widget.custom;
+				widget.preset = 1;
 				let loading = {...widget};
 				loading.loading = true;
 				this.sections.forEach(section => {
@@ -119,7 +120,7 @@ export default {
 			let funktionen = Array.from(evt.target.querySelectorAll("option:checked"),e=>e.value);
 			this.sections = [];
 			this.tmpLoading = funktionen.join('###');
-			axios.get(this.apiurl + '/Config/PresetBatch', {params: {
+			axios.get(this.apiurl + '/Config/presetBatch', {params: {
 				db: this.dashboard,
 				funktionen
 			}}).then(res => {
@@ -142,7 +143,7 @@ export default {
 		}
 	},
 	created() {
-		axios.get(this.apiurl + '/Config/Funktionen').then(res => {
+		axios.get(this.apiurl + '/Config/funktionen').then(res => {
 			//console.log(res.data.retval);
 			this.funktionen = {general: 'GENERAL'};
 			res.data.retval.forEach(funktion => {

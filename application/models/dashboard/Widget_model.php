@@ -29,5 +29,4 @@ class Widget_model extends DB_Model
 
 		return $this->loadWhere(['dashboard_kurzbz' => $db]);
 	}
-
 }
