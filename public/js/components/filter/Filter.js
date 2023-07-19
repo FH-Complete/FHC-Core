@@ -55,6 +55,7 @@ export const CoreFilterCmpt = {
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
+		tabulatorAdditionalColumns: Array,
 		tableOnly: Boolean,
 		reload: Boolean,
 		download: {
@@ -137,7 +138,10 @@ export const CoreFilterCmpt = {
 				{
 					// If the column has to be displayed or not
 					col.visible = selectedFields.indexOf(col.field) >= 0;
-					if (col.formatter == 'rowSelection')
+					if (
+						col.formatter == 'rowSelection'
+						|| (this.tabulatorAdditionalColumns && this.tabulatorAdditionalColumns.indexOf(col.title) >= 0)
+					)
 						col.visible = true;
 
 					if (col.hasOwnProperty('resizable'))
