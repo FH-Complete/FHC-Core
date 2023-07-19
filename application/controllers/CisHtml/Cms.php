@@ -5,19 +5,18 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * 
  */
-class Cms extends Auth_Controller
+class Cms extends FHC_Controller
 {
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
-		parent::__construct([
-			'content' => 'user:r',
-			'news' => 'user:r'
-		]);
+		parent::__construct();
 
 		// Loads Libraries
+		$this->load->library('AuthLib');
+		$this->load->library('PermissionLib');
 		$this->load->library('CmsLib');
 
 		// Loads phrases system
