@@ -103,7 +103,7 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 	</div>
-	<div v-else-if="!hidden || editMode" :class="'dashboard-item card overflow-hidden h-100 ' + (arguments && arguments.className ? arguments.className : '')">
+	<div v-else-if="!hidden || editMode" class="dashboard-item card overflow-hidden h-100" :class="arguments && arguments.className ? arguments.className : ''">
 		<div v-if="editMode && widget" class="card-header d-flex ps-0 pe-2">
 			<span drag-action="move" class="col-auto mx-2 px-2 cursor-move"><i class="fa-solid fa-grip-vertical"></i></span>
 			<span class="col">{{ widget.setup.name }}</span>
