@@ -144,6 +144,34 @@ var IssuesKonfiguration = {
 			}
 		);
 	},
+	deleteKonfigurationsWerte: function(konfigurationstyp_kurzbz, fehlercode, konfigurationsWert)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			'system/issues/IssuesKonfiguration/deleteKonfigurationsWerte',
+			{
+				konfigurationstyp_kurzbz: konfigurationstyp_kurzbz,
+				fehlercode: fehlercode,
+				konfigurationsWert: konfigurationsWert
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t('fehlermonitoring', 'konfigurationGeloescht'))
+						// reload dataset to see change
+						IssuesKonfiguration._reloadKonfigurationOverview();
+					}
+					else
+					{
+						FHC_DialogLib.alertError(FHC_PhrasesLib.t('fehlermonitoring', 'konfigurationGeloeschtFehler'));
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
 	deleteKonfiguration: function(konfigurationstyp_kurzbz, fehlercode)
 	{
 		FHC_AjaxClient.ajaxCallPost(
@@ -229,11 +257,23 @@ $(document).ready(function() {
 		}
 	);
 
-	// get new fehlercodes each time app is changed
+	// set assign configuration event
 	$("#assignKonfiguration").click(
 		function()
 		{
 			IssuesKonfiguration.saveFehlerKonfiguration(
+				$("#"+FEHLERKONFIGURATIONSTYP_DROPDOWN_ID).val(),
+				$("#"+FEHLERCODE_DROPDOWN_ID).val(),
+				$("#konfigurationsWert").val()
+			);
+		}
+	);
+
+	// set delete configuration event
+	$("#deleteKonfiguration").click(
+		function()
+		{
+			IssuesKonfiguration.deleteKonfigurationsWerte(
 				$("#"+FEHLERKONFIGURATIONSTYP_DROPDOWN_ID).val(),
 				$("#"+FEHLERCODE_DROPDOWN_ID).val(),
 				$("#konfigurationsWert").val()

@@ -14,10 +14,10 @@ class CORE_INOUT_0008 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('issues/PlausicheckLib');
+		$this->_ci->load->library('issues/plausichecks/IncomingOhneIoDatensatz');
 
 		// check if issue persists
-		$checkRes = $this->_ci->plausichecklib->getIncomingOhneIoDatensatz(null, $params['prestudent_id']);
+		$checkRes = $this->_ci->incomingohneiodatensatz->getIncomingOhneIoDatensatz(null, $params['prestudent_id']);
 
 		if (isError($checkRes)) return $checkRes;
 
