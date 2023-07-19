@@ -1,4 +1,6 @@
 const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
+const CONTROLLER_URL = BASE_URL + '/' + CALLED_PATH;
 const APPROVE_ANRECHNUNG_DETAIL_URI = "lehre/anrechnung/ApproveAnrechnungDetail";
 
 const ANRECHNUNGSTATUS_PROGRESSED_BY_STGL = 'inProgressDP';
@@ -53,6 +55,12 @@ function hf_filterTrueFalse(headerValue, rowValue){
     {
         return rowValue == null;
     }
+}
+
+// Filters schreibberechtigt boolean values
+function hf_schreibberechtigt(headerValue, rowValue){
+
+    return rowValue == headerValue.toString();
 }
 
 // Adds column details
@@ -171,19 +179,22 @@ function func_selectableCheck(row){
 // data = selected data, rows = selected rows
 function func_rowSelectionChanged(data, rows){
 
-    // Sum up over all anzurechnenden LV-ECTS by Prestudent
-    selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
+    if (tabulator != null)
+    {
+        // Sum up over all anzurechnenden LV-ECTS by Prestudent
+        selectedPrestudentWithAccumulatedLvEcts = approveAnrechnung.getSumLvEctsByPreStudent(data);
 
-    // Loop through all active rows
-    var rowManager = tabulator.rowManager;
-    for (var i = 0; i < rowManager.activeRows.length; i++) {
+        // Loop through all active rows
+        var rowManager = tabulator.rowManager;
+        for (var i = 0; i < rowManager.activeRows.length; i++) {
 
-        // Reinitialize row -> triggers formatters.
-        rowManager.activeRows[i].reinitialize();
+            // Reinitialize row -> triggers formatters.
+            rowManager.activeRows[i].reinitialize();
+        }
+
+        // Show number of selected rows.
+        approveAnrechnung.showNumberSelectedRows(rows);
     }
-
-    // Show number of selected rows.
-    approveAnrechnung.showNumberSelectedRows(rows);
 }
 
 // Returns tooltip
@@ -201,6 +212,18 @@ var format_empfehlung_anrechnung = function(cell, formatterParams){
         : (cell.getValue() ==  'true')
             ? FHC_PhrasesLib.t("ui", "ja")
             : FHC_PhrasesLib.t("ui", "nein");
+}
+
+/**
+ * Returns formatter params for field dokument_bezeichnung (= Spalte Nachweisdokumente)
+ * NOTE: Returning a formatter param object fixes the problem, that tabulator did not know the url after refreshing the page.
+ */
+function paramLookup_dokBez(cell){
+    return {
+        labelField: 'dokument_bezeichnung',
+        url: CONTROLLER_URL + '/download?dms_id=' + cell.getData().dms_id,
+        target: '_blank'
+    }
 }
 
 /*
@@ -556,12 +579,8 @@ $(function(){
             }
         }
 
-        selected_data.map(function(data){
-            // reduce to necessary fields
-            return {
-                'anrechnung_id' : data.anrechnung_id,
-            }
-        });
+        // Reduce to necessary fields
+        selected_data = selected_data.map(data => ({'anrechnung_id' : data.anrechnung_id}));
 
         // Alert and exit if no anrechnung is selected
         if (selected_data.length == 0)
@@ -570,14 +589,9 @@ $(function(){
             return;
         }
 
-        // Prepare data object for ajax call
-        let data = {
-            'data': selected_data
-        };
-
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/requestRecommendation",
-            data,
+            {data: selected_data},
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
@@ -603,14 +617,14 @@ $(function(){
                             // Print success message
                             FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("ui", "empfehlungWurdeAngefordert"));
                         }
+
+                        //Update status 'genehmigt'
+                        $('#tableWidgetTabulator').tabulator('updateData', data);
+
+                        // Deselect rows
+                        var indexesToDeselect = data.map(x => x.anrechnung_id);
+                        $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
                     }
-
-                    //Update status 'genehmigt'
-                    $('#tableWidgetTabulator').tabulator('updateData', data);
-
-                    // Deselect rows
-                    var indexesToDeselect = data.map(x => x.anrechnung_id);
-                    $("#tableWidgetTabulator").tabulator('deselectRow', indexesToDeselect);
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
@@ -687,8 +701,8 @@ var approveAnrechnung = {
         // Find closest textarea
         let textarea = $(elem).closest('div').find('textarea');
 
-        // Copy begruendung into textarea
-        textarea.val($.trim($(elem).parent().text()));
+        // Copy begruendung into textarea and set focus
+        textarea.val($.trim($(elem).parent().text())).focus();
     },
     focusFilterbuttonIfTableStartsWithStoredFilter(filters){
         switch (filters[0].value) {
@@ -728,7 +742,7 @@ var approveAnrechnung = {
     getSumLvEctsByPreStudent(data){
 
         var result = [];
-        
+
         // Berechne für jeden Prestudenten die kumulierte Summe aller selektierten LV ECTS
         data.reduce((prev, curr) => {
 

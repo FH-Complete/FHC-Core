@@ -73,7 +73,7 @@ $(document).ready(function()
 								{ 
 									// Add select menu to this column 
 									6 : { 
-									"Ja" : function(e, n, f, i, $r, c, data) { return /Ja/.test(e); }, 
+									"Ja" : function(e, n, f, i, $r, c, data) { return e == "Ja" || e == "" },
 									"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
 									}, 
 									7 : { 
@@ -182,7 +182,7 @@ $(document).ready(function()
 </head>
 
 <body class="background_main" onload="document.getElementById(\'searchbox\').focus()">
-<h2>Benutzerberechtigungen Übersicht</h2>';
+<h2>Berechtigungen Übersicht</h2>';
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -229,7 +229,7 @@ $htmlstr='
 		<div id="erweitertesuche">
 		<hr>
 		<form accept-charset="UTF-8" name="searchrechte" method="GET">
-			Berechtigung:
+			Rechte:
 			<select id="berechtigung_kurzbz" name="berechtigung_kurzbz">
 				<option value=""></option>';
 			$berechtigung = new berechtigung();
@@ -251,7 +251,7 @@ $htmlstr='
 			<select id="rolle_kurzbz" name="rolle_kurzbz">
 				<option value=""></option>';
 			$rollen = new berechtigung();
-			$rollen->getRollen();
+			$rollen->getRollen('rolle_kurzbz');
 			foreach($rollen->result as $rolle)
 			{
 				if ($rolle_kurzbz == $rolle->rolle_kurzbz)
@@ -361,7 +361,15 @@ if($berechtigung_kurzbz != '')
 		{
 			$htmlstr .= "<h3>".$berechtigung_kurzbz."</h3>\n";
 			$htmlstr .= "<table id='t2' class='tablesorter'><thead><tr>\n";
-			$htmlstr .= "<th>Rolle</th><th>Funktion</th><th>Nachname</th><th>Vorname</th><th>UID</th><th>Art</th><th>Benutzer Aktiv</th><th>Status</th><th>Aktion</th>"; 
+			$htmlstr .= "<th>Rolle</th>
+							<th>Funktion</th>
+							<th>Nachname</th>
+							<th>Vorname</th>
+							<th>UID</th>
+							<th>Art</th>
+							<th data-value='Ja'>Benutzer Aktiv</th>
+							<th data-value='Aktiv'>Status</th>
+							<th>Aktion</th>";
 			$htmlstr .= "</tr></thead><tbody>\n";
 	
 			foreach($berechtigungen->result as $row)
@@ -554,8 +562,8 @@ if($rolle_kurzbz != '')
 						<th>Vorname</th>
 						<th>UID</th>
 						<th>Art</th>
-						<th>Benutzer Aktiv</th>
-						<th>Status</th>
+						<th data-value='Ja'>Benutzer Aktiv</th>
+						<th data-value='Aktiv'>Status</th>
 						<th>Aktion</th>";
 		$htmlstr .= "</tr></thead><tbody>\n";
 

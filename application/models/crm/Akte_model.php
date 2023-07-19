@@ -171,7 +171,7 @@ class Akte_model extends DB_Model
 	 * @param bool $nachgereicht if true, retrieves only nachgereichte Dokumente. if false, only not nachgereichte. default: null, all Dokumente
 	 * @return array
 	 */
-	public function getAktenWithDokInfo($person_id, $dokument_kurzbz = null, $nachgereicht = null)
+	public function getAktenWithDokInfo($person_id, $dokument_kurzbz = null, $nachgereicht = null, $archiv = null)
 	{
 		$this->addSelect('public.tbl_akte.*, bezeichnung_mehrsprachig, dokumentbeschreibung_mehrsprachig, public.tbl_dokument.bezeichnung as dokument_bezeichnung, bis.tbl_nation.*, ausstellungsdetails');
 		$this->addJoin('public.tbl_dokument', 'dokument_kurzbz');
@@ -183,6 +183,9 @@ class Akte_model extends DB_Model
 			$where['dokument_kurzbz'] = $dokument_kurzbz;
 		if(is_bool($nachgereicht))
 			$where['nachgereicht'] = $nachgereicht;
+
+		if (is_bool($archiv))
+			$where['archiv'] = $archiv;
 
 		$dokumente = $this->loadWhere($where);
 

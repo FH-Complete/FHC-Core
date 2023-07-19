@@ -821,7 +821,16 @@ if(!$error)
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
 				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt'];
-				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				// Die Master-ZGV darf nur mit einem eigenen Recht geändert werden
+				if($rechte->isBerechtigt('student/editMakkZgv',$_POST['studiengang_kz'],'suid'))
+				{
+					$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				}
+				elseif ($prestudent->zgvmas_code != $_POST['zgvmas_code'])
+				{
+					$errormsg = 'Keine Berechtigung zum Ändern der ZGV';
+					$error = true;
+				}
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
@@ -1788,7 +1797,13 @@ if(!$error)
 														$stg = $prestd->studiengang_kz;
 														$stg_obj = new studiengang();
 														$stg_obj->load(ltrim($stg,'0'));
-														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
+
+														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
+														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
+														$nachname_clean = str_replace(' ','_', $nachname_clean);
+														$vorname_clean = str_replace(' ','_', $vorname_clean);
+
+														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr,$vorname_clean,$nachname_clean);
 														$matrikelnummer = generateMatrikelnr($stg_obj->oe_kurzbz);
 
 														if($matrikelnummer != null)
@@ -1813,11 +1828,6 @@ if(!$error)
 														$benutzer->person_id = $prestd->person_id;
 														$benutzer->aktiv = true;
 														$benutzer->aktivierungscode = generateActivationKey();
-
-														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
-														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
-														$nachname_clean = str_replace(' ','_', $nachname_clean);
-														$vorname_clean = str_replace(' ','_', $vorname_clean);
 
 														if(!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT===true)
 														{
@@ -2499,7 +2509,23 @@ if(!$error)
 		}
 
 		if($exists)
+		{
 			$return = true;
+			$zusatz = "\n";
+			if (count($exists) > 10)
+			{
+				$zusatz .= "und ";
+				$persons = implode("\n- ", array_slice($exists, 0, 10));
+				if (count($exists) === 11)
+					$zusatz .= "einer weiteren Person.";
+				else
+					$zusatz .= (count($exists) - 10) . " weiteren Personen.";
+			}
+			else
+				$persons = implode("\n- ", $exists);
+
+			$data = "Es ist bereits eine Buchung vorhanden:\n- ". $persons  . $zusatz ." Trotzdem fortfahren?";
+		}
 		else
 			$return = false;
 	}

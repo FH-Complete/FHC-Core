@@ -15,15 +15,11 @@ const STGFREIGABE_MESSAGE_VORLAGE_ANDERES_SEMESTER = "InfocenterSTGfreigegebenSe
 //Statusgründe for which no Studiengang Freigabe Message should be sent
 const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
 
-const PARKEDNAME = 'parked';
-const ONHOLDNAME = 'onhold';
-
 /**
  * javascript file for infocenterDetails page
  */
 $(document).ready(function ()
 {
-
 	InfocenterDetails._formatMessageTable();
 	InfocenterDetails._formatNotizTable();
 	InfocenterDetails._formatLogTable();
@@ -88,7 +84,7 @@ $(document).ready(function ()
 	);
 
 	//check if person is postponed (parked, on hold...) and display it
-	InfocenterDetails.getPostponeDate(personid);
+	Rueckstellung.get(personid);
 
 	if ($(document).scrollTop() > 20)
 		$("#scrollToTop").show();
@@ -150,6 +146,12 @@ var InfocenterDetails = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						var prestudent = data.retval[0];
+
+						if (prestudent.zgv_code === null && prestudent.zgvmas_code === null)
+						{
+							btn.after("<span id='zgvUebernehmenNotice' class='text-warning'>&nbsp;&nbsp;keine ZGV vorhanden</span>");
+						}
+
 						var zgvcode = prestudent.zgv_code !== null ? prestudent.zgv_code : "null";
 						var zgvort = prestudent.zgvort !== null ? prestudent.zgvort : "";
 						var zgvdatum = prestudent.zgvdatum;
@@ -183,7 +185,7 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						btn.after("&nbsp;&nbsp;<span id='zgvUebernehmenNotice' class='text-warning'>keine ZGV vorhanden</span>");
+						btn.after("<span id='zgvUebernehmenNotice' class='text-warning'>&nbsp;&nbsp;Fehler beim Laden der Daten</span>");
 					}
 				},
 				errorCallback: function()
@@ -363,155 +365,6 @@ var InfocenterDetails = {
 				errorCallback: function()
 				{
 					InfocenterDetails._notizError('fehlerBeimSpeichern');
-				},
-				veilTimeout: 0
-			}
-		);
-	},
-	getStudienjahrEnd: function()
-	{
-		FHC_AjaxClient.ajaxCallGet(
-			CALLED_PATH + "/getStudienjahrEnd",
-			null,
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-					{
-						var engdate = $.datepicker.parseDate("yy-mm-dd", FHC_AjaxClient.getData(data)[0]);
-
-						if (engdate.getDate() === 31)
-							engdate.setDate(engdate.getDate() - 1);
-						engdate.setMonth(engdate.getMonth() + 3);
-
-						var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
-						$("#postponedate").val(gerdate);
-					}
-				},
-				errorCallback: function()
-				{
-					FHC_DialogLib.alertError("error when getting Studienjahr end");
-				},
-				veilTimeout: 0
-			}
-		);
-	},
-	getPostponeDate: function(personid)
-	{
-		FHC_AjaxClient.ajaxCallGet(
-			CALLED_PATH + "/getPostponeDate/"+encodeURIComponent(personid),
-			null,
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-					{
-						var postponeobj = FHC_AjaxClient.getData(data);
-						InfocenterDetails._refreshPostpone(postponeobj);
-						InfocenterDetails._refreshLog();
-						if (postponeobj === null || postponeobj.type === null)
-							InfocenterDetails.getStudienjahrEnd();
-					}
-				},
-				errorCallback: function()
-				{
-					FHC_DialogLib.alertError("error when getting parked status");
-				},
-				veilTimeout: 0
-			}
-		);
-	},
-	parkPerson: function(personid, date)
-	{
-		var parkError = function(){
-			$("#postponemsg").text("   Fehler beim Parken!");
-		};
-
-		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + '/park',
-			{
-				"person_id": personid,
-				"parkdate": date
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-						InfocenterDetails.getPostponeDate(personid);
-					else
-					{
-						parkError();
-					}
-				},
-				errorCallback: parkError,
-				veilTimeout: 0
-			}
-		);
-	},
-	unparkPerson: function(personid)
-	{
-		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + '/unpark',
-			{
-				"person_id": personid
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-					{
-						InfocenterDetails.getPostponeDate(personid);
-					}
-					else
-						$("#unpostponemsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumAusparken'));
-				},
-				errorCallback: function(){
-					$("#unpostponemsg").removeClass().addClass("text-danger").text(FHC_PhrasesLib.t('infocenter', 'fehlerBeimAusparken'));
-				},
-				veilTimeout: 0
-			}
-		);
-	},
-	setPersonOnHold: function(personid, date)
-	{
-		var onHoldError = function(){
-			$("#postponemsg").text("   Fehler beim Setzen auf On Hold!");
-		};
-
-		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + '/setOnHold',
-			{
-				"person_id": personid,
-				"onholddate": date
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-						InfocenterDetails.getPostponeDate(personid);
-					else
-					{
-						onHoldError();
-					}
-				},
-				errorCallback: onHoldError,
-				veilTimeout: 0
-			}
-		);
-	},
-	removePersonOnHold: function(personid)
-	{
-		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + '/removeOnHold',
-			{
-				"person_id": personid
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data))
-					{
-						InfocenterDetails.getPostponeDate(personid);
-					}
-					else
-						$("#unpostponemsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumEntfernen'));
-				},
-				errorCallback: function(){
-					$("#unpostponemsg").removeClass().addClass("text-danger").text(FHC_PhrasesLib.t('infocenter', 'fehlerBeimEntfernen'));
 				},
 				veilTimeout: 0
 			}
@@ -936,97 +789,6 @@ var InfocenterDetails = {
 				InfocenterDetails._formatNotizTable()
 			}
 		);
-	},
-	_refreshPostpone: function(postponeobj)
-	{
-		var personid = $("#hiddenpersonid").val();
-		if (postponeobj === null || postponeobj.date === null || postponeobj.type === null)
-		{
-			//show both park and on hold buttons if not parked and not on hold
-			$("#postponing").html(
-				'<div class="form-group form-inline">'+
-					'<button class="btn btn-default" id="parklink" type="button""><i class="fa fa-clock-o"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberParken') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-					'<button class="btn btn-default" id="onholdlink" type="button""><i class="fa fa-anchor"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberOnHold') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-					'<label id="postponedatelabel">'+FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
-					'<input id="postponedate" type="text" class="form-control" placeholder="Parkdatum">&nbsp;'+
-					'<i class="fa fa-info-circle"  data-toggle="tooltip" title="'+FHC_PhrasesLib.t('infocenter', 'parkenZurueckstellenInfo')+'"></i></label>'+
-					'<span class="text-danger" id="postponemsg"></span>'+
-				'</div>');
-
-			$("#postponedate").datepicker({
-				"dateFormat": "dd.mm.yy",
-				"minDate": 1
-			});
-
-			$("#parklink").click(
-
-				function ()
-				{
-					var date = $("#postponedate").val();
-					InfocenterDetails.parkPerson(personid, date);
-				}
-			);
-
-			$("#onholdlink").click(
-
-				function ()
-				{
-					var date = $("#postponedate").val();
-					InfocenterDetails.setPersonOnHold(personid, date);
-				}
-			);
-		}
-		else
-		{
-			//info if parked/on hold and possibility to undo parking/on hold
-			var postponedate = $.datepicker.parseDate("yy-mm-dd", postponeobj.date);
-			var gerpostponedate = $.datepicker.formatDate("dd.mm.yy", postponedate);
-
-			//var postponehtml = "";
-			var callbackforundo = null;
-			var removePhrase = "";
-			var postponedPhrase = "";
-			var postponedtext = "";
-
-			if (postponeobj.type === PARKEDNAME)
-			{
-				removePhrase = 'bewerberAusparken';
-				postponedtext = FHC_PhrasesLib.t('infocenter', 'bewerberGeparktBis')+'&nbsp;&nbsp;'+gerpostponedate;
-
-				callbackforundo = function ()
-				{
-					InfocenterDetails.unparkPerson(personid);
-				}
-			}
-			else if (postponeobj.type === ONHOLDNAME)
-			{
-				removePhrase = 'bewerberOnHoldEntfernen';
-				postponedtext = FHC_PhrasesLib.t('infocenter', 'bewerberOnHoldBis')+'&nbsp;&nbsp;'+gerpostponedate;
-
-				var currdate = new Date();
-
-				if (currdate > postponedate)
-					postponedtext = "<span class='alert-danger' data-toggle='tooltip' title='"+FHC_PhrasesLib.t('infocenter', 'rueckstelldatumUeberschritten')+"'>"+postponedtext+"</span>";
-
-				callbackforundo = function ()
-				{
-					InfocenterDetails.removePersonOnHold(personid);
-				}
-			}
-
-			var postponehtml = postponedtext+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-				'<button class="btn btn-default" id="unpostponelink"><i class="fa fa-sign-out"></i>&nbsp;'+FHC_PhrasesLib.t('infocenter', removePhrase)+'</button>&nbsp;'+
-				'<span id="unpostponemsg"></span>';
-
-
-			$("#postponing").html(
-				postponehtml
-			);
-
-			$("#unpostponelink").click(
-				callbackforundo
-			);
-		}
 	},
 	_formatMessageTable: function()
 	{

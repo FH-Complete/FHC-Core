@@ -40,7 +40,9 @@ $filters = array(
 					{"name": "User/Operator"},
 					{"name": "InfoCenterMitarbeiter"},
 					{"name": "LockUser"},
-					{"name": "OnholdDate"}
+					{"name": "HoldDate"},
+					{"name": "Rueckstellgrund"},
+					{"name": "Kaution"}
 				],
 				"filters": [
 					{
@@ -511,13 +513,14 @@ $filters = array(
 			{
 				"name": "Abgewiesen - Alle",
 				"columns": [
-					{"name": "PersonID"},
+					{"name": "PersonId"},
 					{"name": "PreStudentID"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
-					{"name": "Nachricht"}
+					{"name": "Nachricht"},
+					{"name": "Kaution"}
 				],
 				"filters": []
 			}
@@ -1111,12 +1114,78 @@ $filters = array(
 					{"name": "Standardkostenstelle"}
 				],
 				"filters": [
-					{                              
-					"name": "Nachname",      
-					"option": "",            
-					"condition": "",         
-					"operation": ""          
-					}    
+					{
+					"name": "Nachname",
+					"option": "",
+					"condition": "",
+					"operation": ""
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'personalIssueViewer',
+		'filter_kurzbz' => 'offeneFehlerPersonal',
+		'description' => '{Alle offenen Fehler}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle offenen Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Statuscode"}
+				],
+				"filters": [
+					{
+						"name": "Statuscode",
+						"operation": "ncontains",
+						"condition": "resolved"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'personalIssueViewer',
+		'filter_kurzbz' => 'FehlerLetzte7TageBearbeitetPersonal',
+		'description' => '{Letzten 7 Tage bearbeitet}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Statuscode"},
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
+				],
+				"filters": [
+					{
+						"name": "Verarbeitet am",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					},
+					{
+						"name": "Statuscode",
+						"operation": "contains",
+						"condition": "resolved"
+					}
 				]
 			}
 		',
@@ -1139,6 +1208,28 @@ $filters = array(
 					{"name": "nachname"},
 					{"name": "oe_bezeichnung"},
 					{"name": "funktion_beschreibung"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'fehlerKonfiguration',
+		'filter_kurzbz' => 'fehlerKonfiguration',
+		'description' => '{Fehler Konfiguration}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehler Konfiguration",
+				"columns": [
+					{"name": "konfigurationstyp_kurzbz"},
+					{"name": "fehlercode"},
+					{"name": "fehler_kurzbz"},
+					{"name": "konfiguration"},
+					{"name": "app"}
 				],
 				"filters": []
 			}
