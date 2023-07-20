@@ -94,6 +94,11 @@ class Abmeldung extends FHC_Controller
 		if ($data->typ !== Studierendenantrag_model::TYP_ABMELDUNG_STGL && $data->typ !== Studierendenantrag_model::TYP_ABMELDUNG)
 			return show_404();
 
+		$data->canCancel = (
+			$data->status == Studierendenantragstatus_model::STATUS_CREATED &&
+			$this->antraglib->isEntitledToCancelAntrag($data->studierendenantrag_id)
+		);
+
 		$this->outputJsonSuccess($data);
 	}
 
