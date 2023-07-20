@@ -20429,6 +20429,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_A_Student',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unsubscribe released',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
 		'phrase' => 'mail_subject_A_Stgl',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -20530,6 +20550,26 @@ array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
 		'phrase' => 'mail_subject_W_Approve',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholung von Studiengangsleitung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repetition approved by course director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_W_Student',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(

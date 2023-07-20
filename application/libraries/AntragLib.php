@@ -180,8 +180,7 @@ class AntragLib
 						// NOTE(chris): Sancho mail
 						sendSanchoMail($vorlage, $data, $prestudent_status->email, $subject);
 					}
-				}
-				if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
+				} else { // ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL)
 					$result = $this->_ci->PrestudentstatusModel->getLastStatus($antrag->prestudent_id, '', 'Student');
 					if (isError($result))
 					{
@@ -206,33 +205,35 @@ class AntragLib
 						$errors[] = getError($result);
 						continue;
 					}
+				}
 
+				$res = $this->_ci->PrestudentModel->load($antrag->prestudent_id);
 
-					$res = $this->_ci->PrestudentModel->load($antrag->prestudent_id);
-
+				if (hasData($res)) {
+					$prestudent = current(getData($res));
+					$res = $this->_ci->PersonModel->load($prestudent->person_id);
 					if (hasData($res)) {
-						$prestudent = current(getData($res));
-						$res = $this->_ci->PersonModel->load($prestudent->person_id);
-						if (hasData($res)) {
-							$person = current(getData($res));
-							$name = trim($person->vorname . ' ' . $person->nachname);
-						} else {
-							$name = $this->_ci->p->t('person', 'studentIn');
-						}
-						$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
-						if (hasData($res)) {
-							$kontakt = current(getData($res));
-							$email = $kontakt->kontakt;
-							sendSanchoMail(
-								'Sancho_Mail_Antrag_A_Stgl',
-								[
-									'name' => $name,
-									'grund' => $antrag->grund
-								],
-								$email,
-								$this->_ci->p->t('studierendenantrag', 'mail_subject_A_Stgl')
-							);
-						}
+						$person = current(getData($res));
+						$name = trim($person->vorname . ' ' . $person->nachname);
+					} else {
+						$name = $this->_ci->p->t('person', 'studentIn');
+					}
+					$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
+					if (hasData($res)) {
+						$kontakt = current(getData($res));
+						$email = $kontakt->kontakt;
+						$vorlage = $antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG ? 'Student' : 'Stgl';
+
+						// NOTE(chris): Sancho mail
+						sendSanchoMail(
+							'Sancho_Mail_Antrag_A_' . $vorlage,
+							[
+								'name' => $name,
+								'grund' => $antrag->grund
+							],
+							$email,
+							$this->_ci->p->t('studierendenantrag', 'mail_subject_A_' . $vorlage)
+						);
 					}
 				}
 			}
@@ -250,8 +251,9 @@ class AntragLib
 	 *
 	 * @return stdClass
 	 */
-	public function denyObjectionAbmeldung($studierendenantrag_id, $insertvon)
+	public function denyObjectionAbmeldung($studierendenantrag_id, $insertvon, $grund = null)
 	{
+		// TODO(chris): grund?
 		$result = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
 		if (isError($result))
 		{
@@ -277,6 +279,7 @@ class AntragLib
 		$result = $this->_ci->StudierendenantragstatusModel->insert([
 			'studierendenantrag_id' => $studierendenantrag_id,
 			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
+			'grund' => $grund,
 			'insertvon' => $insertvon
 		]);
 		if (isError($result))
@@ -303,11 +306,10 @@ class AntragLib
 					$kontakt = current(getData($res));
 					$email = $kontakt->kontakt;
 					sendSanchoMail(
-						// TODO(chris): Vorlage erstellen
-						'Sancho_Mail_Antrag_A_ObjectionDenied',
+						'Sancho_Mail_Antrag_A_ObjDenied',
 						[
 							'name' => $name,
-							'grund' => $antrag->grund
+							'grund' => $grund
 						],
 						$email,
 						$this->_ci->p->t('studierendenantrag', 'mail_subject_A_ObjectionDenied')
@@ -1407,8 +1409,8 @@ class AntragLib
 			return $result;
 		if (!hasData($result))
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_person_prestudent', ['prestudent_id' => $prestudent_id]));
-		$result = current(getData($result));
-		$student = trim($result->vorname . ' ' . $result->nachname);
+		$person = current(getData($result));
+		$student = trim($person->vorname . ' ' . $person->nachname);
 
 		$result = $this->_ci->PersonModel->getFullName($insertvon);
 		if (isError($result))
@@ -1433,6 +1435,27 @@ class AntragLib
 			$this->_ci->p->t('studierendenantrag', 'mail_subject_W_Approve')
 		))
 			return error($this->_ci->p->t('studierendenantrag', 'error_mail_to', ['email' => $email]));
+
+		$result = $this->_ci->KontaktModel->getZustellKontakt($person->person_id, ['email']);
+		if (hasData($result)) {
+			$kontakt = current(getData($result));
+			$email = $kontakt->kontakt;
+			
+			// NOTE(chris): Sancho mail
+			sendSanchoMail(
+				'Sancho_Mail_Antrag_W_Student',
+				[
+					'antrag_id' => $antrag_id,
+					'stg' => $stg->bezeichnung,
+					'sem' => $semester,
+					'mitarbeiter' => $mitarbeiter,
+					'name' => $student
+				],
+				$email,
+				$this->_ci->p->t('studierendenantrag', 'mail_subject_W_Student')
+			);
+		}
+
 
 		return success();
 	}
