@@ -33,29 +33,14 @@ $this->load->view(
 			<?php if ($antraege) { ?>
 				<?php foreach($antraege as $prestudent_id => $array){ ?>
 					<h4><?= $array['bezeichnungStg']; ?> (<?= $array['bezeichnungOrgform']; ?>)</h4>
-					<?php switch(count($array['allowedNewTypes'])) {
-						case 0: ?>
-							<button class="btn btn-outline-secondary" type="button" disabled>
-								<i class="fa-regular fa-plus fa-xl"></i> <?= $this->p->t('studierendenantrag', 'btn_new'); ?>
-							</button>
-							<?php
-							break;
-						case 1:
-						?>
-							<a class="btn btn-outline-secondary" href="<?= site_url('lehre/Studierendenantrag/' . strtolower($array['allowedNewTypes'][0]) . '/' . $prestudent_id); ?>"><i class="fa-regular fa-plus fa-xl"></i> <?= $array['allowedNewTypes'][0]; ?> <?= $this->p->t('studierendenantrag', 'btn_new'); ?></a>
-							<?php
-							break;
-						default:
-						?>
-						<div class="dropdown">
-							<button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-								<i class="fa-regular fa-plus fa-xl"></i> <?= $this->p->t('studierendenantrag', 'btn_new'); ?>
-							</button>
-							<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-								<?php foreach($array['allowedNewTypes'] as $type){ ?>
-									<li><a class="dropdown-item" href="<?= site_url('lehre/Studierendenantrag/' . strtolower($type) . '/' . $prestudent_id); ?>"><?= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); ?></a></li>
-								<?php } ?>
-							</ul>
+
+					<?php foreach ($array['allowedNewTypes'] as $type) { ?>
+						<div class="alert alert-secondary">
+							<p><?= $this->p->t('studierendenantrag', 'calltoaction_' . $type); ?></p>
+							<hr>
+							<a href="<?= site_url('lehre/Studierendenantrag/' . strtolower($type) . '/' . $prestudent_id); ?>" class="btn btn-outline-secondary">
+								<i class="fa-regular fa-plus fa-xl"></i> <?= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); ?>
+							</a>
 						</div>
 					<?php } ?>
 
