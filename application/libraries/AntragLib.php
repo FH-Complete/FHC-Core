@@ -1545,7 +1545,16 @@ class AntragLib
 	 */
 	public function isEntitledToCancelAntrag($antrag_id)
 	{
-		return $this->isOwnAntrag($antrag_id);
+		$result = $this->_ci->StudierendenantragModel->load($antrag_id);
+		if (!hasData($result))
+			return false;
+		$antrag = current(getData($result));
+
+		if ($antrag->typ != Studierendenantrag_model::TYP_ABMELDUNG_STGL)
+			return $this->isOwnAntrag($antrag_id);
+		
+		// TODO(chris): assistenz can not cancel - should they be able to?
+		return false;
 	}
 
 	/**
