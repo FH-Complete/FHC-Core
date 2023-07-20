@@ -160,6 +160,7 @@ class AntragJob extends JOB_Controller
 
 			$data['table'] = $data['table_' . DEFAULT_LANGUAGE];
 
+			// NOTE(chris): Sancho mail
 			if (sendSanchoMail("Sancho_Mail_Antrag_Stgl", $data, $leitung['Details']->uid . '@' . DOMAIN, 'Anträge - Aktion(en) erforderlich'))
 				$count++;
 		}
