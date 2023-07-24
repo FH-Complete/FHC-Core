@@ -29,7 +29,7 @@ class Wiederholung extends Auth_Controller
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Public methods
-	public function assistenz($antrag_id, $frame = false)
+	public function assistenz($antrag_id)
 	{
 
 		$result = $this->antraglib->getDetailsForAntrag($antrag_id);
@@ -42,8 +42,7 @@ class Wiederholung extends Auth_Controller
 
 		$this->load->view('lehre/Antrag/Wiederholung/Student', [
 			'antrag_id' => $antrag_id,
-			'antrag' => getData($result),
-			'frame' => $frame
+			'antrag' => getData($result)
 		]);
 	}
 }

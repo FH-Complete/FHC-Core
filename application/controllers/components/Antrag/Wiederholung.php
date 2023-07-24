@@ -67,7 +67,7 @@ class Wiederholung extends FHC_Controller
 		$result = $result->retval;
 		if (!$result) {
 			$this->output->set_status_header(REST_Controller::HTTP_FORBIDDEN);
-			return $this->outputJsonError($this->p->t('studierendenantrag','error_no_student_no_failed_exam'));
+			return $this->outputJsonError($this->p->t('studierendenantrag', 'error_no_student_no_failed_exam'));
 		}
 		elseif ($result == -1)
 		{
@@ -97,7 +97,9 @@ class Wiederholung extends FHC_Controller
 
 			$result = getData($result);
 			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-			return $this->outputJsonError($this->p->t('studierendenantrag', 'error_antrag_pending', ['typ' => $this->p->t('studierendenantrag','antrag_typ_' . $result->typ)]));
+			return $this->outputJsonError($this->p->t('studierendenantrag', 'error_antrag_pending', [
+                'typ' => $this->p->t('studierendenantrag', 'antrag_typ_' . $result->typ)
+            ]));
 		}
 		elseif ($result == -3)
 		{
@@ -217,7 +219,9 @@ class Wiederholung extends FHC_Controller
 			return [
 				'studierendenantrag_id' => $lv->studierendenantrag_id,
 				'lehrveranstaltung_id' => $lv->lehrveranstaltung_id,
-				'note' => $lv->zugelassen ? ($lv->zugelassen == 1 ? 0 : $this->config->item('wiederholung_note_angerechnet')) : $this->config->item('wiederholung_note_nicht_zugelassen'),
+				'note' => $lv->zugelassen
+                    ? ($lv->zugelassen == 1 ? 0 : $this->config->item('wiederholung_note_angerechnet'))
+                    : $this->config->item('wiederholung_note_nicht_zugelassen'),
 				'anmerkung' => $lv->anmerkung,
 				'insertvon' => getAuthUID(),
 				'studiensemester_kurzbz' => $lv->studiensemester_kurzbz

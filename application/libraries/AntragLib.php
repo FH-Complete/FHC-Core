@@ -125,7 +125,6 @@ class AntragLib
 	{
 		$errors = [];
 		foreach ($studierendenantrag_ids as $studierendenantrag_id) {
-
 			$result = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
 			if (isError($result))
 			{
@@ -162,7 +161,14 @@ class AntragLib
 						$vorlage ='Sancho_Mail_Antrag_A_Approve';
 						$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_A_Approve');
 
-						$result = $this->_ci->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon, 'abbrecherStud', $antrag->datum, $insertam) ;
+						$result = $this->_ci->prestudentlib->setAbbrecher(
+                            $antrag->prestudent_id,
+                            $antrag->studiensemester_kurzbz,
+                            $insertvon,
+                            'abbrecherStud',
+                            $antrag->datum,
+                            $insertam
+                        );
 						if (isError($result))
 						{
 							$errors[] = getError($result);
@@ -199,7 +205,7 @@ class AntragLib
 						'status_kurzbz'=>$prestudentstatus->status_kurzbz,
 						'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
 						'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
-					],[]);
+					], []);
 					if (isError($result))
 					{
 						$errors[] = getError($result);
@@ -285,7 +291,13 @@ class AntragLib
 		if (isError($result))
 			return $result;
 		else {
-			$result = $this->_ci->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon, 'abbrecherStgl', $status->insertamum);
+			$result = $this->_ci->prestudentlib->setAbbrecher(
+                $antrag->prestudent_id,
+                $antrag->studiensemester_kurzbz,
+                $insertvon,
+                'abbrecherStgl',
+                $status->insertamum
+            );
 
 			if (isError($result))
 				return $result;
@@ -417,7 +429,11 @@ class AntragLib
 					$resultAntrag = current($resultAntrag);
 
 						// Prestudentstatus und Unterbrechungsfolgeaktionen setzen
-					$result = $this->_ci->prestudentlib->setUnterbrecher($resultAntrag->prestudent_id, $resultAntrag->studiensemester_kurzbz, $studierendenantrag_id);
+					$result = $this->_ci->prestudentlib->setUnterbrecher(
+                        $resultAntrag->prestudent_id,
+                        $resultAntrag->studiensemester_kurzbz,
+                        $studierendenantrag_id
+                    );
 
 					if (isError($result)) {
 						$this->_ci->StudierendenantragstatusModel->delete($studierendenantrag_status_id);
@@ -439,7 +455,9 @@ class AntragLib
 						if (isset($data['errors']['person']))
 						{
 									//send assistenz mit id
-							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_and_name', ['message' => $data['errors']['email'] . '<br>' . $data['errors']['person']]);
+							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_and_name', [
+                                'message' => $data['errors']['email'] . '<br>' . $data['errors']['person']
+                            ]);
 							$mail['ass'] = $this->_ci->p->t('studierendenantrag', 'StudentIn', ['prestudent_id' => $data['antrag']->prestudent_id]);
 						}
 						else
@@ -539,9 +557,9 @@ class AntragLib
 				]);
 				if (isError($result)) {
 					$errors['failed_' . $studierendenantrag_id] = $this->_ci->p->t('studierendenantrag', 'error_U_Reject', [
-					'studierendenantrag_id' => $studierendenantrag_id,
-					'message' => getError($result)['message']
-				]);
+                        'studierendenantrag_id' => $studierendenantrag_id,
+                        'message' => getError($result)['message']
+                    ]);
 				} else {
 					$name = '';
 
@@ -667,7 +685,10 @@ class AntragLib
 			$date_created = new DateTime($result['antrag']->datum);
 			if ($date_created < $date_target) {
 				$this->_ci->load->model('crm/Konto_model', 'KontoModel');
-				$result['studienbeitrag'] = $this->_ci->KontoModel->checkStudienbeitragFromPerson($person_id, $result['antrag']->studiensemester_kurzbz);
+				$result['studienbeitrag'] = $this->_ci->KontoModel->checkStudienbeitragFromPerson(
+                    $person_id,
+                    $result['antrag']->studiensemester_kurzbz
+                );
 			}
 		}
 
@@ -986,7 +1007,11 @@ class AntragLib
 	 *
 	 * @param integer		$prestudent_id
 	 *
-	 * @return \stdClass	on success retval 0 means not a student; retval 1 means Berechtigt; retval -1 means has already an Antrag pending; retval -2 means other Antrag pending; retval -3 means in blacklist stg
+	 * @return \stdClass	on success retval 0 means not a student;
+     *                      retval 1 means Berechtigt;
+     *                      retval -1 means has already an Antrag pending;
+     *                      retval -2 means other Antrag pending;
+     *                      retval -3 means in blacklist stg
 	 */
 	public function getPrestudentAbmeldeBerechtigt($prestudent_id)
 	{
@@ -1009,7 +1034,13 @@ class AntragLib
 		$datumStatus = $result->datum;
 
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
-			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id, 'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED], [Studierendenantrag_model::TYP_ABMELDUNG, Studierendenantrag_model::TYP_ABMELDUNG_STGL]);
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+                'prestudent_id' => $prestudent_id,
+                'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
+            ], [
+                Studierendenantrag_model::TYP_ABMELDUNG,
+                Studierendenantrag_model::TYP_ABMELDUNG_STGL
+            ]);
 			if (isError($result))
 				return $result;
 			if (hasData($result))
@@ -1049,7 +1080,11 @@ class AntragLib
 	 * @param integer		$prestudent_id
 	 * @param string		$studiensemester_kurzbz		(optional)
 	 *
-	 * @return \stdClass	on success retval 0 means not a student; retval 1 means Berechtigt; retval -1 means has already an Antrag pending; retval -2 means other Antrag pending; retval -3 means in blacklist stg
+	 * @return \stdClass	on success retval 0 means not a student;
+     *                      retval 1 means Berechtigt;
+	 * 						retval -1 means has already an Antrag pending;
+	 * 						retval -2 means other Antrag pending;
+	 * 						retval -3 means in blacklist stg
 	 */
 	public function getPrestudentUnterbrechungsBerechtigt($prestudent_id, $studiensemester_kurzbz = null)
 	{
@@ -1071,7 +1106,11 @@ class AntragLib
 		$result = current(getData($result));
 		$datumStatus = $result->datum;
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
-			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id, 'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG, 'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED]);
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				'typ' => Studierendenantrag_model::TYP_UNTERBRECHUNG,
+				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
+			]);
 			if (isError($result))
 				return $result;
 			if (hasData($result))
@@ -1115,7 +1154,11 @@ class AntragLib
 	 *
 	 * @param integer		$prestudent_id
 	 *
-	 * @return \stdClass	on success retval 0 means not a student; retval 1 means Berechtigt; retval -1 means has already an Antrag pending; retval -2 means other Antrag pending; retval -3 means in blacklist stg
+	 * @return \stdClass	on success retval 0 means not a student;
+	 * 						retval 1 means Berechtigt;
+	 * 						retval -1 means has already an Antrag pending;
+	 * 						retval -2 means other Antrag pending;
+	 * 						retval -3 means in blacklist stg
 	 */
 	public function getPrestudentWiederholungsBerechtigt($prestudent_id)
 	{
@@ -1144,7 +1187,11 @@ class AntragLib
 		$result = current(getData($result));
 		$datumStatus = $result->datum;
 		if (!in_array($result->status_kurzbz, $this->_ci->config->item('antrag_prestudentstatus_whitelist'))) {
-			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere(['prestudent_id' => $prestudent_id, 'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG, 'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED]);
+			$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere([
+				'prestudent_id' => $prestudent_id,
+				'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
+				'campus.get_status_studierendenantrag(studierendenantrag_id)' => Studierendenantragstatus_model::STATUS_APPROVED
+			]);
 			if (isError($result))
 				return $result;
 			if (hasData($result))
@@ -1333,7 +1380,9 @@ class AntragLib
 
 	public function saveLvs($lvArray)
 	{
-		$result = $this->_ci->StudierendenantraglehrveranstaltungModel->deleteWhere(['studierendenantrag_id' => $lvArray[0]['studierendenantrag_id']]);
+		$result = $this->_ci->StudierendenantraglehrveranstaltungModel->deleteWhere([
+			'studierendenantrag_id' => $lvArray[0]['studierendenantrag_id']
+		]);
 		if (isError($result))
 			return $result;
 

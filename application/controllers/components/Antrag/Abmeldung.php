@@ -57,7 +57,13 @@ class Abmeldung extends FHC_Controller
 		}
 		elseif ($result == -1)
 		{
-			$result = $this->antraglib->getDetailsForLastAntrag($prestudent_id, [Studierendenantrag_model::TYP_ABMELDUNG, Studierendenantrag_model::TYP_ABMELDUNG_STGL]);
+			$result = $this->antraglib->getDetailsForLastAntrag(
+                $prestudent_id,
+                [
+                    Studierendenantrag_model::TYP_ABMELDUNG,
+                    Studierendenantrag_model::TYP_ABMELDUNG_STGL
+                ]
+            );
 			if (isError($result)) {
 				return $this->outputJsonError(getError($result));
 			}

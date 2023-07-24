@@ -581,7 +581,14 @@ class Studiengang_model extends DB_Model
 		if ($not_antrag_typ !== null && is_array($not_antrag_typ)) {
 			foreach($not_antrag_typ as $k => $v)
 				$not_antrag_typ[$k] = $this->db->escape($v);
-			$this->addJoin('campus.tbl_studierendenantrag a', 'a.prestudent_id=p.prestudent_id and a.typ in ('. implode(',', $not_antrag_typ ).") AND campus.get_status_studierendenantrag (a.studierendenantrag_id)<>'" . Studierendenantragstatus_model::STATUS_CANCELLED . "'", 'LEFT');
+			$this->addJoin(
+				'campus.tbl_studierendenantrag a',
+				'a.prestudent_id=p.prestudent_id and a.typ in ('.
+				implode(',', $not_antrag_typ).
+				") AND campus.get_status_studierendenantrag (a.studierendenantrag_id)<>'" .
+				Studierendenantragstatus_model::STATUS_CANCELLED . "'",
+				'LEFT'
+			);
 			$this->db->where('a.typ IS NULL');
 		}
 

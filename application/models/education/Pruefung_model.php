@@ -64,7 +64,20 @@ class Pruefung_model extends DB_Model
         $this->addSelect('campus.get_status_studierendenantrag(a.studierendenantrag_id) status');
         $this->addSelect('count(1) as count');
 
-        $this->addGroupBy(['pers.vorname','pers.nachname','pers.person_id', 's.matrikelnr','g.bezeichnung', 'g.studiengang_kz','o.bezeichnung_mehrsprachig','ps.prestudent_id', 'lv.bezeichnung', 'le.studiensemester_kurzbz', 'a.typ', 'a.studierendenantrag_id']);
+        $this->addGroupBy([
+			'pers.vorname',
+			'pers.nachname',
+			'pers.person_id',
+			's.matrikelnr',
+			'g.bezeichnung',
+			'g.studiengang_kz',
+			'o.bezeichnung_mehrsprachig',
+			'ps.prestudent_id',
+			'lv.bezeichnung',
+			'le.studiensemester_kurzbz',
+			'a.typ',
+			'a.studierendenantrag_id'
+		]);
         $this->addJoin('lehre.tbl_note n', 'note');
         $this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
         $this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
@@ -91,7 +104,15 @@ class Pruefung_model extends DB_Model
 				AND ps.prestudent_id = ps1.prestudent_id)', null, false);
 
         // NOTE(chris): is Wiederholer without set statusgrund (legacy?)
-        $this->db->where('(SELECT COUNT(*) FROM (SELECT DISTINCT studiensemester_kurzbz FROM tbl_prestudentstatus _s WHERE ausbildungssemester=get_absem_prestudent(ps.prestudent_id, le.studiensemester_kurzbz) AND prestudent_id=ps.prestudent_id) a) = 1', null, false);
+        $this->db->where(
+			'(SELECT COUNT(*) 
+				FROM (SELECT DISTINCT studiensemester_kurzbz 
+					FROM tbl_prestudentstatus _s 	
+					WHERE ausbildungssemester=get_absem_prestudent(ps.prestudent_id, le.studiensemester_kurzbz) 
+					AND prestudent_id=ps.prestudent_id) a) = 1',
+			null,
+			false
+		);
 
         return $this->db->get_compiled_select($this->dbTable);
     }
@@ -113,7 +134,11 @@ class Pruefung_model extends DB_Model
         if (!is_array($statusgruende))
             $statusgruende = [];
 
-        return $this->execQuery('select * from ( ' . $sql . ') temp where count >= 3 AND prestudent_id = ?' , [Studierendenantrag_model::TYP_WIEDERHOLUNG, $statusgruende, $prestudent_id]);
+        return $this->execQuery('select * from ( ' . $sql . ') temp where count >= 3 AND prestudent_id = ?', [
+			Studierendenantrag_model::TYP_WIEDERHOLUNG,
+			$statusgruende,
+			$prestudent_id
+		]);
 	}
 
 	public function getAllPrestudentsWhereCommitteeExamFailed($status, $maxDate, $minDate)

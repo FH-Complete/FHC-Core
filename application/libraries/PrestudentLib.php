@@ -32,7 +32,6 @@ class PrestudentLib
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
-
 	}
 
 	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null)
@@ -153,7 +152,7 @@ class PrestudentLib
 						'studiensemester_kurzbz' => $lv->studiensemester_kurzbz,
 						'student_uid' => $lv->uid,
 						'lehrveranstaltung_id' => $lv->lehrveranstaltung_id
-					],[
+					], [
 						'note' => 9
 					]);
 
@@ -181,7 +180,7 @@ class PrestudentLib
 		$this->_ci->StudentlehrverbandModel->update([
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'student_uid' => $student->student_uid
-		],[
+		], [
 			'studiengang_kz' => $student->studiengang_kz,
 			'semester' => 0,
 			'verband' => 'A',
@@ -193,7 +192,7 @@ class PrestudentLib
 		//Benutzer inaktiv setzen
 		$this->_ci->BenutzerModel->update([
 			'uid' =>  $student->student_uid
-		],[
+		], [
 			'aktiv' => false,
 			'updateaktivvon' => $insertvon,
 			'updateaktivam' => date('c'),
@@ -214,20 +213,6 @@ class PrestudentLib
 			return $result;
 		$result = getData($result);
 		if (!$result) {
-			/** TODO(chris): Zukünftige Unterbrecher so nicht möglich
-			 * - Verband und Gruppe dürfen noch nicht gesetzt werden
-			 * - Keine Garantie das Ausbildungssemester gleich bleibt (weiter Unterbrechungen oder eine Wiederholung in der Zwischenzeit)
-			 * - LVs eventuell nicht zugewießen
-			 * Mögliche Lösung: JOB!
-
-			$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
-			if (isError($result))
-				return $result;
-			$result = getData($result);
-			if (!$result) {
-				return error('Kein Prestudent status gefunden');
-			}
-			$result->studiensemester_kurzbz*/
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
 				'prestudent_id' => $prestudent_id,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz
@@ -341,7 +326,7 @@ class PrestudentLib
 						'studiensemester_kurzbz' => $lv->studiensemester_kurzbz,
 						'student_uid' => $lv->uid,
 						'lehrveranstaltung_id' => $lv->lehrveranstaltung_id
-					],[
+					], [
 						'note' => 9
 					]);
 
@@ -369,7 +354,7 @@ class PrestudentLib
 		$this->_ci->StudentlehrverbandModel->update([
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'student_uid' => $student->student_uid
-		],[
+		], [
 			'studiengang_kz' => $student->studiengang_kz,
 			'semester' => 0,
 			'verband' => 'B',
@@ -380,5 +365,4 @@ class PrestudentLib
 
 		return success();
 	}
-
 }

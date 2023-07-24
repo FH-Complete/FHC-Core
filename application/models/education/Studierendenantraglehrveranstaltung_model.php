@@ -65,7 +65,11 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 			'stat.studierendenantrag_status_id = campus.get_status_id_studierendenantrag(a.studierendenantrag_id)'
 		);
 		$this->addJoin('public.tbl_student s', 'prestudent_id');
-		$this->addJoin('lehre.tbl_zeugnisnote z', 'z.lehrveranstaltung_id=lv.lehrveranstaltung_id AND z.student_uid=s.student_uid AND z.studiensemester_kurzbz=a.studiensemester_kurzbz', 'LEFT');
+		$this->addJoin(
+			'lehre.tbl_zeugnisnote z',
+			'z.lehrveranstaltung_id=lv.lehrveranstaltung_id AND z.student_uid=s.student_uid AND z.studiensemester_kurzbz=a.studiensemester_kurzbz',
+			'LEFT'
+		);
 
 		return $this->loadWhere([
 			'ps.prestudent_id' => $prestudent_id,

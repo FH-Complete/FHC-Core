@@ -15,8 +15,7 @@ const app = Vue.createApp({
 			statusMsg: "",
 			statusSeverity: "",
 			infoArray: []
-		}
-
+		};
 	}
 });
 app.mount('#wrapper');

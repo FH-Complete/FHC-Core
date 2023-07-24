@@ -6,8 +6,6 @@ use \DateTime as DateTime;
 
 class AntragJob extends JOB_Controller
 {
-	private $allPrestudentsWhereCommitteeExamFailed;
-
 	/**
 	 * API constructor
 	 */
@@ -40,7 +38,7 @@ class AntragJob extends JOB_Controller
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
-		$this->StudierendenantragModel->addJoin('public.tbl_prestudent','prestudent_id');
+		$this->StudierendenantragModel->addJoin('public.tbl_prestudent', 'prestudent_id');
 		$this->db->group_start();
 		$this->db->where('typ', Studierendenantrag_model::TYP_ABMELDUNG);
 		$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
@@ -124,7 +122,7 @@ class AntragJob extends JOB_Controller
 		if (isError($result)) {
 			$this->logError(getError($result));
 			$languages = [DEFAULT_LANGUAGE];
-		} else if (!hasData($result)) {
+		} elseif (!hasData($result)) {
 			$languages = [DEFAULT_LANGUAGE];
 		} else {
 			$languages = array_map(function ($row) {
@@ -153,7 +151,11 @@ class AntragJob extends JOB_Controller
 							$rows .= $this->p->t('studierendenantrag', 'mail_part_x_new_' . $typ, ['count' => $c]);
 						}
 					}
-					$table .= $this->p->t('studierendenantrag', 'mail_part_table', ['stg_bezeichnung' => $stg['Details']->bezeichnung, 'stg_orgform_kurzbz' => $stg['Details']->orgform_kurzbz, 'rows' => $rows]);
+					$table .= $this->p->t('studierendenantrag', 'mail_part_table', [
+                        'stg_bezeichnung' => $stg['Details']->bezeichnung,
+                        'stg_orgform_kurzbz' => $stg['Details']->orgform_kurzbz,
+                        'rows' => $rows
+                    ]);
 				}
 				$data['table_' . $lang] = $table;
 			}
@@ -321,13 +323,11 @@ class AntragJob extends JOB_Controller
 		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
 		$this->StudierendenantragModel->addSelect('s.insertamum');
 
-		$result = $this->StudierendenantragModel->getWithLastStatusWhere(
-				[
-					'typ' => Studierendenantrag_model::TYP_ABMELDUNG_STGL,
-					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
-					's.insertamum <=' => $dateDeadline->format('c')
-				]
-			);
+		$result = $this->StudierendenantragModel->getWithLastStatusWhere([
+            'typ' => Studierendenantrag_model::TYP_ABMELDUNG_STGL,
+            'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
+            's.insertamum <=' => $dateDeadline->format('c')
+        ]);
 
 		if(isError($result))
 		{
@@ -340,7 +340,13 @@ class AntragJob extends JOB_Controller
 
 			foreach ($antraege as $antrag)
 			{
-				$result = $this->prestudentlib->setAbbrecher($antrag->prestudent_id, $antrag->studiensemester_kurzbz, $insertvon, 'abbrecherStgl', $antrag->insertamum);
+				$result = $this->prestudentlib->setAbbrecher(
+                    $antrag->prestudent_id,
+                    $antrag->studiensemester_kurzbz,
+                    $insertvon,
+                    'abbrecherStgl',
+                    $antrag->insertamum
+                );
 				if (isError($result))
 					$this->logError(getError($result));
 				else
@@ -402,7 +408,8 @@ class AntragJob extends JOB_Controller
 		$this->logInfo('Ende Job sendAufforderungWiederholer');
 	}
 
-	protected function prestudentsGetUnique($prestudents) {
+	protected function prestudentsGetUnique($prestudents)
+    {
 		$result = [];
 		foreach ($prestudents as $prestudent) {
 			if (!isset($result[$prestudent->prestudent_id]))
@@ -504,42 +511,4 @@ class AntragJob extends JOB_Controller
 		}
 		$this->logInfo('Ende Job sendAufforderungWiederholer ' . $name);
 	}
-
-
-
-	// TODO(chris): REMOVE DEBUG!
-
-	/**
-	 * Writes a cronjob info log
-	 */
-	protected function logInfo($response, $parameters = null)
-	{
-		echo $response . "\n";
-	}
-
-	/**
-	 * Writes a cronjob debug log
-	 */
-	protected function logDebug($response, $parameters = null)
-	{
-		echo $response . "\n";
-	}
-
-	/**
-	 * Writes a cronjob warning log
-	 */
-	protected function logWarning($response, $parameters = null)
-	{
-		echo $response . "\n";
-	}
-
-	/**
-	 * Writes a cronjob error log
-	 */
-	protected function logError($response, $parameters = null)
-	{
-		echo $response . "\n";
-	}
-
-
 }
