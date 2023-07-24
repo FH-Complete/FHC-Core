@@ -19,11 +19,22 @@ $this->load->view(
 		<h3>
 			<?php echo $this->p->t('uhstat', 'uhstat1AnmeldungUeberschrift') ?>
 		</h3>
+		<p>
+			<?php echo $this->p->t('uhstat', 'uhstat1AnmeldungEinleitungstext') ?>
+		</p>
+		<br>
 		<form class="form-horizontal" method="POST" action="<?php echo site_url('codex/UHSTAT1/saveUHSTAT1Data').'?person_id='.$formData['person_id'] ?>">
 			<fieldset>
 				<legend><?php echo $this->p->t('uhstat', 'persoenlicheAngaben') ?></legend>
+				<p>
+					<?php echo $this->p->t('uhstat', 'persoenlicheAngabenEinleitungstext') ?>
+				</p>
 				<div class="form-group">
-					<label for="geburtsstaat" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'geburtsstaat') ?></label>
+					<label for="geburtsstaat" class="col-sm-3 control-label">
+						<?php echo ucfirst($this->p->t('uhstat', 'geburtsstaat')) ?>
+						<br>
+						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
+					</label>
 					<div class="col-sm-9">
 						<select type="text" name="geburtsstaat" id="geburtsstaat" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -39,11 +50,16 @@ $this->load->view(
 					</div>
 				</div>
 			</fieldset>
+			<br>
 			<fieldset>
 				<legend><?php echo $this->p->t('uhstat', 'angabenErziehungsberechtigte') ?></legend>
+				<p>
+					<?php echo $this->p->t('uhstat', 'angabenErziehungsberechtigteEinleitungstext') ?>
+				</p>
+				<br>
 				<h4><?php echo $this->p->t('uhstat', 'erziehungsberechtigtePersonEins') ?></h4>
 				<div class="form-group">
-					<label for="mutter_geburtsjahr" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'mutterGeburtsjahr') ?></label>
+					<label for="mutter_geburtsjahr" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'geburtsjahr')) ?></label>
 					<div class="col-sm-9">
 						<select type="text" name="mutter_geburtsjahr" id="mutter_geburtsjahr" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -59,7 +75,11 @@ $this->load->view(
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="mutter_geburtsstaat" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'mutterGeburtsstaat') ?></label>
+					<label for="mutter_geburtsstaat" class="col-sm-3 control-label">
+						<?php echo ucfirst($this->p->t('uhstat', 'geburtsstaat')) ?>
+						<br>
+						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
+					</label>
 					<div class="col-sm-9">
 						<select type="text" name="mutter_geburtsstaat" id="mutter_geburtsstaat" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -75,7 +95,11 @@ $this->load->view(
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="mutter_bildungsstaat" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'hoechsterAbschlussStaat') ?></label>
+					<label for="mutter_bildungsstaat" class="col-sm-3 control-label">
+						<?php echo ucfirst($this->p->t('uhstat', 'hoechsterAbschlussStaat')) ?>
+						<br>
+						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
+					</label>
 					<div class="col-sm-9">
 						<select type="text" name="mutter_bildungsstaat" id="mutter_bildungsstaat" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -91,7 +115,7 @@ $this->load->view(
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="mutter_bildungmax" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'hoechsterAbschluss') ?></label>
+					<label for="mutter_bildungmax" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'hoechsterAbschluss')) ?></label>
 					<div class="col-sm-9">
 						<select type="text" name="mutter_bildungmax" id="mutter_bildungmax" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -119,9 +143,10 @@ $this->load->view(
 						<?php echo form_error('mutter_bildungmax'); ?>
 					</div>
 				</div>
+				<br>
 				<h4><?php echo $this->p->t('uhstat', 'erziehungsberechtigtePersonZwei') ?></h4>
 				<div class="form-group">
-					<label for="vater_geburtsjahr" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'vaterGeburtsjahr') ?></label>
+					<label for="vater_geburtsjahr" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'geburtsjahr')) ?></label>
 					<div class="col-sm-9">
 						<select type="text" name="vater_geburtsjahr" id="vater_geburtsjahr" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -137,7 +162,11 @@ $this->load->view(
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="vater_geburtsstaat" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'vaterGeburtsstaat') ?></label>
+					<label for="vater_geburtsstaat" class="col-sm-3 control-label">
+						<?php echo ucfirst($this->p->t('uhstat', 'geburtsstaat')) ?>
+						<br>
+						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
+					</label>
 					<div class="col-sm-9">
 						<select type="text" name="vater_geburtsstaat" id="vater_geburtsstaat" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -153,7 +182,11 @@ $this->load->view(
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="vater_bildungsstaat" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'hoechsterAbschlussStaat') ?></label>
+					<label for="vater_bildungsstaat" class="col-sm-3 control-label">
+						<?php echo $this->p->t('uhstat', 'hoechsterAbschlussStaat') ?>
+						<br>
+						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
+					</label>
 					<div class="col-sm-9">
 						<select type="text" name="vater_bildungsstaat" id="vater_bildungsstaat" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -169,7 +202,9 @@ $this->load->view(
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="vater_bildungmax" class="col-sm-3 control-label"><?php echo $this->p->t('uhstat', 'hoechsterAbschluss') ?></label>
+					<label for="vater_bildungmax" class="col-sm-3 control-label">
+						<?php echo ucfirst($this->p->t('uhstat', 'hoechsterAbschluss')) ?>
+					</label>
 					<div class="col-sm-9">
 						<select type="text" name="vater_bildungmax" id="vater_bildungmax" class="form-control">
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
@@ -198,20 +233,24 @@ $this->load->view(
 					</div>
 				</div>
 			</fieldset>
-			<div class="text-right">
-				<?php if (isset($successMessage)): ?>
-					<span class='text-success'><?php echo $successMessage ?></span>
-				<?php endif; ?>
-				<?php if (isset($errorMessage)): ?>
-					<span class='text-danger'><?php echo $errorMessage ?></span>
-				<?php endif; ?>
-				<button class="btn btn-success" type="submit">
-					<?php echo $this->p->t('ui', 'speichern') ?>
-				</button>
-			</div>
+			<br>
+			<fieldset>
+				<div class="form-group">
+					<div class="col-sm-12 text-right">
+						<?php if (isset($successMessage)): ?>
+							<span class='text-success'><?php echo $successMessage ?></span>
+						<?php endif; ?>
+						<?php if (isset($errorMessage)): ?>
+							<span class='text-danger'><?php echo $errorMessage ?></span>
+						<?php endif; ?>
+						<button class="btn btn-success btn-md" type="submit">
+							<?php echo $this->p->t('uhstat', 'pruefenUndSpeichern') ?>
+						</button>
+					</div>
+				</div>
+			</fieldset>
 		</form>
 	</div>
-
 </div>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

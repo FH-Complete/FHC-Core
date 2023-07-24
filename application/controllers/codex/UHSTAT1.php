@@ -42,6 +42,8 @@ class UHSTAT1 extends FHC_Controller
 	{
 		$formData = $this->_getFormData();
 
+		if (isError($formData)) show_error(getError($formData));
+
 		if (!hasData($formData)) show_error("No form data could be loaded");
 
 		$this->load->view("codex/uhstat1.php", array('formData' => getData($formData)));
@@ -59,31 +61,31 @@ class UHSTAT1 extends FHC_Controller
 		$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
 
 		// check required fields
-		$this->form_validation->set_rules('geburtsstaat', 'Geburtsstaat', 'required', array('required' => $this->p->t('uhstat', 'feldFehlt')));
+		$this->form_validation->set_rules('geburtsstaat', 'Geburtsstaat', 'required', array('required' => $this->p->t('uhstat', 'angabeFehlt')));
 		$this->form_validation->set_rules(
 			'mutter_geburtsstaat',
 			'Geburtsstaat Mutter',
 			'required',
-			array('required' => $this->p->t('uhstat', 'feldFehlt'))
+			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
 		);
 		$this->form_validation->set_rules(
 			'mutter_bildungsstaat',
 			'Bildungsstaat Mutter',
 			'required',
-			array('required' => $this->p->t('uhstat', 'feldFehlt'))
+			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
 		);
 		$this->form_validation->set_rules(
 			'mutter_geburtsjahr',
 			'Geburtsjahr Mutter',
 			'required',
-			array('required' => $this->p->t('uhstat', 'feldFehlt'))
+			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
 		);
 		$this->form_validation->set_rules(
 			'mutter_bildungmax',
 			'Höchste Ausbildung Mutter',
 			'required|callback_bildungsstaat_bildungmax_check[m]',
 			array(
-				'required' => $this->p->t('uhstat', 'feldFehlt'),
+				'required' => $this->p->t('uhstat', 'angabeFehlt'),
 				'bildungsstaat_bildungmax_check' => $this->p->t('uhstat', 'ausbildungBildungsstaatUebereinstimmung')
 				//'Land der höchsten Ausbildung muss mit Bildungsstaat übereinstimmen'
 				// Bildungsstaat should correspond to state of bildung max
@@ -93,26 +95,26 @@ class UHSTAT1 extends FHC_Controller
 			'vater_geburtsstaat',
 			'Geburtsstaat Vater',
 			'required',
-			array('required' => $this->p->t('uhstat', 'feldFehlt'))
+			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
 		);
 		$this->form_validation->set_rules(
 			'vater_bildungsstaat',
 			'Bildungsstaat Vater',
 			'required',
-			array('required' => $this->p->t('uhstat', 'feldFehlt'))
+			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
 		);
 		$this->form_validation->set_rules(
 			'vater_geburtsjahr',
 			'Geburtsjahr Vater',
 			'required',
-			array('required' => $this->p->t('uhstat', 'feldFehlt'))
+			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
 		);
 		$this->form_validation->set_rules(
 			'vater_bildungmax',
 			'Höchste Ausbildung Vater',
 			'required|callback_bildungsstaat_bildungmax_check[v]',
 			array(
-				'required' => $this->p->t('uhstat', 'feldFehlt'),
+				'required' => $this->p->t('uhstat', 'angabeFehlt'),
 				'bildungsstaat_bildungmax_check' => $this->p->t('uhstat', 'ausbildungBildungsstaatUebereinstimmung')
 			)
 		);
@@ -171,7 +173,9 @@ class UHSTAT1 extends FHC_Controller
 
 		$formData = $this->_getFormData();
 
-		if (!hasData($formData)) show_error("No data found");
+		if (isError($formData)) show_error(getError($formData));
+
+		if (!hasData($formData)) show_error("No form data could be loaded");
 
 		// pass success/error messages to view
 		$successMessage = isset($uhstat1datenRes) && isSuccess($uhstat1datenRes) ? $this->p->t('uhstat', 'erfolgreichGespeichert') : '';
