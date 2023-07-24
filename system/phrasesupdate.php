@@ -10909,6 +10909,86 @@ Any unusual occurrences
             )
         )
     ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'begruendungEcts',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Begründen Sie die Gleichwertigkeit der ECTS',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Give reasons for the equivalence of ECTS',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'begruendungLvinhalt',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Begründen Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Give reasons for the equivalence of the course contents',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungBegruendungEctsTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinsichtlich des Umfangs der LV, die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum Ihr Zeugnis bzw. Ihre berufliche Praxis mit dem Umfang der LV gleichwertig ist.<br><br>Referenzbeispiele für die ECTS-Berechnung finden Sie rechts in der Infobox.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Regarding the scope of the course you want to have credited: Please explain why your certificate or your professional practice is equivalent to the scope of the course.<br><br>Reference examples for the ECTS calculation can be found in the info box on the right.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungBegruendungLvinhaltTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinsichtlich der Lernergebnisse der LV (vgl. CIS), die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum die von Ihnen erworbenen Kompetenzen mit diesen Lernergebnissen gleichwertig sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'With regard to the learning outcomes of the course (cf. CIS) for which you want to receive credit: Please explain why the competences you have acquired are equivalent to these learning outcomes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -13745,6 +13825,26 @@ array(
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'fehlendeMinZeichen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Fehlende min. Zeichen",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Missing min. Characters",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
