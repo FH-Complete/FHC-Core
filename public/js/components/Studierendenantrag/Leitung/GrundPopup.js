@@ -9,7 +9,9 @@ export default {
 	],
 	props: {
 		placeholder: String,
-		default: String
+		default: String,
+		countRemaining: Number,
+		optional: Boolean
 	},
 	data: () => ({
 		value: '',
@@ -18,15 +20,13 @@ export default {
 		isInvalid: false
 	}),
 	methods: {
-		submit(){
-			if(!this.value)	{
+		submit() {
+			if (!this.value && !this.optional) {
 				this.isInvalid = true;
-					}
-			else {
+			} else {
 				this.result = [this.value, this.check];
 				this.hide();
 			}
-			return
 		}
 	},
 	created() {
@@ -49,12 +49,12 @@ export default {
 					{{p.t('kvp','new.error.required')}}
 				</div>
 			</div>
-			<div class="form-check">
+		</template>
+		<template v-slot:footer>
+			<div v-if="countRemaining > 0" class="form-check flex-grow-1">
 				<input ref="check" type="checkbox" class="form-check-input" id="cbid" v-model="check">
 				<label class="form-check-label" for="cbid">{{p.t('studierendenantrag','fuer_alle_uebernehmen')}}</label>
 			</div>
-		</template>
-		<template v-slot:footer>
 			<button type="button" class="btn btn-primary" @click="submit">{{p.t('ui','ok')}}</button>
 			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{p.t('ui','cancel')}}</button>
 		</template>

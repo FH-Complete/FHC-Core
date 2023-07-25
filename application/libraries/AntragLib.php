@@ -259,7 +259,6 @@ class AntragLib
 	 */
 	public function denyObjectionAbmeldung($studierendenantrag_id, $insertvon, $grund = null)
 	{
-		// TODO(chris): grund?
 		$result = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
 		if (isError($result))
 		{
@@ -281,6 +280,9 @@ class AntragLib
 			return error($this->_ci->p->t('studierendenantrag', 'error_not_approved'));
 
 		$status = current(getData($result));
+
+		if ($grund)
+			$grund = $this->_ci->p->t('studierendenantrag', 'mail_part_grund', ['grund' => $grund]);
 
 		$result = $this->_ci->StudierendenantragstatusModel->insert([
 			'studierendenantrag_id' => $studierendenantrag_id,
@@ -1625,8 +1627,7 @@ class AntragLib
 		if ($antrag->typ != Studierendenantrag_model::TYP_ABMELDUNG_STGL)
 			return $this->isOwnAntrag($antrag_id);
 		
-		// TODO(chris): assistenz can not cancel - should they be able to?
-		return false;
+		return $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag');
 	}
 
 	/**
