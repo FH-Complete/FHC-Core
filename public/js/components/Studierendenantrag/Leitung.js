@@ -123,30 +123,30 @@ export default {
 		},
 		actionReject(evt, gruende) {
 			var antraege = evt || this.selectedData;
-			if(!gruende)
-			{
+			if (!gruende)
 				gruende = [];
-			}
 			var currentAntrag = antraege.pop();
-			if(currentAntrag)
-				GrundPopup.popup(this.p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id})).then(result =>
-				{
-					currentAntrag.grund = result[0];
-					gruende.push(currentAntrag);
-					if(result[1])
-					{
-						while (antraege.length)
+			if (currentAntrag) {
+				GrundPopup
+					.popup(this.p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
+						countRemaining: antraege.length
+					})
+					.then(result => {
+						currentAntrag.grund = result[0];
+						gruende.push(currentAntrag);
+						if (result[1])
 						{
-							currentAntrag = antraege.pop();
-							currentAntrag.grund = result[0];
-							gruende.push(currentAntrag);
+							while (antraege.length)
+							{
+								currentAntrag = antraege.pop();
+								currentAntrag.grund = result[0];
+								gruende.push(currentAntrag);
+							}
 						}
-					}
-					this.actionReject(antraege, gruende);
-				})
-				.catch(() => {});
-			else
-			{
+						this.actionReject(antraege, gruende);
+					})
+					.catch(() => {});
+			} else {
 				this.$refs.loader.show();
 				axios
 					.all(
@@ -206,22 +206,47 @@ export default {
 		},
 		actionoObjectionDeny(evt, gruende) {
 			var antraege = evt || this.selectedData;
-			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/objectionDeny/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
+			if (!gruende)
+				gruende = [];
+			var currentAntrag = antraege.pop();
+			if (currentAntrag) {
+				GrundPopup
+					.popup(this.p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
+						countRemaining : antraege.length,
+						optional: true
+					})
+					.then(result => {
+						currentAntrag.grund = result[0];
+						gruende.push(currentAntrag);
+						if (result[1]) {
+							while (antraege.length) {
+								currentAntrag = antraege.pop();
+								currentAntrag.grund = result[0];
+								gruende.push(currentAntrag);
 							}
+						}
+						this.actionoObjectionDeny(antraege, gruende);
+					})
+					.catch(() => {});
+			} else {
+				this.$refs.loader.show();
+				axios
+					.all(
+						gruende.map(
+							antrag => axios.post(
+								FHC_JS_DATA_STORAGE_OBJECT.app_root +
+								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+								'/components/Antrag/Leitung/objectionDeny/',
+								{
+									studierendenantrag_id: antrag.studierendenantrag_id,
+									grund: antrag.grund
+								}
+							)
 						)
 					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+					.then(this.showValidation)
+					.catch(this.showError);
+			}
 		},
 		actionObjectionApprove(evt, gruende) {
 			var antraege = evt || this.selectedData;
