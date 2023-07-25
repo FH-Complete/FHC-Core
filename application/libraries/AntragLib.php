@@ -1627,8 +1627,7 @@ class AntragLib
 		if ($antrag->typ != Studierendenantrag_model::TYP_ABMELDUNG_STGL)
 			return $this->isOwnAntrag($antrag_id);
 		
-		// TODO(chris): assistenz can not cancel - should they be able to?
-		return false;
+		return $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag');
 	}
 
 	/**

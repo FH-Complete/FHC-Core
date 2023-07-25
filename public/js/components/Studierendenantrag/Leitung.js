@@ -267,6 +267,25 @@ export default {
 				.then(this.showValidation)
 				.catch(this.showError);
 		},
+		actionCancel(evt) {
+			var antraege = evt || this.selectedData;
+			this.$refs.loader.show();
+			axios
+				.all(
+					antraege.map(
+						antrag => axios.post(
+							FHC_JS_DATA_STORAGE_OBJECT.app_root +
+							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+							'/components/Antrag/Abmeldung/cancelAntrag/',
+							{
+								antrag_id: antrag.studierendenantrag_id
+							}
+						)
+					)
+				)
+				.then(this.showValidation)
+				.catch(this.showError);
+		},
 		showValidation(results) {
 			var errors = results.filter(res => res.data.error);
 			this.$refs.loader.hide();
@@ -327,6 +346,7 @@ export default {
 			@action:object="actionObject"
 			@action:objectionDeny="actionoObjectionDeny"
 			@action:objectionApprove="actionObjectionApprove"
+			@action:cancel="actionCancel"
 			>
 		</leitung-table>
 

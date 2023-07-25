@@ -25,7 +25,8 @@ export default {
 		'action:reopen',
 		'action:object',
 		'action:objectionDeny',
-		'action:objectionApprove'
+		'action:objectionApprove',
+		'action:cancel'
 	],
 	data() {
 		return {
@@ -270,6 +271,14 @@ export default {
 									this.$emit('reload');
 								});
 							};
+							container.append(button);
+						}
+						// NOTE(chris): Cancel
+						if (data.typ == 'AbmeldungStgl' && data.status == 'Erstellt') {
+							let button = document.createElement('button');
+							button.innerHTML = this.p.t('studierendenantrag', 'btn_cancel');
+							button.className = "btn btn-outline-secondary";
+							button.addEventListener('click',() => this.$emit('action:cancel', [cell.getData()]));
 							container.append(button);
 						}
 					}
