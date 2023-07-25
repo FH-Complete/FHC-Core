@@ -54,8 +54,11 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
 		$this->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
 		$this->addJoin('bis.tbl_orgform', 'orgform_kurzbz');
-		$this->addJoin('campus.tbl_studierendenantrag_status as s','campus.get_status_id_studierendenantrag('.$this->dbTable .'.studierendenantrag_id) = studierendenantrag_status_id' );
-		$this->addJoin('campus.tbl_studierendenantrag_statustyp as st','studierendenantrag_statustyp_kurzbz' );
+		$this->addJoin(
+			'campus.tbl_studierendenantrag_status as s',
+			'campus.get_status_id_studierendenantrag('. $this->dbTable .'.studierendenantrag_id) = studierendenantrag_status_id'
+		);
+		$this->addJoin('campus.tbl_studierendenantrag_statustyp as st', 'studierendenantrag_statustyp_kurzbz');
 
 		$this->db->where_in('p.studiengang_kz', $studiengaenge);
 
@@ -189,7 +192,11 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin('public.tbl_prestudent p', 'prestudent_id', 'RIGHT');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
 		$this->addJoin('bis.tbl_orgform', 'orgform_kurzbz');
-		$this->addJoin('campus.tbl_studierendenantrag_statustyp st', 'campus.get_status_studierendenantrag(studierendenantrag_id)=st.studierendenantrag_statustyp_kurzbz','LEFT');
+		$this->addJoin(
+			'campus.tbl_studierendenantrag_statustyp st',
+			'campus.get_status_studierendenantrag(studierendenantrag_id)=st.studierendenantrag_statustyp_kurzbz',
+			'LEFT'
+		);
 
 		return $this->loadWhere([
 			'p.person_id' => $person_id

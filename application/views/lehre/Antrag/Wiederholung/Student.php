@@ -26,11 +26,9 @@ $this->load->view(
 ?>
 
 <div id="wrapper" class="overflow-hidden">
-	<?php if (!$frame) { ?>
-	<div class="fhc-header">
+	<div class="fhc-header" v-if="notinframe">
 		<h1 class="h2"><?= $this->p->t('studierendenantrag', 'title_lvzuweisen', ['name' => $antrag->name]);?></h1>
 	</div>
-	<?php } ?>
 	<div class="fhc-container row mt-3">
 		<lv-zuweisung antrag-id="<?= $antrag_id; ?>" initial-status-code="<?= $antrag->status; ?>" initial-status-msg="<?= $antrag->statustyp; ?>"<?= ($antrag->status != Studierendenantragstatus_model::STATUS_CREATED && $antrag->status != Studierendenantragstatus_model::STATUS_LVSASSIGNED) ? ' disabled' : ''; ?>></lv-zuweisung>
 	</div>

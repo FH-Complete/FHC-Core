@@ -15,12 +15,14 @@ export default {
 		antragId: Number,
 		countRemaining: Number
 	},
-	data: () => ({
-		lvs: null,
-		refresh: true,
-		result: false,
-		check: false
-	}),
+	data(){
+		return {
+			lvs: null,
+			refresh: true,
+			result: false,
+			check: false
+		};
+	},
 	computed: {
 		lvzugelassen() {
 			let zwischen = {};

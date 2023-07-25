@@ -21010,6 +21010,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_A_Student',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unsubscribe released',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
 		'phrase' => 'mail_subject_A_Stgl',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -21126,7 +21146,168 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_W_Student',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholung von Studiengangsleitung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repetition approved by course director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_table',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<table><tr><th>{stg_bezeichnung} ({stg_orgform_kurzbz})</th></tr>{rows}</table>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<table><tr><th>{stg_bezeichnung} ({stg_orgform_kurzbz})</th></tr>{rows}</table>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_x_new_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<tr><td>{count} neue Abmeldung(en)</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<tr><td>{count} new De-registration(s)</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_x_new_Unterbrechung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<tr><td>{count} neue(r) Antrag/Anträge auf Unterbrechung</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<tr><td>{count} new application(s) for Interruption</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_x_new_Wiederholung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<tr><td>{count} neue LV Zuweisung(en) für Wiederholer</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<tr><td>{count} new LV assignment(s) for repeaters</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'calltoaction_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Abmeldung vom Studium kannst du hier durchführen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You can deregister from your studies here.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'calltoaction_Unterbrechung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eine Unterbrechung des Studiums ist hier zu beantragen. Die Gründe der Unterbrechung und die beabsichtigte Fortsetzung des Studiums sind nachzuweisen oder glaubhaft zu machen. In der Entscheidung über den Antrag sind zwingende persönliche, gesundheitliche oder berufliche Gründe zu berücksichtigen. Während der Unterbrechung können keine Prüfungen abgelegt werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You can apply for an interruption of your studies here. The reasons for the interruption and the intended continuation of the course must be proven or made credible. Compelling personal, health or professional reasons must be taken into account when deciding on the application. No exams can be taken during the interruption.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'calltoaction_Wiederholung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierenden steht einmalig das Recht auf Wiederholung eines Studienjahres in Folge einer negativ beurteilten kommissionellen Prüfung zu. Die Wiederholung ist bei der Studiengangsleitung binnen eines Monats ab Mitteilung des Prüfungsergebnisses bekannt zu geben. Die Studiengangsleitung hat Prüfungen und Lehrveranstaltungen für die Wiederholung des Studienjahres festzulegen, wobei nicht bestandene Prüfungen und Lehrveranstaltungen jedenfalls, bestandene Prüfungen und Lehrveranstaltungen nur, sofern es der Zweck des Studiums erforderlich macht, zu wiederholen oder erneut zu besuchen sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Students have the one-time right to repeat an academic year as a result of a negative examination by a committee. The head of the degree program must be notified of the repetition within one month of notification of the examination result. The head of the degree program must determine examinations and courses for the repetition of the academic year, whereby failed examinations and courses are to be repeated or attended again, in any case, passed examinations and courses only if the purpose of the course makes it necessary.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 );
 
 

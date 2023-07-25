@@ -2,7 +2,6 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-// TODO(chris): review this!
 $config['frist_rueckzahlung_studiengebuer_WS'] = '15.10.';
 $config['frist_rueckzahlung_studiengebuer_SS'] = '15.03.';
 

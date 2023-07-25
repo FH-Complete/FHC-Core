@@ -69,7 +69,9 @@ class Unterbrechung extends FHC_Controller
 
 			$result = getData($result);
 			$this->output->set_status_header(400);
-			return $this->outputJsonError($this->p->t('studierendenantrag', 'error_antrag_pending', ['typ' => $this->p->t('studierendenantrag','antrag_typ_' . $result->typ)]));
+			return $this->outputJsonError($this->p->t('studierendenantrag', 'error_antrag_pending', [
+                'typ' => $this->p->t('studierendenantrag', 'antrag_typ_' . $result->typ)
+            ]));
 		}
 		elseif ($result == -3)
 		{

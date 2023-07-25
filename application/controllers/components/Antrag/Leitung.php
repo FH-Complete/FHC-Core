@@ -2,6 +2,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \stdClass as stdClass;
+
 /**
  *
  */
@@ -116,7 +118,7 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToReopenAntrag',
 			[
-				'isEntitledToReopenAntrag' => $this->p->t('studierendenantrag','error_no_right')
+				'isEntitledToReopenAntrag' => $this->p->t('studierendenantrag', 'error_no_right')
 			]
 		);
 
@@ -146,8 +148,8 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToObjectAntrag|callback_canBeObjected',
 			[
-				'isEntitledToObjectAntrag' => $this->p->t('studierendenantrag','error_no_right'),
-				'canBeObjected' => $this->p->t('studierendenantrag','error_no_objection')
+				'isEntitledToObjectAntrag' => $this->p->t('studierendenantrag', 'error_no_right'),
+				'canBeObjected' => $this->p->t('studierendenantrag', 'error_no_objection')
 			]
 		);
 
@@ -177,8 +179,8 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToObjectAntrag|callback_isObjected',
 			[
-				'isEntitledToObjectAntrag' => $this->p->t('studierendenantrag','error_no_right'),
-				'isObjected' => $this->p->t('studierendenantrag','error_not_objected')
+				'isEntitledToObjectAntrag' => $this->p->t('studierendenantrag', 'error_no_right'),
+				'isObjected' => $this->p->t('studierendenantrag', 'error_not_objected')
 			]
 		);
 
@@ -208,8 +210,8 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToObjectAntrag|callback_isObjected',
 			[
-				'isEntitledToObjectAntrag' => $this->p->t('studierendenantrag','error_no_right'),
-				'isObjected' => $this->p->t('studierendenantrag','error_not_objected')
+				'isEntitledToObjectAntrag' => $this->p->t('studierendenantrag', 'error_no_right'),
+				'isObjected' => $this->p->t('studierendenantrag', 'error_not_objected')
 			]
 		);
 
@@ -265,7 +267,7 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToApproveAntrag',
 			[
-				'isEntitledToApproveAntrag' => $this->p->t('studierendenantrag','error_no_right')
+				'isEntitledToApproveAntrag' => $this->p->t('studierendenantrag', 'error_no_right')
 			]
 		);
 
@@ -301,7 +303,7 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToApproveAntrag',
 			[
-				'isEntitledToApproveAntrag' => $this->p->t('studierendenantrag','error_no_right')
+				'isEntitledToApproveAntrag' => $this->p->t('studierendenantrag', 'error_no_right')
 			]
 		);
 
@@ -332,7 +334,7 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToRejectAntrag',
 			[
-				'isEntitledToRejectAntrag' => $this->p->t('studierendenantrag','error_no_right')
+				'isEntitledToRejectAntrag' => $this->p->t('studierendenantrag', 'error_no_right')
 			]
 		);
 		$this->form_validation->set_rules('grund', 'Grund', 'required');
@@ -365,7 +367,7 @@ class Leitung extends FHC_Controller
 			'Studierenden Antrag',
 			'required|callback_isEntitledToApproveAntrag',
 			[
-				'isEntitledToApproveAntrag' => $this->p->t('studierendenantrag','error_no_right')
+				'isEntitledToApproveAntrag' => $this->p->t('studierendenantrag', 'error_no_right')
 			]
 		);
 
