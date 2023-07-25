@@ -29,7 +29,4 @@ class Cis4 extends FHC_Controller
 	{
 		$this->load->view('CisHtml/Dashboard.php');
 	}
-
-	
-
 }
