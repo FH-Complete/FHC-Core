@@ -22,14 +22,18 @@ export const BismeldestichtagTabulatorOptions = {
 	maxHeight: "100%",
 	minHeight: 50,
 	layout: 'fitColumns',
+	index: 'meldestichtag_id',
 	columns: [
 		{title: 'Meldestichtag',field: 'meldestichtag', headerFilter: true, formatter: function(cell){
 				return BismeldestichtagTabulatorHelperFunctions._formatDate(cell.getValue());
 			}
 		},
 		{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true},
-		{title: 'Löschen', field: 'meldestichtag_id', headerFilter: false, formatter:function(cell){
-				return '<button class="btn btn-primary delete-btn" data-meldestichtag-id="'+cell.getValue()+'">Löschen</button>';
+		{title: 'ID', field: 'meldestichtag_id', headerFilter: true, visible: false},
+		{title: 'Löschen', field: 'loeschen', headerFilter: false, formatter:function(cell){
+				return	'<button class="btn btn-outline-secondary delete-btn" data-meldestichtag-id="'+cell.getRow().getIndex()+'">'+
+							'<i class="fa fa-xmark"></i>'+
+						'</button>';
 			}
 		}
 	]
@@ -42,8 +46,7 @@ export const BismeldestichtagTabulatorEventHandlers = [
 	{
 		event: "rowClick",
 		handler: function(e, row) {
-			if (e.target.nodeName == 'DIV')
-			{
+			if (e.target.nodeName == 'DIV') {
 				let data = row.getData();
 				alert(data.studiensemester_kurzbz + ': ' + BismeldestichtagTabulatorHelperFunctions._formatDate(data.meldestichtag));
 			}
@@ -52,7 +55,7 @@ export const BismeldestichtagTabulatorEventHandlers = [
 ];
 
 let BismeldestichtagTabulatorHelperFunctions = {
-	_formatDate: function(date){
+	_formatDate: function(date) {
 		return date.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
 	}
 }
