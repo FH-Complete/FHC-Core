@@ -40,6 +40,7 @@ abstract class Vertragsbestandteil extends AbstractBestandteil implements \JsonS
 		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
 		isset($data->von) && $this->setVon($data->von);
 		isset($data->bis) && $this->setBis($data->bis);
+		isset($data->vertragsbestandteiltyp_kurzbz) && $this->setVertragsbestandteiltyp_kurzbz($data->vertragsbestandteiltyp_kurzbz);
 		isset($data->insertamum) && $this->setInsertamum($data->insertamum);
 		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
 		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
@@ -149,8 +150,7 @@ abstract class Vertragsbestandteil extends AbstractBestandteil implements \JsonS
 
 	public function setVertragsbestandteiltyp_kurzbz($vertragsbestandteiltyp_kurzbz)
 	{
-		// type should never change and is set in constructor so do not mark dirty
-		//$this->markDirty('vertragsbestandteiltyp_kurzbz', $this->vertragsbestandteiltyp_kurzbz, $vertragsbestandteiltyp_kurzbz);
+		$this->markDirty('vertragsbestandteiltyp_kurzbz', $this->vertragsbestandteiltyp_kurzbz, $vertragsbestandteiltyp_kurzbz);
 		$this->vertragsbestandteiltyp_kurzbz = $vertragsbestandteiltyp_kurzbz;
 		return $this;
 	}
