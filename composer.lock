@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12acec21673c71641f7f1a6586ec666f",
+    "content-hash": "ca679afc87606768c8ae706f9a8ac6b6",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1490,10 +1490,10 @@
         },
         {
             "name": "npm-asset/primevue",
-            "version": "3.15.0",
+            "version": "3.29.1",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/primevue/-/primevue-3.15.0.tgz"
+                "url": "https://registry.npmjs.org/primevue/-/primevue-3.29.1.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -1850,19 +1850,19 @@
         },
         {
             "name": "vuejs/vuedatepicker_css",
-            "version": "4.2.3",
+            "version": "5.4.0",
             "dist": {
                 "type": "file",
-                "url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/main.css"
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/main.css"
             },
             "type": "library"
         },
         {
             "name": "vuejs/vuedatepicker_js",
-            "version": "4.2.3",
+            "version": "5.4.0",
             "dist": {
                 "type": "file",
-                "url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/vue-datepicker.iife.js"
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/vue-datepicker.iife.js"
             },
             "type": "library"
         },
@@ -4738,5 +4738,5 @@
         "php": ">=5.6.40"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.1.0"
 }

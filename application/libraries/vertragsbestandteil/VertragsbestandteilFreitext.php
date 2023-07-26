@@ -17,14 +17,16 @@ class VertragsbestandteilFreitext extends Vertragsbestandteil
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FREITEXT);
 	}
 	
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{
-		parent::hydrateByStdClass($data);
+		parent::hydrateByStdClass($data, $fromdb);
+		$this->fromdb = $fromdb;
 		isset($data->freitexttyp) && $this->setFreitexttypKurzbz($data->freitexttyp);
 		isset($data->freitexttyp_kurzbz) && $this->setFreitexttypKurzbz($data->freitexttyp_kurzbz);
 		isset($data->titel) && $this->setTitel($data->titel);
 		isset($data->freitext) && $this->setAnmerkung($data->freitext);
 		isset($data->anmerkung) && $this->setAnmerkung($data->anmerkung);
+		$this->fromdb = false;
 	}
 		
 	public function toStdClass(): \stdClass
@@ -36,9 +38,9 @@ class VertragsbestandteilFreitext extends Vertragsbestandteil
 			'anmerkung' => $this->getAnmerkung()
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}
@@ -67,6 +69,7 @@ EOTXT;
 	 */
 	public function setAnmerkung($anmerkung): self
 	{
+		$this->markDirty('anmerkung', $this->anmerkung, $anmerkung);
 		$this->anmerkung = $anmerkung;
 
 		return $this;
@@ -85,6 +88,7 @@ EOTXT;
 	 */
 	public function setTitel($titel): self
 	{
+		$this->markDirty('titel', $this->titel, $titel);
 		$this->titel = $titel;
 
 		return $this;
@@ -94,7 +98,7 @@ EOTXT;
 	 * Get the value of freitexttyp_kurzbz
 	 */
 	public function getFreitexttypKurzbz()
-	{
+	{		
 		return $this->freitexttyp_kurzbz;
 	}
 
@@ -103,6 +107,7 @@ EOTXT;
 	 */
 	public function setFreitexttypKurzbz($freitexttyp_kurzbz): self
 	{
+		$this->markDirty('freitexttyp_kurzbz', $this->freitexttyp_kurzbz, $freitexttyp_kurzbz);
 		$this->freitexttyp_kurzbz = $freitexttyp_kurzbz;
 
 		return $this;

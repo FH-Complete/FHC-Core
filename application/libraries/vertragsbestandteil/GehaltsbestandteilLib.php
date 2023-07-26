@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/IValidation.php';
+require_once __DIR__ . '/AbstractBestandteil.php';
 require_once __DIR__ . '/Gehaltsbestandteil.php';
 
 use vertragsbestandteil\Gehaltsbestandteil;
@@ -82,6 +83,10 @@ class GehaltsbestandteilLib
 	
 	protected function updateGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
 	{
+		if(!$gehaltsbestandteil->isDirty()) {
+			return;
+		}
+		
 		$gehaltsbestandteil->setUpdatevon($this->loggedInUser)
 			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->GehaltsbestandteilModel->update($gehaltsbestandteil->getGehaltsbestandteil_id(), 

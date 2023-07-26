@@ -352,9 +352,9 @@
                         "type": "package",
                         "package": {
                                 "name": "vuejs/vuedatepicker_js",
-                                "version": "4.2.3",
+                                "version": "5.4.0",
                                 "dist": {
-                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/vue-datepicker.iife.js",
+                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/vue-datepicker.iife.js",
                                         "type": "file"
                                 }
                         }
@@ -363,9 +363,9 @@
                         "type": "package",
                         "package": {
                                 "name": "vuejs/vuedatepicker_css",
-                                "version": "4.2.3",
+                                "version": "5.4.0",
                                 "dist": {
-                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/main.css",
+                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/main.css",
                                         "type": "file"
                                 }
                         }
@@ -422,7 +422,7 @@
 		"nategood/httpful": "0.2.*",
 		"netcarver/textile": "3.7.*",
 		"nicolaskruchten/pivottable": "2.23.0",
-		"npm-asset/primevue": "3.15.*",
+		"npm-asset/primevue": "3.29.1",
 		"npm-asset/primeicons": "5.0.0",
 
 		"olifolkerd/tabulator4": "4.9.*",
@@ -443,8 +443,8 @@
 
 		"vuejs/vuejs3": "3.2.33",
 		"vuejs/vuerouter4": "4.1.3",
-                "vuejs/vuedatepicker_js": "4.2.3",
-                "vuejs/vuedatepicker_css": "4.2.3"
+        "vuejs/vuedatepicker_js": "5.4.0",
+        "vuejs/vuedatepicker_css": "5.4.0"
 	},
 	"config": {
 		"bin-dir": "vendor/bin"

@@ -121,7 +121,7 @@ EOSQL;
 		{
 			foreach( $rows as $row ) {
 				$tmpgb = new Gehaltsbestandteil();
-				$tmpgb->hydrateByStdClass($row);
+				$tmpgb->hydrateByStdClass($row, true);
 				$gehaltsbestandteile[] = $tmpgb;
 			}
 		}
@@ -139,7 +139,7 @@ EOSQL;
 		if( null !== ($row = getData($query)) )
 		{
 			$gehaltsbestandteil = new Gehaltsbestandteil();
-			$gehaltsbestandteil->hydrateByStdClass($row[0]);
+			$gehaltsbestandteil->hydrateByStdClass($row[0], true);
 		}
 
 		return $gehaltsbestandteil;

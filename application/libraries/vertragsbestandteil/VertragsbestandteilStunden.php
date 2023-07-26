@@ -24,11 +24,13 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_STUNDEN);
 	}
 	
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{
-		parent::hydrateByStdClass($data);
+		parent::hydrateByStdClass($data, $fromdb);
+		$this->fromdb = $fromdb;
 		isset($data->wochenstunden) && $this->setWochenstunden($data->wochenstunden);
 		isset($data->teilzeittyp_kurzbz) && $this->setTeilzeittyp_kurzbz($data->teilzeittyp_kurzbz);
+		$this->fromdb = false;
 	}
 	
 	public function getWochenstunden()
@@ -43,14 +45,17 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 
 	public function setWochenstunden($wochenstunden)
 	{
+		$this->markDirty('wochenstunden', $this->wochenstunden, $wochenstunden);
 		$this->wochenstunden = $wochenstunden;
 		return $this;
 	}
 
 	public function setTeilzeittyp_kurzbz($teilzeittyp_kurzbz)
 	{
-		$this->teilzeittyp_kurzbz = ($teilzeittyp_kurzbz !== '') 
+		$teilzeittyp_kurzbz = ($teilzeittyp_kurzbz !== '') 
 			? $teilzeittyp_kurzbz : null;
+		$this->markDirty('teilzeittyp_kurzbz', $this->teilzeittyp_kurzbz, $teilzeittyp_kurzbz);
+		$this->teilzeittyp_kurzbz = $teilzeittyp_kurzbz;
 		return $this;
 	}
 	
@@ -62,9 +67,9 @@ class VertragsbestandteilStunden extends Vertragsbestandteil
 			'teilzeittyp_kurzbz' => $this->getTeilzeittyp_kurzbz()
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}

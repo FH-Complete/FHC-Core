@@ -78,9 +78,9 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 			'benutzerfunktion_id' => $this->getBenutzerfunktion_id()
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}
@@ -94,15 +94,17 @@ EOTXT;
 		return parent::__toString() . $txt;
 	}
 
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{
-		parent::hydrateByStdClass($data);
+		parent::hydrateByStdClass($data, $fromdb);
+		$this->fromdb = $fromdb;
 		isset($data->benutzerfunktionid) && $this->setBenutzerfunktion_id($data->benutzerfunktionid);
 		isset($data->benutzerfunktion_id) && $this->setBenutzerfunktion_id($data->benutzerfunktion_id);
 		isset($data->funktion) && isset($data->orget) 
 			&& isset($data->mitarbeiter_uid) && $this->createBenutzerfunktionData($data);
 		isset($data->funktion_bezeichnung) && isset($data->oe_bezeichnung) 
 			&& $this->createBenutzerfunktionData4Display($data);
+		$this->fromdb = false;
 		
 	}
 	
@@ -113,6 +115,7 @@ EOTXT;
 	
 	public function setBenutzerfunktion_id($benutzerfunktion_id)
 	{
+		$this->markDirty('benutzerfunktion_id', $this->benutzerfunktion_id, $benutzerfunktion_id);
 		$this->benutzerfunktion_id = $benutzerfunktion_id;
 		return $this;
 	}

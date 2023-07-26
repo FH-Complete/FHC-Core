@@ -97,7 +97,7 @@ EOSQL;
 		foreach( $data as $row ) {
 			try
 			{
-				$vertragsbestandteile[] = VertragsbestandteilFactory::getVertragsbestandteil($row);
+				$vertragsbestandteile[] = VertragsbestandteilFactory::getVertragsbestandteil($row, true);
 			}
 			catch (Exception $ex)
 			{
@@ -129,7 +129,7 @@ EOSQL;
 			$data = getData($query)[0];
 			try
 			{
-				$vertragsbestandteil = VertragsbestandteilFactory::getVertragsbestandteil($data);  // TODO add decryption
+				$vertragsbestandteil = VertragsbestandteilFactory::getVertragsbestandteil($data, true);  // TODO add decryption
 			}
 			catch (Exception $ex)
 			{

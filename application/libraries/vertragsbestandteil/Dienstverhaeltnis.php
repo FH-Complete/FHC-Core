@@ -2,6 +2,10 @@
 namespace vertragsbestandteil;
 
 require_once __DIR__ . '/IValidation.php';
+require_once __DIR__ . '/AbstractBestandteil.php';
+
+use vertragsbestandteil\AbstractBestandteil;
+use vertragsbestandteil\IValidation;
 
 const TYPE_ECHT = 'echterdv';
 const TYPE_STUDENTISCHE_HILFSKRAFT = 'studentischehilfskr';
@@ -12,7 +16,7 @@ const TYPE_ECHT_FREI = 'echterfreier';
 const TYPE_WERKVERTRAG = 'werkvertrag';
 const TYPE_UEBERLASSUNG = 'ueberlassungsvertrag';
 
-class Dienstverhaeltnis implements IValidation {
+class Dienstverhaeltnis extends AbstractBestandteil implements IValidation {
     protected $dienstverhaeltnis_id;
 	protected $mitarbeiter_uid;
     protected $vertragsart_kurzbz;
@@ -29,12 +33,14 @@ class Dienstverhaeltnis implements IValidation {
 
 	public function __construct()
 	{
+		parent::__construct();
 		$this->isvalid = false;
 		$this->validationerrors = array();
 	}
 	
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{		
+		$this->fromdb = $fromdb;
 		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
 		isset($data->mitarbeiter_uid) && $this->setMitarbeiter_uid($data->mitarbeiter_uid);
 		isset($data->vertragsart_kurzbz) && $this->setVertragsart_kurzbz($data->vertragsart_kurzbz);
@@ -45,6 +51,7 @@ class Dienstverhaeltnis implements IValidation {
 		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
 		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
 		isset($data->updatevon) && $this->setUpdatevon($data->updatevon);
+		$this->fromdb = false;
 	}
 	
     public function toStdClass(): \stdClass
@@ -62,9 +69,9 @@ class Dienstverhaeltnis implements IValidation {
 			'updatevon' => $this->getUpdatevon()
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}
@@ -136,60 +143,70 @@ EOTXT;
 
 	public function setDienstverhaeltnis_id($dienstverhaeltnis_id)
 	{
+		$this->markDirty('dienstverhaeltnis_id', $this->dienstverhaeltnis_id, $dienstverhaeltnis_id);
 		$this->dienstverhaeltnis_id = $dienstverhaeltnis_id;
 		return $this;
 	}
 
 	public function setMitarbeiter_uid($mitarbeiter_uid)
 	{
+		$this->markDirty('mitarbeiter_uid', $this->mitarbeiter_uid, $mitarbeiter_uid);
 		$this->mitarbeiter_uid = $mitarbeiter_uid;
 		return $this;
 	}
 
 	public function setVertragsart_kurzbz($vertragsart_kurzbz)
 	{
+		$this->markDirty('vertragsart_kurzbz', $this->vertragsart_kurzbz, $vertragsart_kurzbz);
 		$this->vertragsart_kurzbz = $vertragsart_kurzbz;
 		return $this;
 	}
 
 	public function setOe_kurzbz($oe_kurzbz)
 	{
+		$this->markDirty('oe_kurzbz', $this->oe_kurzbz, $oe_kurzbz);
 		$this->oe_kurzbz = $oe_kurzbz;
 		return $this;
 	}
 
 	public function setVon($von)
 	{
+		$this->markDirty('von', $this->von, $von);
 		$this->von = $von;
 		return $this;
 	}
 
 	public function setBis($bis)
 	{
+		$this->markDirty('bis', $this->bis, $bis);
 		$this->bis = $bis;
 		return $this;
 	}
 
 	public function setInsertamum($insertamum)
 	{
+		$this->markDirty('insertamum', $this->insertamum, $insertamum);
 		$this->insertamum = $insertamum;
 		return $this;
 	}
 
 	public function setInsertvon($insertvon)
 	{
+		$this->markDirty('insertvon', $this->insertvon, $insertvon);
 		$this->insertvon = $insertvon;
 		return $this;
 	}
 
 	public function setUpdateamum($updateamum)
 	{
+		$this->markDirty('updateamum', $this->updateamum, $updateamum);
 		$this->updateamum = $updateamum;
 		return $this;
 	}
 
 	public function setUpdatevon($updatevon)
 	{
+		$this->markDirty('updatevon', $this->updatevon, $updatevon);
 		$this->updatevon = $updatevon;
 		return $this;
 	}

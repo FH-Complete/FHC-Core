@@ -1,12 +1,13 @@
 <?php
 namespace vertragsbestandteil;
 
+use vertragsbestandteil\AbstractBestandteil;
 use DateTimeImmutable;
 
 /**
  * Salary always depends on employment (Dienstverhältnis) and optionally on part of contract (Vetragsbestandteil)
  */
-class Gehaltsbestandteil implements IValidation, \JsonSerializable
+class Gehaltsbestandteil extends AbstractBestandteil implements IValidation, \JsonSerializable
 {
 	protected $gehaltsbestandteil_id;
 	protected $dienstverhaeltnis_id;
@@ -31,12 +32,14 @@ class Gehaltsbestandteil implements IValidation, \JsonSerializable
 
 	public function __construct()
 	{
+		parent::__construct();
 		$this->isvalid = false;
 		$this->validationerrors = array();
 	}
 	
-    public function hydrateByStdClass($data)
-	{		
+    public function hydrateByStdClass($data, $fromdb=false)
+	{	
+		$this->fromdb = $fromdb;
 		isset($data->gehaltsbestandteil_id) && $this->setGehaltsbestandteil_id($data->gehaltsbestandteil_id);
 		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
 		isset($data->vertragsbestandteil_id) && $this->setVertragsbestandteil_id($data->vertragsbestandteil_id);
@@ -54,6 +57,7 @@ class Gehaltsbestandteil implements IValidation, \JsonSerializable
 		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
 		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
 		isset($data->updatevon) && $this->setUpdatevon($data->updatevon);
+		$this->fromdb = false;
 	}
 	
 	public function getGehaltsbestandteil_id()
@@ -153,96 +157,112 @@ class Gehaltsbestandteil implements IValidation, \JsonSerializable
 
 	public function setGehaltsbestandteil_id($gehaltsbestandteil_id)
 	{
+		$this->markDirty('gehaltsbestandteil_id', $this->gehaltsbestandteil_id, $gehaltsbestandteil_id);
 		$this->gehaltsbestandteil_id = $gehaltsbestandteil_id;
 		return $this;
 	}
 
 	public function setDienstverhaeltnis_id($dienstverhaeltnis_id)
 	{
+		$this->markDirty('dienstverhaeltnis_id', $this->dienstverhaeltnis_id, $dienstverhaeltnis_id);
 		$this->dienstverhaeltnis_id = $dienstverhaeltnis_id;
 		return $this;
 	}
 
 	public function setVertragsbestandteil_id($vertragsbestandteil_id)
 	{
+		$this->markDirty('vertragsbestandteil_id', $this->vertragsbestandteil_id, $vertragsbestandteil_id);
 		$this->vertragsbestandteil_id = $vertragsbestandteil_id;
 		return $this;
 	}
 
 	public function setGehaltstyp_kurzbz($gehaltstyp_kurzbz)
 	{
+		$this->markDirty('gehaltstyp_kurzbz', $this->gehaltstyp_kurzbz, $gehaltstyp_kurzbz);
 		$this->gehaltstyp_kurzbz = $gehaltstyp_kurzbz;
 		return $this;
 	}
 
 	public function setVon($von)
 	{
+		$this->markDirty('von', $this->von, $von);
 		$this->von = $von;
 		return $this;
 	}
 
 	public function setBis($bis)
 	{
+		$this->markDirty('bis', $this->bis, $bis);
 		$this->bis = $bis;
 		return $this;
 	}
 
 	public function setAnmerkung($anmerkung)
 	{
+		$this->markDirty('anmerkung', $this->anmerkung, $anmerkung);
 		$this->anmerkung = $anmerkung;
 		return $this;
 	}
 
 	public function setGrundbetrag($grundbetrag)
 	{
+		$this->markDirty('grundbetrag', $this->grundbetrag, $grundbetrag);
 		$this->grundbetrag = $grundbetrag;
 		return $this;
 	}
 
 	public function setBetrag_valorisiert($betrag_valorisiert)
 	{
+		$this->markDirty('betrag_valorisiert', $this->betrag_valorisiert, $betrag_valorisiert);
 		$this->betrag_valorisiert = $betrag_valorisiert;
 		return $this;
 	}
 
 	public function setValorisierungssperre($valorisierungssperre)
 	{
+		$this->markDirty('valorisierungssperre', $this->valorisierungssperre, $valorisierungssperre);
 		$this->valorisierungssperre = $valorisierungssperre;
 		return $this;
 	}
 
 	public function setValorisierung($valorisierung)
 	{
+		$this->markDirty('valorisierung', $this->valorisierung, $valorisierung);
 		$this->valorisierung = $valorisierung;
 		return $this;
 	}
 
 	public function setAuszahlungen($auszahlungen)
 	{
+		$this->markDirty('auszahlungen', $this->auszahlungen, $auszahlungen);
 		$this->auszahlungen = $auszahlungen;
 		return $this;
 	}
 
 	public function setInsertamum($insertamum)
 	{
+		$this->markDirty('insertamum', $this->insertamum, $insertamum);
 		$this->insertamum = $insertamum;
 		return $this;
 	}
 
 	public function setInsertvon($insertvon)
 	{
+		$this->markDirty('insertvon', $this->insertvon, $insertvon);
 		$this->insertvon = $insertvon;
 		return $this;
 	}
 
 	public function setUpdateamum($updateamum)
 	{
+		$this->markDirty('updateamum', $this->updateamum, $updateamum);
 		$this->updateamum = $updateamum;
 		return $this;
 	}
 
 	public function setUpdatevon($updatevon)
 	{
+		$this->markDirty('updatevon', $this->updatevon, $updatevon);
 		$this->updatevon = $updatevon;
 		return $this;
 	}
@@ -275,9 +295,9 @@ class Gehaltsbestandteil implements IValidation, \JsonSerializable
 			'updatevon' => $this->getUpdatevon()
 		);
 
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 
 		return (object) $tmp;
 	}

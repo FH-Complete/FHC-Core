@@ -1,12 +1,14 @@
 <?php
 namespace vertragsbestandteil;
 
+use vertragsbestandteil\AbstractBestandteil;
+
 /**
  * Description of Vertragsbestandteil
  *
  * @author bambi
  */
-abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
+abstract class Vertragsbestandteil extends AbstractBestandteil implements \JsonSerializable, IValidation
 {
 	protected $vertragsbestandteil_id;
 	protected $dienstverhaeltnis_id;
@@ -25,13 +27,15 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 
 	public function __construct()
 	{
+		parent::__construct();
 		$this->gehaltsbestandteile = array();
 		$this->isvalid = false;
 		$this->validationerrors = array();
 	}
 	
-	public function hydrateByStdClass($data)
-	{		
+	public function hydrateByStdClass($data, $fromdb=false)
+	{
+		$this->fromdb = $fromdb;
 		isset($data->vertragsbestandteil_id) && $this->setVertragsbestandteil_id($data->vertragsbestandteil_id);
 		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
 		isset($data->von) && $this->setVon($data->von);
@@ -40,6 +44,7 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
 		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
 		isset($data->updatevon) && $this->setUpdatevon($data->updatevon);
+		$this->fromdb = false;
 	}
 	
 	public function addGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
@@ -108,6 +113,7 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 	
 	public function setVertragsbestandteil_id($vertragsbestandteil_id)
 	{
+		$this->markDirty('vertragsbestandteil_id', $this->vertragsbestandteil_id, $vertragsbestandteil_id);
 		$this->vertragsbestandteil_id = $vertragsbestandteil_id;
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{
@@ -118,6 +124,7 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 
 	public function setDienstverhaeltnis_id($dienstverhaeltnis_id)
 	{
+		$this->markDirty('dienstverhaeltnis_id', $this->dienstverhaeltnis_id, $dienstverhaeltnis_id);
 		$this->dienstverhaeltnis_id = $dienstverhaeltnis_id;
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{
@@ -128,42 +135,50 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 
 	public function setVon($von)
 	{
+		$this->markDirty('von', $this->von, $von);
 		$this->von = $von;
 		return $this;
 	}
 
 	public function setBis($bis)
 	{
+		$this->markDirty('bis', $this->bis, $bis);
 		$this->bis = $bis;
 		return $this;
 	}
 
 	public function setVertragsbestandteiltyp_kurzbz($vertragsbestandteiltyp_kurzbz)
 	{
+		// type should never change and is set in constructor so do not mark dirty
+		//$this->markDirty('vertragsbestandteiltyp_kurzbz', $this->vertragsbestandteiltyp_kurzbz, $vertragsbestandteiltyp_kurzbz);
 		$this->vertragsbestandteiltyp_kurzbz = $vertragsbestandteiltyp_kurzbz;
 		return $this;
 	}
 
 	public function setInsertamum($insertamum)
 	{
+		$this->markDirty('insertamum', $this->insertamum, $insertamum);
 		$this->insertamum = $insertamum;
 		return $this;
 	}
 
 	public function setInsertvon($insertvon)
 	{
+		$this->markDirty('insertvon', $this->insertvon, $insertvon);
 		$this->insertvon = $insertvon;
 		return $this;
 	}
 
 	public function setUpdateamum($updateamum)
 	{
+		$this->markDirty('updateamum', $this->updateamum, $updateamum);
 		$this->updateamum = $updateamum;
 		return $this;
 	}
 
 	public function setUpdatevon($updatevon)
 	{
+		$this->markDirty('updatevon', $this->updatevon, $updatevon);
 		$this->updatevon = $updatevon;
 		return $this;
 	}
@@ -181,9 +196,9 @@ abstract class Vertragsbestandteil  implements \JsonSerializable, IValidation
 			'updatevon' => $this->getUpdatevon(),
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}

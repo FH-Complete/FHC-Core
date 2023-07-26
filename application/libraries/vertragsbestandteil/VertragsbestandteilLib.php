@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/IValidation.php';
+require_once __DIR__ . '/AbstractBestandteil.php';
 require_once __DIR__ . '/Dienstverhaeltnis.php';
 require_once __DIR__ . '/Vertragsbestandteil.php';
 require_once __DIR__ . '/VertragsbestandteilStunden.php';
@@ -73,7 +74,7 @@ class VertragsbestandteilLib
 		if(null !== ($row = getData($result))) 
 		{
 			$dv = new Dienstverhaeltnis();
-			$dv->hydrateByStdClass($row[0]);
+			$dv->hydrateByStdClass($row[0], true);
 		}
 		return $dv;
 	}
@@ -270,6 +271,10 @@ class VertragsbestandteilLib
 
 	protected function updateDienstverhaeltnis(Dienstverhaeltnis $dv)
 	{
+		if(!$dv->isDirty()) {
+			return;
+		}
+		
 		$dv->setUpdatevon($this->loggedInUser)
 			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->DienstverhaeltnisModel->update($dv->getDienstverhaeltnis_id(),
@@ -315,26 +320,28 @@ class VertragsbestandteilLib
 
 	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
 	{
-		$vertragsbestandteil->setUpdatevon($this->loggedInUser)
-			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
-		$vertragsbestandteil->beforePersist();
-		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(),
-			$vertragsbestandteil->baseToStdClass());
-		
-		if(isError($ret) )
-		{
-			throw new Exception('error updating vertragsbestandteil');
-		}
-		
-		$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
-			$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
-		$retspecial = $specialisedModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
-			$vertragsbestandteil->toStdClass());
-		
-		if(isError($retspecial) )
-		{
-			throw new Exception('error updating vertragsbestandteil ' 
-				. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+		if($vertragsbestandteil->isDirty()) {		
+			$vertragsbestandteil->setUpdatevon($this->loggedInUser)
+				->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
+			$vertragsbestandteil->beforePersist();
+			$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(),
+				$vertragsbestandteil->baseToStdClass());
+
+			if(isError($ret) )
+			{
+				throw new Exception('error updating vertragsbestandteil');
+			}
+
+			$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
+				$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+			$retspecial = $specialisedModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
+				$vertragsbestandteil->toStdClass());
+
+			if(isError($retspecial) )
+			{
+				throw new Exception('error updating vertragsbestandteil ' 
+					. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+			}
 		}
 		
 		try 

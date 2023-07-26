@@ -16,11 +16,13 @@ class VertragsbestandteilKuendigungsfrist extends Vertragsbestandteil
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_KUENDIGUNGSFRIST);
 	}
 	
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{
-		parent::hydrateByStdClass($data);
+		parent::hydrateByStdClass($data, $fromdb);
+		$this->fromdb = $fromdb;
 		isset($data->arbeitgeber_frist) && $this->setArbeitgeberFrist($data->arbeitgeber_frist);
 		isset($data->arbeitnehmer_frist) && $this->setArbeitnehmerFrist($data->arbeitnehmer_frist);
+		$this->fromdb = false;
 	}
 	
 	/**
@@ -36,6 +38,7 @@ class VertragsbestandteilKuendigungsfrist extends Vertragsbestandteil
 	 */
 	public function setArbeitgeberFrist($arbeitgeber_frist): self
 	{
+		$this->markDirty('arbeitgeber_frist', $this->arbeitgeber_frist, $arbeitgeber_frist);
 		$this->arbeitgeber_frist = $arbeitgeber_frist;
 
 		return $this;
@@ -54,6 +57,7 @@ class VertragsbestandteilKuendigungsfrist extends Vertragsbestandteil
 	 */
 	public function setArbeitnehmerFrist($arbeitnehmer_frist): self
 	{
+		$this->markDirty('arbeitnehmer_frist', $this->arbeitnehmer_frist, $arbeitnehmer_frist);
 		$this->arbeitnehmer_frist = $arbeitnehmer_frist;
 
 		return $this;
@@ -67,9 +71,9 @@ class VertragsbestandteilKuendigungsfrist extends Vertragsbestandteil
 			'arbeitnehmer_frist' => $this->getArbeitnehmerFrist()
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}
