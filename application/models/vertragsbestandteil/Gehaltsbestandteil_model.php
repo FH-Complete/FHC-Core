@@ -11,6 +11,7 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_gehaltsbestandteil';
 		$this->pk = 'gehaltsbestandteil_id';
+		$this->hasSequence = true;
 	}
 
     public function getEncryptedColumns(): array

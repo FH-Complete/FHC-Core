@@ -15,6 +15,7 @@ class Vertragsbestandteil_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_vertragsbestandteil';
 		$this->pk = 'vertragsbestandteil_id';
+		$this->hasSequence = true;
 	}
 
 	protected function getVertragsbestandteilSQL()

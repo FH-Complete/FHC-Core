@@ -8,6 +8,7 @@ class Dienstverhaeltnis_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_dienstverhaeltnis';
 		$this->pk = 'dienstverhaeltnis_id';
+		$this->hasSequence = true;
 	}
 
     /**

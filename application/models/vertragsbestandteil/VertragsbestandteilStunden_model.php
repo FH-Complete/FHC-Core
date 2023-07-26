@@ -14,5 +14,6 @@ class VertragsbestandteilStunden_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_vertragsbestandteil_stunden';
 		$this->pk = 'vertragsbestandteil_id';
+		$this->hasSequence = false;
 	}
 }

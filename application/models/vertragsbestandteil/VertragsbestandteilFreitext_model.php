@@ -8,5 +8,6 @@ class VertragsbestandteilFreitext_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_vertragsbestandteil_freitext';
 		$this->pk = 'vertragsbestandteil_id';
+		$this->hasSequence = false;
 	}
 }
