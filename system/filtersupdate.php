@@ -528,6 +528,27 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'aufgenommen',
+		'filter_kurzbz' => 'InfoCenterAufgenommenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Aufgenommen - Alle",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
 		'app' => 'budget',
 		'dataset_name' => 'budgetoverview',
 		'filter_kurzbz' => 'BudgetUebersicht',
