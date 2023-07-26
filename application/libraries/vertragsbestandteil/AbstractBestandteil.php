@@ -30,8 +30,9 @@ abstract class AbstractBestandteil
 			return;
 		}	
 		
-		if($old_value != $new_value) {
-		
+		if( is_bool($new_value) && ($old_value !== $new_value) ) {
+			$this->modifiedcolumns[$columnname] = $columnname;
+		} else if($old_value != $new_value) {		
 			$this->modifiedcolumns[$columnname] = $columnname;
 		}
 	}
