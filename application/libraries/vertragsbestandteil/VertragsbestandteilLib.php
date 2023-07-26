@@ -324,23 +324,33 @@ class VertragsbestandteilLib
 			$vertragsbestandteil->setUpdatevon($this->loggedInUser)
 				->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 			$vertragsbestandteil->beforePersist();
-			$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(),
-				$vertragsbestandteil->baseToStdClass());
-
-			if(isError($ret) )
+			$basedata = $vertragsbestandteil->baseToStdClass();
+			if( count((array) $basedata) > 0 ) 
 			{
-				throw new Exception('error updating vertragsbestandteil');
+				$ret = $this->VertragsbestandteilModel->update(
+					$vertragsbestandteil->getVertragsbestandteil_id(), 
+					$basedata);
+
+				if(isError($ret) )
+				{
+					throw new Exception('error updating vertragsbestandteil');
+				}	
 			}
 
-			$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
-				$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
-			$retspecial = $specialisedModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
-				$vertragsbestandteil->toStdClass());
-
-			if(isError($retspecial) )
+			$specialisedData = $vertragsbestandteil->toStdClass();
+			if( count((array) $specialisedData) > 0 ) 
 			{
-				throw new Exception('error updating vertragsbestandteil ' 
-					. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+				$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
+					$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+				$retspecial = $specialisedModel->update(
+					$vertragsbestandteil->getVertragsbestandteil_id(), 
+					$specialisedData);
+
+				if(isError($retspecial) )
+				{
+					throw new Exception('error updating vertragsbestandteil ' 
+						. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+				}
 			}
 		}
 		

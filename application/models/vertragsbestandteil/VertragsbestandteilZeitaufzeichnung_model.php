@@ -8,6 +8,5 @@ class VertragsbestandteilZeitaufzeichnung_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_vertragsbestandteil_zeitaufzeichnung';
 		$this->pk = 'vertragsbestandteil_id';
-		$this->hasSequence = false;
 	}
 }
