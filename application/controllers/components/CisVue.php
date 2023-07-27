@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class CisVue extends Auth_Controller
+class CisVue extends FHC_Controller
 {
 
 	/**
@@ -13,12 +13,14 @@ class CisVue extends Auth_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct([
-			'Menu' => 'user:r'
-		]);
+		parent::__construct();
 
 		// Loads authentication library and starts authentication
 		$this->load->library('AuthLib');
+		$this->load->library('PermissionLib');
+
+		if (!isLogged())
+			show_404();
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

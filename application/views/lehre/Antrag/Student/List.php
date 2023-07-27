@@ -17,7 +17,7 @@ $sitesettings = array(
 );
 
 $this->load->view(
-	'templates/FHC-Header',
+	'templates/CISHTML-Header',
 	$sitesettings
 );
 ?>
@@ -131,6 +131,6 @@ $this->load->view(
 
 <?php
 $this->load->view(
-	'templates/FHC-Footer',
+	'templates/CISHTML-Footer',
 	$sitesettings
 );

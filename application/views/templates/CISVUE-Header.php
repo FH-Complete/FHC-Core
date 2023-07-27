@@ -17,13 +17,19 @@ $this->load->view('templates/FHC-Header', $includesArray);
 
 ?>
 
+<script type="text/javascript">
+	if (window.self !== window.top)
+		document.body.classList.add("in-frame");
+</script>
+
 <header id="cis-header" class="navbar-dark">
 	<cis-menu 
-		root-url="<?= site_url('CisVue'); ?>" 
+		root-url="<?= site_url(''); ?>" 
 		logo-url="<?= base_url('/public/images/logo-300x160.png'); ?>" 
-		avatar-url="<?= base_url('/cis/public/bild.php?src=person&person_id=' . getAuthPersonId()); ?>" 
+		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>" 
 		:searchbaroptions="searchbaroptions" 
 		:searchfunction="searchfunction" />
 </header>
+
 <main id="cis-main" class="flex-grow-1 overflow-scroll p-4">

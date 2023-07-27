@@ -18,13 +18,13 @@ $sitesettings = array(
 );
 
 $this->load->view(
-	'templates/FHC-Header',
+	'templates/CISHTML-Header',
 	$sitesettings
 );
 ?>
 
 <div id="wrapper">
-	<div class="fhc-header">
+	<div class="fhc-header hide-in-frame">
 		<h1 class="h2"><?= $this->p->t('studierendenantrag', 'antrag_header'); ?></h1>
 	</div>
 
@@ -49,6 +49,6 @@ $this->load->view(
 
 <?php
 $this->load->view(
-	'templates/FHC-Footer',
+	'templates/CISHTML-Footer',
 	$sitesettings
 );

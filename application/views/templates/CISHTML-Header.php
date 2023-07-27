@@ -23,6 +23,10 @@ if (!isset($menu)) {
 }
 ?>
 
+<script type="text/javascript">
+	if (window.self !== window.top)
+		document.body.classList.add("in-frame");
+</script>
 <header id="cis-header" class="navbar-dark">
 	<button id="nav-main-btn" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
@@ -39,7 +43,7 @@ if (!isset($menu)) {
 		<div class="offcanvas-body p-0">
 			<fhc-searchbar id="nav-search" class="fhc-searchbar w-100" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
 			<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
-				<img src="<?= base_url('/cis/public/bild.php?src=person&person_id=' . getAuthPersonId()); ?>" class="avatar rounded-circle"/>
+				<img src="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" class="avatar rounded-circle"/>
 			</button>
 			<ul id="nav-user-menu" class="collapse list-unstyled" aria-labelledby="nav-user-btn">
 				<li><a class="btn btn-level-2 rounded-0 d-block" href="#" id="menu-profil">Profil</a></li>
@@ -57,4 +61,5 @@ if (!isset($menu)) {
 		</div>
 	</nav>
 </header>
+
 <main id="cis-main" class="flex-grow-1 overflow-scroll p-4">
