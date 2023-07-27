@@ -2,8 +2,10 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \stdClass as stdClass;
+
 /**
- * 
+ *
  */
 class Documents extends Auth_Controller
 {
@@ -55,8 +57,6 @@ class Documents extends Auth_Controller
 		$this->load->model('crm/Konto_model', 'KontoModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
-		$studiengaenge = [];
-
 		$stati = $this->PrestudentstatusModel->loadWhereUid($uid, null, true);
 		if (isError($stati))
 			return $this->load->view('errors/html/error_db.php', [
@@ -82,7 +82,7 @@ class Documents extends Auth_Controller
 					return $this->load->view('errors/html/error_db.php', [
 						'heading' => 'Database Error',
 						'message' => getError($stg)
-					]); 
+					]);
 				$stg = getData($stg);
 				if (!$stg)
 					return $this->load->view('errors/html/error_db.php', [
@@ -94,7 +94,13 @@ class Documents extends Auth_Controller
 			}
 			if (!isset($stgs[$status->studiengang_kz]->studiensemester[$status->studiensemester_kurzbz])) {
 				$stgs[$status->studiengang_kz]->studiensemester[$status->studiensemester_kurzbz] = new stdClass();
-				$stgs[$status->studiengang_kz]->studiensemester[$status->studiensemester_kurzbz]->inskriptionsbestaetigung = (boolean) getData($this->KontoModel->checkStudienbeitragFromPrestudent($status->prestudent_id, $status->studiensemester_kurzbz, $buchungstypen));
+				$stgs[$status->studiengang_kz]->studiensemester[$status->studiensemester_kurzbz]->inskriptionsbestaetigung = (boolean)getData(
+					$this->KontoModel->checkStudienbeitragFromPrestudent(
+						$status->prestudent_id,
+						$status->studiensemester_kurzbz,
+						$buchungstypen
+					)
+				);
 			}
 		}
 		$person_ids = array_unique($person_ids);
@@ -166,7 +172,7 @@ class Documents extends Auth_Controller
 			$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
 			$this->WebservicelogModel->insert([
 				'webservicetyp_kurzbz' => 'content',
-				'request_id' => (isset($akte->akte_id) && !empty($akte->akte_id)) ? $akte->akte_id : NULL,
+				'request_id' => (isset($akte->akte_id) && !empty($akte->akte_id)) ? $akte->akte_id : null,
 				'beschreibung' => 'Bescheidbestaetigungsdownload',
 				'request_data' => $_SERVER['QUERY_STRING'],
 				'execute_time' => date('c'),

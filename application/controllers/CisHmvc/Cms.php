@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * 
+ *
  */
 class Cms extends Auth_Controller
 {
@@ -36,7 +36,7 @@ class Cms extends Auth_Controller
 
 	/**
 	 * @param stdClass	$content
-	 * 
+	 *
 	 * @return void
 	 */
 	public function debug($content)
@@ -50,7 +50,7 @@ class Cms extends Auth_Controller
 
 	/**
 	 * @param string	$url
-	 * 
+	 *
 	 * @return void
 	 */
 	public function legacy($url)
@@ -63,7 +63,7 @@ class Cms extends Auth_Controller
 	 * @param int		$version
 	 * @param string	$sprache
 	 * @param boolean	$sichtbar
-	 * 
+	 *
 	 * @return void
 	 */
 	public function content($content_id, $version = null, $sprache = null, $sichtbar = true)
@@ -84,7 +84,7 @@ class Cms extends Auth_Controller
 	 * @param string			$titel
 	 * @param boolean			$edit
 	 * @param boolean			$sichtbar
-	 * 
+	 *
 	 * @return void
 	 */
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)

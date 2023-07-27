@@ -1,10 +1,10 @@
 <?php
-	if (!isset($menu)) {
-		$menu = [];
-		if (property_exists($this->router, 'menu') && $this->router->menu && property_exists($this->router->menu, 'children')) {
-			$menu = $this->router->menu->children;
-		}
+if (!isset($menu)) {
+	$menu = [];
+	if (property_exists($this->router, 'menu') && $this->router->menu && property_exists($this->router->menu, 'children')) {
+		$menu = $this->router->menu->children;
 	}
+}
 ?>
 
 <script type="text/javascript">
@@ -42,9 +42,9 @@
 				<div id="nav-main-menu" class="collapse collapse-horizontal show">
 					<div>
 						<?php
-								foreach ($menu as $entry) {
-									$this->load->view('templates/CISHMVC-Menu/Entry', ['entry' => $entry, 'menu_id' => 'menu']);
-								}
+						foreach ($menu as $entry) {
+							$this->load->view('templates/CISHMVC-Menu/Entry', ['entry' => $entry, 'menu_id' => 'menu']);
+						}
 						?>
 					</div>
 				</div>

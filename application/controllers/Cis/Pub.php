@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
  
 /**
- * 
+ *
  */
 class Pub extends FHC_Controller
 {
@@ -128,7 +128,8 @@ class Pub extends FHC_Controller
 					]);
 
 					if (file_exists($filename)) {
-						if ($handle = fopen($filename, "r")) {
+						$handle = fopen($filename, "r");
+						if ($handle) {
 							while (!feof($handle)) {
 								$akte->inhalt .= fread($handle, 8192);
 							}
@@ -144,7 +145,6 @@ class Pub extends FHC_Controller
 				if ($akte->inhalt && !$foto_gesperrt) {
 					$cTmpHEX = $akte->inhalt;
 				}
-
 			}
 		}
 

@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * 
+ *
  */
 class MyLv extends Auth_Controller
 {
@@ -27,5 +27,4 @@ class MyLv extends Auth_Controller
 	{
 		$this->load->view('Cis/MyLv');
 	}
-
 }

@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
  
 /**
- * 
+ *
  */
 class Auth extends FHC_Controller
 {
@@ -74,5 +74,4 @@ class Auth extends FHC_Controller
 		$this->authlib->logout();
 		redirect('/Cis/Auth/login', 'refresh');
 	}
-
 }

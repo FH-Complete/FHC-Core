@@ -46,7 +46,7 @@ if (property_exists($entry, 'path')) {
 		</div>
 	<?php } ?>
 	<ul id="<?= $menu_id; ?>" class="nav w-100 collapse<?= $menu_open ? ' show' : ''; ?>">
-		<?php foreach ($entry->children as $id => $child) 
+		<?php foreach ($entry->children as $id => $child)
 			$this->load->view('templates/CISHMVC-Menu/Entry', ['content_id' => $id, 'entry' => $child, 'menu_id' => $menu_id, 'path' => $path]);
 		?>
 	</ul>

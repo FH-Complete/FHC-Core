@@ -4,7 +4,7 @@ if (is_array($entry) && isset($entry['content_id']))
 $menu_id .= '-' . $entry->content_id;
 
 switch ($entry->template_kurzbz) {
-	case 'redirect': {
+	case 'redirect':
 		$url = '';
 		$target = '';
 		$xml = new DOMDocument();
@@ -15,7 +15,7 @@ switch ($entry->template_kurzbz) {
 				$url = $xml->getElementsByTagName('url')->item(0)->nodeValue;
 			// TODO(chris): get params
 			if (isset($params) && is_array($params))
-				foreach ($params as $key=>$value)
+				foreach ($params as $key => $value)
 					$url = str_replace('$' . $key, addslashes($value), $url);
 			if ($xml->getElementsByTagName('target')->item(0))
 				$target = $xml->getElementsByTagName('target')->item(0)->nodeValue;
@@ -30,14 +30,15 @@ switch ($entry->template_kurzbz) {
 
 		$this->load->view('templates/CISHTML-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => $url, 'target' => $target]);
 		break;
-	}
-	case 'include': {
+	case 'include':
 		$this->load->view('templates/CISHTML-Menu/EntryInclude', ['entry' => $entry, 'menu_id' => $menu_id]);
 		break;
-	}
-	default: {
-		$this->load->view('templates/CISHTML-Menu/EntryBase', ['entry' => $entry, 'menu_id' => $menu_id, 'link' => site_url('/CisHtml/Cms/content/' . $entry->content_id)]);
+	default:
+		$this->load->view('templates/CISHTML-Menu/EntryBase', [
+			'entry' => $entry,
+			'menu_id' => $menu_id,
+			'link' => site_url('/CisHtml/Cms/content/' . $entry->content_id)
+		]);
 		break;
-	}
 }
 ?>

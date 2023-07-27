@@ -15,15 +15,15 @@ class Content_model extends DB_Model
 	/**
 	 * Laedt den Content in der angegebenen Sprache
 	 * Sollte der Content in dieser Sprache nicht vorhanden sein, wird der Content in der Default Sprache geladen
-	 * 
+	 *
 	 * @param integer			$content_id
 	 * @param string			$sprache optional
 	 * @param integer			$version optional
 	 * @param boolean | null	$sichtbar optional
-	 * 
+	 *
 	 * @return stdClass
 	 */
-	public function getContent($content_id, $sprache=DEFAULT_LANGUAGE, $version=null, $sichtbar=null, $load_default_language=false)
+	public function getContent($content_id, $sprache = DEFAULT_LANGUAGE, $version = null, $sichtbar = null, $load_default_language = false)
 	{
 		$this->load->model('content/Contentsprache_model', 'ContentspracheModel');
 		$spracheExists = $this->ContentspracheModel->exists($content_id, $sprache, $version, $sichtbar);
@@ -45,7 +45,13 @@ class Content_model extends DB_Model
 		if ($version)
 			$condition['version'] = $version;
 
-		$this->addSelect(['*', 'tbl_contentsprache.insertamum', 'tbl_contentsprache.insertvon', 'tbl_contentsprache.updateamum', 'tbl_contentsprache.updatevon']);
+		$this->addSelect([
+			'*',
+			'tbl_contentsprache.insertamum',
+			'tbl_contentsprache.insertvon',
+			'tbl_contentsprache.updateamum',
+			'tbl_contentsprache.updatevon'
+		]);
 		$this->addJoin('campus.tbl_contentsprache', 'content_id');
 		$this->addOrder('version', 'DESC');
 		$this->addLimit(1);
@@ -63,14 +69,14 @@ class Content_model extends DB_Model
 	/**
 	 * Laedt alle Content Eintraege unterhalb eines Contents
 	 * (Ohne Newseintraege)
-	 * 
+	 *
 	 * @param integer			$root_content_id
 	 * @param string			$uid
 	 * @param string			$sprache optional
-	 * 
+	 *
 	 * @return stdClass			on success an array with menu objects
 	 */
-	public function getMenu($root_content_id, $uid, $sprache=DEFAULT_LANGUAGE)
+	public function getMenu($root_content_id, $uid, $sprache = DEFAULT_LANGUAGE)
 	{
 		if ($root_content_id === null) {
 			$res = json_decode('{
@@ -154,7 +160,39 @@ class Content_model extends DB_Model
 					s.contentsprache_id
 				FROM 
 					campus.tbl_content c
-				JOIN (SELECT s5.content_id, s5.contentsprache_id FROM (SELECT content_id, sprache, MAX(version) AS version FROM (SELECT c1.content_id, COALESCE(s1.sprache, ?) AS sprache FROM campus.tbl_content c1 LEFT JOIN campus.tbl_contentsprache s1 ON c1.content_id=s1.content_id AND s1.sprache=? WHERE sichtbar=true) s2 LEFT JOIN campus.tbl_contentsprache s3 USING(content_id, sprache) WHERE sichtbar=true GROUP BY content_id, sprache) s4 LEFT JOIN campus.tbl_contentsprache s5 USING(content_id, sprache, version) WHERE version IS NOT NULL) t USING (content_id)
+				JOIN (
+					SELECT
+						s5.content_id,
+						s5.contentsprache_id
+					FROM (
+						SELECT
+							content_id,
+							sprache,
+							MAX(version) AS version
+						FROM (
+							SELECT
+								c1.content_id,
+								COALESCE(s1.sprache, ?) AS sprache
+							FROM
+								campus.tbl_content c1
+							LEFT JOIN
+								campus.tbl_contentsprache s1 ON c1.content_id=s1.content_id AND s1.sprache=?
+							WHERE
+								sichtbar=true
+						) s2
+						LEFT JOIN
+							campus.tbl_contentsprache s3 USING(content_id, sprache)
+						WHERE
+							sichtbar=true
+						GROUP BY
+							content_id,
+							sprache
+					) s4
+					LEFT JOIN
+						campus.tbl_contentsprache s5 USING(content_id, sprache, version)
+					WHERE
+						version IS NOT NULL
+				) t USING (content_id)
 				JOIN 
 					campus.tbl_contentsprache s USING (contentsprache_id) 
 				WHERE
@@ -227,5 +265,4 @@ class Content_model extends DB_Model
 
 		return success(isset($result[$root_content_id]) ? $result[$root_content_id] : null);
 	}
-
 }

@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * 
+ *
  */
 class Dashboard extends Auth_Controller
 {
@@ -29,5 +29,4 @@ class Dashboard extends Auth_Controller
 	{
 		$this->load->view('CisHmvc/Dashboard.php');
 	}
-
 }

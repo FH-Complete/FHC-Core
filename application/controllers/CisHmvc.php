@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 use \DOMDocument as DOMDocument;
 
 /**
- * 
+ *
  */
 class CisHmvc extends FHC_Controller
 {
@@ -26,7 +26,7 @@ class CisHmvc extends FHC_Controller
 
 	/**
 	 * @param string $method
-	 * 
+	 *
 	 * @return void
 	 */
 	public function _remap($method)
@@ -74,7 +74,7 @@ class CisHmvc extends FHC_Controller
 		else
 		{
 			switch ($current['orig']->template_kurzbz) {
-				case 'redirect': {
+				case 'redirect':
 					list ($url, $target) = $this->getRedirectUrlAndTarget($current['orig']->content);
 					if (substr($url, 0, 1) == '#')
 					{
@@ -136,20 +136,17 @@ class CisHmvc extends FHC_Controller
 					$action = 'debug';
 					array_unshift($params, $current['orig']);
 					break;
-				}
 				case 'contentohnetitel':
-				case 'contentmittitel': {
+				case 'contentmittitel':
 					$controller = 'CisHmvc/Cms';
 					$action = 'content';
 					array_unshift($params, $current['orig']->content_id);
 					break;
-				}
-				default: {
+				default:
 					$controller = 'CisHmvc/Cms';
 					$action = 'debug';
 					array_unshift($params, $current['orig']);
 					break;
-				}
 			}
 		}
 
@@ -187,7 +184,7 @@ class CisHmvc extends FHC_Controller
 
 	/**
 	 * @param uri_string	$url
-	 * 
+	 *
 	 * @return void
 	 */
 	public function redirect($url)
@@ -199,7 +196,8 @@ class CisHmvc extends FHC_Controller
 	// -----------------------------------------------------------------------------------------------------------------
 	// Protected methods (move to lib?)
 
-	protected function getControllerMethodAndParamsFromUrl($url) {
+	protected function getControllerMethodAndParamsFromUrl($url)
+	{
 		$segments = explode('/', $url);
 		$path = '';
 		while ($possibleController = array_shift($segments)) {
@@ -210,7 +208,8 @@ class CisHmvc extends FHC_Controller
 		return [null, null, null];
 	}
 
-	protected function getRedirectUrlAndTarget($content) {
+	protected function getRedirectUrlAndTarget($content)
+	{
 		if (!$content)
 			return ['#', ''];
 
@@ -225,7 +224,7 @@ class CisHmvc extends FHC_Controller
 		/*if (strpos($url, '$') !== FALSE)
 			var_dump($url);*/
 		if (isset($params) && is_array($params))
-			foreach ($params as $key=>$value)
+			foreach ($params as $key => $value)
 				$url = str_replace('$' . $key, addslashes($value), $url);
 		if ($xml->getElementsByTagName('target')->item(0))
 			$target = $xml->getElementsByTagName('target')->item(0)->nodeValue;
@@ -242,7 +241,8 @@ class CisHmvc extends FHC_Controller
 		return [$url, $target];
 	}
 
-	protected function convertMenu($items, $path, $path_prefix) {
+	protected function convertMenu($items, $path, $path_prefix)
+	{
 		$menu = [];
 		$current_path = array_shift($path);
 		foreach ($items as $item)
@@ -296,7 +296,8 @@ class CisHmvc extends FHC_Controller
 	 *
 	 * @return string the resulting slug.
 	 */
-	protected function createSlug($text) {
+	protected function createSlug($text)
+	{
 		$table = [
 			'Š'=>'S', 'š'=>'s', 'Đ'=>'Dj', 'đ'=>'dj', 'Ž'=>'Z', 'ž'=>'z', 'Č'=>'C', 'č'=>'c', 'Ć'=>'C', 'ć'=>'c',
 			'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'Ae', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
@@ -313,5 +314,4 @@ class CisHmvc extends FHC_Controller
 		$text = preg_replace('~^[^a-z]~i', '', $text);
 		return strtolower($text);
 	}
-
 }
