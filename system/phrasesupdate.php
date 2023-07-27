@@ -18246,46 +18246,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'uhstat',
-		'phrase' => 'persoenlicheAngaben',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Persönliche Angaben',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Personal data',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'uhstat',
-		'phrase' => 'persoenlicheAngabenEinleitungstext',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Wenn Sie keine österreichische Sozialversicherungsnummer haben, dann fragen Sie bitte die Hochschule, an der Sie studieren möchten, nach Ihrem Ersatzkennzeichen.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'If you do not have an Austrian \'Sozialversicherungsnummer\' (social security number), please ask the university or university college at which you would like to study for your substitute code (\'Ersatzkennzeichen\').',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'uhstat',
 		'phrase' => 'angabenErziehungsberechtigte',
 		'insertvon' => 'system',
 		'phrases' => array(

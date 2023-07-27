@@ -12,17 +12,19 @@ class Abschluss_model extends DB_Model
 		$this->pk = 'ausbildung_code';
 	}
 
-	public function getActiveAbschluesse()
+	public function getActiveAbschluesse($languageIndex)
 	{
 		return $this->execQuery(
 			'
 				SELECT
-					ausbildung_code, bezeichnung, in_oesterreich
+					ausbildung_code, bezeichnung[?], in_oesterreich
 				FROM
 					bis.tbl_abschluss
 				WHERE
 					aktiv
-				ORDER BY CASE WHEN in_oesterreich THEN 0 ELSE 1 END, ausbildung_code'
+				ORDER BY
+					CASE WHEN in_oesterreich THEN 0 ELSE 1 END, ausbildung_code',
+			array($languageIndex)
 		);
 	}
 }

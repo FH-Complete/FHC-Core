@@ -8,6 +8,17 @@ class UHSTAT1 extends FHC_Controller
 	const LOWER_BOUNDARY_YEARS = 160;
 	const UPPER_BOUNDARY_YEARS = 20;
 
+	private $_uhstat1Fields = array(
+		'mutter_geburtsstaat' => array('name' => 'Geburtsstaat Mutter', 'rules' => array('required')),
+		'mutter_geburtsjahr' => array('name' => 'Geburtsjahr Mutter', 'rules' => array('required')),
+		'mutter_bildungsstaat' => array('name' => 'Bildungsstaat Mutter', 'rules' => array('required')),
+		'mutter_bildungmax' => array('name' => 'Geburtsjahr Mutter', 'rules' => array('required')),
+		'vater_geburtsstaat' => array('name' => 'Geburtsstaat Vater', 'rules' => array('required')),
+		'vater_geburtsjahr',
+		'vater_bildungsstaat',
+		'vater_bildungmax'
+	);
+
 	public function __construct()
 	{
 		parent::__construct(
@@ -40,13 +51,17 @@ class UHSTAT1 extends FHC_Controller
 
 	public function index()
 	{
-		$formData = $this->_getFormData();
+		$formMetaData = $this->_getFormMetaData();
 
-		if (isError($formData)) show_error(getError($formData));
+		if (isError($formMetaData)) show_error(getError($formMetaData));
 
-		if (!hasData($formData)) show_error("No form data could be loaded");
+		if (!hasData($formMetaData)) show_error("No form meta data could be loaded");
 
-		$this->load->view("codex/uhstat1.php", array('formData' => getData($formData)));
+		$uhstatData = $this->_getUHSTAT1Data();
+
+		if (isError($uhstatData)) show_error(getError($uhstatData));
+
+		$this->load->view("codex/uhstat1.php", array('formMetaData' => getData($formMetaData), 'uhstatData' => getData($uhstatData)));
 	}
 
 	/**
@@ -61,7 +76,6 @@ class UHSTAT1 extends FHC_Controller
 		$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
 
 		// check required fields
-		$this->form_validation->set_rules('geburtsstaat', 'Geburtsstaat', 'required', array('required' => $this->p->t('uhstat', 'angabeFehlt')));
 		$this->form_validation->set_rules(
 			'mutter_geburtsstaat',
 			'Geburtsstaat Mutter',
@@ -171,11 +185,11 @@ class UHSTAT1 extends FHC_Controller
 			}
 		}
 
-		$formData = $this->_getFormData();
+		$formMetaData = $this->_getFormMetaData();
 
-		if (isError($formData)) show_error(getError($formData));
+		if (isError($formMetaData)) show_error(getError($formMetaData));
 
-		if (!hasData($formData)) show_error("No form data could be loaded");
+		if (!hasData($formMetaData)) show_error("No form data could be loaded");
 
 		// pass success/error messages to view
 		$successMessage = isset($uhstat1datenRes) && isSuccess($uhstat1datenRes) ? $this->p->t('uhstat', 'erfolgreichGespeichert') : '';
@@ -183,7 +197,7 @@ class UHSTAT1 extends FHC_Controller
 
 		// load view with form data
 		$this->load->view("codex/uhstat1.php", array(
-			'formData' => getData($formData),
+			'formMetaData' => getData($formMetaData),
 			'successMessage' => $successMessage,
 			'errorMessage' => $errorMessage
 		));
@@ -227,22 +241,23 @@ class UHSTAT1 extends FHC_Controller
 	/**
 	 * Gets initial data needed to display UHSTAT1 form.
 	 */
-	private function _getFormData()
+	private function _getFormMetaData()
 	{
 		$person_id = $this->input->get('person_id');
 
 		if (!isset($person_id) || !is_numeric($person_id)) return error("Person Id missing");
 
-		$formData = array(
+		$languageIdx = $this->_getLanguageIndex();
+
+		$formMetaData = array(
 			'nation' => array(),
 			'abschluss_oesterreich' => array(),
 			'abschluss_nicht_oesterreich' => array(),
 			'jahre' => array(),
-			'languageIdx' => $this->_getLanguageIndex(),
 			'person_id' => $person_id
 		);
 
-		$nationTextFieldName = $formData['languageIdx'] == 1 ? 'langtext' : 'engltext';
+		$nationTextFieldName = $languageIdx == 1 ? 'langtext' : 'engltext';
 
 		// get nation list
 		$this->load->model('codex/Nation_model', 'NationModel');
@@ -253,10 +268,10 @@ class UHSTAT1 extends FHC_Controller
 
 		if (isError($nationRes)) return $nationRes;
 
-		if (hasData($nationRes)) $formData['nation'] = getData($nationRes);
+		if (hasData($nationRes)) $formMetaData['nation'] = getData($nationRes);
 
 		// get abschluss list
-		$abschlussRes = $this->AbschlussModel->getActiveAbschluesse();
+		$abschlussRes = $this->AbschlussModel->getActiveAbschluesse($languageIdx);
 
 		if (isError($abschlussRes)) return $abschlussRes;
 
@@ -267,22 +282,38 @@ class UHSTAT1 extends FHC_Controller
 			foreach (getData($abschlussRes) as $abschluss)
 			{
 				if ($abschluss->in_oesterreich === true)
-					$formData['abschluss_oesterreich'][] = $abschluss;
+					$formMetaData['abschluss_oesterreich'][] = $abschluss;
 				elseif ($abschluss->in_oesterreich === false)
-					$formData['abschluss_nicht_oesterreich'][] = $abschluss;
+					$formMetaData['abschluss_nicht_oesterreich'][] = $abschluss;
 				else
 				{
-					$formData['abschluss_oesterreich'][] = $abschluss;
-					$formData['abschluss_nicht_oesterreich'][] = $abschluss;
+					$formMetaData['abschluss_oesterreich'][] = $abschluss;
+					$formMetaData['abschluss_nicht_oesterreich'][] = $abschluss;
 				}
 			}
 		}
 
 		// get realistic birth years, dated back from current year
 		$currYear = date("Y");
-		$formData['jahre'] = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
+		$formMetaData['jahre'] = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
 
-		return success($formData);
+		return success($formMetaData);
+	}
+
+	/**
+	 * Gets initial data needed to display UHSTAT1 form.
+	 */
+	private function _getUHSTAT1Data()
+	{
+		$person_id = $this->input->get('person_id');
+
+		if (!isset($person_id) || !is_numeric($person_id)) return error("Person Id missing");
+
+		$this->Uhstat1datenModel->addSelect("
+			mutter_geburtsstaat, mutter_geburtsjahr, mutter_bildungsstaat, mutter_bildungmax,
+			vater_geburtsstaat, vater_geburtsjahr, vater_bildungsstaat, vater_bildungmax"
+		);
+		return $this->Uhstat1datenModel->loadWhere(array('person_id' => $person_id));
 	}
 
 	/**
