@@ -13,7 +13,18 @@ $this->load->view(
 	)
 );
 ?>
-
+<?php
+// init data
+$mutter_geburtsjahr = isset($uhstatData->mutter_geburtsjahr) ? $uhstatData->mutter_geburtsjahr : set_value('mutter_geburtsjahr');
+$mutter_geburtsstaat = isset($uhstatData->mutter_geburtsstaat) ? $uhstatData->mutter_geburtsstaat : set_value('mutter_geburtsstaat');
+$mutter_bildungsstaat = isset($uhstatData->mutter_bildungsstaat) ? $uhstatData->mutter_bildungsstaat : set_value('mutter_bildungsstaat');
+$mutter_bildungmax = isset($uhstatData->mutter_bildungmax) ? $uhstatData->mutter_bildungmax : set_value('mutter_bildungmax');
+$vater_geburtsjahr = isset($uhstatData->vater_geburtsjahr) ? $uhstatData->vater_geburtsjahr : set_value('vater_geburtsjahr');
+$vater_geburtsstaat = isset($uhstatData->vater_geburtsstaat) ? $uhstatData->vater_geburtsstaat : set_value('vater_geburtsstaat');
+$vater_bildungsstaat = isset($uhstatData->vater_bildungsstaat) ? $uhstatData->vater_bildungsstaat : set_value('vater_bildungsstaat');
+$vater_bildungmax = isset($uhstatData->vater_bildungmax) ? $uhstatData->vater_bildungmax : set_value('vater_bildungmax');
+$disabled = $readonly === true ? ' disabled' : '';
+?>
 <div class="container">
 	<div class="tab-content">
 		<h3>
@@ -39,7 +50,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['jahre'] as $jahr): ?>
 								<option
 									value="<?php echo $jahr ?>"
-									<?php echo set_value('mutter_geburtsjahr') == $jahr ? " selected" : "" ?>>
+									<?php echo $jahr == $mutter_geburtsjahr ? " selected" : "" ?>>
 									<?php echo $jahr ?>
 								</option>
 							<?php endforeach; ?>
@@ -59,7 +70,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
 									value="<?php echo $nation->nation_code ?>"
-									<?php echo set_value('mutter_geburtsstaat') == $nation->nation_code ? " selected" : "" ?>>
+									<?php echo $mutter_geburtsstaat == $nation->nation_code ? " selected" : "" ?>>
 									<?php echo $nation->nation_text ?>
 								</option>
 							<?php endforeach; ?>
@@ -79,7 +90,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
 									value="<?php echo $nation->nation_code ?>"
-									<?php echo set_value('mutter_bildungsstaat') == $nation->nation_code ? " selected" : "" ?>>
+									<?php echo $mutter_bildungsstaat == $nation->nation_code ? " selected" : "" ?>>
 									<?php echo $nation->nation_text ?>
 								</option>
 							<?php endforeach; ?>
@@ -98,7 +109,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['abschluss_oesterreich'] as $abschluss): ?>
 								<option
 									value="<?php echo $abschluss->ausbildung_code ?>"
-									<?php echo set_value('mutter_bildungmax') == $abschluss->ausbildung_code ? " selected" : "" ?>>
+									<?php echo $mutter_bildungmax == $abschluss->ausbildung_code ? " selected" : "" ?>>
 									<?php echo $abschluss->bezeichnung ?>
 								</option>
 							<?php endforeach; ?>
@@ -108,7 +119,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['abschluss_nicht_oesterreich'] as $abschluss): ?>
 								<option
 									value="<?php echo $abschluss->ausbildung_code ?>"
-									<?php echo set_value('mutter_bildungmax') == $abschluss->ausbildung_code ? " selected" : "" ?>>
+									<?php echo $mutter_bildungmax == $abschluss->ausbildung_code ? " selected" : "" ?>>
 									<?php echo $abschluss->bezeichnung ?>
 								</option>
 							<?php endforeach; ?>
@@ -126,7 +137,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['jahre'] as $jahr): ?>
 								<option
 									value="<?php echo $jahr ?>"
-									<?php echo set_value('vater_geburtsjahr') == $jahr ? " selected" : "" ?>>
+									<?php echo $vater_geburtsjahr == $jahr ? " selected" : "" ?>>
 										<?php echo $jahr ?>
 									</option>
 							<?php endforeach; ?>
@@ -146,7 +157,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
 									value="<?php echo $nation->nation_code ?>"
-									<?php echo set_value('vater_geburtsstaat') == $nation->nation_code ? " selected" : "" ?>>
+									<?php echo $vater_geburtsstaat == $nation->nation_code ? " selected" : "" ?>>
 										<?php echo $nation->nation_text ?>
 								</option>
 							<?php endforeach; ?>
@@ -166,7 +177,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
 									value="<?php echo $nation->nation_code ?>"
-									<?php echo set_value('vater_bildungsstaat') == $nation->nation_code ? " selected" : "" ?>>
+									<?php echo $vater_bildungsstaat == $nation->nation_code ? " selected" : "" ?>>
 										<?php echo $nation->nation_text ?>
 								</option>
 							<?php endforeach; ?>
@@ -187,7 +198,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['abschluss_oesterreich'] as $abschluss): ?>
 								<option
 									value="<?php echo $abschluss->ausbildung_code ?>"
-									<?php echo set_value('vater_bildungmax') == $abschluss->ausbildung_code ? " selected" : "" ?>>
+									<?php echo $vater_bildungmax == $abschluss->ausbildung_code ? " selected" : "" ?>>
 									<?php echo $abschluss->bezeichnung ?>
 								</option>
 							<?php endforeach; ?>
@@ -197,7 +208,7 @@ $this->load->view(
 							<?php foreach ($formMetaData['abschluss_nicht_oesterreich'] as $abschluss): ?>
 								<option
 									value="<?php echo $abschluss->ausbildung_code ?>"
-									<?php echo set_value('vater_bildungmax') == $abschluss->ausbildung_code ? " selected" : "" ?>>
+									<?php echo $vater_bildungmax == $abschluss->ausbildung_code ? " selected" : "" ?>>
 									<?php echo $abschluss->bezeichnung ?>
 								</option>
 							<?php endforeach; ?>

@@ -8,16 +8,7 @@ class UHSTAT1 extends FHC_Controller
 	const LOWER_BOUNDARY_YEARS = 160;
 	const UPPER_BOUNDARY_YEARS = 20;
 
-	private $_uhstat1Fields = array(
-		'mutter_geburtsstaat' => array('name' => 'Geburtsstaat Mutter', 'rules' => array('required')),
-		'mutter_geburtsjahr' => array('name' => 'Geburtsjahr Mutter', 'rules' => array('required')),
-		'mutter_bildungsstaat' => array('name' => 'Bildungsstaat Mutter', 'rules' => array('required')),
-		'mutter_bildungmax' => array('name' => 'Geburtsjahr Mutter', 'rules' => array('required')),
-		'vater_geburtsstaat' => array('name' => 'Geburtsstaat Vater', 'rules' => array('required')),
-		'vater_geburtsjahr',
-		'vater_bildungsstaat',
-		'vater_bildungmax'
-	);
+	private $_uhstat1Fields = array();
 
 	public function __construct()
 	{
@@ -47,6 +38,33 @@ class UHSTAT1 extends FHC_Controller
 				'uhstat'
 			)
 		);
+
+		// set form field information
+		$this->_uhstat1Fields = array(
+			'mutter_geburtsstaat' => array('name' => 'Geburtsstaat Mutter'),
+			'mutter_geburtsjahr' => array('name' => 'Geburtsjahr Mutter'),
+			'mutter_bildungsstaat' => array('name' => 'Bildungsstaat Mutter'),
+			'mutter_bildungmax' => array(
+				'name' => 'Geburtsjahr Mutter',
+				'rules' => array(
+					'callback_bildungsstaat_bildungmax_check[m]' => array(
+						'bildungsstaat_bildungmax_check' => $this->p->t('uhstat', 'ausbildungBildungsstaatUebereinstimmung')
+					)
+				)
+			),
+			'vater_geburtsstaat' => array('name' => 'Geburtsstaat Vater'),
+			'vater_geburtsjahr' => array('name' => 'Geburtsjahr Vater'),
+			'vater_bildungsstaat' => array('name' => 'Bildungsstaat Vater'),
+			'vater_bildungmax' => array('name' => 'Geburtsjahr Vater'),
+			'vater_bildungmax' => array(
+				'name' => 'Geburtsjahr Vater',
+				'rules' => array(
+					'callback_bildungsstaat_bildungmax_check[v]' => array(
+						'bildungsstaat_bildungmax_check' => $this->p->t('uhstat', 'ausbildungBildungsstaatUebereinstimmung')
+					)
+				)
+			)
+		);
 	}
 
 	public function index()
@@ -61,7 +79,13 @@ class UHSTAT1 extends FHC_Controller
 
 		if (isError($uhstatData)) show_error(getError($uhstatData));
 
-		$this->load->view("codex/uhstat1.php", array('formMetaData' => getData($formMetaData), 'uhstatData' => getData($uhstatData)));
+		$readonly = hasData($uhstatData);
+
+		$this->load->view("codex/uhstat1.php", array(
+			'formMetaData' => getData($formMetaData),
+			'uhstatData' => getData($uhstatData),
+			'readonly' => $readonly)
+		);
 	}
 
 	/**
@@ -75,77 +99,39 @@ class UHSTAT1 extends FHC_Controller
 
 		$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
 
-		// check required fields
-		$this->form_validation->set_rules(
-			'mutter_geburtsstaat',
-			'Geburtsstaat Mutter',
-			'required',
-			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
-		);
-		$this->form_validation->set_rules(
-			'mutter_bildungsstaat',
-			'Bildungsstaat Mutter',
-			'required',
-			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
-		);
-		$this->form_validation->set_rules(
-			'mutter_geburtsjahr',
-			'Geburtsjahr Mutter',
-			'required',
-			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
-		);
-		$this->form_validation->set_rules(
-			'mutter_bildungmax',
-			'Höchste Ausbildung Mutter',
-			'required|callback_bildungsstaat_bildungmax_check[m]',
-			array(
-				'required' => $this->p->t('uhstat', 'angabeFehlt'),
-				'bildungsstaat_bildungmax_check' => $this->p->t('uhstat', 'ausbildungBildungsstaatUebereinstimmung')
-				//'Land der höchsten Ausbildung muss mit Bildungsstaat übereinstimmen'
-				// Bildungsstaat should correspond to state of bildung max
-			)
-		);
-		$this->form_validation->set_rules(
-			'vater_geburtsstaat',
-			'Geburtsstaat Vater',
-			'required',
-			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
-		);
-		$this->form_validation->set_rules(
-			'vater_bildungsstaat',
-			'Bildungsstaat Vater',
-			'required',
-			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
-		);
-		$this->form_validation->set_rules(
-			'vater_geburtsjahr',
-			'Geburtsjahr Vater',
-			'required',
-			array('required' => $this->p->t('uhstat', 'angabeFehlt'))
-		);
-		$this->form_validation->set_rules(
-			'vater_bildungmax',
-			'Höchste Ausbildung Vater',
-			'required|callback_bildungsstaat_bildungmax_check[v]',
-			array(
-				'required' => $this->p->t('uhstat', 'angabeFehlt'),
-				'bildungsstaat_bildungmax_check' => $this->p->t('uhstat', 'ausbildungBildungsstaatUebereinstimmung')
-			)
-		);
+		foreach ($this->_uhstat1Fields as $field => $params)
+		{
+			// all fields are required
+			$ruleNames = 'required';
+			$ruleMessages = array('required' => $this->p->t('uhstat', 'angabeFehlt'));
+
+			// add additional rules
+			if (isset($params['rules']))
+			{
+				foreach ($params['rules'] as $ruleName => $ruleMessage)
+				{
+					$ruleNames .= '|'.$ruleName;
+					$ruleMessages = array_merge($ruleMessages, $ruleMessage);
+				}
+			}
+
+			$this->form_validation->set_rules(
+				$field,
+				$params['name'],
+				$ruleNames,
+				$ruleMessages
+			);
+		}
 
 		$uhstat1datenRes = null;
 		if ($this->form_validation->run()) // if valid
 		{
 			// get post fields
-			$geburtsstaat = $this->input->post('geburtsstaat');
-			$mutter_geburtsstaat = $this->input->post('mutter_geburtsstaat');
-			$mutter_geburtsjahr = $this->input->post('mutter_geburtsjahr');
-			$mutter_bildungsstaat = $this->input->post('mutter_bildungsstaat');
-			$mutter_bildungmax = $this->input->post('mutter_bildungmax');
-			$vater_geburtsstaat = $this->input->post('vater_geburtsstaat');
-			$vater_geburtsjahr = $this->input->post('vater_geburtsjahr');
-			$vater_bildungsstaat = $this->input->post('vater_bildungsstaat');
-			$vater_bildungmax = $this->input->post('vater_bildungmax');
+			$uhstatData = array();
+			foreach ($this->_uhstat1Fields as $field => $params)
+			{
+				$uhstatData[$field] = $this->input->post($field);
+			}
 
 			$uhstat1datenloadRes = $this->Uhstat1datenModel->loadWhere(array('person_id' => $person_id));
 
@@ -153,34 +139,13 @@ class UHSTAT1 extends FHC_Controller
 			{
 				$uhstat1datenRes = $this->Uhstat1datenModel->update(
 					array('person_id' => $person_id),
-					array(
-						'geburtsstaat' => $geburtsstaat,
-						'mutter_geburtsstaat' => $mutter_geburtsstaat,
-						'mutter_geburtsjahr' => $mutter_geburtsjahr,
-						'mutter_bildungsstaat' => $mutter_bildungsstaat,
-						'mutter_bildungmax' => $mutter_bildungmax,
-						'vater_geburtsstaat' => $vater_geburtsstaat,
-						'vater_geburtsjahr' => $vater_geburtsjahr,
-						'vater_bildungsstaat' => $vater_bildungsstaat,
-						'vater_bildungmax' => $vater_bildungmax
-					)
+					$uhstatData
 				);
 			}
 			else
 			{
 				$uhstat1datenRes = $this->Uhstat1datenModel->insert(
-					array(
-						'geburtsstaat' => $geburtsstaat,
-						'mutter_geburtsstaat' => $mutter_geburtsstaat,
-						'mutter_geburtsjahr' => $mutter_geburtsjahr,
-						'mutter_bildungsstaat' => $mutter_bildungsstaat,
-						'mutter_bildungmax' => $mutter_bildungmax,
-						'vater_geburtsstaat' => $vater_geburtsstaat,
-						'vater_geburtsjahr' => $vater_geburtsjahr,
-						'vater_bildungsstaat' => $vater_bildungsstaat,
-						'vater_bildungmax' => $vater_bildungmax,
-						'person_id' =>$person_id
-					)
+					array_merge($uhstatData, array('person_id' => $person_id))
 				);
 			}
 		}
@@ -194,12 +159,14 @@ class UHSTAT1 extends FHC_Controller
 		// pass success/error messages to view
 		$successMessage = isset($uhstat1datenRes) && isSuccess($uhstat1datenRes) ? $this->p->t('uhstat', 'erfolgreichGespeichert') : '';
 		$errorMessage = isset($uhstat1datenRes) && isError($uhstat1datenRes) ? $this->p->t('uhstat', 'fehlerBeimSpeichern') : '';
+		$readOnly = isSuccess($uhstat1datenRes);
 
 		// load view with form data
 		$this->load->view("codex/uhstat1.php", array(
 			'formMetaData' => getData($formMetaData),
 			'successMessage' => $successMessage,
-			'errorMessage' => $errorMessage
+			'errorMessage' => $errorMessage,
+			'readonly' => $readOnly
 		));
 	}
 
@@ -212,7 +179,7 @@ class UHSTAT1 extends FHC_Controller
 	public function bildungsstaat_bildungmax_check($bildungmax, $bildungsstaat_typ)
 	{
 		// valid if no type passed
-		if (!isset($bildungsstaat_typ)) return true;
+		if (!isset($bildungsstaat_typ) || !isset($bildungmax)) return true;
 
 		// get correct input
 		if ($bildungsstaat_typ == 'm') // mutter
@@ -309,11 +276,14 @@ class UHSTAT1 extends FHC_Controller
 
 		if (!isset($person_id) || !is_numeric($person_id)) return error("Person Id missing");
 
-		$this->Uhstat1datenModel->addSelect("
-			mutter_geburtsstaat, mutter_geburtsjahr, mutter_bildungsstaat, mutter_bildungmax,
-			vater_geburtsstaat, vater_geburtsjahr, vater_bildungsstaat, vater_bildungmax"
+		$this->Uhstat1datenModel->addSelect(
+			implode(', ', array_keys($this->_uhstat1Fields))
 		);
-		return $this->Uhstat1datenModel->loadWhere(array('person_id' => $person_id));
+		$uhstatRes = $this->Uhstat1datenModel->loadWhere(array('person_id' => $person_id));
+
+		if (isError($uhstatRes)) return $uhstatRes;
+
+		return success(hasData($uhstatRes) ? getData($uhstatRes)[0] : null);
 	}
 
 	/**

@@ -58,7 +58,6 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1'))
 			CREATE TABLE bis.tbl_uhstat1daten
 			(
 				uhstat1daten_id integer DEFAULT nextval('bis.tbl_uhstat1daten_uhstat1daten_id_seq'::regclass),
-				geburtsstaat varchar(3),
 				mutter_geburtsstaat varchar(3),
 				mutter_bildungsstaat varchar(3),
 				mutter_geburtsjahr smallint,
@@ -69,10 +68,6 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1'))
 				vater_bildungmax integer,
 				person_id integer NOT NULL
 			);
-
-			ALTER TABLE bis.tbl_uhstat1daten ADD CONSTRAINT fk_tbl_uhstat1daten_geburtsstaat FOREIGN KEY (geburtsstaat)
-			REFERENCES bis.tbl_nation (nation_code) MATCH SIMPLE
-			ON DELETE RESTRICT ON UPDATE CASCADE;
 
 			ALTER TABLE bis.tbl_uhstat1daten ADD CONSTRAINT fk_tbl_uhstat1daten_mutter_geburtsstaat FOREIGN KEY (mutter_geburtsstaat)
 			REFERENCES bis.tbl_nation (nation_code) MATCH SIMPLE
@@ -105,7 +100,6 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1'))
 			ALTER TABLE bis.tbl_uhstat1daten ADD CONSTRAINT uk_uhstat1daten_person_id UNIQUE(person_id);
 
 			COMMENT ON TABLE bis.tbl_uhstat1daten IS 'UHSTAT1 data for a person (statistical data)';
-			COMMENT ON COLUMN bis.tbl_uhstat1daten.geburtsstaat IS 'Birthplace of person';
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.mutter_geburtsstaat IS 'Birth country of mother of person';
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.mutter_bildungsstaat IS 'Education country of mother of person';
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.mutter_geburtsjahr IS 'Birth year of mother of person';
