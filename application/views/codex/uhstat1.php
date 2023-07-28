@@ -45,7 +45,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 				<div class="form-group">
 					<label for="mutter_geburtsjahr" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'geburtsjahr')) ?></label>
 					<div class="col-sm-9">
-						<select type="text" name="mutter_geburtsjahr" id="mutter_geburtsjahr" class="form-control">
+						<select type="text" name="mutter_geburtsjahr" id="mutter_geburtsjahr" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<?php foreach ($formMetaData['jahre'] as $jahr): ?>
 								<option
@@ -65,7 +65,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="mutter_geburtsstaat" id="mutter_geburtsstaat" class="form-control">
+						<select type="text" name="mutter_geburtsstaat" id="mutter_geburtsstaat" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
@@ -85,7 +85,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="mutter_bildungsstaat" id="mutter_bildungsstaat" class="form-control">
+						<select type="text" name="mutter_bildungsstaat" id="mutter_bildungsstaat" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
@@ -101,7 +101,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 				<div class="form-group">
 					<label for="mutter_bildungmax" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'hoechsterAbschluss')) ?></label>
 					<div class="col-sm-9">
-						<select type="text" name="mutter_bildungmax" id="mutter_bildungmax" class="form-control">
+						<select type="text" name="mutter_bildungmax" id="mutter_bildungmax" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<optgroup label="<?php echo $this->p->t('uhstat', 'wennAbschlussInOesterreich') ?>">
 								<?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?>
@@ -132,7 +132,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 				<div class="form-group">
 					<label for="vater_geburtsjahr" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'geburtsjahr')) ?></label>
 					<div class="col-sm-9">
-						<select type="text" name="vater_geburtsjahr" id="vater_geburtsjahr" class="form-control">
+						<select type="text" name="vater_geburtsjahr" id="vater_geburtsjahr" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<?php foreach ($formMetaData['jahre'] as $jahr): ?>
 								<option
@@ -152,7 +152,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="vater_geburtsstaat" id="vater_geburtsstaat" class="form-control">
+						<select type="text" name="vater_geburtsstaat" id="vater_geburtsstaat" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
@@ -172,7 +172,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="vater_bildungsstaat" id="vater_bildungsstaat" class="form-control">
+						<select type="text" name="vater_bildungsstaat" id="vater_bildungsstaat" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<?php foreach ($formMetaData['nation'] as $nation): ?>
 								<option
@@ -190,7 +190,7 @@ $disabled = $readonly === true ? ' disabled' : '';
 						<?php echo ucfirst($this->p->t('uhstat', 'hoechsterAbschluss')) ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="vater_bildungmax" id="vater_bildungmax" class="form-control">
+						<select type="text" name="vater_bildungmax" id="vater_bildungmax" class="form-control" <?php echo $disabled ?>>
 							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
 							<optgroup label="<?php echo $this->p->t('uhstat', 'wennAbschlussInOesterreich') ?>">
 								<?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?>
@@ -221,16 +221,18 @@ $disabled = $readonly === true ? ' disabled' : '';
 			<fieldset>
 				<div class="form-group">
 					<div class="col-sm-12 text-right">
-						<?php if (isset($successMessage)): ?>
-							<span class='text-success'><?php echo $successMessage ?></span>
+						<?php if (isset($successMessage) && !isEmptyString($successMessage)): ?>
+							<div class='alert alert-success text-center' role='alert'><?php echo $successMessage ?></div>
 						<?php endif; ?>
-						<?php if (isset($errorMessage)): ?>
-							<span class='text-danger'><?php echo $errorMessage ?></span>
+						<?php if (isset($errorMessage) && !isEmptyString($errorMessage)): ?>
+							<div class='alert alert-danger text-center'><?php echo $errorMessage ?></div>
 						<?php endif; ?>
-						&nbsp;
-						<button class="btn btn-success btn-md" type="submit">
-							<?php echo $this->p->t('uhstat', 'pruefenUndSpeichern') ?>
-						</button>
+						<?php if (!$readonly): ?>
+							&nbsp;
+							<button class="btn btn-success btn-md" type="submit">
+								<?php echo $this->p->t('uhstat', 'pruefenUndSpeichern') ?>
+							</button>
+						<?php endif; ?>
 					</div>
 				</div>
 			</fieldset>
