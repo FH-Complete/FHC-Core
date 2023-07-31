@@ -55,9 +55,8 @@ export default {
 		datumWsFormatted() {
 			let datumUnformatted = '';
 
-			if (this.studierendenantragId) {
-				if (this.data.datum_wiedereinstieg)
-					datumUnformatted = this.data.datum_wiedereinstieg;
+			if (this.data.datum_wiedereinstieg) {
+				datumUnformatted = this.data.datum_wiedereinstieg;
 			} else {
 				if (this.stsem !== null && this.data.studiensemester[this.stsem].wiedereinstieg)
 					datumUnformatted = this.data.studiensemester[this.stsem].wiedereinstieg;
