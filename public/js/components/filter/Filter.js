@@ -507,7 +507,7 @@ export const CoreFilterCmpt = {
 
 		<div class="row" v-if="title != null && title != ''">
 			<div class="col-lg-12">
-				<h3 class="page-header">
+				<h3 class="page-header mt-1 mb-4">
 					{{ title }}
 				</h3>
 			</div>
@@ -516,7 +516,7 @@ export const CoreFilterCmpt = {
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
-				<div v-if="newBtnShow || reload || $slots.actions" class="d-flex gap-2 align-items-baseline flex-wrap">
+				<div v-if="newBtnShow || reload || $slots.actions" class="d-flex gap-3 align-items-baseline flex-wrap">
 					<button v-if="newBtnShow" class="btn btn-outline-secondary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
 						<span class="fa-solid fa-plus" aria-hidden="true"></span>
 						{{ newBtnLabel }}
@@ -524,7 +524,7 @@ export const CoreFilterCmpt = {
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten: </span>
+					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten:</span>
 					<slot name="actions" v-bind="tabulatorHasSelector ? selectedData : []"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
