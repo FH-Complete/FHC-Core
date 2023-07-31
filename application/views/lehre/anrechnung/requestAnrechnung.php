@@ -210,7 +210,6 @@ $this->load->view(
                                                   title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungEctsTooltipText'); ?>">
                                                 <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                             </span>
-                                            <a href="https://www.technikum-wien.at" target="_blank" class="pull-right">ECTS Berechnung Referenzbeispiele</a>
                                         </div>
                                         <div class="panel-body">
                                             <textarea class="form-control" name="begruendung_ects" rows="1" id="requestAnrechnung-begruendungEcts"
