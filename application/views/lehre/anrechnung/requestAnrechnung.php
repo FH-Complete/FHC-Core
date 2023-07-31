@@ -1,7 +1,8 @@
 <?php
 const CHAR_LENGTH125 = 125;
+const CHAR_LENGTH150 = 150;
 const CHAR_LENGTH500 = 500;
-const CHAR_LENGTH1500 = 1500;
+const CHAR_LENGTH1000 = 1000;
 
 $this->load->view(
 	'templates/FHC-Header',
@@ -212,9 +213,9 @@ $this->load->view(
                                             <a href="https://www.technikum-wien.at" target="_blank" class="pull-right">ECTS Berechnung Referenzbeispiele</a>
                                         </div>
                                         <div class="panel-body">
-                                            <textarea class="form-control" name="begruendung_ects" rows="3" id="requestAnrechnung-begruendungEcts"
-                                                      maxlength="<?php echo CHAR_LENGTH125 ?>" required><?php echo $anrechnungData->begruendung_ects; ?></textarea>
-                                            <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungEcts-charCounter"><?php echo CHAR_LENGTH125 ?></span></span></small>
+                                            <textarea class="form-control" name="begruendung_ects" rows="1" id="requestAnrechnung-begruendungEcts"
+                                                      maxlength="<?php echo CHAR_LENGTH150 ?>" required><?php echo $anrechnungData->begruendung_ects; ?></textarea>
+                                            <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungEcts-charCounter"><?php echo CHAR_LENGTH150 ?></span></span></small>
                                         </div>
                                     </div>
                                 </div>
@@ -233,8 +234,8 @@ $this->load->view(
                                         <div class="panel-body">
                                             <textarea class="form-control" name="begruendung_lvinhalt" rows="7" id="requestAnrechnung-begruendungLvinhalt"
                                                       minlength="<?php echo CHAR_LENGTH500 ?>"
-                                                      maxlength="<?php echo CHAR_LENGTH1500 ?>" required><?php echo $anrechnungData->begruendung_lvinhalt; ?></textarea>
-                                            <small><span class="text-muted pull-right">&nbsp;/&nbsp;<?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungLvinhalt-charCounterMax"><?php echo CHAR_LENGTH1500 ?></span></span></small>
+                                                      maxlength="<?php echo CHAR_LENGTH1000 ?>" required><?php echo $anrechnungData->begruendung_lvinhalt; ?></textarea>
+                                            <small><span class="text-muted pull-right">&nbsp;/&nbsp;<?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungLvinhalt-charCounterMax"><?php echo CHAR_LENGTH1000 ?></span></span></small>
                                             <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'fehlendeMinZeichen'); ?> :<span id="requestAnrechnung-begruendungLvinhalt-charCounterMin"><?php echo CHAR_LENGTH500 ?></span></span></small>
                                         </div>
                                     </div>

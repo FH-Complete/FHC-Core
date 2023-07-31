@@ -1,8 +1,9 @@
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 const CHAR_LENGTH125 = 125;
+const CHAR_LENGTH150 = 150;
 const CHAR_LENGTH500 = 500;
-const CHAR_LENGTH1500 = 1500;
+const CHAR_LENGTH1000 = 1000;
 
 const COLOR_DANGER = '#f2dede';
 
@@ -216,12 +217,12 @@ var requestAnrechnung = {
         });
 
         $('#requestAnrechnung-begruendungEcts').keyup(function() {
-            let length = CHAR_LENGTH125 - $(this).val().length;
+            let length = CHAR_LENGTH150 - $(this).val().length;
             $('#requestAnrechnung-begruendungEcts-charCounter').text(length);
         });
 
         $('#requestAnrechnung-begruendungLvinhalt').keyup(function() {
-            let maxlength = CHAR_LENGTH1500 - $(this).val().length;
+            let maxlength = CHAR_LENGTH1000 - $(this).val().length;
             $('#requestAnrechnung-begruendungLvinhalt-charCounterMax').text(maxlength);
 
             let minlength = CHAR_LENGTH500 - $(this).val().length;
