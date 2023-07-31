@@ -18,7 +18,9 @@ class SearchBar extends FHC_Controller
 		parent::__construct();
 
 		// Loads the AuthLib _without_ starting the authentication
-		// NOTE: a user must be authenticated via another controller to access this one
+		// NOTE:
+		// 	- A user must be authenticated via another controller to access this one
+		//	- It is loaded to be able to call the isLogged function later
 		$this->load->library('AuthLib', array(false));
 		
 		// Load the library SearchBarLib
