@@ -4,6 +4,8 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 
 class UHSTAT1 extends FHC_Controller
 {
+	const BERECHTIGUNG_UHSTAT_VERWALTEN = 'student/uhstat1daten_verwalten';
+	const PERSON_ID_SESSION_INDEX = 'bewerbung/personId';
 	const CODEX_OESTERREICH = 'A';
 	const LOWER_BOUNDARY_YEARS = 160;
 	const UPPER_BOUNDARY_YEARS = 20;
@@ -12,18 +14,17 @@ class UHSTAT1 extends FHC_Controller
 
 	public function __construct()
 	{
-		parent::__construct(
-			array(
-				'index' => 'admin:r',
-				'saveUHSTAT1Data' => 'admin:rw'
-			)
-		);
+		parent::__construct();
 
 		// load ci libs
 		$this->load->library('form_validation');
 
 		// load ci helpers
 		$this->load->helper(array('form', 'url'));
+
+		// load libraries
+		$this->load->library('AuthLib');
+		$this->load->library('PermissionLib');
 
 		// load models
 		$this->load->model('codex/Oehbeitrag_model', 'OehbeitragModel');
@@ -93,9 +94,7 @@ class UHSTAT1 extends FHC_Controller
 	 */
 	public function saveUHSTAT1Data()
 	{
-		$person_id = $this->input->get('person_id');
-
-		if (!isset($person_id) || !is_numeric($person_id)) show_error("Person Id missing");
+		$person_id = $this->_getValidPersonId();
 
 		$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
 
@@ -133,8 +132,10 @@ class UHSTAT1 extends FHC_Controller
 				$uhstatData[$field] = $this->input->post($field);
 			}
 
+			// check if entry already exists
 			$uhstat1datenloadRes = $this->Uhstat1datenModel->loadWhere(array('person_id' => $person_id));
 
+			// if yes, update
 			if (hasData($uhstat1datenloadRes))
 			{
 				$uhstat1datenRes = $this->Uhstat1datenModel->update(
@@ -142,7 +143,7 @@ class UHSTAT1 extends FHC_Controller
 					$uhstatData
 				);
 			}
-			else
+			else // otherwise insert
 			{
 				$uhstat1datenRes = $this->Uhstat1datenModel->insert(
 					array_merge($uhstatData, array('person_id' => $person_id))
@@ -210,9 +211,7 @@ class UHSTAT1 extends FHC_Controller
 	 */
 	private function _getFormMetaData()
 	{
-		$person_id = $this->input->get('person_id');
-
-		if (!isset($person_id) || !is_numeric($person_id)) return error("Person Id missing");
+		$person_id = $this->_getValidPersonId();
 
 		$languageIdx = $this->_getLanguageIndex();
 
@@ -272,9 +271,7 @@ class UHSTAT1 extends FHC_Controller
 	 */
 	private function _getUHSTAT1Data()
 	{
-		$person_id = $this->input->get('person_id');
-
-		if (!isset($person_id) || !is_numeric($person_id)) return error("Person Id missing");
+		$person_id = $this->_getValidPersonId();
 
 		$this->Uhstat1datenModel->addSelect(
 			implode(', ', array_keys($this->_uhstat1Fields))
@@ -302,5 +299,28 @@ class UHSTAT1 extends FHC_Controller
 		}
 
 		return $idx;
+	}
+
+	/**
+	 * Gets Id of person having permissions to manage UHSTAT1 data.
+	 * Can be passed as parameter or be in session.
+	 * @return int person_id
+	 */
+	private function _getValidPersonId()
+	{
+		// if coming from bewerbungstool - person id is in session (person must be logged in bewerbungstool)
+		if (isset($_SESSION[self::PERSON_ID_SESSION_INDEX]) && is_numeric($_SESSION[self::PERSON_ID_SESSION_INDEX]))
+			return $_SESSION[self::PERSON_ID_SESSION_INDEX];
+
+		// if person id passed directly...
+		$person_id = $this->input->post('person_id');
+		if (!isset($person_id)) $person_id = $this->input->get('person_id');
+
+		if (!isset($person_id) || !is_numeric($person_id)) show_error("invalid person id");
+
+		// ...check if there is a permission for editing UHSTAT1 data
+		if ($this->permissionlib->isBerechtigt(self::BERECHTIGUNG_UHSTAT_VERWALTEN, 'suid')) return $person_id;
+
+		show_error("No permission for managing UHSTAT");
 	}
 }
