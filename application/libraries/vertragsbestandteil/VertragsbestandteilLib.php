@@ -127,9 +127,10 @@ class VertragsbestandteilLib
 	
 	public function storeVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil) 
 	{
-		$this->CI->db->trans_begin();
+		$this->CI->db->trans_begin();		
 		try
 		{
+			$this->setUIDtoPGSQL();
 			if( intval($vertragsbestandteil->getVertragsbestandteil_id()) > 0 )
 			{
 				$this->updateVertragsbestandteil($vertragsbestandteil);
@@ -158,6 +159,7 @@ class VertragsbestandteilLib
 		$this->CI->db->trans_begin();
 		try
 		{
+			$this->setUIDtoPGSQL();
 			if( intval($dv->getDienstverhaeltnis_id()) > 0 )
 			{
 				$vbs = $this->fetchVertragsbestandteile($dv->getDienstverhaeltnis_id());
@@ -198,6 +200,7 @@ class VertragsbestandteilLib
 		$this->CI->db->trans_begin();
 		try
 		{
+			$this->setUIDtoPGSQL();
 			if( intval($vertragsbestandteil->getVertragsbestandteil_id()) > 0 )
 			{
 				$this->deleteVertragsbestandteilHelper($vertragsbestandteil);
@@ -387,6 +390,7 @@ class VertragsbestandteilLib
 		$this->CI->db->trans_begin();
 		try
 		{
+			$this->setUIDtoPGSQL();
 			if( intval($dv->getDienstverhaeltnis_id()) > 0 )
 			{
 				$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dv->getDienstverhaeltnis_id());
@@ -448,6 +452,15 @@ class VertragsbestandteilLib
 		if (isError($ret))
 		{
 			throw new Exception('error ending vertragsbestandteil');
+		}
+	}
+	
+	protected function setUIDtoPGSQL() {
+		$uid = getAuthUID();
+		$ret = $this->VertragsbestandteilModel->execReadOnlyQuery('SET LOCAL pv21.uid TO \'' . $uid . '\'');
+		if(isError($ret)) 
+		{
+			throw new Exception('error setting uid to pgsql');
 		}
 	}
 }
