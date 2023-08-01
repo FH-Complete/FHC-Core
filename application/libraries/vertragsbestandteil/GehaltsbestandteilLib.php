@@ -49,6 +49,7 @@ class GehaltsbestandteilLib
 	{
 		try
 		{
+			$this->setUIDtoPGSQL();
 			if( intval($gehaltsbestandteil->getGehaltsbestandteil_id()) > 0 )
 			{
 				$this->updateGehaltsbestandteil($gehaltsbestandteil);
@@ -109,6 +110,7 @@ class GehaltsbestandteilLib
 
 	public function deleteGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
 	{
+		$this->setUIDtoPGSQL();
 		$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
 		
 		if (isError($ret))
@@ -119,6 +121,7 @@ class GehaltsbestandteilLib
 	
 	public function endGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil, $enddate)
 	{
+		$this->setUIDtoPGSQL();
 		if( $gehaltsbestandteil->getBis() !== null && $gehaltsbestandteil->getBis() < $enddate ) 
 		{
 			return;
@@ -134,6 +137,16 @@ class GehaltsbestandteilLib
 		if (isError($ret))
 		{
 			throw new Exception('error ending gehaltsbestandteil');
+		}
+	}
+		
+	protected function setUIDtoPGSQL() {
+		$ret = $this->GehaltsbestandteilModel
+			->execReadOnlyQuery('SET LOCAL pv21.uid TO \'' 
+				. $this->loggedInUser . '\'');
+		if(isError($ret)) 
+		{
+			throw new Exception('error setting uid to pgsql');
 		}
 	}
 }

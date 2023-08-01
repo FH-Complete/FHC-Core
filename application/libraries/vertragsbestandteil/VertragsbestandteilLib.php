@@ -456,8 +456,9 @@ class VertragsbestandteilLib
 	}
 	
 	protected function setUIDtoPGSQL() {
-		$uid = getAuthUID();
-		$ret = $this->VertragsbestandteilModel->execReadOnlyQuery('SET LOCAL pv21.uid TO \'' . $uid . '\'');
+		$ret = $this->VertragsbestandteilModel
+			->execReadOnlyQuery('SET LOCAL pv21.uid TO \'' 
+				. $this->loggedInUser . '\'');
 		if(isError($ret)) 
 		{
 			throw new Exception('error setting uid to pgsql');
