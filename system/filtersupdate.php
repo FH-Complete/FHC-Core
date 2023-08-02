@@ -1273,7 +1273,8 @@ $filters = array(
 					{"name": "beschreibung"},
 					{"name": "hersteller"},
 					{"name": "os"},
-					{"name": "aktiv"}
+					{"name": "aktiv"},
+					{"name": "softwarestatus_kurzbz"}
 				],
 				"filters": []
 			}
