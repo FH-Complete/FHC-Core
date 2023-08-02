@@ -142,7 +142,7 @@ export const CoreFilterCmpt = {
 					col.visible = selectedFields.indexOf(col.field) >= 0;
 					if (
 						col.formatter == 'rowSelection'
-						|| (this.tabulatorAdditionalColumns && this.tabulatorAdditionalColumns.indexOf(col.title) >= 0)
+						|| (this.tabulatorAdditionalColumns && this.tabulatorAdditionalColumns.indexOf(col.field) >= 0)
 					)
 						col.visible = true;
 
