@@ -17937,7 +17937,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Invalid configuration value for data type {1}, special characters not allowed',
+				'text' => 'Invalid configuration value for data type {0}, special characters not allowed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -18158,6 +18158,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Error when deleting configuration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationswertLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfigurationswert(e) löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete configuration value(s)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20746,7 +20766,6 @@ array(
 			)
 		)
 	),
-
 );
 
 
