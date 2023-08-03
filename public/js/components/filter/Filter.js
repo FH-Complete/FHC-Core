@@ -517,7 +517,7 @@ export const CoreFilterCmpt = {
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
 				<div v-if="newBtnShow || reload || $slots.actions" class="d-flex gap-3 align-items-baseline flex-wrap">
-					<button v-if="newBtnShow" class="btn btn-outline-secondary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
+					<button v-if="newBtnShow" class="btn btn-primary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
 						<span class="fa-solid fa-plus" aria-hidden="true"></span>
 						{{ newBtnLabel }}
 					</button>
