@@ -18773,13 +18773,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Datum Wiedereinstieg',
+				'text' => 'Wiedereinstieg',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Date of return',
+				'text' => 'Re-Entry',
 				'description' => '',
 				'insertvon' => 'system'
 			)

@@ -1341,9 +1341,9 @@ class AntragLib
 			return $semester;
 		$nextSem = current(getData($result));
 
-		$semester[] = [
+		$semester[0] = [
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'wiedereinstieg' => $nextSem->start
+			'wiedereinstieg' => [$nextSem]
 		];
 
 		$result = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $nextSem->studiensemester_kurzbz, $ausbildungssemester+1);
@@ -1354,12 +1354,24 @@ class AntragLib
 		if (!hasData($result))
 			return $semester;
 
-		$semAfterNext = current(getData($result));
+		$currSemester = current(getData($result));
+		$followingSemester = [$currSemester];
 
-		$semester[] = [
+		for ($i = 0; $i < 3; $i++) {
+			$result = $this->_ci->StudiensemesterModel->getNextFrom($currSemester->studiensemester_kurzbz);
+			if (!hasData($result))
+				break;
+			$currSemester = current(getData($result));
+			$followingSemester[] = $currSemester;
+		}
+
+		$semester[1] = [
 			'studiensemester_kurzbz' => $nextSem->studiensemester_kurzbz,
-			'wiedereinstieg' => $semAfterNext->start
+			'wiedereinstieg' => $followingSemester
 		];
+
+		foreach ($followingSemester as $sem)
+			$semester[0]['wiedereinstieg'][] = $sem;
 
 		return $semester;
 	}

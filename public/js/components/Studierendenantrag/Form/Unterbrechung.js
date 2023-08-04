@@ -31,6 +31,7 @@ export default {
 				default: []
 			},
 			stsem: null,
+			currentWiedereinstieg: '',
 			siteUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router
 		}
@@ -101,7 +102,7 @@ export default {
 			formData.append("studiensemester", this.stsem !== null && this.data.studiensemester[this.stsem].studiensemester_kurzbz);
 			formData.append("prestudent_id", this.data.prestudent_id);
 			formData.append("grund", this.$refs.grund.value);
-			formData.append("datum_wiedereinstieg", this.stsem !== null && this.data.studiensemester[this.stsem].wiedereinstieg);
+			formData.append("datum_wiedereinstieg", this.stsem !== null && this.currentWiedereinstieg);
 
 			axios.post(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
@@ -257,6 +258,7 @@ export default {
 							v-model="stsem"
 							required
 							:id="'studierendenantrag-form-abmeldung-' + uuid + '-stsem'"
+							@input="currentWiedereinstieg = ''"
 							>
 							<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index">
 								{{stsem.studiensemester_kurzbz}}
@@ -278,8 +280,12 @@ export default {
 					<div v-else-if="stsem === null" class="form-control">
 						{{p.t('ui/select_studiensemester')}}
 					</div>
-					<div v-else class="form-control">
-						{{datumWsFormatted}}
+					<div v-else>
+						<select v-model="currentWiedereinstieg" class="form-control">
+							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start">
+								{{sem.studiensemester_kurzbz}}
+							</option>
+						</select>
 					</div>
 
 					<div v-if="errors.datum_wiedereinstieg.length" class="invalid-feedback d-block">
