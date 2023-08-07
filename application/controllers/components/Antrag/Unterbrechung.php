@@ -27,7 +27,8 @@ class Unterbrechung extends FHC_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'studierendenantrag'
+			'studierendenantrag',
+			'ui'
 		]);
 	}
 
