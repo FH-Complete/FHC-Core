@@ -197,6 +197,9 @@ class Studierendenantrag_model extends DB_Model
 			'campus.get_status_studierendenantrag(studierendenantrag_id)=st.studierendenantrag_statustyp_kurzbz',
 			'LEFT'
 		);
+		
+		$this->db->where("(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=p.prestudent_id AND status_kurzbz='Student' LIMIT 1) IS NOT NULL", null, false);
+
 
 		return $this->loadWhere([
 			'p.person_id' => $person_id
