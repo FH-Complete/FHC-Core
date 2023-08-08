@@ -3092,11 +3092,7 @@ else
 	}
 	if ($rechte->isBerechtigt('infocenter', null, 'suid'))
 	{
-<<<<<<< HEAD
-		echo '&nbsp;&nbsp;<button type="button" class="btn btn-default btn-xs" onclick="clearList()" id="mailSendButton">Liste aufräumen</button>';
-=======
 		echo '&nbsp;&nbsp;<button type="button" class="btn btn-default btn-xs" onclick="clearList()" id="clearListButton" title="Löscht alle Prüflinge, bei denen keine Daten vorhanden sind">Liste aufräumen</button>';
->>>>>>> master
 	}
 	echo '</div></div></form>';
 	echo '	<form class="form" role="form">
