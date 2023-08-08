@@ -27,11 +27,11 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statust
 			(studierendenantrag_statustyp_kurzbz, bezeichnung)
 			VALUES
 			('Erstellt', '{\"Erstellt\",\"Created\"}'),
-			('Genehmigt', '{\"Genehmigt\",\"Approved\"}'),
+			('Genehmigt', '{\"Bestätigt\",\"Approved\"}'),
 			('Abgelehnt', '{\"Abgelehnt\",\"Rejected\"}'),
 			('Verzichtet', '{\"Verzichtet\",\"Pass\"}'),
 			('Offen', '{\"Offen\",\"Reopened\"}'),
-			('Zurückgezogen', '{\"Zurückgezogen\",\"Cancelled\"}'),
+			('Zurueckgezogen', '{\"Zurückgezogen\",\"Cancelled\"}'),
 			('Lvszugewiesen', '{\"Lvszugewiesen\",\"Lvsassigned\"}'),
 			('EmailVersandt', '{\"Email Versandt\",\"Reminder Sent\"}'),
 			('ErsteAufforderungVersandt', '{\"1.Aufforderung Versandt\",\"1st Request Sent\"}'),

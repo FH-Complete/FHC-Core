@@ -42,7 +42,7 @@ export default {
 			{
 				case 'Erstellt': return 'info';
 				case 'Genehmigt': return 'success';
-				case 'Zurückgezogen': return 'danger';
+				case 'Zurueckgezogen': return 'danger';
 				default: return 'info';
 			}
 		},
