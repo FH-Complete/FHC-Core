@@ -18531,13 +18531,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antrag zurückziehen',
+				'text' => 'Bekanntgabe zurückziehen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Cancel Application',
+				'text' => 'Cancel announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19514,13 +19514,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Statusverlauf für Antrag #{id} ',
+				'text' => 'Statusverlauf für #{id} ',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'History for Application #{id}',
+				'text' => 'History for #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19594,13 +19594,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Grund für Ablehnung von Antrag #{id}',
+				'text' => 'Grund für Ablehnung von #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for rejection of Application #{id}',
+				'text' => 'Reason for rejection of #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19774,13 +19774,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Für diesen Studiengang sind keine Anträge möglich',
+				'text' => 'Für diesen Studiengang sind keine Bekanntgaben möglich',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No applications are accepted for this course',
+				'text' => 'No announcements are accepted for this course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19794,13 +19794,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Es gibt bereits einen bestehenden Antrag',
+				'text' => 'Es gibt bereits eine bestehende Bekanntgabe',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'There is already an existing application',
+				'text' => 'There is already an existing announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19814,13 +19814,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Es gibt bereits einen bestehenden Antrag vom Typ {typ}',
+				'text' => 'Es gibt bereits eine bestehende Bekanntgabe vom Typ {typ}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'There is already an existing application of type {typ}',
+				'text' => 'There is already an existing announcement of type {typ}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19834,13 +19834,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Antrag mit AntragsId {id} gefunden',
+				'text' => 'Keine Bekanntgabe mit Id {id} gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No application found with ApplicationId {id}',
+				'text' => 'No announcement found with Id {id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19854,13 +19854,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein {typ} Antrag gefunden für Prestudent {prestudent_id}',
+				'text' => 'Keine {typ} Bekanntgabe gefunden für Prestudent {prestudent_id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No {typ} application found for prestudent {prestudent_id}',
+				'text' => 'No {typ} announcement found for prestudent {prestudent_id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19874,13 +19874,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Studiengang und Ausbildungssemester gefunden für Antrag mit AntragsId {id}',
+				'text' => 'Kein Studiengang und Ausbildungssemester gefunden für Bekanntgabe mit Id {id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No studiengang and ausbildungssemester found for antrag with id: {id}',
+				'text' => 'No studiengang and ausbildungssemester found for announcement with id: {id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19914,13 +19914,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Studiengang gefunden für Antrag #{id}',
+				'text' => 'Kein Studiengang gefunden für Bakanntgabe #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No studiengang found for Application #{id}',
+				'text' => 'No studiengang found for announcement #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19934,13 +19934,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Studiengang-Email gefunden für Antrag #{id}',
+				'text' => 'Keine Studiengang-Email gefunden für Bekanntgabe #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No studiengang-email found for Application #{id}',
+				'text' => 'No studiengang-email found for announcement #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20014,7 +20014,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Dieser Antrag ist gesperrt',
+				'text' => 'Diese Bekanntgabe ist gesperrt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -20054,13 +20054,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Lehrveranstaltung im Antrag gefunden',
+				'text' => 'Keine Lehrveranstaltung in Bekanntgabe gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No course found in application',
+				'text' => 'No course found in announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20074,13 +20074,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Berechtigung, den Antrag zu bearbeiten',
+				'text' => 'Keine Berechtigung, die Bekanntgabe zu bearbeiten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No authorization to edit the application',
+				'text' => 'No authorization to edit the announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20094,13 +20094,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Berechtigung, den Antrag zu beeinspruchen',
+				'text' => 'Keine Berechtigung, die Bekanntgabe zu beeinspruchen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No authorization to object the application',
+				'text' => 'No authorization to object the announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20114,13 +20114,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antrag ist nicht beeinsprucht',
+				'text' => 'Bekanntgabe ist nicht beeinsprucht',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Application is not objected',
+				'text' => 'Announcement is not objected',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20134,13 +20134,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antrag ist nicht bestätigt worden',
+				'text' => 'Bakanntgabe ist nicht bestätigt worden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Application is not approved',
+				'text' => 'Announcement is not approved',
 				'description' => '',
 				'insertvon' => 'system'
 			)
