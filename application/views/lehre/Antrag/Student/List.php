@@ -39,7 +39,7 @@ $this->load->view(
 							<p><?= $this->p->t('studierendenantrag', 'calltoaction_' . $type); ?></p>
 							<hr>
 							<a href="<?= site_url('lehre/Studierendenantrag/' . strtolower($type) . '/' . $prestudent_id); ?>" class="btn btn-outline-secondary">
-								<i class="fa-regular fa-plus fa-xl"></i> <?= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); ?>
+								<i class="fa fa-plus"></i> <?= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); ?>
 							</a>
 						</div>
 					<?php } ?>
