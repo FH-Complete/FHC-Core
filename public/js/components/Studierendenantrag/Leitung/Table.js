@@ -370,7 +370,7 @@ export default {
 				</table>
 			</core-fetch-cmpt>
 		</bs-modal>
-		<lv-popup ref="lvList" class="fade" :antrag-id="lvsData ? lvsData.studierendenantrag_id : null" dialog-class="modal-lg">
+		<lv-popup ref="lvList" class="fade" :antrag-id="lvsData ? lvsData.studierendenantrag_id : null">
 			{{p.t('studierendenantrag', 'title_show_lvs', lvsData ? lvsData : {name: ''}) }}
 		</lv-popup>
 	</div>

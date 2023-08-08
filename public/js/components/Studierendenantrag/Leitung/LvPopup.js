@@ -67,7 +67,7 @@ export default {
 			options = { default: options };
 		return BsAlert.popup.bind(this)(msg, options);
 	},
-	template: `<bs-modal ref="modalContainer" class="bootstrap-prompt" v-bind="$props">
+	template: `<bs-modal ref="modalContainer" class="bootstrap-prompt" v-bind="$props" dialog-class="modal-lg">
 		<template v-slot:title>
 			<slot></slot>
 		</template>
