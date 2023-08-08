@@ -207,7 +207,7 @@ export default {
 
 					container.className = "d-flex gap-2";
 
-					if ((data.typ == 'Abmeldung' || data.typ == 'AbmeldungStgl' || data.typ == 'Unterbrechung') && (data.status == 'Genehmigt' || data.status == 'Beeinsprucht' || data.status == 'EinspruchAbgelehnt')) {
+					if ((data.typ == 'Abmeldung' || data.typ == 'AbmeldungStgl' || data.typ == 'Unterbrechung') && (data.status == 'Genehmigt' || data.status == 'Beeinsprucht' || data.status == 'EinspruchAbgelehnt' || data.status == 'EmailVersandt')) {
 						// NOTE(chris): Download PDF
 						let button = document.createElement('a');
 						button.innerHTML = '<i class="fa-solid fa-download" title="' + this.p.t('studierendenantrag', 'btn_download_antrag') + '"></i>';

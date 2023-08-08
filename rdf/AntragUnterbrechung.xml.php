@@ -15,7 +15,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$id = $_GET['id'];
 
 		$where = " WHERE studierendenantrag_id = " . $db->db_add_param($id) . "
-					AND campus.tbl_studierendenantrag.typ = 'Unterbrechung' AND campus.get_status_studierendenantrag(campus.tbl_studierendenantrag.studierendenantrag_id) = 'Genehmigt';";
+					AND campus.tbl_studierendenantrag.typ = 'Unterbrechung' AND campus.get_status_studierendenantrag(campus.tbl_studierendenantrag.studierendenantrag_id) IN ('Genehmigt', 'EmailVersandt');";
 		$not_found_error = 'Studierendenantrag not found'. $id;
 	} elseif(isset($_GET['uid']) && isset($_GET['prestudent_id'])) {
 		$uid = $_GET['uid'];
@@ -27,7 +27,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$prestudent_id  = (array_filter($prestudent_id, 'strlen'));
 
 		$where = " WHERE  campus.tbl_studierendenantrag.prestudent_id in (" . $db->db_implode4SQL($prestudent_id) . ")
-					AND campus.tbl_studierendenantrag.typ = 'Unterbrechung' AND campus.get_status_studierendenantrag(campus.tbl_studierendenantrag.studierendenantrag_id) = 'Genehmigt';";
+					AND campus.tbl_studierendenantrag.typ = 'Unterbrechung' AND campus.get_status_studierendenantrag(campus.tbl_studierendenantrag.studierendenantrag_id) IN ('Genehmigt', 'EmailVersandt');";
 		$not_found_error = 'Studierendenantrag not found for: ' . implode(',', $uid);
 	} else
 		die('<error>wrong parameters</error>');

@@ -104,7 +104,8 @@ $this->load->view(
 									<?php if ($antrag->typ != Studierendenantrag_model::TYP_WIEDERHOLUNG && in_array($antrag->status, [
 										Studierendenantragstatus_model::STATUS_APPROVED,
 										Studierendenantragstatus_model::STATUS_OBJECTED,
-										Studierendenantragstatus_model::STATUS_OBJECTION_DENIED
+										Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
+										Studierendenantragstatus_model::STATUS_REMINDERSENT
 									])) { ?>
 										<a class="ms-2" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xml=Antrag' . $antrag->typ . '.xml.php&xsl=Antrag' . $antrag->typ . '&id=' . $antrag->studierendenantrag_id . '&uid=' . getAuthUID()); ?>"><i class="fa-solid fa-download" title="<?= $this->p->t('studierendenantrag', 'btn_download_antrag'); ?>"></i></a>
 									<?php } ?>
