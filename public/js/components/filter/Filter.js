@@ -65,7 +65,9 @@ export const CoreFilterCmpt = {
 		newBtnShow: Boolean,
 		newBtnClass: [String, Array, Object],
 		newBtnDisabled: Boolean,
-		newBtnLabel: String
+		newBtnLabel: String,
+		idField: String,
+		parentIdField: String
 	},
 	data: function() {
 		return {
@@ -140,7 +142,7 @@ export const CoreFilterCmpt = {
 					col.visible = selectedFields.indexOf(col.field) >= 0;
 					if (
 						col.formatter == 'rowSelection'
-						|| (this.tabulatorAdditionalColumns && this.tabulatorAdditionalColumns.indexOf(col.title) >= 0)
+						|| (this.tabulatorAdditionalColumns && this.tabulatorAdditionalColumns.indexOf(col.field) >= 0)
 					)
 						col.visible = true;
 
@@ -198,6 +200,13 @@ export const CoreFilterCmpt = {
 			if (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length)
 				this.tabulatorHasSelector = true;
 
+			if (this.idField) {
+				// enable nested tabulator if parent Id given
+				if (this.parentIdField) tabulatorOptions.dataTree = true;
+				// set tabulator index
+				tabulatorOptions.index = this.idField;
+			}
+
 			// Start the tabulator with the build options
 			this.tabulator = new Tabulator(
 				this.$refs.table,
@@ -214,6 +223,32 @@ export const CoreFilterCmpt = {
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
+			// if nested tabulator, restructure data
+			if (this.parentIdField && this.idField) {
+				this.tabulator.on("dataLoading", data => {
+					let toDelete = [];
+
+					// loop through all data
+					for (let childIdx = 0; childIdx < data.length; childIdx++)
+					{
+						let child = data[childIdx];
+
+						// if it has parent id, it is a child
+						if (child[this.parentIdField])
+						{
+							// append the child on the right place. If parent found, mark original sw child on 0 level for deleting
+							if (this.appendChild(data, child)) toDelete.push(childIdx);
+						}
+					}
+
+					// delete the marked children from 0 level
+					for (let counter = 0; counter < toDelete.length; counter++)
+					{
+						// decrease index by counter as index of data array changes after every deletion
+						data.splice(toDelete[counter] - counter, 1);
+					}
+				});
+			}
 			if (this.tableOnly) {
 				this.tabulator.on('tableBuilt', () => {
 					const cols = this.tabulator.getColumns();
@@ -479,6 +514,35 @@ export const CoreFilterCmpt = {
 				},
 				this.getFilter
 			);
+		},
+		// append child to it's parent
+		appendChild(data, child) {
+			// get parent id
+			let parentId = child[this.parentIdField];
+
+			// loop thorugh all data
+			for (let parentIdx = 0; parentIdx < data.length; parentIdx++)
+			{
+				let parent = data[parentIdx];
+
+				// if it's the parent
+				if (parent[this.idField] == parentId)
+				{
+					// create children array if not done yet
+					if (!parent._children) parent._children = [];
+
+					// append the child
+					parent._children.push(child);
+
+					// parent found
+					return true;
+				}
+				// search children for parents
+				else if (parent._children) this.appendChild(parent._children, child);
+			}
+
+			// parent not found
+			return false;
 		}
 	},
 	beforeCreate() {
