@@ -1274,8 +1274,7 @@ $filters = array(
 					{"name": "hersteller"},
 					{"name": "os"},
 					{"name": "aktiv"},
-					{"name": "softwarestatus_kurzbz"},
-					{"name": "actions"}
+					{"name": "softwarestatus_kurzbz"}
 				],
 				"filters": []
 			}
