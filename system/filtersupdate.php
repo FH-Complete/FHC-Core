@@ -1280,6 +1280,30 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'imageVerwaltung',
+		'filter_kurzbz' => 'ImageVerwaltung',
+		'description' => '{Image Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "ImageVerwaltung",
+				"columns": [
+					{"name": "bezeichnung"},
+					{"name": "betriebssystem"},
+					{"name": "verfuegbarkeit_start"},
+					{"name": "verfuegbarkeit_ende"},
+					{"name": "anmerkung"},
+					{"name": "ort_count"},
+					{"name": "software_count"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 
