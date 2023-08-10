@@ -16,7 +16,8 @@ export default {
 	data() {
 		return {
 			data: [],
-			student: ''
+			student: '',
+			abortController: null
 		}
 	},
 	computed: {
@@ -38,11 +39,18 @@ export default {
 			});
 		},
 		loadData(evt) {
+			if (this.abortController)
+				this.abortController.abort();
+			this.abortController = new AbortController();
+
 			axios.post(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 				'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/',
-				evt
+				evt,
+				{
+					signal: this.abortController.signal
+				}
 			).then(
 				result => {
 					if (result.data.error) {
@@ -52,7 +60,7 @@ export default {
 					}
 					return result;
 				}
-			);
+			).catch(() => {});
 		}
 	},
 	template: `
