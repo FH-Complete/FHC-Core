@@ -35,6 +35,8 @@
 					<datepicker v-model="meldestichtag"
 						v-bind:enable-time-picker="false"
 						v-bind:placeholder="'Meldestichtag'"
+						v-bind:text-input="true"
+						v-bind:auto-apply="true"
 						locale="de"
 						format="dd.MM.yyyy"
 						model-type="yyyy-MM-dd">

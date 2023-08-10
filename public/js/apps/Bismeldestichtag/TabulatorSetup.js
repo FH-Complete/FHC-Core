@@ -28,8 +28,22 @@ export const BismeldestichtagTabulatorOptions = {
 				return BismeldestichtagTabulatorHelperFunctions._formatDate(cell.getValue());
 			}
 		},
-		{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true},
+		{title: 'Studiensemester', field: 'studiensemester_kurzbz', headerFilter: true, sorter:function(a, b, aRow, bRow, column, dir, sorterParams) {
+
+				//aRow, bRow - the row components for the values being compared
+				let semesterStartA = new Date(aRow.getData().semester_start);
+				let semesterStartB = new Date(bRow.getData().semester_start);
+
+				return semesterStartA - semesterStartB; // difference between studiensemester start dates
+			}
+		},
+		{title: 'Semesterstart',field: 'semester_start', headerFilter: true, visible: false, formatter: function(cell){
+				return BismeldestichtagTabulatorHelperFunctions._formatDate(cell.getValue());
+			}
+		},
 		{title: 'ID', field: 'meldestichtag_id', headerFilter: true, visible: false},
+		{title: 'Insertamum', field: 'insertamum', headerFilter: true, visible: false},
+		{title: 'Insertvon', field: 'insertvon', headerFilter: true, visible: false},
 		{title: 'Löschen', field: 'loeschen', headerFilter: false, formatter:function(cell){
 				return	'<button class="btn btn-outline-secondary delete-btn" data-meldestichtag-id="'+cell.getRow().getIndex()+'">'+
 							'<i class="fa fa-xmark"></i>'+

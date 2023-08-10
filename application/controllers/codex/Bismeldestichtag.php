@@ -22,9 +22,6 @@ class Bismeldestichtag extends Auth_Controller
 			)
 		);
 
-		// Loads WidgetLib
-		$this->load->library('WidgetLib');
-
 		// Load models
 		$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
@@ -78,7 +75,13 @@ class Bismeldestichtag extends Auth_Controller
 
 	public function getBismeldestichtage()
 	{
-		$this->BismeldestichtagModel->addSelect('meldestichtag_id, meldestichtag, studiensemester_kurzbz');
+		$this->BismeldestichtagModel->addSelect(
+			'meldestichtag_id, meldestichtag,
+			tbl_bismeldestichtag.studiensemester_kurzbz, sem.start AS semester_start,
+			tbl_bismeldestichtag.insertamum, tbl_bismeldestichtag.insertvon, tbl_bismeldestichtag.updateamum, tbl_bismeldestichtag.updatevon'
+		);
+		$this->BismeldestichtagModel->addJoin('public.tbl_studiensemester sem', 'studiensemester_kurzbz', 'LEFT');
+		$this->BismeldestichtagModel->addOrder('semester_start');
 		$this->BismeldestichtagModel->addOrder('meldestichtag', 'DESC');
 		$this->BismeldestichtagModel->addOrder('meldestichtag_id', 'DESC');
 		$this->outputJson($this->BismeldestichtagModel->load());
@@ -111,7 +114,11 @@ class Bismeldestichtag extends Auth_Controller
 		{
 			// insert new if Stichtag does not exist
 			$this->outputJson($this->BismeldestichtagModel->insert(
-				array('meldestichtag' => $request->meldestichtag, 'studiensemester_kurzbz' => $request->studiensemester_kurzbz)
+				array(
+					'meldestichtag' => $request->meldestichtag,
+					'studiensemester_kurzbz' => $request->studiensemester_kurzbz,
+					'insertvon' => getAuthUID()
+				)
 			));
 		}
 	}
