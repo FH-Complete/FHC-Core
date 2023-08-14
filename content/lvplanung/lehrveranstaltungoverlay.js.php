@@ -1228,6 +1228,7 @@ function LeMitarbeiterLektorChange()
 
 	req.add('type', 'getstundensatz');
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
+	req.add('studiensemester_kurzbz', getStudiensemester());
 
 	var response = req.executePOST();
 
@@ -1340,6 +1341,7 @@ function LeMitarbeiterAuswahl()
 
 	req_stundensatz.add('type', 'getstundensatz');
 	req_stundensatz.add('mitarbeiter_uid', mitarbeiter_uid);
+	req_stundensatz.add('studiensemester_kurzbz', getStudiensemester());
 
 	var response_stundensatz = req_stundensatz.executePOST();
 

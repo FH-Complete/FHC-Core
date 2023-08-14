@@ -40,6 +40,7 @@ require_once('dbupdate_3.4/24913_tabelle_raumtyp_neues_attribut_aktiv.php');
 require_once('dbupdate_3.4/28089_plausichecks_in_extension_hinzufuegen.php');
 require_once('dbupdate_3.4/29133_einzelne_studiengaenge_aus_issuechecks_ausnehmen.php');
 require_once('dbupdate_3.4/30537_anmerkung_in_tbl_rolleberechtigung.php');
+require_once('dbupdate_3.4/29094_stundensaetze.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
