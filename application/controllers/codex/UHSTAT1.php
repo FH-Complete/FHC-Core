@@ -10,6 +10,7 @@ class UHSTAT1 extends FHC_Controller
 	const LOWER_BOUNDARY_YEARS = 160;
 	const UPPER_BOUNDARY_YEARS = 20;
 
+	private $_uid;
 	private $_uhstat1Fields = array();
 
 	public function __construct()
@@ -39,6 +40,8 @@ class UHSTAT1 extends FHC_Controller
 				'uhstat'
 			)
 		);
+
+		$this->_uid = getAuthUID();
 
 		// set form field information
 		$this->_uhstat1Fields = array(
@@ -141,6 +144,8 @@ class UHSTAT1 extends FHC_Controller
 			// if yes, update
 			if (hasData($uhstat1datenloadRes))
 			{
+				$uhstatData['updateamum'] = 'NOW()';
+				$uhstatData['updatevon'] = $this->_uid;
 				$uhstat1datenRes = $this->Uhstat1datenModel->update(
 					array('person_id' => $person_id),
 					$uhstatData
