@@ -4,7 +4,7 @@
 $(document).ready(function ()
 {
 	window.setTimeout(function() {
-		$("#success-alert_uhstat1").fadeTo(500, 0).slideUp(500, function(){
+		$("#uhstat_success_alert").fadeTo(500, 0).slideUp(500, function(){
 			$(this).remove();
 		});
 	}, 1000);

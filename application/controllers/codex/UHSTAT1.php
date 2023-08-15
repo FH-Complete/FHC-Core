@@ -68,6 +68,9 @@ class UHSTAT1 extends FHC_Controller
 		);
 	}
 
+	// -----------------------------------------------------------------------------------------------------------------
+	// Public methods
+
 	public function index()
 	{
 		$formMetaData = $this->_getFormMetaData();
@@ -80,12 +83,10 @@ class UHSTAT1 extends FHC_Controller
 
 		if (isError($uhstatData)) show_error(getError($uhstatData));
 
-		$readonly = hasData($uhstatData);
-
 		$this->load->view("codex/uhstat1.php", array(
-			'formMetaData' => getData($formMetaData),
-			'uhstatData' => getData($uhstatData),
-			'readonly' => $readonly)
+				'formMetaData' => getData($formMetaData),
+				'uhstatData' => getData($uhstatData)
+			)
 		);
 	}
 
@@ -94,7 +95,9 @@ class UHSTAT1 extends FHC_Controller
 	 */
 	public function saveUHSTAT1Data()
 	{
-		$person_id = $this->_getValidPersonId();
+		$saved = false;
+
+		$person_id = $this->_getValidPersonId('sui');
 
 		$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
 
@@ -155,20 +158,30 @@ class UHSTAT1 extends FHC_Controller
 
 		if (isError($formMetaData)) show_error(getError($formMetaData));
 
-		if (!hasData($formMetaData)) show_error("No form data could be loaded");
+		if (!hasData($formMetaData)) show_error("No form meta data could be loaded");
 
+		$successMessage = '';
+		$errorMessage = '';
 		// pass success/error messages to view
-		$successMessage = isset($uhstat1datenRes) && isSuccess($uhstat1datenRes) ? $this->p->t('uhstat', 'erfolgreichGespeichert') : '';
-		$errorMessage = isset($uhstat1datenRes) && isError($uhstat1datenRes) ? $this->p->t('uhstat', 'fehlerBeimSpeichern') : '';
-		$readOnly = isSuccess($uhstat1datenRes);
+		if (isset($uhstat1datenRes))
+		{
+			if (isSuccess($uhstat1datenRes))
+			{
+				$successMessage = $this->p->t('uhstat', 'erfolgreichGespeichert');
+				$saved = true;
+			}
+			else
+				$errorMessage = $this->p->t('uhstat', 'fehlerBeimSpeichern');
+		}
 
 		// load view with form data
 		$this->load->view("codex/uhstat1.php", array(
-			'formMetaData' => getData($formMetaData),
-			'successMessage' => $successMessage,
-			'errorMessage' => $errorMessage,
-			'readonly' => $readOnly
-		));
+				'formMetaData' => getData($formMetaData),
+				'saved' => $saved,
+				'successMessage' => $successMessage,
+				'errorMessage' => $errorMessage
+			)
+		);
 	}
 
 	/**
@@ -207,11 +220,62 @@ class UHSTAT1 extends FHC_Controller
 	}
 
 	/**
+	 * Deletes UHSTAT1 entry.
+	 */
+	public function deleteUHSTAT1Data()
+	{
+		$saved = false;
+
+		// uhstat data can only be deleted with permission
+		if (!$this->_checkPermission('suid')) show_error('no permission');
+
+		$person_id = $this->_getValidPersonId('suid');
+
+		$uhstat1datenRes = $this->Uhstat1datenModel->delete(
+			array('person_id' => $person_id)
+		);
+
+		$formMetaData = $this->_getFormMetaData();
+
+		if (isError($formMetaData)) show_error(getError($formMetaData));
+
+		if (!hasData($formMetaData)) show_error("No form meta data could be loaded");
+
+		$successMessage = '';
+		$errorMessage = '';
+		// pass success/error messages to view
+		if (isset($uhstat1datenRes))
+		{
+			if (isSuccess($uhstat1datenRes))
+			{
+				$successMessage = $this->p->t('uhstat', 'erfolgreichGeloescht');
+			}
+			else
+				$errorMessage = $this->p->t('uhstat', 'fehlerBeimLoeschen');
+		}
+
+		// load view with form data
+		$this->load->view("codex/uhstat1.php", array(
+				'formMetaData' => getData($formMetaData),
+				'successMessage' => $successMessage,
+				'errorMessage' => $errorMessage
+			)
+		);
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
 	 * Gets initial data needed to display UHSTAT1 form.
 	 */
 	private function _getFormMetaData()
 	{
-		$person_id = $this->_getValidPersonId();
+		$person_id = $this->_getValidPersonId('s');
+		$readOnly = $this->input->get('readOnly');
+
+		$editPermission = $this->_checkPermission('sui');
+		$deletePermission = $this->_checkPermission('suid');
 
 		$languageIdx = $this->_getLanguageIndex();
 
@@ -220,7 +284,10 @@ class UHSTAT1 extends FHC_Controller
 			'abschluss_oesterreich' => array(),
 			'abschluss_nicht_oesterreich' => array(),
 			'jahre' => array(),
-			'person_id' => $person_id
+			'person_id' => $person_id,
+			'editPermission' => $editPermission,
+			'deletePermission' => $deletePermission,
+			'readOnly' => $readOnly
 		);
 
 		$nationTextFieldName = $languageIdx == 1 ? 'langtext' : 'engltext';
@@ -234,7 +301,18 @@ class UHSTAT1 extends FHC_Controller
 
 		if (isError($nationRes)) return $nationRes;
 
-		if (hasData($nationRes)) $formMetaData['nation'] = getData($nationRes);
+		if (hasData($nationRes))
+		{
+			$nations = getData($nationRes);
+
+			// put austria in beginning of selection
+			foreach ($nations as $nation)
+			{
+				if ($nation->nation_code == self::CODEX_OESTERREICH) array_unshift($nations, $nation);
+			}
+
+			$formMetaData['nation'] = $nations;
+		}
 
 		// get abschluss list
 		$abschlussRes = $this->AbschlussModel->getActiveAbschluesse($languageIdx);
@@ -271,7 +349,7 @@ class UHSTAT1 extends FHC_Controller
 	 */
 	private function _getUHSTAT1Data()
 	{
-		$person_id = $this->_getValidPersonId();
+		$person_id = $this->_getValidPersonId('s');
 
 		$this->Uhstat1datenModel->addSelect(
 			implode(', ', array_keys($this->_uhstat1Fields))
@@ -306,7 +384,7 @@ class UHSTAT1 extends FHC_Controller
 	 * Can be passed as parameter or be in session.
 	 * @return int person_id
 	 */
-	private function _getValidPersonId()
+	private function _getValidPersonId($berechtigungsArt)
 	{
 		// if coming from bewerbungstool - person id is in session (person must be logged in bewerbungstool)
 		if (isset($_SESSION[self::PERSON_ID_SESSION_INDEX]) && is_numeric($_SESSION[self::PERSON_ID_SESSION_INDEX]))
@@ -319,8 +397,18 @@ class UHSTAT1 extends FHC_Controller
 		if (!isset($person_id) || !is_numeric($person_id)) show_error("invalid person id");
 
 		// ...check if there is a permission for editing UHSTAT1 data
-		if ($this->permissionlib->isBerechtigt(self::BERECHTIGUNG_UHSTAT_VERWALTEN, 'suid')) return $person_id;
+		if ($this->_checkPermission($berechtigungsArt)) return $person_id;
 
-		show_error("No permission for managing UHSTAT");
+		show_error("No permission");
+	}
+
+	/**
+	 * Checks if logged user has the UHSTAT management permission.
+	 * @param $art - type of permission, e.g. suid for full permissions
+	 * @return bool
+	 */
+	private function _checkPermission($art)
+	{
+		return $this->permissionlib->isBerechtigt(self::BERECHTIGUNG_UHSTAT_VERWALTEN, $art);
 	}
 }
