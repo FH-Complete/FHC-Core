@@ -476,8 +476,7 @@ function checkStatusaenderung(
 				// Zeitabfolge ungültig, Fehler
 				return array(
 					'error' => true,
-					'errormsg' => 'Datum des Statuseintrags muss nach dem Statusdatum,'
-						.' Semesterstartdatum nach Semesterstartdatum des vorherigen Statuseintrags sein'
+					'errormsg' => 'Ungültige Zeitabfolge der Statuseinträge (Statusdatum oder Semester)'
 				);
 			}
 		}
