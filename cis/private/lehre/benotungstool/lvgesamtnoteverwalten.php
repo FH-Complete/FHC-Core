@@ -20,33 +20,33 @@
  * Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at >
  * Manuela Thamer <manuela.thamer@technikum-wien.at>
  */
-require_once ('../../../../config/cis.config.inc.php');
-require_once ('../../../../config/global.config.inc.php');
-require_once ('../../../../include/functions.inc.php');
-require_once ('../../../../include/lehrveranstaltung.class.php');
-require_once ('../../../../include/studiengang.class.php');
-require_once ('../../../../include/studiensemester.class.php');
-require_once ('../../../../include/lehreinheit.class.php');
-require_once ('../../../../include/benutzerberechtigung.class.php');
-require_once ('../../../../include/uebung.class.php');
-require_once ('../../../../include/beispiel.class.php');
-require_once ('../../../../include/studentnote.class.php');
-require_once ('../../../../include/datum.class.php');
-require_once ('../../../../include/legesamtnote.class.php');
-require_once ('../../../../include/lvgesamtnote.class.php');
-require_once ('../../../../include/zeugnisnote.class.php');
-require_once ('../../../../include/pruefung.class.php');
-require_once ('../../../../include/person.class.php');
-require_once ('../../../../include/benutzer.class.php');
-require_once ('../../../../include/mitarbeiter.class.php');
-require_once ('../../../../include/mail.class.php');
-require_once ('../../../../include/phrasen.class.php');
-require_once ('../../../../include/note.class.php');
-require_once ('../../../../include/notenschluessel.class.php');
-require_once ('../../../../include/studienplan.class.php');
-require_once ('../../../../include/addon.class.php');
-require_once ('../../../../include/mobilitaet.class.php');
-require_once ('../../../../include/student.class.php');
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
+require_once('../../../../include/functions.inc.php');
+require_once('../../../../include/lehrveranstaltung.class.php');
+require_once('../../../../include/studiengang.class.php');
+require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../include/lehreinheit.class.php');
+require_once('../../../../include/benutzerberechtigung.class.php');
+require_once('../../../../include/uebung.class.php');
+require_once('../../../../include/beispiel.class.php');
+require_once('../../../../include/studentnote.class.php');
+require_once('../../../../include/datum.class.php');
+require_once('../../../../include/legesamtnote.class.php');
+require_once('../../../../include/lvgesamtnote.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
+require_once('../../../../include/pruefung.class.php');
+require_once('../../../../include/person.class.php');
+require_once('../../../../include/benutzer.class.php');
+require_once('../../../../include/mitarbeiter.class.php');
+require_once('../../../../include/mail.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/note.class.php');
+require_once('../../../../include/notenschluessel.class.php');
+require_once('../../../../include/studienplan.class.php');
+require_once('../../../../include/addon.class.php');
+require_once('../../../../include/mobilitaet.class.php');
+require_once('../../../../include/student.class.php');
 
 $summe_stud = 0;
 $summe_t2 = 0;
@@ -104,6 +104,152 @@ $sprachen->getAll(true);
 
 $errormsg = '';
 
+// eingetragene lv-gesamtnoten freigeben
+if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
+{
+	// Passwort pruefen
+	if (checkldapuser($user, $_REQUEST['passwort']))
+	{
+		$jetzt = date("Y-m-d H:i:s");
+		$neuenoten = 0;
+
+		$studlist = "<table border='1'>
+		<tr>";
+
+		// entweder personenbezogene Daten einbinden
+		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+        {
+            $studlist .= "
+                <td><b>" . $p->t('global/personenkz') . "</b></td>
+                <td><b>" . $p->t('global/studiengang') . "</b></td>
+			    <td><b>" . $p->t('global/nachname') . "</b></td>
+			    <td><b>" . $p->t('global/vorname') . "</b></td>
+            ";
+
+            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+            {
+                $studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
+            }
+            $studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
+
+            $studlist .= "<td><b>" . $p->t('benotungstool/bearbeitetvon') . "</b></td></tr>\n";
+		}
+		// oder anonymisiert nur die UIDs einbinden
+		else
+		{
+			$studlist .= "
+                <td><b>" . $p->t('global/uid') . "</b></td></tr>\n
+            ";
+		}
+
+		// studentenquery
+		$qry_stud = "SELECT
+						DISTINCT uid, vorname, nachname, matrikelnr, kurzbzlang
+					FROM
+						campus.vw_student_lehrveranstaltung
+						JOIN campus.vw_student USING(uid)
+						JOIN public.tbl_studiengang ON campus.vw_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
+					WHERE
+						studiensemester_kurzbz = " . $db->db_add_param($stsem) . "
+						AND lehrveranstaltung_id = " . $db->db_add_param($lvid, FHC_INTEGER) . "
+					ORDER BY nachname, vorname ";
+		if ($result_stud = $db->db_query($qry_stud))
+		{
+			$i = 1;
+			while ($row_stud = $db->db_fetch_object($result_stud))
+			{
+				$lvgesamtnote = new lvgesamtnote();
+				if ($lvgesamtnote->load($lvid, $row_stud->uid, $stsem))
+				{
+					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
+					{
+						$lvgesamtnote->freigabedatum = $jetzt;
+						$lvgesamtnote->freigabevon_uid = $user;
+						$lvgesamtnote->save();
+
+						if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+						{
+							$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->kurzbzlang) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
+
+                            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+                            {
+                                $studlist .= "<td>";
+                                if ($lvgesamtnote->punkte != '')
+                                    $studlist .= trim(number_format($lvgesamtnote->punkte, 2));
+                                $studlist .= "</td>\n";
+                            }
+                            $studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
+
+                            $studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
+                            if ($lvgesamtnote->updatevon != '')
+                                $studlist .= " (" . $lvgesamtnote->updatevon . ")";
+                            $studlist .= "</td></tr>\n";
+						}
+						else
+						{
+							$studlist .= "<tr><td>" . trim($row_stud->uid) . "</td></tr>\n";
+						}
+
+						$neuenoten ++;
+					}
+				}
+			}
+		}
+
+		$studlist .= "</table>";
+
+		// mail an assistentin und den user selber verschicken
+		if ($neuenoten > 0)
+		{
+			$lv = new lehrveranstaltung($lvid);
+			$sg = new studiengang($lv->studiengang_kz);
+			$lektor_adresse = $user . "@" . DOMAIN;
+			$adressen = $sg->email . ", " . $user . "@" . DOMAIN;
+
+			$studienplan = new studienplan();
+			$studienplan->getStudienplanLehrveranstaltung($lvid, $stsem);
+			$studienplan_bezeichnung = '';
+			foreach ($studienplan->result as $row)
+				$studienplan_bezeichnung .= $row->bezeichnung . ' ';
+
+			$mit = new mitarbeiter();
+			$mit->load($user);
+			$name = $mit->anrede.' '.$mit->vorname.' '.$mit->nachname.' ('.$mit->kurzbz.')';
+
+			$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
+			$mail = new mail($adressen, 'vilesci@' . DOMAIN, $betreff, '');
+			$htmlcontent = "<html>
+				<body>
+					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
+					<b>" . $sg->kuerzel . ' ' . $lv->semester . '.Semester
+					' . $lv->bezeichnung . " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
+					<br>eingetragen.\n<br><br>
+					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
+
+            $htmlcontent .= $studlist;
+
+			$htmlcontent.= "
+					<br>Anzahl der Noten:" . $neuenoten . "
+					<br><br>" . $p->t('abgabetool/mailVerschicktAn') . ": " . $adressen . "
+				</body></html>";
+			$mail->setHTMLContent($htmlcontent);
+			$mail->setReplyTo($lektor_adresse);
+			$mail->send();
+		}
+
+		http_response_code(303);
+		header('Location: ' . $_SERVER['REQUEST_URI']);
+		exit;
+	}
+	else
+	{
+		$errormsg = $p->t('gesamtnote/passwortFalsch');
+	}
+}
+
 echo '<!DOCTYPE HTML>
 <html>
 <head>
@@ -145,8 +291,8 @@ echo '<!DOCTYPE HTML>
 		position:absolute;
 		top:100px;
 		left:300px;
-		width:400px;
-		height:200px;
+		min-width:450px;
+		min-height:200px;
 		background-color:#cccccc;
 		visibility:hidden;
 		border-style:solid;
@@ -190,11 +336,14 @@ foreach ($noten_obj->result as $row)
 	$noten_array[$row->note]['lehre'] = $row->lehre;
 	$noten_array[$row->note]['lkt_ueberschreibbar'] = $row->lkt_ueberschreibbar;
 	$noten_array[$row->note]['anmerkung'] = $row->anmerkung;
-	foreach ($sprachen->result AS $s)
+	foreach ($sprachen->result as $s)
 		$noten_array[$row->note]['bezeichnung_mehrsprachig'][$s->sprache] = $row->bezeichnung_mehrsprachig[$s->sprache];
 }
 
 ?>
+
+	const CIS_GESAMTNOTE_PUNKTE = <?php echo CIS_GESAMTNOTE_PUNKTE ? 'true' : 'false';?>;
+
 	function getOffset(pos)
 	{
 		var x,y;
@@ -376,7 +525,7 @@ foreach ($noten_obj->result as $row)
 		var datum_test = datum.split(".");
 		if (datum_test[0].length != 2 || datum_test[1].length != 2 	|| datum_test[2].length!=4
 			|| isNaN(datum_test[2]) || datum_test[1]>12 || datum_test[1]<1 || datum_test[0]>31 || datum_test[0]<1)
-			alert("Invalid Date Format: DD.MM.YYYY");
+			alert("Das Datum entspricht nicht dem Format TT.MM.JJJJ!");
 		else
 		{
 			var anlegendiv = document.getElementById("nachpruefung_div");
@@ -401,6 +550,7 @@ foreach ($noten_obj->result as $row)
 			url += '&punkte='+punkte;
 			url += '&typ='+typ;
 			url += '&'+ts;
+
 
 			$.ajax({
 				type:"GET",
@@ -593,13 +743,32 @@ foreach ($noten_obj->result as $row)
 		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 		var anlegendiv = document.getElementById("nachpruefung_div");
 		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
-		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisung');?>:</td>';
-		str	+= '<td></td><tr><td><textarea id="noteimporttextarea" name="notenimport"></textarea></td></tr>';
+		str += '<tr><td><div style="width: 400px;"><?php echo $p->t('benotungstool/importAnweisung');?>:</div></td>';
+		str	+= '<td></td><tr><td><textarea style="width: 400px;" id="noteimporttextarea" name="notenimport"></textarea></td></tr>';
 		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulk();'>";
 		str += "</td><td></td></tr></table></center></form>";
 		anlegendiv.innerHTML = str;
 		anlegendiv.style.visibility = "visible";
 		$('#noteimporttextarea').focus();
+	}
+
+	// ****
+	// * Oeffnet ein Fenster fuer den Import von Noten für die Nachprüfung aus dem Excel
+	// ****
+	function GradeImportNachp(termin)
+	{
+		var str = "<form name='gradeimportNachp_form'><center><table style='width: 95%'>";
+		str += "<tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
+		var anlegendiv = document.getElementById("nachpruefung_div");
+		var y = getOffset('y'); y = y+50; anlegendiv.style.top = y+"px";
+		str += '<tr><td><div style="width: 400px;"><?php echo $p->t('benotungstool/importAnweisungNachp');?>:</div></td>';
+		str	+= '<td></td><tr><td><textarea style="width: 400px;" id="noteimporttextareaNachp" name="notenimportNachp"></textarea></td></tr>';
+
+		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulkNachp(\""+ termin +"\");'>";
+		str += "</td><td></td></tr></table></center></form>";
+		anlegendiv.innerHTML = str;
+		anlegendiv.style.visibility = "visible";
+		$('#noteimporttextareaNachp').focus();
 	}
 
 	// Speichert die Noten ueber den Import
@@ -633,33 +802,48 @@ foreach ($noten_obj->result as $row)
 		}
 		?>
 
+		var linenumber = 0;
 		for(row in rows)
 		{
-			zeile = rows[row].split("	");
-
-			<?php
-			// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
-			if (CIS_GESAMTNOTE_PUNKTE == false)
-				echo '	// check for valid grades
-				if (validGrades.indexOf(zeile[1]) === -1 && typeof(zeile[1]) != "undefined" && zeile[1] != "")
-				{
-					alertMsg = alertMsg+"Die Note "+zeile[1]+" ist nicht zulaessig. Die Zeile wurde uebersprungen. \n";
-					continue;
-				}';
-			?>
-
-			if (zeile[0]!='' && zeile[1]!='')
+			linenumber++;
+			if( rows[row] == '' ) 
 			{
-				gradedata['matrikelnr_'+i]=zeile[0];
-				<?php
-				if (CIS_GESAMTNOTE_PUNKTE)
-					echo "gradedata['punkte_'+i]= zeile[1];";
-				else
-					echo "gradedata['note_'+i]= zeile[1];";
-				?>
-
-				i++;
+				//skip empty lines
+				continue;
 			}
+			zeile = rows[row].split("	");
+			
+			if( zeile.length < 2 )
+			{
+			  alertMsg = alertMsg + "Zeile " + linenumber + ': ' 
+			  + 'Zu wenig Paramter - 2 erforderlich.  '
+			  + 'Die Zeile wurde uebersprungen.' + "\n\n";
+			  continue;
+			}
+
+			if (CIS_GESAMTNOTE_PUNKTE == false)
+			{
+				// check for valid grades
+				if (validGrades.indexOf(zeile[1]) === -1)
+				{
+					alertMsg = alertMsg + "Zeile " + linenumber + ': '
+						+ "Die Note "+zeile[1]+" ist nicht zulaessig. "
+						+ "Die Zeile wurde uebersprungen. \n\n";
+					continue;
+				}
+			}
+
+			gradedata['matrikelnr_'+i]=zeile[0];
+			if (CIS_GESAMTNOTE_PUNKTE)
+			{
+				gradedata['punkte_'+i]= zeile[1];
+			}
+			else
+			{
+				gradedata['note_'+i]= zeile[1];
+			}
+
+			i++;
 		}
 
 		if (alertMsg != "")
@@ -690,6 +874,142 @@ foreach ($noten_obj->result as $row)
 	  				alert('Request fehlgeschlagen');
 	  			}
 	  		});
+
+		}
+		else
+		{
+			alert('<?php echo $p->t('benotungstool/hilfeImport');?>');
+		}
+	}
+
+	// Speichert die Noten der Nachprüfung ueber den Import
+	function saveGradeBulkNachp(typ)
+	{
+		data = $('#noteimporttextareaNachp').val();
+		closeDiv();
+
+		//Reihen ermitteln
+		var rows = data.split("\n");
+		var i=0;
+		var params='';
+		alertMsg = '';
+
+		var gradedata = {};
+		var validGrades = '';
+
+		<?php
+		// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
+		// Fill Array $gradesArray with valid grades
+		if (CIS_GESAMTNOTE_PUNKTE == false)
+		{
+			$gradesArray = array();
+			foreach ($noten_obj->result as $row_note)
+			{
+				if ($row_note->lehre && $row_note->aktiv)
+					$gradesArray[] = '"' . $row_note->anmerkung . '"';
+			}
+			// Output JS variable with valid grades
+			echo 'var validGrades = [' . implode(',', $gradesArray) . '];';
+		}
+		?>
+
+		var linenumber = 0;
+		for(row in rows)
+		{
+			linenumber++;
+			if( rows[row] == '' ) 
+			{
+				//skip empty lines
+				continue;
+			}
+			zeile = rows[row].split("	");
+			
+			if( zeile.length < 3 )
+			{
+			  alertMsg = alertMsg + "Zeile " + linenumber + ': ' 
+			  + 'Zu wenig Paramter - 3 erforderlich.  '
+			  + 'Die Zeile wurde uebersprungen.' + "\n\n";
+			  continue;
+			}
+			
+			if( zeile[1] == '' && zeile[2] == '' )
+			{
+				// ignore lines just copied from excel 
+				continue;
+			}
+			
+			if( zeile[2] == '' ) 
+			{
+				alertMsg = alertMsg + "Zeile " + linenumber + ': '
+					+ "Die Note oder Punkte fehlen. "
+					+ "Die Zeile wurde uebersprungen. \n\n";
+				continue;			
+			}
+			
+			if (CIS_GESAMTNOTE_PUNKTE == false) 
+			{
+				// check for valid grades
+				if (validGrades.indexOf(zeile[2]) === -1)
+				{
+					alertMsg = alertMsg + "Zeile " + linenumber + ': '
+						+ "Die Note "+zeile[2]+" ist nicht zulaessig. "
+						+ "Die Zeile wurde uebersprungen. \n\n";
+					continue;
+				}
+			}
+
+			if( !zeile[1].match(/[0-9]{2}\.[0-9]{2}\.[0-9]{4}/)  ) 
+			{
+				alertMsg = alertMsg + "Zeile " + linenumber + ': '
+					+ "Das Datum "+zeile[1]+" fehlt oder ist nicht zulaessig. "
+					+ "Die Zeile wurde uebersprungen. \n\n";
+				continue;
+			}
+
+			gradedata['student_uid_'+i]=zeile[0];
+			gradedata['datumNachp_'+i]=zeile[1];
+			if (CIS_GESAMTNOTE_PUNKTE)
+			{
+				gradedata['punkte_'+i]= zeile[2];
+			}
+			else
+			{
+				gradedata['note_'+i]= zeile[2];
+			}
+			i++;
+		}
+
+
+		if (alertMsg != "")
+			alert(alertMsg);
+
+		if (i>0)
+		{
+
+			var jetzt = new Date();
+			var ts = jetzt.getTime();
+			var url= '<?php echo "nachpruefungeintragen.php?lvid=".urlencode($lvid)."&stsem=".urlencode($stsem); ?>';
+			url += '&sammel=1';
+			url += '&typ=' + typ;
+			url += '&submit=1&'+ts;
+			$.ajax({
+				type:"POST",
+				url: url,
+				data: gradedata,
+				success:function(result)
+				{
+					var resp = result;
+					if (resp!='')
+					{
+						alert(resp);
+					}
+					window.location.reload();
+					},
+					error:function(result)
+					{
+						alert('Request Nachprüfung fehlgeschlagen');
+					}
+				});
 
 		}
 		else
@@ -803,149 +1123,6 @@ if (defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && CIS_ANWESENHEITSLIST
 {
 	$hrefpath = "../notenliste.xls.php?stg=$stg_obj->studiengang_kz&lvid=$lvid&stsem=$stsem";
 	echo "<br><a class='Item' href='" . $hrefpath . "'>" . $p->t('benotungstool/notenlisteImport') . "</a>";
-
-}
-
-// eingetragene lv-gesamtnoten freigeben
-if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
-{
-	// Passwort pruefen
-	if (checkldapuser($user, $_REQUEST['passwort']))
-	{
-		$jetzt = date("Y-m-d H:i:s");
-		$neuenoten = 0;
-
-		$studlist = "<table border='1'>
-		<tr>";
-
-		// entweder personenbezogene Daten einbinden
-		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
-        {
-            $studlist .= "
-                <td><b>" . $p->t('global/personenkz') . "</b></td>
-                <td><b>" . $p->t('global/studiengang') . "</b></td>
-			    <td><b>" . $p->t('global/nachname') . "</b></td>
-			    <td><b>" . $p->t('global/vorname') . "</b></td>
-            ";
-
-            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-            {
-                $studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
-            }
-            $studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
-
-            $studlist .= "<td><b>" . $p->t('benotungstool/bearbeitetvon') . "</b></td></tr>\n";
-		}
-		// oder anonymisiert nur die UIDs einbinden
-		else
-		{
-			$studlist .= "
-                <td><b>" . $p->t('global/uid') . "</b></td></tr>\n
-            ";
-		}
-
-		// studentenquery
-		$qry_stud = "SELECT
-						DISTINCT uid, vorname, nachname, matrikelnr, kurzbzlang
-					FROM
-						campus.vw_student_lehrveranstaltung
-						JOIN campus.vw_student USING(uid)
-						JOIN public.tbl_studiengang ON campus.vw_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
-					WHERE
-						studiensemester_kurzbz = " . $db->db_add_param($stsem) . "
-						AND lehrveranstaltung_id = " . $db->db_add_param($lvid, FHC_INTEGER) . "
-					ORDER BY nachname, vorname ";
-		if ($result_stud = $db->db_query($qry_stud))
-		{
-			$i = 1;
-			while ($row_stud = $db->db_fetch_object($result_stud))
-			{
-				$lvgesamtnote = new lvgesamtnote();
-				if ($lvgesamtnote->load($lvid, $row_stud->uid, $stsem))
-				{
-					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
-					{
-						$lvgesamtnote->freigabedatum = $jetzt;
-						$lvgesamtnote->freigabevon_uid = $user;
-						$lvgesamtnote->save();
-
-						if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
-						{
-							$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
-							$studlist .= "<td>" . trim($row_stud->kurzbzlang) . "</td>";
-							$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
-							$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
-
-                            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-                            {
-                                $studlist .= "<td>";
-                                if ($lvgesamtnote->punkte != '')
-                                    $studlist .= trim(number_format($lvgesamtnote->punkte, 2));
-                                $studlist .= "</td>\n";
-                            }
-                            $studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
-
-                            $studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
-                            if ($lvgesamtnote->updatevon != '')
-                                $studlist .= " (" . $lvgesamtnote->updatevon . ")";
-                            $studlist .= "</td></tr>\n";
-						}
-						else
-						{
-							$studlist .= "<tr><td>" . trim($row_stud->uid) . "</td></tr>\n";
-						}
-
-						$neuenoten ++;
-					}
-				}
-			}
-		}
-
-		$studlist .= "</table>";
-
-		// mail an assistentin und den user selber verschicken
-		if ($neuenoten > 0)
-		{
-			$lv = new lehrveranstaltung($lvid);
-			$sg = new studiengang($lv->studiengang_kz);
-			$lektor_adresse = $user . "@" . DOMAIN;
-			$adressen = $sg->email . ", " . $user . "@" . DOMAIN;
-
-			$studienplan = new studienplan();
-			$studienplan->getStudienplanLehrveranstaltung($lvid, $stsem);
-			$studienplan_bezeichnung = '';
-			foreach ($studienplan->result as $row)
-				$studienplan_bezeichnung .= $row->bezeichnung . ' ';
-
-			$mit = new mitarbeiter();
-			$mit->load($user);
-			$name = $mit->anrede.' '.$mit->vorname.' '.$mit->nachname.' ('.$mit->kurzbz.')';
-
-			$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
-			$mail = new mail($adressen, 'no-reply@' . DOMAIN, $betreff, '');
-			$htmlcontent = "<html>
-				<body>
-					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
-					<b>" . $sg->kuerzel . ' ' . $lv->semester . '.Semester
-					' . $lv->bezeichnung . " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
-					<br>eingetragen.\n<br><br>
-					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
-
-			$htmlcontent .= $studlist;
-
-			$htmlcontent.= "
-					<br>Anzahl der Noten: " . $neuenoten . "
-					<br><br>" . $p->t('abgabetool/mailVerschicktAn') . ": " . $adressen . "
-				</body></html>";
-			$mail->setHTMLContent($htmlcontent);
-			$mail->setReplyTo($lektor_adresse);
-			$mail->send();
-		}
-	}
-	else
-	{
-		$errormsg = $p->t('gesamtnote/passwortFalsch');
-	}
 }
 
 if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
@@ -1052,11 +1229,15 @@ $htmlstring .= "<th>" . $p->t('benotungstool/punkte') . ' / ' . $p->t('benotungs
 
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
 {
-	$htmlstring .= "<th colspan='2'>" . $p->t('benotungstool/nachpruefung') . "</th>";
+	$htmlstring .= "<th colspan='2'><br>" . $p->t('benotungstool/nachpruefung') . "<br>
+	<input type='button' onclick='GradeImportNachp(\"Termin2\")' value='" . $p->t('benotungstool/importieren') . "'>
+	</th>";
 }
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 {
-	$htmlstring .= "<th colspan='2' nowrap>" . $p->t('benotungstool/nachpruefung2') . "</th>";
+	$htmlstring .= "<th colspan='2' nowrap><br>" . $p->t('benotungstool/nachpruefung2') . "<br>
+	<input type='button' onclick='GradeImportNachp(\"Termin3\")' value='" . $p->t('benotungstool/importieren') . "'>
+	</th>";
 }
 if (defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
 {
@@ -1184,7 +1365,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			foreach ($addon_obj->result as $row)
 			{
 				if (file_exists('../../../../addons/' . $row->kurzbz . '/cis/grades.inc.php'))
-					include ('../../../../addons/' . $row->kurzbz . '/cis/grades.inc.php');
+					include('../../../../addons/' . $row->kurzbz . '/cis/grades.inc.php');
 			}
 		}
 	}
@@ -1193,7 +1374,6 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 	foreach ($grades as $uid => $data)
 	//Ausgabe Array
 	{
-
 		$htmlstring .= '<tr class="liste' . ($i % 2) . '">
 			<td><a href="mailto:' . $uid . '@' . DOMAIN . '"><img src="../../../../skin/images/button_mail.gif"></a></td>
 			<td>' . $db->convert_html_chars($uid) . '</td>
@@ -1325,7 +1505,6 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			// Punkte
 			if (CIS_GESAMTNOTE_PUNKTE)
 			{
-
 				$htmlstring .= '
 				<input type="text"
 					name="punkte"
