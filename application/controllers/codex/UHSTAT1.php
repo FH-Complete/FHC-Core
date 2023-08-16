@@ -153,6 +153,8 @@ class UHSTAT1 extends FHC_Controller
 			}
 			else // otherwise insert
 			{
+				$uhstatData['insertamum'] = 'NOW()';
+				$uhstatData['insertvon'] = $this->_uid;
 				$uhstat1datenRes = $this->Uhstat1datenModel->insert(
 					array_merge($uhstatData, array('person_id' => $person_id))
 				);
