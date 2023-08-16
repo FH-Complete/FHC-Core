@@ -67,11 +67,11 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1'))
 				vater_geburtsjahr smallint,
 				vater_bildungmax integer,
 				person_id integer NOT NULL,
-				abgeschicktamum timestamp without time zone,
 				insertamum timestamp without time zone DEFAULT now(),
 				insertvon character varying(32),
 				updateamum timestamp without time zone,
-				updatevon character varying(32)
+				updatevon character varying(32),
+				CONSTRAINT pk_tbl_uhstat1daten PRIMARY KEY (uhstat1daten_id)
 			);
 
 			ALTER TABLE bis.tbl_uhstat1daten ADD CONSTRAINT fk_tbl_uhstat1daten_mutter_geburtsstaat FOREIGN KEY (mutter_geburtsstaat)
@@ -113,7 +113,6 @@ if (!$result = @$db->db_query('SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1'))
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.vater_bildungsstaat IS 'Education country of father of person';
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.vater_geburtsjahr IS 'Birth year of father of person';
 			COMMENT ON COLUMN bis.tbl_uhstat1daten.vater_bildungmax IS 'Highest completed level of education of father (code)';
-			COMMENT ON COLUMN bis.tbl_uhstat1daten.abgeschicktamum IS 'Date and time UHSTAT1 data was sent';
 
 			GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_uhstat1daten TO web;
 			GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_uhstat1daten TO vilesci;
