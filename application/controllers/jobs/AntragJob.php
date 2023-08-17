@@ -323,6 +323,8 @@ class AntragJob extends JOB_Controller
 		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
 		$this->StudierendenantragModel->addSelect('s.insertamum');
 
+		$this->StudierendenantragModel->db->where_in('public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)', $this->config->item('antrag_prestudentstatus_whitelist'));
+
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere([
             'typ' => Studierendenantrag_model::TYP_ABMELDUNG_STGL,
             'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
@@ -350,7 +352,39 @@ class AntragJob extends JOB_Controller
 				if (isError($result))
 					$this->logError(getError($result));
 				else
+				{
 					$count++;
+					$result = $this->PrestudentModel->load($antrag->prestudent_id);
+					if(!hasData($result)) {
+						$this->logWarning('No Prestudent found');
+						continue;
+					}
+					$prestudent = current(getData($result));
+					$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
+					if(!hasData($result)) {
+						$this->logWarning('No Studiengang found');
+						continue;
+					}
+					$studiengang = current(getData($result));
+					$result = $this->PersonModel->loadPrestudent($antrag->prestudent_id);
+					if(!hasData($result))
+					{
+						$this->logWarning('No Person found');
+						continue;
+					}
+					$person = current(getData($result));
+					$email = $studiengang->email;
+					$dataMail = array(
+						'prestudent' => $antrag->prestudent_id,
+						'studiensemester' => $antrag->studiensemester_kurzbz,
+						'name' => trim($person->vorname . ' '. $person->nachname),
+					);
+
+					if(!sendSanchoMail('Sancho_Mail_Antrag_A_Assist', $dataMail, $email, 'Einspruchsfrist abgelaufen'))
+					{
+						$this->logWarning("Failed to send Notification to " . $email);
+					}
+				}
 			}
 			$this->logInfo($count . " Students set to Abbrecher");
 		}

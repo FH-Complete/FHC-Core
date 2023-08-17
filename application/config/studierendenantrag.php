@@ -104,7 +104,7 @@ $config['digitalization_start'] = '2022-07-01';
  * @var string           A string formated as PHP DateTime modifier
  * @see https://www.php.net/manual/de/datetime.modify.php
  */
-$config['abmeldung_job_deadline_date_modifier'] = '+3 weeks';
+$config['abmeldung_job_deadline_date_modifier'] = '+2 weeks';
 
 
 
