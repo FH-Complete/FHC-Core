@@ -129,7 +129,7 @@ class Studierendenantrag extends FHC_Controller
 		]);
 	}
 
-	public function abmeldungstgl($prestudent_id, $studierendenantrag_id)
+	public function abmeldungstgl($prestudent_id, $studierendenantrag_id = null)
 	{
 		$this->load->view('lehre/Antrag/Create', [
 			'prestudent_id' => $prestudent_id,

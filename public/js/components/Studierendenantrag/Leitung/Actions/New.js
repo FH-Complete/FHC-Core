@@ -22,7 +22,7 @@ export default {
 	},
 	computed: {
 		newUrl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldung/' + this.student.prestudent_id;
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldungStgl/' + this.student.prestudent_id;
 		}
 	},
 	methods: {
