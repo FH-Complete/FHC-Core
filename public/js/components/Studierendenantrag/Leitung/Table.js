@@ -274,7 +274,7 @@ export default {
 							container.append(button);
 						}
 						// NOTE(chris): Cancel
-						if (data.typ == 'AbmeldungStgl' && data.status == 'Erstellt') {
+						if (data.typ == 'AbmeldungStgl' && (data.status == 'Erstellt' || data.status == 'Genehmigt' )) {
 							let button = document.createElement('button');
 							button.innerHTML = this.p.t('studierendenantrag', 'btn_cancel');
 							button.className = "btn btn-outline-secondary";

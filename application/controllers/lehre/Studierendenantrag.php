@@ -67,6 +67,9 @@ class Studierendenantrag extends FHC_Controller
 			}
 			if ($antrag->studierendenantrag_id == null)
 				continue;
+			if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL && (!$antrag->isapproved))
+				continue;
+
 			$prestudentenArr[$antrag->prestudent_id]['antraege'][] = $antrag;
 		}
 

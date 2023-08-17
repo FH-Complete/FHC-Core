@@ -188,6 +188,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect($this->dbTable . '.datum_wiedereinstieg');
 		$this->addSelect($this->dbTable . '.grund');
 		$this->addSelect($this->dbTable . '.dms_id');
+		$this->addSelect("(SELECT count(1) FROM campus.tbl_studierendenantrag_status WHERE studierendenantrag_id = " . $this->dbTable . ".studierendenantrag_id AND studierendenantrag_statustyp_kurzbz = 'Genehmigt') AS isapproved", false);
 
 		$this->addJoin('public.tbl_prestudent p', 'prestudent_id', 'RIGHT');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
