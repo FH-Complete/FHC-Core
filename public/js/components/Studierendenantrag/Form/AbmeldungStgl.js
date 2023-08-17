@@ -1,6 +1,8 @@
 import {CoreFetchCmpt} from '../../Fetch.js';
 import Phrasen from '../../../mixins/Phrasen.js';
 
+var _uuid = 0;
+
 export default {
 	components: {
 		CoreFetchCmpt
@@ -166,13 +168,8 @@ export default {
 
 				<div v-if="data.grund" class="mb-3">
 					<h5>{{p.t('studierendenantrag', 'antrag_grund')}}:</h5>
-									
-					<div class="mb-3">
-					<h5>if data grund:</h5>
-					<pre>{{data.grund}}</pre>
-				</div>
 				
-					<pre>{{data.grund}}</pre>
+					<pre class="text-prewrap">{{data.grund}}</pre>
 				</div>      
 				<div v-else class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>
@@ -210,7 +207,7 @@ export default {
 				
 				<div class="col-12 text-end">
 					<button
-						v-else-if="!data.studierendenantrag_id"
+						v-if="!data.studierendenantrag_id"
 						type="button"
 						class="btn btn-primary"
 						data-bs-toggle="modal"
@@ -237,7 +234,7 @@ export default {
 									</h5>
 									<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="p.t('ui', 'schliessen')"></button>
 								</div>
-								<div class="modal-body" v-html="p.t('studierendenantrag', 'warning_Abmeldung')">
+								<div class="modal-body" v-html="p.t('studierendenantrag', 'warning_AbmeldungStgl')">
 								</div>
 								<div class="modal-footer">
 									<button
