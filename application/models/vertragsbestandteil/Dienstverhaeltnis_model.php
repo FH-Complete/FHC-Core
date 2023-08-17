@@ -62,6 +62,17 @@ class Dienstverhaeltnis_model extends DB_Model
 		
     }
 
+    public function getDVByID($dvid) {
+        $this->addSelect('hr.tbl_dienstverhaeltnis.*, public.tbl_organisationseinheit.bezeichnung as unternehmen');
+		$this->addJoin('public.tbl_organisationseinheit', 'hr.tbl_dienstverhaeltnis.oe_kurzbz = public.tbl_organisationseinheit.oe_kurzbz');
+		$result = $this->load($dvid); 
+
+		if (hasData($result)) {
+            return $result;
+        }
+        return error('could not fetch DV by ID');
+    }
+
 
     public function getCurrentDVByPersonUID($uid, $dateAsUnixTS)
     {
