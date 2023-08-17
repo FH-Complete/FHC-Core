@@ -192,7 +192,7 @@ export default {
 					>
 						{{p.t('studierendenantrag/antrag_Wiederholung_button_yes')}}
 					</button>
-					<button
+<!--					<button
 						v-if="!data.studierendenantrag_id || data.status == 'Offen'"
 						type="button"
 						class="btn btn-danger"
@@ -200,7 +200,7 @@ export default {
 						:disabled="saving"
 					>
 						{{p.t('studierendenantrag/antrag_Wiederholung_button_no')}}
-					</button>
+					</button>-->
 				</div>
 			</div>
 			<template v-slot:error="{errorMessage}">
