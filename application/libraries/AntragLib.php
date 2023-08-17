@@ -1358,7 +1358,11 @@ class AntragLib
 		$currSemester = current(getData($result));
 		$followingSemester = [$currSemester];
 
-		for ($i = 0; $i < 3; $i++) {
+		$max = $this->_ci->config->item('unterbrecher_semester_max_length');
+		if(!$max || $max < 1)
+			$max = 2;
+
+		for ($i = 1; $i < $max; $i++) {
 			$result = $this->_ci->StudiensemesterModel->getNextFrom($currSemester->studiensemester_kurzbz);
 			if (!hasData($result))
 				break;
@@ -1370,6 +1374,9 @@ class AntragLib
 			'studiensemester_kurzbz' => $nextSem->studiensemester_kurzbz,
 			'wiedereinstieg' => $followingSemester
 		];
+
+		//remove last Semester of the array
+		array_pop($followingSemester);
 
 		foreach ($followingSemester as $sem)
 			$semester[0]['wiedereinstieg'][] = $sem;
