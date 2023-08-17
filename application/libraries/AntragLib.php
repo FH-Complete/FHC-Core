@@ -1255,13 +1255,14 @@ class AntragLib
 		$where = [
 			'prestudent_id' => $prestudent_id
 		];
+		$types = null;
 		if ($typ) {
 			if (is_array($typ))
-				$this->_ci->StudierendenantragModel->db->where_in('typ', $typ);
+				$types = $typ;
 			else
 				$where['typ'] = $typ;
 		}
-		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere($where);
+		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere($where, $types);
 		if (isError($result))
 			return $result;
 
