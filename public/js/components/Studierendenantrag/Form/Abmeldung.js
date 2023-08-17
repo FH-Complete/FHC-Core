@@ -201,6 +201,10 @@ export default {
 						<tr>
 							<th>{{p.t('lehre', 'studienjahr')}}</th>
 							<td align="right">{{data.studienjahr_kurzbz}}</td>
+						</tr>						
+						<tr>
+							<th>{{p.t('lehre', 'studiensemester')}}</th>
+							<td align="right">{{data.studiensemester_kurzbz}}</td>
 						</tr>
 						<tr>
 							<th>{{p.t('lehre', 'semester')}}</th>
