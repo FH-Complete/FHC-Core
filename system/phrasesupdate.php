@@ -19934,7 +19934,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Studiengang gefunden für Bakanntgabe #{id}',
+				'text' => 'Kein Studiengang gefunden für Bekanntgabe #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -20281,6 +20281,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'No status found for prestudent #{prestudent_id} in semester {studiensemester_kurzbz}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stg_for_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studiengang für Prestudent #{prestudent_id} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No course found for prestudent #{prestudent_id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)

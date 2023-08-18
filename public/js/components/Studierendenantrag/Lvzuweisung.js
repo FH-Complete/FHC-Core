@@ -225,7 +225,7 @@ export default {
 		);
 	},
 	template: `
-	<div class="col-sm-8">
+	<div class="col-sm-10">
 		<div ref="alertbox"></div>
 
 		<span class="d-flex justify-content-between h4">
@@ -244,7 +244,7 @@ export default {
 
 		<button type="button" @click="save" :disabled="isloading || disabled"  class="btn btn-primary my-3">{{p.t('studierendenantrag', 'btn_save_lvs')}}</button>
 	</div>
-	<div class="col-sm-4">
+	<div class="col-sm-2">
 		<studierendenantrag-status :msg="statusMsg" :severity="statusSeverity"></studierendenantrag-status>
 	</div>
 	`

@@ -32,6 +32,7 @@ class PrestudentLib
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
 
 	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null)
@@ -205,6 +206,7 @@ class PrestudentLib
 
 	public function setUnterbrecher($prestudent_id, $studiensemester_kurzbz, $studierendenantrag_id, $insertvon = null)
 	{
+		$ausbildungssemester_plus = 0;
 		if (!$insertvon)
 			$insertvon = getAuthUID();
 
@@ -213,14 +215,38 @@ class PrestudentLib
 			return $result;
 		$result = getData($result);
 		if (!$result) {
-			return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
-				'prestudent_id' => $prestudent_id,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz
-			]));
+			//NOTE(manu): only valid if nextSemester focus max
+
+			$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
+			if (isError($result))
+				return $result;
+			$result = getData($result);
+
+			//check if ausbildungssemester is last
+			$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+			$res = $this->_ci->StudiengangModel->loadWhere(['p.prestudent_id' => $prestudent_id]);
+			if(isError($res))
+				return $res;
+			if(!hasData($res))
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_stg_for_prestudent', [
+					'prestudent_id' => $prestudent_id
+				]));
+
+			$studiengang = current(getData($res));
+			$prestudent_status = current($result);
+			if($prestudent_status->ausbildungssemester + 1 < $studiengang->max_semester)
+				$ausbildungssemester_plus = 1;
+
+			if(!$result)
+			{
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_prestudent_in_sem', [
+					'prestudent_id' => $prestudent_id,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz
+				]));
+			}
 		}
 
 		$prestudent_status = current($result);
-
 		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
 		if (isError($result))
@@ -245,7 +271,7 @@ class PrestudentLib
 			'prestudent_id' => $prestudent_id,
 			'status_kurzbz' => Prestudentstatus_model::STATUS_UNTERBRECHER,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'ausbildungssemester' => $prestudent_status->ausbildungssemester,
+			'ausbildungssemester' => $prestudent_status->ausbildungssemester + $ausbildungssemester_plus,
 			'datum' => date('c'),
 			'insertvon' => $insertvon,
 			'insertamum' => date('c'),
@@ -256,7 +282,6 @@ class PrestudentLib
 			'anmerkung'=> 'Wiedereinstieg ' . $antrag->datum_wiedereinstieg
 		]);
 
-		//error try manu
 		if (isError($result))
 			return $result;
 
