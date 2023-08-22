@@ -599,6 +599,7 @@ class Studiengang_model extends DB_Model
 				$this->db->group_start();
 					$this->db->where('pers.vorname ILIKE', "%" . $q . "%");
 					$this->db->or_where('pers.nachname ILIKE', "%" . $q . "%");
+					$this->db->or_where('stud.student_uid ILIKE', "%" . $q . "%");
 					$this->db->or_where($this->dbTable . '.bezeichnung ILIKE', "%" . $q . "%");
 					if (is_numeric($q))
 						$this->db->or_where('p.prestudent_id', $q);
