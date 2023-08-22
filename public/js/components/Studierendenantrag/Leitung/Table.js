@@ -147,6 +147,19 @@ export default {
 					valuesLookup: true,
 					clearable: true,
 					autocomplete: true,
+				},
+				formatter: (cell, formatterParams, onRendered) => {
+					let link = document.createElement('a');
+					link.href = "#";
+					link.innerHTML = cell.getValue();
+					link.addEventListener('click', e => {
+						e.preventDefault();
+						this.lastHistoryClickedId = cell.getData().studierendenantrag_id;
+						this.$refs.historyLoader.fetchData();
+						this.$refs.history.show();
+					});
+
+					return link;
 				}
 			}, {
 				field: 'matrikelnr',
@@ -337,13 +350,6 @@ export default {
 		});
 		this.table.on("rowSelectionChanged", data => {
 			this.$emit('update:selectedData', data);
-		});
-		this.table.on("cellClick", (e, cell) => {
-			if (cell.getColumn().getField() == 'statustyp') {
-				this.lastHistoryClickedId = cell.getData().studierendenantrag_id;
-				this.$refs.historyLoader.fetchData();
-				this.$refs.history.show();
-			}
 		});
 	},
 	template: `

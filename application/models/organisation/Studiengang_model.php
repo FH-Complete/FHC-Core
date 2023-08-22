@@ -573,6 +573,7 @@ class Studiengang_model extends DB_Model
 		);
 		$this->addJoin('bis.tbl_orgform o', $this->dbTable . '.orgform_kurzbz=o.orgform_kurzbz');
 		$this->addJoin('public.tbl_person pers', 'person_id');
+		$this->addJoin('public.tbl_student stud', 'p.prestudent_id=stud.prestudent_id', 'LEFT');
 
 		$this->db->where_in($this->dbTable . '.studiengang_kz', $studiengang_kzs);
 		$this->db->where_in('ps.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist'));
