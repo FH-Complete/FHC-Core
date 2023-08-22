@@ -376,17 +376,34 @@ class PrestudentLib
 		]);
 
 		//Studentlehrverband setzen
-		$this->_ci->StudentlehrverbandModel->update([
+		$result = $this->_ci->StudentlehrverbandModel->loadWhere([
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'student_uid' => $student->student_uid
-		], [
-			'studiengang_kz' => $student->studiengang_kz,
-			'semester' => 0,
-			'verband' => 'B',
-			'gruppe' => '',
-			'updateamum' => date('c'),
-			'updatevon' => $insertvon
 		]);
+		if (hasData($result)) {
+			$this->_ci->StudentlehrverbandModel->update([
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $student->student_uid
+			], [
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'B',
+				'gruppe' => '',
+				'updateamum' => date('c'),
+				'updatevon' => $insertvon
+			]);
+		} else {
+			$this->_ci->StudentlehrverbandModel->insert([
+				'student_uid' => $student->student_uid,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'studiengang_kz' => $student->studiengang_kz,
+				'semester' => 0,
+				'verband' => 'B',
+				'gruppe' => '',
+				'insertamum' => date('c'),
+				'insertvon' => $insertvon
+			]);
+		}
 
 		return success();
 	}
