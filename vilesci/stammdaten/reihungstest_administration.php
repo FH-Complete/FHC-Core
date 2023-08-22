@@ -783,7 +783,9 @@ $qry="SELECT
 		studiengang_kz,
 		reihung,
 		gebiet_id,
-		tbl_gebiet.bezeichnung,
+		gb.bezeichnung,
+		gb.bezeichnung_mehrsprachig[1] as bezeichnung_de,
+		gb.bezeichnung_mehrsprachig[2] as bezeichnung_en,
 		zeit,
 		multipleresponse,
 		maxfragen,
@@ -794,17 +796,19 @@ $qry="SELECT
 		level_sprung_ab,
 		levelgleichverteilung,
 		maxpunkte,
+		offsetpunkte,
 		antwortenprozeile,
 		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if ($semester!='')
 			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);
 		$qry.="	) AS gesamtzeit,
+		(SELECT count(*) FROM testtool.tbl_frage WHERE gebiet_id=gb.gebiet_id AND demo=false) AS anz_fragen,
 		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if ($semester!='')
 			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);
 		$qry.="	)-'00:40:00'::time without time zone AS gesamtzeit_persoenlichkeit
 		FROM testtool.tbl_ablauf
-		JOIN testtool.tbl_gebiet USING (gebiet_id)
+		JOIN testtool.tbl_gebiet gb USING (gebiet_id)
 		JOIN public.tbl_studiengang USING (studiengang_kz)
 		WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if ($semester!='')
@@ -827,9 +831,11 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 				<th>KZ</th>
 				<th>NR</th>
 				<th>Gebiet_id</th>
-				<th>Bezeichnung</th>
+				<th>Bezeichnung DE</th>
+				<th>Bezeichnung EN</th>
 				<th>Zeit</th>
 				<th><div title='Multiple Response' style='cursor:help'>MR</div></th>
+				<th>Summe Fragen</th>
 				<th>Maxfragen</th>
 				<th><div title='Zufallsfrage' style='cursor:help'>ZFF</div></th>
 				<th><div title='Zufallsvorschlag' style='cursor:help'>ZFV</div></th>
@@ -838,6 +844,7 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 				<th>Level ab</th>
 				<th><div title='Levelgleichverteilung' style='cursor:help'>LGV</div></th>
 				<th>Maxpunkte</th>
+				<th>Offset</th>
 				<th><div title='Antwortenprozeile' style='cursor:help'>AWPZ</div></th>\n";
 		echo "</tr></thead>";
 		echo "<tbody>";
@@ -850,7 +857,8 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 			<td>$row->studiengang_kz</td>
 			<td>$row->reihung</td>
 			<td>$row->gebiet_id</td>
-			<td>$row->bezeichnung</td>";
+			<td>$row->bezeichnung_de</td>
+			<td>$row->bezeichnung_en</td>";
 			if ($row->gebiet_id==7)
 			{
 					echo "<td>00:20:00*</td>";
@@ -861,15 +869,17 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 			{
 					echo "<td>$row->zeit</td>";
 			}
-			echo "<td align='center'><img src='../../skin/images/".($row->multipleresponse=='t'?'true.png':'false.png')."' height='20'></td>
+			echo "<td align='center'>".($row->multipleresponse=='t'?'Ja':'Nein')."</td>
+			<td align='center'>$row->anz_fragen</td>
 			<td align='center'>$row->maxfragen</td>
-			<td align='center'><img src='../../skin/images/".($row->zufallfrage=='t'?'true.png':'false.png')."' height='20'></td>
-			<td align='center'><img src='../../skin/images/".($row->zufallvorschlag=='t'?'true.png':'false.png')."' height='20'></td>
+			<td align='center'>".($row->zufallfrage=='t'?'Ja':'Nein')."</td>
+			<td align='center'>".($row->zufallvorschlag=='t'?'Ja':'Nein')."</td>
 			<td align='center'>$row->level_start</td>
 			<td align='center'>$row->level_sprung_auf</td>
 			<td align='center'>$row->level_sprung_ab</td>
-			<td align='center'><img src='../../skin/images/".($row->levelgleichverteilung=='t'?'true.png':'false.png')."' height='20'></td>
+			<td align='center'>".($row->levelgleichverteilung=='t'?'Ja':'Nein')."</td>
 			<td align='center'>$row->maxpunkte</td>
+			<td align='center'>".number_format((intval(($row->offsetpunkte*100))/100),2,',','.')."</td>
 			<td align='center'>$row->antwortenprozeile</td>";
 			echo "</tr>\n";
 		}
@@ -881,8 +891,11 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 		echo "<td></td>";
 		echo "<td></td>";
 		echo "<td></td>";
+		echo "<td></td>";
 		echo "<td align='right'>Gesamt&nbsp;</td>";
 		echo "<td>".$gesamtzeit."</td>";
+		echo "<td></td>";
+		echo "<td></td>";
 		echo "<td></td>";
 		echo "<td></td>";
 		echo "<td></td>";
