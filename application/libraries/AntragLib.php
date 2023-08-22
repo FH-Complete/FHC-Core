@@ -1511,6 +1511,32 @@ class AntragLib
 		if (hasData($result)) {
 			$kontakt = current(getData($result));
 			$email = $kontakt->kontakt;
+
+			$sem_not_allowed = $sem_to_repeat = '';
+			$list_not_allowed = $list_to_repeat = $this->_ci->p->t('studierendenantrag', 'mail_part_error_no_lvs');
+
+			$result = $this->getLvsForAntrag($antrag_id);
+			if (hasData($result)) {
+				$lvs = getData($result);
+				foreach ($lvs as $semester => $lv_list) {
+					$lvs_filtered = array_filter($lv_list, function ($el) {
+						return $el->antrag_zugelassen;
+					});
+					if (substr($semester, 0, 1) == '1') {
+						$sem_not_allowed = substr($semester, 1);
+						$list_not_allowed = array_map(function ($el) {
+							return $el->bezeichnung . '(' . $el->lehrform_kurzbz . ')';
+						}, $lvs_filtered);
+						$list_not_allowed = '<ul><li>' . implode('</li><li>', $list_not_allowed) . '</li></ul>';
+					} else {
+						$sem_to_repeat = substr($semester, 1);
+						$list_to_repeat = array_map(function ($el) {
+							return $el->bezeichnung . '(' . $el->lehrform_kurzbz . ')';
+						}, $lvs_filtered);
+						$list_to_repeat = '<ul><li>' . implode('</li><li>', $list_to_repeat) . '</li></ul>';
+					}
+				}
+			}
 			
 			// NOTE(chris): Sancho mail
 			sendSanchoMail(
@@ -1520,7 +1546,11 @@ class AntragLib
 					'stg' => $stg->bezeichnung,
 					'sem' => $semester,
 					'mitarbeiter' => $mitarbeiter,
-					'name' => $student
+					'student' => $student,
+					'sem_not_allowed' => $sem_not_allowed,
+					'list_not_allowed' => $list_not_allowed,
+					'sem_to_repeat' => $sem_to_repeat,
+					'list_to_repeat' => $list_to_repeat
 				],
 				$email,
 				$this->_ci->p->t('studierendenantrag', 'mail_subject_W_Student')
