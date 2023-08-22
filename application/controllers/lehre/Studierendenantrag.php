@@ -53,17 +53,18 @@ class Studierendenantrag extends FHC_Controller
 					'bezeichnungStg' => $antrag->bezeichnung,
 					'bezeichnungOrgform' => $antrag->orgform
 				);
-				$result = $this->antraglib->getPrestudentAbmeldeBerechtigt($antrag->prestudent_id);
+				
+				$result = $this->antraglib->getPrestudentWiederholungsBerechtigt($antrag->prestudent_id);
 				if (getData($result) == 1)
-					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Abmeldung';
+					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Wiederholung';
 
 				$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($antrag->prestudent_id);
 				if (getData($result) == 1)
 					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
 
-				$result = $this->antraglib->getPrestudentWiederholungsBerechtigt($antrag->prestudent_id);
+				$result = $this->antraglib->getPrestudentAbmeldeBerechtigt($antrag->prestudent_id);
 				if (getData($result) == 1)
-					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Wiederholung';
+					$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Abmeldung';
 			}
 			if ($antrag->studierendenantrag_id == null)
 				continue;
