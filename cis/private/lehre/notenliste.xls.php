@@ -35,6 +35,7 @@ require_once('../../../include/note.class.php');
 require_once('../../../include/notenschluessel.class.php');
 require_once('../../../include/Excel/excel.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/pruefung.class.php');
 
 $uid = get_uid();
 
@@ -120,6 +121,13 @@ else
 	$format_highlightright->setBorderColor('white');
 	$format_highlightright->setAlign('right');
 
+	$format_highlightright_date=& $workbook->addFormat();
+	$format_highlightright_date->setFgColor(15);
+	$format_highlightright_date->setBorder(1);
+	$format_highlightright_date->setBorderColor('white');
+	$format_highlightright_date->setAlign('right');
+	$format_highlightright_date->setNumFormat(49);
+
 	$format_border_bottom =& $workbook->addFormat();
 	$format_border_bottom ->setBottom(2);
 	$format_border_bottom->setBold();
@@ -191,6 +199,19 @@ else
 	}
 
 	//Studenten holen
+
+	//Spaltengruppe für Nachprüfung
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+	{
+		$worksheet->write($lines,8,$p->t('benotungstool/nachpruefung'),$format_bold);
+	}
+
+	//Spaltengruppe für 2.Nebensprüfungstermin
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+	{
+		$worksheet->write($lines,12,$p->t('benotungstool/nachpruefung2'),$format_bold);
+	}
+
 	$lines++;
 	$worksheet->write($lines,1,$p->t('global/uid'),$format_border_bottom);
 	$worksheet->write($lines,2,$p->t('global/nachname'),$format_border_bottom);
@@ -202,6 +223,26 @@ else
 		$worksheet->write($lines,6,$p->t('benotungstool/punkte'),$format_border_bottom);
 	else
 		$worksheet->write($lines,6,$p->t('benotungstool/note'),$format_border_bottom);
+
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+	{
+		$worksheet->write($lines,8,$p->t('global/personenkennzeichen'),$format_border_bottom);
+		$worksheet->write($lines,9,$p->t('global/datum'),$format_border_bottom);
+		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+		$worksheet->write($lines,10,$p->t('benotungstool/punkte'),$format_border_bottom);
+			else
+		$worksheet->write($lines,10,$p->t('benotungstool/note'),$format_border_bottom);
+	}
+
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+{
+	$worksheet->write($lines,12,$p->t('global/personenkennzeichen'),$format_border_bottom);
+	$worksheet->write($lines,13,$p->t('global/datum'),$format_border_bottom);
+	if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+		$worksheet->write($lines,14,$p->t('benotungstool/punkte'),$format_border_bottom);
+	else
+		$worksheet->write($lines,14,$p->t('benotungstool/note'),$format_border_bottom);
+}
 
 	$stsem_obj = new studiensemester();
 	$stsem_obj->load($stsem);
@@ -229,16 +270,17 @@ else
 			AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
 				AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 		LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+		LEFT JOIN bis.tbl_mobilitaet ON (bis.tbl_mobilitaet.prestudent_id = public.tbl_student.prestudent_id)
 		LEFT JOIN lehre.tbl_note USING(note)
 	WHERE
 		vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
-		AND	vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);";";
+		AND vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);";";
 
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 
 	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
+
 
 	if($result = $db->db_query($qry))
 	{
@@ -282,6 +324,49 @@ else
 					$worksheet->write($lines,4,'="'.$elem->semester.$elem->verband.$elem->gruppe.'"');
 					$worksheet->write($lines,5,'="'.trim($elem->matrikelnr).'"',$format_highlight);
 					$worksheet->write($lines,6, $note, $format_highlightright);
+
+					// Nachprüfung
+					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+					{
+						$worksheet->write($lines,8, '="'.trim($elem->matrikelnr).'"', $format_highlight);
+						$pr = new Pruefung();
+						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $sem);
+						$output2 = $pr->result;
+
+						if ($output2)
+						{
+							$resultPr = $output2[0];
+							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
+							$worksheet->write($lines,10, $resultPr->note, $format_highlightright);
+						}
+                                                else
+                                                {
+                                                        $worksheet->write($lines,9, '', $format_highlightright_date);
+                                                        $worksheet->write($lines,10, '', $format_highlightright);
+                                                }
+					}
+
+					// Nachprüfung
+					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+					{
+						$worksheet->write($lines,12, '="'.trim($elem->matrikelnr).'"', $format_highlight);
+						$pr = new Pruefung();
+						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $sem);
+						$output3 = $pr->result;
+
+						if ($output3)
+						{
+							$resultPr = $output3[0];
+							$worksheet->write($lines,13, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
+							$worksheet->write($lines,14, $resultPr->note, $format_highlightright);
+						}
+                                                else
+                                                {
+                                                        $worksheet->write($lines,13, '', $format_highlightright_date);
+                                                        $worksheet->write($lines,14, '', $format_highlightright);
+                                                }
+					}
+
 					$i++;
 					$lines++;
 	   			}
@@ -335,5 +420,17 @@ else
 	$worksheet->setColumn(0, 3, 25);
 	$worksheet->setColumn(0, 4, 7);
 	$worksheet->setColumn(0, 5, 21);
+	
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+	{
+		$worksheet->setColumn(8, 8, 15);
+		$worksheet->setColumn(9, 9, 10);
+	}
+	if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+	{
+		$worksheet->setColumn(12, 12, 15);
+		$worksheet->setColumn(13, 13, 10);
+	}
+	
 	$workbook->close();
 ?>

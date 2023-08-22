@@ -41,9 +41,15 @@ require_once('../../../../include/benutzerfunktion.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
 require_once('../../../../include/notenschluessel.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/note.class.php');
+
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 $user = get_uid();
 
@@ -52,6 +58,7 @@ if(!check_lektor($user))
 
 
 $lehreinheit_id='';
+$lehreinheit_id_pr='';
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
@@ -62,58 +69,26 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehr
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 
 if(isset($_GET['lehreinheit_id_pr']) && is_numeric($_GET['lehreinheit_id_pr'])) //Lehreinheit_id der pruefung
-	$lehreinheit_id = $_GET['lehreinheit_id_pr'];
-
-if(isset($_GET['datum']))
-{
-	$datum = $_GET['datum'];
-	$datum_obj = new datum();
-	$datum = $datum_obj->checkformatDatum($datum, 'Y-m-d', true) OR die('Invalid date format');
-}
-else
-	die('Fehlerhafte Parameteruebergabe');
-
-//Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung();
-if(!$lv_obj->load($lvid))
-	die($lv_obj->errormsg);
-
-//Studiengang laden
-$stg_obj = new studiengang($lv_obj->studiengang_kz);
+	$lehreinheit_id_pr = $_GET['lehreinheit_id_pr'];
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
-
-$uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
-$uid = (isset($_GET['uid'])?$_GET['uid']:'');
-
 //Studiensemester laden
 $stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
-$student_uid = $_REQUEST["student_uid"];
-
-$note = $_REQUEST["note"];
-if(isset($_REQUEST['punkte']))
-	$punkte = $_REQUEST['punkte'];
-else
-	$punkte = '';
-
-$punkte = str_replace(',','.',$punkte);
-
-if($punkte!='')
+//Notenanmerkung für Eintragung von nichtnumerischen Noten wie en (entschuldigt), ue(unentschuldigt)
+$noten_anmerkung = array();
+$noten_arr = array();
+$note_obj = new note();
+$note_obj->getAll();
+foreach($note_obj->result as $row)
 {
-	// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
-	$notenschluessel = new notenschluessel();
-	$note_pruef = $notenschluessel->getNote($punkte, $lvid, $stsem);
-	if($note_pruef!=$note)
-	{
-		$note = $note_pruef;
-		$note_dirty=true;
-	}
+	$noten_anmerkung[$row->anmerkung] = $row->note;
+	$noten_arr[$row->note] = $row;
 }
 
 if(!isset($_GET['typ']))
@@ -122,22 +97,177 @@ if(!isset($_GET['typ']))
 }
 else
 {
-	if(in_array($_GET['typ'],array('Termin2','Termin3')))
+	if(in_array($_GET['typ'], array('Termin2', 'Termin3')))
 		$typ=$_GET['typ'];
 	else
 		die('Typ ist ungueltig');
 }
 
-if($note=='')
-	$note = 9;
-
-$old_note = $note;
-
-// lvgesamtnote für studenten speichern
-if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
+if (isset($_REQUEST['sammel']) && $_REQUEST["sammel"] == 1)
 {
-	// Die Pruefung muss einer Lehreinheit zugeordnet werden
-	// deshalb wird hier versucht eine passende Lehreinheit zu ermitteln.
+	$errorMatrnr = '';
+	$errorDatum = '';
+	$errorNachp = '';
+
+	foreach ($_POST as $row => $val)
+	{
+		if(mb_strstr(mb_strtolower($row), 'student_uid_'))
+		{
+			$id=mb_substr($row, mb_strlen('student_uid_'));
+
+			$student_uid = $_POST['student_uid_'.$id];
+			$note = null;
+			$punkte = null;
+			$datum = null;
+			$response = '';
+			if(isset($_POST['note_'.$id]))
+				$note = $_POST['note_'.$id];
+			elseif(isset($_POST['punkte_'.$id]))
+				$punkte = $_POST['punkte_'.$id];
+			else
+			{
+				$response.="\nNote oder Punkte fehlen";
+				continue;
+			}
+			$punkte=str_replace(',', '.', $punkte);
+			if($punkte!='')
+			{
+				// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
+				$notenschluessel = new notenschluessel();
+				$note_pruef = $notenschluessel->getNote($punkte, $lvid, $stsem);
+				if($note_pruef!=$note)
+				{
+					$note = $note_pruef;
+					$note_dirty=true;
+				}
+			}
+
+			$datum = $_POST['datumNachp_'.$id];
+			//check Datumsformat
+			$checkedDatum = $datum;
+			$datum_obj = new datum();
+			if(!$datum = $datum_obj->checkformatDatum($datum, 'Y-m-d', true))
+			{
+				$errorDatum .="\n".$p->t('benotungstool/datumsformatUnzulaessig', array($checkedDatum));
+				continue;
+			}
+
+			//check ob Matrikelnummer anstelle der student_uid übergeben wurde
+			$student = new student();
+			if (!$student->checkIfValidStudentUID($student_uid))
+			{
+				$checkedMatrnr = $student_uid;
+				//UID ermitteln
+				if(!$student_uid = $student->getUidFromMatrikelnummer($student_uid))
+				{
+					$errorMatrnr.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht', array($checkedMatrnr));
+					continue;
+				}
+			}
+
+			//check ob eine Note vorhanden ist oder (intern) angerechnet wurde
+			$lvnote = new lvgesamtnote();
+			if (!$lvnote->load($lvid, $student_uid, $stsem))
+			{
+				$errorNachp.="\n".$p->t('benotungstool/NachpruefungNichtZulaessig', array($student_uid));
+				continue;
+			}
+
+			$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
+
+			if(isset($_POST['student_uid_'.$id]) && (isset($_POST['note_'.$id]) || isset($_POST['punkte_'.$id])) && isset($_POST['datumNachp_'.$id]))
+			{
+				if(!is_numeric($note))
+				{
+					if(isset($noten_anmerkung[$note]))
+						$note = $noten_anmerkung[$note];
+				}
+				$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note, $punkte);
+				if($response!='neu' && $response!='update' && $response!='update_f')
+				{
+					echo $response;
+				}
+			}
+			else
+			{
+				echo "\n fehlende oder fehlerhafte Inputparameter";
+			}
+		}
+	}
+	echo $errorMatrnr . $errorDatum . $errorNachp;
+}
+else
+{
+	// Einzelupdate
+
+	if(isset($_GET['datum']))
+	{
+		$datum = $_GET['datum'];
+		$datum_obj = new datum();
+		$datum = $datum_obj->checkformatDatum($datum, 'Y-m-d', true) or die($p->t('benotungstool/datumsformatUnzulaessig', array($checkedDatum)));
+	}
+	$student_uid = $_REQUEST["student_uid"];
+
+	$note = $_REQUEST["note"];
+	if(isset($_REQUEST['punkte']))
+		$punkte = $_REQUEST['punkte'];
+	else
+		$punkte = '';
+
+	$punkte = str_replace(',', '.', $punkte);
+
+	if($punkte!='')
+	{
+		// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
+		$notenschluessel = new notenschluessel();
+		$note_pruef = $notenschluessel->getNote($punkte, $lvid, $stsem);
+		if($note_pruef!=$note)
+		{
+			$note = $note_pruef;
+			$note_dirty=true;
+		}
+	}
+
+	if($note=='')
+		$note = 9;
+
+	$old_note = $note;
+
+	//Laden der Lehrveranstaltung
+	$lv_obj = new lehrveranstaltung();
+	if(!$lv_obj->load($lvid))
+		die($lv_obj->errormsg);
+
+	//Studiengang laden
+	$stg_obj = new studiengang($lv_obj->studiengang_kz);
+
+	$uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
+	$uid = (isset($_GET['uid'])?$_GET['uid']:'');
+
+	// lvgesamtnote für studenten speichern
+	if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != ''))
+	{
+		// Die Pruefung muss einer Lehreinheit zugeordnet werden
+		// deshalb wird hier versucht eine passende Lehreinheit zu ermitteln.
+		$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
+
+		$response = savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note);
+		echo $response;
+	}
+	else
+		echo "Fehler beim Eintragen der Pr&uuml;fungen";
+}
+
+/**
+ * Berechnet Lehreinheit auf Basis LV-Daten
+ * @param string $db Datenbankvariable
+ * @param string $student_uid student_uid
+ * @param int $lvid Lehrveranstaltungsid
+ * @param string $stsem Studiensemester im Format 'WSYYYY'
+ * @return String LehreinheitId
+ */
+function getLehreinheit($db, $lvid, $student_uid, $stsem)
+{
 	$le_arr = array();
 	$qry_stud = "SELECT lehreinheit_id, lehrform_kurzbz
 		FROM
@@ -158,104 +288,159 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 		}
 	}
 
-	if (!in_array($lehreinheit_id,$le_arr))
+	//if (!in_array($lehreinheit_id,$le_arr))
 		$lehreinheit_id = $le_arr[0];
 
+	return $lehreinheit_id;
+}
+
+/**
+ * Prüfung speichern
+ */
+function savePruefung($lvid, $student_uid, $stsem, $lehreinheit_id, $datum, $typ, $note, $punkte = null)
+{
 	$jetzt = date("Y-m-d H:i:s");
+	global $user; //, $note, $punkte, $datum;
 
-	$pr = new Pruefung();
-
-	// Wenn eine Pruefung angelegt wird, wird  zuerst eine Pruefung mit 1. Termin angelegt
-	// und dort die Zeugnisnote gespeichert
-	if($pr->getPruefungen($student_uid, "Termin1", $lvid, $stsem))
+	if ($typ == "Termin2")
 	{
-		if ($pr->result)
+		$pr = new Pruefung();
+		// Wenn eine Pruefung angelegt wird, wird  zuerst eine Pruefung mit 1. Termin angelegt
+	// und dort die Zeugnisnote gespeichert
+		if($pr->getPruefungen($student_uid, "Termin1", $lvid, $stsem))
 		{
-			$termin1 = 1;
-		}
-		else
-		{
-			$lvnote = new lvgesamtnote();
-			if ($lvnote->load($lvid, $student_uid, $stsem))
+			if ($pr->result)
 			{
-				$pr_note = $lvnote->note;
-				$pr_punkte = $lvnote->punkte;
-				$benotungsdatum = $lvnote->benotungsdatum;
+				$termin1 = 1;
 			}
 			else
 			{
-				$pr_note = 9;
-				$pr_punkte = '';
-				$benotungsdatum = $jetzt;
+				$lvnote = new lvgesamtnote();
+				if ($lvnote->load($lvid, $student_uid, $stsem))
+				{
+					$pr_note = $lvnote->note;
+					$pr_punkte = $lvnote->punkte;
+					$benotungsdatum = $lvnote->benotungsdatum;
+				}
+				else
+				{
+					$pr_note = 9;
+					$pr_punkte = '';
+					$benotungsdatum = $jetzt;
+				}
+
+				$pr_1 = new Pruefung();
+				$pr_1->lehreinheit_id = $lehreinheit_id;
+				$pr_1->student_uid = $student_uid;
+				$pr_1->mitarbeiter_uid = $user;
+				$pr_1->note = $pr_note;
+				$pr_1->punkte = $pr_punkte;
+				$pr_1->pruefungstyp_kurzbz = "Termin1";
+				$pr_1->datum = $benotungsdatum;
+				$pr_1->anmerkung = "";
+				$pr_1->insertamum = $jetzt;
+				$pr_1->insertvon = $user;
+				$pr_1->updateamum = null;
+				$pr_1->updatevon = null;
+				$pr_1->ext_id = null;
+				$pr_1->new = true;
+				$pr_1->save();
+				$response = "neu T1";
 			}
 
-			$pr_1 = new Pruefung();
-			$pr_1->lehreinheit_id = $lehreinheit_id;
-			$pr_1->student_uid = $student_uid;
-			$pr_1->mitarbeiter_uid = $user;
-			$pr_1->note = $pr_note;
-			$pr_1->punkte = $pr_punkte;
-			$pr_1->pruefungstyp_kurzbz = "Termin1";
-			$pr_1->datum = $benotungsdatum;
-			$pr_1->anmerkung = "";
-			$pr_1->insertamum = $jetzt;
-			$pr_1->insertvon = $user;
-			$pr_1->updateamum = null;
-			$pr_1->updatevon = null;
-			$pr_1->ext_id = null;
-			$pr_1->new = true;
-			$pr_1->save();
+			$prTermin2 = new Pruefung();
+			$pr_2 = new Pruefung();
+
+			// Die Pruefung wird als Termin2 eingetragen
+			if ($prTermin2->getPruefungen($student_uid, 'Termin2', $lvid, $stsem))
+			{
+				if	($prTermin2->result)
+				{
+					$pr_2->load($prTermin2->result[0]->pruefung_id);
+					$pr_2->new = null;
+					$pr_2->updateamum = $jetzt;
+					$pr_2->updatevon = $user;
+					$old_note = $pr_2->note;
+					$pr_2->note = $note;
+					$pr_2->punkte = $punkte;
+					$pr_2->datum = $datum;
+					$pr_2->anmerkung = "";
+					$response = "update T2";
+				}
+				else
+				{
+					$pr_2->lehreinheit_id = $lehreinheit_id;
+					$pr_2->student_uid = $student_uid;
+					$pr_2->mitarbeiter_uid = $user;
+					$pr_2->note = $note;
+					$pr_2->punkte = $punkte;
+					$pr_2->pruefungstyp_kurzbz = $typ;
+					$pr_2->datum = $datum;
+					$pr_2->anmerkung = "";
+					$pr_2->insertamum = $jetzt;
+					$pr_2->insertvon = $user;
+					$pr_2->updateamum = null;
+					$pr_2->updatevon = null;
+					$pr_2->ext_id = null;
+					$pr_2->new = true;
+					$old_note = -1;
+					$response = "new T2";
+				}
+				$pr_2->save();
+			}
 		}
 	}
-
-
-	$prTermin2 = new Pruefung();
-	$pr_2 = new Pruefung();
-
-	// Die Pruefung wird als Termin2 eingetragen
-	if ($prTermin2->getPruefungen($student_uid, $typ, $lvid, $stsem))
+	elseif ($typ == "Termin3")
 	{
-		if	($prTermin2->result)
+		$prTermin3 = new Pruefung();
+		$pr_3 = new Pruefung();
+
+		if ($prTermin3->getPruefungen($student_uid, 'Termin3', $lvid, $stsem))
 		{
-			$pr_2->load($prTermin2->result[0]->pruefung_id);
-			$pr_2->new = null;
-			$pr_2->updateamum = $jetzt;
-			$pr_2->updatevon = $user;
-			$old_note = $pr_2->note;
-			$pr_2->note = $note;
-			$pr_2->punkte = $punkte;
-			$pr_2->datum = $datum;
-			$pr_2->anmerkung = "";
+			if	($prTermin3->result)
+			{
+				$pr_3->load($prTermin3->result[0]->pruefung_id);
+				$pr_3->new = null;
+				$pr_3->updateamum = $jetzt;
+				$pr_3->updatevon = $user;
+				$old_note = $pr_3->note;
+				$pr_3->note = $note;
+				$pr_3->punkte = $punkte;
+				$pr_3->datum = $datum;
+				$pr_3->anmerkung = "";
+				$response = "update T3";
+			}
+			else
+			{
+				$pr_3->lehreinheit_id = $lehreinheit_id;
+				$pr_3->student_uid = $student_uid;
+				$pr_3->mitarbeiter_uid = $user;
+				$pr_3->note = $note;
+				$pr_3->punkte = $punkte;
+				$pr_3->pruefungstyp_kurzbz = $typ;
+				$pr_3->datum = $datum;
+				$pr_3->anmerkung = "";
+				$pr_3->insertamum = $jetzt;
+				$pr_3->insertvon = $user;
+				$pr_3->updateamum = null;
+				$pr_3->updatevon = null;
+				$pr_3->ext_id = null;
+				$pr_3->new = true;
+				$old_note = -1;
+				$response = "new T3";
+			}
+			$pr_3->save();
 		}
-		else
-		{
-			$pr_2->lehreinheit_id = $lehreinheit_id;
-			$pr_2->student_uid = $student_uid;
-			$pr_2->mitarbeiter_uid = $user;
-			$pr_2->note = $note;
-			$pr_2->punkte = $punkte;
-			$pr_2->pruefungstyp_kurzbz = $typ;
-			$pr_2->datum = $datum;
-			$pr_2->anmerkung = "";
-			$pr_2->insertamum = $jetzt;
-			$pr_2->insertvon = $user;
-			$pr_2->updateamum = null;
-			$pr_2->updatevon = null;
-			$pr_2->ext_id = null;
-			$pr_2->new = true;
-			$old_note = -1;
-		}
-		$pr_2->save();
+	}
+	else
+	{
+		$response = "fehlende oder fehlerhafte Inputparameter";
 	}
 
-
-	// Wenn eine Pruefung eingetragen wird, wird danach die LV-Note korrigiert
-	$jetzt = date("Y-m-d H:i:s");
-
-	$lvid = $_REQUEST["lvid"];
+	//Gesamtnote updaten
 	$lvgesamtnote = new lvgesamtnote();
-    if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
-    {
+	if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
+	{
 		$lvgesamtnote->student_uid = $student_uid;
 		$lvgesamtnote->lehrveranstaltung_id = $lvid;
 		$lvgesamtnote->studiensemester_kurzbz = $stsem;
@@ -272,9 +457,9 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 		$lvgesamtnote->insertvon = $user;
 		$new = true;
 		$response = "neu";
-    }
-    else
-    {
+	}
+	else
+	{
 		$lvgesamtnote->note = $note;
 		$lvgesamtnote->punkte = $punkte;
 		$lvgesamtnote->benotungsdatum = $jetzt;
@@ -286,12 +471,11 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 		else
 			$response = "update";
 	}
+
 	if (!$lvgesamtnote->save($new))
-		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
+		return $lvgesamtnote->errormsg;
 	else
-		echo $response;
+		return $response;
 }
-else
-	echo "Fehler beim Eintragen der Pr&uuml;fungen";
 
 ?>

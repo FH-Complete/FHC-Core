@@ -21,7 +21,7 @@ class DatumSponsionFehlt extends PlausiChecker
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->_ci->plausichecklib->getDatumSponsionFehlt(
+		$prestudentRes = $this->getDatumSponsionFehlt(
 			$studiensemester_kurzbz,
 			$studiengang_kz,
 			null,
@@ -51,5 +51,73 @@ class DatumSponsionFehlt extends PlausiChecker
 
 		// return the results
 		return success($results);
+	}
+
+	/**
+	 * Date of sponsion shouldn't be missing for Absolvent.
+	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
+	 * @param studiengang_kz int if check is to be executed for certain Studiengang
+	 * @param abschlusspruefung_id int if check is to be executed only for a certain Abschlussprüfung
+	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
+	 * @return success with prestudents or error
+	 */
+	public function getDatumSponsionFehlt(
+		$studiensemester_kurzbz = null,
+		$studiengang_kz = null,
+		$abschlusspruefung_id = null,
+		$exkludierte_studiengang_kz = null
+	) {
+		$params = array();
+
+		$qry = "
+			SELECT
+				pre.person_id, pre.prestudent_id,
+				pruefung.sponsion, pruefung.datum, pruefung.abschlusspruefung_id,
+				stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+			FROM
+				public.tbl_prestudent pre
+				JOIN public.tbl_student stud USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus prestatus USING(prestudent_id)
+				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
+				JOIN lehre.tbl_abschlusspruefung pruefung ON stud.student_uid = pruefung.student_uid
+			WHERE
+				status_kurzbz = 'Absolvent'
+				AND NOT EXISTS ( /* exclude gs */
+					SELECT 1
+					FROM bis.tbl_mobilitaet
+					WHERE prestudent_id = pre.prestudent_id
+					AND studiensemester_kurzbz = prestatus.studiensemester_kurzbz
+				)
+				AND abschlussbeurteilung_kurzbz!='nicht'
+				AND abschlussbeurteilung_kurzbz IS NOT NULL
+				AND pruefung.sponsion IS NULL
+				AND pre.bismelden
+				AND stg.melderelevant";
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$qry .= " AND prestatus.studiensemester_kurzbz = ?";
+			$params[] = $studiensemester_kurzbz;
+		}
+
+		if (isset($studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz = ?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($abschlusspruefung_id))
+		{
+			$qry .= " AND pruefung.abschlusspruefung_id = ?";
+			$params[] = $abschlusspruefung_id;
+		}
+
+		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz NOT IN ?";
+			$params[] = $exkludierte_studiengang_kz;
+		}
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 }
