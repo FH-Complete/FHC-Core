@@ -216,7 +216,7 @@ class AnrechnungJob extends JOB_Controller
 					'datentabelle'  => $anrechnungen_table,
 					'link'          => anchor($url, 'Anrechnungsanträge Übersicht')
 				);
-	
+
 				// Send mail
 				sendSanchoMail(
 					'AnrechnungAntragStellen',
@@ -242,7 +242,7 @@ class AnrechnungJob extends JOB_Controller
 
         $result = $this->AnrechnungModel->loadWhere('
             studiensemester_kurzbz = (SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende)
-            AND genehmigt_von IS NULL                             
+            AND genehmigt_von IS NULL
             AND empfehlung_anrechnung IS NULL
             AND status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR) .' -- in Bearbeitung durch Lektor
             AND NOW()::date = (astat.datum + interval \'1 day\')                    -- nur gestrige Empfehlungsanfrage
@@ -387,7 +387,7 @@ class AnrechnungJob extends JOB_Controller
 
 		$db = new DB_Model();
 		$result = $db->execReadOnlyQuery($qry);
-		
+
 		// Exit if there are no rejected Anrechnungen
 		if (!hasData($result))
 		{
@@ -440,9 +440,9 @@ html;
 
         $result = $this->AnrechnungModel->loadWhere('
             studiensemester_kurzbz = (
-                SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende)
+                SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende
             )
-            AND genehmigt_von IS NULL                             
+            AND genehmigt_von IS NULL
             AND empfehlung_anrechnung IS NULL
             AND status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR) .' -- in Bearbeitung durch Lektor
             AND NOW()::date = (astat.datum + interval \'1 week\')                   -- eine Woche nach Empfehlungsanfrage
@@ -455,7 +455,7 @@ html;
             $this->logInfo('End AnrechnungJob sendMailRemindRecommendation, because no recommendations to be done.');
             exit;
         }
-        
+
         $anrechnung_id_arr = array_column(getData($result), 'anrechnung_id');
 
         $arr_lvLector_arr = array();
@@ -514,7 +514,7 @@ html;
 					'vorname' => $stgl->vorname
 				);
 			}
-			
+
 			return $stglMailAdress_arr;
 		}
 		// If not available, get assistance mail address
