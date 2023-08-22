@@ -36,7 +36,7 @@ else
 
 
 $query = "
-	SELECT tbl_studiengang.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, vorname, nachname, studiengang_kz, public.get_absem_prestudent(prestudent_id, NULL) AS semester, tbl_studierendenantrag.grund
+	SELECT tbl_studiengang.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, studiensemester_kurzbz, vorname, nachname, studiengang_kz, public.get_absem_prestudent(prestudent_id, NULL) AS semester, tbl_studierendenantrag.grund
 	FROM
 	campus.tbl_studierendenantrag
 	JOIN public.tbl_student USING (prestudent_id)
@@ -60,6 +60,7 @@ if (!$db->db_query($query) || !$db->db_num_rows())
 		<name><?= trim($row->vorname. " " . $row->nachname);?></name>
 		<personenkz><?=$row->matrikelnr;?></personenkz>
 		<studienjahr><?php echo $row->studienjahr_kurzbz;?></studienjahr>
+		<studiensemester><?php echo $row->studiensemester_kurzbz;?></studiensemester>
 		<semester><?=$row->semester;?></semester>
 		<grund><?=$row->grund;?></grund>
 	</antrag>

@@ -289,7 +289,7 @@
 						</table:table-cell>
 					</table:table-row>
 				</table:table>
-				<text:p text:style-name="P4">Abmeldung vom Studium durch Studierende</text:p>
+				<text:p text:style-name="P4">Abmeldung vom Studium durch Studiengang</text:p>
 				<table:table table:name="Tabelle2" table:style-name="Tabelle2">
 					<table:table-column table:style-name="Tabelle2.A"/>
 					<table:table-column table:style-name="Tabelle2.B"/>
