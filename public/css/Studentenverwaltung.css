@@ -1,0 +1,60 @@
+@import './components/searchbar.css';
+@import './components/verticalsplit.css';
+
+.searchbar {
+	margin-right: 0!important;
+}
+.searchbar > .input-group {
+	margin-right: 0!important;
+}
+.searchbar > .input-group > * {
+	border-radius: 0!important;
+}
+
+#main {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+#main > header {
+	flex: 0 0 auto;
+}
+#main > div {
+	flex: 1 1 auto;
+}
+
+@media (min-width: 768px) {
+	#sidebarMenu {
+		visibility: visible!important;
+		transform: none;
+		position: inherit;
+		z-index: 1;
+	}
+}
+
+
+@media (max-width: 769px) {
+	.stv-verband {
+		max-height: calc(100% - 3rem);
+		overflow: auto;
+	}
+}
+.stv-verband .p-treetable-tbody > tr > td {
+	display: flex;
+	padding-top: .25rem!important;
+	padding-bottom: .25rem!important;
+}
+.stv-verband .p-treetable-tbody > tr > td > button {
+	flex: 0 0 auto;
+}
+.stv-verband .p-treetable-tbody > tr > td > span {
+	flex: 1 1 auto;
+}
+
+.stv-list {
+	display: flex;
+	flex-direction: column;
+}
+.stv-list > #filterTableDataset {
+	flex: 1 1 auto;
+}
