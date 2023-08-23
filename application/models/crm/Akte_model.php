@@ -35,7 +35,8 @@ class Akte_model extends DB_Model
 						 anmerkung,
 						 nachgereicht,
 						 nachgereicht_am,
-						 CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden
+						 CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden,
+						 prestudent_id
 					FROM public.tbl_akte
 				   WHERE person_id = ?';
 

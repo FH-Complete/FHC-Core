@@ -104,6 +104,7 @@ foreach ($obj->result as $row)
 	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
 				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
 				<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
+				<NOTE:prestudent_id><![CDATA['.$benutzer->prestudent_id.']]></NOTE:prestudent_id>
 				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
 				<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
 				<NOTE:uebernahmedatum_iso><![CDATA['.$row->uebernahmedatum.']]></NOTE:uebernahmedatum_iso>

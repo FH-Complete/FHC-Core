@@ -136,6 +136,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte"  onclick="LehrveranstaltungNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-noten-tree-prestudent_id" label="PrestudentID" flex="2" hidden="true" persist="hidden, width, ordinal"
+					 class="sortDirectionIndicator"
+					 sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id"  onclick="LehrveranstaltungNotenTreeSort()"/>
+			<splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -159,6 +163,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz_lv"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_semester"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id"/>
 					</treerow>
 				</treeitem>
 			</treechildren>

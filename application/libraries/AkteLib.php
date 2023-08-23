@@ -43,7 +43,7 @@ class AkteLib
 	 */
 	public function add(
 		$person_id, $dokument_kurzbz, $titel, $mimetype, $fileHandle, // Required parameters
-		$bezeichnung = null, $archiv = false, $signiert = false, $stud_selfservice = false
+		$bezeichnung = null, $archiv = false, $signiert = false, $stud_selfservice = false, $prestudent_id = null
 	)
 	{
 		// add new dms entry and new dms version for the Akte, using Akte data (title, mimetype, file content as handle)
@@ -69,7 +69,8 @@ class AkteLib
 				'signiert' => $signiert,
 				'stud_selfservice' => $stud_selfservice,
 				'insertamum' => date('Y-m-d H:i:s'),
-				'insertvon' => $this->_who
+				'insertvon' => $this->_who,
+				'prestudent_id' => $prestudent_id
 			)
 		);
 	}
@@ -127,7 +128,7 @@ class AkteLib
 		$this->_ci->AkteModel->addSelect('person_id, dokument_kurzbz, mimetype, erstelltam, titel, bezeichnung,
 											gedruckt, uid, dms_id, nachgereicht, nachgereicht_am, anmerkung,
 											ausstellungsnation, formal_geprueft_amum, archiv, signiert,
-											stud_selfservice, akzeptiertamum, insertvon, insertamum, updatevon, updateamum');
+											stud_selfservice, akzeptiertamum, insertvon, insertamum, updatevon, updateamum, prestudent_id');
 		$this->_ci->AkteModel->load($akte_id);
 		$akteResult = $this->_ci->AkteModel->load($akte_id);
 

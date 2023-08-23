@@ -102,6 +102,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid" />
 			<splitter class="tree-splitter"/>
+			<treecol id="student-noten-tree-prestudent_id" label="PrestudentID" flex="2" hidden="true" persist="hidden, width, ordinal"
+					 class="sortDirectionIndicator"
+					 sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id" />
+			<splitter class="tree-splitter"/>
 			<treecol id="student-noten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id" />
@@ -161,6 +165,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiensemester_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz"/>

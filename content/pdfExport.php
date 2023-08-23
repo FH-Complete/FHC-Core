@@ -481,26 +481,31 @@ else
 		$studiengang_kz = null;
 		// Archivieren von Dokumenten
 		// Wenn UID übergeben wurde ist es ein Student, sonst ein PreStudent (zB Ausbildungsvertrag)
-		if (isset($_REQUEST['uid']) && $_REQUEST['uid'] != '')
+		if (isset($_REQUEST['prestudent_id']) && $_REQUEST['prestudent_id'] != '')
 		{
-			$uid = $_REQUEST["uid"];
+			$prestudent_id = $_REQUEST["prestudent_id"];
 			$heute = date('Y-m-d');
-
-			$student = new student();
-			$student->load($uid);
-
+			$uid = '';
+			$prestudent = new prestudent($prestudent_id);
+			$prestudent->getLastStatus($prestudent_id);
+			
 			$studiengang = new studiengang();
-			$studiengang->load($student->studiengang_kz);
-
-			if (isset($_REQUEST['ss']))
+			$studiengang->load($prestudent->studiengang_kz);
+			
+			if (isset($_REQUEST['uid']) && $_REQUEST['uid'] != '')
 			{
-				$ss = $_REQUEST["ss"];
+				$student= new student();
+				$uid = $student->getUid($prestudent_id);
+				$student->load($uid);
 
-				$prestudent = new prestudent();
-				$prestudent->getLastStatus($student->prestudent_id,$ss);
-				$semester = $prestudent->ausbildungssemester;
-
-				$query = "SELECT
+				if (isset($_REQUEST['ss']))
+				{
+					$ss = $_REQUEST["ss"];
+					$prestudent = new prestudent();
+					$prestudent->getLastStatus($prestudent_id, $ss);
+					$semester = $prestudent->ausbildungssemester;
+					
+					$query = "SELECT
 						tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ,
 						tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer,
 						tbl_studentlehrverband, tbl_studiengang
@@ -510,64 +515,60 @@ else
 						AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz
 						AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)."
 						AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
-
-				if ($result = $db->db_query($query))
-				{
-					if ($row = $db->db_fetch_object($result))
+					
+					if ($result = $db->db_query($query))
 					{
-						$person_id = $row->person_id;
-						$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss, 0, 64);
-						if ($xsl == 'Ausbildungsver' || $xsl == 'AusbVerEng')
+						if ($row = $db->db_fetch_object($result))
 						{
-							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
-						}
-						elseif ($xsl === 'LVZeugnisEng' || $xsl === 'LVZeugnis' || $xsl === 'Zertifikat')
-						{
-							$lehrveranstaltung = new lehrveranstaltung($_GET['lvid']);
-							$vorlage->dokument_kurzbz = $xsl;
-							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss . ' '. $lehrveranstaltung->bezeichnung, 0, 64);
-							$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss. '_' . str_replace(' ', '_', $lehrveranstaltung->bezeichnung), 0, 60);
-						}
-						elseif ($xsl == 'SZeugnis')
-						{
-							$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
-							$titel = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+							$person_id = $row->person_id;
+							$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss, 0, 64);
+							if ($xsl == 'Ausbildungsver' || $xsl == 'AusbVerEng')
+							{
+								$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+							}
+							elseif ($xsl === 'LVZeugnisEng' || $xsl === 'LVZeugnis' || $xsl === 'Zertifikat')
+							{
+								$lehrveranstaltung = new lehrveranstaltung($_GET['lvid']);
+								$vorlage->dokument_kurzbz = $xsl;
+								$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss . ' '. $lehrveranstaltung->bezeichnung, 0, 64);
+								$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss. '_' . str_replace(' ', '_', $lehrveranstaltung->bezeichnung), 0, 60);
+							}
+							elseif ($xsl == 'SZeugnis')
+							{
+								$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+								$titel = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
+							}
+							else
+							{
+								$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss, 0, 64);
+							}
+							$studiengang_kz = $row->studiengang_kz;
 						}
 						else
 						{
-							$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss, 0, 64);
+							die('StudentIn hat keinen Status in diesem Semester');
 						}
-						$studiengang_kz = $row->studiengang_kz;
 					}
-					else
-					{
-						die('StudentIn hat keinen Status in diesem Semester');
-					}
+					
+				}
+				else
+				{
+					$studiengang_kz = $student->studiengang_kz;
+					$person_id = $student->person_id;
+					$titel = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
+					$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
 				}
 			}
 			else
 			{
-				$studiengang_kz = $student->studiengang_kz;
-				$person_id = $student->person_id;
-				$titel = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
+				$studiengang_kz = $prestudent->studiengang_kz;
+				$studiengang = new studiengang();
+				$studiengang->load($studiengang_kz);
+				
+				$person_id = $prestudent->person_id;
+				$titel = mb_substr($xsl."_".$studiengang->kuerzel, 0, 64);
 				$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
 			}
-		}
-		elseif (isset($_REQUEST['prestudent_id']) && $_REQUEST['prestudent_id'] != '')
-		{
-			$prestudent_id = $_REQUEST["prestudent_id"];
-			$heute = date('Y-m-d');
-			$uid = '';
-
-			$prestudent = new prestudent($prestudent_id);
-			$prestudent->getLastStatus($prestudent_id);
-			$studiengang_kz = $prestudent->studiengang_kz;
-			$studiengang = new studiengang();
-			$studiengang->load($studiengang_kz);
-
-			$person_id = $prestudent->person_id;
-			$titel = mb_substr($xsl."_".$studiengang->kuerzel, 0, 64);
-			$bezeichnung = mb_substr($vorlage->bezeichnung." ".$studiengang->kuerzel, 0, 64);
 		}
 
 		if ($rechte->isBerechtigt('admin', $studiengang_kz, 'suid')
@@ -627,6 +628,7 @@ else
 				$akte->archiv = true;
 				$akte->signiert = $sign;
 				$akte->stud_selfservice = $vorlage->stud_selfservice;
+				$akte->prestudent_id = $prestudent_id;
 
 				if (!$akte->save())
 				{

@@ -479,6 +479,9 @@ function StudentFFZertifikatPrint(event, signieren)
 	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz_lv"] : "student-noten-tree-studiengang_kz_lv";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
+	col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
+	prestudent_id = tree.view.getCellText(tree.currentIndex,col);
+
 	if (event.shiftKey)
 	    var output='odt';
 	else if (event.ctrlKey)
@@ -494,6 +497,7 @@ function StudentFFZertifikatPrint(event, signieren)
 		req.add('output', 'pdf');
 		req.add('sign', '1');
 		req.add('archive', '1');
+		req.add('prestudent_id', prestudent_id)
 
 		var response = req.execute();
 
@@ -532,6 +536,9 @@ function StudentLVZeugnisPrint(event, sprache, signieren)
 	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz"] : "student-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
+	col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
+	prestudent_id = tree.view.getCellText(tree.currentIndex,col);
+
 	if (event.shiftKey)
 	    var output='odt';
 	else if (event.ctrlKey)
@@ -551,6 +558,7 @@ function StudentLVZeugnisPrint(event, sprache, signieren)
 		req.add('output', 'pdf');
 		req.add('sign', '1');
 		req.add('archive', '1');
+		req.add('prestudent_id', prestudent_id);
 
 		var response = req.execute();
 

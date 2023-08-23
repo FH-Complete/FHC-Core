@@ -2493,6 +2493,9 @@ function LehrveranstaltungFFZertifikatPrint(event, signieren)
 				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 				lvid = tree.view.getCellText(v,col);
 
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
+				prestudent_id = tree.view.getCellText(v,col);
+				
 				// Dokument fuer alle markierten Personen einzeln erstellen und signieren/archivieren
 
 				var req = new phpRequest(url,'','');
@@ -2501,6 +2504,7 @@ function LehrveranstaltungFFZertifikatPrint(event, signieren)
 				req.add('archive', '1');
 				req.add('uid', uid);
 				req.add('lvid', lvid);
+				req.add('prestudent_id', prestudent_id);
 
 				var response = req.execute();
 
@@ -2595,6 +2599,9 @@ function LehrveranstaltungLVZeugnisPrint(event, sprache, signieren)
 				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 				lvid = tree.view.getCellText(v,col);
 
+				col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
+				prestudent_id = tree.view.getCellText(v,col);
+
 				// Dokument fuer alle markierten Personen einzeln erstellen und signieren/archivieren
 
 				var req = new phpRequest(url,'','');
@@ -2603,6 +2610,7 @@ function LehrveranstaltungLVZeugnisPrint(event, sprache, signieren)
 				req.add('archive', '1');
 				req.add('uid', uid);
 				req.add('lvid', lvid);
+				req.add('prestudent_id', prestudent_id);
 
 				var response = req.execute();
 
