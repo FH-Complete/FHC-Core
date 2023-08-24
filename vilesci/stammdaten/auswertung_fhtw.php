@@ -1248,6 +1248,7 @@ $semester = isset($_REQUEST['semester']) ? $_REQUEST['semester'] : '';
 $prestudent_id = isset($_REQUEST['prestudent_id']) ? $_REQUEST['prestudent_id'] : '';
 $orgform_kurzbz = isset($_REQUEST['orgform_kurzbz']) ? $_REQUEST['orgform_kurzbz'] : '';
 $format = (isset($_REQUEST['format']) ? $_REQUEST['format'] : '');
+$stgtyp = (isset($_REQUEST['stgtyp']) ? $_REQUEST['stgtyp'] : '');
 $rtStudiensemester = '';
 
 if ($reihungstest != '' && (is_array($reihungstest) || is_numeric($reihungstest)))
@@ -1418,7 +1419,12 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 							ORDER BY studienplan_id DESC LIMIT 1)
 							OR tbl_ablauf.studienplan_id IS NULL)";
 	}
-	//$query .= " AND nachname='Al-Mafrachi'";
+
+	if ($stgtyp !== '')
+	{
+		$query .= " AND tbl_studiengang.typ = " .$db->db_add_param($stgtyp);
+	}
+
 	$query .= " ORDER BY tbl_ablauf.studiengang_kz, tbl_ablauf.semester, reihung";
 
 	if (!($result = $db->db_query($query)))
@@ -1638,12 +1644,16 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		//$query .= " AND tbl_ablauf.studienplan_id = 5";
 		$query .= " AND tbl_studienplan.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
 	}
+	
+	if ($stgtyp !== '')
+	{
+		$query .= " AND tbl_studiengang.typ = " . $db->db_add_param($stgtyp);
+	}
+	
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY nachname,
 				vorname,
-				person_id	
-	";/*print_r($query);*/
-	//echo '<pre>', var_dump($query), '</pre>';
+				person_id";
 	if (!($result = $db->db_query($query)))
 	{
 		die($db->db_last_error());
@@ -3019,6 +3029,20 @@ else
 
 	echo '&nbsp;<label>von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_von, 'd.m.Y') . '" /></label>&nbsp;';
 	echo '<label>bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_bis, 'd.m.Y') . '" /></label>';
+	
+	$studiengangtyp = ['b' => 'Bachelor', 'm' => 'Master'];
+	echo '&nbsp;<label>Studiengang Typ:
+				<SELECT name="stgtyp">
+					<OPTION value="">Alle</OPTION>';
+		foreach ($studiengangtyp as $key => $typ)
+		{
+			$selected = "";
+			if (isset($_REQUEST['stgtyp']) && $_REQUEST['stgtyp'] !== '' && $_REQUEST['stgtyp'] === $key)
+				$selected = 'selected';
+			
+			echo '<option value='. $key .' '. $selected .'>'. $typ . '</option>';
+		}
+	echo '</SELECT></label>';
 	echo '</td></tr>';
 	echo '<tr><td>';
 	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
@@ -3032,6 +3056,7 @@ else
 										&prestudent_id=' . $prestudent_id . '
 										&' . http_build_query(array('reihungstest' => $reihungstest)) . '
 										&orgform_kurzbz=' . $orgform_kurzbz . '
+										&stgtyp=' . $stgtyp . '
 										&format=xls"
 									class="btn btn-primary"
 									role="button">
