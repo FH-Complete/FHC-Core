@@ -1419,7 +1419,6 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 							ORDER BY studienplan_id DESC LIMIT 1)
 							OR tbl_ablauf.studienplan_id IS NULL)";
 	}
-	//$query .= " AND nachname='Al-Mafrachi'";
 
 	if ($stgtyp !== '')
 	{
@@ -1654,9 +1653,7 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY nachname,
 				vorname,
-				person_id	
-	";/*print_r($query);*/
-	//echo '<pre>', var_dump($query), '</pre>';
+				person_id";
 	if (!($result = $db->db_query($query)))
 	{
 		die($db->db_last_error());
@@ -3037,13 +3034,13 @@ else
 	echo '&nbsp;<label>Studiengang Typ:
 				<SELECT name="stgtyp">
 					<OPTION value="">Alle</OPTION>';
-		foreach ($studiengangtyp as $stgtyp => $typ)
+		foreach ($studiengangtyp as $key => $typ)
 		{
 			$selected = "";
-			if (isset($_REQUEST['stgtyp']) && $_REQUEST['stgtyp'] !== '' && $_REQUEST['stgtyp'] === $stgtyp)
+			if (isset($_REQUEST['stgtyp']) && $_REQUEST['stgtyp'] !== '' && $_REQUEST['stgtyp'] === $key)
 				$selected = 'selected';
 			
-			echo '<option value='. $stgtyp .' '. $selected .'>'. $typ . '</option>';
+			echo '<option value='. $key .' '. $selected .'>'. $typ . '</option>';
 		}
 	echo '</SELECT></label>';
 	echo '</td></tr>';
@@ -3059,6 +3056,7 @@ else
 										&prestudent_id=' . $prestudent_id . '
 										&' . http_build_query(array('reihungstest' => $reihungstest)) . '
 										&orgform_kurzbz=' . $orgform_kurzbz . '
+										&stgtyp=' . $stgtyp . '
 										&format=xls"
 									class="btn btn-primary"
 									role="button">
