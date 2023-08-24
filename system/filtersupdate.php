@@ -520,7 +520,8 @@ $filters = array(
 					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
 					{"name": "Nachricht"},
-					{"name": "Kaution"}
+					{"name": "Kaution"},
+					{"name": "LockUser"}
 				],
 				"filters": []
 			}

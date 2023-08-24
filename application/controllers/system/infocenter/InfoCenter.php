@@ -326,7 +326,7 @@ class InfoCenter extends Auth_Controller
 			show_error('Person does not exist!');
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
-		if ($origin_page == self::INDEX_PAGE)
+		if (in_array($origin_page, array(self::INDEX_PAGE, self::ABGEWIESEN_PAGE)))
 		{
 			// mark person as locked for editing
 			$result = $this->PersonLockModel->lockPerson($person_id, $this->_uid, self::APP);
@@ -371,7 +371,14 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($result)) show_error(getError($result));
 
-		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
+		$origin_page = $this->input->get(self::ORIGIN_PAGE);
+
+		if ($origin_page === self::ABGEWIESEN_PAGE)
+			$redirectLink = self::INFOCENTER_URI. '/' .self::ABGEWIESEN_PAGE;
+		else
+			$redirectLink = '/'.self::INFOCENTER_URI;
+
+		$redirectLink .= '?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
 
 		// Force reload of Dataset after Unlock
 		$redirectLink .= '&'.self::KEEP_TABLESORTER_FILTER.'=true';
