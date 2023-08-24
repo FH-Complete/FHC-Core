@@ -536,7 +536,7 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Aufgenommen - Alle",
+				"name": "Aufgenommen - Lehrgänge",
 				"columns": [
 					{"name": "PersonId"},
 					{"name": "Vorname"},
