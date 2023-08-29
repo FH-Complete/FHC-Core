@@ -25,6 +25,8 @@ class AntragJob extends JOB_Controller
 		$this->load->model('education/Pruefung_model', 'PruefungModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
 	}
 
 	/**
@@ -134,7 +136,9 @@ class AntragJob extends JOB_Controller
 		foreach ($stgLeitungen as $leitung)
 		{
 			$data = [
-				'name' => trim($leitung['Details']->vorname . ' ' . $leitung['Details']->nachname)
+				'name' => trim($leitung['Details']->vorname . ' ' . $leitung['Details']->nachname),
+				'vorname' => $leitung['Details']->vorname,
+				'nachname' => $leitung['Details']->nachname
 			];
 
 			foreach ($languages as $lang) {
@@ -205,12 +209,31 @@ class AntragJob extends JOB_Controller
 		$count = 0;
 		foreach ($antraege as $antrag)
 		{
+			$this->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
+			$res = $this->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
+			$stg = '';
+			$orgform = '';
+			if (hasData($res)) {
+				$studiengang = current(getData($res));
+				$stg = $studiengang->bezeichnung;
+				$orgform = $studiengang->orgform_kurzbz;
+			}
+
 			$datum = new DateTime($antrag->datum_wiedereinstieg);
 			$data = array(
 				'prestudent' => $antrag->prestudent_id,
 				'name' => trim($antrag->vorname . ' '. $antrag->nachname),
-				'datum_wiedereinstieg' => $datum->format('d.m.Y')
+				'datum_wiedereinstieg' => $datum->format('d.m.Y'),
+				'vorname' => $antrag->vorname,
+				'nachname' => $antrag->nachname,
+				'Orgform' => $orgform,
+				'stg' => $stg
 			);
+			$result = $this->StudentModel->loadWhere(['prestudent_id'=> $antrag->prestudent_id]);
+			if (hasData($result)) {
+				$student = current(getData($result));
+				$data['UID'] = $student->student_uid;
+			}
 
 			// NOTE(chris): Sancho mail
 			if(sendSanchoMail('Sancho_Mail_Antrag_U_Reminder', $data, $antrag->email, 'Reminder: Unterbrechung Wiedereinstieg'))
@@ -488,18 +511,41 @@ class AntragJob extends JOB_Controller
 				$fristende = new DateTime($prestudent->datum);
 				$fristende->add(DateInterval::createFromDateString($modifier_deadline));
 
+				$result = $this->StudiensemesterModel->getNextFrom($prestudent->studiensemester_kurzbz);
+				$next_sem = "";
+				$sem_after_next_sem = "";
+				if (hasData($result)) {
+					$next_sem = current(getData($result))->studiensemester_kurzbz;
+					$result = $this->StudiensemesterModel->getNextFrom($next_sem);
+					if (hasData($result)) {
+						$sem_after_next_sem = current(getData($result))->studiensemester_kurzbz;
+					}
+				}
+
+//prestudentstatus
+				$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+				$result = $this->PrestudentstatusModel->loadLastWithStgDetails($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz);
+				if (hasData($result)) {
+					$ausbildungssemester = current(getData($result))->semester;
+				}
+
 				$dataMail = array(
 					'name'=> trim($prestudent->vorname . ' '. $prestudent->nachname),
+					'vorname' => $prestudent->vorname,
+					'nachname' => $prestudent->nachname,
 					'pers_kz'=> $prestudent->matrikelnr,
 					'studiengang' => $prestudent->bezeichnung,
 					'lvbezeichnung' => $prestudent->lvbezeichnung,
 					'datum_kp' => $prestudent->datum,
 					'studiensemester'=> $prestudent->studiensemester_kurzbz,
-					'orgform'=> $prestudent->orgform,
+					'Orgform'=> $prestudent->orgform,
 					'prestudent_id' => $prestudent->prestudent_id,
 					'url' => $url,
 					'urlCIS' => $urlCIS,
-					'fristablauf' => $fristende->format('d.m.Y')
+					'fristablauf' => $fristende->format('d.m.Y'),
+					'pre_wiederholer_sem' => $next_sem,
+					'wiederholer_sem' => $sem_after_next_sem,
+					'sem' => $ausbildungssemester
 				);
 
 				// NOTE(chris): Sancho mail

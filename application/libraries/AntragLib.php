@@ -149,6 +149,15 @@ class AntragLib
 			if (isError($result))
 				$errors[] = getError($result);
 			else {
+				$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
+				$result = $this->_ci->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
+				$stg = '';
+				$orgform = '';
+				if (hasData($result)) {
+					$studiengang = current(getData($result));
+					$stg = $studiengang->bezeichnung;
+					$orgform = $studiengang->orgform_kurzbz;
+				}
 				if ($antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG)
 				{
 					$resultPrestudentStatus = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail($antrag->prestudent_id);
@@ -177,12 +186,25 @@ class AntragLib
 
 						$result = $this->_ci->PersonModel->loadPrestudent($antrag->prestudent_id);
 						$data = [
-							'nameStudent' => $this->_ci->p->t('person', 'studentIn')
+							'student' => $this->_ci->p->t('person', 'studentIn'),
+							'sem' => $antrag->studiensemester_kurzbz,
+							'linkPdf' => base_url('content/pdfExport.php?xml=Antrag' . $antrag->typ . '.xml.php&xsl=Antrag' . $antrag->typ . '&id=' . $antrag->studierendenantrag_id . '&output=pdf')
 						];
 						if (hasData($result)) {
 							$person = current(getData($result));
-							$data['nameStudent'] = trim($person->vorname . ' ' . $person->nachname);
+							$data['student'] = trim($person->vorname . ' ' . $person->nachname);
+							$data['vorname'] = $person->vorname;
+							$data['nachname'] = $person->nachname;
 						}
+						$result = $this->_ci->StudentModel->loadWhere(['prestudent_id'=> $antrag->prestudent_id]);
+						if (hasData($result)) {
+							$student = current(getData($result));
+							$data['UID'] = $student->student_uid;
+						}
+
+						$data['Orgform'] = $orgform;
+						$data['stg'] = $stg;
+
 						// NOTE(chris): Sancho mail
 						sendSanchoMail($vorlage, $data, $prestudent_status->email, $subject);
 					}
@@ -221,8 +243,12 @@ class AntragLib
 					if (hasData($res)) {
 						$person = current(getData($res));
 						$name = trim($person->vorname . ' ' . $person->nachname);
+						$vorname = $person->vorname;
+						$nachname = $person->nachname;
 					} else {
 						$name = $this->_ci->p->t('person', 'studentIn');
+						$vorname = '';
+						$nachname = $name;
 					}
 					$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
 					if (hasData($res)) {
@@ -235,7 +261,11 @@ class AntragLib
 							'Sancho_Mail_Antrag_A_' . $vorlage,
 							[
 								'name' => $name,
-								'grund' => $antrag->grund
+								'grund' => $antrag->grund,
+								'vorname' => $vorname,
+								'nachname' => $nachname,
+								'Orgform' => $orgform,
+								'stg' => $stg
 							],
 							$email,
 							$this->_ci->p->t('studierendenantrag', 'mail_subject_A_' . $vorlage)
@@ -281,9 +311,6 @@ class AntragLib
 
 		$status = current(getData($result));
 
-		if ($grund)
-			$grund = $this->_ci->p->t('studierendenantrag', 'mail_part_grund', ['grund' => $grund]);
-
 		$result = $this->_ci->StudierendenantragstatusModel->insert([
 			'studierendenantrag_id' => $studierendenantrag_id,
 			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
@@ -312,6 +339,8 @@ class AntragLib
 				if (hasData($res)) {
 					$person = current(getData($res));
 					$name = trim($person->vorname . ' ' . $person->nachname);
+					$vorname = $person->vorname;
+					$nachname = $person->nachname;
 				} else {
 					$name = $this->_ci->p->t('person', 'studentIn');
 				}
@@ -319,11 +348,26 @@ class AntragLib
 				if (hasData($res)) {
 					$kontakt = current(getData($res));
 					$email = $kontakt->kontakt;
+
+					$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
+					$res = $this->_ci->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
+					$stg = '';
+					$orgform = '';
+					if (hasData($res)) {
+						$studiengang = current(getData($res));
+						$stg = $studiengang->bezeichnung;
+						$orgform = $studiengang->orgform_kurzbz;
+					}
+
 					sendSanchoMail(
 						'Sancho_Mail_Antrag_A_ObjDenied',
 						[
 							'name' => $name,
-							'grund' => $grund
+							'vorname' => $vorname,
+							'nachname' => $nachname,
+							'grund' => $grund,
+							'Orgform' => $orgform,
+							'stg' => $stg
 						],
 						$email,
 						$this->_ci->p->t('studierendenantrag', 'mail_subject_A_ObjectionDenied')
@@ -405,6 +449,7 @@ class AntragLib
 				'<br>Details:<br>' .
 				$error_msg;
 			} else {
+
 				$data = getData($data);
 
 				$result = $this->_ci->StudierendenantragstatusModel->insert([
@@ -432,17 +477,17 @@ class AntragLib
 
 						// Prestudentstatus und Unterbrechungsfolgeaktionen setzen
 					$result = $this->_ci->prestudentlib->setUnterbrecher(
-                        $resultAntrag->prestudent_id,
-                        $resultAntrag->studiensemester_kurzbz,
-                        $studierendenantrag_id
-                    );
+						$resultAntrag->prestudent_id,
+						$resultAntrag->studiensemester_kurzbz,
+						$studierendenantrag_id
+					);
 
 					if (isError($result)) {
 						$this->_ci->StudierendenantragstatusModel->delete($studierendenantrag_status_id);
 						return $result;
 					}
 
-							//Mail
+					//Mail
 					$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_U_Approve');
 					$mail = [];
 
@@ -456,15 +501,15 @@ class AntragLib
 					{
 						if (isset($data['errors']['person']))
 						{
-									//send assistenz mit id
+							//send assistenz mit id
 							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_and_name', [
-                                'message' => $data['errors']['email'] . '<br>' . $data['errors']['person']
-                            ]);
+								'message' => $data['errors']['email'] . '<br>' . $data['errors']['person']
+							]);
 							$mail['ass'] = $this->_ci->p->t('studierendenantrag', 'StudentIn', ['prestudent_id' => $data['antrag']->prestudent_id]);
 						}
 						else
 						{
-									//send assistenz mit name
+							//send assistenz mit name
 							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail', ['message' => $data['errors']['email']]);
 							$mail['ass'] = trim($data['person']->vorname . ' ' . $data['person']->nachname);
 						}
@@ -473,14 +518,14 @@ class AntragLib
 					{
 						if (isset($data['errors']['person']))
 						{
-									//send assistenz mit id & student mit "Student/in"
+							//send assistenz mit id & student mit "Student/in"
 							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_name', ['message' => $data['errors']['person']]);
 							$mail['ass'] = $this->_ci->p->t('studierendenantrag', 'StudentIn', ['prestudent_id' => $data['antrag']->prestudent_id]);
 							$mail['stu'] = $this->_ci->p->t('person', 'StudentIn');
 						}
 						else
 						{
-									//send normal
+							//send normal
 							$mail['ass'] = $mail['stu'] = trim($data['person']->vorname . ' ' . $data['person']->nachname);
 						}
 					}
@@ -492,7 +537,11 @@ class AntragLib
 						if (!sendSanchoMail(
 							$mailVorlage,
 							[
-								'name' => $mail['ass']
+								'name' => $mail['ass'],
+								'stg' => $data['studiengang']->bezeichnung,
+								'Orgform' => $data['studiengang']->orgform_kurzbz,
+								'vorname' => $data['person']->vorname,
+								'nachname' => $data['person']->nachname
 							],
 							$data['prestudent_status']->email,
 							$subject
@@ -505,7 +554,11 @@ class AntragLib
 						if (!sendSanchoMail(
 							$mailVorlage,
 							[
-								'name' => $mail['stu']
+								'name' => $mail['stu'],
+								'stg' => $data['studiengang']->bezeichnung,
+								'Orgform' => $data['studiengang']->orgform_kurzbz,
+								'vorname' => $data['person']->vorname,
+								'nachname' => $data['person']->nachname
 							],
 							$data['email'],
 							$subject
@@ -577,10 +630,14 @@ class AntragLib
 						if (isset($data['errors']['person'])) {
 							//send student mit "Student/in"
 							$errors[] = $this->_ci->p->t('studierendenantrag', 'error_name', ['message' => $data['errors']['person']]);
-							$name = 'Student/in';
+							$name = $this->_ci->p->t('person', 'studentIn');
+							$vorname = "";
+							$nachname = $name;
 						} else {
 							//send normal
 							$name = trim($data['person']->vorname . ' ' . $data['person']->nachname);
+							$vorname = $data['person']->vorname;
+							$nachname = $data['person']->nachname;
 						}
 					}
 					if ($name)
@@ -589,7 +646,11 @@ class AntragLib
 							'Sancho_Mail_Antrag_U_Reject',
 							[
 								'name' => $name,
+								'vorname' => $vorname,
+								'nachname' => $nachname,
 								'grund' => $grund,
+								'stg' => $data['studiengang']->bezeichnung,
+								'Orgform' => $data['studiengang']->orgform_kurzbz,
 								'prestudent_id' => $data['prestudent_status']->prestudent_id,
 								'abmeldungLink' => site_url('lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id),
 								'abmeldungLinkCIS' => CIS_ROOT . 'index.ci.php/lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id
@@ -627,7 +688,16 @@ class AntragLib
 			return error($this->_ci->p->t('studierendenantrag', 'error_no_antrag_found', ['id' => $studierendenantrag_id]));
 
 		$result['antrag'] = $antrag = current($res);
-
+		$this->_ci->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
+		$res = $this->_ci->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
+		if (hasData($res)) {
+			$result['studiengang'] = current(getData($res));
+		}
+		else{
+			$result['studiengang'] = new stdClass();
+			$result['studiengang']->bezeichnung = "";
+			$result['studiengang']->orgform_kurzbz = "";
+		}
 
 		$res = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail($antrag->prestudent_id);
 		if (isError($res))
@@ -1491,6 +1561,13 @@ class AntragLib
 			$mitarbeiter = getData($result);
 		}
 
+		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id'=> $antrag->prestudent_id]);
+		if (hasData($result)) {
+			$student = current(getData($result));
+			$student_uid = $student->student_uid;
+		}
+		else
+			$student_uid = '';
 
 		// NOTE(chris): Sancho mail
 		if (!sendSanchoMail(
@@ -1500,7 +1577,9 @@ class AntragLib
 				'stg' => $stg->bezeichnung,
 				'sem' => $semester,
 				'student' => $student,
-				'mitarbeiter' => $mitarbeiter
+				'mitarbeiter' => $mitarbeiter,
+				'Orgform' => $stg->orgform_kurzbz,
+				'UID' => $student_uid
 			],
 			$email,
 			$this->_ci->p->t('studierendenantrag', 'mail_subject_W_Approve')
@@ -1518,18 +1597,18 @@ class AntragLib
 			$result = $this->getLvsForAntrag($antrag_id);
 			if (hasData($result)) {
 				$lvs = getData($result);
-				foreach ($lvs as $semester => $lv_list) {
+				foreach ($lvs as $sem => $lv_list) {
 					$lvs_filtered = array_filter($lv_list, function ($el) {
 						return $el->antrag_zugelassen;
 					});
-					if (substr($semester, 0, 1) == '1') {
-						$sem_not_allowed = substr($semester, 1);
+					if (substr($sem, 0, 1) == '1') {
+						$sem_not_allowed = substr($sem, 1);
 						$list_not_allowed = array_map(function ($el) {
 							return $el->bezeichnung . '(' . $el->lehrform_kurzbz . ')';
 						}, $lvs_filtered);
 						$list_not_allowed = '<ul><li>' . implode('</li><li>', $list_not_allowed) . '</li></ul>';
 					} else {
-						$sem_to_repeat = substr($semester, 1);
+						$sem_to_repeat = substr($sem, 1);
 						$list_to_repeat = array_map(function ($el) {
 							return $el->bezeichnung . '(' . $el->lehrform_kurzbz . ')';
 						}, $lvs_filtered);
@@ -1550,7 +1629,8 @@ class AntragLib
 					'sem_not_allowed' => $sem_not_allowed,
 					'list_not_allowed' => $list_not_allowed,
 					'sem_to_repeat' => $sem_to_repeat,
-					'list_to_repeat' => $list_to_repeat
+					'list_to_repeat' => $list_to_repeat,
+					'Orgform' => $stg->orgform_kurzbz
 				],
 				$email,
 				$this->_ci->p->t('studierendenantrag', 'mail_subject_W_Student')
