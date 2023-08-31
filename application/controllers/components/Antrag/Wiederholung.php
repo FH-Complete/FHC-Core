@@ -41,6 +41,7 @@ class Wiederholung extends FHC_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
+			'global',
 			'studierendenantrag'
 		]);
 	}
