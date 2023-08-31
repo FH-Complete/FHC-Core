@@ -77,7 +77,7 @@ $config['wiederholung_job_request_1_date_modifier'] = '+0 days';
  * @var string           A string formated as PHP DateTime modifier
  * @see https://www.php.net/manual/de/datetime.modify.php
  */
-$config['wiederholung_job_request_2_date_modifier'] = '+3 months';
+$config['wiederholung_job_request_2_date_modifier'] = '+3 weeks';
 
 /**
  * Final deadline - after this the student will be abgemeldet if he hasn't chosen yet
