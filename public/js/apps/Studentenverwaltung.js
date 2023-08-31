@@ -18,7 +18,7 @@
 import FhcSearchbar from "../components/searchbar/searchbar.js";
 import StvVerband from "../components/Studienverwaltung/Verband.js";
 import StvList from "../components/Studienverwaltung/List.js";
-import StvStudent from "../components/Studienverwaltung/Student.js";
+import StvDetails from "../components/Studienverwaltung/Details.js";
 import VerticalSplit from "../components/verticalsplit/verticalsplit.js";
 import fhcapifactory from "./api/fhcapifactory.js";
 
@@ -29,7 +29,7 @@ const app = Vue.createApp({
 		FhcSearchbar,
 		StvVerband,
 		StvList,
-		StvStudent,
+		StvDetails,
 		VerticalSplit
 	},
 	data() {
@@ -78,6 +78,9 @@ const app = Vue.createApp({
 		}
 	},
 	methods: {
+		onSelectVerband(link) {
+			this.$refs.stvList.updateUrl(link);
+		},
 		searchfunction(searchsettings) {
 			return Vue.$fhcapi.Search.search(searchsettings);  
 		}

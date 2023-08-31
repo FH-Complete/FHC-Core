@@ -33,12 +33,12 @@
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 					</div>
-					<stv-verband></stv-verband>
+					<stv-verband @select-verband="onSelectVerband"></stv-verband>
 				</nav>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<vertical-split>
 						<template #top>
-							<stv-list v-model:selected="selected"></stv-list>
+							<stv-list ref="stvList" v-model:selected="selected"></stv-list>
 						</template>
 						<template #bottom>
 							<stv-details :student="lastSelected"></stv-details>

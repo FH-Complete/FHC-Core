@@ -5,6 +5,9 @@ export default {
 		TreeTable: primevue.treetable,
 		TreeColumn: primevue.column
 	},
+	emits: [
+		'selectVerband'
+	],
 	data() {
 		return {
 			loading: true,
@@ -31,15 +34,19 @@ export default {
 				}
 			}
 		},
+		onSelectTreeNode(node) {
+			if (node.link)
+				this.$emit('selectVerband', node.link);
+		},
 		mapResultToTreeData(el) {
 			const cp = {
 				data: el
 			};
 			if (el.studiengang_kz !== undefined) {
-				// TODO(chris): scrolling doesn't work
 				cp.key = el.studiengang_kz;
-				cp.data.name = el.bezeichnung;
+				cp.data.name = el.kurzbzlang + ' (' + (el.typ + el.kurzbz).toUpperCase() + ') - ' + el.bezeichnung;
 				cp.leaf = false;
+				cp.link = 'components/Studentenverwaltung/getStudents/' + el.studiengang_kz;
 			}
 			if (el.children)
 				cp.children = el.children.map(this.mapResultToTreeData);
@@ -62,7 +69,7 @@ export default {
 			});
 	},
 	template: `
-	<tree-table class="stv-verband p-treetable-sm" :value="nodes" lazy @node-expand="onExpandTreeNode" scrollable scroll-height="flex">
+	<tree-table class="stv-verband p-treetable-sm" :value="nodes" lazy @node-expand="onExpandTreeNode" selection-mode="single" @node-select="onSelectTreeNode" scrollable scroll-height="flex">
 		<tree-column field="name" header="Verband" expander></tree-column>
 	</tree-table>`
 };

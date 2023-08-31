@@ -1,4 +1,5 @@
 import {CoreFilterCmpt} from "../filter/Filter.js";
+import {CoreRESTClient} from '../../RESTClient.js';
 
 export default {
 	components: {
@@ -13,22 +14,16 @@ export default {
 	data() {
 		return {
 			tabulatorOptions: {
-				columns:[ //Define Table Columns
-					{title:"Name", field:"name", width:150},
-					{title:"Age", field:"age", hozAlign:"left", formatter:"progress"},
-					{title:"Favourite Color", field:"col"},
-					{title:"Date Of Birth", field:"dob", sorter:"date", hozAlign:"center"},
-				],
-				data: [
-					{id:1, name:"Oli Bob", age:"12", col:"red", dob:""},
-					{id:2, name:"Mary May", age:"1", col:"blue", dob:"14/05/1982"},
-					{id:3, name:"Christine Lobowski", age:"42", col:"green", dob:"22/05/1982"},
-					{id:4, name:"Brendon Philips", age:"125", col:"orange", dob:"01/08/1980"},
-					{id:5, name:"Margret Marmajuke", age:"16", col:"yellow", dob:"31/01/1999"},
-					{id:6, name:"Oli Bob", age:"12", col:"red", dob:""},
-					{id:7, name:"Mary May", age:"1", col:"blue", dob:"14/05/1982"},
-					{id:8, name:"Christine Lobowski", age:"42", col:"green", dob:"22/05/1982"},
-					{id:9, name:"Brendon Philips", age:"125", col:"orange", dob:"01/08/1980"}
+				ajaxURL: CoreRESTClient._generateRouterURI("components/Studentenverwaltung/getStudents"),
+				
+				//autoColumns: true,
+				columns:[
+					{title:"UID", field:"uid"},
+					{title:"TitelPre", field:"titelpre"},
+					{title:"Nachname", field:"nachname"},
+					{title:"Vorname", field:"vorname"},
+					{title:"Wahlname", field:"wahlname", visible:false},
+					// TODO(chris): IMPLEMENT!
 				],
 
 				height: 'auto',
@@ -48,6 +43,10 @@ export default {
 		},
 		rowSelectionChanged(data) {
 			this.$emit('update:selected', data);
+		},
+		updateUrl(url) {
+			this.$refs.table.tabulator.setData(CoreRESTClient._generateRouterURI(url));
+			console.log(CoreRESTClient._generateRouterURI(url));
 		}
 	},
 	mounted() {
@@ -55,6 +54,7 @@ export default {
 	template: `
 	<div class="stv-list h-100 pt-3">
 		<core-filter-cmpt
+			ref="table"
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			table-only
