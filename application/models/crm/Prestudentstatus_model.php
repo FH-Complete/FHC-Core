@@ -243,6 +243,7 @@ class Prestudentstatus_model extends DB_Model
 						tbl_orgform.bezeichnung_mehrsprachig AS bezeichnung_orgform,
 						tbl_status.bezeichnung_mehrsprachig,
 						tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund,
+						tbl_studiengang.bezeichnung AS stg_bezeichnung,
 						tbl_studiengang.email');
 		$this->addJoin('lehre.tbl_studienplan', 'studienplan_id', 'LEFT');
 		$this->addJoin('lehre.tbl_studienordnung', 'studienordnung_id', 'LEFT');
