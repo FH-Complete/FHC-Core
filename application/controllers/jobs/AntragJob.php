@@ -26,7 +26,7 @@ class AntragJob extends JOB_Controller
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 	}
 
 	/**
@@ -511,6 +511,8 @@ class AntragJob extends JOB_Controller
 				$fristende = new DateTime($prestudent->datum);
 				$fristende->add(DateInterval::createFromDateString($modifier_deadline));
 
+				$datum_kp = new DateTime($prestudent->datum);
+
 				$result = $this->StudiensemesterModel->getNextFrom($prestudent->studiensemester_kurzbz);
 				$next_sem = "";
 				$sem_after_next_sem = "";
@@ -522,7 +524,6 @@ class AntragJob extends JOB_Controller
 					}
 				}
 
-//prestudentstatus
 				$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 				$result = $this->PrestudentstatusModel->loadLastWithStgDetails($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz);
 				if (hasData($result)) {
@@ -534,9 +535,9 @@ class AntragJob extends JOB_Controller
 					'vorname' => $prestudent->vorname,
 					'nachname' => $prestudent->nachname,
 					'pers_kz'=> $prestudent->matrikelnr,
-					'studiengang' => $prestudent->bezeichnung,
+					'stg' => $prestudent->bezeichnung,
 					'lvbezeichnung' => $prestudent->lvbezeichnung,
-					'datum_kp' => $prestudent->datum,
+					'datum_kp' => $datum_kp->format('d.m.Y'),
 					'studiensemester'=> $prestudent->studiensemester_kurzbz,
 					'Orgform'=> $prestudent->orgform,
 					'prestudent_id' => $prestudent->prestudent_id,
