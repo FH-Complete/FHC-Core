@@ -15,77 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import FhcSearchbar from "../components/searchbar/searchbar.js";
-import StvVerband from "../components/Studienverwaltung/Verband.js";
-import StvList from "../components/Studienverwaltung/List.js";
-import StvDetails from "../components/Studienverwaltung/Details.js";
-import VerticalSplit from "../components/verticalsplit/verticalsplit.js";
+import FhcStudentenverwaltung from "../components/Stv/Studentenverwaltung.js";
 import fhcapifactory from "./api/fhcapifactory.js";
 
 Vue.$fhcapi = fhcapifactory;
 
-const app = Vue.createApp({
-	components: {
-		FhcSearchbar,
-		StvVerband,
-		StvList,
-		StvDetails,
-		VerticalSplit
-	},
-	data() {
-		return {
-			selected: [],
-			searchbaroptions: {
-				types: [
-					"person",
-					"student",
-					"prestudent"
-				],
-				actions: {
-					person: {
-						defaultaction: {
-							type: "link",
-							action: function(data) { 
-								return data.profil;
-							}
-						},
-						childactions: [
-							{
-								"label": "testchildaction1",
-								"icon": "fas fa-check-circle",
-								"type": "function",
-								"action": function(data) { 
-									alert('person testchildaction 01 ' + JSON.stringify(data)); 
-								}
-							},
-							{
-								"label": "testchildaction2",
-								"icon": "fas fa-file-csv",
-								"type": "function",
-								"action": function(data) { 
-									alert('person testchildaction 02 ' + JSON.stringify(data)); 
-								}
-							}
-						]
-					}
-				}
-			},
-		}
-	},
-	computed: {
-		lastSelected() {
-			return this.selected[this.selected.length - 1];
-		}
-	},
-	methods: {
-		onSelectVerband(link) {
-			this.$refs.stvList.updateUrl(link);
-		},
-		searchfunction(searchsettings) {
-			return Vue.$fhcapi.Search.search(searchsettings);  
-		}
-	}
+const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+
+const router = VueRouter.createRouter({
+	history: VueRouter.createWebHistory(),
+	routes: [
+		{ path: `/${ciPath}/studentenverwaltung`, component: FhcStudentenverwaltung },
+		{ path: `/${ciPath}/studentenverwaltung/:id`, component: FhcStudentenverwaltung }
+	]
 });
 
-app.use(primevue.config.default).mount('#main');
+const app = Vue.createApp();
+
+app
+	.use(router)
+	.use(primevue.config.default)
+	.mount('#main');
 

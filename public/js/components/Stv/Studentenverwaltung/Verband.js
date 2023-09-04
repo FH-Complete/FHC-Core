@@ -1,4 +1,4 @@
-import {CoreRESTClient} from '../../RESTClient.js';
+import {CoreRESTClient} from '../../../RESTClient.js';
 
 export default {
 	components: {
@@ -17,55 +17,50 @@ export default {
 	methods: {
 		onExpandTreeNode(node) {
 			if (!node.children) {
-				let url = '';
-				if (node.data.studiengang_kz) {
-					url = "getStudiengang/" + node.data.studiengang_kz;
-				}
-
-				if (url) {
+				if (node.data.link) {
 					this.loading = true;
 					CoreRESTClient
-						.get("components/Studentenverwaltung/" + url)
+						.get("components/stv/verband/" + node.data.link)
+						.then(result => result.data)
 						.then(result => {
-							const subNodes = result.data.map(this.mapResultToTreeData);
+							const subNodes = result.map(this.mapResultToTreeData);
 							node.children = subNodes;
 							this.loading = false;
+						})
+						.catch(error => {
+							console.error(error);
 						});
 				}
 			}
 		},
 		onSelectTreeNode(node) {
-			if (node.link)
-				this.$emit('selectVerband', node.link);
+			if (node.data.link)
+				this.$emit('selectVerband', 'components/stv/students/' + node.data.link);
 		},
 		mapResultToTreeData(el) {
 			const cp = {
+				key: ("" + el.link).replace('/', '-'),
 				data: el
 			};
-			if (el.studiengang_kz !== undefined) {
-				cp.key = el.studiengang_kz;
-				cp.data.name = el.kurzbzlang + ' (' + (el.typ + el.kurzbz).toUpperCase() + ') - ' + el.bezeichnung;
-				cp.leaf = false;
-				cp.link = 'components/Studentenverwaltung/getStudents/' + el.studiengang_kz;
-			}
+
 			if (el.children)
 				cp.children = el.children.map(this.mapResultToTreeData);
 			else
 				cp.leaf = el.leaf || false;
+
 			return cp;
 		}
 	},
 	mounted() {
 		CoreRESTClient
-			.get("components/Studentenverwaltung")
+			.get("components/stv/verband")
 			.then(result => result.data)
 			.then(result => {
-				if(CoreRESTClient.isError(result)) {
-					console.error(CoreRESTClient.getError(result));
-				} else if (CoreRESTClient.hasData(result)) {
-					this.nodes = CoreRESTClient.getData(result).map(this.mapResultToTreeData);
-				}
+				this.nodes = result.map(this.mapResultToTreeData);
 				this.loading = false;
+			})
+			.catch(error => {
+				console.error(error);
 			});
 	},
 	template: `
