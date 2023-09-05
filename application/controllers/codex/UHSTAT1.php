@@ -279,8 +279,11 @@ class UHSTAT1 extends FHC_Controller
 	private function _getFormMetaData()
 	{
 		$person_id = $this->_getValidPersonId('s');
+
+		// read only display param
 		$readOnly = $this->input->get('readOnly');
 
+		// depending on permissions, editing or deleting is possible
 		$editPermission = $this->_checkPermission('sui');
 		$deletePermission = $this->_checkPermission('suid');
 
@@ -296,6 +299,20 @@ class UHSTAT1 extends FHC_Controller
 			'deletePermission' => $deletePermission,
 			'readOnly' => $readOnly
 		);
+
+		// get person data
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->PersonModel->addSelect("vorname, nachname");
+		$personRes = $this->PersonModel->load($person_id);
+
+		if (isError($personRes)) return $personRes;
+
+		if (hasData($personRes))
+		{
+			$person = getData($personRes)[0];
+			$formMetaData['vorname'] = $person->vorname;
+			$formMetaData['nachname'] = $person->nachname;
+		}
 
 		$nationTextFieldName = $languageIdx == 1 ? 'langtext' : 'engltext';
 
