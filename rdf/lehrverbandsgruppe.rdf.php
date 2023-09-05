@@ -246,6 +246,24 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
 					</RDF:Description>
 
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt/reihungstestnichtangemeldet" >
+						<VERBAND:name>Nicht zum Reihungstest angemeldet</VERBAND:name>
+						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
+						<VERBAND:stg_kz><![CDATA['.$stg_kz.']]></VERBAND:stg_kz>
+						<VERBAND:stsem><![CDATA['.$stsem->studiensemester_kurzbz.']]></VERBAND:stsem>
+						<VERBAND:typ>statusbestaetigtrtnichtangemeldet</VERBAND:typ>
+						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
+					</RDF:Description>
+
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt/reihungstestangemeldet" >
+						<VERBAND:name>Reihungstest angemeldet</VERBAND:name>
+						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
+						<VERBAND:stg_kz><![CDATA['.$stg_kz.']]></VERBAND:stg_kz>
+						<VERBAND:stsem><![CDATA['.$stsem->studiensemester_kurzbz.']]></VERBAND:stsem>
+						<VERBAND:typ>statusbestaetigtrtangemeldet</VERBAND:typ>
+						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
+					</RDF:Description>
+
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/reihungstestnichtangemeldet" >
 						<VERBAND:name>Nicht zum Reihungstest angemeldet</VERBAND:name>
 						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
@@ -270,6 +288,24 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:stg_kz><![CDATA['.$stg_kz.']]></VERBAND:stg_kz>
 						<VERBAND:stsem><![CDATA['.$stsem->studiensemester_kurzbz.']]></VERBAND:stsem>
 						<VERBAND:typ>bewerber</VERBAND:typ>
+						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
+					</RDF:Description>
+					
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestnichtangemeldet" >
+						<VERBAND:name>Nicht zum Reihungstest angemeldet</VERBAND:name>
+						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
+						<VERBAND:stg_kz><![CDATA['.$stg_kz.']]></VERBAND:stg_kz>
+						<VERBAND:stsem><![CDATA['.$stsem->studiensemester_kurzbz.']]></VERBAND:stsem>
+						<VERBAND:typ>bewerberrtnichtangemeldet</VERBAND:typ>
+						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
+					</RDF:Description>
+
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestangemeldet" >
+						<VERBAND:name>Reihungstest angemeldet</VERBAND:name>
+						<VERBAND:stg><![CDATA['.$stg_kurzbz.']]></VERBAND:stg>
+						<VERBAND:stg_kz><![CDATA['.$stg_kz.']]></VERBAND:stg_kz>
+						<VERBAND:stsem><![CDATA['.$stsem->studiensemester_kurzbz.']]></VERBAND:stsem>
+						<VERBAND:typ>bewerberrtangemeldet</VERBAND:typ>
 						<VERBAND:orgform><![CDATA['.$orgform.']]></VERBAND:orgform>
 					</RDF:Description>
 
@@ -316,13 +352,24 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/bewerbungnichtabgeschickt\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/bewerbungabgeschickt\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/zgv\" />\n";
-			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt\">\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt/reihungstestnichtangemeldet\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt/reihungstestangemeldet\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t</RDF:Seq>";
+			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/reihungstestnichtangemeldet\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/reihungstestangemeldet\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t</RDF:Seq>";
 			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
-
-			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber\" />\n";
+			
+			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
+			$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber\">\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestnichtangemeldet\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t</RDF:Seq>";
+			$orgform_sequence[$stg_kz].= "\n\t\t\t</RDF:li>\n";
+			
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/aufgenommen\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/warteliste\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/absage\" />\n";
@@ -561,6 +608,22 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:typ><![CDATA[statusbestaetigt]]></VERBAND:typ>
 			</RDF:Description>
 
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt/reihungstestnichtangemeldet'; ?>" >
+				<VERBAND:name><![CDATA[Nicht zum Reihungstest angemeldet]]></VERBAND:name>
+				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>
+				<VERBAND:stg_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></VERBAND:stg_kz>
+				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
+				<VERBAND:typ><![CDATA[statusbestaetigtrtnichtangemeldet]]></VERBAND:typ>
+			</RDF:Description>
+
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt/reihungstestangemeldet'; ?>" >
+				<VERBAND:name><![CDATA[Reihungstest angemeldet]]></VERBAND:name>
+				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>
+				<VERBAND:stg_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></VERBAND:stg_kz>
+				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
+				<VERBAND:typ><![CDATA[statusbestaetigtrtangemeldet]]></VERBAND:typ>
+			</RDF:Description>
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/reihungstestnichtangemeldet'; ?>" >
 				<VERBAND:name><![CDATA[Nicht zum Reihungstest angemeldet]]></VERBAND:name>
 				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>
@@ -583,6 +646,22 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stg_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></VERBAND:stg_kz>
 				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
 				<VERBAND:typ><![CDATA[bewerber]]></VERBAND:typ>
+			</RDF:Description>
+
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestnichtangemeldet'; ?>" >
+				<VERBAND:name><![CDATA[Nicht zum Reihungstest angemeldet]]></VERBAND:name>
+				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>
+				<VERBAND:stg_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></VERBAND:stg_kz>
+				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
+				<VERBAND:typ><![CDATA[bewerberrtnichtangemeldet]]></VERBAND:typ>
+			</RDF:Description>
+
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/bewerber/reihungstestangemeldet'; ?>" >
+				<VERBAND:name><![CDATA[Reihungstest angemeldet]]></VERBAND:name>
+				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>
+				<VERBAND:stg_kz><![CDATA[<?php echo $row->studiengang_kz; ?>]]></VERBAND:stg_kz>
+				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
+				<VERBAND:typ><![CDATA[bewerberrtangemeldet]]></VERBAND:typ>
 			</RDF:Description>
 
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/aufgenommen'; ?>" >
@@ -783,13 +862,24 @@ draw_orgformpart($stg_kz);
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/bewerbungnichtabgeschickt\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/bewerbungabgeschickt\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/zgv\" />\n";
-					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt\" />\n";
+					echo "\t\t\t<RDF:li>";
+					echo "\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt\">\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt/reihungstestnichtangemeldet\" />\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt/reihungstestangemeldet\" />\n";
+					echo "\t\t\t\t</RDF:Seq>";
+					echo "\n\t\t\t</RDF:li>\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/reihungstestnichtangemeldet\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/reihungstestangemeldet\" />\n";
 					echo "\t\t\t\t</RDF:Seq>";
 					echo "\n\t\t\t</RDF:li>\n";
+					
+					echo "\t\t\t<RDF:li>";
+					echo "\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\">\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestnichtangemeldet\" />\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber/reihungstestangemeldet\" />\n";
+					echo "\t\t\t\t</RDF:Seq>";
+					echo "\n\t\t\t</RDF:li>\n";
 
-					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/aufgenommen\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/warteliste\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/absage\" />\n";

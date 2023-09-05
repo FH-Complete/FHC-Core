@@ -249,19 +249,6 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			}
 		}
 
-		/**
-		 * Send mails
-		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
-		 * even if they are required for more recommendations
-		 * */
-		if (!isEmptyArray($retval))
-		{
-            if ($this->config->item('send_mail') === TRUE)
-            {
-                $this->_sendSanchoMail($retval);
-            }
-		}
-
 		// Output json to ajax
 		if (isEmptyArray($retval))
 		{
@@ -273,7 +260,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			$this->terminateWithJsonError('Es wurden keine Empfehlungen angefordert');
 		}
 
-		return $this->outputJsonSuccess($retval);
+		$this->outputJsonSuccess($retval);
 	}
 
 	/**

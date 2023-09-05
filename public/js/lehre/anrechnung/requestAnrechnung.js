@@ -1,6 +1,9 @@
 const ANRECHNUNGSTATUS_APPROVED = 'approved';
 const ANRECHNUNGSTATUS_REJECTED = 'rejected';
-const HERKUNFT_DER_KENNTNISSE_MAX_LENGTH = 125;
+const CHAR_LENGTH125 = 125;
+const CHAR_LENGTH150 = 150;
+const CHAR_LENGTH500 = 500;
+const CHAR_LENGTH1000 = 1000;
 
 const COLOR_DANGER = '#f2dede';
 
@@ -25,7 +28,7 @@ $(function(){
     // Alert message inside Begruendungsbox, if maximum ECTS exceeded
     requestAnrechnung.alertIfMaxEctsExceededInsideBegruendungsbox();
 
-    // Set chars counter for textarea 'Herkunft der Kenntnisse'
+    // Set chars counter for textareas
     requestAnrechnung.setCharsCounter();
 
     // If Sperregrund exists: display Sperre panel, hide Status panel and disable all form elements
@@ -98,6 +101,8 @@ $(function(){
                 begruendung: this.begruendung.value,
                 lv_id: this.lv_id.value,
                 studiensemester: this.studiensemester.value,
+                begruendung_ects: this.begruendung_ects.value,
+                begruendung_lvinhalt: this.begruendung_lvinhalt.value,
                 bestaetigung: this.bestaetigung.value,
                 uploadfile: this.uploadfile.files
             },
@@ -207,10 +212,21 @@ var requestAnrechnung = {
     },
     setCharsCounter: function(){
         $('#requestAnrechnung-herkunftDerKenntnisse').keyup(function() {
-
-            let length = HERKUNFT_DER_KENNTNISSE_MAX_LENGTH - $(this).val().length;
-
+            let length = CHAR_LENGTH125 - $(this).val().length;
             $('#requestAnrechnung-herkunftDerKenntnisse-charCounter').text(length);
+        });
+
+        $('#requestAnrechnung-begruendungEcts').keyup(function() {
+            let length = CHAR_LENGTH150 - $(this).val().length;
+            $('#requestAnrechnung-begruendungEcts-charCounter').text(length);
+        });
+
+        $('#requestAnrechnung-begruendungLvinhalt').keyup(function() {
+            let maxlength = CHAR_LENGTH1000 - $(this).val().length;
+            $('#requestAnrechnung-begruendungLvinhalt-charCounterMax').text(maxlength);
+
+            let minlength = CHAR_LENGTH500 - $(this).val().length;
+            $('#requestAnrechnung-begruendungLvinhalt-charCounterMin').text(minlength);
         });
     },
     formatAnrechnungIsApplied: function (antragdatum, dms_id, filename){

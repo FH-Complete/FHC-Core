@@ -86,6 +86,7 @@ define("AUTH_NAME","FH-Complete");
  * LDAP_BIND_USER: DN des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_BIND_PASSWORD: Passwort des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_USER_SEARCH_FILTER: LDAP Attribut in dem der Username steht nach dem gesucht wird (uid | sAMAccountName)
+ * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false) - wirksam für alle LDAP Server
  */
 define('LDAP_SERVER','ldap://ldap.example.com');
 define('LDAP_PORT',389);
@@ -94,6 +95,7 @@ define('LDAP_BASE_DN','ou=People,dc=example,dc=com');
 define('LDAP_BIND_USER',null);
 define('LDAP_BIND_PASSWORD',null);
 define('LDAP_USER_SEARCH_FILTER','uid');
+define('LDAP_SERVICEPING',true);
 
 // 2. LDAP Server (zB wenn Mitarbeiter und Studierende auf 2 getrennten Servern liegen)
 /*
@@ -206,6 +208,26 @@ define('SOGO_PASSWD','passwort');
 define('TABLE_ID','_id');
 define('TABLE_BEGIN','tbl_');
 define('VIEW_BEGIN','vw_');
+
+/**
+ * Signatur
+ * DEFAULT: https://signatur.example.com/api/sign
+ */
+// Generic URL
+define('SIGNATUR_URL', 'https://signatur.dev.technikum-wien.at/api');
+// Sign API
+define('SIGNATUR_SIGN_API', 'sign');
+// List API
+define('SIGNATUR_LIST_API', 'list');
+// User für Zugriff auf Signaturserver
+define('SIGNATUR_USER', 'fhcomplete');
+// Passwort für Zugriff auf Signaturserver
+define('SIGNATUR_PASSWORD', 'supersecretpassword');
+// Signaturprofil das verwendet werden soll
+define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
+
+// Signaturpruefung im Abgabetool aktivieren
+define('ABGABETOOL_CHECK_SIGNATURE',false);
 
 //Gibt an, ob das Studienbuchblatt im CIS gedruckt werden kann
 define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',true);
