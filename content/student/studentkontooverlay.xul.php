@@ -27,7 +27,13 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../config/global.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
 
 ?>
 
@@ -206,10 +212,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<spacer flex="1"/>
 							<button id="student-konto-button-zahlungsbestaetigung" label="Zahlungsbestaetigung drucken" oncommand="StudentKontoZahlungsbestaetigung();" disabled="true" hidden="<?php echo $is_hidden?>"/>
 						</hbox>
-						<vbox hidden="true">
-							<label value="Buchungsnr" control="student-konto-textbox-buchungsnr"/>
-							<textbox id="student-konto-textbox-buchungsnr" disabled="true"/>
-						</vbox>
 						<groupbox id="student-konto-groupbox">
 						<caption label="Details"/>
 							<grid id="student-konto-grid-detail" style="overflow:auto;margin:4px;" flex="1">
@@ -218,6 +220,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<column flex="5"/>
 								</columns>
 								<rows>
+									<?php
+									$hidden = 'hidden="true"';
+									$rechte = new benutzerberechtigung();
+									$rechte->getBerechtigungen($user);
+									if($rechte->isBerechtigt('admin'))
+										$hidden = '';
+									?>
+									<row <?php echo $hidden ?>>
+										<label value="Buchungsnr" control="student-konto-textbox-buchungsnr"/>
+										<hbox>
+											<textbox id="student-konto-textbox-buchungsnr" readonly="true" size="9"/>
+											<spacer flex="1" />
+										</hbox>
+									</row>
 									<row>
 										<label value="Betrag" control="student-konto-textbox-betrag"/>
 										<hbox>

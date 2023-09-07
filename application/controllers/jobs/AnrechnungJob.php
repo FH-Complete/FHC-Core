@@ -37,6 +37,9 @@ class AnrechnungJob extends JOB_Controller
 		$this->load->helper('hlp_sancho_helper');
 
         $this->load->library('AnrechnungLib');
+
+        // Load configs
+        $this->load->config('anrechnung');
 	}
 
 	/**
@@ -213,7 +216,7 @@ class AnrechnungJob extends JOB_Controller
 					'datentabelle'  => $anrechnungen_table,
 					'link'          => anchor($url, 'Anrechnungsanträge Übersicht')
 				);
-	
+
 				// Send mail
 				sendSanchoMail(
 					'AnrechnungAntragStellen',
@@ -226,6 +229,82 @@ class AnrechnungJob extends JOB_Controller
 
 		$this->logInfo('SUCCEDED: Sending emails to STGL about yesterdays new Anrechnungen succeded.');
 	}
+
+    // Send Sancho mail to LV-Leitung (fallback Lectors) that were requested for recommendation yesterday.
+    public function sendMailRecommendationRequests(){
+
+        $this->logInfo('Start AnrechnungJob sendMailRecommendationRequests to inform lecturers about yesterdays requests for recommendation.');
+
+        // Get Anrechnungen, für die gestern eine Empfehlung angefragt worden ist
+        $this->AnrechnungModel->addSelect('astat.anrechnung_id, astat.datum, astat.insertamum');
+        $this->AnrechnungModel->addDistinct('astat.anrechnung_id');
+        $this->AnrechnungModel->addJoin('lehre.tbl_anrechnung_anrechnungstatus astat', 'anrechnung_id');
+
+        $result = $this->AnrechnungModel->loadWhere('
+            studiensemester_kurzbz = (SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende)
+            AND genehmigt_von IS NULL
+            AND empfehlung_anrechnung IS NULL
+            AND status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR) .' -- in Bearbeitung durch Lektor
+            AND NOW()::date = (astat.datum + interval \'1 day\')                    -- nur gestrige Empfehlungsanfrage
+            ORDER BY astat.anrechnung_id, astat.datum DESC, astat.insertamum DESC   -- nur letzten status dabei prüfen
+        ');
+
+        // Exit, wenn es gestern keine Empfehlungsanfragen gab
+        if (!hasData($result))
+        {
+            $this->logInfo('End AnrechnungJob sendMailRecommendationRequests, because no recommendations were requested yesterday.');
+            exit;
+        }
+
+        $anrechnung_id_arr = array_column(getData($result), 'anrechnung_id');
+
+        $arr_lvLector_arr = array();
+        foreach ($anrechnung_id_arr as $anrechnung_id)
+        {
+            // Get full name of Fachbereichsleitung or LV Leitung.
+            if($this->config->item('fbl') === TRUE)
+            {
+                $arr_lvLector_arr[] = $this->anrechnunglib->getLeitungOfLvOe($anrechnung_id);
+            }
+            else
+            {
+                $arr_lvLector_arr[] = $this->anrechnunglib->getLectors($anrechnung_id); // Returns LV Leitung. If not present, then all lectors of LV.
+            }
+        }
+
+        // Unique lector array to send only one mail per lector
+        $arr_lvLector_arr = array_unique($arr_lvLector_arr, SORT_REGULAR);
+
+        // Link to 'Anrechnungen prüfen' dashboard
+        $url =
+            CIS_ROOT. 'cis/index.php?menu='.
+            CIS_ROOT. 'cis/menu.php?content_id=&content='.
+            CIS_ROOT. index_page(). self::REVIEW_ANRECHNUNG_URI;
+
+        foreach ($arr_lvLector_arr as $lvLector_arr)
+        {
+            foreach ($lvLector_arr as $lector)
+            {
+                // Prepare mail content
+                $fields = array(
+                    'vorname'       => $lector->vorname,
+                    'stgl_name'     => 'Die Studiengangsleitung',
+                    'link'          => anchor($url, 'Anrechnungsanträge Übersicht')
+                );
+
+                // Send mail
+                sendSanchoMail(
+                    'AnrechnungEmpfehlungAnfordern',
+                    $fields,
+                    $lector->uid. '@'. DOMAIN,
+                    'Deine Empfehlung wird benötigt zur Anerkennung nachgewiesener Kenntnisse'
+                );
+            }
+        }
+
+        $this->logInfo('SUCCEDED AnrechnungJob sendMailRecommendationRequests');
+
+    }
 
 	/**
 	 * Send Sancho mail to students, whose Anrechnungen were approved 24 hours ago.
@@ -308,7 +387,7 @@ class AnrechnungJob extends JOB_Controller
 
 		$db = new DB_Model();
 		$result = $db->execReadOnlyQuery($qry);
-		
+
 		// Exit if there are no rejected Anrechnungen
 		if (!hasData($result))
 		{
@@ -361,9 +440,9 @@ html;
 
         $result = $this->AnrechnungModel->loadWhere('
             studiensemester_kurzbz = (
-                SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende)
+                SELECT studiensemester_kurzbz FROM tbl_studiensemester WHERE now()::date BETWEEN start AND ende
             )
-            AND genehmigt_von IS NULL                             
+            AND genehmigt_von IS NULL
             AND empfehlung_anrechnung IS NULL
             AND status_kurzbz = '. $this->db->escape(self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR) .' -- in Bearbeitung durch Lektor
             AND NOW()::date = (astat.datum + interval \'1 week\')                   -- eine Woche nach Empfehlungsanfrage
@@ -376,7 +455,7 @@ html;
             $this->logInfo('End AnrechnungJob sendMailRemindRecommendation, because no recommendations to be done.');
             exit;
         }
-        
+
         $anrechnung_id_arr = array_column(getData($result), 'anrechnung_id');
 
         $arr_lvLector_arr = array();
@@ -435,7 +514,7 @@ html;
 					'vorname' => $stgl->vorname
 				);
 			}
-			
+
 			return $stglMailAdress_arr;
 		}
 		// If not available, get assistance mail address

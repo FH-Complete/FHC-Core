@@ -52,7 +52,7 @@
 	 * LDAP_BIND_USER: DN des Users falls eine Authentifizierung am LDAP noetig ist oder null
 	 * LDAP_BIND_PASSWORD: Passwort des Users falls eine Authentifizierung am LDAP noetig ist oder null
 	 * LDAP_USER_SEARCH_FILTER: LDAP Attribut in dem der Username steht nach dem gesucht wird (uid | sAMAccountName)
-	 * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false)
+	 * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false) - wirksam für alle LDAP Server
 	 */
 	define('LDAP_SERVER','ldap://ldap.example.com');
 	define('LDAP_PORT',389);

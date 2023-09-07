@@ -82,6 +82,9 @@ $this->load->view(
 							<button class="btn btn-default" id="assignKonfiguration">
 								<?php echo $this->p->t('fehlermonitoring', 'konfigurationswertZuweisen') ?>
 							</button>
+							<button class="btn btn-default" id="deleteKonfiguration">
+								<?php echo $this->p->t('fehlermonitoring', 'konfigurationswertLoeschen') ?>
+							</button>
 						</div>
 					</div>
 				</div>

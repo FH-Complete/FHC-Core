@@ -694,11 +694,17 @@ class reihungstest extends basis_db
 					tbl_reihungstest.studiensemester_kurzbz,
 					tbl_reihungstest.stufe,
 					tbl_reihungstest.anmeldefrist,
-					tbl_reihungstest.aufnahmegruppe_kurzbz
+					tbl_reihungstest.aufnahmegruppe_kurzbz,
+					tbl_studiengang.typ,
+					UPPER(typ::varchar(1) || kurzbz) AS stg_kuerzel,
+					so.studiengangbezeichnung,
+       				so.studiengangbezeichnung_englisch
 				FROM
 					public.tbl_rt_person
-				JOIN 
-					public.tbl_reihungstest ON (rt_id=reihungstest_id)
+				JOIN public.tbl_reihungstest ON (rt_id=reihungstest_id)
+				JOIN public.tbl_studiengang ON tbl_reihungstest.studiengang_kz = tbl_studiengang.studiengang_kz
+				JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				WHERE
 					tbl_rt_person.person_id=".$this->db_add_param($person_id);
 
@@ -737,6 +743,10 @@ class reihungstest extends basis_db
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
 				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+				$obj->typ = $row->typ;
+				$obj->stg_kuerzel = $row->stg_kuerzel;
+				$obj->studiengangbezeichnung = $row->studiengangbezeichnung;
+				$obj->studiengangbezeichnung_englisch = $row->studiengangbezeichnung_englisch;
 
 				$this->result[] = $obj;
 			}

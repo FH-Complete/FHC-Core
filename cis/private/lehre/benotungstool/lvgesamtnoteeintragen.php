@@ -98,9 +98,9 @@ if($stsem=='')
 
 //$note = $_REQUEST["note"];
 
-if(!$rechte->isBerechtigt('admin',0) &&
-   !$rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) &&
-   !$rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
+if(!$rechte->isBerechtigt('admin', 0) &&
+   !$rechte->isBerechtigt('admin', $lv_obj->studiengang_kz) &&
+   !$rechte->isBerechtigt('lehre', $lv_obj->studiengang_kz))
 {
 	$qry = "SELECT lehreinheit_id FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
@@ -117,11 +117,11 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 
-function savenote($db,$lvid, $student_uid, $note, $punkte=null)
+function savenote($db, $lvid, $student_uid, $note, $punkte = null)
 {
 	global $stsem, $user, $p, $noten_anmerkung;
 	$jetzt = date("Y-m-d H:i:s");
-	$punkte = str_replace(',','.',$punkte);
+	$punkte = str_replace(',', '.', $punkte);
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 	if($result = $db->db_query($qry))
@@ -207,13 +207,12 @@ if (isset($_REQUEST["submit"]))
 		$note = $_REQUEST["note"];
 		$punkte = (isset($_REQUEST["punkte"])?$_REQUEST["punkte"]:'');
 
-		$response = savenote($db,$lvid, $student_uid, $note, $punkte);
+		$response = savenote($db, $lvid, $student_uid, $note, $punkte);
 		echo $response;
 	}
 	else
 	{
-
-		foreach ($_POST as $row=>$val)
+		foreach ($_POST as $row => $val)
 		{
 			if(mb_strstr(mb_strtolower($row), 'matrikelnr_'))
 			{
@@ -232,7 +231,7 @@ if (isset($_REQUEST["submit"]))
 						$response.="\nNote oder Punkte fehlen";
 						continue;
 					}
-					$punkte=str_replace(',','.', $punkte);
+					$punkte=str_replace(',', '.', $punkte);
 
 					//check ob statt Matrikelnummer nicht bereits student_uid (Moodle Grade Import) vorliegt..
 					$student = new student();
@@ -241,7 +240,7 @@ if (isset($_REQUEST["submit"]))
 						//UID ermitteln
 						if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
 						{
-							$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
+							$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht', array($matrikelnummer));
 							continue;
 						}
 					}
@@ -268,7 +267,7 @@ if (isset($_REQUEST["submit"]))
 						}
 					}
 
-					$val=savenote($db,$lvid, $student_uid, $note, $punkte);
+					$val=savenote($db, $lvid, $student_uid, $note, $punkte);
 					if($val!='neu' && $val!='update' && $val!='update_f')
 						$response.=$val;
 				}

@@ -253,7 +253,7 @@ else
 				array('uid', 'stg_kz', 'person_id', 'id', 'prestudent_id', 'buchungsnummern', 'ss', 'abschlusspruefung_id',
 					'typ', 'all', 'preoutgoing_id', 'lvid', 'projekt_kurzbz', 'von', 'bis', 'stundevon', 'stundebis',
 					'sem', 'lehreinheit', 'mitarbeiter_uid', 'studienordnung_id', 'fixangestellt', 'standort',
-					'abrechnungsmonat', 'form', 'projektarbeit_id', 'betreuerart_kurzbz')
+					'abrechnungsmonat', 'form', 'projektarbeit_id', 'betreuerart_kurzbz', 'studiensemester_kurzbz')
 			)
 		)
 		{
