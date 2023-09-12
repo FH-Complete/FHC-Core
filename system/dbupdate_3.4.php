@@ -43,6 +43,8 @@ require_once('dbupdate_3.4/29133_einzelne_studiengaenge_aus_issuechecks_ausnehme
 require_once('dbupdate_3.4/30537_anmerkung_in_tbl_rolleberechtigung.php');
 require_once('dbupdate_3.4/30181_tabelle_anrechnung_neue_attribute_fuer_begruendung.php');
 require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');
+require_once('dbupdate_3.4/29835_uhstat1_erfassung_der_uhstat1_daten_ueber_das_bewerbungstool.php');
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
