@@ -39,8 +39,8 @@ class dvb extends basis_db
 	const DVB_URL_WEBSERVICE_NACHNAME = DVB_PORTAL.'/rws/0.2/simpleStudentByNachname.xml';
 	const DVB_URL_WEBSERVICE_NAME = DVB_PORTAL.'/rws/0.2/simpleStudentByName.xml';
 	const DVB_URL_WEBSERVICE_MATRIKELNUMMER = DVB_PORTAL.'/rws/0.2/simpleStudentByMatrikelnummer.xml';
-	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/rws/0.5/matrikelreservierung.xml';
-	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/rws/0.5/matrikelmeldung.xml';
+	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/rws/0.6/matrikelreservierung.xml';
+	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/rws/0.6/matrikelmeldung.xml';
 	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.5/pruefebpk.xml';
 
 	public $authentication;
