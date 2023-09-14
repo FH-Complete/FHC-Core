@@ -47,7 +47,21 @@ $(document).ready(function ()
 
 	tinymce.init({
 		theme : "advanced",
-		mode : "textareas"
+		mode : "specific_textareas",
+		editor_selector: "bodyTextArea",
+		theme_advanced_buttons2: "undo, redo, outdent, indent, bullist, numlist, link",
+		theme_advanced_buttons3: "",
+		theme_advanced_buttons4: "",
+		theme_advanced_toolbar_location: "top",
+		height: "400px",
+	});
+
+	tinymce.init({
+		theme : "advanced",
+		mode : "specific_textareas",
+		editor_selector: "tinymcePreview",
+		height: 400,
+		readonly: 1,
 	});
 
 	if ($("#variables"))

@@ -68,7 +68,7 @@
 								<?php echo ucfirst($this->p->t('global', 'nachricht')); ?>:
 
 							</label>
-							<textarea id="bodyTextArea" name="body">
+							<textarea id="bodyTextArea" class="bodyTextArea" name="body">
 
 								<?php echo $body; ?>
 
@@ -180,7 +180,7 @@
 								</div>
 							</div>
 							<br>
-							<textarea id="tinymcePreview"></textarea>
+							<textarea id="tinymcePreview" class="tinymcePreview"></textarea>
 						</div>
 
 					<?php echo $recipients_ids; ?>

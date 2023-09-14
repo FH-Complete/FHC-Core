@@ -6,7 +6,9 @@ $(document).ready(function ()
 {
 	tinymce.init({
 		selector: "#bodyTextArea",
-		plugins: "autoresize",
+		plugins: "autoresize, link",
+		toolbar: "undo redo | presentation | bold italic | link | alignleft aligncenter alignright alignjustify | outdent indent",
+		max_height: 600,
 		autoresize_min_height: 150,
 		autoresize_max_height: 600,
 		autoresize_bottom_margin: 10,

@@ -46,7 +46,10 @@ $(document).ready(function () {
 
 	tinymce.init({
 		selector: "#bodyTextArea",
-		plugins: "autoresize",
+		plugins: "link",
+		toolbar: "undo redo | presentation | bold italic | link | alignleft aligncenter alignright alignjustify | outdent indent",
+		min_height: 400,
+		max_height: 700,
 		autoresize_on_init: false,
 		autoresize_min_height: 400,
 		autoresize_max_height: 400,
@@ -61,6 +64,8 @@ $(document).ready(function () {
 		toolbar: false,
 		statusbar: false,
 		readonly: 1,
+		min_height: 400,
+		max_height: 700,
 		autoresize_on_init: false,
 		autoresize_min_height: 400,
 		autoresize_max_height: 700,
