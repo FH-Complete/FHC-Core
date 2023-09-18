@@ -1688,7 +1688,6 @@ class mitarbeiter extends benutzer
 			WHERE
 				bismelden
 				AND personalnummer > 0
-				AND personalnummer in (182, 218, 3478,20,684,24,457)
 				AND (beginn <= make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 12, 31) OR beginn is null)
 				AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende >= make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 1, 1))
 			ORDER BY uid, nachname, vorname
