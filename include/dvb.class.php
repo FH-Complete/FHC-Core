@@ -829,7 +829,8 @@ class dvb extends basis_db
 			if (ErrorHandler::isError($result))
 				return ErrorHandler::error();
 		}
-		$gebdat = str_replace("-", "", $person->geburtsdatum);
+		//$gebdat = str_replace("-", "", $person->geburtsdatum);
+		$gebdat = $person->geburtsdatum;
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
 		<matrikelnummernmeldung xmlns="http://www.brz.gv.at/datenverbund-unis">
@@ -1038,7 +1039,7 @@ class dvb extends basis_db
 			<ausstellland>'.$reisepass->ausstellland.'</ausstellland>
 			<dokumentnr>'.$reisepass->dokumentnr.'</dokumentnr>
 			<dokumenttyp>'.$reisepass->dokumenttyp.'</dokumenttyp>
-			</ernpmeldung>		
+			</ernpmeldung>
 		';
 		$data .= '</matrikelnummernmeldung>';
 
