@@ -385,6 +385,7 @@ var LeLektorDDObserver=
 
 		req.add('lehreinheit_id', lehreinheit_id);
 		req.add('mitarbeiter_uid', uid);
+		req.add('studiensemester_kurzbz', getStudiensemester());
 
 		var response = req.executePOST();
 

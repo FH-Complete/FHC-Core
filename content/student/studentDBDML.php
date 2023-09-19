@@ -4614,27 +4614,44 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
 	{
-		if(isset($_POST['person_id']))
+		if(isset($_POST['person_id']) && isset($_POST['studiensemester_kurzbz']))
 		{
-			$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
-					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER);
-			if($result = $db->db_query($qry))
+			$studiensemester = new studiensemester();
+			if ($studiensemester->load($_POST['studiensemester_kurzbz']))
 			{
-				if($row = $db->db_fetch_object($result))
+				$qry = "SELECT ss.stundensatz
+					FROM hr.tbl_stundensatz ss
+						JOIN public.tbl_mitarbeiter ON ss.uid = tbl_mitarbeiter.mitarbeiter_uid
+						JOIN public.tbl_benutzer ON(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
+					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER) ."
+						AND stundensatztyp = ". $db->db_add_param('lehre') ."
+						AND gueltig_von <= ". $db->db_add_param($studiensemester->ende) ."
+						AND (gueltig_bis => ". $db->db_add_param($studiensemester->start) ." OR gueltig_bis IS NULL)
+					ORDER BY gueltig_bis DESC NULLS FIRST, gueltig_von DESC NULLS LAST LIMIT 1
+					";
+				if($result = $db->db_query($qry))
 				{
-					$data = $row->stundensatz;
-					$return = true;
+					if($row = $db->db_fetch_object($result))
+					{
+						$data = $row->stundensatz;
+						$return = true;
+					}
+					else
+					{
+						$data = '80.00';
+						$return = true;
+					}
 				}
 				else
 				{
-					$data = '80.00';
-					$return = true;
+					$return = false;
+					$errormsg = 'Unbekannter Fehler';
 				}
 			}
 			else
 			{
 				$return = false;
-				$errormsg = 'Unbekannter Fehler';
+				$errormsg = 'Fehler beim Laden des Studiensemesters';
 			}
 		}
 	}
