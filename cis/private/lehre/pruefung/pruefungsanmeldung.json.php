@@ -419,7 +419,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 				$semCounter = $fakultaeten[1]["sem"];
 				break;
 			default:
-				$semCounter = 2;
+				$semCounter = 3;
 				break;
 			}
 		}

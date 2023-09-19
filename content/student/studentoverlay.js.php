@@ -3452,6 +3452,10 @@ function StudentZeugnisDokumentArchivieren()
 			xml = 'ausbildungsvertrag.xml.php';
 			break;
 
+		case 'AbschlussdokumentLehrgaenge':
+			xml = 'abschlussdokument_lehrgaenge.xml.php';
+			break;
+
 		default:
 			alert('Das Archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
 			return
