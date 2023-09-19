@@ -487,6 +487,7 @@ class AntragLib
 						return $result;
 					}
 
+
 					//Mail
 					$subject = $this->_ci->p->t('studierendenantrag', 'mail_subject_U_Approve');
 					$mail = [];
@@ -529,11 +530,26 @@ class AntragLib
 							$mail['ass'] = $mail['stu'] = trim($data['person']->vorname . ' ' . $data['person']->nachname);
 						}
 					}
-					$mailVorlage = 'Sancho_Mail_Antrag_U_Approve';
-					if ($data['studienbeitrag'])
-						$mailVorlage .= '_SB';
+
 					if (isset($mail['ass'])) {
 						// NOTE(chris): Sancho mail
+						$mailVorlage = 'Sancho_Mail_Antrag_U_Approve';
+
+						$result = $this->_ci->StudentModel->loadWhere(['prestudent_id'=> $data['antrag']->prestudent_id]);
+						if (hasData($result)) {
+							$student = current(getData($result));
+							$data['UID'] = $student->student_uid;
+						}
+
+						$result = $this->_ci->PersonModel->getFullName($insertvon);
+						if (isError($result))
+							return $result;
+						$approvedBy = $insertvon;
+						if (hasData($result))
+						{
+							$approvedBy = getData($result);
+						}
+
 						if (!sendSanchoMail(
 							$mailVorlage,
 							[
@@ -541,7 +557,11 @@ class AntragLib
 								'stg' => $data['studiengang']->bezeichnung,
 								'Orgform' => $data['studiengang']->orgform_kurzbz,
 								'vorname' => $data['person']->vorname,
-								'nachname' => $data['person']->nachname
+								'nachname' => $data['person']->nachname,
+								'UID' => $data['UID'],
+								'sem' => $resultAntrag->studiensemester_kurzbz,
+								'linkPdf' => base_url('content/pdfExport.php?xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&id=' . $studierendenantrag_id . '&output=pdf'),
+								'insertvon' => $approvedBy
 							],
 							$data['prestudent_status']->email,
 							$subject
@@ -551,6 +571,9 @@ class AntragLib
 					}
 					if (isset($mail['stu'])) {
 						// NOTE(chris): Sancho mail
+						$mailVorlage = 'Sancho_Mail_Antrag_U_Student';
+						if ($data['studienbeitrag'])
+							$mailVorlage .= '_SB';
 						if (!sendSanchoMail(
 							$mailVorlage,
 							[
