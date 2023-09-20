@@ -100,9 +100,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<studiengang_kz>'.$studiengang_kz.'</studiengang_kz>';
 
 		$prestudent = new prestudent($row->prestudent_id);
+		$studienplan_id = $prestudent->studienplan_id;
 		if ($prestudent->getLastStatus($row->prestudent_id, null, 'Student'))
 		{
-			$studienplan_id = $prestudent->studienplan_id;
 			$studienordnung = new studienordnung();
 			if ($studienordnung->getStudienordnungFromStudienplan($studienplan_id))
 			{
@@ -116,10 +116,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<studiengang_bezeichnung_deutsch><![CDATA['.$studiengang_bezeichnung.']]></studiengang_bezeichnung_deutsch>';
 		echo '		<studiengang_bezeichnung_englisch><![CDATA['.$studiengang_bezeichnung_englisch.']]></studiengang_bezeichnung_englisch>';
 
+		if($studienplan_id)
+		{
+			echo '		<studienplan_id><![CDATA[' . $studienplan_id . ']]></studienplan_id>';
+		}
+
 		$prestudent = new prestudent();
 		$prestudent->getFirstStatus($row->prestudent_id, 'Student');
 		$semesterNumberStart = $prestudent->ausbildungssemester;
-
 
 		//ECTS-Punkte die bei Quereinsteigern angerechnet werden
 		if($semesterNumberStart>1)
@@ -155,39 +159,60 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		//Unterrichtssprache
 		$sprache_deutsch='';
 		$sprache_englisch='';
-		if($row->mischform=='t')
+		$qry_sprache = "";
+		if($studienplan_id)
 		{
-			//Bei Mischformen, die LVs auf Orgform filtern
-			$prestudent = new prestudent();
-			$prestudent->getLastStatus($row->prestudent_id);
-			if($prestudent->orgform_kurzbz!='')
-				$orgform_kurzbz=$prestudent->orgform_kurzbz;
-			else
-				$orgform_kurzbz=$row->orgform_kurzbz;
+			//Ermittlung Sprache aus den Lehrveranstaltungen des betreffenden Studienplans
 			$qry_sprache = "
 			SELECT
 				sprache
 			FROM
 				lehre.tbl_lehrveranstaltung
+			JOIN
+				lehre.tbl_studienplan_lehrveranstaltung USING (lehrveranstaltung_id)
 			WHERE
-				studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
-				AND aktiv
-				AND orgform_kurzbz=".$db->db_add_param($orgform_kurzbz)."
+				studienplan_id = ".$db->db_add_param($studienplan_id)."
 			GROUP BY sprache
 			ORDER BY sprache DESC";
 		}
 		else
+		//fallback: Sprache aus Studiengang
 		{
-			$qry_sprache = "
-			SELECT
-				sprache
-			FROM
-				lehre.tbl_lehrveranstaltung
-			WHERE
-				studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
-				AND aktiv
-			GROUP BY sprache
-			ORDER BY sprache DESC";
+			if($row->mischform=='t')
+			{
+				//Bei Mischformen, die LVs auf Orgform filtern
+				$prestudent = new prestudent();
+				$prestudent->getLastStatus($row->prestudent_id);
+				if($prestudent->orgform_kurzbz!='')
+					$orgform_kurzbz=$prestudent->orgform_kurzbz;
+				else
+					$orgform_kurzbz=$row->orgform_kurzbz;
+				$qry_sprache = "
+				SELECT
+					sprache
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
+					AND aktiv
+					AND orgform_kurzbz=".$db->db_add_param($orgform_kurzbz)."
+				GROUP BY sprache
+				ORDER BY sprache DESC";
+			}
+			else
+			{
+
+				$qry_sprache = "
+				SELECT
+					sprache
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
+					AND aktiv
+				GROUP BY sprache
+				ORDER BY sprache DESC";
+			}
 		}
 
 		if($result_sprache = $db->db_query($qry_sprache))
