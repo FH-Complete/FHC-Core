@@ -1273,7 +1273,6 @@ $filters = array(
 					{"name": "beschreibung"},
 					{"name": "hersteller"},
 					{"name": "os"},
-					{"name": "aktiv"},
 					{"name": "softwarestatus_kurzbz"}
 				],
 				"filters": []
@@ -1299,6 +1298,30 @@ $filters = array(
 					{"name": "anmerkung"},
 					{"name": "ort_count"},
 					{"name": "software_count"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'lizenzserverVerwaltung',
+		'filter_kurzbz' => 'LizenzserverVerwaltung',
+		'description' => '{Lizenzserver Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "LizenzserverVerwaltung",
+				"columns": [
+					{"name": "lizenzserver_kurzbz"},
+					{"name": "bezeichnung"},
+					{"name": "macadresse"},
+					{"name": "ipadresse"},
+					{"name": "ansprechpartner"},
+					{"name": "anmerkung"},
+					{"name": "location"}
 				],
 				"filters": []
 			}
