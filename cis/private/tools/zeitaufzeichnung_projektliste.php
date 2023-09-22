@@ -88,7 +88,7 @@ $date = new datum();
 $ztauf = new zeitaufzeichnung();
 $projektphaseclass = new projektphase();
 
-$activitiesToIgnore = array('DienstreiseMT', 'Ersatzruhe');//aktivitaetstypen which shouldn't be added to worktime
+$activitiesToIgnore = array('DienstreiseMT');//aktivitaetstypen which shouldn't be added to worktime
 $ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$daysinmonth, $activitiesToIgnore);
 
 //objects for one projectline of list (corresponds to one day)
@@ -96,7 +96,7 @@ $projektlines = array();
 $dayStart = $dayEnd = '';
 $projektnames = $projektphasenames = $tosubtract = $allpauseranges = array();
 $projektTiteles = array();
-$activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde'];//aktivitaetstypen which should be subtracted fromworktime
+$activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde', 'Ersatzruhe'];//aktivitaetstypen which should be subtracted fromworktime
 $ztaufdata = $ztauf->result;
 $totalmonthsum = 0.00;
 $projektmonthsums = array();
@@ -133,8 +133,8 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 		$subtraction->typ = $ztaufrow->aktivitaet_kurzbz;
 		$tosubtract[] = $subtraction;
 
-		//save all pause ranges
-		if ($ztaufrow->aktivitaet_kurzbz == $activitiesToSubtract[0])
+		//save all pause ranges and treat ersatzruhe as pause
+		if ($ztaufrow->aktivitaet_kurzbz == $activitiesToSubtract[0] || $ztaufrow->aktivitaet_kurzbz == $activitiesToSubtract[4])
 		{
 			$prevpause = null;
 			if (count($allpauseranges) > 0)

@@ -1506,6 +1506,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			$pausesumme='00:00';
 			$wochensumme='00:00';
 			$extlehrearr=array();
+			$ersatzruhearr = array();
 			$elsumme = '00:00';
 			$ersumme = '00:00';
 			$ersumme_woche = '00:00';
@@ -1549,6 +1550,16 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 						if ($el["start"] > $tagesbeginn && $el["ende"] < $tagesende)
 							$elsumme = $datum_obj->sumZeit($elsumme, $el["diff"]);
 					}
+					//Korrektur um Ersatzruhezeiten innerhalb der Arbeitszeit
+					foreach($ersatzruhearr as $er)
+					{
+						if ($er["start"] > $tagesbeginn && $er["ende"] < $tagesende)
+						{
+							list($hour, $min) = explode(':', $er["diff"]);
+							$tagessaldo = $tagessaldo - ($hour * 3600 + $min * 60);
+						}
+					}
+
 					list($h2, $m2) = explode(':', $elsumme);
 					$elsumme = $h2*3600+$m2*60;
 					if ($datum->formatDatum($tag, 'Y-m-d') >= '2019-11-06')
@@ -1631,6 +1642,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					$elsumme='00:00';
 					$ersumme = '00:00';
 					$extlehrearr = array();
+					$ersatzruhearr = array();
 					$tagesbeginn = '';
 					$tagesende = '';
 					$pflichtpause = false;
@@ -1725,6 +1737,12 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				{
 					$ersumme = $datum_obj->sumZeit($ersumme, $row->diff);
 					$ersumme_woche = $datum_obj->sumZeit($ersumme_woche, $row->diff);
+
+					$ersatzruhearr[] = array(
+						'start' => $row->start,
+						'ende' => $row->ende,
+						'diff' => $row->diff
+					);
 				}
 				else
 					$tagessumme = $datum_obj->sumZeit($tagessumme, $row->diff);
@@ -1785,6 +1803,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 				if (($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
 					$tagesende = $row->ende;
+
 				if ($row->aktivitaet_kurzbz == 'LehreExtern')
 					$extlehrearr[] = array("start"=>$row->start, "ende"=>$row->ende, "diff"=>$row->diff);
 				}
