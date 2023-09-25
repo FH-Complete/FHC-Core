@@ -34,6 +34,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/addon.class.php');
 require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -62,6 +63,17 @@ $errormsg='';
 $message='';
 $error=false;
 $mlAbgeschickt = '';
+
+//Phrasen
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
+//MaxDatum für BisFeld berechnen: Default 2 Jahre, über Config veränderbar
+$maxPeriodeBisDatum = '+2 years';
+
+if (defined('MAXTIME_ENDEDATUM') && MAXTIME_ENDEDATUM != '') {
+	$maxPeriodeBisDatum = MAXTIME_ENDEDATUM;
+}
 
 //prüfen, ob addon casetime aktiviert ist
 $addon_obj = new addon();
@@ -205,6 +217,26 @@ if(isset($_POST['save']))
 	if(!$berechtigt)
 		die('Sie haben keine Berechtigung für diese Aktion');
 
+	//Validierungen Felder Bis-Datum und Von-Datum
+	if($vondatum > $bisdatum)
+	{
+		$errormsg = $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
+		$error=true;
+	}
+
+	//check if bis-Datum > MaxDatum
+	$von = new DateTime($vondatum);
+	$bis = new DateTime($bisdatum);
+	$vonTime = strtotime($von->format('Y-m-d'));
+	$maxBisDatum = strtotime($maxPeriodeBisDatum, $vonTime);
+	$maxBisDatumDate = new DateTime($maxPeriodeBisDatum);
+
+	if (strtotime($bis->format('Y-m-d')) > $maxBisDatum)
+	{
+		$error=true;
+		$errormsg = $p->t('zeitsperre/bisDatumGroesserMax',date('d.m.Y', $maxBisDatum)).' ';
+	}
+
 	//Speichern der Daten
 	$zeitsperre = new zeitsperre();
 
@@ -224,6 +256,8 @@ if(isset($_POST['save']))
 		$zeitsperre->new=true;
 		$zeitsperre->mitarbeiter_uid=$uid;
 	}
+
+
 
 	if(!$error)
 	{
