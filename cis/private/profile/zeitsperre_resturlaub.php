@@ -79,20 +79,14 @@ else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GE
 else
 	$gesperrt_bis = '2015-08-31';
 
-$todayDate = new DateTime();
-$today = strtotime($todayDate->format('Y-m-d'));
-
 //MaxDatum für BisFeld berechnen: Default 2 Jahre, über Config veränderbar
 $maxPeriodeBisDatum = '+2 years';
+$diffTageMax = $maxPeriodeBisDatum *365;
 
 if (defined('CIS_MAXTIME_ENDEDATUM') && CIS_MAXTIME_ENDEDATUM != '') {
 	$maxPeriodeBisDatum = CIS_MAXTIME_ENDEDATUM;
 }
-$maxBisDatum = strtotime($maxPeriodeBisDatum, $today);
-$maxBisDatumDate = new DateTime($maxPeriodeBisDatum);
-$maxInterval = $todayDate->diff($maxBisDatumDate);
 
-$diffTageMax = $maxInterval->days;
 echo "<input type ='hidden' value='$diffTageMax' id=maxdiff>";
 
 //Stundentabelleholen
@@ -110,7 +104,7 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script-->
+<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 <script src="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 <link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
 <link href="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
@@ -487,6 +481,13 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 
 	//check if bis-Datum > MaxDatum
 	$bis = new DateTime($bisdatum);
+
+/*	$todayDate = new DateTime();
+	$today = strtotime($todayDate->format('Y-m-d'));*/
+
+	$vonDate = new DateTime($vondatum);
+	$von = strtotime($vonDate->format('Y-m-d'));
+	$maxBisDatum = strtotime($maxPeriodeBisDatum, $von);
 
 	if (strtotime($bis->format('Y-m-d')) > $maxBisDatum)
 	{
