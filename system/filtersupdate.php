@@ -520,7 +520,29 @@ $filters = array(
 					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
 					{"name": "Nachricht"},
-					{"name": "Kaution"}
+					{"name": "Kaution"},
+					{"name": "LockUser"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'aufgenommen',
+		'filter_kurzbz' => 'InfoCenterAufgenommenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Aufgenommen - Lehrgänge",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"}
 				],
 				"filters": []
 			}

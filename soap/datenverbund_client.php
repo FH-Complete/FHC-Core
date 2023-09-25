@@ -230,7 +230,7 @@ if ($getPersonData)
 		printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
 		printrow('nachname', 'Nachname', $nachname, '', 255);
 		printrow('vorname', 'Vorname', $vorname, '', 30);
-		printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
+		printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYY-MM-DD', 10);
 		printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
 		printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
     }
