@@ -89,9 +89,9 @@ if (defined('CIS_MAXTIME_ENDEDATUM') && CIS_MAXTIME_ENDEDATUM != '') {
 	$maxPeriodeBisDatum = CIS_MAXTIME_ENDEDATUM;
 }
 $maxBisDatum = strtotime($maxPeriodeBisDatum, $today);
-
-$maxBisDatumDate = new DateTime($maxBisDatum);
+$maxBisDatumDate = new DateTime($maxPeriodeBisDatum);
 $maxInterval = $todayDate->diff($maxBisDatumDate);
+
 $diffTageMax = $maxInterval->days;
 echo "<input type ='hidden' value='$diffTageMax' id=maxdiff>";
 
