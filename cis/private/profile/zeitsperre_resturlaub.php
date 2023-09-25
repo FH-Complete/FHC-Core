@@ -230,7 +230,7 @@ function checkdatum()
 		return false;
 	}
 
-	var Datum, Tag, Monat, Jahr, vonDatum, bisDatum, diff, diffmax;
+	var Datum, Tag, Monat, Jahr, vonDatum, bisDatum, vonDatumDate, bisDatumDate, diff, diffTime, diffmax;
 
 	Datum = document.getElementById('vondatum').value;
 	Tag = Datum.substring(0, 2);
@@ -245,6 +245,7 @@ function checkdatum()
 	Jahr = Datum.substring(6, 10);
 
 	vonDatum = Jahr + '' + Monat + '' + Tag;
+	vonDatumDate = Jahr + '-' + Monat + '-' + Tag;
 
 	Datum = document.getElementById('bisdatum').value;
 	Tag = Datum.substring(0, 2);
@@ -257,8 +258,13 @@ function checkdatum()
 
 	Jahr = Datum.substring(6, 10);
 	bisDatum = Jahr + '' + Monat + '' + Tag;
+	bisDatumDate = Jahr + '-' + Monat + '-' + Tag;
 
-	diff = bisDatum - vonDatum;
+	bisDatumDate = new Date(bisDatumDate);
+	vonDatumDate = new Date(vonDatumDate);
+
+	diffTime = bisDatumDate.getTime() - vonDatumDate.getTime();
+	diff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 	diffmax = $("#maxdiff").val();
 
 	if (vonDatum > bisDatum) {
