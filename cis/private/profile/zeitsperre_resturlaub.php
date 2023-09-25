@@ -81,12 +81,11 @@ else
 
 //MaxDatum für BisFeld berechnen: Default 2 Jahre, über Config veränderbar
 $maxPeriodeBisDatum = '+2 years';
-$diffTageMax = $maxPeriodeBisDatum *365;
 
 if (defined('CIS_MAXTIME_ENDEDATUM') && CIS_MAXTIME_ENDEDATUM != '') {
 	$maxPeriodeBisDatum = CIS_MAXTIME_ENDEDATUM;
 }
-
+$diffTageMax = $maxPeriodeBisDatum *365;
 echo "<input type ='hidden' value='$diffTageMax' id=maxdiff>";
 
 //Stundentabelleholen
