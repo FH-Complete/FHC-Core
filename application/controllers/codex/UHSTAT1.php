@@ -321,7 +321,7 @@ class UHSTAT1 extends FHC_Controller
 
 		$this->NationModel->addSelect("nation_code, $nationTextFieldName AS nation_text");
 		$this->NationModel->addOrder("nation_text");
-		$nationRes = $this->NationModel->load();
+		$nationRes = $this->NationModel->loadWhere('sperre IS NULL OR sperre = FALSE');
 
 		if (isError($nationRes)) return $nationRes;
 
