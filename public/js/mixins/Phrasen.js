@@ -44,6 +44,24 @@ function getValueForLoadedPhrase(category, phrase, params) {
 	return result;
 }
 
+// Composable (wrapper for mixin)
+export function usePhrasen() {
+
+	function t_ref(category, phrase, params) {
+		return phrasen.t_ref(category, phrase, params);
+	}
+
+	function t(category, phrase, params) {
+		return phrasen.t(category, phrase, params);
+	}
+
+	return {
+		t_ref,
+		t,
+	}
+
+}
+
 const phrasen = {
 	t_ref(category, phrase, params) {
 		if (params === undefined && (
