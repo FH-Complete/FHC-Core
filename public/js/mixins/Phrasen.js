@@ -44,23 +44,6 @@ function getValueForLoadedPhrase(category, phrase, params) {
 	return result;
 }
 
-// Composable (wrapper for mixin)
-export function usePhrasen() {
-
-	function t_ref(category, phrase, params) {
-		return phrasen.t_ref(category, phrase, params);
-	}
-
-	function t(category, phrase, params) {
-		return phrasen.t(category, phrase, params);
-	}
-
-	return {
-		t_ref,
-		t,
-	}
-
-}
 
 const phrasen = {
 	t_ref(category, phrase, params) {
@@ -76,8 +59,9 @@ const phrasen = {
 			return '';
 		}
 		if (!categories[category]) {
-//			if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined)
-//				categories[category] = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
+
+			//if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined)
+			//	categories[category] = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
 			
 			if (!categories[category] || Object.keys(categories[category]).length === 0) {
 				categories[category] = undefined;
@@ -100,4 +84,17 @@ export default {
 			p: phrasen
 		}
 	}
+}
+
+// Composable (wrapper for mixin)
+export function usePhrasen() {
+
+	function t(category, phrase, params) {
+		return phrasen.t(category, phrase, params);
+	}
+
+	return {		
+		t,
+	}
+
 }
