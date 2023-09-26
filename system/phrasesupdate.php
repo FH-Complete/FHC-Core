@@ -18795,7 +18795,29 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	// Personalverwaltung begin
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'vbform',
+		'phrase' => 'oder',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'oder',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'or',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Personalverwaltung end
 );
 
 
