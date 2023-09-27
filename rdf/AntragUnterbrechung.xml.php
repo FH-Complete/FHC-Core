@@ -56,15 +56,18 @@ if (!$db->db_query($query) || !$db->db_num_rows())
 <antraege>
 	<?php while($row = $db->db_fetch_object()) { ?>
 	<antrag>
-		<studiengang><?=$row->bezeichnung;?></studiengang>
-		<organisationsform><?=$row->bezeichnung_mehrsprachig;?> </organisationsform>
-		<name><?= trim($row->vorname. " " . $row->nachname);?></name>
-		<personenkz><?=$row->matrikelnr;?></personenkz>
-		<studienjahr><?php echo $row->studienjahr_kurzbz;?></studienjahr>
-		<semester><?=$row->semester;?></semester>
-		<grund><?=$row->grund;?></grund>
-		<returndate><?=(new DateTime($row->datum_wiedereinstieg))->format('d.m.Y');?></returndate>
-		<createdate><?= (new DateTime($row->datum))->format('d.m.Y');?></createdate>
+        <name><![CDATA[<?= trim($row->vorname . $row->nachname); ?>]]></name>
+        <studiengang><![CDATA[<?= $row->bezeichnung; ?>]]></studiengang>
+        <organisationsform><![CDATA[<?= $row->bezeichnung_mehrsprachig; ?>]]></organisationsform>
+        <personenkz><![CDATA[<?= $row->matrikelnr; ?>]]></personenkz>
+        <studienjahr><![CDATA[<?= $row->studienjahr_kurzbz; ?>]]></studienjahr>
+        <studiensemester><![CDATA[<?= $row->studiensemester_kurzbz; ?>]]></studiensemester>
+        <semester><![CDATA[<?= $row->semester; ?>]]></semester>
+        <grund><![CDATA[<?= $row->grund; ?>]]></grund>
+		<returndate><![CDATA[<?=(new DateTime($row->datum_wiedereinstieg))->format('d.m.Y');?>]]></returndate>
+		<createdate><![CDATA[<?= (new DateTime($row->datum))->format('d.m.Y');?>]]></createdate>
 	</antrag>
 	<?php } ?>
 </antraege>
+
+
