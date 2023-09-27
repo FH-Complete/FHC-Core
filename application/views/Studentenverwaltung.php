@@ -10,7 +10,8 @@
 		'tabulator5' => true,
 		'phrases' => [],
 		'customCSSs' => [
-			'public/css/Studentenverwaltung.css'
+			'public/css/Studentenverwaltung.css',
+			'public/css/components/vue-datepicker.css'
 		],
 		'customJSModules' => [
 			'public/js/apps/Studentenverwaltung.js'

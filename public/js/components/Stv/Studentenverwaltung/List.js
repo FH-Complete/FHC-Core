@@ -81,7 +81,6 @@ export default {
 			this.$refs.table.tabulator.on("dataProcessed", () => {
 				let rows = this.$refs.table.tabulator.getRows();
 				if (rows.length && rows.length == 1) {
-					console.log();
 					this.$refs.table.tabulator.selectRow();
 				}
 			});
