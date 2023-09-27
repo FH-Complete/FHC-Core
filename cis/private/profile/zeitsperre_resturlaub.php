@@ -79,14 +79,23 @@ else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GE
 else
 	$gesperrt_bis = '2015-08-31';
 
-//MaxDatum für BisFeld berechnen: Default 2 Jahre, über Config veränderbar
-$maxPeriodeBisDatum = '+2 years';
+//MaxDatum für BisFeld berechnen: Default 730 Tage (2 Jahre), über Config veränderbar
+$maxPeriodeBisDatum = '+730 days';
 
-if (defined('CIS_MAXTIME_ENDEDATUM') && CIS_MAXTIME_ENDEDATUM != '') {
+if (defined('CIS_MAXTIME_ENDEDATUM') && CIS_MAXTIME_ENDEDATUM != '' && CIS_MAXTIME_ENDEDATUM != 0) {
 	$maxPeriodeBisDatum = CIS_MAXTIME_ENDEDATUM;
 }
-$diffTageMax = $maxPeriodeBisDatum *365;
-echo "<input type ='hidden' value='$diffTageMax' id=maxdiff>";
+
+if (strpos($maxPeriodeBisDatum,'day') != false)
+		$diffTageMax = $maxPeriodeBisDatum * 1;
+elseif (strpos($maxPeriodeBisDatum,'week')!= false)
+	$diffTageMax = $maxPeriodeBisDatum * 7;
+elseif (strpos($maxPeriodeBisDatum,'month')!= false)
+	$diffTageMax = $maxPeriodeBisDatum * 30;
+elseif (strpos($maxPeriodeBisDatum,'year') != false)
+	$diffTageMax = $maxPeriodeBisDatum * 365;
+else
+	$diffTageMax = 730;
 
 //Stundentabelleholen
 if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
@@ -271,7 +280,7 @@ function checkdatum()
 			return false;
 		else
 			return true;
-	} else if (diff >= diffmax){
+	} else if (diff >= diffmax) {
 		alert('<?php echo $p->t('zeitsperre/bisDatumGroesserMax');?> ');
 		document.getElementById('bisdatum').focus();
 		return false;
@@ -1013,6 +1022,7 @@ echo "<td class='tdvertical'>";
 echo $content_form;
 echo '</td>';
 echo "<td class='tdvertical'><div id='resturlaub' style='visibility:hidden;'></div></td>";
+echo "<input type ='hidden' value='$diffTageMax' id=maxdiff>";
 echo '</tr><tr><td colspan=2>';
 echo $content_table;
 echo '</td>';
