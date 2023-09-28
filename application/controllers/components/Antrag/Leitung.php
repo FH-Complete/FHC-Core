@@ -101,7 +101,10 @@ class Leitung extends FHC_Controller
 				$this->output->set_status_header(500);
 				return $this->outputJson('Internal Server Error');
 			}
-			$antraege = getData($result);
+			if(hasData($result))
+			{
+			    $antraege = getData($result);
+			}
 		}
 
 		$this->outputJson($antraege);
