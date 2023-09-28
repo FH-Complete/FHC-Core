@@ -60,8 +60,8 @@ const phrasen = {
 		}
 		if (!categories[category]) {
 
-			//if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined)
-			//	categories[category] = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
+			if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined)
+				categories[category] = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
 			
 			if (!categories[category] || Object.keys(categories[category]).length === 0) {
 				categories[category] = undefined;
