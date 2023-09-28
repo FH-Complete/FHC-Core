@@ -289,4 +289,7 @@ define ('DEFAULT_LEHRMODUS','regulaer');
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
 
+//Max-Ende-Datum für Zeitsperren (Parameter 1: Intervall serverside, Parameter 2: Tage clientside)
+define('MAXTIME_FROM_ENDEDATUM', ['+2 years', 730]);
+
 ?>

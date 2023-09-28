@@ -81,21 +81,12 @@ else
 
 //MaxDatum für BisFeld berechnen: Default 730 Tage (2 Jahre), über Config veränderbar
 $maxPeriodeBisDatum = '+730 days';
+$diffTageMax = 730;
 
-if (defined('CIS_MAXTIME_ENDEDATUM') && CIS_MAXTIME_ENDEDATUM != '' && CIS_MAXTIME_ENDEDATUM != 0) {
-	$maxPeriodeBisDatum = CIS_MAXTIME_ENDEDATUM;
+if (defined('MAXTIME_FROM_ENDEDATUM') && MAXTIME_FROM_ENDEDATUM != '') {
+	$maxPeriodeBisDatum = MAXTIME_FROM_ENDEDATUM[0];
+	$diffTageMax = MAXTIME_FROM_ENDEDATUM[1];
 }
-
-if (strpos($maxPeriodeBisDatum,'day') != false)
-		$diffTageMax = $maxPeriodeBisDatum * 1;
-elseif (strpos($maxPeriodeBisDatum,'week')!= false)
-	$diffTageMax = $maxPeriodeBisDatum * 7;
-elseif (strpos($maxPeriodeBisDatum,'month')!= false)
-	$diffTageMax = $maxPeriodeBisDatum * 30;
-elseif (strpos($maxPeriodeBisDatum,'year') != false)
-	$diffTageMax = $maxPeriodeBisDatum * 365;
-else
-	$diffTageMax = 730;
 
 //Stundentabelleholen
 if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))

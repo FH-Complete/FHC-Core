@@ -71,8 +71,8 @@ $p = new phrasen($sprache);
 //MaxDatum für BisFeld berechnen: Default 2 Jahre, über Config veränderbar
 $maxPeriodeBisDatum = '+2 years';
 
-if (defined('MAXTIME_ENDEDATUM') && MAXTIME_ENDEDATUM != '') {
-	$maxPeriodeBisDatum = MAXTIME_ENDEDATUM;
+if (defined('MAXTIME_FROM_ENDEDATUM') && MAXTIME_FROM_ENDEDATUM != '') {
+	$maxPeriodeBisDatum = MAXTIME_FROM_ENDEDATUM[0];
 }
 
 //prüfen, ob addon casetime aktiviert ist
