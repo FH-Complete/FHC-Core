@@ -80,6 +80,10 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$prestudentstatus = new prestudent();
 	$prestudentstatus->getLastStatus($student->prestudent_id,'','Student');
 
+	$prestudent = new prestudent();
+	$prestudent->getLastStatus($student->prestudent_id);
+	$last_status = $prestudent->status_kurzbz;
+
 	if($studiensemester_aktuell!=$prestudentstatus->studiensemester_kurzbz)
 		$studiensemester_aktuell = $prestudentstatus->studiensemester_kurzbz;
 
@@ -154,6 +158,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "	<studienerfolg>";
 	$xml .= "		<logopath>".DOC_ROOT."skin/images/</logopath>";
 	$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
+	$xml .= "		<last_prestudentstatus>".$last_status."</last_prestudentstatus>";
 	$xml .= "		<studiensemester_aktuell>".$studiensemester_aktuell."</studiensemester_aktuell>";
 	$xml .= "		<studiensemester_aktuell_beschreibung>".(($studiensemester->beschreibung != NULL) ? $studiensemester->beschreibung : $studiensemester_aktuell)."</studiensemester_aktuell_beschreibung>";
 	$xml .=	"		<semester>".$row->semester."</semester>";
