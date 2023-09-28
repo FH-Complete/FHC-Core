@@ -283,7 +283,8 @@ class Students extends FHC_Controller
 		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid');
 		$this->PrestudentModel->addJoin(
 			'public.tbl_studentlehrverband v',
-			'v.student_uid=s.student_uid AND v.studiensemester_kurzbz=' . $this->PrestudentModel->escape($studiensemester_kurzbz)
+			'v.student_uid=s.student_uid AND v.studiensemester_kurzbz=' . $this->PrestudentModel->escape($studiensemester_kurzbz),
+			'LEFT'
 		);
 
 		$this->PrestudentModel->addSelect('p.person_id');
