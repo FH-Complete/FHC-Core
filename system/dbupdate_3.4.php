@@ -40,6 +40,7 @@ require_once('dbupdate_3.4/27107_vilesci_erfassung_abwesenheiten_reinigung.php')
 require_once('dbupdate_3.4/24913_tabelle_raumtyp_neues_attribut_aktiv.php');
 require_once('dbupdate_3.4/28089_plausichecks_in_extension_hinzufuegen.php');
 require_once('dbupdate_3.4/29133_einzelne_studiengaenge_aus_issuechecks_ausnehmen.php');
+require_once('dbupdate_3.4/27351_digitalisierung_formulare.php');
 require_once('dbupdate_3.4/30537_anmerkung_in_tbl_rolleberechtigung.php');
 require_once('dbupdate_3.4/30181_tabelle_anrechnung_neue_attribute_fuer_begruendung.php');
 require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');

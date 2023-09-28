@@ -200,6 +200,10 @@ class dokument_export
 		chdir($this->temp_folder);
 		file_put_contents($this->temp_folder . '/content.xml', $contentbuffer);
 
+		if ($this->xml_data->firstChild->tagName == 'error') {
+			$this->errormsg = $this->xml_data->firstChild->textContent;
+			return false;
+		}
 		// styles.xml erstellen
 		if(!is_null($this->styles_xsl))
 		{

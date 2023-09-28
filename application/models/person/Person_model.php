@@ -337,4 +337,17 @@ class Person_model extends DB_Model
 
 		return $this->execQuery($qry, array($person_id, $person_id, $person_id));
 	}
+
+	public function loadPrestudent($prestudent_id)
+	{
+		$this->addSelect($this->dbTable . '.*');
+		
+		$this->addJoin('public.tbl_prestudent p', 'person_id');
+
+		$this->addLimit(1);
+
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
+	}
 }

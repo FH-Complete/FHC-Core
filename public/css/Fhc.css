@@ -1,0 +1,83 @@
+.text-prewrap {
+  white-space: pre-line;
+}
+
+.accordion-button-primary {
+  background-color: #e7f1ff;
+  color: #0c63e4;
+}
+.accordion-button-primary:not(.collapsed) {
+  background-color: #cfe2ff;
+  color: #0a58ca;
+}
+
+.accordion-button-secondary {
+  background-color: #f0f1f2;
+  color: #616971;
+}
+.accordion-button-secondary:not(.collapsed) {
+  background-color: #e2e3e5;
+  color: #565e64;
+}
+
+.accordion-button-success {
+  background-color: #e8f3ee;
+  color: #177a4c;
+}
+.accordion-button-success:not(.collapsed) {
+  background-color: #d1e7dd;
+  color: #146c43;
+}
+
+.accordion-button-info {
+  background-color: #e7fafe;
+  color: #0cb6d8;
+}
+.accordion-button-info:not(.collapsed) {
+  background-color: #cff4fc;
+  color: #0aa2c0;
+}
+
+.accordion-button-warning {
+  background-color: #fff9e6;
+  color: #e6ae06;
+}
+.accordion-button-warning:not(.collapsed) {
+  background-color: #fff3cd;
+  color: #cc9a06;
+}
+
+.accordion-button-danger {
+  background-color: #fcebec;
+  color: #c6303e;
+}
+.accordion-button-danger:not(.collapsed) {
+  background-color: #f8d7da;
+  color: #b02a37;
+}
+
+.accordion-button-light {
+  background-color: #fefeff;
+  color: #dfe0e1;
+}
+.accordion-button-light:not(.collapsed) {
+  background-color: #fefefe;
+  color: #c6c7c8;
+}
+
+.accordion-button-dark {
+  background-color: #e9e9ea;
+  color: #1e2125;
+}
+.accordion-button-dark:not(.collapsed) {
+  background-color: #d3d3d4;
+  color: #1a1e21;
+}
+
+.tabulator-edit-list .tabulator-edit-list-item {
+  background-color: white;
+}
+.tabulator-edit-list .tabulator-edit-list-item:hover,
+.tabulator-edit-list .tabulator-edit-list-item.active {
+  color: white;
+}
