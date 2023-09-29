@@ -1168,7 +1168,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Break',
+				'text' => 'Cancel',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2084,6 +2084,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'person',
+		'phrase' => 'adressen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adressen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'addresses',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
 		'phrase' => 'nation',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -2136,6 +2156,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Post code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'plz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'PLZ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'zip',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -18858,6 +18898,126 @@ array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'gemeinde',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinde',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'municipality',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'heimatadresse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Heimatadresse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'home address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'zustelladresse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zustelladresse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'postal address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'kontaktinformation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktinformation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'contact information',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'zustellung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zustellung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delivery',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'abweichenderEmpfaenger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abweich.Empf. (c/o)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'dissenting recipient (c/o)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
 		'phrase' => 'stammdatenGespeichert',
@@ -18892,6 +19052,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Close master data? Changes will be lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kontaktdatenGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktdaten gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact data saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kontaktdatenGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktdaten gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact data deleted',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19012,6 +19212,86 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Employee data saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'adresseGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Address saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'adresseGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Address deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kannNichtGeloeschtWerden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'kann nicht gelöscht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'cannot be deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'wirklichLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'wirklich löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete',
 				'description' => '',
 				'insertvon' => 'system'
 			)
