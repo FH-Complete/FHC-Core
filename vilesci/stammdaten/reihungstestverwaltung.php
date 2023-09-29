@@ -1257,7 +1257,7 @@ if(isset($_GET['excel']))
 				form.find("input[type=hidden]").remove();
 				$.each(elements, function(index, item)
 				{
-					let person_id = $(this).closest('tr').find('td.clm_person_id').text();
+					var person_id = $(this).closest('tr').find('td.clm_person_id').text();
 					form.append("<input type='hidden' name='person_id[]' value='" + person_id + "'>");
 				});
 				form.submit();
