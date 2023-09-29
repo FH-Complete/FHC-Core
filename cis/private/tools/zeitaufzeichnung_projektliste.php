@@ -316,7 +316,7 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 				$projektlines[$day]->arbeitszeit -= $subtraction->diff;
 				$pauseSubtracted += $subtraction->diff;
 			}
-			elseif ($subtraction->typ == $activitiesToSubtract[1] && $subtraction->start >= $dayStart && $subtraction->ende <= $dayEnd)
+			elseif (($subtraction->typ == $activitiesToSubtract[1] || $subtraction->typ == $activitiesToSubtract[4]) && $subtraction->start >= $dayStart && $subtraction->ende <= $dayEnd)
 			{
 				$projektlines[$day]->arbeitszeit -= $subtraction->diff;
 				$lehreExternExists = true;
