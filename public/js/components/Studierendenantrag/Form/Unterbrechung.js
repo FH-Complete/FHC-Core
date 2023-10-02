@@ -277,11 +277,13 @@ export default {
 					<div v-if="data.studierendenantrag_id">
 						{{datumWsFormatted}}
 					</div>
-					<div v-else-if="stsem === null" class="form-control">
-						{{p.t('ui/select_studiensemester')}}
+					<div v-else-if="stsem === null">
+						<select class="form-select" disabled>
+							<option selected>{{p.t('ui/select_studiensemester')}}</option>
+						</select>
 					</div>
 					<div v-else>
-						<select v-model="currentWiedereinstieg" class="form-control">
+						<select v-model="currentWiedereinstieg" class="form-select">
 							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start">
 								{{sem.studiensemester_kurzbz}}
 							</option>
