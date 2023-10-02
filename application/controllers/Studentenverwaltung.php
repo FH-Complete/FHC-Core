@@ -14,6 +14,13 @@ class Studentenverwaltung extends FHC_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('Studentenverwaltung');
+		$this->load->library('AuthLib');
+		$this->load->library('PermissionLib');
+
+		$this->load->view('Studentenverwaltung', [
+			'permissions' => [
+				'student/bpk' => $this->permissionlib->isBerechtigt('student/bpk')
+			]
+		]);
 	}
 }

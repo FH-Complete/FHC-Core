@@ -22,7 +22,7 @@
 ?>
 
 	<div id="main">
-		<router-view active-addons="<?= defined('ACTIVE_ADDONS') ? ACTIVE_ADDONS : ''; ?>" cis-root="<?= CIS_ROOT; ?>"></router-view>
+		<router-view active-addons="<?= defined('ACTIVE_ADDONS') ? ACTIVE_ADDONS : ''; ?>" cis-root="<?= CIS_ROOT; ?>" :permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"></router-view>
 	</div>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>

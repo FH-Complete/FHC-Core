@@ -8,6 +8,10 @@ export default {
 		FormUploadImage
 	},
 	inject: {
+		showBpk: {
+			from: 'hasBpkPermission',
+			default: false
+		},
 		showZugangscode: {
 			from: 'activeAddonBewerbung',
 			default: false
@@ -53,17 +57,6 @@ export default {
 				.catch(err => {
 					console.error(err.response.data || err.message);
 				});
-			/*CoreRESTClient
-				.get('components/stv/Student/getStudent/' + n.uid)
-				.then(result => result.data)
-				.then(result => {
-					// TODO(chris): IMPLEMENT HERE!
-					console.log(result);
-					this.studentIn = result;
-				})
-				.catch(err => {
-					console.error(err.response.data || err.message);
-				});*/
 		},
 		save() {
 			CoreRESTClient
@@ -98,9 +91,6 @@ export default {
 		this.updateStudent(this.student);
 	},
 	//TODO(chris): Felder student_uid, person_id sperren, Personenkz
-	/**
-	 * BPK: isBerechtigt 'student/bpk'
-	 */
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 		<fieldset>
@@ -115,8 +105,8 @@ export default {
 					<div v-if="showZugangscode" class="col-sm-3">
 						<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat" target="_blank">{{data.zugangscode}}</a>
 					</div>
-					<label for="stv-details-bpk" class="col-sm-1 col-form-label">BPK</label>
-					<div class="col-sm-3">
+					<label v-if="showBpk" for="stv-details-bpk" class="col-sm-1 col-form-label">BPK</label>
+					<div v-if="showBpk" class="col-sm-3">
 						<input id="stv-details-bpk" type="text" class="form-control" v-model="data.bpk">
 					</div>
 				</div>

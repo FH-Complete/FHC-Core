@@ -31,11 +31,13 @@ export default {
 		VerticalSplit
 	},
 	props: {
+		permissions: Object,
 		cisRoot: String,
 		activeAddons: String // semicolon separated list of active addons
 	},
 	provide() {
 		return {
+			hasBpkPermission: this.permissions['student/bpk'],
 			cisRoot: this.cisRoot,
 			activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung')
 		}
