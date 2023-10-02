@@ -30,6 +30,16 @@ export default {
 		StvDetails,
 		VerticalSplit
 	},
+	props: {
+		cisRoot: String,
+		activeAddons: String // semicolon separated list of active addons
+	},
+	provide() {
+		return {
+			cisRoot: this.cisRoot,
+			activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung')
+		}
+	},
 	data() {
 		return {
 			selected: [],

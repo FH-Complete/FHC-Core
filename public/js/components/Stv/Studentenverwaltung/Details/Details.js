@@ -7,6 +7,15 @@ export default {
 		VueDatePicker,
 		FormUploadImage
 	},
+	inject: {
+		showZugangscode: {
+			from: 'activeAddonBewerbung',
+			default: false
+		},
+		cisRoot: {
+			from: 'cisRoot'
+		}
+	},
 	props: {
 		student: Object
 	},
@@ -89,7 +98,9 @@ export default {
 		this.updateStudent(this.student);
 	},
 	//TODO(chris): Felder student_uid, person_id sperren, Personenkz
-	//TODO(chris): Logik Feld Zugangscode
+	/**
+	 * BPK: isBerechtigt 'student/bpk'
+	 */
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 		<fieldset>
@@ -98,7 +109,11 @@ export default {
 				<div class="row mb-3">
 					<label for="stv-details-person_id" class="col-sm-1 col-form-label">Person ID</label>
 					<div class="col-sm-3">
-						<input id="stv-details-person_id" type="text" class="form-control" v-model="data.person_id">
+						<input id="stv-details-person_id" type="text" class="form-control" v-model="data.person_id" disabled>
+					</div>
+					<label v-if="showZugangscode" for="stv-details-zugangscode" class="col-sm-1 col-form-label">Zugangscode</label>
+					<div v-if="showZugangscode" class="col-sm-3">
+						<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat" target="_blank">{{data.zugangscode}}</a>
 					</div>
 					<label for="stv-details-bpk" class="col-sm-1 col-form-label">BPK</label>
 					<div class="col-sm-3">

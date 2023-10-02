@@ -26,6 +26,10 @@ class Student extends FHC_Controller
 		$this->StudentModel->addSelect('v.gruppe');
 		$this->StudentModel->addSelect('b.alias');
 
+		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
+			$this->StudentModel->addSelect("(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung ORDER BY kontakt_id LIMIT 1) AS email_privat", false);
+		}
+
 		$this->StudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid');
 		$this->StudentModel->addJoin('public.tbl_studentlehrverband v', 'b.uid = v.student_uid AND v.studiensemester_kurzbz = ' . $this->StudentModel->escape($studiensemester_kurzbz), 'LEFT');
 		$this->StudentModel->addJoin('public.tbl_person p', 'person_id');
