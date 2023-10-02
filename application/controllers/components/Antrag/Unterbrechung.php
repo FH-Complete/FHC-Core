@@ -86,7 +86,7 @@ class Unterbrechung extends FHC_Controller
 
 		$data = getData($result);
 
-		$data->studiensemester = $this->antraglib->getSemesterForUnterbrechung($data->studiengang_kz, $data->studiensemester_kurzbz, $data->semester);
+		$data->studiensemester = $this->antraglib->getSemesterForUnterbrechung($data->studiensemester_kurzbz);
 
 		$this->outputJsonSuccess($data);
 	}

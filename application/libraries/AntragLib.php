@@ -1421,16 +1421,11 @@ class AntragLib
 		return success($resultDetails);
 	}
 
-	public function getSemesterForUnterbrechung($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester)
+	public function getSemesterForUnterbrechung($studiensemester_kurzbz)
 	{
-		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$semester = [];
-
-		$result = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester);
-		if (!hasData($result))
-			return $semester;
 
 		$result = $this->_ci->StudiensemesterModel->getNextFrom($studiensemester_kurzbz);
 		if (!hasData($result))
@@ -1441,10 +1436,6 @@ class AntragLib
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'wiedereinstieg' => [$nextSem]
 		];
-
-		$result = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $nextSem->studiensemester_kurzbz, $ausbildungssemester+1);
-		if (!hasData($result))
-			return $semester;
 
 		$result = $this->_ci->StudiensemesterModel->getNextFrom($nextSem->studiensemester_kurzbz);
 		if (!hasData($result))
