@@ -2,12 +2,19 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+
 class Student extends FHC_Controller
 {
 	public function __construct()
 	{
 		// TODO(chris): access!
 		parent::__construct();
+
+		// Load language phrases
+		$this->loadPhrases([
+			'ui'
+		]);
 	}
 
 	public function get($prestudent_id)
@@ -94,6 +101,7 @@ class Student extends FHC_Controller
 			$this->outputJson(getData($result) ?: []);
 		}
 	}
+
 	public function save($prestudent_id)
 	{
 		// TODO(chris): stdSem from Variable
@@ -104,7 +112,18 @@ class Student extends FHC_Controller
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 
-		$data = json_decode(utf8_encode($this->input->raw_input_stream), true);
+		$this->load->library('form_validation');
+
+		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
+			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
+		]);
+		// TODO(chris): other validations?
+
+		if ($this->form_validation->run() == false) {
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
 
 		$result = $this->StudentModel->loadWhere(['prestudent_id' =>$prestudent_id]);
 		if (isError($result)) {
@@ -128,30 +147,17 @@ class Student extends FHC_Controller
 			$person_id = $person->person_id;
 		}
 
-		$array_allowed_props = ['verband','semester','gruppe'];
-		$update = array();
-		foreach ($array_allowed_props as $prop)
+		$array_allowed_props_lehrverband = ['verband', 'semester', 'gruppe'];
+		$update_lehrverband = array();
+		foreach ($array_allowed_props_lehrverband as $prop)
 		{
-			if(isset($data[$prop])){
-				$update[$prop] = $data[$prop];
+			$val = $this->input->post($prop);
+			if ($val !== null) {
+				$update_lehrverband[$prop] = $val;
 			}
-		}
-		//TODO(chris): form validation verband
-		if (count($update))
-		{
-			if($uid === null)
-			{
-				$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-				return $this->outputJson("Kein/e StudentIn vorhanden!");
-			}
-			$this->StudentlehrverbandModel->update([
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'student_uid' => $uid],
-				$update
-			);
 		}
 
-		$array_allowed_props = [
+		$array_allowed_props_person = [
 			'anrede',
 			'bpk',
 			'titelpre',
@@ -160,7 +166,7 @@ class Student extends FHC_Controller
 			'vorname',
 			'vornamen',
 			'wahlname',
-			'geburtsdatum',
+			'gebdatum',
 			'gebort',
 			'geburtsnation',
 			'svnr',
@@ -174,52 +180,83 @@ class Student extends FHC_Controller
 			'anmerkung',
 			'homepage'
 		];
-		$update = array();
-		foreach ($array_allowed_props as $prop)
+		$update_person = array();
+		foreach ($array_allowed_props_person as $prop)
 		{
-			if(isset($data[$prop])){
-				$update[$prop] = $data[$prop];
+			$val = $this->input->post($prop);
+			if ($val !== null) {
+				$update_person[$prop] = $val;
 			}
 		}
 
-		if (count($update))
+		$array_allowed_props_student = ['matrikelnr'];
+		$update_student = array();
+		foreach ($array_allowed_props_student as $prop)
 		{
-			if($person_id === null)
-			{
-				$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-				return $this->outputJson("Keine Person vorhanden!");
+			$val = $this->input->post($prop);
+			if ($val !== null) {
+				$update_student[$prop] = $val;
 			}
-			$this->PersonModel->update(
+		}
+
+		if (count($update_lehrverband) + count($update_student) && $uid === null) {
+			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
+			// TODO(chris): phrase
+			return $this->outputJson("Kein/e StudentIn vorhanden!");
+		}
+		if (count($update_person) && $person_id === null) {
+			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
+			// TODO(chris): phrase
+			return $this->outputJson("Keine Person vorhanden!");
+		}
+
+		if (count($update_lehrverband))
+		{
+			$result = $this->StudentlehrverbandModel->update([
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $uid
+			], $update_lehrverband);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+		}
+
+		if (count($update_person))
+		{
+			$result = $this->PersonModel->update(
 				$person_id,
-				$update
+				$update_person
 			);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
 		}
 
 
-		$array_allowed_props = ['matrikelnr'];
-		$update = array();
-		foreach ($array_allowed_props as $prop)
+		if (count($update_student))
 		{
-			if(isset($data[$prop])){
-				$update[$prop] = $data[$prop];
-			}
-		}
-		if (count($update))
-		{
-			if ($uid === null) {
-				$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-				return $this->outputJson("Kein/e StudentIn vorhanden!");
-			}
-			$this->StudentModel->update(
+			$result = $this->StudentModel->update(
 				[$uid],
-				$update
+				$update_student
 			);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
 		}
 
+		$this->outputJsonSuccess(true);
+	}
 
-
-
-
-
+	public function isValidDate($date)
+	{
+		try {
+		    new DateTime($date);
+		} catch (Exception $e) {
+			return false;
+		}
+		return true;
 	}
 }

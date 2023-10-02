@@ -31,15 +31,18 @@ export default {
 		VerticalSplit
 	},
 	props: {
+		config: Object,
 		permissions: Object,
 		cisRoot: String,
 		activeAddons: String // semicolon separated list of active addons
 	},
 	provide() {
 		return {
-			hasBpkPermission: this.permissions['student/bpk'],
 			cisRoot: this.cisRoot,
-			activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung')
+			activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung'),
+			configGenerateAlias: this.config.generateAlias,
+			hasBpkPermission: this.permissions['student/bpk'],
+			hasAliasPermission: this.permissions['student/alias']
 		}
 	},
 	data() {
