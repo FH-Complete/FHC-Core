@@ -1027,30 +1027,18 @@ if(isset($_GET['excel']))
 						$("#"+v.id).checkboxes('toggle');
 						e.preventDefault();
 						if ($("input.chkbox:checked").size() > 0)
-						{
 							$("#mailSendButton").html('Mail an markierte Personen senden');
-							$("#msgSendButton").html('Message an markierte Personen senden');
-						}
 						else
-						{
 							$("#mailSendButton").html('Mail an alle senden');
-							$("#msgSendButton").html('Message an alle senden');
-						}
 					});
 
 					$("#uncheck_"+v.id).on('click', function(e) {
 						$("#"+v.id).checkboxes('uncheck');
 						e.preventDefault();
 						if ($("input.chkbox:checked").size() > 0)
-						{
 							$("#mailSendButton").html('Mail an markierte Personen senden');
-							$("#msgSendButton").html('Message an markierte Personen senden');
-						}
 						else
-						{
 							$("#mailSendButton").html('Mail an alle senden');
-							$("#msgSendButton").html('Message an alle senden');
-						}
 					});
 
 					$("#"+v.id).checkboxes('range', true);
@@ -1126,15 +1114,9 @@ if(isset($_GET['excel']))
 				$('.chkbox').change(function()
 				{
 					if ($("input.chkbox:checked").size() > 0)
-					{
 						$("#mailSendButton").html('Mail an markierte Personen senden');
-						$("#msgSendButton").html('Message an markierte Personen senden');
-					}
 					else
-					{
 						$("#mailSendButton").html('Mail an alle senden');
-						$("#msgSendButton").html('Message an alle senden');
-					}
 				});
 
 				$('#toggle_bearbeitenForm').click(function()
@@ -1250,17 +1232,21 @@ if(isset($_GET['excel']))
 			{
 				// Wenn Checkboxen markiert sind, an diese senden, sonst an alle
 				if ($("input.chkbox:checked").size() > 0)
-					var elements = $("input.chkbox:checked");
-				else
-					var elements = $("input.chkbox");
-				var form = $("#sendMsgForm");
-				form.find("input[type=hidden]").remove();
-				$.each(elements, function(index, item)
 				{
-					var person_id = $(this).closest('tr').find('td.clm_person_id').text();
-					form.append("<input type='hidden' name='person_id[]' value='" + person_id + "'>");
-				});
-				form.submit();
+					var elements = $("input.chkbox:checked");
+					var form = $("#sendMsgForm");
+					form.find("input[type=hidden]").remove();
+					$.each(elements, function(index, item)
+					{
+						var person_id = $(this).closest('tr').find('td.clm_person_id').text();
+						form.append("<input type='hidden' name='person_id[]' value='" + person_id + "'>");
+					});
+					form.submit();
+				}
+				else
+				{
+					alert("Keine Personen markiert");
+				}
 			}
 		</script>
 		<style type="text/css">
@@ -2619,7 +2605,7 @@ if($reihungstest_id!='')
 	//echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
 	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle BewerberInnen senden</a>';
 	echo '<form id="sendMsgForm" method="post" action="'. APP_ROOT .'index.ci.php/system/messages/Messages/writeTemplate" target="_blank" style="display:inline-block">
-			<a class="buttongreen" href="javascript:void(0)" onclick="SendMessage()" id="msgSendButton">Message an alle BewerberInnen senden</a>
+			<a class="buttongreen" href="javascript:void(0)" onclick="SendMessage()" id="msgSendButton">Message an markierte BewerberInnen senden</a>
 			</form>';
 }
 if (defined('CAMPUS_NAME') && CAMPUS_NAME == 'FH Technikum Wien')
