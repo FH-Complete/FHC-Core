@@ -50,35 +50,28 @@ export default {
 			selected: [],
 			searchbaroptions: {
 				types: [
-					"person",
 					"student",
 					"prestudent"
 				],
 				actions: {
-					person: {
+					student: {
 						defaultaction: {
 							type: "link",
 							action: function(data) { 
-								return data.profil;
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/studentenverwaltung/student/' + data.uid;
 							}
 						},
 						childactions: [
-							{
-								"label": "testchildaction1",
-								"icon": "fas fa-check-circle",
-								"type": "function",
-								"action": function(data) { 
-									alert('person testchildaction 01 ' + JSON.stringify(data)); 
-								}
-							},
-							{
-								"label": "testchildaction2",
-								"icon": "fas fa-file-csv",
-								"type": "function",
-								"action": function(data) { 
-									alert('person testchildaction 02 ' + JSON.stringify(data)); 
-								}
+						]
+					},
+					prestudent: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/studentenverwaltung/prestudent/' + data.prestudent_id;
 							}
+						},
+						childactions: [
 						]
 					}
 				}
@@ -102,6 +95,10 @@ export default {
 		if (this.$route.params.id) {
 			this.$refs.stvList.updateUrl('components/stv/students/uid/' + this.$route.params.id);
 		}
+		if (this.$route.params.prestudent_id) {
+			this.$refs.stvList.updateUrl('components/stv/students/prestudent/' + this.$route.params.prestudent_id);
+		}
+
 	},
 	template: `
 	<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">

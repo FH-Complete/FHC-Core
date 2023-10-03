@@ -34,6 +34,7 @@ class Students extends FHC_Controller
 	 * /(studiengang_kz)/(org_form)/(semester)/(verband)/(gruppe)
 	 * 														=> getStudents
 	 * /uid/(student_uid)									=> getStudent
+	 * /prestudent/(prestudent_id)                          => getPrestudent
 	 *
 	 * @param string		$method
 	 * @param array			$params				(optional)
@@ -66,6 +67,9 @@ class Students extends FHC_Controller
 
 		if ($method == 'uid' && $count == 1)
 			return $this->getStudent($params[0]);
+
+		if ($method == 'prestudent' && $count == 1)
+			return $this->getPrestudent($params[0]);
 
 		if (is_numeric($params[0])) {
 			$sem = $params[0];
@@ -334,6 +338,82 @@ class Students extends FHC_Controller
 			's.student_uid' => $student_uid
 		]);
 		
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		} else {
+			$this->outputJson(getData($result) ?: []);
+		}
+	}
+
+	/**
+	 * @param string		$prestudent_id
+	 *
+	 * @return void
+	 */
+	protected function getPrestudent($prestudent_id)
+	{
+		// TODO(chris): stdSem from Variable
+		$studiensemester_kurzbz='SS2023';
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$this->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
+		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
+		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid', 'LEFT');
+		$this->PrestudentModel->addJoin(
+			'public.tbl_studentlehrverband v',
+			'v.student_uid=s.student_uid AND v.studiensemester_kurzbz=' . $this->PrestudentModel->escape($studiensemester_kurzbz),
+			'LEFT'
+		);
+
+		$this->PrestudentModel->addSelect('p.person_id');
+		$this->PrestudentModel->addSelect('tbl_prestudent.prestudent_id');
+		$this->PrestudentModel->addSelect('b.uid');
+		$this->PrestudentModel->addSelect('titelpre');
+		$this->PrestudentModel->addSelect('titelpost');
+		$this->PrestudentModel->addSelect('vorname');
+		$this->PrestudentModel->addSelect('wahlname');
+		$this->PrestudentModel->addSelect('vornamen');
+		$this->PrestudentModel->addSelect('geschlecht');
+		$this->PrestudentModel->addSelect('nachname');
+		$this->PrestudentModel->addSelect('gebdatum');
+		$this->PrestudentModel->addSelect('tbl_prestudent.anmerkung');
+		$this->PrestudentModel->addSelect('ersatzkennzeichen');
+		$this->PrestudentModel->addSelect('svnr');
+		$this->PrestudentModel->addSelect('s.matrikelnr');
+		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
+		$this->PrestudentModel->addSelect('v.semester');
+		$this->PrestudentModel->addSelect('v.verband');
+		$this->PrestudentModel->addSelect('v.gruppe');
+		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
+		$this->PrestudentModel->addSelect('aufmerksamdurch_kurzbz');
+		$this->PrestudentModel->addSelect('mentor');
+		$this->PrestudentModel->addSelect('b.aktiv AS bnaktiv');
+		$this->PrestudentModel->addSelect(
+			"(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung LIMIT 1) AS email_privat",
+			false
+		);
+		$this->PrestudentModel->addSelect(
+			"(SELECT rt_gesamtpunkte AS punkte FROM public.tbl_prestudent WHERE prestudent_id=s.prestudent_id) AS punkte",
+			false
+		);
+		$this->PrestudentModel->addSelect('tbl_prestudent.dual');
+		$this->PrestudentModel->addSelect('tbl_prestudent.reihungstest_id');
+		$this->PrestudentModel->addSelect('tbl_prestudent.anmeldungreihungstest');
+		$this->PrestudentModel->addSelect('p.matr_nr');
+		$this->PrestudentModel->addSelect('tbl_prestudent.gsstudientyp_kurzbz');
+		$this->PrestudentModel->addSelect('tbl_prestudent.aufnahmegruppe_kurzbz');
+		$this->PrestudentModel->addSelect('tbl_prestudent.priorisierung');
+		$this->PrestudentModel->addSelect('p.zugangscode');
+		$this->PrestudentModel->addSelect('p.bpk');
+
+		$where = [];
+
+		$result = $this->PrestudentModel->loadWhere([
+			'tbl_prestudent.prestudent_id' => $prestudent_id
+		]);
+
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			$this->outputJson(getError($result));

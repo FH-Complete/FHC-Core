@@ -22,26 +22,27 @@ class Student extends FHC_Controller
 		// TODO(chris): stdSem from Variable
 		$studiensemester_kurzbz='SS2023';
 
-		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
-		$this->StudentModel->addSelect('p.*');
-		$this->StudentModel->addSelect('tbl_student.student_uid');
-		$this->StudentModel->addSelect('matrikelnr');
-		$this->StudentModel->addSelect('b.aktiv');
-		$this->StudentModel->addSelect('v.semester');
-		$this->StudentModel->addSelect('v.verband');
-		$this->StudentModel->addSelect('v.gruppe');
-		$this->StudentModel->addSelect('b.alias');
+		$this->PrestudentModel->addSelect('p.*');
+		$this->PrestudentModel->addSelect('s.student_uid');
+		$this->PrestudentModel->addSelect('matrikelnr');
+		$this->PrestudentModel->addSelect('b.aktiv');
+		$this->PrestudentModel->addSelect('v.semester');
+		$this->PrestudentModel->addSelect('v.verband');
+		$this->PrestudentModel->addSelect('v.gruppe');
+		$this->PrestudentModel->addSelect('b.alias');
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
-			$this->StudentModel->addSelect("(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung ORDER BY kontakt_id LIMIT 1) AS email_privat", false);
+			$this->PrestudentModel->addSelect("(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung ORDER BY kontakt_id LIMIT 1) AS email_privat", false);
 		}
 
-		$this->StudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid');
-		$this->StudentModel->addJoin('public.tbl_studentlehrverband v', 'b.uid = v.student_uid AND v.studiensemester_kurzbz = ' . $this->StudentModel->escape($studiensemester_kurzbz), 'LEFT');
-		$this->StudentModel->addJoin('public.tbl_person p', 'person_id');
+		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
+		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid', 'LEFT');
+		$this->PrestudentModel->addJoin('public.tbl_studentlehrverband v', 'b.uid = v.student_uid AND v.studiensemester_kurzbz = ' . $this->PrestudentModel->escape($studiensemester_kurzbz), 'LEFT');
+		$this->PrestudentModel->addJoin('public.tbl_person p', 'p.person_id = tbl_prestudent.person_id');
 
-		$result = $this->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			$this->outputJson(getError($result));
@@ -119,7 +120,8 @@ class Student extends FHC_Controller
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
 			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
 		]);
-		// TODO(chris): other validations?
+
+		$this->form_validation->set_rules('semester', 'Semester', 'integer');
 
 		if ($this->form_validation->run() == false) {
 			return $this->outputJsonError($this->form_validation->error_array());
@@ -259,4 +261,5 @@ class Student extends FHC_Controller
 		}
 		return true;
 	}
+
 }

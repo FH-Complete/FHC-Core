@@ -189,22 +189,19 @@ export default {
 			});
 		this.updateStudent(this.student);
 	},
-	mounted() {
-		console.log();
-	},
 	//TODO(chris): Geburtszeit? Anzahl der Kinder?
 	template: `
 	<div ref="form" class="stv-details-details h-100 pb-3">
-		<fieldset>
+		<fieldset class="overflow-hidden">
 			<legend>Person</legend>
 			<template v-if="data">
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-person_id" class="col-sm-1 col-form-label">Person ID</label>
 					<div class="col-sm-3">
 						<input id="stv-details-person_id" type="text" class="form-control" v-model="data.person_id" disabled>
 					</div>
 					<label v-if="showZugangscode" for="stv-details-zugangscode" class="col-sm-1 col-form-label">Zugangscode</label>
-					<div v-if="showZugangscode" class="col-sm-3">
+					<div v-if="showZugangscode" class="col-sm-3 align-self-center">
 						<span class="form-text">
 							<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat" target="_blank">{{data.zugangscode}}</a>
 						</span>
@@ -214,7 +211,7 @@ export default {
 						<input id="stv-details-bpk" type="text" class="form-control" v-model="data.bpk" maxlength="28">
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-anrede" class="col-sm-1 col-form-label">Anrede</label>
 					<div class="col-sm-3">
 						<input id="stv-details-anrede" type="text" class="form-control" v-model="data.anrede" maxlength="16">
@@ -228,7 +225,7 @@ export default {
 						<input id="stv-details-titelpost" type="text" class="form-control" v-model="data.titelpost" maxlength="32">
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-nachname" class="col-sm-1 col-form-label">Nachname</label>
 					<div class="col-sm-3">
 						<input id="stv-details-nachname" type="text" class="form-control" v-model="data.nachname" maxlength="64">
@@ -242,13 +239,13 @@ export default {
 						<input id="stv-details-vornamen" type="text" class="form-control" v-model="data.vornamen" maxlength="128">
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-wahlname" class="col-sm-1 col-form-label">Wahlname</label>
 					<div class="col-sm-3">
 						<input id="stv-details-wahlname" type="text" class="form-control" v-model="data.wahlname" maxlength="128">
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="dp-input-stv-details-gebdatum" class="col-sm-1 col-form-label">Geburtsdatum</label>
 					<div class="col-sm-3">
 						<vue-date-picker id="stv-details-gebdatum" :input-class-name="gebDatumIsInvalid ? 'form-control is-invalid' : (gebDatumIsValid ? 'form-control is-valid' : 'form-control')" uid="stv-details-gebdatum" v-model="data.gebdatum" :clearable="false" no-today auto-apply :enable-time-picker="false" format="dd.MM.yyyy" preview-format="dd.MM.yyyy"></vue-date-picker>
@@ -266,7 +263,7 @@ export default {
 						</select>
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-svnr" class="col-sm-1 col-form-label">SVNR</label>
 					<div class="col-sm-3">
 						<input id="stv-details-svnr" type="text" class="form-control" v-model="data.svnr" maxlength="16">
@@ -276,7 +273,7 @@ export default {
 						<input id="stv-details-ersatzkennzeichen" type="text" class="form-control" v-model="data.ersatzkennzeichen" maxlength="10">
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-staatsbuergerschaft" class="col-sm-1 col-form-label">Staatsbürgerschaft</label>
 					<div class="col-sm-3">
 						<select id="stv-details-staatsbuergerschaft" class="form-control" v-model="data.staatsbuergerschaft">
@@ -296,7 +293,7 @@ export default {
 						</select>
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-geschlecht" class="col-sm-1 col-form-label">Geschlecht</label>
 					<div class="col-sm-3">
 						<select id="stv-details-geschlecht" class="form-control" v-model="data.geschlecht">
@@ -329,10 +326,10 @@ export default {
 				Loading...
 			</div>
 		</fieldset>
-		<fieldset>
+		<fieldset v-if="data?.student_uid" class="overflow-hidden">
 			<legend>StudentIn</legend>
 			<template v-if="data">
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-student_uid" class="col-sm-1 col-form-label">UID</label>
 					<div class="col-sm-3">
 						<input id="stv-details-student_uid" type="text" class="form-control" v-model="data.student_uid" disabled>
@@ -342,13 +339,13 @@ export default {
 						<input id="stv-details-personenkennzeichen" type="text" class="form-control" v-model="data.matrikelnr" disabled>
 					</div>
 					<label for="stv-details-aktiv" class="col-sm-1 col-form-label">Aktiv</label>
-					<div class="col-sm-3">
+					<div class="col-sm-3 align-self-center">
 						<div class="form-check">
 							<input id="stv-details-aktiv" type="checkbox" class="form-check-input" v-model="data.aktiv">
 						</div>
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-semester" class="col-sm-1 col-form-label">Semester</label>
 					<div class="col-sm-3">
 						<input id="stv-details-semester" type="text" class="form-control" v-model="data.semester" maxlength="2">
@@ -362,20 +359,21 @@ export default {
 						<input id="stv-details-gruppe" type="text" class="form-control" v-model="data.gruppe" maxlength="1">
 					</div>
 				</div>
-				<div class="row mb-3 align-items-center">
+				<div class="row mb-3">
 					<label for="stv-details-alias" class="col-sm-1 col-form-label">Alias</label>
 					<div class="col-sm-3">
 						<input id="stv-details-alias" type="text" class="form-control" v-model="data.alias" :disabled="aliasNotAllowed">
 					</div>
 				</div>
-				<div>
-					<button type="button" class="btn btn-primary" @click="save" :disabled="!changedLength">Speichern</button>
-				</div>
+
 			</template>
 			<div v-else>
 				Loading...
 			</div>
 		</fieldset>
+		<div>
+			<button type="button" class="btn btn-primary" @click="save" :disabled="!changedLength">Speichern</button>
+		</div>
 		<pv-toast ref="responseToast" style="z-index:9999"></pv-toast>
 	</div>`
 };

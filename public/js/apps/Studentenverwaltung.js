@@ -26,7 +26,8 @@ const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(),
 	routes: [
 		{ path: `/${ciPath}/studentenverwaltung`, component: FhcStudentenverwaltung },
-		{ path: `/${ciPath}/studentenverwaltung/:id`, component: FhcStudentenverwaltung }
+		{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id`, component: FhcStudentenverwaltung },
+		{ path: `/${ciPath}/studentenverwaltung/student/:id`, component: FhcStudentenverwaltung }
 	]
 });
 
