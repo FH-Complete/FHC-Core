@@ -16,11 +16,15 @@ class Studentenverwaltung extends FHC_Controller
 	{
 		$this->load->library('AuthLib');
 		$this->load->library('PermissionLib');
+		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 
 		$this->load->view('Studentenverwaltung', [
 			'permissions' => [
 				'student/bpk' => $this->permissionlib->isBerechtigt('student/bpk'),
 				'student/alias' => $this->permissionlib->isBerechtigt('student/alias')
+			],
+			'variables' => [
+				'semester_aktuell' => $this->variablelib->getVar('semester_aktuell')
 			]
 		]);
 	}

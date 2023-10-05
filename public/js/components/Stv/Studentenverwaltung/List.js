@@ -78,22 +78,23 @@ export default {
 			this.$emit('update:selected', data);
 		},
 		updateUrl(url) {
-			this.$refs.table.tabulator.on("dataProcessed", () => {
-				let rows = this.$refs.table.tabulator.getRows();
-				if (rows.length && rows.length == 1) {
-					this.$refs.table.tabulator.selectRow();
-				}
-			});
-			
+			if (url)
+				url = CoreRESTClient._generateRouterURI(url);
 			if (!this.$refs.table.tableBuilt)
 				this.$refs.table.tabulator.on("tableBuilt", () => {
-					this.$refs.table.tabulator.setData(CoreRESTClient._generateRouterURI(url));
+					this.$refs.table.tabulator.setData(url);
 				});
 			else
-				this.$refs.table.tabulator.setData(CoreRESTClient._generateRouterURI(url));
+				this.$refs.table.tabulator.setData(url);
 		}
 	},
 	mounted() {
+		this.$refs.table.tabulator.on("dataProcessed", () => {
+			let rows = this.$refs.table.tabulator.getRows();
+			if (rows.length && rows.length == 1) {
+				this.$refs.table.tabulator.selectRow();
+			}
+		});
 	},
 	template: `
 	<div class="stv-list h-100 pt-3">

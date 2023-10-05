@@ -8,6 +8,9 @@ class Students extends FHC_Controller
 	{
 		// TODO(chris): access!
 		parent::__construct();
+
+		$this->load->library('AuthLib');
+		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 	}
 
 	/**
@@ -169,8 +172,7 @@ class Students extends FHC_Controller
 	 */
 	protected function getStudents($studiengang_kz, $semester = null, $verband = null, $gruppe = null, $gruppe_kurzbz = null, $orgform_kurzbz = null)
 	{
-		// TODO(chris): stdSem from Variable
-		$studiensemester_kurzbz='SS2023';
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 		
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
@@ -277,8 +279,7 @@ class Students extends FHC_Controller
 	 */
 	protected function getStudent($student_uid)
 	{
-		// TODO(chris): stdSem from Variable
-		$studiensemester_kurzbz='SS2023';
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
@@ -353,8 +354,7 @@ class Students extends FHC_Controller
 	 */
 	protected function getPrestudent($prestudent_id)
 	{
-		// TODO(chris): stdSem from Variable
-		$studiensemester_kurzbz='SS2023';
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 

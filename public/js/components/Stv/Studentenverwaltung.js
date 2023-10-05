@@ -20,17 +20,20 @@ import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
 import StvDetails from "./Studentenverwaltung/Details.js";
+import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
 
 
 export default {
 	components: {
 		FhcSearchbar,
+		VerticalSplit,
 		StvVerband,
 		StvList,
 		StvDetails,
-		VerticalSplit
+		StvStudiensemester
 	},
 	props: {
+		defaultSemester: String,
 		config: Object,
 		permissions: Object,
 		cisRoot: String,
@@ -89,6 +92,9 @@ export default {
 		},
 		searchfunction(searchsettings) {
 			return Vue.$fhcapi.Search.search(searchsettings);  
+		},
+		studiensemesterChanged() {
+			this.$refs.stvList.updateUrl();
 		}
 	},
 	mounted() {
@@ -112,7 +118,8 @@ export default {
 				<div class="offcanvas-header justify-content-end px-1 d-md-none">
 					<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 				</div>
-				<stv-verband @select-verband="onSelectVerband"></stv-verband>
+				<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+				<stv-studiensemester :default="defaultSemester" @changed="studiensemesterChanged"></stv-studiensemester>
 			</nav>
 			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 				<vertical-split>

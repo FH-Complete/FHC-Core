@@ -26,6 +26,7 @@
 
 	<div id="main">
 		<router-view
+			default-semester="<?= $variables['semester_aktuell']; ?>"
 			active-addons="<?= defined('ACTIVE_ADDONS') ? ACTIVE_ADDONS : ''; ?>"
 			cis-root="<?= CIS_ROOT; ?>"
 			:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
