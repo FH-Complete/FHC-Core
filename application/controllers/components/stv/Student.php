@@ -11,6 +11,10 @@ class Student extends FHC_Controller
 		// TODO(chris): access!
 		parent::__construct();
 
+		// Load Libraries
+		$this->load->library('AuthLib');
+		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+
 		// Load language phrases
 		$this->loadPhrases([
 			'ui'
@@ -19,8 +23,7 @@ class Student extends FHC_Controller
 
 	public function get($prestudent_id)
 	{
-		// TODO(chris): stdSem from Variable
-		$studiensemester_kurzbz='SS2023';
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
@@ -105,8 +108,7 @@ class Student extends FHC_Controller
 
 	public function save($prestudent_id)
 	{
-		// TODO(chris): stdSem from Variable
-		$studiensemester_kurzbz='SS2023';
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('crm/Student_model', 'StudentModel');

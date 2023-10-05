@@ -9,6 +9,7 @@ class Students extends FHC_Controller
 		// TODO(chris): access!
 		parent::__construct();
 
+		// Load Libraries
 		$this->load->library('AuthLib');
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 	}
