@@ -79,13 +79,11 @@ else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GE
 else
 	$gesperrt_bis = '2015-08-31';
 
-//MaxDatum für BisFeld berechnen: Default 730 Tage (2 Jahre), über Config veränderbar
-$maxPeriodeBisDatum = '+730 days';
-$diffTageMax = 730;
+//Default-Wert für Max-Intervall in Tagen für Zeitsperre, über Config veränderbar
+$maxDauerZS = 730;
 
-if (defined('MAXTIME_FROM_ENDEDATUM') && MAXTIME_FROM_ENDEDATUM != '') {
-	$maxPeriodeBisDatum = MAXTIME_FROM_ENDEDATUM[0];
-	$diffTageMax = MAXTIME_FROM_ENDEDATUM[1];
+if (defined('CIS_ZEITSPERREN_MAX_DAUER') && CIS_ZEITSPERREN_MAX_DAUER != '') {
+	$maxDauerZS = CIS_ZEITSPERREN_MAX_DAUER;
 }
 
 //Stundentabelleholen
@@ -258,13 +256,14 @@ function checkdatum()
 
 	diffTime = bisDatumDate.getTime() - vonDatumDate.getTime();
 	diff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-	diffmax = $("#maxdiff").val();
+	diffmax = <?php echo $maxDauerZS ;?>
 
 	if (vonDatum > bisDatum) {
 		alert('<?php echo $p->t('zeitsperre/vonDatum');?> ' + document.getElementById('vondatum').value + ' <?php echo $p->t('zeitsperre/istGroesserAlsBisDatum');?> ' + document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
 		return false;
-	} else if (diff > 14 && diff < diffmax) {
+	}
+	else if (diff > 14 && diff < diffmax) {
 		Check = confirm('<?php echo $p->t('zeitaufzeichnung/zeitraumAuffallendHoch');?>');
 		document.getElementById('bisdatum').focus();
 		if (Check == false)
@@ -276,7 +275,6 @@ function checkdatum()
 		document.getElementById('bisdatum').focus();
 		return false;
 	}
-
 	return true;
 }
 
@@ -478,20 +476,15 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$error_msg .= $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
 	}
 
-	//check if bis-Datum > MaxDatum
+	//check if bis-Datum zu weit in der Zukunft
 	$bis = new DateTime($bisdatum);
+	$von = new DateTime($vondatum);
 
-/*	$todayDate = new DateTime();
-	$today = strtotime($todayDate->format('Y-m-d'));*/
-
-	$vonDate = new DateTime($vondatum);
-	$von = strtotime($vonDate->format('Y-m-d'));
-	$maxBisDatum = strtotime($maxPeriodeBisDatum, $von);
-
-	if (strtotime($bis->format('Y-m-d')) > $maxBisDatum)
+	$intervall = $bis->diff($von);
+	if ($intervall->days >= $maxDauerZS)
 	{
 		$error=true;
-		$error_msg .= $p->t('zeitsperre/bisDatumGroesserMax',date('d.m.Y', $maxBisDatum)).' ';
+		$error_msg = $p->t('zeitsperre/bisDatumGroesserMax');
 	}
 
 	//von-datum pruefen TODO
@@ -1013,7 +1006,6 @@ echo "<td class='tdvertical'>";
 echo $content_form;
 echo '</td>';
 echo "<td class='tdvertical'><div id='resturlaub' style='visibility:hidden;'></div></td>";
-echo "<input type ='hidden' value='$diffTageMax' id=maxdiff>";
 echo '</tr><tr><td colspan=2>';
 echo $content_table;
 echo '</td>';

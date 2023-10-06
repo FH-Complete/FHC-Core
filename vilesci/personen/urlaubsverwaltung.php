@@ -68,13 +68,12 @@ $mlAbgeschickt = '';
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
-//MaxDatum für BisFeld berechnen: Default 2 Jahre, über Config veränderbar
-$maxPeriodeBisDatum = '+2 years';
+//Default-Wert für Max-Intervall in Tagen für Zeitsperre, über Config veränderbar
+$maxDauerZS = 730;
 
-if (defined('MAXTIME_FROM_ENDEDATUM') && MAXTIME_FROM_ENDEDATUM != '') {
-	$maxPeriodeBisDatum = MAXTIME_FROM_ENDEDATUM[0];
+if (defined('CIS_ZEITSPERREN_MAX_DAUER') && CIS_ZEITSPERREN_MAX_DAUER != '') {
+	$maxDauerZS = CIS_ZEITSPERREN_MAX_DAUER;
 }
-
 //prüfen, ob addon casetime aktiviert ist
 $addon_obj = new addon();
 $addoncasetime = $addon_obj->checkActiveAddon("casetime");
@@ -224,17 +223,15 @@ if(isset($_POST['save']))
 		$error=true;
 	}
 
-	//check if bis-Datum > MaxDatum
+	//Check if Bisdatum zu weit in der Zukunft
 	$von = new DateTime($vondatum);
 	$bis = new DateTime($bisdatum);
-	$vonTime = strtotime($von->format('Y-m-d'));
-	$maxBisDatum = strtotime($maxPeriodeBisDatum, $vonTime);
-	$maxBisDatumDate = new DateTime($maxPeriodeBisDatum);
 
-	if (strtotime($bis->format('Y-m-d')) > $maxBisDatum)
+	$intervall = $bis->diff($von);
+	if ($intervall->days > $maxDauerZS)
 	{
 		$error=true;
-		$errormsg = $p->t('zeitsperre/bisDatumGroesserMax',date('d.m.Y', $maxBisDatum)).' ';
+		$errormsg = $p->t('zeitsperre/bisDatumGroesserMax');
 	}
 
 	//Speichern der Daten
