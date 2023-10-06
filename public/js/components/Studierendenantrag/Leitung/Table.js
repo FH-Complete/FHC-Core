@@ -86,8 +86,8 @@ export default {
 		this.table = new Tabulator(this.$refs.table, {
 			placeholder:"Keine zu bearbeitenden Datensätze",
 			movableColumns: true,
-			height: '50vh',
-			layout: "fitDataStretch", // TODO(chris): wont work when changed
+			maxHeight: '50vh',
+			layout: "fitDataFill", // TODO(chris): wont work when changed
 			ajaxURL: this.ajaxUrl,
 			persistence: { // NOTE(chris): do not store column titles
 				sort: true, //persist column sorting
@@ -214,6 +214,10 @@ export default {
 				}
 			}, {
 				field: 'actions',
+				frozen: true,
+				title: this.p.t('ui', 'aktion'),
+				headerFilter: false,
+				headerSort: false,				
 				formatter: (cell, formatterParams, onRendered) => {
 					let container = document.createElement('div'),
 						data = cell.getData();
@@ -325,9 +329,11 @@ export default {
 					}
 
 					// TODO(chris): not yet perfect
+					/*
 					onRendered(() => {
 						cell.getColumn().setWidth(true);
 					});
+					*/
 
 					return container;
 				}

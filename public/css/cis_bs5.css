@@ -59,8 +59,18 @@ h6, .h6 {
 
 .fhc-container {
 	padding: 0 15px;
+	max-width: 100%;
 }
 
 .tabulator {
 	font-size: var(--bs-body-font-size);
+}
+
+.fhc-container .tabulator .tabulator-frozen {
+	background-color: #fff !important;
+}
+
+.fhc-container .tabulator .tabulator-header .tabulator-col,
+.fhc-container .tabulator-row .tabulator-cell {
+	border-right: 1px solid #dee2e6;
 }
