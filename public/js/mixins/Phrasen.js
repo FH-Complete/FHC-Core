@@ -59,13 +59,18 @@ const phrasen = {
 			return '';
 		}
 		if (!categories[category]) {
-
-			if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined)
-				categories[category] = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
+			
+			var initialval = '';
+  			if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined) {
+  				var category = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
+				if(category[phrase] !== undefined ) {
+					initialval = category[phrase];
+				}
+			}
 			
 			if (!categories[category] || Object.keys(categories[category]).length === 0) {
 				categories[category] = undefined;
-				let val = Vue.ref('');
+				let val = Vue.ref(initialval);
 				loadLazy(category, val, phrase, params);
 				return val;
 			}
