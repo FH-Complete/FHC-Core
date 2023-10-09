@@ -66,11 +66,30 @@ h6, .h6 {
 	font-size: var(--bs-body-font-size);
 }
 
-.fhc-container .tabulator .tabulator-frozen {
-	background-color: #fff !important;
+.fhc-container .tabulator {
+	border-left: 1px solid #dee2e6;
+}
+.fhc-container .tabulator .tabulator-row {
+	border-bottom: none;
+}
+.fhc-container .tabulator .tabulator-row .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row .tabulator-cell {
+	border-bottom: 1px solid #dee2e6;
+}
+.fhc-container .tabulator .tabulator-row.tabulator-row-even {
+	background-color: transparent;
+}
+.fhc-container .tabulator .tabulator-headers .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-cell {
+	background-color: #fff;
+}
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-cell {
+	background-color: #f2f2f2;
 }
 
-.fhc-container .tabulator .tabulator-header .tabulator-col,
-.fhc-container .tabulator-row .tabulator-cell {
+.fhc-container .tabulator .tabulator-col,
+.fhc-container .tabulator .tabulator-cell {
 	border-right: 1px solid #dee2e6;
 }
