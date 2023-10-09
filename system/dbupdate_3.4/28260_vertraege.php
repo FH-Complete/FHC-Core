@@ -7,12 +7,12 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 	if ($db->db_num_rows($result) == 0)
 	{
 		$qry = "
-		CREATE SCHEMA hr;
+		CREATE SCHEMA IF NOT EXISTS hr;
 		COMMENT ON SCHEMA hr IS E'Personalverwaltung';
 
 		ALTER SCHEMA hr OWNER TO fhcomplete;
 
-		CREATE EXTENSION pgcrypto;
+		CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 		CREATE TABLE hr.tbl_dienstverhaeltnis
 		(
