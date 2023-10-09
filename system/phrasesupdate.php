@@ -22402,6 +22402,46 @@ array(
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
+		'phrase' => 'funktionGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Job function saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'funktionGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Job function deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
 		'phrase' => 'sachaufwandNochNichtGespeichert',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -22414,6 +22454,27 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Close material expenses? Changes will be lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'funktionNochNichtGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion schließen? Geänderte Daten gehen verloren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Close job function? Changes will be lost!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -22439,6 +22500,8 @@ array(
 			)
 		)
 	),
+
+	
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
@@ -22537,6 +22600,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'company',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'dv_unternehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'DV/Unternehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ec/company',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -22918,6 +23001,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Attribution',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'zuordnung_taetigkeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zuordnung/Tätigkeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attribution/Job Title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'wochenstunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wochenstunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'working hours',
 				'description' => '',
 				'insertvon' => 'system'
 			)
