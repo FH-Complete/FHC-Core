@@ -29,6 +29,28 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "vuepic/vue-datepicker-js",
+				"version": "4.0.0",
+				"dist": {
+					"url": "https://unpkg.com/@vuepic/vue-datepicker@4.0.0/dist/vue-datepicker.iife.js",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "vuepic/vue-datepicker-css",
+				"version": "4.0.0",
+				"dist": {
+					"url": "https://unpkg.com/@vuepic/vue-datepicker@4.0.0/dist/main.css",
+					"type": "file"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "alvaro-prieto/colresizable",
 				"version": "1.6",
 				"dist": {

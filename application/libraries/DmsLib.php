@@ -595,6 +595,8 @@ class DmsLib
 		if (isError($insDmsResult)) return $insDmsResult;
 
 		$upload_data['dms_id'] = getData($insDmsResult);
+		if(isset($upload_data['file_type']) && !isset($dms['mimetype']))
+			$dms['mimetype'] = $upload_data['file_type'];
 
 		// Insert DMS version
 		$insVersionResult = $this->_ci->DmsVersionModel->insert(

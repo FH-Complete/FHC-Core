@@ -126,7 +126,6 @@
 		generateJSsInclude('vendor/npm-asset/primevue/autocomplete/autocomplete.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/overlaypanel/overlaypanel.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/datatable/datatable.min.js');
-		
 	}
 
 	// --------------------------------------------------------------------------------------------------------
