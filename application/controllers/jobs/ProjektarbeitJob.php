@@ -48,15 +48,119 @@ class ProjektarbeitJob extends JOB_Controller
 
 		//get all missed Projektarbeiten
 		$result = $this->ProjektarbeitModel->getMissedProjektarbeiten();
-/*		if(isError($result))
-			return $this->logError(getError($result));
+		/*		if(isError($result))
+					return $this->logError(getError($result));
+
+				if(!hasData($result))
+					return $this->logInfo('End Job Projektarbeit Update: 0 Mails sent');
+				*/
+		if(isError($result))
+			echo $nl . $result;
 
 		if(!hasData($result))
-			return $this->logInfo('End Job sendStglSammelmail: 0 Mails sent');
-		*/
+			echo $nl . 'End Job Projektarbeit Update: 0 Mails sent';
+
 
 		$projektarbeiten = getData($result);
 		var_dump($projektarbeiten);
+
+		//note auf 7 setzen
+		foreach ($projektarbeiten as $projekt) {
+
+			$this->db->where('projektarbeit_id', $projekt->projektarbeit_id);
+
+			$result = $this->ProjektarbeitModel->update([
+				'projektarbeit_id' => $projekt->projektarbeit_id
+			], [
+				'note' => 7
+			]);
+
+			if (isError($result))
+				echo "error: " . getError($result);
+			else
+				echo $nl . " erfolgreiches update von projektarbeit_id " . $projekt->projektarbeit_id;
+
+			//copy Projektarbeit
+			$result = $this->ProjektarbeitModel->load($projekt->projektarbeit_id);
+			if (isError($result))
+			{
+				echo "error: " . getError($result);
+				continue;
+			}
+			if(!hasData($result))
+			{
+				echo $nl . 'Keine Projektarbeit für projektarbeit_id ' . $projekt->projektarbeit_id . 'gefunden';
+				continue;
+			}
+			$projektarbeit = getData($result)[0];
+			var_dump($projektarbeit);
+
+			$result = $this->ProjektarbeitModel->insert([
+				'projekttyp_kurzbz' => $projektarbeit->projekttyp_kurzbz,
+				'titel' => $projektarbeit->titel,
+				'insertvon' => 'Projektjob',
+				'note' => NULL,
+				'lehreinheit_id' => $projektarbeit->lehreinheit_id,
+				'student_uid' => $projektarbeit->student_uid
+
+			]);
+			if (isError($result))
+				echo "error: " . getError($result);
+
+			//Betreuungen kopieren
+
+			//get bestehende Betreuungen
+			$result = $this->ProjektbetreuerModel->loadWhere([
+				'projektarbeit_id' => $projekt->projektarbeit_id,
+				//'betreuerart_kurzbz' => $projekt->betreuerart_kurzbz
+			]);
+			if (isError($result))
+				//$this->logError(getError($result));
+				echo "error: " . getError($result);
+			elseif (!hasData($result))
+			{
+				echo $nl . 'Keine Projektarbeit für' . $projekt->projektarbeit_id . 'gefunden';
+			}
+			else
+			{
+				$betreuung = getData($result);
+				var_dump($betreuung);
+
+				foreach($betreuung as $bet)
+				{
+					echo $nl . $bet->person_id . " " . $bet->projektarbeit_id . " Art: " . $bet->betreuerart_kurzbz;
+				}
+
+				//var_dump($projektarbeit_copy);
+				//$projekt_id_copy = $projektarbeit_copy->projektarbeit_id;
+				//echo "Projektarbeit alt " . $projekt->projektarbeit_id . " Projektarbeit neu: " . $projekt_id_copy;
+			}
+
+
+			$result = $this->ProjektarbeitModel->loadWhere([
+				'student_uid' => $projektarbeit->student_uid,
+				'insertvon' => 'Projektjob',
+				'note' => NULL
+			]);
+			if (isError($result))
+				//$this->logError(getError($result));
+				echo "error: " . getError($result);
+			elseif (!hasData($result))
+			{
+				echo $nl . 'Keine neu angelegte projektarbeit_id für StudentId' . $projektarbeit->student_uid . 'gefunden';
+			}
+			else
+			{
+				$projektarbeit_copy = getData($result)[0];
+				//var_dump($projektarbeit_copy);
+				$projekt_id_copy = $projektarbeit_copy->projektarbeit_id;
+				echo $nl . "Projektarbeit alt " . $projekt->projektarbeit_id . " Projektarbeit neu: " . $projekt_id_copy;
+			}
+
+
+
+
+		}
 
 
 	}
