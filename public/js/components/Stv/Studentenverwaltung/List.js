@@ -60,14 +60,21 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: true,
+				// TODO(chris): select only one? selectMultiple with click?
+				index: 'prestudent_id',
 				//persistence: true
 			},
 			tabulatorEvents: [
 				{
 					event: 'rowSelectionChanged',
 					handler: this.rowSelectionChanged
+				},
+				{
+					event: 'dataProcessed',
+					handler: this.autoSelectRows
 				}
-			]
+			],
+			lastSelected: null
 		}
 	},
 	methods: {
@@ -77,7 +84,27 @@ export default {
 		rowSelectionChanged(data) {
 			this.$emit('update:selected', data);
 		},
-		updateUrl(url) {
+		autoSelectRows(data) {
+			if (this.lastSelected) {
+				// NOTE(chris): reselect rows on refresh
+				let selected = this.lastSelected.map(el => this.$refs.table.tabulator.getRow(el.prestudent_id))
+				// TODO(chris): unselect current item if it's no longer in the table?
+				// or maybe reselect only the last one?
+				selected = selected.filter(el => el);
+
+				this.lastSelected = null;
+
+				if (selected.length)
+					this.$refs.table.tabulator.selectRow(selected);
+			} else if(this.lastSelected === undefined) {
+				// NOTE(chris): select row if it's the only one (preferably only on startup)
+				if (data.length == 1) {
+					this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
+				}
+			}
+		},
+		updateUrl(url, first) {
+			this.lastSelected = first ? undefined : this.selected;
 			if (url)
 				url = CoreRESTClient._generateRouterURI(url);
 			if (!this.$refs.table.tableBuilt)
@@ -87,14 +114,6 @@ export default {
 			else
 				this.$refs.table.tabulator.setData(url);
 		}
-	},
-	mounted() {
-		this.$refs.table.tabulator.on("dataProcessed", () => {
-			let rows = this.$refs.table.tabulator.getRows();
-			if (rows.length && rows.length == 1) {
-				this.$refs.table.tabulator.selectRow();
-			}
-		});
 	},
 	template: `
 	<div class="stv-list h-100 pt-3">

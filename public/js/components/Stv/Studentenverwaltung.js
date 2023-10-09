@@ -99,10 +99,9 @@ export default {
 	},
 	mounted() {
 		if (this.$route.params.id) {
-			this.$refs.stvList.updateUrl('components/stv/students/uid/' + this.$route.params.id);
-		}
-		if (this.$route.params.prestudent_id) {
-			this.$refs.stvList.updateUrl('components/stv/students/prestudent/' + this.$route.params.prestudent_id);
+			this.$refs.stvList.updateUrl('components/stv/students/uid/' + this.$route.params.id, true);
+		} else if (this.$route.params.prestudent_id) {
+			this.$refs.stvList.updateUrl('components/stv/students/prestudent/' + this.$route.params.prestudent_id, true);
 		}
 
 	},
