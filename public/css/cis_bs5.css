@@ -88,6 +88,10 @@ h6, .h6 {
 .fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-cell {
 	background-color: #f2f2f2;
 }
+.fhc-container .tabulator .tabulator-row.tabulator-selectable:hover .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-selectable:hover .tabulator-cell {
+	background-color: #ececec;
+}
 
 .fhc-container .tabulator .tabulator-col,
 .fhc-container .tabulator .tabulator-cell {
