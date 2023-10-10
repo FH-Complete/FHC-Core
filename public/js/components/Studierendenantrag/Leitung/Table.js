@@ -87,7 +87,7 @@ export default {
 			placeholder:"Keine zu bearbeitenden Datensätze",
 			movableColumns: true,
 			maxHeight: '50vh',
-			layout: "fitDataFill", // TODO(chris): wont work when changed
+			layout: "fitDataFill",
 			ajaxURL: this.ajaxUrl,
 			persistence: { // NOTE(chris): do not store column titles
 				sort: true, //persist column sorting
