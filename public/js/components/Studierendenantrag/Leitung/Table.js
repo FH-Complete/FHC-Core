@@ -328,13 +328,6 @@ export default {
 						container.append(button);
 					}
 
-					// TODO(chris): not yet perfect
-					/*
-					onRendered(() => {
-						cell.getColumn().setWidth(true);
-					});
-					*/
-
 					return container;
 				}
 			}]
