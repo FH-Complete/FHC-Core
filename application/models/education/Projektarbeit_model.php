@@ -79,8 +79,10 @@ class Projektarbeit_model extends DB_Model
 		$allowedProjekttypes[] = 'Bachelor';
 		$allowedProjekttypes[] = 'Diplom';
 
-		$now = new DateTime();
+		$selectedStg = [331, 328];
 
+		$now = new DateTime();
+		$this->db->distinct();
 		$this->addSelect($this->dbTable.'.projektarbeit_id');
 		$this->addSelect($this->dbTable.'.titel');
 		$this->addSelect($this->dbTable.'.student_uid');
@@ -102,20 +104,20 @@ class Projektarbeit_model extends DB_Model
 
 		//TODO(MANU) Config date
 		$this->db->where('pa.datum >', '2022-09-01');
-		//$this->db->where('pa.fixtermin', 'TRUE');
 		$this->db->where('pa.abgabedatum', NULL);
 
 		//TODO(MANU) get date with NOW
-		$this->db->where('pa.datum < ', '2023-10-04');
+		$this->db->where('pa.datum < ', '2023-10-10');
 
 		//TODO(MANU) check if note null: ausreichend?
 		$this->db->where($this->dbTable. '.note', NULL);
 
-		$this->addLimit(1);
+		$this->db->where_in('sg.studiengang_kz', $selectedStg);
+
+		//$this->addLimit(3); //for testing
 
 		return $this->loadWhere([
-			'pa.fixtermin' => 'TRUE',
-			'sg.studiengang_kz' => 328
+			'pa.fixtermin' => 'TRUE'
 		]);
 
 	}
