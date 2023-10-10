@@ -344,7 +344,7 @@ export default {
 			let columnData = [];
 			for (let col of columns) {
 				let def = col.getDefinition();
-				if (def.title) {
+				if (def.title && !def.frozen) {
 					columnData.push({
 						title: def.title,
 						visible: col.isVisible(),
