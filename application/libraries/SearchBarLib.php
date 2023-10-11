@@ -150,8 +150,8 @@ class SearchBarLib
 				 WHERE kontakttyp = \'telefon\'
 			) k ON(k.standort_id = m.standort_id)
 			 WHERE 
-				stdkst.bezeichnung IS NULL 
-				AND org.bezeichnung IS NULL 
+				(stdkst.bezeichnung IS NULL 
+				OR org.bezeichnung IS NULL) 
 				AND (
 					b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 					OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
@@ -159,7 +159,7 @@ class SearchBarLib
 				)
 		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
 		';
-		
+
 		$employees = $dbModel->execReadOnlyQuery($sql);
 		
 		// If something has been found then return it
