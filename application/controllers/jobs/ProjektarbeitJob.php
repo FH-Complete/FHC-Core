@@ -10,7 +10,7 @@
  * @since		Version 3.2
  * @filesource
  *
- * Cronjob to be run for missed Abgabe Bachelor and Master Arbeiten
+ * Cronjob to be run for Bachelor and Master Arbeiten failed to be uploaded in time
  *
  *  Actions:
  *  (1) missed endupload projektarbeit: grade projektarbeit with grade 7 (Nicht beurteilt)
@@ -27,52 +27,45 @@ class ProjektarbeitJob extends JOB_Controller
 	{
 		parent::__construct();
 
+		// Config
+		$this->load->config('projektarbeit');
+
 		// Load SanchoHelper
 		$this->load->helper('hlp_sancho_helper');
 
 		//Load Models
-		//$this->load->model('education/Betreuerart_model', 'BetreuerartModel');
-		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
-		//Load Library
-		$this->load->library('VorlageLib');
 	}
 
-	public function handleMissedAbgaben()
+	public function handleProjektarbeitenNotUploadedInTime()
 	{
+		$startDate = $this->config->item('projektarbeitjob_start');
+		if ($startDate)
+			$startDate = new DateTime($startDate);
+
 		$mailArray = array();
 		$countMissedAbgaben = 0;
 		$countTotal = 0;
 		$countMails = 0;
 		$nl = "\n";
-		echo "----------------- Test Cronjob cis/cronjobs/handleMissedAbgabenBachelorMaster.php ------------------";
-		echo $nl;
 
-		//get all missed Projektarbeiten
-		$result = $this->ProjektarbeitModel->getMissedProjektarbeiten();
-		/*		if(isError($result))
-					return $this->logError(getError($result));
+		$this->logInfo('Start Job Projektarbeit');
 
-				if(!hasData($result))
-					return $this->logInfo('End Job Projektarbeit Update: 0 Mails sent');
-				*/
+		//get all Projektarbeiten not Uploaded in Time
+		$result = $this->ProjektarbeitModel->getAllProjektarbeitenNotUploadedInTime($startDate->format('c'));
 		if (isError($result))
-			echo $nl . $result;
-
-		if (!hasData($result)) {
-			echo $nl . 'End Job Projektarbeit Update: 0 Mails sent';
-			return;
-		}
+			return $this->logError(getError($result));
+		if (!hasData($result))
+			return $this->logInfo('End Job Projektarbeit Update: 0 Mails sent');
 
 		$projektarbeiten = getData($result);
-		//var_dump($projektarbeiten);
 
-		//note auf 7 setzen
-		foreach ($projektarbeiten as $projekt) {
-
+		// (1) note auf 7 setzen
+		foreach ($projektarbeiten as $projekt)
+		{
 			$this->db->where('projektarbeit_id', $projekt->projektarbeit_id);
 
 			$result = $this->ProjektarbeitModel->update([
@@ -82,48 +75,47 @@ class ProjektarbeitJob extends JOB_Controller
 			]);
 
 			if (isError($result))
-				echo "error: " . getError($result);
-			else
-				echo $nl . "------" . $nl . " erfolgreiches update von projektarbeit_id " . $projekt->projektarbeit_id . " :" . $projekt->titel;
+				$this->logError(getError($result));
 
-			//copy Projektarbeit
+			// (2) copy Projektarbeit
 			$result = $this->ProjektarbeitModel->load($projekt->projektarbeit_id);
 			if (isError($result)) {
-				echo "error: " . getError($result);
+				$this->logError(getError($result));
 				continue;
 			}
 			if (!hasData($result)) {
-				echo $nl . 'Keine Projektarbeit für projektarbeit_id ' . $projekt->projektarbeit_id . 'gefunden';
+				$this->logInfo('Keine Projektarbeit für projektarbeit_id ' .  $projekt->projektarbeit_id . 'gefunden');
 				continue;
 			}
-			$projektarbeit = getData($result)[0];
-			//var_dump($projektarbeit);
+			$projektarbeit = current(getData($result));
 
-			$result = $this->ProjektarbeitModel->insert([
+			$now = new Datetime();
+
+			$this->ProjektarbeitModel->insert([
 				'projekttyp_kurzbz' => $projektarbeit->projekttyp_kurzbz,
 				'titel' => $projektarbeit->titel,
-				'insertvon' => 'Projektjob',
-				'note' => NULL,
+				'note' => null,
 				'lehreinheit_id' => $projektarbeit->lehreinheit_id,
 				'student_uid' => $projektarbeit->student_uid,
 				'firma_id' => $projektarbeit->firma_id,
-				'punkte' => $projektarbeit->punkte, //TODO(manu) ebenfalls null?
-				'beginn' => NULL,
-				'ende' => NULL,
+				'punkte' => null, //TODO(manu) oder $projektarbeit->punkte
+				'beginn' => null,
+				'ende' => null,
 				'faktor' => $projektarbeit->faktor,
-				'freigegeben' => $projektarbeit->freigegeben,
+				'freigegeben' => $projektarbeit->freigegeben, //TODO(manu) besser FALSE?
 				'gesperrtbis' => $projektarbeit->gesperrtbis,
 				'stundensatz' => $projektarbeit->stundensatz,
 				'themenbereich' => $projektarbeit->themenbereich,
 				'anmerkung' => $projektarbeit->anmerkung,
-				'updateamum' => NULL,
-				'updatevon' => NULL,
-				'insertamum' => $projektarbeit->insertamum, //TODO(manu) besser aktueller timestamp?
+				'updateamum' => null,
+				'updatevon' => null,
+				'insertamum' => $now->format('c'),
+				'insertvon' => 'Projektjob',
 				'ext_id' => $projektarbeit->ext_id,
-				'gesamtstunden' => NULL, //TODO(manu) oder übernehmen?
+				'gesamtstunden' => null, //TODO(manu) oder $projektarbeit->gesamtstunden?
 				'titel_english' => $projektarbeit->titel_english,
-				'sprache' => $projektarbeit->seitenanzahl,
-				'abgabedatum' => $projektarbeit->abgabedatum,
+				'sprache' => $projektarbeit->sprache,
+				'abgabedatum' => null, //TODO(manu) oder $projektarbeit->abgabedatum
 				'kontrollschlagwoerter' => $projektarbeit->kontrollschlagwoerter,
 				'schlagwoerter' => $projektarbeit->schlagwoerter,
 				'schlagwoerter_en' => $projektarbeit->schlagwoerter_en,
@@ -131,121 +123,117 @@ class ProjektarbeitJob extends JOB_Controller
 				'abstract_en' => $projektarbeit->abstract_en,
 				'final' => $projektarbeit->final,
 			]);
-			if (isError($result))
-				echo "error: " . getError($result);
 
+			$this->db->order_by("projektarbeit_id", "desc"); //TODO(manu) Cronjob soll weiterlaufen, continue?
 			$result = $this->ProjektarbeitModel->loadWhere([
 				'student_uid' => $projektarbeit->student_uid,
 				'insertvon' => 'Projektjob',
-				'note' => NULL
+				'note' => null
 			]);
 			if (isError($result))
-				//$this->logError(getError($result));
-				echo "error: " . getError($result);
-			elseif (!hasData($result)) {
-				echo $nl . 'Keine neu angelegte projektarbeit_id für StudentId' . $projektarbeit->student_uid . 'gefunden';
+			{
+				$this->logError(getError($result));
+				continue;
+			}
+			elseif (!hasData($result))
+			{
+				$this->logInfo('Keine neu angelegte projektarbeit_id für StudentId' . $projektarbeit->student_uid . 'gefunden');
+				continue;
 			}
 			else
 			{
-				$projektarbeit_copy = getData($result)[0];
-				//var_dump($projektarbeit_copy);
+				$projektarbeit_copy = current(getData($result));
 				$projekt_id_copy = $projektarbeit_copy->projektarbeit_id;
-				echo $nl . "Projektarbeit alt " . $projekt->projektarbeit_id . " Projektarbeit neu: " . $projekt_id_copy;
-				echo $nl . "Studiengang_kz" . $projekt->studiengang_kz;
 
-				//Mail array
-				if (!isset ($mailArray[$projekt->studiengang_kz])) {
+				//Start Mailarray
+				if (!isset($mailArray[$projekt->studiengang_kz]))
+				{
 					$mailArray[$projekt->studiengang_kz] = $countMissedAbgaben;
 				}
 				$mailArray[$projekt->studiengang_kz] = $mailArray[$projekt->studiengang_kz] + 1;
-
-
 			}
-			//Betreuungen kopieren
 
-			//get bestehende Betreuungen
+			// (3)Betreuungen kopieren
 			$result = $this->ProjektbetreuerModel->loadWhere([
-				'projektarbeit_id' => $projekt->projektarbeit_id,
-				//'betreuerart_kurzbz' => $projekt->betreuerart_kurzbz
+				'projektarbeit_id' => $projekt->projektarbeit_id
 			]);
 			if (isError($result))
-				//$this->logError(getError($result));
-				echo "error: " . getError($result);
-			elseif (!hasData($result)) {
-				echo $nl . 'Keine Betreuung für' . $projekt->projektarbeit_id . 'gefunden';
-			} else {
+				$this->logError(getError($result));
+
+			elseif (!hasData($result))
+			{
+				$this->logInfo('Keine Betreuung für' . $projekt->projektarbeit_id . 'gefunden');
+			}
+			else
+			{
 				$betreuung = getData($result);
-				//var_dump($betreuung);
 
 				foreach ($betreuung as $bet) {
-					echo $nl . $bet->person_id . " P_ID ALT: " . $nl . $bet->projektarbeit_id . "P_ID NEU" . $projekt_id_copy . $nl . " Art: " . $bet->betreuerart_kurzbz;
+					$now = new Datetime();
 					$result = $this->ProjektbetreuerModel->insert([
 						'person_id' => $bet->person_id,
 						'projektarbeit_id' => $projekt_id_copy,
-						'note' => NULL,
+						'note' => null,
 						'faktor' => $bet->faktor,
 						'name' => $bet->name,
 						'punkte' => $bet->punkte,
 						'stundensatz' => $bet->stundensatz,
-						'updateamum' => $bet->updateamum,
-						//TODO insertamum, updateam, updatevon ? Projektjob und aktueller Timestamp
-						'updatevon' => $bet->updatevon,
-						'insertamum' => $bet->insertamum,
+						'updateamum' => null,
+						'updatevon' => null,
+						'insertamum' => $now->format('c'),
 						'insertvon' => 'Projektjob',
 						'ext_id' => $bet->ext_id,
 						'betreuerart_kurzbz' => $bet->betreuerart_kurzbz,
-						'stunden' => NULL,
-						'vertrag_id' => NULL,  //TODO oder besser vertrag_id
-						'zugangstoken' => $bet->zugangstoken,
-						'zugangstoken_gueltigbis' => $bet->zugangstoken_gueltigbis
+						'stunden' => null,
+						'vertrag_id' => null,
+						'zugangstoken' => null, //TODO(manu) sonst insertfehler DB: 1 datensatz 34195
+						'zugangstoken_gueltigbis' => null //TODO analog zu token
 					]);
 					if (isError($result))
-						echo "error: " . getError($result);
-					else
-						echo $nl . "neue Betreuung für person_id " . $bet->person_id . ' und projektarbeit_id ' . $projekt_id_copy . ' angelegt';
-
+					{
+						$this->logError(getError($result));
+					}
+				//	else
+				//		echo $nl . "neue Betreuung für person_id " . $bet->person_id . ' und projektarbeit_id ' . $projekt_id_copy . ' angelegt';
 				}
-
-				//var_dump($projektarbeit_copy);
-				//$projekt_id_copy = $projektarbeit_copy->projektarbeit_id;
-				//echo "Projektarbeit alt " . $projekt->projektarbeit_id . " Projektarbeit neu: " . $projekt_id_copy;
 			}
-
 		}
 
-		//Sancho Mail
-		var_dump($mailArray);
-
-
-		echo $nl . "Arraytest: " . $nl;
-		foreach ($mailArray as $key => $item){
-
+		//(4)Sancho Mail
+		foreach ($mailArray as $stg_kz => $anzahlMissedAbgaben)
+		{
 			$result = $this->StudiengangModel->loadWhere([
-				'studiengang_kz' => $key
+				'studiengang_kz' => $stg_kz
 			]);
 			if (isError($result))
-				//$this->logError(getError($result));
-				echo "error: " . getError($result);
-			elseif (!hasData($result)) {
-				echo $nl . 'Kein Studiengang für' . $key . 'gefunden';
+				$this->logError(getError($result));
+			elseif (!hasData($result))
+			{
+				$this->logInfo('Kein Studiengang für' . $stg_kz . 'gefunden');
 			}
 			else
 			{
 				$studiengang = current(getData($result));
-				//var_dump($studiengang);
 				$email = $studiengang->email;
-				$countTotal = $countTotal + $item;
+				$betreff = 'Versäumte Abgabe(n) Projektarbeiten / Project Work(s) not uploaded in time';
 
-				echo $nl . "Mail an Studiengang " . $key . " , Anzahl missed PAs: " . $item . " email: " . $studiengang->email. $nl;
+				//TODO(manu) link basisurl?
+				$data = [
+					'anzahlMissedAbgaben' => $anzahlMissedAbgaben,
+					'link' => 'https://vilesci.technikum-wien.at/vilesci/lehre/abgabe_assistenz_frameset.php?stg_kz=' . $stg_kz
+				];
 
-				$countMails++;
+				$countTotal = $countTotal + $anzahlMissedAbgaben;
+
+				//send mail
+				if (sendSanchoMail('Sancho_Mail_Stgl_MissedAbgaben', $data, $email, $betreff)) {
+					//echo $nl . "Mail an Studiengang " . $stg_kz . " , Anzahl missed PAs: " . $anzahlMissedAbgaben . " email: " . $studiengang->email . $nl;
+					$countMails++;
+				}
 			}
 		}
-
-
-		echo $nl . 'End Job Projektarbeit: ' . $countTotal . ' Missed Abgaben Total, ' . $countMails . ' verschickte Mails: ' . $nl;
+		$this->logInfo($countTotal . ' projektarbeiten not uploaded in time, ' . $countMails . ' sent mails.');
+		$this->logInfo('End Job Projektarbeit');
+		echo $nl . 'End Job Projektarbeit: ' . $countTotal . ' projektarbeiten not uploaded in time, ' . $countMails . ' sent mails. ' . $nl;
 	}
-
-
-
 }
