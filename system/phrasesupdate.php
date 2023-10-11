@@ -21427,7 +21427,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Abmeldung vom Studium kann hier durchführt werden.',
+				'text' => 'Die Abmeldung vom Studium kann hier durchgeführt werden.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
