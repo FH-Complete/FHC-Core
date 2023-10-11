@@ -62,9 +62,9 @@ const phrasen = {
 			
 			var initialval = '';
   			if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined) {
-  				var category = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
+  				var tmp_category = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
 				if(category[phrase] !== undefined ) {
-					initialval = category[phrase];
+					initialval = tmp_category[phrase];
 				}
 			}
 			
