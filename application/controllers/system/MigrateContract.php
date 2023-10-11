@@ -69,7 +69,7 @@ class MigrateContract extends CLI_Controller
 		{
 			$qry = "SELECT distinct mitarbeiter_uid FROM bis.tbl_bisverwendung";
 			$db = new DB_Model();
-	
+
 			$resultUser = $db->execReadOnlyQuery($qry);
 			if (hasData($resultUser))
 			{
@@ -446,8 +446,8 @@ class MigrateContract extends CLI_Controller
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['von'] = $row_verwendung->beginn;
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['bis'] = $row_verwendung->ende;
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['freitexttyp_kurzbz'] = 'allin';
-			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['titel'] = '';
-			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['anmerkung'] = '';
+			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['titel'] = 'allin';
+			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['anmerkung'] = 'allin';
 		}
 		return true;
 	}
@@ -464,8 +464,8 @@ class MigrateContract extends CLI_Controller
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['von'] = $row_verwendung->beginn;
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['bis'] = $row_verwendung->ende;
 			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['freitexttyp_kurzbz'] = 'befristung';
-			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['titel'] = '';
-			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['anmerkung'] = '';
+			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['titel'] = 'befristung';
+			$contracts['dv'][$dv]['vbs'][$newVBSIndex]['anmerkung'] = 'befristung';
 		}
 		return true;
 	}
@@ -589,7 +589,7 @@ class MigrateContract extends CLI_Controller
 	 */
 	private function _getUnternehmen($row_verwendung)
 	{
-		
+
 		$resultUnternehmen = $this->_findUnternehmen($row_verwendung->mitarbeiter_uid, "'kstzuordnung', 'oezuordnung'", $row_verwendung->beginn);
 
 		// Wenn zeitlich keine passende Unternehmenszuordnung vorhanden ist, dann suchen ob generell eine Zuordnung ermittelt werden kann
@@ -604,7 +604,7 @@ class MigrateContract extends CLI_Controller
 			}
 		}
 
-		return $resultUnternehmen;			
+		return $resultUnternehmen;
 	}
 
 	/**
@@ -615,18 +615,18 @@ class MigrateContract extends CLI_Controller
 		$db = new DB_Model();
 
 		$qry = "
-		WITH RECURSIVE meine_oes(oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz) as 
+		WITH RECURSIVE meine_oes(oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz) as
 		(
-			SELECT 
+			SELECT
 				oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz
-			FROM 
-				public.tbl_organisationseinheit 
-			WHERE 
-				oe_kurzbz=(SELECT 
-						oe_kurzbz 
-					FROM 
-						public.tbl_benutzerfunktion 
-					WHERE 
+			FROM
+				public.tbl_organisationseinheit
+			WHERE
+				oe_kurzbz=(SELECT
+						oe_kurzbz
+					FROM
+						public.tbl_benutzerfunktion
+					WHERE
 						uid=".$db->escape($uid);
 
 		if(!is_null($datum))
@@ -638,18 +638,18 @@ class MigrateContract extends CLI_Controller
 		$qry.="
 					ORDER BY funktion_kurzbz, datum_von LIMIT 1)
 			UNION ALL
-			SELECT 
+			SELECT
 				o.oe_kurzbz, o.oe_parent_kurzbz, o.organisationseinheittyp_kurzbz
-			FROM 
-				public.tbl_organisationseinheit o, meine_oes 
-			WHERE 
-				o.oe_kurzbz=meine_oes.oe_parent_kurzbz 
+			FROM
+				public.tbl_organisationseinheit o, meine_oes
+			WHERE
+				o.oe_kurzbz=meine_oes.oe_parent_kurzbz
 		)
-		SELECT 
+		SELECT
 			oe_kurzbz
-		FROM 
-			meine_oes 
-		WHERE 
+		FROM
+			meine_oes
+		WHERE
 			oe_parent_kurzbz is null
 		LIMIT 1
 		";
