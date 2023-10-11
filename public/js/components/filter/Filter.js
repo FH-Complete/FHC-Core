@@ -173,7 +173,7 @@ export const CoreFilterCmpt = {
 	methods: {
 		reloadTable() {
 			if (this.tableOnly)
-				this.tabulator.reload();
+				this.tabulator.setData();
 			else
 				this.getFilter();
 		},
