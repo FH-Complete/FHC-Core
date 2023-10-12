@@ -32,7 +32,9 @@ export default {
 					<a class="nav-link" :class="{active: comp == component}" :aria-current="comp == component ? 'page' : ''" href="#" @click="component=comp">{{title}}</a>
 				</li>
 			</ul>
-			<component :is="component" :student="student"></component>
+			<keep-alive>
+				<component :is="component" :student="student"></component>
+			</keep-alive>
 		</template>
 	</div>`
 };
