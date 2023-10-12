@@ -18936,6 +18936,9 @@ array(
 			)
 		)
 	),
+/*
+	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status 
+	// erstellt werden, die dann in der Studierendenansicht in einer infobox angezeigt werden
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
@@ -18956,6 +18959,7 @@ array(
 			)
 		)
 	),
+*/
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
