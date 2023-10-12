@@ -158,6 +158,164 @@ class Students extends FHC_Controller
 	{
 		// TODO(chris): @see: prestudent.class::loadInteressentenUndBewerber
 		// TODO(chris): IMPLEMENT!
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$stdsemEsc = $this->PrestudentModel->escape($studiensemester_kurzbz);
+		
+		$this->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
+		#$this->PrestudentModel->addJoin('public.tbl_prestudentstatus ps', 'ps.status_kurzbz=public.get_rolle_prestudent(tbl_prestudent.prestudent_id, ' . $this->PrestudentModel->escape($studiensemester_kurzbz) . ') AND ps.prestudent_id=tbl_prestudent.prestudent_id');
+		$this->PrestudentModel->addJoin('public.tbl_prestudentstatus ps', 'ps.status_kurzbz=public.get_rolle_prestudent(tbl_prestudent.prestudent_id, ' . $stdsemEsc . ') AND ps.prestudent_id=tbl_prestudent.prestudent_id AND ps.studiensemester_kurzbz=public.get_stdsem_prestudent(tbl_prestudent.prestudent_id, ' . $stdsemEsc . ') AND ps.ausbildungssemester=public.get_absem_prestudent(tbl_prestudent.prestudent_id, ' . $stdsemEsc . ')', 'LEFT');
+		// TODO(chris): check what functions are returning when no entry exists
+		
+		$this->PrestudentModel->addSelect('p.person_id');
+		$this->PrestudentModel->addSelect('tbl_prestudent.prestudent_id');
+		$this->PrestudentModel->addSelect("'' AS uid");
+		$this->PrestudentModel->addSelect('titelpre');
+		$this->PrestudentModel->addSelect('titelpost');
+		$this->PrestudentModel->addSelect('vorname');
+		$this->PrestudentModel->addSelect('wahlname');
+		$this->PrestudentModel->addSelect('vornamen');
+		$this->PrestudentModel->addSelect('geschlecht');
+		$this->PrestudentModel->addSelect('nachname');
+		$this->PrestudentModel->addSelect('gebdatum');
+		$this->PrestudentModel->addSelect('tbl_prestudent.anmerkung');
+		$this->PrestudentModel->addSelect('ersatzkennzeichen');
+		$this->PrestudentModel->addSelect('svnr');
+		$this->PrestudentModel->addSelect("'' AS matrikelnr");
+		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
+		$this->PrestudentModel->addSelect("'' AS semester");
+		$this->PrestudentModel->addSelect("'' AS verband");
+		$this->PrestudentModel->addSelect("'' AS gruppe");
+		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
+		$this->PrestudentModel->addSelect('aufmerksamdurch_kurzbz');
+		$this->PrestudentModel->addSelect('mentor');
+		$this->PrestudentModel->addSelect('FALSE AS bnaktiv');
+		$this->PrestudentModel->addSelect(
+			"(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung LIMIT 1) AS email_privat",
+			false
+		);
+		$this->PrestudentModel->addSelect(
+			"(SELECT rt_gesamtpunkte AS punkte FROM public.tbl_prestudent WHERE prestudent_id=s.prestudent_id) AS punkte",
+			false
+		);
+		$this->PrestudentModel->addSelect('tbl_prestudent.dual');
+		$this->PrestudentModel->addSelect('tbl_prestudent.reihungstest_id');
+		$this->PrestudentModel->addSelect('tbl_prestudent.anmeldungreihungstest');
+		$this->PrestudentModel->addSelect('p.matr_nr');
+		$this->PrestudentModel->addSelect('tbl_prestudent.gsstudientyp_kurzbz');
+		$this->PrestudentModel->addSelect('tbl_prestudent.aufnahmegruppe_kurzbz');
+		$this->PrestudentModel->addSelect('tbl_prestudent.priorisierung');
+		$this->PrestudentModel->addSelect('p.zugangscode');
+		$this->PrestudentModel->addSelect('p.bpk');
+
+		$this->PrestudentModel->addOrder('nachname');
+		$this->PrestudentModel->addOrder('vorname');
+
+		$where = [];
+		if ($orgform_kurzbz) {
+			$where['ps.orgform_kurzbz'] = $orgform_kurzbz;
+		}
+
+		switch ($filter) {
+			case "interessenten":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				break;
+			case "bewerbungnichtabgeschickt":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				$where['bewerbung_abgeschicktamum'] = null;
+				break;
+			case "bewerbungabgeschickt":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				$where['bewerbung_abgeschicktamum IS NOT'] = null;
+				$where['bestaetigtam'] = null;
+				break;
+			case "statusbestaetigt":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				$where['bestaetigtam IS NOT'] = null;
+				break;
+			case "statusbestaetigtrtnichtangemeldet":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				$where['bestaetigtam IS NOT'] = null;
+				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				break;
+			case "statusbestaetigtrtangemeldet":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				$where['bestaetigtam IS NOT'] = null;
+				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				break;
+			case "zgv":
+				$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
+				$result = $this->StudiengangModel->load($studiengang_kz);
+				if (isError($result)) {
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson(getError($result));
+				} elseif (!hasData($result)) {
+					$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
+					// TODO(chris): phrase
+					return $this->outputJson("Studiengang does not exist");
+				}
+				$stg = current(getData($result));
+
+				$where['ps.status_kurzbz'] = 'Interessent';
+				
+				if ($stg->typ == 'm') {
+					$where['zgvmas_code IS NOT'] = null;
+					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
+						$where['zgvmas_erfuellt'] = true;
+				} elseif ($stg->typ == 'p') {
+					$where['zgvdoktor_code IS NOT'] = null;
+					if (defined('ZGV_DOKTOR_ANZEIGEN') && ZGV_DOKTOR_ANZEIGEN)
+						$where['zgvdoktor_erfuellt'] = true;
+				} else {
+					$where['zgv_code IS NOT'] = null;
+					if (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN)
+						$where['zgv_erfuellt'] = true;
+				}
+				break;
+			case "reihungstestangemeldet":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				$this->PrestudentModel->db->where('EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				break;
+			case "reihungstestnichtangemeldet":
+				$where['ps.status_kurzbz'] = 'Interessent';
+				$this->PrestudentModel->db->where('NOT EXISTS(SELECT 1 FROM public.tbl_rt_person JOIN public.tbl_reihungstest r ON (rt_id = reihungstest_id) WHERE person_id=p.person_id AND studienplan_id IN (SELECT studienplan_id FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung o USING(studienordnung_id) WHERE o.studiengang_kz=tbl_prestudent.studiengang_kz) AND r.studiensemesterkurzbz=' . $stdsemEsc . ')', null, false);
+				break;
+			case "bewerber":
+				$where['ps.status_kurzbz'] = 'Bewerber';
+				break;
+			case "aufgenommen":
+				$where['ps.status_kurzbz'] = 'Aufgenommener';
+				break;
+			case "warteliste":
+				$where['ps.status_kurzbz'] = 'Wartender';
+				break;
+			case "absage":
+				$where['ps.status_kurzbz'] = 'Abgewiesener';
+				break;
+			case "absolvent":
+				$where['ps.status_kurzbz'] = 'Absolvent';
+				break;
+			case "diplomand":
+				$where['ps.status_kurzbz'] = 'Diplomand';
+				break;
+			default:
+				if (!$studiensemester_kurzbz) {
+					// TODO(chris): should work ... needs testing
+					// we want all prestudents without status?
+					$where['ps.status_kurzbz'] = null;
+				} else {
+					$this->PrestudentModel->db->where_in('ps.status_kurzbz', [
+						'Interessent',
+						'Bewerber',
+						'Aufgenommener',
+						'Wartender',
+						'Abgewiesener'
+					]);
+				}
+				break;
+		}
+
 		$this->outputJson([]);
 	}
 
@@ -273,80 +431,6 @@ class Students extends FHC_Controller
 			$this->outputJson(getData($result) ?: []);
 		}
 	}
-	/**
-	 * @param string		$student_uid
-	 *
-	 * @return void
-	 */
-	protected function getStudent($student_uid)
-	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-
-		$this->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
-		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id');
-		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid');
-		$this->PrestudentModel->addJoin(
-			'public.tbl_studentlehrverband v',
-			'v.student_uid=s.student_uid AND v.studiensemester_kurzbz=' . $this->PrestudentModel->escape($studiensemester_kurzbz),
-			'LEFT'
-		);
-
-		$this->PrestudentModel->addSelect('p.person_id');
-		$this->PrestudentModel->addSelect('s.prestudent_id');
-		$this->PrestudentModel->addSelect('b.uid');
-		$this->PrestudentModel->addSelect('titelpre');
-		$this->PrestudentModel->addSelect('titelpost');
-		$this->PrestudentModel->addSelect('vorname');
-		$this->PrestudentModel->addSelect('wahlname');
-		$this->PrestudentModel->addSelect('vornamen');
-		$this->PrestudentModel->addSelect('geschlecht');
-		$this->PrestudentModel->addSelect('nachname');
-		$this->PrestudentModel->addSelect('gebdatum');
-		$this->PrestudentModel->addSelect('tbl_prestudent.anmerkung');
-		$this->PrestudentModel->addSelect('ersatzkennzeichen');
-		$this->PrestudentModel->addSelect('svnr');
-		$this->PrestudentModel->addSelect('s.matrikelnr');
-		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
-		$this->PrestudentModel->addSelect('v.semester');
-		$this->PrestudentModel->addSelect('v.verband');
-		$this->PrestudentModel->addSelect('v.gruppe');
-		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
-		$this->PrestudentModel->addSelect('aufmerksamdurch_kurzbz');
-		$this->PrestudentModel->addSelect('mentor');
-		$this->PrestudentModel->addSelect('b.aktiv AS bnaktiv');
-		$this->PrestudentModel->addSelect(
-			"(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung LIMIT 1) AS email_privat",
-			false
-		);
-		$this->PrestudentModel->addSelect(
-			"(SELECT rt_gesamtpunkte AS punkte FROM public.tbl_prestudent WHERE prestudent_id=s.prestudent_id) AS punkte",
-			false
-		);
-		$this->PrestudentModel->addSelect('tbl_prestudent.dual');
-		$this->PrestudentModel->addSelect('tbl_prestudent.reihungstest_id');
-		$this->PrestudentModel->addSelect('tbl_prestudent.anmeldungreihungstest');
-		$this->PrestudentModel->addSelect('p.matr_nr');
-		$this->PrestudentModel->addSelect('tbl_prestudent.gsstudientyp_kurzbz');
-		$this->PrestudentModel->addSelect('tbl_prestudent.aufnahmegruppe_kurzbz');
-		$this->PrestudentModel->addSelect('tbl_prestudent.priorisierung');
-		$this->PrestudentModel->addSelect('p.zugangscode');
-		$this->PrestudentModel->addSelect('p.bpk');
-
-		$where = [];
-
-		$result = $this->PrestudentModel->loadWhere([
-			's.student_uid' => $student_uid
-		]);
-		
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
-		}
-	}
 
 	/**
 	 * @param string		$prestudent_id
@@ -409,12 +493,83 @@ class Students extends FHC_Controller
 		$this->PrestudentModel->addSelect('p.zugangscode');
 		$this->PrestudentModel->addSelect('p.bpk');
 
-		$where = [];
-
 		$result = $this->PrestudentModel->loadWhere([
 			'tbl_prestudent.prestudent_id' => $prestudent_id
 		]);
 
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		} else {
+			$this->outputJson(getData($result) ?: []);
+		}
+	}
+
+	/**
+	 * @param string		$student_uid
+	 *
+	 * @return void
+	 */
+	protected function getStudent($student_uid)
+	{
+		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$this->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
+		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id');
+		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid');
+		$this->PrestudentModel->addJoin(
+			'public.tbl_studentlehrverband v',
+			'v.student_uid=s.student_uid AND v.studiensemester_kurzbz=' . $this->PrestudentModel->escape($studiensemester_kurzbz),
+			'LEFT'
+		);
+
+		$this->PrestudentModel->addSelect('p.person_id');
+		$this->PrestudentModel->addSelect('s.prestudent_id');
+		$this->PrestudentModel->addSelect('b.uid');
+		$this->PrestudentModel->addSelect('titelpre');
+		$this->PrestudentModel->addSelect('titelpost');
+		$this->PrestudentModel->addSelect('vorname');
+		$this->PrestudentModel->addSelect('wahlname');
+		$this->PrestudentModel->addSelect('vornamen');
+		$this->PrestudentModel->addSelect('geschlecht');
+		$this->PrestudentModel->addSelect('nachname');
+		$this->PrestudentModel->addSelect('gebdatum');
+		$this->PrestudentModel->addSelect('tbl_prestudent.anmerkung');
+		$this->PrestudentModel->addSelect('ersatzkennzeichen');
+		$this->PrestudentModel->addSelect('svnr');
+		$this->PrestudentModel->addSelect('s.matrikelnr');
+		$this->PrestudentModel->addSelect('p.anmerkung AS anmerkungen');
+		$this->PrestudentModel->addSelect('v.semester');
+		$this->PrestudentModel->addSelect('v.verband');
+		$this->PrestudentModel->addSelect('v.gruppe');
+		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
+		$this->PrestudentModel->addSelect('aufmerksamdurch_kurzbz');
+		$this->PrestudentModel->addSelect('mentor');
+		$this->PrestudentModel->addSelect('b.aktiv AS bnaktiv');
+		$this->PrestudentModel->addSelect(
+			"(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung LIMIT 1) AS email_privat",
+			false
+		);
+		$this->PrestudentModel->addSelect(
+			"(SELECT rt_gesamtpunkte AS punkte FROM public.tbl_prestudent WHERE prestudent_id=s.prestudent_id) AS punkte",
+			false
+		);
+		$this->PrestudentModel->addSelect('tbl_prestudent.dual');
+		$this->PrestudentModel->addSelect('tbl_prestudent.reihungstest_id');
+		$this->PrestudentModel->addSelect('tbl_prestudent.anmeldungreihungstest');
+		$this->PrestudentModel->addSelect('p.matr_nr');
+		$this->PrestudentModel->addSelect('tbl_prestudent.gsstudientyp_kurzbz');
+		$this->PrestudentModel->addSelect('tbl_prestudent.aufnahmegruppe_kurzbz');
+		$this->PrestudentModel->addSelect('tbl_prestudent.priorisierung');
+		$this->PrestudentModel->addSelect('p.zugangscode');
+		$this->PrestudentModel->addSelect('p.bpk');
+
+		$result = $this->PrestudentModel->loadWhere([
+			's.student_uid' => $student_uid
+		]);
+		
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			$this->outputJson(getError($result));
