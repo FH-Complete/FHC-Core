@@ -326,6 +326,8 @@ class Verband extends FHC_Controller
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
+		$this->StudiensemesterModel->addOrder('start');
+
 		/**
 		 * TODO(chris): filter with variable:
 		 * - $number_displayed_past_studiensemester from Variable
