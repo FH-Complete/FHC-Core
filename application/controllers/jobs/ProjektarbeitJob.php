@@ -124,7 +124,7 @@ class ProjektarbeitJob extends JOB_Controller
 				'final' => $projektarbeit->final,
 			]);
 
-			$this->db->order_by("projektarbeit_id", "desc"); //TODO(manu) Cronjob soll weiterlaufen, continue?
+			$this->db->order_by("projektarbeit_id", "desc");
 			$result = $this->ProjektarbeitModel->loadWhere([
 				'student_uid' => $projektarbeit->student_uid,
 				'insertvon' => 'Projektjob',
@@ -158,7 +158,10 @@ class ProjektarbeitJob extends JOB_Controller
 				'projektarbeit_id' => $projekt->projektarbeit_id
 			]);
 			if (isError($result))
+			{
 				$this->logError(getError($result));
+				continue;
+			}
 
 			elseif (!hasData($result))
 			{
@@ -168,34 +171,42 @@ class ProjektarbeitJob extends JOB_Controller
 			{
 				$betreuung = getData($result);
 
-				foreach ($betreuung as $bet) {
+				//error handler, catching also warnings
+				set_error_handler(function ($err_severity, $err_msg, $err_file, $err_line, array $err_context)
+				{
+					throw new ErrorException( $err_msg, 0, $err_severity, $err_file, $err_line );
+				}, E_WARNING);
+
+				foreach ($betreuung as $bet)
+				{
 					$now = new Datetime();
-					$result = $this->ProjektbetreuerModel->insert([
-						'person_id' => $bet->person_id,
-						'projektarbeit_id' => $projekt_id_copy,
-						'note' => null,
-						'faktor' => $bet->faktor,
-						'name' => $bet->name,
-						'punkte' => $bet->punkte,
-						'stundensatz' => $bet->stundensatz,
-						'updateamum' => null,
-						'updatevon' => null,
-						'insertamum' => $now->format('c'),
-						'insertvon' => 'Projektjob',
-						'ext_id' => $bet->ext_id,
-						'betreuerart_kurzbz' => $bet->betreuerart_kurzbz,
-						'stunden' => null,
-						'vertrag_id' => null,
-						'zugangstoken' => null, //TODO(manu) sonst insertfehler DB: 1 datensatz 34195
-						'zugangstoken_gueltigbis' => null //TODO analog zu token
-					]);
-					if (isError($result))
-					{
-						$this->logError(getError($result));
+					try{
+						$result = $this->ProjektbetreuerModel->insert([
+							'person_id' => $bet->person_id,
+							'projektarbeit_id' => $projekt_id_copy,
+							'note' => null,
+							'faktor' => $bet->faktor,
+							'name' => $bet->name,
+							'punkte' => $bet->punkte,
+							'stundensatz' => $bet->stundensatz,
+							'updateamum' => null,
+							'updatevon' => null,
+							'insertamum' => $now->format('c'),
+							'insertvon' => 'Projektjob',
+							'ext_id' => $bet->ext_id,
+							'betreuerart_kurzbz' => $bet->betreuerart_kurzbz,
+							'stunden' => null,
+							'vertrag_id' => null,
+							'zugangstoken' => null,
+							'zugangstoken_gueltigbis' => null
+						]);
 					}
-				//	else
-				//		echo $nl . "neue Betreuung für person_id " . $bet->person_id . ' und projektarbeit_id ' . $projekt_id_copy . ' angelegt';
+					catch (ErrorException $e){
+						$this->logError("Error Insert Betreuungen, check projekt_id: " . $projekt_id_copy);
+						continue;
+					}
 				}
+				restore_error_handler();
 			}
 		}
 
@@ -234,6 +245,5 @@ class ProjektarbeitJob extends JOB_Controller
 		}
 		$this->logInfo($countTotal . ' projektarbeiten not uploaded in time, ' . $countMails . ' sent mails.');
 		$this->logInfo('End Job Projektarbeit');
-		echo $nl . 'End Job Projektarbeit: ' . $countTotal . ' projektarbeiten not uploaded in time, ' . $countMails . ' sent mails. ' . $nl;
 	}
 }
