@@ -426,40 +426,56 @@ class AntragJob extends JOB_Controller
 		$modifier_request_2 = $this->config->item('wiederholung_job_request_2_date_modifier');
 		$modifier_deadline = $this->config->item('wiederholung_job_deadline_date_modifier');
 
-		if ($modifier_deadline)
-		{
+		$digi_start = $this->config->item('digitalization_start');
+		if ($digi_start) {
+			try {
+				$digi_start = new DateTime($digi_start);
+			} catch(Exception $e) {
+			}
+		}
+
+		if ($modifier_deadline) {
 			$dateDeadline = new DateTime();
 			$dateDeadline->sub(DateInterval::createFromDateString($modifier_deadline));
+			
+			if ($digi_start)
+				$dateDeadline = max($digi_start, $dateDeadline);
+		} else {
+			$dateDeadline = $digi_start ?: null;
 		}
-		else
-			$dateDeadline = null;
 
 		//first request
-		if ($modifier_request_1)
-			$this->sendReminder(
-				'Request1',
-				null,
-				Studierendenantragstatus_model::STATUS_REQUESTSENT_1,
-				$dateDeadline,
-				$modifier_request_1,
-				$modifier_deadline,
-				'Aufforderung: Bekanntgabe Wiederholung'
-			);
-		else
+		if ($modifier_request_1) {
+			$dateStichtag = new DateTime();
+			$dateStichtag->sub(DateInterval::createFromDateString($modifier_request_1));
+			if (!$dateDeadline || $dateStichtag > $dateDeadline)
+				$this->sendReminder(
+					'Request1',
+					null,
+					Studierendenantragstatus_model::STATUS_REQUESTSENT_1,
+					$dateDeadline,
+					$dateStichtag,
+					$modifier_deadline,
+					'Aufforderung: Bekanntgabe Wiederholung'
+				);
+		} else
 			$this->logError('Config "wiederholung_job_request_1_date_modifier" nicht gesetzt');
 
 		//second request
-		if ($modifier_request_2)
-			$this->sendReminder(
-				'Request2',
-				Studierendenantragstatus_model::STATUS_REQUESTSENT_1,
-				Studierendenantragstatus_model::STATUS_REQUESTSENT_2,
-				$dateDeadline,
-				$modifier_request_2,
-				$modifier_deadline,
-				'Reminder Aufforderung: Bekanntgabe Wiederholung'
-			);
-		else
+		if ($modifier_request_2) {
+			$dateStichtag = new DateTime();
+			$dateStichtag->sub(DateInterval::createFromDateString($modifier_request_2));
+			if (!$dateDeadline || $dateStichtag > $dateDeadline)
+				$this->sendReminder(
+					'Request2',
+					Studierendenantragstatus_model::STATUS_REQUESTSENT_1,
+					Studierendenantragstatus_model::STATUS_REQUESTSENT_2,
+					$dateDeadline,
+					$dateStichtag,
+					$modifier_deadline,
+					'Reminder Aufforderung: Bekanntgabe Wiederholung'
+				);
+		} else
 			$this->logError('Config "wiederholung_job_request_2_date_modifier" nicht gesetzt');
 
 		$this->logInfo('Ende Job sendAufforderungWiederholer');
@@ -479,14 +495,11 @@ class AntragJob extends JOB_Controller
 		return $result;
 	}
 
-	protected function sendReminder($name, $status_from, $status_to, $deadline, $date_modifier, $modifier_deadline, $subject)
+	protected function sendReminder($name, $status_from, $status_to, $deadline, $date_stichtag, $modifier_deadline, $subject)
 	{
 		$this->logInfo('Start Job sendAufforderungWiederholer ' . $name);
 
-		$dateStichtag = new DateTime();
-		$dateStichtag->sub(DateInterval::createFromDateString($date_modifier));
-
-		$result = $this->PruefungModel->getAllPrestudentsWhereCommitteeExamFailed($status_from, $dateStichtag, $deadline);
+		$result = $this->PruefungModel->getAllPrestudentsWhereCommitteeExamFailed($status_from, $date_stichtag, $deadline);
 
 		if(isError($result))
 		{
