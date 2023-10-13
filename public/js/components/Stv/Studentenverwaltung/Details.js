@@ -24,7 +24,7 @@ export default {
 		}
 	},
 	template: `
-	<div class="stv-details h-100 pb-3">
+	<div class="stv-details h-100 pb-3 d-flex flex-column">
 		<div v-if="hasNoStudent" class="justify-content-center d-flex h-100 align-items-center">Bitte StudentIn auswählen!</div>
 		<template v-else>		
 			<ul class="nav nav-tabs">
@@ -32,9 +32,11 @@ export default {
 					<a class="nav-link" :class="{active: comp == component}" :aria-current="comp == component ? 'page' : ''" href="#" @click="component=comp">{{title}}</a>
 				</li>
 			</ul>
-			<keep-alive>
-				<component :is="component" :student="student"></component>
-			</keep-alive>
+			<div style="flex: 1 1 0%; height: 0%" class="border-bottom border-start border-end overflow-auto p-3">
+				<keep-alive>
+					<component :is="component" :student="student"></component>
+				</keep-alive>
+			</div>
 		</template>
 	</div>`
 };

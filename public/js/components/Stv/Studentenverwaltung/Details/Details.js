@@ -191,7 +191,10 @@ export default {
 	},
 	//TODO(chris): Geburtszeit? Anzahl der Kinder?
 	template: `
-	<div ref="form" class="stv-details-details h-100 pb-3">
+	<div ref="form" class="stv-details-details">
+		<div class="position-sticky top-0">
+			<button type="button" class="btn btn-primary position-absolute top-0 end-0" @click="save" :disabled="!changedLength">Speichern</button>
+		</div>
 		<fieldset class="overflow-hidden">
 			<legend>Person</legend>
 			<template v-if="data">
@@ -371,9 +374,6 @@ export default {
 				Loading...
 			</div>
 		</fieldset>
-		<div>
-			<button type="button" class="btn btn-primary" @click="save" :disabled="!changedLength">Speichern</button>
-		</div>
 		<pv-toast ref="responseToast" style="z-index:9999"></pv-toast>
 	</div>`
 };
