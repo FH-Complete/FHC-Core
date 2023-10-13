@@ -47,6 +47,14 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 			'updateamum' => strftime('%Y-%m-%d %H:%M:%S'),
 			'updatevon' => getAuthUID()
 		);
+		
+		$curbfres = $this->CI->BenutzerfunktionModel->load($this->getBenutzerfunktion_id());
+		$curbf = (getData($curbfres))[0];
+		if( $curbf && ($this->getVon() < $curbf->datum_von) ) 
+		{
+			$data->datum_von = $this->getVon();
+		}
+		
 		$ret = $this->CI->BenutzerfunktionModel->update($this->getBenutzerfunktion_id(), $data);
 		
 		if(isError($ret) )
