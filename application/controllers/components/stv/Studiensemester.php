@@ -29,6 +29,26 @@ class Studiensemester extends FHC_Controller
 		}
 	}
 
+	public function now()
+	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$result = $this->StudiensemesterModel->getAkt();
+
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		}
+		$result = getData($result) ?: [];
+
+		if (count($result) != 1) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(count($result) ? 'Mehrere Studiensemester aktiv' : 'Kein Studiensemester aktiv');
+		} else {
+			$this->outputJson(current($result)->studiensemester_kurzbz);
+		}
+	}
+
 	public function set()
 	{
 		$this->load->library('AuthLib');
@@ -39,7 +59,7 @@ class Studiensemester extends FHC_Controller
 		$this->form_validation->set_rules('studiensemester', 'Studiensemester', 'required');
 
 		if ($this->form_validation->run() == false) {
-			$this->output->set_status_header(HTTP_BAD_REQUEST);
+			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
 			return $this->outputJson($this->form_validation->error_array());
 		}
 
