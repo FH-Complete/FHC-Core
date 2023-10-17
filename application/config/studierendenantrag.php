@@ -159,3 +159,24 @@ $config['stgkz_blacklist_unterbrechung'] = [];
  * @var array           An array of tbl_studiengang.studiengang_kz's
  */
 $config['stgkz_blacklist_wiederholung'] = [];
+
+/**
+ * Blacklisted for abmeldung anträge
+ *
+ * @var array           An array of tbl_studiengang.studiengang_kz's
+ */
+$config['stgtyp_blacklist_abmeldung'] = [];
+
+/**
+ * Blacklisted for unterbrechung anträge
+ *
+ * @var array           An array of tbl_studiengang.studiengang_kz's
+ */
+$config['stgtyp_blacklist_unterbrechung'] = [];
+
+/**
+ * Blacklisted for wiederholung anträge
+ *
+ * @var array           An array of tbl_studiengang.studiengang_kz's
+ */
+$config['stgtyp_blacklist_wiederholung'] = [];

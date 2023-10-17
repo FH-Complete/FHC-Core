@@ -517,6 +517,9 @@ class AntragJob extends JOB_Controller
 				$stg_kz = $prestudent->studiengang_kz;
 				if (in_array($stg_kz, $this->config->item('stgkz_blacklist_wiederholung')))
 					continue;
+				if (in_array($prestudent->stg_typ, $this->config->item('stgtyp_blacklist_wiederholung')))
+					continue;
+
 				$url = site_url('lehre/Studierendenantrag/wiederholung/' . $prestudent->prestudent_id);
 				$urlCIS = CIS_ROOT . 'index.ci.php/lehre/Studierendenantrag/wiederholung/' . $prestudent->prestudent_id;
 				$email = $this->StudentModel->getEmailFH($this->StudentModel->getUID($prestudent->prestudent_id));

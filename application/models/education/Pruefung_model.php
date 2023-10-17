@@ -148,6 +148,7 @@ class Pruefung_model extends DB_Model
 		$this->addSelect('pers.nachname');
 		$this->addSelect('pers.person_id');
 		$this->addSelect('s.matrikelnr');
+		$this->addSelect('g.typ AS stg_typ');
 		$this->addSelect('g.bezeichnung');
 		$this->addSelect('g.studiengang_kz');
 		$this->addSelect('o.bezeichnung_mehrsprachig[(' . $sprache_index . ')] AS orgform', false);

@@ -546,7 +546,7 @@ class Studiengang_model extends DB_Model
 	 *
 	 * @return stdClass
 	 */
-	public function getAktivePrestudenten($studiengang_kzs, $not_antrag_typ = null, $query = null)
+	public function getAktivePrestudenten($studiengang_kzs, $not_antrag_typ = null, $not_stg_typ = null, $query = null)
 	{
 		$this->load->config('studierendenantrag');
 
@@ -591,6 +591,10 @@ class Studiengang_model extends DB_Model
 				'LEFT'
 			);
 			$this->db->where('a.typ IS NULL');
+		}
+
+		if ($not_stg_typ) {
+			$this->db->where_not_in($this->dbTable . '.typ', $not_stg_typ);
 		}
 
 		if ($query) {

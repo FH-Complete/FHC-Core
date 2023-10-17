@@ -1122,6 +1122,16 @@ class AntragLib
 		if (in_array($stg_kz, $this->_ci->config->item('stgkz_blacklist_abmeldung')))
 			return success(-3);
 
+		$result = $this->_ci->StudiengangModel->load($stg_kz);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success(0);
+		$result = current(getData($result));
+		$stg_typ = $result->typ;
+		if (in_array($stg_typ, $this->_ci->config->item('stgtyp_blacklist_abmeldung')))
+			return success(-3);
+
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
 		if (isError($result))
 			return $result;
@@ -1193,6 +1203,16 @@ class AntragLib
 		$result = current(getData($result));
 		$stg_kz = $result->studiengang_kz;
 		if (in_array($stg_kz, $this->_ci->config->item('stgkz_blacklist_unterbrechung')))
+			return success(-3);
+
+		$result = $this->_ci->StudiengangModel->load($stg_kz);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success(0);
+		$result = current(getData($result));
+		$stg_typ = $result->typ;
+		if (in_array($stg_typ, $this->_ci->config->item('stgtyp_blacklist_unterbrechung')))
 			return success(-3);
 
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id);
@@ -1267,6 +1287,16 @@ class AntragLib
 		$result = current(getData($result));
 		$stg_kz = $result->studiengang_kz;
 		if (in_array($stg_kz, $this->_ci->config->item('stgkz_blacklist_wiederholung')))
+			return success(-3);
+
+		$result = $this->_ci->StudiengangModel->load($stg_kz);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success(0);
+		$result = current(getData($result));
+		$stg_typ = $result->typ;
+		if (in_array($stg_typ, $this->_ci->config->item('stgtyp_blacklist_wiederholung')))
 			return success(-3);
 
 		$result = $this->getFailedExamForPrestudent($prestudent_id);
@@ -1473,10 +1503,12 @@ class AntragLib
 	public function getAktivePrestudentenInStgs($studiengaenge, $query)
 	{
 		$blacklist = $this->_ci->config->item('stgkz_blacklist_abmeldung');
+		$blacklist_typ = $this->_ci->config->item('stgtyp_blacklist_abmeldung');
 		$studiengaenge = array_diff($studiengaenge, $blacklist);
 		return $this->_ci->StudiengangModel->getAktivePrestudenten(
 			$studiengaenge,
 			[ Studierendenantrag_model::TYP_ABMELDUNG ],
+			$blacklist_typ,
 			$query
 		);
 	}
