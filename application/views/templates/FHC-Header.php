@@ -118,6 +118,9 @@
 			// HTML Widget CSS
 			if ($widgets === true) generateCSSsInclude('public/css/Widgets.css');
 
+			// CIS
+			if ($cis === true) generateCSSsInclude('public/css/cis_bs5.css');
+
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS
 		?>

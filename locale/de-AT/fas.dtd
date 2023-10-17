@@ -211,6 +211,18 @@
 		<!ENTITY menu-dokumente-diplsupplement.label	"Diploma Supplement">
 		<!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
 
+		<!ENTITY menu-dokumente-antrag.key		"N">
+		<!ENTITY menu-dokumente-antrag.label	"Antrag">
+		<!ENTITY menu-dokumente-antrag.accesskey	"N">
+
+		<!ENTITY menu-dokumente-antrag-abmeldung.key		"A">
+		<!ENTITY menu-dokumente-antrag-abmeldung.label	"Abmeldung">
+		<!ENTITY menu-dokumente-antrag-abmeldung.accesskey	"A">
+
+		<!ENTITY menu-dokumente-antrag-unterbrechung.key		"U">
+		<!ENTITY menu-dokumente-antrag-unterbrechung.label	"Unterbrecher">
+		<!ENTITY menu-dokumente-antrag-unterbrechung.accesskey	"U">
+
 		<!ENTITY menu-dokumente-ausbildungsvertrag.key		"A">
 		<!ENTITY menu-dokumente-ausbildungsvertrag.label	"Ausbildungsvertrag Deutsch">
 		<!ENTITY menu-dokumente-ausbildungsvertrag.accesskey	"A">
