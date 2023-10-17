@@ -47,10 +47,10 @@ class ProjektarbeitJob extends JOB_Controller
 			$startDate = new DateTime($startDate);
 
 		$mailArray = array();
+		$arrayStg = array();
 		$countMissedAbgaben = 0;
 		$countTotal = 0;
 		$countMails = 0;
-		$nl = "\n";
 
 		$this->logInfo('Start Job Projektarbeit');
 
@@ -60,6 +60,8 @@ class ProjektarbeitJob extends JOB_Controller
 			return $this->logError(getError($result));
 		if (!hasData($result))
 			return $this->logInfo('End Job Projektarbeit Update: 0 Mails sent');
+
+
 
 		$projektarbeiten = getData($result);
 
@@ -98,11 +100,11 @@ class ProjektarbeitJob extends JOB_Controller
 				'lehreinheit_id' => $projektarbeit->lehreinheit_id,
 				'student_uid' => $projektarbeit->student_uid,
 				'firma_id' => $projektarbeit->firma_id,
-				'punkte' => null, //TODO(manu) oder $projektarbeit->punkte
+				'punkte' => null,
 				'beginn' => null,
 				'ende' => null,
 				'faktor' => $projektarbeit->faktor,
-				'freigegeben' => $projektarbeit->freigegeben, //TODO(manu) besser FALSE?
+				'freigegeben' => $projektarbeit->freigegeben,
 				'gesperrtbis' => $projektarbeit->gesperrtbis,
 				'stundensatz' => $projektarbeit->stundensatz,
 				'themenbereich' => $projektarbeit->themenbereich,
@@ -112,10 +114,10 @@ class ProjektarbeitJob extends JOB_Controller
 				'insertamum' => $now->format('c'),
 				'insertvon' => 'Projektjob',
 				'ext_id' => $projektarbeit->ext_id,
-				'gesamtstunden' => null, //TODO(manu) oder $projektarbeit->gesamtstunden?
+				'gesamtstunden' => null,
 				'titel_english' => $projektarbeit->titel_english,
 				'sprache' => $projektarbeit->sprache,
-				'abgabedatum' => null, //TODO(manu) oder $projektarbeit->abgabedatum
+				'abgabedatum' => null,
 				'kontrollschlagwoerter' => $projektarbeit->kontrollschlagwoerter,
 				'schlagwoerter' => $projektarbeit->schlagwoerter,
 				'schlagwoerter_en' => $projektarbeit->schlagwoerter_en,
@@ -145,24 +147,50 @@ class ProjektarbeitJob extends JOB_Controller
 				$projektarbeit_copy = current(getData($result));
 				$projekt_id_copy = $projektarbeit_copy->projektarbeit_id;
 
-				//Start Mailarray
-				if (!isset($mailArray[$projekt->studiengang_kz]))
+				//Array Studiengänge
+				if (!isset($arrayStg[$projekt->studiengang_kz]))
 				{
-					$mailArray[$projekt->studiengang_kz] = $countMissedAbgaben;
+					$result = $this->StudiengangModel->loadWhere([
+						'studiengang_kz' => $projekt->studiengang_kz
+					]);
+					if (isError($result))
+						$this->logError(getError($result));
+					elseif (!hasData($result))
+					{
+						$this->logInfo('Kein Studiengang für' . $projekt->studiengang_kz . 'gefunden');
+					}
+					else
+					{
+						$studiengang = current(getData($result));
+						$email = $studiengang->email;
+
+						$arrayStg[$projekt->studiengang_kz] = array(
+							'countMissedAbgaben' => $countMissedAbgaben,
+							'email' => $email
+						);
+					}
 				}
-				$mailArray[$projekt->studiengang_kz] = $mailArray[$projekt->studiengang_kz] + 1;
+				$arrayStg[$projekt->studiengang_kz]['countMissedAbgaben'] = ($arrayStg[$projekt->studiengang_kz]['countMissedAbgaben'] + 1);
+
+				//Mailarray
+				$mailArray[] = 	array(
+					'studiengang_kz' => $projekt->studiengang_kz,
+					'projekt_id_alt' => $projekt->projektarbeit_id,
+					'projekt_id_neu' => $projekt_id_copy,
+					'student_uid' => $projekt->student_uid,
+					'vorname' => $projekt->vorname,
+					'nachname' => $projekt->nachname,
+					'titel' => $projekt->titel);
 			}
 
 			// (3)Betreuungen kopieren
 			$result = $this->ProjektbetreuerModel->loadWhere([
 				'projektarbeit_id' => $projekt->projektarbeit_id
 			]);
-			if (isError($result))
-			{
+			if (isError($result)) {
 				$this->logError(getError($result));
 				continue;
 			}
-
 			elseif (!hasData($result))
 			{
 				$this->logInfo('Keine Betreuung für' . $projekt->projektarbeit_id . 'gefunden');
@@ -172,16 +200,14 @@ class ProjektarbeitJob extends JOB_Controller
 				$betreuung = getData($result);
 
 				//error handler, catching also warnings
-				set_error_handler(function ($err_severity, $err_msg, $err_file, $err_line, array $err_context)
-				{
-					throw new ErrorException( $err_msg, 0, $err_severity, $err_file, $err_line );
+				set_error_handler(function ($err_severity, $err_msg, $err_file, $err_line, array $err_context) {
+					throw new ErrorException($err_msg, 0, $err_severity, $err_file, $err_line);
 				}, E_WARNING);
 
-				foreach ($betreuung as $bet)
-				{
+				foreach ($betreuung as $bet) {
 					$now = new Datetime();
-					try{
-						$result = $this->ProjektbetreuerModel->insert([
+					try {
+						$this->ProjektbetreuerModel->insert([
 							'person_id' => $bet->person_id,
 							'projektarbeit_id' => $projekt_id_copy,
 							'note' => null,
@@ -200,8 +226,7 @@ class ProjektarbeitJob extends JOB_Controller
 							'zugangstoken' => null,
 							'zugangstoken_gueltigbis' => null
 						]);
-					}
-					catch (ErrorException $e){
+					} catch (ErrorException $e) {
 						$this->logError("Error Insert Betreuungen, check projekt_id: " . $projekt_id_copy);
 						continue;
 					}
@@ -209,40 +234,50 @@ class ProjektarbeitJob extends JOB_Controller
 				restore_error_handler();
 			}
 		}
+		array_multisort($mailArray);
 
-		//(4)Sancho Mail
-		foreach ($mailArray as $stg_kz => $anzahlMissedAbgaben)
+		//(4) Sancho Mail
+		foreach ($arrayStg as $stg_kz => $item)
 		{
-			$result = $this->StudiengangModel->loadWhere([
-				'studiengang_kz' => $stg_kz
-			]);
-			if (isError($result))
-				$this->logError(getError($result));
-			elseif (!hasData($result))
+			$maildata = " <table class='table table-striped'> <thead>
+							<tr>
+							<th align=left>UID </th>
+							<th align=left>Name</th>
+							<th align=left>Projektarbeit</th>
+							</tr>
+							</thead>
+							<tbody>";
+			$email = $item['email'];
+			$anzahlMissedAbgaben = $item['countMissedAbgaben'];
+
+			foreach ($mailArray as $m)
 			{
-				$this->logInfo('Kein Studiengang für' . $stg_kz . 'gefunden');
-			}
-			else
-			{
-				$studiengang = current(getData($result));
-				$email = $studiengang->email;
-				$betreff = 'Versäumte Abgabe(n) Projektarbeiten / Project Work(s) not uploaded in time';
-
-				//TODO(manu) link basisurl?
-				$data = [
-					'anzahlMissedAbgaben' => $anzahlMissedAbgaben,
-					'link' => 'https://vilesci.technikum-wien.at/vilesci/lehre/abgabe_assistenz_frameset.php?stg_kz=' . $stg_kz
-				];
-
-				$countTotal = $countTotal + $anzahlMissedAbgaben;
-
-				//send mail
-				if (sendSanchoMail('Sancho_Mail_Stgl_MissedAbgaben', $data, $email, $betreff)) {
-					//echo $nl . "Mail an Studiengang " . $stg_kz . " , Anzahl missed PAs: " . $anzahlMissedAbgaben . " email: " . $studiengang->email . $nl;
-					$countMails++;
+				if ($stg_kz == $m['studiengang_kz'])
+				{
+					$maildata .= "<tr>" .
+						"<td>". $m['student_uid'] . "</td>".
+						"<td>". trim($m['vorname'] . " " . $m['nachname']) ."</td>".
+						"<td>".	$m['titel'] . "</td></tr>";
 				}
 			}
+			$maildata .= "</tbody></table>";
+
+			$betreff = 'Versäumte Abgabe(n) Projektarbeiten / Project Work(s) not uploaded in time';
+			$data = [
+				'anzahlMissedAbgaben' => $anzahlMissedAbgaben,
+				'link' =>  APP_ROOT. '/vilesci/lehre/abgabe_assistenz_frameset.php?stg_kz=' . $stg_kz,
+				'table' => $maildata
+			];
+
+			$countTotal = $countTotal + $anzahlMissedAbgaben;
+
+			//send mail
+			if (sendSanchoMail('Sancho_Mail_Stgl_MissedAbgaben', $data, $email, $betreff))
+			{
+				$countMails++;
+			}
 		}
+
 		$this->logInfo($countTotal . ' projektarbeiten not uploaded in time, ' . $countMails . ' sent mails.');
 		$this->logInfo('End Job Projektarbeit');
 	}

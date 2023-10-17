@@ -74,7 +74,7 @@ class Projektarbeit_model extends DB_Model
 
 	/**
 	 * Gets all Projektarbeiten not uploaded in Time
-	 * @param String $startDate project works before this date will be ignored (in Dateformat: 'YYYY'-'mm'-'dd')
+	 * @param String $startDate project works before this date will be ignored (in Dateformat: 'Y'-'m'-'d')
 	 * @return object
 	 */
 	public function getAllProjektarbeitenNotUploadedInTime($startDate = null)
@@ -83,13 +83,15 @@ class Projektarbeit_model extends DB_Model
 		$now = new DateTime();
 
 		$this->db->distinct();
-		$this->addSelect($this->dbTable.'.projektarbeit_id');
-		$this->addSelect($this->dbTable.'.titel');
-		$this->addSelect($this->dbTable.'.student_uid');
-		$this->addSelect($this->dbTable.'.note');
-		$this->addSelect('p' . '.person_id');
-		$this->addSelect('le' . '.lehreinheit_id');
-		$this->addSelect('sg' . '.studiengang_kz');
+		$this->addSelect($this->dbTable. '.projektarbeit_id');
+		$this->addSelect($this->dbTable. '.titel');
+		$this->addSelect($this->dbTable. '.student_uid');
+		$this->addSelect($this->dbTable. '.note');
+		$this->addSelect('p'. '.person_id');
+		$this->addSelect('p'. '.nachname');
+		$this->addSelect('p'. '.vorname');
+		$this->addSelect('le'. '.lehreinheit_id');
+		$this->addSelect('sg'. '.studiengang_kz');
 
 		$this->addJoin('campus.tbl_paabgabe pa', 'projektarbeit_id');
 		$this->addJoin('lehre.tbl_projektbetreuer pb', 'projektarbeit_id');
@@ -104,7 +106,7 @@ class Projektarbeit_model extends DB_Model
 		if($startDate)
 			$this->db->where('pa.datum >', $startDate);
 
-		$this->db->where($this->dbTable. '.note', null); //TODO(MANU) check if note null: ausreichend?
+		$this->db->where($this->dbTable. '.note', null);
 
 		return $this->loadWhere([
 			'pa.fixtermin' => 'true',
