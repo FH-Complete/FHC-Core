@@ -736,7 +736,7 @@ if($xmlformat=='rdf')
 		}
 	}
 	elseif(in_array($typ, array('prestudent', 'interessenten', 'bewerber', 'aufgenommen',
-		'warteliste', 'absage', 'zgv', 'reihungstestangemeldet', 'reihungstestnichtangemeldet', 'absolvent',
+		'warteliste', 'absage', 'zgv', 'reihungstestangemeldet', 'reihungstestnichtangemeldet', 'bewerberrtangemeldetteilgenommen', 'bewerberrtangemeldetnichtteilgenommen','absolvent',
 		'diplomand', 'bewerbungnichtabgeschickt', 'bewerbungabgeschickt', 'statusbestaetigt', 'statusbestaetigtrtnichtangemeldet', 'statusbestaetigtrtangemeldet', 'bewerberrtangemeldet', 'bewerberrtnichtangemeldet')))
 	{
 		$prestd = new prestudent();
