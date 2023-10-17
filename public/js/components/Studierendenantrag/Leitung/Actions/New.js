@@ -83,7 +83,7 @@ export default {
 								class="w-100"
 								v-model="student"
 								:suggestions="data"
-								optionLabel = "name"
+								optionLabel="name"
 								@complete="loadData"
 								inputId="newAntragModalAutoComplete"
 								dropdown
