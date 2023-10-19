@@ -158,7 +158,9 @@ EOTXT;
 			'funktion_bezeichnung' => $data->funktion_bezeichnung,
 			'oe_kurzbz' => $data->oe_kurzbz,
 			'oe_bezeichnung' => $data->oe_bezeichnung,
-			'oe_kurzbz_sap' => $data->oe_kurzbz_sap
+			'oe_kurzbz_sap' => $data->oe_kurzbz_sap,
+			'oe_typ_kurzbz' => $data->oe_typ_kurzbz,
+			'oe_typ_bezeichnung' => $data->oe_typ_bezeichnung
 		);
 	}
 	

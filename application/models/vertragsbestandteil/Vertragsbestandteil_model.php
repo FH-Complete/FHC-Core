@@ -24,6 +24,7 @@ class Vertragsbestandteil_model extends DB_Model
 				v.*,
 				bf.funktion_kurzbz, funktion.beschreibung funktion_bezeichnung,
 				oe.oe_kurzbz, oe.bezeichnung oe_bezeichnung, sap.oe_kurzbz_sap,
+				oet.organisationseinheittyp_kurzbz AS oe_typ_kurzbz, oet.bezeichnung AS oe_typ_bezeichnung,
 				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung,
 				f.benutzerfunktion_id,
 				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin,
@@ -43,6 +44,8 @@ class Vertragsbestandteil_model extends DB_Model
 				public.tbl_funktion funktion USING(funktion_kurzbz)
 			LEFT JOIN
 				public.tbl_organisationseinheit oe USING(oe_kurzbz)
+			LEFT JOIN
+				public.tbl_organisationseinheittyp oet USING(organisationseinheittyp_kurzbz)
 			LEFT JOIN
 				sync.tbl_sap_organisationsstruktur sap USING(oe_kurzbz)
 			LEFT JOIN
