@@ -126,23 +126,25 @@ class SearchBarLib
 			  FROM public.tbl_mitarbeiter m
 			  JOIN public.tbl_benutzer b ON(b.uid = m.mitarbeiter_uid)
 			  LEFT JOIN (
-				SELECT o.bezeichnung, bf.uid
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
 				  FROM public.tbl_benutzerfunktion bf
 				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 				 WHERE bf.funktion_kurzbz = \'kstzuordnung\'
 				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
 				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, bf.uid
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
 			) stdkst ON stdkst.uid = b.uid 
 			  JOIN public.tbl_person p USING(person_id)
 			  LEFT JOIN (
-				SELECT o.bezeichnung, bf.uid
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
 				  FROM public.tbl_benutzerfunktion bf
 				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 				 WHERE bf.funktion_kurzbz = \'oezuordnung\'
 				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
 				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, bf.uid
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
 			) org ON org.uid = b.uid 
 		     LEFT JOIN (
 				SELECT kontakt, standort_id
@@ -190,23 +192,25 @@ class SearchBarLib
 			  FROM public.tbl_mitarbeiter m
 			  JOIN public.tbl_benutzer b ON(b.uid = m.mitarbeiter_uid)
 			  JOIN (
-				SELECT o.bezeichnung, bf.uid
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
 				  FROM public.tbl_benutzerfunktion bf
 				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 				 WHERE bf.funktion_kurzbz = \'kstzuordnung\'
 				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
 				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, bf.uid
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
 			) stdkst ON stdkst.uid = b.uid 
 			  JOIN public.tbl_person p USING(person_id)
 			  JOIN (
-				SELECT o.bezeichnung, bf.uid
+				SELECT \'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS bezeichnung, bf.uid
 				  FROM public.tbl_benutzerfunktion bf
 				  JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 				 WHERE bf.funktion_kurzbz = \'oezuordnung\'
 				   AND (bf.datum_von IS NULL OR bf.datum_von <= NOW())
 				   AND (bf.datum_bis IS NULL OR bf.datum_bis >= NOW())
-				GROUP BY o.bezeichnung, bf.uid
+				GROUP BY o.bezeichnung, ot.bezeichnung, bf.uid
 			) org ON org.uid = b.uid 
 		     LEFT JOIN (
 				SELECT kontakt, standort_id
@@ -239,15 +243,17 @@ class SearchBarLib
 			SELECT
 				\''.$type.'\' AS type,
 				o.oe_kurzbz AS oe_kurzbz,
-				o.bezeichnung AS name,
+				\'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS name,
 				oParent.oe_kurzbz AS parentoe_kurzbz,
-				oParent.bezeichnung AS parentoe_name,
+				(CASE WHEN oParent.bezeichnung IS NOT NULL THEN \'[\' || otParent.bezeichnung || \'] \' || oParent.bezeichnung END) AS parentoe_name,
 				ARRAY_AGG(DISTINCT(bfLeader.uid)) AS leader_uid,
 				ARRAY_AGG(DISTINCT(bfLeader.vorname || \' \' || bfLeader.nachname)) AS leader_name,
 				COUNT(bfCount.benutzerfunktion_id) AS number_of_people,
 				(CASE WHEN o.mailverteiler = TRUE THEN o.oe_kurzbz || \''.'@'.DOMAIN.'\' END) AS mailgroup
 			  FROM public.tbl_organisationseinheit o
+			  JOIN public.tbl_organisationseinheittyp ot USING(organisationseinheittyp_kurzbz)
 		     LEFT JOIN public.tbl_organisationseinheit oParent ON(oParent.oe_kurzbz = o.oe_parent_kurzbz)
+			 LEFT JOIN public.tbl_organisationseinheittyp otParent ON(oParent.organisationseinheittyp_kurzbz = otParent.organisationseinheittyp_kurzbz)
 		     LEFT JOIN (
 				SELECT benutzerfunktion_id, oe_kurzbz
 				  FROM public.tbl_benutzerfunktion
@@ -267,7 +273,8 @@ class SearchBarLib
 			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz)
 			 WHERE o.oe_kurzbz ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
 			    OR o.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung
+				OR ot.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung
 		');
 
 		// If something has been found
