@@ -2,11 +2,15 @@ import VueDatePicker from '../../../vueDatepicker.js.php';
 import FormUploadImage from '../../../Form/Upload/Image.js';
 import {CoreRESTClient} from '../../../../RESTClient.js';
 
+
+import PvToast from "../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";
+
+
 export default {
 	components: {
 		VueDatePicker,
 		FormUploadImage,
-		PvToast: primevue.toast
+		PvToast
 	},
 	inject: {
 		showBpk: {

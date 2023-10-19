@@ -63,6 +63,9 @@ $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
 $route['studentenverwaltung/(:any)/(:any)'] = 'Studentenverwaltung/index';
 
+$route['public/js/components/primevue/(:any)/(:any)'] = 'public/Primevue/index/$1/$2';
+$route['public/js/components/primevue/(:any)/(:any)/(:any)'] = 'public/Primevue/index/$2/$3/$1';
+
 // load routes from extensions
 $subdir = 'application/config/extensions';
 $dirlist = scandir($subdir);

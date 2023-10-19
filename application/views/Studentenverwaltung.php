@@ -5,7 +5,7 @@
 		'bootstrap5' => true,
 		'fontawesome6' => true,
 		'vue3' => true,
-		'primevue3' => true,
+		#'primevue3' => true,
 		'filtercomponent' => true,
 		'tabulator5' => true,
 		'phrases' => [],
@@ -14,7 +14,8 @@
 			'public/css/components/vue-datepicker.css'
 		],
 		'customJSs' => [
-			'vendor/npm-asset/primevue/toast/toast.min.js'
+			#'vendor/npm-asset/primevue/tree/tree.min.js',
+			#'vendor/npm-asset/primevue/toast/toast.min.js'
 		],
 		'customJSModules' => [
 			'public/js/apps/Studentenverwaltung.js'
@@ -28,6 +29,7 @@
 		<router-view
 			default-semester="<?= $variables['semester_aktuell']; ?>"
 			active-addons="<?= defined('ACTIVE_ADDONS') ? ACTIVE_ADDONS : ''; ?>"
+			stv-root="<?= site_url('Studentenverwaltung'); ?>"
 			cis-root="<?= CIS_ROOT; ?>"
 			:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
 			:config="<?= htmlspecialchars(json_encode(['generateAlias' => !defined('GENERATE_ALIAS_STUDENT') ? true : GENERATE_ALIAS_STUDENT])); ?>"

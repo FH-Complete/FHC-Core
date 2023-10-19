@@ -67,6 +67,7 @@ class Verband extends FHC_Controller
 		$this->StudiengangModel->addSelect('erhalter_kz');
 		$this->StudiengangModel->addSelect('typ');
 		$this->StudiengangModel->addSelect('kurzbz');
+		$this->StudiengangModel->addSelect('studiengang_kz');
 		
 		$this->StudiengangModel->addOrder('erhalter_kz');
 		$this->StudiengangModel->addOrder('typ');

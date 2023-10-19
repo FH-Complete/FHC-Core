@@ -36,6 +36,7 @@ export default {
 		defaultSemester: String,
 		config: Object,
 		permissions: Object,
+		stvRoot: String,
 		cisRoot: String,
 		activeAddons: String // semicolon separated list of active addons
 	},
@@ -107,7 +108,7 @@ export default {
 	},
 	template: `
 	<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
-		<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" href="<?= site_url('Studentenverwaltung'); ?>">FHC 4.0</a>
+		<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">FHC 4.0</a>
 		<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
 		<fhc-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></fhc-searchbar>
 	</header>

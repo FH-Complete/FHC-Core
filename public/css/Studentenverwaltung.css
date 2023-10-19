@@ -1,5 +1,13 @@
 @import './components/searchbar.css';
 @import './components/verticalsplit.css';
+@import '../../vendor/npm-asset/primevue/resources/themes/bootstrap4-light-blue/theme.css';
+@import '../../vendor/npm-asset/primevue/resources/primevue.min.css';
+@import '../../vendor/npm-asset/primeicons/primeicons.css';
+
+.navbar-dark .navbar-brand:focus {
+	box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+	z-index: 3;
+}
 
 .searchbar {
 	margin-right: 0!important;
@@ -23,6 +31,10 @@
 	flex: 1 1 auto;
 }
 
+#sidebarMenu {
+	width: 0%;
+}
+
 @media (min-width: 768px) {
 	#sidebarMenu {
 		visibility: visible!important;
@@ -39,6 +51,8 @@
 		overflow: auto;
 	}
 }
+
+
 .stv-verband .p-treetable-tbody > tr > td {
 	display: flex;
 	padding-top: .25rem!important;
@@ -50,6 +64,15 @@
 .stv-verband .p-treetable-tbody > tr > td > span {
 	flex: 1 1 auto;
 }
+
+
+.stv-verband.p-tree {
+	/*overflow: auto;*/
+}
+.stv-verband.p-tree .p-treenode-icon {
+	display: none;
+}
+
 
 .stv-list {
 	display: flex;
