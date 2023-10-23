@@ -29,7 +29,7 @@ if($result = $db->db_query("SELECT 1 FROM public.tbl_geschlecht WHERE geschlecht
 	}
 }
 
-// Add geschlecht {offen/open}
+// Add geschlecht {keine Angabe/not specified}
 if($result = $db->db_query("SELECT 1 FROM public.tbl_geschlecht WHERE geschlecht = 'k'"))
 {
 	if($db->db_num_rows($result)==0)
