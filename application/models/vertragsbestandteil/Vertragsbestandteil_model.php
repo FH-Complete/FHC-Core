@@ -143,4 +143,38 @@ EOSQL;
 		return $vertragsbestandteil;
 		
 	}
+	
+	public function countOverlappingVBsOfSameType(vertragsbestandteil\Vertragsbestandteil $vb)
+	{
+		$notselfclause = (intval($vb->getVertragsbestandteil_id()) > 0) 
+			? 'AND v.vertragsbestandteil_id <> ' . $this->escape($vb->getVertragsbestandteil_id()) 
+			: '';
+		$sql = <<<EOSQL
+			SELECT
+				count(*) AS overlappingvbs
+			FROM
+				hr.tbl_vertragsbestandteil v
+			WHERE
+				v.dienstverhaeltnis_id = ? 
+			AND 
+				v.vertragsbestandteiltyp_kurzbz = ? 
+			AND 
+				COALESCE(?::date, '2170-12-31'::date) >= COALESCE(v.von, '1970-01-01'::date) 
+			AND 
+				?::date <= COALESCE(v.bis, '2170-12-31')
+			{$notselfclause}
+EOSQL;
+		$ret = $this->execReadOnlyQuery($sql, array(
+			$vb->getDienstverhaeltnis_id(), 
+			$vb->getVertragsbestandteiltyp_kurzbz(), 
+			$vb->getBis(), 
+			$vb->getVon()
+		));
+		
+		if( null === ($vbcount = getData($ret)) ) {
+			throw new Exception('failed to fetch overlappingvbs count');
+		}
+		
+		return $vbcount[0]->overlappingvbs;
+	}
 }

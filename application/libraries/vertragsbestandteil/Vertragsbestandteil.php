@@ -8,7 +8,7 @@ use vertragsbestandteil\AbstractBestandteil;
  *
  * @author bambi
  */
-abstract class Vertragsbestandteil extends AbstractBestandteil implements \JsonSerializable, IValidation
+abstract class Vertragsbestandteil extends AbstractBestandteil implements \JsonSerializable
 {
 	protected $vertragsbestandteil_id;
 	protected $dienstverhaeltnis_id;
@@ -21,16 +21,11 @@ abstract class Vertragsbestandteil extends AbstractBestandteil implements \JsonS
 	protected $updatevon;
 	
 	protected $gehaltsbestandteile;
-	
-	protected $isvalid;
-	protected $validationerrors;
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->gehaltsbestandteile = array();
-		$this->isvalid = false;
-		$this->validationerrors = array();
 	}
 	
 	public function hydrateByStdClass($data, $fromdb=false)
@@ -235,16 +230,6 @@ EOTXT;
 	
 	public function beforePersist() {
 		// can be overridden in childs
-	}
-	
-	public function isValid()
-	{
-		return $this->isvalid;
-	}
-
-	public function getValidationErrors()
-	{
-		return $this->validationerrors;
 	}
 	
 	public function validate() {

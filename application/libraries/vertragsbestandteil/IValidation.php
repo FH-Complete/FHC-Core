@@ -13,4 +13,6 @@ interface IValidation
 	public function getValidationErrors();
 	
 	public function validate();
+	
+	public function addValidationError($errormsg);
 }

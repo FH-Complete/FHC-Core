@@ -11,6 +11,7 @@ require_once __DIR__ . '/VertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilKarenz.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
+require_once __DIR__ . '/OverlapChecker.php';
 
 use vertragsbestandteil\Dienstverhaeltnis;
 use vertragsbestandteil\Vertragsbestandteil;

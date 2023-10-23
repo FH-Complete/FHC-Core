@@ -7,7 +7,7 @@ use DateTimeImmutable;
 /**
  * Salary always depends on employment (Dienstverhältnis) and optionally on part of contract (Vetragsbestandteil)
  */
-class Gehaltsbestandteil extends AbstractBestandteil implements IValidation, \JsonSerializable
+class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializable
 {
 	protected $gehaltsbestandteil_id;
 	protected $dienstverhaeltnis_id;
@@ -26,15 +26,10 @@ class Gehaltsbestandteil extends AbstractBestandteil implements IValidation, \Js
 	protected $insertvon;
 	protected $updateamum;
 	protected $updatevon;
-	
-	protected $isvalid;
-	protected $validationerrors;
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->isvalid = false;
-		$this->validationerrors = array();
 	}
 	
     public function hydrateByStdClass($data, $fromdb=false)
@@ -324,16 +319,6 @@ class Gehaltsbestandteil extends AbstractBestandteil implements IValidation, \Js
 
 EOTXT;
 		return $txt;
-	}
-	
-	public function isValid()
-	{
-		return $this->isvalid;
-	}
-
-	public function getValidationErrors()
-	{
-		return $this->validationerrors;
 	}
 	
 	public function validate() {

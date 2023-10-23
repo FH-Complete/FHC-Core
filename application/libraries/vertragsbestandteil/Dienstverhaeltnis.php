@@ -16,7 +16,7 @@ const TYPE_ECHT_FREI = 'echterfreier';
 const TYPE_WERKVERTRAG = 'werkvertrag';
 const TYPE_UEBERLASSUNG = 'ueberlassungsvertrag';
 
-class Dienstverhaeltnis extends AbstractBestandteil implements IValidation {
+class Dienstverhaeltnis extends AbstractBestandteil {
     protected $dienstverhaeltnis_id;
 	protected $mitarbeiter_uid;
     protected $vertragsart_kurzbz;
@@ -27,15 +27,10 @@ class Dienstverhaeltnis extends AbstractBestandteil implements IValidation {
 	protected $insertvon;
 	protected $updateamum;
 	protected $updatevon;
-	
-	protected $isvalid;
-	protected $validationerrors;
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->isvalid = false;
-		$this->validationerrors = array();
 	}
 	
 	public function hydrateByStdClass($data, $fromdb=false)
@@ -209,16 +204,6 @@ EOTXT;
 		$this->markDirty('updatevon', $this->updatevon, $updatevon);
 		$this->updatevon = $updatevon;
 		return $this;
-	}
-	
-	public function isValid()
-	{
-		return $this->isvalid;
-	}
-
-	public function getValidationErrors()
-	{
-		return $this->validationerrors;
 	}
 	
 	public function validate() {		
