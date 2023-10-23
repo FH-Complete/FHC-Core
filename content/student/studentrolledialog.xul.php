@@ -66,6 +66,10 @@ else
 
 $vorname = '';
 $nachname = '';
+
+$user=get_uid();
+$db = new basis_db();
+
 if($prestudent_id!='')
 {
 	$prestudent = new prestudent();
@@ -75,11 +79,14 @@ if($prestudent_id!='')
 	$nachname = $prestudent->nachname;
 
 	// Prüfen, ob Studnetrolle vor dem aktuellen Meldestichtag ist. In diesem Fall darf die Rolle nicht mehr bearbeitet werden.
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+
 	$bismeldestichtag = new bismeldestichtag();
-	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($datum) ? ' disabled="true"' : '';
+	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($datum) && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid')
+		? ' disabled="true"'
+		: '';
 }
-$db = new basis_db();
-$user=get_uid();
 ?>
 
 <window id="student-rolle-dialog" title="Status"
@@ -234,7 +241,7 @@ $user=get_uid();
 				</row>
 				<row>
 					<label value="Aufnahmestufe"/>
-					<menulist id="student-rolle-menulist-stufe" disabled="false">
+					<menulist id="student-rolle-menulist-stufe" <?php echo empty($disabled) ? 'disabled="false"' : $disabled ?>>
 						<menupopup>
 							<menuitem value="" label="-- keine Auswahl --"/>
 							<menuitem value="1" label="1"/>
@@ -247,7 +254,7 @@ $user=get_uid();
 					<label value="Grund"/>
 					<menulist id="student-rolle-menulist-statusgrund"
 					          datasources="rdf:null" flex="1"
-					          ref="http://www.technikum-wien.at/statusgrund" >
+					          ref="http://www.technikum-wien.at/statusgrund"<?php echo $disabled ?> >
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/statusgrund/rdf#statusgrund_id"
