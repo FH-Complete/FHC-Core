@@ -117,7 +117,7 @@ let confirm_component = null;
 const confirm_queue = [];
 
 function _require_confirm(...args) {
-	confirm_component.confirm.apply(confirm_component, args);
+	confirm_component.confirmListener.apply(confirm_component, args);
 }
 let confirm_require = function _add_to_confirm_queue(...args) {
 	confirm_queue.push(args);
@@ -174,7 +174,7 @@ const helperApp = Vue.createApp({
 					}
 				}),
 				Vue.h(primevue.confirmdialog, {
-					ref: 'pvConfirmdialog'
+					ref: 'confirm'
 				})
 			];
 		};
@@ -246,7 +246,7 @@ export default {
 				toast_add({ severity: 'info', summary: 'Info', detail: message, life: 3000 });
 			},
 			alertWarning(message) {
-				toast_add({ severity: 'warn', summary: 'Achtung', detail: message, life: 7000 });
+				toast_add({ severity: 'warn', summary: 'Achtung', detail: message});
 			},
 			alertError(message) {
 				toast_add({ severity: 'error', summary: 'Achtung', detail: message });
@@ -336,10 +336,8 @@ export default {
 					// If Array has only Objects
 					if (message.every(msg => typeof msg === 'object') && msg !== null) {
 						return message.every(msg => {
-							if (msg.hasOwnProperty('data')) {
-								if (msg.data.hasOwnProperty('retval'))
-									fhcerror.alertWarning(JSON.stringify(msg.data.retval));
-								// TODO(chris): there is no else here! join ifs?
+							if (msg.hasOwnProperty('data') && msg.data.hasOwnProperty('retval')) {
+								fhcerror.alertWarning(JSON.stringify(msg.data.retval));
 							} else {
 								fhcerror.alertSystemError(JSON.stringify(msg));
 							}
@@ -347,13 +345,11 @@ export default {
 					}
 				}
 
-				// Message is Object with data property  TODO: check object handling
+				// Message is Object with data property
 				if (typeof message === 'object' && message !== null){
-					if (message.hasOwnProperty('data')) {
-						if (message.data.hasOwnProperty('retval'))
-							// NOTE(chris): changed: alertSystemError => alertWarning
-							fhcerror.alertWarning(JSON.stringify(message.data.retval));
-						// TODO(chris): there is no else here! join ifs?
+					if (message.hasOwnProperty('data') && message.data.hasOwnProperty('retval')) {
+						// NOTE(chris): changed: alertSystemError => alertWarning
+						fhcerror.alertWarning(JSON.stringify(message.data.retval));
 					} else {
 						fhcerror.alertSystemError(JSON.stringify(message));
 					}
