@@ -2,24 +2,21 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Primevue extends FHC_Controller
+class Components extends FHC_Controller
 {
 	/**
 	 * @return void
 	 */
-	public function index($path, $file, $extrapath = null)
+	public function primevue(...$args)
 	{
-		if ($extrapath)
-			$path = $extrapath . '/' . $path;
-		$target = FHCPATH . 'vendor/npm-asset/primevue/' . $path . '/' . $file;
+		$path = implode('/', $args);
+		$target = FHCPATH . 'vendor/npm-asset/primevue/' . $path;
 		if (!file_exists($target))
 			return show_404();
 		
-		$newUrl = '../../';
-		if ($extrapath)
-			$newUrl .= '../';
+		$newUrl = str_repeat('../', count($args));
 
-		$ext = substr($file, -7) == '.min.js' ? '.esm.min.js' : '.esm.js';
+		$ext = substr($path, -7) == '.min.js' ? '.esm.min.js' : '.esm.js';
 
 		$contents = file_get_contents($target);
 		
