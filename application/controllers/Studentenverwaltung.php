@@ -12,7 +12,7 @@ class Studentenverwaltung extends FHC_Controller
 	/**
 	 * @return void
 	 */
-	public function index()
+	public function _remap()
 	{
 		$this->load->library('AuthLib');
 		$this->load->library('PermissionLib');

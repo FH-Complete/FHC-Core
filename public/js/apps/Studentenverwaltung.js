@@ -29,6 +29,7 @@ const router = VueRouter.createRouter({
 	routes: [
 		{ path: `/${ciPath}/studentenverwaltung`, component: FhcStudentenverwaltung },
 		{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id`, component: FhcStudentenverwaltung },
+		{ path: `/${ciPath}/studentenverwaltung/prestudent/:prestudent_id/:tab`, component: FhcStudentenverwaltung },
 		{ path: `/${ciPath}/studentenverwaltung/student/:id`, component: FhcStudentenverwaltung }
 	]
 });
@@ -38,6 +39,5 @@ const app = Vue.createApp();
 app
 	.use(router)
 	.use(PvConfig)
-	.use(ErrorHandling)
 	.mount('#main');
 
