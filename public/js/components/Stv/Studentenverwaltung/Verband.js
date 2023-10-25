@@ -20,7 +20,15 @@ export default {
 			debug_version: 1, // NOTE(chris): switch between tree/treetable and filter/favorites...
 			loading: true,
 			selected: {}, // NOTE(chris): tree only
-			nodes: []
+			nodes: [],
+			favnodes: [],
+			favorites: {on: false, list: []}
+		}
+	},
+	computed: {
+		filteredNodes() {
+			// TODO(chris): what to display actually?
+			return this.favorites.on ? this.favnodes : this.nodes;
 		}
 	},
 	methods: {
@@ -85,9 +93,62 @@ export default {
 			// NOTE(chris): tree only
 			// TODO(chris): we can online search here
 		},
-		markFav(key) {
+		async filterFav() {
 			// NOTE(chris): treetable only
-			// TODO(chris): IMPLEMENT
+			if (!this.favorites.on && !this.favnodes.length && this.favorites.list.length) {
+				this.loading = true;
+				this.favnodes = await this.loadNodes(this.favorites.list);
+			}
+			this.favorites.on = !this.favorites.on;
+			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
+			this.loading = false;
+		},
+		async loadNodes(links) {
+			// NOTE(chris): treetable only
+			let sortedInParents = links.reduce((o, link) => {
+				link = link + '';
+				let parent,
+					parts = link.split('/');
+				if (parts.length == 1) {
+					parent = '_';
+				} else {
+					parts.pop();
+					parent = parts.join('/');
+				}
+				if (!o[parent])
+					o[parent] = [link];
+				else
+					o[parent].push(link);
+				return o;
+			}, {});
+			
+			let promises = [];
+			for (let parent in sortedInParents)
+				promises.push(CoreRESTClient.get("components/stv/verband/" + (parent == '_' ? '' : parent)).then(res => res.data).then(res => res.filter(node => sortedInParents[parent].includes(node.link + ''))));
+			
+			// NOTE(chris): merge the resulting arrays and transform them to an associative one
+			let result = [].concat.apply([], await Promise.all(promises)).reduce((o, node) => {
+				o[node.link + ''] = this.mapResultToTreeData({...node, leaf: true, children: undefined});
+				return o;
+			}, {});
+
+			return links.map(link => result[link]);
+		},
+		async markFav(key) {
+			// NOTE(chris): treetable only
+			let index = this.favorites.list.indexOf(key.data.link + '');
+
+			if (index != -1) {
+				if (this.favnodes.length)
+					this.favnodes = this.favnodes.filter(node => node.data.link != key.data.link);
+				this.favorites.list.splice(index, 1);
+			} else {
+				if (this.favnodes.length || this.favorites.on)
+					this.favnodes.push((await this.loadNodes([key.data.link])).pop());
+				this.favorites.list.push(key.data.link + '');
+			}
+			
+			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
 			// TODO(chris): make clickable with keyboard
 		}
 	},
@@ -102,6 +163,29 @@ export default {
 			.catch(error => {
 				console.error(error);
 			});
+		// NOTE(chris): treetable only
+		if (this.debug_version)
+			CoreRESTClient
+				.get("components/stv/favorites")
+				.then(result => result.data)
+				.then(result => {
+					if (result) {
+						let f = JSON.parse(result);
+						console.log(f);
+						if (f.on) {
+							this.loading = true;
+							this.favorites = f;
+							this.loadNodes(this.favorites.list).then(res => {
+								this.favnodes = res;
+								this.loading = false;
+							});
+						} else
+							this.favorites = f;
+					}
+				})
+				.catch(error => {
+					console.error(error);
+				});
 	},
 	template: `
 	<div v-if="!debug_version" class="overflow-auto" tabindex="-1">
@@ -126,7 +210,7 @@ export default {
 		<pv-treetable
 			ref="tree"
 			class="stv-verband p-treetable-sm"
-			:value="nodes"
+			:value="filteredNodes"
 			lazy
 			@node-expand="onExpandTreeNode"
 			selection-mode="single"
@@ -141,9 +225,12 @@ export default {
 					</span>
 				</template>
 			</pv-column>
-			<pv-column field="fav" header="FAV" headerStyle="flex: 0 0 auto" style="flex: 0 0 auto">
+			<pv-column field="fav" headerStyle="flex: 0 0 auto" style="flex: 0 0 auto">
+				<template #header>
+					<a href="#" @click.prev="filterFav"><i :class="favorites.on ? 'fa-solid' : 'fa-regular'" class="fa-star"></i></a>
+				</template>
 				<template #body="{node}">
-					<i :class="node.data.fav ? 'fa-solid' : 'fa-regular'" class="fa-star" @click="markFav(node.key)"></i>
+					<a href="#" @click.prev="markFav(node)"><i :class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'" class="fa-star"></i></a>
 				</template>
 			</pv-column>
 		</pv-treetable>
