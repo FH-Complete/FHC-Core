@@ -149,7 +149,24 @@ export default {
 			}
 			
 			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
-			// TODO(chris): make clickable with keyboard
+		},
+		unsetFavFocus(e) {
+			// NOTE(chris): treetable only
+			if (e.target.dataset?.linkFavAdd !== undefined) {
+				e.target.tabIndex = -1;
+			} else {
+				let items = e.target.querySelectorAll('[data-link-fav-add]:not([tabindex="-1"])');
+				items.forEach(el => el.tabIndex = document.activeElement == el ? 0 : -1);
+			}
+		},
+		setFavFocus(e) {
+			// NOTE(chris): treetable only
+			if (e.target.dataset?.linkFavAdd !== undefined) {
+				e.target.tabIndex = 0;
+			} else {
+				let items = e.target.querySelectorAll('[data-link-fav-add][tabindex="-1"]');
+				items.forEach(el => el.tabIndex = 0);
+			}
 		}
 	},
 	mounted() {
@@ -171,7 +188,6 @@ export default {
 				.then(result => {
 					if (result) {
 						let f = JSON.parse(result);
-						console.log(f);
 						if (f.on) {
 							this.loading = true;
 							this.favorites = f;
@@ -217,6 +233,8 @@ export default {
 			@node-select="onSelectTreeNode"
 			scrollable
 			scroll-height="flex"
+			@focusin="setFavFocus"
+			@focusout="unsetFavFocus"
 			>
 			<pv-column field="name" header="Verband" expander>
 				<template #body="{node}">
@@ -227,10 +245,18 @@ export default {
 			</pv-column>
 			<pv-column field="fav" headerStyle="flex: 0 0 auto" style="flex: 0 0 auto">
 				<template #header>
-					<a href="#" @click.prev="filterFav"><i :class="favorites.on ? 'fa-solid' : 'fa-regular'" class="fa-star"></i></a>
+					<a href="#" @click.prevent="filterFav"><i :class="favorites.on ? 'fa-solid' : 'fa-regular'" class="fa-star"></i></a>
 				</template>
-				<template #body="{node}">
-					<a href="#" @click.prev="markFav(node)"><i :class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'" class="fa-star"></i></a>
+				<template #body="{node, column}">
+					<a
+						href="#"
+						@click.prevent="markFav(node)"
+						@keydown.enter.stop.prevent="markFav(node)"
+						tabindex="-1"
+						data-link-fav-add
+						>
+						<i :class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'" class="fa-star"></i>
+					</a>
 				</template>
 			</pv-column>
 		</pv-treetable>
