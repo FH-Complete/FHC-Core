@@ -195,11 +195,12 @@ export default {
 				return new Promise((resolve, reject) => {
 					helperAppInstance.$confirm.require({
 						group: 'fhcAlertConfirm',
-						header: 'Achtung',
+						header: ' ',
 						message: 'Möchten Sie sicher löschen?',
 						acceptLabel: 'Löschen',
 						acceptClass: 'btn btn-danger',
 						rejectLabel: 'Abbrechen',
+						acceptIcon: 'fa fa-xmark',
 						rejectClass: 'btn btn-outline-secondary',
 						accept() {
 							resolve(true);
