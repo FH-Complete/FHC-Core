@@ -195,9 +195,9 @@ export default {
 	},
 	//TODO(chris): Geburtszeit? Anzahl der Kinder?
 	template: `
-	<div ref="form" class="stv-details-details">
+	<form ref="form" class="stv-details-details" @submit.prevent="save">
 		<div class="position-sticky top-0">
-			<button type="button" class="btn btn-primary position-absolute top-0 end-0" @click="save" :disabled="!changedLength">Speichern</button>
+			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">Speichern</button>
 		</div>
 		<fieldset class="overflow-hidden">
 			<legend>Person</legend>
@@ -379,5 +379,5 @@ export default {
 			</div>
 		</fieldset>
 		<pv-toast ref="responseToast" style="z-index:9999"></pv-toast>
-	</div>`
+	</form>`
 };

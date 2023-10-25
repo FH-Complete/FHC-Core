@@ -74,6 +74,7 @@ export default {
 					handler: this.autoSelectRows
 				}
 			],
+			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null
 		}
 	},
@@ -113,10 +114,56 @@ export default {
 				});
 			else
 				this.$refs.table.tabulator.setData(url);
+		},
+		onKeydown(e) { // TODO(chris): this should be in the filter component
+			if (!this.focusObj)
+				return;
+			switch (e.code) {
+				case 'Enter':
+				case 'Space':
+					e.preventDefault();
+					this.$refs.table.tabulator.rowManager.findRow(this.focusObj).component.toggleSelect();
+					break;
+				case 'ArrowUp':
+					e.preventDefault();
+					var next = this.focusObj.previousElementSibling;
+					if (next)
+						this.focusObj = this.changeFocus(this.focusObj, next);
+					break;
+				case 'ArrowDown':
+					e.preventDefault();
+					var next = this.focusObj.nextElementSibling;
+					if (next)
+						this.focusObj = this.changeFocus(this.focusObj, next);
+					break;
+			}
+		},
+		changeFocus(a, b) { // TODO(chris): this should be in the filter component
+			a.tabIndex = -1;
+			if (b) {
+				b.tabIndex = 0;
+				b.focus();
+			}
+			return b;
+		},
+		onBlur(e) { // TODO(chris): this should be in the filter component
+			const tableholder = e.target.closest('.tabulator-tableholder');
+			if (tableholder && tableholder != e.target && !e.relatedTarget?.classList.contains('tabulator-row')) {
+				e.target.tabIndex = -1;
+				tableholder.tabIndex = 0;
+				this.focusObj = null;
+			}
+		},
+		onFocus(e) { // TODO(chris): this should be in the filter component
+			if (e.target.classList.contains('tabulator-tableholder')) {
+				this.focusObj = this.changeFocus(e.target, e.target.querySelector('.tabulator-row'));
+			}
 		}
 	},
+	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
+	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3">
+	<div class="stv-list h-100 pt-3" @focusin="onFocus" @focusout="onBlur" @keydown="onKeydown">
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -127,6 +174,7 @@ export default {
 			new-btn-show
 			new-btn-label="Prestudent"
 			@click:new="actionNewPrestudent"
+			tabindex="0"
 		>
 		</core-filter-cmpt>
 	</div>`
