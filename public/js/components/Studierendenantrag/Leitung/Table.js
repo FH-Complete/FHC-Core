@@ -44,7 +44,10 @@ export default {
 			this.table.replaceData(this.ajaxUrl + (stg || ''));
 		},
 		download() {
-			this.table.download("csv", "data.csv");
+			this.table.download("csv", "data.csv", {
+				delimiter: ';',
+				bom: true
+			});
 		},
 		getHistory() {
 			if (this.lastHistoryClickedId === null)
