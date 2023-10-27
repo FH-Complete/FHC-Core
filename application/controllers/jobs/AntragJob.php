@@ -166,8 +166,12 @@ class AntragJob extends JOB_Controller
 
 			$data['table'] = $data['table_' . DEFAULT_LANGUAGE];
 
+			//Mail an Stgl und Assistenz
+			$to = $leitung['Details']->uid . '@' . DOMAIN;
+			$cc = $leitung['Details']->email;
+
 			// NOTE(chris): Sancho mail
-			if (sendSanchoMail("Sancho_Mail_Antrag_Stgl", $data, $leitung['Details']->uid . '@' . DOMAIN, 'Anträge - Aktion(en) erforderlich'))
+			if (sendSanchoMail("Sancho_Mail_Antrag_Stgl", $data, $to, 'Anträge - Aktion(en) erforderlich', DEFAULT_SANCHO_HEADER_IMG, DEFAULT_SANCHO_FOOTER_IMG, '', $cc))
 				$count++;
 		}
 
