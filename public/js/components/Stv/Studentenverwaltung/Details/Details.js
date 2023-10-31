@@ -123,16 +123,17 @@ export default {
 							this.gebDatumIsValid = true;
 						
 						// TODO(chris): phrase
-						this.addToast('Gespeichert', '', 'success');
+						this.$fhcAlert.alertSuccess('Gespeichert');
+						//this.addToast('Gespeichert', '', 'success');
 
 						this.original = {...this.data};
 						this.changed = {};
 					}
 				})
-				.catch(err => {
+				.catch(this.$fhcAlert.handleSystemError/*err => {
 					// TODO(chris): phrase
 					this.addToast('Error', err?.response?.data || err?.message, 'error');
-				})
+				}*/);
 		},
 		resetErrors() {
 			Array.from(this.$refs.form.getElementsByClassName('is-valid')).forEach(el => el.classList.remove('is-valid'));
@@ -156,14 +157,14 @@ export default {
 			feedback.classList.add('invalid-feedback');
 			feedback.innerHTML = msg;
 			input.after(feedback);
-		},
+		/*},
 		addToast(header, msg, severity) {
 			this.$refs.responseToast.add({
 				severity: severity,
 				summary: header,
 				detail: msg,
 				life: 3000
-			})
+			})*/
 		}
 	},
 	created() {

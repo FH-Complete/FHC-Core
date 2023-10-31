@@ -20,6 +20,8 @@ import fhcapifactory from "./api/fhcapifactory.js";
 
 import PvConfig from "../../../index.ci.php/public/js/components/primevue/config/config.esm.min.js";
 
+import FhcAlert from "../plugin/FhcAlert.js";
+
 Vue.$fhcapi = fhcapifactory;
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -39,5 +41,6 @@ const app = Vue.createApp();
 app
 	.use(router)
 	.use(PvConfig)
+	.use(FhcAlert)
 	.mount('#main');
 
