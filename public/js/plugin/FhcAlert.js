@@ -299,6 +299,65 @@ export default {
 
 				// Fallback
 				this.alertSystemError('alertSystemError throws Generic Error\r\nError Controller Path: ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' +  FHC_JS_DATA_STORAGE_OBJECT.called_method);
+			},
+			handleFormErrors(errors, formRef){
+				// Reset previous error messages, if present
+				this.resetFormErrors(formRef);
+
+				// If errors is object
+				if (typeof errors === 'object' && !Array.isArray(errors) && errors !== null)
+				{
+					// Loop through errors
+					for (let key in errors) {
+
+						let input = formRef.querySelector('[name="' + key + '"]');
+
+						// If key is an input field name, display error above field
+						if (input) {
+							input.classList.add("is-invalid");
+							input.classList.add("form-control");
+
+							const feedback = document.createElement("div");
+							feedback.innerHTML = errors[key];
+							feedback.classList.add("invalid-feedback");
+
+							input.after(feedback);
+						}
+						// ...else display error on top of the form
+						else {
+							const feedback = document.createElement("div");
+							feedback.classList.add("d-flex");
+							feedback.classList.add("align-items-center");
+							feedback.classList.add("alert");
+							feedback.classList.add("alert-danger");
+							feedback.innerHTML = errors[key];
+
+							formRef.prepend(feedback);
+						}
+					}
+				}
+				// else, display on top of the form
+				else {
+					const feedback = document.createElement("div");
+					feedback.classList.add("d-flex");
+					feedback.classList.add("align-items-center");
+					feedback.classList.add("alert");
+					feedback.classList.add("alert-danger");
+					feedback.innerHTML = errors;
+
+					formRef.prepend(feedback);
+				}
+			},
+			resetFormErrors(formRef){
+				// Remove all errors above input fields
+				Array.from(formRef.getElementsByClassName('is-invalid')).forEach(el => el.classList.remove('is-invalid'));
+				Array.from(formRef.getElementsByClassName('invalid-feedback')).forEach(el => el.remove());
+
+				// Check if there is a prepended alert-danger div, and remove it if it exists
+				const prependedAlert = formRef.querySelector('.alert.alert-danger');
+				if (prependedAlert) {
+					prependedAlert.remove();
+				}
 			}
 		};
 		app.config.globalProperties.$fhcAlert = $fhcAlert;
