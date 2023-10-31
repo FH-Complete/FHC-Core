@@ -94,6 +94,7 @@ $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Error when g
 $this->phrasen['abgabetool/uploadedDocumentNotSignedStudent']='The document does not contain an electronic signature. Please inform your Dregree Programm to verify the upload';
 $this->phrasen['abgabetool/uploadedDocumentNotSigned']='Signature not found';
 $this->phrasen['abgabetool/uploadedDocumentSigned']='Signature found';
+$this->phrasen['abgabetool/uploaddDocumentToBigForSignature']='File to big for Signaturecheck';
 $this->phrasen['abgabetool/senatsMitglied']='Examiner';
 $this->phrasen['abgabetool/abgegeben']='handed in, in assessment';
 ?>

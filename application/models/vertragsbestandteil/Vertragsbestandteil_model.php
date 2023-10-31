@@ -24,6 +24,7 @@ class Vertragsbestandteil_model extends DB_Model
 				v.*,
 				bf.funktion_kurzbz, funktion.beschreibung funktion_bezeichnung,
 				oe.oe_kurzbz, oe.bezeichnung oe_bezeichnung, sap.oe_kurzbz_sap,
+				oet.organisationseinheittyp_kurzbz AS oe_typ_kurzbz, oet.bezeichnung AS oe_typ_bezeichnung,
 				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung,
 				f.benutzerfunktion_id,
 				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin,
@@ -43,6 +44,8 @@ class Vertragsbestandteil_model extends DB_Model
 				public.tbl_funktion funktion USING(funktion_kurzbz)
 			LEFT JOIN
 				public.tbl_organisationseinheit oe USING(oe_kurzbz)
+			LEFT JOIN
+				public.tbl_organisationseinheittyp oet USING(organisationseinheittyp_kurzbz)
 			LEFT JOIN
 				sync.tbl_sap_organisationsstruktur sap USING(oe_kurzbz)
 			LEFT JOIN
@@ -97,7 +100,7 @@ EOSQL;
 		foreach( $data as $row ) {
 			try
 			{
-				$vertragsbestandteile[] = VertragsbestandteilFactory::getVertragsbestandteil($row);
+				$vertragsbestandteile[] = VertragsbestandteilFactory::getVertragsbestandteil($row, true);
 			}
 			catch (Exception $ex)
 			{
@@ -120,20 +123,58 @@ EOSQL;
 			;
 EOSQL;
 
-		// echo $sql . "\n\n";
-		$query = $this->db->query($sql);
-
-		$vertragsbestandteil = array();
-		try
+		$query = $this->execReadOnlyQuery($sql);		
+		
+		$vertragsbestandteil = null;
+		
+		if( hasData($query) ) 
 		{
-			$vertragsbestandteile = VertragsbestandteilFactory::getVertragsbestandteil($row);  // TODO add decryption
+			$data = getData($query)[0];
+			try
+			{
+				$vertragsbestandteil = VertragsbestandteilFactory::getVertragsbestandteil($data, true);  // TODO add decryption
+			}
+			catch (Exception $ex)
+			{
+				echo $ex->getMessage() . "\n";
+			}
 		}
-		catch (Exception $ex)
-		{
-			echo $ex->getMessage() . "\n";
-		}
-
+		
 		return $vertragsbestandteil;
 		
+	}
+	
+	public function countOverlappingVBsOfSameType(vertragsbestandteil\Vertragsbestandteil $vb)
+	{
+		$notselfclause = (intval($vb->getVertragsbestandteil_id()) > 0) 
+			? 'AND v.vertragsbestandteil_id <> ' . $this->escape($vb->getVertragsbestandteil_id()) 
+			: '';
+		$sql = <<<EOSQL
+			SELECT
+				count(*) AS overlappingvbs
+			FROM
+				hr.tbl_vertragsbestandteil v
+			WHERE
+				v.dienstverhaeltnis_id = ? 
+			AND 
+				v.vertragsbestandteiltyp_kurzbz = ? 
+			AND 
+				COALESCE(?::date, '2170-12-31'::date) >= COALESCE(v.von, '1970-01-01'::date) 
+			AND 
+				?::date <= COALESCE(v.bis, '2170-12-31')
+			{$notselfclause}
+EOSQL;
+		$ret = $this->execReadOnlyQuery($sql, array(
+			$vb->getDienstverhaeltnis_id(), 
+			$vb->getVertragsbestandteiltyp_kurzbz(), 
+			$vb->getBis(), 
+			$vb->getVon()
+		));
+		
+		if( null === ($vbcount = getData($ret)) ) {
+			throw new Exception('failed to fetch overlappingvbs count');
+		}
+		
+		return $vbcount[0]->overlappingvbs;
 	}
 }

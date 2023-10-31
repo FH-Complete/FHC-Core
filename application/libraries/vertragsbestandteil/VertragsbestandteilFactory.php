@@ -23,7 +23,7 @@ class VertragsbestandteilFactory
 	const VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG = 'zeitaufzeichnung';
 	const VERTRAGSBESTANDTEIL_LEHRE = 'lehre';
 	
-	public static function getVertragsbestandteil($data)
+	public static function getVertragsbestandteil($data, $fromdb=false)
 	{
 		$vertragsbestandteiltyp_kurzbz = isset($data->vertragsbestandteiltyp_kurzbz)
 			? $data->vertragsbestandteiltyp_kurzbz : false;
@@ -37,37 +37,37 @@ class VertragsbestandteilFactory
 		{
 			case self::VERTRAGSBESTANDTEIL_FREITEXT:
 				$vertragsbestandteil = new VertragsbestandteilFreitext();
-				$vertragsbestandteil->hydrateByStdClass($data);
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 			
 			case self::VERTRAGSBESTANDTEIL_FUNKTION:
 				$vertragsbestandteil = new VertragsbestandteilFunktion();
-				$vertragsbestandteil->hydrateByStdClass($data);
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 
 			case self::VERTRAGSBESTANDTEIL_KARENZ:
 				$vertragsbestandteil = new VertragsbestandteilKarenz();
-				$vertragsbestandteil->hydrateByStdClass($data);
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 
 			case self::VERTRAGSBESTANDTEIL_KUENDIGUNGSFRIST:
 				$vertragsbestandteil = new VertragsbestandteilKuendigungsfrist();
-				$vertragsbestandteil->hydrateByStdClass($data);
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 			
 			case self::VERTRAGSBESTANDTEIL_STUNDEN:
 				$vertragsbestandteil = new VertragsbestandteilStunden();
-				$vertragsbestandteil->hydrateByStdClass($data);
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 			
 			case self::VERTRAGSBESTANDTEIL_URLAUBSANSPRUCH:
 				$vertragsbestandteil = new VertragsbestandteilUrlaubsanspruch();
-				$vertragsbestandteil->hydrateByStdClass($data);
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 			
 			case self::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG:
 				$vertragsbestandteil = new VertragsbestandteilZeitaufzeichnung();
-				$vertragsbestandteil->hydrateByStdClass($data);
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 			
 			default:

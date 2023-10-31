@@ -23,6 +23,8 @@ import {CoreFetchCmpt} from '../../components/Fetch.js';
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
 const FILTER_COMPONENT_NEW_FILTER_TYPE = 'Filter Component New Filter Type';
 
+var _uuid = 0;
+
 /**
  *
  */
@@ -42,10 +44,12 @@ export const CoreFilterCmpt = {
 			required: true
 		},
 		tabulatorOptions: Object,
-		tabulatorEvents: Array
+		tabulatorEvents: Array,
+		tableOnly: Boolean
 	},
 	data: function() {
 		return {
+			uuid: 0,
 			// FilterCmpt properties
 			filterName: null,
 			fields: null,
@@ -54,7 +58,6 @@ export const CoreFilterCmpt = {
 			selectedFields: null,
 			notSelectedFields: null,
 			filterFields: null,
-			columnsAlias: null,
 
 			availableFilters: null,
 
@@ -64,104 +67,136 @@ export const CoreFilterCmpt = {
 			fetchCmptApiFunctionParams: null,
 			fetchCmptDataFetched: null,
 
-			tabulator: null
+			tabulator: null,
+			tableBuilt: false
 		};
 	},
-	created: function() {
-		this.getFilter(); // get the filter data
-	},
-	updated: function() {
-		//
-		let dataset = JSON.parse(JSON.stringify(this.dataset));
-		let fields = JSON.parse(JSON.stringify(this.fields));
-		let selectedFields = JSON.parse(JSON.stringify(this.selectedFields));
+	computed: {
+		filteredData() {
+			if (!this.dataset)
+				return [];
+			return JSON.parse(JSON.stringify(this.dataset));
+		},
+		filteredColumns() {
+			let fields = JSON.parse(JSON.stringify(this.fields)) || [];
+			let selectedFields = JSON.parse(JSON.stringify(this.selectedFields)) || [];
 
-		//
-		let columns = null;
+			let columns = null;
 
-		// If the tabulator options has been provided and it contains the property columns
-		if (this.tabulatorOptions != null && this.tabulatorOptions.hasOwnProperty('columns'))
-		{
-			columns = this.tabulatorOptions.columns;
-		}
+			// If the tabulator options has been provided and it contains the property columns
+			if (this.tabulatorOptions && this.tabulatorOptions.hasOwnProperty('columns'))
+				columns = this.tabulatorOptions.columns;
 
-		// If columns is not an array or it is an array with less elements then the array fields
-		if (!Array.isArray(columns) || (Array.isArray(columns) && columns.length < fields.length))
-		{
-			columns = []; // set it as an empty array
-
-			// Loop throught all the retrieved columns from database
-			for (let i = 0; i < fields.length; i++)
+			// If columns is not an array or it is an array with less elements then the array fields
+			if (!Array.isArray(columns) || (Array.isArray(columns) && columns.length < fields.length))
 			{
-				// Create a new column having the title equal to the field name
-				let column = {
-					title: fields[i],
-					field: fields[i]
-				};
+				columns = []; // set it as an empty array
 
-				// If the column has to be displayed or not
-				selectedFields.indexOf(fields[i]) >= 0 ? column.visible = true : column.visible = false;
-
-				// Add the new column to the list of columns
-				columns.push(column);
-			}
-		}
-		else // the property columns has been provided in the tabulator options
-		{
-			// Loop throught the property columns of the tabulator options
-			for (let i = 0; i < columns.length; i++)
-			{
-				// If the column has to be displayed or not
-				selectedFields.indexOf(columns[i].field) >= 0 ? columns[i].visible = true : columns[i].visible = false;
-
-                                if (columns[i].hasOwnProperty('resizable'))
+				// Loop throught all the retrieved columns from database
+				for (let field of fields)
 				{
-                        		columns[i].visible ? columns[i].resizable = true : columns[i].resizable = false;
-                                }
+					// Create a new column having the title equal to the field name
+					let column = {
+						title: field,
+						field: field
+					};
+
+					// If the column has to be displayed or not
+					column.visible = selectedFields.indexOf(field) >= 0;
+
+					// Add the new column to the list of columns
+					columns.push(column);
+				}
 			}
-		}
-
-		this.columnsAlias = columns;
-
-		// Define a default tabulator options in case it was not provided
-		let tabulatorOptions = {
-			height: 500,
-			layout: "fitColumns",
-			movableColumns: true,
-			reactiveData: true,
-			columns: columns,
-			data: JSON.parse(JSON.stringify(this.dataset))
-		};
-
-		// If it was provided
-		if (this.tabulatorOptions != null)
-		{
-			// Then copy it...
-			tabulatorOptions = this.tabulatorOptions;
-			// ...and overwrite the properties data, reactiveData, movableColumns and columns
-			tabulatorOptions.data = JSON.parse(JSON.stringify(this.dataset));
-			tabulatorOptions.columns = columns;
-			tabulatorOptions.reactiveData = true;
-			tabulatorOptions.movableColumns = true;
-		}
-
-		// Start the tabulator with the buid options
-		this.tabulator = new Tabulator(
-			"#filterTableDataset",
-			tabulatorOptions
-		);
-
-		// If event handlers have been provided
-		if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
-		{
-			// Attach all the provided event handlers to the started tabulator
-			for (let i = 0; i < this.tabulatorEvents.length; i++)
+			else // the property columns has been provided in the tabulator options
 			{
-				this.tabulator.on(this.tabulatorEvents[i].event, this.tabulatorEvents[i].handler);
+				// Loop throught the property columns of the tabulator options
+				for (let col of columns)
+				{
+					// If the column has to be displayed or not
+					col.visible = selectedFields.indexOf(col.field) >= 0;
+
+					if (col.hasOwnProperty('resizable'))
+						col.resizable = col.visible;
+				}
 			}
+
+			return columns;
+		},
+		fieldNames() {
+			if (!this.tableBuilt)
+				return {};
+			return this.tabulator.getColumns().reduce((res, col) => {
+				res[col.getField()] = col.getDefinition().title;
+				return res;
+			}, {});
+		},
+		idExtra() {
+			if (!this.uuid)
+				return '';
+			return '-' + this.uuid;
 		}
+	},
+	beforeCreate() {
+		if (!this.tableOnly == !this.filterType)
+			alert('You can not have a filter-type in table-only mode!');
+	},
+	created() {
+		this.uuid = _uuid++;
+		if (!this.tableOnly)
+			this.getFilter(); // get the filter data
+	},
+	mounted() {
+		this.initTabulator();
 	},
 	methods: {
+		initTabulator() {
+			// Define a default tabulator options in case it was not provided
+			let tabulatorOptions = {...{
+				height: 500,
+				layout: "fitColumns",
+				movableColumns: true,
+				reactiveData: true
+			}, ...(this.tabulatorOptions || {})};
+
+			if (!this.tableOnly) {
+				tabulatorOptions.data = this.filteredData;
+				tabulatorOptions.columns = this.filteredColumns;
+			}
+
+			// Start the tabulator with the build options
+			this.tabulator = new Tabulator(
+				this.$refs.table,
+				tabulatorOptions
+			);
+			// If event handlers have been provided
+			if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
+			{
+				// Attach all the provided event handlers to the started tabulator
+				for (let evt of this.tabulatorEvents)
+					this.tabulator.on(evt.event, evt.handler);
+			}
+			this.tabulator.on('tableBuilt', () => this.tableBuilt = true);
+			if (this.tableOnly) {
+				this.tabulator.on('tableBuilt', () => {
+					const cols = this.tabulator.getColumns();
+					this.fields = cols.map(col => col.getField());
+					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+				});
+			}
+		},
+		updateTabulator() {
+			if (this.tabulator) {
+				if (this.tableBuilt)
+					this._updateTabulator();
+				else
+					this.tabulator.on('tableBuilt', this._updateTabulator);
+			}
+		},
+		_updateTabulator() {
+			this.tabulator.setData(this.filteredData);
+			this.tabulator.setColumns(this.filteredColumns);
+		},
 		/**
 		 *
 		 */
@@ -209,6 +244,7 @@ export const CoreFilterCmpt = {
 				{
 					this.setDropDownMenu(data);
 				}
+				this.updateTabulator();
 			}
 			else
 			{
@@ -335,7 +371,7 @@ export const CoreFilterCmpt = {
 			this.startFetchCmpt(
 				CoreFilterAPIs.saveCustomFilter,
 				{
-					customFilterName: document.getElementById('customFilterName').value
+					customFilterName: this.$refscustomFilterName.value
 				},
 				this.getFilter
 			);
@@ -463,22 +499,22 @@ export const CoreFilterCmpt = {
 		/*
 		 *
 		 */
-		handlerToggleSelectedField: function(event) {
+		handlerToggleSelectedField(field) {
 
 			// If it is a selected field
-			if (this.selectedFields.indexOf(event.target.innerText) != -1)
+			if (this.selectedFields.indexOf(field) != -1)
 			{
 				// then hide it
-				this.tabulator.hideColumn(event.target.innerText);
+				this.tabulator.hideColumn(field);
 				// and remove it from the this.selectedFields property
-				this.selectedFields.splice(this.selectedFields.indexOf(event.target.innerText), 1);
+				this.selectedFields.splice(this.selectedFields.indexOf(field), 1);
 			}
 			else // otherwise
 			{
 				// show it
-				this.tabulator.showColumn(event.target.innerText);
+				this.tabulator.showColumn(field);
 				// and add it to the this.selectedFields property
-				this.selectedFields.push(event.target.innerText);
+				this.selectedFields.push(field);
 			}
 		},
 		/**
@@ -527,6 +563,7 @@ export const CoreFilterCmpt = {
 	template: `
 		<!-- Load filter data -->
 		<core-fetch-cmpt
+			v-if="!tableOnly"
 			v-bind:api-function="fetchCmptApiFunction"
 			v-bind:api-function-parameters="fetchCmptApiFunctionParams"
 			v-bind:refresh="fetchCmptRefresh"
@@ -541,15 +578,15 @@ export const CoreFilterCmpt = {
 			</div>
 		</div>
 
-		<div id="filterCollapsables">
+		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="filter-header-title">
-				<span class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
-				<span data-bs-toggle="collapse" data-bs-target="#collapseFilters" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
-				<span data-bs-toggle="collapse" data-bs-target="#collapseColumns" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
+				<span v-if="!tableOnly" class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
+				<span v-if="!tableOnly" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
+				<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
 			</div>
 
-			<div id="collapseColumns" class="card-body collapse" data-bs-parent="#filterCollapsables">
+			<div :id="'collapseColumns' + idExtra" class="card-body collapse" :data-bs-parent="'#filterCollapsables' + idExtra">
 				<div class="card">
 					<!-- Filter fields options -->
 					<div class="row card-body filter-options-div">
@@ -558,9 +595,9 @@ export const CoreFilterCmpt = {
 								<div
 									class="filter-fields-field"
 									v-bind:class="selectedFields.indexOf(fieldToDisplay) != -1 ? 'text-light bg-dark' : '' "
-									@click=handlerToggleSelectedField
+									@click="handlerToggleSelectedField(fieldToDisplay)"
 								>
-									{{ fieldToDisplay }}
+									{{ fieldNames[fieldToDisplay] || fieldToDisplay }}
 								</div>
 							</template>
 						</div>
@@ -568,7 +605,7 @@ export const CoreFilterCmpt = {
 				</div>
 			</div>
 
-			<div id="collapseFilters" class="card-body collapse" data-bs-parent="#filterCollapsables">
+			<div v-if="!tableOnly" :id="'collapseFilters' + idExtra" class="card-body collapse" :data-bs-parent="'#filterCollapsables' + idExtra">
 				<div class="card">
 				<!-- Filter options -->
 					<div class="card-body" v-if="!sideMenu">
@@ -591,7 +628,7 @@ export const CoreFilterCmpt = {
 								<button class="btn btn-outline-dark" type="button" @click=handlerAddNewFilter>+</button>
 							</span>
 						</div>
-						<div id="filterFields" class="filter-filter-fields">
+						<div :id="'filterFields' + idExtra" class="filter-filter-fields">
 							<template v-for="(filterField, index) in filterFields">
 								<div class="row">
 
@@ -605,7 +642,7 @@ export const CoreFilterCmpt = {
 												@change="handlerChangeFilterField(filterField.name, $event.target.value)"
 											>
 												<option value="">Feld zum Filter hinzufügen...</option>
-												<template v-for="columnAlias in columnsAlias">
+												<template v-for="columnAlias in filteredColumns">
 													<option v-bind:value="columnAlias.field">{{ columnAlias.title }}</option>
 												</template>
 											</select>
@@ -704,7 +741,7 @@ export const CoreFilterCmpt = {
 						<div class="row">
 							<div class="col-7">
 								<div class="input-group">
-									<input type="text" class="form-control" placeholder="Filternamen eingeben..." id="customFilterName">
+									<input ref="customFilterName" type="text" class="form-control" placeholder="Filternamen eingeben..." :id="'customFilterName' + idExtra">
 									<button type="button" class="btn btn-outline-secondary" @click=handlerSaveCustomFilter>Filter speichern</button>
 								</div>
 							</div>
@@ -718,7 +755,7 @@ export const CoreFilterCmpt = {
 		</div>
 
 		<!-- Tabulator -->
-		<div id="filterTableDataset" class="filter-table-dataset"></div>
+		<div ref="table" :id="'filterTableDataset' + idExtra" class="filter-table-dataset"></div>
 	`
 };
 

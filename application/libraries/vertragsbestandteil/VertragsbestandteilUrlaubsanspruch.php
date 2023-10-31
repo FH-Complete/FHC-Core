@@ -15,10 +15,12 @@ class VertragsbestandteilUrlaubsanspruch extends Vertragsbestandteil
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_URLAUBSANSPRUCH);
 	}
 	
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{
-		parent::hydrateByStdClass($data);
+		parent::hydrateByStdClass($data, $fromdb);
+		$this->fromdb = $fromdb;
 		isset($data->tage) && $this->setTage($data->tage);
+		$this->fromdb = false;
 	}
 	
 	/**
@@ -34,6 +36,7 @@ class VertragsbestandteilUrlaubsanspruch extends Vertragsbestandteil
 	 */
 	public function setTage($tage): self
 	{
+		$this->markDirty('tage', $this->tage, $tage);
 		$this->tage = $tage;
 
 		return $this;
@@ -46,9 +49,9 @@ class VertragsbestandteilUrlaubsanspruch extends Vertragsbestandteil
 			'tage' => $this->getTage(),
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}

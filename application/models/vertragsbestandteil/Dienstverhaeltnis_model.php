@@ -13,7 +13,7 @@ class Dienstverhaeltnis_model extends DB_Model
     /**
      * @return list of DV
      */
-    public function getDVByPersonUID($uid)
+    public function getDVByPersonUID($uid, $oe_kurzbz=null, $datum=null)
     {
         $result = null;
 
@@ -39,12 +39,38 @@ class Dienstverhaeltnis_model extends DB_Model
             JOIN tbl_person USING (person_id)
             JOIN hr.tbl_dienstverhaeltnis dv ON(tbl_benutzer.uid::text = dv.mitarbeiter_uid::text)
             JOIN public.tbl_organisationseinheit org USING(oe_kurzbz)
-        WHERE tbl_benutzer.uid=?
+        WHERE tbl_benutzer.uid=?";
+		$data = array($uid);
+
+		if(!is_null($oe_kurzbz))
+		{
+			$qry.=" AND oe_kurzbz=?";
+			$data[] = $oe_kurzbz;
+		}
+
+		if (!is_null($datum))
+		{
+			$qry.=" AND ? BETWEEN dv.von AND COALESCE(dv.bis, '2999-12-31')";
+			$data[] = $datum;
+		}
+
+		$qry .="
         ORDER BY dv.von desc
         ";
 
-        return $this->execQuery($qry, array($uid));
+        return $this->execQuery($qry, $data);
 		
+    }
+
+    public function getDVByID($dvid) {
+        $this->addSelect('hr.tbl_dienstverhaeltnis.*, public.tbl_organisationseinheit.bezeichnung as unternehmen');
+		$this->addJoin('public.tbl_organisationseinheit', 'hr.tbl_dienstverhaeltnis.oe_kurzbz = public.tbl_organisationseinheit.oe_kurzbz');
+		$result = $this->load($dvid); 
+
+		if (hasData($result)) {
+            return $result;
+        }
+        return error('could not fetch DV by ID');
     }
 
 
@@ -80,8 +106,10 @@ class Dienstverhaeltnis_model extends DB_Model
         return $this->execQuery($qry, array($uid, $datestring, $datestring));
     }
 
-	public function isOverlappingExistingDV($mitarbeiter_uid, $oe_kurzbz, $von, $bis)
+	public function isOverlappingExistingDV($mitarbeiter_uid, $oe_kurzbz, $von, $bis, $dvid=null)
 	{
+		$dvidclause = (intval($dvid) > 0) ? 'AND dv.dienstverhaeltnis_id != ' . $dvid  : '';
+		
 		$query = <<<EOSQL
 			SELECT 
 				count(*) AS dvcount
@@ -94,11 +122,26 @@ class Dienstverhaeltnis_model extends DB_Model
 			AND
 				?::date <= COALESCE(dv.bis, '2170-12-31'::date)
 			AND 
-				COALESCE(?::date, '2170-12-31'::date) >= dv.von
+				COALESCE(?::date, '2170-12-31'::date) >= dv.von 
+			AND (
+				SELECT 
+					COUNT(*) AS karenzen 
+				FROM 
+					hr.tbl_vertragsbestandteil vb 
+				WHERE 
+					vb.dienstverhaeltnis_id = dv.dienstverhaeltnis_id 
+				AND 
+					vb.vertragsbestandteiltyp_kurzbz = 'karenz' 
+				AND 
+					?::date >= COALESCE(vb.von, '1970-01-01'::date) 
+				AND 
+					COALESCE(?::date, '2170-12-31'::date) <= COALESCE(vb.bis, '2170-12-31') 
+			) = 0 
+			{$dvidclause}
 EOSQL;
 		
 		$ret = $this->execReadOnlyQuery($query, 
-			array($mitarbeiter_uid, $oe_kurzbz, $von, $bis));
+			array($mitarbeiter_uid, $oe_kurzbz, $von, $bis, $von, $bis));
 		
 		if( ($dvcount = getData($ret)) && ($dvcount[0]->dvcount > 0) ) {
 			return true;

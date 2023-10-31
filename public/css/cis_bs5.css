@@ -1,0 +1,66 @@
+:root {
+	--bs-body-font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	--bs-body-font-size: 14px;
+	--bs-body-line-height: 1.42857143;
+	--bs-body-color: #333;
+}
+html {
+	font-size: var(--bs-body-font-size);
+}
+
+h1, .h1 {
+	margin-top: 0;
+	font-size: 1.4rem;
+}
+h2, .h2 {
+	margin-top: 0;
+	font-size: 1.4rem;
+}
+h3, .h3 {
+	margin-top: 0;
+	font-size: 1.3rem;
+}
+h4, .h4 {
+	margin-top: 0;
+	font-size: 1.2rem;
+}
+h5, .h5 {
+	margin-top: 0;
+	font-size: 1.1rem;
+}
+h6, .h6 {
+	margin-top: 0;
+	font-size: 1rem;
+}
+
+.btn {
+	padding: 6px 12px;
+}
+
+.fhc-header {
+	display: flex;
+	justify-content: between;
+	flex: wrap;
+	align-items: center;
+	padding: 20px 15px 19px;
+	margin: 40px 0 20px;
+	border-bottom: solid 1px #eee;
+}
+@media (min-width:768px) { /* NOTE(chris): size "md" from bs5 */
+	.fhc-header {
+		flex-wrap: nowrap!important;
+	}
+}
+.fhc-header h1,
+.fhc-header h2 {
+	font-size: 24px;
+	margin: 0;
+}
+
+.fhc-container {
+	padding: 0 15px;
+}
+
+.tabulator {
+	font-size: var(--bs-body-font-size);
+}

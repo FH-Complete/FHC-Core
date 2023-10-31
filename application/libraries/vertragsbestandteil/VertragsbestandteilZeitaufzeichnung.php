@@ -17,12 +17,14 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG);
 	}
 	
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{
-		parent::hydrateByStdClass($data);
+		parent::hydrateByStdClass($data, $fromdb);
+		$this->fromdb = $fromdb;
 		isset($data->zeitaufzeichnung) && $this->setZeitaufzeichnung($data->zeitaufzeichnung);
 		isset($data->azgrelevant) && $this->setAzgrelevant($data->azgrelevant);
 		isset($data->homeoffice) && $this->setHomeoffice($data->homeoffice);
+		$this->fromdb = false;
 	}
 	
 	/**
@@ -38,6 +40,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 	 */
 	public function setZeitaufzeichnung($zeitaufzeichnung): self
 	{
+		$this->markDirty('zeitaufzeichnung', $this->zeitaufzeichnung, $zeitaufzeichnung);
 		$this->zeitaufzeichnung = $zeitaufzeichnung;
 
 		return $this;
@@ -56,6 +59,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 	 */
 	public function setAzgrelevant($azgrelevant): self
 	{
+		$this->markDirty('azgrelevant', $this->azgrelevant, $azgrelevant);
 		$this->azgrelevant = $azgrelevant;
 
 		return $this;
@@ -74,6 +78,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 	 */
 	public function setHomeoffice($homeoffice): self
 	{
+		$this->markDirty('homeoffice', $this->homeoffice, $homeoffice);
 		$this->homeoffice = $homeoffice;
 
 		return $this;
@@ -88,9 +93,9 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 			'homeoffice' => $this->getHomeoffice()
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}

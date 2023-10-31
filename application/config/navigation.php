@@ -283,10 +283,18 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 	'fehlerzustaendigkeiten' => array(
 		'link' => site_url('system/issues/IssuesZustaendigkeiten'),
 		'description' => 'Fehler Zuständigkeiten',
-		'icon' => 'cogs',
+		'icon' => 'users',
 		'sort' => 100,
 		'target' => '_blank',
 		'requiredPermissions' => array('admin:rw')
-	)
+	),
+	'fehlerkonfiguration' => array(
+		'link' => site_url('system/issues/IssuesKonfiguration'),
+		'description' => 'Fehler Konfiguration',
+		'icon' => 'cogs',
+		'sort' => 200,
+		'target' => '_blank',
+		'requiredPermissions' => array('admin:rw')
+	),
 );
 

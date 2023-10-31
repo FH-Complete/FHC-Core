@@ -182,7 +182,7 @@ $(document).ready(function()
 </head>
 
 <body class="background_main" onload="document.getElementById(\'searchbox\').focus()">
-<h2>Benutzerberechtigungen Übersicht</h2>';
+<h2>Berechtigungen Übersicht</h2>';
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -229,7 +229,7 @@ $htmlstr='
 		<div id="erweitertesuche">
 		<hr>
 		<form accept-charset="UTF-8" name="searchrechte" method="GET">
-			Berechtigung:
+			Rechte:
 			<select id="berechtigung_kurzbz" name="berechtigung_kurzbz">
 				<option value=""></option>';
 			$berechtigung = new berechtigung();
@@ -251,7 +251,7 @@ $htmlstr='
 			<select id="rolle_kurzbz" name="rolle_kurzbz">
 				<option value=""></option>';
 			$rollen = new berechtigung();
-			$rollen->getRollen();
+			$rollen->getRollen('rolle_kurzbz');
 			foreach($rollen->result as $rolle)
 			{
 				if ($rolle_kurzbz == $rolle->rolle_kurzbz)

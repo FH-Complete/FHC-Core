@@ -7,8 +7,8 @@ use vertragsbestandteil\VertragsbestandteilFactory;
 class VertragsbestandteilKarenz extends Vertragsbestandteil
 {
 	protected $karenztyp_kurzbz;
-	protected $geburtstermin;
-	protected $geburtstermin_geplant;
+	protected $tatsaechlicher_geburtstermin;
+	protected $geplanter_geburtstermin;
 	
 	public function __construct()
 	{
@@ -17,12 +17,14 @@ class VertragsbestandteilKarenz extends Vertragsbestandteil
 			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_KARENZ);
 	}
 	
-	public function hydrateByStdClass($data)
+	public function hydrateByStdClass($data, $fromdb=false)
 	{
-		parent::hydrateByStdClass($data);
+		parent::hydrateByStdClass($data, $fromdb);
+		$this->fromdb = $fromdb;
 		isset($data->karenztyp_kurzbz) && $this->setKarenztypKurzbz($data->karenztyp_kurzbz);
-		isset($data->geburtstermin_geplant) && $this->setGeburtsterminGeplant($data->geburtstermin_geplant);
-		isset($data->geburtstermin) && $this->setGeburtstermin($data->geburtstermin);		
+		isset($data->geplanter_geburtstermin) && $this->setGeplanterGeburtstermin($data->geplanter_geburtstermin);
+		isset($data->tatsaechlicher_geburtstermin) && $this->setTatsaechlicherGeburtstermin($data->tatsaechlicher_geburtstermin);
+		$this->fromdb = false;
 	}	
 	
 	/**
@@ -38,43 +40,46 @@ class VertragsbestandteilKarenz extends Vertragsbestandteil
 	 */
 	public function setKarenztypKurzbz($karenztyp_kurzbz): self
 	{
+		$this->markDirty('karenztyp_kurzbz', $this->karenztyp_kurzbz, $karenztyp_kurzbz);
 		$this->karenztyp_kurzbz = $karenztyp_kurzbz;
 
 		return $this;
 	}
 
 	/**
-	 * Get the value of geburtstermin
+	 * Get the value of tatsaechlicher_geburtstermin
 	 */
-	public function getGeburtstermin()
-	{
-		return $this->geburtstermin;
+	public function getTatsaechlicherGeburtstermin()
+	{		
+		return $this->tatsaechlicher_geburtstermin;
 	}
 
 	/**
-	 * Set the value of geburtstermin
+	 * Set the value of tatsaechlicher_geburtstermin
 	 */
-	public function setGeburtstermin($geburtstermin): self
+	public function setTatsaechlicherGeburtstermin($tatsaechlicher_geburtstermin): self
 	{
-		$this->geburtstermin = $geburtstermin;
+		$this->markDirty('tatsaechlicher_geburtstermin', $this->tatsaechlicher_geburtstermin, $tatsaechlicher_geburtstermin);
+		$this->tatsaechlicher_geburtstermin = $tatsaechlicher_geburtstermin;
 
 		return $this;
 	}
 
 	/**
-	 * Get the value of geburtstermin_geplant
+	 * Get the value of geplanter_geburtstermin
 	 */
-	public function getGeburtsterminGeplant()
+	public function getGeplanterGeburtstermin()
 	{
-		return $this->geburtstermin_geplant;
+		return $this->geplanter_geburtstermin;
 	}
 
 	/**
-	 * Set the value of geburtstermin_geplant
+	 * Set the value of geplanter_geburtstermin
 	 */
-	public function setGeburtsterminGeplant($geburtstermin_geplant): self
+	public function setGeplanterGeburtstermin($geplanter_geburtstermin): self
 	{
-		$this->geburtstermin_geplant = $geburtstermin_geplant;
+		$this->markDirty('geplanter_geburtstermin', $this->geplanter_geburtstermin, $geplanter_geburtstermin);
+		$this->geplanter_geburtstermin = $geplanter_geburtstermin;
 
 		return $this;
 	}
@@ -82,14 +87,15 @@ class VertragsbestandteilKarenz extends Vertragsbestandteil
 	public function toStdClass(): \stdClass
 	{
 		$tmp = array(
+			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
 			'karenztyp_kurzbz' => $this->getKarenztypKurzbz(),
-			'geburtstermin' => $this->getGeburtstermin(),
-			'geburtstermin_geplant' => $this->getGeburtsterminGeplant()
+			'tatsaechlicher_geburtstermin' => $this->getTatsaechlicherGeburtstermin(),
+			'geplanter_geburtstermin' => $this->getGeplanterGeburtstermin()
 		);
 		
-		$tmp = array_filter($tmp, function($v) {
-			return !is_null($v);
-		});
+		$tmp = array_filter($tmp, function($k) {
+			return in_array($k, $this->modifiedcolumns);
+		},  ARRAY_FILTER_USE_KEY);
 		
 		return (object) $tmp;
 	}
@@ -98,8 +104,8 @@ class VertragsbestandteilKarenz extends Vertragsbestandteil
 	{
 		$txt = <<<EOTXT
 		karenztyp_kurzbz: {$this->getKarenztypKurzbz()}
-		geburtstermin: {$this->getGeburtstermin()}
-		geburtstermin_geplant: {$this->getGeburtsterminGeplant()}
+		tatsaechlicher_geburtstermin: {$this->getTatsaechlicherGeburtstermin()}
+		geplanter_geburtstermin: {$this->getGeplanterGeburtstermin()}
 
 EOTXT;
 		return parent::__toString() . $txt;
@@ -107,6 +113,29 @@ EOTXT;
 
 	public function validate()
 	{
+		if( empty($this->karenztyp_kurzbz) ) {
+			$this->validationerrors[] = 'Ein Karenztyp muss ausgewählt sein.';
+		}
+		
+		if( $this->karenztyp_kurzbz === 'elternkarenz' ) {			
+			$geplant = \DateTimeImmutable::createFromFormat('Y-m-d', $this->geplanter_geburtstermin);
+			$tatsaechlich = \DateTimeImmutable::createFromFormat('Y-m-d', $this->tatsaechlicher_geburtstermin);
+
+			if( false === $geplant ) {
+				$this->validationerrors[] = 'Bei Elternkarenz muss der geplanter Geburtstermin ein gültiges Datum sein.';
+			}
+			
+			if( !empty($this->tatsaechlicher_geburtstermin) && $tatsaechlich === false ) {
+				$this->validationerrors[] = 'Bei Elternkarenz muss der tatsaechliche Geburtstermin leer oder ein gültiges Datum sein.';
+			}
+		}		
+		
+		$bis = \DateTimeImmutable::createFromFormat('Y-m-d', $this->bis);
+		
+		if( false === $bis ) {
+			$this->validationerrors[] = 'Bei einer Karenz muss ein gültiges Ende-Datum angegeben werden.';
+		}
+		
 		return parent::validate();
 	}
 }

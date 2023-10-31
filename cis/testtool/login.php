@@ -362,6 +362,8 @@ if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
 		$pruefling->idnachweis = '';
 		$pruefling->registriert = date('Y-m-d H:i:s');
 		$pruefling->prestudent_id = $_SESSION['prestudent_id'];
+		$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
+
 		if ($pruefling->save())
 		{
 			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
@@ -385,6 +387,7 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	$pruefling->registriert = date('Y-m-d H:i:s');
 	$pruefling->prestudent_id = $_SESSION['prestudent_id'];
 	$pruefling->semester = $_POST['semester'];
+	$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
 	if ($pruefling->save())
 	{
 		$_SESSION['pruefling_id']=$pruefling->pruefling_id;

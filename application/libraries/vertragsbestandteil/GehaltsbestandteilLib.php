@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/IValidation.php';
+require_once __DIR__ . '/AbstractBestandteil.php';
 require_once __DIR__ . '/Gehaltsbestandteil.php';
 
 use vertragsbestandteil\Gehaltsbestandteil;
@@ -26,9 +27,9 @@ class GehaltsbestandteilLib
 		$this->GehaltsbestandteilModel = $this->CI->GehaltsbestandteilModel;
 	}
 
-	public function fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null)
+	public function fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
-		return $this->GehaltsbestandteilModel->getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag);
+		return $this->GehaltsbestandteilModel->getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
 	}
 
 	public function fetchGehaltsbestandteil($gehaltsbestandteil_id)
@@ -48,6 +49,7 @@ class GehaltsbestandteilLib
 	{
 		try
 		{
+			$this->setUIDtoPGSQL();
 			if( intval($gehaltsbestandteil->getGehaltsbestandteil_id()) > 0 )
 			{
 				$this->updateGehaltsbestandteil($gehaltsbestandteil);
@@ -82,6 +84,10 @@ class GehaltsbestandteilLib
 	
 	protected function updateGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
 	{
+		if(!$gehaltsbestandteil->isDirty()) {
+			return;
+		}
+		
 		$gehaltsbestandteil->setUpdatevon($this->loggedInUser)
 			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->GehaltsbestandteilModel->update($gehaltsbestandteil->getGehaltsbestandteil_id(), 
@@ -91,6 +97,56 @@ class GehaltsbestandteilLib
 		if(isError($ret) )
 		{
 			throw new Exception('error updating gehaltsbestandteil');
+		}
+	}
+
+	public function deleteGehaltsbestandteile($gehaltsbestandteile)
+	{
+		foreach( $gehaltsbestandteile as $gehaltsbestandteil )
+		{
+			$this->deleteGehaltsbestandteil($gehaltsbestandteil);
+		}
+	}
+
+	public function deleteGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil)
+	{
+		$this->setUIDtoPGSQL();
+		$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
+		
+		if (isError($ret))
+		{
+			throw new Exception('error deleting gehaltsbestandteil');
+		}
+	}
+	
+	public function endGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil, $enddate)
+	{
+		$this->setUIDtoPGSQL();
+		if( $gehaltsbestandteil->getBis() !== null && $gehaltsbestandteil->getBis() < $enddate ) 
+		{
+			return;
+		}
+		
+		$ret = $this->GehaltsbestandteilModel->update($gehaltsbestandteil->getGehaltsbestandteil_id(), 
+			(object) array(
+				'bis' => $enddate, 
+				'updatevon' => getAuthUID(),
+				'updateamum' => strftime('%Y-%m-%d %H:%M')
+			));
+		
+		if (isError($ret))
+		{
+			throw new Exception('error ending gehaltsbestandteil');
+		}
+	}
+		
+	protected function setUIDtoPGSQL() {
+		$ret = $this->GehaltsbestandteilModel
+			->execReadOnlyQuery('SET LOCAL pv21.uid TO \'' 
+				. $this->loggedInUser . '\'');
+		if(isError($ret)) 
+		{
+			throw new Exception('error setting uid to pgsql');
 		}
 	}
 }

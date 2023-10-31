@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/IValidation.php';
+require_once __DIR__ . '/AbstractBestandteil.php';
 require_once __DIR__ . '/Dienstverhaeltnis.php';
 require_once __DIR__ . '/Vertragsbestandteil.php';
 require_once __DIR__ . '/VertragsbestandteilStunden.php';
@@ -8,7 +9,9 @@ require_once __DIR__ . '/VertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
+require_once __DIR__ . '/VertragsbestandteilKarenz.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
+require_once __DIR__ . '/OverlapChecker.php';
 
 use vertragsbestandteil\Dienstverhaeltnis;
 use vertragsbestandteil\Vertragsbestandteil;
@@ -20,7 +23,10 @@ use vertragsbestandteil\VertragsbestandteilFactory;
  * @author bambi
  */
 class VertragsbestandteilLib
-{		
+{
+	const INCLUDE_FUTURE = true;
+	const DO_NOT_INCLUDE_FUTURE = false;
+	
 	protected $CI;
 	/** @var Dienstverhaeltnis_model */
 	protected $DienstverhaeltnisModel;
@@ -69,15 +75,15 @@ class VertragsbestandteilLib
 		if(null !== ($row = getData($result))) 
 		{
 			$dv = new Dienstverhaeltnis();
-			$dv->hydrateByStdClass($row[0]);
+			$dv->hydrateByStdClass($row[0], true);
 		}
 		return $dv;
 	}
 	
-	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null)
+	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
-		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag);
-		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag);
+		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
 		
 		$gbsByVBid = array();
 		foreach( $gbs as $gb ) 
@@ -122,9 +128,10 @@ class VertragsbestandteilLib
 	
 	public function storeVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil) 
 	{
-		$this->CI->db->trans_begin();
+		$this->CI->db->trans_begin();		
 		try
 		{
+			$this->setUIDtoPGSQL();
 			if( intval($vertragsbestandteil->getVertragsbestandteil_id()) > 0 )
 			{
 				$this->updateVertragsbestandteil($vertragsbestandteil);
@@ -146,6 +153,72 @@ class VertragsbestandteilLib
 			$this->CI->db->trans_rollback();
 			throw new Exception('Storing Vertragsbestandteil failed.');
 		}	
+	}
+
+	public function deleteDienstverhaeltnis(Dienstverhaeltnis $dv)
+	{
+		$this->CI->db->trans_begin();
+		try
+		{
+			$this->setUIDtoPGSQL();
+			if( intval($dv->getDienstverhaeltnis_id()) > 0 )
+			{
+				$vbs = $this->fetchVertragsbestandteile($dv->getDienstverhaeltnis_id());
+				foreach ($vbs as $vb)
+				{
+					$this->deleteVertragsbestandteil($vb);
+				}
+
+				$ret = $this->DienstverhaeltnisModel->delete($dv->getDienstverhaeltnis_id());
+				if(isError($ret) )
+				{
+					log_message('debug', "Delete DV failed");
+					throw new Exception('error deleting dienstverhaeltnis '
+						. $dv->getDienstverhaeltnis_id());
+				}
+
+				if( $this->CI->db->trans_status() === false )
+				{
+					log_message('debug', "Transaction failed");
+					throw new Exception("Transaction failed");
+				}
+				$this->CI->db->trans_commit();
+			}
+		}
+		catch (Exception $ex)
+		{
+			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
+			$this->CI->db->trans_rollback();
+			return $ex->getMessage();
+		}
+
+		return true;
+
+	}
+
+	public function deleteVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
+	{
+		$this->CI->db->trans_begin();
+		try
+		{
+			$this->setUIDtoPGSQL();
+			if( intval($vertragsbestandteil->getVertragsbestandteil_id()) > 0 )
+			{
+				$this->deleteVertragsbestandteilHelper($vertragsbestandteil);
+			}
+			if( $this->CI->db->trans_status() === false )
+			{
+				log_message('debug', "Transaction failed");
+				throw new Exception("Transaction failed");
+			}
+			$this->CI->db->trans_commit();
+		}
+		catch (Exception $ex)
+		{
+			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
+			$this->CI->db->trans_rollback();
+			throw new Exception('Delete Vertragsbestandteil failed.');
+		}
 	}
 	
 	protected function insertDienstverhaeltnis(Dienstverhaeltnis $dv)
@@ -202,6 +275,10 @@ class VertragsbestandteilLib
 
 	protected function updateDienstverhaeltnis(Dienstverhaeltnis $dv)
 	{
+		if(!$dv->isDirty()) {
+			return;
+		}
+		
 		$dv->setUpdatevon($this->loggedInUser)
 			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
 		$ret = $this->DienstverhaeltnisModel->update($dv->getDienstverhaeltnis_id(),
@@ -212,28 +289,73 @@ class VertragsbestandteilLib
 		}
 	}
 	
-	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
+	private function deleteVertragsbestandteilHelper(Vertragsbestandteil $vertragsbestandteil)
 	{
-		$vertragsbestandteil->setUpdatevon($this->loggedInUser)
-			->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
-		$vertragsbestandteil->beforePersist();
-		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
-			$vertragsbestandteil->baseToStdClass());
-		
-		if(isError($ret) )
-		{
-			throw new Exception('error updating vertragsbestandteil');
-		}
-		
+
 		$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
 			$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
-		$retspecial = $specialisedModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
-			$vertragsbestandteil->toStdClass());
+		$retspecial = $specialisedModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
 		
 		if(isError($retspecial) )
 		{
-			throw new Exception('error updating vertragsbestandteil ' 
+			throw new Exception('error deleting vertragsbestandteil '
 				. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+		}
+		
+		try
+		{
+			$gehaltsbestandteile = $vertragsbestandteil->getGehaltsbestandteile();
+			$this->GehaltsbestandteilLib->deleteGehaltsbestandteile($gehaltsbestandteile);
+		}
+		catch(Exception $ex)
+		{
+			throw new Exception('VertragsbestandteilLib updateVertragsbestandteil '
+				. 'failed to store Gehaltsbestandteile. ' . $ex->getMessage());
+		}
+
+
+		$ret = $this->VertragsbestandteilModel->delete($vertragsbestandteil->getVertragsbestandteil_id());
+
+		if(isError($ret) )
+		{
+			throw new Exception('error deleting vertragsbestandteil');
+		}
+	}
+
+	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)
+	{
+		if($vertragsbestandteil->isDirty()) {		
+			$vertragsbestandteil->setUpdatevon($this->loggedInUser)
+				->setUpdateamum(strftime('%Y-%m-%d %H:%M:%S'));
+			$vertragsbestandteil->beforePersist();
+			$basedata = $vertragsbestandteil->baseToStdClass();
+			if( count((array) $basedata) > 0 ) 
+			{
+				$ret = $this->VertragsbestandteilModel->update(
+					$vertragsbestandteil->getVertragsbestandteil_id(), 
+					$basedata);
+
+				if(isError($ret) )
+				{
+					throw new Exception('error updating vertragsbestandteil');
+				}	
+			}
+
+			$specialisedData = $vertragsbestandteil->toStdClass();
+			if( count((array) $specialisedData) > 0 ) 
+			{
+				$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
+					$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+				$retspecial = $specialisedModel->update(
+					$vertragsbestandteil->getVertragsbestandteil_id(), 
+					$specialisedData);
+
+				if(isError($retspecial) )
+				{
+					throw new Exception('error updating vertragsbestandteil ' 
+						. $vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());
+				}
+			}
 		}
 		
 		try 
@@ -254,7 +376,93 @@ class VertragsbestandteilLib
 			$dv->getMitarbeiter_uid(), 
 			$dv->getOe_kurzbz(), 
 			$dv->getVon(), 
-			$dv->getBis()
+			$dv->getBis(),
+			$dv->getDienstverhaeltnis_id()
 		);
+	}
+	
+	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate)
+	{
+		if( $dv->getBis() !== null && $dv->getBis() < $enddate ) 
+		{
+			return 'Dienstverhältnis ist bereits beendet.';
+		}
+		
+		$this->CI->db->trans_begin();
+		try
+		{
+			$this->setUIDtoPGSQL();
+			if( intval($dv->getDienstverhaeltnis_id()) > 0 )
+			{
+				$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dv->getDienstverhaeltnis_id());
+				foreach ($gbs as $gb)
+				{
+					$this->GehaltsbestandteilLib->endGehaltsbestandteil($gb, $enddate);
+				}
+				
+				$vbs = $this->fetchVertragsbestandteile($dv->getDienstverhaeltnis_id());
+				foreach ($vbs as $vb)
+				{
+					$this->endVertragsbestandteil($vb, $enddate);
+				}			    				
+				
+				$ret = $this->DienstverhaeltnisModel->update($dv->getDienstverhaeltnis_id(),
+					(object) array(
+						'bis' => $enddate, 
+						'updatevon' => getAuthUID(),
+						'updateamum' => strftime('%Y-%m-%d %H:%M')
+					));
+				if(isError($ret) )
+				{
+					log_message('debug', "end DV failed");
+					throw new Exception('error ending dienstverhaeltnis '
+						. $dv->getDienstverhaeltnis_id());
+				}
+
+				if( $this->CI->db->trans_status() === false )
+				{
+					log_message('debug', "Transaction failed");
+					throw new Exception("Transaction failed");
+				}
+				$this->CI->db->trans_commit();
+			}
+		}
+		catch (Exception $ex)
+		{
+			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
+			$this->CI->db->trans_rollback();
+			return $ex->getMessage();
+		}
+		return true;
+	}
+	
+	public function endVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil, $enddate)
+	{
+		if( $vertragsbestandteil->getBis() !== null && $vertragsbestandteil->getBis() < $enddate ) 
+		{
+			return;
+		}
+		
+		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
+			(object) array(
+				'bis' => $enddate, 
+				'updatevon' => getAuthUID(),
+				'updateamum' => strftime('%Y-%m-%d %H:%M')
+			));
+		
+		if (isError($ret))
+		{
+			throw new Exception('error ending vertragsbestandteil');
+		}
+	}
+	
+	protected function setUIDtoPGSQL() {
+		$ret = $this->VertragsbestandteilModel
+			->execReadOnlyQuery('SET LOCAL pv21.uid TO \'' 
+				. $this->loggedInUser . '\'');
+		if(isError($ret)) 
+		{
+			throw new Exception('error setting uid to pgsql');
+		}
 	}
 }

@@ -1433,7 +1433,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		$sem_akt = $stsem->getakt();
 		$lehre = new zeitaufzeichnung();
 		$l_arr = $lehre->getLehreForUser($user, $sem_akt);
-		if ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0)
+		$displayLehresaldo = false;
+		if ($displayLehresaldo && ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0))
 		{
 			if ($lehre_inkludiert == -1)
 			{
