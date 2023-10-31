@@ -159,7 +159,7 @@ FROM
         (
             SELECT
                 /* lehrauftraege also planned with dummies, therefore personalnummer is needed */
-                ma.personalnummer,
+                ma.personalnummer::text,
                 lema.lehreinheit_id,
                 lv.lehrveranstaltung_id,
                 lv.bezeichnung                                      AS "lv_bezeichnung",
@@ -272,7 +272,7 @@ FROM
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
                     lv.bezeichnung                                                                      AS "lv_bezeichnung",
-                    pa.projektarbeit_id                                                                 AS "projektarbeit_id",
+                    pa.projektarbeit_id::text                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
