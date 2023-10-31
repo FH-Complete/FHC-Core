@@ -76,7 +76,8 @@ export default {
 						if (new Date(this.original[k]).toString() != new Date(n[k]).toString())
 							res[k] = n[k];
 					} else {
-						if (this.original[k] !== n[k])
+						// TODO(chris): null && ""? should there be an exception for this?
+						if (this.original[k] !== n[k] && !(this.original[k] === null && n[k] === ""))
 							res[k] = n[k];
 					}
 				}
