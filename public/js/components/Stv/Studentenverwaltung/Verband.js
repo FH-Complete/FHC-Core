@@ -17,10 +17,9 @@ export default {
 	],
 	data() {
 		return {
-			debug_version: 1, // NOTE(chris): switch between tree/treetable and filter/favorites...
 			loading: true,
-			selected: {}, // NOTE(chris): tree only
 			nodes: [],
+			filters: {}, // TODO(chris): filter only 1st level?
 			favnodes: [],
 			favorites: {on: false, list: []}
 		}
@@ -32,6 +31,17 @@ export default {
 		}
 	},
 	methods: {
+		findNodeByKey(key, arr) {
+			if (!arr)
+				arr = this.nodes;
+			let res = arr.filter(n => n.key == key);
+			if (res.length)
+				return res.pop();
+			res = arr.map(n => n.children ? this.findNodeByKey(key, n.children) : null).filter();
+			if (res.length)
+				return res.pop();
+			return null;
+		},
 		onExpandTreeNode(node) {
 			if (!node.children) {
 				if (node.data.link) {
@@ -42,18 +52,20 @@ export default {
 						});
 					});
 					this.loading = true;
+					
 					CoreRESTClient
 						.get("components/stv/verband/" + node.data.link)
 						.then(result => result.data)
 						.then(result => {
 							const subNodes = result.map(this.mapResultToTreeData);
-							node.children = subNodes;
+							const realNode = this.findNodeByKey(node.key);
+							if (realNode)
+								realNode.children = subNodes;
+							else
+								node.children = subNodes; // NOTE(chris): fallback should never be the case
 
 							let treeitem = this.$refs.tree.$el.querySelector('[data-tree-item-key="' + node.key + '"]');
-							if (!this.debug_version) // NOTE(chris): tree only
-								treeitem = treeitem.closest('[role="treeitem"]');
-							else // NOTE(chris): treetable only
-								treeitem = treeitem.closest('[role="row"]');
+							treeitem = treeitem.closest('[role="row"]');
 							
 							this.$nextTick(() => {
 								if (activeEl == document.activeElement)
@@ -89,12 +101,7 @@ export default {
 
 			return cp;
 		},
-		onFilterKeydown(data) {
-			// NOTE(chris): tree only
-			// TODO(chris): we can online search here
-		},
 		async filterFav() {
-			// NOTE(chris): treetable only
 			if (!this.favorites.on && !this.favnodes.length && this.favorites.list.length) {
 				this.loading = true;
 				this.favnodes = await this.loadNodes(this.favorites.list);
@@ -104,7 +111,6 @@ export default {
 			this.loading = false;
 		},
 		async loadNodes(links) {
-			// NOTE(chris): treetable only
 			let sortedInParents = links.reduce((o, link) => {
 				link = link + '';
 				let parent,
@@ -135,7 +141,6 @@ export default {
 			return links.map(link => result[link]);
 		},
 		async markFav(key) {
-			// NOTE(chris): treetable only
 			let index = this.favorites.list.indexOf(key.data.link + '');
 
 			if (index != -1) {
@@ -151,7 +156,6 @@ export default {
 			CoreRESTClient.post("components/stv/favorites/set", {favorites: JSON.stringify(this.favorites)});
 		},
 		unsetFavFocus(e) {
-			// NOTE(chris): treetable only
 			if (e.target.dataset?.linkFavAdd !== undefined) {
 				e.target.tabIndex = -1;
 			} else {
@@ -160,7 +164,6 @@ export default {
 			}
 		},
 		setFavFocus(e) {
-			// NOTE(chris): treetable only
 			if (e.target.dataset?.linkFavAdd !== undefined) {
 				e.target.tabIndex = 0;
 			} else {
@@ -180,54 +183,33 @@ export default {
 			.catch(error => {
 				console.error(error);
 			});
-		// NOTE(chris): treetable only
-		if (this.debug_version)
-			CoreRESTClient
-				.get("components/stv/favorites")
-				.then(result => result.data)
-				.then(result => {
-					if (result) {
-						let f = JSON.parse(result);
-						if (f.on) {
-							this.loading = true;
-							this.favorites = f;
-							this.loadNodes(this.favorites.list).then(res => {
-								this.favnodes = res;
-								this.loading = false;
-							});
-						} else
-							this.favorites = f;
-					}
-				})
-				.catch(error => {
-					console.error(error);
-				});
+		CoreRESTClient
+			.get("components/stv/favorites")
+			.then(result => result.data)
+			.then(result => {
+				if (result) {
+					let f = JSON.parse(result);
+					if (f.on) {
+						this.loading = true;
+						this.favorites = f;
+						this.loadNodes(this.favorites.list).then(res => {
+							this.favnodes = res;
+							this.loading = false;
+						});
+					} else
+						this.favorites = f;
+				}
+			})
+			.catch(error => {
+				console.error(error);
+			});
 	},
 	template: `
-	<div v-if="!debug_version" class="overflow-auto" tabindex="-1">
-		<pv-tree
-			ref="tree"
-			class="stv-verband p-0"
-			v-model:selectionKeys="selected"
-			:value="nodes"
-			selection-mode="single"
-			@node-select="onSelectTreeNode"
-			@node-expand="onExpandTreeNode"
-			:loading="loading"
-			filter
-			:pt="{input:{onKeydown:onFilterKeydown}}"
-			>
-			<template #default="{node}">
-				<span :data-tree-item-key="node.key" :title="node.data.studiengang_kz">{{node.label}}</span>
-			</template>
-		</pv-tree>
-	</div>
-	<div v-else class="overflow-auto" tabindex="-1">
+	<div class="overflow-auto" tabindex="-1">
 		<pv-treetable
 			ref="tree"
 			class="stv-verband p-treetable-sm"
 			:value="filteredNodes"
-			lazy
 			@node-expand="onExpandTreeNode"
 			selection-mode="single"
 			@node-select="onSelectTreeNode"
@@ -235,8 +217,17 @@ export default {
 			scroll-height="flex"
 			@focusin="setFavFocus"
 			@focusout="unsetFavFocus"
+			:filters="filters"
 			>
-			<pv-column field="name" header="Verband" expander>
+			<pv-column field="name" expander>
+				<template #header>
+					<div class="text-right">
+						<div class="p-input-icon-left">
+							<i class="pi pi-search"></i>
+							<input type="text" v-model="filters['global']" class="form-control ps-5" placeholder="Search" />
+						</div>
+					</div>
+				</template>
 				<template #body="{node}">
 					<span :data-tree-item-key="node.key" :title="node.data.studiengang_kz">
 						{{node.data.name}}
