@@ -106,7 +106,7 @@ const helperApp = Vue.createApp({
 			let subject = 'Meldung%20Systemfehler';
 			let body = `
 				Danke, dass Sie uns den Fehler melden. %0D%0A %0D%0A
-				Bitte beschreiben Sie uns ausführlich das Problem.%0D%0A
+				Bitte hängen Sie ein screenshot des Fehlers an und beschreiben Sie uns ausführlich das Problem.%0D%0A
 				Bsp: Ich habe X ausgewählt und Y angelegt. Beim Speichern erhielt ich die Fehlermeldung. [Optional: Ich habe den Browser Z verwendet.]%0D%0A
 				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A
 				PROBLEM: ... %0D%0A %0D%0A %0D%0A
