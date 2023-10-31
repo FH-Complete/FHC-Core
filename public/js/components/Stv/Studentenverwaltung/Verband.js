@@ -250,6 +250,7 @@ export default {
 					</a>
 				</template>
 			</pv-column>
+			<pv-column field="studiengang_kz" class="d-none"></pv-column>
 		</pv-treetable>
 	</div>`
 };
