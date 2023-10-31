@@ -165,6 +165,7 @@ class AntragJob extends JOB_Controller
 			}
 
 			$data['table'] = $data['table_' . DEFAULT_LANGUAGE];
+			$data['leitungLink'] = CIS_ROOT. 'index.ci.php/lehre/Studierendenantrag/leitung';
 
 			//Mail an Stgl und Assistenz
 			$to = $leitung['Details']->uid . '@' . DOMAIN;
