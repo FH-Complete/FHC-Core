@@ -29,28 +29,6 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "vuepic/vue-datepicker-js",
-				"version": "4.0.0",
-				"dist": {
-					"url": "https://unpkg.com/@vuepic/vue-datepicker@4.0.0/dist/vue-datepicker.iife.js",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "vuepic/vue-datepicker-css",
-				"version": "4.0.0",
-				"dist": {
-					"url": "https://unpkg.com/@vuepic/vue-datepicker@4.0.0/dist/main.css",
-					"type": "file"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
 				"name": "alvaro-prieto/colresizable",
 				"version": "1.6",
 				"dist": {
@@ -370,6 +348,28 @@
 				}
 			}
 		},
+                {
+                        "type": "package",
+                        "package": {
+                                "name": "vuejs/vuedatepicker_js",
+                                "version": "5.4.0",
+                                "dist": {
+                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/vue-datepicker.iife.js",
+                                        "type": "file"
+                                }
+                        }
+                },
+                {
+                        "type": "package",
+                        "package": {
+                                "name": "vuejs/vuedatepicker_css",
+                                "version": "5.4.0",
+                                "dist": {
+                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/main.css",
+                                        "type": "file"
+                                }
+                        }
+                },		
 		{
 			"type": "composer",
 			"url": "https://asset-packagist.org"
@@ -443,8 +443,8 @@
 
 		"vuejs/vuejs3": "3.2.33",
 		"vuejs/vuerouter4": "4.1.3",
-		"vuepic/vue-datepicker-js": "4.*",
-		"vuepic/vue-datepicker-css": "4.*"
+		"vuejs/vuedatepicker_js": "5.4.0",
+		"vuejs/vuedatepicker_css": "5.4.0"
 	},
 	"config": {
 		"bin-dir": "vendor/bin"

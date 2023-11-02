@@ -11,7 +11,7 @@ $sitesettings = array(
 	'customJSModules' => array('public/js/apps/lehre/Antrag.js'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
-		'vendor/vuepic/vue-datepicker-css/main.css'
+		'vendor/vuejs/vuedatepicker_css/main.css'
 	),
 	'customJSs' => array(
 	)
