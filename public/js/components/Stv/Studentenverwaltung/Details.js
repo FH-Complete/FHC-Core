@@ -7,7 +7,8 @@ export default {
 			current: this.$route.params.tab || 'details',
 			tabTemplates: {
 				details: 'Details',
-				notizen: 'Notizen'
+				notizen: 'Notizen',
+				kontakt: 'Kontakt'
 			},
 			tabs: {}
 		}
