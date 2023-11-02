@@ -310,19 +310,35 @@ class Student extends FHC_Controller
 				'zustelladresse' => $_POST['zustelladresse'],
 				'co_name' => $_POST['co_name'],
 				'typ' => $_POST['typ']
-
 			]
 		);
 
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson($result);
 		}
-
 		return $this->outputJsonSuccess(true);
+	}
 
+	public function getAdressentypen()
+	{
+		$this->load->model('person/Adressentyp_model', 'AdressentypModel');
 
+		$result = $this->AdressentypModel->load();
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		} else {
+			$this->outputJson(getData($result) ?: []);
+		}
+	}
 
+	public function getGmeinden($plz)
+	{
+		//TODO(manu) finish
+		$result = "";
+		return $result;
 	}
 
 	public function getKontakte($person_id)

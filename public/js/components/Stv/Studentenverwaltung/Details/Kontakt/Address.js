@@ -65,7 +65,12 @@ export default{
 			lastSelected: null,
 			modalRefVis: false,
 			addressData: [],
-			formData: {}
+			formData: {
+				zustelladresse: false,
+				heimatadresse: false
+			},
+			nations: [],
+			adressentypen: []
 		}
 	},
 	methods:{
@@ -75,10 +80,10 @@ export default{
 			bootstrap.Modal.getOrCreateInstance(this.$refs.newAdressModal).show();
 		},
 		deleteAdressData(){
-			formData: {}
+			return this.formData = null;
 		},
 		hideModal(){
-			this.modalRefVis = false;
+			bootstrap.Modal.getOrCreateInstance(this.$refs.newAdressModal).hide();
 		},
 		addNewAddress(formData) {
 			CoreRESTClient.post('components/stv/Student/addNewAddress/' + this.uid,
@@ -86,25 +91,26 @@ export default{
 				).then(response => {
 					console.log(response);
 				if (!response.data.error) {
-					this.statusCode = response.data.retval[0];
-					this.statusMsg = response.data.retval[0].typ;
+					this.statusCode = 0;
+					this.statusMsg = 'success';
 					console.log('Speichern erfolgreich: ' + this.statusMsg);
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 				} else {
 					this.statusCode = 0;
 					this.statusMsg = 'Error';
 					console.log('Speichern nicht erfolgreich: ' + this.statusMsg);
-/*					this.$fhcAlert.alertDanger('Speichern nicht erfolgreich');*/
+					this.$fhcAlert.alertError('Speichern nicht erfolgreich');
 				}
 			}).catch(error => {
 				console.log(error);
 				this.statusCode = 0;
-				this.statusMsg = 'Error2';
+				this.statusMsg = 'Error in Catch';
 				console.log('Speichern nicht erfolgreich ' + this.statusMsg);
+				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
 			}).finally(() => {
 				window.scrollTo(0, 0);
+				hideModal();
 			});
-			this.deleteAdressData();
 		},
 
 
@@ -124,17 +130,31 @@ export default{
 						this.$refs.table.tabulator.setData(url);
 				}*/
 	},
+	created(){
+		CoreRESTClient
+			.get('components/stv/Student/getNations')
+			.then(result => {
+				this.nations = result.data;
+			})
+			.catch(err => {
+				console.error(err.response.data || err.message);
+			});
+		CoreRESTClient
+			.get('components/stv/Student/getAdressentypen')
+			.then(result => {
+				this.adressentypen = result.data;
+			})
+			.catch(err => {
+				console.error(err.response.data || err.message);
+			});
+	},
 	template: `	
 			
 		<div class="stv-list h-100 pt-3">
-		
-		     <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                <Toast ref="toastRef">
-                    <template #body><h4>Adresse gespeichert.</h4></template>
-                </Toast>
-            </div>
-			
-<!--		<Modal>    -->
+					
+<!--		<Modal>   
+ TODO(MANU) use BSModal, Validierungen
+ -->
 		
 		<div ref="newAdressModal" class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		  <div class="modal-dialog">
@@ -144,25 +164,27 @@ export default{
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			  </div>
 			  <div class="modal-body">
-					<form  ref="formData">
-											
-						<div>
-						<label for="typ" class="required form-label">Typ</label>
-							<select id="typ" v-model="formData['typ']">
-							  <option value="h">Hauptwohnsitz</option>
-							  <option value="n">Nebenwohnsitz</option>
-							  <option value="r">Rechnungsadresse</option>
-							  <option value="f">Firma</option>
-							</select>									
+					<form  ref="formData">{{formData}}
+												
+						<div class="col-sm-3">
+							<label for="adressentyp" class="form-label required">Typ</label>
+							<select id="adressentyp" class="form-control" v-model="formData.typ">
+								<option value="">-- keine Auswahl --</option>
+								<option v-for="typ in adressentypen" :key="typ.adressentyp_kurzbz" :value="typ.adressentyp_kurzbz" >{{typ.bezeichnung}}</option>
+							</select>
 						</div>
 																	   
 						<div class="col-sm-3">
 							<label for="strasse" class="form-label">Strasse</label>
 							<input type="text" :readonly="readonly" class="form-control-sm" id="strasse" v-model="formData['strasse']" maxlength="256">
 						</div>
+						
 						<div class="col-sm-3">
 							<label for="nation" class="form-label">Nation</label>
-							<input type="nation" v-model="formData['nation']">
+							<select id="nation" class="form-control" v-model="formData.nation">
+								<option value="">-- keine Auswahl --</option>
+								<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
+							</select>
 						</div>
 						
 						 <div class="col-sm-3">
@@ -179,19 +201,21 @@ export default{
 							<label for="ort" class="required form-label">Ortschaft</label>  
 							<input type="text" required v-model="formData['ort']"> 
 						</div>
-						
-						<div class="col-sm-1">                                             
-							<label for="heimatadresse" class="form-label">Heimatadr.</label>
-							<div>
-								<input class="form-check-input" type="checkbox" id="heimatadresse" v-model="formData['heimatadresse']">
+										
+						<div class="col-sm-3 align-self-center">
+						<label for="heimatadresse" class="form-label">Heimatadresse</label>
+							<div class="form-check">
+								<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="formData['heimatadresse']">
 							</div>
 						</div>
-						<div class="col-sm-1">
-							<label for="zustelladresse" class="form-label">Zustelladr.</label>
-							<div>
-								<input class="form-check-input" type="checkbox" id="zustelladresse" v-model="formData['zustelladresse']">
-							</div>                        
+						
+						<div class="col-sm-3 align-self-center">
+						<label for="zustelladresse" class="form-label">Zustelladresse</label>
+							<div class="form-check">	
+								<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="formData['zustelladresse']">
+							</div>
 						</div>
+						
 
 						<div class="col-sm-6">
 							<label for="co_name" class="form-label">Abweich.Empfänger. (c/o)</label>
