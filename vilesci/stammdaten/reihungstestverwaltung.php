@@ -1010,6 +1010,7 @@ if(isset($_GET['excel']))
 							headers: {0: { sorter: false}},
 							widgetOptions: {filter_cssFilter: [
 									"filter_clm_null",
+									"filter_clm_prestudent_id",
 									"filter_clm_person_id",
 									"filter_clm_null",
 									"filter_clm_vorname",
@@ -1061,6 +1062,7 @@ if(isset($_GET['excel']))
 					if (typeof(Storage) !== 'undefined')
 					{
 						var arr = ['clm_null',
+							'clm_prestudent_id',
 							'clm_person_id',
 							'clm_null',
 							'clm_vorname',
@@ -1257,8 +1259,8 @@ if(isset($_GET['excel']))
 				form.find("input[type=hidden]").remove();
 				$.each(elements, function(index, item)
 				{
-					var person_id = $(this).closest('tr').find('td.clm_person_id').text();
-					form.append("<input type='hidden' name='person_id[]' value='" + person_id + "'>");
+					var prestudent_id = $(this).closest('tr').find('td.clm_prestudent_id').text();
+					form.append("<input type='hidden' name='prestudent_id[]' value='" + prestudent_id + "'>");
 				});
 				form.submit();
 			}
@@ -2618,7 +2620,7 @@ if($reihungstest_id!='')
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
 	//echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
 	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle BewerberInnen senden</a>';
-	echo '<form id="sendMsgForm" method="post" action="'. APP_ROOT .'index.ci.php/system/messages/Messages/writeTemplate" target="_blank" style="display:inline-block">
+	echo '<form id="sendMsgForm" method="post" action="'. APP_ROOT .'index.ci.php/system/messages/FASMessages/writeTemplate" target="_blank" style="display:inline-block">
 			<a class="buttongreen" href="javascript:void(0)" onclick="SendMessage()" id="msgSendButton">Message an alle BewerberInnen senden</a>
 			</form>';
 }
@@ -2645,7 +2647,7 @@ if($reihungstest_id!='')
 	$qry = "
 	SELECT DISTINCT rt_person_id,
 		rt_id,
-		'0' AS prestudent_id,
+		prestudent_id,
 		tbl_rt_person.person_id,
 		vorname,
 		nachname,
@@ -2763,7 +2765,7 @@ if($reihungstest_id!='')
 		echo '<br><span style="color: red"><b>Achtung!</b> Anzahl Arbeitsplätze überschritten</span>';
 	echo '</td></tr>';
 	echo '<tr><td>';
-	//echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
+	echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
 	echo '<div id="clm_person_id" class="active" onclick="hideColumn(\'clm_person_id\')">Person ID</div>';
 	echo '<div id="clm_vorname" class="active" onclick="hideColumn(\'clm_vorname\')">Vorname</div>';
 	echo '<div id="clm_geschlecht" class="active" onclick="hideColumn(\'clm_geschlecht\')">Geschlecht</div>';
@@ -2803,7 +2805,7 @@ if($reihungstest_id!='')
 						<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 					</nobr>
 					</th>
-					<!--<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>-->
+					<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
 					<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 					<th>Nachname</th>
 					<th style="display: table-cell" class="clm_vorname">Vorname</th>
@@ -2922,7 +2924,7 @@ if($reihungstest_id!='')
 							echo '
 									<tr>
 										<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-										<!--<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>-->
+										<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
 										<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 										<td>'.$db->convert_html_chars($row->nachname).'</td>
 										<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>
@@ -2985,7 +2987,7 @@ if($reihungstest_id!='')
 									<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 							</nobr>
 							</th>
-							<!--<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>-->
+							<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
 							<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 							<th>Nachname</th>
 							<th style="display: table-cell" class="clm_vorname">Vorname</th>
@@ -3104,7 +3106,7 @@ if($reihungstest_id!='')
 							echo '
 								<tr>
 									<td style="text-align: center"><input class="chkbox" type="checkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-									<!--<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>-->
+									<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
 									<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 									<td>'.$db->convert_html_chars($row->nachname).'</td>
 									<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>
