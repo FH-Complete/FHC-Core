@@ -100,9 +100,9 @@ class Student extends FHC_Controller
 		$result = $this->GeschlechtModel->load();
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
+			$this->outputJson($result);
 		} else {
-			$this->outputJson(getData($result) ?: []);
+			$this->outputJsonSuccess(getData($result) ?: []);
 		}
 	}
 
@@ -254,6 +254,49 @@ class Student extends FHC_Controller
 		$this->outputJsonSuccess(true);
 	}
 
+	public function check()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
+			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
+		]);
+
+		if ($this->form_validation->run() == false) {
+			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
+		$vorname = $this->input->post('vorname');
+		$nachname = $this->input->post('nachname');
+		$gebdatum = $this->input->post('gebdatum');
+
+		if (!$vorname && !$nachname && !$gebdatum) {
+			return $this->outputJsonSuccess([]);
+		}
+
+		$this->load->model('person/Person_model', 'PersonModel');
+
+		if ($gebdatum)
+			$this->PersonModel->db->where('gebdatum', (new DateTime($gebdatum))->format('Y-m-d'));
+		if ($vorname && $nachname) {
+			$this->PersonModel->db->or_group_start();
+			$this->PersonModel->db->where('LOWER(nachname)', 'LOWER(' . $this->PersonModel->db->escape($nachname) . ')', false);
+			$this->PersonModel->db->where('LOWER(vorname)', 'LOWER(' . $this->PersonModel->db->escape($vorname) . ')', false);
+			$this->PersonModel->db->group_end();
+		} elseif ($nachname) {
+			$this->PersonModel->db->or_where('LOWER(nachname)', 'LOWER(' . $this->PersonModel->escape($nachname) . ')', false);
+		}
+
+		$result = $this->PersonModel->load();
+
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		$this->outputJson($result);
+	}
+
 	public function isValidDate($date)
 	{
 		try {
@@ -263,5 +306,4 @@ class Student extends FHC_Controller
 		}
 		return true;
 	}
-
 }
