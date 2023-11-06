@@ -313,7 +313,7 @@ $assign_to_config['base_url'] = APP_ROOT;
 include_once 'vendor/autoload.php';
 
 // Autoload custom controllers, models, etc that are present in the application/core directory
-require_once $application_folder . 'config/core_includes.php';
+require_once rtrim($application_folder, '/') . '/config/core_includes.php';
 
 // Now the bootstrap file
 require_once BASEPATH . 'core/CodeIgniter.php';
