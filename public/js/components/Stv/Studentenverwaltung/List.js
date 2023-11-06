@@ -1,12 +1,15 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import {CoreRESTClient} from '../../../RESTClient.js';
+import ListNew from './List/New.js';
 
 export default {
 	components: {
-		CoreFilterCmpt
+		CoreFilterCmpt,
+		ListNew
 	},
 	props: {
-		selected: Array
+		selected: Array,
+		studiengangKz: Number
 	},
 	emits: [
 		'update:selected'
@@ -80,7 +83,7 @@ export default {
 	},
 	methods: {
 		actionNewPrestudent() {
-			console.log('actionNewPrestudent');
+			this.$refs.new.open();
 		},
 		rowSelectionChanged(data) {
 			this.$emit('update:selected', data);
@@ -172,10 +175,11 @@ export default {
 			:side-menu="false"
 			reload
 			new-btn-show
-			new-btn-label="Prestudent"
+			new-btn-label="InteressentIn"
 			@click:new="actionNewPrestudent"
 			tabindex="0"
 		>
 		</core-filter-cmpt>
+		<list-new ref="new" studiengang-kz="studiengangKz"></list-new>
 	</div>`
 };

@@ -80,6 +80,7 @@ export default {
 					}
 				}
 			},
+			studiengangKz: undefined,
 		}
 	},
 	computed: {
@@ -88,7 +89,8 @@ export default {
 		}
 	},
 	methods: {
-		onSelectVerband(link) {
+		onSelectVerband({link, studiengang_kz}) {
+			this.studiengangKz = studiengang_kz;
 			this.$refs.stvList.updateUrl(link);
 		},
 		searchfunction(searchsettings) {
@@ -124,7 +126,7 @@ export default {
 			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 				<vertical-split>
 					<template #top>
-						<stv-list ref="stvList" v-model:selected="selected"></stv-list>
+						<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz"></stv-list>
 					</template>
 					<template #bottom>
 						<stv-details :student="lastSelected"></stv-details>

@@ -77,15 +77,13 @@ export default {
 
 							this.loading = false;
 						})
-						.catch(error => {
-							console.error(error);
-						});
+						.catch(this.$fhcAlert.handleSystemError);
 				}
 			}
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', 'components/stv/students/' + node.data.link);
+				this.$emit('selectVerband', {link: 'components/stv/students/' + node.data.link, studiengang_kz: node.data.stg_kz});
 		},
 		mapResultToTreeData(el) {
 			const cp = {
@@ -180,9 +178,7 @@ export default {
 				this.nodes = result.map(this.mapResultToTreeData);
 				this.loading = false;
 			})
-			.catch(error => {
-				console.error(error);
-			});
+			.catch(this.$fhcAlert.handleSystemError);
 		CoreRESTClient
 			.get("components/stv/favorites")
 			.then(result => result.data)
@@ -200,9 +196,7 @@ export default {
 						this.favorites = f;
 				}
 			})
-			.catch(error => {
-				console.error(error);
-			});
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="overflow-auto" tabindex="-1">

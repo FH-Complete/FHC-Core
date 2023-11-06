@@ -68,6 +68,7 @@ class Verband extends FHC_Controller
 		$this->StudiengangModel->addSelect('typ');
 		$this->StudiengangModel->addSelect('kurzbz');
 		$this->StudiengangModel->addSelect('studiengang_kz');
+		$this->StudiengangModel->addSelect('studiengang_kz AS stg_kz');
 		
 		$this->StudiengangModel->addOrder('erhalter_kz');
 		$this->StudiengangModel->addOrder('typ');
@@ -123,6 +124,7 @@ class Verband extends FHC_Controller
 		$this->StudiengangModel->addSelect("CONCAT(UPPER(CONCAT(typ, kurzbz)), '-', semester, (SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END FROM public.tbl_lehrverband WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester ORDER BY verband, gruppe LIMIT 1)) AS name", false);
 
 		$this->StudiengangModel->addSelect('semester');
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . ' AS stg_kz', false);
 		
 		$this->StudiengangModel->addOrder('semester');
 
@@ -146,7 +148,7 @@ class Verband extends FHC_Controller
 		array_unshift($list, [
 			'name' => 'PreStudent',
 			'link' => $link . 'prestudent',
-			'children' => $this->getStdSem($link . 'prestudent/')
+			'children' => $this->getStdSem($link . 'prestudent/', $studiengang_kz)
 		]);
 
 		if ($org_form === null) {
@@ -211,6 +213,7 @@ class Verband extends FHC_Controller
 
 		$this->GruppeModel->addSelect('sort');
 		$this->GruppeModel->addSelect('gruppe_kurzbz');
+		$this->GruppeModel->addSelect($this->GruppeModel->escape($studiengang_kz) . ' AS stg_kz', false);
 
 		$this->GruppeModel->addOrder('sort');
 		$this->GruppeModel->addOrder('gruppe_kurzbz');
@@ -243,6 +246,7 @@ class Verband extends FHC_Controller
 		$this->StudiengangModel->addSelect("CASE WHEN MAX(gruppe)='' OR MAX(gruppe)=' ' THEN TRUE ELSE FALSE END AS leaf");
 
 		$this->StudiengangModel->addSelect('verband');
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . ' AS stg_kz', false);
 		
 		$this->StudiengangModel->addOrder('verband');
 
@@ -293,6 +297,7 @@ class Verband extends FHC_Controller
 		$this->StudiengangModel->addSelect("TRUE AS leaf", false);
 
 		$this->StudiengangModel->addSelect('gruppe');
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . ' AS stg_kz', false);
 		
 		$this->StudiengangModel->addOrder('gruppe');
 
@@ -320,10 +325,11 @@ class Verband extends FHC_Controller
 
 	/**
 	 * @param string		$link
+	 * @param integer		$studiengang_kz
 	 *
 	 * @return array
 	 */
-	protected function getStdSem($link)
+	protected function getStdSem($link, $studiengang_kz)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
@@ -350,29 +356,35 @@ class Verband extends FHC_Controller
 			$result[] = [
 				'name' => $sem->studiensemester_kurzbz,
 				'link' => $semlink,
+				'stg_kz' => $studiengang_kz,
 				'children' => [
 					[
 						'name' => 'Interessenten',
 						'link' => $intlink,
+						'stg_kz' => $studiengang_kz,
 						'children' => [
 							[
 								'name' => 'Bewerbung nicht abgeschickt',
 								'link' => $intlink . '/bewerbungnichtabgeschickt',
+								'stg_kz' => $studiengang_kz,
 								'leaf' => true
 							],
 							[
 								'name' => 'Bewerbung abgeschickt, Status unbestätigt',
 								'link' => $intlink . '/bewerbungabgeschickt',
+								'stg_kz' => $studiengang_kz,
 								'leaf' => true
 							],
 							[
 								'name' => 'ZGV erfüllt',
 								'link' => $intlink . '/zgv',
+								'stg_kz' => $studiengang_kz,
 								'leaf' => true
 							],
 							[
 								'name' => 'Status bestätigt',
 								'link' => $intlink . '/statusbestaetigt',
+								'stg_kz' => $studiengang_kz,
 								'children' => [
 									[
 										'name' => 'Nicht zum Reihungstest angemeldet',
@@ -389,11 +401,13 @@ class Verband extends FHC_Controller
 							[
 								'name' => 'Nicht zum Reihungstest angemeldet',
 								'link' => $intlink . '/reihungstestnichtangemeldet',
+								'stg_kz' => $studiengang_kz,
 								'leaf' => true
 							],
 							[
 								'name' => 'Reihungstest angemeldet',
 								'link' => $intlink . '/reihungstestangemeldet',
+								'stg_kz' => $studiengang_kz,
 								'leaf' => true
 							]
 						]
@@ -401,26 +415,31 @@ class Verband extends FHC_Controller
 					[
 						'name' => 'Bewerber',
 						'link' => $semlink . '/bewerber',
+						'stg_kz' => $studiengang_kz,
 						'leaf' => true
 					],
 					[
 						'name' => 'Aufgenommen',
 						'link' => $semlink . '/aufgenommen',
+						'stg_kz' => $studiengang_kz,
 						'leaf' => true
 					],
 					[
 						'name' => 'Warteliste',
 						'link' => $semlink . '/warteliste',
+						'stg_kz' => $studiengang_kz,
 						'leaf' => true
 					],
 					[
 						'name' => 'Absage',
 						'link' => $semlink . '/absage',
+						'stg_kz' => $studiengang_kz,
 						'leaf' => true
 					],
 					[
 						'name' => 'Incoming',
 						'link' => $semlink . '/incoming',
+						'stg_kz' => $studiengang_kz,
 						'leaf' => true
 					]
 				]

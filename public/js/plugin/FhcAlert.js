@@ -123,8 +123,8 @@ const helperApp = Vue.createApp({
 
 			return "mailto:" + mailTo + "?subject=" + subject + "&body=" + body;
 		},
-		openMessagecard() {
-			bootstrap.Collapse.getOrCreateInstance(this.$refs.messageCard).toggle();
+		openMessagecard(e) {
+			bootstrap.Collapse.getOrCreateInstance(e.target.getAttribute('href')).toggle();
 		}
 	},
 	unmounted() {
@@ -142,10 +142,10 @@ const helperApp = Vue.createApp({
 					<a
 						class="align-bottom flex-fill me-2"
 						data-bs-toggle="collapse"
-						href="#collapseMessageCard"
+						:href="'#fhcAlertCollapseMessageCard' + slotProps.message.id"
 						role="button"
 						aria-expanded="false"
-						aria-controls="collapseMessageCard"
+						:aria-controls="'fhcAlertCollapseMessageCard' + slotProps.message.id"
 						@click="openMessagecard"
 						>
 						Fehler anzeigen
@@ -158,7 +158,7 @@ const helperApp = Vue.createApp({
 						Fehler melden
 					</a>
 				</div>
-				<div ref="messageCard" id="collapseMessageCard" class="collapse mt-3">
+				<div ref="messageCard" :id="'fhcAlertCollapseMessageCard' + slotProps.message.id" class="collapse mt-3">
 					<div class="card card-body text-body small" style="white-space: pre-wrap">
 						{{slotProps.message.detail}}
 					</div>

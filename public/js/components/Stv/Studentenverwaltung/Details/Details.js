@@ -187,11 +187,12 @@ export default {
 			});
 		CoreRESTClient
 			.get('components/stv/Student/getGeschlechter')
+			.then(result => CoreRESTClient.getData(result.data))
 			.then(result => {
 				this.geschlechter = result.data;
 			})
 			.catch(err => {
-				console.error(err.response.data || err.message);
+				console.error(CoreRestClient.getError(err.response.data) || err.message);
 			});
 		this.updateStudent(this.student);
 	},
