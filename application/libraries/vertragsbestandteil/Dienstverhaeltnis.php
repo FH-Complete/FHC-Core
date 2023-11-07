@@ -41,7 +41,7 @@ class Dienstverhaeltnis extends AbstractBestandteil {
 		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
 		isset($data->mitarbeiter_uid) && $this->setMitarbeiter_uid($data->mitarbeiter_uid);
 		isset($data->vertragsart_kurzbz) && $this->setVertragsart_kurzbz($data->vertragsart_kurzbz);
-		isset($data->checkoverlap) && $this->setCeckoverlap($data->checkoverlap);
+		isset($data->checkoverlap) && $this->setCheckoverlap($data->checkoverlap);
 		isset($data->oe_kurzbz) && $this->setOe_kurzbz($data->oe_kurzbz);		
 		isset($data->von) && $this->setVon($data->von);
 		isset($data->bis) && $this->setBis($data->bis);
