@@ -123,6 +123,7 @@
 		generateJSsInclude('vendor/npm-asset/primevue/calendar/calendar.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/skeleton/skeleton.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/timeline/timeline.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/multiselect/multiselect.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/autocomplete/autocomplete.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/overlaypanel/overlaypanel.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/datatable/datatable.min.js');
