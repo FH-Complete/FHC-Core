@@ -20,7 +20,8 @@ class Dienstverhaeltnis extends AbstractBestandteil {
     protected $dienstverhaeltnis_id;
 	protected $mitarbeiter_uid;
     protected $vertragsart_kurzbz;
-    protected $oe_kurzbz;      
+    protected $oe_kurzbz;
+	protected $checkoverlap;
     protected $von;
     protected $bis;
 	protected $insertamum;
@@ -31,6 +32,7 @@ class Dienstverhaeltnis extends AbstractBestandteil {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->checkoverlap = true;
 	}
 	
 	public function hydrateByStdClass($data, $fromdb=false)
@@ -39,6 +41,7 @@ class Dienstverhaeltnis extends AbstractBestandteil {
 		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
 		isset($data->mitarbeiter_uid) && $this->setMitarbeiter_uid($data->mitarbeiter_uid);
 		isset($data->vertragsart_kurzbz) && $this->setVertragsart_kurzbz($data->vertragsart_kurzbz);
+		isset($data->checkoverlap) && $this->setCeckoverlap($data->checkoverlap);
 		isset($data->oe_kurzbz) && $this->setOe_kurzbz($data->oe_kurzbz);		
 		isset($data->von) && $this->setVon($data->von);
 		isset($data->bis) && $this->setBis($data->bis);
@@ -157,6 +160,11 @@ EOTXT;
 		return $this;
 	}
 
+	public function setCheckoverlap(bool $checkoverlap)
+	{
+		$this->checkoverlap = $checkoverlap;
+	}
+	
 	public function setOe_kurzbz($oe_kurzbz)
 	{
 		$this->markDirty('oe_kurzbz', $this->oe_kurzbz, $oe_kurzbz);
@@ -239,8 +247,7 @@ EOTXT;
 			$this->validationerrors[] = 'Das Beginndatum muss vor dem Endedatum liegen.';
 		}
 		
-		// TODO check for overlapping DVs
-		if( $ci->VertragsbestandteilLib->isOverlappingExistingDV($this) ) 
+		if( $this->checkoverlap && $ci->VertragsbestandteilLib->isOverlappingExistingDV($this) ) 
 		{
 			$this->validationerrors[] = 'Es existiert bereits ein überlappendes Dienstverhältnis';
 		}

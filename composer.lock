@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67e5823946d817dac0c89156a2f0fcf0",
+    "content-hash": "3ac7bea74aadb85ee412b61e393f8188",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1850,19 +1850,19 @@
         },
         {
             "name": "vuejs/vuedatepicker_css",
-            "version": "5.4.0",
+            "version": "7.2.0",
             "dist": {
                 "type": "file",
-                "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/main.css"
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@7.2.0/dist/main.css"
             },
             "type": "library"
         },
         {
             "name": "vuejs/vuedatepicker_js",
-            "version": "5.4.0",
+            "version": "7.2.0",
             "dist": {
                 "type": "file",
-                "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/vue-datepicker.iife.js"
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@7.2.0/dist/vue-datepicker.iife.js"
             },
             "type": "library"
         },
@@ -4739,5 +4739,5 @@
         "php": ">=5.6.40"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.1.0"
 }
