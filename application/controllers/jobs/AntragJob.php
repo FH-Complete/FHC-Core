@@ -96,7 +96,7 @@ class AntragJob extends JOB_Controller
 				}
 				$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 
-				$result = $this->StudiengangModel->load($antrag->studiengang_kz);
+				$result = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 				if (isError($result))
 				{
 					$this->logError(getError($result));
@@ -214,12 +214,11 @@ class AntragJob extends JOB_Controller
 		$count = 0;
 		foreach ($antraege as $antrag)
 		{
-			$this->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
-			$res = $this->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
+			$res = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 			$stg = '';
 			$orgform = '';
 			if (hasData($res)) {
-				$studiengang = current(getData($res));
+				$studiengang = current(getData($res));var_dump($studiengang);
 				$stg = $studiengang->bezeichnung;
 				$orgform = $studiengang->orgform_kurzbz;
 			}

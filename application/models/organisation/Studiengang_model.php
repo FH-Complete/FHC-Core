@@ -525,20 +525,6 @@ class Studiengang_model extends DB_Model
 		return $this->execQuery($query, $params);
 	}
 
-	public function loadWithOrgform($studiengang_kzs)
-	{
-		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
-
-		$this->addSelect($this->dbTable . '.*');
-		$this->addSelect('o.bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform');
-		
-		$this->addJoin('bis.tbl_orgform o', 'orgform_kurzbz');
-
-		$this->db->where_in($this->dbTable . '.studiengang_kz', $studiengang_kzs);
-
-		return $this->load();
-	}
-
 	/**
 	 * @param array		$studiengang_kzs
 	 * @param array		$not_antrag_typ		(optional) If the prestudent has an antrag with one of the specified types it will be excluded from the result
@@ -571,7 +557,8 @@ class Studiengang_model extends DB_Model
 				AND ps.ausbildungssemester=get_absem_prestudent(p.prestudent_id, NULL)
 				AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, NULL)'
 		);
-		$this->addJoin('bis.tbl_orgform o', $this->dbTable . '.orgform_kurzbz=o.orgform_kurzbz');
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id');
+		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, ' . $this->dbTable . '.orgform_kurzbz)=o.orgform_kurzbz');
 		$this->addJoin('public.tbl_person pers', 'person_id');
 		$this->addJoin('public.tbl_student stud', 'p.prestudent_id=stud.prestudent_id', 'LEFT');
 
