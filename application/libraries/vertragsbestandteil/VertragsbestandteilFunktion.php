@@ -42,18 +42,30 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 	}
 	
 	protected function beforePersitExisting() {
-		$data = (object) array(
-			'datum_bis' => $this->getBis(),
-			'updateamum' => strftime('%Y-%m-%d %H:%M:%S'),
-			'updatevon' => getAuthUID()
-		);
+		$data = array();
 		
 		$curbfres = $this->CI->BenutzerfunktionModel->load($this->getBenutzerfunktion_id());
-		$curbf = (getData($curbfres))[0];
-		if( $curbf && ($this->getVon() < $curbf->datum_von) ) 
+		if(hasData($curbfres))
 		{
-			$data->datum_von = $this->getVon();
+			$curbf = (getData($curbfres))[0];
+			if($this->getVon() < $curbf->datum_von) 
+			{
+				$data['datum_von'] = $this->getVon();
+			}
+			if($this->getBis() === null 
+				|| ($curbf->datum_bis !== null && ($this->getBis() < $curbf->datum_bis))) 
+			{
+				$data['datum_bis'] = $this->getBis();
+			}
 		}
+
+		if( count($data) === 0 ) 
+		{
+			return;
+		}
+		
+		$data['updateamum'] = strftime('%Y-%m-%d %H:%M:%S');
+		$data['updatevon'] = getAuthUID();		
 		
 		$ret = $this->CI->BenutzerfunktionModel->update($this->getBenutzerfunktion_id(), $data);
 		

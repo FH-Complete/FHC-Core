@@ -347,6 +347,7 @@ export default {
 			@action:objectionDeny="actionoObjectionDeny"
 			@action:objectionApprove="actionObjectionApprove"
 			@action:cancel="actionCancel"
+			@reload="reload"
 			>
 		</leitung-table>
 

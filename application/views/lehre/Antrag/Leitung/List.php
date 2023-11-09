@@ -13,6 +13,7 @@ $sitesettings = array(
 	'primevue3' => true,
 	'phrases' => array(
 		'global',
+		'ui',
 		'studierendenantrag',
 		'lehre',
 		'person',

@@ -59,8 +59,41 @@ h6, .h6 {
 
 .fhc-container {
 	padding: 0 15px;
+	max-width: 100%;
 }
 
 .tabulator {
 	font-size: var(--bs-body-font-size);
+}
+
+.fhc-container .tabulator {
+	border-left: 1px solid #dee2e6;
+}
+.fhc-container .tabulator .tabulator-row {
+	border-bottom: none;
+}
+.fhc-container .tabulator .tabulator-row .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row .tabulator-cell {
+	border-bottom: 1px solid #dee2e6;
+}
+.fhc-container .tabulator .tabulator-row.tabulator-row-even {
+	background-color: transparent;
+}
+.fhc-container .tabulator .tabulator-headers .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-row-odd .tabulator-cell {
+	background-color: #fff;
+}
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-row-even .tabulator-cell {
+	background-color: #f2f2f2;
+}
+.fhc-container .tabulator .tabulator-row.tabulator-selectable:hover .tabulator-frozen,
+.fhc-container .tabulator .tabulator-row.tabulator-selectable:hover .tabulator-cell {
+	background-color: #ececec;
+}
+
+.fhc-container .tabulator .tabulator-col,
+.fhc-container .tabulator .tabulator-cell {
+	border-right: 1px solid #dee2e6;
 }
