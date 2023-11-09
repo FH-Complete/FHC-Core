@@ -218,7 +218,7 @@ class AntragJob extends JOB_Controller
 			$stg = '';
 			$orgform = '';
 			if (hasData($res)) {
-				$studiengang = current(getData($res));var_dump($studiengang);
+				$studiengang = current(getData($res));
 				$stg = $studiengang->bezeichnung;
 				$orgform = $studiengang->orgform_kurzbz;
 			}
