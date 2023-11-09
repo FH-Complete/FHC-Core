@@ -125,6 +125,8 @@ class Pruefung_model extends DB_Model
 	 */
 	public function loadWhereCommitteeExamsFailed()
 	{
+		$this->load->config('studierendenantrag');
+
 		$this->dbTable = 'lehre.tbl_pruefung p';
 
 		$this->addSelect('p.datum');
@@ -132,6 +134,9 @@ class Pruefung_model extends DB_Model
 		$this->addJoin('lehre.tbl_note n', 'note');
 
 		$this->db->where("n.positiv", false);
+		$note_blacklist = $this->config->item('note_blacklist_wiederholung');
+		if ($note_blacklist)
+			$this->db->where_not_in("n.note", $note_blacklist);
 		$this->db->where_in("p.pruefungstyp_kurzbz", ['kommPruef','zusKommPruef']);
 
 		return $this->load();
