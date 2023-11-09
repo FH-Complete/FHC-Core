@@ -18976,6 +18976,9 @@ array(
 			)
 		)
 	),
+/*
+	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status 
+	// erstellt werden, die dann in der Studierendenansicht in einer infobox angezeigt werden
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
@@ -18996,6 +18999,7 @@ array(
 			)
 		)
 	),
+*/
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
@@ -21467,7 +21471,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Abmeldung vom Studium kann hier durchführt werden.',
+				'text' => 'Die Abmeldung vom Studium kann hier durchgeführt werden.',
 				'description' => '',
 				'insertvon' => 'system'
 			),

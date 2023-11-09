@@ -59,13 +59,18 @@ const phrasen = {
 			return '';
 		}
 		if (!categories[category]) {
-
-			//if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined)
-			//	categories[category] = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
+			
+			var initialval = '';
+  			if (window.FHC_JS_PHRASES_STORAGE_OBJECT !== undefined) {
+  				var tmp_category = extractCategory(FHC_JS_PHRASES_STORAGE_OBJECT, category);
+				if(tmp_category[phrase] !== undefined ) {
+					initialval = tmp_category[phrase];
+				}
+			}
 			
 			if (!categories[category] || Object.keys(categories[category]).length === 0) {
 				categories[category] = undefined;
-				let val = Vue.ref('');
+				let val = Vue.ref(initialval);
 				loadLazy(category, val, phrase, params);
 				return val;
 			}

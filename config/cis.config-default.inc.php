@@ -294,5 +294,4 @@ define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
 
-
 ?>

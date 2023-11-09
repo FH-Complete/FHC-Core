@@ -571,7 +571,7 @@ if (isset($_GET['resend']))
 
 			echo "<div id='coodle_content' >
 						<form action='' method='POST'>
-	
+
 					<table class='table-bordered'>
 					<tr><td></td>";
 			// Für Colspan bei Datum
@@ -675,7 +675,6 @@ if (isset($_GET['resend']))
 				}
 				else
 				{
-
 					// Ort-Ressourcen ueberspringen
 					if ($ressource->ort_kurzbz != '')
 					{
@@ -761,8 +760,8 @@ if (isset($_GET['resend']))
 								echo '	<td class="'.$class.'" align="center" '.$style.'>
 									<div class="checkbox">
 										<label style="font-size: 1.5em; padding-left: 10px">
-											<input  type="checkbox" 
-													value="" 
+											<input  type="checkbox"
+													value=""
 													'.($checked ? 'checked="checked"' : '').'
 													'.($termin->datum == '1900-01-01' ? 'id="disableCheckboxes"' : '').'
 													name="check_'.$ressource->coodle_ressource_id.'_'.$termin->coodle_termin_id.'"
@@ -867,8 +866,8 @@ if (isset($_GET['resend']))
 			<span class="glyphicon glyphicon-info-sign"></span>
 			Sie können ihre vorläufigen Terminzusagen in ihr Kalendersystem einbinden.<br>
 			Importieren Sie dazu die .ics-Datei des folgenden Links in ihren Kalender:<br>
-			<a href="'.APP_ROOT.'cis/public/ical_coodle.php/cipher_encryption/'.encryptData($uid,LVPLAN_CYPHER_KEY).'" target="_blank">
-			'.APP_ROOT.'cis/public/ical_coodle.php/cipher_encryption/'.encryptData($uid,LVPLAN_CYPHER_KEY).'
+			<a href="'.APP_ROOT.'cis/public/ical_coodle.php/cipher_encryption/'.encryptData($uid, LVPLAN_CYPHER_KEY).'" target="_blank">
+			'.APP_ROOT.'cis/public/ical_coodle.php/cipher_encryption/'.encryptData($uid, LVPLAN_CYPHER_KEY).'
 			</a>
 			<br><br>
 			Die Datei enthält ihre Terminzusagen aus <b>allen laufenden Umfragen</b>    .
@@ -999,7 +998,7 @@ function sendEmail($coodle_id)
 			else
 				$partstat = 'TENTATIVE';
 
-			$teilnehmer .= 'ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT='.$partstat.';CN='.$name."\n :MAILTO:".$mail."\n";
+			$teilnehmer .= $coodle->foldContentLine('ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT='.$partstat.';CN='.$name.":MAILTO:".$mail) . "\r\n";
 		}
 	}
 	$date = new DateTime($coodle_help->datum.' '.$coodle_help->uhrzeit);
@@ -1015,44 +1014,48 @@ function sendEmail($coodle_id)
 	$benutzer = new benutzer();
 	$benutzer->load($coodle->ersteller_uid);
 	$erstellername = trim($benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost);
+
+	$beschreibung = "DESCRIPTION:" . strip_tags(html_entity_decode($coodle->beschreibung, ENT_QUOTES, 'UTF-8'), '<br>');
+	$terminbeschreibung= $coodle->foldContentLine($beschreibung);
+
 	// Ical File erstellen
-	$ical = "BEGIN:VCALENDAR
-PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN
-VERSION:2.0
-METHOD:PUBLISH
-BEGIN:VTIMEZONE
-TZID:Europe/Vienna
-BEGIN:DAYLIGHT
-TZOFFSETFROM:+0100
-RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
-DTSTART:19810329T020000
-TZNAME:GMT+02:00
-TZOFFSETTO:+0200
-END:DAYLIGHT
-BEGIN:STANDARD
-TZOFFSETFROM:+0200
-RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
-DTSTART:19961027T030000
-TZNAME:GMT+01:00
-TZOFFSETTO:+0100
-END:STANDARD
-END:VTIMEZONE
-BEGIN:VEVENT
-ORGANIZER:MAILTO:".$erstellername." <".$coodle->ersteller_uid."@".DOMAIN."
-".$teilnehmer."
-DTSTART;TZID=Europe/Vienna:".$dtstart."
-DTEND;TZID=Europe/Vienna:".$dtend."
-LOCATION:".$ort."
-TRANSP:OPAQUE
-SEQUENCE:0
-UID:FHCompleteCoodle".$coodle_id."
-DTSTAMP;TZID=Europe/Vienna:".$dtstamp."
-DESCRIPTION:".strip_tags(html_entity_decode($coodle->beschreibung, ENT_QUOTES, 'UTF-8'))."
-SUMMARY:".strip_tags($coodle->titel)."
-PRIORITY:5
-CLASS:PUBLIC
-END:VEVENT
-END:VCALENDAR";
+	$ical = "BEGIN:VCALENDAR\r\n"
+			."PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN\r\n"
+			."VERSION:2.0\r\n"
+			."METHOD:PUBLISH\r\n"
+			."BEGIN:VTIMEZONE\r\n"
+			."TZID:Europe/Vienna\r\n"
+			."BEGIN:DAYLIGHT\r\n"
+			."TZOFFSETFROM:+0100\r\n"
+			."RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU\r\n"
+			."DTSTART:19810329T020000\r\n"
+			."TZNAME:GMT+02:00\r\n"
+			."TZOFFSETTO:+0200\r\n"
+			."END:DAYLIGHT\r\n"
+			."BEGIN:STANDARD\r\n"
+			."TZOFFSETFROM:+0200\r\n"
+			."RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU\r\n"
+			."DTSTART:19961027T030000\r\n"
+			."TZNAME:GMT+01:00\r\n"
+			."TZOFFSETTO:+0100\r\n"
+			."END:STANDARD\r\n"
+			."END:VTIMEZONE\r\n"
+			."BEGIN:VEVENT\r\n"
+			.$coodle->foldContentLine("ORGANIZER:MAILTO:".$erstellername." <".$coodle->ersteller_uid."@".DOMAIN)."\r\n"
+			.rtrim($teilnehmer)."\r\n"
+			."DTSTART;TZID=Europe/Vienna:".$dtstart."\r\n"
+			."DTEND;TZID=Europe/Vienna:".$dtend."\r\n"
+			."LOCATION:".$ort."\r\n"
+			."TRANSP:OPAQUE\r\n"
+			."SEQUENCE:0\r\n"
+			."UID:FHCompleteCoodle".$coodle_id."\r\n"
+			."DTSTAMP;TZID=Europe/Vienna:".$dtstamp."\r\n"
+			.$terminbeschreibung."\r\n"
+			."SUMMARY:".strip_tags($coodle->titel)."\r\n"
+			."PRIORITY:5\r\n"
+			."CLASS:PUBLIC\r\n"
+			."END:VEVENT\r\n"
+			."END:VCALENDAR\r\n";
 
 	if (count($coodle_ressource->result) > 0)
 	{

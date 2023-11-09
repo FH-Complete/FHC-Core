@@ -110,11 +110,10 @@ $config['abmeldung_job_deadline_date_modifier'] = '+2 weeks';
 
 /**
  * System User - uid of a user that is allowed to set prestudentstatus
- * TODO(chris): DEBUG! CHANGE THIS!
  *
  * @var string
  */
-$config['antrag_job_systemuser'] = 'ma0168';
+$config['antrag_job_systemuser'] = '';
 
 
 /**

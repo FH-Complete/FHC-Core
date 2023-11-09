@@ -212,7 +212,7 @@
 		<!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
 
 		<!ENTITY menu-dokumente-antrag.key		"N">
-		<!ENTITY menu-dokumente-antrag.label	"Antrag">
+		<!ENTITY menu-dokumente-antrag.label	"Verwaltung des Studierendenstatus">
 		<!ENTITY menu-dokumente-antrag.accesskey	"N">
 
 		<!ENTITY menu-dokumente-antrag-abmeldung.key		"A">
