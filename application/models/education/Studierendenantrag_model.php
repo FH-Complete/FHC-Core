@@ -37,11 +37,11 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('studienjahr_kurzbz');
 		$this->addSelect('vorname');
 		$this->addSelect('nachname');
-		$this->addSelect('prestudent_id');
+		$this->addSelect('p.prestudent_id');
 		$this->addSelect('p.studiengang_kz');
 		$this->addSelect('semester');
 		$this->addSelect($this->dbTable . '.grund');
-		$this->addSelect('datum');
+		$this->addSelect($this->dbTable . '.datum');
 		$this->addSelect('datum_wiedereinstieg');
 		$this->addSelect($this->dbTable . '.typ');
 		$this->addSelect('st.studierendenantrag_statustyp_kurzbz as status');
@@ -52,8 +52,10 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin('public.tbl_student', 'prestudent_id');
 		$this->addJoin('public.tbl_person', 'person_id');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
-		$this->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
-		$this->addJoin('bis.tbl_orgform', 'orgform_kurzbz');
+		$this->addJoin('public.tbl_studiensemester ss', 'studiensemester_kurzbz');
+		$this->addJoin('public.tbl_prestudentstatus ps', 'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=ss.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ss.studiensemester_kurzbz)');
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_status as s',
 			'campus.get_status_id_studierendenantrag('. $this->dbTable .'.studierendenantrag_id) = studierendenantrag_status_id'
@@ -120,14 +122,17 @@ class Studierendenantrag_model extends DB_Model
 	public function getStgAndSem($antrag_id)
 	{
 		$this->addSelect('p.studiengang_kz');
+		$this->addSelect('stg.bezeichnung');
 		$this->addSelect('s.ausbildungssemester');
-		$this->addSelect('s.orgform_kurzbz');
+		$this->addSelect('COALESCE(plan.orgform_kurzbz, s.orgform_kurzbz, stg.orgform_kurzbz) AS orgform_kurzbz');
 
 		$this->addJoin(
 			'public.tbl_prestudentstatus s',
 			$this->dbTable . '.prestudent_id=s.prestudent_id AND ' . $this->dbTable . '.studiensemester_kurzbz=s.studiensemester_kurzbz'
 		);
 		$this->addJoin('public.tbl_prestudent p', $this->dbTable . '.prestudent_id=p.prestudent_id');
+		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 
 		$this->addOrder('s.datum', 'DESC');
 		$this->addOrder('s.insertamum', 'DESC');
@@ -192,7 +197,9 @@ class Studierendenantrag_model extends DB_Model
 
 		$this->addJoin('public.tbl_prestudent p', 'prestudent_id', 'RIGHT');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
-		$this->addJoin('bis.tbl_orgform', 'orgform_kurzbz');
+		$this->addJoin('public.tbl_prestudentstatus ps', 'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=' . $this->dbTable . '.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ' . $this->dbTable . '.studiensemester_kurzbz)');
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
+		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_statustyp st',
 			'campus.get_status_studierendenantrag(studierendenantrag_id)=st.studierendenantrag_statustyp_kurzbz',
