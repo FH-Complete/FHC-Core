@@ -31,12 +31,12 @@ export default {
 		stgkzL() {
 			if (!this.stgL)
 				return [];
-			return this.stgL.map(stg => stg.studiengang_kz);
+			return this.stgL.map(stg => parseInt(stg));
 		},
 		stgkzA() {
 			if (!this.stgA)
 				return [];
-			return this.stgA.map(stg => stg.studiengang_kz);
+			return this.stgA.map(stg => parseInt(stg));
 		}
 	},
 	methods: {
