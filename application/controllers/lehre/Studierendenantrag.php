@@ -81,42 +81,9 @@ class Studierendenantrag extends FHC_Controller
 
 	public function leitung()
 	{
-		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe');
-		$stgsNeuanlage = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag');
+		$stgL = $this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe') ?: [];
 
-		$stgL = [];
-		if ($studiengaenge) {
-			$result = $this->StudiengangModel->loadWithOrgform($studiengaenge);
-			if (isError($result))
-				return show_error(getError($result));
-			$antraege = getData($result) ?: [];
-
-			foreach ($antraege as $antrag) {
-				if (!isset($stgL[$antrag->studiengang_kz])) {
-					$stgL[$antrag->studiengang_kz] = new stdClass();
-					$stgL[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
-					$stgL[$antrag->studiengang_kz]->orgform = $antrag->orgform;
-					$stgL[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
-				}
-			}
-		}
-
-		$stgA = [];
-		if ($stgsNeuanlage) {
-			$result = $this->StudiengangModel->loadWithOrgform($stgsNeuanlage);
-			if (isError($result))
-				return show_error(getError($result));
-			$antraege = getData($result) ?: [];
-
-			foreach ($antraege as $antrag) {
-				if (!isset($stgA[$antrag->studiengang_kz])) {
-					$stgA[$antrag->studiengang_kz] = new stdClass();
-					$stgA[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
-					$stgA[$antrag->studiengang_kz]->orgform = $antrag->orgform;
-					$stgA[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
-				}
-			}
-		}
+		$stgA = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag') ?: [];
 
 		$this->load->view('lehre/Antrag/Leitung/List', [
 			'stgA' => $stgA,

@@ -230,9 +230,9 @@
 			"type": "package",
 			"package": {
 				"name": "olifolkerd/tabulator5",
-				"version": "5.2.1",
+				"version": "5.5.2",
 				"dist": {
-					"url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.2.1.zip",
+					"url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.5.2.zip",
 					"type": "zip"
 				}
 			}
@@ -426,7 +426,7 @@
 		"npm-asset/primeicons": "5.0.0",
 
 		"olifolkerd/tabulator4": "4.9.*",
-		"olifolkerd/tabulator5": "5.2.*",
+		"olifolkerd/tabulator5": "5.5.*",
 
 		"phpseclib/phpseclib": "2.0.*",
 
