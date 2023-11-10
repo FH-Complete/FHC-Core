@@ -1,11 +1,9 @@
 import StudierendenantragStatus from './Status.js';
-import Phrasen from '../../mixins/Phrasen.js';
 
 export default {
 	components: {
 		StudierendenantragStatus
 	},
-	mixins: [Phrasen],
 	props: {
 		antragId: Number,
 		initialStatusCode: String,
@@ -110,7 +108,7 @@ export default {
 					for (var k in result.data.retval) {
 						if (result.data.retval[k] === null) {
 							const alert = document.createElement('div');
-							alert.innerHTML = this.p.t('studierendenantrag', 'error_stg_last_semester');
+							alert.innerHTML = this.$p.t('studierendenantrag', 'error_stg_last_semester');
 							alert.className = 'alert alert-warning';
 							alert.role = 'alert';
 							this.$refs["lvtable" + k.substr(0,1)].append(alert);
@@ -134,18 +132,19 @@ export default {
 						res[k] = Object.values(lvs).filter(lv => !lv.studienplan_lehrveranstaltung_id_parent);
 						let current = res[k];
 						let index = k.substr(0,1);
-						var table = new Tabulator(this.$refs["lvtable" + k.substr(0,1)], {
+
+						const options = {
 							data: current,
 							dataTree: true,
 							dataTreeStartExpanded: true, //start with an expanded tree
 							dataTreeChildIndent: 15,
 							layout: "fitDataStretch",
 							columns: [
-								{title: this.p.t('ui','bezeichnung'), field: "bezeichnung"},
-								{title: this.p.t('lehre','lehrform'), field: "lehrform_kurzbz"},
+								{title: this.$p.t_node('ui', 'bezeichnung'), field: "bezeichnung"},
+								{title: this.$p.t_node('lehre','lehrform'), field: "lehrform_kurzbz"},
 								{title: "ECTS", field: "ects"},
-								{title: this.p.t('lehre','note'), field: "note", formatter:(cell, formatterParams, onRendered)=>cell.getValue() || "---"},
-								{title: (index==1) ? this.p.t('studierendenantrag','lv_nicht_zulassen') : this.p.t('studierendenantrag','lv_wiederholen'), field: "antrag_zugelassen", formatter: (cell, formatterParams, onRendered) => {
+								{title: this.$p.t_node('lehre','note'), field: "note", formatter:(cell, formatterParams, onRendered)=>cell.getValue() || "---"},
+								{title: (index==1) ? this.$p.t_node('studierendenantrag','lv_nicht_zulassen') : this.$p.t_node('studierendenantrag','lv_wiederholen'), field: "antrag_zugelassen", formatter: (cell, formatterParams, onRendered) => {
 									let data = cell.getData();
 									if(data._children || !data.zeugnis)
 										return "";
@@ -169,7 +168,7 @@ export default {
 									return div;
 								}},
 								{
-									title: this.p.t('global','anmerkung'),
+									title: this.$p.t_node('global','anmerkung'),
 									field: "antrag_anmerkung",
 									headerSort:false,
 									titleFormatter:(cell, formatterParams, onRendered)=>{
@@ -179,10 +178,10 @@ export default {
 										});
 
 										link.href ="#";
-										link.title = this.p.t('studierendenantrag','anmerkung_tooltip');
+										link.title = this.$p.t('studierendenantrag','anmerkung_tooltip');
 										new bootstrap.Tooltip(link);
 										let tooltip = document.createElement('span');
-										tooltip.innerHTML = this.p.t('global','anmerkung') + " ";
+										tooltip.innerHTML = this.$p.t('global','anmerkung') + " ";
 										tooltip.append(link);
 
 										let icon =  document.createElement('i');
@@ -217,7 +216,8 @@ export default {
 									}
 								}
 							]
-						});
+						};
+						var table = new Tabulator(this.$refs["lvtable" + k.substr(0,1)], options);
 					}
 					this.lvs = result.data.retval;
 				}
@@ -229,20 +229,20 @@ export default {
 		<div ref="alertbox"></div>
 
 		<span class="d-flex justify-content-between h4">
-			<span>{{p.t('studierendenantrag', 'title_lv_nicht_zugelassen')}}</span>
+			<span>{{$p.t('studierendenantrag', 'title_lv_nicht_zugelassen')}}</span>
 			<span>{{lvs1sem}}</span>
 		</span>
 		<div ref="lvtable1" class="mb-3">
 		</div>
 
 		<span class="d-flex justify-content-between h4">
-			<span>{{p.t('studierendenantrag', 'title_lv_wiederholen')}}</span>
+			<span>{{$p.t('studierendenantrag', 'title_lv_wiederholen')}}</span>
 			<span>{{lvs2sem}}</span>
 		</span>
 		<div ref="lvtable2">
 		</div>
 
-		<button type="button" @click="save" :disabled="isloading || disabled"  class="btn btn-primary my-3">{{p.t('studierendenantrag', 'btn_save_lvs')}}</button>
+		<button type="button" @click="save" :disabled="isloading || disabled"  class="btn btn-primary my-3">{{$p.t('studierendenantrag', 'btn_save_lvs')}}</button>
 	</div>
 	<div class="col-sm-2">
 		<studierendenantrag-status :msg="statusMsg" :severity="statusSeverity"></studierendenantrag-status>
