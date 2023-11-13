@@ -48,47 +48,35 @@ function getValueForLoadedPhrase(category, phrase, params) {
 	return result;
 }
 
+function t_intern(val, category, phrase, params) {
+	if (params === undefined && (
+		(Array.isArray(category) && category.length == 2) ||
+		(category.split && category.split('/').length == 2))
+		) {
+		params = phrase;
+		[category, phrase] = category.split ? category.split('/') : category;
+	}
+	if (phrase === undefined) {
+		console.error('invalid input', category, phrase, params);
+		return '';
+	}
+	if (categories[category])
+		return getValueForLoadedPhrase(category, phrase, params);
+	
+	loadLazy(category, val, phrase, params);
+	return '';
+}
 
 const phrasen = {
 	t_ref(category, phrase, params) {
-		if (params === undefined && (
-			(Array.isArray(category) && category.length == 2) ||
-			(category.split && category.split('/').length == 2))
-			) {
-			params = phrase;
-			[category, phrase] = category.split ? category.split('/') : category;
-		}
-		if (phrase === undefined) {
-			console.error('invalid input', category, phrase, params);
-			return Vue.ref('');
-		}
-		if (!categories[category]) {
-			let val = Vue.ref('');
-			loadLazy(category, val, phrase, params);
-			return val;
-		}
-		var result = getValueForLoadedPhrase(category, phrase, params);
-		return Vue.ref(result);
+		let val = Vue.ref('');
+		val.value = t_intern(val, category, phrase, params);
+		return val;
 	},
 	t_node(category, phrase, params) {
-		const node = document.createTextNode('');
-		if (params === undefined && (
-			(Array.isArray(category) && category.length == 2) ||
-			(category.split && category.split('/').length == 2))
-			) {
-			params = phrase;
-			[category, phrase] = category.split ? category.split('/') : category;
-		}
-		if (phrase === undefined) {
-			console.error('invalid input', category, phrase, params);
-			return node;
-		}
-		if (!categories[category]) {
-			loadLazy(category, node, phrase, params);
-		} else {
-			node.textContent = getValueForLoadedPhrase(category, phrase, params);
-		}
-		return node;
+		let val = document.createTextNode('');
+		val.textContent = t_intern(val, category, phrase, params);
+		return val;
 	},
 	t(category, phrase, params) {
 		return Vue.unref(this.t_ref(category, phrase, params));
