@@ -78,20 +78,25 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		REFERENCES hr.tbl_dienstverhaeltnis (dienstverhaeltnis_id) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		CREATE TABLE hr.tbl_gehaltsabrechnung
+		CREATE TABLE hr.tbl_gehaltshistorie
 		(
-			gehaltsabrechnung_id serial NOT NULL,
+			gehaltshistorie_id serial NOT NULL,
 			datum date,
 			betrag bytea,
-			gehaltsbestandteil_id integer NOT NULL,
-			CONSTRAINT tbl_gehaltsabrechnung_pk PRIMARY KEY (gehaltsabrechnung_id)
+			gehaltsbestandteil_id integer,
+			mitarbeiter_uid character varying(32),
+			CONSTRAINT tbl_gehaltshistorie_pk PRIMARY KEY (gehaltshistorie_id)
 		);
 
-		COMMENT ON COLUMN hr.tbl_gehaltsabrechnung.betrag IS E'verschluesselt';
+		COMMENT ON COLUMN hr.tbl_gehaltshistorie.betrag IS E'verschluesselt';
 
-		ALTER TABLE hr.tbl_gehaltsabrechnung ADD CONSTRAINT tbl_gehaltsbestandteil_fk FOREIGN KEY (gehaltsbestandteil_id)
+		ALTER TABLE hr.tbl_gehaltshistorie ADD CONSTRAINT tbl_gehaltshistorie_gehaltsbestandteil_id_fk FOREIGN KEY (gehaltsbestandteil_id)
 		REFERENCES hr.tbl_gehaltsbestandteil (gehaltsbestandteil_id) MATCH FULL
-		ON DELETE RESTRICT ON UPDATE CASCADE;
+		ON UPDATE CASCADE ON DELETE SET NULL;
+
+		ALTER TABLE hr.tbl_gehaltshistorie ADD CONSTRAINT tbl_gehaltshistorie_mitarbeiter_uid_fk FOREIGN KEY (mitarbeiter_uid)
+		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
+		ON DELETE SET NULL ON UPDATE CASCADE;
 
 		ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_mitarbeiter_fk FOREIGN KEY (mitarbeiter_uid)
 		REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
@@ -356,7 +361,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT SELECT ON hr.tbl_vertragsbestandteil_zeitaufzeichnung TO web;
 		
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsbestandteil TO vilesci;
-		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsabrechnung TO vilesci;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltshistorie TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltstyp TO vilesci;
 
 		GRANT USAGE ON SCHEMA hr TO vilesci;
@@ -405,11 +410,11 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 		CREATE INDEX idx_tbl_dienstverhaeltnis_mitarbeiter_uid ON hr.tbl_dienstverhaeltnis USING btree (mitarbeiter_uid);
 		CREATE INDEX idx_tbl_vertragsbestandteil_dienstverhaeltnis_id ON hr.tbl_vertragsbestandteil USING btree (dienstverhaeltnis_id);
-		CREATE INDEX idx_tbl_gehaltsabrechnung_gehaltsbestandteil_id ON hr.tbl_gehaltsabrechnung USING btree (gehaltsbestandteil_id);
+		CREATE INDEX idx_tbl_gehaltshistorie_gehaltsbestandteil_id ON hr.tbl_gehaltshistorie USING btree (gehaltsbestandteil_id);
 		CREATE INDEX idx_tbl_gehaltsbestandteil_dienstverhaeltnis_id ON hr.tbl_gehaltsbestandteil USING btree (dienstverhaeltnis_id);
 
 		COMMENT ON TABLE hr.tbl_dienstverhaeltnis IS E'Dienstverhaeltnisse von Mitarbeitern';
-		COMMENT ON TABLE hr.tbl_gehaltsabrechnung IS E'Historie monatlich abgerechneter Gehaelter';
+		COMMENT ON TABLE hr.tbl_gehaltshistorie IS E'Historie monatlich abgerechneter Gehaelter';
 		COMMENT ON TABLE hr.tbl_gehaltsbestandteil IS E'Gehaltskomponenten zu Vertraegen';
 		COMMENT ON TABLE hr.tbl_sachaufwand IS E'Zusatzvergütungen für Mitarbeiter';
 		COMMENT ON TABLE hr.tbl_sachaufwandtyp IS E'Key-Table for Sachaufwand';
@@ -417,6 +422,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 		GRANT USAGE ON hr.tbl_dienstverhaeltnis_dienstverhaeltnis_id_seq TO vilesci;
 		GRANT USAGE ON hr.tbl_vertragsbestandteil_vertragsbestandteil_id_seq TO vilesci;
+		GRANT USAGE ON hr.tbl_gehaltshistorie_gehaltshistorie_id_seq TO vilesci;
 
 		GRANT USAGE ON hr.tbl_gehaltsbestandteil_gehaltsbestandteil_id_seq TO vilesci;
 		";
