@@ -389,6 +389,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('zulage','Zulage', true, 3, true);
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('praemie','Prämie', false, 4, true);
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('lohnausgleichatz','Lohnausgleich ATZ', false, 5, true);
+		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('zusatzvereinbarung','Zusatzvereinbarung',false, 6, true);
 
 		INSERT INTO hr.tbl_vertragsbestandteil_freitexttyp(freitexttyp_kurzbz, bezeichnung, ueberlappend, kuendigungsrelevant) VALUES('allin','All-In', false, false);
 		INSERT INTO hr.tbl_vertragsbestandteil_freitexttyp(freitexttyp_kurzbz, bezeichnung, ueberlappend, kuendigungsrelevant) VALUES('ersatzarbeitskraft','Ersatzarbeitskraft', false, true);

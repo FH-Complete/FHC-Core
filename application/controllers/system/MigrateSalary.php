@@ -168,14 +168,30 @@ class MigrateSalary extends CLI_Controller
 			$typ = '';
 			$allin = false;
 
-			//TODO: DV und VBS Ermitteln
+			//DV und VBS Ermitteln
 			$dv = $this->DienstverhaeltnisModel->getDVByPersonUID($uid, $this->OE_DEFAULT, $row_gehalt['beginn']);
 
 			if (!hasData($dv))
 			{
-				echo "\nKein passendes DV gefunden für User ".$uid." und Datum ".$row_gehalt['beginn']." -> ROLLBACK\n";
-				$failed = true;
-				break;
+				$date = new DateTime($row_gehalt['beginn']);
+				$date->modify('last day of this month');
+				$last_day_this_month = $date->format('Y-m-d');
+
+				// Wenn mit Monatsersten kein DV gefunden wird, wird stattdessen mit Monatsletzten gesucht um DVs zu finden 
+				// für Personen die erst später im Monat in ihr DV einsteigen
+				$dv = $this->DienstverhaeltnisModel->getDVByPersonUID($uid, $this->OE_DEFAULT, $last_day_this_month);
+				
+				if (!hasData($dv))
+				{
+					echo "\nKein passendes DV gefunden für User ".$uid." und Datum ".$row_gehalt['beginn']." -> ROLLBACK\n";
+					$failed = true;
+					break;
+				}
+				else
+				{
+					// Gehaltsstart wird auf den Start des DV korrigiert wenn nicht der Monatserste
+					$row_gehalt['beginn'] = getData($dv)[0]->von;
+				}
 			}
 
 			$resultdata = getData($dv);
@@ -216,7 +232,7 @@ class MigrateSalary extends CLI_Controller
 				|| $row_gehalt['lohnart']==1042  // 12x
 				|| $row_gehalt['lohnart']==3410)  // USTDPausch
 			{
-				$typ = 'zulage';
+				$typ = 'zusatzvereinbarung';
 
 				// Freitextbestandteil anlegen fuer die Zulage
 				// Gaehalt wird der Zuglage zugeordnet
@@ -250,6 +266,46 @@ class MigrateSalary extends CLI_Controller
 				if(!isSuccess($resultVBSFreitext))
 				{
 					echo "VBS Freitext Zusatz kann nicht erstellt werden -> ROLLBACK";
+					$failed = true;
+					break;
+				}
+			}
+			elseif ($row_gehalt['lohnart']==9999) // All-In Custom Lohnart nicht per Default vorhanden
+			{
+				$typ = 'zulage';
+
+				// Freitextbestandteil anlegen fuer die Zulage
+				// Gaehalt wird der Zuglage zugeordnet
+
+				$data = array(
+					'dienstverhaeltnis_id' => $dvid,
+					'von' => $row_gehalt['beginn'],
+					'vertragsbestandteiltyp_kurzbz' => 'freitext',
+					'insertamum' => date('Y-m-d H:i:s'),
+					'insertvon' => 'MigrateSalary'
+				);
+				if (isset($row_gehalt['ende']) && $row_gehalt['ende']!='')
+					$data['bis'] = $row_gehalt['ende'];
+				
+				$resultVBS = $this->VertragsbestandteilModel->Insert($data);
+				if(!isSuccess($resultVBS))
+				{
+					echo "VBS AllIn kann nicht erstellt werden -> ROLLBACK";
+					$failed = true;
+					break;
+				}
+				$vbsid = getData($resultVBS);
+
+				$data = array(
+					'vertragsbestandteil_id' => $vbsid,
+					'freitexttyp_kurzbz' => 'allin',
+					'titel' => $row_gehalt['bezeichnung'],
+					'anmerkung' => $row_gehalt['bezeichnung'],
+				);
+				$resultVBSFreitext = $this->VertragsbestandteilFreitextModel->Insert($data);
+				if(!isSuccess($resultVBSFreitext))
+				{
+					echo "VBS Freitext AllIn Zusatz kann nicht erstellt werden -> ROLLBACK";
 					$failed = true;
 					break;
 				}
