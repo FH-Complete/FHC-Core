@@ -100,7 +100,7 @@ export default {
 				page: true, //persist page
 				columns: ["width", "visible"], //persist columns
 			},
-			persistenceID: 'studierendenantrag_leitung',
+			persistenceID: 'studierendenantrag_leitung_2023-11-14',
 			columns: [{
 				formatter: 'rowSelection',
 				titleFormatter: 'rowSelection',
