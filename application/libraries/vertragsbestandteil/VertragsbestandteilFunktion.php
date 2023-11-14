@@ -27,6 +27,8 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 		$this->CI = get_instance();
 		$this->CI->load->model('person/Benutzerfunktion_model', 
 			'BenutzerfunktionModel');
+		$this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib', 
+			null, 'VertragsbestandteilLib');
 	}
 	
 	public function beforePersist()
@@ -41,23 +43,129 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 		}
 	}
 	
-	protected function beforePersitExisting() {
-		$data = array();
-		
-		$curbfres = $this->CI->BenutzerfunktionModel->load($this->getBenutzerfunktion_id());
-		if(hasData($curbfres))
+	protected function loadBenutzerfunktion($bfid)
+	{
+		$bfres = $this->CI->BenutzerfunktionModel->load($bfid);
+		if(!hasData($bfres))
 		{
-			$curbf = (getData($curbfres))[0];
-			if($this->getVon() < $curbf->datum_von) 
+			throw new Exception('failed to load existing Benutzerfunktion');
+		}
+		return (getData($bfres))[0];
+	}
+	
+	protected function loadPersitedVB($vbid)
+	{
+		$vb = $this->CI->VertragsbestandteilLib->fetchVertragsbestandteil($vbid);
+		if( $vb === null )
+		{
+			throw new Exception('failed to load persited Vertragsbestandteil');
+		}
+		return $vb;
+	}
+	
+	protected function areVbAndBfInSync($bf)
+	{		
+		$vbvon = $this->getVon();
+		$vbbis = $this->getBis();
+		if( intval($this->getVertragsbestandteil_id()) > 0 )
+		{
+			$vb = $this->loadPersitedVB($this->getVertragsbestandteil_id());
+			$vbvon = $vb->getVon();
+			$vbbis = $vb->getBis();
+		}
+		
+		if( ($bf->datum_von === $vbvon) && ($bf->datum_bis === $vbbis) )
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	protected function isBefore($a, $b)
+	{
+		if($b === null) {
+			return false;
+		}
+		elseif($a === null) {
+			return true;
+		}
+		else {
+			return $a < $b;
+		}
+	}
+
+	protected function isAfter($a, $b)
+	{
+		if($b === null) {
+			return false;
+		}
+		elseif($a === null) {
+			return true;
+		}
+		else {
+			return $a > $b;
+		}
+	}
+	
+	protected function beforePersitExisting() 
+	{
+		$bf = $this->loadBenutzerfunktion($this->getBenutzerfunktion_id());
+		if( $this->areVbAndBfInSync($bf) )
+		{
+			// vb or stored vb von bis is in sync so update benutzerfunktion
+			$this->updateBenutzerfunktion($bf, $this->getVon(), $this->getBis());
+		}
+		else
+		{
+			$daybeforevon = \DateTime::createFromFormat('Y-m-d', $this->getVon(), 
+				new \DateTimeZone('Europe/Vienna'));
+			$daybeforevon->sub(new \DateInterval('P1D'));
+			
+			if( $this->isBefore($this->getVon(), $bf->datum_von) && 
+				$this->isAfter($this->getBis(), $bf->datum_bis) )
 			{
-				$data['datum_von'] = $this->getVon();
+				$this->updateBenutzerfunktion($bf, $this->getVon(), $this->getBis());
 			}
-			if($this->getBis() === null 
-				|| ($curbf->datum_bis !== null && ($this->getBis() < $curbf->datum_bis))) 
+			elseif( $this->isBefore($bf->datum_von, $this->getVon()) && 
+					$this->isAfter($this->getBis(), $bf->datum_von) )
 			{
-				$data['datum_bis'] = $this->getBis();
+				$this->updateBenutzerfunktion($bf, $bf->datum_von, $daybeforevon->format('Y-m-d'));
+				$data = (object) array(
+					'mitarbeiter_uid' => $bf->uid,
+					'funktion' => $bf->funktion_kurzbz,
+					'orget' => $bf->oe_kurzbz
+				);
+				$this->createBenutzerfunktionData($data);
+				$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+				$this->setBenutzerfunktion_id($bfid);
+			}
+			elseif( $this->isBefore($bf->datum_von, $this->getVon()) && 
+					$this->isBefore($bf->datum_von, $this->getBis()) )
+			{
+				$data = (object) array(
+					'mitarbeiter_uid' => $bf->uid,
+					'funktion' => $bf->funktion_kurzbz,
+					'orget' => $bf->oe_kurzbz
+				);
+				$this->createBenutzerfunktionData($data);
+				$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+				$this->setBenutzerfunktion_id($bfid);
 			}
 		}
+	}
+	
+	protected function updateBenutzerfunktion($bf, $von, $bis)
+	{
+		$data = array();
+		
+		if($von !== $bf->datum_von) 
+		{
+			$data['datum_von'] = $von;
+		}
+		if($bis !== $bf->datum_bis) 
+		{
+			$data['datum_bis'] = $bis;
+		}			
 
 		if( count($data) === 0 ) 
 		{
@@ -67,7 +175,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 		$data['updateamum'] = strftime('%Y-%m-%d %H:%M:%S');
 		$data['updatevon'] = getAuthUID();		
 		
-		$ret = $this->CI->BenutzerfunktionModel->update($this->getBenutzerfunktion_id(), $data);
+		$ret = $this->CI->BenutzerfunktionModel->update($bf->benutzerfunktion_id, $data);
 		
 		if(isError($ret) )
 		{
@@ -75,22 +183,49 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 		}
 	}
 
-	protected function beforePersitNew() {
-		if( $this->benutzerfunktiondata === null) 
-		{
-			return;
-		}
-		
-		$ret = $this->CI->BenutzerfunktionModel->insert($this->benutzerfunktiondata);
+	protected function insertBenutzerfunktion($benutzerfunktiondata)
+	{
+		$ret = $this->CI->BenutzerfunktionModel->insert($benutzerfunktiondata);
 		
 		if(isError($ret) )
 		{
 			throw new Exception('failed to create Benutzerfunktion');
 		}
 		
-		$this->setBenutzerfunktion_id(getData($ret));		
+		return getData($ret);
 	}
 
+	protected function deleteBenutzerfunktion($benutzerfunktion_id)
+	{
+		$ret = $this->CI->BenutzerfunktionModel->delete($benutzerfunktion_id);
+		
+		if(isError($ret) )
+		{
+			throw new Exception('failed to delete Benutzerfunktion');
+		}
+	}
+	
+	protected function beforePersitNew() {
+		if( $this->benutzerfunktiondata === null) 
+		{
+			return;
+		}
+		
+		$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+		
+		$this->setBenutzerfunktion_id($bfid);
+	}
+	
+	public function afterDelete()
+	{
+		if( !(intval($this->getBenutzerfunktion_id()) > 0) )
+		{
+			return;
+		}
+		
+		$this->deleteBenutzerfunktion($this->getBenutzerfunktion_id());
+	}
+	
 	public function toStdClass()
 	{
 		$tmp = array(

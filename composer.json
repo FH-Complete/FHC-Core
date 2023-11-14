@@ -330,9 +330,9 @@
 			"type": "package",
 			"package": {
 				"name": "vuejs/vuejs3",
-				"version": "3.2.33",
+				"version": "3.3.8",
 				"dist": {
-					"url": "https://unpkg.com/vue@3.2.33/dist/vue.global.prod.js",
+					"url": "https://unpkg.com/vue@3.3.8/dist/vue.global.prod.js",
 					"type": "file"
 				}
 			}
@@ -441,7 +441,7 @@
 		"twbs/bootstrap3": "3.4.*",
 		"twbs/bootstrap5": "5.1.*",
 
-		"vuejs/vuejs3": "3.2.33",
+		"vuejs/vuejs3": "3.3.8",
 		"vuejs/vuerouter4": "4.1.3",
         "vuejs/vuedatepicker_js": "7.2.0",
         "vuejs/vuedatepicker_css": "7.2.0"

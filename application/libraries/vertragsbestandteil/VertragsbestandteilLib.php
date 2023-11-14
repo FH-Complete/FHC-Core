@@ -309,8 +309,8 @@ class VertragsbestandteilLib
 		}
 		catch(Exception $ex)
 		{
-			throw new Exception('VertragsbestandteilLib updateVertragsbestandteil '
-				. 'failed to store Gehaltsbestandteile. ' . $ex->getMessage());
+			throw new Exception('VertragsbestandteilLib deleteVertragsbestandteil '
+				. 'failed to delete Gehaltsbestandteile. ' . $ex->getMessage());
 		}
 
 
@@ -320,6 +320,8 @@ class VertragsbestandteilLib
 		{
 			throw new Exception('error deleting vertragsbestandteil');
 		}
+		
+		$vertragsbestandteil->afterDelete();
 	}
 
 	protected function updateVertragsbestandteil(Vertragsbestandteil $vertragsbestandteil)

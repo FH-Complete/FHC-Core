@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e21d344f075957e02d2dba4f9410325",
+    "content-hash": "0c2983ac2d380bfba68f9837de857844",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1868,10 +1868,10 @@
         },
         {
             "name": "vuejs/vuejs3",
-            "version": "3.2.33",
+            "version": "3.3.8",
             "dist": {
                 "type": "file",
-                "url": "https://unpkg.com/vue@3.2.33/dist/vue.global.prod.js"
+                "url": "https://unpkg.com/vue@3.3.8/dist/vue.global.prod.js"
             },
             "type": "library"
         },

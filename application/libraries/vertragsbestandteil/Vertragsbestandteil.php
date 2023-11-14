@@ -232,6 +232,10 @@ EOTXT;
 		// can be overridden in childs
 	}
 	
+	public function afterDelete() {
+		// can be overridden in childs
+	}
+	
 	public function validate() {
 		$von = \DateTimeImmutable::createFromFormat('Y-m-d', $this->von);
 		$bis = \DateTimeImmutable::createFromFormat('Y-m-d', $this->bis);
