@@ -18,6 +18,8 @@ class Profil extends Auth_Controller
 			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
 			'getUser' => ['student/anrechnung_beantragen:r','user:r']
 		]);
+		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -33,15 +35,26 @@ class Profil extends Auth_Controller
 		$this->load->view('Cis/Profil', ["uid" => getAuthUID()]);
 	}
 
+
+	//? public function getUser returns information related to a user
 	public function getUser()
 	{
-		$myObj = new stdClass();
-		$myObj->name = "John";
-		$myObj->age = 30;
-		$myObj->city = "New York";
-        echo json_encode($myObj);
+		//* retrieve info from the Mitarbeiter model
+		$mitarbeiter_result = $this->MitarbeiterModel->load(getAuthUID());
+		//* retrieve info from the Benutzer model
+		$benutzer_result = $this->BenutzerModel->load([getAuthUID()]);
+		//* return JSON with info
+		$res = ['mitarbeiter' => $mitarbeiter_result,
+				'Benutzer' => $benutzer_result];
+		
+        echo json_encode($res);
 	}
 
+	
+
+
+
+	//? this idea was to use _remap, to call different views based on the type of user
 	/*
 	public function _remap($param)
 	{

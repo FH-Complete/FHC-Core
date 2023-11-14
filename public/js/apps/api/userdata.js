@@ -5,6 +5,11 @@ export default {
                   + 'Cis/Profil/getUser';
         return axios.get(url);
     },
+    getUser2: function(uid) {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
+                  + 'models/person/Benutzer_model/getFromPersonId';
+        return axios.get(url,{params: {uid}});
+    },
     getUserDumy: function(){
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
                 + 'public/js/apps/api/dummyapi.php/getUser';

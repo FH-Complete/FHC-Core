@@ -16,6 +16,8 @@ export default {
         this.$parent.testsearch().then((res) => {
             this.person = res.data;
         }); 
+        
+       
       },
      
     template: `

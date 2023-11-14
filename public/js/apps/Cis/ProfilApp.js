@@ -17,6 +17,9 @@ const app = Vue.createApp({
 	methods: {
         testsearch: function() {
 			return Vue.$fhcapi.UserData.getUser();
+		},
+		testsearch2: function() {
+			return Vue.$fhcapi.UserData.getUser2("ma0594");
 		}
 	},
 	
