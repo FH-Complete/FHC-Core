@@ -247,7 +247,8 @@ EOTXT;
 			$this->validationerrors[] = 'Das Beginndatum muss vor dem Endedatum liegen.';
 		}
 		
-		if( $this->checkoverlap && $ci->VertragsbestandteilLib->isOverlappingExistingDV($this) ) 
+		if( $this->checkoverlap && !($this->vertragsart_kurzbz === 'werkvertrag') 
+			&& $ci->VertragsbestandteilLib->isOverlappingExistingDV($this) ) 
 		{
 			$this->validationerrors[] = 'Es existiert bereits ein überlappendes Dienstverhältnis';
 		}

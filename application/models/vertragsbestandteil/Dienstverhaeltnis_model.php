@@ -119,6 +119,8 @@ class Dienstverhaeltnis_model extends DB_Model
 				dv.mitarbeiter_uid = ?
 			AND
 				dv.oe_kurzbz = ?
+			AND 
+				dv.vertragsart_kurzbz != 'werkvertrag' 
 			AND
 				?::date <= COALESCE(dv.bis, '2170-12-31'::date)
 			AND 
