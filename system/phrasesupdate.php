@@ -5915,6 +5915,26 @@ When on hold, the date is only a reminder.',
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'vertiefungsrichtung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertiefungsrichtung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Specialization',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'lehrauftrag',
 		'category' => 'ui',
 		'phrase' => 'lehrauftragInBearbeitung',
