@@ -16,10 +16,16 @@ class Profil extends Auth_Controller
 	{
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'getUser' => ['student/anrechnung_beantragen:r','user:r']
+			'getUser' => ['student/anrechnung_beantragen:r','user:r'],
+			'isMitarbeiterOrStudent' => ['student/anrechnung_beantragen:r','user:r'],
+			'getPersonInformation' => ['student/anrechnung_beantragen:r','user:r'],
+			
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('ressource/student_model', 'StudentModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+		
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -30,9 +36,11 @@ class Profil extends Auth_Controller
 	 */
 	public function index()
 	{
-		//echo = getAuthUID();
 		
-		$this->load->view('Cis/Profil', ["uid" => getAuthUID()]);
+		//? we can pass data to the view by using the second parameter of the load->view() function 
+		//* the first parameter is the route that Code Igniter will switch to
+		//* the second parameter can be used to pass data to the view  
+		$this->load->view('Cis/Profil', ["uid" => getAuthUID(),"pid" => getAuthPersonId()]);
 	}
 
 
@@ -42,13 +50,35 @@ class Profil extends Auth_Controller
 		//* retrieve info from the Mitarbeiter model
 		$mitarbeiter_result = $this->MitarbeiterModel->load(getAuthUID());
 		//* retrieve info from the Benutzer model
-		$benutzer_result = $this->BenutzerModel->load([getAuthUID()]);
+		$benutzer_result = $this->BenutzerModel->getFromPersonId(getAuthUID());
 		//* return JSON with info
-		$res = ['mitarbeiter' => $mitarbeiter_result,
-				'Benutzer' => $benutzer_result];
+		//! was removed from $res for testing purposes: 'Benutzer' => $benutzer_result
+		$res = ['mitarbeiter' => $mitarbeiter_result,'Benutzer' => $benutzer_result
+				];
 		
         echo json_encode($res);
 	}
+
+	public function getPersonInformation($pid){
+		//? get the person information using the benutzer uid
+		echo json_encode($this->PersonModel->getPersonStammdaten($pid)->retval);
+	}
+
+	//? check wheter the parameter uid is a Mitarbeiter or a Student
+	public function isMitarbeiterOrStudent($uid){
+		if($this->MitarbeiterModel->isMitarbeiter($uid)->retval){
+			echo json_encode("Mitarbeiter");
+		}//! not sure if the user is automatically a student if he is not a mitarbeiter
+		else if($this->StudentModel->isStudent($uid)->retval){
+			echo json_encode("Student");
+		}else{
+			echo json_encode("Not a Mitarbeiter or Student");
+		}
+
+		
+	}
+
+	
 
 	
 
