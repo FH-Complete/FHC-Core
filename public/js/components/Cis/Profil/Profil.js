@@ -24,6 +24,15 @@ export default {
                 nachname:this.person_info.nachname,
                 gebdatum:this.person_info.gebdatum,
                 gebort:this.person_info.gebort,
+                adresse:this.person_info.adressen[0].strasse + " " + this.person_info.adressen[0].plz,
+               
+            };
+        },
+        cis_profil_info_no_foto(){
+            return {
+                ...this.person_info,
+                foto:null, 
+               
             };
         }
     },
@@ -39,12 +48,18 @@ export default {
             <h1>test</h1>
             <p>{{"here is the uid "+uid}} </p>
             <p>{{"here is the pid "+pid}} </p>
-            <code style="color:purple">{{JSON.stringify(cis_profil_info)}}</code>
-            <!--<code style="color:purple">{{JSON.stringify(person_info)}}</code>-->
+            <!--
+            //! printing 2 computed functions
+            //* one to output the collected need information for the cis page
+            //* and the other returns all the information retrieved from the model without the foto data
+            -->
+            <pre style="color:blue">{{JSON.stringify(cis_profil_info,null,2)}}</pre>
+            <pre style="color:purple">{{JSON.stringify(cis_profil_info_no_foto,null,2)}}</pre>
+            
             <br/>
-            <code style="color:red">{{JSON.stringify(person)}}</code>
+            <pre style="color:red">{{JSON.stringify(person)}}</pre>
             <br/>
-            <code>{{JSON.stringify(role)}}</code>
+            <pre>{{JSON.stringify(role)}}</pre>
             </div>
     `,
 };

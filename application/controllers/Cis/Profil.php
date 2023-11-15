@@ -25,6 +25,7 @@ class Profil extends Auth_Controller
 		$this->load->model('ressource/student_model', 'StudentModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('person/Adresse_model', 'AdresseModel');
 		
 	}
 
@@ -61,7 +62,16 @@ class Profil extends Auth_Controller
 
 	public function getPersonInformation($pid){
 		//? get the person information using the benutzer uid
-		echo json_encode($this->PersonModel->getPersonStammdaten($pid)->retval);
+		$json_result = $this->PersonModel->getPersonStammdaten($pid)->retval;
+
+
+		//! the following line is not needed because it is already included in the getPersonStammdaten function
+		//$json_result->addresse_info = $this->AdresseModel->getZustellAdresse($pid)->retval;
+		echo json_encode($json_result);
+		return;
+		
+		
+		
 	}
 
 	//? check wheter the parameter uid is a Mitarbeiter or a Student
