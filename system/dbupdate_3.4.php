@@ -45,6 +45,7 @@ require_once('dbupdate_3.4/30537_anmerkung_in_tbl_rolleberechtigung.php');
 require_once('dbupdate_3.4/30181_tabelle_anrechnung_neue_attribute_fuer_begruendung.php');
 require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');
 require_once('dbupdate_3.4/29835_uhstat1_erfassung_der_uhstat1_daten_ueber_das_bewerbungstool.php');
+require_once('dbupdate_3.4/33003_bis_meldung_personal.php');
 
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
