@@ -279,6 +279,32 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				break;
 		}
 
+		//Anforderungen durch Lernergebnisse des Studiums ersetzen
+
+		// Überprüfen, ob addon studiengangsverwaltung aktiv ist
+		$addon_obj = new addon();
+		$addonStgAktiv = $addon_obj->checkActiveAddon("studiengangsverwaltung");
+
+		if($addonStgAktiv)
+		{
+			echo '<addon_aktiv>1</addon_aktiv>';
+
+			require_once('../addons/studiengangsverwaltung/include/qualifikationsziel.class.php');
+			$qualifikationsziel = new qualifikationsziel();
+			$qualifikationsziel->getAll($studienordnung_id);
+			if (isset($qualifikationsziel->result[0]))
+			{
+				$qualifikation_beschreibung = $qualifikationsziel->result[0]->data[1]->elements[0];
+				echo "<lernergebnisse>$qualifikation_beschreibung</lernergebnisse>";
+			}
+
+		}
+		else
+			echo '<addon_aktiv>0</addon_aktiv>';
+
+
+
+
 		if($row->typ=='d')
 		{
 			echo '		<niveau_code>UNESCO ISCED 7</niveau_code>';
