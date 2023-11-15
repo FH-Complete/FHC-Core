@@ -280,8 +280,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 
 		//Anforderungen durch Lernergebnisse des Studiums ersetzen
-
-		// Überprüfen, ob addon studiengangsverwaltung aktiv ist
 		$addon_obj = new addon();
 		$addonStgAktiv = $addon_obj->checkActiveAddon("studiengangsverwaltung");
 
@@ -295,15 +293,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			if (isset($qualifikationsziel->result[0]))
 			{
 				$qualifikation_beschreibung = $qualifikationsziel->result[0]->data[1]->elements[0];
+				$qualifikation_beschreibung = json2odt($qualifikation_beschreibung);
 				echo "<lernergebnisse>$qualifikation_beschreibung</lernergebnisse>";
 			}
 
 		}
 		else
 			echo '<addon_aktiv>0</addon_aktiv>';
-
-
-
 
 		if($row->typ=='d')
 		{
@@ -1146,6 +1142,14 @@ function checkNote($note_alt, $note_neu)
 function cmp($a, $b)
 {
 	return strcmp($a->bezeichnung, $b->bezeichnung);
+}
+
+//newline \n durch string '\n' ersetzen (für Qualifikationsziele)
+function json2odt($str)
+{
+	$str = str_replace(array("\r\n", "\r", "\n"), '\n', $str);
+
+	return $str;
 }
 
 function printLehrveranstaltungTree($tree)
