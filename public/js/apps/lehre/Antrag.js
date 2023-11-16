@@ -13,8 +13,10 @@ const app = Vue.createApp({
 	},
 	data() {
 		return {
-			statusMsg: "",
-			statusSeverity: "",
+			status: {
+				msg: '',
+				severity: ''
+			},
 			infoArray: []
 		};
 	}

@@ -67,7 +67,7 @@ export default {
 					}
 					this.$emit('update:status', this.data.status);
 					this.$emit("setStatus", {
-						msg: this.$p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+						msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 						severity: this.statusSeverity
 					});
 					return result;
@@ -85,7 +85,7 @@ export default {
 			let nextState = repeat ? 'Erstellt' : 'Verzichtet';
 
 			this.$emit('setStatus', {
-				msg: this.$p.t_ref('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_saving')}),
+				msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_saving')})),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -112,7 +112,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.$p.t_ref('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
 							severity: 'danger'
 						});
 					}
@@ -125,7 +125,7 @@ export default {
 							this.data.status = nextState;
 						this.$emit('update:status', this.data.status);
 						this.$emit("setStatus", {
-							msg: this.$p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 							severity: this.statusSeverity
 						});
 					}
@@ -139,7 +139,7 @@ export default {
 	},
 	mounted() {
 		this.infos = [...Array(5).keys()].map(n => ({
-			body: this.$p.t_ref('studierendenantrag', 'infotext_Wiederholung_' + n)
+			body: Vue.computed(() => this.$p.t('studierendenantrag', 'infotext_Wiederholung_' + n))
 		}));
 		this.$emit('setInfos', this.infos);
 	},

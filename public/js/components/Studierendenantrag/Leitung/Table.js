@@ -74,7 +74,8 @@ export default {
 			this.$refs.lvList.show();
 		}
 	},
-	mounted() {
+	async mounted() {
+		await this.$p.loadCategory(['lehre', 'studierendenantrag', 'person', 'global', 'ui']);
 		function dateFormatter(cell)
 		{
 			let val = cell.getValue();
@@ -112,7 +113,7 @@ export default {
 				title: '#'
 			}, {
 				field: 'bezeichnung',
-				title: this.$p.t_node('lehre', 'studiengang'),
+				title: this.$p.t('lehre', 'studiengang'),
 				headerFilter: 'list',
 				headerFilterParams: {
 					valuesLookup: true,
@@ -121,7 +122,7 @@ export default {
 				}
 			}, {
 				field: 'orgform',
-				title: this.$p.t_node('lehre', 'organisationsform'),
+				title: this.$p.t('lehre', 'organisationsform'),
 				headerFilter: 'list',
 				headerFilterParams: {
 					valuesLookup: true,
@@ -130,7 +131,7 @@ export default {
 				}
 			}, {
 				field: 'typ',
-				title: this.$p.t_node('studierendenantrag', 'antrag_typ'),
+				title: this.$p.t('studierendenantrag', 'antrag_typ'),
 				headerFilter: 'list',
 				headerFilterParams: {
 					valuesLookup: true,
@@ -142,7 +143,7 @@ export default {
 				}
 			}, {
 				field: 'statustyp',
-				title: this.$p.t_node('studierendenantrag', 'antrag_status'),
+				title: this.$p.t('studierendenantrag', 'antrag_status'),
 				headerFilter: 'list',
 				headerFilterParams: {
 					valuesLookup: true,
@@ -164,32 +165,32 @@ export default {
 				}
 			}, {
 				field: 'matrikelnr',
-				title: this.$p.t_node('person', 'personenkennzeichen'),
+				title: this.$p.t('person', 'personenkennzeichen'),
 				headerFilter: 'input'
 			}, {
 				field: 'prestudent_id',
-				title: this.$p.t_node('lehre', 'prestudent'),
+				title: this.$p.t('lehre', 'prestudent'),
 				headerFilter: 'input'
 			}, {
 				field: 'name',
-				title: this.$p.t_node('global', 'name'),
+				title: this.$p.t('global', 'name'),
 				mutator: (value, data) => (data.vorname + ' ' + data.nachname).replace(/^\s*(.*)\s*$/, '$1'),
 				headerFilter: 'input'
 			}, {
 				field: 'datum',
-				title: this.$p.t_node('global', 'datum'),
+				title: this.$p.t('global', 'datum'),
 				formatter: dateFormatter,
 				headerFilterFunc: 'dates',
 				headerFilter: dateFilter
 			}, {
 				field: 'datum_wiedereinstieg',
-				title: this.$p.t_node('studierendenantrag', 'antrag_datum_wiedereinstieg'),
+				title: this.$p.t('studierendenantrag', 'antrag_datum_wiedereinstieg'),
 				formatter: dateFormatter,
 				headerFilterFunc: 'dates',
 				headerFilter: dateFilter
 			}, {
 				field: 'grund',
-				title: this.$p.t_node('studierendenantrag', 'antrag_grund'),
+				title: this.$p.t('studierendenantrag', 'antrag_grund'),
 				formatter: (cell, formatterParams, onRendered) => {
 					let link = document.createElement('a'),
 						val = cell.getValue();
@@ -204,7 +205,7 @@ export default {
 				}
 			}, {
 				field: 'dms_id',
-				title: this.$p.t_node('studierendenantrag', 'antrag_dateianhaenge'),
+				title: this.$p.t('studierendenantrag', 'antrag_dateianhaenge'),
 				formatter: (cell, formatterParams, onRendered) => {
 					let val = cell.getValue();
 					if (!val)
@@ -216,13 +217,13 @@ export default {
 						val;
 					link.setAttribute('target', '_blank');
 					link.innerHTML = '<i class="fa fa-paperclip" aria-hidden="true"></i>';
-					link.append(this.$p.t_node('studierendenantrag/antrag_anhang'));
+					link.append(this.$p.t('studierendenantrag/antrag_anhang'));
 					return link;
 				}
 			}, {
 				field: 'actions',
 				frozen: true,
-				title: this.$p.t_node('ui', 'aktion'),
+				title: this.$p.t('ui', 'aktion'),
 				headerFilter: false,
 				headerSort: false,				
 				formatter: (cell, formatterParams, onRendered) => {
@@ -246,7 +247,7 @@ export default {
 					if (data.typ == 'AbmeldungStgl' && data.status == 'Genehmigt') {
 						// NOTE(chris): Object
 						let button = document.createElement('button');
-						button.append(this.$p.t_node('studierendenantrag', 'btn_object'));
+						button.append(this.$p.t('studierendenantrag', 'btn_object'));
 						button.className = "btn btn-outline-secondary";
 						button.addEventListener('click', () => this.$emit('action:object', [cell.getData()]));
 						container.append(button);
@@ -255,14 +256,14 @@ export default {
 					if (data.typ == 'AbmeldungStgl' && data.status == 'Beeinsprucht') {
 						// NOTE(chris): Deny Objection
 						let button = document.createElement('button');
-						button.append(this.$p.t_node('studierendenantrag', 'btn_objection_deny'));
+						button.append(this.$p.t('studierendenantrag', 'btn_objection_deny'));
 						button.className = "btn btn-outline-secondary";
 						button.addEventListener('click', () => this.$emit('action:objectionDeny', [cell.getData()]));
 						container.append(button);
 
 						// NOTE(chris): Approve Objection
 						button = document.createElement('button');
-						button.append(this.$p.t_node('studierendenantrag', 'btn_objection_approve'));
+						button.append(this.$p.t('studierendenantrag', 'btn_objection_approve'));
 						button.className = "btn btn-outline-secondary";
 						button.addEventListener('click', () => this.$emit('action:objectionApprove', [cell.getData()]));
 						container.append(button);
@@ -272,7 +273,7 @@ export default {
 						// NOTE(chris): Reopen
 						if (data.typ == 'Wiederholung' && data.status == 'Verzichtet') {
 							let button = document.createElement('button');
-							button.append(this.$p.t_node('studierendenantrag', 'btn_reopen'));
+							button.append(this.$p.t('studierendenantrag', 'btn_reopen'));
 							button.className = "btn btn-outline-secondary";
 							button.addEventListener('click', () => this.$emit('action:reopen', [cell.getData()]));
 							container.append(button);
@@ -280,7 +281,7 @@ export default {
 						// NOTE(chris): Lv Zuweisen
 						if (data.typ == 'Wiederholung' && (data.status == 'Erstellt' || data.status == 'Lvszugewiesen')) {
 							let button = document.createElement('a');
-							button.append(this.$p.t_node('studierendenantrag', 'btn_lvzuweisen'));
+							button.append(this.$p.t('studierendenantrag', 'btn_lvzuweisen'));
 							button.className = "btn btn-outline-secondary";
 							button.href = FHC_JS_DATA_STORAGE_OBJECT.app_root +
 								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -302,7 +303,7 @@ export default {
 						// NOTE(chris): Cancel
 						if (data.typ == 'AbmeldungStgl' && (data.status == 'Erstellt' || data.status == 'Genehmigt' )) {
 							let button = document.createElement('button');
-							button.append(this.$p.t_node('studierendenantrag', 'btn_cancel'));
+							button.append(this.$p.t('studierendenantrag', 'btn_cancel'));
 							button.className = "btn btn-outline-secondary";
 							button.addEventListener('click',() => this.$emit('action:cancel', [cell.getData()]));
 							container.append(button);
@@ -313,7 +314,7 @@ export default {
 						// NOTE(chris): Approve
 						if ((data.typ == 'Wiederholung' && data.status == 'Lvszugewiesen') || (data.typ != 'Wiederholung' && data.status == 'Erstellt')) {
 							let button = document.createElement('button');
-							button.append(this.$p.t_node('studierendenantrag', 'btn_approve'));
+							button.append(this.$p.t('studierendenantrag', 'btn_approve'));
 							button.className = "btn btn-outline-secondary";
 							button.addEventListener('click', () => this.$emit('action:approve', [cell.getData()]));
 							container.append(button);
@@ -321,7 +322,7 @@ export default {
 						// NOTE(chris): Reject (Unterbrechung braucht grund)
 						if (data.status == 'Erstellt' && data.typ == 'Unterbrechung') {
 							let button = document.createElement('button');
-							button.append(this.$p.t_node('studierendenantrag', 'btn_reject'));
+							button.append(this.$p.t('studierendenantrag', 'btn_reject'));
 							button.className = "btn btn-outline-secondary";
 							button.addEventListener('click', () => this.$emit('action:reject', [cell.getData()]));
 							container.append(button);
@@ -331,7 +332,7 @@ export default {
 					// NOTE(chris): Show LVs
 					if (data.typ == 'Wiederholung' && (data.status == 'Lvszugewiesen' || data.status == 'Genehmigt')) {
 						let button = document.createElement('button');
-						button.append(this.$p.t_node('studierendenantrag', 'btn_show_lvs'));
+						button.append(this.$p.t('studierendenantrag', 'btn_show_lvs'));
 						button.className = "btn btn-outline-secondary";
 						button.addEventListener('click', () => this.showLVs(cell.getData()));
 						container.append(button);
