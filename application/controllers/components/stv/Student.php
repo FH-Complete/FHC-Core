@@ -256,6 +256,8 @@ class Student extends FHC_Controller
 
 	public function check()
 	{
+		$_POST = json_decode($this->input->raw_input_stream, true);
+		
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
@@ -272,7 +274,7 @@ class Student extends FHC_Controller
 		$gebdatum = $this->input->post('gebdatum');
 
 		if (!$vorname && !$nachname && !$gebdatum) {
-			return $this->outputJsonSuccess([]);
+			return $this->outputJsonError(['#' => 'At least one of vorname, nachname or gebdatum must be set']);
 		}
 
 		$this->load->model('person/Person_model', 'PersonModel');

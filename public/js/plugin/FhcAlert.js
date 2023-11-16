@@ -300,6 +300,73 @@ export default {
 
 				// Fallback
 				fhcerror.alertSystemError('alertSystemError throws Generic Error\r\nError Controller Path: ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' +  FHC_JS_DATA_STORAGE_OBJECT.called_method);
+			},
+			resetFormValidation(form) {
+				const event = new Event('fhc-form-reset');
+				form.querySelectorAll(['[data-fhc-form-validate],[data-fhc-form-error]']).forEach(el => el.dispatchEvent(event));
+				/*const alert = form.querySelector('div.alert.alert-danger[role="alert"]');
+				if (alert) {
+					alert.innerHTML = '';
+					alert.classList.add('d-none');
+				}
+				form.querySelectorAll('.invalid-feedback').forEach(n => n.remove());
+				form.querySelectorAll('.is-invalid').forEach(n => n.classList.remove('is-invalid'));
+				form.querySelectorAll('.is-valid').forEach(n => n.classList.remove('is-valid'));*/
+			},
+			handleFormValidation(error, form) {
+				if (form === undefined) {
+					if (error && error.nodeType === Node.ELEMENT_NODE)
+						return err => $fhcAlert.handleFormValidation(err, error);
+				} else {
+					if (error?.response?.status == 400) {
+						let errors = CoreRESTClient.getError(error.response.data);
+						if (typeof errors !== "object")
+							errors = error.response.data;
+
+						// NOTE(chris): reset form validation
+						$fhcAlert.resetFormValidation(form);
+						
+						// NOTE(chris): set form input validation
+						const notFound = Object.entries(errors).filter(([key, detail]) => {
+							const input = form.querySelector('[data-fhc-form-validate="' + key + '"]');
+							if (!input)
+								return true;
+
+							input.dispatchEvent(new CustomEvent('fhc-form-invalidate', {detail}));
+
+							/*const input = form.querySelector('[name="' + key + '"]');
+							if (!input)
+								return true;
+							input.classList.add('is-invalid');
+							const feedback = document.createElement('div');
+							feedback.classList.add('invalid-feedback');
+							feedback.innerHTML = detail;
+							input.after(feedback);*/
+							return false;
+						}).map(arr => arr[1]);
+
+
+						//const alert = form.querySelector('div.alert.alert-danger[role="alert"]');
+						const alert = form.querySelector('[data-fhc-form-error]');
+						if (alert && notFound.length) {
+							alert.dispatchEvent(new CustomEvent('fhc-form-error', {detail: notFound}));
+							/*notFound.forEach(txt => {
+								const p = document.createElement('p');
+								p.innerHTML = txt;
+								alert.append(p);
+							});
+
+							if (notFound.length) {
+								alert.lastChild.classList.add('mb-0');
+								alert.classList.remove('d-none');
+							}*/
+						} else {
+							notFound.forEach($fhcAlert.alertError);
+						}
+						return;
+					}
+				}
+				$fhcAlert.handleSystemError(error);
 			}
 		};
 		app.config.globalProperties.$fhcAlert = $fhcAlert;
