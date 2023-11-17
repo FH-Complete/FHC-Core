@@ -2,6 +2,8 @@ documents/
 vendor/
 
 /nbproject/
+.vscode
+composer.phar
 /.idea/
 .settings
 .project

@@ -49,12 +49,18 @@ class Profil extends Auth_Controller
 	
 
 	public function getMitarbeiterAnsicht(){
+
 		
-		$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere();
-		if(isError($benutzer_funktion_res)){
-			// error handling
-		}else{
-			$benutzer_funktion_res = hasData($benutzer_funktion_res)? getData($benutzer_funktion_res) : null;
+		if(
+		 isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as bf_bezeichnung","tbl_organisationseinheit.bezeichnung as oe_bezeichnung","datum_von","datum_bis","wochenstunden"]))
+	  	 && isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit","oe_kurzbz"))
+		){
+			$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere("uid='" . getAuthUID() . "'");
+			if(isError($benutzer_funktion_res)){
+				// error handling
+			}else{
+				$benutzer_funktion_res = hasData($benutzer_funktion_res)? getData($benutzer_funktion_res) : null;
+			}
 		}
 
 		//! THERE COULD BE MULTIPLE ADRESSES
@@ -65,7 +71,7 @@ class Profil extends Auth_Controller
 			$adresse_res = hasData($adresse_res)? getData($adresse_res)[0] : null;
 		}
 
-		$benutzer_res = $this->PersonModel->load(getAuthUID());
+		$benutzer_res = $this->BenutzerModel->load([getAuthUID()]);
 		if(isError($benutzer_res)){
 			// error handling
 		}else{
@@ -79,16 +85,13 @@ class Profil extends Auth_Controller
 			$person_res = hasData($person_res)? getData($person_res)[0] : null;
 		}
 		
-		//? get the person information using the benutzer uid
-		//! verwendet getAuthUID()
 		$mitarbeiter_res = $this->MitarbeiterModel->load(getAuthUID());
 		if(isError($mitarbeiter_res)){
 			// error handling
 		}else{
-			//? checks whether the getData does not return null 
-			//? and then checks that the current does return an empty array 
 			$mitarbeiter_res = hasData($mitarbeiter_res)? getData($mitarbeiter_res)[0] : null;
 		}
+
 		$res = new stdClass();
 		$res->username = getAuthUID();
 		//? Person Info
@@ -106,8 +109,8 @@ class Profil extends Auth_Controller
 		$res->kurzbz = $mitarbeiter_res->kurzbz;
 		$res->telefonklappe = $mitarbeiter_res->telefonklappe;
 		//? Benutzer Info
-		$res->email_intern = getAuthUID() . "@technikum-wien.at";
-		$res->email_extern = $benutzer_res->alias . "@technikum-wien.at";
+		$res->email_intern = getAuthUID() . DOMAIN;
+		$res->email_extern = $benutzer_res->alias . DOMAIN;
 		//? Adresse Info 
 		$res->strasse = $adresse_res->strasse;
 		$res->heimatadresse = $adresse_res->heimatadresse;
@@ -119,34 +122,9 @@ class Profil extends Auth_Controller
 		
 		
 		
+		
 		echo json_encode($res);
 		
-		return;
-		/*
-		$res = getData($this->PersonModel->getPersonStammdaten($pid));
-		$json_result = new stdClass();
-		$json_result->anrede = $res->anrede;
-		$json_result->titelpre = $res->titelpre;
-		$json_result->titelpost = $res->titelpost;
-		$json_result->vorname = $res->vorname;
-		$json_result->nachname = $res->nachname;
-		$json_result->gebdatum = $res->gebdatum;
-		$json_result->gebort = $res->gebort;
-		$json_result->adressen = $res->adressen;
-		
-		anrede:this.person_info.anrede,
-                titelpre:this.person_info.titelpre,
-                titelpost:this.person_info.titelpost,
-                vorname:this.person_info.vorname,
-                nachname:this.person_info.nachname,
-                gebdatum:this.person_info.gebdatum,
-                gebort:this.person_info.gebort,
-                adresse:this.person_info.adressen[0].strasse + " " + this.person_info.adressen[0].plz,
-		*/
-
-		//! the following line is not needed because it is already included in the getPersonStammdaten function
-		//$json_result->addresse_info = $this->AdresseModel->getZustellAdresse($pid)->retval;
-		echo json_encode($res);
 		return;
 		
 		
