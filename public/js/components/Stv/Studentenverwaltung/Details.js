@@ -1,4 +1,9 @@
+import accessibility from "../../../directives/accessibility.js";
+
 export default {
+	directives: {
+		accessibility
+	},
 	props: {
 		student: Object
 	},
@@ -33,11 +38,19 @@ export default {
 	<div class="stv-details h-100 pb-3 d-flex flex-column">
 		<div v-if="hasNoStudent" class="justify-content-center d-flex h-100 align-items-center">Bitte StudentIn auswählen!</div>
 		<template v-else>		
-			<ul class="nav nav-tabs">
-				<li v-for="({title}, key) in tabs" class="nav-item" :key="comp">
-					<a class="nav-link" :class="{active: key == current}" :aria-current="key == current ? 'page' : ''" href="#" @click="current=key">{{title}}</a>
-				</li>
-			</ul>
+			<div class="nav nav-tabs">
+				<div
+					v-for="({title}, key) in tabs"
+					:key="comp"
+					class="nav-item nav-link"
+					:class="{active: key == current}"
+					@click="current=key"
+					:aria-current="key == current ? 'page' : ''"
+					v-accessibility:tab
+					>
+					{{title}}
+				</div>
+			</div>
 			<div style="flex: 1 1 0%; height: 0%" class="border-bottom border-start border-end overflow-auto p-3">
 				<keep-alive>
 					<suspense>

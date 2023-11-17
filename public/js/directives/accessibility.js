@@ -2,7 +2,13 @@ export default {
 	created(el, binding) {
 		switch (binding.arg) {
 			case 'tab':
-				const [prev, next] = binding.modifiers.vertical ? ['ArrowUp', 'ArrowDown'] : ['ArrowRight', 'ArrowLeft'];
+				const [prev, next] = binding.modifiers.vertical ? ['ArrowUp', 'ArrowDown'] : ['ArrowLeft', 'ArrowRight'];
+				el.addEventListener('click', () => {
+					let act = el.parentNode.querySelector('[tabindex="0"]');
+					if (act)
+						act.setAttribute('tabindex', -1);
+					el.setAttribute('tabindex', 0);
+				});
 				el.addEventListener('focus', () => {
 					el.setAttribute('aria-selected', true);
 				});
@@ -36,7 +42,6 @@ export default {
 	mounted(el, binding) {
 		switch (binding.arg) {
 			case 'tab':
-				//const [prev, next] = binding.modifiers.vertical ? ['up', 'down'] : ['right', 'left'];
 				let activetab = -1;
 				Array.from(el.parentNode.children).forEach((node, index) => {
 					node.setAttribute('aria-setsize', el.parentNode.children.length);
