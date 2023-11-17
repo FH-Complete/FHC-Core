@@ -350,6 +350,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_vertragsbestandteil_urlaubsanspruch TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_vertragsbestandteil_kuendigungsfrist TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_vertragsbestandteil_karenz TO vilesci;
+		GRANT SELECT ON hr.tbl_vertragsbestandteil_karenz TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_karenztyp TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_teilzeittyp TO vilesci;
 

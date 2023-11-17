@@ -322,4 +322,9 @@ define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
 
 define('DOCSBOX_ENABLED', false);
 
+// Aktiviert Abfragen auf die Dienstverhaeltnisse im HR Schema anstatt auf die BIS-Verwendung
+// Uebergangsphase bis zur entfernung der BIS-Verwendungen
+// (true | false)
+define('DIENSTVERHAELTNIS_SUPPORT', false);
+
 ?>
