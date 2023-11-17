@@ -16,9 +16,8 @@ class Profil extends Auth_Controller
 	{
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'getUser' => ['student/anrechnung_beantragen:r','user:r'],
 			'isMitarbeiterOrStudent' => ['student/anrechnung_beantragen:r','user:r'],
-			'getPersonInformation' => ['student/anrechnung_beantragen:r','user:r'],
+			'getMitarbeiterAnsicht' => ['student/anrechnung_beantragen:r','user:r'],
 			
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -26,6 +25,8 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('person/Adresse_model', 'AdresseModel');
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		
 		
 	}
 
@@ -45,29 +46,107 @@ class Profil extends Auth_Controller
 	}
 
 
-	//? public function getUser returns information related to a user
-	public function getUser()
-	{
-		//* retrieve info from the Mitarbeiter model
-		$mitarbeiter_result = $this->MitarbeiterModel->load(getAuthUID());
-		//* retrieve info from the Benutzer model
-		$benutzer_result = $this->BenutzerModel->getFromPersonId(getAuthUID());
-		//* return JSON with info
-		//! was removed from $res for testing purposes: 'Benutzer' => $benutzer_result
-		$res = ['mitarbeiter' => $mitarbeiter_result,'Benutzer' => $benutzer_result
-				];
+	
+
+	public function getMitarbeiterAnsicht(){
 		
-        echo json_encode($res);
-	}
+		$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere();
+		if(isError($benutzer_funktion_res)){
+			// error handling
+		}else{
+			$benutzer_funktion_res = hasData($benutzer_funktion_res)? getData($benutzer_funktion_res) : null;
+		}
 
-	public function getPersonInformation($pid){
+		//! THERE COULD BE MULTIPLE ADRESSES
+		$adresse_res = $this->AdresseModel->load(getAuthPersonId());
+		if(isError($adresse_res)){
+			// error handling
+		}else{										//! not only one
+			$adresse_res = hasData($adresse_res)? getData($adresse_res)[0] : null;
+		}
+
+		$benutzer_res = $this->PersonModel->load(getAuthUID());
+		if(isError($benutzer_res)){
+			// error handling
+		}else{
+			$benutzer_res = hasData($benutzer_res)? getData($benutzer_res)[0] : null;
+		}
+
+		$person_res = $this->PersonModel->load(getAuthPersonId());
+		if(isError($person_res)){
+			// error handling
+		}else{
+			$person_res = hasData($person_res)? getData($person_res)[0] : null;
+		}
+		
 		//? get the person information using the benutzer uid
-		$json_result = $this->PersonModel->getPersonStammdaten($pid)->retval;
-
+		//! verwendet getAuthUID()
+		$mitarbeiter_res = $this->MitarbeiterModel->load(getAuthUID());
+		if(isError($mitarbeiter_res)){
+			// error handling
+		}else{
+			//? checks whether the getData does not return null 
+			//? and then checks that the current does return an empty array 
+			$mitarbeiter_res = hasData($mitarbeiter_res)? getData($mitarbeiter_res)[0] : null;
+		}
+		$res = new stdClass();
+		$res->username = getAuthUID();
+		//? Person Info
+		$res->foto = $person_res->foto;
+		$res->foto_sperre = $person_res->foto_sperre;
+		$res->anrede = $person_res->anrede;
+		$res->titelpre = $person_res->titelpre;
+		$res->titelpost = $person_res->titelpost;
+		$res->vorname = $person_res->vorname;
+		$res->nachname = $person_res->nachname;
+		//$res->postnomen = $person_res->postnomen; //!POSTNOMEN?
+		$res->gebdatum = $person_res->gebdatum;
+		$res->gebort = $person_res->gebort;
+		//? Mitarbeiter Info
+		$res->kurzbz = $mitarbeiter_res->kurzbz;
+		$res->telefonklappe = $mitarbeiter_res->telefonklappe;
+		//? Benutzer Info
+		$res->email_intern = getAuthUID() . "@technikum-wien.at";
+		$res->email_extern = $benutzer_res->alias . "@technikum-wien.at";
+		//? Adresse Info 
+		$res->strasse = $adresse_res->strasse;
+		$res->heimatadresse = $adresse_res->heimatadresse;
+		$res->zustelladresse = $adresse_res->zustelladresse;
+		$res->plz = $adresse_res->plz;
+		$res->ort = $adresse_res->ort;
+		//? Benutzerfunktion Info
+		$res->funktionen = $benutzer_funktion_res;
+		
+		
+		
+		echo json_encode($res);
+		
+		return;
+		/*
+		$res = getData($this->PersonModel->getPersonStammdaten($pid));
+		$json_result = new stdClass();
+		$json_result->anrede = $res->anrede;
+		$json_result->titelpre = $res->titelpre;
+		$json_result->titelpost = $res->titelpost;
+		$json_result->vorname = $res->vorname;
+		$json_result->nachname = $res->nachname;
+		$json_result->gebdatum = $res->gebdatum;
+		$json_result->gebort = $res->gebort;
+		$json_result->adressen = $res->adressen;
+		
+		anrede:this.person_info.anrede,
+                titelpre:this.person_info.titelpre,
+                titelpost:this.person_info.titelpost,
+                vorname:this.person_info.vorname,
+                nachname:this.person_info.nachname,
+                gebdatum:this.person_info.gebdatum,
+                gebort:this.person_info.gebort,
+                adresse:this.person_info.adressen[0].strasse + " " + this.person_info.adressen[0].plz,
+		*/
 
 		//! the following line is not needed because it is already included in the getPersonStammdaten function
 		//$json_result->addresse_info = $this->AdresseModel->getZustellAdresse($pid)->retval;
-		echo json_encode($json_result);
+		echo json_encode($res);
 		return;
 		
 		

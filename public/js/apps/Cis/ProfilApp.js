@@ -2,6 +2,7 @@ import Profil from "../../components/Cis/Profil/Profil.js";
 
 
 const app = Vue.createApp({
+	
 	components: {
 		Profil,
 	},
@@ -15,4 +16,4 @@ const app = Vue.createApp({
 	},
 	
 });
-app.mount('#content'); 
+app.mount("#content");

@@ -10,9 +10,9 @@ export default {
                   + `Cis/Profil/isMitarbeiterOrStudent/${uid}`;
         return axios.get(url);
     },
-    getPersonInformation: function(uid) {
+    getMitarbeiterAnsicht: function() {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
-                  + `Cis/Profil/getPersonInformation/${uid}`;
+                  + `Cis/Profil/getMitarbeiterAnsicht`;
         return axios.get(url);
     },
     
