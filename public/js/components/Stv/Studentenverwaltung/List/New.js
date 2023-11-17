@@ -2,6 +2,7 @@ import {CoreRESTClient} from '../../../../RESTClient.js';
 import BsModal from '../../../Bootstrap/Modal.js';
 import FhcFormValidation from '../../../Form/Validation.js';
 import VueDatePicker from '../../../vueDatepicker.js.php';
+import accessibility from '../../../../directives/accessibility.js';
 
 var _uuid = 0;
 
@@ -10,6 +11,9 @@ export default {
 		BsModal,
 		FhcFormValidation,
 		VueDatePicker
+	},
+	directives: {
+		accessibility
 	},
 	props: {
 		studiengangKz: Number
