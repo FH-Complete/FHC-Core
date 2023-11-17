@@ -359,12 +359,13 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT SELECT ON hr.tbl_vertragsbestandteiltyp TO web;
 		GRANT SELECT ON hr.tbl_vertragsbestandteil_stunden TO web;
 		GRANT SELECT ON hr.tbl_vertragsbestandteil_zeitaufzeichnung TO web;
-		
+
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsbestandteil TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltshistorie TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltstyp TO vilesci;
 
 		GRANT USAGE ON SCHEMA hr TO vilesci;
+		GRANT USAGE ON SCHEMA hr TO web;
 
 		INSERT INTO hr.tbl_karenztyp(karenztyp_kurzbz, bezeichnung) VALUES('elternkarenz','Elternkarenz');
 		INSERT INTO hr.tbl_karenztyp(karenztyp_kurzbz, bezeichnung) VALUES('bildungskarenz','Bildungskarenz');
