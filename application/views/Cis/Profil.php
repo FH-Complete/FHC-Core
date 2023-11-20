@@ -9,7 +9,7 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 ?>
 
 <div id="content">
-	<h2>Profil2</h2>
+	<h2>Profil22</h2>
 	<hr>
 	<p><?php echo $uid; ?></p>
 	<!-- we can pass information from the php view file to the public js file through interpolating data from php into vue props -->

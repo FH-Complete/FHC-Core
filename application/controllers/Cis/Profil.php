@@ -21,11 +21,13 @@ class Profil extends Auth_Controller
 			
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
-		$this->load->model('ressource/student_model', 'StudentModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$this->load->model('ressource/Betriebsmittelperson_model', 'BetriebsmittelpersonModel');
+		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		
 		
 	}
@@ -50,7 +52,27 @@ class Profil extends Auth_Controller
 
 	public function getMitarbeiterAnsicht(){
 
+
 		
+
+		$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
+		if(isError($zutrittskarte_ausgegebenam)){
+			// error handling
+		}else{
+			$zutrittskarte_ausgegebenam = hasData($zutrittskarte_ausgegebenam)? getData($zutrittskarte_ausgegebenam)[0] : null;
+		}
+
+		if(
+			isSuccess($this->BetriebsmittelpersonModel->addSelect(["betriebsmitteltyp", "beschreibung","nummer","ausgegebenam"]))
+		){
+			$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
+			if(isError($betriebsmittelperson_res)){
+				   // error handling
+			   }else{
+				   $betriebsmittelperson_res = hasData($betriebsmittelperson_res)? getData($betriebsmittelperson_res) : null;
+			   }
+		   }
+
 		if(
 		 isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as bf_bezeichnung","tbl_organisationseinheit.bezeichnung as oe_bezeichnung","datum_von","datum_bis","wochenstunden"]))
 	  	 && isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit","oe_kurzbz"))
@@ -119,7 +141,10 @@ class Profil extends Auth_Controller
 		$res->ort = $adresse_res->ort;
 		//? Benutzerfunktion Info
 		$res->funktionen = $benutzer_funktion_res;
-		
+		//? Betriebsmittel Info
+		$res->mittel = $betriebsmittelperson_res;
+		$res->zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam->ausgegebenam;
+		$res->kontakt = $kontakte;
 		
 		
 		

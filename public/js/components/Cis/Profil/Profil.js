@@ -27,7 +27,7 @@ export default {
     },
     created(){
     //error //! fhcapifactory.UserData.getUser().then(res => this.person = res.data);
-    fhcapifactory.UserData.isMitarbeiterOrStudent(this.uid).then(res => this.role = res.data);
+    fhcapifactory.UserData.isMitarbeiterOrStudent(this.uid).then(res => {console.log(res.data);this.role = res.data;});
     fhcapifactory.UserData.getMitarbeiterAnsicht().then(res => {this.person_info = res.data;});
     
     },
