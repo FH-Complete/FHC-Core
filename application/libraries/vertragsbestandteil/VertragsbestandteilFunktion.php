@@ -1,6 +1,7 @@
 <?php
 namespace vertragsbestandteil;
 
+use Exception;
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
 
@@ -27,6 +28,8 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 		$this->CI = get_instance();
 		$this->CI->load->model('person/Benutzerfunktion_model', 
 			'BenutzerfunktionModel');
+		$this->CI->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model', 
+			'VertragsbestandteilFunktionModel');
 		$this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib', 
 			null, 'VertragsbestandteilLib');
 	}
@@ -136,7 +139,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 					'orget' => $bf->oe_kurzbz
 				);
 				$this->createBenutzerfunktionData($data);
-				$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+				$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
 				$this->setBenutzerfunktion_id($bfid);
 			}
 			elseif( $this->isBefore($bf->datum_von, $this->getVon()) && 
@@ -148,7 +151,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 					'orget' => $bf->oe_kurzbz
 				);
 				$this->createBenutzerfunktionData($data);
-				$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+				$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
 				$this->setBenutzerfunktion_id($bfid);
 			}
 		}
@@ -211,7 +214,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 			return;
 		}
 		
-		$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+		$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
 		
 		$this->setBenutzerfunktion_id($bfid);
 	}
@@ -275,6 +278,25 @@ EOTXT;
 		return $this;
 	}
 	
+	protected function getBenutzerfunktionData4Insert()
+	{
+		if( null === $this->benutzerfunktiondata ) {
+			return null;
+		}
+		
+		$benutzerfunktiondata = (object) array(
+			'funktion_kurzbz' => $this->benutzerfunktiondata->funktion_kurzbz,
+			'oe_kurzbz' => $this->benutzerfunktiondata->oe_kurzbz,
+			'uid' => $this->benutzerfunktiondata->uid,			
+			'datum_von' => $this->getVon(), 
+			'datum_bis' => $this->getBis(),
+			'insertamum' => strftime('%Y-%m-%d %H:%M:%S'),
+			'insertvon' => getAuthUID()
+		);
+		
+		return $benutzerfunktiondata;
+	}
+	
 	protected function createBenutzerfunktionData($data)
 	{
 		if( empty($data->funktion) || empty($data->orget) ) 
@@ -285,11 +307,7 @@ EOTXT;
 		$this->benutzerfunktiondata = (object) array(
 			'funktion_kurzbz' => $data->funktion,
 			'oe_kurzbz' => $data->orget,
-			'uid' => $data->mitarbeiter_uid, 
-			'datum_von' => $this->getVon(), 
-			'datum_bis' => $this->getBis(),
-			'insertamum' => strftime('%Y-%m-%d %H:%M:%S'),
-			'insertvon' => getAuthUID()
+			'uid' => $data->mitarbeiter_uid
 		);
 	}
 
@@ -307,7 +325,8 @@ EOTXT;
 			'oe_bezeichnung' => $data->oe_bezeichnung,
 			'oe_kurzbz_sap' => $data->oe_kurzbz_sap,
 			'oe_typ_kurzbz' => $data->oe_typ_kurzbz,
-			'oe_typ_bezeichnung' => $data->oe_typ_bezeichnung
+			'oe_typ_bezeichnung' => $data->oe_typ_bezeichnung, 
+			'uid' => $data->mitarbeiter_uid
 		);
 	}
 	
@@ -317,6 +336,20 @@ EOTXT;
 			&& ($this->benutzerfunktiondata === NULL) ) {
 			$this->validationerrors[] = 'Eine bestehende Funktion oder eine '
 				. 'Funktion und eine Organisationseinheit müssen ausgewählt sein.';
+		}
+		
+		// TODO check if Benutzerfunktion is assigned to another vb
+		if( intval($this->benutzerfunktion_id) > 0 ) 
+		{
+			if ( $this->CI->VertragsbestandteilFunktionModel
+					->isBenutzerfunktionAlreadyAttachedToAnotherVB(
+						$this->benutzerfunktion_id, 
+						$this->getVertragsbestandteil_id()) )
+			{
+				$this->validationerrors[] = 'Die Benutzerfunktion ist bereits '
+					. 'mit einem anderen Vertragsbestandteil verknüpft und kann '
+					. 'nicht mehrfach verknüft werden.';
+			}
 		}
 		
 		return parent::validate();
