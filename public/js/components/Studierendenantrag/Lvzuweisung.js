@@ -64,7 +64,7 @@ export default {
 						this.statusCode = response.data.retval[0].studierendenantrag_statustyp_kurzbz;
 						this.statusMsg = response.data.retval[0].typ;
 					} else {
-						this.addAlert(response.data.retval, 'alert-danger');
+						this.addAlert(response.data.retval.message || response.data.retval, 'alert-danger');
 						this.statusCode = 0;
 						this.statusMsg = 'Error';
 					}
