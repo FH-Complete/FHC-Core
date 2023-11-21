@@ -171,7 +171,6 @@ class Mitarbeiter_model extends DB_Model
 	 */
 	public function generateKurzbz($uid)
 	{
-		$kurzbz = '';
 		$this->addLimit(1);
 		$this->addSelect('vorname, nachname');
 		$this->addJoin('public.tbl_benutzer', 'tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid');
@@ -181,25 +180,35 @@ class Mitarbeiter_model extends DB_Model
 		if (hasData($nameresult))
 		{
 			$kurzbzdata = getData($nameresult);
-			$nachname_clean = sanitizeProblemChars($kurzbzdata[0]->nachname);
-			$vorname_clean = sanitizeProblemChars($kurzbzdata[0]->vorname);
+			$genKurzbz = $this->generateKurzbzHelper($kurzbzdata[0]->vorname, $kurzbzdata[0]->nachname);
 
-			for ($nn = 6, $vn = 2; $nn != 0; $nn--, $vn++)
-			{
-				$kurzbz = mb_substr($nachname_clean, 0, $nn);
-				$kurzbz .= mb_substr($vorname_clean, 0, $vn);
+			return $genKurzbz;
+		}
+		return error('No Kurzbezeichnung could be generated');
+	}
 
-				$kurzbzexists = $this->kurzbzExists($kurzbz);
+	public function generateKurzbzHelper($vorname, $nachname)
+	{
+		$nachname_clean = sanitizeProblemChars($nachname);
+		$vorname_clean = sanitizeProblemChars($vorname);
+		$kurzbz = '';
 
-				if (hasData($kurzbzexists) && !getData($kurzbzexists)[0])
-					break;
-			}
+		for ($nn = 6, $vn = 2; $nn != 0; $nn--, $vn++)
+		{
+			$kurzbz = mb_substr($nachname_clean, 0, $nn);
+			$kurzbz .= mb_substr($vorname_clean, 0, $vn);
 
 			$kurzbzexists = $this->kurzbzExists($kurzbz);
 
-			if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
-				return error('No Kurzbezeichnung could be generated');
+			if (hasData($kurzbzexists) && !getData($kurzbzexists)[0])
+				break;
 		}
+
+		$kurzbzexists = $this->kurzbzExists($kurzbz);
+
+		if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
+			return error('No Kurzbezeichnung could be generated');
+	
 		return success($kurzbz);
 	}
 }
