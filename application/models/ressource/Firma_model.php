@@ -14,6 +14,7 @@ class Firma_model extends DB_Model
 
 	public function searchFirmen($filter)
 	{
+		$filter = strtoLower($filter);
 		$qry = "
 			SELECT 
 				f.name, f.firma_id

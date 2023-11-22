@@ -14,13 +14,17 @@ class Standort_model extends DB_Model
 
 	public function searchStandorte($filter)
 	{
+		$filter = strtoLower($filter);
 		$qry = "
 			SELECT 
 				s.kurzbz, s.standort_id
 			FROM 
 			    public.tbl_standort s
 			WHERE 
-			    lower (s.kurzbz) LIKE '%". $this->db->escape_like_str($filter)."%'";
+			    lower (s.kurzbz) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				lower (s.bezeichnung) LIKE '%". $this->db->escape_like_str($filter)."%'";
+
 
 		return $this->execQuery($qry);
 	}
