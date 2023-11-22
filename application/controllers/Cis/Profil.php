@@ -18,6 +18,9 @@ class Profil extends Auth_Controller
 			'index' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
 			'isMitarbeiterOrStudent' => ['student/anrechnung_beantragen:r','user:r'],
 			'getMitarbeiterAnsicht' => ['student/anrechnung_beantragen:r','user:r'],
+			'foto_sperre_function' => ['student/anrechnung_beantragen:r','user:r'],
+			
+			
 			
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -52,8 +55,32 @@ class Profil extends Auth_Controller
 
 	public function getMitarbeiterAnsicht(){
 
+		if(
+			isSuccess($this->PersonModel->addSelect('gruppe_kurzbz, beschreibung'))&&
+			isSuccess($this->PersonModel->addJoin('tbl_benutzer', 'person_id')) && 
+		isSuccess($this->PersonModel->addJoin('tbl_benutzergruppe', 'uid')) &&
+		isSuccess($this->PersonModel->addJoin('tbl_gruppe', 'gruppe_kurzbz'))){
 
-		
+			$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid'=>getAuthUID()));
+			if( isError($mailverteiler_res)){
+				// catch error
+			}
+			$mailverteiler_res = hasData($mailverteiler_res)? getData($mailverteiler_res) : null;
+		}
+
+		if(isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
+		isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
+		isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT'))&&
+		isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
+		){
+			$kontakte_res = $this->KontaktModel->loadWhere(array('person_id' => getAuthPersonID()));
+			if(isError($kontakte_res)){
+				// handle error	
+			}else{
+				$kontakte_res = hasData($kontakte_res)? getData($kontakte_res) : null;
+			}
+			
+		}
 
 		$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
 		if(isError($zutrittskarte_ausgegebenam)){
@@ -64,6 +91,7 @@ class Profil extends Auth_Controller
 
 		if(
 			isSuccess($this->BetriebsmittelpersonModel->addSelect(["betriebsmitteltyp", "beschreibung","nummer","ausgegebenam"]))
+			
 		){
 			$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
 			if(isError($betriebsmittelperson_res)){
@@ -74,10 +102,11 @@ class Profil extends Auth_Controller
 		   }
 
 		if(
-		 isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as bf_bezeichnung","tbl_organisationseinheit.bezeichnung as oe_bezeichnung","datum_von","datum_bis","wochenstunden"]))
-	  	 && isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit","oe_kurzbz"))
+			//! Summe der Wochenstunden wird jetzt in der hr/tbl_dienstverhaeltnis gespeichert
+		 isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as bf_bezeichnung","tbl_organisationseinheit.bezeichnung as oe_bezeichnung","datum_von","datum_bis","wochenstunden"]))&&
+	  	  isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit","oe_kurzbz"))
 		){
-			$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere("uid='" . getAuthUID() . "'");
+			$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid'=>getAuthUID()));
 			if(isError($benutzer_funktion_res)){
 				// error handling
 			}else{
@@ -85,12 +114,19 @@ class Profil extends Auth_Controller
 			}
 		}
 
-		//! THERE COULD BE MULTIPLE ADRESSES
-		$adresse_res = $this->AdresseModel->load(getAuthPersonId());
-		if(isError($adresse_res)){
-			// error handling
-		}else{										//! not only one
-			$adresse_res = hasData($adresse_res)? getData($adresse_res)[0] : null;
+
+		if(
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(array("strasse","tbl_adressentyp.bezeichnung as adr_typ","plz","ort")))&&
+			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse","DESC"))&&
+			isSuccess($adresse_res = $this->AdresseModel->addOrder("sort"))&&
+			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp","typ=adressentyp_kurzbz"))
+		){
+			$adresse_res = $this->AdresseModel->loadWhere(array("person_id"=>getAuthPersonID()));
+			if(isError($adresse_res)){
+				// error handling
+			}else{									
+				$adresse_res = hasData($adresse_res)? getData($adresse_res) : null;
+			}
 		}
 
 		$benutzer_res = $this->BenutzerModel->load([getAuthUID()]);
@@ -134,25 +170,19 @@ class Profil extends Auth_Controller
 		$res->email_intern = getAuthUID() . DOMAIN;
 		$res->email_extern = $benutzer_res->alias . DOMAIN;
 		//? Adresse Info 
-		$res->strasse = $adresse_res->strasse;
-		$res->heimatadresse = $adresse_res->heimatadresse;
-		$res->zustelladresse = $adresse_res->zustelladresse;
-		$res->plz = $adresse_res->plz;
-		$res->ort = $adresse_res->ort;
+		$res->adressen = $adresse_res;
 		//? Benutzerfunktion Info
 		$res->funktionen = $benutzer_funktion_res;
 		//? Betriebsmittel Info
 		$res->mittel = $betriebsmittelperson_res;
+		//? Austellungsdatum von der Zutrittskarte
 		$res->zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam->ausgegebenam;
-		$res->kontakt = $kontakte;
-		
-		
+		//? Kontakt Info
+		$res->kontakte = $kontakte_res;
+		//? Mailverteiler Info
+		$res->mailverteiler = $mailverteiler_res;
 		
 		echo json_encode($res);
-		
-		return;
-		
-		
 		
 	}
 
@@ -169,6 +199,27 @@ class Profil extends Auth_Controller
 
 		
 	}
+
+	public function foto_sperre_function($value){
+		$res = $this->PersonModel->update(getAuthPersonID(),array("foto_sperre"=>$value));
+		if(isError($res)){
+			// error handling
+		}else{
+			//? select the value of the column foto_sperre to return 
+			if(isSuccess($this->PersonModel->addSelect("foto_sperre"))){
+				$res = $this->PersonModel->load(getAuthPersonID());
+				if(isError($res)){
+					// error handling
+				}
+				$res = hasData($res) ? getData($res)[0] : null;
+			}
+			
+		}
+		echo json_encode($res);
+	}
+
+
+	
 
 	
 
