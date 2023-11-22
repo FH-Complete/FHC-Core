@@ -84,6 +84,13 @@ export default{
 				typ: 'h',
 				nation: 'A'
 			},
+			initData: {
+				zustelladresse: true,
+				heimatadresse: true,
+				rechnungsadresse: false,
+				typ: 'h',
+				nation: 'A'
+			},
 			nations: [],
 			adressentypen: [],
 			firmen: [],
@@ -121,6 +128,7 @@ export default{
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('newAdressModal');
+					this.resetModal();
 				} else {
 					const errorData = response.data.retval;
 					Object.entries(errorData).forEach(entry => {
@@ -168,6 +176,7 @@ export default{
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('editAdressModal');
+					this.resetModal();
 				} else {
 					const errorData = response.data.retval;
 					Object.entries(errorData).forEach(entry => {
@@ -257,6 +266,11 @@ export default{
 		},
 		hideModal(modalRef){
 			bootstrap.Modal.getOrCreateInstance(this.$refs[modalRef]).hide();
+		},
+		resetModal(){
+			this.formData = {};
+			this.formData = this.initData;
+			this.addressData = {};
 		},
 	},
 	created(){

@@ -73,7 +73,12 @@ export default{
 			tabulatorEvents: [],
 			lastSelected: null,
 			bankverbindungData: {
-				verrechnung: true
+				verrechnung: true,
+				typ: 'p'
+			},
+			initData: {
+				verrechnung: true,
+				typ: 'p'
 			}
 		}
 	},
@@ -100,7 +105,7 @@ export default{
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('newBankverbindungModal');
-					this.reload();
+					this.resetModal();
 				} else {
 					//console.log(response.data.retval);
 					const errorData = response.data.retval;
@@ -120,6 +125,7 @@ export default{
 				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
 			}).finally(() => {
 				window.scrollTo(0, 0);
+				this.reload();
 			});
 		},
 		loadBankverbindung(bankverbindung_id){
@@ -148,7 +154,7 @@ export default{
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('editBankverbindungModal');
-					this.reload();
+					this.resetModal();
 				} else {
 					const errorData = response.data.retval;
 					console.log(errorData);
@@ -163,6 +169,7 @@ export default{
 				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
 			}).finally(() => {
 				window.scrollTo(0, 0);
+				this.reload();
 			});
 		},
 		deleteBankverbindung(bankverbindung_id){
@@ -188,17 +195,15 @@ export default{
 		reload(){
 			this.$refs.table.reloadTable();
 		},
-		resetData(){ //Todo(manu) check
-			bankverbindungData: [];
-		}
+		resetModal(){
+			this.bankverbindungData = {};
+			this.bankverbindungData = this.initData;
+		},
 	},
 	template: `	
 		<div class="stv-list h-100 pt-3">
 		
-<!--			<button type="button" class="btn btn btn-outline-warning" class="col-sm-2" @click="actionDeleteBankverbindung(8796)">delete 8796</button>
-			<button type="button" class="btn btn btn-outline-warning" class="col-sm-2" @click="actionEditBankverbindung(8796)">edit 8796</button>
-			<button type="button" class="btn btn btn-outline-warning" class="col-sm-2" @click="reload">reload</button>-->
-		
+
 		<!--Modal: new Bankverbindung-->
 			<div ref="newBankverbindungModal" class="modal fade" id="newBankverbindungModal" tabindex="-1" aria-labelledby="newBankverbindungModalLabel" aria-hidden="true">
 			  <div class="modal-dialog">
@@ -282,7 +287,7 @@ export default{
 				<div class="modal-content">
 				  <div class="modal-header">
 					<h5 class="modal-title" id="editBankverbindungModalLabel">Bankverbindung bearbeiten</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="resetModal"></button>
 				  </div>
 				  <div class="modal-body">
 						<form ref="bankverbindungData">
@@ -347,7 +352,7 @@ export default{
 								
 				  </div>
 				  <div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
 					<button ref="Close" type="button" class="btn btn-primary" @click="updateBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>
 	
 				  </div>

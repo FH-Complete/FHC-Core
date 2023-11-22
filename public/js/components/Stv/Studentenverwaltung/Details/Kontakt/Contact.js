@@ -67,6 +67,10 @@ export default{
 				zustellung: true,
 				kontakttyp: 'email'
 			},
+			initData: {
+				zustellung: true,
+				kontakttyp: 'email'
+			},
 			kontakttypen: [],
 			standorte: [],
 			selectedStandort: null,
@@ -97,6 +101,7 @@ export default{
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal("newContactModal");
+					this.resetModal();
 				} else {
 					const errorData = response.data.retval;
 					Object.entries(errorData).forEach(entry => {
@@ -171,6 +176,7 @@ export default{
 					console.log('Speichern erfolgreich: ' + this.statusMsg);
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal('editContactModal');
+					this.resetModal();
 					this.reload();
 				} else {
 					const errorData = response.data.retval;
@@ -205,6 +211,10 @@ export default{
 					this.filteredStandorte = CoreRESTClient.getData(result.data);
 				});
 		},
+		resetModal(){
+			this.contactData = {};
+			this.contactData = this.initData;
+		},
 	},
 	created(){
 		CoreRESTClient
@@ -228,8 +238,7 @@ export default{
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				  </div>
 				  <div class="modal-body">
-					<form  ref="contactData">
-					{{contactData}}							
+					<form  ref="contactData">						
 						<div class="row mb-3">
 							<label for="kontakttyp" class="form-label col-sm-4">Typ</label>
 							<div class="col-sm-5">
@@ -285,10 +294,10 @@ export default{
 				<div class="modal-content">
 				  <div class="modal-header">
 					<h5 class="modal-title" id="editContactModalLabel">Kontakt bearbeiten</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="resetModal"></button>
 				  </div>
 				  <div class="modal-body">
-						<form ref="contactData">{{contactData}} 
+						<form ref="contactData">
 													
 							<div class="row mb-3">
 								<label for="kontakttyp" class="form-label col-sm-4">Typ</label>
@@ -322,7 +331,7 @@ export default{
 							</div>	
 							
 							<div class="row mb-3">					
-								<input type="text" :readonly="readonly" class="form-control-sm" id="standort_id" v-model="contactData.standort_id">
+								<input type="hidden" :readonly="readonly" class="form-control-sm" id="standort_id" v-model="contactData.standort_id">
 							</div>
 							
 <!--							<div class="row mb-3">											   
@@ -345,7 +354,7 @@ export default{
 								
 				  </div>
 				  <div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
 					<button ref="Close" type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
 	
 				  </div>
