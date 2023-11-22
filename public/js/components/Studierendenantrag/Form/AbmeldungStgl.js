@@ -30,7 +30,7 @@ export default {
 	},
 	computed: {
 		statusSeverity() {
-			switch (this.data.status)
+			switch (this.data?.status)
 			{
 				case 'Erstellt': return 'info';
 				case 'Genehmigt': return 'success';
@@ -141,39 +141,39 @@ export default {
 					<table class="table">
 						<tr>
 							<th>{{p.t('lehre', 'studiengang')}}</th>
-							<td align="right">{{data.bezeichnung}}</td>
+							<td align="right">{{data?.bezeichnung}}</td>
 						</tr>
 						<tr>
 							<th>{{p.t('lehre', 'organisationsform')}}</th>
-							<td align="right">{{data.orgform_bezeichnung}}</td>
+							<td align="right">{{data?.orgform_bezeichnung}}</td>
 						</tr>
 						<tr>
 							<th>{{p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
-							<td align="right">{{data.name}}</td>
+							<td align="right">{{data?.name}}</td>
 						</tr>
 						<tr>
 							<th>{{p.t('person', 'personenkennzeichen')}}</th>
-							<td align="right">{{data.matrikelnr}}</td>
+							<td align="right">{{data?.matrikelnr}}</td>
 						</tr>
 						<tr>
 							<th>{{p.t('lehre', 'studienjahr')}}</th>
-							<td align="right">{{data.studienjahr_kurzbz}}</td>
+							<td align="right">{{data?.studienjahr_kurzbz}}</td>
 						</tr>
 						<tr>
 							<th>{{p.t('lehre', 'studiensemester')}}</th>
-							<td align="right">{{data.studiensemester_kurzbz}}</td>
+							<td align="right">{{data?.studiensemester_kurzbz}}</td>
 						</tr>
 						<tr>
 							<th>{{p.t('lehre', 'semester')}}</th>
-							<td align="right">{{data.semester}}</td>
+							<td align="right">{{data?.semester}}</td>
 						</tr>
 					</table>
 				</div>
 
-				<div v-if="data.grund" class="mb-3">
+				<div v-if="data?.grund" class="mb-3">
 					<h5>{{p.t('studierendenantrag', 'antrag_grund')}}:</h5>
 				
-					<pre class="text-prewrap">{{data.grund}}</pre>
+					<pre class="text-prewrap">{{data?.grund}}</pre>
 				</div>      
 				<div v-else class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>
@@ -211,7 +211,7 @@ export default {
 				
 				<div class="col-12 text-end">
 					<button
-						v-if="!data.studierendenantrag_id"
+						v-if="!data?.studierendenantrag_id"
 						type="button"
 						class="btn btn-primary"
 						data-bs-toggle="modal"
