@@ -127,27 +127,37 @@ class Kontakt extends FHC_Controller
 			$firma_id = $_POST['firma']['firma_id'];
 		}
 		else
-			$firma_id = $_POST['firma_id'];
+			$firma_id = null;
+
+		$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
+		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
+		$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : null;
+		$ort = isset($_POST['ort']) ? $_POST['ort'] : null;
+		$gemeinde = isset($_POST['gemeinde']) ? $_POST['gemeinde'] : null;
+		$nation = isset($_POST['nation']) ? $_POST['nation'] : null;
+		$name = isset($_POST['name']) ? $_POST['name'] : null;
+		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
+		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
 
 		$result = $this->AdresseModel->update([
 			'adresse_id' => $address_id
 		],
-			[	'person_id' => $_POST['person_id'],
-				'strasse' =>  $_POST['strasse'],
+			[	'person_id' => $person_id,
+				'strasse' =>  $strasse,
 				'updatevon' => 'uid',
 				'updateamum' => date('c'),
 				'plz' => $_POST['plz'],
-				'ort' => $_POST['ort'],
-				'gemeinde' => $_POST['gemeinde'],
-				'nation' => $_POST['nation'],
+				'ort' => $ort,
+				'gemeinde' => $gemeinde,
+				'nation' => $nation,
 				'heimatadresse' => $_POST['heimatadresse'],
 				'zustelladresse' => $_POST['zustelladresse'],
-				'co_name' => $_POST['co_name'],
-				'typ' => $_POST['typ'],
+				'co_name' => $co_name,
+				'typ' => $typ,
 				'firma_id' => $firma_id,
-				'name' => $_POST['name'],
+				'name' => $name,
 				'rechnungsadresse' => $_POST['rechnungsadresse'],
-				'anmerkung' => $_POST['anmerkung']
+				'anmerkung' => $anmerkung
 			]);
 
 		if (isError($result))
@@ -439,7 +449,7 @@ class Kontakt extends FHC_Controller
 			$standort_id = $_POST['standort']['standort_id'];
 		}
 		else
-			$standort_id = $_POST['standort_id'];
+			$standort_id = null;
 
 		$kontakttyp = isset($_POST['kontakttyp']) ? $_POST['kontakttyp'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
