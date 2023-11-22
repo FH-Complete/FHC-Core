@@ -40,7 +40,11 @@ const app = Vue.createApp();
 
 app
 	.use(router)
-	.use(PvConfig)
+	.use(PvConfig, {
+		zIndex: {
+			overlay: 1100
+		}
+	})
 	.use(FhcAlert)
 	.mount('#main');
 
