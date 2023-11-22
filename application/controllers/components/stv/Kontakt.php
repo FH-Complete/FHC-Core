@@ -24,12 +24,13 @@ class Kontakt extends FHC_Controller
 	public function getAdressen($person_id)
 	{
 		$this->load->model('person/Adresse_model', 'AdresseModel');
-		//TODO(manu) check select: für Anzeige alle Tabellen nötig
-		$this->AdresseModel->addSelect('*');
+		//TODO(manu) check name: in Adresse und firma
+		$this->AdresseModel->addSelect('public.tbl_adresse.*');
+		$this->AdresseModel->addSelect('t.*');
+		$this->AdresseModel->addSelect('f.firma_id');
+		$this->AdresseModel->addSelect('f.name as firmenname');
 		$this->AdresseModel->addJoin('public.tbl_adressentyp t', 'ON (t.adressentyp_kurzbz = public.tbl_adresse.typ)');
 		$this->AdresseModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = public.tbl_adresse.firma_id)', 'LEFT');
-
-		//	$this->AdresseModel->addJoin('public.tbl_firmentyp ft', 'ON (f.firma_id = ft.firmentyp.firma_id)', 'LEFT');
 
 		$result = $this->AdresseModel->loadWhere(
 			array('person_id' => $person_id)
@@ -44,41 +45,52 @@ class Kontakt extends FHC_Controller
 
 	public function addNewAddress($person_id)
 	{
+		$this->load->library('form_validation');
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+
+		$this->form_validation->set_rules('plz', 'PLZ', 'required');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
 
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 
-		// Load Libraries
-		$this->load->library('AuthLib');
-		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
+		$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : null;
+		$ort = isset($_POST['ort']) ? $_POST['ort'] : null;
+		$gemeinde = isset($_POST['gemeinde']) ? $_POST['gemeinde'] : null;
+		$nation = isset($_POST['nation']) ? $_POST['nation'] : null;
+		$name = isset($_POST['name']) ? $_POST['name'] : null;
+		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
+		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
 
-		$firma_id = '';
-		if (isset($_POST['firma_id']))
-			$firma_id = $_POST('firma_id');
-
-		$co_name = '';
-		if (isset($_POST['co_name']))
-			$co_name = $_POST('co_name');
+		if(isset($_POST['firma']))
+		{
+			$firma_id = $_POST['firma']['firma_id'];
+		}
+		else
+			$firma_id = null;
 
 		$result = $this->AdresseModel->insert(
 			[
 				'person_id' => $person_id,
-				'strasse' =>  $_POST['strasse'],
+				'strasse' =>  $strasse,
 				'insertvon' => 'uid',
 				'insertamum' => date('c'),
 				'plz' => $_POST['plz'],
-				'ort' => $_POST['ort'],
-				'gemeinde' => $_POST['gemeinde'],
-				'nation' => $_POST['nation'],
+				'ort' => $ort,
+				'gemeinde' => $gemeinde,
+				'nation' => $nation,
 				'heimatadresse' => $_POST['heimatadresse'],
 				'zustelladresse' => $_POST['zustelladresse'],
 				'co_name' => $co_name,
-				'typ' => $_POST['typ'],
+				'typ' => $typ,
 				'firma_id' => $firma_id,
-				'name' => $_POST['name'],
+				'name' => $name,
 				'rechnungsadresse' => $_POST['rechnungsadresse'],
-				'anmerkung' => $_POST['anmerkung']
-
+				'anmerkung' => $anmerkung
 
 			]
 		);
@@ -92,19 +104,30 @@ class Kontakt extends FHC_Controller
 	}
 
 	public function updateAddress($address_id)
-		//Todo(manu) update Firma
 	{
+		$this->load->library('form_validation');
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
+		$this->form_validation->set_rules('plz', 'PLZ', 'required');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
 		$this->load->model('person/Adresse_model', 'AdresseModel');
-		// Load Libraries
-		$this->load->library('AuthLib');
-		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 
 		if(!$address_id)
 		{
 			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
+
+		if(isset($_POST['firma']))
+		{
+			$firma_id = $_POST['firma']['firma_id'];
+		}
+		else
+			$firma_id = $_POST['firma_id'];
 
 		$result = $this->AdresseModel->update([
 			'adresse_id' => $address_id
@@ -120,7 +143,11 @@ class Kontakt extends FHC_Controller
 				'heimatadresse' => $_POST['heimatadresse'],
 				'zustelladresse' => $_POST['zustelladresse'],
 				'co_name' => $_POST['co_name'],
-				'typ' => $_POST['typ']
+				'typ' => $_POST['typ'],
+				'firma_id' => $firma_id,
+				'name' => $_POST['name'],
+				'rechnungsadresse' => $_POST['rechnungsadresse'],
+				'anmerkung' => $_POST['anmerkung']
 			]);
 
 		if (isError($result))
@@ -135,7 +162,10 @@ class Kontakt extends FHC_Controller
 	{
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 
-		$this->AdresseModel->addSelect('*');
+		$this->AdresseModel->addSelect('public.tbl_adresse.*');
+		$this->AdresseModel->addSelect('t.*');
+		$this->AdresseModel->addSelect('f.firma_id');
+		$this->AdresseModel->addSelect('f.name as firmenname');
 		$this->AdresseModel->addJoin('public.tbl_adressentyp t', 'ON (t.adressentyp_kurzbz = public.tbl_adresse.typ)');
 		$this->AdresseModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = public.tbl_adresse.firma_id)', 'LEFT');
 
@@ -151,7 +181,6 @@ class Kontakt extends FHC_Controller
 
 		elseif (!hasData($result)) {
 			$this->outputJson($result); //success mit Wert null
-			//	$this->outputJson(getData($result) ?: []);
 		}
 		else
 		{
@@ -191,7 +220,6 @@ class Kontakt extends FHC_Controller
 		}
 	}
 
-	//TODO(Manu) Liste zu lang - besser nachladen
 	public function getFirmen($searchString)
 	{
 		$this->load->model('ressource/firma_model', 'FirmaModel');
@@ -199,27 +227,22 @@ class Kontakt extends FHC_Controller
 		$result = $this->FirmaModel->searchFirmen($searchString);
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
 		}
+		$this->outputJson($result);
 	}
 
-	//TODO(Manu) Autocomplete?
 	public function getStandorte($searchString)
 	{
-		$this->load->model('organisation/Standort_model', 'StandortModel');
+		$this->load->model('organisation/standort_model', 'StandortModel');
 
-		$result = $this->StandortModel->load();
+		$result = $this->StandortModel->searchStandorte($searchString);
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
 		}
+		$this->outputJson($result);
 	}
 
-	public function getFirmenliste($searchString)
+	public function getFirmenliste($searchString) //TODO (manu) DEPRECATED
 	{
 		$this->load->model('ressource/firma_model', 'FirmaModel');
 
@@ -290,11 +313,9 @@ class Kontakt extends FHC_Controller
 	{
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('organisation/standort_model', 'StandortModel');
-		$this->load->model('ressource/firma_model', 'FirmaModel');
 
 		$this->KontaktModel->addSelect('*');
 		$this->StandortModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
-		$this->StandortModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
 
 		$result = $this->KontaktModel->loadWhere(
 			array('person_id' => $person_id)
@@ -325,9 +346,9 @@ class Kontakt extends FHC_Controller
 	{
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
-		$this->KontaktModel->addSelect('*');
+		$this->AdresseModel->addSelect('public.tbl_kontakt.*');
+		$this->KontaktModel->addSelect('st.kurzbz');
 		$this->KontaktModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
-		$this->KontaktModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
 
 		$this->KontaktModel->addLimit(1);
 
@@ -351,25 +372,46 @@ class Kontakt extends FHC_Controller
 
 	public function addNewContact($person_id)
 	{
+		$this->load->library('form_validation');
+
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+
+		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email');
+		else
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
 
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
-		$firma_id = '';
-		if (isset($_POST['firma_id']))
-			$firma_id = $_POST('firma_id');
+		if(isset($_POST['standort']))
+		{
+			$standort_id = $_POST['standort']['standort_id'];
+		}
+		else
+			$standort_id = null;
+
+		$kontakttyp = isset($_POST['kontakttyp']) ? $_POST['kontakttyp'] : null;
+		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
+		$kontakt = isset($_POST['kontakt']) ? $_POST['kontakt'] : null;
+		$ext_id = isset($_POST['ext_id']) ? $_POST['ext_id'] : null;
 
 		$result = $this->KontaktModel->insert(
 			[
 				'person_id' => $person_id,
-				'kontakttyp' =>  $_POST['kontakttyp'],
-				'anmerkung' => $_POST['anmerkung'],
-				'kontakt' => $_POST['kontakt'],
+				'kontakttyp' =>  $kontakttyp,
+				'anmerkung' => $anmerkung,
+				'kontakt' => $kontakt,
 				'zustellung' => $_POST['zustellung'],
 				'insertvon' => 'uid',
 				'insertamum' => date('c'),
-				'standort_id' => $_POST['standort_id'],
-				'ext_id' => $_POST['ext_id']
+				'standort_id' => $standort_id,
+				'ext_id' => $ext_id
 			]
 		);
 
@@ -392,19 +434,32 @@ class Kontakt extends FHC_Controller
 			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 
+		if(isset($_POST['standort']))
+		{
+			$standort_id = $_POST['standort']['standort_id'];
+		}
+		else
+			$standort_id = $_POST['standort_id'];
+
+		$kontakttyp = isset($_POST['kontakttyp']) ? $_POST['kontakttyp'] : null;
+		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
+		$kontakt = isset($_POST['kontakt']) ? $_POST['kontakt'] : null;
+		$ext_id = isset($_POST['ext_id']) ? $_POST['ext_id'] : null;
+		$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
+
 		$result = $this->KontaktModel->update([
 			'kontakt_id' => $kontakt_id
 		],
 			[
-				'person_id' => $_POST['person_id'],
-				'kontakttyp' =>  $_POST['kontakttyp'],
-				'anmerkung' => $_POST['anmerkung'],
-				'kontakt' => $_POST['kontakt'],
+				'person_id' => $person_id,
+				'kontakttyp' =>  $kontakttyp,
+				'anmerkung' => $anmerkung,
+				'kontakt' => $kontakt,
 				'zustellung' => $_POST['zustellung'],
-				'updatevon' => 'uid',
-				'updateamum' => date('c'),
-				'standort_id' => $_POST['standort_id'],
-				'ext_id' => $_POST['ext_id']
+				'insertvon' => 'uid',
+				'insertamum' => date('c'),
+				'standort_id' => $standort_id,
+				'ext_id' => $ext_id
 			]);
 
 		if (isError($result))
