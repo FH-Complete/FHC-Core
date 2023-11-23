@@ -9,7 +9,8 @@ export default {
 	},
 	props: {
 		selected: Array,
-		studiengangKz: Number
+		studiengangKz: Number,
+		studiensemesterKurzbz: String
 	},
 	emits: [
 		'update:selected'
@@ -180,6 +181,6 @@ export default {
 			tabindex="0"
 		>
 		</core-filter-cmpt>
-		<list-new ref="new" studiengang-kz="studiengangKz"></list-new>
+		<list-new ref="new" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></list-new>
 	</div>`
 };

@@ -97,6 +97,8 @@ import PvToast from "../../../index.ci.php/public/js/components/primevue/toast/t
 import PvConfirm from "../../../index.ci.php/public/js/components/primevue/confirmdialog/confirmdialog.esm.min.js";
 import PvConfirmationService from "../../../index.ci.php/public/js/components/primevue/confirmationservice/confirmationservice.esm.min.js";
 
+import {CoreRESTClient} from '../RESTClient.js';
+
 const helperAppContainer = document.createElement('div');
 
 const helperApp = Vue.createApp({
@@ -181,18 +183,28 @@ export default {
 	install: (app, options) => {
 		const $fhcAlert = {
 			alertSuccess(message) {
+				if (Array.isArray(message))
+					return message.forEach(this.alertSuccess);
 				helperAppInstance.$refs.toast.add({ severity: 'success', summary: 'Info', detail: message, life: 1000});
 			},
 			alertInfo(message) {
+				if (Array.isArray(message))
+					return message.forEach(this.alertInfo);
 				helperAppInstance.$refs.toast.add({ severity: 'info', summary: 'Info', detail: message, life: 3000 });
 			},
 			alertWarning(message) {
+				if (Array.isArray(message))
+					return message.forEach(this.alertWarning);
 				helperAppInstance.$refs.toast.add({ severity: 'warn', summary: 'Achtung', detail: message});
 			},
 			alertError(message) {
+				if (Array.isArray(message))
+					return message.forEach(this.alertError);
 				helperAppInstance.$refs.toast.add({ severity: 'error', summary: 'Achtung', detail: message });
 			},
 			alertSystemError(message) {
+				if (Array.isArray(message))
+					return message.forEach(this.alertSystemError);
 				helperAppInstance.$refs.alert.add({ severity: 'error', summary: 'Systemfehler', detail: message});
 			},
 			confirmDelete() {
@@ -243,7 +255,9 @@ export default {
 				if (typeof error === 'object' && error !== null) {
 					let errMsg = '';
 
-					if (error.hasOwnProperty('message'))
+					if (error.hasOwnProperty('response') && error.response?.data?.retval)
+						errMsg += 'Error Message: ' + (error.response.data.retval.message || error.response.data.retval) + '\r\n';
+					else if (error.hasOwnProperty('message'))
 						errMsg += 'Error Message: ' + error.message.toUpperCase() + '\r\n';
 
 					if (error.hasOwnProperty('config') && error.config.hasOwnProperty('url'))
@@ -366,7 +380,13 @@ export default {
 						return;
 					}
 				}
-				$fhcAlert.handleSystemError(error);
+
+				if (error?.response?.status == 400) {
+					let errors = CoreRESTClient.getError(error.response.data);
+					$fhcAlert.alertError((typeof errors === 'object') ? Object.values(errors) : errors);
+				} else {
+					$fhcAlert.handleSystemError(error);
+				}
 			}
 		};
 		app.config.globalProperties.$fhcAlert = $fhcAlert;

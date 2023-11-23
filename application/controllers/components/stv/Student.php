@@ -57,55 +57,6 @@ class Student extends FHC_Controller
 		}
 	}
 
-	public function getNations()
-	{
-		$this->load->model('codex/Nation_model', 'NationModel');
-
-		$this->NationModel->addOrder('kurztext');
-
-		$result = $this->NationModel->load();
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
-		}
-	}
-
-	public function getSprachen()
-	{
-		$this->load->model('system/Sprache_model', 'SpracheModel');
-
-		$this->SpracheModel->addOrder('sprache');
-
-		$result = $this->SpracheModel->load();
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
-		}
-	}
-
-	public function getGeschlechter()
-	{
-		$this->load->model('person/Geschlecht_model', 'GeschlechtModel');
-
-		$this->GeschlechtModel->addOrder('sort');
-		$this->GeschlechtModel->addOrder('geschlecht');
-
-		$this->GeschlechtModel->addSelect('*');
-		$this->GeschlechtModel->addSelect("bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $this->GeschlechtModel->escape(DEFAULT_LANGUAGE) . " LIMIT 1)] AS bezeichnung");
-
-		$result = $this->GeschlechtModel->load();
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
-		} else {
-			$this->outputJsonSuccess(getData($result) ?: []);
-		}
-	}
-
 	public function save($prestudent_id)
 	{
 		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
@@ -299,6 +250,282 @@ class Student extends FHC_Controller
 		$this->outputJson($result);
 	}
 
+	public function add()
+	{
+		$_POST = json_decode($this->input->raw_input_stream, true);
+
+		if (!$this->input->post('person_id')) {
+			if (!isset($_POST['address']) || !is_array($_POST['address']))
+				$_POST['address'] = [];
+			$_POST['address']['func'] = 1;
+		}
+		if ($this->input->post('incoming')) {
+			$_POST['ausbildungssemester'] = 0;
+		}
+
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('nachname', 'Nachname', 'callback_requiredIfNotPersonId', [
+			'requiredIfNotPersonId' => $this->p->t('ui', 'error_required')
+		]);
+		$this->form_validation->set_rules('geschlecht', 'Geschlecht', 'callback_requiredIfNotPersonId', [
+			'requiredIfNotPersonId' => $this->p->t('ui', 'error_required')
+		]);
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
+			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
+		]);
+		$this->form_validation->set_rules('address[func]', 'Address', 'required|integer|less_than[2]|greater_than[-2]');
+		$this->form_validation->set_rules('address[plz]', 'PLZ', 'callback_requiredIfAddressFunc', [
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+		]);
+		$this->form_validation->set_rules('address[gemeinde]', 'Gemeinde', 'callback_requiredIfAddressFunc', [
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+		]);
+		$this->form_validation->set_rules('address[ort]', 'Ort', 'callback_requiredIfAddressFunc', [
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+		]);
+		$this->form_validation->set_rules('address[address]', 'Adresse', 'callback_requiredIfAddressFunc', [
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+		]);
+		$this->form_validation->set_rules('email', 'E-Mail', 'valid_email');
+		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required');
+		$this->form_validation->set_rules('studiensemester_kurzbz', 'Studiensemester', 'required');
+		$this->form_validation->set_rules('ausbildungssemester', 'Ausbildungssemester', 'required|integer|less_than[9]|greater_than[-1]');
+		// TODO(chris): validate studienplan with studiengang, semester and orgform?
+		// TODO(chris): validate person_id, studiengang_kz, studiensemester_kurzbz, orgform_kurzbz, nation, gemeinde, ort, geschlecht?
+
+		if ($this->form_validation->run() == false) {
+			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
+		// TODO(chris): This should be in a library
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		$this->db->trans_start();
+
+		$result = $this->addInteressent();
+
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === FALSE) {
+			return $this->outputJsonSuccess(true); // TODO(chris): DEBUG! REMOVE!
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		$this->outputJson($result);
+	}
+
+	protected function addInteressent()
+	{
+		// Person anlegen wenn nötig
+		$person_id = $this->input->post('person_id');
+		if (!$person_id) {
+			$this->load->model('person/Person_model', 'PersonModel');
+			
+			$data = [
+				'nachname' => $this->input->post('nachname'),
+				'insertamum' => date('c'),
+				'insertvon' => getAuthUID(),
+				'zugangscode' => uniqid(),
+				'aktiv' => true
+			];
+			if ($this->input->post('anrede'))
+				$data['anrede'] = $this->input->post('anrede');
+			if ($this->input->post('titelpre'))
+				$data['titelpre'] = $this->input->post('titelpre');
+			if ($this->input->post('titelpost'))
+				$data['titelpost'] = $this->input->post('titelpost');
+			if ($this->input->post('vorname'))
+				$data['vorname'] = $this->input->post('vorname');
+			if ($this->input->post('vornamen'))
+				$data['vornamen'] = $this->input->post('vornamen');
+			if ($this->input->post('wahlname'))
+				$data['wahlname'] = $this->input->post('wahlname');
+			if ($this->input->post('geschlecht'))
+				$data['geschlecht'] = $this->input->post('geschlecht');
+			if ($this->input->post('gebdatum'))
+				$data['gebdatum'] = (new DateTime($this->input->post('datum_obj')))->format('Y-m-d');
+			if ($this->input->post('geburtsnation'))
+				$data['geburtsnation'] = $this->input->post('geburtsnation');
+			if ($this->input->post('staatsbuergerschaft'))
+				$data['staatsbuergerschaft'] = $this->input->post('staatsbuergerschaft');
+
+			$result = $this->PersonModel->insert($data);
+			if (isError($result))
+				return $result;
+			$person_id = getData($result);
+		}
+
+		// Addresse anlegen
+		$anlegen = $this->input->post('address[func]');
+		if ($anlegen) {
+			$this->load->model('person/Adresse_model', 'AdresseModel');
+
+			$data = [
+				'nation' => $this->input->post('address[nation]'),
+				'strasse' => $this->input->post('address[address]'),
+				'plz' => $this->input->post('address[plz]'),
+				'ort' => $this->input->post('address[ort]'),
+				'gemeinde' => $this->input->post('address[gemeinde]'),
+				'typ' => 'h',
+				'zustelladresse' => true,
+			];
+			if ($anlegen < 0) { // Überschreiben
+				$this->AdresseModel->addOrder('zustelladresse', 'DESC');
+				$this->AdresseModel->addOrder('sort');
+				$result = $this->AdresseModel->loadWhere([
+					'person_id' => $person_id
+				]);
+				if (isError($result))
+					return $result;
+				if (hasData($result)) {
+					$address = current(getData($result));
+
+					$data['updateamum'] = date('c');
+					$data['updatevon'] = getAuthUID();
+
+					$result = $this->AdresseModel->update($address->adresse_id, $data);
+					if (isError($result))
+						return $result;
+				} else {
+					//Wenn keine Adrese vorhanden ist dann eine neue Anlegen
+					$anlegen = 1;
+					$data['heimatadresse'] = true;
+				}
+			}
+			if ($anlegen > 0) {
+				$data['person_id'] = $person_id;
+				$data['insertamum'] = date('c');
+				$data['insertvon'] = getAuthUID();
+				if (!isset($data['heimatadresse']))
+					$data['heimatadresse'] = !$this->input->post('person_id');
+				
+				$result = $this->AdresseModel->insert($data);
+				if (isError($result))
+					return $result;
+			}
+		}
+		
+		// Kontaktdaten
+		$kontaktdaten = [];
+		foreach (['email', 'telefon', 'mobil'] as $k) {
+			$v = $this->input->post($k);
+			if ($v)
+				$kontaktdaten[$k] = $v;
+		}
+		if (count($kontaktdaten)) {
+			$this->load->model('person/Kontakt_model', 'KontaktModel');
+
+			foreach ($kontaktdaten as $typ => $kontakt) {
+				$data = [
+					'person_id' => $person_id,
+					'kontakttyp' => $typ,
+					'kontakt' => $kontakt,
+					'zustellung' => true,
+					'insertamum' => date('c'),
+					'insertvon' => getAuthUID()
+				];
+				$result = $this->KontaktModel->insert($data);
+				if (isError($result))
+					return $result;
+			}
+		}
+
+		// Prestudent anlegen
+		$data = [
+			'aufmerksamdurch_kurzbz' => 'k.A.',
+			'person_id' => $person_id,
+			'studiengang_kz' => $this->input->post('studiengang_kz'),
+			'ausbildungcode' => $this->input->post('letzteausbildung'),
+			'anmerkung' => $this->input->post('anmerkungen'),
+			'reihungstestangetreten' => false,
+			'bismelden' => true
+		];
+		$ausbildungsart = $this->input->post('ausbildungsart');
+		if ($ausbildungsart)
+			$data['anmerkung'] .= ' Ausbildungsart:' . $ausbildungsart;
+		// Incomings und ausserordentliche sind bei Meldung nicht förderrelevant
+		$incoming = $this->input->post('incoming');
+		if ($incoming || substr($data['studiengang_kz'], 0, 1) == '9')
+			$data['foerderrelevant'] = false;
+		// Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
+		$this->PrestudentModel->addOrder('zgvmas_code');
+		$this->PrestudentModel->addOrder('zgv_code', 'DESC');
+		$this->PrestudentModel->addLimit(1);
+		$result = $this->PrestudentModel->loadWhere([
+			'person_id' => $person_id
+		]);
+		if (isError($result))
+			return $result;
+		if (hasData($result)) {
+			$prestudent = current(getData($result));
+			if ($prestudent->zgv_code) {
+				$data['zgv_code'] = $prestudent->zgv_code;
+				$data['zgvort'] = $prestudent->zgvort;
+				$data['zgvdatum'] = $prestudent->zgvdatum;
+
+				$data['zgvmas_code'] = $prestudent->zgvmas_code;
+				$data['zgvmaort'] = $prestudent->zgvmaort;
+				$data['zgvmadatum'] = $prestudent->zgvmadatum;
+			}
+		}
+		// Prestudent speichern
+		$result = $this->PrestudentModel->insert($data);
+		if (isError($result))
+			return $result;
+		$prestudent_id = getData($result);
+
+		// Prestudent Rolle Anlegen
+		$data = [
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => $incoming ? 'Incoming' : 'Interessent',
+			'studiensemester_kurzbz' => $this->input->post('studiensemester_kurzbz'),
+			'ausbildungssemester' => $this->input->post('ausbildungssemester') ?: 0,
+			'orgform_kurzbz' => $this->input->post('orgform_kurzbz') ?: null,
+			'studienplan_id' => $this->input->post('studienplan_id') ?: null,
+			'datum' => date('Y-m-d'),
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
+		];
+		$result = $this->PrestudentstatusModel->insert($data);
+		if (isError($result))
+			return $result;
+
+		if ($incoming) {
+			// TODO(chris): IMPLEMENT!
+			//Matrikelnummer und UID generieren
+			//Benutzerdatensatz anlegen
+			//Studentendatensatz anlegen
+			//StudentLehrverband anlegen
+		}
+
+		// TODO(chris): DEBUG
+		$result = $this->PrestudentModel->loadWhere([
+			'pestudent_id' => 1
+		]);
+		if (isError($result)) {
+			return $result;
+		}
+
+		return success(true);
+	}
+
+	public function requiredIfNotPersonId($value)
+	{
+		if (isset($_POST['person_id']))
+			return true;
+		return !!$value;
+	}
+	
+	public function requiredIfAddressFunc($value)
+	{
+		if (!$_POST['address']['func'])
+			return true;
+		return !!$value;
+	}
+	
 	public function isValidDate($date)
 	{
 		try {

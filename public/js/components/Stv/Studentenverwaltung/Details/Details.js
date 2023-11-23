@@ -31,6 +31,9 @@ export default {
 		hasAliasPermission: {
 			from: 'hasAliasPermission',
 			default: false
+		},
+		lists: {
+			from: 'lists'
 		}
 	},
 	props: {
@@ -38,9 +41,6 @@ export default {
 	},
 	data() {
 		return {
-			nations: [],
-			sprachen: [],
-			geschlechter: [],
 			familienstaende: {
 				"": "--keine Auswahl--",
 				"g": "geschieden",
@@ -169,31 +169,6 @@ export default {
 		}
 	},
 	created() {
-		CoreRESTClient
-			.get('components/stv/Student/getNations')
-			.then(result => {
-				this.nations = result.data;
-			})
-			.catch(err => {
-				console.error(err.response.data || err.message);
-			});
-		CoreRESTClient
-			.get('components/stv/Student/getSprachen')
-			.then(result => {
-				this.sprachen = result.data;
-			})
-			.catch(err => {
-				console.error(err.response.data || err.message);
-			});
-		CoreRESTClient
-			.get('components/stv/Student/getGeschlechter')
-			.then(result => CoreRESTClient.getData(result.data))
-			.then(result => {
-				this.geschlechter = result.data;
-			})
-			.catch(err => {
-				console.error(CoreRestClient.getError(err.response.data) || err.message);
-			});
 		this.updateStudent(this.student);
 	},
 	//TODO(chris): Geburtszeit? Anzahl der Kinder?
@@ -269,7 +244,7 @@ export default {
 						<select id="stv-details-geburtsnation" class="form-control" v-model="data.geburtsnation">
 							<option value="">-- keine Auswahl --</option>
 							<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
-							<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
+							<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 						</select>
 					</div>
 				</div>
@@ -289,7 +264,7 @@ export default {
 						<select id="stv-details-staatsbuergerschaft" class="form-control" v-model="data.staatsbuergerschaft">
 							<option value="">-- keine Auswahl --</option>
 							<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
-							<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
+							<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 						</select>
 					</div>
 					<label for="stv-details-matr_nr" class="col-sm-1 col-form-label">Matrikelnummer</label>
@@ -299,7 +274,7 @@ export default {
 					<label for="stv-details-sprache" class="col-sm-1 col-form-label">Sprache</label>
 					<div class="col-sm-3">
 						<select id="stv-details-sprache" class="form-control" v-model="data.sprache">
-							<option v-for="sprache in sprachen" :key="sprache.sprache" :value="sprache.sprache">{{sprache.sprache}}</option>
+							<option v-for="sprache in lists.sprachen" :key="sprache.sprache" :value="sprache.sprache">{{sprache.sprache}}</option>
 						</select>
 					</div>
 				</div>
@@ -307,7 +282,7 @@ export default {
 					<label for="stv-details-geschlecht" class="col-sm-1 col-form-label">Geschlecht</label>
 					<div class="col-sm-3">
 						<select id="stv-details-geschlecht" class="form-control" v-model="data.geschlecht">
-							<option v-for="geschlecht in geschlechter" :key="geschlecht.geschlecht" :value="geschlecht.geschlecht">{{geschlecht.bezeichnung}}</option>
+							<option v-for="geschlecht in lists.geschlechter" :key="geschlecht.geschlecht" :value="geschlecht.geschlecht">{{geschlecht.bezeichnung}}</option>
 						</select>
 					</div>
 					<label for="stv-details-familienstand" class="col-sm-1 col-form-label">Familienstand</label>

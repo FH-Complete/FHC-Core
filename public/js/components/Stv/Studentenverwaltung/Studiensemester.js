@@ -49,20 +49,17 @@ export default {
 			this.loading = true;
 			CoreRESTClient
 				.get('components/stv/studiensemester/now')
-				.then(result => result.data)
+				.then(result => CoreRESTClient.getData(result.data))
 				.then(result => {
 					this.today = this.list.indexOf(result);
-					if (this.today > 0) {
+					if (this.today >= 0) {
 						if (this.today != this.current)
 							this.set(this.today);
 					} else {
 						// TODO(chris): handle error (list might not be loaded yet)
 					}
 				})
-				.catch(error => {
-					// TODO(chris): emit error
-					console.error(error);
-				});
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		save(fallback) {
 			CoreRESTClient
@@ -71,27 +68,25 @@ export default {
 				})
 				.then(() => {
 					this.loading = false;
-					this.$emit('changed');
+					this.$emit('changed', this.list[this.current]);
 				})
 				.catch(error => {
 					this.current = fallback;
-					// TODO(chris): emit error
-					console.error(error);
+					this.loading = false;
+					this.$fhcAlert.handleFormValidation(error);
 				});
 		}
 	},
 	created() {
 		CoreRESTClient
 			.get('components/stv/studiensemester')
-			.then(result => result.data)
+			.then(result => CoreRESTClient.getData(result.data) || [])
 			.then(result => {
 				this.list = result.map(el => el.studiensemester_kurzbz);
 				this.loading = false;
 				this.current = this.list.indexOf(this.default);
 			})
-			.catch(error => {
-				console.error(error);
-			});
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-studiensemester">

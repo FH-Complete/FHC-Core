@@ -42,13 +42,16 @@ export default {
 		
 		const res = this.$slots.default();
 		const orig = res.shift();
+
 		let options = {
 			'data-fhc-form-validate': this.name,
 			onFhcFormReset: this.reset,
 			onFhcFormValidate: this.setValid,
 			onFhcFormInvalidate: this.setInvalid,
+			onInput: this.reset,
 			class: {
-				'form-control': true,
+				'form-control': orig.type !== 'select' && orig.props.type !== 'checkbox' && orig.props.type !== 'radio' && !(orig.props?.class || '').split(' ').includes('form-control'),
+				'form-select': orig.type === 'select' && !(orig.props?.class || '').split(' ').includes('form-select'),
 				'is-valid': this.isValid,
 				'is-invalid': this.isInvalid
 			}
@@ -59,11 +62,23 @@ export default {
 		}
 		res.unshift(Vue.cloneVNode(orig, options));
 
-		if (this.isInvalid && this.invalidFeedback && this.$slots.default)
-			res.push(Vue.h('div', {
+		if (this.isInvalid && this.invalidFeedback && this.$slots.default) {
+			/* NOTE(chris): use bootstraps 'feedback' */
+			/*res.push(Vue.h('div', {
 				class: 'invalid-feedback'
-			}, this.invalidFeedback));
+			}, this.invalidFeedback));*/
 
-		return res;
+			/* NOTE(chris): use bootstraps 'tooltip' */
+			res.push(Vue.h('div', {
+				class: 'invalid-tooltip'
+			}, this.invalidFeedback));
+		}
+		/* NOTE(chris): use bootstraps 'feedback' */
+		/*return res;*/
+		
+		/* NOTE(chris): use bootstraps 'tooltip' */
+		return Vue.h('div', {
+			class: 'position-relative'
+		}, res);
 	},
 };

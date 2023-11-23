@@ -21,6 +21,7 @@ import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
 import StvDetails from "./Studentenverwaltung/Details.js";
 import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
+import {CoreRESTClient} from '../../RESTClient.js';
 
 
 export default {
@@ -46,7 +47,8 @@ export default {
 			activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung'),
 			configGenerateAlias: this.config.generateAlias,
 			hasBpkPermission: this.permissions['student/bpk'],
-			hasAliasPermission: this.permissions['student/alias']
+			hasAliasPermission: this.permissions['student/alias'],
+			lists: this.lists
 		}
 	},
 	data() {
@@ -81,6 +83,12 @@ export default {
 				}
 			},
 			studiengangKz: undefined,
+			studiensemesterKurzbz: this.defaultSemester,
+			lists: {
+				nations: [],
+				sprachen: [],
+				geschlechter: []
+			}
 		}
 	},
 	computed: {
@@ -96,9 +104,54 @@ export default {
 		searchfunction(searchsettings) {
 			return Vue.$fhcapi.Search.search(searchsettings);  
 		},
-		studiensemesterChanged() {
+		studiensemesterChanged(v) {
+			this.studiensemesterKurzbz = v;
 			this.$refs.stvList.updateUrl();
 		}
+	},
+	created() {
+		CoreRESTClient
+			.get('components/stv/Address/getNations')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.lists.nations = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Lists/getSprachen')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.lists.sprachen = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Lists/getGeschlechter')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.lists.geschlechter = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Lists/getAusbildungen')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.lists.ausbildungen = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Lists/getStgs')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.lists.stgs = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Lists/getOrgforms')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.lists.orgforms = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	mounted() {
 		if (this.$route.params.id) {
@@ -126,7 +179,7 @@ export default {
 			<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 				<vertical-split>
 					<template #top>
-						<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz"></stv-list>
+						<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
 					</template>
 					<template #bottom>
 						<stv-details :student="lastSelected"></stv-details>

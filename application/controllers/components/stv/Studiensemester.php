@@ -20,13 +20,8 @@ class Studiensemester extends FHC_Controller
 
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} elseif (!hasData($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_NOT_FOUND);
-			$this->outputJson('NOT FOUND');
-		} else {
-			$this->outputJson(getData($result));
 		}
+		$this->outputJson($result);
 	}
 
 	public function now()
@@ -43,9 +38,9 @@ class Studiensemester extends FHC_Controller
 
 		if (count($result) != 1) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(count($result) ? 'Mehrere Studiensemester aktiv' : 'Kein Studiensemester aktiv');
+			$this->outputJsonError(count($result) ? 'Mehrere Studiensemester aktiv' : 'Kein Studiensemester aktiv');
 		} else {
-			$this->outputJson(current($result)->studiensemester_kurzbz);
+			$this->outputJsonSuccess(current($result)->studiensemester_kurzbz);
 		}
 	}
 
@@ -60,7 +55,7 @@ class Studiensemester extends FHC_Controller
 
 		if ($this->form_validation->run() == false) {
 			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-			return $this->outputJson($this->form_validation->error_array());
+			return $this->outputJsonError($this->form_validation->error_array());
 		}
 
 		$stdsem = $this->input->post('studiensemester');
@@ -71,7 +66,7 @@ class Studiensemester extends FHC_Controller
 
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
+			return $this->outputJson($result);
 		}
 
 		$this->outputJsonSuccess(true);
