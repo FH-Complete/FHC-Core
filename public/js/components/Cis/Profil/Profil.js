@@ -46,7 +46,7 @@ export default {
             betriebsmittel_table_options:{
                 height: 300,
                 layout: 'fitColumns',
-                data:[{Bezeichnung:"test1",Organisationseinheit:"test2",Gültig_von:"test3",Gültig_bis:"test4",Wochenstunden:"test5"}],
+                data:[{betriebsmittel:"test1",Nummer:"test2",Ausgegeben_am:"test3"}],
                 
                 columns: [{title: 'Betriebsmittel', field: 'betriebsmittel', headerFilter: true},
                 {title: 'Nummer', field: 'Nummer', headerFilter: true},
@@ -59,6 +59,7 @@ export default {
     //? this props were passed in the Profil.php view file
     props:['uid','pid'],
     methods: {
+        
         concatenate_addresses(address_array){
             let result = "";
             for (let i = 0; i < address_array.length; i++) {
@@ -133,8 +134,8 @@ export default {
             }
             //! postnomen is still missing
            return {
-                Intern:this.person_info.email_intern,
-                Alias:this.person_info.email_extern,
+                FhAusweisStatus: this.person_info.zutrittskarte_ausgegebenam,
+                emails:this.person_info.emails,
                 Kontakte:this.person_info.kontakte,
             };
         },
@@ -150,12 +151,21 @@ export default {
         //.tabulator.setData(this.person_info?.funktionen);
         
     },
-    mounted(){
-        fhcapifactory.UserData.getMitarbeiterAnsicht().then(res => {
-            this.person_info = res.data;
-            this.$refs.funktionenTable.tabulator.setData(res.data.funktionen);
-            this.$refs.betriebsmittelTable.tabulator.setData(res.data.mittel);
-        });
+     mounted(){
+        //? this function is to update the tabulator information only when the tabulator was build checking the tableBulit event
+        //! only the tableBuilt event of the second tabulator was used to update the table informations
+        this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
+            fhcapifactory.UserData.getMitarbeiterAnsicht().then((res)=>{
+                this.person_info = res.data;
+                this.$refs.funktionenTable.tabulator.setData(res.data.funktionen);
+                this.$refs.betriebsmittelTable.tabulator.setData(res.data.mittel);
+                
+            })
+        })
+        
+        
+        
+        
     },
      
     template: `
@@ -200,17 +210,27 @@ export default {
             </div>
             <div :class="{'col':true}">
             <ol style="list-style:none">
-            <!--render_unterelement(wert,bezeichnung)-->
+            
             <li v-for="(wert,bezeichnung) in second_col">
             
-            <p v-for="element in wert" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
+            <!-- HIER IST DAS DATUM DES FH AUSWEIS -->
+            <div v-if="bezeichnung=='FhAusweisStatus'">
+            <p><b>FH-Ausweis Status</b></p>
+            <p >{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</p>
+            </div>
+
+
+            <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
+            <div v-else-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
+            <p><b>Private Kontakte</b></p>
+            <span style="display:block" v-for="element in wert" >
             {{element.kontakttyp + "  " + element.kontakt+"  " }}
             <i v-if="element.zustellung" class="fa-solid fa-check"></i>
             <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
+            </span>
+            </div>
             
-            </p>
-            
-            <p v-else >{{bezeichnung +": "+wert}}</p>
+            <!--<pre v-else>{{JSON.stringify(wert,null,2)}}</pre>-->
             
             </li>
             </ol>
@@ -223,7 +243,7 @@ export default {
             
             <div :class="{'col':true}">
             <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
-           
+          
             </div>
             
             </div>
@@ -231,8 +251,9 @@ export default {
             <div :class="{'row':true}">
             
             <div :class="{'col':true}">
+               
             <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
-            
+       
             </div>
             </div>
             </div>

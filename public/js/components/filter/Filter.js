@@ -182,8 +182,11 @@ export const CoreFilterCmpt = {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+					
 				});
+				
 			}
+			
 		},
 		updateTabulator() {
 			if (this.tabulator) {

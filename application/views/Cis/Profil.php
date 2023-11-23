@@ -3,7 +3,7 @@ $includesArray = array(
 	'title' => 'Stundenplan',
 	'customJSModules' => ['public/js/apps/Cis/ProfilApp.js'],
 	'tabulator5' => true,
-	'customCSSs' => ['public/css/components/calendar.css']
+	'customCSSs' => ['public/css/components/calendar.css', 'public/css/components/FilterComponent.css']
 );
 
 $this->load->view('templates/CISHTML-Header', $includesArray);

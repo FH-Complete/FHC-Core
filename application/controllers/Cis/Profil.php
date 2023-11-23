@@ -86,12 +86,16 @@ class Profil extends Auth_Controller
 			
 		}
 
-		$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
+		$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid(getAuthUID(),"Zutrittskarte");
 		if(isError($zutrittskarte_ausgegebenam)){
 			// error handling
 		}else{
-			$zutrittskarte_ausgegebenam = hasData($zutrittskarte_ausgegebenam)? getData($zutrittskarte_ausgegebenam)[0] : null;
+			$zutrittskarte_ausgegebenam = hasData($zutrittskarte_ausgegebenam)? getData($zutrittskarte_ausgegebenam)[0]->ausgegebenam : null;
+			//? formats the date from 01-01-2000 to 01.01.2000
+			$zutrittskarte_ausgegebenam = str_replace("-",".",$zutrittskarte_ausgegebenam);
 		}
+		
+		
 
 		if(
 			isSuccess($this->BetriebsmittelpersonModel->addSelect(["CONCAT(betriebsmitteltyp, ' ' ,beschreibung) as Betriebsmittel","nummer as Nummer","ausgegebenam as Ausgegeben_am"]))
@@ -170,9 +174,14 @@ class Profil extends Auth_Controller
 		//? Mitarbeiter Info
 		$res->kurzbz = $mitarbeiter_res->kurzbz;
 		$res->telefonklappe = $mitarbeiter_res->telefonklappe;
-		//? Benutzer Info
-		$res->email_intern = getAuthUID() . DOMAIN;
-		$res->email_extern = $benutzer_res->alias . DOMAIN;
+		//? Email Info 
+		$intern_email = array();
+		$intern_email+=array("type" => "intern");
+		$intern_email+=array("email"=> getAuthUID() . DOMAIN);
+		$extern_email=array();
+		$extern_email+=array("type" => "extern");
+		$extern_email+=array("email" => $benutzer_res->alias . DOMAIN);
+		$res->emails = array($intern_email,$extern_email);
 		//? Adresse Info 
 		$res->adressen = $adresse_res;
 		//? Benutzerfunktion Info
@@ -180,7 +189,7 @@ class Profil extends Auth_Controller
 		//? Betriebsmittel Info
 		$res->mittel = $betriebsmittelperson_res;
 		//? Austellungsdatum von der Zutrittskarte
-		$res->zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam->ausgegebenam;
+		$res->zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam;
 		//? Kontakt Info
 		$res->kontakte = $kontakte_res;
 		//? Mailverteiler Info
