@@ -268,7 +268,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				?>
 				<tab id="mitarbeiter-tab-termine" label="Termine" onclick="MitarbeiterTermineIFrameLoad()" />
 				<tab id="mitarbeiter-tab-notizen" label="Notizen"/>
-				<tab id="mitarbeiter-tab-stundensatz" label="Stundensatz" />
+				<tab id="mitarbeiter-tab-stundensatz" label="Stundensätze" />
 				<?php
 					if (!defined('FAS_UDF') || FAS_UDF == true)
 						echo '<tab id="mitarbeiter-tab-udf" label="Zusatzfelder" onclick="MitarbeiterUDFIFrameLoad()"/>';
