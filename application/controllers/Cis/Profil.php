@@ -66,7 +66,11 @@ class Profil extends Auth_Controller
 				// catch error
 			}
 			$mailverteiler_res = hasData($mailverteiler_res)? getData($mailverteiler_res) : null;
+			
+			$mailverteiler_res = array_map(function($element) { $element->mailto="mailto:".$element->gruppe_kurzbz."@".DOMAIN; return $element;},$mailverteiler_res);
 		}
+
+	
 
 		if(isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
 		isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
@@ -90,7 +94,7 @@ class Profil extends Auth_Controller
 		}
 
 		if(
-			isSuccess($this->BetriebsmittelpersonModel->addSelect(["betriebsmitteltyp", "beschreibung","nummer","ausgegebenam"]))
+			isSuccess($this->BetriebsmittelpersonModel->addSelect(["CONCAT(betriebsmitteltyp, ' ' ,beschreibung) as Betriebsmittel","nummer as Nummer","ausgegebenam as Ausgegeben_am"]))
 			
 		){
 			$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
@@ -103,7 +107,7 @@ class Profil extends Auth_Controller
 
 		if(
 			//! Summe der Wochenstunden wird jetzt in der hr/tbl_dienstverhaeltnis gespeichert
-		 isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as bf_bezeichnung","tbl_organisationseinheit.bezeichnung as oe_bezeichnung","datum_von","datum_bis","wochenstunden"]))&&
+		 isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as Bezeichnung","tbl_organisationseinheit.bezeichnung as Organisationseinheit","datum_von as Gültig_von","datum_bis as Gültig_bis","wochenstunden as Wochenstunden"]))&&
 	  	  isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit","oe_kurzbz"))
 		){
 			$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid'=>getAuthUID()));
@@ -217,6 +221,7 @@ class Profil extends Auth_Controller
 		}
 		echo json_encode($res);
 	}
+
 
 
 	

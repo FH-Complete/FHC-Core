@@ -20,6 +20,12 @@ export default {
                   + `cis.php/Cis/Profil/foto_sperre_function/${value}`;
         return axios.get(url);
     },
+    getBenutzerFunktionen: function() {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   "/Cis/Profil/getBenutzerFunktionen";
+        
+        return axios.get(url);
+    },
     
  
 };
