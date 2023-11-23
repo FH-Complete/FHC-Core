@@ -373,9 +373,10 @@ class AntragJob extends JOB_Controller
 				$result = $this->prestudentlib->setAbbrecher(
                     $antrag->prestudent_id,
                     $antrag->studiensemester_kurzbz,
-                    $antrag->insertvon ?: $insertvon,
+                    'AntragJob',
                     'abbrecherStgl',
-                    $antrag->insertamum
+                    $antrag->insertamum,
+                    $antrag->insertvon ?: $insertvon
                 );
 				if (isError($result))
 					$this->logError(getError($result));
