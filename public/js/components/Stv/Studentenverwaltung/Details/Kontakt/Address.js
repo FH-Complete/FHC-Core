@@ -275,7 +275,7 @@ export default{
 	},
 	created(){
 		CoreRESTClient
-			.get('components/stv/Student/getNations')
+			.get('components/stv/Kontakt/getNations')
 			.then(result => {
 				this.nations = result.data;
 			})

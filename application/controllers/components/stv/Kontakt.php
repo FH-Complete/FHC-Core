@@ -8,7 +8,6 @@ class Kontakt extends FHC_Controller
 {
 	public function __construct()
 	{
-		// TODO(chris): access!
 		parent::__construct();
 
 		// Load Libraries
@@ -215,6 +214,21 @@ class Kontakt extends FHC_Controller
 			$this->outputJson($result); //success mit Wert null
 		}
 		return $this->outputJsonSuccess(current(getData($result)));
+	}
+
+	public function getNations()
+	{
+		$this->load->model('codex/Nation_model', 'NationModel');
+
+		$this->NationModel->addOrder('kurztext');
+
+		$result = $this->NationModel->load();
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		} else {
+			$this->outputJson(getData($result) ?: []);
+		}
 	}
 
 	public function getAdressentypen()
