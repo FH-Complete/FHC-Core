@@ -192,7 +192,9 @@ export default {
 							<option value="textLong_studentNichtGezahlt">{{p.t('studierendenantrag', 'dropdown_nichtGezahlt')}}
 							</option>
 							<option value="textLong_plageat">{{p.t('studierendenantrag', 'dropdown_plageat')}}
-							</option>					
+							</option>
+							<option value="textLong_MissingZgv">{{p.t('studierendenantrag', 'dropdown_MissingZgv')}}
+							</option>						
 						</select>	
 					</div>			
 					<textarea
