@@ -1,5 +1,6 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import {CoreRESTClient} from "../../../../../RESTClient";
+/*import {BsModal} from "../../../../Bootstrap/Modal.js";*/
 
 var editIcon = function(cell, formatterParams){ //plain text value
 	return "<i class='fa fa-edit'></i>";
@@ -10,7 +11,8 @@ var deleteIcon = function(cell, formatterParams) { //plain text value
 
 export default{
 	components: {
-		CoreFilterCmpt
+		CoreFilterCmpt,
+/*		BsModal*/
 	},
 	props: {
 		uid: String
@@ -51,8 +53,8 @@ export default{
 					},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Bankverbindung_id", field:"bankverbindung_id", visible:false},
-					{title: "Actions",
-						columns:[
+	/*				{title: "Actions",
+						columns:[*/
 							{formatter:editIcon, width:40, align:"center", cellClick: (e, cell) => {
 									this.actionEditBankverbindung(cell.getData().bankverbindung_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
@@ -61,8 +63,8 @@ export default{
 									this.actionDeleteBankverbindung(cell.getData().bankverbindung_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
 								}, width:50, headerSort:false },
-						],
-					},
+/*						],
+					},*/
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
@@ -186,6 +188,7 @@ export default{
 			}).finally(()=> {
 				window.scrollTo(0, 0);
 				this.hideModal('deleteBankverbindungModal');
+				this.resetModal();
 				this.reload();
 			});
 		},
@@ -203,6 +206,73 @@ export default{
 	template: `	
 		<div class="stv-list h-100 pt-3">
 		
+<!--		Todo(manu) BsModal-->
+<!--		<BsModal title="Bankverbindung anlegen" ref="newBankverbindungModal">
+            <template #body>
+                <form class="row g-3" v-if="currentAddress != null" ref="bankverbindungData" >
+					<div class="row mb-3">
+							<label for="name" class="form-label col-sm-4">Name</label>
+							<div class="col-sm-3">
+								<input type="text" :readonly="readonly" class="form-control-sm" id="name" v-model="bankverbindungData['name']">
+							</div>
+						</div>
+						<div class="row mb-3">											   
+							<label for="anschrift" class="form-label col-sm-4">Anschrift</label>
+							<div class="col-sm-3">
+								<input type="text" :readonly="readonly" class="form-control-sm" id="anschrift" v-model="bankverbindungData['anschrift']">
+							</div>
+						</div>	
+
+						<div class="row mb-3">											   
+							<label for="iban" class="form-label col-sm-4">IBAN</label>
+							<div class="col-sm-3">
+								<input type="text" :readonly="readonly" required class="form-control-sm" id="iban" v-model="bankverbindungData['iban']">
+							</div>
+						</div>	
+						<div class="row mb-3">											   
+							<label for="bic" class="form-label col-sm-4">BIC</label>
+							<div class="col-sm-3">
+								<input type="text" :readonly="readonly" class="form-control-sm" id="bic" v-model="bankverbindungData['bic']">
+							</div>
+						</div>	
+						<div class="row mb-3">											   
+							<label for="kontonr" class="form-label col-sm-4">Kontonummer</label>
+							<div class="col-sm-3">
+								<input type="text" :readonly="readonly" class="form-control-sm" id="kontonr" v-model="bankverbindungData['kontonr']">
+							</div>
+						</div>	
+						<div class="row mb-3">											   
+							<label for="blz" class="form-label col-sm-4">BLZ</label>
+							<div class="col-sm-3">
+								<input type="text" :readonly="readonly" class="form-control-sm" id="blz" v-model="bankverbindungData['blz']">
+							</div>
+						</div>		
+						<div class="row mb-3">
+							<label for="typ" class="form-label col-sm-4">Typ</label>
+							<div class="col-sm-5">
+								<select  id="typ" class="form-control" required v-model="bankverbindungData['typ']">
+									<option  value="p">Privatkonto</option>
+									<option  value="f">Firmenkonto</option>
+								</select>
+							</div>
+						</div>	
+						<div class="row mb-3">
+							<label for="verrechnung" class="form-label col-sm-4">Verrechnung</label>
+							<div class="col-sm-3">
+								<div class="form-check">	
+									<input id="verrechnung" type="checkbox" class="form-check-input" value="1" v-model="bankverbindungData['verrechnung']">
+								</div>
+							</div>
+						</div>	
+				</form>
+			</template>
+            <template #footer>
+            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+					<button type="button" class="btn btn-primary" @click="addNewBankverbindung()">OK</button>
+            </template>
+					
+		</BsModal>-->
+		
 
 		<!--Modal: new Bankverbindung-->
 			<div ref="newBankverbindungModal" class="modal fade" id="newBankverbindungModal" tabindex="-1" aria-labelledby="newBankverbindungModalLabel" aria-hidden="true">
@@ -213,8 +283,7 @@ export default{
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				  </div>
 				  <div class="modal-body">
-					<form ref="bankverbindungData">
-<!--					{{bankverbindungData}}	-->						
+					<form ref="bankverbindungData">				
 						<div class="row mb-3">
 							<label for="name" class="form-label col-sm-4">Name</label>
 							<div class="col-sm-3">
@@ -263,7 +332,7 @@ export default{
 						</div>	
 						<div class="row mb-3">
 							<label for="verrechnung" class="form-label col-sm-4">Verrechnung</label>
-							<div class="col-sm-3 align-self-center">
+							<div class="col-sm-3">
 								<div class="form-check">	
 									<input id="verrechnung" type="checkbox" class="form-check-input" value="1" v-model="bankverbindungData['verrechnung']">
 								</div>
@@ -341,7 +410,7 @@ export default{
 						</div>	
 						<div class="row mb-3">
 							<label for="verrechnung" class="form-label col-sm-4">Verrechnung</label>
-							<div class="col-sm-3 align-self-center">
+							<div class="col-sm-3">
 								<div class="form-check">	
 									<input id="verrechnung" type="checkbox" class="form-check-input" value="1" v-model="bankverbindungData['verrechnung']">
 								</div>
@@ -378,7 +447,8 @@ export default{
 				</div>
 			  </div>
 			</div>
-		
+			
+	
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"

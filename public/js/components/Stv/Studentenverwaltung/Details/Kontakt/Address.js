@@ -54,8 +54,8 @@ export default{
 							return output;}
 					},
 					{title:"Anmerkung", field:"anmerkung", visible:false},
-					{title: "Actions",
-						columns:[
+/*					{title: "Actions",
+						columns:[*/
 							{formatter:editIcon, width:40, align:"center", cellClick: (e, cell) => {
 									this.actionEditAdress(cell.getData().adresse_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
@@ -64,8 +64,8 @@ export default{
 									this.actionDeleteAdress(cell.getData().adresse_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
 								}, width:50, headerSort:false },
-						],
-					},
+/*					],
+					},*/
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
@@ -295,7 +295,7 @@ export default{
 		<div class="stv-list h-100 pt-3">
 					
 		<!--		<Modal>   
-		 TODO(MANU) use BSModal, Validierungen
+		 TODO(MANU) use BSModal, Validierungen, utf-8? 
 		 -->
 				
 		<div ref="newAdressModal" class="modal fade" id="newAddressModal" tabindex="-1" aria-labelledby="newAddressModalLabel" aria-hidden="true">
@@ -376,7 +376,7 @@ export default{
 						
 					<div class="row mb-3">				
 						<label for="heimatadresse" class="form-label col-sm-4">Heimatadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="formData['heimatadresse']">
 							</div>
@@ -385,7 +385,7 @@ export default{
 						
 					<div class="row mb-3">
 						<label for="zustelladresse" class="form-label col-sm-4">Zustelladresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="formData['zustelladresse']">
 							</div>
@@ -401,7 +401,7 @@ export default{
 					
 					<div class="row mb-3">
 						<label for="rechnungsadresse" class="form-label col-sm-4">Rechnungsadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="formData['rechnungsadresse']">
 							</div>
@@ -411,13 +411,13 @@ export default{
 					<div class="row mb-3">
 						<label for="firma_name" class="form-label col-sm-4">Firma</label>
 							<div class="col-sm-3">
-							 	<PvAutoComplete v-model="formData['firma']" optionLabel="name" :suggestions="filteredFirmen" @complete="search" minLength="3"/>
+									<PvAutoComplete v-model="formData['firma']" optionLabel="name" :suggestions="filteredFirmen" @complete="search" minLength="3"/>
 							</div>	
 					</div>	
-
+					
 					<div class="row mb-3">											   
 						<label for="name" class="form-label col-sm-4">Name</label>
-						<div class="col-sm-2">
+						<div class="col-sm-3">
 							<input type="text" :readonly="readonly" class="form-control-sm" id="name" v-model="formData['name']">
 						</div>
 					</div>		
@@ -527,7 +527,7 @@ export default{
 					
 					<div class="row mb-3">				
 						<label for="heimatadresse" class="form-label col-sm-4">Heimatadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['heimatadresse']">
 							</div>
@@ -536,7 +536,7 @@ export default{
 						
 					<div class="row mb-3">
 						<label for="zustelladresse" class="form-label col-sm-4">Zustelladresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['zustelladresse']">
 							</div>
@@ -552,7 +552,7 @@ export default{
 					
 					<div class="row mb-3">
 						<label for="rechnungsadresse" class="form-label col-sm-4">Rechnungsadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="addressData['rechnungsadresse']">
 							</div>

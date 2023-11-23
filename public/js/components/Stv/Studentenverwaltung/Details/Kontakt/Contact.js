@@ -41,8 +41,8 @@ export default{
 					{title:"Kontakt_id", field:"kontakt_id", visible:false},
 					{title:"Standort_id", field:"standort_id", visible:false},
 					{title:"letzte Änderung", field:"updateamum", visible:false},
-					{title: "Actions",
-						columns:[
+	/*				{title: "Actions",
+						columns:[*/
 							{formatter:editIcon, cellClick: (e, cell) => {
 									this.actionEditContact(cell.getData().kontakt_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
@@ -51,8 +51,8 @@ export default{
 									this.actionDeleteContact(cell.getData().kontakt_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
 								}, width:50, headerSort:false, headerVisible:false },
-						],
-					},
+/*						],
+					},*/
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
@@ -162,6 +162,7 @@ export default{
 			}).finally(()=> {
 				window.scrollTo(0, 0);
 				this.hideModal('deleteContactModal');
+				this.resetModal();
 				this.reload();
 			});
 		},
@@ -263,7 +264,7 @@ export default{
 						
 						<div class="row mb-3">
 							<label for="zustellung" class="form-label col-sm-4">Zustellung</label>
-							<div class="col-sm-3 align-self-center">
+							<div class="col-sm-3">
 								<div class="form-check">	
 									<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
 								</div>
@@ -323,7 +324,7 @@ export default{
 							
 							<div class="row mb-3">
 								<label for="zustellung" class="form-label col-sm-4">Zustellung</label>
-								<div class="col-sm-3 align-self-center">
+								<div class="col-sm-3">
 									<div class="form-check">	
 										<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
 									</div>
