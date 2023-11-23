@@ -21611,7 +21611,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
+				'text' => 'Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
