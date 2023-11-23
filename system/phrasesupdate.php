@@ -21617,7 +21617,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for exclusion according to the training contract (point 7.4): Entry requirements BA (resp. MA) not fulfilled)',
+				'text' => 'Entry requirements BA (resp. MA) not fulfilled)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
