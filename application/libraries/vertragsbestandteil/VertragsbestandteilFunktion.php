@@ -34,6 +34,19 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 			null, 'VertragsbestandteilLib');
 	}
 	
+	public function isDirty()
+	{
+		$isdirty = parent::isDirty();
+		if( !$isdirty ) {
+			$bf = $this->loadBenutzerfunktion($this->getBenutzerfunktion_id());
+			if( !$this->areVbAndBfInSync($bf) )
+			{
+				$isdirty = true;
+			}
+		}
+		return $isdirty;
+	}
+
 	public function beforePersist()
 	{
 		if( isset($this->benutzerfunktion_id) && intval($this->benutzerfunktion_id) > 0 ) 
@@ -86,10 +99,10 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 	
 	protected function isBefore($a, $b)
 	{
-		if($b === null) {
+		if($a === null) {
 			return false;
 		}
-		elseif($a === null) {
+		elseif($b === null) {
 			return true;
 		}
 		else {
@@ -124,10 +137,17 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 				new \DateTimeZone('Europe/Vienna'));
 			$daybeforevon->sub(new \DateInterval('P1D'));
 			
-			if( $this->isBefore($this->getVon(), $bf->datum_von) && 
-				$this->isAfter($this->getBis(), $bf->datum_bis) )
+			if( $this->isBefore($bf->datum_von, $this->getVon()) && 
+				$this->isBefore($bf->datum_von, $this->getBis()) )
 			{
-				$this->updateBenutzerfunktion($bf, $this->getVon(), $this->getBis());
+				$data = (object) array(
+					'mitarbeiter_uid' => $bf->uid,
+					'funktion' => $bf->funktion_kurzbz,
+					'orget' => $bf->oe_kurzbz
+				);
+				$this->createBenutzerfunktionData($data);
+				$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
+				$this->setBenutzerfunktion_id($bfid);
 			}
 			elseif( $this->isBefore($bf->datum_von, $this->getVon()) && 
 					$this->isAfter($this->getBis(), $bf->datum_von) )
@@ -142,17 +162,9 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 				$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
 				$this->setBenutzerfunktion_id($bfid);
 			}
-			elseif( $this->isBefore($bf->datum_von, $this->getVon()) && 
-					$this->isBefore($bf->datum_von, $this->getBis()) )
+			else
 			{
-				$data = (object) array(
-					'mitarbeiter_uid' => $bf->uid,
-					'funktion' => $bf->funktion_kurzbz,
-					'orget' => $bf->oe_kurzbz
-				);
-				$this->createBenutzerfunktionData($data);
-				$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
-				$this->setBenutzerfunktion_id($bfid);
+				$this->updateBenutzerfunktion($bf, $this->getVon(), $this->getBis());
 			}
 		}
 	}
