@@ -376,6 +376,7 @@ class AntragJob extends JOB_Controller
                     'AntragJob',
                     'abbrecherStgl',
                     $antrag->insertamum,
+                    null,
                     $antrag->insertvon ?: $insertvon
                 );
 				if (isError($result))
