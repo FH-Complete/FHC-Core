@@ -233,7 +233,7 @@ export default {
 
             <div class="mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
             <p class="mb-0"><b>eMail</b></p>
-            <p v-for="email in wert" class="mb-0">{{email.type}}: <a  :href="'mailto:'+email.email"><b>{{email.email}}</b></a></p>
+            <p v-for="email in wert" class="mb-0">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></p>
             </div>
 
             <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
