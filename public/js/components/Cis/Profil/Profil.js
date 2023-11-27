@@ -109,26 +109,33 @@ export default {
             }
             return "data:image/jpeg;base64,"+(this.person_info ? this.person_info.foto : "");
         },
-        first_col(){
+        personData(){
             if(!this.person_info){
                 return {};
             }
             //! postnomen is still missing
            return {
-                Username:this.uid,
+                Allgemein: {
+                    Username:this.uid,
                 Anrede:this.person_info.anrede,
                 Titel:(this.person_info.titelpre&&this.person_info.titelpost)?this.person_info.titelpre.concat(this.person_info.titelpost):"null",
                 Vorname:this.person_info.vorname,
                 Nachname:this.person_info.nachname,
                 Postnomen:null,
+            },
+            GeburtsDaten:{
                 Geburtsdatum:this.person_info.gebdatum,
                 Geburtsort: this.person_info.gebort,
-                Adresse: this.person_info.adressen,
+            },
+                Adressen: this.person_info.adressen,
+            SpecialInformation: {
                 Kurzzeichen: this.person_info.kurzbz,
                 Telefon: this.person_info.telefonklappe,
+            },
             };
         },
-        second_col(){
+        //? this computed conains all the information that is used for the second column that displays the information of the person
+        kontaktInfo(){
             if(!this.person_info){
                 return {};
             }
@@ -169,6 +176,7 @@ export default {
     },
      
     template: `
+   
     <div :class="{'container':true}">
     <div :class="{'row':true}">
     <div :class="{'col':true}">
@@ -180,7 +188,7 @@ export default {
     </div>
     </div>
 
-            <div :class="{'container':true}">
+            <div :class="{'container-fluid':true}">
             <!-- here starts the row of the whole window -->
             <div :class="{'row':true}">
             <!-- this is the left column of the window -->
@@ -197,37 +205,48 @@ export default {
             
             </div>
             <div :class="{'col':true}">
-            
            
-            <ol style="list-style:none">
-            <li  v-for="(wert,bezeichnung) in first_col">
+            <p v-if="role=='Mitarbeiter'"><b>Mitarbeiter</b></p>
+            <p v-else ><b>Student</b></p>
             
-            <p v-for="element in wert" v-if="typeof wert == 'object' && bezeichnung=='Adresse'">{{element.strasse +" "+element.adr_typ+" " + element.plz+" "+element.ort}}</p>
-           
-            <p v-else>{{bezeichnung +": " +wert}}</p>
-            </li>
-            </ol>
+            <div v-for="(wert,bezeichnung) in personData">
+            
+            <div class="mb-3"  v-if="typeof wert == 'object' && bezeichnung=='Adressen'"><span style="display:block" v-for="element in wert">{{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}</span></div>
+            <div v-else class="mb-3" ><span style="display:block;" v-for="(val,bez) in wert">{{bez}}: {{val}}</span></div>
+            
+            </div>
+            
             </div>
             <div :class="{'col':true}">
             <ol style="list-style:none">
             
-            <li v-for="(wert,bezeichnung) in second_col">
+            <li v-for="(wert,bezeichnung) in kontaktInfo">
             
             <!-- HIER IST DAS DATUM DES FH AUSWEIS -->
-            <div v-if="bezeichnung=='FhAusweisStatus'">
-            <p><b>FH-Ausweis Status</b></p>
-            <p >{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</p>
+            <div class="mb-3" v-if="bezeichnung=='FhAusweisStatus'">
+            <p class="mb-0"><b>FH-Ausweis Status</b></p>
+            <p class="mb-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</p>
             </div>
 
+            <!-- HIER SIND DIE EMAILS -->
+      
+
+            <div class="mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
+            <p class="mb-0"><b>eMail</b></p>
+            <p v-for="email in wert" class="mb-0">{{email.type}}: <a  :href="'mailto:'+email.email"><b>{{email.email}}</b></a></p>
+            </div>
 
             <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
-            <div v-else-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
-            <p><b>Private Kontakte</b></p>
-            <span style="display:block" v-for="element in wert" >
-            {{element.kontakttyp + "  " + element.kontakt+"  " }}
+            <div class="mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
+            <p class="mb-0"><b>Private Kontakte</b></p>
+            <div class="row" v-for="element in wert" >
+            <div class="col-6">{{element.kontakttyp + "  " + element.kontakt+"  " }}</div>
+            <div class="col-3"> {{element?.anmerkung}}</div>
+            <div class="col-3"> 
             <i v-if="element.zustellung" class="fa-solid fa-check"></i>
             <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
-            </span>
+            </div>
+            </div>
             </div>
             
             <!--<pre v-else>{{JSON.stringify(wert,null,2)}}</pre>-->

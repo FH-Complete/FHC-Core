@@ -158,17 +158,31 @@ class Profil extends Auth_Controller
 			$mitarbeiter_res = hasData($mitarbeiter_res)? getData($mitarbeiter_res)[0] : null;
 		}
 
+		// collection for the first collumn
+		$first_column = new stdClass();
+		$first_column->username = getAuthUID();
+		$first_column->anrede = $person_res->anrede;
+		$first_column->titelpre = $person_res->titelpre;
+		$first_column->titelpost = $person_res->titelpost;
+		$first_column->vorname = $person_res->vorname;
+		$first_column->nachname = $person_res->nachname;
+		
+		
 		$res = new stdClass();
 		$res->username = getAuthUID();
+
+
 		//? Person Info
 		$res->foto = $person_res->foto;
 		$res->foto_sperre = $person_res->foto_sperre;
+		
 		$res->anrede = $person_res->anrede;
 		$res->titelpre = $person_res->titelpre;
 		$res->titelpost = $person_res->titelpost;
 		$res->vorname = $person_res->vorname;
 		$res->nachname = $person_res->nachname;
 		//$res->postnomen = $person_res->postnomen; //!POSTNOMEN?
+		
 		$res->gebdatum = $person_res->gebdatum;
 		$res->gebort = $person_res->gebort;
 		//? Mitarbeiter Info
@@ -177,10 +191,10 @@ class Profil extends Auth_Controller
 		//? Email Info 
 		$intern_email = array();
 		$intern_email+=array("type" => "intern");
-		$intern_email+=array("email"=> getAuthUID() . DOMAIN);
+		$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
 		$extern_email=array();
-		$extern_email+=array("type" => "extern");
-		$extern_email+=array("email" => $benutzer_res->alias . DOMAIN);
+		$extern_email+=array("type" => "alias");
+		$extern_email+=array("email" => $benutzer_res->alias . "@" . DOMAIN);
 		$res->emails = array($intern_email,$extern_email);
 		//? Adresse Info 
 		$res->adressen = $adresse_res;
