@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1105a07a83f98040eedbe34b23e11ee3",
+    "content-hash": "b6e875dbd1ec2554abbf9f7513806469",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -1511,10 +1511,10 @@
         },
         {
             "name": "olifolkerd/tabulator5",
-            "version": "5.2.1",
+            "version": "5.5.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.2.1.zip"
+                "url": "https://github.com/olifolkerd/tabulator/archive/refs/tags/5.5.2.zip"
             },
             "type": "library"
         },
@@ -1849,6 +1849,24 @@
             "time": "2020-02-11T05:59:23+00:00"
         },
         {
+            "name": "vuejs/vuedatepicker_css",
+            "version": "5.4.0",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/main.css"
+            },
+            "type": "library"
+        },
+        {
+            "name": "vuejs/vuedatepicker_js",
+            "version": "5.4.0",
+            "dist": {
+                "type": "file",
+                "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/vue-datepicker.iife.js"
+            },
+            "type": "library"
+        },
+        {
             "name": "vuejs/vuejs3",
             "version": "3.2.33",
             "dist": {
@@ -1863,24 +1881,6 @@
             "dist": {
                 "type": "file",
                 "url": "https://unpkg.com/vue-router@4.1.3/dist/vue-router.global.js"
-            },
-            "type": "library"
-        },
-        {
-            "name": "vuepic/vue-datepicker-css",
-            "version": "4.0.0",
-            "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/@vuepic/vue-datepicker@4.0.0/dist/main.css"
-            },
-            "type": "library"
-        },
-        {
-            "name": "vuepic/vue-datepicker-js",
-            "version": "4.0.0",
-            "dist": {
-                "type": "file",
-                "url": "https://unpkg.com/@vuepic/vue-datepicker@4.0.0/dist/vue-datepicker.iife.js"
             },
             "type": "library"
         }

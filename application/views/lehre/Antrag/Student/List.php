@@ -82,7 +82,7 @@ $this->load->view(
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body">
-													<pre><?= $antrag->grund; ?></pre>
+													<textarea class="form-control" style="width: 100%; height: 250px;" readonly><?= $antrag->grund; ?></textarea>
 												</div>
 											</div>
 										</div>
@@ -110,8 +110,8 @@ $this->load->view(
 										<a class="ms-2" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xml=Antrag' . $antrag->typ . '.xml.php&xsl=Antrag' . $antrag->typ . '&id=' . $antrag->studierendenantrag_id . '&uid=' . getAuthUID()); ?>"><i class="fa-solid fa-download" title="<?= $this->p->t('studierendenantrag', 'btn_download_antrag'); ?>"></i></a>
 									<?php } ?>
 									<?php if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG && $antrag->status == Studierendenantragstatus_model::STATUS_APPROVED) { ?>
-										<a class="ms-2" href="#modalgrund<?= $antrag->studierendenantrag_id; ?>" data-bs-toggle="modal"><?= $this->p->t('studierendenantrag', 'btn_show_lvs'); ?></a>
-										<lv-popup id="modalgrund<?= $antrag->studierendenantrag_id; ?>" antrag-id = "<?= $antrag->studierendenantrag_id; ?>">
+										<a class="ms-2" href="#modallv<?= $antrag->studierendenantrag_id; ?>" data-bs-toggle="modal"><?= $this->p->t('studierendenantrag', 'btn_show_lvs'); ?></a>
+										<lv-popup id="modallv<?= $antrag->studierendenantrag_id; ?>" antrag-id = "<?= $antrag->studierendenantrag_id; ?>">
 											<?= $this->p->t('studierendenantrag', 'my_lvs'); ?>
 										</lv-popup>
 									<?php } ?>
