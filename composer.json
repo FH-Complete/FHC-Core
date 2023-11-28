@@ -428,7 +428,7 @@
 		"olifolkerd/tabulator4": "4.9.*",
 		"olifolkerd/tabulator5": "5.5.*",
 
-		"phpseclib/phpseclib": "2.0.*",
+		"phpseclib/phpseclib": "3.0.*",
 
 		"rmariuzzo/jquery-checkboxes": "1.0.7",
 
