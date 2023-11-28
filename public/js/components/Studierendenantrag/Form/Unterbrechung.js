@@ -292,7 +292,7 @@ export default {
 				</div>
 				<div v-if="data.studierendenantrag_id" class="mb-3">
 					<h5>{{$p.t('studierendenantrag', 'antrag_grund')}}:</h5>
-					<pre>{{data.grund}}</pre>
+					<textarea class="form-control" rows="5" readonly>{{data.grund}}</textarea>
 				</div>
 				<div v-else class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>

@@ -366,7 +366,7 @@ export default {
 		<div ref="table"></div>
 		<bs-modal ref="modalGrund" id="modal-grund" class="fade">
 			<template #title>{{$p.t('studierendenantrag', 'antrag_grund')}}</template>
-			<textarea ref="modalGrundPre" style="width: 100%; height: 250px;" readonly></textarea>
+			<textarea class="form-control" ref="modalGrundPre" style="width: 100%; height: 250px;" readonly></textarea>
 		</bs-modal>
 		<bs-modal ref="history" class="fade">
 			<template #title>{{$p.t('studierendenantrag', 'title_history', {id: lastHistoryClickedId})}}</template>

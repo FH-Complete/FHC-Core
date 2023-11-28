@@ -82,7 +82,7 @@ $this->load->view(
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body">
-													<pre><?= $antrag->grund; ?></pre>
+													<textarea class="form-control" style="width: 100%; height: 250px;" readonly><?= $antrag->grund; ?></textarea>
 												</div>
 											</div>
 										</div>
