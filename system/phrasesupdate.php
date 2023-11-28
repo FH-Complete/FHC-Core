@@ -13639,6 +13639,26 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragNichtFuerVerganganeSS',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Der Antrag kann nicht für vergangene Semester gestellt werden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "You can not apply for the past study semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'neu',
 		'insertvon' => 'system',
