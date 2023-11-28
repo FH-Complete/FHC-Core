@@ -45,7 +45,8 @@ export const CoreFilterCmpt = {
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
-		tableOnly: Boolean
+		tableOnly: Boolean,
+		noColFilter:Boolean,
 	},
 	data: function() {
 		return {
@@ -586,10 +587,10 @@ export const CoreFilterCmpt = {
 			<div class="filter-header-title">
 				<span v-if="!tableOnly" class="filter-header-title-span-filter">[ {{ filterName }} ]</span>
 				<span v-if="!tableOnly" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra" class="filter-header-title-span-icon fa-solid fa-filter fa-xl"></span>
-				<span data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
+				<span v-if="!noColFilter" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra" class="filter-header-title-span-icon fa-solid fa-table-columns fa-xl"></span>
 			</div>
 
-			<div :id="'collapseColumns' + idExtra" class="card-body collapse" :data-bs-parent="'#filterCollapsables' + idExtra">
+			<div v-if="!noColFilter" :id="'collapseColumns' + idExtra" class="card-body collapse" :data-bs-parent="'#filterCollapsables' + idExtra">
 				<div class="card">
 					<!-- Filter fields options -->
 					<div class="row card-body filter-options-div">
