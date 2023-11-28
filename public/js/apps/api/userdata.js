@@ -27,5 +27,26 @@ export default {
         return axios.get(url);
     },
     
+    indexProfilInformaion: function() {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   "/Cis/Profil/indexProfilInformaion";
+        
+        return axios.get(url);
+    },
+    mitarbeiterProfil: function() {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   "/Cis/Profil/mitarbeiterProfil";
+        
+        return axios.get(url);
+    },
+    studentProfil: function() {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   "/Cis/Profil/studentProfil";
+        
+        return axios.get(url);
+    },
+
+
+    
  
 };
