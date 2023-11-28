@@ -19,6 +19,10 @@ class Profil extends Auth_Controller
 			'isMitarbeiterOrStudent' => ['student/anrechnung_beantragen:r','user:r'],
 			'getMitarbeiterAnsicht' => ['student/anrechnung_beantragen:r','user:r'],
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r','user:r'],
+			'indexProfilInformaion' => ['student/anrechnung_beantragen:r','user:r'],
+			'mitarbeiterProfil' => ['student/anrechnung_beantragen:r','user:r'],
+			'studentProfil' => ['student/anrechnung_beantragen:r','user:r'],
+			
 			
 			
 			
@@ -29,8 +33,11 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 		$this->load->model('ressource/Betriebsmittelperson_model', 'BetriebsmittelpersonModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		
 		
 	}
@@ -51,9 +58,222 @@ class Profil extends Auth_Controller
 	}
 
 
+	public function studentProfil(){
+
+		if(
+		isSuccess($this->BenutzergruppeModel->addSelect(['bezeichnung']))
+		&& isSuccess($this->BenutzergruppeModel->addJoin('tbl_gruppe', 'gruppe_kurzbz' ))
+		){
+			$zutrittsgruppe_res = $this->BenutzergruppeModel->loadWhere(array("uid"=>getAuthUID(), "zutrittssystem"=>true));
+			if(isError($zutrittsgruppe_res)){
+				// catch error
+			}
+			$zutrittsgruppe_res = hasData($zutrittsgruppe_res) ? getData($zutrittsgruppe_res) : null;
+			
+		}
+		
+
+
+		//? personenkennzeichen ist die Spalte Matrikelnr in der Tabelle Student
+		if(isSuccess($this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang','tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe' ,'tbl_student.matrikelnr as personenkennzeichen']))
+		 && isSuccess($this->StudentModel->addJoin('tbl_studiengang', "tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz")))
+		{
+			$student_res = $this->StudentModel->load([getAuthUID()]);
+			if(isError($student_res)){
+				// catch error
+			}
+			$student_res = hasData($student_res)?getData($student_res)[0]:null;
+		
+		}
+		
+
+		
+		//? Matrikelnummer ist die Spalte matr_nr in Person
+		if(isSuccess($this->StudentModel->addSelect(["matr_nr"]))){
+			$person_res = $this->PersonModel->load(getAuthPersonID());
+			if(isError($person_res)){
+				// catch error
+			}else{
+				$person_res = hasData($person_res)? getData($person_res)[0] : [];
+				
+			}
+		}
+
+		$res = new stdClass();
+		$res->matrikelnummer = $person_res->matr_nr;
+		foreach($student_res as $key => $value){
+			$res->$key = $value;
+		}
+		$res->zuttritsgruppen = $zutrittsgruppe_res;
+		
+		echo json_encode($res);
+		
+		 
+
+	}
+
+	public function mitarbeiterProfil(){
+	//? informationen die nur für den Mitarbeiter verfügbar sind
+
+
+	if(
+		//! Summe der Wochenstunden wird jetzt in der hr/tbl_dienstverhaeltnis gespeichert
+	isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as Bezeichnung","tbl_organisationseinheit.bezeichnung as Organisationseinheit","datum_von as Gültig_von","datum_bis as Gültig_bis","wochenstunden as Wochenstunden"]))&&
+		isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit","oe_kurzbz"))
+	){
+		$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid'=>getAuthUID()));
+		if(isError($benutzer_funktion_res)){
+			// error handling
+		}else{
+			$benutzer_funktion_res = hasData($benutzer_funktion_res)? getData($benutzer_funktion_res) : null;
+		}
+	}
+
+
+
+	if(isSuccess($this->MitarbeiterModel->addSelect(["kurzbz","telefonklappe", "alias"]))
+		&& isSuccess($this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid"))
+	){
+		$mitarbeiter_res = $this->MitarbeiterModel->load(getAuthUID());
+			if(isError($mitarbeiter_res)){
+				// error handling
+			}else{
+				$mitarbeiter_res = hasData($mitarbeiter_res)? getData($mitarbeiter_res)[0] : null;
+			}
+		}
 	
+		$res = new stdClass();
+		foreach($mitarbeiter_res as $key => $value){
+			$res->$key = $value;
+		}
+		$intern_email = array();
+		$intern_email+=array("type" => "intern");
+		$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
+		$extern_email=array();
+		$extern_email+=array("type" => "alias");
+		$extern_email+=array("email" => $mitarbeiter_res->alias . "@" . DOMAIN);
+		$res->emails = array($intern_email,$extern_email);
+		
+		$res->funktionen = $benutzer_funktion_res;
+		echo json_encode($res);
+	}
+
+	public function indexProfilInformaion(){
+		//? funktion returns all data needed for the student and the mitarbeiter profil view
+
+
+
+		if(
+			isSuccess($this->PersonModel->addSelect('gruppe_kurzbz, beschreibung'))&&
+			isSuccess($this->PersonModel->addJoin('tbl_benutzer', 'person_id')) && 
+		isSuccess($this->PersonModel->addJoin('tbl_benutzergruppe', 'uid')) &&
+		isSuccess($this->PersonModel->addJoin('tbl_gruppe', 'gruppe_kurzbz'))){
+
+			$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid'=>getAuthUID()));
+			if( isError($mailverteiler_res)){
+				// catch error
+			}
+			$mailverteiler_res = hasData($mailverteiler_res)? getData($mailverteiler_res) : null;
+			
+			$mailverteiler_res = array_map(function($element) { $element->mailto="mailto:".$element->gruppe_kurzbz."@".DOMAIN; return $element;},$mailverteiler_res);
+		}
+
+		
+
+		if(
+			isSuccess($this->BetriebsmittelpersonModel->addSelect(["CONCAT(betriebsmitteltyp, ' ' ,beschreibung) as Betriebsmittel","nummer as Nummer","ausgegebenam as Ausgegeben_am"]))
+			
+		){
+			$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
+			if(isError($betriebsmittelperson_res)){
+				   // error handling
+			   }else{
+				   $betriebsmittelperson_res = hasData($betriebsmittelperson_res)? getData($betriebsmittelperson_res) : null;
+			   }
+		   }
+
+
+		if(isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
+		isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
+		isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT'))&&
+		isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
+		){
+			$kontakte_res = $this->KontaktModel->loadWhere(array('person_id' => getAuthPersonID()));
+			if(isError($kontakte_res)){
+				// handle error	
+			}else{
+				$kontakte_res = hasData($kontakte_res)? getData($kontakte_res) : null;
+			}
+			
+		}
+		
+		$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid(getAuthUID(),"Zutrittskarte");
+		if(isError($zutrittskarte_ausgegebenam)){
+			// error handling
+		}else{
+			$zutrittskarte_ausgegebenam = hasData($zutrittskarte_ausgegebenam)? getData($zutrittskarte_ausgegebenam)[0]->ausgegebenam : null;
+			//? formats the date from 01-01-2000 to 01.01.2000
+			$zutrittskarte_ausgegebenam = str_replace("-",".",$zutrittskarte_ausgegebenam);
+		}
+
+		if(
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(array("strasse","tbl_adressentyp.bezeichnung as adr_typ","plz","ort")))&&
+			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse","DESC"))&&
+			isSuccess($adresse_res = $this->AdresseModel->addOrder("sort"))&&
+			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp","typ=adressentyp_kurzbz"))
+		){
+			$adresse_res = $this->AdresseModel->loadWhere(array("person_id"=>getAuthPersonID()));
+			if(isError($adresse_res)){
+				// error handling
+			}else{									
+				$adresse_res = hasData($adresse_res)? getData($adresse_res) : null;
+			}
+		}
+		
+		if(isSuccess($this->PersonModel->addSelect(["foto","foto_sperre","anrede","titelpost","titelpre","vorname","nachname", "gebort", "gebdatum"]))){
+
+			$person_res = $this->PersonModel->load(getAuthPersonId());
+			if(isError($person_res)){
+				// error handling
+			}else{
+				$person_res = hasData($person_res)? getData($person_res)[0] : null;
+			}
+		}
+		
+
+				
+		$res = new stdClass();
+		$res->foto = $person_res->foto;
+		$res->foto_sperre = $person_res->foto_sperre;
+		$res->username = getAuthUID();
+		
+		$res->anrede = $person_res->anrede;
+		$res->titel = $person_res->titelpre ." " . $person_res->titelpost;
+		$res->vorname = $person_res->vorname;
+		$res->nachname = $person_res->nachname;
+		$res->gebort = $person_res->gebort;
+		$res->gebdatum = $person_res->gebdatum;
+		$res->adressen = $adresse_res;
+		$res->zutrittsdatum = $zutrittskarte_ausgegebenam;
+		//$res->postnomen = $person_res->postnomen; //! still not found
+		$intern_email = array();
+		$intern_email+=array("type" => "intern");
+		$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
+		$res->emails = array($intern_email);
+
+		$res->kontakte = $kontakte_res;
+		$res->mittel = $betriebsmittelperson_res;
+		$res->mailverteiler = $mailverteiler_res;
+		 
+
+
+		echo json_encode($res);
+
+	}
 
 	public function getMitarbeiterAnsicht(){
+
+		
 
 		if(
 			isSuccess($this->PersonModel->addSelect('gruppe_kurzbz, beschreibung'))&&
@@ -158,15 +378,6 @@ class Profil extends Auth_Controller
 			$mitarbeiter_res = hasData($mitarbeiter_res)? getData($mitarbeiter_res)[0] : null;
 		}
 
-		// collection for the first collumn
-		$first_column = new stdClass();
-		$first_column->username = getAuthUID();
-		$first_column->anrede = $person_res->anrede;
-		$first_column->titelpre = $person_res->titelpre;
-		$first_column->titelpost = $person_res->titelpost;
-		$first_column->vorname = $person_res->vorname;
-		$first_column->nachname = $person_res->nachname;
-		
 		
 		$res = new stdClass();
 		$res->username = getAuthUID();
@@ -208,7 +419,7 @@ class Profil extends Auth_Controller
 		$res->kontakte = $kontakte_res;
 		//? Mailverteiler Info
 		$res->mailverteiler = $mailverteiler_res;
-		
+		 
 		echo json_encode($res);
 		
 	}
