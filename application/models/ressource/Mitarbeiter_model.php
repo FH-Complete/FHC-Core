@@ -144,10 +144,15 @@ class Mitarbeiter_model extends DB_Model
 	 * Checks if alias exists
 	 * @param $kurzbz
 	 */
-	public function kurzbzExists($kurzbz)
+	public function kurzbzExists($kurzbz, $uid=null)
 	{
 		$this->addSelect('1');
-		$result = $this->loadWhere(array('kurzbz' => $kurzbz));
+		$where = array('kurzbz' => $kurzbz);
+		if ($uid != null)
+		{
+			$where['mitarbeiter_uid<>'] = $uid;
+		}
+		$result = $this->loadWhere($where);
 
 		if (isSuccess($result))
 		{
