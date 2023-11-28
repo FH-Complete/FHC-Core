@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import {CoreRESTClient} from "../../../../../RESTClient";
-import PvToast from "../../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";
+import BsModal from "../../../../Bootstrap/Modal.js";
+/*import PvToast from "../../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";*/
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 
 var editIcon = function(cell, formatterParams){ //plain text value
@@ -14,7 +15,7 @@ export default{
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,
-		PvToast
+		BsModal
 	},
 	props: {
 		uid: String
@@ -79,25 +80,22 @@ export default{
 	},
 	methods:{
 		actionNewContact(){
-			console.log("Neuen Kontakt anlegen");
-			bootstrap.Modal.getOrCreateInstance(this.$refs.newContactModal).show();
+			this.$refs.newContactModal.show();
+/*			bootstrap.Modal.getOrCreateInstance(this.$refs.newContactModal).show();*/
 		},
 		actionEditContact(contact_id){
-			console.log("Edit Contact mit contact_id " + contact_id);
 			this.loadContact(contact_id);
-			bootstrap.Modal.getOrCreateInstance(this.$refs.editContactModal).show();
+			this.$refs.editContactModal.show();
 
 		},
 		actionDeleteContact(contact_id){
-			console.log("Delete Contact " + contact_id);
 			this.loadContact(contact_id);
-			bootstrap.Modal.getOrCreateInstance(this.$refs.deleteContactModal).show();
+			this.$refs.deleteContactModal.show();
 		},
 		addNewContact(formData) {
 			CoreRESTClient.post('components/stv/Kontakt/addNewContact/' + this.uid,
 				this.contactData
 			).then(response => {
-				console.log(response);
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.hideModal("newContactModal");
@@ -106,7 +104,7 @@ export default{
 					const errorData = response.data.retval;
 					Object.entries(errorData).forEach(entry => {
 						const [key, value] = entry;
-						console.log(key, value);
+						//console.log(key, value);
 						this.$fhcAlert.alertError(value);
 					});
 				}
@@ -141,11 +139,10 @@ export default{
 		deleteContact(kontakt_id){
 			CoreRESTClient.post('components/stv/Kontakt/deleteContact/' + kontakt_id)
 				.then(response => {
-					console.log(response);
 					if (!response.data.error) {
 						this.statusCode = 0;
 						this.statusMsg = 'success';
-						console.log('Löschen erfolgreich: ' + this.statusMsg);
+						//console.log('Löschen erfolgreich: ' + this.statusMsg);
 						this.$fhcAlert.alertSuccess('Löschen erfolgreich');
 					} else {
 						this.statusCode = 0;
@@ -200,7 +197,7 @@ export default{
 			});
 		},
 		hideModal(modalRef){
-			bootstrap.Modal.getOrCreateInstance(this.$refs[modalRef]).hide();
+			this.$refs[modalRef].hide();
 		},
 		reload(){
 			this.$refs.table.reloadTable();
@@ -231,40 +228,35 @@ export default{
 		<div class="stv-list h-100 pt-3">
 		
 		<!--Modal: new Contact-->
-			<div ref="newContactModal" class="modal fade" id="newAContactModal" tabindex="-1" aria-labelledby="newAContactModalLabel" aria-hidden="true">
-			  <div class="modal-dialog">
-				<div class="modal-content">
-				  <div class="modal-header">
-					<h5 class="modal-title" id="newContactModalLabel">Details</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				  </div>
-				  <div class="modal-body">
-					<form  ref="contactData">						
+		<BsModal ref="newContactModal">
+			<template #title>Kontakt anlegen</template>
+				<form class="row g-3" ref="contactData">
+				
 						<div class="row mb-3">
 							<label for="kontakttyp" class="form-label col-sm-4">Typ</label>
-							<div class="col-sm-5">
+							<div class="col-sm-6">
 								<select id="kontakttyp" class="form-control" v-model="contactData.kontakttyp">
-									<option value="">-- keine Auswahl --</option>
+									<option value="">keine Auswahl</option>
 									<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.kontakttyp}}</option>
 								</select>
 							</div>
 						</div>
 						<div class="row mb-3">											   
 							<label for="kontakt" class="form-label col-sm-4">Kontakt</label>
-							<div class="col-sm-3">
-								<input type="text" :readonly="readonly" class="form-control-sm" id="kontakt" v-model="contactData['kontakt']">
+							<div class="col-sm-6">
+								<input type="text" :readonly="readonly" class="form-control" id="kontakt" v-model="contactData['kontakt']">
 							</div>
 						</div>	
 						<div class="row mb-3">											   
 							<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
-							<div class="col-sm-3">
-								<input type="text" :readonly="readonly" class="form-control-sm" id="anmerkung" v-model="contactData['anmerkung']">
+							<div class="col-sm-6">
+								<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
 							</div>
 						</div>	
 						
 						<div class="row mb-3">
 							<label for="zustellung" class="form-label col-sm-4">Zustellung</label>
-							<div class="col-sm-3">
+							<div class="col-sm-6">
 								<div class="form-check">	
 									<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
 								</div>
@@ -273,98 +265,84 @@ export default{
 							
 						<div class="row mb-3">
 							<label for="firma_name" class="form-label col-sm-4">Firma / Standort</label>
-								<div class="col-sm-3">
+								<div class="col-sm-6">
 									<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" minLength="3"/>
 								</div>	
-						</div>		
-																						   
-					</form>  
-								
-				  </div>
-				  <div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+						</div>	
+				</form>
+			    <template #footer>
+            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
 					<button type="button" class="btn btn-primary" @click="addNewContact()">OK</button>
-				  </div>
-				</div>
-			  </div>
-			</div>
+            	</template>
+		</BsModal>
 				
-			<!--Modal: Edit Contact-->
-			<div ref="editContactModal" class="modal fade" id="editContactModal" tabindex="-1" aria-labelledby="editContactModalLabel" aria-hidden="true">
-			  <div class="modal-dialog">
-				<div class="modal-content">
-				  <div class="modal-header">
-					<h5 class="modal-title" id="editContactModalLabel">Kontakt bearbeiten</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="resetModal"></button>
-				  </div>
-				  <div class="modal-body">
-						<form ref="contactData">
-													
-							<div class="row mb-3">
-								<label for="kontakttyp" class="form-label col-sm-4">Typ</label>
-								<div class="col-sm-5">
-									<select id="kontakttyp" class="form-control" v-model="contactData.kontakttyp">
-										<option value="">-- keine Auswahl --</option>
-										<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.kontakttyp}}</option>
-									</select>
-								</div>
-							</div>
-							<div class="row mb-3">											   
-								<label for="kontakt" class="form-label col-sm-4">Kontakt</label>
-								<div class="col-sm-3">
-									<input type="text" :readonly="readonly" class="form-control-sm" id="kontakt" v-model="contactData['kontakt']">
-								</div>
-							</div>	
-							<div class="row mb-3">											   
-								<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
-								<div class="col-sm-3">
-									<input type="text" :readonly="readonly" class="form-control-sm" id="anmerkung" v-model="contactData['anmerkung']">
-								</div>
-							</div>	
-							
-							<div class="row mb-3">
-								<label for="zustellung" class="form-label col-sm-4">Zustellung</label>
-								<div class="col-sm-3">
-									<div class="form-check">	
-										<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
-									</div>
-								</div>
-							</div>	
-							
-							<div class="row mb-3">					
-								<input type="hidden" :readonly="readonly" class="form-control-sm" id="standort_id" v-model="contactData.standort_id">
-							</div>
-							
-<!--							<div class="row mb-3">											   
-								<label for="name" class="form-label col-sm-4">Firma/Standort</label>
-								<div class="col-sm-2">
-									<input type="text" :readonly="readonly" class="form-control-sm" id="name" v-model="addressData['name']">
-								</div>
-							</div>	-->
-							
-							<div class="row mb-3">
-								<label for="standort" class="form-label col-sm-4">Firma / Standort</label>
-									<div v-if="contactData.kurzbz" class="col-sm-3">
-										<input type="text" :readonly="readonly" class="form-control-sm" id="name" v-model="contactData.kurzbz">
-									</div>					
-									<div v-else class="col-sm-3">
-										<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" minLength="3"/>
-									</div>	
-							</div>																					   
-					</form>  
-								
-				  </div>
-				  <div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
-					<button ref="Close" type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
-	
-				  </div>
+					
+		<!--Modal: Edit Contact-->
+		<BsModal ref="editContactModal">
+			<template #title>Kontakt bearbeiten</template>
+			<form class="row g-3" ref="contactData">	
+				<div class="row mb-3">
+					<label for="kontakttyp" class="form-label col-sm-4">Typ</label>
+					<div class="col-sm-6">
+						<select id="kontakttyp" class="form-control" v-model="contactData.kontakttyp">
+							<option value="">-- keine Auswahl --</option>
+							<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.kontakttyp}}</option>
+						</select>
+					</div>
 				</div>
-			  </div>
-			</div>
+				<div class="row mb-3">											   
+					<label for="kontakt" class="form-label col-sm-4">Kontakt</label>
+					<div class="col-sm-6">
+						<input type="text" :readonly="readonly" class="form-control" id="kontakt" v-model="contactData['kontakt']">
+					</div>
+				</div>	
+				<div class="row mb-3">											   
+					<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+					<div class="col-sm-6">
+						<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
+					</div>
+				</div>		
+				<div class="row mb-3">
+					<label for="zustellung" class="form-label col-sm-4">Zustellung</label>
+					<div class="col-sm-6">
+						<div class="form-check">	
+							<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
+						</div>
+					</div>
+				</div>	
+				<div class="row mb-3">					
+					<input type="hidden" :readonly="readonly" class="form-control" id="standort_id" v-model="contactData.standort_id">
+				</div>
 				
-			<!--		Modal: Delete Contact-->
-			<div ref="deleteContactModal" class="modal fade" id="deleteContactModal" tabindex="-1" aria-labelledby="deleteContactModalLabel" aria-hidden="true">
+				<div class="row mb-3">
+					<label for="standort" class="form-label col-sm-4">Firma / Standort</label>
+						<div v-if="contactData.kurzbz" class="col-sm-3">
+							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="contactData.kurzbz">
+						</div>					
+						<div v-else class="col-sm-3">
+							<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" minLength="3"/>
+						</div>	
+				</div>	
+			</form>
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
+			</template>
+		</BsModal>
+									
+		<!--		Modal: Delete Contact TODO(manu) Formatierung-->
+		<BsModal ref="deleteContactModal" >
+			<template #title>Kontakt löschen</template>  
+			<template #default>
+				<p>Kontakt wirklich löschen?</p>	
+			</template>												
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button ref="Close" type="button" class="btn btn-primary" @click="deleteContact(contactData.kontakt_id)">OK</button>
+			</template> 
+		</BsModal>
+		
+<!--		<div ref="deleteContactModal" class="modal fade" id="deleteContactModal" tabindex="-1" aria-labelledby="deleteContactModalLabel" aria-hidden="true">
 			  <div class="modal-dialog">
 				<div class="modal-content">
 				  <div class="modal-header">
@@ -380,7 +358,7 @@ export default{
 				  </div>
 				</div>
 			  </div>
-			</div>
+			</div>-->
 				
 			<core-filter-cmpt
 				ref="table"
