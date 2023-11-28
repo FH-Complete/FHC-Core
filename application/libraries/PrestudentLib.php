@@ -35,10 +35,12 @@ class PrestudentLib
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
 
-	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null)
+	public function setAbbrecher($prestudent_id, $studiensemester_kurzbz, $insertvon = null, $statusgrund_kurzbz = null, $datum = null, $bestaetigtam = null, $bestaetigtvon = null)
 	{
 		if (!$insertvon)
 			$insertvon = getAuthUID();
+		if (!$bestaetigtvon)
+			$bestaetigtvon = $insertvon;
 
 		$result = $this->_ci->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz);
 		if (isError($result))
@@ -79,7 +81,7 @@ class PrestudentLib
 			'insertamum' => date('c'),
 			'orgform_kurzbz'=> $prestudent_status->orgform_kurzbz,
 			'studienplan_id'=> $prestudent_status->studienplan_id,
-			'bestaetigtvon' => $insertvon,
+			'bestaetigtvon' => $bestaetigtvon,
 			'bestaetigtam' => $bestaetigtam
 		]);
 

@@ -854,14 +854,18 @@ class AntragLib
 			$prestudent_status = current($res);
 			$email = $prestudent_status->email;
 			// NOTE(chris): Sancho mail
+			$lvzuweisungLink = site_url('lehre/Antrag/Wiederholung/assistenz/' . $antrag_id);
+			if( defined('VILESCI_ROOT') )
+			{
+				$lvzuweisungLink = VILESCI_ROOT . 'index.ci.php/lehre/Antrag/Wiederholung/assistenz/' . $antrag_id;
+			}
 			sendSanchoMail(
 				'Sancho_Mail_Antrag_W_New',
 				[
 					'antrag_id' => $antrag_id,
 					'stg' => $prestudent_status->stg_bezeichnung,
 					'Orgform' => $prestudent_status->orgform,
-					'lvzuweisungLink' => site_url('lehre/Antrag/Wiederholung/assistenz/' . $antrag_id),
-					'lvzuweisungLinkCIS' => CIS_ROOT . 'index.ci.php/lehre/Antrag/Wiederholung/assistenz/' . $antrag_id
+					'lvzuweisungLink' => $lvzuweisungLink 
 				],
 				$email,
 				$this->_ci->p->t('studierendenantrag', 'mail_subject_W_New')

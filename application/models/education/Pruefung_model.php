@@ -222,9 +222,9 @@ class Pruefung_model extends DB_Model
 		$this->withDetailsForStudierendenAntrag();
 
 		if ($maxDate)
-			$this->db->where("p.datum < ", $maxDate->format('c'));
+			$this->db->where("p.datum <= ", $maxDate->format('Y-m-d'));
 		if ($minDate)
-			$this->db->where("p.datum > ", $minDate->format('c'));
+			$this->db->where("p.datum > ", $minDate->format('Y-m-d'));
 
 		$this->db->where("b.aktiv", true);
 
