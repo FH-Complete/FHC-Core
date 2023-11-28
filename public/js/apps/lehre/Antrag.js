@@ -2,6 +2,7 @@ import StudierendenantragAntrag from "../../components/Studierendenantrag/Antrag
 import StudierendenantragStatus from "../../components/Studierendenantrag/Status.js";
 import StudierendenantragInfoblock from "../../components/Studierendenantrag/Infoblock.js";
 import VueDatePicker from "../../components/vueDatepicker.js.php";
+import Phrasen from '../../plugin/Phrasen.js';
 
 const app = Vue.createApp({
 	components: {
@@ -12,10 +13,14 @@ const app = Vue.createApp({
 	},
 	data() {
 		return {
-			statusMsg: "",
-			statusSeverity: "",
+			status: {
+				msg: '',
+				severity: ''
+			},
 			infoArray: []
 		};
 	}
 });
-app.mount('#wrapper');
+app
+	.use(Phrasen)
+	.mount('#wrapper');
