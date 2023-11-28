@@ -99,7 +99,7 @@ export default {
 				page: true, //persist page
 				columns: ["width", "visible"], //persist columns
 			},
-			persistenceID: 'studierendenantrag_leitung',
+			persistenceID: 'studierendenantrag_leitung_2023-11-14',
 			columns: [{
 				formatter: 'rowSelection',
 				titleFormatter: 'rowSelection',
@@ -366,7 +366,7 @@ export default {
 		<div ref="table"></div>
 		<bs-modal ref="modalGrund" id="modal-grund" class="fade">
 			<template #title>{{$p.t('studierendenantrag', 'antrag_grund')}}</template>
-			<pre ref="modalGrundPre"></pre>
+			<textarea ref="modalGrundPre" style="width: 100%; height: 250px;" readonly></textarea>
 		</bs-modal>
 		<bs-modal ref="history" class="fade">
 			<template #title>{{$p.t('studierendenantrag', 'title_history', {id: lastHistoryClickedId})}}</template>

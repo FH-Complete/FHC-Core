@@ -26,7 +26,7 @@ export default {
 	},
 	computed: {
 		statusSeverity() {
-			switch (this.data.status)
+			switch (this.data?.status)
 			{
 				case 'Erstellt': return 'info';
 				case 'Genehmigt': return 'success';
@@ -169,7 +169,7 @@ export default {
 				<div v-if="data.grund" class="mb-3">
 					<h5>{{$p.t('studierendenantrag', 'antrag_grund')}}:</h5>
 				
-					<pre class="text-prewrap">{{data.grund}}</pre>
+					<pre class="text-prewrap">{{data?.grund}}</pre>
 				</div>      
 				<div v-else class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>
@@ -189,6 +189,8 @@ export default {
 							</option>
 							<option value="textLong_plageat">{{$p.t('studierendenantrag', 'dropdown_plageat')}}
 							</option>					
+							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
+							</option>						
 						</select>	
 					</div>			
 					<textarea
@@ -207,7 +209,7 @@ export default {
 				
 				<div class="col-12 text-end">
 					<button
-						v-if="!data.studierendenantrag_id"
+						v-if="!data?.studierendenantrag_id"
 						type="button"
 						class="btn btn-primary"
 						data-bs-toggle="modal"
