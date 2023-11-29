@@ -3,7 +3,6 @@ import BsModal from '../../../Bootstrap/Modal.js';
 import FhcForm from '../../../Form/Form.js';
 import FormValidation from '../../../Form/Validation.js';
 import FormInput from '../../../Form/Input.js';
-import { useForm } from '../../../../composables/Form.js';
 import accessibility from '../../../../directives/accessibility.js';
 
 var _uuid = 0;
