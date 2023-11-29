@@ -15,7 +15,9 @@ export default {
 		clearValidation() {
 			this.feedback = FEEDBACK_DEFAULT;
 		},
-		setFeedback(feedback, valid) {
+		setFeedback(valid, feedback) {
+			if (!feedback)
+				feedback = [];
 			if (!Array.isArray(feedback))
 				feedback = [feedback];
 			this.feedback[valid ? 'success' : 'danger'] = feedback;

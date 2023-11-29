@@ -37,7 +37,7 @@ export default {
 	methods: {
 		_sendFeedbackToInput(inputs, feedback, valid) {
 			if (inputs.length) {
-				inputs.forEach(input => input.setFeedback(feedback, valid));
+				inputs.forEach(input => input.setFeedback(valid, feedback));
 				return false;
 			}
 			if (this.$fhcAlert) {
@@ -46,7 +46,7 @@ export default {
 			}
 			return true;
 		},
-		setFeedback(feedback, valid) {
+		setFeedback(valid, feedback) {
 			if (Array.isArray(feedback)) {
 				let remaining = feedback.filter(fb => 
 					this._sendFeedbackToInput(
@@ -91,7 +91,7 @@ export default {
 						const data = result.data.retval;
 						// TODO(chris): check for something better/add new standardized return value
 						if (result.data.code == 1)
-							this.setFeedback(data, true);
+							this.setFeedback(true, data);
 						return resolve(data);
 					}
 					// TODO(chris): IMPLEMENT! Wrong result object
@@ -103,8 +103,8 @@ export default {
 							return reject(result);
 						this.clearValidation();
 						const remaining = this.setFeedback(
-							result.response.data.retval,
-							false
+							false,
+							result.response.data.retval
 						);
 						if (remaining) {
 							result.response.data.retval = remaining;

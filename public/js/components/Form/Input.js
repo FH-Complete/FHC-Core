@@ -121,7 +121,9 @@ export default {
 			this.valid = undefined;
 			this.feedback = [];
 		},
-		setFeedback(feedback, valid) {
+		setFeedback(valid, feedback) {
+			if (!feedback)
+				feedback = [];
 			if (!Array.isArray(feedback))
 				feedback = [feedback];
 			this.valid = valid;
