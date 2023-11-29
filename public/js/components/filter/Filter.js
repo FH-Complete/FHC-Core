@@ -147,6 +147,14 @@ export const CoreFilterCmpt = {
 
 			return columns;
 		},
+		fieldIdsForVisibilty() {
+			if (!this.tableBuilt)
+				return [];
+			return this.tabulator.getColumns().filter(col => {
+				let def = col.getDefinition();
+				return !def.frozen && def.title;
+			}).map(col => col.getField());
+		},
 		fieldNames() {
 			if (!this.tableBuilt)
 				return {};
@@ -539,7 +547,7 @@ export const CoreFilterCmpt = {
 				:id="'collapseColumns' + idExtra"
 				class="card-body collapse"
 				:data-bs-parent="'#filterCollapsables' + idExtra"
-				:fields="fields"
+				:fields="fieldIdsForVisibilty"
 				:selected="selectedFields"
 				:names="fieldNames"
 				@hide="tabulator.hideColumn($event)"

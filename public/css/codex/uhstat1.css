@@ -1,0 +1,5 @@
+/* for removing horizontal scrollbar when form is embedded as i frame */
+#uhstat1Container {
+	overflow-x:hidden;
+	height: 100%;
+}

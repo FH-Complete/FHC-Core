@@ -78,7 +78,7 @@
 			}
 
 			// Tabulator 5 CSS
-			if ($tabulator5 === true) generateCSSsInclude('vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css');
+			if ($tabulator5 === true) generateCSSsInclude('public/css/Tabulator5.css');
 
 			// Tinymce 4 CSS
 			if ($tinymce4 === true) generateCSSsInclude('public/css/TinyMCE4.css');
@@ -118,6 +118,9 @@
 
 			// HTML Widget CSS
 			if ($widgets === true) generateCSSsInclude('public/css/Widgets.css');
+
+			// CIS
+			if ($cis === true) generateCSSsInclude('public/css/cis_bs5.css');
 
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS

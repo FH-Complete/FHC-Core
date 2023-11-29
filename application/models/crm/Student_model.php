@@ -82,4 +82,14 @@ class Student_model extends DB_Model
 
 		return $result;
 	}
+
+	/**
+	 * Get the FH-Email for a student (not the private kontakt emailt)
+	 * @param $student_uid
+	 * @return string
+	 */
+	public function getEmailFH($student_uid)
+	{
+		return $student_uid . '@' . DOMAIN;
+	}
 }

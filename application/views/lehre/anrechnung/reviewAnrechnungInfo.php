@@ -16,6 +16,22 @@
         </div>
     </div>
     <div class="panel panel-info">
+        <div class="panel-heading" role="tab" id="headingBegruendung">
+            <h4 class="panel-title">
+                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseBegruendung"
+                   aria-expanded="false" aria-controls="collapseBegruendung">
+                    <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
+					<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoEctsBerechnungTitle'); ?>
+                </a>
+            </h4>
+        </div>
+        <div id="collapseBegruendung" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingBegruendung">
+            <div class="panel-body">
+				<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoEctsBerechnungBody'); ?>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-info">
         <div class="panel-heading" role="tab" id="headingZero">
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero"
