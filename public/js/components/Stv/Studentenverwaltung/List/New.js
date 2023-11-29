@@ -1,7 +1,9 @@
 import {CoreRESTClient} from '../../../../RESTClient.js';
 import BsModal from '../../../Bootstrap/Modal.js';
-import FhcFormValidation from '../../../Form/Validation.js';
-import VueDatePicker from '../../../vueDatepicker.js.php';
+import FhcForm from '../../../Form/Form.js';
+import FormValidation from '../../../Form/Validation.js';
+import FormInput from '../../../Form/Input.js';
+import { useForm } from '../../../../composables/Form.js';
 import accessibility from '../../../../directives/accessibility.js';
 
 var _uuid = 0;
@@ -20,8 +22,9 @@ const FORMDATA_DEFAULT = {
 export default {
 	components: {
 		BsModal,
-		FhcFormValidation,
-		VueDatePicker
+		FhcForm,
+		FormValidation,
+		FormInput
 	},
 	directives: {
 		accessibility
@@ -95,9 +98,9 @@ export default {
 			this.formData = FORMDATA_DEFAULT;
 			this.person = null;
 			this.suggestions = [];
-			this.$fhcAlert.resetFormValidation(this.$refs.form)
+			this.$refs.form.clearValidation();
 		},
-		loadSuggestions() {
+		loadSuggestions() {console.log('loadSuggestions');
 			if (this.abortController.suggestions)
 				this.abortController.suggestions.abort();
 			if (this.person !== null)
@@ -129,21 +132,22 @@ export default {
 				return;
 
 			this.abortController.places = new AbortController();
-			CoreRESTClient
-				.get('components/stv/address/getPlaces/' + this.formData.address.plz, undefined, {
-					signal: this.abortController.places.signal
-				})
-				.then(result => CoreRESTClient.getData(result.data) || [])
+			this.$refs.form
+				.send(CoreRESTClient.get(
+					'components/stv/address/getPlaces/' + this.formData.address.plz,
+					undefined,
+					{
+						signal: this.abortController.places.signal
+					}
+				))
 				.then(result => {
-					this.places = result;
+					this.places = result
 				})
 				.catch(error => {
-					if (error.code == 'ERR_BAD_REQUEST') {
-						return this.$fhcAlert.handleFormValidation(error, this.$refs.form);
-					}
-					// NOTE(chris): repeat request
 					if (error.code != "ERR_CANCELED")
 						window.setTimeout(this.loadPlaces, 100);
+					else
+						console.error(error);
 				});
 		},
 		loadStudienplaene() {
@@ -180,26 +184,20 @@ export default {
 			if (this.person === null)
 				return this.person = 0;
 
-			this.$fhcAlert.resetFormValidation(this.$refs.form);
+			//this.$fhcAlert.resetFormValidation(this.$refs.form);
 			const data = {...this.formData, ...(this.person || {})};
 			if (data.studiengang_kz === undefined)
 				data.studiengang_kz = this.studiengangKz;
 			if (data.studiensemester_kurzbz === undefined)
 				data.studiensemester_kurzbz = this.studiensemesterKurzbz;
 
-			CoreRESTClient
-				.post('components/stv/student/add', data)
-				.then(result => result.data)
-				.then(result => {
-					if (CoreRESTClient.isError(result))
-						throw new Error(CoreRESTClient.getError(result));
-					return CoreRESTClient.getData(result);
-				})
+			this.$refs.form
+				.send(CoreRESTClient.post('components/stv/student/add', data))
 				.then(result => {
 					this.$fhcAlert.alertSuccess('Gespeichert');
 					this.$refs.modal.hide();
 				})
-				.catch(this.$fhcAlert.handleFormValidation(this.$refs.form));
+				.catch(console.error);
 		}
 	},
 	created() {
@@ -211,35 +209,59 @@ export default {
 				this.semester = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-
 	},
 	template: `
-	<form ref="form" class="stv-list-new" @submit.prevent="send">
+	<fhc-form ref="form" class="stv-list-new" @submit.prevent="send">
 		<bs-modal ref="modal" dialog-class="modal-lg modal-scrollable" @hidden-bs-modal="reset">
 			<template #title>
 				InteressentIn anlegen
 			</template>
 			<template #default>
-				<fhc-form-validation></fhc-form-validation>
+
+				<form-validation></form-validation>
+
 				<template v-if="person === null">
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-nachname-' + uuid">Nachname*</label>
-							<fhc-form-validation name="nachname">
-								<input :id="'stv-list-new-nachname-' + uuid" type="text" name="nachname" v-model="formDataPerson['nachname']" class="form-control" :disabled="person" @input="loadSuggestions">
-							</fhc-form-validation>
+							<form-input
+								label="Nachname*"
+								type="text"
+								id="stv-list-new-nachname"
+								name="nachname"
+								v-model="formDataPerson['nachname']"
+								:disabled="person"
+								@input="loadSuggestions"
+								>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-vorname-' + uuid">Vorname</label>
-							<fhc-form-validation name="vorname">
-								<input :id="'stv-list-new-vorname-' + uuid" type="text" name="vorname" v-model="formDataPerson['vorname']" class="form-control" :disabled="person" @input="loadSuggestions">
-							</fhc-form-validation>
+							<form-input
+								label="Vorname"
+								type="text"
+								:id="'stv-list-new-vorname-' + uuid"
+								name="vorname"
+								v-model="formDataPerson['vorname']"
+								:disabled="person"
+								@input="loadSuggestions"
+								>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'dp-input-stv-list-new-gebdatum-' + uuid">Geburtsdatum</label>
-							<fhc-form-validation name="gebdatum">
-								<vue-date-picker :uid="'stv-list-new-gebdatum-' + uuid" name="gebdatum" text-input auto-apply no-today v-model="formDataPerson['gebdatum']" :enable-time-picker="false" format="dd.MM.yyyy" @update:model-value="loadSuggestions" :disabled="person"></vue-date-picker>
-							</fhc-form-validation>
+							<form-input
+								label="Geburtsdatum"
+								type="datepicker"
+								uid="stv-list-new-gebdatum"
+								name="gebdatum"
+								v-model="formDataPerson['gebdatum']"
+								:disabled="person"
+								@update:model-value="loadSuggestions"
+								text-input
+								auto-apply
+								no-today 
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								>
+							</form-input>
 						</div>
 					</div>
 					<!-- TODO(chris): more details -->
@@ -262,78 +284,133 @@ export default {
 				<tempalte v-else>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-anrede-' + uuid">Anrede</label>
-							<fhc-form-validation name="anrede">
-								<input :id="'stv-list-new-anrede-' + uuid" type="text" name="anrede" v-model="formDataPerson['anrede']" class="form-control" :disabled="person">
-							</fhc-form-validation>
+							<form-input
+								label="Anrede"
+								type="text"
+								id="stv-list-new-anrede"
+								name="anrede"
+								v-model="formDataPerson['anrede']"
+								:disabled="person"
+								>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-titelpre-' + uuid">Titel (Pre)</label>
-							<fhc-form-validation name="titelpre">
-								<input :id="'stv-list-new-titelpre-' + uuid" type="text" name="titelpre" v-model="formDataPerson['titelpre']" class="form-control" :disabled="person">
-							</fhc-form-validation>
+							<form-input
+								label="Titel (Pre)"
+								type="text"
+								id="stv-list-new-titelpre"
+								name="titelpre"
+								v-model="formDataPerson['titelpre']"
+								:disabled="person"
+								>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-titelpost-' + uuid">Titel (Post)</label>
-							<fhc-form-validation name="titelpost">
-								<input :id="'stv-list-new-titelpost-' + uuid" type="text" name="titelpost" v-model="formDataPerson['titelpost']" class="form-control" :disabled="person">
-							</fhc-form-validation>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-nachname-' + uuid">Nachname*</label>
-							<fhc-form-validation name="nachname">
-								<input :id="'stv-list-new-nachname-' + uuid" type="text" name="nachname" v-model="formDataPerson['nachname']" class="form-control" :disabled="person" @input="loadSuggestions">
-							</fhc-form-validation>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-vorname-' + uuid">Vorname</label>
-							<fhc-form-validation name="vorname">
-								<input :id="'stv-list-new-vorname-' + uuid" type="text" name="vorname" v-model="formDataPerson['vorname']" class="form-control" :disabled="person" @input="loadSuggestions">
-							</fhc-form-validation>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-vornamen-' + uuid">Weitere Vornamen</label>
-							<fhc-form-validation name="vornamen">
-								<input :id="'stv-list-new-vornamen-' + uuid" type="text" name="vornamen" v-model="formDataPerson['vornamen']" class="form-control" :disabled="person">
-							</fhc-form-validation>
+							<form-input
+								label="Titel (Post)"
+								type="text"
+								id="stv-list-new-titelpost"
+								name="titelpost"
+								v-model="formDataPerson['titelpost']"
+								:disabled="person"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-wahlname-' + uuid">Wahlname</label>
-							<fhc-form-validation name="wahlname">
-								<input :id="'stv-list-new-wahlname-' + uuid" type="text" name="wahlname" v-model="formDataPerson['wahlname']" class="form-control" :disabled="person">
-							</fhc-form-validation>
+							<form-input
+								label="Nachname*"
+								type="text"
+								id="stv-list-new-nachname"
+								name="nachname"
+								v-model="formDataPerson['nachname']"
+								:disabled="person"
+								@input="loadSuggestions"
+								>
+							</form-input>
+						</div>
+						<div class="col-sm-4 mb-3">
+							<form-input
+								label="Vorname"
+								type="text"
+								id="stv-list-new-vorname"
+								name="vorname"
+								v-model="formDataPerson['vorname']"
+								:disabled="person"
+								@input="loadSuggestions"
+								>
+							</form-input>
+						</div>
+						<div class="col-sm-4 mb-3">
+							<form-input
+								label="Weitere Vornamen"
+								type="text"
+								id="stv-list-new-vornamen"
+								name="vornamen"
+								v-model="formDataPerson['vornamen']"
+								:disabled="person"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-geschlecht-' + uuid">Geschlecht*</label>
-							<fhc-form-validation name="geschlecht">
-								<select :id="'stv-list-new-geschlecht-' + uuid" class="form-control" class="form-select" :disabled="person" name="geschlecht" v-model="formDataPerson['geschlecht']">
-									<option v-for="geschlecht in lists.geschlechter" :key="geschlecht.geschlecht" :value="geschlecht.geschlecht">{{geschlecht.bezeichnung}}</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="Wahlname"
+								type="text"
+								id="stv-list-new-wahlname"
+								name="wahlname"
+								v-model="formDataPerson['wahlname']"
+								:disabled="person"
+								>
+							</form-input>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-4 mb-3">
+							<form-input
+								label="Geschlecht*"
+								type="select"
+								id="stv-list-new-geschlecht"
+								name="geschlecht"
+								v-model="formDataPerson['geschlecht']"
+								:disabled="person"
+								>
+								<option v-for="geschlecht in lists.geschlechter" :key="geschlecht.geschlecht" :value="geschlecht.geschlecht">{{geschlecht.bezeichnung}}</option>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'dp-input-stv-list-new-gebdatum-' + uuid">Geburtsdatum</label>
-							<fhc-form-validation name="gebdatum">
-								<vue-date-picker :uid="'stv-list-new-gebdatum-' + uuid" name="gebdatum" text-input auto-apply no-today v-model="formDataPerson['gebdatum']" :enable-time-picker="false" format="dd.MM.yyyy" @update:model-value="loadSuggestions" :disabled="person"></vue-date-picker>
-							</fhc-form-validation>
+							<form-input
+								label="Geburtsdatum"
+								type="datepicker"
+								uid="stv-list-new-gebdatum"
+								name="gebdatum"
+								v-model="formDataPerson['gebdatum']"
+								:disabled="person"
+								@update:model-value="loadSuggestions"
+								text-input
+								auto-apply
+								no-today
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								>
+							</form-input>
 						</div>
 					</div>
 					
 					<div v-if="person" class="row">
 						<div class="col-sm-6 mb-3">
-							<fhc-form-validation name="address[func]">
-								<select :id="'stv-list-new-address-func-' + uuid" name="address[func]" class="form-select" v-model="formData['address']['func']">
-									<option value="-1">Bestehende Adresse überschreiben</option>
-									<option value="1">Adresse hinzufügen</option>
-									<option value="0">Adresse nicht anlegen</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								type="select"
+								id="stv-list-new-address-func"
+								name="address[func]"
+								v-model="formData['address']['func']"
+								>
+								<option value="-1">Bestehende Adresse überschreiben</option>
+								<option value="1">Adresse hinzufügen</option>
+								<option value="0">Adresse nicht anlegen</option>
+							</form-input>
 						</div>
 					</div>
 					
@@ -341,167 +418,256 @@ export default {
 						<legend>Adresse</legend>
 						<div class="row">
 							<div class="col-sm-4 mb-3">
-								<label :for="'dp-input-stv-list-new-address-nation-' + uuid">Land</label>
-								<fhc-form-validation name="address.nation">
-									<select :id="'stv-list-new-address-nation' + uuid" name="address[nation]" class="form-select" v-model="formData['address']['nation']" @input="changeAddressNation">
-										<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.langtext}}</option>
-									</select>
-								</fhc-form-validation>
+								<form-input
+									label="Land"
+									type="select"
+									id="stv-list-new-address-nation"
+									name="address[nation]"
+									v-model="formData['address']['nation']"
+									@input="changeAddressNation"
+									>
+									<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.langtext}}</option>
+								</form-input>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-4 mb-3">
-								<label :for="'dp-input-stv-list-new-address-plz-' + uuid">PLZ</label>
-								<fhc-form-validation name="address[plz]">
-									<input type="text" :id="'stv-list-new-address-plz' + uuid" name="address[plz]" v-model="formData['address']['plz']" @input="loadPlaces">
-								</fhc-form-validation>
+								<form-input
+									label="PLZ"
+									type="text"
+									id="stv-list-new-address-plz"
+									name="address[plz]"
+									v-model="formData['address']['plz']"
+									@input="loadPlaces"
+									>
+								</form-input>
 							</div>
 							<div class="col-sm-4 mb-3">
-								<label :for="'dp-input-stv-list-new-address-gemeinde-' + uuid">Gemeinde</label>
-								<fhc-form-validation name="address[gemeinde]">
-									<select v-if="formData['address']['nation'] == 'A'" :id="'stv-list-new-address-gemeinde' + uuid" name="address[gemeinde]" class="form-select" v-model="formData['address']['gemeinde']">
-										<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
-										<option v-for="gemeinde in gemeinden" :key="gemeinde.name" :value="gemeinde.name">{{gemeinde.name}}</option>
-									</select>
-									<input v-else type="text" :id="'stv-list-new-address-gemeinde' + uuid" name="address[gemeinde]" class="form-control" v-model="formData['address']['gemeinde']">
-								</fhc-form-validation>
+								<form-input
+									label="Gemeinde"
+									type="select"
+									v-if="formData['address']['nation'] == 'A'"
+									id="stv-list-new-address-gemeinde"
+									name="address[gemeinde]"
+									v-model="formData['address']['gemeinde']"
+									>
+									<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
+									<option v-for="gemeinde in gemeinden" :key="gemeinde.name" :value="gemeinde.name">{{gemeinde.name}}</option>
+								</form-input>
+								<form-input
+									label="Gemeinde"
+									type="text"
+									v-else
+									id="stv-list-new-address-gemeinde"
+									name="address[gemeinde]"
+									v-model="formData['address']['gemeinde']"
+									>
+								</form-input>
 							</div>
 							<div class="col-sm-4 mb-3">
-								<label :for="'dp-input-stv-list-new-address-ort-' + uuid">Ort</label>
-								<fhc-form-validation name="address[ort]">
-									<select v-if="formData['address']['nation'] == 'A'" :id="'stv-list-new-address-ort' + uuid" name="address[ort]" class="form-select" v-model="formData['address']['ort']">
-										<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
-										<option v-for="ort in orte" :key="ort.ortschaftsname" :value="ort.ortschaftsname">{{ort.ortschaftsname}}</option>
-									</select>
-									<input v-else type="text" :id="'stv-list-new-address-ort' + uuid" name="address[ort]" class="form-control" v-model="formData['address']['ort']">
-								</fhc-form-validation>
+								<form-input
+									label="Ort"
+									type="select"
+									v-if="formData['address']['nation'] == 'A'"
+									id="stv-list-new-address-ort"
+									name="address[ort]"
+									v-model="formData['address']['ort']"
+									>
+									<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
+									<option v-for="ort in orte" :key="ort.ortschaftsname" :value="ort.ortschaftsname">{{ort.ortschaftsname}}</option>
+								</form-input>
+								<form-input
+									label="Ort"
+									type="text"
+									v-else
+									id="stv-list-new-address-ort"
+									name="address[ort]"
+									v-model="formData['address']['ort']"
+									>
+								</form-input>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-12 mb-3">
-								<label :for="'dp-input-stv-list-new-address-address-' + uuid">Adresse</label>
-								<fhc-form-validation name="address[address]">
-									<input type="text" :id="'stv-list-new-address-address' + uuid" name="address[address]" v-model="formData['address']['address']">
-								</fhc-form-validation>
+								<form-input
+									label="Adresse"
+									type="text"
+									id="stv-list-new-address-address"
+									name="address[address]"
+									v-model="formData['address']['address']"
+									>
+								</form-input>
 							</div>
 						</div>
 					</fieldset>
 
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'dp-input-stv-list-new-geburtsnation-' + uuid">Geburtsnation</label>
-							<fhc-form-validation name="geburtsnation">
-								<select :id="'stv-list-new-geburtsnation' + uuid" name="geburtsnation" class="form-select" v-model="formData['geburtsnation']">
-									<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.langtext}}</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="Geburtsnation"
+								type="select"
+								id="stv-list-new-geburtsnation"
+								name="geburtsnation" class="form-select"
+								v-model="formData['geburtsnation']"
+								>
+								<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.langtext}}</option>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'dp-input-stv-list-new-staatsbuergerschaft-' + uuid">Staatsbürgerschaft</label>
-							<fhc-form-validation name="staatsbuergerschaft">
-								<select :id="'stv-list-new-staatsbuergerschaft' + uuid" name="staatsbuergerschaft" class="form-select" v-model="formData['staatsbuergerschaft']">
-									<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.langtext}}</option>
-								</select>
-							</fhc-form-validation>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-email-' + uuid">E-Mail</label>
-							<fhc-form-validation name="email">
-								<input :id="'stv-list-new-email-' + uuid" type="text" name="email" v-model="formDataPerson['email']" class="form-control">
-							</fhc-form-validation>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-telefon-' + uuid">Telefon</label>
-							<fhc-form-validation name="telefon">
-								<input :id="'stv-list-new-telefon-' + uuid" type="text" name="telefon" v-model="formDataPerson['telefon']" class="form-control">
-							</fhc-form-validation>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-mobil-' + uuid">Mobil</label>
-							<fhc-form-validation name="mobil">
-								<input :id="'stv-list-new-mobil-' + uuid" type="text" name="mobil" v-model="formDataPerson['mobil']" class="form-control">
-							</fhc-form-validation>
+							<form-input
+								label="Staatsbürgerschaft"
+								type="select"
+								id="stv-list-new-staatsbuergerschaft"
+								name="staatsbuergerschaft"
+								v-model="formData['staatsbuergerschaft']"
+								>
+								<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.langtext}}</option>
+							</form-input>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-letzteausbildung-' + uuid">Letzte Ausbildung</label>
-							<fhc-form-validation name="letzteausbildung">
-								<select :id="'stv-list-new-letzteausbildung' + uuid" name="letzteausbildung" class="form-select" v-model="formData['letzteausbildung']">
-									<option v-for="ausbildung in lists.ausbildungen" :key="ausbildung.ausbildungcode" :value="ausbildung.ausbildungcode">{{ausbildung.ausbildungbez}}</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="E-Mail"
+								type="text"
+								id="stv-list-new-email"
+								name="email"
+								v-model="formDataPerson['email']"
+								>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-ausbildungsart-' + uuid">Ausbildungsart</label>
-							<fhc-form-validation name="ausbildungsart">
-								<input :id="'stv-list-new-ausbildungsart-' + uuid" type="text" name="ausbildungsart" v-model="formDataPerson['ausbildungsart']" class="form-control">
-							</fhc-form-validation>
+							<form-input
+								label="Telefon"
+								type="text"
+								id="stv-list-new-telefon"
+								name="telefon"
+								v-model="formDataPerson['telefon']"
+								>
+							</form-input>
+						</div>
+						<div class="col-sm-4 mb-3">
+							<form-input
+								label="Mobil"
+								type="text"
+								id="stv-list-new-mobil"
+								name="mobil"
+								v-model="formDataPerson['mobil']"
+								>
+							</form-input>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-4 mb-3">
+							<form-input
+								label="Letzte Ausbildung"
+								type="select"
+								id="stv-list-new-letzteausbildung"
+								name="letzteausbildung"
+								v-model="formData['letzteausbildung']"
+								>
+								<option v-for="ausbildung in lists.ausbildungen" :key="ausbildung.ausbildungcode" :value="ausbildung.ausbildungcode">{{ausbildung.ausbildungbez}}</option>
+							</form-input>
+						</div>
+						<div class="col-sm-4 mb-3">
+							<form-input
+								label="Ausbildungsart"
+								type="text"
+								id="stv-list-new-ausbildungsart"
+								name="ausbildungsart"
+								v-model="formDataPerson['ausbildungsart']"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-8 mb-3">
-							<label :for="'stv-list-new-anmerkungen-' + uuid">Anmerkungen</label>
-							<fhc-form-validation name="anmerkungen">
-								<textarea :id="'stv-list-new-anmerkungen-' + uuid" name="anmerkungen" v-model="formDataPerson['anmerkungen']" class="form-control"></textarea>
-							</fhc-form-validation>
+							<form-input
+								label="Anmerkungen"
+								type="textarea"
+								id="stv-list-new-anmerkungen"
+								name="anmerkungen"
+								v-model="formDataPerson['anmerkungen']"
+								>
+							</form-input>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-studiengang_kz-' + uuid">Studiengang*</label>
-							<fhc-form-validation name="studiengang_kz">
-								<select :id="'stv-list-new-studiengang_kz-' + uuid" name="studiengang_kz" v-model="formDataStg" class="form-select">
-									<option v-for="stg in lists.stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}}</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="Studiengang*"
+								type="select"
+								id="stv-list-new-studiengang_kz"
+								name="studiengang_kz"
+								v-model="formDataStg"
+								>
+								<option v-for="stg in lists.stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}}</option>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-studiensemester_kurzbz-' + uuid">Studiensemester*</label>
-							<fhc-form-validation name="studiensemester_kurzbz">
-								<select :id="'stv-list-new-studiensemester_kurzbz-' + uuid" name="studiensemester_kurzbz" v-model="formDataSem" class="form-select">
-									<option v-for="sem in semester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="Studiensemester*"
+								type="select"
+								id="stv-list-new-studiensemester_kurzbz"
+								name="studiensemester_kurzbz"
+								v-model="formDataSem"
+								>
+								<option v-for="sem in semester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-ausbildungssemester-' + uuid">Ausbildungssemester*</label>
-							<fhc-form-validation name="ausbildungssemester">
-								<select :id="'stv-list-new-ausbildungssemester-' + uuid" name="ausbildungssemester" v-model="formData['ausbildungssemester']" class="form-select" @input="loadStudienplaene" :disabled="formData['incoming']">
-									<option v-for="sem in Array.from({length:8}).map((u,i) => i+1)" :key="sem" :value="sem">{{sem}}. Semester</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="Ausbildungssemester*"
+								type="select"
+								id="stv-list-new-ausbildungssemester"
+								name="ausbildungssemester"
+								v-model="formData['ausbildungssemester']"
+								:disabled="formData['incoming']"
+								@input="loadStudienplaene"
+								>
+								<option v-for="sem in Array.from({length:8}).map((u,i) => i+1)" :key="sem" :value="sem">{{sem}}. Semester</option>
+							</form-input>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-orgform_kurzbz-' + uuid">OrgForm</label>
-							<fhc-form-validation name="orgform_kurzbz">
-								<select :id="'stv-list-new-orgform_kurzbz-' + uuid" name="orgform_kurzbz" v-model="formData['orgform_kurzbz']" class="form-select" @input="loadStudienplaene">
-									<option value="">-- keine Auswahl --</option>
-									<option v-for="orgform in lists.orgforms" :key="orgform.orgform_kurzbz" :value="orgform.orgform_kurzbz">{{orgform.bezeichnung}}</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="OrgForm"
+								type="select"
+								id="stv-list-new-orgform_kurzbz"
+								name="orgform_kurzbz"
+								v-model="formData['orgform_kurzbz']"
+								@input="loadStudienplaene"
+								>
+								<option value="">-- keine Auswahl --</option>
+								<option v-for="orgform in lists.orgforms" :key="orgform.orgform_kurzbz" :value="orgform.orgform_kurzbz">{{orgform.bezeichnung}}</option>
+							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
-							<label :for="'stv-list-new-studienplan_id-' + uuid">Studienplan</label>
-							<fhc-form-validation name="studienplan_id">
-								<select :id="'stv-list-new-studienplan_id-' + uuid" name="studienplan_id" v-model="formData['studienplan_id']" class="form-select">
-									<option value="">-- keine Auswahl --</option>
-									<option v-for="plan in studienplaene" :key="plan.studienplan_id" :value="plan.studienplan_id">{{plan.bezeichnung}}</option>
-								</select>
-							</fhc-form-validation>
+							<form-input
+								label="Studienplan"
+								type="select"
+								id="stv-list-new-studienplan_id"
+								name="studienplan_id"
+								v-model="formData['studienplan_id']"
+								>
+								<option value="">-- keine Auswahl --</option>
+								<option v-for="plan in studienplaene" :key="plan.studienplan_id" :value="plan.studienplan_id">{{plan.bezeichnung}}</option>
+							</form-input>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-10 mb-3">
 							<div class="form-check">
-								<fhc-form-validation name="incoming">
-									<input type="checkbox" :id="'stv-list-new-incoming-' + uuid" name="incoming" v-model="formData['incoming']" class="form-check-input" value="1">
-								</fhc-form-validation>
-								<label :for="'stv-list-new-incoming-' + uuid" class="form-check-label">Incoming</label>
+								<form-input
+									label="Incoming"
+									type="checkbox"
+									id="stv-list-new-incoming"
+									name="incoming"
+									v-model="formData['incoming']"
+									value="1"
+									>
+								</form-input>
 							</div>
 						</div>
 					</div>
@@ -513,5 +679,5 @@ export default {
 				<button type="submit" class="btn btn-primary">{{ person === null ? 'Person anlegen' : 'InteressentIn anlegen' }}</button>
 			</template>
 		</bs-modal>
-	</form>`
+	</fhc-form>`
 };
