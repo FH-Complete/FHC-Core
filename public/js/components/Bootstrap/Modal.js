@@ -1,3 +1,5 @@
+import Phrasen from '../../plugin/Phrasen.js';
+
 export default {
 	data: () => ({
 		modal: null
@@ -19,11 +21,7 @@ export default {
 			default: true
 		},
 		noCloseBtn: Boolean,
-		dialogClass: [String,Array,Object],
-		bodyClass: {
-			type: [String,Array,Object],
-			default: 'px-4 py-5'
-		}
+		dialogClass: [String,Array,Object]
 	},
 	emits: [
 		"hideBsModal",
@@ -50,12 +48,14 @@ export default {
 		}
 	},
 	mounted() {
-		if (this.$refs.modal)
+		if(this.$refs.modal)
+		{
 			this.modal = new bootstrap.Modal(this.$refs.modal, {
 				backdrop: this.backdrop,
 				focus: this.focus,
 				keyboard: this.keyboard
 			});
+		}
 	},
 	popup(body, options, title, footer) {
 		const BsModal = this,
@@ -88,6 +88,7 @@ export default {
 				}
 			});
 			const wrapper = document.createElement("div");
+			instance.use(Phrasen); // TODO(chris): find a more dynamic way
 			instance.mount(wrapper);
 			document.body.appendChild(wrapper);
 		});
@@ -99,7 +100,7 @@ export default {
 					<h5 class="modal-title"><slot name="title"/></h5>
 					<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body" :class="bodyClass">
+				<div class="modal-body">
 					<slot></slot>
 				</div>
 				<div v-if="$slots.footer" class="modal-footer">
