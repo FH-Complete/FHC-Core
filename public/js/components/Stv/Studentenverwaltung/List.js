@@ -66,7 +66,7 @@ export default {
 				selectable: true,
 				// TODO(chris): select only one? selectMultiple with click?
 				index: 'prestudent_id',
-				//persistence: true
+				persistence: true
 			},
 			tabulatorEvents: [
 				{

@@ -502,12 +502,12 @@ class Student extends FHC_Controller
 		}
 
 		// TODO(chris): DEBUG
-		$result = $this->PrestudentModel->loadWhere([
+		/*$result = $this->PrestudentModel->loadWhere([
 			'pestudent_id' => 1
 		]);
 		if (isError($result)) {
 			return $result;
-		}
+		}*/
 
 		return success(true);
 	}

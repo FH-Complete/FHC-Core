@@ -6,12 +6,13 @@
 		'fontawesome6' => true,
 		'vue3' => true,
 		#'primevue3' => true,
-		'filtercomponent' => true,
+		#'filtercomponent' => true,
 		'tabulator5' => true,
 		'phrases' => [],
 		'customCSSs' => [
-			'public/css/Studentenverwaltung.css',
-			'public/css/components/vue-datepicker.css'
+			'public/css/components/vue-datepicker.css',
+			'public/css/components/primevue.css',
+			'public/css/Studentenverwaltung.css'
 		],
 		'customJSs' => [
 			#'vendor/npm-asset/primevue/tree/tree.min.js',
