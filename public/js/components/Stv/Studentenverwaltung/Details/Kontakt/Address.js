@@ -1,7 +1,9 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import {CoreRESTClient} from "../../../../../RESTClient";
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
+import FhcFormValidation from '../../../../Form/Validation.js';
 /*import PvToast from "../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";*/
+import BsModal from "../../../../Bootstrap/Modal.js";
 
 
 var editIcon = function(cell, formatterParams){ //plain text value
@@ -15,14 +17,16 @@ var deleteIcon = function(cell, formatterParams){ //plain text value
 export default{
 	components: {
 		CoreFilterCmpt,
-		PvAutoComplete
+		PvAutoComplete,
+		FhcFormValidation,
+		BsModal
 	},
 	props: {
 		uid: String
 	},
-	emits: [
+/*	emits: [
 		'update:selected'
-	],
+	],*/
 	data() {
 		return{
 			tabulatorOptions: {
@@ -54,8 +58,8 @@ export default{
 							return output;}
 					},
 					{title:"Anmerkung", field:"anmerkung", visible:false},
-					{title: "Actions",
-						columns:[
+/*					{title: "Actions",
+						columns:[*/
 							{formatter:editIcon, width:40, align:"center", cellClick: (e, cell) => {
 									this.actionEditAdress(cell.getData().adresse_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
@@ -64,8 +68,8 @@ export default{
 									this.actionDeleteAdress(cell.getData().adresse_id);
 									console.log(cell.getRow().getIndex(), cell.getData(), this);
 								}, width:50, headerSort:false },
-						],
-					},
+/*					],
+					},*/
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
@@ -104,12 +108,14 @@ export default{
 	},
 	methods:{
 		actionNewAdress(){
-			bootstrap.Modal.getOrCreateInstance(this.$refs.newAdressModal).show();
+			/*bootstrap.Modal.getOrCreateInstance(this.$refs.newAdressModal).show();*/
+			this.$refs.newAdressModal.show();
 		},
 		actionEditAdress(adress_id){
 			this.loadAdress(adress_id).then(() => {
 				if(this.addressData.adresse_id)
-					bootstrap.Modal.getOrCreateInstance(this.$refs.editAdressModal).show();
+					this.$refs.editAdressModal.show();
+/*					bootstrap.Modal.getOrCreateInstance(this.$refs.editAdressModal).show();*/
 			});
 		},
 		actionDeleteAdress(adress_id){
@@ -118,7 +124,8 @@ export default{
 					if(this.addressData.heimatadresse)
 						this.$fhcAlert.alertError("Heimatadressen dürfen nicht gelöscht werden, da diese für die BIS-Meldung relevant sind. Um die Adresse dennoch zu löschen, entfernen sie das Häkchen bei Heimatadresse!");
 					else
-						bootstrap.Modal.getOrCreateInstance(this.$refs.deleteAdressModal).show();
+						this.$refs.deleteAdressModal.show();
+/*						bootstrap.Modal.getOrCreateInstance(this.$refs.deleteAdressModal).show();*/
 			});
 		},
 		addNewAddress(formData) {
@@ -135,6 +142,7 @@ export default{
 						const [key, value] = entry;
 						console.log(key, value);
 						this.$fhcAlert.alertError(value);
+						/*this.$fhcAlert.handleFormValidation(error, this.$refs.newAdressModal);*/
 					});
 				}
 			}).catch(error => {
@@ -252,6 +260,24 @@ export default{
 				}
 			);
 		},
+		getPlaces(plz){
+			CoreRESTClient
+				.get('components/stv/address/getPlaces/' + this.formData.address.plz, undefined, {
+					signal: this.abortController.places.signal
+				})
+				.then(result => CoreRESTClient.getData(result.data) || [])
+				.then(result => {
+					this.places = result;
+				})
+				.catch(error => {
+					if (error.code == 'ERR_BAD_REQUEST') {
+						return this.$fhcAlert.handleFormValidation(error, this.$refs.form);
+					}
+					// NOTE(chris): repeat request
+					if (error.code != "ERR_CANCELED")
+						window.setTimeout(this.loadPlaces, 100);
+				});
+		},
 		search(event) {
 			//console.log(event.query);
 			return CoreRESTClient
@@ -265,7 +291,7 @@ export default{
 			this.$refs.table.reloadTable();
 		},
 		hideModal(modalRef){
-			bootstrap.Modal.getOrCreateInstance(this.$refs[modalRef]).hide();
+			this.$refs[modalRef].hide();
 		},
 		resetModal(){
 			this.formData = {};
@@ -274,14 +300,21 @@ export default{
 		},
 	},
 	created(){
-		CoreRESTClient
-			.get('components/stv/Student/getNations')
+/*		CoreRESTClient
+			.get('components/stv/Address/getNations')
 			.then(result => {
-				this.nations = result.data;
+				this.nations = result.data[];
 			})
 			.catch(err => {
 				console.error(err.response.data || err.message);
-			});
+			});*/
+		CoreRESTClient
+			.get('components/stv/Address/getNations')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.nations = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 		CoreRESTClient
 			.get('components/stv/Kontakt/getAdressentypen')
 			.then(result => {
@@ -293,32 +326,23 @@ export default{
 	},
 	template: `			
 		<div class="stv-list h-100 pt-3">
-					
-		<!--		<Modal>   
-		 TODO(MANU) use BSModal, Validierungen
-		 -->
-				
-		<div ref="newAdressModal" class="modal fade" id="newAddressModal" tabindex="-1" aria-labelledby="newAddressModalLabel" aria-hidden="true">
-		  <div class="modal-dialog">
-			<div class="modal-content">
-			  <div class="modal-header">
-				<h5 class="modal-title" id="newAddressModalLabel">Neue Adresse anlegen</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			  </div>
-			  <div class="modal-body">
-				<form  ref="formData">					
+		
+		<!--Modal: Add Address-->
+		<BsModal ref="newAdressModal">
+			<template #title>Adresse anlegen</template>
+				<form class="row g-3" ref="formData">
 					<div class="row mb-3">
 						<label for="adressentyp" class="form-label col-sm-4">Typ</label>
 						<div class="col-sm-5">
-							<select id="adressentyp" class="form-control" v-model="formData.typ">
+							<select id="adressentyp" class="form-select" v-model="formData.typ">
 								<option v-for="typ in adressentypen" :key="typ.adressentyp_kurzbz" :value="typ.adressentyp_kurzbz" >{{typ.bezeichnung}}</option>
 							</select>
 						</div>
 					</div>
 					<div class="row mb-3">											   
 						<label for="strasse" class="form-label col-sm-4">Strasse</label>
-						<div class="col-sm-3">
-							<input type="text" :readonly="readonly" class="form-control-sm" id="strasse" v-model="formData['strasse']">
+						<div class="col-sm-5">
+							<input type="text" :readonly="readonly" class="form-control" id="strasse" v-model="formData['strasse']">
 						</div>
 					</div>	
 						
@@ -333,8 +357,8 @@ export default{
 						
 					<div class="row mb-3">								
 						<label for="plz" class="required form-label col-sm-4" >PLZ</label>
-						 <div class="col-sm-3">
-							<input type="text" class="form-control-sm" required v-model="formData['plz']" >
+						 <div class="col-sm-5">
+							<input type="text" class="form-control" required v-model="formData['plz']" >
 						</div>
 					</div>	
 					
@@ -376,7 +400,7 @@ export default{
 						
 					<div class="row mb-3">				
 						<label for="heimatadresse" class="form-label col-sm-4">Heimatadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="formData['heimatadresse']">
 							</div>
@@ -385,7 +409,7 @@ export default{
 						
 					<div class="row mb-3">
 						<label for="zustelladresse" class="form-label col-sm-4">Zustelladresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="formData['zustelladresse']">
 							</div>
@@ -401,7 +425,7 @@ export default{
 					
 					<div class="row mb-3">
 						<label for="rechnungsadresse" class="form-label col-sm-4">Rechnungsadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="formData['rechnungsadresse']">
 							</div>
@@ -410,15 +434,152 @@ export default{
 					
 					<div class="row mb-3">
 						<label for="firma_name" class="form-label col-sm-4">Firma</label>
-							<div class="col-sm-3">
-							 	<PvAutoComplete v-model="formData['firma']" optionLabel="name" :suggestions="filteredFirmen" @complete="search" minLength="3"/>
+							<div class="col-sm-5">
+									<PvAutoComplete v-model="formData['firma']" class="form-control" optionLabel="name" :suggestions="filteredFirmen" @complete="search" minLength="3"/>
 							</div>	
 					</div>	
-
+				
 					<div class="row mb-3">											   
 						<label for="name" class="form-label col-sm-4">Name</label>
-						<div class="col-sm-2">
-							<input type="text" :readonly="readonly" class="form-control-sm" id="name" v-model="formData['name']">
+						<div class="col-sm-3">
+							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="formData['name']">
+						</div>
+					</div>			
+					<div class="row mb-3">											   
+						<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+						<div class="col-sm-3">
+							<input type="text" :readonly="readonly" class="form-control-sm" id="anmerkung" v-model="formData['anmerkung']">
+						</div>
+					</div>	
+			</form>	
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+				<button type="button" class="btn btn-primary" @click="addNewAdress()">OK</button>
+            </template>
+		</BsModal>
+		
+								
+	<!--	<div ref="newAdressModal" class="modal fade" id="newAddressModal" tabindex="-1" aria-labelledby="newAddressModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title" id="newAddressModalLabel">Neue Adresse anlegen</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			  </div>
+			  <div class="modal-body">
+				<form  ref="formData">					
+					<div class="row mb-3">
+						<label for="adressentyp" class="form-label col-sm-4">Typ</label>
+						<div class="col-sm-5">
+							<select id="adressentyp" class="form-select" v-model="formData.typ">
+								<option v-for="typ in adressentypen" :key="typ.adressentyp_kurzbz" :value="typ.adressentyp_kurzbz" >{{typ.bezeichnung}}</option>
+							</select>
+						</div>
+					</div>
+					<div class="row mb-3">											   
+						<label for="strasse" class="form-label col-sm-4">Strasse</label>
+						<div class="col-sm-5">
+							<input type="text" :readonly="readonly" class="form-control" id="strasse" v-model="formData['strasse']">
+						</div>
+					</div>	
+						
+					<div class="row mb-3">
+						<label for="nation" class="form-label col-sm-4">Nation</label>
+						<div class="col-sm-5">
+							<select id="nation" class="form-control" v-model="formData.nation">
+								<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
+							</select>
+						</div>
+					</div>	
+						
+					<div class="row mb-3">								
+						<label for="plz" class="required form-label col-sm-4" >PLZ</label>
+						 <div class="col-sm-5">
+							<input type="text" class="form-control" required v-model="formData['plz']" >
+						</div>
+					</div>	
+					
+					<div class="row mb-3">
+						<label for="gemeinde" class="form-label col-sm-4">Gemeinde</label>
+						<div v-if="formData.plz && formData.nation === 'A'" class="col-sm-5">
+							<select id="gemeinde" class="form-control" v-model="formData['gemeinde']" @click="getGemeinden(formData.plz)">
+								<option value="">&#45;&#45; keine Auswahl &#45;&#45;</option>
+								<option v-for="gemeinde in gemeinden" :value="gemeinde.name" >{{gemeinde.name}}</option>
+							</select>	
+						</div>
+						<div v-else class="col-sm-3">
+							<div class="col-sm-3">
+								<input id="ort" type="text" class="form-control-sm" v-model="formData['gemeinde']">
+							</div>
+						</div>
+					</div>
+						
+					<div class="row mb-3">	
+						<label for="ort" class="form-label col-sm-4">Ortschaft</label>  
+						<div v-if="formData.plz && formData.nation === 'A' && formData.gemeinde" class="col-sm-5">
+							<select id="ort" class="form-control" v-model="formData['ort']" @click="getOrtschaften(formData.plz + '/' + formData.gemeinde)">
+								<option value="">&#45;&#45; keine Auswahl &#45;&#45;</option>
+								<option v-for="ort in ortschaften" :value="ort.ortschaftsname" >{{ort.ortschaftsname}}</option>
+							</select>	
+						</div>
+						<div v-else-if="formData.plz && formData.nation === 'A'" class="col-sm-5">
+							<select id="ort" class="form-control" v-model="formData['ort']" @click="getOrtschaften(formData.plz)">
+								<option value="">&#45;&#45; keine Auswahl &#45;&#45;</option>
+								<option v-for="ort in ortschaften" :value="ort.ortschaftsname" >{{ort.ortschaftsname}}</option>
+							</select>	
+						</div>
+						<div v-else class="col-sm-3">
+							<div class="col-sm-3">
+								<input id="ort" type="text" class="form-control-sm" v-model="formData['ort']">
+							</div>
+						</div>
+					</div>	
+						
+					<div class="row mb-3">				
+						<label for="heimatadresse" class="form-label col-sm-4">Heimatadresse</label>
+						<div class="col-sm-3">
+							<div class="form-check">
+								<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="formData['heimatadresse']">
+							</div>
+						</div>
+					</div>	
+						
+					<div class="row mb-3">
+						<label for="zustelladresse" class="form-label col-sm-4">Zustelladresse</label>
+						<div class="col-sm-3">
+							<div class="form-check">	
+								<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="formData['zustelladresse']">
+							</div>
+						</div>
+					</div>	
+					
+					<div class="row mb-3">
+							<label for="co_name" class="form-label col-sm-4">Abweich.Empfänger. (c/o)</label>
+						<div class="col-sm-3">
+							<input type="text" id="co_name" class="form-control-sm" v-model="formData['co_name']">
+						</div>	
+					</div>
+					
+					<div class="row mb-3">
+						<label for="rechnungsadresse" class="form-label col-sm-4">Rechnungsadresse</label>
+						<div class="col-sm-3">
+							<div class="form-check">	
+								<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="formData['rechnungsadresse']">
+							</div>
+						</div>
+					</div>			
+					
+					<div class="row mb-3">
+						<label for="firma_name" class="form-label col-sm-4">Firma</label>
+							<div class="col-sm-5">
+									<PvAutoComplete v-model="formData['firma']" class="form-control" optionLabel="name" :suggestions="filteredFirmen" @complete="search" minLength="3"/>
+							</div>	
+					</div>	
+					
+					<div class="row mb-3">											   
+						<label for="name" class="form-label col-sm-4">Name</label>
+						<div class="col-sm-3">
+							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="formData['name']">
 						</div>
 					</div>		
 					
@@ -437,7 +598,19 @@ export default{
 			  </div>
 			</div>
 		  </div>
-		</div>
+		</div>-->
+		
+				<!--Modal: Edit Address-->
+<!--		<BsModal ref="newBankverbindungModal">
+			<template #title>Adresse anlegen</template>
+			<form class="row g-3" ref="formData">
+			
+			</form>	
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+				<button type="button" class="btn btn-primary" @click="addNewAdress()">OK</button>
+            </template>
+		</BsModal>-->
 		
 		<div ref="editAdressModal" class="modal fade" id="editAdressModal" tabindex="-1" aria-labelledby="editAdressModalLabel" aria-hidden="true">
 		  <div class="modal-dialog">
@@ -527,7 +700,7 @@ export default{
 					
 					<div class="row mb-3">				
 						<label for="heimatadresse" class="form-label col-sm-4">Heimatadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['heimatadresse']">
 							</div>
@@ -536,7 +709,7 @@ export default{
 						
 					<div class="row mb-3">
 						<label for="zustelladresse" class="form-label col-sm-4">Zustelladresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['zustelladresse']">
 							</div>
@@ -552,7 +725,7 @@ export default{
 					
 					<div class="row mb-3">
 						<label for="rechnungsadresse" class="form-label col-sm-4">Rechnungsadresse</label>
-						<div class="col-sm-3 align-self-center">
+						<div class="col-sm-3">
 							<div class="form-check">	
 								<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="addressData['rechnungsadresse']">
 							</div>
@@ -592,9 +765,8 @@ export default{
 							
 			  </div>
 			  <div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
 				<button ref="Close" type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
-
 			  </div>
 			</div>
 		  </div>

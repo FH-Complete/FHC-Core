@@ -8,7 +8,6 @@ class Kontakt extends FHC_Controller
 {
 	public function __construct()
 	{
-		// TODO(chris): access!
 		parent::__construct();
 
 		// Load Libraries
@@ -48,7 +47,7 @@ class Kontakt extends FHC_Controller
 		$this->load->library('form_validation');
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
-		$this->form_validation->set_rules('plz', 'PLZ', 'required');
+		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -57,6 +56,7 @@ class Kontakt extends FHC_Controller
 
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 
+		$uid = getAuthUID();
 		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
 		$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : null;
 		$ort = isset($_POST['ort']) ? $_POST['ort'] : null;
@@ -77,7 +77,7 @@ class Kontakt extends FHC_Controller
 			[
 				'person_id' => $person_id,
 				'strasse' =>  $strasse,
-				'insertvon' => 'uid',
+				'insertvon' => $uid,
 				'insertamum' => date('c'),
 				'plz' => $_POST['plz'],
 				'ort' => $ort,
@@ -105,8 +105,9 @@ class Kontakt extends FHC_Controller
 
 	public function updateAddress($address_id)
 	{
+		$uid = getAuthUID();
 		$this->load->library('form_validation');
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+		$_POST = json_decode($this->input->raw_input_stream, true);
 
 		$this->form_validation->set_rules('plz', 'PLZ', 'required');
 
@@ -144,7 +145,7 @@ class Kontakt extends FHC_Controller
 		],
 			[	'person_id' => $person_id,
 				'strasse' =>  $strasse,
-				'updatevon' => 'uid',
+				'updatevon' => $uid,
 				'updateamum' => date('c'),
 				'plz' => $_POST['plz'],
 				'ort' => $ort,
@@ -217,6 +218,22 @@ class Kontakt extends FHC_Controller
 		return $this->outputJsonSuccess(current(getData($result)));
 	}
 
+/*	TODO Manu bereits in Address.ph*/
+	public function getNations()
+	{
+		$this->load->model('codex/Nation_model', 'NationModel');
+
+		$this->NationModel->addOrder('kurztext');
+
+		$result = $this->NationModel->load();
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		} else {
+			$this->outputJson(getData($result) ?: []);
+		}
+	}
+
 	public function getAdressentypen()
 	{
 		$this->load->model('person/Adressentyp_model', 'AdressentypModel');
@@ -275,11 +292,20 @@ class Kontakt extends FHC_Controller
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 
 		//$ort = isset($ortschaft) ? $ortschaft : null;
-		if(isset($gemeinde)) {
+		if(isset($gemeinde)) {var_dump($gemeinde);
 			$gemeinde = urldecode($gemeinde);
 		}
 		else
 			$gemeinde = null;
+
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules($plz, 'PLZ', 'numeric|less_than[10000]');
+		if ($this->form_validation->run() == false) {
+			return $this->outputJsonError($this->form_validation->error_array());
+/*			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
+			return $this->outputJsonError($this->form_validation->error_array());*/
+		}
 
 		$result = $this->AdresseModel->getOrtschaften($plz, $gemeinde);
 		if (isError($result)) {
@@ -352,18 +378,18 @@ class Kontakt extends FHC_Controller
 		}
 	}
 
-	public function loadContact($kontact_id)
+	public function loadContact($kontakt_id)
 	{
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
-		$this->AdresseModel->addSelect('public.tbl_kontakt.*');
+		$this->KontaktModel->addSelect('public.tbl_kontakt.*');
 		$this->KontaktModel->addSelect('st.kurzbz');
 		$this->KontaktModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
 
 		$this->KontaktModel->addLimit(1);
 
 		$result = $this->KontaktModel->loadWhere(
-			array('kontakt_id' => $kontact_id)
+			array('kontakt_id' => $kontakt_id)
 		);
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -391,6 +417,13 @@ class Kontakt extends FHC_Controller
 		else
 			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required');
 
+/*		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
+		{
+			$this->form_validation->set_data(['email' => $_POST['kontakt']]);
+			$this->form_validation->set_rules('email', 'email', 'valid_email|required]');
+		}*/
+
+
 		if ($this->form_validation->run() == false)
 		{
 			return $this->outputJsonError($this->form_validation->error_array());
@@ -406,6 +439,7 @@ class Kontakt extends FHC_Controller
 		else
 			$standort_id = null;
 
+		$uid = getAuthUID();
 		$kontakttyp = isset($_POST['kontakttyp']) ? $_POST['kontakttyp'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
 		$kontakt = isset($_POST['kontakt']) ? $_POST['kontakt'] : null;
@@ -418,7 +452,7 @@ class Kontakt extends FHC_Controller
 				'anmerkung' => $anmerkung,
 				'kontakt' => $kontakt,
 				'zustellung' => $_POST['zustellung'],
-				'insertvon' => 'uid',
+				'insertvon' => $uid,
 				'insertamum' => date('c'),
 				'standort_id' => $standort_id,
 				'ext_id' => $ext_id
@@ -451,6 +485,7 @@ class Kontakt extends FHC_Controller
 		else
 			$standort_id = null;
 
+		$uid = getAuthUID();
 		$kontakttyp = isset($_POST['kontakttyp']) ? $_POST['kontakttyp'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
 		$kontakt = isset($_POST['kontakt']) ? $_POST['kontakt'] : null;
@@ -466,7 +501,7 @@ class Kontakt extends FHC_Controller
 				'anmerkung' => $anmerkung,
 				'kontakt' => $kontakt,
 				'zustellung' => $_POST['zustellung'],
-				'insertvon' => 'uid',
+				'insertvon' => 	$uid,
 				'insertamum' => date('c'),
 				'standort_id' => $standort_id,
 				'ext_id' => $ext_id
@@ -595,6 +630,7 @@ class Kontakt extends FHC_Controller
 
 	public function updateBankverbindung($bankverbindung_id)
 	{
+
 		$this->load->library('form_validation');
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
@@ -613,6 +649,8 @@ class Kontakt extends FHC_Controller
 			return $this->outputJsonError($this->form_validation->error_array());
 		}
 
+		$uid = getAuthUID();
+
 		$result = $this->BankverbindungModel->update([
 			'bankverbindung_id' => $bankverbindung_id
 		],
@@ -624,7 +662,7 @@ class Kontakt extends FHC_Controller
 				'iban' => $_POST['iban'],
 				'blz' => $_POST['blz'],
 				'kontonr' => $_POST['kontonr'],
-				'updatevon' => 'uid',
+				'updatevon' => $uid,
 				'updateamum' => date('c'),
 				'typ' => $_POST['typ'],
 				'verrechnung' => $_POST['verrechnung'],
