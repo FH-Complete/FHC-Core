@@ -126,6 +126,7 @@ export default {
             SpecialInformation: this.role =='Mitarbeiter' || this.role === 'View_Mitarbeiter'?  {
                 Kurzzeichen: this.mitarbeiter_info?.kurzbz,
                 Telefon: this.mitarbeiter_info?.telefonklappe,
+                ...(this.role === 'View_Mitarbeiter'?{Büro:this.mitarbeiter_info?.ort_kurzbz}:{}) ,
             } : {
                 Studiengang:this.student_info?.studiengang,
                 Semester:this.student_info?.semester,
@@ -223,6 +224,8 @@ export default {
     <div :class="{'container':true}">
     <div :class="{'row':true}">
     <div :class="{'col':true}">
+    <pre>
+   <!-- {{JSON.stringify(personData,null,2)}}</pre>-->
     </div>
     <div :class="{'col':true}">
     

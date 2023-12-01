@@ -166,8 +166,9 @@ class Profil extends Auth_Controller
 	}
 
 
+	
 
-	if(isSuccess($this->MitarbeiterModel->addSelect(["kurzbz","telefonklappe", "alias"]))
+	if(isSuccess($this->MitarbeiterModel->addSelect(["kurzbz","telefonklappe", "alias","ort_kurzbz"]))
 		&& isSuccess($this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid"))
 	){
 		$mitarbeiter_res = $this->MitarbeiterModel->load($uid);
