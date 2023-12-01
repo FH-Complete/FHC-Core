@@ -2,20 +2,12 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js"
 
-
-/* [
-    {title: 'Log ID', field: 'LogId', headerFilter: true},
-    {title: 'Request ID', field: 'RequestId', headerFilter: true},
-    {title: 'Execution time', field: 'ExecutionTime', headerFilter: true},
-    {title: 'Executed by', field: 'ExecutedBy', headerFilter: true},
-    {title: 'Description', field: 'Description', headerFilter: true},
-    {title: 'Data', field: 'Data', headerFilter: true},
-    {title: 'Web service type', field: 'WebserviceType', headerFilter: true}
-] */
-
-//? old data
-/* ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                "/Cis/Profil/getBenutzerFunktionen", */
+//? possible types of roles:
+//! depending on the role of the current view, different content is being displayed and fetched
+//* Student
+//* Mitarbeiter
+//* View_Student
+//* View_Mitarbeiter
 
 export default {
     components:{
@@ -28,7 +20,6 @@ export default {
             student_info:null,
             //? beinhaltet die Information ob der angefragte user ein Student oder Mitarbeiter ist
             role: null,
-            //"bf_bezeichnung", "oe_bezeichnung", "datum_von", "datum_bis", "wochenstunden" ]
 
             funktionen_table_options: {
                 height: 300,
@@ -60,7 +51,7 @@ export default {
     },
     
     //? this props were passed in the Profil.php view file
-    props:['uid','pid'],
+    props:['uid','pid','view'],
     methods: {
         
         concatenate_addresses(address_array){
@@ -111,7 +102,7 @@ export default {
             }
   
            return {
-                Allgemein: this.role =='Mitarbeiter'?{
+                Allgemein: (this.role =='Mitarbeiter' || this.role =='View_Mitarbeiter')?{
                     Username:this.index_information.username,
                     Anrede:this.index_information.anrede,
                     Titel:this.index_information.titel,
@@ -127,12 +118,12 @@ export default {
                 Nachname:this.index_information.nachname,
                 Postnomen:null,
             },
-            GeburtsDaten:{
+            GeburtsDaten:!this.role.includes("View")?{
                 Geburtsdatum:this.index_information.gebdatum,
                 Geburtsort: this.index_information.gebort,
-            },
+            }: null,
                 Adressen: this.index_information.adressen,
-            SpecialInformation: this.role =='Mitarbeiter'?  {
+            SpecialInformation: this.role =='Mitarbeiter' || this.role === 'View_Mitarbeiter'?  {
                 Kurzzeichen: this.mitarbeiter_info?.kurzbz,
                 Telefon: this.mitarbeiter_info?.telefonklappe,
             } : {
@@ -152,7 +143,7 @@ export default {
          
            return {
                 FhAusweisStatus: this.index_information.zutrittsdatum,
-                emails: this.role === 'Mitarbeiter'?  this.mitarbeiter_info?.emails: this.index_information.emails,
+                emails: this.role === 'Mitarbeiter' || this.role === 'View_Mitarbeiter'?  this.mitarbeiter_info?.emails: this.index_information.emails,
                 Kontakte:this.index_information.kontakte,
             };
         },
@@ -171,43 +162,57 @@ export default {
 
         console.log(this.uid);
         console.log(this.pid);
+        console.log(this.view);
+        console.log(typeof this.view);
+        if(this.view){console.log("view is true")}else{ console.log("view is false")}
 
         //? this function is to update the tabulator information only when the tabulator was build checking the tableBulit event
         //! only the tableBuilt event of the second tabulator was used to update the table informations
-         this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
-           
-            fhcapifactory.UserData.isMitarbeiterOrStudent(this.uid).then((res) => {
-                this.role = res.data;
-            
+         
 
-                //? Die anderen api calls werden erst gemacht wenn der call zu isMitarbeiterOrStudent gemacht worden ist
+        fhcapifactory.UserData.isMitarbeiterOrStudent(this.uid).then((res) => {
+
+            this.role = this.view? "View_"+res.data: res.data;
+            if(!this.role.includes('View')){
+                this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
+                }) 
+             }
 
 
-                //! indexProfilInformationen werden immer gefetcht
-                fhcapifactory.UserData.indexProfilInformaion().then((res) => {
-                    this.index_information = res.data;
-                    this.$refs.betriebsmittelTable.tabulator.setData(res.data.mittel);
-                });
-                
+        console.log("the role of the current view: ", this.role);
+        
+    
 
-                //? Danach werden die Informationen der Role gefetcht
-                if(this.role === 'Student'){ 
-                    fhcapifactory.UserData.studentProfil().then((res)=> {
-                        this.student_info = res.data;
-                        this.$refs.zutrittsgruppenTable.tabulator.setData(res.data.zuttritsgruppen);
-                    })
+        //? Die anderen api calls werden erst gemacht wenn der call zu isMitarbeiterOrStudent gemacht worden ist
+
+
+        //! indexProfilInformationen werden immer gefetcht
+        fhcapifactory.UserData.indexProfilInformaion(this.uid,this.view).then((res) => {
+            console.log(res.data);
+            this.index_information = res.data;
+            if(!this.role.includes("View")){
+            this.$refs.betriebsmittelTable.tabulator.setData(res.data.mittel);
+        }
+        });
+        
+
+        //? Danach werden die Informationen der Role gefetcht
+        if(this.role === "Student" || this.role === "View_Student"){ 
+            fhcapifactory.UserData.studentProfil(this.uid,this.view).then((res)=> {
+                this.student_info = res.data;
+                if(this.role ==="Student"){
+                this.$refs.zutrittsgruppenTable.tabulator.setData(res.data.zuttritsgruppen);
                 }
-                
-                if(this.role === 'Mitarbeiter'){
-                    fhcapifactory.UserData.mitarbeiterProfil().then((res)=> {
-                        this.mitarbeiter_info = res.data;
-                        this.$refs.funktionenTable.tabulator.setData(res.data.funktionen);
-                    })
-                }   
-            });
-            
-
-        }) 
+            })
+        }
+        
+        if(this.role === "Mitarbeiter" || this.role === "View_Mitarbeiter"){
+            fhcapifactory.UserData.mitarbeiterProfil(this.uid).then((res)=> {
+                this.mitarbeiter_info = res.data;
+                this.$refs.funktionenTable.tabulator.setData(res.data.funktionen);
+            })
+        }   
+    });
 
         
         
@@ -218,7 +223,6 @@ export default {
     <div :class="{'container':true}">
     <div :class="{'row':true}">
     <div :class="{'col':true}">
-    
     </div>
     <div :class="{'col':true}">
     
@@ -244,7 +248,7 @@ export default {
             </div>
             <div :class="{'col':true}">
            
-            <h3 v-if="role=='Mitarbeiter'">Mitarbeiter</h3>
+            <h3 v-if="role=='Mitarbeiter' || role == 'View_Mitarbeiter'">Mitarbeiter</h3>
             <h3 v-else >Student</h3>
             
             <div v-for="(wert,bezeichnung) in personData">
@@ -261,7 +265,7 @@ export default {
             <li v-for="(wert,bezeichnung) in kontaktInfo">
             
             <!-- HIER IST DAS DATUM DES FH AUSWEIS -->
-            <div class="mb-3" v-if="bezeichnung=='FhAusweisStatus'">
+            <div class="mb-3" v-if="bezeichnung=='FhAusweisStatus' && (role=='Sudent' || role =='Mitarbeiter')">
             <p class="mb-0"><b>FH-Ausweis Status</b></p>
             <p class="mb-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</p>
             </div>
@@ -299,15 +303,15 @@ export default {
             <div :class="{'row':true}">
             
             <!-- order-1 classe wird nur bei der Studentenansicht hinzugefügt um die Zutrittsgruppen Tabelle hinter der Betriebsmittel aufzureihen -->
-            <div :class="{'col-12':true, 'order-2':role==='Student'}">
+            <div :class="{'col-12':true, 'order-2':role=='Student'}">
           
-            <core-filter-cmpt v-if="role === 'Mitarbeiter'" title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
-            <core-filter-cmpt v-else title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options" :tableOnly :noColFilter />
+            <core-filter-cmpt v-if="role == 'Mitarbeiter' || role =='View_Mitarbeiter'" title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
+            <core-filter-cmpt v-if="role == 'Student'" title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options" :tableOnly :noColFilter />
             
             </div>
             <div :class="{'col-12':true}">
                
-            <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
+            <core-filter-cmpt title="Entlehnte Betriebsmittel" v-if="!role?.includes('View')"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
        
             </div>
             

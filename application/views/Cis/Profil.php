@@ -14,8 +14,8 @@ $this->load->view('templates/CISHTML-Header', $includesArray);
 	
 	<hr>
 	
-	<!-- we can pass information from the php view file to the public js file through interpolating data from php into vue props -->
-	<Profil uid="<?php echo $uid ?>" pid="<?php echo $pid ?>"></Profil>
+	<!-- we can pass information from the php view file to the public js file throughz interpolating data from php into vue props -->
+	<Profil <?php echo "uid=$uid" ?> <?php echo "pid=$pid" ?> view=<?php echo $view? boolval(1): boolval(0); ?>></Profil>
 </div>
 
 <?php $this->load->view('templates/CISHTML-Footer', $includesArray); ?>

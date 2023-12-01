@@ -23,6 +23,10 @@ Vue.createApp({
                             type: "function",
                             action: function(data) {
                                 alert('employee defaultaction ' + JSON.stringify(data));
+                                //return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                                //"/Cis/Profil/"+data.person_id; 
+                                //? Person id is data.person_id
+                                //? Benutzer UID is data.uid
                             }
                         },
                         childactions: []
