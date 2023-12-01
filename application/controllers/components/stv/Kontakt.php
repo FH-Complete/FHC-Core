@@ -23,7 +23,7 @@ class Kontakt extends FHC_Controller
 	public function getAdressen($person_id)
 	{
 		$this->load->model('person/Adresse_model', 'AdresseModel');
-		//TODO(manu) check name: in Adresse und firma
+
 		$this->AdresseModel->addSelect('public.tbl_adresse.*');
 		$this->AdresseModel->addSelect('t.*');
 		$this->AdresseModel->addSelect('f.firma_id');
@@ -42,10 +42,11 @@ class Kontakt extends FHC_Controller
 		}
 	}
 
+	//old version
 	public function addNewAddress($person_id)
 	{
 		$this->load->library('form_validation');
-		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+		$_POST = json_decode($this->input->raw_input_stream, true);
 
 		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric');
 
@@ -94,7 +95,6 @@ class Kontakt extends FHC_Controller
 
 			]
 		);
-
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -102,6 +102,63 @@ class Kontakt extends FHC_Controller
 		}
 		return $this->outputJsonSuccess(true);
 	}
+
+	//Version mit input->post() TODO(Manu) check mit Chris, not working
+/*	public function addNewAddress($person_id)
+	{
+		$this->load->library('form_validation');
+		//$_POST = json_decode($this->input->raw_input_stream, true);
+
+
+		$this->load->model('person/Adresse_model', 'AdresseModel');
+
+		$uid = getAuthUID();
+
+		$data = [
+			'insertvon' => $uid,
+			'insertamum' => date('c'),
+			'plz' => $this->input->post('plz'),
+			'heimatadresse' => $this->input->post('heimatadresse'),
+			'zustelladresse' => $this->input->post('zustelladresse'),
+			'rechnungsadresse' => $this->input->post('rechnungsadresse')
+		];
+
+
+		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
+
+		if ($this->input->post('co_name'))
+			$data['co_name'] = $this->input->post('co_name');
+		if ($this->input->post('strasse'))
+			$data['strasse'] = $this->input->post('strasse');
+		if ($this->input->post('ort'))
+			$data['ort'] = $this->input->post('ort');
+		if ($this->input->post('gemeinde'))
+			$data['gemeinde'] = $this->input->post('gemeinde');
+		if ($this->input->post('nation'))
+			$data['nation'] = $this->input->post('nation');
+		if ($this->input->post('name'))
+			$data['name'] = $this->input->post('name');
+		if ($this->input->post('typ'))
+			$data['typ'] = $this->input->post('typ');
+		if ($this->input->post('anmerkung'))
+			$data['anmerkung'] = $this->input->post('anmerkung');
+		if ($this->input->post('firma'))
+			$data['firma_id'] = $this->input->post('firma_id');
+
+		$result = $this->AdresseModel->insert($data);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}
+		return $this->outputJsonSuccess(true);
+	}*/
 
 	public function updateAddress($address_id)
 	{
@@ -140,9 +197,10 @@ class Kontakt extends FHC_Controller
 		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
 
-		$result = $this->AdresseModel->update([
+		$result = $this->AdresseModel->update(
+			[
 			'adresse_id' => $address_id
-		],
+			],
 			[	'person_id' => $person_id,
 				'strasse' =>  $strasse,
 				'updatevon' => $uid,
@@ -159,7 +217,8 @@ class Kontakt extends FHC_Controller
 				'name' => $name,
 				'rechnungsadresse' => $_POST['rechnungsadresse'],
 				'anmerkung' => $anmerkung
-			]);
+			]
+		);
 
 		if (isError($result))
 		{
@@ -218,22 +277,6 @@ class Kontakt extends FHC_Controller
 		return $this->outputJsonSuccess(current(getData($result)));
 	}
 
-/*	TODO Manu bereits in Address.ph*/
-	public function getNations()
-	{
-		$this->load->model('codex/Nation_model', 'NationModel');
-
-		$this->NationModel->addOrder('kurztext');
-
-		$result = $this->NationModel->load();
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
-		}
-	}
-
 	public function getAdressentypen()
 	{
 		$this->load->model('person/Adressentyp_model', 'AdressentypModel');
@@ -267,82 +310,6 @@ class Kontakt extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 		$this->outputJson($result);
-	}
-
-	public function getFirmenliste($searchString) //TODO (manu) DEPRECATED
-	{
-		$this->load->model('ressource/firma_model', 'FirmaModel');
-
-		$result = $this->FirmaModel->load();
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
-		}
-	}
-
-	/**
-	 * Get Array of Names of Ortschaften having plz
-	 * @param string $plz Postleitzahl
-	 * @return array $result[]
-	 */
-	public function getOrtschaften($plz, $gemeinde=null)
-	{
-		$this->load->model('person/Adresse_model', 'AdresseModel');
-
-		//$ort = isset($ortschaft) ? $ortschaft : null;
-		if(isset($gemeinde)) {var_dump($gemeinde);
-			$gemeinde = urldecode($gemeinde);
-		}
-		else
-			$gemeinde = null;
-
-		$this->load->library('form_validation');
-
-		$this->form_validation->set_rules($plz, 'PLZ', 'numeric|less_than[10000]');
-		if ($this->form_validation->run() == false) {
-			return $this->outputJsonError($this->form_validation->error_array());
-/*			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
-			return $this->outputJsonError($this->form_validation->error_array());*/
-		}
-
-		$result = $this->AdresseModel->getOrtschaften($plz, $gemeinde);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
-		}
-		elseif (!hasData($result)) {
-			$this->outputJson($result);
-		}
-		else
-		{
-			$this->outputJsonSuccess(getData($result));
-		}
-	}
-
-	/**
-	 * Get Array of Names of Gemeinden having plz
-	 * @param string $plz Postleitzahl
-	 * @return array $result[]
-	 */
-	function getGemeinden($plz)
-	{
-		$this->load->model('person/Adresse_model', 'AdresseModel');
-
-		$result = $this->AdresseModel->getGemeinden($plz);
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
-		}
-		elseif (!hasData($result)) {
-			$this->outputJson($result); //success mit Wert null
-			//	$this->outputJson(getData($result) ?: []);
-		}
-		else
-		{
-			$this->outputJsonSuccess(getData($result));
-		}
 	}
 
 	public function getKontakte($person_id)
@@ -492,9 +459,10 @@ class Kontakt extends FHC_Controller
 		$ext_id = isset($_POST['ext_id']) ? $_POST['ext_id'] : null;
 		$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
 
-		$result = $this->KontaktModel->update([
+		$result = $this->KontaktModel->update(
+			[
 			'kontakt_id' => $kontakt_id
-		],
+			],
 			[
 				'person_id' => $person_id,
 				'kontakttyp' =>  $kontakttyp,
@@ -505,7 +473,8 @@ class Kontakt extends FHC_Controller
 				'insertamum' => date('c'),
 				'standort_id' => $standort_id,
 				'ext_id' => $ext_id
-			]);
+			]
+		);
 
 		if (isError($result))
 		{
@@ -529,7 +498,7 @@ class Kontakt extends FHC_Controller
 			$this->outputJson($result);
 		}
 		elseif (!hasData($result)) {
-			$this->outputJson($result); //success mit Wert null
+			$this->outputJson($result);
 		}
 		return $this->outputJsonSuccess(current(getData($result)));
 	}
@@ -630,7 +599,6 @@ class Kontakt extends FHC_Controller
 
 	public function updateBankverbindung($bankverbindung_id)
 	{
-
 		$this->load->library('form_validation');
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
@@ -651,9 +619,10 @@ class Kontakt extends FHC_Controller
 
 		$uid = getAuthUID();
 
-		$result = $this->BankverbindungModel->update([
+		$result = $this->BankverbindungModel->update(
+			[
 			'bankverbindung_id' => $bankverbindung_id
-		],
+			],
 			[
 				'person_id' => $_POST['person_id'],
 				'name' => $_POST['name'],
@@ -669,7 +638,8 @@ class Kontakt extends FHC_Controller
 				'ext_id' => $_POST['ext_id'],
 				'oe_kurzbz' => $_POST['oe_kurzbz'],
 				'orgform_kurzbz' => $_POST['orgform_kurzbz']
-			]);
+			]
+		);
 
 		if (isError($result))
 		{
@@ -693,11 +663,8 @@ class Kontakt extends FHC_Controller
 			$this->outputJson($result);
 		}
 		elseif (!hasData($result)) {
-			$this->outputJson($result); //success mit Wert null
+			$this->outputJson($result);
 		}
 		return $this->outputJsonSuccess(current(getData($result)));
 	}
-
-
-
 }
