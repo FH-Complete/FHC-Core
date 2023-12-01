@@ -278,7 +278,7 @@ export default{
 				
 				<div class="row mb-3">
 					<label for="standort" class="form-label col-sm-4">Firma / Standort</label>
-						<div v-if="contactData.kurzbz" class="col-sm-3">
+						<div v-if="contactData.kurzbz" class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="contactData.kurzbz">
 						</div>	
 						<div v-else class="col-sm-3">

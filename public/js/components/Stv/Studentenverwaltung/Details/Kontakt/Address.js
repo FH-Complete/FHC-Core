@@ -359,7 +359,7 @@ export default{
 					
 					<div class="row mb-3">
 						<label for="firma_name" class="form-label col-sm-4">Firma</label>
-							<div class="col-sm-4">
+							<div class="col-sm-3">
 							 	<PvAutoComplete v-model="addressData['firma']"  optionLabel="name" :suggestions="filteredFirmen" @complete="search" minLength="3"/>
 							</div>
 					</div>
