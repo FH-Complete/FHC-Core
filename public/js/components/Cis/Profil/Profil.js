@@ -24,7 +24,7 @@ export default {
             funktionen_table_options: {
                 height: 300,
                 layout: 'fitColumns',
-                data:[{Bezeichnung:"test1",Organisationseinheit:"test2",Gültig_von:"test3",Gültig_bis:"test4",Wochenstunden:"test5"}],
+                data:[{Bezeichnung:"",Organisationseinheit:"",Gültig_von:"",Gültig_bis:"",Wochenstunden:""}],
                 columns: [{title: 'Bezeichnung', field: 'Bezeichnung', headerFilter: true},
                 {title: 'Organisationseinheit', field: 'Organisationseinheit', headerFilter: true},
                 {title: 'Gültig_von', field: 'Gültig_von', headerFilter: true},
@@ -35,7 +35,7 @@ export default {
             betriebsmittel_table_options:{
                 height: 300,
                 layout: 'fitColumns',
-                data:[{betriebsmittel:"test1",Nummer:"test2",Ausgegeben_am:"test3"}],
+                data:[{betriebsmittel:"",Nummer:"",Ausgegeben_am:""}],
                 columns: [{title: 'Betriebsmittel', field: 'betriebsmittel', headerFilter: true},
                 {title: 'Nummer', field: 'Nummer', headerFilter: true},
                 {title: 'Ausgegeben_am', field: 'Ausgegeben_am', headerFilter: true},]
@@ -108,7 +108,7 @@ export default {
                     Titel:this.index_information.titel,
                     Vorname:this.index_information.vorname,
                     Nachname:this.index_information.nachname,
-                    Postnomen:null,
+                    Postnomen:this.index_information.postnomen,
             }:{
                 Username:this.index_information.username,
                 Matrikelnummer: this.student_info?.matrikelnummer,
@@ -116,7 +116,7 @@ export default {
                 Titel:this.index_information.titel,
                 Vorname:this.index_information.vorname,
                 Nachname:this.index_information.nachname,
-                Postnomen:null,
+                Postnomen:this.index_information.postnomen,
             },
             GeburtsDaten:!this.role.includes("View")?{
                 Geburtsdatum:this.index_information.gebdatum,
@@ -126,6 +126,7 @@ export default {
             SpecialInformation: this.role =='Mitarbeiter' || this.role === 'View_Mitarbeiter'?  {
                 Kurzzeichen: this.mitarbeiter_info?.kurzbz,
                 Telefon: this.mitarbeiter_info?.telefonklappe,
+                //* Wird das Feld Ort_kurzbz noch gepflegt?
                 ...(this.role === 'View_Mitarbeiter'?{Büro:this.mitarbeiter_info?.ort_kurzbz}:{}) ,
             } : {
                 Studiengang:this.student_info?.studiengang,
@@ -150,15 +151,7 @@ export default {
         },
         
     },
-    
-    created(){
-        
-   
-        
-        
-        
-        
-    },
+  
      mounted(){
 
         console.log(this.uid);
@@ -241,12 +234,13 @@ export default {
             <div :class="{'row':true}">
             <div :class="{'col':true}">
             <img :class="{'img-thumbnail':true}" :src="get_image_base64_src"></img>
-            <div v-if="index_information?.foto_sperre">
+            <div v-if="!role?.includes('View')">
+            <div v-if="index_information?.foto_sperre ">
             <p style="margin:0">Profilfoto gesperrt</p>
             <a href="#" @click.prevent="sperre_foto_function(false)" style="text-decoration:none">Sperre des Profilfotos aufheben</a>
             </div>
             <a href="#" @click.prevent="sperre_foto_function(true)" style="display:block; text-decoration:none"  v-else>Profilfoto sperren</a>
-            
+            </div>
             
             </div>
             <div :class="{'col':true}">
@@ -303,9 +297,9 @@ export default {
             </div>
             </div>
             
-            <div :class="{'row':true}">
+            <div class="row my-5">
             
-            <!-- order-1 classe wird nur bei der Studentenansicht hinzugefügt um die Zutrittsgruppen Tabelle hinter der Betriebsmittel aufzureihen -->
+            <!-- order-2 class wird nur bei der Studentenansicht hinzugefügt um die Zutrittsgruppen Tabelle hinter der Betriebsmittel aufzureihen -->
             <div :class="{'col-12':true, 'order-2':role=='Student'}">
           
             <core-filter-cmpt v-if="role == 'Mitarbeiter' || role =='View_Mitarbeiter'" title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />

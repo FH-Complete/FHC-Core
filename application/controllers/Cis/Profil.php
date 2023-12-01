@@ -314,14 +314,14 @@ class Profil extends Auth_Controller
 		$res->username = $uid;
 		
 		$res->anrede = $person_res->anrede;
-		$res->titel = $person_res->titelpre ." " . $person_res->titelpost;
+		$res->titel = $person_res->titelpre;
 		$res->vorname = $person_res->vorname;
 		$res->nachname = $person_res->nachname;
 		if(!$view){
 		$res->gebort = $person_res->gebort;
 		$res->gebdatum = $person_res->gebdatum;
 	}
-		//$res->postnomen = $person_res->postnomen; //! still not found
+		$res->postnomen = $person_res->titelpost; 
 		$intern_email = array();
 		$intern_email+=array("type" => "intern");
 		$intern_email+=array("email"=> $uid . "@" . DOMAIN);
