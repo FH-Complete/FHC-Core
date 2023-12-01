@@ -37,7 +37,7 @@ export default {
 		}
 	},
 	props: {
-		student: Object
+		modelValue: Object
 	},
 	data() {
 		return {
@@ -65,7 +65,7 @@ export default {
 		}
 	},
 	watch: {
-		student(n) {
+		modelValue(n) {
 			this.updateStudent(n);
 		},
 		data: {
@@ -104,7 +104,7 @@ export default {
 		},
 		save() {
 			CoreRESTClient
-				.post('components/stv/Student/save/' + this.student.prestudent_id, this.changed)
+				.post('components/stv/Student/save/' + this.modelValue.prestudent_id, this.changed)
 				.then(result => result.data)
 				.then(result => {
 					this.resetErrors();
@@ -169,7 +169,7 @@ export default {
 		}
 	},
 	created() {
-		this.updateStudent(this.student);
+		this.updateStudent(this.modelValue);
 	},
 	//TODO(chris): Geburtszeit? Anzahl der Kinder?
 	template: `

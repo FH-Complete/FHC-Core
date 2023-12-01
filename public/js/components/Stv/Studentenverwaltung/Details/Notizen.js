@@ -1,6 +1,6 @@
 export default {
 	props: {
-		student: Object
+		modelValue: Object
 	},
 	template: `
 	<div class="stv-details-details h-100 pb-3">

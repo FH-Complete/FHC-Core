@@ -1,66 +1,20 @@
-import accessibility from "../../../directives/accessibility.js";
+import FhcTabs from "../../Tabs.js";
 
 export default {
-	directives: {
-		accessibility
+	components: {
+		FhcTabs
 	},
 	props: {
-		student: Object
-	},
-	data() {
-		return {
-			current: this.$route.params.tab || 'details',
-			tabTemplates: {
-				details: 'Details',
-				notizen: 'Notizen',
-				kontakt: 'Kontakt'
-			},
-			tabs: {}
-		}
-	},
-	computed: {
-		hasNoStudent() {
-			return !this.student || (Object.keys(this.student).length === 0 && this.student.constructor === Object);
-		},
-		currentComponent() {
-			return this.tabs[this.current].component;
-		}
-	},
-	created() {
-		this.tabs = Object.fromEntries(Object.entries(this.tabTemplates).map(([key, title]) => {
-			return [key, {
-				title,
-				component: Vue.defineAsyncComponent(() => import("./Details/" + key.charAt(0).toUpperCase() + key.slice(1) + '.js'))
-			}];
-		}));
+		students: Array
 	},
 	template: `
 	<div class="stv-details h-100 pb-3 d-flex flex-column">
-		<div v-if="hasNoStudent" class="justify-content-center d-flex h-100 align-items-center">Bitte StudentIn auswählen!</div>
-		<template v-else>		
-			<div class="nav nav-tabs">
-				<div
-					v-for="({title}, key) in tabs"
-					:key="comp"
-					class="nav-item nav-link"
-					:class="{active: key == current}"
-					@click="current=key"
-					:aria-current="key == current ? 'page' : ''"
-					v-accessibility:tab
-					>
-					{{title}}
-				</div>
-			</div>
-			<div style="flex: 1 1 0%; height: 0%" class="border-bottom border-start border-end overflow-auto p-3">
-				<keep-alive>
-					<suspense>
-						<component :is="currentComponent" :student="student"></component>
-						<template #fallback>
-							Loading...
-						</template>
-					</suspense>
-				</keep-alive>
-			</div>
+		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
+			Bitte StudentIn auswählen!
+		</div>
+		<template v-else>
+			<fhc-tabs v-if="students.length == 1" :modelValue="students[0]" config-url="/components/stv/config/student" :default="$route.params.tab"></fhc-tabs>
+			<fhc-tabs v-else :modelValue="students" config-url="/components/stv/config/students" :default="$route.params.tab"></fhc-tabs>
 		</template>
 	</div>`
 };

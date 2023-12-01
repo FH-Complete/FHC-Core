@@ -91,11 +91,6 @@ export default {
 			}
 		}
 	},
-	computed: {
-		lastSelected() {
-			return this.selected[this.selected.length - 1];
-		}
-	},
 	methods: {
 		onSelectVerband({link, studiengang_kz}) {
 			this.studiengangKz = studiengang_kz;
@@ -182,7 +177,7 @@ export default {
 						<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
 					</template>
 					<template #bottom>
-						<stv-details :student="lastSelected"></stv-details>
+						<stv-details :students="selected"></stv-details>
 					</template>
 				</vertical-split>
 			</main>

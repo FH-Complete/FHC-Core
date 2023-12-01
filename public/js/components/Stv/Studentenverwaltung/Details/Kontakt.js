@@ -14,7 +14,7 @@ export default {
 		PvAutoComplete
 	},
 	props: {
-		student: Object
+		modelValue: Object
 	},
 	data() {
 		return {
@@ -25,7 +25,7 @@ export default {
 	},
 	created(){
 		CoreRESTClient
-			.get('components/stv/Kontakt/getAdressen/' + this.student.person_id)
+			.get('components/stv/Kontakt/getAdressen/' + this.modelValue.person_id)
 			.then(result => {
 				this.adressen = result.data;
 			})
@@ -33,7 +33,7 @@ export default {
 				console.error(err.response.data || err.message);
 			});
 		/*		CoreRESTClient
-					.get('components/stv/Kontakt/getKontakte/' + this.student.person_id)
+					.get('components/stv/Kontakt/getKontakte/' + this.modelValue.person_id)
 					.then(result => {
 						this.kontakte = result.data;
 					})
@@ -41,7 +41,7 @@ export default {
 						console.error(err.response.data || err.message);
 					});
 				CoreRESTClient
-					.get('components/stv/Kontakt/getBankverbindung/' + this.student.person_id)
+					.get('components/stv/Kontakt/getBankverbindung/' + this.modelValue.person_id)
 					.then(result => {
 						this.bankverbindungen = result.data;
 					})
@@ -62,19 +62,19 @@ export default {
 <!--				<button type="button" class="btn btn btn-outline-warning" @click="actionNewAdress()">new Adress</button>
 				<button type="button" class="btn btn btn-outline-warning" @click="actionEditAdress(111444)">edit 111444</button>-->
 				
-				<address-list ref="adressList" :uid="student.person_id"></address-list>
+				<address-list ref="adressList" :uid="modelValue.person_id"></address-list>
 		</fieldset>
 		<br>
 		<fieldset class="overflow-hidden">
 			<legend>Kontakt</legend>
 	<!--		{{this.kontakte}}-->
-			<contact-list ref="contactList" :uid="student.person_id"></contact-list>
+			<contact-list ref="contactList" :uid="modelValue.person_id"></contact-list>
 		</fieldset>
 		<br>
 		<fieldset class="overflow-hidden">
 			<legend>Bankverbindungen</legend>
 <!--			{{this.bankverbindungen}}-->
-			<bankaccount-list ref="bankaccountList" :uid="student.person_id"></bankaccount-list>
+			<bankaccount-list ref="bankaccountList" :uid="modelValue.person_id"></bankaccount-list>
 		</fieldset>
 	</div>`
 };
