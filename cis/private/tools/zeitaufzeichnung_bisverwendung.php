@@ -31,7 +31,6 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/projekt.class.php');
-require_once('../../../include/bisverwendung.class.php');
 require_once('../../../include/vertragsbestandteil.class.php');
 
 if ((isset($_GET['uid'])) && (isset($_GET['day'])))
