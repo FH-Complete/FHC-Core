@@ -1397,23 +1397,15 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					echo '</table>';
 					echo '</td><td valign="top"><span id="zeitsaldo"></span><br>';
 
-					if (defined('DEFAULT_ALLIN_DIENSTVERTRAG') && DEFAULT_ALLIN_DIENSTVERTRAG != '')
+					$vbt = new vertragsbestandteil();
+					$isAllin = $vbt->isAllin($user);
+					
+					if ($isAllin)
 					{
-						$bisver = new bisverwendung();
-						$bisver->getLastVerwendung($user);
-		//				$ba1code = $bisver->ba1code;
-						$ba1code = null;
-
-						if (in_array($bisver->ba1code, DEFAULT_ALLIN_DIENSTVERTRAG))
-						{
-							echo '<span id="saldoAllin"></span><br><br>';
-						}
-						else
-							echo '<br>';
+						echo '<span id="saldoAllin"></span><br>';
 					}
-					else
-						echo '<br>';
 
+					echo '<br>';
 
 
 
