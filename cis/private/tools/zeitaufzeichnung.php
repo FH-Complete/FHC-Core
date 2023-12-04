@@ -46,6 +46,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/zeitaufzeichnung_import_csv.class.php');
 require_once('../../../include/zeitaufzeichnung_import_post.class.php');
+require_once('../../../include/vertragsbestandteil.class.php');
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
@@ -303,7 +304,7 @@ echo '
 					Monat=Datum.substring(3,5);
 					Jahr=Datum.substring(6,10);
 					var day = Jahr + "-" + Monat + "-" + Tag;
-					checkBisverwendung(day,uid);
+					checkZeitaufzeichnung(day,uid);
 					checkZeitsperre(day,uid);
 				}
 			)
@@ -762,14 +763,15 @@ echo '
 			Monat=Datum.substring(3,5);
 			Jahr=Datum.substring(6,10);
 			var checkedDay = Jahr + "-" + Monat + "-" + Tag;
-			checkBisverwendung(checkedDay, uid);
+			checkZeitaufzeichnung(checkedDay, uid);
 			checkZeitsperre(checkedDay, uid);
 		}
 
-		function checkBisverwendung(day, uid)
+		function checkZeitaufzeichnung(day, uid)
 		{
+			/* Checkt nicht mehr Bisverwendung, sondern Vertragsbestandteil Zeitaufzeichnung */
 			$.ajax({
-  			url: "zeitaufzeichnung_bisverwendung.php",
+  			url: "zeitaufzeichnung_bisverwendung.php", 
   			data: {
   			  day: day,
 			  uid: uid
@@ -1395,23 +1397,15 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					echo '</table>';
 					echo '</td><td valign="top"><span id="zeitsaldo"></span><br>';
 
-					if (defined('DEFAULT_ALLIN_DIENSTVERTRAG') && DEFAULT_ALLIN_DIENSTVERTRAG != '')
+					$vbt = new vertragsbestandteil();
+					$isAllin = $vbt->isAllin($user);
+					
+					if ($isAllin)
 					{
-						$bisver = new bisverwendung();
-						$bisver->getLastVerwendung($user);
-		//				$ba1code = $bisver->ba1code;
-						$ba1code = null;
-
-						if (in_array($bisver->ba1code, DEFAULT_ALLIN_DIENSTVERTRAG))
-						{
-							echo '<span id="saldoAllin"></span><br><br>';
-						}
-						else
-							echo '<br>';
+						echo '<span id="saldoAllin"></span><br>';
 					}
-					else
-						echo '<br>';
 
+					echo '<br>';
 
 
 
@@ -1578,21 +1572,21 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					$linkInformation =  APP_ROOT. 'skin/images/information.png';
 
 					$za = new zeitaufzeichnung();
-					$verwendung = new bisverwendung();
+
 					if ($za->checkPausenErrors($user, $tag))
 					{
-						$verwendung->getVerwendungDatum($user, $tag);
-						foreach ($verwendung->result as $v)
+						$vbt = new vertragsbestandteil();
+						$isAzgrelevant = $vbt->isAzgRelevant($user, $tag);
+
+						if ($isAzgrelevant)
 						{
-							if ($v->azgrelevant)
-							{
-								$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz -- </span>';
-							}
-							else
-							{
-								$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
-							}
+							$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz -- </span>';
 						}
+						else
+						{
+							$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
+						}
+
 					}
 
 					$tagessaldo = date('H:i', ($tagessaldo));
