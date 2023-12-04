@@ -28,7 +28,9 @@ class Config extends FHC_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Notizen.js'
 		];
 
-		Events::trigger('stv_conf_student', $result);
+		Events::trigger('stv_conf_student', function & () use (&$result) {
+			return $result;
+		});
 
 		$this->outputJsonSuccess($result);
 	}

@@ -24,7 +24,7 @@ class CI3_Events
 			self::$eventsSorted[$event] = false;
 	}
 
-	public static function trigger($event, &...$args)
+	public static function trigger($event, ...$args)
 	{
 		if (!isset(self::$events[$event]))
 			return;
@@ -37,7 +37,7 @@ class CI3_Events
 		}
 		
 		foreach (self::$events[$event] as $conf) {
-			call_user_func_array($conf[1], $args);
+			$conf[1](...$args);
 		}
 	}
 }
