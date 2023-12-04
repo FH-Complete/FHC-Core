@@ -31,21 +31,35 @@ $query = '
 					ORDER BY l.log_id DESC
 					LIMIT 1
 				)
-				AND '. $LOGDATA_VON .' = (
+				AND ('. $LOGDATA_VON .' = (
 					SELECT l.insertvon
 					FROM system.tbl_log l
 					WHERE l.person_id = p.person_id
 					ORDER BY l.log_id DESC
 					LIMIT 1
 				)
+				OR
+					(
+						(
+						SELECT l.insertvon
+						FROM system.tbl_log l
+						WHERE l.person_id = p.person_id
+						ORDER BY l.log_id DESC
+						LIMIT 1
+						) IS NULL
+					)
+				)
 				AND l.zeitpunkt >= pss.insertamum
 			  ORDER BY l.log_id DESC
 				 LIMIT 1
 			) AS "Nachricht",
 			(
-				SELECT SUM(konto.betrag)
+				SELECT
+					CASE
+						WHEN COUNT(CASE WHEN konto.betrag != 0 THEN 1 END) = 0 THEN null
+						ELSE SUM(konto.betrag)
+					END AS "Kaution"
 				FROM public.tbl_konto konto
-				LEFT JOIN tbl_konto skonto ON (skonto.buchungsnr_verweis = konto.buchungsnr)
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
 					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'

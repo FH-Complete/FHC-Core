@@ -198,7 +198,11 @@ $query = '
 				LIMIT 1 
 			) AS "InfoCenterMitarbeiter",
 			(
-				SELECT SUM(konto.betrag)
+				SELECT
+					CASE
+						WHEN COUNT(CASE WHEN konto.betrag != 0 THEN 1 END) = 0 THEN null
+						ELSE SUM(konto.betrag)
+					END AS "Kaution"
 				FROM public.tbl_konto konto
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
