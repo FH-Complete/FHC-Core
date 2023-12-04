@@ -51,7 +51,7 @@ export default {
     },
     
     //? this props were passed in the Profil.php view file
-    props:['uid','pid','view'],
+    props:['uid','view'],
     methods: {
         
         concatenate_addresses(address_array){
@@ -155,7 +155,6 @@ export default {
      mounted(){
 
         console.log(this.uid);
-        console.log(this.pid);
         console.log(this.view);
         console.log(typeof this.view);
         if(this.view){console.log("view is true")}else{ console.log("view is false")}

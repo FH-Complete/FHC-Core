@@ -79,13 +79,12 @@ class Profil extends Auth_Controller
 	
 	public function View($uid){
 		
-		//? get the personID of the uid
-		isSuccess($this->BenutzerModel->addSelect(["person_id"]));
-		$personID_res = $this->BenutzerModel->load([$uid]);
-		$personID_res = hasData($personID_res) ? getData($personID_res)[0] : null; 
+		if($uid === getAuthUID()){
+			$this->index();
+		}else{
+			$this->load->view('Cis/Profil', ["uid" => $uid,"view"=>true]);
+		}
 		
-		$this->load->view('Cis/Profil', ["uid" => $uid,"pid" => $personID_res->person_id,"view"=>true]);
-	
 	}
 	
 
