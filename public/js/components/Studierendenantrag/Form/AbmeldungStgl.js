@@ -1,5 +1,4 @@
 import {CoreFetchCmpt} from '../../Fetch.js';
-import Phrasen from '../../../mixins/Phrasen.js';
 
 var _uuid = 0;
 
@@ -7,9 +6,6 @@ export default {
 	components: {
 		CoreFetchCmpt
 	},
-	mixins: [
-		Phrasen
-	],
 	emits: [
 		'setInfos',
 		'setStatus'
@@ -30,7 +26,7 @@ export default {
 	},
 	computed: {
 		statusSeverity() {
-			switch (this.data.status)
+			switch (this.data?.status)
 			{
 				case 'Erstellt': return 'info';
 				case 'Genehmigt': return 'success';
@@ -56,7 +52,7 @@ export default {
 					this.data = result.data.retval;
 					if (this.data.status) {
 						this.$emit("setStatus", {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 							severity: this.statusSeverity
 						});
 					}
@@ -67,7 +63,7 @@ export default {
 		createAntrag() {
 			bootstrap.Modal.getOrCreateInstance(this.$refs.modal).hide();
 			this.$emit('setStatus', {
-				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_saving')}),
+				msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_saving')})),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -93,7 +89,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_error')}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
 							severity: 'danger'
 						});
 					}
@@ -104,13 +100,13 @@ export default {
 						this.data = result.data.retval;
 						if (this.data.status) {
 							this.$emit("setStatus", {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 								severity: this.statusSeverity
 							});
 						}
 						else
 							this.$emit('setStatus', {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_open')}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_open')})),
 								severity:'success'
 							});
 					}
@@ -123,7 +119,7 @@ export default {
 
 			if(event.target.value)
 			{
-				let templateT= this.p.t('studierendenantrag', event.target.value);
+				let templateT= this.$p.t('studierendenantrag', event.target.value);
 				templateText.value = templateT;
 			}
 			else
@@ -140,40 +136,40 @@ export default {
 				<div class="col-12">
 					<table class="table">
 						<tr>
-							<th>{{p.t('lehre', 'studiengang')}}</th>
+							<th>{{$p.t('lehre', 'studiengang')}}</th>
 							<td align="right">{{data.bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'organisationsform')}}</th>
+							<th>{{$p.t('lehre', 'organisationsform')}}</th>
 							<td align="right">{{data.orgform_bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
+							<th>{{$p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
 							<td align="right">{{data.name}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('person', 'personenkennzeichen')}}</th>
+							<th>{{$p.t('person', 'personenkennzeichen')}}</th>
 							<td align="right">{{data.matrikelnr}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'studienjahr')}}</th>
+							<th>{{$p.t('lehre', 'studienjahr')}}</th>
 							<td align="right">{{data.studienjahr_kurzbz}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'studiensemester')}}</th>
+							<th>{{$p.t('lehre', 'studiensemester')}}</th>
 							<td align="right">{{data.studiensemester_kurzbz}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'semester')}}</th>
+							<th>{{$p.t('lehre', 'semester')}}</th>
 							<td align="right">{{data.semester}}</td>
 						</tr>
 					</table>
 				</div>
 
 				<div v-if="data.grund" class="mb-3">
-					<h5>{{p.t('studierendenantrag', 'antrag_grund')}}:</h5>
+					<h5>{{$p.t('studierendenantrag', 'antrag_grund')}}:</h5>
 				
-					<pre class="text-prewrap">{{data.grund}}</pre>
+					<pre class="text-prewrap">{{data?.grund}}</pre>
 				</div>      
 				<div v-else class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>
@@ -181,18 +177,20 @@ export default {
 						<select name="grundAv" @change="appendDropDownText
 							($event)">
 							<option value="" > --- bitte auswählen, sofern zutreffend ---- </option>
-							<option value="textLong_NichtantrittStudium">{{p.t('studierendenantrag', 'dropdown_NichtantrittStudium')}}
+							<option value="textLong_NichtantrittStudium">{{$p.t('studierendenantrag', 'dropdown_NichtantrittStudium')}}
 							</option>
-							<option value="textLong_ungenuegendeLeistung">{{p.t('studierendenantrag', 'dropdown_ungenuegendeLeistung')}}
+							<option value="textLong_ungenuegendeLeistung">{{$p.t('studierendenantrag', 'dropdown_ungenuegendeLeistung')}}
 							</option>
-							<option value="textLong_studentNichtAnwesend">{{p.t('studierendenantrag', 'dropdown_nichtAnwesend')}}
+							<option value="textLong_studentNichtAnwesend">{{$p.t('studierendenantrag', 'dropdown_nichtAnwesend')}}
 							</option>
-							<option value="textLong_PruefunstermineNichtEingehalten">{{p.t('studierendenantrag', 'dropdown_PruefunstermineNichtEingehalten')}}
+							<option value="textLong_PruefunstermineNichtEingehalten">{{$p.t('studierendenantrag', 'dropdown_PruefunstermineNichtEingehalten')}}
 							</option>
-							<option value="textLong_studentNichtGezahlt">{{p.t('studierendenantrag', 'dropdown_nichtGezahlt')}}
+							<option value="textLong_studentNichtGezahlt">{{$p.t('studierendenantrag', 'dropdown_nichtGezahlt')}}
 							</option>
-							<option value="textLong_plageat">{{p.t('studierendenantrag', 'dropdown_plageat')}}
+							<option value="textLong_plageat">{{$p.t('studierendenantrag', 'dropdown_plageat')}}
 							</option>					
+							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
+							</option>						
 						</select>	
 					</div>			
 					<textarea
@@ -211,14 +209,14 @@ export default {
 				
 				<div class="col-12 text-end">
 					<button
-						v-if="!data.studierendenantrag_id"
+						v-if="!data?.studierendenantrag_id"
 						type="button"
 						class="btn btn-primary"
 						data-bs-toggle="modal"
 						:data-bs-target="'#studierendenantrag-form-abmeldung-' + uuid + '-modal'"
 						:disabled="saving"
 						>
-						{{p.t('studierendenantrag', 'btn_create_Abmeldung')}}
+						{{$p.t('studierendenantrag', 'btn_create_Abmeldung')}}
 					</button>
 					<div
 						ref="modal"
@@ -234,18 +232,18 @@ export default {
 										class="modal-title"
 										:id="'studierendenantrag-form-abmeldung-' + uuid + '-modal-label'"
 										>
-										{{p.t('studierendenantrag', 'title_Abmeldung')}}
+										{{$p.t('studierendenantrag', 'title_Abmeldung')}}
 									</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="p.t('ui', 'schliessen')"></button>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="$p.t('ui', 'schliessen')"></button>
 								</div>
-								<div class="modal-body" v-html="p.t('studierendenantrag', 'warning_AbmeldungStgl')">
+								<div class="modal-body" v-html="$p.t('studierendenantrag', 'warning_AbmeldungStgl')">
 								</div>
 								<div class="modal-footer">
 									<button
 										type="button"
 										class="btn btn-primary"
 										@click="createAntrag">
-										{{p.t('studierendenantrag', 'btn_create_Abmeldung')}}
+										{{$p.t('studierendenantrag', 'btn_create_Abmeldung')}}
 									</button>
 								</div>
 							</div>

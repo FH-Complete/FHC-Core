@@ -22,8 +22,9 @@ class Vertragsbestandteil_model extends DB_Model
 		$sql = <<<EOSQL
 		SELECT
 				v.*,
-				bf.funktion_kurzbz, funktion.beschreibung funktion_bezeichnung,
-				oe.oe_kurzbz, oe.bezeichnung oe_bezeichnung, sap.oe_kurzbz_sap,
+				bf.funktion_kurzbz, bf.uid AS mitarbeiter_uid, 
+				funktion.beschreibung AS funktion_bezeichnung, 			    
+				oe.oe_kurzbz, oe.bezeichnung AS oe_bezeichnung, sap.oe_kurzbz_sap,
 				oet.organisationseinheittyp_kurzbz AS oe_typ_kurzbz, oet.bezeichnung AS oe_typ_bezeichnung,
 				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung,
 				f.benutzerfunktion_id,

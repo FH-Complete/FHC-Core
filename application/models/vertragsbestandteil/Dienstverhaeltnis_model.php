@@ -108,7 +108,30 @@ class Dienstverhaeltnis_model extends DB_Model
 
 	public function isOverlappingExistingDV($mitarbeiter_uid, $oe_kurzbz, $von, $bis, $dvid=null)
 	{
-		$dvidclause = (intval($dvid) > 0) ? 'AND dv.dienstverhaeltnis_id != ' . $dvid  : '';
+		$params = array($mitarbeiter_uid, $oe_kurzbz, $von, $bis, $von, $bis);
+		$dvidclause = '';
+		if (intval($dvid) > 0)
+		{
+			$params = array_merge($params, array($dvid, $dvid));
+			$dvidclause = <<<EODVIDC
+            AND (
+				SELECT 
+					COUNT(*) AS karenzen 
+				FROM 
+					hr.tbl_vertragsbestandteil vb 
+				WHERE 
+					vb.dienstverhaeltnis_id = ?
+				AND 
+					vb.vertragsbestandteiltyp_kurzbz = 'karenz' 
+				AND 
+					dv.von::date >= COALESCE(vb.von, '1970-01-01'::date) 
+				AND 
+					COALESCE(dv.bis::date, '2170-12-31'::date) <= COALESCE(vb.bis, '2170-12-31') 
+			) = 0
+			AND dv.dienstverhaeltnis_id != ?
+EODVIDC;
+		
+		}
 		
 		$query = <<<EOSQL
 			SELECT 
@@ -131,7 +154,7 @@ class Dienstverhaeltnis_model extends DB_Model
 				FROM 
 					hr.tbl_vertragsbestandteil vb 
 				WHERE 
-					vb.dienstverhaeltnis_id = dv.dienstverhaeltnis_id 
+					vb.dienstverhaeltnis_id = dv.dienstverhaeltnis_id
 				AND 
 					vb.vertragsbestandteiltyp_kurzbz = 'karenz' 
 				AND 
@@ -142,8 +165,7 @@ class Dienstverhaeltnis_model extends DB_Model
 			{$dvidclause}
 EOSQL;
 		
-		$ret = $this->execReadOnlyQuery($query, 
-			array($mitarbeiter_uid, $oe_kurzbz, $von, $bis, $von, $bis));
+		$ret = $this->execReadOnlyQuery($query, $params);
 		
 		if( ($dvcount = getData($ret)) && ($dvcount[0]->dvcount > 0) ) {
 			return true;

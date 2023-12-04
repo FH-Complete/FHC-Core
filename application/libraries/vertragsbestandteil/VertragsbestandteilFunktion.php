@@ -1,6 +1,7 @@
 <?php
 namespace vertragsbestandteil;
 
+use Exception;
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
 
@@ -27,10 +28,25 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 		$this->CI = get_instance();
 		$this->CI->load->model('person/Benutzerfunktion_model', 
 			'BenutzerfunktionModel');
+		$this->CI->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model', 
+			'VertragsbestandteilFunktionModel');
 		$this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib', 
 			null, 'VertragsbestandteilLib');
 	}
 	
+	public function isDirty()
+	{
+		$isdirty = parent::isDirty();
+		if( !$isdirty ) {
+			$bf = $this->loadBenutzerfunktion($this->getBenutzerfunktion_id());
+			if( !$this->areVbAndBfInSync($bf) )
+			{
+				$isdirty = true;
+			}
+		}
+		return $isdirty;
+	}
+
 	public function beforePersist()
 	{
 		if( isset($this->benutzerfunktion_id) && intval($this->benutzerfunktion_id) > 0 ) 
@@ -83,10 +99,10 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 	
 	protected function isBefore($a, $b)
 	{
-		if($b === null) {
+		if($a === null) {
 			return false;
 		}
-		elseif($a === null) {
+		elseif($b === null) {
 			return true;
 		}
 		else {
@@ -121,10 +137,17 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 				new \DateTimeZone('Europe/Vienna'));
 			$daybeforevon->sub(new \DateInterval('P1D'));
 			
-			if( $this->isBefore($this->getVon(), $bf->datum_von) && 
-				$this->isAfter($this->getBis(), $bf->datum_bis) )
+			if( $this->isBefore($bf->datum_von, $this->getVon()) && 
+				$this->isBefore($bf->datum_von, $this->getBis()) )
 			{
-				$this->updateBenutzerfunktion($bf, $this->getVon(), $this->getBis());
+				$data = (object) array(
+					'mitarbeiter_uid' => $bf->uid,
+					'funktion' => $bf->funktion_kurzbz,
+					'orget' => $bf->oe_kurzbz
+				);
+				$this->createBenutzerfunktionData($data);
+				$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
+				$this->setBenutzerfunktion_id($bfid);
 			}
 			elseif( $this->isBefore($bf->datum_von, $this->getVon()) && 
 					$this->isAfter($this->getBis(), $bf->datum_von) )
@@ -136,20 +159,12 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 					'orget' => $bf->oe_kurzbz
 				);
 				$this->createBenutzerfunktionData($data);
-				$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+				$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
 				$this->setBenutzerfunktion_id($bfid);
 			}
-			elseif( $this->isBefore($bf->datum_von, $this->getVon()) && 
-					$this->isBefore($bf->datum_von, $this->getBis()) )
+			else
 			{
-				$data = (object) array(
-					'mitarbeiter_uid' => $bf->uid,
-					'funktion' => $bf->funktion_kurzbz,
-					'orget' => $bf->oe_kurzbz
-				);
-				$this->createBenutzerfunktionData($data);
-				$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
-				$this->setBenutzerfunktion_id($bfid);
+				$this->updateBenutzerfunktion($bf, $this->getVon(), $this->getBis());
 			}
 		}
 	}
@@ -211,7 +226,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 			return;
 		}
 		
-		$bfid = $this->insertBenutzerfunktion($this->benutzerfunktiondata);
+		$bfid = $this->insertBenutzerfunktion($this->getBenutzerfunktionData4Insert());
 		
 		$this->setBenutzerfunktion_id($bfid);
 	}
@@ -275,6 +290,25 @@ EOTXT;
 		return $this;
 	}
 	
+	protected function getBenutzerfunktionData4Insert()
+	{
+		if( null === $this->benutzerfunktiondata ) {
+			return null;
+		}
+		
+		$benutzerfunktiondata = (object) array(
+			'funktion_kurzbz' => $this->benutzerfunktiondata->funktion_kurzbz,
+			'oe_kurzbz' => $this->benutzerfunktiondata->oe_kurzbz,
+			'uid' => $this->benutzerfunktiondata->uid,			
+			'datum_von' => $this->getVon(), 
+			'datum_bis' => $this->getBis(),
+			'insertamum' => strftime('%Y-%m-%d %H:%M:%S'),
+			'insertvon' => getAuthUID()
+		);
+		
+		return $benutzerfunktiondata;
+	}
+	
 	protected function createBenutzerfunktionData($data)
 	{
 		if( empty($data->funktion) || empty($data->orget) ) 
@@ -285,11 +319,7 @@ EOTXT;
 		$this->benutzerfunktiondata = (object) array(
 			'funktion_kurzbz' => $data->funktion,
 			'oe_kurzbz' => $data->orget,
-			'uid' => $data->mitarbeiter_uid, 
-			'datum_von' => $this->getVon(), 
-			'datum_bis' => $this->getBis(),
-			'insertamum' => strftime('%Y-%m-%d %H:%M:%S'),
-			'insertvon' => getAuthUID()
+			'uid' => $data->mitarbeiter_uid
 		);
 	}
 
@@ -307,7 +337,8 @@ EOTXT;
 			'oe_bezeichnung' => $data->oe_bezeichnung,
 			'oe_kurzbz_sap' => $data->oe_kurzbz_sap,
 			'oe_typ_kurzbz' => $data->oe_typ_kurzbz,
-			'oe_typ_bezeichnung' => $data->oe_typ_bezeichnung
+			'oe_typ_bezeichnung' => $data->oe_typ_bezeichnung, 
+			'uid' => $data->mitarbeiter_uid
 		);
 	}
 	
@@ -317,6 +348,20 @@ EOTXT;
 			&& ($this->benutzerfunktiondata === NULL) ) {
 			$this->validationerrors[] = 'Eine bestehende Funktion oder eine '
 				. 'Funktion und eine Organisationseinheit müssen ausgewählt sein.';
+		}
+		
+		// TODO check if Benutzerfunktion is assigned to another vb
+		if( intval($this->benutzerfunktion_id) > 0 ) 
+		{
+			if ( $this->CI->VertragsbestandteilFunktionModel
+					->isBenutzerfunktionAlreadyAttachedToAnotherVB(
+						$this->benutzerfunktion_id, 
+						$this->getVertragsbestandteil_id()) )
+			{
+				$this->validationerrors[] = 'Die Benutzerfunktion ist bereits '
+					. 'mit einem anderen Vertragsbestandteil verknüpft und kann '
+					. 'nicht mehrfach verknüft werden.';
+			}
 		}
 		
 		return parent::validate();

@@ -86,15 +86,23 @@ EOTXT;
 	
 	public function validate()
 	{
-		if( !(filter_var($this->wochenstunden, FILTER_VALIDATE_FLOAT, 
+		if( false === filter_var($this->wochenstunden, FILTER_VALIDATE_FLOAT, 
 				array(
 					'options' => array(
 						'min_range' => 0,
 						'max_range' => 100
 					)
 				)
-			)) ) {
+			) ) {
 			$this->validationerrors[] = 'Stunden muss eine Kommazahl im Bereich 0 bis 100 sein.';
+		}
+		else
+		{
+			if( floatval($this->wochenstunden) < floatval('0.01') && 
+				$this->teilzeittyp_kurzbz !== 'altersteilzeit' ) 
+			{
+				$this->validationerrors[] = '0 Wochenstunden ist nur in Kombination mit Altersteilzeit zulässig.';
+			}
 		}
 		
 		return parent::validate();

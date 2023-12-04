@@ -21531,13 +21531,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): \nNichterfüllung finanzieller Verpflichtungen trotz Mahnung (Studienbeitrag)',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichterfüllung finanzieller Verpflichtungen trotz Mahnung (Studienbeitrag)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for exclusion according to the training contract (point 7.4): \nFailure to meet financial obligations despite a reminder (tuition fees)',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Failure to meet financial obligations despite a reminder (tuition fees)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21551,13 +21551,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): \nmehrmalig unentschuldigtes Verletzen der Anwesenheitspflicht',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): mehrmalig unentschuldigtes Verletzen der Anwesenheitspflicht',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for exclusion according to the training contract (point 7.4): \nmultiple unexcused breaches of attendance requirements',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): multiple unexcused breaches of attendance requirements',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21571,13 +21571,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): \nwiederholtes Nichteinhalten von Prüfungsterminen bzw Abgabeterminen für Seminararbeiten bzw. Projektarbeiten',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): wiederholtes Nichteinhalten von Prüfungsterminen bzw Abgabeterminen für Seminararbeiten bzw. Projektarbeiten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for exclusion according to the training contract (point 7.4): \nrepeated non-compliance with examination dates or deadlines for seminar papers or project work',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): repeated non-compliance with examination dates or deadlines for seminar papers or project work',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21591,13 +21591,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): \nPlagiieren im Rahmen wissenschaftlicher Arbeiten bzw. unerlaubte Verwendung KI generierter Hilfsmittel bzw. Quellen',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Plagiieren im Rahmen wissenschaftlicher Arbeiten bzw. unerlaubte Verwendung KI generierter Hilfsmittel bzw. Quellen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for exclusion according to the training contract (point 7.4): \nPlagiarism in the context of scientific work or unauthorized use of AI-generated tools or sources',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Plagiarism in the context of scientific work or unauthorized use of AI-generated tools or sources',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21611,13 +21611,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): \nnicht genügende Leistung im Sinne der Prüfungsordnung',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): nicht genügende Leistung im Sinne der Prüfungsordnung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for exclusion according to the training contract (point 7.4): \ninsufficient performance in terms of the examination regulations',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): insufficient performance in terms of the examination regulations',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21631,13 +21631,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): \nNichtantritt des Studiums zu Beginn des Studienjahres (=Unbegründetes Nichterscheinen zur ersten Studienveranstaltung)',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichtantritt des Studiums zu Beginn des Studienjahres (=Unbegründetes Nichterscheinen zur ersten Studienveranstaltung)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for exclusion according to the training contract (point 7.4): \nFailure to start the course at the beginning of the academic year (= unjustified non-attendance to the first course event)',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Failure to start the course at the beginning of the academic year (= unjustified non-attendance to the first course event)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_MissingZgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry requirements BA (resp. MA) not fulfilled)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21758,6 +21778,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'non-commencement of the course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_MissingZgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry requirements BA (resp. MA) not fulfilled',
 				'description' => '',
 				'insertvon' => 'system'
 			)
