@@ -124,6 +124,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('p.studiengang_kz');
 		$this->addSelect('stg.bezeichnung');
 		$this->addSelect('s.ausbildungssemester');
+		$this->addSelect('plan.sprache');
 		$this->addSelect('COALESCE(plan.orgform_kurzbz, s.orgform_kurzbz, stg.orgform_kurzbz) AS orgform_kurzbz');
 
 		$this->addJoin(
