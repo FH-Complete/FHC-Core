@@ -7,6 +7,12 @@ export default {
                   + `cis.php/Cis/Profil/isMitarbeiterOrStudent/${uid}`;
         return axios.get(url);
     },
+
+    getView: function(payload) {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
+                  + `cis.php/Cis/Profil/getView`;
+        return axios.post(url,payload);
+    },
  
     sperre_foto_function: function(value) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
@@ -21,9 +27,9 @@ export default {
         
         return axios.get(url);
     },
-    mitarbeiterProfil: function(uid) {
+    mitarbeiterProfil: function() {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                   `/Cis/Profil/mitarbeiterProfil/${uid}`;
+                   `/Cis/Profil/mitarbeiterProfil/`;
         
         return axios.get(url);
     },
