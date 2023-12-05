@@ -20,6 +20,7 @@ const app = Vue.createApp({
 	data() {
 		return {
 			view:null,
+			data:null,
 			
 		}
 	},
@@ -38,16 +39,16 @@ const app = Vue.createApp({
 		};
 
 		Vue.$fhcapi.UserData.getView(payload).then((res)=>{
-			//this.view = res.data.view;
-			//this.data = res.data.data;
+			this.view = res.data.view;
+			this.data = res.data.data;
 			console.log(res.data);
 		});
 	},
 	template:`
 	<div>
-	<p>test element</p>
-	<!--<StudentProfil></StudentProfil>-->
-	<component :is="view"></component>
+	
+	
+	<component :is="view" :data="data" ></component>
 	</div>`
 	
 	

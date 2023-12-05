@@ -148,11 +148,17 @@ class Profil extends Auth_Controller
 				$person_res = hasData($person_res)? getData($person_res)[0] : null;
 			}
 		}
-		$mitarbeiter_res = $this->MitarbeiterModel->load($uid);
-		if(isError($mitarbeiter_res)){
-			// error handling
-		}else{
-			$mitarbeiter_res = hasData($mitarbeiter_res)? getData($mitarbeiter_res)[0] : null;
+
+
+		if(isSuccess($this->MitarbeiterModel->addSelect(["kurzbz","telefonklappe", "alias","ort_kurzbz"]))
+			&& isSuccess($this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid")))
+		{
+			$mitarbeiter_res = $this->MitarbeiterModel->load($uid);
+			if(isError($mitarbeiter_res)){
+				// error handling
+			}else{
+				$mitarbeiter_res = hasData($mitarbeiter_res)? getData($mitarbeiter_res)[0] : null;
+			}
 		}
 
 		
@@ -171,11 +177,11 @@ class Profil extends Auth_Controller
 		$res->nachname = $person_res->nachname;
 		
 		
-		$res->gebdatum = $person_res->gebdatum;
-		$res->gebort = $person_res->gebort;
 		//? Mitarbeiter Info
-		$res->kurzbz = $mitarbeiter_res->kurzbz;
-		$res->telefonklappe = $mitarbeiter_res->telefonklappe;
+		foreach($mitarbeiter_res as $key => $val){
+			$res->$key = $val;
+
+		}
 		//? Email Info 
 		$intern_email = array();
 		$intern_email+=array("type" => "intern");
@@ -184,20 +190,14 @@ class Profil extends Auth_Controller
 		$extern_email+=array("type" => "alias");
 		$extern_email+=array("email" => $benutzer_res->alias . "@" . DOMAIN);
 		$res->emails = array($intern_email,$extern_email);
-		//? Adresse Info 
-		$res->adressen = $adresse_res;
+	
 		//? Benutzerfunktion Info
 		$res->funktionen = $benutzer_funktion_res;
-		//? Betriebsmittel Info
-		$res->mittel = $betriebsmittelperson_res;
-		//? Austellungsdatum von der Zutrittskarte
-		$res->zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam;
-		//? Kontakt Info
-		$res->kontakte = $kontakte_res;
+	
 		//? Mailverteiler Info
 		$res->mailverteiler = $mailverteiler_res;
 		 
-		echo json_encode($res);
+		return $res;
 
 	}
 
@@ -276,7 +276,11 @@ class Profil extends Auth_Controller
 	
 		$res->postnomen = $person_res->titelpost; 
 		
-		$res->internal_email= $uid . "@" . DOMAIN;
+		$intern_email = array();
+			$intern_email+=array("type" => "intern");
+			$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
+		
+			$res->emails = array($intern_email);
 	
 	
 		
@@ -296,8 +300,7 @@ class Profil extends Auth_Controller
 	}
 
 	private function mitarbeiterProfil(){
-		//? informationen die nur für den Mitarbeiter verfügbar sind
-	//? Data for the Mitarbeiter view
+		
 
 			//? betriebsmittel soll nur der user selber sehen
 			if(
@@ -457,12 +460,9 @@ class Profil extends Auth_Controller
 			
 			$res->funktionen = $benutzer_funktion_res;
 			return $res;
-		}
+	}
 	
 	
-	
-
-
 	private function studentProfil(){
 
 
@@ -619,7 +619,12 @@ class Profil extends Auth_Controller
 	
 		$res->postnomen = $person_res->titelpost; 
 		
-		$res->internal_email= getAuthUID() . "@" . DOMAIN;
+
+		$intern_email = array();
+		$intern_email+=array("type" => "intern");
+		$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
+		
+		$res->emails = array($intern_email);
 		$res->adressen = $adresse_res;
 		$res->zutrittsdatum = $zutrittskarte_ausgegebenam;
 		$res->kontakte = $kontakte_res;
@@ -662,18 +667,8 @@ class Profil extends Auth_Controller
 		$isMitarbeiter = hasData($isMitarbeiter) ? getData($isMitarbeiter) : null;
 		
 		$res = new stdClass();
-	
-		if($uid){
-			// if an $uid was passed as payload to the function then the user is trying to view another profile
-			if($isMitarbeiter ){
-				 $res->view= "ViewMitarbeiterProfil";
-				 $res->data= $this->viewMitarbeiterProfil($uid);
-			}
-			else {
-				$res->view= "ViewStudentProfil";
-				$res->data= $this->viewStudentProfil($uid);
-			}
-		}else{
+		
+		if($uid == getAuthUID() || !$uid ){
 			// if the $uid is empty, then no payload was supplied and the own profile is being requested
 			if($isMitarbeiter ) {
 				$res->view= "MitarbeiterProfil";
@@ -684,10 +679,21 @@ class Profil extends Auth_Controller
 				$res->data = $this->studentProfil();
 			}
 		}
+		elseif($uid){
+			// if an $uid was passed as payload to the function then the user is trying to view another profile
+			if($isMitarbeiter ){
+				 $res->view= "ViewMitarbeiterProfil";
+				 $res->data= $this->viewMitarbeiterProfil($uid);
+			}
+			else {
+				$res->view= "ViewStudentProfil";
+				$res->data= $this->viewStudentProfil($uid);
+			}
+		}
 
 
 		echo json_encode($res);
-		return;
+		
 		
 
 		

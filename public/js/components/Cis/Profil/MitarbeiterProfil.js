@@ -1,6 +1,5 @@
-
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
-import {CoreFilterCmpt} from "../../../components/filter/Filter.js"
+import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
 //? possible types of roles:
 //! depending on the role of the current view, different content is being displayed and fetched
@@ -10,209 +9,282 @@ import {CoreFilterCmpt} from "../../../components/filter/Filter.js"
 //* View_Mitarbeiter
 
 export default {
-    components:{
-        CoreFilterCmpt,
-    },
-    data() {
-        return {
-            index_information: null,
-            mitarbeiter_info: null,
-            student_info:null,
-            //? beinhaltet die Information ob der angefragte user ein Student oder Mitarbeiter ist
-            role: null,
+  components: {
+    CoreFilterCmpt,
+  },
+  data() {
+    return {
+      index_information: null,
+      mitarbeiter_info: null,
+      student_info: null,
+      //? beinhaltet die Information ob der angefragte user ein Student oder Mitarbeiter ist
+      role: null,
 
-            funktionen_table_options: {
-                height: 300,
-                layout: 'fitColumns',
-                data:[{Bezeichnung:"",Organisationseinheit:"",Gültig_von:"",Gültig_bis:"",Wochenstunden:""}],
-                columns: [{title: 'Bezeichnung', field: 'Bezeichnung', headerFilter: true},
-                {title: 'Organisationseinheit', field: 'Organisationseinheit', headerFilter: true},
-                {title: 'Gültig_von', field: 'Gültig_von', headerFilter: true},
-                {title: 'Gültig_bis', field: 'Gültig_bis', headerFilter: true},
-                {title: 'Wochenstunden', field: 'Wochenstunden', headerFilter: true},]
-                
-            },
-            betriebsmittel_table_options:{
-                height: 300,
-                layout: 'fitColumns',
-                data:[{betriebsmittel:"",Nummer:"",Ausgegeben_am:""}],
-                columns: [{title: 'Betriebsmittel', field: 'betriebsmittel', headerFilter: true},
-                {title: 'Nummer', field: 'Nummer', headerFilter: true},
-                {title: 'Ausgegeben_am', field: 'Ausgegeben_am', headerFilter: true},]
-                
-            },
-            zutrittsgruppen_table_options:{
-                height: 300,
-                layout: 'fitColumns',
-                data:[{bezeichnung:"test1"}],
-                columns: [{title: 'Zutritt', field: 'bezeichnung'}]
-            }
-        }
+      funktionen_table_options: {
+        height: 300,
+        layout: "fitColumns",
+        data: [
+          {
+            Bezeichnung: "",
+            Organisationseinheit: "",
+            Gültig_von: "",
+            Gültig_bis: "",
+            Wochenstunden: "",
+          },
+        ],
+        columns: [
+          { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true },
+          {
+            title: "Organisationseinheit",
+            field: "Organisationseinheit",
+            headerFilter: true,
+          },
+          { title: "Gültig_von", field: "Gültig_von", headerFilter: true },
+          { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true },
+          {
+            title: "Wochenstunden",
+            field: "Wochenstunden",
+            headerFilter: true,
+          },
+        ],
+      },
+      betriebsmittel_table_options: {
+        height: 300,
+        layout: "fitColumns",
+        data: [{ betriebsmittel: "", Nummer: "", Ausgegeben_am: "" }],
+        columns: [
+          {
+            title: "Betriebsmittel",
+            field: "betriebsmittel",
+            headerFilter: true,
+          },
+          { title: "Nummer", field: "Nummer", headerFilter: true },
+          {
+            title: "Ausgegeben_am",
+            field: "Ausgegeben_am",
+            headerFilter: true,
+          },
+        ],
+      },
+      zutrittsgruppen_table_options: {
+        height: 300,
+        layout: "fitColumns",
+        data: [{ bezeichnung: "test1" }],
+        columns: [{ title: "Zutritt", field: "bezeichnung" }],
+      },
+    };
+  },
+
+  //? this props were passed in the Profil.php view file
+  props: ["data"],
+  methods: {
+    concatenate_addresses(address_array) {
+      let result = "";
+      for (let i = 0; i < address_array.length; i++) {
+        result +=
+          address_array[i].strasse +
+          " " +
+          address_array[i].plz +
+          " " +
+          address_array[i].ort +
+          "\n";
+      }
+      return result;
     },
+    render_unterelement(wert, bezeichnung) {
+      if (isArray(bezeichnung)) {
+      }
+    },
+    concatenate_kontakte(kontakt_array) {
+      let result = "";
+      for (let i = 0; i < kontakt_array.length; i++) {
+        result +=
+          kontakt_array[i].kontakttyp +
+          " " +
+          kontakt_array[i].kontakt +
+          " " +
+          kontakt_array[i].zustellung +
+          "\n";
+      }
+      return result;
+    },
+    sperre_foto_function(value) {
+      if (!this.data) {
+        return;
+      }
+      fhcapifactory.UserData.sperre_foto_function(value).then((res) => {
+        this.data.foto_sperre = res.data.foto_sperre;
+      });
+    },
+  },
+  computed: {
+    get_image_base64_src() {
+      if (!this.data) {
+        return "";
+      }
+      return "data:image/jpeg;base64," + this.data.foto;
+    },
+    personData() {
+      if (!this.data) {
+        return {};
+      }
+
+      return {
+        Allgemein: {
+          Username: this.data.username,
+          Anrede: this.data.anrede,
+          Titel: this.data.titel,
+          Vorname: this.data.vorname,
+          Nachname: this.data.nachname,
+          Postnomen: this.data.postnomen,
+        },
+        GeburtsDaten: {
+          Geburtsdatum: this.data.gebdatum,
+          Geburtsort: this.data.gebort,
+        },
+        Adressen: this.data.adressen,
+        SpecialInformation:  {
+            Kurzzeichen: this.data.kurzbz,
+            Telefon: this.data.telefonklappe,
+            Büro:this.data.ort_kurzbz,
+        },
+      };
+    },
+    //? this computed conains all the information that is used for the second column that displays the information of the person
+    kontaktInfo() {
+      if (!this.data) {
+        return {};
+      }
+
+      return {
+        FhAusweisStatus: this.data.zutrittsdatum,
+        emails: this.data.emails,
+        Kontakte: this.data.kontakte,
+      };
+    },
+  },
+
+  mounted() {
+    this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
     
-    //? this props were passed in the Profil.php view file
-    props:['uid','view'],
-    methods: {
+        this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
         
-        concatenate_addresses(address_array){
-            let result = "";
-            for (let i = 0; i < address_array.length; i++) {
-                result += address_array[i].strasse + " " + address_array[i].plz + " " + address_array[i].ort + "\n";
-            }
-            return result;
-        },
-        render_unterelement(wert,bezeichnung){
-            if (isArray(bezeichnung)){
-                
-            }
-        },
-        concatenate_kontakte(kontakt_array){
-            let result = "";
-            for (let i = 0; i < kontakt_array.length; i++) {
-                result += kontakt_array[i].kontakttyp + " " + kontakt_array[i].kontakt + " " + kontakt_array[i].zustellung + "\n";
-            }
-            return result;
-        },
-        sperre_foto_function(value){
-            if(!(this.mitarbeiter_info && this.index_information && this.student_info) ){
-                return;
-            }
-            fhcapifactory.UserData.sperre_foto_function(value).then(res => {
+    }) 
+
+    this.$refs.funktionenTable.tabulator.on('tableBuilt', () => {
+    
+        this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
+        
+    }) 
+
+  },
+
+  template: `
+
+
+            <div class="container-fluid">
+            <!-- here starts the row of the whole window -->
+                <div class="row">
+                <!-- this is the left column of the window -->
+                    <div class="col-9">
+                        <div class="row">
+                            <div class="col">
+                                <img class="img-thumbnail" :src="get_image_base64_src"></img>
+                                
+                                <div v-if="data.foto_sperre ">
+                                    <p style="margin:0">Profilfoto gesperrt</p>
+                                    <a href="#" @click.prevent="sperre_foto_function(false)" style="text-decoration:none">Sperre des Profilfotos aufheben</a>
+                                </div>
+                                <a href="#" @click.prevent="sperre_foto_function(true)" style="display:block; text-decoration:none"  v-else>Profilfoto sperren</a>
+                            </div>
+                            
+                          
+                            <div class="col">
+                        
+                        
+                                <h3 >Mitarbeiter</h3>
+                                
+                                <div v-for="(wert,bezeichnung) in personData">
+                                
+                                <div class="mb-3"  v-if="typeof wert == 'object' && bezeichnung=='Adressen'"><span style="display:block" v-for="element in wert">{{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}</span></div>
+                                <div v-else class="mb-3" ><span style="display:block;" v-for="(val,bez) in wert">{{bez}}: {{val}}</span></div>
+                                
+                                </div>
+                                
+                            </div>
+                            <div class="col">
+                                <ol style="list-style:none">
+                                
+                                    <li v-for="(wert,bezeichnung) in kontaktInfo">
+                                    
+                                    <!-- HIER IST DAS DATUM DES FH AUSWEIS -->
+                                        <div class="mb-3" v-if="bezeichnung=='FhAusweisStatus'">
+                                            <p class="mb-0"><b>FH-Ausweis Status</b></p>
+                                            <p class="mb-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</p>
+                                        </div>
+
+                                    <!-- HIER SIND DIE EMAILS -->
+                            
+
+                                        <div class="mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
+                                            <p class="mb-0"><b>eMail</b></p>
+                                            <p v-for="email in wert" class="mb-0">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></p>
+                                        </div>
+
+                                        <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
+                                        <div class="mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
+                                        <p class="mb-0"><b>Private Kontakte</b></p>
+                                            <div class="row" v-for="element in wert" >
+                                                <div class="col-8">{{element.kontakttyp + ":  " + element.kontakt+"  " }}</div>
+                                                <div class="col-2"> {{element?.anmerkung}}</div>
+                                                <div class="col-2"> 
+                                                <i v-if="element.zustellung" class="fa-solid fa-check"></i>
+                                                <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                    </li>
+                                </ol>
+
+
+                            </div>
+                        </div>
+                      
                     
-                    this.index_information.foto_sperre = res.data.foto_sperre;
+                        <div class="row my-5">
+                        
                 
-            });
+                            <div class="col-12">
+                            <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
+                            
+                            </div>
+                            <div class="col-12">
+                            <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
+                            </div>
+                        
+                        </div>
+
+                
+                    </div>
+
+                    <div  class="col-3">
+                        <div style="background-color:#EEEEEE" class="row py-4">
+                        <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
+                        <a style="text-decoration:none" class="my-1" href="#">Lehrveranstaltungen</a>
+                        <a style="text-decoration:none" class="my-1" href="#">Zeitsperren von Gschnell</a>
+                        </div>
+                        <div class="row">
+                            <h5 class="fs-3" style="margin-top:1em">Mailverteilers</h5>
+                            <p class="fs-6">Sie sind Mitgglied in folgenden Verteilern:</p>
+                            <div  class="row text-break" v-for="verteiler in data?.mailverteiler">
+                                <div class="col-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
+                                <div class="col-6">{{verteiler.beschreibung}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-        },
-        
-        
-    },
-    computed:{
-     
-        
-        get_image_base64_src(){
-            if(!this.index_information){
-                return "";
-            }
-            return "data:image/jpeg;base64,"+this.index_information.foto;
-        },
-        personData(){
-            if(!this.index_information){
-                return {};
-            }
-  
-           return {
-                Allgemein: (this.role =='Mitarbeiter' || this.role =='View_Mitarbeiter')?{
-                    Username:this.index_information.username,
-                    Anrede:this.index_information.anrede,
-                    Titel:this.index_information.titel,
-                    Vorname:this.index_information.vorname,
-                    Nachname:this.index_information.nachname,
-                    Postnomen:this.index_information.postnomen,
-            }:{
-                Username:this.index_information.username,
-                Matrikelnummer: this.student_info?.matrikelnummer,
-                Anrede:this.index_information.anrede,
-                Titel:this.index_information.titel,
-                Vorname:this.index_information.vorname,
-                Nachname:this.index_information.nachname,
-                Postnomen:this.index_information.postnomen,
-            },
-            GeburtsDaten:!this.role.includes("View")?{
-                Geburtsdatum:this.index_information.gebdatum,
-                Geburtsort: this.index_information.gebort,
-            }: null,
-                Adressen: this.index_information.adressen,
-            SpecialInformation: this.role =='Mitarbeiter' || this.role === 'View_Mitarbeiter'?  {
-                Kurzzeichen: this.mitarbeiter_info?.kurzbz,
-                Telefon: this.mitarbeiter_info?.telefonklappe,
-                //* Wird das Feld Ort_kurzbz noch gepflegt?
-                ...(this.role === 'View_Mitarbeiter'?{Büro:this.mitarbeiter_info?.ort_kurzbz}:{}) ,
-            } : {
-                Studiengang:this.student_info?.studiengang,
-                Semester:this.student_info?.semester,
-                Verband:this.student_info?.verband,
-                Gruppe:this.student_info?.gruppe,
-                Personenkennzeichen:this.student_info?.personenkennzeichen
-            },
-            };
-        },
-        //? this computed conains all the information that is used for the second column that displays the information of the person
-        kontaktInfo(){
-            if(!this.index_information){
-                return {};
-            }
-         
-           return {
-                FhAusweisStatus: this.index_information.zutrittsdatum,
-                emails: this.role === 'Mitarbeiter' || this.role === 'View_Mitarbeiter'?  this.mitarbeiter_info?.emails: this.index_information.emails,
-                Kontakte:this.index_information.kontakte,
-            };
-        },
-        
-    },
-  
-     mounted(){
-
-        console.log(this.uid);
-        console.log(this.view);
-        console.log(typeof this.view);
-        if(this.view){console.log("view is true")}else{ console.log("view is false")}
-
-        //? this function is to update the tabulator information only when the tabulator was build checking the tableBulit event
-        //! only the tableBuilt event of the second tabulator was used to update the table informations
-         
-
-        fhcapifactory.UserData.isMitarbeiterOrStudent(this.uid).then((res) => {
-
-            this.role = this.view? "View_"+res.data: res.data;
-            if(!this.role.includes('View')){
-                this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
-                }) 
-             }
-
-
-        console.log("the role of the current view: ", this.role);
-        
-    
-
-        //? Die anderen api calls werden erst gemacht wenn der call zu isMitarbeiterOrStudent gemacht worden ist
-
-
-        //! indexProfilInformationen werden immer gefetcht
-        fhcapifactory.UserData.indexProfilInformaion(this.uid,this.view).then((res) => {
-            console.log(res.data);
-            this.index_information = res.data;
-            if(!this.role.includes("View")){
-            this.$refs.betriebsmittelTable.tabulator.setData(res.data.mittel);
-        }
-        });
-        
-
-        //? Danach werden die Informationen der Role gefetcht
-        if(this.role === "Student" || this.role === "View_Student"){ 
-            fhcapifactory.UserData.studentProfil(this.uid,this.view).then((res)=> {
-                this.student_info = res.data;
-                if(this.role ==="Student"){
-                this.$refs.zutrittsgruppenTable.tabulator.setData(res.data.zuttritsgruppen);
-                }
-            })
-        }
-        
-        if(this.role === "Mitarbeiter" || this.role === "View_Mitarbeiter"){
-            fhcapifactory.UserData.mitarbeiterProfil(this.uid).then((res)=> {
-                this.mitarbeiter_info = res.data;
-                this.$refs.funktionenTable.tabulator.setData(res.data.funktionen);
-            })
-        }   
-    });
-
-        
-        
-    },
-     
-    template: `
-   
-    <p>MitarbeiterProfil</p>
     `,
 };

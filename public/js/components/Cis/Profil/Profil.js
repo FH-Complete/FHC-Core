@@ -51,7 +51,7 @@ export default {
     },
     
     //? this props were passed in the Profil.php view file
-    props:['uid','view'],
+    props:['data','view'],
     methods: {
         
         concatenate_addresses(address_array){
