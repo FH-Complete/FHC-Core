@@ -62,24 +62,6 @@ class AntragLib
 			'insertvon' => $insertvon
 		]);
 
-		// NOTE(chris): remove "preabbrecher" statusgrund for Stgl-Abmeldungen if set
-		$res = $this->_ci->StudierendenantragModel->load($antrag_id);
-		if (hasData($res) && current(getData($res))->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
-			$this->_ci->PrestudentstatusModel->addSelect('tbl_status_grund.statusgrund_kurzbz');
-			$res = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail(current(getData($res))->prestudent_id, '', 'Student');
-			if (hasData($res) && current(getData($res))->statusgrund_kurzbz == 'preabbrecher') {
-				$prestudentstatus = current(getData($res));
-				$this->_ci->PrestudentstatusModel->update([
-					'prestudent_id' => $prestudentstatus->prestudent_id,
-					'status_kurzbz'=>$prestudentstatus->status_kurzbz,
-					'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
-					'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
-				], [
-					'statusgrund_id' => null
-				]);
-			}
-		}
-
 		return $result;
 	}
 
