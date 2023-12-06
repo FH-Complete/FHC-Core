@@ -438,6 +438,7 @@ if($berechtigung_kurzbz != '')
 							<th>Nachname</th>
 							<th>Vorname</th>
 							<th>UID</th>
+							<th>Organisationseinheit</th>
 							<th>Art</th>
 							<th data-value='Ja'>Benutzer Aktiv</th>
 							<th data-value='Aktiv'>Status</th>
@@ -448,6 +449,8 @@ if($berechtigung_kurzbz != '')
 			{
 				$benutzer = new benutzer();
 				$benutzer->load($row->uid);
+
+				$organisationseinheit = new organisationseinheit($row->oe_kurzbz);
 	
 				$heute = strtotime(date('Y-m-d'));
 	
@@ -470,6 +473,7 @@ if($berechtigung_kurzbz != '')
 				$htmlstr .= '		<td>'.($benutzer->nachname != ''?$benutzer->nachname:'').'</td>';
 				$htmlstr .= '		<td>'.($benutzer->vorname != ''?$benutzer->vorname:'').'</td>';
 				$htmlstr .= '		<td>'.($row->uid != ''?$row->uid:'').'</td>';
+				$htmlstr .= '		<td style="text-overflow: ellipsis; white-space: nowrap; overflow:hidden;">'.($row->oe_kurzbz != '' ? $organisationseinheit->organisationseinheittyp_kurzbz.' '.$organisationseinheit->bezeichnung:'').'</td>';
 				$htmlstr .= '		<td>'.$row->art.'</td>';
 				$htmlstr .= '		<td>'.(isset($row->uid)?$benutzer->bnaktiv?'Ja':'Nein':'').'</td>';
 				$htmlstr .= '		<td align="center">'.$status.'</td>';
