@@ -24,17 +24,17 @@ export default {
 	<div class="stv-details-details h-100 pb-3">
 		<fieldset class="overflow-hidden">
 			<legend>Adressen</legend>
-			<address-list ref="adressList" :uid="student.person_id"></address-list>
+			<address-list ref="adressList" :uid="modelValue.person_id"></address-list>
 		</fieldset>
 		<br>
 		<fieldset class="overflow-hidden">
 			<legend>Kontakt</legend>
-			<contact-list ref="contactList" :uid="student.person_id"></contact-list>
+			<contact-list ref="contactList" :uid="modelValue.person_id"></contact-list>
 		</fieldset>
 		<br>
 		<fieldset class="overflow-hidden">
 			<legend>Bankverbindungen</legend>
-			<bankaccount-list ref="bankaccountList" :uid="student.person_id"></bankaccount-list>
+			<bankaccount-list ref="bankaccountList" :uid="modelValue.person_id"></bankaccount-list>
 		</fieldset>
 	</div>`
 };
