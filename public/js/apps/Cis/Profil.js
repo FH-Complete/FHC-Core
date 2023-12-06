@@ -30,18 +30,16 @@ const app = Vue.createApp({
 	created(){
 
 		let path = location.pathname;
-		console.log(path);
-		console.log(path.lastIndexOf('/'));
+		
 		let uid = path.substring(path.lastIndexOf('/')).replace("/","");
-		console.log("i am passing this uid: ", uid);
-		const payload = {
+		
+		/* const payload = {
 			...(uid != "Profil" ? {uid} : {})
 		};
-
-		Vue.$fhcapi.UserData.getView(payload).then((res)=>{
+ */
+		Vue.$fhcapi.UserData.getView(uid).then((res)=>{
 			this.view = res.data.view;
 			this.data = res.data.data;
-			console.log(res.data);
 		});
 	},
 	template:`

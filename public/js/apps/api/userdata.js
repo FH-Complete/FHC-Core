@@ -8,10 +8,10 @@ export default {
         return axios.get(url);
     },
 
-    getView: function(payload) {
+    getView: function(uid) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
-                  + `cis.php/Cis/Profil/getView`;
-        return axios.post(url,payload);
+                  + `cis.php/Cis/Profil/getView/${uid}`;
+        return axios.get(url);
     },
  
     sperre_foto_function: function(value) {

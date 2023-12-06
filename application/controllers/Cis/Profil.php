@@ -31,6 +31,10 @@ class Profil extends Auth_Controller
 		$this->load->model('ressource/Betriebsmittelperson_model', 'BetriebsmittelpersonModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		
+
+		//? put the uid and pid inside the controller for further usage in views
+		$this->uid = getAuthUID();
+		$this->pid = getAuthPersonID();
 		
 	}
 
@@ -48,7 +52,7 @@ class Profil extends Auth_Controller
 	}
 	public function View($uid){
 		
-		if($uid === getAuthUID()){
+		if($uid === $this->uid){
 			$this->index();
 		}else{
 			$this->load->view('Cis/Profil');
@@ -241,7 +245,7 @@ class Profil extends Auth_Controller
 		
 		$intern_email = array();
 			$intern_email+=array("type" => "intern");
-			$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
+			$intern_email+=array("email"=> $this->uid . "@" . DOMAIN);
 		
 			$res->emails = array($intern_email);
 	
@@ -272,7 +276,7 @@ class Profil extends Auth_Controller
 				
 			){
 				//? betriebsmittel are not needed in a view
-				$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
+				$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel($this->pid);
 				if(isError($betriebsmittelperson_res)){
 					   // error handling
 				   }else{
@@ -288,7 +292,7 @@ class Profil extends Auth_Controller
 			isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT'))&&
 			isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
 			){
-				$kontakte_res = $this->KontaktModel->loadWhere(array('person_id' => getAuthPersonID()));
+				$kontakte_res = $this->KontaktModel->loadWhere(array('person_id' => $this->pid));
 				if(isError($kontakte_res)){
 					// handle error	
 				}else{
@@ -298,7 +302,7 @@ class Profil extends Auth_Controller
 			}
 
 			//? FH Ausweis Austellungsdatum soll auch nur der user selbst sehen
-			$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid(getAuthUID(),"Zutrittskarte");
+			$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid($this->uid,"Zutrittskarte");
 			if(isError($zutrittskarte_ausgegebenam)){
 				// error handling
 			}else{
@@ -317,7 +321,7 @@ class Profil extends Auth_Controller
 				isSuccess($adresse_res = $this->AdresseModel->addOrder("sort"))&&
 				isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp","typ=adressentyp_kurzbz"))
 			){
-				$adresse_res = $this->AdresseModel->loadWhere(array("person_id"=>getAuthPersonID()));
+				$adresse_res = $this->AdresseModel->loadWhere(array("person_id"=>$this->pid));
 				if(isError($adresse_res)){
 					// error handling
 				}else{									
@@ -337,7 +341,7 @@ class Profil extends Auth_Controller
 		isSuccess($this->PersonModel->addJoin('tbl_benutzergruppe', 'uid')) &&
 		isSuccess($this->PersonModel->addJoin('tbl_gruppe', 'gruppe_kurzbz'))){
 
-			$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid'=>getAuthUID()));
+			$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid'=>$this->uid));
 			if( isError($mailverteiler_res)){
 				// catch error
 			}
@@ -351,7 +355,7 @@ class Profil extends Auth_Controller
 		if(isSuccess($this->BenutzerModel->addSelect(["foto","foto_sperre","anrede","titelpost","titelpre","vorname","nachname", "gebort", "gebdatum"]))
 		&& isSuccess($this->BenutzerModel->addJoin("tbl_person", "person_id"))){
 
-			$person_res = $this->BenutzerModel->load([getAuthUID()]);
+			$person_res = $this->BenutzerModel->load([$this->uid]);
 			if(isError($person_res)){
 				// error handling
 			}else{
@@ -365,7 +369,7 @@ class Profil extends Auth_Controller
 		isSuccess($this->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as Bezeichnung","tbl_organisationseinheit.bezeichnung as Organisationseinheit","datum_von as Gültig_von","datum_bis as Gültig_bis","wochenstunden as Wochenstunden"]))&&
 			isSuccess($this->BenutzerfunktionModel->addJoin("tbl_organisationseinheit","oe_kurzbz"))
 		){
-			$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid'=>getAuthUID()));
+			$benutzer_funktion_res = $this->BenutzerfunktionModel->loadWhere(array('uid'=>$this->uid));
 			if(isError($benutzer_funktion_res)){
 				// error handling
 			}else{
@@ -379,7 +383,7 @@ class Profil extends Auth_Controller
 		if(isSuccess($this->MitarbeiterModel->addSelect(["kurzbz","telefonklappe", "alias","ort_kurzbz"]))
 			&& isSuccess($this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid"))
 		){
-			$mitarbeiter_res = $this->MitarbeiterModel->load(getAuthUID());
+			$mitarbeiter_res = $this->MitarbeiterModel->load($this->uid);
 				if(isError($mitarbeiter_res)){
 					// error handling
 				}else{
@@ -390,7 +394,7 @@ class Profil extends Auth_Controller
 			$res = new stdClass();
 			$res->foto = $person_res->foto;
 			$res->foto_sperre = $person_res->foto_sperre;
-			$res->username = getAuthUID();
+			$res->username = $this->uid;
 			
 			$res->anrede = $person_res->anrede;
 			$res->titel = $person_res->titelpre;
@@ -415,7 +419,7 @@ class Profil extends Auth_Controller
 			}
 			$intern_email = array();
 			$intern_email+=array("type" => "intern");
-			$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
+			$intern_email+=array("email"=> $this->uid . "@" . DOMAIN);
 			$extern_email=array();
 			$extern_email+=array("type" => "alias");
 			$extern_email+=array("email" => $mitarbeiter_res->alias . "@" . DOMAIN);
@@ -437,7 +441,7 @@ class Profil extends Auth_Controller
 				
 			){
 				//? betriebsmittel are not needed in a view
-				$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel(getAuthPersonId());
+				$betriebsmittelperson_res = $this->BetriebsmittelpersonModel->getBetriebsmittel($this->pid);
 				if(isError($betriebsmittelperson_res)){
 					   // error handling
 				   }else{
@@ -453,7 +457,7 @@ class Profil extends Auth_Controller
 			isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT'))&&
 			isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
 			){
-				$kontakte_res = $this->KontaktModel->loadWhere(array('person_id' => getAuthPersonID()));
+				$kontakte_res = $this->KontaktModel->loadWhere(array('person_id' => $this->pid));
 				if(isError($kontakte_res)){
 					// handle error	
 				}else{
@@ -463,7 +467,7 @@ class Profil extends Auth_Controller
 			}
 
 			//? FH Ausweis Austellungsdatum soll auch nur der user selbst sehen
-			$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid(getAuthUID(),"Zutrittskarte");
+			$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid($this->uid,"Zutrittskarte");
 			if(isError($zutrittskarte_ausgegebenam)){
 				// error handling
 			}else{
@@ -482,7 +486,7 @@ class Profil extends Auth_Controller
 				isSuccess($adresse_res = $this->AdresseModel->addOrder("sort"))&&
 				isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp","typ=adressentyp_kurzbz"))
 			){
-				$adresse_res = $this->AdresseModel->loadWhere(array("person_id"=>getAuthPersonID()));
+				$adresse_res = $this->AdresseModel->loadWhere(array("person_id"=>$this->pid));
 				if(isError($adresse_res)){
 					// error handling
 				}else{									
@@ -502,7 +506,7 @@ class Profil extends Auth_Controller
 		isSuccess($this->PersonModel->addJoin('tbl_benutzergruppe', 'uid')) &&
 		isSuccess($this->PersonModel->addJoin('tbl_gruppe', 'gruppe_kurzbz'))){
 
-			$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid'=>getAuthUID()));
+			$mailverteiler_res = $this->PersonModel->loadWhere(array('mailgrp' => true, 'uid'=>$this->uid));
 			if( isError($mailverteiler_res)){
 				// catch error
 			}
@@ -516,7 +520,7 @@ class Profil extends Auth_Controller
 		if(isSuccess($this->BenutzerModel->addSelect(["foto","foto_sperre","anrede","titelpost","titelpre","vorname","nachname", "gebort", "gebdatum"]))
 		&& isSuccess($this->BenutzerModel->addJoin("tbl_person", "person_id"))){
 
-			$person_res = $this->BenutzerModel->load([getAuthUID()]);
+			$person_res = $this->BenutzerModel->load([$this->uid]);
 			if(isError($person_res)){
 				// error handling
 			}else{
@@ -529,7 +533,7 @@ class Profil extends Auth_Controller
 		isSuccess($this->BenutzergruppeModel->addSelect(['bezeichnung']))
 		&& isSuccess($this->BenutzergruppeModel->addJoin('tbl_gruppe', 'gruppe_kurzbz' ))
 		){
-			$zutrittsgruppe_res = $this->BenutzergruppeModel->loadWhere(array("uid"=>getAuthUID(), "zutrittssystem"=>true));
+			$zutrittsgruppe_res = $this->BenutzergruppeModel->loadWhere(array("uid"=>$this->uid, "zutrittssystem"=>true));
 			if(isError($zutrittsgruppe_res)){
 				// catch error
 			}
@@ -543,7 +547,7 @@ class Profil extends Auth_Controller
 		if(isSuccess($this->StudentModel->addSelect(['tbl_studiengang.bezeichnung as studiengang','tbl_student.semester', 'tbl_student.verband', 'tbl_student.gruppe' ,'tbl_student.matrikelnr as personenkennzeichen']))
 		 && isSuccess($this->StudentModel->addJoin('tbl_studiengang', "tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz")))
 		{
-			$student_res = $this->StudentModel->load([getAuthUID()]);
+			$student_res = $this->StudentModel->load([$this->uid]);
 			if(isError($student_res)){
 				// catch error
 			}
@@ -556,7 +560,7 @@ class Profil extends Auth_Controller
 		//? Matrikelnummer ist die Spalte matr_nr in Person
 		if(isSuccess($this->BenutzerModel->addSelect(["matr_nr"])) 
 		&& isSuccess($this->BenutzerModel->addJoin("tbl_person","person_id"))){
-			$matr_res = $this->BenutzerModel->load([getAuthUID()]);
+			$matr_res = $this->BenutzerModel->load([$this->uid]);
 			if(isError($matr_res)){
 				// catch error
 			}else{
@@ -570,7 +574,7 @@ class Profil extends Auth_Controller
 		
 		$res->foto = $person_res->foto;
 		$res->foto_sperre = $person_res->foto_sperre;
-		$res->username = getAuthUID();
+		$res->username = $this->uid;
 		
 		$res->anrede = $person_res->anrede;
 		$res->titel = $person_res->titelpre;
@@ -585,7 +589,7 @@ class Profil extends Auth_Controller
 
 		$intern_email = array();
 		$intern_email+=array("type" => "intern");
-		$intern_email+=array("email"=> getAuthUID() . "@" . DOMAIN);
+		$intern_email+=array("email"=> $this->uid . "@" . DOMAIN);
 		
 		$res->emails = array($intern_email);
 		$res->adressen = $adresse_res;
@@ -608,30 +612,29 @@ class Profil extends Auth_Controller
 
 	}
 
-	public function getView(){
-		// property_exists(object|string $object_or_class, string $property): bool
+	public function getView($uid){
+	
 		
-		$payload = json_decode($this->input->raw_input_stream);
-		/* echo json_encode($payload);
-		return; */
-		$uid = property_exists($payload,"uid")?  $payload->uid : null;
+		$uid = $uid != "Profil" ? $uid : null;
 		
 		
 		$isMitarbeiter = null;
 		if($uid)
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
 		else
-			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
+			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($this->uid);
 		
 
 		if(isError($isMitarbeiter)){
 			//catch error
+			echo "error";
+			return;
 		}
 		$isMitarbeiter = hasData($isMitarbeiter) ? getData($isMitarbeiter) : null;
 		
 		$res = new stdClass();
 		
-		if($uid == getAuthUID() || !$uid ){
+		if($uid == $this->uid || !$uid ){
 			// if the $uid is empty, then no payload was supplied and the own profile is being requested
 			if($isMitarbeiter ) {
 				$res->view= "MitarbeiterProfil";
@@ -658,14 +661,14 @@ class Profil extends Auth_Controller
 		echo json_encode($res);
 		
 	}
-	public function foto_sperre_function($value){
-		$res = $this->PersonModel->update(getAuthPersonID(),array("foto_sperre"=>$value));
+	public function foto_sperre_function($value, $uid=""){
+		$res = $this->PersonModel->update($this->pid,array("foto_sperre"=>$value));
 		if(isError($res)){
 			// error handling
 		}else{
 			//? select the value of the column foto_sperre to return 
 			if(isSuccess($this->PersonModel->addSelect("foto_sperre"))){
-				$res = $this->PersonModel->load(getAuthPersonID());
+				$res = $this->PersonModel->load($this->pid);
 				if(isError($res)){
 					// error handling
 				}

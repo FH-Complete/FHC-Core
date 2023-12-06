@@ -1,12 +1,6 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
-//? possible types of roles:
-//! depending on the role of the current view, different content is being displayed and fetched
-//* Student
-//* Mitarbeiter
-//* View_Student
-//* View_Mitarbeiter
 
 export default {
   components: {
@@ -14,11 +8,7 @@ export default {
   },
   data() {
     return {
-      index_information: null,
-      mitarbeiter_info: null,
-      student_info: null,
-      //? beinhaltet die Information ob der angefragte user ein Student oder Mitarbeiter ist
-      role: null,
+      
 
       funktionen_table_options: {
         height: 300,
@@ -48,66 +38,14 @@ export default {
           },
         ],
       },
-      betriebsmittel_table_options: {
-        height: 300,
-        layout: "fitColumns",
-        data: [{ betriebsmittel: "", Nummer: "", Ausgegeben_am: "" }],
-        columns: [
-          {
-            title: "Betriebsmittel",
-            field: "betriebsmittel",
-            headerFilter: true,
-          },
-          { title: "Nummer", field: "Nummer", headerFilter: true },
-          {
-            title: "Ausgegeben_am",
-            field: "Ausgegeben_am",
-            headerFilter: true,
-          },
-        ],
-      },
-      zutrittsgruppen_table_options: {
-        height: 300,
-        layout: "fitColumns",
-        data: [{ bezeichnung: "test1" }],
-        columns: [{ title: "Zutritt", field: "bezeichnung" }],
-      },
+    
+   
     };
   },
-
-  //? this props were passed in the Profil.php view file
+  //? this is the prop passed to the dynamic component with the custom data of the view
   props: ["data"],
   methods: {
-    concatenate_addresses(address_array) {
-      let result = "";
-      for (let i = 0; i < address_array.length; i++) {
-        result +=
-          address_array[i].strasse +
-          " " +
-          address_array[i].plz +
-          " " +
-          address_array[i].ort +
-          "\n";
-      }
-      return result;
-    },
-    render_unterelement(wert, bezeichnung) {
-      if (isArray(bezeichnung)) {
-      }
-    },
-    concatenate_kontakte(kontakt_array) {
-      let result = "";
-      for (let i = 0; i < kontakt_array.length; i++) {
-        result +=
-          kontakt_array[i].kontakttyp +
-          " " +
-          kontakt_array[i].kontakt +
-          " " +
-          kontakt_array[i].zustellung +
-          "\n";
-      }
-      return result;
-    },
+   
     sperre_foto_function(value) {
       if (!this.data) {
         return;
@@ -124,6 +62,7 @@ export default {
       }
       return "data:image/jpeg;base64," + this.data.foto;
     },
+    //? this computed function returns all the informations for the first column in the profil 
     personData() {
       if (!this.data) {
         return {};
@@ -147,7 +86,7 @@ export default {
         },
       };
     },
-    //? this computed conains all the information that is used for the second column that displays the information of the person
+    //? this computed function returns the data for the second column in the profil 
     kontaktInfo() {
       if (!this.data) {
         return {};
@@ -206,9 +145,9 @@ export default {
                                 
                             </div>
                             <div class="col">
-                                <ol style="list-style:none">
+                                <div style="list-style:none">
                                 
-                                    <li v-for="(wert,bezeichnung) in kontaktInfo">
+                                    <p v-for="(wert,bezeichnung) in kontaktInfo">
                                     
                                     <!-- HIER IST DAS DATUM DES FH AUSWEIS -->
                                         <div class="mb-3" v-if="bezeichnung=='FhAusweisStatus'">
@@ -237,8 +176,8 @@ export default {
                                             </div>
                                         </div>
                                     
-                                    </li>
-                                </ol>
+                                    </p>
+                                </div>
 
 
                             </div>
