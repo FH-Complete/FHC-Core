@@ -41,8 +41,6 @@ require_once('../../../include/service.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/betriebsmittelperson.class.php');
 require_once('../../../include/globals.inc.php');
-require_once('../../../include/bisverwendung.class.php');
-require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/zeitaufzeichnung_import_csv.class.php');
 require_once('../../../include/zeitaufzeichnung_import_post.class.php');
@@ -1415,41 +1413,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				}
 				echo '</span></td></tr>';
 				echo '<tr><td style="float:right;">';
-
-		// Summen Lehre anzeigen
-		$bv = new bisverwendung();
-		$bv->getLastAktVerwendung($user);
-		$lehre_inkludiert = $bv->inkludierte_lehre;
-		if (!$lehre_inkludiert)
-			$lehre_inkludiert = 0;
-
-		$stsem = new studiensemester();
-		$sem_akt = $stsem->getakt();
-		$lehre = new zeitaufzeichnung();
-		$l_arr = $lehre->getLehreForUser($user, $sem_akt);
-		$displayLehresaldo = false;
-		if ($displayLehresaldo && ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0))
-		{
-			if ($lehre_inkludiert == -1)
-			{
-				$l_extern_soll = 0;
-				$lehre_inkludiert = $l_arr["LehreAuftraege"];
-			}
-			else
-				$l_extern_soll = $l_arr["LehreAuftraege"]-$lehre_inkludiert;
-			$l_extern_soll_norm = $l_extern_soll/4*3;
-			$lehre_inkludiert_norm = $lehre_inkludiert/4*3;
-			echo '<table style="border: 1px solid gray">';
-			echo '<tr><td colspan="3" style="border: 1px solid gray"><h3>Übersicht Lehre '.$sem_akt.'</h3></tr>';
-			echo '<tr><td colspan="3" style="border: 1px solid gray">(in Stunden)</tr>';
-			echo '<tr><td></td><td style="border: 1px solid gray">beauftragt (LE)</td><td style="border: 1px solid gray">gebucht</td></tr>';
-			if ($lehre_inkludiert > 0 || $l_arr["Lehre"] > 0)
-				echo '<tr><td style="border: 1px solid gray">Lehre:</td><td align="right" style="border: 1px solid gray">'.$lehre_inkludiert_norm.' ('.$lehre_inkludiert.')</td><td align="right" style="border: 1px solid gray">'.$l_arr["Lehre"].'</td></tr>';
-			if ($l_extern_soll > 0 || $l_arr["LehreExtern"] > 0)
-				echo '<tr><td style="border: 1px solid gray">LehreExtern:</td><td align="right" style="border: 1px solid gray">'.$l_extern_soll_norm.' ('.$l_extern_soll.')</td><td align="right" style="border: 1px solid gray">'.$l_arr["LehreExtern"].'</td></tr>';
-
-			echo '</table>';
-		}
 
 		echo '</td></tr>';
 		echo '</table>';
