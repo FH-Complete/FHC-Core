@@ -140,6 +140,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng','finanzamt', '', 'true');"/>
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt(event);"/>
   <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
+  <command id="menu-dokumente-antrag-abmeldung:command" oncommand="StudentPrintAntragAbmeldung(event);"/>
+  <command id="menu-dokumente-antrag-unterbrechung:command" oncommand="StudentPrintAntragUnterbrechung(event);"/>
   <command id="menu-dokumente-studienblatt:command" oncommand="PrintStudienblatt(event);"/>
   <command id="menu-dokumente-studienblatt_englisch:command" oncommand="PrintStudienblattEnglisch(event);"/>
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'de');"/>
@@ -507,19 +509,38 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-zutrittskarte.label;"
                command   =  "menu-dokumente-zutrittskarte:command"
                accesskey = "&menu-dokumente-zutrittskarte.accesskey;"/>
+          <menu id="menu-dokumente-antrag" label="&menu-dokumente-antrag.label;" accesskey="&menu-dokumente-antrag.accesskey;">
+            <menupopup id="menu-dokumente-antrag-popup">
+              <menuitem
+                id        =  "menu-dokumente-antrag-abmeldung"
+                key       =  "menu-dokumente-antrag-abmeldung:key"
+                label     = "&menu-dokumente-antrag-abmeldung.label;"
+                command   =  "menu-dokumente-antrag-abmeldung:command"
+                accesskey = "&menu-dokumente-antrag-abmeldung.accesskey;"
+                />
+              <menuitem
+                id        =  "menu-dokumente-antrag-unterbrechung"
+                key       =  "menu-dokumente-antrag-unterbrechung:key"
+                label     = "&menu-dokumente-antrag-unterbrechung.label;"
+                command   =  "menu-dokumente-antrag-unterbrechung:command"
+                accesskey = "&menu-dokumente-antrag-unterbrechung.accesskey;"
+                />
+            </menupopup>
+          </menu>
           <menuseparator/>
           <menuitem
-               id        =  "menu-dokumente-inskriptionsbestaetigung"
-               key       =  "menu-dokumente-inskriptionsbestaetigung:key"
-               label     = "&menu-dokumente-inskriptionsbestaetigung.label;"
-               command   =  "menu-dokumente-inskriptionsbestaetigung:command"
-               accesskey = "&menu-dokumente-inskriptionsbestaetigung.accesskey;"/>
-		  <menuitem
+            id        =  "menu-dokumente-inskriptionsbestaetigung"
+            key       =  "menu-dokumente-inskriptionsbestaetigung:key"
+            label     = "&menu-dokumente-inskriptionsbestaetigung.label;"
+            command   =  "menu-dokumente-inskriptionsbestaetigung:command"
+            accesskey = "&menu-dokumente-inskriptionsbestaetigung.accesskey;"/>
+          <menuitem
 					  id        =  "menu-dokumente-inskriptionsbestaetigungeng"
 					  key       =  "menu-dokumente-inskriptionsbestaetigungeng:key"
 					  label     = "&menu-dokumente-inskriptionsbestaetigungeng.label;"
 					  command   =  "menu-dokumente-inskriptionsbestaetigungeng:command"
-					  accesskey = "&menu-dokumente-inskriptionsbestaetigungeng.accesskey;"/>
+					  accesskey = "&menu-dokumente-inskriptionsbestaetigungeng.accesskey;"
+            />
           <menuitem
                id        =  "menu-statistic-lehrauftraege"
                key       =  "menu-statistic-lehrauftraege:key"

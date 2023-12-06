@@ -3,6 +3,9 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class ReihungstestJob extends JOB_Controller
 {
+
+	const LAST_DAYS_PRESTUDENTSTATUS = 5;
+
 	/**
 	 * Constructor
 	 */
@@ -826,7 +829,7 @@ class ReihungstestJob extends JOB_Controller
 						AND tbl_studiengang.typ IN ('b', 'm')
 				)
 				SELECT * FROM prst
-				WHERE prestudenstatus_datum >= (SELECT CURRENT_DATE - 1)
+				WHERE prestudenstatus_datum >= (SELECT CURRENT_DATE - ". self::LAST_DAYS_PRESTUDENTSTATUS .")
 				AND (studiengang_typ = 'b' OR (studiengang_typ = 'm' AND EXISTS (SELECT 1 /* Master Studiengänge berücksichtigen wenn auch Bachelor im gleichen Semester */
 																					FROM prst prstb
 																					WHERE studiengang_typ = 'b'
@@ -868,7 +871,8 @@ class ReihungstestJob extends JOB_Controller
 							tbl_person.nachname,
 							tbl_person.vorname,
 							tbl_prestudent.*,
-							tbl_studiengang.typ AS studiengang_typ
+							tbl_studiengang.typ AS studiengang_typ,
+							tbl_prestudentstatus.datum
 						FROM PUBLIC.tbl_person
 							JOIN PUBLIC.tbl_prestudent USING (person_id)
 							JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
@@ -901,7 +905,7 @@ class ReihungstestJob extends JOB_Controller
 								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
 									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Bewerber')
+							elseif ($rowNiedrPrios->laststatus == 'Bewerber' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
 							{
 								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
 								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
@@ -927,7 +931,7 @@ class ReihungstestJob extends JOB_Controller
 										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 								}
 							}
-							elseif ($rowNiedrPrios->laststatus == 'Wartender')
+							elseif ($rowNiedrPrios->laststatus == 'Wartender' && $row_ps->prestudenstatus_datum > $rowNiedrPrios->datum)
 							{
 								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
 								// Mail zur Info an Assistenz schicken
