@@ -40,7 +40,7 @@ export default {
       betriebsmittel_table_options: {
         height: 300,
         layout: "fitColumns",
-        data: [{ betriebsmittel: "", Nummer: "", Ausgegeben_am: "" }],
+        data: [{ betriebsmittel: "<a href='#'>test</a>", Nummer: "", Ausgegeben_am: "" }],
         columns: [
           {
             title: "Betriebsmittel",
@@ -93,8 +93,6 @@ export default {
           Vorname: this.data.vorname,
           Nachname: this.data.nachname,
           Postnomen: this.data.postnomen,
-        },
-        GeburtsDaten: {
           Geburtsdatum: this.data.gebdatum,
           Geburtsort: this.data.gebort,
         },
@@ -121,7 +119,7 @@ export default {
   },
 
   mounted() {
-    this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
+     this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
     
         this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
         
@@ -132,11 +130,10 @@ export default {
         this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
         
     }) 
-
+ 
   },
 
   template: `
-
 
             <div class="container-fluid">
             <!-- here starts the row of the whole window -->
@@ -147,9 +144,10 @@ export default {
                             
 
 
-                            <div class="col">
+                            <div class="col-2">
                             <div class="row">
                                 <div class="col">
+                                <h3 >Mitarbeiter</h3>
                                     <img class="img-thumbnail" :src="get_image_base64_src"></img>
                                 </div>
                             </div>
@@ -168,52 +166,65 @@ export default {
 
                             
                           
-                            <div class="col">
+                            <div class="col m-4">
                         
                         
-                                <h3 >Mitarbeiter</h3>
                                 
-                                <div v-for="(wert,bezeichnung) in personData">
+                            
                                 
-                                <div class="mb-3"  v-if="typeof wert == 'object' && bezeichnung=='Adressen'"><span style="display:block" v-for="element in wert">{{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}</span></div>
-                                <div v-else class="mb-3" ><span style="display:block;" v-for="(val,bez) in wert">{{bez}}: {{val}}</span></div>
+                                <div class="row">
+                                  <div :class="{'col-lg-12':true, 'col-xl-6':true, 'order-1':bezeichnung=='Allgemein', 'order-3':bezeichnung=='SpecialInformation', 'order-4':bezeichnung=='Adressen'}" v-for="(wert,bezeichnung) in personData">
+                                                                  
+                                    <dl class="m-0"  v-if="bezeichnung=='Adressen'">
+                                      <dt>Adressen</dt>
+                                      <dd class="text-end m-0"  v-for="element in wert">
+                                      {{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}
+                                      </dd>
+                                    </dl>
+
+                                    <dl class="m-0" v-else v-for="(wert,bez) in wert">
+                                      <dt >{{bez}}</dt>
+                                      <dd class="text-end m-0">{{wert?wert:"-"}}</dd>
+                                    </dl>
                                 
-                                </div>
+                                  </div>
                                 
-                            </div>
-                            <div class="col">
-                                <div style="list-style:none">
                                 
-                                    <p v-for="(wert,bezeichnung) in kontaktInfo">
+                            
+                           
+                                <div class="col-lg-12 col-xl-6 order-2">
+                                
+                                    <dl v-for="(wert,bezeichnung) in kontaktInfo">
                                     
                                     <!-- HIER IST DAS DATUM DES FH AUSWEIS -->
                                         <div class="mb-3" v-if="bezeichnung=='FhAusweisStatus'">
-                                            <p class="mb-0"><b>FH-Ausweis Status</b></p>
-                                            <p class="mb-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</p>
+                                            <dt class="mb-0">FH-Ausweis Status</dt>
+                                            <dd class="mb-0 text-end">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</dd>
                                         </div>
 
                                     <!-- HIER SIND DIE EMAILS -->
                             
 
                                         <div class="mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
-                                            <p class="mb-0"><b>eMail</b></p>
-                                            <p v-for="email in wert" class="mb-0">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></p>
+                                            <dt class="mb-0">eMail</dt>
+                                            <dd v-for="email in wert" class="mb-0 text-end">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></dd>
                                         </div>
 
                                         <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
                                         <div class="mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
-                                        <p class="mb-0"><b>Private Kontakte</b></p>
-                                            <div class="row" v-for="element in wert" >
+                                        <dt class="mb-0">Private Kontakte</dt>
+                                            <dd class="row text-end" v-for="element in wert" >
                                                 <div class="col-8">{{element.kontakttyp + ":  " + element.kontakt+"  " }}</div>
                                                 <div class="col-2"> {{element?.anmerkung}}</div>
                                                 <div class="col-2"> 
                                                 <i v-if="element.zustellung" class="fa-solid fa-check"></i>
                                                 <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
                                                 </div>
-                                            </div>
+                                            </dd>
                                         </div>
                                     
-                                    </p>
+                                    </dl>
+                                </div>
                                 </div>
 
 

@@ -123,11 +123,7 @@ export default {
                             <div class="col">
                                 <img class="img-thumbnail" :src="get_image_base64_src"></img>
                                 
-                                <div v-if="data.foto_sperre ">
-                                    <p style="margin:0">Profilfoto gesperrt</p>
-                                    <a href="#" @click.prevent="sperre_foto_function(false)" style="text-decoration:none">Sperre des Profilfotos aufheben</a>
-                                </div>
-                                <a href="#" @click.prevent="sperre_foto_function(true)" style="display:block; text-decoration:none"  v-else>Profilfoto sperren</a>
+                              
                             </div>
                             
                           

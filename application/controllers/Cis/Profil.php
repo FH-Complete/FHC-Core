@@ -618,19 +618,30 @@ class Profil extends Auth_Controller
 		$uid = $uid != "Profil" ? $uid : null;
 		
 		
+		
 		$isMitarbeiter = null;
-		if($uid)
+		if($uid){
+			
+			if(isSuccess($this->PersonModel->addSelect(["person_id"]))){
+				$pid = $this->PersonModel->getByUid($uid);
+				$pid = hasData($pid) ? getData($pid)[0] : null;
+				
+			}
+			if(!$pid){
+				return null;
+			}
+			
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($uid);
+		}
 		else
 			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter($this->uid);
 		
 
 		if(isError($isMitarbeiter)){
 			//catch error
-			echo "error";
-			return;
 		}
 		$isMitarbeiter = hasData($isMitarbeiter) ? getData($isMitarbeiter) : null;
+		
 		
 		$res = new stdClass();
 		
@@ -639,10 +650,12 @@ class Profil extends Auth_Controller
 			if($isMitarbeiter ) {
 				$res->view= "MitarbeiterProfil";
 				$res->data = $this->mitarbeiterProfil();
+				$res->data->pid = $this->pid;
 			}
 			else {
 				$res->view= "StudentProfil";
 				$res->data = $this->studentProfil();
+				$res->data->pid = $this->pid;
 			}
 		}
 		elseif($uid){
@@ -650,10 +663,12 @@ class Profil extends Auth_Controller
 			if($isMitarbeiter ){
 				 $res->view= "ViewMitarbeiterProfil";
 				 $res->data= $this->viewMitarbeiterProfil($uid);
+				
 			}
 			else {
 				$res->view= "ViewStudentProfil";
 				$res->data= $this->viewStudentProfil($uid);
+				
 			}
 		}
 
@@ -661,9 +676,14 @@ class Profil extends Auth_Controller
 		echo json_encode($res);
 		
 	}
-	public function foto_sperre_function($value, $uid=""){
+
+	public function foto_sperre_function($value){
+		//? Nur der Index User hat die Erlaubniss das Profilbild zu sperren 
 		$res = $this->PersonModel->update($this->pid,array("foto_sperre"=>$value));
+		
 		if(isError($res)){
+			echo json_encode("error encountered when updating foto_sperre");
+			return;
 			// error handling
 		}else{
 			//? select the value of the column foto_sperre to return 
