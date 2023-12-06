@@ -6,9 +6,6 @@ export default {
 		toggleColumn(col) {
 			col.visible = !col.visible;
 			col.original.toggle()
-		},
-		show() {
-
 		}
 	},
 	template: `

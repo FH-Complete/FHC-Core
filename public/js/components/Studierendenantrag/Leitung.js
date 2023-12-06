@@ -5,7 +5,6 @@ import GrundPopup from './Leitung/GrundPopup.js';
 import LvPopup from './Leitung/LvPopup.js';
 import BsAlert from '../Bootstrap/Alert.js';
 import FhcLoader from '../Loader.js';
-import Phrasen from '../../mixins/Phrasen.js';
 
 export default {
 	components: {
@@ -14,7 +13,6 @@ export default {
 		LeitungActions,
 		FhcLoader
 	},
-	mixins: [Phrasen],
 	props: {
 		stgL: Array,
 		stgA: Array
@@ -31,12 +29,12 @@ export default {
 		stgkzL() {
 			if (!this.stgL)
 				return [];
-			return this.stgL.map(stg => stg.studiengang_kz);
+			return this.stgL.map(stg => parseInt(stg));
 		},
 		stgkzA() {
 			if (!this.stgA)
 				return [];
-			return this.stgA.map(stg => stg.studiengang_kz);
+			return this.stgA.map(stg => parseInt(stg));
 		}
 	},
 	methods: {
@@ -79,7 +77,7 @@ export default {
 				{
 					let countAntrage = 0;
 					LvPopup
-						.popup(this.p.t('studierendenantrag','title_show_lvs', currentAntrag), {
+						.popup(this.$p.t('studierendenantrag','title_show_lvs', currentAntrag), {
 							antragId: currentAntrag.studierendenantrag_id,
 							footer: true,
 							dialogClass: 'modal-lg',
@@ -128,7 +126,7 @@ export default {
 			var currentAntrag = antraege.pop();
 			if (currentAntrag) {
 				GrundPopup
-					.popup(this.p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
+					.popup(this.$p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
 						countRemaining: antraege.length
 					})
 					.then(result => {
@@ -211,7 +209,7 @@ export default {
 			var currentAntrag = antraege.pop();
 			if (currentAntrag) {
 				GrundPopup
-					.popup(this.p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
+					.popup(this.$p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
 						countRemaining : antraege.length,
 						optional: true
 					})

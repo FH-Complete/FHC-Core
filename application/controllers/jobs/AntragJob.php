@@ -96,7 +96,7 @@ class AntragJob extends JOB_Controller
 				}
 				$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 
-				$result = $this->StudiengangModel->load($antrag->studiengang_kz);
+				$result = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 				if (isError($result))
 				{
 					$this->logError(getError($result));
@@ -214,8 +214,7 @@ class AntragJob extends JOB_Controller
 		$count = 0;
 		foreach ($antraege as $antrag)
 		{
-			$this->StudiengangModel->addJoin('public.tbl_prestudent ps','studiengang_kz');
-			$res = $this->StudiengangModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
+			$res = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 			$stg = '';
 			$orgform = '';
 			if (hasData($res)) {
@@ -350,6 +349,7 @@ class AntragJob extends JOB_Controller
 		$this->StudierendenantragModel->addSelect('prestudent_id');
 		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
 		$this->StudierendenantragModel->addSelect('s.insertamum');
+		$this->StudierendenantragModel->addSelect('s.insertvon');
 
 		$this->StudierendenantragModel->db->where_in('public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)', $this->config->item('antrag_prestudentstatus_whitelist'));
 
@@ -373,9 +373,11 @@ class AntragJob extends JOB_Controller
 				$result = $this->prestudentlib->setAbbrecher(
                     $antrag->prestudent_id,
                     $antrag->studiensemester_kurzbz,
-                    $insertvon,
+                    'AntragJob',
                     'abbrecherStgl',
-                    $antrag->insertamum
+                    $antrag->insertamum,
+                    null,
+                    $antrag->insertvon ?: $insertvon
                 );
 				if (isError($result))
 					$this->logError(getError($result));
@@ -414,7 +416,7 @@ class AntragJob extends JOB_Controller
 					}
 				}
 			}
-			$this->logInfo($count . " Students set to Abbrecher");
+			$this->logInfo($count . "/" . count($antraege) . " Students set to Abbrecher");
 		}
 		$this->logInfo('Ende Job handleAbmeldungenStglDeadline');
 	}
