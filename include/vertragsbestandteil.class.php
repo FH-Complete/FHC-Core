@@ -447,5 +447,62 @@ class vertragsbestandteil extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Arbeits-Wochenstunden eines/r MitarbeiterIn im Monat des uebergebenen $datums.
+	 * Wenn kein Datum übergeben wird, wird das heutige Datum gesetzt.
+	 *
+	 * @param $mitarbeiter_uid
+	 * @param null $datum
+	 * @return bool
+	 */
+	public function getWochenstunden($mitarbeiter_uid, $datum = null)
+	{
+		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
+
+		$qry = 'SELECT 
+					vbtstd.vertragsbestandteil_id,
+				   	vbtstd.wochenstunden,
+				   	vbtstd.teilzeittyp_kurzbz
+				FROM hr.tbl_vertragsbestandteil_stunden vbtstd
+				JOIN hr.tbl_vertragsbestandteil vbt USING (vertragsbestandteil_id)
+				JOIN hr.tbl_dienstverhaeltnis dv USING (dienstverhaeltnis_id)
+				-- Dienstverhältnis(se) des Mitarbeiters
+				WHERE dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
+				-- Vertragsbestandteil ist im Monat des übergebenen $datums
+				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
+				-- Vorerst nur check nach aktuellstem Vertragsbestandteil. Später Unterscheidung nach Dienstverhältnis?
+				ORDER BY vbt.von DESC -- aktuellster
+				LIMIT 1';
+
+		if ($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) > 0)
+			{
+				$this->result = array();
+
+				while ($row = $this->db_fetch_object())
+				{
+					$obj = new stdClass();
+
+					$obj->vertragsbestandteil_id = $row->vertragsbestandteil_id;
+					$obj->wochenstunden = $row->wochenstunden;
+					$obj->teilzeittyp_kurzbz = $row->teilzeittyp_kurzbz;
+
+					$this->result[] = $obj;
+				}
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+			return false;
+		}
+	}
 }
 ?>
