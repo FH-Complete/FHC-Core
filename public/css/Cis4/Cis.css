@@ -42,6 +42,10 @@
   }
 }
 
+html {
+	font-size: .875em;
+}
+
 /* buttons */
 #cis-header .btn-level-1,
 #cis-header .btn-level-1 + .btn,
