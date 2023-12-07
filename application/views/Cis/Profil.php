@@ -3,7 +3,7 @@ $includesArray = array(
 	'title' => 'Stundenplan',
 	'customJSModules' => ['public/js/apps/Cis/Profil.js'],
 	'tabulator5' => true,
-	'customCSSs' => ['public/css/components/calendar.css', 'public/css/components/FilterComponent.css'],
+	'customCSSs' => ['public/css/components/calendar.css', 'public/css/components/FilterComponent.css','public/css/components/Profil.css'],
 	
 );
 

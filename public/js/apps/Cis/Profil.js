@@ -3,6 +3,7 @@ import StudentProfil from "../../components/Cis/Profil/StudentProfil.js";
 import MitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterProfil.js";
 import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js";
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
+import Base from "../../components/Cis/Profil/Base.js";
 import fhcapifactory from "../api/fhcapifactory.js";
 
 Vue.$fhcapi = fhcapifactory;
@@ -11,7 +12,7 @@ Vue.$fhcapi = fhcapifactory;
 const app = Vue.createApp({
 	
 	components: {
-		
+		Base,
 		StudentProfil,
 		MitarbeiterProfil,
 		ViewStudentProfil,
@@ -41,15 +42,17 @@ const app = Vue.createApp({
 			}
 			this.view = res.data?.view;
 			this.data = res.data?.data;
+			//* only for testing purposes and needs to be deleted after
+			this.data.base = "Base";
 		});
 	},
 	template:`
 	<div>
-	
+
 	<div v-if="notFoundUID">
 	<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
 	</div>
-	<component v-else :is="view" :data="data" ></component>
+	<component v-else :is="data?.base" :data="data" ></component>
 	</div>`
 	
 	

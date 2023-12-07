@@ -1,0 +1,42 @@
+
+
+@media (max-width: 991px) {
+    
+    .md-invisible{
+        display:none;
+    }
+  }
+
+  @media (min-width: 992px) {
+    
+    .lg-invisible{
+        display:none;
+    }
+  }
+
+/*   dl {
+    width: 100%;
+    overflow: hidden;
+   
+    padding: 0;
+    margin: 0
+  }
+  dt {
+    float: left;
+    width: 35%;
+    
+  
+   
+    padding: 0;
+    margin: 0
+  }
+  dd {
+    float: left;
+    width: 50%;
+   
+  
+    padding: 0;
+    margin: 0
+  }
+ */
+ 
