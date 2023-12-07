@@ -1,6 +1,10 @@
 @import './components/searchbar.css';
 @import './components/verticalsplit.css';
 
+html {
+  font-size: .875em;
+}
+
 .navbar-dark .navbar-brand:focus {
 	box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
 	z-index: 3;
