@@ -497,7 +497,8 @@ class vertragsbestandteil extends basis_db
 	}
 
 	/**
-	 * Arbeits-Wochenstunden eines/r MitarbeiterIn im Monat des uebergebenen $datums.
+	 * Arbeits-Wochenstunden eines/r MitarbeiterIn im Monat des uebergebenen $datums. Karenzierte Dienstverhältnisse
+	 * werden nicht zurückgegeben. Dafür aber ein eventuelles 2.DV mit geringfügiger Beschäftigung neben der Karenz.
 	 * Wenn kein Datum übergeben wird, wird das heutige Datum gesetzt.
 	 *
 	 * @param $mitarbeiter_uid
@@ -519,7 +520,21 @@ class vertragsbestandteil extends basis_db
 				WHERE dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
 				-- Vertragsbestandteil ist im Monat des übergebenen $datums
 				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
-				-- Vorerst nur check nach aktuellstem Vertragsbestandteil. Später Unterscheidung nach Dienstverhältnis?
+				-- DV mit Vertragsbestandteile Karenz herausnehmen, weil die Wochenstunden dieser DV dann ruhen
+				AND (
+					SELECT 
+						COUNT(*) AS karenzen 
+					FROM 
+						hr.tbl_vertragsbestandteil vbt 
+					WHERE 
+						vbt.dienstverhaeltnis_id = dv.dienstverhaeltnis_id
+					AND 
+						vbt.vertragsbestandteiltyp_kurzbz = \'karenz\' 
+					AND 
+						vbt.von::date <= '. $timestamp. '::date
+					AND 
+						vbt.bis::date >= '. $timestamp. '::date
+					) = 0
 				ORDER BY vbt.von DESC -- aktuellster
 				LIMIT 1';
 
