@@ -81,7 +81,7 @@ export default {
 
 
   <!-- CONTAINER -->
-  <div class="container-fluid">
+  <div class="container-fluid" style="overflow-wrap:break-word">
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
@@ -160,7 +160,7 @@ export default {
 
 
                       <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
-                      <div style="word-wrap:break-word;border:4px solid;border-color:red" class="col-md-12 col-lg-6">
+                      <div style="border:4px solid;border-color:red" class="col-lg-12 col-xl-6">
 
 
 
@@ -183,7 +183,7 @@ export default {
 
 
                       <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
-                      <div style="word-wrap:break-word;border:4px solid;border-color:orange" class="col-lg-6 col-md-12">
+                      <div style="border:4px solid;border-color:orange" class="col-xl-6 col-lg-12">
 
 
 
@@ -237,7 +237,7 @@ export default {
 
 
               <!-- START OF SIDE PANEL -->
-              <div class="col-md-3 col-sm-12">
+              <div  class="col-md-3 col-sm-12">
 
 
               <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
