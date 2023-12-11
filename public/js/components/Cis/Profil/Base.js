@@ -176,10 +176,13 @@ export default {
                         
                         
                         </div>
+                        <div class="col-sm-12 col-md-9">
+                        <div class="row">
+                        
                         <div class="col-md-3 col-sm-12" style="background-color:lightgreen;">
                         <img class=" img-thumbnail "  :src="get_image_base64_src"></img>
                         </div>
-                        <div class="col-md-6 col-sm-12" style="background-color:lightcoral;">
+                        <div class="col-md-9 col-sm-12" style="background-color:lightcoral;">
                         
 
 
@@ -229,7 +232,21 @@ export default {
 
                         </div>
 
+                        </div>
+                        </div>
+                        <div class="row">
 
+                        <!-- HIER SIND DIE TABELLEN -->
+                        <div class="col-12" style="background-color:purple">
+                        <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
+                        
+                        </div>
+                        <div class="col-12" style="background-color:orange">
+                        <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
+                        </div>
+
+
+                    </div>
 
                         
                         </div>
@@ -266,19 +283,7 @@ export default {
 
 
                         </div>    
-                        <div class="row">
-
-                            <!-- HIER SIND DIE TABELLEN -->
-                            <div class="col-12" style="background-color:purple">
-                            <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
-                            
-                            </div>
-                            <div class="col-12" style="background-color:orange">
-                            <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
-                            </div>
-
-
-                        </div>
+                       
                          
                     </div>
 
