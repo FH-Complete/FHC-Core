@@ -166,8 +166,8 @@ export default {
 
 
                     <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
-                      <div class="row">
-                        <div class="col">
+                    <div class="row justify-content-center">
+                    <div class="col-auto ">
                           <img class=" img-thumbnail " style=" max-height:150px"  :src="get_image_base64_src"></img>
                         </div>
                       </div>
