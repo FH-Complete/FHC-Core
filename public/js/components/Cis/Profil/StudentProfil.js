@@ -179,8 +179,8 @@ export default {
 
 
                     <!-- START OF THE SECOND ROW WITH THE IMAGE LINK -->
-                      <div class="row">
-                        <div class="col">
+                    <div class="row justify-content-center">
+                    <div class="col-auto text-center ">
                           
 
                         
