@@ -112,7 +112,7 @@ class vertragsbestandteil extends basis_db
 				-- ...im aktuellen Monat (default) oder im Monat des übergebenen $datums 
 				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
 				-- Vorerst nur check, ob zumindest eine aufrechte Zeitaufzeichnungspflicht. Später Unterscheidung nach Dienstverhältnis.
-				--ORDER BY vbt.von DESC --aktuellster
+				ORDER BY vbt.von DESC --aktuellster
 				LIMIT 1';
 
 		if ($result = $this->db_query($qry))
@@ -265,7 +265,7 @@ class vertragsbestandteil extends basis_db
 				-- ...im aktuellen Monat (default) oder im Monat des übergebenen $datums 
 				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
 				-- Vorerst nur check, ob zumindest eine aufrechte Zeitaufzeichnungspflicht. Später Unterscheidung nach Dienstverhältnis.
-				--ORDER BY vbt.von DESC --aktuellster
+				ORDER BY vbt.von DESC --aktuellster
 				LIMIT 1';
 
 		if ($result = $this->db_query($qry))
@@ -335,7 +335,7 @@ class vertragsbestandteil extends basis_db
 				-- ...im aktuellen Monat (default) oder im Monat des übergebenen $datums 
 				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
 				-- Vorerst nur check, ob zumindest eine aufrechte Zeitaufzeichnungspflicht. Später Unterscheidung nach Dienstverhältnis.
-				--ORDER BY vbt.von DESC --aktuellster
+				ORDER BY vbt.von DESC --aktuellster
 				LIMIT 1';
 
 		if ($result = $this->db_query($qry))
