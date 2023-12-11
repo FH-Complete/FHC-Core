@@ -628,6 +628,7 @@ class Profil extends Auth_Controller
 				
 			}
 			if(!$pid){
+				//! if no Person_ID was found, null is returned and the vue component will show a 404 View
 				return null;
 			}
 			

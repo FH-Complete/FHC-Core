@@ -172,14 +172,14 @@ export default {
                           <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
                           <div class="row">
                             <!-- COLUMN WITH PROFIL IMAGE -->
-                              <div class="col-md-3 col-sm-12" style="background-color:lightgreen;">
-                              <img class=" img-thumbnail " style=" min-width:150px"  :src="get_image_base64_src"></img>
+                              <div class="col-md-2 col-sm-12" style="background-color:lightgreen;">
+                              <img class=" img-thumbnail " style=" max-height:150px"  :src="get_image_base64_src"></img>
                               </div>
 
 
 
                               <!-- COLUMN WITH THE PROFIL INFORMATION --> 
-                              <div class="col-md-9 col-sm-12" style="background-color:lightcoral;">
+                              <div class="col-md-10 col-sm-12" style="background-color:lightcoral;">
                         
 
                               <!-- INFORMATION CONTENT START -->
@@ -252,6 +252,13 @@ export default {
                             </div>
                             <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
                           </div  >
+
+
+                          <div class="row">
+                            <div style="background-color:lightpink" class="col">
+                              <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
+                            </div>
+                          </div>
 
 
 

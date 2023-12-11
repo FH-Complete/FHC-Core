@@ -145,178 +145,296 @@ export default {
   },
 
   template: `
-
-            <div class="container-fluid">
-            <!-- here starts the row of the whole window -->
-                <div class="row ">
-                <!-- this is the left column of the window -->
-                    <div class="col-md-12 col-lg-9">
-                    
-                        <div class="row align-items-center">
-                            
-
-
-                            <div style="background-color:lightgreen" class="col-md-12 col-lg-2">
-                         
-                            <div class="row">
-                                <div class="align-middle ">
-                                <h3 >Mitarbeiter</h3>
-                                    <img class=" img-thumbnail " :height="" :src="get_image_base64_src"></img>
-                                   
-                                </div>
-                                <div  style="background-color:#EEEEEE" class=" lg-invisible col row py-4">
-                                <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
-                                <a style="text-decoration:none" class="my-1" href="#">Lehrveranstaltungen</a>
-                                <a style="text-decoration:none" class="my-1" href="#">Zeitsperren von Gschnell</a>
-                                </div>
-                                
-                                
-                                
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col">
-                                    <div v-if="data.foto_sperre ">
-                                        <p class="m-0">Profilfoto gesperrt</p>
-                                        <a href="#" @click.prevent="sperre_foto_function(false)" class="text-decoration-none">Sperre des Profilfotos aufheben</a>
-                                    </div>
-                                    <a href="#" @click.prevent="sperre_foto_function(true)" class="text-decoration-none"  v-else>Profilfoto sperren</a>
-                                </div>
-                            </div>
-                          
-                        </div>
+  <!-- CONTAINER -->
+  <div class="container-fluid">
+    <!-- ROW --> 
+          <div class="row">
+          <!-- HIDDEN QUICK LINKS -->
+              <div  class="d-md-none col-12 ">
+             
 
 
 
-                            
-                          
-                            <div style="background-color:lightblue" class="col-lg-10 col-md-12 ">
-                        
-                        
-                                
-                            
-                                
-                                <div class="row">
-                                  <div style="background-color:lightsalmon" :class="{ 'col-lg-12':true, 'col-xl-6':true, 'order-1':bezeichnung=='Allgemein',  'order-4':bezeichnung=='Adressen'}" v-for="(wert,bezeichnung) in personData">
-                                                                  
-                                    
 
-                                    <dl class="  mb-3" v-else v-for="(wert,bez) in wert">
-                                    
-                                    
-                                    <div class="row justify-content-center" v-if="bez=='FhAusweisStatus'">
-                                    <dt class="col-md-6 col-xxl-4 m-0" >FH-Ausweis Status</dt>
-                                    <dd class=" col-md-6 col-xxl-4 m-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</dd>
-                                  
-                                  </div>
-                                  <div v-else class="row justify-content-center">
-                                        <dt class="col-md-6 col-xxl-4 m-0" >{{bez}}</dt>
-                                        <dd class=" col-md-6 col-xxl-4 m-0">{{wert?wert:"-"}}</dd>
-                                        </div>
-                                    </dl>
-                                
-                                  </div>
-                                
-                                
-                            
-                           
-                                  <div style="background-color: lightcoral" class="col-lg-12 col-xl-6 order-2  ">
-                                  
-                                      <dl v-for="(wert,bezeichnung) in kontaktInfo">
-                                      
-                                      <!-- HIER IST DAS DATUM DES FH AUSWEIS -->
-                                      <!-- WAS MOVED TO THE FIRST INFO BOX -->
+                <div style="border:4px solid;border-color:#EEEEEE;" class="row py-4">
+                  <div class="col">
+                      <div class="dropdown">
+                      <button style="width:100%" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                          Quick links
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                          <li><button class="dropdown-item" type="button">Zeitwuensche</button></li>
+                          <li><button class="dropdown-item" type="button">Lehrveranstaltungen</button></li>
+                          <li><button class="dropdown-item" type="button">Zeitsperren von Gschnell</button></li>
+                      </ul>
+                      </div>
+                  </div>
+                </div>
 
 
-                                          <div class="justify-content-center row mb-3" v-if="bezeichnung=='FhAusweisStatus'">
-                                            <dt class="col-md-6 col-xxl-4  mb-0">FH-Ausweis Status</dt>
-                                            <div class="col-md-6 col-xxl-4">
-                                              <dd class="mb-0 ">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</dd>
-                                            </div>
-                                          </div>
-
-                                      <!-- HIER SIND DIE EMAILS -->
-                              
-
-                                          <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
-                                              <dt class="col-md-6 col-xxl-4 mb-0">eMail</dt>
-                                              <div class="col-md-6 col-xxl-4">
-                                              <dd v-for="email in wert" class="mb-0 ">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></dd>
-                                              </div>
-                                            </div>
-
-                                          <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
-                                          <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
-                                          <dt   class="col-md-6 col-xxl-4 mb-0">Private Kontakte</dt>
-                                          <div class="col-md-6 col-xxl-4">
-                                              <dd class="row justify-end" v-for="element in wert" >
-                                                  <div class="col-8">{{element.kontakttyp + ":  " + element.kontakt+"  " }}</div>
-                                                  <div class="col-2"> {{element?.anmerkung}}</div>
-                                                  <div class="col-2"> 
-                                                  <i v-if="element.zustellung" class="fa-solid fa-check"></i>
-                                                  <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
-                                                  </div>
-                                              </dd>
-                                              </div>
-                                          </div>
-                                          
-                                          <!-- HIER SIND DIE ADRESSEN -->
-                                          <div class=" justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Adressen'">
-                                            <dt class="col-md-6 col-xxl-4">Adressen</dt>
-                                              <div class="col-md-6 col-xxl-4">
-                                                <dd class="  m-0"  v-for="element in wert">
-                                                  {{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}
-                                                </dd>
-                                              </div>
-                                          </div>
-                                      
-                                      </dl>
-                                  </div>
-                                </div>
+              
+              
+              </div>
+              <!-- END OF HIDDEN QUCK LINKS -->
 
 
-                            </div>
-                        </div>
-                      
+
+              <!-- MAIN PANNEL -->
+              <div class="col-sm-12 col-md-9">
+                <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
+                <div class="row">
+                  <!-- COLUMN WITH PROFIL IMAGE -->
+                    <div class="col-md-2 col-sm-12" style="border:4px solid;border-color:lightgreen;">
+
+
+
+
+
+
+                    <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
                       <div class="row">
-                      <div class="col">
-                      <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
-                      </div>
-                      </div>
-                        <div class="row my-5">
-                        
-                
-                            <div class="col-12">
-                            <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
-                            
-                            </div>
-                            <div class="col-12">
-                            <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
-                            </div>
-                        
+                        <div class="col">
+                          <img class=" img-thumbnail " style=" max-height:150px"  :src="get_image_base64_src"></img>
                         </div>
+                      </div>
+                    <!-- END OF THE ROW WITH THE IMAGE -->
 
-                
+
+
+
+
+
+                    <!-- START OF THE SECOND ROW WITH THE IMAGE LINK -->
+                      <div class="row">
+                        <div class="col">
+                          
+
+                        
+                        <div v-if="data.foto_sperre ">
+                          <p class="m-0">Profilfoto gesperrt</p>
+                          <a href="#" @click.prevent="sperre_foto_function(false)" class="text-decoration-none">Sperre des Profilfotos aufheben</a>
+                        </div>
+                        <!-- DIESEN LINK KOENNTE MAN MIT EINEM ICON AUSTAUSCHEN WENN DIE VIEWPORT KLEIN IST -->
+                        <a href="#" @click.prevent="sperre_foto_function(true)" class="text-decoration-none"  v-else>Profilfoto sperren</a>
+                     
+
+
+
+                        </div>
+                      </div>
+                    <!-- END OF THE ROW WITH THE IMAGE LINK -->
+
+
+
+
+
+
+                    <!-- END OF THE COLUMN WITH PROFIL IMAGE AND LINK -->
                     </div>
 
-                    <div  class="col-md-12 col-lg-3 ">
-                        <div style="background-color:#EEEEEE" class="row md-invisible py-4">
+
+
+                    <!-- COLUMN WITH THE PROFIL INFORMATION --> 
+                    <div class="col-md-10 col-sm-12" style="border:4px solid;border-color:lightcoral;">
+              
+
+                    <!-- INFORMATION CONTENT START -->
+                    <!-- ROW WITH THE PROFIL INFORMATION --> 
+                    <div class="row">
+
+
+
+                      <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
+                      <div style="border:4px solid;border-color:red" class="col-md-12 col-lg-6">
+
+
+
+
+
+                        <div   v-for="(wert,bezeichnung) in personData">
+                            <dl class="  mb-0" v-else v-for="(wert,bez) in wert">
+                                <div class="row justify-content-center">
+                                    <dt class="col-6" >{{bez}}</dt>
+                                    <dd class=" col-6">{{wert?wert:"-"}}</dd>
+                                </div>
+                            </dl>
+                            <div class="row justify-content-center" v-if="bez=='FhAusweisStatus'">
+                                <dt class="col-6" >FH-Ausweis Status</dt>
+                                <dd class=" col-6 m-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</dd>
+                            </div>
+                        </div>
+
+
+
+                      <!-- END OF THE FIRST INFORMATION COLUMN -->
+                      </div>
+
+
+                      <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
+                      <div style="border:4px solid;border-color:orange" class="col-lg-6 col-md-12">
+
+
+
+
+
+
+                        <dl v-for="(wert,bezeichnung) in kontaktInfo">
+
+                        <!-- HIER SIND DIE EMAILS -->
+                    
+                    
+                          <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
+                              <dt class="col-4  mb-0">eMail</dt>
+                              <div class="col-8 ">
+                                  <dd v-for="email in wert" class="mb-0 ">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></dd>
+                              </div>
+                          </div>
+                      
+                      
+                          <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
+                          <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
+                              <dt   class="col-4 mb-0">Private Kontakte</dt>
+                              <div class="col-8 ">
+                                  <dd class="row justify-end" v-for="element in wert" >
+                                      <div class="col-8">{{element.kontakttyp + ":  " + element.kontakt+"  " }}</div>
+                                      <div class="col-2"> {{element?.anmerkung}}</div>
+                                      <div class="col-2"> 
+                                          <i v-if="element.zustellung" class="fa-solid fa-check"></i>
+                                          <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
+                                      </div>
+                                  </dd>
+                              </div>
+                          </div>
+                      
+                      
+                      
+                          <!-- HIER SIND DIE ADRESSEN -->
+                          <div class=" justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Adressen'">
+                              <dt class="col-4">Adressen</dt>
+                              <div class="col-8">
+                                  <dd class="  m-0"  v-for="element in wert">
+                                      {{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}
+                                  </dd>
+                              </div>
+                          </div>
+                    
+                        </dl>
+
+
+
+
+                      <!-- END OF THE SECOND INFORMATION COLUMN -->
+                      </div>
+
+
+              
+                    <!-- END OF PROFIL INFORMATION ROW -->
+                    <!-- INFORMATION CONTENT END -->
+                    </div>
+
+
+                    <!-- COLUMN WITH ALL PROFIL INFORMATION END -->
+                  </div>
+                  <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
+                </div  >
+
+
+
+                <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
+                <div class="row">
+                  <div style="border:4px solid;border-color:lightpink" class="col">
+                    <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
+                  </div>
+                </div>
+                <!-- END OF REFRESHING LINK ROW -->
+
+
+
+
+                <!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
+                <div class="row">
+
+                <!-- FIRST TABLE -->
+                  <div class="col-12" style="border: 4px solid; border-color:lightskyblue">
+                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
+                  </div>
+
+                <!-- SECOND TABLE -->
+                  <div class="col-12" style="border:4px solid;border-color:orange">
+                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
+                  </div>
+
+                <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
+                </div>
+
+
+
+
+
+
+
+              <!-- END OF MAIN CONTENT COL -->
+              </div>
+
+
+
+
+              <!-- START OF SIDE PANEL -->
+              <div class="col-md-3 col-sm-12">
+
+
+              <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
+
+
+              <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
+              <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
+                <div style="border:4px solid;border-color:#EEEEEE;" class="row d-none d-md-block">
+                  <div class="col">
+                    <div  class="row py-4">
                         <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
                         <a style="text-decoration:none" class="my-1" href="#">Lehrveranstaltungen</a>
                         <a style="text-decoration:none" class="my-1" href="#">Zeitsperren von Gschnell</a>
-                        </div>
-                        <div class="row">
-                            <h5 class="fs-3" style="margin-top:1em">Mailverteilers</h5>
-                            <p class="fs-6">Sie sind Mitgglied in folgenden Verteilern:</p>
-                            <div  class="row text-break" v-for="verteiler in data?.mailverteiler">
-                                <div class="col-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
-                                <div class="col-6">{{verteiler.beschreibung}}</div>
-                            </div>
-                        </div>
                     </div>
+                  </div>
                 </div>
-        
-            </div>
+
+
+                <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
+                <div style="border:4px solid;border-color: darkgray"  class="row">
+                
+                  <div class="col">
+                
+
+                  
+                  <!-- HIER SIND DIE MAILVERTEILER -->
+                    <h5 class="fs-3" style="margin-top:1em">Mailverteilers</h5>
+                    <p class="fs-6">Sie sind Mitgglied in folgenden Verteilern:</p>
+                    <div  class="row text-break" v-for="verteiler in data?.mailverteiler">
+                      <div class="col-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
+                      <div class="col-6">{{verteiler.beschreibung}}</div>
+                    </div>
+
+
+
+                  </div>
+
+                <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
+                </div>
+
+                <!-- END OF SIDE PANEL -->
+              </div>
+
+
+            
+
+
+
+          <!-- END OF CONTAINER ROW-->
+          
+      </div>
+      
+      <!-- END OF CONTAINER -->
+  </div>
             
     `,
 };
