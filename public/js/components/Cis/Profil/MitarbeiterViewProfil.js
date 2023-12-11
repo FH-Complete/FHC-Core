@@ -191,22 +191,20 @@ export default {
                       <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
                       <div style="border:4px solid;border-color:red" class="col-lg-12 col-xl-6">
 
+                        <dl class="  mb-0"  >
 
+                        <!-- MITARBEITER TITEL -->
+                          <div class="row mb-2">
+                              <dt class="col-12 " ><b>MitarbeiterIn</b></dt>
+                          </div>
 
-
-
-                        <div   v-for="(wert,bezeichnung) in personData">
-                            <dl class="  mb-0" v-else v-for="(wert,bez) in wert">
-                                <div class="row justify-content-center">
-                                    <dt class="col-6" >{{bez}}</dt>
-                                    <dd class=" col-6">{{wert?wert:"-"}}</dd>
-                                </div>
-                            </dl>
-                            <div class="row justify-content-center" v-if="bez=='FhAusweisStatus'">
-                                <dt class="col-6" >FH-Ausweis Status</dt>
-                                <dd class=" col-6 m-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</dd>
-                            </div>
-                        </div>
+                          <div v-for="(wert,bez) in personData.Allgemein" class="row">
+                              <dt class="col-lg-4 col-6  " >{{bez}}</dt>
+                              <dd class=" col-lg-8 col-6 ">{{wert?wert:"-"}}</dd>
+                          </div>
+                        
+                    
+                        </dl>
 
 
 
