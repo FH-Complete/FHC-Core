@@ -449,6 +449,54 @@ class vertragsbestandteil extends basis_db
 	}
 
 	/**
+	 * Prüft, ob MitarbeiterIn zum Abfragedatum karenziert ist.
+	 * Wenn kein Datum übergeben wird, wird das heutige Datum gesetzt.
+	 *
+	 * @param $mitarbeiter_uid
+	 * @param null $datum
+	 * @return bool
+	 */
+	public function isKarenziert($mitarbeiter_uid, $datum = null)
+	{
+		$timestamp = is_null($datum) ? 'NOW()' :  '(date('. $this->db_add_param($datum).'))';
+
+		$qry = '
+				SELECT 
+					1
+				FROM 
+					hr.tbl_vertragsbestandteil vbt 
+				JOIN 
+					hr.tbl_dienstverhaeltnis dv USING (dienstverhaeltnis_id)
+				WHERE
+				    dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
+				AND 
+					vbt.vertragsbestandteiltyp_kurzbz = \'karenz\' 
+				AND 
+					vbt.von::date <= '. $timestamp. '::date
+				AND 
+					vbt.bis::date >= '. $timestamp. '::date
+		';
+
+
+		if ($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+			return false;
+		}
+	}
+
+	/**
 	 * Arbeits-Wochenstunden eines/r MitarbeiterIn im Monat des uebergebenen $datums.
 	 * Wenn kein Datum übergeben wird, wird das heutige Datum gesetzt.
 	 *
