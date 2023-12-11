@@ -219,7 +219,7 @@ export default {
 
 
                       <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
-                      <div style="border:4px solid;border-color:red" class="col-md-12 col-lg-6">
+                      <div style="word-wrap:break-word;border:4px solid;border-color:red" class="col-md-12 col-lg-6">
 
 
 
@@ -245,7 +245,7 @@ export default {
 
 
                       <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
-                      <div style="border:4px solid;border-color:orange" class="col-lg-6 col-md-12">
+                      <div style="word-wrap:break-word;border:4px solid;border-color:orange" class="col-lg-6 col-md-12">
 
 
 

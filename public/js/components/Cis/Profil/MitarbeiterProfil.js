@@ -245,7 +245,7 @@ export default {
 
 
                       <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
-                      <div style="border:4px solid;border-color:red" class="col-md-12 col-lg-6">
+                      <div style="word-wrap:break-word;border:4px solid;border-color:red" class="col-md-12 col-lg-6">
 
 
 
@@ -271,7 +271,7 @@ export default {
 
 
                       <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
-                      <div style="border:4px solid;border-color:orange" class="col-lg-6 col-md-12">
+                      <div style="word-wrap:break-word; border:4px solid;border-color:orange" class="col-lg-6 col-md-12">
 
 
 
@@ -284,8 +284,8 @@ export default {
                     
                     
                           <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
-                              <dt class="col-4  mb-0">eMail</dt>
-                              <div class="col-8 ">
+                              <dt class="col-3  mb-0">eMail</dt>
+                              <div class="col-9 ">
                                   <dd v-for="email in wert" class="mb-0 ">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></dd>
                               </div>
                           </div>
@@ -293,8 +293,8 @@ export default {
                       
                           <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
                           <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
-                              <dt   class="col-4 mb-0">Private Kontakte</dt>
-                              <div class="col-8 ">
+                              <dt   class="col-3 mb-0">Private Kontakte</dt>
+                              <div class="col-9 ">
                                   <dd class="row justify-end" v-for="element in wert" >
                                       <div class="col-8">{{element.kontakttyp + ":  " + element.kontakt+"  " }}</div>
                                       <div class="col-2"> {{element?.anmerkung}}</div>
@@ -310,8 +310,8 @@ export default {
                       
                           <!-- HIER SIND DIE ADRESSEN -->
                           <div class=" justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Adressen'">
-                              <dt class="col-4">Adressen</dt>
-                              <div class="col-8">
+                              <dt class="col-3">Adressen</dt>
+                              <div class="col-9">
                                   <dd class="  m-0"  v-for="element in wert">
                                       {{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}
                                   </dd>
