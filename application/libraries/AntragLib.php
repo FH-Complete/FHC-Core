@@ -123,6 +123,8 @@ class AntragLib
 	 */
 	public function approveAbmeldung($studierendenantrag_ids, $insertvon)
 	{
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
+
 		$errors = [];
 		foreach ($studierendenantrag_ids as $studierendenantrag_id) {
 			$result = $this->_ci->StudierendenantragModel->load($studierendenantrag_id);
@@ -251,10 +253,9 @@ class AntragLib
 						$vorname = '';
 						$nachname = $name;
 					}
-					$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
+					$res = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
 					if (hasData($res)) {
-						$kontakt = current(getData($res));
-						$email = $kontakt->kontakt;
+						$email = $this->_ci->StudentModel->getEmailFH(current(getData($res))->student_uid);
 						$vorlage = $antrag->typ == Studierendenantrag_model::TYP_ABMELDUNG ? 'Student' : 'Stgl';
 
 						// NOTE(chris): Sancho mail
@@ -335,6 +336,8 @@ class AntragLib
 			$res = $this->_ci->PrestudentModel->load($antrag->prestudent_id);
 
 			if (hasData($res)) {
+				$this->_ci->load->model('crm/Student_model', 'StudentModel');
+
 				$prestudent = current(getData($res));
 				$res = $this->_ci->PersonModel->load($prestudent->person_id);
 				if (hasData($res)) {
@@ -345,10 +348,10 @@ class AntragLib
 				} else {
 					$name = $this->_ci->p->t('person', 'studentIn');
 				}
-				$res = $this->_ci->KontaktModel->getZustellKontakt($prestudent->person_id, ['email']);
+
+				$res = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
 				if (hasData($res)) {
-					$kontakt = current(getData($res));
-					$email = $kontakt->kontakt;
+					$email = $this->_ci->StudentModel->getEmailFH(current(getData($res))->student_uid);
 
 					$res = $this->_ci->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 					$stg = '';
@@ -432,6 +435,7 @@ class AntragLib
 	public function approveUnterbrechung($studierendenantrag_ids, $insertvon)
 	{
 		$this->_ci->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
 
 		$errors = [];
 
@@ -609,6 +613,7 @@ class AntragLib
 	public function rejectUnterbrechung($studierendenantrag_ids, $insertvon, $grund)
 	{
 		$this->_ci->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
 
 		$errors = [];
 
@@ -755,7 +760,7 @@ class AntragLib
 					}
 				}
 
-				$res = $this->_ci->KontaktModel->getZustellKontakt($person_id, ['email']);
+				$res = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $antrag->prestudent_id]);
 				if (isError($res)) {
 					$errors['email'] = getError($res);
 				} else {
@@ -764,7 +769,7 @@ class AntragLib
 					if (!$res) {
 						$errors['email'] = $this->_ci->p->t('studierendenantrag', 'error_no_email', ['person_id' => $person_id]);
 					} else {
-						$result['email'] = current($res)->kontakt;
+						$result['email'] = $this->_ci->StudentModel->getEmailFH(current($res)->student_uid);
 					}
 				}
 			}
@@ -1517,6 +1522,8 @@ class AntragLib
 
 	public function approveWiederholung($antrag_id, $insertvon)
 	{
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
+
 		$result = $this->_ci->StudierendenantragstatusModel->insert([
 			'studierendenantrag_id' => $antrag_id,
 			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
@@ -1571,10 +1578,10 @@ class AntragLib
 			$mitarbeiter = getData($result);
 		}
 
-		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id'=> $antrag->prestudent_id]);
+		$result = $this->_ci->StudentModel->loadWhere(['prestudent_id'=> $prestudent_id]);
 		if (hasData($result)) {
-			$student = current(getData($result));
-			$student_uid = $student->student_uid;
+			$studentObj = current(getData($result));
+			$student_uid = $studentObj->student_uid;
 		}
 		else
 			$student_uid = '';
@@ -1596,10 +1603,8 @@ class AntragLib
 		))
 			return error($this->_ci->p->t('studierendenantrag', 'error_mail_to', ['email' => $email]));
 
-		$result = $this->_ci->KontaktModel->getZustellKontakt($person->person_id, ['email']);
-		if (hasData($result)) {
-			$kontakt = current(getData($result));
-			$email = $kontakt->kontakt;
+		if ($student_uid) {
+			$email = $this->_ci->StudentModel->getEmailFH($student_uid);
 
 			$sem_not_allowed = $sem_to_repeat = '';
 			$list_not_allowed = $list_to_repeat = $this->_ci->p->t('studierendenantrag', 'mail_part_error_no_lvs');
@@ -1609,7 +1614,7 @@ class AntragLib
 				$lvs = getData($result);
 				foreach ($lvs as $sem => $lv_list) {
 					$lvs_filtered = array_filter($lv_list, function ($el) {
-						return $el->antrag_zugelassen;
+						return property_exists($el, 'antrag_zugelassen') && $el->antrag_zugelassen;
 					});
 					if (substr($sem, 0, 1) == '1') {
 						$sem_not_allowed = substr($sem, 1);
