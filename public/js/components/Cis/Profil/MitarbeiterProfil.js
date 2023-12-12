@@ -2,6 +2,7 @@ import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
 
+
 export default {
   components: {
     CoreFilterCmpt,
@@ -12,8 +13,37 @@ export default {
 
       funktionen_table_options: {
         height: 300,
-        layout: "fitColumns",
+        layout:"fitColumns",
+        responsiveLayout:"collapse",
+        responsiveLayoutCollapseUseFormatters:false,
+        responsiveLayoutCollapseFormatter:function(data){
+          //data - an array of objects containing the column title and value for each cell
+          var container = document.createElement("div");
+          //container.classList.add("container-fluid");
+          //container.classList.add("p-0");
+          container.classList.add("tabulator-collapsed-row");
+          var list = document.createElement("div");
+          list.classList.add("row");
+          container.appendChild(list);
+        
+          data.forEach(function(col){
+              let item = document.createElement("div");
+              item.classList.add("col-6");
+              let item2 = document.createElement("div");
+              item2.classList.add("col-6");
+              
+              item.innerHTML = "<strong>" + col.title + "</strong>";
+              console.log("col values",col);
+              item2.innerHTML = col.value?col.value:"-";
+              list.appendChild(item);
+              list.appendChild(item2);
+          });
+        
+          return Object.keys(data).length ? container : "";
+        },
+        
         data: [
+          
           {
             Bezeichnung: "",
             Organisationseinheit: "",
@@ -23,19 +53,29 @@ export default {
           },
         ],
         columns: [
-          { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true },
+         //? option when wanting to hide the collapsed list
+          /*  {
+            title: "",
+            field: "",
+            headerSort: false,
+            formatter:"responsiveCollapse",
+            maxWidth:20,
+          }, */
+          { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
           {
             title: "Organisationseinheit",
             field: "Organisationseinheit",
-            headerFilter: true,
+            headerFilter: true,minWidth:200,
           },
-          { title: "Gültig_von", field: "Gültig_von", headerFilter: true },
-          { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true },
+          { title: "Gültig_von", field: "Gültig_von", headerFilter: true, resizable:true,minWidth:200, },
+          { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true, resizable:true,minWidth:200, },
           {
             title: "Wochenstunden",
             field: "Wochenstunden",
             headerFilter: true,
+            minWidth:200,
           },
+          
         ],
       },
       betriebsmittel_table_options: {
@@ -46,13 +86,13 @@ export default {
           {
             title: "Betriebsmittel",
             field: "betriebsmittel",
-            headerFilter: true,
+            headerFilter: true
           },
-          { title: "Nummer", field: "Nummer", headerFilter: true },
+          { title: "Nummer", field: "Nummer", headerFilter: true, resizable:true },
           {
             title: "Ausgegeben_am",
             field: "Ausgegeben_am",
-            headerFilter: true,
+            headerFilter: true
           },
         ],
       },
@@ -254,8 +294,8 @@ export default {
                             </div>
 
                             <div v-for="(wert,bez) in personData.Allgemein" class="row">
-                                <dt class="col-lg-4 col-6  " >{{bez}}</dt>
-                                <dd class=" col-lg-8 col-6 ">{{wert?wert:"-"}}</dd>
+                                <dt class="col-lg-4  col-md-6  " >{{bez}}</dt>
+                                <dd class=" col-lg-8  col-md-6 ">{{wert?wert:"-"}}</dd>
                             </div>
                             
                         
