@@ -7,7 +7,31 @@ import Base from "../../components/Cis/Profil/Base.js";
 import fhcapifactory from "../api/fhcapifactory.js";
 
 Vue.$fhcapi = fhcapifactory;
-
+Vue.$collapseFormatter  = function(data){
+	//data - an array of objects containing the column title and value for each cell
+	var container = document.createElement("div");
+	container.classList.add("tabulator-collapsed-row");
+  
+	var list = document.createElement("div");
+	list.classList.add("row");
+	
+	container.appendChild(list);
+  
+	data.forEach(function(col){
+		let item = document.createElement("div");
+		item.classList.add("col-6");
+		let item2 = document.createElement("div");
+		item2.classList.add("col-6");
+		
+		item.innerHTML = "<strong>" + col.title + "</strong>";
+		console.log("col values",col);
+		item2.innerHTML = col.value?col.value:"-";
+		list.appendChild(item);
+		list.appendChild(item2);
+	});
+  
+	return Object.keys(data).length ? container : "";
+  };
 
 const app = Vue.createApp({
 	

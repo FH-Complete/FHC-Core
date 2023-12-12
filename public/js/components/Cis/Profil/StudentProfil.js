@@ -14,21 +14,26 @@ export default {
       betriebsmittel_table_options: {
         height: 300,
         layout: "fitColumns",
+        responsiveLayout:"collapse",
+        responsiveLayoutCollapseUseFormatters:false,
+        responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
         data: [{ betriebsmittel: "", Nummer: "", Ausgegeben_am: "" }],
         columns: [
           {
             title: "Betriebsmittel",
             field: "betriebsmittel",
-            headerFilter: true,
+            headerFilter: true, minWidth:200,
           },
-          { title: "Nummer", field: "Nummer", headerFilter: true },
+          { title: "Nummer", field: "Nummer", headerFilter: true, resizable:true, minWidth:200, },
           {
             title: "Ausgegeben_am",
             field: "Ausgegeben_am",
             headerFilter: true,
+            minWidth:200,
           },
         ],
       },
+     
       zutrittsgruppen_table_options: {
         height: 300,
         layout: "fitColumns",

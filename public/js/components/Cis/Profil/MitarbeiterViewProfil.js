@@ -12,8 +12,13 @@ export default {
 
       funktionen_table_options: {
         height: 300,
-        layout: "fitColumns",
+        layout:"fitColumns",
+        responsiveLayout:"collapse",
+        responsiveLayoutCollapseUseFormatters:false,
+        responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
+        
         data: [
+          
           {
             Bezeichnung: "",
             Organisationseinheit: "",
@@ -23,19 +28,29 @@ export default {
           },
         ],
         columns: [
-          { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true },
+         //? option when wanting to hide the collapsed list
+          /*  {
+            title: "",
+            field: "",
+            headerSort: false,
+            formatter:"responsiveCollapse",
+            maxWidth:20,
+          }, */
+          { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
           {
             title: "Organisationseinheit",
             field: "Organisationseinheit",
-            headerFilter: true,
+            headerFilter: true,minWidth:200,
           },
-          { title: "Gültig_von", field: "Gültig_von", headerFilter: true },
-          { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true },
+          { title: "Gültig_von", field: "Gültig_von", headerFilter: true, resizable:true,minWidth:200, },
+          { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true, resizable:true,minWidth:200, },
           {
             title: "Wochenstunden",
             field: "Wochenstunden",
             headerFilter: true,
+            minWidth:200,
           },
+          
         ],
       },
     

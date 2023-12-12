@@ -2,31 +2,7 @@ import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
 
-const collapseFormatter = function(data){
-  //data - an array of objects containing the column title and value for each cell
-  var container = document.createElement("div");
-  container.classList.add("tabulator-collapsed-row");
 
-  var list = document.createElement("div");
-  list.classList.add("row");
-  
-  container.appendChild(list);
-
-  data.forEach(function(col){
-      let item = document.createElement("div");
-      item.classList.add("col-6");
-      let item2 = document.createElement("div");
-      item2.classList.add("col-6");
-      
-      item.innerHTML = "<strong>" + col.title + "</strong>";
-      console.log("col values",col);
-      item2.innerHTML = col.value?col.value:"-";
-      list.appendChild(item);
-      list.appendChild(item2);
-  });
-
-  return Object.keys(data).length ? container : "";
-};
 
 
 export default {
@@ -42,7 +18,7 @@ export default {
         layout:"fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
-        responsiveLayoutCollapseFormatter:collapseFormatter,
+        responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
         
         data: [
           
@@ -68,6 +44,7 @@ export default {
             title: "Organisationseinheit",
             field: "Organisationseinheit",
             headerFilter: true,minWidth:200,
+            
           },
           { title: "Gültig_von", field: "Gültig_von", headerFilter: true, resizable:true,minWidth:200, },
           { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true, resizable:true,minWidth:200, },
@@ -85,7 +62,7 @@ export default {
         layout: "fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
-        responsiveLayoutCollapseFormatter:collapseFormatter,
+        responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
         data: [{ betriebsmittel: "<a href='#'>test</a>", Nummer: "", Ausgegeben_am: "" }],
         columns: [
           {
@@ -177,9 +154,13 @@ export default {
   },
 
   mounted() {
+
+    
+
      this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
     
         this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
+        this.$refs.betriebsmittelTable.tabulator.hideColumn("betriebsmittel");
         
     }) 
 
