@@ -42,35 +42,26 @@ function parseMessageText(receiver_id, text)
 	);
 }
 
-$(document).ready(function () {
+$(document).ready(function ()
+{
 
 	tinymce.init({
-		selector: "#bodyTextArea",
-		plugins: "link",
-		toolbar: "undo redo | presentation | bold italic | link | alignleft aligncenter alignright alignjustify | outdent indent",
-		min_height: 400,
-		max_height: 700,
-		autoresize_on_init: false,
-		autoresize_min_height: 400,
-		autoresize_max_height: 400,
-		autoresize_bottom_margin: 10,
-		auto_focus: "bodyTextArea"
+		theme : "advanced",
+		mode : "specific_textareas",
+		editor_selector: "bodyTextArea",
+		theme_advanced_buttons2: "undo, redo, outdent, indent, bullist, numlist, link",
+		theme_advanced_buttons3: "",
+		theme_advanced_buttons4: "",
+		theme_advanced_toolbar_location: "top",
+		height: "400px",
 	});
 
 	tinymce.init({
-		selector: "#tinymcePreview",
-		plugins: "autoresize",
-		menubar: false,
-		toolbar: false,
-		statusbar: false,
+		theme : "advanced",
+		mode : "specific_textareas",
+		editor_selector: "tinymcePreview",
+		height: 400,
 		readonly: 1,
-		min_height: 400,
-		max_height: 700,
-		autoresize_on_init: false,
-		autoresize_min_height: 400,
-		autoresize_max_height: 700,
-		autoresize_bottom_margin: 10,
-		auto_focus: "bodyTextArea"
 	});
 
 	if ($("#variables"))

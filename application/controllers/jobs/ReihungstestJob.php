@@ -467,7 +467,7 @@ class ReihungstestJob extends JOB_Controller
 		$this->PrestudentstatusModel->addJoin('public.tbl_person', 'person_id');
 
 		$yesterdays_applicants_arr = $this->PrestudentstatusModel->loadWhere('
-			status_kurzbz = \'Interessent\' AND
+			status_kurzbz IN (\'Interessent\', \'Bewerber\') AND
 			typ = \'b\' AND
 			bestaetigtam = current_date - 1
 		');

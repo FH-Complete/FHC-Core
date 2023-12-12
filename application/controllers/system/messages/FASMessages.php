@@ -37,7 +37,7 @@ class FASMessages extends Auth_Controller
 
 		// Loads the view to write a new message with a template
 		$this->load->view(
-			'system/messages/htmlWriteTemplate',
+			'system/messages/FAShtmlWriteTemplate',
 			$this->CLMessagesModel->prepareHtmlWriteTemplatePrestudents($prestudents)
 		);
  	}
@@ -53,7 +53,7 @@ class FASMessages extends Auth_Controller
 
 		// Loads the view to write a new message with a template
 		$this->load->view(
-			'system/messages/htmlWriteTemplate',
+			'system/messages/FAShtmlWriteTemplate',
 			$this->CLMessagesModel->prepareHtmlWriteTemplatePrestudents($prestudents, $message_id, $recipient_id)
 		);
  	}
