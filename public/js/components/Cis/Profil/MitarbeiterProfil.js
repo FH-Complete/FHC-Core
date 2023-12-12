@@ -232,7 +232,7 @@ export default {
 
 
                     <!-- COLUMN WITH THE PROFIL INFORMATION --> 
-                    <div class="col-md-10 col-sm-12" style="border:4px solid;border-color:lightcoral;">
+                    <div class="col-md-10 col-sm-12" style="overflow-wrap:break-word; border:4px solid;border-color:lightcoral;">
               
 
                     <!-- INFORMATION CONTENT START -->
@@ -296,10 +296,10 @@ export default {
                       
                       
                           <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
-                          <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
+                          <div  class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
                               <dt   class="col-lg-4 col-6  mb-0">Private Kontakte</dt>
                               <div class="col-lg-8 col-6 ">
-                                  <dd class="row justify-end" v-for="element in wert" >
+                                  <dd style="white-space:normal" class="row justify-end" v-for="element in wert" >
                                       <div :class="{...(element?.anmerkung? {'col-7':true} : {'col-10':true} )}">{{element.kontakttyp + ":  " + element.kontakt+"  " }}</div>
                                       <div :class="{...(element?.anmerkung? {'col-3':true} : {'d-none':true} )}"> {{element?.anmerkung}}</div>
                                       <div class="col-2"> 
