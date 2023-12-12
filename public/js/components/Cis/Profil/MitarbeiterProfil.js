@@ -147,7 +147,7 @@ export default {
 
   template: `
   <!-- CONTAINER -->
-  <div class="container-fluid" style="overflow-wrap:break-word">
+  <div class="container-fluid" style="overflow-wrap:word-break; white-space:break-spaces;" >
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
@@ -183,19 +183,9 @@ export default {
               <!-- MAIN PANNEL -->
               <div class="col-sm-12 col-md-9">
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
-                <div class="row">
+                <div class="row ">
                   <!-- COLUMN WITH PROFIL IMAGE -->
-                    <div class="col-md-2 col-sm-12" style="border:4px solid;border-color:lightgreen;">
-
-
-                      <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
-                      <!--<div class="row justify-content-center">-->
-                      <!--  <div class="col-auto ">-->
-                      <!--    <h3>Mitarbeiter</h3>-->
-                      <!--  </div> -->
-                      <!--</div>-->
-                      <!-- END OF THE ROW WITH THE IMAGE -->
-
+                    <div class=" col-md-2 col-sm-12" style="border:4px solid;border-color:lightgreen;  ">
 
 
                     <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->

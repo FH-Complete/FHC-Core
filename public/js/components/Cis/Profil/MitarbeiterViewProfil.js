@@ -115,7 +115,7 @@ export default {
 
 
   <!-- CONTAINER -->
-  <div class="container-fluid" style="overflow-wrap:break-word">
+  <div class="container-fluid" style="overflow-wrap:word-break; white-space:break-spaces;">
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
