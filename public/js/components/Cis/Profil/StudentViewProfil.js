@@ -147,7 +147,7 @@ export default {
 
 
                     <!-- COLUMN WITH THE PROFIL INFORMATION --> 
-                    <div class="col-md-10 col-sm-12" style="border:4px solid;border-color:lightcoral;">
+                    <div class="col-md-10 col-sm-12" style="overflow-wrap:break-word;border:4px solid;border-color:lightcoral;">
               
 
                     <!-- INFORMATION CONTENT START -->
@@ -194,8 +194,8 @@ export default {
                     
                     
                           <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
-                              <dt class="col-4  mb-0">eMail</dt>
-                              <div class="col-8 ">
+                              <dt class="col-lg-4 col-6 mb-0">eMail</dt>
+                              <div class="col-lg-8 col-6 ">
                                   <dd v-for="email in wert" class="mb-0 ">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></dd>
                               </div>
                           </div>
