@@ -266,10 +266,10 @@ export default {
                   
                   <!-- HIER SIND DIE MAILVERTEILER -->
                     <h5 class="fs-3" style="margin-top:1em">Mailverteilers</h5>
-                    <p class="fs-6">Sie sind Mitgglied in folgenden Verteilern:</p>
+                    <p >Sie sind Mitgglied in folgenden Verteilern:</p>
                     <div  class="row text-break" v-for="verteiler in data?.mailverteiler">
-                      <div class="col-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
-                      <div class="col-6">{{verteiler.beschreibung}}</div>
+                      <div class="col-lg-12 col-xl-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
+                      <div class="col-lg-12 col-xl-6">{{verteiler.beschreibung}}</div>
                     </div>
 
 
