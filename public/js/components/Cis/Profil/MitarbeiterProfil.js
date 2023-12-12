@@ -68,7 +68,8 @@ export default {
           {
             title: "Betriebsmittel",
             field: "betriebsmittel",
-            headerFilter: true, minWidth:200,
+            headerFilter: true,
+            minWidth:200,
           },
           { title: "Nummer", field: "Nummer", headerFilter: true, resizable:true, minWidth:200, },
           {
@@ -160,7 +161,6 @@ export default {
      this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
     
         this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
-        this.$refs.betriebsmittelTable.tabulator.hideColumn("betriebsmittel");
         
     }) 
 
