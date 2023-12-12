@@ -35,7 +35,7 @@ export default {
       },
      
       zutrittsgruppen_table_options: {
-        height: 300,
+        height: 200,
         layout: "fitColumns",
         data: [{ bezeichnung: "test1" }],
         columns: [{ title: "Zutritt", field: "bezeichnung" }],
@@ -345,7 +345,7 @@ export default {
 
                 <!-- SECOND TABLE -->
                   <div class="col-12" style="border:4px solid;border-color:orange">
-                  <core-filter-cmpt title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options" :tableOnly :noColFilter />
+                  <core-filter-cmpt title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options" :tableOnly :noColumnFilter />
                   </div>
 
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
@@ -364,7 +364,7 @@ export default {
 
 
               <!-- START OF SIDE PANEL -->
-              <div  class="col-md-3 col-sm-12">
+              <div  class="col-md-3 col-sm-12" style="overflow-wrap:break-word">
 
 
               <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->

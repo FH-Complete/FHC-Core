@@ -235,7 +235,7 @@ export default {
 
 
               <!-- START OF SIDE PANEL -->
-              <div  class="col-md-3 col-sm-12">
+              <div  class="col-md-3 col-sm-12" style="overflow-wrap:break-word">
 
 
               <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->

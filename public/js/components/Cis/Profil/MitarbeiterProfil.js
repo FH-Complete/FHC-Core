@@ -13,8 +13,7 @@ export default {
       
 
       funktionen_table_options: {
-        reactiveData:true,
-        height: 300,
+        height:400,
         layout:"fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
@@ -30,7 +29,8 @@ export default {
         ],
         columns: [
          //? option when wanting to hide the collapsed list
-          /*  {
+         /*   
+         {
             title: "",
             field: "",
             headerSort: false,
@@ -57,7 +57,7 @@ export default {
       },
       betriebsmittel_table_options: {
         
-        height: 300,
+        height:300,
         layout: "fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
@@ -165,18 +165,7 @@ export default {
  
   },
 
-/* 
-  <div class="dropdown">
-                      <button class="w-100 btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
-                          Quick links
-                      </button>
-                      <ul class="w-100 dropdown-menu" aria-labelledby="dropdownMenu2">
-                          <li><button class="dropdown-item" type="button">Zeitwuensche</button></li>
-                          <li><button class="dropdown-item" type="button">Lehrveranstaltungen</button></li>
-                          <li><button class="dropdown-item" type="button">Zeitsperren von Gschnell</button></li>
-                      </ul>
-                      </div>
-*/
+
   template: ` 
 
 
@@ -207,7 +196,7 @@ export default {
                 </div>
               </div>
             </div>
-            
+
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
 
@@ -417,7 +406,7 @@ export default {
 
 
               <!-- START OF SIDE PANEL -->
-              <div  class="col-md-3 col-sm-12">
+              <div  class="col-md-3 col-sm-12" style="overflow-wrap:break-word">
 
 
               <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
