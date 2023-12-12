@@ -15,8 +15,13 @@
   }
 
 .tabulator-collapsed-row{
-    padding:7px;
-    
+    padding:15px;
+    background-color: rgba(0,0,0,0.1);
+
+}
+
+.tabulator-responsive-collapse{
+  padding:0 !important;
 }
 
 /*   dl {
