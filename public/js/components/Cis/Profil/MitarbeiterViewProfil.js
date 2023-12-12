@@ -136,28 +136,25 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-
-
-
-
-                <div style="border:4px solid;border-color:#EEEEEE;" class="row py-4">
-                  <div class="col">
-                      <div class="dropdown">
-                      <button style="width:100%" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
-                          Quick links
-                      </button>
-                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                          <li><button class="dropdown-item" type="button">Zeitwuensche</button></li>
-                          <li><button class="dropdown-item" type="button">Lehrveranstaltungen</button></li>
-                          <li><button class="dropdown-item" type="button">Zeitsperren von Gschnell</button></li>
-                      </ul>
-                      </div>
+              <div style="border:4px solid;border-color:#EEEEEE;" class="row py-2">
+              <div class="col">
+                <p class="m-0">
+                  <a class="border w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                   <u> Quick links</u>
+                  </a>
+                 
+                </p>
+                <div class="mt-1 collapse" id="collapseExample">
+                  
+                  <div class="list-group">
+                   
+                    <a href="#" class="list-group-item list-group-item-action">Zeitwünsche</a>
+                    <a href="#" class="list-group-item list-group-item-action">Lehrveranstaltungen</a>
+                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren von Gschnell</a>
                   </div>
                 </div>
-
-
-              
-              
+              </div>
+            </div>
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
 

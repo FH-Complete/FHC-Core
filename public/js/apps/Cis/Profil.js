@@ -24,8 +24,8 @@ Vue.$collapseFormatter  = function(data){
 		item2.classList.add("col-6");
 		
 		item.innerHTML = "<strong>" + col.title + "</strong>";
-		console.log("col values",col);
 		item2.innerHTML = col.value?col.value:"-";
+		
 		list.appendChild(item);
 		list.appendChild(item2);
 	});

@@ -4,7 +4,6 @@ import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
 
 
-
 export default {
   components: {
     CoreFilterCmpt,
@@ -14,14 +13,13 @@ export default {
       
 
       funktionen_table_options: {
+        reactiveData:true,
         height: 300,
         layout:"fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
         responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
-        
         data: [
-          
           {
             Bezeichnung: "",
             Organisationseinheit: "",
@@ -58,12 +56,13 @@ export default {
         ],
       },
       betriebsmittel_table_options: {
+        
         height: 300,
         layout: "fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
         responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
-        data: [{ betriebsmittel: "<a href='#'>test</a>", Nummer: "", Ausgegeben_am: "" }],
+        data: [{ betriebsmittel: "", Nummer: "", Ausgegeben_am: "" }],
         columns: [
           {
             title: "Betriebsmittel",
@@ -130,12 +129,6 @@ export default {
           Büro:this.data.ort_kurzbz,
           
         },
-        
-
-
-
-
-        
       };
     },
     //? this computed function returns the data for the second column in the profil 
@@ -167,12 +160,27 @@ export default {
     this.$refs.funktionenTable.tabulator.on('tableBuilt', () => {
     
         this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
-        
+       
     }) 
  
   },
 
-  template: `
+/* 
+  <div class="dropdown">
+                      <button class="w-100 btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                          Quick links
+                      </button>
+                      <ul class="w-100 dropdown-menu" aria-labelledby="dropdownMenu2">
+                          <li><button class="dropdown-item" type="button">Zeitwuensche</button></li>
+                          <li><button class="dropdown-item" type="button">Lehrveranstaltungen</button></li>
+                          <li><button class="dropdown-item" type="button">Zeitsperren von Gschnell</button></li>
+                      </ul>
+                      </div>
+*/
+  template: ` 
+
+
+  
   <!-- CONTAINER -->
   <div class="container-fluid" style="overflow-wrap:word-break; white-space:break-spaces;" >
     <!-- ROW --> 
@@ -180,28 +188,26 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-
-
-
-
-                <div style="border:4px solid;border-color:#EEEEEE;" class="row py-4">
-                  <div class="col">
-                      <div class="dropdown">
-                      <button style="width:100%" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
-                          Quick links
-                      </button>
-                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                          <li><button class="dropdown-item" type="button">Zeitwuensche</button></li>
-                          <li><button class="dropdown-item" type="button">Lehrveranstaltungen</button></li>
-                          <li><button class="dropdown-item" type="button">Zeitsperren von Gschnell</button></li>
-                      </ul>
-                      </div>
+              <div style="border:4px solid;border-color:#EEEEEE;" class="row py-2">
+              <div class="col">
+                <p class="m-0">
+                  <a class="border w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                   <u> Quick links</u>
+                  </a>
+                 
+                </p>
+                <div class="mt-1 collapse" id="collapseExample">
+                  
+                  <div class="list-group">
+                   
+                    <a href="#" class="list-group-item list-group-item-action">Zeitwünsche</a>
+                    <a href="#" class="list-group-item list-group-item-action">Lehrveranstaltungen</a>
+                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren von Gschnell</a>
                   </div>
                 </div>
-
-
-              
-              
+              </div>
+            </div>
+            
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
 
