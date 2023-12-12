@@ -2,6 +2,32 @@ import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
 
+const collapseFormatter = function(data){
+  //data - an array of objects containing the column title and value for each cell
+  var container = document.createElement("div");
+  container.classList.add("tabulator-collapsed-row");
+
+  var list = document.createElement("div");
+  list.classList.add("row");
+  
+  container.appendChild(list);
+
+  data.forEach(function(col){
+      let item = document.createElement("div");
+      item.classList.add("col-6");
+      let item2 = document.createElement("div");
+      item2.classList.add("col-6");
+      
+      item.innerHTML = "<strong>" + col.title + "</strong>";
+      console.log("col values",col);
+      item2.innerHTML = col.value?col.value:"-";
+      list.appendChild(item);
+      list.appendChild(item2);
+  });
+
+  return Object.keys(data).length ? container : "";
+};
+
 
 export default {
   components: {
@@ -16,31 +42,7 @@ export default {
         layout:"fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
-        responsiveLayoutCollapseFormatter:function(data){
-          //data - an array of objects containing the column title and value for each cell
-          var container = document.createElement("div");
-          //container.classList.add("container-fluid");
-          //container.classList.add("p-0");
-          container.classList.add("tabulator-collapsed-row");
-          var list = document.createElement("div");
-          list.classList.add("row");
-          container.appendChild(list);
-        
-          data.forEach(function(col){
-              let item = document.createElement("div");
-              item.classList.add("col-6");
-              let item2 = document.createElement("div");
-              item2.classList.add("col-6");
-              
-              item.innerHTML = "<strong>" + col.title + "</strong>";
-              console.log("col values",col);
-              item2.innerHTML = col.value?col.value:"-";
-              list.appendChild(item);
-              list.appendChild(item2);
-          });
-        
-          return Object.keys(data).length ? container : "";
-        },
+        responsiveLayoutCollapseFormatter:collapseFormatter,
         
         data: [
           
@@ -81,18 +83,22 @@ export default {
       betriebsmittel_table_options: {
         height: 300,
         layout: "fitColumns",
+        responsiveLayout:"collapse",
+        responsiveLayoutCollapseUseFormatters:false,
+        responsiveLayoutCollapseFormatter:collapseFormatter,
         data: [{ betriebsmittel: "<a href='#'>test</a>", Nummer: "", Ausgegeben_am: "" }],
         columns: [
           {
             title: "Betriebsmittel",
             field: "betriebsmittel",
-            headerFilter: true
+            headerFilter: true, minWidth:200,
           },
-          { title: "Nummer", field: "Nummer", headerFilter: true, resizable:true },
+          { title: "Nummer", field: "Nummer", headerFilter: true, resizable:true, minWidth:200, },
           {
             title: "Ausgegeben_am",
             field: "Ausgegeben_am",
-            headerFilter: true
+            headerFilter: true,
+            minWidth:200,
           },
         ],
       },
