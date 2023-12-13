@@ -272,7 +272,7 @@ export default {
                               <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
                               <template v-else>
                                 <dt class="col-xl-4 col-lg-6 col-md-6 col-6  " >{{bez}}</dt>
-                                <dd class="  col-6 ">{{wert?wert:"-"}}</dd>
+                                <dd class=" col-lg-8 col-xl-6 col-6 ">{{wert?wert:"-"}}</dd>
                               </template>
                           </div>
                         
@@ -380,12 +380,12 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12" style="border: 4px solid; border-color:lightskyblue">
-                  <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
+                  <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
                 <!-- SECOND TABLE -->
                   <div class="col-12" style="border:4px solid;border-color:orange">
-                  <core-filter-cmpt title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options" :tableOnly :noColumnFilter />
+                  <core-filter-cmpt title="Zutrittsgruppen" ref="zutrittsgruppenTable" :tabulator-options="zutrittsgruppen_table_options" tableOnly :sideMenu="false" :noColumnFilter />
                   </div>
 
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->

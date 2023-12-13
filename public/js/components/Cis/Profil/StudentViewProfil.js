@@ -170,7 +170,7 @@ export default {
                             <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
                             <template v-else>
                               <dt class="col-xl-4 col-lg-6 col-md-6 col-6  " >{{bez}}</dt>
-                              <dd class="  col-6 ">{{wert?wert:"-"}}</dd>
+                              <dd class=" col-lg-8 col-xl-6 col-6 ">{{wert?wert:"-"}}</dd>
                             </template>
                           </div>
                       

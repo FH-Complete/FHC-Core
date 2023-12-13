@@ -318,8 +318,8 @@ export default {
                             <div v-for="(wert,bez) in personData.Allgemein" class="row justify-content-center">
                               <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
                               <template v-else>
-                                <dt class="col-xl-4 col-lg-6 col-md-6 col-6  " >{{bez}}</dt>
-                                <dd class="  col-6 ">{{wert?wert:"-"}}</dd>
+                                <dt class="col-lg-4  col-md-6 col-6  " >{{bez}}</dt>
+                                <dd class=" col-lg-8 col-xl-6 col-6">{{wert?wert:"-"}}</dd>
                               </template>
                             </div>
                             
@@ -425,12 +425,12 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12" >
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  :tableOnly />
+                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   </div>
 
                 <!-- SECOND TABLE -->
                   <div class="col-12" >
-                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
+                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->

@@ -153,7 +153,7 @@ export const CoreFilterCmpt = {
 				return [];
 			return this.tabulator.getColumns().filter(col => {
 				let def = col.getDefinition();
-				return !def.frozen && def.title;
+				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
 			}).map(col => col.getField());
 		},
 		fieldNames() {
