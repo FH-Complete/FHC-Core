@@ -1,7 +1,10 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
-
+let customEvents = [{event: "headerClick", handler:function(e,column){
+  console.log(e);
+  console.log(column);
+}}]
 
 
 export default {
@@ -11,9 +14,9 @@ export default {
   data() {
     return {
       
-
+      showCollapsedColumn: true,
       funktionen_table_options: {
-        height:400,
+        height:300,
         layout:"fitColumns",
         responsiveLayout:"collapse",
         responsiveLayoutCollapseUseFormatters:false,
@@ -29,14 +32,15 @@ export default {
         ],
         columns: [
          //? option when wanting to hide the collapsed list
-         /*   
+            
          {
-            title: "",
-            field: "",
+            title: "<i id='collapseIcon'  class='fa-solid fa-angle-down'></i>",
+            field: "collapse",
             headerSort: false,
+            headerFilter:false,
             formatter:"responsiveCollapse",
             maxWidth:20,
-          }, */
+          }, 
           { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
           {
             title: "Organisationseinheit",
@@ -115,7 +119,8 @@ export default {
 
       return {
         Allgemein: {
-         
+          
+          View:"MitarbeiterIn",
           Username: this.data.username,
           Anrede: this.data.anrede,
           Titel: this.data.titel,
@@ -159,10 +164,48 @@ export default {
 
     this.$refs.funktionenTable.tabulator.on('tableBuilt', () => {
     
-        this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
+      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
+        
        
     }) 
  
+
+
+    this.$refs.funktionenTable.tabulator.on("headerClick", function(e, column){
+      this.showCollapsedColumn = !this.showCollapsedColumn;
+      
+      if(column._column.field == "collapse"){
+        //* changes the icon that shows or hides all the collapsed columns
+        if(this.showCollapsedColumn){
+          document.getElementById("collapseIcon").classList.replace("fa-angle-up","fa-angle-down");
+        }else{
+          document.getElementById("collapseIcon").classList.replace("fa-angle-down","fa-angle-up");
+        }
+        
+        //* changes the icon for every collapsed column to open or closed
+        [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
+            if(this.showCollapsedColumn){
+              ele.classList.replace("close","open");
+              
+            }else{
+              ele.classList.replace("open","close");
+            }
+        });
+
+        //* hides or shows the collapsed columns
+        [...document.getElementsByClassName("tabulator-responsive-collapse")].forEach(ele => {
+          if(this.showCollapsedColumn){
+            ele.style.display=""
+            
+          }else{
+            ele.style.display="none"
+          }
+          
+        });
+       
+      }
+      
+  });
   },
 
 
@@ -177,10 +220,10 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-              <div style="border:4px solid;border-color:#EEEEEE;" class="row py-2">
+              <div style=":4px solid;-color:#EEEEEE;" class="row py-2">
               <div class="col">
                 <p class="m-0">
-                  <a class="border w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
                    <u> Quick links</u>
                   </a>
                  
@@ -207,7 +250,7 @@ export default {
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
                 <div class="row ">
                   <!-- COLUMN WITH PROFIL IMAGE -->
-                    <div class=" col-md-2 col-sm-12" style="border:4px solid;border-color:lightgreen;  ">
+                    <div class=" col-md-2 col-sm-12" style=":4px solid;-color:lightgreen;  ">
 
 
                     <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
@@ -254,7 +297,7 @@ export default {
 
 
                     <!-- COLUMN WITH THE PROFIL INFORMATION --> 
-                    <div class="col-md-10 col-sm-12" style="overflow-wrap:break-word; border:4px solid;border-color:lightcoral;">
+                    <div class="col-md-10 col-sm-12" style="overflow-wrap:break-word; :4px solid;-color:lightcoral;">
               
 
                     <!-- INFORMATION CONTENT START -->
@@ -264,20 +307,20 @@ export default {
 
 
                       <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
-                      <div style="border:4px solid;border-color:red" class="col-lg-12 col-xl-6">
+                      <div style=":4px solid;-color:red" class="col-lg-12 col-xl-6">
                         
                       
                       
                         <dl class="  mb-0"  >
 
-                            <!-- MITARBEITER TITEL -->
-                            <div class="row mb-2">
-                                <dt class="col-12 " ><b>MitarbeiterIn</b></dt>
-                            </div>
+                        
 
-                            <div v-for="(wert,bez) in personData.Allgemein" class="row">
-                                <dt class="col-lg-4  col-md-6  " >{{bez}}</dt>
-                                <dd class=" col-lg-8  col-md-6 ">{{wert?wert:"-"}}</dd>
+                            <div v-for="(wert,bez) in personData.Allgemein" class="row justify-content-center">
+                              <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
+                              <template v-else>
+                                <dt class="col-xl-4 col-lg-6 col-md-6 col-6  " >{{bez}}</dt>
+                                <dd class="  col-6 ">{{wert?wert:"-"}}</dd>
+                              </template>
                             </div>
                             
                         
@@ -291,7 +334,7 @@ export default {
 
 
                       <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
-                      <div style=" border:4px solid;border-color:orange" class="col-xl-6 col-lg-12">
+                      <div style=" :4px solid;-color:orange" class="col-xl-6 col-lg-12">
 
 
 
@@ -368,7 +411,7 @@ export default {
 
                 <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
                 <div class="row">
-                  <div style="border:4px solid;border-color:lightpink" class="col">
+                  <div class="mt-5" style=":4px solid;-color:lightpink" class="col">
                     <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
                   </div>
                 </div>
@@ -381,12 +424,12 @@ export default {
                 <div class="row">
 
                 <!-- FIRST TABLE -->
-                  <div class="col-12" style="border: 4px solid; border-color:lightskyblue">
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tableOnly />
+                  <div class="col-12" style=": 4px solid; -color:lightskyblue">
+                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tabulator-events="customEvents" :tableOnly />
                   </div>
 
                 <!-- SECOND TABLE -->
-                  <div class="col-12" style="border:4px solid;border-color:orange">
+                  <div class="col-12" style=":4px solid;-color:orange">
                     <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
                   </div>
 
@@ -414,7 +457,7 @@ export default {
 
               <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
               <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
-                <div style="border:4px solid;border-color:#EEEEEE;" class="row d-none d-md-block">
+                <div style=":4px solid;-color:#EEEEEE;" class="row d-none d-md-block">
                   <div class="col">
                     <div  class="row py-4">
                         <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
@@ -426,7 +469,7 @@ export default {
 
 
                 <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
-                <div style="border:4px solid;border-color: darkgray"  class="row">
+                <div style=":4px solid;-color: darkgray"  class="row">
                 
                   <div class="col">
                 

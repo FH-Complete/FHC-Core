@@ -20,6 +20,10 @@
 
 }
 
+.tabulator-col{
+  justify-content:center !important;
+}
+
 .tabulator-responsive-collapse{
   padding:0 !important;
 }

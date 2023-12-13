@@ -39,6 +39,7 @@ export default {
 
       return {
         Allgemein: {
+          View:"StudentIn",
           Username: this.data.username,
           Matrikelnummer: this.data.matrikelnummer,
           Anrede: this.data.anrede,
@@ -161,14 +162,16 @@ export default {
 
                         <dl class="  mb-0"  >
 
-                          <!-- STUDENTEN TITEL -->
-                          <div class="row mb-2">
-                              <dt class="col-12 " ><b>StudentIn</b></dt>
-                          </div>
+                          
+                       
 
-                          <div v-for="(wert,bez) in personData.Allgemein" class="row">
-                              <dt class="col-lg-4 col-6  " >{{bez}}</dt>
-                              <dd class=" col-lg-8 col-6 ">{{wert?wert:"-"}}</dd>
+                          <div v-for="(wert,bez) in personData.Allgemein" class="row justify-content-center">
+                          <!-- STUDENTEN TITEL -->
+                            <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
+                            <template v-else>
+                              <dt class="col-xl-4 col-lg-6 col-md-6 col-6  " >{{bez}}</dt>
+                              <dd class="  col-6 ">{{wert?wert:"-"}}</dd>
+                            </template>
                           </div>
                       
                   
