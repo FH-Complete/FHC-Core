@@ -967,6 +967,7 @@ class AntragLib
 		$studiengang_kz = $result->studiengang_kz;
 		$orgform_kurzbz = $result->orgform_kurzbz;
 		$ausbildungssemester = $result->ausbildungssemester;
+		$sprache = $result->sprache;
 
 		// NOTE(chris): check permission
 		$allowedStgs = $this->_ci->permissionlib->getSTG_isEntitledFor('student/studierendenantrag') ?: [];
@@ -1012,7 +1013,8 @@ class AntragLib
 			$semA,
 			$ausbildungssemester + 1,
 			$antrag->prestudent_id,
-			$antrag->studiensemester_kurzbz
+			$antrag->studiensemester_kurzbz,
+			$sprache
 		);
 		if (isError($result))
 			return $result;
@@ -1035,7 +1037,8 @@ class AntragLib
 			$semB,
 			$ausbildungssemester,
 			$antrag->prestudent_id,
-			$antrag->studiensemester_kurzbz
+			$antrag->studiensemester_kurzbz,
+			$sprache
 		);
 		if (isError($result))
 			return $result;
@@ -1062,7 +1065,8 @@ class AntragLib
 		$studiensemester_kurzbz,
 		$ausbildungssemester,
 		$prestudent_id,
-		$note_stsem
+		$note_stsem,
+		$sprache
 	) {
 		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
@@ -1091,12 +1095,25 @@ class AntragLib
 				'semester' => $ausbildungssemester
 			]));
 		}
-		if (count($result) > 1)
-			return error($this->_ci->p->t('studierendenantrag', 'error_multiple_studienplan', [
-				'studiengang_kz' => $studiengang_kz,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'semester' => $ausbildungssemester
-			]));
+		if (count($result) > 1) {
+			$langmap = array_unique(array_map(function ($a) {
+				return $a->sprache;
+			}, $result));
+			if ($sprache
+				&& count($langmap) == count($result)
+				&& in_array($sprache, $langmap)
+			) {
+				$result = array_filter($result, function ($a) use ($sprache) {
+					return $a->sprache == $sprache;
+				});
+			} else {
+				return error($this->_ci->p->t('studierendenantrag', 'error_multiple_studienplan', [
+					'studiengang_kz' => $studiengang_kz,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'semester' => $ausbildungssemester
+				]));
+			}
+		}
 		$studienplan = current($result);
 
 		return $this->_ci->StudienplanModel->getStudienplanLehrveranstaltungForPrestudent(
