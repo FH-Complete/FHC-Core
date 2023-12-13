@@ -30,7 +30,7 @@ class Studierendenantrag_model extends DB_Model
 	{
 		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
 
-		$this->addSelect('stg.bezeichnung');
+		$this->addSelect('UPPER(stg.typ) || UPPER(stg.kurzbz) || \' \' || stg.bezeichnung AS bezeichnung');
 		$this->addSelect('bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform', false);
 		$this->addSelect('s.studierendenantrag_id');
 		$this->addSelect('matrikelnr');

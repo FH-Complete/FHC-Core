@@ -62,8 +62,11 @@ $(document).ready(function () {
 	//
 	tinymce.init({
 		selector: "#body",
-		plugins: "autoresize",
-		autoresize_min_height: 150,
+		plugins: "autoresize, link",
+		toolbar: "undo redo | presentation | bold italic | link | alignleft aligncenter alignright alignjustify | outdent indent",
+		min_height: 300,
+		max_height: 600,
+		autoresize_min_height: 300,
 		autoresize_max_height: 600,
 		autoresize_bottom_margin: 10
 	});
