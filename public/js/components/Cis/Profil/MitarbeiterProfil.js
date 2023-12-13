@@ -6,6 +6,8 @@ let customEvents = [{event: "headerClick", handler:function(e,column){
   console.log(column);
 }}]
 
+let showCollapsedColumn= true; 
+
 
 export default {
   components: {
@@ -14,7 +16,7 @@ export default {
   data() {
     return {
       
-      showCollapsedColumn: true,
+      
       funktionen_table_options: {
         height:300,
         layout:"fitColumns",
@@ -39,7 +41,7 @@ export default {
             headerSort: false,
             headerFilter:false,
             formatter:"responsiveCollapse",
-            maxWidth:20,
+            maxWidth:40,
           }, 
           { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
           {
@@ -172,11 +174,15 @@ export default {
 
 
     this.$refs.funktionenTable.tabulator.on("headerClick", function(e, column){
-      this.showCollapsedColumn = !this.showCollapsedColumn;
       
+      //* update the reactive data
+      console.log(showCollapsedColumn);
+      showCollapsedColumn = !showCollapsedColumn;
+      console.log(showCollapsedColumn);
+
       if(column._column.field == "collapse"){
         //* changes the icon that shows or hides all the collapsed columns
-        if(this.showCollapsedColumn){
+        if(showCollapsedColumn){
           document.getElementById("collapseIcon").classList.replace("fa-angle-up","fa-angle-down");
         }else{
           document.getElementById("collapseIcon").classList.replace("fa-angle-down","fa-angle-up");
@@ -184,25 +190,24 @@ export default {
         
         //* changes the icon for every collapsed column to open or closed
         [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
-            if(this.showCollapsedColumn){
-              ele.classList.replace("close","open");
+            if(showCollapsedColumn){
+              ele.classList.add("open");
               
             }else{
-              ele.classList.replace("open","close");
+              ele.classList.remove("open")
             }
         });
 
         //* hides or shows the collapsed columns
         [...document.getElementsByClassName("tabulator-responsive-collapse")].forEach(ele => {
-          if(this.showCollapsedColumn){
+          if(showCollapsedColumn){
             ele.style.display=""
             
           }else{
             ele.style.display="none"
           }
-          
         });
-       
+
       }
       
   });
