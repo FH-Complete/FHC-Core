@@ -1,42 +1,9 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
-let customEvents = [{event: "headerClick", handler:function(e,column){
-  console.log(e);
-  console.log(column);
-}}]
 
-let showCollapsedColumn= true; 
-const collapseFunction = function(e, column){
-      
-  //* update the reactive data
-  console.log(showCollapsedColumn);
-  showCollapsedColumn = !showCollapsedColumn;
-  console.log(showCollapsedColumn);
+ 
 
-  
-    //* changes the icon that shows or hides all the collapsed columns
-    if(showCollapsedColumn){
-      document.getElementById("collapseIcon").classList.replace("fa-angle-up","fa-angle-down");
-    }else{
-      document.getElementById("collapseIcon").classList.replace("fa-angle-down","fa-angle-up");
-    }
-    
-    //* changes the icon for every collapsed column to open or closed
-    [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
-      if(showCollapsedColumn){
-          if(!ele.classList.contains("open"))
-            ele.click();
-      }else{
-        if(ele.classList.contains("open"))
-          ele.click();
-      }
-      
-      
-      });
-  
-  
-}
 
 
 export default {
@@ -46,8 +13,9 @@ export default {
   data() {
     return {
       
-      
+      showCollapsedColumn: true,
       funktionen_table_options: {
+        
         height:300,
         layout:"fitColumns",
         responsiveLayout:"collapse",
@@ -66,13 +34,13 @@ export default {
          //? option when wanting to hide the collapsed list
             
          {
-            title: "<i id='collapseIcon'  class='fa-solid fa-angle-down'></i>",
+            title: "<i id='collapseIcon' role='button' class='fa-solid fa-angle-down  '></i>",
             field: "collapse",
             headerSort: false,
             headerFilter:false,
             formatter:"responsiveCollapse",
             maxWidth:40,
-            headerClick:collapseFunction,
+            headerClick:this.collapseFunction,
           }, 
           { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
           {
@@ -132,7 +100,41 @@ export default {
         this.data.foto_sperre = res.data.foto_sperre;
       });
     },
+    collapseFunction (e, column){
+      
+     
+      this.showCollapsedColumn = !this.showCollapsedColumn;
+      
+
+
+      //* changes the icon that shows or hides all the collapsed columns
+      if(this.showCollapsedColumn){
+        e.target.classList.replace("fa-angle-up","fa-angle-down");
+      }else{
+        e.target.classList.replace("fa-angle-down","fa-angle-up");
+      }
+      
+      //* changes the icon for every collapsed column to open or closed
+      [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
+        if(this.showCollapsedColumn){
+            if(!ele.classList.contains("open"))
+              ele.click();
+        }else{
+          if(ele.classList.contains("open"))
+            ele.click();
+        }
+        
+        
+        });
+
+        /* console.log(this);
+        
+        this.showCollapsedColumn = !this.showCollapsedColumn;
+        console.log(this.showCollapsedColumn); */
+    
   },
+  },
+  
   computed: {
     refreshMailTo() {
       return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`
@@ -186,9 +188,6 @@ export default {
   },
 
   mounted() {
-
-    
-
      this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
     
         this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
@@ -201,10 +200,6 @@ export default {
         
        
     }) 
- 
-
-
-   
   },
 
 
@@ -424,7 +419,7 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12" >
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tabulator-events="customEvents" :tableOnly />
+                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  :tableOnly />
                   </div>
 
                 <!-- SECOND TABLE -->
