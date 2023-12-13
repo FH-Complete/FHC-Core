@@ -309,22 +309,30 @@ export default {
                       <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
                       <div  class="col-lg-12 col-xl-6">
                         
+                      <div class="card h-100">
+                     
+                      <div class="card-body">
                       
-                      
-                        <dl class="  mb-0"  >
+                       
+                      <dl class="  mb-0"  >
 
                         
 
-                            <div v-for="(wert,bez) in personData.Allgemein" class="row justify-content-center">
-                              <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
-                              <template v-else>
-                                <dt class="col-lg-4  col-md-6 col-6  " >{{bez}}</dt>
-                                <dd class=" col-lg-8 col-xl-6 col-6">{{wert?wert:"-"}}</dd>
-                              </template>
-                            </div>
-                            
-                        
-                        </dl>
+                      <div v-for="(wert,bez) in personData.Allgemein" class="row justify-content-center">
+                        <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
+                        <template v-else>
+                          <dt class="col-lg-4  col-md-6 col-6  " >{{bez}}</dt>
+                          <dd class=" col-lg-8 col-xl-6 col-6">{{wert?wert:"-"}}</dd>
+                        </template>
+                      </div>
+                      
+                  
+                  </dl>
+
+                      </div>
+                    </div>
+                      
+                       
                             
 
 
@@ -337,7 +345,9 @@ export default {
                       <div  class="col-xl-6 col-lg-12">
 
 
-
+                      <div class="card h-100">
+                     
+                      <div class="card-body">
 
 
 
@@ -390,7 +400,8 @@ export default {
                         </dl>
 
 
-
+                      </div>
+                      </div>
 
                       <!-- END OF THE SECOND INFORMATION COLUMN -->
                       </div>
@@ -457,13 +468,26 @@ export default {
 
               <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
               <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
-                <div  class="row d-none d-md-block">
+                <div  class="row d-none d-md-block mb-3">
                   <div class="col">
-                    <div  class="row py-4">
+                 
+                    <div class="card">
+                      <div class="card-header">
+                      Quick Links
+                      </div>
+                      <div class="card-body">
+                      
+                       
                         <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
                         <a style="text-decoration:none" class="my-1" href="#">Lehrveranstaltungen</a>
                         <a style="text-decoration:none" class="my-1" href="#">Zeitsperren von Gschnell</a>
+
+                      </div>
                     </div>
+
+                   
+                      
+                  
                   </div>
                 </div>
 
