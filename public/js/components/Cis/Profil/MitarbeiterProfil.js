@@ -190,23 +190,19 @@ export default {
         
         //* changes the icon for every collapsed column to open or closed
         [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
-            if(showCollapsedColumn){
-              ele.classList.add("open");
-              
-            }else{
-              ele.classList.remove("open")
-            }
-        });
-
-        //* hides or shows the collapsed columns
-        [...document.getElementsByClassName("tabulator-responsive-collapse")].forEach(ele => {
           if(showCollapsedColumn){
-            ele.style.display=""
-            
+              if(!ele.classList.contains("open"))
+                ele.click();
           }else{
-            ele.style.display="none"
+            if(ele.classList.contains("open"))
+              ele.click();
           }
-        });
+          
+          
+          });
+
+       
+    
 
       }
       
@@ -219,13 +215,13 @@ export default {
 
   
   <!-- CONTAINER -->
-  <div class="container-fluid" style="overflow-wrap:word-break; white-space:break-spaces;" >
+  <div class="container-fluid text-break"  >
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-              <div style=":4px solid;-color:#EEEEEE;" class="row py-2">
+              <div class="row py-2">
               <div class="col">
                 <p class="m-0">
                   <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
@@ -255,7 +251,7 @@ export default {
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
                 <div class="row ">
                   <!-- COLUMN WITH PROFIL IMAGE -->
-                    <div class=" col-md-2 col-sm-12" style=":4px solid;-color:lightgreen;  ">
+                    <div class=" col-md-2 col-sm-12" >
 
 
                     <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
@@ -302,7 +298,7 @@ export default {
 
 
                     <!-- COLUMN WITH THE PROFIL INFORMATION --> 
-                    <div class="col-md-10 col-sm-12" style="overflow-wrap:break-word; :4px solid;-color:lightcoral;">
+                    <div class="col-md-10 col-sm-12 text-break" >
               
 
                     <!-- INFORMATION CONTENT START -->
@@ -312,7 +308,7 @@ export default {
 
 
                       <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
-                      <div style=":4px solid;-color:red" class="col-lg-12 col-xl-6">
+                      <div  class="col-lg-12 col-xl-6">
                         
                       
                       
@@ -339,7 +335,7 @@ export default {
 
 
                       <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
-                      <div style=" :4px solid;-color:orange" class="col-xl-6 col-lg-12">
+                      <div  class="col-xl-6 col-lg-12">
 
 
 
@@ -416,7 +412,7 @@ export default {
 
                 <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
                 <div class="row">
-                  <div class="mt-5" style=":4px solid;-color:lightpink" class="col">
+                  <div class="mt-5"  class="col">
                     <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
                   </div>
                 </div>
@@ -429,12 +425,12 @@ export default {
                 <div class="row">
 
                 <!-- FIRST TABLE -->
-                  <div class="col-12" style=": 4px solid; -color:lightskyblue">
+                  <div class="col-12" >
                     <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" :tabulator-events="customEvents" :tableOnly />
                   </div>
 
                 <!-- SECOND TABLE -->
-                  <div class="col-12" style=":4px solid;-color:orange">
+                  <div class="col-12" >
                     <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" :tableOnly />
                   </div>
 
@@ -454,7 +450,7 @@ export default {
 
 
               <!-- START OF SIDE PANEL -->
-              <div  class="col-md-3 col-sm-12" style="overflow-wrap:break-word">
+              <div  class="col-md-3 col-sm-12 text-break" >
 
 
               <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
@@ -462,7 +458,7 @@ export default {
 
               <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
               <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
-                <div style=":4px solid;-color:#EEEEEE;" class="row d-none d-md-block">
+                <div  class="row d-none d-md-block">
                   <div class="col">
                     <div  class="row py-4">
                         <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
@@ -474,7 +470,7 @@ export default {
 
 
                 <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
-                <div style=":4px solid;-color: darkgray"  class="row">
+                <div  class="row">
                 
                   <div class="col">
                 
