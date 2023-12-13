@@ -13,7 +13,8 @@ export default {
   data() {
     return {
       
-      showCollapsedColumn: true,
+      collapseIconFunktionen: true,
+      collapseIconBetriebsmittel: true,
       funktionen_table_options: {
         
         height:300,
@@ -34,7 +35,7 @@ export default {
          //? option when wanting to hide the collapsed list
             
          {
-            title: "<i id='collapseIcon' role='button' class='fa-solid fa-angle-down  '></i>",
+            title: "<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
             field: "collapse",
             headerSort: false,
             headerFilter:false,
@@ -70,6 +71,15 @@ export default {
         data: [{ betriebsmittel: "", Nummer: "", Ausgegeben_am: "" }],
         columns: [
           {
+            title: "<i id='collapseIconBetriebsmittel' role='button' class='fa-solid fa-angle-down  '></i>",
+            field: "collapse",
+            headerSort: false,
+            headerFilter:false,
+            formatter:"responsiveCollapse",
+            maxWidth:40,
+            headerClick:this.collapseFunction,
+          }, 
+          {
             title: "Betriebsmittel",
             field: "betriebsmittel",
             headerFilter: true,
@@ -101,37 +111,33 @@ export default {
       });
     },
     collapseFunction (e, column){
-      
-     
-      this.showCollapsedColumn = !this.showCollapsedColumn;
-      
 
+      //* the if of the column has to match with the name of the responsive data in the vue component
+      this[e.target.id] = !this[e.target.id];
 
+      //* gets all event icons of the different rows to use the onClick event later
+      let allClickableIcons = column._column.cells.map(row => {
+        return row.element.children[0];
+      });
+      
       //* changes the icon that shows or hides all the collapsed columns
-      if(this.showCollapsedColumn){
+      //* if the replace function does not find the class to replace, it just simply returns false
+      if(this[e.target.id]){
         e.target.classList.replace("fa-angle-up","fa-angle-down");
       }else{
         e.target.classList.replace("fa-angle-down","fa-angle-up");
       }
       
       //* changes the icon for every collapsed column to open or closed
-      [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
-        if(this.showCollapsedColumn){
-            if(!ele.classList.contains("open"))
-              ele.click();
+        if(this[e.target.id]){
+          allClickableIcons.filter(column => {
+            return !column.classList.contains("open");
+          }).forEach(col => {col.click();})
         }else{
-          if(ele.classList.contains("open"))
-            ele.click();
+          allClickableIcons.filter(column => {
+            return column.classList.contains("open");
+          }).forEach(col => {col.click();})
         }
-        
-        
-        });
-
-        /* console.log(this);
-        
-        this.showCollapsedColumn = !this.showCollapsedColumn;
-        console.log(this.showCollapsedColumn); */
-    
   },
   },
   
