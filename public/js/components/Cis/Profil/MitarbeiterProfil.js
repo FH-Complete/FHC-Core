@@ -7,6 +7,36 @@ let customEvents = [{event: "headerClick", handler:function(e,column){
 }}]
 
 let showCollapsedColumn= true; 
+const collapseFunction = function(e, column){
+      
+  //* update the reactive data
+  console.log(showCollapsedColumn);
+  showCollapsedColumn = !showCollapsedColumn;
+  console.log(showCollapsedColumn);
+
+  
+    //* changes the icon that shows or hides all the collapsed columns
+    if(showCollapsedColumn){
+      document.getElementById("collapseIcon").classList.replace("fa-angle-up","fa-angle-down");
+    }else{
+      document.getElementById("collapseIcon").classList.replace("fa-angle-down","fa-angle-up");
+    }
+    
+    //* changes the icon for every collapsed column to open or closed
+    [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
+      if(showCollapsedColumn){
+          if(!ele.classList.contains("open"))
+            ele.click();
+      }else{
+        if(ele.classList.contains("open"))
+          ele.click();
+      }
+      
+      
+      });
+  
+  
+}
 
 
 export default {
@@ -42,6 +72,7 @@ export default {
             headerFilter:false,
             formatter:"responsiveCollapse",
             maxWidth:40,
+            headerClick:collapseFunction,
           }, 
           { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
           {
@@ -173,40 +204,7 @@ export default {
  
 
 
-    this.$refs.funktionenTable.tabulator.on("headerClick", function(e, column){
-      
-      //* update the reactive data
-      console.log(showCollapsedColumn);
-      showCollapsedColumn = !showCollapsedColumn;
-      console.log(showCollapsedColumn);
-
-      if(column._column.field == "collapse"){
-        //* changes the icon that shows or hides all the collapsed columns
-        if(showCollapsedColumn){
-          document.getElementById("collapseIcon").classList.replace("fa-angle-up","fa-angle-down");
-        }else{
-          document.getElementById("collapseIcon").classList.replace("fa-angle-down","fa-angle-up");
-        }
-        
-        //* changes the icon for every collapsed column to open or closed
-        [...document.getElementsByClassName("tabulator-responsive-collapse-toggle")].forEach(ele => {
-          if(showCollapsedColumn){
-              if(!ele.classList.contains("open"))
-                ele.click();
-          }else{
-            if(ele.classList.contains("open"))
-              ele.click();
-          }
-          
-          
-          });
-
-       
-    
-
-      }
-      
-  });
+   
   },
 
 
