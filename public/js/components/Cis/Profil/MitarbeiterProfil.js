@@ -411,7 +411,7 @@ export default {
 
                 <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
                 <div class="row">
-                  <div class="mt-5"  class="col">
+                  <div   class="col pt-4">
                     <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
                   </div>
                 </div>
@@ -476,12 +476,22 @@ export default {
 
                   
                   <!-- HIER SIND DIE MAILVERTEILER -->
-                    <h5 class="fs-3" style="margin-top:1em">Mailverteilers</h5>
-                    <p >Sie sind Mitgglied in folgenden Verteilern:</p>
-                    <div  class="row text-break" v-for="verteiler in data?.mailverteiler">
-                      <div class="col-lg-12 col-xl-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
-                      <div class="col-lg-12 col-xl-6">{{verteiler.beschreibung}}</div>
+                    <div class="card">
+                      <div class="card-header">
+                      Mailverteilers
+                      </div>
+                      <div class="card-body">
+                      
+                        <h6 class="card-title">Sie sind Mitgglied in folgenden Verteilern:</h6>
+                        <div  class="card-text row text-break" v-for="verteiler in data?.mailverteiler">
+                          <div class="col-lg-12 col-xl-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
+                          <div class="col-lg-12 col-xl-6">{{verteiler.beschreibung}}</div>
+                        </div>
+
+                      </div>
                     </div>
+
+
 
 
 

@@ -365,8 +365,8 @@ export default {
 
 
                 <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
-                <div class="row mt-4">
-                  <div style="border:4px solid;border-color:lightpink" class="col">
+                <div class="row ">
+                  <div style="border:4px solid;border-color:lightpink" class="col pt-4">
                     <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
                   </div>
                 </div>
