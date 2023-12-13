@@ -239,7 +239,7 @@ class vertragsbestandteil extends basis_db
 	}
 
 	/**
-	 * Prueft ob MitarbeiterIn im Monat des uebergebenen $datums AZG-relevant ist.
+	 * Prueft ob MitarbeiterIn am Tag des uebergebenen $datums AZG-relevant ist.
 	 * Wenn kein Datum übergeben wird, wird das heutige Datum gesetzt.
 	 *
 	 * @param $mitarbeiter_uid
@@ -262,10 +262,13 @@ class vertragsbestandteil extends basis_db
 				WHERE dv.mitarbeiter_uid = '. $this->db_add_param($mitarbeiter_uid). '
 				-- AZG-relevant...
 				AND azgrelevant = TRUE 
-				-- ...im aktuellen Monat (default) oder im Monat des übergebenen $datums 
-				AND ((date_trunc(\'month\', '. $timestamp. ')::date < vbt.bis AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von) OR (vbt.bis IS NULL AND (date_trunc(\'month\', '. $timestamp. ') + interval \'1 month - 1 day\')::date > vbt.von))
-				-- Vorerst nur check, ob zumindest eine aufrechte Zeitaufzeichnungspflicht. Später Unterscheidung nach Dienstverhältnis.
-				ORDER BY vbt.von DESC --aktuellster
+				-- ...am aktuellen Tag (default) oder am Tag des übergebenen $datums 
+				AND (
+					(' . $timestamp . '::date BETWEEN vbt.von AND vbt.bis)
+					OR 
+					(vbt.bis IS NULL AND ' . $timestamp . '::date > vbt.von)
+				)
+				ORDER BY vbt.von DESC --zur Sicherheit: aktuellster
 				LIMIT 1';
 
 		if ($result = $this->db_query($qry))
