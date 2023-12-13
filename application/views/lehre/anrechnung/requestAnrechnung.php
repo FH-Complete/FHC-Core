@@ -1,5 +1,8 @@
 <?php
-const HERKUNFT_DER_KENNTNISSE_MAX_LENGTH = 125;
+const CHAR_LENGTH125 = 125;
+const CHAR_LENGTH150 = 150;
+const CHAR_LENGTH500 = 500;
+const CHAR_LENGTH1000 = 1000;
 
 $this->load->view(
 	'templates/FHC-Header',
@@ -197,6 +200,46 @@ $this->load->view(
 									</div>
 								</div>
 							</div>
+                            <!-- Begruendung ECTS -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <b><?php echo $this->p->t('anrechnung', 'begruendungEcts'); ?></b>&emsp;
+                                            <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
+                                                  title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungEctsTooltipText'); ?>">
+                                                <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
+                                        <div class="panel-body">
+                                            <textarea class="form-control" name="begruendung_ects" rows="1" id="requestAnrechnung-begruendungEcts"
+                                                      maxlength="<?php echo CHAR_LENGTH150 ?>" required><?php echo $anrechnungData->begruendung_ects; ?></textarea>
+                                            <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungEcts-charCounter"><?php echo CHAR_LENGTH150 ?></span></span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Begruendung LV Inhalt -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <b><?php echo $this->p->t('anrechnung', 'begruendungLvinhalt'); ?></b>&emsp;
+                                            <span class="requestAnrechnung-anrechnungInfoTooltip" data-toggle="tooltip" data-placement="right"
+                                                  title="<?php echo $this->p->t('anrechnung', 'anrechnungBegruendungLvinhaltTooltipText'); ?>">
+                                                <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
+                                        <div class="panel-body">
+                                            <textarea class="form-control" name="begruendung_lvinhalt" rows="7" id="requestAnrechnung-begruendungLvinhalt"
+                                                      minlength="<?php echo CHAR_LENGTH500 ?>"
+                                                      maxlength="<?php echo CHAR_LENGTH1000 ?>" required><?php echo $anrechnungData->begruendung_lvinhalt; ?></textarea>
+                                            <small><span class="text-muted pull-right">&nbsp;/&nbsp;<?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-begruendungLvinhalt-charCounterMax"><?php echo CHAR_LENGTH1000 ?></span></span></small>
+                                            <small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'fehlendeMinZeichen'); ?> :<span id="requestAnrechnung-begruendungLvinhalt-charCounterMin"><?php echo CHAR_LENGTH500 ?></span></span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 							<!-- Dokument Upload-->
 							<div class="row">
 								<div class="col-lg-12">
@@ -242,8 +285,8 @@ $this->load->view(
 												</div>
 												<div class="panel-body">
 													<textarea class="form-control" name="anmerkung" rows="1" id="requestAnrechnung-herkunftDerKenntnisse"
-															  maxlength="<?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?>" required><?php echo $anrechnungData->anmerkung; ?></textarea>
-													<small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo HERKUNFT_DER_KENNTNISSE_MAX_LENGTH ?></span></span></small>
+                                                              maxlength="<?php echo CHAR_LENGTH125 ?>" required><?php echo $anrechnungData->anmerkung; ?></textarea>
+													<small><span class="text-muted pull-right"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo CHAR_LENGTH125 ?></span></span></small>
 												</div>
 											</div>
 										</div>

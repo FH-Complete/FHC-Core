@@ -70,6 +70,7 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 			'z.lehrveranstaltung_id=lv.lehrveranstaltung_id AND z.student_uid=s.student_uid AND z.studiensemester_kurzbz=a.studiensemester_kurzbz',
 			'LEFT'
 		);
+		$this->addJoin('lehre.tbl_note zn', 'z.note = zn.note', 'LEFT');
 
 		return $this->loadWhere([
 			'ps.prestudent_id' => $prestudent_id,
@@ -77,7 +78,7 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 			'stat.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
 			'n.note <> ' => 0,
 			$this->dbTable . '.studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'(n.note<>19 OR z.note IS NOT NULL)' => null
+			'(n.note<>19 OR (z.note IS NOT NULL AND zn.positiv))' => null
 		]);
 	}
 }

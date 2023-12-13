@@ -1,27 +1,24 @@
 import BsAlert from '../../../Bootstrap/Alert.js';
 import BsModal from '../../../Bootstrap/Modal.js';
-import Phrasen from '../../../../mixins/Phrasen.js';
 
 export default {
 	components: {
 		BsModal,
 		AutoComplete: primevue.autocomplete
 	},
-	mixins: [
-		Phrasen
-	],
 	emits: [
 		'reload'
 	],
 	data() {
 		return {
 			data: [],
-			student: ''
+			student: '',
+			abortController: null
 		}
 	},
 	computed: {
 		newUrl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldung/' + this.student.prestudent_id;
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/lehre/Studierendenantrag/abmeldungStgl/' + this.student.prestudent_id;
 		}
 	},
 	methods: {
@@ -32,17 +29,24 @@ export default {
 				class: 'position-absolute top-0 start-0 w-100 h-100'
 			}), {
 				dialogClass: 'modal-fullscreen'
-			}, this.p.t('studierendenantrag', 'antrag_header')).then(() => {
+			}, this.$p.t('studierendenantrag', 'antrag_header')).then(() => {
 				this.$emit('reload');
 				this.student = '';
 			});
 		},
 		loadData(evt) {
+			if (this.abortController)
+				this.abortController.abort();
+			this.abortController = new AbortController();
+
 			axios.post(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 				'/components/Antrag/Abmeldung/getStudiengaengeAssistenz/',
-				evt
+				evt,
+				{
+					signal: this.abortController.signal
+				}
 			).then(
 				result => {
 					if (result.data.error) {
@@ -52,24 +56,24 @@ export default {
 					}
 					return result;
 				}
-			);
+			).catch(() => {});
 		}
 	},
 	template: `
 	<div class="studierendenantrag-leitung-actions-new" v-if="data">
 		<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newAntragModal">
 			<i class="fa fa-plus"></i>
-			{{p.t('studierendenantrag','btn_new')}}
+			{{$p.t('studierendenantrag','btn_new')}}
 		</button>
 		<div ref="modal" class="modal fade" id="newAntragModal" tabindex="-1" aria-labelledby="newAntragModalLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="newAntragModalLabel">{{p.t('studierendenantrag','title_new_Abmeldung')}}</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="p.t('ui','schliessen')"></button>
+						<h5 class="modal-title" id="newAntragModalLabel">{{$p.t('studierendenantrag','title_new_Abmeldung')}}</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="$p.t('ui','schliessen')"></button>
 					</div>
 					<div class="modal-body">
-						<label for="newAntragModalAutoComplete">{{p.t('person','studentIn')}}</label>
+						<label for="newAntragModalAutoComplete">{{$p.t('person','studentIn')}}</label>
 						<div>
 							<auto-complete
 								class="w-100"
@@ -94,7 +98,7 @@ export default {
 							class="btn btn-primary"
 							:disabled="!this.student"
 							@click.prevent="openForm">
-							{{p.t('studierendenantrag','btn_create')}}
+							{{$p.t('studierendenantrag','btn_create')}}
 						</button>
 					</div>
 				</div>

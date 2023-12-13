@@ -39,7 +39,7 @@ $this->load->view(
 							<p><?= $this->p->t('studierendenantrag', 'calltoaction_' . $type); ?></p>
 							<hr>
 							<a href="<?= site_url('lehre/Studierendenantrag/' . strtolower($type) . '/' . $prestudent_id); ?>" class="btn btn-outline-secondary">
-								<i class="fa-regular fa-plus fa-xl"></i> <?= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); ?>
+								<i class="fa fa-plus"></i> <?= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); ?>
 							</a>
 						</div>
 					<?php } ?>
@@ -82,7 +82,7 @@ $this->load->view(
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body">
-													<pre><?= $antrag->grund; ?></pre>
+													<textarea class="form-control" style="width: 100%; height: 250px;" readonly><?= $antrag->grund; ?></textarea>
 												</div>
 											</div>
 										</div>
@@ -101,14 +101,17 @@ $this->load->view(
 								</td>
 								<td>
 									<a href="<?= site_url('lehre/Studierendenantrag/' . strtolower($antrag->typ) . '/' . $antrag->prestudent_id . '/' . $antrag->studierendenantrag_id); ?>"><i class="fa-solid fa-pen" title="<?= $this->p->t('studierendenantrag', 'btn_edit'); ?>"></i></a>
-									<?php if ($antrag->typ != Studierendenantrag_model::TYP_WIEDERHOLUNG && $antrag->status == Studierendenantragstatus_model::STATUS_APPROVED) { ?>
-										<a class="ms-2" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xml=Antrag' . str_replace('AbmeldungStgl', 'Abmeldung', $antrag->typ) . '.xml.php&xsl=Antrag' . str_replace('AbmeldungStgl', 'Abmeldung', $antrag->typ) . '&id=' . $antrag->studierendenantrag_id . '&uid=' . getAuthUID()); ?>"><i class="fa-solid fa-download" title="<?= $this->p->t('studierendenantrag', 'btn_download_antrag'); ?>"></i></a>
+									<?php if ($antrag->typ != Studierendenantrag_model::TYP_WIEDERHOLUNG && in_array($antrag->status, [
+										Studierendenantragstatus_model::STATUS_APPROVED,
+										Studierendenantragstatus_model::STATUS_OBJECTED,
+										Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
+										Studierendenantragstatus_model::STATUS_REMINDERSENT
+									])) { ?>
+										<a class="ms-2" target="_blank" href="<?= base_url('cis/private/pdfExport.php?xml=Antrag' . $antrag->typ . '.xml.php&xsl=Antrag' . $antrag->typ . '&id=' . $antrag->studierendenantrag_id . '&uid=' . getAuthUID()); ?>"><i class="fa-solid fa-download" title="<?= $this->p->t('studierendenantrag', 'btn_download_antrag'); ?>"></i></a>
 									<?php } ?>
 									<?php if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG && $antrag->status == Studierendenantragstatus_model::STATUS_APPROVED) { ?>
-										<a class="btn btn-outline-secondary" href="#modalgrund<?= $antrag->studierendenantrag_id; ?>" data-bs-toggle="modal">
-											<?= $this->p->t('studierendenantrag', 'btn_show_lvs'); ?>
-										</a>
-										<lv-popup id="modalgrund<?= $antrag->studierendenantrag_id; ?>" antrag-id = "<?= $antrag->studierendenantrag_id; ?>">
+										<a class="ms-2" href="#modallv<?= $antrag->studierendenantrag_id; ?>" data-bs-toggle="modal"><?= $this->p->t('studierendenantrag', 'btn_show_lvs'); ?></a>
+										<lv-popup id="modallv<?= $antrag->studierendenantrag_id; ?>" antrag-id = "<?= $antrag->studierendenantrag_id; ?>">
 											<?= $this->p->t('studierendenantrag', 'my_lvs'); ?>
 										</lv-popup>
 									<?php } ?>

@@ -4155,6 +4155,671 @@ When on hold, the date is only a reminder.',
 		)
 	),
 	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungsnummer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'date',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faelligam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fällig am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Due on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'gesamtbetrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtbetrag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Total amount',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungsempfaenger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsempfänger',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice recipient',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsempfänger',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'studiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bezeichnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bezeichnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'datum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zahlungsbestaetigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zahlungsbestätigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Payment confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'bewerbung',
+		'phrase' => 'erklaerungInvoices',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ablauf und Zahlungsbedingungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungserklaerung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wir möchten Sie darauf aufmerksam machen, dass bei der Überweisung *immer* die Rechnungsnummer als Zahlungsreferenz anzuführen ist.
+						Andernfalls erfolgt keine automatische Zahlungszuordnung und es kann zu einer Verzögerung der Darstellung des aktuellen Zahlungsstatus
+						der Rechnung im CIS kommen.
+						<br/>
+						<br/>
+						Im Falle dass der Betrag an ein falsches Konto überwiesen wurde, bitten wir Sie höflichst sich an Ihre Bank zu wenden.
+						<br/>
+						<br/>
+						Jede Rechnung gilt als "Bezahlt", wenn der Gesamtbetrag vollständig auf unser Konto eingelangt ist.
+						<br/>
+						<br/>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'kontoinfotitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontoinformationen der FHTW',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'kontoinfobody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sämtliche Zahlungen sind an die nachstehende Kontonummer zu leisten und die Rechnungsnummer muss als Zahlungsreferenz eingegeben werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'kontoinfoausland',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Auslandsüberweisungen:
+											<br/>
+											Bei Auslandsüberweisungen sind die Spesenkosten von den
+											<br/>
+											Zahlenden zusätzlich zu den Rechnungsbeträgen zu zahlen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungtitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungen & Zahlungsbestätigungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq0frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Warum ist die Einzahlung trotz Einzahlung noch offen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq0antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der häufigste Grund für diesen Fall ist, dass bei der Überweisung nicht die Rechnungsnummer als Zahlungsreferenz eingegeben wird.
+Wir bitten Sie höflichst in diesem Fall eine Mail an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> mit Zahlungsbestätigung zu senden.
+Die Transaktion und die Bearbeitung der Zahlung, kann bis zu sechs Werktage dauern.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq1frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich habe keine Rechnung erhalten, was tun?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq1antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In diesem Fall ist der Spam-Ordner zu kontrollieren. Falls die Rechnung nicht übermittelt wurde ersuchen wir um Information an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.
+Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechnung ist der Betrag zu überweisen</strong></u>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq2frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Refundierung des Studienbeitrags',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq2antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Studienbeitrag wird nicht rückerstattet, wenn…
+-Anfänger*innen, die ihren Studienplatz nach Semesterbeginn (1. September / 16. Februar) nicht in Anspruch nehmen
+-Studierende, die ihr Studium nach Semesterbeginn (1. September / 16. Februar) abbrechen.
+
+-Unterbrechung vor dem 15.10. bzw. 15.3.: Studienbeitrag wird rückerstattet
+-Unterbrechung nach dem 15.10. bzw. 15.3.: Studienbeitrag wird nicht rückerstattet
+-in den Folgesemestern der Unterbrechung sind keine Studienbeiträge zu zahlen; der ÖHBeitrag ist jedoch in jedem Semester der Unterbrechung zu zahlen',
+			'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq3frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie sind vom Studienbeitrag befreit und haben eine Rechnung für den Studienbeitrag bekommen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq3antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Treten Sie bitte in Kontakt mit Ihrer Studiengangsassistenz. Die offene Rechnung wird storniert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq4frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mir ist ein Fehler bei der Überweisung unterlaufen, was tun?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq4antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte den Fehler an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> melden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq5frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eine Rechnung wurde zwei Mal überwiesen, was tun?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq5antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls eine Rechnung doppelt überwiesen wurde, bitten wir Sie dies an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> zu melden. Wir werden Ihnen eine Zahlung refundieren.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq6frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es stehen mehrere Positionen auf der Rechnung – soll für jede Position eine Überweisung durchgeführt werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq6antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nein, es ist immer der auf der Rechnung ausgewiesene Gesamtbetrag zu überweisen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq7frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wann kann der Betrag überwiesen werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq7antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wir möchten Sie darauf hinweisen, dass Überweisungen erst bei Erhalt der Rechnung durchzuführen sind. Bitte um Angabe der Rechnungsnummer als Zahlungsreferenz.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
+	array(
 		'app' => 'core',
 		'category' => 'password',
 		'phrase' => 'changeFor',
@@ -10909,6 +11574,178 @@ Any unusual occurrences
             )
         )
     ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'begruendungEcts',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Begründen Sie die Gleichwertigkeit der ECTS',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Give reasons for the equivalence of ECTS',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'begruendungLvinhalt',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Begründen Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Give reasons for the equivalence of the course contents',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungBegruendungEctsTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinsichtlich des Umfangs der LV, die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum Ihr Zeugnis bzw. Ihre berufliche Praxis mit dem Umfang der LV gleichwertig ist.<br><br>Referenzbeispiele für die ECTS-Berechnung finden Sie rechts in der Infobox.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Regarding the scope of the course you want to have credited: Please explain why your certificate or your professional practice is equivalent to the scope of the course.<br><br>Reference examples for the ECTS calculation can be found in the info box on the right.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungBegruendungLvinhaltTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinsichtlich der Lernergebnisse der LV (vgl. CIS), die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum die von Ihnen erworbenen Kompetenzen mit diesen Lernergebnissen gleichwertig sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'With regard to the learning outcomes of the course (cf. CIS) for which you want to receive credit: Please explain why the competences you have acquired are equivalent to these learning outcomes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoEctsBerechnungTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Referenzbeispiele ECTS-Berechnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reference examples of ECTS calculation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoEctsBerechnungBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<b>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden.</b>
+					<br><br><u>Schulisches Zeugnis:</u>
+					<br>Bitte die Unterrichtsstunden nachvollziehbar in ECTS umrechnen (ein Schuljahr besteht aus ca. 40 Wochen; d.h., eine Unterrichtsstunde pro Woche sind insgesamt ca. 40 Stunden Jahresaufwand.)
+					<br><br><u>Hochschulzeugnis:</u>
+					<br>Bitte die ECTS angeben.
+					<br><br><u>Berufliche Praxis:</u>
+					<br>Bitte die Dauer der einschlägigen beruflichen Praxis nachvollziehbar in ECTS umrechnen (1,5 ECTS sind ungefähr eine Arbeitswoche im Umfang von 37,5 Stunden).",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<br>1 ECTS at the FH Technikum Wien corresponds to a workload of 25 hours.</b>
+					<br><br><u>School certificate:</u>
+					<br>Please convert the teaching hours into ECTS in a comprehensible way (a school year consists of approx. 40 weeks; i.e. one teaching hour per week is a total of approx. 40 hours of annual work).
+					<br><br><u>University certificate:</u>
+					<br>Please indicate the ECTS.
+					<br><br><u>Professional practice:</u>
+					<br>Please convert the duration of the relevant professional practice into ECTS in a comprehensible way (1.5 ECTS are approximately one working week of 37.5 hours).",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'begruendungEctsLabel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung Gleichwertigkeit ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason Equivalency of ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'begruendungLvinhaltLabel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung Gleichwertigkeit LV-Inhalt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason Equivalency of Course content',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -13447,6 +14284,26 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragNichtFuerVerganganeSS',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Der Antrag kann nicht für vergangene Semester gestellt werden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "You can not apply for the past study semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'neu',
 		'insertvon' => 'system',
@@ -13745,6 +14602,26 @@ array(
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'fehlendeMinZeichen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Fehlende min. Zeichen",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Missing min. Characters",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -18145,605 +19022,465 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'lvinfo',
-		'phrase' => 'lehrveranstaltungsinformationen',
+		'category' => 'uhstat',
+		'phrase' => 'angabeFehlt',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Lehrveranstaltungsinformationen",
+				'text' => 'Angabe fehlt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Course Information",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'lehre',
-		'phrase' => 'keinLektorZugeordnet',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Aktuell ist dieser Lehrveranstaltung noch kein Lektor zugeordnet",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "ENG Aktuell ist dieser Lehrveranstaltung noch kein Lektor zugeordnet",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'lehre',
-		'phrase' => 'incomingplaetze',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Incomingplätze",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Places Available for Incoming Students",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'lehre',
-		'phrase' => 'lehrbeauftragter',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Lehrbeauftragte*r",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Lecturer(s)",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'lehre',
-		'phrase' => 'lvleitung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "LV-Leiter*in",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Head of Course",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'lehre',
-		'phrase' => 'noLvFound',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Keine Lehrveranstaltungen gefunden",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "No LVs found",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'leitung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Leitung",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Head",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'koordination',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Koordination",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Coordination",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'sprache',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Sprache",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Language",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'englisch',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Englisch",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "English",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'deutsch',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Deutsch",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "German",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'verfuegbareSprachen',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Verfügbare Sprachen",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Available languages",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'dokumente',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Dokumente',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Documents',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'dokument',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Dokument',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Document',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'erstelldatum',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Erstelldatum',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Creation date',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'bestaetigungenZeugnisse',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Bestätigungen/Zeugnisse',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Certificates/Transcripts',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'inskriptionsbestaetigung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Studienbestätigung',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Enrollment Confirmation',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'studienbeitragFuerSSBezahlt',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Studienbeitrag für das %1$s bezahlt',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'tuition fee for semester %1$s paid',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'studienbeitragFuerSSNochNichtBezahlt',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Studienbeitrag für das %1$s noch nicht bezahlt',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'tuition fee for semester %1$s not yet paid',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'studienbeitragFuerStgNochNichtBezahlt',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Studienbeitrag für %1$s noch nicht bezahlt',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'tuition fee for %1$s not yet paid',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'studienbeitragNochNichtBezahlt',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Studienbeitrag noch nicht bezahlt',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'tuition fee not yet paid',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'studienerfolgsbestaetigung',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Studienerfolgsbestätigung',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Student progress report',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'studiensemesterAuswaehlen',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Bitte wählen Sie das entsprechende Studiensemester aus',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Please select the corresponding semester',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'vorlageWohnsitzfinanzamt',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'zur Vorlage beim Wohnsitzfinanzamt',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'for submission to local tax office',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'studienbuchblatt',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Studienbuchblatt',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Student Record', //Noch zu übersetzen
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'alleStudiensemester',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Alle Studiensemester',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'All semester',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'abschlussdokumente',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Abschlussdokumente/Zeugnisse',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Final documents/Transcripts',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'nochKeineAbschlussdokumenteVorhanden',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Noch keine Abschlussdokumente vorhanden',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'No final documents available yet',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'keinStatusImStudiensemester',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Für das übergebene Studiensemester %1$s existiert kein Status. Bitte wählen Sie ein gültiges Studiensemester aus dem DropDown.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'No status found for %1$s. Please select a valid semester from the dropdown.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'tools',
-		'phrase' => 'warnungDruckDigitaleSignatur',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => '<b>Hinweis!</b> Digital signierte Dokumente werden in manchen Browsern und PDF-Readern nicht korrekt angezeigt. <br/>Bitte verwenden Sie den <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a>, wenn Sie das Dokument ausdrucken möchten.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => '<b>Note!</b> Digitally signed documents are not displayed correctly in some browsers and PDF readers. <br/>Please use the <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a> if you want to print the document.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
+				'text' => 'Value is missing',
 
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'ausbildungBildungsstaatUebereinstimmung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Höchster Abschluss (unterteilt in Österreich oder im Ausland/unbekannt) passt nicht zum Staat des höchsten Abschlusses.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Highest completed level of education (divided into those acquired in Austria and those abroad/unknown) does not match country of the highest completed level of education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erfolgreichGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erfolgreich gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saved successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'fehlerBeimSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when saving',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'uhstat1AnmeldungUeberschrift',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erhebung bei der Anmeldung zu einem Studium oder bei Studienbeginn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Survey when applying for a study or at the start of studies',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'rechtsbelehrung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gemäß § 18 Absätzen 6 und 7 Bildungsdokumentationsgesetz 2020, BGBl. I  Nr. 20/2021, in der gültigen Fassung, sowie § 141 Absatz 3 Universitätsgesetz 2002, BGBl. I  Nr. 120/2002, in der gültigen Fassung.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'according to section 18 subsections 6 and 7 of the Bildungsdokumentationsgesetz 2020, Federal Law Gazette I  No. 20/2021, in the current version, and section 141 subsection 3 of the Universitätsgesetz 2002, Federal Law Gazette I  No. 120/2002, in the current version.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'uhstat1AnmeldungEinleitungstext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Senden der Daten ist nur möglich, wenn die Sozialversicherungsnummer (bzw. das Ersatzkennzeichen) gültig ist und alle Fragen beantwortet worden sind. Wenn Sie etwas nicht wissen, wählen Sie die Antwortmöglichkeit „unbekannt“, aber beantworten Sie bitte alle Fragen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sending the data is only possible if the social security number (or the substitute code) is valid and all questions have been answered. If you don\'t know something, choose the answer option “unknown”, but please answer all questions.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'angabenErziehungsberechtigte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angaben zu Ihren Erziehungsberechtigten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Information about your legal guardians',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'angabenErziehungsberechtigteEinleitungstext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die folgenden Fragen beziehen sich auf Personen, welche für Sie erziehungsberechtigt waren oder sind (Eltern oder jene Personen, die für Sie eine entsprechende Rolle übernommen haben, wie z.B. Stief- oder Pflegeeltern).',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The following issues refer to your legal guardians (parents or persons who were in the role of the parents, e.g. stepparents or foster parents).',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'bitteAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte auswählen...',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'please select...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erziehungsberechtigtePersonEins',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erziehungsberechtigte Person 1/Mutter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Legal guardian 1/mother',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'geburtsjahr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Geburtsjahr',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'year of birth',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'geburtsstaat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Geburtsstaat',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'country of birth',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'inDenHeutigenGrenzen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'in den heutigen Grenzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'in today\'s borders',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'hoechsterAbschlussStaat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Staat des höchsten Abschlusses',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Country of the highest completed level of education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'hoechsterAbschluss',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Höchster Abschluss',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Highest completed level of education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'wennAbschlussInOesterreich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls der höchste Bildungsabschluss in Österreich erworben wurde',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If the highest level of education was completed in Austria:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'wennAbschlussNichtInOesterreich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls das Land des höchsten erworbenen Bildungsabschlusses unbekannt oder nicht Österreich ist',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If the country of the highest completed level of education is unknown or not Austria:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erziehungsberechtigtePersonZwei',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erziehungsberechtigte Person 2/Vater',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Legal guardian 2/father',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'pruefenUndSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfen und Speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Check and submit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'datenLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Daten löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erfolgreichGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erfolgreich gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deleted successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'datenLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Daten löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
@@ -18844,6 +19581,9 @@ array(
 			)
 		)
 	),
+/*
+	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status 
+	// erstellt werden, die dann in der Studierendenansicht in einer infobox angezeigt werden
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
@@ -18864,6 +19604,7 @@ array(
 			)
 		)
 	),
+*/
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
@@ -19092,13 +19833,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antrag zurückziehen',
+				'text' => 'Bekanntgabe zurückziehen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Cancel Application',
+				'text' => 'Cancel announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19121,6 +19862,26 @@ array(
 				'sprache' => 'English',
 				'text' => 'Your CIS account is still active for 21 days. We ask you to download all required files (certificates, confirmations of academic success, confirmation of studies, etc.) within this period. There is a charge for issuing duplicates after the CIS account has been deactivated.' . "<br>\n" .
 					'Please return borrowed books to the library as soon as possible.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'warning_AbmeldungStgl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte beachten Sie die Einspruchsfrist von 2 Wochen nach Bestätigung durch die Studiengangsleitung!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please note the objection period of 2 weeks after confirmation by the head of the degree program!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19334,13 +20095,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Datum Wiedereinstieg',
+				'text' => 'Wiedereinstieg',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Date of return',
+				'text' => 'Re-Entry',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20075,13 +20836,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Statusverlauf für Antrag #{id} ',
+				'text' => 'Statusverlauf für #{id} ',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'History for Application #{id}',
+				'text' => 'History for #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20155,13 +20916,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Grund für Ablehnung von Antrag #{id}',
+				'text' => 'Grund für Ablehnung von #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reason for rejection of Application #{id}',
+				'text' => 'Reason for rejection of #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20335,13 +21096,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Für diesen Studiengang sind keine Anträge möglich',
+				'text' => 'Für diesen Studiengang sind keine Bekanntgaben möglich',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No applications are accepted for this course',
+				'text' => 'No announcements are accepted for this course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20355,13 +21116,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Es gibt bereits einen bestehenden Antrag',
+				'text' => 'Es gibt bereits eine bestehende Bekanntgabe',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'There is already an existing application',
+				'text' => 'There is already an existing announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20375,13 +21136,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Es gibt bereits einen bestehenden Antrag vom Typ {typ}',
+				'text' => 'Es gibt bereits eine bestehende Bekanntgabe vom Typ {typ}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'There is already an existing application of type {typ}',
+				'text' => 'There is already an existing announcement of type {typ}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20395,13 +21156,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Antrag mit AntragsId {id} gefunden',
+				'text' => 'Keine Bekanntgabe mit Id {id} gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No application found with ApplicationId {id}',
+				'text' => 'No announcement found with Id {id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20415,13 +21176,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein {typ} Antrag gefunden für Prestudent {prestudent_id}',
+				'text' => 'Keine {typ} Bekanntgabe gefunden für Prestudent {prestudent_id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No {typ} application found for prestudent {prestudent_id}',
+				'text' => 'No {typ} announcement found for prestudent {prestudent_id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20435,13 +21196,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Studiengang und Ausbildungssemester gefunden für Antrag mit AntragsId {id}',
+				'text' => 'Kein Studiengang und Ausbildungssemester gefunden für Bekanntgabe mit Id {id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No studiengang and ausbildungssemester found for antrag with id: {id}',
+				'text' => 'No studiengang and ausbildungssemester found for announcement with id: {id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20475,13 +21236,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Studiengang gefunden für Antrag #{id}',
+				'text' => 'Kein Studiengang gefunden für Bekanntgabe #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No studiengang found for Application #{id}',
+				'text' => 'No studiengang found for announcement #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20495,13 +21256,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Studiengang-Email gefunden für Antrag #{id}',
+				'text' => 'Keine Studiengang-Email gefunden für Bekanntgabe #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No studiengang-email found for Application #{id}',
+				'text' => 'No studiengang-email found for announcement #{id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20575,7 +21336,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Dieser Antrag ist gesperrt',
+				'text' => 'Diese Bekanntgabe ist gesperrt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -20615,13 +21376,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Lehrveranstaltung im Antrag gefunden',
+				'text' => 'Keine Lehrveranstaltung in Bekanntgabe gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No course found in application',
+				'text' => 'No course found in announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20635,13 +21396,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Berechtigung, den Antrag zu bearbeiten',
+				'text' => 'Keine Berechtigung, die Bekanntgabe zu bearbeiten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No authorization to edit the application',
+				'text' => 'No authorization to edit the announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20655,13 +21416,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Berechtigung, den Antrag zu beeinspruchen',
+				'text' => 'Keine Berechtigung, die Bekanntgabe zu beeinspruchen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No authorization to object the application',
+				'text' => 'No authorization to object the announcement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20675,13 +21436,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antrag ist nicht beeinsprucht',
+				'text' => 'Bekanntgabe ist nicht beeinsprucht',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Application is not objected',
+				'text' => 'Announcement is not objected',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20695,13 +21456,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antrag ist nicht bestätigt worden',
+				'text' => 'Bakanntgabe ist nicht bestätigt worden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Application is not approved',
+				'text' => 'Announcement is not approved',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -20822,6 +21583,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'No status found for prestudent #{prestudent_id} in semester {studiensemester_kurzbz}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stg_for_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studiengang für Prestudent #{prestudent_id} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No course found for prestudent #{prestudent_id}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -21270,12 +22051,32 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_error_no_lvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Lehrveranstaltungen gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No courses found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
 		'phrase' => 'calltoaction_Abmeldung',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Abmeldung vom Studium kannst du hier durchführen.',
+				'text' => 'Die Abmeldung vom Studium kann hier durchgeführt werden.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -21327,7 +22128,305 @@ array(
 			)
 		)
 	),
-
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_studentNichtGezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichterfüllung finanzieller Verpflichtungen trotz Mahnung (Studienbeitrag)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Failure to meet financial obligations despite a reminder (tuition fees)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_studentNichtAnwesend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): mehrmalig unentschuldigtes Verletzen der Anwesenheitspflicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): multiple unexcused breaches of attendance requirements',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_PruefunstermineNichtEingehalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): wiederholtes Nichteinhalten von Prüfungsterminen bzw Abgabeterminen für Seminararbeiten bzw. Projektarbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): repeated non-compliance with examination dates or deadlines for seminar papers or project work',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_plageat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Plagiieren im Rahmen wissenschaftlicher Arbeiten bzw. unerlaubte Verwendung KI generierter Hilfsmittel bzw. Quellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Plagiarism in the context of scientific work or unauthorized use of AI-generated tools or sources',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_ungenuegendeLeistung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): nicht genügende Leistung im Sinne der Prüfungsordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): insufficient performance in terms of the examination regulations',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_NichtantrittStudium',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichtantritt des Studiums zu Beginn des Studienjahres (=Unbegründetes Nichterscheinen zur ersten Studienveranstaltung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Failure to start the course at the beginning of the academic year (= unjustified non-attendance to the first course event)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_MissingZgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry requirements BA (resp. MA) not fulfilled)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_nichtGezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in hat nicht bezahlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has not paid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_nichtAnwesend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in war mehrmals unentschuldigt abwesend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student was absent without excuse several times',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_PruefunstermineNichtEingehalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in hat Prüfunstermine nicht eingehalten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student failed to meet exam dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_plageat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in hat plagiiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student failed to meet exam dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_ungenuegendeLeistung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Leistung ungenügend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'performance insufficient',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_NichtantrittStudium',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nichtantritt des Studiums',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'non-commencement of the course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_MissingZgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry requirements BA (resp. MA) not fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_bitteWaehlen',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'bitte auswählen, sofern zutreffend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'please select if applicable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

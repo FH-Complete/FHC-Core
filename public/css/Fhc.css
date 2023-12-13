@@ -1,3 +1,7 @@
+.text-prewrap {
+  white-space: pre-line;
+}
+
 .accordion-button-primary {
   background-color: #e7f1ff;
   color: #0c63e4;

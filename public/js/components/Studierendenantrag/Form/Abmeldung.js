@@ -1,5 +1,4 @@
 import {CoreFetchCmpt} from '../../Fetch.js';
-import Phrasen from '../../../mixins/Phrasen.js';
 
 var _uuid = 0;
 
@@ -7,9 +6,6 @@ export default {
 	components: {
 		CoreFetchCmpt
 	},
-	mixins: [
-		Phrasen
-	],
 	emits: [
 		'setInfos',
 		'setStatus'
@@ -56,7 +52,7 @@ export default {
 					this.data = result.data.retval;
 					if (this.data.status) {
 						this.$emit("setStatus", {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 							severity: this.statusSeverity
 						});
 					}
@@ -67,7 +63,7 @@ export default {
 		createAntrag() {
 			bootstrap.Modal.getOrCreateInstance(this.$refs.modal).hide();
 			this.$emit('setStatus', {
-				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_saving')}),
+				msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_saving')})),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -93,7 +89,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_error')}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
 							severity: 'danger'
 						});
 					}
@@ -104,13 +100,13 @@ export default {
 						this.data = result.data.retval;
 						if (this.data.status) {
 							this.$emit("setStatus", {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 								severity: this.statusSeverity
 							});
 						}
 						else
 							this.$emit('setStatus', {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_open')}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_open')})),
 								severity:'success'
 							});
 					}
@@ -120,7 +116,7 @@ export default {
 		},
 		cancelAntrag() {
 			this.$emit('setStatus', {
-				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_cancelling')}),
+				msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_cancelling')})),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -144,7 +140,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_error')}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
 							severity:'danger'
 						});
 					}
@@ -156,13 +152,13 @@ export default {
 						this.data = result.data.retval;
 						if (this.data.status) {
 							this.$emit("setStatus", {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 								severity: this.statusSeverity
 							});
 						}
 						else
 							this.$emit('setStatus', {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_cancelled')}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_cancelled')})),
 								severity: 'danger'
 							});
 					}
@@ -183,33 +179,37 @@ export default {
 					</div>
 					<table class="table">
 						<tr>
-							<th>{{p.t('lehre', 'studiengang')}}</th>
+							<th>{{$p.t('lehre', 'studiengang')}}</th>
 							<td align="right">{{data.bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'organisationsform')}}</th>
+							<th>{{$p.t('lehre', 'organisationsform')}}</th>
 							<td align="right">{{data.orgform_bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
+							<th>{{$p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
 							<td align="right">{{data.name}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('person', 'personenkennzeichen')}}</th>
+							<th>{{$p.t('person', 'personenkennzeichen')}}</th>
 							<td align="right">{{data.matrikelnr}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'studienjahr')}}</th>
+							<th>{{$p.t('lehre', 'studienjahr')}}</th>
 							<td align="right">{{data.studienjahr_kurzbz}}</td>
+						</tr>						
+						<tr>
+							<th>{{$p.t('lehre', 'studiensemester')}}</th>
+							<td align="right">{{data.studiensemester_kurzbz}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'semester')}}</th>
+							<th>{{$p.t('lehre', 'semester')}}</th>
 							<td align="right">{{data.semester}}</td>
 						</tr>
 					</table>
 				</div>
 				<div v-if="data.grund" class="mb-3">
-					<h5>{{p.t('studierendenantrag', 'antrag_grund')}}:</h5>
+					<h5>{{$p.t('studierendenantrag', 'antrag_grund')}}:</h5>
 					<pre>{{data.grund}}</pre>
 				</div>
 				<div v-else class="col-sm-6 mb-3">
@@ -235,7 +235,7 @@ export default {
 						@click="cancelAntrag"
 						:disabled="saving"
 						>
-						{{p.t('studierendenantrag', 'btn_cancel')}}
+						{{$p.t('studierendenantrag', 'btn_cancel')}}
 					</button>
 					<button
 						v-else-if="!data.studierendenantrag_id"
@@ -245,7 +245,7 @@ export default {
 						:data-bs-target="'#studierendenantrag-form-abmeldung-' + uuid + '-modal'"
 						:disabled="saving"
 						>
-						{{p.t('studierendenantrag', 'btn_create_Abmeldung')}}
+						{{$p.t('studierendenantrag', 'btn_create_Abmeldung')}}
 					</button>
 
 					<div
@@ -262,18 +262,18 @@ export default {
 										class="modal-title"
 										:id="'studierendenantrag-form-abmeldung-' + uuid + '-modal-label'"
 										>
-										{{p.t('studierendenantrag', 'title_Abmeldung')}}
+										{{$p.t('studierendenantrag', 'title_Abmeldung')}}
 									</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="p.t('ui', 'schliessen')"></button>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="$p.t('ui', 'schliessen')"></button>
 								</div>
-								<div class="modal-body" v-html="p.t('studierendenantrag', 'warning_Abmeldung')">
+								<div class="modal-body" v-html="$p.t('studierendenantrag', 'warning_Abmeldung')">
 								</div>
 								<div class="modal-footer">
 									<button
 										type="button"
 										class="btn btn-primary"
 										@click="createAntrag">
-										{{p.t('studierendenantrag', 'btn_create_Abmeldung')}}
+										{{$p.t('studierendenantrag', 'btn_create_Abmeldung')}}
 									</button>
 								</div>
 							</div>

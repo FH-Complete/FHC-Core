@@ -1,6 +1,5 @@
 import {CoreFetchCmpt} from '../../Fetch.js';
 import VueDatepicker from '../../vueDatepicker.js.php';
-import Phrasen from '../../../mixins/Phrasen.js';
 
 var _uuid = 0;
 
@@ -9,9 +8,6 @@ export default {
 		CoreFetchCmpt,
 		VueDatepicker
 	},
-	mixins: [
-		Phrasen
-	],
 	emits: [
 		'setInfos',
 		'setStatus'
@@ -31,6 +27,7 @@ export default {
 				default: []
 			},
 			stsem: null,
+			currentWiedereinstieg: '',
 			siteUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router
 		}
@@ -41,7 +38,7 @@ export default {
 			{
 				case 'Erstellt': return 'info';
 				case 'Genehmigt': return 'success';
-				case 'Zurückgezogen': return 'danger';
+				case 'Zurueckgezogen': return 'danger';
 				default: return 'info';
 			}
 		},
@@ -55,9 +52,8 @@ export default {
 		datumWsFormatted() {
 			let datumUnformatted = '';
 
-			if (this.studierendenantragId) {
-				if (this.data.datum_wiedereinstieg)
-					datumUnformatted = this.data.datum_wiedereinstieg;
+			if (this.data.datum_wiedereinstieg) {
+				datumUnformatted = this.data.datum_wiedereinstieg;
 			} else {
 				if (this.stsem !== null && this.data.studiensemester[this.stsem].wiedereinstieg)
 					datumUnformatted = this.data.studiensemester[this.stsem].wiedereinstieg;
@@ -79,7 +75,7 @@ export default {
 					this.data = result.data.retval;
 					if (this.data.status) {
 						this.$emit("setStatus", {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 							severity: this.statusSeverity
 						});
 					}
@@ -89,7 +85,7 @@ export default {
 		},
 		createAntrag() {
 			this.$emit('setStatus', {
-				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_saving')}),
+				msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_saving')})),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -102,7 +98,7 @@ export default {
 			formData.append("studiensemester", this.stsem !== null && this.data.studiensemester[this.stsem].studiensemester_kurzbz);
 			formData.append("prestudent_id", this.data.prestudent_id);
 			formData.append("grund", this.$refs.grund.value);
-			formData.append("datum_wiedereinstieg", this.stsem !== null && this.data.studiensemester[this.stsem].wiedereinstieg);
+			formData.append("datum_wiedereinstieg", this.stsem !== null && this.currentWiedereinstieg);
 
 			axios.post(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
@@ -126,7 +122,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_error')}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
 							severity: 'danger'
 						});
 					}
@@ -137,13 +133,13 @@ export default {
 						this.data = result.data.retval;
 						if (this.data.status) {
 							this.$emit("setStatus", {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 								severity: this.statusSeverity
 							});
 						}
 						else
 							this.$emit('setStatus', {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_created')}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_created')})),
 								severity: 'info'
 							});
 					}
@@ -153,7 +149,7 @@ export default {
 		},
 		cancelAntrag() {
 			this.$emit('setStatus', {
-				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_cancelling')}),
+				msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_cancelling')})),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -177,7 +173,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_error')}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
 							severity: 'danger'
 						});
 					}
@@ -189,13 +185,13 @@ export default {
 						this.data = result.data.retval;
 						if (this.data.status) {
 							this.$emit("setStatus", {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 								severity: this.statusSeverity
 							});
 						}
 						else
 							this.$emit('setStatus', {
-								msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_cancelled')}),
+								msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_cancelled')})),
 								severity: 'danger'
 							});
 					}
@@ -216,28 +212,28 @@ export default {
 					</div>
 					<table class="table">
 						<tr>
-							<th>{{p.t('lehre', 'studiengang')}}</th>
+							<th>{{$p.t('lehre', 'studiengang')}}</th>
 							<td align="right">{{data.bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'organisationsform')}}</th>
+							<th>{{$p.t('lehre', 'organisationsform')}}</th>
 							<td align="right">{{data.orgform_bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
+							<th>{{$p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
 							<td align="right">{{data.name}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('person', 'personenkennzeichen')}}</th>
+							<th>{{$p.t('person', 'personenkennzeichen')}}</th>
 							<td align="right">{{data.matrikelnr}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'studienjahr')}}</th>
+							<th>{{$p.t('lehre', 'studienjahr')}}</th>
 							<td align="right" v-if="data.studierendenantrag_id">{{data.studienjahr_kurzbz}}</td>
 							<td align="right" v-else>{{stsem === null ? '' : data.studiensemester[stsem].studienjahr_kurzbz}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'semester')}}</th>
+							<th>{{$p.t('lehre', 'semester')}}</th>
 							<td align="right" v-if="data.studierendenantrag_id">{{data.semester}}</td>
 							<td align="right" v-else>{{stsem === null ? '' : data.studiensemester[stsem].semester}}</td>
 						</tr>
@@ -246,7 +242,7 @@ export default {
 
 				<div class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-stsem'" class="form-label">
-						{{p.t('lehre', 'studiensemester')}}
+						{{$p.t('lehre', 'studiensemester')}}
 					</label>
 					<div v-if="data.studierendenantrag_id">
 						{{data.studiensemester_kurzbz}}
@@ -258,6 +254,7 @@ export default {
 							v-model="stsem"
 							required
 							:id="'studierendenantrag-form-abmeldung-' + uuid + '-stsem'"
+							@input="currentWiedereinstieg = ''"
 							>
 							<option v-for="(stsem, index) in data.studiensemester" :key="index" :value="index">
 								{{stsem.studiensemester_kurzbz}}
@@ -270,17 +267,23 @@ export default {
 				</div>
 				<div class="col-sm-6 mb-3">
 					<label class="form-label">
-						{{p.t('studierendenantrag', 'antrag_datum_wiedereinstieg')}}
+						{{$p.t('studierendenantrag', 'antrag_datum_wiedereinstieg')}}
 					</label>
 
 					<div v-if="data.studierendenantrag_id">
 						{{datumWsFormatted}}
 					</div>
-					<div v-else-if="stsem === null" class="form-control">
-						{{p.t('ui/select_studiensemester')}}
+					<div v-else-if="stsem === null">
+						<select class="form-select" disabled>
+							<option selected>{{$p.t('ui/select_studiensemester')}}</option>
+						</select>
 					</div>
-					<div v-else class="form-control">
-						{{datumWsFormatted}}
+					<div v-else>
+						<select v-model="currentWiedereinstieg" class="form-select">
+							<option v-for="sem in data.studiensemester[stsem].wiedereinstieg" :key="sem.studiensemester_kurzbz" :value="sem.start">
+								{{sem.studiensemester_kurzbz}}
+							</option>
+						</select>
 					</div>
 
 					<div v-if="errors.datum_wiedereinstieg.length" class="invalid-feedback d-block">
@@ -288,8 +291,8 @@ export default {
 					</div>
 				</div>
 				<div v-if="data.studierendenantrag_id" class="mb-3">
-					<h5>{{p.t('studierendenantrag', 'antrag_grund')}}:</h5>
-					<pre>{{data.grund}}</pre>
+					<h5>{{$p.t('studierendenantrag', 'antrag_grund')}}:</h5>
+					<textarea class="form-control" rows="5" readonly>{{data.grund}}</textarea>
 				</div>
 				<div v-else class="col-sm-6 mb-3">
 					<label :for="'studierendenantrag-form-abmeldung-' + uuid + '-grund'" class="form-label">Grund:</label>
@@ -309,14 +312,14 @@ export default {
 				<div class="col-12 mb-3">
 
 					<div v-if="data.studierendenantrag_id">
-						<a v-if="data.dms_id" target="_blank" :href="siteUrl + '/lehre/Antrag/Attachment/Show/' + data.dms_id"> {{p.t('studierendenantrag', 'antrag_dateianhaenge')}} </a>
-						<span v-else>{{p.t('studierendenantrag', 'no_attachments')}}</span>
+						<a v-if="data.dms_id" target="_blank" :href="siteUrl + '/lehre/Antrag/Attachment/Show/' + data.dms_id"> {{$p.t('studierendenantrag', 'antrag_dateianhaenge')}} </a>
+						<span v-else>{{$p.t('studierendenantrag', 'no_attachments')}}</span>
 					</div>
 					<div v-else>
 						<label
 							:for="'studierendenantrag-form-abmeldung-' + uuid + '-attachment'"
 							class="form-label">
-							{{p.t('studierendenantrag', 'antrag_dateianhaenge')}}
+							{{$p.t('studierendenantrag', 'antrag_dateianhaenge')}}
 						</label>
 						<input
 							class="form-control"
@@ -334,7 +337,7 @@ export default {
 						@click="createAntrag"
 						:disabled="saving"
 						>
-						{{p.t('studierendenantrag', 'btn_create_Unterbrechung')}}
+						{{$p.t('studierendenantrag', 'btn_create_Unterbrechung')}}
 					</button>
 					<button
 						v-else-if="data.status == 'Erstellt'"
@@ -343,7 +346,7 @@ export default {
 						@click="cancelAntrag"
 						:disabled="saving"
 						>
-						{{p.t('studierendenantrag', 'btn_cancel')}}
+						{{$p.t('studierendenantrag', 'btn_cancel')}}
 					</button>
 				</div>
 			</div>

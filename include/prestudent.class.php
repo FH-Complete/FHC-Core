@@ -870,6 +870,81 @@ class prestudent extends person
 							AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 					)";
 				break;
+			case "bewerberrtnichtangemeldet":
+				$qry.=" AND a.rolle='Bewerber'
+					AND NOT EXISTS (
+						SELECT
+							1
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+						WHERE
+							person_id=a.person_id
+							AND studienplan_id IN (
+								SELECT studienplan_id FROM lehre.tbl_studienplan
+								JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+								WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz
+							)
+							AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					)";
+				break;
+			case "bewerberrtangemeldet":
+				$qry.=" AND a.rolle='Bewerber'
+					AND EXISTS (
+						SELECT
+							1
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+						WHERE
+							person_id=a.person_id
+							AND studienplan_id IN (
+								SELECT studienplan_id FROM lehre.tbl_studienplan
+								JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+								WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz
+							)
+							AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					)";
+				break;
+			case "bewerberrtangemeldetteilgenommen":
+				$qry.=" AND a.rolle='Bewerber'
+					AND EXISTS (
+						SELECT
+							1
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+						WHERE
+							person_id=a.person_id
+							AND studienplan_id IN (
+								SELECT studienplan_id FROM lehre.tbl_studienplan
+								JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+								WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz
+							)
+							AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					)
+					AND reihungstestangetreten = true";
+				break;
+			case "bewerberrtangemeldetnichtteilgenommen":
+				$qry.=" AND a.rolle='Bewerber'
+					AND EXISTS (
+						SELECT
+							1
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+						WHERE
+							person_id=a.person_id
+							AND studienplan_id IN (
+								SELECT studienplan_id FROM lehre.tbl_studienplan
+								JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+								WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz
+							)
+							AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					)
+					AND reihungstestangetreten = false
+					";
+				break;
 			case "zgv":
 				$stg_obj = new studiengang();
 				$stg_obj->load($studiengang_kz);

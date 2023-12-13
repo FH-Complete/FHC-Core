@@ -1,3 +1,5 @@
+import Phrasen from '../../plugin/Phrasen.js';
+
 export default {
 	data: () => ({
 		modal: null
@@ -88,6 +90,7 @@ export default {
 				}
 			});
 			const wrapper = document.createElement("div");
+			instance.use(Phrasen); // TODO(chris): find a more dynamic way
 			instance.mount(wrapper);
 			document.body.appendChild(wrapper);
 		});

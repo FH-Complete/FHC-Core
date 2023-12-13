@@ -79,7 +79,12 @@ else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GE
 else
 	$gesperrt_bis = '2015-08-31';
 
-//echo $gesperrt_bis;
+//Default-Wert für Max-Intervall in Tagen für Zeitsperre, über Config veränderbar
+$maxDauerZS = 730;
+
+if (defined('CIS_ZEITSPERREN_MAX_DAUER') && CIS_ZEITSPERREN_MAX_DAUER != '') {
+	$maxDauerZS = CIS_ZEITSPERREN_MAX_DAUER;
+}
 
 //Stundentabelleholen
 if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
@@ -204,66 +209,72 @@ function berechnen()
 
 function checkdatum()
 {
-	if(document.getElementById('vondatum').value.length<10)
+	if (document.getElementById('vondatum').value.length < 10)
 	{
 		alert('<?php echo $p->t('zeitsperre/vonDatumIstUngueltigNullenAngeben');?>');
 		return false;
 	}
 
-	if(document.getElementById('bisdatum').value.length<10)
+	if (document.getElementById('bisdatum').value.length < 10)
 	{
 		alert('<?php echo $p->t('zeitsperre/bisDatumIstUngueltigNullenAngeben');?>');
 		return false;
 	}
 
-      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum, diff;
+	var Datum, Tag, Monat, Jahr, vonDatum, bisDatum, vonDatumDate, bisDatumDate, diff, diffTime, diffmax;
 
-	  Datum=document.getElementById('vondatum').value;
-      Tag=Datum.substring(0,2);
-      Monat=Datum.substring(3,5);
-	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
-	  {
-		alert('<?php echo $p->t('zeitsperre/vonDatumMonat');?>'+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
+	Datum = document.getElementById('vondatum').value;
+	Tag = Datum.substring(0, 2);
+	Monat = Datum.substring(3, 5);
+	if (parseInt(Monat, 10) < 1 || parseInt(Monat, 10) > 12)
+	{
+		alert('<?php echo $p->t('zeitsperre/vonDatumMonat');?>' + document.getElementById('vondatum').value + ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
 		document.getElementById('vondatum').focus();
-	  	return false;
-	  }
+		return false;
+	}
 
-      Jahr=Datum.substring(6,10);
+	Jahr = Datum.substring(6, 10);
 
-	  vonDatum=Jahr+''+Monat+''+Tag;
+	vonDatum = Jahr + '' + Monat + '' + Tag;
+	vonDatumDate = Jahr + '-' + Monat + '-' + Tag;
 
-	  Datum=document.getElementById('bisdatum').value;
-      Tag=Datum.substring(0,2);
-      Monat=Datum.substring(3,5);
-	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
-	  {
-		alert('<?php echo $p->t('zeitsperre/bisDatumMonat');?>'+ document.getElementById('bisdatum').value+ ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
+	Datum = document.getElementById('bisdatum').value;
+	Tag = Datum.substring(0, 2);
+	Monat = Datum.substring(3, 5);
+	if (parseInt(Monat, 10) < 1 || parseInt(Monat, 10) > 12) {
+		alert('<?php echo $p->t('zeitsperre/bisDatumMonat');?>' + document.getElementById('bisdatum').value + ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
 		document.getElementById('bisdatum').focus();
-	  	return false;
-	  }
+		return false;
+	}
 
-      Jahr=Datum.substring(6,10);
+	Jahr = Datum.substring(6, 10);
+	bisDatum = Jahr + '' + Monat + '' + Tag;
+	bisDatumDate = Jahr + '-' + Monat + '-' + Tag;
 
-	  bisDatum=Jahr+''+Monat+''+Tag;
+	bisDatumDate = new Date(bisDatumDate);
+	vonDatumDate = new Date(vonDatumDate);
 
-	  diff=bisDatum-vonDatum;
+	diffTime = bisDatumDate.getTime() - vonDatumDate.getTime();
+	diff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+	diffmax = <?php echo $maxDauerZS ;?>
 
-	  if (vonDatum>bisDatum)
-	  {
-		alert('<?php echo $p->t('zeitsperre/vonDatum');?> '+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istGroesserAlsBisDatum');?> '+document.getElementById('bisdatum').value);
+	if (vonDatum > bisDatum) {
+		alert('<?php echo $p->t('zeitsperre/vonDatum');?> ' + document.getElementById('vondatum').value + ' <?php echo $p->t('zeitsperre/istGroesserAlsBisDatum');?> ' + document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
-	  	return false;
-	  }
-      else if (diff>14)
-      {
-      	Check = confirm('<?php echo $p->t('zeitaufzeichnung/zeitraumAuffallendHoch');?>');
+		return false;
+	}
+	else if (diff > 14 && diff < diffmax) {
+		Check = confirm('<?php echo $p->t('zeitaufzeichnung/zeitraumAuffallendHoch');?>');
 		document.getElementById('bisdatum').focus();
-	      if (Check == false)
-		      return false;
-	      else
-		      return true;
-	  }
-
+		if (Check == false)
+			return false;
+		else
+			return true;
+	} else if (diff >= diffmax) {
+		alert('<?php echo $p->t('zeitsperre/bisDatumGroesserMax');?> ');
+		document.getElementById('bisdatum').focus();
+		return false;
+	}
 	return true;
 }
 
@@ -445,7 +456,8 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$date=explode('.',$_POST['bisdatum']);
 		if (@checkdate($date[1], $date[0], $date[2]))
 		{
-			 $bisdatum=$date[2].$date[1].$date[0];
+			$bisdatum=$date[2].$date[1].$date[0];
+			$bisdatum_iso = $date[2].'-'.$date[1].'-'.$date[0];
 		}
 		else
 		{
@@ -462,6 +474,17 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	{
 		$error=true;
 		$error_msg .= $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
+	}
+
+	//check if bis-Datum zu weit in der Zukunft
+	$bis = new DateTime($bisdatum);
+	$von = new DateTime($vondatum);
+
+	$intervall = $bis->diff($von);
+	if ($intervall->days >= $maxDauerZS)
+	{
+		$error=true;
+		$error_msg = $p->t('zeitsperre/bisDatumGroesserMax');
 	}
 
 	//von-datum pruefen TODO

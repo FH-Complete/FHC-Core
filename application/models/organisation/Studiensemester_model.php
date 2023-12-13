@@ -205,6 +205,16 @@ class Studiensemester_model extends DB_Model
 		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
 
+	public function getAktAndFutureSemester()
+	{
+		$query = 'SELECT studiensemester_kurzbz
+					FROM public.tbl_studiensemester
+					WHERE start >= NOW() OR (start <= NOW() AND ende >= NOW())
+					ORDER BY start';
+					
+		return $this->execQuery($query);
+	}
+
 	/**
 	 * @param string		$student_uid
 	 * 

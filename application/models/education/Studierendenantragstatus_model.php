@@ -7,7 +7,7 @@ class Studierendenantragstatus_model extends DB_Model
 	const STATUS_REJECTED = 'Abgelehnt';
 	const STATUS_PASS = 'Verzichtet';
 	const STATUS_REOPENED = 'Offen';
-	const STATUS_CANCELLED = 'Zurückgezogen';
+	const STATUS_CANCELLED = 'Zurueckgezogen';
 	const STATUS_LVSASSIGNED = 'Lvszugewiesen';
 	const STATUS_REMINDERSENT = 'EmailVersandt';
 	const STATUS_REQUESTSENT_1 = 'ErsteAufforderungVersandt';
