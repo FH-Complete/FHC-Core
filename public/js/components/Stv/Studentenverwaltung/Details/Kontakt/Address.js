@@ -513,7 +513,7 @@ export default{
             </template>
 		</BsModal>
 		
-		<!--Modal: deleteAdressModal TODO(manu) Formatierung mit zuviel Abstand-->
+		<!--Modal: deleteAdressModal-->
 		<BsModal ref="deleteAdressModal">
 			<template #title>Adresse löschen</template>
 			<template #default>

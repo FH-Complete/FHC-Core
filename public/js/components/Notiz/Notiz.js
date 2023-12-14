@@ -71,7 +71,7 @@ export default {
 	},
 	template: `
 <div>
-{{intTitel}} {{intText}} {{intVon}}| {{titel}} {{text}} {{action}} {{von}} {{bis}} {{document}} {{erledigt}} {{verfasser}} {{bearbeiter}}
+<!--{{intTitel}} {{intText}} {{intVon}}| {{titel}} {{text}} {{action}} {{von}} {{bis}} {{document}} {{erledigt}} {{verfasser}} {{bearbeiter}}-->
 	<form class="row">
 		<div class="notizAction row mb-3">
 			<b>{{action}}</b>

@@ -172,6 +172,23 @@ class Notiz extends FHC_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
+	public function deleteNotiz ($notiz_id)
+	{
+		$this->load->model('person/Notiz_model', 'NotizModel');
 
+		$result = $this->NotizModel->delete(
+			array('notiz_id' => $notiz_id)
+		);
+
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson($result);
+		}
+		elseif (!hasData($result)) {
+			$this->outputJson($result);
+		}
+		return $this->outputJsonSuccess(current(getData($result)));
+	}
 
 }

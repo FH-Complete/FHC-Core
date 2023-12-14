@@ -1,7 +1,7 @@
-//import NotizList from "./Notizen/Notizen.js";
 import {CoreRESTClient} from "../../../../RESTClient.js";
 import {CoreFilterCmpt} from "../../../filter/Filter.js";
 import Notiz from "../../../Notiz/Notiz.js";
+import BsModal from "../../../Bootstrap/Modal";
 
 var editIcon = function (cell, formatterParams) {
 	return "<i class='fa fa-edit'></i>";
@@ -14,7 +14,8 @@ export default {
 	components: {
 		CoreRESTClient,
 		CoreFilterCmpt,
-		Notiz
+		Notiz,
+		BsModal
 	},
 	props: {
 		modelValue: Object
@@ -69,6 +70,12 @@ export default {
 		}
 	},
 	methods:{
+		actionDeleteNotiz(notiz_id){
+			this.loadNotiz(notiz_id).then(() => {
+				if(this.notizen.notiz_id)
+					this.$refs.deleteNotizModal.show();
+			});
+		},
 		actionEditNotiz(notiz_id){
 			this.loadNotiz(notiz_id).then(() => {
 				if(this.notizen.notiz_id) {
@@ -113,6 +120,22 @@ export default {
 			}).catch(error => {
 				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
 			}).finally(() => {
+				window.scrollTo(0, 0);
+			});
+		},
+		deleteNotiz(notiz_id){
+			CoreRESTClient.post('components/stv/Notiz/deleteNotiz/' + notiz_id)
+				.then(response => {
+					if (!response.data.error) {
+						this.$fhcAlert.alertSuccess('Löschen erfolgreich');
+						this.$refs.deleteNotizModal.hide();
+						this.reload();
+					} else {
+						this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
+					}
+				}).catch(error => {
+				this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
+			}).finally(()=> {
 				window.scrollTo(0, 0);
 			});
 		},
@@ -171,6 +194,18 @@ export default {
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 	
+		<!--Modal: deleteNotizModal-->
+		<BsModal ref="deleteNotizModal">
+			<template #title>Notiz löschen</template>
+			<template #default>
+				<p>Notiz wirklich löschen?</p>
+			</template>
+			<template #footer>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizen.notiz_id)">OK</button>
+			</template>
+		</BsModal>
+	
 		<core-filter-cmpt
 		ref="table"
 		:tabulator-options="tabulatorOptions"
@@ -184,8 +219,7 @@ export default {
 		>
 	</core-filter-cmpt>
 
-	<br>
-			
+	<br>	
 		<Notiz 
 			v-model:titel="formData.titel" 
 			v-model:text="formData.text" 
@@ -196,14 +230,8 @@ export default {
 			v-model:erledigt="formData.erledigt"
 			v-model:verfasser="formData.verfasser"
 			v-model:bearbeiter="formData.bearbeiter"
-			></Notiz>
+		></Notiz>
 			
-			
-			<hr>
-			Parent: 	{{titel}}  {{text}}| {{notizTitel}} {{notizText}}
-			<br> {{modelValue}}
-			<br> {{formData}}
-			<hr>
 		<button v-if="formData.action === 'Neue Notiz'"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
 		<button v-else type="button" class="btn btn-warning" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
 	</div>
