@@ -75,12 +75,18 @@ class Leitung extends FHC_Controller
 		$this->outputJsonSuccess($stgs);
 	}
 
-	public function getAntraege($studiengang = null)
+	public function getAntraege($studiengang = null, $extra = null)
 	{
+		if ($studiengang && $studiengang == 'todo') {
+			$studiengang = $extra;
+			$extra = true;
+		} else {
+			$extra = false;
+		}
 
-		if($studiengang)
+		if ($studiengang) {
 			$studiengaenge = [$studiengang];
-		else {
+		} else {
 			$studiengaenge =$this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe');
 			if(!is_array($studiengaenge))
 				$studiengaenge = [];
@@ -96,7 +102,21 @@ class Leitung extends FHC_Controller
 
 		$antraege = [];
 		if ($studiengaenge) {
-			$result = $this->StudierendenantragModel->loadForStudiengaenge($studiengaenge);
+			if ($extra) {
+				$this->StudierendenantragModel->db->group_start();
+				$this->StudierendenantragModel->db->where_not_in('s.studierendenantrag_statustyp_kurzbz', [
+					Studierendenantragstatus_model::STATUS_CANCELLED,
+					Studierendenantragstatus_model::STATUS_APPROVED,
+					Studierendenantragstatus_model::STATUS_REJECTED,
+					Studierendenantragstatus_model::STATUS_OBJECTION_DENIED
+				]);
+				$this->StudierendenantragModel->db->or_group_start();
+				$this->StudierendenantragModel->db->where('s.studierendenantrag_statustyp_kurzbz', Studierendenantragstatus_model::STATUS_APPROVED);
+				$this->StudierendenantragModel->db->where('tbl_studierendenantrag.typ', Studierendenantrag_model::TYP_ABMELDUNG_STGL);
+				$this->StudierendenantragModel->db->group_end();
+				$this->StudierendenantragModel->db->group_end();
+			}
+			$result = $this->StudierendenantragModel->loadForStudiengaenge($studiengaenge, null, null, true);
 			if (isError($result)) {
 				$this->output->set_status_header(500);
 				return $this->outputJson('Internal Server Error');

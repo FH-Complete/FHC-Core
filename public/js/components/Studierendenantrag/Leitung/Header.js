@@ -1,3 +1,5 @@
+const LOCAL_STORAGE_ID = 'studierendenantrag_leitung_2023-11-14_header_filter';
+
 export default {
 	props: {
 		stgs: Array
@@ -5,16 +7,60 @@ export default {
 	emits: [
 		'input'
 	],
+	data() {
+		return {
+			todo_value: '',
+			stg_value: ''
+		}
+	},
+	computed: {
+		value() {
+			const a = [];
+			if (this.todo_value)
+				a.push(this.todo_value);
+			if (this.stg_value)
+				a.push(this.stg_value);
+
+			return a.join('/');
+		}
+	},
+	watch: {
+		value(n) {
+			window.localStorage.setItem(LOCAL_STORAGE_ID, n);
+			this.$emit('input', n);
+		}
+	},
+	created() {
+		const values = window.localStorage.getItem(LOCAL_STORAGE_ID).split('/');
+		if (values.length) {
+			if (values.length == 1) {
+				if (values[0] == 'todo')
+					values.push('');
+				else
+					values.unshift('');
+			}
+			this.stg_value = values.pop();
+			this.todo_value = values.pop();
+		}
+	},
 	template: `
 	<div class="studierendenantrag-leitung-header fhc-table-header d-flex align-items-center mb-2 gap-2">
 		<h3 class="h5 col m-0">{{$p.t('studierendenantrag', 'studierendenantraege')}}</h3>
-		<div v-if="stgs.length > 1" class="col-auto">
-			<select ref="stg_select" class="form-select" @input="$emit('input', $event)">
-				<option value="">{{$p.t('global', 'alle')}}</option>
-				<option v-for="stg in stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">
-					{{stg.bezeichnung}} ({{stg.orgform}})
-				</option>
-			</select>
+		<div class="col-auto row row-cols-lg-auto g-3 align-items-center">
+			<div class="col-12">
+				<select class="form-select" v-model="todo_value">
+					<option value="">{{$p.t('global', 'alle')}}</option>
+					<option value="todo">{{$p.t('global', 'aktiv')}}</option>
+				</select>
+			</div>
+			<div class="col-12">
+				<select v-if="stgs.length > 1" class="form-select" v-model="stg_value">
+					<option value="">{{$p.t('global', 'alle')}}</option>
+					<option v-for="stg in stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">
+						{{stg.bezeichnung}} ({{stg.orgform}})
+					</option>
+				</select>
+			</div>
 		</div>
 	</div>
 	`

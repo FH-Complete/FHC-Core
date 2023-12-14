@@ -49,8 +49,8 @@ export default {
 				console.error(error);
 			});
 		},
-		changeFilter(evt) {
-			this.filter = evt.target.value || undefined;
+		changeFilter(filter) {
+			this.filter = filter || undefined;
 			this.reload();
 		},
 		reload() {

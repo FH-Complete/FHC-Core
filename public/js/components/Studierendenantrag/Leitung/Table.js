@@ -80,7 +80,7 @@ export default {
 		{
 			let val = cell.getValue();
 			if (!val)
-				return '';
+				return '&nbsp;';
 			let date = new Date(val);
 			return date.toLocaleDateString();
 		}
@@ -201,7 +201,7 @@ export default {
 						this.$refs.modalGrundPre.innerHTML = val;
 					});
 
-					return val ? link : '';
+					return val ? link : '&nbsp;';
 				}
 			}, {
 				field: 'dms_id',
@@ -209,7 +209,7 @@ export default {
 				formatter: (cell, formatterParams, onRendered) => {
 					let val = cell.getValue();
 					if (!val)
-						return '';
+						return '&nbsp;';
 					let link = document.createElement('a');
 					link.href = FHC_JS_DATA_STORAGE_OBJECT.app_root +
 						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -337,6 +337,9 @@ export default {
 						button.addEventListener('click', () => this.showLVs(cell.getData()));
 						container.append(button);
 					}
+
+					if (container.innerHTML == '')
+						container.innerHTML = '&nbsp;';
 
 					return container;
 				}
