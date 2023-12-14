@@ -1,5 +1,6 @@
 @import './components/searchbar.css';
 @import './components/verticalsplit.css';
+@import './components/Notiz.css';
 
 html {
   font-size: .875em;
