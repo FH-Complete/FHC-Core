@@ -223,9 +223,14 @@ export default {
               <div class="row py-2">
               <div class="col">
                 <p class="m-0">
-                  <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                   <u> Quick links</u>
-                  </a>
+                <div class="card">
+                
+                <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                <u> Quick links</u>
+               </a>
+             
+                
+               </div>
                  
                 </p>
                 <div class="mt-1 collapse" id="collapseExample">
@@ -478,9 +483,9 @@ export default {
                       <div class="card-body">
                       
                        
-                        <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
-                        <a style="text-decoration:none" class="my-1" href="#">Lehrveranstaltungen</a>
-                        <a style="text-decoration:none" class="my-1" href="#">Zeitsperren von Gschnell</a>
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitwuensche</a>
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Lehrveranstaltungen</a>
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren von Gschnell</a>
 
                       </div>
                     </div>
