@@ -212,8 +212,6 @@ export default {
   template: ` 
 
 
-  
-  <!-- CONTAINER -->
   <div class="container-fluid text-break"  >
     <!-- ROW --> 
           <div class="row">
@@ -319,7 +317,7 @@ export default {
                       <div class="card-body">
                       
                        
-                      <dl class="  mb-0"  >
+                   <dl class="  mb-0"  >
 
                         
 
@@ -330,9 +328,10 @@ export default {
                           <dd class=" col-lg-8 col-xl-6 col-6">{{wert?wert:"-"}}</dd>
                         </template>
                       </div>
-                      
-                  
                   </dl>
+
+                  
+           
 
                       </div>
                     </div>

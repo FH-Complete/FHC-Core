@@ -28,6 +28,24 @@
   padding:0 !important;
 }
 
+.form-control_{
+  border:0;
+  border-bottom: 1px solid #ced4da;
+  height:auto !important;
+  padding-bottom: 5px !important;
+  padding-left: 3px !important;
+  border-radius:0px;
+}
+
+.form-control-plaintext[readonly]{
+  background-color:white;
+}
+
+.form-control:focus{
+  border-color:white;
+  box-shadow:none;
+}
+
 /*   dl {
     width: 100%;
     overflow: hidden;

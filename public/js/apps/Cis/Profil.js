@@ -11,9 +11,11 @@ Vue.$collapseFormatter  = function(data){
 	//data - an array of objects containing the column title and value for each cell
 	var container = document.createElement("div");
 	container.classList.add("tabulator-collapsed-row");
+	container.classList.add("text-break");
   
 	var list = document.createElement("div");
 	list.classList.add("row");
+	
 	
 	container.appendChild(list);
   
@@ -74,9 +76,10 @@ const app = Vue.createApp({
 	<div>
 
 	<div v-if="notFoundUID">
+	
 	<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
 	</div>
-	<component v-else :is="view" :data="data" ></component>
+	<component v-else :is="data.base" :data="data" ></component>
 	</div>`
 	
 	
