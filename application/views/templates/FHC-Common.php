@@ -34,6 +34,7 @@
 	// Internal resources
 	$ajaxlib = isset($ajaxlib) ? $ajaxlib : false;
 	$bootstrapper = isset($bootstrapper) ? $bootstrapper : false;
+	$cis = isset($cis) ? $cis : false;
 	$dialoglib = isset($dialoglib) ? $dialoglib : false;
 	$filtercomponent = isset($filtercomponent) ? $filtercomponent : false;
 	$filterwidget = isset($filterwidget) ? $filterwidget : false;
@@ -43,4 +44,3 @@
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$udfs = isset($udfs) ? $udfs : false;
 	$widgets = isset($widgets) ? $widgets : false;
-

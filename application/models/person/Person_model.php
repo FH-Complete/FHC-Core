@@ -326,13 +326,28 @@ class Person_model extends DB_Model
 
 				SELECT p2.person_id
 				FROM tbl_person p1
+				JOIN tbl_prestudent ps ON p1.person_id = ps.person_id
 				INNER JOIN (
-					SELECT vorname, nachname, gebdatum, person_id
-					FROM tbl_person
-					) p2
+					SELECT vorname, nachname, gebdatum, person.person_id
+					FROM tbl_person person
+					JOIN tbl_prestudent sps ON person.person_id = sps.person_id
+				) p2
 					ON (lower(p1.vorname) = lower(p2.vorname) AND lower(p1.nachname) = lower(p2.nachname) AND p1.gebdatum = p2.gebdatum)
 				WHERE p1.person_id != p2.person_id AND (p1.person_id = ?)";
 
 		return $this->execQuery($qry, array($person_id, $person_id, $person_id));
+	}
+
+	public function loadPrestudent($prestudent_id)
+	{
+		$this->addSelect($this->dbTable . '.*');
+		
+		$this->addJoin('public.tbl_prestudent p', 'person_id');
+
+		$this->addLimit(1);
+
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
 	}
 }

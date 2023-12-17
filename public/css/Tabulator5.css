@@ -1,0 +1,40 @@
+@import '../../vendor/olifolkerd/tabulator5/dist/css/tabulator_bootstrap5.min.css';
+
+/* Apply borders and background to Cell instead of the Row
+ * otherwise frozen columns won't look good (columns behind
+ * will be partial visible)
+ */
+.tabulator-row {
+	border-bottom: none;
+}
+.tabulator-row .tabulator-frozen,
+.tabulator-row .tabulator-cell {
+	border-bottom: 1px solid #dee2e6;
+}
+.tabulator-row.tabulator-row-even {
+	background-color: transparent;
+}
+.tabulator-headers .tabulator-frozen,
+.tabulator-row.tabulator-row-odd .tabulator-frozen,
+.tabulator-row.tabulator-row-odd .tabulator-cell {
+	background-color: #fff;
+}
+.tabulator-row.tabulator-row-even .tabulator-frozen,
+.tabulator-row.tabulator-row-even .tabulator-cell {
+	background-color: #f2f2f2;
+}
+.tabulator-row.tabulator-selectable:hover .tabulator-frozen,
+.tabulator-row.tabulator-selectable:hover .tabulator-cell {
+	background-color: #ececec;
+}
+.tabulator-row.tabulator-selected .tabulator-frozen,
+.tabulator-row.tabulator-selected .tabulator-cell {
+	background-color: #9abcea;
+}
+.tabulator-row.tabulator-selected:hover .tabulator-frozen,
+.tabulator-row.tabulator-selected:hover .tabulator-cell {
+	background-color: #769bcc;
+}
+.tabulator .tabulator-col-resize-handle:last-of-type {
+	z-index: 999999;
+}
