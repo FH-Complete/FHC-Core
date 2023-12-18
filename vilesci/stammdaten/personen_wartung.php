@@ -229,7 +229,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_students lösen.');
 			}
 		}
-		
+
 		$personToDelete_obj = new person();
 		if ($personToDelete_obj->load($personToDelete))
 		{
@@ -333,7 +333,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
 					)
 					ORDER BY kennzeichentyp_kurzbz, aktiv DESC";
-				
+
 				if ($result = $db->db_query($kennzeichen_query))
 				{
 					while ($row = $db->db_fetch_object($result))
@@ -398,6 +398,58 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						else
 						{
 							$sql_query_upd1 .= "UPDATE public.tbl_kennzeichen SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE kennzeichen_id=" . $db->db_add_param($kennzeichen_toDelete->kennzeichen_id, FHC_INTEGER) . ";";
+						}
+					}
+				}
+			}
+
+			if($result = @$db->db_query("SELECT 1 FROM bis.tbl_uhstat1daten LIMIT 1"))
+			{
+				$uhstat_has_personToKeep = array();
+				$uhstat_has_personToDelete = array();
+
+				$uhstat_query = "
+					SELECT uhstat1daten_id, person_id
+					FROM bis.tbl_uhstat1daten
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)
+					ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST";
+
+				// Herausfinden, ob UHSTAT Daten der löschenden oder zu belassenden Person zugeordnet sind
+				if ($result = $db->db_query($uhstat_query))
+				{
+					while ($row = $db->db_fetch_object($result))
+					{
+						if ($row->person_id === $personToKeep)
+						{
+							$uhstat_has_personToKeep[] = $row;
+						}
+						else if ($row->person_id === $personToDelete)
+						{
+							$uhstat_has_personToDelete[] = $row;
+						}
+					}
+				}
+
+				// wenn UHSTAT Daten an Person, die gelöscht werden soll, hängen
+				if (!empty($uhstat_has_personToDelete))
+				{
+					// Wenn es auch UHSTAT Daten für die Person, die bleibt, gibt
+					if (!empty($uhstat_has_personToKeep))
+					{
+						// Unklar: welche Version der Daten soll behalten werden?
+						$msg_error[] = 'Beide Personen haben UHSTAT1 Daten. Können nicht zusammengelegt werden.<br>
+						Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+						$error = true;
+					}
+					else
+					{
+						// Es gibt nur UHSTAT Daten für die zu löschende Person: Update
+						foreach ($uhstat_has_personToDelete as $uhstat_toDelete)
+						{
+							$sql_query_upd1 .= "UPDATE bis.tbl_uhstat1daten SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE uhstat1daten_id=" . $db->db_add_param($uhstat_toDelete->uhstat1daten_id, FHC_INTEGER) . ";";
 						}
 					}
 				}
@@ -521,7 +573,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 Alte Anmerkungen: ".$personToDelete_obj->anmerkungen;
 
 				$anmerkung .= "
-				
+
 Zusammengelegt mit Person-ID ".$personToDelete_obj->person_id." am ".date('d.m.Y H:i:s')." von ".$uid;
 
 				// Letztbenutzten Zugangscode abfragen und übernehmen
