@@ -1,27 +1,20 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
-
- 
-
-
-
 export default {
   components: {
     CoreFilterCmpt,
   },
   data() {
     return {
-      
       collapseIconFunktionen: true,
       collapseIconBetriebsmittel: true,
       funktionen_table_options: {
-        
-        height:300,
-        layout:"fitColumns",
-        responsiveLayout:"collapse",
-        responsiveLayoutCollapseUseFormatters:false,
-        responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
+        height: 300,
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
+        responsiveLayoutCollapseUseFormatters: false,
+        responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
         data: [
           {
             Bezeichnung: "",
@@ -32,118 +25,146 @@ export default {
           },
         ],
         columns: [
-         //? option when wanting to hide the collapsed list
-            
-         {
-            title: "<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
+          //? option when wanting to hide the collapsed list
+
+          {
+            title:
+              "<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
             field: "collapse",
             headerSort: false,
-            headerFilter:false,
-            formatter:"responsiveCollapse",
-            maxWidth:40,
-            headerClick:this.collapseFunction,
-          }, 
-          { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
+            headerFilter: false,
+            formatter: "responsiveCollapse",
+            maxWidth: 40,
+            headerClick: this.collapseFunction,
+          },
+          {
+            title: "Bezeichnung",
+            field: "Bezeichnung",
+            headerFilter: true,
+            minWidth: 200,
+          },
           {
             title: "Organisationseinheit",
             field: "Organisationseinheit",
-            headerFilter: true,minWidth:200,
-            
+            headerFilter: true,
+            minWidth: 200,
           },
-          { title: "Gültig_von", field: "Gültig_von", headerFilter: true, resizable:true,minWidth:200, },
-          { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true, resizable:true,minWidth:200, },
+          {
+            title: "Gültig_von",
+            field: "Gültig_von",
+            headerFilter: true,
+            resizable: true,
+            minWidth: 200,
+          },
+          {
+            title: "Gültig_bis",
+            field: "Gültig_bis",
+            headerFilter: true,
+            resizable: true,
+            minWidth: 200,
+          },
           {
             title: "Wochenstunden",
             field: "Wochenstunden",
             headerFilter: true,
-            minWidth:200,
+            minWidth: 200,
           },
-          
         ],
       },
       betriebsmittel_table_options: {
-        
-        height:300,
+        height: 300,
         layout: "fitColumns",
-        responsiveLayout:"collapse",
-        responsiveLayoutCollapseUseFormatters:false,
-        responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
+        responsiveLayout: "collapse",
+        responsiveLayoutCollapseUseFormatters: false,
+        responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
         data: [{ betriebsmittel: "", Nummer: "", Ausgegeben_am: "" }],
         columns: [
           {
-            title: "<i id='collapseIconBetriebsmittel' role='button' class='fa-solid fa-angle-down  '></i>",
+            title:
+              "<i id='collapseIconBetriebsmittel' role='button' class='fa-solid fa-angle-down  '></i>",
             field: "collapse",
             headerSort: false,
-            headerFilter:false,
-            formatter:"responsiveCollapse",
-            maxWidth:40,
-            headerClick:this.collapseFunction,
-          }, 
+            headerFilter: false,
+            formatter: "responsiveCollapse",
+            maxWidth: 40,
+            headerClick: this.collapseFunction,
+          },
           {
             title: "Betriebsmittel",
             field: "betriebsmittel",
             headerFilter: true,
-            minWidth:200,
+            minWidth: 200,
           },
-          { title: "Nummer", field: "Nummer", headerFilter: true, resizable:true, minWidth:200, },
+          {
+            title: "Nummer",
+            field: "Nummer",
+            headerFilter: true,
+            resizable: true,
+            minWidth: 200,
+          },
           {
             title: "Ausgegeben_am",
             field: "Ausgegeben_am",
             headerFilter: true,
-            minWidth:200,
+            minWidth: 200,
           },
         ],
       },
-     
     };
   },
 
-    //? this is the prop passed to the dynamic component with the custom data of the view
+  //? this is the prop passed to the dynamic component with the custom data of the view
   props: ["data"],
   methods: {
-   
-    sperre_foto_function(value) {
+    sperre_foto_function() {
       if (!this.data) {
         return;
       }
-      fhcapifactory.UserData.sperre_foto_function(value).then((res) => {
+      fhcapifactory.UserData.sperre_foto_function(!this.data.foto_sperre).then((res) => {
         this.data.foto_sperre = res.data.foto_sperre;
       });
     },
-    collapseFunction (e, column){
-
+    collapseFunction(e, column) {
       //* the if of the column has to match with the name of the responsive data in the vue component
       this[e.target.id] = !this[e.target.id];
 
       //* gets all event icons of the different rows to use the onClick event later
-      let allClickableIcons = column._column.cells.map(row => {
+      let allClickableIcons = column._column.cells.map((row) => {
         return row.element.children[0];
       });
-      
+
       //* changes the icon that shows or hides all the collapsed columns
       //* if the replace function does not find the class to replace, it just simply returns false
-      if(this[e.target.id]){
-        e.target.classList.replace("fa-angle-up","fa-angle-down");
-      }else{
-        e.target.classList.replace("fa-angle-down","fa-angle-up");
+      if (this[e.target.id]) {
+        e.target.classList.replace("fa-angle-up", "fa-angle-down");
+      } else {
+        e.target.classList.replace("fa-angle-down", "fa-angle-up");
       }
-      
+
       //* changes the icon for every collapsed column to open or closed
-        if(this[e.target.id]){
-          allClickableIcons.filter(column => {
+      if (this[e.target.id]) {
+        allClickableIcons
+          .filter((column) => {
             return !column.classList.contains("open");
-          }).forEach(col => {col.click();})
-        }else{
-          allClickableIcons.filter(column => {
+          })
+          .forEach((col) => {
+            col.click();
+          });
+      } else {
+        allClickableIcons
+          .filter((column) => {
             return column.classList.contains("open");
-          }).forEach(col => {col.click();})
-        }
+          })
+          .forEach((col) => {
+            col.click();
+          });
+      }
+    },
   },
-  },
-  
+
   computed: {
     refreshMailTo() {
-      return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`
+      return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`;
     },
 
     get_image_base64_src() {
@@ -152,39 +173,70 @@ export default {
       }
       return "data:image/jpeg;base64," + this.data.foto;
     },
-    //? this computed function returns all the informations for the first column in the profil 
+    //? this computed function returns all the informations for the first column in the profil
     personData() {
       if (!this.data) {
         return {};
       }
 
       return {
-        Allgemein: {
-          
-          View:"MitarbeiterIn",
-          Username: this.data.username,
-          Anrede: this.data.anrede,
-          Titel: this.data.titel,
-          Vorname: this.data.vorname,
-          Nachname: this.data.nachname,
-          Postnomen: this.data.postnomen,
-          Geburtsdatum: this.data.gebdatum,
-          Geburtsort: this.data.gebort,
-          Kurzzeichen: this.data.kurzbz,
-          Telefon: this.data.telefonklappe,
-          Büro:this.data.ort_kurzbz,
-          
-        },
+        Username: this.data.username,
+        Anrede: this.data.anrede,
+        Titel: this.data.titel,
+        Postnomen: this.data.postnomen,
       };
     },
-    //? this computed function returns the data for the second column in the profil 
+
+    personKontakt() {
+      if (!this.data) {
+        return {};
+      }
+
+      return {
+        emails: this.data.emails,
+        
+      };
+    },
+
+    specialData() {
+      if (!this.data) {
+        return {};
+      }
+
+      return {
+        Geburtsdatum: this.data.gebdatum,
+        Geburtsort: this.data.gebort,
+        Kurzzeichen: this.data.kurzbz,
+        Telefon: this.data.telefonklappe,
+        Büro: this.data.ort_kurzbz,
+      };
+    },
+
+    privateKontakte() {
+      if (!this.data) {
+        return {};
+      }
+
+      return this.data.kontakte;
+      
+    },
+
+    privateAdressen() {
+      if (!this.data) {
+        return {};
+      }
+
+      return this.data.adressen;
+      
+    },
+    
+
     kontaktInfo() {
       if (!this.data) {
         return {};
       }
 
       return {
-        
         FhAusweisStatus: this.data.zutrittsdatum,
         emails: this.data.emails,
         Kontakte: this.data.kontakte,
@@ -194,23 +246,16 @@ export default {
   },
 
   mounted() {
-     this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
-    
-        this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
-        
-    }) 
+    this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
+      this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
+    });
 
-    this.$refs.funktionenTable.tabulator.on('tableBuilt', () => {
-    
+    this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
       this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
-        
-       
-    }) 
+    });
   },
 
-
   template: ` 
-
 
   <div class="container-fluid text-break"  >
     <!-- ROW --> 
@@ -247,168 +292,173 @@ export default {
               <!-- END OF HIDDEN QUCK LINKS -->
 
 
+              <div class="col-12">
+             
+             
+                    <div class=" form-floating mb-2">
+                      <div class="card">
+                        <div class="card-body">
+                          <span>Der FH Ausweis ist am <b>{{data.zutrittsdatum}}</b> ausgegeben worden.</span>
+                        </div>
+                      </div>
+                    </div>
+          
+              </div>
+
 
               <!-- MAIN PANNEL -->
               <div class="col-sm-12 col-md-9">
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
-                <div class="row ">
-                  <!-- COLUMN WITH PROFIL IMAGE -->
-                    <div class=" col-md-2 col-sm-12" >
-
-
-                    <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
-                      <div class="row justify-content-center">
-                        <div class="col-auto ">
-                          <img class=" img-thumbnail " style=" max-height:150px"  :src="get_image_base64_src"></img>
-                        </div>
-                      </div>
-                    <!-- END OF THE ROW WITH THE IMAGE -->
-
-
-
-
-
-
-                    <!-- START OF THE SECOND ROW WITH THE IMAGE LINK -->
-                    <div class="row justify-content-center">
-                    <div class="col-auto text-center ">
-                          
-
-                        
-                        <div v-if="data.foto_sperre ">
-                          <p class="m-0">Profilfoto gesperrt</p>
-                          <a href="#" @click.prevent="sperre_foto_function(false)" class="text-decoration-none">Sperre des Profilfotos aufheben</a>
-                        </div>
-                        <!-- DIESEN LINK KOENNTE MAN MIT EINEM ICON AUSTAUSCHEN WENN DIE VIEWPORT KLEIN IST -->
-                        <a href="#" @click.prevent="sperre_foto_function(true)" class="text-decoration-none"  v-else>Profilfoto sperren</a>
-                     
-
-
-
-                        </div>
-                      </div>
-                    <!-- END OF THE ROW WITH THE IMAGE LINK -->
-
-
-
-
-
-
-                    <!-- END OF THE COLUMN WITH PROFIL IMAGE AND LINK -->
-                    </div>
-
-
-
-                    <!-- COLUMN WITH THE PROFIL INFORMATION --> 
-                    <div class="col-md-10 col-sm-12 text-break" >
+               
               
 
                     <!-- INFORMATION CONTENT START -->
                     <!-- ROW WITH THE PROFIL INFORMATION --> 
-                    <div class="row">
+                    <div class="row mb-4">
 
 
 
-                      <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
-                      <div  class="col-lg-12 col-xl-6">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- FIRST KAESTCHEN -->
+                      <div  class="col-lg-12 col-xl-6 ">
+                     <div class="row mb-4">
+                     <div class="col">
+                     
                         
                       <div class="card h-100">
-                     
+                      <div class="card-header">
+                      MitarbeiterIn
+                      </div>
                       <div class="card-body">
                       
                        
-                   <dl class="  mb-0"  >
 
-                        
-
-                      <div v-for="(wert,bez) in personData.Allgemein" class="row justify-content-center">
-                        <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
-                        <template v-else>
-                          <dt class="col-lg-4  col-md-6 col-6  " >{{bez}}</dt>
-                          <dd class=" col-lg-8 col-xl-6 col-6">{{wert?wert:"-"}}</dd>
-                        </template>
-                      </div>
-                  </dl>
 
                   
-           
+                  <div  class="row justify-content-center align-items-center">
 
+
+
+
+                  <!-- SQUEEZING THE IMAGE INSIDE THE FIRST INFORMATION COLUMN -->
+ <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
+          <div class="col-12 col-sm-6 mb-2">
+           <div class="row justify-content-center">
+                        <div class="col-auto " style="position:relative">
+                          <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"></img>
+                          <!-- LOCKING IMAGE FUNCTIONALITY -->
+                          
+                          
+                          <div role="button" @click.prevent="sperre_foto_function" style="height:22px; width:21px; background-color:white; position:absolute; top:0; right:12px; display:flex; align-items:center; justify-content:center;" >
+                          <i :class="{'fa':true, ...(data.foto_sperre?{'fa-lock':true}:{'fa-lock-open':true})} " ></i>
+                          
+                          
+                          </div>
+                        </div>
+                      </div>
+                    <!-- END OF THE ROW WITH THE IMAGE -->
+                    </div>
+<!-- END OF SQUEEZE -->
+
+
+
+<!-- COLUMNS WITH MULTIPLE ROWS NEXT TO PROFIL PICTURE -->
+                  <div class="col-12 col-sm-6">
+                  <div class="row">
+                  <div class="col-12">
+                  <div class=" form-floating mb-2">
+                        
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.vorname">
+                  <label for="floatingInputValue">Vorname</label>
+                </div>
+                </div>
+                <div class="col-12">
+                <div class=" form-floating mb-2">
+                        
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.nachname">
+                  <label for="floatingInputValue">Nachname</label>
+                </div>
+                </div>
+                </div>
+             
+                
+                  </div>
+                  
+
+
+
+
+
+
+
+                  <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
+                  <div class=" form-floating mb-2">
+                        
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
+                  <label for="floatingInputValue">{{bez}}</label>
+                  </div>
+                  </div>
+
+                  
+                      </div>
+
+
+                      
                       </div>
                     </div>
-                      
-                       
+		    </div>
+                    </div>
+                     <div class="row mb-4">
+                     
+
+                     <div  class=" col-lg-12">
+        
+                     <div class="card">
+                 
+                         <div class="card-header">
+                         Mitarbeiter Information
+                         </div>
+                         <div class="card-body">
+                             <div class="row">
+                             <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
+                                 <div class=" form-floating mb-2">    
+                                 <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
+                                 <label for="floatingInputValue">{{bez}}</label>
+                                 </div>
+                             </div>
+                         </div>
+                         
+                     </div>
+                     
+                 </div>
+
+                     </div>  
                             
 
 
 
-                      <!-- END OF THE FIRST INFORMATION COLUMN -->
+<!-- END OF THE FIRST KAESTCHEN -->
                       </div>
 
 
-                      <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
-                      <div  class="col-xl-6 col-lg-12">
-
-
-                      <div class="card h-100">
+                      <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
                      
-                      <div class="card-body">
 
 
-
-                        <dl v-for="(wert,bezeichnung) in kontaktInfo">
-
-
-                          <div class="row justify-content-center" v-if="bezeichnung=='FhAusweisStatus'">
-                            <dt class="col-lg-4 col-6" >FH-Ausweis Status</dt>
-                            <dd class=" col-lg-8 col-6 m-0">{{"Der FH Ausweis ist am "+ wert+ " ausgegeben worden."}}</dd>
-                          </div>
-
-                        <!-- HIER SIND DIE EMAILS -->
-                    
-                    
-                          <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
-                            <dt class="col-lg-4  col-6 mb-0">eMail</dt>
-                            <div class="col-lg-8 col-6">
-                                <dd v-for="email in wert" class="mb-0 ">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></dd>
-                            </div>
-                          </div>
-                      
-                      
-                          <!-- HIER SIND DIE PRIVATEN KONTAKTE -->
-                          <div  class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Kontakte'">
-                              <dt   class="col-lg-4 col-6  mb-0">Private Kontakte</dt>
-                              <div class="col-lg-8 col-6 ">
-                                  <dd style="white-space:normal" class="row justify-end" v-for="element in wert" >
-                                      <div :class="{...(element?.anmerkung? {'col-7':true} : {'col-10':true} )}">{{element.kontakttyp + ":  " + element.kontakt+"  " }}</div>
-                                      <div :class="{...(element?.anmerkung? {'col-3':true} : {'d-none':true} )}"> {{element?.anmerkung}}</div>
-                                      <div class="col-2"> 
-                                          <i v-if="element.zustellung" class="fa-solid fa-check"></i>
-                                          <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
-                                      </div>
-                                  </dd>
-                              </div>
-                          </div>
-                      
-                      
-                      
-                          <!-- HIER SIND DIE ADRESSEN -->
-                          <div class=" justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung=='Adressen'">
-                              <dt class="col-lg-4 col-6">Adressen</dt>
-                              <div class="col-lg-8 col-6">
-                                  <dd class="  m-0"  v-for="element in wert">
-                                      {{element.strasse}} <b>({{element.adr_typ}})</b><br/>{{ element.plz}} {{element.ort}}
-                                  </dd>
-                              </div>
-                          </div>
-                    
-                        </dl>
-
-
-                      </div>
-                      </div>
-
-                      <!-- END OF THE SECOND INFORMATION COLUMN -->
-                      </div>
+                     
 
 
               
@@ -416,9 +466,143 @@ export default {
                     <!-- INFORMATION CONTENT END -->
                     </div>
 
+                    <div  class="col-xl-6 col-lg-12 ">
+                    <div class="row mb-4">
+                    <div class="col">
 
-                    <!-- COLUMN WITH ALL PROFIL INFORMATION END -->
-                  </div>
+
+                    <div class="card ">
+                    <div class="card-header">
+                    Mails
+                    </div>
+                   
+                    <div class="card-body">
+
+
+
+                      <div v-for="(wert,bezeichnung) in personKontakt">
+
+                      
+            
+                      <!-- HIER SIND DIE EMAILS -->
+                  
+                  
+                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center">
+                      <div  class="col-12 ">
+                      <div class=" form-floating mb-2">
+                            
+                      <a  :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" >{{email.email}}</a>
+                      <label for="floatingFhAusweis">{{email.type }}</label>
+                    
+                      </div>
+                      </div>
+                          </div>
+
+                    
+                    
+                     
+
+
+
+
+                    
+                      </div>
+
+
+                    </div>
+                    </div>
+                    </div></div>
+
+                    <!-- HIER SIND DIE PRIVATEN KONTAKTE-->
+                    <div class="row mb-4 ">
+                      <div class="col">
+                        <div class="card">
+                          <div class="card-header">
+                            Private Kontakte
+                          </div>
+                          <div class="card-body text-center">
+                            
+                            <div v-for="element in privateKontakte" class="align-items-center row justify-content-center">
+                           
+                              <div  :class="{...(element.anmerkung? {'col-10':true, 'col-md-6':true} : {'col-10':true, 'col-xl-11':true})}">
+                                  <div class=" form-floating mb-2">
+                                      <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingKontakt" :value="element.kontakt">
+                                      <label for="floatingKontakt">{{element.kontakttyp}}</label>
+                                  </div>
+                              </div>
+                              <div v-if="element?.anmerkung" class="col-12 col-md-4 col-lg-4 col-xl-5 order-2 order-md-1 ">
+                                  <div class=" form-floating mb-2">
+                                      <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingAnmerkung" :value="element.anmerkung">
+                                      <label for="floatingAnmerkung">Anmerkung</label>
+                                  </div>
+                              </div>
+                              <div class="col-2 order-1 order-md-2 col-xl-1 allign-middle">
+                                  <i v-if="element.zustellung" class="fa-solid fa-check"></i>
+                                  <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
+                              </div>
+                            </div>
+                           
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- -->
+
+                    <!-- HIER SIND DIE PRIVATEN ADRESSEN-->
+                    <div class="row mb-4">
+                      <div class="col">
+                        <div class="card">
+                          <div class="card-header">Private Adressen</div>
+                          <div class="card-body">
+                          
+                            <div v-for="element in privateAdressen" class="row justify-content-center align-items-center">
+                            <!-- column 1 in the address row -->
+                                <div class="col-2 col-sm-1 text-center">
+                                 
+                                  <i class="fa fa-location-dot fa-lg" style="color:#00649C "></i>
+                                
+                                </div>
+                                <div  class="col-10 col-sm-11 ">
+                                    <div class=" form-floating mb-2">
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.strasse">
+                                        <label for="floatingFhAusweis">Strasse</label>
+                                    </div>
+                                </div>
+                            <!-- column 2 in the address row -->
+                                <div  class="col-lg-4 col-md-4 col-sm-6 col-xs-6 order-sm-1">
+                                    <div class=" form-floating mb-2">
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.adr_typ">
+                                        <label for="floatingFhAusweis">Typ</label>
+                                    </div>
+                                </div>
+                                <div  class="col-md-5 col-sm-12 col-xs-12 ">
+                                    <div class=" form-floating mb-2">
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.ort">
+                                        <label for="floatingFhAusweis">Ort</label>
+                                    </div>
+                                </div>
+                                <div  class="col-lg-3 col-md-3 col-sm-6 col-xs-6 order-sm-2">
+                                    <div class=" form-floating mb-2">
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.plz">
+                                        <label for="floatingFhAusweis">PLZ</label>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- -->
+
+
+
+                    <!-- END OF THE SECOND INFORMATION COLUMN -->
+                    </div>
+
+
+                    <!-- START OF THE SECOND PROFIL INFORMATION ROW --> 
+                  
+                    
                   <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
                 </div  >
 
@@ -426,7 +610,7 @@ export default {
 
                 <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
                 <div class="row">
-                  <div   class="col pt-4">
+                  <div   class="col ">
                     <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
                   </div>
                 </div>
@@ -439,12 +623,12 @@ export default {
                 <div class="row">
 
                 <!-- FIRST TABLE -->
-                  <div class="col-12" >
+                  <div class="col-12 mb-4" >
                     <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   </div>
 
                 <!-- SECOND TABLE -->
-                  <div class="col-12" >
+                  <div class="col-12 mb-4" >
                     <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
@@ -511,9 +695,21 @@ export default {
                       <div class="card-body">
                       
                         <h6 class="card-title">Sie sind Mitgglied in folgenden Verteilern:</h6>
-                        <div  class="card-text row text-break" v-for="verteiler in data?.mailverteiler">
-                          <div class="col-lg-12 col-xl-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
-                          <div class="col-lg-12 col-xl-6">{{verteiler.beschreibung}}</div>
+                        <div  class="card-text row text-break mb-2" v-for="verteiler in data?.mailverteiler">
+                          <div class="col-12 ">
+                            <div class="row">  
+                              <div class="col-1">
+                              
+                              <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
+                              
+                              </div>
+                              <div class="col-11">
+                                <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
+                              </div>
+                            </div>
+                           
+                          </div> 
+                          <div class="col-12 ">{{verteiler.beschreibung}}</div>
                         </div>
 
                       </div>

@@ -79,7 +79,7 @@ const app = Vue.createApp({
 	
 	<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
 	</div>
-	<component v-else :is="data.base" :data="data" ></component>
+	<component v-else :is="view" :data="data" ></component>
 	</div>`
 	
 	

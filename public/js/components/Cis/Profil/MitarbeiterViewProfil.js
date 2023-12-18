@@ -115,36 +115,38 @@ export default {
       }
 
       return {
-        Allgemein: {
-          View:"MitarbeiterIn",
-          Username: this.data.username,
-          Anrede: this.data.anrede,
-          Titel: this.data.titel,
-          Vorname: this.data.vorname,
-          Nachname: this.data.nachname,
-          Postnomen: this.data.postnomen,
-        },
-     
-       
-        SpecialInformation:  {
-            Kurzzeichen: this.data.kurzbz,
-            Telefon: this.data.telefonklappe,
-            Büro:this.data.ort_kurzbz,
-        },
+        Username: this.data.username,
+        Anrede: this.data.anrede,
+        Titel: this.data.titel,
+        Postnomen: this.data.postnomen,
       };
     },
-    //? this computed function returns the data for the second column in the profil 
-    kontaktInfo() {
+
+    personKontakt() {
+      if (!this.data) {
+        return {};
+      }
+
+      return {
+        emails: this.data.emails,
+        
+      };
+    },
+
+    specialData() {
       if (!this.data) {
         return {};
       }
 
       return {
        
-        emails: this.data.emails,
-        
+        Kurzzeichen: this.data.kurzbz,
+        Telefon: this.data.telefonklappe,
+        Büro: this.data.ort_kurzbz,
       };
     },
+    
+    
   },
 
   mounted() {
@@ -159,21 +161,25 @@ export default {
   },
 
   template: `
+ 
 
-
-  <!-- CONTAINER -->
-  <div class="container-fluid text-break" >
+  <div class="container-fluid text-break"  >
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-              <div style="border:4px solid;border-color:#EEEEEE;" class="row py-2">
+              <div class="row py-2">
               <div class="col">
                 <p class="m-0">
-                  <a class="border w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                   <u> Quick links</u>
-                  </a>
+                <div class="card">
+                
+                <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                <u> Quick links</u>
+               </a>
+             
+                
+               </div>
                  
                 </p>
                 <div class="mt-1 collapse" id="collapseExample">
@@ -187,105 +193,178 @@ export default {
                 </div>
               </div>
             </div>
+
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
 
+
+              <div class="col-12">
+             
+             
+                    <div class=" form-floating mb-2">
+                      <div class="card">
+                        <div class="card-body">
+                          <span>Der FH Ausweis ist am <b>{{data.zutrittsdatum}}</b> ausgegeben worden.</span>
+                        </div>
+                      </div>
+                    </div>
+          
+              </div>
 
 
               <!-- MAIN PANNEL -->
               <div class="col-sm-12 col-md-9">
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
-                <div class="row">
-                  <!-- COLUMN WITH PROFIL IMAGE -->
-                    <div class="col-md-2 col-sm-12" style="border:4px solid;border-color:lightgreen;">
-
-
-
-
-
-
-                    <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
-                    <div class="row justify-content-center">
-                    <div class="col-auto ">
-                          <img class=" img-thumbnail " style=" max-height:150px"  :src="get_image_base64_src"></img>
-                        </div>
-                      </div>
-                    <!-- END OF THE ROW WITH THE IMAGE -->
-
-
-
-
-
-
-                    <!-- END OF THE COLUMN WITH PROFIL IMAGE AND LINK -->
-                    </div>
-
-
-
-                    <!-- COLUMN WITH THE PROFIL INFORMATION --> 
-                    <div class="col-md-10 col-sm-12 text-break" style="border:4px solid;border-color:lightcoral;">
+               
               
 
                     <!-- INFORMATION CONTENT START -->
                     <!-- ROW WITH THE PROFIL INFORMATION --> 
-                    <div class="row">
+                    <div class="row mb-4">
 
 
 
-                      <!-- FIRST COLUMN WITH PROFIL INFORMATION -->
-                      <div style="border:4px solid;border-color:red" class="col-lg-12 col-xl-6">
 
-                        <dl class="  mb-0"  >
 
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- FIRST KAESTCHEN -->
+                      <div  class="col-lg-12 col-xl-6 ">
+                     <div class="row mb-4">
+                     <div class="col">
+                     
                         
+                      <div class="card h-100">
+                      <div class="card-header">
+                      MitarbeiterIn
+                      </div>
+                      <div class="card-body">
+                      
+                       
 
-                          <div v-for="(wert,bez) in personData.Allgemein" class="row justify-content-center">
-                          <!-- MITARBEITER TITEL -->
-                            <dt class="col-xl-10 col-12 " v-if="bez=='View'" ><b>{{wert}}</b></dt>
-                            <template v-else>
-                              <dt class="col-xl-4 col-lg-6 col-md-6 col-6  " >{{bez}}</dt>
-                              <dd class=" col-lg-8 col-xl-6 col-6 ">{{wert?wert:"-"}}</dd>
-                            </template>
+
+                  
+                  <div  class="row justify-content-center align-items-center">
+
+
+
+
+                  <!-- SQUEEZING THE IMAGE INSIDE THE FIRST INFORMATION COLUMN -->
+ <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
+          <div class="col-12 col-sm-6 mb-2">
+           <div class="row justify-content-center">
+                        <div class="col-auto " style="position:relative">
+                          <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"></img>
+                          <!-- LOCKING IMAGE FUNCTIONALITY -->
+                          
+                          
+                          <div role="button" @click.prevent="sperre_foto_function" style="height:22px; width:21px; background-color:white; position:absolute; top:0; right:12px; display:flex; align-items:center; justify-content:center;" >
+                          <i :class="{'fa':true, ...(data.foto_sperre?{'fa-lock':true}:{'fa-lock-open':true})} " ></i>
+                          
+                          
                           </div>
+                        </div>
+                      </div>
+                    <!-- END OF THE ROW WITH THE IMAGE -->
+                    </div>
+<!-- END OF SQUEEZE -->
+
+
+
+<!-- COLUMNS WITH MULTIPLE ROWS NEXT TO PROFIL PICTURE -->
+                  <div class="col-12 col-sm-6">
+                  <div class="row">
+                  <div class="col-12">
+                  <div class=" form-floating mb-2">
                         
-                    
-                        </dl>
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.vorname">
+                  <label for="floatingInputValue">Vorname</label>
+                </div>
+                </div>
+                <div class="col-12">
+                <div class=" form-floating mb-2">
+                        
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.nachname">
+                  <label for="floatingInputValue">Nachname</label>
+                </div>
+                </div>
+                </div>
+             
+                
+                  </div>
+                  
 
 
 
-                      <!-- END OF THE FIRST INFORMATION COLUMN -->
+
+
+
+
+                  <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
+                  <div class=" form-floating mb-2">
+                        
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
+                  <label for="floatingInputValue">{{bez}}</label>
+                  </div>
+                  </div>
+
+                  
                       </div>
 
 
-                      <!-- START OF THE SECOND PROFIL INFORMATION COLUMN -->
-                      <div style="border:4px solid;border-color:orange" class="col-xl-6 col-lg-12">
-
-
-
-
-
-
-                        <dl v-for="(wert,bezeichnung) in kontaktInfo">
-
-                        <!-- HIER SIND DIE EMAILS -->
-                    
-                    
-                          <div class="justify-content-center row mb-3" v-if="typeof wert === 'object' && bezeichnung == 'emails'">
-                              <dt class="col-lg-4 col-6  mb-0">eMail</dt>
-                              <div class="col-lg-8 col-6">
-                                  <dd v-for="email in wert" class="mb-0 ">{{email.type}}: <a style="text-decoration:none" :href="'mailto:'+email.email">{{email.email}}</a></dd>
-                              </div>
-                          </div>
                       
-                      
-                      
-                        </dl>
-
-
-
-
-                      <!-- END OF THE SECOND INFORMATION COLUMN -->
                       </div>
+                    </div>
+		    </div>
+                    </div>
+                     <div class="row mb-4">
+                     
+
+                     <div  class=" col-lg-12">
+        
+                     <div class="card">
+                 
+                         <div class="card-header">
+                         Mitarbeiter Information
+                         </div>
+                         <div class="card-body">
+                             <div class="row">
+                             <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
+                                 <div class=" form-floating mb-2">    
+                                 <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
+                                 <label for="floatingInputValue">{{bez}}</label>
+                                 </div>
+                             </div>
+                         </div>
+                         
+                     </div>
+                     
+                 </div>
+
+                     </div>  
+                            
+
+
+
+<!-- END OF THE FIRST KAESTCHEN -->
+                      </div>
+
+
+                      <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
+                     
+
+
+                     
 
 
               
@@ -293,11 +372,83 @@ export default {
                     <!-- INFORMATION CONTENT END -->
                     </div>
 
+                    <div  class="col-xl-6 col-lg-12 ">
+                    <div class="row mb-4">
+                    <div class="col">
 
-                    <!-- COLUMN WITH ALL PROFIL INFORMATION END -->
-                  </div>
+
+                    <div class="card ">
+                    <div class="card-header">
+                    Mails
+                    </div>
+                   
+                    <div class="card-body">
+
+
+
+                      <div v-for="(wert,bezeichnung) in personKontakt">
+
+                      
+            
+                      <!-- HIER SIND DIE EMAILS -->
+                  
+                  
+                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center">
+                      <div  class="col-12 ">
+                      <div class=" form-floating mb-2">
+                            
+                      <a  :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" >{{email.email}}</a>
+                      <label for="floatingFhAusweis">{{email.type }}</label>
+                    
+                      </div>
+                      </div>
+                          </div>
+
+                    
+                    
+                     
+
+
+
+
+                    
+                      </div>
+
+
+                    </div>
+                    </div>
+                    </div></div>
+
+                  
+
+                    <!-- HIER SIND DIE PRIVATEN ADRESSEN-->
+                    <div class="row mb-4">
+                      <div class="col">
+                                              </div>
+                    </div>
+                    <!-- -->
+
+
+
+                    <!-- END OF THE SECOND INFORMATION COLUMN -->
+                    </div>
+
+
+                    <!-- START OF THE SECOND PROFIL INFORMATION ROW --> 
+                  
+                    
                   <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
                 </div  >
+
+
+
+                <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
+                <div class="row">
+                  <div   class="col ">
+                    <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
+                  </div>
+                </div>
+                <!-- END OF REFRESHING LINK ROW -->
 
 
 
@@ -306,8 +457,13 @@ export default {
                 <div class="row">
 
                 <!-- FIRST TABLE -->
-                  <div class="col-12" style="border: 4px solid; border-color:lightskyblue">
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options" tableOnly :sideMenu="false" />
+                  <div class="col-12 mb-4" >
+                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                  </div>
+
+                <!-- SECOND TABLE -->
+                  <div class="col-12 mb-4" >
+                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
@@ -334,31 +490,66 @@ export default {
 
               <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
               <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
-                <div style="border:4px solid;border-color:#EEEEEE;" class="row d-none d-md-block">
+                <div  class="row d-none d-md-block mb-3">
                   <div class="col">
-                    <div  class="row py-4">
-                        <a style="text-decoration:none" class="my-1" href="#">Zeitwuensche</a>
-                        <a style="text-decoration:none" class="my-1" href="#">Lehrveranstaltungen</a>
-                        <a style="text-decoration:none" class="my-1" href="#">Zeitsperren von Gschnell</a>
+                 
+                    <div class="card">
+                      <div class="card-header">
+                      Quick Links
+                      </div>
+                      <div class="card-body">
+                      
+                       
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitwuensche</a>
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Lehrveranstaltungen</a>
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren von Gschnell</a>
+
+                      </div>
                     </div>
+
+                   
+                      
+                  
                   </div>
                 </div>
 
 
                 <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
-                <div style="border:4px solid;border-color: darkgray"  class="row">
+                <div  class="row">
                 
                   <div class="col">
                 
 
                   
                   <!-- HIER SIND DIE MAILVERTEILER -->
-                    <h5 class="fs-3" style="margin-top:1em">Mailverteilers</h5>
-                    <p >Sie sind Mitgglied in folgenden Verteilern:</p>
-                    <div  class="row text-break" v-for="verteiler in data?.mailverteiler">
-                      <div class="col-lg-12 col-xl-6"><a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a></div> 
-                      <div class="col-lg-12 col-xl-6">{{verteiler.beschreibung}}</div>
+                    <div class="card">
+                      <div class="card-header">
+                      Mailverteilers
+                      </div>
+                      <div class="card-body">
+                      
+                        <h6 class="card-title">Sie sind Mitgglied in folgenden Verteilern:</h6>
+                        <div  class="card-text row text-break mb-2" v-for="verteiler in data?.mailverteiler">
+                          <div class="col-12 ">
+                            <div class="row">  
+                              <div class="col-1">
+                              
+                              <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
+                              
+                              </div>
+                              <div class="col-11">
+                                <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
+                              </div>
+                            </div>
+                           
+                          </div> 
+                          <div class="col-12 ">{{verteiler.beschreibung}}</div>
+                        </div>
+
+                      </div>
                     </div>
+
+
 
 
 
@@ -381,6 +572,7 @@ export default {
       
       <!-- END OF CONTAINER -->
   </div>
-
+            
+    
     `,
 };

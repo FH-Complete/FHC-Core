@@ -491,7 +491,7 @@ export default {
                       <div  class="col-12 ">
                       <div class=" form-floating mb-2">
                             
-                      <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="email.email">
+                      <a  :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" >{{email.email}}</a>
                       <label for="floatingFhAusweis">{{email.type }}</label>
                     
                       </div>
