@@ -62,4 +62,4 @@ if (!isset($menu)) {
 	</nav>
 </header>
 
-<main id="cis-main" class="flex-grow-1 overflow-scroll p-4">
+<main id="cis-main" class="flex-grow-1 overflow-scroll">
