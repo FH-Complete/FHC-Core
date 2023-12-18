@@ -79,9 +79,6 @@
 			// Tabulator 5 CSS
 			if ($tabulator5 === true) generateCSSsInclude('public/css/Tabulator5.css');
 
-			// Tinymce 4 CSS
-			if ($tinymce4 === true) generateCSSsInclude('public/css/TinyMCE4.css');
-
 			// Tinymce 5 CSS
 			if ($tinymce5 === true) generateCSSsInclude('public/css/TinyMCE5.css');
 

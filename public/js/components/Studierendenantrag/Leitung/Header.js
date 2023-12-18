@@ -57,7 +57,7 @@ export default {
 				<select v-if="stgs.length > 1" class="form-select" v-model="stg_value">
 					<option value="">{{$p.t('global', 'alle')}}</option>
 					<option v-for="stg in stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">
-						{{stg.bezeichnung}} ({{stg.orgform}})
+						{{stg.bezeichnung}}
 					</option>
 				</select>
 			</div>
