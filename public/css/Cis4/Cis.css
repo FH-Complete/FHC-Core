@@ -1,5 +1,10 @@
-/* variables */
+/* basic */
 @import '../components/searchbar.css';
+html {
+  font-size: 0.875em;
+}
+
+/* variables */
 :root {
   --fhc-cis-primary: #00649c;
   --fhc-cis-header-px: 1rem;
@@ -40,10 +45,6 @@
     --fhc-cis-header-height: 40px;
     --fhc-cis-menu-bg: #343a40;
   }
-}
-
-html {
-	font-size: .875em;
 }
 
 /* buttons */
