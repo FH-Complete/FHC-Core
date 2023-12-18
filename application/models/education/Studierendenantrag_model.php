@@ -73,6 +73,23 @@ class Studierendenantrag_model extends DB_Model
 		return $this->loadWhere($where);
 	}
 
+	public function loadActiveForStudiengaenge($studiengaenge) {
+		$this->db->group_start();
+		$this->db->where_not_in('s.studierendenantrag_statustyp_kurzbz', [
+			Studierendenantragstatus_model::STATUS_CANCELLED,
+			Studierendenantragstatus_model::STATUS_APPROVED,
+			Studierendenantragstatus_model::STATUS_REJECTED,
+			Studierendenantragstatus_model::STATUS_OBJECTION_DENIED
+		]);
+		$this->db->or_group_start();
+		$this->db->where('s.studierendenantrag_statustyp_kurzbz', Studierendenantragstatus_model::STATUS_APPROVED);
+		$this->db->where('tbl_studierendenantrag.typ', Studierendenantrag_model::TYP_ABMELDUNG_STGL);
+		$this->db->group_end();
+		$this->db->group_end();
+
+		return $this->loadForStudiengaenge($studiengaenge);
+	}
+
 	public function isInStudiengang($studierendenantrag_id, $studiengaenge)
 	{
 		$this->addJoin('public.tbl_prestudent', 'prestudent_id');
