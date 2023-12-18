@@ -34,7 +34,7 @@ html {
 }
 @media (min-width: 992px) {
   :root {
-    --fhc-cis-menu-width: 300px;
+    --fhc-cis-menu-width: 250px;
     --fhc-cis-header-height: 60px;
     --fhc-cis-menu-bg: #72777A;
   }
