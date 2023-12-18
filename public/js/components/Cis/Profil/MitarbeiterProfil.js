@@ -292,22 +292,11 @@ export default {
               <!-- END OF HIDDEN QUCK LINKS -->
 
 
-              <div class="col-12">
-             
-             
-                    <div class=" form-floating mb-2">
-                      <div class="card">
-                        <div class="card-body">
-                          <span>Der FH Ausweis ist am <b>{{data.zutrittsdatum}}</b> ausgegeben worden.</span>
-                        </div>
-                      </div>
-                    </div>
-          
-              </div>
+            
 
 
               <!-- MAIN PANNEL -->
-              <div class="col-sm-12 col-md-9">
+              <div class="col-sm-12 col-md-8 col-xxl-9 ">
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
                
               
@@ -381,15 +370,15 @@ export default {
                   <div class="col-12">
                   <div class=" form-floating mb-2">
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.vorname">
-                  <label for="floatingInputValue">Vorname</label>
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingVorname"  :value="data.vorname">
+                  <label for="floatingVorname">Vorname</label>
                 </div>
                 </div>
                 <div class="col-12">
                 <div class=" form-floating mb-2">
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.nachname">
-                  <label for="floatingInputValue">Nachname</label>
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingNachname"  :value="data.nachname">
+                  <label for="floatingNachname">Nachname</label>
                 </div>
                 </div>
                 </div>
@@ -407,8 +396,8 @@ export default {
                   <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
                   <div class=" form-floating mb-2">
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
-                  <label for="floatingInputValue">{{bez}}</label>
+                  <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
+                  <label :for="'floating'+bez">{{bez}}</label>
                   </div>
                   </div>
 
@@ -435,8 +424,8 @@ export default {
                              <div class="row">
                              <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
                                  <div class=" form-floating mb-2">    
-                                 <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
-                                 <label for="floatingInputValue">{{bez}}</label>
+                                 <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
+                                 <label :for="'floating'+bez">{{bez}}</label>
                                  </div>
                              </div>
                          </div>
@@ -487,13 +476,21 @@ export default {
                       <!-- HIER SIND DIE EMAILS -->
                   
                   
-                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center">
+                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center ">
                       <div  class="col-12 ">
+                     
+                            <div class="row align-items-center">
+                      <div class="col-1">
+
+                      <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
+
+                      </div>
+                      <div class="col">
                       <div class=" form-floating mb-2">
-                            
-                      <a  :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" >{{email.email}}</a>
-                      <label for="floatingFhAusweis">{{email.type }}</label>
-                    
+                            <a  :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type" >{{email.email}}</a>
+                      <label :for="'floating'+email.type">{{email.type }}</label>
+                      </div>
+                      </div>
                       </div>
                       </div>
                           </div>
@@ -523,20 +520,22 @@ export default {
                           <div class="card-body text-center">
                             
                             <div v-for="element in privateKontakte" class="align-items-center row justify-content-center">
-                           
-                              <div  :class="{...(element.anmerkung? {'col-10':true, 'col-md-6':true} : {'col-10':true, 'col-xl-11':true})}">
+                              <div class="col-1">
+                              <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
+                              </div>
+                              <div  :class="{...(element.anmerkung? {'col-11':true, 'col-md-5':true, 'col-xl-11':true, 'col-xxl-5':true} : {'col-9':true, 'col-xl-9':true})}">
                                   <div class=" form-floating mb-2">
                                       <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingKontakt" :value="element.kontakt">
                                       <label for="floatingKontakt">{{element.kontakttyp}}</label>
                                   </div>
                               </div>
-                              <div v-if="element?.anmerkung" class="col-12 col-md-4 col-lg-4 col-xl-5 order-2 order-md-1 ">
+                              <div v-if="element?.anmerkung" class="offset-1 offset-md-0 col-9 col-md-4  offset-xl-1 offset-xxl-0 col-xl-9 col-xxl-4 order-2 order-md-1 order-xl-1 order-sm-1 order-xxl-1  ">
                                   <div class=" form-floating mb-2">
                                       <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingAnmerkung" :value="element.anmerkung">
                                       <label for="floatingAnmerkung">Anmerkung</label>
                                   </div>
                               </div>
-                              <div class="col-2 order-1 order-md-2 col-xl-1 allign-middle">
+                              <div class="col-2 order-2 order-sm-2 order-md-2 order-lg-1 col-xl-2 col-xxl-2 allign-middle">
                                   <i v-if="element.zustellung" class="fa-solid fa-check"></i>
                                   <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
                               </div>
@@ -557,34 +556,37 @@ export default {
                           
                             <div v-for="element in privateAdressen" class="row justify-content-center align-items-center">
                             <!-- column 1 in the address row -->
-                                <div class="col-2 col-sm-1 text-center">
+                            
+                                <div class="col-1 text-center">
                                  
                                   <i class="fa fa-location-dot fa-lg" style="color:#00649C "></i>
                                 
                                 </div>
-                                <div  class="col-10 col-sm-11 ">
+                                <div  class="col ">
                                     <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.strasse">
-                                        <label for="floatingFhAusweis">Strasse</label>
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingStrasse" :value="element.strasse">
+                                        <label for="floatingStrasse">Strasse</label>
                                     </div>
                                 </div>
+                                <div class="w-100 "></div>
+                                
                             <!-- column 2 in the address row -->
-                                <div  class="col-lg-4 col-md-4 col-sm-6 col-xs-6 order-sm-1">
+                                <div  class="col-11 offset-1 offset-md-0 offset-xl-1  col-xl-6 order-xl-1 col-md-3 col-sm-6 col-xs-6 order-sm-1">
                                     <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.adr_typ">
-                                        <label for="floatingFhAusweis">Typ</label>
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingTyp" :value="element.adr_typ">
+                                        <label for="floatingTyp">Typ</label>
                                     </div>
                                 </div>
-                                <div  class="col-md-5 col-sm-12 col-xs-12 ">
+                                <div  class="col-11 offset-1  col-xl-11 col-md-5 col-sm-11 col-xs-11 ">
                                     <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.ort">
-                                        <label for="floatingFhAusweis">Ort</label>
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingOrt" :value="element.ort">
+                                        <label for="floatingOrt">Ort</label>
                                     </div>
                                 </div>
-                                <div  class="col-lg-3 col-md-3 col-sm-6 col-xs-6 order-sm-2">
+                                <div  class="col-11 offset-1 offset-sm-0 offset-md-0 col-xl-5 order-xl-2 col-md-3 col-sm-5 col-xs-5 order-sm-2">
                                     <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" :value="element.plz">
-                                        <label for="floatingFhAusweis">PLZ</label>
+                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingPLZ" :value="element.plz">
+                                        <label for="floatingPLZ">PLZ</label>
                                     </div>
                                 </div>
                             </div>
@@ -648,7 +650,7 @@ export default {
 
 
               <!-- START OF SIDE PANEL -->
-              <div  class="col-md-3 col-sm-12 text-break" >
+              <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
 
 
               <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
@@ -679,6 +681,25 @@ export default {
                   </div>
                 </div>
 
+                <div class="row mb-3" >
+                
+                
+                <div class="col-12">
+             
+             
+                
+                  <div class="card">
+                    <div class="card-body">
+                      <span>Der FH Ausweis ist am <b>{{data.zutrittsdatum}}</b> ausgegeben worden.</span>
+                    </div>
+                
+                </div>
+      
+         
+                </div>
+                
+                </div>
+
 
                 <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
                 <div  class="row">
@@ -698,18 +719,18 @@ export default {
                         <div  class="card-text row text-break mb-2" v-for="verteiler in data?.mailverteiler">
                           <div class="col-12 ">
                             <div class="row">  
-                              <div class="col-1">
+                              <div class="col-1 ">
                               
                               <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
                               
                               </div>
-                              <div class="col-11">
+                              <div class="col">
                                 <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
                               </div>
                             </div>
                            
                           </div> 
-                          <div class="col-12 ">{{verteiler.beschreibung}}</div>
+                          <div class="col-11 offset-1 ">{{verteiler.beschreibung}}</div>
                         </div>
 
                       </div>

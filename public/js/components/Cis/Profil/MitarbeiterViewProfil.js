@@ -198,18 +198,7 @@ export default {
               <!-- END OF HIDDEN QUCK LINKS -->
 
 
-              <div class="col-12">
              
-             
-                    <div class=" form-floating mb-2">
-                      <div class="card">
-                        <div class="card-body">
-                          <span>Der FH Ausweis ist am <b>{{data.zutrittsdatum}}</b> ausgegeben worden.</span>
-                        </div>
-                      </div>
-                    </div>
-          
-              </div>
 
 
               <!-- MAIN PANNEL -->
