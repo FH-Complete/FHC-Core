@@ -160,8 +160,10 @@ $tage_imJahr = $ende_imJahr->diff($beginn_imJahr)->days + 1;
 $wochen_imJahr = $tage_imJahr / 7;
 
 // Sommer- und Wintersemester im BIS Meldungsjahr
-$ss_kurzbz = $studiensemester->getBeforePrevious();
+//$ss_kurzbz = $studiensemester->getBeforePrevious();
 $ws_kurzbz = $studiensemester->getStudienjahrStudiensemester($stsem);
+$ss_kurzbz = $studiensemester->getPreviousFrom($ws_kurzbz);
+
 $ss = new studiensemester($ss_kurzbz);
 $ws = new studiensemester($ws_kurzbz);
 

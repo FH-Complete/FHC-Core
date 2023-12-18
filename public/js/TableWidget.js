@@ -544,13 +544,10 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
-				if (typeof options.tableWidgetHeader == 'undefined')
-				{
-					options.persistentLayout = true;			// enables persistence (default store in localStorage if available, else in cookie)
-					options.persistenceID = data.tableUniqueId;	// TableWidget unique id to store persistence data seperately for multiple tables
-				}
-				options.movableColumns = true;				// allows changing column order
-				options.tooltipsHeader = true;				// set header tooltip with column title
+                options.persistence = (typeof options.persistence == 'undefined') ? true : options.persistence;			// enables persistence (default store in localStorage if available, else in cookie)
+                options.persistenceID = (typeof options.persistenceID == 'undefined') ?  data.tableUniqueId : options.persistenceID;  // persistenceID to store persistence data seperately for multiple tables
+				options.movableColumns = (typeof options.movableColumns == 'undefined') ? true : options.movableColumns;				// allows changing column order
+				options.tooltipsHeader = (typeof options.tooltipsHeader == 'undefined') ? true : options.tooltipsHeader;					// set header tooltip with column title
 				options.placeholder = _func_placeholder();	// display text when table is empty
 
 				if (typeof options.rowSelectionChanged == 'undefined')
@@ -827,7 +824,7 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	{
 		var field = column.getField();
 		var title = column.getDefinition().title;
-		var btn_select_col_selected = column.getVisibility() ? 'btn-select-col-selected' : '';
+		var btn_select_col_selected = column.isVisible() ? 'btn-select-col-selected' : '';
 
 		// If certain columns should be excluded from the column picker (define them in a blacklist array)
 		if (typeof tableWidgetBlacklistArray_columnUnselectable != 'undefined' &&

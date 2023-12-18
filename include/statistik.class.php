@@ -52,6 +52,7 @@ class statistik extends basis_db
 	// Daten der Statistik
 	public $data; // DB ressource
 	public $html;
+	public $countRows;
 	public $csv;
 	public $json;
 
@@ -510,6 +511,7 @@ class statistik extends basis_db
 		$this->html='';
 		$this->csv='';
 		$this->json=array();
+		$this->countRows=0;
 		set_time_limit(120);
 
 		if($this->sql!='')
@@ -572,6 +574,7 @@ class statistik extends basis_db
 					$this->json[] = $row;
 					$this->html.= '</tr>';
 					$this->csv=substr($this->csv,0,-1)."\n";
+					$this->countRows++;
 				}
 				$this->html.= '</tbody>';
 			}
@@ -586,8 +589,7 @@ class statistik extends basis_db
 
 	function getHtmlTable($id, $class='')
 	{
-
-		return '<table class="'.$class.'" id="'.$id.'">'.$this->html.'</table>';
+		return '<p>'.$this->countRows.' Zeilen</p><table class="'.$class.'" id="'.$id.'">'.$this->html.'</table>';
 	}
 
 	function getCSV()

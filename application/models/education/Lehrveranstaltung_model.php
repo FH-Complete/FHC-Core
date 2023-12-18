@@ -200,6 +200,28 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
 	}
+	/**
+	 * Gets all Leiter of Lehrveranstaltungsorganisationseinheit
+	 * @param $lehrveranstaltung_id
+	 * @return array|null
+	 */
+	public function getLeitungOfLvOe($lehrveranstaltung_id)
+	{
+		$query = "select distinct vorname, nachname, uid
+				FROM
+				lehre.tbl_lehrveranstaltung lv
+				JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
+				JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)	
+				join public.tbl_benutzer b using (uid)
+				join public.tbl_person p using (person_id)
+				where
+				bf.datum_von <= now()::date
+				and (bf.datum_bis >= now()::date or bf.datum_bis is null)
+				and bf.funktion_kurzbz = 'Leitung' -- Leitung of LV-OE
+				and lehrveranstaltung_id = ?";
+
+		return $this->execQuery($query, array($lehrveranstaltung_id));
+	}
 
 	/**
 	 * Gets Lehrveranstaltungen of a student

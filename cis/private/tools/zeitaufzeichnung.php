@@ -229,6 +229,21 @@ $( document ).ready(function()
 </script>
 ';
 
+echo <<<EOSBJS
+<script>
+	$(document).ready(function() {
+        const scrollDiv = document.createElement('div');
+        scrollDiv.style.cssText = 'width: 99px; height: 99px; overflow: scroll; position: absolute; top: -9999px;';
+        document.body.appendChild(scrollDiv);
+        const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+        document.body.removeChild(scrollDiv);
+		var marginright = Math.max((20 - scrollbarWidth), 0);
+        document.body.style.setProperty('width', 'calc(100% - ' + marginright + 'px)');
+    });
+</script>
+
+EOSBJS;
+
 echo '
         <script type="text/javascript">
 		$(document).ready(function()
@@ -1433,7 +1448,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		$sem_akt = $stsem->getakt();
 		$lehre = new zeitaufzeichnung();
 		$l_arr = $lehre->getLehreForUser($user, $sem_akt);
-		if ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0)
+		$displayLehresaldo = false;
+		if ($displayLehresaldo && ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0))
 		{
 			if ($lehre_inkludiert == -1)
 			{
@@ -1620,7 +1636,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
 			        <td '.$style.' colspan="3" align="right">';
 					if ($tag > $sperrdatum)
-					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
+					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&larr;</a>';
 
 					echo '</td></tr>';
 

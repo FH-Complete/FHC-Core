@@ -783,6 +783,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									class="sortDirectionIndicator"
 									sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#statusgrund" />
 								<splitter class="tree-splitter"/>
+								<treecol id="student-prestudent-tree-rolle-statusgrund" label="Insertamum" flex="1" hidden="true" persist="hidden, width, ordinal"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertamum" />
+								<splitter class="tree-splitter"/>
+								<treecol id="student-prestudent-tree-rolle-insertvon" label="Insertvon" flex="1" hidden="true" persist="hidden, width, ordinal"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertvon" />
+								<splitter class="tree-splitter"/>
+								<treecol id="student-prestudent-tree-rolle-updateamum" label="Updateamum" flex="1" hidden="true" persist="hidden, width, ordinal"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updateamum" />
+								<splitter class="tree-splitter"/>
+								<treecol id="student-prestudent-tree-rolle-updatevon" label="Updatevon" flex="1" hidden="true" persist="hidden, width, ordinal"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updatevon" />
+								<splitter class="tree-splitter"/>
 							</treecols>
 
 							<template>
@@ -804,6 +820,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_am"/>
 												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bewerbung_abgeschicktamum"/>
 												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#statusgrund"/>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertamum"/>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertvon"/>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updateamum"/>
+												<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updatevon"/>
 											</treerow>
 										</treeitem>
 									</treechildren>

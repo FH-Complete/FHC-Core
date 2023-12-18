@@ -2502,10 +2502,15 @@ if(!$error)
 	{
 		$person_ids = explode(';',$_POST['person_ids']);
 		$exists = false;
-		if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK') && (in_array($_POST['buchungstyp_kurzbz'], unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK))))
+		if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK'))
 		{
-			$konto = new konto();
-			$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $_POST['buchungstyp_kurzbz']);
+			$buchungen = unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK);
+			$buchung = $_POST['buchungstyp_kurzbz'];
+			if (isset($buchungen[$buchung]))
+			{
+				$konto = new konto();
+				$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $buchungen[$buchung]);
+			}
 		}
 
 		if($exists)

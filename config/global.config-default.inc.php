@@ -47,6 +47,9 @@ define('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN',true);
 // Zeitaufzeichnung gesperrt_bis Datum YYYY-MM-DD
 define('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS','');
 
+// maximale Dauer einer Zeitsperre in Tagen
+define('CIS_ZEITSPERREN_MAX_DAUER', 730);
+
 // Anzeige des Links zur Noteneingabe in der LVA Uebersicht
 define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 

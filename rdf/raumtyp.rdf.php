@@ -56,10 +56,11 @@ foreach ($raumtypDAO->result as $rt)
 {
 	?>
   <RDF:li>
-      	<RDF:Description  id="<?php echo $rt->raumtyp_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$rt->raumtyp_kurzbz; ?>" >
-        	<RAUMTYP:kurzbz><?php echo $rt->raumtyp_kurzbz  ?></RAUMTYP:kurzbz>
-    		<RAUMTYP:beschreibung><?php echo $rt->beschreibung  ?></RAUMTYP:beschreibung>
-      	</RDF:Description>
+	<RDF:Description  id="<?php echo $rt->raumtyp_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$rt->raumtyp_kurzbz; ?>" >
+			<RAUMTYP:kurzbz><?php echo $rt->raumtyp_kurzbz  ?></RAUMTYP:kurzbz>
+			<RAUMTYP:beschreibung><?php echo $rt->beschreibung  ?></RAUMTYP:beschreibung>
+			<RAUMTYP:aktiv><?php echo ($rt->aktiv ? "true" : "false") ?></RAUMTYP:aktiv>
+	</RDF:Description>
   </RDF:li>
 	  <?php
 }
