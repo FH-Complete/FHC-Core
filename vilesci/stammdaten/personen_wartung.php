@@ -455,6 +455,58 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				}
 			}
 
+			if($result = @$db->db_query("SELECT 1 FROM public.tbl_rueckstellung LIMIT 1"))
+			{
+				$rueckstellung_has_personToKeep = array();
+				$rueckstellung_has_personToDelete = array();
+
+				$rueckstellung_query = "
+					SELECT rueckstellung_id, person_id
+					FROM public.tbl_rueckstellung
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)
+					ORDER BY insertamum DESC NULLS LAST";
+
+				// Herausfinden, ob Rueckstellung Daten der löschenden oder zu belassenden Person zugeordnet sind
+				if ($result = $db->db_query($rueckstellung_query))
+				{
+					while ($row = $db->db_fetch_object($result))
+					{
+						if ($row->person_id === $personToKeep)
+						{
+							$rueckstellung_has_personToKeep[] = $row;
+						}
+						else if ($row->person_id === $personToDelete)
+						{
+							$rueckstellung_has_personToDelete[] = $row;
+						}
+					}
+				}
+
+				// wenn Rueckstellung Daten an Person, die gelöscht werden soll, hängen
+				if (!empty($rueckstellung_has_personToDelete))
+				{
+					// Wenn es auch Rueckstellung Daten für die Person, die bleibt, gibt
+					if (!empty($rueckstellung_has_personToKeep))
+					{
+						// Unklar: welche Version der Daten soll behalten werden?
+						$msg_error[] = 'Beide Personen haben Rückstellung Daten. Können nicht zusammengelegt werden.<br>
+						Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.';
+						$error = true;
+					}
+					else
+					{
+						// Es gibt nur Rueckstellung Daten für die zu löschende Person: Update
+						foreach ($rueckstellung_has_personToDelete as $rueckstellung_toDelete)
+						{
+							$sql_query_upd1 .= "UPDATE public.tbl_rueckstellung SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE rueckstellung_id=" . $db->db_add_param($rueckstellung_toDelete->rueckstellung_id, FHC_INTEGER) . ";";
+						}
+					}
+				}
+			}
+
 			if ($error == false)
 			{
 				// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
