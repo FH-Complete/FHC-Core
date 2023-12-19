@@ -639,7 +639,7 @@ class Profil extends Auth_Controller
 		$res->mittel = $betriebsmittelperson_res;
 		$res->matrikelnummer = $matr_res->matr_nr;
 		foreach($student_res as $key => $value){
-			$res->$key = $value;
+			$res->$key = trim($value);
 		}
 		$res->zuttritsgruppen = $zutrittsgruppe_res;
 

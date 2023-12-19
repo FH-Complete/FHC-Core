@@ -366,9 +366,9 @@ export default {
                              <div class="row">
                              <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
                              
-                            
+                          
                              <div  class=" form-floating mb-2">  
-                            
+                           
                                  <input   readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
                                  <label :for="'floating'+bez">{{bez}}</label>
                                  </div>
