@@ -262,7 +262,7 @@ class Profil extends Auth_Controller
 		
 		$intern_email = array();
 			$intern_email+=array("type" => "intern");
-			$intern_email+=array("email"=> $this->uid . "@" . DOMAIN);
+			$intern_email+=array("email"=> $uid . "@" . DOMAIN);
 		
 			$res->emails = array($intern_email);
 	
