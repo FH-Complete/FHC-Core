@@ -187,7 +187,7 @@ export default {
 
   template: ` 
 
-  <div class="container-fluid text-break"  >
+  <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->

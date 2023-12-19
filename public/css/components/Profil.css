@@ -41,10 +41,10 @@
   background-color:white;
 }
 
-.form-control:focus{
+.fhc-form .form-control:focus{
   border-color:white;
   box-shadow:none;
-}
+} 
 
 /*   dl {
     width: 100%;

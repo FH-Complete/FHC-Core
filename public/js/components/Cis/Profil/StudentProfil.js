@@ -199,7 +199,7 @@ export default {
 
   template: ` 
 
-  <div class="container-fluid text-break"  >
+  <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
           <div class="row">
           <!-- HIDDEN QUICK LINKS -->
@@ -328,12 +328,6 @@ export default {
                 
                   </div>
                   
-
-
-
-
-
-
 
                   <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
                   <div class=" form-floating mb-2">
