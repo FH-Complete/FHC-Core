@@ -163,6 +163,7 @@ export default {
   },
 
   computed: {
+    //? legacy mailto link to create an email with information that should be changed
     refreshMailTo() {
       return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`;
     },
@@ -190,7 +191,7 @@ export default {
       return {
         Username: this.data.username,
         Anrede: this.data.anrede,
-        Titel: this.data.titel,
+        Titel: this.data.titelpre,
         Postnomen: this.data.postnomen,
       };
     },
@@ -437,8 +438,11 @@ export default {
                             
                              <div  class=" form-floating mb-2">  
                               <!-- print Telefon link -->
-                                 <a v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon"  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  >{{wert?wert:''}}</a>  
-                                 
+                               
+                                <a v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez">
+                                  <input :role="get_mitarbeiter_standort_telefon?'button':''" readonly :value="wert?wert:'-'" class="w-100" style="border:none; outline:none;" />
+                                </a>
+
                               <!-- otherwise print input field -->
                                  <input v-else  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
                                  <label :for="'floating'+bez">{{bez}}</label>
@@ -503,8 +507,10 @@ export default {
                       </div>
                       <div class="col">
                       <div class=" form-floating mb-2">
-                            <a  :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type" >{{email.email}}</a>
-                      <label :for="'floating'+email.type">{{email.type }}</label>
+                            <a :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
+                              <input role="button" readonly :value="email.email" class="w-100" style="border:none; outline:none;" />
+                            </a>
+                            <label :for="'floating'+email.type">{{email.type }}</label>
                       </div>
                       </div>
                       </div>
@@ -544,13 +550,25 @@ export default {
                                   
                                   <!-- rendering KONTAKT emails -->
                                   <div v-if="element.kontakt.includes('@')" class=" form-floating mb-2">
-                                      <a :href="'mailto:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" id="floatingKontakt" >{{element.kontakt}}</a>
-                                      <label for="floatingKontakt">{{element.kontakttyp}}</label>
+
+
+                                      <a :href="'mailto:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
+                                        <input role="button" readonly :value="element.kontakt" class="w-100" style="border:none; outline:none;" />
+                                      </a>
+                                      <label :for="'floating'+element.kontakttyp">{{element.kontakttyp}}</label>
+
+                                     
                                   </div>
                                   <!-- rendering KONTAKT phones -->
                                   <div v-else class=" form-floating mb-2">
-                                      <a :href="'tel:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" id="floatingKontakt" >{{element.kontakt}}</a>
-                                      <label for="floatingKontakt">{{element.kontakttyp}}</label>
+
+
+                                      <a :href="'tel:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
+                                        <input role="button" readonly :value="element.kontakt" class="w-100" style="border:none; outline:none;" />
+                                      </a>
+                                      <label :for="'floating'+element.kontakttyp">{{element.kontakttyp}}</label>
+
+                                     
                                   </div>
 
                               </div>

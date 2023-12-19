@@ -1,24 +1,21 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
-
 export default {
   components: {
     CoreFilterCmpt,
   },
   data() {
     return {
-      collapseIconFunktionen:true,
-
+      collapseIconFunktionen: true,
+     
       funktionen_table_options: {
-        height: 400,
-        layout:"fitColumns",
-        responsiveLayout:"collapse",
-        responsiveLayoutCollapseUseFormatters:false,
-        responsiveLayoutCollapseFormatter:Vue.$collapseFormatter,
-        
+        height: 300,
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
+        responsiveLayoutCollapseUseFormatters: false,
+        responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
         data: [
-          
           {
             Bezeichnung: "",
             Organisationseinheit: "",
@@ -28,87 +25,116 @@ export default {
           },
         ],
         columns: [
-         
-         {
-          title: "<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
-          field: "collapse",
-          headerSort: false,
-          headerFilter:false,
-          formatter:"responsiveCollapse",
-          maxWidth:40,
-          headerClick:this.collapseFunction,
-        }, 
-          { title: "Bezeichnung", field: "Bezeichnung", headerFilter: true,minWidth:200, },
+          //? option when wanting to hide the collapsed list
+
+          {
+            title:
+              "<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
+            field: "collapse",
+            headerSort: false,
+            headerFilter: false,
+            formatter: "responsiveCollapse",
+            maxWidth: 40,
+            headerClick: this.collapseFunction,
+          },
+          {
+            title: "Bezeichnung",
+            field: "Bezeichnung",
+            headerFilter: true,
+            minWidth: 200,
+          },
           {
             title: "Organisationseinheit",
             field: "Organisationseinheit",
-            headerFilter: true,minWidth:200,
+            headerFilter: true,
+            minWidth: 200,
           },
-          { title: "Gültig_von", field: "Gültig_von", headerFilter: true, resizable:true,minWidth:200, },
-          { title: "Gültig_bis", field: "Gültig_bis", headerFilter: true, resizable:true,minWidth:200, },
+          {
+            title: "Gültig_von",
+            field: "Gültig_von",
+            headerFilter: true,
+            resizable: true,
+            minWidth: 200,
+          },
+          {
+            title: "Gültig_bis",
+            field: "Gültig_bis",
+            headerFilter: true,
+            resizable: true,
+            minWidth: 200,
+          },
           {
             title: "Wochenstunden",
             field: "Wochenstunden",
             headerFilter: true,
-            minWidth:200,
+            minWidth: 200,
           },
-          
         ],
       },
-    
-   
+     
     };
   },
+
   //? this is the prop passed to the dynamic component with the custom data of the view
   props: ["data"],
   methods: {
-   
-    sperre_foto_function(value) {
-      if (!this.data) {
-        return;
-      }
-      fhcapifactory.UserData.sperre_foto_function(value).then((res) => {
-        this.data.foto_sperre = res.data.foto_sperre;
-      });
-    },
-    collapseFunction (e, column){
-
+    
+    collapseFunction(e, column) {
       //* the if of the column has to match with the name of the responsive data in the vue component
       this[e.target.id] = !this[e.target.id];
 
       //* gets all event icons of the different rows to use the onClick event later
-      let allClickableIcons = column._column.cells.map(row => {
+      let allClickableIcons = column._column.cells.map((row) => {
         return row.element.children[0];
       });
-      
+
       //* changes the icon that shows or hides all the collapsed columns
       //* if the replace function does not find the class to replace, it just simply returns false
-      if(this[e.target.id]){
-        e.target.classList.replace("fa-angle-up","fa-angle-down");
-      }else{
-        e.target.classList.replace("fa-angle-down","fa-angle-up");
+      if (this[e.target.id]) {
+        e.target.classList.replace("fa-angle-up", "fa-angle-down");
+      } else {
+        e.target.classList.replace("fa-angle-down", "fa-angle-up");
       }
-      
+
       //* changes the icon for every collapsed column to open or closed
-        if(this[e.target.id]){
-          allClickableIcons.filter(column => {
+      if (this[e.target.id]) {
+        allClickableIcons
+          .filter((column) => {
             return !column.classList.contains("open");
-          }).forEach(col => {col.click();})
-        }else{
-          allClickableIcons.filter(column => {
+          })
+          .forEach((col) => {
+            col.click();
+          });
+      } else {
+        allClickableIcons
+          .filter((column) => {
             return column.classList.contains("open");
-          }).forEach(col => {col.click();})
-        }
+          })
+          .forEach((col) => {
+            col.click();
+          });
+      }
+    },
   },
-  },
+
   computed: {
+    
+
     get_image_base64_src() {
       if (!this.data) {
         return "";
       }
       return "data:image/jpeg;base64," + this.data.foto;
     },
-    //? this computed function returns all the informations for the first column in the profil 
+
+    get_mitarbeiter_standort_telefon(){
+      if(this.data.standort_telefon){
+        return "tel:"+ this.data.telefonklappe + this.data.standort_telefon;
+      }else{
+        return null;
+      }
+    },
+    //? this computed function returns all the informations for the first column in the profil
     personData() {
       if (!this.data) {
         return {};
@@ -117,7 +143,7 @@ export default {
       return {
         Username: this.data.username,
         Anrede: this.data.anrede,
-        Titel: this.data.titel,
+        Titel: this.data.titelpre,
         Postnomen: this.data.postnomen,
       };
     },
@@ -139,29 +165,27 @@ export default {
       }
 
       return {
-       
+        
         Kurzzeichen: this.data.kurzbz,
-        Telefon: this.data.telefonklappe,
+        Telefon: this.data.telefonklappe + (this.data.standort_telefon?this.data.standort_telefon:""),
         Büro: this.data.ort_kurzbz,
       };
     },
-    
-    
+
+  
   },
 
   mounted() {
+  
 
+    this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
+      this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
+    });
 
-    this.$refs.funktionenTable.tabulator.on('tableBuilt', () => {
-    
-        this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
-        
-    }) 
-
+   
   },
 
-  template: `
- 
+  template: ` 
 
   <div class="container-fluid text-break"  >
     <!-- ROW --> 
@@ -198,11 +222,11 @@ export default {
               <!-- END OF HIDDEN QUCK LINKS -->
 
 
-             
+            
 
 
               <!-- MAIN PANNEL -->
-              <div class="col-sm-12 col-md-9">
+              <div class="col-sm-12 col-md-8 col-xxl-9 ">
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
                
               
@@ -254,14 +278,7 @@ export default {
            <div class="row justify-content-center">
                         <div class="col-auto " style="position:relative">
                           <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"></img>
-                          <!-- LOCKING IMAGE FUNCTIONALITY -->
-                          
-                          
-                          <div role="button" @click.prevent="sperre_foto_function" style="height:22px; width:21px; background-color:white; position:absolute; top:0; right:12px; display:flex; align-items:center; justify-content:center;" >
-                          <i :class="{'fa':true, ...(data.foto_sperre?{'fa-lock':true}:{'fa-lock-open':true})} " ></i>
-                          
-                          
-                          </div>
+                         
                         </div>
                       </div>
                     <!-- END OF THE ROW WITH THE IMAGE -->
@@ -276,15 +293,15 @@ export default {
                   <div class="col-12">
                   <div class=" form-floating mb-2">
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.vorname">
-                  <label for="floatingInputValue">Vorname</label>
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingVorname"  :value="data.vorname">
+                  <label for="floatingVorname">Vorname</label>
                 </div>
                 </div>
                 <div class="col-12">
                 <div class=" form-floating mb-2">
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue"  :value="data.nachname">
-                  <label for="floatingInputValue">Nachname</label>
+                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingNachname"  :value="data.nachname">
+                  <label for="floatingNachname">Nachname</label>
                 </div>
                 </div>
                 </div>
@@ -302,8 +319,8 @@ export default {
                   <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
                   <div class=" form-floating mb-2">
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
-                  <label for="floatingInputValue">{{bez}}</label>
+                  <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
+                  <label :for="'floating'+bez">{{bez}}</label>
                   </div>
                   </div>
 
@@ -329,9 +346,16 @@ export default {
                          <div class="card-body">
                              <div class="row">
                              <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
-                                 <div class=" form-floating mb-2">    
-                                 <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingInputValue" placeholder="name@example.com" :value="wert?wert:'-'">
-                                 <label for="floatingInputValue">{{bez}}</label>
+                             
+                            
+                             <div  class=" form-floating mb-2">  
+                              <!-- print Telefon link -->
+                                <a v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez">
+                                  <input :role="get_mitarbeiter_standort_telefon?'button':''" readonly :value="wert?wert:'-'" class="w-100" style="border:none; outline:none;" />
+                                </a>
+                              <!-- otherwise print input field -->
+                                 <input v-else  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
+                                 <label :for="'floating'+bez">{{bez}}</label>
                                  </div>
                              </div>
                          </div>
@@ -382,13 +406,24 @@ export default {
                       <!-- HIER SIND DIE EMAILS -->
                   
                   
-                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center">
+                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center ">
                       <div  class="col-12 ">
+                     
+                            <div class="row align-items-center">
+                      <div class="col-1 text-center">
+
+                      <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
+
+                      </div>
+                      <div class="col">
                       <div class=" form-floating mb-2">
                             
-                      <a  :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" id="floatingFhAusweis" >{{email.email}}</a>
-                      <label for="floatingFhAusweis">{{email.type }}</label>
-                    
+                      <a :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
+                              <input role="button" readonly :value="email.email" class="w-100" style="border:none; outline:none;" />
+                            </a>
+                            <label :for="'floating'+email.type">{{email.type }}</label>
+                      </div>
+                      </div>
                       </div>
                       </div>
                           </div>
@@ -408,14 +443,6 @@ export default {
                     </div>
                     </div></div>
 
-                  
-
-                    <!-- HIER SIND DIE PRIVATEN ADRESSEN-->
-                    <div class="row mb-4">
-                      <div class="col">
-                                              </div>
-                    </div>
-                    <!-- -->
 
 
 
@@ -431,13 +458,7 @@ export default {
 
 
 
-                <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
-                <div class="row">
-                  <div   class="col ">
-                    <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
-                  </div>
-                </div>
-                <!-- END OF REFRESHING LINK ROW -->
+                
 
 
 
@@ -450,10 +471,7 @@ export default {
                     <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   </div>
 
-                <!-- SECOND TABLE -->
-                  <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
-                  </div>
+               
 
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
                 </div>
@@ -471,7 +489,7 @@ export default {
 
 
               <!-- START OF SIDE PANEL -->
-              <div  class="col-md-3 col-sm-12 text-break" >
+              <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
 
 
               <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
@@ -502,6 +520,8 @@ export default {
                   </div>
                 </div>
 
+              
+
 
                 <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
                 <div  class="row">
@@ -521,18 +541,18 @@ export default {
                         <div  class="card-text row text-break mb-2" v-for="verteiler in data?.mailverteiler">
                           <div class="col-12 ">
                             <div class="row">  
-                              <div class="col-1">
+                              <div class="col-1 ">
                               
                               <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
                               
                               </div>
-                              <div class="col-11">
+                              <div class="col">
                                 <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
                               </div>
                             </div>
                            
                           </div> 
-                          <div class="col-12 ">{{verteiler.beschreibung}}</div>
+                          <div class="col-11 offset-1 ">{{verteiler.beschreibung}}</div>
                         </div>
 
                       </div>
@@ -562,6 +582,5 @@ export default {
       <!-- END OF CONTAINER -->
   </div>
             
-    
     `,
 };

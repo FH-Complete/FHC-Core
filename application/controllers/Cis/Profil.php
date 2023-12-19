@@ -129,13 +129,13 @@ class Profil extends Auth_Controller
 		}
 
 		//? querying the telefon number of the office
-		if(isSuccess($this->MitarbeiterModel->addSelect(["mitarbeiter_uid"])) &&
+		if(isSuccess($this->MitarbeiterModel->addSelect(["kontakt"])) &&
 			isSuccess($this->MitarbeiterModel->addJoin("tbl_kontakt", "tbl_mitarbeiter.standort_id = tbl_kontakt.standort_id"))
 			
 			
 		){
 			$this->MitarbeiterModel->addLimit(1);
-			$telefon_res = $this->MitarbeiterModel->loadWhere(["mitarbeiter_uid"=>$this->uid, "kontakttyp"=>"telefon"]);
+			$telefon_res = $this->MitarbeiterModel->loadWhere(["mitarbeiter_uid"=>$uid, "kontakttyp"=>"telefon"]);
 			if(isError($telefon_res)){
 				// error handling
 			}else{
@@ -179,7 +179,7 @@ class Profil extends Auth_Controller
 		//? Mailverteiler Info
 		$res->mailverteiler = $mailverteiler_res;
 
-		$res->standort_telefon = $telefon_res;
+		$res->standort_telefon = $telefon_res->kontakt;
 		 
 		return $res;
 
