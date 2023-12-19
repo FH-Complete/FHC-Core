@@ -1728,7 +1728,7 @@ class AntragLib
 				if (isset($lvs['repeat_last'])) {
 					$repeat_last = true;
 					unset($lvs['repeat_last']);
-					$vorlage .= '_Last';
+					$vorlage .= '_Lst';
 				}
 				foreach ($lvs as $sem => $lv_list) {
 					$lvs_filtered = array_filter($lv_list, function ($el) {
