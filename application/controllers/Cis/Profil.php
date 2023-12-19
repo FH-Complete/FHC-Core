@@ -128,6 +128,21 @@ class Profil extends Auth_Controller
 			}
 		}
 
+		//? querying the telefon number of the office
+		if(isSuccess($this->MitarbeiterModel->addSelect(["mitarbeiter_uid"])) &&
+			isSuccess($this->MitarbeiterModel->addJoin("tbl_kontakt", "tbl_mitarbeiter.standort_id = tbl_kontakt.standort_id"))
+			
+			
+		){
+			$this->MitarbeiterModel->addLimit(1);
+			$telefon_res = $this->MitarbeiterModel->loadWhere(["mitarbeiter_uid"=>$this->uid, "kontakttyp"=>"telefon"]);
+			if(isError($telefon_res)){
+				// error handling
+			}else{
+				$telefon_res = hasData($telefon_res)? getData($telefon_res)[0] : null;
+			}
+		}
+
 		
 		$res = new stdClass();
 		$res->username = $uid;
@@ -163,6 +178,8 @@ class Profil extends Auth_Controller
 	
 		//? Mailverteiler Info
 		$res->mailverteiler = $mailverteiler_res;
+
+		$res->standort_telefon = $telefon_res;
 		 
 		return $res;
 
@@ -301,6 +318,9 @@ class Profil extends Auth_Controller
 				
 			}
 
+
+			//$this->MitarbeiterModel->load($this->uid);
+
 			//? FH Ausweis Austellungsdatum soll auch nur der user selbst sehen
 			$zutrittskarte_ausgegebenam = $this->BetriebsmittelpersonModel->getBetriebsmittelByUid($this->uid,"Zutrittskarte");
 			if(isError($zutrittskarte_ausgegebenam)){
@@ -378,10 +398,28 @@ class Profil extends Auth_Controller
 		}
 	
 	
+		//? querying the telefon number of the office
+		if(isSuccess($this->MitarbeiterModel->addSelect(["mitarbeiter_uid"])) &&
+			isSuccess($this->MitarbeiterModel->addJoin("tbl_kontakt", "tbl_mitarbeiter.standort_id = tbl_kontakt.standort_id"))
+			
+			
+		){
+			$this->MitarbeiterModel->addLimit(1);
+			$telefon_res = $this->MitarbeiterModel->loadWhere(["mitarbeiter_uid"=>$this->uid, "kontakttyp"=>"telefon"]);
+			if(isError($telefon_res)){
+				// error handling
+			}else{
+				$telefon_res = hasData($telefon_res)? getData($telefon_res)[0] : null;
+			}
+		}
+			
+			
+			
 		
 	
-		if(isSuccess($this->MitarbeiterModel->addSelect(["kurzbz","telefonklappe", "alias","ort_kurzbz"]))
+		if(isSuccess($this->MitarbeiterModel->addSelect(["kurzbz","tbl_mitarbeiter.telefonklappe", "alias","ort_kurzbz"]))
 			&& isSuccess($this->MitarbeiterModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid"))
+			
 		){
 			$mitarbeiter_res = $this->MitarbeiterModel->load($this->uid);
 				if(isError($mitarbeiter_res)){
@@ -426,6 +464,9 @@ class Profil extends Auth_Controller
 			$res->emails = array($intern_email,$extern_email);
 			
 			$res->funktionen = $benutzer_funktion_res;
+
+			//telefon nummer von dem Standort
+			$res->standort_telefon = $telefon_res;
 			return $res;
 	}
 	

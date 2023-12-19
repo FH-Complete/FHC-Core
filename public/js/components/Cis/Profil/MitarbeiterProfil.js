@@ -173,6 +173,14 @@ export default {
       }
       return "data:image/jpeg;base64," + this.data.foto;
     },
+
+    get_mitarbeiter_standort_telefon(){
+      if(this.data.standort_telefon){
+        return "tel:"+ this.data.telefonklappe + this.data.standort_telefon;
+      }else{
+        return null;
+      }
+    },
     //? this computed function returns all the informations for the first column in the profil
     personData() {
       if (!this.data) {
@@ -207,7 +215,7 @@ export default {
         Geburtsdatum: this.data.gebdatum,
         Geburtsort: this.data.gebort,
         Kurzzeichen: this.data.kurzbz,
-        Telefon: this.data.telefonklappe,
+        Telefon: this.data.telefonklappe + (this.data.standort_telefon?this.data.standort_telefon:""),
         Büro: this.data.ort_kurzbz,
       };
     },
@@ -253,6 +261,8 @@ export default {
     this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
       this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
     });
+
+   
   },
 
   template: ` 
@@ -423,8 +433,14 @@ export default {
                          <div class="card-body">
                              <div class="row">
                              <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
-                                 <div class=" form-floating mb-2">    
-                                 <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
+                             
+                            
+                             <div  class=" form-floating mb-2">  
+                              <!-- print Telefon link -->
+                                 <a v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon"  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  >{{wert?wert:''}}</a>  
+                                 
+                              <!-- otherwise print input field -->
+                                 <input v-else  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
                                  <label :for="'floating'+bez">{{bez}}</label>
                                  </div>
                              </div>
@@ -480,7 +496,7 @@ export default {
                       <div  class="col-12 ">
                      
                             <div class="row align-items-center">
-                      <div class="col-1">
+                      <div class="col-1 text-center">
 
                       <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
 
@@ -517,17 +533,26 @@ export default {
                           <div class="card-header">
                             Private Kontakte
                           </div>
-                          <div class="card-body text-center">
+                          <div class="card-body ">
                             
                             <div v-for="element in privateKontakte" class="align-items-center row justify-content-center">
-                              <div class="col-1">
-                              <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
+                              <div class="col-1 text-center" >
+                              
+                              <i class="fa-solid " :class="{...(element.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" style="color:rgb(0, 100, 156)"></i>
                               </div>
                               <div  :class="{...(element.anmerkung? {'col-11':true, 'col-md-5':true, 'col-xl-11':true, 'col-xxl-5':true} : {'col-9':true, 'col-xl-9':true})}">
-                                  <div class=" form-floating mb-2">
-                                      <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingKontakt" :value="element.kontakt">
+                                  
+                                  <!-- rendering KONTAKT emails -->
+                                  <div v-if="element.kontakt.includes('@')" class=" form-floating mb-2">
+                                      <a :href="'mailto:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" id="floatingKontakt" >{{element.kontakt}}</a>
                                       <label for="floatingKontakt">{{element.kontakttyp}}</label>
                                   </div>
+                                  <!-- rendering KONTAKT phones -->
+                                  <div v-else class=" form-floating mb-2">
+                                      <a :href="'tel:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" id="floatingKontakt" >{{element.kontakt}}</a>
+                                      <label for="floatingKontakt">{{element.kontakttyp}}</label>
+                                  </div>
+
                               </div>
                               <div v-if="element?.anmerkung" class="offset-1 offset-md-0 col-9 col-md-4  offset-xl-1 offset-xxl-0 col-xl-9 col-xxl-4 order-2 order-md-1 order-xl-1 order-sm-1 order-xxl-1  ">
                                   <div class=" form-floating mb-2">
@@ -610,13 +635,7 @@ export default {
 
 
 
-                <!-- LITTLE EXTRA ROW WITH INFORMATION REFRESHING LINK -->
-                <div class="row">
-                  <div   class="col ">
-                    <p>Sollten Ihre Daten nicht mehr aktuell sein, klicken Sie bitte <a :href="refreshMailTo">hier</a></p>
-                  </div>
-                </div>
-                <!-- END OF REFRESHING LINK ROW -->
+                
 
 
 
