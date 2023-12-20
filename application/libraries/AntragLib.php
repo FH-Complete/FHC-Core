@@ -1499,6 +1499,8 @@ class AntragLib
 		$resultDetails->grund = $resultAntrag->grund;
 		$resultDetails->studierendenantrag_id = $resultAntrag->studierendenantrag_id;
 		$resultDetails->typ = $resultAntrag->typ;
+		$resultDetails->datum = $resultAntrag->datum;
+		$resultDetails->studiensemester_kurzbz = $resultAntrag->studiensemester_kurzbz;
 
 		return success($resultDetails);
 	}
@@ -1600,9 +1602,9 @@ class AntragLib
 		);
 	}
 
-	public function getFailedExamForPrestudent($prestudent_id)
+	public function getFailedExamForPrestudent($prestudent_id, $max_date = null, $studiensemester_kurzbz = null)
 	{
-		return $this->_ci->PruefungModel->loadWhereCommitteeExamFailedForPrestudent($prestudent_id);
+		return $this->_ci->PruefungModel->loadWhereCommitteeExamFailedForPrestudent($prestudent_id, $max_date, $studiensemester_kurzbz);
 	}
 
 	public function saveLvs($lvArray)
