@@ -75,12 +75,18 @@ class Leitung extends FHC_Controller
 		$this->outputJsonSuccess($stgs);
 	}
 
-	public function getAntraege($studiengang = null)
+	public function getAntraege($studiengang = null, $extra = null)
 	{
+		if ($studiengang && $studiengang == 'todo') {
+			$studiengang = $extra;
+			$extra = true;
+		} else {
+			$extra = false;
+		}
 
-		if($studiengang)
+		if ($studiengang) {
 			$studiengaenge = [$studiengang];
-		else {
+		} else {
 			$studiengaenge =$this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe');
 			if(!is_array($studiengaenge))
 				$studiengaenge = [];
@@ -96,7 +102,9 @@ class Leitung extends FHC_Controller
 
 		$antraege = [];
 		if ($studiengaenge) {
-			$result = $this->StudierendenantragModel->loadForStudiengaenge($studiengaenge);
+			$result = $extra
+				? $this->StudierendenantragModel->loadActiveForStudiengaenge($studiengaenge)
+				: $this->StudierendenantragModel->loadForStudiengaenge($studiengaenge);
 			if (isError($result)) {
 				$this->output->set_status_header(500);
 				return $this->outputJson('Internal Server Error');
