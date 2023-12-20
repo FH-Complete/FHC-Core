@@ -4488,7 +4488,7 @@ When on hold, the date is only a reminder.',
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
@@ -4818,7 +4818,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'core',
 		'category' => 'password',
@@ -22515,7 +22515,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bismeldestichtage verwalten',
+				'text' => 'BIS-Meldestichtage verwalten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
