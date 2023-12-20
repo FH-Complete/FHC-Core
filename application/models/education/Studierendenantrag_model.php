@@ -26,9 +26,10 @@ class Studierendenantrag_model extends DB_Model
 		return $this->loadForStudiengaenge($studiengaenge, $typ, $this->StudierendenantragstatusModel::STATUS_CREATED);
 	}
 
-	public function loadForStudiengaenge($studiengaenge, $typ = null, $status = null)
+	public function loadForStudiengaenge($studiengaenge, $typ = null, $status = null, $sql = null)
 	{
-		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+		if ($sql == null)
+			$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
 
 		$this->addSelect('UPPER(stg.typ) || UPPER(stg.kurzbz) || \' \' || stg.bezeichnung AS bezeichnung');
 		$this->addSelect('bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform', false);
@@ -74,6 +75,9 @@ class Studierendenantrag_model extends DB_Model
 	}
 
 	public function loadActiveForStudiengaenge($studiengaenge) {
+		// NOTE(chris): get language before changing things in the global db object because getUserLanguage() might use it and it should not have been tampered with
+		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+
 		$this->db->group_start();
 		$this->db->where_not_in('s.studierendenantrag_statustyp_kurzbz', [
 			Studierendenantragstatus_model::STATUS_CANCELLED,
@@ -87,7 +91,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->db->group_end();
 		$this->db->group_end();
 
-		return $this->loadForStudiengaenge($studiengaenge);
+		return $this->loadForStudiengaenge($studiengaenge, null, null, $sql);
 	}
 
 	public function isInStudiengang($studierendenantrag_id, $studiengaenge)
