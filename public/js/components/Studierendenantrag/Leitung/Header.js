@@ -31,7 +31,14 @@ export default {
 		}
 	},
 	created() {
-		const values = window.localStorage.getItem(LOCAL_STORAGE_ID).split('/');
+		var values = 'todo';
+		const savedPath = window.localStorage.getItem(LOCAL_STORAGE_ID);
+		if (savedPath !== null) {
+			values = savedPath;
+		}
+
+		values = values.split('/');
+
 		if (values.length) {
 			if (values.length == 1) {
 				if (values[0] == 'todo')
@@ -49,8 +56,8 @@ export default {
 		<div class="col-auto row row-cols-lg-auto g-3 align-items-center">
 			<div class="col-12">
 				<select class="form-select" v-model="todo_value">
-					<option value="">{{$p.t('global', 'alle')}}</option>
 					<option value="todo">{{$p.t('global', 'aktiv')}}</option>
+					<option value="">{{$p.t('global', 'alle')}}</option>
 				</select>
 			</div>
 			<div class="col-12">

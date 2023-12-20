@@ -54,7 +54,8 @@ export default {
 			this.reload();
 		},
 		reload() {
-			this.$refs.table.reload(this.filter);
+			if (this.$refs.table)
+				this.$refs.table.reload(this.filter);
 			this.loadFilter();
 		},
 		download() {
@@ -336,6 +337,7 @@ export default {
 			ref="table"
 			:stg-a="stgkzA"
 			:stg-l="stgkzL"
+			:filter="filter"
 			v-model:columnData="columns"
 			v-model:selectedData="selectedData"
 			@action:approve="actionApprove"

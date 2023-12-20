@@ -13,7 +13,8 @@ export default {
 		selectedData: Array,
 		columnData: Array,
 		stgL: Array,
-		stgA: Array
+		stgA: Array,
+		filter: String
 	},
 	emits: [
 		'update:columnData',
@@ -90,7 +91,7 @@ export default {
 			movableColumns: true,
 			maxHeight: '50vh',
 			layout: "fitDataFill",
-			ajaxURL: this.ajaxUrl,
+			ajaxURL: this.ajaxUrl + (this.filter || ''),
 			persistence: { // NOTE(chris): do not store column titles
 				sort: true, //persist column sorting
 				filter: true, //persist filters
