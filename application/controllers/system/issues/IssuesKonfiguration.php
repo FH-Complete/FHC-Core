@@ -18,7 +18,8 @@ class IssuesKonfiguration extends Auth_Controller
 				'getApps' => 'admin:r',
 				'getFehlerKonfigurationByApp' => 'admin:r',
 				'saveFehlerKonfiguration' => 'admin:rw',
-				'deleteKonfiguration' => 'admin:rw'
+				'deleteKonfiguration' => 'admin:rw',
+				'deleteKonfigurationsWerte' => 'admin:rw'
 			)
 		);
 
@@ -202,6 +203,73 @@ class IssuesKonfiguration extends Auth_Controller
 
 		// output result (insert or update)
 		$this->outputJson($result);
+	}
+
+	/**
+	 * Deletes values of a Konfiguration.
+	 */
+	public function deleteKonfigurationsWerte()
+	{
+		$konfigurationstyp_kurzbz = $this->input->post('konfigurationstyp_kurzbz');
+		$fehlercode = $this->input->post('fehlercode');
+		$konfigurationsWert = $this->input->post('konfigurationsWert');
+
+		// check if Konfigurationstyp correctly passed
+		if (isEmptyString($konfigurationstyp_kurzbz)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'ungueltigerKonfigurationstyp'));
+
+		// check if fehlercode correctly passed
+		if (isEmptyString($fehlercode)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlercodeFehlt'));
+
+		// separate by semicolon if multiple values passed
+		$konfigurationsWert = explode(';', $konfigurationsWert);
+
+		// check if konfiguration already set for the fehlercode
+		$this->FehlerkonfigurationModel->addSelect('konfiguration');
+		$fehlerkonfigurationRes = $this->FehlerkonfigurationModel->loadWhere(
+			array(
+				'konfigurationstyp_kurzbz' => $konfigurationstyp_kurzbz,
+				'fehlercode' => $fehlercode
+			)
+		);
+
+		if (!hasData($fehlerkonfigurationRes)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerFehlerKonfigurationLaden'));
+
+		// if konfiguration exists, update values
+		if (hasData($fehlerkonfigurationRes))
+		{
+			$fehlerkonfiguration = getData($fehlerkonfigurationRes);
+
+			$existingKonf = json_decode($fehlerkonfiguration[0]->konfiguration);
+
+			if (!$existingKonf) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerJsonDekodierung'));
+
+			if (!is_array($existingKonf)) $existingKonf = array($existingKonf);
+
+			$newKonfArr = array_values(array_diff($existingKonf, $konfigurationsWert));
+
+			// if no konfiguration values left, delete whole entry
+			if (isEmptyArray($newKonfArr))
+			{
+				$this->outputJson(
+					$this->FehlerkonfigurationModel->delete(
+						array('konfigurationstyp_kurzbz' => $konfigurationstyp_kurzbz, 'fehlercode' => $fehlercode)
+					)
+				);
+			}
+			else
+			{
+				$newKonf = json_encode($newKonfArr);
+				if (!$newKonf) $this->terminateWithJsonError("error when encoding JSON");
+
+				// if there are still values, delete only part of the konfiguration
+				$this->outputJson(
+					$this->FehlerkonfigurationModel->update(
+						array('konfigurationstyp_kurzbz' => $konfigurationstyp_kurzbz, 'fehlercode' => $fehlercode),
+						array('konfiguration' => $newKonf, 'updateamum' => 'NOW()', 'updatevon' => $this->_uid)
+					)
+				);
+			}
+		}
 	}
 
 	/**

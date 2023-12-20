@@ -650,11 +650,14 @@ class organisationseinheit extends basis_db
 					LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
 					OR
 					LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
+					OR
+					LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
 				)';
 				foreach($searchItem as $value)
 				{
 					$qry.=' OR (LOWER(oe_kurzbz)=LOWER('.$this->db_add_param($value).'))
-							OR (LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))';
+							OR (LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))
+							OR (LOWER(organisationseinheittyp_kurzbz||bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))';
 				}
 		$qry.=	' ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
 

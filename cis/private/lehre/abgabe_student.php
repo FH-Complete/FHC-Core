@@ -124,7 +124,6 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)."
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";
 
-//AND tbl_projektarbeit.student_uid='$getuid' 'ie07m102';
 if(!$erg=$db->db_query($sql_query))
 {
 	$errormsg=$p->t('global/fehlerBeimLesenAusDatenbank');

@@ -242,7 +242,7 @@ class approveAnrechnungDetail extends Auth_Controller
         $empfehlungsanfrage_an = !isEmptyArray($result) ? implode(', ', array_column($result, 'fullname')) : '';
 
         // Request Recommendation
-        if($this->anrechnunglib->requestRecommendation($anrechnung_id))
+        if ($this->anrechnunglib->requestRecommendation($anrechnung_id))
         {
             $retval[]= array(
                 'anrechnung_id' => $anrechnung_id,
@@ -254,31 +254,23 @@ class approveAnrechnungDetail extends Auth_Controller
             );
         }
 
-		/**
-		 * Send mails to lectors
-		 * NOTE: mails are sent at the end to ensure sending only ONE mail to each LV-Leitung or lector
-		 * even if they are required for more recommendations
-		 * */
-		if (!isEmptyArray($retval))
-		{
-            if ($this->config->item('send_mail') === TRUE)
-            {
-                $this->_sendSanchoMailToLectors($anrechnung_id);
-            }
-
-			// Output json to ajax
-			return $this->outputJsonSuccess($retval);
-		}
-
 		// Output json to ajax
+        if ($empfehlungsanfrage_an == '')
+        {
+            $this->terminateWithJsonError(
+                "Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
+            );
+        }
+
 		if (isEmptyArray($retval))
 		{
-			$this->terminateWithJsonError(
-				"Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
-			);
+            $this->terminateWithJsonError("Empfehlung wurde nicht angefordert");
 		}
-
-		$this->terminateWithJsonError($this->p->t('ui', 'errorNichtAusgefuehrt'));
+        else
+        {
+            // Output json to ajax
+            return $this->outputJsonSuccess($retval);
+        }
 	}
 
 	/**

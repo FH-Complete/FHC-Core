@@ -39,9 +39,6 @@ export default {
 			selectedFields: []
 		};
 	},
-	computed: {
-		
-	},
 	watch: {
 		selected(n) {
 			this.selectedFields = n;
@@ -68,7 +65,7 @@ export default {
 				<div
 					v-for="fieldToDisplay in fields"
 					class="btn"
-					:class="selected.indexOf(fieldToDisplay) != -1 ? 'btn-dark' : 'btn-outline-dark' "
+					:class="selectedFields.indexOf(fieldToDisplay) != -1 ? 'btn-dark' : 'btn-outline-dark' "
 					@click="toggle(fieldToDisplay)"
 				>
 					{{ names[fieldToDisplay] || fieldToDisplay }}

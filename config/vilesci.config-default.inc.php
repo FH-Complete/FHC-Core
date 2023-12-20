@@ -75,7 +75,7 @@ define('AUTH_NAME', 'FH Complete');
  * LDAP_BIND_USER: DN des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_BIND_PASSWORD: Passwort des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_USER_SEARCH_FILTER: LDAP Attribut in dem der Username steht nach dem gesucht wird (uid | sAMAccountName)
- * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false)
+ * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false) - wirksam für alle LDAP Server
  */
 define('LDAP_SERVER', 'ldap://ldap.example.com');
 define('LDAP_PORT', 389);
@@ -276,7 +276,13 @@ define('DOCSBOX_WAITING_SLEEP_TIME', 1);
 // Bei folgenden Buchungstypen wird ein Anlegen geprüft ob bereits ein Eintrag für diesen Typ vorhanden ist im selben
 // Semester und ggf ein Hinweis ausgegeben
 define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
-        array('StudiengebuehrAnzahlung', 'Studiengebuehr', 'StudiengebuehrRestzahlung', 'OEH')
+	array(
+			'Studiengebuehr' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrErhoeht' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrAnzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung'),
+			'StudiengebuehrRestzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrRestzahlung'),
+			'OEH' => array('OEH')
+	))
 ));
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden

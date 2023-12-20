@@ -14,10 +14,10 @@ class CORE_STG_0001 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('issues/PlausicheckLib');
+		$this->_ci->load->library('issues/plausichecks/StgPrestudentUngleichStgStudent');
 
 		// check if issue persists
-		$checkRes = $this->_ci->plausichecklib->getStgPrestudentUngleichStgStudent(null, $params['prestudent_id']);
+		$checkRes = $this->_ci->stgprestudentungleichstgstudent->getStgPrestudentUngleichStgStudent(null, $params['prestudent_id']);
 
 		if (isError($checkRes)) return $checkRes;
 
