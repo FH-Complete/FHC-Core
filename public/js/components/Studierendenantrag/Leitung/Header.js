@@ -56,8 +56,8 @@ export default {
 		<div class="col-auto row row-cols-lg-auto g-3 align-items-center">
 			<div class="col-12">
 				<select class="form-select" v-model="todo_value">
-					<option value="todo">{{$p.t('global', 'aktiv')}}</option>
-					<option value="">{{$p.t('global', 'alle')}}</option>
+					<option value="todo">{{$p.t('studierendenantrag', 'filter_todo')}}</option>
+					<option value="">{{$p.t('studierendenantrag', 'filter_all')}}</option>
 				</select>
 			</div>
 			<div class="col-12">

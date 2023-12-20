@@ -19888,6 +19888,46 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'studierendenantrag',
+		'phrase' => 'filter_all',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alle anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'show all',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'filter_todo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'nur offene anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'only show open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
 		'phrase' => 'warning_Abmeldung',
 		'insertvon' => 'system',
 		'phrases' => array(
