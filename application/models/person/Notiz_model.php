@@ -175,15 +175,39 @@ class Notiz_model extends DB_Model
 	 * gets all Notizen for a person
 	 * @param $person_id
 	 */
-	public function getNotiz($person_id, $withDoc=false)
+	public function getNotiz($person_id)
 	{
-		// Join with the table public.tbl_notizzuordnung using notiz_id
+		$this->addSelect('public.tbl_notiz.*');
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
 
-		if($withDoc)
-			$this->addJoin('public.tbl_notiz_dokument', 'notiz_id', 'LEFT');
-
 		return $this->loadWhere(array('person_id' => $person_id));
+	}
+
+	/**
+	 * gets all Notizen with Documententries for a person
+	 * @param $person_id
+	 */
+	public function getNotizWithDocEntries($person_id)
+	{
+		$qry = "
+			SELECT 
+			    	n.*, count(dms_id) as countDoc
+			FROM
+			    	public.tbl_notiz n
+			JOIN 
+			    	    public.tbl_notizzuordnung z USING (notiz_id)
+			LEFT JOIN 
+			    	    public.tbl_notiz_dokument dok USING (notiz_id)
+			LEFT JOIN 
+			    	    campus.tbl_dms_version USING (dms_id)
+			WHERE 
+			    z.person_id = ?
+			GROUP BY 
+			    notiz_id
+		";
+
+		return $this->execQuery($qry, array($person_id));
+
 	}
 
 	/**

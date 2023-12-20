@@ -38,3 +38,6 @@
 .tabulator .tabulator-col-resize-handle:last-of-type {
 	z-index: 999999;
 }
+.tabulator {
+	font-size: 1rem;
+}
