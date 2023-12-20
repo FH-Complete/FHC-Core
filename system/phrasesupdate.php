@@ -19204,6 +19204,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'uhstat',
+		'phrase' => 'uhstat1EinleitungSvnrtext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Laut Bildungsdokumentationsgesetz sind wir verpflichtet die Sozialversicherungsnummer zu erheben bzw. zu registrieren. Falls Sie über keine Sozialversicherungsnummer verfügen, fordert die FH Technikum Wien in Ihrem Namen ein Ersatzkenneichen an.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'According to the General Social Insurance Act, we are obliged to collect and register your national insurance number. If you do not have a national insurance number, UAS Technikum Wien will request a social insurance substitute code on your behalf.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
 		'phrase' => 'angabenErziehungsberechtigte',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -19622,7 +19642,7 @@ array(
 		)
 	),
 /*
-	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status 
+	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status
 	// erstellt werden, die dann in der Studierendenansicht in einer infobox angezeigt werden
 	array(
 		'app' => 'core',
