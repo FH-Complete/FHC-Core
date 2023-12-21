@@ -280,7 +280,7 @@ export default {
 						</tbody>
 					</table>
 				</template>
-				<tempalte v-else>
+				<template v-else>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
@@ -670,7 +670,6 @@ export default {
 							</div>
 						</div>
 					</div>
-
 				</template>
 			</template>
 			<template #footer>

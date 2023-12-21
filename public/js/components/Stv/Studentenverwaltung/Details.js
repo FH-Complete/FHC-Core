@@ -24,7 +24,7 @@ export default {
 			<div class="d-flex justify-content-start align-items-center w-100 pb-3 gap-3" style="max-height:8rem">
 				<img v-for="student in students" :key="student.person_id" class="d-block h-100 rounded" alt="profilbild" :src="appRoot + '/cis/public/bild.php?src=person&person_id=' + student.person_id">
 				<div v-if="students.length == 1">
-					<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}
+					<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>
 				</div>
 			</div>
 			<fhc-tabs v-if="students.length == 1" :modelValue="students[0]" config-url="/components/stv/config/student" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%"></fhc-tabs>
