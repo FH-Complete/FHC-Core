@@ -46,6 +46,65 @@
   box-shadow:none;
 } 
 
+.fhc-form .form-floating > .form-control:focus ~ .floating-title, .form-floating > .form-control:not(:placeholder-shown) ~ .floating-title, .form-floating > .form-select ~ .floating-title{
+  opacity: .65;
+  transform: scale(.85) translateY(-.5rem) translateX(.15rem);
+}
+
+.fhc-form .form-floating > .floating-title{
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  padding: 1rem .75rem;
+  pointer-events: none;
+  border: 1px solid transparent;
+  transform-origin: 0 0;
+  transition: opacity .1s ease-in-out,transform .1s ease-in-out;
+}
+
+.floating-title{
+  display:inline-block;
+}
+
+.form-floating>.form-control, .form-floating>.form-select{
+  height: auto;
+}
+
+
+/* FORM UNDERLINE
+*/
+.form-underline{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: space-between;
+
+}
+.form-underline .form-underline-content{
+  border-width: 1px;
+  border-color: transparent transparent #dee2e6 transparent;
+  border-style: solid;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+
+  /*optional not wrapping text that is horizontally scrollable and does not display a scrollbar */
+  white-space: nowrap;
+  overflow: auto;
+  scrollbar-width: none;
+
+}
+
+.form-underline .form-underline-content::-webkit-scrollbar {
+  display: none;
+}
+
+.form-underline .form-underline-titel{
+  opacity: 0.65;
+  font-size: .85rem;
+  padding-left: 0.5rem;
+}
+
 /*   dl {
     width: 100%;
     overflow: hidden;

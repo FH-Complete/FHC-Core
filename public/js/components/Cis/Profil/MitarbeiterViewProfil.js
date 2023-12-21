@@ -129,7 +129,7 @@ export default {
 
     get_mitarbeiter_standort_telefon(){
       if(this.data.standort_telefon){
-        return "tel:"+ this.data.telefonklappe + this.data.standort_telefon;
+        return "tel:"+ this.data.telefonklappe + this.data.standort_telefon ;
       }else{
         return null;
       }
@@ -167,7 +167,7 @@ export default {
       return {
         
         Kurzzeichen: this.data.kurzbz,
-        Telefon: this.data.telefonklappe + (this.data.standort_telefon?this.data.standort_telefon:""),
+        Telefon: (this.data.standort_telefon?this.data.standort_telefon:"") + " " + this.data.telefonklappe ,
         Büro: this.data.ort_kurzbz,
       };
     },
@@ -333,44 +333,7 @@ export default {
                     </div>
 		    </div>
                     </div>
-                     <div class="row mb-4">
-                     
-
-                     <div  class=" col-lg-12">
-        
-                     <div class="card">
-                 
-                         <div class="card-header">
-                         Mitarbeiter Information
-                         </div>
-                         <div class="card-body">
-                             <div class="row">
-                             <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
-                             
-                            
-                             <div  class=" form-floating mb-2">  
-                              <!-- print Telefon link -->
-                                <a v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez">
-                                  <input :role="get_mitarbeiter_standort_telefon?'button':''" readonly :value="wert?wert:'-'" class="w-100" style="border:none; outline:none;" />
-                                </a>
-                              <!-- otherwise print input field -->
-                                 <input v-else  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
-                                 <label :for="'floating'+bez">{{bez}}</label>
-                                 </div>
-                             </div>
-                         </div>
-                         
-                     </div>
-                     
-                 </div>
-
-                     </div>  
-                            
-
-
-
-<!-- END OF THE FIRST KAESTCHEN -->
-                      </div>
+                    
 
 
                       <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
@@ -418,10 +381,11 @@ export default {
                       <div class="col">
                       <div class=" form-floating mb-2">
                             
-                      <a :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
-                              <input role="button" readonly :value="email.email" class="w-100" style="border:none; outline:none;" />
+                      <a :href="'mailto:'+email.email" class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
+                             {{email.email}}
                             </a>
-                            <label :for="'floating'+email.type">{{email.type }}</label>
+                            <div class="floating-title">{{email.type }}</div>
+
                       </div>
                       </div>
                       </div>
@@ -442,6 +406,50 @@ export default {
                     </div>
                     </div>
                     </div></div>
+
+
+                    <!-- SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
+                    <div class="row mb-4">
+                     
+
+                    <div  class=" col-lg-12">
+       
+                    <div class="card">
+                
+                        <div class="card-header">
+                        Mitarbeiter Information
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                            <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
+                            
+                           
+                            <div  class=" form-floating mb-2">  
+                             <!-- print Telefon link -->
+                             <template v-if="bez=='Telefon'">
+                               <a  :href="get_mitarbeiter_standort_telefon"  class="form-control form-control-plaintext border-bottom" :id="'floating'+bez">
+                                 {{wert?wert:'-'}}
+                                </a>
+                                <div class="floating-title">{{bez }}</div>
+                                </template>
+
+                             <!-- otherwise print input field -->
+                                <template v-else>
+                                <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
+                                <label :for="'floating'+bez">{{bez }}</label>
+                                </template>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+
+                    </div>  
+                           
+                     </div>
+                     <!-- END OF SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
 
 
 

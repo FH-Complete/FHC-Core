@@ -38,7 +38,6 @@ Vue.$collapseFormatter  = function(data){
 const app = Vue.createApp({
 	
 	components: {
-		Base,
 		StudentProfil,
 		MitarbeiterProfil,
 		ViewStudentProfil,
@@ -68,18 +67,20 @@ const app = Vue.createApp({
 			}
 			this.view = res.data?.view;
 			this.data = res.data?.data;
-			//* only for testing purposes and needs to be deleted after
-			this.data.base = "Base";
+			
 		});
 	},
 	template:`
 	<div>
 
-	<div v-if="notFoundUID">
+		<div v-if="notFoundUID">
+		
+			<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
+
+		</div>
+
+		<component v-else :is="view" :data="data" ></component>
 	
-	<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
-	</div>
-	<component v-else :is="view" :data="data" ></component>
 	</div>`
 	
 	

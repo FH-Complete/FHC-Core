@@ -61,7 +61,7 @@ export default {
         Studiengang: this.data.studiengang,
         Semester: this.data.semester,
         Verband: this.data.verband,
-        Gruppe: this.data.gruppe,
+        Gruppe: this.data.gruppe.trim(),
       };
     },
 
@@ -224,40 +224,7 @@ export default {
                     </div>
 		    </div>
                     </div>
-                     <div class="row mb-4">
-                     
-
-                     <div  class=" col-lg-12">
-        
-                     <div class="card">
-                 
-                         <div class="card-header">
-                         Studenten Information
-                         </div>
-                         <div class="card-body">
-                             <div class="row">
-                             <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
-                             
-                            
-                             <div  class=" form-floating mb-2">  
-                            
-                                 <input   readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
-                                 <label :for="'floating'+bez">{{bez}}</label>
-                                 </div>
-                             </div>
-                         </div>
-                         
-                     </div>
-                     
-                 </div>
-
-                     </div>  
-                            
-
-
-
-<!-- END OF THE FIRST KAESTCHEN -->
-                      </div>
+                  
 
 
                       <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
@@ -305,10 +272,10 @@ export default {
                       <div class="col">
                       <div class=" form-floating mb-2">
                            
-                            <a :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
-                              <input role="button" readonly :value="email.email" class="w-100" style="border:none; outline:none;" />
+                            <a :href="'mailto:'+email.email" class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
+                              {{email.email}}
                             </a>
-                            <label :for="'floating'+email.type">{{email.type }}</label>
+                            <div class="floating-title">{{email.type }}</div>
 
                       </div>
                       </div>
@@ -331,8 +298,41 @@ export default {
                     </div>
                     </div></div>
 
-                   
+                   <!-- SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
+                    <div class="row mb-4">
+                     
 
+                    <div  class=" col-lg-12">
+       
+                    <div class="card">
+                
+                        <div class="card-header">
+                        Studenten Information
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                            <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
+                            
+                           
+                            <div  class=" form-floating mb-2">  
+                           
+                                <input   readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
+                                <label :for="'floating'+bez">{{bez}}</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+
+                    </div>  
+                           
+
+
+                     </div>
+
+                     <!-- END OF SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
                   
 
 

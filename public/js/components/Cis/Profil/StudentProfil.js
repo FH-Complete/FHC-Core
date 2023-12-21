@@ -155,7 +155,7 @@ export default {
         Studiengang: this.data.studiengang,
         Semester: this.data.semester,
         Verband: this.data.verband,
-        Gruppe: this.data.gruppe,
+        Gruppe: this.data.gruppe.trim(),
       };
     },
 
@@ -419,19 +419,24 @@ export default {
                       <div  class="col-12 ">
                      
                             <div class="row align-items-center">
+                            <!--
                       <div class="col-1 text-center">
 
                       <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
 
                       </div>
+                      -->
                       <div class="col">
                       <div class=" form-floating mb-2">
                             
                             <a :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
-                              <input role="button" readonly :value="email.email" class="w-100" style="border:none; outline:none;" />
+                              {{email.email}}
                             </a>
-                            <label :for="'floating'+email.type">{{email.type }}</label>
+                            <div class="floating-title"> <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i> {{email.type }}</div>
                       </div>
+
+                   
+
                       </div>
                       </div>
                       </div>
@@ -464,27 +469,28 @@ export default {
                             <div v-for="element in privateKontakte" class="align-items-center row justify-content-center">
                               <div class="col-1 text-center" >
                               
-                              <i class="fa-solid " :class="{...(element.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" style="color:rgb(0, 100, 156)"></i>
+                              <!--<i class="fa-solid " :class="{...(element.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" style="color:rgb(0, 100, 156)"></i>-->
                               </div>
                               <div  :class="{...(element.anmerkung? {'col-11':true, 'col-md-5':true, 'col-xl-11':true, 'col-xxl-5':true} : {'col-9':true, 'col-xl-9':true})}">
                                   
                                   <!-- rendering KONTAKT emails -->
                                   <div v-if="element.kontakt.includes('@')" class=" form-floating mb-2">
                                     
-                                    <a :href="'mailto:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
-                                      <input role="button" readonly :value="element.kontakt" class="w-100" style="border:none; outline:none;" />
+                                    <a :href="'mailto:'+element.kontakt" class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
+                                     {{element.kontakt}}
                                     </a>
-                                    <label :for="'floating'+element.kontakttyp">{{element.kontakttyp}}</label>
+                                     <div class="floating-title"><i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i> {{element.kontakttyp }}</div>
                                   
                                   </div>
 
                                   <!-- rendering KONTAKT phones -->
                                   <div v-else class=" form-floating mb-2">
                                      
-                                    <a :href="'tel:'+element.kontakt" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
-                                      <input role="button" readonly :value="element.kontakt" class="w-100" style="border:none; outline:none;" />
+                                    <a :href="'tel:'+element.kontakt" class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
+                                      {{element.kontakt}}
                                     </a>
-                                    <label :for="'floating'+element.kontakttyp">{{element.kontakttyp}}</label>
+                                    <div class="floating-title"><i class="fa-solid fa-phone" style="color:rgb(0, 100, 156)"></i> {{element.kontakttyp }}</div>
+                                    
 
                                   </div>
 
