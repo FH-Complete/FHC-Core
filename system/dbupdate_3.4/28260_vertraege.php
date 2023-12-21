@@ -427,6 +427,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT USAGE ON hr.tbl_dienstverhaeltnis_dienstverhaeltnis_id_seq TO vilesci;
 		GRANT USAGE ON hr.tbl_vertragsbestandteil_vertragsbestandteil_id_seq TO vilesci;
 		GRANT USAGE ON hr.tbl_gehaltshistorie_gehaltshistorie_id_seq TO vilesci;
+		GRANT USAGE ON hr.tbl_sachaufwand_sachaufwand_id_seq TO vilesci;
 
 		GRANT USAGE ON hr.tbl_gehaltsbestandteil_gehaltsbestandteil_id_seq TO vilesci;
 		";
