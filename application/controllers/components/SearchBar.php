@@ -17,6 +17,9 @@ class SearchBar extends FHC_Controller
 	{
 		parent::__construct();
 
+		// Loads the AuthLib and starts the authentication
+		$this->load->library('AuthLib');
+		
 		// Load the library SearchBarLib
 		$this->load->library('SearchBarLib');
 	}

@@ -161,8 +161,11 @@ if(!isset($_SESSION['pruefling_id']))
 $pruefling = new pruefling();
 $pruefling->load($_SESSION['pruefling_id']);
 
-if ($pruefling->gesperrt === 't')
+if ($pruefling->isGesperrt($_SESSION['pruefling_id']))
 	die("<script>document.location.href='prueflinggesperrt.php';</script>");
+
+if (!in_array($gebiet_id, $_SESSION['alleGebiete']))
+	die($p->t('testtool/dasGebietIstNichtFuerSieBestimmt'));
 
 $gebiet = new gebiet($gebiet_id);
 

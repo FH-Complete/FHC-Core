@@ -229,6 +229,21 @@ $( document ).ready(function()
 </script>
 ';
 
+echo <<<EOSBJS
+<script>
+	$(document).ready(function() {
+        const scrollDiv = document.createElement('div');
+        scrollDiv.style.cssText = 'width: 99px; height: 99px; overflow: scroll; position: absolute; top: -9999px;';
+        document.body.appendChild(scrollDiv);
+        const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+        document.body.removeChild(scrollDiv);
+		var marginright = Math.max((20 - scrollbarWidth), 0);
+        document.body.style.setProperty('width', 'calc(100% - ' + marginright + 'px)');
+    });
+</script>
+
+EOSBJS;
+
 echo '
         <script type="text/javascript">
 		$(document).ready(function()
@@ -605,9 +620,14 @@ echo '
 							{
 								projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>";
 								projphasenhtml += json[i].bezeichnung;
+
 								if(json[i].start != \'\' && json[i].ende !=\'\')
 								{
-									projphasenhtml += " ( "+json[i].start+" - "+json[i].ende+" )";
+									projphasenhtml += " ( "+json[i].start+" - "+json[i].ende+ " )";
+								}
+								if (!json[i].zeitaufzeichnung_erlaubt)
+								{
+										projphasenhtml += " ---AP NICHT bebuchbar---";
 								}
 								projphasenhtml += "<\/option>";
 							}
@@ -664,6 +684,7 @@ echo '
 				}
 			);
 		}
+
 
 		// Pausenblock
 
@@ -840,6 +861,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 	$projektph_of_user = new projektphase();
 	$projektphasen = $projektph_of_user->getProjectphaseForMitarbeiter($user);
 
+	$phaseBebuchbar = $projektph_of_user->getPhasenZA($projektphase_id);
+	$projekt = new projekt();
+	$projekt->load($projekt_kurzbz);
+
 	if ($_FILES['csv']['error'] == 0 && isset($_POST['import']))
 	{
 		$zeit_csv_import = new zeitaufzeichnung_import_csv($p, $user, $sperrdatum, $_FILES['csv']['tmp_name']);
@@ -848,9 +873,11 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 	}
 	else if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
 		echo '<span id="triggerPhasenReset" style="color:#ff0000"><b>' .$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
+
 	// NOTE(chris): Save
 	else if (isset($_POST['save']) || isset($_POST['edit']))
 	{
+
 		$zeit_post_import = new zeitaufzeichnung_import_post($p, $user, isset($_POST['edit']), [
 			'aktivitaet_kurzbz' => $aktivitaet_kurzbz,
 			'beschreibung' => $beschreibung,
@@ -867,6 +894,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			'von_pause' => $von_pause,
 			'zeitaufzeichnung_id' => $zeitaufzeichnung_id,
 		]);
+
 		$zeit_post_import->import();
 		echo $zeit_post_import->OutputToHTML();
 		if (!$zeit_post_import->hasErrors() && !$zeit_post_import->hasWarnings())
@@ -1239,7 +1267,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				else
 					$selected = '';
 
-				echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung). $phasentext.'</option>';
+				echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).
+				$phasentext. '</option>';
 			}
 			echo '</SELECT></span>';
 		}
@@ -1379,7 +1408,27 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					}
 				}
 					echo '</table>';
-					echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br>';
+					echo '</td><td valign="top"><span id="zeitsaldo"></span><br>';
+
+					if (defined('DEFAULT_ALLIN_DIENSTVERTRAG') && DEFAULT_ALLIN_DIENSTVERTRAG != '')
+					{
+						$bisver = new bisverwendung();
+						$bisver->getLastVerwendung($user);
+		//				$ba1code = $bisver->ba1code;
+						$ba1code = null;
+
+						if (in_array($bisver->ba1code, DEFAULT_ALLIN_DIENSTVERTRAG))
+						{
+							echo '<span id="saldoAllin"></span><br><br>';
+						}
+						else
+							echo '<br>';
+					}
+					else
+						echo '<br>';
+
+
+
 
 				if (!$adminView)
 				{
@@ -1399,7 +1448,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		$sem_akt = $stsem->getakt();
 		$lehre = new zeitaufzeichnung();
 		$l_arr = $lehre->getLehreForUser($user, $sem_akt);
-		if ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0)
+		$displayLehresaldo = false;
+		if ($displayLehresaldo && ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0))
 		{
 			if ($lehre_inkludiert == -1)
 			{
@@ -1586,7 +1636,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
 			        <td '.$style.' colspan="3" align="right">';
 					if ($tag > $sperrdatum)
-					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
+					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&larr;</a>';
 
 					echo '</td></tr>';
 

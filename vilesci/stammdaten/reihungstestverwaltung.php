@@ -847,6 +847,12 @@ if(isset($_GET['excel']))
 						if ($('.ort_listitem').length == 0 && $('#max_teilnehmer').val() == '' && $('#ort').val() == '')
 							confirm('Wenn der Reihungstest "Öffentlich" ist, sollten Räume zugeteilt sein, oder "Max TeilnehmerInnen" gesetzt sein');
 					}
+
+					if ($('#zugangs_ueberpruefung').is(":checked") && $('#zugangcode').val() == '')
+					{
+						alert('Wenn die Zugangsüberprüfung aktiviert ist, ist ein Zugangscode verpflichtend.');
+						return false;
+					}
 				});
 
 				if ($('#oeffentlich').is(":checked") && $('.ort_listitem').length == 0 && $('#max_teilnehmer').val() == '' && $('#ort').val() == '')
@@ -1004,6 +1010,7 @@ if(isset($_GET['excel']))
 							headers: {0: { sorter: false}},
 							widgetOptions: {filter_cssFilter: [
 									"filter_clm_null",
+									"filter_clm_prestudent_id",
 									"filter_clm_person_id",
 									"filter_clm_null",
 									"filter_clm_vorname",
@@ -1021,18 +1028,30 @@ if(isset($_GET['excel']))
 						$("#"+v.id).checkboxes('toggle');
 						e.preventDefault();
 						if ($("input.chkbox:checked").size() > 0)
+						{
 							$("#mailSendButton").html('Mail an markierte Personen senden');
+							$("#msgSendButton").html('Message an markierte Personen senden');
+						}
 						else
+						{
 							$("#mailSendButton").html('Mail an alle senden');
+							$("#msgSendButton").html('Message an alle senden');
+						}
 					});
 
 					$("#uncheck_"+v.id).on('click', function(e) {
 						$("#"+v.id).checkboxes('uncheck');
 						e.preventDefault();
 						if ($("input.chkbox:checked").size() > 0)
+						{
 							$("#mailSendButton").html('Mail an markierte Personen senden');
+							$("#msgSendButton").html('Message an markierte Personen senden');
+						}
 						else
+						{
 							$("#mailSendButton").html('Mail an alle senden');
+							$("#msgSendButton").html('Message an alle senden');
+						}
 					});
 
 					$("#"+v.id).checkboxes('range', true);
@@ -1043,6 +1062,7 @@ if(isset($_GET['excel']))
 					if (typeof(Storage) !== 'undefined')
 					{
 						var arr = ['clm_null',
+							'clm_prestudent_id',
 							'clm_person_id',
 							'clm_null',
 							'clm_vorname',
@@ -1108,9 +1128,15 @@ if(isset($_GET['excel']))
 				$('.chkbox').change(function()
 				{
 					if ($("input.chkbox:checked").size() > 0)
+					{
 						$("#mailSendButton").html('Mail an markierte Personen senden');
+						$("#msgSendButton").html('Message an markierte Personen senden');
+					}
 					else
+					{
 						$("#mailSendButton").html('Mail an alle senden');
+						$("#msgSendButton").html('Message an alle senden');
+					}
 				});
 
 				$('#toggle_bearbeitenForm').click(function()
@@ -1220,6 +1246,23 @@ if(isset($_GET['excel']))
 					mailadressen += adresse;
 				});
 				window.location.href = "mailto:?bcc="+mailadressen;
+			}
+			
+			function SendMessage()
+			{
+				// Wenn Checkboxen markiert sind, an diese senden, sonst an alle
+				if ($("input.chkbox:checked").size() > 0)
+					var elements = $("input.chkbox:checked");
+				else
+					var elements = $("input.chkbox");
+				var form = $("#sendMsgForm");
+				form.find("input[type=hidden]").remove();
+				$.each(elements, function(index, item)
+				{
+					var prestudent_id = $(this).closest('tr').find('td.clm_prestudent_id').text();
+					form.append("<input type='hidden' name='prestudent_id[]' value='" + prestudent_id + "'>");
+				});
+				form.submit();
 			}
 		</script>
 		<style type="text/css">
@@ -1396,6 +1439,12 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$error = true;
 		}
 	}
+	
+	if (isset($_POST['zugangs_ueberpruefung']) && $_POST['zugangcode'] === '')
+	{
+		$messageError .= '<p>Der Zugangscode muss ausgefüllt sein, wenn die Zugangsüberprüfung aktiviert ist. </p>';
+		$error = true;
+	}
 
 	if(!$error)
 	{
@@ -1407,6 +1456,8 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT);
 			$reihungstest->aufnahmegruppe_kurzbz = filter_input(INPUT_POST, 'aufnahmegruppe');
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
+			$reihungstest->zugangs_ueberpruefung = false;
+			$reihungstest->zugangscode = null;
 		}
 		else
 		{
@@ -1421,6 +1472,8 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
 			$reihungstest->updateamum = date('Y-m-d H:i:s');
 			$reihungstest->updatevon = $user;
+			$reihungstest->zugangs_ueberpruefung = isset($_POST['zugangs_ueberpruefung']);
+			$reihungstest->zugangscode = ($_POST['zugangcode'] === '' ? null : $_POST['zugangcode']);
 		}
 		$reihungstest->studiengang_kz = $_POST['studiengang_kz'];
 		//$reihungstest->ort_kurzbz = $_POST['ort_kurzbz'];
@@ -2248,7 +2301,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 								echo '<option value="2" '.($reihungstest->stufe == 2 ? 'selected' : '').'>2 (Interview)</option>';
 								echo '<option value="3" '.($reihungstest->stufe == 3 ? 'selected' : '').'>3</option>';
 							}
-							else 
+							else
 							{
 								echo '<option value="1" '.($reihungstest->stufe == 1 ? 'selected' : '').'>1</option>';
 								echo '<option value="2" '.($reihungstest->stufe == 2 ? 'selected' : '').'>2</option>';
@@ -2505,6 +2558,18 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			</td>
 		</tr>
 		<tr>
+			<td class="feldtitel">Zugangsüberprüfung</td>
+			<td>
+				<input type="checkbox" id="zugangs_ueberpruefung" name="zugangs_ueberpruefung"<?php echo $reihungstest->zugangs_ueberpruefung ? 'checked="checked"' : '' ?>>
+			</td>
+		</tr>
+		<tr>
+			<td class="feldtitel">Zugangscode</td>
+			<td>
+				<input type="number" class="input" id="zugangcode" name="zugangcode" value="<?php echo $db->convert_html_chars($reihungstest->zugangscode) ?>"> (Verpflichtend, wenn die Zugangsüberprüfung aktiviert ist)
+			</td>
+		</tr>
+		<tr>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
@@ -2555,6 +2620,9 @@ if($reihungstest_id!='')
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
 	//echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
 	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle BewerberInnen senden</a>';
+	echo '<form id="sendMsgForm" method="post" action="'. APP_ROOT .'index.ci.php/system/messages/FASMessages/writeTemplate" target="_blank" style="display:inline-block">
+			<a class="buttongreen" href="javascript:void(0)" onclick="SendMessage()" id="msgSendButton">Message an alle BewerberInnen senden</a>
+			</form>';
 }
 if (defined('CAMPUS_NAME') && CAMPUS_NAME == 'FH Technikum Wien')
 {
@@ -2579,7 +2647,7 @@ if($reihungstest_id!='')
 	$qry = "
 	SELECT DISTINCT rt_person_id,
 		rt_id,
-		'0' AS prestudent_id,
+		prestudent_id,
 		tbl_rt_person.person_id,
 		vorname,
 		nachname,
@@ -2697,7 +2765,7 @@ if($reihungstest_id!='')
 		echo '<br><span style="color: red"><b>Achtung!</b> Anzahl Arbeitsplätze überschritten</span>';
 	echo '</td></tr>';
 	echo '<tr><td>';
-	//echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
+	echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
 	echo '<div id="clm_person_id" class="active" onclick="hideColumn(\'clm_person_id\')">Person ID</div>';
 	echo '<div id="clm_vorname" class="active" onclick="hideColumn(\'clm_vorname\')">Vorname</div>';
 	echo '<div id="clm_geschlecht" class="active" onclick="hideColumn(\'clm_geschlecht\')">Geschlecht</div>';
@@ -2737,7 +2805,7 @@ if($reihungstest_id!='')
 						<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 					</nobr>
 					</th>
-					<!--<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>-->
+					<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
 					<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 					<th>Nachname</th>
 					<th style="display: table-cell" class="clm_vorname">Vorname</th>
@@ -2856,7 +2924,7 @@ if($reihungstest_id!='')
 							echo '
 									<tr>
 										<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-										<!--<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>-->
+										<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
 										<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 										<td>'.$db->convert_html_chars($row->nachname).'</td>
 										<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>
@@ -2919,7 +2987,7 @@ if($reihungstest_id!='')
 									<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 							</nobr>
 							</th>
-							<!--<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>-->
+							<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
 							<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 							<th>Nachname</th>
 							<th style="display: table-cell" class="clm_vorname">Vorname</th>
@@ -3038,7 +3106,7 @@ if($reihungstest_id!='')
 							echo '
 								<tr>
 									<td style="text-align: center"><input class="chkbox" type="checkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-									<!--<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>-->
+									<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
 									<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 									<td>'.$db->convert_html_chars($row->nachname).'</td>
 									<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>

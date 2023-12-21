@@ -2,7 +2,7 @@
 	<?php
 	$unique_studsemester = array();
 	$first = true;
-	$fit_programme_studiengaenge = array(10021, 10027);
+	$fit_programme_studiengaenge = $additional_stg;
 	foreach ($zgvpruefungen as $zgvpruefung):
 		$infoonly = $zgvpruefung->infoonly;
 		$studiengangkurzbz = $studiengangbezeichnung = $studiengangtyp = '';
@@ -447,7 +447,6 @@
 								<div class="form-inline">
 									<div class="input-group" id="absgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 										<select name="absgstatusgrund"
-												<?php echo $disabledStg ?>
 												<?php echo $disabledPer ?>
 												class="d-inline float-right"
 												required>
@@ -460,7 +459,7 @@
 										</select>
 										<span class="input-group-btn">
 											<button type="button"
-													class="btn btn-default absageBtn" <?php echo $disabledStg . ' ' . $disabledPer?> id="absagebtn_<?php echo $zgvpruefung->prestudent_id ?>">
+													class="btn btn-default absageBtn" <?php echo $disabledPer?> id="absagebtn_<?php echo $zgvpruefung->prestudent_id ?>">
 												<?php echo  $this->p->t('ui', 'absagen') ?>
 											</button>
 										</span>

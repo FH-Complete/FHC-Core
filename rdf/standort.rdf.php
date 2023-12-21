@@ -106,6 +106,7 @@ function draw_content($row)
 	            <STANDORT:standort_id><![CDATA['.$row->standort_id.']]></STANDORT:standort_id>
 	            <STANDORT:adresse_id><![CDATA['.$row->adresse_id.']]></STANDORT:adresse_id>
 	            <STANDORT:bezeichnung><![CDATA['.$row->bezeichnung.']]></STANDORT:bezeichnung>
+				<STANDORT:bezeichnung_null><![CDATA['.(is_null($row->bezeichnung)?'t':'').']]></STANDORT:bezeichnung_null>
 	            <STANDORT:kurzbz><![CDATA['.$row->kurzbz.']]></STANDORT:kurzbz>
 	            <STANDORT:firma_id><![CDATA['.$row->firma_id.']]></STANDORT:firma_id>
 	         </RDF:Description>

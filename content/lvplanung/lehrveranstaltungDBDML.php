@@ -65,6 +65,13 @@ $data = '';
 $error = false;
 $warnung = false;
 
+//Default BA1Codes für echte Dienstverträge aus Config Laden
+$arrEchterDV = [103];
+if (defined('DEFAULT_ECHTER_DIENSTVERTRAG') && DEFAULT_ECHTER_DIENSTVERTRAG != '')
+{
+	$arrEchterDV = DEFAULT_ECHTER_DIENSTVERTRAG;
+}
+
 loadVariables($user);
 
 //Berechtigungen laden
@@ -560,10 +567,12 @@ if(!$error)
 						{
 							// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
 							// geliefert da dies im Vertrag inkludiert ist.
-							if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+
+							if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
 							{
 								$fixangestellt = true;
 								$lem->stundensatz = '';
+
 								break;
 							}
 						}
@@ -1567,9 +1576,10 @@ if(!$error)
 
 					foreach($bisverwendung->result as $row_verwendung)
 					{
+
 						// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
 						// geliefert da dies im Vertrag inkludiert ist.
-						if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+						if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
 						{
 							$data = '';
 							break;

@@ -21,7 +21,7 @@ class zeitaufzeichnung_import {
 	protected $project;
 	protected $phase;
 	protected $limitdate;
-	
+
 	protected $zeit;
 
 
@@ -42,7 +42,7 @@ class zeitaufzeichnung_import {
 
 		$this->zeit = new zeitaufzeichnung();
 	}
-	
+
 
 	/**
 	 * @return boolean
@@ -64,7 +64,7 @@ class zeitaufzeichnung_import {
 	public function hasInfos() {
 		return !empty($this->infos);
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -96,15 +96,15 @@ class zeitaufzeichnung_import {
 			$html .= '<span style="color:green;"><b>' . $msg . '</b></span><br>' . "\n";
 		}
 		return $html;
-	}   
-	
+	}
+
 	/**
 	 * @return string
 	 */
 	public function OutputToHTML() {
 		return $this->InfosToHTML() . $this->WarningsToHTML() . $this->ErrorsToHTML();
-	}   
-	
+	}
+
 	/**
 	 * @param string $msg
 	 * @return void
@@ -112,7 +112,7 @@ class zeitaufzeichnung_import {
 	protected function addError($msg) {
 		$this->errors[] = $msg;
 	}
-	
+
 	/**
 	 * @param string $msg
 	 * @return void
@@ -120,7 +120,7 @@ class zeitaufzeichnung_import {
 	protected function addWarning($msg) {
 		$this->warnings[] = $msg;
 	}
-	
+
 	/**
 	 * @param string $msg
 	 * @return void
@@ -134,7 +134,7 @@ class zeitaufzeichnung_import {
 	 * @param string $uid The user id
 	 * @param string $day "Y-m-d" formatted datestring
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkZeitsperren($uid, $day) {
@@ -150,25 +150,25 @@ class zeitaufzeichnung_import {
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ": " . $this->p->t("zeitaufzeichnung/zeitsperreVorhanden", [$zsdate, $zs->result[0]->zeitsperretyp_kurzbz]));
 		}
 	}
-	
+
 	/**
 	 * @param string $date datetimestring
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkLimitdatum($date) {
 		if ($this->datum->formatDatum($date, 'Y-m-d H:i:s') > $this->limitdate) {
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Eingabe nicht möglich da (' . $date . ') zu weit in der Zukunft liegt.');
-		}        
+		}
 	}
-	
+
 	/**
 	 * @param string $start datestring
 	 * @param string $end datestring
 	 * @param string $aktivitaet_kurzbz
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkDienstreise($start, $end, $aktivitaet_kurzbz) {
@@ -179,11 +179,11 @@ class zeitaufzeichnung_import {
 				.': Eingabe nicht möglich, da keine Zeitaufzeichnung über mehrere Tage erlaubt ist (ausgenommen Dienstreisen).');
 		}
 	}
-	
+
 	/**
 	 * @param string $end timestring
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkTagesgenau($end) {
@@ -193,13 +193,13 @@ class zeitaufzeichnung_import {
 				.': Bitte Arbeitszeiten gemäß Arbeitsaufzeichnung Leitfaden tagesgenau abgrenzen: Nur Eingaben von 00:00 bis 23:59 erlaubt!');
 		}
 	}
-	
+
 	/**
 	 * @param string $projekt_kurzbz
 	 * @param string $start datestring
 	 * @param string $end datestring
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkProjectInterval($projekt_kurzbz, $start, $end) {
@@ -207,13 +207,13 @@ class zeitaufzeichnung_import {
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt: (' . $start . ') (' . $end . ')');
 		}
 	}
-	
+
 	/**
 	 * @param string $phase The Projektphase ID
 	 * @param string $start datestring
 	 * @param string $end datestring
 	 * @return void
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected function checkPhaseInterval($phase, $start, $end) {
@@ -221,5 +221,37 @@ class zeitaufzeichnung_import {
 			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt: (' . $start . ') (' . $end . ')');
 		}
 	}
+
+	/**
+ * @param string $phase The Projektphase ID
+ * @return void
+ *
+ * @throws Exception
+ */
+protected function checkPhaseBebuchbar($phase)
+{
+	if ($this->phase->getPhasenZA($phase) == 'f')
+	{
+		throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Dieses Arbeitspaket darf nicht bebucht werden!');
+	}
+}
+
+/**
+* @param string $phase The Projektphase ID
+* @return void
+*
+* @throws Exception
+*/
+protected function checkIfArbeitspaketZuWaehlen($projekt_kurzbz, $phase)
+{
+	if ($projekt_kurzbz != '')
+	{
+		$this->project->load($projekt_kurzbz);
+		if (!$this->project->zeitaufzeichnung && !$phase)
+		{
+			throw new Exception($this->p->t("global/fehlerBeimSpeichernDerDaten") . ': Bitte ein Arbeitspaket wählen!');
+		}
+	}
+}
 
 }

@@ -74,6 +74,7 @@ require_once('../../include/reihungstest.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/mobilitaet.class.php');
 require_once('../../include/studienordnung.class.php');
+require_once('../../include/bismeldestichtag.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -383,7 +384,7 @@ function isBuchungAllowedToChange($buchung_obj)
  * @param $new_status_ausbildungssemester Ausbildungssemester des neuen/zu ändernen Status
  * @param $old_status_studiensemester Studiensemester des alten Status, leer wenn neuer Status
  * @param $old_status_ausbildungssemester Ausbildungssemester des alten Status, leer wenn neuer Status
- * @return array
+ * @return array mit error = true und Fehlerbeschreibung wenn ungültig, andernfalls error = false
  */
 function checkStatusaenderung(
 	$prestudent_id, $status_kurzbz, $new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester,
@@ -417,7 +418,7 @@ function checkStatusaenderung(
 	$studiensemester->load($new_status_studiensemester);
 	$new_status_semesterstart = new DateTime($studiensemester->start);
 
-	// Alle bisherigen prestudentstatus nach Datum sortiert
+	// Alle prestudentstatus nach Datum sortiert
 	$qry = "SELECT status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start
 			FROM public.tbl_prestudentstatus pss
 			JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
@@ -464,7 +465,7 @@ function checkStatusaenderung(
 				// Gültige Zeitabfolge, bestehenden Status hinzufügen
 				$statusArr[] = $row;
 			}
-			// oder Neuer/editierter Statuseintrag nach bestehendem Statuseintrag
+			// oder Neuer/editierter Statuseintrag vor bestehendem Statuseintrag
 			elseif ($new_status_datum <= $status_datum && $new_status_semesterstart <= $studiensemester_start)
 			{
 				// Gültige Zeitabfolge, bestehenden Status hinzufügen
@@ -475,8 +476,7 @@ function checkStatusaenderung(
 				// Zeitabfolge ungültig, Fehler
 				return array(
 					'error' => true,
-					'errormsg' => 'Datum des Statuseintrags muss nach dem Statusdatum,'
-						.' Semesterstartdatum nach Semesterstartdatum des vorherigen Statuseintrags sein'
+					'errormsg' => 'Ungültige Zeitabfolge der Statuseinträge (Statusdatum oder Semester)'
 				);
 			}
 		}
@@ -821,7 +821,16 @@ if(!$error)
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
 				$prestudent->zgv_erfuellt = $_POST['zgv_erfuellt'];
-				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				// Die Master-ZGV darf nur mit einem eigenen Recht geändert werden
+				if($rechte->isBerechtigt('student/editMakkZgv',$_POST['studiengang_kz'],'suid'))
+				{
+					$prestudent->zgvmas_code = $_POST['zgvmas_code'];
+				}
+				elseif ($prestudent->zgvmas_code != $_POST['zgvmas_code'])
+				{
+					$errormsg = 'Keine Berechtigung zum Ändern der ZGV';
+					$error = true;
+				}
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
@@ -984,6 +993,18 @@ if(!$error)
 								if (!$rechte->isBerechtigt($check_statusaenderung_berechtigung))
 								{
 									$new_status_datum = isset($_POST['datum']) ? $_POST['datum'] : date('Y-m-d');
+
+									$bismeldestichtag = new bismeldestichtag();
+
+									$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($new_status_datum);
+
+									if ($meldestichtag_erreicht === true)
+									{
+										$return = false;
+										$error = true;
+										$errormsg .= 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
+										$anzahl_fehler++;
+									}
 
 									$check_statusaenderung_result = checkStatusaenderung(
 										$prestudent_id,
@@ -1195,12 +1216,23 @@ if(!$error)
 
 		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['status_kurzbz']) &&
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
-		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
+		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']) &&
+		   isset($_POST['datum']))
 		{
-			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid'))
+			$erweiterteBerechtigungen = $rechte->isBerechtigt('admin', null, 'suid') || $rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
+
+			$bismeldestichtag = new bismeldestichtag();
+			$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
+
+			if($_POST['status_kurzbz']=='Student' && !$erweiterteBerechtigungen)
 			{
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
+			}
+			elseif ($meldestichtag_erreicht && !$erweiterteBerechtigungen)
+			{
+				$return = false;
+				$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht gelöscht werden.';
 			}
 			else
 			{
@@ -1521,6 +1553,17 @@ if(!$error)
 							$error = true;
 							$errormsg = isset($check_statusaenderung_result['errormsg']) ? $check_statusaenderung_result['errormsg'] : '';
 						}
+
+						// Prüfung, ob Meldestichtag erreicht ist
+						$bismeldestichtag = new bismeldestichtag();
+						$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
+
+						if ($meldestichtag_erreicht === true)
+						{
+							$return = false;
+							$error = true;
+							$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
+						}
 					}
 
 					if(!$error)
@@ -1788,7 +1831,13 @@ if(!$error)
 														$stg = $prestd->studiengang_kz;
 														$stg_obj = new studiengang();
 														$stg_obj->load(ltrim($stg,'0'));
-														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
+
+														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
+														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
+														$nachname_clean = str_replace(' ','_', $nachname_clean);
+														$vorname_clean = str_replace(' ','_', $vorname_clean);
+
+														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr,$vorname_clean,$nachname_clean);
 														$matrikelnummer = generateMatrikelnr($stg_obj->oe_kurzbz);
 
 														if($matrikelnummer != null)
@@ -1813,11 +1862,6 @@ if(!$error)
 														$benutzer->person_id = $prestd->person_id;
 														$benutzer->aktiv = true;
 														$benutzer->aktivierungscode = generateActivationKey();
-
-														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
-														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
-														$nachname_clean = str_replace(' ','_', $nachname_clean);
-														$vorname_clean = str_replace(' ','_', $vorname_clean);
 
 														if(!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT===true)
 														{
@@ -2492,14 +2536,35 @@ if(!$error)
 	{
 		$person_ids = explode(';',$_POST['person_ids']);
 		$exists = false;
-		if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK') && (in_array($_POST['buchungstyp_kurzbz'], unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK))))
+		if (defined('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK'))
 		{
-			$konto = new konto();
-			$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $_POST['buchungstyp_kurzbz']);
+			$buchungen = unserialize(FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK);
+			$buchung = $_POST['buchungstyp_kurzbz'];
+			if (isset($buchungen[$buchung]))
+			{
+				$konto = new konto();
+				$exists = $konto->checkDoppelteBuchung($person_ids, $_POST['studiensemester_kurzbz'], $buchungen[$buchung]);
+			}
 		}
 
 		if($exists)
+		{
 			$return = true;
+			$zusatz = "\n";
+			if (count($exists) > 10)
+			{
+				$zusatz .= "und ";
+				$persons = implode("\n- ", array_slice($exists, 0, 10));
+				if (count($exists) === 11)
+					$zusatz .= "einer weiteren Person.";
+				else
+					$zusatz .= (count($exists) - 10) . " weiteren Personen.";
+			}
+			else
+				$persons = implode("\n- ", $exists);
+
+			$data = "Es ist bereits eine Buchung vorhanden:\n- ". $persons  . $zusatz ." Trotzdem fortfahren?";
+		}
 		else
 			$return = false;
 	}

@@ -163,7 +163,8 @@ class zeitaufzeichnung_import_csv extends zeitaufzeichnung_import {
 			$this->initData($data);
 			$this->checkProject($data[self::PROJEKT], $data[self::PHASE]);
 			$this->checkPhase($data[self::PHASE]);
-
+			$this->checkPhaseBebuchbar($data[self::PHASE]);
+			$this->checkIfArbeitspaketZuWaehlen($data[self::PROJEKT], $data[self::PHASE]);
 			$this->checkZeitsperren($this->user, $this->datum->formatDatum($data[self::STARTDT], 'Y-m-d'));
 			$this->checkSperrdatum($data[self::STARTDT]);
 			$this->checkLimitdatum($data[self::STARTDT]);

@@ -15,7 +15,6 @@ class CORE_INOUT_0006 implements IIssueResolvedChecker
 		$this->_ci =& get_instance(); // get code igniter instance
 
 		$this->_ci->load->model('codex/Bisio_model', 'BisioModel');
-		//$this->_ci->load->model('codex/Aufenthaltfoerderung_model', 'AufenthaltfoerderungModel');
 
 		// get all Zwecke
 		$this->_ci->BisioModel->addSelect('ects_erworben');

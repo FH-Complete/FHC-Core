@@ -30,7 +30,7 @@ class addon extends basis_db
 	public $fhcomplete_target_version;
 
 	public $aktive_addons=array();
-	
+
 	/**
 	 * Konstruktor
 	 */
@@ -38,12 +38,12 @@ class addon extends basis_db
 	{
 		parent::__construct();
 		$this->aktive_addons = array_filter(array_map('trim', explode(";", ACTIVE_ADDONS)));
-		
+
 	}
 
 	/**
 	 * Liefert alle aktivierten Addons
-	 */ 
+	 */
 	public function loadAddons()
 	{
 
@@ -55,7 +55,7 @@ class addon extends basis_db
 			$fhcomplete_target_version='';
 
 			include(dirname(__FILE__).'/../addons/'.$addon.'/version.php');
-	
+
 			$obj = new stdClass();
 			$obj->kurzbz = $addon;
 			$obj->addon_name = $addon_name;
@@ -63,7 +63,7 @@ class addon extends basis_db
 			$obj->addon_description = $addon_description;
 			$obj->fhcomplete_target_version = $fhcomplete_target_version;
 
-			
+
 			$this->result[] = $obj;
 		}
 		return true;
@@ -86,6 +86,22 @@ class addon extends basis_db
 		$this->addon_description = $addon_description;
 		$this->fhcomplete_target_version = $fhcomplete_target_version;
 
+	}
+
+	/**
+	 * Prüfen, ob ein bestimmtes Addon aktivierten ist
+	 * @param $addon_kurzbz (fhtw,casetime, wawi..)
+	 * @return true wenn addon aktiv, sonst false
+	 */
+	public function checkActiveAddon($addon_kurzbz)
+	{
+		$addonIsActive = false;
+		foreach($this->aktive_addons as $addon)
+		{
+			if ($addon == $addon_kurzbz)
+				$addonIsActive = true;
+		}
+		return $addonIsActive;
 	}
 }
 ?>

@@ -31,13 +31,23 @@ export const LogsViewerTabulatorOptions = {
 		{title: 'Web service type', field: 'WebserviceType', headerFilter: true}
 	],
 	rowFormatter: function(row) {
-		if (row.getData().RequestId.includes("error"))
+
+		let data = row.getData(); // get data for this row
+
+		// If data is not null and provides the property RequestId and it is not null
+		if (data != null && data.hasOwnProperty('RequestId') && data.RequestId != null)
 		{
-			row.getElement().style.color = "red";
-		}
-		else if (row.getData().RequestId.includes("warning"))
-		{
-			row.getElement().style.color = "orange";
+			let requestId = data.RequestId;
+
+			if (requestId.includes("error"))
+			{
+				row.getElement().style.color = "red";
+			}
+			else if (requestId.includes("warning"))
+			{
+				row.getElement().style.color = "orange";
+			
+			}
 		}
 	}
 };

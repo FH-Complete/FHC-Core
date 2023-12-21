@@ -43,6 +43,7 @@ var lehrveranstaltungLvGesamtNotenSelectUID=null; //LehreinheitID des Noten Eint
 var lehrveranstaltungNotenTreeloaded=false;
 var lehrveranstaltungGesamtNotenTreeloaded=false;
 var LehrveranstaltungAusbildungssemesterFilter='';
+var LeDetailsDisabled = false; //Damit die Details von der Lehreinheit disabled bleiben soland der Rebuild nicht fertig ist
 
 // Config-Eintrag, ob Vertragsdetails angezeigt werden sollen
 var lehrveranstaltung_vertragsdetails_anzeigen = Boolean(<?php echo (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>);
@@ -80,6 +81,7 @@ var LvTreeListener =
 	didRebuild : function(builder)
   	{
   		//debug('didrebuild');
+		LeDetailsDisabled = false;
 		//timeout nur bei Mozilla notwendig da sonst die rows
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
@@ -452,7 +454,7 @@ function LvTreeSelectLehreinheit()
 		return false;
 
 	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
-	if(LvSelectLehreinheit_id!=null)
+	if(LvSelectLehreinheit_id!=null && LeDetailsDisabled === false)
 	{
 		//Den Subtree der Lehrveranstaltung oeffnen zu der zuletzt die Lehreinheit gespeichert/angelegt wurde
 	   	//da diese sonst nicht markiert werden kann
@@ -754,6 +756,7 @@ function LeDetailSave()
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
 		LeDetailDisableFields(true);
+		LeDetailsDisabled = true;
 		//LvTreeRefresh();
 		LvSelectLehreinheit_id=val.dbdml_data;
 		LvOpenLehrveranstaltung_id=lehrveranstaltung;
@@ -820,7 +823,12 @@ function LeAuswahl()
 			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
 
 			//Notizen Tab ausblenden
-			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
+			document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
+
+			if(document.getElementById('lehrveranstaltung-tabs').selectedItem === document.getElementById('lehrveranstaltung-tab-notizen'))
+			{
+				document.getElementById('lehrveranstaltung-tabs').selectedItem = document.getElementById('lehrveranstaltung-tab-detail');
+			}
 
 			//LV-Angebot Tab einblenden und Gruppen laden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=false;
@@ -845,7 +853,8 @@ function LeAuswahl()
 		}
 		else
 		{
-			LeDetailDisableFields(false);
+			if (LeDetailsDisabled === false)
+				LeDetailDisableFields(false);
 			LehrveranstaltungNotenDisableFields(true);
 			LehrveranstaltungNotenTreeUnload();
 
@@ -853,7 +862,7 @@ function LeAuswahl()
 			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=true;
 
 			//Notizen Tab einblenden
-			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
+			document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
 
 			//LV-Angebot Tab ausblenden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=true;

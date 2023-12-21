@@ -140,7 +140,7 @@ var zgvUeberpruefung = {
 							var datum = new Date();
 							datum.setDate(datum.getDate() + 14);
 							var formatedDate = $.datepicker.formatDate("mm/dd/yy", datum);
-							InfocenterDetails.setPersonOnHold(response.person_id, formatedDate);
+							Rueckstellung.set(response.person_id, formatedDate, 'onhold_zgv');
 						}
 
 						InfocenterDetails._refreshLog();
@@ -171,7 +171,7 @@ var zgvUeberpruefung = {
 						var response = FHC_AjaxClient.getData(data)
 
 						if (response.openZgv === false)
-							InfocenterDetails.removePersonOnHold(response.person_id);
+							Rueckstellung.delete(response.person_id, 'onhold_zgv');
 
 						FHC_DialogLib.alertSuccess(response.msg);
 					} else if (FHC_AjaxClient.isError(data))

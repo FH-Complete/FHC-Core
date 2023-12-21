@@ -1196,4 +1196,19 @@ function anzahlTage($date1, $date2)
 	$diff = $date2_ts - $date1_ts;
 	return round($diff / 86400);
 }
+
+/**
+ * Gibt zurück, ob ein String ausschließlich erlaubte Zeichen enthält
+ * erlaubt: Buchstaben a-z, A-Z, 0-9, -, _
+ * @param string $stringToCheck Eingabestring
+ * @return boolena true or false
+ */
+function hasOnlyAllowedChars($stringToCheck)
+{
+		if (!preg_match("#^[a-zA-Z0-9_-]+$#", $stringToCheck))
+			return false;
+		else
+			return true;
+}
+
 ?>

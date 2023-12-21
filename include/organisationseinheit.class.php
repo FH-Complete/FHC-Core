@@ -650,11 +650,14 @@ class organisationseinheit extends basis_db
 					LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
 					OR
 					LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
+					OR
+					LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
 				)';
 				foreach($searchItem as $value)
 				{
 					$qry.=' OR (LOWER(oe_kurzbz)=LOWER('.$this->db_add_param($value).'))
-							OR (LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))';
+							OR (LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))
+							OR (LOWER(organisationseinheittyp_kurzbz||bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))';
 				}
 		$qry.=	' ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
 
@@ -938,5 +941,42 @@ class organisationseinheit extends basis_db
 			return false;
 		}
 	}
+	
+	public function getOERoot($oe_kurzbz)
+	{
+		$qry = '
+			WITH RECURSIVE organizations(rid, oe_kurzbz, oe_parent_kurzbz) AS
+			(
+				SELECT 1 AS rid, o.oe_kurzbz, o.oe_parent_kurzbz
+	  			FROM public.tbl_organisationseinheit o
+				WHERE o.oe_kurzbz = '. $this->db_add_param($oe_kurzbz). '
+				UNION ALL
+				SELECT rid + 1 AS rid, oe.oe_kurzbz, oe.oe_parent_kurzbz
+	  			FROM organizations org, public.tbl_organisationseinheit oe
+				WHERE oe.oe_kurzbz = org.oe_parent_kurzbz
+					AND oe.aktiv = TRUE
+			)
+			SELECT oe_kurzbz
+			FROM organizations orgs
+			ORDER BY rid DESC
+			LIMIT 1
+		';
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->oe_kurzbz = $row->oe_kurzbz;
+				return true;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+			return false;
+		}
+	}
+	
+	
 }
 ?>

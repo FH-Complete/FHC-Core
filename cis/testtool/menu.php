@@ -277,6 +277,7 @@ if (isset($_SESSION['pruefling_id']))
 	$anzahlGebiete = $db->db_num_rows($result);
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
+	$_SESSION['alleGebiete']= [];
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -385,6 +386,7 @@ if (isset($_SESSION['pruefling_id']))
 						</td>
 					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
 					</tr>';
+			$_SESSION['alleGebiete'][] = $row->gebiet_id;
 		}
 		else
 		{
