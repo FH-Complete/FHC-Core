@@ -289,20 +289,27 @@ export default {
 
 <!-- COLUMNS WITH MULTIPLE ROWS NEXT TO PROFIL PICTURE -->
                   <div class="col-12 col-sm-6">
-                  <div class="row">
+                  <div class="gy-4 row">
                   <div class="col-12">
-                  <div class=" form-floating mb-2">
-                        
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingVorname"  :value="data.vorname">
-                  <label for="floatingVorname">Vorname</label>
+                
+
+                  <div  class="form-underline ">
+                <div class="form-underline-titel">Vorname</div>
+                <span class="form-underline-content">{{data.vorname}} </span>
+                
                 </div>
+
+                        
                 </div>
                 <div class="col-12">
-                <div class=" form-floating mb-2">
-                        
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingNachname"  :value="data.nachname">
-                  <label for="floatingNachname">Nachname</label>
+                
+                
+                <div  class="form-underline ">
+                <div class="form-underline-titel">Nachname</div>
+                <span class="form-underline-content">{{data.nachname}} </span>
+                
                 </div>
+
                 </div>
                 </div>
              
@@ -317,13 +324,18 @@ export default {
 
 
                   <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
-                  <div class=" form-floating mb-2">
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
-                  <label :for="'floating'+bez">{{bez}}</label>
-                  </div>
-                  </div>
 
+
+                  
+                  <div  class="form-underline ">
+                  <div class="form-underline-titel">{{bez}}</div>
+                  <span class="form-underline-content">{{wert?wert:'-'}} </span>
+                  
+                  </div>
+                  
+                  </div>
+                
                   
                       </div>
 
@@ -369,8 +381,8 @@ export default {
                       <!-- HIER SIND DIE EMAILS -->
                   
                   
-                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center ">
-                      <div  class="col-12 ">
+                      <div  v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="gy-3 row justify-content-center ">
+                      <div v-for="email in wert" class="col-12 ">
                      
                             <div class="row align-items-center">
                       <div class="col-1 text-center">
@@ -379,14 +391,16 @@ export default {
 
                       </div>
                       <div class="col">
-                      <div class=" form-floating mb-2">
-                            
-                      <a :href="'mailto:'+email.email" class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
-                             {{email.email}}
-                            </a>
-                            <div class="floating-title">{{email.type }}</div>
 
-                      </div>
+
+
+                      <div  class="form-underline ">
+                  <div class="form-underline-titel">{{email.type}}</div>
+                  <a :href="'mailto:'+email.email" class="form-underline-content" >{{email.email}}</a>
+                  </div>
+                     
+                            
+                   
                       </div>
                       </div>
                       </div>
@@ -420,25 +434,25 @@ export default {
                         Mitarbeiter Information
                         </div>
                         <div class="card-body">
-                            <div class="row">
+                            <div class="gy-3 row">
                             <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
                             
                            
-                            <div  class=" form-floating mb-2">  
-                             <!-- print Telefon link -->
-                             <template v-if="bez=='Telefon'">
-                               <a  :href="get_mitarbeiter_standort_telefon"  class="form-control form-control-plaintext border-bottom" :id="'floating'+bez">
-                                 {{wert?wert:'-'}}
-                                </a>
-                                <div class="floating-title">{{bez }}</div>
-                                </template>
+                         
 
-                             <!-- otherwise print input field -->
-                                <template v-else>
-                                <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
-                                <label :for="'floating'+bez">{{bez }}</label>
-                                </template>
-                                </div>
+                                <div  class="form-underline ">
+                             <div class="form-underline-titel">{{bez}}</div>
+                             <a v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon"  class="form-underline-content" >
+                             {{wert?wert:'-'}}
+                            </a>
+                             <span  v-else class="form-underline-content" >
+                                 {{wert?wert:'-'}}
+                                </span>
+                             
+                             </div>
+
+                               
+                              
                             </div>
                         </div>
                         

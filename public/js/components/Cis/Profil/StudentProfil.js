@@ -245,7 +245,7 @@ export default {
 
                     <!-- INFORMATION CONTENT START -->
                     <!-- ROW WITH THE PROFIL INFORMATION --> 
-                    <div class="row mb-4">
+                    <div class="row mb-4 ">
 
 
 
@@ -265,7 +265,7 @@ export default {
 
 <!-- FIRST KAESTCHEN -->
                       <div  class="col-lg-12 col-xl-6 ">
-                     <div class="row mb-4">
+                     <div class="row mb-4 ">
                      <div class="col">
                      
                         
@@ -279,7 +279,7 @@ export default {
 
 
                   
-                  <div  class="row align-items-center">
+                  <div  class="row gy-3 align-items-center">
 
 
 
@@ -308,20 +308,29 @@ export default {
 
 <!-- COLUMNS WITH MULTIPLE ROWS NEXT TO PROFIL PICTURE -->
                   <div class="col-12 col-sm-6">
-                  <div class="row">
+                  <div class="row gy-4">
                   <div class="col-12">
-                  <div class=" form-floating mb-2">
+                 
                         
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingVorname"  :value="data.vorname">
-                  <label for="floatingVorname">Vorname</label>
-                </div>
+                  <div  class="form-underline ">
+                  <div class="form-underline-titel">Vorname</div>
+                  <span class="form-underline-content">{{data.vorname}} </span>
+                  
+                  </div>
+
+                  
+               
                 </div>
                 <div class="col-12">
-                <div class=" form-floating mb-2">
-                        
-                  <input  readonly class="form-control form-control-plaintext border-bottom" id="floatingNachname"  :value="data.nachname">
-                  <label for="floatingNachname">Nachname</label>
-                </div>
+                
+                     
+
+                  <div  class="form-underline ">
+                  <div class="form-underline-titel">Nachname</div>
+                  <span class="form-underline-content">{{data.nachname}} </span>
+                  
+                  </div>
+                
                 </div>
                 </div>
              
@@ -330,11 +339,15 @@ export default {
                   
 
                   <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
-                  <div class=" form-floating mb-2">
-                        
-                  <input  readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
-                  <label :for="'floating'+bez">{{bez}}</label>
+          
+
+
+                  <div  class="form-underline ">
+                  <div class="form-underline-titel">{{bez}}</div>
+                  <span class="form-underline-content">{{wert?wert:'-'}} </span>
+                  
                   </div>
+                  
                   </div>
 
                   
@@ -346,7 +359,7 @@ export default {
                     </div>
 		    </div>
                     </div>
-                     <div class="row mb-4">
+                     <div class="row mb-4 ">
                      
 
                      <div  class=" col-lg-12">
@@ -357,15 +370,18 @@ export default {
                          Studenten Information
                          </div>
                          <div class="card-body">
-                             <div class="row">
+                             <div class="row gy-3">
                              <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
                              
                           
-                             <div  class=" form-floating mb-2">  
+                             <div  class="form-underline ">
+                             <div class="form-underline-titel">{{bez}}</div>
+                             <span class="form-underline-content">{{wert?wert:'-'}} </span>
+                             
+                             </div>
                            
-                                 <input   readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+bez"  :value="wert?wert:'-'">
-                                 <label :for="'floating'+bez">{{bez}}</label>
-                                 </div>
+                               
+                               
                              </div>
                          </div>
                          
@@ -415,8 +431,8 @@ export default {
                       <!-- HIER SIND DIE EMAILS -->
                   
                   
-                      <div v-for="email in wert" v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row justify-content-center ">
-                      <div  class="col-12 ">
+                      <div  v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="row gy-3 justify-content-center ">
+                      <div v-for="email in wert" class="col-12 ">
                      
                             <div class="row align-items-center">
                             <!--
@@ -429,10 +445,11 @@ export default {
                       <div class="col">
                       <div class=" form-floating mb-2">
                             
-                            <a :href="'mailto:'+email.email" readonly class="form-control form-control-plaintext border-bottom" :id="'floating'+email.type">
-                              {{email.email}}
-                            </a>
-                            <div class="floating-title"> <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i> {{email.type }}</div>
+                            <div class="form-underline ">
+                            <div class="form-underline-titel">{{email.type}}</div>
+                            <a :href="'mailto'+email.email" class="form-underline-content">{{email.email}} </a>
+                            </div>
+
                       </div>
 
                    
@@ -466,52 +483,49 @@ export default {
                           </div>
                           <div class="card-body ">
                             
-                            <div v-for="element in privateKontakte" class="align-items-center row justify-content-center">
+                            <div  class="gy-3  row ">
+                            <div v-for="element in privateKontakte" class="col-12">
+                            <div class="gy-3 row align-items-center justify-content-center">
                               <div class="col-1 text-center" >
                               
-                              <!--<i class="fa-solid " :class="{...(element.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" style="color:rgb(0, 100, 156)"></i>-->
+                              <i class="fa-solid " :class="{...(element.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" style="color:rgb(0, 100, 156)"></i>
                               </div>
-                              <div  :class="{...(element.anmerkung? {'col-11':true, 'col-md-5':true, 'col-xl-11':true, 'col-xxl-5':true} : {'col-9':true, 'col-xl-9':true})}">
+                              <div  :class="{...(element.anmerkung? {'col-11':true, 'col-md-6':true, 'col-xl-11':true, 'col-xxl-6':true} : {'col-10':true, 'col-xl-9':true, 'col-xxl-10':true})}">
                                   
                                   <!-- rendering KONTAKT emails -->
-                                  <div v-if="element.kontakt.includes('@')" class=" form-floating mb-2">
+                             
+
+                                  <div  class="form-underline ">
+                                  <div class="form-underline-titel">{{element.kontakttyp}}</div>
+                                  <a  :href="'mailto:'+element.kontakt" v-if="element.kontakt.includes('@')" class="form-underline-content">{{element.kontakt}} </a>
+                                  <a  v-else :href="'tel:'+element.kontakt" class="form-underline-content">{{element.kontakt}} </a>
+                                  </div>
                                     
-                                    <a :href="'mailto:'+element.kontakt" class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
-                                     {{element.kontakt}}
-                                    </a>
-                                     <div class="floating-title"><i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i> {{element.kontakttyp }}</div>
+                                 
+
+                              </div>
+                              <div v-if="element?.anmerkung" class="offset-1 offset-md-0 offset-xl-1 offset-xxl-0 order-2 order-sm-1 col-10  col-md-4   col-xl-9 col-xxl-4   ">
                                   
-                                  </div>
-
-                                  <!-- rendering KONTAKT phones -->
-                                  <div v-else class=" form-floating mb-2">
-                                     
-                                    <a :href="'tel:'+element.kontakt" class="form-control form-control-plaintext border-bottom" :id="'floating'+element.kontakttyp">
-                                      {{element.kontakt}}
-                                    </a>
-                                    <div class="floating-title"><i class="fa-solid fa-phone" style="color:rgb(0, 100, 156)"></i> {{element.kontakttyp }}</div>
-                                    
-
-                                  </div>
-
+                              <div  class="form-underline ">
+                              <div class="form-underline-titel">Anmerkung</div>
+                              <span  class="form-underline-content">{{element.anmerkung}} </span>
                               </div>
-                              <div v-if="element?.anmerkung" class="offset-1 offset-md-0 col-9 col-md-4  offset-xl-1 offset-xxl-0 col-xl-9 col-xxl-4 order-2 order-md-1 order-xl-1 order-sm-1 order-xxl-1  ">
-                                  <div class=" form-floating mb-2">
-                                      <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingAnmerkung" :value="element.anmerkung">
-                                      <label for="floatingAnmerkung">Anmerkung</label>
-                                  </div>
+
+                            
                               </div>
-                              <div class="col-2 order-2 order-sm-2 order-md-2 order-lg-1 col-xl-2 col-xxl-2 allign-middle">
+                              <div class="col-1 col-sm-1 order-2  order-lg-1 col-xl-2 col-xxl-1 allign-middle">
                                   <i v-if="element.zustellung" class="fa-solid fa-check"></i>
                                   <i v-else="element.zustellung" class="fa-solid fa-xmark"></i>
                               </div>
                             </div>
-                           
+                            </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                     <!-- -->
+
 
                     <!-- HIER SIND DIE PRIVATEN ADRESSEN-->
                     <div class="row mb-4">
@@ -520,7 +534,10 @@ export default {
                           <div class="card-header">Private Adressen</div>
                           <div class="card-body">
                           
-                            <div v-for="element in privateAdressen" class="row justify-content-center align-items-center">
+                            <div class="gy-3 row ">
+                            <div v-for="element in privateAdressen" class="col-12">
+                            <div class="gy-3 row justify-content-center align-items-center">
+                            
                             <!-- column 1 in the address row -->
                             
                                 <div class="col-1 text-center">
@@ -528,35 +545,43 @@ export default {
                                   <i class="fa fa-location-dot fa-lg" style="color:#00649C "></i>
                                 
                                 </div>
-                                <div  class="col ">
-                                    <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingStrasse" :value="element.strasse">
-                                        <label for="floatingStrasse">Strasse</label>
-                                    </div>
+                                <div  class="col-11 col-sm-8 col-xl-11 col-xxl-8 order-1">
+
+                                <div class="form-underline ">
+                                <div class="form-underline-titel">Strasse</div>
+                                <span class="form-underline-content">{{element.strasse}} </span>
                                 </div>
-                                <div class="w-100 "></div>
+
+
+                                </div>
                                 
                             <!-- column 2 in the address row -->
-                                <div  class="col-11 offset-1 offset-md-0 offset-xl-1  col-xl-6 order-xl-1 col-md-3 col-sm-6 col-xs-6 order-sm-1">
-                                    <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingTyp" :value="element.adr_typ">
-                                        <label for="floatingTyp">Typ</label>
+                                <div  class="offset-1 offset-sm-0 offset-xl-1 offset-xxl-0 order-2 order-sm-4 order-xl-2 order-xxl-4 col-11 col-sm-5  col-xl-11 col-xxl-5  ">
+                                    
+
+                                    <div class="form-underline ">
+                                    <div class="form-underline-titel">Typ</div>
+                                    <span class="form-underline-content">{{element.adr_typ}} </span>
+                                    </div>
+
+                                </div>
+                                <div  class="offset-1 order-3 order-sm-3 col-11 col-sm-6  col-xl-7 col-xxl-6 ">
+                                    
+                                    <div class="form-underline ">
+                                    <div class="form-underline-titel">Ort</div>
+                                    <span class="form-underline-content">{{element.ort}} </span>
                                     </div>
                                 </div>
-                                <div  class="col-11 offset-1  col-xl-11 col-md-5 col-sm-11 col-xs-11 ">
-                                    <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingOrt" :value="element.ort">
-                                        <label for="floatingOrt">Ort</label>
-                                    </div>
-                                </div>
-                                <div  class="col-11 offset-1 offset-sm-0 offset-md-0 col-xl-5 order-xl-2 col-md-3 col-sm-5 col-xs-5 order-sm-2">
-                                    <div class=" form-floating mb-2">
-                                        <input   readonly class="form-control form-control-plaintext border-bottom" id="floatingPLZ" :value="element.plz">
-                                        <label for="floatingPLZ">PLZ</label>
+                                <div  class="offset-1 offset-sm-0 order-4 order-sm-2 order-xl-4 order-xxl-2 col-11 col-sm-3 col-xl-4 col-xxl-3 ">
+                                    <div class="form-underline ">
+                                    <div class="form-underline-titel">PLZ</div>
+                                    <span class="form-underline-content">{{element.plz}} </span>
                                     </div>
                                 </div>
                             </div>
                           </div>
+                          </div>
+                            </div>
                         </div>
                       </div>
                     </div>
