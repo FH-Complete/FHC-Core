@@ -35,6 +35,7 @@ require_once('../include/prestudent.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/statusgrund.class.php');
 require_once('../include/student.class.php');
+require_once('../include/bismeldestichtag.class.php');
 
 $rdf_url='http://www.technikum-wien.at/prestudentrolle';
 $datum = new datum();
@@ -80,6 +81,8 @@ foreach($statusgrund->result as $row)
 $studentlehrverband = new student();
 $uid = $studentlehrverband->getUid($prestudent_id);
 
+
+$erstes_stichtag_inaktiv = true;
 foreach($ps->result as $row)
 {
 	$lehrverband = '-';
@@ -97,6 +100,21 @@ foreach($ps->result as $row)
 			$studentlehrverband->load_studentlehrverband($uid, $row->studiensemester_kurzbz);
 			$lehrverband = $studentlehrverband->semester.$studentlehrverband->verband.$studentlehrverband->gruppe;
 		}
+	}
+
+	// prüfen, ob Meldestichtag erreicht
+	$bismeldestichtag = new bismeldestichtag();
+	$stichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($row->datum);
+
+	// Variablen für layout von prestudentstatus Anzeige
+	$stichtagsaktiv = $stichtag_erreicht ? 'stichtagsinaktiv' : 'stichtagsaktiv';
+	$aktiv = $stichtag_erreicht ? 'false' : 'true';
+
+	// erstes mal stichtag erreicht -> anderes layout
+	if ($stichtag_erreicht && $erstes_stichtag_inaktiv)
+	{
+		$stichtagsaktiv = 'erstes_stichtagsinaktiv';
+		$erstes_stichtag_inaktiv = false;
 	}
 
 	echo '
@@ -123,6 +141,8 @@ foreach($ps->result as $row)
 			<ROLLE:insertvon><![CDATA['.$row->insertvon.']]></ROLLE:insertvon>
 			<ROLLE:updateamum><![CDATA['.$datum->formatDatum($row->updateamum,'d.m.Y H:i:s').']]></ROLLE:updateamum>
 			<ROLLE:updatevon><![CDATA['.$row->updatevon.']]></ROLLE:updatevon>
+			<ROLLE:stichtagsaktiv><![CDATA['.$stichtagsaktiv.']]></ROLLE:stichtagsaktiv>
+			<ROLLE:aktiv><![CDATA['.$aktiv.']]></ROLLE:aktiv>
       	</RDF:Description>
       </RDF:li>
 	';

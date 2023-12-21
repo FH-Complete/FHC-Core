@@ -4488,7 +4488,7 @@ When on hold, the date is only a reminder.',
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
@@ -4818,7 +4818,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'core',
 		'category' => 'password',
@@ -22567,6 +22567,66 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'stichtagHinzufuegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add report target date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'stichtageVerwalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BIS-Meldestichtage verwalten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Manage report target dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'stichtagLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete report target date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 

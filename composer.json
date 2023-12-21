@@ -337,28 +337,28 @@
 				}
 			}
 		},
-                {
-                        "type": "package",
-                        "package": {
-                                "name": "vuejs/vuedatepicker_js",
-                                "version": "5.4.0",
-                                "dist": {
-                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/vue-datepicker.iife.js",
-                                        "type": "file"
-                                }
-                        }
-                },
-                {
-                        "type": "package",
-                        "package": {
-                                "name": "vuejs/vuedatepicker_css",
-                                "version": "5.4.0",
-                                "dist": {
-                                        "url": "https://unpkg.com/@vuepic/vue-datepicker@5.4.0/dist/main.css",
-                                        "type": "file"
-                                }
-                        }
-                },		
+		{
+			"type": "package",
+			"package": {
+					"name": "vuejs/vuedatepicker_js",
+					"version": "5.4.0",
+					"dist": {
+							"url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/vue-datepicker.iife.js",
+							"type": "file"
+					}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+					"name": "vuejs/vuedatepicker_css",
+					"version": "5.4.0",
+					"dist": {
+							"url": "https://unpkg.com/@vuepic/vue-datepicker@4.2.3/dist/main.css",
+							"type": "file"
+					}
+			}
+		},
 		{
 			"type": "composer",
 			"url": "https://asset-packagist.org"

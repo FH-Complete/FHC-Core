@@ -74,6 +74,7 @@ require_once('../../include/reihungstest.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/mobilitaet.class.php');
 require_once('../../include/studienordnung.class.php');
+require_once('../../include/bismeldestichtag.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -383,7 +384,7 @@ function isBuchungAllowedToChange($buchung_obj)
  * @param $new_status_ausbildungssemester Ausbildungssemester des neuen/zu ändernen Status
  * @param $old_status_studiensemester Studiensemester des alten Status, leer wenn neuer Status
  * @param $old_status_ausbildungssemester Ausbildungssemester des alten Status, leer wenn neuer Status
- * @return array
+ * @return array mit error = true und Fehlerbeschreibung wenn ungültig, andernfalls error = false
  */
 function checkStatusaenderung(
 	$prestudent_id, $status_kurzbz, $new_status_studiensemester, $new_status_datum, $new_status_ausbildungssemester,
@@ -417,7 +418,7 @@ function checkStatusaenderung(
 	$studiensemester->load($new_status_studiensemester);
 	$new_status_semesterstart = new DateTime($studiensemester->start);
 
-	// Alle bisherigen prestudentstatus nach Datum sortiert
+	// Alle prestudentstatus nach Datum sortiert
 	$qry = "SELECT status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, sem.start AS studiensemester_start
 			FROM public.tbl_prestudentstatus pss
 			JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
@@ -464,7 +465,7 @@ function checkStatusaenderung(
 				// Gültige Zeitabfolge, bestehenden Status hinzufügen
 				$statusArr[] = $row;
 			}
-			// oder Neuer/editierter Statuseintrag nach bestehendem Statuseintrag
+			// oder Neuer/editierter Statuseintrag vor bestehendem Statuseintrag
 			elseif ($new_status_datum <= $status_datum && $new_status_semesterstart <= $studiensemester_start)
 			{
 				// Gültige Zeitabfolge, bestehenden Status hinzufügen
@@ -475,8 +476,7 @@ function checkStatusaenderung(
 				// Zeitabfolge ungültig, Fehler
 				return array(
 					'error' => true,
-					'errormsg' => 'Datum des Statuseintrags muss nach dem Statusdatum,'
-						.' Semesterstartdatum nach Semesterstartdatum des vorherigen Statuseintrags sein'
+					'errormsg' => 'Ungültige Zeitabfolge der Statuseinträge (Statusdatum oder Semester)'
 				);
 			}
 		}
@@ -994,6 +994,18 @@ if(!$error)
 								{
 									$new_status_datum = isset($_POST['datum']) ? $_POST['datum'] : date('Y-m-d');
 
+									$bismeldestichtag = new bismeldestichtag();
+
+									$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($new_status_datum);
+
+									if ($meldestichtag_erreicht === true)
+									{
+										$return = false;
+										$error = true;
+										$errormsg .= 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
+										$anzahl_fehler++;
+									}
+
 									$check_statusaenderung_result = checkStatusaenderung(
 										$prestudent_id,
 										$_POST['status_kurzbz'],
@@ -1204,12 +1216,23 @@ if(!$error)
 
 		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['status_kurzbz']) &&
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
-		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
+		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']) &&
+		   isset($_POST['datum']))
 		{
-			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid'))
+			$erweiterteBerechtigungen = $rechte->isBerechtigt('admin', null, 'suid') || $rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid');
+
+			$bismeldestichtag = new bismeldestichtag();
+			$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
+
+			if($_POST['status_kurzbz']=='Student' && !$erweiterteBerechtigungen)
 			{
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
+			}
+			elseif ($meldestichtag_erreicht && !$erweiterteBerechtigungen)
+			{
+				$return = false;
+				$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht gelöscht werden.';
 			}
 			else
 			{
@@ -1529,6 +1552,17 @@ if(!$error)
 							$return = false;
 							$error = true;
 							$errormsg = isset($check_statusaenderung_result['errormsg']) ? $check_statusaenderung_result['errormsg'] : '';
+						}
+
+						// Prüfung, ob Meldestichtag erreicht ist
+						$bismeldestichtag = new bismeldestichtag();
+						$meldestichtag_erreicht = $bismeldestichtag->checkMeldestichtagErreicht($_POST['datum']);
+
+						if ($meldestichtag_erreicht === true)
+						{
+							$return = false;
+							$error = true;
+							$errormsg = 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag können nicht hinzugefügt werden.';
 						}
 					}
 
