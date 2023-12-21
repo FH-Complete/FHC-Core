@@ -47,7 +47,7 @@ export default {
 						return console.error('Component missing for ' + key);
 
 					tabs[key] = {
-						component: Vue.defineAsyncComponent(() => import(config.component)),
+						component: Vue.markRaw(Vue.defineAsyncComponent(() => import(config.component))),
 						title: config.title || key,
 						config: config.config,
 						key
