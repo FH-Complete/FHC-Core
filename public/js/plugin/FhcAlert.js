@@ -133,8 +133,8 @@ const helperApp = Vue.createApp({
 		helperAppContainer.parentElement.removeChild(helperAppContainer);
 	},
 	template: `
-	<pv-toast ref="toast" base-z-index="99999"></pv-toast>
-	<pv-toast ref="alert" base-z-index="99999" position="center">
+	<pv-toast ref="toast" :base-z-index="99999"></pv-toast>
+	<pv-toast ref="alert" :base-z-index="99999" position="center">
 		<template #message="slotProps">
 			<i class="fa fa-circle-exclamation fa-2xl mt-3"></i>
 			<div class="p-toast-message-text">
