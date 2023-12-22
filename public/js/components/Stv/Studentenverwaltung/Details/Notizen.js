@@ -15,7 +15,7 @@ export default {
 		CoreRESTClient,
 		CoreFilterCmpt,
 		Notiz,
-		BsModal
+		BsModal,
 	},
 	props: {
 		modelValue: Object
@@ -31,7 +31,8 @@ export default {
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
 					{title: "Start", field: "start"},
 					{title: "Ende", field: "ende"},
-					{title: "Dokumente", field: "dms_id"},
+/*					{title: "Dokumente", field: "dms_id"},*/
+					{title: "Dokumente", field: "countdoc"},
 					{title: "Erledigt", field: "erledigt"},
 					{title: "Notiz_id", field: "notiz_id", visible: false},
 					{title: "Notizzuordnung_id", field: "notizzuordnung_id", visible: false},
@@ -62,18 +63,23 @@ export default {
 				text: null,
 				von: null,
 				bis: null,
-				dms_id: null,
+				document: null,
 				erledigt: false,
 				verfasser: null,
-				bearbeiter: null
+				bearbeiter: null,
+				anhang: []
 			},
+			showErweitert: true,
+			showDocument: true,
+
 		}
 	},
 	methods:{
 		actionDeleteNotiz(notiz_id){
 			this.loadNotiz(notiz_id).then(() => {
-				if(this.notizen.notiz_id)
+				if(this.notizen.notiz_id) {
 					this.$refs.deleteNotizModal.show();
+				}
 			});
 		},
 		actionEditNotiz(notiz_id){
@@ -84,10 +90,14 @@ export default {
 					this.formData.text = this.notizen.text;
 					this.formData.von = this.notizen.start;
 					this.formData.bis = this.notizen.ende;
-					this.formData.doc = this.notizen.dms_id;
+					this.formData.document = this.notizen.dms_id;
 					this.formData.erledigt = this.notizen.erledigt;
 					this.formData.verfasser = this.notizen.verfasser_uid;
 					this.formData.bearbeiter = this.notizen.bearbeiter_uid;
+					if(this.notizen.dms_id){
+						console.log("loadEntries");
+						this.loadDocEntries(this.notizen.notiz_id);
+					}
 				}
 			});
 		},
@@ -97,14 +107,20 @@ export default {
 			this.formData.text = null;
 			this.formData.von = null;
 			this.formData.bis = null;
-			this.formData.dms_id = null;
+			this.formData.document = null;
 			this.formData.erledigt = false;
 			this.formData.verfasser = null;
 			this.formData.bearbeiter = null;
+			this.formData.anhang = [];
 		},
 		addNewNotiz(notizData) {
+			console.log(this.formData);
+			const formData = new FormData();
+			Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
+			console.log(formData);
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
-				this.formData
+				formData,
+				{ Headers: { "Content-Type": "multipart/form-data" } }
 			).then(response => {
 				if (!response.data.error) {
 					this.$fhcAlert.alertSuccess('Anlegen von neuer Notiz erfolgreich');
@@ -123,6 +139,9 @@ export default {
 				window.scrollTo(0, 0);
 			});
 		},
+		attachFile(){
+			console.log("ATTACH FILE");
+		},
 		deleteNotiz(notiz_id){
 			CoreRESTClient.post('components/stv/Notiz/deleteNotiz/' + notiz_id)
 				.then(response => {
@@ -139,12 +158,30 @@ export default {
 				window.scrollTo(0, 0);
 			});
 		},
+		loadDocEntries(notiz_id){
+			return CoreRESTClient.get('components/stv/Notiz/loadDokumente/' + notiz_id)
+				.then(
+					result => {
+						console.log(result.data);
+						if(result.data.retval)
+							this.formData.anhang = result.data.retval;
+						else
+						{
+							this.formData.anhang = {};
+							this.$fhcAlert.alertError('Kein Dokumenteneintrag mit NotizId ' + notiz_id + ' gefunden');
+						}
+						return result;
+					}
+				);
+		},
 		loadNotiz(notiz_id){
 			return CoreRESTClient.get('components/stv/Notiz/loadNotiz/' + notiz_id)
 				.then(
 					result => {
-						if(result.data.retval)
+						if(result.data.retval) {
 							this.notizen = result.data.retval;
+
+						}
 						else
 						{
 							this.notizen = {};
@@ -162,10 +199,11 @@ export default {
 			this.formData.text = null;
 			this.formData.von = null;
 			this.formData.bis = null;
-			this.formData.dms_id = null;
+			this.formData.document = null;
 			this.formData.erledigt = false;
 			this.formData.verfasser = null;
 			this.formData.bearbeiter = null;
+			this.formData.anhang = [];
 		},
 		updateNotiz(notiz_id){
 			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
@@ -189,11 +227,12 @@ export default {
 				window.scrollTo(0, 0);
 				//this.reload();
 			});
-		}
+		},
 	},
 	template: `
 	<div class="stv-details-details h-100 pb-3">
-	
+	{{modelValue}}
+
 		<!--Modal: deleteNotizModal-->
 		<BsModal ref="deleteNotizModal">
 			<template #title>Notiz löschen</template>
@@ -205,7 +244,7 @@ export default {
 				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizen.notiz_id)">OK</button>
 			</template>
 		</BsModal>
-	
+			
 		<core-filter-cmpt
 		ref="table"
 		:tabulator-options="tabulatorOptions"
@@ -220,20 +259,30 @@ export default {
 	</core-filter-cmpt>
 
 	<br>	
+	<hr>
 		<Notiz 
+			:showErweitert="showErweitert"
+			:showDocument="showDocument"
 			v-model:titel="formData.titel" 
 			v-model:text="formData.text" 
-			v-model:action="formData.action" 
+			v-model:action="formData.action" 				
 			v-model:von="formData.von" 
 			v-model:bis="formData.bis" 
-			v-model:document="formData.dms_id"
+			v-model:document="formData.document"
 			v-model:erledigt="formData.erledigt"
 			v-model:verfasser="formData.verfasser"
 			v-model:bearbeiter="formData.bearbeiter"
-		></Notiz>
+			v-model:anhang="formData.anhang"
+		>
+		</Notiz>
 			
 		<button v-if="formData.action === 'Neue Notiz'"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
 		<button v-else type="button" class="btn btn-warning" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
+		
+		
+		<div>
+			parent: {{anhang}} | {{formData.anhang.name}}
+		</div>
 	</div>
 `
 };

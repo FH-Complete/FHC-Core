@@ -23,7 +23,7 @@ class Notiz extends FHC_Controller
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
-		$result = $this->NotizModel->getNotiz($person_id, true);
+		$result = $this->NotizModel->getNotizWithDocEntries($person_id);
 
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -62,7 +62,9 @@ class Notiz extends FHC_Controller
 
 	public function addNewNotiz($person_id)
 	{
-		$_POST = json_decode($this->input->raw_input_stream, true);
+		var_dump($this->input->post('titel'));
+		var_dump($this->input->post('anhang'));
+		var_dump($_FILES);
 		$this->load->library('form_validation');
 
 
@@ -79,16 +81,10 @@ class Notiz extends FHC_Controller
 		$uid = getAuthUID();
 		$titel = isset($_POST['titel']) ? $_POST['titel'] : null;
 		$text = isset($_POST['text']) ? $_POST['text'] : null;
-		//$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
 		$verfasser_uid = $uid;
 		$start = isset($_POST['von']) ? $_POST['von'] : null;
 		$ende = isset($_POST['bis']) ? $_POST['bis'] : null;
 		$erledigt = $_POST['erledigt'];
-
-/*		$dms_id = isset($_POST['dms_id']) ? $_POST['dms_id'] : null;
-		$bearbeiter_uid = isset($_POST['bearbeiter_uid']) ? $_POST['bearbeiter_uid'] : null;
-
-*/
 
 		$result = $this->NotizModel->addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $start, $ende);
 
@@ -189,6 +185,34 @@ class Notiz extends FHC_Controller
 			$this->outputJson($result);
 		}
 		return $this->outputJsonSuccess(current(getData($result)));
+	}
+
+	public function loadDokumente($notiz_id)
+	{
+		$this->load->model('person/Notiz_model', 'NotizModel');
+
+		//TODO(manu) check, ob mehr Dateien bzw. -versionen
+		//warum nur ein Eintrag???
+		$this->NotizModel->addSelect('campus.tbl_dms_version.*');
+
+		$this->NotizModel->addJoin('public.tbl_notiz_dokument','ON (public.tbl_notiz_dokument.notiz_id = public.tbl_notiz.notiz_id)');
+		$this->NotizModel->addJoin('campus.tbl_dms_version','ON (public.tbl_notiz_dokument.dms_id = campus.tbl_dms_version.dms_id)');
+
+		$result = $this->NotizModel->loadWhere(
+			array('public.tbl_notiz.notiz_id' => $notiz_id)
+		);
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson($result);
+		}
+
+		elseif (!hasData($result)) {
+			$this->outputJson($result);
+		}
+		else
+		{
+			$this->outputJsonSuccess(getData($result));
+		}
 	}
 
 }
