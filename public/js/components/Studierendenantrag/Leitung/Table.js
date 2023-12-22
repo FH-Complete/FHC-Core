@@ -40,7 +40,7 @@ export default {
 	},
 	methods: {
 		reload(stg) {
-			this.table.replaceData(this.ajaxUrl + (stg || ''));
+			this.table.setData(this.ajaxUrl + (stg || ''));
 		},
 		download() {
 			this.table.download("csv", "data.csv", {
