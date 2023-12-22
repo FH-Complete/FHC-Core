@@ -286,7 +286,6 @@ class AntragJob extends JOB_Controller
 
 		$result = $this->PruefungModel->getAllPrestudentsWhereCommitteeExamFailed(
 			[
-				null,
 				Studierendenantragstatus_model::STATUS_REQUESTSENT_1,
 				Studierendenantragstatus_model::STATUS_REQUESTSENT_2
 			],
