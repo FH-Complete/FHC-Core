@@ -50,8 +50,7 @@ export const CoreFilterCmpt = {
 			default: true
 		},
 		filterType: {
-			type: String,
-			required: true
+			type: String
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
