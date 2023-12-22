@@ -461,7 +461,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$abschlussbeurteilung='';
 		// Hole Datum der Sponsion -> wenn keine vorhanden nimm aktuelles datum
 		$qry = "SELECT
-					sponsion, tbl_abschlussbeurteilung.bezeichnung_english, datum, pruefungstyp_kurzbz
+					sponsion, tbl_abschlussbeurteilung.bezeichnung_english, datum, pruefungstyp_kurzbz, bezeichnung
 				FROM
 					lehre.tbl_abschlusspruefung
 					JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz)
@@ -481,11 +481,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$sponsion_datum = $datum->formatDatum($row1->sponsion, 'd.m.Y');
 				$abschlusspruefungsdatum = $datum->formatDatum($row1->datum, 'd.m.Y');
 				$abschlussbeurteilung = $row1->bezeichnung_english;
+				$abschlussbeurteilung_deutsch = $row1->bezeichnung;
 				$pruefungstyp_kurzbz = $row1->pruefungstyp_kurzbz;
 			}
 		}
 		echo "		<pruefungstyp_kurzbz>$pruefungstyp_kurzbz</pruefungstyp_kurzbz>";
 		echo "		<abschlussbeurteilung>$abschlussbeurteilung</abschlussbeurteilung>";
+		echo "		<abschlussbeurteilung_deutsch>$abschlussbeurteilung_deutsch</abschlussbeurteilung_deutsch>";
 		echo "		<abschlusspruefungsdatum>$abschlusspruefungsdatum</abschlusspruefungsdatum>";
 		echo "      <sponsion_datum>$sponsion_datum</sponsion_datum>";
 
