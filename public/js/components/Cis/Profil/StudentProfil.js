@@ -293,11 +293,11 @@ export default {
                           <!-- LOCKING IMAGE FUNCTIONALITY -->
                           
                           
-                          <div role="button" @click.prevent="sperre_foto_function" style="height:22px; width:21px; background-color:white; position:absolute; top:0; right:12px; display:flex; align-items:center; justify-content:center;" >
+                          <div role="button" @click.prevent="sperre_foto_function" class="image-lock" >
                           <i :class="{'fa':true, ...(data.foto_sperre?{'fa-lock':true}:{'fa-lock-open':true})} " ></i>
-                          
-                          
                           </div>
+
+
                         </div>
                       </div>
                     <!-- END OF THE ROW WITH THE IMAGE -->

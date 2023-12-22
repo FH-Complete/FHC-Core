@@ -14,6 +14,18 @@
     }
   }
 
+.image-lock{
+  height:22px; 
+  width:21px; 
+  background-color:white; 
+  position:absolute; 
+  top:0; 
+  right:12px; 
+  display:flex; 
+  align-items:center;
+  justify-content:center;
+}
+
 .tabulator-collapsed-row{
     padding:15px;
     background-color: rgba(0,0,0,0.1);
@@ -41,10 +53,10 @@
   background-color:white;
 }
 
-.fhc-form .form-control:focus{
+/* .fhc-form .form-control:focus{
   border-color:white;
   box-shadow:none;
-} 
+}  */
 
 .fhc-form .form-floating > .form-control:focus ~ .floating-title, .form-floating > .form-control:not(:placeholder-shown) ~ .floating-title, .form-floating > .form-select ~ .floating-title{
   opacity: .65;

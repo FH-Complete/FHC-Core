@@ -1,6 +1,10 @@
 export default {
 
- 
+    editProfil: function(payload) {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   `/Cis/Profil/editProfil`;
+        return axios.post(url,payload);
+    },
     
     isMitarbeiterOrStudent: function(uid) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 

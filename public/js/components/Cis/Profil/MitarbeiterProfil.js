@@ -1,14 +1,18 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
+import BsModal from "../../Bootstrap/Modal.js";
 
 export default {
   components: {
     CoreFilterCmpt,
+    BsModal,
   },
   data() {
     return {
       collapseIconFunktionen: true,
       collapseIconBetriebsmittel: true,
+      //? this reactive object contains all the field the user is able to edit and keep track of which fields he has edited
+      editData:null,
       funktionen_table_options: {
         height: 300,
         layout: "fitColumns",
@@ -114,8 +118,64 @@ export default {
   },
 
   //? this is the prop passed to the dynamic component with the custom data of the view
-  props: ["data"],
+  
+  props: {
+		data: Object,
+		
+		/*
+		 * NOTE(chris): 
+		 * Hack to expose in "emits" declared events to $props which we use 
+		 * in the v-bind directive to forward all events.
+		 * @see: https://github.com/vuejs/core/issues/3432
+		
+		onHideBsModal: Function,
+		onHiddenBsModal: Function,
+		onHidePreventedBsModal: Function,
+		onShowBsModal: Function,
+		onShownBsModal: Function
+    */
+	},
+ /*  mixins: [
+		BsModal,
+	
+	], */
+  popup(options) {
+		return BsModal.popup.bind(this)(null, options);
+	},
   methods: {
+    showModal() {
+      this.$refs.bsmodal.show()
+    },
+
+    hideModal() {
+      // You can call the hide method of the modal component if needed
+      this.$refs.bsmodal.hide();
+    },
+
+
+    insertEditData(){
+      
+      
+      let editDataKeys = Object.keys(this.editData);
+      let this_data = Object.entries(this.data).filter(([key,value])=>{
+        return editDataKeys.includes(key);
+      })
+
+      if(JSON.stringify(this_data) == JSON.stringify(Object.entries(this.editData))){
+        
+        console.log("the editData contains the same information",JSON.stringify(this_data),"editData values:", JSON.stringify(Object.entries(this.editData)));
+      }else{
+        console.log("the editData HAS DIFFERENT INFORMATION");
+      }
+
+      /* if(somethingChanged){
+        console.log("the editData contains changed information");
+      }else{
+        console.log("the editData does not contain changed information");
+      } */
+      //? insert editData into a new row inside the public.tbl_cis_profil_update table
+      //Vue.$fhcapi.UserData.editProfil(this.editData);
+    },
     sperre_foto_function() {
       if (!this.data) {
         return;
@@ -191,7 +251,7 @@ export default {
       return {
         Username: this.data.username,
         Anrede: this.data.anrede,
-        Titel: this.data.titelpre,
+        Titel: this.data.titel,
         Postnomen: this.data.postnomen,
       };
     },
@@ -253,8 +313,26 @@ export default {
       };
     },
   },
+  created() {
 
+    
+    this.editData =  JSON.parse(
+      JSON.stringify(
+      {
+        emails:this.data.emails,
+        kontakte: this.data.kontakte,
+        
+        personData : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname}
+      }));
+
+      console.log(this.data.titelpre);
+   
+   
+  },
   mounted() {
+
+
+    
     this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
       this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
     });
@@ -262,11 +340,17 @@ export default {
     this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
       this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
     });
+   
+    
+
+    
 
    
   },
 
   template: ` 
+
+  <div class="row"><div class="col"><pre>{{JSON.stringify(editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
 
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
@@ -362,11 +446,11 @@ export default {
                           <!-- LOCKING IMAGE FUNCTIONALITY -->
                           
                           
-                          <div role="button" @click.prevent="sperre_foto_function" style="height:22px; width:21px; background-color:white; position:absolute; top:0; right:12px; display:flex; align-items:center; justify-content:center;" >
+                          <div role="button" @click.prevent="sperre_foto_function" class="image-lock" >
                           <i :class="{'fa':true, ...(data.foto_sperre?{'fa-lock':true}:{'fa-lock-open':true})} " ></i>
-                          
-                          
                           </div>
+
+
                         </div>
                       </div>
                     <!-- END OF THE ROW WITH THE IMAGE -->
@@ -461,7 +545,87 @@ export default {
 
                          
                              </div>
-                         </div>
+
+
+                             <!-- Bearbeiten Button -->
+                             <div class="col-md-6 col-sm-12 ">
+                              <button @click="showModal" type="button" class="text-start w-100 btn btn-outline-primary" >
+                                <div class="row">
+                                  <div class="col-2">
+                                    <i class="fa fa-edit"></i>
+                                  </div>
+                                  <div class="col-10">Bearbeiten</div>
+                                </div>
+                              </button>
+
+                             <bs-modal ref="bsmodal" >
+                                <template v-slot:title>
+                                  {{"Profil bearbeiten" }}
+                                </template>
+                                <template v-slot:default>
+                                
+                                <!-- START OF THE ACCORDION -->
+
+                                <!-- ACCORDEON 1 -->
+
+
+                                <div class="accordion accordion-flush" id="accordionFlushExample" v-for="ele in editData ">
+                                  <div class="accordion-item">
+                                    <h2 class="accordion-header" id="flush-headingOne">
+                                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                        Personen Daten
+                                      </button>
+                                    </h2>
+                                    <!-- SHOWING ALL MAILS IN THE FIRST PART OF THE ACCORDION -->
+                                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                      <div class="accordion-body">
+                                     
+                                      <div class="row gy-3">
+                                      <div v-for="(wert,bez) in ele" class="col-12">
+                                      <div class="form-underline ">
+                                      <div class="form-underline-titel">
+                                      <label :for="bez+'input'" >{{bez}}</label>
+                                      </div>
+                                      <div>
+                                        
+                                        <input type="email" class="form-control" :id="bez+'input'" v-model="editData.personData[bez]" :placeholder="wert">
+                                      </div>
+                                      </div>
+                                      </div>
+                                      </div>
+
+                                      
+                                      
+                                      
+                                      
+
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <!-- -->
+
+                                  <!-- ACCORDEON 2 -->
+
+                                <!-- -->
+                        
+                        
+                                <!-- END OF THE ACCORDION -->
+
+                                </template>
+                                <!-- optional footer 
+                                <template v-slot:footer>
+                                  {{""}}
+                                </template>
+                                -->
+                                </bs-modal>
+
+                           
+                              
+                            
+
+                             </div>
+                             </div>
                          
                      </div>
                      

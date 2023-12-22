@@ -19,6 +19,7 @@ class Profil extends Auth_Controller
 			'View' => ['student/anrechnung_beantragen:r','user:r'],
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r','user:r'],
 			'getView' => ['student/anrechnung_beantragen:r','user:r'],
+			'editProfil' => ['student/anrechnung_beantragen:r','user:r'],
 			
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -30,7 +31,7 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 		$this->load->model('ressource/Betriebsmittelperson_model', 'BetriebsmittelpersonModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
-		
+		$this->load->model('crm/Profil_change_model', 'ChangeModel');
 
 		//? put the uid and pid inside the controller for further usage in views
 		$this->uid = getAuthUID();
@@ -60,6 +61,23 @@ class Profil extends Auth_Controller
 		
 	}
 
+
+
+	
+
+	public function editProfil(){
+		
+		$json = $this->input->raw_input_stream;
+		$data = ["uid"=>"karpenko", "profil_changes"=>$json, "change_timestamp"=>"NOW()"];
+		//? gets the data inside the public.tbl_cis_profil_update
+		//$res = json_encode($this->ChangeModel->load([$this->uid]));
+
+		//? inserts new row inside the public.tbl_cis_profil_update table
+		$insert_res = json_encode($this->ChangeModel->insert($data));
+		
+		echo $insert_res;
+
+	}
 
 
 	private function viewMitarbeiterProfil($uid){
