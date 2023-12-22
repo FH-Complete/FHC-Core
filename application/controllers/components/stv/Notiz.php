@@ -62,19 +62,26 @@ class Notiz extends FHC_Controller
 
 	public function addNewNotiz($person_id)
 	{
-		var_dump($this->input->post('titel'));
-		var_dump($this->input->post('anhang'));
+/*		var_dump($this->input->post('titel'));
+		var_dump($this->input->post('anhang'));*/
 		var_dump($_FILES);
+
 		$this->load->library('form_validation');
+		$this->load->library('DmsLib');
+
+		$name = $this->input->post('anhang')['name'];
 
 
-		$this->form_validation->set_rules('titel', 'titel', 'required');
+		//$this->DmsLib->add($name, $mimetype, $fileHandle);
+
+
+/*		$this->form_validation->set_rules('titel', 'titel', 'required');
 		$this->form_validation->set_rules('text', 'Text', 'required');
 
 		if ($this->form_validation->run() == false)
 		{
 			return $this->outputJsonError($this->form_validation->error_array());
-		}
+		}*/
 
 		$this->load->model('person/Notiz_model', 'NotizModel');
 

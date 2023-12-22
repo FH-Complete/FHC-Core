@@ -136,6 +136,7 @@ class Notiz_model extends DB_Model
 	/**
 	 * Add a Notiz for a given person
 	 */
+	//TODO(manu) add type for Notizzuordnung
 	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis)
 	{
 		// Loads model Notizzuordnung_model
@@ -187,6 +188,7 @@ class Notiz_model extends DB_Model
 	 * gets all Notizen with Documententries for a person
 	 * @param $person_id
 	 */
+	//Todo(Manu) rewrite in CI-Style
 	public function getNotizWithDocEntries($person_id)
 	{
 		$qry = "
