@@ -159,3 +159,11 @@ $config['stgkz_blacklist_unterbrechung'] = [];
  * @var array           An array of tbl_studiengang.studiengang_kz's
  */
 $config['stgkz_blacklist_wiederholung'] = [];
+
+/**
+ * Blacklisted noten for negative committee exams
+ * noten with this ids won't be seen as negative
+ *
+ * @var array           An array of noten ids
+ */
+$config['note_blacklist_wiederholung'] = [];
