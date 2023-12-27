@@ -521,7 +521,7 @@ export default {
                                 </div>
                               </button>
 
-                             <bs-modal ref="bsmodal" >
+                             <bs-modal ref="bsmodal" backdrop="false" >
                                 <template v-slot:title>
                                   {{"Profil bearbeiten" }}
                                 </template>
@@ -532,26 +532,49 @@ export default {
                                 <!-- ACCORDEON 1 -->
 
 
-                                <div class="accordion accordion-flush" id="accordionFlushExample" v-for="ele in editData ">
-                                  <div class="accordion-item">
-                                    <h2 class="accordion-header" id="flush-headingOne">
-                                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                                        Personen Daten
+                                <div class="accordion accordion-flush" id="accordionFlushExample" >
+                                  <div class="accordion-item" v-for="(value,key) in editData ">
+                                    <h2 class="accordion-header" :id="'flush-headingOne'+key">
+                                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#flush-collapseOne'+key" aria-expanded="false" :aria-controls="'flush-collapseOne'+key">
+                                        {{key}}
                                       </button>
                                     </h2>
                                     <!-- SHOWING ALL MAILS IN THE FIRST PART OF THE ACCORDION -->
-                                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                    <div :id="'flush-collapseOne'+key" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                                       <div class="accordion-body">
                                      
-                                      <div class="row gy-3">
-                                      <div v-for="(wert,bez) in ele" class="col-12">
-                                      <div class="form-underline ">
+                                      <div v-if="Array.isArray(value)" class="row gy-5">
+                                      
+                                        <div  v-for="(objects,objectkey) in value" class="col-12" >
+                                          <div class="row gy-3">
+                                          <div v-for="(data,title) in objects" class="col-12" >
+                                          
+                                          <div  class="form-underline ">
+                                          <div class="form-underline-titel">
+                                          <label :for="title+'input'" >{{title}}</label>
+                                          </div>
+                                          <div>
+                                            
+                                            <input type="email" class="form-control" :id="title+'input'" v-model="editData[key][objectkey][title]" :placeholder="data">
+                                          </div>
+                                          </div>
+
+                                          </div>
+                                          </div>
+
+                                        </div>
+                                      
+                                      </div>
+                                      <div v-else class="row gy-3">
+                                      <div  v-for="(data,title) in value" class="col-12">
+                                    
+                                      <div  class="form-underline ">
                                       <div class="form-underline-titel">
-                                      <label :for="bez+'input'" >{{bez}}</label>
+                                      <label :for="title+'input'" >{{title}}</label>
                                       </div>
                                       <div>
                                         
-                                        <input type="email" class="form-control" :id="bez+'input'" v-model="editData.personData[bez]" :placeholder="wert">
+                                        <input type="email" class="form-control" :id="title+'input'" v-model="editData.personData[title]" :placeholder="data">
                                       </div>
                                       </div>
                                       </div>
@@ -581,6 +604,7 @@ export default {
                                   {{""}}
                                 </template>
                                 -->
+                                
                                 </bs-modal>
 
                            
