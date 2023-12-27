@@ -231,7 +231,7 @@ export default {
 
 
                   
-                  <div  class="row justify-content-center align-items-center">
+                  <div  class="row gy-3 justify-content-center align-items-center">
 
 
 
