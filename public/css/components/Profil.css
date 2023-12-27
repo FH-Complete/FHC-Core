@@ -40,49 +40,6 @@
   padding:0 !important;
 }
 
-.form-control_{
-  border:0;
-  border-bottom: 1px solid #ced4da;
-  height:auto !important;
-  padding-bottom: 5px !important;
-  padding-left: 3px !important;
-  border-radius:0px;
-}
-
-.form-control-plaintext[readonly]{
-  background-color:white;
-}
-
-/* .fhc-form .form-control:focus{
-  border-color:white;
-  box-shadow:none;
-}  */
-
-.fhc-form .form-floating > .form-control:focus ~ .floating-title, .form-floating > .form-control:not(:placeholder-shown) ~ .floating-title, .form-floating > .form-select ~ .floating-title{
-  opacity: .65;
-  transform: scale(.85) translateY(-.5rem) translateX(.15rem);
-}
-
-.fhc-form .form-floating > .floating-title{
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  padding: 1rem .75rem;
-  pointer-events: none;
-  border: 1px solid transparent;
-  transform-origin: 0 0;
-  transition: opacity .1s ease-in-out,transform .1s ease-in-out;
-}
-
-.floating-title{
-  display:inline-block;
-}
-
-.form-floating>.form-control, .form-floating>.form-select{
-  height: auto;
-}
-
 
 /* FORM UNDERLINE
 */

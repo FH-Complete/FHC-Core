@@ -2,6 +2,7 @@ import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import BsModal from "../../Bootstrap/Modal.js";
 
+
 export default {
   components: {
     CoreFilterCmpt,
@@ -9,8 +10,7 @@ export default {
   },
   data() {
     return {
-      collapseIconFunktionen: true,
-      collapseIconBetriebsmittel: true,
+      
       //? this reactive object contains all the field the user is able to edit and keep track of which fields he has edited
       editData:null,
       funktionen_table_options: {
@@ -39,7 +39,7 @@ export default {
             headerFilter: false,
             formatter: "responsiveCollapse",
             maxWidth: 40,
-            headerClick: this.collapseFunction,
+            headerClick: this.$parent.collapseFunction,
           },
           {
             title: "Bezeichnung",
@@ -91,7 +91,7 @@ export default {
             headerFilter: false,
             formatter: "responsiveCollapse",
             maxWidth: 40,
-            headerClick: this.collapseFunction,
+            headerClick: this.$parent.collapseFunction,
           },
           {
             title: "Betriebsmittel",
@@ -184,42 +184,7 @@ export default {
         this.data.foto_sperre = res.data.foto_sperre;
       });
     },
-    collapseFunction(e, column) {
-      //* the if of the column has to match with the name of the responsive data in the vue component
-      this[e.target.id] = !this[e.target.id];
-
-      //* gets all event icons of the different rows to use the onClick event later
-      let allClickableIcons = column._column.cells.map((row) => {
-        return row.element.children[0];
-      });
-
-      //* changes the icon that shows or hides all the collapsed columns
-      //* if the replace function does not find the class to replace, it just simply returns false
-      if (this[e.target.id]) {
-        e.target.classList.replace("fa-angle-up", "fa-angle-down");
-      } else {
-        e.target.classList.replace("fa-angle-down", "fa-angle-up");
-      }
-
-      //* changes the icon for every collapsed column to open or closed
-      if (this[e.target.id]) {
-        allClickableIcons
-          .filter((column) => {
-            return !column.classList.contains("open");
-          })
-          .forEach((col) => {
-            col.click();
-          });
-      } else {
-        allClickableIcons
-          .filter((column) => {
-            return column.classList.contains("open");
-          })
-          .forEach((col) => {
-            col.click();
-          });
-      }
-    },
+    
   },
 
   computed: {
@@ -330,8 +295,6 @@ export default {
    
   },
   mounted() {
-
-
     
     this.$refs.betriebsmittelTable.tabulator.on("tableBuilt", () => {
       this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
