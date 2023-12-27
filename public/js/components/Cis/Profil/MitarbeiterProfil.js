@@ -284,10 +284,11 @@ export default {
     this.editData =  JSON.parse(
       JSON.stringify(
       {
-        emails:this.data.emails,
-        kontakte: this.data.kontakte,
-        
-        personData : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname}
+        Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
+        Mitarbeiter_Informatinen: this.specialData,
+        Emails:this.data.emails,
+        Private_Kontakte: this.data.kontakte,
+        Private_Adressen:this.privateAdressen,
       }));
 
       console.log(this.data.titelpre);
@@ -313,8 +314,8 @@ export default {
 
   template: ` 
 
-  <div class="row"><div class="col"><pre>{{JSON.stringify(editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
-
+  <!--<div  class="row"><div class="col"><pre>{{JSON.stringify(editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
+-->
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
           <div class="row">
@@ -535,8 +536,8 @@ export default {
                                 <div class="accordion accordion-flush" id="accordionFlushExample" >
                                   <div class="accordion-item" v-for="(value,key) in editData ">
                                     <h2 class="accordion-header" :id="'flush-headingOne'+key">
-                                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#flush-collapseOne'+key" aria-expanded="false" :aria-controls="'flush-collapseOne'+key">
-                                        {{key}}
+                                      <button style="font-weight:500" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#flush-collapseOne'+key" aria-expanded="false" :aria-controls="'flush-collapseOne'+key">
+                                        {{key.replace("_"," ")}}
                                       </button>
                                     </h2>
                                     <!-- SHOWING ALL MAILS IN THE FIRST PART OF THE ACCORDION -->
@@ -545,7 +546,8 @@ export default {
                                      
                                       <div v-if="Array.isArray(value)" class="row gy-5">
                                       
-                                        <div  v-for="(objects,objectkey) in value" class="col-12" >
+                                        <template  v-for="(objects,objectkey) in value"  >
+                                        <div class="col-12 ">
                                           <div class="row gy-3">
                                           <div v-for="(data,title) in objects" class="col-12" >
                                           
@@ -555,14 +557,18 @@ export default {
                                           </div>
                                           <div>
                                             
-                                            <input type="email" class="form-control" :id="title+'input'" v-model="editData[key][objectkey][title]" :placeholder="data">
+                                            <input  class="form-control" :id="title+'input'" v-model="editData[key][objectkey][title]" :placeholder="data">
                                           </div>
                                           </div>
 
                                           </div>
                                           </div>
 
-                                        </div>
+                                          </div>
+                                          <hr class="mb-0" v-if="value[value.length-1] != objects">
+                                        </template>
+                                        
+
                                       
                                       </div>
                                       <div v-else class="row gy-3">
@@ -574,7 +580,7 @@ export default {
                                       </div>
                                       <div>
                                         
-                                        <input type="email" class="form-control" :id="title+'input'" v-model="editData.personData[title]" :placeholder="data">
+                                        <input type="email" class="form-control" :id="title+'input'" v-model="editData[key][title]" :placeholder="data">
                                       </div>
                                       </div>
                                       </div>
