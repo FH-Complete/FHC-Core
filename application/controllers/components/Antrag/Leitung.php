@@ -33,46 +33,14 @@ class Leitung extends FHC_Controller
 
 	public function getActiveStgs()
 	{
-		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe');
-		$stgsNeuanlage = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag');
-
-		$stgs = [];
-
-		if ($studiengaenge) {
-			$result = $this->StudierendenantragModel->loadForStudiengaenge($studiengaenge);
-
-			if (isError($result))
-				return $this->outputJson($result);
-			$antraege = getData($result) ?: [];
-
-			foreach ($antraege as $antrag) {
-				if (!isset($stgs[$antrag->studiengang_kz])) {
-					$stgs[$antrag->studiengang_kz] = new stdClass();
-					$stgs[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
-					$stgs[$antrag->studiengang_kz]->orgform = $antrag->orgform;
-					$stgs[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
-				}
-			}
+		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('student/antragfreigabe') ?: [];
+		$studiengaenge = array_merge($studiengaenge, $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag') ?: []);
+		
+		$result = $this->StudierendenantragModel->loadStgsWithAntraege($studiengaenge);
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
-
-		if ($stgsNeuanlage) {
-			$result = $this->StudierendenantragModel->loadForStudiengaenge($stgsNeuanlage);
-
-			if (isError($result))
-				return $this->outputJson($result);
-			$antraege = getData($result) ?: [];
-
-			foreach ($antraege as $antrag) {
-				if (!isset($stgs[$antrag->studiengang_kz])) {
-					$stgs[$antrag->studiengang_kz] = new stdClass();
-					$stgs[$antrag->studiengang_kz]->bezeichnung = $antrag->bezeichnung;
-					$stgs[$antrag->studiengang_kz]->orgform = $antrag->orgform;
-					$stgs[$antrag->studiengang_kz]->studiengang_kz = $antrag->studiengang_kz;
-				}
-			}
-		}
-
-		$this->outputJsonSuccess($stgs);
+		$this->outputJson($result);
 	}
 
 	public function getAntraege($studiengang = null, $extra = null)
