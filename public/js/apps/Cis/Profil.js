@@ -3,7 +3,6 @@ import StudentProfil from "../../components/Cis/Profil/StudentProfil.js";
 import MitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterProfil.js";
 import ViewStudentProfil from "../../components/Cis/Profil/StudentViewProfil.js";
 import ViewMitarbeiterProfil from "../../components/Cis/Profil/MitarbeiterViewProfil.js";
-import Base from "../../components/Cis/Profil/Base.js";
 import fhcapifactory from "../api/fhcapifactory.js";
 
 Vue.$fhcapi = fhcapifactory;

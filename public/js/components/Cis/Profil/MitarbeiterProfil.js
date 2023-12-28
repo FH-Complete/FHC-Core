@@ -135,10 +135,6 @@ export default {
 		onShownBsModal: Function
     */
 	},
- /*  mixins: [
-		BsModal,
-	
-	], */
   
   methods: {
     showModal() {
@@ -152,22 +148,11 @@ export default {
 
 
     submitProfilChange(){
-      
-      
       if(this.isEditDataChanged){
-        
-        console.log("the editData contains the same information",JSON.stringify(this_data),"editData values:", JSON.stringify(Object.entries(this.editData)));
-      }else{
-        console.log("the editData HAS DIFFERENT INFORMATION");
+        //? inserts new row in public.tbl_cis_profil_update 
+        Vue.$fhcapi.UserData.editProfil(this.editData);
+     
       }
-
-      /* if(somethingChanged){
-        console.log("the editData contains changed information");
-      }else{
-        console.log("the editData does not contain changed information");
-      } */
-      //? insert editData into a new row inside the public.tbl_cis_profil_update table
-      //Vue.$fhcapi.UserData.editProfil(this.editData);
     },
     sperre_foto_function() {
       if (!this.data) {
@@ -608,7 +593,7 @@ export default {
                                 </template>
                                 <!-- optional footer -->
                                 <template v-if="isEditDataChanged" v-slot:footer>
-                                  <button role="button" class="btn btn-primary">submit</button>
+                                  <button @click="submitProfilChange" role="button" class="btn btn-primary">submit</button>
                                 </template>
                                 <!-- end of optional footer -->
                                 </bs-modal>
