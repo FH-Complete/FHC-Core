@@ -31,7 +31,7 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 		$this->load->model('ressource/Betriebsmittelperson_model', 'BetriebsmittelpersonModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
-		$this->load->model('crm/Profil_change_model', 'ChangeModel');
+		$this->load->model('person/Profil_change_model', 'ProfilChangeModel');
 
 		//? put the uid and pid inside the controller for further usage in views
 		$this->uid = getAuthUID();
@@ -73,7 +73,7 @@ class Profil extends Auth_Controller
 		//$res = json_encode($this->ChangeModel->load([$this->uid]));
 
 		//? inserts new row inside the public.tbl_cis_profil_update table
-		$insert_res = json_encode($this->ChangeModel->insert($data));
+		$insert_res = json_encode($this->ProfilChangeModel->insert($data));
 		
 		echo $insert_res;
 

@@ -10,7 +10,7 @@ export default {
   },
   data() {
     return {
-      
+     
       //? this reactive object contains all the field the user is able to edit and keep track of which fields he has edited
       editData:null,
       funktionen_table_options: {
@@ -139,9 +139,7 @@ export default {
 		BsModal,
 	
 	], */
-  popup(options) {
-		return BsModal.popup.bind(this)(null, options);
-	},
+  
   methods: {
     showModal() {
       this.$refs.bsmodal.show()
@@ -153,15 +151,10 @@ export default {
     },
 
 
-    insertEditData(){
+    submitProfilChange(){
       
       
-      let editDataKeys = Object.keys(this.editData);
-      let this_data = Object.entries(this.data).filter(([key,value])=>{
-        return editDataKeys.includes(key);
-      })
-
-      if(JSON.stringify(this_data) == JSON.stringify(Object.entries(this.editData))){
+      if(this.isEditDataChanged){
         
         console.log("the editData contains the same information",JSON.stringify(this_data),"editData values:", JSON.stringify(Object.entries(this.editData)));
       }else{
@@ -193,11 +186,18 @@ export default {
       return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`;
     },
 
+    
+
     get_image_base64_src() {
       if (!this.data) {
         return "";
       }
       return "data:image/jpeg;base64," + this.data.foto;
+    },
+
+    
+    isEditDataChanged: function(){
+      return JSON.stringify(this.editData) != this.originalEditData;
     },
 
     get_mitarbeiter_standort_telefon(){
@@ -278,21 +278,25 @@ export default {
       };
     },
   },
+ 
   created() {
+    
 
     
-    this.editData =  JSON.parse(
-      JSON.stringify(
+    
+    //? storing an original version of the editData to check if the editData was changed by the user and is not in the original state
+    this.originalEditData = JSON.stringify(
       {
         Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
         Mitarbeiter_Informatinen: this.specialData,
         Emails:this.data.emails,
         Private_Kontakte: this.data.kontakte,
         Private_Adressen:this.privateAdressen,
-      }));
+      });
 
-      console.log(this.data.titelpre);
-   
+    this.editData = JSON.parse(this.originalEditData);
+
+
    
   },
   mounted() {
@@ -306,7 +310,6 @@ export default {
     });
    
     
-
     
 
    
@@ -314,8 +317,8 @@ export default {
 
   template: ` 
 
-  <!--<div  class="row"><div class="col"><pre>{{JSON.stringify(editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
--->
+  <div  class="row"><div class="col"><pre>{{JSON.stringify(editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
+
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
           <div class="row">
@@ -530,7 +533,7 @@ export default {
                                 
                                 <!-- START OF THE ACCORDION -->
 
-                                <!-- ACCORDEON 1 -->
+                               
 
 
                                 <div class="accordion accordion-flush" id="accordionFlushExample" >
@@ -597,20 +600,17 @@ export default {
 
                                   <!-- -->
 
-                                  <!-- ACCORDEON 2 -->
-
-                                <!-- -->
+                               
                         
                         
                                 <!-- END OF THE ACCORDION -->
 
                                 </template>
-                                <!-- optional footer 
-                                <template v-slot:footer>
-                                  {{""}}
+                                <!-- optional footer -->
+                                <template v-if="isEditDataChanged" v-slot:footer>
+                                  <button role="button" class="btn btn-primary">submit</button>
                                 </template>
-                                -->
-                                
+                                <!-- end of optional footer -->
                                 </bs-modal>
 
                            
@@ -845,8 +845,13 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12 mb-4" >
-                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
-                  </div>
+                  <div class="card">
+                  <div class="card-header">Funktionen </div>
+                  <div class="card-body">
+                    <core-filter-cmpt   ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    </div>
+                    </div>
+                    </div>
 
                 <!-- SECOND TABLE -->
                   <div class="col-12 mb-4" >
