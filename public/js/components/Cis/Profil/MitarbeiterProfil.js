@@ -11,8 +11,7 @@ export default {
   data() {
     return {
      
-      //? this reactive object contains all the field the user is able to edit and keep track of which fields he has edited
-      editData:null,
+      
       funktionen_table_options: {
         height: 300,
         layout: "fitColumns",
@@ -150,7 +149,7 @@ export default {
     submitProfilChange(){
       if(this.isEditDataChanged){
         //? inserts new row in public.tbl_cis_profil_update 
-        Vue.$fhcapi.UserData.editProfil(this.editData);
+        Vue.$fhcapi.UserData.editProfil(this.data.editData);
      
       }
     },
@@ -182,7 +181,7 @@ export default {
 
     
     isEditDataChanged: function(){
-      return JSON.stringify(this.editData) != this.originalEditData;
+      return JSON.stringify(this.data.editData) != this.originalEditData;
     },
 
     get_mitarbeiter_standort_telefon(){
@@ -266,23 +265,22 @@ export default {
  
   created() {
     
+    if(this.data.editData){
+      this.originalEditData = JSON.stringify(this.data.editData);
+    }else{
+      //? storing an original version of the editData to check if the editData was changed by the user and is not in the original state
+      this.originalEditData = JSON.stringify(
+        {
+          Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
+          Mitarbeiter_Informatinen: this.specialData,
+          Emails:this.data.emails,
+          Private_Kontakte: this.data.kontakte,
+          Private_Adressen:this.privateAdressen,
+        });
 
-    
-    
-    //? storing an original version of the editData to check if the editData was changed by the user and is not in the original state
-    this.originalEditData = JSON.stringify(
-      {
-        Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
-        Mitarbeiter_Informatinen: this.specialData,
-        Emails:this.data.emails,
-        Private_Kontakte: this.data.kontakte,
-        Private_Adressen:this.privateAdressen,
-      });
+      this.data.editData = JSON.parse(this.originalEditData);
 
-    this.editData = JSON.parse(this.originalEditData);
-
-
-   
+    }
   },
   mounted() {
     
@@ -295,14 +293,11 @@ export default {
     });
    
     
-    
-
-   
   },
 
   template: ` 
 
-  <div  class="row"><div class="col"><pre>{{JSON.stringify(editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
+  <div  class="row"><div class="col"><pre>{{JSON.stringify(data.editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
 
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
@@ -522,7 +517,7 @@ export default {
 
 
                                 <div class="accordion accordion-flush" id="accordionFlushExample" >
-                                  <div class="accordion-item" v-for="(value,key) in editData ">
+                                  <div class="accordion-item" v-for="(value,key) in data.editData ">
                                     <h2 class="accordion-header" :id="'flush-headingOne'+key">
                                       <button style="font-weight:500" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#flush-collapseOne'+key" aria-expanded="false" :aria-controls="'flush-collapseOne'+key">
                                         {{key.replace("_"," ")}}
@@ -534,18 +529,18 @@ export default {
                                      
                                       <div v-if="Array.isArray(value)" class="row gy-5">
                                       
-                                        <template  v-for="(objects,objectkey) in value"  >
+                                        <template  v-for="(object,objectkey) in value"  >
                                         <div class="col-12 ">
                                           <div class="row gy-3">
-                                          <div v-for="(data,title) in objects" class="col-12" >
+                                          <div v-for="(propertyValue,propertyKey) in object" class="col-12" >
                                           
                                           <div  class="form-underline ">
                                           <div class="form-underline-titel">
-                                          <label :for="title+'input'" >{{title}}</label>
+                                          <label :for="propertyKey+'input'" >{{propertyKey}}</label>
                                           </div>
                                           <div>
                                             
-                                            <input  class="form-control" :id="title+'input'" v-model="editData[key][objectkey][title]" :placeholder="data">
+                                            <input  class="form-control" :id="propertyKey+'input'" v-model="data.editData[key][objectkey][propertyKey]" :placeholder="propertyValue">
                                           </div>
                                           </div>
 
@@ -553,22 +548,22 @@ export default {
                                           </div>
 
                                           </div>
-                                          <hr class="mb-0" v-if="value[value.length-1] != objects">
+                                          <hr class="mb-0" v-if="value[value.length-1] != object">
                                         </template>
                                         
 
                                       
                                       </div>
                                       <div v-else class="row gy-3">
-                                      <div  v-for="(data,title) in value" class="col-12">
+                                      <div  v-for="(propertyValue,propertyKey) in value" class="col-12">
                                     
                                       <div  class="form-underline ">
                                       <div class="form-underline-titel">
-                                      <label :for="title+'input'" >{{title}}</label>
+                                      <label :for="propertyKey+'input'" >{{propertyKey}}</label>
                                       </div>
                                       <div>
                                         
-                                        <input type="email" class="form-control" :id="title+'input'" v-model="editData[key][title]" :placeholder="data">
+                                        <input type="email" class="form-control" :id="propertyKey+'input'" v-model="data.editData[key][propertyKey]" :placeholder="propertyValue">
                                       </div>
                                       </div>
                                       </div>

@@ -21,6 +21,7 @@ class Profil extends Auth_Controller
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'editProfil' => ['student/anrechnung_beantragen:r', 'user:r'],
+			
 
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -88,6 +89,7 @@ class Profil extends Auth_Controller
 
 
 	}
+
 
 
 	private function viewMitarbeiterProfil($uid)
@@ -179,6 +181,7 @@ class Profil extends Auth_Controller
 			}
 		}
 
+		
 
 		$res = new stdClass();
 		$res->username = $uid;
@@ -482,6 +485,15 @@ class Profil extends Auth_Controller
 			}
 		}
 
+
+		//? querying if the user already has a pending profil information update request
+		$editData_res = $this->ProfilChangeModel->load([$this->uid]);
+		if(isError($editData_res)){
+			//error handling
+		}else{
+			$editData_res = hasData($editData_res) ? getData($editData_res)[0] : null;
+		}
+
 		$res = new stdClass();
 		$res->foto = $person_res->foto;
 		$res->foto_sperre = $person_res->foto_sperre;
@@ -520,6 +532,10 @@ class Profil extends Auth_Controller
 
 		//telefon nummer von dem Standort
 		$res->standort_telefon = $telefon_res;
+
+		$res->editData = json_decode($editData_res->profil_changes);
+		$res->editDataTimestamp = $editData_res->change_timestamp;
+
 		return $res;
 	}
 
@@ -672,6 +688,15 @@ class Profil extends Auth_Controller
 			}
 		}
 
+		//? querying if the user already has a pending profil information update request
+		$editData_res = $this->ProfilChangeModel->load([$this->uid]);
+		if(isError($editData_res)){
+			//error handling
+		}else{
+			$editData_res = hasData($editData_res) ? getData($editData_res)[0] : null;
+		}
+
+
 		$res = new stdClass();
 
 
@@ -708,7 +733,8 @@ class Profil extends Auth_Controller
 
 
 		$res->mailverteiler = $mailverteiler_res;
-
+		$res->editData = json_decode($editData_res->profil_changes);
+		$res->editDataTimestamp = $editData_res->change_timestamp;
 		return $res;
 
 

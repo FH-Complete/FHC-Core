@@ -1,4 +1,4 @@
-import fhcapifactory from "../../../apps/api/fhcapifactory.js";
+
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
 export default {

@@ -111,6 +111,7 @@ const app = Vue.createApp({
 			this.view = res.data?.view;
 			this.data = res.data?.data;
 			
+			
 		});
 	},
 	template:`

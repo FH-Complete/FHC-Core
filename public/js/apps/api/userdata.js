@@ -5,6 +5,12 @@ export default {
                    `/Cis/Profil/editProfil`;
         return axios.post(url,payload);
     },
+
+    getEditProfil: function() {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   `/Cis/Profil/getEditProfil`;
+        return axios.get(url);
+    },
     
     isMitarbeiterOrStudent: function(uid) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
@@ -25,24 +31,7 @@ export default {
     },
 
     
-    indexProfilInformaion: function(uid, view=false) {
-        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                   `/Cis/Profil/indexProfilInformaion/${uid}/${view}`;
-        
-        return axios.get(url);
-    },
-    mitarbeiterProfil: function() {
-        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                   `/Cis/Profil/mitarbeiterProfil/`;
-        
-        return axios.get(url);
-    },
-    studentProfil: function(uid, view=false) {
-        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                   `/Cis/Profil/studentProfil/${uid}/${view}`;
-        
-        return axios.get(url);
-    },
+   
 
 
     
