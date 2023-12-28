@@ -120,10 +120,9 @@ export const CoreRESTClient = {
 	 * Retrives error message from response object
 	 */
 	getError: function(response) {
-
-		if (typeof response[CORE_REST_CLIENT_RETVAL] === "object"
-			&& Object.keys(response[CORE_REST_CLIENT_RETVAL]).length > 0
-			&& response.hasOwnProperty(CORE_REST_CLIENT_RETVAL))
+		if (response.hasOwnProperty(CORE_REST_CLIENT_RETVAL)
+			&& ((typeof response[CORE_REST_CLIENT_RETVAL] === "object" && Object.keys(response[CORE_REST_CLIENT_RETVAL]).length > 0)
+				|| (typeof response[CORE_REST_CLIENT_RETVAL] === "string" && response[CORE_REST_CLIENT_RETVAL].trim() != "")))
 		{
 			return response[CORE_REST_CLIENT_RETVAL];
 		}
