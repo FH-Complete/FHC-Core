@@ -1,6 +1,7 @@
 import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import BsModal from "../../Bootstrap/Modal.js";
+import Alert from "../../Bootstrap/Alert.js";
 
 
 
@@ -8,6 +9,7 @@ export default {
   components: {
     CoreFilterCmpt,
     BsModal,
+    Alert,
   },
   data() {
     return {
@@ -142,7 +144,6 @@ export default {
     },
 
     hideModal() {
-      // You can call the hide method of the modal component if needed
       this.$refs.bsmodal.hide();
     },
 
@@ -150,7 +151,22 @@ export default {
     submitProfilChange(){
       if(this.isEditDataChanged){
         //? inserts new row in public.tbl_cis_profil_update 
-        Vue.$fhcapi.UserData.editProfil(this.data.editData);
+        Vue.$fhcapi.UserData.editProfil(this.data.editData).then((res)=>{
+          this.hideModal(); 
+          if(res.data.error == 0){
+
+            //? sets the requested changes as the current data state, so that computed property isEditDataChanged works properly
+            this.originalEditData = JSON.stringify(this.data.editData);
+            console.log(this.originalEditData != JSON.stringify(this.data.editData));
+
+            //* sets the returned timestamp from the response
+            this.data.editDataTimestamp = res.data.retval? new Date(res.data.retval) : null;
+            Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
+          }else{
+            Alert.popup("Ein Fehler ist aufgetreten: "+ res.data.retval);
+          }
+          //
+        });
      
       }
     },
@@ -167,13 +183,7 @@ export default {
 
   computed: {
 
-    editDataTimestampFormated: function(){
-      return [
-        this.data.editDataTimestamp.getDate().toString().padStart(2,'0'),
-        (this.data.editDataTimestamp.getMonth()+1).toString().padStart(2,'0'),
-        this.data.editDataTimestamp.getFullYear(),
-      ].join('/');
-    },
+    
 
     //? legacy mailto link to create an email with information that should be changed
     refreshMailTo() {
@@ -190,8 +200,8 @@ export default {
     },
 
     
-    isEditDataChanged: function(){
-      return JSON.stringify(this.data.editData) != this.originalEditData;
+    isEditDataChanged(){
+      return this.originalEditData != JSON.stringify(this.data.editData)
     },
 
     get_mitarbeiter_standort_telefon(){
@@ -275,6 +285,9 @@ export default {
  
   created() {
     
+    
+    
+
     if(this.data.editData){
       this.originalEditData = JSON.stringify(this.data.editData);
     }else{
@@ -310,8 +323,8 @@ export default {
 
   template: ` 
 
-  <div  class="row"><div class="col"><pre>{{JSON.stringify(data.editData,null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.emails,null,2)}}</pre></div></div>
-
+  <div  class="row"><div class="col"><pre>{{JSON.stringify(JSON.parse(originalEditData),null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.editData,null,2)}}</pre></div></div>
+  <p>{{isEditDataChanged}}</p>
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
           <div class="row">
@@ -600,10 +613,10 @@ export default {
 
                                 </template>
                                 <!-- optional footer -->
-                                <template  v-slot:footer>
-                                  <p v-if="data.editDataTimestamp" class="flex-fill">Letzte Anfrage: {{editDataTimestampFormated}}</p>
+                                <template v-if="data.editDataTimestamp || isEditDataChanged"  v-slot:footer>
+                                  <p v-if="data.editDataTimestamp" class="flex-fill">Letzte Anfrage: {{$parent.getFormatedDate(data.editDataTimestamp)}}</p>
                                  
-                                  <button v-if="isEditDataChanged" @click="submitProfilChange" role="button" class="btn btn-primary">submit</button>
+                                  <button v-if="isEditDataChanged" @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
                                 </template>
                                 <!-- end of optional footer -->
                                 </bs-modal>

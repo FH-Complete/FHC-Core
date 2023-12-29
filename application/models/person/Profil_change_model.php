@@ -19,20 +19,10 @@ class Profil_change_model extends DB_Model
 	/**
 	 * getLastStatuses
 	 */
-	public function getData($uid){
-       
-        $res = $this->load($uid);
-        $res = hasData($res) ? getData($res)[0] : null;
-
-        return $res;
-    }
-
-    public function insertData($data){
-       
-        $res =  $this->insert($data);
-        //$res = hasData($res) ? getData($res)[0] : null;
-
-        return $res;
-    }
+	public function getTimestamp($uid){
+		$this->addSelect(['change_timestamp']);
+		$res = $this->load([$uid]);
+		return hasData($res) ? getData($res)[0] : null;
+	}
 
 }

@@ -80,9 +80,22 @@ class Profil extends Auth_Controller
 
 		if (empty($res)) {
 			$insert_res = $this->ProfilChangeModel->insert($data);
-			echo json_encode($insert_res);
+			if(isError($insert_res)){
+				//catch error
+			}else{
+				//? status code 201 CREATED
+				$insert_res->code = 201;
+				$insert_res->retval = $this->ProfilChangeModel->getTimestamp($this->uid)->change_timestamp;
+				echo json_encode($insert_res);
+			}
+			
 		} else {
 			$update_res = $this->ProfilChangeModel->update([$this->uid], $data);
+			if(isError($update_res)){
+				//catch error
+			}
+			//? status code 200 OK
+			$update_res->code = 200;
 			echo json_encode($update_res);
 		}
 
