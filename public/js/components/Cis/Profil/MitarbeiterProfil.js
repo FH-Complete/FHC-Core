@@ -3,6 +3,7 @@ import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import BsModal from "../../Bootstrap/Modal.js";
 
 
+
 export default {
   components: {
     CoreFilterCmpt,
@@ -165,6 +166,15 @@ export default {
   },
 
   computed: {
+
+    editDataTimestampFormated: function(){
+      return [
+        this.data.editDataTimestamp.getDate().toString().padStart(2,'0'),
+        (this.data.editDataTimestamp.getMonth()+1).toString().padStart(2,'0'),
+        this.data.editDataTimestamp.getFullYear(),
+      ].join('/');
+    },
+
     //? legacy mailto link to create an email with information that should be changed
     refreshMailTo() {
       return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`;
@@ -291,6 +301,9 @@ export default {
     this.$refs.funktionenTable.tabulator.on("tableBuilt", () => {
       this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
     });
+
+    
+    
    
     
   },
@@ -587,8 +600,10 @@ export default {
 
                                 </template>
                                 <!-- optional footer -->
-                                <template v-if="isEditDataChanged" v-slot:footer>
-                                  <button @click="submitProfilChange" role="button" class="btn btn-primary">submit</button>
+                                <template  v-slot:footer>
+                                  <p v-if="data.editDataTimestamp" class="flex-fill">Letzte Anfrage: {{editDataTimestampFormated}}</p>
+                                 
+                                  <button v-if="isEditDataChanged" @click="submitProfilChange" role="button" class="btn btn-primary">submit</button>
                                 </template>
                                 <!-- end of optional footer -->
                                 </bs-modal>

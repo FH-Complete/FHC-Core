@@ -533,8 +533,8 @@ class Profil extends Auth_Controller
 		//telefon nummer von dem Standort
 		$res->standort_telefon = $telefon_res;
 
-		$res->editData = json_decode($editData_res->profil_changes);
-		$res->editDataTimestamp = $editData_res->change_timestamp;
+		$res->editData = $editData_res? json_decode($editData_res->profil_changes): null;
+		$res->editDataTimestamp = $editData_res? $editData_res->change_timestamp: null;
 
 		return $res;
 	}
@@ -733,8 +733,8 @@ class Profil extends Auth_Controller
 
 
 		$res->mailverteiler = $mailverteiler_res;
-		$res->editData = json_decode($editData_res->profil_changes);
-		$res->editDataTimestamp = $editData_res->change_timestamp;
+		$res->editData = $editData_res? json_decode($editData_res->profil_changes): null;
+		$res->editDataTimestamp = $editData_res? $editData_res->change_timestamp: null;
 		return $res;
 
 

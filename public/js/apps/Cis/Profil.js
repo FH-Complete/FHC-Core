@@ -107,9 +107,15 @@ const app = Vue.createApp({
 		Vue.$fhcapi.UserData.getView(uid).then((res)=>{
 			if(!res.data){
 				this.notFoundUID=uid;
+			}else{
+				this.view = res.data?.view;
+
+				this.data = res.data?.data;
+			
+				if(this.data.editDataTimestamp){
+					this.data.editDataTimestamp= new Date(this.data.editDataTimestamp);
+				}
 			}
-			this.view = res.data?.view;
-			this.data = res.data?.data;
 			
 			
 		});
