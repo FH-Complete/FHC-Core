@@ -37,12 +37,28 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statust
 			('ErsteAufforderungVersandt', '{\"1.Aufforderung Versandt\",\"1st Request Sent\"}'),
 			('ZweiteAufforderungVersandt', '{\"2.Aufforderung Versandt\",\"2nd Request Sent\"}'),
 			('Beeinsprucht', '{\"Beeinsprucht\",\"Objected\"}'),
-			('EinspruchAbgelehnt', '{\"Einspruch abgelehnt\",\"Objection denied\"}');
+			('EinspruchAbgelehnt', '{\"Einspruch abgelehnt\",\"Objection denied\"}'),
+			('Abgemeldet', '{\"Abgemeldet\",\"Deregistered\"}');
 			";
 		if (!$db->db_query($qry))
 			echo '<strong>campus.tbl_studierendenantrag_statustyp (insert): '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>campus.tbl_studierendenantrag_statustyp: table prefilled';
+	}
+}
+if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statustyp WHERE studierendenantrag_statustyp_kurzbz = 'Abgemeldet' "))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_studierendenantrag_statustyp
+			(studierendenantrag_statustyp_kurzbz, bezeichnung)
+			VALUES
+			('Abgemeldet', '{\"Abgemeldet\",\"Deregistered\"}');
+			";
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_studierendenantrag_statustyp (insert): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.tbl_studierendenantrag_statustyp: "Abgemeldet" added';
 	}
 }
 
