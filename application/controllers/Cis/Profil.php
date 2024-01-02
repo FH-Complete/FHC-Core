@@ -96,6 +96,7 @@ class Profil extends Auth_Controller
 			}
 			//? status code 200 OK
 			$update_res->code = 200;
+			$update_res->retval = $this->ProfilChangeModel->getTimestamp($this->uid)->change_timestamp;
 			echo json_encode($update_res);
 		}
 

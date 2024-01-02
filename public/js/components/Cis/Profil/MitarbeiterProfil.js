@@ -1,15 +1,14 @@
-import fhcapifactory from "../../../apps/api/fhcapifactory.js";
+
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
-import BsModal from "../../Bootstrap/Modal.js";
-import Alert from "../../Bootstrap/Alert.js";
+import EditProfil from "./EditProfil.js"
+
 
 
 
 export default {
   components: {
     CoreFilterCmpt,
-    BsModal,
-    Alert,
+    EditProfil,
   },
   data() {
     return {
@@ -124,57 +123,36 @@ export default {
   props: {
 		data: Object,
 		
-		/*
-		 * NOTE(chris): 
-		 * Hack to expose in "emits" declared events to $props which we use 
-		 * in the v-bind directive to forward all events.
-		 * @see: https://github.com/vuejs/core/issues/3432
-		
-		onHideBsModal: Function,
-		onHiddenBsModal: Function,
-		onHidePreventedBsModal: Function,
-		onShowBsModal: Function,
-		onShownBsModal: Function
-    */
+	
 	},
   
   methods: {
     showModal() {
-      this.$refs.bsmodal.show()
-    },
-
-    hideModal() {
-      this.$refs.bsmodal.hide();
-    },
-
-
-    submitProfilChange(){
-      if(this.isEditDataChanged){
-        //? inserts new row in public.tbl_cis_profil_update 
-        Vue.$fhcapi.UserData.editProfil(this.data.editData).then((res)=>{
-          this.hideModal(); 
-          if(res.data.error == 0){
-
-            //? sets the requested changes as the current data state, so that computed property isEditDataChanged works properly
-            this.originalEditData = JSON.stringify(this.data.editData);
-            console.log(this.originalEditData != JSON.stringify(this.data.editData));
-
-            //* sets the returned timestamp from the response
-            this.data.editDataTimestamp = res.data.retval? new Date(res.data.retval) : null;
-            Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
-          }else{
-            Alert.popup("Ein Fehler ist aufgetreten: "+ res.data.retval);
+      
+      EditProfil.popup({ 
+          value:JSON.parse(JSON.stringify(this.data.editData)),
+          timestamp:this.data.editDataTimestamp
+        }).then((res) => {
+          if(res.timestamp && res.editData){
+            this.data.editDataTimestamp = new Date(res.timestamp);
+            this.data.editData = res.editData;
           }
-          //
+          
+        }).catch((e) => {
+          console.log(e);
+         
         });
      
-      }
+    
     },
+
+
+  
     sperre_foto_function() {
       if (!this.data) {
         return;
       }
-      fhcapifactory.UserData.sperre_foto_function(!this.data.foto_sperre).then((res) => {
+      Vue.$fhcapi.UserData.sperre_foto_function(!this.data.foto_sperre).then((res) => {
         this.data.foto_sperre = res.data.foto_sperre;
       });
     },
@@ -200,9 +178,7 @@ export default {
     },
 
     
-    isEditDataChanged(){
-      return this.originalEditData != JSON.stringify(this.data.editData)
-    },
+
 
     get_mitarbeiter_standort_telefon(){
       if(this.data.standort_telefon){
@@ -288,20 +264,16 @@ export default {
     
     
 
-    if(this.data.editData){
-      this.originalEditData = JSON.stringify(this.data.editData);
-    }else{
-      //? storing an original version of the editData to check if the editData was changed by the user and is not in the original state
-      this.originalEditData = JSON.stringify(
-        {
-          Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
-          Mitarbeiter_Informatinen: this.specialData,
-          Emails:this.data.emails,
-          Private_Kontakte: this.data.kontakte,
-          Private_Adressen:this.privateAdressen,
-        });
+    if(!this.data.editData){
+    
 
-      this.data.editData = JSON.parse(this.originalEditData);
+      this.data.editData = {
+        Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
+        Mitarbeiter_Informatinen: this.specialData,
+        Emails:this.data.emails,
+        Private_Kontakte: this.data.kontakte,
+        Private_Adressen:this.privateAdressen,
+      };
 
     }
   },
@@ -323,8 +295,6 @@ export default {
 
   template: ` 
 
-  <div  class="row"><div class="col"><pre>{{JSON.stringify(JSON.parse(originalEditData),null,2)}}</pre></div><div class="col"><pre>{{JSON.stringify(data.editData,null,2)}}</pre></div></div>
-  <p>{{isEditDataChanged}}</p>
   <div class="container-fluid text-break fhc-form"  >
     <!-- ROW --> 
           <div class="row">
@@ -531,95 +501,7 @@ export default {
                                 </div>
                               </button>
 
-                             <bs-modal ref="bsmodal" backdrop="false" >
-                                <template v-slot:title>
-                                  {{"Profil bearbeiten" }}
-                                </template>
-                                <template v-slot:default>
-                                
-                                <!-- START OF THE ACCORDION -->
-
-                               
-
-
-                                <div class="accordion accordion-flush" id="accordionFlushExample" >
-                                  <div class="accordion-item" v-for="(value,key) in data.editData ">
-                                    <h2 class="accordion-header" :id="'flush-headingOne'+key">
-                                      <button style="font-weight:500" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#flush-collapseOne'+key" aria-expanded="false" :aria-controls="'flush-collapseOne'+key">
-                                        {{key.replace("_"," ")}}
-                                      </button>
-                                    </h2>
-                                    <!-- SHOWING ALL MAILS IN THE FIRST PART OF THE ACCORDION -->
-                                    <div :id="'flush-collapseOne'+key" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                                      <div class="accordion-body">
-                                     
-                                      <div v-if="Array.isArray(value)" class="row gy-5">
-                                      
-                                        <template  v-for="(object,objectkey) in value"  >
-                                        <div class="col-12 ">
-                                          <div class="row gy-3">
-                                          <div v-for="(propertyValue,propertyKey) in object" class="col-12" >
-                                          
-                                          <div  class="form-underline ">
-                                          <div class="form-underline-titel">
-                                          <label :for="propertyKey+'input'" >{{propertyKey}}</label>
-                                          </div>
-                                          <div>
-                                            
-                                            <input  class="form-control" :id="propertyKey+'input'" v-model="data.editData[key][objectkey][propertyKey]" :placeholder="propertyValue">
-                                          </div>
-                                          </div>
-
-                                          </div>
-                                          </div>
-
-                                          </div>
-                                          <hr class="mb-0" v-if="value[value.length-1] != object">
-                                        </template>
-                                        
-
-                                      
-                                      </div>
-                                      <div v-else class="row gy-3">
-                                      <div  v-for="(propertyValue,propertyKey) in value" class="col-12">
-                                    
-                                      <div  class="form-underline ">
-                                      <div class="form-underline-titel">
-                                      <label :for="propertyKey+'input'" >{{propertyKey}}</label>
-                                      </div>
-                                      <div>
-                                        
-                                        <input type="email" class="form-control" :id="propertyKey+'input'" v-model="data.editData[key][propertyKey]" :placeholder="propertyValue">
-                                      </div>
-                                      </div>
-                                      </div>
-                                      </div>
-
-                                      
-                                      
-                                      
-                                      
-
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <!-- -->
-
-                               
-                        
-                        
-                                <!-- END OF THE ACCORDION -->
-
-                                </template>
-                                <!-- optional footer -->
-                                <template v-if="data.editDataTimestamp || isEditDataChanged"  v-slot:footer>
-                                  <p v-if="data.editDataTimestamp" class="flex-fill">Letzte Anfrage: {{$parent.getFormatedDate(data.editDataTimestamp)}}</p>
-                                 
-                                  <button v-if="isEditDataChanged" @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
-                                </template>
-                                <!-- end of optional footer -->
-                                </bs-modal>
+                             <!-- simml -->
 
                            
                               
@@ -853,12 +735,9 @@ export default {
 
                 <!-- FIRST TABLE -->
                   <div class="col-12 mb-4" >
-                  <div class="card">
-                  <div class="card-header">Funktionen </div>
-                  <div class="card-body">
+                 
                     <core-filter-cmpt   ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
-                    </div>
-                    </div>
+                  
                     </div>
 
                 <!-- SECOND TABLE -->
