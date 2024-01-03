@@ -6,7 +6,9 @@ export default {
 		accessibility
 	},
 	emits: [
-		'update:modelValue'
+		'update:modelValue',
+		'change',
+		'changed'
 	],
 	props: {
 		configUrl: String,
@@ -33,6 +35,13 @@ export default {
 			set(v) {
 				this.$emit('update:modelValue', v);
 			}
+		}
+	},
+	methods: {
+		change(key) {
+			this.$emit("change", key)
+			this.current = key;
+			this.$nextTick(() => this.$emit("changed", key));
 		}
 	},
 	created() {
@@ -87,7 +96,7 @@ export default {
 				:key="tab.key"
 				class="nav-item nav-link"
 				:class="{active: tab.key == current}"
-				@click="current=tab.key"
+				@click="change(tab.key)"
 				:aria-current="tab.key == current ? 'page' : ''"
 				v-accessibility:tab
 				>
