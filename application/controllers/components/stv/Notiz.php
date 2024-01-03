@@ -64,24 +64,33 @@ class Notiz extends FHC_Controller
 	{
 /*		var_dump($this->input->post('titel'));
 		var_dump($this->input->post('anhang'));*/
+
 		var_dump($_FILES);
+		var_dump($_FILES["anhang"]["name"]);
 
 		$this->load->library('form_validation');
 		$this->load->library('DmsLib');
+		$dms_id = null;
 
-		$name = $this->input->post('anhang')['name'];
+		$uid = getAuthUID();
+		$dms = array(
+			'kategorie_kurzbz'  => 'notiz',
+			'version'           => 0,
+			'name'              => $_FILES["anhang"]["name"],
+			'mimetype'          => $_FILES["anhang"]["type"],
+			'insertamum'        => date('c'),
+			'insertvon'         => $uid
+		);
 
+		var_dump($dms);
+		$result = $this->dmslib->upload($dms, 'anhang', array('pdf'));
 
-		//$this->DmsLib->add($name, $mimetype, $fileHandle);
-
-
-/*		$this->form_validation->set_rules('titel', 'titel', 'required');
-		$this->form_validation->set_rules('text', 'Text', 'required');
-
-		if ($this->form_validation->run() == false)
+		if (isSuccess($result))
 		{
-			return $this->outputJsonError($this->form_validation->error_array());
-		}*/
+			$dms_id = $result->retval['dms_id'];
+			//var_dump($dms_id);
+		}
+
 
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
@@ -89,11 +98,45 @@ class Notiz extends FHC_Controller
 		$titel = isset($_POST['titel']) ? $_POST['titel'] : null;
 		$text = isset($_POST['text']) ? $_POST['text'] : null;
 		$verfasser_uid = $uid;
-		$start = isset($_POST['von']) ? $_POST['von'] : null;
-		$ende = isset($_POST['bis']) ? $_POST['bis'] : null;
+
+		/*		$start = isset($_POST['bis']) ? ($_POST['bis'] : null;
+		$ende = isset($_POST['bis']) ? $_POST['bis'] : null;*/
+
+
+		if(isset($_POST['von']))
+		{
+/*			$date = $_POST['von'];
+			$date = DateTime::createFromFormat('F-d-Y h:i A',$date);
+			var_dump($date);
+			$timestamp = strtotime($_POST['von']);
+			$start = date('Y-m-d', $timestamp);*/
+
+/*			$dateString = $_POST['von'];
+			$myDateTime = DateTime::createFromFormat('Y-m-d', $dateString);
+			$start= $myDateTime->format('Y-m-d');*/
+
+			//Todo(manu) check input format datepicker.. auch ohne null!!!
+			$start = '2023-01-01';
+		}
+		else
+			$start = null;
+
+
+		if(isset($_POST['bis']))
+		{
+			//Todo(manu) check input format datepicker
+			$ende = strtotime($_POST['bis']);
+			$ende = new DateTime($ende);
+			$ende = $ende->format('Y-m-d');
+		}
+		else
+			$ende = null;
+
+
+
 		$erledigt = $_POST['erledigt'];
 
-		$result = $this->NotizModel->addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $start, $ende);
+		$result = $this->NotizModel->addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $start, $ende, $dms_id);
 
 	//	var_dump($result);
 
@@ -146,8 +189,8 @@ class Notiz extends FHC_Controller
 		$text = isset($_POST['text']) ? $_POST['text'] : null;
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
 		$bearbeiter_uid = $uid;
-		$start = isset($_POST['von']) ? $_POST['von'] : null;
-		$ende = isset($_POST['bis']) ? $_POST['bis'] : null;
+		$start = isset($_POST['von']) ? new DateTime($_POST['von']) : null;
+		$ende = isset($_POST['bis']) ? new DateTime($_POST['bis']) : null;
 		$erledigt = $_POST['erledigt'];
 
 		$result = $this->NotizModel->update(
@@ -177,6 +220,7 @@ class Notiz extends FHC_Controller
 
 	public function deleteNotiz ($notiz_id)
 	{
+		//Todo(manu) Notizzuordnung und NotizDokument ebenfalls berücksichtigen
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
 		$result = $this->NotizModel->delete(

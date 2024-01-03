@@ -103,7 +103,7 @@ export default {
 		},
 		actionNewNotiz(){
 			this.formData.titel = '';
-			this.formData.action = 'Neue Notiz';
+			this.formData.action = 'Neue Notiz2';
 			this.formData.text = null;
 			this.formData.von = null;
 			this.formData.bis = null;
@@ -114,10 +114,10 @@ export default {
 			this.formData.anhang = [];
 		},
 		addNewNotiz(notizData) {
-			console.log(this.formData);
+			//console.log(this.formData);
 			const formData = new FormData();
 			Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
-			console.log(formData);
+			//console.log(formData);
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
@@ -204,6 +204,7 @@ export default {
 			this.formData.verfasser = null;
 			this.formData.bearbeiter = null;
 			this.formData.anhang = [];
+			//this.formData.anhang = {};
 		},
 		updateNotiz(notiz_id){
 			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
@@ -231,7 +232,6 @@ export default {
 	},
 	template: `
 	<div class="stv-details-details h-100 pb-3">
-	{{modelValue}}
 
 		<!--Modal: deleteNotizModal-->
 		<BsModal ref="deleteNotizModal">
@@ -281,7 +281,7 @@ export default {
 		
 		
 		<div>
-			parent: {{anhang}} | {{formData.anhang.name}}
+			parent: {{formData.anhang}} | {{formData.anhang.name}}
 		</div>
 	</div>
 `

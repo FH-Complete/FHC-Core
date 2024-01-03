@@ -98,7 +98,11 @@ export default {
 	},
 	methods: {
 		handleFileChange(event) {
+			//single
 			this.intAnhang = event.target.files[0];
+
+			//multiple
+			//this.intAnhang = event.target.files;
 		},
 	},
 	template: `
@@ -134,23 +138,26 @@ component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}}
 					<!--<single-file id="file" v-model="intDocument"></single-file>-->
 
 					<div  class="col-sm-7">					
-					<span>
-					  <input type="file" ref="fileInput" @change="handleFileChange" v-model="intAnhang"/>
-<!--      							<button type="submit">Upload</button>-->
-							<div v-if="intAnhang.name">
-							  <p>Selected File: {{ intAnhang.name }}</p>
-							  <button class="text-danger">X</button>
-							</div>
-					</span>
-					<span >					
-						<ul>							
-							<li v-for="anh in anhang">
-								<button>{{anh.name}}</button><button class="text-danger">X</button>
-							</li>
-						</ul>
-					</span>
+						<span>
+						  <input type="file" multiple ref="fileInput" @change="handleFileChange" v-model="intAnhang"/>
+	<!--      							<button type="submit">Upload</button>-->
+								<div v-if="intAnhang.name">
+								  <p>Selected File: {{ intAnhang.name }}</p>
+								  <button class="text-danger">X</button>
+								</div>
+						</span>
+						
+<!--						Anzeige outputs-->
+						<span >					
+							<ul>							
+								<li v-for="anh in anhang">
+									<button>{{anh.name}}</button><button class="text-danger">X</button>
+								</li>
+							</ul>
+						</span>
 					</div>
 				</div>
+				
 			</slot>
 	</div>	
 
@@ -174,12 +181,12 @@ component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}}
 				<div class="row mb-3">
 					<label for="von" class="form-label col-sm-2">von</label>
 					<div class="col-sm-2">
-						<vue-date-picker id="von" v-model="intVon" clearable="false" no-today auto-apply enable-time-picker="true" format="dd.MM.yyyy" preview-format="dd.MM.yyyy"></vue-date-picker>
+						<vue-date-picker id="von" v-model="intVon" clearable="false" auto-apply enable-time-picker="true" format="Y-m-d" preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 	
 					<label for="bis" class="form-label col-sm-1">bis</label>
 					<div class="col-sm-2">
-						<vue-date-picker id="bis" v-model="intBis" clearable="false" no-today auto-apply enable-time-picker="true" format="dd.MM.yyyy" preview-format="dd.MM.yyyy"></vue-date-picker>
+						<vue-date-picker id="bis" v-model="intBis" clearable="false" auto-apply enable-time-picker="true" format="dd.MM.yyyy" preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 	
 					<label for="bis" class="form-label col-sm-1">erledigt</label>

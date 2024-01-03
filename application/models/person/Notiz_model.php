@@ -137,7 +137,7 @@ class Notiz_model extends DB_Model
 	 * Add a Notiz for a given person
 	 */
 	//TODO(manu) add type for Notizzuordnung
-	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis)
+	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis, $dms_id=null)
 	{
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -152,6 +152,13 @@ class Notiz_model extends DB_Model
 		{
 			$notiz_id = $result->retval;
 			$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'person_id' => $person_id));
+
+			if($dms_id)
+			{
+				// Loads model Notizdokument_model
+				$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
+				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+			}
 		}
 
 		// Transaction complete!
