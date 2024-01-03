@@ -96,7 +96,7 @@ export default {
 		</div>
 		<div style="flex: 1 1 0%; height: 0%" class="border-bottom border-start border-end overflow-auto p-3">
 			<keep-alive>
-				<component :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
+				<component ref="current" :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
 			</keep-alive>
 		</div>
 	</div>`
