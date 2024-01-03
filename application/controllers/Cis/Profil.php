@@ -17,7 +17,6 @@ class Profil extends Auth_Controller
 	{
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r', 'user:r'], // TODO(chris): permissions?
-			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'editProfil' => ['student/anrechnung_beantragen:r', 'user:r'],
@@ -35,7 +34,7 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('person/Profil_change_model', 'ProfilChangeModel');
 
-		//? put the uid and pid inside the controller for further usage in views
+		//? put the uid and pid inside the controller to reuse in controller
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
 

@@ -30,8 +30,6 @@ export default {
           },
         ],
         columns: [
-          //? option when wanting to hide the collapsed list
-
           {
             title:
               "<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
@@ -492,7 +490,7 @@ export default {
 
                              <!-- Bearbeiten Button -->
                              <div class="col-md-6 col-sm-12 ">
-                              <button @click="showModal" type="button" class="text-start w-100 btn btn-outline-primary" >
+                              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-primary" >
                                 <div class="row">
                                   <div class="col-2">
                                     <i class="fa fa-edit"></i>
@@ -736,7 +734,7 @@ export default {
                 <!-- FIRST TABLE -->
                   <div class="col-12 mb-4" >
                  
-                    <core-filter-cmpt   ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   
                     </div>
 

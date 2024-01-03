@@ -132,7 +132,7 @@ export default {
             <template  v-for="(object,objectkey) in value"  >
             <div class="col-12 ">
               <div class="row gy-3">
-              <div v-for="(propertyValue,propertyKey) in object" class="col-12" >
+              <div v-for="(propertyValue,propertyKey) in object" class="col-6" >
               
               <div  class="form-underline ">
               <div class="form-underline-titel">
@@ -155,7 +155,7 @@ export default {
           
           </div>
           <div v-else class="row gy-3">
-          <div  v-for="(propertyValue,propertyKey) in value" class="col-12">
+          <div  v-for="(propertyValue,propertyKey) in value" class="col-6">
         
           <div  class="form-underline ">
           <div class="form-underline-titel">

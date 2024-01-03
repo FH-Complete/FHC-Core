@@ -1,5 +1,8 @@
 export default {
 
+
+    //! API Calls for Profil Views
+
     editProfil: function(payload) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
                    `/Cis/Profil/editProfil`;
@@ -31,6 +34,12 @@ export default {
     },
 
     
+    //! API Calls for Profil Update View
+
+    getProfilUpdateRequest: function(){
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/Cis/ProfilUpdate/getAllRequests';
+        return axios.get(url);
+    }
    
 
 
