@@ -15,6 +15,12 @@ export default {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
 		}
 	},
+	methods: {
+		reload() {
+			if (this.$refs.tabs?.$refs?.current?.reload)
+				this.$refs.tabs.$refs.current.reload();
+		}
+	},
 	template: `
 	<div class="stv-details h-100 pb-3 d-flex flex-column">
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
@@ -27,8 +33,8 @@ export default {
 					<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>
 				</div>
 			</div>
-			<fhc-tabs v-if="students.length == 1" :modelValue="students[0]" config-url="/components/stv/config/student" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%"></fhc-tabs>
-			<fhc-tabs v-else :modelValue="students" config-url="/components/stv/config/students" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%"></fhc-tabs>
+			<fhc-tabs v-if="students.length == 1" ref="tabs" :modelValue="students[0]" config-url="/components/stv/config/student" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%"></fhc-tabs>
+			<fhc-tabs v-else ref="tabs" :modelValue="students" config-url="/components/stv/config/students" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%"></fhc-tabs>
 		</div>
 	</div>`
 };
