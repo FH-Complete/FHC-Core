@@ -76,15 +76,16 @@ class Profil extends Auth_Controller
 
 		$res = $this->ProfilChangeModel->load([$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
-
+		
 		if (empty($res)) {
 			$insert_res = $this->ProfilChangeModel->insert($data);
 			if(isError($insert_res)){
 				//catch error
 			}else{
+				$editTimestamp = $this->ProfilChangeModel->getTimestamp($this->uid);
 				//? status code 201 CREATED
 				$insert_res->code = 201;
-				$insert_res->retval = $this->ProfilChangeModel->getTimestamp($this->uid)->change_timestamp;
+				$insert_res->retval = date_create($editTimestamp)->format('d/m/Y');
 				echo json_encode($insert_res);
 			}
 			
@@ -93,9 +94,10 @@ class Profil extends Auth_Controller
 			if(isError($update_res)){
 				//catch error
 			}
+			$editTimestamp = $this->ProfilChangeModel->getTimestamp($this->uid);
 			//? status code 200 OK
 			$update_res->code = 200;
-			$update_res->retval = $this->ProfilChangeModel->getTimestamp($this->uid)->change_timestamp;
+			$update_res->retval = date_create($editTimestamp)->format('d/m/Y');;
 			echo json_encode($update_res);
 		}
 
@@ -547,7 +549,8 @@ class Profil extends Auth_Controller
 		$res->standort_telefon = $telefon_res;
 
 		$res->editData = $editData_res? json_decode($editData_res->profil_changes): null;
-		$res->editDataTimestamp = $editData_res? $editData_res->change_timestamp: null;
+		$res->editDataTimestamp = $editData_res? date_create($editData_res->change_timestamp)->format('d/m/Y') : null;
+		
 
 		return $res;
 	}
@@ -747,7 +750,8 @@ class Profil extends Auth_Controller
 
 		$res->mailverteiler = $mailverteiler_res;
 		$res->editData = $editData_res? json_decode($editData_res->profil_changes): null;
-		$res->editDataTimestamp = $editData_res? $editData_res->change_timestamp: null;
+		$res->editDataTimestamp = $editData_res? date_create($editData_res->change_timestamp)->format('d/m/Y'): null;
+		
 		return $res;
 
 

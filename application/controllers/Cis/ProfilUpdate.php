@@ -35,7 +35,14 @@ class ProfilUpdate extends Auth_Controller
 			echo $res->retval->data;
 			return;
 		}else{
-			$res = hasData($res)? getData($res) : null;
+			if(hasData($res)){
+				$res = getData($res);
+				foreach($res as $element){
+					$element->change_timestamp = date_create($element->change_timestamp)->format('d/m/Y H:i');
+				}
+			}else{
+				$res = null;
+			}
 		}
 		echo json_encode($res);
 	}

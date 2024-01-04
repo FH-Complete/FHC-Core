@@ -114,9 +114,7 @@ const app = Vue.createApp({
 
 				this.data = res.data?.data;
 			
-				if(this.data.editDataTimestamp){
-					this.data.editDataTimestamp= new Date(this.data.editDataTimestamp);
-				}
+				
 			}
 			
 			

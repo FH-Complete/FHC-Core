@@ -126,13 +126,13 @@ export default {
   
   methods: {
     showModal() {
-      
+
       EditProfil.popup({ 
           value:JSON.parse(JSON.stringify(this.data.editData)),
           timestamp:this.data.editDataTimestamp
         }).then((res) => {
           if(res.timestamp && res.editData){
-            this.data.editDataTimestamp = new Date(res.timestamp);
+            this.data.editDataTimestamp = res.timestamp;
             this.data.editData = res.editData;
           }
           
@@ -260,14 +260,13 @@ export default {
   created() {
     
     
-    
 
     if(!this.data.editData){
     
 
       this.data.editData = {
         Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
-        Mitarbeiter_Informatinen: this.specialData,
+        Mitarbeiter_Informationen: this.specialData,
         Emails:this.data.emails,
         Private_Kontakte: this.data.kontakte,
         Private_Adressen:this.privateAdressen,

@@ -12,8 +12,6 @@ class Profil_change_model extends DB_Model
 		$this->pk = ['uid'];
         $this->hasSequence = false;
 
-		//? loading other models to query them
-        $this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 	}
 
 	/**
@@ -22,7 +20,7 @@ class Profil_change_model extends DB_Model
 	public function getTimestamp($uid){
 		$this->addSelect(['change_timestamp']);
 		$res = $this->load([$uid]);
-		return hasData($res) ? getData($res)[0] : null;
+		return hasData($res) ? getData($res)[0]->change_timestamp : null;
 	}
 
 }

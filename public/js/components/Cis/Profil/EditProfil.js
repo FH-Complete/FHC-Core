@@ -28,20 +28,46 @@ export default {
   data() {
     return {
     editData: this.value,
+    //? tracks what specific profil data was changed
+    changesData: {Emails: [],Private_Adressen:[],Private_Kontakte:[],Personen_Informationen:{},Mitarbeiter_Informationen:{} },
     editTimestamp: this.timestamp,
     result: true,
     info: null,
   }
  
   },
+
   methods: {
-    test(){
-      console.log("test");
+     
+    updateData: function(event,key,ArrayKey,ObjectKey=null){
+      if(Array.isArray(this.editData[key])){
+        this.editData[key][ArrayKey][ObjectKey]= event.target.value;
+        if(event.target.value === JSON.parse(this.originalEditData)[key][ArrayKey][ObjectKey]){
+          this.changesData[key].splice(ArrayKey,1);
+        }else{
+          if(!this.changesData[key].includes(this.editData[key][ArrayKey])){
+            this.changesData[key].push(this.editData[key][ArrayKey]);
+          }
+          
+        }
+      }else{
+        console.log(key);
+        this.editData[key][ArrayKey]= event.target.value;
+        if(event.target.value === JSON.parse(this.originalEditData)[key][ArrayKey]){
+          delete this.changesData[key][ArrayKey];
+        }else{
+          this.changesData[key][ArrayKey]= this.editData[key][ArrayKey];
+        }
+      }
+      
+     
     },
     submitProfilChange(){
       
        if(this.isEditDataChanged){
         //? inserts new row in public.tbl_cis_profil_update 
+
+
         Vue.$fhcapi.UserData.editProfil(this.editData).then((res)=>{
           this.result = {
             editData: this.editData,
@@ -62,6 +88,7 @@ export default {
     },
   },
   computed: {
+   
     getFormatedDate: function(){
 			return [
 			  this.editTimestamp.getDate().toString().padStart(2,'0'),
@@ -109,12 +136,12 @@ export default {
       {{"Profil bearbeiten" }}
     </template>
     <template v-slot:default>
-    
-    <!-- START OF THE ACCORDION 
-<pre>{{JSON.stringify(data)}}</pre>
-<pre>{{JSON.stringify(result)}}</pre>-->
-  
 
+
+    
+    <!-- START OF THE ACCORDION
+     -->
+     <pre>{{JSON.stringify(changesData,null,2)}}</pre>
 
     <div class="accordion accordion-flush" id="accordionFlushExample" >
       <div class="accordion-item" v-for="(value,key) in editData ">
@@ -129,7 +156,7 @@ export default {
         
           <div v-if="Array.isArray(value)" class="row gy-5">
           
-            <template  v-for="(object,objectkey) in value"  >
+            <template  v-for="(object,objectKey) in value"  >
             <div class="col-12 ">
               <div class="row gy-3">
               <div v-for="(propertyValue,propertyKey) in object" class="col-6" >
@@ -139,8 +166,7 @@ export default {
               <label :for="propertyKey+'input'" >{{propertyKey}}</label>
               </div>
               <div>
-                
-                <input  class="form-control" :id="propertyKey+'input'" v-model="editData[key][objectkey][propertyKey]" :placeholder="propertyValue">
+                <input  class="form-control" :id="propertyKey+'input'" :value="editData[key][objectKey][propertyKey]" @input="updateData($event,key,objectKey,propertyKey)" :placeholder="propertyValue">
               </div>
               </div>
 
@@ -163,7 +189,7 @@ export default {
           </div>
           <div>
             
-            <input type="email" class="form-control" :id="propertyKey+'input'" v-model="editData[key][propertyKey]" :placeholder="propertyValue">
+            <input type="email" class="form-control" :id="propertyKey+'input'" :value="editData[key][propertyKey]" @input="updateData($event,key,propertyKey)"  :placeholder="propertyValue">
           </div>
           </div>
           </div>
@@ -188,7 +214,7 @@ export default {
     </template>
     <!-- optional footer -->
     <template v-if="editTimestamp || isEditDataChanged"  v-slot:footer>
-      <p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{getFormatedDate}}</p>
+      <p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{editTimestamp}}</p>
     
       <button v-if="isEditDataChanged" @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>
