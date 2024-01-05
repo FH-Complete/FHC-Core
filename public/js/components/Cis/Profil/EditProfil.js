@@ -29,7 +29,7 @@ export default {
     return {
     editData: this.value,
     //? tracks what specific profil data was changed
-    changesData: {Emails: [],Private_Adressen:[],Private_Kontakte:[],Personen_Informationen:{},Mitarbeiter_Informationen:{} },
+    changesData: {},
     editTimestamp: this.timestamp,
     result: true,
     info: null,
@@ -40,24 +40,48 @@ export default {
   methods: {
      
     updateData: function(event,key,ArrayKey,ObjectKey=null){
+
+      const cleanUpObjectProperties= () => {
+        Object.entries(this.changesData).forEach( ([property, value]) => { if(!Object.keys(value).length) delete this.changesData[property]; })
+      }
+      
+      let newValue = event.target.value;
+      if(!this.changesData[key]){
+        Array.isArray(this.editData[key])? this.changesData[key] = [] : this.changesData[key] = {};
+      } 
+      
       if(Array.isArray(this.editData[key])){
-        this.editData[key][ArrayKey][ObjectKey]= event.target.value;
-        if(event.target.value === JSON.parse(this.originalEditData)[key][ArrayKey][ObjectKey]){
-          this.changesData[key].splice(ArrayKey,1);
+        if(newValue.length > 0) this.editData[key][ArrayKey][ObjectKey]= newValue;
+          
+        else this.editData[key][ArrayKey][ObjectKey]= null;
+
+        let Obj = {key:ArrayKey, new: this.editData[key][ArrayKey], old: JSON.parse(this.originalEditData)[key][ArrayKey]};
+
+        
+        if(JSON.stringify(this.editData[key][ArrayKey]) === JSON.stringify(JSON.parse(this.originalEditData)[key][ArrayKey]) ){
+            this.changesData[key] = this.changesData[key].filter( arrayElement => arrayElement.key !== ArrayKey );
+            cleanUpObjectProperties();
         }else{
-          if(!this.changesData[key].includes(this.editData[key][ArrayKey])){
-            this.changesData[key].push(this.editData[key][ArrayKey]);
+          if(!this.changesData[key].filter( arrayElement => arrayElement.key === ArrayKey ).length){
+            this.changesData[key].push(Obj);
           }
           
         }
       }else{
-        console.log(key);
-        this.editData[key][ArrayKey]= event.target.value;
-        if(event.target.value === JSON.parse(this.originalEditData)[key][ArrayKey]){
+        if(newValue.length > 0) this.editData[key][ArrayKey]= newValue;
+          
+        else this.editData[key][ArrayKey]= null;
+
+        let Obj = { new: this.editData[key][ArrayKey], old: JSON.parse(this.originalEditData)[key][ArrayKey]};
+
+        
+        if(JSON.stringify(this.editData[key][ArrayKey]) === JSON.stringify(JSON.parse(this.originalEditData)[key][ArrayKey])){
           delete this.changesData[key][ArrayKey];
+          cleanUpObjectProperties();
         }else{
-          this.changesData[key][ArrayKey]= this.editData[key][ArrayKey];
+          this.changesData[key][ArrayKey]= Obj;
         }
+
       }
       
      
