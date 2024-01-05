@@ -22,6 +22,7 @@ class Notiz extends FHC_Controller
 	public function getNotizen($person_id)
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
+		$type = 'person';
 
 		$result = $this->NotizModel->getNotizWithDocEntries($person_id);
 
@@ -37,9 +38,7 @@ class Notiz extends FHC_Controller
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->NotizModel->addJoin('public.tbl_notiz_dokument', 'notiz_id', 'LEFT');
-
 		$this->NotizModel->addSelect('*');
-
 		$this->NotizModel->addLimit(1);
 
 		$result = $this->NotizModel->loadWhere(
@@ -60,19 +59,25 @@ class Notiz extends FHC_Controller
 		}
 	}
 
-	public function addNewNotiz($person_id)
+	public function addNewNotiz($id)
 	{
-/*		var_dump($this->input->post('titel'));
-		var_dump($this->input->post('anhang'));*/
-
-		var_dump($_FILES);
-		var_dump($_FILES["anhang"]["name"]);
-
 		$this->load->library('form_validation');
-		$this->load->library('DmsLib');
 		$dms_id = null;
 
+		//DMS-Logik zum Speichern des Anhangs
+/*		var_dump("im Backend: addNewNotiz, dmslogik");
+		var_dump($_FILES);*/
+
+		$this->load->library('DmsLib');
+
+
+
+
+
 		$uid = getAuthUID();
+
+		//single
+		$dms_id = null;
 		$dms = array(
 			'kategorie_kurzbz'  => 'notiz',
 			'version'           => 0,
@@ -82,22 +87,61 @@ class Notiz extends FHC_Controller
 			'insertvon'         => $uid
 		);
 
-		var_dump($dms);
+		//var_dump($dms);
+
 		$result = $this->dmslib->upload($dms, 'anhang', array('pdf'));
+		//var_dump($result);
 
 		if (isSuccess($result))
 		{
+			//TODO(Manu) change to array
 			$dms_id = $result->retval['dms_id'];
-			//var_dump($dms_id);
 		}
+
+		//var_dump($dms_id);
+
+/*		//multiple files
+		$dms_id = [];
+		foreach ($_FILES as $file)
+		{
+			//var_dump($file["name"]);
+			var_dump($file);
+			$dms = array(
+				'kategorie_kurzbz'  => 'notiz',
+				'version'           => 0,
+				'name'              => $file["name"],
+				'mimetype'          => $file["type"],
+				'insertamum'        => date('c'),
+				'insertvon'         => $uid
+			);
+
+			$result = $this->dmslib->upload($dms, 'file', array('pdf'));
+			var_dump($result);
+
+			if (isSuccess($result))
+			{
+				//TODO(Manu) change to array
+				$dms_id[] = $result->retval['dms_id'];
+			}
+
+
+		}
+
+		var_dump($dms_id);
+		return;*/
 
 
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
+		//var_dump($_POST);
+
 		$uid = getAuthUID();
 		$titel = isset($_POST['titel']) ? $_POST['titel'] : null;
 		$text = isset($_POST['text']) ? $_POST['text'] : null;
-		$verfasser_uid = $uid;
+		$bearbeiter_uid = isset($_POST['bearbeiter_uid']) ? $_POST['bearbeiter_uid'] : null;
+		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
+		$erledigt = $_POST['erledigt'];
+		$type = $_POST['typeId'];
 
 		/*		$start = isset($_POST['bis']) ? ($_POST['bis'] : null;
 		$ende = isset($_POST['bis']) ? $_POST['bis'] : null;*/
@@ -125,18 +169,24 @@ class Notiz extends FHC_Controller
 		if(isset($_POST['bis']))
 		{
 			//Todo(manu) check input format datepicker
-			$ende = strtotime($_POST['bis']);
+/*			$ende = strtotime($_POST['bis']);
 			$ende = new DateTime($ende);
-			$ende = $ende->format('Y-m-d');
+			$ende = $ende->format('Y-m-d');*/
+
+			$ende = '2023-01-01';
 		}
 		else
 			$ende = null;
 
 
+		//Todo(manu) multiple files
+		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $dms_id, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 
-		$erledigt = $_POST['erledigt'];
+		//vorher
+		//$result = $this->NotizModel->addNotizForPersonWithDoc($id, $titel, $text, $erledigt, $verfasser_uid, $start, $ende, $dms_id);
 
-		$result = $this->NotizModel->addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $start, $ende, $dms_id);
+
+
 
 	//	var_dump($result);
 
@@ -220,8 +270,51 @@ class Notiz extends FHC_Controller
 
 	public function deleteNotiz ($notiz_id)
 	{
-		//Todo(manu) Notizzuordnung und NotizDokument ebenfalls berücksichtigen
+		//dms_id auslesen aus notizdokument wenn vorhanden
+		$dms_id = null;
+		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
+
+		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
+
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson($result);
+		}
+		elseif (!hasData($result))
+		{
+			$this->outputJson($result);
+			$dms_id = null;
+		}
+		else
+		{
+			//Todo(manu( umbau auf array)
+			$result = current(getData($result));
+			$dms_id = $result->dms_id;
+		}
+
+		if($dms_id)
+		{
+			$this->load->library('DmsLib');
+			$result = $this->dmslib->removeAll($dms_id);
+
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				$this->outputJson($result);
+			}
+			else
+				$this->outputJson($result);
+
+			//return $this->outputJsonSuccess(current(getData($result)));
+
+		}
+
+
+		//Todo(manu) rollback?
+		//delete Notiz und Notizzuordnung
 		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->NotizModel->addJoin('public.tbl_notizzuordnung', 'notiz_id');
 
 		$result = $this->NotizModel->delete(
 			array('notiz_id' => $notiz_id)
@@ -235,6 +328,7 @@ class Notiz extends FHC_Controller
 		elseif (!hasData($result)) {
 			$this->outputJson($result);
 		}
+
 		return $this->outputJsonSuccess(current(getData($result)));
 	}
 

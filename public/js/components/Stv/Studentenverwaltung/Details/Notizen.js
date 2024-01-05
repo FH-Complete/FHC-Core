@@ -24,6 +24,7 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id),
+				//	+ this.modelValue.person_id, 'person'),
 				columns: [
 					{title: "Titel", field: "titel"},
 					{title: "Text", field: "text", width: 350},
@@ -58,6 +59,7 @@ export default {
 			tabulatorEvents: [],
 			notizen: [],
 			formData: {
+				typeId: 'person',
 				titel: null,
 				action: 'Neue Notiz',
 				text: null,
@@ -102,6 +104,7 @@ export default {
 			});
 		},
 		actionNewNotiz(){
+			this.formData.typeId = 'person';
 			this.formData.titel = '';
 			this.formData.action = 'Neue Notiz2';
 			this.formData.text = null;
@@ -114,10 +117,20 @@ export default {
 			this.formData.anhang = [];
 		},
 		addNewNotiz(notizData) {
-			//console.log(this.formData);
+/*			console.log("here: anhang noch empty");
+			console.log(this.formData);*/
 			const formData = new FormData();
+
 			Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
-			//console.log(formData);
+
+/*			for( var i = 0; i < this.formData.anhang.length; i++ ){
+				let file = this.formData.anhang[i];
+
+				formData.append('files[' + i + ']', file);
+			}*/
+
+			console.log("after append");
+			console.log(formData);
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
@@ -263,6 +276,7 @@ export default {
 		<Notiz 
 			:showErweitert="showErweitert"
 			:showDocument="showDocument"
+			v-model:typeId="formData.typeId"
 			v-model:titel="formData.titel" 
 			v-model:text="formData.text" 
 			v-model:action="formData.action" 				
@@ -281,7 +295,7 @@ export default {
 		
 		
 		<div>
-			parent: {{formData.anhang}} | {{formData.anhang.name}}
+			parent: {{formData.anhang}} {{formData.typeId}} | {{formData.anhang.name}}
 		</div>
 	</div>
 `

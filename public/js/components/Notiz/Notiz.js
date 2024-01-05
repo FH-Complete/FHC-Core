@@ -8,6 +8,7 @@ export default {
 		//SingleFile
 	},
 	props: [
+		'typeId',
 		'titel',
 		'text',
 		'von',
@@ -96,23 +97,31 @@ export default {
 			}
 		}
 	},
+/*	mounted(){
+		showZuordnung(){
+			this.idTyp = 'Person';
+		}
+	},*/
 	methods: {
 		handleFileChange(event) {
 			//single
 			this.intAnhang = event.target.files[0];
 
-			//multiple
+			//multiple not working
 			//this.intAnhang = event.target.files;
 		},
 	},
 	template: `
 <div>
 
-component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}}
+component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}} {{typeId}}
 	<form class="row">
 		<div>
 			<div class="row mb-3">
 				<b>{{action}}</b>
+			</div>
+			<div>
+				<p>Zuordnung {{this.typeId}}</p>
 			</div>
 			<div class="notizTitle row mb-3">
 				<label for="titel" class="form-label col-sm-2">Titel</label>
@@ -181,7 +190,7 @@ component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}}
 				<div class="row mb-3">
 					<label for="von" class="form-label col-sm-2">von</label>
 					<div class="col-sm-2">
-						<vue-date-picker id="von" v-model="intVon" clearable="false" auto-apply enable-time-picker="true" format="Y-m-d" preview-format="dd.MM.yyyy"></vue-date-picker>
+						<vue-date-picker id="von" v-model="intVon" clearable="false" auto-apply enable-time-picker="true" format="dd.MM.yyyy" preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 	
 					<label for="bis" class="form-label col-sm-1">bis</label>

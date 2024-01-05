@@ -134,7 +134,65 @@ class Notiz_model extends DB_Model
 	}
 
 	/**
-	 * Add a Notiz for a given person
+	 * Add a Notiz with Notizuordnung for a given type
+	 * @param type type of id for Notizzuordnung (example: person, prestudent, mitarbeiter, projekt, projektphase, projekttask,
+	 *        bestellung, lehreinheit, anrechnung)
+	 * @param id for Dokumentzuordnung (person_id, prestudent_id, uid, projekt_id...)
+	 * @param titel, text, start, ende, erledigt, verfasser_uid, bearbeiter_uid, insertvon Parameter for notiz
+	 */
+	public function addNotizForType($type, $id, $titel, $text, $insertvon, $dms_id=null, $start=null, $ende=null, $erledigt=false, $verfasser_uid=null, $bearbeiter_uid=null)
+	{
+		// Loads model Notizzuordnung_model
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+
+		// Start DB transaction
+		$this->db->trans_start(false);
+
+		$result = $this->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => $erledigt, 'verfasser_uid' => $verfasser_uid,
+			"insertvon" => $insertvon, 'start' => $start, 'ende' => $ende, 'bearbeiter_uid' => $bearbeiter_uid));
+
+		if (isSuccess($result))
+		{
+			//cases für alle types
+
+			$notiz_id = $result->retval;
+
+			if($dms_id)
+			{
+				// Loads model Notizdokument_model
+				$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
+				//Todo(manu) change for multiple files
+				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+			}
+
+			if ($type == 'person')
+				$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'person_id' => $id));
+			elseif ($type == 'prestudent')
+				$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'prestudent_id' => $id));
+			else
+				$result = error($result->msg, "Type nicht vorhanden");
+		}
+
+		// Transaction complete!
+		$this->db->trans_complete();
+
+		// Check if everything went ok during the transaction
+		if ($this->db->trans_status() === false || isError($result))
+		{
+			$this->db->trans_rollback();
+			$result = error($result->msg, EXIT_ERROR);
+		}
+		else
+		{
+			$this->db->trans_commit();
+			$result = success($notiz_id);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Add a Notiz for a given person with DMS_id
 	 */
 	//TODO(manu) add type for Notizzuordnung
 	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis, $dms_id=null)
@@ -157,6 +215,7 @@ class Notiz_model extends DB_Model
 			{
 				// Loads model Notizdokument_model
 				$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
+				//Todo(manu) change for multiple files
 				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
 			}
 		}
@@ -192,15 +251,19 @@ class Notiz_model extends DB_Model
 	}
 
 	/**
-	 * gets all Notizen with Documententries for a person
+	 * gets all Notizen with Documententries for a certain type and type_id
 	 * @param $person_id
 	 */
 	//Todo(Manu) rewrite in CI-Style
-	public function getNotizWithDocEntries($person_id)
+	public function getNotizWithDocEntries($id)
 	{
+	$type = 'writeFunction';
+		//$type_id = 'z.person_id';
+
+
 		$qry = "
 			SELECT 
-			    	n.*, count(dms_id) as countDoc
+			    	n.*, count(dms_id) as countDoc, z.notizzuordnung_id
 			FROM
 			    	public.tbl_notiz n
 			JOIN 
@@ -210,12 +273,12 @@ class Notiz_model extends DB_Model
 			LEFT JOIN 
 			    	    campus.tbl_dms_version USING (dms_id)
 			WHERE 
-			    z.person_id = ?
+			   z.person_id = ?
 			GROUP BY 
-			    notiz_id
+			    notiz_id, z.notizzuordnung_id
 		";
 
-		return $this->execQuery($qry, array($person_id));
+		return $this->execQuery($qry, array($id));
 
 	}
 
