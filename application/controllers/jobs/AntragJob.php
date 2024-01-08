@@ -345,6 +345,7 @@ class AntragJob extends JOB_Controller
 		$dateDeadline = new DateTime();
 		$dateDeadline->sub(DateInterval::createFromDateString($modifier_deadline));
 
+		$this->StudierendenantragModel->addSelect('tbl_studierendenantrag.studierendenantrag_id');
 		$this->StudierendenantragModel->addSelect('prestudent_id');
 		$this->StudierendenantragModel->addSelect('studiensemester_kurzbz');
 		$this->StudierendenantragModel->addSelect('s.insertamum');
@@ -369,50 +370,62 @@ class AntragJob extends JOB_Controller
 
 			foreach ($antraege as $antrag)
 			{
-				$result = $this->prestudentlib->setAbbrecher(
-                    $antrag->prestudent_id,
-                    $antrag->studiensemester_kurzbz,
-                    'AntragJob',
-                    'abbrecherStgl',
-                    $antrag->insertamum,
-                    null,
-                    $antrag->insertvon ?: $insertvon
-                );
+				$result = $this->StudierendenantragstatusModel->insert([
+					'studierendenantrag_id' => $antrag->studierendenantrag_id,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_DEREGISTERED,
+					'insertvon' => 'AntragJob'
+				]);
 				if (isError($result))
 					$this->logError(getError($result));
-				else
-				{
-					$count++;
-					$result = $this->PrestudentModel->load($antrag->prestudent_id);
-					if(!hasData($result)) {
-						$this->logWarning('No Prestudent found');
-						continue;
-					}
-					$prestudent = current(getData($result));
-					$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
-					if(!hasData($result)) {
-						$this->logWarning('No Studiengang found');
-						continue;
-					}
-					$studiengang = current(getData($result));
-					$result = $this->PersonModel->loadPrestudent($antrag->prestudent_id);
-					if(!hasData($result))
-					{
-						$this->logWarning('No Person found');
-						continue;
-					}
-					$person = current(getData($result));
-					$email = $studiengang->email;
-					$dataMail = array(
-						'prestudent' => $antrag->prestudent_id,
-						'studiensemester' => $antrag->studiensemester_kurzbz,
-						'name' => trim($person->vorname . ' '. $person->nachname),
-					);
+				else {
+					$deregisterStatus = getData($result);
 
-					if(!sendSanchoMail('Sancho_Mail_Antrag_A_Assist', $dataMail, $email, 'Einspruchsfrist abgelaufen'))
-					{
-						$this->logWarning("Failed to send Notification to " . $email);
+					$result = $this->prestudentlib->setAbbrecher(
+	                    $antrag->prestudent_id,
+	                    $antrag->studiensemester_kurzbz,
+	                    'AntragJob',
+	                    'abbrecherStgl',
+	                    $antrag->insertamum,
+	                    null,
+	                    $antrag->insertvon ?: $insertvon
+	                );
+					if (isError($result)) {
+						$this->StudierendenantragstatusModel->delete($deregisterStatus);
+						$this->logError(getError($result));
+					} else {
+						$count++;
+						$result = $this->PrestudentModel->load($antrag->prestudent_id);
+						if(!hasData($result)) {
+							$this->logWarning('No Prestudent found');
+							continue;
+						}
+						$prestudent = current(getData($result));
+						$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
+						if(!hasData($result)) {
+							$this->logWarning('No Studiengang found');
+							continue;
+						}
+						$studiengang = current(getData($result));
+						$result = $this->PersonModel->loadPrestudent($antrag->prestudent_id);
+						if(!hasData($result))
+						{
+							$this->logWarning('No Person found');
+							continue;
+						}
+						$person = current(getData($result));
+						$email = $studiengang->email;
+						$dataMail = array(
+							'prestudent' => $antrag->prestudent_id,
+							'studiensemester' => $antrag->studiensemester_kurzbz,
+							'name' => trim($person->vorname . ' '. $person->nachname),
+						);
+
+						if(!sendSanchoMail('Sancho_Mail_Antrag_A_Assist', $dataMail, $email, 'Einspruchsfrist abgelaufen'))
+						{
+							$this->logWarning("Failed to send Notification to " . $email);
+						}
 					}
+
 				}
 			}
 			$this->logInfo($count . "/" . count($antraege) . " Students set to Abbrecher");
