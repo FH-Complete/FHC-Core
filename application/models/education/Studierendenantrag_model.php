@@ -74,7 +74,8 @@ class Studierendenantrag_model extends DB_Model
 		return $this->loadWhere($where);
 	}
 
-	public function loadActiveForStudiengaenge($studiengaenge) {
+	public function loadActiveForStudiengaenge($studiengaenge)
+	{
 		// NOTE(chris): get language before changing things in the global db object because getUserLanguage() might use it and it should not have been tampered with
 		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
 
@@ -92,6 +93,22 @@ class Studierendenantrag_model extends DB_Model
 		$this->db->group_end();
 
 		return $this->loadForStudiengaenge($studiengaenge, null, null, $sql);
+	}
+
+	public function loadStgsWithAntraege($studiengaenge)
+	{
+		$this->addDistinct();
+		$this->addSelect('UPPER(stg.typ) || UPPER(stg.kurzbz) || \' \' || stg.bezeichnung AS bezeichnung');
+		$this->addSelect('p.studiengang_kz');
+
+		$this->addJoin('public.tbl_prestudent p', 'prestudent_id');
+		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
+
+		$this->addOrder('UPPER(stg.typ) || UPPER(stg.kurzbz) || \' \' || stg.bezeichnung');
+
+		$this->db->where_in('p.studiengang_kz', $studiengaenge);
+
+		return $this->load();
 	}
 
 	public function isInStudiengang($studierendenantrag_id, $studiengaenge)

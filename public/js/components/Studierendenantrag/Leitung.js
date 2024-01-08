@@ -44,7 +44,7 @@ export default {
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 				'/components/Antrag/Leitung/getActiveStgs'
 			).then(result => {
-				this.stgs = Object.values(result.data.retval).sort((a,b) => a.bezeichnung == b.bezeichnung ? (a.orgform == b.orgform ? 0 : (a.orgform > b.orgform ? 1 : -1)) : (a.bezeichnung > b.bezeichnung ? 1 : -1));
+				this.stgs = result.data.retval;
 			}).catch(error => {
 				console.error(error);
 			});
