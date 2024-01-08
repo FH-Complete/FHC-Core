@@ -71,35 +71,38 @@ class Profil extends Auth_Controller
 	{
 
 		$json = $this->input->raw_input_stream;
+		
 
-		$data = ["uid" => $this->uid, "profil_changes" => $json, "change_timestamp" => "NOW()"];
+		$data = ["uid" => $this->uid, "requested_change" => $json, "change_timestamp" => "NOW()"];
 
-		$res = $this->ProfilChangeModel->load([$this->uid]);
+		//? gets all the requested changes from a user
+		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
 		
-		if (empty($res)) {
+		
 			$insert_res = $this->ProfilChangeModel->insert($data);
+		
 			if(isError($insert_res)){
 				//catch error
 			}else{
-				$editTimestamp = $this->ProfilChangeModel->getTimestamp($this->uid);
-				//? status code 201 CREATED
-				$insert_res->code = 201;
-				$insert_res->retval = date_create($editTimestamp)->format('d/m/Y');
+				$editTimestamp = $this->ProfilChangeModel->getTimestamp($insert_res->retval);
+				
+				$insert_res->retval = date_create($editTimestamp)->format('d.m.Y');
 				echo json_encode($insert_res);
 			}
-			
+			/* if (empty($res)) {
 		} else {
 			$update_res = $this->ProfilChangeModel->update([$this->uid], $data);
+			
 			if(isError($update_res)){
 				//catch error
 			}
 			$editTimestamp = $this->ProfilChangeModel->getTimestamp($this->uid);
 			//? status code 200 OK
 			$update_res->code = 200;
-			$update_res->retval = date_create($editTimestamp)->format('d/m/Y');;
+			$update_res->retval = date_create($editTimestamp)->format('d.m.Y');;
 			echo json_encode($update_res);
-		}
+		} */
 
 
 
@@ -502,12 +505,12 @@ class Profil extends Auth_Controller
 
 
 		//? querying if the user already has a pending profil information update request
-		$editData_res = $this->ProfilChangeModel->load([$this->uid]);
+		/* $editData_res = $this->ProfilChangeModel->load([$this->uid]);
 		if(isError($editData_res)){
 			//error handling
 		}else{
 			$editData_res = hasData($editData_res) ? getData($editData_res)[0] : null;
-		}
+		} */
 
 		$res = new stdClass();
 		$res->foto = $person_res->foto;
@@ -548,9 +551,9 @@ class Profil extends Auth_Controller
 		//telefon nummer von dem Standort
 		$res->standort_telefon = $telefon_res;
 
-		$res->editData = $editData_res? json_decode($editData_res->profil_changes): null;
+		/* $res->editData = $editData_res? json_decode($editData_res->profil_data): null;
 		$res->editDataTimestamp = $editData_res? date_create($editData_res->change_timestamp)->format('d/m/Y') : null;
-		
+		 */
 
 		return $res;
 	}
@@ -705,12 +708,12 @@ class Profil extends Auth_Controller
 		}
 
 		//? querying if the user already has a pending profil information update request
-		$editData_res = $this->ProfilChangeModel->load([$this->uid]);
+		/* $editData_res = $this->ProfilChangeModel->load([$this->uid]);
 		if(isError($editData_res)){
 			//error handling
 		}else{
 			$editData_res = hasData($editData_res) ? getData($editData_res)[0] : null;
-		}
+		} */
 
 
 		$res = new stdClass();
@@ -749,9 +752,9 @@ class Profil extends Auth_Controller
 
 
 		$res->mailverteiler = $mailverteiler_res;
-		$res->editData = $editData_res? json_decode($editData_res->profil_changes): null;
+		/* $res->editData = $editData_res? json_decode($editData_res->profil_data): null;
 		$res->editDataTimestamp = $editData_res? date_create($editData_res->change_timestamp)->format('d/m/Y'): null;
-		
+		 */
 		return $res;
 
 

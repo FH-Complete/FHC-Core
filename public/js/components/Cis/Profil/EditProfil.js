@@ -27,10 +27,17 @@ export default {
   },
   data() {
     return {
+    selection: null,
+    propertySelection:true,
+    selectedProperty:null,
+    inputField:null,
+    detailSelection:false,
     editData: this.value,
     //? tracks what specific profil data was changed
     changesData: {},
     editTimestamp: this.timestamp,
+    selectionOrder: {firstSelect: true, secondSelect:false},
+    
     result: true,
     info: null,
   }
@@ -38,6 +45,20 @@ export default {
   },
 
   methods: {
+
+    formSelection: function(selection){
+      
+      if(Array.isArray(selection)){
+        return ['a','b'];
+      }else if(typeof(selection) === 'object'){
+        console.log(selection);
+        return Object.keys(selection);
+
+      }else{
+        // it is not an array or and object
+        return null;
+      }
+    },
      
     updateData: function(event,key,ArrayKey,ObjectKey=null){
 
@@ -88,18 +109,18 @@ export default {
     },
     submitProfilChange(){
       
-       if(this.isEditDataChanged){
+     
         //? inserts new row in public.tbl_cis_profil_update 
 
 
-        Vue.$fhcapi.UserData.editProfil(this.editData).then((res)=>{
+        Vue.$fhcapi.UserData.editProfil(this.inputField).then((res)=>{
           this.result = {
             editData: this.editData,
             timestamp: res.data.retval,
           };
           this.hide(); 
           
-           if(res.data.error == 0){
+          if(res.data.error == 0){
            
             Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
           }else{
@@ -108,24 +129,34 @@ export default {
           //
         });
      
-      } 
+      
     },
   },
   computed: {
+
+    firstSelection(){
+      return Object.keys(this.value);
+    },
+
+    secondSelection(){
+      switch(this.selectedProperty){
+        case "Personen_Informationen": return Object.keys(this.editData[this.selectedProperty]);
+        case "Private_Kontakte": return this.editData[this.selectedProperty];
+        case "Private_Adressen": return this.editData[this.selectedProperty];
+        default: return [];
+      }
+    },
+
+  
+
+    
    
-    getFormatedDate: function(){
-			return [
-			  this.editTimestamp.getDate().toString().padStart(2,'0'),
-			  (this.editTimestamp.getMonth()+1).toString().padStart(2,'0'),
-			  this.editTimestamp.getFullYear(),
-			].join('/');
-		  },
+    
       isEditDataChanged(){
         return this.originalEditData != JSON.stringify(this.editData)
       },
   },
   created() {
-
     this.originalEditData = JSON.stringify(this.editData);
     
     /* 
@@ -161,86 +192,42 @@ export default {
     </template>
     <template v-slot:default>
 
+    
+
+    <select v-if="!selectedProperty"  class="form-select" size="3" aria-label="size 3 select example">
+      <option @click="selectedProperty=option;  " v-for="option in firstSelection" :value="option">{{option}}</option>
+    </select>
+
+    <select v-if="selectedProperty && !inputField" class="form-select" size="3" aria-label="size 3 select example">
+      <option @click="
+      if(Array.isArray(editData[selectedProperty])){
+        inputField=option
+      }else{
+        inputField={[option]:editData[selectedProperty][option]};
+      }" v-for="option in secondSelection" :value="option"><div v-if="typeof(option)==='object'"><p v-for="(value,property) in option">{{property}}:{{value}}</p></div><template v-else>{{option}}</template></option>
+    </select>
+    <div v-if="inputField">
+    <div v-for="(field,index) in inputField">
+    
+    <div class="form-underline">
+    <div class="form-underline-titel">{{index}}</div>
+
+    <input  class="form-control" :id="index" v-model="inputField[index]" :placeholder="field">
+    </div>
+    
+      </div>
+    </div>
 
     
-    <!-- START OF THE ACCORDION
-     -->
-     <pre>{{JSON.stringify(changesData,null,2)}}</pre>
-
-    <div class="accordion accordion-flush" id="accordionFlushExample" >
-      <div class="accordion-item" v-for="(value,key) in editData ">
-        <h2 class="accordion-header" :id="'flush-headingOne'+key">
-          <button style="font-weight:500" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#flush-collapseOne'+key" aria-expanded="false" :aria-controls="'flush-collapseOne'+key">
-            {{key.replace("_"," ")}}
-          </button>
-        </h2>
-        <!-- SHOWING ALL MAILS IN THE FIRST PART OF THE ACCORDION -->
-        <div :id="'flush-collapseOne'+key" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-          <div class="accordion-body">
-        
-          <div v-if="Array.isArray(value)" class="row gy-5">
-          
-            <template  v-for="(object,objectKey) in value"  >
-            <div class="col-12 ">
-              <div class="row gy-3">
-              <div v-for="(propertyValue,propertyKey) in object" class="col-6" >
-              
-              <div  class="form-underline ">
-              <div class="form-underline-titel">
-              <label :for="propertyKey+'input'" >{{propertyKey}}</label>
-              </div>
-              <div>
-                <input  class="form-control" :id="propertyKey+'input'" :value="editData[key][objectKey][propertyKey]" @input="updateData($event,key,objectKey,propertyKey)" :placeholder="propertyValue">
-              </div>
-              </div>
-
-              </div>
-              </div>
-
-              </div>
-              <hr class="mb-0" v-if="value[value.length-1] != object">
-            </template>
-            
-
-          
-          </div>
-          <div v-else class="row gy-3">
-          <div  v-for="(propertyValue,propertyKey) in value" class="col-6">
-        
-          <div  class="form-underline ">
-          <div class="form-underline-titel">
-          <label :for="propertyKey+'input'" >{{propertyKey}}</label>
-          </div>
-          <div>
-            
-            <input type="email" class="form-control" :id="propertyKey+'input'" :value="editData[key][propertyKey]" @input="updateData($event,key,propertyKey)"  :placeholder="propertyValue">
-          </div>
-          </div>
-          </div>
-          </div>
-
-          
-          
-          
-          
-
-          </div>
-        </div>
-      </div>
-
-      <!-- -->
-
-     
-
-
-    <!-- END OF THE ACCORDION -->
-
+ 
+    
+  
     </template>
     <!-- optional footer -->
-    <template v-if="editTimestamp || isEditDataChanged"  v-slot:footer>
+    <template   v-slot:footer>
       <p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{editTimestamp}}</p>
     
-      <button v-if="isEditDataChanged" @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
+      <button  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>
     <!-- end of optional footer --> 
   </bs-modal>`,

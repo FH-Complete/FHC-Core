@@ -9,8 +9,8 @@ class Profil_change_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'public.tbl_cis_profil_update';
-		$this->pk = ['uid'];
-        $this->hasSequence = false;
+		$this->pk = ['profil_update_id'];
+        $this->hasSequence = true;
 
 	}
 

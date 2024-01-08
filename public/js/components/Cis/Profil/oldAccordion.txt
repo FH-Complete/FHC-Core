@@ -1,0 +1,72 @@
+<!-- START OF THE ACCORDION
+ 
+<pre>{{JSON.stringify(changesData,null,2)}}</pre>
+
+<div class="accordion accordion-flush" id="accordionFlushExample" >
+ <div class="accordion-item" v-for="(value,key) in editData ">
+   <h2 class="accordion-header" :id="'flush-headingOne'+key">
+     <button style="font-weight:500" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#flush-collapseOne'+key" aria-expanded="false" :aria-controls="'flush-collapseOne'+key">
+       {{key.replace("_"," ")}}
+     </button>
+   </h2>
+   <!-- SHOWING ALL MAILS IN THE FIRST PART OF THE ACCORDION -->
+   <div :id="'flush-collapseOne'+key" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+     <div class="accordion-body">
+   
+     <div v-if="Array.isArray(value)" class="row gy-3">
+     
+       <template  v-for="(object,objectKey) in value"  >
+       
+       <div class="card card-body col-12 ">
+         <div class="row gy-3">
+         <div v-for="(propertyValue,propertyKey) in object" class="col-6" >
+         
+         <div  class="form-underline ">
+         <div class="form-underline-titel">
+         <label :for="propertyKey+'input'" >{{propertyKey}}</label>
+         </div>
+         <div>
+           <input  class="form-control" :id="propertyKey+'input'" :value="editData[key][objectKey][propertyKey]" @input="updateData($event,key,objectKey,propertyKey)" :placeholder="propertyValue">
+         </div>
+         </div>
+
+         </div>
+         </div>
+
+         </div>
+      
+       </template>
+       
+
+     
+     </div>
+     <div v-else class="row gy-3">
+     <div  v-for="(propertyValue,propertyKey) in value" class="col-6">
+   
+     <div  class="form-underline ">
+     <div class="form-underline-titel">
+     <label :for="propertyKey+'input'" >{{propertyKey}}</label>
+     </div>
+     <div>
+       
+       <input type="email" class="form-control" :id="propertyKey+'input'" :value="editData[key][propertyKey]" @input="updateData($event,key,propertyKey)"  :placeholder="propertyValue">
+     </div>
+     </div>
+     </div>
+     </div>
+
+     
+     
+     
+     
+
+     </div>
+   </div>
+ </div>
+
+ <!-- -->
+
+
+
+
+<!-- END OF THE ACCORDION -->

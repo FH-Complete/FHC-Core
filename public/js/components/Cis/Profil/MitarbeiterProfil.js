@@ -266,8 +266,13 @@ export default {
 
       this.data.editData = {
         Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
-        Mitarbeiter_Informationen: this.specialData,
-        Emails:this.data.emails,
+        Private_Kontakte: this.data.kontakte,
+        Private_Adressen:this.privateAdressen,
+      };
+
+    }else{
+      this.data.editData = {
+        Personen_Informationen : {...this.personData, vorname: this.data.vorname, nachname: this.data.nachname},
         Private_Kontakte: this.data.kontakte,
         Private_Adressen:this.privateAdressen,
       };
@@ -317,7 +322,7 @@ export default {
                    
                     <a href="#" class="list-group-item list-group-item-action">Zeitwünsche</a>
                     <a href="#" class="list-group-item list-group-item-action">Lehrveranstaltungen</a>
-                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren von Gschnell</a>
+                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren</a>
                   </div>
                 </div>
               </div>
@@ -778,7 +783,7 @@ export default {
                        
                         <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitwuensche</a>
                         <a style="text-decoration:none" class="my-1 d-block" href="#">Lehrveranstaltungen</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren von Gschnell</a>
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren</a>
 
                       </div>
                     </div>

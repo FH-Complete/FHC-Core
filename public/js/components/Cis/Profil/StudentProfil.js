@@ -189,7 +189,7 @@ export default {
                    
                     <a href="#" class="list-group-item list-group-item-action">Zeitwünsche</a>
                     <a href="#" class="list-group-item list-group-item-action">Lehrveranstaltungen</a>
-                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren von Gschnell</a>
+                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren</a>
                   </div>
                 </div>
               </div>
@@ -623,7 +623,7 @@ export default {
                        
                         <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitwuensche</a>
                         <a style="text-decoration:none" class="my-1 d-block" href="#">Lehrveranstaltungen</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren von Gschnell</a>
+                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren</a>
 
                       </div>
                     </div>
