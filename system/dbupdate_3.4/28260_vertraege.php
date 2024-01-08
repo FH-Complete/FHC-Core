@@ -374,6 +374,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 		INSERT INTO hr.tbl_teilzeittyp(teilzeittyp_kurzbz, bezeichnung) VALUES('altersteilzeit','Altersteilzeit');
 		INSERT INTO hr.tbl_teilzeittyp(teilzeittyp_kurzbz, bezeichnung) VALUES('elternteilzeit','Elternteilzeit');
+		INSERT INTO hr.tbl_teilzeittyp(teilzeittyp_kurzbz, bezeichnung) VALUES('wiedereingliederungteilzeit','Wiedereingliederungsteilzeit');
 
 		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('echterdv','Echter DV','Echter Dienstvertrag', true, null, true, 100);
 		INSERT INTO hr.tbl_vertragsart(vertragsart_kurzbz, bezeichnung, anmerkung, dienstverhaeltnis, vertragsart_kurzbz_parent, aktiv, sort) VALUES('studentischehilfskr','Studentische Hilfskraft','Studentische Hilfskraft', true, 'echterdv', true, 101);
@@ -426,6 +427,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT USAGE ON hr.tbl_dienstverhaeltnis_dienstverhaeltnis_id_seq TO vilesci;
 		GRANT USAGE ON hr.tbl_vertragsbestandteil_vertragsbestandteil_id_seq TO vilesci;
 		GRANT USAGE ON hr.tbl_gehaltshistorie_gehaltshistorie_id_seq TO vilesci;
+		GRANT USAGE ON hr.tbl_sachaufwand_sachaufwand_id_seq TO vilesci;
 
 		GRANT USAGE ON hr.tbl_gehaltsbestandteil_gehaltsbestandteil_id_seq TO vilesci;
 		";
