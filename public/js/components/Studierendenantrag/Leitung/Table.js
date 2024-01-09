@@ -111,7 +111,8 @@ export default {
 				headerSort: false
 			}, {
 				field: 'studierendenantrag_id',
-				title: '#'
+				title: '#',
+				sorter: 'number'
 			}, {
 				field: 'bezeichnung',
 				title: this.$p.t('lehre', 'studiengang'),
