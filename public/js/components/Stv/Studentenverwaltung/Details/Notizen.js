@@ -28,7 +28,7 @@ export default {
 				columns: [
 					{title: "Titel", field: "titel"},
 					{title: "Text", field: "text", width: 350},
-					{title: "VerfasserIn", field: "verfasser_uid"},
+					{title: "VerfasserIn", field: "verfasser_uid", visible: false},
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
 					{title: "Start", field: "start", visible: false},
 					{title: "Ende", field: "ende", visible: false},
@@ -71,7 +71,7 @@ export default {
 				bearbeiter: null,
 				anhang: []
 			},
-			showErweitert: false,
+			showErweitert: true,
 			showDocument: true,
 
 		}
@@ -105,7 +105,7 @@ export default {
 		},
 		actionNewNotiz(){
 			this.resetFormData();
-/*			this.formData.typeId = 'person';
+			this.formData.typeId = 'person';
 			this.formData.titel = '';
 			this.formData.action = 'Neue Notiz2';
 			this.formData.text = null;
@@ -115,7 +115,7 @@ export default {
 			this.formData.erledigt = false;
 			this.formData.verfasser = null;
 			this.formData.bearbeiter = null;
-			this.formData.anhang = [];*/
+			this.formData.anhang = [];
 		},
 		addNewNotiz(notizData) {
 /*			console.log("here: anhang noch empty");
@@ -134,14 +134,6 @@ export default {
 			});
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-/*			for( var i = 0; i < this.formData.anhang.length; i++ ){
-				let file = this.formData.anhang[i];
-
-				formData.append('files[' + i + ']', file);
-			}*/
-
-/*			console.log("after append");
-			console.log(this.formData);*/
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
@@ -232,7 +224,7 @@ export default {
 					anhang: []
 			};
 		},
-		updateNotiz(notiz_id){
+/*		updateNotiz(notiz_id){
 			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
 				this.formData
 			).then(response => {
@@ -253,6 +245,35 @@ export default {
 			}).finally(() => {
 				window.scrollTo(0, 0);
 				//this.reload();
+			});
+		},*/
+		updateNotiz(notiz_id){
+			const formData = new FormData();
+			Object.entries(this.formData).forEach(([k, v]) => {
+				if(k!= 'anhang')
+					formData.append(k, v);
+			});
+			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
+
+			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
+				formData,
+				{ Headers: { "Content-Type": "multipart/form-data" } }
+			).then(response => {
+				if (!response.data.error) {
+					this.$fhcAlert.alertSuccess('Update von neuer Notiz erfolgreich');
+					this.resetFormData();
+					this.reload();
+				} else {
+					const errorData = response.data.retval;
+					Object.entries(errorData).forEach(entry => {
+						const [key, value] = entry;
+						this.$fhcAlert.alertError(value);
+					});
+				}
+			}).catch(error => {
+				this.$fhcAlert.alertError('Fehler bei Updateroutine aufgetreten');
+			}).finally(() => {
+				window.scrollTo(0, 0);
 			});
 		},
 	},
@@ -305,7 +326,7 @@ export default {
 		</Notiz>
 			
 		<button v-if="formData.action === 'Neue Notiz'"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
-		<button v-else type="button" class="btn btn-warning" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
+		<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
 		
 		
 		<div>

@@ -77,8 +77,6 @@ class Notiz extends FHC_Controller
 		$dms_id = [];
 		foreach ($_FILES as $k => $file)
 		{
-/*			var_dump($file["name"]);
-			var_dump($file);*/
 			$dms = array(
 				'kategorie_kurzbz'  => 'notiz',
 				'version'           => 0,
@@ -92,7 +90,6 @@ class Notiz extends FHC_Controller
 
 			if (isSuccess($result))
 			{
-				//TODO(Manu) change to array
 				$dms_id[] = $result->retval['dms_id'];
 			}
 /*			else {
@@ -117,48 +114,11 @@ class Notiz extends FHC_Controller
 		$erledigt = $_POST['erledigt'];
 		$type = $_POST['typeId'];
 
-		/*		$start = isset($_POST['bis']) ? ($_POST['bis'] : null;
-		$ende = isset($_POST['bis']) ? $_POST['bis'] : null;*/
+		//get rid of null value error
+		$start = $this->input->post(date('von'));
+		$ende = $this->input->post(date('bis'));
 
-
-		if(isset($_POST['von']))
-		{
-/*			$date = $_POST['von'];
-			$date = DateTime::createFromFormat('F-d-Y h:i A',$date);
-			var_dump($date);
-			$timestamp = strtotime($_POST['von']);
-			$start = date('Y-m-d', $timestamp);*/
-
-/*			$dateString = $_POST['von'];
-			$myDateTime = DateTime::createFromFormat('Y-m-d', $dateString);
-			$start= $myDateTime->format('Y-m-d');*/
-
-			//Todo(manu) check input format datepicker.. auch ohne null!!!
-			$start = '2023-01-01';
-		}
-		else
-			$start = null;
-
-
-		if(isset($_POST['bis']))
-		{
-			//Todo(manu) check input format datepicker
-/*			$ende = strtotime($_POST['bis']);
-			$ende = new DateTime($ende);
-			$ende = $ende->format('Y-m-d');*/
-
-			$ende = '2023-01-01';
-		}
-		else
-			$ende = null;
-
-
-		//Todo(manu) multiple files
-		// mit id_type
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $dms_id, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
-
-		//vorher
-		//$result = $this->NotizModel->addNotizForPersonWithDoc($id, $titel, $text, $erledigt, $verfasser_uid, $start, $ende, $dms_id);
 
 		if (isError($result))
 		{
@@ -172,7 +132,7 @@ class Notiz extends FHC_Controller
 	{
 		$uid = getAuthUID();
 		$this->load->library('form_validation');
-		$_POST = json_decode($this->input->raw_input_stream, true);
+		//$_POST = json_decode($this->input->raw_input_stream, true);
 
 		$this->form_validation->set_rules('titel', 'titel', 'required');
 		$this->form_validation->set_rules('text', 'Text', 'required');
@@ -195,9 +155,11 @@ class Notiz extends FHC_Controller
 		$text = isset($_POST['text']) ? $_POST['text'] : null;
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
 		$bearbeiter_uid = $uid;
-		$start = isset($_POST['von']) ? new DateTime($_POST['von']) : null;
-		$ende = isset($_POST['bis']) ? new DateTime($_POST['bis']) : null;
 		$erledigt = $_POST['erledigt'];
+		$start = $this->input->post(date('von'));
+		$ende = $this->input->post(date('bis'));
+
+
 
 		$result = $this->NotizModel->update(
 			[

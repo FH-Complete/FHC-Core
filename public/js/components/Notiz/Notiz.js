@@ -48,7 +48,8 @@ export default {
 				return this.von;
 			},
 			set(value) {
-				this.$emit('update:von', value);
+				const tempVon = new Date(value).toISOString().split('T')[0];
+				this.$emit('update:von', tempVon);
 			}
 		},
 		intBis: {
@@ -56,7 +57,8 @@ export default {
 				return this.bis;
 			},
 			set(value) {
-				this.$emit('update:bis', value);
+				const tempBis = new Date(value).toISOString().split('T')[0];
+				this.$emit('update:bis', tempBis);
 			}
 		},
 		intDocument: {
@@ -101,36 +103,11 @@ export default {
 			}
 		}
 	},
-/*	mounted(){
-		showZuordnung(){
-			this.idTyp = 'Person';
-		}
-	},*/
 	methods: {
-/*		handleFileChange(event) {
-			this.intAnhang = event.target.files;
-		},*/
 		reset() {
 			this.$refs.form.reset();
 			//this.$emit('update:anhang', dt.files);
 		},
-/*		deleteFile(id){
-			//console.log("Delete file with id " + id );
-
-			//console.log(this.intAnhang[id]);
-
-			const dt = new DataTransfer();
-			const files = this.$refs.upload.files;
-
-			for (let i = 0; i < files.length; i++) {
-				const file = files[i];
-				if (id !== i)
-					dt.items.add(file); // here you exclude the file. thus removing it.
-			}
-
-			this.$refs.upload.files = dt.files; // Assign the updates list
-			this.$emit('update:anhang', dt.files);
-		}*/
 	},
 
 	template: `
@@ -143,9 +120,7 @@ export default {
 					</b><span class="small">[{{this.typeId}}]</span>
 				</div>	
 			</div>
-<!--			<div>
-				<p>Zuordnung {{this.typeId}}</p>
-			</div>-->
+
 			<div class="notizTitle row mb-3">
 				<label for="titel" class="form-label col-sm-2">Titel</label>
 				<div class="col-sm-7">
@@ -170,24 +145,7 @@ export default {
 				<div  class="col-sm-7">		
 					<File ref="upload" id="file" :multiupload="multiupload" v-model:dateien="intAnhang" ></File>
 				</div>
-
-<!--					<div  class="col-sm-7">					
-						<span>
-						
-						  <input ref="upload" type="file" multiple ref="fileInput" @change="handleFileChange" v-model="intAnhang"/>
-													
-						</span>
-						
-						<span >					
-							<ul>							
-								<li v-for="(anh,index) in intAnhang">
-									<button>{{anh.name}}</button><button class="text-danger" @click="deleteFile(index)">X {{index}}</button>
-								</li>
-							</ul>
-						</span>
-					</div>
-				</div>-->
-				
+			
 				<hr>
 
 				
@@ -196,7 +154,8 @@ export default {
 
 		<div v-if="showErweitert">
 			<slot name="erweitert">	
-				<div class="row mb-3">
+				
+<!--				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">VerfasserIn</label>
 					<div class="col-sm-7">
 						<input type="text" v-model="intVerfasser" class="form-control">	
@@ -209,17 +168,31 @@ export default {
 					<div class="col-sm-7">
 						<input type="text" v-model="intBearbeiter" class="form-control">	
 					</div>
-				</div>
+				</div>-->
 							
 				<div class="row mb-3">
 					<label for="von" class="form-label col-sm-2">von</label>
 					<div class="col-sm-2">
-						<vue-date-picker id="von" v-model="intVon" clearable="false" auto-apply enable-time-picker="true" format="dd.MM.yyyy" preview-format="dd.MM.yyyy"></vue-date-picker>
+						<vue-date-picker 
+							id="von" 
+							v-model="intVon" 
+							clearable="false" 
+							auto-apply
+							:enable-time-picker="false"
+							format="dd.MM.yyyy" 
+							preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 	
 					<label for="bis" class="form-label col-sm-1">bis</label>
 					<div class="col-sm-2">
-						<vue-date-picker id="bis" v-model="intBis" clearable="false" auto-apply enable-time-picker="true" format="dd.MM.yyyy" preview-format="dd.MM.yyyy"></vue-date-picker>
+						<vue-date-picker 
+							id="bis" 
+							v-model="intBis" 
+							clearable="false" 
+							auto-apply 
+							:enable-time-picker="false"
+							format="dd.MM.yyyy" 
+							preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 	
 					<label for="bis" class="form-label col-sm-1">erledigt</label>
@@ -233,6 +206,7 @@ export default {
 		
 		
 	</form>
+	
 </div>`
 }
 
