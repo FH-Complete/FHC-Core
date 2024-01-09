@@ -359,6 +359,18 @@ elseif ($result = @$db->db_query("SELECT 1 FROM pg_proc WHERE proname='get_stdse
 	}
 }
 
+if ($result = @$db->db_query("SELECT 1 FROM pg_proc WHERE proname='get_rolle_prestudent' AND provolatile='s'"))
+{
+	if ($db->db_num_rows($result) == 0) {
+		$qry = 'ALTER FUNCTION public.get_rolle_prestudent(integer, character varying) STABLE;';
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.get_rolle_prestudent(integer, character varying): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.get_rolle_prestudent(integer, character varying): function updated';
+	}
+}
+
 if($result = @$db->db_query("SELECT 1 FROM public.tbl_status_grund WHERE statusgrund_kurzbz = 'abbrecherStgl';"))
 {
 	if($db->db_num_rows($result) == 0)
