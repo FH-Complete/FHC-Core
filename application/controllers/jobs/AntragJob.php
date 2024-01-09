@@ -306,7 +306,7 @@ class AntragJob extends JOB_Controller
 
 			foreach ($prestudents as $prestudent)
 			{
-				$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz, $insertvon);
+				$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, '', $insertvon);
 				if (isError($result))
 					$this->logError(getError($result));
 				else
