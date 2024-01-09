@@ -1,11 +1,10 @@
 import VueDatePicker from '../vueDatepicker.js.php';
-//import SingleFile from '../Form/Upload/SingleFile.js';
+import File from '../Form/Upload/File.js';
 
 export default {
 	components: {
 		VueDatePicker,
-		//BsModal
-		//SingleFile
+		File
 	},
 	props: [
 		'typeId',
@@ -22,6 +21,11 @@ export default {
 		'showDocument',
 		'anhang'
 		],
+	data(){
+		return {
+			multiupload: true
+		}
+	},
 	computed: {
 		intTitel: {
 			get() {
@@ -103,26 +107,45 @@ export default {
 		}
 	},*/
 	methods: {
-		handleFileChange(event) {
-			//single
-			this.intAnhang = event.target.files[0];
-
-			//multiple not working
-			//this.intAnhang = event.target.files;
+/*		handleFileChange(event) {
+			this.intAnhang = event.target.files;
+		},*/
+		reset() {
+			this.$refs.form.reset();
+			//this.$emit('update:anhang', dt.files);
 		},
+/*		deleteFile(id){
+			//console.log("Delete file with id " + id );
+
+			//console.log(this.intAnhang[id]);
+
+			const dt = new DataTransfer();
+			const files = this.$refs.upload.files;
+
+			for (let i = 0; i < files.length; i++) {
+				const file = files[i];
+				if (id !== i)
+					dt.items.add(file); // here you exclude the file. thus removing it.
+			}
+
+			this.$refs.upload.files = dt.files; // Assign the updates list
+			this.$emit('update:anhang', dt.files);
+		}*/
 	},
+
 	template: `
 <div>
-
-component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}} {{typeId}}
-	<form class="row">
+	<form ref="form" @submit.prevent class="row">
 		<div>
 			<div class="row mb-3">
-				<b>{{action}}</b>
+				<b>{{action}}
+				<div class="col-sm-7">
+					</b><span class="small">[{{this.typeId}}]</span>
+				</div>	
 			</div>
-			<div>
+<!--			<div>
 				<p>Zuordnung {{this.typeId}}</p>
-			</div>
+			</div>-->
 			<div class="notizTitle row mb-3">
 				<label for="titel" class="form-label col-sm-2">Titel</label>
 				<div class="col-sm-7">
@@ -143,29 +166,30 @@ component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}} {{typeId}
 				<div class="row mb-3">
 					<label for="text" class="form-label col-sm-2">Dokument</label>
 					
-					<!--Todo(Manu) Component SingleFile-->
-					<!--<single-file id="file" v-model="intDocument"></single-file>-->
+				<!-- Component File-->
+				<div  class="col-sm-7">		
+					<File ref="upload" id="file" :multiupload="multiupload" v-model:dateien="intAnhang" ></File>
+				</div>
 
-					<div  class="col-sm-7">					
+<!--					<div  class="col-sm-7">					
 						<span>
-						  <input type="file" multiple ref="fileInput" @change="handleFileChange" v-model="intAnhang"/>
-	<!--      							<button type="submit">Upload</button>-->
-								<div v-if="intAnhang.name">
-								  <p>Selected File: {{ intAnhang.name }}</p>
-								  <button class="text-danger">X</button>
-								</div>
+						
+						  <input ref="upload" type="file" multiple ref="fileInput" @change="handleFileChange" v-model="intAnhang"/>
+													
 						</span>
 						
-<!--						Anzeige outputs-->
 						<span >					
 							<ul>							
-								<li v-for="anh in anhang">
-									<button>{{anh.name}}</button><button class="text-danger">X</button>
+								<li v-for="(anh,index) in intAnhang">
+									<button>{{anh.name}}</button><button class="text-danger" @click="deleteFile(index)">X {{index}}</button>
 								</li>
 							</ul>
 						</span>
 					</div>
-				</div>
+				</div>-->
+				
+				<hr>
+
 				
 			</slot>
 	</div>	
@@ -175,7 +199,7 @@ component: {{intTitel}} {{intVon}} || {{intAnhang.name}} {{intAnhang}} {{typeId}
 				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">VerfasserIn</label>
 					<div class="col-sm-7">
-						<input type="text" v-model="intVerfasser" class="form-contrsol">	
+						<input type="text" v-model="intVerfasser" class="form-control">	
 						{{uid}}
 					</div>
 				</div>

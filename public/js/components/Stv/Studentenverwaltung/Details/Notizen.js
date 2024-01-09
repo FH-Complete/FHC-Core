@@ -30,8 +30,8 @@ export default {
 					{title: "Text", field: "text", width: 350},
 					{title: "VerfasserIn", field: "verfasser_uid"},
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
-					{title: "Start", field: "start"},
-					{title: "Ende", field: "ende"},
+					{title: "Start", field: "start", visible: false},
+					{title: "Ende", field: "ende", visible: false},
 /*					{title: "Dokumente", field: "dms_id"},*/
 					{title: "Dokumente", field: "countdoc"},
 					{title: "Erledigt", field: "erledigt"},
@@ -71,7 +71,7 @@ export default {
 				bearbeiter: null,
 				anhang: []
 			},
-			showErweitert: true,
+			showErweitert: false,
 			showDocument: true,
 
 		}
@@ -104,7 +104,8 @@ export default {
 			});
 		},
 		actionNewNotiz(){
-			this.formData.typeId = 'person';
+			this.resetFormData();
+/*			this.formData.typeId = 'person';
 			this.formData.titel = '';
 			this.formData.action = 'Neue Notiz2';
 			this.formData.text = null;
@@ -114,14 +115,24 @@ export default {
 			this.formData.erledigt = false;
 			this.formData.verfasser = null;
 			this.formData.bearbeiter = null;
-			this.formData.anhang = [];
+			this.formData.anhang = [];*/
 		},
 		addNewNotiz(notizData) {
 /*			console.log("here: anhang noch empty");
 			console.log(this.formData);*/
+
 			const formData = new FormData();
 
-			Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
+			//working with single files
+		//	Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
+
+			//multiple files
+			//console.log(this.formData.anhang);
+			Object.entries(this.formData).forEach(([k, v]) => {
+				if(k!= 'anhang')
+					formData.append(k, v);
+			});
+			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
 
 /*			for( var i = 0; i < this.formData.anhang.length; i++ ){
 				let file = this.formData.anhang[i];
@@ -129,8 +140,8 @@ export default {
 				formData.append('files[' + i + ']', file);
 			}*/
 
-			console.log("after append");
-			console.log(formData);
+/*			console.log("after append");
+			console.log(this.formData);*/
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
@@ -151,9 +162,6 @@ export default {
 			}).finally(() => {
 				window.scrollTo(0, 0);
 			});
-		},
-		attachFile(){
-			console.log("ATTACH FILE");
 		},
 		deleteNotiz(notiz_id){
 			CoreRESTClient.post('components/stv/Notiz/deleteNotiz/' + notiz_id)
@@ -208,16 +216,21 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		resetFormData(){
-			this.formData.titel = null;
-			this.formData.text = null;
-			this.formData.von = null;
-			this.formData.bis = null;
-			this.formData.document = null;
-			this.formData.erledigt = false;
-			this.formData.verfasser = null;
-			this.formData.bearbeiter = null;
-			this.formData.anhang = [];
-			//this.formData.anhang = {};
+			this.$refs.form.reset();
+			//sicherstellen, dass über props nur leere felder übergeben werden
+			this.formData = {
+				typeId: 'person',
+					titel: null,
+					action: 'Neue Notiz',
+					text: null,
+					von: null,
+					bis: null,
+					document: null,
+					erledigt: false,
+					verfasser: null,
+					bearbeiter: null,
+					anhang: []
+			};
 		},
 		updateNotiz(notiz_id){
 			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
@@ -274,6 +287,7 @@ export default {
 	<br>	
 	<hr>
 		<Notiz 
+			ref="form"
 			:showErweitert="showErweitert"
 			:showDocument="showDocument"
 			v-model:typeId="formData.typeId"
@@ -295,7 +309,7 @@ export default {
 		
 		
 		<div>
-			parent: {{formData.anhang}} {{formData.typeId}} | {{formData.anhang.name}}
+<!--			PARENT: {{formData.anhang}} {{formData.typeId}} | single: {{formData.anhang.name}} , multi: {{formData.anhang}} <span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->
 		</div>
 	</div>
 `

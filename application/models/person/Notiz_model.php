@@ -162,7 +162,13 @@ class Notiz_model extends DB_Model
 				// Loads model Notizdokument_model
 				$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 				//Todo(manu) change for multiple files
-				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+				foreach ($dms_id as $file)
+				{
+					$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $file));
+				}
+
+				//single File
+				//$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
 			}
 
 			if ($type == 'person')

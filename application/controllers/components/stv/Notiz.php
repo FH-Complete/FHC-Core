@@ -62,50 +62,23 @@ class Notiz extends FHC_Controller
 	public function addNewNotiz($id)
 	{
 		$this->load->library('form_validation');
-		$dms_id = null;
+		//$_POST = json_decode($this->input->raw_input_stream, true);
 
-		//DMS-Logik zum Speichern des Anhangs
-/*		var_dump("im Backend: addNewNotiz, dmslogik");
-		var_dump($_FILES);*/
+		//TODO(Manu) Validation
 
+		$this->form_validation->set_rules('titel', 'titel', 'required');
+		$this->form_validation->set_rules('text', 'Text', 'required');
+
+		//TODO(Manu) form validation - schon für type hier?,
 		$this->load->library('DmsLib');
-
-
-
-
-
 		$uid = getAuthUID();
 
-		//single
-		$dms_id = null;
-		$dms = array(
-			'kategorie_kurzbz'  => 'notiz',
-			'version'           => 0,
-			'name'              => $_FILES["anhang"]["name"],
-			'mimetype'          => $_FILES["anhang"]["type"],
-			'insertamum'        => date('c'),
-			'insertvon'         => $uid
-		);
-
-		//var_dump($dms);
-
-		$result = $this->dmslib->upload($dms, 'anhang', array('pdf'));
-		//var_dump($result);
-
-		if (isSuccess($result))
-		{
-			//TODO(Manu) change to array
-			$dms_id = $result->retval['dms_id'];
-		}
-
-		//var_dump($dms_id);
-
-/*		//multiple files
+		//multiple files
 		$dms_id = [];
-		foreach ($_FILES as $file)
+		foreach ($_FILES as $k => $file)
 		{
-			//var_dump($file["name"]);
-			var_dump($file);
+/*			var_dump($file["name"]);
+			var_dump($file);*/
 			$dms = array(
 				'kategorie_kurzbz'  => 'notiz',
 				'version'           => 0,
@@ -115,25 +88,26 @@ class Notiz extends FHC_Controller
 				'insertvon'         => $uid
 			);
 
-			$result = $this->dmslib->upload($dms, 'file', array('pdf'));
-			var_dump($result);
+			$result = $this->dmslib->upload($dms, $k, array('pdf'));
 
 			if (isSuccess($result))
 			{
 				//TODO(Manu) change to array
 				$dms_id[] = $result->retval['dms_id'];
 			}
+/*			else {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+
+				//TODO(manu) error handling
+				//feedback, dass ein File nicht erfolgreich gespeichert werden konnte
+				//$this->outputJson($result);
+				//$this->outputJsonError(['filetype nicht erlaubt' => getError($result)]);
+			}*/
 
 
 		}
 
-		var_dump($dms_id);
-		return;*/
-
-
 		$this->load->model('person/Notiz_model', 'NotizModel');
-
-		//var_dump($_POST);
 
 		$uid = getAuthUID();
 		$titel = isset($_POST['titel']) ? $_POST['titel'] : null;
@@ -180,30 +154,12 @@ class Notiz extends FHC_Controller
 
 
 		//Todo(manu) multiple files
+		// mit id_type
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $dms_id, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 
 		//vorher
 		//$result = $this->NotizModel->addNotizForPersonWithDoc($id, $titel, $text, $erledigt, $verfasser_uid, $start, $ende, $dms_id);
 
-
-
-
-	//	var_dump($result);
-
-/*		$result = $this->NotizModel->insert(
-			[
-				'titel' => $titel,
-				'text' =>  $text,
-				'insertvon' => $uid,
-				'insertamum' => date('c'),
-				'verfasser_uid' => $verfasser_uid,
-				'bearbeiter_uid' => $bearbeiter_uid,
-				'start' => $start,
-				'ende' => $ende,
-				'erledigt' => $_POST['erledigt'],
-				//'dms_id' => $dms_id
-			]
-		);*/
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
