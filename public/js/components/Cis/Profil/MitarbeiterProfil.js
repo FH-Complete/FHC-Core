@@ -303,7 +303,7 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-              <div class="row py-2">
+              <div class="row mb-3">
               <div class="col">
                 <p class="m-0">
                 <div class="card">
@@ -328,8 +328,25 @@ export default {
               </div>
             </div>
 
+            <!-- HERE STARTS THE ROW WITH REQUESTED CHANGES FROM THE USER -->
+            <div class="row mb-3">
+            <div class="col">
+              <div class="card">
+              <div class="card-header">
+              Profil Informations Änderungen Anfragen</div>
+              <div class="card-body">
+              <p v-for="update in data.profilUpdates">{{update.requested_change}}</p>
               </div>
-              <!-- END OF HIDDEN QUCK LINKS -->
+              </div>
+             
+            </div>
+          </div>
+
+            
+
+              </div>
+              
+              <!-- END OF HIDDEN ROW (HIDDEN IN VIEWPORTS GREATER THEN-EQUAL MD) -->
 
 
             
@@ -771,8 +788,27 @@ export default {
 
               <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
               <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
-                <div  class="row d-none d-md-block mb-3">
-                  <div class="col">
+              <div  class="row d-none d-md-block mb-3">
+              <div class="col mb-3">
+                 
+                    <div class="card">
+                      <div class="card-header">
+                      Something else
+                      </div>
+                      <div class="card-body">
+                      
+                       <p v-for="update in data.profilUpdates">{{JSON.stringify(update)}}</p>
+                      </div>
+                    </div>
+
+                   
+                      
+                  
+                  </div>    
+                  </div>
+              <div  class="row d-none d-md-block mb-3">
+                
+                <div class="col">
                  
                     <div class="card">
                       <div class="card-header">

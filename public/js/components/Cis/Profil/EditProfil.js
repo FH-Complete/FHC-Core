@@ -1,6 +1,6 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
-const infos = {};
+
 
 export default {
   components: {
@@ -27,93 +27,50 @@ export default {
   },
   data() {
     return {
-    selection: null,
-    propertySelection:true,
-    selectedProperty:null,
-    inputField:null,
-    detailSelection:false,
-    editData: this.value,
-    //? tracks what specific profil data was changed
-    changesData: {},
-    editTimestamp: this.timestamp,
-    selectionOrder: {firstSelect: true, secondSelect:false},
+      topic:null,
+      firstSelectedOption:null,
+      secondSelectedOption: null,
+      secondSelectedOptionIndex: null,
     
-    result: true,
-    info: null,
-  }
- 
+    
+      inputField:null,
+      
+      editData: this.value,
+      //? tracks what specific profil data was changed
+      changesData: {},
+      editTimestamp: this.timestamp,
+      
+      result: true,
+      info: null,
+    }
   },
 
   methods: {
+    
 
-    formSelection: function(selection){
-      
-      if(Array.isArray(selection)){
-        return ['a','b'];
-      }else if(typeof(selection) === 'object'){
-        console.log(selection);
-        return Object.keys(selection);
-
-      }else{
-        // it is not an array or and object
-        return null;
-      }
+    createDeepCopy: function(object){
+      //? using Vue.toRaw because deep clones with structuredClone can not be done on proxies
+      return structuredClone(Vue.toRaw(object));
     },
-     
-    updateData: function(event,key,ArrayKey,ObjectKey=null){
 
-      const cleanUpObjectProperties= () => {
-        Object.entries(this.changesData).forEach( ([property, value]) => { if(!Object.keys(value).length) delete this.changesData[property]; })
-      }
-      
-      let newValue = event.target.value;
-      if(!this.changesData[key]){
-        Array.isArray(this.editData[key])? this.changesData[key] = [] : this.changesData[key] = {};
-      } 
-      
-      if(Array.isArray(this.editData[key])){
-        if(newValue.length > 0) this.editData[key][ArrayKey][ObjectKey]= newValue;
-          
-        else this.editData[key][ArrayKey][ObjectKey]= null;
+    changeInput: function(event, inputField,index){
+      let newValue = event.target.value? event.target.value: null;
+      inputField[index] = newValue; 
 
-        let Obj = {key:ArrayKey, new: this.editData[key][ArrayKey], old: JSON.parse(this.originalEditData)[key][ArrayKey]};
-
-        
-        if(JSON.stringify(this.editData[key][ArrayKey]) === JSON.stringify(JSON.parse(this.originalEditData)[key][ArrayKey]) ){
-            this.changesData[key] = this.changesData[key].filter( arrayElement => arrayElement.key !== ArrayKey );
-            cleanUpObjectProperties();
-        }else{
-          if(!this.changesData[key].filter( arrayElement => arrayElement.key === ArrayKey ).length){
-            this.changesData[key].push(Obj);
-          }
-          
-        }
-      }else{
-        if(newValue.length > 0) this.editData[key][ArrayKey]= newValue;
-          
-        else this.editData[key][ArrayKey]= null;
-
-        let Obj = { new: this.editData[key][ArrayKey], old: JSON.parse(this.originalEditData)[key][ArrayKey]};
-
-        
-        if(JSON.stringify(this.editData[key][ArrayKey]) === JSON.stringify(JSON.parse(this.originalEditData)[key][ArrayKey])){
-          delete this.changesData[key][ArrayKey];
-          cleanUpObjectProperties();
-        }else{
-          this.changesData[key][ArrayKey]= Obj;
-        }
-
-      }
-      
-     
     },
+
+
+     
+    
     submitProfilChange(){
       
      
+        //* only inserts new row if the inputField value is different from the original value
+        if(this.isInputFieldChanged && this.topic){
+
         //? inserts new row in public.tbl_cis_profil_update 
-
-
-        Vue.$fhcapi.UserData.editProfil(this.inputField).then((res)=>{
+      
+        Vue.$fhcapi.UserData.editProfil(this.topic,this.inputField).then((res)=>{
           this.result = {
             editData: this.editData,
             timestamp: res.data.retval,
@@ -129,54 +86,34 @@ export default {
           //
         });
      
-      
+      }
     },
   },
   computed: {
+
+    isInputFieldChanged: function(){
+      if(this.inputField){
+        return JSON.stringify(this.inputField) !== JSON.stringify(this.secondSelectedOption);
+      }
+      return false;
+    },
 
     firstSelection(){
       return Object.keys(this.value);
     },
 
     secondSelection(){
-      switch(this.selectedProperty){
-        case "Personen_Informationen": return Object.keys(this.editData[this.selectedProperty]);
-        case "Private_Kontakte": return this.editData[this.selectedProperty];
-        case "Private_Adressen": return this.editData[this.selectedProperty];
+      switch(this.firstSelectedOption){
+        case "Personen_Informationen": return Object.keys(this.editData[this.firstSelectedOption]);
+        case "Private_Kontakte": return this.editData[this.firstSelectedOption];
+        case "Private_Adressen": return this.editData[this.firstSelectedOption];
         default: return [];
       }
     },
 
   
-
-    
-   
-    
-      isEditDataChanged(){
-        return this.originalEditData != JSON.stringify(this.editData)
-      },
   },
   created() {
-    this.originalEditData = JSON.stringify(this.editData);
-    
-    /* 
-    if (infos[this.lehrveranstaltung_id]) {
-      this.info = infos[this.lehrveranstaltung_id];
-    } else {
-      axios
-        .get(
-          FHC_JS_DATA_STORAGE_OBJECT.app_root +
-          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-          "/components/Cis/Mylv/Info/" +
-          this.studien_semester +
-          "/" +
-          this.lehrveranstaltung_id
-        )
-        .then((res) => {
-          this.info = infos[this.lehrveranstaltung_id] = res.data.retval || [];
-        })
-        .catch(() => (this.info = {}));
-    } */
   },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
@@ -192,19 +129,35 @@ export default {
     </template>
     <template v-slot:default>
 
-    
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item" v-if="firstSelectedOption">{{firstSelectedOption}}</li>
+        <li class="breadcrumb-item" v-if="secondSelectedOption" >{{firstSelectedOption ==="Personen_Informationen" ? Object.keys(secondSelectedOption)[0] : secondSelectedOptionIndex+1 }}</li>
+        <!--<li class="breadcrumb-item" aria-current="page">Drei</li>-->
+      </ol>
+    </nav>
 
-    <select v-if="!selectedProperty"  class="form-select" size="3" aria-label="size 3 select example">
-      <option @click="selectedProperty=option;  " v-for="option in firstSelection" :value="option">{{option}}</option>
+
+    <select v-if="!firstSelectedOption" v-model="firstSelectedOption"  class="form-select" size="3" aria-label="size 3 select example">
+      <option  v-for="option in firstSelection" :value="option">{{option}}</option>
     </select>
 
-    <select v-if="selectedProperty && !inputField" class="form-select" size="3" aria-label="size 3 select example">
+    <select v-if="firstSelectedOption && !secondSelectedOption" class="form-select" size="3" aria-label="size 3 select example">
       <option @click="
-      if(Array.isArray(editData[selectedProperty])){
-        inputField=option
+      
+      if(Array.isArray(editData[firstSelectedOption])){
+        secondSelectedOptionIndex = index;
+        secondSelectedOption = createDeepCopy(option);
+        inputField= createDeepCopy(option);
+        //* topic is the property in which the array is stored when it is an array
+        topic = firstSelectedOption;
       }else{
-        inputField={[option]:editData[selectedProperty][option]};
-      }" v-for="option in secondSelection" :value="option"><div v-if="typeof(option)==='object'"><p v-for="(value,property) in option">{{property}}:{{value}}</p></div><template v-else>{{option}}</template></option>
+        secondSelectedOption={[option]:editData[firstSelectedOption][option]};
+        inputField={[option]:editData[firstSelectedOption][option]};
+        //* topic is the selected property if is an object
+        topic = option;
+      }" v-for="(option, index) in secondSelection" :value="option"><div v-if="typeof(option)==='object'"><span class="m-2 d-block" v-for="(value,property) in option">{{property}}:{{value}}</span></div><template v-else>{{option}}</template></option>
     </select>
     <div v-if="inputField">
     <div v-for="(field,index) in inputField">
@@ -212,7 +165,7 @@ export default {
     <div class="form-underline">
     <div class="form-underline-titel">{{index}}</div>
 
-    <input  class="form-control" :id="index" v-model="inputField[index]" :placeholder="field">
+    <input  class="form-control" :id="index" :value="inputField[index]" @input="changeInput($event,inputField,index)" :placeholder="field">
     </div>
     
       </div>
@@ -225,9 +178,10 @@ export default {
     </template>
     <!-- optional footer -->
     <template   v-slot:footer>
+      <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>
       <p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{editTimestamp}}</p>
     
-      <button  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
+      <button v-if="isInputFieldChanged"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>
     <!-- end of optional footer --> 
   </bs-modal>`,

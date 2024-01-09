@@ -70,17 +70,28 @@ class Profil extends Auth_Controller
 	public function editProfil()
 	{
 
-		$json = $this->input->raw_input_stream;
+		$json = json_decode($this->input->raw_input_stream);
 		
 
-		$data = ["uid" => $this->uid, "requested_change" => $json, "change_timestamp" => "NOW()"];
+		$data = ["uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()", "topic"=>$json->topic];
 
 		//? gets all the requested changes from a user
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
+
+		//? checks if the user already made a request to change a topic
+		//! which is an constraint added to the public.tbl_cis_profil_update table
+		foreach($res as $update_request){
+			if($update_request->topic == $json->topic && $update_request->uid == $this->uid){
+				
+				echo json_encode(error("uid and topic combination exists already"));
+				return;
+			}
+		}
 		
 		
 			$insert_res = $this->ProfilChangeModel->insert($data);
+			
 		
 			if(isError($insert_res)){
 				//catch error
@@ -504,13 +515,15 @@ class Profil extends Auth_Controller
 		}
 
 
-		//? querying if the user already has a pending profil information update request
-		/* $editData_res = $this->ProfilChangeModel->load([$this->uid]);
-		if(isError($editData_res)){
+		//? querying if the user has profil update requests
+		$profilUpdates = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
+		if(isError($profilUpdates)){
 			//error handling
 		}else{
-			$editData_res = hasData($editData_res) ? getData($editData_res)[0] : null;
-		} */
+			//? array containing all the requested profil information changes from the current user
+			$profilUpdates = hasData($profilUpdates) ? getData($profilUpdates) : null;
+			
+		} 
 
 		$res = new stdClass();
 		$res->foto = $person_res->foto;
@@ -551,9 +564,8 @@ class Profil extends Auth_Controller
 		//telefon nummer von dem Standort
 		$res->standort_telefon = $telefon_res;
 
-		/* $res->editData = $editData_res? json_decode($editData_res->profil_data): null;
-		$res->editDataTimestamp = $editData_res? date_create($editData_res->change_timestamp)->format('d/m/Y') : null;
-		 */
+		$res->profilUpdates = $profilUpdates?: null;
+		
 
 		return $res;
 	}
@@ -707,13 +719,15 @@ class Profil extends Auth_Controller
 			}
 		}
 
-		//? querying if the user already has a pending profil information update request
-		/* $editData_res = $this->ProfilChangeModel->load([$this->uid]);
-		if(isError($editData_res)){
+		//? querying if the user has profil update requests
+		$profilUpdates = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
+		if(isError($profilUpdates)){
 			//error handling
 		}else{
-			$editData_res = hasData($editData_res) ? getData($editData_res)[0] : null;
-		} */
+			//? array containing all the requested profil information changes from the current user
+			$profilUpdates = hasData($profilUpdates) ? getData($profilUpdates) : null;
+			
+		} 
 
 
 		$res = new stdClass();
@@ -752,9 +766,8 @@ class Profil extends Auth_Controller
 
 
 		$res->mailverteiler = $mailverteiler_res;
-		/* $res->editData = $editData_res? json_decode($editData_res->profil_data): null;
-		$res->editDataTimestamp = $editData_res? date_create($editData_res->change_timestamp)->format('d/m/Y'): null;
-		 */
+		$res->profilUpdates = $profilUpdates?: null;
+		
 		return $res;
 
 

@@ -3,10 +3,11 @@ export default {
 
     //! API Calls for Profil Views
 
-    editProfil: function(payload) {
+    editProfil: function(topic, payload) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
                    `/Cis/Profil/editProfil`;
-        return axios.post(url,payload);
+                   
+        return axios.post(url,{topic, payload});
     },
 
     getEditProfil: function() {
