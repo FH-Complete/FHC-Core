@@ -57,7 +57,12 @@ define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 
 // Anzeige des Links zum Profil von Personen bei globaler Suche
+// Wenn ein Mitarbeiter sucht, wird der Link IMMER angezeigt, unabhängig von der Config
+// Wenn ein Studierender sucht und die Config auf false ist, wird der Link nicht angezeigt - ansonsten schon
 define('CIS_SUCHE_PROFIL_ANZEIGEN',true);
+
+// Anzeige von Personen bei globaler Suche
+define('CIS_ALLOW_PERSON_SEARCH', true);
 
 // Soll geprueft werden ob das Passwort innerhalb des letzten Jahres geaendert wurde true|false
 // Wenn dies nicht geaendert wurde wird nach dem Login auf die Passwort aendern Seite umgeleitet
