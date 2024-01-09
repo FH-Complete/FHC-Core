@@ -6,7 +6,9 @@ export default {
 		accessibility
 	},
 	emits: [
-		'update:modelValue'
+		'update:modelValue',
+		'change',
+		'changed'
 	],
 	props: {
 		configUrl: String,
@@ -35,24 +37,49 @@ export default {
 			}
 		}
 	},
+	methods: {
+		change(key) {
+			this.$emit("change", key)
+			this.current = key;
+			this.$nextTick(() => this.$emit("changed", key));
+		}
+	},
 	created() {
 		CoreRESTClient
 			.get(this.configUrl)
 			.then(result => CoreRESTClient.getData(result.data))
 			.then(result => {
-				const tabs = {};
-				// TODO(chris): check if result is array
-				Object.entries(result).forEach(([key, config]) => {
-					if (!config.component)
-						return console.error('Component missing for ' + key);
+				if (!result)
+					return;
 
-					tabs[key] = {
-						component: Vue.defineAsyncComponent(() => import(config.component)),
-						title: config.title || key,
-						config: config.config,
-						key
-					}
-				});
+				const tabs = {};
+
+				if (Array.isArray(result)) {
+					result.forEach((config, key) => {
+						if (!config.component)
+							return console.error('Component missing for ' + key);
+
+						tabs[key] = {
+							component: Vue.markRaw(Vue.defineAsyncComponent(() => import(config.component))),
+							title: config.title || key,
+							config: config.config,
+							key
+						}
+					});
+
+				} else {
+					Object.entries(result).forEach(([key, config]) => {
+						if (!config.component)
+							return console.error('Component missing for ' + key);
+
+						tabs[key] = {
+							component: Vue.markRaw(Vue.defineAsyncComponent(() => import(config.component))),
+							title: config.title || key,
+							config: config.config,
+							key
+						}
+					});
+				}
 				if (tabs[this.default])
 					this.current = this.default;
 				else
@@ -62,14 +89,14 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="fhc-tabs d-flex flex-column">
+	<div class="fhc-tabs d-flex flex-column" v-if="Object.keys(tabs).length">
 		<div class="nav nav-tabs">
 			<div
 				v-for="tab in tabs"
 				:key="tab.key"
 				class="nav-item nav-link"
 				:class="{active: tab.key == current}"
-				@click="current=tab.key"
+				@click="change(tab.key)"
 				:aria-current="tab.key == current ? 'page' : ''"
 				v-accessibility:tab
 				>
@@ -78,7 +105,7 @@ export default {
 		</div>
 		<div style="flex: 1 1 0%; height: 0%" class="border-bottom border-start border-end overflow-auto p-3">
 			<keep-alive>
-				<component :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
+				<component ref="current" :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
 			</keep-alive>
 		</div>
 	</div>`

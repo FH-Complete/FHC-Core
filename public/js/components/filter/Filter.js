@@ -50,8 +50,7 @@ export const CoreFilterCmpt = {
 			default: true
 		},
 		filterType: {
-			type: String,
-			required: true
+			type: String
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
@@ -199,7 +198,7 @@ export const CoreFilterCmpt = {
 				tabulatorOptions.columns = this.filteredColumns;
 			}
 
-			if (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length)
+			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
 
 			// Start the tabulator with the build options
@@ -235,7 +234,7 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
-			this.tabulatorHasSelector = this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
+			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
 		},
@@ -529,7 +528,7 @@ export const CoreFilterCmpt = {
 						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
 					</button>
 					<span v-if="$slots.actions && tabulatorHasSelector">Mit {{selectedData.length}} ausgewählten: </span>
-					<slot name="actions" v-bind="tabulatorHasSelector ? selectedData : []"></slot>
+					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>

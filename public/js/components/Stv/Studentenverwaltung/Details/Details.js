@@ -299,7 +299,7 @@ export default {
 					</div>
 					<label for="stv-details-anmerkung" class="col-sm-1 col-form-label">Anmerkung</label>
 					<div class="col-sm-3">
-						<textarea id="stv-details-anmerkung" class="form-control" v-text="anmerkung"></textarea>
+						<textarea id="stv-details-anmerkung" class="form-control" v-model="data.anmerkung"></textarea>
 					</div>
 					<label for="stv-details-homepage" class="col-sm-1 col-form-label">Homepage</label>
 					<div class="col-sm-3">

@@ -150,27 +150,28 @@ export default {
 				});
 		},
 		loadStudienplaene() {
-			CoreRESTClient
-				.post('components/stv/studienplan/get', {
-					studiengang_kz: this.formDataStg,
-					studiensemester_kurzbz: this.formDataSem,
-					ausbildungssemester: this.formData.ausbildungssemester,
-					orgform_kurzbz: this.formData.orgform_kurzbz
-				})
-				.then(result => CoreRESTClient.getData(result.data) || [])
-				.then(result => {
-					this.studienplaene = result;
-					if (this.formData.studienplan_id !== '' && !this.studienplaene.filter(plan => plan.studienplan_id == this.formData.studienplan_id).length)
-						this.formData.studienplan_id = '';
-				})
-				.catch(error => {
-					if (error.code == 'ERR_BAD_REQUEST') {
-						return this.studienplaene = [];
-					}
-					// NOTE(chris): repeat request
-					if (error.code != "ERR_CANCELED")
-						window.setTimeout(this.loadStudienplaene, 100);
-				})
+			if (this.formDataStg)
+				CoreRESTClient
+					.post('components/stv/studienplan/get', {
+						studiengang_kz: this.formDataStg,
+						studiensemester_kurzbz: this.formDataSem,
+						ausbildungssemester: this.formData.ausbildungssemester,
+						orgform_kurzbz: this.formData.orgform_kurzbz
+					})
+					.then(result => CoreRESTClient.getData(result.data) || [])
+					.then(result => {
+						this.studienplaene = result;
+						if (this.formData.studienplan_id !== '' && !this.studienplaene.filter(plan => plan.studienplan_id == this.formData.studienplan_id).length)
+							this.formData.studienplan_id = '';
+					})
+					.catch(error => {
+						if (error.code == 'ERR_BAD_REQUEST') {
+							return this.studienplaene = [];
+						}
+						// NOTE(chris): repeat request
+						if (error.code != "ERR_CANCELED")
+							window.setTimeout(this.loadStudienplaene, 100);
+					})
 		},
 		changeAddressNation(e) {
 			if (this.formData['geburtsnation'] == this.formData['address']['nation'])
@@ -280,7 +281,7 @@ export default {
 						</tbody>
 					</table>
 				</template>
-				<tempalte v-else>
+				<template v-else>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
@@ -670,7 +671,6 @@ export default {
 							</div>
 						</div>
 					</div>
-
 				</template>
 			</template>
 			<template #footer>

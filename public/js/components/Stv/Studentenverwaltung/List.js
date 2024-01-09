@@ -60,11 +60,11 @@ export default {
 					{title:"GeburtsdatumISO", field:"geburtsdatum_iso", visible:false},
 				],
 
-				layout: 'fitDataFill',
+				layout: 'fitDataStretch',
 				layoutColumnsOnNewData: false,
-				height: 'auto',
+				height: '100%',
 				selectable: true,
-				// TODO(chris): select only one? selectMultiple with click?
+				selectableRangeMode: 'click',
 				index: 'prestudent_id',
 				persistence: true
 			},
@@ -126,7 +126,12 @@ export default {
 				case 'Enter':
 				case 'Space':
 					e.preventDefault();
-					this.$refs.table.tabulator.rowManager.findRow(this.focusObj).component.toggleSelect();
+					const e2 = new Event('click', e);
+					e2.altKey = e.altKey;
+					e2.ctrlKey = e.ctrlKey;
+					e2.shiftKey = e.shiftKey;
+					this.focusObj.dispatchEvent(e2);
+					//row.component.toggleSelect();
 					break;
 				case 'ArrowUp':
 					e.preventDefault();
@@ -159,6 +164,9 @@ export default {
 			}
 		},
 		onFocus(e) { // TODO(chris): this should be in the filter component
+			if (e.target.classList.contains('tablulator-container')) {
+				this.focusObj = this.changeFocus(e.target, e.target.querySelector('.tabulator-row'));
+			}
 			if (e.target.classList.contains('tabulator-tableholder')) {
 				this.focusObj = this.changeFocus(e.target, e.target.querySelector('.tabulator-row'));
 			}
@@ -167,20 +175,21 @@ export default {
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3" @focusin="onFocus" @focusout="onBlur" @keydown="onKeydown">
-		<core-filter-cmpt
-			ref="table"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			table-only
-			:side-menu="false"
-			reload
-			new-btn-show
-			new-btn-label="InteressentIn"
-			@click:new="actionNewPrestudent"
-			tabindex="0"
-		>
-		</core-filter-cmpt>
+	<div class="stv-list h-100 pt-3">
+		<div class="tablulator-container d-flex flex-column h-100" tabindex="0" @focusin="onFocus" @focusout="onBlur" @keydown="onKeydown">
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				reload
+				new-btn-show
+				new-btn-label="InteressentIn"
+				@click:new="actionNewPrestudent"
+			>
+			</core-filter-cmpt>
+		</div>
 		<list-new ref="new" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></list-new>
 	</div>`
 };
