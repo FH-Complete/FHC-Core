@@ -90,4 +90,17 @@ class Studienplan_model extends DB_Model
 			'tbl_studienplan_lehrveranstaltung.semester' => $semester
 		));
 	}
+
+	public function getAllOesForLv($lehrveranstaltung_id)
+	{
+		$this->addDistinct('oe_kurzbz');
+
+		$this->addJoin('lehre.tbl_studienplan_lehrveranstaltung lv', 'studienplan_id');
+		$this->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
+		$this->addJoin('public.tbl_studiengang', 'studiengang_kz');
+
+		return $this->loadWhere([
+			'lv.lehrveranstaltung_id' => $lehrveranstaltung_id
+		]);
+	}
 }

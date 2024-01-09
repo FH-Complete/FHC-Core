@@ -1,9 +1,11 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import {CoreRESTClient} from '../../../../../RESTClient.js';
+import ZeugnisActions from './Zeugnis/Actions.js';
 
 export default {
 	components: {
-		CoreFilterCmpt
+		CoreFilterCmpt,
+		ZeugnisActions
 	},
 	props: {
 		student: Object
@@ -51,8 +53,18 @@ export default {
 				],
 				layout: 'fitDataStretch',
 				height: '100%',
+				selectable: true,
+				selectableRangeMode: 'click',
 				persistence: true
 			};
+		}
+	},
+	methods: {
+		setGrades(selected) {
+			CoreRESTClient
+				.post('components/stv/Noten/update', selected)
+				.then(this.$refs.table.reloadTable)
+				.catch(this.$fhcAlert.handleFormValidation);
 		}
 	},
 	template: `
@@ -67,6 +79,9 @@ export default {
 			:side-menu="false"
 			reload
 			>
+			<template #actions="{selected}">
+				<zeugnis-actions :selected="selected" @set-grades="setGrades"></zeugnis-actions>
+			</template>
 		</core-filter-cmpt>
 	</div>`
 };
