@@ -1220,16 +1220,16 @@ class mitarbeiter extends benutzer
 		return $return;
 	}
 
-
-
 	/**
 	 * Gibt ein Array mit den UIDs der aktiv beschäftigten Untergebenen zurueck
 	 * @param string $uid	UID.
 	 * @param boolean $include_OE_childs	Wenn true, dann werden auch alle aktiv
 	 * beschäftigten Untergebenen der Kind-OEs des Leiters zurückgegeben.
+	 * @param bool $fixangestellte_only
+	 * @param bool $include_ImLetztenMonatBeendete Inkludiert Mitarbeiter, deren Benutzerfunktion im letzten Monat bereits endete
 	 * @return boolean
 	 */
-	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true)
+	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true, $include_ImLetztenMonatBeendete = false)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
@@ -1336,11 +1336,18 @@ class mitarbeiter extends benutzer
 
 		$qry.= ")
 			AND
-				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
-			AND
-				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
-			AND
-				tbl_benutzer.aktiv = 'true'";
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())";
+			if ($include_ImLetztenMonatBeendete)
+			{
+				// hier kein check auf aktiv = 'true', da hier auch DV abgefragt werden, die im letzten Monat beendet wurden
+				$qry .= " AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis >= (DATE_TRUNC('MONTH', NOW()) - INTERVAL '1 month'))";
+			}
+			else {
+
+				$qry .= " AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis >= now())";
+				$qry .= " AND tbl_benutzer.aktiv = 'true'";
+			}
+
 			if ($fixangestellte_only)
 				$qry .= " AND tbl_mitarbeiter.fixangestellt";
 			$qry .= ";";
