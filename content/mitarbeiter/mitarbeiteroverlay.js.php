@@ -436,7 +436,6 @@ function MitarbeiterDetailDisableFields(val)
 	//document.getElementById('mitarbeiter-detail-textbox-personalnummer').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-lektor').disabled=val;
-	document.getElementById('mitarbeiter-detail-textbox-stundensatz').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-telefonklappe').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-bismelden').disabled=val;
@@ -557,7 +556,6 @@ function MitarbeiterAuswahl()
 
 	personalnummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personalnummer" ));
 	kurzbezeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kurzbz" ));
-	stundensatz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
 	telefonklappe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#telefonklappe" ));
 	lektor=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lektor" ));
 	fixangestellt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fixangestellt" ));
@@ -605,7 +603,6 @@ function MitarbeiterAuswahl()
 	//Mitarbeiterdaten
 	document.getElementById('mitarbeiter-detail-textbox-personalnummer').value=personalnummer;
 	document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').value=kurzbezeichnung;
-	document.getElementById('mitarbeiter-detail-textbox-stundensatz').value=stundensatz;
 	document.getElementById('mitarbeiter-detail-textbox-telefonklappe').value=telefonklappe;
 	if(lektor=='Ja')
 		document.getElementById('mitarbeiter-detail-checkbox-lektor').checked=true;
@@ -651,6 +648,8 @@ function MitarbeiterAuswahl()
 	{
 		document.getElementById('mitarbeiter-udf').setAttribute('src', 'udf.xul.php?person_id='+person_id);
 	}
+
+	document.getElementById('mitarbeiter-stundensatz').setAttribute('src','mitarbeiter/stundensatzoverlay.xul.php?mitarbeiter_uid='+uid);
 
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
@@ -843,7 +842,6 @@ function MitarbeiterSave()
 	//Mitarbeiterdaten
 	personalnummer = document.getElementById('mitarbeiter-detail-textbox-personalnummer').value;
 	kurzbezeichnung = document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').value;
-	stundensatz = document.getElementById('mitarbeiter-detail-textbox-stundensatz').value;
 	telefonklappe = document.getElementById('mitarbeiter-detail-textbox-telefonklappe').value;
 	lektor = document.getElementById('mitarbeiter-detail-checkbox-lektor').checked;
 	fixangestellt = document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').checked;
@@ -895,7 +893,6 @@ function MitarbeiterSave()
 	req.add('geburtsnation', geburtsnation);
 	req.add('sprache', sprache);
 	req.add('kurzbezeichnung', kurzbezeichnung);
-	req.add('stundensatz', stundensatz);
 	req.add('telefonklappe', telefonklappe);
 	req.add('lektor', lektor);
 	req.add('fixangestellt', fixangestellt);
