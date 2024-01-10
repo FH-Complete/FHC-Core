@@ -95,7 +95,7 @@ if($jqueryV1 && $jqueryV2) show_error("Two JQuery versions used: composer and in
 <?php endif ?>
 
 <?php if($tinymce) : ?>
-	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce4/tinymce.min.js');?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce5/tinymce.min.js');?>"></script>
 <?php endif ?>
 
 <?php if($textile) : ?>

@@ -41,10 +41,11 @@ export default {
 	methods: {
 		save() {
 			this.isloading = true;
-			const forbiddenLvs = this.lvs1.filter(lv => lv.antrag_zugelassen && !lv._children).map(lv => ({
+			const forbiddenLvs = this.lvs1.filter(lv => (lv.antrag_zugelassen || this.lvs.repeat_last)
+			 && !lv._children).map(lv => ({
 				studierendenantrag_id: this.antragId,
 				lehrveranstaltung_id: lv.lehrveranstaltung_id,
-				zugelassen: 0,
+				zugelassen: this.lvs.repeat_last ? (lv.antrag_zugelassen ? 1 : 2) : 0,
 				anmerkung: lv.antrag_anmerkung || "",
 				studiensemester_kurzbz: this.lvs1sem
 			}));
@@ -109,6 +110,8 @@ export default {
 						.loadCategory(['ui', 'lehre', 'studierendenantrag', 'global'])
 						.then(() => {
 							for (var k in result.data.retval) {
+								if (k === 'repeat_last')
+									continue;
 								if (result.data.retval[k] === null) {
 									const alert = document.createElement('div');
 									alert.innerHTML = this.$p.t('studierendenantrag', 'error_stg_last_semester');
@@ -147,29 +150,33 @@ export default {
 										{title: this.$p.t('lehre','lehrform'), field: "lehrform_kurzbz"},
 										{title: "ECTS", field: "ects"},
 										{title: this.$p.t('lehre','note'), field: "note", formatter:(cell, formatterParams, onRendered)=>cell.getValue() || "---"},
-										{title: (index==1) ? this.$p.t('studierendenantrag','lv_nicht_zulassen') : this.$p.t('studierendenantrag','lv_wiederholen'), field: "antrag_zugelassen", formatter: (cell, formatterParams, onRendered) => {
-											let data = cell.getData();
-											if(data._children || !data.zeugnis)
-												return "";
-											let input = document.createElement('input');
-											input.className = "form-check-input";
-											input.type = "checkbox";
-											input.role = "switch";
-											input.checked = cell.getValue();
-											input.addEventListener('input', () => {
-												lvs[data.studienplan_lehrveranstaltung_id].antrag_zugelassen = input.checked;
-												cell.getRow().reformat();
-											});
-											if (this.disabled) {
-												input.disabled = true;
+										{
+											title: index == 1 && !result.data.retval.repeat_last ? this.$p.t('studierendenantrag','lv_nicht_zulassen') : this.$p.t('studierendenantrag','lv_wiederholen'),
+											field: "antrag_zugelassen",
+											formatter: (cell, formatterParams, onRendered) => {
+												let data = cell.getData();
+												if(data._children || !data.zeugnis)
+													return "";
+												let input = document.createElement('input');
+												input.className = "form-check-input";
+												input.type = "checkbox";
+												input.role = "switch";
+												input.checked = cell.getValue();
+												input.addEventListener('input', () => {
+													lvs[data.studienplan_lehrveranstaltung_id].antrag_zugelassen = input.checked;
+													cell.getRow().reformat();
+												});
+												if (this.disabled) {
+													input.disabled = true;
+												}
+
+												let div =  document.createElement('div');
+												div.className = 'form-check form-switch';
+												div.append(input);
+
+												return div;
 											}
-
-											let div =  document.createElement('div');
-											div.className = 'form-check form-switch';
-											div.append(input);
-
-											return div;
-										}},
+										},
 										{
 											title: this.$p.t('global','anmerkung'),
 											field: "antrag_anmerkung",
@@ -233,7 +240,7 @@ export default {
 		<div ref="alertbox"></div>
 
 		<span class="d-flex justify-content-between h4">
-			<span>{{$p.t('studierendenantrag', 'title_lv_nicht_zugelassen')}}</span>
+			<span>{{lvs.repeat_last ? $p.t('studierendenantrag', 'title_lv_wiederholen') : $p.t('studierendenantrag', 'title_lv_nicht_zugelassen')}}</span>
 			<span>{{lvs1sem}}</span>
 		</span>
 		<div ref="lvtable1" class="mb-3">

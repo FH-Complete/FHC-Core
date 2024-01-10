@@ -44,17 +44,18 @@ export default {
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 				'/components/Antrag/Leitung/getActiveStgs'
 			).then(result => {
-				this.stgs = Object.values(result.data.retval).sort((a,b) => a.bezeichnung == b.bezeichnung ? (a.orgform == b.orgform ? 0 : (a.orgform > b.orgform ? 1 : -1)) : (a.bezeichnung > b.bezeichnung ? 1 : -1));
+				this.stgs = result.data.retval;
 			}).catch(error => {
 				console.error(error);
 			});
 		},
-		changeFilter(evt) {
-			this.filter = evt.target.value || undefined;
+		changeFilter(filter) {
+			this.filter = filter || undefined;
 			this.reload();
 		},
 		reload() {
-			this.$refs.table.reload(this.filter);
+			if (this.$refs.table)
+				this.$refs.table.reload(this.filter);
 			this.loadFilter();
 		},
 		download() {
@@ -336,6 +337,7 @@ export default {
 			ref="table"
 			:stg-a="stgkzA"
 			:stg-l="stgkzL"
+			:filter="filter"
 			v-model:columnData="columns"
 			v-model:selectedData="selectedData"
 			@action:approve="actionApprove"
