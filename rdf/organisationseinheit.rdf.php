@@ -35,7 +35,12 @@ require_once('../include/organisationseinheit.class.php');
 
 // raumtypen holen
 $org=new organisationseinheit();
-$org->getAll(null, null, 'organisationseinheittyp_kurzbz, bezeichnung');
+if (isset($_GET['onlyRoots']) && $_GET['onlyRoots'] === 'true')
+{
+	$org->getRoots();
+}
+else
+	$org->getAll(null, null, 'organisationseinheittyp_kurzbz, bezeichnung');
 
 $rdf_url='http://www.technikum-wien.at/organisationseinheit';
 
