@@ -140,7 +140,7 @@ export default {
 
 
     <select v-if="!firstSelectedOption" v-model="firstSelectedOption"  class="form-select" size="3" aria-label="size 3 select example">
-      <option  v-for="option in firstSelection" :value="option">{{option}}</option>
+      <option  v-for="(option,index) in firstSelection" :value="option">{{option.replace("_"," ")}}</option>
     </select>
 
     <select v-if="firstSelectedOption && !secondSelectedOption" class="form-select" size="3" aria-label="size 3 select example">
@@ -157,7 +157,15 @@ export default {
         inputField={[option]:editData[firstSelectedOption][option]};
         //* topic is the selected property if is an object
         topic = option;
-      }" v-for="(option, index) in secondSelection" :value="option"><div v-if="typeof(option)==='object'"><span class="m-2 d-block" v-for="(value,property) in option">{{property}}:{{value}}</span></div><template v-else>{{option}}</template></option>
+      }" v-for="(option, index) in secondSelection" :value="option"><div v-if="typeof(option)==='object'">
+      <div class="row m-2" v-for="(value,property) in option">
+      <div class="col"><span>{{property}}</span></div>
+      <div class="col"><span>{{value}}</span></div>
+      
+      </div>
+      </div>
+      <template v-else>{{option}}</template>
+      </option>
     </select>
     <div v-if="inputField">
     <div v-for="(field,index) in inputField">
