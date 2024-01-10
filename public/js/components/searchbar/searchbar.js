@@ -85,7 +85,7 @@ export default {
             if( this.searchtimer !== null ) {
                 clearTimeout(this.searchtimer);
             }
-            if( this.searchsettings.searchstr.length >= 3 ) {
+            if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
                     this.callsearchapi,
