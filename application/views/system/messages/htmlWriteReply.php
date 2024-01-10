@@ -6,7 +6,7 @@
 			'jquery3' => true,
 			'bootstrap3' => true,
 			'fontawesome4' => true,
-			'tinymce4' => true,
+			'tinymce5' => true,
 			'sbadmintemplate3' => true,
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/messageWriteReply.js')

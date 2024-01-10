@@ -30,6 +30,7 @@ class SearchBarLib
 	const ERROR_WRONG_SEARCHSTR = 'ERR002';
 	const ERROR_NO_TYPES = 'ERR003';
 	const ERROR_WRONG_TYPES = 'ERR004';
+	const ERROR_NOT_AUTH = 'ERR005';
 
 	// List of allowed types of search
 	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student', 'prestudent', 'document', 'cms'];
@@ -155,9 +156,13 @@ class SearchBarLib
 				(stdkst.bezeichnung IS NULL 
 				OR org.bezeichnung IS NULL) 
 				AND (
-					b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-					OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-					OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'					
+			' .
+			$this->buildSearchClause(
+				$dbModel, 
+				array('b.uid', 'p.vorname', 'p.nachname'), 
+				$searchstr
+			) .
+			'
 				)
 		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
 		';
@@ -170,7 +175,26 @@ class SearchBarLib
 		// Otherwise return an empty array
 		return array();
 	}
+
+	protected function buildSearchClause(DB_Model $dbModel, array $columns, $searchstr)
+	{
+		$document			 = implode(' || \' \' || ', $columns);
+		$query				 = '\'' . implode(':* & ', explode(' ', trim($searchstr))) . ':*\'';
+		$reversequery		 = '\'*:' . implode(' & *:', explode(' ', trim($searchstr))) . '\'';
+		$nospacequery		 = '\'' . implode('', explode(' ', trim($searchstr))) . ':*\'';
+
+		$searchclause = <<<EOSC
+			to_tsvector(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g'))) @@ to_tsquery(lower({$query}))
+			OR
+			to_tsvector(reverse(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g')))) @@ to_tsquery(reverse(lower({$reversequery})))
+			OR
+			to_tsvector(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g'))) @@ to_tsquery(lower({$nospacequery}))
 	
+EOSC;
+
+		return $searchclause;
+	}
+
 	/**
 	 * Search for employees
 	 */
@@ -217,11 +241,13 @@ class SearchBarLib
 				  FROM public.tbl_kontakt
 				 WHERE kontakttyp = \'telefon\'
 			) k ON(k.standort_id = m.standort_id)
-			 WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR org.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR stdkst.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			 WHERE ' .
+			$this->buildSearchClause(
+				$dbModel, 
+				array('b.uid', 'p.vorname', 'p.nachname', 'org.bezeichnung', 'stdkst.bezeichnung'), 
+				$searchstr
+			) .
+			'
 		      GROUP BY type, b.uid, p.person_id, name, email, m.telefonklappe, phone
 		');
 
@@ -271,9 +297,13 @@ class SearchBarLib
 				   AND (datum_bis IS NULL OR datum_bis >= NOW())
 				   AND b.aktiv = TRUE
 			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz)
-			 WHERE o.oe_kurzbz ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			    OR o.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-				OR ot.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			 WHERE ' .
+			$this->buildSearchClause(
+				$dbModel, 
+				array('o.oe_kurzbz', 'o.bezeichnung', 'ot.bezeichnung'), 
+				$searchstr
+			) .
+			'
 		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung
 		');
 

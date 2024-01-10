@@ -62,6 +62,24 @@ class AntragLib
 			'insertvon' => $insertvon
 		]);
 
+		// NOTE(chris): remove "preabbrecher" statusgrund for Stgl-Abmeldungen if set
+		$res = $this->_ci->StudierendenantragModel->load($antrag_id);
+		if (hasData($res) && current(getData($res))->typ == Studierendenantrag_model::TYP_ABMELDUNG_STGL) {
+			$this->_ci->PrestudentstatusModel->addSelect('tbl_status_grund.statusgrund_kurzbz');
+			$res = $this->_ci->PrestudentstatusModel->getLastStatusWithStgEmail(current(getData($res))->prestudent_id, '', 'Student');
+			if (hasData($res) && current(getData($res))->statusgrund_kurzbz == 'preabbrecher') {
+				$prestudentstatus = current(getData($res));
+				$this->_ci->PrestudentstatusModel->update([
+					'prestudent_id' => $prestudentstatus->prestudent_id,
+					'status_kurzbz'=>$prestudentstatus->status_kurzbz,
+					'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
+					'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
+				], [
+					'statusgrund_id' => null
+				]);
+			}
+		}
+
 		return $result;
 	}
 
@@ -967,6 +985,7 @@ class AntragLib
 		$studiengang_kz = $result->studiengang_kz;
 		$orgform_kurzbz = $result->orgform_kurzbz;
 		$ausbildungssemester = $result->ausbildungssemester;
+		$sprache = $result->sprache;
 
 		// NOTE(chris): check permission
 		$allowedStgs = $this->_ci->permissionlib->getSTG_isEntitledFor('student/studierendenantrag') ?: [];
@@ -1012,11 +1031,12 @@ class AntragLib
 			$semA,
 			$ausbildungssemester + 1,
 			$antrag->prestudent_id,
-			$antrag->studiensemester_kurzbz
+			$sprache
 		);
 		if (isError($result))
 			return $result;
 		$lvsA = $result->retval; // NOTE(chris): don't use getData() because we want to differenciate [] and null
+		$repeat_last = false;
 		if ($lvsA) {
 			foreach($lvsA as $lv)
 			{
@@ -1027,6 +1047,81 @@ class AntragLib
 					$lv->antrag_anmerkung = $lvszugewiesen[$lv->lehrveranstaltung_id]->anmerkung;
 				}
 			}
+		} elseif ($lvsA === null) {
+			// NOTE(chris): We are repeating the last semester
+			$repeat_last = true;
+
+			$result = $this->_ci->PrestudentstatusModel->getStatusByFilter($antrag->prestudent_id, 'Student', $ausbildungssemester - 1);
+			if (isError($result))
+				return $result;
+
+			$stdsems = getData($result) ?: [];
+			$stdsem = null;
+
+			$result = $this->_ci->StudiensemesterModel->load($antrag->studiensemester_kurzbz);
+			if (isError($result))
+				return $result;
+			if (!hasData($result))
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_stdsem', ['studiensemester_kurzbz' => $antrag->studiensemester_kurzbz]));
+			$asem = current(getData($result));
+
+			foreach ($stdsems as $sem) {
+				$result = $this->_ci->StudiensemesterModel->load($sem->studiensemester_kurzbz);
+				if (isError($result))
+					return $result;
+				if (hasData($result)) {
+					if (current(getData($result))->start < $asem->start) {
+						$stdsem = $sem->studiensemester_kurzbz;
+						break;
+					}
+				}
+			}
+
+			// NOTE(chris): if we don't find a status in the previous semester there is something wrong
+			if (!$stdsem)
+				return error($this->_ci->p->t('studierendenantrag', 'error_no_status_in_prev_sem'));
+
+			$result = $this->getLvsByStgStsemAndSem(
+				$studiengang_kz,
+				$orgform_kurzbz,
+				$semA,
+				$ausbildungssemester - 1,
+				$antrag->prestudent_id,
+				$sprache
+			);
+			if (isError($result))
+				return $result;
+			
+			$lvsA = getData($result) ?: [];
+			
+			$result = $this->getLvsByStgStsemAndSem(
+				$studiengang_kz,
+				$orgform_kurzbz,
+				$stdsem,
+				$ausbildungssemester - 1,
+				$antrag->prestudent_id,
+				$sprache
+			);
+			if (isError($result))
+				return $result;
+
+			$lvsAtest = getData($result) ?: [];
+
+			if (count(array_intersect(array_map(function ($a) {
+				return $a->lehrveranstaltung_id;
+			}, $lvsA), array_map(function ($a) {
+				return $a->lehrveranstaltung_id;
+			}, $lvsAtest)))) {
+				foreach ($lvsA as $lv) {
+					if (isset($lvszugewiesen[$lv->lehrveranstaltung_id]) && ($lvszugewiesen[$lv->lehrveranstaltung_id]->note == 0)) {
+						$lv->antrag_anmerkung = $lvszugewiesen[$lv->lehrveranstaltung_id]->anmerkung;
+						$lv->antrag_zugelassen = true;
+					}
+
+				}
+			} else {
+				$lvsA = null;
+			}
 		}
 
 		$result = $this->getLvsByStgStsemAndSem(
@@ -1035,7 +1130,7 @@ class AntragLib
 			$semB,
 			$ausbildungssemester,
 			$antrag->prestudent_id,
-			$antrag->studiensemester_kurzbz
+			$sprache
 		);
 		if (isError($result))
 			return $result;
@@ -1050,10 +1145,14 @@ class AntragLib
 			// TODO(manu): eventuelle Änderungen taggen
 		}
 
-		return success([
+		$result = [
 			'1' . $semA => $lvsA,
 			'2' . $semB => $lvsB ?: []
-		]);
+		];
+		if ($repeat_last)
+			$result['repeat_last'] = true;
+
+		return success($result);
 	}
 
 	public function getLvsByStgStsemAndSem(
@@ -1062,7 +1161,7 @@ class AntragLib
 		$studiensemester_kurzbz,
 		$ausbildungssemester,
 		$prestudent_id,
-		$note_stsem
+		$sprache
 	) {
 		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
@@ -1091,19 +1190,31 @@ class AntragLib
 				'semester' => $ausbildungssemester
 			]));
 		}
-		if (count($result) > 1)
-			return error($this->_ci->p->t('studierendenantrag', 'error_multiple_studienplan', [
-				'studiengang_kz' => $studiengang_kz,
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'semester' => $ausbildungssemester
-			]));
+		if (count($result) > 1) {
+			$langmap = array_unique(array_map(function ($a) {
+				return $a->sprache;
+			}, $result));
+			if ($sprache
+				&& count($langmap) == count($result)
+				&& in_array($sprache, $langmap)
+			) {
+				$result = array_filter($result, function ($a) use ($sprache) {
+					return $a->sprache == $sprache;
+				});
+			} else {
+				return error($this->_ci->p->t('studierendenantrag', 'error_multiple_studienplan', [
+					'studiengang_kz' => $studiengang_kz,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'semester' => $ausbildungssemester
+				]));
+			}
+		}
 		$studienplan = current($result);
 
 		return $this->_ci->StudienplanModel->getStudienplanLehrveranstaltungForPrestudent(
 			$studienplan->studienplan_id,
 			$ausbildungssemester,
-			$prestudent_id,
-			$note_stsem
+			$prestudent_id
 		);
 	}
 
@@ -1388,6 +1499,8 @@ class AntragLib
 		$resultDetails->grund = $resultAntrag->grund;
 		$resultDetails->studierendenantrag_id = $resultAntrag->studierendenantrag_id;
 		$resultDetails->typ = $resultAntrag->typ;
+		$resultDetails->datum = $resultAntrag->datum;
+		$resultDetails->studiensemester_kurzbz = $resultAntrag->studiensemester_kurzbz;
 
 		return success($resultDetails);
 	}
@@ -1489,9 +1602,9 @@ class AntragLib
 		);
 	}
 
-	public function getFailedExamForPrestudent($prestudent_id)
+	public function getFailedExamForPrestudent($prestudent_id, $max_date = null, $studiensemester_kurzbz = null)
 	{
-		return $this->_ci->PruefungModel->loadWhereCommitteeExamFailedForPrestudent($prestudent_id);
+		return $this->_ci->PruefungModel->loadWhereCommitteeExamFailedForPrestudent($prestudent_id, $max_date, $studiensemester_kurzbz);
 	}
 
 	public function saveLvs($lvArray)
@@ -1605,6 +1718,7 @@ class AntragLib
 
 		if ($student_uid) {
 			$email = $this->_ci->StudentModel->getEmailFH($student_uid);
+			$vorlage = 'Sancho_Mail_Antrag_W_Student';
 
 			$sem_not_allowed = $sem_to_repeat = '';
 			$list_not_allowed = $list_to_repeat = $this->_ci->p->t('studierendenantrag', 'mail_part_error_no_lvs');
@@ -1612,6 +1726,12 @@ class AntragLib
 			$result = $this->getLvsForAntrag($antrag_id);
 			if (hasData($result)) {
 				$lvs = getData($result);
+				$repeat_last = false;
+				if (isset($lvs['repeat_last'])) {
+					$repeat_last = true;
+					unset($lvs['repeat_last']);
+					$vorlage .= '_Lst';
+				}
 				foreach ($lvs as $sem => $lv_list) {
 					$lvs_filtered = array_filter($lv_list, function ($el) {
 						return property_exists($el, 'antrag_zugelassen') && $el->antrag_zugelassen;
@@ -1634,7 +1754,7 @@ class AntragLib
 			
 			// NOTE(chris): Sancho mail
 			sendSanchoMail(
-				'Sancho_Mail_Antrag_W_Student',
+				$vorlage,
 				[
 					'antrag_id' => $antrag_id,
 					'stg' => $stg->bezeichnung,
