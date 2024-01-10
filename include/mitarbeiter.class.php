@@ -1640,28 +1640,6 @@ class mitarbeiter extends benutzer
 		}
 	}
 
-	/** Check if uid is a supervisor
- *
- * @param string $uid
- * @param string $employee_uid
- * @return boolean True if $uid is direct leader of $employee_uid.
- */
-	function check_isVorgesetzter($uid, $employee_uid)
-	{
-		$this->getUntergebene($uid);
-		$untergebenen_arr = $this->untergebene;
-
-		// Check, if uid is an employee of supervisor
-		if (!empty($untergebenen_arr) &&
-			in_array($employee_uid, $untergebenen_arr))
-		{
-			 return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
 	/** Check if uid is a supervisor on higher oe level
 	 *
 	 * @param string $uid
