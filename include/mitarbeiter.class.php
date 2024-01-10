@@ -1122,9 +1122,12 @@ class mitarbeiter extends benutzer
 
 	/**
 	 * Gibt ein Array mit den UIDs der Vorgesetzten zum Zeitpunkt des korrespondierenden Timesheets zurück
+	 * @param $uid
+	 * @param $date
+	 * @param null $limit LIMIT = 1 liefert bei mehreren Vorgesetzten den letzten (aktuellsten) zurück.
 	 * @return uid
 	 */
-	public function getVorgesetzteMonatTimesheet($uid, $timesheetDate)
+	public function getVorgesetzteByDate($uid, $date, $limit = null)
 	{
 		$return=false;
 
@@ -1134,15 +1137,21 @@ class mitarbeiter extends benutzer
 					public.tbl_benutzerfunktion
 				WHERE
 					funktion_kurzbz='Leitung' AND
-					(datum_von is null OR datum_von<=".$this->db_add_param($timesheetDate).") AND
-					(datum_bis is null OR datum_bis>=".$this->db_add_param($timesheetDate).") AND
+					(datum_von is null OR datum_von<=".$this->db_add_param($date).") AND
+					(datum_bis is null OR datum_bis>=".$this->db_add_param($date).") AND
 					oe_kurzbz in (SELECT oe_kurzbz
 									FROM public.tbl_benutzerfunktion
 									WHERE
 									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
-									(datum_von is null OR (datum_von<= ".$this->db_add_param($timesheetDate).")) AND
-									(datum_bis is null OR (datum_bis>=".$this->db_add_param($timesheetDate)."))
-									);";
+									(datum_von is null OR (datum_von<= ".$this->db_add_param($date).")) AND
+									(datum_bis is null OR (datum_bis>=".$this->db_add_param($date)."))
+									)
+				ORDER BY datum_von DESC ";
+
+		if (is_numeric($limit))
+		{
+			$qry .= 'LIMIT '. $this->db_add_param($limit);
+		}
 
 		if($this->db_query($qry))
 		{
