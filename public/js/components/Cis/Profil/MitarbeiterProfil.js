@@ -793,12 +793,13 @@ export default {
                  
                     <div class="card">
                       <div class="card-header">
-                      Something else
+                      Profil Updates
                       </div>
-                      <div class="card-body">
-                      
-                       <p v-for="update in data.profilUpdates">{{JSON.stringify(update)}}</p>
-                      </div>
+                      <div class="card-body d-flex justify-content-start flex-wrap">
+                      <!--  -->
+                  <button v-for="update in data.profilUpdates" class="btn m-1" :class="{'btn-outline-primary':(update.topic !== 'Private_Kontakte' || update.topic !== 'Private_Adressen'), 'btn-outline-danger':update.topic == 'Private_Kontakte', 'btn-outline-success':update.topic == 'Private_Adressen'}" ><i class="fa fa-edit"></i> {{update.topic}}</button>
+                        
+                       </div>
                     </div>
 
                    

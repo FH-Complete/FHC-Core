@@ -1,11 +1,14 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
-
+import BreadCrumb from "../Selection/Breadcrumb.js";
+import Select from "../Selection/Select.js";
 
 export default {
   components: {
     BsModal,
     Alert,
+    BreadCrumb,
+    Select,
   },
   mixins: [BsModal],
   props: {
@@ -27,6 +30,15 @@ export default {
   },
   data() {
     return {
+      propertySelected: false,
+      testValue:null,
+      testListe:{
+        privateInfo:{username:"hans33",Titel:"Doktor", Anrede:"Herr"},
+        privateKontakte:[{strasse:"strasse1",plz:100},{strasse:"strasse1",plz:100},{strasse:"strasse1",plz:100}],
+        privateAdressen:[{kontakt:"telefon",anmerkung:"1"},{kontakt:"email",anmerkung:"2"},{kontakt:"telefon",anmerkung:"3"}]
+      },
+
+
       topic:null,
       firstSelectedOption:null,
       secondSelectedOption: null,
@@ -47,7 +59,12 @@ export default {
 
   methods: {
     
-
+    testEvent: function(){
+      if(!this.propertySelected){
+        this.testListe = this.testListe[this.testValue];
+        this.propertySelected = true;
+      }
+    },
     createDeepCopy: function(object){
       //? using Vue.toRaw because deep clones with structuredClone can not be done on proxies
       return structuredClone(Vue.toRaw(object));
@@ -128,15 +145,20 @@ export default {
       {{"Profil bearbeiten" }}
     </template>
     <template v-slot:default>
-
-    <!-- Breadcrumbs -->
+    
+    <bread-crumb :list="['this','is a','test']" ></bread-crumb>
+    <p>{{testValue}}</p>
+    <Select ariaLabel="test" v-model="testValue" @select="testEvent" :list="testListe"></Select>
+    <!-- DONT FORGET TO UNCOMMENT THIS -->
+    <!-- Breadcrumbs 
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item" v-if="firstSelectedOption">{{firstSelectedOption}}</li>
         <li class="breadcrumb-item" v-if="secondSelectedOption" >{{firstSelectedOption ==="Personen_Informationen" ? Object.keys(secondSelectedOption)[0] : secondSelectedOptionIndex+1 }}</li>
-        <!--<li class="breadcrumb-item" aria-current="page">Drei</li>-->
+       
       </ol>
     </nav>
+    -->
 
 
     <select v-if="!firstSelectedOption" v-model="firstSelectedOption"  class="form-select" size="3" aria-label="size 3 select example">
@@ -187,7 +209,7 @@ export default {
     <!-- optional footer -->
     <template   v-slot:footer>
       <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>
-      <p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{editTimestamp}}</p>
+      <!--<p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{editTimestamp}}</p>-->
     
       <button v-if="isInputFieldChanged"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>

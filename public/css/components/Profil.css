@@ -74,29 +74,12 @@
   padding-left: 0.5rem;
 }
 
-/*   dl {
-    width: 100%;
-    overflow: hidden;
-   
-    padding: 0;
-    margin: 0
-  }
-  dt {
-    float: left;
-    width: 35%;
-    
+
+option:checked{
+  background: linear-gradient(#005485, #005485);
+
+}
+
+#SelectStyle{
   
-   
-    padding: 0;
-    margin: 0
-  }
-  dd {
-    float: left;
-    width: 50%;
-   
-  
-    padding: 0;
-    margin: 0
-  }
- */
- 
+}
