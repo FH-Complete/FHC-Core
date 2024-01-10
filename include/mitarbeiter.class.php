@@ -1067,10 +1067,12 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
-	 * Gibt ein Array mit den UIDs der Vorgesetzten zurück
+	 * Gibt ein Array mit den UIDs der aktuellen Vorgesetzten zurück
+	 * @param null $uid
+	 * @param null $limit LIMIT = 1 liefert bei mehreren Vorgesetzten den letzten (aktuellsten) zurück.
 	 * @return uid
 	 */
-	public function getVorgesetzte($uid=null)
+	public function getVorgesetzte($uid=null, $limit = null)
 	{
 		$return=false;
 		if (is_null($uid))
@@ -1090,8 +1092,13 @@ class mitarbeiter extends benutzer
 									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
 									(datum_von is null OR datum_von<=now()) AND
 									(datum_bis is null OR datum_bis>=now())
-								  );";
+								  )
+				  ORDER BY datum_von DESC ";
 
+		if (is_numeric($limit))
+		{
+			$qry .= 'LIMIT '. $this->db_add_param($limit, FHC_INTEGER);
+		}
 
 		if($this->db_query($qry))
 		{
