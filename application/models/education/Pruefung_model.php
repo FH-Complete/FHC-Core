@@ -164,6 +164,7 @@ class Pruefung_model extends DB_Model
 		$this->addSelect('ps.prestudent_id');
 		$this->addSelect('lv.bezeichnung as lvbezeichnung');
 		$this->addSelect('le.studiensemester_kurzbz');
+		$this->addSelect('a.studierendenantrag_id');
 		$this->addSelect('a.typ');
 		$this->addSelect('campus.get_status_studierendenantrag(a.studierendenantrag_id) status');
 
