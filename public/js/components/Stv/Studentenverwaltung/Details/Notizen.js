@@ -52,7 +52,7 @@ export default {
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
-				height: '150',
+				height: '200',
 				selectable: true,
 				index: 'notiz_id'
 			},
@@ -96,6 +96,7 @@ export default {
 					this.formData.erledigt = this.notizen.erledigt;
 					this.formData.verfasser = this.notizen.verfasser_uid;
 					this.formData.bearbeiter = this.notizen.bearbeiter_uid;
+					this.formData.anhang = this.notizen.anhang;
 					if(this.notizen.dms_id){
 						console.log("loadEntries");
 						this.loadDocEntries(this.notizen.notiz_id);
@@ -107,7 +108,7 @@ export default {
 			this.resetFormData();
 			this.formData.typeId = 'person_id';
 			this.formData.titel = '';
-			this.formData.action = 'Neue Notiz2';
+			this.formData.action = 'Neue Notiz';
 			this.formData.text = null;
 			this.formData.von = null;
 			this.formData.bis = null;

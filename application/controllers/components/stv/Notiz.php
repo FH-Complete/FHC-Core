@@ -48,7 +48,6 @@ class Notiz extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			$this->outputJson($result);
 		}
-
 		elseif (!hasData($result)) {
 			$this->outputJson($result); //success mit Wert null
 			//	$this->outputJson(getData($result) ?: []);
@@ -158,9 +157,6 @@ class Notiz extends FHC_Controller
 
 		}
 
-
-
-
 		//$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $dms_id, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 /*
 		$result = $this->NotizModel->addNotizForPerson($id, $titel, $text, $erledigt, $verfasser_uid);
@@ -172,7 +168,7 @@ class Notiz extends FHC_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function updateNotiz($notiz_id)
+	public function updateNotizOldVersion($notiz_id)
 	{
 		$uid = getAuthUID();
 		$this->load->library('form_validation');
@@ -200,6 +196,63 @@ class Notiz extends FHC_Controller
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
 		$bearbeiter_uid = $uid;
 		$erledigt = $_POST['erledigt'];
+		$start = $this->input->post(date('von'));
+		$ende = $this->input->post(date('bis'));
+
+
+
+		$result = $this->NotizModel->update(
+			[
+				'notiz_id' => $notiz_id
+			],
+			[
+				'titel' =>  $titel,
+				'updatevon' => $uid,
+				'updateamum' => date('c'),
+				'text' => $text,
+				'verfasser_uid' => $verfasser_uid,
+				'bearbeiter_uid' => $bearbeiter_uid,
+				'start' => $start,
+				'ende' => $ende,
+				'erledigt' => $erledigt
+			]
+		);
+
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}
+		return $this->outputJsonSuccess(true);
+	}
+
+	public function updateNotiz($notiz_id)
+	{
+		$uid = getAuthUID();
+		$this->load->library('form_validation');
+		//$_POST = json_decode($this->input->raw_input_stream, true);
+	/*	$this->form_validation->set_rules('titel', 'titel', 'required');
+		$this->form_validation->set_rules('text', 'Text', 'required');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}*/
+
+		$this->load->model('person/Notiz_model', 'NotizModel');
+
+		if(!$notiz_id)
+		{
+			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		$uid = getAuthUID();
+		$titel = $this->input->post('titel');
+		$text = $this->input->post('text');
+		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
+		$bearbeiter_uid = $uid;
+		$erledigt = $this->input->post('erledigt');
+		$type = $this->input->post('typeId');
 		$start = $this->input->post(date('von'));
 		$ende = $this->input->post(date('bis'));
 
@@ -298,8 +351,7 @@ class Notiz extends FHC_Controller
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
-		//TODO(manu) check, ob mehr Dateien bzw. -versionen
-		//warum nur ein Eintrag???
+
 		$this->NotizModel->addSelect('campus.tbl_dms_version.*');
 
 		$this->NotizModel->addJoin('public.tbl_notiz_dokument','ON (public.tbl_notiz_dokument.notiz_id = public.tbl_notiz.notiz_id)');

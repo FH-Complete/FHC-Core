@@ -180,6 +180,8 @@ class Notiz_model extends DB_Model
 		return $result;
 	}
 
+
+
 	/**
 	 * Add a Notiz for a given person with DMS_id
 	 */
@@ -244,6 +246,7 @@ class Notiz_model extends DB_Model
 	 * @param $person_id
 	 */
 	//Todo(Manu) rewrite in CI-Style
+	//Todo(Manu) auf andere types erweitern
 	public function getNotizWithDocEntries($id)
 	{
 	$type = 'writeFunction';
@@ -266,6 +269,7 @@ class Notiz_model extends DB_Model
 			GROUP BY 
 			    notiz_id, z.notizzuordnung_id
 		";
+
 
 		return $this->execQuery($qry, array($id));
 
