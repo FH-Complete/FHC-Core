@@ -61,20 +61,24 @@ class Notiz extends FHC_Controller
 
 	public function addNewNotiz($id)
 	{
-		$this->load->library('form_validation');
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+		//$this->load->library('form_validation');
 		//$_POST = json_decode($this->input->raw_input_stream, true);
 
 		//TODO(Manu) Validation
 
-		$this->form_validation->set_rules('titel', 'titel', 'required');
-		$this->form_validation->set_rules('text', 'Text', 'required');
+/*		$this->form_validation->set_rules('titel', 'titel', 'required');
+		$this->form_validation->set_rules('text', 'Text', 'required');*/
 
 		//TODO(Manu) form validation - schon für type hier?,
+
+		//Speichern der Files
 		$this->load->library('DmsLib');
 		$uid = getAuthUID();
 
 		//multiple files
-		$dms_id = [];
+		$dms_id_arr = [];
+		$notiz_id = null;
 		foreach ($_FILES as $k => $file)
 		{
 			$dms = array(
@@ -90,7 +94,7 @@ class Notiz extends FHC_Controller
 
 			if (isSuccess($result))
 			{
-				$dms_id[] = $result->retval['dms_id'];
+				$dms_id_arr[] = $result->retval['dms_id'];
 			}
 /*			else {
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -104,27 +108,67 @@ class Notiz extends FHC_Controller
 
 		}
 
+		//Speichern der Notiz mit Notizzuordnung
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
 		$uid = getAuthUID();
-		$titel = isset($_POST['titel']) ? $_POST['titel'] : null;
-		$text = isset($_POST['text']) ? $_POST['text'] : null;
-		$bearbeiter_uid = isset($_POST['bearbeiter_uid']) ? $_POST['bearbeiter_uid'] : null;
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
-		$erledigt = $_POST['erledigt'];
-		$type = $_POST['typeId'];
+		$titel = $this->input->post('titel');
+		$text = $this->input->post('text');
+		$bearbeiter_uid = $this->input->post('bearbeiter_uid');
+		$erledigt = $this->input->post('erledigt');
+		$type = $this->input->post('typeId');
 
 		//get rid of null value error
 		$start = $this->input->post(date('von'));
 		$ende = $this->input->post(date('bis'));
 
-		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $dms_id, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
-
+		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson($result);
+			return $this->outputJson(getError($result));
 		}
+		$notiz_id = $result->retval;
+
+		//Zuordnung speichern
+/*		$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, $type=> $id));
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		}*/
+
+
+		//Eintrag in Notizdokument speichern
+		if($dms_id_arr)
+		{
+			// Loads model Notizdokument_model
+			$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
+			//Todo(manu) change for multiple files
+			foreach($dms_id_arr as $dms_id)
+			{
+				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+				if (isError($result))
+				{
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson(getError($result));
+				}
+			}
+
+		}
+
+
+
+
+		//$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $dms_id, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
+/*
+		$result = $this->NotizModel->addNotizForPerson($id, $titel, $text, $erledigt, $verfasser_uid);
+		if (isError($result))
+		{
+			//$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson($result);
+		}*/
 		return $this->outputJsonSuccess(true);
 	}
 

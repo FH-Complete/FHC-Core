@@ -98,7 +98,7 @@ export default {
 				return this.anhang;
 			},
 			set(value) {
-				console.log(value);
+				//console.log(value);
 				this.$emit('update:anhang', value);
 			}
 		}
@@ -106,12 +106,15 @@ export default {
 	methods: {
 		reset() {
 			this.$refs.form.reset();
-			//this.$emit('update:anhang', dt.files);
+			this.intAnhang = null;
+			this.$emit('update:anhang', []);
 		},
 	},
 
 	template: `
 <div>
+{{this.intAnhang}} 
+		<span v-for="(anhang,index) in intAnhang"> {{anhang.name}} {{index}}<br></span>
 	<form ref="form" @submit.prevent class="row">
 		<div>
 			<div class="row mb-3">

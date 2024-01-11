@@ -140,7 +140,7 @@ class Notiz_model extends DB_Model
 	 * @param id for Dokumentzuordnung (person_id, prestudent_id, uid, projekt_id...)
 	 * @param titel, text, start, ende, erledigt, verfasser_uid, bearbeiter_uid, insertvon Parameter for notiz
 	 */
-	public function addNotizForType($type, $id, $titel, $text, $insertvon, $dms_id=null, $start=null, $ende=null, $erledigt=false, $verfasser_uid=null, $bearbeiter_uid=null)
+	public function addNotizForType($type, $id, $titel, $text, $insertvon, $start=null, $ende=null, $erledigt=false, $verfasser_uid=null, $bearbeiter_uid=null)
 	{
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -153,30 +153,13 @@ class Notiz_model extends DB_Model
 
 		if (isSuccess($result))
 		{
-			//cases für alle types
-
 			$notiz_id = $result->retval;
 
-			if($dms_id)
+			if (isSuccess($result))
 			{
-				// Loads model Notizdokument_model
-				$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
-				//Todo(manu) change for multiple files
-				foreach ($dms_id as $file)
-				{
-					$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $file));
-				}
-
-				//single File
-				//$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+				$notiz_id = $result->retval;
+				$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, $type => $id));
 			}
-
-			if ($type == 'person')
-				$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'person_id' => $id));
-			elseif ($type == 'prestudent')
-				$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'prestudent_id' => $id));
-			else
-				$result = error($result->msg, "Type nicht vorhanden");
 		}
 
 		// Transaction complete!

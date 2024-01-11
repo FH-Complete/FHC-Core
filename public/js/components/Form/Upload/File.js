@@ -32,6 +32,7 @@ export default {
 		}
 	},
 	template: `		
+		FILES: {{dateien}}
 		<span v-if="multiupload">
 		  	<input type="file" multiple ref="upload" @change="handleFileChange" v-model="dateien"/>								
 		</span>

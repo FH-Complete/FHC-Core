@@ -59,7 +59,7 @@ export default {
 			tabulatorEvents: [],
 			notizen: [],
 			formData: {
-				typeId: 'person',
+				typeId: 'person_id',
 				titel: null,
 				action: 'Neue Notiz',
 				text: null,
@@ -105,7 +105,7 @@ export default {
 		},
 		actionNewNotiz(){
 			this.resetFormData();
-			this.formData.typeId = 'person';
+			this.formData.typeId = 'person_id';
 			this.formData.titel = '';
 			this.formData.action = 'Neue Notiz2';
 			this.formData.text = null;
@@ -133,6 +133,9 @@ export default {
 					formData.append(k, v);
 			});
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
+
+			console.log(this.formData);
+			console.log(formData);
 
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
@@ -211,7 +214,7 @@ export default {
 			this.$refs.form.reset();
 			//sicherstellen, dass über props nur leere felder übergeben werden
 			this.formData = {
-				typeId: 'person',
+				typeId: 'person_id',
 					titel: null,
 					action: 'Neue Notiz',
 					text: null,
@@ -330,6 +333,8 @@ export default {
 		
 		
 		<div>
+		Parent: {{formData.title}} {{formData.anhang}} || {{formData.anhang.name}}
+		<span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}
 <!--			PARENT: {{formData.anhang}} {{formData.typeId}} | single: {{formData.anhang.name}} , multi: {{formData.anhang}} <span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->
 		</div>
 	</div>
