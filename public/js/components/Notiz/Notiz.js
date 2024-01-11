@@ -107,37 +107,37 @@ export default {
 		reset() {
 			this.$refs.form.reset();
 			this.intAnhang = null;
-			this.$emit('update:anhang', []);
+			//this.$emit('update:anhang', []);
 		},
 	},
 
 	template: `
-<div>
-{{this.intAnhang}} 
+	<div class="notiz-notiz">
+<!--		{{this.intAnhang}}-->
 		<span v-for="(anhang,index) in intAnhang"> {{anhang.name}} {{index}}<br></span>
-	<form ref="form" @submit.prevent class="row">
-		<div>
-			<div class="row mb-3">
-				<b>{{action}}
-				<div class="col-sm-7">
-					</b><span class="small">[{{this.typeId}}]</span>
-				</div>	
-			</div>
-
-			<div class="notizTitle row mb-3">
-				<label for="titel" class="form-label col-sm-2">Titel</label>
-				<div class="col-sm-7">
-					<input type="text" v-model="intTitel" class="form-control">
-				</div>	
-			</div>
-			
-			<div class="row mb-3">
-				<label for="text" class="form-label col-sm-2">Text</label>
-				<div class="col-sm-7">
-					<textarea rows="5" cols="75" v-model="intText" class="form-control"></textarea>
+		<form ref="form" @submit.prevent class="row">
+			<div>
+				<div class="row mb-3">
+					<b>{{action}}</b>
+					<div class="col-sm-7">
+						<span class="small">[{{this.typeId}}]</span>
+					</div>	
+				</div>
+	
+				<div class="notizTitle row mb-3">
+					<label for="titel" class="form-label col-sm-2">Titel</label>
+					<div class="col-sm-7">
+						<input type="text" v-model="intTitel" class="form-control">
+					</div>	
+				</div>
+				
+				<div class="row mb-3">
+					<label for="text" class="form-label col-sm-2">Text</label>
+					<div class="col-sm-7">
+						<textarea rows="5" cols="75" v-model="intText" class="form-control"></textarea>
+					</div>
 				</div>
 			</div>
-		</div>
 	
 	<div v-if="showDocument">
 			<slot name="document">

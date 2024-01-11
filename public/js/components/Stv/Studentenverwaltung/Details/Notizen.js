@@ -333,8 +333,8 @@ export default {
 		
 		
 		<div>
-		Parent: {{formData.title}} {{formData.anhang}} || {{formData.anhang.name}}
-		<span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}
+<!--		Parent: {{formData.title}} {{formData.anhang}} || {{formData.anhang.name}}
+		<span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->
 <!--			PARENT: {{formData.anhang}} {{formData.typeId}} | single: {{formData.anhang.name}} , multi: {{formData.anhang}} <span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->
 		</div>
 	</div>
