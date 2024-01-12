@@ -290,8 +290,8 @@ if (!$ansicht)
 					echo 'Hauptberuf: '. $verwendung->hauptberuf;
 				}
 			}
-		}
-		echo "<br><br>";
+			echo "<br><br>";
+		}		
 	}
 }
 
@@ -625,7 +625,7 @@ function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstun
 								hr.tbl_dienstverhaeltnis dv USING(dienstverhaeltnis_id)
 							WHERE 
 								dv.mitarbeiter_uid = ".$db->db_add_param($uid)."
-								AND NOW() BETWEEN COALESCE(vb.von, '1970-01-01'::date) AND COALESCE(vb.bis, '2170-12-31'::date))
+								AND NOW() BETWEEN COALESCE(vb.von, '1970-01-01'::date) AND COALESCE(vb.bis, '2170-12-31'::date)
 								AND NOT EXISTS (
 									SELECT 
 										1 
