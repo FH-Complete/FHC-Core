@@ -82,17 +82,8 @@ class Notiz extends FHC_Controller
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
 		$this->load->library('DmsLib');
+		$this->load->library('form_validation');
 
-		//$this->load->library('form_validation');
-		//$_POST = json_decode($this->input->raw_input_stream, true);
-
-		//TODO(Manu) Validation
-
-/*		$this->form_validation->set_rules('titel', 'titel', 'required');
-		$this->form_validation->set_rules('text', 'Text', 'required');*/
-
-		//TODO(Manu) form validation - schon für type hier?
-		//Speichern der Notiz und Notizzuordnung
 		$uid = getAuthUID();
 
 		if (isset($_POST['data']))
@@ -104,6 +95,15 @@ class Notiz extends FHC_Controller
 			}
 		}
 
+		//Form Validation
+		$this->form_validation->set_rules('titel', 'titel', 'required');
+		$this->form_validation->set_rules('text', 'Text', 'required');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
+		}
+
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
 		$erledigt = $this->input->post('erledigt');
@@ -113,6 +113,7 @@ class Notiz extends FHC_Controller
 		$start = $this->input->post('von');
 		$ende = $this->input->post('bis');
 
+		//Speichern der Notiz und Notizzuordnung
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 		if (isError($result))
 		{
@@ -222,23 +223,11 @@ class Notiz extends FHC_Controller
 
 	public function updateNotiz($notiz_id)
 	{
-		var_dump("in function updateNotiz " . $notiz_id);
-		//Loads Libraries
-		$this->load->library('form_validation');
-		$this->load->library('DmsLib');
-
-		// Loads models
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 
-		//$_POST = json_decode($this->input->raw_input_stream, true);
-	/*	$this->form_validation->set_rules('titel', 'titel', 'required');
-		$this->form_validation->set_rules('text', 'Text', 'required');
-
-		if ($this->form_validation->run() == false)
-		{
-			return $this->outputJsonError($this->form_validation->error_array());
-		}*/
+		$this->load->library('form_validation');
+		$this->load->library('DmsLib');
 
 		if (isset($_POST['data']))
 		{
@@ -252,6 +241,15 @@ class Notiz extends FHC_Controller
 		if(!$notiz_id)
 		{
 			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		//Form Validation
+		$this->form_validation->set_rules('titel', 'titel', 'required');
+		$this->form_validation->set_rules('text', 'Text', 'required');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
 		}
 
 		//update Notiz
@@ -288,7 +286,6 @@ class Notiz extends FHC_Controller
 		}
 
 		//neue Files speichern
-		//Todo(manu) check, welche files neu sind..
 		foreach ($_FILES as $k => $file)
 		{
 			$dms = array(
