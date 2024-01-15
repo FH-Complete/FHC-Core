@@ -318,7 +318,7 @@ class Notiz extends FHC_Controller
 	public function deleteNotiz ($notiz_id)
 	{
 		//dms_id auslesen aus notizdokument wenn vorhanden
-		$dms_id = null;
+		$dms_id_arr = [];
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 
 		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
@@ -326,35 +326,36 @@ class Notiz extends FHC_Controller
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson($result);
+			$this->outputJson(getError($result));
 		}
 		elseif (!hasData($result))
 		{
 			$this->outputJson($result);
-			$dms_id = null;
+			//$dms_id_arr = [];
 		}
 		else
 		{
-			//Todo(manu( umbau auf array)
-			$result = current(getData($result));
-			$dms_id = $result->dms_id;
+			$result = getData($result);
+			foreach($result as $doc) {
+				$dms_id_arr[] = $doc->dms_id;
+			}
 		}
 
-		if($dms_id)
+		if($dms_id_arr)
 		{
 			$this->load->library('DmsLib');
-			$result = $this->dmslib->removeAll($dms_id);
-
-			if (isError($result))
+			foreach($dms_id_arr as $dms_id)
 			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				$this->outputJson($result);
+				$result = $this->dmslib->removeAll($dms_id);
+
+				if (isError($result))
+				{
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson(getError($result));
+				}
+				else
+					$this->outputJson($result);
 			}
-			else
-				$this->outputJson($result);
-
-			//return $this->outputJsonSuccess(current(getData($result)));
-
 		}
 
 
