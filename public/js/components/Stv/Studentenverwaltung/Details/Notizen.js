@@ -15,7 +15,7 @@ export default {
 		CoreRESTClient,
 		CoreFilterCmpt,
 		Notiz,
-		BsModal,
+		BsModal
 	},
 	props: {
 		modelValue: Object
@@ -32,7 +32,7 @@ export default {
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
 					{title: "Start", field: "start", visible: false},
 					{title: "Ende", field: "ende", visible: false},
-/*					{title: "Dokumente", field: "dms_id"},*/
+					/*					{title: "Dokumente", field: "dms_id"},*/
 					{title: "Dokumente", field: "countdoc"},
 					{title: "Erledigt", field: "erledigt"},
 					{title: "Notiz_id", field: "notiz_id", visible: false},
@@ -58,10 +58,11 @@ export default {
 			},
 			tabulatorEvents: [],
 			notizen: [],
+			filteredMitarbeiter: [],
 			formData: {
 				typeId: 'person_id',
 				titel: null,
-				action: 'Neue Notiz',
+				statusNew: true,
 				text: null,
 				von: null,
 				bis: null,
@@ -73,7 +74,6 @@ export default {
 			},
 			showErweitert: true,
 			showDocument: true,
-
 		}
 	},
 	methods:{
@@ -88,7 +88,7 @@ export default {
 			this.loadNotiz(notiz_id).then(() => {
 				if(this.notizen.notiz_id) {
 					this.formData.titel = this.notizen.titel;
-					this.formData.action = 'Notiz bearbeiten';
+					this.formData.statusNew = false;
 					this.formData.text = this.notizen.text;
 					this.formData.von = this.notizen.start;
 					this.formData.bis = this.notizen.ende;
@@ -96,19 +96,22 @@ export default {
 					this.formData.erledigt = this.notizen.erledigt;
 					this.formData.verfasser = this.notizen.verfasser_uid;
 					this.formData.bearbeiter = this.notizen.bearbeiter_uid;
-					this.formData.anhang = this.notizen.anhang;
-					if(this.notizen.dms_id){
-						console.log("loadEntries");
-						this.loadDocEntries(this.notizen.notiz_id);
-					}
 				}
-			});
+			})
+				.then(() => {
+					if(this.notizen.dms_id){
+						console.log("loadEntries with " + this.notizen.notiz_id);
+						this.loadDocEntries(this.notizen.notiz_id);
+						//console.log(this.formData.anhang);
+					}
+				})
+			;
 		},
 		actionNewNotiz(){
 			this.resetFormData();
 			this.formData.typeId = 'person_id';
 			this.formData.titel = '';
-			this.formData.action = 'Neue Notiz';
+			this.formData.statusNew = false;
 			this.formData.text = null;
 			this.formData.von = null;
 			this.formData.bis = null;
@@ -119,13 +122,13 @@ export default {
 			this.formData.anhang = [];
 		},
 		addNewNotiz(notizData) {
-/*			console.log("here: anhang noch empty");
-			console.log(this.formData);*/
+			/*			console.log("here: anhang noch empty");
+						console.log(this.formData);*/
 
 			const formData = new FormData();
 
 			//working with single files
-		//	Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
+			//	Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
 
 			//multiple files
 			//console.log(this.formData.anhang);
@@ -134,9 +137,9 @@ export default {
 					formData.append(k, v);
 			});
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
-
+/*
 			console.log(this.formData);
-			console.log(formData);
+			console.log(formData);*/
 
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
@@ -179,9 +182,11 @@ export default {
 			return CoreRESTClient.get('components/stv/Notiz/loadDokumente/' + notiz_id)
 				.then(
 					result => {
-						console.log(result.data);
-						if(result.data.retval)
+						//console.log(result.data);
+						if(result.data.retval) {
 							this.formData.anhang = result.data.retval;
+							console.log(this.formData.anhang);
+						}
 						else
 						{
 							this.formData.anhang = {};
@@ -197,7 +202,7 @@ export default {
 					result => {
 						if(result.data.retval) {
 							this.notizen = result.data.retval;
-
+							console.log(this.notizen);
 						}
 						else
 						{
@@ -216,55 +221,59 @@ export default {
 			//sicherstellen, dass über props nur leere felder übergeben werden
 			this.formData = {
 				typeId: 'person_id',
-					titel: null,
-					action: 'Neue Notiz',
-					text: null,
-					von: null,
-					bis: null,
-					document: null,
-					erledigt: false,
-					verfasser: null,
-					bearbeiter: null,
-					anhang: []
+				titel: null,
+				statusNew: true,
+				text: null,
+				von: null,
+				bis: null,
+				document: null,
+				erledigt: false,
+				verfasser: null,
+				bearbeiter: null,
+				anhang: []
 			};
 		},
-/*		updateNotiz(notiz_id){
-			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
-				this.formData
-			).then(response => {
-				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Update erfolgreich');
-					this.resetFormData();
-					this.reload();
-				} else {
-					const errorData = response.data.retval;
-					Object.entries(errorData).forEach(entry => {
-						const [key, value] = entry;
-						this.$fhcAlert.alertError(value);
+		/*		updateNotiz(notiz_id){
+					CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
+						this.formData
+					).then(response => {
+						if (!response.data.error) {
+							this.$fhcAlert.alertSuccess('Update erfolgreich');
+							this.resetFormData();
+							this.reload();
+						} else {
+							const errorData = response.data.retval;
+							Object.entries(errorData).forEach(entry => {
+								const [key, value] = entry;
+								this.$fhcAlert.alertError(value);
+							});
+						}
+					}).catch(error => {
+						this.statusMsg = 'Error in Catch';
+						this.$fhcAlert.alertError('Fehler bei Updateroutine aufgetreten');
+					}).finally(() => {
+						window.scrollTo(0, 0);
+						//this.reload();
 					});
-				}
-			}).catch(error => {
-				this.statusMsg = 'Error in Catch';
-				this.$fhcAlert.alertError('Fehler bei Updateroutine aufgetreten');
-			}).finally(() => {
-				window.scrollTo(0, 0);
-				//this.reload();
-			});
-		},*/
+				},*/
 		updateNotiz(notiz_id){
 			const formData = new FormData();
+
+
 			Object.entries(this.formData).forEach(([k, v]) => {
 				if(k!= 'anhang')
 					formData.append(k, v);
 			});
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
+			console.log(this.formData);
 
+			//warum geht das nicht analog? wie kann titel = null sein?
 			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
 			).then(response => {
 				if (!response.data.error) {
-					this.$fhcAlert.alertSuccess('Update von neuer Notiz erfolgreich');
+					this.$fhcAlert.alertSuccess('Update von Notiz erfolgreich');
 					this.resetFormData();
 					this.reload();
 				} else {
@@ -318,7 +327,7 @@ export default {
 			v-model:typeId="formData.typeId"
 			v-model:titel="formData.titel" 
 			v-model:text="formData.text" 
-			v-model:action="formData.action" 				
+			v-model:statusNew="formData.statusNew" 				
 			v-model:von="formData.von" 
 			v-model:bis="formData.bis" 
 			v-model:document="formData.document"
@@ -329,11 +338,12 @@ export default {
 		>
 		</Notiz>
 			
-		<button v-if="formData.action === 'Neue Notiz'"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
+		<button v-if="formData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
 		<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
 		
 		
 		<div>
+		parent: {{formData.bearbeiter}}
 <!--		Parent: {{formData.title}} {{formData.anhang}} || {{formData.anhang.name}}
 		<span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->
 <!--			PARENT: {{formData.anhang}} {{formData.typeId}} | single: {{formData.anhang.name}} , multi: {{formData.anhang}} <span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->

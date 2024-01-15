@@ -48,6 +48,7 @@ class Notiz extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			$this->outputJson($result);
 		}
+
 		elseif (!hasData($result)) {
 			$this->outputJson($result); //success mit Wert null
 			//	$this->outputJson(getData($result) ?: []);
@@ -60,7 +61,10 @@ class Notiz extends FHC_Controller
 
 	public function addNewNotiz($id)
 	{
-		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+		$this->load->model('person/Notiz_model', 'NotizModel');
+
+		$this->load->library('DmsLib');
+
 		//$this->load->library('form_validation');
 		//$_POST = json_decode($this->input->raw_input_stream, true);
 
@@ -69,52 +73,14 @@ class Notiz extends FHC_Controller
 /*		$this->form_validation->set_rules('titel', 'titel', 'required');
 		$this->form_validation->set_rules('text', 'Text', 'required');*/
 
-		//TODO(Manu) form validation - schon für type hier?,
+		//TODO(Manu) form validation - schon für type hier?
 
-		//Speichern der Files
-		$this->load->library('DmsLib');
-		$uid = getAuthUID();
-
-		//multiple files
-		$dms_id_arr = [];
-		$notiz_id = null;
-		foreach ($_FILES as $k => $file)
-		{
-			$dms = array(
-				'kategorie_kurzbz'  => 'notiz',
-				'version'           => 0,
-				'name'              => $file["name"],
-				'mimetype'          => $file["type"],
-				'insertamum'        => date('c'),
-				'insertvon'         => $uid
-			);
-
-			$result = $this->dmslib->upload($dms, $k, array('pdf'));
-
-			if (isSuccess($result))
-			{
-				$dms_id_arr[] = $result->retval['dms_id'];
-			}
-/*			else {
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-
-				//TODO(manu) error handling
-				//feedback, dass ein File nicht erfolgreich gespeichert werden konnte
-				//$this->outputJson($result);
-				//$this->outputJsonError(['filetype nicht erlaubt' => getError($result)]);
-			}*/
-
-
-		}
-
-		//Speichern der Notiz mit Notizzuordnung
-		$this->load->model('person/Notiz_model', 'NotizModel');
-
+		//Speichern der Notiz und Notizzuordnung
 		$uid = getAuthUID();
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
-		$bearbeiter_uid = $this->input->post('bearbeiter_uid');
+		$bearbeiter_uid = $this->input->post('bearbeiter');
 		$erledigt = $this->input->post('erledigt');
 		$type = $this->input->post('typeId');
 
@@ -130,21 +96,33 @@ class Notiz extends FHC_Controller
 		}
 		$notiz_id = $result->retval;
 
-		//Zuordnung speichern
-/*		$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, $type=> $id));
-		if (isError($result))
+		//Speichern der Files
+		$dms_id_arr = [];
+		foreach ($_FILES as $k => $file)
 		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}*/
+			$dms = array(
+				'kategorie_kurzbz'  => 'notiz',
+				'version'           => 0,
+				'name'              => $file["name"],
+				'mimetype'          => $file["type"],
+				'insertamum'        => date('c'),
+				'insertvon'         => $uid
+			);
 
+			$result = $this->dmslib->upload($dms, $k, array('pdf'));
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			$dms_id_arr[] = $result->retval['dms_id'];
+		}
 
 		//Eintrag in Notizdokument speichern
 		if($dms_id_arr)
 		{
 			// Loads model Notizdokument_model
 			$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
-			//Todo(manu) change for multiple files
 			foreach($dms_id_arr as $dms_id)
 			{
 				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
@@ -154,17 +132,8 @@ class Notiz extends FHC_Controller
 					return $this->outputJson(getError($result));
 				}
 			}
-
 		}
 
-		//$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $dms_id, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
-/*
-		$result = $this->NotizModel->addNotizForPerson($id, $titel, $text, $erledigt, $verfasser_uid);
-		if (isError($result))
-		{
-			//$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson($result);
-		}*/
 		return $this->outputJsonSuccess(true);
 	}
 
@@ -228,8 +197,15 @@ class Notiz extends FHC_Controller
 
 	public function updateNotiz($notiz_id)
 	{
-		$uid = getAuthUID();
+		var_dump("in function updateNotiz " . $notiz_id);
+		//Loads Libraries
 		$this->load->library('form_validation');
+		$this->load->library('DmsLib');
+
+		// Loads models
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
+
 		//$_POST = json_decode($this->input->raw_input_stream, true);
 	/*	$this->form_validation->set_rules('titel', 'titel', 'required');
 		$this->form_validation->set_rules('text', 'Text', 'required');
@@ -239,24 +215,21 @@ class Notiz extends FHC_Controller
 			return $this->outputJsonError($this->form_validation->error_array());
 		}*/
 
-		$this->load->model('person/Notiz_model', 'NotizModel');
-
 		if(!$notiz_id)
 		{
 			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 
+		//update Notiz
 		$uid = getAuthUID();
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
-		$bearbeiter_uid = $uid;
+		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
 		$type = $this->input->post('typeId');
 		$start = $this->input->post(date('von'));
 		$ende = $this->input->post(date('bis'));
-
-
 
 		$result = $this->NotizModel->update(
 			[
@@ -274,11 +247,39 @@ class Notiz extends FHC_Controller
 				'erledigt' => $erledigt
 			]
 		);
-
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 			return $this->outputJson(getError($result));
+		}
+
+		//neue Files speichern
+		//Todo(manu) check, welche files neu sind..
+		foreach ($_FILES as $k => $file)
+		{
+			$dms = array(
+				'kategorie_kurzbz'  => 'notiz',
+				'version'           => 0,
+				'name'              => $file["name"],
+				'mimetype'          => $file["type"],
+				'insertamum'        => date('c'),
+				'insertvon'         => $uid
+			);
+
+			$result = $this->dmslib->upload($dms, $k, array('pdf'));
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			$dms_id = $result->retval['dms_id'];
+
+			$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+			if (isError($result))
+			{
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
 		}
 		return $this->outputJsonSuccess(true);
 	}
@@ -372,6 +373,17 @@ class Notiz extends FHC_Controller
 		{
 			$this->outputJsonSuccess(getData($result));
 		}
+	}
+
+	public function getMitarbeiter($searchString)
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+
+		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString);
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+		$this->outputJson($result);
 	}
 
 }

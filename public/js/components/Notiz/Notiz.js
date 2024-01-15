@@ -1,10 +1,13 @@
 import VueDatePicker from '../vueDatepicker.js.php';
+import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import File from '../Form/Upload/File.js';
+import {CoreRESTClient} from "../../RESTClient";
 
 export default {
 	components: {
 		VueDatePicker,
-		File
+		File,
+		PvAutoComplete
 	},
 	props: [
 		'typeId',
@@ -12,7 +15,7 @@ export default {
 		'text',
 		'von',
 		'bis',
-		'action',
+		'statusNew',
 		'document',
 		'erledigt',
 		'verfasser',
@@ -23,7 +26,10 @@ export default {
 		],
 	data(){
 		return {
-			multiupload: true
+			multiupload: true,
+			mitarbeiter: [],
+			filteredMitarbeiter: [],
+			filteredFirmen: []
 		}
 	},
 	computed: {
@@ -90,7 +96,12 @@ export default {
 				return this.bearbeiter;
 			},
 			set(value) {
-				this.$emit('update:bearbeiter', value);
+				if(value)
+				{
+					this.$emit('update:bearbeiter', value.mitarbeiter_uid);
+				}
+				else
+					this.$emit('update:bearbeiter', value);
 			}
 		},
 		intAnhang: {
@@ -109,11 +120,19 @@ export default {
 			this.intAnhang = null;
 			//this.$emit('update:anhang', []);
 		},
+
+		search(event) {
+			return CoreRESTClient
+				.get('components/stv/Notiz/getMitarbeiter/' + event.query)
+				.then(result => {
+					//console.log(result);
+					this.filteredMitarbeiter = CoreRESTClient.getData(result.data);
+				});
+		},
 	},
 
 	template: `
 	<div class="notiz-notiz">
-<!--		{{this.intAnhang}}-->
 		<span v-for="(anhang,index) in intAnhang"> {{anhang.name}} {{index}}<br></span>
 		<form ref="form" @submit.prevent class="row">
 			<div>
@@ -156,9 +175,9 @@ export default {
 	</div>	
 
 		<div v-if="showErweitert">
-			<slot name="erweitert">	
+<!--			<slot name="erweitert">	-->
 				
-<!--				<div class="row mb-3">
+				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">VerfasserIn</label>
 					<div class="col-sm-7">
 						<input type="text" v-model="intVerfasser" class="form-control">	
@@ -169,10 +188,12 @@ export default {
 				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">BearbeiterIn</label>
 					<div class="col-sm-7">
-						<input type="text" v-model="intBearbeiter" class="form-control">	
+						<PvAutoComplete v-model="intBearbeiter" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
+<!--						<input type="text" v-model="intBearbeiter" class="form-control">	-->
 					</div>
-				</div>-->
-							
+					
+				</div>
+									
 				<div class="row mb-3">
 					<label for="von" class="form-label col-sm-2">von</label>
 					<div class="col-sm-2">
@@ -203,7 +224,7 @@ export default {
 						<input type="checkbox" v-model="intErledigt">	
 					</div>
 				</div>
-			</slot>
+<!--			</slot>-->
 		
 	</div>
 		

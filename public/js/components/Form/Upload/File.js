@@ -39,7 +39,7 @@ export default {
 		<span>					
 			<ul>							
 				<li v-for="(datei,index) in dateien">
-					<button>{{datei.name}}</button><button class="text-danger" @click="deleteFile(index)">X</button>
+					<button>{{datei.name}}</button><button class="text-danger" @click="deleteFile(index)"><i class="fa fa-remove"></i></button>
 				</li>
 			</ul>
 		</span>
