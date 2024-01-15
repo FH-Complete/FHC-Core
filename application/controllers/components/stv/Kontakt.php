@@ -42,7 +42,6 @@ class Kontakt extends FHC_Controller
 		}
 	}
 
-	//old version
 	public function addNewAddress($person_id)
 	{
 		$this->load->library('form_validation');
@@ -58,6 +57,16 @@ class Kontakt extends FHC_Controller
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 
 		$uid = getAuthUID();
+/*		$person_id = $this->input->post('$person_id');
+		$co_name = $this->input->post('co_name');
+		$strasse = $this->input->post('strasse');
+		$ort = $this->input->post('ort');
+		$gemeinde = $this->input->post('gemeinde');
+		$nation = $this->input->post('nation');
+		$name = $this->input->post('name');
+		$typ = $this->input->post('typ');
+		$anmerkung = $this->input->post('anmerkung');*/
+
 		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
 		$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : null;
 		$ort = isset($_POST['ort']) ? $_POST['ort'] : null;
@@ -98,67 +107,10 @@ class Kontakt extends FHC_Controller
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson($result);
+			return $this->outputJson(getError($result));
 		}
 		return $this->outputJsonSuccess(true);
 	}
-
-	//Version mit input->post() TODO(Manu) check mit Chris, not working
-/*	public function addNewAddress($person_id)
-	{
-		$this->load->library('form_validation');
-		//$_POST = json_decode($this->input->raw_input_stream, true);
-
-
-		$this->load->model('person/Adresse_model', 'AdresseModel');
-
-		$uid = getAuthUID();
-
-		$data = [
-			'insertvon' => $uid,
-			'insertamum' => date('c'),
-			'plz' => $this->input->post('plz'),
-			'heimatadresse' => $this->input->post('heimatadresse'),
-			'zustelladresse' => $this->input->post('zustelladresse'),
-			'rechnungsadresse' => $this->input->post('rechnungsadresse')
-		];
-
-
-		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric');
-
-		if ($this->form_validation->run() == false)
-		{
-			return $this->outputJsonError($this->form_validation->error_array());
-		}
-
-
-		if ($this->input->post('co_name'))
-			$data['co_name'] = $this->input->post('co_name');
-		if ($this->input->post('strasse'))
-			$data['strasse'] = $this->input->post('strasse');
-		if ($this->input->post('ort'))
-			$data['ort'] = $this->input->post('ort');
-		if ($this->input->post('gemeinde'))
-			$data['gemeinde'] = $this->input->post('gemeinde');
-		if ($this->input->post('nation'))
-			$data['nation'] = $this->input->post('nation');
-		if ($this->input->post('name'))
-			$data['name'] = $this->input->post('name');
-		if ($this->input->post('typ'))
-			$data['typ'] = $this->input->post('typ');
-		if ($this->input->post('anmerkung'))
-			$data['anmerkung'] = $this->input->post('anmerkung');
-		if ($this->input->post('firma'))
-			$data['firma_id'] = $this->input->post('firma_id');
-
-		$result = $this->AdresseModel->insert($data);
-		if (isError($result))
-		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson($result);
-		}
-		return $this->outputJsonSuccess(true);
-	}*/
 
 	public function updateAddress($address_id)
 	{
@@ -187,6 +139,8 @@ class Kontakt extends FHC_Controller
 		else
 			$firma_id = null;
 
+
+
 		$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
 		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
 		$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : null;
@@ -196,6 +150,16 @@ class Kontakt extends FHC_Controller
 		$name = isset($_POST['name']) ? $_POST['name'] : null;
 		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
+
+/*		$person_id = $this->input->post('$person_id');
+		$co_name = $this->input->post('co_name');
+		$strasse = $this->input->post('strasse');
+		$ort = $this->input->post('ort');
+		$gemeinde = $this->input->post('gemeinde');
+		$nation = $this->input->post('nation');
+		$name = $this->input->post('name');
+		$typ = $this->input->post('typ');
+		$anmerkung = $this->input->post('anmerkung');*/
 
 		$result = $this->AdresseModel->update(
 			[
@@ -407,10 +371,11 @@ class Kontakt extends FHC_Controller
 			$standort_id = null;
 
 		$uid = getAuthUID();
-		$kontakttyp = isset($_POST['kontakttyp']) ? $_POST['kontakttyp'] : null;
-		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
-		$kontakt = isset($_POST['kontakt']) ? $_POST['kontakt'] : null;
-		$ext_id = isset($_POST['ext_id']) ? $_POST['ext_id'] : null;
+
+		$kontakttyp = $this->input->post('kontakttyp');
+		$anmerkung = $this->input->post('anmerkung');
+		$kontakt = $this->input->post('kontakt');
+		$ext_id = $this->input->post('ext_id');
 
 		$result = $this->KontaktModel->insert(
 			[
@@ -453,11 +418,11 @@ class Kontakt extends FHC_Controller
 			$standort_id = null;
 
 		$uid = getAuthUID();
-		$kontakttyp = isset($_POST['kontakttyp']) ? $_POST['kontakttyp'] : null;
-		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
-		$kontakt = isset($_POST['kontakt']) ? $_POST['kontakt'] : null;
-		$ext_id = isset($_POST['ext_id']) ? $_POST['ext_id'] : null;
-		$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
+		$kontakttyp = $this->input->post('kontakttyp');
+		$anmerkung = $this->input->post('anmerkung');
+		$kontakt = $this->input->post('kontakt');
+		$ext_id = $this->input->post('ext_id');
+		$person_id = $this->input->post('person_id');
 
 		$result = $this->KontaktModel->update(
 			[
@@ -536,14 +501,14 @@ class Kontakt extends FHC_Controller
 
 		$this->load->model('person/Bankverbindung_model', 'BankverbindungModel');
 
-		$ext_id = isset($_POST['ext_id']) ? $_POST['ext_id'] : null;
-		$oe_kurzbz = isset($_POST['oe_kurzbz']) ? $_POST['oe_kurzbz'] : null;
-		$orgform_kurzbz = isset($_POST['orgform_kurzbz']) ? $_POST['orgform_kurzbz'] : null;
-		$name = isset($_POST['name']) ? $_POST['name'] : null;
-		$anschrift = isset($_POST['anschrift']) ? $_POST['anschrift'] : null;
-		$bic = isset($_POST['bic']) ? $_POST['bic'] : null;
-		$blz = isset($_POST['blz']) ? $_POST['blz'] : null;
-		$kontonr = isset($_POST['kontonr']) ? $_POST['kontonr'] : null;
+		$ext_id = $this->input->post('ext_id');
+		$oe_kurzbz = $this->input->post('oe_kurzbz');
+		$orgform_kurzbz = $this->input->post('orgform_kurzbz');
+		$name = $this->input->post('name');
+		$anschrift = $this->input->post('anschrift');
+		$bic = $this->input->post('bic');
+		$blz  = $this->input->post('blz ');
+		$kontonr = $this->input->post('kontonr');
 
 		$result = $this->BankverbindungModel->insert(
 			[

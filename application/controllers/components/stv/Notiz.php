@@ -25,16 +25,8 @@ class Notiz extends FHC_Controller
 		$this->load->library('AuthLib');
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 		$result = getAuthUid();
+
 		$this->outputJsonError($result);
-
-	//	$this->outputJson(getData($result));
-
-/*		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson($result);
-		}*/
 	}
 
 	public function getNotizen($person_id)
@@ -163,64 +155,6 @@ class Notiz extends FHC_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function updateNotizOldVersion($notiz_id)
-	{
-		$uid = getAuthUID();
-		$this->load->library('form_validation');
-		//$_POST = json_decode($this->input->raw_input_stream, true);
-
-		$this->form_validation->set_rules('titel', 'titel', 'required');
-		$this->form_validation->set_rules('text', 'Text', 'required');
-
-		if ($this->form_validation->run() == false)
-		{
-			return $this->outputJsonError($this->form_validation->error_array());
-		}
-
-		$this->load->model('person/Notiz_model', 'NotizModel');
-
-		if(!$notiz_id)
-		{
-			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-		}
-
-	//	$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
-		$uid = getAuthUID();
-		$titel = isset($_POST['titel']) ? $_POST['titel'] : null;
-		$text = isset($_POST['text']) ? $_POST['text'] : null;
-		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
-		$bearbeiter_uid = $uid;
-		$erledigt = $_POST['erledigt'];
-		$start = $this->input->post(date('von'));
-		$ende = $this->input->post(date('bis'));
-
-
-
-		$result = $this->NotizModel->update(
-			[
-				'notiz_id' => $notiz_id
-			],
-			[
-				'titel' =>  $titel,
-				'updatevon' => $uid,
-				'updateamum' => date('c'),
-				'text' => $text,
-				'verfasser_uid' => $verfasser_uid,
-				'bearbeiter_uid' => $bearbeiter_uid,
-				'start' => $start,
-				'ende' => $ende,
-				'erledigt' => $erledigt
-			]
-		);
-
-		if (isError($result))
-		{
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-			return $this->outputJson(getError($result));
-		}
-		return $this->outputJsonSuccess(true);
-	}
-
 	public function updateNotiz($notiz_id)
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
@@ -315,7 +249,7 @@ class Notiz extends FHC_Controller
 		return $this->outputJsonSuccess(true);
 	}
 
-	public function deleteNotiz ($notiz_id)
+	public function deleteNotiz($notiz_id)
 	{
 		//dms_id auslesen aus notizdokument wenn vorhanden
 		$dms_id_arr = [];
@@ -331,7 +265,6 @@ class Notiz extends FHC_Controller
 		elseif (!hasData($result))
 		{
 			$this->outputJson($result);
-			//$dms_id_arr = [];
 		}
 		else
 		{
@@ -387,8 +320,8 @@ class Notiz extends FHC_Controller
 
 		$this->NotizModel->addSelect('campus.tbl_dms_version.*');
 
-		$this->NotizModel->addJoin('public.tbl_notiz_dokument','ON (public.tbl_notiz_dokument.notiz_id = public.tbl_notiz.notiz_id)');
-		$this->NotizModel->addJoin('campus.tbl_dms_version','ON (public.tbl_notiz_dokument.dms_id = campus.tbl_dms_version.dms_id)');
+		$this->NotizModel->addJoin('public.tbl_notiz_dokument', 'ON (public.tbl_notiz_dokument.notiz_id = public.tbl_notiz.notiz_id)');
+		$this->NotizModel->addJoin('campus.tbl_dms_version', 'ON (public.tbl_notiz_dokument.dms_id = campus.tbl_dms_version.dms_id)');
 
 		$result = $this->NotizModel->loadWhere(
 			array('public.tbl_notiz.notiz_id' => $notiz_id)
@@ -417,5 +350,4 @@ class Notiz extends FHC_Controller
 		}
 		$this->outputJson($result);
 	}
-
 }
