@@ -408,18 +408,8 @@ class VertragsbestandteilLib
 					$this->endVertragsbestandteil($vb, $enddate);
 				}			    				
 				
-				$ret = $this->DienstverhaeltnisModel->update($dv->getDienstverhaeltnis_id(),
-					(object) array(
-						'bis' => $enddate, 
-						'updatevon' => getAuthUID(),
-						'updateamum' => strftime('%Y-%m-%d %H:%M')
-					));
-				if(isError($ret) )
-				{
-					log_message('debug', "end DV failed");
-					throw new Exception('error ending dienstverhaeltnis '
-						. $dv->getDienstverhaeltnis_id());
-				}
+				$dv->setBis($enddate);
+				$this->updateDienstverhaeltnis($dv);
 
 				if( $this->CI->db->trans_status() === false )
 				{
@@ -431,6 +421,7 @@ class VertragsbestandteilLib
 		}
 		catch (Exception $ex)
 		{
+			log_message('debug', "end DV failed " . $dv->getDienstverhaeltnis_id());
 			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
 			$this->CI->db->trans_rollback();
 			return $ex->getMessage();
@@ -445,17 +436,8 @@ class VertragsbestandteilLib
 			return;
 		}
 		
-		$ret = $this->VertragsbestandteilModel->update($vertragsbestandteil->getVertragsbestandteil_id(), 
-			(object) array(
-				'bis' => $enddate, 
-				'updatevon' => getAuthUID(),
-				'updateamum' => strftime('%Y-%m-%d %H:%M')
-			));
-		
-		if (isError($ret))
-		{
-			throw new Exception('error ending vertragsbestandteil');
-		}
+		$vertragsbestandteil->setBis($enddate);
+		$this->updateVertragsbestandteil($vertragsbestandteil);
 	}
 	
 	protected function setUIDtoPGSQL() {
