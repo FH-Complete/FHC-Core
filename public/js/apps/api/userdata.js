@@ -3,9 +3,16 @@ export default {
 
     //! API Calls for Profil Views
 
-    editProfil: function(topic, payload) {
+    insertProfilRequest: function(topic, payload) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                   `/Cis/Profil/editProfil`;
+                   `/Cis/Profil/insertProfilRequest`;
+                   
+        return axios.post(url,{topic, payload});
+    },
+
+    updateProfilRequest: function(topic, payload) {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   `/Cis/Profil/updateProfilRequest`;
                    
         return axios.post(url,{topic, payload});
     },

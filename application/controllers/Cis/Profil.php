@@ -19,7 +19,8 @@ class Profil extends Auth_Controller
 			'index' => ['student/anrechnung_beantragen:r', 'user:r'], // TODO(chris): permissions?
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'editProfil' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'insertProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 
 		]);
@@ -67,13 +68,13 @@ class Profil extends Auth_Controller
 
 
 
-	public function editProfil()
+	public function insertProfilRequest()
 	{
 
 		$json = json_decode($this->input->raw_input_stream);
 		
 
-		$data = ["uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()", "topic"=>$json->topic];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()" ];
 
 		//? gets all the requested changes from a user
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
@@ -81,13 +82,14 @@ class Profil extends Auth_Controller
 
 		//? checks if the user already made a request to change a topic
 		//! which is an constraint added to the public.tbl_cis_profil_update table
+		if($res){
 		foreach($res as $update_request){
 			if($update_request->topic == $json->topic && $update_request->uid == $this->uid){
 				
 				echo json_encode(error("uid and topic combination exists already"));
 				return;
 			}
-		}
+		}}
 		
 		
 			$insert_res = $this->ProfilChangeModel->insert($data);
@@ -117,6 +119,32 @@ class Profil extends Auth_Controller
 
 
 
+	}
+
+	public function updateProfilRequest()
+	{
+
+		$json = json_decode($this->input->raw_input_stream);
+		
+
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()" ];
+
+		//? gets all the requested changes from a user
+		
+		if(isSuccess($this->ProfilChangeModel->addSelect(["profil_update_id"])) ){
+			$requestID = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid,"topic"=>$json->topic]);
+			$requestID = hasData($requestID) ? getData($requestID)[0]->profil_update_id : null;
+		};
+		
+		$update_res =$this->ProfilChangeModel->update([$requestID],$data);
+		if(isError($update_res)){
+			//catch error
+		}else{
+			$editTimestamp = $this->ProfilChangeModel->getTimestamp($update_res->retval[0]);
+			
+			$update_res->retval = date_create($editTimestamp)->format('d.m.Y'); 
+			echo json_encode($update_res);
+		}
 	}
 
 
@@ -414,7 +442,7 @@ class Profil extends Auth_Controller
 
 		if (
 
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(array("strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort"))) &&
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("sort")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
@@ -565,7 +593,11 @@ class Profil extends Auth_Controller
 		$res->standort_telefon = $telefon_res;
 
 		$res->profilUpdates = $profilUpdates?: null;
-		
+		if($res->profilUpdates){
+		foreach($res->profilUpdates as $update){
+			$update->requested_change = json_decode($update->requested_change);
+			$update->change_timestamp = date_create($update->change_timestamp)->format('d.m.Y');
+		}}
 
 		return $res;
 	}
@@ -623,7 +655,7 @@ class Profil extends Auth_Controller
 
 		if (
 
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(array("strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort"))) &&
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("sort")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
@@ -767,6 +799,11 @@ class Profil extends Auth_Controller
 
 		$res->mailverteiler = $mailverteiler_res;
 		$res->profilUpdates = $profilUpdates?: null;
+		if($res->profilUpdates){
+		foreach($res->profilUpdates as $update){
+			$update->requested_change = json_decode($update->requested_change);
+			$update->change_timestamp = date_create($update->change_timestamp)->format('d.m.Y');
+		}}
 		
 		return $res;
 

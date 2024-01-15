@@ -1,14 +1,14 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
 import BreadCrumb from "../Selection/Breadcrumb.js";
-import Select from "../Selection/Select.js";
+import EditProfilSelect from "./EditProfilSelect.js";
 
 export default {
   components: {
     BsModal,
     Alert,
     BreadCrumb,
-    Select,
+    EditProfilSelect,
   },
   mixins: [BsModal],
   props: {
@@ -37,6 +37,8 @@ export default {
         privateKontakte:[{strasse:"strasse1",plz:100},{strasse:"strasse1",plz:100},{strasse:"strasse1",plz:100}],
         privateAdressen:[{kontakt:"telefon",anmerkung:"1"},{kontakt:"email",anmerkung:"2"},{kontakt:"telefon",anmerkung:"3"}]
       },
+      testSelectedItems:[],
+      profilUpdate:null,
 
 
       topic:null,
@@ -58,12 +60,11 @@ export default {
   },
 
   methods: {
+
     
-    testEvent: function(){
-      if(!this.propertySelected){
-        this.testListe = this.testListe[this.testValue];
-        this.propertySelected = true;
-      }
+    
+    selectEvent: function (option){
+      this.editData = this.editData[option];
     },
     createDeepCopy: function(object){
       //? using Vue.toRaw because deep clones with structuredClone can not be done on proxies
@@ -83,11 +84,12 @@ export default {
       
      
         //* only inserts new row if the inputField value is different from the original value
-        if(this.isInputFieldChanged && this.topic){
+        if(this.topic && this.profilUpdate){
 
         //? inserts new row in public.tbl_cis_profil_update 
-      
-        Vue.$fhcapi.UserData.editProfil(this.topic,this.inputField).then((res)=>{
+      if(this.editData.update){
+        
+        Vue.$fhcapi.UserData.updateProfilRequest(this.topic,this.profilUpdate).then((res)=>{
           this.result = {
             editData: this.editData,
             timestamp: res.data.retval,
@@ -102,116 +104,68 @@ export default {
           } 
           //
         });
+        //
      
-      }
+      }else{
+
+        Vue.$fhcapi.UserData.insertProfilRequest(this.topic,this.profilUpdate).then((res)=>{
+          this.result = {
+            editData: this.editData,
+            timestamp: res.data.retval,
+          };
+          this.hide(); 
+          
+          if(res.data.error == 0){
+           
+            Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
+          }else{
+            Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
+          } 
+          //
+        });
+        
+      
+    }
+   
+    }
     },
   },
   computed: {
-
-    isInputFieldChanged: function(){
-      if(this.inputField){
-        return JSON.stringify(this.inputField) !== JSON.stringify(this.secondSelectedOption);
-      }
-      return false;
-    },
-
-    firstSelection(){
-      return Object.keys(this.value);
-    },
-
-    secondSelection(){
-      switch(this.firstSelectedOption){
-        case "Personen_Informationen": return Object.keys(this.editData[this.firstSelectedOption]);
-        case "Private_Kontakte": return this.editData[this.firstSelectedOption];
-        case "Private_Adressen": return this.editData[this.firstSelectedOption];
-        default: return [];
-      }
-    },
-
-  
   },
   created() {
+
+    if(this.editData.topic){
+      //? if the topic was passed through the prop add it to the reactive data
+      this.topic = this.editData.topic;
+    }
+   
+
   },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
   },
   popup(options) {
+    console.log("popup start");
     return BsModal.popup.bind(this)(null, options);
   },
   template: `
   
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
-    <template v-slot:title>
-      {{"Profil bearbeiten" }}
+    
+  <template v-slot:title>
+      {{"Profil bearbeiten" }}  
     </template>
     <template v-slot:default>
-    
-    <bread-crumb :list="['this','is a','test']" ></bread-crumb>
-    <p>{{testValue}}</p>
-    <Select ariaLabel="test" v-model="testValue" @select="testEvent" :list="testListe"></Select>
-    <!-- DONT FORGET TO UNCOMMENT THIS -->
-    <!-- Breadcrumbs 
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item" v-if="firstSelectedOption">{{firstSelectedOption}}</li>
-        <li class="breadcrumb-item" v-if="secondSelectedOption" >{{firstSelectedOption ==="Personen_Informationen" ? Object.keys(secondSelectedOption)[0] : secondSelectedOptionIndex+1 }}</li>
-       
-      </ol>
-    </nav>
-    -->
+    <edit-profil-select v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
+   
 
-
-    <select v-if="!firstSelectedOption" v-model="firstSelectedOption"  class="form-select" size="3" aria-label="size 3 select example">
-      <option  v-for="(option,index) in firstSelection" :value="option">{{option.replace("_"," ")}}</option>
-    </select>
-
-    <select v-if="firstSelectedOption && !secondSelectedOption" class="form-select" size="3" aria-label="size 3 select example">
-      <option @click="
-      
-      if(Array.isArray(editData[firstSelectedOption])){
-        secondSelectedOptionIndex = index;
-        secondSelectedOption = createDeepCopy(option);
-        inputField= createDeepCopy(option);
-        //* topic is the property in which the array is stored when it is an array
-        topic = firstSelectedOption;
-      }else{
-        secondSelectedOption={[option]:editData[firstSelectedOption][option]};
-        inputField={[option]:editData[firstSelectedOption][option]};
-        //* topic is the selected property if is an object
-        topic = option;
-      }" v-for="(option, index) in secondSelection" :value="option"><div v-if="typeof(option)==='object'">
-      <div class="row m-2" v-for="(value,property) in option">
-      <div class="col"><span>{{property}}</span></div>
-      <div class="col"><span>{{value}}</span></div>
-      
-      </div>
-      </div>
-      <template v-else>{{option}}</template>
-      </option>
-    </select>
-    <div v-if="inputField">
-    <div v-for="(field,index) in inputField">
-    
-    <div class="form-underline">
-    <div class="form-underline-titel">{{index}}</div>
-
-    <input  class="form-control" :id="index" :value="inputField[index]" @input="changeInput($event,inputField,index)" :placeholder="field">
-    </div>
-    
-      </div>
-    </div>
-
-    
- 
-    
-  
     </template>
     <!-- optional footer -->
     <template   v-slot:footer>
       <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>
       <!--<p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{editTimestamp}}</p>-->
     
-      <button v-if="isInputFieldChanged"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
+      <button v-if="profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>
     <!-- end of optional footer --> 
   </bs-modal>`,

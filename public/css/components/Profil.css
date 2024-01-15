@@ -50,6 +50,9 @@
   align-content: space-between;
 
 }
+
+
+
 .form-underline .form-underline-content{
   border-width: 1px;
   border-color: transparent transparent #dee2e6 transparent;
@@ -75,11 +78,7 @@
 }
 
 
-option:checked{
-  background: linear-gradient(#005485, #005485);
 
-}
 
-#SelectStyle{
-  
-}
+
+
