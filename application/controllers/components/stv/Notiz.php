@@ -19,6 +19,24 @@ class Notiz extends FHC_Controller
 		]);
 	}
 
+	public function getUid()
+	{
+		// Load Libraries
+		$this->load->library('AuthLib');
+		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+		$result = getAuthUid();
+		$this->outputJsonError($result);
+
+	//	$this->outputJson(getData($result));
+
+/*		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		} else {
+			$this->outputJson($result);
+		}*/
+	}
+
 	public function getNotizen($person_id)
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
@@ -74,19 +92,26 @@ class Notiz extends FHC_Controller
 		$this->form_validation->set_rules('text', 'Text', 'required');*/
 
 		//TODO(Manu) form validation - schon für type hier?
-
 		//Speichern der Notiz und Notizzuordnung
 		$uid = getAuthUID();
-		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
+
+		if (isset($_POST['data']))
+		{
+			$data = json_decode($_POST['data']);
+			unset($_POST['data']);
+			foreach ($data as $k => $v) {
+				$_POST[$k] = $v;
+			}
+		}
+
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
-		$bearbeiter_uid = $this->input->post('bearbeiter');
 		$erledigt = $this->input->post('erledigt');
+		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
+		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
 		$type = $this->input->post('typeId');
-
-		//get rid of null value error
-		$start = $this->input->post(date('von'));
-		$ende = $this->input->post(date('bis'));
+		$start = $this->input->post('von');
+		$ende = $this->input->post('bis');
 
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 		if (isError($result))
@@ -215,6 +240,15 @@ class Notiz extends FHC_Controller
 			return $this->outputJsonError($this->form_validation->error_array());
 		}*/
 
+		if (isset($_POST['data']))
+		{
+			$data = json_decode($_POST['data']);
+			unset($_POST['data']);
+			foreach ($data as $k => $v) {
+				$_POST[$k] = $v;
+			}
+		}
+
 		if(!$notiz_id)
 		{
 			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -228,8 +262,8 @@ class Notiz extends FHC_Controller
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
 		$type = $this->input->post('typeId');
-		$start = $this->input->post(date('von'));
-		$ende = $this->input->post(date('bis'));
+		$start = $this->input->post('von');
+		$ende = $this->input->post('bis');
 
 		$result = $this->NotizModel->update(
 			[

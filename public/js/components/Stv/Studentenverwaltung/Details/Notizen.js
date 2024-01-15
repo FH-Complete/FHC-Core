@@ -7,7 +7,7 @@ var editIcon = function (cell, formatterParams) {
 	return "<i class='fa fa-edit'></i>";
 };
 var deleteIcon = function (cell, formatterParams){
-	return "<i class='fa fa-remove'></i>";
+	return "<i class='fa fa-remove text-danger'></i>";
 };
 
 export default {
@@ -28,13 +28,13 @@ export default {
 				columns: [
 					{title: "Titel", field: "titel"},
 					{title: "Text", field: "text", width: 350},
-					{title: "VerfasserIn", field: "verfasser_uid", visible: false},
+					{title: "VerfasserIn", field: "verfasser_uid"},
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
 					{title: "Start", field: "start", visible: false},
 					{title: "Ende", field: "ende", visible: false},
 					/*					{title: "Dokumente", field: "dms_id"},*/
 					{title: "Dokumente", field: "countdoc"},
-					{title: "Erledigt", field: "erledigt"},
+					{title: "Erledigt", field: "erledigt", visible: false},
 					{title: "Notiz_id", field: "notiz_id", visible: false},
 					{title: "Notizzuordnung_id", field: "notizzuordnung_id", visible: false},
 					{
@@ -58,6 +58,8 @@ export default {
 			},
 			tabulatorEvents: [],
 			notizen: [],
+			uid: '',
+			intVerfasser: '',
 			filteredMitarbeiter: [],
 			formData: {
 				typeId: 'person_id',
@@ -68,12 +70,13 @@ export default {
 				bis: null,
 				document: null,
 				erledigt: false,
-				verfasser: null,
+				verfasser: this.uid,
 				bearbeiter: null,
 				anhang: []
 			},
 			showErweitert: true,
-			showDocument: true,
+			showDocument: true
+
 		}
 	},
 	methods:{
@@ -111,35 +114,22 @@ export default {
 			this.resetFormData();
 			this.formData.typeId = 'person_id';
 			this.formData.titel = '';
-			this.formData.statusNew = false;
+			this.formData.statusNew = true;
 			this.formData.text = null;
 			this.formData.von = null;
 			this.formData.bis = null;
 			this.formData.document = null;
 			this.formData.erledigt = false;
-			this.formData.verfasser = null;
+			this.formData.verfasser = this.uid;
 			this.formData.bearbeiter = null;
 			this.formData.anhang = [];
 		},
 		addNewNotiz(notizData) {
-			/*			console.log("here: anhang noch empty");
-						console.log(this.formData);*/
 
 			const formData = new FormData();
 
-			//working with single files
-			//	Object.entries(this.formData).forEach(([k, v]) => formData.append(k, v));
-
-			//multiple files
-			//console.log(this.formData.anhang);
-			Object.entries(this.formData).forEach(([k, v]) => {
-				if(k!= 'anhang')
-					formData.append(k, v);
-			});
+			formData.append('data', JSON.stringify(this.formData));
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
-/*
-			console.log(this.formData);
-			console.log(formData);*/
 
 			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
@@ -228,46 +218,18 @@ export default {
 				bis: null,
 				document: null,
 				erledigt: false,
-				verfasser: null,
+				verfasser: this.uid,
 				bearbeiter: null,
 				anhang: []
 			};
 		},
-		/*		updateNotiz(notiz_id){
-					CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
-						this.formData
-					).then(response => {
-						if (!response.data.error) {
-							this.$fhcAlert.alertSuccess('Update erfolgreich');
-							this.resetFormData();
-							this.reload();
-						} else {
-							const errorData = response.data.retval;
-							Object.entries(errorData).forEach(entry => {
-								const [key, value] = entry;
-								this.$fhcAlert.alertError(value);
-							});
-						}
-					}).catch(error => {
-						this.statusMsg = 'Error in Catch';
-						this.$fhcAlert.alertError('Fehler bei Updateroutine aufgetreten');
-					}).finally(() => {
-						window.scrollTo(0, 0);
-						//this.reload();
-					});
-				},*/
 		updateNotiz(notiz_id){
 			const formData = new FormData();
 
-
-			Object.entries(this.formData).forEach(([k, v]) => {
-				if(k!= 'anhang')
-					formData.append(k, v);
-			});
+			formData.append('data', JSON.stringify(this.formData));
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
-			console.log(this.formData);
+			//console.log(this.formData);
 
-			//warum geht das nicht analog? wie kann titel = null sein?
 			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
@@ -290,6 +252,17 @@ export default {
 			});
 		},
 	},
+	created(){
+		CoreRESTClient
+			.get('components/stv/Notiz/getUid')
+			.then(result => {
+					if(result.data.retval) {
+						this.formData.verfasser = result.data.retval;
+					}
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+	},
+	computed: {	},
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 
@@ -343,10 +316,7 @@ export default {
 		
 		
 		<div>
-		parent: {{formData.bearbeiter}}
-<!--		Parent: {{formData.title}} {{formData.anhang}} || {{formData.anhang.name}}
-		<span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->
-<!--			PARENT: {{formData.anhang}} {{formData.typeId}} | single: {{formData.anhang.name}} , multi: {{formData.anhang}} <span v-for="(anhang,index) in formData.anhang"> {{anhang.name}} {{index}}<br></span> ref: {{formData.ref}}-->
+<!--			parent: -->
 		</div>
 	</div>
 `

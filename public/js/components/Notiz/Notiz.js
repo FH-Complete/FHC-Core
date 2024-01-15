@@ -88,7 +88,8 @@ export default {
 				return this.verfasser;
 			},
 			set(value) {
-				this.$emit('update:verfasser', value);
+				//this.$emit('update:verfasser', value);
+				this.$emit('update:verfasser', value.mitarbeiter_uid);
 			}
 		},
 		intBearbeiter: {
@@ -179,24 +180,12 @@ export default {
 				
 				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">VerfasserIn</label>
-					<div class="col-sm-7">
-						<input type="text" v-model="intVerfasser" class="form-control">	
-						{{uid}}
-					</div>
-				</div>
-				
-				<div class="row mb-3">
-					<label for="bis" class="form-label col-sm-2">BearbeiterIn</label>
-					<div class="col-sm-7">
-						<PvAutoComplete v-model="intBearbeiter" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
-<!--						<input type="text" v-model="intBearbeiter" class="form-control">	-->
+					<div class="col-sm-3">
+						<PvAutoComplete v-model="intVerfasser" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
 					</div>
 					
-				</div>
-									
-				<div class="row mb-3">
-					<label for="von" class="form-label col-sm-2">von</label>
-					<div class="col-sm-2">
+					<label for="von" class="form-label col-sm-1">von</label>
+					<div class="col-sm-3">
 						<vue-date-picker 
 							id="von" 
 							v-model="intVon" 
@@ -205,10 +194,17 @@ export default {
 							:enable-time-picker="false"
 							format="dd.MM.yyyy" 
 							preview-format="dd.MM.yyyy"></vue-date-picker>
+					</div>			
+				</div>
+				
+				<div class="row mb-3">
+					<label for="bis" class="form-label col-sm-2">BearbeiterIn</label>
+					<div class="col-sm-3">
+						<PvAutoComplete v-model="intBearbeiter" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
 					</div>
-	
+					
 					<label for="bis" class="form-label col-sm-1">bis</label>
-					<div class="col-sm-2">
+					<div class="col-sm-3">
 						<vue-date-picker 
 							id="bis" 
 							v-model="intBis" 
@@ -218,8 +214,12 @@ export default {
 							format="dd.MM.yyyy" 
 							preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
+					
+				</div>
+									
+				<div class="row mb-3">
 	
-					<label for="bis" class="form-label col-sm-1">erledigt</label>
+					<label for="bis" class="form-label col-sm-2">erledigt</label>
 					<div class="col-sm-1"> 
 						<input type="checkbox" v-model="intErledigt">	
 					</div>
