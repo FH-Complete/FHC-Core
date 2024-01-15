@@ -276,7 +276,13 @@ define('DOCSBOX_WAITING_SLEEP_TIME', 1);
 // Bei folgenden Buchungstypen wird ein Anlegen geprüft ob bereits ein Eintrag für diesen Typ vorhanden ist im selben
 // Semester und ggf ein Hinweis ausgegeben
 define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
-        array('StudiengebuehrAnzahlung', 'Studiengebuehr', 'StudiengebuehrRestzahlung', 'OEH')
+	array(
+			'Studiengebuehr' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrErhoeht' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrAnzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung'),
+			'StudiengebuehrRestzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrRestzahlung'),
+			'OEH' => array('OEH')
+	))
 ));
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
