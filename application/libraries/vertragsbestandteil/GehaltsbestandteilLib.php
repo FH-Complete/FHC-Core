@@ -133,17 +133,8 @@ class GehaltsbestandteilLib
 			return;
 		}
 		
-		$ret = $this->GehaltsbestandteilModel->update($gehaltsbestandteil->getGehaltsbestandteil_id(), 
-			(object) array(
-				'bis' => $enddate, 
-				'updatevon' => getAuthUID(),
-				'updateamum' => strftime('%Y-%m-%d %H:%M')
-			));
-		
-		if (isError($ret))
-		{
-			throw new Exception('error ending gehaltsbestandteil');
-		}
+		$gehaltsbestandteil->setBis($enddate);
+		$this->updateGehaltsbestandteil($gehaltsbestandteil);
 	}
 		
 	protected function setUIDtoPGSQL() {
