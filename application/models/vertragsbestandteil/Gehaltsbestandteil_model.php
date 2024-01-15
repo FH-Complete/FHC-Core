@@ -18,11 +18,11 @@ class Gehaltsbestandteil_model extends DB_Model implements IEncryption
 		return array(
 			'grundbetrag' => array(
 				DB_Model::CRYPT_CAST => 'numeric',
-				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEY'
+				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEYGEHALT'
 			),
 			'betrag_valorisiert' => array(
 				DB_Model::CRYPT_CAST => 'numeric',
-				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEY'
+				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEYGEHALT'
 			)
 		);
     }
