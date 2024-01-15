@@ -21,6 +21,7 @@ class Profil extends Auth_Controller
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'deleteProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 
 		]);
@@ -145,6 +146,16 @@ class Profil extends Auth_Controller
 			$update_res->retval = date_create($editTimestamp)->format('d.m.Y'); 
 			echo json_encode($update_res);
 		}
+	}
+
+	public function deleteProfilRequest(){
+
+		$json = json_decode($this->input->raw_input_stream);
+
+		$delete_res = $this->ProfilChangeModel->delete([$json]);
+		echo json_encode($delete_res);
+		
+
 	}
 
 

@@ -268,6 +268,12 @@ const FetchProfilUpdates = {
         return {}
     },
     methods:{
+        deleteRequest: function(item){
+
+            Vue.$fhcapi.UserData.deleteProfilRequest(item.profil_update_id).then((res)=>{
+                console.log(res);
+            });
+        },
         getView: function(topic){
             console.log("the topic is here",topic);
             switch(topic){
@@ -289,6 +295,7 @@ const FetchProfilUpdates = {
                     },
                     update:true,
                     topic:updateRequest.topic,
+                    
                 }
             }else{
                 content = {
@@ -296,6 +303,7 @@ const FetchProfilUpdates = {
                     data: updateRequest.requested_change,
                     update:true,
                     topic:updateRequest.topic,
+                    
                     
                 }
             }
@@ -328,20 +336,22 @@ const FetchProfilUpdates = {
     },
     template:`
    
-    
+    <pre>{{JSON.stringify(data,null,2)}}</pre>
     <table class="table table-sm table-hover">
     <thead>
     <tr >
       <th scope="col">Topic</th>
       <th scope="col">Date of Request</th>
-      <th scope="col"></th>
+      <th scope="col">Bearbeiten</th>
+      <th scope="col">Löschen</th>
     </tr>
   </thead>
   <tbody>
     <tr v-for="item in data">
       <td >{{item.topic}}</td>
       <td >{{item.change_timestamp}}</td>
-      <td ><i @click="openModal(item)" role="button" class="fa fa-edit"></i></td>
+      <td class="text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></td>
+      <td class="text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></td>
     </tr>
   </tbody>
     </table>

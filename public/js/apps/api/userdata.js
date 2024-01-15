@@ -17,6 +17,13 @@ export default {
         return axios.post(url,{topic, payload});
     },
 
+    deleteProfilRequest: function(requestID){
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+        `/Cis/Profil/deleteProfilRequest`;
+
+        return axios.post(url,requestID);
+    },
+
     getEditProfil: function() {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
                    `/Cis/Profil/getEditProfil`;
