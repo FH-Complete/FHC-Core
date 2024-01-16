@@ -22,7 +22,7 @@ class Profil extends Auth_Controller
 			'insertProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'deleteProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			
+			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -67,7 +67,23 @@ class Profil extends Auth_Controller
 
 
 
+	public function selectProfilRequest(){
+		$uid =json_decode($this->input->get("uid"));
+		$id =json_decode($this->input->get("id"));
+		
+		if($uid && $id){
+			$res= $this->ProfilChangeModel->getProfilUpdate($uid, $id);
+		}elseif($uid){
+			$res= $this->ProfilChangeModel->getProfilUpdate($uid);
+		}elseif($id){
+			$res= $this->ProfilChangeModel->getProfilUpdate($this->uid, $id);
+		}else{
+			$res= $this->ProfilChangeModel->getProfilUpdate($this->uid);
+		}
 
+		echo json_encode($res);
+		
+	}
 
 	public function insertProfilRequest()
 	{
@@ -151,11 +167,8 @@ class Profil extends Auth_Controller
 	public function deleteProfilRequest(){
 
 		$json = json_decode($this->input->raw_input_stream);
-
 		$delete_res = $this->ProfilChangeModel->delete([$json]);
 		echo json_encode($delete_res);
-		
-
 	}
 
 
@@ -296,8 +309,6 @@ class Profil extends Auth_Controller
 
 	private function viewStudentProfil($uid)
 	{
-
-
 
 		if (
 			isSuccess($this->PersonModel->addSelect('gruppe_kurzbz, beschreibung')) &&
@@ -555,7 +566,7 @@ class Profil extends Auth_Controller
 
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
+		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate($this->uid);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{
@@ -604,11 +615,8 @@ class Profil extends Auth_Controller
 		$res->standort_telefon = $telefon_res;
 
 		$res->profilUpdates = $profilUpdates?: null;
-		if($res->profilUpdates){
-		foreach($res->profilUpdates as $update){
-			$update->requested_change = json_decode($update->requested_change);
-			$update->change_timestamp = date_create($update->change_timestamp)->format('d.m.Y');
-		}}
+		
+		
 
 		return $res;
 	}
@@ -763,7 +771,7 @@ class Profil extends Auth_Controller
 		}
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
+		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate($this->uid);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{
@@ -810,11 +818,7 @@ class Profil extends Auth_Controller
 
 		$res->mailverteiler = $mailverteiler_res;
 		$res->profilUpdates = $profilUpdates?: null;
-		if($res->profilUpdates){
-		foreach($res->profilUpdates as $update){
-			$update->requested_change = json_decode($update->requested_change);
-			$update->change_timestamp = date_create($update->change_timestamp)->format('d.m.Y');
-		}}
+	
 		
 		return $res;
 

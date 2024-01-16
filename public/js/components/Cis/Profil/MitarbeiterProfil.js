@@ -122,31 +122,43 @@ export default {
   
   props: {
 		data: Object,
-		
-	
 	},
   
   methods: {
+
+    fetchProfilUpdates: function(){
+      Vue.$fhcapi.UserData.selectProfilRequest().then((res)=>{
+        
+        if(!res.error){
+          this.data.profilUpdates = res.data.retval?.length ? res.data.retval : null ; 
+        }
+      });
+    },
+  
     showModal() {
 
       EditProfil.popup({ 
           value:JSON.parse(JSON.stringify(this.data.editData)),
           timestamp:this.data.editDataTimestamp
-        }).then((res) => {
-          if(res.timestamp && res.editData){
-            this.data.editDataTimestamp = res.timestamp;
-            this.data.editData = res.editData;
+        }).then((popup_result) => {
+          if(popup_result){
+            Vue.$fhcapi.UserData.selectProfilRequest()
+            .then((res) =>{
+              if(!res.error){
+                this.data.profilUpdates = res.data.retval;
+              }else{
+                alert("Error when fetching profile updates: " +res.data.retval);
+              }
+            })
+            .catch(err=>alert(err));
           }
           
         }).catch((e) => {
           console.log(e);
          
         });
-     
     
     },
-
-
   
     sperre_foto_function() {
       if (!this.data) {
@@ -161,14 +173,10 @@ export default {
 
   computed: {
 
-    
-
     //? legacy mailto link to create an email with information that should be changed
     refreshMailTo() {
       return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`;
     },
-
-    
 
     get_image_base64_src() {
       if (!this.data) {
@@ -176,9 +184,6 @@ export default {
       }
       return "data:image/jpeg;base64," + this.data.foto;
     },
-
-    
-
 
     get_mitarbeiter_standort_telefon(){
       if(this.data.standort_telefon){
@@ -320,7 +325,7 @@ export default {
        
       };
 
-    console.log(JSON.stringify(this.data.editData,null,2));
+  
   },
   mounted() {
     
@@ -332,10 +337,6 @@ export default {
       this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
     });
 
-    
-    
-   
-    
   },
 
   template: ` 
@@ -378,7 +379,8 @@ export default {
               <div class="card-header">
               Profil Informations Änderungen Anfragen</div>
               <div class="card-body">
-              <fetch-profil-updates></fetch-profil-updates>
+              <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                    
               </div>
               </div>
              
@@ -761,15 +763,16 @@ export default {
 
               <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
               <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
-              <div  class="row d-none d-md-block mb-3">
+              <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
               <div class="col mb-3">
-                 
-                    <div class="card">
+                    <div  class="card">
                       <div class="card-header">
                       Profil Updates
                       </div>
-                      <fetch-profil-updates :modal="EditProfil" :data="data.profilUpdates"></fetch-profil-updates>
-                    </div>
+                      <div class="card-body">
+                      <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                      </div>
+                      </div>
 
                    
                       

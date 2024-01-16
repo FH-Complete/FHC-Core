@@ -195,7 +195,7 @@ const EditKontakt =  {
         },
     },
     created(){
-        console.log(this.$props);
+        
     },
     template:
     `
@@ -240,7 +240,7 @@ const EditKontakt =  {
         
    
     
-        <span style="opacity: 0.65; font-size: .85rem; " class="px-2">Zustellungs Adresse</span>
+        <span style="opacity: 0.65; font-size: .85rem; " class="px-2">Zustellungs Kontakt</span>
 
         <input class="form-check-input " type="checkbox" :checked="data.zustellung" @change="updateValue($event,'zustellung')" id="flexCheckDefault">
     
@@ -261,21 +261,28 @@ const FetchProfilUpdates = {
         data:{
             type:Object,
         },
-        
     },
+
+    emits:["fetchUpdates"],
     
     data(){
-        return {}
+        return {
+            
+        }
     },
     methods:{
         deleteRequest: function(item){
-
+            
             Vue.$fhcapi.UserData.deleteProfilRequest(item.profil_update_id).then((res)=>{
-                console.log(res);
+                if(res.data.error){
+                    //? open alert
+                    console.log(res.data);                    
+                }else{
+                    this.$emit('fetchUpdates');
+                }
             });
         },
         getView: function(topic){
-            console.log("the topic is here",topic);
             switch(topic){
                 case "Private Kontakte" : return "EditKontakt"; break;
                 case "Private Adressen" : return "EditAdresse"; break;
@@ -316,10 +323,9 @@ const FetchProfilUpdates = {
                 value:content,
                 timestamp:null,
               }).then((res) => {
-                /* if(res.timestamp && res.editData){
-                  this.data.editDataTimestamp = res.timestamp;
-                  this.data.editData = res.editData;
-                } */
+                if(res === true){
+                    this.$emit('fetchUpdates');
+                }
                 
               }).catch(e => {
                 console.log(e);
@@ -334,27 +340,30 @@ const FetchProfilUpdates = {
     created(){
         
     },
+    computed:{
+        
+    },
     template:`
-   
-    <pre>{{JSON.stringify(data,null,2)}}</pre>
-    <table class="table table-sm table-hover">
-    <thead>
-    <tr >
-      <th scope="col">Topic</th>
-      <th scope="col">Date of Request</th>
-      <th scope="col">Bearbeiten</th>
-      <th scope="col">Löschen</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="item in data">
-      <td >{{item.topic}}</td>
-      <td >{{item.change_timestamp}}</td>
-      <td class="text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></td>
-      <td class="text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></td>
-    </tr>
-  </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="m-0  table  table-hover">
+            <thead>
+                <tr >
+                <th scope="col">Topic</th>
+                <th scope="col">Date of Request</th>
+                <th scope="col">Bearbeiten</th>
+                <th style="white-space:normal" scope="col">Löschen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in data">
+                <td class="align-middle">{{item.topic}}</td>
+                <td class="align-middle">{{item.change_timestamp}}</td>
+                <td class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></td>
+                <td class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     
     `
 };

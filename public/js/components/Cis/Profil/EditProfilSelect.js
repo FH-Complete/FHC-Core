@@ -25,6 +25,7 @@ export default {
       },
       profilUpdate:String,
       topic:String,
+      breadcrumb:String,
 
      
     },
@@ -32,6 +33,7 @@ export default {
         //? update:modelValue event is needed to notify the v-model when the value has changed
         ['update:profilUpdate']:null,
         ['update:topic']:null,
+        ['update:breadcrumb']:null,
         select:null,
 
     },
@@ -39,6 +41,7 @@ export default {
       return {
         view:null,
         data:null,
+        breadcrumbItems:[],
       }
     },
   
@@ -52,44 +55,35 @@ export default {
         
         this.data=item.data; 
         this.view=item.view; 
-        //? emits the selected topic to the parent component
+        
         if(item.title){
+          //? emits the selected topic to the parent component
           this.$emit('update:topic',item.title);
+        
+          //? emits the new item for the breadcrumb in the parent component
+          this.breadcrumbItems.push(item.title);
+        }else{
+          if(item.data.kontakttyp){
+            this.breadcrumbItems.push(item.data.kontakttyp);
+            this.breadcrumbItems.push(item.data.kontakt);
+          }else if(item.data.strasse){
+            this.breadcrumbItems.push(item.data.strasse);
+          }
         }
+        this.$emit('update:breadcrumb',this.breadcrumbItems);
+        
       },
      
     },
     computed: {
-      listLength: function(){
-        return this.list.length;
-      },
-      lastElement: function(){
-          return this.list[this.list.length-1];
-      },
-      computedList: function(){
-        if(Array.isArray(this.list)){
-            //? the passed data is an array
-            return this.list;
-        }else if(typeof(this.list) === 'object' && this.list !== null){
-            //? the passed data is an object
-            return Object.keys(this.list);
-        }else{
-            console.warn("The passed data is neither an Array or an Object");
-            return null;
-            //! the passed data is neither an object or an array
-        }
-        
-      }
+      
+      
     },
     created() {
       this.data = JSON.parse(JSON.stringify(this.list.data));
       this.view = JSON.parse(JSON.stringify(this.list.view));
         
-        //? sets the default length of the options to show equal to the number of elements in the list
-        if(!this.optionLength){
-            //? if it is an object, then it will take the length of the object keys, otherwise it takes the normal length
-            this.optionLength = this.computedList.length;
-        }
+        
     },
     mounted() {
     },

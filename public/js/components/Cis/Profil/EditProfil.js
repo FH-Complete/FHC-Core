@@ -1,20 +1,17 @@
 import BsModal from "../../Bootstrap/Modal.js";
 import Alert from "../../Bootstrap/Alert.js";
-import BreadCrumb from "../Selection/Breadcrumb.js";
 import EditProfilSelect from "./EditProfilSelect.js";
 
 export default {
   components: {
     BsModal,
     Alert,
-    BreadCrumb,
     EditProfilSelect,
   },
   mixins: [BsModal],
   props: {
 
     value: Object,
-    
     timestamp: Object,
     /*
      * NOTE(chris):
@@ -30,31 +27,12 @@ export default {
   },
   data() {
     return {
-      propertySelected: false,
-      testValue:null,
-      testListe:{
-        privateInfo:{username:"hans33",Titel:"Doktor", Anrede:"Herr"},
-        privateKontakte:[{strasse:"strasse1",plz:100},{strasse:"strasse1",plz:100},{strasse:"strasse1",plz:100}],
-        privateAdressen:[{kontakt:"telefon",anmerkung:"1"},{kontakt:"email",anmerkung:"2"},{kontakt:"telefon",anmerkung:"3"}]
-      },
-      testSelectedItems:[],
-      profilUpdate:null,
-
-
       topic:null,
-      firstSelectedOption:null,
-      secondSelectedOption: null,
-      secondSelectedOptionIndex: null,
-    
-    
-      inputField:null,
-      
+      profilUpdate:null,      
       editData: this.value,
-      //? tracks what specific profil data was changed
-      changesData: {},
-      editTimestamp: this.timestamp,
+      breadcrumb:null,
       
-      result: true,
+      result: false,
       info: null,
     }
   },
@@ -62,69 +40,44 @@ export default {
   methods: {
 
     
-    
-    selectEvent: function (option){
-      this.editData = this.editData[option];
-    },
-    createDeepCopy: function(object){
-      //? using Vue.toRaw because deep clones with structuredClone can not be done on proxies
-      return structuredClone(Vue.toRaw(object));
-    },
-
-    changeInput: function(event, inputField,index){
-      let newValue = event.target.value? event.target.value: null;
-      inputField[index] = newValue; 
-
-    },
-
-
-     
-    
     submitProfilChange(){
       
-     
-        //* only inserts new row if the inputField value is different from the original value
-        if(this.topic && this.profilUpdate){
+       if(this.topic && this.profilUpdate){
 
         //? inserts new row in public.tbl_cis_profil_update 
       if(this.editData.update){
         
         Vue.$fhcapi.UserData.updateProfilRequest(this.topic,this.profilUpdate).then((res)=>{
-          this.result = {
-            editData: this.editData,
-            timestamp: res.data.retval,
-          };
-          this.hide(); 
           
           if(res.data.error == 0){
-           
+            this.result= true;
+            this.hide();
             Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
           }else{
+            this.result= false;
+            this.hide();
             Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
           } 
-          //
+         
         });
-        //
-     
+      
       }else{
 
         Vue.$fhcapi.UserData.insertProfilRequest(this.topic,this.profilUpdate).then((res)=>{
-          this.result = {
-            editData: this.editData,
-            timestamp: res.data.retval,
-          };
-          this.hide(); 
+          
           
           if(res.data.error == 0){
-           
+            this.result= true;
+            this.hide();
             Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
           }else{
+            this.result= false;
+            this.hide();
             Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
           } 
-          //
+      
         });
         
-      
     }
    
     }
@@ -135,7 +88,7 @@ export default {
   created() {
 
     if(this.editData.topic){
-      //? if the topic was passed through the prop add it to the reactive data
+      //? if the topic was passed through the prop add it to the component
       this.topic = this.editData.topic;
     }
    
@@ -145,7 +98,6 @@ export default {
     this.modal = this.$refs.modalContainer.modal;
   },
   popup(options) {
-    console.log("popup start");
     return BsModal.popup.bind(this)(null, options);
   },
   template: `
@@ -156,7 +108,15 @@ export default {
       {{"Profil bearbeiten" }}  
     </template>
     <template v-slot:default>
-    <edit-profil-select v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
+
+    <nav aria-label="breadcrumb" class="ps-2  ">
+      <ol class="breadcrumb ">
+        <li class="breadcrumb-item"  v-for="element in breadcrumb">{{element}}</li>
+      
+      </ol>
+    </nav>
+
+    <edit-profil-select v-model:breadcrumb="breadcrumb" v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
    
 
     </template>
