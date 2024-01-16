@@ -1,6 +1,23 @@
 <?php
 
 /**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
  * To filter data using a SQL statement
  */
 class FilterWidget extends Widget
@@ -58,6 +75,8 @@ class FilterWidget extends Widget
 	private $_reloadDataset; // Force Reload of Dataset
 
 	private $_sessionTimeout; // session expiring time
+
+	private $_encryptedColumns; // contains info about encrypted columns
 
 	private static $_FilterWidgetInstance; // static property that contains the instance of itself
 
@@ -195,6 +214,7 @@ class FilterWidget extends Widget
 		$this->_formatRow = null;
 		$this->_markRow = null;
 		$this->_checkboxes = null;
+		$this->_encryptedColumns = null;
 		$this->_hideOptions = null;
 		$this->_hideSelectFields = null;
 		$this->_hideSelectFilters = null;
@@ -250,6 +270,14 @@ class FilterWidget extends Widget
 			&& count($args[FilterWidgetLib::ADDITIONAL_COLUMNS]) > 0)
 		{
 			$this->_additionalColumns = $args[FilterWidgetLib::ADDITIONAL_COLUMNS];
+		}
+
+		// Parameter is used to define the ecrypted columns
+		if (isset($args[FilterWidgetLib::ENCRYPTED_COLUMNS])
+			&& is_array($args[FilterWidgetLib::ENCRYPTED_COLUMNS])
+			&& count($args[FilterWidgetLib::ENCRYPTED_COLUMNS]) > 0)
+		{
+			$this->_encryptedColumns = $args[FilterWidgetLib::ENCRYPTED_COLUMNS];
 		}
 
 		// Parameter is used to add use aliases for the columns fo the dataset
@@ -441,7 +469,7 @@ class FilterWidget extends Widget
 					);
 
 					// Then retrieve dataset from DB
-					$dataset = $this->filterwidgetlib->getDataset($datasetQuery);
+					$dataset = $this->filterwidgetlib->getDataset($datasetQuery, $this->_encryptedColumns);
 
 					// Save changes into session if data are valid
 					if (!isError($dataset))
@@ -476,7 +504,7 @@ class FilterWidget extends Widget
 				$datasetQuery = $this->filterwidgetlib->generateDatasetQuery($this->_query, $parsedFilterJson->filters);
 
 				// Then retrieve dataset from DB
-				$dataset = $this->filterwidgetlib->getDataset($datasetQuery);
+				$dataset = $this->filterwidgetlib->getDataset($datasetQuery, $this->_encryptedColumns);
 
 				// Try to load the name of the filter using the PhrasesLib
 				$filterName = $this->filterwidgetlib->getFilterName($parsedFilterJson);
@@ -497,6 +525,7 @@ class FilterWidget extends Widget
 							FilterWidgetLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
 							FilterWidgetLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
 							FilterWidgetLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns
+							FilterWidgetLib::SESSION_ENCRYPTED_COLUMNS => $this->_encryptedColumns, // encrypted columns
 							FilterWidgetLib::SESSION_CHECKBOXES => $this->_checkboxes, // the name of the field used to build the checkboxes column
 							FilterWidgetLib::SESSION_FILTERS => $parsedFilterJson->filters, // all the filters used to filter the dataset
 							FilterWidgetLib::SESSION_METADATA => $this->FiltersModel->getExecutedQueryMetaData(), // the metadata of the dataset
@@ -525,7 +554,7 @@ class FilterWidget extends Widget
 	private function _setFilterMenu()
 	{
 		// Generates the filters structure array
-		$filterMenu = $this->filterwidgetlib->generateFilterMenu(
+		$this->filterwidgetlib->generateFilterMenu(
 			$this->router->directory.$this->router->class.'/'.$this->router->method
 		);
 	}
@@ -604,7 +633,7 @@ class FilterWidget extends Widget
 	{
 		$columnsNames = array();
 
-		foreach ($columns as $key => $obj)
+		foreach ($columns as $obj)
 		{
 			if (isset($obj->name))
 			{
