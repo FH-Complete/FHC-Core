@@ -173,11 +173,12 @@ abstract class db extends basis
 		// If the global constant CI_ENVIRONMENT is not defined then return a failure
 		if (!defined('CI_ENVIRONMENT')) return null;
 
-		define('BASEPATH', 'LEGACY_WORKAROUND'); // little trick to load a CI config file
+		if(!defined('BASEPATH'))
+			define('BASEPATH', 'LEGACY_WORKAROUND'); // little trick to load a CI config file
 
 		// Tries to include the CI config file that contains password for the database encryption
 		// If the include fails then return a failure
-		if (!include_once(dirname(__FILE__).'/../application/config/'.CI_ENVIRONMENT.'/db_crypt.php')) return null;
+		if (!include(dirname(__FILE__).'/../application/config/'.CI_ENVIRONMENT.'/db_crypt.php')) return null;
 
 		// Array that will contains all the DB decryption password
 		$decryptionPasswordsArray = array();
