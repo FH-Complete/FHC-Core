@@ -6,7 +6,7 @@ import BsModal from "../../../Bootstrap/Modal";
 var editIcon = function (cell, formatterParams) {
 	return "<i class='fa fa-edit'></i>";
 };
-var deleteIcon = function (cell, formatterParams){
+var deleteIcon = function (cell, formatterParams) {
 	return "<i class='fa fa-remove text-danger'></i>";
 };
 
@@ -20,11 +20,11 @@ export default {
 	props: {
 		modelValue: Object
 	},
-	data() {
+	data(){
 		return {
 			tabulatorOptions: {
-				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id),
-				//	+ this.modelValue.person_id, 'person'),
+				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id + '/person_id'),
+				//ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id + '/' + this.typeId),
 				columns: [
 					{title: "Titel", field: "titel"},
 					{title: "Text", field: "text", width: 350},
@@ -52,7 +52,7 @@ export default {
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
-				height: '200',
+				height: '150',
 				selectable: true,
 				index: 'notiz_id'
 			},
@@ -74,10 +74,10 @@ export default {
 				bearbeiter: null,
 				anhang: []
 			},
-			showErweitert: true,
-			showDocument: true
+			showErweitert: true, //show details verfasser, bearbeiter, von, bis, erledigt
+			showDocument: true //show upload documents
 
-		}
+		};
 	},
 	methods:{
 		actionDeleteNotiz(notiz_id){
@@ -107,8 +107,7 @@ export default {
 						this.loadDocEntries(this.notizen.notiz_id);
 						//console.log(this.formData.anhang);
 					}
-				})
-			;
+				});
 		},
 		actionNewNotiz(){
 			this.resetFormData();
@@ -125,13 +124,13 @@ export default {
 			this.formData.anhang = [];
 		},
 		addNewNotiz(notizData) {
-
 			const formData = new FormData();
 
 			formData.append('data', JSON.stringify(this.formData));
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
 
-			CoreRESTClient.post('components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
+			CoreRESTClient.post(
+				'components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
 			).then(response => {
@@ -163,16 +162,15 @@ export default {
 						this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
 					}
 				}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
-			}).finally(()=> {
-				window.scrollTo(0, 0);
-			});
+					this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
+				}).finally(()=> {
+					window.scrollTo(0, 0);
+				});
 		},
 		loadDocEntries(notiz_id){
 			return CoreRESTClient.get('components/stv/Notiz/loadDokumente/' + notiz_id)
 				.then(
 					result => {
-						//console.log(result.data);
 						if(result.data.retval) {
 							this.formData.anhang = result.data.retval;
 							console.log(this.formData.anhang);
@@ -187,15 +185,15 @@ export default {
 				);
 		},
 		loadNotiz(notiz_id){
-			return CoreRESTClient.get('components/stv/Notiz/loadNotiz/' + notiz_id)
+			return CoreRESTClient.get(
+				'components/stv/Notiz/loadNotiz/' + notiz_id)
 				.then(
 					result => {
 						if(result.data.retval) {
 							this.notizen = result.data.retval;
-							console.log(this.notizen);
+							//console.log(this.notizen);
 						}
-						else
-						{
+						else {
 							this.notizen = {};
 							this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
 						}
@@ -230,7 +228,8 @@ export default {
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
 			//console.log(this.formData);
 
-			CoreRESTClient.post('components/stv/Notiz/updateNotiz/' + notiz_id,
+			CoreRESTClient.post(
+				'components/stv/Notiz/updateNotiz/' + notiz_id,
 				formData,
 				{ Headers: { "Content-Type": "multipart/form-data" } }
 			).then(response => {
@@ -256,9 +255,9 @@ export default {
 		CoreRESTClient
 			.get('components/stv/Notiz/getUid')
 			.then(result => {
-					if(result.data.retval) {
-						this.formData.verfasser = result.data.retval;
-					}
+				if(result.data.retval) {
+					this.formData.verfasser = result.data.retval;
+				}
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -277,7 +276,7 @@ export default {
 				<button ref="Close" type="button" class="btn btn-primary" @click="deleteNotiz(notizen.notiz_id)">OK</button>
 			</template>
 		</BsModal>
-			
+		
 		<core-filter-cmpt
 		ref="table"
 		:tabulator-options="tabulatorOptions"
@@ -291,18 +290,18 @@ export default {
 		>
 	</core-filter-cmpt>
 
-	<br>	
+	<br>
 	<hr>
-		<Notiz 
+		<Notiz
 			ref="form"
 			:showErweitert="showErweitert"
 			:showDocument="showDocument"
 			v-model:typeId="formData.typeId"
-			v-model:titel="formData.titel" 
-			v-model:text="formData.text" 
-			v-model:statusNew="formData.statusNew" 				
-			v-model:von="formData.von" 
-			v-model:bis="formData.bis" 
+			v-model:titel="formData.titel"
+			v-model:text="formData.text"
+			v-model:statusNew="formData.statusNew"
+			v-model:von="formData.von"
+			v-model:bis="formData.bis"
 			v-model:document="formData.document"
 			v-model:erledigt="formData.erledigt"
 			v-model:verfasser="formData.verfasser"
@@ -314,10 +313,6 @@ export default {
 		<button v-if="formData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
 		<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
 		
-		
-		<div>
-<!--			parent: -->
-		</div>
 	</div>
-`
+	`
 };

@@ -29,7 +29,7 @@ export default {
 			multiupload: true,
 			mitarbeiter: [],
 			filteredMitarbeiter: [],
-			filteredFirmen: []
+/*			filteredFirmen: []*/
 		}
 	},
 	computed: {
@@ -138,17 +138,16 @@ export default {
 		<form ref="form" @submit.prevent class="row">
 			<div>
 				<div class="row mb-3">
-					<b>{{action}}</b>
 					<div class="col-sm-7">
 						<span class="small">[{{this.typeId}}]</span>
-					</div>	
+					</div>
 				</div>
 	
 				<div class="notizTitle row mb-3">
 					<label for="titel" class="form-label col-sm-2">Titel</label>
 					<div class="col-sm-7">
 						<input type="text" v-model="intTitel" class="form-control">
-					</div>	
+					</div>
 				</div>
 				
 				<div class="row mb-3">
@@ -159,25 +158,21 @@ export default {
 				</div>
 			</div>
 	
-	<div v-if="showDocument">
-			<slot name="document">
+			<!-- show Documentupload-->
+			<div v-if="showDocument">
 				<div class="row mb-3">
 					<label for="text" class="form-label col-sm-2">Dokument</label>
 					
-				<!-- Component File-->
-				<div  class="col-sm-7">		
+				<!-- File component-->
+				<div  class="col-sm-7">
 					<File ref="upload" id="file" :multiupload="multiupload" v-model:dateien="intAnhang" ></File>
 				</div>
-			
 				<hr>
-
-				
-			</slot>
-	</div>	
-
-		<div v-if="showErweitert">
-<!--			<slot name="erweitert">	-->
-				
+			</div>
+			
+			<!-- show Details-->
+			<div v-if="showErweitert">
+			
 				<div class="row mb-3">
 					<label for="bis" class="form-label col-sm-2">VerfasserIn</label>
 					<div class="col-sm-3">
@@ -186,15 +181,15 @@ export default {
 					
 					<label for="von" class="form-label col-sm-1">von</label>
 					<div class="col-sm-3">
-						<vue-date-picker 
-							id="von" 
-							v-model="intVon" 
-							clearable="false" 
+						<vue-date-picker
+							id="von"
+							v-model="intVon"
+							clearable="false"
 							auto-apply
 							:enable-time-picker="false"
-							format="dd.MM.yyyy" 
+							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"></vue-date-picker>
-					</div>			
+					</div>
 				</div>
 				
 				<div class="row mb-3">
@@ -205,32 +200,28 @@ export default {
 					
 					<label for="bis" class="form-label col-sm-1">bis</label>
 					<div class="col-sm-3">
-						<vue-date-picker 
-							id="bis" 
-							v-model="intBis" 
-							clearable="false" 
-							auto-apply 
+						<vue-date-picker
+							id="bis"
+							v-model="intBis"
+							clearable="false"
+							auto-apply
 							:enable-time-picker="false"
-							format="dd.MM.yyyy" 
+							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 					
 				</div>
 									
 				<div class="row mb-3">
-	
 					<label for="bis" class="form-label col-sm-2">erledigt</label>
-					<div class="col-sm-1"> 
-						<input type="checkbox" v-model="intErledigt">	
+					<div class="col-sm-1">
+						<input type="checkbox" v-model="intErledigt">
 					</div>
 				</div>
-<!--			</slot>-->
-		
-	</div>
-		
-		
-	</form>
-	
-</div>`
+			</div>
+				
+		</form>
+
+	</div>`
 }
 

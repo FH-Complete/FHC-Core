@@ -29,18 +29,30 @@ class Notiz extends FHC_Controller
 		$this->outputJsonError($result);
 	}
 
-	public function getNotizen($person_id)
+	public function getNotizen($id, $type)
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
-		$type = 'person';
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 
-		$result = $this->NotizModel->getNotizWithDocEntries($person_id);
+		//check if valid type
+		$isValidType = $this->NotizzuordnungModel->isValidType($type);
 
-		if (isError($result)) {
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		if($isValidType)
+		{
+			$result = $this->NotizModel->getNotizWithDocEntries($id, $type);
+
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				$this->outputJson(getError($result));
+			} else {
+				$this->outputJson(getData($result) ?: []);
+			}
+		}
+		else
+		{
+			//Todo manu (correct return to ajax)
+			$result = "datatype not yet implemented for notes";
 			$this->outputJson(getError($result));
-		} else {
-			$this->outputJson(getData($result) ?: []);
 		}
 	}
 
@@ -60,8 +72,7 @@ class Notiz extends FHC_Controller
 		}
 
 		elseif (!hasData($result)) {
-			$this->outputJson($result); //success mit Wert null
-			//	$this->outputJson(getData($result) ?: []);
+			$this->outputJson($result);
 		}
 		else
 		{
@@ -69,7 +80,7 @@ class Notiz extends FHC_Controller
 		}
 	}
 
-	public function addNewNotiz($id)
+	public function addNewNotiz($id, $paramTyp = null)
 	{
 		$this->load->model('person/Notiz_model', 'NotizModel');
 
@@ -87,6 +98,18 @@ class Notiz extends FHC_Controller
 			}
 		}
 
+		//Überprüfung ob type übergeben wurde (entweder Funktions- oder Postparameter)
+		if ($paramTyp)
+			$type = $paramTyp;
+		if(isset($_POST['typeId']))
+			$type = $this->input->post('typeId');
+
+		if(!$type)
+		{
+			//Todo(manu) return error
+			var_dump("ERROR no type");
+		}
+
 		//Form Validation
 		$this->form_validation->set_rules('titel', 'titel', 'required');
 		$this->form_validation->set_rules('text', 'Text', 'required');
@@ -101,11 +124,11 @@ class Notiz extends FHC_Controller
 		$erledigt = $this->input->post('erledigt');
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
-		$type = $this->input->post('typeId');
+		//$type = $this->input->post('typeId');
 		$start = $this->input->post('von');
 		$ende = $this->input->post('bis');
 
-		//Speichern der Notiz und Notizzuordnung
+		//Speichern der Notiz und Notizzuordnung inkl Prüfung ob valid type
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
 		if (isError($result))
 		{
@@ -219,7 +242,10 @@ class Notiz extends FHC_Controller
 			return $this->outputJson(getError($result));
 		}
 
+		//Todo(manu) update von Notizzuordnung?? typeId?
+
 		//neue Files speichern
+		//Todo(manu) update files
 		foreach ($_FILES as $k => $file)
 		{
 			$dms = array(
@@ -290,7 +316,6 @@ class Notiz extends FHC_Controller
 					$this->outputJson($result);
 			}
 		}
-
 
 		//Todo(manu) rollback?
 		//delete Notiz und Notizzuordnung

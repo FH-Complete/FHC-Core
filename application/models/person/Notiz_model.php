@@ -140,10 +140,30 @@ class Notiz_model extends DB_Model
 	 * @param id for Dokumentzuordnung (person_id, prestudent_id, uid, projekt_id...)
 	 * @param titel, text, start, ende, erledigt, verfasser_uid, bearbeiter_uid, insertvon Parameter for notiz
 	 */
-	public function addNotizForType($type, $id, $titel, $text, $insertvon, $start=null, $ende=null, $erledigt=false, $verfasser_uid=null, $bearbeiter_uid=null)
-	{
+	public function addNotizForType(
+		$type,
+		$id,
+		$titel,
+		$text,
+		$insertvon,
+		$start = null,
+		$ende = null,
+		$erledigt = false,
+		$verfasser_uid = null,
+		$bearbeiter_uid = null
+	) {
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+
+		//check if valid type
+		$isValidType = $this->NotizzuordnungModel->isValidType($type);
+
+		if(!$isValidType)
+		{
+			//Todo manu (correct return to controller)
+			$msg = "datatype " . $type . " not implemented for notes";
+			return error($msg, EXIT_ERROR);
+		}
 
 		// Start DB transaction
 		$this->db->trans_start(false);
@@ -180,13 +200,10 @@ class Notiz_model extends DB_Model
 		return $result;
 	}
 
-
-
 	/**
 	 * Add a Notiz for a given person with DMS_id
 	 */
-	//TODO(manu) add type for Notizzuordnung
-	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis, $dms_id=null)
+	public function addNotizForPersonWithDoc($person_id, $titel, $text, $erledigt, $verfasser_uid, $von, $bis, $dms_id = null)
 	{
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -243,16 +260,12 @@ class Notiz_model extends DB_Model
 
 	/**
 	 * gets all Notizen with Documententries for a certain type and type_id
-	 * @param $person_id
+	 * @param String type of id eg. person_id, prestudent_id, mitarbeiter_uid, projekt_kurzbz, projektphase_id, projekttask_id,
+	 *         bestellung_id, lehreinheit_id, anrechnung_id, uid)
+	 * @param $id the corresponding id, part of public.tbl_notizzuordnung
 	 */
-	//Todo(Manu) rewrite in CI-Style
-	//Todo(Manu) auf andere types erweitern
-	public function getNotizWithDocEntries($id)
+	public function getNotizWithDocEntries($id, $type)
 	{
-	$type = 'writeFunction';
-		//$type_id = 'z.person_id';
-
-
 		$qry = "
 			SELECT 
 			    	n.*, count(dms_id) as countDoc, z.notizzuordnung_id
@@ -265,15 +278,14 @@ class Notiz_model extends DB_Model
 			LEFT JOIN 
 			    	    campus.tbl_dms_version USING (dms_id)
 			WHERE 
-			   z.person_id = ?
+			   z.$type  = ?
 			GROUP BY 
 			    notiz_id, z.notizzuordnung_id
 		";
 
-
 		return $this->execQuery($qry, array($id));
-
 	}
+
 
 	/**
 	 * gets all Notizen for a person with a specific title
@@ -361,6 +373,4 @@ class Notiz_model extends DB_Model
 		
 		return $this->loadWhere(array('anrechnung_id' => $anrechnung_id));
 	}
-	// ------------------------------------------------------------------------------------------------------
-
 }
