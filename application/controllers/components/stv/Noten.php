@@ -30,7 +30,7 @@ class Noten extends Auth_Controller
 		return $this->outputJson($result);
 	}
 
-	public function getZeugnis($prestudent_id)
+	public function getZeugnis($prestudent_id, $all = null)
 	{
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
@@ -47,7 +47,7 @@ class Noten extends Auth_Controller
 		
 		$student_uid = current(getData($result))->student_uid;
 
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+		$studiensemester_kurzbz = ($all === null) ? $this->variablelib->getVar('semester_aktuell') : null;
 
 		$result = $this->ZeugnisnoteModel->getZeugnisnoten($student_uid, $studiensemester_kurzbz);
 		if (isError($result)) {
