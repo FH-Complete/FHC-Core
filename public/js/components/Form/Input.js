@@ -161,7 +161,7 @@ export default {
 		// TODO(chris): wrap check in div?
 	},
 	template: `
-	<component :is="hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="containerClass">
+	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="containerClass">
 		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
 		<input v-if="tag == 'input'" :type="lcType" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
 		<textarea v-else-if="tag == 'textarea'" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)"></textarea>
