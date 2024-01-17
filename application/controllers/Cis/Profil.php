@@ -97,16 +97,33 @@ class Profil extends Auth_Controller
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
 
+		
 		//? checks if the user already made a request to change a topic
-		//! which is an constraint added to the public.tbl_cis_profil_update table
-		if($res){
+		//* Exception: a user can have multiple delete or add requests 
+			
 		foreach($res as $update_request){
-			if($update_request->topic == $json->topic && $update_request->uid == $this->uid){
+			
+			//TODO: Check if a change request already exists before adding the delete request
+				
+			if(property_exists($json->payload, "delete")){
+				
+				if(json_decode($update_request->requested_change) == $json->payload){
+				//? Check if the delete request for this resource already exists before adding the new delete request
+						
+					echo json_encode(error("this delete request already exists"));
+					return;	
+				}
+			}elseif(property_exists($json->payload, "add")){
+	
+			}elseif($update_request->topic == $json->topic && $update_request->uid == $this->uid){
 				
 				echo json_encode(error("uid and topic combination exists already"));
 				return;
 			}
-		}}
+		}
+		
+		
+		
 		
 		
 			$insert_res = $this->ProfilChangeModel->insert($data);

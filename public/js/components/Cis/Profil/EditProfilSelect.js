@@ -34,6 +34,7 @@ export default {
         ['update:profilUpdate']:null,
         ['update:topic']:null,
         ['update:breadcrumb']:null,
+        submit:null,
         select:null,
 
     },
@@ -46,6 +47,16 @@ export default {
     },
   
     methods: {
+
+      deleteItem: function(item){
+        let data = item.data;
+        data.delete = true;
+        this.$emit('update:profilUpdate',item.data);
+        //? updates the topic when a Kontakt or an Address should be deleted
+        this.$emit('update:topic',item.data.kontakt?"Delete Kontakte":"Delete Adressen");
+        this.$emit('submit');
+      },
+
       profilUpdateEmit: function(event){
         console.log(event);
         //? passes the updated profil information to the parent component
@@ -92,11 +103,15 @@ export default {
   
 
     <div v-if="!view" class="list-group">
-      <button type="button" class=" list-group-item list-group-item-action" @click="updateOptions($event,item)" v-for="item in data">
+      <button style="position:relative" type="button" class=" list-group-item list-group-item-action" @click="updateOptions($event,item)" v-for="item in data">
       
         <p v-if="item.title" class="my-1"   >{{item.title}}</p>
         <!-- this is used for multiple elements in the select -->
-        <component class="my-2" :is="item.listview" v-bind="item"></component>
+        <div class="my-2 me-4" v-else>
+        <component  :is="item.listview" v-bind="item"></component>
+        <i @click="deleteItem(item)" style="color:lightcoral; position:absolute; top:10px; right:10px;" class="fa fa-trash"></i>
+        
+        </div>
       </button>
     
     </div>

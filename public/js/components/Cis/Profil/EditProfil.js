@@ -38,17 +38,15 @@ export default {
   },
 
   methods: {
-
-    
     submitProfilChange(){
       
        if(this.topic && this.profilUpdate){
 
         //? inserts new row in public.tbl_cis_profil_update 
-      if(this.editData.update){
-        
-        Vue.$fhcapi.UserData.updateProfilRequest(this.topic,this.profilUpdate).then((res)=>{
-          
+        //* calls the update api call if an update field is present in the data that was passed to the module
+        Vue.$fhcapi.UserData[this.editData.update?'updateProfilRequest':'insertProfilRequest'](this.topic,this.profilUpdate).then((res)=>{
+          console.log("topic",this.topic);
+          console.log("profilUpdate",this.profilUpdate);
           if(res.data.error == 0){
             this.result= true;
             this.hide();
@@ -60,26 +58,6 @@ export default {
           } 
          
         });
-      
-      }else{
-
-        Vue.$fhcapi.UserData.insertProfilRequest(this.topic,this.profilUpdate).then((res)=>{
-          
-          
-          if(res.data.error == 0){
-            this.result= true;
-            this.hide();
-            Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
-          }else{
-            this.result= false;
-            this.hide();
-            Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
-          } 
-      
-        });
-        
-    }
-   
     }
     },
   },
@@ -116,7 +94,10 @@ export default {
       </ol>
     </nav>
 
-    <edit-profil-select v-model:breadcrumb="breadcrumb" v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
+    <pre>{{JSON.stringify(profilUpdate,null,2)}}</pre>
+    <pre>{{JSON.stringify(topic,null,2)}}</pre>
+
+    <edit-profil-select @submit="submitProfilChange" v-model:breadcrumb="breadcrumb" v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
    
 
     </template>

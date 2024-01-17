@@ -10,7 +10,7 @@ const Adresse = {
         
     },
     template:`
-    <div class="my-2 row justify-content-center align-items-center">
+    <div class="gy-2 row justify-content-center align-items-center">
     
     <!-- column 1 in the address row -->
     
@@ -166,6 +166,9 @@ const Kontakt = {
         <i v-if="data.zustellung" class="fa-solid fa-check"></i>
         <i v-else="data.zustellung" class="fa-solid fa-xmark"></i>
     </div>
+    
+    
+</div>
   </div>
     
     
@@ -344,13 +347,14 @@ const FetchProfilUpdates = {
         
     },
     template:`
+    <pre>{{JSON.stringify(data,null,2)}}</pre>
     <div class="table-responsive">
         <table class="m-0  table  table-hover">
             <thead>
                 <tr >
                 <th scope="col">Topic</th>
                 <th scope="col">Date of Request</th>
-                <th scope="col">Bearbeiten</th>
+                <th  scope="col">Bearbeiten</th>
                 <th style="white-space:normal" scope="col">Löschen</th>
                 </tr>
             </thead>
@@ -358,7 +362,8 @@ const FetchProfilUpdates = {
                 <tr v-for="item in data">
                 <td class="align-middle">{{item.topic}}</td>
                 <td class="align-middle">{{item.change_timestamp}}</td>
-                <td class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></td>
+                <td v-if="item.topic.toLowerCase().includes('delete')" class="align-middle text-center" >{{item.requested_change.adr_typ?item.requested_change.adr_typ:item.requested_change.kontakt}}</td>
+                <td v-else class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></td>
                 <td class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></td>
                 </tr>
             </tbody>

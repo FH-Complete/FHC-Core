@@ -19,7 +19,7 @@
 			 CACHE 1;
              
 		    ALTER TABLE public.tbl_cis_profil_update ALTER COLUMN profil_update_id SET DEFAULT nextval('public.tbl_cis_profil_update_id_seq');
-            ALTER TABLE public.tbl_cis_profil_update ADD CONSTRAINT cis_profil_udpate_topic_uid_unique UNIQUE (uid,topic);
+            --ALTER TABLE public.tbl_cis_profil_update ADD CONSTRAINT cis_profil_udpate_topic_uid_unique UNIQUE (uid,topic);
 
             GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_cis_profil_update TO vilesci;
             GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_cis_profil_update TO web; 

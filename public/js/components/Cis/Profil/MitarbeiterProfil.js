@@ -325,6 +325,9 @@ export default {
        
       };
 
+
+      console.log(JSON.stringify(this.data.editData,null,2));
+
   
   },
   mounted() {
