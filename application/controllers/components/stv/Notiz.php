@@ -61,6 +61,8 @@ class Notiz extends FHC_Controller
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->NotizModel->addJoin('public.tbl_notiz_dokument', 'notiz_id', 'LEFT');
 		$this->NotizModel->addSelect('*');
+		$this->NotizModel->addSelect("TO_CHAR(CASE WHEN public.tbl_notiz.updateamum >= public.tbl_notiz.insertamum 
+			THEN public.tbl_notiz.updateamum ELSE public.tbl_notiz.insertamum END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate");
 		$this->NotizModel->addLimit(1);
 
 		$result = $this->NotizModel->loadWhere(

@@ -13,6 +13,7 @@ export default {
 		'typeId',
 		'titel',
 		'text',
+		'lastChange',
 		'von',
 		'bis',
 		'statusNew',
@@ -49,6 +50,14 @@ export default {
 				this.$emit('update:text', value);
 			}
 		},
+/*		intLastChange: {
+			get() {
+				return this.lastChange;
+			},
+			set(value) {
+				this.$emit('update:lastChange', value);
+			}
+		},*/
 		intVon: {
 			get() {
 				return this.von;
@@ -142,6 +151,13 @@ export default {
 						<span class="small">[{{this.typeId}}]</span>
 					</div>
 				</div>
+				
+				<div class="row mb-3">
+					<div class="col-sm-7">
+						<p v-if="statusNew" class="fw-bold">Neue Notiz</p>
+						<p v-else class="fw-bold">Notiz bearbeiten</p>
+					</div>
+				</div>
 	
 				<div class="notizTitle row mb-3">
 					<label for="titel" class="form-label col-sm-2">Titel</label>
@@ -156,6 +172,7 @@ export default {
 						<textarea rows="5" cols="75" v-model="intText" class="form-control"></textarea>
 					</div>
 				</div>
+				
 			</div>
 	
 			<!-- show Documentupload-->
@@ -179,7 +196,7 @@ export default {
 						<PvAutoComplete v-model="intVerfasser" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
 					</div>
 					
-					<label for="von" class="form-label col-sm-1">von</label>
+					<label for="von" class="form-label col-sm-1">gültig von</label>
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="von"
@@ -198,7 +215,7 @@ export default {
 						<PvAutoComplete v-model="intBearbeiter" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
 					</div>
 					
-					<label for="bis" class="form-label col-sm-1">bis</label>
+					<label for="bis" class="form-label col-sm-1">gültig bis</label>
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="bis"
@@ -219,7 +236,15 @@ export default {
 					</div>
 				</div>
 			</div>
-				
+			
+			<div class="row mb-3">
+				<label for="lastChange" class="form-label col-sm-2 small">letzte Änderung</label>
+				<div class="col-sm-7">
+<!--					<input v-model="lastChange" >-->
+					<p class="small">{{this.lastChange}}</p>
+				</div>
+			</div>
+			
 		</form>
 
 	</div>`

@@ -37,6 +37,7 @@ export default {
 					{title: "Erledigt", field: "erledigt", visible: false},
 					{title: "Notiz_id", field: "notiz_id", visible: false},
 					{title: "Notizzuordnung_id", field: "notizzuordnung_id", visible: false},
+					{title: "letzte Änderung", field: "lastupdate", visible: false},
 					{
 						formatter: editIcon, cellClick: (e, cell) => {
 							this.actionEditNotiz(cell.getData().notiz_id);
@@ -66,6 +67,7 @@ export default {
 				titel: null,
 				statusNew: true,
 				text: null,
+				lastChange: null,
 				von: null,
 				bis: null,
 				document: null,
@@ -93,6 +95,7 @@ export default {
 					this.formData.titel = this.notizen.titel;
 					this.formData.statusNew = false;
 					this.formData.text = this.notizen.text;
+					this.formData.lastChange = this.notizen.lastupdate;
 					this.formData.von = this.notizen.start;
 					this.formData.bis = this.notizen.ende;
 					this.formData.document = this.notizen.dms_id;
@@ -115,6 +118,7 @@ export default {
 			this.formData.titel = '';
 			this.formData.statusNew = true;
 			this.formData.text = null;
+			this.formData.lastChange = null;
 			this.formData.von = null;
 			this.formData.bis = null;
 			this.formData.document = null;
@@ -212,6 +216,7 @@ export default {
 				titel: null,
 				statusNew: true,
 				text: null,
+				lastChange: null,
 				von: null,
 				bis: null,
 				document: null,
@@ -299,6 +304,7 @@ export default {
 			v-model:typeId="formData.typeId"
 			v-model:titel="formData.titel"
 			v-model:text="formData.text"
+			:lastChange="formData.lastChange"
 			v-model:statusNew="formData.statusNew"
 			v-model:von="formData.von"
 			v-model:bis="formData.bis"
@@ -312,7 +318,7 @@ export default {
 			
 		<button v-if="formData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
 		<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
-		
+
 	</div>
 	`
 };

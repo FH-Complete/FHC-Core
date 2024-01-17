@@ -266,9 +266,27 @@ class Notiz_model extends DB_Model
 	 */
 	public function getNotizWithDocEntries($id, $type)
 	{
+	// ci query builder returns null
+/*		$this->db->select('n.*, count(dms_id) as countDoc, z.notizzuordnung_id');
+		$this->db->select('(CASE WHEN n.updateamum >= n.insertamum THEN n.updateamum ELSE n.insertamum END) AS lastUpdate');
+		$this->db->from('public.tbl_notiz n');
+		$this->db->join('public.tbl_notizzuordnung z', 'n.notiz_id = z.notiz_id');
+		$this->db->join('public.tbl_notiz_dokument dok', 'n.notiz_id = dok.notiz_id', 'left');
+		$this->db->join('campus.tbl_dms_version', 'dok.notiz_id = campus.tbl_dms_version.dms_id', 'left');
+		$this->db->where("z.$type", $id);
+		$this->db->group_by('n.notiz_id, z.notizzuordnung_id');
+
+		$query = $this->db->get();
+		return $query->result();*/
+
+
 		$qry = "
 			SELECT 
-			    	n.*, count(dms_id) as countDoc, z.notizzuordnung_id
+			    	n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
+			    	TO_CHAR (CASE 
+						WHEN n.updateamum >= n.insertamum THEN n.updateamum 
+						ELSE n.insertamum
+					END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate
 			FROM
 			    	public.tbl_notiz n
 			JOIN 
@@ -284,6 +302,7 @@ class Notiz_model extends DB_Model
 		";
 
 		return $this->execQuery($qry, array($id));
+
 	}
 
 
