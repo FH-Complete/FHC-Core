@@ -77,6 +77,7 @@ class Student extends FHC_Controller
 		$this->form_validation->set_rules('semester', 'Semester', 'integer');
 
 		if ($this->form_validation->run() == false) {
+			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
 			return $this->outputJsonError($this->form_validation->error_array());
 		}
 
@@ -202,7 +203,11 @@ class Student extends FHC_Controller
 			}
 		}
 
-		$this->outputJsonSuccess(true);
+		$this->outputJson(success(array_fill_keys(array_merge(
+			array_keys($update_lehrverband),
+			array_keys($update_person),
+			array_keys($update_student)
+		), ''), 1));
 	}
 
 	public function check()
