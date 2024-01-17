@@ -43,16 +43,48 @@ export default {
         view:null,
         data:null,
         breadcrumbItems:[],
+        topic:null,
       }
     },
   
     methods: {
 
+      addItem: function(){
+        
+        this.view= this.topic == "Private Kontakte"?"EditKontakt":"EditAdresse" ;
+        console.log(this.view);
+        //? updates the topic when a Kontakt or an Address should be added
+        this.topic = this.topic == "Private Kontakte"?"Add Kontakte":"Add Adressen"
+        this.$emit('update:topic',this.topic);
+       
+        
+        
+        this.data= this.view=="EditAdresse"?
+        {
+          adresse_id: "to be defined",
+          strasse: "",
+          adr_typ: "",
+          plz: "",
+          ort: ""
+        }:
+        {
+          kontakt_id: "to be defined",
+          kontakttyp: "",
+          kontakt: "",
+          anmerkung: "",
+          zustellung: false
+        }
+        console.log(this.data);
+
+      },
+
       deleteItem: function(item){
         
         this.$emit('update:profilUpdate',item.data);
         //? updates the topic when a Kontakt or an Address should be deleted
-        this.$emit('update:topic',item.data.kontakt?"Delete Kontakte":"Delete Adressen");
+        this.topic = item.data.kontakt?"Delete Kontakte":"Delete Adressen";
+        this.$emit('update:topic',this.topic);
+
         this.$emit('submit');
       },
 
@@ -68,7 +100,8 @@ export default {
         
         if(item.title){
           //? emits the selected topic to the parent component
-          this.$emit('update:topic',item.title);
+          this.topic= item.title;
+          this.$emit('update:topic',this.topic);
         
           //? emits the new item for the breadcrumb in the parent component
           this.breadcrumbItems.push(item.title);
@@ -99,21 +132,32 @@ export default {
     },
    
     template: `
+   
   
-
-    <div v-if="!view" class="list-group">
-      <button style="position:relative" type="button" class=" list-group-item list-group-item-action" @click="updateOptions($event,item)" v-for="item in data">
+    <template v-if="!view">
+    <div  class="list-group">
+    <template v-for="item in data">
+      <div class="d-flex flex-row align-items-center">
+      <button style="position:relative" type="button" class=" list-group-item list-group-item-action" @click="updateOptions($event,item)" >
       
         <p v-if="item.title" class="my-1"   >{{item.title}}</p>
         <!-- this is used for multiple elements in the select -->
         <div class="my-2 me-4" v-else>
         <component  :is="item.listview" v-bind="item"></component>
-        <i @click="deleteItem(item)" style="color:lightcoral; position:absolute; top:10px; right:10px;" class="fa fa-trash"></i>
-        
         </div>
       </button>
-    
+      <button v-if="item.listview" @click="deleteItem(item)" type="button" class="mx-3 btn btn-danger btn-circle"><i class="fa fa-trash"></i>
+      </div>
+      </template>
     </div>
+    <div v-if="Array.isArray(data)" class="mt-4 d-flex justify-content-center">
+      
+      <button @click="addItem" type="button" class="btn btn-primary btn-circle"><i class="fa fa-plus"></i>
+      
+    </div>
+    
+    </template>
+    
 
     <div v-else-if="view==='text_input'" class="form-underline">
       <div class="form-underline-titel">{{data.titel?data.titel:'titel'}}</div>

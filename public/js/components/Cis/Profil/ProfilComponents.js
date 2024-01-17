@@ -205,14 +205,28 @@ const EditKontakt =  {
    
     <div class="gy-3 row align-items-center justify-content-center">
     
-   
+    <div v-if="data.kontakt_id =='to be defined'" class="col-12">
+        
+    
+        <div  class="form-underline">
+            <div class="form-underline-titel">Kontakttyp</div>
+    
+            <select :value="data.kontakttyp" @change="updateValue($event,'kontakttyp')" class="form-select" aria-label="Select Kontakttyp">
+                <option selected></option>
+                <option value="email">Email</option>
+                <option value="telefon">Telefon</option>
+                <option value="notfallkontakt">Notfallkontakt</option>
+            </select>    
+        </div>
+        
+    </div>
     <div class="col-12">
         
         <!-- rendering KONTAKT emails -->
    
 
         <div  class="form-underline">
-        <div class="form-underline-titel">{{data.kontakttyp}}</div>
+        <div class="form-underline-titel">{{data.kontakttyp?data.kontakttyp:'Kontakt'}}</div>
     
         <input  class="form-control"   :value="data.kontakt" @input="updateValue($event,'kontakt')" :placeholder="data.kontakt">
         </div>
