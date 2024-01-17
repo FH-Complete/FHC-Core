@@ -49,8 +49,7 @@ export default {
     methods: {
 
       deleteItem: function(item){
-        let data = item.data;
-        data.delete = true;
+        
         this.$emit('update:profilUpdate',item.data);
         //? updates the topic when a Kontakt or an Address should be deleted
         this.$emit('update:topic',item.data.kontakt?"Delete Kontakte":"Delete Adressen");

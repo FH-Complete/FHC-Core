@@ -85,42 +85,41 @@ class Profil extends Auth_Controller
 		
 	}
 
+
+
 	public function insertProfilRequest()
 	{
 
 		$json = json_decode($this->input->raw_input_stream);
-		
+		$payload = $json->payload;
+		$type = isset($json->payload->kontakt_id)? "kontakt_id" : "adresse_id";
 
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()" ];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "change_timestamp" => "NOW()" ];
 
-		//? gets all the requested changes from a user
+		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
-
-		
-		//? checks if the user already made a request to change a topic
-		//* Exception: a user can have multiple delete or add requests 
-			
+		if($res){
 		foreach($res as $update_request){
-			
-			//TODO: Check if a change request already exists before adding the delete request
+			$existing_change = json_decode($update_request->requested_change);
+
+			if(isset($existing_change->$type) && $existing_change->$type == $payload->$type){
+				//? the kontakt_id / adresse_id of a change has to be unique 
 				
-			if(property_exists($json->payload, "delete")){
-				
-				if(json_decode($update_request->requested_change) == $json->payload){
-				//? Check if the delete request for this resource already exists before adding the new delete request
-						
-					echo json_encode(error("this delete request already exists"));
-					return;	
-				}
-			}elseif(property_exists($json->payload, "add")){
-	
-			}elseif($update_request->topic == $json->topic && $update_request->uid == $this->uid){
-				
-				echo json_encode(error("uid and topic combination exists already"));
+				echo json_encode(error("cannot change the same resource twice"));
 				return;
 			}
-		}
+
+			
+			if(isset($payload->add)){
+				//TODO: add functionality for adding a new kontakt or address
+	
+			}elseif($update_request->topic == $json->topic && $update_request->uid == $this->uid){
+				//? if it is not a delete or add request than the topic in combination with the uid of the user have to be unique
+				echo json_encode(error("A request to change " + $json->topic + " is already open"));
+				return;
+			}
+		}}
 		
 		
 		
@@ -137,19 +136,7 @@ class Profil extends Auth_Controller
 				$insert_res->retval = date_create($editTimestamp)->format('d.m.Y');
 				echo json_encode($insert_res);
 			}
-			/* if (empty($res)) {
-		} else {
-			$update_res = $this->ProfilChangeModel->update([$this->uid], $data);
-			
-			if(isError($update_res)){
-				//catch error
-			}
-			$editTimestamp = $this->ProfilChangeModel->getTimestamp($this->uid);
-			//? status code 200 OK
-			$update_res->code = 200;
-			$update_res->retval = date_create($editTimestamp)->format('d.m.Y');;
-			echo json_encode($update_res);
-		} */
+		
 
 
 
@@ -449,7 +436,7 @@ class Profil extends Auth_Controller
 		if (
 
 			//? kontaktdaten soll auch nur der user selbst sehen
-			isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
+			isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt_id, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
@@ -662,7 +649,7 @@ class Profil extends Auth_Controller
 		if (
 
 			//? kontaktdaten soll auch nur der user selbst sehen
-			isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
+			isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt_id, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
