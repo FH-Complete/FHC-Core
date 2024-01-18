@@ -2,7 +2,12 @@
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import EditProfil from "./EditProfil.js";
 import {Adresse, Kontakt, FetchProfilUpdates} from "./ProfilComponents.js";
-
+import Mailverteiler from "./ProfilComponents/Mailverteiler.js"; 
+import AusweisStatus from "./ProfilComponents/FhAusweisStatus.js";
+import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import ProfilEmails from "./ProfilComponents/ProfilEmails.js"
+import RoleInformation from "./ProfilComponents/RoleInformation.js";
+import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
 export default {
   components: {
@@ -11,6 +16,12 @@ export default {
     Adresse,
     Kontakt,
     FetchProfilUpdates,
+    AusweisStatus,
+    Mailverteiler,
+    QuickLinks,
+    ProfilEmails,
+    RoleInformation,
+    ProfilInformation,
   },
   data() {
     return {
@@ -160,64 +171,30 @@ export default {
     
     },
   
-    sperre_foto_function() {
-      if (!this.data) {
-        return;
-      }
-      Vue.$fhcapi.UserData.sperre_foto_function(!this.data.foto_sperre).then((res) => {
-        this.data.foto_sperre = res.data.foto_sperre;
-      });
-    },
+    
     
   },
 
   computed: {
-
-    //? legacy mailto link to create an email with information that should be changed
-    refreshMailTo() {
-      return `mailto:info.mio@technikum-wien.at?subject=Datenkorrektur&body=Die%20Profildaten%20für%20User%20'${this.data.username}'%20sind%20nicht%20korrekt.%0DHier, die richtigen Daten:%0A%0ANachname:%20${this.data.nachname}%0AVorname:%20${this.data.vorname}%0AGeburtsdatum:${this.data.gebdatum}%0AGeburtsort:%20${this.data.gebort}%0ATitelPre:${this.data.titel}%20%0ATitelPost:${this.data.postnomen}%20%0A%0A***%0DPlatz für weitere (nicht angeführte Daten)%0D***%0A%0A[Bitte%20übermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Änderung]`;
-    },
-
-    get_image_base64_src() {
-      if (!this.data) {
-        return "";
-      }
-      return "data:image/jpeg;base64," + this.data.foto;
-    },
-
-    get_mitarbeiter_standort_telefon(){
-      if(this.data.standort_telefon){
-        return "tel:"+ this.data.telefonklappe + this.data.standort_telefon;
-      }else{
-        return null;
-      }
-    },
-    //? this computed function returns all the informations for the first column in the profil
-    personData() {
+     profilInformation() {
       if (!this.data) {
         return {};
       }
 
       return {
+        Vorname: this.data.vorname,
+        Nachname: this.data.nachname,
         Username: this.data.username,
         Anrede: this.data.anrede,
         Titel: this.data.titel,
         Postnomen: this.data.postnomen,
+        foto_sperre:this.data.foto_sperre,
+        foto:this.data.foto,
+
       };
     },
 
-    personKontakt() {
-      if (!this.data) {
-        return {};
-      }
-
-      return {
-        emails: this.data.emails,
-        
-      };
-    },
-
-    specialData() {
+    roleInformation() {
       if (!this.data) {
         return {};
       }
@@ -229,6 +206,10 @@ export default {
         Telefon:  (this.data.standort_telefon?this.data.standort_telefon:"") + " " + this.data.telefonklappe,
         Büro: this.data.ort_kurzbz,
       };
+    },
+
+    personEmails() {
+      return this.data?.emails ? this.data.emails : [];
     },
 
     privateKontakte() {
@@ -250,18 +231,6 @@ export default {
     },
     
 
-    kontaktInfo() {
-      if (!this.data) {
-        return {};
-      }
-
-      return {
-        FhAusweisStatus: this.data.zutrittsdatum,
-        emails: this.data.emails,
-        Kontakte: this.data.kontakte,
-        Adressen: this.data.adressen,
-      };
-    },
   },
  
   created() {
@@ -352,41 +321,18 @@ export default {
              
               <div class="row mb-3">
               <div class="col">
-                <p class="m-0">
-                <div class="card">
-                
-                <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                <u> Quick links</u>
-               </a>
-             
-                
-               </div>
-                 
-                </p>
-                <div class="mt-1 collapse" id="collapseExample">
-                  
-                  <div class="list-group">
-                   
-                    <a href="#" class="list-group-item list-group-item-action">Zeitwünsche</a>
-                    <a href="#" class="list-group-item list-group-item-action">Lehrveranstaltungen</a>
-                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren</a>
-                  </div>
-                </div>
+               
+                <quick-links :mobile="true"></quick-links>
               </div>
             </div>
 
             <!-- HERE STARTS THE ROW WITH REQUESTED CHANGES FROM THE USER -->
             <div class="row mb-3">
             <div class="col">
-              <div class="card">
-              <div class="card-header">
-              Profil Informations Änderungen Anfragen</div>
-              <div class="card-body">
+              
               <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
                     
-              </div>
-              </div>
-             
+              
             </div>
           </div>
 
@@ -432,96 +378,10 @@ export default {
                      <div class="col">
                      
                         
-                      <div class="card h-100">
-                      <div class="card-header">
-                      MitarbeiterIn
-                      </div>
-                      <div class="card-body">
-                      
-                       
+                     <!-- PROFIL INFORMATION -->
+                     <profil-information title="MitarbeiterIn" :data="profilInformation"></profil-information>
 
 
-                  
-                  <div  class="gy-3 row justify-content-center align-items-center">
-
-
-
-
-                  <!-- SQUEEZING THE IMAGE INSIDE THE FIRST INFORMATION COLUMN -->
- <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
-          <div class="col-12 col-sm-6 mb-2">
-           <div class="row justify-content-center">
-                        <div class="col-auto " style="position:relative">
-                          <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"></img>
-                          <!-- LOCKING IMAGE FUNCTIONALITY -->
-                          
-                          
-                          <div role="button" @click.prevent="sperre_foto_function" class="image-lock" >
-                          <i :class="{'fa':true, ...(data.foto_sperre?{'fa-lock':true}:{'fa-lock-open':true})} " ></i>
-                          </div>
-
-
-                        </div>
-                      </div>
-                    <!-- END OF THE ROW WITH THE IMAGE -->
-                    </div>
-<!-- END OF SQUEEZE -->
-
-
-
-<!-- COLUMNS WITH MULTIPLE ROWS NEXT TO PROFIL PICTURE -->
-                  <div class="col-12 col-sm-6">
-                  <div class="row gy-4">
-                  <div class="col-12">
-                  
-                        
-                  <div class="form-underline ">
-                  <div class="form-underline-titel">Vorname</div>
-                  <span class="form-underline-content">{{data.vorname}} </span>
-                  </div>
-
-
-                
-                </div>
-                <div class="col-12">
-              
-                <div class="form-underline ">
-                <div class="form-underline-titel">Nachname</div>
-                <span class="form-underline-content">{{data.nachname}} </span>
-                </div>
-
-                </div>
-                </div>
-             
-                
-                  </div>
-                  
-
-
-
-
-
-
-
-                  <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
-                  
-                  
-                  <div class="form-underline ">
-                  <div class="form-underline-titel">{{bez}}</div>
-                  <span class="form-underline-content">{{wert?wert:'-'}} </span>
-                  </div>
-                
-
-
-                  </div>
-
-                  
-                      </div>
-
-
-                      
-                      </div>
-                    </div>
 		    </div>
                     </div>
                      <div class="row mb-4">
@@ -529,57 +389,9 @@ export default {
 
                      <div  class=" col-lg-12">
         
-                     <div class="card">
-                 
-                         <div class="card-header">
-                         Mitarbeiter Information
-                         </div>
-                         <div class="card-body">
-                             <div class="gy-3 row">
-                             <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
-                             
-                            
-                             
-                             
-                               
-                                <div class="form-underline">
-                                <div class="form-underline-titel">{{bez }}</div>
+                   <!-- MITARBEITER INFO -->
+                    <role-information title="Mitarbeiter Information" :data="roleInformation"></role-information>
 
-                                <!-- print Telefon link -->
-                                <a :href="get_mitarbeiter_standort_telefon" v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon" class="form-underline-content">{{wert?wert:'-'}}</a>
-                                
-                                <!-- else print information -->
-                                <span v-else class="form-underline-content">{{wert?wert:'-'}}</span>
-                                </div>
-                                
-
-                         
-                             </div>
-
-
-                             <!-- Bearbeiten Button -->
-                             <div class="col-md-6 col-sm-12 ">
-                              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-primary" >
-                                <div class="row">
-                                  <div class="col-2">
-                                    <i class="fa fa-edit"></i>
-                                  </div>
-                                  <div class="col-10">Bearbeiten</div>
-                                </div>
-                              </button>
-
-                             <!-- simml -->
-
-                           
-                              
-                            
-
-                             </div>
-                             </div>
-                         
-                     </div>
-                     
-                 </div>
 
                      </div>  
                             
@@ -606,64 +418,11 @@ export default {
                     <div class="row mb-4">
                     <div class="col">
 
-
-                    <div class="card ">
-                    <div class="card-header">
-                    Mails
-                    </div>
-                   
-                    <div class="card-body">
-
-
+                    
+                    <!-- EMAILS -->
+                    <profil-emails :data="personEmails" ></profil-emails>
 
                    
-
-                      <div v-for="(wert,bezeichnung) in personKontakt">
-
-                      
-            
-                      <!-- HIER SIND DIE EMAILS -->
-                  
-
-                  
-                      <div  v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="gy-3 row justify-content-center ">
-                      <div v-for="email in wert" class="col-12 ">
-                     
-                            <div class="row align-items-center">
-                            
-                      <div class="col-1 text-center">
-
-                      <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
-
-                      </div>
-
-                      
-                      <div class="col-11">
-
-                      <div class="form-underline">
-                      <div class="form-underline-titel">{{email.type}}</div>
-                      <a :href="'mailto:'+email.email" class="form-underline-content">{{email.email}} </a>
-                      </div>
-                      
-                      
-                      </div>
-                      </div>
-                      </div>
-                          </div>
-
-                    
-                    
-                     
-
-
-
-
-                    
-                      </div>
-
-
-                    </div>
-                    </div>
                     </div></div>
 
                     <!-- HIER SIND DIE PRIVATEN KONTAKTE-->
@@ -759,26 +518,13 @@ export default {
 
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-
-
-              <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
-
-
-              <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
-              <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
+              
               <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
               <div class="col mb-3">
-                    <div  class="card">
-                      <div class="card-header">
-                      Profil Updates
-                      </div>
-                      <div class="card-body">
-                      <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
-                      </div>
-                      </div>
 
-                   
-                      
+
+                      <!-- PROFIL UPDATES -->
+                      <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
                   
                   </div>    
                   </div>
@@ -786,20 +532,8 @@ export default {
                 
                 <div class="col">
                  
-                    <div class="card">
-                      <div class="card-header">
-                      Quick Links
-                      </div>
-                      <div class="card-body">
-                      
-                       
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitwuensche</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Lehrveranstaltungen</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren</a>
-
-                      </div>
-                    </div>
-
+                    <!-- QUICK LINKS --> 
+                    <quick-links></quick-links>
                    
                       
                   
@@ -807,82 +541,21 @@ export default {
                 </div>
 
                 <div class="row mb-3" >
-                
-                
                 <div class="col-12">
-             
-             
-                
-                  <div class="card">
-                    <div class="card-body">
-                      <span>Der FH Ausweis ist am <b>{{data.zutrittsdatum}}</b> ausgegeben worden.</span>
-                    </div>
-                
-                </div>
-      
-         
-                </div>
-                
+                  <!-- AUSWEIS STATUS -->
+                  <ausweis-status :data="data.zutrittsdatum"></ausweis-status>
+                </div>                
                 </div>
 
-
-                <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
                 <div  class="row">
-                
                   <div class="col">
-                
-
-                  
-                  <!-- HIER SIND DIE MAILVERTEILER -->
-                    <div class="card">
-                      <div class="card-header">
-                      Mailverteilers
-                      </div>
-                      <div class="card-body">
-                      
-                        <h6 class="card-title">Sie sind Mitgglied in folgenden Verteilern:</h6>
-                        <div  class="card-text row text-break mb-2" v-for="verteiler in data?.mailverteiler">
-                          <div class="col-12 ">
-                            <div class="row">  
-                              <div class="col-1 ">
-                              
-                              <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
-                              
-                              </div>
-                              <div class="col">
-                                <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
-                              </div>
-                            </div>
-                           
-                          </div> 
-                          <div class="col-11 offset-1 ">{{verteiler.beschreibung}}</div>
-                        </div>
-
-                      </div>
-                    </div>
-
-
-
-
-
+                  <!-- MAILVERTEILER -->
+                    <mailverteiler  :data="data?.mailverteiler"></mailverteiler>
+                    
                   </div>
-
-                <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
                 </div>
-
-                <!-- END OF SIDE PANEL -->
-              </div>
-
-
-            
-
-
-
-          <!-- END OF CONTAINER ROW-->
-          
+              </div>          
       </div>
-      
-      <!-- END OF CONTAINER -->
   </div>
             
     `,

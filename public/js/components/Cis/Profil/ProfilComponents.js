@@ -223,8 +223,7 @@ const EditKontakt =  {
     },
     template:
     `
-    <pre>{{JSON.stringify(data)}}</pre>
-    <pre>{{originalValue}}</pre>
+    
     <div class="gy-3 row align-items-center justify-content-center">
     
     <div v-if="!data.kontakt_id" class="col-12">
@@ -386,7 +385,12 @@ const FetchProfilUpdates = {
         
     },
     template:`
-    <pre>{{JSON.stringify(data,null,2)}}</pre>
+   
+    <div  class="card">
+                      <div class="card-header">
+                      Profil Updates
+                      </div>
+                      <div class="card-body" >
     <div class="table-responsive">
         <table class="m-0  table  table-hover">
             <thead>
@@ -408,6 +412,9 @@ const FetchProfilUpdates = {
             </tbody>
         </table>
     </div>
+    </div>
+    </div>
+
     
     `
 };
