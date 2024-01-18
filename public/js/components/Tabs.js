@@ -12,7 +12,7 @@ export default {
 	],
 	props: {
 		// TODO(chris): rename to config?
-		configUrl: {
+		config: {
 			type: [String, Object],
 			required: true
 		},
@@ -43,7 +43,7 @@ export default {
 		}
 	},
 	watch: {
-		configUrl(n) {
+		config(n) {
 			this.initConfig(n);
 		}
 	},
@@ -101,7 +101,7 @@ export default {
 		}
 	},
 	created() {
-		this.initConfig(this.configUrl);
+		this.initConfig(this.config);
 	},
 	template: `
 	<div class="fhc-tabs d-flex" :class="vertical ? 'align-items-stretch' : 'flex-column'" v-if="Object.keys(tabs).length">
