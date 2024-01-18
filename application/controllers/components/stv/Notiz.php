@@ -100,7 +100,8 @@ class Notiz extends FHC_Controller
 			}
 		}
 
-		//Überprüfung ob type übergeben wurde (entweder Funktions- oder Postparameter)
+		//Überprüfung ob type übergeben wurde (via Funktions- oder Postparameter)
+		$type = null;
 		if ($paramTyp)
 			$type = $paramTyp;
 		if(isset($_POST['typeId']))
@@ -108,8 +109,10 @@ class Notiz extends FHC_Controller
 
 		if(!$type)
 		{
-			//Todo(manu) return error
-			var_dump("ERROR no type");
+			$result = error('kein Type für ID vorhanden', EXIT_ERROR);
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+
+			return $this->outputJson(getError($result));
 		}
 
 		//Form Validation
@@ -126,7 +129,7 @@ class Notiz extends FHC_Controller
 		$erledigt = $this->input->post('erledigt');
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
-		//$type = $this->input->post('typeId');
+		$type = $this->input->post('typeId');
 		$start = $this->input->post('von');
 		$ende = $this->input->post('bis');
 

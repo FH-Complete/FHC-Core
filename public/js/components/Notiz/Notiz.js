@@ -30,7 +30,6 @@ export default {
 			multiupload: true,
 			mitarbeiter: [],
 			filteredMitarbeiter: [],
-/*			filteredFirmen: []*/
 		}
 	},
 	computed: {
@@ -50,14 +49,6 @@ export default {
 				this.$emit('update:text', value);
 			}
 		},
-/*		intLastChange: {
-			get() {
-				return this.lastChange;
-			},
-			set(value) {
-				this.$emit('update:lastChange', value);
-			}
-		},*/
 		intVon: {
 			get() {
 				return this.von;
@@ -128,7 +119,6 @@ export default {
 		reset() {
 			this.$refs.form.reset();
 			this.intAnhang = null;
-			//this.$emit('update:anhang', []);
 		},
 
 		search(event) {
@@ -143,7 +133,8 @@ export default {
 
 	template: `
 	<div class="notiz-notiz">
-		<span v-for="(anhang,index) in intAnhang"> {{anhang.name}} {{index}}<br></span>
+<!--	<p>testausgaben child</p>
+		<span v-for="(anhang,index) in intAnhang"> {{anhang.name}} {{index}}<br></span>-->
 		<form ref="form" @submit.prevent class="row">
 			<div>
 				<div class="row mb-3">
@@ -240,7 +231,6 @@ export default {
 			<div class="row mb-3">
 				<label for="lastChange" class="form-label col-sm-2 small">letzte Änderung</label>
 				<div class="col-sm-7">
-<!--					<input v-model="lastChange" >-->
 					<p class="small">{{this.lastChange}}</p>
 				</div>
 			</div>

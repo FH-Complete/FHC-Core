@@ -150,7 +150,9 @@ export default {
 					});
 				}
 			}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
+				if (error.response) {
+					this.$fhcAlert.alertError(error.response.data);
+				}
 			}).finally(() => {
 				window.scrollTo(0, 0);
 			});
@@ -210,7 +212,6 @@ export default {
 		},
 		resetFormData(){
 			this.$refs.form.reset();
-			//sicherstellen, dass über props nur leere felder übergeben werden
 			this.formData = {
 				typeId: 'person_id',
 				titel: null,

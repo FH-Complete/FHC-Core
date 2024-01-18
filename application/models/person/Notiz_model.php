@@ -156,14 +156,21 @@ class Notiz_model extends DB_Model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 
 		//check if valid type
-		$isValidType = $this->NotizzuordnungModel->isValidType($type);
+		$result = $this->NotizzuordnungModel->isValidType($type);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 
+			$result = error($result->retval, EXIT_ERROR);
+			return $result;
+		}
+/*
 		if(!$isValidType)
 		{
 			//Todo manu (correct return to controller)
 			$msg = "datatype " . $type . " not implemented for notes";
 			return error($msg, EXIT_ERROR);
-		}
+		}*/
 
 		// Start DB transaction
 		$this->db->trans_start(false);
