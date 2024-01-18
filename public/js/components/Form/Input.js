@@ -14,7 +14,8 @@ export default {
 		bsFeedback: Boolean,
 		noAutoClass: Boolean,
 		type: String,
-		name: String
+		name: String,
+		containerClass: [String, Array, Object]
 	},
 	data() {
 		return {
@@ -23,6 +24,13 @@ export default {
 		}
 	},
 	computed: {
+		hasContainer() {
+			if (!this.bsFeedback)
+				return true;
+			if (this.containerClass)
+				return true;
+			return false;
+		},
 		lcType() {
 			if (!this.type)
 				return 'text';
@@ -37,6 +45,8 @@ export default {
 					return 'VueDatePicker';
 				case 'autocomplete':
 					return 'PvAutocomplete';
+				case 'uploadimage':
+					return 'UploadImage';
 				default:
 					return 'input';
 			}
@@ -133,7 +143,9 @@ export default {
 			if (this.tag == 'VueDatePicker' && !this._.components.VueDatePicker) {
 				this._.components.VueDatePicker = Vue.defineAsyncComponent(() => import("../vueDatepicker.js.php"));
 			} else if (this.tag == 'PvAutocomplete' && !this._.components.PvAutocomplete) {
-				this._.components.PvAutocomplete = Vue.defineAsyncComponent(() => import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/autocomplete/autocomplete.esm.min.js"));;
+				this._.components.PvAutocomplete = Vue.defineAsyncComponent(() => import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/autocomplete/autocomplete.esm.min.js"));
+			} else if (this.tag == 'UploadImage' && !this._.components.UploadImage) {
+				this._.components.UploadImage = Vue.defineAsyncComponent(() => import("./Upload/Image.js"));
 			}
 		}
 	},
@@ -149,7 +161,7 @@ export default {
 		// TODO(chris): wrap check in div?
 	},
 	template: `
-	<component :is="bsFeedback ? 'FhcFragment' : 'div'" class="position-relative">
+	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="containerClass">
 		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
 		<input v-if="tag == 'input'" :type="lcType" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
 		<textarea v-else-if="tag == 'textarea'" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)"></textarea>
@@ -197,7 +209,7 @@ export default {
 			>
 			<slot></slot>
 		</component>
-		<div v-if="valid !== undefined" :class="feedbackClass">
+		<div v-if="valid !== undefined && feedback.length" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">
 				{{msg}}

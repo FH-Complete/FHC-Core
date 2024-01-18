@@ -2,6 +2,8 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import {CoreRESTClient} from '../../../../../RESTClient.js';
 import ZeugnisActions from './Zeugnis/Actions.js';
 
+const LOCAL_STORAGE_ID = 'stv_details_noten_zeugnis_2024-01-11_stdsem_all';
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -13,12 +15,13 @@ export default {
 	data() {
 		return {
 			validStudent: true,
-			tabulatorEvents: []
+			tabulatorEvents: [],
+			stdsem: ''
 		};
 	},
 	computed: {
 		ajaxURL() {
-			return CoreRESTClient._generateRouterURI('components/stv/Noten/getZeugnis/' + this.student.prestudent_id);
+			return CoreRESTClient._generateRouterURI('components/stv/Noten/getZeugnis/' + this.student.prestudent_id + this.stdsem);
 		},
 		tabulatorOptions() {
 			return {
@@ -59,29 +62,50 @@ export default {
 			};
 		}
 	},
+	watch: {
+		ajaxURL(n) {
+			if (this.$refs.table)
+				this.$refs.table.tabulator.setData(n);
+		}
+	},
 	methods: {
 		setGrades(selected) {
 			CoreRESTClient
 				.post('components/stv/Noten/update', selected)
 				.then(this.$refs.table.reloadTable)
 				.catch(this.$fhcAlert.handleFormValidation);
+		},
+		saveStdsem(event) {
+			window.localStorage.setItem(LOCAL_STORAGE_ID, event.target.value ? 'true' : '');
 		}
 	},
+	created() {
+		const savedPath = window.localStorage.getItem(LOCAL_STORAGE_ID);
+		this.stdsem = savedPath ? '/all' : '';
+	},
+	// TODO(chris): phrasen
 	template: `
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
 		<div v-if="!validStudent">Kein Student</div>
-		<core-filter-cmpt
-			v-else
-			ref="table"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			table-only
-			:side-menu="false"
-			reload
-			>
-			<template #actions="{selected}">
-				<zeugnis-actions :selected="selected" @set-grades="setGrades"></zeugnis-actions>
-			</template>
-		</core-filter-cmpt>
+		<template v-else>
+			<div class="mb-3">
+				<select class="form-select" v-model="stdsem" @input="saveStdsem">
+					<option value="">Aktuelles Semester</option>
+					<option value="/all">Alle Semester</option>
+				</select>
+			</div>
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				reload
+				>
+				<template #actions="{selected}">
+					<zeugnis-actions :selected="selected" @set-grades="setGrades"></zeugnis-actions>
+				</template>
+			</core-filter-cmpt>
+		</template>
 	</div>`
 };
