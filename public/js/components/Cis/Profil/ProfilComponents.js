@@ -60,15 +60,24 @@ const Adresse = {
 const EditAdresse = {
     props:{data:Object},
     data(){
-        return{}
+        return{
+            originalValue:null,
+        }
     },
     methods:{
         updateValue: function(event,bind){
-            this.data[bind] = event.target.value;
-            this.$emit('profilUpdate',this.data);
+            //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid 
+            this.data[bind] = event.target.value === "" ? null : event.target.value;
+            this.$emit('profilUpdate',this.isChanged?this.data:null);
+        },
+    },
+    computed:{
+        isChanged: function(){
+            return this.originalValue !== JSON.stringify(this.data);
         },
     },
     created(){
+        this.originalValue = JSON.stringify(this.data);
         
     },
     template:`
@@ -183,7 +192,7 @@ const EditKontakt =  {
     },
     data(){
         return{
-
+            originalValue:null,
         }
     },
     methods:{
@@ -191,18 +200,31 @@ const EditKontakt =  {
             if(bind === 'zustellung'){
                 this.data[bind] = event.target.checked;    
             }else{
-                this.data[bind] = event.target.value;
+                //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid
+                this.data[bind] = event.target.value === ""  ? null: event.target.value;
             }
             
-            this.$emit('profilUpdate',this.data);
+            
+            this.$emit('profilUpdate',this.isChanged?this.data:null);
+            
         },
     },
+    computed:{
+        isChanged: function(){
+            //? returns true if the original passed data object was changed 
+            return JSON.stringify(this.data) !== this.originalValue;
+        }
+    },
     created(){
+
+        this.originalValue = JSON.stringify(this.data);
+       
         
     },
     template:
     `
-   
+    <pre>{{JSON.stringify(data)}}</pre>
+    <pre>{{originalValue}}</pre>
     <div class="gy-3 row align-items-center justify-content-center">
     
     <div v-if="!data.kontakt_id" class="col-12">
@@ -228,7 +250,7 @@ const EditKontakt =  {
         <div  class="form-underline">
         <div class="form-underline-titel">{{data.kontakttyp?data.kontakttyp:'Kontakt'}}</div>
     
-        <input  class="form-control"   :value="data.kontakt" @input="updateValue($event,'kontakt')" :placeholder="data.kontakt">
+        <input :disabled="data.kontakttyp?false:true"  class="form-control"   :value="data.kontakt" @input="updateValue($event,'kontakt')" :placeholder="data.kontakt">
         </div>
 
     

@@ -62,17 +62,19 @@ export default {
         
         this.data= this.view=="EditAdresse"?
         {
-          adresse_id: "",
-          strasse: "",
-          adr_typ: "",
-          plz: "",
-          ort: ""
+          added:true,
+          adresse_id: null,
+          strasse: null,
+          adr_typ: null,
+          plz: null,
+          ort: null
         }:
         {
-          kontakt_id: "",
-          kontakttyp: "",
-          kontakt: "",
-          anmerkung: "",
+          added:true,
+          kontakt_id: null,
+          kontakttyp: null,
+          kontakt: null,
+          anmerkung: null,
           zustellung: false
         }
 

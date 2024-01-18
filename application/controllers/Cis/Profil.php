@@ -446,6 +446,8 @@ class Profil extends Auth_Controller
 				// handle error	
 			} else {
 				$kontakte_res = hasData($kontakte_res) ? getData($kontakte_res) : null;
+				
+				
 			}
 
 		}
@@ -659,6 +661,7 @@ class Profil extends Auth_Controller
 				// handle error	
 			} else {
 				$kontakte_res = hasData($kontakte_res) ? getData($kontakte_res) : null;
+				
 			}
 
 		}
