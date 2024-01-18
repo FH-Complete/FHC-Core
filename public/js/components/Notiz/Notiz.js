@@ -1,4 +1,5 @@
 import VueDatePicker from '../vueDatepicker.js.php';
+import tinymce from '../tinymce.js.php';
 import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import File from '../Form/Upload/File.js';
 import {CoreRESTClient} from "../../RESTClient";
@@ -7,7 +8,8 @@ export default {
 	components: {
 		VueDatePicker,
 		File,
-		PvAutoComplete
+		PvAutoComplete,
+		tinymce
 	},
 	props: [
 		'typeId',
@@ -129,6 +131,26 @@ export default {
 					this.filteredMitarbeiter = CoreRESTClient.getData(result.data);
 				});
 		},
+		methods: {
+			initTinyMCE() {
+				//console.log(" before initfile");
+				tinymce.init({
+					selector: '#editor', // Use the ID of your textarea or div
+					plugins: ['autoresize', 'lists'],
+					toolbar: 'undo redo | styleselect | bold italic | bullist numlist',
+					autoresize_bottom_margin: 16,
+					setup: (editor) => {
+						// for additional setup or customization here
+					},
+				});
+			},
+		},
+	},
+	mounted() {
+		this.initTinyMCE();
+	},
+	beforeDestroy() {
+		tinymce.get('editor').destroy();
 	},
 
 	template: `
@@ -150,10 +172,28 @@ export default {
 					</div>
 				</div>
 	
-				<div class="notizTitle row mb-3">
+				<div class="row mb-3">
 					<label for="titel" class="form-label col-sm-2">Titel</label>
 					<div class="col-sm-7">
 						<input type="text" v-model="intTitel" class="form-control">
+					</div>
+				</div>
+				
+				<div class="row mb-3">
+				<!--TINYMCE-->
+				<label for="text" class="form-label col-sm-2">tinymce</label>
+					<div class="col-sm-7">
+					<tinymce id="editor"></tinymce>
+					  <textarea id="editor"  rows="5" cols="75" v-model="intText" class="form-control"></textarea>
+<!--					  <tinymce
+						api-key="no-api-key"
+						:init="{
+						  menubar: true,
+						  plugins: 'lists link image emoticons',
+						  toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+						}"
+					  />-->
+
 					</div>
 				</div>
 				
