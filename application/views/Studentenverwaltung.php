@@ -8,6 +8,7 @@
 		#'primevue3' => true,
 		#'filtercomponent' => true,
 		'tabulator5' => true,
+		'tinymce5' => true,
 		'phrases' => [],
 		'customCSSs' => [
 			'public/css/components/vue-datepicker.css',

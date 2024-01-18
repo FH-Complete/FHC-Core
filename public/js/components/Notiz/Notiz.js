@@ -1,7 +1,7 @@
 import VueDatePicker from '../vueDatepicker.js.php';
-import tinymce from '../tinymce.js.php';
 import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import File from '../Form/Upload/File.js';
+import FormUploadDms from '../Form/Upload/Dms.js';
 import {CoreRESTClient} from "../../RESTClient";
 
 export default {
@@ -9,12 +9,12 @@ export default {
 		VueDatePicker,
 		File,
 		PvAutoComplete,
-		tinymce
+		FormUploadDms
 	},
 	props: [
 		'typeId',
 		'titel',
-		'text',
+		'propText',
 		'lastChange',
 		'von',
 		'bis',
@@ -32,6 +32,7 @@ export default {
 			multiupload: true,
 			mitarbeiter: [],
 			filteredMitarbeiter: [],
+			zwischenvar: null
 		}
 	},
 	computed: {
@@ -51,6 +52,14 @@ export default {
 				this.$emit('update:text', value);
 			}
 		},
+/*		intPropText: {
+			get() {
+				return this.propText;
+			},
+			set(value) {
+				this.$emit('update:propText', value);
+			}
+		},*/
 		intVon: {
 			get() {
 				return this.von;
@@ -131,19 +140,35 @@ export default {
 					this.filteredMitarbeiter = CoreRESTClient.getData(result.data);
 				});
 		},
-		methods: {
-			initTinyMCE() {
-				//console.log(" before initfile");
-				tinymce.init({
-					selector: '#editor', // Use the ID of your textarea or div
-					plugins: ['autoresize', 'lists'],
-					toolbar: 'undo redo | styleselect | bold italic | bullist numlist',
-					autoresize_bottom_margin: 16,
-					setup: (editor) => {
-						// for additional setup or customization here
-					},
-				});
-			},
+		initTinyMCE() {
+			tinymce.init({
+				selector: '#editor',
+				//height: 800,
+				plugins: ['autoresize', 'lists'],
+				toolbar: "undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | outdent indent",
+
+				autoresize_bottom_margin: 16,
+				setup: (editor) => {
+
+/*					editor.on('input', () => {
+						this.$emit('update:propText', editor.getContent());
+					});*/
+
+					// workaround for avoiding conflict id of frame: same Id as textarea
+					// working just for new notes
+					//Todo(manu) find a solution for update notes
+					editor.on('input', () => {
+						this.intText = editor.getContent();
+						//this.$emit('update:intText', editor.getContent());
+
+					});
+				},
+			});
+		},
+		updateContent(event) {
+			// Manually update the content when the textarea is edited
+			tinymce.get('editor').setContent(event.target.value);
+			console.log(event.target.value);
 		},
 	},
 	mounted() {
@@ -152,7 +177,6 @@ export default {
 	beforeDestroy() {
 		tinymce.get('editor').destroy();
 	},
-
 	template: `
 	<div class="notiz-notiz">
 <!--	<p>testausgaben child</p>
@@ -178,44 +202,28 @@ export default {
 						<input type="text" v-model="intTitel" class="form-control">
 					</div>
 				</div>
-				
-				<div class="row mb-3">
-				<!--TINYMCE-->
-				<label for="text" class="form-label col-sm-2">tinymce</label>
-					<div class="col-sm-7">
-					<tinymce id="editor"></tinymce>
-					  <textarea id="editor"  rows="5" cols="75" v-model="intText" class="form-control"></textarea>
-<!--					  <tinymce
-						api-key="no-api-key"
-						:init="{
-						  menubar: true,
-						  plugins: 'lists link image emoticons',
-						  toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-						}"
-					  />-->
-
-					</div>
-				</div>
-				
+							
 				<div class="row mb-3">
 					<label for="text" class="form-label col-sm-2">Text</label>
+					
+					<!--tinymce-->
 					<div class="col-sm-7">
-						<textarea rows="5" cols="75" v-model="intText" class="form-control"></textarea>
+<!--						<textarea id="editor" rows="5" cols="75" @input="updateContent" class="form-control">{{ intText }}</textarea>-->
+						<textarea id="editor" rows="5" cols="75" @input="updateContent" class="form-control">{{ intText }}</textarea>
 					</div>
 				</div>
-				
-			</div>
 	
 			<!-- show Documentupload-->
 			<div v-if="showDocument">
 				<div class="row mb-3">
+				
 					<label for="text" class="form-label col-sm-2">Dokument</label>
-					
-				<!-- File component-->
-				<div  class="col-sm-7">
-					<File ref="upload" id="file" :multiupload="multiupload" v-model:dateien="intAnhang" ></File>
+					<div  class="col-sm-7 py-3">
+						<!--Upload Component-->
+						<FormUploadDms ref="upload" id="file" multiple v-model="intAnhang" ></FormUploadDms>
+					</div>
+				
 				</div>
-				<hr>
 			</div>
 			
 			<!-- show Details-->
@@ -274,8 +282,11 @@ export default {
 					<p class="small">{{this.lastChange}}</p>
 				</div>
 			</div>
-			
+					
 		</form>
+		
+		intText: {{intText}} |<br>propText:	{{propText}} |<br> text: {{text}}  <br> {{intPropText}}
+
 
 	</div>`
 }
