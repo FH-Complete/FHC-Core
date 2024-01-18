@@ -965,17 +965,16 @@ class konto extends basis_db
 		}
 	}
 
-	public function checkDoppelteBuchung($person_ids, $stsem, $typ)
+	public function checkDoppelteBuchung($person_ids, $stsem, $typen)
 	{
 		$qry = "SELECT person.vorname, person.nachname
 				FROM public.tbl_konto konto
 					JOIN public.tbl_person person USING(person_id)
 				WHERE konto.person_id IN (".$this->implode4SQL(array_filter($person_ids)).")
 					AND studiensemester_kurzbz = ".$this->db_add_param($stsem)."
-					AND buchungstyp_kurzbz = ".$this->db_add_param($typ)."
+					AND buchungstyp_kurzbz IN (".$this->implode4SQL($typen) .")
 				GROUP BY person.vorname, person.nachname
 				ORDER BY person.nachname, person.vorname";
-
 		if ($result = $this->db_query($qry))
 		{
 			$persons = array();

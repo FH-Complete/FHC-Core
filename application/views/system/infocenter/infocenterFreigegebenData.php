@@ -267,9 +267,12 @@ $query = '
 				LIMIT 1
 			) AS "AktenId",
 			(
-				SELECT SUM(konto.betrag)
+				SELECT
+					CASE
+						WHEN COUNT(CASE WHEN konto.betrag != 0 THEN 1 END) = 0 THEN null
+						ELSE SUM(konto.betrag)
+					END AS "Kaution"
 				FROM public.tbl_konto konto
-				LEFT JOIN tbl_konto skonto ON (skonto.buchungsnr_verweis = konto.buchungsnr)
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
 					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'

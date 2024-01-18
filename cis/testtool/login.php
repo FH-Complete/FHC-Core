@@ -126,10 +126,6 @@ if (isset($_REQUEST['prestudent']))
 			$rt->getReihungstestPerson($ps->person_id);
 			if (isset($rt->result[0]))
 				$reihungstest_id = $rt->result[0]->reihungstest_id;
-			else
-			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-			}
 		}
 		else
 		{
@@ -138,10 +134,6 @@ if (isset($_REQUEST['prestudent']))
 				// TODO Was ist wenn da mehrere Zurueckkommen?!
 				if (isset($rt->result[0]))
 					$reihungstest_id = $rt->result[0]->reihungstest_id;
-				else
-				{
-					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-				}
 			}
 			else
 			{

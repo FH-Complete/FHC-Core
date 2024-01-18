@@ -22,11 +22,13 @@
  * Authors: Werner Masik <werner.masik@gefi.at>
  * 
  */
-require_once('../../config/system.config.inc.php');
-require_once('../../include/appdaten.class.php');
-require_once('../../include/benutzer.class.php');
+require_once( __DIR__.'/../../config/system.config.inc.php');
+require_once( __DIR__.'/../../include/appdaten.class.php');
+require_once( __DIR__.'/../../include/benutzer.class.php');
 
-class AppdatenTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class AppdatenTest extends TestCase
 {
 	protected $benutzer;
 	protected $uid = 'unittest';

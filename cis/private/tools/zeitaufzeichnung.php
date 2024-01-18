@@ -41,11 +41,10 @@ require_once('../../../include/service.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/betriebsmittelperson.class.php');
 require_once('../../../include/globals.inc.php');
-require_once('../../../include/bisverwendung.class.php');
-require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/zeitaufzeichnung_import_csv.class.php');
 require_once('../../../include/zeitaufzeichnung_import_post.class.php');
+require_once('../../../include/vertragsbestandteil.class.php');
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
@@ -229,6 +228,21 @@ $( document ).ready(function()
 </script>
 ';
 
+echo <<<EOSBJS
+<script>
+	$(document).ready(function() {
+        const scrollDiv = document.createElement('div');
+        scrollDiv.style.cssText = 'width: 99px; height: 99px; overflow: scroll; position: absolute; top: -9999px;';
+        document.body.appendChild(scrollDiv);
+        const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+        document.body.removeChild(scrollDiv);
+		var marginright = Math.max((20 - scrollbarWidth), 0);
+        document.body.style.setProperty('width', 'calc(100% - ' + marginright + 'px)');
+    });
+</script>
+
+EOSBJS;
+
 echo '
         <script type="text/javascript">
 		$(document).ready(function()
@@ -303,7 +317,7 @@ echo '
 					Monat=Datum.substring(3,5);
 					Jahr=Datum.substring(6,10);
 					var day = Jahr + "-" + Monat + "-" + Tag;
-					checkBisverwendung(day,uid);
+					checkZeitaufzeichnung(day,uid);
 					checkZeitsperre(day,uid);
 				}
 			)
@@ -762,14 +776,15 @@ echo '
 			Monat=Datum.substring(3,5);
 			Jahr=Datum.substring(6,10);
 			var checkedDay = Jahr + "-" + Monat + "-" + Tag;
-			checkBisverwendung(checkedDay, uid);
+			checkZeitaufzeichnung(checkedDay, uid);
 			checkZeitsperre(checkedDay, uid);
 		}
 
-		function checkBisverwendung(day, uid)
+		function checkZeitaufzeichnung(day, uid)
 		{
+			/* Checkt nicht mehr Bisverwendung, sondern Vertragsbestandteil Zeitaufzeichnung */
 			$.ajax({
-  			url: "zeitaufzeichnung_bisverwendung.php",
+  			url: "zeitaufzeichnung_bisverwendung.php", 
   			data: {
   			  day: day,
 			  uid: uid
@@ -1395,23 +1410,15 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					echo '</table>';
 					echo '</td><td valign="top"><span id="zeitsaldo"></span><br>';
 
-					if (defined('DEFAULT_ALLIN_DIENSTVERTRAG') && DEFAULT_ALLIN_DIENSTVERTRAG != '')
+					$vbt = new vertragsbestandteil();
+					$isAllin = $vbt->isAllin($user);
+					
+					if ($isAllin)
 					{
-						$bisver = new bisverwendung();
-						$bisver->getLastVerwendung($user);
-		//				$ba1code = $bisver->ba1code;
-						$ba1code = null;
-
-						if (in_array($bisver->ba1code, DEFAULT_ALLIN_DIENSTVERTRAG))
-						{
-							echo '<span id="saldoAllin"></span><br><br>';
-						}
-						else
-							echo '<br>';
+						echo '<span id="saldoAllin"></span><br>';
 					}
-					else
-						echo '<br>';
 
+					echo '<br>';
 
 
 
@@ -1421,41 +1428,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				}
 				echo '</span></td></tr>';
 				echo '<tr><td style="float:right;">';
-
-		// Summen Lehre anzeigen
-		$bv = new bisverwendung();
-		$bv->getLastAktVerwendung($user);
-		$lehre_inkludiert = $bv->inkludierte_lehre;
-		if (!$lehre_inkludiert)
-			$lehre_inkludiert = 0;
-
-		$stsem = new studiensemester();
-		$sem_akt = $stsem->getakt();
-		$lehre = new zeitaufzeichnung();
-		$l_arr = $lehre->getLehreForUser($user, $sem_akt);
-		$displayLehresaldo = false;
-		if ($displayLehresaldo && ($l_arr["LehreAuftraege"]>0 || $l_arr["Lehre"] > 0 || $l_arr["LehreExtern"] > 0))
-		{
-			if ($lehre_inkludiert == -1)
-			{
-				$l_extern_soll = 0;
-				$lehre_inkludiert = $l_arr["LehreAuftraege"];
-			}
-			else
-				$l_extern_soll = $l_arr["LehreAuftraege"]-$lehre_inkludiert;
-			$l_extern_soll_norm = $l_extern_soll/4*3;
-			$lehre_inkludiert_norm = $lehre_inkludiert/4*3;
-			echo '<table style="border: 1px solid gray">';
-			echo '<tr><td colspan="3" style="border: 1px solid gray"><h3>Übersicht Lehre '.$sem_akt.'</h3></tr>';
-			echo '<tr><td colspan="3" style="border: 1px solid gray">(in Stunden)</tr>';
-			echo '<tr><td></td><td style="border: 1px solid gray">beauftragt (LE)</td><td style="border: 1px solid gray">gebucht</td></tr>';
-			if ($lehre_inkludiert > 0 || $l_arr["Lehre"] > 0)
-				echo '<tr><td style="border: 1px solid gray">Lehre:</td><td align="right" style="border: 1px solid gray">'.$lehre_inkludiert_norm.' ('.$lehre_inkludiert.')</td><td align="right" style="border: 1px solid gray">'.$l_arr["Lehre"].'</td></tr>';
-			if ($l_extern_soll > 0 || $l_arr["LehreExtern"] > 0)
-				echo '<tr><td style="border: 1px solid gray">LehreExtern:</td><td align="right" style="border: 1px solid gray">'.$l_extern_soll_norm.' ('.$l_extern_soll.')</td><td align="right" style="border: 1px solid gray">'.$l_arr["LehreExtern"].'</td></tr>';
-
-			echo '</table>';
-		}
 
 		echo '</td></tr>';
 		echo '</table>';
@@ -1578,21 +1550,21 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 					$linkInformation =  APP_ROOT. 'skin/images/information.png';
 
 					$za = new zeitaufzeichnung();
-					$verwendung = new bisverwendung();
+
 					if ($za->checkPausenErrors($user, $tag))
 					{
-						$verwendung->getVerwendungDatum($user, $tag);
-						foreach ($verwendung->result as $v)
+						$vbt = new vertragsbestandteil();
+						$isAzgrelevant = $vbt->isAzgRelevant($user, $tag);
+
+						if ($isAzgrelevant)
 						{
-							if ($v->azgrelevant)
-							{
-								$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz -- </span>';
-							}
-							else
-							{
-								$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
-							}
+							$pausefehlt_str = '<span style="color:red; font-weight:bold;"> <img src= '. $linkExclamation. '> -- Pause fehlt oder zu kurz -- </span>';
 						}
+						else
+						{
+							$pausefehlt_str = '<span style="color:steelblue; font-weight:bold;"> <img src= '. $linkInformation. '> -- Pause fehlt --</span>';
+						}
+
 					}
 
 					$tagessaldo = date('H:i', ($tagessaldo));
@@ -1621,7 +1593,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
 			        <td '.$style.' colspan="3" align="right">';
 					if ($tag > $sperrdatum)
-					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
+					echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&larr;</a>';
 
 					echo '</td></tr>';
 
