@@ -58,3 +58,11 @@
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
 }
+
+.form-control-color.is-invalid,
+.was-validated .form-control-color:invalid,
+.form-control-color.is-valid,
+.was-validated .form-control-color:valid {
+	padding-right: .375rem;
+	background-image: none;
+}

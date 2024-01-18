@@ -115,6 +115,9 @@ export default {
 					case 'datepicker':
 						classes.push('p-0');
 						classes.push('border-0');
+					case 'color':
+						if (!c.includes('form-control-color'))
+							classes.push('form-control-color');
 					case 'text':
 					case 'number':
 					case 'password':
