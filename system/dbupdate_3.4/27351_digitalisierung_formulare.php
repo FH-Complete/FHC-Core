@@ -37,12 +37,28 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statust
 			('ErsteAufforderungVersandt', '{\"1.Aufforderung Versandt\",\"1st Request Sent\"}'),
 			('ZweiteAufforderungVersandt', '{\"2.Aufforderung Versandt\",\"2nd Request Sent\"}'),
 			('Beeinsprucht', '{\"Beeinsprucht\",\"Objected\"}'),
-			('EinspruchAbgelehnt', '{\"Einspruch abgelehnt\",\"Objection denied\"}');
+			('EinspruchAbgelehnt', '{\"Einspruch abgelehnt\",\"Objection denied\"}'),
+			('Abgemeldet', '{\"Abgemeldet\",\"Deregistered\"}');
 			";
 		if (!$db->db_query($qry))
 			echo '<strong>campus.tbl_studierendenantrag_statustyp (insert): '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>campus.tbl_studierendenantrag_statustyp: table prefilled';
+	}
+}
+if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statustyp WHERE studierendenantrag_statustyp_kurzbz = 'Abgemeldet' "))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_studierendenantrag_statustyp
+			(studierendenantrag_statustyp_kurzbz, bezeichnung)
+			VALUES
+			('Abgemeldet', '{\"Abgemeldet\",\"Deregistered\"}');
+			";
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_studierendenantrag_statustyp (insert): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.tbl_studierendenantrag_statustyp: "Abgemeldet" added';
 	}
 }
 
@@ -170,9 +186,12 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
-if (!$result = @$db->db_query("SELECT campus.get_status_studierendenantrag(0)")) {
+if (!$result = @$db->db_query("SELECT campus.get_status_studierendenantrag(0)"))
+{
 	$qry = 'CREATE FUNCTION campus.get_status_studierendenantrag(integer) RETURNS character varying
     LANGUAGE plpgsql
+    STABLE
+    RETURNS NULL ON NULL INPUT
     AS $_$
         DECLARE i_studierendenantrag_id ALIAS FOR $1;
         DECLARE rec RECORD;
@@ -194,10 +213,25 @@ if (!$result = @$db->db_query("SELECT campus.get_status_studierendenantrag(0)"))
 	else
 		echo '<br>campus.get_status_studierendenantrag(integer): function created';
 }
+elseif ($result = @$db->db_query("SELECT 1 FROM pg_proc WHERE proname='get_status_studierendenantrag' AND provolatile='s'"))
+{
+	if ($db->db_num_rows($result) == 0) {
+		$qry = 'ALTER FUNCTION campus.get_status_studierendenantrag(integer) STABLE;';
+		$qry .= 'ALTER FUNCTION campus.get_status_studierendenantrag(integer) RETURNS NULL ON NULL INPUT;';
 
-if (!$result = @$db->db_query("SELECT campus.get_status_id_studierendenantrag(0)")) {
+		if(!$db->db_query($qry))
+			echo '<strong>campus.get_status_studierendenantrag(integer): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.get_status_studierendenantrag(integer): function updated';
+	}
+}
+
+if (!$result = @$db->db_query("SELECT campus.get_status_id_studierendenantrag(0)"))
+{
 	$qry = 'CREATE FUNCTION campus.get_status_id_studierendenantrag(integer) RETURNS integer
     LANGUAGE plpgsql
+    STABLE
+    RETURNS NULL ON NULL INPUT
     AS $_$
         DECLARE i_studierendenantrag_id ALIAS FOR $1;
         DECLARE rec RECORD;
@@ -219,10 +253,24 @@ if (!$result = @$db->db_query("SELECT campus.get_status_id_studierendenantrag(0)
 	else
 		echo '<br>campus.get_status_id_studierendenantrag(integer): function created';
 }
+elseif ($result = @$db->db_query("SELECT 1 FROM pg_proc WHERE proname='get_status_id_studierendenantrag' AND provolatile='s'"))
+{
+	if ($db->db_num_rows($result) == 0) {
+		$qry = 'ALTER FUNCTION campus.get_status_id_studierendenantrag(integer) STABLE;';
+		$qry .= 'ALTER FUNCTION campus.get_status_id_studierendenantrag(integer) RETURNS NULL ON NULL INPUT;';
 
-if (!$result = @$db->db_query("SELECT public.get_absem_prestudent(0, null)")) {
+		if(!$db->db_query($qry))
+			echo '<strong>campus.get_status_id_studierendenantrag(integer): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.get_status_id_studierendenantrag(integer): function updated';
+	}
+}
+
+if (!$result = @$db->db_query("SELECT public.get_absem_prestudent(0, null)"))
+{
 	$qry = 'CREATE FUNCTION public.get_absem_prestudent(integer, character varying) RETURNS integer
     LANGUAGE plpgsql
+    STABLE
     AS $_$
         DECLARE i_prestudent_id ALIAS FOR $1;
         DECLARE cv_studiensemester_kurzbz ALIAS FOR $2;
@@ -253,9 +301,22 @@ if (!$result = @$db->db_query("SELECT public.get_absem_prestudent(0, null)")) {
 	else
 		echo '<br>public.get_absem_prestudent(integer, character varying): function created';
 }
-if (!$result = @$db->db_query("SELECT public.get_stdsem_prestudent(0, null)")) {
+elseif ($result = @$db->db_query("SELECT 1 FROM pg_proc WHERE proname='get_absem_prestudent' AND provolatile='s'"))
+{
+	if ($db->db_num_rows($result) == 0) {
+		$qry = 'ALTER FUNCTION public.get_absem_prestudent(integer, character varying) STABLE;';
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.get_absem_prestudent(integer, character varying): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.get_absem_prestudent(integer, character varying): function updated';
+	}
+}
+if (!$result = @$db->db_query("SELECT public.get_stdsem_prestudent(0, null)"))
+{
 	$qry = 'CREATE FUNCTION public.get_stdsem_prestudent(integer, character varying) RETURNS character varying
     LANGUAGE plpgsql
+    STABLE
     AS $_$
         DECLARE i_prestudent_id ALIAS FOR $1;
         DECLARE cv_studiensemester_kurzbz ALIAS FOR $2;
@@ -285,6 +346,29 @@ if (!$result = @$db->db_query("SELECT public.get_stdsem_prestudent(0, null)")) {
 		echo '<strong>public.get_stdsem_prestudent(integer, character varying): '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.get_stdsem_prestudent(integer, character varying): function created';
+}
+elseif ($result = @$db->db_query("SELECT 1 FROM pg_proc WHERE proname='get_stdsem_prestudent' AND provolatile='s'"))
+{
+	if ($db->db_num_rows($result) == 0) {
+		$qry = 'ALTER FUNCTION public.get_stdsem_prestudent(integer, character varying) STABLE;';
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.get_stdsem_prestudent(integer, character varying): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.get_stdsem_prestudent(integer, character varying): function updated';
+	}
+}
+
+if ($result = @$db->db_query("SELECT 1 FROM pg_proc WHERE proname='get_rolle_prestudent' AND provolatile='s'"))
+{
+	if ($db->db_num_rows($result) == 0) {
+		$qry = 'ALTER FUNCTION public.get_rolle_prestudent(integer, character varying) STABLE;';
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.get_rolle_prestudent(integer, character varying): '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.get_rolle_prestudent(integer, character varying): function updated';
+	}
 }
 
 if($result = @$db->db_query("SELECT 1 FROM public.tbl_status_grund WHERE statusgrund_kurzbz = 'abbrecherStgl';"))
