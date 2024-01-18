@@ -13,6 +13,8 @@ export default {
 	props: {
 		bsFeedback: Boolean,
 		noAutoClass: Boolean,
+		noFeedback: Boolean,
+		inputGroup: Boolean,
 		type: String,
 		name: String,
 		containerClass: [String, Array, Object]
@@ -29,7 +31,37 @@ export default {
 				return true;
 			if (this.containerClass)
 				return true;
+			if (this.autoContainerClass)
+				return true;
 			return false;
+		},
+		acc() {
+			if (!this.containerClass)
+				return {};
+			if (typeof this.containerClass === 'string' || this.containerClass instanceof String)
+				return this.containerClass.split(' ').reduce((a,c) => {a[c] = true; return a}, {});
+			if (Array.isArray(this.containerClass))
+				return this.containerClass.reduce((a,c) => {a[c] = true; return a}, {});
+			return this.containerClass;
+		},
+		autoContainerClass() {
+			if (this.noAutoClass)
+				return this.acc;
+			
+			const acc = {...this.acc};
+			
+			if (this.inputGroup)
+				acc['input-group-item'] = true;
+
+			if (this.lcType == 'radio' || this.lcType == 'checkbox')
+				acc['form-check'] = true;
+			
+			if (this.inputGroup && acc['form-check']) {
+				acc['input-group-item'] = false;
+				acc['form-check'] = false;
+				acc['input-group-text'] = true;
+			}
+			return acc;
 		},
 		lcType() {
 			if (!this.type)
@@ -47,6 +79,9 @@ export default {
 					return 'PvAutocomplete';
 				case 'uploadimage':
 					return 'UploadImage';
+				case 'uploadfile':
+				case 'uploaddms':
+					return 'UploadDms';
 				default:
 					return 'input';
 			}
@@ -81,6 +116,8 @@ export default {
 						classes.push('p-0');
 						classes.push('border-0');
 					case 'text':
+					case 'number':
+					case 'password':
 					case 'textarea':
 						if (!c.includes('form-control'))
 							classes.push('form-control');
@@ -146,6 +183,8 @@ export default {
 				this._.components.PvAutocomplete = Vue.defineAsyncComponent(() => import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/autocomplete/autocomplete.esm.min.js"));
 			} else if (this.tag == 'UploadImage' && !this._.components.UploadImage) {
 				this._.components.UploadImage = Vue.defineAsyncComponent(() => import("./Upload/Image.js"));
+			} else if (this.tag == 'UploadDms' && !this._.components.UploadDms) {
+				this._.components.UploadDms = Vue.defineAsyncComponent(() => import("./Upload/Dms.js"));
 			}
 		}
 	},
@@ -158,10 +197,9 @@ export default {
 	mounted() {
 		if (this.$registerToForm)
 			this.$registerToForm(this);
-		// TODO(chris): wrap check in div?
 	},
 	template: `
-	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="containerClass">
+	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
 		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
 		<input v-if="tag == 'input'" :type="lcType" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
 		<textarea v-else-if="tag == 'textarea'" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)"></textarea>
@@ -174,10 +212,11 @@ export default {
 			:type="type"
 			v-model="modelValueCmp"
 			v-bind="$attrs"
-			:uid="idCmp.substr(9)"
+			:uid="idCmp ? idCmp.substr(9) : idCmp"
 			:name="name"
 			:class="validationClass"
-			:input-class-name="[...Object.entries({'form-control': !noAutoClass, 'is-valid': valid === true, 'is-invalid': valid === false}).reduce((a,[k,v]) => {if(v) a.push(k);return a}, []), ...($attrs['input-class-name'] ? $attrs['input-class-name'].split(' ') : [])].join(' ')"
+			:input-class-name=
+			"[...Object.entries({'form-control': !noAutoClass, 'is-valid': valid === true, 'is-invalid': valid === false}).reduce((a,[k,v]) => {if(v) a.push(k);return a}, []), ...($attrs['input-class-name'] ? $attrs['input-class-name'].split(' ') : [])].join(' ')"
 			@update:model-value="clearValidation"
 			>
 			<slot></slot>
@@ -189,9 +228,24 @@ export default {
 			v-model="modelValueCmp"
 			v-bind="$attrs"
 			:id="idCmp"
-			:name="name"
+			:input-props="{name}"
 			:class="validationClass"
 			:input-class="[...Object.entries({'form-control': !noAutoClass, 'is-valid': valid === true, 'is-invalid': valid === false}).reduce((a,[k,v]) => {if(v) a.push(k);return a}, []), ...($attrs['input-class'] ? $attrs['input-class'].split(' ') : [])].join(' ')"
+			@update:model-value="clearValidation"
+			>
+			<slot></slot>
+		</component>
+		<component
+			v-else-if="tag == 'UploadDms'"
+			:is="tag"
+			:type="type"
+			v-model="modelValueCmp"
+			v-bind="$attrs"
+			:id="idCmp"
+			:name="name"
+			:class="validationClass"
+			:input-class="validationClass"
+			:no-list="inputGroup"
 			@update:model-value="clearValidation"
 			>
 			<slot></slot>
@@ -209,13 +263,13 @@ export default {
 			>
 			<slot></slot>
 		</component>
-		<div v-if="valid !== undefined && feedback.length" :class="feedbackClass">
+		<label v-if="$attrs.label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{$attrs.label}}</label>
+		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">
 				{{msg}}
 			</template>
 		</div>
-		<label v-if="$attrs.label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{$attrs.label}}</label>
 	</component>
 	`
 }

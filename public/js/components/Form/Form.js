@@ -30,6 +30,14 @@ export default {
 				if (!a[name])
 					a[name] = [];
 				a[name].push(c);
+
+				if (c.lcType == 'checkbox' && name.substr(-1) == ']' && name.indexOf('[')) {
+					name = name.substr(0, name.lastIndexOf('['));
+					if (!a[name])
+						a[name] = [];
+					a[name].push(c);
+				}
+
 				return a;
 			}, {});
 		}

@@ -9,7 +9,9 @@ export default {
 		},
 		multiple: Boolean,
 		id: String,
-		name: String
+		name: String,
+		inputClass: [String, Array, Object],
+		noList: Boolean
 	},
 	methods: {
 		stringifyFile(file) {
@@ -71,8 +73,8 @@ export default {
 	},
 	template: `
 	<div class="form-upload-dms">
-		<input ref="upload" class="form-control" :id="id" :name="name" :multiple="multiple" type="file" @change="addFiles">
-		<ul v-if="modelValue.length && multiple" class="list-unstyled m-0">
+		<input ref="upload" class="form-control" :class="inputClass" :id="id" :name="name" :multiple="multiple" type="file" @change="addFiles">
+		<ul v-if="modelValue.length && multiple && !noList" class="list-unstyled m-0">
 			<li v-for="(file, index) in modelValue" :key="index" class="d-flex mx-1 mt-1">
 				<span class="col-auto"><i class="fa fa-file me-1"></i></span>
 				<span class="col">{{ file.name }}</span>
