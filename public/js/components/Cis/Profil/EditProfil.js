@@ -39,7 +39,7 @@ export default {
 
   methods: {
     submitProfilChange(){
-      
+        //TODO: check if the updated value is different from the original value before submitting the request
        if(this.topic && this.profilUpdate){
 
         //? inserts new row in public.tbl_cis_profil_update 
@@ -94,9 +94,7 @@ export default {
       </ol>
     </nav>
 
-    <pre>{{JSON.stringify(profilUpdate,null,2)}}</pre>
-    <pre>{{JSON.stringify(topic,null,2)}}</pre>
-
+   
     <edit-profil-select @submit="submitProfilChange" v-model:breadcrumb="breadcrumb" v-model:topic="topic" v-model:profilUpdate="profilUpdate" ariaLabel="test" :list="editData"></edit-profil-select>
    
 

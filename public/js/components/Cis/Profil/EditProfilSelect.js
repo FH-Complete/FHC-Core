@@ -52,29 +52,29 @@ export default {
       addItem: function(){
         
         this.view= this.topic == "Private Kontakte"?"EditKontakt":"EditAdresse" ;
-        console.log(this.view);
+        
         //? updates the topic when a Kontakt or an Address should be added
         this.topic = this.topic == "Private Kontakte"?"Add Kontakte":"Add Adressen"
         this.$emit('update:topic',this.topic);
-       
+        this.breadcrumbItems.push(this.topic);
+        this.$emit('update:breadcrumb',this.breadcrumbItems);
         
         
         this.data= this.view=="EditAdresse"?
         {
-          adresse_id: "to be defined",
+          adresse_id: "",
           strasse: "",
           adr_typ: "",
           plz: "",
           ort: ""
         }:
         {
-          kontakt_id: "to be defined",
+          kontakt_id: "",
           kontakttyp: "",
           kontakt: "",
           anmerkung: "",
           zustellung: false
         }
-        console.log(this.data);
 
       },
 

@@ -205,7 +205,7 @@ const EditKontakt =  {
    
     <div class="gy-3 row align-items-center justify-content-center">
     
-    <div v-if="data.kontakt_id =='to be defined'" class="col-12">
+    <div v-if="!data.kontakt_id" class="col-12">
         
     
         <div  class="form-underline">
@@ -236,9 +236,8 @@ const EditKontakt =  {
        
 
     </div>
-    <div v-if="data?.anmerkung" class="col-12">
+    <div class="col-12">
         
-
     <div  class="form-underline">
     <div class="form-underline-titel">Anmerkung</div>
 
@@ -303,6 +302,10 @@ const FetchProfilUpdates = {
             switch(topic){
                 case "Private Kontakte" : return "EditKontakt"; break;
                 case "Private Adressen" : return "EditAdresse"; break;
+                case "Add Adressen" : return "EditAdresse"; break;
+                case "Add Kontakte" : return "EditKontakt"; break;
+                case "Delete Adressen" : return "EditAdresse"; break;
+                case "Delete Kontakte" : return "EditKontakt"; break;
                 default: return "text_input"; break;
             }
         },
