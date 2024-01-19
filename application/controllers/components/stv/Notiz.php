@@ -50,7 +50,7 @@ class Notiz extends FHC_Controller
 		}
 		else
 		{
-			//Todo manu (correct return to ajax)
+			//Todo manu (phrases, response?)
 			$result = "datatype not yet implemented for notes";
 			$this->outputJson(getError($result));
 		}
@@ -107,6 +107,8 @@ class Notiz extends FHC_Controller
 		if(isset($_POST['typeId']))
 			$type = $this->input->post('typeId');
 
+		//var_dump($_POST);
+
 		if(!$type)
 		{
 			$result = error('kein Type für ID vorhanden', EXIT_ERROR);
@@ -155,7 +157,9 @@ class Notiz extends FHC_Controller
 				'insertvon'         => $uid
 			);
 
-			$result = $this->dmslib->upload($dms, $k, array('pdf'));
+			//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
+			$result = $this->dmslib->upload($dms, $k, ['*']);
+/*			$result = $this->dmslib->upload($dms, $k, ['application/pdf','application/x.fhc-dms+json']);*/
 			if (isError($result))
 			{
 				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -221,7 +225,7 @@ class Notiz extends FHC_Controller
 		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
-		$type = $this->input->post('typeId');
+		//$type = $this->input->post('typeId'); //soll auch dieser geändert werden können?
 		$start = $this->input->post('von');
 		$ende = $this->input->post('bis');
 
@@ -247,34 +251,90 @@ class Notiz extends FHC_Controller
 			return $this->outputJson(getError($result));
 		}
 
-		//Todo(manu) update von Notizzuordnung?? typeId?
+		//update(1) laden aller bereits mit dieser notiz_id verknüpften DMS-Einträge
+		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
+		$this->NotizdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
 
-		//neue Files speichern
-		//Todo(manu) update files
+		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			$this->outputJson(getError($result));
+		}
+		elseif (!hasData($result))
+		{
+			$dms_id_arr = null;
+		}
+		else
+		{
+			$result = getData($result);
+			foreach($result as $doc) {
+				$dms_id_arr[] = array(
+					'name' => $doc->name,
+					'dms_id' => $doc->dms_id
+					);
+			}
+		}
+
 		foreach ($_FILES as $k => $file)
 		{
-			$dms = array(
-				'kategorie_kurzbz'  => 'notiz',
-				'version'           => 0,
-				'name'              => $file["name"],
-				'mimetype'          => $file["type"],
-				'insertamum'        => date('c'),
-				'insertvon'         => $uid
-			);
-
-			$result = $this->dmslib->upload($dms, $k, array('pdf'));
-			if (isError($result))
+			//update(2) alle neuen files (alle außer type application/x.fhc-dms+json) anhängen
+			if($file["type"] == 'application/x.fhc-dms+json')
 			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
+				$dms_uploaded[] = array(
+					'name' => $file["name"]
+				);
 			}
-			$dms_id = $result->retval['dms_id'];
-
-			$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
-			if (isError($result))
+			else
 			{
-				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-				return $this->outputJson(getError($result));
+				$dms = array(
+					'kategorie_kurzbz'  => 'notiz',
+					'version'           => 0,
+					'name'              => $file["name"],
+					'mimetype'          => $file["type"],
+					'insertamum'        => date('c'),
+					'insertvon'         => $uid
+				);
+
+				//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
+				$result = $this->dmslib->upload($dms, $k, array('*'));
+
+				if (isError($result))
+				{
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson(getError($result));
+				}
+				$dms_id = $result->retval['dms_id'];
+
+				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
+				if (isError($result))
+				{
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson(getError($result));
+				}
+			}
+		}
+
+		//update(3) check if Dateien gelöscht wurden
+		if(count($dms_uploaded) != count($dms_id_arr))
+		{
+			$upload_new_names = array_column($dms_uploaded, "name");
+
+			$filesDeleted = array_filter($dms_id_arr, function ($file) use ($upload_new_names) {
+				return !in_array($file["name"], $upload_new_names);
+			});
+
+			foreach ($filesDeleted as $file)
+			{
+				$result = $this->dmslib->removeAll($file['dms_id']);
+
+				if (isError($result))
+				{
+					$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+					return $this->outputJson(getError($result));
+				}
+				else
+					$this->outputJson($result);
 			}
 		}
 		return $this->outputJsonSuccess(true);

@@ -32,7 +32,6 @@ export default {
 			multiupload: true,
 			mitarbeiter: [],
 			filteredMitarbeiter: [],
-			zwischenvar: null
 		}
 	},
 	computed: {
@@ -52,14 +51,6 @@ export default {
 				this.$emit('update:text', value);
 			}
 		},
-/*		intPropText: {
-			get() {
-				return this.propText;
-			},
-			set(value) {
-				this.$emit('update:propText', value);
-			}
-		},*/
 		intVon: {
 			get() {
 				return this.von;
@@ -179,8 +170,8 @@ export default {
 	},
 	template: `
 	<div class="notiz-notiz">
-<!--	<p>testausgaben child</p>
-		<span v-for="(anhang,index) in intAnhang"> {{anhang.name}} {{index}}<br></span>-->
+	
+<!--		<span v-for="(anhang,index) in intAnhang"> {{anhang.name}} | {{anhang.type}} | {{anhang.size}} {{index}}<br></span>-->
 		<form ref="form" @submit.prevent class="row">
 			<div>
 				<div class="row mb-3">
@@ -225,7 +216,7 @@ export default {
 					<label for="text" class="form-label col-sm-2">Dokument</label>
 					<div  class="col-sm-7 py-3">
 						<!--Upload Component-->
-						<FormUploadDms ref="upload" id="file" multiple v-model="intAnhang" ></FormUploadDms>
+						<FormUploadDms ref="upload" id="file" multiple v-model="intAnhang"></FormUploadDms>
 					</div>
 				
 				</div>
@@ -289,8 +280,10 @@ export default {
 			</div>
 					
 		</form>
+<!--		files: {{files}} <hr>
+		intText: {{intText}} |<br>propText:	{{propText}} |<br> text: {{text}}  <br> {{intPropText}}-->
 		
-		intText: {{intText}} |<br>propText:	{{propText}} |<br> text: {{text}}  <br> {{intPropText}}
+<!--		{{intAnhang}}-->
 
 
 	</div>`
