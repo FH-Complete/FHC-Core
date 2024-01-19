@@ -14,7 +14,7 @@ export default {
 	props: [
 		'typeId',
 		'titel',
-		'propText',
+		'text',
 		'lastChange',
 		'von',
 		'bis',
@@ -211,6 +211,11 @@ export default {
 <!--						<textarea id="editor" rows="5" cols="75" @input="updateContent" class="form-control">{{ intText }}</textarea>-->
 						<textarea id="editor" rows="5" cols="75" @input="updateContent" class="form-control">{{ intText }}</textarea>
 					</div>
+					
+					<!--	oldversion-->
+<!--					<div class="col-sm-7">
+						<textarea rows="5" cols="75" v-model="intText" class="form-control"></textarea>
+					</div>-->
 				</div>
 	
 			<!-- show Documentupload-->
