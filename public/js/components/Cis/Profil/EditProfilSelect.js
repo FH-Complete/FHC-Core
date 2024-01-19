@@ -1,5 +1,7 @@
-import {Kontakt, EditKontakt, Adresse, EditAdresse} from "./ProfilComponents.js";
-
+import Kontakt from "./ProfilComponents/Kontakt.js";
+import EditKontakt from "./ProfilComponents/EditKontakt.js";
+import Adresse from "./ProfilComponents/Adresse.js";
+import EditAdresse from "./ProfilComponents/EditAdresse.js";
 
 export default {
     components: {
@@ -91,7 +93,7 @@ export default {
       },
 
       profilUpdateEmit: function(event){
-        console.log(event);
+        
         //? passes the updated profil information to the parent component
         this.$emit('update:profilUpdate',event);
       },

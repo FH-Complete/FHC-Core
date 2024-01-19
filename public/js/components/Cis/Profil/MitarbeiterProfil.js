@@ -1,7 +1,9 @@
 
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import EditProfil from "./EditProfil.js";
-import {Adresse, Kontakt, FetchProfilUpdates} from "./ProfilComponents.js";
+import Adresse from "./ProfilComponents/Adresse.js";
+import Kontakt from "./ProfilComponents/Kontakt.js";
+import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
 import Mailverteiler from "./ProfilComponents/Mailverteiler.js"; 
 import AusweisStatus from "./ProfilComponents/FhAusweisStatus.js";
 import QuickLinks from "./ProfilComponents/QuickLinks.js";
@@ -165,7 +167,7 @@ export default {
           }
           
         }).catch((e) => {
-          console.log(e);
+          // Wenn der User das Modal abbricht ohne Änderungen
          
         });
     
@@ -314,25 +316,23 @@ export default {
   template: ` 
 
   <div class="container-fluid text-break fhc-form"  >
-    <!-- ROW --> 
+    
           <div class="row">
-          <!-- HIDDEN QUICK LINKS -->
+          
               <div  class="d-md-none col-12 ">
              
               <div class="row mb-3">
               <div class="col">
-               
+              <!-- MOBILE QUICK LINKS -->     
                 <quick-links :mobile="true"></quick-links>
               </div>
             </div>
 
-            <!-- HERE STARTS THE ROW WITH REQUESTED CHANGES FROM THE USER -->
+            
             <div class="row mb-3">
             <div class="col">
-              
+              <!-- MOBILE PROFIL UPDATES -->  
               <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
-                    
-              
             </div>
           </div>
 
@@ -341,10 +341,6 @@ export default {
               </div>
               
               <!-- END OF HIDDEN ROW (HIDDEN IN VIEWPORTS GREATER THEN-EQUAL MD) -->
-
-
-            
-
 
               <!-- MAIN PANNEL -->
               <div class="col-sm-12 col-md-8 col-xxl-9 ">
@@ -356,79 +352,49 @@ export default {
                     <!-- ROW WITH THE PROFIL INFORMATION --> 
                     <div class="row mb-4">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- FIRST KAESTCHEN -->
                       <div  class="col-lg-12 col-xl-6 ">
                      <div class="row mb-4">
                      <div class="col">
                      
-                        
                      <!-- PROFIL INFORMATION -->
                      <profil-information title="MitarbeiterIn" :data="profilInformation"></profil-information>
 
 
-		    </div>
+		                 </div>
                     </div>
                      <div class="row mb-4">
                      
 
                      <div  class=" col-lg-12">
         
-                   <!-- MITARBEITER INFO -->
+                    <!-- MITARBEITER INFO -->
                     <role-information title="Mitarbeiter Information" :data="roleInformation"></role-information>
 
 
-                     </div>  
-                            
-
-
-
-<!-- END OF THE FIRST KAESTCHEN -->
+                     </div> 
                       </div>
 
 
                       <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
                      
-
-
-                     
-
-
-              
-                    <!-- END OF PROFIL INFORMATION ROW -->
-                    <!-- INFORMATION CONTENT END -->
+                    
                     </div>
 
                     <div  class="col-xl-6 col-lg-12 ">
                     <div class="row mb-4">
                     <div class="col">
-
-                    
                     <!-- EMAILS -->
                     <profil-emails :data="personEmails" ></profil-emails>
+                    </div>
+                    </div>
 
-                   
-                    </div></div>
-
-                    <!-- HIER SIND DIE PRIVATEN KONTAKTE-->
+                    
                     <div class="row mb-4 ">
                       <div class="col">
-                        <div class="card">
+                        
+                      <!-- PRIVATE KONTAKTE-->
+                      
+                      <div class="card">
                           <div class="card-header">
                             Private Kontakte
                           </div>
@@ -445,12 +411,14 @@ export default {
                         </div>
                       </div>
                     </div>
-                    <!-- -->
-
-                    <!-- HIER SIND DIE PRIVATEN ADRESSEN-->
+                   
+                    
                     <div class="row mb-4">
                       <div class="col">
-                        <div class="card">
+                    
+                      <!-- PRIVATE ADRESSEN-->
+
+                      <div class="card">
                           <div class="card-header">Private Adressen</div>
                             <div class="card-body">
                             
@@ -464,61 +432,51 @@ export default {
                         </div>
                       </div>
                     </div>
+
+
                     
-                    <!--   -->
-
-
-
-                    <!-- END OF THE SECOND INFORMATION COLUMN -->
                     </div>
-
-
-                    <!-- START OF THE SECOND PROFIL INFORMATION ROW --> 
-                  
-                    
-                  <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
                 </div  >
 
-
-
-                
-
-
-
-
-                <!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
                 <div class="row">
 
-                <!-- FIRST TABLE -->
+                
                   <div class="col-12 mb-4" >
+
+                  <!-- FUNKTIONEN TABELLE -->
                  
                     <core-filter-cmpt title="Funktionen"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                   
                     </div>
 
-                <!-- SECOND TABLE -->
                   <div class="col-12 mb-4" >
+
+                  <!-- BETRIEBSMITTEL TABELLE -->
                     <core-filter-cmpt title="Entlehnte Betriebsmittel"  ref="betriebsmittelTable" :tabulator-options="betriebsmittel_table_options" tableOnly :sideMenu="false" />
                   </div>
 
-                <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
                 </div>
 
-
-
-
-
-
-
-              <!-- END OF MAIN CONTENT COL -->
               </div>
-
-
-
 
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
               
+              <!-- Bearbeiten Button -->
+  
+              <div class="row d-none d-md-block mb-3">
+              <div class="col mb-3">
+              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <div class="row">
+                  <div class="col-2">
+                    <i class="fa fa-edit"></i>
+                  </div>
+                  <div class="col-10">Bearbeiten</div>
+                </div>
+              </button>
+              </div>
+              </div>
+
               <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
               <div class="col mb-3">
 

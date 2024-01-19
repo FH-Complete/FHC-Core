@@ -45,8 +45,7 @@ export default {
         //? inserts new row in public.tbl_cis_profil_update 
         //* calls the update api call if an update field is present in the data that was passed to the module
         Vue.$fhcapi.UserData[this.editData.update?'updateProfilRequest':'insertProfilRequest'](this.topic,this.profilUpdate).then((res)=>{
-          console.log("topic",this.topic);
-          console.log("profilUpdate",this.profilUpdate);
+          
           if(res.data.error == 0){
             this.result= true;
             this.hide();
@@ -79,7 +78,6 @@ export default {
     return BsModal.popup.bind(this)(null, options);
   },
   template: `
-  
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
   <template v-slot:title>

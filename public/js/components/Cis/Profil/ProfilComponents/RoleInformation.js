@@ -27,10 +27,6 @@ export default {
     <div class="card-body">
         <div class="gy-3 row">
         <div v-for="(wert,bez) in data" class="col-md-6 col-sm-12 ">
-            
-       
-        
-        
           
            <div class="form-underline">
            <div class="form-underline-titel">{{bez }}</div>
@@ -42,28 +38,9 @@ export default {
            <span v-else class="form-underline-content">{{wert?wert:'-'}}</span>
            </div>
            
-
-    
         </div>
 
-
-        <!-- Bearbeiten Button -->
-        <div class="col-md-6 col-sm-12 ">
-         <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-primary" >
-           <div class="row">
-             <div class="col-2">
-               <i class="fa fa-edit"></i>
-             </div>
-             <div class="col-10">Bearbeiten</div>
-           </div>
-         </button>
-
-
-      
-         
        
-
-        </div>
         </div>
     
 </div>
