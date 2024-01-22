@@ -13,6 +13,8 @@ class ProfilUpdate extends Auth_Controller
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r', 'user:r'], // TODO(chris): permissions?
 			'getAllRequests' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'acceptProfilRequest'=>['user:r'],
+			'denyProfilRequest'=>['user:r'],
 
 		]);
 		//? put the uid and pid inside the controller to reuse in controller
@@ -28,22 +30,39 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	public function getAllRequests(){
-		
-		$res = $this->ProfilChangeModel->load();
-		if(isError($res)){
-			// catch exception
-			echo $res->retval->data;
-			return;
-		}else{
-			if(hasData($res)){
-				$res = getData($res);
-				foreach($res as $element){
-					$element->change_timestamp = date_create($element->change_timestamp)->format('d/m/Y H:i');
-				}
-			}else{
-				$res = null;
-			}
-		}
+		$res = $this->ProfilChangeModel->getProfilUpdate();
+		$res = hasData($res)? getData($res) : null;
 		echo json_encode($res);
+	}
+
+	public function acceptProfilRequest(){
+		$_POST = json_decode($this->input->raw_input_stream,true);
+
+		$id = $this->input->post('requestID',true);
+		
+		if(isset($id)){
+			$res =$this->ProfilChangeModel->update([$id], ["status"=>"accepted","status_timestamp"=>"NOW()"]);
+			echo json_encode($res);
+		}
+
+	}
+
+	public function denyProfilRequest(){
+		$_POST = json_decode($this->input->raw_input_stream,true);
+
+		$id = $this->input->post('requestID',true);
+		
+		if(isset($id)){
+			var_dump($id);
+			//! instead of deleting the rejected profil update, the status of the db entry is set to rejected
+			//$res = $this->ProfilChangeModel->delete([$id]);
+
+
+			$res = $this->ProfilChangeModel->update([$id],["status"=>"rejected","status_timestamp"=>"NOW()"]);
+			echo json_encode($res);
+			
+		}
+		
+
 	}
 }

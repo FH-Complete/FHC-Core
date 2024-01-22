@@ -94,7 +94,7 @@ class Profil extends Auth_Controller
 		$payload = $json->payload;
 		$type = isset($json->payload->kontakt_id)? "kontakt_id" : "adresse_id";
 
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "change_timestamp" => "NOW()" ];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "change_timestamp" => "NOW()","status"=>"pending" ];
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
@@ -148,7 +148,7 @@ class Profil extends Auth_Controller
 		$json = json_decode($this->input->raw_input_stream);
 		
 
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()" ];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()","status"=>"pending" ];
 
 		//? gets all the requested changes from a user
 		

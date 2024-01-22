@@ -33,12 +33,13 @@ export default {
                 case "Private Adressen" : return "EditAdresse"; break;
                 case "Add Adressen" : return "EditAdresse"; break;
                 case "Add Kontakte" : return "EditKontakt"; break;
-                case "Delete Adressen" : return "EditAdresse"; break;
-                case "Delete Kontakte" : return "EditKontakt"; break;
+                case "Delete Adressen" : return "Adresse"; break;
+                case "Delete Kontakte" : return "Kontakt"; break;
                 default: return "text_input"; break;
             }
         },
         openModal(updateRequest) {
+            console.log(JSON.stringify(updateRequest));
 
             let view = this.getView(updateRequest.topic);
             let content =null;
@@ -104,18 +105,42 @@ export default {
             <thead>
                 <tr >
                 <th scope="col">Topic</th>
+                <th scope="col">Status</th>
                 <th scope="col">Date of Request</th>
-                <th  scope="col">Bearbeiten</th>
-                <th style="white-space:normal" scope="col">Löschen</th>
+                
+                <th  scope="col">Action</th>
+                
+                
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data">
+            <!-- :class="{'bg-success':item.status === 'accepted', 'bg-danger':item.status === 'rejected', 'text-white':item.status =='rejected' || item.status=='accepted'}" -->
+                <tr v-for="item in data" :style="item.status=='accepted'?'background-color:lightgreen':item.status==='rejected'?'background-color:lightcoral':''">
                 <td class="align-middle">{{item.topic}}</td>
+                <td class="align-middle text-center" >{{item.status}}</td>
                 <td class="align-middle">{{item.change_timestamp}}</td>
-                <td v-if="item.topic.toLowerCase().includes('delete')" class="align-middle text-center" >{{item.requested_change.adr_typ?item.requested_change.adr_typ:item.requested_change.kontakt}}</td>
-                <td v-else class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></td>
-                <td class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></td>
+                
+                
+                
+                <template v-if="item.status === 'pending'">
+                <td>
+                <template v-if="item.topic.toLowerCase().includes('delete')">
+                <!-- old edit view for delete requests <div class="align-middle text-center" >{{item.requested_change.adr_typ?item.requested_change.adr_typ:item.requested_change.kontakt}}</div>-->
+                <div  class="align-middle text-center"><i style="color:gray" role="button" @click="openModal(item)" class="fa fa-eye"></i></div>
+                </template>
+                <template v-else >
+                <div class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></div>
+                </template>
+                
+                <div class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></div>
+                
+                </td>
+                </template>
+                
+                
+                
+                
+                
                 </tr>
             </tbody>
         </table>

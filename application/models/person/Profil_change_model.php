@@ -30,8 +30,13 @@ class Profil_change_model extends DB_Model
 	 * returns a profil update with id 
 	 * returns all profil updates if id is set to null
 	 */
-	public function getProfilUpdate($uid,$id=null){
-		$whereClause = ["uid"=>$uid];
+	public function getProfilUpdate($uid=null,$id=null){
+		$whereClause=[];
+
+		if(!is_null($uid)){
+			$whereClause['uid']=$uid;
+		}
+		//?
 		if(!is_null($id)){
 			$whereClause['profil_update_id']=$id;
 		}

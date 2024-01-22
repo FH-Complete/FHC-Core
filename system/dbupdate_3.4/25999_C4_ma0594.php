@@ -8,6 +8,9 @@
                 uid VARCHAR(32) NOT NULL,
                 requested_change jsonb NOT NULL,
                 change_timestamp TIMESTAMP NOT NULL,
+                status VARCHAR(32) NOT NULL,
+                status_timestamp TIMESTAMP NULL,
+                status_message TEXT NULL,
                 CONSTRAINT tbl_cis_profil_update_pk PRIMARY KEY(profil_update_id),
                 CONSTRAINT tbl_cis_profil_update_fk FOREIGN KEY(uid) REFERENCES public.tbl_benutzer(uid)
             );
@@ -19,6 +22,7 @@
 			 CACHE 1;
              
 		    ALTER TABLE public.tbl_cis_profil_update ALTER COLUMN profil_update_id SET DEFAULT nextval('public.tbl_cis_profil_update_id_seq');
+            ALTER TABLE public.tbl_cis_profil_update ADD CONSTRAINT tbl_cis_profil_update_restricted_status CHECK (status IN ('pending','accepted','rejected'));
             --ALTER TABLE public.tbl_cis_profil_update ADD CONSTRAINT cis_profil_udpate_topic_uid_unique UNIQUE (uid,topic);
 
             GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_cis_profil_update TO vilesci;
