@@ -19,6 +19,7 @@ class Profil extends Auth_Controller
 			'index' => ['student/anrechnung_beantragen:r', 'user:r'], // TODO(chris): permissions?
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'deleteProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
@@ -99,11 +100,14 @@ class Profil extends Auth_Controller
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
+		
 		if($res){
 		foreach($res as $update_request){
 			$existing_change = json_decode($update_request->requested_change);
-
-			if(isset($existing_change->$type) && $existing_change->$type == $payload->$type){
+			echo json_encode($existing_change);
+			echo property_exists($existing_change,$type);
+			 
+			if(property_exists($existing_change,$type) && $existing_change->$type == $payload->$type){
 				//? the kontakt_id / adresse_id of a change has to be unique 
 				
 				echo json_encode(error("cannot change the same resource twice"));
@@ -267,6 +271,7 @@ class Profil extends Auth_Controller
 		}
 
 		
+		print_r($telefon_res);
 
 		$res = new stdClass();
 		$res->username = $uid;
@@ -303,7 +308,7 @@ class Profil extends Auth_Controller
 		//? Mailverteiler Info
 		$res->mailverteiler = $mailverteiler_res;
 
-		$res->standort_telefon = $telefon_res->kontakt;
+		$res->standort_telefon = isset($telefon_res)? $telefon_res->kontakt : null;
 
 		return $res;
 

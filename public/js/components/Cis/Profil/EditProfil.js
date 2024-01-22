@@ -68,6 +68,7 @@ export default {
       //? if the topic was passed through the prop add it to the component
       this.topic = this.editData.topic;
     }
+    console.log("here",this.editData);
    
 
   },

@@ -2,6 +2,7 @@ import Kontakt from "./ProfilComponents/Kontakt.js";
 import EditKontakt from "./ProfilComponents/EditKontakt.js";
 import Adresse from "./ProfilComponents/Adresse.js";
 import EditAdresse from "./ProfilComponents/EditAdresse.js";
+import Status from "./ProfilComponents/Status.js";
 
 export default {
     components: {
@@ -9,6 +10,7 @@ export default {
       EditKontakt,
       Adresse,
       EditAdresse,
+      Status,
     },
     props: {
 
@@ -173,7 +175,7 @@ export default {
     <!-- if it not a normal text input field then reder the custom edit input component -->
     <!-- custom component is required to emit an profilUpdate event to register the new entered value --> 
     <template v-else>
-      <component @profilUpdate="profilUpdateEmit"  :is="view" :data="data"></component>
+      <component @profilUpdate="profilUpdateEmit"  :is="view" :data="data" v-bind="list"></component>
     </template>
    `,
   };

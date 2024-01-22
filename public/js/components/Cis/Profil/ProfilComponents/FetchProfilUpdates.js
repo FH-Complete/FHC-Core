@@ -16,6 +16,7 @@ export default {
         }
     },
     methods:{
+       
         deleteRequest: function(item){
             
             Vue.$fhcapi.UserData.deleteProfilRequest(item.profil_update_id).then((res)=>{
@@ -27,42 +28,46 @@ export default {
                 }
             });
         },
-        getView: function(topic){
+        getView: function(topic,status){
             switch(topic){
                 case "Private Kontakte" : return "EditKontakt"; break;
                 case "Private Adressen" : return "EditAdresse"; break;
                 case "Add Adressen" : return "EditAdresse"; break;
                 case "Add Kontakte" : return "EditKontakt"; break;
-                case "Delete Adressen" : return "Adresse"; break;
-                case "Delete Kontakte" : return "Kontakt"; break;
+                case "Delete Adressen" :  return status ==='pending'? "Adresse": "Status" ; break;
+                case "Delete Kontakte" : return status ==='pending'? "Kontakt": "Status"; break;
                 default: return "text_input"; break;
             }
         },
         openModal(updateRequest) {
             console.log(JSON.stringify(updateRequest));
 
-            let view = this.getView(updateRequest.topic);
+            let view = this.getView(updateRequest.topic,updateRequest.status);
+            let data = null;
             let content =null;
             if(view === 'text_input'){
-                content={
-                    view:view,
-                    data:{
+               //TODO:  change data handling for text_input component to accept the data in the same way as the other components
+                data = {
                         titel:updateRequest.topic,
                         value:updateRequest.requested_change,
-                    },
-                    update:true,
-                    topic:updateRequest.topic,
-                    
-                }
+                    };
             }else{
-                content = {
-                    view: view,
-                    data: updateRequest.requested_change,
-                    update:true,
-                    topic:updateRequest.topic,
-                    
-                    
-                }
+                data = updateRequest.requested_change;
+            }
+
+            content={
+                view:view,
+                data:data,
+                update:true,
+                topic:updateRequest.topic,
+                
+            }
+
+            //? adds the status information if the profil update request was rejected or accepted
+            if(updateRequest.status !== 'pending'){
+                content['status']= updateRequest.status;
+                content['status_message']= updateRequest.status_message;
+                content['status_timestamp']=updateRequest.status_timestamp;
             }
 
 
@@ -135,6 +140,12 @@ export default {
                 <div class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></div>
                 
                 </td>
+                </template>
+                <template v-else-if="item.status === 'accepted'">
+                <td  class="align-middle text-center"><i style="color:gray" role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
+                </template>
+                <template v-else-if="item.status === 'rejected'">
+                <td  class="align-middle text-center"><i style="color:gray" role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
                 </template>
                 
                 
