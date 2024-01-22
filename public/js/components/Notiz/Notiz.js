@@ -31,7 +31,7 @@ export default {
 		return {
 			multiupload: true,
 			mitarbeiter: [],
-			filteredMitarbeiter: [],
+			filteredMitarbeiter: []
 		}
 	},
 	computed: {
@@ -132,41 +132,72 @@ export default {
 				});
 		},
 		initTinyMCE() {
+			//const vm = this.intText;
 			tinymce.init({
 				selector: '#editor',
+/*				selector: `#${this.$refs.editor.id}`,*/
 				//height: 800,
-				plugins: ['autoresize', 'lists'],
-				toolbar: "undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | outdent indent",
+				plugins: ['lists'],
+/*				toolbar: "undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | outdent indent",*/
+				toolbar: "undo redo",
 
 				autoresize_bottom_margin: 16,
 				setup: (editor) => {
 
-/*					editor.on('input', () => {
-						this.$emit('update:propText', editor.getContent());
-					});*/
-
 					// workaround for avoiding conflict id of frame: same Id as textarea
 					// working just for new notes
-					//Todo(manu) find a solution for update notes
+					//solution for update notes: now working
+					//todo(manu) but now: cursor position!!
+
 					editor.on('input', () => {
-						this.intText = editor.getContent();
-						//this.$emit('update:intText', editor.getContent());
+
+						const newContent = editor.getContent();
+/*						const contentLength = newContent.length;
+						console.log(contentLength);
+
+						editor.selection.setCursorLocation(editor.getBody(), contentLength);*/
+						this.intText = newContent;
 
 					});
+
+/*					editor.on('change', () => {
+						const newContent = editor.getContent();
+						const contentLength = newContent.length;
+
+						//editor.selection.setCursorLocation(editor.getBody(), contentLength);
+
+						// Vue-Instanz-Referenz (vm), um auf die Daten zuzugreifen
+						this.intText = newContent;
+					});*/
 				},
 			});
 		},
 		updateContent(event) {
 			// Manually update the content when the textarea is edited
 			tinymce.get('editor').setContent(event.target.value);
-			console.log(event.target.value);
+			//console.log(event.target.value);
 		},
 	},
 	mounted() {
 		this.initTinyMCE();
 	},
+	watch: {
+		intText: function(newVal, oldVal) {
+			// Überprüfen, ob sich der Wert von intText geändert hat
+			if (newVal !== oldVal) {
+
+				const editor = tinymce.get('editor');
+
+				// Aktualisieren Inhalt des Editors
+				editor.setContent(newVal);
+				//tinymce.get(this.$refs.editor.id).setContent(newVal);
+
+			}
+		},
+	},
 	beforeDestroy() {
 		tinymce.get('editor').destroy();
+/*		tinymce.get(this.$refs.editor.id).destroy();*/
 	},
 	template: `
 	<div class="notiz-notiz">
@@ -199,8 +230,9 @@ export default {
 					
 					<!--tinymce-->
 					<div class="col-sm-7">
-<!--						<textarea id="editor" rows="5" cols="75" @input="updateContent" class="form-control">{{ intText }}</textarea>-->
-						<textarea id="editor" rows="5" cols="75" @input="updateContent" class="form-control">{{ intText }}</textarea>
+						<!--<textarea id="editor" rows="5" cols="75" @input="updateContent" class="form-control">{{ intText }}</textarea>-->
+						<textarea id="editor" rows="5" cols="75" :value="intText" @input="updateContent" class="form-control"></textarea>
+
 					</div>
 					
 					<!--	oldversion-->
@@ -280,10 +312,8 @@ export default {
 			</div>
 					
 		</form>
-<!--		files: {{files}} <hr>
-		intText: {{intText}} |<br>propText:	{{propText}} |<br> text: {{text}}  <br> {{intPropText}}-->
 		
-<!--		{{intAnhang}}-->
+		intText: {{intText}}
 
 
 	</div>`
