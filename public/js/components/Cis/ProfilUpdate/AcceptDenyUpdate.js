@@ -133,15 +133,15 @@ export default {
 
     <div  class="form-underline mb-2 col">
       <div class="form-underline-titel">Date of Status: </div>
-
-      <span  class="form-underline-content" >{{data.status_timestamp}}</span>
+      <!-- only status timestamp and status message can be null in the database -->
+      <span  class="form-underline-content" >{{data.status_timestamp?data.status_timestamp:'-'}}</span>
     </div>
 
 
     
     <div  class="form-underline mb-2 col">
       <div class="form-underline-titel">Status message: </div>
-
+      <!-- only status timestamp and status message can be null in the database -->
       <span  class="form-underline-content" >{{data.status_message? data.status_message : '-'}}</span>
     </div>
 

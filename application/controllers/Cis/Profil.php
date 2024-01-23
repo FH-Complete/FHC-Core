@@ -72,8 +72,7 @@ class Profil extends Auth_Controller
 		$_GET = json_decode($this->input->raw_input_stream, true);
 		$uid = $this->input->get('uid');
 		$id = $this->input->get('id');
-		echo $uid;
-		echo $id;
+		
 		
 		if($uid && $id){
 			$res= $this->ProfilChangeModel->getProfilUpdate($uid, $id);
