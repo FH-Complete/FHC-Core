@@ -249,14 +249,7 @@ export default {
           title:"Personen Informationen",
           view:null,
           data:{
-            username:{
-              title:"username",
-              view:"text_input",
-              data:{
-                titel:"username",
-                value:this.data.username,
-              }
-            },
+            
             vorname: {
               title:"vorname",
               view:"text_input",
@@ -271,7 +264,23 @@ export default {
                   titel:"nachname",
                   value:this.data.nachname,
                 }
-              }
+              },
+              titel:{
+                title:"titel",
+                view:"text_input",
+                data:{
+                  titel:"titel",
+                  value:this.data.titel,
+                }
+              },
+              postnomen:{
+                title:"postnomen",
+                view:"text_input",
+                data:{
+                  titel:"postnomen",
+                  value:this.data.titel,
+                }
+              },
             }
           },
           Private_Kontakte: {

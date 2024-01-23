@@ -49,6 +49,7 @@ class Profil_change_model extends DB_Model
 				foreach($res->retval as $update){
 					$update->requested_change = json_decode($update->requested_change);
 					$update->change_timestamp = date_create($update->change_timestamp)->format('d.m.Y');
+					$update->status_timestamp = date_create($update->status_timestamp)->format('d.m.Y');
 				}
 			}
 		}

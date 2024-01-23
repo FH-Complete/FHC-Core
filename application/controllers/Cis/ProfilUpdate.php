@@ -37,28 +37,24 @@ class ProfilUpdate extends Auth_Controller
 
 	public function acceptProfilRequest(){
 		$_POST = json_decode($this->input->raw_input_stream,true);
-
-		$id = $this->input->post('requestID',true);
 		
+		$id = $this->input->post('profil_update_id',true);
+		$status_message = $this->input->post('status_message',true);
 		if(isset($id)){
-			$res =$this->ProfilChangeModel->update([$id], ["status"=>"accepted","status_timestamp"=>"NOW()"]);
+			$res =$this->ProfilChangeModel->update([$id], ["status"=>"accepted","status_timestamp"=>"NOW()","status_message"=>$status_message]);
 			echo json_encode($res);
-		}
+		} 
 
 	}
 
 	public function denyProfilRequest(){
 		$_POST = json_decode($this->input->raw_input_stream,true);
-
-		$id = $this->input->post('requestID',true);
+		
+		$id = $this->input->post('profil_update_id',true);
+		$status_message = $this->input->post('status_message',true);
 		
 		if(isset($id)){
-			var_dump($id);
-			//! instead of deleting the rejected profil update, the status of the db entry is set to rejected
-			//$res = $this->ProfilChangeModel->delete([$id]);
-
-
-			$res = $this->ProfilChangeModel->update([$id],["status"=>"rejected","status_timestamp"=>"NOW()"]);
+			$res = $this->ProfilChangeModel->update([$id],["status"=>"rejected","status_timestamp"=>"NOW()","status_mesage"=>$status_message]);
 			echo json_encode($res);
 			
 		}

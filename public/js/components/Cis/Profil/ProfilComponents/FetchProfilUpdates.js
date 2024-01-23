@@ -30,13 +30,13 @@ export default {
         },
         getView: function(topic,status){
             switch(topic){
-                case "Private Kontakte" : return "EditKontakt"; break;
-                case "Private Adressen" : return "EditAdresse"; break;
-                case "Add Adressen" : return "EditAdresse"; break;
-                case "Add Kontakte" : return "EditKontakt"; break;
+                case "Private Kontakte" : return status ==='pending'? "EditKontakt": "Status"; break;
+                case "Private Adressen" : return status ==='pending'? "EditAdresse": "Status"; break;
+                case "Add Adressen" : return status ==='pending'? "EditAdresse": "Status"; break;
+                case "Add Kontakte" : return status ==='pending'? "EditKontakt": "Status"; break;
                 case "Delete Adressen" :  return status ==='pending'? "Adresse": "Status" ; break;
                 case "Delete Kontakte" : return status ==='pending'? "Kontakt": "Status"; break;
-                default: return "text_input"; break;
+                default: return status ==='pending'? "text_input": "Status"; break;
             }
         },
         openModal(updateRequest) {
@@ -45,15 +45,19 @@ export default {
             let view = this.getView(updateRequest.topic,updateRequest.status);
             let data = null;
             let content =null;
-            if(view === 'text_input'){
-               //TODO:  change data handling for text_input component to accept the data in the same way as the other components
+
+            if(view === "text_input"){
+                
                 data = {
-                        titel:updateRequest.topic,
-                        value:updateRequest.requested_change,
-                    };
-            }else{
+                    titel:updateRequest.topic,
+                    value: updateRequest.requested_change,
+                };
+            }
+            else{
                 data = updateRequest.requested_change;
             }
+                
+           
 
             content={
                 view:view,
@@ -130,7 +134,7 @@ export default {
                 <template v-if="item.status === 'pending'">
                 <td>
                 <template v-if="item.topic.toLowerCase().includes('delete')">
-                <!-- old edit view for delete requests <div class="align-middle text-center" >{{item.requested_change.adr_typ?item.requested_change.adr_typ:item.requested_change.kontakt}}</div>-->
+                
                 <div  class="align-middle text-center"><i style="color:gray" role="button" @click="openModal(item)" class="fa fa-eye"></i></div>
                 </template>
                 <template v-else >

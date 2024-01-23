@@ -10,6 +10,7 @@ export default {
     },
     methods:{
         updateValue: function(event,bind){
+
             if(bind === 'zustellung'){
                 this.data[bind] = event.target.checked;    
             }else{
@@ -38,7 +39,6 @@ export default {
     },
     template:
     `
-    
     <div class="gy-3 row align-items-center justify-content-center">
     
     <div v-if="!data.kontakt_id" class="col-12">

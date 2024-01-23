@@ -55,6 +55,7 @@ export default {
 
       addItem: function(){
         
+        
         this.view= this.topic == "Private Kontakte"?"EditKontakt":"EditAdresse" ;
         
         //? updates the topic when a Kontakt or an Address should be added
@@ -62,7 +63,6 @@ export default {
         this.$emit('update:topic',this.topic);
         this.breadcrumbItems.push(this.topic);
         this.$emit('update:breadcrumb',this.breadcrumbItems);
-        
         
         this.data= this.view=="EditAdresse"?
         {
@@ -72,8 +72,7 @@ export default {
           adr_typ: null,
           plz: null,
           ort: null
-        }:
-        {
+        }: {
           added:true,
           kontakt_id: null,
           kontakttyp: null,
@@ -81,7 +80,8 @@ export default {
           anmerkung: null,
           zustellung: false
         }
-
+        
+        
       },
 
       deleteItem: function(item){
@@ -138,8 +138,6 @@ export default {
     },
    
     template: `
-   
-  
     <template v-if="!view">
     <div  class="list-group">
     <template v-for="item in data">
@@ -175,7 +173,8 @@ export default {
     <!-- if it not a normal text input field then reder the custom edit input component -->
     <!-- custom component is required to emit an profilUpdate event to register the new entered value --> 
     <template v-else>
-      <component @profilUpdate="profilUpdateEmit"  :is="view" :data="data" v-bind="list"></component>
+      <!-- both v-bind="list" and :data="data" pass a data prop, in this case the last one is the one that gets taken -->
+      <component @profilUpdate="profilUpdateEmit"  :is="view" v-bind="list" :data="data"></component>
     </template>
    `,
   };

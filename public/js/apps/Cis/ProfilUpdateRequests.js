@@ -73,6 +73,7 @@ const app = Vue.createApp({
                         //! function that is called when clicking on a row in the table
                         
                         let cellData = cell.getRow().getData();
+                        
                         AcceptDenyUpdate.popup({value:cellData}).then(res=>{
                           console.log("res of the modal: ",res);
                           //? refetches the data, if any request was denied or accepted
@@ -82,6 +83,7 @@ const app = Vue.createApp({
                           //? catches the rejected Promise if the result of the modal was falsy
                           console.log("catch of the modal: ",e);
                         });
+                      
                           
                       },
                       //responsive:0,

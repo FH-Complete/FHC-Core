@@ -26,7 +26,7 @@ export default {
         
     },
     template:`
-    <pre>{{isChanged}}</pre>
+    
     <div class="gy-3 row justify-content-center align-items-center">
     
     <!-- column 1 in the address row -->
@@ -46,6 +46,7 @@ export default {
     <!-- column 2 in the address row -->
         <div  class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
             
+            <!-- OLD INPUT FIELD FOR ADDRESS TYPE 
             <template v-if="data.adresse_id">
             <div class="form-underline ">
             <div class="form-underline-titel">Typ</div>
@@ -54,6 +55,7 @@ export default {
             </div>
             </template>
             <template v-else>
+            -->
             
         
     

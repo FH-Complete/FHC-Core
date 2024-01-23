@@ -5,9 +5,9 @@ export default {
 
     selectProfilRequest: function(uid=null,id=null) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                   `/Cis/Profil/selectProfilRequest?uid=${uid}&id=${id}`;
+                   `/Cis/Profil/selectProfilRequest`;
                    
-        return axios.get(url);
+        return axios.get(url,{uid:uid, id:id});
     },
     
     insertProfilRequest: function(topic, payload) {

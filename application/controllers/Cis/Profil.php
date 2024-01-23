@@ -69,8 +69,11 @@ class Profil extends Auth_Controller
 
 
 	public function selectProfilRequest(){
-		$uid =json_decode($this->input->get("uid"));
-		$id =json_decode($this->input->get("id"));
+		$_GET = json_decode($this->input->raw_input_stream, true);
+		$uid = $this->input->get('uid');
+		$id = $this->input->get('id');
+		echo $uid;
+		echo $id;
 		
 		if($uid && $id){
 			$res= $this->ProfilChangeModel->getProfilUpdate($uid, $id);
@@ -93,7 +96,8 @@ class Profil extends Auth_Controller
 
 		$json = json_decode($this->input->raw_input_stream);
 		$payload = $json->payload;
-		$type = isset($json->payload->kontakt_id)? "kontakt_id" : "adresse_id";
+		$type = property_exists($json->payload,"kontakt_id")? "kontakt_id" : "adresse_id";
+		
 
 		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "change_timestamp" => "NOW()","status"=>"pending" ];
 
@@ -104,10 +108,9 @@ class Profil extends Auth_Controller
 		if($res){
 		foreach($res as $update_request){
 			$existing_change = json_decode($update_request->requested_change);
-			echo json_encode($existing_change);
-			echo property_exists($existing_change,$type);
+			
 			 
-			if(property_exists($existing_change,$type) && $existing_change->$type == $payload->$type){
+			if(property_exists($existing_change,$type) && property_exists($payload,$type) && $existing_change->$type == $payload->$type){
 				//? the kontakt_id / adresse_id of a change has to be unique 
 				
 				echo json_encode(error("cannot change the same resource twice"));
