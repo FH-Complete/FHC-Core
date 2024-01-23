@@ -53,6 +53,7 @@ export default {
           }else{
             this.result= false;
             this.hide();
+            console.log(res.data);
             Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
           } 
          

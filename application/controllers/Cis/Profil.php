@@ -120,9 +120,10 @@ class Profil extends Auth_Controller
 			if(isset($payload->add)){
 				//TODO: add functionality for adding a new kontakt or address
 	
-			}elseif($update_request->topic == $json->topic && $update_request->uid == $this->uid){
+			}elseif($update_request->topic == $json->topic ){
+				
 				//? if it is not a delete or add request than the topic in combination with the uid of the user have to be unique
-				echo json_encode(error("A request to change " + $json->topic + " is already open"));
+				echo json_encode(error("A request to change " . $json->topic . " is already open"));
 				return;
 			}
 		}}
@@ -477,7 +478,7 @@ class Profil extends Auth_Controller
 
 		if (
 
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort"])) &&
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("sort")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))

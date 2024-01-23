@@ -32,7 +32,7 @@ export default {
 
             <div class="form-underline ">
             <div class="form-underline-titel">Typ</div>
-            <span class="form-underline-content">{{data.adr_typ}} </span>
+            <span class="form-underline-content">{{data.typ}} </span>
             </div>
 
         </div>

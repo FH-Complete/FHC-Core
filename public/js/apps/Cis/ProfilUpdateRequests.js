@@ -4,9 +4,7 @@ import AcceptDenyUpdate from "../../components/Cis/ProfilUpdate/AcceptDenyUpdate
 Vue.$fhcapi = fhcapifactory;
 
 
-let printIcon= function(cell, formatterParams, onRendered){ //plain text value
-  return "<i class='fa fa-eye'></i>";
-};
+
 
 const app = Vue.createApp({
     components:{
@@ -27,12 +25,15 @@ const app = Vue.createApp({
                       field: "topic",
                       resizable: true,
                       minWidth: 200,
+                      headerFilter: true,
                       //responsive:0,
                     },
                     {
                       title: "UID",
                       field: "uid",
                       minWidth: 200,
+                      resizable:true,
+                      headerFilter: true,
                       //responsive:0,
                     },
                    
@@ -40,6 +41,7 @@ const app = Vue.createApp({
                       title: "Date",
                       field: "change_timestamp",
                       resizable: true,
+                      headerFilter: true,
                       minWidth: 200,
                       //responsive:0,
                     },
@@ -47,6 +49,7 @@ const app = Vue.createApp({
                       title: "Status",
                       field: "status",
                       hozAlign:'center',
+                      headerFilter: true,
                       formatter: function(cell,para){
                         let res =Object.getPrototypeOf(cell);
                         //console.log(res);
@@ -65,7 +68,7 @@ const app = Vue.createApp({
                     },
                     {
                       title: "View",
-                      formatter:printIcon,
+                      formatter:function(){ return "<i class='fa fa-eye'></i>";},
                       resizable: true,
                       minWidth: 200,
                       hozAlign: 'center',

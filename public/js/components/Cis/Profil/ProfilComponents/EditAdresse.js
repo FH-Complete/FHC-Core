@@ -14,7 +14,7 @@ export default {
     },
     computed:{
         isChanged: function(){
-            if(!this.data.strasse || !this.data.plz || !this.data.ort || !this.data.adr_typ){
+            if(!this.data.strasse || !this.data.plz || !this.data.ort || !this.data.typ){
                
                 return false;
             }
@@ -26,8 +26,7 @@ export default {
         
     },
     template:`
-    
-    <div class="gy-3 row justify-content-center align-items-center">
+     <div class="gy-3 row justify-content-center align-items-center">
     
     <!-- column 1 in the address row -->
     
@@ -46,23 +45,14 @@ export default {
     <!-- column 2 in the address row -->
         <div  class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
             
-            <!-- OLD INPUT FIELD FOR ADDRESS TYPE 
-            <template v-if="data.adresse_id">
-            <div class="form-underline ">
-            <div class="form-underline-titel">Typ</div>
-            <input  class="form-control" :value="data.adr_typ" @input="updateValue($event,'adr_typ')" :placeholder="data.adr_typ">
-        
-            </div>
-            </template>
-            <template v-else>
-            -->
+            
             
         
     
             <div  class="form-underline">
                 <div class="form-underline-titel">Kontakttyp</div>
         
-                <select :value="data.adr_typ" @change="updateValue($event,'adr_typ')" class="form-select" aria-label="Select Kontakttyp">
+                <select :value="data.typ" @change="updateValue($event,'typ')" class="form-select" aria-label="Select Kontakttyp">
                     <option selected></option>
                     <option value="Rechnungsadresse">Rechnungsadresse</option>
                     <option value="Nebenwohnsitz">Nebenwohnsitz</option>
