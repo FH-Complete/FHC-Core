@@ -57,8 +57,7 @@ class ProfilUpdate extends Auth_Controller
 		
 		
 		if(is_array($requested_change) && array_key_exists("adresse_id",$requested_change)){
-			$this->handleAdresse($requested_change);
-			return;
+			$this->handleAdresse($requested_change, $personID);
 		}else if (is_array($requested_change) && array_key_exists("kontakt_id", $requested_change)){
 			$this->handleKontakt($requested_change, $personID);
 		}else{
@@ -121,7 +120,7 @@ class ProfilUpdate extends Auth_Controller
 		return $res;
 	}
 
-	private function handleAdresse($requested_change){
+	private function handleAdresse($requested_change, $personID){
 
 		$this->AdressenTypModel->addSelect(["adressentyp_kurzbz"]);
 		$adr_kurzbz = $this->AdressenTypModel->loadWhere(["bezeichnung"=>$requested_change['typ']]);
@@ -138,23 +137,17 @@ class ProfilUpdate extends Auth_Controller
 		if(array_key_exists('add',$requested_change) && $requested_change['add']){
 			//? removes add flag
 			unset($requested_change['add']);
-			echo "add";
-			var_dump($requested_change);
-			return;
+			//? fields like insertvon are not filled when inserting new row
+			$requested_change['person_id'] = $personID;
+			//TODO: zustelladresse, heimatadresse, rechnungsadresse und nation werden nicht beachtet
 			$res = $this->AdresseModel->insert($requested_change);
 		}
 		//! DELETE
 		elseif(array_key_exists('delete',$requested_change) && $requested_change['delete']){
-			echo "delete";
-			var_dump($requested_change);
-			return;
 			$res = $this->AdresseModel->delete($adresse_id);
 		}
 		//! UPDATE
 		else{
-			echo "update";
-			var_dump($requested_change);
-			return;
 			$res = $this->AdresseModel->update($adresse_id,$requested_change);
 		}
 		return $res;
