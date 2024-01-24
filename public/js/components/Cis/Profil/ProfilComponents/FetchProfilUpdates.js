@@ -104,14 +104,14 @@ export default {
     },
     template:`
    
-    <div  class="card">
+    <div  class="card text-nowrap" >
                       <div class="card-header">
                       Profil Updates
                       </div>
                       <div class="card-body" >
     <div class="table-responsive">
         <table class="m-0  table  table-hover">
-            <thead>
+            <thead >
                 <tr >
                 <th scope="col">Topic</th>
                 <th scope="col">Status</th>
@@ -125,7 +125,7 @@ export default {
             <tbody>
             <!-- :class="{'bg-success':item.status === 'accepted', 'bg-danger':item.status === 'rejected', 'text-white':item.status =='rejected' || item.status=='accepted'}" -->
                 <tr v-for="item in data" :style="item.status=='accepted'?'background-color:lightgreen':item.status==='rejected'?'background-color:lightcoral':''">
-                <td class="align-middle">{{item.topic}}</td>
+                <td class="align-middle text-wrap">{{item.topic}}</td>
                 <td class="align-middle text-center" >{{item.status}}</td>
                 <td class="align-middle">{{item.change_timestamp}}</td>
                 
@@ -135,7 +135,7 @@ export default {
                 <td>
                 <template v-if="item.topic.toLowerCase().includes('delete')">
                 
-                <div  class="align-middle text-center"><i style="color:gray" role="button" @click="openModal(item)" class="fa fa-eye"></i></div>
+                <div  class="align-middle text-center"><i role="button" @click="openModal(item)" class="fa fa-eye"></i></div>
                 </template>
                 <template v-else >
                 <div class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></div>
@@ -146,10 +146,10 @@ export default {
                 </td>
                 </template>
                 <template v-else-if="item.status === 'accepted'">
-                <td  class="align-middle text-center"><i style="color:gray" role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
+                <td  class="align-middle text-center"><i  role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
                 </template>
                 <template v-else-if="item.status === 'rejected'">
-                <td  class="align-middle text-center"><i style="color:gray" role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
+                <td  class="align-middle text-center"><i  role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
                 </template>
                 
                 

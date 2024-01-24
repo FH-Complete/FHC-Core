@@ -18,12 +18,14 @@
   height:22px; 
   width:21px; 
   background-color:white; 
-  position:absolute; 
-  top:0; 
+  position:absolute;
+  /* top: 1px is important, otherwise it goes over the border of the thumbnail*/ 
+  top:1px; 
   right:12px; 
   display:flex; 
   align-items:center;
   justify-content:center;
+  border-radius:3px;
 }
 
 .tabulator-collapsed-row{

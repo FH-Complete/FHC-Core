@@ -4,8 +4,9 @@
     {
         $qry = "CREATE TABLE public.tbl_cis_profil_update (
                 profil_update_id INTEGER NOT NULL,
-                topic VARCHAR(32) NOT NULL,
                 uid VARCHAR(32) NOT NULL,
+                name TEXT NOT NULL,
+                topic VARCHAR(32) NOT NULL,
                 requested_change jsonb NOT NULL,
                 change_timestamp TIMESTAMP NOT NULL,
                 status VARCHAR(32) NOT NULL,
@@ -22,6 +23,7 @@
 			 CACHE 1;
              
 		    ALTER TABLE public.tbl_cis_profil_update ALTER COLUMN profil_update_id SET DEFAULT nextval('public.tbl_cis_profil_update_id_seq');
+            ALTER SEQUENCE public.tbl_cis_profil_update_id_seq OWNED BY public.tbl_cis_profil_update.profil_update_id;
             ALTER TABLE public.tbl_cis_profil_update ADD CONSTRAINT tbl_cis_profil_update_restricted_status CHECK (status IN ('pending','accepted','rejected'));
             --ALTER TABLE public.tbl_cis_profil_update ADD CONSTRAINT cis_profil_udpate_topic_uid_unique UNIQUE (uid,topic);
 

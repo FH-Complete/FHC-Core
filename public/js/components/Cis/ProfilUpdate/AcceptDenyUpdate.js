@@ -202,7 +202,7 @@ export default {
 
       <div class="d-flex flex-row gap-2">
         <input  class="form-control " v-model="data.status_message"  >
-        <button  @click="acceptRequest" class="text-nowrap btn btn-primary">Accept <i class="fa fa-check"></i></button>
+        <button  @click="acceptRequest" class="text-nowrap btn btn-success">Accept <i class="fa fa-check"></i></button>
         <button @click="denyRequest" class="text-nowrap btn btn-danger">Deny <i class="fa fa-xmark"></i></button>
       </div>
     </div>

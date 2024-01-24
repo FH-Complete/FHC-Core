@@ -16,18 +16,10 @@ const app = Vue.createApp({
           
             profil_updates_table_options:{
               ajaxURL:FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/Cis/ProfilUpdate/getAllRequests',
-                height:300,
+                height:600,
                 layout:'fitColumns',
                 
                   columns: [
-                    {
-                      title: "Topic",
-                      field: "topic",
-                      resizable: true,
-                      minWidth: 200,
-                      headerFilter: true,
-                      //responsive:0,
-                    },
                     {
                       title: "UID",
                       field: "uid",
@@ -36,7 +28,22 @@ const app = Vue.createApp({
                       headerFilter: true,
                       //responsive:0,
                     },
-                   
+                    {
+                      title: "Name",
+                      field: "name",
+                      minWidth: 200,
+                      resizable:true,
+                      headerFilter: true,
+                      //responsive:0,
+                    },
+                    {
+                      title: "Topic",
+                      field: "topic",
+                      resizable: true,
+                      minWidth: 200,
+                      headerFilter: true,
+                      //responsive:0,
+                    },
                     {
                       title: "Date",
                       field: "change_timestamp",

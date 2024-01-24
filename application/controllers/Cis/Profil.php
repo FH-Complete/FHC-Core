@@ -97,8 +97,13 @@ class Profil extends Auth_Controller
 		$payload = $json->payload;
 		$type = property_exists($json->payload,"kontakt_id")? "kontakt_id" : "adresse_id";
 		
-
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "change_timestamp" => "NOW()","status"=>"pending" ];
+		$name = $this->PersonModel->getFullName($this->uid);
+		if(isError($name)){
+			// error handling
+			var_dump($name);
+			return;
+		}
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "name"=>getData($name), "requested_change" => json_encode($payload), "change_timestamp" => "NOW()","status"=>"pending" ];
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);

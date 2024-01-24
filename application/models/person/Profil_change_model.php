@@ -51,6 +51,7 @@ class Profil_change_model extends DB_Model
 					$update->requested_change = json_decode($update->requested_change);
 					$update->change_timestamp = !is_null($update->change_timestamp)?date_create($update->change_timestamp)->format('d.m.Y'):null;
 					$update->status_timestamp = !is_null($update->status_timestamp)?date_create($update->status_timestamp)->format('d.m.Y'):null;
+					 
 				}
 			}
 		}
