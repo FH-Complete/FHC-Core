@@ -107,11 +107,9 @@ class Notiz extends FHC_Controller
 		if(isset($_POST['typeId']))
 			$type = $this->input->post('typeId');
 
-		//var_dump($_POST);
-
 		if(!$type)
 		{
-			$result = error('kein Type für ID vorhanden', EXIT_ERROR);
+			$result = error('kein Type für ID vorhanden', ERROR);
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 
 			return $this->outputJson(getError($result));

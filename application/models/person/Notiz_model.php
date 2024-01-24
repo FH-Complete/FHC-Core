@@ -293,7 +293,8 @@ class Notiz_model extends DB_Model
 			    	TO_CHAR (CASE 
 						WHEN n.updateamum >= n.insertamum THEN n.updateamum 
 						ELSE n.insertamum
-					END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate
+					END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate,
+			    	regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped
 			FROM
 			    	public.tbl_notiz n
 			JOIN 

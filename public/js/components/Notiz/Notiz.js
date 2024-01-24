@@ -140,8 +140,19 @@ export default {
 			tinymce.init({
 				target: this.$refs.editor, //Important: not selector: to enable multiple import of component
 				//height: 800,
-				plugins: ['lists'],
-				toolbar: "undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | outdent indent",
+				//plugins: ['lists'],
+				//toolbar: " blocks | bold italic underline | alignleft aligncenter alignright alignjustify",
+				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify',
+				style_formats: [
+					{ title: 'Blocks', block: 'div' },
+					{ title: 'Paragraph', block: 'p' },
+					{ title: 'Heading 1', block: 'h1' },
+					{ title: 'Heading 2', block: 'h2' },
+					{ title: 'Heading 3', block: 'h3' },
+					{ title: 'Heading 4', block: 'h4' },
+					{ title: 'Heading 5', block: 'h5' },
+					{ title: 'Heading 6', block: 'h6' },
+				],
 				autoresize_bottom_margin: 16,
 
 				setup: (editor) => {
@@ -278,7 +289,7 @@ export default {
 					
 		</form>
 		
-		<!--intText: {{intText}}-->
+	<!--	intText: {{intText}}-->
 
 
 	</div>`

@@ -24,15 +24,14 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id + '/person_id'),
-				//ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id + '/' + this.typeId),
+				//ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id + '/' + this.formData.typeId),
 				columns: [
 					{title: "Titel", field: "titel"},
-					{title: "Text", field: "text", width: 350},
+					{title: "Text", field: "text_stripped", width: 350},
 					{title: "VerfasserIn", field: "verfasser_uid"},
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
 					{title: "Start", field: "start", visible: false},
 					{title: "Ende", field: "ende", visible: false},
-					/*					{title: "Dokumente", field: "dms_id"},*/
 					{title: "Dokumente", field: "countdoc"},
 					{title: "Erledigt", field: "erledigt", visible: false},
 					{title: "Notiz_id", field: "notiz_id", visible: false},
@@ -54,8 +53,14 @@ export default {
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: '150',
+				selectableRangeMode: 'click',
 				selectable: true,
-				index: 'notiz_id'
+				index: 'notiz_id',
+/*				rowClick: (e, row) => {
+					const notizId = row.getData().notiz_id;
+					console.log(notizId);
+					this.actionEditNotiz(notizId);
+				},*/
 			},
 			tabulatorEvents: [],
 			notizen: [],
@@ -132,7 +137,6 @@ export default {
 
 			formData.append('data', JSON.stringify(this.formData));
 			Object.entries(this.formData.anhang).forEach(([k, v]) => formData.append(k, v));
-
 			CoreRESTClient.post(
 				'components/stv/Notiz/addNewNotiz/' + this.modelValue.person_id,
 				formData,
