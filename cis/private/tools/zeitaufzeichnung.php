@@ -1242,8 +1242,6 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		$showprojphases = isset($projektphasen) && is_array($projektphasen) && count($projektphasen) > 0 && $projektfound;
 		$hiddentext = $showprojphases ? "" : " style='display:none'";
 
-		echo "<input type ='hidden' value='$user' id='uidpass'>";
-
 		echo
 			'<span id="projektphaseformgroup"'.$hiddentext.'>&nbsp;&nbsp;&nbsp;&nbsp;'.
 			$p->t("zeitaufzeichnung/projektphase").'
@@ -1430,6 +1428,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		echo '</td></tr>';
 		echo '</table>';
 		echo '</form>';
+		echo "<input type ='hidden' value='$user' id='uidpass'>";
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)
