@@ -95,6 +95,7 @@ class Profil extends Auth_Controller
 
 		$json = json_decode($this->input->raw_input_stream);
 		$payload = $json->payload;
+	
 		$type = property_exists($json->payload,"kontakt_id")? "kontakt_id" : "adresse_id";
 		
 		$name = $this->PersonModel->getFullName($this->uid);
@@ -449,7 +450,8 @@ class Profil extends Auth_Controller
 		if (
 
 			//? kontaktdaten soll auch nur der user selbst sehen
-			isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt_id, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
+			//DISTINCT ON (kontakttyp)
+			isSuccess($this->KontaktModel->addSelect(['kontakttyp','kontakt_id','kontakt', 'tbl_kontakt.anmerkung', 'tbl_kontakt.zustellung'])) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))
@@ -664,7 +666,8 @@ class Profil extends Auth_Controller
 		if (
 
 			//? kontaktdaten soll auch nur der user selbst sehen
-			isSuccess($this->KontaktModel->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt_id, kontakt, tbl_kontakt.anmerkung, tbl_kontakt.zustellung')) &&
+			//DISTINCT ON (kontakttyp) 
+			isSuccess($this->KontaktModel->addSelect(['kontakttyp', 'kontakt_id', 'kontakt', 'tbl_kontakt.anmerkung', 'tbl_kontakt.zustellung'])) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT')) &&
 			isSuccess($this->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum'))

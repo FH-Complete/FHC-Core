@@ -49,9 +49,13 @@ export default {
     
             <select :value="data.kontakttyp" @change="updateValue($event,'kontakttyp')" class="form-select" aria-label="Select Kontakttyp">
                 <option selected></option>
-                <option value="email">Email</option>
-                <option value="telefon">Telefon</option>
+                <option value="email">E-mail</option>
+                <option value="telefon">Telefonnummer</option>
                 <option value="notfallkontakt">Notfallkontakt</option>
+                <option value="mobil">Mobiltelefonnummer</option>
+                <option value="homepage">Homepage</option>
+                <option value="fax">Faxnummer</option>
+                
             </select>    
         </div>
         

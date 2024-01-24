@@ -26,6 +26,7 @@ export default {
         
     },
     template:`
+   
      <div class="gy-3 row justify-content-center align-items-center">
     
     <!-- column 1 in the address row -->

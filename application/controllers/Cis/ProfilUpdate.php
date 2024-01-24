@@ -17,9 +17,7 @@ class ProfilUpdate extends Auth_Controller
 			'denyProfilRequest'=>['user:r'],
 
 		]);
-		//? put the uid and pid inside the controller to reuse in controller
-		$this->uid = getAuthUID();
-		$this->pid = getAuthPersonID();
+		
 
 		$this->load->model('person/Profil_change_model','ProfilChangeModel');
 		$this->load->model('person/Kontakt_model','KontaktModel');
@@ -44,48 +42,27 @@ class ProfilUpdate extends Auth_Controller
 		
 		$id = $this->input->post('profil_update_id',true);
 		$uid = $this->input->post('uid',true);	
+		//? fetching person_id using UID
+		$personID = $this->PersonModel->getByUid($uid);
+		$personID = hasData($personID)? getData($personID)[0]->person_id : null;
 		$status_message = $this->input->post('status_message',true);
 		$topic = $this->input->post('topic',true);
-		$requested_change = $this->input->post('requested_change',true);
+		//! somehow the xss check converted boolean false to empty string
+		$requested_change = $this->input->post('requested_change');
+
+		//! check for required information
+		if(!isset($id) || !isset($uid) || !isset($personID) || !isset($requested_change) || !isset($topic)){
+			return json_encode(error("missing required information"));
+		}
 		
 		
-		print_r($_POST);
-		//! PROPERTY EXISTS DOES NOT WORK FOR ASSOCIATIVE ARRAYS
-		if(property_exists($requested_change,"adresse_id")){
-			echo 'if';
+		if(is_array($requested_change) && array_key_exists("adresse_id",$requested_change)){
+			$this->handleAdresse($requested_change);
 			return;
-
-			$this->AdressenTypModel->addSelect(["adressentyp_kurzbz"]);
-			$adr_kurzbz = $this->AdressenTypModel->loadWhere(["bezeichnung"=>$requested_change['typ']]);
-			$adr_kurzbz = hasData($adr_kurzbz)? getData($adr_kurzbz)[0]->adressentyp_kurzbz : null;
-			//? replace the address_typ with its correct kurzbz foreign key
-			$requested_change['typ']= $adr_kurzbz;
-			
-			$adresse_id = $requested_change["adresse_id"];
-			//? removes the adresse_id because we don't want to update the kontakt_id in the database
-			unset($requested_change["adresse_id"]);
-
-			$res = $this->AdresseModel->update($adresse_id, $requested_change);
-			echo json_encode($res);
-		}else if (property_exists($requested_change,"kontakt_id")){
-			echo 'else if';
-			return;
-			
-			$kontakt_id = $requested_change["kontakt_id"];
-			//? removes the kontakt_id because we don't want to update the kontakt_id in the database
-			unset($requested_change["kontakt_id"]);
-			
-			
-			$res = $this->KontaktModel->update($kontakt_id,$requested_change);
-			
-			echo json_encode($res);
-
+		}else if (is_array($requested_change) && array_key_exists("kontakt_id", $requested_change)){
+			$this->handleKontakt($requested_change, $personID);
 		}else{
-			echo 'else';
-			return;
-			//? fetching person_id using UID
-			$personID = $this->PersonModel->getByUid($uid);
-			$personID = hasData($personID)? getData($personID)[0]->person_id : null;
+			
 			
 			switch($topic){
 				case "titel": $topic ="titelpre"; break;
@@ -96,11 +73,9 @@ class ProfilUpdate extends Auth_Controller
 			echo json_encode($res);
 		}
 
-		return;
-		if(isset($id)){
-			$res =$this->ProfilChangeModel->update([$id], ["status"=>"accepted","status_timestamp"=>"NOW()","status_message"=>$status_message]);
-			echo json_encode($res);
-		} 
+		
+		echo json_encode($this->setStatusOnUpdateRequest($id, "accepted", $status_message));
+		 
 
 	}
 
@@ -110,12 +85,78 @@ class ProfilUpdate extends Auth_Controller
 		$id = $this->input->post('profil_update_id',true);
 		$status_message = $this->input->post('status_message',true);
 		
-		if(isset($id)){
-			$res = $this->ProfilChangeModel->update([$id],["status"=>"rejected","status_timestamp"=>"NOW()","status_mesage"=>$status_message]);
-			echo json_encode($res);
-			
-		}
+		
+		echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));
+		
 		
 
+	}
+
+	private function setStatusOnUpdateRequest($id, $status, $status_message){
+		return $this->ProfilChangeModel->update([$id],["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message]);
+	}
+
+	private function handleKontakt($requested_change, $personID){
+		$kontakt_id = $requested_change["kontakt_id"];
+		//? removes the kontakt_id because we don't want to update the kontakt_id in the database
+		unset($requested_change["kontakt_id"]);
+		
+
+		//! ADD
+		if(array_key_exists('add',$requested_change) && $requested_change['add']){
+			//? removes add flag
+			unset($requested_change['add']);
+			//? fields like insertvon are not filled when inserting new row
+			$requested_change['person_id'] = $personID;
+			$res = $this->KontaktModel->insert($requested_change);
+		}
+		//! DELETE
+		elseif(array_key_exists('delete',$requested_change) && $requested_change['delete']){
+			$res = $this->KontaktModel->delete($kontakt_id);
+		}
+		//! UPDATE
+		else{
+			$res = $this->KontaktModel->update($kontakt_id,$requested_change);
+		}
+		return $res;
+	}
+
+	private function handleAdresse($requested_change){
+
+		$this->AdressenTypModel->addSelect(["adressentyp_kurzbz"]);
+		$adr_kurzbz = $this->AdressenTypModel->loadWhere(["bezeichnung"=>$requested_change['typ']]);
+		$adr_kurzbz = hasData($adr_kurzbz)? getData($adr_kurzbz)[0]->adressentyp_kurzbz : null;
+		//? replace the address_typ with its correct kurzbz foreign key
+		$requested_change['typ']= $adr_kurzbz;
+		
+		$adresse_id = $requested_change["adresse_id"];
+		//? removes the adresse_id because we don't want to update the kontakt_id in the database
+		unset($requested_change["adresse_id"]);
+
+		
+		//! ADD
+		if(array_key_exists('add',$requested_change) && $requested_change['add']){
+			//? removes add flag
+			unset($requested_change['add']);
+			echo "add";
+			var_dump($requested_change);
+			return;
+			$res = $this->AdresseModel->insert($requested_change);
+		}
+		//! DELETE
+		elseif(array_key_exists('delete',$requested_change) && $requested_change['delete']){
+			echo "delete";
+			var_dump($requested_change);
+			return;
+			$res = $this->AdresseModel->delete($adresse_id);
+		}
+		//! UPDATE
+		else{
+			echo "update";
+			var_dump($requested_change);
+			return;
+			$res = $this->AdresseModel->update($adresse_id,$requested_change);
+		}
+		return $res;
 	}
 }

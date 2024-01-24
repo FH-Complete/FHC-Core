@@ -66,14 +66,16 @@ export default {
         
         this.data= this.view=="EditAdresse"?
         {
-          added:true,
+          //? add flag
+          add:true,
           adresse_id: null,
           strasse: null,
-          adr_typ: null,
+          typ: null,
           plz: null,
           ort: null
         }: {
-          added:true,
+          //? add flag
+          add:true,
           kontakt_id: null,
           kontakttyp: null,
           kontakt: null,
@@ -85,7 +87,8 @@ export default {
       },
 
       deleteItem: function(item){
-        
+        //? delete flag 
+        item.data.delete = true;
         this.$emit('update:profilUpdate',item.data);
         //? updates the topic when a Kontakt or an Address should be deleted
         this.topic = item.data.kontakt?"Delete Kontakte":"Delete Adressen";

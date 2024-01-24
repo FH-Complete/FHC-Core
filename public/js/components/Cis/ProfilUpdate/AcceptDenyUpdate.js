@@ -44,7 +44,7 @@ export default {
 
   methods: {
     acceptRequest: function(){
-      console.log(this.data.profil_update_id);
+      
       Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then(res =>{
         console.log("res",res);
         console.log("res.data",res.data);
@@ -108,6 +108,7 @@ export default {
     return BsModal.popup.bind(this)(null, options);
   },
   template: `
+
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
     <template v-slot:title>
@@ -116,14 +117,15 @@ export default {
 
 
     <template v-slot:default>
-   
+
     <!-- debugging prints 
     <pre>{{JSON.stringify(data.profil_update_id,null,2)}}</pre>
     <pre>view {{getComponentView}}</pre>
     <pre>topic {{JSON.stringify(data.topic,null,2)}}</pre>
-    <pre>data {{JSON.stringify(data.requested_change,null,2)}}</pre>
+    
     -->
-    <div class="row">
+    
+   <div class="row">
     <div  class="form-underline mb-2 col">
       <div class="form-underline-titel">Status: </div>
 
