@@ -4,6 +4,7 @@ import File from '../Form/Upload/File.js';
 import FormUploadDms from '../Form/Upload/Dms.js';
 import {CoreRESTClient} from "../../RESTClient";
 
+
 export default {
 	components: {
 		VueDatePicker,
@@ -115,7 +116,6 @@ export default {
 				return this.anhang;
 			},
 			set(value) {
-				//console.log(value);
 				this.$emit('update:anhang', value);
 			}
 		}
@@ -130,7 +130,6 @@ export default {
 			return CoreRESTClient
 				.get('components/stv/Notiz/getMitarbeiter/' + event.query)
 				.then(result => {
-					//console.log(result);
 					this.filteredMitarbeiter = CoreRESTClient.getData(result.data);
 				});
 		},
@@ -195,20 +194,20 @@ export default {
 				
 				<div class="row mb-3">
 					<div class="col-sm-7">
-						<p v-if="statusNew" class="fw-bold">Neue Notiz</p>
-						<p v-else class="fw-bold">Notiz bearbeiten</p>
+						<p v-if="statusNew" class="fw-bold"> {{$p.t('notiz','notiz_new')}}</p>
+						<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}}</p>
 					</div>
 				</div>
 	
 				<div class="row mb-3">
-					<label for="titel" class="form-label col-sm-2">Titel</label>
+					<label for="titel" class="form-label col-sm-2">{{$p.t('global','titel')}}</label>
 					<div class="col-sm-7">
 						<input type="text" v-model="intTitel" class="form-control">
 					</div>
 				</div>
 							
 				<div class="row mb-3">
-					<label for="text" class="form-label col-sm-2">Text</label>
+					<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}}</label>
 								
 					<!-- TinyMce 5 -->
 					<div class="col-sm-7">
@@ -221,7 +220,7 @@ export default {
 			<div v-if="showDocument">
 				<div class="row mb-3">
 				
-					<label for="text" class="form-label col-sm-2">Dokument</label>
+					<label for="text" class="form-label col-sm-2">{{$p.t('notiz','document')}}</label>
 					<div  class="col-sm-7 py-3">
 						<!--Upload Component-->
 						<FormUploadDms ref="upload" id="file" multiple v-model="intAnhang"></FormUploadDms>
@@ -234,12 +233,12 @@ export default {
 			<div v-if="showErweitert">
 			
 				<div class="row mb-3">
-					<label for="bis" class="form-label col-sm-2">VerfasserIn</label>
+					<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','verfasser')}}</label>
 					<div class="col-sm-3">
 						<PvAutoComplete v-model="intVerfasser" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
 					</div>
 					
-					<label for="von" class="form-label col-sm-1">gültig von</label>
+					<label for="von" class="form-label col-sm-1">{{$p.t('global','gueltigVon')}}</label>
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="von"
@@ -253,12 +252,13 @@ export default {
 				</div>
 				
 				<div class="row mb-3">
-					<label for="bis" class="form-label col-sm-2">BearbeiterIn</label>
+					<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','bearbeiter')}}</label>
 					<div class="col-sm-3">
-						<PvAutoComplete v-model="intBearbeiter" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
+						<PvAutoComplete v-model="intBearbeiter" optionLabel="mitarbeiter" :suggestions="filteredMitarbeiter" @complete="search" minlength="3"/>
 					</div>
 					
-					<label for="bis" class="form-label col-sm-1">gültig bis</label>
+					
+					<label for="bis" class="form-label col-sm-1">{{$p.t('global','gueltigBis')}}</label>
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="bis"
@@ -268,12 +268,12 @@ export default {
 							:enable-time-picker="false"
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"></vue-date-picker>
-					</div>
+					</div>				
 					
 				</div>
 									
 				<div class="row mb-3">
-					<label for="bis" class="form-label col-sm-2">erledigt</label>
+					<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','erledigt')}}</label>
 					<div class="col-sm-1">
 						<input type="checkbox" v-model="intErledigt">
 					</div>
@@ -281,7 +281,7 @@ export default {
 			</div>
 			
 			<div class="row mb-3">
-				<label for="lastChange" class="form-label col-sm-2 small">letzte Änderung</label>
+				<label for="lastChange" class="form-label col-sm-2 small">{{$p.t('notiz','letzte_aenderung')}}</label>
 				<div class="col-sm-7">
 					<p class="small">{{this.lastChange}}</p>
 				</div>
@@ -289,9 +289,6 @@ export default {
 					
 		</form>
 		
-	<!--	intText: {{intText}}-->
-
-
 	</div>`
 }
 

@@ -9,7 +9,11 @@
 		#'filtercomponent' => true,
 		'tabulator5' => true,
 		'tinymce5' => true,
-		'phrases' => [],
+		'phrases' => array(
+			'global',
+			'ui',
+			'notiz',
+		),
 		'customCSSs' => [
 			'public/css/components/vue-datepicker.css',
 			'public/css/components/primevue.css',

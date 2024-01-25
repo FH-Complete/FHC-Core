@@ -3,13 +3,6 @@ import {CoreFilterCmpt} from "../../../filter/Filter.js";
 import Notiz from "../../../Notiz/Notiz.js";
 import BsModal from "../../../Bootstrap/Modal";
 
-var editIcon = function (cell, formatterParams) {
-	return "<i class='fa fa-edit'></i>";
-};
-var deleteIcon = function (cell, formatterParams) {
-	return "<i class='fa fa-remove text-danger'></i>";
-};
-
 export default {
 	components: {
 		CoreRESTClient,
@@ -27,8 +20,8 @@ export default {
 				//ajaxURL: CoreRESTClient._generateRouterURI('components/stv/Notiz/getNotizen/' + this.modelValue.person_id + '/' + this.formData.typeId),
 				columns: [
 					{title: "Titel", field: "titel"},
-					{title: "Text", field: "text_stripped", width: 350},
-					{title: "VerfasserIn", field: "verfasser_uid"},
+					{title: "Text", field: "text_stripped", width: 250},
+					{title:  "VerfasserIn", field: "verfasser_uid"},
 					{title: "BearbeiterIn", field: "bearbeiter_uid", visible: false},
 					{title: "Start", field: "start", visible: false},
 					{title: "Ende", field: "ende", visible: false},
@@ -37,22 +30,37 @@ export default {
 					{title: "Notiz_id", field: "notiz_id", visible: false},
 					{title: "Notizzuordnung_id", field: "notizzuordnung_id", visible: false},
 					{title: "letzte Änderung", field: "lastupdate", visible: false},
-					{
-						formatter: editIcon, cellClick: (e, cell) => {
-							this.actionEditNotiz(cell.getData().notiz_id);
-							//console.log(cell.getRow().getIndex(), cell.getData(), this);
-						}, width: 50, headerSort: false, headerVisible: false
-					},
-					{
-						formatter: deleteIcon, cellClick: (e, cell) => {
-							this.actionDeleteNotiz(cell.getData().notiz_id);
+					{title: 'Aktionen', field: 'actions',
+						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						formatter: (cell, formatterParams, onRendered) => {
+						let container = document.createElement('div');
+						container.className = "d-flex gap-2";
 
-						}, width: 50, headerSort: false, headerVisible: false
-					},
+						let button = document.createElement('button');
+						button.className = 'btn btn-outline-secondary btn-action';
+						button.innerHTML = '<i class="fa fa-edit"></i>';
+						button.addEventListener('click', (event) =>
+							this.actionEditNotiz(cell.getData().notiz_id)
+						);
+						container.append(button);
+
+						button = document.createElement('button');
+						button.className = 'btn btn-outline-secondary btn-action';
+						button.innerHTML = '<i class="fa fa-xmark"></i>';
+						button.addEventListener('click', () =>
+							this.actionDeleteNotiz(cell.getData().notiz_id)
+						);
+						container.append(button);
+
+						return container;
+						},
+						frozen: true
+					}
 				],
+
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
-				height: '150',
+				height: '250',
 				selectableRangeMode: 'click',
 				selectable: true,
 				index: 'notiz_id',
@@ -82,8 +90,7 @@ export default {
 				anhang: []
 			},
 			showErweitert: true, //show details verfasser, bearbeiter, von, bis, erledigt
-			showDocument: true //show upload documents
-
+			showDocument: true, //show upload documents
 		};
 	},
 	methods:{
@@ -113,7 +120,6 @@ export default {
 					if(this.notizen.dms_id){
 						console.log("loadEntries with " + this.notizen.notiz_id);
 						this.loadDocEntries(this.notizen.notiz_id);
-						//console.log(this.formData.anhang);
 					}
 				});
 		},
@@ -271,7 +277,41 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	computed: {	},
+	async mounted() {
+		await this.$p.loadCategory(['notiz','global']);
+
+		let cm = this.$refs.table.tabulator.columnManager;
+
+		cm.getColumnByField('verfasser_uid').component.updateDefinition({
+			title: this.$p.t('notiz', 'verfasser')
+		});
+		cm.getColumnByField('titel').component.updateDefinition({
+			title: this.$p.t('global', 'titel')
+		});
+		cm.getColumnByField('text_stripped').component.updateDefinition({
+			title: this.$p.t('global', 'text')
+		});
+		cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
+			title: this.$p.t('notiz', 'bearbeiter')
+		});
+		cm.getColumnByField('start').component.updateDefinition({
+			title: this.$p.t('global', 'gueltigVon')
+		});
+		cm.getColumnByField('ende').component.updateDefinition({
+			title: this.$p.t('global', 'gueltigBis')
+		});
+		cm.getColumnByField('countdoc').component.updateDefinition({
+			title: this.$p.t('notiz', 'document')
+		});
+		cm.getColumnByField('erledigt').component.updateDefinition({
+			title: this.$p.t('notiz', 'erledigt')
+		});
+		cm.getColumnByField('lastupdate').component.updateDefinition({
+			title: this.$p.t('notiz', 'letzte_aenderung')
+		});
+	},
+/*	computed: {
+		},*/
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 
@@ -321,9 +361,9 @@ export default {
 		>
 		</Notiz>
 			
-		<button v-if="formData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> Neu anlegen </button>
-		<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> Speichern </button>
-
+		<button v-if="formData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+		<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+	
 	</div>
 	`
 };

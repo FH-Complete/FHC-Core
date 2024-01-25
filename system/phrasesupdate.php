@@ -21782,6 +21782,139 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'document',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anhänge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attachments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'notiz_new',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Notiz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'notiz_edit',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'verfasser',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verfasser*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'author',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'bearbeiter',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bearbeiter*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'editor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'erledigt',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'erledigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'completed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'letzte_aenderung',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'letzte Änderung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Last updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
