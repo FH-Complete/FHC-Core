@@ -115,7 +115,7 @@ class Profil extends Auth_Controller
 			$existing_change = json_decode($update_request->requested_change);
 			
 			 
-			if(property_exists($existing_change,$type) && property_exists($payload,$type) && $existing_change->$type == $payload->$type){
+			if(!isset($existing_change->add) && property_exists($existing_change,$type) && property_exists($payload,$type) && $existing_change->$type == $payload->$type){
 				//? the kontakt_id / adresse_id of a change has to be unique 
 				
 				echo json_encode(error("cannot change the same resource twice"));

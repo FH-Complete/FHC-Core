@@ -40,7 +40,6 @@ export default {
             }
         },
         openModal(updateRequest) {
-            console.log(JSON.stringify(updateRequest));
 
             let view = this.getView(updateRequest.topic,updateRequest.status);
             let data = null;
@@ -73,7 +72,6 @@ export default {
                 content['status_message']= updateRequest.status_message;
                 content['status_timestamp']=updateRequest.status_timestamp;
             }
-
 
             //? only show the popup if also the right content is available
             if(content){

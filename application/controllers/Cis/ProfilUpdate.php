@@ -38,62 +38,65 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	public function acceptProfilRequest(){
+
 		$_POST = json_decode($this->input->raw_input_stream,true);
-		
 		$id = $this->input->post('profil_update_id',true);
 		$uid = $this->input->post('uid',true);	
+
 		//? fetching person_id using UID
 		$personID = $this->PersonModel->getByUid($uid);
 		$personID = hasData($personID)? getData($personID)[0]->person_id : null;
 		$status_message = $this->input->post('status_message',true);
 		$topic = $this->input->post('topic',true);
+
 		//! somehow the xss check converted boolean false to empty string
 		$requested_change = $this->input->post('requested_change');
-
+		
 		//! check for required information
 		if(!isset($id) || !isset($uid) || !isset($personID) || !isset($requested_change) || !isset($topic)){
 			return json_encode(error("missing required information"));
 		}
 		
-		
 		if(is_array($requested_change) && array_key_exists("adresse_id",$requested_change)){
-			$this->handleAdresse($requested_change, $personID);
+			$resID = $this->handleAdresse($requested_change, $personID);
+			$resID = hasData($resID) ? getData($resID) : null;
+			$requested_change['adresse_id'] = $resID;
+			
 		}else if (is_array($requested_change) && array_key_exists("kontakt_id", $requested_change)){
-			$this->handleKontakt($requested_change, $personID);
+			$resID = $this->handleKontakt($requested_change, $personID);
+			$resID = hasData($resID) ? getData($resID)[0] : null;
+			$requested_change['kontakt_id'] = $resID;
+			
 		}else{
-			
-			
 			switch($topic){
 				case "titel": $topic ="titelpre"; break;
 				case "postnomen": $topic = "titelpost"; break;
 			}
-			$res = $this->PersonModel->update($personID,[$topic=>$requested_change]);
-		
-			echo json_encode($res);
+			$result = $this->PersonModel->update($personID,[$topic=>$requested_change]);
+			if(isError($result)){
+				echo json_encode($result);
+				return;
+			}
 		}
-
 		
-		echo json_encode($this->setStatusOnUpdateRequest($id, "accepted", $status_message));
-		 
-
+		echo json_encode($this->setStatusOnUpdateRequest($id, "accepted", $status_message, $requested_change));
 	}
 
 	public function denyProfilRequest(){
-		$_POST = json_decode($this->input->raw_input_stream,true);
 		
+		$_POST = json_decode($this->input->raw_input_stream,true);
 		$id = $this->input->post('profil_update_id',true);
 		$status_message = $this->input->post('status_message',true);
 		
-		
 		echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));
-		
-		
-
 	}
 
-	private function setStatusOnUpdateRequest($id, $status, $status_message){
-		return $this->ProfilChangeModel->update([$id],["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message]);
+	private function setStatusOnUpdateRequest($id, $status, $status_message, $requested_change=NULL){
+		$update = ["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message];
+		if(isset($requested_change)) { $update['requested_change'] = $requested_change; } 
+		return $this->ProfilChangeModel->update([$id], $update);
 	}
+
 
 	private function handleKontakt($requested_change, $personID){
 		$kontakt_id = $requested_change["kontakt_id"];

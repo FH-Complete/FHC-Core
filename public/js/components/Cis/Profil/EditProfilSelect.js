@@ -134,7 +134,7 @@ export default {
     created() {
       this.data = JSON.parse(JSON.stringify(this.list.data));
       this.view = JSON.parse(JSON.stringify(this.list.view));
-        
+      
         
     },
     mounted() {

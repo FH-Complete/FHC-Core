@@ -278,7 +278,7 @@ export default {
                 view:"text_input",
                 data:{
                   titel:"postnomen",
-                  value:this.data.titel,
+                  value:this.data.postnomen,
                 }
               },
             }
