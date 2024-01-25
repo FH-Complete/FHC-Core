@@ -22,7 +22,8 @@ export default {
 	data() {
 		return {
 			valid: undefined,
-			feedback: []
+			feedback: [],
+			modelValueDummy: undefined
 		}
 	},
 	computed: {
@@ -31,8 +32,9 @@ export default {
 				return true;
 			if (this.containerClass)
 				return true;
-			if (this.autoContainerClass)
-				return true;
+			for (const prop in this.autoContainerClass)
+				if (Object.hasOwn(this.autoContainerClass, prop))
+					return true;
 			return false;
 		},
 		acc() {
@@ -70,6 +72,8 @@ export default {
 		},
 		tag() {
 			switch (this.lcType) {
+				case 'textarea+':
+					return 'textarea';
 				case 'textarea':
 				case 'select':
 					return this.lcType;
@@ -122,6 +126,7 @@ export default {
 					case 'number':
 					case 'password':
 					case 'textarea':
+					case 'textarea+':
 						if (!c.includes('form-control'))
 							classes.push('form-control');
 						break;
@@ -145,9 +150,13 @@ export default {
 		},
 		modelValueCmp: {
 			get() {
+				if (this.$attrs.modelValue === undefined)
+					return this.modelValueDummy;
 				return this.$attrs.modelValue;
 			},
 			set(v) {
+				if (this.$attrs.modelValue === undefined)
+					this.modelValueDummy = v;
 				this.$emit('update:modelValue', v);
 			}
 		},
@@ -204,13 +213,14 @@ export default {
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
 		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
-		<input v-if="tag == 'input'" :type="lcType" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
-		<textarea v-else-if="tag == 'textarea'" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)"></textarea>
-		<select v-else-if="tag == 'select'" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
+		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
+		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)"></textarea>
+		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
 			<slot></slot>
 		</select>
 		<component
 			v-else-if="tag == 'VueDatePicker'"
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -226,6 +236,7 @@ export default {
 		</component>
 		<component
 			v-else-if="tag == 'PvAutocomplete'"
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -240,6 +251,7 @@ export default {
 		</component>
 		<component
 			v-else-if="tag == 'UploadDms'"
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -255,6 +267,7 @@ export default {
 		</component>
 		<component
 			v-else
+			ref="input"
 			:is="tag"
 			:type="type"
 			v-model="modelValueCmp"
@@ -267,6 +280,7 @@ export default {
 			<slot></slot>
 		</component>
 		<label v-if="$attrs.label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{$attrs.label}}</label>
+		<div v-if="lcType == 'textarea' && $attrs.maxlength" class="form-text text-end">{{ modelValueCmp?.length || 0 }} / {{ $attrs.maxlength }}</div>
 		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">
