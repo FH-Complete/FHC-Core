@@ -4,14 +4,6 @@ import PvAutoComplete from "../../../../../../../index.ci.php/public/js/componen
 import FhcFormValidation from '../../../../Form/Validation.js';
 import BsModal from "../../../../Bootstrap/Modal.js";
 
-
-var editIcon = function (cell, formatterParams) {
-	return "<i class='fa fa-edit'></i>";
-};
-var deleteIcon = function (cell, formatterParams) {
-	return "<i class='fa fa-remove'></i>";
-};
-
 export default{
 	components: {
 		CoreFilterCmpt,
@@ -55,12 +47,32 @@ export default{
 						}
 					},
 					{title:"Anmerkung", field:"anmerkung", visible:false},
-						{formatter:editIcon, width:40, align:"center", cellClick: (e, cell) => {
-								this.actionEditAdress(cell.getData().adresse_id);
-							}, width:50, headerSort:false},
-						{formatter:deleteIcon, width:40, align:"center", cellClick: (e, cell) => {
-								this.actionDeleteAdress(cell.getData().adresse_id);
-							}, width:50, headerSort:false },
+					{title: 'Aktionen', field: 'actions',
+						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.addEventListener('click', (event) =>
+								this.actionEditAdress(cell.getData().adresse_id)
+							);
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.addEventListener('click', () =>
+								this.actionDeleteAdress(cell.getData().adresse_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					},
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,

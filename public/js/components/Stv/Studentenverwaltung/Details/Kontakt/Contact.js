@@ -4,13 +4,6 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 /*import PvToast from "../../../../../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";*/
 import PvAutoComplete from "../../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 
-var editIcon = function (cell, formatterParams) {
-	return "<i class='fa fa-edit'></i>";
-};
-var deleteIcon = function (cell, formatterParams){
-	return "<i class='fa fa-remove'></i>";
-};
-
 export default{
 	components: {
 		CoreFilterCmpt,
@@ -39,13 +32,32 @@ export default{
 					{title:"Kontakt_id", field:"kontakt_id", visible:false},
 					{title:"Standort_id", field:"standort_id", visible:false},
 					{title:"letzte Änderung", field:"updateamum", visible:false},
-						{formatter:editIcon, cellClick: (e, cell) => {
-								this.actionEditContact(cell.getData().kontakt_id);
-							}, width:50, headerSort:false, headerVisible:false},
-						{formatter:deleteIcon, cellClick: (e, cell) => {
-								this.actionDeleteContact(cell.getData().kontakt_id);
+					{title: 'Aktionen', field: 'actions',
+						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
 
-							}, width:50, headerSort:false, headerVisible:false},
+							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.addEventListener('click', (event) =>
+								this.actionEditContact(cell.getData().kontakt_id)
+							);
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.addEventListener('click', () =>
+								this.actionDeleteContact(cell.getData().kontakt_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					},
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,

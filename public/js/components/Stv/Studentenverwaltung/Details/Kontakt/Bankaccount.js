@@ -2,13 +2,6 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import {CoreRESTClient} from "../../../../../RESTClient";
 import BsModal from "../../../../Bootstrap/Modal.js";
 
-var editIcon = function (cell, formatterParams) {
-	return "<i class='fa fa-edit'></i>";
-};
-var deleteIcon = function (cell, formatterParams)  {
-	return "<i class='fa fa-remove'></i>";
-};
-
 export default{
 	components: {
 		CoreFilterCmpt,
@@ -50,13 +43,32 @@ export default{
 					},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Bankverbindung_id", field:"bankverbindung_id", visible:false},
-					{formatter:editIcon, width:40, align:"center", cellClick: (e, cell) => {
-							this.actionEditBankverbindung(cell.getData().bankverbindung_id);
-						}, width:50, headerSort:false},
-					{formatter:deleteIcon, width:40, align:"center", cellClick: (e, cell) => {
-							this.actionDeleteBankverbindung(cell.getData().bankverbindung_id);
-						}, width:50, headerSort:false },
+					{title: 'Aktionen', field: 'actions',
+						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
 
+							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.addEventListener('click', (event) =>
+								this.actionEditBankverbindung(cell.getData().bankverbindung_id)
+							);
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.addEventListener('click', () =>
+								this.actionDeleteBankverbindung(cell.getData().bankverbindung_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					},
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData:	false,
