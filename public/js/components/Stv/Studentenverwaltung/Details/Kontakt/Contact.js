@@ -187,16 +187,40 @@ export default{
 				console.error(err.response.data || err.message);
 			});
 	},
+	async mounted() {
+		await this.$p.loadCategory(['notiz','global','person']);
+
+		let cm = this.$refs.table.tabulator.columnManager;
+
+		cm.getColumnByField('kontakttyp').component.updateDefinition({
+			title: this.$p.t('global', 'typ')
+		});
+		cm.getColumnByField('kontakt').component.updateDefinition({
+			title: this.$p.t('global', 'kontakt')
+		});
+		cm.getColumnByField('zustellung').component.updateDefinition({
+			title: this.$p.t('person', 'zustellung')
+		});
+		cm.getColumnByField('anmerkung').component.updateDefinition({
+			title: this.$p.t('global', 'anmerkung')
+		});
+		cm.getColumnByField('kurz_bz').component.updateDefinition({
+			title: this.$p.t('person', 'firma')
+		});
+		cm.getColumnByField('updateamum').component.updateDefinition({
+			title: this.$p.t('notiz', 'letzte_aenderung')
+		});
+	},
 	template: `	
 		<div class="stv-list h-100 pt-3">
 		
 		<!--Modal: new Contact-->
 		<BsModal ref="newContactModal">
-			<template #title>Kontakt anlegen</template>
+			<template #title>{{this.$p.t('person', 'kontakt_new')}}</template>
 				<form class="row g-3" ref="contactData">
 				
 						<div class="row mb-3">
-							<label for="kontakttyp" class="form-label col-sm-4">Typ</label>
+							<label for="kontakttyp" class="form-label col-sm-4">{{this.$p.t('global', 'typ')}}</label>
 							<div class="col-sm-6">
 								<select id="kontakttyp" class="form-control" v-model="contactData.kontakttyp">
 									<option value="">keine Auswahl</option>
@@ -205,20 +229,20 @@ export default{
 							</div>
 						</div>
 						<div class="row mb-3">										   
-							<label for="kontakt" class="form-label col-sm-4">Kontakt</label>
+							<label for="kontakt" class="form-label col-sm-4">{{this.$p.t('global', 'kontakt')}}</label>
 							<div class="col-sm-6">
 								<input type="text" :readonly="readonly" class="form-control" id="kontakt" v-model="contactData['kontakt']">
 							</div>
 						</div>
 						<div class="row mb-3">									   
-							<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+							<label for="anmerkung" class="form-label col-sm-4">{{this.$p.t('global', 'anmerkung')}}</label>
 							<div class="col-sm-6">
 								<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
 							</div>
 						</div>
 						
 						<div class="row mb-3">
-							<label for="zustellung" class="form-label col-sm-4">Zustellung</label>
+							<label for="zustellung" class="form-label col-sm-4">{{this.$p.t('person', 'zustellung')}}</label>
 							<div class="col-sm-6">
 								<div class="form-check">
 									<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
@@ -227,24 +251,24 @@ export default{
 						</div>
 							
 						<div class="row mb-3">
-							<label for="firma_name" class="form-label col-sm-4">Firma / Standort</label>
+							<label for="firma_name" class="form-label col-sm-4">{{this.$p.t('person', 'firma')}} / {{this.$p.t('person', 'standort')}}</label>
 								<div class="col-sm-6">
 									<PvAutoComplete v-model="contactData['standort']" optionLabel="kurzbz" :suggestions="filteredStandorte" @complete="search" minLength="3"/>
 								</div>
 						</div>
 				</form>
 			    <template #footer>
-            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{this.$p.t('ui', 'abbrechen')}}</button>
 					<button type="button" class="btn btn-primary" @click="addNewContact()">OK</button>
             	</template>
 		</BsModal>
 						
 		<!--Modal: Edit Contact-->
 		<BsModal ref="editContactModal">
-			<template #title>Kontakt bearbeiten</template>
+			<template #title>{{this.$p.t('person', 'kontakt_edit')}}</template>
 			<form class="row g-3" ref="contactData">
 				<div class="row mb-3">
-					<label for="kontakttyp" class="form-label col-sm-4">Typ</label>
+					<label for="kontakttyp" class="form-label col-sm-4">{{this.$p.t('global', 'typ')}}</label>
 					<div class="col-sm-6">
 						<select id="kontakttyp" class="form-control" v-model="contactData.kontakttyp">
 							<option value="">-- keine Auswahl --</option>
@@ -253,19 +277,19 @@ export default{
 					</div>
 				</div>
 				<div class="row mb-3">									   
-					<label for="kontakt" class="form-label col-sm-4">Kontakt</label>
+					<label for="kontakt" class="form-label col-sm-4">{{this.$p.t('global', 'kontakt')}}</label>
 					<div class="col-sm-6">
 						<input type="text" :readonly="readonly" class="form-control" id="kontakt" v-model="contactData['kontakt']">
 					</div>
 				</div>
 				<div class="row mb-3">									   
-					<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+					<label for="anmerkung" class="form-label col-sm-4">{{this.$p.t('global', 'anmerkung')}}</label>
 					<div class="col-sm-6">
 						<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="contactData['anmerkung']">
 					</div>
 				</div>
 				<div class="row mb-3">
-					<label for="zustellung" class="form-label col-sm-4">Zustellung</label>
+					<label for="zustellung" class="form-label col-sm-4">{{this.$p.t('person', 'zustellung')}}</label>
 					<div class="col-sm-6">
 						<div class="form-check">
 							<input id="zustellung" type="checkbox" class="form-check-input" value="1" v-model="contactData['zustellung']">
@@ -277,7 +301,7 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="standort" class="form-label col-sm-4">Firma / Standort</label>
+					<label for="standort" class="form-label col-sm-4">{{this.$p.t('person', 'firma')}} / {{this.$p.t('person', 'standort')}}</label>
 						<div v-if="contactData.kurzbz" class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="contactData.kurzbz">
 						</div>	
@@ -287,19 +311,19 @@ export default{
 				</div>
 			</form>
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{this.$p.t('ui', 'abbrechen')}}</button>
 				<button type="button" class="btn btn-primary" @click="updateContact(contactData.kontakt_id)">OK</button>
 			</template>
 		</BsModal>
 									
 		<!--Modal: Delete Contact-->
 		<BsModal ref="deleteContactModal">
-			<template #title>Kontakt löschen</template>  
+			<template #title>{{this.$p.t('person', 'kontakt_delete')}}</template>  
 			<template #default>
-				<p>Kontakt wirklich löschen?</p>
+				<p>{{this.$p.t('person', 'kontakt_confirm_delete')}}</p>
 			</template>												
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{this.$p.t('ui', 'abbrechen')}}</button>
 				<button ref="Close" type="button" class="btn btn-primary" @click="deleteContact(contactData.kontakt_id)">OK</button>
 			</template>
 		</BsModal>

@@ -41,9 +41,9 @@ export default{
 						}
 					},
 					{title:"Abweich.Empf", field:"co_name"},
-					{title:"Name", field:"name"},
 					{title:"Firma", field:"firmenname"},
 					{title:"Firma_id", field:"firma_id", visible:false},
+					{title:"Name", field:"name"},
 					{title:"Adresse_id", field:"adresse_id", visible:false},
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Name", field:"name", visible:false},
@@ -263,15 +263,60 @@ export default{
 				console.error(err.response.data || err.message);
 			});
 	},
+	async mounted() {
+		await this.$p.loadCategory(['notiz','global','person']);
+
+		let cm = this.$refs.table.tabulator.columnManager;
+
+		cm.getColumnByField('bezeichnung').component.updateDefinition({
+			title: this.$p.t('global', 'typ')
+		});
+		cm.getColumnByField('strasse').component.updateDefinition({
+			title: this.$p.t('person', 'strasse')
+		});
+		cm.getColumnByField('plz').component.updateDefinition({
+			title: this.$p.t('person', 'plz')
+		});
+		cm.getColumnByField('ort').component.updateDefinition({
+			title: this.$p.t('person', 'ort')
+		});
+		cm.getColumnByField('gemeinde').component.updateDefinition({
+			title: this.$p.t('person', 'gemeinde')
+		});
+		cm.getColumnByField('nation').component.updateDefinition({
+			title: this.$p.t('person', 'nation')
+		});
+		cm.getColumnByField('heimatadresse').component.updateDefinition({
+			title: this.$p.t('person', 'heimatadresse')
+		});
+		cm.getColumnByField('co_name').component.updateDefinition({
+			title: this.$p.t('person', 'co_name')
+		});
+		cm.getColumnByField('name').component.updateDefinition({
+			title: this.$p.t('person', 'firma_zusatz')
+		});
+		cm.getColumnByField('firmenname').component.updateDefinition({
+			title: this.$p.t('person', 'firma')
+		});
+		cm.getColumnByField('updateamum').component.updateDefinition({
+			title: this.$p.t('notiz', 'letzte_aenderung')
+		});
+		cm.getColumnByField('rechnungsadresse').component.updateDefinition({
+			title: this.$p.t('person', 'rechnungsadresse')
+		});
+		cm.getColumnByField('anmerkung').component.updateDefinition({
+			title: this.$p.t('notiz', 'document')
+		});
+	},
 	template: `
 		<div class="stv-list h-100 pt-3">
 		
 		<!--Modal: Add Address-->
 		<BsModal ref="newAdressModal">
-			<template #title>Adresse anlegen</template>
+			<template #title>{{this.$p.t('person', 'adresse_new')}}</template>
 				<form class="row g-3" ref="addressData">
 					<div class="row mb-3">
-						<label for="adressentyp" class="form-label col-sm-4">Typ</label>
+						<label for="adressentyp" class="form-label col-sm-4">{{this.$p.t('global', 'typ')}}</label>
 						<div class="col-sm-6">
 							<select id="adressentyp" class="form-select" v-model="addressData.typ">
 								<option v-for="typ in adressentypen" :key="typ.adressentyp_kurzbz" :value="typ.adressentyp_kurzbz" >{{typ.bezeichnung}}</option>
@@ -279,14 +324,14 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="strasse" class="form-label col-sm-4">Strasse</label>
+						<label for="strasse" class="form-label col-sm-4">{{this.$p.t('person', 'strasse')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="strasse" v-model="addressData['strasse']">
 						</div>
 					</div>
 						
 					<div class="row mb-3">
-						<label for="nation" class="form-label col-sm-4">Nation</label>
+						<label for="nation" class="form-label col-sm-4">{{this.$p.t('person', 'nation')}}</label>
 						<div class="col-sm-6">
 							<select id="nation" class="form-select" v-model="addressData.nation">
 								<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
@@ -295,14 +340,14 @@ export default{
 					</div>
 										
 					<div class="row mb-3">
-						<label for="plz" class="required form-label col-sm-4" >PLZ</label>
+						<label for="plz" class="required form-label col-sm-4" >{{this.$p.t('person', 'plz')}}</label>
 						 <div class="col-sm-6">
 							<input type="text" class="form-control" required v-model="addressData['plz']" @input="loadPlaces" >
 						</div>
 					</div>
 					
 					<div class="row mb-3">
-						<label :for="gemeinde" class="form-label col-sm-4">Gemeinde</label>
+						<label :for="gemeinde" class="form-label col-sm-4">{{this.$p.t('person', 'gemeinde')}}</label>
 							<div class="col-sm-6">
 								<select v-if="addressData['nation'] == 'A'" name="addressData[gemeinde]" class="form-select" v-model="addressData['gemeinde']">
 									<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
@@ -313,7 +358,7 @@ export default{
 					</div>
 					
 					<div class="row mb-3">
-							<label :for="Ort" class="form-label col-sm-4">Ort</label>
+							<label :for="Ort" class="form-label col-sm-4">{{this.$p.t('person', 'ort')}}</label>
 							<div class="col-sm-6">
 								<select v-if="addressData['nation'] == 'A'" name="address[ort]" class="form-select" v-model="addressData['ort']">
 									<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
@@ -324,7 +369,7 @@ export default{
 					</div>
 										
 					<div class="row mb-3">
-						<label for="heimatadresse" class="form-label col-sm-4">Heimatadresse</label>
+						<label for="heimatadresse" class="form-label col-sm-4">{{this.$p.t('person', 'heimatadresse')}}</label>
 						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['heimatadresse']">
@@ -333,7 +378,7 @@ export default{
 					</div>
 						
 					<div class="row mb-3">
-						<label for="zustelladresse" class="form-label col-sm-4">Zustelladresse</label>
+						<label for="zustelladresse" class="form-label col-sm-4">{{this.$p.t('person', 'zustelladresse')}}</label>
 						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['zustelladresse']">
@@ -342,14 +387,14 @@ export default{
 					</div>
 					
 					<div class="row mb-3">
-							<label for="co_name" class="form-label col-sm-4">Abweich.Empfänger. (c/o)</label>
+							<label for="co_name" class="form-label col-sm-4">{{this.$p.t('person', 'co_name')}}</label>
 						<div class="col-sm-6">
 							<input type="text" id="co_name" class="form-control" v-model="addressData['co_name']">
 						</div>
 					</div>
 					
 					<div class="row mb-3">
-						<label for="rechnungsadresse" class="form-label col-sm-4">Rechnungsadresse</label>
+						<label for="rechnungsadresse" class="form-label col-sm-4">{{this.$p.t('person', 'rechnungsadresse')}}</label>
 						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="addressData['rechnungsadresse']">
@@ -358,37 +403,37 @@ export default{
 					</div>
 					
 					<div class="row mb-3">
-						<label for="firma_name" class="form-label col-sm-4">Firma</label>
+						<label for="firma_name" class="form-label col-sm-4">{{this.$p.t('person', 'firma')}}</label>
 							<div class="col-sm-3">
 							 	<PvAutoComplete v-model="addressData['firma']"  optionLabel="name" :suggestions="filteredFirmen" @complete="search" minLength="3"/>
 							</div>
 					</div>
 					
 					<div class="row mb-3">
-						<label for="name" class="form-label col-sm-4">Name</label>
+						<label for="name" class="form-label col-sm-4">{{this.$p.t('person', 'firma_zusatz')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="addressData['name']">
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+						<label for="anmerkung" class="form-label col-sm-4">{{this.$p.t('global', 'anmerkung')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="addressData['anmerkung']">
 						</div>
 					</div>
 			</form>
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{this.$p.t('ui', 'abbrechen')}}</button>
 				<button type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
             </template>
 		</BsModal>
 		
 		<!--Modal: Edit Address-->
 		<BsModal ref="editAdressModal">
-			<template #title>Adresse bearbeiten</template>
+			<template #title>{{this.$p.t('person', 'adresse_edit')}}</template>
 			<form class="row g-3" ref="addressData">
 				<div class="row mb-3">
-					<label for="adressentyp" class="form-label col-sm-4">Typ</label>
+					<label for="adressentyp" class="form-label col-sm-4">{{this.$p.t('global', 'typ')}}</label>
 					<div class="col-sm-6">
 						<select id="adressentyp" class="form-control" v-model="addressData.typ">
 							<option v-for="typ in adressentypen" :key="typ.adressentyp_kurzbz" :value="typ.adressentyp_kurzbz" >{{typ.bezeichnung}}</option>
@@ -397,14 +442,14 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="strasse" class="form-label col-sm-4">Strasse</label>
+					<label for="strasse" class="form-label col-sm-4">{{this.$p.t('person', 'strasse')}}</label>
 					<div class="col-sm-6">
 						<input type="text" :readonly="readonly" class="form-control" id="strasse" v-model="addressData.strasse">
 					</div>
 				</div>
 					
 				<div class="row mb-3">
-					<label for="nation" class="form-label col-sm-4">Nation</label>
+					<label for="nation" class="form-label col-sm-4">{{this.$p.t('person', 'nation')}}</label>
 					<div class="col-sm-6">
 						<select id="nation" class="form-select" v-model="addressData.nation">
 							<option v-for="nation in nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
@@ -413,39 +458,39 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="plz" class="required form-label col-sm-4" >PLZ</label>
+					<label for="plz" class="required form-label col-sm-4" >{{this.$p.t('person', 'plz')}}</label>
 					 <div class="col-sm-6">
 						<input type="text" class="form-control" required v-model="addressData['plz']" @input="loadPlaces">
 					</div>
 				</div>
 				<div class="row mb-3">
-					<label :for="gemeinde" class="form-label col-sm-4">Gemeinde</label>
+					<label :for="gemeinde" class="form-label col-sm-4">{{this.$p.t('person', 'gemeinde')}}</label>
 						<div v-if="addressData['gemeinde']" class="col-sm-6">
 							<input type="text" class="form-control" v-model="addressData['gemeinde']">
 						</div>
 						<div v-else class="col-sm-6">
 							<select v-if="addressData['nation'] == 'A'" name="addressData[gemeinde]" class="form-select" v-model="addressData['gemeinde']">
-								<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
+								<option v-if="!gemeinden.length" disabled>{{this.$p.t('person', 'plz_waehlen')}}</option>
 								<option v-for="gemeinde in gemeinden" :key="gemeinde.name" :value="gemeinde.name">{{gemeinde.name}}</option>
 							</select>
 						</div>
 				</div>
 		
 				<div class="row mb-3">
-						<label :for="Ort" class="form-label col-sm-4">Ort</label>
+						<label :for="Ort" class="form-label col-sm-4">{{this.$p.t('person', 'ort')}}</label>
 						<div v-if="addressData['ort']" class="col-sm-6">
 							<input type="text" name="ort" class="form-control" v-model="addressData['ort']">
 						</div>
 						<div v-else class="col-sm-6">
 							<select v-if="addressData['nation'] == 'A'" name="address[ort]" class="form-select" v-model="addressData['ort']">
-								<option v-if="!orte.length" disabled>Bitte gültige Gemeinde wählen</option>
+								<option v-if="!orte.length" disabled>{{this.$p.t('person', 'gemeinde_waehlen')}}</option>
 								<option v-for="ort in orte" :key="ort.ortschaftsname" :value="ort.ortschaftsname">{{ort.ortschaftsname}}</option>
 							</select>
 						</div>
 				</div>
 								
 				<div class="row mb-3">
-					<label for="heimatadresse" class="form-label col-sm-4">Heimatadresse</label>
+					<label for="heimatadresse" class="form-label col-sm-4">{{this.$p.t('person', 'heimatadresse')}}</label>
 					<div class="col-sm-3">
 						<div class="form-check">
 							<input id="heimatadresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['heimatadresse']">
@@ -454,7 +499,7 @@ export default{
 				</div>
 					
 				<div class="row mb-3">
-					<label for="zustelladresse" class="form-label col-sm-4">Zustelladresse</label>
+					<label for="zustelladresse" class="form-label col-sm-4">{{this.$p.t('person', 'zustelladresse')}}</label>
 					<div class="col-sm-3">
 						<div class="form-check">
 							<input id="zustelladresse" type="checkbox" class="form-check-input" value="1" v-model="addressData['zustelladresse']">
@@ -463,14 +508,14 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="co_name" class="form-label col-sm-4">Abweich.Empfänger. (c/o)</label>
+					<label for="co_name" class="form-label col-sm-4">{{this.$p.t('person', 'co_name')}}</label>
 					<div class="col-sm-6">
 						<input type="text" id="co_name" class="form-control" v-model="addressData['co_name']">
 					</div>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="rechnungsadresse" class="form-label col-sm-4">Rechnungsadresse</label>
+					<label for="rechnungsadresse" class="form-label col-sm-4">{{this.$p.t('person', 'rechnungsadresse')}}</label>
 					<div class="col-sm-3">
 						<div class="form-check">
 							<input id="rechnungsadresse" type="checkbox" class="form-check-input" v-model="addressData['rechnungsadresse']">
@@ -479,7 +524,7 @@ export default{
 				</div>
 				
 				<div class="row mb-3">
-					<label for="firma_name" class="form-label col-sm-4">Firma</label>
+					<label for="firma_name" class="form-label col-sm-4">{{this.$p.t('person', 'firma')}}</label>
 						<div v-if="addressData.firmenname" class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="addressData.firmenname">
 						</div>
@@ -493,14 +538,14 @@ export default{
 				</div>
 	
 				<div class="row mb-3">
-					<label for="name" class="form-label col-sm-4">Name</label>
+					<label for="name" class="form-label col-sm-4">{{this.$p.t('person', 'firma_zusatz')}}</label>
 					<div class="col-sm-6">
 						<input type="text" :readonly="readonly" class="form-control" id="name" v-model="addressData['name']">
 					</div>
 				</div>
 				
 				<div class="row mb-3">
-					<label for="anmerkung" class="form-label col-sm-4">Anmerkung</label>
+					<label for="anmerkung" class="form-label col-sm-4">{{this.$p.t('global', 'anmerkung')}}</label>
 					<div class="col-sm-6">
 						<input type="text" :readonly="readonly" class="form-control" id="anmerkung" v-model="addressData['anmerkung']">
 					</div>
@@ -508,19 +553,19 @@ export default{
 			
 			</form>
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{this.$p.t('ui', 'abbrechen')}}</button>
 				<button ref="Close" type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>
 		</BsModal>
 		
 		<!--Modal: deleteAdressModal-->
 		<BsModal ref="deleteAdressModal">
-			<template #title>Adresse löschen</template>
+			<template #title>{{this.$p.t('person', 'adresse_delete')}}</template>
 			<template #default>
-				<p>Adresse wirklich löschen?</p>
+				<p>{{this.$p.t('person', 'adresse_confirm_delete')}}</p>
 			</template>
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">Abbrechen</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{this.$p.t('ui', 'abbrechen')}}</button>
 				<button ref="Close" type="button" class="btn btn-primary" @click="deleteAddress(addressData.adresse_id)">OK</button>
 			</template>
 		</BsModal>

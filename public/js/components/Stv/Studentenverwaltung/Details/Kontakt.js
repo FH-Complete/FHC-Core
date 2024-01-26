@@ -23,17 +23,17 @@ export default {
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 		<fieldset class="overflow-hidden">
-			<legend>Adressen</legend>
+			<legend>{{this.$p.t('person', 'adressen')}}</legend>
 			<address-list ref="adressList" :uid="modelValue.person_id"></address-list>
 		</fieldset>
 		<br>
 		<fieldset class="overflow-hidden">
-			<legend>Kontakt</legend>
+			<legend>{{this.$p.t('global', 'kontakt')}}</legend>
 			<contact-list ref="contactList" :uid="modelValue.person_id"></contact-list>
 		</fieldset>
 		<br>
 		<fieldset class="overflow-hidden">
-			<legend>Bankverbindungen</legend>
+			<legend>{{this.$p.t('person', 'bankverbindungen')}}</legend>
 			<bankaccount-list ref="bankaccountList" :uid="modelValue.person_id"></bankaccount-list>
 		</fieldset>
 	</div>`
