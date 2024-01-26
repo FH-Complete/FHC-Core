@@ -38,22 +38,33 @@ export default {
     created(){
 
     },template:`
-  
+    <div class="row">
+
+    <div class="col">
     <div  class="form-underline mb-2">
     <div class="form-underline-titel">Status</div>
     <span  class="form-underline-content">{{status}} </span>
     </div>
-
-    <div v-if="status_message" class="form-underline mb-2 ">
-    <div class="form-underline-titel">Status message</div>
-    <span  class="form-underline-content">{{status_message}} </span>
     </div>
 
+    <div class="col">
     <div  class="form-underline mb-2">
     <div class="form-underline-titel">Date</div>
     <span  class="form-underline-content">{{status_timestamp}} </span>
     </div>
-    
+    </div>
+ 
+    </div>
+    <div class="row">
+    <div class="col">
+    <div v-if="status_message" class="form-underline mb-2 ">
+    <div class="form-underline-titel">Status message</div>
+    <textarea  class="form-control" rows="4" disabled>{{status_message}} </textarea>
+    </div>
+    </div>
+    </div>
+
+
     <div class="card mt-4">
     <div class="card-header">
     <i class="fa" :class="{'fa-trash':cardHeader==='Delete', 'fa-edit':cardHeader==='Update', 'fa-plus':cardHeader==='Add'}" ></i>

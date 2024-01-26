@@ -12,7 +12,7 @@ export default {
   props: {
 
     value: Object,
-    timestamp: Object,
+    title: String,
     /*
      * NOTE(chris):
      * Hack to expose in "emits" declared events to $props which we use
@@ -81,8 +81,8 @@ export default {
   template: `
   <bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" backdrop="false" >
     
-  <template v-slot:title>
-      {{"Profil bearbeiten" }}  
+  <template v-if="title" v-slot:title>
+      {{title }}  
     </template>
     <template v-slot:default>
 
@@ -100,9 +100,7 @@ export default {
     </template>
     <!-- optional footer -->
     <template   v-slot:footer>
-      <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>
-      <!--<p v-if="editTimestamp" class="flex-fill">Letzte Anfrage: {{editTimestamp}}</p>-->
-    
+      <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>    
       <button v-if="profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>
     <!-- end of optional footer --> 

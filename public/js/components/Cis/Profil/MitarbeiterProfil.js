@@ -131,8 +131,6 @@ export default {
     };
   },
 
-  //? this is the prop passed to the dynamic component with the custom data of the view
-  
   props: {
 		data: Object,
 	},
@@ -152,7 +150,7 @@ export default {
 
       EditProfil.popup({ 
           value:JSON.parse(JSON.stringify(this.data.editData)),
-          timestamp:this.data.editDataTimestamp
+          title:"Profil bearbeiten",
         }).then((popup_result) => {
           if(popup_result){
             Vue.$fhcapi.UserData.selectProfilRequest()
@@ -165,12 +163,10 @@ export default {
             })
             .catch(err=>alert(err));
           }
-          
         }).catch((e) => {
           // Wenn der User das Modal abbricht ohne Änderungen
          
         });
-    
     },
   
     
@@ -236,11 +232,6 @@ export default {
   },
  
   created() {
-    
-    
-    
-    
-    
 
       this.data.editData = {
         view:null,
@@ -305,10 +296,6 @@ export default {
        
       };
 
-
-      console.log(JSON.stringify(this.data.editData,null,2));
-
-  
   },
   mounted() {
     
@@ -331,19 +318,19 @@ export default {
               <div  class="d-md-none col-12 ">
              
               <div class="row mb-3">
-              <div class="col">
-              <!-- MOBILE QUICK LINKS -->     
-                <quick-links :mobile="true"></quick-links>
+                <div class="col">
+                <!-- MOBILE QUICK LINKS -->     
+                  <quick-links :mobile="true"></quick-links>
+                </div>
               </div>
-            </div>
 
             
-            <div class="row mb-3">
-            <div class="col">
-              <!-- MOBILE PROFIL UPDATES -->  
-              <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
-            </div>
-          </div>
+              <div v-if="data.profilUpdates" class="row mb-3">
+                <div class="col">
+                  <!-- MOBILE PROFIL UPDATES -->  
+                  <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                </div>
+              </div>
 
             
 

@@ -1,4 +1,3 @@
-import fhcapifactory from "../../../apps/api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
 import AusweisStatus from "./ProfilComponents/FhAusweisStatus.js";
@@ -8,6 +7,8 @@ import Kontakt from "./ProfilComponents/Kontakt.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
+import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
+import EditProfil from "./EditProfil.js";
 
 export default {
   components: {
@@ -20,6 +21,7 @@ export default {
     ProfilEmails,
     RoleInformation,
     ProfilInformation,
+    FetchProfilUpdates,
 
   },
   data() {
@@ -74,31 +76,45 @@ export default {
     };
   },
 
-  //? this is the prop passed to the dynamic component with the custom data of the view
   props: ["data"],
   methods: {
-    sperre_foto_function() {
-      if (!this.data) {
-        return;
-      }
-      fhcapifactory.UserData.sperre_foto_function(!this.data.foto_sperre).then((res) => {
-        this.data.foto_sperre = res.data.foto_sperre;
+
+    fetchProfilUpdates: function(){
+      Vue.$fhcapi.UserData.selectProfilRequest().then((res)=>{
+        
+        if(!res.error){
+          this.data.profilUpdates = res.data.retval?.length ? res.data.retval : null ; 
+        }
       });
+    },
+    
+    showModal() {
+
+      EditProfil.popup({ 
+          value:JSON.parse(JSON.stringify(this.data.editData)),
+          title:"Profil bearbeiten",
+        }).then((popup_result) => {
+          if(popup_result){
+            Vue.$fhcapi.UserData.selectProfilRequest()
+            .then((res) =>{
+              if(!res.error){
+                this.data.profilUpdates = res.data.retval;
+              }else{
+                alert("Error when fetching profile updates: " +res.data.retval);
+              }
+            })
+            .catch(err=>alert(err));
+          }
+        }).catch((e) => {
+          // Wenn der User das Modal abbricht ohne Änderungen
+         
+        });
     },
    
   },
 
   computed: {
  
-
-    get_image_base64_src() {
-      if (!this.data) {
-        return "";
-      }
-      return "data:image/jpeg;base64," + this.data.foto;
-    },
-
-   
    profilInformation() {
       if (!this.data) {
         return {};
@@ -154,6 +170,71 @@ export default {
     
   },
 
+  created(){
+    this.data.editData = {
+      view:null,
+      data:{
+      Personen_Informationen : {
+        title:"Personen Informationen",
+        view:null,
+        data:{
+          
+          vorname: {
+            title:"vorname",
+            view:"text_input",
+            data:{
+              titel:"vorname",
+              value:this.data.vorname,
+            }},
+            nachname: {
+              title:"nachname",
+              view:"text_input",
+              data:{
+                titel:"nachname",
+                value:this.data.nachname,
+              }
+            },
+            titel:{
+              title:"titel",
+              view:"text_input",
+              data:{
+                titel:"titel",
+                value:this.data.titel,
+              }
+            },
+            postnomen:{
+              title:"postnomen",
+              view:"text_input",
+              data:{
+                titel:"postnomen",
+                value:this.data.postnomen,
+              }
+            },
+          }
+        },
+        Private_Kontakte: {
+          title:"Private Kontakte" ,
+          data:this.privateKontakte.map(kontakt => {
+            return {
+              listview:'Kontakt',
+              view:'EditKontakt',
+              data:kontakt
+            }})
+         },
+        Private_Adressen: {
+          title: "Private Adressen",
+          data:this.privateAdressen.map(kontakt => {
+            return {
+              listview:'Adresse',
+              view:'EditAdresse',
+              data:kontakt
+            }})
+         },
+        },
+     
+    };
+  },
+
   mounted() {
     this.$refs.betriebsmittelTable.tabulator.on('tableBuilt', () => {
     
@@ -179,11 +260,18 @@ export default {
               <div  class="d-md-none col-12 ">
              
               <div class="row py-2">
-              <div class="col">
-               
-              <quick-links :mobile="true"></quick-links>
+                <div class="col">
+                
+                <quick-links :mobile="true"></quick-links>
+                </div>
               </div>
-            </div>
+
+              <div v-if="data.profilUpdates" class="row mb-3">
+                <div class="col">
+                  <!-- MOBILE PROFIL UPDATES -->  
+                  <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                </div>
+              </div>
 
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
@@ -339,7 +427,27 @@ export default {
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
 
 
-             
+              <!-- Bearbeiten Button -->
+  
+              <div class="row d-none d-md-block mb-3">
+              <div class="col mb-3">
+              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <div class="row">
+                  <div class="col-2">
+                    <i class="fa fa-edit"></i>
+                  </div>
+                  <div class="col-10">Bearbeiten</div>
+                </div>
+              </button>
+              </div>
+              </div>
+
+                <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
+                <div class="col mb-3">
+                    <!-- PROFIL UPDATES -->
+                    <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                </div>    
+                </div>
               
                 <div  class="row d-none d-md-block mb-3">
                   <div class="col">

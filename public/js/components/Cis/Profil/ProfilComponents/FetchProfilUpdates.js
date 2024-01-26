@@ -78,7 +78,7 @@ export default {
             EditProfil.popup({ 
                 
                 value:content,
-                timestamp:null,
+               
               }).then((res) => {
                 if(res === true){
                     this.$emit('fetchUpdates');
@@ -113,46 +113,39 @@ export default {
                 <tr >
                 <th scope="col">Topic</th>
                 <th scope="col">Status</th>
-                <th scope="col">Date of Request</th>
-                
-                <th  scope="col">Action</th>
-                
-                
+                <th scope="col">Date</th>
+                <th class="text-center" scope="col">Action</th>
                 </tr>
             </thead>
             <tbody>
-            <!-- :class="{'bg-success':item.status === 'accepted', 'bg-danger':item.status === 'rejected', 'text-white':item.status =='rejected' || item.status=='accepted'}" -->
                 <tr v-for="item in data" :style="item.status=='accepted'?'background-color:lightgreen':item.status==='rejected'?'background-color:lightcoral':''">
                 <td class="align-middle text-wrap">{{item.topic}}</td>
-                <td class="align-middle text-center" >{{item.status}}</td>
+                <td class="align-middle " >{{item.status}}</td>
                 <td class="align-middle">{{item.change_timestamp}}</td>
-                
-                
                 
                 <template v-if="item.status === 'pending'">
                 <td>
-                <template v-if="item.topic.toLowerCase().includes('delete')">
                 
+                <div class="d-flex flex-row justify-content-evenly">
+                <template v-if="item.topic.toLowerCase().includes('delete')">
                 <div  class="align-middle text-center"><i role="button" @click="openModal(item)" class="fa fa-eye"></i></div>
                 </template>
+
                 <template v-else >
                 <div class="align-middle text-center" ><i style="color:#00639c" @click="openModal(item)" role="button" class="fa fa-edit"></i></div>
                 </template>
                 
                 <div class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></div>
-                
+                </div>
+
                 </td>
                 </template>
-                <template v-else-if="item.status === 'accepted'">
+
+                <template v-else>
+                <div class="d-flex flex-row justify-content-evenly">
                 <td  class="align-middle text-center"><i  role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
                 </template>
-                <template v-else-if="item.status === 'rejected'">
-                <td  class="align-middle text-center"><i  role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
-                </template>
-                
-                
-                
-                
+                </div>
                 
                 </tr>
             </tbody>
