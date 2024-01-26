@@ -96,7 +96,7 @@ class Profil extends Auth_Controller
 		$json = json_decode($this->input->raw_input_stream);
 		$payload = $json->payload;
 	
-		$type = property_exists($json->payload,"kontakt_id")? "kontakt_id" : "adresse_id";
+		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : "adresse_id";
 		
 		$name = $this->PersonModel->getFullName($this->uid);
 		if(isError($name)){
@@ -111,36 +111,28 @@ class Profil extends Auth_Controller
 		$res = hasData($res) ? getData($res) : null;
 		
 		if($res){
-		foreach($res as $update_request){
+		$pending_changes = array_filter($res, function($element) {
+			return $element->status == 'pending';
+		});
+		foreach($pending_changes as $update_request){
 			$existing_change = json_decode($update_request->requested_change);
 			
-			 
-			if(!isset($existing_change->add) && property_exists($existing_change,$type) && property_exists($payload,$type) && $existing_change->$type == $payload->$type){
+			 //? the user can add as many new kontakt/adresse as he likes
+			if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
 				//? the kontakt_id / adresse_id of a change has to be unique 
-				
 				echo json_encode(error("cannot change the same resource twice"));
 				return;
 			}
 
-			
-			if(isset($payload->add)){
-				//TODO: add functionality for adding a new kontakt or address
-	
-			}elseif($update_request->topic == $json->topic ){
-				
+			elseif(!isset($payload->add) && !isset($payload->delete) && $update_request->topic == $json->topic ){
 				//? if it is not a delete or add request than the topic in combination with the uid of the user have to be unique
 				echo json_encode(error("A request to change " . $json->topic . " is already open"));
 				return;
 			}
 		}}
 		
-		
-		
-		
-		
 			$insert_res = $this->ProfilChangeModel->insert($data);
-			
-		
+				
 			if(isError($insert_res)){
 				//catch error
 			}else{
@@ -149,10 +141,6 @@ class Profil extends Auth_Controller
 				$insert_res->retval = date_create($editTimestamp)->format('d.m.Y');
 				echo json_encode($insert_res);
 			}
-		
-
-
-
 	}
 
 	public function updateProfilRequest()

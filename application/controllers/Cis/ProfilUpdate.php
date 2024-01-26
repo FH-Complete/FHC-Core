@@ -58,14 +58,29 @@ class ProfilUpdate extends Auth_Controller
 		}
 		
 		if(is_array($requested_change) && array_key_exists("adresse_id",$requested_change)){
-			$resID = $this->handleAdresse($requested_change, $personID);
-			$resID = hasData($resID) ? getData($resID) : null;
-			$requested_change['adresse_id'] = $resID;
-			
+			$insertID = $this->handleAdresse($requested_change, $personID);
+			$insertID = hasData($insertID) ? getData($insertID) : null;
+			if(isset($insertID)) {
+				$requested_change['kontakt_id'] = $insertID;
+				$update_res = $this->updateRequestedChange($id,$requested_change);
+				if(isError($update_res)){
+					echo json_encode(error("was not able to add addresse_id " . $insertID . " to profilRequest " . $id ));
+					return;
+				}
+			}
+		
 		}else if (is_array($requested_change) && array_key_exists("kontakt_id", $requested_change)){
-			$resID = $this->handleKontakt($requested_change, $personID);
-			$resID = hasData($resID) ? getData($resID)[0] : null;
-			$requested_change['kontakt_id'] = $resID;
+			$insertID = $this->handleKontakt($requested_change, $personID);
+			$insertID = hasData($insertID) ? getData($insertID) : null;
+			if(isset($insertID)) {
+				$requested_change['kontakt_id'] = $insertID;
+				$update_res = $this->updateRequestedChange($id,$requested_change);
+				if(isError($update_res)){
+					 echo json_encode(error("was not able to add kontakt_id " . $insertID . " to profilRequest " . $id ));
+					 return;
+				}
+			}
+			
 			
 		}else{
 			switch($topic){
@@ -74,7 +89,7 @@ class ProfilUpdate extends Auth_Controller
 			}
 			$result = $this->PersonModel->update($personID,[$topic=>$requested_change]);
 			if(isError($result)){
-				echo json_encode($result);
+				echo json_encode(error("was not able to update Person Information: " . $topic . " with value : " . $requested_change));
 				return;
 			}
 		}
@@ -91,10 +106,12 @@ class ProfilUpdate extends Auth_Controller
 		echo json_encode($this->setStatusOnUpdateRequest($id, "rejected", $status_message));
 	}
 
-	private function setStatusOnUpdateRequest($id, $status, $status_message, $requested_change=NULL){
-		$update = ["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message];
-		if(isset($requested_change)) { $update['requested_change'] = $requested_change; } 
-		return $this->ProfilChangeModel->update([$id], $update);
+	private function updateRequestedChange($id, $requested_change){
+		return $this->ProfilChangeModel->update([$id], ['requested_change'=>json_encode($requested_change)]);
+	}
+
+	private function setStatusOnUpdateRequest($id, $status, $status_message ){ 
+		return $this->ProfilChangeModel->update([$id], ["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message]);
 	}
 
 
@@ -110,17 +127,18 @@ class ProfilUpdate extends Auth_Controller
 			unset($requested_change['add']);
 			//? fields like insertvon are not filled when inserting new row
 			$requested_change['person_id'] = $personID;
-			$res = $this->KontaktModel->insert($requested_change);
+			$insertID = $this->KontaktModel->insert($requested_change);
+			
 		}
 		//! DELETE
 		elseif(array_key_exists('delete',$requested_change) && $requested_change['delete']){
-			$res = $this->KontaktModel->delete($kontakt_id);
+			$this->KontaktModel->delete($kontakt_id);
 		}
 		//! UPDATE
 		else{
-			$res = $this->KontaktModel->update($kontakt_id,$requested_change);
+			$this->KontaktModel->update($kontakt_id,$requested_change);
 		}
-		return $res;
+		return isset($insertID) ? $insertID : null;
 	}
 
 	private function handleAdresse($requested_change, $personID){
@@ -143,16 +161,16 @@ class ProfilUpdate extends Auth_Controller
 			//? fields like insertvon are not filled when inserting new row
 			$requested_change['person_id'] = $personID;
 			//TODO: zustelladresse, heimatadresse, rechnungsadresse und nation werden nicht beachtet
-			$res = $this->AdresseModel->insert($requested_change);
+			$insertID = $this->AdresseModel->insert($requested_change);
 		}
 		//! DELETE
 		elseif(array_key_exists('delete',$requested_change) && $requested_change['delete']){
-			$res = $this->AdresseModel->delete($adresse_id);
+			$this->AdresseModel->delete($adresse_id);
 		}
 		//! UPDATE
 		else{
-			$res = $this->AdresseModel->update($adresse_id,$requested_change);
+			$this->AdresseModel->update($adresse_id,$requested_change);
 		}
-		return $res;
+		return isset($insertID)? $insertID : null;
 	}
 }
