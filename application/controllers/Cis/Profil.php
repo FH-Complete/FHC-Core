@@ -267,8 +267,6 @@ class Profil extends Auth_Controller
 			}
 		}
 
-		
-		print_r($telefon_res);
 
 		$res = new stdClass();
 		$res->username = $uid;

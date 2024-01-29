@@ -1,9 +1,19 @@
 
 import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
+import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
+import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import RoleInformation from "./ProfilComponents/RoleInformation.js";
+import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
+import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
 export default {
   components: {
     CoreFilterCmpt,
+    Mailverteiler,
+    QuickLinks,
+    RoleInformation,
+    ProfilEmails,
+    ProfilInformation,
   },
   data() {
     return {
@@ -82,56 +92,41 @@ export default {
   },
 
   computed: {
+
+    personEmails() {
+      return this.data?.emails ? this.data.emails : [];
+    },
     
-
-    get_image_base64_src() {
-      if (!this.data) {
-        return "";
-      }
-      return "data:image/jpeg;base64," + this.data.foto;
-    },
-
-    get_mitarbeiter_standort_telefon(){
-      if(this.data.standort_telefon){
-        return "tel:"+ this.data.telefonklappe + this.data.standort_telefon ;
-      }else{
-        return null;
-      }
-    },
-    //? this computed function returns all the informations for the first column in the profil
-    personData() {
+    profilInformation() {
       if (!this.data) {
         return {};
       }
 
       return {
+        Vorname: this.data.vorname,
+        Nachname: this.data.nachname,
         Username: this.data.username,
         Anrede: this.data.anrede,
-        Titel: this.data.titelpre,
+        Titel: this.data.titel,
         Postnomen: this.data.postnomen,
+        foto_sperre:this.data.foto_sperre,
+        foto:this.data.foto,
+
       };
     },
+  
+   
 
-    personKontakt() {
+    roleInformation() {
       if (!this.data) {
         return {};
       }
 
       return {
-        emails: this.data.emails,
-        
-      };
-    },
-
-    specialData() {
-      if (!this.data) {
-        return {};
-      }
-
-      return {
-        
+        Geburtsdatum: this.data.gebdatum,
+        Geburtsort: this.data.gebort,
         Kurzzeichen: this.data.kurzbz,
-        Telefon: (this.data.standort_telefon?this.data.standort_telefon:"") + " " + this.data.telefonklappe ,
+        Telefon:  (this.data.standort_telefon?this.data.standort_telefon:"") + " " + this.data.telefonklappe,
         Büro: this.data.ort_kurzbz,
       };
     },
@@ -220,94 +215,10 @@ export default {
                      <div class="row mb-4">
                      <div class="col">
                      
-                        
-                      <div class="card h-100">
-                      <div class="card-header">
-                      MitarbeiterIn
-                      </div>
-                      <div class="card-body">
-                      
-                       
-
-
-                  
-                  <div  class="row gy-3 justify-content-center align-items-center">
-
-
-
-
-                  <!-- SQUEEZING THE IMAGE INSIDE THE FIRST INFORMATION COLUMN -->
- <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
-          <div class="col-12 col-sm-6 mb-2">
-           <div class="row justify-content-center">
-                        <div class="col-auto " style="position:relative">
-                          <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"></img>
-                         
-                        </div>
-                      </div>
-                    <!-- END OF THE ROW WITH THE IMAGE -->
-                    </div>
-<!-- END OF SQUEEZE -->
-
-
-
-<!-- COLUMNS WITH MULTIPLE ROWS NEXT TO PROFIL PICTURE -->
-                  <div class="col-12 col-sm-6">
-                  <div class="gy-4 row">
-                  <div class="col-12">
-                
-
-                  <div  class="form-underline ">
-                <div class="form-underline-titel">Vorname</div>
-                <span class="form-underline-content">{{data.vorname}} </span>
-                
-                </div>
-
-                        
-                </div>
-                <div class="col-12">
-                
-                
-                <div  class="form-underline ">
-                <div class="form-underline-titel">Nachname</div>
-                <span class="form-underline-content">{{data.nachname}} </span>
-                
-                </div>
-
-                </div>
-                </div>
-             
-                
-                  </div>
-                  
-
-
-
-
-
-
-
-                  <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
-                        
-
-
-                  
-                  <div  class="form-underline ">
-                  <div class="form-underline-titel">{{bez}}</div>
-                  <span class="form-underline-content">{{wert?wert:'-'}} </span>
-                  
-                  </div>
-                  
-                  </div>
-                
-                  
-                      </div>
-
-
-                      
-                      </div>
-                    </div>
-		    </div>
+                        <!-- Profil Informationen -->
+                        <profil-information title="MitarbeiterIn" :data="profilInformation"></profil-information>
+                     
+		                </div>
                     </div>
                     
 
@@ -328,61 +239,9 @@ export default {
                     <div class="row mb-4">
                     <div class="col">
 
-
-                    <div class="card ">
-                    <div class="card-header">
-                    Mails
-                    </div>
+                    <!-- EMAILS -->
+                    <profil-emails :data="personEmails"></profil-emails>
                    
-                    <div class="card-body">
-
-
-
-                      <div v-for="(wert,bezeichnung) in personKontakt">
-
-                      
-            
-                      <!-- HIER SIND DIE EMAILS -->
-                  
-                  
-                      <div  v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="gy-3 row justify-content-center ">
-                      <div v-for="email in wert" class="col-12 ">
-                     
-                            <div class="row align-items-center">
-                      <div class="col-1 text-center">
-
-                      <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
-
-                      </div>
-                      <div class="col">
-
-
-
-                      <div  class="form-underline ">
-                  <div class="form-underline-titel">{{email.type}}</div>
-                  <a :href="'mailto:'+email.email" class="form-underline-content" >{{email.email}}</a>
-                  </div>
-                     
-                            
-                   
-                      </div>
-                      </div>
-                      </div>
-                          </div>
-
-                    
-                    
-                     
-
-
-
-
-                    
-                      </div>
-
-
-                    </div>
-                    </div>
                     </div></div>
 
 
@@ -392,37 +251,8 @@ export default {
 
                     <div  class=" col-lg-12">
        
-                    <div class="card">
-                
-                        <div class="card-header">
-                        Mitarbeiter Information
-                        </div>
-                        <div class="card-body">
-                            <div class="gy-3 row">
-                            <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
-                            
-                           
-                         
-
-                                <div  class="form-underline ">
-                             <div class="form-underline-titel">{{bez}}</div>
-                             <a v-if="bez=='Telefon'" :href="get_mitarbeiter_standort_telefon"  class="form-underline-content" >
-                             {{wert?wert:'-'}}
-                            </a>
-                             <span  v-else class="form-underline-content" >
-                                 {{wert?wert:'-'}}
-                                </span>
-                             
-                             </div>
-
-                               
-                              
-                            </div>
-                        </div>
-                        
-                    </div>
-                    
-                </div>
+                    <!-- roleInformation -->
+                    <role-information :data="roleInformation" title="Mitarbeiter Information"></role-information>
 
                     </div>  
                            
@@ -477,80 +307,26 @@ export default {
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
 
-
-              <!-- SRART OF QUICK LINKS IN THE SIDE PANEL -->
-
-
-              <!-- START OF THE FIRDT ROW IN THE SIDE PANEL -->
-              <!-- THESE QUCK LINKS ARE ONLY VISIBLE UNTIL VIEWPORT MD -->
+              <!-- VISIBLE UNTIL VIEWPORT MD -->
                 <div  class="row d-none d-md-block mb-3">
                   <div class="col">
                  
-                    <div class="card">
-                      <div class="card-header">
-                      Quick Links
-                      </div>
-                      <div class="card-body">
-                      
-                       
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitwuensche</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Lehrveranstaltungen</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren</a>
+                   <!-- QUICKLINKS -->
+                   <quick-links ></quick-links>
 
-                      </div>
-                    </div>
-
-                   
-                      
-                  
                   </div>
                 </div>
 
-              
-
-
-                <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
                 <div  class="row">
                 
                   <div class="col">
-                
 
-                  
-                  <!-- HIER SIND DIE MAILVERTEILER -->
-                    <div class="card">
-                      <div class="card-header">
-                      Mailverteilers
-                      </div>
-                      <div class="card-body">
-                      
-                        <h6 class="card-title">Sie sind Mitgglied in folgenden Verteilern:</h6>
-                        <div  class="card-text row text-break mb-2" v-for="verteiler in data?.mailverteiler">
-                          <div class="col-12 ">
-                            <div class="row">  
-                              <div class="col-1 ">
-                              
-                              <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
-                              
-                              </div>
-                              <div class="col">
-                                <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
-                              </div>
-                            </div>
-                           
-                          </div> 
-                          <div class="col-11 offset-1 ">{{verteiler.beschreibung}}</div>
-                        </div>
+                  <!-- MAILVERTEILER -->
 
-                      </div>
-                    </div>
-
-
-
-
+                  <mailverteiler :data="data?.mailverteiler"></mailverteiler>
 
                   </div>
 
-                <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
                 </div>
 
                 <!-- END OF SIDE PANEL -->
