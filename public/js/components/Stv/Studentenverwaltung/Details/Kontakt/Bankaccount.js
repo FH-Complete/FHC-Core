@@ -222,7 +222,7 @@ export default{
 		
 		<!--Modal: Add Bankverbindung-->
 		<BsModal title="Bankverbindung anlegen" ref="newBankverbindungModal">
-			<template #title>{{this.$p.t('person', 'bankvb_new')}}</template>
+			<template #title>{{$p.t('person', 'bankvb_new')}}</template>
 			<form class="row g-3" ref="bankverbindungData">
 				<div class="row mb-3">
 						<label for="name" class="form-label col-sm-4">Name</label>
@@ -231,7 +231,7 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">										   
-						<label for="anschrift" class="form-label col-sm-4">{{this.$p.t('person', 'anschrift')}}</label>
+						<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
 						</div>
@@ -250,28 +250,28 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">							   
-						<label for="kontonr" class="form-label col-sm-4">{{this.$p.t('person', 'kontonr')}}</label>
+						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
 						</div>
 					</div>
 					<div class="row mb-3">										   
-						<label for="blz" class="form-label col-sm-4">{{this.$p.t('person', 'blz')}}</label>
+						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="blz" v-model="bankverbindungData['blz']">
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="typ" class="form-label col-sm-4">{{this.$p.t('global', 'typ')}}</label>
+						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
 						<div class="col-sm-6">
 							<select  id="typ" class="form-select" required v-model="bankverbindungData['typ']">
-								<option  value="p">{{this.$p.t('person', 'privatkonto')}}</option>
-								<option  value="f">{{this.$p.t('person', 'firmenkonto')}}</option>
+								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>
+								<option  value="f">{{$p.t('person', 'firmenkonto')}}</option>
 							</select>
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="verrechnung" class="form-label col-sm-4">{{this.$p.t('person', 'verrechnung')}}</label>
+						<label for="verrechnung" class="form-label col-sm-4">{{$p.t('person', 'verrechnung')}}</label>
 						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="verrechnung" type="checkbox" class="form-check-input" value="1" v-model="bankverbindungData['verrechnung']">
@@ -280,14 +280,14 @@ export default{
 					</div>
 			</form>
             <template #footer>
-            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{this.$p.t('ui', 'abbrechen')}}</button>
+            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
 					<button type="button" class="btn btn-primary" @click="addNewBankverbindung()">OK</button>
             </template>
 		</BsModal>
 				
 		<!--Modal: Edit Bankverbindung-->
 		<BsModal ref="editBankverbindungModal">
-			<template #title>{{this.$p.t('person', 'bankvb_edit')}}</template>
+			<template #title>{{$p.t('person', 'bankvb_edit')}}</template>
 				<form class="row g-3" ref="bankverbindungData">
 				
 					<div class="row mb-3">
@@ -297,7 +297,7 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">									   
-						<label for="anschrift" class="form-label col-sm-4">{{this.$p.t('person', 'anschrift')}}</label>
+						<label for="anschrift" class="form-label col-sm-4">{{$p.t('person', 'anschrift')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="anschrift" v-model="bankverbindungData['anschrift']">
 						</div>
@@ -315,28 +315,28 @@ export default{
 						</div>
 					</div>
 					<div class="row mb-3">									   
-						<label for="kontonr" class="form-label col-sm-4">{{this.$p.t('person', 'kontonr')}}</label>
+						<label for="kontonr" class="form-label col-sm-4">{{$p.t('person', 'kontonr')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="kontonr" v-model="bankverbindungData['kontonr']">
 						</div>
 					</div>
 					<div class="row mb-3">									   
-						<label for="blz" class="form-label col-sm-4">{{this.$p.t('person', 'blz')}}</label>
+						<label for="blz" class="form-label col-sm-4">{{$p.t('person', 'blz')}}</label>
 						<div class="col-sm-6">
 							<input type="text" :readonly="readonly" class="form-control" id="blz" v-model="bankverbindungData['blz']">
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="typ" class="form-label col-sm-4">{{this.$p.t('global', 'typ')}}</label>
+						<label for="typ" class="form-label col-sm-4">{{$p.t('global', 'typ')}}</label>
 						<div class="col-sm-6">
 							<select  id="typ" class="form-select" required v-model="bankverbindungData['typ']">
-								<option  value="p">{{this.$p.t('person', 'privatkonto')}}</option>
-								<option  value="f">{{this.$p.t('person', 'firmenkonto')}}</option>
+								<option  value="p">{{$p.t('person', 'privatkonto')}}</option>
+								<option  value="f">{{$p.t('person', 'firmenkonto')}}</option>
 							</select>
 						</div>
 					</div>
 					<div class="row mb-3">
-						<label for="verrechnung" class="form-label col-sm-4">{{this.$p.t('person', 'verrechnung')}}</label>
+						<label for="verrechnung" class="form-label col-sm-4">{{$p.t('person', 'verrechnung')}}</label>
 						<div class="col-sm-3">
 							<div class="form-check">
 								<input id="verrechnung" type="checkbox" class="form-check-input" value="1" v-model="bankverbindungData['verrechnung']">
@@ -345,19 +345,19 @@ export default{
 					</div>															   
 				</form>
 				<template #footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{this.$p.t('ui', 'abbrechen')}}</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
 					<button ref="Close" type="button" class="btn btn-primary" @click="updateBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>
             	</template>
 		</BsModal>
 		
 		<!--Modal: Delete Bankverbindung-->
 		<BsModal ref="deleteBankverbindungModal">
-			<template #title>{{this.$p.t('person', 'bankvb_delete')}}</template>
+			<template #title>{{$p.t('person', 'bankvb_delete')}}</template>
 			<template #default>
-				<p>{{this.$p.t('person', 'bankvb_confirm_delete')}}</p>
+				<p>{{$p.t('person', 'bankvb_confirm_delete')}}</p>
 			</template>									
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{this.$p.t('ui', 'abbrechen')}}</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">{{$p.t('ui', 'abbrechen')}}</button>
 				<button ref="Close" type="button" class="btn btn-primary" @click="deleteBankverbindung(bankverbindungData.bankverbindung_id)">OK</button>
 			</template>
 		</BsModal>

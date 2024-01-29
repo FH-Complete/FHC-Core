@@ -188,7 +188,7 @@ export default {
 			<div>
 				<div class="row mb-3">
 					<div class="col-sm-7">
-						<span class="small">[{{this.typeId}}]</span>
+						<span class="small">[{{typeId}}]</span>
 					</div>
 				</div>
 				
