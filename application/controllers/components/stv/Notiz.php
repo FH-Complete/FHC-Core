@@ -116,8 +116,8 @@ class Notiz extends FHC_Controller
 		}
 
 		//Form Validation
-		$this->form_validation->set_rules('titel', 'titel', 'required');
-		$this->form_validation->set_rules('text', 'Text', 'required');
+		$this->form_validation->set_rules('titel', 'titel', 'callback_titel_required');
+		$this->form_validation->set_rules('text', 'text', 'callback_text_required');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -208,8 +208,8 @@ class Notiz extends FHC_Controller
 		}
 
 		//Form Validation
-		$this->form_validation->set_rules('titel', 'titel', 'required');
-		$this->form_validation->set_rules('text', 'Text', 'required');
+		$this->form_validation->set_rules('titel', 'titel', 'callback_titel_required');
+		$this->form_validation->set_rules('text', 'text', 'callback_text_required');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -437,5 +437,29 @@ class Notiz extends FHC_Controller
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 		$this->outputJson($result);
+	}
+
+	public function titel_required($value)
+	{
+		if (empty($value)) {
+			$this->form_validation->set_message('titel_required',  $this->p->t('ui','error_fieldRequired',['field' => 'Titel']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public function text_required($value)
+	{
+		if (empty($value)) {
+			$this->form_validation->set_message('text_required', $this->p->t('ui','error_fieldRequired',['field' => 'Text']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 }

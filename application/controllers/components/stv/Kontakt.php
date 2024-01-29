@@ -13,6 +13,7 @@ class Kontakt extends FHC_Controller
 		// Load Libraries
 		$this->load->library('AuthLib');
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+		$this->load->library('form_validation');
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -44,10 +45,9 @@ class Kontakt extends FHC_Controller
 
 	public function addNewAddress($person_id)
 	{
-		$this->load->library('form_validation');
 		$_POST = json_decode($this->input->raw_input_stream, true);
 
-		$this->form_validation->set_rules('plz', 'PLZ', 'required|numeric');
+		$this->form_validation->set_rules('plz', 'PLZ', 'callback_plz_required|callback_plz_numeric');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -115,10 +115,9 @@ class Kontakt extends FHC_Controller
 	public function updateAddress($address_id)
 	{
 		$uid = getAuthUID();
-		$this->load->library('form_validation');
 		$_POST = json_decode($this->input->raw_input_stream, true);
 
-		$this->form_validation->set_rules('plz', 'PLZ', 'required');
+		$this->form_validation->set_rules('plz', 'PLZ', 'callback_plz_required|callback_plz_numeric');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -339,27 +338,17 @@ class Kontakt extends FHC_Controller
 
 	public function addNewContact($person_id)
 	{
-		$this->load->library('form_validation');
-
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
 		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'valid_email');
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'callback_kontakt_valid_email');
 		else
-			$this->form_validation->set_rules('kontakt', 'Kontakt', 'required');
-
-/*		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
-		{
-			$this->form_validation->set_data(['email' => $_POST['kontakt']]);
-			$this->form_validation->set_rules('email', 'email', 'valid_email|required]');
-		}*/
-
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'callback_kontakt_required');
 
 		if ($this->form_validation->run() == false)
 		{
 			return $this->outputJsonError($this->form_validation->error_array());
 		}
-
 
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 
@@ -408,6 +397,16 @@ class Kontakt extends FHC_Controller
 		if(!$kontakt_id)
 		{
 			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		if(($_POST['kontakttyp'] == 'email' && isset($_POST['kontakt'])))
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'callback_kontakt_valid_email');
+		else
+			$this->form_validation->set_rules('kontakt', 'Kontakt', 'callback_kontakt_required');
+
+		if ($this->form_validation->run() == false)
+		{
+			return $this->outputJsonError($this->form_validation->error_array());
 		}
 
 		if(isset($_POST['standort']))
@@ -491,8 +490,8 @@ class Kontakt extends FHC_Controller
 		$this->load->library('form_validation');
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
-		$this->form_validation->set_rules('iban', 'IBAN', 'required');
-		$this->form_validation->set_rules('typ', 'TYP', 'required');
+		$this->form_validation->set_rules('iban', 'IBAN', 'callback_iban_required');
+		$this->form_validation->set_rules('typ', 'TYP', 'callback_typ_required');
 
 		if ($this->form_validation->run() == false)
 		{
@@ -564,11 +563,10 @@ class Kontakt extends FHC_Controller
 
 	public function updateBankverbindung($bankverbindung_id)
 	{
-		$this->load->library('form_validation');
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
-		$this->form_validation->set_rules('iban', 'IBAN', 'required');
-		$this->form_validation->set_rules('typ', 'TYP', 'required');
+		$this->form_validation->set_rules('iban', 'IBAN', 'callback_iban_required');
+		$this->form_validation->set_rules('typ', 'TYP', 'callback_typ_required');
 
 		$this->load->model('person/Bankverbindung_model', 'BankverbindungModel');
 
@@ -631,5 +629,77 @@ class Kontakt extends FHC_Controller
 			$this->outputJson($result);
 		}
 		return $this->outputJsonSuccess(current(getData($result)));
+	}
+
+	public function plz_required($value)
+	{
+		if (empty($value)) {
+			$this->form_validation->set_message('plz_required',  $this->p->t('ui','error_fieldRequired',['field' => 'PLZ']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public function kontakt_required($value)
+	{
+		if (empty($value)) {
+			$this->form_validation->set_message('kontakt_required',  $this->p->t('ui','error_fieldRequired',['field' => 'Kontakt']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public function iban_required($value)
+	{
+		if (empty($value)) {
+			$this->form_validation->set_message('iban_required',  $this->p->t('ui','error_fieldRequired',['field' => 'IBANoff']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public function typ_required($value)
+	{
+		if (empty($value)) {
+			$this->form_validation->set_message('typ_required',  $this->p->t('ui','error_fieldRequired',['field' => 'Typ']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public function plz_numeric($value)
+	{
+		if (!is_numeric($value)) {
+			$this->form_validation->set_message('plz_numeric',  $this->p->t('ui','error_fieldNotNumeric',['field' => 'PLZ']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public function kontakt_valid_email($email)
+	{
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			$this->form_validation->set_message('kontakt_valid_email',  $this->p->t('ui','error_fieldNoValidEmail',['field' => 'Kontakt']));
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 }

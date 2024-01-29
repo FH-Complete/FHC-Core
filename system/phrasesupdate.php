@@ -22117,7 +22117,7 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'notiz',
+		'category' => 'ui',
 		'phrase' => 'error_fieldRequired',
 		'phrases' => array(
 			array(
@@ -22136,18 +22136,37 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'notiz',
-		'phrase' => 'error_textFieldRequired',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNotNumeric',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Das Eingabefeld textField ist erforderlich',
+				'text' => 'Das Eingabefeld {field} darf nur Zahlen enthalten.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The Field textField is required',
+				'text' => 'The Field {Field} must contain only numbers.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNoValidEmail',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} muss eine gültige Email-Adresse enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The field {field} must contain a valid email address.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
