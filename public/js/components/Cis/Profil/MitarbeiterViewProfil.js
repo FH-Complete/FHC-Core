@@ -152,30 +152,7 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-              <div class="row py-2">
-              <div class="col">
-                <p class="m-0">
-                <div class="card">
-                
-                <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                <u> Quick links</u>
-               </a>
-             
-                
-               </div>
-                 
-                </p>
-                <div class="mt-1 collapse" id="collapseExample">
-                  
-                  <div class="list-group">
-                   
-                    <a href="#" class="list-group-item list-group-item-action">Zeitwünsche</a>
-                    <a href="#" class="list-group-item list-group-item-action">Lehrveranstaltungen</a>
-                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren</a>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <quick-links :mobile="true" ></quick-links>
 
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->

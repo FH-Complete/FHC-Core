@@ -1,3 +1,8 @@
+import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
+import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
+import RoleInformation from "./ProfilComponents/RoleInformation.js";
+import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
 export default {
   
@@ -7,56 +12,51 @@ export default {
      
     };
   },
+  components:{
+    QuickLinks,
+    Mailverteiler,
+    ProfilEmails,
+    RoleInformation,
+    ProfilInformation
+  },
 
-  //? this is the prop passed to the dynamic component with the custom data of the view
   props: ["data"],
   methods: {
     
   },
 
   computed: {
-  
-
-    get_image_base64_src() {
-      if (!this.data) {
-        return "";
-      }
-      return "data:image/jpeg;base64," + this.data.foto;
-    },
-
    
-    //? this computed function returns all the informations for the first column in the profil
-    personData() {
+     profilInformation() {
       if (!this.data) {
         return {};
       }
 
       return {
+        Vorname: this.data.vorname,
+        Nachname: this.data.nachname,
         Username: this.data.username,
         Anrede: this.data.anrede,
-        Matrikelnummer: this.data.matrikelnummer,
-        Titel: this.data.titelpre,
+        Titel: this.data.titel,
         Postnomen: this.data.postnomen,
+        foto_sperre:this.data.foto_sperre,
+        foto:this.data.foto,
+
       };
     },
 
-    personKontakt() {
+    personEmails() {
+      return this.data?.emails ? this.data.emails : [];
+    },
+
+    roleInformation() {
       if (!this.data) {
         return {};
       }
 
       return {
-        emails: this.data.emails,
-        
-      };
-    },
-
-    specialData() {
-      if (!this.data) {
-        return {};
-      }
-
-      return {
+        Geburtsdatum: this.data.gebdatum,
+        Geburtsort: this.data.gebort,
         Personenkennzeichen: this.data.personenkennzeichen,
         Studiengang: this.data.studiengang,
         Semester: this.data.semester,
@@ -64,9 +64,6 @@ export default {
         Gruppe: this.data.gruppe.trim(),
       };
     },
-
-    
-
   
   },
 
@@ -84,30 +81,7 @@ export default {
           <!-- HIDDEN QUICK LINKS -->
               <div  class="d-md-none col-12 ">
              
-              <div class="row py-2">
-              <div class="col">
-                <p class="m-0">
-                <div class="card">
-                
-                <a class=" w-100 btn " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                <u> Quick links</u>
-               </a>
-             
-                
-               </div>
-                 
-                </p>
-                <div class="mt-1 collapse" id="collapseExample">
-                  
-                  <div class="list-group">
-                   
-                    <a href="#" class="list-group-item list-group-item-action">Zeitwünsche</a>
-                    <a href="#" class="list-group-item list-group-item-action">Lehrveranstaltungen</a>
-                    <a href="#" class="list-group-item list-group-item-action ">Zeitsperren</a>
-                  </div>
-                </div>
-              </div>
-            </div>
+             <quick-links :mobile="true"></quick-links>
 
               </div>
               <!-- END OF HIDDEN QUCK LINKS -->
@@ -147,98 +121,9 @@ export default {
                      <div class="row mb-4">
                      <div class="col">
                      
-                        
-                      <div class="card h-100">
-                      <div class="card-header">
-                      StudentIn
-                      </div>
-                      <div class="card-body">
-                      
-                       
-
-
-                  
-                  <div  class="gy-3 row align-items-center">
-
-
-
-
-                  <!-- SQUEEZING THE IMAGE INSIDE THE FIRST INFORMATION COLUMN -->
- <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
-          <div class="col-12 col-sm-6 mb-2">
-           <div class="row justify-content-center">
-                        <div class="col-auto " style="position:relative">
-                          <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"></img>
-                         
-                        </div>
-                      </div>
-                    <!-- END OF THE ROW WITH THE IMAGE -->
-                    </div>
-<!-- END OF SQUEEZE -->
-
-
-
-<!-- COLUMNS WITH MULTIPLE ROWS NEXT TO PROFIL PICTURE -->
-                  <div class="col-12 col-sm-6">
-                  <div class="gy-4 row">
-                  <div class="col-12">
-                 
-                        
-                  <div  class="form-underline ">
-                  <div class="form-underline-titel">Vorname</div>
-                  <span class="form-underline-content">{{data.vorname}} </span>
-                  
-                  </div>
-
-
-
-                </div>
-                <div class="col-12">
-               
-                        
-                
-
-                  <div  class="form-underline ">
-                  <div class="form-underline-titel">Nachname</div>
-                  <span class="form-underline-content">{{data.nachname}} </span>
-                  
-                  </div>
-
-
-                </div>
-                </div>
-             
-                
-                  </div>
-                  
-
-
-
-
-
-
-
-                  <div v-for="(wert,bez) in personData" class="col-md-6 col-sm-12 ">
-                  
-                        
-                  <div  class="form-underline ">
-                  <div class="form-underline-titel">{{bez}}</div>
-                  <span class="form-underline-content">{{wert?wert:'-'}} </span>
-                  
-                  </div>
-
-
-                  
-                  </div>
-
-                  
-                      </div>
-
-
-                      
-                      </div>
-                    </div>
-		    </div>
+                        <profil-information :data="profilInformation" title="StudentIn"></profil-information>
+                     
+		                </div>
                     </div>
                   
 
@@ -259,60 +144,9 @@ export default {
                     <div class="row mb-4">
                     <div class="col">
 
-
-                    <div class="card ">
-                    <div class="card-header">
-                    Mails
-                    </div>
-                   
-                    <div class="card-body">
-
-
-
-                      <div v-for="(wert,bezeichnung) in personKontakt">
-
-                      
-            
-                      <!-- HIER SIND DIE EMAILS -->
+                    <!-- EMAILS -->
+                    <profil-emails :data="personEmails"></profil-emails>
                   
-                  
-                      <div  v-if="typeof wert === 'object' && bezeichnung == 'emails'" class="gy-3 row justify-content-center ">
-                      <div v-for="email in wert" class="col-12 ">
-                     
-                            <div class="row align-items-center">
-                      <div class="col-1 text-center">
-
-                      <i class="fa-solid fa-envelope" style="color:rgb(0, 100, 156)"></i>
-
-                      </div>
-                      <div class="col">
-                     
-                           
-                            <div  class="form-underline ">
-                            <div class="form-underline-titel">{{email.type }}</div>
-                            <a :href="'mailto:'+email.emails" class="form-underline-content">{{email.email}} </a>
-                            
-                            </div>
-
-                     
-                      </div>
-                      </div>
-                      </div>
-                          </div>
-
-                    
-                    
-                     
-
-
-
-
-                    
-                      </div>
-
-
-                    </div>
-                    </div>
                     </div></div>
 
                    <!-- SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
@@ -321,28 +155,7 @@ export default {
 
                     <div  class=" col-lg-12">
        
-                    <div class="card">
-                
-                        <div class="card-header">
-                        Studenten Information
-                        </div>
-                        <div class="card-body">
-                            <div class="gy-3 row">
-                            <div v-for="(wert,bez) in specialData" class="col-md-6 col-sm-12 ">
-                            
-
-                            <div  class="form-underline ">
-                            <div class="form-underline-titel">{{bez}}</div>
-                            <span class="form-underline-content">{{wert?wert:'-'}} </span>
-                            
-                            </div>
-                           
-                            </div>
-                        </div>
-                        
-                    </div>
-                    
-                </div>
+                    <role-information title="Student Information" :data="roleInformation"></role-information>
 
                     </div>  
                            
@@ -365,20 +178,6 @@ export default {
                   <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
                 </div  >
 
-
-
-                
-
-
-
-
-        
-
-
-
-
-
-
               <!-- END OF MAIN CONTENT COL -->
               </div>
 
@@ -397,27 +196,10 @@ export default {
                 <div  class="row d-none d-md-block mb-3">
                   <div class="col">
                  
-                    <div class="card">
-                      <div class="card-header">
-                      Quick Links
-                      </div>
-                      <div class="card-body">
-                      
-                       
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitwuensche</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Lehrveranstaltungen</a>
-                        <a style="text-decoration:none" class="my-1 d-block" href="#">Zeitsperren</a>
+                   <quick-links></quick-links>
 
-                      </div>
-                    </div>
-
-                   
-                      
-                  
                   </div>
                 </div>
-
-              
 
                 <!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
                 <div  class="row">
@@ -427,36 +209,7 @@ export default {
 
                   
                   <!-- HIER SIND DIE MAILVERTEILER -->
-                    <div class="card">
-                      <div class="card-header">
-                      Mailverteilers
-                      </div>
-                      <div class="card-body">
-                      
-                        <h6 class="card-title">Sie sind Mitgglied in folgenden Verteilern:</h6>
-                        <div  class="card-text row text-break mb-2" v-for="verteiler in data?.mailverteiler">
-                          <div class="col-12 ">
-                            <div class="row">  
-                              <div class="col-1 ">
-                              
-                              <i class="fa-solid fa-envelope" style="color: #00649C;"></i>
-                              
-                              </div>
-                              <div class="col">
-                                <a :href="verteiler.mailto"><b>{{verteiler.gruppe_kurzbz}}</b></a>
-                              </div>
-                            </div>
-                           
-                          </div> 
-                          <div class="col-11 offset-1 ">{{verteiler.beschreibung}}</div>
-                        </div>
-
-                      </div>
-                    </div>
-
-
-
-
+                    <mailverteiler :data="data?.mailverteiler"></mailverteiler>
 
                   </div>
 
