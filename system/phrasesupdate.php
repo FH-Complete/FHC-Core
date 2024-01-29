@@ -22413,7 +22413,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Bank account number',
+				'text' => 'Address',
 				'description' => '',
 				'insertvon' => 'system'
 			)

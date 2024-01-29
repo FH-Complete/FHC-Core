@@ -31,7 +31,7 @@ export default{
 					{title:"Person_id", field:"person_id", visible:false},
 					{title:"Kontakt_id", field:"kontakt_id", visible:false},
 					{title:"Standort_id", field:"standort_id", visible:false},
-					{title:"letzte Änderung", field:"updateamum", visible:false},
+					{title:"letzte Änderung", field:"lastupdate", visible:false},
 					{title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
@@ -216,10 +216,10 @@ export default{
 		cm.getColumnByField('anmerkung').component.updateDefinition({
 			title: this.$p.t('global', 'anmerkung')
 		});
-		cm.getColumnByField('kurz_bz').component.updateDefinition({
+		cm.getColumnByField('kurzbz').component.updateDefinition({
 			title: this.$p.t('person', 'firma')
 		});
-		cm.getColumnByField('updateamum').component.updateDefinition({
+		cm.getColumnByField('lastupdate').component.updateDefinition({
 			title: this.$p.t('notiz', 'letzte_aenderung')
 		});
 	},

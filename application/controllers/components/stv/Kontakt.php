@@ -279,8 +279,12 @@ class Kontakt extends FHC_Controller
 	{
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('organisation/standort_model', 'StandortModel');
-
-		$this->KontaktModel->addSelect('*');
+		$this->KontaktModel->addSelect("*,
+			TO_CHAR (CASE 
+					WHEN public.tbl_kontakt.updateamum >= public.tbl_kontakt.insertamum 
+					THEN public.tbl_kontakt.updateamum 
+					ELSE public.tbl_kontakt.insertamum 
+				END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate");
 		$this->StandortModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
 
 		$result = $this->KontaktModel->loadWhere(
