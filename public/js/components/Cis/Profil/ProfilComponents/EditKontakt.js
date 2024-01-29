@@ -1,10 +1,12 @@
 
 export default {
+  
     props:{
         data:Object,
     },
     data(){
         return{
+           
             originalValue:null,
         }
     },
@@ -39,7 +41,7 @@ export default {
     },
     template:
     `
-    <div class="gy-3 row align-items-center justify-content-center">
+    <div class="gy-3 row align-items-center justify-content-center">    
     
     <div v-if="!data.kontakt_id" class="col-12">
         

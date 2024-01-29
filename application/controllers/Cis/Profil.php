@@ -24,6 +24,7 @@ class Profil extends Auth_Controller
 			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'deleteProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -40,6 +41,7 @@ class Profil extends Auth_Controller
 		//? put the uid and pid inside the controller to reuse in controller
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
+		
 
 	}
 
@@ -66,6 +68,33 @@ class Profil extends Auth_Controller
 
 	}
 
+
+	public function insertFile(){
+		$this->load->library('DmsLib');
+		$this->load->model('DmsVersion_model','DmsVersionModel');
+		$files = $_FILES['files'];
+        $file_count = count($files['name']);
+
+        for ($i = 0; $i < $file_count; $i++) {
+            $_FILES['files']['name'] = $files['name'][$i];
+            $_FILES['files']['type'] = $files['type'][$i];
+            $_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
+            $_FILES['files']['error'] = $files['error'][$i];
+            $_FILES['files']['size'] = $files['size'][$i];
+			//! ID CHANGES EVERYTIME AND TMP_FILENAME IS A HASH THAT ALSO CHANGES EVERYTIME
+			$this->DmsVersionModel->addSelect(["version"]);
+			$fileVersion = $this->DmsVersionModel->loadWhere(["filename"=>$_FILES['files']['tmp_name']]);
+			$fileVersion = hasData($fileVersion) ? getData($fileVersion)[0]->version : 0;
+			if($fileVersion) $fileVersion++;
+			
+            $res=$this->dmslib->upload(["kategorie_kurzbz"=>"dokumente","version"=>$fileVersion] , 'files');
+			echo json_encode($res);
+			echo "\n\n";
+		}
+
+		
+		
+	}
 
 
 	public function selectProfilRequest(){

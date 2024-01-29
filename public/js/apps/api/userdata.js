@@ -3,6 +3,15 @@ export default {
 
     //! API Calls for Profil Views
 
+    insertFile: function(dms) {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   `/Cis/Profil/insertFile`;
+                   
+        return axios.post(url,dms, {
+            headers: {'Content-Type': 'multipart/form-data'}
+          });
+    },
+
     selectProfilRequest: function(uid=null,id=null) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
                    `/Cis/Profil/selectProfilRequest`;
