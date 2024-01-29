@@ -119,7 +119,7 @@ export default {
             </thead>
             <tbody>
                 <tr v-for="item in data" :style="item.status=='accepted'?'background-color:lightgreen':item.status==='rejected'?'background-color:lightcoral':''">
-                <td class="align-middle text-wrap">{{item.topic}}</td>
+                <td class="align-middle text-wrap ">{{item.topic}}</td>
                 <td class="align-middle " >{{item.status}}</td>
                 <td class="align-middle">{{item.change_timestamp}}</td>
                 
@@ -142,10 +142,15 @@ export default {
                 </template>
 
                 <template v-else>
+                
+                <td  class="align-middle text-center">
                 <div class="d-flex flex-row justify-content-evenly">
-                <td  class="align-middle text-center"><i  role="button" @click="openModal(item)" class="fa fa-eye"></i></td>
-                </template>
+                <i  role="button" @click="openModal(item)" class="fa fa-eye"></i>
                 </div>
+                </td>
+                
+                </template>
+                
                 
                 </tr>
             </tbody>

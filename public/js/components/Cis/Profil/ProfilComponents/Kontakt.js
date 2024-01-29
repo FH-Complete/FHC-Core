@@ -12,7 +12,7 @@ export default{
 
     }, 
     template:`
-    <div class=" row align-items-center justify-content-center">
+    <div class="gy-2 row align-items-center justify-content-center">
     <div class="col-1 text-center" >
     
     <i class="fa-solid " :class="{...(data.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" style="color:rgb(0, 100, 156)"></i>
