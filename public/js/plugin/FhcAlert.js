@@ -281,21 +281,21 @@ export default {
 			handleSystemMessage(message) {
 				// Message is string
 				if (typeof message === 'string')
-					return fhcerror.alertWarning(message);
+					return $fhcAlert.alertWarning(message);
 
 				// Message is array of strings
 				if (Array.isArray(message)) {
 					// If Array has only Strings
 					if (message.every(msg => typeof msg === 'string'))
-						return message.every(fhcerror.alertWarning);
+						return message.every($fhcAlert.alertWarning);
 
 					// If Array has only Objects
 					if (message.every(msg => typeof msg === 'object') && msg !== null) {
 						return message.every(msg => {
 							if (msg.hasOwnProperty('data') && msg.data.hasOwnProperty('retval')) {
-								fhcerror.alertWarning(JSON.stringify(msg.data.retval));
+								$fhcAlert.alertWarning(JSON.stringify(msg.data.retval));
 							} else {
-								fhcerror.alertSystemError(JSON.stringify(msg));
+								$fhcAlert.alertSystemError(JSON.stringify(msg));
 							}
 						});
 					}
@@ -305,15 +305,15 @@ export default {
 				if (typeof message === 'object' && message !== null){
 					if (message.hasOwnProperty('data') && message.data.hasOwnProperty('retval')) {
 						// NOTE(chris): changed: alertSystemError => alertWarning
-						fhcerror.alertWarning(JSON.stringify(message.data.retval));
+						$fhcAlert.alertWarning(JSON.stringify(message.data.retval));
 					} else {
-						fhcerror.alertSystemError(JSON.stringify(message));
+						$fhcAlert.alertSystemError(JSON.stringify(message));
 					}
 					return;
 				}
 
 				// Fallback
-				fhcerror.alertSystemError('alertSystemError throws Generic Error\r\nError Controller Path: ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' +  FHC_JS_DATA_STORAGE_OBJECT.called_method);
+				$fhcAlert.alertSystemError('alertSystemError throws Generic Error\r\nError Controller Path: ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' +  FHC_JS_DATA_STORAGE_OBJECT.called_method);
 			},
 			resetFormValidation(form) {
 				const event = new Event('fhc-form-reset');
