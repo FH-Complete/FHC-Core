@@ -11642,13 +11642,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Begründen Sie die Gleichwertigkeit der ECTS',
+                'text' => 'Erläutern Sie die Gleichwertigkeit der ECTS',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'Give reasons for the equivalence of ECTS',
+                'text' => 'Explain ECTS equivalencies',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -11662,13 +11662,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Begründen Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
+                'text' => 'Erläutern Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'Give reasons for the equivalence of the course contents',
+                'text' => 'Explain the equivalence of course content',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -19702,7 +19702,7 @@ array(
 		)
 	),
 /*
-	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status 
+	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status
 	// erstellt werden, die dann in der Studierendenansicht in einer infobox angezeigt werden
 	array(
 		'app' => 'core',
@@ -23370,7 +23370,7 @@ array(
 		)
 	),
 
-	
+
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
@@ -23451,7 +23451,7 @@ array(
 			)
 		)
 	),
-	
+
 
 
 	array(
