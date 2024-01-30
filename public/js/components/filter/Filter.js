@@ -136,9 +136,9 @@ export const CoreFilterCmpt = {
 				for (let col of columns)
 				{
 					// If the column has to be displayed or not
-					col.visible = selectedFields.indexOf(col.field) >= 0;
-					if (col.formatter == 'rowSelection')
-						col.visible = true;
+					/* fields.indexOf(col.field) == -1; ensures displaying formatter colums
+					e.g. column with rowSelection checkboxes or with custom formatted action buttons */
+					col.visible = selectedFields.indexOf(col.field) >= 0 || fields.indexOf(col.field) == -1;
 
 					if (col.hasOwnProperty('resizable'))
 						col.resizable = col.visible;
@@ -265,6 +265,7 @@ export const CoreFilterCmpt = {
 				this.filterName = data.filterName;
 				this.dataset = data.dataset;
 				this.datasetMetadata = data.datasetMetadata;
+
 				this.fields = data.fields;
 				this.selectedFields = data.selectedFields;
 				this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
