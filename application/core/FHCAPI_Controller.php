@@ -155,7 +155,7 @@ class FHCAPI_Controller extends FHC_Controller
 	{
 		$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
 		$this->addError($errors, self::ERROR_TYPE_VALIDATION);
-		$this->setStatus(self::STATUS_FAILED);
+		$this->setStatus(self::STATUS_FAIL);
 		exit(EXIT_ERROR);
 	}
 
