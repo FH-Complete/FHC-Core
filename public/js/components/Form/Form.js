@@ -40,9 +40,31 @@ export default {
 
 				return a;
 			}, {});
+		},
+		factory() {
+			const factory = Object.create(Object.getPrototypeOf(this.$fhcApi.factory), Object.getOwnPropertyDescriptors(this.$fhcApi.factory));
+			factory.$fhcApi = {
+				get: this.get,
+				post: this.post
+			};
+			return factory;
 		}
 	},
 	methods: {
+		get(...args) {
+			if (typeof args[0] == 'object' && args[0].clearValidation && args[0].setFeedback)
+				args[0] = this;
+			else
+				args.unshift(this);
+			this.$fhcApi.get(...args);
+		},
+		post(...args) {
+			if (typeof args[0] == 'object' && args[0].clearValidation && args[0].setFeedback)
+				args[0] = this;
+			else
+				args.unshift(this);
+			this.$fhcApi.post(...args);
+		},
 		_sendFeedbackToInput(inputs, feedback, valid) {
 			if (inputs.length) {
 				inputs.forEach(input => input.setFeedback(valid, feedback));
