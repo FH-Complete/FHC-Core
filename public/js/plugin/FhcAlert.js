@@ -237,7 +237,7 @@ export default {
 			alertMultiple(messageArray, severity = 'info', title = 'Info', sticky = false){
 				// Check, if array has only string values
 				if (messageArray.every(message => typeof message === 'string')) {
-					messageArray.every(message => this.alertDefault(severity, title, message, sticky));
+					messageArray.forEach(message => this.alertDefault(severity, title, message, sticky));
 					return true;
 				}
 				return false;
