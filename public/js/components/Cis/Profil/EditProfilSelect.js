@@ -3,6 +3,7 @@ import EditKontakt from "./ProfilComponents/EditKontakt.js";
 import Adresse from "./ProfilComponents/Adresse.js";
 import EditAdresse from "./ProfilComponents/EditAdresse.js";
 import Status from "./ProfilComponents/Status.js";
+import TextInputDokument from "./ProfilComponents/TextInputDokument.js";
 
 export default {
     components: {
@@ -11,10 +12,11 @@ export default {
       Adresse,
       EditAdresse,
       Status,
+      TextInputDokument,
     },
     props: {
 
-      //! this should throw an error in the js console, have to check later
+      
       list:Object,
   
       //? Prop used to determine how many options the select should initially show
@@ -48,6 +50,7 @@ export default {
         data:null,
         breadcrumbItems:[],
         topic:null,
+        properties:null,
       }
     },
   
@@ -100,13 +103,16 @@ export default {
       profilUpdateEmit: function(event){
         
         //? passes the updated profil information to the parent component
+        
         this.$emit('update:profilUpdate',event);
       },
+
+      
       updateOptions: function(event, item){
-        
+        this.properties = item;
         this.data=item.data; 
-        this.view=item.view; 
-        
+        this.view=item.view;    
+        console.log("properties",this.properties);
         if(item.title){
           //? emits the selected topic to the parent component
           this.topic= item.title;
@@ -132,6 +138,8 @@ export default {
       
     },
     created() {
+      //? JSON parse and stringify are used to deep clone the objects 
+      this.properties = {...this.list};
       this.data = JSON.parse(JSON.stringify(this.list.data));
       this.view = JSON.parse(JSON.stringify(this.list.view));
       
@@ -142,6 +150,7 @@ export default {
    
     template: `
     <template v-if="!view">
+    
     <div  class="list-group">
     <template v-for="item in data">
       <div class="d-flex flex-row align-items-center">
@@ -176,8 +185,9 @@ export default {
     <!-- if it not a normal text input field then reder the custom edit input component -->
     <!-- custom component is required to emit an profilUpdate event to register the new entered value --> 
     <template v-else>
-      <!-- both v-bind="list" and :data="data" pass a data prop, in this case the last one is the one that gets taken -->
-      <component @profilUpdate="profilUpdateEmit"  :is="view" v-bind="list" :data="data"></component>
+    
+      <!-- receives two events, one for normal data update and one when a file has to be stored to the database -->
+      <component @profilUpdate="profilUpdateEmit"   :is="view" v-bind="properties" :data="data" ></component>
     </template>
    `,
   };

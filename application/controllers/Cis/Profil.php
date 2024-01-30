@@ -70,6 +70,15 @@ class Profil extends Auth_Controller
 
 
 	public function insertFile(){
+
+		//? Version des Dokuments
+		/*$this->DmsVersionModel->addSelect(["version"]);
+			$fileVersion = $this->DmsVersionModel->loadWhere(["name"=>$_FILES['files']['name'], "mimetype"=>$_FILES['files']['type']]);
+			$fileVersion = hasData($fileVersion) ? getData($fileVersion)[0]->version : 0;
+			if($fileVersion) $fileVersion++; */
+
+		$res=[];
+
 		$this->load->library('DmsLib');
 		$this->load->model('DmsVersion_model','DmsVersionModel');
 		$files = $_FILES['files'];
@@ -81,19 +90,22 @@ class Profil extends Auth_Controller
             $_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
             $_FILES['files']['error'] = $files['error'][$i];
             $_FILES['files']['size'] = $files['size'][$i];
-			//! ID CHANGES EVERYTIME AND TMP_FILENAME IS A HASH THAT ALSO CHANGES EVERYTIME
-			$this->DmsVersionModel->addSelect(["version"]);
-			$fileVersion = $this->DmsVersionModel->loadWhere(["filename"=>$_FILES['files']['tmp_name']]);
-			$fileVersion = hasData($fileVersion) ? getData($fileVersion)[0]->version : 0;
-			if($fileVersion) $fileVersion++;
 			
-            $res=$this->dmslib->upload(["kategorie_kurzbz"=>"dokumente","version"=>$fileVersion] , 'files');
-			echo json_encode($res);
-			echo "\n\n";
+			$dms = [
+				"kategorie_kurzbz"=>"dokumente",
+				"version"=>0, 
+				"name"=>$_FILES['files']['name'],
+				"mimetype"=>$_FILES['files']['type'],
+				"beschreibung"=>$this->uid . " Profil Änderung",
+				"insertvon"=>$this->uid,
+				"insertamum"=>"NOW()",
+			];
+            $tmp_res=$this->dmslib->upload($dms , 'files');
+			$tmp_res = hasData($tmp_res)? getData($tmp_res) : null;
+			array_push($res,$tmp_res);
 		}
 
-		
-		
+		echo json_encode($res);
 	}
 
 

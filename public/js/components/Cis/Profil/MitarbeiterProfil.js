@@ -10,7 +10,7 @@ import QuickLinks from "./ProfilComponents/QuickLinks.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js"
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
-import Dms from "../../Form/Upload/Dms.js";
+
 
 export default {
   components: {
@@ -25,13 +25,10 @@ export default {
     ProfilEmails,
     RoleInformation,
     ProfilInformation,
-    Dms,
   },
   data() {
     return {
 
-      //? used for dms component
-      dmsData:[],
      
       
       funktionen_table_options: {
@@ -142,30 +139,8 @@ export default {
   
   methods: {
 
-    testUpdload: function(){
-      let formData = new FormData();
-      for(let i = 0; i < this.dmsData.length; i++){
-        
-        formData.append("files[]",this.dmsData[i]);
-      }
-      
-      Vue.$fhcapi.UserData.insertFile(formData).then(res => {
-        console.log(res);
-      }).catch(err=>{
-        console.log(err);
-      })
-    },
+   
 
-    //! delete later
-    stringifyFile(file) {
-			return JSON.stringify({
-				lastModified: file.lastModified,
-				lastModifiedDate: file.lastModifiedDate,
-				name: file.name,
-				size: file.size,
-				type: file.type
-			});
-		},
     
 
     fetchProfilUpdates: function(){
@@ -277,14 +252,17 @@ export default {
             
             vorname: {
               title:"vorname",
-              view:"text_input",
+              view:"TextInputDokument",
+              withFiles:true,
               data:{
                 titel:"vorname",
                 value:this.data.vorname,
+                
               }},
               nachname: {
                 title:"nachname",
-                view:"text_input",
+                view:"TextInputDokument",
+                withFiles:true,
                 data:{
                   titel:"nachname",
                   value:this.data.nachname,
@@ -292,7 +270,8 @@ export default {
               },
               titel:{
                 title:"titel",
-                view:"text_input",
+                view:"TextInputDokument",
+                withFiles:true,
                 data:{
                   titel:"titel",
                   value:this.data.titel,
@@ -300,7 +279,8 @@ export default {
               },
               postnomen:{
                 title:"postnomen",
-                view:"text_input",
+                view:"TextInputDokument",
+                withFiles:true,
                 data:{
                   titel:"postnomen",
                   value:this.data.postnomen,
@@ -346,9 +326,7 @@ export default {
   template: ` 
 
   <div class="container-fluid text-break fhc-form"  >
-<pre>{{JSON.stringify(Array.from(dmsData).map(item=>{return stringifyFile(item);}),null,2)}}</pre>
-<button @click="testUpdload">upload</button>
-  <dms ref="upload" id="files" :noList="false" :multiple="true" v-model="dmsData" ></dms>
+
     
           <div class="row">
           

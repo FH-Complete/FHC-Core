@@ -36,7 +36,7 @@ export default {
                 case "Add Kontakte" : return status ==='pending'? "EditKontakt": "Status"; break;
                 case "Delete Adressen" :  return status ==='pending'? "Adresse": "Status" ; break;
                 case "Delete Kontakte" : return status ==='pending'? "Kontakt": "Status"; break;
-                default: return status ==='pending'? "text_input": "Status"; break;
+                default: return status ==='pending'? "TextInputDokument": "Status"; break;
             }
         },
         openModal(updateRequest) {
@@ -45,26 +45,39 @@ export default {
             let data = null;
             let content =null;
 
-            if(view === "text_input"){
-                
+           
+            if(view === "TextInputDokument"){
+                // this should be the files : updateRequest.requested_change.files
                 data = {
                     titel:updateRequest.topic,
-                    value: updateRequest.requested_change,
+                    value: updateRequest.requested_change.value,
+                    
                 };
+
+                
+                
             }
             else{
                 data = updateRequest.requested_change;
             }
                 
-           
+            const exampleFile = updateRequest.requested_change.files.map(file=>{return new File(["files[]"], file.name);})
+            const exampleFileList = new DataTransfer();
+            exampleFile.forEach(file => {
+                exampleFileList.items.add(file);
+            })
+            
 
             content={
                 view:view,
                 data:data,
+                withFiles:view==="TextInputDokument" ? true:false,
                 update:true,
                 topic:updateRequest.topic,
+                files: view==="TextInputDokument" ? exampleFileList.files:null,
                 
             }
+
 
             //? adds the status information if the profil update request was rejected or accepted
             if(updateRequest.status !== 'pending'){

@@ -38,10 +38,22 @@ export default {
   },
 
   methods: {
-    submitProfilChange(){
+    async submitProfilChange(){
+      //? when the update contains a file upload 
+      
         //TODO: check if the updated value is different from the original value before submitting the request
        if(this.topic && this.profilUpdate){
 
+        if(this.profilUpdate.files){
+          
+          const fileIDs = await this.uploadFiles(this.profilUpdate.files);
+          
+          if(fileIDs){
+            
+            this.profilUpdate.files=fileIDs;
+            console.log("here is the update",this.profilUpdate);
+          };
+        }
         //? inserts new row in public.tbl_cis_profil_update 
         //* calls the update api call if an update field is present in the data that was passed to the module
         Vue.$fhcapi.UserData[this.editData.update?'updateProfilRequest':'insertProfilRequest'](this.topic,this.profilUpdate).then((res)=>{
@@ -53,13 +65,31 @@ export default {
           }else{
             this.result= false;
             this.hide();
-            console.log(res.data);
             Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
-          } 
-         
+          }
         });
+        
+        
     }
     },
+
+    //? uploads files to the dms table and returns an array with the ids of the created files
+     uploadFiles: async function(files){
+      let formData = new FormData();
+      for(let i = 0; i < files.length; i++){
+        
+        formData.append("files[]",files[i]);
+      }
+      
+      return await Vue.$fhcapi.UserData.insertFile(formData).then(res => {
+        /* returns file information as 
+        [{"name":"example.png", "dms_id":282531}] */
+        return res.data.map(file => { return {dms_id:file.dms_id, name:file.client_name}});
+      }).catch(err=>{
+        console.log(err);
+        return null;
+      })
+    }, 
   },
   computed: {
   },
@@ -100,7 +130,8 @@ export default {
     </template>
     <!-- optional footer -->
     <template   v-slot:footer>
-      <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>    
+      
+    <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>    
       <button v-if="profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>
     <!-- end of optional footer --> 

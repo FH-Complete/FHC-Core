@@ -71,10 +71,16 @@ export default {
     {{cardHeader}} 
     </div>
     <div class="card-body">
-    <div v-if="getComponentView === 'text_input'"  class="form-underline mb-2">
+    <template v-if="getComponentView === 'text_input'">
+    <div   class="form-underline mb-2">
     <div class="form-underline-titel">{{topic}}</div>
-    <span  class="form-underline-content">{{data}} </span>
+    <span  class="form-underline-content">{{data.value}} </span>
     </div>
+    <div class="ms-2">
+    <p>files:</p>
+    <p v-for="file in data.files">{{file}}</p>
+    </div>
+    </template>
     <component v-else :is="getComponentView" :data="data"></component>
     
     </div>
