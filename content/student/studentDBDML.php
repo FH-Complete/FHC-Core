@@ -4665,7 +4665,7 @@ if(!$error)
 					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER) ."
 						AND stundensatztyp = ". $db->db_add_param('lehre') ."
 						AND gueltig_von <= ". $db->db_add_param($studiensemester->ende) ."
-						AND (gueltig_bis => ". $db->db_add_param($studiensemester->start) ." OR gueltig_bis IS NULL)
+						AND (gueltig_bis >= ". $db->db_add_param($studiensemester->start) ." OR gueltig_bis IS NULL)
 					ORDER BY gueltig_bis DESC NULLS FIRST, gueltig_von DESC NULLS LAST LIMIT 1
 					";
 				if($result = $db->db_query($qry))
