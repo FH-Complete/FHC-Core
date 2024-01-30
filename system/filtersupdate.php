@@ -1278,6 +1278,31 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'anrechnungTableData',
+		'filter_kurzbz' => 'AnrechnungTable',
+		'description' => '{Alle Anrechnungen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "AnrechnungTable",
+				"columns": [
+					{"name": "studiengang_kz"},
+					{"name": "stg_bezeichnung"},
+					{"name": "studiensemester_kurzbz"},
+					{"name": "student"},
+					{"name": "lv_bezeichnung"},
+					{"name": "dokument_bezeichnung"},
+					{"name": "anmerkung_student"},
+					{"name": "status_kurzbz"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
 	)
 );
 
