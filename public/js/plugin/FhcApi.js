@@ -12,7 +12,7 @@ export default {
 				form = undefined;
 			} else if (form) {
 				if (typeof form != 'object')
-					throw new Error('Parameter 1 of function get must be an object or a string'); // TODO(chris): wording
+					throw new TypeError('Parameter 1 of _get_config must be an object or a string');
 				if (uri === undefined && data === undefined && config === undefined) {
 					config = form;
 					form = undefined;
@@ -21,7 +21,7 @@ export default {
 			if (form) {
 				// NOTE(chris): check if form is fhc-form
 				if (!form.clearValidation || !form.setFeedback)
-					throw new Error('form is not a form'); // TODO(chris): wording
+					throw new TypeError("'form' is not a Form Component");
 
 				form = {
 					clearValidation: form.clearValidation,
@@ -53,16 +53,14 @@ export default {
 				response.data.errors = response.data.errors.filter(
 					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config.form)
 				);
-			console.log(response, app.config.globalProperties.$fhcAlert); // TODO(chris): DEBUG REMOVE!
 			return response;
 		}, error => {
-			// TODO(chris): turn off silent cancel?
 			if (error.code == 'ERR_CANCELED')
 				return;
 			
-			if (error.config.errorHandling == 'off'
-				|| error.config.errorHandling === false
-				|| error.config.errorHandling == 'success')
+			if (error.config?.errorHandling == 'off'
+				|| error.config?.errorHandling === false
+				|| error.config?.errorHandling == 'success')
 				return Promise.reject(error);
 
 			if (error.response) {
@@ -75,8 +73,6 @@ export default {
 				);
 				if (!error.response.data.errors.length)
 					return;
-
-				console.log(error, error.response, error.response.data); // TODO(chris): DEBUG REMOVE!
 			} else if (error.request) {
 				return app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL);
 			} else {
