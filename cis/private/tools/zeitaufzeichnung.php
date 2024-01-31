@@ -784,23 +784,23 @@ echo '
 		{
 			/* Checkt nicht mehr Bisverwendung, sondern Vertragsbestandteil Zeitaufzeichnung */
 			$.ajax({
-  			url: "zeitaufzeichnung_bisverwendung.php", 
-  			data: {
-  			  day: day,
-			  uid: uid
-  			},
-  			success: function (result)
-			{
-			  if (result==\'true\')
-			  {
-				$("#homeofficeBlock").show();
-			  }
-			  else
-			  {
-				  $("#homeofficeBlock").hide();
-			  }
-  			}
-  		  });
+				url: "zeitaufzeichnung_bisverwendung.php",
+				data: {
+					day: day,
+					uid: uid
+				},
+				success: function (result)
+				{
+					if (result==\'true\')
+					{
+						$("#homeofficeBlock").show();
+					}
+					else
+					{
+						$("#homeofficeBlock").hide();
+					}
+				}
+			});
 		}
 
 		function checkZeitsperre(day, uid)
@@ -1042,7 +1042,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			echo "
 			<hr><br>
 
-			<select name='mas' id='mas' onchange='location = this.options[this.selectedIndex].value;''>
+			<select name='mas' id='mas' onchange='location = this.options[this.selectedIndex].value;'>
 				<option>-- Timesheets Mitarbeiter*Innen --</option>";
 			foreach($mitarbeiter->result as $row)
 			{
@@ -1247,9 +1247,9 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			$p->t("zeitaufzeichnung/projektphase").'
 				<SELECT name="projektphase" id="projektphase">
 					<OPTION value="" id="projektphasekeineausw">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
-
 		if ($showprojphases)
 		{
+
 			foreach ($projektphasen as $projektphase)
 			{
 				if (($projektphase->start != "" ) && ($projektphase->ende != " "))
@@ -1270,12 +1270,11 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).
 				$phasentext. '</option>';
 			}
-			echo '</SELECT></span>';
+
 		}
+		echo '</SELECT></span>';
 		echo '</td></tr>';
 	}
-
-	echo "<input type ='hidden' value='$user'id=uidpass>";
 
 	if ($za_simple == 0)
 		{
@@ -1370,14 +1369,11 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 			<td>&nbsp;</td>
 			<td colspan="3">
 				<span id="pausenblock">
-					<input type="checkbox" name="genPause" id="genPause" onChange="checkPausenzeit()"> '.$p->t("zeitaufzeichnung/pauseEinfuegen").' <input type="text" name="pause_von" class="timepicker" size="4" id="pause_von"> - <input type="text" name="pause_bis" class="timepicker" size="4" id="pause_bis">
+					<input type="checkbox" name="genPause" id="genPause" onChange="checkPausenzeit()"> <label for="genPause">'.$p->t("zeitaufzeichnung/pauseEinfuegen").'</label> <input type="text" name="pause_von" class="timepicker" size="4" id="pause_von"> - <input type="text" name="pause_bis" class="timepicker" size="4" id="pause_bis">
 				</span>
 			</td>
 		</tr>
 		';
-
-		//Zeitsperren
-		echo '<p id="outputZs"></p>';
 
 		//Homeoffice Checkbox
 			echo '
@@ -1385,7 +1381,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 				<td>&nbsp;</td>
 				<td colspan="1">
 					<span id="homeofficeBlock">
-						<input type="checkbox" name="homeoffice" id="homeoffice" '. $homeofficeChecked . '>Homeoffice</input>
+						<input type="checkbox" name="homeoffice" id="homeoffice" '. $homeofficeChecked . '> <label for="homeoffice">Homeoffice</label>
 					</span>
 				</td>
 			</tr>
@@ -1412,7 +1408,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 					$vbt = new vertragsbestandteil();
 					$isAllin = $vbt->isAllin($user);
-					
+
 					if ($isAllin)
 					{
 						echo '<span id="saldoAllin"></span><br>';
@@ -1432,6 +1428,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 		echo '</td></tr>';
 		echo '</table>';
 		echo '</form>';
+		echo "<input type ='hidden' value='$user' id='uidpass'>";
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)
@@ -1569,7 +1566,7 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 					$tagessaldo = date('H:i', ($tagessaldo));
 					$colspan = ($za_simple)?6:8;
-					echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="'.$colspan.'")>';
+					echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="'.$colspan.'">';
 
 					// Zusaetzlicher span fuer Addon Informationen
 
@@ -1626,8 +1623,8 @@ if ($projekt->getProjekteMitarbeiter($user, true))
 
 							<tr>
 								<th  colspan="'.$colspan.'" style="background-color: #8DBDD8;"></th>
-								<th style="background-color: #8DBDD8;" align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
-								<th style="background-color: #8DBDD8;" align="right" style="font-weight: normal;"><b>'.$wochensaldo.$erstr.'</b></th>
+								<th style="background-color: #8DBDD8; font-weight: normal;" align="right" colspan="2"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
+								<th style="background-color: #8DBDD8; font-weight: normal;" align="right"><b>'.$wochensaldo.$erstr.'</b></th>
 								<th style="background-color: #8DBDD8;" colspan="3"></th>
 							</tr>
 

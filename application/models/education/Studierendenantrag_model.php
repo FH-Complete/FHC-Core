@@ -54,7 +54,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addJoin('public.tbl_person', 'person_id');
 		$this->addJoin('public.tbl_studiengang stg', 'p.studiengang_kz=stg.studiengang_kz');
 		$this->addJoin('public.tbl_studiensemester ss', 'studiensemester_kurzbz');
-		$this->addJoin('public.tbl_prestudentstatus ps', 'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=ss.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ss.studiensemester_kurzbz)');
+		$this->addJoin('public.tbl_prestudentstatus ps', 'ps.prestudent_id=p.prestudent_id AND ps.studiensemester_kurzbz=ss.studiensemester_kurzbz AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, ss.studiensemester_kurzbz)', 'LEFT');
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
 		$this->addJoin(

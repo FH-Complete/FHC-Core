@@ -126,6 +126,9 @@ if (!$searchPerson && !$searchOrt && !$searchDms && !$searchContent && !$searchO
 
 function searchPerson($searchItems)
 {
+	if (defined('CIS_ALLOW_PERSON_SEARCH') && !CIS_ALLOW_PERSON_SEARCH)
+		return false;
+
 	global $db, $p, $noalias, $uid;
 	$bn = new benutzer();
 	//search only active and Mitarbeiter with positive Personalnr
@@ -182,18 +185,13 @@ function searchPerson($searchItems)
 					echo '<td>',$row->vorname, '</td>';
 
 			echo '<td>';
-			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN'))
-				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname, ' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
-			else if(!CIS_SUCHE_PROFIL_ANZEIGEN)
-			{
-				$mitarbeiter = new Mitarbeiter($uid);
-				if($mitarbeiter->errormsg === NULL)
-					echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname, ' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
-				else
+
+			$mitarbeiter = new Mitarbeiter();
+			if (defined('CIS_SUCHE_PROFIL_ANZEIGEN') && CIS_SUCHE_PROFIL_ANZEIGEN === false && !$mitarbeiter->load($uid))
 					echo $row->nachname;
-			}
 			else
 				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+
 			if($row->aktiv==false)
 				echo '<span style="color: red"> (ausgeschieden)</span>';
 			elseif(isKarenziert($row->uid))
