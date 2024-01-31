@@ -323,6 +323,88 @@ if(isset($_POST['setDate_multi']) && $_POST['setDate_multi'] != '')
 
 }
 
+if(isset($_POST['save_anmerkung_multi']) && $_POST['anmerkung_multi'] != '')
+{
+	if(!$rechte->isBerechtigt('basis/berechtigung', null, 'su'))
+		die($rechte->errormsg);
+
+	$anmerkungNeu = $_POST['anmerkung_multi'];
+
+	if (isset($_POST['dataset']))
+	{
+		$i = 0;
+		foreach ($_POST['dataset'] AS $benutzerberechtigung_id => $value)
+		{
+			// Nur markierte Einträge bearbeiten
+			if (!isset($value['check']))
+			{
+				continue;
+			}
+
+			$ber = new benutzerberechtigung();
+			if(!$ber->load($benutzerberechtigung_id))
+			{
+				die('Fehler beim Laden der Berechtigung');
+			}
+
+			// Bestehende Anmerkungen belassen und neue Ergänzen
+			if ($ber->anmerkung != '')
+			{
+				$ber->anmerkung = $ber->anmerkung.'; '.$anmerkungNeu;
+			}
+			else
+			{
+				$ber->anmerkung = $anmerkungNeu;
+			}
+
+			// Wenn Anmerkung länger als 256 Zeichen ist (DB-Beschränkung), String kürzen und Warnung ausgeben
+			if (strlen($ber->anmerkung) > 256)
+			{
+				$ber->anmerkung = cutString($ber->anmerkung, 256, '...');
+				$errorstr .= "<span style='color: red'><b>Die Anmerkung bei der ID ".$benutzerberechtigung_id." übersteigt die maximale Länge von 256 Zeichen und wurde nicht vollständig gespeichert</b></span><br>";
+			}
+
+			$ber->updateamum = date('Y-m-d H:i:s');
+			$ber->updatevon = $user;
+
+			if(!$ber->save())
+			{
+				$errorstr .= "Die Anmerkung des Datensatzes mit der ID ".$benutzerberechtigung_id." konnte nicht gespeichert werden!".$ber->errormsg;
+			}
+			else
+			{
+				$i ++;
+				//Log schreiben
+				$log = new log();
+
+				$logdata = var_export((array) $ber, true);
+				$log->new = true;
+				$log->sql = $logdata;
+				$log->sqlundo = 'Kein Undo vorhanden';
+				$log->executetime = date('Y-m-d H:i:s');
+				$log->mitarbeiter_uid = $user;
+				$log->beschreibung = 'Anmerkung bearbeitet';
+
+				if(!$log->save())
+				{
+					$errorstr .= "<span style='color: red'><b>Fehler beim schreiben des Log-Eintrags</b></span><br>";
+				}
+			}
+		}
+		if ($i > 0)
+		{
+			$successstr .= "<span style='color: green'><b>Anmerkung bei ".$i." Einträgen erfolgreich gespeichert</b></span><br>";
+		}
+	}
+
+
+
+	//$reloadstr .= "<script type='text/javascript'>";
+	//$reloadstr .= "	parent.uebersicht.location.href='benutzerberechtigung_uebersicht.php';";
+	//$reloadstr .= "</script>";
+
+}
+
 if(isset($_POST['schick']))
 {
 	if($rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
@@ -423,6 +505,10 @@ if(isset($_POST['schick']))
 						$errorstr .= "<span style='color: red'><b>Fehler beim schreiben des Log-Eintrags</b></span><br>";
 					}
 				}
+			}
+			if ($errorstr == '')
+			{
+				$successstr .= "<span style='color: green'><b>Änderungen erfolgreich gespeichert</b></span><br>";
 			}
 		}
 	}
@@ -539,20 +625,23 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "Berechtigungen von <b>".$name->nachname." ".$name->vorname." (".$uid.")</b>";
 		$message = '';
 		$class = '';
+		$messageString = '';
 		if ($errorstr != '' || $successstr != '')
 		{
 			if ($successstr != '')
 			{
 				$class = 'class="alert alert-success"';
 				$message = $successstr;
+				$messageString .= '	<div '.$class.'>'.$message.'</div>';
 			}
-			elseif ($errorstr != '')
+			if ($errorstr != '')
 			{
 				$class = 'class="alert alert-danger"';
 				$message = $errorstr;
+				$messageString .= '	<div '.$class.'>'.$message.'</div>';
 			}
 		}
-		$htmlstr .= '	<div id="msgbox" '.$class.'>'.$message.'</div>';
+		$htmlstr .= '	<div id="msgbox">'.$messageString.'</div>';
 
 		$i = 0;
 
@@ -643,8 +732,9 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				</tr></thead><tbody>";
 
 	$htmlstr .= "<tr id='neu'>";
-	$htmlstr .= "<form action='benutzerberechtigung_details.php?uid=".$uid."&funktion_kurzbz=".$funktion_kurzbz."' method='POST' name='berechtigung_neu'>";
+	$htmlstr .= "<form id='formNeuesRecht' action='benutzerberechtigung_details.php?uid=".$uid."&funktion_kurzbz=".$funktion_kurzbz."' method='POST' name='berechtigung_neu'>";
 	$htmlstr .= "<input type='hidden' name='neu' value='1'>";
+	$htmlstr .= "<input type='hidden' name='schick' value='1'>";
 	$htmlstr .= "<input type='hidden' name='benutzerberechtigung_id' value=''>";
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>";
 	$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$funktion_kurzbz."'>";
@@ -716,7 +806,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	//Anmerkung
 	$htmlstr .= "		<td><input id='anmerkung_neu' type='text' name='dataset[0][anmerkung]' value='' size='100' maxlength='256'></td>";
 
-	$htmlstr .= "		<td><input type='submit' name='schick' value='Neu anlegen' onclick='return validateNewData()'></td>";
+	//$htmlstr .= "		<td><input type='submit' name='schick' value='Neu anlegen' onclick='return validateNewData()'></td>";
 	$htmlstr .= "</form>";
 	$htmlstr .= "	</tr></tbody></table>";
 
@@ -727,7 +817,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	////////////////
 
 	$htmlstr .= "<p style='font-size: small' id='anzahl'></p>";
-	$htmlstr .= "<form action='benutzerberechtigung_details.php?uid=".$uid."&funktion_kurzbz=".$funktion_kurzbz."' method='POST'>";
+	$htmlstr .= "<form id='formRechte' action='benutzerberechtigung_details.php?uid=".$uid."&funktion_kurzbz=".$funktion_kurzbz."' method='POST'>";
 
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>";
 	$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$funktion_kurzbz."'>";
@@ -775,7 +865,6 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			default: break;
 		}
 
-		$htmlstr .= "	<tr class='row_berechtigung' id='".$b->benutzerberechtigung_id."'>";
 		$heute = strtotime(date('Y-m-d'));
 		if ($b->ende!='' && strtotime($b->ende) < $heute)
 		{
@@ -798,6 +887,16 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			$inaktiv_class = '';
 			$data = 'gruen';
 		}
+		// Inaktive Elemente sowie WaWi-Rechte ausblenden
+		if ($b->ende!='' && strtotime($b->ende) < $heute || $b->rolle_kurzbz == 'wawi' || substr($b->berechtigung_kurzbz, 0, 4) == 'wawi')
+		{
+			$htmlstr .= "	<tr class='row_berechtigung ausgeblendet' id='".$b->benutzerberechtigung_id."'>";
+		}
+		else
+		{
+			$htmlstr .= "	<tr class='row_berechtigung' id='".$b->benutzerberechtigung_id."'>";
+		}
+
 		// Auswahlcheckbox
 		$htmlstr .= "		<td $style class='auswahlcheckboxen' name='td_$b->benutzerberechtigung_id' data-".$data."='".$data."'>";
 		$htmlstr .= "			<span style='display: none'>".$titel."</span>";
@@ -960,10 +1059,15 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "	</tr>";
 	}
 	$htmlstr .= "</tbody></table>";
+	
+	//Button zum einblenden ausgeblendeter Zeilen
+	$htmlstr .= "<button type='button' class='btn btn-default' onclick='show_hidden()'>Inaktive und WaWi anzeigen</button>";
+	
 	$htmlstr .= '<div id="bottomArea" >
 					<div class="input-group">
-						<button type="submit" class="btn btn-default" name="schick" onclick="return validateSpeichern()" style="margin-bottom: 10px">Speichern</button>
-						<div class="form-inline" style="">
+						<button id="ButtonNeu" type="button" class="btn btn-default" name="schick" onclick="return submitNeuesRecht()" style="margin-bottom: 10px">Neues Recht speichern</button>
+						<button id="ButtonSpeichern" type="submit" class="btn btn-default" name="schick" onclick="return validateSpeichern()" style="margin-bottom: 10px">Änderungen Speichern</button>
+						<div class="form-inline multi-options" style="">
 							<div class="input-group" style="width: 180px;">
 								<input type="text" id="input_uebertragen_nach" name="uebertragen_nach" class="form-control benutzer_autocomplete" placeholder="Zu UID übertragen">
 								<div class="input-group-btn">
@@ -974,6 +1078,16 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 							</div>
 							<button type="submit" id="button_mehrfachbeenden" name="setDate_multi" value="setDate_multi" class="btn btn-default" onclick="return validateBeenden()">Ende setzen</button>
 							<button type="submit" id="button_mehrfachloeschen" name="delete_multi" value="delete_multi" class="btn btn-warning" onclick="return validateDeleteMulti()">Markierte löschen</button>
+						</div>
+						<div class="form-inline multi-options" style="">
+							<div class="input-group" style="width: 180px;">
+								<input type="text" id="input_anmerkung_multi" maxlength="256" name="anmerkung_multi" class="form-control" placeholder="Mehrfach-Anmerkung" style="width: 390px;">
+								<div class="input-group-btn">
+									<button class="btn btn-default" type="submit" id="button_anmerkung_multi" name="save_anmerkung_multi" onclick="return validateAnmerkungMulti()">
+										<i class="glyphicon glyphicon-ok" style="line-height: unset"></i>
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>';
@@ -1268,6 +1382,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			/*border-right: 1px solid #999;*/
 			margin-left: auto;
 			display: block ruby;
+			border-top-left-radius: 4px;
 		}
 		#msgbox
         {
@@ -1305,6 +1420,14 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		.tablesorter-filter
         {
 			background-color: #f3f3f3 !important;
+		}
+		.ausgeblendet
+		{
+			display: none;
+		}
+		.multi-options
+		{
+			display: none;
 		}
 	</style>
 	<script type="text/javascript">
@@ -1499,17 +1622,70 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			var aktiv = $('td.auswahlcheckboxen[data-gruen]').length + $('td.auswahlcheckboxen[data-gelb]').length;
 			var inaktiv = $('td.auswahlcheckboxen[data-rot]').length;
 
-			$("#anzahl").html(aktiv + inaktiv + " Einträge (" + aktiv + " Aktive, " + inaktiv + " Inaktive)");
+			$("#anzahl").html(aktiv + inaktiv + " Einträge (" + aktiv + " Aktive, " + inaktiv + " Inaktive (ausgeblendet))");
 
 			/*$('.checkbox').each(function ()
 			{
 				$("#t1").checkboxes('range', true);
 			});*/
 
-			$("#uncheck_t1").on('click', function(e) {
-							$(".auswahlcheckboxen").checkboxes('uncheck');
-							e.preventDefault();
-						});
+			$("#uncheck_t1").on('click', function(e)
+			{
+				$(".auswahlcheckboxen").checkboxes('uncheck');
+				e.preventDefault();
+			});
+
+			// Wenn eine Auswahlcheckbox angeklickt wird, Zusatzoptionen anzeigen
+			$(".auswahlcheckbox").change(function() {
+				if ($(".auswahlcheckbox:checked").length > 0)
+				{
+					// Zeige den Bereich an, wenn mindestens eine Checkbox ausgewählt ist
+					$(".multi-options").show();
+				}
+				else
+				{
+					// Verberge den Bereich, wenn keine Checkbox ausgewählt ist
+					$(".multi-options").hide();
+				}
+			});
+
+			// Wenn etwas ins Neu-Formular eingegeben wird, nur den Neu-Speicherbutton aktivieren, sonst den anderen
+			$("#neu :input").on( "input", function() {
+				var filled = false;
+
+				$("#formNeuesRecht :input").each(function() {
+					if ($(this).val().trim() !== '') {
+						filled = true;
+						return false; // Brechen Sie die each-Schleife ab, wenn ein gefülltes Feld gefunden wurde
+					}
+				});
+
+				// Aktualisieren Sie den Status des Buttons basierend auf den Änderungen in den Feldern
+				$("#ButtonSpeichern").prop("disabled", !filled);
+				$("#ButtonNeu").prop("disabled", filled);
+
+				// Aktualisieren Sie die Variable, um den Status zu speichern
+				isButtonDisabled = !filled;
+			});
+
+			// Wenn etwas ins Rechte-Formular eingegeben wird, nur den Speicherbutton aktivieren, sonst den anderen
+			$("#formRechte :input").on( "input", function() {
+				var filled = false;
+
+				$("#formNeuesRecht :input").each(function() {
+					if ($(this).val().trim() !== '') {
+						filled = true;
+						return false; // Brechen Sie die each-Schleife ab, wenn ein gefülltes Feld gefunden wurde
+					}
+				});
+
+				// Aktualisieren Sie den Status des Buttons basierend auf den Änderungen in den Feldern
+				$("#ButtonNeu").prop("disabled", !filled);
+				$("#ButtonSpeichern").prop("disabled", filled);
+
+				// Aktualisieren Sie die Variable, um den Status zu speichern
+				isButtonDisabled = !filled;
+			});
 
 			//if (typeof $("#filterTableDataset").checkboxes === 'function')
 			//	$("#filterTableDataset").checkboxes("range", true);
@@ -1533,6 +1709,22 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			else if($('#input_uebertragen_nach').val() == '')
 			{
 				alert('Bitte eine UID angeben');
+				return false;
+			}
+			else
+				return true;
+		}
+
+		function validateAnmerkungMulti()
+		{
+			if($('input.auswahlcheckbox:checked').length == 0)
+			{
+				alert('Bitte mindestens eine Berechtigung auswählen');
+				return false;
+			}
+			else if($('#input_anmerkung_multi').val() == '')
+			{
+				alert('Bitte Text eingeben, der als Anmerkung hinzugefügt werden soll');
 				return false;
 			}
 			else
@@ -1584,18 +1776,17 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			}
 			else if ($('#art_neu').val() != '')
 			{
-				var eingabe, c, erlaubt = 'suid', laenge;
-				eingabe = $('#art_neu').val();
-				eingabe = eingabe.toLowerCase();
-				laenge = eingabe.length;
-				for (c = 0; c < laenge; c++)
+				var eingabe = $('#art_neu').val().toLowerCase();
+				var erlaubt = ['s', 'su', 'sui', 'suid'];
+
+				if (erlaubt.includes(eingabe))
 				{
-					d = eingabe.charAt(c);
-					if (erlaubt.indexOf(d) == -1)
-					{
-						alert ('Erlaubte Werte für Art sind s,u,i,d');
-						return false;
-					}
+					return true;
+				}
+				else
+				{
+					alert('Erlaubte Werte für Art sind s, su, sui, suid');
+					return false;
 				}
 			}
 			else
@@ -1697,7 +1888,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		function validateArt(id)
 		{
 			var eingabe, c, erlaubt = 'suid', laenge;
-			eingabe = document.getElementById(id).value;;
+			eingabe = document.getElementById(id).value;
 			eingabe = eingabe.toLowerCase();
 			laenge = eingabe.length;
 			if (eingabe == '')
@@ -1716,6 +1907,22 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				}
 				else
 					document.getElementById(id).style.border = "";
+			}
+		}
+		function show_hidden()
+		{
+			$("tr.ausgeblendet:hidden").each(function()
+			{
+				$(this).fadeIn(1000);
+			});
+		}
+
+		function submitNeuesRecht()
+		{
+			if (validateNewData())
+			{
+				var form = document.getElementById("formNeuesRecht");
+				form.submit();
 			}
 		}
 	</script>
