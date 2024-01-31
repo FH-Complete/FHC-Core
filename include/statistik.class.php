@@ -514,6 +514,9 @@ class statistik extends basis_db
 		$this->countRows=0;
 		set_time_limit(120);
 
+		// In case a decryption function is used then perform password substitution
+		$this->sql = $this->replaceSQLDecryptionPassword($this->sql);
+
 		if($this->sql!='')
 		{
 			$sql = $this->sql;

@@ -26,8 +26,8 @@ export default {
 			default: []
 		},
 		names: {
-			type: Array,
-			default: []
+			type: Object,
+			default: {}
 		}
 	},
 	emits: {
