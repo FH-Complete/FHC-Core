@@ -3,23 +3,21 @@ import Alert from "../../Bootstrap/Alert.js";
 import Kontakt from "../Profil/ProfilComponents/Kontakt.js";
 import Adresse from "../Profil/ProfilComponents/Adresse.js";
 
-
 export default {
   components: {
     BsModal,
     Alert,
     Kontakt,
     Adresse,
-   
   },
   mixins: [BsModal],
   props: {
-    title:{
-        type:String,
-        default:"Profil Update Request"
+    title: {
+      type: String,
+      default: "Profil Update Request",
     },
     value: {
-        type:Object,
+      type: Object,
     },
     /*
      * NOTE(chris):
@@ -34,73 +32,71 @@ export default {
     onShownBsModal: Function,
   },
   data() {
-    return {      
+    return {
       data: this.value,
       //? result is returned from the Promise when the modal is closed
       result: false,
       info: null,
-    }
+    };
   },
 
   methods: {
-    acceptRequest: function(){
-      
-      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then(res =>{
-        console.log("res",res);
-        console.log("res.data",res.data);
+    acceptRequest: function () {
+      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then((res) => {
+        console.log("res", res);
+        console.log("res.data", res.data);
         this.result = true;
-      })
+      });
       this.hide();
     },
 
-    denyRequest: function(){
+    denyRequest: function () {
       console.log(this.data.profil_update_id);
-      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data).then(res =>{
-        console.log("res",res);
-        console.log("res.data",res.data);
+      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data).then((res) => {
+        console.log("res", res);
+        console.log("res.data", res.data);
         this.result = true;
-      })
+      });
       this.hide();
     },
-    
-    submitProfilChange(){
-        //TODO: check if the updated value is different from the original value before submitting the request
-       if(false){
 
-        //? inserts new row in public.tbl_cis_profil_update 
+    submitProfilChange() {
+      //TODO: check if the updated value is different from the original value before submitting the request
+      if (false) {
+        //? inserts new row in public.tbl_cis_profil_update
         //* calls the update api call if an update field is present in the data that was passed to the module
-        Vue.$fhcapi.UserData[this.editData.update?'updateProfilRequest':'insertProfilRequest'](this.topic,this.profilUpdate).then((res)=>{
-          
-          if(res.data.error == 0){
-            this.result= true;
+        Vue.$fhcapi.UserData[
+          this.editData.update ? "updateProfilRequest" : "insertProfilRequest"
+        ](this.topic, this.profilUpdate).then((res) => {
+          if (res.data.error == 0) {
+            this.result = true;
             this.hide();
-            Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
-          }else{
-            this.result= false;
+            Alert.popup(
+              "Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert."
+            );
+          } else {
+            this.result = false;
             this.hide();
-            Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
-          } 
-         
+            Alert.popup(
+              "Ein Fehler ist aufgetreten: " + JSON.stringify(res.data.retval)
+            );
+          }
         });
-    }
+      }
     },
   },
   computed: {
-    getComponentView: function(){
-        
-        if(this.data.topic.toLowerCase().includes("kontakt")){
-            return "kontakt";
-        }else if (this.data.topic.toLowerCase().includes("adresse")){
-            return "adresse";
-        }else{
-            return "text_input";
-        }
+    getComponentView: function () {
+      if (this.data.topic.toLowerCase().includes("kontakt")) {
+        return "kontakt";
+      } else if (this.data.topic.toLowerCase().includes("adresse")) {
+        return "adresse";
+      } else {
+        return "text_input";
+      }
     },
   },
-  created() {
-   
-
-  },
+  created() {},
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
   },

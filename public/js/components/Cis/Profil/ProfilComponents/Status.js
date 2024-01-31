@@ -2,42 +2,38 @@ import Adresse from "./Adresse.js";
 import Kontakt from "./Kontakt.js";
 
 export default {
-    components:{
-        Adresse,
-        Kontakt,
+  components: {
+    Adresse,
+    Kontakt,
+  },
+  data() {
+    return {};
+  },
+  computed: {
+    getComponentView: function () {
+      let title = this.topic.toLowerCase();
+      if (title.includes("adressen")) return "Adresse";
+      else if (title.includes("kontakte")) return "Kontakt";
+      else return "text_input";
     },
-    data(){
-        return {
-
-        }
+    cardHeader: function () {
+      let title = this.topic.toLowerCase();
+      if (title.includes("delete")) return "Delete";
+      else if (title.includes("add")) return "Add";
+      else return "Update";
     },
-    computed:{
-        getComponentView: function(){
-            let title = this.topic.toLowerCase();
-            if(title.includes("adressen")) return "Adresse";
-            else if(title.includes("kontakte"))return "Kontakt";
-            else return "text_input";
-            
-        },
-        cardHeader: function(){
-            let title = this.topic.toLowerCase();
-            if(title.includes("delete")) return "Delete";
-            else if(title.includes("add")) return "Add";
-            else return "Update";
-        }
-    },
-    props:{
-        data:{type:Object},
-        view:{type:String},
-        status:{type:String},
-        status_message:{type:String},
-        status_timestamp:{type:String},
-        updateID:{type:Number},
-        topic:{type:String},
-    },
-    created(){
-
-    },template:`
+  },
+  props: {
+    data: { type: Object },
+    view: { type: String },
+    status: { type: String },
+    status_message: { type: String },
+    status_timestamp: { type: String },
+    updateID: { type: Number },
+    topic: { type: String },
+  },
+  created() {},
+  template: `
     <div class="row">
 
     <div class="col">
@@ -86,5 +82,4 @@ export default {
     </div>
     </div>
     `,
-
-}
+};

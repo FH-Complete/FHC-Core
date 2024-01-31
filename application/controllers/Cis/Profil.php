@@ -77,11 +77,15 @@ class Profil extends Auth_Controller
 			$fileVersion = $this->DmsVersionModel->loadWhere(["name"=>$_FILES['files']['name'], "mimetype"=>$_FILES['files']['type']]);
 			$fileVersion = hasData($fileVersion) ? getData($fileVersion)[0]->version : 0;
 			if($fileVersion) $fileVersion++; */
-
+		if(!count($_FILES)){
+			echo json_encode([]);
+			return;
+		}
 		$res=[];
 
 		$this->load->library('DmsLib');
 		$this->load->model('DmsVersion_model','DmsVersionModel');
+		
 		$files = $_FILES['files'];
         $file_count = count($files['name']);
 

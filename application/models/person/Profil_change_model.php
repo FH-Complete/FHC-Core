@@ -40,7 +40,7 @@ class Profil_change_model extends DB_Model
 		$this->addSelect(["requested_change"]);
 		$res = $this->load([$profil_update_id]);
 		$res = hasData($res) ? getData($res)[0] : null;
-		return json_decode($res->requested_change)->files?:null;
+		return json_decode($res->requested_change)->files?:[];
 	}
 
 	/**

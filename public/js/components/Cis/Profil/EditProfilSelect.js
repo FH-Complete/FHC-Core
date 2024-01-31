@@ -6,149 +6,133 @@ import Status from "./ProfilComponents/Status.js";
 import TextInputDokument from "./ProfilComponents/TextInputDokument.js";
 
 export default {
-    components: {
-      Kontakt,
-      EditKontakt,
-      Adresse,
-      EditAdresse,
-      Status,
-      TextInputDokument,
-    },
-    props: {
+  components: {
+    Kontakt,
+    EditKontakt,
+    Adresse,
+    EditAdresse,
+    Status,
+    TextInputDokument,
+  },
+  props: {
+    list: Object,
 
-      
-      list:Object,
-  
-      //? Prop used to determine how many options the select should initially show
-      size:{
-        type:Number,
-        default: null,
-      },
-      //? Content for the aria label of the select
-      ariaLabel:{
-        type:String,
-        required:true,
-      },
-      profilUpdate:String,
-      topic:String,
-      breadcrumb:String,
-
-     
+    //? Prop used to determine how many options the select should initially show
+    size: {
+      type: Number,
+      default: null,
     },
-    emits:{
-        //? update:modelValue event is needed to notify the v-model when the value has changed
-        ['update:profilUpdate']:null,
-        ['update:topic']:null,
-        ['update:breadcrumb']:null,
-        submit:null,
-        select:null,
-
+    //? Content for the aria label of the select
+    ariaLabel: {
+      type: String,
+      required: true,
     },
-    data() {
-      return {
-        view:null,
-        data:null,
-        breadcrumbItems:[],
-        topic:null,
-        properties:null,
+    profilUpdate: String,
+    topic: String,
+    breadcrumb: String,
+  },
+  emits: {
+    //? update:modelValue event is needed to notify the v-model when the value has changed
+    ["update:profilUpdate"]: null,
+    ["update:topic"]: null,
+    ["update:breadcrumb"]: null,
+    submit: null,
+    select: null,
+  },
+  data() {
+    return {
+      view: null,
+      data: null,
+      breadcrumbItems: [],
+      topic: null,
+      properties: null,
+    };
+  },
+
+  methods: {
+    addItem: function () {
+      this.view =
+        this.topic == "Private Kontakte" ? "EditKontakt" : "EditAdresse";
+
+      //? updates the topic when a Kontakt or an Address should be added
+      this.topic =
+        this.topic == "Private Kontakte" ? "Add Kontakte" : "Add Adressen";
+      this.$emit("update:topic", this.topic);
+      this.breadcrumbItems.push(this.topic);
+      this.$emit("update:breadcrumb", this.breadcrumbItems);
+
+      this.data =
+        this.view == "EditAdresse"
+          ? {
+              //? add flag
+              add: true,
+              adresse_id: null,
+              strasse: null,
+              typ: null,
+              plz: null,
+              ort: null,
+            }
+          : {
+              //? add flag
+              add: true,
+              kontakt_id: null,
+              kontakttyp: null,
+              kontakt: null,
+              anmerkung: null,
+              zustellung: false,
+            };
+    },
+
+    deleteItem: function (item) {
+      //? delete flag
+      item.data.delete = true;
+      this.$emit("update:profilUpdate", item.data);
+      //? updates the topic when a Kontakt or an Address should be deleted
+      this.topic = item.data.kontakt ? "Delete Kontakte" : "Delete Adressen";
+      this.$emit("update:topic", this.topic);
+
+      this.$emit("submit");
+    },
+
+    profilUpdateEmit: function (event) {
+      //? passes the updated profil information to the parent component
+
+      this.$emit("update:profilUpdate", event);
+    },
+
+    updateOptions: function (event, item) {
+      this.properties = item;
+      this.data = item.data;
+      this.view = item.view;
+      console.log("properties", this.properties);
+      if (item.title) {
+        //? emits the selected topic to the parent component
+        this.topic = item.title;
+        this.$emit("update:topic", this.topic);
+
+        //? emits the new item for the breadcrumb in the parent component
+        this.breadcrumbItems.push(item.title);
+      } else {
+        if (item.data.kontakttyp) {
+          this.breadcrumbItems.push(item.data.kontakttyp);
+          this.breadcrumbItems.push(item.data.kontakt);
+        } else if (item.data.strasse) {
+          this.breadcrumbItems.push(item.data.strasse);
+        }
       }
+      this.$emit("update:breadcrumb", this.breadcrumbItems);
     },
-  
-    methods: {
+  },
+  computed: {},
+  created() {
+    //? JSON parse and stringify are used to deep clone the objects
+    this.properties = { ...this.list };
+    this.data = JSON.parse(JSON.stringify(this.list.data));
+    this.view = JSON.parse(JSON.stringify(this.list.view));
+  },
+  mounted() {},
 
-      addItem: function(){
-        
-        
-        this.view= this.topic == "Private Kontakte"?"EditKontakt":"EditAdresse" ;
-        
-        //? updates the topic when a Kontakt or an Address should be added
-        this.topic = this.topic == "Private Kontakte"?"Add Kontakte":"Add Adressen"
-        this.$emit('update:topic',this.topic);
-        this.breadcrumbItems.push(this.topic);
-        this.$emit('update:breadcrumb',this.breadcrumbItems);
-        
-        this.data= this.view=="EditAdresse"?
-        {
-          //? add flag
-          add:true,
-          adresse_id: null,
-          strasse: null,
-          typ: null,
-          plz: null,
-          ort: null
-        }: {
-          //? add flag
-          add:true,
-          kontakt_id: null,
-          kontakttyp: null,
-          kontakt: null,
-          anmerkung: null,
-          zustellung: false
-        }
-        
-        
-      },
-
-      deleteItem: function(item){
-        //? delete flag 
-        item.data.delete = true;
-        this.$emit('update:profilUpdate',item.data);
-        //? updates the topic when a Kontakt or an Address should be deleted
-        this.topic = item.data.kontakt?"Delete Kontakte":"Delete Adressen";
-        this.$emit('update:topic',this.topic);
-
-        this.$emit('submit');
-      },
-
-      profilUpdateEmit: function(event){
-        
-        //? passes the updated profil information to the parent component
-        
-        this.$emit('update:profilUpdate',event);
-      },
-
-      
-      updateOptions: function(event, item){
-        this.properties = item;
-        this.data=item.data; 
-        this.view=item.view;    
-        console.log("properties",this.properties);
-        if(item.title){
-          //? emits the selected topic to the parent component
-          this.topic= item.title;
-          this.$emit('update:topic',this.topic);
-        
-          //? emits the new item for the breadcrumb in the parent component
-          this.breadcrumbItems.push(item.title);
-        }else{
-          if(item.data.kontakttyp){
-            this.breadcrumbItems.push(item.data.kontakttyp);
-            this.breadcrumbItems.push(item.data.kontakt);
-          }else if(item.data.strasse){
-            this.breadcrumbItems.push(item.data.strasse);
-          }
-        }
-        this.$emit('update:breadcrumb',this.breadcrumbItems);
-        
-      },
-     
-    },
-    computed: {
-      
-      
-    },
-    created() {
-      //? JSON parse and stringify are used to deep clone the objects 
-      this.properties = {...this.list};
-      this.data = JSON.parse(JSON.stringify(this.list.data));
-      this.view = JSON.parse(JSON.stringify(this.list.view));
-      
-        
-    },
-    mounted() {
-    },
-   
-    template: `
+  template: `
     <template v-if="!view">
     
     <div  class="list-group">
@@ -190,5 +174,4 @@ export default {
       <component @profilUpdate="profilUpdateEmit"   :is="view" v-bind="properties" :data="data" ></component>
     </template>
    `,
-  };
-  
+};

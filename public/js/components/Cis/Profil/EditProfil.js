@@ -10,7 +10,6 @@ export default {
   },
   mixins: [BsModal],
   props: {
-
     value: Object,
     title: String,
     /*
@@ -27,96 +26,113 @@ export default {
   },
   data() {
     return {
-      topic:null,
-      profilUpdate:null,      
+      topic: null,
+      profilUpdate: null,
       editData: this.value,
-      breadcrumb:null,
-      
+      breadcrumb: null,
+
       result: false,
       info: null,
-    }
+    };
   },
 
   methods: {
-    async submitProfilChange(){
-      //? when the update contains a file upload 
-      
-        //TODO: check if the updated value is different from the original value before submitting the request
-       if(this.topic && this.profilUpdate){
+    async submitProfilChange() {
+      //? when the update contains a file upload
 
-        if(this.profilUpdate.files){
-          
+      //TODO: check if the updated value is different from the original value before submitting the request
+      if (this.topic && this.profilUpdate) {
+        if (this.profilUpdate.files) {
           const fileIDs = await this.uploadFiles(this.profilUpdate.files);
-         
-          if(fileIDs){
-            
-            this.profilUpdate.files=fileIDs;
-            console.log("here is the update",this.profilUpdate);
-          };
-        }
-        //? inserts new row in public.tbl_cis_profil_update 
-        //* calls the update api call if an update field is present in the data that was passed to the modal
-        const handleApiResponse = (res)=>{
-          if(res.data.error == 0){
-            this.result= true;
-            this.hide();
-            Alert.popup("Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert.");
-          }else{
-            this.result= false;
-            this.hide();
-            Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
+
+          if (fileIDs) {
+            this.profilUpdate.files = fileIDs;
+            console.log("here is the update", this.profilUpdate);
           }
         }
-        
-        this.editData.updateID? 
-        Vue.$fhcapi.UserData.updateProfilRequest(this.topic,this.profilUpdate,this.editData.updateID).then((res)=>{
-          handleApiResponse(res);
-        }):
-        Vue.$fhcapi.UserData.insertProfilRequest(this.topic,this.profilUpdate).then((res)=>{
-          handleApiResponse(res);
-        })
-        
-        
-    }
+        //? inserts new row in public.tbl_cis_profil_update
+        //* calls the update api call if an update field is present in the data that was passed to the modal
+        const handleApiResponse = (res) => {
+          if (res.data.error == 0) {
+            this.result = true;
+            this.hide();
+            Alert.popup(
+              "Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert."
+            );
+          } else {
+            this.result = false;
+            this.hide();
+            Alert.popup(
+              "Ein Fehler ist aufgetreten: " + JSON.stringify(res.data.retval)
+            );
+          }
+        };
+
+        this.editData.updateID
+          ? Vue.$fhcapi.UserData.updateProfilRequest(
+              this.topic,
+              this.profilUpdate,
+              this.editData.updateID
+            ).then((res) => {
+              handleApiResponse(res);
+            })
+          : Vue.$fhcapi.UserData.insertProfilRequest(
+              this.topic,
+              this.profilUpdate
+            ).then((res) => {
+              handleApiResponse(res);
+            });
+      }
     },
 
-    //? uploads files to the dms table and returns an array with the ids of the created files
-     uploadFiles: async function(files){
+    uploadFiles: async function (files) {
       let updatedFiles = [];
-      if(this.editData.updateID){ //? if we are updating an already existing profilRequest
-        const existingFiles = await Vue.$fhcapi.UserData.getProfilRequestFiles(this.editData.updateID).then(res => {return res.data});
-        updatedFiles = [...existingFiles];
+
+      if (this.editData.updateID) {
+        //? if we are updating an already existing profilRequest
+        const existingFiles = await Vue.$fhcapi.UserData.getProfilRequestFiles(
+          this.editData.updateID
+        ).then((res) => {
+          return res.data;
+        });
+        updatedFiles = [...existingFiles.filter((file) => {
+          for(let j=0; j<files.length; j++) {
+            if (file.name === files[j].name)
+              return true;
+          }
+        })];
       }
+
       let formData = new FormData();
-      for(let i = 0; i < files.length; i++){
-        if(files[i].type!=='application/x.fhc-dms+json')
-          formData.append("files[]",files[i]);        
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].type !== "application/x.fhc-dms+json")
+          formData.append("files[]", files[i]);
       }
-      
-      await Vue.$fhcapi.UserData.insertFile(formData).then(res => {
-        /* returns file information as 
+
+      await Vue.$fhcapi.UserData.insertFile(formData)
+        .then((res) => {
+          /* returns file information as 
         [{"name":"example.png", "dms_id":282531}] */
-        console.log(res)
-        updatedFiles = updatedFiles.concat(res.data?.map(file => {  return {dms_id:file.dms_id, name:file.client_name}}));
-      }).catch(err=>{
-        console.log(err);
-        
-      })
+
+          updatedFiles = updatedFiles.concat(
+            res.data?.map((file) => {
+              return { dms_id: file.dms_id, name: file.client_name };
+            })
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       return updatedFiles;
-
-    }, 
+    },
   },
-  computed: {
-  },
+  computed: {},
   created() {
-
-    if(this.editData.topic){
+    if (this.editData.topic) {
       //? if the topic was passed through the prop add it to the component
       this.topic = this.editData.topic;
     }
-   
-
   },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
