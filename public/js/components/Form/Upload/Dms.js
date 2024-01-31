@@ -33,14 +33,11 @@ export default {
 				dt.items.add(file);
 				doubles.push(this.stringifyFile(file));
 			}
-			console.log("files",event.target.files);
 			for (var file of event.target.files) {
 				// NOTE(chris): deep check (with FileReader) would require an async function so we only check the basic attributes
 				if (doubles.indexOf(this.stringifyFile(file)) < 0)
 					dt.items.add(file);
 			}
-			console.log(Array.isArray(dt.files));
-			console.log(typeof(dt.files));
 			this.$emit('update:modelValue', dt.files);
 		},
 		removeFile(id) {
