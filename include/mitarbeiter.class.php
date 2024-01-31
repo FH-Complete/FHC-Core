@@ -1067,10 +1067,12 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
-	 * Gibt ein Array mit den UIDs der Vorgesetzten zurück
+	 * Gibt ein Array mit den UIDs der aktuellen Vorgesetzten zurück
+	 * @param null $uid
+	 * @param null $limit LIMIT = 1 liefert bei mehreren Vorgesetzten den letzten (aktuellsten) zurück.
 	 * @return uid
 	 */
-	public function getVorgesetzte($uid=null)
+	public function getVorgesetzte($uid=null, $limit = null)
 	{
 		$return=false;
 		if (is_null($uid))
@@ -1090,8 +1092,13 @@ class mitarbeiter extends benutzer
 									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
 									(datum_von is null OR datum_von<=now()) AND
 									(datum_bis is null OR datum_bis>=now())
-								  );";
+								  )
+				  ORDER BY datum_von DESC ";
 
+		if (is_numeric($limit))
+		{
+			$qry .= 'LIMIT '. $this->db_add_param($limit, FHC_INTEGER);
+		}
 
 		if($this->db_query($qry))
 		{
@@ -1115,9 +1122,12 @@ class mitarbeiter extends benutzer
 
 	/**
 	 * Gibt ein Array mit den UIDs der Vorgesetzten zum Zeitpunkt des korrespondierenden Timesheets zurück
+	 * @param $uid
+	 * @param $date
+	 * @param null $limit LIMIT = 1 liefert bei mehreren Vorgesetzten den letzten (aktuellsten) zurück.
 	 * @return uid
 	 */
-	public function getVorgesetzteMonatTimesheet($uid, $timesheetDate)
+	public function getVorgesetzteByDate($uid, $date, $limit = null)
 	{
 		$return=false;
 
@@ -1127,15 +1137,21 @@ class mitarbeiter extends benutzer
 					public.tbl_benutzerfunktion
 				WHERE
 					funktion_kurzbz='Leitung' AND
-					(datum_von is null OR datum_von<=".$this->db_add_param($timesheetDate).") AND
-					(datum_bis is null OR datum_bis>=".$this->db_add_param($timesheetDate).") AND
+					(datum_von is null OR datum_von<=".$this->db_add_param($date).") AND
+					(datum_bis is null OR datum_bis>=".$this->db_add_param($date).") AND
 					oe_kurzbz in (SELECT oe_kurzbz
 									FROM public.tbl_benutzerfunktion
 									WHERE
 									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
-									(datum_von is null OR (datum_von<= ".$this->db_add_param($timesheetDate).")) AND
-									(datum_bis is null OR (datum_bis>=".$this->db_add_param($timesheetDate)."))
-									);";
+									(datum_von is null OR (datum_von<= ".$this->db_add_param($date).")) AND
+									(datum_bis is null OR (datum_bis>=".$this->db_add_param($date)."))
+									)
+				ORDER BY datum_von DESC ";
+
+		if (is_numeric($limit))
+		{
+			$qry .= 'LIMIT '. $this->db_add_param($limit);
+		}
 
 		if($this->db_query($qry))
 		{
@@ -1204,16 +1220,16 @@ class mitarbeiter extends benutzer
 		return $return;
 	}
 
-
-
 	/**
 	 * Gibt ein Array mit den UIDs der aktiv beschäftigten Untergebenen zurueck
 	 * @param string $uid	UID.
 	 * @param boolean $include_OE_childs	Wenn true, dann werden auch alle aktiv
 	 * beschäftigten Untergebenen der Kind-OEs des Leiters zurückgegeben.
+	 * @param bool $fixangestellte_only
+	 * @param bool $include_ImLetztenMonatBeendete Inkludiert Mitarbeiter, deren Benutzerfunktion im letzten Monat bereits endete
 	 * @return boolean
 	 */
-	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true)
+	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true, $include_ImLetztenMonatBeendete = false)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
@@ -1320,11 +1336,18 @@ class mitarbeiter extends benutzer
 
 		$qry.= ")
 			AND
-				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
-			AND
-				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
-			AND
-				tbl_benutzer.aktiv = 'true'";
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())";
+			if ($include_ImLetztenMonatBeendete)
+			{
+				// hier kein check auf aktiv = 'true', da hier auch DV abgefragt werden, die im letzten Monat beendet wurden
+				$qry .= " AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis >= (DATE_TRUNC('MONTH', NOW()) - INTERVAL '1 month'))";
+			}
+			else {
+
+				$qry .= " AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis >= now())";
+				$qry .= " AND tbl_benutzer.aktiv = 'true'";
+			}
+
 			if ($fixangestellte_only)
 				$qry .= " AND tbl_mitarbeiter.fixangestellt";
 			$qry .= ";";
@@ -1617,28 +1640,6 @@ class mitarbeiter extends benutzer
 		}
 	}
 
-	/** Check if uid is a supervisor
- *
- * @param string $uid
- * @param string $employee_uid
- * @return boolean True if $uid is direct leader of $employee_uid.
- */
-	function check_isVorgesetzter($uid, $employee_uid)
-	{
-		$this->getUntergebene($uid);
-		$untergebenen_arr = $this->untergebene;
-
-		// Check, if uid is an employee of supervisor
-		if (!empty($untergebenen_arr) &&
-			in_array($employee_uid, $untergebenen_arr))
-		{
-			 return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
 	/** Check if uid is a supervisor on higher oe level
 	 *
 	 * @param string $uid

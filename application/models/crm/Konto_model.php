@@ -100,8 +100,8 @@ class Konto_model extends DB_Model
 
 	public function checkStudienbeitrag($uid, $stsem, $buchungstypen)
 	{
-		$query = 'SELECT tbl_konto.buchungsnr, 
-       				tbl_konto.buchungsdatum 
+		$query = 'SELECT tbl_konto.buchungsnr,
+       				tbl_konto.buchungsdatum
 					FROM public.tbl_konto,
 					public.tbl_benutzer,
 					public.tbl_student
@@ -117,10 +117,47 @@ class Konto_model extends DB_Model
 							FROM public.tbl_konto skonto
 							WHERE skonto.buchungsnr = tbl_konto.buchungsnr_verweis
 							OR skonto.buchungsnr_verweis = tbl_konto.buchungsnr_verweis
-						)	
+						)
 					ORDER BY buchungsnr DESC LIMIT 1
 					';
 
 		return $this->execQuery($query);
+	}
+
+	/**
+	 * check if student has paid studienbeitrag for certain semester
+	 *
+	 * @param $person_id person_id
+	 * @param $stsem stsem
+	 *
+	 * @return boolean
+	 */
+	public function checkStudienbeitragFromPerson($person_id, $stsem)
+	{
+		$this->addOrder('buchungsnr');
+		$this->addLimit(1);
+		$result = $this->loadWhere([
+			'person_id'=>$person_id,
+			'studiensemester_kurzbz' => $stsem,
+			'buchungstyp_kurzbz' => 'Studiengebuehr'
+		]);
+
+		if (!getData($result))
+			return false;
+
+		$data = getData($result)[0];
+
+		$this->resetQuery();
+
+		$this->addSelect('sum(betrag) as differenz');
+		$this->db->or_where('buchungsnr', $data->buchungsnr);
+		$this->db->or_where('buchungsnr_verweis', $data->buchungsnr);
+
+		$result = $this->load();
+		if (!getData($result))
+			return false;
+
+		$data = getData($result)[0];
+		return $data->differenz >= 0;
 	}
 }

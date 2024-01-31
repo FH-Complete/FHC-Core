@@ -26,6 +26,7 @@ $this->phrasen['zeitsperre/vonDatumMonat']='Von-Datum Monat';
 $this->phrasen['zeitsperre/bisDatumMonat']='Bis-Datum Monat';
 $this->phrasen['zeitsperre/istGroesserAlsBisDatum']='ist größer als das Bis-Datum';
 $this->phrasen['zeitsperre/vonDatum']='Von-Datum';
+$this->phrasen['zeitsperre/bisDatumGroesserMax']='BisDatum liegt zu weit in der Zukunft, nicht zulässig!';
 
 $this->phrasen['zeitsperre/resturlaubstage']='Resturlaubstage';
 $this->phrasen['zeitsperre/aktuellerStand']='aktueller Stand';

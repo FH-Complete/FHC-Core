@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+
 // ------------------------------------------------------------------------
 // Collection of utility functions for general purpose
 // ------------------------------------------------------------------------
@@ -354,7 +356,8 @@ function sanitizeProblemChars($str)
 		'ss' => '/&szlig;/'
 	);
 
-	return preg_replace($acentos, array_keys($acentos), htmlentities($str, ENT_NOQUOTES | ENT_HTML5, $enc));
+	$tmp = preg_replace($acentos, array_keys($acentos), htmlentities($str, ENT_NOQUOTES | ENT_HTML5, $enc));
+	return html_entity_decode($tmp, ENT_NOQUOTES | ENT_HTML5, $enc);
 }
 
 /**
@@ -405,3 +408,17 @@ function findResource($path, $resource, $subdir = false, $extraDir = null)
 	return null;
 }
 
+/**
+ * check if String can be converted to a date
+ */
+function isValidDate($dateString)
+{
+	try
+	{
+		return (new DateTime($dateString)) !== false;
+	}
+	catch(Exception $e)
+	{
+		return false;
+	}
+}
