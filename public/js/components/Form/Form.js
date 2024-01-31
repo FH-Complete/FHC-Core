@@ -56,14 +56,16 @@ export default {
 				args[0] = this;
 			else
 				args.unshift(this);
-			this.$fhcApi.get(...args);
+			
+			return this.$fhcApi.get(...args);
 		},
 		post(...args) {
 			if (typeof args[0] == 'object' && args[0].clearValidation && args[0].setFeedback)
 				args[0] = this;
 			else
 				args.unshift(this);
-			this.$fhcApi.post(...args);
+			
+			return this.$fhcApi.post(...args);
 		},
 		_sendFeedbackToInput(inputs, feedback, valid) {
 			if (inputs.length) {

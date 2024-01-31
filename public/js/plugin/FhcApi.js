@@ -43,20 +43,21 @@ export default {
 		});
 
 		fhcApiAxios.interceptors.response.use(response => {
-			if (response.config.errorHandling == 'off'
-				|| response.config.errorHandling === false
-				|| response.config.errorHandling == 'fail')
-				return Promise.reject(response);
+			if (response.config?.errorHandling == 'off'
+				|| response.config?.errorHandling === false
+				|| response.config?.errorHandling == 'fail')
+				return response;
 			
 			// NOTE(chris): loop through errors
 			if (response.data.errors)
 				response.data.errors = response.data.errors.filter(
 					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config.form)
 				);
+
 			return response;
 		}, error => {
 			if (error.code == 'ERR_CANCELED')
-				return;
+				return new Promise(() => {});
 			
 			if (error.config?.errorHandling == 'off'
 				|| error.config?.errorHandling === false
@@ -64,20 +65,25 @@ export default {
 				return Promise.reject(error);
 
 			if (error.response) {
-				if (error.response.status == 404)
-					return app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL, true);
+				if (error.response.status == 404) {
+					app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL, true);
+					return new Promise(() => {});
+				}
 				
 				// NOTE(chris): loop through errors
 				error.response.data.errors = error.response.data.errors.filter(
 					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config.form)
 				);
 				if (!error.response.data.errors.length)
-					return;
+					return new Promise(() => {});
 			} else if (error.request) {
-				return app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL);
+				app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL);
+				return new Promise(() => {});
 			} else {
-				return app.config.globalProperties.$fhcAlert.alertError(error.message);
+				app.config.globalProperties.$fhcAlert.alertError(error.message);
+				return new Promise(() => {});
 			}
+			
 			return Promise.reject(error);
 		});
 
