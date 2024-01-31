@@ -52,8 +52,7 @@ export default {
 		}
 	},
 	watch: {
-		modelValue:{
-			handler(n) {
+		modelValue(n) {
 				if (n instanceof FileList)
 					return this.$refs.upload.files = n;
 	
@@ -71,12 +70,10 @@ export default {
 				}
 				this.$emit('update:modelValue', dt.files);
 			},
-			immediate:true
-		}
 	},
 	template: `
 	<div class="form-upload-dms">
-	
+	<pre>{{JSON.stringify(Array.from(modelValue).map(item => stringifyFile(item)),null,2)}}</pre>
 		<input ref="upload" class="form-control" :class="inputClass" :id="id" :name="name" :multiple="multiple" type="file" @change="addFiles">
 		<ul v-if="modelValue.length && multiple && !noList" class="list-unstyled m-0">
 			<li v-for="(file, index) in modelValue" :key="index" class="d-flex mx-1 mt-1 align-items-center">

@@ -47,7 +47,7 @@ export default {
         if(this.profilUpdate.files){
           
           const fileIDs = await this.uploadFiles(this.profilUpdate.files);
-          
+         
           if(fileIDs){
             
             this.profilUpdate.files=fileIDs;
@@ -55,9 +55,8 @@ export default {
           };
         }
         //? inserts new row in public.tbl_cis_profil_update 
-        //* calls the update api call if an update field is present in the data that was passed to the module
-        Vue.$fhcapi.UserData[this.editData.update?'updateProfilRequest':'insertProfilRequest'](this.topic,this.profilUpdate).then((res)=>{
-          
+        //* calls the update api call if an update field is present in the data that was passed to the modal
+        const handleApiResponse = (res)=>{
           if(res.data.error == 0){
             this.result= true;
             this.hide();
@@ -67,7 +66,15 @@ export default {
             this.hide();
             Alert.popup("Ein Fehler ist aufgetreten: "+ JSON.stringify(res.data.retval));
           }
-        });
+        }
+        
+        this.editData.updateID? 
+        Vue.$fhcapi.UserData.updateProfilRequest(this.topic,this.profilUpdate,this.editData.updateID).then((res)=>{
+          handleApiResponse(res);
+        }):
+        Vue.$fhcapi.UserData.insertProfilRequest(this.topic,this.profilUpdate).then((res)=>{
+          handleApiResponse(res);
+        })
         
         
     }
@@ -75,20 +82,29 @@ export default {
 
     //? uploads files to the dms table and returns an array with the ids of the created files
      uploadFiles: async function(files){
+      let updatedFiles = [];
+      if(this.editData.updateID){ //? if we are updating an already existing profilRequest
+        const existingFiles = await Vue.$fhcapi.UserData.getProfilRequestFiles(this.editData.updateID).then(res => {return res.data});
+        updatedFiles = [...existingFiles];
+      }
       let formData = new FormData();
       for(let i = 0; i < files.length; i++){
-        
-        formData.append("files[]",files[i]);
+        if(files[i].type!=='application/x.fhc-dms+json')
+          formData.append("files[]",files[i]);        
       }
       
-      return await Vue.$fhcapi.UserData.insertFile(formData).then(res => {
+      await Vue.$fhcapi.UserData.insertFile(formData).then(res => {
         /* returns file information as 
         [{"name":"example.png", "dms_id":282531}] */
-        return res.data.map(file => { return {dms_id:file.dms_id, name:file.client_name}});
+        console.log(res)
+        updatedFiles = updatedFiles.concat(res.data?.map(file => {  return {dms_id:file.dms_id, name:file.client_name}}));
       }).catch(err=>{
         console.log(err);
-        return null;
+        
       })
+
+      return updatedFiles;
+
     }, 
   },
   computed: {

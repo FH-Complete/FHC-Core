@@ -12,6 +12,13 @@ export default {
           });
     },
 
+    getProfilRequestFiles: function(requestID) {
+        const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+                   `/Cis/Profil/getProfilRequestFiles`;
+                   
+        return axios.post(url,requestID);
+    },
+
     selectProfilRequest: function(uid=null,id=null) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
                    `/Cis/Profil/selectProfilRequest`;
@@ -26,11 +33,11 @@ export default {
         return axios.post(url,{topic, payload});
     },
 
-    updateProfilRequest: function(topic, payload) {
+    updateProfilRequest: function(topic, payload, ID) {
         const url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
                    `/Cis/Profil/updateProfilRequest`;
                    
-        return axios.post(url,{topic, payload});
+        return axios.post(url,{topic, payload, ID});
     },
 
     deleteProfilRequest: function(requestID){

@@ -25,7 +25,8 @@ class Profil extends Auth_Controller
 			'deleteProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
-
+			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
+			
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -130,6 +131,10 @@ class Profil extends Auth_Controller
 	}
 
 
+	public function getProfilRequestFiles(){
+		$id = json_decode($this->input->raw_input_stream);
+		echo json_encode($this->ProfilChangeModel->getFilesFromChangeRequest($id));
+	}
 
 	public function insertProfilRequest()
 	{
@@ -137,7 +142,7 @@ class Profil extends Auth_Controller
 		$json = json_decode($this->input->raw_input_stream);
 		$payload = $json->payload;
 	
-		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : "adresse_id";
+		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : (property_exists($json->payload,"adresse_id")? "adresse_id" : null);
 		
 		$name = $this->PersonModel->getFullName($this->uid);
 		if(isError($name)){
@@ -145,7 +150,7 @@ class Profil extends Auth_Controller
 			var_dump($name);
 			return;
 		}
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "name"=>getData($name), "requested_change" => json_encode($payload), "change_timestamp" => "NOW()","status"=>"pending" ];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "name"=>getData($name), "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
@@ -165,22 +170,23 @@ class Profil extends Auth_Controller
 				return;
 			}
 
-			elseif(!isset($payload->add) && !isset($payload->delete) && $update_request->topic == $json->topic ){
-				//? if it is not a delete or add request than the topic in combination with the uid of the user have to be unique
+			elseif(!$identifier && $update_request->topic == $json->topic ){
+				//? if it is not a delete or add request than the topic has to be unique
 				echo json_encode(error("A request to change " . $json->topic . " is already open"));
 				return;
 			}
 		}}
 		
-			$insert_res = $this->ProfilChangeModel->insert($data);
+			$insertID = $this->ProfilChangeModel->insert($data);
 				
-			if(isError($insert_res)){
+			if(isError($insertID)){
 				//catch error
 			}else{
-				$editTimestamp = $this->ProfilChangeModel->getTimestamp($insert_res->retval);
+				$insertID = hasData($insertID)? getData($insertID): null;
+				$editTimestamp = $this->ProfilChangeModel->getTimestamp($insertID);
 				
-				$insert_res->retval = date_create($editTimestamp)->format('d.m.Y');
-				echo json_encode($insert_res);
+				$date = success(date_create($editTimestamp)->format('d.m.Y'));
+				echo json_encode($date);
 			}
 	}
 
@@ -189,24 +195,16 @@ class Profil extends Auth_Controller
 
 		$json = json_decode($this->input->raw_input_stream);
 		
-
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($json->payload), "change_timestamp" => "NOW()","status"=>"pending" ];
-
-		//? gets all the requested changes from a user
 		
-		if(isSuccess($this->ProfilChangeModel->addSelect(["profil_update_id"])) ){
-			$requestID = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid,"topic"=>$json->topic]);
-			$requestID = hasData($requestID) ? getData($requestID)[0]->profil_update_id : null;
-		};
-		
-		$update_res =$this->ProfilChangeModel->update([$requestID],$data);
-		if(isError($update_res)){
+		$updateID =$this->ProfilChangeModel->update([$json->ID],["requested_change" => json_encode($json->payload), "updateamum" => "NOW()", "updatevon" => $this->uid]);
+		if(isError($updateID)){
 			//catch error
 		}else{
-			$editTimestamp = $this->ProfilChangeModel->getTimestamp($update_res->retval[0]);
+			$updateID = hasData($updateID)? getData($updateID)[0]: null;
+			$editTimestamp = $this->ProfilChangeModel->getTimestamp($updateID,true);
 			
-			$update_res->retval = date_create($editTimestamp)->format('d.m.Y'); 
-			echo json_encode($update_res);
+			$date = success(date_create($editTimestamp)->format('d.m.Y')); 
+			echo json_encode($date);
 		}
 	}
 

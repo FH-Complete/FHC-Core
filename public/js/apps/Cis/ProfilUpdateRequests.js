@@ -45,8 +45,8 @@ const app = Vue.createApp({
                       //responsive:0,
                     },
                     {
-                      title: "Date",
-                      field: "change_timestamp",
+                      title: "Insert Date",
+                      field: "insertamum",
                       resizable: true,
                       headerFilter: true,
                       minWidth: 200,
@@ -109,41 +109,11 @@ const app = Vue.createApp({
       
     },
     methods:{
-        sideMenuFunction: function(){
-            console.log("test from the side menu");
-        },
-        collapseFormatter: function(data){
-          //data - an array of objects containing the column title and value for each cell
-          var container = document.createElement("div");
-          container.classList.add("tabulator-collapsed-row");
-          container.classList.add("text-break");
-          
-          var list = document.createElement("div");
-          list.classList.add("row");
-          
-          
-          container.appendChild(list);
-          
-          data.forEach(function(col){
-            let item = document.createElement("div");
-            item.classList.add("col-12");
-          
-            
-            item.innerHTML = Object.keys(JSON.parse(col.value)).map(key => {return key+'<br/>'});
-            
-          
-            list.appendChild(item);
-         
-          });
-          
-          return Object.keys(data).length ? container : "";
-          },
+        
+      
     },
     created(){
 
-        Vue.$fhcapi.ProfilUpdate.getProfilUpdateRequest().then((res)=>{
-          console.log(res.data);
-        })
 
 
     },

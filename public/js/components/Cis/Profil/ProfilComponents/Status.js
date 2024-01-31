@@ -32,7 +32,7 @@ export default {
         status:{type:String},
         status_message:{type:String},
         status_timestamp:{type:String},
-        update:{type:Boolean},
+        updateID:{type:Number},
         topic:{type:String},
     },
     created(){

@@ -44,37 +44,41 @@ export default {
             let view = this.getView(updateRequest.topic,updateRequest.status);
             let data = null;
             let content =null;
+            let files =null;
+            let withFiles = false;
 
            
             if(view === "TextInputDokument"){
-                // this should be the files : updateRequest.requested_change.files
+             
                 data = {
                     titel:updateRequest.topic,
                     value: updateRequest.requested_change.value,
                     
-                };
-
-                
-                
+                }; 
+                if(updateRequest.requested_change.files.length){
+                const FILE = updateRequest.requested_change.files?.map(file=>{return new File(["files[]"], file.name);})
+                const FILELIST = new DataTransfer();
+                FILE.forEach(file => {
+                    FILELIST.items.add(file);
+                })
+                files=updateRequest.requested_change.files;
+                }
+                withFiles = true;
             }
             else{
                 data = updateRequest.requested_change;
             }
                 
-            const exampleFile = updateRequest.requested_change.files.map(file=>{return new File(["files[]"], file.name);})
-            const exampleFileList = new DataTransfer();
-            exampleFile.forEach(file => {
-                exampleFileList.items.add(file);
-            })
+            
             
 
             content={
+                updateID:updateRequest.profil_update_id,
                 view:view,
                 data:data,
-                withFiles:view==="TextInputDokument" ? true:false,
-                update:true,
+                withFiles:withFiles,
                 topic:updateRequest.topic,
-                files: view==="TextInputDokument" ? exampleFileList.files:null,
+                files: files,
                 
             }
 
