@@ -9,11 +9,21 @@ const app = Vue.createApp({
   },
   data() {
     return {
+      showAll: false,
       profil_updates_table_options: {
-        ajaxURL:
-          FHC_JS_DATA_STORAGE_OBJECT.app_root +
-          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-          "/Cis/ProfilUpdate/getAllRequests",
+        ajaxURL:FHC_JS_DATA_STORAGE_OBJECT.app_root +
+        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+        `/Cis/ProfilUpdate/`,
+
+        ajaxURLGenerator: (url,config,params)=>{
+          //? this function needs to be an array function in order to access the this properties of the Vue component
+          if(this.showAll){
+            return url +"getAllRequests";
+          }else{
+            return url +"getPendingRequests";
+          }
+          
+        },
         height: 600,
         layout: "fitColumns",
 
@@ -106,13 +116,44 @@ const app = Vue.createApp({
       },
     };
   },
-  computed: {},
-  methods: {},
+  computed: {
+    getFetchUrl: function(){
+      let url = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+      FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+      `/Cis/ProfilUpdate/`;
+      if(this.showAll){
+        url+"getAllRequests";
+      }else{
+        url+"getPendingRequests";
+      }
+      return url;
+    }
+  },
+  methods: {
+    updateData: function(){
+      
+      this.$refs.UpdatesTable.tabulator.setData(); 
+       /* 
+        console.log(this.profil_updates_table_options.ajaxURL);
+       */
+    }
+  },
   created() {},
   mounted() {},
   template: `
     <div>
     
+    <div  class="form-underline flex-fill ">
+      <div class="form-underline-titel">Show Profil Requests</div>
+
+      <select class="mb-2 " v-model="showAll" @change="updateData" class="form-select" aria-label="Profil updates display selection">
+        <option :selected="true" :value="false">Only Pending Requests</option>
+        <option :value="true">All Requests</option>
+      </select>
+  
+    </div>
+
+ 
     
     <core-filter-cmpt title="Update Requests"  ref="UpdatesTable" :tabulator-options="profil_updates_table_options" tableOnly :sideMenu="false" />
 

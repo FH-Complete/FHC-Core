@@ -16,6 +16,7 @@ class ProfilUpdate extends Auth_Controller
 			'acceptProfilRequest'=>['user:r'],
 			'denyProfilRequest'=>['user:r'],
 			'show'=>['user:r'],
+			'getPendingRequests'=>['user:r'], 
 
 		]);
 		
@@ -46,6 +47,15 @@ class ProfilUpdate extends Auth_Controller
 	public function getAllRequests(){
 		$res = $this->ProfilChangeModel->getProfilUpdate();
 		$res = hasData($res)? getData($res) : null;
+		echo json_encode($res);
+	}
+
+	public function getPendingRequests(){
+		$res = $this->ProfilChangeModel->loadWhere(["status"=>"pending"]);
+		
+		$res = hasData($res)? getData($res) : [];
+		
+		
 		echo json_encode($res);
 	}
 
