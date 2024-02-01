@@ -26,7 +26,8 @@ class Profil extends Auth_Controller
 			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
-			
+			'deleteOldVersionFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
+						
 		]);
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -38,6 +39,8 @@ class Profil extends Auth_Controller
 		$this->load->model('ressource/Betriebsmittelperson_model', 'BetriebsmittelpersonModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('person/Profil_change_model', 'ProfilChangeModel');
+		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
+		
 
 		//? put the uid and pid inside the controller to reuse in controller
 		$this->uid = getAuthUID();
@@ -110,6 +113,18 @@ class Profil extends Auth_Controller
 			array_push($res,$tmp_res);
 		}
 
+		echo json_encode($res);
+	}
+
+
+	public function deleteOldVersionFiles(){
+		//? table dms_version has a composite primary key with dms_id and dms_version
+		$file_array = json_decode($this->input->raw_input_stream);
+		$res =[];
+		foreach($file_array as $value){
+			
+			array_push($res, $this->DmsVersionModel->delete([$value,0]));
+		}
 		echo json_encode($res);
 	}
 

@@ -44,7 +44,7 @@ export default {
       if (this.topic && this.profilUpdate) {
         if (this.profilUpdate.files) {
           const fileIDs = await this.uploadFiles(this.profilUpdate.files);
-
+         
           if (fileIDs) {
             this.profilUpdate.files = fileIDs;
             console.log("here is the update", this.profilUpdate);
@@ -95,12 +95,26 @@ export default {
         ).then((res) => {
           return res.data;
         });
-        updatedFiles = [...existingFiles.filter((file) => {
-          for(let j=0; j<files.length; j++) {
-            if (file.name === files[j].name)
-              return true;
-          }
-        })];
+
+        let filesToKeep = [];
+        let filesToDelete = [];
+        console.log(existingFiles);
+        console.log(files);
+        existingFiles.forEach((file) => {
+          Array.from(files).some((f) => f.name === file.name)
+            ? filesToKeep.push(file)
+            : filesToDelete.push(file.dms_id);
+        });
+        
+        //? only keeps the newest version of the documents and deletes the old versions in the database
+        Vue.$fhcapi.UserData.deleteOldVersionFiles(
+          filesToDelete
+        ).then((res) => {
+          console.log(res);
+        });  
+       
+
+        updatedFiles = [...filesToKeep];
       }
 
       let formData = new FormData();
@@ -116,7 +130,8 @@ export default {
 
           updatedFiles = updatedFiles.concat(
             res.data?.map((file) => {
-              return { dms_id: file.dms_id, name: file.client_name };
+              console.log("here are the files:",file);
+              return { dms_id: file.dms_id, name: file.client_name};
             })
           );
         })

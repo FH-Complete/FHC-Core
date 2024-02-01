@@ -9,6 +9,13 @@ export default {
   data() {
     return {};
   },
+  methods:{
+    getDocumentLink: function(dms_id){
+      return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+          `/Cis/ProfilUpdate/show/${dms_id}`;
+    }
+  },
   computed: {
     getComponentView: function () {
       let title = this.topic.toLowerCase();
@@ -72,9 +79,9 @@ export default {
     <div class="form-underline-titel">{{topic}}</div>
     <span  class="form-underline-content">{{data.value}} </span>
     </div>
-    <div class="ms-2">
-    <p>files:</p>
-    <p v-for="file in data.files">{{file}}</p>
+    <div v-if="data.files?.length" class="ms-2">
+    
+    <a target="_blank" :href="getDocumentLink(file.dms_id)" v-for="file in data.files">{{file.name}}</a>
     </div>
     </template>
     <component v-else :is="getComponentView" :data="data"></component>

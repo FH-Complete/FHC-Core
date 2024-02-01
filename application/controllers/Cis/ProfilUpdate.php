@@ -15,6 +15,7 @@ class ProfilUpdate extends Auth_Controller
 			'getAllRequests' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'acceptProfilRequest'=>['user:r'],
 			'denyProfilRequest'=>['user:r'],
+			'show'=>['user:r'],
 
 		]);
 		
@@ -29,6 +30,17 @@ class ProfilUpdate extends Auth_Controller
 
 	public function index(){
 		$this->load->view('Cis/ProfilUpdate');
+	}
+
+	public function show($dms_id){
+		$this->load->library('DmsLib');
+		//? downloads the file using the dms_id
+		$file = $this->dmslib->download($dms_id);
+		$file = hasData($file) ? getData($file) : null;
+		//? returns the downloaded file to the user
+		$res = $this->outputFile($file);
+
+		echo json_encode($res);
 	}
 
 	public function getAllRequests(){
@@ -87,7 +99,8 @@ class ProfilUpdate extends Auth_Controller
 				case "titel": $topic ="titelpre"; break;
 				case "postnomen": $topic = "titelpost"; break;
 			}
-			$result = $this->PersonModel->update($personID,[$topic=>$requested_change]);
+			
+			$result = $this->PersonModel->update($personID,[$topic=>$requested_change["value"]]);
 			if(isError($result)){
 				echo json_encode(error("was not able to update Person Information: " . $topic . " with value : " . $requested_change));
 				return;

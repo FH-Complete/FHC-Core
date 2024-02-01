@@ -12,6 +12,15 @@ export default {
     });
   },
 
+  deleteOldVersionFiles: function (files) {
+    const url =
+      FHC_JS_DATA_STORAGE_OBJECT.app_root +
+      FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+      `/Cis/Profil/deleteOldVersionFiles`;
+
+    return axios.post(url, files);
+  },
+
   getProfilRequestFiles: function (requestID) {
     const url =
       FHC_JS_DATA_STORAGE_OBJECT.app_root +

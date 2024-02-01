@@ -41,6 +41,11 @@ export default {
   },
 
   methods: {
+    getDocumentLink: function(dms_id){
+      return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+          `/Cis/ProfilUpdate/show/${dms_id}`;
+    },
     acceptRequest: function () {
       Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then((res) => {
         console.log("res", res);
@@ -183,9 +188,9 @@ export default {
 
       <span  class="form-underline-content" >{{data.requested_change.value}}</span>
     </div>
-    <div class="ms-2">
-    <p>files:</p>
-    <p v-for="file in data.requested_change.files">{{file}}</p>
+    <div v-if="data.requested_change.files.length" class="ms-2">
+    <!--<p>files:</p>-->
+    <a  v-for="file in data.requested_change.files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
     </div>
     </template>
 
