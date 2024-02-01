@@ -87,7 +87,7 @@ class FHCAPI_Controller extends FHC_Controller
 
 		// For JSON Requests (as opposed to multipart/form-data) get the $_POST variable from the input stream instead
 		if ($this->input->get_request_header('Content-Type', true) == 'application/json')
-			$_POST = json_decode($this->security->xss_clean($this->input->raw_input_stream));
+			$_POST = json_decode($this->security->xss_clean($this->input->raw_input_stream), true);
 	}
 
 
@@ -157,6 +157,17 @@ class FHCAPI_Controller extends FHC_Controller
 		$this->addError($errors, self::ERROR_TYPE_VALIDATION);
 		$this->setStatus(self::STATUS_FAIL);
 		exit(EXIT_ERROR);
+	}
+
+	/**
+	 * @param mixed					$data (optional)
+	 * @return void
+	 */
+	protected function terminateWithSuccess($data = null)
+	{
+		$this->setData($data);
+		$this->setStatus(self::STATUS_SUCCESS);
+		exit;
 	}
 
 	// TODO(chris): complete list
