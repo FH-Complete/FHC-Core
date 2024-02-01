@@ -28,8 +28,6 @@ require_once('dbupdate_3.4/example2.php');
 ...
 */
 require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
-
-require_once('dbupdate_3.4/feature_17513_EWteam.php');
 require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
 require_once('dbupdate_3.4/17512_fehlercode_constraints.php');
@@ -50,7 +48,7 @@ require_once('dbupdate_3.4/30181_tabelle_anrechnung_neue_attribute_fuer_begruend
 require_once('dbupdate_3.4/29529_infocenter_anpassungen.php');
 require_once('dbupdate_3.4/29835_uhstat1_erfassung_der_uhstat1_daten_ueber_das_bewerbungstool.php');
 require_once('dbupdate_3.4/33714_erhoehter_studienbeitrag_fuer_drittsaatenangehoerig.php');
-
+require_once('dbupdate_3.4/17513_Entwicklungsteam.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
