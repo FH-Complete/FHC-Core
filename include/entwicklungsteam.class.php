@@ -157,7 +157,7 @@ class entwicklungsteam extends basis_db
 			$this->errormsg = 'Besondere Qualifikation muss eingetragen werden';
 			return false;
 		}
-		if($this->beginn > $this->ende)
+		if($this->ende != '' && $this->beginn > $this->ende)
 		{
 			$this->errormsg = 'Endedatum darf nicht vor Anfangsdatum liegen';
 			return false;
