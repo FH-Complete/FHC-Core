@@ -189,6 +189,16 @@ export default {
 			if (!Array.isArray(feedback))
 				feedback = [feedback];
 			this.valid = valid;
+			// NOTE(chris): On a list of radios/checkboxes only add the feedback message to the last item
+			if (this.name && (this.lcType == 'radio' || this.lcType == 'checkbox')) {
+				let n = this.$el.nextSibling;
+				for (; n; n = n.nextSibling)
+					if (n.nodeType == 1
+						&& n.__vueParentComponent?.ctx?.lcType == this.lcType
+						&& n.__vueParentComponent?.ctx?.name == this.name
+						)
+						return;
+			}
 			this.feedback = feedback;
 		},
 		_loadComponents() {
