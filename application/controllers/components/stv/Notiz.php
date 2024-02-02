@@ -127,11 +127,11 @@ class Notiz extends FHC_Controller
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
 		$erledigt = $this->input->post('erledigt');
-		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : $uid;
+		$verfasser_uid = isset($_POST['verfasser']) ? $_POST['verfasser'] : $uid;
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : null;
 		$type = $this->input->post('typeId');
-		$start = $this->input->post('von');
-		$ende = $this->input->post('bis');
+		$start = $this->input->post('Von');
+		$ende = $this->input->post('Bis');
 
 		//Speichern der Notiz und Notizzuordnung inkl Prüfung ob valid type
 		$result = $this->NotizModel->addNotizForType($type, $id, $titel, $text, $uid, $start, $ende, $erledigt, $verfasser_uid, $bearbeiter_uid);
@@ -220,12 +220,12 @@ class Notiz extends FHC_Controller
 		$uid = getAuthUID();
 		$titel = $this->input->post('titel');
 		$text = $this->input->post('text');
-		$verfasser_uid = isset($_POST['verfasser_uid']) ? $_POST['verfasser_uid'] : null;
+		$verfasser_uid = $this->input->post('verfasser');
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
 		//$type = $this->input->post('typeId'); //soll auch dieser geändert werden können?
-		$start = $this->input->post('von');
-		$ende = $this->input->post('bis');
+		$start = $this->input->post('Von');
+		$ende = $this->input->post('Bis');
 
 		$result = $this->NotizModel->update(
 			[
@@ -252,6 +252,7 @@ class Notiz extends FHC_Controller
 		//update(1) laden aller bereits mit dieser notiz_id verknüpften DMS-Einträge
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 		$this->NotizdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
+		$dms_uploaded = null;
 
 		$result = $this->NotizdokumentModel->loadWhere(array('notiz_id' => $notiz_id));
 		if (isError($result))

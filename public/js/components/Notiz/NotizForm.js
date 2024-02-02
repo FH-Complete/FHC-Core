@@ -174,6 +174,7 @@ export default {
 
 			if (tinymcsVal != newVal) {
 				//Inhalt des Editors aktualisieren
+				//Todo(manu) hier gibts ein problem mit update function
 				this.editor.setContent(newVal);
 			}
 		},
