@@ -5,7 +5,6 @@ export default {
     return {
       dmsData: [],
       originalValue: null,
-      originalFiles: null,
     };
   },
   components: {
@@ -20,19 +19,40 @@ export default {
       default: false,
     },
     files: {
-      type: FileList,
+      type: Array,
     },
     updateID: {
       type: Boolean,
     },
   },
   computed: {
-    isChanged: function () {
-      //? controls whether the user is allowed to send the profil update or not
-      if (this.withFiles && !this.dmsData.length) {
-        return false;
+    didFilesChange: function () {
+      let res = false;
+      //? case in which the profilRequest has already associated files 
+      if(this.files){ 
+        Array.from(this.dmsData).forEach((file) => {
+          if (this.files.some((f) => f.name !== file.name)) {
+            res = true;
+          }
+        });
+        return !(this.dmsData.length == this.files.length) || res;
       }
-      return JSON.stringify(this.data) !== Vue.toRaw(this.originalValue);
+      //? case in which the user creates a new profilRequest
+      else{  
+        return Array.from(this.dmsData).length? true:false;
+      }
+    },
+    didDataChange: function(){
+      return JSON.stringify(this.data) !== this.originalValue;
+    },
+    isChanged: function () {
+      if (this.withFiles) {
+        if(this.updateID){
+          return this.didDataChange || this.didFilesChange;
+        }
+        return this.didDataChange && this.didFilesChange;
+      }
+      return this.didDataChange
     },
   },
   emits: ["profilUpdate"],
@@ -44,7 +64,7 @@ export default {
   },
   methods: {
     emitChanges: function () {
-      if (this.updateID || this.isChanged) {
+      if (this.isChanged) {
         this.$emit(
           "profilUpdate",
           this.withFiles
@@ -57,20 +77,13 @@ export default {
     },
   },
   mounted() {
-    this.originalValue = JSON.stringify(this.data);
+    this.originalValue = JSON.stringify(Vue.toRaw(this.data));
 
     if (this.files) {
       this.dmsData = this.files;
-
-      for (let i = 0; i < this.dmsData.length; i++) {
-        console.log("here", this.dmsData[i]);
-      }
-
-      this.originalFiles = null;
     }
   },
   template: `
-   
     <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">Please update your {{data.titel}} and upload the corresponding Document for proof</p>
 
     <div class="form-underline">
@@ -79,7 +92,7 @@ export default {
     <input  class="mb-2 form-control" @input="emitChanges"  v-model="data.value" :placeholder="data.value">
   
     
-    <dms ref="update" v-if="withFiles" id="files" :noList="false" :multiple="true" v-model="dmsData"  ></dms>
+    <dms ref="update" v-if="withFiles" id="files" :noList="false" :multiple="true" v-model="dmsData" @update:model-value="didFilesChange"  ></dms>
 
     </div>
     `,
