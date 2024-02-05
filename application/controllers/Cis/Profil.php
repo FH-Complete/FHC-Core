@@ -162,17 +162,12 @@ class Profil extends Auth_Controller
 		$_GET = json_decode($this->input->raw_input_stream, true);
 		$uid = $this->input->get('uid');
 		$id = $this->input->get('id');
+		$whereClause=['uid'=> $this->uid];
 		
+		if(isset($uid)) $whereClause['uid'] = $uid;
+		if(isset($id)) $whereClause['id'] = $id;
 		
-		if($uid && $id){
-			$res= $this->ProfilChangeModel->getProfilUpdate($uid, $id);
-		}elseif($uid){
-			$res= $this->ProfilChangeModel->getProfilUpdate($uid);
-		}elseif($id){
-			$res= $this->ProfilChangeModel->getProfilUpdate($this->uid, $id);
-		}else{
-			$res= $this->ProfilChangeModel->getProfilUpdate($this->uid);
-		}
+		$res= $this->ProfilChangeModel->getProfilUpdate($whereClause);
 
 		echo json_encode($res);
 		
@@ -659,7 +654,7 @@ class Profil extends Auth_Controller
 
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate($this->uid);
+		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate(['uid'=>$this->uid]);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{
@@ -769,9 +764,8 @@ class Profil extends Auth_Controller
 
 		if (
 
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort"])) &&
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort","zustelladresse"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
-			isSuccess($adresse_res = $this->AdresseModel->addOrder("sort")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
 		) {
 			$adresse_res = $this->AdresseModel->loadWhere(array("person_id" => $this->pid));
@@ -866,7 +860,7 @@ class Profil extends Auth_Controller
 		}
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate($this->uid);
+		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate(['uid'=>$this->uid]);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{

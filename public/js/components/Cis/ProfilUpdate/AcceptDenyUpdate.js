@@ -3,6 +3,7 @@ import Alert from "../../Bootstrap/Alert.js";
 import Kontakt from "../Profil/ProfilComponents/Kontakt.js";
 import Adresse from "../Profil/ProfilComponents/Adresse.js";
 
+
 export default {
   components: {
     BsModal,
@@ -119,6 +120,7 @@ export default {
 
     <template v-slot:default>
 
+    
     <!-- debugging prints 
     <pre>{{JSON.stringify(data.profil_update_id,null,2)}}</pre>
     <pre>view {{getComponentView}}</pre>
@@ -188,7 +190,7 @@ export default {
 
       <span  class="form-underline-content" >{{data.requested_change.value}}</span>
     </div>
-    <div v-if="data.requested_change.files.length" class="ms-2">
+    <div v-if="data.requested_change.files?.length" class="ms-2">
     <!--<p>files:</p>-->
     <a  v-for="file in data.requested_change.files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
     </div>

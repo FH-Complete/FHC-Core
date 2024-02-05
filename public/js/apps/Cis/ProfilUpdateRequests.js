@@ -18,9 +18,9 @@ const app = Vue.createApp({
         ajaxURLGenerator: (url,config,params)=>{
           //? this function needs to be an array function in order to access the this properties of the Vue component
           if(this.showAll){
-            return url +"getAllRequests";
+            return url +"getProfilUpdates";
           }else{
-            return url +"getPendingRequests";
+            return url +"getProfilUpdates/pending";
           }
           
         },
@@ -97,7 +97,7 @@ const app = Vue.createApp({
               //! function that is called when clicking on a row in the table
 
               let cellData = cell.getRow().getData();
-
+              console.log("cellData",cellData);
               AcceptDenyUpdate.popup({ value: cellData })
                 .then((res) => {
                   console.log("res of the modal: ", res);
@@ -146,8 +146,8 @@ const app = Vue.createApp({
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">Show Profil Requests</div>
 
-      <select class="mb-2 " v-model="showAll" @change="updateData" class="form-select" aria-label="Profil updates display selection">
-        <option :selected="true" :value="false">Only Pending Requests</option>
+      <select class="mb-4 " v-model="showAll" @change="updateData" class="form-select" aria-label="Profil updates display selection">
+        <option :selected="true" :value="false">Pending Requests</option>
         <option :value="true">All Requests</option>
       </select>
   

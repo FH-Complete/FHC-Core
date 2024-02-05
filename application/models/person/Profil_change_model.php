@@ -49,15 +49,7 @@ class Profil_change_model extends DB_Model
 	 * returns a profil update with id 
 	 * returns all profil updates if id is set to null
 	 */
-	public function getProfilUpdate($uid=null,$id=null){
-		$whereClause=[];
-
-		if(!is_null($uid)){
-			$whereClause['uid']=$uid;
-		}
-		if(!is_null($id)){
-			$whereClause['profil_update_id']=$id;
-		}
+	public function getProfilUpdate($whereClause=null){
 		
 		$res = $this->loadWhere($whereClause);
 		if(isError($res)){
@@ -68,6 +60,7 @@ class Profil_change_model extends DB_Model
 				foreach($res->retval as $update){
 					$update->requested_change = json_decode($update->requested_change);
 					$update->insertamum = !is_null($update->insertamum)?date_create($update->insertamum)->format('d.m.Y'):null;
+					$update->updateamum = !is_null($update->updateamum)?date_create($update->updateamum)->format('d.m.Y'):null;
 					$update->status_timestamp = !is_null($update->status_timestamp)?date_create($update->status_timestamp)->format('d.m.Y'):null;
 					 
 				}

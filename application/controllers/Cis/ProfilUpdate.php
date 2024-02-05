@@ -12,11 +12,11 @@ class ProfilUpdate extends Auth_Controller
 	public function __construct(){
 		parent::__construct([
 			'index' => ['student/anrechnung_beantragen:r', 'user:r'], // TODO(chris): permissions?
-			'getAllRequests' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'getProfilUpdates' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'acceptProfilRequest'=>['user:r'],
 			'denyProfilRequest'=>['user:r'],
 			'show'=>['user:r'],
-			'getPendingRequests'=>['user:r'], 
+			
 
 		]);
 		
@@ -45,20 +45,16 @@ class ProfilUpdate extends Auth_Controller
 		echo json_encode($res);
 	}
 
-	public function getAllRequests(){
-		$res = $this->ProfilChangeModel->getProfilUpdate();
+	public function getProfilUpdates($status=null){
+		if(isset($status)){
+			$res = $this->ProfilChangeModel->getProfilUpdate(["status"=>$status]);
+		}else{
+			$res = $this->ProfilChangeModel->getProfilUpdate();
+		}
 		$res = hasData($res)? getData($res) : null;
 		echo json_encode($res);
 	}
 
-	public function getPendingRequests(){
-		$res = $this->ProfilChangeModel->loadWhere(["status"=>"pending"]);
-		
-		$res = hasData($res)? getData($res) : [];
-		
-		
-		echo json_encode($res);
-	}
 
 	public function acceptProfilRequest(){
 
