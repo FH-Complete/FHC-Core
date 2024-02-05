@@ -37,6 +37,7 @@ class ProfilUpdate extends Auth_Controller
 		$this->load->library('DmsLib');
 		//? downloads the file using the dms_id
 		$file = $this->dmslib->download($dms_id);
+		
 		$file = hasData($file) ? getData($file) : null;
 		//? returns the downloaded file to the user
 		$res = $this->outputFile($file);
@@ -148,8 +149,9 @@ class ProfilUpdate extends Auth_Controller
 		if(array_key_exists('add',$requested_change) && $requested_change['add']){
 			//? removes add flag
 			unset($requested_change['add']);
-			//? fields like insertvon are not filled when inserting new row
 			$requested_change['person_id'] = $personID;
+			$requested_change['insertamum'] = "NOW()";
+			$requested_change['insertvon'] = getAuthUID();
 			$insertID = $this->KontaktModel->insert($requested_change);
 			
 		}
@@ -159,6 +161,8 @@ class ProfilUpdate extends Auth_Controller
 		}
 		//! UPDATE
 		else{
+			$requested_change['updateamum']="NOW()";
+			$requested_change['updatemvon']=getAuthUID();
 			$this->KontaktModel->update($kontakt_id,$requested_change);
 		}
 		return isset($insertID) ? $insertID : null;
@@ -181,7 +185,8 @@ class ProfilUpdate extends Auth_Controller
 		if(array_key_exists('add',$requested_change) && $requested_change['add']){
 			//? removes add flag
 			unset($requested_change['add']);
-			//? fields like insertvon are not filled when inserting new row
+			$requested_change['insertamum']="NOW()";
+			$requested_change['insertvon']=getAuthUID();
 			$requested_change['person_id'] = $personID;
 			//TODO: zustelladresse, heimatadresse, rechnungsadresse und nation werden nicht beachtet
 			$insertID = $this->AdresseModel->insert($requested_change);
@@ -192,6 +197,8 @@ class ProfilUpdate extends Auth_Controller
 		}
 		//! UPDATE
 		else{
+			$requested_change['updateamum']	= "NOW()";
+			$requested_change['updatevon'] = getAuthUID();
 			$this->AdresseModel->update($adresse_id,$requested_change);
 		}
 		return isset($insertID)? $insertID : null;

@@ -71,6 +71,7 @@ export default {
               typ: null,
               plz: null,
               ort: null,
+              zustelladresse:null,
             }
           : {
               //? add flag
@@ -104,7 +105,6 @@ export default {
       this.properties = item;
       this.data = item.data;
       this.view = item.view;
-      console.log("properties", this.properties);
       if (item.title) {
         //? emits the selected topic to the parent component
         this.topic = item.title;
@@ -160,6 +160,7 @@ export default {
     
 
     <div v-else-if="view==='text_input'" class="form-underline">
+   
       <div class="form-underline-titel">{{data.titel?data.titel:'titel'}}</div>
 
       <input  class="form-control" @input="$emit('update:profilUpdate',data.value)"  v-model="data.value" :placeholder="data.value">

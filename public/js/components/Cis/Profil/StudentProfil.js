@@ -181,14 +181,16 @@ export default {
           
           vorname: {
             title:"vorname",
-            view:"text_input",
+            view:"TextInputDokument",
+            withFiles:true,
             data:{
               titel:"vorname",
               value:this.data.vorname,
             }},
             nachname: {
               title:"nachname",
-              view:"text_input",
+              view:"TextInputDokument",
+              withFiles:true,
               data:{
                 titel:"nachname",
                 value:this.data.nachname,
@@ -196,7 +198,8 @@ export default {
             },
             titel:{
               title:"titel",
-              view:"text_input",
+              view:"TextInputDokument",
+              withFiles:true,
               data:{
                 titel:"titel",
                 value:this.data.titel,
@@ -204,7 +207,8 @@ export default {
             },
             postnomen:{
               title:"postnomen",
-              view:"text_input",
+              view:"TextInputDokument",
+              withFiles:true,
               data:{
                 titel:"postnomen",
                 value:this.data.postnomen,
@@ -264,6 +268,21 @@ export default {
                 
                 <quick-links :mobile="true"></quick-links>
                 </div>
+              </div>
+
+              <!-- Bearbeiten Button -->
+  
+              <div class="row ">
+              <div class="col mb-3">
+              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                <div class="row">
+                  <div class="col-2">
+                    <i class="fa fa-edit"></i>
+                  </div>
+                  <div class="col-10">Bearbeiten</div>
+                </div>
+              </button>
+              </div>
               </div>
 
               <div v-if="data.profilUpdates" class="row mb-3">
@@ -426,28 +445,6 @@ export default {
               <!-- START OF SIDE PANEL -->
               <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
 
-
-              <!-- Bearbeiten Button -->
-  
-              <div class="row d-none d-md-block mb-3">
-              <div class="col mb-3">
-              <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
-                <div class="row">
-                  <div class="col-2">
-                    <i class="fa fa-edit"></i>
-                  </div>
-                  <div class="col-10">Bearbeiten</div>
-                </div>
-              </button>
-              </div>
-              </div>
-
-                <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
-                <div class="col mb-3">
-                    <!-- PROFIL UPDATES -->
-                    <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
-                </div>    
-                </div>
               
                 <div  class="row d-none d-md-block mb-3">
                   <div class="col">
@@ -458,6 +455,30 @@ export default {
                   
                   </div>
                 </div>
+
+                <!-- Bearbeiten Button -->
+  
+                <div class="row d-none d-md-block">
+                <div class="col mb-3">
+                <button @click="showModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                  <div class="row">
+                    <div class="col-2">
+                      <i class="fa fa-edit"></i>
+                    </div>
+                    <div class="col-10">Bearbeiten</div>
+                  </div>
+                </button>
+                </div>
+                </div>
+
+                <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
+                <div class="col mb-3">
+                    <!-- PROFIL UPDATES -->
+                    <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                </div>    
+                </div>
+
+                
 
                 <div class="row mb-3" >
                 

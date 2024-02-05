@@ -27,8 +27,12 @@ class Profil extends Auth_Controller
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'deleteOldVersionFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'test' => ['student/anrechnung_beantragen:r', 'user:r'],
 						
 		]);
+
+		
+
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
@@ -40,12 +44,15 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('person/Profil_change_model', 'ProfilChangeModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
-		
+		$this->load->model('DmsVersion_model','DmsVersionModel');
+
+		$this->load->library('DmsLib');
 
 		//? put the uid and pid inside the controller to reuse in controller
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
 		
+
 
 	}
 
@@ -84,13 +91,14 @@ class Profil extends Auth_Controller
 			echo json_encode([]);
 			return;
 		}
-		$res=[];
+		
 
-		$this->load->library('DmsLib');
-		$this->load->model('DmsVersion_model','DmsVersionModel');
+		
 		
 		$files = $_FILES['files'];
         $file_count = count($files['name']);
+
+		$res=[];
 
         for ($i = 0; $i < $file_count; $i++) {
             $_FILES['files']['name'] = $files['name'][$i];
@@ -100,7 +108,7 @@ class Profil extends Auth_Controller
             $_FILES['files']['size'] = $files['size'][$i];
 			
 			$dms = [
-				"kategorie_kurzbz"=>"dokumente",
+				"kategorie_kurzbz"=>"profil_aenderung",
 				"version"=>0, 
 				"name"=>$_FILES['files']['name'],
 				"mimetype"=>$_FILES['files']['type'],
@@ -118,15 +126,36 @@ class Profil extends Auth_Controller
 
 
 	public function deleteOldVersionFiles(){
-		//? table dms_version has a composite primary key with dms_id and dms_version
 		$file_array = json_decode($this->input->raw_input_stream);
+		if(!isset($file_array) || !sizeof($file_array)){
+			return;
+		}
+		
 		$res =[];
-		foreach($file_array as $value){
+		foreach($file_array as $id){
+			//? delete all the different versions of the dms_file
 			
-			array_push($res, $this->DmsVersionModel->delete([$value,0]));
+			$zwischen_res = $this->DmsVersionModel->loadWhere(["dms_id"=>$id]);
+			$zwischen_res = hasData($zwischen_res) ? getData($zwischen_res) : null;
+			if(isset($zwischen_res)){
+				$zwischen_res = array_map(function($item){ return $item->version;},$zwischen_res);
+				foreach($zwischen_res as $version){
+					array_push($res, $this->DmsVersionModel->delete([$id,$version]));
+				}
+			}else{
+				echo json_encode(error("No version of the file has been found"));
+			}
 		}
 		echo json_encode($res);
 	}
+
+	public function test(){
+		
+		// Loads permission lib
+		$this->load->library('PermissionLib');
+		var_dump($this->permissionlib->getOE_isEntitledFor());
+	}
+
 
 
 	public function selectProfilRequest(){
@@ -529,9 +558,8 @@ class Profil extends Auth_Controller
 
 		if (
 
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort"])) &&
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
-			isSuccess($adresse_res = $this->AdresseModel->addOrder("sort")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
 		) {
 			$adresse_res = $this->AdresseModel->loadWhere(array("person_id" => $this->pid));

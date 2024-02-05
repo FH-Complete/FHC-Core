@@ -8,7 +8,12 @@ export default {
     methods:{
         updateValue: function(event,bind){
             //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid 
-            this.data[bind] = event.target.value === "" ? null : event.target.value;
+            if(bind ==="zustelladresse"){
+                this.data[bind] = event.target.checked;
+            }else{
+                this.data[bind] = event.target.value === "" ? null : event.target.value;
+            }
+            
             this.$emit('profilUpdate',this.isChanged?this.data:null);
         },
     },
@@ -28,7 +33,7 @@ export default {
     template:`
    
      <div class="gy-3 row justify-content-center align-items-center">
-    
+       
     <!-- column 1 in the address row -->
     
       
@@ -82,6 +87,14 @@ export default {
     
             <input  class="form-control" :value="data.plz" @input="updateValue($event,'plz')" :placeholder="data.plz">
         
+            </div>
+        </div>
+        <div class="col-12 order-5">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @change="updateValue($event,'zustelladresse')" :checked="data.zustelladresse" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Zustelladresse
+                </label>
             </div>
         </div>
     </div>

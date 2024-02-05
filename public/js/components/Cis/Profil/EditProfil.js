@@ -38,16 +38,12 @@ export default {
 
   methods: {
     async submitProfilChange() {
-      //? when the update contains a file upload
-
-      //TODO: check if the updated value is different from the original value before submitting the request
       if (this.topic && this.profilUpdate) {
         if (this.profilUpdate.files) {
           const fileIDs = await this.uploadFiles(this.profilUpdate.files);
          
           if (fileIDs) {
             this.profilUpdate.files = fileIDs;
-            console.log("here is the update", this.profilUpdate);
           }
         }
         //? inserts new row in public.tbl_cis_profil_update
@@ -98,8 +94,6 @@ export default {
 
         let filesToKeep = [];
         let filesToDelete = [];
-        console.log(existingFiles);
-        console.log(files);
         existingFiles.forEach((file) => {
           Array.from(files).some((f) => f.name === file.name)
             ? filesToKeep.push(file)
@@ -107,11 +101,13 @@ export default {
         });
         
         //? only keeps the newest version of the documents and deletes the old versions in the database
-        Vue.$fhcapi.UserData.deleteOldVersionFiles(
-          filesToDelete
-        ).then((res) => {
-          console.log(res);
-        });  
+        if(filesToDelete.length > 0) {
+          Vue.$fhcapi.UserData.deleteOldVersionFiles(
+            filesToDelete
+          ).then((res) => {
+            console.log(res);
+          });  
+        }
        
 
         updatedFiles = [...filesToKeep];
@@ -122,7 +118,7 @@ export default {
         if (files[i].type !== "application/x.fhc-dms+json")
           formData.append("files[]", files[i]);
       }
-
+      if(Array.from(formData).length > 0){
       await Vue.$fhcapi.UserData.insertFile(formData)
         .then((res) => {
           /* returns file information as 
@@ -130,7 +126,6 @@ export default {
 
           updatedFiles = updatedFiles.concat(
             res.data?.map((file) => {
-              console.log("here are the files:",file);
               return { dms_id: file.dms_id, name: file.client_name};
             })
           );
@@ -138,6 +133,7 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+      }
 
       return updatedFiles;
     },
@@ -162,6 +158,7 @@ export default {
       {{title }}  
     </template>
     <template v-slot:default>
+
 
     <nav aria-label="breadcrumb" class="ps-2  ">
       <ol class="breadcrumb ">
