@@ -11,6 +11,59 @@ const app = Vue.createApp({
     return {
       showAll: false,
       profil_updates_table_options: {
+        
+       
+        rowContextMenu: (e, component)=>{
+
+          let menu =[];
+          if(component.getData().status === "pending"){
+            menu.push(
+              
+                {
+                    label:"<i class='fa fa-check'></i> Accept Request",
+                    action:(e, column)=>{
+                      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData()).then((res) => {
+                        this.$refs.UpdatesTable.tabulator.setData();
+                      });
+                   
+                    }
+                },
+                {
+                    separator:true,
+                },
+                {
+                    label:" <i style='width:16px' class='text-center fa fa-xmark'></i> Deny Request",
+                    action:(e, column)=>{
+                      
+                      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(column.getData()).then((res) => {
+                        this.$refs.UpdatesTable.tabulator.setData();
+                      });
+                    }
+                },
+                {
+                    separator:true,
+                },
+                {
+                    label:"<i class='fa fa-eye'></i> Show Request",
+                    action:(e, column)=>{
+                      this.showModal(column.getData());
+                    }
+                }
+              
+            );
+          }else{
+            menu.push(
+              {
+                label:"<i class='fa fa-eye'></i> Show Request",
+                action:(e, column)=>{
+                  this.showModal(column.getData());
+                }
+              }
+            )
+          }
+          return menu;
+
+        } ,
         ajaxURL:FHC_JS_DATA_STORAGE_OBJECT.app_root +
         FHC_JS_DATA_STORAGE_OBJECT.ci_router +
         `/Cis/ProfilUpdate/`,
@@ -66,8 +119,6 @@ const app = Vue.createApp({
             hozAlign: "center",
             headerFilter: true,
             formatter: function (cell, para) {
-              let res = Object.getPrototypeOf(cell);
-              //console.log(res);
 
               switch (cell.getValue()) {
                 case "pending":
@@ -95,20 +146,9 @@ const app = Vue.createApp({
             hozAlign: "center",
             cellClick: (e, cell) => {
               //! function that is called when clicking on a row in the table
-
               let cellData = cell.getRow().getData();
+              this.showModal(cellData);
               
-              AcceptDenyUpdate.popup({ value: cellData })
-                .then((res) => {
-                  console.log("res of the modal: ", res);
-                  //? refetches the data, if any request was denied or accepted
-                  //* setData will call the ajaxURL again to refresh the data
-                  this.$refs.UpdatesTable.tabulator.setData();
-                })
-                .catch((e) => {
-                  //? catches the rejected Promise if the result of the modal was falsy
-                  console.log("catch of the modal: ", e);
-                });
             },
             //responsive:0,
           },
@@ -130,6 +170,19 @@ const app = Vue.createApp({
     }
   },
   methods: {
+    showModal: function(value){
+      AcceptDenyUpdate.popup({ value: value })
+                .then((res) => {
+                  console.log("res of the modal: ", res);
+                  //? refetches the data, if any request was denied or accepted
+                  //* setData will call the ajaxURL again to refresh the data
+                  this.$refs.UpdatesTable.tabulator.setData();
+                })
+                .catch((e) => {
+                  //? catches the rejected Promise if the result of the modal was falsy
+                  console.log("catch of the modal: ", e);
+                });
+    },
     updateData: function(event){
       
       this.$refs.UpdatesTable.tabulator.setData(); 

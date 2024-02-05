@@ -49,18 +49,14 @@ export default {
     },
     acceptRequest: function () {
       Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then((res) => {
-        console.log("res", res);
-        console.log("res.data", res.data);
         this.result = true;
       });
       this.hide();
     },
 
     denyRequest: function () {
-      console.log(this.data.profil_update_id);
+      
       Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data).then((res) => {
-        console.log("res", res);
-        console.log("res.data", res.data);
         this.result = true;
       });
       this.hide();
@@ -129,14 +125,14 @@ export default {
     -->
     
    <div class="row">
-    <div  class="form-underline mb-2 col">
+    <div  class="form-underline mb-2 col-12 col-sm-6">
       <div class="form-underline-titel">Status: </div>
 
       <span  class="form-underline-content" >{{data.status}}</span>
     </div>
 
 
-    <div  class="form-underline mb-2 col">
+    <div v-if="data.status!=='pending'" class="form-underline mb-2 col-12 col-sm-6">
       <div class="form-underline-titel">Date of Status: </div>
       <!-- only status timestamp and status message can be null in the database -->
       <span  class="form-underline-content" >{{data.status_timestamp?data.status_timestamp:'-'}}</span>
@@ -144,16 +140,19 @@ export default {
 
 
     
-    <div  class="form-underline mb-2 col">
+    <div  class="form-underline mb-2 col-12 col-sm-6">
       <div class="form-underline-titel">UserID: </div>
 
       <span  class="form-underline-content" >{{data.uid}}</span>
     </div>
 
+    <div  class="form-underline mb-2 col-12 col-sm-6">
+      <div class="form-underline-titel">Name: </div>
 
+      <span  class="form-underline-content" >{{data.name}}</span>
+    </div>
 
-
-    <div  class="form-underline mb-2 col">
+    <div  class="form-underline mb-2 col-12 col-sm-6">
       <div class="form-underline-titel">Topic of Request: </div>
 
       <span  class="form-underline-content" >{{data.topic}}</span>
@@ -162,7 +161,7 @@ export default {
 
 
 
-    <div  class="form-underline mb-2 col">
+    <div  class="form-underline mb-2 col-12 col-sm-6">
       <div class="form-underline-titel">Date of Request:</div>
 
       <span  class="form-underline-content" >{{data.insertamum}}</span>
