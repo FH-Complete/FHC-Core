@@ -80,7 +80,7 @@ class ProfilUpdate extends Auth_Controller
 			$insertID = $this->handleAdresse($requested_change, $personID);
 			$insertID = hasData($insertID) ? getData($insertID) : null;
 			if(isset($insertID)) {
-				$requested_change['kontakt_id'] = $insertID;
+				$requested_change['adresse_id'] = $insertID;
 				$update_res = $this->updateRequestedChange($id,$requested_change);
 				if(isError($update_res)){
 					echo json_encode(error("was not able to add addresse_id " . $insertID . " to profilRequest " . $id ));

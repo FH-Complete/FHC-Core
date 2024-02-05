@@ -97,7 +97,7 @@ const app = Vue.createApp({
               //! function that is called when clicking on a row in the table
 
               let cellData = cell.getRow().getData();
-              console.log("cellData",cellData);
+              
               AcceptDenyUpdate.popup({ value: cellData })
                 .then((res) => {
                   console.log("res of the modal: ", res);
@@ -144,7 +144,7 @@ const app = Vue.createApp({
     <div>
     
     <div  class="form-underline flex-fill ">
-      <div class="form-underline-titel">Show Profil Requests</div>
+      <div class="form-underline-titel">Show </div>
 
       <select class="mb-4 " v-model="showAll" @change="updateData" class="form-select" aria-label="Profil updates display selection">
         <option :selected="true" :value="false">Pending Requests</option>

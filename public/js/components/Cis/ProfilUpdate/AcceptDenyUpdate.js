@@ -197,7 +197,7 @@ export default {
     </template>
 
 
-    <component v-else :is="getComponentView" :data="data.requested_change"></component>
+    <component v-else :is="getComponentView" :withZustelladresse="getComponentView==='adresse'?true:false" :data="data.requested_change"></component>
     </div>
     </div>
     </div>
