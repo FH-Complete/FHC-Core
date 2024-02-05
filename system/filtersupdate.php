@@ -1278,6 +1278,38 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'AnwesenheitenByLektor',
+		'filter_kurzbz' => 'anwByLektor',
+		'description' => '{AnwesenheitenByLektor}',
+		'sort' => 2,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Anwesenheiten By Lektor",
+				"columns": [
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Aktuelles Datum"},
+					{"name": "Summe"}
+				],
+				"filters": [
+					{
+						"name": "Aktuelles Datum",
+						"operation": "ncontains",
+						"condition": "anw"
+					},
+					{
+						"name": "Aktuelles Datum",
+						"operation": "contains",
+						"condition": "abw"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 
