@@ -65,7 +65,7 @@ export default {
 				],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
-				height: '250',
+				height: '150',
 				selectableRangeMode: 'click',
 				selectable: true,
 				index: 'notiz_id'
@@ -403,7 +403,7 @@ export default {
 			@click:new="actionNewNotiz"
 			>
 		</core-filter-cmpt>
-		<br><br>
+		<br>
 	
 		<form ref="formc" @submit.prevent class="row pt-3">
 		<br><br>
