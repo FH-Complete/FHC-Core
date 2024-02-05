@@ -145,15 +145,6 @@ export default {
 
     
     <div  class="form-underline mb-2 col">
-      <div class="form-underline-titel">Status message: </div>
-      <!-- only status timestamp and status message can be null in the database -->
-      <span  class="form-underline-content" >{{data.status_message? data.status_message : '-'}}</span>
-    </div>
-
-
-
-
-    <div  class="form-underline mb-2 col">
       <div class="form-underline-titel">UserID: </div>
 
       <span  class="form-underline-content" >{{data.uid}}</span>
@@ -177,6 +168,16 @@ export default {
       <span  class="form-underline-content" >{{data.insertamum}}</span>
     </div>
 
+    </div>
+
+    <!-- Row with the status message is only visible if the request is not pending and the message is not empty -->
+    <div v-if="data.status !=='pending' && data.status_message" class="row">
+    <div class="col">
+    <div  class="form-underline mb-2 ">
+    <div class="form-underline-titel">Status message</div>
+    <textarea  class="form-control" rows="4" disabled>{{data.status_message}} </textarea>
+    </div>
+    </div>
     </div>
 
     <div class="row my-4">

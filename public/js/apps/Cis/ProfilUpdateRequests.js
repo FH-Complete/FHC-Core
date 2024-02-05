@@ -130,16 +130,20 @@ const app = Vue.createApp({
     }
   },
   methods: {
-    updateData: function(){
+    updateData: function(event){
       
       this.$refs.UpdatesTable.tabulator.setData(); 
-       /* 
-        console.log(this.profil_updates_table_options.ajaxURL);
-       */
+      //? store the selected view in the session storage of the browser
+      sessionStorage.setItem("showAll",event.target.value);
     }
   },
-  created() {},
-  mounted() {},
+  mounted() {
+    if(!(sessionStorage.getItem("showAll")===null))
+    {
+      this.showAll = sessionStorage.getItem("showAll");
+    }
+   
+  },
   template: `
     <div>
     
