@@ -1139,13 +1139,30 @@ class mitarbeiter extends benutzer
 					funktion_kurzbz='Leitung' AND
 					(datum_von is null OR datum_von<=".$this->db_add_param($date).") AND
 					(datum_bis is null OR datum_bis>=".$this->db_add_param($date).") AND
-					oe_kurzbz in (SELECT oe_kurzbz
-									FROM public.tbl_benutzerfunktion
-									WHERE
-									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
-									(datum_von is null OR (datum_von<= ".$this->db_add_param($date).")) AND
-									(datum_bis is null OR (datum_bis>=".$this->db_add_param($date)."))
-									)
+					oe_kurzbz in (
+						SELECT
+							oe_kurzbz
+						FROM
+							public.tbl_benutzerfunktion
+						WHERE
+							funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
+							(datum_von is null OR (datum_von<= ".$this->db_add_param($date).")) AND
+							(datum_bis is null OR (datum_bis>=".$this->db_add_param($date)."))
+						ORDER BY
+						(
+							SELECT
+								1
+							FROM
+								hr.tbl_vertragsbestandteil_funktion
+								JOIN hr.tbl_vertragsbestandteil vbsfkt USING(vertragsbestandteil_id)
+								JOIN hr.tbl_vertragsbestandteil vbskarenz USING(dienstverhaeltnis_id)
+							WHERE
+								tbl_vertragsbestandteil_funktion.benutzerfunktion_id=tbl_benutzerfunktion.benutzerfunktion_id
+								AND vbskarenz.vertragsbestandteiltyp_kurzbz='karenz'
+								AND (vbskarenz.von <= ".$this->db_add_param($date)." OR vbskarenz.von is null)
+								AND (vbskarenz.bis >= ".$this->db_add_param($date)." OR vbskarenz.bis is null)
+						) NULLS FIRST LIMIT 1
+					)
 				ORDER BY datum_von DESC ";
 
 		if (is_numeric($limit))
@@ -1754,7 +1771,7 @@ class mitarbeiter extends benutzer
 	{
 		if (is_null($uid))
 			$uid = $this->uid;
-		
+
 		$qry = "
 			SELECT o.oe_kurzbz AS standardkostenstelle, o.bezeichnung
 			FROM public.tbl_benutzerfunktion bf
@@ -1771,7 +1788,7 @@ class mitarbeiter extends benutzer
 				$obj = new StdClass();
 				$obj->oekurzbz = $row->standardkostenstelle;
 				$obj->bezeichnung = $row->bezeichnung;
-				
+
 				$this->result []= $obj;
 			}
 			return true;
