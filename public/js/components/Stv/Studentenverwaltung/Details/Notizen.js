@@ -9,8 +9,10 @@ export default {
 	},
 	data(){
 		return {
-			showErweitert: true, //show details verfasser, bearbeiter, von, bis, erledigt
+/*			showErweitert: true, //show details verfasser, bearbeiter, von, bis, erledigt
 			showDocument: true, //show upload documents
+			showTinyMCE: true
+ */
 		};
 	},
 	template: `
@@ -22,7 +24,8 @@ export default {
 			:id="modelValue.person_id"
 			:showErweitert=true
 			:showDocument=true
-			>		
+			:showTinyMCE=true
+			>
 		</NotizComponent>
 		
 		<br><br>
@@ -33,19 +36,9 @@ export default {
 			:id="modelValue.prestudent_id"
 			:showErweitert=false
 			:showDocument=true
-			>		
+			>
 		</NotizComponent>
 		
-		<br><br>
-		<h3>Test Projekt</h3>
-		<NotizComponent
-			ref="formc"
-			typeId="projekt_kurzbz"
-			:id="ZeitErfassung"
-			:showErweitert=true
-			:showDocument=false
-			>		
-		</NotizComponent>
 	</div>
 	`
 };

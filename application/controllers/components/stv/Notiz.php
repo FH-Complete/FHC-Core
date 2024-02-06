@@ -224,8 +224,8 @@ class Notiz extends FHC_Controller
 		$bearbeiter_uid = isset($_POST['bearbeiter']) ? $_POST['bearbeiter'] : $uid;
 		$erledigt = $this->input->post('erledigt');
 		//$type = $this->input->post('typeId'); //soll auch dieser geändert werden können?
-		$start = $this->input->post('Von');
-		$ende = $this->input->post('Bis');
+		$start = $this->input->post('von');
+		$ende = $this->input->post('bis');
 
 		$result = $this->NotizModel->update(
 			[
@@ -443,7 +443,7 @@ class Notiz extends FHC_Controller
 	public function titel_required($value)
 	{
 		if (empty($value)) {
-			$this->form_validation->set_message('titel_required',  $this->p->t('ui','error_fieldRequired',['field' => 'Titel']));
+			$this->form_validation->set_message('titel_required', $this->p->t('ui', 'error_fieldRequired', ['field' => 'Titel']));
 			return false;
 		}
 		else
@@ -455,7 +455,7 @@ class Notiz extends FHC_Controller
 	public function text_required($value)
 	{
 		if (empty($value)) {
-			$this->form_validation->set_message('text_required', $this->p->t('ui','error_fieldRequired',['field' => 'Text']));
+			$this->form_validation->set_message('text_required', $this->p->t('ui', 'error_fieldRequired', ['field' => 'Text']));
 			return false;
 		}
 		else

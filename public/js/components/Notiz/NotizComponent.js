@@ -18,7 +18,8 @@ export default {
 		'typeId',
 		'id',
 		'showErweitert',
-		'showDocument'
+		'showDocument',
+		'showTinyMCE'
 		],
 	data(){
 		return {
@@ -45,7 +46,9 @@ export default {
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.addEventListener('click', (event) =>
+							button.addEventListener(
+								'click',
+								(event) =>
 								this.actionEditNotiz(cell.getData().notiz_id)
 							);
 							container.append(button);
@@ -53,7 +56,9 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.addEventListener('click', () =>
+							button.addEventListener(
+								'click',
+								() =>
 								this.actionDeleteNotiz(cell.getData().notiz_id)
 							);
 							container.append(button);
@@ -61,8 +66,7 @@ export default {
 							return container;
 						},
 						frozen: true
-					}
-				],
+				}],
 				layout: 'fitDataFill',
 				layoutColumnsOnNewData: false,
 				height: '150',
@@ -109,14 +113,15 @@ export default {
 					this.notizData.titel = this.notizen.titel;
 					this.notizData.statusNew = false;
 					this.notizData.text = this.notizen.text;
+					this.notizData.intText = this.notizen.text;
 					this.notizData.lastChange = this.notizen.lastupdate;
 					this.notizData.von = this.notizen.start;
 					this.notizData.bis = this.notizen.ende;
 					this.notizData.document = this.notizen.dms_id;
 					this.notizData.erledigt = this.notizen.erledigt;
-					this.notizData.verfasser = this.notizen.verfasser_uid; //todo(manu) better
+					this.notizData.verfasser = this.notizen.verfasser_uid;
 					this.notizData.intVerfasser = this.notizen.verfasser_uid;
-					this.notizData.intBearbeiter = this.notizen.bearbeiter_uid; //todo(manu) better
+					this.notizData.intBearbeiter = this.notizen.bearbeiter_uid;
 					this.notizData.bearbeiter = this.notizen.bearbeiter_uid;
 				}
 			})
@@ -170,19 +175,17 @@ export default {
 						this.$fhcAlert.alertError('Keine Notiz mit Id ' + notiz_id + ' gefunden');
 					}
 				}).catch(error => {
-				this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
-			}).finally(()=> {
-				window.scrollTo(0, 0);
-			});
+					this.$fhcAlert.alertError('Fehler bei Löschroutine aufgetreten');
+				}).finally(()=> {
+					window.scrollTo(0, 0);
+				});
 		},
 		loadNotiz(notiz_id){
-			return CoreRESTClient.get(
-				'components/stv/Notiz/loadNotiz/' + notiz_id)
+			return CoreRESTClient.get('components/stv/Notiz/loadNotiz/' + notiz_id)
 				.then(
 					result => {
 						if(result.data.retval) {
 							this.notizen = result.data.retval;
-							//console.log(this.notizen);
 						}
 						else {
 							this.notizen = {};
@@ -273,7 +276,7 @@ export default {
 					this.filteredMitarbeiter = CoreRESTClient.getData(result.data);
 				});
 		},
-/*		initTinyMCE() {
+		initTinyMCE() {
 
 			const vm = this;
 			tinymce.init({
@@ -299,16 +302,22 @@ export default {
 
 					editor.on('input', () => {
 						const newContent = editor.getContent();
-						vm.intText =  newContent;
+						vm.notizData.text = newContent;
+						//vm.text =  newContent;
+						console.log('vm.text: ' + newContent);
 					});
 				},
 			});
-		},*/
+		},
+		updateText(value) {
+			this.notizData.text = value;
+		}
 	},
 	created(){
 		this.getUid();
 	},
 	async mounted() {
+		this.initTinyMCE();
 		await this.$p.loadCategory(['notiz','global']);
 
 		let cm = this.$refs.table.tabulator.columnManager;
@@ -341,11 +350,9 @@ export default {
 			title: this.$p.t('notiz', 'letzte_aenderung')
 		});
 	},
-/*	mounted() {
-		this.initTinyMCE();
-	},*/
-/*	watch: {
-		intText: function(newVal) {
+	watch: {
+		//watcher für Tinymce-Textfeld
+		'notizData.text': function (newVal) {
 			const tinymcsVal = this.editor.getContent();
 
 			if (tinymcsVal != newVal) {
@@ -353,11 +360,6 @@ export default {
 				this.editor.setContent(newVal);
 			}
 		},
-	},*/
-	beforeDestroy() {
-		this.editor.destroy();
-	},
-	watch: {
 		//Watcher für autocomplete Bearbeiter und Verfasser
 		'notizData.intBearbeiter': {
 			handler(newVal) {
@@ -375,6 +377,9 @@ export default {
 			},
 			deep: true
 		}
+	},
+	beforeDestroy() {
+		this.editor.destroy();
 	},
 	template: `
 	<div class="notiz-notiz">
@@ -431,14 +436,18 @@ export default {
 				<div class="row mb-3">
 					<label for="text" class="form-label col-sm-2">{{$p.t('global','text')}}</label>
 						
-					<!--Todo(manu) make TINYMCE optional	-->	
 					<!-- TinyMce 5 -->
-<!--					<div class="col-sm-7">
-						<textarea ref="editor" rows="5" cols="75" class="form-control"></textarea>
+					<div v-if="showTinyMCE"class="col-sm-7">
+						<textarea
+						ref="editor"
+						rows="5"
+						cols="75"
+						class="form-control"
+						:value="notizData.text"
+     					@input="updateText"></textarea>
 					</div>
-					-->
-
-					<div class="col-sm-7">
+					
+					<div v-else class="col-sm-7">
 						<textarea rows="5" cols="75" v-model="notizData.text" class="form-control"></textarea>
 					</div>
 				
@@ -470,7 +479,7 @@ export default {
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="von"
-							v-model="notizData.Von"
+							v-model="notizData.von"
 							clearable="false"
 							auto-apply
 							:enable-time-picker="false"
@@ -490,13 +499,13 @@ export default {
 					<div class="col-sm-3">
 						<vue-date-picker
 							id="bis"
-							v-model="notizData.Bis"
+							v-model="notizData.bis"
 							clearable="false"
 							auto-apply
 							:enable-time-picker="false"
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"></vue-date-picker>
-					</div>				
+					</div>
 					
 				</div>
 									
