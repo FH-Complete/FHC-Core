@@ -24,6 +24,11 @@ export default {
     onShowBsModal: Function,
     onShownBsModal: Function,
   },
+/*   provide(){
+    return {
+      topic: computed(()=> "test"),
+    }
+  }, */
   data() {
     return {
       topic: null,

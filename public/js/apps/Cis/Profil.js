@@ -44,9 +44,62 @@ const app = Vue.createApp({
 		ViewStudentProfil,
 		ViewMitarbeiterProfil,
 	},
-	provide: {
+	data() {
+		return {
+			editData: this.filteredEditData,
+			view:null,
+			data:null,
+			// notfound is null by default, but contains an UID if no user exists with that UID
+			notFoundUID:null,
+			
+		}
+	},
+	//? use function syntax for provide so that we can access `this`
+	provide() {
+		return {
 		
+			editData:this.editData,
+			collapseFunction:  (e, column)=> {
 		
+				//* check if property doesn't exist already and add it to the reactive this properties
+				if(this[e.target.id] === undefined){
+				this[e.target.id] = true
+			
+				} 
+				this[e.target.id]=!this[e.target.id];
+			
+				//* gets all event icons of the different rows to use the onClick event later
+				let allClickableIcons = column._column.cells.map((row) => {
+				return row.element.children[0];
+				});
+			
+				//* changes the icon that shows or hides all the collapsed columns
+				//* if the replace function does not find the class to replace, it just simply returns false
+				if (this[e.target.id]) {
+				e.target.classList.replace("fa-angle-up", "fa-angle-down");
+				} else {
+				e.target.classList.replace("fa-angle-down", "fa-angle-up");
+				}
+			
+				//* changes the icon for every collapsed column to open or closed
+				if (this[e.target.id]) {
+				allClickableIcons
+					.filter((column) => {
+					return !column.classList.contains("open");
+					})
+					.forEach((col) => {
+					col.click();
+					});
+				} else {
+				allClickableIcons
+					.filter((column) => {
+					return column.classList.contains("open");
+					})
+					.forEach((col) => {
+					col.click();
+					});
+				}
+		  },
 		  sortProfilUpdates: (ele1,ele2)=>{
 
 			let result = 0;
@@ -65,64 +118,95 @@ const app = Vue.createApp({
 			}
 			return result;
 		  }
-		
-	},
-	data() {
-		return {
-			view:null,
-			data:null,
-			// notfound is null by default, but contains an UID if no user exists with that UID
-			notFoundUID:null,
-			
 		}
+		
 	},
-	methods: {
-		//? arrow function because it references to the this element of the components that use the function
-		collapseFunction: function (e, column) {
-		
-		  //* check if property doesn't exist already and add it to the reactive this properties
-		  if(this[e.target.id] === undefined){
-			this[e.target.id] = true
-		
-		  } 
-		  this[e.target.id]=!this[e.target.id];
-	  
-		  //* gets all event icons of the different rows to use the onClick event later
-		  let allClickableIcons = column._column.cells.map((row) => {
-			return row.element.children[0];
-		  });
-	  
-		  //* changes the icon that shows or hides all the collapsed columns
-		  //* if the replace function does not find the class to replace, it just simply returns false
-		  if (this[e.target.id]) {
-			e.target.classList.replace("fa-angle-up", "fa-angle-down");
-		  } else {
-			e.target.classList.replace("fa-angle-down", "fa-angle-up");
-		  }
-	  
-		  //* changes the icon for every collapsed column to open or closed
-		  if (this[e.target.id]) {
-			allClickableIcons
-			  .filter((column) => {
-				return !column.classList.contains("open");
-			  })
-			  .forEach((col) => {
-				col.click();
-			  });
-		  } else {
-			allClickableIcons
-			  .filter((column) => {
-				return column.classList.contains("open");
-			  })
-			  .forEach((col) => {
-				col.click();
-			  });
-		  }
-		},
+	computed:{
 
-		
-        
+		filteredEditData(){
+			if(!this.data){
+				return;
+			}
+			
+			
+			return {
+			  view:null,
+			  data:{
+			  Personen_Informationen : {
+				title:"Personen Informationen",
+				view:null,
+				data:{
+				  
+				  vorname: {
+					title:"vorname",
+					view:"TextInputDokument",
+					withFiles:true,
+					data:{
+					  titel:"vorname",
+					  value:this.data.vorname,
+					  
+					}},
+					nachname: {
+					  title:"nachname",
+					  view:"TextInputDokument",
+					  withFiles:true,
+					  data:{
+						titel:"nachname",
+						value:this.data.nachname,
+					  }
+					},
+					titel:{
+					  title:"titel",
+					  view:"TextInputDokument",
+					  withFiles:true,
+					  data:{
+						titel:"titel",
+						value:this.data.titel,
+					  }
+					},
+					postnomen:{
+					  title:"postnomen",
+					  view:"TextInputDokument",
+					  withFiles:true,
+					  data:{
+						titel:"postnomen",
+						value:this.data.postnomen,
+					  }
+					},
+				  }
+				},
+				Private_Kontakte: {
+				  title:"Private Kontakte" ,
+				  data:this.data.kontakte.filter(item => {
+					return !this.data.profilUpdates.some((update) => update.status ==='pending' && update.requested_change?.kontakt_id === item.kontakt_id);
+				  }).map(kontakt => {
+					return {
+					  listview:'Kontakt',
+					  view:'EditKontakt',
+					  data:kontakt
+					}})
+				 },
+				Private_Adressen: {
+				  title: "Private Adressen",
+				  data:this.data.adressen.filter(item => {
+					return !this.data.profilUpdates.some(update => {
+					  return  update.status ==='pending' &&  update.requested_change?.adresse_id == item.adresse_id;
+					})
+				  }).map(kontakt => {
+					return {
+					  listview:'Adresse',
+					  view:'EditAdresse',
+					  data:kontakt
+					}})
+				 },
+				},
+			 
+			};
+		  },
+	  
 	},
+
+
 	created(){
 
 		let path = location.pathname;
@@ -145,7 +229,7 @@ const app = Vue.createApp({
 	},
 	template:`
 	<div>
-
+		<pre>{{JSON.stringify(data.profilUpdates.length,null,2)}}</pre>
 		<div v-if="notFoundUID">
 		
 			<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>

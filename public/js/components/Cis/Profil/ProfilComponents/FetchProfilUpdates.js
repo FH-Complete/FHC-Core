@@ -97,6 +97,7 @@ export default {
       if (content) {
         EditProfil.popup({
           value: content,
+          title: updateRequest.topic,
         })
           .then((res) => {
             if (res === true) {

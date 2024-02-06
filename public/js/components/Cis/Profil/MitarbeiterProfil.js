@@ -26,7 +26,7 @@ export default {
     RoleInformation,
     ProfilInformation,
   },
-  inject: ['sortProfilUpdates'],
+  inject: ['sortProfilUpdates','collapseFunction','editData'],
   data() {
     return {
 
@@ -56,7 +56,7 @@ export default {
             headerFilter: false,
             formatter: "responsiveCollapse",
             maxWidth: 40,
-            headerClick: this.$parent.collapseFunction,
+            headerClick: this.collapseFunction,
           },
           {
             title: "Bezeichnung",
@@ -108,7 +108,7 @@ export default {
             headerFilter: false,
             formatter: "responsiveCollapse",
             maxWidth: 40,
-            headerClick: this.$parent.collapseFunction,
+            headerClick: this.collapseFunction,
           },
           {
             title: "Betriebsmittel",
@@ -148,7 +148,7 @@ export default {
       Vue.$fhcapi.UserData.selectProfilRequest().then((res)=>{
         
         if(!res.error){
-          this.data.profilUpdates = res.data.retval?.length ? res.data.retval : null ; 
+          this.data.profilUpdates = res.data.retval?.length ? res.data.retval.sort(this.sortProfilUpdates) : null ; 
         }
       });
     },
@@ -156,7 +156,7 @@ export default {
     showModal() {
 
       EditProfil.popup({ 
-          value:JSON.parse(JSON.stringify(this.data.editData)),
+          value:JSON.parse(JSON.stringify(this.editData)),
           title:"Profil bearbeiten",
         }).then((popup_result) => {
           if(popup_result){
@@ -165,6 +165,7 @@ export default {
               if(!res.error){
                 this.data.profilUpdates = res.data.retval;
                 this.data.profilUpdates.sort(this.sortProfilUpdates);
+                
               }else{
                 alert("Error when fetching profile updates: " +res.data.retval);
               }
@@ -247,73 +248,7 @@ export default {
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates.sort(this.sortProfilUpdates);
 
-      this.data.editData = {
-        view:null,
-        data:{
-        Personen_Informationen : {
-          title:"Personen Informationen",
-          view:null,
-          data:{
-            
-            vorname: {
-              title:"vorname",
-              view:"TextInputDokument",
-              withFiles:true,
-              data:{
-                titel:"vorname",
-                value:this.data.vorname,
-                
-              }},
-              nachname: {
-                title:"nachname",
-                view:"TextInputDokument",
-                withFiles:true,
-                data:{
-                  titel:"nachname",
-                  value:this.data.nachname,
-                }
-              },
-              titel:{
-                title:"titel",
-                view:"TextInputDokument",
-                withFiles:true,
-                data:{
-                  titel:"titel",
-                  value:this.data.titel,
-                }
-              },
-              postnomen:{
-                title:"postnomen",
-                view:"TextInputDokument",
-                withFiles:true,
-                data:{
-                  titel:"postnomen",
-                  value:this.data.postnomen,
-                }
-              },
-            }
-          },
-          Private_Kontakte: {
-            title:"Private Kontakte" ,
-            data:this.privateKontakte.map(kontakt => {
-              return {
-                listview:'Kontakt',
-                view:'EditKontakt',
-                data:kontakt
-              }})
-           },
-          Private_Adressen: {
-            title: "Private Adressen",
-            data:this.privateAdressen.map(kontakt => {
-              return {
-                listview:'Adresse',
-                view:'EditAdresse',
-                data:kontakt
-              }})
-           },
-          },
-       
-      };
+      
 
   },
   mounted() {
@@ -331,7 +266,6 @@ export default {
   template: ` 
 
   <div class="container-fluid text-break fhc-form"  >
-
     
           <div class="row">
           
