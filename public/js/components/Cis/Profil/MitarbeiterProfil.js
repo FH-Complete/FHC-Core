@@ -26,6 +26,7 @@ export default {
     RoleInformation,
     ProfilInformation,
   },
+  inject: ['sortProfilUpdates'],
   data() {
     return {
 
@@ -163,6 +164,7 @@ export default {
             .then((res) =>{
               if(!res.error){
                 this.data.profilUpdates = res.data.retval;
+                this.data.profilUpdates.sort(this.sortProfilUpdates);
               }else{
                 alert("Error when fetching profile updates: " +res.data.retval);
               }
@@ -241,6 +243,9 @@ export default {
   },
  
   created() {
+
+    //? sorts the profil Updates: pending -> accepted -> rejected
+    this.data.profilUpdates.sort(this.sortProfilUpdates);
 
       this.data.editData = {
         view:null,

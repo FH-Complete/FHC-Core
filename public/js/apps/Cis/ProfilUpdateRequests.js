@@ -3,6 +3,25 @@ import { CoreFilterCmpt } from "../../components/filter/Filter.js";
 import AcceptDenyUpdate from "../../components/Cis/ProfilUpdate/AcceptDenyUpdate.js";
 Vue.$fhcapi = fhcapifactory;
 
+const sortProfilUpdates = (ele1,ele2)=>{
+
+  let result = 0;
+  if(ele1.status === 'pending'){
+    result= -1;
+  }
+  else if(ele1.status === 'accepted'){
+    result= ele2.status ==='rejected'? -1 : 1;
+  }
+  else{
+    result= 1;
+  }
+  //? if they have the same status the insert date is used for ordering
+  if(ele1.status === ele2.status){
+    result= new Date(ele2.insertamum.split('.').reverse().join('-')) - new Date(ele1.insertamum.split('.').reverse().join('-'));
+  }
+  return result;
+  };
+
 const app = Vue.createApp({
   components: {
     CoreFilterCmpt,
@@ -12,7 +31,39 @@ const app = Vue.createApp({
       showAll: false,
       profil_updates_table_options: {
         
-       
+        ajaxResponse:function(url, params, response){
+            //url - the URL of the request
+            //params - the parameters passed with the request
+            //response - the JSON object returned in the body of the response.
+            //? sorts the response data from the backend
+            response.sort(sortProfilUpdates);
+            return response;  
+        },
+        //? adds tooltip with the status message of a profil update request if its status is not pending
+        columnDefaults:{
+          tooltip:function(e, cell, onRendered){
+              //e - mouseover event
+              //cell - cell component
+              //onRendered - onRendered callback registration function
+              let statusMessage = cell.getData().status_message;
+              let statusDate = cell.getData().status_timestamp;
+              let status = cell.getData().status;
+              if(!statusMessage){
+                return null;
+              }
+              let el = document.createElement("div");
+              el.classList.add("border","border-dark");
+              
+              let statusDateEl = document.createElement("p");
+              statusDateEl.innerHTML = "Request was "+ status + " on " + statusDate ;
+              let statusMessageEl = document.createElement("span");
+              statusMessageEl.innerHTML = "Status message: " + statusMessage ;
+              
+              el.appendChild(statusDateEl);
+              el.appendChild(statusMessageEl);  
+              return el; 
+          },
+      },
         rowContextMenu: (e, component)=>{
 
           let menu =[];
@@ -79,7 +130,7 @@ const app = Vue.createApp({
         },
         height: 600,
         layout: "fitColumns",
-
+       
         columns: [
           {
             title: "UID",
@@ -122,11 +173,11 @@ const app = Vue.createApp({
 
               switch (cell.getValue()) {
                 case "pending":
-                  return "<i class='fa fa-circle-info text-info fa-lg'></i> pending";
+                  return "<div class='row justify-content-center'><div class='col-2'><i class='fa fa-circle-info text-info fa-lg'></i></div> <div class='col-4'><span>pending</span></div></div>";
                 case "accepted":
-                  return "<i class='fa fa-circle-check text-success fa-lg'></i> accepted";
+                  return "<div class='row justify-content-center'><div class='col-2'><i class='fa fa-circle-check text-success fa-lg'></i></div> <div class='col-4'><span>accepted</span></div></div>";
                 case "rejected":
-                  return "<i class='fa-solid fa-circle-xmark text-danger fa-lg '></i> rejected";
+                  return "<div class='row justify-content-center'><div class='col-2'><i class='fa-solid fa-circle-xmark text-danger fa-lg '></i></div> <div class='col-4'><span>rejected</span></div></div>";
                 default:
                   return "<p>default</p>";
               }

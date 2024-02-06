@@ -84,7 +84,7 @@ export default {
     }
   },
   template: `
-    <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">Please update your {{data.titel}} and upload the corresponding Document for proof</p>
+    <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">Please update your {{data.titel}} and upload the corresponding Document of proof</p>
 
     <div class="form-underline">
     <div class="form-underline-titel">{{data.titel?data.titel:"titel"}}</div>

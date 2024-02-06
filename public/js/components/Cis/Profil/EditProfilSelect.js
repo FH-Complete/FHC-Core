@@ -95,6 +95,7 @@ export default {
       this.$emit("submit");
     },
 
+    //TODO: REWRITE THIS TO USE PROVIDE AND INJECT
     profilUpdateEmit: function (event) {
       //? passes the updated profil information to the parent component
 

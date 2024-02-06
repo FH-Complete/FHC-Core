@@ -44,6 +44,29 @@ const app = Vue.createApp({
 		ViewStudentProfil,
 		ViewMitarbeiterProfil,
 	},
+	provide: {
+		
+		
+		  sortProfilUpdates: (ele1,ele2)=>{
+
+			let result = 0;
+			if(ele1.status === 'pending'){
+			  result= -1;
+			}
+			else if(ele1.status === 'accepted'){
+			  result= ele2.status ==='rejected'? -1 : 1;
+			}
+			else{
+			  result= 1;
+			}
+			//? if they have the same status the insert date is used for ordering
+			if(ele1.status === ele2.status){
+			  result= new Date(ele2.insertamum.split('.').reverse().join('-')) - new Date(ele1.insertamum.split('.').reverse().join('-'));
+			}
+			return result;
+		  }
+		
+	},
 	data() {
 		return {
 			view:null,
