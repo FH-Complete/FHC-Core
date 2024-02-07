@@ -1,3 +1,5 @@
+var i = 0;
+
 export default {
 	inject: [
 		'$registerToForm'
@@ -31,7 +33,7 @@ export default {
 	},
 	template: `
 	<template v-for="(arr, key) in feedback" :key="key">
-		<div v-for="msg in arr" :key="msg" class="alert alert-dismissible fade show" :class="'alert-' + key" role="alert">
+		<div v-for="msg in arr" :key="i++" class="alert alert-dismissible fade show" :class="'alert-' + key" role="alert">
 			{{msg}}
 			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 		</div>
