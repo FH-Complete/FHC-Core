@@ -1,6 +1,6 @@
 <?php
 
-class Profil_change_model extends DB_Model
+class Profil_update_model extends DB_Model
 {
 	/**
 	 * Constructor
@@ -8,7 +8,7 @@ class Profil_change_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = 'public.tbl_cis_profil_update';
+		$this->dbTable = 'public.tbl_profil_update';
 		$this->pk = ['profil_update_id'];
         $this->hasSequence = true;
 
@@ -61,8 +61,8 @@ class Profil_change_model extends DB_Model
 		
 		$res =[];
 		if($studentBerechtigung) {
-			$this->addJoin('tbl_student','tbl_student.student_uid=tbl_cis_profil_update.uid');
-			$studentRequests = $this->loadWhere(isset($whereClause['status']) && $whereClause['status']? ['status'=>$whereClause['status']]:[]);
+			$this->addJoin('tbl_student','tbl_student.student_uid=tbl_profil_update.uid');
+			$studentRequests = $this->loadWhere($whereClause);
 			if(isError($studentRequests)) return error("db error: ". getData($studentRequests));
 			$studentRequests = getData($studentRequests)?:[]; 
 			foreach($studentRequests as $request){
@@ -70,8 +70,8 @@ class Profil_change_model extends DB_Model
 			}
 		}
 		if($mitarbeiterBerechtigung) {
-			$this->addJoin('tbl_mitarbeiter','tbl_mitarbeiter.mitarbeiter_uid=tbl_cis_profil_update.uid');
-			$mitarbeiterRequests = $this->loadWhere(isset($whereClause['status']) && $whereClause['status']? ['status'=>$whereClause['status']]:[]);
+			$this->addJoin('tbl_mitarbeiter','tbl_mitarbeiter.mitarbeiter_uid=tbl_profil_update.uid');
+			$mitarbeiterRequests = $this->loadWhere($whereClause);
 			if(isError($mitarbeiterRequests)) return error("db error: ". getData($mitarbeiterRequests));
 			$mitarbeiterRequests = getData($mitarbeiterRequests)?:[]; 
 			foreach($mitarbeiterRequests as $request){

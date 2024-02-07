@@ -178,7 +178,7 @@ const app = Vue.createApp({
 				Private_Kontakte: {
 				  title:"Private Kontakte" ,
 				  data:this.data.kontakte.filter(item => {
-					return !this.data.profilUpdates.some((update) => update.status ==='pending' && update.requested_change?.kontakt_id === item.kontakt_id);
+					return !this.data.profilUpdates?.some((update) => update.status ==='pending' && update.requested_change?.kontakt_id === item.kontakt_id);
 				  }).map(kontakt => {
 					return {
 					  listview:'Kontakt',
@@ -189,7 +189,7 @@ const app = Vue.createApp({
 				Private_Adressen: {
 				  title: "Private Adressen",
 				  data:this.data.adressen.filter(item => {
-					return !this.data.profilUpdates.some(update => {
+					return !this.data.profilUpdates?.some(update => {
 					  return  update.status ==='pending' &&  update.requested_change?.adresse_id == item.adresse_id;
 					})
 				  }).map(kontakt => {

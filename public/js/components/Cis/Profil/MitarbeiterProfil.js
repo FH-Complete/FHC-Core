@@ -225,7 +225,7 @@ export default {
   created() {
     
     //? sorts the profil Updates: pending -> accepted -> rejected
-    this.data.profilUpdates.sort(this.sortProfilUpdates);
+    this.data.profilUpdates?.sort(this.sortProfilUpdates);
 
       
 

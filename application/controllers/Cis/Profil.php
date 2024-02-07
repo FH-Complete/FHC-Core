@@ -42,7 +42,7 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 		$this->load->model('ressource/Betriebsmittelperson_model', 'BetriebsmittelpersonModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
-		$this->load->model('person/Profil_change_model', 'ProfilChangeModel');
+		$this->load->model('person/Profil_update_model', 'ProfilUpdateModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->load->model('DmsVersion_model','DmsVersionModel');
 
@@ -172,7 +172,7 @@ class Profil extends Auth_Controller
 		if(isset($uid)) $whereClause['uid'] = $uid;
 		if(isset($id)) $whereClause['id'] = $id;
 		
-		$res= $this->ProfilChangeModel->getProfilUpdate($whereClause);
+		$res= $this->ProfilUpdateModel->getProfilUpdate($whereClause);
 
 		echo json_encode($res);
 		
@@ -181,7 +181,7 @@ class Profil extends Auth_Controller
 
 	public function getProfilRequestFiles(){
 		$id = json_decode($this->input->raw_input_stream);
-		echo json_encode($this->ProfilChangeModel->getFilesFromChangeRequest($id));
+		echo json_encode($this->ProfilUpdateModel->getFilesFromChangeRequest($id));
 	}
 
 	public function insertProfilRequest()
@@ -201,7 +201,7 @@ class Profil extends Auth_Controller
 		$data = ["topic"=>$json->topic,"uid" => $this->uid, "name"=>getData($name), "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
-		$res = $this->ProfilChangeModel->loadWhere(["uid"=>$this->uid]);
+		$res = $this->ProfilUpdateModel->loadWhere(["uid"=>$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
 		
 		if($res){
@@ -225,13 +225,13 @@ class Profil extends Auth_Controller
 			}
 		}}
 		
-			$insertID = $this->ProfilChangeModel->insert($data);
+			$insertID = $this->ProfilUpdateModel->insert($data);
 				
 			if(isError($insertID)){
 				//catch error
 			}else{
 				$insertID = hasData($insertID)? getData($insertID): null;
-				$editTimestamp = $this->ProfilChangeModel->getTimestamp($insertID);
+				$editTimestamp = $this->ProfilUpdateModel->getTimestamp($insertID);
 				
 				$date = success(date_create($editTimestamp)->format('d.m.Y'));
 				echo json_encode($date);
@@ -244,12 +244,12 @@ class Profil extends Auth_Controller
 		$json = json_decode($this->input->raw_input_stream);
 		
 		
-		$updateID =$this->ProfilChangeModel->update([$json->ID],["requested_change" => json_encode($json->payload), "updateamum" => "NOW()", "updatevon" => $this->uid]);
+		$updateID =$this->ProfilUpdateModel->update([$json->ID],["requested_change" => json_encode($json->payload), "updateamum" => "NOW()", "updatevon" => $this->uid]);
 		if(isError($updateID)){
 			//catch error
 		}else{
 			$updateID = hasData($updateID)? getData($updateID)[0]: null;
-			$editTimestamp = $this->ProfilChangeModel->getTimestamp($updateID,true);
+			$editTimestamp = $this->ProfilUpdateModel->getTimestamp($updateID,true);
 			
 			$date = success(date_create($editTimestamp)->format('d.m.Y')); 
 			echo json_encode($date);
@@ -259,7 +259,7 @@ class Profil extends Auth_Controller
 	public function deleteProfilRequest(){
 
 		$json = json_decode($this->input->raw_input_stream);
-		$delete_res = $this->ProfilChangeModel->delete([$json]);
+		$delete_res = $this->ProfilUpdateModel->delete([$json]);
 		echo json_encode($delete_res);
 	}
 
@@ -659,7 +659,7 @@ class Profil extends Auth_Controller
 
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate(['uid'=>$this->uid]);
+		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdate(['uid'=>$this->uid]);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{
@@ -865,7 +865,7 @@ class Profil extends Auth_Controller
 		}
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilChangeModel->getProfilUpdate(['uid'=>$this->uid]);
+		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdate(['uid'=>$this->uid]);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{

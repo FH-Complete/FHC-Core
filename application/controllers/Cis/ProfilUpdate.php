@@ -21,7 +21,7 @@ class ProfilUpdate extends Auth_Controller
 		]);
 		
 
-		$this->load->model('person/Profil_change_model','ProfilChangeModel');
+		$this->load->model('person/Profil_update_model','ProfilUpdateModel');
 		$this->load->model('person/Kontakt_model','KontaktModel');
 		$this->load->model('person/Adresse_model','AdresseModel');
 		$this->load->model('person/Adressentyp_model', 'AdressenTypModel');
@@ -48,7 +48,7 @@ class ProfilUpdate extends Auth_Controller
 	public function getProfilUpdates($status=null){
 		
 		
-		$res = $this->ProfilChangeModel->getProfilUpdate(isset($status)?['status'=>$status]:null);
+		$res = $this->ProfilUpdateModel->getProfilUpdate(isset($status)?['status'=>$status]:null);
 		
 		echo json_encode($res);
 	}
@@ -125,11 +125,11 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	private function updateRequestedChange($id, $requested_change){
-		return $this->ProfilChangeModel->update([$id], ['requested_change'=>json_encode($requested_change)]);
+		return $this->ProfilUpdateModel->update([$id], ['requested_change'=>json_encode($requested_change)]);
 	}
 
 	private function setStatusOnUpdateRequest($id, $status, $status_message ){ 
-		return $this->ProfilChangeModel->update([$id], ["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message]);
+		return $this->ProfilUpdateModel->update([$id], ["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message]);
 	}
 
 
