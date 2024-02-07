@@ -7,9 +7,16 @@ export default {
 	components: {
 		FhcFragment
 	},
-	inject: [
-		'$registerToForm'
-	],
+	inject: {
+		registerToForm: {
+			from: '$registerToForm',
+			default: null
+		},
+		clearValidationForName: {
+			from: '$clearValidationForName',
+			default: null
+		}
+	},
 	props: {
 		bsFeedback: Boolean,
 		noAutoClass: Boolean,
@@ -72,8 +79,6 @@ export default {
 		},
 		tag() {
 			switch (this.lcType) {
-				case 'textarea+':
-					return 'textarea';
 				case 'textarea':
 				case 'select':
 					return this.lcType;
@@ -126,7 +131,6 @@ export default {
 					case 'number':
 					case 'password':
 					case 'textarea':
-					case 'textarea+':
 						if (!c.includes('form-control'))
 							classes.push('form-control');
 						break;
@@ -180,12 +184,30 @@ export default {
 			this.valid = undefined;
 			this.feedback = [];
 		},
+		clearValidationForThisName() {
+			if (this.valid === undefined)
+				return;
+			if (this.clearValidationForName && this.name)
+				this.clearValidationForName(this.name);
+			else
+				this.clearValidation();
+		},
 		setFeedback(valid, feedback) {
 			if (!feedback)
 				feedback = [];
 			if (!Array.isArray(feedback))
 				feedback = [feedback];
 			this.valid = valid;
+			// NOTE(chris): On a list of radios/checkboxes only add the feedback message to the last item
+			if (this.name && (this.lcType == 'radio' || this.lcType == 'checkbox')) {
+				let n = this.$el.nextSibling;
+				for (; n; n = n.nextSibling)
+					if (n.nodeType == 1
+						&& n.__vueParentComponent?.ctx?.lcType == this.lcType
+						&& n.__vueParentComponent?.ctx?.name == this.name
+						)
+						return;
+			}
 			this.feedback = feedback;
 		},
 		_loadComponents() {
@@ -207,15 +229,15 @@ export default {
 		this._loadComponents();
 	},
 	mounted() {
-		if (this.$registerToForm)
-			this.$registerToForm(this);
+		if (this.registerToForm)
+			this.registerToForm(this);
 	},
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
 		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :for="idCmp">{{$attrs.label}}</label>
-		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
-		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)"></textarea>
-		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidation(); $emit('input', $event)">
+		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
+		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)"></textarea>
+		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
 			<slot></slot>
 		</select>
 		<component
@@ -230,7 +252,7 @@ export default {
 			:class="validationClass"
 			:input-class-name=
 			"[...Object.entries({'form-control': !noAutoClass, 'is-valid': valid === true, 'is-invalid': valid === false}).reduce((a,[k,v]) => {if(v) a.push(k);return a}, []), ...($attrs['input-class-name'] ? $attrs['input-class-name'].split(' ') : [])].join(' ')"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>
@@ -245,7 +267,7 @@ export default {
 			:input-props="{name}"
 			:class="validationClass"
 			:input-class="[...Object.entries({'form-control': !noAutoClass, 'is-valid': valid === true, 'is-invalid': valid === false}).reduce((a,[k,v]) => {if(v) a.push(k);return a}, []), ...($attrs['input-class'] ? $attrs['input-class'].split(' ') : [])].join(' ')"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>
@@ -261,7 +283,7 @@ export default {
 			:class="validationClass"
 			:input-class="validationClass"
 			:no-list="inputGroup"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>
@@ -275,12 +297,11 @@ export default {
 			:id="idCmp"
 			:name="name"
 			:class="validationClass"
-			@update:model-value="clearValidation"
+			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>
 		</component>
 		<label v-if="$attrs.label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{$attrs.label}}</label>
-		<div v-if="lcType == 'textarea' && $attrs.maxlength" class="form-text text-end">{{ modelValueCmp?.length || 0 }} / {{ $attrs.maxlength }}</div>
 		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">
