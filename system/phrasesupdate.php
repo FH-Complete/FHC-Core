@@ -24135,7 +24135,27 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+		array(
+			'app' => 'lehrauftrag',
+			'category' => 'ui',
+			'phrase' => 'hinweistextLehrauftrag',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => '<strong>Hinweis:</strong> Das Akzeptieren von Lehraufträgen ersetzt alle vorhergehenden Lehraufträge dieses Studiensemesters.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => '<strong>Note:</strong> Accepting teaching assignments replaces all previous teaching assignments for this study semester.',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		)
 );
 
 
