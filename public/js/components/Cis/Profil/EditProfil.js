@@ -109,9 +109,7 @@ export default {
         if(filesToDelete.length > 0) {
           Vue.$fhcapi.UserData.deleteOldVersionFiles(
             filesToDelete
-          ).then((res) => {
-            console.log(res);
-          });  
+          );
         }
        
 

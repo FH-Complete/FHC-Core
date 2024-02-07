@@ -46,7 +46,7 @@ const app = Vue.createApp({
 	},
 	data() {
 		return {
-			editData: this.filteredEditData,
+			
 			view:null,
 			data:null,
 			// notfound is null by default, but contains an UID if no user exists with that UID
@@ -58,7 +58,7 @@ const app = Vue.createApp({
 	provide() {
 		return {
 		
-			editData:this.editData,
+			
 			collapseFunction:  (e, column)=> {
 		
 				//* check if property doesn't exist already and add it to the reactive this properties
@@ -229,14 +229,14 @@ const app = Vue.createApp({
 	},
 	template:`
 	<div>
-		<pre>{{JSON.stringify(data.profilUpdates.length,null,2)}}</pre>
+	
 		<div v-if="notFoundUID">
 		
 			<h3>Es wurden keine oder mehrere Profile für {{this.notFoundUID}} gefunden</h3>
 
 		</div>
 
-		<component v-else :is="view" :data="data" ></component>
+		<component v-else :is="view" :data="data" :editData="filteredEditData" ></component>
 	
 	</div>`
 	

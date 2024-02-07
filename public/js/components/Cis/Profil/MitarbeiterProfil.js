@@ -26,7 +26,7 @@ export default {
     RoleInformation,
     ProfilInformation,
   },
-  inject: ['sortProfilUpdates','collapseFunction','editData'],
+  inject: ['sortProfilUpdates','collapseFunction'],
   data() {
     return {
 
@@ -136,6 +136,7 @@ export default {
 
   props: {
 		data: Object,
+    editData: Object,
 	},
   
   methods: {
@@ -218,33 +219,11 @@ export default {
       };
     },
 
-    personEmails() {
-      return this.data?.emails ? this.data.emails : [];
-    },
-
-    privateKontakte() {
-      if (!this.data) {
-        return {};
-      }
-
-      return this.data.kontakte;
-      
-    },
-
-    privateAdressen() {
-      if (!this.data) {
-        return {};
-      }
-
-      return this.data.adressen;
-      
-    },
-    
 
   },
  
   created() {
-
+    
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates.sort(this.sortProfilUpdates);
 
@@ -348,7 +327,7 @@ export default {
                     <div class="row mb-4">
                     <div class="col">
                     <!-- EMAILS -->
-                    <profil-emails :data="personEmails" ></profil-emails>
+                    <profil-emails :data="data.emails" ></profil-emails>
                     </div>
                     </div>
 
@@ -365,7 +344,7 @@ export default {
                           <div class="card-body ">
                             
                             <div  class="gy-3  row ">
-                            <div v-for="element in privateKontakte" class="col-12">
+                            <div v-for="element in data.kontakte" class="col-12">
                             
                             <Kontakt :data="element"></Kontakt>
                             
@@ -387,7 +366,7 @@ export default {
                             <div class="card-body">
                             
                               <div class="gy-3 row ">
-                                <div v-for="element in privateAdressen" class="col-12">
+                                <div v-for="element in data.adressen" class="col-12">
                                 <Adresse :data="element"></Adresse>
                                  
                               </div>

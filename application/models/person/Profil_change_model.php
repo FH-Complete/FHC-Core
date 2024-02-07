@@ -12,6 +12,9 @@ class Profil_change_model extends DB_Model
 		$this->pk = ['profil_update_id'];
         $this->hasSequence = true;
 
+
+		$this->load->model('crm/Student_model','StudentModel');
+		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
 	}
 
 	/**
@@ -50,22 +53,41 @@ class Profil_change_model extends DB_Model
 	 * returns all profil updates if id is set to null
 	 */
 	public function getProfilUpdate($whereClause=null){
-		
-		$res = $this->loadWhere($whereClause);
-		if(isError($res)){
-			// catch error
-		}else{
-			if(hasData($res)){
-				
-				foreach($res->retval as $update){
-					$update->requested_change = json_decode($update->requested_change);
-					$update->insertamum = !is_null($update->insertamum)?date_create($update->insertamum)->format('d.m.Y'):null;
-					$update->updateamum = !is_null($update->updateamum)?date_create($update->updateamum)->format('d.m.Y'):null;
-					$update->status_timestamp = !is_null($update->status_timestamp)?date_create($update->status_timestamp)->format('d.m.Y'):null;
-					 
-				}
+		$res =[];
+		if($whereClause["studentView"]) {
+			$this->addJoin('tbl_student','tbl_student.student_uid=tbl_cis_profil_update.uid');
+			$studentRequests = $this->loadWhere(isset($whereClause['status']) && $whereClause['status']? ['status'=>$whereClause['status']]:[]);
+			if(isError($studentRequests)) return error("db error: ". getData($studentRequests));
+			$studentRequests = getData($studentRequests)?:[]; 
+			foreach($studentRequests as $request){
+				array_push($res,$request);
 			}
 		}
+		if($whereClause["mitarbeiterView"]) {
+			$this->addJoin('tbl_mitarbeiter','tbl_mitarbeiter.mitarbeiter_uid=tbl_cis_profil_update.uid');
+			$mitarbeiterRequests = $this->loadWhere(isset($whereClause['status']) && $whereClause['status']? ['status'=>$whereClause['status']]:[]);
+			if(isError($mitarbeiterRequests)) return error("db error: ". getData($mitarbeiterRequests));
+			$mitarbeiterRequests = getData($mitarbeiterRequests)?:[]; 
+			foreach($mitarbeiterRequests as $request){
+				array_push($res,$request);
+			}
+		}
+		
+		
+	
+		if($res){
+			
+			foreach($res as $update){
+			
+				
+				$update->requested_change = json_decode($update->requested_change);
+				$update->insertamum = !is_null($update->insertamum)?date_create($update->insertamum)->format('d.m.Y'):null;
+				$update->updateamum = !is_null($update->updateamum)?date_create($update->updateamum)->format('d.m.Y'):null;
+				$update->status_timestamp = !is_null($update->status_timestamp)?date_create($update->status_timestamp)->format('d.m.Y'):null;
+					
+			}
+		}
+		
 		return $res;
 
 	}

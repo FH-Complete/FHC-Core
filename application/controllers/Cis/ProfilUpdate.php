@@ -11,10 +11,10 @@ class ProfilUpdate extends Auth_Controller
 
 	public function __construct(){
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r', 'user:r'], // TODO(chris): permissions?
-			'getProfilUpdates' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'acceptProfilRequest'=>['user:r'],
-			'denyProfilRequest'=>['user:r'],
+			'index' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
+			'getProfilUpdates' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
+			'acceptProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
+			'denyProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
 			'show'=>['user:r'],
 			
 
@@ -46,12 +46,16 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	public function getProfilUpdates($status=null){
+		$this->load->library('PermissionLib');
+		$studentBerechtigung = $this->permissionlib->isBerechtigt('student/stammdaten','s');
+		$mitarbeiterBerechtigung = $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten','s');
+		
+		$options = ["mitarbeiterView"=>$mitarbeiterBerechtigung,"studentView"=>$studentBerechtigung];
 		if(isset($status)){
-			$res = $this->ProfilChangeModel->getProfilUpdate(["status"=>$status]);
-		}else{
-			$res = $this->ProfilChangeModel->getProfilUpdate();
+			$options['status'] = $status;
 		}
-		$res = hasData($res)? getData($res) : null;
+		$res = $this->ProfilChangeModel->getProfilUpdate($options);
+		
 		echo json_encode($res);
 	}
 

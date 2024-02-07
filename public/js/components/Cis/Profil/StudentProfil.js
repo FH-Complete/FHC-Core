@@ -24,6 +24,7 @@ export default {
     FetchProfilUpdates,
 
   },
+  inject:['sortProfilUpdates'],
   data() {
     return {
       
@@ -76,14 +77,17 @@ export default {
     };
   },
 
-  props: ["data"],
+  props: {
+    data:Object,
+    editData:Object,
+  },
   methods: {
 
     fetchProfilUpdates: function(){
       Vue.$fhcapi.UserData.selectProfilRequest().then((res)=>{
         
         if(!res.error){
-          this.data.profilUpdates = res.data.retval?.length ? res.data.retval : null ; 
+          this.data.profilUpdates = res.data.retval?.length ? res.data.retval.sort(this.sortProfilUpdates) : null ; 
         }
       });
     },
@@ -91,14 +95,14 @@ export default {
     showModal() {
 
       EditProfil.popup({ 
-          value:JSON.parse(JSON.stringify(this.data.editData)),
+          value:JSON.parse(JSON.stringify(this.editData)),
           title:"Profil bearbeiten",
         }).then((popup_result) => {
           if(popup_result){
             Vue.$fhcapi.UserData.selectProfilRequest()
             .then((res) =>{
               if(!res.error){
-                this.data.profilUpdates = res.data.retval;
+                this.data.profilUpdates = res.data.retval.sort(this.sortProfilUpdates);
               }else{
                 alert("Error when fetching profile updates: " +res.data.retval);
               }
@@ -133,10 +137,6 @@ export default {
       };
     },
 
-    personEmails() {
-      return this.data?.emails ? this.data.emails : [];
-    },
-
    
     roleInformation() {
       if (!this.data) {
@@ -154,89 +154,10 @@ export default {
       };
     },
 
-    privateKontakte() {
-      if (!this.data) {
-        return {};
-      }
-      return this.data.kontakte;
-    },
-
-    privateAdressen() {
-      if (!this.data) {
-        return {};
-      }
-      return this.data.adressen;
-    },
     
   },
 
   created(){
-    this.data.editData = {
-      view:null,
-      data:{
-      Personen_Informationen : {
-        title:"Personen Informationen",
-        view:null,
-        data:{
-          
-          vorname: {
-            title:"vorname",
-            view:"TextInputDokument",
-            withFiles:true,
-            data:{
-              titel:"vorname",
-              value:this.data.vorname,
-            }},
-            nachname: {
-              title:"nachname",
-              view:"TextInputDokument",
-              withFiles:true,
-              data:{
-                titel:"nachname",
-                value:this.data.nachname,
-              }
-            },
-            titel:{
-              title:"titel",
-              view:"TextInputDokument",
-              withFiles:true,
-              data:{
-                titel:"titel",
-                value:this.data.titel,
-              }
-            },
-            postnomen:{
-              title:"postnomen",
-              view:"TextInputDokument",
-              withFiles:true,
-              data:{
-                titel:"postnomen",
-                value:this.data.postnomen,
-              }
-            },
-          }
-        },
-        Private_Kontakte: {
-          title:"Private Kontakte" ,
-          data:this.privateKontakte.map(kontakt => {
-            return {
-              listview:'Kontakt',
-              view:'EditKontakt',
-              data:kontakt
-            }})
-         },
-        Private_Adressen: {
-          title: "Private Adressen",
-          data:this.privateAdressen.map(kontakt => {
-            return {
-              listview:'Adresse',
-              view:'EditAdresse',
-              data:kontakt
-            }})
-         },
-        },
-     
-    };
   },
 
   mounted() {
@@ -361,7 +282,7 @@ export default {
                     <div class="row mb-4">
                     <div class="col">
                     <!-- EMAILS -->
-                    <profil-emails :data="personEmails" ></profil-emails>
+                    <profil-emails :data="data.emails" ></profil-emails>
                     </div>
                     </div>
 
@@ -379,7 +300,7 @@ export default {
                           <div class="card-body ">
                             
                             <div  class="gy-3  row ">
-                            <div v-for="element in privateKontakte" class="col-12">
+                            <div v-for="element in data.kontakte" class="col-12">
                             
                             <Kontakt :data="element"></Kontakt>
                             
@@ -400,7 +321,7 @@ export default {
                           <div class="card-body">
                           
                             <div class="gy-3 row ">
-                              <div v-for="element in privateAdressen" class="col-12">
+                              <div v-for="element in data.adressen" class="col-12">
                               <Adresse :data="element"></Adresse>
                                
                             </div>

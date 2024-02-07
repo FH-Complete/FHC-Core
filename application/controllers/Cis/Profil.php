@@ -16,7 +16,7 @@ class Profil extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['student/anrechnung_beantragen:r', 'user:r'], // TODO(chris): permissions?
+			'index' => ['student/anrechnung_beantragen:r', 'user:r'], 
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
@@ -62,6 +62,16 @@ class Profil extends Auth_Controller
 	/**
 	 * @return void
 	 */
+
+	 public function test(){
+		
+		// Loads permission lib
+		$this->load->library('PermissionLib');
+		$mit_daten =$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten','suid');
+		var_dump($mit_daten);
+		$stud_daten = $this->permissionlib->isBerechtigt('student/stammdaten','suid');
+		var_dump($stud_daten);
+	}
 
 
 	public function index()
@@ -149,12 +159,7 @@ class Profil extends Auth_Controller
 		echo json_encode($res);
 	}
 
-	public function test(){
-		
-		// Loads permission lib
-		$this->load->library('PermissionLib');
-		var_dump($this->permissionlib->getOE_isEntitledFor());
-	}
+	
 
 
 

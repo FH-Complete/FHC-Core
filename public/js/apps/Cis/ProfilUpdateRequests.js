@@ -36,7 +36,9 @@ const app = Vue.createApp({
             //params - the parameters passed with the request
             //response - the JSON object returned in the body of the response.
             //? sorts the response data from the backend
+            if(response)
             response.sort(sortProfilUpdates);
+            
             return response;  
         },
         //? adds tooltip with the status message of a profil update request if its status is not pending
@@ -122,11 +124,11 @@ const app = Vue.createApp({
         ajaxURLGenerator: (url,config,params)=>{
           //? this function needs to be an array function in order to access the this properties of the Vue component
           if(this.showAll){
-            return url +"getProfilUpdates";
+           return url +"getProfilUpdates";
           }else{
             return url +"getProfilUpdates/pending";
           }
-          
+       
         },
         height: 600,
         layout: "fitColumns",
@@ -238,13 +240,13 @@ const app = Vue.createApp({
       
       this.$refs.UpdatesTable.tabulator.setData(); 
       //? store the selected view in the session storage of the browser
-      sessionStorage.setItem("showAll",event.target.value);
+      sessionStorage.setItem("showAll",JSON.stringify(event.target.value));
     }
   },
   mounted() {
     if(!(sessionStorage.getItem("showAll")===null))
     {
-      this.showAll = sessionStorage.getItem("showAll");
+      this.showAll = JSON.parse(sessionStorage.getItem("showAll"));
     }
    
   },
