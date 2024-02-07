@@ -152,6 +152,13 @@ class Notiz_model extends DB_Model
 		$verfasser_uid = null,
 		$bearbeiter_uid = null
 	) {
+
+		//check, ob id und type valid
+		if (!isset($id) || ($id == "undefined")) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return error("Id(". $id. ') ist keine gültige ID!');
+		}
+
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 
@@ -160,17 +167,8 @@ class Notiz_model extends DB_Model
 		if (isError($result))
 		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-
-			$result = error($result->retval, EXIT_ERROR);
-			return $result;
+			return error($type . ' ist kein gültiger ID_TYP!');
 		}
-/*
-		if(!$isValidType)
-		{
-			//Todo manu (correct return to controller)
-			$msg = "datatype " . $type . " not implemented for notes";
-			return error($msg, EXIT_ERROR);
-		}*/
 
 		// Start DB transaction
 		$this->db->trans_start(false);

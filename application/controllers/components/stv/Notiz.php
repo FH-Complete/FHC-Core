@@ -100,21 +100,6 @@ class Notiz extends FHC_Controller
 			}
 		}
 
-		//Überprüfung ob type übergeben wurde (via Funktions- oder Postparameter)
-		$type = null;
-		if ($paramTyp)
-			$type = $paramTyp;
-		if(isset($_POST['typeId']))
-			$type = $this->input->post('typeId');
-
-		if(!$type)
-		{
-			$result = error('kein Type für ID vorhanden', ERROR);
-			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-
-			return $this->outputJson(getError($result));
-		}
-
 		//Form Validation
 		$this->form_validation->set_rules('titel', 'titel', 'callback_titel_required');
 		$this->form_validation->set_rules('text', 'text', 'callback_text_required');

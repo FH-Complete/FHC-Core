@@ -67,7 +67,7 @@ export default {
 						},
 						frozen: true
 				}],
-				layout: 'fitDataFill',
+				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '150',
 				selectableRangeMode: 'click',
@@ -135,7 +135,7 @@ export default {
 		actionNewNotiz(){
 			this.resetFormData();
 		},
-		addNewNotiz(notizData) {
+		addNewNotiz() {
 			const formData = new FormData();
 
 			formData.append('data', JSON.stringify(this.notizData));
@@ -158,6 +158,7 @@ export default {
 				}
 			}).catch(error => {
 				if (error.response) {
+					console.log(error.response);
 					this.$fhcAlert.alertError(error.response.data);
 				}
 			}).finally(() => {
@@ -303,8 +304,6 @@ export default {
 					editor.on('input', () => {
 						const newContent = editor.getContent();
 						vm.notizData.text = newContent;
-						//vm.text =  newContent;
-						console.log('vm.text: ' + newContent);
 					});
 				},
 			});
@@ -317,7 +316,10 @@ export default {
 		this.getUid();
 	},
 	async mounted() {
-		this.initTinyMCE();
+		if(this.showTinyMCE){
+			this.initTinyMCE();
+		}
+
 		await this.$p.loadCategory(['notiz','global']);
 
 		let cm = this.$refs.table.tabulator.columnManager;
@@ -353,11 +355,13 @@ export default {
 	watch: {
 		//watcher für Tinymce-Textfeld
 		'notizData.text': function (newVal) {
-			const tinymcsVal = this.editor.getContent();
+			if(this.showTinyMCE) {
+				const tinymcsVal = this.editor.getContent();
 
-			if (tinymcsVal != newVal) {
-				//Inhalt des Editors aktualisieren
-				this.editor.setContent(newVal);
+				if (tinymcsVal != newVal) {
+					//Inhalt des Editors aktualisieren
+					this.editor.setContent(newVal);
+				}
 			}
 		},
 		//Watcher für autocomplete Bearbeiter und Verfasser
@@ -379,7 +383,9 @@ export default {
 		}
 	},
 	beforeDestroy() {
-		this.editor.destroy();
+		if(this.showTinyMCE) {
+			this.editor.destroy();
+		}
 	},
 	template: `
 	<div class="notiz-notiz">
@@ -484,6 +490,7 @@ export default {
 							auto-apply
 							:enable-time-picker="false"
 							format="dd.MM.yyyy"
+							:teleport="true"
 							preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 				</div>
@@ -504,6 +511,7 @@ export default {
 							auto-apply
 							:enable-time-picker="false"
 							format="dd.MM.yyyy"
+							:teleport="true"
 							preview-format="dd.MM.yyyy"></vue-date-picker>
 					</div>
 					
@@ -528,8 +536,7 @@ export default {
 			<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
 			<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizen.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
 					
-		</form>
-		
+		</form>		
 	</div>`
 }
 
