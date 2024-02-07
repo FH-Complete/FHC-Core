@@ -226,15 +226,12 @@ const app = Vue.createApp({
     showModal: function (value) {
       AcceptDenyUpdate.popup({ value: value })
         .then((res) => {
-          console.log("res of the modal: ", res);
+          
           //? refetches the data, if any request was denied or accepted
           //* setData will call the ajaxURL again to refresh the data
           this.$refs.UpdatesTable.tabulator.setData();
         })
-        .catch((e) => {
-          //? catches the rejected Promise if the result of the modal was falsy
-          console.log("catch of the modal: ", e);
-        });
+        
     },
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();

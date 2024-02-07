@@ -15,7 +15,7 @@ class ProfilUpdate extends Auth_Controller
 			'getProfilUpdates' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
 			'acceptProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
 			'denyProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
-			'show'=>['user:r'],
+			'show'=>['student/stammdaten:r','mitarbeiter/stammdaten:r'],
 			
 
 		]);
