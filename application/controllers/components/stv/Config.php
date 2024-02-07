@@ -19,17 +19,21 @@ class Config extends FHC_Controller
 			'title' => 'Details',
 			'component' => './Stv/Studentenverwaltung/Details/Details.js'
 		];
+		$result['notizen'] = [
+			'title' => 'Notizen',
+			'component' => './Stv/Studentenverwaltung/Details/Notizen.js'
+		];
 		$result['kontakt'] = [
 			'title' => 'Kontakt',
 			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js'
 		];
+		$result['prestudent'] = [
+			'title' => 'PreStudentIn',
+			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js'
+		];
 		$result['noten'] = [
 			'title' => 'Noten',
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js'
-		];
-		$result['notizen'] = [
-			'title' => 'Notizen',
-			'component' => './Stv/Studentenverwaltung/Details/Notizen.js'
 		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
