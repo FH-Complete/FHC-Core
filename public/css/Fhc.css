@@ -1,3 +1,27 @@
+.fhc-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3rem;
+}
+.fhc-header > h1:first-child {
+  font-size: calc(1.325rem + .9vw);
+}
+.fhc-header > :first-child > small {
+  color: var(--bs-secondary);
+  font-size: .65em;
+  padding-inline-start: 1em;
+}
+.fhc-header:after {
+  background-color: var(--bs-gray-300);
+  content: "";
+  display: block;
+  height: 1px;
+  width: 100%;
+}
+
 .fhc-alert.p-toast-center {
   width: 35rem;
   max-width: 100vw;
