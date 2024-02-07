@@ -1,26 +1,26 @@
 import fhcapifactory from "../api/fhcapifactory.js";
 import { CoreFilterCmpt } from "../../components/filter/Filter.js";
 import AcceptDenyUpdate from "../../components/Cis/ProfilUpdate/AcceptDenyUpdate.js";
+import Alert from "../../components/Bootstrap/Alert.js";
 Vue.$fhcapi = fhcapifactory;
 
-const sortProfilUpdates = (ele1,ele2)=>{
-
+const sortProfilUpdates = (ele1, ele2) => {
   let result = 0;
-  if(ele1.status === 'pending'){
-    result= -1;
-  }
-  else if(ele1.status === 'accepted'){
-    result= ele2.status ==='rejected'? -1 : 1;
-  }
-  else{
-    result= 1;
+  if (ele1.status === "pending") {
+    result = -1;
+  } else if (ele1.status === "accepted") {
+    result = ele2.status === "rejected" ? -1 : 1;
+  } else {
+    result = 1;
   }
   //? if they have the same status the insert date is used for ordering
-  if(ele1.status === ele2.status){
-    result= new Date(ele2.insertamum.split('.').reverse().join('-')) - new Date(ele1.insertamum.split('.').reverse().join('-'));
+  if (ele1.status === ele2.status) {
+    result =
+      new Date(ele2.insertamum.split(".").reverse().join("-")) -
+      new Date(ele1.insertamum.split(".").reverse().join("-"));
   }
   return result;
-  };
+};
 
 const app = Vue.createApp({
   components: {
@@ -30,109 +30,110 @@ const app = Vue.createApp({
     return {
       showAll: false,
       profil_updates_table_options: {
-        
-        ajaxResponse:function(url, params, response){
-            //url - the URL of the request
-            //params - the parameters passed with the request
-            //response - the JSON object returned in the body of the response.
-            //? sorts the response data from the backend
-            if(response)
-            response.sort(sortProfilUpdates);
-            
-            return response;  
+        ajaxResponse: function (url, params, response) {
+          //url - the URL of the request
+          //params - the parameters passed with the request
+          //response - the JSON object returned in the body of the response.
+          //? sorts the response data from the backend
+          if (response) response.sort(sortProfilUpdates);
+
+          return response;
         },
         //? adds tooltip with the status message of a profil update request if its status is not pending
-        columnDefaults:{
-          tooltip:function(e, cell, onRendered){
-              //e - mouseover event
-              //cell - cell component
-              //onRendered - onRendered callback registration function
-              let statusMessage = cell.getData().status_message;
-              let statusDate = cell.getData().status_timestamp;
-              let status = cell.getData().status;
-              if(!statusMessage){
-                return null;
-              }
-              let el = document.createElement("div");
-              el.classList.add("border","border-dark");
-              
-              let statusDateEl = document.createElement("p");
-              statusDateEl.innerHTML = "Request was "+ status + " on " + statusDate ;
-              let statusMessageEl = document.createElement("span");
-              statusMessageEl.innerHTML = "Status message: " + statusMessage ;
-              
-              el.appendChild(statusDateEl);
-              el.appendChild(statusMessageEl);  
-              return el; 
-          },
-      },
-        rowContextMenu: (e, component)=>{
+        columnDefaults: {
+          tooltip: function (e, cell, onRendered) {
+            //e - mouseover event
+            //cell - cell component
+            //onRendered - onRendered callback registration function
+            let statusMessage = cell.getData().status_message;
+            let statusDate = cell.getData().status_timestamp;
+            let status = cell.getData().status;
+            if (!statusMessage) {
+              return null;
+            }
+            let el = document.createElement("div");
+            el.classList.add("border", "border-dark");
 
-          let menu =[];
-          if(component.getData().status === "pending"){
-            menu.push(
-              
-                {
-                    label:"<i class='fa fa-check'></i> Accept Request",
-                    action:(e, column)=>{
-                      Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData()).then((res) => {
-                        this.$refs.UpdatesTable.tabulator.setData();
-                      });
-                   
-                    }
-                },
-                {
-                    separator:true,
-                },
-                {
-                    label:" <i style='width:16px' class='text-center fa fa-xmark'></i> Deny Request",
-                    action:(e, column)=>{
-                      
-                      Vue.$fhcapi.ProfilUpdate.denyProfilRequest(column.getData()).then((res) => {
-                        this.$refs.UpdatesTable.tabulator.setData();
-                      });
-                    }
-                },
-                {
-                    separator:true,
-                },
-                {
-                    label:"<i class='fa fa-eye'></i> Show Request",
-                    action:(e, column)=>{
-                      this.showModal(column.getData());
-                    }
-                }
-              
-            );
-          }else{
+            let statusDateEl = document.createElement("p");
+            statusDateEl.innerHTML =
+              "Request was " + status + " on " + statusDate;
+            let statusMessageEl = document.createElement("span");
+            statusMessageEl.innerHTML = "Status message: " + statusMessage;
+
+            el.appendChild(statusDateEl);
+            el.appendChild(statusMessageEl);
+            return el;
+          },
+        },
+        rowContextMenu: (e, component) => {
+          let menu = [];
+          if (component.getData().status === "pending") {
             menu.push(
               {
-                label:"<i class='fa fa-eye'></i> Show Request",
-                action:(e, column)=>{
+                label: "<i class='fa fa-check'></i> Accept Request",
+                action: (e, column) => {
+                  Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData())
+                    .then((res) => {
+                      console.log("here");
+                      this.$refs.UpdatesTable.tabulator.setData();
+                    })
+                    .catch((e) => {
+                      Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
+                    });
+                },
+              },
+              {
+                separator: true,
+              },
+              {
+                label:
+                  " <i style='width:16px' class='text-center fa fa-xmark'></i> Deny Request",
+                action: (e, column) => {
+                  Vue.$fhcapi.ProfilUpdate.denyProfilRequest(
+                    column.getData()
+                  ).then((res) => {
+                    this.$refs.UpdatesTable.tabulator.setData();
+                  }).catch((e) => {
+                    Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
+                  });
+                },
+              },
+              {
+                separator: true,
+              },
+              {
+                label: "<i class='fa fa-eye'></i> Show Request",
+                action: (e, column) => {
                   this.showModal(column.getData());
-                }
+                },
               }
-            )
+            );
+          } else {
+            menu.push({
+              label: "<i class='fa fa-eye'></i> Show Request",
+              action: (e, column) => {
+                this.showModal(column.getData());
+              },
+            });
           }
           return menu;
+        },
+        ajaxURL:
+          FHC_JS_DATA_STORAGE_OBJECT.app_root +
+          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+          `/Cis/ProfilUpdate/`,
 
-        } ,
-        ajaxURL:FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-        `/Cis/ProfilUpdate/`,
-
-        ajaxURLGenerator: (url,config,params)=>{
+        ajaxURLGenerator: (url, config, params) => {
           //? this function needs to be an array function in order to access the this properties of the Vue component
-          if(this.showAll){
-           return url +"getProfilUpdates";
-          }else{
-            return url +"getProfilUpdates/pending";
+          if (this.showAll) {
+            return url + "getProfilUpdates";
+          } else {
+            return url + "getProfilUpdates/pending";
           }
-       
         },
         height: 600,
         layout: "fitColumns",
-       
+
         columns: [
           {
             title: "UID",
@@ -172,7 +173,6 @@ const app = Vue.createApp({
             hozAlign: "center",
             headerFilter: true,
             formatter: function (cell, para) {
-
               switch (cell.getValue()) {
                 case "pending":
                   return "<div class='row justify-content-center'><div class='col-2'><i class='fa fa-circle-info text-info fa-lg'></i></div> <div class='col-4'><span>pending</span></div></div>";
@@ -201,7 +201,6 @@ const app = Vue.createApp({
               //! function that is called when clicking on a row in the table
               let cellData = cell.getRow().getData();
               this.showModal(cellData);
-              
             },
             //responsive:0,
           },
@@ -210,45 +209,43 @@ const app = Vue.createApp({
     };
   },
   computed: {
-    getFetchUrl: function(){
-      let url = FHC_JS_DATA_STORAGE_OBJECT.app_root +
-      FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-      `/Cis/ProfilUpdate/`;
-      if(this.showAll){
-        url+"getAllRequests";
-      }else{
-        url+"getPendingRequests";
+    getFetchUrl: function () {
+      let url =
+        FHC_JS_DATA_STORAGE_OBJECT.app_root +
+        FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+        `/Cis/ProfilUpdate/`;
+      if (this.showAll) {
+        url + "getAllRequests";
+      } else {
+        url + "getPendingRequests";
       }
       return url;
-    }
+    },
   },
   methods: {
-    showModal: function(value){
+    showModal: function (value) {
       AcceptDenyUpdate.popup({ value: value })
-                .then((res) => {
-                  console.log("res of the modal: ", res);
-                  //? refetches the data, if any request was denied or accepted
-                  //* setData will call the ajaxURL again to refresh the data
-                  this.$refs.UpdatesTable.tabulator.setData();
-                })
-                .catch((e) => {
-                  //? catches the rejected Promise if the result of the modal was falsy
-                  console.log("catch of the modal: ", e);
-                });
+        .then((res) => {
+          console.log("res of the modal: ", res);
+          //? refetches the data, if any request was denied or accepted
+          //* setData will call the ajaxURL again to refresh the data
+          this.$refs.UpdatesTable.tabulator.setData();
+        })
+        .catch((e) => {
+          //? catches the rejected Promise if the result of the modal was falsy
+          console.log("catch of the modal: ", e);
+        });
     },
-    updateData: function(event){
-      
-      this.$refs.UpdatesTable.tabulator.setData(); 
+    updateData: function (event) {
+      this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
-      sessionStorage.setItem("showAll",JSON.stringify(event.target.value));
-    }
+      sessionStorage.setItem("showAll", JSON.stringify(event.target.value));
+    },
   },
   mounted() {
-    if(!(sessionStorage.getItem("showAll")===null))
-    {
+    if (!(sessionStorage.getItem("showAll") === null)) {
       this.showAll = JSON.parse(sessionStorage.getItem("showAll"));
     }
-   
   },
   template: `
     <div>

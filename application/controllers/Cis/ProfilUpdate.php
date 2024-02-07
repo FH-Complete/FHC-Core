@@ -46,15 +46,9 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	public function getProfilUpdates($status=null){
-		$this->load->library('PermissionLib');
-		$studentBerechtigung = $this->permissionlib->isBerechtigt('student/stammdaten','s');
-		$mitarbeiterBerechtigung = $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten','s');
 		
-		$options = ["mitarbeiterView"=>$mitarbeiterBerechtigung,"studentView"=>$studentBerechtigung];
-		if(isset($status)){
-			$options['status'] = $status;
-		}
-		$res = $this->ProfilChangeModel->getProfilUpdate($options);
+		
+		$res = $this->ProfilChangeModel->getProfilUpdate(isset($status)?['status'=>$status]:null);
 		
 		echo json_encode($res);
 	}

@@ -7,7 +7,6 @@ import Adresse from "../Profil/ProfilComponents/Adresse.js";
 export default {
   components: {
     BsModal,
-    Alert,
     Kontakt,
     Adresse,
   },
@@ -50,6 +49,8 @@ export default {
     acceptRequest: function () {
       Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(this.data).then((res) => {
         this.result = true;
+      }).catch((e) => {
+        Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
       });
       this.hide();
     },
@@ -58,34 +59,13 @@ export default {
       
       Vue.$fhcapi.ProfilUpdate.denyProfilRequest(this.data).then((res) => {
         this.result = true;
+      }).catch((e) => {
+        Alert.popup(Vue.h('div',{innerHTML:e.response.data}));
       });
       this.hide();
     },
 
-    submitProfilChange() {
-      //TODO: check if the updated value is different from the original value before submitting the request
-      if (false) {
-        //? inserts new row in public.tbl_cis_profil_update
-        //* calls the update api call if an update field is present in the data that was passed to the module
-        Vue.$fhcapi.UserData[
-          this.editData.update ? "updateProfilRequest" : "insertProfilRequest"
-        ](this.topic, this.profilUpdate).then((res) => {
-          if (res.data.error == 0) {
-            this.result = true;
-            this.hide();
-            Alert.popup(
-              "Ihre Anfrage wurde erfolgreich gesendet. Bitte warten Sie, während sich das Team um Ihre Anfrage kümmert."
-            );
-          } else {
-            this.result = false;
-            this.hide();
-            Alert.popup(
-              "Ein Fehler ist aufgetreten: " + JSON.stringify(res.data.retval)
-            );
-          }
-        });
-      }
-    },
+   
   },
   computed: {
     getComponentView: function () {

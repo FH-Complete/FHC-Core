@@ -87,7 +87,7 @@ export default {
       Vue.$fhcapi.UserData.selectProfilRequest().then((res)=>{
         
         if(!res.error){
-          this.data.profilUpdates = res.data.retval?.length ? res.data.retval.sort(this.sortProfilUpdates) : null ; 
+          this.data.profilUpdates = res.data?.length ? res.data.sort(this.sortProfilUpdates) : null ; 
         }
       });
     },
@@ -102,9 +102,9 @@ export default {
             Vue.$fhcapi.UserData.selectProfilRequest()
             .then((res) =>{
               if(!res.error){
-                this.data.profilUpdates = res.data.retval.sort(this.sortProfilUpdates);
+                this.data.profilUpdates = res.data.sort(this.sortProfilUpdates);
               }else{
-                alert("Error when fetching profile updates: " +res.data.retval);
+                alert("Error when fetching profile updates: " +res.data);
               }
             })
             .catch(err=>alert(err));

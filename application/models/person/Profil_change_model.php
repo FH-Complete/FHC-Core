@@ -15,6 +15,8 @@ class Profil_change_model extends DB_Model
 
 		$this->load->model('crm/Student_model','StudentModel');
 		$this->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
+
+		$this->load->library('PermissionLib');
 	}
 
 	/**
@@ -53,8 +55,12 @@ class Profil_change_model extends DB_Model
 	 * returns all profil updates if id is set to null
 	 */
 	public function getProfilUpdate($whereClause=null){
+		
+		$studentBerechtigung = $this->permissionlib->isBerechtigt('student/stammdaten','s');
+		$mitarbeiterBerechtigung = $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten','s');
+		
 		$res =[];
-		if($whereClause["studentView"]) {
+		if($studentBerechtigung) {
 			$this->addJoin('tbl_student','tbl_student.student_uid=tbl_cis_profil_update.uid');
 			$studentRequests = $this->loadWhere(isset($whereClause['status']) && $whereClause['status']? ['status'=>$whereClause['status']]:[]);
 			if(isError($studentRequests)) return error("db error: ". getData($studentRequests));
@@ -63,7 +69,7 @@ class Profil_change_model extends DB_Model
 				array_push($res,$request);
 			}
 		}
-		if($whereClause["mitarbeiterView"]) {
+		if($mitarbeiterBerechtigung) {
 			$this->addJoin('tbl_mitarbeiter','tbl_mitarbeiter.mitarbeiter_uid=tbl_cis_profil_update.uid');
 			$mitarbeiterRequests = $this->loadWhere(isset($whereClause['status']) && $whereClause['status']? ['status'=>$whereClause['status']]:[]);
 			if(isError($mitarbeiterRequests)) return error("db error: ". getData($mitarbeiterRequests));
