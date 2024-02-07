@@ -7,10 +7,16 @@ export default {
 	components: {
 		FhcFragment
 	},
-	inject: [
-		'$registerToForm',
-		'$clearValidationForName'
-	],
+	inject: {
+		registerToForm: {
+			from: '$registerToForm',
+			default: null
+		},
+		clearValidationForName: {
+			from: '$clearValidationForName',
+			default: null
+		}
+	},
 	props: {
 		bsFeedback: Boolean,
 		noAutoClass: Boolean,
@@ -73,8 +79,6 @@ export default {
 		},
 		tag() {
 			switch (this.lcType) {
-				case 'textarea+':
-					return 'textarea';
 				case 'textarea':
 				case 'select':
 					return this.lcType;
@@ -181,7 +185,12 @@ export default {
 			this.feedback = [];
 		},
 		clearValidationForThisName() {
-			this.$clearValidationForName(this.name);
+			if (this.valid === undefined)
+				return;
+			if (this.clearValidationForName && this.name)
+				this.clearValidationForName(this.name);
+			else
+				this.clearValidation();
 		},
 		setFeedback(valid, feedback) {
 			if (!feedback)
@@ -220,8 +229,8 @@ export default {
 		this._loadComponents();
 	},
 	mounted() {
-		if (this.$registerToForm)
-			this.$registerToForm(this);
+		if (this.registerToForm)
+			this.registerToForm(this);
 	},
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
