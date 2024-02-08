@@ -316,7 +316,7 @@ class AntragJob extends JOB_Controller
 				} else {
 					$deregisterStatus = getData($result);
 
-					$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, $prestudent->studiensemester_kurzbz, $insertvon);
+					$result = $this->prestudentlib->setAbbrecher($prestudent->prestudent_id, '', $insertvon);
 					if (isError($result)) {
 						$this->StudierendenantragstatusModel->delete($deregisterStatus);
 						$this->logError(getError($result));

@@ -76,9 +76,18 @@
 		$filter->type = $_POST["type"];
 		$filter->htmlattr = $_POST["htmlattr"];
 
-		if(!$filter->save())
+		// Check if the SQL string contains functions to decrypt data and if there are
+		// variables to replace the value of the password (no clear password wanted!)
+		if (isSQLDecryptionValid($filter->sql))
 		{
-			$errorstr .= $filter->errormsg;
+			if (!$filter->save())
+			{
+				$errorstr .= $filter->errormsg;
+			}
+		}
+		else
+		{
+			$errorstr .= 'It is not possible to store a SQL that contains clear passwords to decrypt data from the DB';
 		}
 
 		$reloadstr .= "<script type='text/javascript'>\n";
