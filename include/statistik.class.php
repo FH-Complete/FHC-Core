@@ -512,7 +512,10 @@ class statistik extends basis_db
 		$this->csv='';
 		$this->json=array();
 		$this->countRows=0;
-		set_time_limit(120);
+		set_time_limit(600);
+
+		// In case a decryption function is used then perform password substitution
+		$this->sql = $this->replaceSQLDecryptionPassword($this->sql);
 
 		if($this->sql!='')
 		{

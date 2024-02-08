@@ -40,7 +40,7 @@ export default {
 	},
 	methods: {
 		reload(stg) {
-			this.table.replaceData(this.ajaxUrl + (stg || ''));
+			this.table.setData(this.ajaxUrl + (stg || ''));
 		},
 		download() {
 			this.table.download("csv", "data.csv", {
@@ -111,7 +111,8 @@ export default {
 				headerSort: false
 			}, {
 				field: 'studierendenantrag_id',
-				title: '#'
+				title: '#',
+				sorter: 'number'
 			}, {
 				field: 'bezeichnung',
 				title: this.$p.t('lehre', 'studiengang'),

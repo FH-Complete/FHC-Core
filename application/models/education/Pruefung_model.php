@@ -210,7 +210,7 @@ class Pruefung_model extends DB_Model
 		$this->db->where('ps.prestudent_id', $prestudent_id);
 
 		if ($max_date !== null) {
-			$this->db->where('p.datum <', $max_date);
+			$this->db->where('p.datum <=', $max_date);
 		}
 		if ($studiensemester_kurzbz !== null) {
 			$this->db->where('le.studiensemester_kurzbz', $studiensemester_kurzbz);
