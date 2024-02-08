@@ -48,13 +48,30 @@ class Profil_update_model extends DB_Model
 		return json_decode($res->requested_change)->files?:[];
 	}
 
+
+	public function getProfilUpdatesWhere($whereClause){
+		$res = $this->loadWhere($whereClause);
+		if(isError($res)){
+			return error("Could not load public.tbl_profil_update with whereClause");
+		}
+		$res = hasData($res) ? getData($res) : [];
+		if($res){
+			foreach($res as $request){
+				$this->formatProfilRequest($request);
+			}
+		}
+		return $res;
+
+	}
+	
+
 	/**
 	 * 
 	 * getProfilUpdate
 	 * returns a profil update with id 
 	 * returns all profil updates if id is set to null
 	 */
-	public function getProfilUpdate($whereClause=null){
+	public function getProfilUpdateWithPermission($whereClause=null){
 		
 		$studentBerechtigung = $this->permissionlib->isBerechtigt('student/stammdaten','s');
 		$mitarbeiterBerechtigung = $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten','s');
@@ -103,19 +120,20 @@ class Profil_update_model extends DB_Model
 	
 		if($res){
 			
-			foreach($res as $update){
-			
-				
-				$update->requested_change = json_decode($update->requested_change);
-				$update->insertamum = !is_null($update->insertamum)?date_create($update->insertamum)->format('d.m.Y'):null;
-				$update->updateamum = !is_null($update->updateamum)?date_create($update->updateamum)->format('d.m.Y'):null;
-				$update->status_timestamp = !is_null($update->status_timestamp)?date_create($update->status_timestamp)->format('d.m.Y'):null;
-					
+			foreach($res as $request){
+				$this->formatProfilRequest($request);
 			}
 		}
 		
 		return $res;
 
+	}
+
+	private function formatProfilRequest($request){
+				$request->requested_change = json_decode($request->requested_change);
+				$request->insertamum = !is_null($request->insertamum)?date_create($request->insertamum)->format('d.m.Y'):null;
+				$request->updateamum = !is_null($request->updateamum)?date_create($request->updateamum)->format('d.m.Y'):null;
+				$request->status_timestamp = !is_null($request->status_timestamp)?date_create($request->status_timestamp)->format('d.m.Y'):null;
 	}
 
 }

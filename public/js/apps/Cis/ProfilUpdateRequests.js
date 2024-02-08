@@ -38,11 +38,10 @@ const app = Vue.createApp({
 
         ajaxURLGenerator: (url, config, params) => {
           //? this function needs to be an array function in order to access the this properties of the Vue component
-          console.log("showAll printed here:", this.showAll);
           if (this.showAll) {
-            return url + "getProfilUpdates";
+            return url + "getProfilUpdateWithPermission";
           } else {
-            return url + "getProfilUpdates/pending";
+            return url + "getProfilUpdateWithPermission/pending";
           }
         },
         ajaxResponse: function (url, params, response) {

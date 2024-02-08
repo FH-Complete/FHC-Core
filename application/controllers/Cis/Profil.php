@@ -27,7 +27,7 @@ class Profil extends Auth_Controller
 			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'deleteOldVersionFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'test' => ['student/anrechnung_beantragen:r', 'user:r'],
+			
 						
 		]);
 
@@ -62,17 +62,6 @@ class Profil extends Auth_Controller
 	/**
 	 * @return void
 	 */
-
-	 public function test(){
-		
-		// Loads permission lib
-		$this->load->library('PermissionLib');
-		$mit_daten =$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten','suid');
-		var_dump($mit_daten);
-		$stud_daten = $this->permissionlib->isBerechtigt('student/stammdaten','suid');
-		var_dump($stud_daten);
-	}
-
 
 	public function index()
 	{
@@ -172,7 +161,7 @@ class Profil extends Auth_Controller
 		if(isset($uid)) $whereClause['uid'] = $uid;
 		if(isset($id)) $whereClause['id'] = $id;
 		
-		$res= $this->ProfilUpdateModel->getProfilUpdate($whereClause);
+		$res= $this->ProfilUpdateModel->getProfilUpdatesWhere($whereClause);
 
 		echo json_encode($res);
 		
@@ -201,7 +190,7 @@ class Profil extends Auth_Controller
 		$data = ["topic"=>$json->topic,"uid" => $this->uid, "name"=>getData($name), "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
-		$res = $this->ProfilUpdateModel->loadWhere(["uid"=>$this->uid]);
+		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid"=>$this->uid]);
 		$res = hasData($res) ? getData($res) : null;
 		
 		if($res){
@@ -659,7 +648,7 @@ class Profil extends Auth_Controller
 
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdate(['uid'=>$this->uid]);
+		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdatesWhere(['uid'=>$this->uid]);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{
@@ -865,7 +854,7 @@ class Profil extends Auth_Controller
 		}
 
 		//? querying if the user has profil update requests
-		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdate(['uid'=>$this->uid]);
+		$profilUpdates = $this->ProfilUpdateModel->getProfilUpdatesWhere(['uid'=>$this->uid]);
 		if(isError($profilUpdates)){
 			//error handling
 		}else{

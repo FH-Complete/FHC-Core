@@ -12,7 +12,7 @@ class ProfilUpdate extends Auth_Controller
 	public function __construct(){
 		parent::__construct([
 			'index' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
-			'getProfilUpdates' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
+			'getProfilUpdateWithPermission' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
 			'acceptProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
 			'denyProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
 			'show'=>['student/stammdaten:r','mitarbeiter/stammdaten:r'],
@@ -45,10 +45,10 @@ class ProfilUpdate extends Auth_Controller
 		echo json_encode($res);
 	}
 
-	public function getProfilUpdates($status=null){
+	public function getProfilUpdateWithPermission($status=null){
 		
 		
-		$res = $this->ProfilUpdateModel->getProfilUpdate(isset($status)?['status'=>$status]:null);
+		$res = $this->ProfilUpdateModel->getProfilUpdateWithPermission(isset($status)?['status'=>$status]:null);
 		
 		echo json_encode($res);
 	}

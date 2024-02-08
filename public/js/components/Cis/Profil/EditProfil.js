@@ -43,6 +43,7 @@ export default {
 
   methods: {
     async submitProfilChange() {
+      //? check if data is valid before making a request
       if (this.topic && this.profilUpdate) {
         if (this.profilUpdate.files) {
           const fileIDs = await this.uploadFiles(this.profilUpdate.files);
@@ -179,7 +180,7 @@ export default {
     <template   v-slot:footer>
       
     <button class="btn btn-outline-danger " @click="hide">Abbrechen</button>    
-      <button v-if="profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
+      <button :disabled="!profilUpdate"  @click="submitProfilChange" role="button" class="btn btn-primary">Senden</button>
     </template>
     <!-- end of optional footer --> 
   </bs-modal>`,
