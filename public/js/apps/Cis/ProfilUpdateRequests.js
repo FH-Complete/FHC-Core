@@ -29,7 +29,22 @@ const app = Vue.createApp({
   data() {
     return {
       showAll: false,
+      
       profil_updates_table_options: {
+        ajaxURL:
+          FHC_JS_DATA_STORAGE_OBJECT.app_root +
+          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+          `/Cis/ProfilUpdate/`,
+
+        ajaxURLGenerator: (url, config, params) => {
+          //? this function needs to be an array function in order to access the this properties of the Vue component
+          console.log("showAll printed here:", this.showAll);
+          if (this.showAll) {
+            return url + "getProfilUpdates";
+          } else {
+            return url + "getProfilUpdates/pending";
+          }
+        },
         ajaxResponse: function (url, params, response) {
           //url - the URL of the request
           //params - the parameters passed with the request
@@ -118,19 +133,7 @@ const app = Vue.createApp({
           }
           return menu;
         },
-        ajaxURL:
-          FHC_JS_DATA_STORAGE_OBJECT.app_root +
-          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-          `/Cis/ProfilUpdate/`,
-
-        ajaxURLGenerator: (url, config, params) => {
-          //? this function needs to be an array function in order to access the this properties of the Vue component
-          if (this.showAll) {
-            return url + "getProfilUpdates";
-          } else {
-            return url + "getProfilUpdates/pending";
-          }
-        },
+        
         height: 600,
         layout: "fitColumns",
 
@@ -241,7 +244,9 @@ const app = Vue.createApp({
   },
   mounted() {
     if (!(sessionStorage.getItem("showAll") === null)) {
-      this.showAll = JSON.parse(sessionStorage.getItem("showAll"));
+      //? converting string into a boolean: https://sentry.io/answers/how-can-i-convert-a-string-to-a-boolean-in-javascript/
+      this.showAll = sessionStorage.getItem("showAll")==="true";
+      
     }
   },
   template: `

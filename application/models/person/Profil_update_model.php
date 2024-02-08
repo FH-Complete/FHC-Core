@@ -58,11 +58,30 @@ class Profil_update_model extends DB_Model
 		
 		$studentBerechtigung = $this->permissionlib->isBerechtigt('student/stammdaten','s');
 		$mitarbeiterBerechtigung = $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten','s');
+		$oe_berechtigung = $this->permissionlib->getOE_isEntitledFor('student/stammdaten');
 		
 		$res =[];
+		
 		if($studentBerechtigung) {
-			$this->addJoin('tbl_student','tbl_student.student_uid=tbl_profil_update.uid');
-			$studentRequests = $this->loadWhere($whereClause);
+			//? Nur wenn der/die AssistentIn auch die Berechtigung in der gleichen Organisationseinheit des Studenten hat
+			$parameters = [];
+			$query="
+			SELECT * FROM public.tbl_profil_update 
+			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
+			JOIN public.tbl_prestudent ON public.tbl_prestudent.prestudent_id=public.tbl_student.prestudent_id
+			JOIN public.tbl_studiengang ON public.tbl_studiengang.studiengang_kz=public.tbl_prestudent.studiengang_kz
+			JOIN public.tbl_organisationseinheit ON public.tbl_organisationseinheit.oe_kurzbz=public.tbl_studiengang.oe_kurzbz
+			Where public.tbl_studiengang.oe_kurzbz IN ? ";
+			$parameters[]=$oe_berechtigung;
+			if($whereClause){
+				foreach($whereClause as $key=>$value){
+					$parameters[] = $value;
+					$query .=  " AND ".$key." = ?";
+				} 
+			}
+			
+			$studentRequests =$this->execReadOnlyQuery($query,$parameters);
+			
 			if(isError($studentRequests)) return error("db error: ". getData($studentRequests));
 			$studentRequests = getData($studentRequests)?:[]; 
 			foreach($studentRequests as $request){
@@ -70,6 +89,7 @@ class Profil_update_model extends DB_Model
 			}
 		}
 		if($mitarbeiterBerechtigung) {
+			
 			$this->addJoin('tbl_mitarbeiter','tbl_mitarbeiter.mitarbeiter_uid=tbl_profil_update.uid');
 			$mitarbeiterRequests = $this->loadWhere($whereClause);
 			if(isError($mitarbeiterRequests)) return error("db error: ". getData($mitarbeiterRequests));
