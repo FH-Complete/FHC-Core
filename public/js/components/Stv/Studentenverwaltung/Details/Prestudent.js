@@ -18,51 +18,108 @@ export default {
 	},
 	data(){
 		return {
+			config: {},
 			data: [],
 			listZgvs: [],
+			listZgvsmaster: [],
+			listZgvsdoktor: [],
 			listStgs: [],
 			listAusbildung: [],
 			listAufmerksamdurch: [],
 			listBerufe: [],
 			listStgTyp: [],
-			listFoerderrelevant: []
+			listFoerderrelevant: [],
+			initialFormData: {},
+			deltaArray: [],
+			actionUpdate: false
 		};
 	},
+	watch: {
+	},
+
 	methods: {
-		loadData(prestudent_id){
-			console.log("prestudent_id: " + prestudent_id);
-			return CoreRESTClient.get('components/stv/Zusatzfelder/loadData/' + prestudent_id)
-				.then(
-					result => {
-						if(result)
-							this.data = result.data.retval;
-						else
-						{
-							this.data = [];
-							this.$fhcAlert.alertError('Keine Prestudent_id ' + prestudent_id + ' gefunden');
-						}
-						return result;
-					}
-				);
-		},
-		updatePrestudent() {
+		loadPrestudent() {
 			CoreRESTClient
 				.get('components/stv/Prestudent/get/' + this.modelValue.prestudent_id)
 				.then(result => result.data)
 				.then(result => {
 					this.data = result;
-					console.log(result);
+					//neue DataVariable um ein Delta der vorgenommenen Änderungen berechnen zu können
+					this.initialFormData = {...this.data};
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		updatePrestudent(){
+			this.detectChanges();
+
+/*			this.$nextTick(() => {
+
+				if (this.actionUpdate) {
+					console.log("Action");*/
+					//todo(manu) checken, ob überhaupt eine Änderung vorgenommen wurde
+					CoreRESTClient.post('components/stv/Prestudent/updatePrestudent/' + this.modelValue.prestudent_id,
+						this.deltaArray
+					).then(response => {
+						if (!response.data.error) {
+							this.$fhcAlert.alertSuccess('Speichern erfolgreich');
+							this.deltaArray = [];
+							this.actionUpdate = false;
+						} else {
+							const errorData = response.data.retval;
+							Object.entries(errorData).forEach(entry => {
+								const [key, value] = entry;
+								this.$fhcAlert.alertError(value);
+							});
+						}
+					}).catch(error => {
+						this.statusMsg = 'Error in Catch';
+						this.$fhcAlert.alertError('Fehler bei Speicherroutine aufgetreten');
+					}).finally(() => {
+						window.scrollTo(0, 0);
+					});
+
+/*				} else {
+					console.log("no action");
+				}
+			});*/
+
+
+
+		},
+		detectChanges() {
+			const delta = {};
+			for (const key in this.data) {
+				if (this.data[key] !== this.initialFormData[key]) {
+					delta[key] = this.data[key];
+					this.actionUpdate = true;
+				}
+			}
+			this.deltaArray.push(delta);
+		},
 	},
 	created() {
-		this.updatePrestudent();
+		this.loadPrestudent();
+		//initiale Daten nach dem Laden
+		//this.initialFormData = {...this.data};
 		CoreRESTClient
 			.get('components/stv/Prestudent/getBezeichnungZGV')
 			.then(result => CoreRESTClient.getData(result.data) || [])
 			.then(result => {
 				this.listZgvs = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Prestudent/getBezeichnungMZGV')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.listZgvsmaster = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		CoreRESTClient
+			.get('components/stv/Prestudent/getBezeichnungDZGV')
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.listZgvsdoktor = result;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		CoreRESTClient
@@ -101,9 +158,21 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
+	mounted(){
+		fetch('config/stv')
+			.then(result => result.json())
+			.then(result => {
+				this.config = result;
+				console.log('Konfiguration geladen:', this.config);
+			})
+			.catch(error => console.error('Fehler beim Laden der Konfiguration:', error));
+	},
 	template: `
 	<div class="stv-details-details h-100 pb-3">
-		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="save">
+		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="updatePrestudent">
+		<div class="position-sticky top-0 z-1">
+			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" >Speichern</button>
+		</div>
 		<!--<form ref="form">-->
 			<fieldset class="overflow-hidden">
 				<legend>Zugangsvoraussetzungen für {{modelValue.nachname}} {{modelValue.vorname}}</legend>
@@ -175,11 +244,11 @@ export default {
 							<form-input
 								container-class="col-3"
 								label="ZGV Master"
-								type="text"
+								type="select"
 								v-model="data.zgvmas_code"
 								name="zgvmascode"
 								>
-								<option v-for="zgv in listZgvs" :key="zgv.zgv_code" :value="zgv.zgv_code">{{zgv.zgv_bez}}</option>
+								<option v-for="mzgv in listZgvsmaster" :key="mzgv.zgvmas_code" :value="mzgv.zgvmas_code">{{mzgv.zgvmas_bez}}</option>
 							</form-input>
 							<form-input
 								container-class="col-3"
@@ -214,6 +283,86 @@ export default {
 								<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 							</form-input>
 						</div>
+						<!--ZGV Doktor Todo(manu) Config -->
+						<div class="row mb-3">
+							<form-input
+								container-class="col-3"
+								label="ZGV Doktor"
+								type="select"
+								v-model="data.zgvdoktor_code"
+								name="zgvdoktor_code"
+								>
+								<option v-for="zgv in listZgvsdoktor" :key="zgv.zgvdoktor_code" :value="zgv.zgvdoktor_code">{{zgv.zgvdoktor_bez}}</option>
+							</form-input>
+							<form-input
+								container-class="col-3"
+								label="ZGV Doktor Ort"
+								type="text"
+								v-model="data.zgvdoktorort"
+								name="zgvdoktorort"
+								>
+							</form-input>
+							<form-input
+								container-class="col-3"
+								label="ZGV Doktor Datum"
+								type="DatePicker"
+								v-model="data.zgvdoktordatum"
+								name="zgvdoktordatum"
+								no-today
+								auto-apply
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
+								:teleport="true"
+								>
+							</form-input>
+							<form-input
+								container-class="col-3"
+								label="ZGV Doktor Nation"
+								type="select"
+								v-model="data.zgvdoktornation"
+								name="zgvdoktornation"
+								>
+								<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+								<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
+							</form-input>
+						</div>
+																		
+						<div class="row mb-3">
+							<div class="col-3 pt-4 d-flex align-items-center">
+								<form-input
+									container-class="form-check"
+									label="ZGV erfüllt"
+									type="checkbox"
+									v-model="data.zgv_erfuellt"
+									name="zgv_erfuellt"
+									>
+								</form-input>
+							</div>
+							<div class="col-3 pt-4 d-flex align-items-center">
+								<form-input
+									container-class="form-check"
+									label="ZGV Master erfüllt"
+									type="checkbox"
+									v-model="data.zgvmas_erfuellt"
+									name="zgvmas_erfuellt"
+									>
+								</form-input>
+							</div>
+							<div class="col-3 pt-4 d-flex align-items-center">
+								<form-input
+									container-class="form-check"
+									label="ZGV Doktor erfüllt"
+									type="checkbox"
+									v-model="data.zgvdoktor_erfuellt"
+									name="zgvdoktor_erfuellt"
+									>
+								</form-input>
+							</div>
+						</div>
+						
+						
+						
 		<!--			</template>-->
 			</fieldset>
 			<fieldset class="overflow-hidden">
@@ -247,6 +396,40 @@ export default {
 							>
 							<option v-for="ausbld in listAusbildung" :key="ausbld.ausbildungcode" :value="ausbld.ausbildungcode">{{ausbld.ausbildungbez}} </option>
 						</form-input>
+					</div>
+					
+					<div class="row mb-3">
+						<form-input
+							container-class="col-4"
+							label="Aufnahmeschlüssel"
+							type="text"
+							v-model="data.aufnahmeschluessel"
+							name="aufnahmeschluessel"
+							>
+						</form-input>
+						
+						<div class="col-4 pt-4 d-flex align-items-center">
+							<form-input
+								container-class="form-check"
+								label="Facheinschlägig berufstätig"
+								type="checkbox"
+								v-model="data.facheinschlberuf"
+								name="facheinschlberuf"
+								>
+							</form-input>
+						</div>
+						
+						<!--Todo(manu) validierung Integer, liste hier null-->
+						<form-input
+							container-class="col-4"
+							label="Bisstandort"
+							type="text"
+							v-model="data.standort_code"
+							name="standort_code"
+							disabled
+							>
+						</form-input>
+					 
 					</div>
 					
 					<div class="row mb-3">
@@ -300,17 +483,21 @@ export default {
 								>
 							</form-input>
 						</div>
-						<form-input
-							container-class="col-2"
-							label="Förderrelevant"
-							type="select"
-							v-model="data.foerderrelevant"
-							name="foerderrelevant"
-							>
-							<option :value="" selected >wie Studiengang</option>
-							<option :value="true">ja</option>
-							<option :value="false">nein</option>
-						</form-input>
+					<!--	Todo(manu) hier soll ein select ausgewählt werden??-->
+						<div class="col-2 pt-4 d-flex align-items-center">
+							<form-input
+								container-class="form-check"
+								label="Förderrelevant"
+								type="checkbox" 
+								v-model="data.foerderrelevant"
+								name="foerderrelevant"
+								>
+	<!--							<option :value="" selected >wie Studiengang</option>
+								<option :value="true">ja</option>
+								<option :value="false">nein</option>-->
+							</form-input>
+						</div>
+						<!--	Todo(manu) an Recht basis/prestudent hänaen -->
 						<form-input
 							container-class="col-1"
 							label="Priorität"
@@ -320,18 +507,34 @@ export default {
 							>
 						</form-input>
 					</div>
+					
+					<div class="row mb-3">
+						<form-input
+							container-class="col-5"
+							label="MentorIn"
+							type="text"
+							v-model="data.mentor"
+							name="mentor"
+							>
+						</form-input>
+					</div>
 				
 			</fieldset>
 		
 		</form-form>
 		
 		<br>
-		{{modelValue}}
+<!--		<hr>
+		Data: {{data}}
+		<hr>-->
+
+<!--		<hr>
+		DeltaArray: {{deltaArray}}
+		<br>
+		to update: {{actionUpdate}}
 		<hr>
-		{{data}}
-		<hr>
-		{{listStgTyp}}
-		
+		InitialData: {{initialFormData}}-->
+	
 		
 	</div>
 	`

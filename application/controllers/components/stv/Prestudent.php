@@ -38,12 +38,144 @@ class Prestudent extends FHC_Controller
 		}
 	}
 
+	public function updatePrestudent($prestudent_id)
+	{
+		$this->load->library('form_validation');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+/*		$result = $this->PrestudentModel->loadWhere(['prestudent_id' =>$prestudent_id]);
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+			return $this->outputJson(getError($result));
+		} elseif (!hasData($result)) {
+			return $this->outputJson(getError($result));
+		} else {
+			$prestudentData = current(getData($result));
+		}
+
+		var_dump($prestudentData);*/
+
+		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+		$deltaData = $_POST[0];
+
+		if(!$prestudent_id)
+		{
+			return $this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		//Todo(manu) updateamum, updatevon ergänzen
+		$uid = getAuthUID();
+
+		$array_allowed_props_prestudent = [
+			'aufmerksamdurch_kurzbz',
+			'studiengang_kz',
+			'gsstudientyp_kurzbz',
+			'person_id',
+			'berufstaetigkeit_code',
+			'ausbildungcode',
+			'zgv_code',
+			'zgvort',
+			'zgvdatum',
+			'zgvnation',
+			'zgvmas_code',
+			'zgvmaort',
+			'zgvmadatum',
+			'zgvmanation',
+			'facheinschlberuf',
+			'bismelden',
+			'anmerkung',
+			'dual',
+			'zgvdoktor_code', //Todo(Manu) tabelle leer? db zum testen
+			'zgvdoktorort',
+			'zgvdoktordatum',
+			'zgvdoktornation',
+			'aufnahmegruppe_kurzbz',
+			'priorisierung',
+			'foerderrelevant',
+			'zgv_erfuellt',
+			'zgvmas_erfuellt',
+			'zgvdoktor_erfuellt',
+			'mentor',
+			'aufnahmeschluessel',
+			'standort_code'
+		];
+
+/*		foreach ($array_allowed_props_prestudent as $prop)
+		{
+
+
+		}*/
+
+/*		"insertamum": "2021-05-27 13:03:08",
+		"insertvon": "online",
+		"updateamum": "2022-10-10 15:37:31.903056",
+		"updatevon": "poeckl", "ext_id": null,*/
+
+		$update_prestudent = array();
+		foreach ($array_allowed_props_prestudent as $prop)
+		{
+			$val = isset($deltaData[$prop]) ? $deltaData[$prop] : null;
+			if ($val !== null) {
+				$update_prestudent[$prop] = $val;
+			}
+		}
+/*
+		var_dump("update Array");
+		var_dump($update_prestudent);*/
+
+
+
+		if (count($update_prestudent) && $prestudent_id === null) {
+			$this->output->set_status_header(REST_Controller::HTTP_BAD_REQUEST);
+			// TODO(manu): phrase
+			return $this->outputJson("Kein/e PrestudentIn vorhanden!");
+		}
+
+		if (count($update_prestudent))
+		{
+			$result = $this->PrestudentModel->update(
+				$prestudent_id,
+				$update_prestudent
+			);
+			if (isError($result)) {
+				$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+				return $this->outputJson(getError($result));
+			}
+			return $this->outputJsonSuccess(true);
+		}
+
+	}
+
 	public function getBezeichnungZgv(){
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
 
 		$this->ZgvModel->addOrder('zgv_code');
 
 		$result = $this->ZgvModel->load();
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+		$this->outputJson($result);
+	}
+
+	public function getBezeichnungDZgv(){
+		$this->load->model('codex/Zgvdoktor_model', 'ZgvdoktorModel');
+
+		$this->ZgvdoktorModel->addOrder('zgvdoktor_code');
+
+		$result = $this->ZgvdoktorModel->load();
+		if (isError($result)) {
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+		$this->outputJson($result);
+	}
+
+	public function getBezeichnungMZgv(){
+		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
+
+		$this->ZgvmasterModel->addOrder('zgvmas_code');
+
+		$result = $this->ZgvmasterModel->load();
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
@@ -87,6 +219,7 @@ class Prestudent extends FHC_Controller
 	}
 
 	public function getTypenStg(){
+		//TODO(manu) hier soll bis.tbl_gsstudientyp herangezogen werden
 		$this->load->model('organisation/Studiengangstyp_model', 'StudiengangstypModel');
 
 		$this->StudiengangstypModel->addOrder('typ');
