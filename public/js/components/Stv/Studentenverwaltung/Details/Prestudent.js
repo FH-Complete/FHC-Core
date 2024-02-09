@@ -11,14 +11,21 @@ export default {
 	inject: {
 		lists: {
 			from: 'lists'
-		}
+		},
+		showZgvErfuellt: {
+			from: 'configShowZgvErfuellt',
+			default: false
+		},
+		showZgvDoktor: {
+			from: 'configShowZgvDoktor',
+			default: false
+		},
 	},
 	props: {
 		modelValue: Object
 	},
 	data(){
 		return {
-			config: {},
 			data: [],
 			listZgvs: [],
 			listZgvsmaster: [],
@@ -158,15 +165,7 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	mounted(){
-		fetch('config/stv')
-			.then(result => result.json())
-			.then(result => {
-				this.config = result;
-				console.log('Konfiguration geladen:', this.config);
-			})
-			.catch(error => console.error('Fehler beim Laden der Konfiguration:', error));
-	},
+	mounted(){},
 	template: `
 	<div class="stv-details-details h-100 pb-3">
 		<form-form ref="form" class="stv-details-prestudent" @submit.prevent="updatePrestudent">
@@ -284,7 +283,7 @@ export default {
 							</form-input>
 						</div>
 						<!--ZGV Doktor Todo(manu) Config -->
-						<div class="row mb-3">
+						<div v-if="showZgvDoktor" class="row mb-3">
 							<form-input
 								container-class="col-3"
 								label="ZGV Doktor"
@@ -328,7 +327,7 @@ export default {
 							</form-input>
 						</div>
 																		
-						<div class="row mb-3">
+						<div v-if="showZgvErfuellt" class="row mb-3">
 							<div class="col-3 pt-4 d-flex align-items-center">
 								<form-input
 									container-class="form-check"
@@ -349,7 +348,7 @@ export default {
 									>
 								</form-input>
 							</div>
-							<div class="col-3 pt-4 d-flex align-items-center">
+							<div v-if="showZgvDoktor" class="col-3 pt-4 d-flex align-items-center">
 								<form-input
 									container-class="form-check"
 									label="ZGV Doktor erfüllt"
@@ -524,6 +523,8 @@ export default {
 		</form-form>
 		
 		<br>
+		
+		{{showZgvDoktor}} || {{generateAlias}} || {{showZgvErfuellt}} 
 <!--		<hr>
 		Data: {{data}}
 		<hr>-->

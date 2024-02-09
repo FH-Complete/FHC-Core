@@ -31,6 +31,14 @@
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
+<?php
+$configArray = [
+	'generateAlias' => !defined('GENERATE_ALIAS_STUDENT') ? true : GENERATE_ALIAS_STUDENT,
+	'showZgvDoktor' => !defined('ZGV_DOKTOR_ANZEIGEN') ? true : ZGV_DOKTOR_ANZEIGEN,
+	'showZgvErfuellt' => !defined('ZGV_ERFUELLT_ANZEIGEN') ? true : ZGV_ERFUELLT_ANZEIGEN
+];
+?>
+
 	<div id="main">
 		<router-view
 			default-semester="<?= $variables['semester_aktuell']; ?>"
@@ -38,7 +46,7 @@
 			stv-root="<?= site_url('Studentenverwaltung'); ?>"
 			cis-root="<?= CIS_ROOT; ?>"
 			:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
-			:config="<?= htmlspecialchars(json_encode(['generateAlias' => !defined('GENERATE_ALIAS_STUDENT') ? true : GENERATE_ALIAS_STUDENT])); ?>"
+			:config="<?=  htmlspecialchars(json_encode($configArray)); ?>"
 			>
 		</router-view>
 	</div>

@@ -46,6 +46,8 @@ export default {
 			cisRoot: this.cisRoot,
 			activeAddonBewerbung: this.activeAddons.split(';').includes('bewerbung'),
 			configGenerateAlias: this.config.generateAlias,
+			configShowZgvDoktor: this.config.showZgvDoktor,
+			configShowZgvErfuellt: this.config.showZgvErfuellt,
 			hasBpkPermission: this.permissions['student/bpk'],
 			hasAliasPermission: this.permissions['student/alias'],
 			lists: this.lists
