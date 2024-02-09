@@ -4408,7 +4408,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Procedure and terms of payment',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4438,7 +4438,16 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'We would like to draw your attention to the fact that the invoice number must *always* be quoted as the payment reference when making a bank transfer.
+							Otherwise, no automatic payment allocation will take place and there may be a delay in displaying the current payment status of the invoice in CIS.
+							<br />
+							<br />
+							In the event that the amount has been transferred to an incorrect account, we kindly ask you to contact your bank.
+							<br />
+							<br />
+							Each invoice is considered "paid" when the total amount has been credited to our account in full.
+							<br />
+							<br />',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4458,7 +4467,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'FHTW account information',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4478,7 +4487,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'All payments must be made to the following account number and the invoice number must be entered as the payment reference.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4502,7 +4511,11 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Foreign bank transfers:
+											<br />
+											In the case of foreign bank transfers, the charges are to be paid by the
+											<br />
+											the payer in addition to the invoice amounts.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4522,7 +4535,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Invoices & payment confirmations',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4543,7 +4556,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Why is the deposit still outstanding despite payment?s',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4565,7 +4578,9 @@ Die Transaktion und die Bearbeitung der Zahlung, kann bis zu sechs Werktage daue
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The most common reason for this is that the invoice number is not entered as the payment reference in the bank transfer.
+In this case, we kindly ask you to send an e-mail to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> with a payment confirmation.
+The transaction and processing of the payment can take up to six working days.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4585,7 +4600,7 @@ Die Transaktion und die Bearbeitung der Zahlung, kann bis zu sechs Werktage daue
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'I have not received an invoice, what should I do?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4606,7 +4621,8 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'In this case, please check your spam folder. If the invoice has not been sent, please inform us at <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.
+The invoice will be sent to you again. <u><strong>The amount is only to be transferred after receipt of the invoice</strong></u>',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4626,7 +4642,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Refund of the tuition fee',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4652,7 +4668,13 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The tuition fee will not be refunded if...
+-Freshmen who do not take up their study place after the start of the semester (September 1 / February 16)
+-Students who discontinue their studies after the start of the semester (September 1 / February 16).
+
+-Interruption before 15.10. or 15.3.: tuition fees will be refunded
+-Interruption after 15.10. or 15.3.: Tuition fee will not be refunded
+-No tuition fees are payable in the semesters following the interruption; however, the ÖH fee must be paid in each semester of the interruption',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4672,7 +4694,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'You are exempt from paying tuition fees and have received an invoice for tuition fees?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4692,7 +4714,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Please contact your study program assistant. The outstanding invoice will be canceled.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4712,7 +4734,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'I made a mistake with the transfer, what should I do?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4732,7 +4754,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Please report the error to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4752,7 +4774,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'An invoice has been transferred twice, what should I do?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4772,7 +4794,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'If an invoice has been transferred twice, please report this to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>. We will refund you one payment.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4792,7 +4814,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'There are several items on the invoice - should a transfer be made for each item?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4812,7 +4834,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'No, the total amount shown on the invoice must always be transferred.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4832,7 +4854,7 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'When can the amount be transferred?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4852,13 +4874,32 @@ Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechn
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'We would like to point out that bank transfers should only be made on receipt of the invoice. Please state the invoice number as the payment reference.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
-
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zahlungsempfaenger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fachhochschule Technikum Wien',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'University of Applied Sciences Technikum Wien',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'password',
