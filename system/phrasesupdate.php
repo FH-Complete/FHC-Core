@@ -4556,7 +4556,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Why is the deposit still outstanding despite payment?s',
+				'text' => 'Why is the deposit still outstanding despite payment?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
