@@ -11683,13 +11683,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Begründen Sie die Gleichwertigkeit der ECTS',
+                'text' => 'Erläutern Sie die Gleichwertigkeit der ECTS',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'Give reasons for the equivalence of ECTS',
+                'text' => 'Explain ECTS equivalencies',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -11703,13 +11703,13 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Begründen Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
+                'text' => 'Erläutern Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'Give reasons for the equivalence of the course contents',
+                'text' => 'Explain the equivalence of course content',
                 'description' => '',
                 'insertvon' => 'system'
             )
@@ -18084,6 +18084,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'alleGeplantenMarkieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle geplanten markieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mark all planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'alleMassnahmenJetzt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -19723,7 +19743,7 @@ array(
 		)
 	),
 /*
-	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status 
+	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status
 	// erstellt werden, die dann in der Studierendenansicht in einer infobox angezeigt werden
 	array(
 		'app' => 'core',
@@ -20643,6 +20663,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Select a semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'keineBerechtigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No authority',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -23371,7 +23411,7 @@ array(
 		)
 	),
 
-	
+
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
@@ -23452,7 +23492,7 @@ array(
 			)
 		)
 	),
-	
+
 
 
 	array(
@@ -24136,7 +24176,27 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+		array(
+			'app' => 'lehrauftrag',
+			'category' => 'ui',
+			'phrase' => 'hinweistextLehrauftrag',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => '<strong>Hinweis:</strong> Das Akzeptieren von Lehraufträgen ersetzt alle vorhergehenden Lehraufträge dieses Studiensemesters.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => '<strong>Note:</strong> Accepting teaching assignments replaces all previous teaching assignments for this study semester.',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		)
 );
 
 
