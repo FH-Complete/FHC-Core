@@ -84,7 +84,9 @@ class Profil_update_model extends DB_Model
 			//? Nur wenn der/die AssistentIn auch die Berechtigung in der gleichen Organisationseinheit des Studenten hat
 			$parameters = [];
 			$query="
-			SELECT * FROM public.tbl_profil_update 
+			SELECT
+			profil_update_id, uid, name, topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, status_timestamp, status_message, attachment_id 
+			FROM public.tbl_profil_update 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
 			JOIN public.tbl_prestudent ON public.tbl_prestudent.prestudent_id=public.tbl_student.prestudent_id
 			JOIN public.tbl_studiengang ON public.tbl_studiengang.studiengang_kz=public.tbl_prestudent.studiengang_kz
@@ -107,7 +109,7 @@ class Profil_update_model extends DB_Model
 			}
 		}
 		if($mitarbeiterBerechtigung) {
-			
+			$this->addSelect(["profil_update_id", "uid", "name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "status_timestamp", "status_message", "attachment_id"]);
 			$this->addJoin('tbl_mitarbeiter','tbl_mitarbeiter.mitarbeiter_uid=tbl_profil_update.uid');
 			$mitarbeiterRequests = $this->loadWhere($whereClause);
 			if(isError($mitarbeiterRequests)) return error("db error: ". getData($mitarbeiterRequests));

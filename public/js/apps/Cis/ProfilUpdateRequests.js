@@ -88,7 +88,6 @@ const app = Vue.createApp({
                 action: (e, column) => {
                   Vue.$fhcapi.ProfilUpdate.acceptProfilRequest(column.getData())
                     .then((res) => {
-                      console.log("here");
                       this.$refs.UpdatesTable.tabulator.setData();
                     })
                     .catch((e) => {

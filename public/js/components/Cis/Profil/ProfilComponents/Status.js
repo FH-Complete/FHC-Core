@@ -7,7 +7,9 @@ export default {
     Kontakt,
   },
   data() {
-    return {};
+    return {
+      files:null,
+    };
   },
   methods:{
     getDocumentLink: function(dms_id){
@@ -39,7 +41,11 @@ export default {
     updateID: { type: Number },
     topic: { type: String },
   },
-  created() {},
+  created() {
+    Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(this.updateID).then((res) =>{
+      this.files = res.data;
+    })
+  },
   template: `
     <div class="row">
 
@@ -79,9 +85,9 @@ export default {
     <div class="form-underline-titel">{{topic}}</div>
     <span  class="form-underline-content">{{data.value}} </span>
     </div>
-    <div v-if="data.files?.length" class="ms-2">
+    <div v-if="files?.length" class="ms-2">
     
-    <a target="_blank" :href="getDocumentLink(file.dms_id)" v-for="file in data.files">{{file.name}}</a>
+    <a target="_blank" :href="getDocumentLink(file.dms_id)" v-for="file in files">{{file.name}}</a>
     </div>
     </template>
     <component v-else :is="getComponentView" :data="data"></component>

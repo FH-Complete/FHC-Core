@@ -178,7 +178,6 @@ class ProfilUpdate extends Auth_Controller
 			return json_encode(error("Error loading DmsVersion resource"));
 		}
 		$attachment = hasData($attachment) ? getData($attachment) : null;
-		
 		//? returns {name:..., dms_id:...}
 		echo json_encode($attachment);
 	}
@@ -353,11 +352,11 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	private function updateRequestedChange($id, $requested_change){
-		return $this->update([$id], ['requested_change'=>json_encode($requested_change)]);
+		return $this->ProfilUpdateModel->update([$id], ['requested_change'=>json_encode($requested_change)]);
 	}
 
 	private function setStatusOnUpdateRequest($id, $status, $status_message ){ 
-		return $this->update([$id], ["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message]);
+		return $this->ProfilUpdateModel->update([$id], ["status"=>$status,"status_timestamp"=>"NOW()","status_message"=>$status_message]);
 	}
 
 

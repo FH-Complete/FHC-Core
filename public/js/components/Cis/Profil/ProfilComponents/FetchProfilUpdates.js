@@ -131,7 +131,7 @@ export default {
                 <tr v-for="item in data" :style="item.status=='accepted'?'background-color:lightgreen':item.status==='rejected'?'background-color:lightcoral':''">
                 <td class="align-middle text-wrap ">{{item.topic}}</td>
                 <td class="align-middle " >{{item.status}}</td>
-                <td class="align-middle">{{item.change_timestamp}}</td>
+                <td class="align-middle">{{item.status_timestamp}}</td>
                 
                 <template v-if="item.status === 'pending'">
                 <td>

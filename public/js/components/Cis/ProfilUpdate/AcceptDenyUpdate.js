@@ -37,6 +37,7 @@ export default {
       //? result is returned from the Promise when the modal is closed
       result: false,
       info: null,
+      files:null,
     };
   },
 
@@ -78,7 +79,12 @@ export default {
       }
     },
   },
-  created() {},
+  created() {
+   
+     Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(this.data.profil_update_id).then((res) =>{
+      this.files=res.data;
+    }) 
+  },
   mounted() {
     this.modal = this.$refs.modalContainer.modal;
   },
@@ -170,9 +176,9 @@ export default {
 
       <span  class="form-underline-content" >{{data.requested_change.value}}</span>
     </div>
-    <div v-if="data.requested_change.files?.length" class="ms-2">
-    <!--<p>files:</p>-->
-    <a  v-for="file in data.requested_change.files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
+    <div v-if="files?.length" class="ms-2">
+    
+    <a  v-for="file in files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
     </div>
     </template>
 
