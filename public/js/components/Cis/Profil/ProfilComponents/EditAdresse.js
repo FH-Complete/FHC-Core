@@ -18,6 +18,18 @@ export default {
         },
     },
     computed:{
+        ortLayoutClasses: function(){
+            return this.showKontaktTyp?[
+                'col-12', 
+                'col-sm-7',
+                'col-xl-12',
+                'col-xxl-7',
+            ]:['col-12'];
+        },
+        showKontaktTyp: function(){
+            let kontaktTypen = ["Nebenwohnsitz","Hauptwohnsitz"];
+            return kontaktTypen.includes(this.data.typ) || !this.data.typ
+        },
         isChanged: function(){
             if(!this.data.strasse || !this.data.plz || !this.data.ort || !this.data.typ){
                
@@ -34,7 +46,6 @@ export default {
    
      <div class="gy-3 row justify-content-center align-items-center">
        
-    <!-- column 1 in the address row -->
     
       
         <div  class="col-12 col-sm-9 col-xl-12 col-xxl-9 order-1">
@@ -48,23 +59,15 @@ export default {
 
         </div>
         
-    <!-- column 2 in the address row -->
-        <div  class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
+        <div v-if="showKontaktTyp" class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
             
-            
-            
-        
-    
             <div  class="form-underline">
                 <div class="form-underline-titel">Kontakttyp</div>
         
-                <select :value="data.typ" @change="updateValue($event,'typ')" class="form-select" aria-label="Select Kontakttyp">
+                <select  :value="data.typ" @change="updateValue($event,'typ')" class="form-select" aria-label="Select Kontakttyp">
                     <option selected></option>
-                    <option value="Rechnungsadresse">Rechnungsadresse</option>
                     <option value="Nebenwohnsitz">Nebenwohnsitz</option>
-                    <option value="Homeoffice">Homeoffice</option>
                     <option value="Hauptwohnsitz">Hauptwohnsitz</option>
-                    <option value="Firma">Firma</option>
                 </select>    
             </div>
         
@@ -73,7 +76,7 @@ export default {
             </template>
 
         </div>
-        <div  class="order-3 order-sm-3 order-xl-2 order-xxl-3 col-12 col-sm-7  col-xl-12 col-xxl-7 ">
+        <div  class="order-3 order-sm-3 order-xl-2 order-xxl-3 " :class="ortLayoutClasses">
             
             <div class="form-underline ">
             <div class="form-underline-titel">Ort</div>

@@ -118,6 +118,7 @@ const app = Vue.createApp({
                 label: "<i class='fa fa-eye'></i> Show Request",
                 action: (e, column) => {
                   this.showModal(column.getData());
+                    
                 },
               }
             );
@@ -231,6 +232,8 @@ const app = Vue.createApp({
           //? refetches the data, if any request was denied or accepted
           //* setData will call the ajaxURL again to refresh the data
           this.$refs.UpdatesTable.tabulator.setData();
+        }).catch(err=>{
+         
         })
         
     },
