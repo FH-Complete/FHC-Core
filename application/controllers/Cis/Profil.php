@@ -20,13 +20,7 @@ class Profil extends Auth_Controller
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'insertProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'deleteProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'selectProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'insertFile' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'getProfilRequestFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
-			'deleteOldVersionFiles' => ['student/anrechnung_beantragen:r', 'user:r'],
+			
 			
 						
 		]);
@@ -44,11 +38,9 @@ class Profil extends Auth_Controller
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('person/Profil_update_model', 'ProfilUpdateModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
-		$this->load->model('DmsVersion_model','DmsVersionModel');
 
-		$this->load->library('DmsLib');
 
-		//? put the uid and pid inside the controller to reuse in controller
+		//? put the uid and pid inside the controller for reusability
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
 		
@@ -79,178 +71,6 @@ class Profil extends Auth_Controller
 	}
 
 
-	public function insertFile(){
-
-		//? Version des Dokuments
-		/*$this->DmsVersionModel->addSelect(["version"]);
-			$fileVersion = $this->DmsVersionModel->loadWhere(["name"=>$_FILES['files']['name'], "mimetype"=>$_FILES['files']['type']]);
-			$fileVersion = hasData($fileVersion) ? getData($fileVersion)[0]->version : 0;
-			if($fileVersion) $fileVersion++; */
-		if(!count($_FILES)){
-			echo json_encode([]);
-			return;
-		}
-		
-
-		
-		
-		$files = $_FILES['files'];
-        $file_count = count($files['name']);
-
-		$res=[];
-
-        for ($i = 0; $i < $file_count; $i++) {
-            $_FILES['files']['name'] = $files['name'][$i];
-            $_FILES['files']['type'] = $files['type'][$i];
-            $_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
-            $_FILES['files']['error'] = $files['error'][$i];
-            $_FILES['files']['size'] = $files['size'][$i];
-			
-			$dms = [
-				"kategorie_kurzbz"=>"profil_aenderung",
-				"version"=>0, 
-				"name"=>$_FILES['files']['name'],
-				"mimetype"=>$_FILES['files']['type'],
-				"beschreibung"=>$this->uid . " Profil Änderung",
-				"insertvon"=>$this->uid,
-				"insertamum"=>"NOW()",
-			];
-            $tmp_res=$this->dmslib->upload($dms , 'files');
-			$tmp_res = hasData($tmp_res)? getData($tmp_res) : null;
-			array_push($res,$tmp_res);
-		}
-
-		echo json_encode($res);
-	}
-
-
-	public function deleteOldVersionFiles(){
-		$file_array = json_decode($this->input->raw_input_stream);
-		if(!isset($file_array) || !sizeof($file_array)){
-			return;
-		}
-		
-		$res =[];
-		foreach($file_array as $id){
-			//? delete all the different versions of the dms_file
-			
-			$zwischen_res = $this->DmsVersionModel->loadWhere(["dms_id"=>$id]);
-			$zwischen_res = hasData($zwischen_res) ? getData($zwischen_res) : null;
-			if(isset($zwischen_res)){
-				$zwischen_res = array_map(function($item){ return $item->version;},$zwischen_res);
-				foreach($zwischen_res as $version){
-					array_push($res, $this->DmsVersionModel->delete([$id,$version]));
-				}
-			}else{
-				echo json_encode(error("No version of the file has been found"));
-			}
-		}
-		echo json_encode($res);
-	}
-
-	
-
-
-
-	public function selectProfilRequest(){
-		$_GET = json_decode($this->input->raw_input_stream, true);
-		$uid = $this->input->get('uid');
-		$id = $this->input->get('id');
-		$whereClause=['uid'=> $this->uid];
-		
-		if(isset($uid)) $whereClause['uid'] = $uid;
-		if(isset($id)) $whereClause['id'] = $id;
-		
-		$res= $this->ProfilUpdateModel->getProfilUpdatesWhere($whereClause);
-
-		echo json_encode($res);
-		
-	}
-
-
-	public function getProfilRequestFiles(){
-		$id = json_decode($this->input->raw_input_stream);
-		echo json_encode($this->ProfilUpdateModel->getFilesFromChangeRequest($id));
-	}
-
-	public function insertProfilRequest()
-	{
-
-		$json = json_decode($this->input->raw_input_stream);
-		$payload = $json->payload;
-	
-		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : (property_exists($json->payload,"adresse_id")? "adresse_id" : null);
-		
-		$name = $this->PersonModel->getFullName($this->uid);
-		if(isError($name)){
-			// error handling
-			var_dump($name);
-			return;
-		}
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "name"=>getData($name), "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
-
-		//? loops over all updateRequests from a user to validate if the new request is valid
-		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid"=>$this->uid]);
-		$res = hasData($res) ? getData($res) : null;
-		
-		if($res){
-		$pending_changes = array_filter($res, function($element) {
-			return $element->status == 'pending';
-		});
-		foreach($pending_changes as $update_request){
-			$existing_change = json_decode($update_request->requested_change);
-			
-			 //? the user can add as many new kontakt/adresse as he likes
-			if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
-				//? the kontakt_id / adresse_id of a change has to be unique 
-				echo json_encode(error("cannot change the same resource twice"));
-				return;
-			}
-
-			elseif(!$identifier && $update_request->topic == $json->topic ){
-				//? if it is not a delete or add request than the topic has to be unique
-				echo json_encode(error("A request to change " . $json->topic . " is already open"));
-				return;
-			}
-		}}
-		
-			$insertID = $this->ProfilUpdateModel->insert($data);
-				
-			if(isError($insertID)){
-				//catch error
-			}else{
-				$insertID = hasData($insertID)? getData($insertID): null;
-				$editTimestamp = $this->ProfilUpdateModel->getTimestamp($insertID);
-				
-				$date = success(date_create($editTimestamp)->format('d.m.Y'));
-				echo json_encode($date);
-			}
-	}
-
-	public function updateProfilRequest()
-	{
-
-		$json = json_decode($this->input->raw_input_stream);
-		
-		
-		$updateID =$this->ProfilUpdateModel->update([$json->ID],["requested_change" => json_encode($json->payload), "updateamum" => "NOW()", "updatevon" => $this->uid]);
-		if(isError($updateID)){
-			//catch error
-		}else{
-			$updateID = hasData($updateID)? getData($updateID)[0]: null;
-			$editTimestamp = $this->ProfilUpdateModel->getTimestamp($updateID,true);
-			
-			$date = success(date_create($editTimestamp)->format('d.m.Y')); 
-			echo json_encode($date);
-		}
-	}
-
-	public function deleteProfilRequest(){
-
-		$json = json_decode($this->input->raw_input_stream);
-		$delete_res = $this->ProfilUpdateModel->delete([$json]);
-		echo json_encode($delete_res);
-	}
 
 
 
@@ -758,7 +578,7 @@ class Profil extends Auth_Controller
 
 		if (
 
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as adr_typ", "plz", "ort","zustelladresse"])) &&
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
 		) {

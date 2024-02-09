@@ -24,16 +24,13 @@ export default {
     onShowBsModal: Function,
     onShownBsModal: Function,
   },
-/*   provide(){
-    return {
-      topic: computed(()=> "test"),
-    }
-  }, */
+  
   data() {
     return {
       topic: null,
       profilUpdate: null,
       editData: this.value,
+      fileID:null,
       breadcrumb: null,
 
       result: false,
@@ -41,17 +38,29 @@ export default {
     };
   },
 
+  provide(){
+    return {
+      updateFileID: this.updateFileIDFunction,
+    }
+  }, 
+
   methods: {
+
+    updateFileIDFunction: function(newFileID){
+      this.fileID = newFileID;
+    },
+
     async submitProfilChange() {
       //? check if data is valid before making a request
       if (this.topic && this.profilUpdate) {
-        if (this.profilUpdate.files) {
-          const fileIDs = await this.uploadFiles(this.profilUpdate.files);
-         
-          if (fileIDs) {
-            this.profilUpdate.files = fileIDs;
-          }
+        
+        //? if profil update contains any attachment
+        if (this.fileID) {
+          const fileData = await this.uploadFiles(this.fileID);
+          
+          this.fileID = fileData? fileData : null;
         }
+
         //? inserts new row in public.tbl_cis_profil_update
         //* calls the update api call if an update field is present in the data that was passed to the modal
         const handleApiResponse = (res) => {
@@ -71,16 +80,19 @@ export default {
         };
 
         this.editData.updateID
-          ? Vue.$fhcapi.UserData.updateProfilRequest(
+          ? Vue.$fhcapi.ProfilUpdate.updateProfilRequest(
               this.topic,
               this.profilUpdate,
-              this.editData.updateID
+              this.editData.updateID,
+              this.fileID[0]
             ).then((res) => {
               handleApiResponse(res);
             })
-          : Vue.$fhcapi.UserData.insertProfilRequest(
+          : Vue.$fhcapi.ProfilUpdate.insertProfilRequest(
               this.topic,
-              this.profilUpdate
+              this.profilUpdate,
+              this.fileID[0]
+
             ).then((res) => {
               handleApiResponse(res);
             });
@@ -91,55 +103,31 @@ export default {
       let updatedFiles = [];
 
       if (this.editData.updateID) {
-        //? if we are updating an already existing profilRequest
-        const existingFiles = await Vue.$fhcapi.UserData.getProfilRequestFiles(
-          this.editData.updateID
-        ).then((res) => {
-          return res.data;
-        });
-
-        let filesToKeep = [];
-        let filesToDelete = [];
-        existingFiles.forEach((file) => {
-          Array.from(files).some((f) => f.name === file.name)
-            ? filesToKeep.push(file)
-            : filesToDelete.push(file.dms_id);
-        });
         
-        //? only keeps the newest version of the documents and deletes the old versions in the database
-        if(filesToDelete.length > 0) {
-          Vue.$fhcapi.UserData.deleteOldVersionFiles(
-            filesToDelete
-          );
-        }
-       
-
-        updatedFiles = [...filesToKeep];
       }
 
-      let formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].type !== "application/x.fhc-dms+json")
-          formData.append("files[]", files[i]);
-      }
-      if(Array.from(formData).length > 0){
-      await Vue.$fhcapi.UserData.insertFile(formData)
-        .then((res) => {
-          /* returns file information as 
-        [{"name":"example.png", "dms_id":282531}] */
-
-          updatedFiles = updatedFiles.concat(
-            res.data?.map((file) => {
-              return { dms_id: file.dms_id, name: file.client_name};
-            })
-          );
+      
+      
+      if (files[0].type !== "application/x.fhc-dms+json"){
+        let formData = new FormData();
+        formData.append("files[]", files[0]);
+        const result = this.editData.updateID ?
+        //? updating old attachment by replacing
+        //* second parameter of api request insertFile checks if the file has to be replaced or not
+        await Vue.$fhcapi.ProfilUpdate.insertFile(formData,this.editData.updateID).then(res => {
+          return res.data?.map((file) => file.dms_id);
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        :
+        //? fresh insert of new attachment
+        await Vue.$fhcapi.ProfilUpdate.insertFile(formData).then(res => {
+          return res.data?.map((file) => file.dms_id);
+        })
+        return result;
+      }else{
+        //? attachment hasn't been replaced
+        return false;
       }
 
-      return updatedFiles;
     },
   },
   computed: {},
@@ -162,7 +150,6 @@ export default {
       {{title }}  
     </template>
     <template v-slot:default>
-
 
     <nav aria-label="breadcrumb" class="ps-2  ">
       <ol class="breadcrumb ">

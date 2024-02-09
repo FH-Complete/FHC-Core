@@ -25,8 +25,10 @@ export default {
       type: Boolean,
     },
   },
+  inject:["updateFileID"],
   computed: {
     didFilesChange: function () {
+      this.updateFileID(this.dmsData);
       let res = false;
       //? case in which the profilRequest has already associated files 
       if(this.files){ 
@@ -48,7 +50,7 @@ export default {
     isChanged: function () {
       if (this.withFiles) {
         if(this.updateID){
-          return this.didDataChange || this.didFilesChange;
+          return (this.didDataChange || this.didFilesChange) && this.dmsData.length;
         }
         return this.didDataChange && this.didFilesChange;
       }
@@ -63,13 +65,20 @@ export default {
     },
   },
   methods: {
+    stringifyFile(file) {
+			return JSON.stringify({
+				lastModified: file.lastModified,
+				lastModifiedDate: file.lastModifiedDate,
+				name: file.name,
+				size: file.size,
+				type: file.type
+			});
+		},
     emitChanges: function () {
       if (this.isChanged) {
+        
         this.$emit(
-          "profilUpdate",
-          this.withFiles
-            ? { value: this.data.value, files: this.dmsData }
-            : { value: this.data.value }
+          "profilUpdate", { value: this.data.value }
         );
       } else {
         this.$emit("profilUpdate", null);
@@ -84,6 +93,7 @@ export default {
     }
   },
   template: `
+  
     <p style="opacity:0.8" class="ms-2" v-if="withFiles && !updateID">Please update your {{data.titel}} and upload the corresponding Document of proof</p>
 
     <div class="form-underline">
@@ -91,9 +101,14 @@ export default {
     
     <input  class="mb-2 form-control" @input="emitChanges"  v-model="data.value" :placeholder="data.value">
   
-    
-    <dms ref="update" v-if="withFiles" id="files" :noList="false" :multiple="true" v-model="dmsData" @update:model-value="didFilesChange"  ></dms>
-
+    <div class="row gx-2">
+    <div class="col">
+    <dms ref="update" v-if="withFiles" id="files" name="files" :multiple="false" v-model="dmsData" @update:model-value="didFilesChange"  ></dms>
+    </div>
+    <div class="col-auto">
+    <button @click="dmsData=[]" class="btn btn-danger"><i style="color:white" class="fa fa-trash"></i></button>
+    </div>
+    </div>
     </div>
     `,
 };

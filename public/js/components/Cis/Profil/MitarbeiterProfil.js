@@ -146,7 +146,7 @@ export default {
     
 
     fetchProfilUpdates: function(){
-      Vue.$fhcapi.UserData.selectProfilRequest().then((res)=>{
+      Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
         
         if(!res.error){
           this.data.profilUpdates = res.data.retval?.length ? res.data.retval.sort(this.sortProfilUpdates) : null ; 
@@ -161,7 +161,7 @@ export default {
           title:"Profil bearbeiten",
         }).then((popup_result) => {
           if(popup_result){
-            Vue.$fhcapi.UserData.selectProfilRequest()
+            Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
             .then((res) =>{
               if(!res.error){
                 this.data.profilUpdates = res.data.retval;
@@ -223,12 +223,8 @@ export default {
   },
  
   created() {
-    
     //? sorts the profil Updates: pending -> accepted -> rejected
     this.data.profilUpdates?.sort(this.sortProfilUpdates);
-
-      
-
   },
   mounted() {
     

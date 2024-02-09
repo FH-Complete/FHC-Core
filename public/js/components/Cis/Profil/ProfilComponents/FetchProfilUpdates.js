@@ -14,7 +14,7 @@ export default {
   },
   methods: {
     deleteRequest: function (item) {
-      Vue.$fhcapi.UserData.deleteProfilRequest(item.profil_update_id).then(
+      Vue.$fhcapi.ProfilUpdate.deleteProfilRequest(item.profil_update_id).then(
         (res) => {
           if (res.data.error) {
             //? open alert
@@ -50,7 +50,7 @@ export default {
           break;
       }
     },
-    openModal(updateRequest) {
+    async openModal(updateRequest) {
       let view = this.getView(updateRequest.topic, updateRequest.status);
       let data = null;
       let content = null;
@@ -62,17 +62,15 @@ export default {
           titel: updateRequest.topic,
           value: updateRequest.requested_change.value,
         };
-        if (updateRequest.requested_change.files.length) {
-          const FILE = updateRequest.requested_change.files?.map((file) => {
-            return new File(["files[]"], file.name);
-          });
-          const FILELIST = new DataTransfer();
-          FILE.forEach((file) => {
-            FILELIST.items.add(file);
-          });
-          files = updateRequest.requested_change.files;
+
+        const filesFromDatabase = await Vue.$fhcapi.ProfilUpdate.getProfilRequestFiles(updateRequest.profil_update_id).then(res=>{
+          return res.data;
+        });
+
+        files= filesFromDatabase;
+        if(files){
+          withFiles = true;
         }
-        withFiles = true;
       } else {
         data = updateRequest.requested_change;
       }

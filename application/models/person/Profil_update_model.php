@@ -49,6 +49,7 @@ class Profil_update_model extends DB_Model
 	}
 
 
+	//? queries the tbl_profil_updates without permissions of the user
 	public function getProfilUpdatesWhere($whereClause){
 		$res = $this->loadWhere($whereClause);
 		if(isError($res)){
