@@ -146,67 +146,78 @@ class Prestudent extends FHC_Controller
 
 	}
 
-	public function getBezeichnungZgv(){
+	public function getBezeichnungZgv()
+	{
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
 
 		$this->ZgvModel->addOrder('zgv_code');
 
 		$result = $this->ZgvModel->load();
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 		$this->outputJson($result);
 	}
 
-	public function getBezeichnungDZgv(){
+	public function getBezeichnungDZgv()
+	{
 		$this->load->model('codex/Zgvdoktor_model', 'ZgvdoktorModel');
 
 		$this->ZgvdoktorModel->addOrder('zgvdoktor_code');
 
 		$result = $this->ZgvdoktorModel->load();
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 		$this->outputJson($result);
 	}
 
-	public function getBezeichnungMZgv(){
+	public function getBezeichnungMZgv()
+	{
 		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
 
 		$this->ZgvmasterModel->addOrder('zgvmas_code');
 
 		$result = $this->ZgvmasterModel->load();
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 		$this->outputJson($result);
 	}
 
-	public function getAusbildung(){
+	public function getAusbildung()
+	{
 		$this->load->model('codex/Ausbildung_model', 'AusbildungModel');
 
 		$this->AusbildungModel->addOrder('ausbildungcode');
 
 		$result = $this->AusbildungModel->load();
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 		$this->outputJson($result);
 	}
 
-	public function getAufmerksamdurch(){
+	public function getAufmerksamdurch()
+	{
 		$this->load->model('codex/Aufmerksamdurch_model', 'AufmerksamdurchModel');
 
 		$this->AufmerksamdurchModel->addOrder('aufmerksamdurch_kurzbz');
 
 		$result = $this->AufmerksamdurchModel->load();
-		if (isError($result)) {
+		if (isError($result))
+		{
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
 		$this->outputJson($result);
 	}
 
-	public function getBerufstaetigkeit(){
+	public function getBerufstaetigkeit()
+	{
 		$this->load->model('codex/Berufstaetigkeit_model', 'BerufstaetigkeitModel');
 
 		$this->BerufstaetigkeitModel->addOrder('berufstaetigkeit_code');
@@ -218,24 +229,16 @@ class Prestudent extends FHC_Controller
 		$this->outputJson($result);
 	}
 
-	public function getTypenStg(){
-		//TODO(manu) hier soll bis.tbl_gsstudientyp herangezogen werden
-		$this->load->model('organisation/Studiengangstyp_model', 'StudiengangstypModel');
+	public function getTypenStg()
+	{
+		$this->load->model('education/Gsstudientyp_model', 'GsstudientypModel');
 
-		$this->StudiengangstypModel->addOrder('typ');
+		$this->GsstudientypModel->addOrder('gsstudientyp_kurzbz');
 
-		$result = $this->StudiengangstypModel->load();
+		$result = $this->GsstudientypModel->load();
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
 		}
-		$data = $result->retval;
-
-		//filter NullValues
-		$filteredData = array_filter($data, function ($entry) {
-			return $entry->bezeichnung !== null;
-		});
-		$result->retval = $filteredData;
-
 		$this->outputJson($result);
 	}
 
