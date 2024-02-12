@@ -3,11 +3,11 @@ export default {
 
 
 
-  isMitarbeiterOrStudent: function (uid) {
+  getMitarbeiter: function (student_id) {
     const url =
       FHC_JS_DATA_STORAGE_OBJECT.app_root +
-      `cis.php/Cis/Profil/isMitarbeiterOrStudent/${uid}`;
-    return axios.get(url);
+      `cis.php/api/v1/crm/Student/getStudent`;
+    return axios.get(url,{student_id:student_id});
   },
 
   getView: function (uid) {

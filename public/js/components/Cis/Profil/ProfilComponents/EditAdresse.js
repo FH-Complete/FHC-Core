@@ -1,5 +1,11 @@
 export default {
-    props:{data:Object},
+    props:{
+        data:Object,
+        isMitarbeiter:{
+            type: Boolean,
+            default: false,
+        },
+    },
     data(){
         return{
             originalValue:null,
@@ -78,7 +84,7 @@ export default {
 
         </div>
         
-        <div v-if="showKontaktTyp" class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
+        <div class=" order-2 order-sm-4 order-xl-3 order-xxl-4 col-12 col-sm-5  col-xl-8 col-xxl-5  ">
             
             <div  class="form-underline">
                 <div class="form-underline-titel">Kontakttyp</div>
@@ -87,6 +93,9 @@ export default {
                     <option selected></option>
                     <option value="Nebenwohnsitz">Nebenwohnsitz</option>
                     <option value="Hauptwohnsitz">Hauptwohnsitz</option>
+                    <option v-if="isMitarbeiter" value="Homeoffice">Homeoffice</option>
+                    <option v-if="isMitarbeiter" value="Rechnungsadresse">Rechnungsadresse</option>
+                  
                 </select>    
             </div>
         
@@ -95,7 +104,8 @@ export default {
             </template>
 
         </div>
-        <div  class="order-3 order-sm-3 order-xl-2 order-xxl-3 " :class="ortLayoutClasses">
+
+        <div  class="order-3 order-sm-3 order-xl-2 order-xxl-3 col-12 col-sm-7 col-xl-12 col-xxl-7 " >
             
             <div class="form-underline ">
             <div class="form-underline-titel">Ort</div>

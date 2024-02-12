@@ -26,32 +26,38 @@ export default {
       );
     },
     getView: function (topic, status) {
+
+      if(!(status === "pending")){
+        return "Status";
+      }
+
       switch (topic) {
         case "Private Kontakte":
-          return status === "pending" ? "EditKontakt" : "Status";
-          break;
-        case "Private Adressen":
-          return status === "pending" ? "EditAdresse" : "Status";
-          break;
-        case "Add Adressen":
-          return status === "pending" ? "EditAdresse" : "Status";
+          return "EditKontakt";
           break;
         case "Add Kontakte":
-          return status === "pending" ? "EditKontakt" : "Status";
-          break;
-        case "Delete Adressen":
-          return status === "pending" ? "Adresse" : "Status";
+          return "EditKontakt";
           break;
         case "Delete Kontakte":
-          return status === "pending" ? "Kontakt" : "Status";
+          return "Kontakt";
+          break;
+        case "Private Adressen":
+          return "EditAdresse";
+          break;
+        case "Add Adressen":
+          return "EditAdresse";
+          break;
+        case "Delete Adressen":
+          return "Adresse";
           break;
         default:
-          return status === "pending" ? "TextInputDokument" : "Status";
+          return "TextInputDokument";
           break;
       }
     },
     async openModal(updateRequest) {
       let view = this.getView(updateRequest.topic, updateRequest.status);
+      
       let data = null;
       let content = null;
       let files = null;
@@ -83,6 +89,12 @@ export default {
         topic: updateRequest.topic,
         files: files,
       };
+
+      //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
+      /* if(view === "EditAdresse"){
+        const getMitarbeiter = await Vue.$fhcapi.UserData.getMitarbeiter(updateRequest.uid);
+        console.log(getMitarbeiter);
+      } */
 
       //? adds the status information if the profil update request was rejected or accepted
       if (updateRequest.status !== "pending") {
