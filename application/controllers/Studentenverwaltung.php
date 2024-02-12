@@ -21,7 +21,9 @@ class Studentenverwaltung extends FHC_Controller
 		$this->load->view('Studentenverwaltung', [
 			'permissions' => [
 				'student/bpk' => $this->permissionlib->isBerechtigt('student/bpk'),
-				'student/alias' => $this->permissionlib->isBerechtigt('student/alias')
+				'student/alias' => $this->permissionlib->isBerechtigt('student/alias'),
+				'basis/prestudent' => $this->permissionlib->isBerechtigt('basis/prestudent'),
+
 			],
 			'variables' => [
 				'semester_aktuell' => $this->variablelib->getVar('semester_aktuell')

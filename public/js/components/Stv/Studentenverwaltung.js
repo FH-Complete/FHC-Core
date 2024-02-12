@@ -50,6 +50,7 @@ export default {
 			configShowZgvErfuellt: this.config.showZgvErfuellt,
 			hasBpkPermission: this.permissions['student/bpk'],
 			hasAliasPermission: this.permissions['student/alias'],
+			hasPrestudentPermission: this.permissions['basis/prestudent'],
 			lists: this.lists
 		}
 	},

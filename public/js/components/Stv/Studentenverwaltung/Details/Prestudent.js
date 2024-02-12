@@ -20,6 +20,10 @@ export default {
 			from: 'configShowZgvDoktor',
 			default: false
 		},
+		hasPrestudentPermission: {
+			from: 'hasPrestudentPermission',
+			default: false
+		},
 	},
 	props: {
 		modelValue: Object
@@ -40,6 +44,8 @@ export default {
 			deltaArray: [],
 			actionUpdate: false
 		};
+	},
+	computed: {
 	},
 	watch: {
 	},
@@ -496,13 +502,13 @@ export default {
 								<option :value="false">nein</option>-->
 							</form-input>
 						</div>
-						<!--	Todo(manu) an Recht basis/prestudent hänaen -->
 						<form-input
 							container-class="col-1"
 							label="Priorität"
 							type="text"
 							v-model="data.priorisierung"
 							name="priorisierung"
+							:disabled="!hasPrestudentPermission"
 							>
 						</form-input>
 					</div>
@@ -524,7 +530,7 @@ export default {
 		
 		<br>
 		
-		{{showZgvDoktor}} || {{generateAlias}} || {{showZgvErfuellt}} 
+		{{hasPrestudentPermission}}
 <!--		<hr>
 		Data: {{data}}
 		<hr>-->
