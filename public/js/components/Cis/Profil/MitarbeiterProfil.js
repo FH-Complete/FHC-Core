@@ -149,7 +149,7 @@ export default {
       Vue.$fhcapi.ProfilUpdate.selectProfilRequest().then((res)=>{
         
         if(!res.error){
-          this.data.profilUpdates = res.data.retval?.length ? res.data.retval.sort(this.sortProfilUpdates) : null ; 
+          this.data.profilUpdates = res.data?.length ? res.data.sort(this.sortProfilUpdates) : null ; 
         }
       });
     },
@@ -164,14 +164,16 @@ export default {
             Vue.$fhcapi.ProfilUpdate.selectProfilRequest()
             .then((res) =>{
               if(!res.error){
-                this.data.profilUpdates = res.data.retval;
+                this.data.profilUpdates = res.data;
                 this.data.profilUpdates.sort(this.sortProfilUpdates);
                 
               }else{
-                alert("Error when fetching profile updates: " +res.data.retval);
+                console.log("Error when fetching profile updates: " +res.data);
               }
             })
-            .catch(err=>alert(err));
+            .catch(err=>{
+              console.log(err);
+            });
           }
         }).catch((e) => {
           // Wenn der User das Modal abbricht ohne Änderungen

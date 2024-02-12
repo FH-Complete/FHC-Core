@@ -206,22 +206,22 @@ class ProfilUpdate extends Auth_Controller
 
 		//? loops over all updateRequests from a user to validate if the new request is valid
 		$res = $this->ProfilUpdateModel->getProfilUpdatesWhere(["uid"=>$this->uid]);
-		$res = hasData($res) ? getData($res) : null;
 		
 		if($res){
 		$pending_changes = array_filter($res, function($element) {
 			return $element->status == 'pending';
 		});
 		foreach($pending_changes as $update_request){
-			$existing_change = json_decode($update_request->requested_change);
+			$existing_change = $update_request->requested_change;
 			
 			 //? the user can add as many new kontakt/adresse as he likes
-			if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
+			 
+			 if( !isset($payload->add) && property_exists($existing_change,$identifier) && property_exists($payload,$identifier) && $existing_change->$identifier == $payload->$identifier){
 				//? the kontakt_id / adresse_id of a change has to be unique 
 				echo json_encode(error("cannot change the same resource twice"));
 				return;
 			}
-
+			
 			elseif(!$identifier && $update_request->topic == $json->topic ){
 				//? if it is not a delete or add request than the topic has to be unique
 				echo json_encode(error("A request to change " . $json->topic . " is already open"));
