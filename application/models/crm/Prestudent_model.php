@@ -700,4 +700,30 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery($query, array($prestudent_id));
 	}
 
+	/**
+	 * Gets history of all prestudents, person given
+	 * @param int $person_id
+	 * @return object
+	 */
+	public function getHistoryPrestudents($person_id)
+	{
+		$query = "
+			SELECT ps.studiensemester_kurzbz, p.priorisierung, p.studiengang_kz, sg.kurzbzlang, sg.orgform_kurzbz, ps.status_kurzbz, s.student_uid, sp.bezeichnung, ps.ausbildungssemester,
+			       CONCAT(ps.status_kurzbz, ' (', ps.ausbildungssemester, '. Semester)') as status
+			FROM public.tbl_prestudent p
+			JOIN (
+					SELECT DISTINCT ON(prestudent_id) *
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id IN (SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id = ?)
+					ORDER BY prestudent_id, datum desc, insertamum desc
+				) ps USING(prestudent_id)
+			JOIN public.tbl_status USING(status_kurzbz)
+			JOIN public.tbl_studiengang sg USING(studiengang_kz)
+			LEFT JOIN lehre.tbl_studienplan sp USING (studienplan_id)
+			LEFT JOIN public.tbl_student s USING (prestudent_id)
+			ORDER BY p.priorisierung
+		";
+
+		return $this->execQuery($query, array($person_id));
+	}
 }

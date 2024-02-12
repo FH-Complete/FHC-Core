@@ -1,12 +1,16 @@
 import {CoreRESTClient} from '../../../../RESTClient.js';
 import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
+import TblHistory from "./Prestudent/History.js";
+/*import TblStatus from "./Prestudent/Status.js";*/
 
 export default {
 	components: {
 		CoreRESTClient,
 		FormForm,
-		FormInput
+		FormInput,
+		TblHistory,
+/*		TblStatus*/
 	},
 	inject: {
 		lists: {
@@ -42,7 +46,7 @@ export default {
 			listFoerderrelevant: [],
 			initialFormData: {},
 			deltaArray: [],
-			actionUpdate: false
+			actionUpdate: false,
 		};
 	},
 	computed: {
@@ -112,6 +116,13 @@ export default {
 	},
 	created() {
 		this.loadPrestudent();
+/*		CoreRESTClient
+			.get('components/stv/Prestudent/getHistoryPrestudents/'+ this.modelValue.person_id)
+			.then(result => CoreRESTClient.getData(result.data) || [])
+			.then(result => {
+				this.historyPrestudents = result;
+			})
+			.catch(this.$fhcAlert.handleSystemError);*/
 		//initiale Daten nach dem Laden
 		//this.initialFormData = {...this.data};
 		CoreRESTClient
@@ -410,6 +421,7 @@ export default {
 							type="text"
 							v-model="data.aufnahmeschluessel"
 							name="aufnahmeschluessel"
+							disabled							
 							>
 						</form-input>
 						
@@ -529,18 +541,19 @@ export default {
 		</form-form>
 		
 		<br>
-		
-		{{hasPrestudentPermission}}
-<!--		<hr>
-		Data: {{data}}
-		<hr>-->
+		<div class="row mb-3">
+			<div class="col-6">
+				<legend>Status</legend>
+<!--				<TblStatus :prestudent_id="modelValue.prestudent_id"></TblStatus>	-->	
+			</div>
+			
+			<div class="col-6">
+				<legend>Gesamthistorie</legend>
+				<TblHistory :person_id="modelValue.person_id"></TblHistory>		
+			</div>
+				
+		</div>
 
-<!--		<hr>
-		DeltaArray: {{deltaArray}}
-		<br>
-		to update: {{actionUpdate}}
-		<hr>
-		InitialData: {{initialFormData}}-->
 	
 		
 	</div>

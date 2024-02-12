@@ -43,6 +43,8 @@ class Prestudent extends FHC_Controller
 		$this->load->library('form_validation');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
+		//Todo(manu) Validierungen
+
 /*		$result = $this->PrestudentModel->loadWhere(['prestudent_id' =>$prestudent_id]);
 		if (isError($result)) {
 			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -143,6 +145,20 @@ class Prestudent extends FHC_Controller
 			}
 			return $this->outputJsonSuccess(true);
 		}
+
+	}
+
+	public function getHistoryPrestudents($person_id)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$result = $this->PrestudentModel->getHistoryPrestudents($person_id);
+		if (isError($result))
+		{
+			$this->output->set_status_header(REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+		}
+
+		$this->outputJson(getData($result) ?: []);
 
 	}
 
