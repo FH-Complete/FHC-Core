@@ -53,11 +53,10 @@ class ProfilUpdate extends Auth_Controller
 	public function show($dms_id){
 		
 		$profil_update = $this->ProfilUpdateModel->loadWhere(['attachment_id'=>$dms_id]);
-		$profil_update = hasData($profil_update) ? getData($profil_update) : null;
+		$profil_update = hasData($profil_update) ? getData($profil_update)[0] : null;
 		
 		//? checks if an profil update exists with the dms_id requested from the user
 		if($profil_update){ 
-			
 			$is_mitarbeiter_profil_update = $this->MitarbeiterModel->isMitarbeiter($profil_update->uid);
 			$is_student_profil_update = $this->StudentModel->isStudent($profil_update->uid);
 
@@ -66,11 +65,15 @@ class ProfilUpdate extends Auth_Controller
 				$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:r') && $is_mitarbeiter_profil_update || 
 				$this->uid == $profil_update->uid)
 			{
-				$file = $this->dmslib->download($dms_id);
-				$file = hasData($file) ? getData($file) : null;
-				//? returns the downloaded file to the user
-				$res = $this->outputFile($file);
-				echo json_encode($res);	
+
+				// Get file to be downloaded from DMS
+				$newFilename= $this->uid."/document_".$dms_id;
+				$download = $this->dmslib->download($dms_id, $newFilename);
+				if (isError($download)) return $download;
+				
+				// Download file
+				$this->outputFile(getData($download));
+				
 
 			}else{
 				show_error("Missing necessary permissions");
@@ -133,6 +136,7 @@ class ProfilUpdate extends Auth_Controller
 			];
 			
             $tmp_res=$this->dmslib->upload($dms , 'files');
+			
 			$tmp_res = hasData($tmp_res)? getData($tmp_res) : null;
 			array_push($res,$tmp_res);
 		}
