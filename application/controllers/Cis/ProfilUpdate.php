@@ -15,7 +15,7 @@ class ProfilUpdate extends Auth_Controller
 			'getProfilUpdateWithPermission' => ['student/stammdaten:r','mitarbeiter/stammdaten:r'],
 			'acceptProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
 			'denyProfilRequest'=>['student/stammdaten:rw','mitarbeiter/stammdaten:rw'],
-			'show'=>['student/stammdaten:r','mitarbeiter/stammdaten:r'],
+			'show'=>['student/anrechnung_beantragen:r'],
 		
 			'insertProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'updateProfilRequest' => ['student/anrechnung_beantragen:r', 'user:r'],
@@ -33,8 +33,12 @@ class ProfilUpdate extends Auth_Controller
 		$this->load->model('person/Adresse_model','AdresseModel');
 		$this->load->model('person/Adressentyp_model', 'AdressenTypModel');
 		$this->load->model('person/Person_model','PersonModel');
+		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
+
 
 		$this->load->library('DmsLib');
+		$this->load->library('PermissionLib');
 
 		//? put the uid and pid inside the controller for reusability
 		$this->uid = getAuthUID();
@@ -47,15 +51,37 @@ class ProfilUpdate extends Auth_Controller
 	}
 
 	public function show($dms_id){
-		$this->load->library('DmsLib');
-		//? downloads the file using the dms_id
-		$file = $this->dmslib->download($dms_id);
 		
-		$file = hasData($file) ? getData($file) : null;
-		//? returns the downloaded file to the user
-		$res = $this->outputFile($file);
+		$profil_update = $this->ProfilUpdateModel->loadWhere(['attachment_id'=>$dms_id]);
+		$profil_update = hasData($profil_update) ? getData($profil_update) : null;
+		
+		//? checks if an profil update exists with the dms_id requested from the user
+		if($profil_update){ 
+			
+			$is_mitarbeiter_profil_update = $this->MitarbeiterModel->isMitarbeiter($profil_update->uid);
+			$is_student_profil_update = $this->StudentModel->isStudent($profil_update->uid);
 
-		echo json_encode($res);
+			if(
+				$this->permissionlib->isBerechtigt('student/stammdaten:r') && $is_student_profil_update || 
+				$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:r') && $is_mitarbeiter_profil_update || 
+				$this->uid == $profil_update->uid)
+			{
+				$file = $this->dmslib->download($dms_id);
+				$file = hasData($file) ? getData($file) : null;
+				//? returns the downloaded file to the user
+				$res = $this->outputFile($file);
+				echo json_encode($res);	
+
+			}else{
+				show_error("Missing necessary permissions");
+				return;
+			}
+			
+		}else{
+			show_error("The requested document is not an attachment for any profil update");
+			return;
+		}
+		
 	}
 
 
