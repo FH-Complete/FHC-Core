@@ -185,13 +185,23 @@ export const CoreFilterCmpt = {
 			else
 				this.getFilter();
 		},
-		initTabulator() {
+		async initTabulator() {
+			let placeholder = '< Phrasen Plugin not loaded! >';
+			if (this.$p) {
+				await this.$p.loadCategory('ui');
+				placeholder = this.$p.t('ui/keineDatenVorhanden');
+			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 				height: 500,
-				layout: "fitColumns",
+				layout: "fitDataStretch",
 				movableColumns: true,
-				reactiveData: true
+				columnDefaults:{
+					tooltip: true,
+				},
+				placeholder,
+				reactiveData: true,
+				persistence: true
 			}, ...(this.tabulatorOptions || {})};
 
 			if (!this.tableOnly) {
@@ -436,7 +446,7 @@ export const CoreFilterCmpt = {
 		 *
 		 */
 		handlerRemoveCustomFilter: function(event) {
-			filterId = event.currentTarget.getAttribute("href").substring(1);
+			let filterId = event.currentTarget.getAttribute("href").substring(1);
 			if (filterId === this.selectedFilter)
 				this.selectedFilter = null;
 			//

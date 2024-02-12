@@ -14,13 +14,6 @@
   font-size: .65em;
   padding-inline-start: 1em;
 }
-.fhc-header:after {
-  background-color: var(--bs-gray-300);
-  content: "";
-  display: block;
-  height: 1px;
-  width: 100%;
-}
 
 .fhc-alert.p-toast-center {
   width: 35rem;
