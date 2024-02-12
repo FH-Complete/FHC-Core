@@ -51,7 +51,6 @@
             $qry = "CREATE TABLE public.tbl_profil_update (
                 profil_update_id INTEGER NOT NULL,
                 uid VARCHAR(32) NOT NULL,
-                name TEXT NOT NULL,
                 topic VARCHAR(32) NOT NULL,
                 requested_change jsonb NOT NULL,
                 updateamum TIMESTAMP NULL,
