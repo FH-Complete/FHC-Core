@@ -213,19 +213,21 @@ class ProfilUpdate extends Auth_Controller
 
 	public function insertProfilRequest()
 	{
+		//! deprecated code
+		//? Name of user is now queried in the database table model Profil_update_model.php
+		/* $name = $this->PersonModel->getFullName($this->uid);
+		if(isError($name)){
+			// error handling
+			var_dump($name);
+			return;
+		} */
 
 		$json = json_decode($this->input->raw_input_stream);
 		$payload = $json->payload;
 		
 		$identifier = property_exists($json->payload,"kontakt_id")? "kontakt_id" : (property_exists($json->payload,"adresse_id")? "adresse_id" : null);
 		
-		$name = $this->PersonModel->getFullName($this->uid);
-		if(isError($name)){
-			// error handling
-			var_dump($name);
-			return;
-		}
-		$data = ["topic"=>$json->topic,"uid" => $this->uid, "name"=>getData($name), "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
+		$data = ["topic"=>$json->topic,"uid" => $this->uid, "requested_change" => json_encode($payload), "insertamum" => "NOW()", "insertvon"=>$this->uid,"status"=>"pending" ];
 		//? insert fileID in the dataset if sent with post request
 		if(isset($json->fileID)){
 			$data['attachment_id'] = $json->fileID;

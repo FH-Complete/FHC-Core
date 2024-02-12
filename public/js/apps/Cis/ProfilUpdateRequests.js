@@ -55,7 +55,7 @@ const app = Vue.createApp({
         },
         //? adds tooltip with the status message of a profil update request if its status is not pending
         columnDefaults: {
-          tooltip: function (e, cell, onRendered) {
+          tooltip: (e, cell, onRendered) =>{
             //e - mouseover event
             //cell - cell component
             //onRendered - onRendered callback registration function
@@ -68,7 +68,8 @@ const app = Vue.createApp({
             let el = document.createElement("div");
             el.classList.add("border", "border-dark");
 
-            let statusDateEl = document.createElement("p");
+            let statusDateEl = document.createElement("span");
+            statusDateEl.classList.add("d-block","mb-1");
             statusDateEl.innerHTML =
               "Request was " + status + " on " + statusDate;
             let statusMessageEl = document.createElement("span");
@@ -240,7 +241,7 @@ const app = Vue.createApp({
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
-      sessionStorage.setItem("showAll", JSON.stringify(event.target.value));
+      sessionStorage.setItem("showAll", event.target.value);
     },
   },
   mounted() {
@@ -252,7 +253,7 @@ const app = Vue.createApp({
   },
   template: `
     <div>
-    
+  
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">Show </div>
 

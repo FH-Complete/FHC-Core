@@ -51,7 +51,13 @@ class Profil_update_model extends DB_Model
 
 	//? queries the tbl_profil_updates without permissions of the user
 	public function getProfilUpdatesWhere($whereClause){
-		
+		if(array_key_exists("uid",$whereClause)){
+			$whereClause["public.tbl_profil_update.uid"]= $whereClause["uid"];
+			unset($whereClause["uid"]);
+		}
+		$this->addSelect(["public.tbl_profil_update.*","public.tbl_person.vorname"]);
+		$this->addJoin("public.tbl_benutzer","public.tbl_benutzer.uid = public.tbl_profil_update.uid");
+		$this->addJoin("public.tbl_person","public.tbl_person.person_id = public.tbl_benutzer.person_id");
 		$res = $this->loadWhere($whereClause);
 		if(isError($res)){
 			return error("Could not load public.tbl_profil_update with whereClause");
@@ -86,10 +92,11 @@ class Profil_update_model extends DB_Model
 			$parameters = [];
 			$query="
 			SELECT
-			profil_update_id, uid, name, topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, status_timestamp, status_message, attachment_id 
+			profil_update_id, tbl_profil_update.uid, (tbl_person.vorname || ' ' || tbl_person.nachname) AS name , topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, status_timestamp, status_message, attachment_id 
 			FROM public.tbl_profil_update 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
 			JOIN public.tbl_prestudent ON public.tbl_prestudent.prestudent_id=public.tbl_student.prestudent_id
+			JOIN public.tbl_person ON public.tbl_prestudent.person_id=public.tbl_person.person_id
 			JOIN public.tbl_studiengang ON public.tbl_studiengang.studiengang_kz=public.tbl_prestudent.studiengang_kz
 			JOIN public.tbl_organisationseinheit ON public.tbl_organisationseinheit.oe_kurzbz=public.tbl_studiengang.oe_kurzbz
 			Where public.tbl_studiengang.oe_kurzbz IN ? ";
@@ -110,8 +117,10 @@ class Profil_update_model extends DB_Model
 			}
 		}
 		if($mitarbeiterBerechtigung) {
-			$this->addSelect(["profil_update_id", "uid", "name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "status_timestamp", "status_message", "attachment_id"]);
+			$this->addSelect(["profil_update_id", "tbl_profil_update.uid", "(tbl_person.vorname || ' ' || tbl_person.nachname) AS name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "status_timestamp", "status_message", "attachment_id"]);
 			$this->addJoin('tbl_mitarbeiter','tbl_mitarbeiter.mitarbeiter_uid=tbl_profil_update.uid');
+			$this->addJoin('tbl_benutzer','tbl_benutzer.uid=tbl_profil_update.uid');
+			$this->addJoin('tbl_person','tbl_benutzer.person_id=tbl_person.person_id');
 			$mitarbeiterRequests = $this->loadWhere($whereClause);
 			if(isError($mitarbeiterRequests)) return error("db error: ". getData($mitarbeiterRequests));
 			$mitarbeiterRequests = getData($mitarbeiterRequests)?:[]; 

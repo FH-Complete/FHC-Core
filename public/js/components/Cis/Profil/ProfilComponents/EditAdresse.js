@@ -8,7 +8,7 @@ export default {
     methods:{
         updateValue: function(event,bind){
             //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid 
-            if(bind ==="zustelladresse"){
+            if(bind ==="zustelladresse" || bind ==="heimatadresse"){
                 this.data[bind] = event.target.checked;
             }else{
                 this.data[bind] = event.target.value === "" ? null : event.target.value;
@@ -46,7 +46,26 @@ export default {
    
      <div class="gy-3 row justify-content-center align-items-center">
        
-    
+     <div class="col-12 ">
+        
+       
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" @change="updateValue($event,'zustelladresse')" :checked="data.zustelladresse" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Zustelladresse
+                </label>
+            </div>
+        
+       
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" @change="updateValue($event,'heimatadresse')" :checked="data.heimatadresse" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Heimatadresse
+                </label>
+            </div>
+            
+            
+        </div>
       
         <div  class="col-12 col-sm-9 col-xl-12 col-xxl-9 order-1">
 
@@ -92,14 +111,7 @@ export default {
         
             </div>
         </div>
-        <div class="col-12 order-5">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" @change="updateValue($event,'zustelladresse')" :checked="data.zustelladresse" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                    Zustelladresse
-                </label>
-            </div>
-        </div>
+       
     </div>
     `
 

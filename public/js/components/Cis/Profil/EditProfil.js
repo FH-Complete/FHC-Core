@@ -84,14 +84,14 @@ export default {
               this.topic,
               this.profilUpdate,
               this.editData.updateID,
-              this.fileID[0]
+              this.fileID? this.fileID[0]: null
             ).then((res) => {
               handleApiResponse(res);
             })
           : Vue.$fhcapi.ProfilUpdate.insertProfilRequest(
               this.topic,
               this.profilUpdate,
-              this.fileID[0]
+              this.fileID? this.fileID[0]: null
 
             ).then((res) => {
               handleApiResponse(res);
