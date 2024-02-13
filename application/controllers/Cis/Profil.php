@@ -557,8 +557,8 @@ class Profil extends Auth_Controller
 	private function getAdressenInfo($pid){
 		$adresse_res = null;
 		if (
-
-			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse","heimatadresse"])) &&
+			
+			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
 		) {

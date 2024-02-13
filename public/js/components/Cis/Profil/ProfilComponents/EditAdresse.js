@@ -14,7 +14,7 @@ export default {
     methods:{
         updateValue: function(event,bind){
             //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid 
-            if(bind ==="zustelladresse" || bind ==="heimatadresse"){
+            if(bind ==="zustelladresse" ){
                 this.data[bind] = event.target.checked;
             }else{
                 this.data[bind] = event.target.value === "" ? null : event.target.value;
@@ -63,12 +63,7 @@ export default {
             </div>
         
        
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" @change="updateValue($event,'heimatadresse')" :checked="data.heimatadresse" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                    Heimatadresse
-                </label>
-            </div>
+           
             
             
         </div>
