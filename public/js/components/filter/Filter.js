@@ -55,8 +55,6 @@ export const CoreFilterCmpt = {
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
-		// TODO check to remove
-		tabulatorAdditionalColumns: Array,
 		tableOnly: Boolean,
 		reload: Boolean,
 		download: {
@@ -141,15 +139,12 @@ export const CoreFilterCmpt = {
 				for (let col of columns)
 				{
 					// If the column has to be displayed or not
-					col.visible = selectedFields.indexOf(col.field) >= 0;
-					// TODO additionalCols wieder löschen?
-					// if (col.formatter == 'rowSelection')
-					// 	col.visible = true;
-					if (
-						col.formatter == 'rowSelection'
-						|| (this.tabulatorAdditionalColumns && this.tabulatorAdditionalColumns.indexOf(col.field) >= 0)
-					)
+					/* fields.indexOf(col.field) == -1; ensures displaying formatter colums
+					e.g. column with rowSelection checkboxes or with custom formatted action buttons */
+					col.visible = selectedFields.indexOf(col.field) >= 0 || fields.indexOf(col.field) == -1;
 
+					if (col.formatter == 'rowSelection')
+						col.visible = true;
 
 					if (col.hasOwnProperty('resizable'))
 						col.resizable = col.visible;
