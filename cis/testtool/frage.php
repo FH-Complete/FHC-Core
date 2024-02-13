@@ -148,6 +148,30 @@ echo '
 		alert(<?php echo "'".$p->t("testtool/alleFragenBeantwortet")."'"?>);
 		return true;
 	}
+	
+	$(document).ready(function () {
+		$(document).bind('cut copy paste', function(e)
+		{
+			if (document.querySelector('.frage'))
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("keydown", function (e)
+		{
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("contextmenu", function (e)
+		{
+			e.preventDefault();
+		});
+
+	});
 
 	//]]>
 	</script>
@@ -598,7 +622,7 @@ if($frage->frage_id!='')
 
 	$display_well = $frage->nummer == 0 ? '' : 'well'; // don't style frage 0 because this is always the introduction to gebiet
 	echo '
-		<div class="row">
+		<div class="row frage">
 			<div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8">
 				<div class="'. $display_well. ' text-center">'. $frage->text. '</div>
 			</div>

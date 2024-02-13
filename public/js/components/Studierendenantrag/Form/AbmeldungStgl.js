@@ -29,7 +29,8 @@ export default {
 			switch (this.data?.status)
 			{
 				case 'Erstellt': return 'info';
-				case 'Genehmigt': return 'success';
+				case 'Genehmigt':
+				case 'Abgemeldet': return 'success';
 				default: return 'info';
 			}
 		},

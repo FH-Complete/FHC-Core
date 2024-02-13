@@ -215,7 +215,13 @@ function loadampel()
 		        </td>
 		         <td valign="middle" align="center">
 					<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">
-		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $p->t('menu/suchePersonOrtDokumentInhalt');?> ..." title="<?php echo $p->t('menu/suchePersonOrtDokumentInhaltLang');?>"/>
+					<?php
+					if (defined('CIS_ALLOW_PERSON_SEARCH') && !CIS_ALLOW_PERSON_SEARCH)
+						$searchText = $p->t('menu/sucheOrtDokumentInhalt');
+					else
+						$searchText = $p->t('menu/suchePersonOrtDokumentInhalt');
+					?>
+		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $searchText ;?> ..." title="<?php echo $searchText ;?>"/>
 		        	<img src="../skin/images/search.png" onclick="document.searchform.submit()" class="suchicon"/>
 		        	</form>
 		        </td>

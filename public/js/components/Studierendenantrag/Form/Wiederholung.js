@@ -37,7 +37,8 @@ export default {
 			{
 				case 'Erstellt': return 'info';
 				case 'Genehmigt': return 'success';
-				case 'Verzichtet': return 'danger';
+				case 'Verzichtet':
+				case 'Abgemeldet': return 'danger';
 				default: return 'info';
 			}
 		},
