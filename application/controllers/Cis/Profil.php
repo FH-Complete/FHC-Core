@@ -20,9 +20,9 @@ class Profil extends Auth_Controller
 			'foto_sperre_function' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'getView' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'isMitarbeiter' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'isStudent' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
-			
-						
 		]);
 
 		
@@ -611,6 +611,26 @@ class Profil extends Auth_Controller
 
 		
 		return $zutrittskarte_ausgegebenam;
+	}
+
+	//? foreward declaration of the function isStudent in Student_model.php
+	public function isStudent($uid){
+		$result = $this->StudentModel->isStudent($uid);
+		if(!isSuccess($result)){
+			show_error("error when calling Student_model function isStudent with uid ".$uid);
+		}
+		$result = getData($result);
+		echo json_encode($result);
+	}
+
+	//? foreward declaration of the function isMitarbeiter in Mitarbeiter_model.php
+	public function isMitarbeiter($uid){
+		$result = $this->MitarbeiterModel->isMitarbeiter($uid);
+		if(!isSuccess($result)){
+			show_error("error when calling Mitarbeiter_model function isMitarbeiter with uid ".$uid);
+		}
+		$result = getData($result);
+		echo json_encode($result);
 	}
 
 }

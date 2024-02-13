@@ -91,10 +91,14 @@ export default {
       };
 
       //?TODO: check if updateRequest.uid is a mitarbeiter, if so add the flag isMitarbeiter:true
-      /* if(view === "EditAdresse"){
-        const getMitarbeiter = await Vue.$fhcapi.UserData.getMitarbeiter(updateRequest.uid);
-        console.log(getMitarbeiter);
-      } */
+      if(view === "EditAdresse"){
+        console.log("uid",updateRequest.uid);
+        const isMitarbeiter = await Vue.$fhcapi.UserData.isMitarbeiter(updateRequest.uid).then(res => res.data);
+        console.log(typeof(isMitarbeiter));
+        if(isMitarbeiter){
+          content['isMitarbeiter']=isMitarbeiter;
+        }
+      } 
 
       //? adds the status information if the profil update request was rejected or accepted
       if (updateRequest.status !== "pending") {

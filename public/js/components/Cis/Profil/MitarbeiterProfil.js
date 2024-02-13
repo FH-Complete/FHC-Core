@@ -273,7 +273,7 @@ export default {
               <div v-if="data.profilUpdates" class="row mb-3">
                 <div class="col">
                   <!-- MOBILE PROFIL UPDATES -->  
-                  <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                  <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
                 </div>
               </div>
 
@@ -438,7 +438,7 @@ export default {
   
   
                     <!-- PROFIL UPDATES -->
-                    <fetch-profil-updates @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                    <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
                 
                 </div>    
                 </div>
