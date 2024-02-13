@@ -22,6 +22,7 @@ class Profil extends Auth_Controller
 			'View' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'isMitarbeiter' => ['student/anrechnung_beantragen:r', 'user:r'],
 			'isStudent' => ['student/anrechnung_beantragen:r', 'user:r'],
+			'getZustellAdresse' => ['student/anrechnung_beantragen:r', 'user:r'],
 			
 		]);
 
@@ -68,6 +69,36 @@ class Profil extends Auth_Controller
 			$this->load->view('Cis/Profil');
 		}
 
+	}
+
+	//? foreward declaration of the function isStudent in Student_model.php
+	public function isStudent($uid){
+		$result = $this->StudentModel->isStudent($uid);
+		if(!isSuccess($result)){
+			show_error("error when calling Student_model function isStudent with uid ".$uid);
+		}
+		$result = getData($result);
+		echo json_encode($result);
+	}
+
+	//? foreward declaration of the function isMitarbeiter in Mitarbeiter_model.php
+	public function isMitarbeiter($uid){
+		$result = $this->MitarbeiterModel->isMitarbeiter($uid);
+		if(!isSuccess($result)){
+			show_error("error when calling Mitarbeiter_model function isMitarbeiter with uid ".$uid);
+		}
+		$result = getData($result);
+		echo json_encode($result);
+	}
+
+	public function getZustellAdresse(){
+		$this->AdresseModel->addSelect(["adresse_id"]);
+		$adressen_res = $this->AdresseModel->loadWhere(['person_id'=>$this->pid, 'zustelladresse'=>true]);
+		$adressen_res = hasData($adressen_res) ? getData($adressen_res): null;
+		$adressen_res = array_map(function($item){
+			return $item->adresse_id;
+		},$adressen_res);
+		echo json_encode($adressen_res);
 	}
 
 
@@ -557,7 +588,7 @@ class Profil extends Auth_Controller
 	private function getAdressenInfo($pid){
 		$adresse_res = null;
 		if (
-			
+
 			isSuccess($adresse_res = $this->AdresseModel->addSelect(["adresse_id","strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort","zustelladresse"])) &&
 			isSuccess($adresse_res = $this->AdresseModel->addOrder("zustelladresse", "DESC")) &&
 			isSuccess($adresse_res = $this->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz"))
@@ -613,24 +644,6 @@ class Profil extends Auth_Controller
 		return $zutrittskarte_ausgegebenam;
 	}
 
-	//? foreward declaration of the function isStudent in Student_model.php
-	public function isStudent($uid){
-		$result = $this->StudentModel->isStudent($uid);
-		if(!isSuccess($result)){
-			show_error("error when calling Student_model function isStudent with uid ".$uid);
-		}
-		$result = getData($result);
-		echo json_encode($result);
-	}
-
-	//? foreward declaration of the function isMitarbeiter in Mitarbeiter_model.php
-	public function isMitarbeiter($uid){
-		$result = $this->MitarbeiterModel->isMitarbeiter($uid);
-		if(!isSuccess($result)){
-			show_error("error when calling Mitarbeiter_model function isMitarbeiter with uid ".$uid);
-		}
-		$result = getData($result);
-		echo json_encode($result);
-	}
+	
 
 }

@@ -36,4 +36,11 @@ export default {
       `cis.php/Cis/Profil/isMitarbeiter/${uid}`;
     return axios.get(url);
   },
+
+  getZustellAdresse: function () {
+    const url =
+      FHC_JS_DATA_STORAGE_OBJECT.app_root +
+      `cis.php/Cis/Profil/getZustellAdresse`;
+    return axios.get(url);
+  },
 };

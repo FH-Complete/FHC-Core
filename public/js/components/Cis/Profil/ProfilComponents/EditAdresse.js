@@ -9,6 +9,7 @@ export default {
     data(){
         return{
             originalValue:null,
+            zustellAdressenCount:null,
         }
     },
     methods:{
@@ -24,6 +25,20 @@ export default {
         },
     },
     computed:{
+        showZustellAdressenWarning: function(){
+            if(this.zustellAdressenCount){
+                
+                if(this.zustellAdressenCount.includes(this.data.adresse_id)){
+                    //? if the adresse was already saved
+                    return false;
+                }
+                return this.zustellAdressenCount > 0 && this.data.zustelladresse;
+            }
+            //? if this.zustellAdressenCount is still not set by the api call and is still null
+            return false;
+            
+
+        },
         ortLayoutClasses: function(){
             return this.showKontaktTyp?[
                 'col-12', 
@@ -45,13 +60,25 @@ export default {
         },
     },
     created(){
+        Vue.$fhcapi.UserData.getZustellAdresse().then(res => {
+            
+            this.zustellAdressenCount = res.data;
+        })
         this.originalValue = JSON.stringify(this.data);
         
     },
     template:`
    
      <div class="gy-3 row justify-content-center align-items-center">
-       
+     
+     
+     <div v-if="showZustellAdressenWarning" class="col-12 ">
+     <div class="card bg-danger mx-2">
+     <div class="card-body text-white ">
+     <span>!Achtung: Eine deiner Adressen ist bereits als Zustelladresse gespeichert, sind sie sicher, dass sie die aktuelle Adresse stattdessen als Zustelladresse speichern wollen?</span>
+     </div>
+     </div>
+     </div>
      <div class="col-12 ">
         
        

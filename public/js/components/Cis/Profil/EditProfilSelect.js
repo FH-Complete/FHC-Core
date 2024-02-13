@@ -71,7 +71,7 @@ export default {
               typ: null,
               plz: null,
               ort: null,
-              zustelladresse:null,
+              zustelladresse:false,
             }
           : {
               //? add flag
