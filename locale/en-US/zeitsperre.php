@@ -26,6 +26,7 @@ $this->phrasen['zeitsperre/vonDatumMonat']='From-date month';
 $this->phrasen['zeitsperre/bisDatumMonat']='To-date month';
 $this->phrasen['zeitsperre/istGroesserAlsBisDatum']='is later than To-date';
 $this->phrasen['zeitsperre/vonDatum']='From-date';
+$this->phrasen['zeitsperre/bisDatumGroesserMax']='TO-Date value is too far in the future, action not permitted';
 
 $this->phrasen['zeitsperre/resturlaubstage']='Carry-over days';
 $this->phrasen['zeitsperre/aktuellerStand']='Available vacation';

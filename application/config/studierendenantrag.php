@@ -110,11 +110,10 @@ $config['abmeldung_job_deadline_date_modifier'] = '+2 weeks';
 
 /**
  * System User - uid of a user that is allowed to set prestudentstatus
- * TODO(chris): DEBUG! CHANGE THIS!
  *
  * @var string
  */
-$config['antrag_job_systemuser'] = 'ma0168';
+$config['antrag_job_systemuser'] = '';
 
 
 /**
@@ -160,3 +159,11 @@ $config['stgkz_blacklist_unterbrechung'] = [];
  * @var array           An array of tbl_studiengang.studiengang_kz's
  */
 $config['stgkz_blacklist_wiederholung'] = [];
+
+/**
+ * Blacklisted noten for negative committee exams
+ * noten with this ids won't be seen as negative
+ *
+ * @var array           An array of noten ids
+ */
+$config['note_blacklist_wiederholung'] = [];

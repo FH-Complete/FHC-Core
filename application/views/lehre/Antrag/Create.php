@@ -11,7 +11,7 @@ $sitesettings = array(
 	'customJSModules' => array('public/js/apps/lehre/Antrag.js'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
-		'vendor/vuepic/vue-datepicker-css/main.css'
+		'vendor/vuejs/vuedatepicker_css/main.css'
 	),
 	'customJSs' => array(
 	)
@@ -35,13 +35,13 @@ $this->load->view(
 				antrag-type="<?= $antrag_type; ?>"
 				studierendenantrag-id="<?= $studierendenantrag_id; ?>"
 				v-model:info-array="infoArray"
-				v-model:status-msg="statusMsg"
-				v-model:status-severity="statusSeverity"
+				v-model:status-msg="status.msg"
+				v-model:status-severity="status.severity"
 				>
 			</studierendenantrag-antrag>
 		</div>
 		<div class="col-sm-4 mb-3">
-			<studierendenantrag-status :msg="statusMsg" :severity="statusSeverity"></studierendenantrag-status>
+			<studierendenantrag-status :msg="status.msg" :severity="status.severity"></studierendenantrag-status>
 			<studierendenantrag-infoblock :infos="infoArray"></studierendenantrag-infoblock>
 		</div>
 	</div>

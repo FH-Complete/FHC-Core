@@ -14,6 +14,7 @@ class Studierendenantragstatus_model extends DB_Model
 	const STATUS_REQUESTSENT_2 = 'ZweiteAufforderungVersandt';
 	const STATUS_OBJECTED = 'Beeinsprucht';
 	const STATUS_OBJECTION_DENIED = 'EinspruchAbgelehnt';
+	const STATUS_DEREGISTERED = 'Abgemeldet';
 
 	/**
 	 * Constructor

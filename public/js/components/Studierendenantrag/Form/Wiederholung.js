@@ -1,6 +1,5 @@
 import {CoreFetchCmpt} from '../../Fetch.js';
 import VueDatepicker from '../../vueDatepicker.js.php';
-import Phrasen from '../../../mixins/Phrasen.js';
 
 var _uuid = 0;
 
@@ -9,9 +8,6 @@ export default {
 		CoreFetchCmpt,
 		VueDatepicker
 	},
-	mixins: [
-		Phrasen
-	],
 	emits: [
 		'setInfos',
 		'setStatus',
@@ -67,11 +63,11 @@ export default {
 					this.data = result.data.retval;
 					if (!this.data.status || this.data.status == 'ErsteAufforderungVersandt' || this.data.status == 'ZweiteAufforderungVersandt') {
 						this.data.status = 'Offen';
-						this.data.statustyp = this.p.t('studierendenantrag', 'status_open');
+						this.data.statustyp = this.$p.t('studierendenantrag', 'status_open');
 					}
 					this.$emit('update:status', this.data.status);
 					this.$emit("setStatus", {
-						msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+						msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 						severity: this.statusSeverity
 					});
 					return result;
@@ -89,7 +85,7 @@ export default {
 			let nextState = repeat ? 'Erstellt' : 'Verzichtet';
 
 			this.$emit('setStatus', {
-				msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_saving')}),
+				msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_saving')})),
 				severity: 'warning'
 			});
 			this.saving = true;
@@ -116,7 +112,7 @@ export default {
 								this.errors.default.push(result.data.retval[k]);
 						}
 						this.$emit('setStatus', {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.p.t('studierendenantrag', 'status_error')}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.$p.t('studierendenantrag', 'status_error')})),
 							severity: 'danger'
 						});
 					}
@@ -129,7 +125,7 @@ export default {
 							this.data.status = nextState;
 						this.$emit('update:status', this.data.status);
 						this.$emit("setStatus", {
-							msg: this.p.t_ref('studierendenantrag', 'status_x', {status: this.data.statustyp}),
+							msg: Vue.computed(() => this.$p.t('studierendenantrag', 'status_x', {status: this.data.statustyp})),
 							severity: this.statusSeverity
 						});
 					}
@@ -143,7 +139,7 @@ export default {
 	},
 	mounted() {
 		this.infos = [...Array(5).keys()].map(n => ({
-			body: this.p.t_ref('studierendenantrag', 'infotext_Wiederholung_' + n)
+			body: Vue.computed(() => this.$p.t('studierendenantrag', 'infotext_Wiederholung_' + n))
 		}));
 		this.$emit('setInfos', this.infos);
 	},
@@ -156,27 +152,27 @@ export default {
 					</div>
 					<table class="table">
 						<tr>
-							<th>{{p.t('lehre', 'studiengang')}}</th>
+							<th>{{$p.t('lehre', 'studiengang')}}</th>
 							<td align="right">{{data.bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('lehre', 'organisationsform')}}</th>
+							<th>{{$p.t('lehre', 'organisationsform')}}</th>
 							<td align="right">{{data.orgform_bezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
+							<th>{{$p.t('projektarbeitsbeurteilung', 'nameStudierende')}}</th>
 							<td align="right">{{data.name}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('person', 'personenkennzeichen')}}</th>
+							<th>{{$p.t('person', 'personenkennzeichen')}}</th>
 							<td align="right">{{data.matrikelnr}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('studierendenantrag', 'antrag_Wiederholung_pruefung')}}</th>
+							<th>{{$p.t('studierendenantrag', 'antrag_Wiederholung_pruefung')}}</th>
 							<td align="right">{{data.lvbezeichnung}}</td>
 						</tr>
 						<tr>
-							<th>{{p.t('studierendenantrag', 'antrag_Wiederholung_pruefung_date')}}</th>
+							<th>{{$p.t('studierendenantrag', 'antrag_Wiederholung_pruefung_date')}}</th>
 							<td align="right">{{datumPruefungFormatted}}</td>
 						</tr>
 					</table>
@@ -190,7 +186,7 @@ export default {
 						@click="createAntrag"
 						:disabled="saving"
 					>
-						{{p.t('studierendenantrag/antrag_Wiederholung_button_yes')}}
+						{{$p.t('studierendenantrag/antrag_Wiederholung_button_yes')}}
 					</button>
 <!--					<button
 						v-if="!data.studierendenantrag_id || data.status == 'Offen'"
@@ -199,7 +195,7 @@ export default {
 						@click="cancelAntrag"
 						:disabled="saving"
 					>
-						{{p.t('studierendenantrag/antrag_Wiederholung_button_no')}}
+						{{$p.t('studierendenantrag/antrag_Wiederholung_button_no')}}
 					</button>-->
 				</div>
 			</div>
